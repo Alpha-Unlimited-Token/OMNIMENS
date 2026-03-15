@@ -11,6 +11,7 @@ export type StreamedMessage = {
 export function useSuperAIStream(sessionId: number) {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamedMessages, setStreamedMessages] = useState<StreamedMessage[]>([]);
+  const [activeAgent, setActiveAgent] = useState<StreamedMessage['agentName'] | null>(null);
   const queryClient = useQueryClient();
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -23,6 +24,7 @@ export function useSuperAIStream(sessionId: number) {
   const startStream = async (rounds: number = 3) => {
     setIsStreaming(true);
     setStreamedMessages([]);
+    setActiveAgent(null);
     abortControllerRef.current = new AbortController();
 
     try {
@@ -64,7 +66,16 @@ export function useSuperAIStream(sessionId: number) {
 
             if (parsed.done || parsed.type === 'done') {
               finished = true;
+              setActiveAgent(null);
               break;
+            }
+
+            if (parsed.type === 'agent_start' && parsed.agent) {
+              setActiveAgent(parsed.agent as StreamedMessage['agentName']);
+            }
+
+            if (parsed.type === 'agent_done') {
+              setActiveAgent(null);
             }
 
             if (parsed.type === 'message' && parsed.agent && parsed.content) {
@@ -97,5 +108,5 @@ export function useSuperAIStream(sessionId: number) {
     }
   };
 
-  return { startStream, isStreaming, streamedMessages };
+  return { startStream, isStreaming, streamedMessages, activeAgent };
 }

@@ -173,17 +173,13 @@ export default function SessionPage() {
 
   const { data: sessionData, isLoading } = useGetSuperAISession(sessionId);
   const { mutateAsync: deleteSession, isPending: isDeleting } = useDeleteSuperAISession();
-  const { startStream, isStreaming, streamedMessages } = useSuperAIStream(sessionId);
+  const { startStream, isStreaming, streamedMessages, activeAgent } = useSuperAIStream(sessionId);
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const isCompleted = sessionData?.status === "completed";
   const displayMessages = [...(sessionData?.messages || [])];
   const allMessages = [...displayMessages, ...streamedMessages];
-
-  const activeAgent = isStreaming && streamedMessages.length > 0
-    ? (streamedMessages[streamedMessages.length - 1].agentName as AgentKey)
-    : null;
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
