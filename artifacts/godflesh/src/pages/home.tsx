@@ -84,7 +84,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-display font-bold tracking-widest text-white/90 uppercase">
-              Architected by Six Agents
+              Not Trained. Transcended.
             </h2>
             <div className="w-24 h-1 bg-primary mx-auto mt-6 rounded-full shadow-[0_0_10px_rgba(204,0,0,0.5)]" />
           </div>
