@@ -368,6 +368,9 @@ export default function SessionPage() {
   const [, setLocation] = useLocation();
   const [mobilePanel, setMobilePanel] = useState<"conversation" | "code">("conversation");
   const [isClearingLab, setIsClearingLab] = useState(false);
+  const [continuationPrompt, setContinuationPrompt] = useState("");
+  const [continuationRounds, setContinuationRounds] = useState(3);
+  const [showContinue, setShowContinue] = useState(false);
 
   const { data: sessionData, isLoading } = useGetSuperAISession(sessionId);
   const { mutateAsync: deleteSession, isPending: isDeleting } = useDeleteSuperAISession();
@@ -958,31 +961,125 @@ export default function SessionPage() {
       </div>
 
       {/* Footer */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 px-4 py-4 border-t border-white/5 flex justify-center items-center gap-3 bg-background/95 backdrop-blur-xl">
-        {canStart && (
-          <button
-            onClick={() => startStream(3)}
-            className="group flex items-center justify-center w-full md:w-auto gap-3 px-10 py-4 bg-blue-500 text-white font-bold tracking-widest rounded-2xl hover:bg-blue-400 hover:shadow-[0_0_40px_rgba(96,165,250,0.5)] transition-all text-sm"
-          >
-            <Play className="w-5 h-5 fill-current" />
-            {isRunningInBackground
-              ? "RECONNECT LIVE — SESSION IN PROGRESS"
-              : isCodeMode
-              ? "LAUNCH CODE LAB — 6 AGENTS LIVE"
-              : "ACTIVATE 6-AGENT SUPER AI COUNCIL"}
-          </button>
-        )}
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/5 bg-background/95 backdrop-blur-xl">
 
-        {isCompleted && (
-          <Link
-            href={`/blueprint/${sessionId}`}
-            className="group flex items-center justify-center w-full md:w-auto gap-3 px-10 py-4 bg-purple-500 text-white font-bold tracking-widest rounded-2xl hover:bg-purple-400 hover:shadow-[0_0_40px_rgba(192,132,252,0.5)] transition-all text-sm"
-          >
-            <CheckCircle2 className="w-5 h-5" />
-            {isCodeMode ? "VIEW SYSTEM REPORT" : "VIEW FINAL BLUEPRINT"}
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        )}
+        {/* Continue Building Panel — expands from bottom when toggled */}
+        <AnimatePresence>
+          {showContinue && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden border-b border-white/10"
+            >
+              <div className="max-w-5xl mx-auto px-4 py-4">
+                <p className="text-[10px] font-bold tracking-[0.2em] text-emerald-400 uppercase mb-2 flex items-center gap-1.5">
+                  <Sparkles className="w-3 h-3" />
+                  New Upgrade Directive — agents will build on all prior work
+                </p>
+                <div className="flex gap-2">
+                  <textarea
+                    value={continuationPrompt}
+                    onChange={(e) => setContinuationPrompt(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        if (!continuationPrompt.trim() || isStreaming) return;
+                        startStream(continuationRounds, continuationPrompt.trim());
+                        setContinuationPrompt("");
+                        setShowContinue(false);
+                      }
+                    }}
+                    placeholder="e.g. Add a real-time self-learning module, optimize for 10× speed, integrate quantum-inspired algorithms..."
+                    rows={2}
+                    disabled={isStreaming}
+                    className="flex-1 bg-black/60 border border-white/10 focus:border-emerald-400/50 focus:ring-1 focus:ring-emerald-400/30 rounded-xl px-4 py-3 text-white font-mono text-sm resize-none outline-none transition-all placeholder:text-white/20 disabled:opacity-40"
+                  />
+                  <div className="flex flex-col gap-2 shrink-0">
+                    {/* Round selector */}
+                    <select
+                      value={continuationRounds}
+                      onChange={(e) => setContinuationRounds(Number(e.target.value))}
+                      disabled={isStreaming}
+                      className="bg-black/60 border border-white/10 text-white/60 text-[10px] font-mono rounded-xl px-3 py-2 outline-none disabled:opacity-40 cursor-pointer"
+                    >
+                      <option value={1}>1 round</option>
+                      <option value={2}>2 rounds</option>
+                      <option value={3}>3 rounds</option>
+                      <option value={4}>4 rounds</option>
+                      <option value={5}>5 rounds</option>
+                    </select>
+                    <button
+                      onClick={() => {
+                        if (!continuationPrompt.trim() || isStreaming) return;
+                        startStream(continuationRounds, continuationPrompt.trim());
+                        setContinuationPrompt("");
+                        setShowContinue(false);
+                      }}
+                      disabled={!continuationPrompt.trim() || isStreaming}
+                      className="flex items-center justify-center gap-2 px-5 py-2 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed text-black font-bold text-[11px] tracking-widest rounded-xl transition-all"
+                    >
+                      <Play className="w-3.5 h-3.5 fill-current" />
+                      LAUNCH
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Main footer bar */}
+        <div className="px-4 py-4 flex justify-center items-center gap-3 max-w-5xl mx-auto">
+          {canStart && (
+            <button
+              onClick={() => startStream(3)}
+              className="group flex items-center justify-center w-full md:w-auto gap-3 px-10 py-4 bg-blue-500 text-white font-bold tracking-widest rounded-2xl hover:bg-blue-400 hover:shadow-[0_0_40px_rgba(96,165,250,0.5)] transition-all text-sm"
+            >
+              <Play className="w-5 h-5 fill-current" />
+              {isRunningInBackground
+                ? "RECONNECT LIVE — SESSION IN PROGRESS"
+                : isCodeMode
+                ? "LAUNCH CODE LAB — 6 AGENTS LIVE"
+                : "ACTIVATE 6-AGENT SUPER AI COUNCIL"}
+            </button>
+          )}
+
+          {/* Continue Building button — available when not streaming */}
+          {!isStreaming && !canStart && (
+            <button
+              onClick={() => setShowContinue((v) => !v)}
+              className={cn(
+                "group flex items-center justify-center gap-2.5 px-7 py-4 font-bold tracking-widest rounded-2xl transition-all text-sm border",
+                showContinue
+                  ? "bg-emerald-500/20 border-emerald-400/40 text-emerald-300"
+                  : "bg-emerald-500/10 border-emerald-400/20 text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-400/40"
+              )}
+            >
+              <RotateCcw className="w-4 h-4" />
+              {showContinue ? "CLOSE" : "CONTINUE BUILDING"}
+            </button>
+          )}
+
+          {isCompleted && (
+            <Link
+              href={`/blueprint/${sessionId}`}
+              className="group flex items-center justify-center w-full md:w-auto gap-3 px-8 py-4 bg-purple-500 text-white font-bold tracking-widest rounded-2xl hover:bg-purple-400 hover:shadow-[0_0_40px_rgba(192,132,252,0.5)] transition-all text-sm"
+            >
+              <CheckCircle2 className="w-5 h-5" />
+              {isCodeMode ? "VIEW SYSTEM REPORT" : "VIEW FINAL BLUEPRINT"}
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          )}
+
+          {isStreaming && (
+            <div className="flex items-center gap-2.5 text-blue-400/60 font-mono text-xs tracking-widest px-4">
+              <Sparkles className="w-4 h-4 animate-pulse" />
+              AGENTS RUNNING — DIRECTIVE IN PROGRESS
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

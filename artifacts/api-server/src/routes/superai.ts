@@ -594,6 +594,7 @@ const ALL_AGENTS: AgentName[] = ["Architect", "Mathematician", "Neuroscientist",
 router.post("/superai/sessions/:id/run", async (req, res) => {
   const id = Number(req.params.id);
   const rounds = Math.min(Math.max(Number(req.body?.rounds) || 3, 1), 5);
+  const continuationPrompt: string | undefined = req.body?.continuationPrompt?.trim() || undefined;
 
   const [session] = await db.select().from(superAISessions).where(eq(superAISessions.id, id));
   if (!session) { res.status(404).json({ error: "Session not found" }); return; }
@@ -667,13 +668,23 @@ router.post("/superai/sessions/:id/run", async (req, res) => {
 
   const isCodeMode = session.mode === "code";
 
+  // Build effective topic — original topic plus optional continuation directive
+  const effectiveTopic = continuationPrompt
+    ? `${session.topic}\n\n=== NEW UPGRADE DIRECTIVE FROM OWNER ===\n${continuationPrompt}\n\nAll agents must focus their work this run on fulfilling this directive while preserving and building upon all prior code.`
+    : session.topic;
+
+  // Emit the continuation directive as a status event so the UI can display it
+  if (continuationPrompt) {
+    bgSend({ type: "continuation_directive", prompt: continuationPrompt });
+  }
+
   // Launch the session in the background — not awaited, runs independently
   (async () => {
     try {
       if (isCodeMode) {
-        await runCodeMode(id, session.topic, rounds, bgSend);
+        await runCodeMode(id, effectiveTopic, rounds, bgSend);
       } else {
-        await runBlueprintMode(id, session.topic, rounds, bgSend);
+        await runBlueprintMode(id, effectiveTopic, rounds, bgSend);
       }
     } catch (err) {
       console.error(`[Session ${id}] Fatal error:`, err);

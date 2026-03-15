@@ -103,7 +103,7 @@ export function useSuperAIStream(sessionId: number) {
     };
   }, []);
 
-  const startStream = async (rounds: number = 3) => {
+  const startStream = async (rounds: number = 3, continuationPrompt?: string) => {
     setIsStreaming(true);
     setStreamedMessages([]);
     setActiveAgent(null);
@@ -128,7 +128,7 @@ export function useSuperAIStream(sessionId: number) {
       const res = await fetch(`/api/superai/sessions/${sessionId}/run`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rounds }),
+        body: JSON.stringify({ rounds, continuationPrompt }),
         signal: abortControllerRef.current.signal,
       });
 
