@@ -127,18 +127,29 @@ export interface GetCurrentAuthUserResponse {
 }
 
 export interface GodflesUserStatus {
+  tier: string;
+  isOwner: boolean;
   messagesUsedToday: number;
-  dailyLimit: number;
+  messagesUsedThisMonth: number | null;
+  dailyLimit: number | null;
+  monthlyLimit: number | null;
   isPro: boolean;
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
 }
 
 export interface GodfleshPricing {
+  id: string;
+  name: string;
+  tagline: string;
   priceId: string;
   amount: number;
   currency: string;
   interval: string;
+  monthlyLimit: number | null;
+  dailyLimit: number | null;
+  popular?: boolean;
+  features: string[];
 }
 
 export interface GodfleshCheckoutSession {
@@ -151,4 +162,13 @@ export interface GodfleshPortalSession {
 
 export type CreateGodfleshCheckoutBody = {
   priceId: string;
+};
+
+export type VerifyGodfleshSessionBody = {
+  sessionId: string;
+};
+
+export interface GodfleshVerifySessionResult {
+  ok: boolean;
+  tier: string;
 };

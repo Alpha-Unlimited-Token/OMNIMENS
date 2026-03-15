@@ -1,6 +1,7 @@
 import { pgTable, serial, text, integer, timestamp, boolean, real, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 
+// tier: "free" | "seeker" | "oracle" | "sovereign"
 export const godfleshUsers = pgTable("godflesh_users", {
   id: text("id").primaryKey(),
   username: text("username"),
@@ -8,6 +9,7 @@ export const godfleshUsers = pgTable("godflesh_users", {
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   isPro: boolean("is_pro").default(false).notNull(),
+  tier: text("tier").default("free").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

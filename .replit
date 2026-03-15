@@ -20,6 +20,7 @@ runButton = "Project"
 [agent]
 stack = "PNPM_WORKSPACE"
 expertMode = true
+integrations = ["stripe:1.0.0"]
 
 [postMerge]
 path = "scripts/post-merge.sh"
@@ -27,3 +28,12 @@ timeoutMs = 20000
 
 [nix]
 channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+STRIPE_PRICE_SEEKER = "price_1TBO1aIoyf122ZOhzYHZ9A58"
+STRIPE_PRICE_ORACLE = "price_1TBO1bIoyf122ZOhXMEr60Js"
+STRIPE_PRICE_SOVEREIGN = "price_1TBO1bIoyf122ZOhJ5hNVocU"
+STRIPE_SECRET_KEY = "sk_test_51TBMhgIoyf122ZOhMQdGEHb05ZrflHoRWyER6IreG5NwAys1ouy2cYgkwQXxARPepwhur1QLSdyQ9EgdLYJpCak700eLzFyHbs"
+STRIPE_PUBLISHABLE_KEY = "pk_test_51TBMhgIoyf122ZOheTYgUJwGkjvL2o5QYguayj7GAB7NYEVngwfriQ04OvG1am682bhfhHpHJnOtZnmdmrlMFhch00uuqaXu5M"

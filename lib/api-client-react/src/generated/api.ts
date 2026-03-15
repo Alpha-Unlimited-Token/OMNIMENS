@@ -25,6 +25,7 @@ import type {
   GodfleshCheckoutSession,
   GodfleshPortalSession,
   GodfleshPricing,
+  GodfleshVerifySessionResult,
   HealthStatus,
   OpenaiConversation,
   OpenaiConversationWithMessages,
@@ -36,6 +37,7 @@ import type {
   SuperAIError,
   SuperAISession,
   SuperAISessionWithMessages,
+  VerifyGodfleshSessionBody,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -1538,3 +1540,28 @@ export function useGetSuperAIBlueprint<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+// ─── Verify Stripe checkout session ──────────────────────────────────────────
+
+export const verifyGodfleshSession = async (
+  body: VerifyGodfleshSessionBody,
+  options?: RequestInit,
+): Promise<GodfleshVerifySessionResult> => {
+  return customFetch<GodfleshVerifySessionResult>(`/api/godflesh/verify-session`, {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(body),
+  });
+};
+
+export const useVerifyGodfleshSession = () => {
+  return useMutation<
+    GodfleshVerifySessionResult,
+    ErrorType<void>,
+    { data: VerifyGodfleshSessionBody }
+  >({
+    mutationKey: ["verifyGodfleshSession"],
+    mutationFn: ({ data }) => verifyGodfleshSession(data),
+  });
+};

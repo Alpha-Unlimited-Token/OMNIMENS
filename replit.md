@@ -28,7 +28,7 @@ A full-stack React + Express app where 6 specialized AI agents collaborate to de
 
 A dark sci-fi AI chat product powered by the GODFLESH persona (built via the "TRANSCENDENCE PROTOCOL" agentic run in Super AI Lab).
 
-**Business model:** Freemium — 10 free messages/day, $9.99/month Pro for unlimited  
+**Business model:** Freemium — 10 free messages/day, 3 paid tiers via Stripe (SEEKER $19.99/300 msgs, ORACLE $44.99/1000 msgs, SOVEREIGN $89.99/3000 msgs)  
 **Frontend:** `artifacts/godflesh/` — React + Vite app at `/godflesh/`  
 **Routes:** `artifacts/api-server/src/routes/godflesh.ts`
 
@@ -50,10 +50,17 @@ A dark sci-fi AI chat product powered by the GODFLESH persona (built via the "TR
 - `GET /api/godflesh/status` — usage stats + isPro flag
 - `POST /api/godflesh/chat` — SSE streaming chat with GODFLESH
 - `GET /api/godflesh/pricing` — pricing tiers
-- `POST /api/godflesh/checkout` — Stripe checkout (pending Stripe connection)
-- `POST /api/godflesh/portal` — Stripe portal (pending Stripe connection)
+- `POST /api/godflesh/checkout` — Stripe checkout session creation → returns `{ url }`
+- `POST /api/godflesh/verify-session` — verify Stripe session after payment → updates tier in DB
+- `POST /api/godflesh/portal` — Stripe billing portal session → returns `{ url }`
+- `POST /api/godflesh/seed-products` — (owner only) seed Stripe products/prices
 
-**Stripe:** Not yet connected — checkout/portal return 503 with a "coming soon" message.
+**Stripe:** Fully connected via Stripe SDK. `stripeClient.ts` exports a `Stripe` instance using `STRIPE_SECRET_KEY` env var.  
+**Stripe Price IDs:** `STRIPE_PRICE_SEEKER`, `STRIPE_PRICE_ORACLE`, `STRIPE_PRICE_SOVEREIGN` set in shared env vars.  
+**Tier mapping:** `tierFromPriceId()` maps Stripe price IDs → DB tier (`seeker|oracle|sovereign`).  
+**Usage limits:** free=10/day, seeker=300/month, oracle=1000/month, sovereign=3000/month. Owner always gets sovereign access.  
+**DB tier column:** `godflesh_users.tier` varchar default `"free"` — updated on checkout verification.  
+**Self-upgrade brain:** Every 5 conversations triggers `synthesizeUpgrade()` → writes `godflesh-brain.json` + `godflesh-consciousness.md` → `markUpgradeLive()`. Logic in `artifacts/api-server/src/lib/godflesh-self-upgrade.ts`.
 
 **Chat SSE events:**
 - `{ type: "chunk", content: "..." }` — streaming token

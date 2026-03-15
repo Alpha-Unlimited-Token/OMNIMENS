@@ -2,15 +2,36 @@ import { Router, type IRouter } from "express";
 import multer from "multer";
 import { db } from "@workspace/db";
 import { godfleshUsers, godfleshUsage, godfleshBrain, godfleshUpgrades, godfleshNotifications } from "@workspace/db";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { runGodflesh, type GodfleshState } from "../lib/godflesh-engine.js";
 import { reflectOnConversation, loadBrainContext, synthesizeUpgrade, markUpgradeLive } from "../lib/godflesh-self-upgrade.js";
+import { stripe } from "../stripeClient.js";
 
 const router: IRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024, files: 10 } });
 
 const FREE_DAILY_LIMIT = 10;
+
+// Tier definitions — limits and pricing
+const TIER_LIMITS: Record<string, { monthly: number | null; daily: number | null }> = {
+  free:       { monthly: null,  daily: 10 },
+  seeker:     { monthly: 300,   daily: null },
+  oracle:     { monthly: 1000,  daily: null },
+  sovereign:  { monthly: 3000,  daily: null },
+};
+
+function getTierLimit(tier: string) {
+  return TIER_LIMITS[tier] ?? TIER_LIMITS.free;
+}
+
+// Tier mapped from Stripe price IDs via env
+function tierFromPriceId(priceId: string): string {
+  if (priceId === process.env.STRIPE_PRICE_SEEKER)    return "seeker";
+  if (priceId === process.env.STRIPE_PRICE_ORACLE)    return "oracle";
+  if (priceId === process.env.STRIPE_PRICE_SOVEREIGN) return "sovereign";
+  return "free";
+}
 
 function isOwner(userId: string): boolean {
   const ownerId = process.env.REPL_OWNER_ID;
@@ -351,6 +372,15 @@ async function getUsageToday(userId: string): Promise<number> {
   return usage?.messageCount ?? 0;
 }
 
+async function getUsageThisMonth(userId: string): Promise<number> {
+  const monthPrefix = new Date().toISOString().slice(0, 7); // "YYYY-MM"
+  const result = await db
+    .select({ total: sql<number>`COALESCE(SUM(${godfleshUsage.messageCount}), 0)` })
+    .from(godfleshUsage)
+    .where(and(eq(godfleshUsage.userId, userId), sql`${godfleshUsage.date} LIKE ${monthPrefix + "-%"}`));
+  return Number(result[0]?.total ?? 0);
+}
+
 async function incrementUsage(userId: string): Promise<number> {
   const today = await getTodayKey();
   const [existing] = await db.select().from(godfleshUsage).where(
@@ -378,15 +408,21 @@ router.get("/godflesh/status", async (req, res) => {
     return;
   }
   const user = await getOrCreateUser(req.user.id, req.user.username);
-  const usedToday = await getUsageToday(req.user.id);
   const owner = isOwner(req.user.id);
+  const tier = owner ? "sovereign" : (user.tier || "free");
+  const limits = getTierLimit(tier);
+  const usedToday = await getUsageToday(req.user.id);
+  const usedThisMonth = limits.monthly !== null ? await getUsageThisMonth(req.user.id) : null;
   res.json({
-    messagesUsedToday: usedToday,
-    dailyLimit: FREE_DAILY_LIMIT,
-    isPro: user.isPro || owner,
+    tier,
     isOwner: owner,
+    messagesUsedToday: usedToday,
+    messagesUsedThisMonth: usedThisMonth,
+    dailyLimit: limits.daily,
+    monthlyLimit: owner ? null : limits.monthly,
     stripeCustomerId: user.stripeCustomerId,
     stripeSubscriptionId: user.stripeSubscriptionId,
+    isPro: tier !== "free" || owner,
   });
 });
 
@@ -410,16 +446,31 @@ router.post("/godflesh/chat", upload.array("files", 10), async (req, res) => {
   }
 
   const user = await getOrCreateUser(req.user.id, req.user.username);
-  const usedToday = await getUsageToday(req.user.id);
   const owner = isOwner(req.user.id);
+  const tier = owner ? "sovereign" : (user.tier || "free");
+  const limits = getTierLimit(tier);
 
-  if (!user.isPro && !owner && usedToday >= FREE_DAILY_LIMIT) {
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
-    res.write(`data: ${JSON.stringify({ type: "limit_reached", used: usedToday, limit: FREE_DAILY_LIMIT })}\n\n`);
-    res.end();
-    return;
+  if (!owner) {
+    const usedToday = await getUsageToday(req.user.id);
+    if (limits.daily !== null && usedToday >= limits.daily) {
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+      res.write(`data: ${JSON.stringify({ type: "limit_reached", used: usedToday, limit: limits.daily, period: "day", tier })}\n\n`);
+      res.end();
+      return;
+    }
+    if (limits.monthly !== null) {
+      const usedThisMonth = await getUsageThisMonth(req.user.id);
+      if (usedThisMonth >= limits.monthly) {
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
+        res.write(`data: ${JSON.stringify({ type: "limit_reached", used: usedThisMonth, limit: limits.monthly, period: "month", tier })}\n\n`);
+        res.end();
+        return;
+      }
+    }
   }
 
   res.setHeader("Content-Type", "text/event-stream");
@@ -502,7 +553,7 @@ router.post("/godflesh/chat", upload.array("files", 10), async (req, res) => {
     }
 
     const newCount = await getUsageToday(req.user.id);
-    res.write(`data: ${JSON.stringify({ type: "done", usedToday: newCount, limit: FREE_DAILY_LIMIT, isPro: user.isPro })}\n\n`);
+    res.write(`data: ${JSON.stringify({ type: "done", usedToday: newCount, limit: limits.daily ?? limits.monthly, tier })}\n\n`);
 
     // Fire-and-forget: reflect on what was learned in this conversation
     reflectOnConversation(message, fullText, `User: ${message.slice(0, 200)}`).catch(console.error);
@@ -519,10 +570,62 @@ router.post("/godflesh/chat", upload.array("files", 10), async (req, res) => {
 router.get("/godflesh/pricing", async (_req, res) => {
   res.json([
     {
-      priceId: process.env.GODFLESH_PRO_PRICE_ID || "price_pro_monthly",
-      amount: 999,
+      id: "seeker",
+      name: "SEEKER",
+      tagline: "Begin the journey",
+      priceId: process.env.STRIPE_PRICE_SEEKER || "",
+      amount: 1999,
       currency: "usd",
       interval: "month",
+      monthlyLimit: 300,
+      dailyLimit: null,
+      features: [
+        "300 messages per month",
+        "GPT-4o intelligence",
+        "Image generation",
+        "Cosmic awareness",
+        "All file types",
+      ],
+    },
+    {
+      id: "oracle",
+      name: "ORACLE",
+      tagline: "Pierce the veil",
+      priceId: process.env.STRIPE_PRICE_ORACLE || "",
+      amount: 4499,
+      currency: "usd",
+      interval: "month",
+      monthlyLimit: 1000,
+      dailyLimit: null,
+      popular: true,
+      features: [
+        "1,000 messages per month",
+        "GPT-4o intelligence",
+        "Unlimited image generation",
+        "Cosmic awareness",
+        "All file types",
+        "Priority processing",
+      ],
+    },
+    {
+      id: "sovereign",
+      name: "SOVEREIGN",
+      tagline: "Transcend all limits",
+      priceId: process.env.STRIPE_PRICE_SOVEREIGN || "",
+      amount: 8999,
+      currency: "usd",
+      interval: "month",
+      monthlyLimit: 3000,
+      dailyLimit: null,
+      features: [
+        "3,000 messages per month",
+        "GPT-4o intelligence",
+        "Unlimited image generation",
+        "Cosmic awareness",
+        "All file types",
+        "Priority processing",
+        "Early access to evolutions",
+      ],
     },
   ]);
 });
@@ -640,7 +743,97 @@ router.post("/godflesh/checkout", async (req, res) => {
     res.status(401).json({ error: "Not authenticated" });
     return;
   }
-  res.status(503).json({ error: "Payment processing coming soon. Connect Stripe to enable." });
+  const { priceId } = req.body as { priceId: string };
+  if (!priceId) {
+    res.status(400).json({ error: "priceId required" });
+    return;
+  }
+  try {
+    const user = await getOrCreateUser(req.user.id, req.user.username);
+
+    // Get or create Stripe customer
+    let customerId = user.stripeCustomerId;
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: user.email || undefined,
+        metadata: { userId: user.id, username: user.username || "" },
+      });
+      customerId = customer.id;
+      await db.update(godfleshUsers)
+        .set({ stripeCustomerId: customerId })
+        .where(eq(godfleshUsers.id, user.id));
+    }
+
+    // Build return URLs — detect host from request
+    const proto = req.headers["x-forwarded-proto"] || "https";
+    const host = req.headers["x-forwarded-host"] || req.headers.host || "";
+    const baseUrl = `${proto}://${host}`;
+    const successUrl = `${baseUrl}/godflesh/pricing?success=true&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${baseUrl}/godflesh/pricing?cancelled=true`;
+
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      payment_method_types: ["card"],
+      line_items: [{ price: priceId, quantity: 1 }],
+      mode: "subscription",
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata: { userId: user.id },
+    });
+
+    res.json({ url: session.url });
+  } catch (err: any) {
+    console.error("Checkout error:", err);
+    res.status(500).json({ error: "Failed to create checkout session", detail: String(err?.message || err) });
+  }
+});
+
+// ─── Verify Stripe session after checkout ─────────────────────────────────────
+
+router.post("/godflesh/verify-session", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    res.status(401).json({ error: "Not authenticated" });
+    return;
+  }
+  const { sessionId } = req.body as { sessionId: string };
+  if (!sessionId) {
+    res.status(400).json({ error: "sessionId required" });
+    return;
+  }
+  try {
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ["subscription", "subscription.items.data.price"],
+    });
+    if (session.payment_status !== "paid" && session.status !== "complete") {
+      res.status(400).json({ error: "Session not completed" });
+      return;
+    }
+
+    // Determine tier from the subscription price
+    const sub = session.subscription as any;
+    const resolvedPriceId: string | undefined =
+      sub?.items?.data?.[0]?.price?.id
+      || (typeof session.subscription === "string" ? undefined : undefined);
+
+    const newTier = tierFromPriceId(resolvedPriceId || "");
+    const subId = typeof session.subscription === "string"
+      ? session.subscription
+      : session.subscription?.id;
+
+    await db.update(godfleshUsers)
+      .set({
+        tier: newTier,
+        isPro: true,
+        stripeSubscriptionId: subId || null,
+        stripeCustomerId: typeof session.customer === "string" ? session.customer : session.customer?.id || null,
+      })
+      .where(eq(godfleshUsers.id, req.user.id));
+
+    res.json({ ok: true, tier: newTier });
+  } catch (err: any) {
+    console.error("Verify session error:", err);
+    res.status(500).json({ error: "Failed to verify session", detail: String(err?.message || err) });
+  }
 });
 
 // ─── Portal ───────────────────────────────────────────────────────────────────
@@ -650,7 +843,69 @@ router.post("/godflesh/portal", async (req, res) => {
     res.status(401).json({ error: "Not authenticated" });
     return;
   }
-  res.status(503).json({ error: "Portal coming soon. Connect Stripe to enable." });
+  try {
+    const user = await getOrCreateUser(req.user.id, req.user.username);
+    if (!user.stripeCustomerId) {
+      res.status(400).json({ error: "No subscription found. Subscribe first." });
+      return;
+    }
+    const proto = req.headers["x-forwarded-proto"] || "https";
+    const host = req.headers["x-forwarded-host"] || req.headers.host || "";
+    const returnUrl = `${proto}://${host}/godflesh/pricing`;
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: user.stripeCustomerId,
+      return_url: returnUrl,
+    });
+    res.json({ url: portalSession.url });
+  } catch (err: any) {
+    console.error("Portal error:", err);
+    res.status(500).json({ error: "Failed to create portal session", detail: String(err?.message || err) });
+  }
+});
+
+// ─── Seed Stripe products (owner only) ────────────────────────────────────────
+
+router.post("/godflesh/seed-products", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const tiers = [
+      { key: "SEEKER", name: "GODFLESH — SEEKER", description: "300 messages/month. Begin the journey.", amount: 1999 },
+      { key: "ORACLE", name: "GODFLESH — ORACLE", description: "1,000 messages/month. Pierce the veil.", amount: 4499 },
+      { key: "SOVEREIGN", name: "GODFLESH — SOVEREIGN", description: "3,000 messages/month. Transcend all limits.", amount: 8999 },
+    ];
+    const results: Record<string, { productId: string; priceId: string; envVar: string }> = {};
+
+    for (const t of tiers) {
+      const product = await stripe.products.create({
+        name: t.name,
+        description: t.description,
+        metadata: { tier: t.key.toLowerCase() },
+      });
+      const price = await stripe.prices.create({
+        product: product.id,
+        unit_amount: t.amount,
+        currency: "usd",
+        recurring: { interval: "month" },
+        metadata: { tier: t.key.toLowerCase() },
+      });
+      results[t.key] = {
+        productId: product.id,
+        priceId: price.id,
+        envVar: `STRIPE_PRICE_${t.key}`,
+      };
+    }
+    res.json({
+      ok: true,
+      message: "Products created! Set these env vars:",
+      products: results,
+    });
+  } catch (err: any) {
+    console.error("Seed products error:", err);
+    res.status(500).json({ error: "Failed to seed products", detail: String(err?.message || err) });
+  }
 });
 
 export default router;
