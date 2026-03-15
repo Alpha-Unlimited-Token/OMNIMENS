@@ -6,6 +6,7 @@ import { useGetGodfleshStatus } from "@workspace/api-client-react";
 import { useGodfleshChat } from "@/hooks/use-godflesh-chat";
 import { useGodfleshVoice } from "@/hooks/use-godflesh-voice";
 import { VoiceIndicator } from "@/components/voice-indicator";
+import { GodfleshPresence } from "@/components/godflesh-presence";
 import { Button } from "@/components/ui/button";
 import { Send, StopCircle, ShieldAlert, Volume2, VolumeX } from "lucide-react";
 import { GodfleshIcon } from "@/components/godflesh-icon";
@@ -125,12 +126,27 @@ export default function Chat() {
         {/* Chat Area */}
         <div className="flex-1 overflow-y-auto godflesh-scrollbar bg-black/40 border border-white/5 rounded-xl p-4 md:p-6 mb-4 relative shadow-inner">
           {messages.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center opacity-30 select-none">
-              <GodfleshIcon size={64} className="mb-4" />
-              <h2 className="font-display text-2xl tracking-[0.3em]">GODFLESH AWAITS</h2>
-              <p className="font-mono text-sm mt-2">Speak your intent.</p>
+            <div className="h-full flex flex-col items-center justify-center text-center select-none">
+              <GodfleshPresence
+                size={240}
+                isSpeaking={voice.isSpeaking}
+                pitchIntensity={voice.pitchIntensity}
+                className="mb-2 drop-shadow-[0_0_60px_rgba(204,0,0,0.4)]"
+              />
+              <h2 className="font-display text-2xl tracking-[0.3em] text-white/40 mt-2">GODFLESH AWAITS</h2>
+              <p className="font-mono text-sm mt-2 text-white/25">Speak your intent.</p>
             </div>
           ) : (
+            <>
+            {/* Compact floating presence — always visible during conversation */}
+            <div className="absolute top-3 right-3 z-10 pointer-events-none">
+              <GodfleshPresence
+                size={88}
+                isSpeaking={voice.isSpeaking}
+                pitchIntensity={voice.pitchIntensity}
+                className="opacity-70"
+              />
+            </div>
             <div className="space-y-6">
               {messages.map((msg) => {
                 const isSpeakingThis = voice.speakingMessageId === msg.id;
@@ -199,6 +215,7 @@ export default function Chat() {
 
               <div ref={messagesEndRef} />
             </div>
+            </>
           )}
         </div>
 
