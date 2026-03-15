@@ -530,6 +530,10 @@ router.get("/godflesh/pricing", async (_req, res) => {
 // ─── Upgrades — self-evolution log ────────────────────────────────────────────
 
 router.get("/godflesh/upgrades", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
   try {
     const upgrades = await db
       .select()
@@ -542,9 +546,13 @@ router.get("/godflesh/upgrades", async (req, res) => {
   }
 });
 
-// ─── Notifications ─────────────────────────────────────────────────────────────
+// ─── Notifications — owner only ────────────────────────────────────────────────
 
 router.get("/godflesh/notifications", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
   try {
     const notifications = await db
       .select()
@@ -558,6 +566,10 @@ router.get("/godflesh/notifications", async (req, res) => {
 });
 
 router.post("/godflesh/notifications/:id/read", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
   const id = parseInt(req.params.id);
   try {
     await db
@@ -570,7 +582,11 @@ router.post("/godflesh/notifications/:id/read", async (req, res) => {
   }
 });
 
-router.post("/godflesh/notifications/read-all", async (_req, res) => {
+router.post("/godflesh/notifications/read-all", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
   try {
     await db
       .update(godfleshNotifications)
@@ -581,9 +597,13 @@ router.post("/godflesh/notifications/read-all", async (_req, res) => {
   }
 });
 
-// ─── Brain — what GODFLESH has learned ────────────────────────────────────────
+// ─── Brain — owner only ────────────────────────────────────────────────────────
 
 router.get("/godflesh/brain", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
   try {
     const entries = await db
       .select()

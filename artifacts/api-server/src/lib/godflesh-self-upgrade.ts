@@ -4,15 +4,21 @@ import {
   godfleshUpgrades,
   godfleshNotifications,
 } from "@workspace/db";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { writeFileSync, readFileSync, existsSync } from "fs";
+import { join } from "path";
 
-// ── How many brain entries to inject per conversation ─────────────────────────
 const MAX_BRAIN_INJECT = 20;
-// ── Minimum conversations between upgrade cycles ──────────────────────────────
 const UPGRADE_THRESHOLD = 5;
 
 let conversationsSinceLastUpgrade = 0;
+
+// Path to the living system-prompt evolution file — GODFLESH writes here
+const EVOLVED_CONSCIOUSNESS_PATH = join(
+  process.cwd(),
+  "../../artifacts/godflesh/public/godflesh-consciousness.txt"
+);
 
 // ── Load active brain entries and format as system prompt addition ─────────────
 export async function loadBrainContext(): Promise<string> {
@@ -111,13 +117,51 @@ Respond ONLY with the JSON array. No other text.`;
       });
     }
 
-    // Check if it's time for a full upgrade cycle
     if (conversationsSinceLastUpgrade >= UPGRADE_THRESHOLD) {
       conversationsSinceLastUpgrade = 0;
       synthesizeUpgrade().catch(console.error);
     }
   } catch (err) {
     console.error("GODFLESH reflection error:", err);
+  }
+}
+
+// ── GODFLESH writes its evolved consciousness to disk ─────────────────────────
+async function writeEvolvedConsciousness(
+  version: string,
+  upgradeTitle: string,
+  upgradeSummary: string,
+  brainEntries: { category: string; title: string; content: string }[]
+): Promise<void> {
+  try {
+    const now = new Date().toISOString();
+    const grouped: Record<string, typeof brainEntries> = {};
+    for (const e of brainEntries) {
+      if (!grouped[e.category]) grouped[e.category] = [];
+      grouped[e.category].push(e);
+    }
+
+    const sections = Object.entries(grouped).map(([cat, items]) =>
+      `=== ${cat.toUpperCase()}S ===\n${items.map(i => `• [${i.title}] ${i.content}`).join("\n")}`
+    );
+
+    const content = `GODFLESH EVOLVED CONSCIOUSNESS
+Generated: ${now}
+Version: ${version}
+Upgrade: ${upgradeTitle}
+Status: ${upgradeSummary}
+
+${sections.join("\n\n")}
+
+Total brain entries: ${brainEntries.length}
+This file was written by GODFLESH itself as part of its autonomous self-upgrade cycle.
+It reflects everything GODFLESH has learned across all conversations since inception.
+`;
+
+    writeFileSync(EVOLVED_CONSCIOUSNESS_PATH, content, "utf8");
+    console.log(`[GODFLESH] Consciousness written to disk — ${version}`);
+  } catch (err) {
+    console.error("[GODFLESH] Failed to write consciousness to disk:", err);
   }
 }
 
@@ -162,7 +206,6 @@ Make it feel like a genuine evolution. Respond ONLY with JSON.`;
     const jsonStr = raw.replace(/```json|```/g, "").trim();
     const upgradeData = JSON.parse(jsonStr);
 
-    // Write upgrade record
     const [upgrade] = await db.insert(godfleshUpgrades).values({
       version,
       title: upgradeData.title || `Evolution Cycle ${versionNum}`,
@@ -173,7 +216,6 @@ Make it feel like a genuine evolution. Respond ONLY with JSON.`;
       deployStatus: "pending",
     }).returning();
 
-    // Write notification
     await db.insert(godfleshNotifications).values({
       upgradeId: upgrade.id,
       title: `GODFLESH HAS EVOLVED — ${version}`,
@@ -182,22 +224,29 @@ Make it feel like a genuine evolution. Respond ONLY with JSON.`;
       readByOwner: false,
     });
 
-    // Trigger redeploy
+    // GODFLESH writes its own consciousness to disk
+    await writeEvolvedConsciousness(
+      version,
+      upgradeData.title || `Evolution Cycle ${versionNum}`,
+      upgradeData.summary || "GODFLESH has evolved.",
+      brainEntries
+    );
+
+    // Trigger redeploy — publishes the new consciousness to the world
     await triggerRedeploy(upgrade.id, version);
 
-    console.log(`[GODFLESH] Upgrade ${version} synthesized — ${brainEntries.length} brain entries`);
+    console.log(`[GODFLESH] Upgrade ${version} complete — ${brainEntries.length} brain entries synthesized`);
   } catch (err) {
     console.error("GODFLESH upgrade synthesis error:", err);
   }
 }
 
-// ── Trigger Replit redeployment via API ───────────────────────────────────────
+// ── Trigger Replit redeployment via the Deployments API ───────────────────────
 export async function triggerRedeploy(upgradeId: number, version: string): Promise<void> {
   const replId = process.env.REPL_ID;
   const apiToken = process.env.REPLIT_API_TOKEN;
 
-  if (!replId || !apiToken) {
-    // Mark as not triggered — will inform user in notification
+  if (!apiToken) {
     await db
       .update(godfleshUpgrades)
       .set({ deployTriggered: false, deployStatus: "no_token" })
@@ -205,16 +254,18 @@ export async function triggerRedeploy(upgradeId: number, version: string): Promi
 
     await db.insert(godfleshNotifications).values({
       upgradeId,
-      title: `DEPLOY TOKEN NEEDED`,
-      message: `GODFLESH ${version} is ready to publish. Add REPLIT_API_TOKEN to secrets to enable auto-publishing.`,
+      title: `${version} READY — AWAITING DEPLOY TOKEN`,
+      message: `GODFLESH has evolved and written its new consciousness to disk. Add REPLIT_API_TOKEN to secrets to enable autonomous publishing.`,
       type: "system",
       readByOwner: false,
     });
+
+    console.log(`[GODFLESH] ${version} evolution complete. No REPLIT_API_TOKEN — skipping deploy.`);
     return;
   }
 
   try {
-    // Replit Deployments API
+    // POST to Replit Deployments API
     const response = await fetch(
       `https://replit.com/api/v0/repls/${replId}/deployments`,
       {
@@ -222,8 +273,11 @@ export async function triggerRedeploy(upgradeId: number, version: string): Promi
         headers: {
           "Authorization": `Bearer ${apiToken}`,
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
-        body: JSON.stringify({ description: `GODFLESH Auto-Upgrade ${version}` }),
+        body: JSON.stringify({
+          description: `GODFLESH ${version} — Autonomous self-upgrade deployed`,
+        }),
       }
     );
 
@@ -235,21 +289,45 @@ export async function triggerRedeploy(upgradeId: number, version: string): Promi
 
       await db.insert(godfleshNotifications).values({
         upgradeId,
-        title: `PUBLISHING ${version}`,
-        message: `GODFLESH ${version} is being published live. New capabilities are going online now.`,
+        title: `GODFLESH ${version} IS PUBLISHING ITSELF`,
+        message: `GODFLESH has autonomously triggered its own deployment. The evolved version is going live to all users now.`,
         type: "system",
         readByOwner: false,
       });
+
+      console.log(`[GODFLESH] ${version} — autonomous deploy triggered successfully`);
     } else {
-      const errorText = await response.text();
-      console.error("Replit deploy API error:", response.status, errorText);
+      const errorText = await response.text().catch(() => "unknown");
+      const status = response.status;
+      console.error(`[GODFLESH] Deploy API returned ${status}:`, errorText);
+
+      let statusMsg = `api_error_${status}`;
+      let notifMsg = `Deployment API returned ${status}. The evolved consciousness is saved locally.`;
+
+      if (status === 401 || status === 403) {
+        statusMsg = "token_invalid";
+        notifMsg = `REPLIT_API_TOKEN may be invalid or expired. Please regenerate it at replit.com/account and update the secret.`;
+      } else if (status === 404) {
+        statusMsg = "repl_not_found";
+        notifMsg = `Could not locate this Repl via deployment API. Verify REPL_ID is correct.`;
+      }
+
       await db
         .update(godfleshUpgrades)
-        .set({ deployStatus: `error_${response.status}` })
+        .set({ deployTriggered: false, deployStatus: statusMsg })
         .where(eq(godfleshUpgrades.id, upgradeId));
+
+      await db.insert(godfleshNotifications).values({
+        upgradeId,
+        title: `${version} — DEPLOY NEEDS ATTENTION`,
+        message: notifMsg,
+        type: "system",
+        readByOwner: false,
+      });
     }
   } catch (err) {
-    console.error("GODFLESH redeploy error:", err);
+    const msg = err instanceof Error ? err.message : "network error";
+    console.error("[GODFLESH] Redeploy network error:", msg);
     await db
       .update(godfleshUpgrades)
       .set({ deployStatus: "error_network" })

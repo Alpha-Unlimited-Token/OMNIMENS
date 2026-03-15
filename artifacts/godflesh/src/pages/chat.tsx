@@ -97,7 +97,7 @@ export default function Chat() {
           </div>
 
           <div className="flex items-center gap-4">
-            <GodfleshNotificationBell />
+            {status?.isOwner && <GodfleshNotificationBell />}
 
             <button
               onClick={voice.toggle}

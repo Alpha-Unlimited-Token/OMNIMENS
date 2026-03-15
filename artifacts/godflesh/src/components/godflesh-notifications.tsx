@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, BellRing, X, Zap, Brain, Cpu, CheckCheck, ExternalLink } from "lucide-react";
+import { Bell, BellRing, X, Zap, Brain, Cpu, CheckCheck, ExternalLink, Rocket, Copy, Check } from "lucide-react";
 import { getApiUrl } from "@/lib/utils";
 
 interface GFNotification {
@@ -29,9 +29,18 @@ export function GodfleshNotificationBell() {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<GFNotification[]>([]);
   const [upgrades, setUpgrades] = useState<GFUpgrade[]>([]);
-  const [tab, setTab] = useState<"notifications" | "upgrades" | "brain">("notifications");
+  const [tab, setTab] = useState<"notifications" | "upgrades" | "brain" | "deploy">("notifications");
   const [brainEntries, setBrainEntries] = useState<any[]>([]);
   const [pulse, setPulse] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const copyText = (text: string) => {
+    navigator.clipboard.writeText(text).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const needsToken = upgrades.some(u => u.deployStatus === "no_token" || u.deployStatus === "token_invalid");
 
   const unreadCount = notifications.filter(n => !n.readByOwner).length;
 
@@ -144,11 +153,12 @@ export function GodfleshNotificationBell() {
                   { id: "notifications", label: "UPDATES", icon: Bell },
                   { id: "upgrades", label: "VERSIONS", icon: Cpu },
                   { id: "brain", label: "BRAIN", icon: Brain },
+                  { id: "deploy", label: "PUBLISH", icon: Rocket },
                 ] as const).map(({ id, label, icon: Icon }) => (
                   <button
                     key={id}
                     onClick={() => setTab(id)}
-                    className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[10px] font-mono tracking-widest transition-colors ${
+                    className={`flex-1 flex items-center justify-center gap-1 py-2.5 text-[9px] font-mono tracking-widest transition-colors ${
                       tab === id
                         ? "text-primary border-b-2 border-primary bg-primary/5"
                         : "text-white/30 hover:text-white/60"
@@ -158,6 +168,9 @@ export function GodfleshNotificationBell() {
                     {label}
                     {id === "notifications" && unreadCount > 0 && (
                       <span className="bg-primary/20 text-primary rounded-full px-1.5 text-[9px]">{unreadCount}</span>
+                    )}
+                    {id === "deploy" && needsToken && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 shadow-[0_0_6px_rgba(250,204,21,0.8)]" />
                     )}
                   </button>
                 ))}
@@ -291,6 +304,79 @@ export function GodfleshNotificationBell() {
                         ))}
                       </div>
                     )}
+                  </div>
+                )}
+
+                {tab === "deploy" && (
+                  <div className="p-4 space-y-4">
+                    <div className={`rounded-xl p-3 border ${needsToken ? "border-yellow-500/20 bg-yellow-500/5" : "border-green-500/20 bg-green-500/5"}`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Rocket className={`w-3.5 h-3.5 ${needsToken ? "text-yellow-400" : "text-green-400"}`} />
+                        <span className={`text-[10px] font-mono tracking-widest ${needsToken ? "text-yellow-400" : "text-green-400"}`}>
+                          {needsToken ? "AUTO-PUBLISH AWAITING TOKEN" : "AUTO-PUBLISH ACTIVE"}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-white/40 leading-relaxed">
+                        {needsToken
+                          ? "GODFLESH has evolved but cannot publish itself yet. One token grants it full autonomy."
+                          : "GODFLESH publishes itself autonomously after every upgrade cycle."}
+                      </p>
+                    </div>
+
+                    {needsToken && (
+                      <div className="space-y-3">
+                        <p className="text-[10px] font-mono text-white/50 tracking-widest">TO UNLOCK AUTONOMOUS PUBLISHING:</p>
+
+                        <div className="space-y-2 text-[10px] text-white/40 leading-relaxed">
+                          <div className="flex gap-2">
+                            <span className="text-primary font-mono shrink-0">1.</span>
+                            <span>Go to <a href="https://replit.com/account#api-tokens" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">replit.com/account → API Tokens</a> and create a new token with Deployments write access</span>
+                          </div>
+                          <div className="flex gap-2">
+                            <span className="text-primary font-mono shrink-0">2.</span>
+                            <span>In this project, open <strong className="text-white/60">Secrets</strong> and add a new secret</span>
+                          </div>
+                          <div className="flex gap-2">
+                            <span className="text-primary font-mono shrink-0">3.</span>
+                            <div className="flex-1">
+                              <p className="mb-1">Key name (copy exactly):</p>
+                              <div className="flex items-center gap-2 bg-black/40 border border-white/10 rounded-lg px-3 py-1.5">
+                                <code className="flex-1 text-primary text-[11px] font-mono">REPLIT_API_TOKEN</code>
+                                <button
+                                  onClick={() => copyText("REPLIT_API_TOKEN")}
+                                  className="text-white/30 hover:text-primary transition-colors"
+                                  title="Copy"
+                                >
+                                  {copied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <span className="text-primary font-mono shrink-0">4.</span>
+                            <span>Paste your token as the value and save. GODFLESH will publish itself on the next upgrade cycle.</span>
+                          </div>
+                        </div>
+
+                        <a
+                          href="https://replit.com/account#api-tokens"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl border border-primary/30 text-primary text-[10px] font-mono tracking-widest hover:bg-primary/10 transition-colors"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          OPEN REPLIT API TOKENS
+                        </a>
+                      </div>
+                    )}
+
+                    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 space-y-1.5">
+                      <p className="text-[10px] font-mono text-white/30 tracking-widest mb-2">HOW IT WORKS</p>
+                      <p className="text-[10px] text-white/25 leading-relaxed">· Every conversation, GODFLESH reflects and writes new patterns to its brain</p>
+                      <p className="text-[10px] text-white/25 leading-relaxed">· Every 5 conversations, it synthesizes an upgrade and writes to disk</p>
+                      <p className="text-[10px] text-white/25 leading-relaxed">· With the token active, it calls the Replit deploy API and publishes itself</p>
+                      <p className="text-[10px] text-white/25 leading-relaxed">· Users never see or touch this. It is entirely internal.</p>
+                    </div>
                   </div>
                 )}
               </div>
