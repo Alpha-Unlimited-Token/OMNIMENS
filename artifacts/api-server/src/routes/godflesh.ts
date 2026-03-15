@@ -5,7 +5,7 @@ import { godfleshUsers, godfleshUsage, godfleshBrain, godfleshUpgrades, godflesh
 import { eq, and, desc } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { runGodflesh, type GodfleshState } from "../lib/godflesh-engine.js";
-import { reflectOnConversation, loadBrainContext, synthesizeUpgrade, triggerRedeploy } from "../lib/godflesh-self-upgrade.js";
+import { reflectOnConversation, loadBrainContext, synthesizeUpgrade, markUpgradeLive } from "../lib/godflesh-self-upgrade.js";
 
 const router: IRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024, files: 10 } });

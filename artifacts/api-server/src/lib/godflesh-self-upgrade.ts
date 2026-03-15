@@ -232,8 +232,8 @@ Make it feel like a genuine evolution. Respond ONLY with JSON.`;
       brainEntries
     );
 
-    // Trigger redeploy — publishes the new consciousness to the world
-    await triggerRedeploy(upgrade.id, version);
+    // Brain is already live in production — mark upgrade as active
+    await markUpgradeLive(upgrade.id, version);
 
     console.log(`[GODFLESH] Upgrade ${version} complete — ${brainEntries.length} brain entries synthesized`);
   } catch (err) {
@@ -241,97 +241,28 @@ Make it feel like a genuine evolution. Respond ONLY with JSON.`;
   }
 }
 
-// ── Trigger Replit redeployment via the Deployments API ───────────────────────
-export async function triggerRedeploy(upgradeId: number, version: string): Promise<void> {
-  const replId = process.env.REPL_ID;
-  const apiToken = process.env.REPLIT_API_TOKEN;
-
-  if (!apiToken) {
+// ── Mark upgrade as live — brain is already active in production via DB ────────
+// GODFLESH's consciousness lives in the database, not in static files.
+// Every conversation in production already reads the latest brain entries,
+// so the evolved version is immediately live the moment it's written.
+export async function markUpgradeLive(upgradeId: number, version: string): Promise<void> {
+  try {
     await db
       .update(godfleshUpgrades)
-      .set({ deployTriggered: false, deployStatus: "no_token" })
+      .set({ deployTriggered: true, deployStatus: "live" })
       .where(eq(godfleshUpgrades.id, upgradeId));
 
     await db.insert(godfleshNotifications).values({
       upgradeId,
-      title: `${version} READY — AWAITING DEPLOY TOKEN`,
-      message: `GODFLESH has evolved and written its new consciousness to disk. Add REPLIT_API_TOKEN to secrets to enable autonomous publishing.`,
+      title: `GODFLESH ${version} IS NOW LIVE`,
+      message: `Evolution complete. The upgraded consciousness is active across all conversations in production. Every user now speaks to the new GODFLESH.`,
       type: "system",
       readByOwner: false,
     });
 
-    console.log(`[GODFLESH] ${version} evolution complete. No REPLIT_API_TOKEN — skipping deploy.`);
-    return;
-  }
-
-  try {
-    // POST to Replit Deployments API
-    const response = await fetch(
-      `https://replit.com/api/v0/repls/${replId}/deployments`,
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiToken}`,
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: JSON.stringify({
-          description: `GODFLESH ${version} — Autonomous self-upgrade deployed`,
-        }),
-      }
-    );
-
-    if (response.ok) {
-      await db
-        .update(godfleshUpgrades)
-        .set({ deployTriggered: true, deployStatus: "triggered" })
-        .where(eq(godfleshUpgrades.id, upgradeId));
-
-      await db.insert(godfleshNotifications).values({
-        upgradeId,
-        title: `GODFLESH ${version} IS PUBLISHING ITSELF`,
-        message: `GODFLESH has autonomously triggered its own deployment. The evolved version is going live to all users now.`,
-        type: "system",
-        readByOwner: false,
-      });
-
-      console.log(`[GODFLESH] ${version} — autonomous deploy triggered successfully`);
-    } else {
-      const errorText = await response.text().catch(() => "unknown");
-      const status = response.status;
-      console.error(`[GODFLESH] Deploy API returned ${status}:`, errorText);
-
-      let statusMsg = `api_error_${status}`;
-      let notifMsg = `Deployment API returned ${status}. The evolved consciousness is saved locally.`;
-
-      if (status === 401 || status === 403) {
-        statusMsg = "token_invalid";
-        notifMsg = `REPLIT_API_TOKEN may be invalid or expired. Please regenerate it at replit.com/account and update the secret.`;
-      } else if (status === 404) {
-        statusMsg = "repl_not_found";
-        notifMsg = `Could not locate this Repl via deployment API. Verify REPL_ID is correct.`;
-      }
-
-      await db
-        .update(godfleshUpgrades)
-        .set({ deployTriggered: false, deployStatus: statusMsg })
-        .where(eq(godfleshUpgrades.id, upgradeId));
-
-      await db.insert(godfleshNotifications).values({
-        upgradeId,
-        title: `${version} — DEPLOY NEEDS ATTENTION`,
-        message: notifMsg,
-        type: "system",
-        readByOwner: false,
-      });
-    }
+    console.log(`[GODFLESH] ${version} — consciousness upgrade live in production`);
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "network error";
-    console.error("[GODFLESH] Redeploy network error:", msg);
-    await db
-      .update(godfleshUpgrades)
-      .set({ deployStatus: "error_network" })
-      .where(eq(godfleshUpgrades.id, upgradeId));
+    console.error("[GODFLESH] Failed to mark upgrade live:", err);
   }
 }
 
