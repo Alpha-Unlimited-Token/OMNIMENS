@@ -1,17 +1,50 @@
-import { useState, useRef, useEffect } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { getGetSuperAISessionQueryKey } from '@workspace/api-client-react';
+import { useState, useRef, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { getGetSuperAISessionQueryKey } from "@workspace/api-client-react";
+
+export type AgentName =
+  | "Architect"
+  | "Critic"
+  | "Synthesizer"
+  | "Mathematician"
+  | "Neuroscientist"
+  | "Meta-Agent";
 
 export type StreamedMessage = {
-  agentName: 'Architect' | 'Critic' | 'Synthesizer' | 'Mathematician' | 'Neuroscientist' | 'Meta-Agent';
+  agentName: AgentName;
   content: string;
   round: number;
+};
+
+export type CodeFile = {
+  filename: string;
+  language: string;
+  code: string;
+  writtenBy: AgentName;
+};
+
+export type ExecutionResult = {
+  filename: string;
+  output: string;
+  errors: string;
+  success: boolean;
+};
+
+export type InstallEvent = {
+  packages: string[];
+  success?: boolean;
+  output?: string;
+  done: boolean;
 };
 
 export function useSuperAIStream(sessionId: number) {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamedMessages, setStreamedMessages] = useState<StreamedMessage[]>([]);
-  const [activeAgent, setActiveAgent] = useState<StreamedMessage['agentName'] | null>(null);
+  const [activeAgent, setActiveAgent] = useState<AgentName | null>(null);
+  const [codeFiles, setCodeFiles] = useState<CodeFile[]>([]);
+  const [executions, setExecutions] = useState<ExecutionResult[]>([]);
+  const [executingFile, setExecutingFile] = useState<string | null>(null);
+  const [installingPackages, setInstallingPackages] = useState<string[] | null>(null);
   const queryClient = useQueryClient();
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -25,23 +58,23 @@ export function useSuperAIStream(sessionId: number) {
     setIsStreaming(true);
     setStreamedMessages([]);
     setActiveAgent(null);
+    setCodeFiles([]);
+    setExecutions([]);
+    setExecutingFile(null);
+    setInstallingPackages(null);
     abortControllerRef.current = new AbortController();
 
     try {
       const res = await fetch(`/api/superai/sessions/${sessionId}/run`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rounds }),
         signal: abortControllerRef.current.signal,
       });
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Stream request failed:", res.status, errorText);
-        return;
+      if (!res.ok || !res.body) {
+        throw new Error(`HTTP ${res.status}`);
       }
-
-      if (!res.body) throw new Error("No response body");
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -49,64 +82,119 @@ export function useSuperAIStream(sessionId: number) {
       let finished = false;
 
       while (!finished) {
-        const { value, done } = await reader.read();
+        const { done, value } = await reader.read();
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || "";
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
 
         for (const line of lines) {
-          if (!line.startsWith('data: ')) continue;
+          if (!line.startsWith("data: ")) continue;
           const dataStr = line.slice(6).trim();
-          if (!dataStr || dataStr === '[DONE]') continue;
+          if (!dataStr) continue;
 
           try {
             const parsed = JSON.parse(dataStr);
 
-            if (parsed.done || parsed.type === 'done') {
+            if (parsed.done || parsed.type === "done") {
               finished = true;
               setActiveAgent(null);
               break;
             }
 
-            if (parsed.type === 'agent_start' && parsed.agent) {
-              setActiveAgent(parsed.agent as StreamedMessage['agentName']);
+            if (parsed.type === "agent_start" && parsed.agent) {
+              setActiveAgent(parsed.agent as AgentName);
             }
 
-            if (parsed.type === 'agent_done') {
+            if (parsed.type === "agent_done") {
               setActiveAgent(null);
             }
 
-            if (parsed.type === 'message' && parsed.agent && parsed.content) {
-              setStreamedMessages(prev => {
+            if (parsed.type === "message" && parsed.agent && parsed.content) {
+              setStreamedMessages((prev) => {
                 const last = prev[prev.length - 1];
                 if (last && last.agentName === parsed.agent && last.round === parsed.round) {
                   return [
                     ...prev.slice(0, -1),
-                    { ...last, content: last.content + parsed.content }
+                    { ...last, content: last.content + parsed.content },
                   ];
                 }
                 return [
                   ...prev,
-                  { agentName: parsed.agent, content: parsed.content, round: parsed.round || 1 }
+                  { agentName: parsed.agent as AgentName, content: parsed.content, round: parsed.round || 1 },
                 ];
               });
             }
-          } catch (e) {
-            // skip malformed lines
+
+            if (parsed.type === "code_write") {
+              setCodeFiles((prev) => {
+                const idx = prev.findIndex((f) => f.filename === parsed.filename);
+                const entry: CodeFile = {
+                  filename: parsed.filename,
+                  language: parsed.language,
+                  code: parsed.code,
+                  writtenBy: parsed.agent as AgentName,
+                };
+                if (idx >= 0) {
+                  const next = [...prev];
+                  next[idx] = entry;
+                  return next;
+                }
+                return [...prev, entry];
+              });
+            }
+
+            if (parsed.type === "code_execute") {
+              setExecutingFile(parsed.filename);
+            }
+
+            if (parsed.type === "execution_result") {
+              setExecutingFile(null);
+              setExecutions((prev) => [
+                ...prev,
+                {
+                  filename: parsed.filename,
+                  output: parsed.output || "",
+                  errors: parsed.errors || "",
+                  success: parsed.success,
+                },
+              ]);
+            }
+
+            if (parsed.type === "package_install") {
+              setInstallingPackages(parsed.packages);
+            }
+
+            if (parsed.type === "install_result") {
+              setInstallingPackages(null);
+            }
+          } catch {
+            // ignore malformed JSON
           }
         }
       }
     } catch (err: any) {
-      if (err.name !== 'AbortError') {
-        console.error("Stream failed:", err);
+      if (err?.name !== "AbortError") {
+        console.error("Stream error:", err);
       }
     } finally {
       setIsStreaming(false);
+      setActiveAgent(null);
+      setExecutingFile(null);
+      setInstallingPackages(null);
       queryClient.invalidateQueries({ queryKey: getGetSuperAISessionQueryKey(sessionId) });
     }
   };
 
-  return { startStream, isStreaming, streamedMessages, activeAgent };
+  return {
+    startStream,
+    isStreaming,
+    streamedMessages,
+    activeAgent,
+    codeFiles,
+    executions,
+    executingFile,
+    installingPackages,
+  };
 }

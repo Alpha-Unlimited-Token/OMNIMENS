@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, integer } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, timestamp, integer, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -6,6 +6,7 @@ export const superAISessions = pgTable("super_ai_sessions", {
   id: serial("id").primaryKey(),
   topic: text("topic").notNull(),
   status: text("status").notNull().default("pending"),
+  mode: text("mode").notNull().default("blueprint"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
@@ -54,3 +55,33 @@ export const insertSuperAIBlueprintSchema = createInsertSchema(superAIBlueprints
 
 export type SuperAIBlueprint = typeof superAIBlueprints.$inferSelect;
 export type InsertSuperAIBlueprint = z.infer<typeof insertSuperAIBlueprintSchema>;
+
+export const superAICodeFiles = pgTable("super_ai_code_files", {
+  id: serial("id").primaryKey(),
+  sessionId: integer("session_id")
+    .notNull()
+    .references(() => superAISessions.id, { onDelete: "cascade" }),
+  filename: text("filename").notNull(),
+  language: text("language").notNull().default("python"),
+  content: text("content").notNull(),
+  writtenBy: text("written_by").notNull(),
+  version: integer("version").notNull().default(1),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export type SuperAICodeFile = typeof superAICodeFiles.$inferSelect;
+
+export const superAIExecutions = pgTable("super_ai_executions", {
+  id: serial("id").primaryKey(),
+  sessionId: integer("session_id")
+    .notNull()
+    .references(() => superAISessions.id, { onDelete: "cascade" }),
+  filename: text("filename").notNull(),
+  code: text("code").notNull(),
+  output: text("output").notNull().default(""),
+  errors: text("errors").notNull().default(""),
+  success: boolean("success").notNull().default(false),
+  executedAt: timestamp("executed_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export type SuperAIExecution = typeof superAIExecutions.$inferSelect;

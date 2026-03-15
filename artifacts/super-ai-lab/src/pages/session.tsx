@@ -1,95 +1,58 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, Link, useLocation } from "wouter";
 import { useGetSuperAISession, useDeleteSuperAISession } from "@workspace/api-client-react";
 import { useSuperAIStream } from "@/hooks/use-superai-stream";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Brain,
-  ShieldAlert,
-  Cpu,
-  Sparkles,
-  ArrowRight,
-  Play,
-  CheckCircle2,
-  Trash2,
-  FlaskConical,
-  Network,
-  Eye,
+  Brain, ShieldAlert, Cpu, Sparkles, ArrowRight, Play, CheckCircle2,
+  Trash2, FlaskConical, Network, Eye, Terminal, FileCode, Package,
+  Loader2, ChevronRight, MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
+import type { AgentName, CodeFile, ExecutionResult } from "@/hooks/use-superai-stream";
 
-type AgentKey = "Architect" | "Critic" | "Synthesizer" | "Mathematician" | "Neuroscientist" | "Meta-Agent";
+type AgentKey = AgentName;
 
 const AGENT_CONFIG: Record<AgentKey, {
-  icon: React.ElementType;
-  description: string;
-  color: string;
-  glow: string;
-  border: string;
-  bg: string;
-  dot: string;
-  badge: string;
+  icon: React.ElementType; description: string; color: string;
+  glow: string; border: string; bg: string; dot: string; badge: string;
 }> = {
   Architect: {
-    icon: Brain,
-    description: "Proposes radical new paradigms",
-    color: "text-blue-400",
-    glow: "rgba(96,165,250,0.6)",
-    border: "border-blue-400/50",
-    bg: "bg-blue-400/10",
-    dot: "bg-blue-400",
-    badge: "border-blue-400/30 bg-blue-400/5 text-blue-400",
+    icon: Brain, description: "Core architecture & system design",
+    color: "text-blue-400", glow: "rgba(96,165,250,0.6)",
+    border: "border-blue-400/50", bg: "bg-blue-400/10",
+    dot: "bg-blue-400", badge: "border-blue-400/30 bg-blue-400/5 text-blue-400",
   },
   Critic: {
-    icon: ShieldAlert,
-    description: "Stress-tests & finds weaknesses",
-    color: "text-orange-400",
-    glow: "rgba(251,146,60,0.6)",
-    border: "border-orange-400/50",
-    bg: "bg-orange-400/10",
-    dot: "bg-orange-400",
-    badge: "border-orange-400/30 bg-orange-400/5 text-orange-400",
+    icon: ShieldAlert, description: "Bug detection & code hardening",
+    color: "text-orange-400", glow: "rgba(251,146,60,0.6)",
+    border: "border-orange-400/50", bg: "bg-orange-400/10",
+    dot: "bg-orange-400", badge: "border-orange-400/30 bg-orange-400/5 text-orange-400",
   },
   Synthesizer: {
-    icon: Cpu,
-    description: "Unifies ideas into superior designs",
-    color: "text-purple-400",
-    glow: "rgba(192,132,252,0.6)",
-    border: "border-purple-400/50",
-    bg: "bg-purple-400/10",
-    dot: "bg-purple-400",
-    badge: "border-purple-400/30 bg-purple-400/5 text-purple-400",
+    icon: Cpu, description: "Integration & unified pipeline",
+    color: "text-purple-400", glow: "rgba(192,132,252,0.6)",
+    border: "border-purple-400/50", bg: "bg-purple-400/10",
+    dot: "bg-purple-400", badge: "border-purple-400/30 bg-purple-400/5 text-purple-400",
   },
   Mathematician: {
-    icon: FlaskConical,
-    description: "Formalizes with proofs & theory",
-    color: "text-emerald-400",
-    glow: "rgba(52,211,153,0.6)",
-    border: "border-emerald-400/50",
-    bg: "bg-emerald-400/10",
-    dot: "bg-emerald-400",
-    badge: "border-emerald-400/30 bg-emerald-400/5 text-emerald-400",
+    icon: FlaskConical, description: "Math engine & optimization",
+    color: "text-emerald-400", glow: "rgba(52,211,153,0.6)",
+    border: "border-emerald-400/50", bg: "bg-emerald-400/10",
+    dot: "bg-emerald-400", badge: "border-emerald-400/30 bg-emerald-400/5 text-emerald-400",
   },
   Neuroscientist: {
-    icon: Network,
-    description: "Bridges bio & mechanical intelligence",
-    color: "text-pink-400",
-    glow: "rgba(244,114,182,0.6)",
-    border: "border-pink-400/50",
-    bg: "bg-pink-400/10",
-    dot: "bg-pink-400",
-    badge: "border-pink-400/30 bg-pink-400/5 text-pink-400",
+    icon: Network, description: "Bio-inspired learning systems",
+    color: "text-pink-400", glow: "rgba(244,114,182,0.6)",
+    border: "border-pink-400/50", bg: "bg-pink-400/10",
+    dot: "bg-pink-400", badge: "border-pink-400/30 bg-pink-400/5 text-pink-400",
   },
   "Meta-Agent": {
-    icon: Eye,
-    description: "Orchestrates the collective mind",
-    color: "text-yellow-400",
-    glow: "rgba(250,204,21,0.6)",
-    border: "border-yellow-400/50",
-    bg: "bg-yellow-400/10",
-    dot: "bg-yellow-400",
-    badge: "border-yellow-400/30 bg-yellow-400/5 text-yellow-400",
+    icon: Eye, description: "Self-upgrade & orchestration",
+    color: "text-yellow-400", glow: "rgba(250,204,21,0.6)",
+    border: "border-yellow-400/50", bg: "bg-yellow-400/10",
+    dot: "bg-yellow-400", badge: "border-yellow-400/30 bg-yellow-400/5 text-yellow-400",
   },
 };
 
@@ -101,26 +64,22 @@ const AgentCard = ({ name, isActive }: { name: AgentKey; isActive: boolean }) =>
   return (
     <div
       className={cn(
-        "relative flex flex-col items-center p-4 rounded-2xl border bg-black/60 backdrop-blur-2xl transition-all duration-700 overflow-hidden",
+        "relative flex flex-col items-center p-3 md:p-4 rounded-2xl border bg-black/60 backdrop-blur-2xl transition-all duration-700 overflow-hidden",
         isActive ? cfg.border : "border-white/5",
         isActive ? "scale-105 z-10" : "scale-100 opacity-50 hover:opacity-70"
       )}
       style={isActive ? { boxShadow: `0 0 30px -8px ${cfg.glow}` } : {}}
     >
       {isActive && <div className={cn("absolute top-0 left-0 w-full h-0.5", cfg.dot)} />}
-      <div className={cn("p-3 rounded-xl mb-3 transition-colors duration-500", isActive ? cn(cfg.bg, cfg.color) : "bg-white/5 text-white/30")}>
-        <Icon className="w-6 h-6" />
+      <div className={cn("p-2.5 rounded-xl mb-2 transition-colors duration-500", isActive ? cn(cfg.bg, cfg.color) : "bg-white/5 text-white/30")}>
+        <Icon className="w-5 h-5" />
       </div>
-      <h3 className={cn("font-bold text-xs tracking-widest uppercase mb-1 transition-colors duration-500", isActive ? cfg.color : "text-white/50")}>
+      <h3 className={cn("font-bold text-[10px] tracking-widest uppercase mb-0.5 transition-colors duration-500", isActive ? cfg.color : "text-white/50")}>
         {name}
       </h3>
-      <p className="text-[10px] text-center text-white/30 leading-tight">{cfg.description}</p>
+      <p className="text-[9px] text-center text-white/30 leading-tight hidden md:block">{cfg.description}</p>
       {isActive && (
-        <motion.div
-          className={cn("absolute bottom-2 flex gap-0.5")}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
+        <motion.div className="absolute bottom-2 flex gap-0.5" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           {[0, 1, 2].map((i) => (
             <motion.span
               key={i}
@@ -138,17 +97,12 @@ const AgentCard = ({ name, isActive }: { name: AgentKey; isActive: boolean }) =>
 function ChatMessage({ message }: { message: { id?: number; agentName: string; content: string; round: number } }) {
   const agentName = message.agentName as AgentKey;
   const cfg = AGENT_CONFIG[agentName] ?? AGENT_CONFIG.Architect;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.35 }}
-      className={cn(
-        "w-full md:max-w-[82%] rounded-2xl p-5 border backdrop-blur-md shadow-lg",
-        cfg.border.replace("/50", "/20"),
-        cfg.bg,
-      )}
+      className={cn("w-full rounded-2xl p-4 md:p-5 border backdrop-blur-md shadow-lg", cfg.border.replace("/50", "/20"), cfg.bg)}
     >
       <div className="flex items-center justify-between mb-3 border-b border-white/5 pb-2">
         <span className={cn("font-bold text-xs tracking-widest uppercase flex items-center gap-2", cfg.color)}>
@@ -166,24 +120,212 @@ function ChatMessage({ message }: { message: { id?: number; agentName: string; c
   );
 }
 
+function CodePanel({
+  codeFiles,
+  executions,
+  executingFile,
+  installingPackages,
+  isCodeMode,
+}: {
+  codeFiles: CodeFile[];
+  executions: ExecutionResult[];
+  executingFile: string | null;
+  installingPackages: string[] | null;
+  isCodeMode: boolean;
+}) {
+  const [activeFile, setActiveFile] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (codeFiles.length > 0 && (!activeFile || !codeFiles.find((f) => f.filename === activeFile))) {
+      setActiveFile(codeFiles[codeFiles.length - 1].filename);
+    }
+  }, [codeFiles, activeFile]);
+
+  const currentFile = codeFiles.find((f) => f.filename === activeFile);
+  const cfg = currentFile ? AGENT_CONFIG[currentFile.writtenBy] ?? AGENT_CONFIG.Architect : null;
+
+  if (!isCodeMode) return null;
+
+  return (
+    <div className="flex flex-col h-full bg-black/40 rounded-2xl border border-white/10 overflow-hidden">
+      {/* Panel header */}
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-black/60 shrink-0">
+        <FileCode className="w-4 h-4 text-white/40" />
+        <span className="text-xs font-bold tracking-widest text-white/40 uppercase">Code Lab</span>
+        <div className="ml-auto flex items-center gap-2">
+          {installingPackages && (
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              className="flex items-center gap-1.5 text-yellow-400 text-[10px] tracking-widest"
+            >
+              <Package className="w-3 h-3 animate-pulse" />
+              <span>INSTALLING {installingPackages.join(", ")}</span>
+            </motion.div>
+          )}
+          {executingFile && (
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              className="flex items-center gap-1.5 text-blue-400 text-[10px] tracking-widest"
+            >
+              <Loader2 className="w-3 h-3 animate-spin" />
+              <span>EXECUTING {executingFile}</span>
+            </motion.div>
+          )}
+          <span className="text-[10px] text-white/20 font-mono">{codeFiles.length} FILE{codeFiles.length !== 1 ? "S" : ""}</span>
+        </div>
+      </div>
+
+      {codeFiles.length === 0 ? (
+        <div className="flex-1 flex flex-col items-center justify-center text-white/20 p-8 text-center">
+          <FileCode className="w-10 h-10 mb-3 opacity-30" />
+          <p className="text-xs tracking-widest uppercase">Agents Will Write Code Here</p>
+          <p className="text-[10px] mt-2 opacity-60">Files execute automatically as they are written</p>
+        </div>
+      ) : (
+        <>
+          {/* File tabs */}
+          <div className="flex gap-1 px-3 py-2 border-b border-white/5 overflow-x-auto shrink-0 scrollbar-none">
+            {codeFiles.map((f) => {
+              const agentCfg = AGENT_CONFIG[f.writtenBy] ?? AGENT_CONFIG.Architect;
+              const isActive = f.filename === activeFile;
+              const lastExec = [...executions].reverse().find((e) => e.filename === f.filename);
+              return (
+                <button
+                  key={f.filename}
+                  onClick={() => setActiveFile(f.filename)}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono whitespace-nowrap transition-all shrink-0 border",
+                    isActive
+                      ? cn(agentCfg.bg, agentCfg.border.replace("/50", "/40"), agentCfg.color)
+                      : "bg-white/5 border-white/5 text-white/40 hover:text-white/70"
+                  )}
+                >
+                  <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", agentCfg.dot)} />
+                  {f.filename}
+                  {lastExec && (
+                    <span className={lastExec.success ? "text-emerald-400" : "text-red-400"}>
+                      {lastExec.success ? "✓" : "✗"}
+                    </span>
+                  )}
+                  {executingFile === f.filename && (
+                    <Loader2 className="w-2.5 h-2.5 animate-spin text-blue-400" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Code viewer */}
+          <div className="flex-1 overflow-auto min-h-0">
+            {currentFile && (
+              <div className="p-1">
+                <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/5">
+                  <span className={cn("text-[10px] font-mono font-bold", cfg?.color)}>{currentFile.filename}</span>
+                  <span className="text-[10px] text-white/30 font-mono">{currentFile.language}</span>
+                </div>
+                <pre className="text-[11px] font-mono text-green-300/80 p-4 leading-relaxed overflow-x-auto whitespace-pre-wrap break-words">
+                  {currentFile.code}
+                </pre>
+              </div>
+            )}
+          </div>
+
+          {/* Terminal */}
+          <div className="border-t border-white/10 shrink-0 max-h-48 overflow-y-auto">
+            <div className="flex items-center gap-2 px-3 py-2 border-b border-white/5 bg-black/60 sticky top-0">
+              <Terminal className="w-3 h-3 text-white/30" />
+              <span className="text-[10px] font-mono text-white/30 tracking-widest uppercase">Terminal</span>
+              <span className="ml-auto text-[10px] text-white/20">{executions.length} execution{executions.length !== 1 ? "s" : ""}</span>
+            </div>
+            <div className="p-3 space-y-2 font-mono text-[11px]">
+              {executions.length === 0 && (
+                <p className="text-white/20">No executions yet...</p>
+              )}
+              <AnimatePresence initial={false}>
+                {executions.map((exec, i) => (
+                  <motion.div
+                    key={`${exec.filename}-${i}`}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className="border-b border-white/5 pb-2 last:border-0"
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={exec.success ? "text-emerald-400" : "text-red-400"}>
+                        {exec.success ? "✓" : "✗"}
+                      </span>
+                      <span className="text-white/50">{exec.filename}</span>
+                    </div>
+                    {exec.output && (
+                      <pre className="text-emerald-300/70 whitespace-pre-wrap break-words pl-4">{exec.output}</pre>
+                    )}
+                    {exec.errors && (
+                      <pre className="text-red-400/70 whitespace-pre-wrap break-words pl-4">{exec.errors}</pre>
+                    )}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+              {executingFile && (
+                <motion.div
+                  initial={{ opacity: 0 }} animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ repeat: Infinity, duration: 1 }}
+                  className="text-blue-400 flex items-center gap-2"
+                >
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  Running {executingFile}...
+                </motion.div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function SessionPage() {
   const params = useParams();
   const sessionId = parseInt(params.id || "0");
   const [, setLocation] = useLocation();
+  const [mobilePanel, setMobilePanel] = useState<"conversation" | "code">("conversation");
 
   const { data: sessionData, isLoading } = useGetSuperAISession(sessionId);
   const { mutateAsync: deleteSession, isPending: isDeleting } = useDeleteSuperAISession();
-  const { startStream, isStreaming, streamedMessages, activeAgent } = useSuperAIStream(sessionId);
+  const {
+    startStream, isStreaming, streamedMessages, activeAgent,
+    codeFiles, executions, executingFile, installingPackages,
+  } = useSuperAIStream(sessionId);
 
   const bottomRef = useRef<HTMLDivElement>(null);
+  const codeBottomRef = useRef<HTMLDivElement>(null);
 
   const isCompleted = sessionData?.status === "completed";
+  const isCodeMode = sessionData?.mode === "code";
   const displayMessages = [...(sessionData?.messages || [])];
   const allMessages = [...displayMessages, ...streamedMessages];
 
+  // Merge persisted code files with live streamed ones
+  const persistedCodeFiles: CodeFile[] = (sessionData as any)?.codeFiles || [];
+  const allCodeFiles = codeFiles.length > 0 ? codeFiles : persistedCodeFiles;
+
+  const persistedExecutions: ExecutionResult[] = (sessionData as any)?.executions || [];
+  const allExecutions = executions.length > 0 ? executions : persistedExecutions;
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [allMessages.length, isStreaming, streamedMessages]);
+  }, [allMessages.length]);
+
+  useEffect(() => {
+    if (codeFiles.length > 0) {
+      codeBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [codeFiles.length, executions.length]);
+
+  // Auto-switch to code panel when code starts being written
+  useEffect(() => {
+    if (codeFiles.length > 0 && isCodeMode) {
+      setMobilePanel("code");
+    }
+  }, [codeFiles.length, isCodeMode]);
 
   const handleDelete = async () => {
     if (confirm("Purge this session from memory? This action is irreversible.")) {
@@ -213,80 +355,161 @@ export default function SessionPage() {
     );
   }
 
+  const canStart = (sessionData.status === "pending" || (sessionData.status === "running" && !isStreaming && allMessages.length === 0)) && !isStreaming;
+
   return (
-    <div className="flex flex-col min-h-[calc(100vh-6rem)]">
+    <div className="flex flex-col h-[calc(100vh-5rem)]">
+
       {/* Header */}
-      <div className="mb-4 flex justify-between items-start shrink-0">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60 tracking-tight">
+      <div className="mb-3 flex justify-between items-start shrink-0">
+        <div className="min-w-0 flex-1 pr-3">
+          <h1 className="text-xl md:text-2xl font-black mb-1.5 text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60 tracking-tight truncate">
             {sessionData.topic}
           </h1>
-          <div className="flex items-center gap-3 text-sm font-mono">
+          <div className="flex items-center gap-2 flex-wrap text-sm font-mono">
             <span className={cn(
-              "px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase border",
+              "px-3 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase border",
               isCompleted ? "bg-purple-400/10 border-purple-400/30 text-purple-400" :
               sessionData.status === "running" ? "bg-blue-400/10 border-blue-400/30 text-blue-400 animate-pulse" :
               "bg-white/5 border-white/10 text-white/50"
             )}>
               {sessionData.status}
             </span>
-            <span className="text-white/30">ID: {sessionData.id}</span>
+            <span className={cn(
+              "px-3 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase border",
+              isCodeMode ? "bg-emerald-400/10 border-emerald-400/30 text-emerald-400" : "bg-white/5 border-white/10 text-white/30"
+            )}>
+              {isCodeMode ? "CODE LAB" : "BLUEPRINT"}
+            </span>
+            <span className="text-white/20">ID: {sessionData.id}</span>
           </div>
         </div>
         <button
           onClick={handleDelete}
           disabled={isDeleting}
-          className="p-2.5 bg-white/5 border border-white/10 text-red-400 hover:bg-red-400/20 hover:border-red-400/30 rounded-xl transition-all"
+          className="shrink-0 p-2.5 bg-white/5 border border-white/10 text-red-400 hover:bg-red-400/20 hover:border-red-400/30 rounded-xl transition-all"
           title="Delete Session"
         >
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
 
-      {/* 6-Agent Grid */}
-      <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-6 shrink-0">
+      {/* Agent Grid */}
+      <div className="grid grid-cols-6 gap-2 mb-3 shrink-0">
         {AGENT_ORDER.map((name) => (
           <AgentCard key={name} name={name} isActive={activeAgent === name} />
         ))}
       </div>
 
-      {/* Messages Feed */}
-      <div className="flex-1 overflow-y-auto space-y-5 pr-2 pb-28 scrollbar-thin">
-        {allMessages.length === 0 && !isStreaming && (
-          <div className="h-full flex flex-col items-center justify-center text-white/20 border border-dashed border-white/10 rounded-3xl bg-white/5 min-h-[200px]">
-            <Brain className="w-10 h-10 mb-3 opacity-50" />
-            <p className="text-sm tracking-widest">6 AGENTS STANDING BY...</p>
+      {/* Mobile tab switcher — only shown in code mode */}
+      {isCodeMode && (
+        <div className="flex gap-1 mb-3 shrink-0 md:hidden">
+          <button
+            onClick={() => setMobilePanel("conversation")}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold tracking-widest uppercase border transition-all",
+              mobilePanel === "conversation"
+                ? "bg-blue-400/10 border-blue-400/30 text-blue-400"
+                : "bg-white/5 border-white/5 text-white/40"
+            )}
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            Conversation
+          </button>
+          <button
+            onClick={() => setMobilePanel("code")}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold tracking-widest uppercase border transition-all",
+              mobilePanel === "code"
+                ? "bg-emerald-400/10 border-emerald-400/30 text-emerald-400"
+                : "bg-white/5 border-white/5 text-white/40"
+            )}
+          >
+            <FileCode className="w-3.5 h-3.5" />
+            Code Lab
+            {allCodeFiles.length > 0 && (
+              <span className="bg-emerald-400/20 text-emerald-400 text-[9px] px-1.5 py-0.5 rounded-full font-mono">
+                {allCodeFiles.length}
+              </span>
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* Main content area */}
+      <div className={cn(
+        "flex-1 min-h-0 gap-4",
+        isCodeMode ? "grid md:grid-cols-[1fr_1fr] lg:grid-cols-[55%_45%]" : "flex flex-col"
+      )}>
+
+        {/* Conversation panel */}
+        <div className={cn(
+          "flex flex-col min-h-0",
+          isCodeMode && mobilePanel !== "conversation" && "hidden md:flex",
+        )}>
+          <div className="flex-1 overflow-y-auto space-y-4 pr-1 pb-32 scrollbar-thin">
+            {allMessages.length === 0 && !isStreaming && (
+              <div className="flex flex-col items-center justify-center text-white/20 border border-dashed border-white/10 rounded-3xl bg-white/5 min-h-[200px] p-8 text-center">
+                <Brain className="w-10 h-10 mb-3 opacity-50" />
+                <p className="text-sm tracking-widest">6 AGENTS STANDING BY...</p>
+                {isCodeMode && <p className="text-xs mt-2 opacity-60">Activate to begin live coding session</p>}
+              </div>
+            )}
+
+            <AnimatePresence initial={false}>
+              {allMessages.map((msg, idx) => (
+                <ChatMessage key={(msg as any).id || `stream-${idx}`} message={msg as any} />
+              ))}
+            </AnimatePresence>
+
+            {isStreaming && (
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                className="flex items-center gap-3 text-blue-400/70 bg-blue-400/5 border border-blue-400/20 w-fit px-5 py-3 rounded-full mx-auto"
+              >
+                <Sparkles className="w-4 h-4 animate-pulse" />
+                <span className="text-xs tracking-widest">
+                  {isCodeMode ? "AGENTS WRITING & EXECUTING CODE..." : "6-AGENT COUNCIL IS COLLABORATING..."}
+                </span>
+              </motion.div>
+            )}
+            <div ref={bottomRef} className="h-4" />
+          </div>
+        </div>
+
+        {/* Code panel — only shown in code mode */}
+        {isCodeMode && (
+          <div className={cn(
+            "min-h-0 pb-32 md:pb-0",
+            mobilePanel !== "code" && "hidden md:flex md:flex-col"
+          )}>
+            <div className="h-full md:max-h-[calc(100vh-18rem)]">
+              <CodePanel
+                codeFiles={allCodeFiles}
+                executions={allExecutions}
+                executingFile={executingFile}
+                installingPackages={installingPackages}
+                isCodeMode={isCodeMode}
+              />
+            </div>
+            <div ref={codeBottomRef} />
           </div>
         )}
-
-        <AnimatePresence initial={false}>
-          {allMessages.map((msg, idx) => (
-            <ChatMessage key={(msg as any).id || `stream-${idx}`} message={msg as any} />
-          ))}
-        </AnimatePresence>
-
-        {isStreaming && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center gap-3 text-blue-400/70 bg-blue-400/5 border border-blue-400/20 w-fit px-5 py-3 rounded-full mx-auto"
-          >
-            <Sparkles className="w-4 h-4 animate-pulse" />
-            <span className="text-xs tracking-widest">6-AGENT COUNCIL IS COLLABORATING...</span>
-          </motion.div>
-        )}
-        <div ref={bottomRef} className="h-4" />
       </div>
 
-      {/* Footer Controls — fixed to bottom so always visible on mobile */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 px-4 py-4 border-t border-white/5 flex justify-center items-center bg-background/95 backdrop-blur-xl">
-        {(sessionData.status === "pending" || (sessionData.status === "running" && !isStreaming && allMessages.length === 0)) && !isStreaming && (
+      {/* Footer */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 px-4 py-4 border-t border-white/5 flex justify-center items-center gap-3 bg-background/95 backdrop-blur-xl">
+        {canStart && (
           <button
             onClick={() => startStream(3)}
             className="group flex items-center justify-center w-full md:w-auto gap-3 px-10 py-4 bg-blue-500 text-white font-bold tracking-widest rounded-2xl hover:bg-blue-400 hover:shadow-[0_0_40px_rgba(96,165,250,0.5)] transition-all text-sm"
           >
             <Play className="w-5 h-5 fill-current" />
-            {sessionData.status === "running" ? "RECONNECT & RETRY" : "ACTIVATE 6-AGENT SUPER AI COUNCIL"}
+            {sessionData.status === "running"
+              ? "RECONNECT & RETRY"
+              : isCodeMode
+              ? "LAUNCH CODE LAB — 6 AGENTS LIVE"
+              : "ACTIVATE 6-AGENT SUPER AI COUNCIL"}
           </button>
         )}
 
@@ -296,7 +519,7 @@ export default function SessionPage() {
             className="group flex items-center justify-center w-full md:w-auto gap-3 px-10 py-4 bg-purple-500 text-white font-bold tracking-widest rounded-2xl hover:bg-purple-400 hover:shadow-[0_0_40px_rgba(192,132,252,0.5)] transition-all text-sm"
           >
             <CheckCircle2 className="w-5 h-5" />
-            VIEW FINAL BLUEPRINT
+            {isCodeMode ? "VIEW SYSTEM REPORT" : "VIEW FINAL BLUEPRINT"}
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         )}
