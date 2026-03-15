@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
-import type { AgentName, CodeFile, ExecutionResult } from "@/hooks/use-superai-stream";
+import type { AgentName, CodeFile, ExecutionResult, CrossChallenge } from "@/hooks/use-superai-stream";
 
 type AgentKey = AgentName;
 
@@ -95,28 +95,82 @@ const AgentCard = ({ name, isActive }: { name: AgentKey; isActive: boolean }) =>
   );
 };
 
-function ChatMessage({ message }: { message: { id?: number; agentName: string; content: string; round: number } }) {
+// Extract structured inter-agent signals from a message
+function parseAgentSignals(content: string) {
+  const challengeMatch = content.match(/CHALLENGE TO ([^:]+):\s*([^\n]+)/i);
+  const responseMatch = content.match(/DIRECT RESPONSE TO ([^:(\n]+)/i);
+  const weaknessMatch = content.match(/(?:weakest point|weakness identified)[:\s]+([^\n]{10,120})/i);
+  return {
+    challengeTo: challengeMatch ? { name: challengeMatch[1].trim().replace(/[.*]/g, ""), text: challengeMatch[2].trim() } : null,
+    responseToAgent: responseMatch ? responseMatch[1].trim().replace(/[.:*]/g, "").trim() : null,
+    weakness: weaknessMatch ? weaknessMatch[1].trim() : null,
+  };
+}
+
+function ChatMessage({ message }: { message: { id?: number; agentName: string; content: string; round: number; iteration?: number } }) {
   const agentName = message.agentName as AgentKey;
   const cfg = AGENT_CONFIG[agentName] ?? AGENT_CONFIG.Architect;
+  const signals = parseAgentSignals(message.content);
+  const targetCfg = signals.challengeTo
+    ? (AGENT_CONFIG[signals.challengeTo.name as AgentKey] ?? null)
+    : null;
+  const responseCfg = signals.responseToAgent
+    ? (AGENT_CONFIG[signals.responseToAgent as AgentKey] ?? null)
+    : null;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.35 }}
-      className={cn("w-full rounded-2xl p-4 md:p-5 border backdrop-blur-md shadow-lg", cfg.border.replace("/50", "/20"), cfg.bg)}
+      className={cn("w-full rounded-2xl border backdrop-blur-md shadow-lg overflow-hidden", cfg.border.replace("/50", "/20"), cfg.bg)}
     >
-      <div className="flex items-center justify-between mb-3 border-b border-white/5 pb-2">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 md:px-5 pt-4 pb-2 border-b border-white/5">
         <span className={cn("font-bold text-xs tracking-widest uppercase flex items-center gap-2", cfg.color)}>
           <span className={cn("w-2 h-2 rounded-full", cfg.dot)} />
           {message.agentName}
         </span>
-        <span className="text-[10px] text-white/30 font-mono tracking-widest uppercase border border-white/10 px-2 py-0.5 rounded-md bg-black/40">
-          RND {String(message.round).padStart(2, "0")}
-        </span>
+        <div className="flex items-center gap-2">
+          {message.iteration && (
+            <span className="text-[9px] font-mono text-white/20 border border-white/5 px-1.5 py-0.5 rounded">
+              ITR {message.iteration}
+            </span>
+          )}
+          <span className="text-[10px] text-white/30 font-mono tracking-widest uppercase border border-white/10 px-2 py-0.5 rounded-md bg-black/40">
+            RND {String(message.round).padStart(2, "0")}
+          </span>
+        </div>
       </div>
-      <div className="prose prose-invert prose-sm prose-p:leading-relaxed prose-pre:bg-black/50 prose-pre:border prose-pre:border-white/10 max-w-none text-white/80">
+
+      {/* Responding-to banner */}
+      {responseCfg && (
+        <div className={cn("flex items-center gap-1.5 px-4 py-1.5 text-[9px] font-mono tracking-widest border-b border-white/5", responseCfg.bg)}>
+          <ArrowRight className={cn("w-2.5 h-2.5", responseCfg.color)} />
+          <span className={cn("font-bold uppercase", responseCfg.color)}>responding to {signals.responseToAgent}</span>
+        </div>
+      )}
+
+      {/* Content */}
+      <div className="px-4 md:px-5 py-3 prose prose-invert prose-sm prose-p:leading-relaxed prose-pre:bg-black/50 prose-pre:border prose-pre:border-white/10 max-w-none text-white/80">
         <ReactMarkdown>{message.content}</ReactMarkdown>
       </div>
+
+      {/* Challenge-to footer */}
+      {signals.challengeTo && targetCfg && (
+        <div className={cn(
+          "flex items-start gap-2.5 px-4 py-2.5 border-t border-white/5",
+          targetCfg.bg
+        )}>
+          <Swords className={cn("w-3.5 h-3.5 shrink-0 mt-0.5", targetCfg.color)} />
+          <div>
+            <span className={cn("text-[9px] font-bold tracking-widest uppercase mr-2", targetCfg.color)}>
+              CHALLENGE TO {signals.challengeTo.name.toUpperCase()}:
+            </span>
+            <span className="text-[10px] text-white/60">{signals.challengeTo.text}</span>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -303,6 +357,7 @@ export default function SessionPage() {
     restoringWorkspace, restoredWorkspace,
     iterationStatus, isPackaging, packageReady, downloadUrl,
     namingInProgress, namingMessages, activeNamingAgent, decidedName,
+    crossChallenges,
   } = useSuperAIStream(sessionId);
 
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -405,11 +460,52 @@ export default function SessionPage() {
       </div>
 
       {/* Agent Grid */}
-      <div className="grid grid-cols-6 gap-2 mb-3 shrink-0">
+      <div className="grid grid-cols-6 gap-2 mb-2 shrink-0">
         {AGENT_ORDER.map((name) => (
-          <AgentCard key={name} name={name} isActive={activeAgent === name} />
+          <AgentCard key={name} name={name} isActive={activeAgent === name || activeNamingAgent === name} />
         ))}
       </div>
+
+      {/* Live Cross-Agent Challenge Feed */}
+      <AnimatePresence>
+        {isCodeMode && crossChallenges.length > 0 && (
+          <motion.div key="challenge-feed"
+            initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-3 shrink-0 overflow-hidden"
+          >
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 px-0.5 scrollbar-none">
+              <span className="shrink-0 text-[8px] font-bold tracking-[0.2em] text-white/25 uppercase mr-1">Live</span>
+              {crossChallenges.slice(-6).map((c, i) => {
+                const fromCfg = AGENT_CONFIG[c.from];
+                const toCfg = AGENT_CONFIG[c.to];
+                return (
+                  <motion.div
+                    key={`${c.timestamp}-${i}`}
+                    initial={{ opacity: 0, scale: 0.8, x: -8 }}
+                    animate={{ opacity: 1, scale: 1, x: 0 }}
+                    className="shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 border border-white/5"
+                  >
+                    <span className={cn("text-[9px] font-bold tracking-widest", fromCfg.color)}>{c.from}</span>
+                    <Swords className="w-2 h-2 text-white/20 mx-0.5" />
+                    <span className={cn("text-[9px] font-bold tracking-widest", toCfg.color)}>{c.to}</span>
+                    {c.files.length > 0 && (
+                      <span className="text-[7px] font-mono text-white/20 ml-1 max-w-[80px] truncate">
+                        {c.files[0]}
+                      </span>
+                    )}
+                  </motion.div>
+                );
+              })}
+              {isStreaming && (
+                <span className="shrink-0 text-[8px] font-mono text-white/20 ml-auto pl-2 animate-pulse">
+                  {crossChallenges.length} challenges
+                </span>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Workspace restoration banner */}
       <AnimatePresence>

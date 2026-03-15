@@ -64,6 +64,15 @@ export type NamingMessage = {
   content: string;
 };
 
+export type CrossChallenge = {
+  from: AgentName;
+  to: AgentName;
+  files: string[];
+  round: number;
+  iteration?: number;
+  timestamp: number;
+};
+
 export function useSuperAIStream(sessionId: number) {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamedMessages, setStreamedMessages] = useState<StreamedMessage[]>([]);
@@ -78,6 +87,8 @@ export function useSuperAIStream(sessionId: number) {
   const [isPackaging, setIsPackaging] = useState(false);
   const [packageReady, setPackageReady] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  // Cross-agent challenge events
+  const [crossChallenges, setCrossChallenges] = useState<CrossChallenge[]>([]);
   // Naming ceremony state
   const [namingInProgress, setNamingInProgress] = useState(false);
   const [namingMessages, setNamingMessages] = useState<NamingMessage[]>([]);
@@ -110,6 +121,7 @@ export function useSuperAIStream(sessionId: number) {
     setNamingMessages([]);
     setActiveNamingAgent(null);
     setDecidedName(null);
+    setCrossChallenges([]);
     abortControllerRef.current = new AbortController();
 
     try {
@@ -204,6 +216,21 @@ export function useSuperAIStream(sessionId: number) {
             }
             if (parsed.type === "agent_done") {
               setActiveAgent(null);
+            }
+
+            // ── Cross-agent challenges ──
+            if (parsed.type === "cross_challenge" && parsed.from && parsed.to) {
+              setCrossChallenges((prev) => [
+                ...prev.slice(-50), // keep last 50
+                {
+                  from: parsed.from as AgentName,
+                  to: parsed.to as AgentName,
+                  files: parsed.files || [],
+                  round: parsed.round || 1,
+                  iteration: parsed.iteration,
+                  timestamp: Date.now(),
+                },
+              ]);
             }
 
             // ── Messages ──
@@ -342,5 +369,6 @@ export function useSuperAIStream(sessionId: number) {
     namingMessages,
     activeNamingAgent,
     decidedName,
+    crossChallenges,
   };
 }

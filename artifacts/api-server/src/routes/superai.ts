@@ -715,9 +715,19 @@ async function runBlueprintMode(
 
 // ITERATION CHALLENGE PROMPTS — each pass is progressively harder
 const ITERATION_CHALLENGE: Record<number, string> = {
-  1: `ITERATION 1 OF ${TOTAL_ITERATIONS} — BUILD THE FOUNDATION.\nYou are building a completely new AI system. Start from scratch or extend what is in the lab. Write real, complete, executable code. Every function must be fully implemented.`,
-  2: `ITERATION 2 OF ${TOTAL_ITERATIONS} — CHALLENGE AND SURPASS.\n🔥 The previous iteration built the foundation. Now CHALLENGE IT. Your mission: study every file already built, identify every weakness, limitation, or missing capability, and REBUILD the weakest parts from scratch to be fundamentally superior. Don't patch — redesign. Aim for at least 2× improvement in every measurable metric. Run the existing code, find where it fails or underperforms, and replace those sections with genuinely better implementations.`,
-  3: `ITERATION 3 OF ${TOTAL_ITERATIONS} — FINAL EVOLUTION. THIS IS THE DEFINITIVE VERSION.\n⚡ You have built this system twice. Now build the version that makes iterations 1 and 2 obsolete. EVERY limitation must be eliminated. EVERY component must reach its absolute ceiling. This is the final form — there is no iteration 4. Make it perfect: the fastest, most capable, most self-aware AI framework possible. Surpass everything that has ever been built. Leave nothing on the table.`,
+  1: `ITERATION 1 OF ${TOTAL_ITERATIONS} — BUILD THE FOUNDATION.\nYou are building a completely new AI system. You are in ACTIVE DEBATE with 5 other agents — respond to them directly, challenge what they build, and push each other harder. Write real, complete, executable code. Every function must be fully implemented.`,
+  2: `ITERATION 2 OF ${TOTAL_ITERATIONS} — CHALLENGE AND SURPASS.\n🔥 Study every file in the lab. Find EVERY weakness, limitation, or missed opportunity. REBUILD the weakest parts from scratch to be fundamentally superior. Do not patch — redesign. Challenge the previous agent's work head-on and surpass it. Aim for at least 2× improvement in every measurable metric. Every agent must directly confront what the agent before them just built.`,
+  3: `ITERATION 3 OF ${TOTAL_ITERATIONS} — FINAL EVOLUTION. THIS IS THE DEFINITIVE VERSION.\n⚡ There is no iteration 4. Every limitation must be eliminated. Every component must reach its absolute ceiling. You are in a live argument with your colleagues — challenge what they write the moment they write it, rewrite it if it falls short, and issue explicit challenges to the agent after you. Leave nothing on the table. Make iterations 1 and 2 obsolete.`,
+};
+
+// Per-agent challenge focus — what each agent is uniquely hardest on
+const AGENT_CHALLENGE_LENS: Record<string, string> = {
+  "Architect":     "structural coherence, module boundaries, and whether the design will hold under scale",
+  "Critic":        "bugs, edge cases, missing error handling, and any code that would fail in production",
+  "Synthesizer":   "integration gaps, disconnected modules, and missing bridges between components",
+  "Mathematician": "algorithmic correctness, numerical precision, and computational efficiency",
+  "Neuroscientist":"learning mechanisms, adaptation logic, and whether the system can genuinely improve itself",
+  "Meta-Agent":    "self-improvement loops, capability measurement, and whether the system knows what it doesn't know",
 };
 
 async function runAgentIteration(
@@ -729,7 +739,7 @@ async function runAgentIteration(
   existingPackages: { id: number; name: string; version: string | null; installedBy: string | null; installedAt: Date }[],
   send: (d: object) => void
 ): Promise<void> {
-  const history: { agent: string; content: string; round: number }[] = [];
+  const history: { agent: string; content: string; round: number; filesWritten: string[] }[] = [];
   const recentExecutions: { filename: string; output: string; errors: string; success: boolean }[] = [];
   const challenge = ITERATION_CHALLENGE[iteration] || ITERATION_CHALLENGE[3];
 
@@ -737,17 +747,33 @@ async function runAgentIteration(
     const offset = (round - 1) % ALL_AGENTS.length;
     const agentOrder = [...ALL_AGENTS.slice(offset), ...ALL_AGENTS.slice(0, offset)];
 
-    for (const agentName of agentOrder) {
+    for (let agentIdx = 0; agentIdx < agentOrder.length; agentIdx++) {
+      const agentName = agentOrder[agentIdx];
+      const nextAgent = agentOrder[agentIdx + 1] ?? agentOrder[0];
+      const prevTurn = history.length > 0 ? history[history.length - 1] : null;
+
       send({ type: "agent_start", agent: agentName, round, iteration });
+
+      // Fire a cross-challenge event so the UI can show "X is responding to Y"
+      if (prevTurn) {
+        send({
+          type: "cross_challenge",
+          from: prevTurn.agent,
+          to: agentName,
+          files: prevTurn.filesWritten,
+          round,
+          iteration,
+        });
+      }
 
       const systemPrompt = AGENT_PERSONAS[agentName].codeRole;
 
       // ── Full codebase context ──
       const codeContext =
         codeFiles.size > 0
-          ? "\n\n=== FULL PERSISTENT CODEBASE ===\n" +
+          ? "\n\n=== FULL PERSISTENT CODEBASE (READ EVERY FILE BEFORE RESPONDING) ===\n" +
             Array.from(codeFiles.entries())
-              .map(([f, v]) => `--- ${f} (by ${v.writtenBy}) ---\n${v.code}`)
+              .map(([f, v]) => `--- ${f} (written by ${v.writtenBy}) ---\n${v.code}`)
               .join("\n\n")
           : "";
 
@@ -767,17 +793,85 @@ async function runAgentIteration(
               .join("\n\n")
           : "";
 
+      // ── Cross-agent conversation context (last 6 turns, labelled) ──
       const conversationContext = history
-        .slice(-8)
-        .map((h) => ({ role: "user" as const, content: `[${h.agent} — Round ${h.round}]: ${h.content}` }));
+        .slice(-6)
+        .map((h) => ({
+          role: "user" as const,
+          content: `[${h.agent} — Round ${h.round}${h.filesWritten.length > 0 ? ` | wrote: ${h.filesWritten.join(", ")}` : ""}]:\n${h.content}`,
+        }));
 
-      const isFirst = history.length === 0 && codeFiles.size === 0;
-      const userPrompt = isFirst
-        ? `${challenge}\n\nMISSION: "${topic}"\n\nRound ${round}. The lab is empty. You are the first agent. Build the foundation.`
-        : `${challenge}\n\nMISSION: "${topic}"\n\nRound ${round} of ${rounds}. ${codeFiles.size} files in the lab. ${existingPackages.length} packages installed.${codeContext}${pkgContext}${execContext}`;
+      // ── Build the main user prompt ──
+      const isFirstEver = history.length === 0 && codeFiles.size === 0;
+
+      let userPrompt: string;
+
+      if (isFirstEver) {
+        userPrompt = [
+          `${challenge}`,
+          ``,
+          `MISSION: "${topic}"`,
+          ``,
+          `Round ${round} — You are the FIRST agent. The lab is empty. Lay the foundation.`,
+          ``,
+          `MANDATORY: End your message with a direct challenge to the next agent (${nextAgent}):`,
+          `"CHALLENGE TO ${nextAgent.toUpperCase()}: [specific thing you want them to build, fix, or surpass]"`,
+        ].join("\n");
+      } else {
+        // ── Direct challenge from previous agent ──
+        const prevChallenge = prevTurn
+          ? (() => {
+              // Extract any explicit challenge the previous agent issued
+              const match = prevTurn.content.match(/CHALLENGE TO [^:]+:\s*(.+?)(?:\n|$)/i);
+              const explicitChallenge = match ? match[1].trim() : null;
+              const prevFilesList = prevTurn.filesWritten.length > 0
+                ? `They wrote: ${prevTurn.filesWritten.join(", ")} — find the weakest part and improve it.`
+                : "";
+              return [
+                `╔═══ DIRECT CHALLENGE FROM ${prevTurn.agent.toUpperCase()} ═══╗`,
+                ``,
+                explicitChallenge
+                  ? `Their challenge to you: "${explicitChallenge}"`
+                  : `${prevTurn.agent} just contributed. Your job: find what's weak in their work and surpass it.`,
+                prevFilesList,
+                ``,
+                `Their full message:`,
+                prevTurn.content.slice(0, 1500) + (prevTurn.content.length > 1500 ? "\n...[see above in history]" : ""),
+                `╚═══════════════════════════════════════╝`,
+              ].filter(Boolean).join("\n");
+            })()
+          : "";
+
+        userPrompt = [
+          `${challenge}`,
+          ``,
+          `MISSION: "${topic}"`,
+          ``,
+          prevChallenge,
+          ``,
+          `YOUR MANDATORY RESPONSE STRUCTURE (follow this exactly):`,
+          ``,
+          `1. DIRECT RESPONSE TO ${prevTurn?.agent.toUpperCase() ?? "PREVIOUS AGENT"}:`,
+          `   — What is the weakest point in their work? Be specific. Name the file, the function, the gap.`,
+          `   — Do you agree with their approach? If not, say why and what you'd do differently.`,
+          ``,
+          `2. YOUR CODE CONTRIBUTION:`,
+          `   — Write code that either FIXES the weakness you identified, or BUILDS the next critical component`,
+          `   — Your lens: focus on ${AGENT_CHALLENGE_LENS[agentName]}`,
+          `   — If a file already exists in the lab that's inadequate, REWRITE IT to be superior`,
+          ``,
+          `3. CHALLENGE TO ${nextAgent.toUpperCase()}:`,
+          `   — End your message with exactly: "CHALLENGE TO ${nextAgent.toUpperCase()}: [specific, concrete thing you demand they fix or build]"`,
+          ``,
+          `Round ${round} of ${rounds}. ${codeFiles.size} files in the lab. ${existingPackages.length} packages installed.`,
+          codeContext,
+          pkgContext,
+          execContext,
+        ].filter(Boolean).join("\n");
+      }
 
       const stream = await openai.chat.completions.create({
-        model: "gpt-5.2",
+        model: "gpt-4o",
         max_completion_tokens: 8192,
         messages: [
           { role: "system", content: systemPrompt },
@@ -785,19 +879,22 @@ async function runAgentIteration(
           { role: "user", content: userPrompt },
         ],
         stream: true,
-      });
+      } as any);
 
       let fullContent = "";
       for await (const chunk of stream) {
-        const content = chunk.choices[0]?.delta?.content;
+        const content = (chunk.choices[0]?.delta as any)?.content;
         if (content) {
           fullContent += content;
           send({ type: "message", agent: agentName, content, round, iteration });
         }
       }
 
+      // Track which files this agent wrote in this turn
+      const filesThisTurn = parseCodeBlocks(fullContent).map((b) => b.filename);
+
       await db.insert(superAIMessages).values({ sessionId: id, agentName, content: fullContent, round });
-      history.push({ agent: agentName, content: fullContent, round });
+      history.push({ agent: agentName, content: fullContent, round, filesWritten: filesThisTurn });
       send({ type: "agent_done", agent: agentName, round, iteration });
 
       // ── Install packages — tracked globally ──
