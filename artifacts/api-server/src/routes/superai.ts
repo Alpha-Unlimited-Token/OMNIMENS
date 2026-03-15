@@ -1370,8 +1370,37 @@ router.get("/superai/lab/download", async (_req, res) => {
   }
 });
 
-// ─── Lab Status Endpoint ──────────────────────────────────────────────────────
-// Returns the current state of the global persistent lab workspace
+// ─── Clear Lab Endpoint ────────────────────────────────────────────────────────
+// Wipes all persistent lab files and packages from the DB and filesystem.
+// Session records, messages, and blueprints are left untouched.
+
+router.delete("/superai/lab", async (_req, res) => {
+  try {
+    // Clear DB tables
+    await db.delete(superAILabFiles);
+    await db.delete(superAIPackages);
+
+    // Wipe the filesystem workspace but leave the directory itself
+    try {
+      const entries = await fs.readdir(LAB_WORKSPACE);
+      await Promise.all(
+        entries.map((entry) =>
+          fs.rm(path.join(LAB_WORKSPACE, entry), { recursive: true, force: true })
+        )
+      );
+    } catch {
+      // Workspace might not exist yet — that's fine
+    }
+
+    // Reinitialise a clean workspace (creates package.json etc.)
+    await initLabWorkspace();
+
+    res.json({ cleared: true });
+  } catch (err) {
+    console.error("Clear lab error:", err);
+    res.status(500).json({ error: "Failed to clear lab" });
+  }
+});
 
 router.get("/superai/lab/status", async (_req, res) => {
   try {

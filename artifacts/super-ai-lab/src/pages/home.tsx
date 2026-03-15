@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useCreateSuperAISession } from "@workspace/api-client-react";
-import { ArrowRight, BrainCircuit, Activity, FileCode, Map, Sparkles, ChevronRight, Package, CheckCircle2 } from "lucide-react";
+import { ArrowRight, BrainCircuit, Activity, FileCode, Map, Sparkles, ChevronRight, Package, CheckCircle2, Trash2, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -21,17 +21,33 @@ export default function Home() {
   const [topic, setTopic] = useState("");
   const [mode, setMode] = useState<Mode>("blueprint");
   const [labStatus, setLabStatus] = useState<LabStatus>(null);
+  const [isClearing, setIsClearing] = useState(false);
   const [, setLocation] = useLocation();
   const { mutateAsync, isPending } = useCreateSuperAISession();
 
+  const fetchLabStatus = () => {
+    fetch("/api/superai/lab/status")
+      .then((r) => r.json())
+      .then((data) => setLabStatus(data))
+      .catch(() => {});
+  };
+
   useEffect(() => {
-    if (mode === "code") {
-      fetch("/api/superai/lab/status")
-        .then((r) => r.json())
-        .then((data) => setLabStatus(data))
-        .catch(() => {});
-    }
+    if (mode === "code") fetchLabStatus();
   }, [mode]);
+
+  const handleClearLab = async () => {
+    if (!confirm("Delete all persistent lab files and packages? Agents will start fresh next run. This cannot be undone.")) return;
+    setIsClearing(true);
+    try {
+      await fetch("/api/superai/lab", { method: "DELETE" });
+      setLabStatus(null);
+    } catch (err) {
+      console.error("Failed to clear lab:", err);
+    } finally {
+      setIsClearing(false);
+    }
+  };
 
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -234,6 +250,14 @@ export default function Home() {
                 <span className="text-white/20 hidden sm:inline">
                   Agents will extend existing work — no rebuilding from scratch
                 </span>
+                <button
+                  onClick={handleClearLab}
+                  disabled={isClearing}
+                  className="ml-auto flex items-center gap-1.5 px-3 py-1 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400/70 hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/40 transition-all disabled:opacity-40 disabled:cursor-not-allowed font-bold"
+                >
+                  {isClearing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                  {isClearing ? "CLEARING..." : "CLEAR LAB"}
+                </button>
               </motion.div>
             )}
           </motion.div>

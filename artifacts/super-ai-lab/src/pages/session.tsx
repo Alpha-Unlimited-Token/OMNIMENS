@@ -181,12 +181,16 @@ function CodePanel({
   executingFile,
   installingPackages,
   isCodeMode,
+  onClearLab,
+  isClearingLab,
 }: {
   codeFiles: CodeFile[];
   executions: ExecutionResult[];
   executingFile: string | null;
   installingPackages: string[] | null;
   isCodeMode: boolean;
+  onClearLab: () => void;
+  isClearingLab: boolean;
 }) {
   const [activeFile, setActiveFile] = useState<string | null>(null);
 
@@ -227,6 +231,21 @@ function CodePanel({
             </motion.div>
           )}
           <span className="text-[10px] text-white/20 font-mono">{codeFiles.length} FILE{codeFiles.length !== 1 ? "S" : ""}</span>
+          {codeFiles.length > 0 && (
+            <button
+              onClick={onClearLab}
+              disabled={isClearingLab}
+              title="Delete all persistent lab files and packages"
+              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400/70 hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/40 transition-all disabled:opacity-40 disabled:cursor-not-allowed text-[10px] font-bold tracking-widest"
+            >
+              {isClearingLab ? (
+                <Loader2 className="w-3 h-3 animate-spin" />
+              ) : (
+                <Trash2 className="w-3 h-3" />
+              )}
+              CLEAR LAB
+            </button>
+          )}
         </div>
       </div>
 
@@ -348,6 +367,7 @@ export default function SessionPage() {
   const sessionId = parseInt(params.id || "0");
   const [, setLocation] = useLocation();
   const [mobilePanel, setMobilePanel] = useState<"conversation" | "code">("conversation");
+  const [isClearingLab, setIsClearingLab] = useState(false);
 
   const { data: sessionData, isLoading } = useGetSuperAISession(sessionId);
   const { mutateAsync: deleteSession, isPending: isDeleting } = useDeleteSuperAISession();
@@ -396,6 +416,18 @@ export default function SessionPage() {
     if (confirm("Purge this session from memory? This action is irreversible.")) {
       await deleteSession({ id: sessionId });
       setLocation("/");
+    }
+  };
+
+  const handleClearLab = async () => {
+    if (!confirm("Delete all persistent lab files and packages? Agents will start fresh next run. This cannot be undone.")) return;
+    setIsClearingLab(true);
+    try {
+      await fetch("/api/superai/lab", { method: "DELETE" });
+    } catch (err) {
+      console.error("Failed to clear lab:", err);
+    } finally {
+      setIsClearingLab(false);
     }
   };
 
@@ -916,6 +948,8 @@ export default function SessionPage() {
                 executingFile={executingFile}
                 installingPackages={installingPackages}
                 isCodeMode={isCodeMode}
+                onClearLab={handleClearLab}
+                isClearingLab={isClearingLab}
               />
             </div>
             <div ref={codeBottomRef} />
