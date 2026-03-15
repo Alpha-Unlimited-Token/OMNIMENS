@@ -6,4 +6,20 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./createOpenaiConversationBody";
+export * from "./createSuperAISessionBody";
 export * from "./healthStatus";
+export * from "./openaiConversation";
+export * from "./openaiConversationWithMessages";
+export * from "./openaiError";
+export * from "./openaiMessage";
+export * from "./runSuperAISessionBody";
+export * from "./sendOpenaiMessageBody";
+export * from "./superAIAgentMessage";
+export * from "./superAIAgentMessageAgentName";
+export * from "./superAIBlueprint";
+export * from "./superAIError";
+export * from "./superAISession";
+export * from "./superAISessionStatus";
+export * from "./superAISessionWithMessages";
+export * from "./superAISessionWithMessagesStatus";

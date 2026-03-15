@@ -8,3 +8,107 @@
 export interface HealthStatus {
   status: string;
 }
+
+export interface OpenaiConversation {
+  id: number;
+  title: string;
+  createdAt: string;
+}
+
+export interface OpenaiMessage {
+  id: number;
+  conversationId: number;
+  role: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface CreateOpenaiConversationBody {
+  title: string;
+}
+
+export interface SendOpenaiMessageBody {
+  content: string;
+}
+
+export interface OpenaiConversationWithMessages {
+  id: number;
+  title: string;
+  createdAt: string;
+  messages: OpenaiMessage[];
+}
+
+export interface OpenaiError {
+  error: string;
+}
+
+export type SuperAISessionStatus =
+  (typeof SuperAISessionStatus)[keyof typeof SuperAISessionStatus];
+
+export const SuperAISessionStatus = {
+  pending: "pending",
+  running: "running",
+  completed: "completed",
+} as const;
+
+export interface SuperAISession {
+  id: number;
+  topic: string;
+  status: SuperAISessionStatus;
+  createdAt: string;
+}
+
+export type SuperAISessionWithMessagesStatus =
+  (typeof SuperAISessionWithMessagesStatus)[keyof typeof SuperAISessionWithMessagesStatus];
+
+export const SuperAISessionWithMessagesStatus = {
+  pending: "pending",
+  running: "running",
+  completed: "completed",
+} as const;
+
+export type SuperAIAgentMessageAgentName =
+  (typeof SuperAIAgentMessageAgentName)[keyof typeof SuperAIAgentMessageAgentName];
+
+export const SuperAIAgentMessageAgentName = {
+  Architect: "Architect",
+  Critic: "Critic",
+  Synthesizer: "Synthesizer",
+} as const;
+
+export interface SuperAIAgentMessage {
+  id: number;
+  sessionId: number;
+  agentName: SuperAIAgentMessageAgentName;
+  content: string;
+  round: number;
+  createdAt: string;
+}
+
+export interface SuperAISessionWithMessages {
+  id: number;
+  topic: string;
+  status: SuperAISessionWithMessagesStatus;
+  createdAt: string;
+  messages: SuperAIAgentMessage[];
+}
+
+export interface CreateSuperAISessionBody {
+  topic: string;
+}
+
+export interface RunSuperAISessionBody {
+  /** Number of discussion rounds between agents (1-5) */
+  rounds?: number;
+}
+
+export interface SuperAIBlueprint {
+  sessionId: number;
+  title: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface SuperAIError {
+  error: string;
+}

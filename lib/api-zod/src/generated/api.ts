@@ -14,3 +14,163 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * @summary List all conversations
+ */
+export const ListOpenaiConversationsResponseItem = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  createdAt: zod.date(),
+});
+export const ListOpenaiConversationsResponse = zod.array(
+  ListOpenaiConversationsResponseItem,
+);
+
+/**
+ * @summary Create a new conversation
+ */
+export const CreateOpenaiConversationBody = zod.object({
+  title: zod.string(),
+});
+
+/**
+ * @summary Get conversation with messages
+ */
+export const GetOpenaiConversationParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetOpenaiConversationResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  createdAt: zod.date(),
+  messages: zod.array(
+    zod.object({
+      id: zod.number(),
+      conversationId: zod.number(),
+      role: zod.string(),
+      content: zod.string(),
+      createdAt: zod.date(),
+    }),
+  ),
+});
+
+/**
+ * @summary Delete a conversation
+ */
+export const DeleteOpenaiConversationParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * @summary List messages in a conversation
+ */
+export const ListOpenaiMessagesParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const ListOpenaiMessagesResponseItem = zod.object({
+  id: zod.number(),
+  conversationId: zod.number(),
+  role: zod.string(),
+  content: zod.string(),
+  createdAt: zod.date(),
+});
+export const ListOpenaiMessagesResponse = zod.array(
+  ListOpenaiMessagesResponseItem,
+);
+
+/**
+ * @summary Send a text message and receive a streaming text response
+ */
+export const SendOpenaiMessageParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const SendOpenaiMessageBody = zod.object({
+  content: zod.string(),
+});
+
+/**
+ * @summary List all Super AI collaboration sessions
+ */
+export const ListSuperAISessionsResponseItem = zod.object({
+  id: zod.number(),
+  topic: zod.string(),
+  status: zod.enum(["pending", "running", "completed"]),
+  createdAt: zod.date(),
+});
+export const ListSuperAISessionsResponse = zod.array(
+  ListSuperAISessionsResponseItem,
+);
+
+/**
+ * @summary Create a new Super AI session
+ */
+export const CreateSuperAISessionBody = zod.object({
+  topic: zod.string(),
+});
+
+/**
+ * @summary Get session with all agent messages
+ */
+export const GetSuperAISessionParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetSuperAISessionResponse = zod.object({
+  id: zod.number(),
+  topic: zod.string(),
+  status: zod.enum(["pending", "running", "completed"]),
+  createdAt: zod.date(),
+  messages: zod.array(
+    zod.object({
+      id: zod.number(),
+      sessionId: zod.number(),
+      agentName: zod.enum(["Architect", "Critic", "Synthesizer"]),
+      content: zod.string(),
+      round: zod.number(),
+      createdAt: zod.date(),
+    }),
+  ),
+});
+
+/**
+ * @summary Delete a session
+ */
+export const DeleteSuperAISessionParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * Streams real-time SSE events as three AI agents (Architect, Critic, Synthesizer)
+discuss and develop a superior AI design. Each event carries the agent name and
+message chunk, culminating in a final blueprint document.
+
+ * @summary Run the multi-agent collaboration and stream agent messages
+ */
+export const RunSuperAISessionParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const RunSuperAISessionBody = zod.object({
+  rounds: zod
+    .number()
+    .optional()
+    .describe("Number of discussion rounds between agents (1-5)"),
+});
+
+/**
+ * @summary Get the final Super AI blueprint document for a session
+ */
+export const GetSuperAIBlueprintParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetSuperAIBlueprintResponse = zod.object({
+  sessionId: zod.number(),
+  title: zod.string(),
+  content: zod.string(),
+  createdAt: zod.date(),
+});

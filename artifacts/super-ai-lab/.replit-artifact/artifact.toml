@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Super AI Lab"
+version = "1.0.0"
+id = "artifacts/super-ai-lab"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+localPort = 26095
+name = "web"
+paths = ["/"]
+
+[services.development]
+run = "pnpm --filter @workspace/super-ai-lab run dev"
+
+[services.env]
+PORT = "26095"
+BASE_PATH = "/"
+
+[services.production]
+build = ["pnpm", "--filter", "@workspace/super-ai-lab", "run", "build"]
+publicDir = "artifacts/super-ai-lab/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"

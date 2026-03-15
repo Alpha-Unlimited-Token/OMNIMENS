@@ -5,18 +5,35 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { HealthStatus } from "./api.schemas";
+import type {
+  CreateOpenaiConversationBody,
+  CreateSuperAISessionBody,
+  HealthStatus,
+  OpenaiConversation,
+  OpenaiConversationWithMessages,
+  OpenaiError,
+  OpenaiMessage,
+  RunSuperAISessionBody,
+  SendOpenaiMessageBody,
+  SuperAIBlueprint,
+  SuperAIError,
+  SuperAISession,
+  SuperAISessionWithMessages,
+} from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
-import type { ErrorType } from "../custom-fetch";
+import type { ErrorType, BodyType } from "../custom-fetch";
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -92,6 +109,1029 @@ export function useHealthCheck<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getHealthCheckQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary List all conversations
+ */
+export const getListOpenaiConversationsUrl = () => {
+  return `/api/openai/conversations`;
+};
+
+export const listOpenaiConversations = async (
+  options?: RequestInit,
+): Promise<OpenaiConversation[]> => {
+  return customFetch<OpenaiConversation[]>(getListOpenaiConversationsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListOpenaiConversationsQueryKey = () => {
+  return [`/api/openai/conversations`] as const;
+};
+
+export const getListOpenaiConversationsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listOpenaiConversations>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listOpenaiConversations>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListOpenaiConversationsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listOpenaiConversations>>
+  > = ({ signal }) => listOpenaiConversations({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listOpenaiConversations>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListOpenaiConversationsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listOpenaiConversations>>
+>;
+export type ListOpenaiConversationsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List all conversations
+ */
+
+export function useListOpenaiConversations<
+  TData = Awaited<ReturnType<typeof listOpenaiConversations>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listOpenaiConversations>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListOpenaiConversationsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Create a new conversation
+ */
+export const getCreateOpenaiConversationUrl = () => {
+  return `/api/openai/conversations`;
+};
+
+export const createOpenaiConversation = async (
+  createOpenaiConversationBody: CreateOpenaiConversationBody,
+  options?: RequestInit,
+): Promise<OpenaiConversation> => {
+  return customFetch<OpenaiConversation>(getCreateOpenaiConversationUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createOpenaiConversationBody),
+  });
+};
+
+export const getCreateOpenaiConversationMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createOpenaiConversation>>,
+    TError,
+    { data: BodyType<CreateOpenaiConversationBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createOpenaiConversation>>,
+  TError,
+  { data: BodyType<CreateOpenaiConversationBody> },
+  TContext
+> => {
+  const mutationKey = ["createOpenaiConversation"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createOpenaiConversation>>,
+    { data: BodyType<CreateOpenaiConversationBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createOpenaiConversation(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateOpenaiConversationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createOpenaiConversation>>
+>;
+export type CreateOpenaiConversationMutationBody =
+  BodyType<CreateOpenaiConversationBody>;
+export type CreateOpenaiConversationMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Create a new conversation
+ */
+export const useCreateOpenaiConversation = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createOpenaiConversation>>,
+    TError,
+    { data: BodyType<CreateOpenaiConversationBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createOpenaiConversation>>,
+  TError,
+  { data: BodyType<CreateOpenaiConversationBody> },
+  TContext
+> => {
+  return useMutation(getCreateOpenaiConversationMutationOptions(options));
+};
+
+/**
+ * @summary Get conversation with messages
+ */
+export const getGetOpenaiConversationUrl = (id: number) => {
+  return `/api/openai/conversations/${id}`;
+};
+
+export const getOpenaiConversation = async (
+  id: number,
+  options?: RequestInit,
+): Promise<OpenaiConversationWithMessages> => {
+  return customFetch<OpenaiConversationWithMessages>(
+    getGetOpenaiConversationUrl(id),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export const getGetOpenaiConversationQueryKey = (id: number) => {
+  return [`/api/openai/conversations/${id}`] as const;
+};
+
+export const getGetOpenaiConversationQueryOptions = <
+  TData = Awaited<ReturnType<typeof getOpenaiConversation>>,
+  TError = ErrorType<OpenaiError>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getOpenaiConversation>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetOpenaiConversationQueryKey(id);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getOpenaiConversation>>
+  > = ({ signal }) => getOpenaiConversation(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getOpenaiConversation>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetOpenaiConversationQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getOpenaiConversation>>
+>;
+export type GetOpenaiConversationQueryError = ErrorType<OpenaiError>;
+
+/**
+ * @summary Get conversation with messages
+ */
+
+export function useGetOpenaiConversation<
+  TData = Awaited<ReturnType<typeof getOpenaiConversation>>,
+  TError = ErrorType<OpenaiError>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getOpenaiConversation>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetOpenaiConversationQueryOptions(id, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Delete a conversation
+ */
+export const getDeleteOpenaiConversationUrl = (id: number) => {
+  return `/api/openai/conversations/${id}`;
+};
+
+export const deleteOpenaiConversation = async (
+  id: number,
+  options?: RequestInit,
+): Promise<void> => {
+  return customFetch<void>(getDeleteOpenaiConversationUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteOpenaiConversationMutationOptions = <
+  TError = ErrorType<OpenaiError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteOpenaiConversation>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteOpenaiConversation>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteOpenaiConversation"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteOpenaiConversation>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteOpenaiConversation(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteOpenaiConversationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteOpenaiConversation>>
+>;
+
+export type DeleteOpenaiConversationMutationError = ErrorType<OpenaiError>;
+
+/**
+ * @summary Delete a conversation
+ */
+export const useDeleteOpenaiConversation = <
+  TError = ErrorType<OpenaiError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteOpenaiConversation>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteOpenaiConversation>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteOpenaiConversationMutationOptions(options));
+};
+
+/**
+ * @summary List messages in a conversation
+ */
+export const getListOpenaiMessagesUrl = (id: number) => {
+  return `/api/openai/conversations/${id}/messages`;
+};
+
+export const listOpenaiMessages = async (
+  id: number,
+  options?: RequestInit,
+): Promise<OpenaiMessage[]> => {
+  return customFetch<OpenaiMessage[]>(getListOpenaiMessagesUrl(id), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListOpenaiMessagesQueryKey = (id: number) => {
+  return [`/api/openai/conversations/${id}/messages`] as const;
+};
+
+export const getListOpenaiMessagesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listOpenaiMessages>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listOpenaiMessages>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListOpenaiMessagesQueryKey(id);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listOpenaiMessages>>
+  > = ({ signal }) => listOpenaiMessages(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof listOpenaiMessages>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListOpenaiMessagesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listOpenaiMessages>>
+>;
+export type ListOpenaiMessagesQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List messages in a conversation
+ */
+
+export function useListOpenaiMessages<
+  TData = Awaited<ReturnType<typeof listOpenaiMessages>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listOpenaiMessages>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListOpenaiMessagesQueryOptions(id, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Send a text message and receive a streaming text response
+ */
+export const getSendOpenaiMessageUrl = (id: number) => {
+  return `/api/openai/conversations/${id}/messages`;
+};
+
+export const sendOpenaiMessage = async (
+  id: number,
+  sendOpenaiMessageBody: SendOpenaiMessageBody,
+  options?: RequestInit,
+): Promise<unknown> => {
+  return customFetch<unknown>(getSendOpenaiMessageUrl(id), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(sendOpenaiMessageBody),
+  });
+};
+
+export const getSendOpenaiMessageMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof sendOpenaiMessage>>,
+    TError,
+    { id: number; data: BodyType<SendOpenaiMessageBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof sendOpenaiMessage>>,
+  TError,
+  { id: number; data: BodyType<SendOpenaiMessageBody> },
+  TContext
+> => {
+  const mutationKey = ["sendOpenaiMessage"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof sendOpenaiMessage>>,
+    { id: number; data: BodyType<SendOpenaiMessageBody> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return sendOpenaiMessage(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SendOpenaiMessageMutationResult = NonNullable<
+  Awaited<ReturnType<typeof sendOpenaiMessage>>
+>;
+export type SendOpenaiMessageMutationBody = BodyType<SendOpenaiMessageBody>;
+export type SendOpenaiMessageMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Send a text message and receive a streaming text response
+ */
+export const useSendOpenaiMessage = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof sendOpenaiMessage>>,
+    TError,
+    { id: number; data: BodyType<SendOpenaiMessageBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof sendOpenaiMessage>>,
+  TError,
+  { id: number; data: BodyType<SendOpenaiMessageBody> },
+  TContext
+> => {
+  return useMutation(getSendOpenaiMessageMutationOptions(options));
+};
+
+/**
+ * @summary List all Super AI collaboration sessions
+ */
+export const getListSuperAISessionsUrl = () => {
+  return `/api/superai/sessions`;
+};
+
+export const listSuperAISessions = async (
+  options?: RequestInit,
+): Promise<SuperAISession[]> => {
+  return customFetch<SuperAISession[]>(getListSuperAISessionsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListSuperAISessionsQueryKey = () => {
+  return [`/api/superai/sessions`] as const;
+};
+
+export const getListSuperAISessionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listSuperAISessions>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listSuperAISessions>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListSuperAISessionsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listSuperAISessions>>
+  > = ({ signal }) => listSuperAISessions({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listSuperAISessions>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListSuperAISessionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listSuperAISessions>>
+>;
+export type ListSuperAISessionsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List all Super AI collaboration sessions
+ */
+
+export function useListSuperAISessions<
+  TData = Awaited<ReturnType<typeof listSuperAISessions>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listSuperAISessions>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListSuperAISessionsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Create a new Super AI session
+ */
+export const getCreateSuperAISessionUrl = () => {
+  return `/api/superai/sessions`;
+};
+
+export const createSuperAISession = async (
+  createSuperAISessionBody: CreateSuperAISessionBody,
+  options?: RequestInit,
+): Promise<SuperAISession> => {
+  return customFetch<SuperAISession>(getCreateSuperAISessionUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createSuperAISessionBody),
+  });
+};
+
+export const getCreateSuperAISessionMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createSuperAISession>>,
+    TError,
+    { data: BodyType<CreateSuperAISessionBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createSuperAISession>>,
+  TError,
+  { data: BodyType<CreateSuperAISessionBody> },
+  TContext
+> => {
+  const mutationKey = ["createSuperAISession"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createSuperAISession>>,
+    { data: BodyType<CreateSuperAISessionBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createSuperAISession(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateSuperAISessionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createSuperAISession>>
+>;
+export type CreateSuperAISessionMutationBody =
+  BodyType<CreateSuperAISessionBody>;
+export type CreateSuperAISessionMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Create a new Super AI session
+ */
+export const useCreateSuperAISession = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createSuperAISession>>,
+    TError,
+    { data: BodyType<CreateSuperAISessionBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createSuperAISession>>,
+  TError,
+  { data: BodyType<CreateSuperAISessionBody> },
+  TContext
+> => {
+  return useMutation(getCreateSuperAISessionMutationOptions(options));
+};
+
+/**
+ * @summary Get session with all agent messages
+ */
+export const getGetSuperAISessionUrl = (id: number) => {
+  return `/api/superai/sessions/${id}`;
+};
+
+export const getSuperAISession = async (
+  id: number,
+  options?: RequestInit,
+): Promise<SuperAISessionWithMessages> => {
+  return customFetch<SuperAISessionWithMessages>(getGetSuperAISessionUrl(id), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetSuperAISessionQueryKey = (id: number) => {
+  return [`/api/superai/sessions/${id}`] as const;
+};
+
+export const getGetSuperAISessionQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSuperAISession>>,
+  TError = ErrorType<SuperAIError>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getSuperAISession>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetSuperAISessionQueryKey(id);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getSuperAISession>>
+  > = ({ signal }) => getSuperAISession(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getSuperAISession>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetSuperAISessionQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getSuperAISession>>
+>;
+export type GetSuperAISessionQueryError = ErrorType<SuperAIError>;
+
+/**
+ * @summary Get session with all agent messages
+ */
+
+export function useGetSuperAISession<
+  TData = Awaited<ReturnType<typeof getSuperAISession>>,
+  TError = ErrorType<SuperAIError>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getSuperAISession>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetSuperAISessionQueryOptions(id, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Delete a session
+ */
+export const getDeleteSuperAISessionUrl = (id: number) => {
+  return `/api/superai/sessions/${id}`;
+};
+
+export const deleteSuperAISession = async (
+  id: number,
+  options?: RequestInit,
+): Promise<void> => {
+  return customFetch<void>(getDeleteSuperAISessionUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteSuperAISessionMutationOptions = <
+  TError = ErrorType<SuperAIError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteSuperAISession>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteSuperAISession>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteSuperAISession"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteSuperAISession>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteSuperAISession(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteSuperAISessionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteSuperAISession>>
+>;
+
+export type DeleteSuperAISessionMutationError = ErrorType<SuperAIError>;
+
+/**
+ * @summary Delete a session
+ */
+export const useDeleteSuperAISession = <
+  TError = ErrorType<SuperAIError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteSuperAISession>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteSuperAISession>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteSuperAISessionMutationOptions(options));
+};
+
+/**
+ * Streams real-time SSE events as three AI agents (Architect, Critic, Synthesizer)
+discuss and develop a superior AI design. Each event carries the agent name and
+message chunk, culminating in a final blueprint document.
+
+ * @summary Run the multi-agent collaboration and stream agent messages
+ */
+export const getRunSuperAISessionUrl = (id: number) => {
+  return `/api/superai/sessions/${id}/run`;
+};
+
+export const runSuperAISession = async (
+  id: number,
+  runSuperAISessionBody: RunSuperAISessionBody,
+  options?: RequestInit,
+): Promise<unknown> => {
+  return customFetch<unknown>(getRunSuperAISessionUrl(id), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(runSuperAISessionBody),
+  });
+};
+
+export const getRunSuperAISessionMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof runSuperAISession>>,
+    TError,
+    { id: number; data: BodyType<RunSuperAISessionBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof runSuperAISession>>,
+  TError,
+  { id: number; data: BodyType<RunSuperAISessionBody> },
+  TContext
+> => {
+  const mutationKey = ["runSuperAISession"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof runSuperAISession>>,
+    { id: number; data: BodyType<RunSuperAISessionBody> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return runSuperAISession(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RunSuperAISessionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof runSuperAISession>>
+>;
+export type RunSuperAISessionMutationBody = BodyType<RunSuperAISessionBody>;
+export type RunSuperAISessionMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Run the multi-agent collaboration and stream agent messages
+ */
+export const useRunSuperAISession = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof runSuperAISession>>,
+    TError,
+    { id: number; data: BodyType<RunSuperAISessionBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof runSuperAISession>>,
+  TError,
+  { id: number; data: BodyType<RunSuperAISessionBody> },
+  TContext
+> => {
+  return useMutation(getRunSuperAISessionMutationOptions(options));
+};
+
+/**
+ * @summary Get the final Super AI blueprint document for a session
+ */
+export const getGetSuperAIBlueprintUrl = (id: number) => {
+  return `/api/superai/sessions/${id}/blueprint`;
+};
+
+export const getSuperAIBlueprint = async (
+  id: number,
+  options?: RequestInit,
+): Promise<SuperAIBlueprint> => {
+  return customFetch<SuperAIBlueprint>(getGetSuperAIBlueprintUrl(id), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetSuperAIBlueprintQueryKey = (id: number) => {
+  return [`/api/superai/sessions/${id}/blueprint`] as const;
+};
+
+export const getGetSuperAIBlueprintQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSuperAIBlueprint>>,
+  TError = ErrorType<SuperAIError>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getSuperAIBlueprint>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetSuperAIBlueprintQueryKey(id);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getSuperAIBlueprint>>
+  > = ({ signal }) => getSuperAIBlueprint(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getSuperAIBlueprint>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetSuperAIBlueprintQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getSuperAIBlueprint>>
+>;
+export type GetSuperAIBlueprintQueryError = ErrorType<SuperAIError>;
+
+/**
+ * @summary Get the final Super AI blueprint document for a session
+ */
+
+export function useGetSuperAIBlueprint<
+  TData = Awaited<ReturnType<typeof getSuperAIBlueprint>>,
+  TError = ErrorType<SuperAIError>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getSuperAIBlueprint>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetSuperAIBlueprintQueryOptions(id, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

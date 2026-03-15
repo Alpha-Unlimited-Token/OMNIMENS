@@ -1,0 +1,16 @@
+packages:
+  "framer-motion": "For smooth page transitions and glowing pulse animations"
+  "react-markdown": "To render the synthesized AI blueprint beautifully"
+  "@tailwindcss/typography": "Typography plugin for rendering markdown text"
+  "date-fns": "For formatting session timestamps"
+  "clsx": "Class merging logic"
+  "tailwind-merge": "Tailwind utility class merging"
+
+images:
+  - path: "artifacts/super-ai-lab/public/images/hero-bg.png"
+    description: "Dark futuristic sci-fi background with glowing neural network nodes and abstract neon light connections in electric blue and purple"
+    aspect_ratio: "16:9"
+
+notes:
+  - using native fetch with ReadableStream for SSE POST
+  - using generated orval hooks from @workspace/api-client-react for standard CRUD operations
