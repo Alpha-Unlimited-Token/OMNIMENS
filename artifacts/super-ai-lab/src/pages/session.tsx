@@ -218,9 +218,9 @@ export default function SessionPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-6rem)]">
+    <div className="flex flex-col min-h-[calc(100vh-6rem)]">
       {/* Header */}
-      <div className="mb-6 flex justify-between items-start shrink-0">
+      <div className="mb-4 flex justify-between items-start shrink-0">
         <div>
           <h1 className="text-2xl md:text-3xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60 tracking-tight">
             {sessionData.topic}
@@ -255,7 +255,7 @@ export default function SessionPage() {
       </div>
 
       {/* Messages Feed */}
-      <div className="flex-1 overflow-y-auto space-y-5 pr-2 pb-10 scrollbar-thin">
+      <div className="flex-1 overflow-y-auto space-y-5 pr-2 pb-28 scrollbar-thin">
         {allMessages.length === 0 && !isStreaming && (
           <div className="h-full flex flex-col items-center justify-center text-white/20 border border-dashed border-white/10 rounded-3xl bg-white/5 min-h-[200px]">
             <Brain className="w-10 h-10 mb-3 opacity-50" />
@@ -282,8 +282,8 @@ export default function SessionPage() {
         <div ref={bottomRef} className="h-4" />
       </div>
 
-      {/* Footer Controls */}
-      <div className="pt-5 mt-auto border-t border-white/5 shrink-0 flex justify-center items-center bg-background/80 backdrop-blur-xl">
+      {/* Footer Controls — fixed to bottom so always visible on mobile */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 px-4 py-4 border-t border-white/5 flex justify-center items-center bg-background/95 backdrop-blur-xl">
         {sessionData.status === "pending" && !isStreaming && (
           <button
             onClick={() => startStream(3)}
