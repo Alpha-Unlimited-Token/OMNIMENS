@@ -6,6 +6,14 @@ export type Message = {
   id: string;
   role: "user" | "godflesh";
   content: string;
+  files?: AttachedFile[];
+};
+
+export type AttachedFile = {
+  name: string;
+  type: string;
+  size: number;
+  preview?: string; // data URL for images
 };
 
 export function useGodfleshChat(onLimitReached: () => void) {
@@ -15,31 +23,62 @@ export function useGodfleshChat(onLimitReached: () => void) {
   const queryClient = useQueryClient();
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const sendMessage = async (content: string) => {
-    if (!content.trim() || isTyping) return;
+  const sendMessage = async (content: string, files: File[] = []) => {
+    if (!content.trim() && files.length === 0) return;
+    if (isTyping) return;
 
     const userMsgId = Date.now().toString();
     const assistantMsgId = (Date.now() + 1).toString();
 
-    setMessages((prev) => [...prev, { id: userMsgId, role: "user", content }]);
+    // Build file metadata + previews for display
+    const attachedFiles: AttachedFile[] = await Promise.all(
+      files.map(async (f) => {
+        const base: AttachedFile = { name: f.name, type: f.type, size: f.size };
+        if (f.type.startsWith("image/")) {
+          base.preview = await new Promise<string>((res) => {
+            const reader = new FileReader();
+            reader.onload = (e) => res(e.target?.result as string);
+            reader.readAsDataURL(f);
+          });
+        }
+        return base;
+      })
+    );
+
+    setMessages((prev) => [
+      ...prev,
+      { id: userMsgId, role: "user", content, files: attachedFiles.length ? attachedFiles : undefined },
+    ]);
     setIsTyping(true);
     setError(null);
 
     abortControllerRef.current = new AbortController();
 
     try {
+      // Build conversation history (text only for API)
+      const history = messages.slice(-10).map((m) => ({
+        role: m.role === "user" ? "user" : "assistant",
+        content: m.content,
+      }));
+
+      // Use FormData to support file uploads
+      const form = new FormData();
+      form.append("message", content);
+      form.append("history", JSON.stringify(history));
+      for (const file of files) {
+        form.append("files", file);
+      }
+
       const res = await fetch("/api/godflesh/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: content }),
+        body: form,
         signal: abortControllerRef.current.signal,
       });
 
       if (!res.ok) {
         if (res.status === 403) {
           onLimitReached();
-          // Remove the optimistic user message if limit was reached before sending
-          setMessages((prev) => prev.filter(m => m.id !== userMsgId));
+          setMessages((prev) => prev.filter((m) => m.id !== userMsgId));
           setIsTyping(false);
           return;
         }
@@ -65,7 +104,7 @@ export function useGodfleshChat(onLimitReached: () => void) {
           if (line.startsWith("data: ")) {
             try {
               const data = JSON.parse(line.slice(6));
-              
+
               if (data.type === "chunk") {
                 assistantContent += data.content;
                 setMessages((prev) => {
@@ -79,7 +118,7 @@ export function useGodfleshChat(onLimitReached: () => void) {
               } else if (data.type === "limit_reached") {
                 onLimitReached();
               }
-            } catch (e) {
+            } catch {
               // Ignore parse errors on incomplete chunks
             }
           }
@@ -92,7 +131,6 @@ export function useGodfleshChat(onLimitReached: () => void) {
     } finally {
       setIsTyping(false);
       abortControllerRef.current = null;
-      // Refresh status to update message counts
       queryClient.invalidateQueries({ queryKey: getGetGodfleshStatusQueryKey() });
     }
   };
