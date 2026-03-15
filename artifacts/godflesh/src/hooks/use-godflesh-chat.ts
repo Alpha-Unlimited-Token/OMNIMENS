@@ -2,18 +2,26 @@ import { useState, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getGetGodfleshStatusQueryKey } from "@workspace/api-client-react";
 
+export type GeneratedImage = {
+  url: string;
+  prompt: string;
+  index: number;
+};
+
 export type Message = {
   id: string;
   role: "user" | "godflesh";
   content: string;
   files?: AttachedFile[];
+  images?: GeneratedImage[];
+  generatingImages?: boolean;
 };
 
 export type AttachedFile = {
   name: string;
   type: string;
   size: number;
-  preview?: string; // data URL for images
+  preview?: string;
 };
 
 export function useGodfleshChat(onLimitReached: () => void) {
@@ -30,7 +38,6 @@ export function useGodfleshChat(onLimitReached: () => void) {
     const userMsgId = Date.now().toString();
     const assistantMsgId = (Date.now() + 1).toString();
 
-    // Build file metadata + previews for display
     const attachedFiles: AttachedFile[] = await Promise.all(
       files.map(async (f) => {
         const base: AttachedFile = { name: f.name, type: f.type, size: f.size };
@@ -55,13 +62,11 @@ export function useGodfleshChat(onLimitReached: () => void) {
     abortControllerRef.current = new AbortController();
 
     try {
-      // Build conversation history (text only for API)
       const history = messages.slice(-10).map((m) => ({
         role: m.role === "user" ? "user" : "assistant",
         content: m.content,
       }));
 
-      // Use FormData to support file uploads
       const form = new FormData();
       form.append("message", content);
       form.append("history", JSON.stringify(history));
@@ -110,13 +115,55 @@ export function useGodfleshChat(onLimitReached: () => void) {
                 setMessages((prev) => {
                   const newMsgs = [...prev];
                   const lastMsg = newMsgs[newMsgs.length - 1];
-                  if (lastMsg && lastMsg.role === "godflesh") {
+                  if (lastMsg?.role === "godflesh") {
                     lastMsg.content = assistantContent;
                   }
                   return newMsgs;
                 });
+
+              } else if (data.type === "image_generating") {
+                // Show a "generating..." placeholder on the message
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) msg.generatingImages = true;
+                  return newMsgs;
+                });
+
+              } else if (data.type === "image_generated") {
+                // Append the real image to the message
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    msg.images = [...(msg.images || []), {
+                      url: data.url,
+                      prompt: data.prompt,
+                      index: data.index,
+                    }];
+                    msg.generatingImages = false;
+                  }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "image_error") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) msg.generatingImages = false;
+                  return newMsgs;
+                });
+
               } else if (data.type === "limit_reached") {
                 onLimitReached();
+
+              } else if (data.type === "done") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) msg.generatingImages = false;
+                  return newMsgs;
+                });
               }
             } catch {
               // Ignore parse errors on incomplete chunks
