@@ -357,21 +357,13 @@ export default function Chat() {
 function GeneratedImageCard({ image }: { image: GeneratedImage }) {
   const [expanded, setExpanded] = useState(false);
 
-  const handleDownload = async () => {
-    try {
-      const response = await fetch(image.url);
-      const blob = await response.blob();
-      const objectUrl = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = objectUrl;
-      a.download = `godflesh-${image.index + 1}.png`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(objectUrl);
-    } catch {
-      window.open(image.url, "_blank");
-    }
+  const handleDownload = () => {
+    const a = document.createElement("a");
+    a.href = image.url;
+    a.download = `godflesh-${image.index + 1}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   return (

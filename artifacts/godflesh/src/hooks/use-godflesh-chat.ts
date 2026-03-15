@@ -121,6 +121,16 @@ export function useGodfleshChat(onLimitReached: () => void) {
                   return newMsgs;
                 });
 
+              } else if (data.type === "content_update") {
+                // Server stripped [GENERATE_IMAGE: ...] markers — replace displayed text
+                assistantContent = data.content;
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) msg.content = data.content;
+                  return newMsgs;
+                });
+
               } else if (data.type === "image_generating") {
                 // Show a "generating..." placeholder on the message
                 setMessages((prev) => {

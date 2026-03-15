@@ -3,7 +3,7 @@ import multer from "multer";
 import { db } from "@workspace/db";
 import { godfleshUsers, godfleshUsage, godfleshBrain, godfleshUpgrades, godfleshNotifications } from "@workspace/db";
 import { eq, and, desc, sql } from "drizzle-orm";
-import { openai } from "@workspace/integrations-openai-ai-server";
+import { openai, generateImageBuffer } from "@workspace/integrations-openai-ai-server";
 import { runGodflesh, type GodfleshState } from "../lib/godflesh-engine.js";
 import { reflectOnConversation, loadBrainContext, synthesizeUpgrade, markUpgradeLive } from "../lib/godflesh-self-upgrade.js";
 import { stripe } from "../stripeClient.js";
@@ -529,25 +529,23 @@ router.post("/godflesh/chat", upload.array("files", 10), async (req, res) => {
       }
     }
 
-    // After text stream — scan for [GENERATE_IMAGE: ...] markers and call DALL-E 3
+    // Strip [GENERATE_IMAGE: ...] markers from the displayed content
+    const cleanText = fullText.replace(/\[GENERATE_IMAGE:\s*[\s\S]+?\]/g, "").trim();
+    if (cleanText !== fullText) {
+      res.write(`data: ${JSON.stringify({ type: "content_update", content: cleanText })}\n\n`);
+    }
+
+    // After text stream — scan for [GENERATE_IMAGE: ...] markers and generate images
     const imageMarkers = [...fullText.matchAll(/\[GENERATE_IMAGE:\s*([\s\S]+?)\]/g)];
     for (let i = 0; i < imageMarkers.length; i++) {
       const prompt = imageMarkers[i][1].trim();
       try {
         res.write(`data: ${JSON.stringify({ type: "image_generating", index: i, prompt })}\n\n`);
-        const imgResponse = await (openai as any).images.generate({
-          model: "dall-e-3",
-          prompt: prompt.slice(0, 4000),
-          n: 1,
-          size: "1024x1024",
-          quality: "standard",
-        });
-        const url = imgResponse.data?.[0]?.url;
-        if (url) {
-          res.write(`data: ${JSON.stringify({ type: "image_generated", url, prompt, index: i })}\n\n`);
-        }
+        const imageBuffer = await generateImageBuffer(prompt.slice(0, 4000), "1024x1024");
+        const dataUrl = `data:image/png;base64,${imageBuffer.toString("base64")}`;
+        res.write(`data: ${JSON.stringify({ type: "image_generated", url: dataUrl, prompt, index: i })}\n\n`);
       } catch (imgErr) {
-        console.error("DALL-E generation error:", imgErr);
+        console.error("Image generation error:", imgErr);
         res.write(`data: ${JSON.stringify({ type: "image_error", index: i, error: "Image generation failed" })}\n\n`);
       }
     }
