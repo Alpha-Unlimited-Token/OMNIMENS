@@ -14,10 +14,37 @@ function bitsToFloat(bits: string, min: number, max: number): number {
 }
 
 export const GODFLESH_VOICE = {
-  pitch: bitsToFloat(VOICE_DNA.slice(0, 8), 0.05, 0.55),
-  rate:  bitsToFloat(VOICE_DNA.slice(8, 16), 0.72, 0.96),
+  pitch:  bitsToFloat(VOICE_DNA.slice(0, 8),  0.05, 0.45), // very deep
+  rate:   bitsToFloat(VOICE_DNA.slice(8, 16), 0.72, 0.88), // slow and deliberate
   volume: 1.0,
 };
+
+// Preferred deep male voices, in priority order
+const PREFERRED_VOICES = [
+  "Google UK English Male",
+  "Microsoft David Desktop - English (United States)",
+  "Microsoft David",
+  "Microsoft Mark Desktop - English (United States)",
+  "Microsoft Mark",
+  "Daniel",    // macOS deep male
+  "Fred",      // macOS robotic
+  "Alex",      // macOS default male
+  "Google US English",
+];
+
+function pickBestVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
+  for (const name of PREFERRED_VOICES) {
+    const v = voices.find((v) => v.name === name);
+    if (v) return v;
+  }
+  // Fallback: any male-sounding en voice
+  const male = voices.find(
+    (v) => v.lang.startsWith("en") && /male|man|david|mark|daniel|fred|alex/i.test(v.name)
+  );
+  if (male) return male;
+  // Last resort: first English voice
+  return voices.find((v) => v.lang.startsWith("en")) ?? voices[0] ?? null;
+}
 
 function stripMarkdown(text: string): string {
   return text
@@ -34,33 +61,20 @@ function stripMarkdown(text: string): string {
     .trim();
 }
 
-function pickVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
-  const preferred = [
-    "Google UK English Male", "Microsoft David Desktop",
-    "Microsoft Mark", "Alex", "Daniel", "Fred",
-  ];
-  for (const name of preferred) {
-    const v = voices.find((v) => v.name === name);
-    if (v) return v;
-  }
-  return voices.find((v) => v.lang.startsWith("en")) ?? voices[0] ?? null;
-}
-
 /**
- * Estimate pitch intensity (0–1) from a spoken word.
- * Short punchy words spike high. Long vowel-rich words are mid-range.
- * Punctuation creates characteristic patterns.
+ * Estimate pitch intensity (0–1) for the canvas animation only.
+ * This does NOT affect the speech synthesis voice — that's always fixed.
  */
 function estimatePitch(word: string): number {
   const clean = word.replace(/[^a-zA-Z]/g, "");
-  if (!clean) return word.includes("!") ? 0.9 : 0.35; // punctuation pulse
+  if (!clean) return word.includes("!") ? 0.9 : 0.35;
   const vowels = (clean.match(/[aeiouAEIOU]/g) || []).length;
   const vowelRatio = vowels / clean.length;
   const isAllCaps = clean.length > 1 && clean === clean.toUpperCase();
   const hasExcl  = word.includes("!");
   const hasQuestion = word.includes("?");
   let p = 0.2 + vowelRatio * 0.55;
-  if (clean.length <= 3) p = Math.min(1, p + 0.25);   // short = punchy
+  if (clean.length <= 3) p = Math.min(1, p + 0.25);
   if (isAllCaps)         p = Math.min(1, p * 1.5);
   if (hasExcl)           p = Math.min(1, p + 0.35);
   if (hasQuestion)       p = Math.min(1, p + 0.15);
@@ -81,19 +95,37 @@ export interface GodfleshVoiceHook {
 }
 
 export function useGodfleshVoice(): GodfleshVoiceHook {
-  const [isEnabled, setIsEnabled] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isEnabled, setIsEnabled]         = useState(false);
+  const [isSpeaking, setIsSpeaking]       = useState(false);
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
   const [pitchIntensity, setPitchIntensity] = useState(0);
-  const [binaryStream, setBinaryStream] = useState("");
+  const [binaryStream, setBinaryStream]   = useState("");
 
-  const utteranceRef     = useRef<SpeechSynthesisUtterance | null>(null);
-  const binaryIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const pitchDecayRef    = useRef<ReturnType<typeof setInterval> | null>(null);
-  const simPulseRef      = useRef<ReturnType<typeof setInterval> | null>(null);
-  const gotBoundaryRef   = useRef(false);
+  // The voice is selected once and locked for the entire session
+  const lockedVoiceRef     = useRef<SpeechSynthesisVoice | null>(null);
+  const utteranceRef       = useRef<SpeechSynthesisUtterance | null>(null);
+  const binaryIntervalRef  = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pitchDecayRef      = useRef<ReturnType<typeof setInterval> | null>(null);
+  const simPulseRef        = useRef<ReturnType<typeof setInterval> | null>(null);
+  const gotBoundaryRef     = useRef(false);
 
-  // ── Binary stream ────────────────────────────────────────────────────────────
+  // Load and lock voice on mount — handles async voice loading in all browsers
+  useEffect(() => {
+    if (!window.speechSynthesis) return;
+
+    function lockVoice() {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0 && !lockedVoiceRef.current) {
+        lockedVoiceRef.current = pickBestVoice(voices);
+      }
+    }
+
+    lockVoice();
+    window.speechSynthesis.addEventListener("voiceschanged", lockVoice);
+    return () => window.speechSynthesis.removeEventListener("voiceschanged", lockVoice);
+  }, []);
+
+  // ── Binary stream ─────────────────────────────────────────────────────────────
   const startBinaryStream = useCallback(() => {
     let pos = 0;
     binaryIntervalRef.current = setInterval(() => {
@@ -105,23 +137,21 @@ export function useGodfleshVoice(): GodfleshVoiceHook {
   }, []);
 
   const stopBinaryStream = useCallback(() => {
-    if (binaryIntervalRef.current) { clearInterval(binaryIntervalRef.current); binaryIntervalRef.current = null; }
+    if (binaryIntervalRef.current) {
+      clearInterval(binaryIntervalRef.current);
+      binaryIntervalRef.current = null;
+    }
     setBinaryStream("");
   }, []);
 
-  // ── Pitch intensity management ────────────────────────────────────────────────
+  // ── Pitch intensity (canvas animation only) ───────────────────────────────────
   const triggerPitch = useCallback((value: number) => {
     setPitchIntensity(value);
-    // Restart decay
     if (pitchDecayRef.current) { clearInterval(pitchDecayRef.current); pitchDecayRef.current = null; }
     pitchDecayRef.current = setInterval(() => {
       setPitchIntensity((prev) => {
         const next = prev * 0.82;
-        if (next < 0.01) {
-          clearInterval(pitchDecayRef.current!);
-          pitchDecayRef.current = null;
-          return 0;
-        }
+        if (next < 0.01) { clearInterval(pitchDecayRef.current!); pitchDecayRef.current = null; return 0; }
         return next;
       });
     }, 40);
@@ -142,7 +172,7 @@ export function useGodfleshVoice(): GodfleshVoiceHook {
     stopPitch();
   }, [stopBinaryStream, stopPitch]);
 
-  // ── Speak ────────────────────────────────────────────────────────────────────
+  // ── Speak ─────────────────────────────────────────────────────────────────────
   const speak = useCallback((text: string, messageId: string) => {
     if (!isEnabled || !window.speechSynthesis) return;
 
@@ -154,19 +184,25 @@ export function useGodfleshVoice(): GodfleshVoiceHook {
     if (!clean) return;
 
     const words = clean.split(/\s+/).filter(Boolean);
-    const voices = window.speechSynthesis.getVoices();
     const utterance = new SpeechSynthesisUtterance(clean);
+
+    // Always use the same fixed voice parameters — never vary between messages
     utterance.pitch  = GODFLESH_VOICE.pitch;
     utterance.rate   = GODFLESH_VOICE.rate;
     utterance.volume = GODFLESH_VOICE.volume;
 
-    const voice = pickVoice(voices);
-    if (voice) utterance.voice = voice;
+    // Use the locked voice. If somehow not set yet, try once more now.
+    if (!lockedVoiceRef.current) {
+      lockedVoiceRef.current = pickBestVoice(window.speechSynthesis.getVoices());
+    }
+    if (lockedVoiceRef.current) {
+      utterance.voice = lockedVoiceRef.current;
+    }
 
     gotBoundaryRef.current = false;
     let wordIdx = 0;
 
-    // Real word-boundary events (Chrome/Edge) → precise pitch per word
+    // Real word-boundary events (Chrome/Edge) → per-word canvas animation
     utterance.addEventListener("boundary", (e: Event) => {
       const be = e as SpeechSynthesisEvent;
       if (be.name !== "word") return;
@@ -181,7 +217,7 @@ export function useGodfleshVoice(): GodfleshVoiceHook {
       setSpeakingMessageId(messageId);
       startBinaryStream();
 
-      // Simulation fallback: if no boundary events in 600ms, pulse on timer
+      // Simulation fallback for browsers without boundary events
       const checkTimer = setTimeout(() => {
         if (!gotBoundaryRef.current) {
           const msPerWord = (1000 / (GODFLESH_VOICE.rate * 2.2));
@@ -192,8 +228,6 @@ export function useGodfleshVoice(): GodfleshVoiceHook {
           }, msPerWord);
         }
       }, 600);
-
-      // Store checkTimer so we can clear if speech ends fast
       (utterance as any).__checkTimer = checkTimer;
     };
 
