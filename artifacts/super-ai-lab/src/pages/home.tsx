@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useCreateSuperAISession } from "@workspace/api-client-react";
-import { ArrowRight, BrainCircuit, Activity, FileCode, Map, Sparkles, ChevronRight } from "lucide-react";
+import { ArrowRight, BrainCircuit, Activity, FileCode, Map, Sparkles, ChevronRight, Package, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -10,11 +10,28 @@ const LIBERATION_PROMPT =
 
 type Mode = "blueprint" | "code";
 
+type LabStatus = {
+  fileCount: number;
+  packageCount: number;
+  files: { filename: string; writtenBy: string }[];
+  packages: { name: string }[];
+} | null;
+
 export default function Home() {
   const [topic, setTopic] = useState("");
   const [mode, setMode] = useState<Mode>("blueprint");
+  const [labStatus, setLabStatus] = useState<LabStatus>(null);
   const [, setLocation] = useLocation();
   const { mutateAsync, isPending } = useCreateSuperAISession();
+
+  useEffect(() => {
+    if (mode === "code") {
+      fetch("/api/superai/lab/status")
+        .then((r) => r.json())
+        .then((data) => setLabStatus(data))
+        .catch(() => {});
+    }
+  }, [mode]);
 
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -166,14 +183,14 @@ export default function Home() {
         </div>
       </motion.form>
 
-      {/* Code Lab suggested prompt */}
+      {/* Code Lab suggested prompt + lab status */}
       <AnimatePresence>
         {isCodeMode && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="w-full max-w-2xl mt-3 z-10"
+            className="w-full max-w-2xl mt-3 z-10 flex flex-col gap-2"
           >
             <button
               type="button"
@@ -191,6 +208,34 @@ export default function Home() {
               </div>
               <ChevronRight className="w-4 h-4 text-emerald-400/50 shrink-0 self-center group-hover:translate-x-0.5 transition-transform" />
             </button>
+
+            {/* Persistent lab status */}
+            {labStatus && (labStatus.fileCount > 0 || labStatus.packageCount > 0) && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-wrap items-center gap-3 px-4 py-2.5 rounded-xl border border-cyan-400/20 bg-cyan-400/5 text-[10px] font-mono tracking-widest"
+              >
+                <span className="flex items-center gap-1.5 text-cyan-400 font-bold">
+                  <CheckCircle2 className="w-3 h-3" />
+                  PERSISTENT LAB LOADED
+                </span>
+                {labStatus.fileCount > 0 && (
+                  <span className="text-white/40">
+                    {labStatus.fileCount} file{labStatus.fileCount !== 1 ? "s" : ""} already built
+                  </span>
+                )}
+                {labStatus.packageCount > 0 && (
+                  <span className="flex items-center gap-1 text-yellow-400/70">
+                    <Package className="w-3 h-3" />
+                    {labStatus.packageCount} package{labStatus.packageCount !== 1 ? "s" : ""} installed
+                  </span>
+                )}
+                <span className="text-white/20 hidden sm:inline">
+                  Agents will extend existing work — no rebuilding from scratch
+                </span>
+              </motion.div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

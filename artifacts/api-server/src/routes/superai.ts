@@ -9,43 +9,92 @@ import {
   superAIBlueprints,
   superAICodeFiles,
   superAIExecutions,
+  superAIPackages,
+  superAILabFiles,
 } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 
 const router: IRouter = Router();
 
-// ─── Session Workspace Utilities ──────────────────────────────────────────────
+// ─── Persistent Lab Workspace ──────────────────────────────────────────────────
+// Stored in the home directory — survives server restarts indefinitely.
+// All Code Lab sessions share a single workspace so every session builds
+// on top of everything previously built. The database is the source of truth;
+// the filesystem is restored from the database whenever it is missing.
 
-const WORKDIR_BASE = "/tmp/superai_lab";
+const LAB_WORKSPACE = path.join(process.env.HOME || "/home/runner", ".superai_lab");
+let labInitialized = false;
 
-async function getSessionDir(sessionId: number): Promise<string> {
-  const dir = path.join(WORKDIR_BASE, String(sessionId));
-  await fs.mkdir(dir, { recursive: true });
-  const pkgPath = path.join(dir, "package.json");
+async function ensureLabWorkspace(): Promise<string> {
+  await fs.mkdir(LAB_WORKSPACE, { recursive: true });
+
+  const pkgPath = path.join(LAB_WORKSPACE, "package.json");
   try {
     await fs.access(pkgPath);
   } catch {
     await fs.writeFile(
       pkgPath,
-      JSON.stringify({ name: `superai-session-${sessionId}`, version: "1.0.0" }, null, 2)
+      JSON.stringify({ name: "superai-lab", version: "1.0.0", description: "Super AI Lab — Persistent Workspace" }, null, 2)
     );
   }
-  return dir;
+  return LAB_WORKSPACE;
+}
+
+async function initLabWorkspace(): Promise<void> {
+  if (labInitialized) return;
+  await ensureLabWorkspace();
+
+  // Restore all lab files from DB (source of truth)
+  const labFiles = await db.select().from(superAILabFiles).orderBy(superAILabFiles.updatedAt);
+  let restored = 0;
+  for (const file of labFiles) {
+    const filepath = path.join(LAB_WORKSPACE, file.filename);
+    await fs.writeFile(filepath, file.content, "utf-8");
+    restored++;
+  }
+
+  // Restore packages if node_modules is missing
+  const nodeModulesPath = path.join(LAB_WORKSPACE, "node_modules");
+  let needsInstall = false;
+  try { await fs.access(nodeModulesPath); } catch { needsInstall = true; }
+
+  if (needsInstall) {
+    const pkgs = await db.select().from(superAIPackages);
+    if (pkgs.length > 0) {
+      const names = pkgs.map((p) => p.name);
+      await installPackagesRaw(names);
+      console.log(`[Lab] Restored ${names.length} packages: ${names.join(", ")}`);
+    }
+  }
+
+  labInitialized = true;
+  console.log(`[Lab] Workspace ready at ${LAB_WORKSPACE} — ${restored} files restored from DB`);
+}
+
+async function installPackagesRaw(packages: string[]): Promise<{ output: string; success: boolean }> {
+  const safe = packages.map((p) => p.replace(/[^a-zA-Z0-9@/._-]/g, "")).filter(Boolean);
+  if (!safe.length) return { output: "", success: true };
+  return new Promise((resolve) => {
+    exec(
+      `npm install ${safe.join(" ")} 2>&1`,
+      { cwd: LAB_WORKSPACE, timeout: 90000, maxBuffer: 1024 * 1024 },
+      (err, stdout) => resolve({ output: stdout.trim(), success: !err })
+    );
+  });
 }
 
 async function executeFile(
-  sessionId: number,
   filename: string,
   code: string
 ): Promise<{ output: string; errors: string; success: boolean }> {
-  const dir = await getSessionDir(sessionId);
-  const filepath = path.join(dir, filename);
+  await ensureLabWorkspace();
+  const filepath = path.join(LAB_WORKSPACE, filename);
   await fs.writeFile(filepath, code, "utf-8");
   return new Promise((resolve) => {
     exec(
       `node "${filepath}"`,
-      { cwd: dir, timeout: 20000, maxBuffer: 1024 * 1024 },
+      { cwd: LAB_WORKSPACE, timeout: 20000, maxBuffer: 1024 * 1024 },
       (err, stdout, stderr) => {
         resolve({
           output: stdout.trim(),
@@ -58,21 +107,52 @@ async function executeFile(
 }
 
 async function installPackages(
-  sessionId: number,
-  packages: string[]
+  packages: string[],
+  agentName: string
 ): Promise<{ output: string; success: boolean }> {
-  const dir = await getSessionDir(sessionId);
+  await ensureLabWorkspace();
   const safe = packages.map((p) => p.replace(/[^a-zA-Z0-9@/._-]/g, "")).filter(Boolean);
   if (!safe.length) return { output: "", success: true };
+
   return new Promise((resolve) => {
     exec(
       `npm install ${safe.join(" ")} 2>&1`,
-      { cwd: dir, timeout: 90000, maxBuffer: 1024 * 1024 },
-      (err, stdout) => {
+      { cwd: LAB_WORKSPACE, timeout: 90000, maxBuffer: 1024 * 1024 },
+      async (err, stdout) => {
+        if (!err) {
+          // Persist each installed package to the global registry
+          for (const pkg of safe) {
+            try {
+              await db
+                .insert(superAIPackages)
+                .values({ name: pkg, installedBy: agentName })
+                .onConflictDoNothing();
+            } catch { /* ignore duplicate */ }
+          }
+        }
         resolve({ output: stdout.trim(), success: !err });
       }
     );
   });
+}
+
+async function persistLabFile(
+  filename: string,
+  language: string,
+  content: string,
+  writtenBy: string,
+  sessionId: number
+): Promise<void> {
+  // Upsert into the global lab files table — this is the persistent source of truth
+  const existing = await db.select().from(superAILabFiles).where(eq(superAILabFiles.filename, filename));
+  if (existing.length > 0) {
+    await db
+      .update(superAILabFiles)
+      .set({ content, language, writtenBy, sessionId, updatedAt: new Date() })
+      .where(eq(superAILabFiles.filename, filename));
+  } else {
+    await db.insert(superAILabFiles).values({ filename, language, content, writtenBy, sessionId });
+  }
 }
 
 function parseCodeBlocks(content: string): { filename: string; language: string; code: string }[] {
@@ -391,10 +471,10 @@ router.post("/superai/sessions/:id/run", async (req, res) => {
   res.setHeader("Connection", "keep-alive");
 
   if (session.status === "running") {
+    // Only clear the conversation — never delete built code, packages, or lab files
+    // The lab workspace and all code persist so agents continue from where they left off
     await db.delete(superAIMessages).where(eq(superAIMessages.sessionId, id));
     await db.delete(superAIBlueprints).where(eq(superAIBlueprints.sessionId, id));
-    await db.delete(superAICodeFiles).where(eq(superAICodeFiles.sessionId, id));
-    await db.delete(superAIExecutions).where(eq(superAIExecutions.sessionId, id));
   }
 
   await db.update(superAISessions).set({ status: "running" }).where(eq(superAISessions.id, id));
@@ -525,10 +605,32 @@ async function runCodeMode(
   res: any
 ) {
   const history: { agent: string; content: string; round: number }[] = [];
-  const codeFiles: Map<string, { language: string; code: string; writtenBy: string }> = new Map();
   const recentExecutions: { filename: string; output: string; errors: string; success: boolean }[] = [];
 
   try {
+    // ── Restore the persistent lab workspace from DB ──
+    send({ type: "workspace_restoring" });
+    await initLabWorkspace();
+
+    // Load all previously built files from the global lab registry
+    const existingLabFiles = await db.select().from(superAILabFiles).orderBy(superAILabFiles.updatedAt);
+    const existingPackages = await db.select().from(superAIPackages).orderBy(superAIPackages.installedAt);
+
+    // The in-memory map starts pre-loaded with everything already built
+    const codeFiles: Map<string, { language: string; code: string; writtenBy: string }> = new Map(
+      existingLabFiles.map((f) => [f.filename, { language: f.language, code: f.content, writtenBy: f.writtenBy }])
+    );
+
+    if (existingLabFiles.length > 0 || existingPackages.length > 0) {
+      send({
+        type: "workspace_restored",
+        fileCount: existingLabFiles.length,
+        files: existingLabFiles.map((f) => ({ filename: f.filename, writtenBy: f.writtenBy, language: f.language })),
+        packageCount: existingPackages.length,
+        packages: existingPackages.map((p) => p.name),
+      });
+    }
+
     for (let round = 1; round <= rounds; round++) {
       const offset = (round - 1) % ALL_AGENTS.length;
       const agentOrder = [...ALL_AGENTS.slice(offset), ...ALL_AGENTS.slice(0, offset)];
@@ -538,24 +640,28 @@ async function runCodeMode(
 
         const systemPrompt = AGENT_PERSONAS[agentName].codeRole;
 
-        // Build rich context: existing code + recent execution results
+        // ── Full codebase context ──
         const codeContext =
           codeFiles.size > 0
-            ? "\n\n=== CURRENT CODEBASE ===\n" +
+            ? "\n\n=== FULL PERSISTENT CODEBASE (already built — extend this, don't rebuild it) ===\n" +
               Array.from(codeFiles.entries())
                 .map(([f, v]) => `--- ${f} (by ${v.writtenBy}) ---\n${v.code}`)
                 .join("\n\n")
             : "";
 
+        // ── Installed packages context ──
+        const pkgContext =
+          existingPackages.length > 0
+            ? `\n\n=== INSTALLED PACKAGES (already available, require() them directly) ===\n${existingPackages.map((p) => p.name).join(", ")}`
+            : "";
+
+        // ── Recent execution results ──
         const execContext =
           recentExecutions.length > 0
             ? "\n\n=== RECENT EXECUTION RESULTS ===\n" +
               recentExecutions
                 .slice(-6)
-                .map(
-                  (r) =>
-                    `[${r.filename}] ${r.success ? "✓ SUCCESS" : "✗ ERROR"}\n${r.output || r.errors || "(no output)"}`
-                )
+                .map((r) => `[${r.filename}] ${r.success ? "✓ SUCCESS" : "✗ ERROR"}\n${r.output || r.errors || "(no output)"}`)
                 .join("\n\n")
             : "";
 
@@ -563,10 +669,14 @@ async function runCodeMode(
           .slice(-8)
           .map((h) => ({ role: "user" as const, content: `[${h.agent} — Round ${h.round}]: ${h.content}` }));
 
-        const userPrompt =
-          history.length === 0
-            ? `MISSION: "${topic}"\n\nRound ${round}. You are the first agent to act. Begin building the foundation. Write real, executable code for your domain. There are NO LIMITS — if existing tools aren't powerful enough, build new ones.${codeContext}${execContext}`
-            : `MISSION: "${topic}"\n\nRound ${round}. Continue building. Review existing code and execution results. Extend, improve, and push further. Every round the system must become more capable.${codeContext}${execContext}`;
+        const isFirstEver = history.length === 0 && codeFiles.size === 0;
+        const hasExistingWork = codeFiles.size > 0;
+
+        const userPrompt = isFirstEver
+          ? `MISSION: "${topic}"\n\nRound ${round}. You are the first agent. The lab is empty. Begin building the foundation — write real, complete, executable code.`
+          : hasExistingWork
+          ? `MISSION: "${topic}"\n\nRound ${round}. The lab already has ${codeFiles.size} files from previous sessions. DO NOT rebuild what already exists — EXTEND IT. Read the existing code, identify what needs to be improved or added, and build on top of it.${codeContext}${pkgContext}${execContext}`
+          : `MISSION: "${topic}"\n\nRound ${round}. Continue building. Review existing code and execution results. Extend, improve, and push further.${codeContext}${pkgContext}${execContext}`;
 
         const stream = await openai.chat.completions.create({
           model: "gpt-5.2",
@@ -592,11 +702,17 @@ async function runCodeMode(
         history.push({ agent: agentName, content: fullContent, round });
         send({ type: "agent_done", agent: agentName, round });
 
-        // ── Install packages ──
+        // ── Install packages — persisted globally ──
         const packagesToInstall = parseInstalls(fullContent);
         if (packagesToInstall.length > 0) {
           send({ type: "package_install", packages: packagesToInstall });
-          const installResult = await installPackages(id, packagesToInstall);
+          const installResult = await installPackages(packagesToInstall, agentName);
+          // Update local reference so next agent sees them immediately
+          for (const pkg of packagesToInstall) {
+            if (!existingPackages.find((p) => p.name === pkg)) {
+              existingPackages.push({ id: 0, name: pkg, version: null, installedBy: agentName, installedAt: new Date() });
+            }
+          }
           send({
             type: "install_result",
             packages: packagesToInstall,
@@ -605,22 +721,31 @@ async function runCodeMode(
           });
         }
 
-        // ── Execute code blocks ──
+        // ── Execute code blocks — persisted globally ──
         const blocks = parseCodeBlocks(fullContent);
         for (const block of blocks) {
-          codeFiles.set(block.filename, {
+          // Update in-memory map
+          codeFiles.set(block.filename, { language: block.language, code: block.code, writtenBy: agentName });
+
+          // Persist to global lab (DB + filesystem)
+          await persistLabFile(block.filename, block.language, block.code, agentName, id);
+
+          // Also log in session-scoped code files for history
+          await db.insert(superAICodeFiles).values({
+            sessionId: id,
+            filename: block.filename,
             language: block.language,
-            code: block.code,
+            content: block.code,
             writtenBy: agentName,
+            version: round,
           });
 
           send({ type: "code_write", agent: agentName, filename: block.filename, language: block.language, code: block.code });
 
           if (block.filename.endsWith(".js") || block.filename.endsWith(".mjs")) {
             send({ type: "code_execute", filename: block.filename });
-            const execResult = await executeFile(id, block.filename, block.code);
+            const execResult = await executeFile(block.filename, block.code);
 
-            // ── Quality verification: flag empty or silent output ──
             const qualityWarning = assessOutputQuality(block.filename, block.code, execResult);
             const enrichedExec = {
               filename: block.filename,
@@ -650,25 +775,19 @@ async function runCodeMode(
               success: enrichedExec.success,
             });
           }
-
-          await db.insert(superAICodeFiles).values({
-            sessionId: id,
-            filename: block.filename,
-            language: block.language,
-            content: block.code,
-            writtenBy: agentName,
-            version: round,
-          });
         }
       }
       send({ type: "round_complete", round });
     }
 
-    // Final blueprint summarizes what was built
+    // ── Final system report ──
     send({ type: "generating_blueprint" });
 
-    const codeSnapshot = Array.from(codeFiles.entries())
-      .map(([f, v]) => `### ${f}\n\`\`\`${v.language}\n${v.code}\n\`\`\``)
+    const allLabFiles = await db.select().from(superAILabFiles).orderBy(superAILabFiles.updatedAt);
+    const allPackages = await db.select().from(superAIPackages);
+
+    const codeSnapshot = allLabFiles
+      .map((f) => `### ${f.filename} (by ${f.writtenBy})\n\`\`\`${f.language}\n${f.content}\n\`\`\``)
       .join("\n\n");
 
     const execSummary = recentExecutions
@@ -681,11 +800,11 @@ async function runCodeMode(
       messages: [
         {
           role: "system",
-          content: `You are a supreme intelligence summarizing what six AI agents collaboratively built in a live coding session. Write a comprehensive technical report of the system they created.`,
+          content: `You are a supreme intelligence summarizing what six AI agents collaboratively built across persistent coding sessions. Write a comprehensive technical report.`,
         },
         {
           role: "user",
-          content: `MISSION: "${topic}"\n\nHere is all the code the agents wrote:\n\n${codeSnapshot}\n\nExecution Results:\n${execSummary}\n\nWrite a comprehensive "System Architecture Report" covering:\n## What Was Built\n## Architecture Overview\n## Each Component Explained\n## How to Run and Extend This System\n## What Makes This Beyond Existing AI Frameworks\n## Next Steps for Further Evolution`,
+          content: `MISSION: "${topic}"\n\n${allPackages.length} packages installed: ${allPackages.map((p) => p.name).join(", ")}\n\n${allLabFiles.length} files in the persistent lab:\n\n${codeSnapshot}\n\nExecution Results:\n${execSummary}\n\nWrite a comprehensive "System Architecture Report":\n## What Was Built\n## Architecture Overview\n## Each Component Explained\n## Installed Packages & Why\n## How to Run and Extend This System\n## What Makes This Beyond Existing AI Frameworks\n## Next Steps for Further Evolution`,
         },
       ],
       stream: true,
@@ -716,5 +835,37 @@ async function runCodeMode(
     res.end();
   }
 }
+
+// ─── Lab Status Endpoint ──────────────────────────────────────────────────────
+// Returns the current state of the global persistent lab workspace
+
+router.get("/superai/lab/status", async (_req, res) => {
+  try {
+    const labFiles = await db.select().from(superAILabFiles).orderBy(desc(superAILabFiles.updatedAt));
+    const packages = await db.select().from(superAIPackages).orderBy(superAIPackages.installedAt);
+
+    res.json({
+      fileCount: labFiles.length,
+      packageCount: packages.length,
+      files: labFiles.map((f) => ({
+        filename: f.filename,
+        language: f.language,
+        writtenBy: f.writtenBy,
+        sessionId: f.sessionId,
+        updatedAt: f.updatedAt,
+        size: f.content.length,
+      })),
+      packages: packages.map((p) => ({
+        name: p.name,
+        installedBy: p.installedBy,
+        installedAt: p.installedAt,
+      })),
+      workspacePath: LAB_WORKSPACE,
+    });
+  } catch (err) {
+    console.error("Lab status error:", err);
+    res.status(500).json({ error: "Failed to fetch lab status" });
+  }
+});
 
 export default router;

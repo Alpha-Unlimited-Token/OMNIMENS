@@ -299,6 +299,7 @@ export default function SessionPage() {
   const {
     startStream, isStreaming, streamedMessages, activeAgent,
     codeFiles, executions, executingFile, installingPackages,
+    restoringWorkspace, restoredWorkspace,
   } = useSuperAIStream(sessionId);
 
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -406,6 +407,52 @@ export default function SessionPage() {
           <AgentCard key={name} name={name} isActive={activeAgent === name} />
         ))}
       </div>
+
+      {/* Workspace restoration banner */}
+      <AnimatePresence>
+        {restoringWorkspace && (
+          <motion.div
+            key="restoring"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-3 shrink-0 overflow-hidden"
+          >
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-cyan-400/20 bg-cyan-400/5 text-cyan-400 text-[11px] font-mono tracking-widest">
+              <Loader2 className="w-3 h-3 animate-spin shrink-0" />
+              <span>RESTORING PERSISTENT LAB WORKSPACE FROM DATABASE…</span>
+            </div>
+          </motion.div>
+        )}
+        {restoredWorkspace && restoredWorkspace.fileCount > 0 && (
+          <motion.div
+            key="restored"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-3 shrink-0 overflow-hidden"
+          >
+            <div className="flex flex-wrap items-center gap-3 px-4 py-2.5 rounded-xl border border-emerald-400/25 bg-emerald-400/5 text-[10px] font-mono tracking-widest">
+              <span className="flex items-center gap-1.5 text-emerald-400">
+                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                <span className="font-bold">LAB WORKSPACE LOADED</span>
+              </span>
+              <span className="text-white/40">
+                {restoredWorkspace.fileCount} file{restoredWorkspace.fileCount !== 1 ? "s" : ""} persisted
+              </span>
+              {restoredWorkspace.packageCount > 0 && (
+                <span className="flex items-center gap-1 text-yellow-400/80">
+                  <Package className="w-3 h-3 shrink-0" />
+                  {restoredWorkspace.packageCount} package{restoredWorkspace.packageCount !== 1 ? "s" : ""} installed
+                </span>
+              )}
+              <span className="text-white/20 hidden md:inline">
+                {restoredWorkspace.files.map((f) => f.filename).join(" · ")}
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Mobile tab switcher — only shown in code mode */}
       {isCodeMode && (

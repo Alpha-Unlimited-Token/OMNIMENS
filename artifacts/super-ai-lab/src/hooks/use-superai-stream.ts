@@ -38,6 +38,13 @@ export type InstallEvent = {
   done: boolean;
 };
 
+export type LabWorkspaceState = {
+  fileCount: number;
+  packageCount: number;
+  files: { filename: string; writtenBy: string; language: string }[];
+  packages: string[];
+} | null;
+
 export function useSuperAIStream(sessionId: number) {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamedMessages, setStreamedMessages] = useState<StreamedMessage[]>([]);
@@ -46,6 +53,8 @@ export function useSuperAIStream(sessionId: number) {
   const [executions, setExecutions] = useState<ExecutionResult[]>([]);
   const [executingFile, setExecutingFile] = useState<string | null>(null);
   const [installingPackages, setInstallingPackages] = useState<string[] | null>(null);
+  const [restoringWorkspace, setRestoringWorkspace] = useState(false);
+  const [restoredWorkspace, setRestoredWorkspace] = useState<LabWorkspaceState>(null);
   const queryClient = useQueryClient();
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -63,6 +72,8 @@ export function useSuperAIStream(sessionId: number) {
     setExecutions([]);
     setExecutingFile(null);
     setInstallingPackages(null);
+    setRestoringWorkspace(false);
+    setRestoredWorkspace(null);
     abortControllerRef.current = new AbortController();
 
     try {
@@ -104,7 +115,34 @@ export function useSuperAIStream(sessionId: number) {
               break;
             }
 
+            // ── Workspace restoration events ──
+            if (parsed.type === "workspace_restoring") {
+              setRestoringWorkspace(true);
+            }
+
+            if (parsed.type === "workspace_restored") {
+              setRestoringWorkspace(false);
+              setRestoredWorkspace({
+                fileCount: parsed.fileCount,
+                packageCount: parsed.packageCount,
+                files: parsed.files || [],
+                packages: parsed.packages || [],
+              });
+              // Pre-load previously built code files into the UI
+              if (parsed.files && parsed.files.length > 0) {
+                setCodeFiles(
+                  parsed.files.map((f: { filename: string; language: string; writtenBy: string }) => ({
+                    filename: f.filename,
+                    language: f.language,
+                    code: "(loading from workspace...)",
+                    writtenBy: f.writtenBy as AgentName,
+                  }))
+                );
+              }
+            }
+
             if (parsed.type === "agent_start" && parsed.agent) {
+              setRestoringWorkspace(false);
               setActiveAgent(parsed.agent as AgentName);
             }
 
@@ -185,6 +223,7 @@ export function useSuperAIStream(sessionId: number) {
       setActiveAgent(null);
       setExecutingFile(null);
       setInstallingPackages(null);
+      setRestoringWorkspace(false);
       queryClient.invalidateQueries({ queryKey: getGetSuperAISessionQueryKey(sessionId) });
     }
   };
@@ -198,5 +237,7 @@ export function useSuperAIStream(sessionId: number) {
     executions,
     executingFile,
     installingPackages,
+    restoringWorkspace,
+    restoredWorkspace,
   };
 }

@@ -62,7 +62,7 @@ export const superAICodeFiles = pgTable("super_ai_code_files", {
     .notNull()
     .references(() => superAISessions.id, { onDelete: "cascade" }),
   filename: text("filename").notNull(),
-  language: text("language").notNull().default("python"),
+  language: text("language").notNull().default("javascript"),
   content: text("content").notNull(),
   writtenBy: text("written_by").notNull(),
   version: integer("version").notNull().default(1),
@@ -85,3 +85,29 @@ export const superAIExecutions = pgTable("super_ai_executions", {
 });
 
 export type SuperAIExecution = typeof superAIExecutions.$inferSelect;
+
+// Global package registry — tracks every package ever installed across all lab sessions
+// Persists independently so packages can be restored after server restarts
+export const superAIPackages = pgTable("super_ai_packages", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  version: text("version"),
+  installedBy: text("installed_by"),
+  installedAt: timestamp("installed_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export type SuperAIPackage = typeof superAIPackages.$inferSelect;
+
+// Global lab files — the latest version of every file ever written, persisted independently
+// This is the source of truth for the persistent lab workspace
+export const superAILabFiles = pgTable("super_ai_lab_files", {
+  id: serial("id").primaryKey(),
+  filename: text("filename").notNull().unique(),
+  language: text("language").notNull().default("javascript"),
+  content: text("content").notNull(),
+  writtenBy: text("written_by").notNull(),
+  sessionId: integer("session_id").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export type SuperAILabFile = typeof superAILabFiles.$inferSelect;
