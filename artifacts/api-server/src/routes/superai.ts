@@ -121,6 +121,13 @@ router.post("/superai/sessions/:id/run", async (req, res) => {
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
 
+  // Allow re-running a stuck session (e.g. after a dropped connection)
+  // Clear any existing messages so it starts fresh
+  if (session.status === "running") {
+    await db.delete(superAIMessages).where(eq(superAIMessages.sessionId, id));
+    await db.delete(superAIBlueprints).where(eq(superAIBlueprints.sessionId, id));
+  }
+
   await db.update(superAISessions).set({ status: "running" }).where(eq(superAISessions.id, id));
 
   const send = (data: object) => res.write(`data: ${JSON.stringify(data)}\n\n`);

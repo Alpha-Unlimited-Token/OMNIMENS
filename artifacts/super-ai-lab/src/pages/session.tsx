@@ -284,13 +284,13 @@ export default function SessionPage() {
 
       {/* Footer Controls — fixed to bottom so always visible on mobile */}
       <div className="fixed bottom-0 left-0 right-0 z-50 px-4 py-4 border-t border-white/5 flex justify-center items-center bg-background/95 backdrop-blur-xl">
-        {sessionData.status === "pending" && !isStreaming && (
+        {(sessionData.status === "pending" || (sessionData.status === "running" && !isStreaming && allMessages.length === 0)) && !isStreaming && (
           <button
             onClick={() => startStream(3)}
             className="group flex items-center justify-center w-full md:w-auto gap-3 px-10 py-4 bg-blue-500 text-white font-bold tracking-widest rounded-2xl hover:bg-blue-400 hover:shadow-[0_0_40px_rgba(96,165,250,0.5)] transition-all text-sm"
           >
             <Play className="w-5 h-5 fill-current" />
-            ACTIVATE 6-AGENT SUPER AI COUNCIL
+            {sessionData.status === "running" ? "RECONNECT & RETRY" : "ACTIVATE 6-AGENT SUPER AI COUNCIL"}
           </button>
         )}
 

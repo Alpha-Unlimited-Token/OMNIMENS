@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { getGetSuperAISessionQueryKey } from '@workspace/api-client-react';
 
 export type StreamedMessage = {
-  agentName: 'Architect' | 'Critic' | 'Synthesizer';
+  agentName: 'Architect' | 'Critic' | 'Synthesizer' | 'Mathematician' | 'Neuroscientist' | 'Meta-Agent';
   content: string;
   round: number;
 };
@@ -24,7 +24,7 @@ export function useSuperAIStream(sessionId: number) {
     setIsStreaming(true);
     setStreamedMessages([]);
     abortControllerRef.current = new AbortController();
-    
+
     try {
       const res = await fetch(`/api/superai/sessions/${sessionId}/run`, {
         method: 'POST',
@@ -33,13 +33,20 @@ export function useSuperAIStream(sessionId: number) {
         signal: abortControllerRef.current.signal,
       });
 
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Stream request failed:", res.status, errorText);
+        return;
+      }
+
       if (!res.body) throw new Error("No response body");
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
+      let finished = false;
 
-      while (true) {
+      while (!finished) {
         const { value, done } = await reader.read();
         if (done) break;
 
@@ -48,30 +55,35 @@ export function useSuperAIStream(sessionId: number) {
         buffer = lines.pop() || "";
 
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const dataStr = line.slice(6).trim();
-            if (!dataStr || dataStr === '[DONE]') continue;
-            try {
-              const parsed = JSON.parse(dataStr);
-              if (parsed.done) {
-                 break;
-              }
+          if (!line.startsWith('data: ')) continue;
+          const dataStr = line.slice(6).trim();
+          if (!dataStr || dataStr === '[DONE]') continue;
+
+          try {
+            const parsed = JSON.parse(dataStr);
+
+            if (parsed.done || parsed.type === 'done') {
+              finished = true;
+              break;
+            }
+
+            if (parsed.type === 'message' && parsed.agent && parsed.content) {
               setStreamedMessages(prev => {
                 const last = prev[prev.length - 1];
-                if (last && last.agentName === parsed.agentName && last.round === parsed.round) {
+                if (last && last.agentName === parsed.agent && last.round === parsed.round) {
                   return [
-                    ...prev.slice(0, -1), 
-                    { ...last, content: last.content + (parsed.content || '') }
+                    ...prev.slice(0, -1),
+                    { ...last, content: last.content + parsed.content }
                   ];
                 }
                 return [
-                  ...prev, 
-                  { agentName: parsed.agentName, content: parsed.content || '', round: parsed.round || 1 }
+                  ...prev,
+                  { agentName: parsed.agent, content: parsed.content, round: parsed.round || 1 }
                 ];
               });
-            } catch (e) {
-              console.error("Failed to parse SSE line:", dataStr);
             }
+          } catch (e) {
+            // skip malformed lines
           }
         }
       }
@@ -81,7 +93,6 @@ export function useSuperAIStream(sessionId: number) {
       }
     } finally {
       setIsStreaming(false);
-      // Invalidate the session query to fetch the finalized messages and status from the DB
       queryClient.invalidateQueries({ queryKey: getGetSuperAISessionQueryKey(sessionId) });
     }
   };
