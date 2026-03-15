@@ -261,6 +261,12 @@ function CodePanel({
                     {exec.errors && (
                       <pre className="text-red-400/70 whitespace-pre-wrap break-words pl-4">{exec.errors}</pre>
                     )}
+                    {exec.qualityWarning && (
+                      <div className="mt-1 pl-4 flex items-start gap-1.5 text-yellow-400/80 text-[10px] leading-snug">
+                        <span className="shrink-0 mt-0.5">⚠</span>
+                        <span>{exec.qualityWarning}</span>
+                      </div>
+                    )}
                   </motion.div>
                 ))}
               </AnimatePresence>

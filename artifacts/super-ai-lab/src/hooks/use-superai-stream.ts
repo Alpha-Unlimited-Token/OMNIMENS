@@ -28,6 +28,7 @@ export type ExecutionResult = {
   output: string;
   errors: string;
   success: boolean;
+  qualityWarning?: string | null;
 };
 
 export type InstallEvent = {
@@ -158,6 +159,7 @@ export function useSuperAIStream(sessionId: number) {
                   output: parsed.output || "",
                   errors: parsed.errors || "",
                   success: parsed.success,
+                  qualityWarning: parsed.qualityWarning || null,
                 },
               ]);
             }
