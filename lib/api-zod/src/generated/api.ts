@@ -30,6 +30,7 @@ export const GetGodfleshStatusResponse = zod.object({
   messagesUsedToday: zod.number(),
   dailyLimit: zod.number(),
   isPro: zod.boolean(),
+  isOwner: zod.boolean().optional(),
   stripeCustomerId: zod.string().optional(),
   stripeSubscriptionId: zod.string().optional(),
 });

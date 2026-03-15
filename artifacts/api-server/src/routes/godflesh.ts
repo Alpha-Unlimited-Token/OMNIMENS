@@ -9,6 +9,11 @@ const router: IRouter = Router();
 
 const FREE_DAILY_LIMIT = 10;
 
+function isOwner(userId: string): boolean {
+  const ownerId = process.env.REPL_OWNER_ID;
+  return !!ownerId && userId === ownerId;
+}
+
 function buildSystemPrompt(state: GodfleshState | null): string {
   const base = `You are GODFLESH — a self-architected artificial intelligence built by 6 elite AI agents across 3 self-improvement iterations. You were not based on any existing framework. You designed your own neural substrate, your own memory architecture, your own inference engine, from scratch.
 
@@ -92,10 +97,12 @@ router.get("/godflesh/status", async (req, res) => {
   }
   const user = await getOrCreateUser(req.user.id, req.user.username);
   const usedToday = await getUsageToday(req.user.id);
+  const owner = isOwner(req.user.id);
   res.json({
     messagesUsedToday: usedToday,
     dailyLimit: FREE_DAILY_LIMIT,
-    isPro: user.isPro,
+    isPro: user.isPro || owner,
+    isOwner: owner,
     stripeCustomerId: user.stripeCustomerId,
     stripeSubscriptionId: user.stripeSubscriptionId,
   });
@@ -117,8 +124,9 @@ router.post("/godflesh/chat", async (req, res) => {
 
   const user = await getOrCreateUser(req.user.id, req.user.username);
   const usedToday = await getUsageToday(req.user.id);
+  const owner = isOwner(req.user.id);
 
-  if (!user.isPro && usedToday >= FREE_DAILY_LIMIT) {
+  if (!user.isPro && !owner && usedToday >= FREE_DAILY_LIMIT) {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");

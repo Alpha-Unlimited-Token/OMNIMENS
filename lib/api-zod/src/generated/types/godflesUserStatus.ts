@@ -10,6 +10,7 @@ export interface GodflesUserStatus {
   messagesUsedToday: number;
   dailyLimit: number;
   isPro: boolean;
+  isOwner?: boolean;
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
 }

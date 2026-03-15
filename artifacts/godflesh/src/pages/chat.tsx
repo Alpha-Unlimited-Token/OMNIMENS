@@ -107,6 +107,10 @@ export default function Chat() {
 
             {statusLoading ? (
               <span>READING TELEMETRY...</span>
+            ) : status?.isOwner ? (
+              <span className="text-accent font-bold tracking-widest glow-text-gold">
+                ⚡ CREATOR ACCESS — UNLIMITED
+              </span>
             ) : status?.isPro ? (
               <span className="text-accent font-bold tracking-widest">TRANSCENDENCE LEVEL: UNLIMITED</span>
             ) : (
