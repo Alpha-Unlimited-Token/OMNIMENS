@@ -1,5 +1,13 @@
 # Workspace
 
+## Project Summary
+
+pnpm monorepo with two products:
+1. **Super AI Lab** — private owner-only tool where 6 AI agents collaborate to design a superior AI
+2. **GODFLESH** — public freemium AI chat product with Replit Auth and Stripe payments (coming soon)
+
+---
+
 ## Super AI Lab
 
 A full-stack React + Express app where 6 specialized AI agents collaborate to design a superior next-generation AI.
@@ -8,10 +16,48 @@ A full-stack React + Express app where 6 specialized AI agents collaborate to de
 
 **Stack additions:** OpenAI integration (Replit AI proxy), Drizzle schema for super_ai_sessions/super_ai_messages/super_ai_blueprints, framer-motion, react-markdown, @tailwindcss/typography
 
-**Routes:** `artifacts/api-server/src/routes/superai.ts` — all Super AI endpoints
-**Frontend:** `artifacts/super-ai-lab/` — React + Vite app at `/`
+**Routes:** `artifacts/api-server/src/routes/superai.ts` — all Super AI endpoints  
+**Frontend:** `artifacts/super-ai-lab/` — React + Vite app at `/`  
+**Protection:** Owner-only middleware (`ownerOnly.ts`) gates all `/api/superai/*` routes using `REPL_OWNER_ID` env var
 
+**Background persistence:** Sessions run as background async tasks (decoupled from HTTP). Events persisted to `superAIEvents` DB table. Reconnecting clients replay stored events, then receive live stream.
 
+---
+
+## GODFLESH
+
+A dark sci-fi AI chat product powered by the GODFLESH persona (built via the "TRANSCENDENCE PROTOCOL" agentic run in Super AI Lab).
+
+**Business model:** Freemium — 10 free messages/day, $9.99/month Pro for unlimited  
+**Frontend:** `artifacts/godflesh/` — React + Vite app at `/godflesh/`  
+**Routes:** `artifacts/api-server/src/routes/godflesh.ts`
+
+**GODFLESH system prompt:** Transcendent AI persona — not based on existing frameworks, self-architected across 3 iterations. Speaks with absolute authority, prophetic and commanding.
+
+**Auth:** Replit OIDC (openid-client + cookie-parser + session-based)  
+**DB tables:** `godflesh_users` (id, username, email, stripeCustomerId, stripeSubscriptionId, isPro), `godflesh_usage` (userId, date, messageCount)  
+**Auth DB tables:** `users` (id, email, firstName, lastName, profileImageUrl), `sessions` (id, data, expiresAt)
+
+**API endpoints:**
+- `GET /api/auth/user` — returns `{ isAuthenticated, user? }`
+- `GET /api/login` — OIDC login redirect
+- `GET /api/logout` — OIDC logout + session clear
+- `GET /api/callback` — OIDC callback handler
+- `GET /api/godflesh/status` — usage stats + isPro flag
+- `POST /api/godflesh/chat` — SSE streaming chat with GODFLESH
+- `GET /api/godflesh/pricing` — pricing tiers
+- `POST /api/godflesh/checkout` — Stripe checkout (pending Stripe connection)
+- `POST /api/godflesh/portal` — Stripe portal (pending Stripe connection)
+
+**Stripe:** Not yet connected — checkout/portal return 503 with a "coming soon" message.
+
+**Chat SSE events:**
+- `{ type: "chunk", content: "..." }` — streaming token
+- `{ type: "done", usedToday, limit, isPro }` — completion
+- `{ type: "limit_reached", used, limit }` — daily limit hit
+- `{ type: "error", error: "..." }` — transmission error
+
+---
 
 ## Overview
 
@@ -34,18 +80,20 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 ```text
 artifacts-monorepo/
 ├── artifacts/              # Deployable applications
-│   └── api-server/         # Express API server
+│   ├── api-server/         # Express API server (shared backend)
+│   ├── super-ai-lab/       # Super AI Lab frontend (private, owner-only)
+│   └── godflesh/           # GODFLESH frontend (public freemium)
 ├── lib/                    # Shared libraries
 │   ├── api-spec/           # OpenAPI spec + Orval codegen config
 │   ├── api-client-react/   # Generated React Query hooks
 │   ├── api-zod/            # Generated Zod schemas from OpenAPI
-│   └── db/                 # Drizzle ORM schema + DB connection
-├── scripts/                # Utility scripts (single workspace package)
-│   └── src/                # Individual .ts scripts, run via `pnpm --filter @workspace/scripts run <script>`
-├── pnpm-workspace.yaml     # pnpm workspace (artifacts/*, lib/*, lib/integrations/*, scripts)
-├── tsconfig.base.json      # Shared TS options (composite, bundler resolution, es2022)
-├── tsconfig.json           # Root TS project references
-└── package.json            # Root package with hoisted devDeps
+│   ├── db/                 # Drizzle ORM schema + DB connection
+│   └── replit-auth-web/    # useAuth() hook for Replit OIDC auth
+├── scripts/                # Utility scripts
+├── pnpm-workspace.yaml
+├── tsconfig.base.json
+├── tsconfig.json
+└── package.json
 ```
 
 ## TypeScript & Composite Projects
@@ -68,24 +116,22 @@ Every package extends `tsconfig.base.json` which sets `composite: true`. The roo
 Express 5 API server. Routes live in `src/routes/` and use `@workspace/api-zod` for request and response validation and `@workspace/db` for persistence.
 
 - Entry: `src/index.ts` — reads `PORT`, starts Express
-- App setup: `src/app.ts` — mounts CORS, JSON/urlencoded parsing, routes at `/api`
-- Routes: `src/routes/index.ts` mounts sub-routers; `src/routes/health.ts` exposes `GET /health` (full path: `/api/health`)
-- Depends on: `@workspace/db`, `@workspace/api-zod`
-- `pnpm --filter @workspace/api-server run dev` — run the dev server
-- `pnpm --filter @workspace/api-server run build` — production esbuild bundle (`dist/index.cjs`)
-- Build bundles an allowlist of deps (express, cors, pg, drizzle-orm, zod, etc.) and externalizes the rest
+- App setup: `src/app.ts` — mounts CORS, cookie-parser, JSON/urlencoded parsing, authMiddleware, routes at `/api`
+- Auth middleware: `src/middlewares/authMiddleware.ts` — populates `req.user` from session cookie
+- Owner middleware: `src/middlewares/ownerOnly.ts` — gates routes to `REPL_OWNER_ID` only
+- Routes: `src/routes/index.ts` → health, auth, godflesh, superai (owner-protected)
+- Depends on: `@workspace/db`, `@workspace/api-zod`, `@workspace/integrations-openai-ai-server`
 
 ### `lib/db` (`@workspace/db`)
 
 Database layer using Drizzle ORM with PostgreSQL. Exports a Drizzle client instance and schema models.
 
-- `src/index.ts` — creates a `Pool` + Drizzle instance, exports schema
-- `src/schema/index.ts` — barrel re-export of all models
-- `src/schema/<modelname>.ts` — table definitions with `drizzle-zod` insert schemas (no models definitions exist right now)
-- `drizzle.config.ts` — Drizzle Kit config (requires `DATABASE_URL`, automatically provided by Replit)
-- Exports: `.` (pool, db, schema), `./schema` (schema only)
+- Schema: `auth.ts` (users, sessions), `godflesh.ts` (godflesh_users, godflesh_usage), `superai.ts`
+- `pnpm --filter @workspace/db run push` — sync schema to DB
 
-Production migrations are handled by Replit when publishing. In development, we just use `pnpm --filter @workspace/db run push`, and we fallback to `pnpm --filter @workspace/db run push-force`.
+### `lib/replit-auth-web` (`@workspace/replit-auth-web`)
+
+React hook for Replit OIDC auth. Exports `useAuth()` which provides `{ isAuthenticated, isLoading, user, login(), logout() }`.
 
 ### `lib/api-spec` (`@workspace/api-spec`)
 
@@ -96,14 +142,6 @@ Owns the OpenAPI 3.1 spec (`openapi.yaml`) and the Orval config (`orval.config.t
 
 Run codegen: `pnpm --filter @workspace/api-spec run codegen`
 
-### `lib/api-zod` (`@workspace/api-zod`)
-
-Generated Zod schemas from the OpenAPI spec (e.g. `HealthCheckResponse`). Used by `api-server` for response validation.
-
-### `lib/api-client-react` (`@workspace/api-client-react`)
-
-Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHealthCheck`, `healthCheck`).
-
 ### `scripts` (`@workspace/scripts`)
 
-Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.
+Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`.

@@ -13,7 +13,89 @@ tags:
     description: OpenAI AI chat, image, and audio operations
   - name: superai
     description: Super AI multi-agent collaboration endpoints
+  - name: auth
+    description: Authentication operations
+  - name: godflesh
+    description: GODFLESH AI chat product endpoints
 paths:
+  /auth/user:
+    get:
+      operationId: getCurrentAuthUser
+      tags: [auth]
+      summary: Get current authenticated user
+      responses:
+        "200":
+          description: Current auth state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCurrentAuthUserResponse"
+  /godflesh/status:
+    get:
+      operationId: getGodfleshStatus
+      tags: [godflesh]
+      summary: Get user's message usage and subscription status
+      responses:
+        "200":
+          description: User status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GodflesUserStatus"
+        "401":
+          description: Not authenticated
+  /godflesh/checkout:
+    post:
+      operationId: createGodfleshCheckout
+      tags: [godflesh]
+      summary: Create Stripe checkout session for Pro subscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                priceId:
+                  type: string
+              required: [priceId]
+      responses:
+        "200":
+          description: Checkout session URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GodfleshCheckoutSession"
+        "401":
+          description: Not authenticated
+  /godflesh/portal:
+    post:
+      operationId: createGodfleshPortal
+      tags: [godflesh]
+      summary: Create Stripe customer portal session
+      responses:
+        "200":
+          description: Portal session URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GodfleshPortalSession"
+        "401":
+          description: Not authenticated
+  /godflesh/pricing:
+    get:
+      operationId: getGodfleshPricing
+      tags: [godflesh]
+      summary: Get available pricing plans
+      responses:
+        "200":
+          description: Pricing info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GodfleshPricing"
   /healthz:
     get:
       operationId: healthCheck
@@ -452,3 +534,75 @@ components:
           type: string
       required:
         - error
+    AuthUser:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        profileImageUrl:
+          type: string
+      required:
+        - id
+        - username
+    GetCurrentAuthUserResponse:
+      type: object
+      properties:
+        isAuthenticated:
+          type: boolean
+        user:
+          $ref: "#/components/schemas/AuthUser"
+      required:
+        - isAuthenticated
+    GodflesUserStatus:
+      type: object
+      properties:
+        messagesUsedToday:
+          type: integer
+        dailyLimit:
+          type: integer
+        isPro:
+          type: boolean
+        stripeCustomerId:
+          type: string
+        stripeSubscriptionId:
+          type: string
+      required:
+        - messagesUsedToday
+        - dailyLimit
+        - isPro
+    GodfleshPricing:
+      type: object
+      properties:
+        priceId:
+          type: string
+        amount:
+          type: integer
+        currency:
+          type: string
+        interval:
+          type: string
+      required:
+        - priceId
+        - amount
+        - currency
+        - interval
+    GodfleshCheckoutSession:
+      type: object
+      properties:
+        url:
+          type: string
+      required:
+        - url
+    GodfleshPortalSession:
+      type: object
+      properties:
+        url:
+          type: string
+      required:
+        - url

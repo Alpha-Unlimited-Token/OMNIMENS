@@ -112,3 +112,43 @@ export interface SuperAIBlueprint {
 export interface SuperAIError {
   error: string;
 }
+
+export interface AuthUser {
+  id: string;
+  username: string;
+  firstName?: string;
+  lastName?: string;
+  profileImageUrl?: string;
+}
+
+export interface GetCurrentAuthUserResponse {
+  isAuthenticated: boolean;
+  user?: AuthUser;
+}
+
+export interface GodflesUserStatus {
+  messagesUsedToday: number;
+  dailyLimit: number;
+  isPro: boolean;
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+}
+
+export interface GodfleshPricing {
+  priceId: string;
+  amount: number;
+  currency: string;
+  interval: string;
+}
+
+export interface GodfleshCheckoutSession {
+  url: string;
+}
+
+export interface GodfleshPortalSession {
+  url: string;
+}
+
+export type CreateGodfleshCheckoutBody = {
+  priceId: string;
+};

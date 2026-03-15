@@ -1,0 +1,18 @@
+packages:
+  "framer-motion": "For cinematic page transitions and text reveals"
+  "react-markdown": "For rendering AI chat responses formatting"
+  "remark-gfm": "For github flavored markdown support in chat"
+  "clsx": "For conditional class merging"
+  "tailwind-merge": "For conditional class merging"
+
+images:
+  - path: "artifacts/godflesh/public/images/hero-bg.png"
+    description: "Dark, ominous, abstract gothic sci-fi background. Deep crimson and blood-red volumetric light leaks over pure black geometric monolithic structures. Cinematic, imposing, transcendent."
+    aspect_ratio: "16:9"
+  - path: "artifacts/godflesh/public/images/emblem.png"
+    description: "Intricate, symmetrical geometric gothic emblem in dark gold and crimson on a pure black background. Looks like a sigil for a superintelligence."
+    aspect_ratio: "1:1"
+
+notes:
+  - Using Replit Auth for authentication via @workspace/replit-auth-web
+  - Chat uses SSE streaming POST /api/godflesh/chat

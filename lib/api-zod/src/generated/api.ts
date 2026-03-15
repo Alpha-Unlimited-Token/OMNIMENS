@@ -8,6 +8,64 @@
 import * as zod from "zod";
 
 /**
+ * @summary Get current authenticated user
+ */
+export const GetCurrentAuthUserResponse = zod.object({
+  isAuthenticated: zod.boolean(),
+  user: zod
+    .object({
+      id: zod.string(),
+      username: zod.string(),
+      firstName: zod.string().optional(),
+      lastName: zod.string().optional(),
+      profileImageUrl: zod.string().optional(),
+    })
+    .optional(),
+});
+
+/**
+ * @summary Get user's message usage and subscription status
+ */
+export const GetGodfleshStatusResponse = zod.object({
+  messagesUsedToday: zod.number(),
+  dailyLimit: zod.number(),
+  isPro: zod.boolean(),
+  stripeCustomerId: zod.string().optional(),
+  stripeSubscriptionId: zod.string().optional(),
+});
+
+/**
+ * @summary Create Stripe checkout session for Pro subscription
+ */
+export const CreateGodfleshCheckoutBody = zod.object({
+  priceId: zod.string(),
+});
+
+export const CreateGodfleshCheckoutResponse = zod.object({
+  url: zod.string(),
+});
+
+/**
+ * @summary Create Stripe customer portal session
+ */
+export const CreateGodfleshPortalResponse = zod.object({
+  url: zod.string(),
+});
+
+/**
+ * @summary Get available pricing plans
+ */
+export const GetGodfleshPricingResponseItem = zod.object({
+  priceId: zod.string(),
+  amount: zod.number(),
+  currency: zod.string(),
+  interval: zod.string(),
+});
+export const GetGodfleshPricingResponse = zod.array(
+  GetGodfleshPricingResponseItem,
+);
+
+/**
  * Returns server health status
  * @summary Health check
  */

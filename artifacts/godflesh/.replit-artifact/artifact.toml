@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/godflesh/"
+title = "GODFLESH"
+version = "1.0.0"
+id = "artifacts/godflesh"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+localPort = 25047
+name = "web"
+paths = ["/godflesh/"]
+
+[services.development]
+run = "pnpm --filter @workspace/godflesh run dev"
+
+[services.env]
+PORT = "25047"
+BASE_PATH = "/godflesh/"
+
+[services.production]
+build = ["pnpm", "--filter", "@workspace/godflesh", "run", "build"]
+publicDir = "artifacts/godflesh/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"

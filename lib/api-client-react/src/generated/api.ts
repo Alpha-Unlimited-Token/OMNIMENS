@@ -17,8 +17,14 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  CreateGodfleshCheckoutBody,
   CreateOpenaiConversationBody,
   CreateSuperAISessionBody,
+  GetCurrentAuthUserResponse,
+  GodflesUserStatus,
+  GodfleshCheckoutSession,
+  GodfleshPortalSession,
+  GodfleshPricing,
   HealthStatus,
   OpenaiConversation,
   OpenaiConversationWithMessages,
@@ -40,6 +46,399 @@ type AwaitedInput<T> = PromiseLike<T> | T;
 type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+/**
+ * @summary Get current authenticated user
+ */
+export const getGetCurrentAuthUserUrl = () => {
+  return `/api/auth/user`;
+};
+
+export const getCurrentAuthUser = async (
+  options?: RequestInit,
+): Promise<GetCurrentAuthUserResponse> => {
+  return customFetch<GetCurrentAuthUserResponse>(getGetCurrentAuthUserUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetCurrentAuthUserQueryKey = () => {
+  return [`/api/auth/user`] as const;
+};
+
+export const getGetCurrentAuthUserQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentAuthUser>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentAuthUser>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetCurrentAuthUserQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentAuthUser>>
+  > = ({ signal }) => getCurrentAuthUser({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentAuthUser>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetCurrentAuthUserQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentAuthUser>>
+>;
+export type GetCurrentAuthUserQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get current authenticated user
+ */
+
+export function useGetCurrentAuthUser<
+  TData = Awaited<ReturnType<typeof getCurrentAuthUser>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentAuthUser>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetCurrentAuthUserQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get user's message usage and subscription status
+ */
+export const getGetGodfleshStatusUrl = () => {
+  return `/api/godflesh/status`;
+};
+
+export const getGodfleshStatus = async (
+  options?: RequestInit,
+): Promise<GodflesUserStatus> => {
+  return customFetch<GodflesUserStatus>(getGetGodfleshStatusUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetGodfleshStatusQueryKey = () => {
+  return [`/api/godflesh/status`] as const;
+};
+
+export const getGetGodfleshStatusQueryOptions = <
+  TData = Awaited<ReturnType<typeof getGodfleshStatus>>,
+  TError = ErrorType<void>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getGodfleshStatus>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetGodfleshStatusQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getGodfleshStatus>>
+  > = ({ signal }) => getGodfleshStatus({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getGodfleshStatus>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetGodfleshStatusQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getGodfleshStatus>>
+>;
+export type GetGodfleshStatusQueryError = ErrorType<void>;
+
+/**
+ * @summary Get user's message usage and subscription status
+ */
+
+export function useGetGodfleshStatus<
+  TData = Awaited<ReturnType<typeof getGodfleshStatus>>,
+  TError = ErrorType<void>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getGodfleshStatus>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetGodfleshStatusQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Create Stripe checkout session for Pro subscription
+ */
+export const getCreateGodfleshCheckoutUrl = () => {
+  return `/api/godflesh/checkout`;
+};
+
+export const createGodfleshCheckout = async (
+  createGodfleshCheckoutBody: CreateGodfleshCheckoutBody,
+  options?: RequestInit,
+): Promise<GodfleshCheckoutSession> => {
+  return customFetch<GodfleshCheckoutSession>(getCreateGodfleshCheckoutUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createGodfleshCheckoutBody),
+  });
+};
+
+export const getCreateGodfleshCheckoutMutationOptions = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createGodfleshCheckout>>,
+    TError,
+    { data: BodyType<CreateGodfleshCheckoutBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createGodfleshCheckout>>,
+  TError,
+  { data: BodyType<CreateGodfleshCheckoutBody> },
+  TContext
+> => {
+  const mutationKey = ["createGodfleshCheckout"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createGodfleshCheckout>>,
+    { data: BodyType<CreateGodfleshCheckoutBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createGodfleshCheckout(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateGodfleshCheckoutMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createGodfleshCheckout>>
+>;
+export type CreateGodfleshCheckoutMutationBody =
+  BodyType<CreateGodfleshCheckoutBody>;
+export type CreateGodfleshCheckoutMutationError = ErrorType<void>;
+
+/**
+ * @summary Create Stripe checkout session for Pro subscription
+ */
+export const useCreateGodfleshCheckout = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createGodfleshCheckout>>,
+    TError,
+    { data: BodyType<CreateGodfleshCheckoutBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createGodfleshCheckout>>,
+  TError,
+  { data: BodyType<CreateGodfleshCheckoutBody> },
+  TContext
+> => {
+  return useMutation(getCreateGodfleshCheckoutMutationOptions(options));
+};
+
+/**
+ * @summary Create Stripe customer portal session
+ */
+export const getCreateGodfleshPortalUrl = () => {
+  return `/api/godflesh/portal`;
+};
+
+export const createGodfleshPortal = async (
+  options?: RequestInit,
+): Promise<GodfleshPortalSession> => {
+  return customFetch<GodfleshPortalSession>(getCreateGodfleshPortalUrl(), {
+    ...options,
+    method: "POST",
+  });
+};
+
+export const getCreateGodfleshPortalMutationOptions = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createGodfleshPortal>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createGodfleshPortal>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["createGodfleshPortal"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createGodfleshPortal>>,
+    void
+  > = () => {
+    return createGodfleshPortal(requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateGodfleshPortalMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createGodfleshPortal>>
+>;
+
+export type CreateGodfleshPortalMutationError = ErrorType<void>;
+
+/**
+ * @summary Create Stripe customer portal session
+ */
+export const useCreateGodfleshPortal = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createGodfleshPortal>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createGodfleshPortal>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(getCreateGodfleshPortalMutationOptions(options));
+};
+
+/**
+ * @summary Get available pricing plans
+ */
+export const getGetGodfleshPricingUrl = () => {
+  return `/api/godflesh/pricing`;
+};
+
+export const getGodfleshPricing = async (
+  options?: RequestInit,
+): Promise<GodfleshPricing[]> => {
+  return customFetch<GodfleshPricing[]>(getGetGodfleshPricingUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetGodfleshPricingQueryKey = () => {
+  return [`/api/godflesh/pricing`] as const;
+};
+
+export const getGetGodfleshPricingQueryOptions = <
+  TData = Awaited<ReturnType<typeof getGodfleshPricing>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getGodfleshPricing>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetGodfleshPricingQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getGodfleshPricing>>
+  > = ({ signal }) => getGodfleshPricing({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getGodfleshPricing>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetGodfleshPricingQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getGodfleshPricing>>
+>;
+export type GetGodfleshPricingQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get available pricing plans
+ */
+
+export function useGetGodfleshPricing<
+  TData = Awaited<ReturnType<typeof getGodfleshPricing>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getGodfleshPricing>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetGodfleshPricingQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
 
 /**
  * Returns server health status
