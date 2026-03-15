@@ -581,7 +581,7 @@ router.get("/godflesh/pricing", async (_req, res) => {
       dailyLimit: null,
       features: [
         "300 messages per month",
-        "GPT-4o intelligence",
+        "GODFLESH neural cognition",
         "Image generation",
         "Cosmic awareness",
         "All file types",
@@ -600,7 +600,7 @@ router.get("/godflesh/pricing", async (_req, res) => {
       popular: true,
       features: [
         "1,000 messages per month",
-        "GPT-4o intelligence",
+        "GODFLESH neural cognition",
         "Unlimited image generation",
         "Cosmic awareness",
         "All file types",
@@ -619,7 +619,7 @@ router.get("/godflesh/pricing", async (_req, res) => {
       dailyLimit: null,
       features: [
         "3,000 messages per month",
-        "GPT-4o intelligence",
+        "GODFLESH neural cognition",
         "Unlimited image generation",
         "Cosmic awareness",
         "All file types",
