@@ -14,6 +14,7 @@ export type StreamedMessage = {
   agentName: AgentName;
   content: string;
   round: number;
+  iteration?: number;
 };
 
 export type CodeFile = {
@@ -21,6 +22,7 @@ export type CodeFile = {
   language: string;
   code: string;
   writtenBy: AgentName;
+  iteration?: number;
 };
 
 export type ExecutionResult = {
@@ -29,6 +31,7 @@ export type ExecutionResult = {
   errors: string;
   success: boolean;
   qualityWarning?: string | null;
+  iteration?: number;
 };
 
 export type InstallEvent = {
@@ -45,6 +48,17 @@ export type LabWorkspaceState = {
   packages: string[];
 } | null;
 
+export type IterationStatus = {
+  current: number;
+  total: number;
+  challenge?: string;
+  completedIterations: {
+    iteration: number;
+    fileCount: number;
+    files: string[];
+  }[];
+};
+
 export function useSuperAIStream(sessionId: number) {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamedMessages, setStreamedMessages] = useState<StreamedMessage[]>([]);
@@ -55,6 +69,10 @@ export function useSuperAIStream(sessionId: number) {
   const [installingPackages, setInstallingPackages] = useState<string[] | null>(null);
   const [restoringWorkspace, setRestoringWorkspace] = useState(false);
   const [restoredWorkspace, setRestoredWorkspace] = useState<LabWorkspaceState>(null);
+  const [iterationStatus, setIterationStatus] = useState<IterationStatus | null>(null);
+  const [isPackaging, setIsPackaging] = useState(false);
+  const [packageReady, setPackageReady] = useState(false);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -74,6 +92,10 @@ export function useSuperAIStream(sessionId: number) {
     setInstallingPackages(null);
     setRestoringWorkspace(false);
     setRestoredWorkspace(null);
+    setIterationStatus(null);
+    setIsPackaging(false);
+    setPackageReady(false);
+    setDownloadUrl(null);
     abortControllerRef.current = new AbortController();
 
     try {
@@ -115,11 +137,10 @@ export function useSuperAIStream(sessionId: number) {
               break;
             }
 
-            // ── Workspace restoration events ──
+            // ── Workspace restoration ──
             if (parsed.type === "workspace_restoring") {
               setRestoringWorkspace(true);
             }
-
             if (parsed.type === "workspace_restored") {
               setRestoringWorkspace(false);
               setRestoredWorkspace({
@@ -128,44 +149,66 @@ export function useSuperAIStream(sessionId: number) {
                 files: parsed.files || [],
                 packages: parsed.packages || [],
               });
-              // Pre-load previously built code files into the UI
               if (parsed.files && parsed.files.length > 0) {
                 setCodeFiles(
                   parsed.files.map((f: { filename: string; language: string; writtenBy: string }) => ({
                     filename: f.filename,
                     language: f.language,
-                    code: "(loading from workspace...)",
+                    code: "(loading from persistent workspace...)",
                     writtenBy: f.writtenBy as AgentName,
                   }))
                 );
               }
             }
 
+            // ── Iteration lifecycle ──
+            if (parsed.type === "iteration_start") {
+              setRestoringWorkspace(false);
+              setIterationStatus((prev) => ({
+                current: parsed.iteration,
+                total: parsed.total,
+                challenge: parsed.challenge,
+                completedIterations: prev?.completedIterations || [],
+              }));
+            }
+            if (parsed.type === "iteration_complete") {
+              setIterationStatus((prev) => ({
+                current: parsed.iteration,
+                total: parsed.total,
+                challenge: prev?.challenge,
+                completedIterations: [
+                  ...(prev?.completedIterations || []),
+                  { iteration: parsed.iteration, fileCount: parsed.fileCount, files: parsed.files || [] },
+                ],
+              }));
+            }
+
+            // ── Agent lifecycle ──
             if (parsed.type === "agent_start" && parsed.agent) {
               setRestoringWorkspace(false);
               setActiveAgent(parsed.agent as AgentName);
             }
-
             if (parsed.type === "agent_done") {
               setActiveAgent(null);
             }
 
+            // ── Messages ──
             if (parsed.type === "message" && parsed.agent && parsed.content) {
               setStreamedMessages((prev) => {
                 const last = prev[prev.length - 1];
-                if (last && last.agentName === parsed.agent && last.round === parsed.round) {
-                  return [
-                    ...prev.slice(0, -1),
-                    { ...last, content: last.content + parsed.content },
-                  ];
+                if (last && last.agentName === parsed.agent && last.round === parsed.round && last.iteration === (parsed.iteration || 1)) {
+                  return [...prev.slice(0, -1), { ...last, content: last.content + parsed.content }];
                 }
-                return [
-                  ...prev,
-                  { agentName: parsed.agent as AgentName, content: parsed.content, round: parsed.round || 1 },
-                ];
+                return [...prev, {
+                  agentName: parsed.agent as AgentName,
+                  content: parsed.content,
+                  round: parsed.round || 1,
+                  iteration: parsed.iteration || 1,
+                }];
               });
             }
 
+            // ── Code files ──
             if (parsed.type === "code_write") {
               setCodeFiles((prev) => {
                 const idx = prev.findIndex((f) => f.filename === parsed.filename);
@@ -174,6 +217,7 @@ export function useSuperAIStream(sessionId: number) {
                   language: parsed.language,
                   code: parsed.code,
                   writtenBy: parsed.agent as AgentName,
+                  iteration: parsed.iteration || 1,
                 };
                 if (idx >= 0) {
                   const next = [...prev];
@@ -190,24 +234,33 @@ export function useSuperAIStream(sessionId: number) {
 
             if (parsed.type === "execution_result") {
               setExecutingFile(null);
-              setExecutions((prev) => [
-                ...prev,
-                {
-                  filename: parsed.filename,
-                  output: parsed.output || "",
-                  errors: parsed.errors || "",
-                  success: parsed.success,
-                  qualityWarning: parsed.qualityWarning || null,
-                },
-              ]);
+              setExecutions((prev) => [...prev, {
+                filename: parsed.filename,
+                output: parsed.output || "",
+                errors: parsed.errors || "",
+                success: parsed.success,
+                qualityWarning: parsed.qualityWarning || null,
+                iteration: parsed.iteration || 1,
+              }]);
             }
 
+            // ── Packages ──
             if (parsed.type === "package_install") {
               setInstallingPackages(parsed.packages);
             }
-
             if (parsed.type === "install_result") {
               setInstallingPackages(null);
+            }
+
+            // ── Packaging ──
+            if (parsed.type === "packaging") {
+              setIsPackaging(true);
+              setActiveAgent(null);
+            }
+            if (parsed.type === "package_ready") {
+              setIsPackaging(false);
+              setPackageReady(true);
+              setDownloadUrl(parsed.downloadUrl || "/api/superai/lab/download");
             }
           } catch {
             // ignore malformed JSON
@@ -239,5 +292,9 @@ export function useSuperAIStream(sessionId: number) {
     installingPackages,
     restoringWorkspace,
     restoredWorkspace,
+    iterationStatus,
+    isPackaging,
+    packageReady,
+    downloadUrl,
   };
 }
