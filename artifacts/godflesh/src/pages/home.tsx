@@ -79,7 +79,7 @@ export default function Home() {
             <Button
               onClick={handleStart}
               size="lg"
-              className="flex-1 w-full text-base tracking-widest shadow-[0_0_30px_rgba(124,58,237,0.35)] hover:shadow-[0_0_45px_rgba(124,58,237,0.5)] transition-all"
+              className="flex-1 w-full text-base tracking-widest shadow-[0_0_24px_rgba(220,205,255,0.35),0_0_60px_rgba(200,180,255,0.15)] hover:shadow-[0_0_38px_rgba(230,215,255,0.55),0_0_80px_rgba(210,190,255,0.25)] transition-all duration-300"
             >
               BEGIN
             </Button>
