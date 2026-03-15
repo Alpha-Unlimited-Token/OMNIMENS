@@ -4,6 +4,7 @@ import { promises as fs } from "fs";
 import { createWriteStream } from "fs";
 import path from "path";
 import archiver from "archiver";
+import { EventEmitter } from "events";
 import { db } from "@workspace/db";
 import {
   superAISessions,
@@ -13,9 +14,21 @@ import {
   superAIExecutions,
   superAIPackages,
   superAILabFiles,
+  superAIEvents,
 } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
+
+// ─── Background Session Runners ───────────────────────────────────────────────
+// Sessions run as background async tasks completely decoupled from HTTP connections.
+// Closing the browser tab, navigating away, or losing connection does NOT stop them.
+// Reconnecting clients replay all stored events then pick up live from the emitter.
+
+interface SessionRunner {
+  emitter: EventEmitter;
+  isRunning: boolean;
+}
+const sessionRunners = new Map<number, SessionRunner>();
 
 const router: IRouter = Router();
 
@@ -574,6 +587,9 @@ type AgentName = "Architect" | "Critic" | "Synthesizer" | "Mathematician" | "Neu
 const ALL_AGENTS: AgentName[] = ["Architect", "Mathematician", "Neuroscientist", "Synthesizer", "Critic", "Meta-Agent"];
 
 // ─── Run Route ────────────────────────────────────────────────────────────────
+// Sessions run as background tasks — completely decoupled from the HTTP connection.
+// Leaving the page, refreshing, or losing network does NOT interrupt the session.
+// Reconnecting clients get a full replay of everything that happened + live updates.
 
 router.post("/superai/sessions/:id/run", async (req, res) => {
   const id = Number(req.params.id);
@@ -586,24 +602,92 @@ router.post("/superai/sessions/:id/run", async (req, res) => {
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
 
+  // Helper to write to this specific client without throwing if already closed
+  const writeToClient = (data: object) => {
+    if (!res.writableEnded) {
+      try { res.write(`data: ${JSON.stringify(data)}\n\n`); } catch { /* client gone */ }
+    }
+  };
+
+  const existingRunner = sessionRunners.get(id);
+
+  if (existingRunner?.isRunning) {
+    // ── RECONNECT MODE ── session already running in background
+    // Subscribe to emitter first to buffer events emitted during DB replay
+    const buffered: object[] = [];
+    const bufferListener = (ev: object) => buffered.push(ev);
+    existingRunner.emitter.on("event", bufferListener);
+
+    // Replay all stored events in order
+    const stored = await db
+      .select()
+      .from(superAIEvents)
+      .where(eq(superAIEvents.sessionId, id))
+      .orderBy(superAIEvents.id);
+    for (const ev of stored) writeToClient(ev.payload as object);
+
+    // Switch to live listener and flush anything buffered during replay
+    existingRunner.emitter.removeListener("event", bufferListener);
+    const liveListener = (ev: object) => writeToClient(ev);
+    existingRunner.emitter.on("event", liveListener);
+    for (const ev of buffered) writeToClient(ev);
+
+    // When client disconnects, remove listener — session keeps running
+    req.on("close", () => existingRunner.emitter.removeListener("event", liveListener));
+    return; // leave SSE connection open for live streaming
+  }
+
+  // ── NEW RUN ── start a fresh background task
+  // Clear old events and conversation (code + lab files are never cleared)
+  await db.delete(superAIEvents).where(eq(superAIEvents.sessionId, id));
   if (session.status === "running") {
-    // Only clear the conversation — never delete built code, packages, or lab files
-    // The lab workspace and all code persist so agents continue from where they left off
     await db.delete(superAIMessages).where(eq(superAIMessages.sessionId, id));
     await db.delete(superAIBlueprints).where(eq(superAIBlueprints.sessionId, id));
   }
-
   await db.update(superAISessions).set({ status: "running" }).where(eq(superAISessions.id, id));
 
-  const send = (data: object) => res.write(`data: ${JSON.stringify(data)}\n\n`);
+  const emitter = new EventEmitter();
+  emitter.setMaxListeners(50);
+  const runner: SessionRunner = { emitter, isRunning: true };
+  sessionRunners.set(id, runner);
+
+  // bgSend — emits immediately for live clients AND persists to DB in order
+  let writeQueue = Promise.resolve();
+  const bgSend = (data: object): void => {
+    emitter.emit("event", data);
+    writeQueue = writeQueue
+      .then(() => db.insert(superAIEvents).values({ sessionId: id, payload: data as any }))
+      .catch((err) => console.error(`[Session ${id}] Event write error:`, err));
+  };
+
+  // Subscribe this client to the emitter for live streaming
+  const liveListener = (ev: object) => writeToClient(ev);
+  emitter.on("event", liveListener);
+  req.on("close", () => emitter.removeListener("event", liveListener));
 
   const isCodeMode = session.mode === "code";
 
-  if (isCodeMode) {
-    await runCodeMode(id, session.topic, rounds, send, res);
-  } else {
-    await runBlueprintMode(id, session.topic, rounds, send, res);
-  }
+  // Launch the session in the background — not awaited, runs independently
+  (async () => {
+    try {
+      if (isCodeMode) {
+        await runCodeMode(id, session.topic, rounds, bgSend);
+      } else {
+        await runBlueprintMode(id, session.topic, rounds, bgSend);
+      }
+    } catch (err) {
+      console.error(`[Session ${id}] Fatal error:`, err);
+      bgSend({ type: "error", error: "An error occurred during the session" });
+      await db.update(superAISessions).set({ status: "pending" }).where(eq(superAISessions.id, id));
+    } finally {
+      runner.isRunning = false;
+      // Clean up runner reference after 15 minutes
+      setTimeout(() => {
+        if (!sessionRunners.get(id)?.isRunning) sessionRunners.delete(id);
+      }, 15 * 60 * 1000);
+    }
+  })();
+  // Return immediately — do not await the background task
 });
 
 // ─── Blueprint Mode ───────────────────────────────────────────────────────────
@@ -612,8 +696,7 @@ async function runBlueprintMode(
   id: number,
   topic: string,
   rounds: number,
-  send: (d: object) => void,
-  res: any
+  send: (d: object) => void
 ) {
   const history: { agent: string; content: string; round: number }[] = [];
 
@@ -702,12 +785,10 @@ async function runBlueprintMode(
 
     await db.update(superAISessions).set({ status: "completed" }).where(eq(superAISessions.id, id));
     send({ type: "done", done: true });
-    res.end();
   } catch (err) {
     console.error("Blueprint mode error:", err);
     await db.update(superAISessions).set({ status: "pending" }).where(eq(superAISessions.id, id));
-    send({ type: "error", error: "An error occurred during the collaboration" });
-    res.end();
+    throw err; // re-throw so the background runner catches and handles it
   }
 }
 
@@ -1140,8 +1221,7 @@ async function runCodeMode(
   id: number,
   topic: string,
   rounds: number,
-  send: (d: object) => void,
-  res: any
+  send: (d: object) => void
 ) {
   try {
     // ── Restore the persistent lab workspace from DB ──
@@ -1255,12 +1335,10 @@ async function runCodeMode(
 
     await db.update(superAISessions).set({ status: "completed" }).where(eq(superAISessions.id, id));
     send({ type: "done", done: true });
-    res.end();
   } catch (err) {
     console.error("Code mode error:", err);
     await db.update(superAISessions).set({ status: "pending" }).where(eq(superAISessions.id, id));
-    send({ type: "error", error: "An error occurred during the coding session" });
-    res.end();
+    throw err; // re-throw so the background runner catches and handles it
   }
 }
 

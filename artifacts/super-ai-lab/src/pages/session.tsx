@@ -420,7 +420,9 @@ export default function SessionPage() {
     );
   }
 
-  const canStart = (sessionData.status === "pending" || (sessionData.status === "running" && !isStreaming && allMessages.length === 0)) && !isStreaming;
+  // canStart: allow starting a new session OR reconnecting to a background session
+  const isRunningInBackground = sessionData.status === "running" && !isStreaming;
+  const canStart = (sessionData.status === "pending" || isRunningInBackground) && !isStreaming;
 
   return (
     <div className="flex flex-col h-[calc(100vh-5rem)]">
@@ -458,6 +460,23 @@ export default function SessionPage() {
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
+
+      {/* Running-in-background banner */}
+      {isRunningInBackground && (
+        <div className="mb-3 flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl border border-blue-400/20 bg-blue-500/5 shrink-0">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+            <span className="text-blue-300 font-semibold">Session running in background</span>
+            <span className="text-white/40 text-xs hidden sm:inline">— agents are active even when you leave this page</span>
+          </div>
+          <button
+            onClick={() => startStream(3)}
+            className="shrink-0 px-4 py-1.5 rounded-lg bg-blue-500/20 border border-blue-400/30 text-blue-300 hover:bg-blue-500/40 hover:text-white transition-all text-xs font-bold tracking-widest"
+          >
+            RECONNECT LIVE
+          </button>
+        </div>
+      )}
 
       {/* Agent Grid */}
       <div className="grid grid-cols-6 gap-2 mb-2 shrink-0">
@@ -912,8 +931,8 @@ export default function SessionPage() {
             className="group flex items-center justify-center w-full md:w-auto gap-3 px-10 py-4 bg-blue-500 text-white font-bold tracking-widest rounded-2xl hover:bg-blue-400 hover:shadow-[0_0_40px_rgba(96,165,250,0.5)] transition-all text-sm"
           >
             <Play className="w-5 h-5 fill-current" />
-            {sessionData.status === "running"
-              ? "RECONNECT & RETRY"
+            {isRunningInBackground
+              ? "RECONNECT LIVE — SESSION IN PROGRESS"
               : isCodeMode
               ? "LAUNCH CODE LAB — 6 AGENTS LIVE"
               : "ACTIVATE 6-AGENT SUPER AI COUNCIL"}
