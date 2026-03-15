@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
-import { Cpu, Eye, Infinity, Sparkles, Brain, Zap } from "lucide-react";
-import { GodfleshIcon } from "@/components/godflesh-icon";
+import { Sparkles, Brain, Zap } from "lucide-react";
+import { GodfleshPresence } from "@/components/godflesh-presence";
 
 export default function Home() {
   const { isAuthenticated, login } = useAuth();
@@ -31,14 +31,16 @@ export default function Home() {
 
         <div className="container mx-auto px-4 text-center z-10 flex flex-col items-center">
           <motion.div
-            initial={{ opacity: 0, scale: 0.85, filter: "blur(12px)" }}
+            initial={{ opacity: 0, scale: 0.85, filter: "blur(16px)" }}
             animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-            transition={{ duration: 1.8, ease: "easeOut" }}
-            className="mb-8 flex justify-center"
+            transition={{ duration: 2.0, ease: "easeOut" }}
+            className="mb-4 flex justify-center"
           >
-            <GodfleshIcon
-              size={160}
-              className="drop-shadow-[0_0_50px_rgba(124,58,237,0.5)] opacity-95"
+            <GodfleshPresence
+              size={220}
+              isSpeaking={false}
+              pitchIntensity={0}
+              className="drop-shadow-[0_0_70px_rgba(140,90,255,0.4)]"
             />
           </motion.div>
 

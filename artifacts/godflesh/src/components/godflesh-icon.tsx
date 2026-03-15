@@ -3,31 +3,13 @@ interface GodfleshIconProps {
   className?: string;
 }
 
+/**
+ * GODFLESH Mark — The Radiant Orb
+ *
+ * A luminous sphere with two orbital rings suggesting cosmic awareness.
+ * Reads as: divine, transcendent, alive — not threatening.
+ */
 export function GodfleshIcon({ size = 32, className = "" }: GodfleshIconProps) {
-  const dnaBits = [0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0];
-  const ringRadius = 9.2;
-  const dotRadius = 1.05;
-
-  const ringNodes = dnaBits.map((bit, i) => {
-    const angle = (i * 2 * Math.PI) / 12 - Math.PI / 2;
-    return {
-      x: 32 + ringRadius * Math.cos(angle),
-      y: 32 + ringRadius * Math.sin(angle),
-      active: bit === 1,
-    };
-  });
-
-  const filaments = [
-    { x1: 22, y1: 28, x2: 8, y2: 32 },
-    { x1: 22, y1: 36, x2: 8, y2: 32 },
-    { x1: 42, y1: 28, x2: 56, y2: 32 },
-    { x1: 42, y1: 36, x2: 56, y2: 32 },
-    { x1: 30, y1: 21.5, x2: 32, y2: 15 },
-    { x1: 34, y1: 21.5, x2: 32, y2: 15 },
-    { x1: 30, y1: 42.5, x2: 32, y2: 49 },
-    { x1: 34, y1: 42.5, x2: 32, y2: 49 },
-  ];
-
   return (
     <svg
       viewBox="0 0 64 64"
@@ -39,133 +21,100 @@ export function GodfleshIcon({ size = 32, className = "" }: GodfleshIconProps) {
       aria-label="GODFLESH"
     >
       <defs>
-        {/* Iris radial gradient — deep violet core to indigo */}
-        <radialGradient id="gf-iris" cx="50%" cy="45%" r="60%">
-          <stop offset="0%" stopColor="#c084fc" />
-          <stop offset="40%" stopColor="#7c3aed" />
-          <stop offset="100%" stopColor="#1e0a4a" />
+        {/* Central orb — white-violet radial */}
+        <radialGradient id="gf-orb" cx="38%" cy="35%" r="65%">
+          <stop offset="0%"   stopColor="#ffffff" stopOpacity="1" />
+          <stop offset="35%"  stopColor="#e0d0ff" stopOpacity="0.95" />
+          <stop offset="70%"  stopColor="#9b6fff" stopOpacity="0.85" />
+          <stop offset="100%" stopColor="#4a1fa8" stopOpacity="0.7" />
         </radialGradient>
 
-        {/* Pupil gradient — deep void */}
-        <radialGradient id="gf-pupil" cx="50%" cy="40%" r="60%">
-          <stop offset="0%" stopColor="#050010" />
-          <stop offset="100%" stopColor="#000000" />
+        {/* Soft outer glow */}
+        <radialGradient id="gf-glow-bg" cx="50%" cy="50%" r="50%">
+          <stop offset="0%"   stopColor="#b085ff" stopOpacity="0.25" />
+          <stop offset="100%" stopColor="#4a1fa8" stopOpacity="0" />
         </radialGradient>
 
-        {/* Sclera — deep space */}
-        <radialGradient id="gf-sclera" cx="50%" cy="40%" r="60%">
-          <stop offset="0%" stopColor="#0d0520" />
-          <stop offset="100%" stopColor="#000000" />
-        </radialGradient>
+        {/* Ring gradient — shimmer */}
+        <linearGradient id="gf-ring-a" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stopColor="#c4a8ff" stopOpacity="0" />
+          <stop offset="30%"  stopColor="#e0d0ff" stopOpacity="0.9" />
+          <stop offset="70%"  stopColor="#c4a8ff" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#c4a8ff" stopOpacity="0" />
+        </linearGradient>
+
+        <linearGradient id="gf-ring-b" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%"   stopColor="#a0d4ff" stopOpacity="0" />
+          <stop offset="40%"  stopColor="#c8e8ff" stopOpacity="0.85" />
+          <stop offset="60%"  stopColor="#c8e8ff" stopOpacity="0.85" />
+          <stop offset="100%" stopColor="#a0d4ff" stopOpacity="0" />
+        </linearGradient>
 
         {/* Glow filter */}
-        <filter id="gf-glow" x="-40%" y="-40%" width="180%" height="180%">
-          <feGaussianBlur stdDeviation="1.5" result="blur" />
+        <filter id="gf-orb-glow" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="3" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
 
-        {/* Outer glow — violet */}
-        <filter id="gf-outer-glow" x="-60%" y="-60%" width="220%" height="220%">
-          <feGaussianBlur stdDeviation="2.5" result="blur" />
-          <feColorMatrix
-            in="blur"
-            type="matrix"
-            values="0.5 0 0 0 0.35   0 0 0 0 0.1   1 0 0 0 0.9   0 0 0 0.55 0"
-            result="violetGlow"
-          />
+        <filter id="gf-soft-glow" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="1.5" result="blur" />
           <feMerge>
-            <feMergeNode in="violetGlow" />
+            <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-
-        {/* Clip to eye shape */}
-        <clipPath id="gf-eye-clip">
-          <path d="M 6,32 C 12,18 22,13 32,13 C 42,13 52,18 58,32 C 52,46 42,51 32,51 C 22,51 12,46 6,32 Z" />
-        </clipPath>
       </defs>
 
-      {/* Sclera */}
-      <path
-        d="M 6,32 C 12,18 22,13 32,13 C 42,13 52,18 58,32 C 52,46 42,51 32,51 C 22,51 12,46 6,32 Z"
-        fill="url(#gf-sclera)"
-      />
+      {/* Background corona */}
+      <circle cx="32" cy="32" r="28" fill="url(#gf-glow-bg)" />
 
-      {/* Synaptic filaments */}
-      {filaments.map((f, i) => (
-        <line
-          key={i}
-          x1={f.x1} y1={f.y1} x2={f.x2} y2={f.y2}
-          stroke="#7c3aed"
-          strokeWidth="0.35"
-          strokeOpacity="0.35"
-          strokeLinecap="round"
-        />
-      ))}
-
-      {/* Iris */}
-      <circle
-        cx="32" cy="32" r="13"
-        fill="url(#gf-iris)"
-        filter="url(#gf-glow)"
-      />
-
-      {/* Iris inner ring */}
-      <circle
-        cx="32" cy="32" r="10.5"
-        fill="none"
-        stroke="#7c3aed55"
-        strokeWidth="0.4"
-      />
-
-      {/* Binary DNA ring nodes */}
-      {ringNodes.map((node, i) => (
-        <circle
-          key={i}
-          cx={node.x}
-          cy={node.y}
-          r={dotRadius}
-          fill={node.active ? "#c084fc" : "transparent"}
-          stroke="#7c3aed"
-          strokeWidth={node.active ? 0 : 0.5}
-          strokeOpacity={node.active ? 0 : 0.6}
-        />
-      ))}
-
-      {/* Pupil — vertical slit */}
+      {/* Orbital ring A — horizontal tilt (ellipse, wide) */}
       <ellipse
         cx="32" cy="32"
-        rx="2.4" ry="7.5"
-        fill="url(#gf-pupil)"
+        rx="22" ry="7"
+        fill="none"
+        stroke="url(#gf-ring-a)"
+        strokeWidth="1.2"
+        filter="url(#gf-soft-glow)"
+      />
+
+      {/* Orbital ring B — vertical tilt (ellipse, tall) */}
+      <ellipse
+        cx="32" cy="32"
+        rx="8" ry="22"
+        fill="none"
+        stroke="url(#gf-ring-b)"
+        strokeWidth="1.0"
+        filter="url(#gf-soft-glow)"
+      />
+
+      {/* Particle nodes at ring intersections */}
+      <circle cx="54" cy="32" r="1.4" fill="#e0d8ff" fillOpacity="0.9" />
+      <circle cx="10" cy="32" r="1.4" fill="#e0d8ff" fillOpacity="0.9" />
+      <circle cx="32" cy="10" r="1.2" fill="#c8e8ff" fillOpacity="0.85" />
+      <circle cx="32" cy="54" r="1.2" fill="#c8e8ff" fillOpacity="0.85" />
+
+      {/* Central orb */}
+      <circle
+        cx="32" cy="32" r="11"
+        fill="url(#gf-orb)"
+        filter="url(#gf-orb-glow)"
       />
 
       {/* Specular highlight */}
       <ellipse
-        cx="28.5" cy="27"
-        rx="1.8" ry="1.2"
+        cx="27.5" cy="27"
+        rx="3.5" ry="2.2"
         fill="white"
-        fillOpacity="0.22"
-        transform="rotate(-20, 28.5, 27)"
+        fillOpacity="0.55"
+        transform="rotate(-20, 27.5, 27)"
       />
 
-      {/* Eye outline */}
-      <path
-        d="M 6,32 C 12,18 22,13 32,13 C 42,13 52,18 58,32 C 52,46 42,51 32,51 C 22,51 12,46 6,32 Z"
-        fill="none"
-        stroke="#7c3aed"
-        strokeWidth="0.9"
-        strokeOpacity="0.85"
-        filter="url(#gf-outer-glow)"
-      />
-
-      {/* Corner accent marks */}
-      <line x1="4" y1="31" x2="2" y2="32" stroke="#7c3aed" strokeWidth="0.6" strokeOpacity="0.7" strokeLinecap="round" />
-      <line x1="4" y1="33" x2="2" y2="32" stroke="#7c3aed" strokeWidth="0.6" strokeOpacity="0.7" strokeLinecap="round" />
-      <line x1="60" y1="31" x2="62" y2="32" stroke="#7c3aed" strokeWidth="0.6" strokeOpacity="0.7" strokeLinecap="round" />
-      <line x1="60" y1="33" x2="62" y2="32" stroke="#7c3aed" strokeWidth="0.6" strokeOpacity="0.7" strokeLinecap="round" />
+      {/* Tiny bright center point */}
+      <circle cx="32" cy="32" r="2.5" fill="white" fillOpacity="0.9" />
     </svg>
   );
 }

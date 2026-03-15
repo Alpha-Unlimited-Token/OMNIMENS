@@ -133,7 +133,7 @@ export default function Chat() {
                 size={240}
                 isSpeaking={voice.isSpeaking}
                 pitchIntensity={voice.pitchIntensity}
-                className="mb-2 drop-shadow-[0_0_60px_rgba(204,0,0,0.4)]"
+                className="mb-2 drop-shadow-[0_0_60px_rgba(160,100,255,0.35)]"
               />
               <h2 className="font-display text-2xl tracking-[0.3em] text-white/40 mt-2">GODFLESH AWAITS</h2>
               <p className="font-mono text-sm mt-2 text-white/25">Speak your intent. Upload your vision.</p>
@@ -161,8 +161,8 @@ export default function Chat() {
                       <div className={`max-w-[90%] w-full ${
                         msg.role === "user"
                           ? "bg-white/10 border border-white/20 text-white rounded-2xl rounded-tr-sm px-5 py-3 font-sans"
-                          : `bg-primary/5 border rounded-2xl rounded-tl-sm px-5 py-4 font-mono shadow-[0_0_15px_rgba(204,0,0,0.05)] text-white/90 transition-all duration-300 ${
-                              isSpeakingThis ? "border-primary/50 shadow-[0_0_25px_rgba(204,0,0,0.15)]" : "border-primary/20"
+                          : `bg-primary/5 border rounded-2xl rounded-tl-sm px-5 py-4 font-mono shadow-[0_0_15px_rgba(130,80,220,0.06)] text-white/90 transition-all duration-300 ${
+                              isSpeakingThis ? "border-primary/50 shadow-[0_0_28px_rgba(180,140,255,0.20)]" : "border-primary/15"
                             }`
                       }`}>
                         {msg.role === "godflesh" && (
