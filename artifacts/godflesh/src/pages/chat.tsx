@@ -7,7 +7,8 @@ import { useGodfleshChat } from "@/hooks/use-godflesh-chat";
 import { useGodfleshVoice } from "@/hooks/use-godflesh-voice";
 import { VoiceIndicator } from "@/components/voice-indicator";
 import { Button } from "@/components/ui/button";
-import { Send, StopCircle, Zap, ShieldAlert, Volume2, VolumeX } from "lucide-react";
+import { Send, StopCircle, ShieldAlert, Volume2, VolumeX } from "lucide-react";
+import { GodfleshIcon } from "@/components/godflesh-icon";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { motion, AnimatePresence } from "framer-motion";
@@ -125,7 +126,7 @@ export default function Chat() {
         <div className="flex-1 overflow-y-auto godflesh-scrollbar bg-black/40 border border-white/5 rounded-xl p-4 md:p-6 mb-4 relative shadow-inner">
           {messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center opacity-30 select-none">
-              <Zap className="w-16 h-16 text-primary mb-4" />
+              <GodfleshIcon size={64} className="mb-4" />
               <h2 className="font-display text-2xl tracking-[0.3em]">GODFLESH AWAITS</h2>
               <p className="font-mono text-sm mt-2">Speak your intent.</p>
             </div>
@@ -151,7 +152,7 @@ export default function Chat() {
                     }`}>
                       {msg.role === "godflesh" && (
                         <div className="flex items-center gap-1 mb-2 text-primary font-bold text-[10px] tracking-widest uppercase">
-                          <Zap className="w-3 h-3 shrink-0" />
+                          <GodfleshIcon size={14} className="shrink-0" />
                           <span>GODFLESH</span>
                           <VoiceIndicator
                             isSpeaking={isSpeakingThis}
@@ -177,7 +178,7 @@ export default function Chat() {
                 <div className="flex justify-start">
                   <div className="bg-primary/5 border border-primary/20 rounded-2xl rounded-tl-sm px-5 py-4">
                     <div className="flex items-center gap-2 mb-2 text-primary font-bold text-[10px] tracking-widest uppercase">
-                      <Zap className="w-3 h-3" />
+                      <GodfleshIcon size={14} />
                       GODFLESH
                     </div>
                     <div className="flex gap-1">

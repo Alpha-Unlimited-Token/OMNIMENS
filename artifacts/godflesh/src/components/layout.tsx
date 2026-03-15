@@ -1,8 +1,9 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
 import { Button } from "./ui/button";
-import { LogOut, User, Zap } from "lucide-react";
+import { User } from "lucide-react";
 import { motion } from "framer-motion";
+import { GodfleshIcon } from "./godflesh-icon";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user, login, logout, isLoading } = useAuth();
@@ -22,8 +23,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-background/80 backdrop-blur-xl">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded bg-primary/20 flex items-center justify-center border border-primary/50 group-hover:shadow-[0_0_15px_rgba(204,0,0,0.5)] transition-all">
-              <Zap className="w-4 h-4 text-primary" />
+            <div className="group-hover:drop-shadow-[0_0_8px_rgba(204,0,0,0.8)] transition-all duration-300">
+              <GodfleshIcon size={36} />
             </div>
             <span className="font-display font-black text-xl tracking-[0.2em] text-white group-hover:text-primary transition-colors">
               GODFLESH

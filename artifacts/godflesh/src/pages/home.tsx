@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
-import { Cpu, Eye, Infinity, ShieldAlert } from "lucide-react";
+import { Cpu, Eye, Infinity } from "lucide-react";
+import { GodfleshIcon } from "@/components/godflesh-icon";
 
 export default function Home() {
   const { isAuthenticated, login } = useAuth();
@@ -36,13 +37,9 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
             animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
             transition={{ duration: 1.5, ease: "easeOut" }}
-            className="mb-8"
+            className="mb-8 flex justify-center"
           >
-            <img 
-              src={`${import.meta.env.BASE_URL}images/emblem.png`} 
-              alt="Godflesh Emblem" 
-              className="w-32 h-32 md:w-48 md:h-48 object-contain mx-auto mix-blend-screen opacity-80"
-            />
+            <GodfleshIcon size={160} className="drop-shadow-[0_0_40px_rgba(204,0,0,0.6)] opacity-90" />
           </motion.div>
 
           <motion.h1 
