@@ -7,6 +7,7 @@ export const superAISessions = pgTable("super_ai_sessions", {
   topic: text("topic").notNull(),
   status: text("status").notNull().default("pending"),
   mode: text("mode").notNull().default("blueprint"),
+  aiName: text("ai_name"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 

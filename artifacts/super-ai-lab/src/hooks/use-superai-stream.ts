@@ -59,6 +59,11 @@ export type IterationStatus = {
   }[];
 };
 
+export type NamingMessage = {
+  agent: AgentName;
+  content: string;
+};
+
 export function useSuperAIStream(sessionId: number) {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamedMessages, setStreamedMessages] = useState<StreamedMessage[]>([]);
@@ -73,6 +78,11 @@ export function useSuperAIStream(sessionId: number) {
   const [isPackaging, setIsPackaging] = useState(false);
   const [packageReady, setPackageReady] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  // Naming ceremony state
+  const [namingInProgress, setNamingInProgress] = useState(false);
+  const [namingMessages, setNamingMessages] = useState<NamingMessage[]>([]);
+  const [activeNamingAgent, setActiveNamingAgent] = useState<AgentName | null>(null);
+  const [decidedName, setDecidedName] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -96,6 +106,10 @@ export function useSuperAIStream(sessionId: number) {
     setIsPackaging(false);
     setPackageReady(false);
     setDownloadUrl(null);
+    setNamingInProgress(false);
+    setNamingMessages([]);
+    setActiveNamingAgent(null);
+    setDecidedName(null);
     abortControllerRef.current = new AbortController();
 
     try {
@@ -252,6 +266,33 @@ export function useSuperAIStream(sessionId: number) {
               setInstallingPackages(null);
             }
 
+            // ── Naming Ceremony ──
+            if (parsed.type === "naming_start") {
+              setNamingInProgress(true);
+              setActiveAgent(null);
+              setActiveNamingAgent(null);
+            }
+            if (parsed.type === "naming_agent_thinking" && parsed.agent) {
+              setActiveNamingAgent(parsed.agent as AgentName);
+            }
+            if (parsed.type === "naming_message" && parsed.agent && parsed.content) {
+              setNamingMessages((prev) => {
+                const last = prev[prev.length - 1];
+                if (last && last.agent === parsed.agent) {
+                  return [...prev.slice(0, -1), { agent: last.agent, content: last.content + parsed.content }];
+                }
+                return [...prev, { agent: parsed.agent as AgentName, content: parsed.content }];
+              });
+            }
+            if (parsed.type === "naming_agent_done") {
+              setActiveNamingAgent(null);
+            }
+            if (parsed.type === "naming_decision" && parsed.name) {
+              setNamingInProgress(false);
+              setActiveNamingAgent(null);
+              setDecidedName(parsed.name);
+            }
+
             // ── Packaging ──
             if (parsed.type === "packaging") {
               setIsPackaging(true);
@@ -261,6 +302,7 @@ export function useSuperAIStream(sessionId: number) {
               setIsPackaging(false);
               setPackageReady(true);
               setDownloadUrl(parsed.downloadUrl || "/api/superai/lab/download");
+              if (parsed.aiName) setDecidedName(parsed.aiName);
             }
           } catch {
             // ignore malformed JSON
@@ -296,5 +338,9 @@ export function useSuperAIStream(sessionId: number) {
     isPackaging,
     packageReady,
     downloadUrl,
+    namingInProgress,
+    namingMessages,
+    activeNamingAgent,
+    decidedName,
   };
 }

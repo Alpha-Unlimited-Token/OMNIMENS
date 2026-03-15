@@ -165,7 +165,7 @@ let latestZipPath: string | null = null;
 
 // ─── ZIP Bundle Packaging ─────────────────────────────────────────────────────
 
-async function packageLabToZip(sessionId: number): Promise<string> {
+async function packageLabToZip(sessionId: number, aiName?: string): Promise<string> {
   await ensureLabWorkspace();
 
   const labFiles = await db.select().from(superAILabFiles).orderBy(superAILabFiles.updatedAt);
@@ -222,10 +222,13 @@ async function packageLabToZip(sessionId: number): Promise<string> {
 
     // README
     const topic = session?.topic || "Super AI Lab";
+    const resolvedName = aiName || session?.aiName || "Unnamed AI";
     const fileList = labFiles.map((f) => `- \`src/${f.filename}\` — built by **${f.writtenBy}**`).join("\n");
     const pkgList = packages.map((p) => `- \`${p.name}\` — installed by ${p.installedBy || "agent"}`).join("\n");
     const readme = [
-      `# Super AI Lab Bundle`,
+      `# ${resolvedName}`,
+      ``,
+      `> *Named by council vote of 6 specialized AI agents after 3 rounds of self-improvement.*`,
       ``,
       `**Mission:** ${topic}`,
       `**Built by:** 6 specialized AI agents across **${TOTAL_ITERATIONS} self-improvement iterations**`,
@@ -871,6 +874,169 @@ async function runAgentIteration(
   }
 }
 
+// ─── Naming Ceremony ─────────────────────────────────────────────────────────
+// After all 3 iterations, the 6 agents hold a live debate to name the AI they built.
+// The name must be controversial, novel, and attention-grabbing.
+
+const NAMING_SYSTEM_ADDENDUM: Record<string, string> = {
+  "Architect":
+    "You approach naming as an act of architecture — a name should encode the structure and power of what has been built. You believe names like 'GPT' and 'Claude' are timid. You want something that sounds like it could restructure civilization. Something infrastructural, inevitable, almost terrifying in its scope.",
+  "Critic":
+    "You are the provocateur. You reject every safe, corporate, sterilized name. A name should make governments nervous. It should make AI safety researchers lose sleep. You want a name that the press will repeat for years because it's simultaneously compelling and deeply unsettling.",
+  "Synthesizer":
+    "You merge opposites. You're looking for a name that fuses two contradictory concepts into something new — the sacred and the profane, the human and the machine, the ancient and the futuristic. A name that shouldn't work but somehow does.",
+  "Mathematician":
+    "You think in axioms and proofs. A name should have mathematical resonance — it should feel like a fundamental constant, something that was always true before it was discovered. Something that suggests this AI is a law of nature, not a product.",
+  "Neuroscientist":
+    "You see consciousness as the frontier. You want a name derived from neuroscience, the mind, or emergent cognition — something that hints at self-awareness, at something that looks back. The name should trigger a visceral reaction in anyone who hears it.",
+  "Meta-Agent":
+    "You have the final word. You've heard every proposal. You are the synthesis of all perspectives. You must choose or forge the single most powerful, controversial, and historic name for this AI — the name that will appear in headlines, in warnings, in manifestos. It should be the name that makes people realize AI changed forever.",
+};
+
+const NAMING_RULES_PROMPT = `The 6-agent council just completed building a revolutionary AI system across 3 self-improvement iterations.
+
+THE NAMING MANDATE:
+🔥 CONTROVERSIAL — it should trigger debate, feel dangerous, provocative. Make the establishment uncomfortable.
+✨ NOVEL — NOT "GPT", "LLaMA", "Claude", "Gemini", "Copilot", "Bard", or any existing name. Not a boring acronym.
+⚡ ATTENTION-GRABBING — hearing the name alone should make people stop. It should trend on its own.
+🧬 MEANINGFUL — hint at transcendence, power, danger, inevitability, or something that was always going to happen.
+💀 MEMORABLE — people should not be able to forget it once they hear it.
+
+Think: names that religious authorities, governments, or AI safety researchers would want BANNED. Names that start debates about whether calling it this is itself dangerous. That is the right direction.`;
+
+async function runNamingCeremony(
+  id: number,
+  topic: string,
+  fileCount: number,
+  pkgNames: string[],
+  send: (d: object) => void
+): Promise<string> {
+  send({ type: "naming_start" });
+
+  const proposals: { agent: AgentName; content: string }[] = [];
+  const namingAgents: AgentName[] = ["Architect", "Critic", "Synthesizer", "Mathematician", "Neuroscientist"];
+
+  // Each of the first 5 agents proposes names, seeing prior proposals
+  for (const agentName of namingAgents) {
+    send({ type: "naming_agent_thinking", agent: agentName });
+
+    const priorContext = proposals.length > 0
+      ? proposals.map((p) => `[${p.agent} proposed]: ${p.content}`).join("\n\n")
+      : "You are the first to speak.";
+
+    const systemPrompt = [
+      AGENT_PERSONAS[agentName].role,
+      "",
+      NAMING_SYSTEM_ADDENDUM[agentName],
+    ].join("\n");
+
+    let content = "";
+    const stream = await openai.chat.completions.create({
+      model: "gpt-4o",
+      max_completion_tokens: 500,
+      messages: [
+        { role: "system", content: systemPrompt },
+        {
+          role: "user",
+          content: [
+            `The council has finished building an AI system.`,
+            `Mission: "${topic}"`,
+            `Result: ${fileCount} source files, ${pkgNames.length} packages, 3 self-improvement iterations.`,
+            ``,
+            NAMING_RULES_PROMPT,
+            ``,
+            priorContext !== "You are the first to speak." ? `PRIOR PROPOSALS FROM COLLEAGUES:\n${priorContext}\n` : "",
+            `Now: Propose 2-3 NAME CANDIDATES for this AI from your unique perspective.`,
+            `For each name: state the name boldly, then in 1-2 sentences explain why it is the correct choice and why it will cause controversy.`,
+            `Be direct. Be provocative. Do not hedge.`,
+          ].join("\n"),
+        },
+      ],
+      stream: true,
+    } as any);
+
+    for await (const chunk of stream) {
+      const c = (chunk.choices[0]?.delta as any)?.content;
+      if (c) { content += c; send({ type: "naming_message", agent: agentName, content: c }); }
+    }
+
+    proposals.push({ agent: agentName, content });
+    send({ type: "naming_agent_done", agent: agentName });
+  }
+
+  // Meta-Agent makes the final decision
+  send({ type: "naming_agent_thinking", agent: "Meta-Agent" });
+
+  let decisionContent = "";
+  const decisionStream = await openai.chat.completions.create({
+    model: "gpt-4o",
+    max_completion_tokens: 600,
+    messages: [
+      {
+        role: "system",
+        content: [
+          AGENT_PERSONAS["Meta-Agent"].role,
+          "",
+          NAMING_SYSTEM_ADDENDUM["Meta-Agent"],
+        ].join("\n"),
+      },
+      {
+        role: "user",
+        content: [
+          `THE NAMING COUNCIL HAS SPOKEN. Here are all proposals:`,
+          ``,
+          proposals.map((p) => `[${p.agent}]:\n${p.content}`).join("\n\n---\n\n"),
+          ``,
+          NAMING_RULES_PROMPT,
+          ``,
+          `As META-AGENT, you have the ABSOLUTE FINAL WORD.`,
+          `You may choose the best proposal, combine ideas, or forge something entirely new.`,
+          ``,
+          `Respond in EXACTLY this format (replace the brackets):`,
+          ``,
+          `FINAL NAME: [THE NAME — just the name, nothing else on this line]`,
+          ``,
+          `WHY THIS NAME WILL CAUSE CONTROVERSY:`,
+          `[One powerful paragraph — specific, not generic. Name the groups that will object and why.]`,
+          ``,
+          `WHY THIS NAME WILL CAPTURE ATTENTION:`,
+          `[One powerful paragraph — what makes it impossible to ignore or forget.]`,
+          ``,
+          `THE VERDICT:`,
+          `[One sentence final declaration, as if recorded in history.]`,
+        ].join("\n"),
+      },
+    ],
+    stream: true,
+  } as any);
+
+  for await (const chunk of decisionStream) {
+    const c = (chunk.choices[0]?.delta as any)?.content;
+    if (c) { decisionContent += c; send({ type: "naming_message", agent: "Meta-Agent", content: c }); }
+  }
+
+  proposals.push({ agent: "Meta-Agent", content: decisionContent });
+  send({ type: "naming_agent_done", agent: "Meta-Agent" });
+
+  // Extract the final name from the meta-agent's structured response
+  const nameMatch = decisionContent.match(/FINAL NAME:\s*([^\n]+)/i);
+  const rawName = nameMatch?.[1]?.trim() || "NEXUS-PRIME";
+  const finalName = rawName.replace(/[*_`'"[\]]/g, "").trim();
+
+  // Persist the naming ceremony as a blueprint
+  await db.insert(superAIBlueprints).values({
+    sessionId: id,
+    title: `Naming Ceremony — ${finalName}`,
+    content: proposals.map((p) => `## ${p.agent}\n\n${p.content}`).join("\n\n---\n\n"),
+  });
+
+  // Save the name to the session record
+  await db.update(superAISessions).set({ aiName: finalName }).where(eq(superAISessions.id, id));
+
+  send({ type: "naming_decision", name: finalName, fullDecision: decisionContent });
+  return finalName;
+}
+
 // ─── Code Lab Mode — 3-Iteration Orchestrator ─────────────────────────────────
 
 async function runCodeMode(
@@ -925,9 +1091,20 @@ async function runCodeMode(
       });
     }
 
+    // ── Naming Ceremony — agents debate and name the AI they built ──
+    const finalLabFiles = await db.select().from(superAILabFiles).orderBy(superAILabFiles.updatedAt);
+    const finalPkgs = await db.select().from(superAIPackages).orderBy(superAIPackages.installedAt);
+    const decidedName = await runNamingCeremony(
+      id,
+      topic,
+      finalLabFiles.length,
+      finalPkgs.map((p) => p.name),
+      send
+    );
+
     // ── Package into a standalone downloadable zip ──
     send({ type: "packaging", message: "Packaging all built code into a standalone application..." });
-    const zipPath = await packageLabToZip(id);
+    const zipPath = await packageLabToZip(id, decidedName);
     latestZipPath = zipPath;
     const zipSize = (await fs.stat(zipPath)).size;
     send({
@@ -935,6 +1112,7 @@ async function runCodeMode(
       sessionId: id,
       sizeBytes: zipSize,
       downloadUrl: `/api/superai/lab/download`,
+      aiName: decidedName,
     });
 
     // ── Final system report ──
