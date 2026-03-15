@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Send, StopCircle, ShieldAlert, Volume2, VolumeX, Paperclip, Download, Loader2, Expand } from "lucide-react";
 import { GodfleshIcon } from "@/components/godflesh-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
+import { GodfleshNotificationBell } from "@/components/godflesh-notifications";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { motion, AnimatePresence } from "framer-motion";
@@ -96,6 +97,8 @@ export default function Chat() {
           </div>
 
           <div className="flex items-center gap-4">
+            <GodfleshNotificationBell />
+
             <button
               onClick={voice.toggle}
               title={voice.isEnabled ? "Disable voice" : "Enable GODFLESH voice"}

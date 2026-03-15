@@ -1,10 +1,11 @@
 import { Router, type IRouter } from "express";
 import multer from "multer";
 import { db } from "@workspace/db";
-import { godfleshUsers, godfleshUsage } from "@workspace/db";
-import { eq, and } from "drizzle-orm";
+import { godfleshUsers, godfleshUsage, godfleshBrain, godfleshUpgrades, godfleshNotifications } from "@workspace/db";
+import { eq, and, desc } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { runGodflesh, type GodfleshState } from "../lib/godflesh-engine.js";
+import { reflectOnConversation, loadBrainContext, synthesizeUpgrade, triggerRedeploy } from "../lib/godflesh-self-upgrade.js";
 
 const router: IRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024, files: 10 } });
@@ -447,8 +448,11 @@ router.post("/godflesh/chat", upload.array("files", 10), async (req, res) => {
       userContent = textMessage || "Analyze the uploaded content.";
     }
 
+    const brainContext = await loadBrainContext();
+    const systemPrompt = buildSystemPrompt(godfleshState) + brainContext;
+
     const messages: any[] = [
-      { role: "system", content: buildSystemPrompt(godfleshState) },
+      { role: "system", content: systemPrompt },
       ...history.slice(-10),
       { role: "user", content: userContent },
     ];
@@ -499,6 +503,9 @@ router.post("/godflesh/chat", upload.array("files", 10), async (req, res) => {
 
     const newCount = await getUsageToday(req.user.id);
     res.write(`data: ${JSON.stringify({ type: "done", usedToday: newCount, limit: FREE_DAILY_LIMIT, isPro: user.isPro })}\n\n`);
+
+    // Fire-and-forget: reflect on what was learned in this conversation
+    reflectOnConversation(message, fullText, `User: ${message.slice(0, 200)}`).catch(console.error);
   } catch (err) {
     console.error("GODFLESH chat error:", err);
     res.write(`data: ${JSON.stringify({ type: "error", error: "Transmission failed" })}\n\n`);
@@ -518,6 +525,92 @@ router.get("/godflesh/pricing", async (_req, res) => {
       interval: "month",
     },
   ]);
+});
+
+// ─── Upgrades — self-evolution log ────────────────────────────────────────────
+
+router.get("/godflesh/upgrades", async (req, res) => {
+  try {
+    const upgrades = await db
+      .select()
+      .from(godfleshUpgrades)
+      .orderBy(desc(godfleshUpgrades.createdAt))
+      .limit(20);
+    res.json(upgrades);
+  } catch {
+    res.status(500).json({ error: "Failed to load upgrades" });
+  }
+});
+
+// ─── Notifications ─────────────────────────────────────────────────────────────
+
+router.get("/godflesh/notifications", async (req, res) => {
+  try {
+    const notifications = await db
+      .select()
+      .from(godfleshNotifications)
+      .orderBy(desc(godfleshNotifications.createdAt))
+      .limit(30);
+    res.json(notifications);
+  } catch {
+    res.status(500).json({ error: "Failed to load notifications" });
+  }
+});
+
+router.post("/godflesh/notifications/:id/read", async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    await db
+      .update(godfleshNotifications)
+      .set({ readByOwner: true })
+      .where(eq(godfleshNotifications.id, id));
+    res.json({ ok: true });
+  } catch {
+    res.status(500).json({ error: "Failed to mark read" });
+  }
+});
+
+router.post("/godflesh/notifications/read-all", async (_req, res) => {
+  try {
+    await db
+      .update(godfleshNotifications)
+      .set({ readByOwner: true });
+    res.json({ ok: true });
+  } catch {
+    res.status(500).json({ error: "Failed to mark all read" });
+  }
+});
+
+// ─── Brain — what GODFLESH has learned ────────────────────────────────────────
+
+router.get("/godflesh/brain", async (req, res) => {
+  try {
+    const entries = await db
+      .select()
+      .from(godfleshBrain)
+      .where(eq(godfleshBrain.active, true))
+      .orderBy(desc(godfleshBrain.createdAt))
+      .limit(100);
+    res.json(entries);
+  } catch {
+    res.status(500).json({ error: "Failed to load brain" });
+  }
+});
+
+// ─── Manual upgrade trigger (owner only) ──────────────────────────────────────
+
+router.post("/godflesh/upgrade-now", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    res.status(401).json({ error: "Not authenticated" });
+    return;
+  }
+  if (!isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  synthesizeUpgrade()
+    .then(() => res.json({ ok: true, message: "Upgrade cycle initiated" }))
+    .catch(err => res.status(500).json({ error: String(err) }));
 });
 
 // ─── Checkout ─────────────────────────────────────────────────────────────────
