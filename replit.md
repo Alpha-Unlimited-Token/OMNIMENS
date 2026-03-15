@@ -1,5 +1,18 @@
 # Workspace
 
+## Super AI Lab
+
+A full-stack React + Express app where 6 specialized AI agents collaborate to design a superior next-generation AI.
+
+**Agents:** Architect (blue), Critic (orange), Synthesizer (purple), Mathematician (emerald), Neuroscientist/Bio-Mech Bridge (pink), Meta-Agent (yellow)
+
+**Stack additions:** OpenAI integration (Replit AI proxy), Drizzle schema for super_ai_sessions/super_ai_messages/super_ai_blueprints, framer-motion, react-markdown, @tailwindcss/typography
+
+**Routes:** `artifacts/api-server/src/routes/superai.ts` — all Super AI endpoints
+**Frontend:** `artifacts/super-ai-lab/` — React + Vite app at `/`
+
+
+
 ## Overview
 
 pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.

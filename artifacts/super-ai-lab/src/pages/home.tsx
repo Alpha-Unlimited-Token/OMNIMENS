@@ -53,8 +53,7 @@ export default function Home() {
          transition={{ duration: 0.8, delay: 0.4 }}
          className="text-lg md:text-xl text-white/50 mb-12 max-w-2xl font-light z-10"
        >
-         Initialize a secure collaboration channel. Our triad of specialized neural networks will 
-         debate, challenge, and synthesize a radically superior architecture for any given domain.
+         Initialize a secure collaboration channel. Six specialized intelligences — Architect, Mathematician, Critic, Neuroscientist, Synthesizer, and Meta-Agent — will debate, challenge, and forge a radically superior AI blueprint together.
        </motion.p>
        
        <motion.form 
