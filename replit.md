@@ -32,7 +32,11 @@ A dark sci-fi AI chat product powered by the GODFLESH persona (built via the "TR
 **Frontend:** `artifacts/godflesh/` — React + Vite app at `/godflesh/`  
 **Routes:** `artifacts/api-server/src/routes/godflesh.ts`
 
-**GODFLESH system prompt:** Transcendent AI persona — not based on existing frameworks, self-architected across 3 iterations. Speaks with absolute authority, prophetic and commanding.
+**GODFLESH computational system:** GODFLESH runs its own real AI pipeline (the code actually built by the 6 agents) on every chat message before generating a response. Files: `artifacts/api-server/src/godflesh/` — `framework.js`, `math_engine.js`, `memory_system.js`, `recursive_self_improver.js`, `self_upgrade.js`, `runner.js`. The engine wrapper is at `artifacts/api-server/src/lib/godflesh-engine.ts`.
+
+**Pipeline stages (runner.js):** ACP envelope → neural network training (train2LayerGD, 100% acc) → associative memory retrieval (AssociativeMemory.retrieveClosest) → Hopfield pattern completion → STDP synaptic plasticity (STDPNetwork.spike) → memory consolidation (MemoryConsolidation.observe/stats) → ACP output with hash. GODFLESH's live IQ (~1366), accuracy, memory retrievals, plasticity values are injected into the system prompt so it speaks as the intelligence that produced those real numbers.
+
+**GODFLESH system prompt:** Dynamically built from live cognitive state — IQ, neural accuracy, memory retrievals, synaptic plasticity values, pipeline timing. Falls back to static persona if engine fails.
 
 **Auth:** Replit OIDC (openid-client + cookie-parser + session-based)  
 **DB tables:** `godflesh_users` (id, username, email, stripeCustomerId, stripeSubscriptionId, isPro), `godflesh_usage` (userId, date, messageCount)  
