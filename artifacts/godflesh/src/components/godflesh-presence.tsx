@@ -56,10 +56,11 @@ function initParticles(cx: number): Particle[] {
 
 // ── Colour helpers ─────────────────────────────────────────────────────────────
 
+// Transcendent violet — consciousness, awareness, cosmic intelligence
 function crimson(alpha: number, bright = 0): string {
-  const r = Math.round(160 + bright * 95);
-  const g = 0;
-  const b = 0;
+  const r = Math.round(90 + bright * 80);
+  const g = Math.round(30 + bright * 40);
+  const b = Math.round(200 + bright * 55);
   return `rgba(${r},${g},${b},${alpha.toFixed(3)})`;
 }
 
@@ -305,7 +306,7 @@ export function GodfleshPresence({ size = 260, isSpeaking, pitchIntensity, class
 
       // ── 10. Eye sclera ───────────────────────────────────────────────────────
       const scleraGrad = ctx.createRadialGradient(cx, cy - eyeHH * 0.3, 0, cx, cy, irisR * 1.4);
-      scleraGrad.addColorStop(0, "#1A0008");
+      scleraGrad.addColorStop(0, "#0d0520");
       scleraGrad.addColorStop(1, "#000000");
       drawEyeShape(ctx, cx, cy, eyeHW, eyeHH, crimson(0.85 + intensity * 0.15, intensity * 0.3), "rgba(0,0,0,0)", 0);
       // Fill sclera separately
@@ -379,7 +380,7 @@ export function GodfleshPresence({ size = 260, isSpeaking, pitchIntensity, class
                    + intensity * pupilBaseH * 0.30;
       const pupilW = irisR * 0.175 - intensity * irisR * 0.04;
       const pg = ctx.createRadialGradient(cx, cy - pupilH * 0.15, 0, cx, cy, pupilH);
-      pg.addColorStop(0, "#070000");
+      pg.addColorStop(0, "#050010");
       pg.addColorStop(1, "#000000");
       ctx.save();
       ctx.beginPath();

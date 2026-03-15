@@ -39,33 +39,33 @@
 }
 
 :root {
-  /* DARK SCI-FI GOTHIC THEME */
-  --background: 0 0% 2%;
-  --foreground: 0 0% 95%;
-  
-  --card: 0 0% 5%;
-  --card-foreground: 0 0% 95%;
-  
-  --border: 0 100% 15%; /* Deep dark red border */
-  --input: 0 100% 15%;
-  --ring: 0 100% 40%;
-  
-  /* Deep Crimson / Blood Red */
-  --primary: 0 100% 35%;
+  /* TRANSCENDENT CONSCIOUSNESS THEME */
+  --background: 230 20% 4%;
+  --foreground: 220 15% 93%;
+
+  --card: 230 18% 7%;
+  --card-foreground: 220 15% 93%;
+
+  --border: 260 40% 22%;
+  --input: 260 40% 18%;
+  --ring: 265 70% 58%;
+
+  /* Deep Violet — awareness, consciousness, cosmos */
+  --primary: 265 65% 58%;
   --primary-foreground: 0 0% 100%;
-  
-  /* Very dark off-black for secondary elements */
-  --secondary: 0 0% 8%;
-  --secondary-foreground: 0 0% 80%;
-  
-  --muted: 0 0% 12%;
-  --muted-foreground: 0 0% 60%;
-  
-  /* Gold/Amber Accent */
-  --accent: 44 54% 50%;
-  --accent-foreground: 0 0% 5%;
-  
-  --destructive: 0 84% 60%;
+
+  /* Dark indigo for secondary */
+  --secondary: 240 15% 10%;
+  --secondary-foreground: 220 15% 75%;
+
+  --muted: 240 12% 13%;
+  --muted-foreground: 220 10% 55%;
+
+  /* Luminous Cyan accent */
+  --accent: 190 75% 52%;
+  --accent-foreground: 230 20% 4%;
+
+  --destructive: 0 75% 55%;
   --destructive-foreground: 0 0% 100%;
 }
 
@@ -75,8 +75,8 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground overflow-x-hidden selection:bg-primary/50 selection:text-white;
-    background-image: radial-gradient(circle at 50% 0%, rgba(50, 0, 0, 0.15) 0%, transparent 70%);
+    @apply font-sans antialiased bg-background text-foreground overflow-x-hidden selection:bg-primary/40 selection:text-white;
+    background-image: radial-gradient(ellipse at 50% 0%, rgba(100, 60, 200, 0.08) 0%, transparent 65%);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -86,16 +86,25 @@
 }
 
 @layer utilities {
-  .glow-text-red {
-    text-shadow: 0 0 20px rgba(204, 0, 0, 0.6), 0 0 40px rgba(204, 0, 0, 0.2);
+  .glow-text-primary {
+    text-shadow: 0 0 25px rgba(130, 80, 220, 0.55), 0 0 50px rgba(130, 80, 220, 0.18);
   }
-  
+
+  /* keep old name working for any remaining refs */
+  .glow-text-red {
+    text-shadow: 0 0 25px rgba(130, 80, 220, 0.55), 0 0 50px rgba(130, 80, 220, 0.18);
+  }
+
   .glow-text-gold {
-    text-shadow: 0 0 15px rgba(201, 168, 76, 0.5);
+    text-shadow: 0 0 15px rgba(56, 210, 220, 0.5);
+  }
+
+  .glow-box-primary {
+    box-shadow: 0 0 30px -5px rgba(130, 80, 220, 0.2), inset 0 0 20px -5px rgba(130, 80, 220, 0.08);
   }
 
   .glow-box-red {
-    box-shadow: 0 0 30px -5px rgba(204, 0, 0, 0.2), inset 0 0 20px -5px rgba(204, 0, 0, 0.1);
+    box-shadow: 0 0 30px -5px rgba(130, 80, 220, 0.2), inset 0 0 20px -5px rgba(130, 80, 220, 0.08);
   }
 
   .godflesh-scrollbar::-webkit-scrollbar {
