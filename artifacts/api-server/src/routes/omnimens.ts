@@ -806,7 +806,7 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
       loadGeneratedModulesContext(),
       loadLearningContext(req.user.id),
       loadPhysioContext(req.user.id),
-      loadToolKnowledgeForTask(message + " " + (customInstructions?.persona || "")),
+      loadToolKnowledgeForTask(message),
     ]);
     const customInstructionsContext = buildCustomInstructionsContext(customInstructions);
 
