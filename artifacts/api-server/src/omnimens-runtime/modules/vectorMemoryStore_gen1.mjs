@@ -1,90 +1,95 @@
+// vectorMemoryStore.js
+
 /**
  * @module vectorMemoryStore
- * @description A utility module for storing and retrieving vector embeddings, enabling extended conversational memory and efficient similarity search.
+ * @description Provides fast, in-memory storage and retrieval of vector embeddings using nearest neighbor search.
+ * Designed for dynamic context management and efficient embedding indexing.
  */
 
 /**
- * VectorMemoryStore class for managing vector embeddings and performing approximate nearest neighbor search.
+ * Stores vector embeddings in memory and allows efficient nearest neighbor search.
+ * @type {Map<string, number[]>}
  */
-class VectorMemoryStore {
-  constructor() {
-    /**
-     * @private
-     * @type {Map<number, number[]>}
-     * Stores vectors with unique IDs.
-     */
-    this.store = new Map();
+const embeddingStore = new Map();
+
+/**
+ * Adds a new embedding to the store.
+ * @param {string} id - Unique identifier for the embedding.
+ * @param {number[]} vector - The embedding vector.
+ * @throws {Error} Throws if the vector is not a valid array of numbers.
+ */
+export function addEmbedding(id, vector) {
+  if (!Array.isArray(vector) || vector.some(v => typeof v !== 'number')) {
+    throw new Error('Vector must be an array of numbers.');
   }
-
-  /**
-   * Adds a vector to the store.
-   * @param {number} id - Unique identifier for the vector.
-   * @param {number[]} vector - The vector to store.
-   */
-  addVector(id, vector) {
-    if (!Array.isArray(vector)) {
-      throw new Error("Vector must be an array of numbers.");
-    }
-    if (this.store.has(id)) {
-      throw new Error(`ID ${id} already exists in the store.`);
-    }
-    this.store.set(id, vector);
-  }
-
-  /**
-   * Retrieves a vector by ID.
-   * @param {number} id - Unique identifier of the vector.
-   * @returns {number[] | null} - The vector if found, or null if not.
-   */
-  getVector(id) {
-    return this.store.get(id) || null;
-  }
-
-  /**
-   * Finds the nearest neighbors to a given query vector.
-   * @param {number[]} queryVector - The vector to search for neighbors.
-   * @param {number} k - Number of nearest neighbors to retrieve.
-   * @returns {Array<{id: number, distance: number}>} - Array of nearest neighbors with their IDs and distances.
-   */
-  findNearestNeighbors(queryVector, k) {
-    if (!Array.isArray(queryVector)) {
-      throw new Error("Query vector must be an array of numbers.");
-    }
-    if (k <= 0) {
-      throw new Error("Number of neighbors (k) must be greater than 0.");
-    }
-
-    const distances = [];
-
-    for (const [id, vector] of this.store.entries()) {
-      const distance = this._euclideanDistance(queryVector, vector);
-      distances.push({ id, distance });
-    }
-
-    distances.sort((a, b) => a.distance - b.distance);
-
-    return distances.slice(0, k);
-  }
-
-  /**
-   * Calculates the Euclidean distance between two vectors.
-   * @private
-   * @param {number[]} vectorA - First vector.
-   * @param {number[]} vectorB - Second vector.
-   * @returns {number} - Euclidean distance between the vectors.
-   */
-  _euclideanDistance(vectorA, vectorB) {
-    if (vectorA.length !== vectorB.length) {
-      throw new Error("Vectors must have the same length.");
-    }
-
-    return Math.sqrt(
-      vectorA.reduce((sum, value, index) => sum + Math.pow(value - vectorB[index], 2), 0)
-    );
-  }
+  embeddingStore.set(id, vector);
 }
 
 /**
- * Exports the VectorMemoryStore class.
+ * Finds the nearest neighbor to a given query vector.
+ * @param {number[]} queryVector - The vector to search for nearest neighbors.
+ * @returns {{id: string, distance: number}[]} An array of nearest neighbors sorted by distance.
+ * @throws {Error} Throws if the query vector is not a valid array of numbers.
  */
-export { VectorMemoryStore };
+export function findNearestNeighbors(queryVector) {
+  if (!Array.isArray(queryVector) || queryVector.some(v => typeof v !== 'number')) {
+    throw new Error('Query vector must be an array of numbers.');
+  }
+
+  const results = [];
+
+  for (const [id, vector] of embeddingStore.entries()) {
+    if (vector.length !== queryVector.length) {
+      continue; // Skip vectors of mismatched dimensions.
+    }
+
+    const distance = calculateEuclideanDistance(queryVector, vector);
+    results.push({ id, distance });
+  }
+
+  // Sort results by ascending distance.
+  return results.sort((a, b) => a.distance - b.distance);
+}
+
+/**
+ * Clears all embeddings from the store.
+ */
+export function clearEmbeddings() {
+  embeddingStore.clear();
+}
+
+/**
+ * Calculates the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} The Euclidean distance.
+ */
+function calculateEuclideanDistance(vectorA, vectorB) {
+  return Math.sqrt(vectorA.reduce((sum, val, index) => sum + Math.pow(val - vectorB[index], 2), 0));
+}
+
+/**
+ * Retrieves all stored embeddings.
+ * @returns {Map<string, number[]>} A map of all embeddings.
+ */
+export function getAllEmbeddings() {
+  return new Map(embeddingStore);
+}
+
+/**
+ * Retrieves an embedding by its ID.
+ * @param {string} id - The ID of the embedding to retrieve.
+ * @returns {number[] | undefined} The embedding vector, or undefined if not found.
+ */
+export function getEmbeddingById(id) {
+  return embeddingStore.get(id);
+}
+
+/**
+ * Removes an embedding by its ID.
+ * @param {string} id - The ID of the embedding to remove.
+ * @returns {boolean} True if the embedding was removed, false if not found.
+ */
+export function removeEmbeddingById(id) {
+  return embeddingStore.delete(id);
+}

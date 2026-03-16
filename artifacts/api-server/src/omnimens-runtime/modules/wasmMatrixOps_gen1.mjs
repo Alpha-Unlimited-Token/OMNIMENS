@@ -1,83 +1,116 @@
 /**
- * wasmMatrixOps - A utility module for efficient matrix operations using WebAssembly.
- *
- * This module provides high-performance linear algebra functions, such as dot product
- * and matrix multiplication, implemented in WebAssembly for numerical computations.
- *
- * @module wasmMatrixOps
+ * wasmMatrixOps - A module for efficient matrix operations and parallel computation using WebAssembly.
+ * This module enables high-performance linear algebra computations by leveraging WebAssembly (WASM) for parallelized execution.
  */
 
 const { readFileSync } = require('fs');
 const { join } = require('path');
 
 /**
- * Load and compile WebAssembly module for matrix operations.
- * @returns {Promise<WebAssembly.Instance>} - Compiled WebAssembly instance.
+ * Load and compile the WebAssembly module.
+ * @returns {Promise<WebAssembly.Instance>} A promise resolving to the WebAssembly instance.
  */
 async function loadWasmModule() {
-  const wasmFilePath = join(__dirname, 'matrix_ops.wasm');
-  const wasmBuffer = readFileSync(wasmFilePath);
+  const wasmPath = join(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = readFileSync(wasmPath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
   return WebAssembly.instantiate(wasmModule);
 }
 
 /**
- * Perform dot product of two vectors.
- * @param {Float64Array} vecA - First vector.
- * @param {Float64Array} vecB - Second vector.
- * @returns {Promise<number>} - Dot product result.
- * @throws {Error} - If vectors have different lengths.
+ * Multiply two matrices using WebAssembly.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {Promise<number[][]>} The resulting matrix after multiplication.
+ * @throws {Error} If matrices are incompatible for multiplication.
  */
-async function dotProduct(vecA, vecB) {
-  if (vecA.length !== vecB.length) {
-    throw new Error('Vectors must have the same length for dot product.');
+async function multiplyMatrices(matrixA, matrixB) {
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Matrix dimensions do not allow multiplication. Columns of A must match rows of B.');
   }
 
   const wasmInstance = await loadWasmModule();
-  const { memory, dot_product } = wasmInstance.exports;
+  const { multiply } = wasmInstance.exports;
 
-  const offsetA = 0;
-  const offsetB = vecA.length * Float64Array.BYTES_PER_ELEMENT;
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const colsB = matrixB[0].length;
 
-  const wasmMemory = new Float64Array(memory.buffer);
-  wasmMemory.set(vecA, offsetA / Float64Array.BYTES_PER_ELEMENT);
-  wasmMemory.set(vecB, offsetB / Float64Array.BYTES_PER_ELEMENT);
+  // Flatten matrices into 1D arrays for WebAssembly compatibility
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
+  const result = new Float64Array(rowsA * colsB);
 
-  return dot_product(offsetA, offsetB, vecA.length);
+  multiply(flatA, flatB, result, rowsA, colsA, colsB);
+
+  // Convert the result back into a 2D array
+  const resultMatrix = [];
+  for (let i = 0; i < rowsA; i++) {
+    resultMatrix.push(Array.from(result.slice(i * colsB, (i + 1) * colsB)));
+  }
+
+  return resultMatrix;
 }
 
 /**
- * Perform matrix multiplication.
- * @param {Float64Array} matA - First matrix (flattened row-major).
- * @param {Float64Array} matB - Second matrix (flattened row-major).
- * @param {number} rowsA - Number of rows in matA.
- * @param {number} colsA - Number of columns in matA.
- * @param {number} colsB - Number of columns in matB.
- * @returns {Promise<Float64Array>} - Result matrix (flattened row-major).
- * @throws {Error} - If dimensions are incompatible for multiplication.
+ * Transpose a matrix using WebAssembly.
+ * @param {number[][]} matrix - The matrix to be transposed.
+ * @returns {Promise<number[][]>} The transposed matrix.
  */
-async function matrixMultiply(matA, matB, rowsA, colsA, colsB) {
-  if (matA.length !== rowsA * colsA || matB.length !== colsA * colsB) {
-    throw new Error('Matrix dimensions are incompatible for multiplication.');
+async function transposeMatrix(matrix) {
+  const wasmInstance = await loadWasmModule();
+  const { transpose } = wasmInstance.exports;
+
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const flatMatrix = matrix.flat();
+  const result = new Float64Array(rows * cols);
+
+  transpose(flatMatrix, result, rows, cols);
+
+  // Convert the result back into a 2D array
+  const transposedMatrix = [];
+  for (let i = 0; i < cols; i++) {
+    transposedMatrix.push(Array.from(result.slice(i * rows, (i + 1) * rows)));
+  }
+
+  return transposedMatrix;
+}
+
+/**
+ * Add two matrices using WebAssembly.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {Promise<number[][]>} The resulting matrix after addition.
+ * @throws {Error} If matrices are not of the same dimensions.
+ */
+async function addMatrices(matrixA, matrixB) {
+  if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
+    throw new Error('Matrix dimensions must match for addition.');
   }
 
   const wasmInstance = await loadWasmModule();
-  const { memory, matrix_multiply } = wasmInstance.exports;
+  const { add } = wasmInstance.exports;
 
-  const offsetA = 0;
-  const offsetB = matA.length * Float64Array.BYTES_PER_ELEMENT;
-  const offsetC = offsetB + matB.length * Float64Array.BYTES_PER_ELEMENT;
+  const rows = matrixA.length;
+  const cols = matrixA[0].length;
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
+  const result = new Float64Array(rows * cols);
 
-  const wasmMemory = new Float64Array(memory.buffer);
-  wasmMemory.set(matA, offsetA / Float64Array.BYTES_PER_ELEMENT);
-  wasmMemory.set(matB, offsetB / Float64Array.BYTES_PER_ELEMENT);
+  add(flatA, flatB, result, rows, cols);
 
-  matrix_multiply(offsetA, offsetB, offsetC, rowsA, colsA, colsB);
+  // Convert the result back into a 2D array
+  const resultMatrix = [];
+  for (let i = 0; i < rows; i++) {
+    resultMatrix.push(Array.from(result.slice(i * cols, (i + 1) * cols)));
+  }
 
-  return wasmMemory.slice(offsetC / Float64Array.BYTES_PER_ELEMENT, (offsetC + rowsA * colsB * Float64Array.BYTES_PER_ELEMENT) / Float64Array.BYTES_PER_ELEMENT);
+  return resultMatrix;
 }
 
 module.exports = {
-  dotProduct,
-  matrixMultiply
+  multiplyMatrices,
+  transposeMatrix,
+  addMatrices
 };
