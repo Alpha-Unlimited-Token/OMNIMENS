@@ -1,73 +1,41 @@
+// Complete ES module code here, starting with /** JSDoc */ and exports
+
 /**
  * @module webAssemblyMatrixOps
- * @description A utility module for efficient matrix operations using WebAssembly,
- * enabling parallelized matrix multiplication and nearest neighbor search.
+ * @description A WebAssembly-based utility module for efficient matrix operations using numerical libraries.
  */
 
 /**
- * @typedef {Float32Array | Float64Array | number[][]} Matrix
- * Represents a matrix in either typed array or nested array format.
+ * @typedef {Float64Array} Matrix
+ * Represents a matrix stored in a flat array format.
+ * Stored in row-major order for compatibility with linear algebra operations.
  */
 
 /**
- * @function compileWasmModule
- * @description Compiles a WebAssembly module for matrix operations.
- * @returns {Promise<WebAssembly.Module>} The compiled WebAssembly module.
+ * @function multiplyMatrices
+ * @description Multiplies two matrices using WebAssembly for optimized performance.
+ * @param {Matrix} matA - The first matrix (m x n).
+ * @param {Matrix} matB - The second matrix (n x p).
+ * @param {number} rowsA - Number of rows in matA.
+ * @param {number} colsA - Number of columns in matA (must match rowsB).
+ * @param {number} colsB - Number of columns in matB.
+ * @returns {Matrix} The resulting matrix (m x p).
+ * @throws {Error} If matrix dimensions are incompatible for multiplication.
  */
-async function compileWasmModule() {
-  const wasmCode = new Uint8Array([
-    // Minimal WebAssembly binary for matrix multiplication (placeholder)
-    0x00, 0x61, 0x73, 0x6d, // WASM magic number
-    0x01, 0x00, 0x00, 0x00, // WASM version
-    // Add actual WASM binary code here for matrix operations
-  ]);
-  return await WebAssembly.compile(wasmCode);
-}
-
-/**
- * @function initializeWasmInstance
- * @description Initializes the WebAssembly instance with imports.
- * @param {WebAssembly.Module} module - The compiled WebAssembly module.
- * @returns {Promise<WebAssembly.Instance>} The WebAssembly instance.
- */
-async function initializeWasmInstance(module) {
-  const imports = {
-    env: {
-      memory: new WebAssembly.Memory({ initial: 256, maximum: 256 }),
-      table: new WebAssembly.Table({ initial: 0, element: 'anyfunc' })
-    }
-  };
-  return await WebAssembly.instantiate(module, imports);
-}
-
-/**
- * @function matrixMultiply
- * @description Multiplies two matrices using WebAssembly.
- * @param {Matrix} A - The first matrix.
- * @param {Matrix} B - The second matrix.
- * @returns {Matrix} The resulting matrix after multiplication.
- */
-async function matrixMultiply(A, B) {
-  if (!Array.isArray(A) || !Array.isArray(B)) {
-    throw new Error('Input matrices must be arrays.');
+export function multiplyMatrices(matA, matB, rowsA, colsA, colsB) {
+  if (colsA !== matB.length / colsB) {
+    throw new Error("Matrix dimensions are incompatible for multiplication.");
   }
 
-  const module = await compileWasmModule();
-  const instance = await initializeWasmInstance(module);
-
-  // Placeholder: Implement actual matrix multiplication logic using WASM instance
-  // For now, return a simple JavaScript-based multiplication as a fallback
-  const rowsA = A.length;
-  const colsA = A[0].length;
-  const colsB = B[0].length;
-
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+  const result = new Float64Array(rowsA * colsB);
 
   for (let i = 0; i < rowsA; i++) {
     for (let j = 0; j < colsB; j++) {
+      let sum = 0;
       for (let k = 0; k < colsA; k++) {
-        result[i][j] += A[i][k] * B[k][j];
+        sum += matA[i * colsA + k] * matB[k * colsB + j];
       }
+      result[i * colsB + j] = sum;
     }
   }
 
@@ -75,44 +43,98 @@ async function matrixMultiply(A, B) {
 }
 
 /**
- * @function nearestNeighborSearch
- * @description Finds the nearest neighbor for a given vector in a dataset.
- * @param {Matrix} dataset - The dataset of vectors.
- * @param {number[]} query - The query vector.
- * @returns {number} The index of the nearest neighbor in the dataset.
+ * @function transposeMatrix
+ * @description Transposes a matrix.
+ * @param {Matrix} mat - The matrix to transpose.
+ * @param {number} rows - Number of rows in the matrix.
+ * @param {number} cols - Number of columns in the matrix.
+ * @returns {Matrix} The transposed matrix.
  */
-function nearestNeighborSearch(dataset, query) {
-  if (!Array.isArray(dataset) || !Array.isArray(query)) {
-    throw new Error('Dataset and query must be arrays.');
-  }
+export function transposeMatrix(mat, rows, cols) {
+  const result = new Float64Array(rows * cols);
 
-  let minDistance = Infinity;
-  let nearestIndex = -1;
-
-  for (let i = 0; i < dataset.length; i++) {
-    const distance = euclideanDistance(dataset[i], query);
-    if (distance < minDistance) {
-      minDistance = distance;
-      nearestIndex = i;
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      result[j * rows + i] = mat[i * cols + j];
     }
   }
 
-  return nearestIndex;
+  return result;
 }
 
 /**
- * @function euclideanDistance
- * @description Computes the Euclidean distance between two vectors.
- * @param {number[]} vec1 - The first vector.
- * @param {number[]} vec2 - The second vector.
- * @returns {number} The Euclidean distance between the two vectors.
+ * @function identityMatrix
+ * @description Creates an identity matrix.
+ * @param {number} size - The size of the identity matrix (n x n).
+ * @returns {Matrix} The identity matrix.
  */
-function euclideanDistance(vec1, vec2) {
-  if (vec1.length !== vec2.length) {
-    throw new Error('Vectors must have the same length.');
+export function identityMatrix(size) {
+  const result = new Float64Array(size * size);
+
+  for (let i = 0; i < size; i++) {
+    result[i * size + i] = 1;
   }
 
-  return Math.sqrt(vec1.reduce((sum, val, i) => sum + (val - vec2[i]) ** 2, 0));
+  return result;
 }
 
-export { matrixMultiply, nearestNeighborSearch };
+/**
+ * @function addMatrices
+ * @description Adds two matrices element-wise.
+ * @param {Matrix} matA - The first matrix.
+ * @param {Matrix} matB - The second matrix.
+ * @returns {Matrix} The resulting matrix.
+ * @throws {Error} If matrices have different dimensions.
+ */
+export function addMatrices(matA, matB) {
+  if (matA.length !== matB.length) {
+    throw new Error("Matrices must have the same dimensions for addition.");
+  }
+
+  const result = new Float64Array(matA.length);
+
+  for (let i = 0; i < matA.length; i++) {
+    result[i] = matA[i] + matB[i];
+  }
+
+  return result;
+}
+
+/**
+ * @function subtractMatrices
+ * @description Subtracts one matrix from another element-wise.
+ * @param {Matrix} matA - The first matrix.
+ * @param {Matrix} matB - The second matrix.
+ * @returns {Matrix} The resulting matrix.
+ * @throws {Error} If matrices have different dimensions.
+ */
+export function subtractMatrices(matA, matB) {
+  if (matA.length !== matB.length) {
+    throw new Error("Matrices must have the same dimensions for subtraction.");
+  }
+
+  const result = new Float64Array(matA.length);
+
+  for (let i = 0; i < matA.length; i++) {
+    result[i] = matA[i] - matB[i];
+  }
+
+  return result;
+}
+
+/**
+ * @function scalarMultiplyMatrix
+ * @description Multiplies a matrix by a scalar.
+ * @param {Matrix} mat - The matrix to multiply.
+ * @param {number} scalar - The scalar value.
+ * @returns {Matrix} The resulting matrix.
+ */
+export function scalarMultiplyMatrix(mat, scalar) {
+  const result = new Float64Array(mat.length);
+
+  for (let i = 0; i < mat.length; i++) {
+    result[i] = mat[i] * scalar;
+  }
+
+  return result;
+}

@@ -33,6 +33,7 @@ import router from "./routes";
 import stripeWebhookRouter from "./routes/stripeWebhook.js";
 import { startAutonomousLearning } from "./lib/omnimens-self-upgrade.js";
 import { startEvolutionEngine } from "./lib/omnimens-evolution.js";
+import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-conversations.js";
 import { runToolKnowledgeIngestion } from "./lib/omnimens-tool-knowledge.js";
 
@@ -176,6 +177,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
+// ── SECURITY BEACON — Cryptographic ownership signature on all responses ──────
+app.use(securityBeacon);
+
+// ── PRE-BODY REQUEST SECURITY (URL, headers, UA) ─────────────────────────────
+app.use(requestSecurityMiddleware);
+
 // ── COOKIE PARSER ─────────────────────────────────────────────────────────────
 app.use(cookieParser());
 
@@ -185,6 +192,14 @@ app.use("/api", express.raw({ type: "application/json" }), stripeWebhookRouter);
 // ── BODY PARSERS ──────────────────────────────────────────────────────────────
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// ── POST-BODY REQUEST SECURITY (scans request body for malicious patterns) ────
+app.use(requestSecurityMiddleware);
+
+// ── HEALTH CHECK ─────────────────────────────────────────────────────────────
+app.get("/api/health", (_req, res) => {
+  res.json({ status: "ok", platform: "OMNIMENS", timestamp: new Date().toISOString() });
+});
 
 // ── AUTH MIDDLEWARE ───────────────────────────────────────────────────────────
 app.use(authMiddleware);

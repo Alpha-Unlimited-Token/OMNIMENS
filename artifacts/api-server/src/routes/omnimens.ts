@@ -3354,4 +3354,15 @@ router.get("/omnimens/usage-stats", async (req, res) => {
   }
 });
 
+// ─── Owner-Only: Security Status ─────────────────────────────────────────────
+router.get("/omnimens/security-status", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  const { getSecurityStatus } = await import("../middleware/security.js");
+  const ownerId = process.env.REPL_OWNER_ID || "50777126";
+  if (String(req.user.id) !== String(ownerId)) {
+    return res.status(403).json({ error: "Owner access only" });
+  }
+  res.json({ ...getSecurityStatus(), timestamp: new Date().toISOString() });
+});
+
 export default router;
