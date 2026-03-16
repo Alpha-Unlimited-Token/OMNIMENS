@@ -34,8 +34,10 @@ export type Message = {
   searchingWeb?: boolean;
   webSearchQuery?: string;
   webSearchResultCount?: number;
-  creditCost?: number;          // credits deducted for this message
-  costBreakdown?: CostBreakdown; // detailed cost info
+  analyzingUrls?: boolean;
+  urlCount?: number;
+  creditCost?: number;
+  costBreakdown?: CostBreakdown;
 };
 
 export type AttachedFile = {
@@ -149,6 +151,22 @@ export function useOmnimensChat(onLimitReached: () => void) {
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
                   if (msg) msg.content = data.content;
+                  return newMsgs;
+                });
+
+              } else if (data.type === "analyzing_urls") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) { msg.analyzingUrls = true; msg.urlCount = data.count; }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "url_analysis_complete") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) { msg.analyzingUrls = false; }
                   return newMsgs;
                 });
 

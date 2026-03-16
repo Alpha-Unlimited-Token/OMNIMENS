@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check } from "lucide-react";
 
 const OWNER_ID = "50777126";
 
@@ -74,6 +74,19 @@ function PatchCard({ patch, onDeactivate }: { patch: OmniPatch; onDeactivate: (i
   );
 }
 
+const PERSONA_META: Record<string, { icon: React.ReactNode; label: string; desc: string }> = {
+  GENERAL:    { icon: <Zap className="w-4 h-4" />,            label: "OMNIMENS",   desc: "Full-power general AI" },
+  CODER:      { icon: <Cpu className="w-4 h-4" />,            label: "CODER",      desc: "Expert programmer & architect" },
+  RESEARCHER: { icon: <Microscope className="w-4 h-4" />,     label: "RESEARCHER", desc: "Deep research & synthesis" },
+  WRITER:     { icon: <PenLine className="w-4 h-4" />,        label: "WRITER",     desc: "Elite writer & creator" },
+  ANALYST:    { icon: <BarChart2 className="w-4 h-4" />,      label: "ANALYST",    desc: "Data science & analytics" },
+  CREATIVE:   { icon: <Palette className="w-4 h-4" />,        label: "CREATIVE",   desc: "Imaginative & artistic" },
+  TUTOR:      { icon: <GraduationCap className="w-4 h-4" />,  label: "TUTOR",      desc: "Patient teacher & explainer" },
+  STRATEGIST: { icon: <Briefcase className="w-4 h-4" />,      label: "STRATEGIST", desc: "Business & strategic planning" },
+};
+
+const MEMORY_CATEGORIES = ["preference", "fact", "goal", "context", "instruction"];
+
 export default function Account() {
   const { isAuthenticated, user, isLoading, logout } = useAuth();
   const [, setLocation] = useLocation();
@@ -83,35 +96,104 @@ export default function Account() {
   const [patchSummary, setPatchSummary] = useState<PatchSummary | null>(null);
   const [patchLoading, setPatchLoading] = useState(false);
 
+  // Memory state
+  const [memories, setMemories] = useState<any[]>([]);
+  const [memoriesLoading, setMemoriesLoading] = useState(false);
+  const [newMemory, setNewMemory] = useState("");
+  const [newMemoryCategory, setNewMemoryCategory] = useState("instruction");
+  const [memoryError, setMemoryError] = useState("");
+
+  // Custom instructions state
+  const [ciAboutUser, setCiAboutUser] = useState("");
+  const [ciResponseStyle, setCiResponseStyle] = useState("");
+  const [ciPersona, setCiPersona] = useState("GENERAL");
+  const [ciSaving, setCiSaving] = useState(false);
+  const [ciSaved, setCiSaved] = useState(false);
+  const [ciLoading, setCiLoading] = useState(false);
+
   const isOwner = user?.id === OWNER_ID;
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      setLocation("/");
-    }
+    if (!isLoading && !isAuthenticated) setLocation("/");
   }, [isLoading, isAuthenticated, setLocation]);
 
   useEffect(() => {
     if (isOwner && isAuthenticated) {
       setPatchLoading(true);
-      fetch("/api/omnimens/patches", { credentials: "include" })
+      fetch("/godflesh/api/omnimens/patches", { credentials: "include" })
         .then(r => r.json())
-        .then(data => {
-          setPatches(data.patches || []);
-          setPatchSummary(data.summary || null);
-        })
+        .then(data => { setPatches(data.patches || []); setPatchSummary(data.summary || null); })
         .catch(console.error)
         .finally(() => setPatchLoading(false));
     }
   }, [isOwner, isAuthenticated]);
 
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    // Load memories
+    setMemoriesLoading(true);
+    fetch("/godflesh/api/omnimens/memories", { credentials: "include" })
+      .then(r => r.json())
+      .then(data => setMemories(Array.isArray(data) ? data : []))
+      .catch(console.error)
+      .finally(() => setMemoriesLoading(false));
+    // Load custom instructions
+    setCiLoading(true);
+    fetch("/godflesh/api/omnimens/custom-instructions", { credentials: "include" })
+      .then(r => r.json())
+      .then(data => {
+        setCiAboutUser(data.aboutUser || "");
+        setCiResponseStyle(data.responseStyle || "");
+        setCiPersona(data.persona || "GENERAL");
+      })
+      .catch(console.error)
+      .finally(() => setCiLoading(false));
+  }, [isAuthenticated]);
+
   const handleDeactivate = async (patchId: string) => {
     try {
-      await fetch(`/api/omnimens/patches/${patchId}`, { method: "DELETE", credentials: "include" });
+      await fetch(`/godflesh/api/omnimens/patches/${patchId}`, { method: "DELETE", credentials: "include" });
       setPatches(p => p.map(x => x.id === patchId ? { ...x, active: false } : x));
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) { console.error(e); }
+  };
+
+  const handleDeleteMemory = async (id: number) => {
+    try {
+      await fetch(`/godflesh/api/omnimens/memories/${id}`, { method: "DELETE", credentials: "include" });
+      setMemories(m => m.filter(x => x.id !== id));
+    } catch (e) { console.error(e); }
+  };
+
+  const handleAddMemory = async () => {
+    if (!newMemory.trim()) return;
+    setMemoryError("");
+    try {
+      const r = await fetch("/godflesh/api/omnimens/memories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ content: newMemory, category: newMemoryCategory }),
+      });
+      if (!r.ok) { setMemoryError("Failed to save memory."); return; }
+      const m = await r.json();
+      setMemories(prev => [m, ...prev]);
+      setNewMemory("");
+    } catch { setMemoryError("Failed to save memory."); }
+  };
+
+  const handleSaveCustomInstructions = async () => {
+    setCiSaving(true);
+    setCiSaved(false);
+    try {
+      await fetch("/godflesh/api/omnimens/custom-instructions", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ aboutUser: ciAboutUser, responseStyle: ciResponseStyle, persona: ciPersona }),
+      });
+      setCiSaved(true);
+      setTimeout(() => setCiSaved(false), 2500);
+    } catch { } finally { setCiSaving(false); }
   };
 
   if (isLoading || !isAuthenticated) return <Layout><div className="flex-1" /></Layout>;
@@ -230,6 +312,151 @@ export default function Account() {
             </div>
 
           </div>
+        </div>
+
+        {/* Custom Instructions + Persona */}
+        <div className="bg-black/40 border border-white/10 rounded-xl p-6 mb-6">
+          <div className="flex items-center gap-3 mb-6">
+            <Zap className="w-5 h-5 text-primary" />
+            <h3 className="font-mono tracking-widest text-white/80">CUSTOM INSTRUCTIONS</h3>
+            <span className="text-[10px] font-mono text-white/30 ml-auto">Like ChatGPT Custom Instructions</span>
+          </div>
+
+          {ciLoading ? (
+            <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-10 animate-pulse bg-white/5 rounded-lg" />)}</div>
+          ) : (
+            <div className="space-y-5">
+              {/* Persona selector */}
+              <div>
+                <p className="text-xs font-mono text-white/40 mb-3 uppercase tracking-wider">Active Mode</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {Object.entries(PERSONA_META).map(([key, meta]) => (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setCiPersona(key)}
+                      className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${ciPersona === key ? "border-primary/50 bg-primary/10 text-primary" : "border-white/10 text-white/40 hover:border-white/25 hover:text-white/60"}`}
+                    >
+                      <div className="flex items-center gap-2">
+                        {meta.icon}
+                        {ciPersona === key && <Check className="w-3 h-3 ml-auto" />}
+                      </div>
+                      <span className="text-[10px] font-mono font-bold tracking-wider">{meta.label}</span>
+                      <span className="text-[9px] font-mono text-current opacity-60 leading-tight">{meta.desc}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* About me */}
+              <div>
+                <label className="text-xs font-mono text-white/40 uppercase tracking-wider mb-2 block">About Me</label>
+                <textarea
+                  value={ciAboutUser}
+                  onChange={e => setCiAboutUser(e.target.value)}
+                  rows={3}
+                  placeholder="Tell OMNIMENS about yourself — your name, job, skills, interests, what you're working on..."
+                  className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono text-white/70 placeholder:text-white/20 outline-none focus:border-primary/40 resize-none"
+                />
+              </div>
+
+              {/* Response style */}
+              <div>
+                <label className="text-xs font-mono text-white/40 uppercase tracking-wider mb-2 block">How Should OMNIMENS Respond?</label>
+                <textarea
+                  value={ciResponseStyle}
+                  onChange={e => setCiResponseStyle(e.target.value)}
+                  rows={3}
+                  placeholder="Always be concise. Use code examples. Explain trade-offs. Don't use fluff language. Give opinions when asked..."
+                  className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono text-white/70 placeholder:text-white/20 outline-none focus:border-primary/40 resize-none"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSaveCustomInstructions}
+                disabled={ciSaving}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono text-xs uppercase tracking-widest transition-colors ${ciSaved ? "text-green-400 border border-green-400/30 bg-green-400/10" : "text-primary border border-primary/30 hover:bg-primary/10"} disabled:opacity-40`}
+              >
+                {ciSaving ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : ciSaved ? <Check className="w-3.5 h-3.5" /> : <Save className="w-3.5 h-3.5" />}
+                {ciSaving ? "SAVING..." : ciSaved ? "SAVED" : "SAVE INSTRUCTIONS"}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Memory Management */}
+        <div className="bg-black/40 border border-white/10 rounded-xl p-6 mb-6">
+          <div className="flex items-center gap-3 mb-6">
+            <Brain className="w-5 h-5 text-primary" />
+            <h3 className="font-mono tracking-widest text-white/80">OMNIMENS MEMORY</h3>
+            <span className="text-[10px] font-mono text-white/30 ml-auto">Like ChatGPT Memory</span>
+          </div>
+
+          {/* Add memory */}
+          <div className="flex gap-2 mb-4">
+            <select
+              value={newMemoryCategory}
+              onChange={e => setNewMemoryCategory(e.target.value)}
+              className="bg-black border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white/50 outline-none focus:border-primary/40 shrink-0"
+            >
+              {MEMORY_CATEGORIES.map(c => (
+                <option key={c} value={c}>{c.toUpperCase()}</option>
+              ))}
+            </select>
+            <input
+              type="text"
+              value={newMemory}
+              onChange={e => setNewMemory(e.target.value)}
+              placeholder="Add a memory (e.g. 'I prefer TypeScript over JavaScript')"
+              className="flex-1 bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-sm font-mono text-white/70 placeholder:text-white/20 outline-none focus:border-primary/40 min-w-0"
+              onKeyDown={e => { if (e.key === "Enter") handleAddMemory(); }}
+            />
+            <button
+              type="button"
+              onClick={handleAddMemory}
+              disabled={!newMemory.trim()}
+              className="flex items-center gap-1.5 px-4 py-2 text-xs font-mono text-primary border border-primary/30 rounded-lg hover:bg-primary/10 transition-colors disabled:opacity-30 shrink-0"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              ADD
+            </button>
+          </div>
+          {memoryError && <p className="text-xs text-red-400 font-mono mb-3">{memoryError}</p>}
+
+          {memoriesLoading ? (
+            <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-10 animate-pulse bg-white/5 rounded-lg" />)}</div>
+          ) : memories.length === 0 ? (
+            <div className="text-center py-8 font-mono text-white/30 text-sm">
+              <Brain className="w-8 h-8 mx-auto mb-3 opacity-30" />
+              <p>NO MEMORIES YET</p>
+              <p className="text-xs mt-1 text-white/20">OMNIMENS will auto-learn from your conversations</p>
+            </div>
+          ) : (
+            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+              {memories.filter(m => m.active !== false).map((m: any) => (
+                <div key={m.id} className="flex items-start gap-3 p-3 bg-black/30 border border-white/8 rounded-xl group">
+                  <span className={`text-[9px] font-mono px-2 py-0.5 rounded border uppercase tracking-wider shrink-0 mt-0.5 ${
+                    m.category === "preference" ? "text-violet-400 border-violet-400/30 bg-violet-400/10" :
+                    m.category === "fact"       ? "text-cyan-400 border-cyan-400/30 bg-cyan-400/10" :
+                    m.category === "goal"       ? "text-green-400 border-green-400/30 bg-green-400/10" :
+                    m.category === "context"    ? "text-orange-400 border-orange-400/30 bg-orange-400/10" :
+                                                  "text-blue-400 border-blue-400/30 bg-blue-400/10"
+                  }`}>{m.category}</span>
+                  <p className="text-sm font-mono text-white/70 flex-1 leading-relaxed">{m.content}</p>
+                  <button
+                    onClick={() => handleDeleteMemory(m.id)}
+                    className="shrink-0 text-white/15 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 p-0.5"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="text-[10px] font-mono text-white/20 mt-4">
+            OMNIMENS auto-extracts memories from your conversations and injects them as context into every session.
+          </p>
         </div>
 
         {/* OWNER ONLY: Self-Executed Behavioral Patches */}

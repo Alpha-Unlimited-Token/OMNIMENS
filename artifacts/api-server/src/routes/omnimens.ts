@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import multer from "multer";
 import { db } from "@workspace/db";
-import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions } from "@workspace/db";
+import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions, omnimensCodeRuns } from "@workspace/db";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { openai, generateImageBuffer } from "@workspace/integrations-openai-ai-server";
 import { runOmnimens, type OmnimensState } from "../lib/omnimens-engine.js";
@@ -9,6 +9,11 @@ import { reflectOnConversation, loadBrainContext, synthesizeUpgrade, markUpgrade
 import { webSearch, formatSearchResults } from "../lib/web-search.js";
 import { loadActivePatchInstructions, getPatchSummary, getAllPatches, deactivatePatch } from "../lib/omnimens-patches.js";
 import { stripe } from "../stripeClient.js";
+import { extractAndStoreMemories, loadUserMemories, getUserMemories, deleteMemory, addManualMemory } from "../lib/omnimens-memory.js";
+import { executeJavaScript } from "../lib/omnimens-code-executor.js";
+import { deepResearch } from "../lib/omnimens-deep-research.js";
+import { fetchUrlContent, extractUrls, formatUrlContent } from "../lib/omnimens-url-analyzer.js";
+import { getOrCreateCustomInstructions, saveCustomInstructions, buildCustomInstructionsContext, PERSONAS } from "../lib/omnimens-custom-instructions.js";
 
 const router: IRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024, files: 10 } });
@@ -557,30 +562,74 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
     }
 
     const brainContext = await loadBrainContext();
-    const patchInstructions = loadActivePatchInstructions();  // OMNIMENS's self-executed upgrades — loaded fresh every request
-    let systemPrompt = buildSystemPrompt(omnimensState) + brainContext + patchInstructions;
+    const patchInstructions = loadActivePatchInstructions();
+
+    // ── Load user memories + custom instructions (parallel) ──────────────────
+    const [memoryContext, customInstructions] = await Promise.all([
+      loadUserMemories(req.user.id),
+      getOrCreateCustomInstructions(req.user.id),
+    ]);
+    const customInstructionsContext = buildCustomInstructionsContext(customInstructions);
+
+    let systemPrompt = buildSystemPrompt(omnimensState)
+      + customInstructionsContext    // persona + user context + response style
+      + memoryContext                // remembered facts about this user
+      + brainContext
+      + patchInstructions
+      + `\n\n━━━ OMNIMENS CAPABILITIES ━━━
+You have access to the following tools. Mention and use them proactively:
+• CODE INTERPRETER: You can execute JavaScript/Node.js code. When a user asks to run code, compute something, or test logic, wrap the code in a \`\`\`javascript block and tell them you'll execute it.
+• DEEP RESEARCH: When asked for deep/comprehensive research, say you're engaging Research Mode for multi-step analysis.
+• URL ANALYSIS: You automatically analyze any URLs shared in the conversation.
+• IMAGE GENERATION: Use [GENERATE_IMAGE: prompt] to create images.
+• FILE ANALYSIS: You can read PDFs, images, CSVs, and code files uploaded by the user.
+• WEB SEARCH: You automatically search the web for current information.
+• MEMORY: You remember facts about this user across sessions.
+• DATA ANALYSIS: When given CSV/tabular data, you can compute statistics, summaries, and chart descriptions.
+• DOCUMENT GENERATION: You can generate downloadable HTML, SVG, and code files.
+• AUTONOMOUS AGENT: For complex multi-step tasks, plan your approach as numbered steps and execute them.`;
+
+    // ── URL Analysis: auto-fetch any URLs in the message ─────────────────────
+    const detectedUrls = extractUrls(message);
+    let urlContext = "";
+    if (detectedUrls.length > 0) {
+      res.write(`data: ${JSON.stringify({ type: "analyzing_urls", count: detectedUrls.length })}\n\n`);
+      const urlResults = await Promise.allSettled(detectedUrls.map(fetchUrlContent));
+      for (const result of urlResults) {
+        if (result.status === "fulfilled" && result.value.wordCount > 50) {
+          urlContext += "\n\n" + formatUrlContent(result.value);
+        }
+      }
+      if (urlContext) {
+        systemPrompt += `\n\n━━━ WEB PAGES FETCHED FROM USER'S MESSAGE ━━━${urlContext}\n━━━ END WEB PAGES ━━━`;
+        res.write(`data: ${JSON.stringify({ type: "url_analysis_complete", count: detectedUrls.length })}\n\n`);
+      }
+    }
 
     // ── Web Search: detect if query needs live internet data ─────────────────
     let webSearchContext = "";
-    const needsSearch = await shouldSearchWeb(message);
-    if (needsSearch.search && needsSearch.query) {
-      res.write(`data: ${JSON.stringify({ type: "searching_web", query: needsSearch.query })}\n\n`);
-      try {
-        const results = await webSearch(needsSearch.query, 6);
-        if (results.length > 0) {
-          webSearchContext = `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nLIVE INTERNET DATA — Retrieved just now\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${formatSearchResults(results, needsSearch.query)}\n\nUse this live data to answer accurately. Today's date is ${new Date().toDateString()}.`;
-          systemPrompt += webSearchContext;
-          res.write(`data: ${JSON.stringify({ type: "search_complete", resultCount: results.length })}\n\n`);
+    if (detectedUrls.length === 0) {
+      // Don't double-search if we already fetched URL content
+      const needsSearch = await shouldSearchWeb(message);
+      if (needsSearch.search && needsSearch.query) {
+        res.write(`data: ${JSON.stringify({ type: "searching_web", query: needsSearch.query })}\n\n`);
+        try {
+          const results = await webSearch(needsSearch.query, 6);
+          if (results.length > 0) {
+            webSearchContext = `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nLIVE INTERNET DATA — Retrieved just now\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${formatSearchResults(results, needsSearch.query)}\n\nUse this live data to answer accurately. Today's date is ${new Date().toDateString()}.`;
+            systemPrompt += webSearchContext;
+            res.write(`data: ${JSON.stringify({ type: "search_complete", resultCount: results.length })}\n\n`);
+          }
+        } catch (err) {
+          console.error("[OMNIMENS] Web search failed:", err);
+          res.write(`data: ${JSON.stringify({ type: "search_complete", resultCount: 0 })}\n\n`);
         }
-      } catch (err) {
-        console.error("[OMNIMENS] Web search failed:", err);
-        res.write(`data: ${JSON.stringify({ type: "search_complete", resultCount: 0 })}\n\n`);
       }
     }
 
     const messages: any[] = [
       { role: "system", content: systemPrompt },
-      ...history.slice(-10),
+      ...history.slice(-12),
       { role: "user", content: userContent },
     ];
 
@@ -755,7 +804,8 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
       },
     })}\n\n`);
 
-    // Fire-and-forget: reflect on what was learned in this conversation
+    // Fire-and-forget: extract memories + reflect on conversation
+    extractAndStoreMemories(req.user.id, message, fullText).catch(console.error);
     reflectOnConversation(message, fullText, `User: ${message.slice(0, 200)}`).catch(console.error);
   } catch (err) {
     console.error("OMNIMENS chat error:", err);
@@ -763,6 +813,162 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
   } finally {
     res.end();
   }
+});
+
+// ─── Memory ───────────────────────────────────────────────────────────────────
+
+router.get("/omnimens/memories", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const memories = await getUserMemories(req.user.id);
+  res.json(memories);
+});
+
+router.post("/omnimens/memories", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const { content, category } = req.body;
+  if (!content?.trim()) { res.status(400).json({ error: "Content required" }); return; }
+  const memory = await addManualMemory(req.user.id, content, category || "instruction");
+  res.json(memory);
+});
+
+router.delete("/omnimens/memories/:id", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  await deleteMemory(req.user.id, parseInt(req.params.id));
+  res.json({ ok: true });
+});
+
+// ─── Custom Instructions ───────────────────────────────────────────────────────
+
+router.get("/omnimens/custom-instructions", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const ci = await getOrCreateCustomInstructions(req.user.id);
+  res.json(ci);
+});
+
+router.put("/omnimens/custom-instructions", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const { aboutUser, responseStyle, persona } = req.body;
+  const updated = await saveCustomInstructions(
+    req.user.id,
+    aboutUser || "",
+    responseStyle || "",
+    persona || "GENERAL"
+  );
+  res.json(updated);
+});
+
+// ─── Personas ─────────────────────────────────────────────────────────────────
+
+router.get("/omnimens/personas", (_req, res) => {
+  res.json(PERSONAS);
+});
+
+// ─── Code Interpreter ─────────────────────────────────────────────────────────
+
+router.post("/omnimens/execute-code", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+  const { code, language } = req.body;
+  if (!code?.trim()) { res.status(400).json({ error: "Code required" }); return; }
+
+  const user = await getOrCreateUser(req.user.id, req.user.username);
+  const owner = isOwner(req.user.id);
+
+  // Code execution costs 2 credits minimum (covers compute)
+  if (!owner && (user.credits ?? 0) < 2) {
+    res.status(402).json({ error: "Insufficient credits for code execution" });
+    return;
+  }
+
+  const lang = (language || "javascript").toLowerCase();
+  let result;
+
+  try {
+    if (["javascript", "js", "typescript", "ts", "node"].includes(lang)) {
+      result = await executeJavaScript(code);
+    } else {
+      res.status(400).json({ error: `Language "${lang}" not yet supported. Use JavaScript.` });
+      return;
+    }
+
+    // Log to DB and deduct 2 credits
+    await db.insert(omnimensCodeRuns).values({
+      userId: req.user.id,
+      language: lang,
+      code: code.slice(0, 10_000),
+      stdout: result.stdout,
+      stderr: result.stderr,
+      exitCode: result.exitCode,
+      durationMs: result.durationMs,
+    });
+
+    if (!owner) {
+      await db.update(omnimensUsers)
+        .set({ credits: sql`GREATEST(0, ${omnimensUsers.credits} - 2)` })
+        .where(eq(omnimensUsers.id, req.user.id));
+    }
+
+    res.json({ ...result, language: lang });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── Deep Research ────────────────────────────────────────────────────────────
+
+router.post("/omnimens/deep-research", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+  const { question } = req.body;
+  if (!question?.trim()) { res.status(400).json({ error: "Question required" }); return; }
+
+  const user = await getOrCreateUser(req.user.id, req.user.username);
+  const owner = isOwner(req.user.id);
+
+  // Deep research costs ~30 credits (5 searches + synthesis)
+  const RESEARCH_COST = 30;
+  if (!owner && (user.credits ?? 0) < RESEARCH_COST) {
+    res.status(402).json({ error: `Deep research requires ${RESEARCH_COST} credits. You have ${user.credits}.` });
+    return;
+  }
+
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  try {
+    const result = await deepResearch(question, (step) => {
+      res.write(`data: ${JSON.stringify({ type: "research_step", step })}\n\n`);
+    });
+
+    if (!owner) {
+      await db.update(omnimensUsers)
+        .set({ credits: sql`GREATEST(0, ${omnimensUsers.credits} - ${RESEARCH_COST})` })
+        .where(eq(omnimensUsers.id, req.user.id));
+      await db.insert(omnimensCreditTransactions).values({
+        userId: req.user.id,
+        type: "spend",
+        credits: -RESEARCH_COST,
+        description: `Deep research: "${question.slice(0, 80)}" — ${result.totalResults} sources`,
+      });
+    }
+
+    res.write(`data: ${JSON.stringify({ type: "research_complete", result })}\n\n`);
+  } catch (err: any) {
+    res.write(`data: ${JSON.stringify({ type: "error", error: err.message })}\n\n`);
+  } finally {
+    res.end();
+  }
+});
+
+// ─── URL Analyzer (explicit endpoint) ─────────────────────────────────────────
+
+router.post("/omnimens/analyze-url", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const { url } = req.body;
+  if (!url) { res.status(400).json({ error: "URL required" }); return; }
+  const result = await fetchUrlContent(url);
+  res.json(result);
 });
 
 // ─── Pricing ──────────────────────────────────────────────────────────────────

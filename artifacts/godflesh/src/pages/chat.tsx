@@ -9,7 +9,7 @@ import { VoiceIndicator } from "@/components/voice-indicator";
 import { OmnimensPresence } from "@/components/omnimens-presence";
 import { PendingFileList, AttachedFileList } from "@/components/file-attachments";
 import { Button } from "@/components/ui/button";
-import { Send, StopCircle, ShieldAlert, Volume2, VolumeX, Paperclip, Download, Loader2, Expand, FileCode, Box, Film, Music, BarChart3, Shapes, Globe, Zap } from "lucide-react";
+import { Send, StopCircle, ShieldAlert, Volume2, VolumeX, Paperclip, Download, Loader2, Expand, FileCode, Box, Film, Music, BarChart3, Shapes, Globe, Zap, Terminal, Play, Microscope, ChevronDown, Check, BookOpen, Brain, Cpu, PenLine, BarChart2, Palette, GraduationCap, Briefcase } from "lucide-react";
 import { OmnimensIcon } from "@/components/omnimens-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
 import { OmnimensNotificationBell } from "@/components/omnimens-notifications";
@@ -79,6 +79,128 @@ function CreditCostBadge({ creditCost, costBreakdown }: { creditCost: number; co
   );
 }
 
+function UrlAnalysisBadge({ count, done }: { count: number; done: boolean }) {
+  return (
+    <div className="mt-3 border border-blue-500/20 rounded-xl px-4 py-2 bg-blue-500/5 font-mono text-xs flex items-center gap-3 text-white/50">
+      {done ? <Globe className="w-3.5 h-3.5 text-blue-400 shrink-0" /> : <Loader2 className="w-3.5 h-3.5 text-blue-400 animate-spin shrink-0" />}
+      <span className="tracking-wider">{done ? `${count} WEB PAGE${count > 1 ? "S" : ""} ANALYZED` : `READING ${count} WEB PAGE${count > 1 ? "S" : ""}...`}</span>
+    </div>
+  );
+}
+
+const PERSONA_ICONS: Record<string, React.ReactNode> = {
+  GENERAL: <Zap className="w-3.5 h-3.5" />,
+  CODER: <Cpu className="w-3.5 h-3.5" />,
+  RESEARCHER: <Microscope className="w-3.5 h-3.5" />,
+  WRITER: <PenLine className="w-3.5 h-3.5" />,
+  ANALYST: <BarChart2 className="w-3.5 h-3.5" />,
+  CREATIVE: <Palette className="w-3.5 h-3.5" />,
+  TUTOR: <GraduationCap className="w-3.5 h-3.5" />,
+  STRATEGIST: <Briefcase className="w-3.5 h-3.5" />,
+};
+
+const PERSONA_NAMES: Record<string, string> = {
+  GENERAL: "OMNIMENS", CODER: "CODER", RESEARCHER: "RESEARCHER",
+  WRITER: "WRITER", ANALYST: "ANALYST", CREATIVE: "CREATIVE",
+  TUTOR: "TUTOR", STRATEGIST: "STRATEGIST",
+};
+
+function PersonaSelector({ currentPersona, onSelect }: { currentPersona: string; onSelect: (p: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const personas = Object.keys(PERSONA_NAMES);
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className="flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-widest text-white/40 hover:text-primary border border-white/10 hover:border-primary/30 rounded-lg transition-colors"
+        title="Switch OMNIMENS mode"
+      >
+        {PERSONA_ICONS[currentPersona] || <Zap className="w-3.5 h-3.5" />}
+        <span className="hidden sm:inline">{PERSONA_NAMES[currentPersona] || "OMNIMENS"}</span>
+        <ChevronDown className="w-3 h-3" />
+      </button>
+      {open && (
+        <div className="absolute bottom-full mb-2 left-0 z-50 bg-black border border-white/15 rounded-xl shadow-2xl p-1 min-w-[160px]">
+          {personas.map(p => (
+            <button
+              key={p}
+              type="button"
+              onClick={() => { onSelect(p); setOpen(false); }}
+              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-xs font-mono transition-colors ${currentPersona === p ? "bg-primary/15 text-primary" : "text-white/60 hover:bg-white/5 hover:text-white"}`}
+            >
+              {PERSONA_ICONS[p]}
+              <span>{PERSONA_NAMES[p]}</span>
+              {currentPersona === p && <Check className="w-3 h-3 ml-auto" />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CodeBlockWithRun({ code, language }: { code: string; language: string }) {
+  const [running, setRunning] = useState(false);
+  const [result, setResult] = useState<{ stdout: string; stderr: string; exitCode: number; durationMs: number } | null>(null);
+  const isRunnable = ["javascript", "js", "typescript", "ts", "node"].includes(language.toLowerCase());
+
+  const runCode = async () => {
+    if (running) return;
+    setRunning(true);
+    setResult(null);
+    try {
+      const resp = await fetch(`/godflesh/api/omnimens/execute-code`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ code, language }),
+      });
+      const data = await resp.json();
+      setResult(data);
+    } catch (e: any) {
+      setResult({ stdout: "", stderr: e.message, exitCode: 1, durationMs: 0 });
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  return (
+    <div className="my-3 rounded-xl border border-white/10 overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/8">
+        <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider">{language || "code"}</span>
+        {isRunnable && (
+          <button
+            onClick={runCode}
+            disabled={running}
+            className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono text-primary/70 hover:text-primary border border-primary/20 hover:border-primary/50 rounded transition-colors disabled:opacity-40"
+          >
+            {running ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
+            {running ? "RUNNING..." : "RUN"}
+          </button>
+        )}
+      </div>
+      <pre className="p-4 overflow-x-auto text-sm text-white/80 font-mono bg-black/40 omnimens-scrollbar">
+        <code>{code}</code>
+      </pre>
+      {result && (
+        <div className="border-t border-white/8 bg-black/60 px-4 py-3 font-mono text-xs">
+          <div className="flex items-center gap-2 mb-2 text-white/40">
+            <Terminal className="w-3 h-3" />
+            <span>EXECUTION RESULT</span>
+            <span className={`ml-auto ${result.exitCode === 0 ? "text-green-400" : "text-red-400"}`}>
+              exit:{result.exitCode} · {result.durationMs}ms
+            </span>
+          </div>
+          {result.stdout && <pre className="text-green-300/80 whitespace-pre-wrap mb-1">{result.stdout}</pre>}
+          {result.stderr && <pre className="text-red-400/80 whitespace-pre-wrap">{result.stderr}</pre>}
+          {!result.stdout && !result.stderr && <span className="text-white/30">No output</span>}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Chat() {
   const { isAuthenticated, isLoading } = useAuth();
   const [, setLocation] = useLocation();
@@ -94,6 +216,67 @@ export default function Chat() {
     setShowLimitModal(true);
   });
   const voice = useOmnimensVoice();
+  const [persona, setPersona] = useState("GENERAL");
+  const [deepResearchMode, setDeepResearchMode] = useState(false);
+  const [researchQuestion, setResearchQuestion] = useState("");
+  const [isResearching, setIsResearching] = useState(false);
+  const [researchResult, setResearchResult] = useState<any>(null);
+
+  // Load saved persona from custom instructions
+  useEffect(() => {
+    fetch("/godflesh/api/omnimens/custom-instructions", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.persona) setPersona(d.persona); })
+      .catch(() => {});
+  }, []);
+
+  const handlePersonaChange = async (p: string) => {
+    setPersona(p);
+    try {
+      const existing = await fetch("/godflesh/api/omnimens/custom-instructions", { credentials: "include" }).then(r => r.json());
+      await fetch("/godflesh/api/omnimens/custom-instructions", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ aboutUser: existing.aboutUser || "", responseStyle: existing.responseStyle || "", persona: p }),
+      });
+    } catch {}
+  };
+
+  const handleDeepResearch = async () => {
+    const q = researchQuestion.trim() || input.trim();
+    if (!q || isResearching) return;
+    setIsResearching(true);
+    setResearchResult(null);
+    try {
+      const res = await fetch("/godflesh/api/omnimens/deep-research", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ question: q }),
+      });
+      const reader = res.body?.getReader();
+      if (!reader) return;
+      const decoder = new TextDecoder();
+      let buffer = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.type === "research_complete") setResearchResult(data.result);
+          } catch {}
+        }
+      }
+    } finally {
+      setIsResearching(false);
+    }
+  };
 
   // Auto-speak latest completed OMNIMENS message
   useEffect(() => {
@@ -272,7 +455,21 @@ export default function Chat() {
                                 <WebsitePreview key={i} html={seg.value} index={i} />
                               ) : (
                                 <div key={i} className="markdown-body">
-                                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{seg.value}</ReactMarkdown>
+                                  <ReactMarkdown
+                                    remarkPlugins={[remarkGfm]}
+                                    components={{
+                                      code({ node, className, children, ...props }: any) {
+                                        const match = /language-(\w+)/.exec(className || "");
+                                        const isBlock = !props.inline && match;
+                                        const lang = match ? match[1] : "";
+                                        const codeStr = String(children).replace(/\n$/, "");
+                                        if (isBlock) {
+                                          return <CodeBlockWithRun code={codeStr} language={lang} />;
+                                        }
+                                        return <code className={`font-mono text-primary/80 bg-primary/10 px-1 rounded text-sm ${className || ""}`} {...props}>{children}</code>;
+                                      },
+                                    }}
+                                  >{seg.value}</ReactMarkdown>
                                 </div>
                               )
                             )}
@@ -286,7 +483,12 @@ export default function Chat() {
                               </div>
                             )}
 
-                            {/* Generating indicator with elapsed timer */}
+                            {/* URL analysis badge */}
+                            {(msg.analyzingUrls || msg.urlCount) && (
+                              <UrlAnalysisBadge count={msg.urlCount || 1} done={!msg.analyzingUrls} />
+                            )}
+
+                            {/* Web search badge */}
                             {(msg.searchingWeb || msg.webSearchQuery) && (
                               <WebSearchBadge
                                 query={msg.webSearchQuery || ""}
@@ -420,7 +622,73 @@ export default function Chat() {
               )}
             </div>
           </div>
+
+          {/* Capability toolbar */}
+          <div className="flex items-center gap-2 mt-2 px-1 flex-wrap">
+            <PersonaSelector currentPersona={persona} onSelect={handlePersonaChange} />
+            <button
+              type="button"
+              onClick={() => setDeepResearchMode(m => !m)}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] font-mono uppercase tracking-widest border rounded-lg transition-colors ${deepResearchMode ? "text-violet-300 border-violet-400/40 bg-violet-400/10" : "text-white/30 border-white/10 hover:text-white/60 hover:border-white/20"}`}
+            >
+              <Microscope className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">DEEP RESEARCH</span>
+            </button>
+            {deepResearchMode && (
+              <div className="flex items-center gap-2 ml-1 flex-1">
+                <input
+                  type="text"
+                  value={researchQuestion}
+                  onChange={e => setResearchQuestion(e.target.value)}
+                  placeholder="Research question (or use chat input above)..."
+                  className="flex-1 bg-black/60 border border-violet-400/20 rounded-lg px-3 py-1.5 text-xs font-mono text-white/70 placeholder:text-white/20 outline-none focus:border-violet-400/50 min-w-0"
+                  onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); handleDeepResearch(); } }}
+                />
+                <button
+                  type="button"
+                  onClick={handleDeepResearch}
+                  disabled={isResearching}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-mono uppercase text-violet-300 border border-violet-400/30 rounded-lg hover:bg-violet-400/10 transition-colors disabled:opacity-40"
+                >
+                  {isResearching ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <BookOpen className="w-3.5 h-3.5" />}
+                  {isResearching ? "RESEARCHING..." : "RESEARCH"}
+                </button>
+              </div>
+            )}
+            <span className="text-[9px] font-mono text-white/15 ml-auto hidden sm:block">URLS AUTO-ANALYZED · MEMORY ACTIVE · CODE EXECUTABLE</span>
+          </div>
         </form>
+
+        {/* Deep Research Result Panel */}
+        {researchResult && (
+          <div className="shrink-0 mt-2 border border-violet-400/20 rounded-xl overflow-hidden max-h-[400px] overflow-y-auto omnimens-scrollbar">
+            <div className="sticky top-0 flex items-center justify-between px-4 py-3 bg-violet-950/80 backdrop-blur border-b border-violet-400/20">
+              <div className="flex items-center gap-2 text-violet-300 font-mono text-xs font-bold tracking-widest">
+                <Microscope className="w-4 h-4" />
+                DEEP RESEARCH REPORT
+                <span className="text-violet-400/50">· {researchResult.totalResults} sources · {researchResult.subQueries?.length} searches</span>
+              </div>
+              <button onClick={() => setResearchResult(null)} className="text-white/30 hover:text-white text-xs">✕</button>
+            </div>
+            <div className="p-4 bg-black/60">
+              <div className="markdown-body text-sm">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{researchResult.report}</ReactMarkdown>
+              </div>
+              {researchResult.sources?.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <p className="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-2">Sources ({researchResult.sources.length})</p>
+                  <div className="space-y-1">
+                    {researchResult.sources.map((s: any, i: number) => (
+                      <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" className="block text-xs text-primary/60 hover:text-primary font-mono truncate">
+                        [{i+1}] {s.title}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Limit Modal */}

@@ -97,6 +97,45 @@ export const omnimensProjectFiles = pgTable("godflesh_project_files", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// ─── Persistent User Memory ───────────────────────────────────────────────────
+// Auto-extracted facts about each user — injected as context every conversation
+export const omnimensMemories = pgTable("godflesh_memories", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => omnimensUsers.id),
+  content: text("content").notNull(),            // the memory fact
+  category: text("category").notNull(),          // "preference"|"fact"|"goal"|"context"|"instruction"
+  confidence: real("confidence").default(1.0).notNull(),
+  sourceHash: text("source_hash"),               // hash of convo that produced it (dedup)
+  active: boolean("active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// ─── Custom Instructions ──────────────────────────────────────────────────────
+// User-defined context injected into every system prompt (like ChatGPT custom instructions)
+export const omnimensCustomInstructions = pgTable("godflesh_custom_instructions", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().unique().references(() => omnimensUsers.id),
+  aboutUser: text("about_user").default("").notNull(),         // "About me" context
+  responseStyle: text("response_style").default("").notNull(), // "How to respond" instructions
+  persona: text("persona").default("GENERAL").notNull(),       // active specialist persona
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// ─── Code Execution History ───────────────────────────────────────────────────
+export const omnimensCodeRuns = pgTable("godflesh_code_runs", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => omnimensUsers.id),
+  language: text("language").notNull(),          // "javascript" | "python"
+  code: text("code").notNull(),
+  stdout: text("stdout").default("").notNull(),
+  stderr: text("stderr").default("").notNull(),
+  exitCode: integer("exit_code").default(0).notNull(),
+  durationMs: integer("duration_ms").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export type OmnimensUser = typeof omnimensUsers.$inferSelect;
 export type OmnimensUsage = typeof omnimensUsage.$inferSelect;
 export type OmnimensCreditTransaction = typeof omnimensCreditTransactions.$inferSelect;
@@ -105,4 +144,7 @@ export type OmnimensUpgrade = typeof omnimensUpgrades.$inferSelect;
 export type OmnimensNotification = typeof omnimensNotifications.$inferSelect;
 export type OmnimensProject = typeof omnimensProjects.$inferSelect;
 export type OmnimensProjectFile = typeof omnimensProjectFiles.$inferSelect;
+export type OmnimensMemory = typeof omnimensMemories.$inferSelect;
+export type OmnimensCustomInstructions = typeof omnimensCustomInstructions.$inferSelect;
+export type OmnimensCodeRun = typeof omnimensCodeRuns.$inferSelect;
 export const insertOmnimensUserSchema = createInsertSchema(omnimensUsers);
