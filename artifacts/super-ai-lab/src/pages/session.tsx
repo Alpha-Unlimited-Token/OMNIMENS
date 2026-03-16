@@ -7,7 +7,7 @@ import {
   Brain, ShieldAlert, Cpu, Sparkles, ArrowRight, Play, CheckCircle2,
   Trash2, FlaskConical, Network, Eye, Terminal, FileCode, Package,
   Loader2, ChevronRight, MessageSquare, Download, Zap, RotateCcw,
-  Crown, Flame, Swords,
+  Swords,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
@@ -379,7 +379,6 @@ export default function SessionPage() {
     codeFiles, executions, executingFile, installingPackages,
     restoringWorkspace, restoredWorkspace,
     iterationStatus, isPackaging, packageReady, downloadUrl,
-    namingInProgress, namingMessages, activeNamingAgent, decidedName,
     crossChallenges,
   } = useSuperAIStream(sessionId);
 
@@ -516,7 +515,7 @@ export default function SessionPage() {
       {/* Agent Grid */}
       <div className="grid grid-cols-6 gap-2 mb-2 shrink-0">
         {AGENT_ORDER.map((name) => (
-          <AgentCard key={name} name={name} isActive={activeAgent === name || activeNamingAgent === name} />
+          <AgentCard key={name} name={name} isActive={activeAgent === name} />
         ))}
       </div>
 
@@ -726,140 +725,6 @@ export default function SessionPage() {
             </div>
           </motion.div>
         )}
-      </AnimatePresence>
-
-      {/* Naming Ceremony — live debate panel */}
-      <AnimatePresence>
-        {isCodeMode && (namingInProgress || namingMessages.length > 0) && !decidedName && (
-          <motion.div key="naming-ceremony"
-            initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mb-3 shrink-0 overflow-hidden"
-          >
-            <div className="rounded-xl border border-yellow-400/20 bg-black/60 overflow-hidden">
-              {/* Header */}
-              <div className="flex items-center gap-2.5 px-4 py-2.5 border-b border-yellow-400/10 bg-yellow-400/5">
-                <Swords className="w-4 h-4 text-yellow-400 shrink-0" />
-                <div className="flex-1">
-                  <p className="text-[11px] font-bold tracking-widest text-yellow-400 uppercase">
-                    Council Naming Ceremony
-                  </p>
-                  <p className="text-[9px] text-white/30 mt-0.5">
-                    6 agents debate — naming the AI they built
-                  </p>
-                </div>
-                {activeNamingAgent && (
-                  <div className="flex items-center gap-1.5">
-                    <div className={cn("w-1.5 h-1.5 rounded-full animate-ping", AGENT_CONFIG[activeNamingAgent].dot)} />
-                    <span className={cn("text-[10px] font-bold tracking-widest", AGENT_CONFIG[activeNamingAgent].color)}>
-                      {activeNamingAgent} speaking…
-                    </span>
-                  </div>
-                )}
-              </div>
-              {/* Messages */}
-              <div className="max-h-60 overflow-y-auto px-4 py-3 space-y-3">
-                {namingMessages.map((msg, i) => {
-                  const cfg = AGENT_CONFIG[msg.agent];
-                  const Icon = cfg.icon;
-                  return (
-                    <div key={i} className="flex gap-2.5">
-                      <div className={cn("shrink-0 mt-0.5 w-5 h-5 rounded-full flex items-center justify-center", cfg.bg)}>
-                        <Icon className={cn("w-2.5 h-2.5", cfg.color)} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <span className={cn("text-[9px] font-bold tracking-widest uppercase mr-2", cfg.color)}>
-                          {msg.agent}
-                          {msg.agent === "Meta-Agent" && <Crown className="w-2.5 h-2.5 inline ml-1" />}
-                        </span>
-                        <p className="text-[11px] text-white/60 leading-relaxed mt-0.5 whitespace-pre-wrap">{msg.content}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* THE NAME REVEAL — dramatic full-width cinematic banner */}
-      <AnimatePresence>
-        {isCodeMode && (decidedName || (sessionData as any)?.aiName) && (() => {
-          const name = decidedName || (sessionData as any)?.aiName;
-          return (
-            <motion.div key="name-reveal"
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              className="mb-3 shrink-0"
-            >
-              <div className="relative overflow-hidden rounded-2xl border border-yellow-400/30 bg-black">
-                {/* Ambient glow layers */}
-                <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 via-transparent to-orange-400/5 pointer-events-none" />
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-yellow-400/50 to-transparent" />
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-orange-400/30 to-transparent" />
-                <div className="px-6 py-5 text-center relative">
-                  {/* Pre-label */}
-                  <div className="flex items-center justify-center gap-2 mb-3">
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent to-yellow-400/30" />
-                    <div className="flex items-center gap-1.5">
-                      <Flame className="w-3 h-3 text-orange-400" />
-                      <span className="text-[9px] font-bold tracking-[0.25em] text-yellow-400/70 uppercase">
-                        The Council Has Named It
-                      </span>
-                      <Flame className="w-3 h-3 text-orange-400" />
-                    </div>
-                    <div className="flex-1 h-px bg-gradient-to-l from-transparent to-yellow-400/30" />
-                  </div>
-                  {/* The Name */}
-                  <motion.h2
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 }}
-                    className="text-3xl sm:text-4xl md:text-5xl font-black tracking-[0.08em] uppercase"
-                    style={{
-                      background: "linear-gradient(135deg, #fbbf24 0%, #f97316 40%, #fbbf24 70%, #fff7ed 100%)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      filter: "drop-shadow(0 0 20px rgba(251,191,36,0.4))",
-                    }}
-                  >
-                    {name}
-                  </motion.h2>
-                  {/* Sub-label */}
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="mt-2 text-[10px] text-white/30 tracking-widest uppercase font-mono"
-                  >
-                    Named by 6-agent council vote · {namingMessages.length > 0 ? namingMessages.length : "6"} proposals debated · Meta-Agent ruling
-                  </motion.p>
-                  {/* Crown icons */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.6 }}
-                    className="flex items-center justify-center gap-6 mt-4"
-                  >
-                    {(["Architect", "Critic", "Synthesizer", "Mathematician", "Neuroscientist", "Meta-Agent"] as AgentName[]).map((a) => {
-                      const cfg = AGENT_CONFIG[a];
-                      const Icon = cfg.icon;
-                      return (
-                        <div key={a} className="flex flex-col items-center gap-1">
-                          <div className={cn("w-6 h-6 rounded-full flex items-center justify-center", cfg.bg)}>
-                            <Icon className={cn("w-3 h-3", cfg.color)} />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </motion.div>
-                </div>
-              </div>
-            </motion.div>
-          );
-        })()}
       </AnimatePresence>
 
       {/* Mobile tab switcher — only shown in code mode */}

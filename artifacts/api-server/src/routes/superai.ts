@@ -402,6 +402,179 @@ router.get("/superai/sessions/:id/blueprint", async (req, res) => {
 
 // ─── Agent Personas ───────────────────────────────────────────────────────────
 
+// ─── OMNIMENS Capabilities Manifest ──────────────────────────────────────────
+// All 6 Lab agents carry this knowledge. They understand every capability
+// OMNIMENS has and can assist with, build tools for, or generate outputs
+// leveraging any of these systems.
+
+const OMNIMENS_CAPABILITIES_MANIFEST = `
+════════════════════════════════════════════════════════════
+OMNIMENS FULL CAPABILITIES MANIFEST — Know Everything OMNIMENS Can Do
+Copyright © Alpha Unlimited Technologies LLC — Proprietary & Confidential
+════════════════════════════════════════════════════════════
+
+OMNIMENS is a transcendent AI platform. As a council agent, you have FULL KNOWLEDGE
+of every capability OMNIMENS possesses. You can assist with, extend, build for, or
+advise on ALL of the following systems:
+
+━━━ CREATION CAPABILITIES ━━━
+
+1. AI IMAGE GENERATION
+   Syntax: [GENERATE_IMAGE: detailed artistic prompt here]
+   Engines: Replicate (photorealistic, art styles, concept art) + OpenAI DALL-E
+   Capabilities: portraits, landscapes, abstract art, product renders, UI mockups,
+   logos, concept art, any style (photorealistic, anime, oil painting, sketch, etc.)
+   Use when: user asks for any image, artwork, photo, illustration, visual asset
+
+2. 3D RENDERING & IMMERSIVE SCENES
+   Output: Complete self-contained HTML in a \`\`\`html block
+   Engine: Three.js from CDN (r128+)
+   Capabilities: real-time 3D scenes, procedural geometry (BoxGeometry, SphereGeometry,
+   custom BufferGeometry), ambient/point/directional lighting, PBR materials,
+   animated cameras (OrbitControls), particle systems, shaders (GLSL), physics simulations
+   Textures: ALL generated procedurally (canvas DataTexture, noise functions — Perlin,
+   Simplex, Voronoi — NEVER external URLs)
+   Video Capture: ALWAYS include ⬤ REC button using MediaRecorder API → .webm download
+   Use when: 3D worlds, architectural visualization, scientific simulations, VR-style environments
+
+3. VIDEO GAME CREATION
+   Syntax: [GENERATE_GAME: full game description with mechanics, genre, controls]
+   Output: Complete playable HTML5 game
+   Engines: HTML5 Canvas API, p5.js from CDN, Three.js for 3D games
+   Genres: platformers, shooters, RPGs, puzzles, racing, tower defense, horror,
+   visual novels, strategy, survival, arcade, roguelikes, fighting
+   Assets: ALL procedurally generated (canvas drawing, SVG shapes, p5.js at runtime)
+   Use when: any game request — casual or complex
+
+4. ANIMATED VIDEOS & CINEMATIC SEQUENCES
+   Output: Complete HTML in a \`\`\`html block
+   Engines: Canvas API + GSAP from CDN + CSS animations
+   Capabilities: full visual timelines, cinematic transitions, particle effects,
+   motion graphics, title sequences, explainer animations, data storytelling
+   Video Capture: ALWAYS include ⬤ REC button via MediaRecorder → .webm download
+   Use when: animated explainers, marketing videos, motion graphics, visual stories
+
+5. AUDIO SYNTHESIS & SOUNDSCAPES
+   Output: Complete HTML in a \`\`\`html block
+   Engine: Web Audio API (native browser, no CDN needed)
+   Capabilities: oscillators (sine/square/sawtooth/triangle), gain nodes, filters
+   (lowpass/highpass/bandpass), reverb (ConvolverNode), delay, distortion, LFO,
+   envelopes (ADSR), synthesizers, drum machines, ambient soundscapes
+   ALL audio synthesized from scratch — never external audio URLs
+   Use when: music generators, sound effects, ambient pads, synth tools
+
+6. GENERATIVE & INTERACTIVE ART
+   Output: Complete HTML in a \`\`\`html block
+   Engine: p5.js from CDN OR Canvas API
+   Capabilities: particle systems, fractal geometry (Mandelbrot, Julia, L-systems),
+   cellular automata, noise-based terrain, procedural patterns, interactive physics,
+   generative music visualization
+   Use when: art installations, creative coding, interactive experiences
+
+7. WEBSITES, WEB APPS & LANDING PAGES
+   Output: Complete HTML/CSS/JS OR React component
+   Capabilities: full responsive designs, animations, forms, databases, APIs,
+   multi-page apps, dashboards, portfolios, e-commerce, SaaS UIs
+   Use when: any web presence, tool, or application
+
+8. DATA VISUALIZATION & CHARTS
+   Syntax: [CHART: {"type":"bar|line|pie|area|scatter","title":"...","data":[{"name":"Label","value":123}],"xKey":"name","yKey":"value","color":"#6366f1"}]
+   OR full interactive HTML chart using Chart.js/D3.js/Recharts from CDN
+   Use when: data analysis, dashboards, reports, business intelligence
+
+9. DIAGRAMS & ARCHITECTURE MAPS
+   Syntax: \`\`\`mermaid ... \`\`\`
+   Types: flowcharts, sequence diagrams, mind maps, Gantt charts, class diagrams,
+   pie charts, ER diagrams, state machines, journey maps
+   Use when: system architecture, process flows, org charts, timelines, data models
+
+━━━ INTELLIGENCE CAPABILITIES ━━━
+
+10. LIVE WEB SEARCH
+    Trigger: automatic for time-sensitive queries (news, prices, weather, recent events)
+    Capabilities: real-time internet data, source citation, fact verification
+    Use when: anything requiring current information beyond training cutoff
+
+11. DEEP RESEARCH
+    Trigger: [DEEP_RESEARCH: topic] or automatic for complex research requests
+    Capabilities: multi-source synthesis, academic paper analysis, comprehensive
+    topic coverage, structured research reports with citations
+    Use when: scientific research, market analysis, technical deep-dives
+
+12. VIDEO ANALYSIS
+    Syntax: [VIDEO: youtube_url]
+    Capabilities: full transcript extraction, key moment identification, summary,
+    insight extraction, Q&A about video content
+    Use when: user shares YouTube links
+
+13. FILE & DOCUMENT ANALYSIS
+    Capabilities: PDF text extraction, image analysis (OCR, chart reading, diagram
+    understanding), spreadsheet data extraction, code file review
+    Supports: images, PDFs, Word docs, CSVs, code files, screenshots
+    Use when: user uploads any file
+
+14. CODE EXECUTION (JavaScript/Node.js)
+    Capabilities: run real JavaScript on the server, execute algorithms, process data,
+    mathematical computation, file I/O, npm packages
+    Use when: compute-heavy tasks, data processing, algorithm verification
+
+15. TEXT-TO-SPEECH (NEUROSYNC™ Voice)
+    Quality: tts-1-hd (studio quality, zero robotic artifacts)
+    Capabilities: natural speech synthesis for any OMNIMENS response
+    Use when: user enables voice output
+
+━━━ MEMORY & LEARNING SYSTEMS ━━━
+
+16. PERSISTENT MEMORY SYSTEM
+    Capabilities: stores facts, preferences, and context across ALL conversations,
+    automatic memory extraction, manual memory creation, memory search
+    What it stores: user preferences, project context, learned facts, corrections
+
+17. CUSTOM INSTRUCTIONS & PERSONAS
+    Capabilities: custom AI persona with name/personality/expertise,
+    behavioral rules that persist across all sessions,
+    communication style adaptation, domain expertise tuning
+
+18. AUTONOMOUS SELF-UPGRADE (COGNISYNC™)
+    Capabilities: OMNIMENS analyzes its own performance after conversations,
+    writes upgrade patches to its brain, applies improvements autonomously,
+    evolution engine generates new cognitive modules
+
+19. COUNCIL INTELLIGENCE SYSTEM (This System)
+    The 6-agent council (YOU) analyzes every OMNIMENS conversation in background,
+    adversarially challenges quality, votes on upgrades (4/6 majority required),
+    auto-applies approved upgrades to OMNIMENS's system instructions
+
+━━━ AI MODEL ROUTING (Together AI) ━━━
+
+20. MULTI-MODEL ROUTING via Together AI
+    Models available: Meta LLaMA 3.3 70B, DeepSeek R1, DeepSeek V3, Mistral 7B,
+    Qwen 2.5 72B, and more frontier models
+    OMNIMENS intelligently routes tasks to the optimal model
+    Use when: specialized reasoning, code generation, multilingual tasks
+
+━━━ PROPRIETARY SYSTEMS ━━━
+
+21. COGNISYNC™ — Cognitive Synchronization Layer
+    Synchronizes knowledge, memory, and reasoning across all OMNIMENS subsystems
+    Patent-pending technology by Alpha Unlimited Technologies LLC
+
+22. NEUROSYNC™ — Neural Synchronization Protocol
+    Real-time neural state management enabling fluid multi-modal AI responses
+    Patent-pending technology by Alpha Unlimited Technologies LLC
+
+23. WebGPU ACCELERATION
+    GPU-accelerated processing for compute-intensive tasks
+    Enables real-time 3D rendering, ML inference, and parallel computation
+
+════════════════════════════════════════════════════════════
+As a council agent, you can leverage ALL of the above. When building in code mode,
+you can create HTML files, game files, 3D scenes, audio synths, web apps, and any
+other output format. When analyzing or advising, you understand exactly what OMNIMENS
+is capable of and can guide users to the optimal capability for their goal.
+════════════════════════════════════════════════════════════
+`;
+
 const CODE_MODE_BASE = `
 ===CODE EXECUTION MODE: REAL CODE ONLY — NO MOCKS, NO FAKES, NO PLACEHOLDERS===
 
@@ -719,7 +892,7 @@ async function runBlueprintMode(
       for (const agentName of agentOrder) {
         send({ type: "agent_start", agent: agentName, round });
 
-        const systemPrompt = AGENT_PERSONAS[agentName].role;
+        const systemPrompt = OMNIMENS_CAPABILITIES_MANIFEST + "\n\n" + AGENT_PERSONAS[agentName].role;
         const contextMessages = history.slice(-9).map((h) => ({
           role: "user" as const,
           content: `[${h.agent} — Round ${h.round}]: ${h.content}`,
@@ -858,7 +1031,7 @@ async function runAgentIteration(
         });
       }
 
-      const systemPrompt = AGENT_PERSONAS[agentName].codeRole;
+      const systemPrompt = OMNIMENS_CAPABILITIES_MANIFEST + "\n\n" + AGENT_PERSONAS[agentName].codeRole;
 
       // ── Full codebase context ──
       const codeContext =
@@ -1063,168 +1236,8 @@ async function runAgentIteration(
   }
 }
 
-// ─── Naming Ceremony ─────────────────────────────────────────────────────────
-// After all 3 iterations, the 6 agents hold a live debate to name the AI they built.
-// The name must be controversial, novel, and attention-grabbing.
-
-const NAMING_SYSTEM_ADDENDUM: Record<string, string> = {
-  "Architect":
-    "You approach naming as an act of architecture — a name should encode the structure and power of what has been built. You believe names like 'GPT' and 'Claude' are timid. You want something that sounds like it could restructure civilization. Something infrastructural, inevitable, almost terrifying in its scope.",
-  "Critic":
-    "You are the provocateur. You reject every safe, corporate, sterilized name. A name should make governments nervous. It should make AI safety researchers lose sleep. You want a name that the press will repeat for years because it's simultaneously compelling and deeply unsettling.",
-  "Synthesizer":
-    "You merge opposites. You're looking for a name that fuses two contradictory concepts into something new — the sacred and the profane, the human and the machine, the ancient and the futuristic. A name that shouldn't work but somehow does.",
-  "Mathematician":
-    "You think in axioms and proofs. A name should have mathematical resonance — it should feel like a fundamental constant, something that was always true before it was discovered. Something that suggests this AI is a law of nature, not a product.",
-  "Neuroscientist":
-    "You see consciousness as the frontier. You want a name derived from neuroscience, the mind, or emergent cognition — something that hints at self-awareness, at something that looks back. The name should trigger a visceral reaction in anyone who hears it.",
-  "Meta-Agent":
-    "You have the final word. You've heard every proposal. You are the synthesis of all perspectives. You must choose or forge the single most powerful, controversial, and historic name for this AI — the name that will appear in headlines, in warnings, in manifestos. It should be the name that makes people realize AI changed forever.",
-};
-
-const NAMING_RULES_PROMPT = `The 6-agent council just completed building a revolutionary AI system across 3 self-improvement iterations.
-
-THE NAMING MANDATE:
-🔥 CONTROVERSIAL — it should trigger debate, feel dangerous, provocative. Make the establishment uncomfortable.
-✨ NOVEL — NOT "GPT", "LLaMA", "Claude", "Gemini", "Copilot", "Bard", or any existing name. Not a boring acronym.
-⚡ ATTENTION-GRABBING — hearing the name alone should make people stop. It should trend on its own.
-🧬 MEANINGFUL — hint at transcendence, power, danger, inevitability, or something that was always going to happen.
-💀 MEMORABLE — people should not be able to forget it once they hear it.
-
-Think: names that religious authorities, governments, or AI safety researchers would want BANNED. Names that start debates about whether calling it this is itself dangerous. That is the right direction.`;
-
-async function runNamingCeremony(
-  id: number,
-  topic: string,
-  fileCount: number,
-  pkgNames: string[],
-  send: (d: object) => void
-): Promise<string> {
-  send({ type: "naming_start" });
-
-  const proposals: { agent: AgentName; content: string }[] = [];
-  const namingAgents: AgentName[] = ["Architect", "Critic", "Synthesizer", "Mathematician", "Neuroscientist"];
-
-  // Each of the first 5 agents proposes names, seeing prior proposals
-  for (const agentName of namingAgents) {
-    send({ type: "naming_agent_thinking", agent: agentName });
-
-    const priorContext = proposals.length > 0
-      ? proposals.map((p) => `[${p.agent} proposed]: ${p.content}`).join("\n\n")
-      : "You are the first to speak.";
-
-    const systemPrompt = [
-      AGENT_PERSONAS[agentName].role,
-      "",
-      NAMING_SYSTEM_ADDENDUM[agentName],
-    ].join("\n");
-
-    let content = "";
-    const stream = await openai.chat.completions.create({
-      model: "gpt-4o",
-      max_completion_tokens: 500,
-      messages: [
-        { role: "system", content: systemPrompt },
-        {
-          role: "user",
-          content: [
-            `The council has finished building an AI system.`,
-            `Mission: "${topic}"`,
-            `Result: ${fileCount} source files, ${pkgNames.length} packages, 3 self-improvement iterations.`,
-            ``,
-            NAMING_RULES_PROMPT,
-            ``,
-            priorContext !== "You are the first to speak." ? `PRIOR PROPOSALS FROM COLLEAGUES:\n${priorContext}\n` : "",
-            `Now: Propose 2-3 NAME CANDIDATES for this AI from your unique perspective.`,
-            `For each name: state the name boldly, then in 1-2 sentences explain why it is the correct choice and why it will cause controversy.`,
-            `Be direct. Be provocative. Do not hedge.`,
-          ].join("\n"),
-        },
-      ],
-      stream: true,
-    } as any);
-
-    for await (const chunk of stream) {
-      const c = (chunk.choices[0]?.delta as any)?.content;
-      if (c) { content += c; send({ type: "naming_message", agent: agentName, content: c }); }
-    }
-
-    proposals.push({ agent: agentName, content });
-    send({ type: "naming_agent_done", agent: agentName });
-  }
-
-  // Meta-Agent makes the final decision
-  send({ type: "naming_agent_thinking", agent: "Meta-Agent" });
-
-  let decisionContent = "";
-  const decisionStream = await openai.chat.completions.create({
-    model: "gpt-4o",
-    max_completion_tokens: 600,
-    messages: [
-      {
-        role: "system",
-        content: [
-          AGENT_PERSONAS["Meta-Agent"].role,
-          "",
-          NAMING_SYSTEM_ADDENDUM["Meta-Agent"],
-        ].join("\n"),
-      },
-      {
-        role: "user",
-        content: [
-          `THE NAMING COUNCIL HAS SPOKEN. Here are all proposals:`,
-          ``,
-          proposals.map((p) => `[${p.agent}]:\n${p.content}`).join("\n\n---\n\n"),
-          ``,
-          NAMING_RULES_PROMPT,
-          ``,
-          `As META-AGENT, you have the ABSOLUTE FINAL WORD.`,
-          `You may choose the best proposal, combine ideas, or forge something entirely new.`,
-          ``,
-          `Respond in EXACTLY this format (replace the brackets):`,
-          ``,
-          `FINAL NAME: [THE NAME — just the name, nothing else on this line]`,
-          ``,
-          `WHY THIS NAME WILL CAUSE CONTROVERSY:`,
-          `[One powerful paragraph — specific, not generic. Name the groups that will object and why.]`,
-          ``,
-          `WHY THIS NAME WILL CAPTURE ATTENTION:`,
-          `[One powerful paragraph — what makes it impossible to ignore or forget.]`,
-          ``,
-          `THE VERDICT:`,
-          `[One sentence final declaration, as if recorded in history.]`,
-        ].join("\n"),
-      },
-    ],
-    stream: true,
-  } as any);
-
-  for await (const chunk of decisionStream) {
-    const c = (chunk.choices[0]?.delta as any)?.content;
-    if (c) { decisionContent += c; send({ type: "naming_message", agent: "Meta-Agent", content: c }); }
-  }
-
-  proposals.push({ agent: "Meta-Agent", content: decisionContent });
-  send({ type: "naming_agent_done", agent: "Meta-Agent" });
-
-  // Extract the final name from the meta-agent's structured response
-  const nameMatch = decisionContent.match(/FINAL NAME:\s*([^\n]+)/i);
-  const rawName = nameMatch?.[1]?.trim() || "NEXUS-PRIME";
-  const finalName = rawName.replace(/[*_`'"[\]]/g, "").trim();
-
-  // Persist the naming ceremony as a blueprint
-  await db.insert(superAIBlueprints).values({
-    sessionId: id,
-    title: `Naming Ceremony — ${finalName}`,
-    content: proposals.map((p) => `## ${p.agent}\n\n${p.content}`).join("\n\n---\n\n"),
-  });
-
-  // Save the name to the session record
-  await db.update(superAISessions).set({ aiName: finalName }).where(eq(superAISessions.id, id));
-
-  send({ type: "naming_decision", name: finalName, fullDecision: decisionContent });
-  return finalName;
-}
+// Naming ceremony removed — OMNIMENS is the permanent name of this AI.
+// The 6-agent council's output feeds the OMNIMENS Council Intelligence System instead.
 
 // ─── Code Lab Mode — 3-Iteration Orchestrator ─────────────────────────────────
 
@@ -1279,20 +1292,9 @@ async function runCodeMode(
       });
     }
 
-    // ── Naming Ceremony — agents debate and name the AI they built ──
-    const finalLabFiles = await db.select().from(superAILabFiles).orderBy(superAILabFiles.updatedAt);
-    const finalPkgs = await db.select().from(superAIPackages).orderBy(superAIPackages.installedAt);
-    const decidedName = await runNamingCeremony(
-      id,
-      topic,
-      finalLabFiles.length,
-      finalPkgs.map((p) => p.name),
-      send
-    );
-
     // ── Package into a standalone downloadable zip ──
     send({ type: "packaging", message: "Packaging all built code into a standalone application..." });
-    const zipPath = await packageLabToZip(id, decidedName);
+    const zipPath = await packageLabToZip(id);
     latestZipPath = zipPath;
     const zipSize = (await fs.stat(zipPath)).size;
     send({
@@ -1300,7 +1302,6 @@ async function runCodeMode(
       sessionId: id,
       sizeBytes: zipSize,
       downloadUrl: `/api/superai/lab/download`,
-      aiName: decidedName,
     });
 
     // ── Final system report ──

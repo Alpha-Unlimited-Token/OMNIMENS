@@ -406,3 +406,35 @@ export const omnimensSavedPrompts = pgTable("godflesh_saved_prompts", {
 
 export type OmnimensHubSettings = typeof omnimensHubSettings.$inferSelect;
 export type OmnimensSavedPrompt = typeof omnimensSavedPrompts.$inferSelect;
+
+// ─── Council Intelligence System ─────────────────────────────────────────────
+// 6 Super AI Lab agents analyze every OMNIMENS conversation in the background,
+// challenge each other adversarially, and vote on autonomous upgrades.
+// OMNIMENS's name is PERMANENT — this system improves the AI, never renames it.
+
+export const omnimensCouncilAnalyses = pgTable("godflesh_council_analyses", {
+  id: serial("id").primaryKey(),
+  conversationId: text("conversation_id"),
+  userQuery: text("user_query").notNull(),
+  omnimensResponse: text("omnimens_response").notNull(),
+  status: text("status").default("pending").notNull(), // "pending"|"running"|"complete"|"failed"
+  consensus: text("consensus"),                        // Meta-Agent's final synthesis
+  upgradeApplied: boolean("upgrade_applied").default(false).notNull(),
+  upgradeContent: text("upgrade_content"),             // the patch written to OMNIMENS
+  agentVotes: integer("agent_votes").default(0).notNull(), // how many agents voted for upgrade
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+});
+
+export const omnimensCouncilVerdicts = pgTable("godflesh_council_verdicts", {
+  id: serial("id").primaryKey(),
+  analysisId: integer("analysis_id").notNull().references(() => omnimensCouncilAnalyses.id),
+  agentName: text("agent_name").notNull(),             // Architect|Critic|Synthesizer|Mathematician|Neuroscientist|Meta-Agent
+  findings: text("findings").notNull(),                // what this agent observed
+  upgradeProposal: text("upgrade_proposal"),           // optional upgrade text from this agent
+  voteForUpgrade: boolean("vote_for_upgrade").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type OmnimensCouncilAnalysis = typeof omnimensCouncilAnalyses.$inferSelect;
+export type OmnimensCouncilVerdict = typeof omnimensCouncilVerdicts.$inferSelect;

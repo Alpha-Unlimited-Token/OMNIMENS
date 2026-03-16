@@ -28,6 +28,7 @@ import { fetchUrlContent, extractUrls, formatUrlContent } from "../lib/omnimens-
 import { getOrCreateCustomInstructions, saveCustomInstructions, buildCustomInstructionsContext, PERSONAS } from "../lib/omnimens-custom-instructions.js";
 import { analyzeUserEmotionalState, buildEmotionalContext, loadLearningContext, runLearningCycle } from "../lib/omnimens-learning.js";
 import { loadGeneratedModulesContext, getConsciousnessState, getEvolutionHistory, getGeneratedModules, deactivateModule, runEvolutionCycle } from "../lib/omnimens-evolution.js";
+import { runCouncilAnalysis } from "./council.js";
 import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness, omnimensProjects, omnimensProjectFiles } from "@workspace/db";
 import {
   loadPhysioContext,
@@ -1820,6 +1821,15 @@ Example format: ["How does X relate to Y?", "Show me how to implement Z", "What 
     reflectOnConversation(message, fullText, `User: ${message.slice(0, 200)}`).catch(console.error);
     // Learning cycle: critic evaluates quality → learning element updates → memory stores insights
     runLearningCycle(req.user.id, message, fullText, taskAnalysis.taskType || "chat").catch(console.error);
+    // Council Intelligence System: 6 Lab agents analyze this conversation in background
+    // They challenge each other adversarially and vote on autonomous upgrades (4/6 required)
+    if (message && fullText && fullText.length > 50) {
+      runCouncilAnalysis({
+        conversationId: String(conversationId),
+        userQuery: message,
+        omnimensResponse: fullText,
+      }).catch((err) => console.error("[Council] Background analysis error:", err));
+    }
 
     // ── Persist conversation messages to DB ───────────────────────────────────
     const isFirstMessage = (conversationIdInput === undefined || conversationIdInput !== conversationId);

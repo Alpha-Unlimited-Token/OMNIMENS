@@ -1,98 +1,112 @@
 /**
  * @module inMemoryVectorStore
- * @description A utility module for fast semantic search and recall using in-memory vector embeddings.
- * Implements cosine similarity and k-nearest neighbors search for high-dimensional vectors.
+ * @description A module for storing and retrieving vector embeddings using cosine similarity for semantic search and context retention.
  */
 
 /**
- * Stores vectors and their associated metadata in memory.
- * @type {Map<string, {vector: number[], metadata: any}>}
+ * Stores vector embeddings in memory and provides functionality for similarity-based retrieval.
  */
-const vectorStore = new Map();
-
-/**
- * Adds a vector and its associated metadata to the in-memory store.
- * @param {string} id - Unique identifier for the vector.
- * @param {number[]} vector - High-dimensional vector to store.
- * @param {any} metadata - Metadata associated with the vector.
- * @throws {Error} If the vector is not an array of numbers.
- */
-export function addVector(id, vector, metadata = null) {
-  if (!Array.isArray(vector) || !vector.every((v) => typeof v === 'number')) {
-    throw new Error('Vector must be an array of numbers.');
+class InMemoryVectorStore {
+  constructor() {
+    /**
+     * @private
+     * @type {Array<{id: string, embedding: number[]}>}
+     * Array to store embeddings with unique IDs.
+     */
+    this.store = [];
   }
-  vectorStore.set(id, { vector, metadata });
+
+  /**
+   * Adds a new embedding to the store.
+   * @param {string} id - A unique identifier for the embedding.
+   * @param {number[]} embedding - The vector embedding to store.
+   * @throws {Error} If the embedding is not an array of numbers.
+   */
+  addEmbedding(id, embedding) {
+    if (!Array.isArray(embedding) || !embedding.every((val) => typeof val === 'number')) {
+      throw new Error('Embedding must be an array of numbers.');
+    }
+    this.store.push({ id, embedding });
+  }
+
+  /**
+   * Finds the most similar embeddings to a given query vector using cosine similarity.
+   * @param {number[]} query - The query vector.
+   * @param {number} topK - The number of top results to return.
+   * @returns {Array<{id: string, similarity: number}>} Sorted array of IDs and their similarity scores.
+   * @throws {Error} If the query is not an array of numbers.
+   */
+  search(query, topK = 5) {
+    if (!Array.isArray(query) || !query.every((val) => typeof val === 'number')) {
+      throw new Error('Query must be an array of numbers.');
+    }
+
+    // Normalize the query vector
+    const queryNorm = this.#vectorNorm(query);
+    if (queryNorm === 0) {
+      throw new Error('Query vector norm cannot be zero.');
+    }
+    const normalizedQuery = query.map((val) => val / queryNorm);
+
+    // Compute cosine similarity for each embedding in the store
+    const similarities = this.store.map(({ id, embedding }) => {
+      const embeddingNorm = this.#vectorNorm(embedding);
+      if (embeddingNorm === 0) {
+        return { id, similarity: 0 };
+      }
+      const normalizedEmbedding = embedding.map((val) => val / embeddingNorm);
+      const similarity = this.#cosineSimilarity(normalizedQuery, normalizedEmbedding);
+      return { id, similarity };
+    });
+
+    // Sort by similarity in descending order and return the top K results
+    return similarities
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, topK);
+  }
+
+  /**
+   * Computes the cosine similarity between two vectors.
+   * @private
+   * @param {number[]} vecA - The first vector.
+   * @param {number[]} vecB - The second vector.
+   * @returns {number} The cosine similarity between the two vectors.
+   */
+  #cosineSimilarity(vecA, vecB) {
+    const dotProduct = vecA.reduce((sum, val, index) => sum + val * vecB[index], 0);
+    return dotProduct;
+  }
+
+  /**
+   * Computes the Euclidean norm (magnitude) of a vector.
+   * @private
+   * @param {number[]} vector - The vector.
+   * @returns {number} The norm of the vector.
+   */
+  #vectorNorm(vector) {
+    return Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
+  }
 }
 
 /**
- * Computes the cosine similarity between two vectors.
- * @param {number[]} vectorA - First vector.
- * @param {number[]} vectorB - Second vector.
- * @returns {number} Cosine similarity value between -1 and 1.
- * @throws {Error} If vectors are not of the same length.
+ * Factory function to create a new instance of InMemoryVectorStore.
+ * @returns {InMemoryVectorStore} A new instance of the vector store.
  */
-export function cosineSimilarity(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
+export function createVectorStore() {
+  return new InMemoryVectorStore();
+}
+
+/**
+ * Utility function to compute cosine similarity between two vectors directly.
+ * @param {number[]} vecA - The first vector.
+ * @param {number[]} vecB - The second vector.
+ * @returns {number} The cosine similarity between the two vectors.
+ * @throws {Error} If the vectors are not of the same length or contain invalid data.
+ */
+export function computeCosineSimilarity(vecA, vecB) {
+  if (vecA.length !== vecB.length) {
     throw new Error('Vectors must be of the same length.');
   }
-
-  const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a ** 2, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b ** 2, 0));
-
-  return dotProduct / (magnitudeA * magnitudeB || 1); // Avoid division by zero
-}
-
-/**
- * Finds the k-nearest neighbors to a given query vector.
- * @param {number[]} queryVector - The query vector.
- * @param {number} k - Number of nearest neighbors to retrieve.
- * @returns {Array<{id: string, similarity: number, metadata: any}>} List of nearest neighbors sorted by similarity.
- */
-export function findKNearestNeighbors(queryVector, k) {
-  if (!Array.isArray(queryVector) || !queryVector.every((v) => typeof v === 'number')) {
-    throw new Error('Query vector must be an array of numbers.');
-  }
-
-  const similarities = Array.from(vectorStore.entries()).map(([id, { vector, metadata }]) => {
-    return { id, similarity: cosineSimilarity(queryVector, vector), metadata };
-  });
-
-  return similarities
-    .sort((a, b) => b.similarity - a.similarity) // Sort by descending similarity
-    .slice(0, k); // Return top-k results
-}
-
-/**
- * Clears all vectors from the in-memory store.
- */
-export function clearStore() {
-  vectorStore.clear();
-}
-
-/**
- * Retrieves all stored vectors and their metadata.
- * @returns {Array<{id: string, vector: number[], metadata: any}>} List of all stored vectors.
- */
-export function getAllVectors() {
-  return Array.from(vectorStore.entries()).map(([id, { vector, metadata }]) => ({ id, vector, metadata }));
-}
-
-/**
- * Removes a vector by its unique identifier.
- * @param {string} id - Unique identifier of the vector to remove.
- * @returns {boolean} True if the vector was removed, false if not found.
- */
-export function removeVector(id) {
-  return vectorStore.delete(id);
-}
-
-/**
- * Finds the most similar vector to a given query vector.
- * @param {number[]} queryVector - The query vector.
- * @returns {{id: string, similarity: number, metadata: any} | null} The most similar vector or null if store is empty.
- */
-export function findMostSimilar(queryVector) {
-  const neighbors = findKNearestNeighbors(queryVector, 1);
-  return neighbors.length > 0 ? neighbors[0] : null;
+  const store = new InMemoryVectorStore();
+  return store.#cosineSimilarity(vecA, vecB);
 }
