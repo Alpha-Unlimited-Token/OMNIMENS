@@ -349,3 +349,55 @@ export type OmnimensMemory = typeof omnimensMemories.$inferSelect;
 export type OmnimensCustomInstructions = typeof omnimensCustomInstructions.$inferSelect;
 export type OmnimensCodeRun = typeof omnimensCodeRuns.$inferSelect;
 export const insertOmnimensUserSchema = createInsertSchema(omnimensUsers);
+
+// ─── Control Hub Settings ─────────────────────────────────────────────────────
+// Per-user global settings for AI behavior, tools, interface
+export const omnimensHubSettings = pgTable("godflesh_hub_settings", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().unique().references(() => omnimensUsers.id),
+  // AI Core
+  creativity: real("creativity").default(0.7).notNull(),
+  responseLength: text("response_length").default("normal").notNull(),
+  formatPreference: text("format_preference").default("auto").notNull(),
+  responseLanguage: text("response_language").default("auto").notNull(),
+  focusMode: text("focus_mode").default("general").notNull(),
+  // Tool Toggles
+  webSearchEnabled: boolean("web_search_enabled").default(true).notNull(),
+  imageGenEnabled: boolean("image_gen_enabled").default(true).notNull(),
+  codeExecEnabled: boolean("code_exec_enabled").default(true).notNull(),
+  modelGenEnabled: boolean("model_gen_enabled").default(true).notNull(),
+  gameCreationEnabled: boolean("game_creation_enabled").default(true).notNull(),
+  memoryEnabled: boolean("memory_enabled").default(true).notNull(),
+  antiHallucinationMode: boolean("anti_hallucination_mode").default(false).notNull(),
+  debateMode: boolean("debate_mode").default(false).notNull(),
+  // Interface
+  fontSize: text("font_size").default("md").notNull(),
+  messageDensity: text("message_density").default("normal").notNull(),
+  showTimestamps: boolean("show_timestamps").default(false).notNull(),
+  showToolUsage: boolean("show_tool_usage").default(true).notNull(),
+  accentColor: text("accent_color").default("teal").notNull(),
+  autoScroll: boolean("auto_scroll").default(true).notNull(),
+  soundFx: boolean("sound_fx").default(false).notNull(),
+  // Workspaces (JSON map of workspace configs)
+  workspaces: jsonb("workspaces").$type<Record<string, any>>().default({}).notNull(),
+  activeWorkspace: text("active_workspace").default("general").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// ─── Saved Prompts / Prompt Library ──────────────────────────────────────────
+export const omnimensSavedPrompts = pgTable("godflesh_saved_prompts", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => omnimensUsers.id),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  category: text("category").notNull().default("general"),
+  tags: jsonb("tags").$type<string[]>().default([]).notNull(),
+  usageCount: integer("usage_count").default(0).notNull(),
+  isFavorite: boolean("is_favorite").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type OmnimensHubSettings = typeof omnimensHubSettings.$inferSelect;
+export type OmnimensSavedPrompt = typeof omnimensSavedPrompts.$inferSelect;

@@ -1,99 +1,81 @@
 /**
  * @module matrixOpsWasm
- * @description Perform efficient matrix operations using WebAssembly in Node.js.
- * This module implements basic linear algebra routines such as dot product and matrix multiplication.
+ * @description Perform high-dimensional matrix operations efficiently using WebAssembly.
  */
 
-// WebAssembly binary source for matrix operations
-const wasmCode = new Uint8Array([
-  0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x0d, 0x02, 0x60, 0x02, 0x7f, 0x7f,
-  0x01, 0x7f, 0x60, 0x03, 0x7f, 0x7f, 0x7f, 0x01, 0x7f, 0x03, 0x03, 0x02, 0x00, 0x01, 0x07,
-  0x13, 0x02, 0x03, 0x64, 0x6f, 0x74, 0x00, 0x00, 0x06, 0x6d, 0x75, 0x6c, 0x74, 0x69, 0x70,
-  0x6c, 0x79, 0x00, 0x01, 0x0a, 0x17, 0x02, 0x09, 0x00, 0x20, 0x00, 0x20, 0x01, 0x6c, 0x0b,
-  0x0e, 0x00, 0x20, 0x00, 0x20, 0x01, 0x20, 0x02, 0x6c, 0x20, 0x02, 0x6c, 0x0b
-]);
+const { readFileSync } = require('fs');
+const { join } = require('path');
 
 /**
- * Initialize WebAssembly module.
- * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WebAssembly instance.
+ * Loads and initializes the WebAssembly module for matrix operations.
+ * @returns {Promise<WebAssembly.Instance>} A promise resolving to the WebAssembly instance.
  */
 async function initializeWasm() {
-  const wasmModule = await WebAssembly.compile(wasmCode);
-  return WebAssembly.instantiate(wasmModule);
+  const wasmBuffer = readFileSync(join(__dirname, 'matrix_ops.wasm'));
+  const wasmModule = await WebAssembly.instantiate(wasmBuffer);
+  return wasmModule.instance;
 }
 
 /**
- * Compute the dot product of two vectors.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {Promise<number>} The dot product of the two vectors.
- * @throws {Error} If the vectors are not of the same length.
+ * Performs a matrix multiplication using WebAssembly.
+ * @param {Float32Array} matrixA - The first matrix (row-major order).
+ * @param {Float32Array} matrixB - The second matrix (row-major order).
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA (and rows in matrixB).
+ * @param {number} colsB - Number of columns in matrixB.
+ * @returns {Float32Array} The resulting matrix (row-major order).
+ * @throws {Error} If input dimensions are invalid.
  */
-export async function dotProduct(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error("Vectors must be of the same length.");
+async function multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB) {
+  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+    throw new Error('Invalid matrix dimensions.');
   }
 
   const wasmInstance = await initializeWasm();
-  const dot = wasmInstance.exports.dot;
+  const { memory, multiply_matrices } = wasmInstance.exports;
 
-  let result = 0;
-  for (let i = 0; i < vectorA.length; i++) {
-    result += dot(vectorA[i], vectorB[i]);
-  }
+  const memoryOffsetA = 0;
+  const memoryOffsetB = matrixA.length * 4; // 4 bytes per Float32
+  const memoryOffsetC = memoryOffsetB + matrixB.length * 4;
 
-  return result;
+  const wasmMemory = new Float32Array(memory.buffer);
+  wasmMemory.set(matrixA, memoryOffsetA / 4);
+  wasmMemory.set(matrixB, memoryOffsetB / 4);
+
+  multiply_matrices(memoryOffsetA, memoryOffsetB, memoryOffsetC, rowsA, colsA, colsB);
+
+  return new Float32Array(memory.buffer, memoryOffsetC, rowsA * colsB);
 }
 
 /**
- * Perform matrix multiplication.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {Promise<number[][]>} The resulting matrix after multiplication.
- * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
+ * Transposes a matrix using WebAssembly.
+ * @param {Float32Array} matrix - The input matrix (row-major order).
+ * @param {number} rows - Number of rows in the matrix.
+ * @param {number} cols - Number of columns in the matrix.
+ * @returns {Float32Array} The transposed matrix (row-major order).
+ * @throws {Error} If input dimensions are invalid.
  */
-export async function matrixMultiply(matrixA, matrixB) {
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
-
-  if (colsA !== rowsB) {
-    throw new Error("Matrix dimensions do not allow multiplication.");
+async function transposeMatrix(matrix, rows, cols) {
+  if (matrix.length !== rows * cols) {
+    throw new Error('Invalid matrix dimensions.');
   }
 
   const wasmInstance = await initializeWasm();
-  const multiply = wasmInstance.exports.multiply;
+  const { memory, transpose_matrix } = wasmInstance.exports;
 
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+  const memoryOffsetInput = 0;
+  const memoryOffsetOutput = matrix.length * 4; // 4 bytes per Float32
 
-  for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      for (let k = 0; k < colsA; k++) {
-        result[i][j] += multiply(matrixA[i][k], matrixB[k][j]);
-      }
-    }
-  }
+  const wasmMemory = new Float32Array(memory.buffer);
+  wasmMemory.set(matrix, memoryOffsetInput / 4);
 
-  return result;
+  transpose_matrix(memoryOffsetInput, memoryOffsetOutput, rows, cols);
+
+  return new Float32Array(memory.buffer, memoryOffsetOutput, rows * cols);
 }
 
-/**
- * Example usage.
- * Uncomment below to test the module.
- */
-// (async () => {
-//   const vectorA = [1, 2, 3];
-//   const vectorB = [4, 5, 6];
-//   console.log("Dot Product:", await dotProduct(vectorA, vectorB));
-
-//   const matrixA = [
-//     [1, 2],
-//     [3, 4]
-//   ];
-//   const matrixB = [
-//     [5, 6],
-//     [7, 8]
-//   ];
-//   console.log("Matrix Multiplication:", await matrixMultiply(matrixA, matrixB));
-// })();
+module.exports = {
+  initializeWasm,
+  multiplyMatrices,
+  transposeMatrix
+};

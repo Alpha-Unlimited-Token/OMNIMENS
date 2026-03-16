@@ -17,7 +17,8 @@ import {
   Cpu, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Image,
   FolderOpen, Activity, SlidersHorizontal, PanelLeftClose, PanelRightClose, PersonStanding,
   PanelLeft, PanelRight, X, Layers, Stethoscope, AlertTriangle, HeartPulse,
-  MessageSquare, PlusCircle, Trash2
+  MessageSquare, PlusCircle, Trash2, Settings, LayoutTemplate, Search,
+  ShieldCheck, Swords, Clock, ToggleLeft, ToggleRight
 } from "lucide-react";
 import { OmnimensIcon } from "@/components/omnimens-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
@@ -25,6 +26,8 @@ import { OmnimensNotificationBell } from "@/components/omnimens-notifications";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { motion, AnimatePresence } from "framer-motion";
+import { ControlHub, loadHubSettingsFromStorage, saveHubSettingsToStorage, type HubSettings } from "@/components/control-hub";
+import { SmartTemplates } from "@/components/smart-templates";
 
 // ── Small reusable badges ──────────────────────────────────────────────────────
 
@@ -1577,6 +1580,7 @@ function LeftPanel({
   deepResearchMode,
   onToggleDeepResearch,
   onOpenAvatarStudio,
+  onOpenHub,
   voice,
   status,
   conversations,
@@ -1584,12 +1588,15 @@ function LeftPanel({
   onNewChat,
   onLoadConversation,
   onDeleteConversation,
+  convSearch,
+  onConvSearchChange,
 }: {
   persona: string;
   onPersonaChange: (p: string) => void;
   deepResearchMode: boolean;
   onToggleDeepResearch: () => void;
   onOpenAvatarStudio: () => void;
+  onOpenHub: () => void;
   voice: any;
   status: any;
   conversations: { id: number; title: string | null; updatedAt: string | null }[];
@@ -1597,8 +1604,13 @@ function LeftPanel({
   onNewChat: () => void;
   onLoadConversation: (id: number) => void;
   onDeleteConversation: (id: number) => void;
+  convSearch: string;
+  onConvSearchChange: (s: string) => void;
 }) {
   const personas = Object.keys(PERSONA_NAMES);
+  const filteredConversations = conversations.filter(c =>
+    !convSearch || (c.title || "").toLowerCase().includes(convSearch.toLowerCase())
+  );
 
   return (
     <div className="flex flex-col h-full overflow-y-auto omnimens-scrollbar p-3 gap-3">
@@ -1623,8 +1635,18 @@ function LeftPanel({
         {conversations.length > 0 && (
           <div className="mt-2">
             <p className="font-mono text-[9px] tracking-[0.2em] text-white/75 uppercase mb-1 px-1">HISTORY</p>
-            <div className="space-y-0.5 max-h-48 overflow-y-auto omnimens-scrollbar">
-              {conversations.map(conv => (
+            {/* Search conversations */}
+            <div className="relative mb-1.5">
+              <Search className="w-2.5 h-2.5 absolute left-2 top-1/2 -translate-y-1/2 text-white/25" />
+              <input
+                value={convSearch}
+                onChange={e => onConvSearchChange(e.target.value)}
+                placeholder="Search chats..."
+                className="w-full bg-white/4 border border-white/8 rounded-md pl-6 pr-2 py-1 text-[9px] font-mono text-white/70 placeholder:text-white/20 outline-none focus:border-primary/20"
+              />
+            </div>
+            <div className="space-y-0.5 max-h-44 overflow-y-auto omnimens-scrollbar">
+              {filteredConversations.map(conv => (
                 <div
                   key={conv.id}
                   className={`group flex items-center gap-1.5 px-2 py-1.5 rounded-lg cursor-pointer transition-all ${
@@ -1645,6 +1667,9 @@ function LeftPanel({
                   </button>
                 </div>
               ))}
+              {filteredConversations.length === 0 && convSearch && (
+                <p className="text-[9px] font-mono text-white/25 text-center py-2">No matches</p>
+              )}
             </div>
           </div>
         )}
@@ -1737,6 +1762,14 @@ function LeftPanel({
         >
           <PersonStanding className="w-3.5 h-3.5" />
           AVATAR STUDIO
+        </button>
+
+        <button
+          onClick={onOpenHub}
+          className="w-full flex items-center gap-2 px-2.5 py-2 mt-1 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border border-primary/20 text-primary/80 hover:text-primary hover:bg-primary/10 hover:border-primary/30"
+        >
+          <Settings className="w-3.5 h-3.5" />
+          CONTROL HUB
         </button>
       </div>
     </div>
@@ -1938,6 +1971,10 @@ export default function Chat() {
   const lastSpokenIdRef = useRef<string | null>(null);
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
+  const [showControlHub, setShowControlHub] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
+  const [hubSettings, setHubSettings] = useState<HubSettings>(() => loadHubSettingsFromStorage());
+  const [convSearch, setConvSearch] = useState("");
 
   const { data: status, isLoading: statusLoading } = useGetOmnimensStatus();
   const qc = useQC();
@@ -1995,6 +2032,32 @@ export default function Chat() {
       .then(d => { if (d?.persona) setPersona(d.persona); })
       .catch(() => {});
   }, []);
+
+  // Load hub settings from API (merge with localStorage)
+  useEffect(() => {
+    fetch("/api/omnimens/hub-settings", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d) {
+          const merged = { ...hubSettings, ...d };
+          setHubSettings(merged);
+          saveHubSettingsToStorage(merged);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "/") { e.preventDefault(); setShowControlHub(c => !c); }
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") { e.preventDefault(); handleNewChat(); }
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "R") { e.preventDefault(); setDeepResearchMode(m => !m); }
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "V") { e.preventDefault(); voice.toggle(); }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [voice]);
 
   const handlePersonaChange = async (p: string) => {
     setPersona(p);
@@ -2081,7 +2144,7 @@ export default function Chat() {
       setShowLimitModal(true);
       return;
     }
-    sendMessage(input, pendingFiles, persona);
+    sendMessage(input, pendingFiles, persona, hubSettings);
     setInput("");
     setPendingFiles([]);
   };
@@ -2116,6 +2179,7 @@ export default function Chat() {
                 deepResearchMode={deepResearchMode}
                 onToggleDeepResearch={() => setDeepResearchMode(m => !m)}
                 onOpenAvatarStudio={() => setShowAvatarStudio(true)}
+                onOpenHub={() => setShowControlHub(true)}
                 voice={voice}
                 status={status}
                 conversations={conversations}
@@ -2123,6 +2187,8 @@ export default function Chat() {
                 onNewChat={handleNewChat}
                 onLoadConversation={handleLoadConversation}
                 onDeleteConversation={handleDeleteConversation}
+                convSearch={convSearch}
+                onConvSearchChange={setConvSearch}
               />
             </motion.div>
           )}
@@ -2146,18 +2212,43 @@ export default function Chat() {
             <div className="flex items-center gap-2 font-mono text-xs">
               <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
               <span className="text-white">LINK ACTIVE</span>
+              {/* Active hub modes indicators */}
+              {hubSettings.antiHallucinationMode && (
+                <span title="Anti-Hallucination Mode ON" className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-orange-400/10 border border-orange-400/20 text-orange-400 text-[9px] font-mono">
+                  <ShieldCheck className="w-2.5 h-2.5" /> VERIFIED
+                </span>
+              )}
+              {hubSettings.debateMode && (
+                <span title="Debate Mode ON" className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-violet-400/10 border border-violet-400/20 text-violet-400 text-[9px] font-mono">
+                  <Swords className="w-2.5 h-2.5" /> DEBATE
+                </span>
+              )}
+              {hubSettings.responseLanguage && hubSettings.responseLanguage !== "auto" && (
+                <span className="px-1.5 py-0.5 rounded bg-blue-400/10 border border-blue-400/20 text-blue-400 text-[9px] font-mono uppercase">
+                  {hubSettings.responseLanguage}
+                </span>
+              )}
               {status?.isOwner && <OmnimensNotificationBell />}
             </div>
 
             {/* Right controls */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               {statusLoading ? (
                 <span className="font-mono text-[10px] text-white/75">READING...</span>
               ) : status?.isOwner ? (
-                <span className="font-mono text-[10px] text-accent font-bold tracking-widest hidden sm:block">⚡ CREATOR — UNLIMITED</span>
+                <span className="font-mono text-[10px] text-accent font-bold tracking-widest hidden sm:block mr-1">⚡ CREATOR</span>
               ) : status?.isPro ? (
-                <span className="font-mono text-[10px] text-accent font-bold tracking-widest hidden sm:block">UNLIMITED</span>
+                <span className="font-mono text-[10px] text-accent font-bold tracking-widest hidden sm:block mr-1">UNLIMITED</span>
               ) : null}
+              {/* Control Hub button */}
+              <button
+                onClick={() => setShowControlHub(true)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-white/70 hover:text-primary hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 text-[9px] font-mono font-bold tracking-wider"
+                title="Control Hub (Ctrl+/)"
+              >
+                <Settings className="w-3.5 h-3.5" />
+                <span className="hidden sm:block">HUB</span>
+              </button>
               {/* Right panel toggle */}
               <button
                 onClick={() => setRightOpen(o => !o)}
@@ -2404,6 +2495,7 @@ export default function Chat() {
                 accept="image/*,.pdf,.txt,.md,.js,.ts,.jsx,.tsx,.py,.html,.css,.json,.csv,.xml,.yaml,.yml,.sh,.rb,.go,.rs,.java,.c,.cpp,.h,.sql"
                 onChange={handleFileChange} className="hidden"
               />
+              {/* Attach files */}
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
@@ -2425,10 +2517,19 @@ export default function Chat() {
                   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(e); }
                 }}
                 placeholder={pendingFiles.length > 0 ? "Describe what to create with these files..." : "Query the intelligence... or attach files to build something"}
-                className="w-full bg-black border border-white/15 focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-xl pl-10 pr-24 py-3.5 text-white font-mono text-sm resize-none h-[56px] omnimens-scrollbar outline-none transition-all placeholder:text-white/25"
+                className="w-full bg-black border border-white/15 focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-xl pl-10 pr-28 py-3.5 text-white font-mono text-sm resize-none h-[56px] omnimens-scrollbar outline-none transition-all placeholder:text-white/25"
                 disabled={isTyping}
               />
               <div className="absolute right-2 flex items-center gap-1">
+                {/* Templates picker */}
+                <button
+                  type="button"
+                  onClick={() => setShowTemplates(t => !t)}
+                  title="Smart Templates"
+                  className="text-white/40 hover:text-primary transition-colors w-7 h-7 flex items-center justify-center rounded"
+                >
+                  <LayoutTemplate className="w-3.5 h-3.5" />
+                </button>
                 {voice.isSpeaking && (
                   <Button type="button" onClick={voice.stop} size="icon" variant="ghost" title="Stop speaking" className="text-primary/70 hover:text-primary w-8 h-8">
                     <VolumeX className="w-4 h-4" />
@@ -2448,12 +2549,38 @@ export default function Chat() {
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-2 mt-1.5 px-1">
+            <div className="flex items-center justify-between mt-1.5 px-1">
               <span className="text-[9px] font-mono text-white/70">
                 {PERSONA_NAMES[persona]} · URLS AUTO-ANALYZED · MEMORY ACTIVE
               </span>
+              <div className="flex items-center gap-2">
+                {hubSettings.antiHallucinationMode && (
+                  <span className="flex items-center gap-0.5 text-[8px] font-mono text-orange-400/70">
+                    <ShieldCheck className="w-2.5 h-2.5" /> VERIFIED
+                  </span>
+                )}
+                {hubSettings.debateMode && (
+                  <span className="flex items-center gap-0.5 text-[8px] font-mono text-violet-400/70">
+                    <Swords className="w-2.5 h-2.5" /> DEBATE
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setShowControlHub(true)}
+                  className="text-[8px] font-mono text-white/25 hover:text-primary/60 transition-colors flex items-center gap-0.5"
+                >
+                  <Settings className="w-2.5 h-2.5" /> HUB
+                </button>
+              </div>
             </div>
           </form>
+
+          {/* Smart Templates overlay */}
+          <SmartTemplates
+            open={showTemplates}
+            onClose={() => setShowTemplates(false)}
+            onUseTemplate={(t) => { setInput(t); setShowTemplates(false); }}
+          />
         </div>
 
         {/* ── RIGHT PANEL ─────────────────────────────────────────── */}
@@ -2509,6 +2636,24 @@ export default function Chat() {
               sandbox="allow-scripts allow-same-origin allow-forms allow-downloads"
             />
           </motion.div>
+        )}
+
+        {/* ── Control Hub Modal ── */}
+        {showControlHub && (
+          <ControlHub
+            settings={hubSettings}
+            onChange={(s) => {
+              setHubSettings(s);
+              saveHubSettingsToStorage(s);
+              fetch("/api/omnimens/hub-settings", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify(s),
+              }).catch(() => {});
+            }}
+            onClose={() => setShowControlHub(false)}
+          />
         )}
 
         {showLimitModal && (

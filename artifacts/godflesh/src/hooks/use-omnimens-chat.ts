@@ -129,7 +129,7 @@ export function useOmnimensChat(onLimitReached: () => void) {
     setMessages(mapped);
   };
 
-  const sendMessage = async (content: string, files: File[] = [], persona = "GENERAL") => {
+  const sendMessage = async (content: string, files: File[] = [], persona = "GENERAL", hubSettings?: any) => {
     if (!content.trim() && files.length === 0) return;
     if (isTyping) return;
 
@@ -171,6 +171,9 @@ export function useOmnimensChat(onLimitReached: () => void) {
       form.append("persona", persona);
       if (currentConversationId !== undefined) {
         form.append("conversationId", String(currentConversationId));
+      }
+      if (hubSettings) {
+        form.append("hubSettings", JSON.stringify(hubSettings));
       }
       for (const file of files) {
         form.append("files", file);

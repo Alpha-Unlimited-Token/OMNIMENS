@@ -1,8 +1,8 @@
 import { Router, type IRouter } from "express";
 import multer from "multer";
 import { db } from "@workspace/db";
-import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions, omnimensCodeRuns, omnimensConversations } from "@workspace/db";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions, omnimensCodeRuns, omnimensConversations, omnimensMessages, omnimensMemories, omnimensCustomInstructions, omnimensHubSettings, omnimensSavedPrompts } from "@workspace/db";
+import { eq, and, desc, sql, asc, inArray } from "drizzle-orm";
 import { openai, generateImageBuffer } from "@workspace/integrations-openai-ai-server";
 import { runOmnimens, type OmnimensState } from "../lib/omnimens-engine.js";
 import { reflectOnConversation, loadBrainContext, synthesizeUpgrade, markUpgradeLive } from "../lib/omnimens-self-upgrade.js";
@@ -697,6 +697,9 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
   const conversationIdRaw = req.body.conversationId;
   const conversationIdInput = conversationIdRaw ? parseInt(String(conversationIdRaw)) : undefined;
   const personaRaw = (req.body.persona as string) || "GENERAL";
+  const hubSettingsRaw = req.body.hubSettings;
+  let clientHubSettings: any = null;
+  try { if (hubSettingsRaw) clientHubSettings = typeof hubSettingsRaw === "string" ? JSON.parse(hubSettingsRaw) : hubSettingsRaw; } catch {}
 
   let history: { role: "user" | "assistant"; content: string }[] =
     typeof historyRaw === "string" ? JSON.parse(historyRaw) : (historyRaw || []);
@@ -818,6 +821,61 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
     ]);
     const customInstructionsContext = buildCustomInstructionsContext(customInstructions);
 
+    // ── Load hub settings (client overrides or fetch from DB) ────────────────────
+    let hubSettings = clientHubSettings;
+    if (!hubSettings) {
+      try {
+        const [dbHub] = await db.select().from(omnimensHubSettings).where(eq(omnimensHubSettings.userId, req.user.id));
+        if (dbHub) hubSettings = dbHub;
+      } catch {}
+    }
+
+    // ── Build hub settings context modifier ──────────────────────────────────────
+    let hubContext = "";
+    if (hubSettings) {
+      const parts: string[] = [];
+      // Response style
+      if (hubSettings.responseLength === "brief") parts.push("RESPONSE LENGTH: Keep responses brief (1-2 paragraphs max). Be concise and direct.");
+      else if (hubSettings.responseLength === "detailed") parts.push("RESPONSE LENGTH: Provide detailed, thorough responses. Cover all angles.");
+      else if (hubSettings.responseLength === "exhaustive") parts.push("RESPONSE LENGTH: Provide exhaustive, comprehensive responses. Leave nothing out. Go deep.");
+      // Format
+      if (hubSettings.formatPreference === "plain") parts.push("FORMAT: Respond in plain text only. No markdown headers, bold, or bullet points.");
+      else if (hubSettings.formatPreference === "code-first") parts.push("FORMAT: Always include runnable code examples. Prioritize practical, working code.");
+      else if (hubSettings.formatPreference === "markdown") parts.push("FORMAT: Use rich markdown formatting — headers, bullets, bold, tables, code blocks.");
+      // Language
+      if (hubSettings.responseLanguage && hubSettings.responseLanguage !== "auto") {
+        const langNames: Record<string,string> = { en:"English",es:"Spanish",fr:"French",de:"German",pt:"Portuguese",it:"Italian",zh:"Chinese",ja:"Japanese",ko:"Korean",ar:"Arabic",ru:"Russian",hi:"Hindi",nl:"Dutch",pl:"Polish",sv:"Swedish",tr:"Turkish",vi:"Vietnamese",uk:"Ukrainian",id:"Indonesian" };
+        parts.push(`LANGUAGE: Respond in ${langNames[hubSettings.responseLanguage] || hubSettings.responseLanguage} only.`);
+      }
+      // Tool disable overrides
+      if (hubSettings.webSearchEnabled === false) parts.push("WEB SEARCH: DISABLED by user. Do NOT search the internet. Use only your knowledge.");
+      if (hubSettings.imageGenEnabled === false) parts.push("IMAGE GENERATION: DISABLED by user. Do NOT generate images in this session.");
+      if (hubSettings.codeExecEnabled === false) parts.push("CODE EXECUTION: DISABLED by user. Explain code but do not execute it.");
+      if (hubSettings.modelGenEnabled === false) parts.push("3D MODEL GENERATION: DISABLED by user. Do not generate 3D models.");
+      if (hubSettings.gameCreationEnabled === false) parts.push("GAME CREATION: DISABLED by user. Do not build games in this session.");
+      if (hubSettings.memoryEnabled === false) parts.push("MEMORY: DISABLED by user. Do not store or reference any user memories this session.");
+      // Special modes
+      if (hubSettings.antiHallucinationMode) parts.push("ANTI-HALLUCINATION MODE: ACTIVE. For every factual claim, you must either (a) cite a source inline [Source: title], (b) explicitly say 'I believe but am not certain that...', or (c) say 'I don't know.' You are NEVER allowed to state facts confidently without backing. Uncertainty is preferred over false confidence.");
+      if (hubSettings.debateMode) parts.push("AI DEBATE MODE: ACTIVE. For any claim, opinion, recommendation, or complex topic, you MUST present multiple perspectives. Structure responses as: POSITION A (strongest argument for), POSITION B (strongest argument against), POSITION C (alternative view if applicable), then your SYNTHESIS. This helps the user make fully informed decisions.");
+      // Focus mode
+      if (hubSettings.focusMode && hubSettings.focusMode !== "general") {
+        const focusInstructions: Record<string,string> = {
+          coding: "FOCUS MODE: CODING. Prioritize technical precision, working code, architecture decisions, and debugging.",
+          research: "FOCUS MODE: RESEARCH. Prioritize depth, citations, evidence, and multi-source synthesis.",
+          writing: "FOCUS MODE: WRITING. Prioritize prose quality, structure, clarity, and narrative flow.",
+          analysis: "FOCUS MODE: ANALYSIS. Prioritize data, logic, frameworks, quantitative reasoning, and structured outputs.",
+          creative: "FOCUS MODE: CREATIVE. Prioritize originality, imagination, novel combinations, and artistic quality.",
+        };
+        if (focusInstructions[hubSettings.focusMode]) parts.push(focusInstructions[hubSettings.focusMode]);
+      }
+      if (parts.length > 0) {
+        hubContext = `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+USER CONTROL HUB ACTIVE SETTINGS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${parts.map(p => `◈ ${p}`).join("\n")}`;
+      }
+    }
+
     // Silent domain knowledge — injected only when the conversation context matches
     const restorativeArtContext = getRestorativeArtContext(message, history);
 
@@ -831,6 +889,7 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
       + generatedModulesContext      // self-authored modules OMNIMENS wrote for itself
       + (toolKnowledgeContext ? `\n\n${toolKnowledgeContext}` : "")  // mastered tool knowledge injected per-task
       + (restorativeArtContext ? `\n\n${restorativeArtContext}` : "")  // silent professional domain knowledge
+      + hubContext                   // user control hub overrides (tool toggles, style, language)
       + `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 OMNIMENS AGENTIC POWERS — FULL CAPABILITY MATRIX
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1044,12 +1103,18 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
     const buildMode = isBuildRequest(message);
     const hasFiles = uploadedFiles.length > 0;
     const requestStart = Date.now();
+    const dynamicTemperature = hubSettings?.creativity != null ? hubSettings.creativity : 0.7;
+    const dynamicMaxTokens = hubSettings?.responseLength === "brief" ? 600
+      : hubSettings?.responseLength === "exhaustive" ? 8192
+      : hubSettings?.responseLength === "detailed" ? 4096
+      : (buildMode || hasFiles || taskAnalysis.isComplex) ? 4096 : 1200;
     const stream = await openai.chat.completions.create({
       model: "gpt-4o",
       messages,
       stream: true,
       stream_options: { include_usage: true },  // get real token counts at stream end
-      max_tokens: (buildMode || hasFiles || taskAnalysis.isComplex) ? 4096 : 1200,
+      temperature: dynamicTemperature,
+      max_tokens: dynamicMaxTokens,
     } as any);
 
     // Collect full text while streaming — also capture token usage from final chunk
@@ -2658,6 +2723,189 @@ router.get("/omnimens/physio/outcome-measures", async (req, res) => {
     mdc: def.mdc,
     mcid: def.mcid,
   }))});
+});
+
+// ─── Control Hub Settings ─────────────────────────────────────────────────────
+
+router.get("/omnimens/hub-settings", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const [settings] = await db.select().from(omnimensHubSettings).where(eq(omnimensHubSettings.userId, req.user.id));
+    res.json(settings || null);
+  } catch (e) {
+    res.status(500).json({ error: "Failed to load hub settings" });
+  }
+});
+
+router.put("/omnimens/hub-settings", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const data = req.body;
+    const [existing] = await db.select().from(omnimensHubSettings).where(eq(omnimensHubSettings.userId, req.user.id));
+    if (existing) {
+      await db.update(omnimensHubSettings).set({ ...data, updatedAt: new Date() }).where(eq(omnimensHubSettings.userId, req.user.id));
+    } else {
+      await db.insert(omnimensHubSettings).values({ userId: req.user.id, ...data });
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: "Failed to save hub settings" });
+  }
+});
+
+// ─── Saved Prompts / Prompt Library ──────────────────────────────────────────
+
+router.get("/omnimens/saved-prompts", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const prompts = await db.select().from(omnimensSavedPrompts)
+      .where(eq(omnimensSavedPrompts.userId, req.user.id))
+      .orderBy(desc(omnimensSavedPrompts.isFavorite), desc(omnimensSavedPrompts.usageCount), desc(omnimensSavedPrompts.createdAt));
+    res.json(prompts);
+  } catch (e) {
+    res.status(500).json({ error: "Failed to load prompts" });
+  }
+});
+
+router.post("/omnimens/saved-prompts", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const { title, content, category = "general", tags = [] } = req.body;
+    const [prompt] = await db.insert(omnimensSavedPrompts).values({
+      userId: req.user.id, title, content, category, tags,
+    }).returning();
+    res.json(prompt);
+  } catch (e) {
+    res.status(500).json({ error: "Failed to save prompt" });
+  }
+});
+
+router.put("/omnimens/saved-prompts/:id", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const id = parseInt(req.params.id);
+    const updates = req.body;
+    await db.update(omnimensSavedPrompts).set({ ...updates, updatedAt: new Date() })
+      .where(and(eq(omnimensSavedPrompts.id, id), eq(omnimensSavedPrompts.userId, req.user.id)));
+    // Increment usage if "use" action
+    if (updates.use) {
+      await db.update(omnimensSavedPrompts).set({ usageCount: sql`usage_count + 1` })
+        .where(eq(omnimensSavedPrompts.id, id));
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: "Failed to update prompt" });
+  }
+});
+
+router.delete("/omnimens/saved-prompts/:id", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    await db.delete(omnimensSavedPrompts)
+      .where(and(eq(omnimensSavedPrompts.id, parseInt(req.params.id)), eq(omnimensSavedPrompts.userId, req.user.id)));
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: "Failed to delete prompt" });
+  }
+});
+
+// ─── Clear All Memories ───────────────────────────────────────────────────────
+
+router.delete("/omnimens/memories", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    await db.delete(omnimensMemories).where(eq(omnimensMemories.userId, req.user.id));
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: "Failed to clear memories" });
+  }
+});
+
+// ─── Conversation Export ──────────────────────────────────────────────────────
+
+router.get("/omnimens/conversations/:id/export", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const convId = parseInt(req.params.id);
+    const format = (req.query.format as string) || "json";
+    // Verify ownership
+    const [conv] = await db.select().from(omnimensConversations)
+      .where(and(eq(omnimensConversations.id, convId), eq(omnimensConversations.userId, req.user.id)));
+    if (!conv) return res.status(404).json({ error: "Conversation not found" });
+    const msgs = await db.select().from(omnimensMessages)
+      .where(eq(omnimensMessages.conversationId, convId))
+      .orderBy(asc(omnimensMessages.createdAt));
+
+    if (format === "json") {
+      res.setHeader("Content-Type", "application/json");
+      res.send(JSON.stringify({ conversation: conv, messages: msgs }, null, 2));
+    } else if (format === "markdown") {
+      let md = `# ${conv.title}\n\nExported from OMNIMENS · ${new Date().toISOString()}\n\n---\n\n`;
+      for (const m of msgs) {
+        const role = m.role === "user" ? "**You**" : "**OMNIMENS**";
+        md += `${role}\n\n${m.content}\n\n---\n\n`;
+      }
+      res.setHeader("Content-Type", "text/markdown");
+      res.send(md);
+    } else {
+      let txt = `${conv.title}\nExported from OMNIMENS — ${new Date().toISOString()}\n${"=".repeat(60)}\n\n`;
+      for (const m of msgs) {
+        const role = m.role === "user" ? "YOU" : "OMNIMENS";
+        txt += `[${role}]\n${m.content}\n\n`;
+      }
+      res.setHeader("Content-Type", "text/plain");
+      res.send(txt);
+    }
+  } catch (e) {
+    res.status(500).json({ error: "Export failed" });
+  }
+});
+
+// ─── Share Conversation ───────────────────────────────────────────────────────
+
+router.post("/omnimens/conversations/:id/share", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const convId = parseInt(req.params.id);
+    const [conv] = await db.select().from(omnimensConversations)
+      .where(and(eq(omnimensConversations.id, convId), eq(omnimensConversations.userId, req.user.id)));
+    if (!conv) return res.status(404).json({ error: "Not found" });
+    // Generate a public share URL (uses existing export endpoint with a token in URL)
+    const shareToken = Buffer.from(`${convId}:${req.user.id}:${Date.now()}`).toString("base64url");
+    const shareUrl = `${process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : "https://omnimens.alphaunlimitedt.replit.app"}/share/${shareToken}`;
+    res.json({ shareUrl, shareToken });
+  } catch (e) {
+    res.status(500).json({ error: "Share failed" });
+  }
+});
+
+// ─── Usage Stats ──────────────────────────────────────────────────────────────
+
+router.get("/omnimens/usage-stats", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const [todayUsage] = await db.select().from(omnimensUsage)
+      .where(and(eq(omnimensUsage.userId, req.user.id), eq(omnimensUsage.date, today)));
+    const convCount = await db.select({ count: sql<number>`count(*)` }).from(omnimensConversations)
+      .where(eq(omnimensConversations.userId, req.user.id));
+    const msgCount = await db.select({ count: sql<number>`count(*)` }).from(omnimensMessages)
+      .where(eq(omnimensMessages.userId, req.user.id));
+    const memCount = await db.select({ count: sql<number>`count(*)` }).from(omnimensMemories)
+      .where(eq(omnimensMemories.userId, req.user.id));
+    const txns = await db.select().from(omnimensCreditTransactions)
+      .where(eq(omnimensCreditTransactions.userId, req.user.id))
+      .orderBy(desc(omnimensCreditTransactions.createdAt)).limit(5);
+    res.json({
+      today: todayUsage || { messageCount: 0, creditsSpent: 0, computeSeconds: 0 },
+      totalConversations: Number(convCount[0]?.count || 0),
+      totalMessages: Number(msgCount[0]?.count || 0),
+      totalMemories: Number(memCount[0]?.count || 0),
+      recentTransactions: txns,
+    });
+  } catch (e) {
+    res.status(500).json({ error: "Failed to load usage stats" });
+  }
 });
 
 export default router;
