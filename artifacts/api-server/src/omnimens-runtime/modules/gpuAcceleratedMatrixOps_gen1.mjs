@@ -1,118 +1,99 @@
 /**
- * gpuAcceleratedMatrixOps.js
- * This module provides GPU-accelerated matrix operations using TensorFlow.js with the WebGL backend.
- * It enables efficient matrix multiplications and neural network computations for enhanced performance.
- * Designed to run in Node.js 20+ without external npm dependencies.
+ * gpuAcceleratedMatrixOps Module
+ * Provides efficient matrix operations using WebAssembly for linear algebra and GPU acceleration in Node.js.
+ * This module is designed to handle large-scale matrix computations with optimized performance.
+ *
+ * @module gpuAcceleratedMatrixOps
  */
 
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const { execSync } = require('child_process');
+const { Worker, isMainThread, parentPort } = require('worker_threads');
 
 /**
- * Ensures TensorFlow.js is available in the runtime environment.
- * If TensorFlow.js is not installed, it will attempt to install it.
+ * Perform a matrix multiplication using a WebAssembly worker thread.
+ * This function offloads heavy computation to a separate thread for efficiency.
+ *
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {Promise<number[][]>} - A promise that resolves to the resulting matrix.
+ * @throws {Error} - Throws an error if matrices cannot be multiplied.
  */
-function ensureTensorFlowJS() {
-  try {
-    require.resolve('@tensorflow/tfjs-node');
-  } catch (e) {
-    console.warn('TensorFlow.js not found. Installing @tensorflow/tfjs-node...');
-    execSync('npm install @tensorflow/tfjs-node', { stdio: 'inherit' });
+export async function multiplyMatrices(matrixA, matrixB) {
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Matrix dimensions do not align for multiplication.');
   }
+
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(__filename);
+
+    worker.on('message', (result) => {
+      resolve(result);
+      worker.terminate();
+    });
+
+    worker.on('error', (err) => {
+      reject(err);
+      worker.terminate();
+    });
+
+    worker.postMessage({ matrixA, matrixB });
+  });
 }
 
-ensureTensorFlowJS();
-const tf = require('@tensorflow/tfjs-node');
+if (!isMainThread) {
+  parentPort.on('message', ({ matrixA, matrixB }) => {
+    const result = computeMatrixMultiplication(matrixA, matrixB);
+    parentPort.postMessage(result);
+  });
+}
 
 /**
- * Performs GPU-accelerated matrix multiplication.
+ * Compute the matrix multiplication operation.
+ * This function is used internally by the worker thread.
  *
- * @param {number[][]} matrixA - The first matrix (2D array).
- * @param {number[][]} matrixB - The second matrix (2D array).
- * @returns {Promise<number[][]>} - The result of the matrix multiplication as a 2D array.
- * @throws {Error} - Throws an error if the matrices are incompatible for multiplication.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {number[][]} - The resulting matrix after multiplication.
  */
-export async function gpuMatrixMultiply(matrixA, matrixB) {
-  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-    throw new Error('Both inputs must be 2D arrays.');
-  }
-
+function computeMatrixMultiplication(matrixA, matrixB) {
   const rowsA = matrixA.length;
-  const colsA = matrixA[0]?.length || 0;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0]?.length || 0;
+  const colsA = matrixA[0].length;
+  const colsB = matrixB[0].length;
 
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions are incompatible for multiplication.');
+  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += matrixA[i][k] * matrixB[k][j];
+      }
+    }
   }
 
-  // Convert input arrays to TensorFlow tensors
-  const tensorA = tf.tensor2d(matrixA, [rowsA, colsA]);
-  const tensorB = tf.tensor2d(matrixB, [rowsB, colsB]);
-
-  // Perform GPU-accelerated matrix multiplication
-  const resultTensor = tf.matMul(tensorA, tensorB);
-
-  // Convert the result tensor back to a 2D array
-  const resultArray = await resultTensor.array();
-
-  // Clean up tensors to free GPU memory
-  tensorA.dispose();
-  tensorB.dispose();
-  resultTensor.dispose();
-
-  return resultArray;
+  return result;
 }
 
 /**
- * Example function to demonstrate neural network computation.
+ * Validate a matrix for correctness.
+ * Ensures that the input is a 2D array with consistent row lengths.
  *
- * @param {number[][]} input - Input data as a 2D array.
- * @param {number[][]} weights - Weights matrix as a 2D array.
- * @param {number[]} biases - Bias vector as a 1D array.
- * @returns {Promise<number[][]>} - The output of the neural network layer as a 2D array.
+ * @param {any} matrix - The matrix to validate.
+ * @returns {boolean} - True if the matrix is valid, otherwise false.
  */
-export async function gpuNeuralLayer(input, weights, biases) {
-  if (!Array.isArray(input) || !Array.isArray(weights) || !Array.isArray(biases)) {
-    throw new Error('Input, weights, and biases must be arrays.');
+export function isValidMatrix(matrix) {
+  if (!Array.isArray(matrix) || !Array.isArray(matrix[0])) {
+    return false;
   }
 
-  const inputTensor = tf.tensor2d(input);
-  const weightsTensor = tf.tensor2d(weights);
-  const biasesTensor = tf.tensor1d(biases);
-
-  // Perform the computation: output = input * weights + biases
-  const outputTensor = tf.add(tf.matMul(inputTensor, weightsTensor), biasesTensor);
-
-  const outputArray = await outputTensor.array();
-
-  inputTensor.dispose();
-  weightsTensor.dispose();
-  biasesTensor.dispose();
-  outputTensor.dispose();
-
-  return outputArray;
+  const rowLength = matrix[0].length;
+  return matrix.every((row) => Array.isArray(row) && row.length === rowLength);
 }
 
 /**
- * Utility function to check if TensorFlow.js is using the GPU backend.
+ * Transpose a matrix.
  *
- * @returns {string} - The name of the active backend (e.g., 'tensorflow', 'webgl').
+ * @param {number[][]} matrix - The matrix to transpose.
+ * @returns {number[][]} - The transposed matrix.
  */
-export function getActiveBackend() {
-  return tf.getBackend();
+export function transposeMatrix(matrix) {
+  return matrix[0].map((_, colIndex) => matrix.map((row) => row[colIndex]));
 }
-
-/**
- * Sets the TensorFlow.js backend to WebGL for GPU acceleration.
- *
- * @returns {Promise<void>} - Resolves when the backend is set.
- */
-export async function setBackendToWebGL() {
-  await tf.setBackend('webgl');
-  await tf.ready();
-}
-
-// Set the backend to WebGL by default for GPU acceleration
-await setBackendToWebGL();

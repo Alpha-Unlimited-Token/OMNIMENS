@@ -1,102 +1,73 @@
+// wasmMatrixOps.js
+
 /**
  * @module wasmMatrixOps
- * @description Perform efficient GPU-like matrix operations using WebAssembly (WASM) for neural computations.
+ * @description Perform GPU-like matrix operations for efficient computation in Node.js
+ * using WebAssembly and optimized linear algebra techniques.
  */
 
-const { readFileSync } = require('fs');
+// WebAssembly binary loader
+const fs = require('fs');
 const path = require('path');
 
 /**
- * Loads and initializes the WebAssembly module for matrix operations.
- * @returns {Promise<WebAssembly.Instance>} The initialized WebAssembly instance.
+ * Load WebAssembly module from file.
+ * @param {string} filePath - Path to the WebAssembly binary file.
+ * @returns {Promise<WebAssembly.Instance>} - A promise that resolves to the WebAssembly instance.
  */
-async function initializeWasm() {
-  const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
-  const wasmBuffer = readFileSync(wasmPath);
+async function loadWasmModule(filePath) {
+  const wasmBuffer = fs.readFileSync(filePath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
   const instance = await WebAssembly.instantiate(wasmModule);
   return instance;
 }
 
 /**
- * Multiplies two matrices using WebAssembly.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {Promise<number[][]>} The resulting matrix after multiplication.
- * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
+ * Perform matrix multiplication using WebAssembly.
+ * @param {Float32Array} matrixA - First matrix (flattened).
+ * @param {Float32Array} matrixB - Second matrix (flattened).
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA.
+ * @param {number} colsB - Number of columns in matrixB.
+ * @returns {Float32Array} - Resultant matrix (flattened).
  */
-async function wasmMatrixMultiply(matrixA, matrixB) {
-  if (matrixA[0].length !== matrixB.length) {
-    throw new Error('Matrix dimensions do not allow multiplication.');
-  }
+async function matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
+  const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
+  const wasmInstance = await loadWasmModule(wasmPath);
 
-  const instance = await initializeWasm();
-  const { memory, multiply_matrices } = instance.exports;
+  const { memory, matrixMultiply } = wasmInstance.exports;
 
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const colsB = matrixB[0].length;
+  const bufferA = new Float32Array(memory.buffer, 0, matrixA.length);
+  const bufferB = new Float32Array(memory.buffer, matrixA.length * 4, matrixB.length);
+  const bufferC = new Float32Array(memory.buffer, (matrixA.length + matrixB.length) * 4, rowsA * colsB);
 
-  const matrixASize = rowsA * colsA;
-  const matrixBSize = colsA * colsB;
-  const resultSize = rowsA * colsB;
+  bufferA.set(matrixA);
+  bufferB.set(matrixB);
 
-  const offsetA = 0;
-  const offsetB = matrixASize * 4;
-  const offsetResult = offsetB + matrixBSize * 4;
+  matrixMultiply(matrixA.length, matrixB.length, rowsA, colsA, colsB);
 
-  const wasmMemory = new Float32Array(memory.buffer);
-
-  // Flatten and copy matrices into WASM memory
-  let index = offsetA / 4;
-  for (const row of matrixA) {
-    for (const value of row) {
-      wasmMemory[index++] = value;
-    }
-  }
-
-  index = offsetB / 4;
-  for (const row of matrixB) {
-    for (const value of row) {
-      wasmMemory[index++] = value;
-    }
-  }
-
-  // Perform matrix multiplication
-  multiply_matrices(offsetA, rowsA, colsA, offsetB, colsB, offsetResult);
-
-  // Extract result matrix
-  const result = [];
-  index = offsetResult / 4;
-  for (let i = 0; i < rowsA; i++) {
-    const row = [];
-    for (let j = 0; j < colsB; j++) {
-      row.push(wasmMemory[index++]);
-    }
-    result.push(row);
-  }
-
-  return result;
+  return bufferC.slice(0, rowsA * colsB);
 }
 
 /**
- * A placeholder for future convolution operations.
- * @todo Implement convolution operation using WebAssembly.
+ * Validate matrix dimensions for multiplication.
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA.
+ * @param {number} rowsB - Number of rows in matrixB.
+ * @param {number} colsB - Number of columns in matrixB.
+ * @throws Will throw an error if the matrices cannot be multiplied.
  */
-async function wasmConvolution() {
-  throw new Error('Convolution operation not yet implemented.');
+function validateMatrixDimensions(rowsA, colsA, rowsB, colsB) {
+  if (colsA !== rowsB) {
+    throw new Error('Matrix dimensions are incompatible for multiplication.');
+  }
 }
 
 /**
- * A placeholder for other advanced linear algebra operations.
- * @todo Expand with additional operations as needed.
+ * Exported functions.
  */
-async function wasmAdvancedOps() {
-  throw new Error('Advanced operations not yet implemented.');
-}
-
 module.exports = {
-  wasmMatrixMultiply,
-  wasmConvolution,
-  wasmAdvancedOps
+  loadWasmModule,
+  matrixMultiply,
+  validateMatrixDimensions
 };

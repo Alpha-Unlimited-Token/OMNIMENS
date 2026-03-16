@@ -1,187 +1,99 @@
 /**
  * @module inMemoryVectorCache
- * @description Provides fast in-memory storage and retrieval of vector embeddings with LRU cache eviction.
- * This module supports both pure JavaScript hashmap-based storage and optional Redis-backed persistence.
- */
-
-const crypto = require('crypto');
-
-/**
- * @typedef {Object} VectorCacheOptions
- * @property {number} maxSize - Maximum number of vectors to store in memory.
- * @property {boolean} useRedis - Whether to use Redis for persistence (default: false).
- * @property {string} [redisHost] - Redis host address (required if useRedis is true).
- * @property {number} [redisPort] - Redis port (default: 6379).
+ * @description A lightweight in-memory LRU cache for embeddings and semantic data, designed for fast retrieval and reasoning.
  */
 
 /**
- * LRU Cache Node structure.
- * @private
- * @class
- */
-class LRUNode {
-  constructor(key, value) {
-    this.key = key;
-    this.value = value;
-    this.prev = null;
-    this.next = null;
-  }
-}
-
-/**
- * LRU Cache implementation for in-memory storage.
- * @private
- * @class
- */
-class LRUCache {
-  constructor(maxSize) {
-    this.maxSize = maxSize;
-    this.size = 0;
-    this.map = new Map();
-    this.head = null;
-    this.tail = null;
-  }
-
-  /**
-   * Get a value from the cache.
-   * @param {string} key - The key of the item to retrieve.
-   * @returns {any|null} - The value if found, or null if not found.
-   */
-  get(key) {
-    if (!this.map.has(key)) return null;
-    const node = this.map.get(key);
-    this._moveToHead(node);
-    return node.value;
-  }
-
-  /**
-   * Put a value into the cache.
-   * @param {string} key - The key of the item to store.
-   * @param {any} value - The value to store.
-   */
-  put(key, value) {
-    if (this.map.has(key)) {
-      const node = this.map.get(key);
-      node.value = value;
-      this._moveToHead(node);
-    } else {
-      const newNode = new LRUNode(key, value);
-      if (this.size >= this.maxSize) {
-        this._evict();
-      }
-      this._addNode(newNode);
-      this.map.set(key, newNode);
-      this.size++;
-    }
-  }
-
-  /**
-   * Evict the least recently used item from the cache.
-   * @private
-   */
-  _evict() {
-    if (!this.tail) return;
-    this.map.delete(this.tail.key);
-    this._removeNode(this.tail);
-    this.size--;
-  }
-
-  /**
-   * Move a node to the head of the cache.
-   * @private
-   * @param {LRUNode} node - The node to move.
-   */
-  _moveToHead(node) {
-    this._removeNode(node);
-    this._addNode(node);
-  }
-
-  /**
-   * Add a node to the head of the cache.
-   * @private
-   * @param {LRUNode} node - The node to add.
-   */
-  _addNode(node) {
-    node.next = this.head;
-    node.prev = null;
-    if (this.head) this.head.prev = node;
-    this.head = node;
-    if (!this.tail) this.tail = node;
-  }
-
-  /**
-   * Remove a node from the cache.
-   * @private
-   * @param {LRUNode} node - The node to remove.
-   */
-  _removeNode(node) {
-    if (node.prev) node.prev.next = node.next;
-    if (node.next) node.next.prev = node.prev;
-    if (node === this.head) this.head = node.next;
-    if (node === this.tail) this.tail = node.prev;
-    node.next = null;
-    node.prev = null;
-  }
-}
-
-/**
- * In-memory vector cache with optional Redis persistence.
- * @class
+ * Class representing an in-memory LRU cache.
  */
 class InMemoryVectorCache {
   /**
-   * @param {VectorCacheOptions} options - Configuration options for the cache.
+   * Creates an instance of InMemoryVectorCache.
+   * @param {number} maxSize - The maximum number of items the cache can hold.
    */
-  constructor({ maxSize = 1000, useRedis = false, redisHost, redisPort = 6379 }) {
-    this.cache = new LRUCache(maxSize);
-    this.useRedis = useRedis;
-    if (useRedis) {
-      const { createClient } = require('redis');
-      this.redisClient = createClient({ host: redisHost, port: redisPort });
-      this.redisClient.connect();
+  constructor(maxSize = 100) {
+    if (maxSize <= 0) {
+      throw new Error('Cache size must be greater than 0.');
+    }
+    this.maxSize = maxSize;
+    this.cache = new Map(); // Using Map to maintain insertion order for LRU logic
+  }
+
+  /**
+   * Adds or updates an item in the cache.
+   * @param {string} key - The unique key for the item.
+   * @param {Array<number>} embedding - The embedding vector to cache.
+   */
+  set(key, embedding) {
+    if (typeof key !== 'string') {
+      throw new TypeError('Key must be a string.');
+    }
+    if (!Array.isArray(embedding) || !embedding.every((val) => typeof val === 'number')) {
+      throw new TypeError('Embedding must be an array of numbers.');
+    }
+
+    // If the key already exists, delete it to update its position in the LRU order
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    }
+
+    this.cache.set(key, embedding);
+
+    // If the cache exceeds the maximum size, remove the least recently used item
+    if (this.cache.size > this.maxSize) {
+      const oldestKey = this.cache.keys().next().value;
+      this.cache.delete(oldestKey);
     }
   }
 
   /**
-   * Store a vector in the cache.
-   * @param {string} key - Unique key for the vector.
-   * @param {number[]} vector - The vector to store.
+   * Retrieves an item from the cache.
+   * @param {string} key - The unique key for the item.
+   * @returns {Array<number>|undefined} The cached embedding or undefined if not found.
    */
-  async store(key, vector) {
-    const vectorString = JSON.stringify(vector);
-    this.cache.put(key, vector);
-    if (this.useRedis) {
-      await this.redisClient.set(key, vectorString);
+  get(key) {
+    if (typeof key !== 'string') {
+      throw new TypeError('Key must be a string.');
     }
+
+    if (!this.cache.has(key)) {
+      return undefined;
+    }
+
+    // Move the accessed item to the end to mark it as recently used
+    const value = this.cache.get(key);
+    this.cache.delete(key);
+    this.cache.set(key, value);
+
+    return value;
   }
 
   /**
-   * Retrieve a vector from the cache.
-   * @param {string} key - Unique key for the vector.
-   * @returns {Promise<number[]|null>} - The vector if found, or null if not found.
+   * Checks if a key exists in the cache.
+   * @param {string} key - The unique key for the item.
+   * @returns {boolean} True if the key exists, false otherwise.
    */
-  async retrieve(key) {
-    const inMemory = this.cache.get(key);
-    if (inMemory) return inMemory;
-    if (this.useRedis) {
-      const redisValue = await this.redisClient.get(key);
-      if (redisValue) {
-        const vector = JSON.parse(redisValue);
-        this.cache.put(key, vector);
-        return vector;
-      }
+  has(key) {
+    if (typeof key !== 'string') {
+      throw new TypeError('Key must be a string.');
     }
-    return null;
+    return this.cache.has(key);
   }
 
   /**
-   * Close the Redis connection (if applicable).
+   * Clears all items from the cache.
    */
-  async close() {
-    if (this.useRedis && this.redisClient) {
-      await this.redisClient.quit();
-    }
+  clear() {
+    this.cache.clear();
+  }
+
+  /**
+   * Gets the current size of the cache.
+   * @returns {number} The number of items in the cache.
+   */
+  size() {
+    return this.cache.size;
   }
 }
 
-module.exports = InMemoryVectorCache;
+export default InMemoryVectorCache;

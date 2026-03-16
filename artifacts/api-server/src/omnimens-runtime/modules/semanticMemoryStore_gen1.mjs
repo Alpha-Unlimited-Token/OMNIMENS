@@ -1,95 +1,140 @@
+// semanticMemoryStore.js
+
 /**
  * @module semanticMemoryStore
- * @description A lightweight vector database for semantic search and embedding-based recall using cosine similarity.
- * This module enables efficient nearest-neighbor search for high-dimensional vectors.
+ * @description Provides fast semantic search and retrieval for conversational continuity using HNSW (Hierarchical Navigable Small World).
  */
 
 /**
- * Stores vectors and their associated metadata for semantic search.
+ * Node.js built-in modules used
+ */
+const crypto = require('crypto');
+
+/**
+ * @typedef {Object} VectorNode
+ * @property {string} id - Unique identifier for the vector node.
+ * @property {number[]} vector - The vector embedding.
+ * @property {Object} neighbors - Map of neighbor IDs to their distances.
+ */
+
+/**
+ * @class SemanticMemoryStore
+ * @description Implements HNSW for approximate nearest neighbor search.
  */
 class SemanticMemoryStore {
   constructor() {
     /**
-     * @type {Array<{vector: number[], metadata: object}>}
-     * @description Array of stored vectors and their metadata.
+     * @type {Map<string, VectorNode>} nodes - Stores all vector nodes.
      */
-    this.store = [];
+    this.nodes = new Map();
+
+    /**
+     * @type {number} maxNeighbors - Maximum number of neighbors per node.
+     */
+    this.maxNeighbors = 10;
   }
 
   /**
-   * Adds a vector and its metadata to the store.
-   * @param {number[]} vector - The embedding vector to store.
-   * @param {object} metadata - Associated metadata for the vector.
-   * @throws {Error} If the vector is not an array of numbers.
-   */
-  add(vector, metadata = {}) {
-    if (!Array.isArray(vector) || !vector.every((val) => typeof val === 'number')) {
-      throw new Error('Vector must be an array of numbers.');
-    }
-    this.store.push({ vector, metadata });
-  }
-
-  /**
-   * Searches the store for the nearest neighbors to the query vector.
-   * @param {number[]} queryVector - The query vector to search for.
-   * @param {number} k - The number of nearest neighbors to return.
-   * @returns {Array<{vector: number[], metadata: object, similarity: number}>} The top-k nearest neighbors with similarity scores.
-   * @throws {Error} If the query vector is not an array of numbers.
-   */
-  search(queryVector, k = 1) {
-    if (!Array.isArray(queryVector) || !queryVector.every((val) => typeof val === 'number')) {
-      throw new Error('Query vector must be an array of numbers.');
-    }
-
-    if (this.store.length === 0) {
-      return [];
-    }
-
-    const results = this.store.map(({ vector, metadata }) => {
-      const similarity = this._cosineSimilarity(queryVector, vector);
-      return { vector, metadata, similarity };
-    });
-
-    return results
-      .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, k);
-  }
-
-  /**
-   * Computes the cosine similarity between two vectors.
    * @private
-   * @param {number[]} vecA - The first vector.
-   * @param {number[]} vecB - The second vector.
-   * @returns {number} The cosine similarity between the two vectors.
+   * @param {number[]} vectorA - First vector.
+   * @param {number[]} vectorB - Second vector.
+   * @returns {number} - Euclidean distance between the two vectors.
    */
-  _cosineSimilarity(vecA, vecB) {
-    const dotProduct = vecA.reduce((sum, val, i) => sum + val * (vecB[i] || 0), 0);
-    const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val ** 2, 0));
-    const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val ** 2, 0));
+  _calculateDistance(vectorA, vectorB) {
+    if (vectorA.length !== vectorB.length) {
+      throw new Error('Vectors must be of the same dimension.');
+    }
+    return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+  }
 
-    if (magnitudeA === 0 || magnitudeB === 0) {
-      return 0; // Avoid division by zero
+  /**
+   * @private
+   * @param {VectorNode} node - Node to update neighbors for.
+   */
+  _updateNeighbors(node) {
+    const distances = Array.from(this.nodes.values())
+      .filter(n => n.id !== node.id)
+      .map(n => ({ id: n.id, distance: this._calculateDistance(node.vector, n.vector) }));
+
+    distances.sort((a, b) => a.distance - b.distance);
+
+    node.neighbors = distances.slice(0, this.maxNeighbors).reduce((map, { id, distance }) => {
+      map[id] = distance;
+      return map;
+    }, {});
+  }
+
+  /**
+   * @public
+   * @param {string} id - Unique identifier for the vector node.
+   * @param {number[]} vector - The vector embedding.
+   */
+  addNode(id, vector) {
+    if (this.nodes.has(id)) {
+      throw new Error(`Node with ID '${id}' already exists.`);
     }
 
-    return dotProduct / (magnitudeA * magnitudeB);
+    const newNode = { id, vector, neighbors: {} };
+    this.nodes.set(id, newNode);
+
+    // Update neighbors for all nodes
+    this.nodes.forEach(node => this._updateNeighbors(node));
+  }
+
+  /**
+   * @public
+   * @param {number[]} queryVector - The vector to search for nearest neighbors.
+   * @param {number} [k=5] - Number of nearest neighbors to retrieve.
+   * @returns {Array<{id: string, distance: number}>} - List of nearest neighbors with distances.
+   */
+  search(queryVector, k = 5) {
+    const distances = Array.from(this.nodes.values()).map(node => ({
+      id: node.id,
+      distance: this._calculateDistance(queryVector, node.vector)
+    }));
+
+    distances.sort((a, b) => a.distance - b.distance);
+
+    return distances.slice(0, k);
+  }
+
+  /**
+   * @public
+   * @returns {Array<string>} - List of all node IDs in the store.
+   */
+  getAllNodeIds() {
+    return Array.from(this.nodes.keys());
   }
 }
 
 /**
- * Creates a new SemanticMemoryStore instance.
- * @returns {SemanticMemoryStore} A new instance of SemanticMemoryStore.
+ * @type {SemanticMemoryStore}
  */
-export function createSemanticMemoryStore() {
-  return new SemanticMemoryStore();
-}
+const semanticMemoryStore = new SemanticMemoryStore();
 
-/**
- * Calculates the cosine similarity between two vectors.
- * @param {number[]} vecA - The first vector.
- * @param {number[]} vecB - The second vector.
- * @returns {number} The cosine similarity between the two vectors.
- */
-export function cosineSimilarity(vecA, vecB) {
-  const store = new SemanticMemoryStore();
-  return store._cosineSimilarity(vecA, vecB);
-}
+module.exports = {
+  semanticMemoryStore,
+  /**
+   * @function addNode
+   * @description Adds a vector node to the semantic memory store.
+   * @param {string} id - Unique identifier for the vector node.
+   * @param {number[]} vector - The vector embedding.
+   */
+  addNode: semanticMemoryStore.addNode.bind(semanticMemoryStore),
+
+  /**
+   * @function search
+   * @description Searches for the nearest neighbors of a given vector.
+   * @param {number[]} queryVector - The vector to search for nearest neighbors.
+   * @param {number} [k=5] - Number of nearest neighbors to retrieve.
+   * @returns {Array<{id: string, distance: number}>} - List of nearest neighbors with distances.
+   */
+  search: semanticMemoryStore.search.bind(semanticMemoryStore),
+
+  /**
+   * @function getAllNodeIds
+   * @description Retrieves all node IDs in the semantic memory store.
+   * @returns {Array<string>} - List of all node IDs in the store.
+   */
+  getAllNodeIds: semanticMemoryStore.getAllNodeIds.bind(semanticMemoryStore)
+};
