@@ -242,7 +242,7 @@ function ProjectDetail({ project: initialProject, onBack, onRefresh }: {
   const publishedUrl = project.slug ? `${BASE}/godflesh/p/${project.slug}` : null;
 
   const loadFiles = useCallback(async () => {
-    const res = await fetch(`/godflesh/api/omnimens/projects/${project.id}`, { credentials: "include" });
+    const res = await fetch(`/api/omnimens/projects/${project.id}`, { credentials: "include" });
     if (res.ok) {
       const data = await res.json();
       setProject(data);
@@ -265,7 +265,7 @@ function ProjectDetail({ project: initialProject, onBack, onRefresh }: {
     setBuildLog([]);
     setProject(p => ({ ...p, status: "building" }));
 
-    const res = await fetch(`/godflesh/api/omnimens/projects/${project.id}/build`, {
+    const res = await fetch(`/api/omnimens/projects/${project.id}/build`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -309,7 +309,7 @@ function ProjectDetail({ project: initialProject, onBack, onRefresh }: {
   const handlePublish = async (publish: boolean) => {
     setPublishing(true);
     try {
-      const res = await fetch(`/godflesh/api/omnimens/projects/${project.id}/publish`, {
+      const res = await fetch(`/api/omnimens/projects/${project.id}/publish`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -327,7 +327,7 @@ function ProjectDetail({ project: initialProject, onBack, onRefresh }: {
 
   const handleSetDomain = async () => {
     if (!domainInput.trim()) return;
-    const res = await fetch(`/godflesh/api/omnimens/projects/${project.id}/domain`, {
+    const res = await fetch(`/api/omnimens/projects/${project.id}/domain`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -341,7 +341,7 @@ function ProjectDetail({ project: initialProject, onBack, onRefresh }: {
   };
 
   const handleRemoveDomain = async () => {
-    await fetch(`/godflesh/api/omnimens/projects/${project.id}/domain`, { method: "DELETE", credentials: "include" });
+    await fetch(`/api/omnimens/projects/${project.id}/domain`, { method: "DELETE", credentials: "include" });
     setProject(p => ({ ...p, customDomain: null, domainStatus: "none" }));
   };
 
@@ -349,7 +349,7 @@ function ProjectDetail({ project: initialProject, onBack, onRefresh }: {
     if (!activeFile) return;
     setSaving(true);
     try {
-      await fetch(`/godflesh/api/omnimens/projects/${project.id}/files/${activeFile.id}`, {
+      await fetch(`/api/omnimens/projects/${project.id}/files/${activeFile.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -688,7 +688,7 @@ export default function Projects() {
   const loadProjects = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/godflesh/api/omnimens/projects", { credentials: "include" });
+      const res = await fetch("/api/omnimens/projects", { credentials: "include" });
       if (res.ok) setProjects(await res.json());
     } finally {
       setLoading(false);
@@ -698,7 +698,7 @@ export default function Projects() {
   useEffect(() => { if (isAuthenticated) loadProjects(); }, [isAuthenticated]);
 
   const handleCreate = async ({ name, description, type }: { name: string; description: string; type: ProjectType }) => {
-    const res = await fetch("/godflesh/api/omnimens/projects", {
+    const res = await fetch("/api/omnimens/projects", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -712,7 +712,7 @@ export default function Projects() {
   };
 
   const handleDelete = async (id: number) => {
-    await fetch(`/godflesh/api/omnimens/projects/${id}`, { method: "DELETE", credentials: "include" });
+    await fetch(`/api/omnimens/projects/${id}`, { method: "DELETE", credentials: "include" });
     setProjects(p => p.filter(pr => pr.id !== id));
     setDeleteConfirm(null);
     if (activeProject?.id === id) setActiveProject(null);

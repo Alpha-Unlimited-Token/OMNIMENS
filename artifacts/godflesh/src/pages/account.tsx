@@ -11,7 +11,7 @@ function useBillingInfo() {
   return useQuery({
     queryKey: ["/api/omnimens/billing"],
     queryFn: async () => {
-      const r = await fetch("/godflesh/api/omnimens/billing", { credentials: "include" });
+      const r = await fetch("/api/omnimens/billing", { credentials: "include" });
       if (!r.ok) return null;
       return r.json();
     },
@@ -143,7 +143,7 @@ export default function Account() {
   useEffect(() => {
     if (isOwner && isAuthenticated) {
       setPatchLoading(true);
-      fetch("/godflesh/api/omnimens/patches", { credentials: "include" })
+      fetch("/api/omnimens/patches", { credentials: "include" })
         .then(r => r.json())
         .then(data => { setPatches(data.patches || []); setPatchSummary(data.summary || null); })
         .catch(console.error)
@@ -155,9 +155,9 @@ export default function Account() {
     if (!isAuthenticated) return;
     setEvolutionLoading(true);
     Promise.all([
-      fetch("/godflesh/api/omnimens/consciousness", { credentials: "include" }).then(r => r.json()),
-      fetch("/godflesh/api/omnimens/evolution", { credentials: "include" }).then(r => r.json()),
-      fetch("/godflesh/api/omnimens/generated-modules", { credentials: "include" }).then(r => r.json()),
+      fetch("/api/omnimens/consciousness", { credentials: "include" }).then(r => r.json()),
+      fetch("/api/omnimens/evolution", { credentials: "include" }).then(r => r.json()),
+      fetch("/api/omnimens/generated-modules", { credentials: "include" }).then(r => r.json()),
     ]).then(([c, e, m]) => {
       setConsciousness(c);
       setEvolutionHistory(Array.isArray(e) ? e : []);
@@ -167,7 +167,7 @@ export default function Account() {
 
   const handleDeactivateModule = async (id: number) => {
     try {
-      await fetch(`/godflesh/api/omnimens/generated-modules/${id}`, { method: "DELETE", credentials: "include" });
+      await fetch(`/api/omnimens/generated-modules/${id}`, { method: "DELETE", credentials: "include" });
       setGeneratedModules(m => m.filter(x => x.id !== id));
     } catch (e) { console.error(e); }
   };
@@ -175,7 +175,7 @@ export default function Account() {
   const handleForceEvolve = async () => {
     setEvolvingNow(true);
     try {
-      await fetch("/godflesh/api/omnimens/evolve-now", { method: "POST", credentials: "include" });
+      await fetch("/api/omnimens/evolve-now", { method: "POST", credentials: "include" });
     } catch { } finally {
       setTimeout(() => setEvolvingNow(false), 3000);
     }
@@ -185,14 +185,14 @@ export default function Account() {
     if (!isAuthenticated) return;
     // Load memories
     setMemoriesLoading(true);
-    fetch("/godflesh/api/omnimens/memories", { credentials: "include" })
+    fetch("/api/omnimens/memories", { credentials: "include" })
       .then(r => r.json())
       .then(data => setMemories(Array.isArray(data) ? data : []))
       .catch(console.error)
       .finally(() => setMemoriesLoading(false));
     // Load custom instructions
     setCiLoading(true);
-    fetch("/godflesh/api/omnimens/custom-instructions", { credentials: "include" })
+    fetch("/api/omnimens/custom-instructions", { credentials: "include" })
       .then(r => r.json())
       .then(data => {
         setCiAboutUser(data.aboutUser || "");
@@ -205,14 +205,14 @@ export default function Account() {
 
   const handleDeactivate = async (patchId: string) => {
     try {
-      await fetch(`/godflesh/api/omnimens/patches/${patchId}`, { method: "DELETE", credentials: "include" });
+      await fetch(`/api/omnimens/patches/${patchId}`, { method: "DELETE", credentials: "include" });
       setPatches(p => p.map(x => x.id === patchId ? { ...x, active: false } : x));
     } catch (e) { console.error(e); }
   };
 
   const handleDeleteMemory = async (id: number) => {
     try {
-      await fetch(`/godflesh/api/omnimens/memories/${id}`, { method: "DELETE", credentials: "include" });
+      await fetch(`/api/omnimens/memories/${id}`, { method: "DELETE", credentials: "include" });
       setMemories(m => m.filter(x => x.id !== id));
     } catch (e) { console.error(e); }
   };
@@ -221,7 +221,7 @@ export default function Account() {
     if (!newMemory.trim()) return;
     setMemoryError("");
     try {
-      const r = await fetch("/godflesh/api/omnimens/memories", {
+      const r = await fetch("/api/omnimens/memories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -238,7 +238,7 @@ export default function Account() {
     setCiSaving(true);
     setCiSaved(false);
     try {
-      await fetch("/godflesh/api/omnimens/custom-instructions", {
+      await fetch("/api/omnimens/custom-instructions", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

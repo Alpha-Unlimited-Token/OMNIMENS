@@ -1,100 +1,90 @@
-/**
- * wasmMatrixOps - A WebAssembly-powered utility module for high-performance matrix operations.
- * 
- * This module provides matrix multiplication, vector similarity, and other linear algebra operations
- * implemented using WebAssembly for speed and efficiency. It is designed to work in Node.js 20+ environments
- * without external dependencies.
- */
-
-const fs = require('fs');
-const path = require('path');
+// wasmMatrixOps.js
 
 /**
- * Load and compile the WebAssembly module.
- * @returns {Promise<WebAssembly.Instance>} The compiled WebAssembly instance.
+ * @module wasmMatrixOps
+ * @description Perform high-dimensional matrix operations efficiently using WebAssembly in Node.js.
  */
-async function loadWasmModule() {
-  const wasmFilePath = path.join(__dirname, 'matrix_ops.wasm');
-  const wasmBuffer = fs.readFileSync(wasmFilePath);
-  const wasmModule = await WebAssembly.compile(wasmBuffer);
+
+const { readFileSync } = require('fs');
+const { join } = require('path');
+
+/**
+ * Load and compile the WebAssembly binary for matrix operations.
+ * @returns {Promise<WebAssembly.Instance>} - The compiled WebAssembly instance.
+ */
+async function loadWasm() {
+  const wasmPath = join(__dirname, 'matrix_ops.wasm');
+  const wasmBinary = readFileSync(wasmPath);
+  const wasmModule = await WebAssembly.compile(wasmBinary);
   return WebAssembly.instantiate(wasmModule);
 }
 
 /**
- * Perform matrix multiplication using WebAssembly.
+ * Multiply two matrices using WebAssembly.
  * @param {number[][]} matrixA - The first matrix.
  * @param {number[][]} matrixB - The second matrix.
- * @returns {Promise<number[][]>} The resulting matrix after multiplication.
+ * @returns {Promise<number[][]>} - The resulting matrix after multiplication.
+ * @throws {Error} - If matrices are incompatible for multiplication.
  */
-async function matrixMultiply(matrixA, matrixB) {
-  const wasmInstance = await loadWasmModule();
-  const { multiplyMatrices } = wasmInstance.exports;
-
-  // Flatten matrices into 1D arrays for WASM compatibility
-  const flatA = matrixA.flat();
-  const flatB = matrixB.flat();
+async function multiplyMatrices(matrixA, matrixB) {
   const rowsA = matrixA.length;
   const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
   const colsB = matrixB[0].length;
 
-  // Allocate memory in WASM module
-  const aPtr = multiplyMatrices.allocate(flatA.length);
-  const bPtr = multiplyMatrices.allocate(flatB.length);
-  const resultPtr = multiplyMatrices.allocate(rowsA * colsB);
-
-  // Copy data to WASM memory
-  multiplyMatrices.setMemory(aPtr, flatA);
-  multiplyMatrices.setMemory(bPtr, flatB);
-
-  // Perform multiplication
-  multiplyMatrices.execute(aPtr, bPtr, resultPtr, rowsA, colsA, colsB);
-
-  // Retrieve result from WASM memory
-  const resultFlat = multiplyMatrices.getMemory(resultPtr, rowsA * colsB);
-
-  // Free allocated memory
-  multiplyMatrices.free(aPtr);
-  multiplyMatrices.free(bPtr);
-  multiplyMatrices.free(resultPtr);
-
-  // Convert flat result back into 2D array
-  const resultMatrix = [];
-  for (let i = 0; i < rowsA; i++) {
-    resultMatrix.push(resultFlat.slice(i * colsB, (i + 1) * colsB));
+  if (colsA !== rowsB) {
+    throw new Error('Matrix dimensions are incompatible for multiplication.');
   }
 
-  return resultMatrix;
+  const wasmInstance = await loadWasm();
+  const { memory, multiply } = wasmInstance.exports;
+
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
+
+  const bufferA = new Float64Array(memory.buffer, 0, flatA.length);
+  const bufferB = new Float64Array(memory.buffer, flatA.length * 8, flatB.length);
+  const bufferC = new Float64Array(memory.buffer, flatA.length * 8 + flatB.length * 8, rowsA * colsB);
+
+  bufferA.set(flatA);
+  bufferB.set(flatB);
+
+  multiply(rowsA, colsA, colsB);
+
+  const result = [];
+  for (let i = 0; i < rowsA; i++) {
+    result.push(bufferC.slice(i * colsB, (i + 1) * colsB));
+  }
+
+  return result;
 }
 
 /**
- * Compute cosine similarity between two vectors using WebAssembly.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {Promise<number>} The cosine similarity between the two vectors.
+ * Compute the eigenvalues of a square matrix using WebAssembly.
+ * @param {number[][]} matrix - The square matrix.
+ * @returns {Promise<number[]>} - The eigenvalues of the matrix.
+ * @throws {Error} - If the matrix is not square.
  */
-async function cosineSimilarity(vectorA, vectorB) {
-  const wasmInstance = await loadWasmModule();
-  const { computeCosineSimilarity } = wasmInstance.exports;
+async function computeEigenvalues(matrix) {
+  const rows = matrix.length;
+  const cols = matrix[0].length;
 
-  // Allocate memory in WASM module
-  const aPtr = computeCosineSimilarity.allocate(vectorA.length);
-  const bPtr = computeCosineSimilarity.allocate(vectorB.length);
+  if (rows !== cols) {
+    throw new Error('Matrix must be square to compute eigenvalues.');
+  }
 
-  // Copy data to WASM memory
-  computeCosineSimilarity.setMemory(aPtr, vectorA);
-  computeCosineSimilarity.setMemory(bPtr, vectorB);
+  const wasmInstance = await loadWasm();
+  const { memory, eigenvalues } = wasmInstance.exports;
 
-  // Compute cosine similarity
-  const similarity = computeCosineSimilarity.execute(aPtr, bPtr, vectorA.length);
+  const flatMatrix = matrix.flat();
+  const bufferMatrix = new Float64Array(memory.buffer, 0, flatMatrix.length);
+  const bufferEigenvalues = new Float64Array(memory.buffer, flatMatrix.length * 8, rows);
 
-  // Free allocated memory
-  computeCosineSimilarity.free(aPtr);
-  computeCosineSimilarity.free(bPtr);
+  bufferMatrix.set(flatMatrix);
 
-  return similarity;
+  eigenvalues(rows);
+
+  return Array.from(bufferEigenvalues);
 }
 
-module.exports = {
-  matrixMultiply,
-  cosineSimilarity
-};
+export { multiplyMatrices, computeEigenvalues };

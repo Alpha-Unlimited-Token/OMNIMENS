@@ -98,7 +98,7 @@ export function useOmnimensChat(onLimitReached: () => void) {
         form.append("files", file);
       }
 
-      const res = await fetch("/godflesh/api/omnimens/chat", {
+      const res = await fetch("/api/omnimens/chat", {
         method: "POST",
         body: form,
         signal: abortControllerRef.current.signal,

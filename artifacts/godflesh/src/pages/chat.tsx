@@ -139,7 +139,7 @@ function CodeBlockWithRun({ code, language }: { code: string; language: string }
     setRunning(true);
     setResult(null);
     try {
-      const resp = await fetch(`/godflesh/api/omnimens/execute-code`, {
+      const resp = await fetch(`/api/omnimens/execute-code`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -518,7 +518,7 @@ export default function Chat() {
 
   // Load saved persona
   useEffect(() => {
-    fetch("/godflesh/api/omnimens/custom-instructions", { credentials: "include" })
+    fetch("/api/omnimens/custom-instructions", { credentials: "include" })
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d?.persona) setPersona(d.persona); })
       .catch(() => {});
@@ -527,8 +527,8 @@ export default function Chat() {
   const handlePersonaChange = async (p: string) => {
     setPersona(p);
     try {
-      const existing = await fetch("/godflesh/api/omnimens/custom-instructions", { credentials: "include" }).then(r => r.json());
-      await fetch("/godflesh/api/omnimens/custom-instructions", {
+      const existing = await fetch("/api/omnimens/custom-instructions", { credentials: "include" }).then(r => r.json());
+      await fetch("/api/omnimens/custom-instructions", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -543,7 +543,7 @@ export default function Chat() {
     setIsResearching(true);
     setResearchResult(null);
     try {
-      const res = await fetch("/godflesh/api/omnimens/deep-research", {
+      const res = await fetch("/api/omnimens/deep-research", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
