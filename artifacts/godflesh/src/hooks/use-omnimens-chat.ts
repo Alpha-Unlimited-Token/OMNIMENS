@@ -54,7 +54,7 @@ export function useOmnimensChat(onLimitReached: () => void) {
   const queryClient = useQueryClient();
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const sendMessage = async (content: string, files: File[] = []) => {
+  const sendMessage = async (content: string, files: File[] = [], persona = "GENERAL") => {
     if (!content.trim() && files.length === 0) return;
     if (isTyping) return;
 
@@ -93,11 +93,12 @@ export function useOmnimensChat(onLimitReached: () => void) {
       const form = new FormData();
       form.append("message", content);
       form.append("history", JSON.stringify(history));
+      form.append("persona", persona);
       for (const file of files) {
         form.append("files", file);
       }
 
-      const res = await fetch("/api/omnimens/chat", {
+      const res = await fetch("/godflesh/api/omnimens/chat", {
         method: "POST",
         body: form,
         signal: abortControllerRef.current.signal,
