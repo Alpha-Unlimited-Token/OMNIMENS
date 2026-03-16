@@ -1,122 +1,172 @@
-// In-memory vector store module using HNSW for approximate nearest neighbor search
-
 /**
  * @module inMemoryVectorStore
- * @description Implements an in-memory vector database using HNSW for fast similarity search and retrieval.
+ * @description A utility module implementing an in-memory vector store with HNSW (Hierarchical Navigable Small World) for approximate nearest neighbor search.
  */
 
 /**
- * Represents a node in the HNSW graph.
+ * A class representing a node in the HNSW graph.
  * @class
  */
 class HNSWNode {
   /**
-   * @param {number[]} vector - The vector associated with the node.
-   * @param {string} id - The unique identifier for the node.
+   * @param {number[]} vector - The vector embedding for this node.
+   * @param {number} id - Unique identifier for this node.
    */
   constructor(vector, id) {
     this.vector = vector;
     this.id = id;
-    this.connections = new Map(); // Stores connections to other nodes
+    this.neighbors = new Map(); // Level -> Array of neighbor node IDs
   }
 }
 
 /**
- * Represents the HNSW graph for approximate nearest neighbor search.
+ * A class implementing the HNSW algorithm for approximate nearest neighbor search.
  * @class
  */
-class HNSWGraph {
-  constructor() {
-    this.nodes = new Map(); // Node storage by ID
+class HNSW {
+  /**
+   * @param {number} dimensions - The dimensionality of the vector space.
+   * @param {number} maxNeighbors - Maximum number of neighbors per node per level.
+   * @param {number} efConstruction - Number of candidates to consider during construction.
+   */
+  constructor(dimensions, maxNeighbors = 16, efConstruction = 200) {
+    this.dimensions = dimensions;
+    this.maxNeighbors = maxNeighbors;
+    this.efConstruction = efConstruction;
+    this.nodes = new Map(); // ID -> HNSWNode
+    this.entryPoint = null; // Entry point to the graph
+    this.levels = new Map(); // Level -> Set of Node IDs
   }
 
   /**
-   * Adds a new vector to the graph.
+   * Adds a vector to the HNSW graph.
    * @param {number[]} vector - The vector to add.
-   * @param {string} id - The unique identifier for the vector.
+   * @param {number} id - Unique identifier for the vector.
+   * @throws {Error} If the vector dimensionality does not match.
    */
   add(vector, id) {
-    if (this.nodes.has(id)) {
-      throw new Error(`Node with ID ${id} already exists.`);
+    if (vector.length !== this.dimensions) {
+      throw new Error('Vector dimensionality does not match the graph.');
     }
+
     const newNode = new HNSWNode(vector, id);
     this.nodes.set(id, newNode);
-    this._connectToNearestNeighbors(newNode);
+
+    // Assign level to the new node
+    const level = this._randomLevel();
+    for (let i = 0; i <= level; i++) {
+      if (!this.levels.has(i)) {
+        this.levels.set(i, new Set());
+      }
+      this.levels.get(i).add(id);
+    }
+
+    if (!this.entryPoint) {
+      this.entryPoint = id;
+      return;
+    }
+
+    // Find neighbors and connect
+    for (let l = level; l >= 0; l--) {
+      const candidates = this._searchLayer(vector, this.entryPoint, this.efConstruction, l);
+      this._connectNeighbors(newNode, candidates, l);
+    }
   }
 
   /**
-   * Searches for the nearest neighbors to a given query vector.
-   * @param {number[]} queryVector - The vector to search for.
-   * @param {number} k - The number of nearest neighbors to retrieve.
-   * @returns {Array<{id: string, distance: number}>} - The nearest neighbors.
+   * Searches for the nearest neighbors to a given vector.
+   * @param {number[]} vector - The query vector.
+   * @param {number} k - Number of neighbors to retrieve.
+   * @returns {Array<{id: number, distance: number}>} The nearest neighbors with distances.
    */
-  search(queryVector, k) {
-    const distances = [];
-
-    for (const node of this.nodes.values()) {
-      const distance = this._euclideanDistance(queryVector, node.vector);
-      distances.push({ id: node.id, distance });
+  search(vector, k) {
+    if (vector.length !== this.dimensions) {
+      throw new Error('Vector dimensionality does not match the graph.');
     }
 
-    distances.sort((a, b) => a.distance - b.distance);
-    return distances.slice(0, k);
-  }
-
-  /**
-   * Connects a new node to its nearest neighbors in the graph.
-   * @private
-   * @param {HNSWNode} newNode - The new node to connect.
-   */
-  _connectToNearestNeighbors(newNode) {
-    const neighbors = this.search(newNode.vector, 5); // Connect to 5 nearest neighbors
-    for (const neighbor of neighbors) {
-      const neighborNode = this.nodes.get(neighbor.id);
-      newNode.connections.set(neighbor.id, neighbor.distance);
-      neighborNode.connections.set(newNode.id, neighbor.distance);
+    let candidates = [this.entryPoint];
+    for (let l = Math.max(...this.levels.keys()); l >= 0; l--) {
+      candidates = this._searchLayer(vector, candidates[0], 1, l);
     }
+
+    const resultSet = this._searchLayer(vector, candidates[0], k, 0);
+    return resultSet.map(id => ({ id, distance: this._distance(vector, this.nodes.get(id).vector) }));
   }
 
   /**
    * Computes the Euclidean distance between two vectors.
    * @private
-   * @param {number[]} vectorA - The first vector.
-   * @param {number[]} vectorB - The second vector.
-   * @returns {number} - The Euclidean distance.
+   * @param {number[]} a - The first vector.
+   * @param {number[]} b - The second vector.
+   * @returns {number} The Euclidean distance.
    */
-  _euclideanDistance(vectorA, vectorB) {
-    if (vectorA.length !== vectorB.length) {
-      throw new Error('Vectors must have the same dimensions.');
+  _distance(a, b) {
+    return Math.sqrt(a.reduce((sum, val, idx) => sum + (val - b[idx]) ** 2, 0));
+  }
+
+  /**
+   * Searches for neighbors within a specific layer.
+   * @private
+   * @param {number[]} vector - The query vector.
+   * @param {number} entryPoint - The starting node ID.
+   * @param {number} ef - The number of candidates to consider.
+   * @param {number} level - The graph level to search.
+   * @returns {number[]} The IDs of the nearest neighbors.
+   */
+  _searchLayer(vector, entryPoint, ef, level) {
+    const visited = new Set();
+    const candidates = new Set([entryPoint]);
+    const results = new Set();
+
+    while (candidates.size > 0) {
+      const current = [...candidates].shift();
+      candidates.delete(current);
+      visited.add(current);
+
+      const neighbors = this.nodes.get(current).neighbors.get(level) || [];
+      for (const neighbor of neighbors) {
+        if (!visited.has(neighbor)) {
+          candidates.add(neighbor);
+          visited.add(neighbor);
+          results.add(neighbor);
+        }
+      }
     }
-    let sum = 0;
-    for (let i = 0; i < vectorA.length; i++) {
-      sum += (vectorA[i] - vectorB[i]) ** 2;
+
+    return [...results].sort((a, b) => this._distance(vector, this.nodes.get(a).vector) - this._distance(vector, this.nodes.get(b).vector)).slice(0, ef);
+  }
+
+  /**
+   * Connects a node to its nearest neighbors at a specific level.
+   * @private
+   * @param {HNSWNode} node - The node to connect.
+   * @param {number[]} neighbors - The IDs of the neighbors.
+   * @param {number} level - The graph level.
+   */
+  _connectNeighbors(node, neighbors, level) {
+    const sortedNeighbors = neighbors.sort((a, b) => this._distance(node.vector, this.nodes.get(a).vector) - this._distance(node.vector, this.nodes.get(b).vector));
+    node.neighbors.set(level, sortedNeighbors.slice(0, this.maxNeighbors));
+    for (const neighbor of node.neighbors.get(level)) {
+      const neighborNode = this.nodes.get(neighbor);
+      if (!neighborNode.neighbors.has(level)) {
+        neighborNode.neighbors.set(level, []);
+      }
+      neighborNode.neighbors.get(level).push(node.id);
     }
-    return Math.sqrt(sum);
+  }
+
+  /**
+   * Generates a random level for a new node.
+   * @private
+   * @returns {number} The random level.
+   */
+  _randomLevel() {
+    let level = 0;
+    while (Math.random() < 0.5 && level < 10) {
+      level++;
+    }
+    return level;
   }
 }
 
-/**
- * Creates an instance of the in-memory vector store.
- * @returns {HNSWGraph} - The vector store instance.
- */
-function createVectorStore() {
-  return new HNSWGraph();
-}
-
-/**
- * Example usage of the vector store.
- * @returns {void}
- */
-function exampleUsage() {
-  const store = createVectorStore();
-
-  store.add([1, 2, 3], 'vector1');
-  store.add([4, 5, 6], 'vector2');
-  store.add([7, 8, 9], 'vector3');
-
-  const results = store.search([2, 3, 4], 2);
-  console.log('Nearest neighbors:', results);
-}
-
-// Export the module functions
-export { createVectorStore, exampleUsage };
+export { HNSW };
