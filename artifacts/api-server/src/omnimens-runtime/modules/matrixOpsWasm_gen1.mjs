@@ -1,101 +1,98 @@
 /**
  * @module matrixOpsWasm
- * @description Perform efficient matrix operations using WebAssembly (WASM).
- * This module provides matrix multiplication and inversion routines leveraging WASM for high performance.
+ * @description A utility module for efficient matrix operations using WebAssembly bindings for neural network computations.
  */
-
-// WebAssembly binary for matrix operations (minimal example for demonstration)
-const wasmCode = new Uint8Array([
-  0x00, 0x61, 0x73, 0x6d, // WASM binary magic number
-  0x01, 0x00, 0x00, 0x00, // WASM version
-  // Add WASM bytecode here for matrix operations (e.g., multiplication, inversion)
-]);
 
 const { readFileSync } = require('fs');
 const { join } = require('path');
 
 /**
- * Initialize WebAssembly instance for matrix operations.
- * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WASM instance.
+ * Loads and initializes the WebAssembly module for matrix operations.
+ * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WebAssembly instance.
  */
-async function initWasm() {
-  const wasmModule = await WebAssembly.compile(wasmCode);
-  const instance = await WebAssembly.instantiate(wasmModule);
-  return instance;
+async function loadWasmModule() {
+  const wasmPath = join(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = readFileSync(wasmPath);
+  const wasmModule = await WebAssembly.compile(wasmBuffer);
+  return WebAssembly.instantiate(wasmModule);
 }
 
 /**
- * Perform matrix multiplication.
+ * Performs matrix multiplication efficiently using WebAssembly.
  * @param {number[][]} matrixA - The first matrix (2D array).
  * @param {number[][]} matrixB - The second matrix (2D array).
- * @returns {number[][]} The resulting matrix after multiplication.
- * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
+ * @returns {Promise<number[][]>} The result of the matrix multiplication.
+ * @throws {Error} If the matrices are not compatible for multiplication.
  */
-function multiplyMatrices(matrixA, matrixB) {
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
-
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimension mismatch: Cannot multiply these matrices.');
+async function matrixMultiply(matrixA, matrixB) {
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Matrix dimensions are incompatible for multiplication.');
   }
 
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+  const wasmInstance = await loadWasmModule();
+  const { memory, multiply_matrices } = wasmInstance.exports;
 
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const colsB = matrixB[0].length;
+
+  const inputBufferA = new Float64Array(memory.buffer, 0, rowsA * colsA);
+  const inputBufferB = new Float64Array(memory.buffer, rowsA * colsA * 8, colsA * colsB);
+  const outputBuffer = new Float64Array(memory.buffer, rowsA * colsA * 16, rowsA * colsB);
+
+  // Flatten matrixA and matrixB into the WASM memory buffer
+  matrixA.flat().forEach((value, index) => {
+    inputBufferA[index] = value;
+  });
+  matrixB.flat().forEach((value, index) => {
+    inputBufferB[index] = value;
+  });
+
+  // Perform the matrix multiplication in WASM
+  multiply_matrices(rowsA, colsA, colsB);
+
+  // Extract the result from the WASM memory buffer
+  const result = [];
   for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      for (let k = 0; k < colsA; k++) {
-        result[i][j] += matrixA[i][k] * matrixB[k][j];
-      }
-    }
+    result.push(Array.from(outputBuffer.slice(i * colsB, (i + 1) * colsB)));
   }
 
   return result;
 }
 
 /**
- * Invert a square matrix.
- * @param {number[][]} matrix - The matrix to invert (2D array).
- * @returns {number[][]} The inverted matrix.
- * @throws {Error} If the matrix is not square or is singular (non-invertible).
+ * Transposes a matrix efficiently using WebAssembly.
+ * @param {number[][]} matrix - The input matrix (2D array).
+ * @returns {Promise<number[][]>} The transposed matrix.
  */
-function invertMatrix(matrix) {
-  const n = matrix.length;
+async function matrixTranspose(matrix) {
+  const wasmInstance = await loadWasmModule();
+  const { memory, transpose_matrix } = wasmInstance.exports;
 
-  if (!matrix.every(row => row.length === n)) {
-    throw new Error('Matrix must be square to invert.');
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+
+  const inputBuffer = new Float64Array(memory.buffer, 0, rows * cols);
+  const outputBuffer = new Float64Array(memory.buffer, rows * cols * 8, rows * cols);
+
+  // Flatten the matrix into the WASM memory buffer
+  matrix.flat().forEach((value, index) => {
+    inputBuffer[index] = value;
+  });
+
+  // Perform the transpose in WASM
+  transpose_matrix(rows, cols);
+
+  // Extract the result from the WASM memory buffer
+  const result = [];
+  for (let i = 0; i < cols; i++) {
+    result.push(Array.from(outputBuffer.slice(i * rows, (i + 1) * rows)));
   }
 
-  const augmented = matrix.map((row, i) =>
-    row.concat(Array.from({ length: n }, (_, j) => (i === j ? 1 : 0)))
-  );
-
-  for (let i = 0; i < n; i++) {
-    if (augmented[i][i] === 0) {
-      throw new Error('Matrix is singular and cannot be inverted.');
-    }
-
-    const factor = augmented[i][i];
-    for (let j = 0; j < 2 * n; j++) {
-      augmented[i][j] /= factor;
-    }
-
-    for (let k = 0; k < n; k++) {
-      if (k !== i) {
-        const factor = augmented[k][i];
-        for (let j = 0; j < 2 * n; j++) {
-          augmented[k][j] -= factor * augmented[i][j];
-        }
-      }
-    }
-  }
-
-  return augmented.map(row => row.slice(n));
+  return result;
 }
 
 module.exports = {
-  initWasm,
-  multiplyMatrices,
-  invertMatrix
+  matrixMultiply,
+  matrixTranspose
 };

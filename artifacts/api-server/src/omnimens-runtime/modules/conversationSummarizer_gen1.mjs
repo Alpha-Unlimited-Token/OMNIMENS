@@ -1,104 +1,108 @@
+// conversationSummarizer.js
+
 /**
  * @module conversationSummarizer
- * @description Summarizes and embeds earlier conversational context dynamically to extend coherence beyond token window limitations.
+ * @description Summarizes earlier context into embeddings for extended token window utilization.
  */
 
 /**
- * Performs sentiment analysis on a given text.
- * @param {string} text - The input text to analyze.
- * @returns {string} - Sentiment of the text ('positive', 'neutral', 'negative').
+ * Generates sentence embeddings using a simple numerical vectorization technique.
+ * @param {string[]} sentences - Array of sentences to process.
+ * @returns {number[][]} Array of numerical vectors representing sentence embeddings.
  */
-function analyzeSentiment(text) {
-  const positiveWords = ['good', 'great', 'excellent', 'positive', 'happy', 'success'];
-  const negativeWords = ['bad', 'poor', 'terrible', 'negative', 'sad', 'failure'];
-
-  let positiveCount = 0;
-  let negativeCount = 0;
-
-  const words = text.toLowerCase().split(/\s+/);
-
-  for (const word of words) {
-    if (positiveWords.includes(word)) positiveCount++;
-    if (negativeWords.includes(word)) negativeCount++;
-  }
-
-  if (positiveCount > negativeCount) return 'positive';
-  if (negativeCount > positiveCount) return 'negative';
-  return 'neutral';
+export function generateEmbeddings(sentences) {
+  return sentences.map(sentence => {
+    const words = sentence.split(/\s+/);
+    return words.map(word => word.length); // Simple embedding: word length as a proxy for semantic value.
+  });
 }
 
 /**
- * Clusters conversational context into key points based on semantic similarity.
- * @param {Array<string>} contextArray - Array of conversational strings.
- * @returns {Array<string>} - Array of condensed key points.
+ * Clusters embeddings into representative groups.
+ * @param {number[][]} embeddings - Array of numerical vectors.
+ * @param {number} clusterCount - Desired number of clusters.
+ * @returns {number[][]} Array of representative vectors for each cluster.
  */
-function clusterContext(contextArray) {
-  const clusters = [];
+export function clusterEmbeddings(embeddings, clusterCount) {
+  if (embeddings.length === 0 || clusterCount <= 0) {
+    throw new Error("Invalid input: embeddings must be non-empty and clusterCount must be positive.");
+  }
 
-  for (const text of contextArray) {
-    let addedToCluster = false;
+  // Initialize clusters with the first `clusterCount` embeddings.
+  const clusters = embeddings.slice(0, clusterCount);
 
-    for (const cluster of clusters) {
-      if (areSemanticallySimilar(text, cluster[0])) {
-        cluster.push(text);
-        addedToCluster = true;
-        break;
+  let changed = true;
+  while (changed) {
+    const clusterAssignments = embeddings.map(embedding => {
+      return clusters.reduce((closest, cluster, index) => {
+        const distance = euclideanDistance(embedding, cluster);
+        return distance < closest.distance ? { index, distance } : closest;
+      }, { index: -1, distance: Infinity }).index;
+    });
+
+    const newClusters = Array.from({ length: clusterCount }, () => []);
+    clusterAssignments.forEach((clusterIndex, i) => {
+      newClusters[clusterIndex].push(embeddings[i]);
+    });
+
+    changed = false;
+    for (let i = 0; i < clusterCount; i++) {
+      const newCluster = calculateCentroid(newClusters[i]);
+      if (!arraysEqual(clusters[i], newCluster)) {
+        clusters[i] = newCluster;
+        changed = true;
       }
     }
-
-    if (!addedToCluster) clusters.push([text]);
   }
 
-  return clusters.map(cluster => summarizeCluster(cluster));
+  return clusters;
 }
 
 /**
- * Determines if two texts are semantically similar.
- * @param {string} text1 - First text.
- * @param {string} text2 - Second text.
- * @returns {boolean} - True if semantically similar, false otherwise.
+ * Summarizes context by clustering sentence embeddings into representative vectors.
+ * @param {string[]} sentences - Array of sentences to summarize.
+ * @param {number} clusterCount - Desired number of clusters.
+ * @returns {number[][]} Array of representative vectors summarizing the context.
  */
-function areSemanticallySimilar(text1, text2) {
-  const commonWordsThreshold = 0.3;
-
-  const words1 = new Set(text1.toLowerCase().split(/\s+/));
-  const words2 = new Set(text2.toLowerCase().split(/\s+/));
-
-  const commonWords = [...words1].filter(word => words2.has(word));
-  const similarityRatio = commonWords.length / Math.min(words1.size, words2.size);
-
-  return similarityRatio >= commonWordsThreshold;
+export function summarizeContext(sentences, clusterCount) {
+  const embeddings = generateEmbeddings(sentences);
+  return clusterEmbeddings(embeddings, clusterCount);
 }
 
 /**
- * Summarizes a cluster of texts into a single key point.
- * @param {Array<string>} cluster - Array of texts in the cluster.
- * @returns {string} - Condensed summary of the cluster.
+ * Calculates the Euclidean distance between two numerical vectors.
+ * @param {number[]} vec1 - First vector.
+ * @param {number[]} vec2 - Second vector.
+ * @returns {number} Euclidean distance.
  */
-function summarizeCluster(cluster) {
-  const sentimentCounts = { positive: 0, neutral: 0, negative: 0 };
-
-  for (const text of cluster) {
-    const sentiment = analyzeSentiment(text);
-    sentimentCounts[sentiment]++;
-  }
-
-  const dominantSentiment = Object.keys(sentimentCounts).reduce((a, b) => sentimentCounts[a] > sentimentCounts[b] ? a : b);
-
-  return `Cluster Summary: ${cluster.join(' ')} | Sentiment: ${dominantSentiment}`;
+function euclideanDistance(vec1, vec2) {
+  return Math.sqrt(vec1.reduce((sum, val, i) => sum + Math.pow(val - (vec2[i] || 0), 2), 0));
 }
 
 /**
- * Summarizes and embeds earlier conversational context.
- * @param {Array<string>} contextArray - Array of conversational strings.
- * @returns {Array<string>} - Array of summarized key points.
+ * Calculates the centroid of a cluster of vectors.
+ * @param {number[][]} cluster - Array of numerical vectors.
+ * @returns {number[]} Centroid vector.
  */
-function summarizeAndEmbedContext(contextArray) {
-  return clusterContext(contextArray);
+function calculateCentroid(cluster) {
+  if (cluster.length === 0) return [];
+  const dimension = cluster[0].length;
+  const sums = Array(dimension).fill(0);
+  cluster.forEach(vector => {
+    vector.forEach((value, index) => {
+      sums[index] += value;
+    });
+  });
+  return sums.map(sum => sum / cluster.length);
 }
 
-module.exports = {
-  analyzeSentiment,
-  clusterContext,
-  summarizeAndEmbedContext
-};
+/**
+ * Checks if two arrays are equal.
+ * @param {number[]} arr1 - First array.
+ * @param {number[]} arr2 - Second array.
+ * @returns {boolean} True if arrays are equal, false otherwise.
+ */
+function arraysEqual(arr1, arr2) {
+  if (arr1.length !== arr2.length) return false;
+  return arr1.every((val, index) => val === arr2[index]);
+}
