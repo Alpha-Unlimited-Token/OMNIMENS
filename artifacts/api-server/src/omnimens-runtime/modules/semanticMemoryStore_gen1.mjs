@@ -1,86 +1,93 @@
 /**
  * @module semanticMemoryStore
- * @description This module provides a semantic memory store for real-time embedding storage, search, and similarity operations.
- * It uses an in-memory vector store for fast indexing and retrieval of high-dimensional embeddings.
+ * @description A utility module for maintaining and retrieving long-term conversational context using an in-memory vector store.
  */
 
 /**
- * Internal in-memory store for embeddings and associated metadata.
- * @type {Map<string, { embedding: number[], metadata: any }>}
+ * Generates a normalized vector from a given string by hashing its characters and normalizing the result.
+ * @param {string} input - The input string to be converted into a vector.
+ * @returns {number[]} A normalized vector representation of the input string.
  */
-const memoryStore = new Map();
-
-/**
- * Adds an embedding and associated metadata to the memory store.
- * @param {string} id - Unique identifier for the embedding.
- * @param {number[]} embedding - The high-dimensional vector representation.
- * @param {any} metadata - Additional metadata associated with the embedding.
- * @throws {Error} If the embedding is not a valid array of numbers.
- */
-export function addEmbedding(id, embedding, metadata = {}) {
-  if (!Array.isArray(embedding) || !embedding.every((x) => typeof x === 'number')) {
-    throw new Error('Embedding must be an array of numbers.');
+function generateVector(input) {
+  const vector = Array(128).fill(0);
+  for (let i = 0; i < input.length; i++) {
+    const charCode = input.charCodeAt(i) % 128;
+    vector[charCode] += 1;
   }
-  memoryStore.set(id, { embedding, metadata });
+  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
+  return vector.map((val) => val / magnitude);
 }
 
 /**
  * Computes the cosine similarity between two vectors.
- * @param {number[]} vecA - First vector.
- * @param {number[]} vecB - Second vector.
- * @returns {number} Cosine similarity value between -1 and 1.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} The cosine similarity between the two vectors.
  */
-function cosineSimilarity(vecA, vecB) {
-  const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
-  const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a ** 2, 0));
-  const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b ** 2, 0));
-  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
+function cosineSimilarity(vectorA, vectorB) {
+  const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
+  return dotProduct / (magnitudeA * magnitudeB);
 }
 
 /**
- * Searches for the most similar embeddings in the memory store.
- * @param {number[]} queryEmbedding - The query embedding vector.
- * @param {number} topK - Number of top results to return (default: 5).
- * @returns {Array<{ id: string, similarity: number, metadata: any }>} Array of topK results sorted by similarity.
+ * Class representing a semantic memory store.
  */
-export function searchSimilar(queryEmbedding, topK = 5) {
-  if (!Array.isArray(queryEmbedding) || !queryEmbedding.every((x) => typeof x === 'number')) {
-    throw new Error('Query embedding must be an array of numbers.');
+class SemanticMemoryStore {
+  constructor() {
+    /** @type {Map<string, {vector: number[], data: any}>} */
+    this.store = new Map();
   }
 
-  const results = [];
-
-  for (const [id, { embedding, metadata }] of memoryStore.entries()) {
-    const similarity = cosineSimilarity(queryEmbedding, embedding);
-    results.push({ id, similarity, metadata });
+  /**
+   * Adds an entry to the memory store.
+   * @param {string} key - The unique key for the entry.
+   * @param {string} text - The text data to store.
+   * @param {any} metadata - Additional metadata associated with the entry.
+   */
+  add(key, text, metadata = null) {
+    const vector = generateVector(text);
+    this.store.set(key, { vector, data: { text, metadata } });
   }
 
-  return results
-    .sort((a, b) => b.similarity - a.similarity)
-    .slice(0, topK);
+  /**
+   * Retrieves the most semantically similar entry to the given query.
+   * @param {string} query - The input query string.
+   * @param {number} threshold - The similarity threshold (0 to 1).
+   * @returns {{key: string, similarity: number, data: any} | null} The closest match or null if no match exceeds the threshold.
+   */
+  retrieve(query, threshold = 0.7) {
+    const queryVector = generateVector(query);
+    let bestMatch = null;
+    let highestSimilarity = -Infinity;
+
+    for (const [key, { vector, data }] of this.store.entries()) {
+      const similarity = cosineSimilarity(queryVector, vector);
+      if (similarity > highestSimilarity && similarity >= threshold) {
+        highestSimilarity = similarity;
+        bestMatch = { key, similarity, data };
+      }
+    }
+
+    return bestMatch;
+  }
+
+  /**
+   * Clears all entries in the memory store.
+   */
+  clear() {
+    this.store.clear();
+  }
+
+  /**
+   * Removes a specific entry by its key.
+   * @param {string} key - The key of the entry to remove.
+   * @returns {boolean} True if the entry was successfully removed, false otherwise.
+   */
+  remove(key) {
+    return this.store.delete(key);
+  }
 }
 
-/**
- * Clears all embeddings from the memory store.
- */
-export function clearMemoryStore() {
-  memoryStore.clear();
-}
-
-/**
- * Retrieves the current size of the memory store.
- * @returns {number} The number of embeddings stored.
- */
-export function getMemoryStoreSize() {
-  return memoryStore.size;
-}
-
-/**
- * Retrieves metadata for a specific embedding by ID.
- * @param {string} id - The unique identifier of the embedding.
- * @returns {any|null} The metadata associated with the embedding, or null if not found.
- */
-export function getMetadataById(id) {
-  const entry = memoryStore.get(id);
-  return entry ? entry.metadata : null;
-}
+export { SemanticMemoryStore, generateVector, cosineSimilarity };

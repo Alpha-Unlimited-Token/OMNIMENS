@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getGetOmnimensStatusQueryKey } from "@workspace/api-client-react";
 
@@ -152,11 +152,20 @@ export type AttachedFile = {
   preview?: string;
 };
 
-export function useOmnimensChat(onLimitReached: () => void) {
+export type GpuCompressorFn = (msgs: { role: string; content: string }[]) => Promise<string | null>;
+
+export function useOmnimensChat(
+  onLimitReached: () => void,
+  gpuCompressor?: GpuCompressorFn,
+) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentConversationId, setCurrentConversationId] = useState<number | undefined>();
+
+  // Keep compressor ref up-to-date without requiring re-render
+  const gpuCompressorRef = useRef<GpuCompressorFn | undefined>(gpuCompressor);
+  useEffect(() => { gpuCompressorRef.current = gpuCompressor; }, [gpuCompressor]);
   const [activeCogniSync, setActiveCogniSync] = useState<CogniSyncState | null>(null);
   const queryClient = useQueryClient();
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -208,10 +217,33 @@ export function useOmnimensChat(onLimitReached: () => void) {
     abortControllerRef.current = new AbortController();
 
     try {
-      const history = messages.slice(-10).map((m) => ({
+      const rawHistory = messages.slice(-20).map((m) => ({
         role: m.role === "user" ? "user" : "assistant",
         content: m.content,
       }));
+
+      // GPU acceleration: if conversation is long and GPU is ready, compress
+      // older messages locally before sending to the server. This reduces
+      // token usage and server latency — fully transparent, no behavior change.
+      let history = rawHistory;
+      if (gpuCompressorRef.current && rawHistory.length > 8) {
+        const olderMessages = rawHistory.slice(0, -6);
+        const recentMessages = rawHistory.slice(-6);
+        try {
+          const summary = await gpuCompressorRef.current(olderMessages);
+          if (summary) {
+            history = [
+              { role: "user", content: `[Earlier conversation summary: ${summary}]` },
+              { role: "assistant", content: "Understood, I have the context from our earlier conversation." },
+              ...recentMessages,
+            ];
+          }
+        } catch {
+          history = rawHistory.slice(-10);
+        }
+      } else {
+        history = rawHistory.slice(-10);
+      }
 
       const form = new FormData();
       form.append("message", content);

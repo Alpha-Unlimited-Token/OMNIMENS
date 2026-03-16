@@ -15,6 +15,7 @@ import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { useQuery, useQueryClient as useQC } from "@tanstack/react-query";
 import { useOmnimensChat, type GeneratedImage, type Generated3DModel, type GeneratedGame, type Artifact, type CostBreakdown, type TaskPlan, type RedFlagAlert, type ToolResult, type CogniSyncState } from "@/hooks/use-omnimens-chat";
+import { useWebGpuLlm } from "@/hooks/use-webgpu-llm";
 import { useOmnimensVoice } from "@/hooks/use-omnimens-voice";
 import { VoiceIndicator } from "@/components/voice-indicator";
 import { OmnimensPresence } from "@/components/omnimens-presence";
@@ -2282,9 +2283,21 @@ export default function Chat() {
 
   const { data: status, isLoading: statusLoading } = useGetOmnimensStatus();
   const qc = useQC();
-  const { messages, sendMessage, isTyping, error, stopGeneration, currentConversationId, startNewConversation, loadConversation, activeCogniSync } = useOmnimensChat(() => {
-    setShowLimitModal(true);
-  });
+  const gpu = useWebGpuLlm();
+
+  // Auto-load the local GPU model once user is logged in and GPU is supported
+  useEffect(() => {
+    if (isAuthenticated && gpu.supported && gpu.status === "idle") {
+      // Small delay so the chat UI renders first
+      const t = setTimeout(() => gpu.load(), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [isAuthenticated, gpu.supported, gpu.status]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const { messages, sendMessage, isTyping, error, stopGeneration, currentConversationId, startNewConversation, loadConversation, activeCogniSync } = useOmnimensChat(
+    () => { setShowLimitModal(true); },
+    gpu.ready ? gpu.compressContext : undefined,
+  );
 
   const { data: conversations = [], refetch: refetchConversations } = useQuery<{ id: number; title: string | null; updatedAt: string | null }[]>({
     queryKey: ["omnimens-conversations"],
@@ -2532,6 +2545,26 @@ export default function Chat() {
               <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
               <span className="text-white">LINK ACTIVE</span>
               <CogniSyncIndicator state={activeCogniSync} />
+              {/* WebGPU accelerator badge */}
+              {gpu.supported && gpu.status !== "unsupported" && (
+                gpu.status === "loading" ? (
+                  <span
+                    title={`Loading local GPU model… ${gpu.progress}%\n${gpu.progressText}`}
+                    className="flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-sky-400/20 bg-sky-400/8 text-sky-400 text-[8px] font-mono tracking-widest cursor-default"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" style={{}} />
+                    GPU {gpu.progress}%
+                  </span>
+                ) : gpu.status === "ready" ? (
+                  <span
+                    title="WebGPU local acceleration active — context is compressed locally on your GPU before sending"
+                    className="flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-sky-400/25 bg-sky-400/10 text-sky-400 text-[8px] font-mono tracking-widest cursor-default"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400" style={{ boxShadow: "0 0 6px #38bdf8" }} />
+                    GPU ACTIVE
+                  </span>
+                ) : null
+              )}
               {/* Active hub modes indicators */}
               {hubSettings.antiHallucinationMode && (
                 <span title="Anti-Hallucination Mode ON" className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-orange-400/10 border border-orange-400/20 text-orange-400 text-[9px] font-mono">
