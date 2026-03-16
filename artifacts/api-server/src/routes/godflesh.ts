@@ -492,6 +492,7 @@ router.post("/godflesh/chat", upload.array("files", 10), async (req, res) => {
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
 
+  console.log(`[OMNIMENS CHAT] Request from user=${req.user.id} owner=${owner} tier=${tier} msg="${message.slice(0, 80)}"`);
   try {
     const godfleshState = await runGodflesh(message || "analyze the uploaded files");
 
@@ -551,15 +552,28 @@ router.post("/godflesh/chat", upload.array("files", 10), async (req, res) => {
 
     // After text stream — scan for [GENERATE_IMAGE: ...] markers and generate images
     const imageMarkers = [...fullText.matchAll(/\[GENERATE_IMAGE:\s*([\s\S]+?)\]/g)];
+    console.log(`[OMNIMENS IMAGE] fullText length=${fullText.length}, markers found=${imageMarkers.length}`);
     for (let i = 0; i < imageMarkers.length; i++) {
       const prompt = imageMarkers[i][1].trim();
+      console.log(`[OMNIMENS IMAGE] Generating image ${i}: ${prompt.slice(0, 100)}`);
       try {
         res.write(`data: ${JSON.stringify({ type: "image_generating", index: i, prompt })}\n\n`);
-        const imageBuffer = await generateImageBuffer(prompt.slice(0, 4000), "1024x1024");
-        const dataUrl = `data:image/png;base64,${imageBuffer.toString("base64")}`;
+        // Keep SSE connection alive with heartbeat pings while waiting for image generation
+        // (gpt-image-1 can take 60-120 seconds; proxies drop idle connections)
+        const heartbeat = setInterval(() => {
+          try { res.write(`: ping\n\n`); } catch { /* ignore if closed */ }
+        }, 8000);
+        let imageBuffer: Buffer;
+        try {
+          imageBuffer = await generateImageBuffer(prompt.slice(0, 4000), "1024x1024");
+        } finally {
+          clearInterval(heartbeat);
+        }
+        console.log(`[OMNIMENS IMAGE] Generated image ${i}, buffer size=${imageBuffer!.length}`);
+        const dataUrl = `data:image/png;base64,${imageBuffer!.toString("base64")}`;
         res.write(`data: ${JSON.stringify({ type: "image_generated", url: dataUrl, prompt, index: i })}\n\n`);
       } catch (imgErr) {
-        console.error("Image generation error:", imgErr);
+        console.error(`[OMNIMENS IMAGE] Error generating image ${i}:`, imgErr);
         res.write(`data: ${JSON.stringify({ type: "image_error", index: i, error: "Image generation failed" })}\n\n`);
       }
     }

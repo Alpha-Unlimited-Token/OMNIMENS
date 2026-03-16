@@ -17,6 +17,30 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { motion, AnimatePresence } from "framer-motion";
 
+function ImageGeneratingBadge() {
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setElapsed((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const pct = Math.min(100, (elapsed / 90) * 100);
+  return (
+    <div className="mt-4 border border-primary/20 rounded-xl px-4 py-3 bg-primary/5 font-mono text-xs space-y-2">
+      <div className="flex items-center gap-3 text-white/50">
+        <Loader2 className="w-4 h-4 animate-spin text-primary shrink-0" />
+        <span className="tracking-widest">MANIFESTING IMAGE...</span>
+        <span className="ml-auto text-primary/70">{elapsed}s</span>
+      </div>
+      <div className="w-full h-0.5 bg-white/5 rounded-full overflow-hidden">
+        <div className="h-full bg-primary/60 transition-all duration-1000" style={{ width: `${pct}%` }} />
+      </div>
+      {elapsed > 20 && (
+        <p className="text-white/25 text-[10px]">High-resolution synthesis in progress — this can take up to 2 minutes.</p>
+      )}
+    </div>
+  );
+}
+
 export default function Chat() {
   const { isAuthenticated, isLoading } = useAuth();
   const [, setLocation] = useLocation();
@@ -224,12 +248,9 @@ export default function Chat() {
                               </div>
                             )}
 
-                            {/* Generating indicator */}
+                            {/* Generating indicator with elapsed timer */}
                             {msg.generatingImages && (
-                              <div className="mt-4 flex items-center gap-3 text-white/40 font-mono text-xs border border-primary/15 rounded-xl px-4 py-3 bg-primary/5">
-                                <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                                <span className="tracking-widest">MANIFESTING IMAGE...</span>
-                              </div>
+                              <ImageGeneratingBadge />
                             )}
 
                             {/* Downloadable artifacts */}
