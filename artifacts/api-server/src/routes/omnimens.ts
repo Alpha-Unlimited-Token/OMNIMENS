@@ -45,6 +45,7 @@ import { checkAndGrantMonthlyCredits, attemptAutoTopup, createSetupSession, conf
 import { getOrCreateConversation, saveMessage, generateConversationTitle, loadConversationHistory, listConversations, deleteConversation } from "../lib/omnimens-conversations.js";
 import { generate3DModel } from "../lib/omnimens-3d.js";
 import { generateGame } from "../lib/omnimens-game.js";
+import { buildCinematicZip, type CinematicExportRequest } from "../lib/omnimens-avatar-cinematic.js";
 import { loadToolKnowledgeForTask, runToolKnowledgeIngestion, INSTALLED_TOOLS } from "../lib/omnimens-tool-knowledge.js";
 import { getRestorativeArtContext } from "../lib/omnimens-restorative-art.js";
 
@@ -1855,6 +1856,38 @@ router.post("/omnimens/3d-generate", async (req, res) => {
   } catch (err) {
     console.error("[OMNIMENS 3D endpoint]", err);
     res.status(500).json({ error: "3D generation failed", detail: String(err) });
+  }
+});
+
+// ─── Avatar Cinematic Export ──────────────────────────────────────────────────
+
+router.post("/omnimens/avatar/export-cinematic", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Login required" }); return; }
+
+  const body = req.body as CinematicExportRequest;
+  if (!body.frames || !Array.isArray(body.frames) || body.frames.length === 0) {
+    res.status(400).json({ error: "No animation frames provided" }); return;
+  }
+  if (body.frames.length > 18000) {
+    res.status(400).json({ error: "Recording too long (max 10 minutes)" }); return;
+  }
+
+  try {
+    const zipBuffer = await buildCinematicZip({
+      frames: body.frames,
+      cinematicStyle: body.cinematicStyle || "studio",
+      fps: body.fps || 30,
+      avatarType: body.avatarType || "default",
+      totalDuration: body.totalDuration || body.frames.length / 30,
+    });
+
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader("Content-Disposition", "attachment; filename=omnimens-avatar-cinematic.zip");
+    res.setHeader("Content-Length", zipBuffer.length.toString());
+    res.send(zipBuffer);
+  } catch (err) {
+    console.error("[OMNIMENS Avatar Cinematic]", err);
+    res.status(500).json({ error: "Cinematic export failed", detail: String(err) });
   }
 });
 

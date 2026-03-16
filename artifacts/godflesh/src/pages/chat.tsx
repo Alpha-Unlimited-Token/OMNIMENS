@@ -15,7 +15,7 @@ import {
   Loader2, Expand, FileCode, Box, Film, Music, BarChart3, Shapes, Globe,
   Zap, Terminal, Play, Microscope, ChevronDown, Check, BookOpen, Brain,
   Cpu, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Image,
-  FolderOpen, Activity, SlidersHorizontal, PanelLeftClose, PanelRightClose,
+  FolderOpen, Activity, SlidersHorizontal, PanelLeftClose, PanelRightClose, PersonStanding,
   PanelLeft, PanelRight, X, Layers, Stethoscope, AlertTriangle, HeartPulse,
   MessageSquare, PlusCircle, Trash2
 } from "lucide-react";
@@ -1576,6 +1576,7 @@ function LeftPanel({
   onPersonaChange,
   deepResearchMode,
   onToggleDeepResearch,
+  onOpenAvatarStudio,
   voice,
   status,
   conversations,
@@ -1588,6 +1589,7 @@ function LeftPanel({
   onPersonaChange: (p: string) => void;
   deepResearchMode: boolean;
   onToggleDeepResearch: () => void;
+  onOpenAvatarStudio: () => void;
   voice: any;
   status: any;
   conversations: { id: number; title: string | null; updatedAt: string | null }[];
@@ -1727,6 +1729,14 @@ function LeftPanel({
         >
           <Microscope className="w-3.5 h-3.5" />
           DEEP RESEARCH
+        </button>
+
+        <button
+          onClick={onOpenAvatarStudio}
+          className="w-full flex items-center gap-2 px-2.5 py-2 mt-1 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border border-white/10 text-white/85 hover:text-emerald-300 hover:border-emerald-500/30 hover:bg-emerald-500/5"
+        >
+          <PersonStanding className="w-3.5 h-3.5" />
+          AVATAR STUDIO
         </button>
       </div>
     </div>
@@ -1969,6 +1979,7 @@ export default function Chat() {
   const voice = useOmnimensVoice();
   const [persona, setPersona] = useState("GENERAL");
   const [deepResearchMode, setDeepResearchMode] = useState(false);
+  const [showAvatarStudio, setShowAvatarStudio] = useState(false);
   const [researchQuestion, setResearchQuestion] = useState("");
   const [isResearching, setIsResearching] = useState(false);
   const [researchResult, setResearchResult] = useState<any>(null);
@@ -2104,6 +2115,7 @@ export default function Chat() {
                 onPersonaChange={handlePersonaChange}
                 deepResearchMode={deepResearchMode}
                 onToggleDeepResearch={() => setDeepResearchMode(m => !m)}
+                onOpenAvatarStudio={() => setShowAvatarStudio(true)}
                 voice={voice}
                 status={status}
                 conversations={conversations}
@@ -2468,6 +2480,37 @@ export default function Chat() {
 
       {/* Limit Modal */}
       <AnimatePresence>
+        {/* ── Avatar Studio Modal ── */}
+        {showAvatarStudio && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[90] flex flex-col bg-black/95 backdrop-blur-sm"
+          >
+            <div className="flex items-center justify-between px-4 py-2 border-b border-white/8 bg-black/60 shrink-0">
+              <div className="flex items-center gap-2">
+                <PersonStanding className="w-4 h-4 text-emerald-400" />
+                <span className="font-mono text-[10px] tracking-widest text-emerald-400">OMNIMENS AVATAR STUDIO</span>
+                <span className="font-mono text-[8px] text-white/30 border border-white/10 px-1.5 py-0.5 rounded">
+                  MediaPipe · Three.js · Blender 4 · VRM
+                </span>
+              </div>
+              <button
+                onClick={() => setShowAvatarStudio(false)}
+                className="text-white/40 hover:text-white transition-colors p-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <iframe
+              src={`${import.meta.env.BASE_URL}avatar-studio.html`}
+              className="flex-1 w-full border-0"
+              title="OMNIMENS Avatar Studio"
+              allow="camera;microphone"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-downloads"
+            />
+          </motion.div>
+        )}
+
         {showLimitModal && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}

@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OMNIMENS Avatar Studio</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #050508;
+    --surface: #0a0a12;
+    --border: rgba(255,255,255,0.07);
+    --primary: #00ffc8;
+    --accent: #7c3aed;
+    --text: rgba(255,255,255,0.85);
+    --muted: rgba(255,255,255,0.35);
+    --danger: #ef4444;
+    --rec: #ff3333;
+  }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'Courier New', monospace; }
+
+  /* ── Permission Gate ── */
+  #gate {
+    position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at 50% 30%, rgba(0,255,200,0.05) 0%, #050508 70%);
+    z-index: 100;
+  }
+  .gate-card {
+    max-width: 500px; width: 90%; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 36px 32px; text-align: center;
+    box-shadow: 0 0 60px rgba(0,255,200,0.04), 0 0 120px rgba(124,58,237,0.04);
+  }
+  .gate-orb {
+    width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 20px;
+    background: radial-gradient(circle, rgba(0,255,200,0.15), rgba(124,58,237,0.08));
+    border: 1px solid rgba(0,255,200,0.2); display: flex; align-items: center; justify-content: center;
+    font-size: 24px; animation: pulse-orb 2s ease-in-out infinite;
+  }
+  @keyframes pulse-orb { 0%,100%{box-shadow:0 0 12px rgba(0,255,200,0.2)} 50%{box-shadow:0 0 28px rgba(0,255,200,0.4)} }
+  .gate-title { font-size: 13px; letter-spacing: 0.35em; color: var(--primary); margin-bottom: 8px; }
+  .gate-sub { font-size: 10px; color: var(--muted); line-height: 1.7; margin-bottom: 20px; }
+  .gate-warning {
+    background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.15);
+    border-radius: 8px; padding: 10px 14px; font-size: 9px; color: rgba(255,100,100,0.8);
+    text-align: left; margin-bottom: 20px; line-height: 1.6;
+  }
+  .gate-features { display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px; }
+  .gate-feature {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 9px; color: var(--muted); text-align: left;
+  }
+  .gate-feature-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); opacity: 0.6; flex-shrink: 0; }
+  #btn-enable {
+    width: 100%; padding: 12px; font-family: inherit; font-size: 10px; letter-spacing: 0.25em;
+    background: rgba(0,255,200,0.08); border: 1px solid rgba(0,255,200,0.3);
+    color: var(--primary); border-radius: 10px; cursor: pointer; transition: all 0.2s;
+  }
+  #btn-enable:hover { background: rgba(0,255,200,0.16); border-color: rgba(0,255,200,0.6); }
+  #gate-error { font-size: 9px; color: var(--danger); margin-top: 10px; display: none; }
+
+  /* ── Studio Layout ── */
+  #studio {
+    position: fixed; inset: 0; display: grid;
+    grid-template-columns: 220px 1fr;
+    grid-template-rows: 1fr;
+  }
+
+  /* ── Sidebar ── */
+  #sidebar {
+    background: var(--surface); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden;
+  }
+  #sidebar::-webkit-scrollbar { width: 3px; }
+  #sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+  .sidebar-header {
+    padding: 14px 14px 10px; border-bottom: 1px solid var(--border);
+    font-size: 9px; letter-spacing: 0.3em; color: var(--primary);
+  }
+  .sb-section { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  .sb-label { font-size: 8px; letter-spacing: 0.2em; color: var(--muted); margin-bottom: 8px; }
+  .sb-btn {
+    width: 100%; padding: 8px 10px; font-family: inherit; font-size: 9px;
+    letter-spacing: 0.15em; border-radius: 8px; cursor: pointer;
+    transition: all 0.15s; border: 1px solid var(--border);
+    background: transparent; color: var(--text); margin-bottom: 5px;
+  }
+  .sb-btn:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15); }
+  .sb-btn.primary { border-color: rgba(0,255,200,0.3); color: var(--primary); background: rgba(0,255,200,0.06); }
+  .sb-btn.primary:hover { background: rgba(0,255,200,0.14); }
+  .sb-btn.danger { border-color: rgba(239,68,68,0.3); color: #f87171; background: rgba(239,68,68,0.05); }
+  .sb-btn.danger:hover { background: rgba(239,68,68,0.12); }
+  .sb-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .sb-btn.active { border-color: var(--rec); color: var(--rec); background: rgba(255,51,51,0.1); animation: rec-blink 1s steps(1) infinite; }
+  @keyframes rec-blink { 0%,100%{opacity:1} 50%{opacity:0.6} }
+  .style-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+  .style-chip {
+    padding: 6px 4px; font-family: inherit; font-size: 8px; letter-spacing: 0.1em;
+    border-radius: 6px; cursor: pointer; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); transition: all 0.15s; text-align: center;
+  }
+  .style-chip.selected { border-color: rgba(124,58,237,0.5); color: #a78bfa; background: rgba(124,58,237,0.1); }
+  .style-chip:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+  #avatar-info { font-size: 8px; color: var(--muted); line-height: 1.5; margin-top: 4px; }
+  #rec-timer { font-size: 18px; color: var(--rec); letter-spacing: 0.1em; text-align: center; padding: 4px 0; display: none; }
+  #frame-count { font-size: 9px; color: var(--muted); text-align: center; }
+  .sb-divider { height: 1px; background: var(--border); margin: 0; }
+  .sb-footer { padding: 12px 14px; margin-top: auto; }
+  .help-text { font-size: 8px; color: var(--muted); line-height: 1.7; }
+  .help-link { color: var(--primary); text-decoration: none; }
+  .help-link:hover { text-decoration: underline; }
+
+  /* ── Main Canvas Area ── */
+  #canvas-area { position: relative; background: #000; overflow: hidden; }
+  #avatar-canvas { display: block; width: 100%; height: 100%; }
+
+  /* ── PiP Webcam ── */
+  #pip {
+    position: absolute; bottom: 16px; right: 16px;
+    width: 160px; height: 120px; border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--border); background: #000;
+  }
+  #webcam { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+  #tracking-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+  /* ── HUD ── */
+  #hud {
+    position: absolute; top: 12px; left: 12px;
+    display: flex; flex-direction: column; gap: 4px; pointer-events: none;
+  }
+  .hud-badge {
+    font-size: 8px; letter-spacing: 0.15em; padding: 3px 8px; border-radius: 4px;
+    background: rgba(0,0,0,0.6); border: 1px solid var(--border);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .hud-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .hud-dot.green { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+  .hud-dot.yellow { background: #eab308; }
+  .hud-dot.red { background: var(--rec); box-shadow: 0 0 6px var(--rec); animation: rec-blink 1s steps(1) infinite; }
+  #rec-hud { display: none; position: absolute; top: 12px; right: 12px; }
+  .rec-badge {
+    font-size: 9px; letter-spacing: 0.2em; padding: 4px 10px; border-radius: 6px;
+    background: rgba(255,51,51,0.15); border: 1px solid rgba(255,51,51,0.4);
+    color: var(--rec); display: flex; align-items: center; gap: 6px;
+  }
+  .rec-circle { width: 7px; height: 7px; border-radius: 50%; background: var(--rec); animation: rec-blink 0.8s steps(1) infinite; }
+
+  /* ── Export Progress ── */
+  #export-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+    align-items: center; justify-content: center; z-index: 200;
+    backdrop-filter: blur(4px);
+  }
+  #export-overlay.show { display: flex; }
+  .export-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 28px 32px; text-align: center; max-width: 360px;
+  }
+  .export-spinner {
+    width: 40px; height: 40px; border: 2px solid var(--border);
+    border-top-color: var(--primary); border-radius: 50%;
+    animation: spin 0.8s linear infinite; margin: 0 auto 14px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .export-title { font-size: 11px; letter-spacing: 0.2em; color: var(--primary); margin-bottom: 6px; }
+  .export-sub { font-size: 9px; color: var(--muted); }
+
+  /* ── Toast ── */
+  #toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.9); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 16px; font-size: 9px; letter-spacing: 0.1em;
+    z-index: 300; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap;
+  }
+  #toast.show { opacity: 1; }
+  #toast.success { border-color: rgba(34,197,94,0.4); color: #4ade80; }
+  #toast.error { border-color: rgba(239,68,68,0.4); color: #f87171; }
+</style>
+</head>
+<body>
+
+<!-- ── Permission Gate ── -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-orb">⬡</div>
+    <div class="gate-title">OMNIMENS AVATAR STUDIO</div>
+    <div class="gate-sub">
+      Live face tracking · Real-time 3D avatar · Cinematic Blender export<br/>
+      Powered by Google MediaPipe · Three.js · Open-source technologies
+    </div>
+    <div class="gate-warning">
+      ⚠ Camera Permission Required — Your camera is NEVER recorded or transmitted to any server.
+      All face tracking runs entirely in your browser. You control when it starts and stops.
+    </div>
+    <div class="gate-features">
+      <div class="gate-feature"><div class="gate-feature-dot"></div>MediaPipe face mesh (468 landmarks, real-time)</div>
+      <div class="gate-feature"><div class="gate-feature-dot"></div>Three.js 3D avatar — mirrors your expressions live</div>
+      <div class="gate-feature"><div class="gate-feature-dot"></div>VRM avatar support — load your VRoid/Ready Player Me character</div>
+      <div class="gate-feature"><div class="gate-feature-dot"></div>Record performance → export cinematic Blender scene</div>
+      <div class="gate-feature"><div class="gate-feature-dot"></div>Cinematic styles: Studio, Sci-Fi, Film Noir, Documentary</div>
+    </div>
+    <button id="btn-enable">⬡ ENABLE CAMERA &amp; LAUNCH STUDIO</button>
+    <div id="gate-error"></div>
+  </div>
+</div>
+
+<!-- ── Studio ── -->
+<div id="studio" style="display:none">
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div class="sidebar-header">⬡ OMNIMENS AVATAR STUDIO</div>
+
+    <!-- Avatar section -->
+    <div class="sb-section">
+      <div class="sb-label">AVATAR</div>
+      <button class="sb-btn primary" id="btn-load-vrm">LOAD VRM FILE</button>
+      <input type="file" id="vrm-file" accept=".vrm" style="display:none" />
+      <button class="sb-btn" id="btn-default-avatar">DEFAULT AVATAR</button>
+      <div id="avatar-info">⬡ OMNIMENS default — stylized 3D head<br/>Upload a .vrm file for custom avatar</div>
+    </div>
+
+    <!-- Cinematic style -->
+    <div class="sb-section">
+      <div class="sb-label">CINEMATIC STYLE</div>
+      <div class="style-grid">
+        <button class="style-chip selected" data-style="studio">STUDIO</button>
+        <button class="style-chip" data-style="cinematic">CINEMATIC</button>
+        <button class="style-chip" data-style="scifi">SCI-FI</button>
+        <button class="style-chip" data-style="noir">FILM NOIR</button>
+        <button class="style-chip" data-style="documentary">DOCUM.</button>
+        <button class="style-chip" data-style="fantasy">FANTASY</button>
+      </div>
+    </div>
+
+    <!-- Blender integration -->
+    <div class="sb-section">
+      <div class="sb-label">3D TOOLS INTEGRATION</div>
+      <div style="font-size:8px;color:var(--muted);line-height:1.7;margin-bottom:8px;">
+        Export connects to:<br/>
+        ✦ Blender 4 (cinematic render)<br/>
+        ✦ GLB/VRM mesh pipeline<br/>
+        ✦ OpenSCAD prosthetics<br/>
+        ✦ Game engine (Phaser/Godot)
+      </div>
+    </div>
+
+    <!-- Record -->
+    <div class="sb-section">
+      <div class="sb-label">PERFORMANCE CAPTURE</div>
+      <div id="rec-timer">0:00</div>
+      <div id="frame-count"></div>
+      <button class="sb-btn primary" id="btn-record">⏺ START RECORDING</button>
+      <button class="sb-btn" id="btn-export" disabled>⬡ EXPORT CINEMATIC ZIP</button>
+    </div>
+
+    <!-- Help -->
+    <div class="sb-footer">
+      <div class="help-text">
+        Free VRM avatars:<br/>
+        <a class="help-link" href="https://hub.vroid.com" target="_blank">hub.vroid.com</a><br/>
+        <a class="help-link" href="https://readyplayer.me" target="_blank">readyplayer.me</a><br/><br/>
+        Export ZIP contains Blender .py scene + animation data. Open in Blender 4 and press F12 to render.
+      </div>
+    </div>
+  </div>
+
+  <!-- Canvas area -->
+  <div id="canvas-area">
+    <canvas id="avatar-canvas"></canvas>
+
+    <!-- HUD -->
+    <div id="hud">
+      <div class="hud-badge">
+        <div class="hud-dot green" id="track-dot"></div>
+        <span id="track-label">TRACKING</span>
+      </div>
+      <div class="hud-badge" id="fps-badge">FPS: <span id="fps-val">--</span></div>
+    </div>
+
+    <!-- Rec badge -->
+    <div id="rec-hud">
+      <div class="rec-badge">
+        <div class="rec-circle"></div>
+        REC <span id="rec-hud-time">0:00</span>
+      </div>
+    </div>
+
+    <!-- PiP webcam -->
+    <div id="pip">
+      <video id="webcam" autoplay muted playsinline></video>
+      <canvas id="tracking-overlay"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Export overlay -->
+<div id="export-overlay">
+  <div class="export-card">
+    <div class="export-spinner"></div>
+    <div class="export-title">BUILDING CINEMATIC PACKAGE</div>
+    <div class="export-sub" id="export-status">Generating Blender scene script…</div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- MediaPipe CDN (global scripts) -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/face_mesh.js" crossorigin="anonymous"></script>
+
+<!-- Three.js importmap + main module -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+// ─── State ────────────────────────────────────────────────────────────────────
+const state = {
+  tracking: false,
+  recording: false,
+  frames: [],
+  recordStart: 0,
+  currentAvatar: 'default',
+  cinematicStyle: 'studio',
+  vrm: null,
+  fps: 0,
+  lastFpsTime: 0,
+  frameCount: 0,
+};
+
+// Face tracking targets (smoothed)
+const target = { yaw: 0, pitch: 0, roll: 0, eyeL: 1, eyeR: 1, mouth: 0, brow: 0 };
+const current = { yaw: 0, pitch: 0, roll: 0, eyeL: 1, eyeR: 1, mouth: 0, brow: 0 };
+
+// ─── Three.js Setup ───────────────────────────────────────────────────────────
+const canvas = document.getElementById('avatar-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x050508);
+scene.fog = new THREE.FogExp2(0x050508, 0.08);
+
+const camera3d = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+camera3d.position.set(0, 0.15, 4.5);
+
+const controls = new OrbitControls(camera3d, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.target.set(0, 0.1, 0);
+controls.minDistance = 2;
+controls.maxDistance = 8;
+controls.update();
+
+// ─── Lights for default studio style ─────────────────────────────────────────
+let lights = [];
+function setupLights(style) {
+  lights.forEach(l => scene.remove(l));
+  lights = [];
+
+  if (style === 'studio') {
+    const key = new THREE.DirectionalLight(0xfff5e8, 3); key.position.set(3, 4, 3); key.castShadow = true; scene.add(key); lights.push(key);
+    const fill = new THREE.DirectionalLight(0xe8f0ff, 1.2); fill.position.set(-3, 2, 2); scene.add(fill); lights.push(fill);
+    const rim = new THREE.DirectionalLight(0xffffff, 1.5); rim.position.set(0, 3, -4); scene.add(rim); lights.push(rim);
+    const amb = new THREE.AmbientLight(0x404060, 0.5); scene.add(amb); lights.push(amb);
+    scene.background = new THREE.Color(0x101018);
+    scene.fog = new THREE.FogExp2(0x101018, 0.06);
+  } else if (style === 'cinematic') {
+    const key = new THREE.SpotLight(0xff9944, 8, 20, Math.PI/5, 0.3); key.position.set(4, 5, 2); key.castShadow = true; scene.add(key); lights.push(key);
+    const fill = new THREE.DirectionalLight(0x2244aa, 0.5); fill.position.set(-4, 1, 1); scene.add(fill); lights.push(fill);
+    const rim = new THREE.DirectionalLight(0x00ffcc, 1); rim.position.set(-1, 4, -5); scene.add(rim); lights.push(rim);
+    const amb = new THREE.AmbientLight(0x0a0820, 0.3); scene.add(amb); lights.push(amb);
+    scene.background = new THREE.Color(0x020206);
+    scene.fog = new THREE.FogExp2(0x020206, 0.05);
+  } else if (style === 'scifi') {
+    const key = new THREE.DirectionalLight(0x00ffcc, 2); key.position.set(3, 4, 2); scene.add(key); lights.push(key);
+    const fill = new THREE.DirectionalLight(0x7c3aed, 1.5); fill.position.set(-4, 2, 1); scene.add(fill); lights.push(fill);
+    const rim = new THREE.PointLight(0x00ccff, 3, 12); rim.position.set(0, 4, -4); scene.add(rim); lights.push(rim);
+    const floor = new THREE.PointLight(0x7c3aed, 2, 8); floor.position.set(0, -3, 0); scene.add(floor); lights.push(floor);
+    const amb = new THREE.AmbientLight(0x020a18, 0.4); scene.add(amb); lights.push(amb);
+    scene.background = new THREE.Color(0x020608);
+    scene.fog = new THREE.FogExp2(0x020608, 0.04);
+  } else if (style === 'noir') {
+    const key = new THREE.SpotLight(0xffffff, 10, 15, Math.PI/8, 0.1); key.position.set(2, 6, 1); key.castShadow = true; scene.add(key); lights.push(key);
+    const amb = new THREE.AmbientLight(0x0a0808, 0.2); scene.add(amb); lights.push(amb);
+    scene.background = new THREE.Color(0x000000);
+    scene.fog = new THREE.FogExp2(0x000000, 0.07);
+  } else if (style === 'documentary') {
+    const key = new THREE.DirectionalLight(0xfff8f0, 2.5); key.position.set(2, 3, 4); scene.add(key); lights.push(key);
+    const fill = new THREE.DirectionalLight(0xf0f8ff, 1); fill.position.set(-2, 1, 3); scene.add(fill); lights.push(fill);
+    const amb = new THREE.AmbientLight(0x808080, 0.6); scene.add(amb); lights.push(amb);
+    scene.background = new THREE.Color(0x1a1a22);
+    scene.fog = new THREE.FogExp2(0x1a1a22, 0.04);
+  } else if (style === 'fantasy') {
+    const key = new THREE.PointLight(0xffc060, 4, 15); key.position.set(3, 4, 2); scene.add(key); lights.push(key);
+    const fill = new THREE.PointLight(0x60b0ff, 2, 12); fill.position.set(-4, 2, -1); scene.add(fill); lights.push(fill);
+    const rim = new THREE.PointLight(0xff60c0, 3, 10); rim.position.set(0, -2, -4); scene.add(rim); lights.push(rim);
+    const amb = new THREE.AmbientLight(0x100820, 0.5); scene.add(amb); lights.push(amb);
+    scene.background = new THREE.Color(0x060210);
+    scene.fog = new THREE.FogExp2(0x060210, 0.05);
+  }
+}
+setupLights('studio');
+
+// ─── Default Procedural Avatar ────────────────────────────────────────────────
+let avatarGroup = null;
+let avatarParts = {};
+
+function buildDefaultAvatar() {
+  if (avatarGroup) scene.remove(avatarGroup);
+  avatarGroup = new THREE.Group();
+  avatarParts = {};
+
+  const skinColor = 0xd4956a;
+  const skinMat = new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.75, metalness: 0.0 });
+  const eyeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8f8f8, roughness: 0.5 });
+  const irisMat = new THREE.MeshStandardMaterial({ color: 0x00c8a0, roughness: 0.3, metalness: 0.1, emissive: 0x006644, emissiveIntensity: 0.3 });
+  const pupilMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.4 });
+  const hairMat = new THREE.MeshStandardMaterial({ color: 0x1a0a00, roughness: 0.9 });
+  const lipMat = new THREE.MeshStandardMaterial({ color: 0xb06050, roughness: 0.7 });
+  const toothMat = new THREE.MeshStandardMaterial({ color: 0xf0f0e8, roughness: 0.5 });
+
+  // ── Head skull ──
+  const headGeo = new THREE.SphereGeometry(1, 48, 48);
+  const head = new THREE.Mesh(headGeo, skinMat);
+  head.scale.set(0.92, 1.08, 0.88);
+  head.castShadow = true;
+  avatarGroup.add(head);
+  avatarParts.head = avatarGroup; // we rotate the whole group for head movement
+
+  // ── Neck ──
+  const neckMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.32, 0.6, 20), skinMat);
+  neckMesh.position.set(0, -1.12, 0);
+  neckMesh.castShadow = true;
+  avatarGroup.add(neckMesh);
+
+  // ── Eye sockets (darkened) ──
+  const socketMat = new THREE.MeshStandardMaterial({ color: 0xb07050, roughness: 0.9 });
+  for (const side of [-1, 1]) {
+    const socket = new THREE.Mesh(new THREE.SphereGeometry(0.19, 20, 20), socketMat);
+    socket.position.set(side * 0.33, 0.2, 0.82);
+    socket.scale.set(1, 0.85, 0.5);
+    avatarGroup.add(socket);
+  }
+
+  // ── Eye whites ──
+  avatarParts.eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.155, 20, 20), eyeWhiteMat);
+  avatarParts.eyeL.position.set(-0.33, 0.2, 0.83);
+  avatarGroup.add(avatarParts.eyeL);
+
+  avatarParts.eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.155, 20, 20), eyeWhiteMat);
+  avatarParts.eyeR.position.set(0.33, 0.2, 0.83);
+  avatarGroup.add(avatarParts.eyeR);
+
+  // ── Irises ──
+  for (const [side, eyePart] of [[-1, avatarParts.eyeL], [1, avatarParts.eyeR]]) {
+    const iris = new THREE.Mesh(new THREE.CircleGeometry(0.085, 32), irisMat);
+    iris.position.copy(eyePart.position); iris.position.z += 0.135;
+    avatarGroup.add(iris);
+    const pupil = new THREE.Mesh(new THREE.CircleGeometry(0.04, 20), pupilMat);
+    pupil.position.copy(iris.position); pupil.position.z += 0.001;
+    avatarGroup.add(pupil);
+  }
+
+  // ── Eyelids (upper) — these animate for blink ──
+  avatarParts.lidL = new THREE.Mesh(
+    new THREE.SphereGeometry(0.165, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2),
+    new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.7, side: THREE.FrontSide })
+  );
+  avatarParts.lidL.rotation.x = Math.PI;
+  avatarParts.lidL.position.copy(avatarParts.eyeL.position);
+  avatarGroup.add(avatarParts.lidL);
+
+  avatarParts.lidR = new THREE.Mesh(
+    new THREE.SphereGeometry(0.165, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2),
+    new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.7, side: THREE.FrontSide })
+  );
+  avatarParts.lidR.rotation.x = Math.PI;
+  avatarParts.lidR.position.copy(avatarParts.eyeR.position);
+  avatarGroup.add(avatarParts.lidR);
+
+  // ── Nose ──
+  const noseMesh = new THREE.Mesh(new THREE.SphereGeometry(0.13, 16, 12), skinMat);
+  noseMesh.scale.set(1.2, 0.8, 1);
+  noseMesh.position.set(0, -0.12, 0.88);
+  noseMesh.castShadow = false;
+  avatarGroup.add(noseMesh);
+  const noseB = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 10), skinMat);
+  noseB.position.set(0, -0.18, 0.86);
+  avatarGroup.add(noseB);
+  // Nostrils
+  for (const s of [-1, 1]) {
+    const nostril = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 8), new THREE.MeshStandardMaterial({ color: 0x8b5e45, roughness: 0.9 }));
+    nostril.position.set(s * 0.1, -0.22, 0.83);
+    nostril.scale.set(0.9, 0.6, 0.5);
+    avatarGroup.add(nostril);
+  }
+
+  // ── Mouth ──
+  avatarParts.mouthGroup = new THREE.Group();
+  avatarParts.mouthGroup.position.set(0, -0.44, 0.82);
+  avatarGroup.add(avatarParts.mouthGroup);
+
+  // Upper lip
+  const upperLip = new THREE.Mesh(new THREE.SphereGeometry(0.18, 20, 8), lipMat);
+  upperLip.scale.set(1.5, 0.55, 0.6);
+  upperLip.position.set(0, 0.035, 0);
+  avatarParts.mouthGroup.add(upperLip);
+
+  // Lower lip (jaw group — animates for mouth open)
+  avatarParts.jaw = new THREE.Group();
+  avatarParts.jaw.position.set(0, 0, 0);
+  avatarParts.mouthGroup.add(avatarParts.jaw);
+
+  const lowerLip = new THREE.Mesh(new THREE.SphereGeometry(0.2, 20, 8), lipMat);
+  lowerLip.scale.set(1.4, 0.5, 0.6);
+  lowerLip.position.set(0, -0.055, 0);
+  avatarParts.jaw.add(lowerLip);
+
+  // Teeth (hidden when mouth closed)
+  avatarParts.teeth = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.08, 0.05), toothMat);
+  avatarParts.teeth.position.set(0, -0.01, 0.02);
+  avatarParts.jaw.add(avatarParts.teeth);
+  avatarParts.teeth.visible = false;
+
+  // ── Eyebrows ──
+  for (const side of [-1, 1]) {
+    const browGeo = new THREE.BoxGeometry(0.22, 0.04, 0.04);
+    const brow = new THREE.Mesh(browGeo, hairMat);
+    brow.position.set(side * 0.33, 0.42, 0.84);
+    brow.rotation.z = side * 0.08;
+    if (side === -1) avatarParts.browL = brow;
+    else avatarParts.browR = brow;
+    avatarGroup.add(brow);
+  }
+
+  // ── Hair (simple cap) ──
+  const hairCap = new THREE.Mesh(new THREE.SphereGeometry(1.02, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.45), hairMat);
+  hairCap.scale.set(0.93, 1.1, 0.89);
+  hairCap.position.y = 0.1;
+  hairCap.castShadow = true;
+  avatarGroup.add(hairCap);
+
+  // Side hair
+  for (const side of [-1, 1]) {
+    const sideHair = new THREE.Mesh(new THREE.SphereGeometry(0.5, 20, 12), hairMat);
+    sideHair.scale.set(0.5, 1.1, 0.6);
+    sideHair.position.set(side * 0.88, -0.25, 0);
+    avatarGroup.add(sideHair);
+  }
+
+  // ── Ears ──
+  for (const side of [-1, 1]) {
+    const ear = new THREE.Mesh(new THREE.SphereGeometry(0.14, 16, 12), skinMat);
+    ear.scale.set(0.45, 0.75, 0.5);
+    ear.position.set(side * 0.9, 0.05, 0);
+    avatarGroup.add(ear);
+  }
+
+  // ── Position the avatar ──
+  avatarGroup.position.set(0, 0, 0);
+  scene.add(avatarGroup);
+
+  state.currentAvatar = 'default';
+  document.getElementById('avatar-info').textContent = '⬡ OMNIMENS default avatar active\nUpload a .vrm file for custom avatar';
+}
+
+buildDefaultAvatar();
+
+// ─── VRM Support ──────────────────────────────────────────────────────────────
+async function loadVRM(file) {
+  try {
+    toast('Loading VRM avatar…');
+    const { VRMLoaderPlugin, VRMUtils } = await import('https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@2.1.0/lib/three-vrm.module.js');
+    const loader = new GLTFLoader();
+    loader.register((parser) => new VRMLoaderPlugin(parser));
+    const url = URL.createObjectURL(file);
+    const gltf = await new Promise((res, rej) => loader.load(url, res, null, rej));
+    const vrm = gltf.userData.vrm;
+    VRMUtils.removeUnnecessaryJoints(vrm.scene);
+    if (avatarGroup) scene.remove(avatarGroup);
+    state.vrm = vrm;
+    state.currentAvatar = 'vrm';
+    vrm.scene.rotation.y = Math.PI;
+    vrm.scene.position.y = -1.5;
+    vrm.scene.scale.setScalar(1.8);
+    scene.add(vrm.scene);
+    avatarGroup = vrm.scene;
+    document.getElementById('avatar-info').textContent = `✓ VRM loaded: ${file.name}`;
+    toast('VRM avatar loaded!', 'success');
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    toast('VRM load failed — using default avatar', 'error');
+    console.error(e);
+  }
+}
+
+// ─── Resize ───────────────────────────────────────────────────────────────────
+function onResize() {
+  const area = document.getElementById('canvas-area');
+  const w = area.clientWidth, h = area.clientHeight;
+  renderer.setSize(w, h);
+  camera3d.aspect = w / h;
+  camera3d.updateProjectionMatrix();
+}
+window.addEventListener('resize', onResize);
+onResize();
+
+// ─── MediaPipe Face Mesh ──────────────────────────────────────────────────────
+let faceMesh, mpCamera;
+
+function initMediaPipe(videoEl) {
+  faceMesh = new FaceMesh({ locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/${f}` });
+  faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+  faceMesh.onResults(onFaceMeshResults);
+
+  mpCamera = new Camera(videoEl, {
+    onFrame: async () => { await faceMesh.send({ image: videoEl }); },
+    width: 320, height: 240,
+  });
+  mpCamera.start();
+  state.tracking = true;
+  document.getElementById('track-label').textContent = 'INITIALIZING…';
+}
+
+// ─── Landmark Math ────────────────────────────────────────────────────────────
+function ear(lm, upper, lower, cL, cR) {
+  const v = Math.hypot(lm[upper].x - lm[lower].x, lm[upper].y - lm[lower].y);
+  const h = Math.hypot(lm[cL].x - lm[cR].x, lm[cL].y - lm[cR].y);
+  return Math.min(1, Math.max(0, (v / (h + 0.0001)) / 0.25));
+}
+
+function computeHeadRotation(lm) {
+  const nose = lm[1], leftFace = lm[234], rightFace = lm[454];
+  const forehead = lm[10], chin = lm[152];
+  const faceW = Math.abs(rightFace.x - leftFace.x);
+  const midX = (leftFace.x + rightFace.x) / 2;
+  const midY = (forehead.y + chin.y) / 2;
+  const yaw = -(nose.x - midX) / (faceW * 0.5 + 0.001) * 0.9;
+  const faceH = Math.abs(chin.y - forehead.y);
+  const pitch = (nose.y - midY) / (faceH * 0.5 + 0.001) * 0.7;
+  const eyeL = lm[33], eyeR = lm[263];
+  const roll = -Math.atan2(eyeR.y - eyeL.y, eyeR.x - eyeL.x) * 0.8;
+  return { yaw, pitch, roll };
+}
+
+function onFaceMeshResults(results) {
+  document.getElementById('track-label').textContent = results.multiFaceLandmarks?.length ? 'TRACKING' : 'SEARCHING…';
+  document.getElementById('track-dot').className = 'hud-dot ' + (results.multiFaceLandmarks?.length ? 'green' : 'yellow');
+
+  if (!results.multiFaceLandmarks?.length) return;
+  const lm = results.multiFaceLandmarks[0];
+
+  const rot = computeHeadRotation(lm);
+  target.yaw = rot.yaw;
+  target.pitch = rot.pitch;
+  target.roll = rot.roll;
+  target.eyeL = ear(lm, 159, 145, 33, 133);
+  target.eyeR = ear(lm, 386, 374, 362, 263);
+
+  const upper = lm[13], lower = lm[14], mL = lm[78], mR = lm[308];
+  const mv = Math.abs(upper.y - lower.y);
+  const mh = Math.abs(mL.x - mR.x);
+  target.mouth = Math.min(1, Math.max(0, (mv / (mh + 0.001)) * 3));
+
+  const browL = lm[70], browR = lm[300], leftEyeTop = lm[159], rightEyeTop = lm[386];
+  target.brow = Math.max(0, Math.min(1, ((leftEyeTop.y - browL.y) + (rightEyeTop.y - browR.y)) / 2 * 20 - 0.5));
+
+  // Record frame
+  if (state.recording) {
+    const t = (Date.now() - state.recordStart) / 1000;
+    state.frames.push({ t, yaw: target.yaw, pitch: target.pitch, roll: target.roll, eyeL: target.eyeL, eyeR: target.eyeR, mouth: target.mouth, brow: target.brow });
+    updateRecTimer(t);
+  }
+
+  // Draw tracking overlay on PiP
+  drawTrackingOverlay(lm);
+}
+
+// ─── Drive Default Avatar ─────────────────────────────────────────────────────
+function driveDefaultAvatar(dt) {
+  const SMOOTH = 1 - Math.exp(-dt * 8);
+  for (const k of Object.keys(current)) current[k] += (target[k] - current[k]) * SMOOTH;
+
+  if (!avatarGroup || state.currentAvatar !== 'default') return;
+
+  // Head rotation
+  avatarGroup.rotation.y = current.yaw;
+  avatarGroup.rotation.x = current.pitch * 0.7;
+  avatarGroup.rotation.z = current.roll * 0.4;
+
+  // Eye blink — scale eyelids down to cover eye
+  if (avatarParts.lidL) {
+    const blinkL = 1 - current.eyeL;
+    avatarParts.lidL.scale.y = 0.15 + blinkL * 0.85;
+    avatarParts.lidL.position.y = avatarParts.eyeL.position.y - (blinkL * 0.1);
+  }
+  if (avatarParts.lidR) {
+    const blinkR = 1 - current.eyeR;
+    avatarParts.lidR.scale.y = 0.15 + blinkR * 0.85;
+    avatarParts.lidR.position.y = avatarParts.eyeR.position.y - (blinkR * 0.1);
+  }
+
+  // Mouth
+  if (avatarParts.jaw) {
+    avatarParts.jaw.position.y = -current.mouth * 0.12;
+    avatarParts.teeth.visible = current.mouth > 0.2;
+  }
+
+  // Eyebrows
+  if (avatarParts.browL) {
+    avatarParts.browL.position.y = 0.42 + current.brow * 0.08;
+    avatarParts.browR.position.y = 0.42 + current.brow * 0.08;
+  }
+}
+
+function driveVRMAvatar(dt) {
+  if (!state.vrm) return;
+  const SMOOTH = 1 - Math.exp(-dt * 8);
+  for (const k of Object.keys(current)) current[k] += (target[k] - current[k]) * SMOOTH;
+
+  const vrm = state.vrm;
+  // VRM head bone
+  try {
+    const head = vrm.humanoid?.getNormalizedBoneNode('head');
+    if (head) { head.rotation.y = current.yaw; head.rotation.x = -current.pitch; head.rotation.z = current.roll; }
+    const neck = vrm.humanoid?.getNormalizedBoneNode('neck');
+    if (neck) { neck.rotation.y = current.yaw * 0.3; neck.rotation.x = -current.pitch * 0.3; }
+    // Blink
+    vrm.expressionManager?.setValue('blinkLeft', 1 - current.eyeL);
+    vrm.expressionManager?.setValue('blinkRight', 1 - current.eyeR);
+    // Mouth
+    vrm.expressionManager?.setValue('aa', current.mouth);
+  } catch (_) {}
+  vrm.update(dt);
+}
+
+// ─── PiP Tracking Overlay ─────────────────────────────────────────────────────
+function drawTrackingOverlay(lm) {
+  const pip = document.getElementById('pip');
+  const overlay = document.getElementById('tracking-overlay');
+  overlay.width = pip.clientWidth;
+  overlay.height = pip.clientHeight;
+  const ctx = overlay.getContext('2d');
+  ctx.clearRect(0, 0, overlay.width, overlay.height);
+
+  // Draw key landmarks
+  const KEY = [10, 152, 234, 454, 1, 33, 263, 13, 14, 78, 308, 70, 300, 159, 145, 386, 374, 133, 362];
+  ctx.fillStyle = 'rgba(0,255,200,0.6)';
+  for (const i of KEY) {
+    const p = lm[i];
+    // Mirror because video is mirrored
+    ctx.beginPath();
+    ctx.arc((1 - p.x) * overlay.width, p.y * overlay.height, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+// ─── Render Loop ──────────────────────────────────────────────────────────────
+let lastTime = 0;
+function animate(now) {
+  requestAnimationFrame(animate);
+  const dt = Math.min((now - lastTime) / 1000, 0.05);
+  lastTime = now;
+
+  controls.update();
+
+  if (state.currentAvatar === 'default') driveDefaultAvatar(dt);
+  else driveVRMAvatar(dt);
+
+  renderer.render(scene, camera3d);
+
+  // FPS
+  state.frameCount++;
+  if (now - state.lastFpsTime > 1000) {
+    document.getElementById('fps-val').textContent = state.frameCount;
+    state.frameCount = 0;
+    state.lastFpsTime = now;
+  }
+}
+animate(0);
+
+// ─── Recording ────────────────────────────────────────────────────────────────
+let recInterval;
+function updateRecTimer(secs) {
+  const m = Math.floor(secs / 60), s = Math.floor(secs % 60);
+  const txt = `${m}:${s.toString().padStart(2,'0')}`;
+  document.getElementById('rec-timer').textContent = txt;
+  document.getElementById('rec-hud-time').textContent = txt;
+}
+
+function startRecording() {
+  state.frames = [];
+  state.recordStart = Date.now();
+  state.recording = true;
+  document.getElementById('rec-timer').style.display = 'block';
+  document.getElementById('rec-hud').style.display = 'block';
+  document.getElementById('btn-record').textContent = '⏹ STOP RECORDING';
+  document.getElementById('btn-record').className = 'sb-btn active';
+  document.getElementById('btn-export').disabled = true;
+}
+
+function stopRecording() {
+  state.recording = false;
+  document.getElementById('rec-timer').style.display = 'none';
+  document.getElementById('rec-hud').style.display = 'none';
+  document.getElementById('btn-record').textContent = '⏺ START RECORDING';
+  document.getElementById('btn-record').className = 'sb-btn primary';
+  document.getElementById('frame-count').textContent = `${state.frames.length} frames captured (${(state.frames.length / 30).toFixed(1)}s)`;
+  document.getElementById('btn-export').disabled = state.frames.length === 0;
+  if (state.frames.length > 0) toast(`Captured ${state.frames.length} frames — ready to export!`, 'success');
+}
+
+// ─── Export ───────────────────────────────────────────────────────────────────
+async function exportCinematic() {
+  if (!state.frames.length) return;
+  const overlay = document.getElementById('export-overlay');
+  const status = document.getElementById('export-status');
+  overlay.classList.add('show');
+  status.textContent = 'Sending animation data to OMNIMENS…';
+
+  try {
+    // Get API base URL — parent page tells us via window.name or we compute from location
+    const baseUrl = window.location.origin;
+    const apiBase = baseUrl.includes('localhost') ? '' : '';
+    
+    status.textContent = 'Generating Blender cinematic scene…';
+    const resp = await fetch(`${apiBase}/api/omnimens/avatar/export-cinematic`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        frames: state.frames,
+        cinematicStyle: state.cinematicStyle,
+        fps: 30,
+        avatarType: state.currentAvatar,
+        totalDuration: state.frames.length / 30,
+      }),
+    });
+
+    if (!resp.ok) throw new Error(await resp.text());
+    status.textContent = 'Building ZIP package…';
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `omnimens-avatar-cinematic.zip`;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Cinematic package downloaded!', 'success');
+  } catch (e) {
+    toast('Export failed: ' + e.message, 'error');
+  } finally {
+    overlay.classList.remove('show');
+  }
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = ''; }, 3000);
+}
+
+// ─── UI Wiring ────────────────────────────────────────────────────────────────
+document.getElementById('btn-enable').addEventListener('click', async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240, facingMode: 'user' }, audio: false });
+    const video = document.getElementById('webcam');
+    video.srcObject = stream;
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('studio').style.display = 'grid';
+    onResize();
+    initMediaPipe(video);
+    toast('Camera active — face tracking started', 'success');
+  } catch (e) {
+    const err = document.getElementById('gate-error');
+    err.style.display = 'block';
+    err.textContent = e.name === 'NotAllowedError'
+      ? '⚠ Camera permission denied. Please allow camera access in your browser settings and try again.'
+      : `⚠ Camera error: ${e.message}`;
+  }
+});
+
+document.getElementById('btn-load-vrm').addEventListener('click', () => document.getElementById('vrm-file').click());
+document.getElementById('vrm-file').addEventListener('change', (e) => { if (e.target.files[0]) loadVRM(e.target.files[0]); });
+document.getElementById('btn-default-avatar').addEventListener('click', () => {
+  if (state.vrm?.scene) scene.remove(state.vrm.scene);
+  state.vrm = null;
+  buildDefaultAvatar();
+  toast('Switched to default avatar');
+});
+
+document.getElementById('btn-record').addEventListener('click', () => {
+  state.recording ? stopRecording() : startRecording();
+});
+
+document.getElementById('btn-export').addEventListener('click', exportCinematic);
+
+document.querySelectorAll('.style-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.style-chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+    state.cinematicStyle = chip.dataset.style;
+    setupLights(state.cinematicStyle);
+    toast(`Cinematic style: ${chip.textContent}`);
+  });
+});
+</script>
+</body>
+</html>
