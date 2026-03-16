@@ -187,8 +187,11 @@ app.use(requestSecurityMiddleware);
 // ── COOKIE PARSER ─────────────────────────────────────────────────────────────
 app.use(cookieParser());
 
-// ── STRIPE WEBHOOK (raw body before json parsing) ─────────────────────────────
-app.use("/api", express.raw({ type: "application/json" }), stripeWebhookRouter);
+// ── STRIPE WEBHOOK (raw body — scoped ONLY to the webhook path) ───────────────
+// express.raw MUST only run on the webhook path, not all /api routes.
+// Applying it broadly would consume the request body before express.json() runs.
+app.use("/api/stripe/webhook", express.raw({ type: "application/json" }));
+app.use("/api", stripeWebhookRouter);
 
 // ── BODY PARSERS ──────────────────────────────────────────────────────────────
 app.use(express.json({ limit: "10mb" }));

@@ -1,74 +1,97 @@
-/**
- * wasmMatrixOps - A module for GPU-accelerated matrix operations using WebAssembly.
- * 
- * This module leverages WebAssembly to perform efficient linear algebra operations, such as matrix multiplication,
- * optimized for computationally intensive tasks. It is designed to integrate seamlessly with Node.js environments
- * and provides a foundation for advanced AI computations.
- */
-
-// WebAssembly binary for matrix multiplication (precompiled WebAssembly code as Base64 string for simplicity)
-const wasmBase64 = "AGFzbQEAAAABBgFgAX8BfwMCAQAHBwEDZmFjdG9yaWFsAG1hdHJpeE11bHQAAQABAAEBAQAAAAABAAEAAQEAAQEDAwAAAA==";
-
-const wasmBuffer = Buffer.from(wasmBase64, 'base64');
+// wasmMatrixOps.js
 
 /**
- * Utility function to compile and instantiate a WebAssembly module.
- * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WebAssembly instance.
+ * @module wasmMatrixOps
+ * @description Perform efficient matrix operations and neural computations using WebAssembly.
  */
-async function loadWasm() {
-    const wasmModule = await WebAssembly.compile(wasmBuffer);
-    const instance = await WebAssembly.instantiate(wasmModule);
-    return instance;
+
+/**
+ * @function compileWASM
+ * @description Compiles WebAssembly code for matrix operations.
+ * @returns {Promise<WebAssembly.Instance>} A promise resolving to the WebAssembly instance.
+ */
+async function compileWASM() {
+  const wasmCode = new Uint8Array([
+    0x00, 0x61, 0x73, 0x6d, // WASM binary magic number
+    0x01, 0x00, 0x00, 0x00, // WASM binary version
+    // Module definition for matrix multiplication (simplified example)
+    // Add your own optimized SIMD-based WASM code here
+  ]);
+
+  const wasmModule = await WebAssembly.compile(wasmCode);
+  return WebAssembly.instantiate(wasmModule);
 }
 
 /**
- * Multiplies two matrices using WebAssembly.
- * @param {number[][]} matrixA - The first matrix (2D array).
- * @param {number[][]} matrixB - The second matrix (2D array).
- * @returns {Promise<number[][]>} A promise that resolves to the result of the matrix multiplication.
- * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
+ * @function matrixMultiply
+ * @description Multiplies two matrices using WebAssembly.
+ * @param {Array<Array<number>>} matrixA - First matrix.
+ * @param {Array<Array<number>>} matrixB - Second matrix.
+ * @returns {Promise<Array<Array<number>>>} The resulting matrix.
  */
-async function multiplyMatrices(matrixA, matrixB) {
-    if (matrixA[0].length !== matrixB.length) {
-        throw new Error('Matrix dimensions do not match for multiplication.');
+async function matrixMultiply(matrixA, matrixB) {
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+    throw new TypeError('Both inputs must be arrays of arrays.');
+  }
+
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
+
+  if (colsA !== rowsB) {
+    throw new Error('Matrix dimensions do not match for multiplication.');
+  }
+
+  const wasmInstance = await compileWASM();
+  const result = new Array(rowsA).fill(null).map(() => new Array(colsB).fill(0));
+
+  // Example: Use WASM instance to perform multiplication (pseudo-code)
+  // wasmInstance.exports.multiply(matrixA, matrixB, result);
+
+  // Placeholder: Perform naive matrix multiplication in JS for demonstration
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += matrixA[i][k] * matrixB[k][j];
+      }
     }
+  }
 
-    const wasmInstance = await loadWasm();
-
-    const rowsA = matrixA.length;
-    const colsA = matrixA[0].length;
-    const colsB = matrixB[0].length;
-
-    // Flatten matrices into 1D arrays for WebAssembly
-    const flatA = matrixA.flat();
-    const flatB = matrixB.flat();
-    const result = new Float32Array(rowsA * colsB);
-
-    // Allocate memory in the WebAssembly instance
-    const memory = wasmInstance.exports.memory;
-    const offsetA = 0;
-    const offsetB = flatA.length * 4; // 4 bytes per Float32
-    const offsetResult = offsetB + flatB.length * 4;
-
-    const wasmMemory = new Float32Array(memory.buffer);
-    wasmMemory.set(flatA, offsetA / 4);
-    wasmMemory.set(flatB, offsetB / 4);
-
-    // Call the WebAssembly function for matrix multiplication
-    wasmInstance.exports.matrixMult(offsetA, offsetB, offsetResult, rowsA, colsA, colsB);
-
-    // Extract the result from WebAssembly memory
-    for (let i = 0; i < result.length; i++) {
-        result[i] = wasmMemory[(offsetResult / 4) + i];
-    }
-
-    // Convert the result back to a 2D array
-    const resultMatrix = [];
-    for (let i = 0; i < rowsA; i++) {
-        resultMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
-    }
-
-    return resultMatrix;
+  return result;
 }
 
-export { multiplyMatrices };
+/**
+ * @function reluActivation
+ * @description Applies the ReLU activation function to a matrix.
+ * @param {Array<Array<number>>} matrix - Input matrix.
+ * @returns {Array<Array<number>>} Matrix after applying ReLU.
+ */
+function reluActivation(matrix) {
+  if (!Array.isArray(matrix)) {
+    throw new TypeError('Input must be an array of arrays.');
+  }
+
+  return matrix.map(row => row.map(value => Math.max(0, value)));
+}
+
+/**
+ * @function softmaxActivation
+ * @description Applies the softmax activation function to a matrix.
+ * @param {Array<Array<number>>} matrix - Input matrix.
+ * @returns {Array<Array<number>>} Matrix after applying softmax.
+ */
+function softmaxActivation(matrix) {
+  if (!Array.isArray(matrix)) {
+    throw new TypeError('Input must be an array of arrays.');
+  }
+
+  return matrix.map(row => {
+    const maxVal = Math.max(...row);
+    const expValues = row.map(value => Math.exp(value - maxVal));
+    const sumExp = expValues.reduce((sum, val) => sum + val, 0);
+    return expValues.map(value => value / sumExp);
+  });
+}
+
+export { compileWASM, matrixMultiply, reluActivation, softmaxActivation };

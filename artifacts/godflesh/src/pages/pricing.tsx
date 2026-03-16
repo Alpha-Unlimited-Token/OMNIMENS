@@ -332,7 +332,7 @@ function WalletPanel({
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function Pricing() {
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated } = useAuth();
   const searchString = useSearch();
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
@@ -379,7 +379,7 @@ export default function Pricing() {
   }, []);
 
   const handleConnect = () => {
-    if (!isAuthenticated) { login(); return; }
+    if (!isAuthenticated) { setLocation("/login"); return; }
     setupWallet(undefined, {
       onSuccess: (r) => { window.location.href = r.url; },
       onError: (e: any) => showToast("error", e.message || "Failed to open wallet setup"),
@@ -477,7 +477,7 @@ export default function Pricing() {
             <Shield className="w-10 h-10 text-white/70 mx-auto mb-4" />
             <div className="font-mono font-bold text-white tracking-widest mb-2">SIGN IN TO GET STARTED</div>
             <p className="text-xs font-mono text-white/75 mb-6">Create an account and receive $20 free credits instantly. No card required.</p>
-            <Button onClick={login} size="lg" className="font-mono px-8">
+            <Button onClick={() => setLocation("/login")} size="lg" className="font-mono px-8">
               SIGN IN / CREATE ACCOUNT
               <ChevronRight className="w-4 h-4 ml-2" />
             </Button>

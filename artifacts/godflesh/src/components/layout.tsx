@@ -10,8 +10,8 @@ import { OmnimensIcon } from "./omnimens-icon";
 import { CopyrightFooter } from "./copyright-footer";
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, user, login, isLoading } = useAuth();
-  const [location] = useLocation();
+  const { isAuthenticated, user, isLoading } = useAuth();
+  const [location, setLocation] = useLocation();
   const isChat = location === "/chat";
 
   return (
@@ -64,7 +64,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </Link>
               </div>
             ) : (
-              <Button onClick={login} variant="outline" size="sm" className="font-mono tracking-widest border-primary/30 text-white hover:border-primary/60 hover:bg-primary/8">
+              <Button onClick={() => setLocation("/login")} variant="outline" size="sm" className="font-mono tracking-widest border-primary/30 text-white hover:border-primary/60 hover:bg-primary/8">
                 CONNECT
               </Button>
             )}

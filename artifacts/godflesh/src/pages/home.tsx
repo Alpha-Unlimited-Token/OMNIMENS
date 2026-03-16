@@ -8,14 +8,14 @@ import { Sparkles, Brain, Zap, Activity, Cpu, GitBranch, Layers } from "lucide-r
 import { OmnimensPresence } from "@/components/omnimens-presence";
 
 export default function Home() {
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
 
   const handleStart = () => {
     if (isAuthenticated) {
       setLocation("/chat");
     } else {
-      login();
+      setLocation("/login");
     }
   };
 
