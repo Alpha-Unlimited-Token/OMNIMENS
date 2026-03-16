@@ -5,6 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { authMiddleware } from "./middlewares/authMiddleware";
 import router from "./routes";
+import stripeWebhookRouter from "./routes/stripeWebhook.js";
 import { startAutonomousLearning } from "./lib/omnimens-self-upgrade.js";
 import { startEvolutionEngine } from "./lib/omnimens-evolution.js";
 
@@ -15,6 +16,10 @@ const app: Express = express();
 
 app.use(cors({ credentials: true, origin: true }));
 app.use(cookieParser());
+
+// Stripe webhook MUST use raw body — register before express.json()
+app.use("/api", express.raw({ type: "application/json" }), stripeWebhookRouter);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(authMiddleware);
