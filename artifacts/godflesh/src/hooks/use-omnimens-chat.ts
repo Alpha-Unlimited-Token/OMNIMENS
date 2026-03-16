@@ -17,6 +17,10 @@ export type Generated3DModel = {
   prompt: string;
   index: number;
   toolUsed?: "blender" | "openscad" | "trimesh";
+  previewImageBase64?: string;
+  zipBase64?: string;
+  zipSizeBytes?: number;
+  formats?: string[];
 };
 
 export type Artifact = {
@@ -326,6 +330,10 @@ export function useOmnimensChat(onLimitReached: () => void) {
                       prompt: data.prompt,
                       index: data.index,
                       toolUsed: data.toolUsed,
+                      previewImageBase64: data.previewImageBase64,
+                      zipBase64: data.zipBase64,
+                      zipSizeBytes: data.zipSizeBytes,
+                      formats: data.formats,
                     }];
                     msg.generating3d = false;
                   }

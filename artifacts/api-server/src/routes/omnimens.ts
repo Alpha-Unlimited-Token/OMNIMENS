@@ -1142,20 +1142,36 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
     }
 
     // ── Scan for [GENERATE_3D: ...] markers and generate real 3D models ──────
+    // Extract first image attachment to use as visual reference (if any)
+    let ref3dImageBase64: string | undefined;
+    let ref3dImageMime: string | undefined;
+    if (req.files && Array.isArray(req.files)) {
+      const imgFile = (req.files as Express.Multer.File[]).find(f => f.mimetype.startsWith("image/"));
+      if (imgFile) {
+        ref3dImageBase64 = imgFile.buffer.toString("base64");
+        ref3dImageMime = imgFile.mimetype;
+      }
+    }
+
     const model3dMarkers = [...fullText.matchAll(/\[GENERATE_3D:\s*([\s\S]+?)\]/g)].slice(0, 1);
     for (let i = 0; i < model3dMarkers.length; i++) {
       const prompt3d = model3dMarkers[i][1].trim();
       try {
-        res.write(`data: ${JSON.stringify({ type: "3d_generating", index: i, prompt: prompt3d })}\n\n`);
+        res.write(`data: ${JSON.stringify({
+          type: "3d_generating",
+          index: i,
+          prompt: prompt3d,
+          hasImageReference: !!ref3dImageBase64,
+        })}\n\n`);
 
-        // Heartbeat while Python runs (can take 20–90s)
+        // Heartbeat while Blender/Python runs (can take 30–180s)
         const hb3d = setInterval(() => {
           try { res.write(`: ping\n\n`); } catch { /* ignore */ }
         }, 6000);
 
         let model3d;
         try {
-          model3d = await generate3DModel(prompt3d);
+          model3d = await generate3DModel(prompt3d, ref3dImageBase64, ref3dImageMime);
         } finally {
           clearInterval(hb3d);
         }
@@ -1169,7 +1185,11 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
           threejsHtml: model3d.threejsHtml,
           vertexCount: model3d.vertexCount,
           faceCount: model3d.faceCount,
-          toolUsed: model3d.toolUsed || "trimesh",
+          toolUsed: model3d.toolUsed || "blender",
+          previewImageBase64: model3d.previewImageBase64 || "",
+          zipBase64: model3d.zipBase64 || "",
+          zipSizeBytes: model3d.zipSizeBytes || 0,
+          formats: model3d.formats || ["GLB"],
         })}\n\n`);
       } catch (err3d) {
         console.error(`[OMNIMENS 3D] Error generating model ${i}:`, err3d);

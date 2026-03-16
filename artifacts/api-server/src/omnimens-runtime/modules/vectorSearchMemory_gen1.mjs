@@ -1,127 +1,132 @@
 /**
  * @module vectorSearchMemory
- * @description Provides in-memory vector similarity search for conversational context management using HNSW-like approximate nearest neighbor search.
+ * @description A utility module implementing Hierarchical Navigable Small World (HNSW) for efficient similarity search on vector embeddings.
  */
 
 /**
- * Represents a node in the hierarchical graph for nearest neighbor search.
- * @class
+ * @typedef {Object} Node
+ * @property {number[]} vector - The embedding vector associated with this node.
+ * @property {number} id - Unique identifier for the node.
+ * @property {Map<number, Node[]>} neighbors - A map of levels to arrays of neighboring nodes.
  */
-class Node {
-  /**
-   * @param {number[]} vector - The vector associated with this node.
-   * @param {number} id - Unique identifier for the node.
-   */
-  constructor(vector, id) {
-    this.vector = vector;
-    this.id = id;
-    this.connections = new Set(); // Connections to other nodes.
+
+/**
+ * @typedef {Object} SearchResult
+ * @property {number} id - The ID of the closest node.
+ * @property {number} distance - The distance to the closest node.
+ */
+
+/**
+ * Calculate the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} The Euclidean distance between the vectors.
+ */
+function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error("Vectors must be of the same dimension.");
   }
+  return Math.sqrt(vectorA.reduce((sum, val, index) => sum + Math.pow(val - vectorB[index], 2), 0));
 }
 
 /**
- * @class VectorSearchMemory
- * @description Implements an approximate nearest neighbor search using a hierarchical graph structure.
+ * Class representing the HNSW graph.
  */
-class VectorSearchMemory {
-  constructor() {
-    this.nodes = new Map(); // Stores nodes by their ID.
+class HNSW {
+  constructor(maxLevel = 5, maxNeighbors = 10) {
+    this.maxLevel = maxLevel;
+    this.maxNeighbors = maxNeighbors;
+    this.nodes = new Map();
+    this.entryPoint = null;
   }
 
   /**
-   * Adds a vector to the memory.
-   * @param {number[]} vector - The vector to add.
-   * @param {number} id - Unique identifier for the vector.
+   * Add a new node to the graph.
+   * @param {number[]} vector - The embedding vector.
+   * @param {number} id - Unique identifier for the node.
    */
-  addVector(vector, id) {
-    if (this.nodes.has(id)) {
-      throw new Error(`Node with id ${id} already exists.`);
+  addNode(vector, id) {
+    const newNode = { vector, id, neighbors: new Map() };
+    for (let level = 0; level <= this.maxLevel; level++) {
+      newNode.neighbors.set(level, []);
     }
-    const newNode = new Node(vector, id);
+
+    if (this.entryPoint === null) {
+      this.entryPoint = newNode;
+    } else {
+      this._connectNode(newNode);
+    }
+
     this.nodes.set(id, newNode);
-    this._connectNode(newNode);
   }
 
   /**
-   * Searches for the nearest neighbors to a given vector.
+   * Search for the closest node to a given vector.
    * @param {number[]} queryVector - The vector to search for.
-   * @param {number} k - The number of nearest neighbors to return.
-   * @returns {Array<{id: number, distance: number}>} The k nearest neighbors and their distances.
+   * @returns {SearchResult} The closest node and its distance.
    */
-  search(queryVector, k) {
-    if (this.nodes.size === 0) {
-      throw new Error("No vectors in memory to search.");
+  search(queryVector) {
+    if (!this.entryPoint) {
+      throw new Error("Graph is empty.");
     }
 
-    const visited = new Set();
-    const results = [];
+    let closestNode = this.entryPoint;
+    let closestDistance = euclideanDistance(queryVector, closestNode.vector);
 
-    // Start with a random node.
-    const startNode = this.nodes.values().next().value;
-    this._searchRecursive(startNode, queryVector, k, visited, results);
-
-    // Sort results by distance and return the top k.
-    return results.sort((a, b) => a.distance - b.distance).slice(0, k);
-  }
-
-  /**
-   * Recursively searches for the nearest neighbors.
-   * @private
-   * @param {Node} node - The current node.
-   * @param {number[]} queryVector - The vector to search for.
-   * @param {number} k - The number of nearest neighbors to return.
-   * @param {Set<number>} visited - Set of visited node IDs.
-   * @param {Array<{id: number, distance: number}>} results - Accumulated results.
-   */
-  _searchRecursive(node, queryVector, k, visited, results) {
-    if (visited.has(node.id)) {
-      return;
-    }
-    visited.add(node.id);
-
-    const distance = this._calculateDistance(node.vector, queryVector);
-    results.push({ id: node.id, distance });
-
-    // Explore connections recursively.
-    for (const neighborId of node.connections) {
-      const neighbor = this.nodes.get(neighborId);
-      this._searchRecursive(neighbor, queryVector, k, visited, results);
-    }
-  }
-
-  /**
-   * Connects a new node to existing nodes in the graph based on similarity.
-   * @private
-   * @param {Node} newNode - The new node to connect.
-   */
-  _connectNode(newNode) {
-    for (const node of this.nodes.values()) {
-      if (node.id !== newNode.id) {
-        const distance = this._calculateDistance(node.vector, newNode.vector);
-        if (distance < 1.0) { // Threshold for connection.
-          node.connections.add(newNode.id);
-          newNode.connections.add(node.id);
+    for (let level = this.maxLevel; level >= 0; level--) {
+      let improved = true;
+      while (improved) {
+        improved = false;
+        for (const neighbor of closestNode.neighbors.get(level)) {
+          const distance = euclideanDistance(queryVector, neighbor.vector);
+          if (distance < closestDistance) {
+            closestNode = neighbor;
+            closestDistance = distance;
+            improved = true;
+          }
         }
       }
     }
+
+    return { id: closestNode.id, distance: closestDistance };
   }
 
   /**
-   * Calculates the Euclidean distance between two vectors.
+   * Connect a new node to the graph.
+   * @param {Node} newNode - The node to connect.
    * @private
-   * @param {number[]} vectorA - The first vector.
-   * @param {number[]} vectorB - The second vector.
-   * @returns {number} The Euclidean distance between the vectors.
    */
-  _calculateDistance(vectorA, vectorB) {
-    if (vectorA.length !== vectorB.length) {
-      throw new Error("Vectors must have the same dimensions.");
+  _connectNode(newNode) {
+    let currentNode = this.entryPoint;
+
+    for (let level = this.maxLevel; level >= 0; level--) {
+      let closestNode = currentNode;
+      let closestDistance = euclideanDistance(newNode.vector, closestNode.vector);
+
+      let improved = true;
+      while (improved) {
+        improved = false;
+        for (const neighbor of closestNode.neighbors.get(level)) {
+          const distance = euclideanDistance(newNode.vector, neighbor.vector);
+          if (distance < closestDistance) {
+            closestNode = neighbor;
+            closestDistance = distance;
+            improved = true;
+          }
+        }
+      }
+
+      closestNode.neighbors.get(level).push(newNode);
+      newNode.neighbors.get(level).push(closestNode);
+
+      if (closestNode.neighbors.get(level).length > this.maxNeighbors) {
+        closestNode.neighbors.set(level, closestNode.neighbors.get(level).slice(0, this.maxNeighbors));
+      }
     }
-    return Math.sqrt(vectorA.reduce((sum, a, i) => sum + (a - vectorB[i]) ** 2, 0));
   }
 }
 
 /**
- * Exports the VectorSearchMemory class for use in other modules.
+ * Exported functions.
  */
-export { VectorSearchMemory };
+export { HNSW, euclideanDistance };

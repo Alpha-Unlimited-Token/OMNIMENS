@@ -53,6 +53,10 @@ export type Generated3DModel = {
   vertexCount: number;
   faceCount: number;
   toolUsed?: "blender" | "openscad" | "trimesh";
+  previewImageBase64?: string;
+  zipBase64?: string;
+  zipSizeBytes?: number;
+  formats?: string[];
 };
 
 // ── GPT-4o generates the trimesh Python script ────────────────────────────────
@@ -431,7 +435,11 @@ window.toggleRecord = ()=>{
 
 // ── Main export: generate a 3D model from a text prompt ──────────────────────
 
-export async function generate3DModel(prompt: string): Promise<Generated3DModel> {
+export async function generate3DModel(
+  prompt: string,
+  referenceImageBase64?: string,
+  referenceImageMimeType?: string
+): Promise<Generated3DModel> {
   const tool = await classifyPromptFor3DTool(prompt);
 
   console.log(`[OMNIMENS 3D] Tool selected: ${tool.toUpperCase()} for prompt: "${prompt.slice(0, 80)}"`);
@@ -439,7 +447,7 @@ export async function generate3DModel(prompt: string): Promise<Generated3DModel>
   // ── Try Blender (primary — best quality) ────────────────────────────────
   if (tool === "blender") {
     try {
-      const result = await generateWithBlender(prompt);
+      const result = await generateWithBlender(prompt, referenceImageBase64, referenceImageMimeType);
       return {
         glbBase64: result.glbBase64,
         glbSizeBytes: result.glbSizeBytes,
@@ -449,6 +457,10 @@ export async function generate3DModel(prompt: string): Promise<Generated3DModel>
         vertexCount: result.vertexCount,
         faceCount: result.faceCount,
         toolUsed: "blender" as const,
+        previewImageBase64: result.previewImageBase64,
+        zipBase64: result.zipBase64,
+        zipSizeBytes: result.zipSizeBytes,
+        formats: result.formats,
       };
     } catch (blenderErr) {
       console.warn("[OMNIMENS 3D] Blender failed, falling back to trimesh:", blenderErr);

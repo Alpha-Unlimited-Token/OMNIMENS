@@ -1,85 +1,105 @@
 /**
- * wasmMatrixOps - A module for efficient matrix operations using WebAssembly.
- * This module implements basic BLAS-like operations (e.g., matrix multiplication) in WebAssembly
- * and exposes them to JavaScript for high-performance numerical computations.
+ * wasmMatrixOps - A module for efficient matrix operations and lightweight neural network inference using WebAssembly in Node.js.
+ * 
+ * This module provides a WebAssembly-backed implementation of matrix multiplication and other basic linear algebra operations.
+ * It is designed for high performance and can be used for lightweight neural network inference tasks.
  */
 
-// WebAssembly binary for matrix operations (compiled from a minimal C program)
-const wasmCode = new Uint8Array([
-  0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x0a, 0x02, 0x60, 0x03, 0x7f, 0x7f, 0x7f,
-  0x01, 0x7f, 0x60, 0x00, 0x00, 0x03, 0x03, 0x02, 0x00, 0x01, 0x07, 0x11, 0x02, 0x0a, 0x6d, 0x61,
-  0x74, 0x72, 0x69, 0x78, 0x5f, 0x6d, 0x75, 0x6c, 0x00, 0x00, 0x0a, 0x69, 0x6e, 0x69, 0x74, 0x00,
-  0x01, 0x0a, 0x1d, 0x01, 0x1b, 0x01, 0x7f, 0x20, 0x00, 0x20, 0x01, 0x20, 0x02, 0x6a, 0x20, 0x03,
-  0x6b, 0x36, 0x02, 0x00, 0x20, 0x00, 0x20, 0x01, 0x6a, 0x20, 0x02, 0x6c, 0x20, 0x03, 0x6a, 0x6b,
-  0x0b
-]);
-
-let wasmInstance;
+// Import the WebAssembly utilities from the Node.js built-in 'fs' and 'path' modules
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 
 /**
- * Initialize the WebAssembly module.
- * @returns {Promise<void>} Resolves when the WebAssembly module is ready.
+ * Load and compile the WebAssembly module.
+ * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WebAssembly instance.
  */
-export async function init() {
-  const wasmModule = await WebAssembly.compile(wasmCode);
-  wasmInstance = await WebAssembly.instantiate(wasmModule, {});
+async function loadWasmModule() {
+  const wasmPath = resolve(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = readFileSync(wasmPath);
+  const wasmModule = await WebAssembly.compile(wasmBuffer);
+  return WebAssembly.instantiate(wasmModule);
 }
 
 /**
- * Perform matrix multiplication (C = A * B).
- * @param {number[]} A - Flat array representing matrix A (row-major order).
- * @param {number[]} B - Flat array representing matrix B (row-major order).
- * @param {number} rowsA - Number of rows in matrix A.
- * @param {number} colsA - Number of columns in matrix A.
- * @param {number} colsB - Number of columns in matrix B.
- * @returns {number[]} Flat array representing the resulting matrix C (row-major order).
- * @throws {Error} Throws if dimensions are incompatible or if wasmInstance is not initialized.
+ * Perform matrix multiplication using WebAssembly.
+ * @param {Float32Array} matrixA - The first matrix (flattened, row-major order).
+ * @param {Float32Array} matrixB - The second matrix (flattened, row-major order).
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA (and rows in matrixB).
+ * @param {number} colsB - Number of columns in matrixB.
+ * @returns {Float32Array} The result of the matrix multiplication (flattened, row-major order).
  */
-export function matrixMultiply(A, B, rowsA, colsA, colsB) {
-  if (!wasmInstance) {
-    throw new Error("WebAssembly module not initialized. Call init() first.");
+export async function matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
+  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+    throw new Error('Matrix dimensions do not match the provided sizes.');
   }
 
-  if (A.length !== rowsA * colsA || B.length !== colsA * colsB) {
-    throw new Error("Matrix dimensions do not match input arrays.");
-  }
+  const wasmInstance = await loadWasmModule();
+  const { memory, matrix_multiply } = wasmInstance.exports;
 
-  const C = new Float32Array(rowsA * colsB);
+  // Allocate memory in the WebAssembly instance
+  const aOffset = 0;
+  const bOffset = aOffset + matrixA.length * 4; // Float32Array -> 4 bytes per element
+  const cOffset = bOffset + matrixB.length * 4;
+  const cLength = rowsA * colsB;
 
-  const memory = new WebAssembly.Memory({ initial: 1 });
-  const memoryBuffer = new Float32Array(memory.buffer);
+  // Write matrices into WebAssembly memory
+  const wasmMemory = new Float32Array(memory.buffer);
+  wasmMemory.set(matrixA, aOffset / 4);
+  wasmMemory.set(matrixB, bOffset / 4);
 
-  // Copy A and B into the WebAssembly memory buffer
-  memoryBuffer.set(A, 0);
-  memoryBuffer.set(B, A.length);
+  // Perform the matrix multiplication
+  matrix_multiply(aOffset, bOffset, cOffset, rowsA, colsA, colsB);
 
-  // Call the WebAssembly function
-  wasmInstance.exports.matrix_mul(
-    0, // Offset of A in memory
-    A.length, // Offset of B in memory
-    A.length + B.length, // Offset of C in memory
-    rowsA,
-    colsA,
-    colsB
-  );
-
-  // Copy the result back from WebAssembly memory to JavaScript
-  C.set(memoryBuffer.subarray(A.length + B.length, A.length + B.length + C.length));
-
-  return Array.from(C);
+  // Read the result from WebAssembly memory
+  return new Float32Array(memory.buffer, cOffset, cLength);
 }
 
 /**
- * Example usage of the wasmMatrixOps module.
- * Demonstrates matrix multiplication.
+ * A lightweight neural network inference function.
+ * @param {Float32Array} inputVector - The input vector for the neural network.
+ * @param {Array<Float32Array>} weights - An array of weight matrices (flattened, row-major order).
+ * @param {Array<number>} biases - An array of bias vectors for each layer.
+ * @param {Function} activationFn - The activation function to apply (e.g., ReLU, sigmoid).
+ * @returns {Float32Array} The output vector after running inference.
  */
-(async () => {
-  await init();
+export async function neuralNetworkInference(inputVector, weights, biases, activationFn) {
+  if (weights.length !== biases.length) {
+    throw new Error('The number of weight matrices must match the number of bias vectors.');
+  }
 
-  const A = [1, 2, 3, 4, 5, 6]; // 2x3 matrix
-  const B = [7, 8, 9, 10, 11, 12]; // 3x2 matrix
+  let currentOutput = inputVector;
 
-  const C = matrixMultiply(A, B, 2, 3, 2); // 2x2 result
+  for (let i = 0; i < weights.length; i++) {
+    const weightMatrix = weights[i];
+    const biasVector = biases[i];
+    const rows = biasVector.length;
+    const cols = currentOutput.length;
 
-  console.log("Matrix C:", C);
-})();
+    // Perform matrix multiplication
+    const layerOutput = await matrixMultiply(weightMatrix, currentOutput, rows, cols, 1);
+
+    // Add bias and apply activation function
+    currentOutput = layerOutput.map((value, index) => activationFn(value + biasVector[index]));
+  }
+
+  return currentOutput;
+}
+
+/**
+ * A simple ReLU activation function.
+ * @param {number} x - The input value.
+ * @returns {number} The output value after applying ReLU.
+ */
+export function relu(x) {
+  return Math.max(0, x);
+}
+
+/**
+ * A simple sigmoid activation function.
+ * @param {number} x - The input value.
+ * @returns {number} The output value after applying the sigmoid function.
+ */
+export function sigmoid(x) {
+  return 1 / (1 + Math.exp(-x));
+}

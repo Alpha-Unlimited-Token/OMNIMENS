@@ -70,20 +70,23 @@ function Model3DGeneratingBadge() {
     const t = setInterval(() => setElapsed((s) => s + 1), 1000);
     return () => clearInterval(t);
   }, []);
-  const pct = Math.min(95, (elapsed / 75) * 100);
+  const pct = Math.min(95, (elapsed / 120) * 100);
+  const phase = elapsed < 15 ? "Writing Blender Python script..."
+    : elapsed < 40 ? "Blender sculpting geometry + modifiers..."
+    : elapsed < 90 ? "Applying PBR materials + shader nodes..."
+    : elapsed < 120 ? "Cycles rendering preview (64 samples)..."
+    : "Exporting GLB + OBJ + STL + FBX, zipping...";
   return (
-    <div className="mt-4 border border-cyan-500/20 rounded-xl px-4 py-3 bg-cyan-950/20 font-mono text-xs space-y-2">
+    <div className="mt-4 border border-orange-500/20 rounded-xl px-4 py-3 bg-orange-950/10 font-mono text-xs space-y-2">
       <div className="flex items-center gap-3 text-white/70">
-        <Loader2 className="w-4 h-4 animate-spin text-cyan-400 shrink-0" />
-        <span className="tracking-widest text-cyan-300">SCULPTING 3D MODEL...</span>
-        <span className="ml-auto text-cyan-400/70">{elapsed}s</span>
+        <Loader2 className="w-4 h-4 animate-spin text-orange-400 shrink-0" />
+        <span className="tracking-widest text-orange-300">BLENDER 4.4 RUNNING...</span>
+        <span className="ml-auto text-orange-400/70">{elapsed}s</span>
       </div>
       <div className="w-full h-0.5 bg-white/10 rounded-full overflow-hidden">
-        <div className="h-full bg-cyan-400/60 transition-all duration-1000" style={{ width: `${pct}%` }} />
+        <div className="h-full bg-orange-400/60 transition-all duration-1000" style={{ width: `${pct}%` }} />
       </div>
-      {elapsed > 20 && (
-        <p className="text-white/50 text-[10px]">Python 3D pipeline running — trimesh mesh synthesis typically 30–90 seconds.</p>
-      )}
+      <p className="text-white/50 text-[10px]">{phase}</p>
     </div>
   );
 }
@@ -1439,7 +1442,9 @@ function InlineImageCard({ image }: { image: GeneratedImage }) {
 
 function Model3DCard({ model }: { model: Generated3DModel }) {
   const [expanded, setExpanded] = useState(false);
+  const [activeTab, setActiveTab] = useState<"render" | "viewer">(model.previewImageBase64 ? "render" : "viewer");
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const expandedIframeRef = useRef<HTMLIFrameElement>(null);
   const blobUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -1447,26 +1452,29 @@ function Model3DCard({ model }: { model: Generated3DModel }) {
       const blob = new Blob([model.threejsHtml], { type: "text/html" });
       const url = URL.createObjectURL(blob);
       blobUrlRef.current = url;
-      if (iframeRef.current) iframeRef.current.src = url;
     }
     return () => { if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current); };
   }, [model.threejsHtml]);
 
-  const handleDownloadGlb = () => {
+  const download = (dataUrl: string, filename: string) => {
     const a = document.createElement("a");
-    a.href = `data:model/gltf-binary;base64,${model.glbBase64}`;
-    a.download = `omnimens-3d-${model.index + 1}.glb`;
+    a.href = dataUrl;
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
   };
 
+  const modelName = model.prompt.slice(0, 30).replace(/[^a-z0-9]/gi, "-").toLowerCase();
   const toolLabel = model.toolUsed === "blender" ? "⬡ BLENDER 4.4"
-    : model.toolUsed === "openscad" ? "⬡ OPENSCAD"
-    : "⬡ TRIMESH";
+    : model.toolUsed === "openscad" ? "⬡ OPENSCAD" : "⬡ TRIMESH";
   const toolColor = model.toolUsed === "blender" ? "text-orange-400"
-    : model.toolUsed === "openscad" ? "text-yellow-400"
-    : "text-cyan-400";
+    : model.toolUsed === "openscad" ? "text-yellow-400" : "text-cyan-400";
+  const borderColor = model.toolUsed === "blender" ? "border-orange-500/25"
+    : model.toolUsed === "openscad" ? "border-yellow-500/25" : "border-cyan-500/25";
+  const glowColor = model.toolUsed === "blender"
+    ? "shadow-[0_0_30px_rgba(255,150,50,0.10)]"
+    : "shadow-[0_0_30px_rgba(0,200,255,0.10)]";
 
   return (
     <>
@@ -1474,61 +1482,120 @@ function Model3DCard({ model }: { model: Generated3DModel }) {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="rounded-xl overflow-hidden border border-cyan-500/25 bg-black/60 shadow-[0_0_30px_rgba(0,200,255,0.10)]"
+        className={`rounded-xl overflow-hidden border ${borderColor} bg-black/60 ${glowColor}`}
       >
-        {/* Compact preview (320px tall) */}
-        <div
-          className="relative cursor-pointer group"
-          style={{ height: 320 }}
-          onClick={() => setExpanded(true)}
-        >
-          <iframe
-            ref={iframeRef}
-            className="w-full h-full border-0 rounded-t-xl pointer-events-none"
-            sandbox="allow-scripts"
-            title="3D model preview"
-          />
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-            <div className="bg-black/70 px-4 py-2 rounded-xl font-mono text-xs text-cyan-300 tracking-widest border border-cyan-500/30">
-              EXPAND 3D VIEW
-            </div>
-          </div>
+        {/* Tab bar */}
+        <div className="flex items-center border-b border-white/8 bg-black/30">
+          {model.previewImageBase64 && (
+            <button
+              onClick={() => setActiveTab("render")}
+              className={`flex-1 py-2 font-mono text-[10px] tracking-widest transition-all ${activeTab === "render" ? `${toolColor} border-b border-current` : "text-white/40 hover:text-white/70"}`}
+            >
+              ◉ CYCLES RENDER
+            </button>
+          )}
+          <button
+            onClick={() => setActiveTab("viewer")}
+            className={`flex-1 py-2 font-mono text-[10px] tracking-widest transition-all ${activeTab === "viewer" ? "text-cyan-400 border-b border-cyan-400" : "text-white/40 hover:text-white/70"}`}
+          >
+            ⬡ 3D VIEWER
+          </button>
         </div>
 
-        {/* Info bar */}
-        <div className="flex items-center justify-between px-4 py-3 border-t border-white/8 bg-black/40">
-          <div className="flex-1 min-w-0 pr-4">
-            <div className="flex items-center gap-2 mb-0.5">
-              <span className={`font-mono text-[9px] tracking-widest ${toolColor}`}>{toolLabel}</span>
-              <span className="text-white/25 text-[9px]">·</span>
-              <span className="font-mono text-[9px] text-white/40 tracking-widest">
-                {model.vertexCount.toLocaleString()}V / {model.faceCount.toLocaleString()}F / {(model.glbSizeBytes / 1024).toFixed(0)}KB
-              </span>
+        {/* Main content */}
+        <div className="relative" style={{ height: 340 }}>
+          {/* Cycles render preview */}
+          {activeTab === "render" && model.previewImageBase64 && (
+            <div className="w-full h-full flex items-center justify-center bg-black relative group">
+              <img
+                src={`data:image/png;base64,${model.previewImageBase64}`}
+                alt="Blender Cycles render"
+                className="max-w-full max-h-full object-contain"
+              />
+              <div className="absolute top-2 right-2 bg-black/70 border border-orange-500/30 px-2 py-1 rounded font-mono text-[8px] text-orange-400 tracking-widest">
+                CYCLES · 64 SAMPLES · PBR
+              </div>
+              <button
+                onClick={() => download(`data:image/png;base64,${model.previewImageBase64}`, `${modelName}-render.png`)}
+                className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 flex items-center gap-1.5 bg-black/80 border border-white/20 text-white/70 hover:text-white font-mono text-[10px] px-3 py-1.5 rounded-lg transition-all"
+              >
+                <Download className="w-3 h-3" />
+                SAVE PNG
+              </button>
             </div>
-            <p className="font-mono text-[10px] text-white/60 truncate">
-              {model.prompt.slice(0, 80)}{model.prompt.length > 80 ? "…" : ""}
-            </p>
+          )}
+
+          {/* Three.js interactive viewer */}
+          {activeTab === "viewer" && (
+            <div className="relative w-full h-full group cursor-pointer" onClick={() => setExpanded(true)}>
+              <iframe
+                ref={iframeRef}
+                src={blobUrlRef.current || ""}
+                className="w-full h-full border-0 pointer-events-none"
+                sandbox="allow-scripts"
+                title="3D model preview"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <div className="bg-black/80 px-4 py-2 rounded-xl font-mono text-xs text-cyan-300 tracking-widest border border-cyan-500/30">
+                  CLICK TO EXPAND
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Info + download bar */}
+        <div className="px-4 py-3 border-t border-white/8 bg-black/40 space-y-2.5">
+          {/* Stats */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className={`font-mono text-[9px] tracking-widest ${toolColor}`}>{toolLabel}</span>
+            <span className="text-white/20 text-[9px]">·</span>
+            <span className="font-mono text-[9px] text-white/40">{model.vertexCount.toLocaleString()} verts</span>
+            <span className="text-white/20 text-[9px]">·</span>
+            <span className="font-mono text-[9px] text-white/40">{model.faceCount.toLocaleString()} faces</span>
+            {model.formats && model.formats.map(f => (
+              <span key={f} className="font-mono text-[8px] text-white/30 border border-white/10 px-1.5 py-0.5 rounded">{f}</span>
+            ))}
           </div>
-          <div className="flex items-center gap-2 shrink-0">
+
+          {/* Prompt */}
+          <p className="font-mono text-[10px] text-white/50 truncate">
+            {model.prompt.slice(0, 90)}{model.prompt.length > 90 ? "…" : ""}
+          </p>
+
+          {/* Download buttons */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* ZIP — primary */}
+            {model.zipBase64 && (
+              <button
+                onClick={() => download(`data:application/zip;base64,${model.zipBase64}`, `omnimens-${modelName}.zip`)}
+                className={`flex items-center gap-1.5 text-[10px] font-mono text-orange-300 hover:text-white bg-orange-500/12 hover:bg-orange-500/25 border border-orange-500/30 hover:border-orange-500/60 px-3 py-1.5 rounded-lg transition-all`}
+              >
+                <Download className="w-3 h-3" />
+                ZIP ALL ({model.formats?.join("+")}) {model.zipSizeBytes ? `${(model.zipSizeBytes / 1024 / 1024).toFixed(1)}MB` : ""}
+              </button>
+            )}
+            {/* GLB */}
             <button
-              onClick={() => setExpanded(true)}
-              className="flex items-center gap-1.5 text-[10px] font-mono text-white/60 hover:text-white border border-white/10 hover:border-white/25 px-3 py-1.5 rounded-lg transition-all"
-            >
-              <Expand className="w-3 h-3" />
-              3D
-            </button>
-            <button
-              onClick={handleDownloadGlb}
-              className="flex items-center gap-1.5 text-[10px] font-mono text-cyan-400 hover:text-white bg-cyan-500/10 hover:bg-cyan-500/25 border border-cyan-500/25 hover:border-cyan-500/50 px-3 py-1.5 rounded-lg transition-all"
+              onClick={() => download(`data:model/gltf-binary;base64,${model.glbBase64}`, `${modelName}.glb`)}
+              className="flex items-center gap-1.5 text-[10px] font-mono text-cyan-400 hover:text-white bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/25 hover:border-cyan-500/50 px-3 py-1.5 rounded-lg transition-all"
             >
               <Download className="w-3 h-3" />
               .GLB
+            </button>
+            {/* Expand 3D viewer */}
+            <button
+              onClick={() => { setActiveTab("viewer"); setExpanded(true); }}
+              className="flex items-center gap-1.5 text-[10px] font-mono text-white/50 hover:text-white border border-white/10 hover:border-white/25 px-3 py-1.5 rounded-lg transition-all ml-auto"
+            >
+              <Expand className="w-3 h-3" />
+              FULLSCREEN
             </button>
           </div>
         </div>
       </motion.div>
 
-      {/* Fullscreen 3D viewer */}
+      {/* Fullscreen Three.js viewer */}
       <AnimatePresence>
         {expanded && (
           <motion.div
@@ -1538,18 +1605,29 @@ function Model3DCard({ model }: { model: Generated3DModel }) {
             className="fixed inset-0 z-[200] bg-black/98 backdrop-blur-md flex flex-col"
           >
             <div className="flex items-center justify-between px-6 py-3 border-b border-white/8 shrink-0">
-              <div>
-                <span className={`font-mono text-xs tracking-widest ${toolColor}`}>{toolLabel}</span>
-                <span className="text-white/25 mx-2">·</span>
-                <span className="font-mono text-[10px] text-white/50">{model.vertexCount.toLocaleString()} verts · {model.faceCount.toLocaleString()} faces</span>
-              </div>
               <div className="flex items-center gap-3">
+                <span className={`font-mono text-xs tracking-widest ${toolColor}`}>{toolLabel}</span>
+                <span className="text-white/20">·</span>
+                <span className="font-mono text-[10px] text-white/40">
+                  {model.vertexCount.toLocaleString()} verts · {model.faceCount.toLocaleString()} faces
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {model.zipBase64 && (
+                  <button
+                    onClick={() => download(`data:application/zip;base64,${model.zipBase64}`, `omnimens-${modelName}.zip`)}
+                    className="flex items-center gap-2 bg-orange-500/15 hover:bg-orange-500/30 border border-orange-500/30 text-orange-300 font-mono text-xs tracking-widest px-4 py-2 rounded-xl transition-all"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    DOWNLOAD ALL FORMATS
+                  </button>
+                )}
                 <button
-                  onClick={handleDownloadGlb}
+                  onClick={() => download(`data:model/gltf-binary;base64,${model.glbBase64}`, `${modelName}.glb`)}
                   className="flex items-center gap-2 bg-cyan-500/15 hover:bg-cyan-500/30 border border-cyan-500/30 text-cyan-300 font-mono text-xs tracking-widest px-4 py-2 rounded-xl transition-all"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  DOWNLOAD .GLB
+                  .GLB
                 </button>
                 <button
                   onClick={() => setExpanded(false)}
@@ -1560,11 +1638,11 @@ function Model3DCard({ model }: { model: Generated3DModel }) {
               </div>
             </div>
             <iframe
+              ref={expandedIframeRef}
               src={blobUrlRef.current || ""}
               className="flex-1 border-0"
               sandbox="allow-scripts"
               title="3D model fullscreen"
-              allow="accelerometer; fullscreen"
             />
           </motion.div>
         )}
