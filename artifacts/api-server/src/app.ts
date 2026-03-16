@@ -31,7 +31,7 @@ startEvolutionEngine();
 if (process.env.NODE_ENV === "production") {
   const omnimensDist = path.resolve(__dirname, "../../omnimens/dist/public");
   app.use("/omnimens", express.static(omnimensDist));
-  app.get("/omnimens/*", (_req, res) => {
+  app.get("/omnimens/*splat", (_req, res) => {
     res.sendFile(path.join(omnimensDist, "index.html"));
   });
   app.get("/", (_req, res) => res.redirect("/omnimens"));

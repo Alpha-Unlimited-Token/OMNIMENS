@@ -23,9 +23,7 @@ const allowlist = [
   "jsonwebtoken",
   "memorystore",
   "multer",
-  "nanoid",
   "nodemailer",
-  "openai",
   "passport",
   "passport-local",
   "pg",
@@ -60,7 +58,13 @@ async function buildAll() {
     bundle: true,
     format: "cjs",
     outfile: path.resolve(distDir, "index.cjs"),
+    // Polyfill import.meta.url for CJS bundles — fileURLToPath(import.meta.url)
+    // needs a valid URL string, not undefined, when running in CommonJS context.
+    banner: {
+      js: `const _importMetaUrlCompat = (typeof __filename !== "undefined") ? require("url").pathToFileURL(__filename).href : "file:///bundle.cjs";`,
+    },
     define: {
+      "import.meta.url": "_importMetaUrlCompat",
       "process.env.NODE_ENV": '"production"',
     },
     minify: true,
