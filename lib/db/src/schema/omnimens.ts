@@ -84,7 +84,7 @@ export const omnimensNotifications = pgTable("godflesh_notifications", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// User projects — built by 6 AI agents
+// User projects — built by OMNIMENS AI
 export const omnimensProjects = pgTable("godflesh_projects", {
   id: serial("id").primaryKey(),
   userId: text("user_id").notNull().references(() => omnimensUsers.id),
@@ -92,6 +92,15 @@ export const omnimensProjects = pgTable("godflesh_projects", {
   description: text("description").notNull(),
   type: text("type").notNull(), // "webapp"|"website"|"game"|"api"|"dataviz"|"extension"|"tool"
   status: text("status").default("idle").notNull(), // "idle"|"building"|"ready"|"failed"
+  // Publishing
+  published: boolean("published").default(false).notNull(),
+  publishedAt: timestamp("published_at"),
+  slug: text("slug").unique(),                    // short unique slug for public URL
+  // Custom domain
+  customDomain: text("custom_domain"),
+  domainStatus: text("domain_status").default("none"), // "none"|"pending"|"active"|"error"
+  // Build output
+  buildLog: text("build_log"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

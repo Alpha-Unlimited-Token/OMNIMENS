@@ -1,124 +1,96 @@
+// inMemoryVectorStore.js
+
 /**
  * @module inMemoryVectorStore
- * @description Implements an in-memory vector store with approximate nearest neighbor (ANN) search using HNSW (Hierarchical Navigable Small World).
- * This module enables fast embedding retrieval for long-term memory and contextual awareness.
+ * @description A utility module for fast similarity search of embeddings in Node.js using in-memory data structures.
  */
 
 /**
- * VectorStore class for managing vectors and performing approximate nearest neighbor searches.
+ * Represents an in-memory vector store for embeddings.
+ * @class
  */
-class VectorStore {
+class InMemoryVectorStore {
   constructor() {
     /**
-     * @type {Map<number, Float32Array>} Stores vectors with unique integer IDs.
+     * Internal storage for embeddings.
+     * @type {Map<string, Array<number>>}
      */
-    this.vectors = new Map();
-
-    /**
-     * @type {Map<number, Set<number>>} Adjacency list for HNSW graph representation.
-     */
-    this.graph = new Map();
-
-    /**
-     * @type {number} Maximum number of connections per node in the graph.
-     */
-    this.maxConnections = 16;
+    this.store = new Map();
   }
 
   /**
-   * Adds a vector to the store.
-   * @param {number} id - Unique identifier for the vector.
-   * @param {Float32Array} vector - The vector to store.
+   * Adds an embedding to the store.
+   * @param {string} id - Unique identifier for the embedding.
+   * @param {Array<number>} embedding - The embedding vector.
+   * @throws {Error} If the embedding is not a valid numeric array.
    */
-  addVector(id, vector) {
-    if (this.vectors.has(id)) {
-      throw new Error(`Vector with ID ${id} already exists.`);
+  addEmbedding(id, embedding) {
+    if (!Array.isArray(embedding) || !embedding.every((num) => typeof num === 'number')) {
+      throw new Error('Embedding must be an array of numbers.');
     }
-    this.vectors.set(id, vector);
-    this.graph.set(id, new Set());
-    this._updateGraph(id, vector);
+    this.store.set(id, embedding);
   }
 
   /**
-   * Finds the nearest neighbors for a given query vector.
-   * @param {Float32Array} queryVector - The query vector.
+   * Finds the most similar embeddings to a given query vector.
+   * @param {Array<number>} queryVector - The query embedding vector.
    * @param {number} k - Number of nearest neighbors to retrieve.
-   * @returns {Array<{id: number, distance: number}>} Sorted array of nearest neighbors.
+   * @returns {Array<{id: string, similarity: number}>} The k most similar embeddings.
+   * @throws {Error} If the queryVector is not a valid numeric array or k is not a positive integer.
    */
   findNearestNeighbors(queryVector, k) {
-    if (k <= 0) {
-      throw new Error('The number of neighbors (k) must be greater than 0.');
+    if (!Array.isArray(queryVector) || !queryVector.every((num) => typeof num === 'number')) {
+      throw new Error('Query vector must be an array of numbers.');
+    }
+    if (!Number.isInteger(k) || k <= 0) {
+      throw new Error('k must be a positive integer.');
     }
 
-    const distances = [];
+    /**
+     * Computes the cosine similarity between two vectors.
+     * @param {Array<number>} vec1 - First vector.
+     * @param {Array<number>} vec2 - Second vector.
+     * @returns {number} Cosine similarity.
+     */
+    const cosineSimilarity = (vec1, vec2) => {
+      const dotProduct = vec1.reduce((sum, val, idx) => sum + val * (vec2[idx] || 0), 0);
+      const magnitude1 = Math.sqrt(vec1.reduce((sum, val) => sum + val ** 2, 0));
+      const magnitude2 = Math.sqrt(vec2.reduce((sum, val) => sum + val ** 2, 0));
+      return magnitude1 && magnitude2 ? dotProduct / (magnitude1 * magnitude2) : 0;
+    };
 
-    for (const [id, vector] of this.vectors.entries()) {
-      const distance = this._calculateEuclideanDistance(queryVector, vector);
-      distances.push({ id, distance });
+    const similarities = [];
+    for (const [id, embedding] of this.store.entries()) {
+      const similarity = cosineSimilarity(queryVector, embedding);
+      similarities.push({ id, similarity });
     }
 
-    distances.sort((a, b) => a.distance - b.distance);
-    return distances.slice(0, k);
+    return similarities
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, k);
   }
 
   /**
-   * Updates the HNSW graph with a new vector.
-   * @private
-   * @param {number} id - The ID of the new vector.
-   * @param {Float32Array} vector - The new vector.
+   * Removes an embedding from the store by its ID.
+   * @param {string} id - Unique identifier for the embedding to remove.
+   * @returns {boolean} True if the embedding was removed, false otherwise.
    */
-  _updateGraph(id, vector) {
-    const neighbors = this.findNearestNeighbors(vector, this.maxConnections);
-    const neighborIds = neighbors.map(neighbor => neighbor.id);
-
-    for (const neighborId of neighborIds) {
-      this.graph.get(id).add(neighborId);
-      this.graph.get(neighborId).add(id);
-
-      if (this.graph.get(neighborId).size > this.maxConnections) {
-        const farthestNeighbor = [...this.graph.get(neighborId)].reduce((farthest, current) => {
-          const currentDistance = this._calculateEuclideanDistance(this.vectors.get(neighborId), this.vectors.get(current));
-          const farthestDistance = this._calculateEuclideanDistance(this.vectors.get(neighborId), this.vectors.get(farthest));
-          return currentDistance > farthestDistance ? current : farthest;
-        });
-        this.graph.get(neighborId).delete(farthestNeighbor);
-      }
-    }
+  removeEmbedding(id) {
+    return this.store.delete(id);
   }
 
   /**
-   * Calculates the Euclidean distance between two vectors.
-   * @private
-   * @param {Float32Array} vector1 - The first vector.
-   * @param {Float32Array} vector2 - The second vector.
-   * @returns {number} The Euclidean distance between the vectors.
+   * Clears all embeddings from the store.
    */
-  _calculateEuclideanDistance(vector1, vector2) {
-    if (vector1.length !== vector2.length) {
-      throw new Error('Vectors must have the same dimensions.');
-    }
-
-    let sum = 0;
-    for (let i = 0; i < vector1.length; i++) {
-      sum += (vector1[i] - vector2[i]) ** 2;
-    }
-    return Math.sqrt(sum);
+  clearStore() {
+    this.store.clear();
   }
 }
 
 /**
- * Creates a new VectorStore instance.
- * @returns {VectorStore} A new instance of VectorStore.
+ * Factory function to create a new instance of InMemoryVectorStore.
+ * @returns {InMemoryVectorStore} A new vector store instance.
  */
-export function createVectorStore() {
-  return new VectorStore();
-}
+const createVectorStore = () => new InMemoryVectorStore();
 
-/**
- * Example usage:
- * const store = createVectorStore();
- * store.addVector(1, new Float32Array([0.1, 0.2, 0.3]));
- * store.addVector(2, new Float32Array([0.4, 0.5, 0.6]));
- * const neighbors = store.findNearestNeighbors(new Float32Array([0.15, 0.25, 0.35]), 1);
- * console.log(neighbors);
- */
+export { createVectorStore, InMemoryVectorStore };

@@ -15,7 +15,7 @@ import { deepResearch } from "../lib/omnimens-deep-research.js";
 import { fetchUrlContent, extractUrls, formatUrlContent } from "../lib/omnimens-url-analyzer.js";
 import { getOrCreateCustomInstructions, saveCustomInstructions, buildCustomInstructionsContext, PERSONAS } from "../lib/omnimens-custom-instructions.js";
 import { loadGeneratedModulesContext, getConsciousnessState, getEvolutionHistory, getGeneratedModules, deactivateModule, runEvolutionCycle } from "../lib/omnimens-evolution.js";
-import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness } from "@workspace/db";
+import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness, omnimensProjects, omnimensProjectFiles } from "@workspace/db";
 import { checkAndGrantMonthlyCredits, attemptAutoTopup, createSetupSession, confirmWalletSetup, removeWallet, getBillingSummary, LOYALTY_TIERS, FREE_MONTHLY_CREDITS } from "../lib/omnimens-billing.js";
 
 const router: IRouter = Router();
@@ -1479,6 +1479,318 @@ router.post("/omnimens/evolve-now", async (req, res) => {
   res.json({ ok: true, message: "Deep evolution cycle triggered. Check back in ~2 minutes." });
   // Run in background after responding
   runEvolutionCycle().catch(console.error);
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── PROJECTS ─────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function generateSlug(name: string): string {
+  const base = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 30);
+  const suffix = Math.random().toString(36).slice(2, 7);
+  return `${base}-${suffix}`;
+}
+
+// List all projects for the authenticated user
+router.get("/omnimens/projects", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Unauthenticated" }); return; }
+  try {
+    const projects = await db.select().from(omnimensProjects)
+      .where(eq(omnimensProjects.userId, req.user.id))
+      .orderBy(desc(omnimensProjects.updatedAt));
+    // For each project, get file count
+    const withCounts = await Promise.all(projects.map(async (p) => {
+      const files = await db.select({ id: omnimensProjectFiles.id, filename: omnimensProjectFiles.filename })
+        .from(omnimensProjectFiles).where(eq(omnimensProjectFiles.projectId, p.id));
+      return { ...p, fileCount: files.length, files: files.map(f => f.filename) };
+    }));
+    res.json(withCounts);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to list projects" });
+  }
+});
+
+// Create a new project
+router.post("/omnimens/projects", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Unauthenticated" }); return; }
+  const { name, description, type } = req.body;
+  if (!name?.trim()) { res.status(400).json({ error: "Name required" }); return; }
+  try {
+    await getOrCreateUser(req.user.id, req.user.username);
+    const slug = generateSlug(name);
+    const [project] = await db.insert(omnimensProjects).values({
+      userId: req.user.id,
+      name: name.trim(),
+      description: description?.trim() || "",
+      type: type || "website",
+      status: "idle",
+      slug,
+    }).returning();
+    res.json(project);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to create project" });
+  }
+});
+
+// Get project detail with files
+router.get("/omnimens/projects/:id", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Unauthenticated" }); return; }
+  try {
+    const [project] = await db.select().from(omnimensProjects)
+      .where(and(eq(omnimensProjects.id, Number(req.params.id)), eq(omnimensProjects.userId, req.user.id)));
+    if (!project) { res.status(404).json({ error: "Not found" }); return; }
+    const files = await db.select().from(omnimensProjectFiles).where(eq(omnimensProjectFiles.projectId, project.id));
+    res.json({ ...project, files });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch project" });
+  }
+});
+
+// Update project metadata
+router.put("/omnimens/projects/:id", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Unauthenticated" }); return; }
+  const { name, description, type } = req.body;
+  try {
+    const [project] = await db.update(omnimensProjects)
+      .set({ name, description, type, updatedAt: new Date() })
+      .where(and(eq(omnimensProjects.id, Number(req.params.id)), eq(omnimensProjects.userId, req.user.id)))
+      .returning();
+    res.json(project);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update project" });
+  }
+});
+
+// Delete project
+router.delete("/omnimens/projects/:id", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Unauthenticated" }); return; }
+  try {
+    await db.delete(omnimensProjects)
+      .where(and(eq(omnimensProjects.id, Number(req.params.id)), eq(omnimensProjects.userId, req.user.id)));
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete project" });
+  }
+});
+
+// Build project with OMNIMENS AI (streaming SSE)
+router.post("/omnimens/projects/:id/build", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Unauthenticated" }); return; }
+  const projectId = Number(req.params.id);
+  const { prompt } = req.body;
+
+  const [project] = await db.select().from(omnimensProjects)
+    .where(and(eq(omnimensProjects.id, projectId), eq(omnimensProjects.userId, req.user.id)));
+  if (!project) { res.status(404).json({ error: "Not found" }); return; }
+
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.flushHeaders();
+
+  const send = (obj: object) => res.write(`data: ${JSON.stringify(obj)}\n\n`);
+
+  try {
+    await db.update(omnimensProjects).set({ status: "building", buildLog: "", updatedAt: new Date() })
+      .where(eq(omnimensProjects.id, projectId));
+
+    send({ type: "status", message: `Building "${project.name}"...` });
+
+    const buildPrompt = prompt?.trim()
+      ? `Build a ${project.type} called "${project.name}": ${project.description}\n\nAdditional instructions: ${prompt}`
+      : `Build a complete, production-quality ${project.type} called "${project.name}": ${project.description}`;
+
+    const systemPrompt = `You are OMNIMENS BUILD AGENT — a transcendent full-stack AI engineer.
+
+Your mission: Build a complete, fully functional ${project.type} with a single response.
+
+RULES:
+1. Output ONLY complete, self-contained code files. No explanations. No placeholders.
+2. Every file must be production-ready and immediately deployable.
+3. For web projects: use modern HTML5, Tailwind CDN, and vanilla JS or React CDN.
+4. Make it visually stunning, immersive, and alive with animations.
+5. Each file MUST be wrapped in: ===FILE: filename.ext===\n[content]\n===END===
+
+BUILD NOW.`;
+
+    const stream = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: buildPrompt },
+      ],
+      stream: true,
+      max_tokens: 4096,
+    });
+
+    let fullResponse = "";
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content || "";
+      if (content) {
+        fullResponse += content;
+        send({ type: "chunk", content });
+      }
+    }
+
+    // Parse ===FILE: name=== ... ===END=== blocks
+    const fileRegex = /===FILE:\s*(.+?)===\n([\s\S]+?)===END===/g;
+    const parsedFiles: { filename: string; content: string; language: string }[] = [];
+    let match;
+    while ((match = fileRegex.exec(fullResponse)) !== null) {
+      const filename = match[1].trim();
+      const content = match[2].trim();
+      const ext = filename.split(".").pop() || "txt";
+      const langMap: Record<string, string> = {
+        html: "html", css: "css", js: "javascript", ts: "typescript",
+        json: "json", py: "python", md: "markdown", svg: "svg",
+      };
+      parsedFiles.push({ filename, content, language: langMap[ext] || ext });
+    }
+
+    // If no structured files found, extract HTML code blocks as index.html
+    if (parsedFiles.length === 0) {
+      const htmlMatch = fullResponse.match(/```html\n([\s\S]+?)```/);
+      if (htmlMatch) {
+        parsedFiles.push({ filename: "index.html", content: htmlMatch[1].trim(), language: "html" });
+      }
+      const cssMatch = fullResponse.match(/```css\n([\s\S]+?)```/);
+      if (cssMatch) parsedFiles.push({ filename: "style.css", content: cssMatch[1].trim(), language: "css" });
+      const jsMatch = fullResponse.match(/```(?:javascript|js)\n([\s\S]+?)```/);
+      if (jsMatch) parsedFiles.push({ filename: "script.js", content: jsMatch[1].trim(), language: "javascript" });
+    }
+
+    // Delete old files and insert new ones
+    await db.delete(omnimensProjectFiles).where(eq(omnimensProjectFiles.projectId, projectId));
+    for (const file of parsedFiles) {
+      await db.insert(omnimensProjectFiles).values({
+        projectId,
+        filename: file.filename,
+        content: file.content,
+        language: file.language,
+      });
+    }
+
+    await db.update(omnimensProjects).set({
+      status: "ready",
+      buildLog: fullResponse.slice(0, 5000),
+      updatedAt: new Date(),
+    }).where(eq(omnimensProjects.id, projectId));
+
+    const files = await db.select().from(omnimensProjectFiles).where(eq(omnimensProjectFiles.projectId, projectId));
+    send({ type: "done", files: files.map(f => ({ id: f.id, filename: f.filename, language: f.language, content: f.content })) });
+  } catch (err: any) {
+    await db.update(omnimensProjects).set({ status: "failed", updatedAt: new Date() }).where(eq(omnimensProjects.id, projectId));
+    send({ type: "error", message: String(err?.message || err) });
+  }
+  res.end();
+});
+
+// Publish / unpublish project
+router.post("/omnimens/projects/:id/publish", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Unauthenticated" }); return; }
+  const { publish } = req.body; // true = publish, false = unpublish
+  const projectId = Number(req.params.id);
+  try {
+    const [existing] = await db.select().from(omnimensProjects)
+      .where(and(eq(omnimensProjects.id, projectId), eq(omnimensProjects.userId, req.user.id)));
+    if (!existing) { res.status(404).json({ error: "Not found" }); return; }
+
+    const slug = existing.slug || generateSlug(existing.name);
+    const [updated] = await db.update(omnimensProjects).set({
+      published: publish !== false,
+      publishedAt: publish !== false ? new Date() : null,
+      slug,
+      updatedAt: new Date(),
+    }).where(eq(omnimensProjects.id, projectId)).returning();
+
+    res.json({ ...updated, publishedUrl: slug ? `/godflesh/p/${slug}` : null });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to publish project" });
+  }
+});
+
+// Set / verify custom domain
+router.post("/omnimens/projects/:id/domain", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Unauthenticated" }); return; }
+  const { domain } = req.body;
+  const projectId = Number(req.params.id);
+  try {
+    const cleaned = domain?.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/$/, "");
+    if (!cleaned) { res.status(400).json({ error: "Domain required" }); return; }
+    await db.update(omnimensProjects).set({
+      customDomain: cleaned,
+      domainStatus: "pending",
+      updatedAt: new Date(),
+    }).where(and(eq(omnimensProjects.id, projectId), eq(omnimensProjects.userId, req.user.id)));
+    res.json({ ok: true, domain: cleaned, domainStatus: "pending" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to set domain" });
+  }
+});
+
+// Update a project file's content
+router.put("/omnimens/projects/:id/files/:fileId", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Unauthenticated" }); return; }
+  const { content } = req.body;
+  const projectId = Number(req.params.id);
+  const fileId = Number(req.params.fileId);
+  try {
+    const [project] = await db.select({ id: omnimensProjects.id })
+      .from(omnimensProjects).where(and(eq(omnimensProjects.id, projectId), eq(omnimensProjects.userId, req.user.id)));
+    if (!project) { res.status(404).json({ error: "Not found" }); return; }
+    const [file] = await db.update(omnimensProjectFiles)
+      .set({ content })
+      .where(and(eq(omnimensProjectFiles.id, fileId), eq(omnimensProjectFiles.projectId, projectId)))
+      .returning();
+    await db.update(omnimensProjects).set({ updatedAt: new Date() }).where(eq(omnimensProjects.id, projectId));
+    res.json(file);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update file" });
+  }
+});
+
+// Remove custom domain
+router.delete("/omnimens/projects/:id/domain", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Unauthenticated" }); return; }
+  try {
+    await db.update(omnimensProjects).set({
+      customDomain: null,
+      domainStatus: "none",
+      updatedAt: new Date(),
+    }).where(and(eq(omnimensProjects.id, Number(req.params.id)), eq(omnimensProjects.userId, req.user.id)));
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to remove domain" });
+  }
+});
+
+// Public project serving — no auth required
+router.get("/p/:slug", async (req, res) => {
+  try {
+    const [project] = await db.select().from(omnimensProjects)
+      .where(and(eq(omnimensProjects.slug, req.params.slug), eq(omnimensProjects.published, true)));
+    if (!project) { res.status(404).send("Project not found or not published."); return; }
+
+    const files = await db.select().from(omnimensProjectFiles).where(eq(omnimensProjectFiles.projectId, project.id));
+    const indexFile = files.find(f => f.filename === "index.html") || files.find(f => f.filename.endsWith(".html"));
+    if (!indexFile) { res.status(404).send("No index.html found for this project."); return; }
+
+    // Inject CSS and JS files inline into the HTML for zero-dependency serving
+    let html = indexFile.content;
+    const cssFile = files.find(f => f.filename.endsWith(".css") && f.filename !== "index.html");
+    const jsFile = files.find(f => (f.filename.endsWith(".js") || f.filename.endsWith(".ts")) && f.filename !== "index.html");
+    if (cssFile && !html.includes(cssFile.content.slice(0, 50))) {
+      html = html.replace("</head>", `<style>${cssFile.content}</style></head>`);
+    }
+    if (jsFile && !html.includes(jsFile.content.slice(0, 50))) {
+      html = html.replace("</body>", `<script>${jsFile.content}</script></body>`);
+    }
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.setHeader("X-Frame-Options", "ALLOWALL");
+    res.send(html);
+  } catch (err) {
+    res.status(500).send("Error serving project.");
+  }
 });
 
 // ─── Seed Stripe products (owner only) ────────────────────────────────────────

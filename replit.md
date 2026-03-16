@@ -44,8 +44,8 @@ A transcendent sci-fi AI chat platform matching and surpassing the capabilities 
 - `godflesh_brain` — OMNIMENS's self-learned knowledge base
 - `godflesh_upgrades` — upgrade cycle log
 - `godflesh_notifications` — user-facing upgrade announcements
-- `godflesh_projects` — user projects (schema done, routes pending)
-- `godflesh_project_files` — project file storage
+- `godflesh_projects` — user projects (published, slug, customDomain, domainStatus, buildLog)
+- `godflesh_project_files` — project file storage (filename, content, language)
 - `godflesh_memories` — per-user persistent memories (auto-extracted + manual)
 - `godflesh_custom_instructions` — per-user persona + aboutUser + responseStyle
 - `godflesh_code_runs` — code execution history
@@ -72,6 +72,24 @@ A transcendent sci-fi AI chat platform matching and surpassing the capabilities 
 - `GET /api/omnimens/patches` — (owner only) behavioral patches
 - `DELETE /api/omnimens/patches/:id` — deactivate patch
 - `POST /api/omnimens/seed-products` — (owner only) create Stripe products
+- `GET /api/omnimens/projects` — list user projects
+- `POST /api/omnimens/projects` — create project
+- `GET /api/omnimens/projects/:id` — get project + files
+- `PUT /api/omnimens/projects/:id` — update metadata
+- `DELETE /api/omnimens/projects/:id` — delete project + files (cascade)
+- `POST /api/omnimens/projects/:id/build` — SSE streaming GPT-4o build (parses ===FILE: name===...===END=== blocks)
+- `PUT /api/omnimens/projects/:id/files/:fileId` — edit individual file
+- `POST /api/omnimens/projects/:id/publish` — publish/unpublish project (generates slug)
+- `POST /api/omnimens/projects/:id/domain` — connect custom domain (status: pending)
+- `DELETE /api/omnimens/projects/:id/domain` — remove custom domain
+- `GET /p/:slug` — public project serving (no auth; inlines CSS+JS into index.html)
+
+### Frontend Pages
+- `/` — home (OMNIMENS landing page)
+- `/chat` — 3-panel AI workspace (personas, chat, gallery/artifacts)
+- `/projects` — project management (create, AI build, preview, publish, custom domain)
+- `/pricing` — loyalty tiers + wallet connection
+- `/account` — user account + billing
 
 ### Library Files
 - `lib/omnimens-engine.ts` — neural pipeline runner (OMNIMENS cognitive state)

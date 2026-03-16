@@ -15,7 +15,7 @@ import {
   Zap, Terminal, Play, Microscope, ChevronDown, Check, BookOpen, Brain,
   Cpu, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Image,
   FolderOpen, Activity, SlidersHorizontal, PanelLeftClose, PanelRightClose,
-  PanelLeft, PanelRight, X
+  PanelLeft, PanelRight, X, Layers
 } from "lucide-react";
 import { OmnimensIcon } from "@/components/omnimens-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
@@ -264,6 +264,15 @@ function LeftPanel({
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Projects shortcut */}
+      <div className="border-t border-white/8 pt-3">
+        <a href={`${window.location.origin}/godflesh/projects`}
+          className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[10px] font-mono font-bold tracking-wider border border-white/10 text-white/40 hover:text-white/70 hover:border-white/20 transition-all">
+          <Layers className="w-3.5 h-3.5" />
+          MY PROJECTS
+        </a>
       </div>
 
       {/* Voice toggle */}
