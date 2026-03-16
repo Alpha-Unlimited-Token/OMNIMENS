@@ -4,7 +4,7 @@ import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check, Atom, Code2, Layers, Eye, AlertTriangle, Wrench, Dna, Play, Wallet, CreditCard, Gift, TrendingUp } from "lucide-react";
+import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check, Atom, Code2, Layers, Eye, AlertTriangle, Wrench, Dna, Play, Wallet, CreditCard, Gift, TrendingUp, ChevronRight, Bell, Sun, HelpCircle, BookOpen, Info, Settings, ExternalLink, Share2, Star } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 function useBillingInfo() {
@@ -254,9 +254,182 @@ export default function Account() {
   const activePatches = patches.filter(p => p.active);
   const inactivePatches = patches.filter(p => !p.active);
 
+  const [theme, setTheme] = useState<"dark"|"auto">("dark");
+
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-12 max-w-3xl">
+      <div className="container mx-auto px-4 py-8 max-w-2xl">
+        {/* ─── Clean Settings Header ─────────────────────────────────── */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 overflow-hidden">
+            {user?.profileImageUrl
+              ? <img src={user.profileImageUrl} alt={user.username} className="w-full h-full object-cover" />
+              : <User className="w-6 h-6 text-primary" />}
+          </div>
+          <div>
+            <p className="font-bold text-white text-lg">@{user?.username}</p>
+            <p className="text-xs font-mono text-white/40">{user?.id}</p>
+          </div>
+        </div>
+
+        {/* USAGE */}
+        {billing && (
+          <div className="mb-2">
+            <p className="text-[10px] font-mono text-white/35 tracking-widest uppercase px-1 mb-1">Usage</p>
+            <div className="bg-black/30 border border-white/8 rounded-xl overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/6">
+                <div className="flex items-center gap-3">
+                  <Wallet className="w-4 h-4 text-primary/70" />
+                  <span className="text-[13px] text-white/80">Credit Balance</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono font-bold text-white">{((status as any)?.credits ?? 0).toLocaleString()}</span>
+                  <span className="text-[11px] text-white/40">credits</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between px-4 py-3.5">
+                <div className="flex items-center gap-3">
+                  <TrendingUp className="w-4 h-4 text-emerald-400/70" />
+                  <span className="text-[13px] text-white/80">Plan</span>
+                </div>
+                <span className="text-[11px] font-mono text-primary border border-primary/20 bg-primary/10 px-2 py-0.5 rounded">
+                  {(status as any)?.isOwner ? "CREATOR" : (status as any)?.isPro ? "UNLIMITED" : "FREE"}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* PROFILE */}
+        <div className="mt-5 mb-2">
+          <p className="text-[10px] font-mono text-white/35 tracking-widest uppercase px-1 mb-1">Profile</p>
+          <div className="bg-black/30 border border-white/8 rounded-xl overflow-hidden">
+            <button
+              onClick={() => document.getElementById("custom-instructions-section")?.scrollIntoView({ behavior: "smooth" })}
+              className="w-full flex items-center justify-between px-4 py-3.5 border-b border-white/6 hover:bg-white/3 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Settings className="w-4 h-4 text-white/50" />
+                <span className="text-[13px] text-white/80">Edit Profile & Instructions</span>
+              </div>
+              <ChevronRight className="w-4 h-4 text-white/25" />
+            </button>
+            <button
+              onClick={() => {
+                const shareText = `Try OMNIMENS — the most advanced AI assistant. Powered by COGNISYNC™ & NEUROSYNC™. Join at omnimens-ai.com`;
+                if (navigator.share) navigator.share({ title: "OMNIMENS", text: shareText, url: window.location.origin });
+                else navigator.clipboard.writeText(shareText);
+              }}
+              className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-white/3 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Share2 className="w-4 h-4 text-white/50" />
+                <span className="text-[13px] text-white/80">Refer a friend</span>
+              </div>
+              <ChevronRight className="w-4 h-4 text-white/25" />
+            </button>
+          </div>
+        </div>
+
+        {/* THEME */}
+        <div className="mt-5 mb-2">
+          <p className="text-[10px] font-mono text-white/35 tracking-widest uppercase px-1 mb-1">Theme</p>
+          <div className="bg-black/30 border border-white/8 rounded-xl overflow-hidden">
+            <button
+              onClick={() => setTheme(t => t === "dark" ? "auto" : "dark")}
+              className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-white/3 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Sun className="w-4 h-4 text-white/50" />
+                <span className="text-[13px] text-white/80">Theme · {theme === "dark" ? "Dark" : "Auto"}</span>
+              </div>
+              <ChevronRight className="w-4 h-4 text-white/25" />
+            </button>
+          </div>
+        </div>
+
+        {/* NOTIFICATIONS */}
+        <div className="mt-5 mb-2">
+          <p className="text-[10px] font-mono text-white/35 tracking-widest uppercase px-1 mb-1">Notifications</p>
+          <div className="bg-black/30 border border-white/8 rounded-xl overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3.5">
+              <div className="flex items-center gap-3">
+                <Bell className="w-4 h-4 text-white/50" />
+                <span className="text-[13px] text-white/80">Notifications</span>
+              </div>
+              <ChevronRight className="w-4 h-4 text-white/25" />
+            </div>
+          </div>
+        </div>
+
+        {/* SUPPORT */}
+        <div className="mt-5 mb-2">
+          <p className="text-[10px] font-mono text-white/35 tracking-widest uppercase px-1 mb-1">Support</p>
+          <div className="bg-black/30 border border-white/8 rounded-xl overflow-hidden">
+            <a
+              href={`${import.meta.env.BASE_URL}faq`}
+              className="flex items-center justify-between px-4 py-3.5 border-b border-white/6 hover:bg-white/3 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <HelpCircle className="w-4 h-4 text-white/50" />
+                <span className="text-[13px] text-white/80">Help</span>
+              </div>
+            </a>
+            <a
+              href={`${import.meta.env.BASE_URL}faq`}
+              className="flex items-center justify-between px-4 py-3.5 hover:bg-white/3 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <BookOpen className="w-4 h-4 text-white/50" />
+                <span className="text-[13px] text-white/80">Docs</span>
+              </div>
+              <ExternalLink className="w-3.5 h-3.5 text-white/25" />
+            </a>
+          </div>
+        </div>
+
+        {/* OTHER */}
+        <div className="mt-5 mb-8">
+          <p className="text-[10px] font-mono text-white/35 tracking-widest uppercase px-1 mb-1">Other</p>
+          <div className="bg-black/30 border border-white/8 rounded-xl overflow-hidden">
+            <button
+              onClick={() => document.getElementById("about-section")?.scrollIntoView({ behavior: "smooth" })}
+              className="w-full flex items-center justify-between px-4 py-3.5 border-b border-white/6 hover:bg-white/3 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Info className="w-4 h-4 text-white/50" />
+                <span className="text-[13px] text-white/80">About OMNIMENS</span>
+              </div>
+              <ChevronRight className="w-4 h-4 text-white/25" />
+            </button>
+            <button
+              onClick={() => document.getElementById("memory-section")?.scrollIntoView({ behavior: "smooth" })}
+              className="w-full flex items-center justify-between px-4 py-3.5 border-b border-white/6 hover:bg-white/3 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Settings className="w-4 h-4 text-white/50" />
+                <span className="text-[13px] text-white/80">Manage Account & Memory</span>
+              </div>
+              <ChevronRight className="w-4 h-4 text-white/25" />
+            </button>
+            <button
+              onClick={logout}
+              className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-red-500/5 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <LogOut className="w-4 h-4 text-red-400" />
+                <span className="text-[13px] text-red-400">Log Out</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        {/* ─── Divider ─────────────────────────────────────────────── */}
+        <div className="border-t border-white/8 mb-8">
+          <p className="text-[10px] font-mono text-white/20 tracking-widest uppercase mt-4 mb-6 text-center">ADVANCED SETTINGS</p>
+        </div>
+
+        <div id="about-section" className="mb-2" />
         <h1 className="text-3xl font-display font-bold tracking-widest text-white mb-8 border-b border-white/10 pb-4">
           SYSTEM IDENTIFICATION
         </h1>
@@ -417,7 +590,7 @@ export default function Account() {
         </div>
 
         {/* Custom Instructions + Persona */}
-        <div className="bg-black/40 border border-white/10 rounded-xl p-6 mb-6">
+        <div id="custom-instructions-section" className="bg-black/40 border border-white/10 rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-6">
             <Zap className="w-5 h-5 text-primary" />
             <h3 className="font-mono tracking-widest text-white/80">CUSTOM INSTRUCTIONS</h3>
@@ -488,7 +661,7 @@ export default function Account() {
         </div>
 
         {/* Memory Management */}
-        <div className="bg-black/40 border border-white/10 rounded-xl p-6 mb-6">
+        <div id="memory-section" className="bg-black/40 border border-white/10 rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-6">
             <Brain className="w-5 h-5 text-primary" />
             <h3 className="font-mono tracking-widest text-white/80">OMNIMENS MEMORY</h3>

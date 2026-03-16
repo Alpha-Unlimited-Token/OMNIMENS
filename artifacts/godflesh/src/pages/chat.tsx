@@ -29,7 +29,10 @@ import {
   FolderOpen, Activity, SlidersHorizontal, PanelLeftClose, PanelRightClose, PersonStanding,
   PanelLeft, PanelRight, X, Layers, Stethoscope, AlertTriangle, HeartPulse,
   MessageSquare, PlusCircle, Trash2, Settings, LayoutTemplate, Search,
-  ShieldCheck, Swords, Clock, ToggleLeft, ToggleRight
+  ShieldCheck, Swords, Clock, ToggleLeft, ToggleRight,
+  Plus, Database, KeyRound, Mic, ListChecks, Infinity, Gauge, ChevronUp,
+  Globe2, Sparkles, Bolt, Monitor, Code2, FileText, Gamepad2,
+  Presentation, Table2, Wand2
 } from "lucide-react";
 import { OmnimensIcon } from "@/components/omnimens-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
@@ -1392,6 +1395,38 @@ const PERSONA_DESC: Record<string, string> = {
   PHYSIO: "AI physical therapist & rehab coach",
 };
 
+// ── OMNIMENS Skills Library ──────────────────────────────────────────────────
+const OMNIMENS_SKILLS = [
+  { id: "code-expert",    name: "Code Expert",      desc: "Expert programming, debugging & architecture in any language", emoji: "💻", persona: "CODER",       category: "Tech" },
+  { id: "data-analyst",   name: "Data Analyst",     desc: "Analyze data, build dashboards & extract deep insights",       emoji: "📊", persona: "ANALYST",     category: "Data" },
+  { id: "research-pro",   name: "Research Pro",     desc: "Deep research, fact-checking & synthesis across any topic",    emoji: "🔬", persona: "RESEARCHER",  category: "Research" },
+  { id: "content-creator",name: "Content Creator",  desc: "Blog posts, social media, newsletters & viral copy",          emoji: "✍️", persona: "WRITER",      category: "Marketing" },
+  { id: "biz-planner",    name: "Business Planner", desc: "Business plans, pitch decks & strategic roadmaps",            emoji: "💼", persona: "STRATEGIST",  category: "Business" },
+  { id: "ad-creative",    name: "Ad Creative",      desc: "Compelling ad copy & creative concepts for any platform",     emoji: "🎨", persona: "CREATIVE",    category: "Marketing" },
+  { id: "legal-helper",   name: "Legal Helper",     desc: "Contracts, documents & plain-English legal guidance",         emoji: "⚖️", persona: "RESEARCHER",  category: "Legal" },
+  { id: "lang-tutor",     name: "Language Tutor",   desc: "Learn any language — coaching, fluency & cultural context",   emoji: "🌍", persona: "TUTOR",       category: "Education" },
+  { id: "finance-pro",    name: "Finance Advisor",  desc: "Investment analysis, budgeting & financial planning",         emoji: "💰", persona: "ANALYST",     category: "Finance" },
+  { id: "health-coach",   name: "Health Coach",     desc: "Wellness plans, fitness routines & nutrition guidance",       emoji: "🏋️", persona: "PHYSIO",      category: "Health" },
+  { id: "creative-writer",name: "Creative Writer",  desc: "Stories, scripts, poetry, dialogue & world-building",        emoji: "📚", persona: "WRITER",      category: "Creative" },
+  { id: "marketing-pro",  name: "Marketing Expert", desc: "Campaigns, branding, growth hacking & go-to-market",         emoji: "📣", persona: "STRATEGIST",  category: "Marketing" },
+  { id: "resume-builder", name: "Resume Builder",   desc: "Powerful resumes, cover letters & LinkedIn profiles",        emoji: "📄", persona: "WRITER",      category: "Career" },
+  { id: "travel-planner", name: "Travel Planner",   desc: "Itineraries, local tips, bookings & travel hacks",           emoji: "✈️", persona: "RESEARCHER",  category: "Lifestyle" },
+  { id: "interview-prep", name: "Interview Prep",   desc: "Mock interviews, coaching & industry-specific Q&A",          emoji: "🎯", persona: "TUTOR",       category: "Career" },
+  { id: "product-manager",name: "Product Manager",  desc: "Roadmaps, PRDs, feature prioritization & user stories",      emoji: "🗺️", persona: "STRATEGIST",  category: "Tech" },
+  { id: "ux-designer",    name: "UX Designer",      desc: "Design critique, wireframes, accessibility & usability",     emoji: "🖌️", persona: "CREATIVE",    category: "Design" },
+  { id: "email-composer", name: "Email Composer",   desc: "Professional emails for any situation or relationship",      emoji: "📧", persona: "WRITER",      category: "Business" },
+  { id: "social-media",   name: "Social Media",     desc: "Platform-specific posts, hashtags & engagement boosts",      emoji: "📱", persona: "CREATIVE",    category: "Marketing" },
+  { id: "negotiation",    name: "Negotiation Coach",desc: "Deal strategies, persuasion tactics & winning scripts",      emoji: "🤝", persona: "STRATEGIST",  category: "Business" },
+  { id: "sql-expert",     name: "SQL / Database",   desc: "Write queries, optimize schemas & model your data",          emoji: "🗄️", persona: "CODER",       category: "Tech" },
+  { id: "game-designer",  name: "Game Designer",    desc: "Game mechanics, level design, narrative & balance",          emoji: "🎮", persona: "GAME_BUILDER",category: "Creative" },
+  { id: "ai-trainer",     name: "AI Trainer",       desc: "Prompt engineering, fine-tuning & model optimization",      emoji: "🤖", persona: "RESEARCHER",  category: "Tech" },
+  { id: "music-composer", name: "Music Composer",   desc: "Chord progressions, lyrics, arrangements & genres",         emoji: "🎵", persona: "CREATIVE",    category: "Creative" },
+  { id: "presentation",   name: "Presentation Pro", desc: "Slide decks, talking points & visual storytelling",         emoji: "📽️", persona: "WRITER",      category: "Business" },
+  { id: "stock-analyst",  name: "Stock Analyst",    desc: "Market analysis, stock research & investment theses",       emoji: "📈", persona: "ANALYST",     category: "Finance" },
+  { id: "meal-planner",   name: "Meal Planner",     desc: "Personalized meal plans, recipes & nutritional balance",    emoji: "🥗", persona: "PHYSIO",      category: "Lifestyle" },
+  { id: "academic",       name: "Academic Writer",  desc: "Essays, citations, research papers & academic style",       emoji: "🎓", persona: "RESEARCHER",  category: "Education" },
+];
+
 // ── Red Flag Alert Component ────────────────────────────────────────────────────
 
 function RedFlagAlertCard({ alert }: { alert: RedFlagAlert }) {
@@ -1584,6 +1619,108 @@ function CodeBlockWithRun({ code, language }: { code: string; language: string }
   );
 }
 
+// ── Plus Menu Component ────────────────────────────────────────────────────────
+function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onVoice, onTasks, onSelectSkill, voice }: {
+  onClose: () => void;
+  onUpload: () => void;
+  onDatabase: () => void;
+  onWebSearch: () => void;
+  onVoice: () => void;
+  onTasks: () => void;
+  onSelectSkill: (skill: typeof OMNIMENS_SKILLS[number]) => void;
+  voice: any;
+}) {
+  const [showSkills, setShowSkills] = useState(false);
+  const [skillQ, setSkillQ] = useState("");
+  const filtered = OMNIMENS_SKILLS.filter(s =>
+    !skillQ || s.name.toLowerCase().includes(skillQ.toLowerCase()) || s.category.toLowerCase().includes(skillQ.toLowerCase())
+  );
+
+  if (showSkills) {
+    return (
+      <div>
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
+          <button onClick={() => setShowSkills(false)} className="text-white/40 hover:text-white transition-colors">
+            <ChevronDown className="w-3.5 h-3.5 rotate-90" />
+          </button>
+          <span className="font-mono text-[10px] text-white/70 tracking-widest font-bold">SKILLS</span>
+        </div>
+        <div className="px-3 py-2 border-b border-white/8">
+          <div className="relative">
+            <Search className="w-3 h-3 absolute left-2 top-1/2 -translate-y-1/2 text-white/30" />
+            <input
+              autoFocus
+              value={skillQ}
+              onChange={e => setSkillQ(e.target.value)}
+              placeholder="Search skills..."
+              className="w-full bg-white/5 border border-white/10 rounded-lg pl-7 pr-3 py-1.5 text-[10px] font-mono text-white/80 placeholder:text-white/30 outline-none focus:border-primary/30"
+            />
+          </div>
+        </div>
+        <div className="max-h-64 overflow-y-auto omnimens-scrollbar py-1">
+          {filtered.map(skill => (
+            <button
+              key={skill.id}
+              onClick={() => onSelectSkill(skill)}
+              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/6 transition-colors text-left"
+            >
+              <span className="text-lg shrink-0">{skill.emoji}</span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-semibold text-white/90 font-mono">{skill.name}</p>
+                <p className="text-[9px] text-white/40 font-mono truncate">{skill.desc}</p>
+              </div>
+              <span className="text-[8px] font-mono text-primary/50 border border-primary/15 px-1.5 py-0.5 rounded shrink-0">{skill.category}</span>
+            </button>
+          ))}
+          {filtered.length === 0 && <p className="text-[9px] font-mono text-white/30 text-center py-4">No skills found</p>}
+        </div>
+      </div>
+    );
+  }
+
+  const menuItems = [
+    { icon: <Paperclip className="w-4 h-4" />, label: "Upload a file", sub: "Image, PDF, code, CSV…", color: "text-white/80", onClick: onUpload },
+    { icon: <Database className="w-4 h-4" />, label: "Database", sub: "SQL queries & data modeling", color: "text-cyan-400", onClick: onDatabase },
+    { icon: <Globe className="w-4 h-4" />, label: "Web Search", sub: "Enable deep research mode", color: "text-blue-400", onClick: onWebSearch },
+    { icon: voice.isEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />, label: voice.isEnabled ? "Voice ON" : "Voice OFF", sub: voice.isEnabled ? "Click to disable voice" : "Click to enable voice", color: voice.isEnabled ? "text-primary" : "text-white/80", onClick: onVoice },
+    { icon: <ListChecks className="w-4 h-4" />, label: "Tasks", sub: "Background tasks & planning", color: "text-emerald-400", onClick: onTasks },
+  ];
+
+  return (
+    <div>
+      <div className="px-4 py-2.5 border-b border-white/10">
+        <span className="font-mono text-[9px] text-white/40 tracking-[0.15em] uppercase">Actions</span>
+      </div>
+      <div className="py-1">
+        {menuItems.map(item => (
+          <button
+            key={item.label}
+            onClick={item.onClick}
+            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/6 transition-colors text-left group"
+          >
+            <span className={`shrink-0 ${item.color}`}>{item.icon}</span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold text-white/90 font-mono">{item.label}</p>
+              <p className="text-[9px] text-white/35 font-mono">{item.sub}</p>
+            </div>
+          </button>
+        ))}
+        <button
+          onClick={() => setShowSkills(true)}
+          className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/6 transition-colors text-left border-t border-white/8 mt-1"
+        >
+          <span className="shrink-0 text-yellow-400"><Sparkles className="w-4 h-4" /></span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-semibold text-white/90 font-mono">Use a skill</p>
+            <p className="text-[9px] text-white/35 font-mono">{OMNIMENS_SKILLS.length} specialized AI skills</p>
+          </div>
+          <ChevronDown className="w-3.5 h-3.5 text-white/30 -rotate-90 shrink-0" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── Left Panel ─────────────────────────────────────────────────────────────────
 
 function LeftPanel({
@@ -1624,165 +1761,206 @@ function LeftPanel({
     !convSearch || (c.title || "").toLowerCase().includes(convSearch.toLowerCase())
   );
 
+  const [panelTab, setPanelTab] = useState<"chats"|"mode"|"skills"|"tools">("chats");
+  const [skillSearch, setSkillSearch] = useState("");
+  const filteredSkills = OMNIMENS_SKILLS.filter(s =>
+    !skillSearch || s.name.toLowerCase().includes(skillSearch.toLowerCase()) || s.category.toLowerCase().includes(skillSearch.toLowerCase()) || s.desc.toLowerCase().includes(skillSearch.toLowerCase())
+  );
+
+  const PANEL_TABS = [
+    { id: "chats",  label: "CHATS",   icon: <MessageSquare className="w-3 h-3" /> },
+    { id: "mode",   label: "MODE",    icon: <Sparkles className="w-3 h-3" /> },
+    { id: "skills", label: "SKILLS",  icon: <Zap className="w-3 h-3" /> },
+    { id: "tools",  label: "TOOLS",   icon: <Settings className="w-3 h-3" /> },
+  ];
+
   return (
-    <div className="flex flex-col h-full overflow-y-auto omnimens-scrollbar p-3 gap-3">
-      {/* OMNIMENS identity */}
-      <div className="flex flex-col items-center py-3 border-b border-white/8 gap-1">
-        <OmnimensPresence size={52} isSpeaking={voice.isSpeaking} pitchIntensity={voice.pitchIntensity} />
-        <p className="font-mono text-[9px] tracking-[0.25em] text-primary/70 mt-1">OMNIMENS</p>
-        {status?.isOwner && (
-          <span className="font-mono text-[8px] tracking-widest text-accent/80 bg-accent/10 border border-accent/20 px-2 py-0.5 rounded-full">CREATOR</span>
-        )}
+    <div className="flex flex-col h-full">
+      {/* OMNIMENS identity header */}
+      <div className="flex items-center gap-2.5 px-3 py-2.5 border-b border-white/8 shrink-0">
+        <OmnimensPresence size={32} isSpeaking={voice.isSpeaking} pitchIntensity={voice.pitchIntensity} />
+        <div className="min-w-0 flex-1">
+          <p className="font-mono text-[9px] tracking-[0.2em] text-primary/70 font-bold">OMNIMENS</p>
+          {status?.isOwner && <span className="font-mono text-[7px] tracking-widest text-accent/70">CREATOR MODE</span>}
+        </div>
+        <button onClick={onNewChat} className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] font-mono font-bold border border-primary/30 text-primary hover:bg-primary/10 transition-all shrink-0">
+          <PlusCircle className="w-3 h-3" /> NEW
+        </button>
       </div>
 
-      {/* New Chat + History */}
-      <div>
-        <button
-          onClick={onNewChat}
-          className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[10px] font-mono font-bold tracking-wider border border-primary/30 text-primary hover:bg-primary/10 transition-all"
-        >
-          <PlusCircle className="w-3.5 h-3.5" />
-          NEW CHAT
-        </button>
-        {conversations.length > 0 && (
-          <div className="mt-2">
-            <p className="font-mono text-[9px] tracking-[0.2em] text-white/75 uppercase mb-1 px-1">HISTORY</p>
-            {/* Search conversations */}
-            <div className="relative mb-1.5">
+      {/* Scrollable tab bar */}
+      <div className="flex border-b border-white/8 shrink-0 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+        {PANEL_TABS.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setPanelTab(tab.id as typeof panelTab)}
+            className={`flex items-center gap-1 px-3 py-2 font-mono text-[9px] tracking-widest whitespace-nowrap transition-all border-b-2 flex-shrink-0 ${
+              panelTab === tab.id ? "text-primary border-primary" : "text-white/35 border-transparent hover:text-white/60"
+            }`}
+          >
+            {tab.icon} {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      <div className="flex-1 overflow-y-auto omnimens-scrollbar p-3">
+
+        {/* ── CHATS TAB ── */}
+        {panelTab === "chats" && (
+          <div className="space-y-3">
+            {conversations.length > 0 && (
+              <div>
+                <div className="relative mb-2">
+                  <Search className="w-2.5 h-2.5 absolute left-2 top-1/2 -translate-y-1/2 text-white/25" />
+                  <input
+                    value={convSearch}
+                    onChange={e => onConvSearchChange(e.target.value)}
+                    placeholder="Search conversations..."
+                    className="w-full bg-white/4 border border-white/8 rounded-md pl-6 pr-2 py-1.5 text-[9px] font-mono text-white/70 placeholder:text-white/20 outline-none focus:border-primary/20"
+                  />
+                </div>
+                <div className="space-y-0.5">
+                  {filteredConversations.map(conv => (
+                    <div
+                      key={conv.id}
+                      className={`group flex items-center gap-1.5 px-2 py-1.5 rounded-lg cursor-pointer transition-all ${
+                        currentConversationId === conv.id
+                          ? "bg-primary/15 border border-primary/25 text-primary"
+                          : "hover:bg-white/5 text-white/70 border border-transparent"
+                      }`}
+                      onClick={() => onLoadConversation(conv.id)}
+                    >
+                      <MessageSquare className="w-3 h-3 shrink-0 opacity-60" />
+                      <span className="text-[10px] font-mono truncate flex-1">{conv.title || "Untitled"}</span>
+                      <button
+                        onClick={e => { e.stopPropagation(); onDeleteConversation(conv.id); }}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400 shrink-0"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                  {filteredConversations.length === 0 && convSearch && (
+                    <p className="text-[9px] font-mono text-white/25 text-center py-4">No matches</p>
+                  )}
+                </div>
+              </div>
+            )}
+            {conversations.length === 0 && (
+              <div className="text-center py-8">
+                <MessageSquare className="w-8 h-8 text-white/10 mx-auto mb-2" />
+                <p className="text-[9px] font-mono text-white/30">No conversations yet</p>
+                <p className="text-[8px] font-mono text-white/20 mt-1">Start a new chat above</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── MODE TAB ── */}
+        {panelTab === "mode" && (
+          <div className="space-y-1">
+            {personas.map(p => (
+              <button
+                key={p}
+                onClick={() => onPersonaChange(p)}
+                className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-all ${
+                  persona === p
+                    ? "bg-primary/15 text-primary border border-primary/25"
+                    : "text-white hover:bg-white/5 hover:text-white border border-transparent"
+                }`}
+              >
+                <span className="shrink-0">{PERSONA_ICONS[p]}</span>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-mono font-bold tracking-wider truncate">{PERSONA_NAMES[p]}</p>
+                  <p className={`text-[8px] font-mono truncate ${persona === p ? "text-primary/60" : "text-white/70"}`}>{PERSONA_DESC[p]}</p>
+                </div>
+                {persona === p && <Check className="w-3 h-3 ml-auto shrink-0" />}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* ── SKILLS TAB ── */}
+        {panelTab === "skills" && (
+          <div className="space-y-3">
+            <div className="relative">
               <Search className="w-2.5 h-2.5 absolute left-2 top-1/2 -translate-y-1/2 text-white/25" />
               <input
-                value={convSearch}
-                onChange={e => onConvSearchChange(e.target.value)}
-                placeholder="Search chats..."
-                className="w-full bg-white/4 border border-white/8 rounded-md pl-6 pr-2 py-1 text-[9px] font-mono text-white/70 placeholder:text-white/20 outline-none focus:border-primary/20"
+                value={skillSearch}
+                onChange={e => setSkillSearch(e.target.value)}
+                placeholder="Search skills..."
+                className="w-full bg-white/4 border border-white/8 rounded-md pl-6 pr-2 py-1.5 text-[9px] font-mono text-white/70 placeholder:text-white/20 outline-none focus:border-primary/20"
               />
             </div>
-            <div className="space-y-0.5 max-h-44 overflow-y-auto omnimens-scrollbar">
-              {filteredConversations.map(conv => (
-                <div
-                  key={conv.id}
-                  className={`group flex items-center gap-1.5 px-2 py-1.5 rounded-lg cursor-pointer transition-all ${
-                    currentConversationId === conv.id
-                      ? "bg-primary/15 border border-primary/25 text-primary"
-                      : "hover:bg-white/5 text-white/70 border border-transparent"
-                  }`}
-                  onClick={() => onLoadConversation(conv.id)}
+            <div className="space-y-1">
+              {filteredSkills.map(skill => (
+                <button
+                  key={skill.id}
+                  onClick={() => onPersonaChange(skill.persona)}
+                  className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left hover:bg-white/5 border border-transparent hover:border-white/10 transition-all"
                 >
-                  <MessageSquare className="w-3 h-3 shrink-0 opacity-60" />
-                  <span className="text-[10px] font-mono truncate flex-1">{conv.title || "Untitled"}</span>
-                  <button
-                    onClick={e => { e.stopPropagation(); onDeleteConversation(conv.id); }}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400 shrink-0"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </button>
-                </div>
+                  <span className="text-base shrink-0">{skill.emoji}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] font-mono font-bold text-white/90 truncate">{skill.name}</p>
+                    <p className="text-[8px] font-mono text-white/40 truncate">{skill.desc}</p>
+                  </div>
+                  <span className="text-[7px] font-mono text-primary/50 border border-primary/20 px-1.5 py-0.5 rounded shrink-0">{skill.category}</span>
+                </button>
               ))}
-              {filteredConversations.length === 0 && convSearch && (
-                <p className="text-[9px] font-mono text-white/25 text-center py-2">No matches</p>
+              {filteredSkills.length === 0 && (
+                <p className="text-[9px] font-mono text-white/25 text-center py-4">No skills found</p>
               )}
             </div>
           </div>
         )}
-      </div>
 
-      {/* Persona selector */}
-      <div>
-        <p className="font-mono text-[9px] tracking-[0.2em] text-white/75 uppercase mb-2 px-1">MODE</p>
-        <div className="space-y-0.5">
-          {personas.map(p => (
-            <button
-              key={p}
-              onClick={() => onPersonaChange(p)}
-              className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-all ${
-                persona === p
-                  ? "bg-primary/15 text-primary border border-primary/25"
-                  : "text-white hover:bg-white/5 hover:text-white border border-transparent"
-              }`}
-            >
-              <span className="shrink-0">{PERSONA_ICONS[p]}</span>
-              <div className="min-w-0">
-                <p className="text-[10px] font-mono font-bold tracking-wider truncate">{PERSONA_NAMES[p]}</p>
-                <p className={`text-[8px] font-mono truncate ${persona === p ? "text-primary/60" : "text-white/70"}`}>{PERSONA_DESC[p]}</p>
+        {/* ── TOOLS TAB ── */}
+        {panelTab === "tools" && (
+          <div className="space-y-3">
+            {/* Capabilities */}
+            <div>
+              <p className="font-mono text-[9px] tracking-[0.2em] text-white/75 uppercase mb-2 px-1">CAPABILITIES</p>
+              <div className="space-y-1">
+                {[
+                  { icon: <Image className="w-3 h-3" />, label: "Image Generation", color: "text-pink-400" },
+                  { icon: <Globe className="w-3 h-3" />, label: "Web Search", color: "text-blue-400" },
+                  { icon: <Cpu className="w-3 h-3" />, label: "Code Execution", color: "text-green-400" },
+                  { icon: <Brain className="w-3 h-3" />, label: "Long-term Memory", color: "text-purple-400" },
+                  { icon: <Microscope className="w-3 h-3" />, label: "Deep Research", color: "text-violet-400" },
+                  { icon: <FolderOpen className="w-3 h-3" />, label: "File Analysis", color: "text-yellow-400" },
+                  { icon: <Database className="w-3 h-3" />, label: "Database Query", color: "text-cyan-400" },
+                ].map(cap => (
+                  <div key={cap.label} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg">
+                    <span className={`shrink-0 ${cap.color}`}>{cap.icon}</span>
+                    <span className="text-[10px] font-mono text-white">{cap.label}</span>
+                    <div className="ml-auto w-1.5 h-1.5 rounded-full bg-green-400/70 shrink-0" />
+                  </div>
+                ))}
               </div>
-              {persona === p && <Check className="w-3 h-3 ml-auto shrink-0" />}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Capabilities */}
-      <div className="border-t border-white/8 pt-3">
-        <p className="font-mono text-[9px] tracking-[0.2em] text-white/75 uppercase mb-2 px-1">CAPABILITIES</p>
-        <div className="space-y-1">
-          {[
-            { icon: <Image className="w-3 h-3" />, label: "Image Generation", color: "text-pink-400" },
-            { icon: <Globe className="w-3 h-3" />, label: "Web Search", color: "text-blue-400" },
-            { icon: <Cpu className="w-3 h-3" />, label: "Code Execution", color: "text-green-400" },
-            { icon: <Brain className="w-3 h-3" />, label: "Long-term Memory", color: "text-purple-400" },
-            { icon: <Microscope className="w-3 h-3" />, label: "Deep Research", color: "text-violet-400" },
-            { icon: <FolderOpen className="w-3 h-3" />, label: "File Analysis", color: "text-yellow-400" },
-          ].map(cap => (
-            <div key={cap.label} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg">
-              <span className={`shrink-0 ${cap.color}`}>{cap.icon}</span>
-              <span className="text-[10px] font-mono text-white">{cap.label}</span>
-              <div className="ml-auto w-1.5 h-1.5 rounded-full bg-green-400/70 shrink-0" />
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Projects shortcut */}
-      <div className="border-t border-white/8 pt-3">
-        <a href={`${window.location.origin}/godflesh/projects`}
-          className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[10px] font-mono font-bold tracking-wider border border-white/10 text-white/85 hover:text-white/70 hover:border-white/20 transition-all">
-          <Layers className="w-3.5 h-3.5" />
-          MY PROJECTS
-        </a>
-      </div>
-
-      {/* Voice toggle */}
-      <div className="border-t border-white/8 pt-3 mt-auto">
-        <button
-          onClick={voice.toggle}
-          className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border ${
-            voice.isEnabled
-              ? "text-primary border-primary/25 bg-primary/10"
-              : "text-white/85 border-white/10 hover:text-white/70 hover:border-white/20"
-          }`}
-        >
-          {voice.isEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-          {voice.isEnabled ? "VOICE ON" : "VOICE OFF"}
-        </button>
-
-        <button
-          onClick={onToggleDeepResearch}
-          className={`w-full flex items-center gap-2 px-2.5 py-2 mt-1 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border ${
-            deepResearchMode
-              ? "text-violet-300 border-violet-400/30 bg-violet-400/10"
-              : "text-white/85 border-white/10 hover:text-white/70 hover:border-white/20"
-          }`}
-        >
-          <Microscope className="w-3.5 h-3.5" />
-          DEEP RESEARCH
-        </button>
-
-        <button
-          onClick={onOpenAvatarStudio}
-          className="w-full flex items-center gap-2 px-2.5 py-2 mt-1 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border border-white/10 text-white/85 hover:text-emerald-300 hover:border-emerald-500/30 hover:bg-emerald-500/5"
-        >
-          <PersonStanding className="w-3.5 h-3.5" />
-          AVATAR STUDIO
-        </button>
-
-        <button
-          onClick={onOpenHub}
-          className="w-full flex items-center gap-2 px-2.5 py-2 mt-1 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border border-primary/20 text-primary/80 hover:text-primary hover:bg-primary/10 hover:border-primary/30"
-        >
-          <Settings className="w-3.5 h-3.5" />
-          CONTROL HUB
-        </button>
+            {/* Action buttons */}
+            <div className="space-y-1 border-t border-white/8 pt-3">
+              <button onClick={voice.toggle} className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border ${voice.isEnabled ? "text-primary border-primary/25 bg-primary/10" : "text-white/85 border-white/10 hover:text-white/70 hover:border-white/20"}`}>
+                {voice.isEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+                {voice.isEnabled ? "VOICE ON" : "VOICE OFF"}
+              </button>
+              <button onClick={onToggleDeepResearch} className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border ${deepResearchMode ? "text-violet-300 border-violet-400/30 bg-violet-400/10" : "text-white/85 border-white/10 hover:text-white/70 hover:border-white/20"}`}>
+                <Microscope className="w-3.5 h-3.5" /> DEEP RESEARCH
+              </button>
+              <button onClick={onOpenAvatarStudio} className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border border-white/10 text-white/85 hover:text-emerald-300 hover:border-emerald-500/30 hover:bg-emerald-500/5">
+                <PersonStanding className="w-3.5 h-3.5" /> AVATAR STUDIO
+              </button>
+              <button onClick={onOpenHub} className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border border-primary/20 text-primary/80 hover:text-primary hover:bg-primary/10 hover:border-primary/30">
+                <Settings className="w-3.5 h-3.5" /> CONTROL HUB
+              </button>
+              <a href={`${window.location.origin}/godflesh/projects`} className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[10px] font-mono font-bold tracking-wider border border-white/10 text-white/85 hover:text-white/70 hover:border-white/20 transition-all">
+                <Layers className="w-3.5 h-3.5" /> MY PROJECTS
+              </a>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -2432,6 +2610,13 @@ export default function Chat() {
   const [researchQuestion, setResearchQuestion] = useState("");
   const [isResearching, setIsResearching] = useState(false);
   const [researchResult, setResearchResult] = useState<any>(null);
+  const [showPlusMenu, setShowPlusMenu] = useState(false);
+  const [agentMode, setAgentMode] = useState<"swift"|"omni"|"apex">("omni");
+  const [showAgentModes, setShowAgentModes] = useState(false);
+  const [showTasksPanel, setShowTasksPanel] = useState(false);
+  const [tasks, setTasks] = useState<Array<{id:string;title:string;status:"pending"|"running"|"done"}>>([]);
+  const [newTaskInput, setNewTaskInput] = useState("");
+  const plusMenuRef = useRef<HTMLDivElement>(null);
 
   // Collect all images and artifacts from session messages
   const allImages: GeneratedImage[] = messages.flatMap(m => m.images || []);
@@ -2458,6 +2643,18 @@ export default function Chat() {
       })
       .catch(() => {});
   }, []);
+
+  // Close plus menu on outside click
+  useEffect(() => {
+    if (!showPlusMenu) return;
+    const handler = (e: MouseEvent) => {
+      if (plusMenuRef.current && !plusMenuRef.current.contains(e.target as Node)) {
+        setShowPlusMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showPlusMenu]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -2673,6 +2870,30 @@ export default function Chat() {
               ) : status?.isPro ? (
                 <span className="font-mono text-[10px] text-accent font-bold tracking-widest hidden sm:block mr-1">UNLIMITED</span>
               ) : null}
+              {/* Voice toggle — always visible */}
+              <button
+                onClick={voice.toggle}
+                title={voice.isEnabled ? "Voice ON — click to disable (Ctrl+Shift+V)" : "Voice OFF — click to enable"}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all border text-[9px] font-mono font-bold tracking-wider ${
+                  voice.isEnabled
+                    ? "text-primary border-primary/30 bg-primary/10"
+                    : "text-white/50 border-transparent hover:text-white/70 hover:bg-white/[0.05]"
+                }`}
+              >
+                {voice.isEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+                <span className="hidden sm:block">VOICE</span>
+              </button>
+              {/* Agent Mode indicator + switcher */}
+              <button
+                onClick={() => setShowAgentModes(true)}
+                title="Agent Mode"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-white/50 hover:text-white/70 hover:bg-white/[0.05] transition-all border border-transparent text-[9px] font-mono font-bold tracking-wider"
+              >
+                {agentMode === "swift" && <Zap className="w-3.5 h-3.5 text-yellow-400" />}
+                {agentMode === "omni" && <Sparkles className="w-3.5 h-3.5 text-primary" />}
+                {agentMode === "apex" && <Infinity className="w-3.5 h-3.5 text-emerald-400" />}
+                <span className="hidden sm:block">{agentMode.toUpperCase()}</span>
+              </button>
               {/* Control Hub button */}
               <button
                 onClick={() => setShowControlHub(true)}
@@ -2739,6 +2960,32 @@ export default function Chat() {
                 />
                 <h2 className="font-display text-2xl tracking-[0.3em] text-white/85 mt-2">OMNIMENS AWAITS</h2>
                 <p className="font-mono text-sm mt-2 text-white/70">Speak your intent. Upload your vision.</p>
+                {/* Creation chips */}
+                <div className="mt-5 flex gap-2 overflow-x-auto pb-1 max-w-lg w-full px-4" style={{ scrollbarWidth: "none" }}>
+                  {[
+                    { emoji: "🌐", label: "Website", prompt: "Build me a stunning website for " },
+                    { emoji: "📱", label: "Mobile App", prompt: "Design a mobile app that " },
+                    { emoji: "🗄️", label: "Database", prompt: "Help me design a database schema for " },
+                    { emoji: "🎨", label: "Image", prompt: "Generate an image of " },
+                    { emoji: "💻", label: "Code", prompt: "Write code to " },
+                    { emoji: "🔬", label: "Research", prompt: "Research and summarize everything about " },
+                    { emoji: "💼", label: "Business Plan", prompt: "Create a full business plan for " },
+                    { emoji: "🎮", label: "Game", prompt: "Build a browser game where " },
+                    { emoji: "📊", label: "Data Analysis", prompt: "Analyze this data and create visualizations: " },
+                    { emoji: "📄", label: "Document", prompt: "Write a professional document about " },
+                    { emoji: "📽️", label: "Presentation", prompt: "Create a presentation with slides about " },
+                    { emoji: "🤖", label: "AI Agent", prompt: "Build an AI agent that can " },
+                  ].map(chip => (
+                    <button
+                      key={chip.label}
+                      onClick={() => setInput(chip.prompt)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/12 bg-white/4 hover:bg-white/8 hover:border-primary/30 text-white/70 hover:text-white transition-all text-[11px] font-mono whitespace-nowrap shrink-0"
+                    >
+                      <span>{chip.emoji}</span>
+                      <span>{chip.label}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : (
               <>
@@ -2983,21 +3230,51 @@ export default function Chat() {
                 accept="image/*,.pdf,.txt,.md,.js,.ts,.jsx,.tsx,.py,.html,.css,.json,.csv,.xml,.yaml,.yml,.sh,.rb,.go,.rs,.java,.c,.cpp,.h,.sql"
                 onChange={handleFileChange} className="hidden"
               />
-              {/* Attach files */}
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isTyping || pendingFiles.length >= 10}
-                title="Attach files"
-                className={`absolute left-3 z-10 transition-colors ${pendingFiles.length > 0 ? "text-primary" : "text-white/75 hover:text-white/70"} disabled:opacity-30`}
-              >
-                <Paperclip className="w-4 h-4" />
-                {pendingFiles.length > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-primary text-[8px] font-bold text-black flex items-center justify-center">
-                    {pendingFiles.length}
-                  </span>
-                )}
-              </button>
+              {/* + menu button */}
+              <div ref={plusMenuRef} className="absolute left-2 z-20">
+                <button
+                  type="button"
+                  onClick={() => setShowPlusMenu(v => !v)}
+                  disabled={isTyping}
+                  title="Actions"
+                  className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${showPlusMenu ? "text-primary bg-primary/15" : pendingFiles.length > 0 ? "text-primary" : "text-white/50 hover:text-white/70 hover:bg-white/5"} disabled:opacity-30`}
+                >
+                  <Plus className="w-4 h-4" />
+                  {pendingFiles.length > 0 && (
+                    <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-primary text-[7px] font-bold text-black flex items-center justify-center">
+                      {pendingFiles.length}
+                    </span>
+                  )}
+                </button>
+
+                {/* + Popup Menu */}
+                <AnimatePresence>
+                  {showPlusMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute bottom-full left-0 mb-2 w-64 bg-[#111] border border-white/12 rounded-xl shadow-2xl overflow-hidden z-50"
+                    >
+                      <PlusMenuContent
+                        onClose={() => setShowPlusMenu(false)}
+                        onUpload={() => { fileInputRef.current?.click(); setShowPlusMenu(false); }}
+                        onDatabase={() => { setInput(v => (v ? v + "\n" : "") + "Help me with a database query: "); setShowPlusMenu(false); }}
+                        onWebSearch={() => { setDeepResearchMode(true); setShowPlusMenu(false); }}
+                        onVoice={() => { voice.toggle(); setShowPlusMenu(false); }}
+                        onTasks={() => { setShowTasksPanel(true); setShowPlusMenu(false); }}
+                        onSelectSkill={(skill) => {
+                          handlePersonaChange(skill.persona);
+                          setInput(v => (v ? v + "\n" : "") + `Using ${skill.name}: `);
+                          setShowPlusMenu(false);
+                        }}
+                        voice={voice}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -3128,6 +3405,186 @@ export default function Chat() {
             />
           </motion.div>
         )}
+
+        {/* ── Agent Modes Modal ── */}
+        <AnimatePresence>
+          {showAgentModes && (
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+              onClick={e => { if (e.target === e.currentTarget) setShowAgentModes(false); }}
+            >
+              <motion.div
+                initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }}
+                className="bg-[#0d0d0d] border border-white/12 rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden"
+              >
+                <div className="flex items-center justify-between px-5 py-4 border-b border-white/8">
+                  <span className="font-mono text-sm font-bold text-white/90 tracking-widest">Agent modes</span>
+                  <button onClick={() => setShowAgentModes(false)} className="text-white/40 hover:text-white transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="p-3 space-y-2">
+                  {/* SWIFT mode */}
+                  <div
+                    onClick={() => { setAgentMode("swift"); setSelectedModel("meta-llama/Llama-3.3-70B-Instruct-Turbo"); }}
+                    className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all ${agentMode === "swift" ? "border-primary/50 bg-primary/8" : "border-white/8 hover:border-white/15"}`}
+                  >
+                    <div className={`w-4 h-4 rounded-full border-2 mt-0.5 shrink-0 flex items-center justify-center ${agentMode === "swift" ? "border-primary" : "border-white/30"}`}>
+                      {agentMode === "swift" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-white/90 text-sm">Swift</span>
+                        <Zap className="w-3.5 h-3.5 text-yellow-400" />
+                      </div>
+                      <p className="text-[11px] text-white/50 mt-0.5">Fast, lightweight responses. Lowest credit usage.</p>
+                    </div>
+                  </div>
+                  {/* OMNI mode */}
+                  <div
+                    onClick={() => { setAgentMode("omni"); setSelectedModel("gpt-4o"); }}
+                    className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all ${agentMode === "omni" ? "border-primary/50 bg-primary/8" : "border-white/8 hover:border-white/15"}`}
+                  >
+                    <div className={`w-4 h-4 rounded-full border-2 mt-0.5 shrink-0 flex items-center justify-center ${agentMode === "omni" ? "border-primary" : "border-white/30"}`}>
+                      {agentMode === "omni" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-white/90 text-sm">Omni</span>
+                        <Sparkles className="w-3.5 h-3.5 text-primary" />
+                      </div>
+                      <p className="text-[11px] text-white/50 mt-0.5">Full OMNIMENS experience. All tools active.</p>
+                      {agentMode === "omni" && (
+                        <div className="mt-3 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] text-white/60">NEUROSYNC™ emotion engine</span>
+                            <div className="w-8 h-4 rounded-full bg-primary relative cursor-pointer">
+                              <div className="w-3 h-3 rounded-full bg-white absolute right-0.5 top-0.5" />
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] text-white/60">COGNISYNC™ deep reasoning</span>
+                            <div className="w-8 h-4 rounded-full bg-primary relative cursor-pointer">
+                              <div className="w-3 h-3 rounded-full bg-white absolute right-0.5 top-0.5" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {/* APEX mode */}
+                  <div
+                    onClick={() => { setAgentMode("apex"); setSelectedModel("gpt-4o"); setDeepResearchMode(true); }}
+                    className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all ${agentMode === "apex" ? "border-emerald-500/40 bg-emerald-500/5" : "border-white/8 hover:border-white/15"}`}
+                  >
+                    <div className={`w-4 h-4 rounded-full border-2 mt-0.5 shrink-0 flex items-center justify-center ${agentMode === "apex" ? "border-emerald-400" : "border-white/30"}`}>
+                      {agentMode === "apex" && <div className="w-2 h-2 rounded-full bg-emerald-400" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-white/90 text-sm">Apex</span>
+                        <Infinity className="w-3.5 h-3.5 text-emerald-400" />
+                      </div>
+                      <p className="text-[11px] text-white/50 mt-0.5">Maximum intelligence. Deep research always on. No limits.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="px-5 py-3 border-t border-white/8">
+                  <button onClick={() => setShowAgentModes(false)} className="w-full py-2.5 rounded-xl bg-primary text-black font-mono text-sm font-bold tracking-wider hover:bg-primary/90 transition-all">
+                    CONFIRM
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── Tasks Panel ── */}
+        <AnimatePresence>
+          {showTasksPanel && (
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50 backdrop-blur-sm"
+              onClick={e => { if (e.target === e.currentTarget) setShowTasksPanel(false); }}
+            >
+              <motion.div
+                initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+                transition={{ type: "spring", damping: 28, stiffness: 300 }}
+                className="bg-[#0d0d0d] border border-white/12 rounded-t-2xl w-full max-w-lg shadow-2xl overflow-hidden"
+              >
+                <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mt-3 mb-4" />
+                <div className="flex items-center justify-between px-5 pb-3 border-b border-white/8">
+                  <div className="flex items-center gap-2">
+                    <ListChecks className="w-4 h-4 text-primary" />
+                    <span className="font-mono text-sm font-bold text-white/90">Tasks</span>
+                  </div>
+                  <button onClick={() => setShowTasksPanel(false)} className="text-white/40 hover:text-white transition-colors p-1">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="p-5 space-y-4 max-h-[60vh] overflow-y-auto omnimens-scrollbar">
+                  {/* Task list */}
+                  {tasks.length === 0 ? (
+                    <div className="text-center py-6">
+                      <ListChecks className="w-10 h-10 text-white/10 mx-auto mb-3" />
+                      <p className="text-sm font-mono text-white/50">No background tasks yet</p>
+                      <p className="text-[11px] font-mono text-white/25 mt-1">Describe a task below and OMNIMENS will plan and execute it</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {tasks.map(task => (
+                        <div key={task.id} className={`flex items-center gap-3 p-3 rounded-xl border ${task.status === "done" ? "border-green-500/20 bg-green-500/5" : task.status === "running" ? "border-primary/20 bg-primary/5" : "border-white/8 bg-white/2"}`}>
+                          {task.status === "done" && <Check className="w-4 h-4 text-green-400 shrink-0" />}
+                          {task.status === "running" && <Loader2 className="w-4 h-4 text-primary animate-spin shrink-0" />}
+                          {task.status === "pending" && <Clock className="w-4 h-4 text-white/30 shrink-0" />}
+                          <span className="text-[12px] font-mono text-white/80 flex-1">{task.title}</span>
+                          <button onClick={() => setTasks(ts => ts.filter(t => t.id !== task.id))} className="text-white/20 hover:text-red-400 transition-colors shrink-0">
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {/* New task input */}
+                  <div className="flex gap-2">
+                    <input
+                      value={newTaskInput}
+                      onChange={e => setNewTaskInput(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === "Enter" && newTaskInput.trim()) {
+                          const id = crypto.randomUUID?.() || Date.now().toString();
+                          setTasks(ts => [...ts, { id, title: newTaskInput.trim(), status: "pending" }]);
+                          setInput(`Plan this task for me: ${newTaskInput.trim()}`);
+                          setNewTaskInput("");
+                          setShowTasksPanel(false);
+                        }
+                      }}
+                      placeholder="Describe a task for OMNIMENS to plan..."
+                      className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm font-mono text-white/80 placeholder:text-white/25 outline-none focus:border-primary/30"
+                    />
+                    <button
+                      onClick={() => {
+                        if (!newTaskInput.trim()) return;
+                        const id = crypto.randomUUID?.() || Date.now().toString();
+                        setTasks(ts => [...ts, { id, title: newTaskInput.trim(), status: "pending" }]);
+                        setInput(`Plan this task for me: ${newTaskInput.trim()}`);
+                        setNewTaskInput("");
+                        setShowTasksPanel(false);
+                      }}
+                      className="px-4 py-2.5 rounded-xl bg-primary text-black font-mono text-sm font-bold hover:bg-primary/90 transition-all shrink-0"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <a href={`${window.location.origin}/godflesh/projects`} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/8 text-white/50 hover:text-white hover:border-white/15 transition-all text-[11px] font-mono">
+                    <Layers className="w-3.5 h-3.5" /> View all projects & saved work
+                  </a>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ── Control Hub Modal ── */}
         {showControlHub && (

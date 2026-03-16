@@ -8,7 +8,8 @@ import {
   Play, Loader2, CheckCircle, XCircle, Clock, Download, Eye,
   Trash2, Edit3, ExternalLink, Copy, Check, ChevronRight, ChevronLeft,
   Upload, AlertCircle, RefreshCw, Send, Link, X, FileCode, Zap,
-  Monitor, Smartphone, Server, Package, Rocket, Settings
+  Monitor, Smartphone, Server, Package, Rocket, Settings,
+  Search, Star, FolderOpen, Folder, Filter, Lock, Globe2, MoreVertical, FolderPlus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -36,6 +37,10 @@ type Project = {
   buildLog: string | null;
   fileCount?: number;
   files?: string[];
+  folder: string | null;
+  starred: boolean;
+  visibility: "private" | "public" | "shared";
+  thumbnail: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -161,7 +166,7 @@ function CreateProjectModal({ onClose, onCreate }: { onClose: () => void; onCrea
 
 // ── Project Card ───────────────────────────────────────────────────────────────
 
-function ProjectCard({ project, onClick, onDelete }: { project: Project; onClick: () => void; onDelete: () => void }) {
+function ProjectCard({ project, onClick, onDelete, onStar }: { project: Project; onClick: () => void; onDelete: () => void; onStar: () => void }) {
   const s = STATUS_CONFIG[project.status];
   const typeConf = PROJECT_TYPES.find(t => t.value === project.type);
 
@@ -181,15 +186,30 @@ function ProjectCard({ project, onClick, onDelete }: { project: Project; onClick
             </div>
             <div className="min-w-0">
               <h3 className="font-bold text-white text-sm font-mono truncate">{project.name}</h3>
-              <p className="text-[9px] font-mono text-white/85 uppercase tracking-widest">{project.type}</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <p className="text-[9px] font-mono text-white/85 uppercase tracking-widest">{project.type}</p>
+                {project.folder && (
+                  <span className="text-[9px] font-mono text-white/40 flex items-center gap-0.5">
+                    <Folder className="w-2.5 h-2.5" />{project.folder}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
-          <button
-            onClick={e => { e.stopPropagation(); onDelete(); }}
-            className="opacity-0 group-hover:opacity-100 p-1 text-white/75 hover:text-red-400 transition-all"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-center gap-0.5">
+            <button
+              onClick={e => { e.stopPropagation(); onStar(); }}
+              className={`p-1 transition-all ${project.starred ? "text-amber-400" : "opacity-0 group-hover:opacity-100 text-white/40 hover:text-amber-400"}`}
+            >
+              <Star className={`w-3.5 h-3.5 ${project.starred ? "fill-amber-400" : ""}`} />
+            </button>
+            <button
+              onClick={e => { e.stopPropagation(); onDelete(); }}
+              className="opacity-0 group-hover:opacity-100 p-1 text-white/75 hover:text-red-400 transition-all"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
 
         <p className="text-white text-xs font-mono line-clamp-2 mb-3">{project.description || "No description"}</p>
@@ -680,6 +700,13 @@ export default function Projects() {
   const [showCreate, setShowCreate] = useState(false);
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+  // Search / filter / folder state
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<"all" | "starred" | "public" | "private">("all");
+  const [activeFolder, setActiveFolder] = useState<string | null>(null);
+  const [showFolderInput, setShowFolderInput] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
+  const [collapsedFolders, setCollapsedFolders] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) setLocation("/");
@@ -718,6 +745,47 @@ export default function Projects() {
     if (activeProject?.id === id) setActiveProject(null);
   };
 
+  const handleStar = async (id: number) => {
+    const res = await fetch(`/api/omnimens/projects/${id}/star`, { method: "PATCH", credentials: "include" });
+    if (res.ok) {
+      const updated = await res.json();
+      setProjects(p => p.map(pr => pr.id === id ? { ...pr, starred: updated.starred } : pr));
+    }
+  };
+
+  // Derived: folders list, filtered projects
+  const folders = Array.from(new Set(projects.map(p => p.folder).filter(Boolean))) as string[];
+
+  const visibleProjects = projects.filter(p => {
+    if (filter === "starred" && !p.starred) return false;
+    if (filter === "public" && p.visibility !== "public") return false;
+    if (filter === "private" && p.visibility !== "private") return false;
+    if (activeFolder !== null && p.folder !== activeFolder) return false;
+    if (search && !p.name.toLowerCase().includes(search.toLowerCase()) && !p.description.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
+
+  // Time-group projects
+  function timeGroup(dateStr: string): string {
+    const d = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+    if (diffDays < 1) return "Today";
+    if (diffDays < 2) return "Yesterday";
+    if (diffDays < 7) return "This Week";
+    if (diffDays < 30) return "This Month";
+    return "Older";
+  }
+
+  const groupOrder = ["Today", "Yesterday", "This Week", "This Month", "Older"];
+  const grouped: Record<string, Project[]> = {};
+  for (const p of visibleProjects) {
+    const g = timeGroup(p.updatedAt);
+    if (!grouped[g]) grouped[g] = [];
+    grouped[g].push(p);
+  }
+
   if (isLoading) return (
     <Layout>
       <div className="flex-1 flex items-center justify-center">
@@ -737,59 +805,147 @@ export default function Projects() {
           />
         ) : (
           /* Projects dashboard */
-          <div className="flex-1 overflow-y-auto p-6">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+            {/* Header row */}
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <h1 className="font-display text-2xl font-bold text-white tracking-wider mb-1">PROJECTS</h1>
-                <p className="font-mono text-sm text-white/85">Build, deploy, and publish with OMNIMENS AI</p>
+                <h1 className="font-display text-2xl font-bold text-white tracking-wider">PROJECTS</h1>
+                <p className="font-mono text-[11px] text-white/40 mt-0.5">{projects.length} total · {projects.filter(p => p.published).length} live</p>
               </div>
-              <Button onClick={() => setShowCreate(true)} className="gap-2">
-                <Plus className="w-4 h-4" />
-                New Project
+              <Button onClick={() => setShowCreate(true)} size="sm" className="gap-1.5 text-sm">
+                <Plus className="w-4 h-4" /> New
               </Button>
             </div>
 
-            {/* Stats bar */}
-            <div className="grid grid-cols-4 gap-3 mb-6">
-              {[
-                { label: "Total", value: projects.length, color: "text-white" },
-                { label: "Live", value: projects.filter(p => p.published).length, color: "text-green-400" },
-                { label: "Ready", value: projects.filter(p => p.status === "ready").length, color: "text-blue-400" },
-                { label: "Building", value: projects.filter(p => p.status === "building").length, color: "text-yellow-400" },
-              ].map(s => (
-                <div key={s.label} className="bg-white/3 border border-white/8 rounded-xl p-3 text-center">
-                  <p className={`text-2xl font-bold font-mono ${s.color}`}>{s.value}</p>
-                  <p className="text-[9px] font-mono text-white/75 uppercase tracking-widest mt-0.5">{s.label}</p>
-                </div>
-              ))}
+            {/* Search bar */}
+            <div className="relative mb-3">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+              <input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search projects..."
+                className="w-full bg-white/4 border border-white/8 focus:border-primary/40 rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder:text-white/25 outline-none transition-all font-mono"
+              />
+              {search && (
+                <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white">
+                  <X className="w-4 h-4" />
+                </button>
+              )}
             </div>
 
-            {/* Project grid */}
+            {/* Filter tabs */}
+            <div className="flex items-center gap-1 mb-4 overflow-x-auto pb-1 scrollbar-none">
+              {(["all", "starred", "public", "private"] as const).map(f => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-mono whitespace-nowrap transition-all ${
+                    filter === f
+                      ? "bg-primary/20 border border-primary/40 text-primary"
+                      : "bg-white/3 border border-white/8 text-white/50 hover:text-white hover:border-white/20"
+                  }`}
+                >
+                  {f === "starred" && <Star className="w-3 h-3" />}
+                  {f === "public" && <Globe2 className="w-3 h-3" />}
+                  {f === "private" && <Lock className="w-3 h-3" />}
+                  {f.charAt(0).toUpperCase() + f.slice(1)}
+                  {f === "all" && <span className="ml-1 text-white/25">{projects.length}</span>}
+                  {f === "starred" && <span className="ml-1 text-white/25">{projects.filter(p => p.starred).length}</span>}
+                  {f === "public" && <span className="ml-1 text-white/25">{projects.filter(p => p.visibility === "public").length}</span>}
+                  {f === "private" && <span className="ml-1 text-white/25">{projects.filter(p => p.visibility === "private").length}</span>}
+                </button>
+              ))}
+
+              {/* Folder filter */}
+              {folders.length > 0 && (
+                <>
+                  <div className="w-px h-4 bg-white/10 mx-1 shrink-0" />
+                  {folders.map(f => (
+                    <button
+                      key={f}
+                      onClick={() => setActiveFolder(activeFolder === f ? null : f)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-mono whitespace-nowrap transition-all ${
+                        activeFolder === f
+                          ? "bg-amber-400/20 border border-amber-400/40 text-amber-400"
+                          : "bg-white/3 border border-white/8 text-white/50 hover:text-white hover:border-white/20"
+                      }`}
+                    >
+                      <FolderOpen className="w-3 h-3" />
+                      {f}
+                    </button>
+                  ))}
+                </>
+              )}
+
+              {/* New folder */}
+              <button
+                onClick={() => setShowFolderInput(v => !v)}
+                className="flex items-center gap-1 px-2 py-1.5 rounded-full text-[11px] font-mono text-white/30 hover:text-white/60 transition-colors whitespace-nowrap border border-transparent hover:border-white/10"
+              >
+                <FolderPlus className="w-3 h-3" /> Folder
+              </button>
+              {showFolderInput && (
+                <form
+                  onSubmit={e => {
+                    e.preventDefault();
+                    if (newFolderName.trim()) {
+                      setActiveFolder(newFolderName.trim());
+                      setShowFolderInput(false);
+                      setNewFolderName("");
+                    }
+                  }}
+                  className="flex items-center gap-1"
+                >
+                  <input
+                    autoFocus
+                    value={newFolderName}
+                    onChange={e => setNewFolderName(e.target.value)}
+                    placeholder="Folder name..."
+                    className="bg-black border border-primary/40 rounded-full px-3 py-1 text-[11px] font-mono text-white outline-none w-28"
+                  />
+                </form>
+              )}
+            </div>
+
+            {/* Projects grouped by time */}
             {loading ? (
               <div className="flex items-center justify-center py-16 text-white/75 font-mono">
-                <Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading projects...
+                <Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading...
               </div>
-            ) : projects.length === 0 ? (
+            ) : visibleProjects.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
-                <Layers className="w-16 h-16 text-white/60 mb-4" />
-                <h3 className="font-mono font-bold text-white/85 text-lg mb-2">No projects yet</h3>
-                <p className="font-mono text-sm text-white/70 mb-6 max-w-sm">
-                  Create your first project and let OMNIMENS build it for you. Websites, apps, games — anything.
-                </p>
-                <Button onClick={() => setShowCreate(true)} className="gap-2">
-                  <Plus className="w-4 h-4" /> Create Your First Project
-                </Button>
+                <Layers className="w-12 h-12 text-white/20 mb-4" />
+                {projects.length === 0 ? (
+                  <>
+                    <h3 className="font-mono font-bold text-white/60 mb-2">No projects yet</h3>
+                    <p className="font-mono text-[12px] text-white/35 mb-5 max-w-xs">
+                      Create your first project and let OMNIMENS build it for you.
+                    </p>
+                    <Button onClick={() => setShowCreate(true)} size="sm" className="gap-1.5">
+                      <Plus className="w-4 h-4" /> Create First Project
+                    </Button>
+                  </>
+                ) : (
+                  <p className="font-mono text-[12px] text-white/35">No projects match your filter</p>
+                )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {projects.map(project => (
-                  <ProjectCard
-                    key={project.id}
-                    project={project}
-                    onClick={() => setActiveProject(project)}
-                    onDelete={() => setDeleteConfirm(project.id)}
-                  />
+              <div className="space-y-6">
+                {groupOrder.filter(g => grouped[g]?.length).map(groupLabel => (
+                  <div key={groupLabel}>
+                    <p className="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-2 px-1">{groupLabel}</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                      {grouped[groupLabel].map(project => (
+                        <ProjectCard
+                          key={project.id}
+                          project={project}
+                          onClick={() => setActiveProject(project)}
+                          onDelete={() => setDeleteConfirm(project.id)}
+                          onStar={() => handleStar(project.id)}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             )}

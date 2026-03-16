@@ -216,6 +216,29 @@ export function useOmnimensVoice(): OmnimensVoiceHook {
   }, [stopBinaryStream, stopPitch]);
 
   // ── Speak ─────────────────────────────────────────────────────────────────────
+  /**
+   * Split text into fluent sentence-level chunks.
+   * Each chunk is ~80–160 chars, breaking at sentence ends (. ! ?) or commas
+   * to prevent the browser SpeechSynthesis engine from truncating long inputs.
+   */
+  function splitIntoChunks(text: string): string[] {
+    // Split at sentence boundaries first
+    const sentences = text.match(/[^.!?]+[.!?]*/g) ?? [text];
+    const chunks: string[] = [];
+    let current = "";
+    for (const s of sentences) {
+      const candidate = current ? current + " " + s.trim() : s.trim();
+      if (candidate.length > 160 && current) {
+        chunks.push(current.trim());
+        current = s.trim();
+      } else {
+        current = candidate;
+      }
+    }
+    if (current.trim()) chunks.push(current.trim());
+    return chunks.filter(Boolean);
+  }
+
   const speak = useCallback((text: string, messageId: string) => {
     if (!isEnabled || !window.speechSynthesis) return;
 
@@ -226,71 +249,86 @@ export function useOmnimensVoice(): OmnimensVoiceHook {
     const clean = stripMarkdown(text);
     if (!clean) return;
 
-    const words = clean.split(/\s+/).filter(Boolean);
-    const utterance = new SpeechSynthesisUtterance(clean);
-
-    // Deep, ominous, primordial — the voice from the depths
-    utterance.pitch  = OMNIMENS_VOICE.pitch;   // 0.28–0.50 (subterranean)
-    utterance.rate   = OMNIMENS_VOICE.rate;    // 0.68–0.78 (slow, deliberate)
-    utterance.volume = OMNIMENS_VOICE.volume;
+    const chunks = splitIntoChunks(clean);
+    if (chunks.length === 0) return;
 
     if (!lockedVoiceRef.current) {
       lockedVoiceRef.current = pickBestVoice(window.speechSynthesis.getVoices());
     }
-    if (lockedVoiceRef.current) {
-      utterance.voice = lockedVoiceRef.current;
-    }
 
-    gotBoundaryRef.current = false;
-    let wordIdx = 0;
+    let chunkIdx = 0;
+    let simWordIdx = 0;
 
-    utterance.addEventListener("boundary", (e: Event) => {
-      const be = e as SpeechSynthesisEvent;
-      if (be.name !== "word") return;
-      gotBoundaryRef.current = true;
-      if (simPulseRef.current) { clearInterval(simPulseRef.current); simPulseRef.current = null; }
-      const word = clean.slice(be.charIndex, be.charIndex + (be.charLength ?? 6));
-      triggerPitch(estimatePitch(word));
-    });
+    const speakChunk = (chunk: string, isFirst: boolean) => {
+      const words = chunk.split(/\s+/).filter(Boolean);
+      const utterance = new SpeechSynthesisUtterance(chunk);
 
-    utterance.onstart = () => {
-      setIsSpeaking(true);
-      setSpeakingMessageId(messageId);
-      startBinaryStream();
+      utterance.pitch  = OMNIMENS_VOICE.pitch;
+      utterance.rate   = OMNIMENS_VOICE.rate;
+      utterance.volume = OMNIMENS_VOICE.volume;
+      if (lockedVoiceRef.current) utterance.voice = lockedVoiceRef.current;
 
-      const checkTimer = setTimeout(() => {
-        if (!gotBoundaryRef.current) {
-          const msPerWord = (1000 / (OMNIMENS_VOICE.rate * 2.2));
-          simPulseRef.current = setInterval(() => {
-            const word = words[wordIdx % words.length];
-            wordIdx++;
-            triggerPitch(estimatePitch(word));
-          }, msPerWord);
+      if (isFirst) gotBoundaryRef.current = false;
+
+      utterance.addEventListener("boundary", (e: Event) => {
+        const be = e as SpeechSynthesisEvent;
+        if (be.name !== "word") return;
+        gotBoundaryRef.current = true;
+        if (simPulseRef.current) { clearInterval(simPulseRef.current); simPulseRef.current = null; }
+        const word = chunk.slice(be.charIndex, be.charIndex + (be.charLength ?? 6));
+        triggerPitch(estimatePitch(word));
+      });
+
+      if (isFirst) {
+        utterance.onstart = () => {
+          setIsSpeaking(true);
+          setSpeakingMessageId(messageId);
+          startBinaryStream();
+
+          const checkTimer = setTimeout(() => {
+            if (!gotBoundaryRef.current) {
+              const msPerWord = 1000 / (OMNIMENS_VOICE.rate * 2.2);
+              simPulseRef.current = setInterval(() => {
+                const word = words[simWordIdx % words.length];
+                simWordIdx++;
+                triggerPitch(estimatePitch(word));
+              }, msPerWord);
+            }
+          }, 600);
+          (utterance as any).__checkTimer = checkTimer;
+        };
+      }
+
+      utterance.onend = () => {
+        clearTimeout((utterance as any).__checkTimer);
+        chunkIdx++;
+        if (chunkIdx < chunks.length) {
+          // speak next chunk with a tiny gap for naturalness
+          setTimeout(() => speakChunk(chunks[chunkIdx], false), 80);
+        } else {
+          // All chunks done
+          if (simPulseRef.current) { clearInterval(simPulseRef.current); simPulseRef.current = null; }
+          setIsSpeaking(false);
+          setSpeakingMessageId(null);
+          stopBinaryStream();
+          stopPitch();
         }
-      }, 600);
-      (utterance as any).__checkTimer = checkTimer;
+      };
+
+      utterance.onerror = () => {
+        clearTimeout((utterance as any).__checkTimer);
+        if (simPulseRef.current) { clearInterval(simPulseRef.current); simPulseRef.current = null; }
+        setIsSpeaking(false);
+        setSpeakingMessageId(null);
+        stopBinaryStream();
+        stopPitch();
+      };
+
+      utteranceRef.current = utterance;
+      window.speechSynthesis.speak(utterance);
     };
 
-    utterance.onend = () => {
-      clearTimeout((utterance as any).__checkTimer);
-      if (simPulseRef.current) { clearInterval(simPulseRef.current); simPulseRef.current = null; }
-      setIsSpeaking(false);
-      setSpeakingMessageId(null);
-      stopBinaryStream();
-      stopPitch();
-    };
-
-    utterance.onerror = () => {
-      clearTimeout((utterance as any).__checkTimer);
-      if (simPulseRef.current) { clearInterval(simPulseRef.current); simPulseRef.current = null; }
-      setIsSpeaking(false);
-      setSpeakingMessageId(null);
-      stopBinaryStream();
-      stopPitch();
-    };
-
-    utteranceRef.current = utterance;
-    window.speechSynthesis.speak(utterance);
+    speakChunk(chunks[0], true);
   }, [isEnabled, startBinaryStream, stopBinaryStream, stopPitch, triggerPitch]);
 
   const toggle = useCallback(() => {

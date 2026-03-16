@@ -101,6 +101,11 @@ export const omnimensProjects = pgTable("godflesh_projects", {
   domainStatus: text("domain_status").default("none"), // "none"|"pending"|"active"|"error"
   // Build output
   buildLog: text("build_log"),
+  // Organization & visibility
+  folder: text("folder"),                                              // folder name for grouping
+  starred: boolean("starred").default(false).notNull(),               // starred/favorited
+  visibility: text("visibility").default("private").notNull(),        // "private"|"public"|"shared"
+  thumbnail: text("thumbnail"),                                       // base64 or URL for card preview
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

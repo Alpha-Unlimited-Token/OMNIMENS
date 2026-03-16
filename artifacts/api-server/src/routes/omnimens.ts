@@ -2662,10 +2662,17 @@ function generateSlug(name: string): string {
 router.get("/omnimens/projects", async (req, res) => {
   if (!req.isAuthenticated()) { res.status(401).json({ error: "Unauthenticated" }); return; }
   try {
-    const projects = await db.select().from(omnimensProjects)
+    const { filter, folder, search } = req.query as { filter?: string; folder?: string; search?: string };
+    let projects = await db.select().from(omnimensProjects)
       .where(eq(omnimensProjects.userId, req.user.id))
       .orderBy(desc(omnimensProjects.updatedAt));
-    // For each project, get file count
+    // Apply filters in memory for simplicity
+    if (filter === "public")   projects = projects.filter(p => p.visibility === "public");
+    if (filter === "private")  projects = projects.filter(p => p.visibility === "private");
+    if (filter === "starred")  projects = projects.filter(p => p.starred);
+    if (folder)                projects = projects.filter(p => p.folder === folder);
+    if (search)                projects = projects.filter(p => p.name.toLowerCase().includes((search as string).toLowerCase()) || p.description.toLowerCase().includes((search as string).toLowerCase()));
+    // Add file counts
     const withCounts = await Promise.all(projects.map(async (p) => {
       const files = await db.select({ id: omnimensProjectFiles.id, filename: omnimensProjectFiles.filename })
         .from(omnimensProjectFiles).where(eq(omnimensProjectFiles.projectId, p.id));
@@ -2716,15 +2723,32 @@ router.get("/omnimens/projects/:id", async (req, res) => {
 // Update project metadata
 router.put("/omnimens/projects/:id", async (req, res) => {
   if (!req.isAuthenticated()) { res.status(401).json({ error: "Unauthenticated" }); return; }
-  const { name, description, type } = req.body;
+  const { name, description, type, folder, visibility } = req.body;
   try {
     const [project] = await db.update(omnimensProjects)
-      .set({ name, description, type, updatedAt: new Date() })
+      .set({ name, description, type, folder: folder ?? null, visibility: visibility || "private", updatedAt: new Date() })
       .where(and(eq(omnimensProjects.id, Number(req.params.id)), eq(omnimensProjects.userId, req.user.id)))
       .returning();
     res.json(project);
   } catch (err) {
     res.status(500).json({ error: "Failed to update project" });
+  }
+});
+
+// Toggle star on project
+router.patch("/omnimens/projects/:id/star", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Unauthenticated" }); return; }
+  try {
+    const [existing] = await db.select({ starred: omnimensProjects.starred }).from(omnimensProjects)
+      .where(and(eq(omnimensProjects.id, Number(req.params.id)), eq(omnimensProjects.userId, req.user.id)));
+    if (!existing) { res.status(404).json({ error: "Not found" }); return; }
+    const [updated] = await db.update(omnimensProjects)
+      .set({ starred: !existing.starred, updatedAt: new Date() })
+      .where(and(eq(omnimensProjects.id, Number(req.params.id)), eq(omnimensProjects.userId, req.user.id)))
+      .returning();
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to toggle star" });
   }
 });
 

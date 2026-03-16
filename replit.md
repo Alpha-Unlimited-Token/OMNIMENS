@@ -44,7 +44,7 @@ A transcendent sci-fi AI chat platform matching and surpassing the capabilities 
 - `godflesh_brain` — OMNIMENS's self-learned knowledge base
 - `godflesh_upgrades` — upgrade cycle log
 - `godflesh_notifications` — user-facing upgrade announcements
-- `godflesh_projects` — user projects (published, slug, customDomain, domainStatus, buildLog)
+- `godflesh_projects` — user projects (published, slug, customDomain, domainStatus, buildLog, folder, starred, visibility, thumbnail)
 - `godflesh_project_files` — project file storage (filename, content, language)
 - `godflesh_memories` — per-user persistent memories (auto-extracted + manual)
 - `godflesh_custom_instructions` — per-user persona + aboutUser + responseStyle
@@ -82,6 +82,7 @@ A transcendent sci-fi AI chat platform matching and surpassing the capabilities 
 - `POST /api/omnimens/projects/:id/publish` — publish/unpublish project (generates slug)
 - `POST /api/omnimens/projects/:id/domain` — connect custom domain (status: pending)
 - `DELETE /api/omnimens/projects/:id/domain` — remove custom domain
+- `PATCH /api/omnimens/projects/:id/star` — toggle starred/unstarred
 - `GET /p/:slug` — public project serving (no auth; inlines CSS+JS into index.html)
 
 ### Frontend Pages
