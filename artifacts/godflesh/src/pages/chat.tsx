@@ -175,12 +175,13 @@ const PERSONA_ICONS: Record<string, React.ReactNode> = {
   CREATIVE: <Palette className="w-3.5 h-3.5" />,
   TUTOR: <GraduationCap className="w-3.5 h-3.5" />,
   STRATEGIST: <Briefcase className="w-3.5 h-3.5" />,
+  GAME_BUILDER: <Play className="w-3.5 h-3.5" />,
 };
 
 const PERSONA_NAMES: Record<string, string> = {
   GENERAL: "OMNIMENS", CODER: "CODER", RESEARCHER: "RESEARCHER",
   WRITER: "WRITER", ANALYST: "ANALYST", CREATIVE: "CREATIVE",
-  TUTOR: "TUTOR", STRATEGIST: "STRATEGIST",
+  TUTOR: "TUTOR", STRATEGIST: "STRATEGIST", GAME_BUILDER: "GAME ARCHITECT",
 };
 
 const PERSONA_DESC: Record<string, string> = {
@@ -192,6 +193,7 @@ const PERSONA_DESC: Record<string, string> = {
   CREATIVE: "Images, design, art",
   TUTOR: "Teach, explain, mentor",
   STRATEGIST: "Plans, decisions, vision",
+  GAME_BUILDER: "Games, NPCs, worlds, PCG",
 };
 
 // ── Code block with run ────────────────────────────────────────────────────────

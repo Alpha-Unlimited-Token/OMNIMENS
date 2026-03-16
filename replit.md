@@ -99,8 +99,9 @@ A transcendent sci-fi AI chat platform matching and surpassing the capabilities 
 - `lib/omnimens-code-executor.ts` — JS code interpreter (subprocess sandbox)
 - `lib/omnimens-deep-research.ts` — Perplexity-style multi-step research
 - `lib/omnimens-url-analyzer.ts` — URL fetch + content extraction
-- `lib/omnimens-custom-instructions.ts` — 8 personas + custom context injection
+- `lib/omnimens-custom-instructions.ts` — 9 personas (incl. GAME_BUILDER) + custom context injection
 - `lib/web-search.ts` — web search integration
+- `lib/omnimens-learning.ts` — Learning AI engine: Critic evaluator, learning element, emotional intelligence analyzer, self-reflection, proactive anticipation, learning memory store, full per-user learning cycle (DeepMind SIMA / AWS Learning Agent / Emotional Intelligence architectures)
 
 ### Credit System
 - 1 credit = $0.01 USD

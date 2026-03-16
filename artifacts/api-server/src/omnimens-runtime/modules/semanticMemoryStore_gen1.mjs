@@ -1,99 +1,95 @@
 /**
- * semanticMemoryStore.js
- *
- * A self-contained utility module for retaining and retrieving context efficiently using embeddings.
- * This module combines pgvector-like vector storage with cosine similarity search for intelligent context retrieval and summarization.
- * Designed for Node.js 20+ with no external dependencies.
+ * @module semanticMemoryStore
+ * @description A lightweight vector database for semantic search and embedding-based recall using cosine similarity.
+ * This module enables efficient nearest-neighbor search for high-dimensional vectors.
  */
 
 /**
- * Generates a normalized vector from input data.
- * @param {Array<number>} vector - The input vector.
- * @returns {Array<number>} - The normalized vector.
+ * Stores vectors and their associated metadata for semantic search.
  */
-export function normalizeVector(vector) {
-  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
-  if (magnitude === 0) throw new Error("Cannot normalize a zero vector.");
-  return vector.map((val) => val / magnitude);
+class SemanticMemoryStore {
+  constructor() {
+    /**
+     * @type {Array<{vector: number[], metadata: object}>}
+     * @description Array of stored vectors and their metadata.
+     */
+    this.store = [];
+  }
+
+  /**
+   * Adds a vector and its metadata to the store.
+   * @param {number[]} vector - The embedding vector to store.
+   * @param {object} metadata - Associated metadata for the vector.
+   * @throws {Error} If the vector is not an array of numbers.
+   */
+  add(vector, metadata = {}) {
+    if (!Array.isArray(vector) || !vector.every((val) => typeof val === 'number')) {
+      throw new Error('Vector must be an array of numbers.');
+    }
+    this.store.push({ vector, metadata });
+  }
+
+  /**
+   * Searches the store for the nearest neighbors to the query vector.
+   * @param {number[]} queryVector - The query vector to search for.
+   * @param {number} k - The number of nearest neighbors to return.
+   * @returns {Array<{vector: number[], metadata: object, similarity: number}>} The top-k nearest neighbors with similarity scores.
+   * @throws {Error} If the query vector is not an array of numbers.
+   */
+  search(queryVector, k = 1) {
+    if (!Array.isArray(queryVector) || !queryVector.every((val) => typeof val === 'number')) {
+      throw new Error('Query vector must be an array of numbers.');
+    }
+
+    if (this.store.length === 0) {
+      return [];
+    }
+
+    const results = this.store.map(({ vector, metadata }) => {
+      const similarity = this._cosineSimilarity(queryVector, vector);
+      return { vector, metadata, similarity };
+    });
+
+    return results
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, k);
+  }
+
+  /**
+   * Computes the cosine similarity between two vectors.
+   * @private
+   * @param {number[]} vecA - The first vector.
+   * @param {number[]} vecB - The second vector.
+   * @returns {number} The cosine similarity between the two vectors.
+   */
+  _cosineSimilarity(vecA, vecB) {
+    const dotProduct = vecA.reduce((sum, val, i) => sum + val * (vecB[i] || 0), 0);
+    const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val ** 2, 0));
+    const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val ** 2, 0));
+
+    if (magnitudeA === 0 || magnitudeB === 0) {
+      return 0; // Avoid division by zero
+    }
+
+    return dotProduct / (magnitudeA * magnitudeB);
+  }
+}
+
+/**
+ * Creates a new SemanticMemoryStore instance.
+ * @returns {SemanticMemoryStore} A new instance of SemanticMemoryStore.
+ */
+export function createSemanticMemoryStore() {
+  return new SemanticMemoryStore();
 }
 
 /**
  * Calculates the cosine similarity between two vectors.
- * @param {Array<number>} vectorA - The first vector.
- * @param {Array<number>} vectorB - The second vector.
- * @returns {number} - The cosine similarity score (-1 to 1).
+ * @param {number[]} vecA - The first vector.
+ * @param {number[]} vecB - The second vector.
+ * @returns {number} The cosine similarity between the two vectors.
  */
-export function cosineSimilarity(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error("Vectors must be of the same length.");
-  }
-  const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val * val, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val * val, 0));
-  if (magnitudeA === 0 || magnitudeB === 0) {
-    throw new Error("Cannot calculate cosine similarity with a zero vector.");
-  }
-  return dotProduct / (magnitudeA * magnitudeB);
+export function cosineSimilarity(vecA, vecB) {
+  const store = new SemanticMemoryStore();
+  return store._cosineSimilarity(vecA, vecB);
 }
-
-/**
- * Stores embeddings and associated metadata in memory.
- */
-const memoryStore = [];
-
-/**
- * Adds a new embedding to the memory store.
- * @param {Array<number>} embedding - The vector representation of the data.
- * @param {string} metadata - Associated metadata for the embedding.
- */
-export function addEmbedding(embedding, metadata) {
-  const normalizedEmbedding = normalizeVector(embedding);
-  memoryStore.push({ embedding: normalizedEmbedding, metadata });
-}
-
-/**
- * Retrieves the most similar embeddings from the memory store.
- * @param {Array<number>} queryEmbedding - The query vector.
- * @param {number} topK - The number of top results to retrieve.
- * @returns {Array<{metadata: string, similarity: number}>} - The top K results with metadata and similarity scores.
- */
-export function retrieveSimilar(queryEmbedding, topK = 5) {
-  const normalizedQuery = normalizeVector(queryEmbedding);
-  const similarities = memoryStore.map(({ embedding, metadata }) => {
-    const similarity = cosineSimilarity(normalizedQuery, embedding);
-    return { metadata, similarity };
-  });
-  return similarities
-    .sort((a, b) => b.similarity - a.similarity)
-    .slice(0, topK);
-}
-
-/**
- * Summarizes the memory store by aggregating metadata of the top matches.
- * @param {Array<number>} queryEmbedding - The query vector.
- * @param {number} topK - The number of top results to consider for summarization.
- * @returns {string} - A summary of the top matches' metadata.
- */
-export function summarizeContext(queryEmbedding, topK = 5) {
-  const topMatches = retrieveSimilar(queryEmbedding, topK);
-  return topMatches.map(({ metadata }) => metadata).join("\n");
-}
-
-/**
- * Clears the memory store.
- */
-export function clearMemoryStore() {
-  memoryStore.length = 0;
-}
-
-/**
- * Exports the module's functions.
- */
-export default {
-  normalizeVector,
-  cosineSimilarity,
-  addEmbedding,
-  retrieveSimilar,
-  summarizeContext,
-  clearMemoryStore
-};

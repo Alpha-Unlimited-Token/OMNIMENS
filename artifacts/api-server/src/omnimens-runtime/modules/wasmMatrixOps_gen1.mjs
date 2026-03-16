@@ -1,90 +1,102 @@
-// wasmMatrixOps.js
-
 /**
  * @module wasmMatrixOps
- * @description Perform high-dimensional matrix operations efficiently using WebAssembly in Node.js.
+ * @description Perform efficient GPU-like matrix operations using WebAssembly (WASM) for neural computations.
  */
 
 const { readFileSync } = require('fs');
-const { join } = require('path');
+const path = require('path');
 
 /**
- * Load and compile the WebAssembly binary for matrix operations.
- * @returns {Promise<WebAssembly.Instance>} - The compiled WebAssembly instance.
+ * Loads and initializes the WebAssembly module for matrix operations.
+ * @returns {Promise<WebAssembly.Instance>} The initialized WebAssembly instance.
  */
-async function loadWasm() {
-  const wasmPath = join(__dirname, 'matrix_ops.wasm');
-  const wasmBinary = readFileSync(wasmPath);
-  const wasmModule = await WebAssembly.compile(wasmBinary);
-  return WebAssembly.instantiate(wasmModule);
+async function initializeWasm() {
+  const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = readFileSync(wasmPath);
+  const wasmModule = await WebAssembly.compile(wasmBuffer);
+  const instance = await WebAssembly.instantiate(wasmModule);
+  return instance;
 }
 
 /**
- * Multiply two matrices using WebAssembly.
+ * Multiplies two matrices using WebAssembly.
  * @param {number[][]} matrixA - The first matrix.
  * @param {number[][]} matrixB - The second matrix.
- * @returns {Promise<number[][]>} - The resulting matrix after multiplication.
- * @throws {Error} - If matrices are incompatible for multiplication.
+ * @returns {Promise<number[][]>} The resulting matrix after multiplication.
+ * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
  */
-async function multiplyMatrices(matrixA, matrixB) {
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
-
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions are incompatible for multiplication.');
+async function wasmMatrixMultiply(matrixA, matrixB) {
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Matrix dimensions do not allow multiplication.');
   }
 
-  const wasmInstance = await loadWasm();
-  const { memory, multiply } = wasmInstance.exports;
+  const instance = await initializeWasm();
+  const { memory, multiply_matrices } = instance.exports;
 
-  const flatA = matrixA.flat();
-  const flatB = matrixB.flat();
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const colsB = matrixB[0].length;
 
-  const bufferA = new Float64Array(memory.buffer, 0, flatA.length);
-  const bufferB = new Float64Array(memory.buffer, flatA.length * 8, flatB.length);
-  const bufferC = new Float64Array(memory.buffer, flatA.length * 8 + flatB.length * 8, rowsA * colsB);
+  const matrixASize = rowsA * colsA;
+  const matrixBSize = colsA * colsB;
+  const resultSize = rowsA * colsB;
 
-  bufferA.set(flatA);
-  bufferB.set(flatB);
+  const offsetA = 0;
+  const offsetB = matrixASize * 4;
+  const offsetResult = offsetB + matrixBSize * 4;
 
-  multiply(rowsA, colsA, colsB);
+  const wasmMemory = new Float32Array(memory.buffer);
 
+  // Flatten and copy matrices into WASM memory
+  let index = offsetA / 4;
+  for (const row of matrixA) {
+    for (const value of row) {
+      wasmMemory[index++] = value;
+    }
+  }
+
+  index = offsetB / 4;
+  for (const row of matrixB) {
+    for (const value of row) {
+      wasmMemory[index++] = value;
+    }
+  }
+
+  // Perform matrix multiplication
+  multiply_matrices(offsetA, rowsA, colsA, offsetB, colsB, offsetResult);
+
+  // Extract result matrix
   const result = [];
+  index = offsetResult / 4;
   for (let i = 0; i < rowsA; i++) {
-    result.push(bufferC.slice(i * colsB, (i + 1) * colsB));
+    const row = [];
+    for (let j = 0; j < colsB; j++) {
+      row.push(wasmMemory[index++]);
+    }
+    result.push(row);
   }
 
   return result;
 }
 
 /**
- * Compute the eigenvalues of a square matrix using WebAssembly.
- * @param {number[][]} matrix - The square matrix.
- * @returns {Promise<number[]>} - The eigenvalues of the matrix.
- * @throws {Error} - If the matrix is not square.
+ * A placeholder for future convolution operations.
+ * @todo Implement convolution operation using WebAssembly.
  */
-async function computeEigenvalues(matrix) {
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-
-  if (rows !== cols) {
-    throw new Error('Matrix must be square to compute eigenvalues.');
-  }
-
-  const wasmInstance = await loadWasm();
-  const { memory, eigenvalues } = wasmInstance.exports;
-
-  const flatMatrix = matrix.flat();
-  const bufferMatrix = new Float64Array(memory.buffer, 0, flatMatrix.length);
-  const bufferEigenvalues = new Float64Array(memory.buffer, flatMatrix.length * 8, rows);
-
-  bufferMatrix.set(flatMatrix);
-
-  eigenvalues(rows);
-
-  return Array.from(bufferEigenvalues);
+async function wasmConvolution() {
+  throw new Error('Convolution operation not yet implemented.');
 }
 
-export { multiplyMatrices, computeEigenvalues };
+/**
+ * A placeholder for other advanced linear algebra operations.
+ * @todo Expand with additional operations as needed.
+ */
+async function wasmAdvancedOps() {
+  throw new Error('Advanced operations not yet implemented.');
+}
+
+module.exports = {
+  wasmMatrixMultiply,
+  wasmConvolution,
+  wasmAdvancedOps
+};

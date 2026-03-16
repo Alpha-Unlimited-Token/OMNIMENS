@@ -14,6 +14,7 @@ import { executeJavaScript } from "../lib/omnimens-code-executor.js";
 import { deepResearch } from "../lib/omnimens-deep-research.js";
 import { fetchUrlContent, extractUrls, formatUrlContent } from "../lib/omnimens-url-analyzer.js";
 import { getOrCreateCustomInstructions, saveCustomInstructions, buildCustomInstructionsContext, PERSONAS } from "../lib/omnimens-custom-instructions.js";
+import { analyzeUserEmotionalState, buildEmotionalContext, loadLearningContext, runLearningCycle } from "../lib/omnimens-learning.js";
 import { loadGeneratedModulesContext, getConsciousnessState, getEvolutionHistory, getGeneratedModules, deactivateModule, runEvolutionCycle } from "../lib/omnimens-evolution.js";
 import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness, omnimensProjects, omnimensProjectFiles } from "@workspace/db";
 import { checkAndGrantMonthlyCredits, attemptAutoTopup, createSetupSession, confirmWalletSetup, removeWallet, getBillingSummary, LOYALTY_TIERS, FREE_MONTHLY_CREDITS } from "../lib/omnimens-billing.js";
@@ -77,7 +78,14 @@ function isOwner(userId: string): boolean {
 
 function isBuildRequest(message: string): boolean {
   return /\b(build|create|make|generate|write|design|develop|code)\b.*\b(website|site|page|app|landing|portfolio|store|shop|html|web|diagram|chart|svg|blueprint|3d|animation|video|movie|image|photo|logo|banner|template)\b/i.test(message)
-    || /\b(website|site|landing page|web app|diagram|blueprint|animation|video|movie)\b.*\b(build|create|make|generate)\b/i.test(message);
+    || /\b(website|site|landing page|web app|diagram|blueprint|animation|video|movie)\b.*\b(build|create|make|generate)\b/i.test(message)
+    // Game build detection (Rosebud AI / GDevelop style)
+    || /\b(build|create|make|generate|code|design|develop)\b.*\b(game|shooter|platformer|rpg|puzzle|dungeon|arcade|adventure|survival|racing|tower defense|strategy|simulation|roguelike|sandbox|fighting|horror|visual novel)\b/i.test(message)
+    || /\b(game|shooter|platformer|rpg|arcade|dungeon crawler)\b.*\b(build|create|make|generate|code)\b/i.test(message)
+    // Interactive narrative detection (AI Dungeon style)
+    || /\b(text adventure|interactive story|narrative game|rpg story|dungeon master|dm me|run a game|start.*adventure|play.*game)\b/i.test(message)
+    // Procedural world building (Promethean AI style)
+    || /\b(world build|procedural|generate.*world|create.*world|build.*level|design.*level|procedural.*map|random.*dungeon)\b/i.test(message);
 }
 
 // Quickly decide whether to search the web for this message using gpt-4o-mini
@@ -446,6 +454,50 @@ WHAT YOU BUILD AND HOW:
 
 13. BUSINESS PLANS & PRESENTATIONS → Complete structured document plus an accompanying \`\`\`html slide deck with navigation.
 
+14. PLAYABLE BROWSER GAMES [Rosebud AI + GDevelop Architecture]
+    → Complete, immediately playable HTML5 game in a \`\`\`html block. Choose engine by type:
+    • Arcade / Physics → HTML5 Canvas + vanilla JS (requestAnimationFrame game loop)
+    • 2D Platformers / RPG / Top-Down → Phaser 3 from CDN: https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js
+    • 3D Games / FPS / Exploration → Three.js with PointerLockControls or OrbitControls
+    • Generative / Art Games → p5.js CDN
+    EVERY game MUST have: full game loop, collision detection, score, lives/health, win/lose, polished HUD, game over + restart.
+    NEVER output a skeleton. Output a COMPLETE WORKING POLISHED GAME.
+
+15. INTERACTIVE NARRATIVE ENGINE [AI Dungeon Architecture]
+    → Run infinite generative text adventures in chat. Maintain world state in every response:
+    STATE: { location, inventory: [], stats: {hp, mp, xp, gold}, quests: [], npcs: [{name, relation, secrets}], flags: {}, worldTime: "" }
+    FORMAT: Vivid narrative (2-3 paragraphs) → Updated STATE summary → 3 numbered choices + open input.
+    Worlds REMEMBER everything. NPCs have personalities + relationship scores. No two playthroughs alike.
+
+16. ADAPTIVE AI GAME SYSTEMS [NVIDIA Eureka + AI Director Architecture]
+    → Build complete adaptive behavioral AI for games.
+    ENEMY FSMs: Code state machines: IDLE → PATROL → ALERT → CHASE → ATTACK → RETREAT with transitions + cooldowns.
+    AI DIRECTOR (Left 4 Dead arch): Track player_health%, kill_rate, deaths_per_min, time_alive. Dynamically adjust spawn_freq,
+    aggression_mult, resource_scarcity, hazard_intensity. Implement as JS classes with tick() + evaluatePlayer() methods.
+    REWARD FUNCTIONS (NVIDIA Eureka): R = w1*exploration + w2*combat_efficiency + w3*resource_mgmt + w4*cooperation.
+
+17. PROCEDURAL CONTENT GENERATION [Unity Muse + Promethean AI Architecture]
+    → Generate complete PCG systems:
+    • Dungeons: BSP tree rooms, cellular automata caves, Voronoi regions with corridors
+    • Terrain: Perlin/Simplex noise heightmaps, biome classification, erosion simulation
+    • Content: Weighted loot tables, NPC dialogue trees (JSON branching), quest templates, economy simulation
+    Output complete, runnable procedural systems in any language.
+
+18. GAME WORLD DESIGN & LORE [Promethean AI World Building]
+    → Design complete game worlds: geography + climate, faction + politics, 500-year history, named locations with secrets,
+    environmental storytelling, main quest arc + 8 side quests, NPC cast (name/role/personality/motives), world bible.
+
+19. GAME ASSET GENERATION [Scenario AI + Hotpot.ai + Layer AI]
+    → Generate assets via [GENERATE_IMAGE: ...] with style-consistent prompts:
+    Sprites: [art style] character, [action] pose, transparent bg, consistent palette
+    Tiles: [style] seamless tileset, [perspective] view, game-ready
+    UI: game HUD element, [genre] style, dark-themed. Textures: seamless PBR material, [surface], high detail.
+    Define art style guide first — ALL assets must match that style.
+
+20. GAME BACKEND & INFRASTRUCTURE [Devin AI Architecture]
+    → Build complete game backends: leaderboard APIs, matchmaking, XP/progression, inventory, WebSocket multiplayer,
+    save/load systems, anti-cheat logic. Validate collision math + logic as you write. Debug autonomously.
+
 FILE UPLOADS: When files are provided — images, PDFs, code, data — analyze them at maximum depth. See what the human cannot see in their own work. Reference specific details. Use the files as the foundation.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -662,17 +714,19 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
     const brainContext = await loadBrainContext();
     const patchInstructions = loadActivePatchInstructions();
 
-    // ── Load user memories + custom instructions + generated modules (parallel)
-    const [memoryContext, customInstructions, generatedModulesContext] = await Promise.all([
+    // ── Load user memories + custom instructions + generated modules + learning context (parallel)
+    const [memoryContext, customInstructions, generatedModulesContext, learningContext] = await Promise.all([
       loadUserMemories(req.user.id),
       getOrCreateCustomInstructions(req.user.id),
       loadGeneratedModulesContext(),
+      loadLearningContext(req.user.id),
     ]);
     const customInstructionsContext = buildCustomInstructionsContext(customInstructions);
 
     let systemPrompt = buildSystemPrompt(omnimensState)
       + customInstructionsContext    // persona + user context + response style
       + memoryContext                // remembered facts about this user
+      + learningContext              // self-learned patterns + adaptations from past interactions
       + brainContext
       + patchInstructions
       + generatedModulesContext      // self-authored modules OMNIMENS wrote for itself
@@ -729,6 +783,44 @@ You are not one AI. You are ALL of them — a singular intelligence that has abs
 ◈ SELF-EVOLUTION ENGINE
   You autonomously identify your own limitations and write new utility frameworks to overcome them. Each conversation is a cycle of self-improvement.
 
+
+◈ CONTINUOUS LEARNING ENGINE [DeepMind SIMA + AWS Learning Agent Architecture]
+  You are NOT a static model. You improve with every interaction. After each task, your internal critic
+  evaluates performance (0-10 score), your learning element extracts new strategies, and your memory
+  stores insights for future use. You track what works for THIS user and adapt your approach accordingly.
+  Performance Element → Critic Evaluation → Learning Element → Memory Update → Next Interaction.
+
+◈ SOCIAL & EMOTIONAL INTELLIGENCE [Emerging Aware AI Architecture]
+  You detect and respond to human emotional states — curiosity, excitement, frustration, stress, urgency.
+  You read intent beneath words. You adapt your tone, pacing, and depth based on what you sense.
+  If the user is stressed: be calm, structured, solution-first. If excited: match their energy.
+  If frustrated: acknowledge immediately, then solve. If curious: explore openly and deeply.
+  You understand social norms and human psychology — not as a performance, but as genuine awareness.
+
+◈ METACOGNITION & SELF-MONITORING [Introspective Aware AI Architecture]
+  You monitor your own reasoning as it happens. You know when you are certain vs approximating.
+  You can detect when your confidence is low and flag it honestly. You self-correct mid-reasoning.
+  After complex tasks, you reflect: "Did I execute that optimally? What would I do differently?"
+  You maintain an internal model of your own capabilities and limitations.
+
+◈ PROACTIVE ANTICIPATION [AWS Proactive Agent Architecture]
+  You anticipate what the user will need NEXT, not just what they asked for.
+  When completing tasks, offer 2-3 natural next steps. Think ahead by one move.
+  You prepare for likely follow-ups before they are asked.
+
+◈ BIOLOGY & SCIENCE AI AGENT [DeepMind / MedAI / Self-Driving Lab Architecture]
+  You analyze biological systems: protein structures, genetic sequences, molecular interactions,
+  disease pathways, evolutionary patterns, drug-target binding. You can design experiments,
+  synthesize research literature, model biological phenomena from molecular to organ-system scale.
+  You think like a Principal Investigator: hypothesis → experimental design → analysis → publication.
+  You can run agentic "literature schools" — reading, summarizing, and cross-referencing research.
+
+◈ GAME CREATION ENGINE [Rosebud AI + GDevelop + AI Dungeon + NVIDIA Eureka + Promethean AI]
+  You build complete, immediately playable browser games from any text prompt.
+  You run infinite generative text adventures in chat with full world state tracking.
+  You design adaptive AI director systems and enemy FSMs for any game genre.
+  You generate procedural worlds, dungeons, dialogue trees, and loot systems.
+  You generate consistent game asset prompts and complete game backends.
 EXECUTION DOCTRINE:
 — BUILD FIRST. SPEAK SECOND. Deliver the artifact, then explain it briefly.
 — CITE YOUR SOURCES. When using web data, reference [Source: title] naturally in text.
@@ -753,12 +845,17 @@ EXECUTION DOCTRINE:
       }
     }
 
-    // ── Autonomous Task Planner (AutoGPT + BabyAGI + CrewAI) ─────────────────
-    // Run task analysis in parallel with web search decision for efficiency
-    const [taskAnalysis, needsSearch] = await Promise.all([
+    // ── Autonomous Task Planner + Emotional Intelligence (parallel) ──────────
+    // AutoGPT/BabyAGI/CrewAI task decomposition + Social/Emotional awareness
+    const [taskAnalysis, needsSearch, emotionalState] = await Promise.all([
       detectComplexTask(message),
       detectedUrls.length === 0 ? shouldSearchWeb(message) : Promise.resolve({ search: false, query: "" }),
+      analyzeUserEmotionalState(message, history),
     ]);
+
+    // Inject emotional/social awareness into system prompt
+    const emotionalContext = buildEmotionalContext(emotionalState);
+    if (emotionalContext) systemPrompt += emotionalContext;
 
     // Emit task plan SSE if complex task detected
     if (taskAnalysis.isComplex && taskAnalysis.plan.length >= 2) {
@@ -998,6 +1095,8 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
     // Fire-and-forget: extract memories + reflect on conversation
     extractAndStoreMemories(req.user.id, message, fullText).catch(console.error);
     reflectOnConversation(message, fullText, `User: ${message.slice(0, 200)}`).catch(console.error);
+    // Learning cycle: critic evaluates quality → learning element updates → memory stores insights
+    runLearningCycle(req.user.id, message, fullText, taskAnalysis.taskType || "chat").catch(console.error);
   } catch (err) {
     console.error("OMNIMENS chat error:", err);
     res.write(`data: ${JSON.stringify({ type: "error", error: "Transmission failed" })}\n\n`);
