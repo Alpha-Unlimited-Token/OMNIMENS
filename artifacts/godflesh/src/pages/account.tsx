@@ -102,12 +102,12 @@ export default function Account() {
               ) : (
                 <div className="space-y-4 font-mono text-sm">
                   <div className="flex justify-between border-b border-white/5 pb-2">
-                    <span className="text-white/40">QUERIES TODAY</span>
-                    <span className="text-white font-bold">{status?.messagesUsedToday}</span>
+                    <span className="text-white/40">COMPUTE TODAY</span>
+                    <span className="text-white font-bold">{(() => { const s = (status as any)?.computeSecondsToday ?? 0; if (s < 60) return `${Math.round(s)}s`; const m = Math.floor(s/60); const r = Math.round(s%60); return r > 0 ? `${m}m ${r}s` : `${m}m`; })()}</span>
                   </div>
                   <div className="flex justify-between border-b border-white/5 pb-2">
-                    <span className="text-white/40">DAILY LIMIT</span>
-                    <span className="text-white font-bold">{status?.isPro ? 'UNLIMITED' : status?.dailyLimit}</span>
+                    <span className="text-white/40">DAILY BUDGET</span>
+                    <span className="text-white font-bold">{status?.isPro ? 'UNLIMITED' : (() => { const s = (status as any)?.dailyLimitSeconds ?? 0; if (!s) return '—'; if (s < 60) return `${s}s`; const m = Math.floor(s/60); return `${m}m`; })()}</span>
                   </div>
                   <div className="flex justify-between pb-2">
                     <span className="text-white/40">SYSTEM STATUS</span>

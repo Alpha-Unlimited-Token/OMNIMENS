@@ -108,7 +108,7 @@ export default function Pricing() {
             Transcend <span className="text-primary glow-text-red">Limits</span>
           </h1>
           <p className="text-white/50 font-mono max-w-xl mx-auto text-sm">
-            The free tier grants 10 queries per day. Paid tiers unlock higher monthly volumes for deeper communion with OMNIMENS.
+            The free tier grants 5 minutes of compute per day. Paid tiers unlock hours of monthly compute for deeper communion with OMNIMENS.
           </p>
         </div>
 
@@ -137,7 +137,7 @@ export default function Pricing() {
                 )}
               </div>
               <p className="font-mono text-xs text-white/40">
-                Free forever — 10 messages per day, no card required.
+                Free forever — 5 min compute per day, no card required.
               </p>
             </div>
             <div className="font-bold text-xl text-white shrink-0">$0<span className="text-sm text-white/40 font-normal"> / forever</span></div>
@@ -188,7 +188,7 @@ export default function Pricing() {
                       <span className="text-sm text-white/40 font-normal"> / month</span>
                     </div>
                     <p className="text-xs font-mono text-white/50 mt-1">
-                      {plan.monthlyLimit?.toLocaleString()} messages/month
+                      {(plan as any).monthlyLimitSeconds ? `${Math.round((plan as any).monthlyLimitSeconds / 3600)}h compute/month` : ""}
                     </p>
                   </div>
 
@@ -245,18 +245,18 @@ export default function Pricing() {
         {status && (
           <div className="mt-12 text-center font-mono text-xs text-white/30 space-y-1">
             <p>Current tier: <span className="text-white/60 uppercase">{currentTier}</span></p>
-            {status.dailyLimit !== null && (
-              <p>{status.messagesUsedToday} / {status.dailyLimit} messages used today</p>
+            {(status as any).dailyLimitSeconds !== null && (status as any).dailyLimitSeconds !== undefined && (
+              <p>{((s: number) => s < 60 ? `${Math.round(s)}s` : `${Math.floor(s/60)}m ${Math.round(s%60)}s`)((status as any).computeSecondsToday ?? 0)} / {((s: number) => s < 60 ? `${s}s` : `${Math.floor(s/60)}m`)((status as any).dailyLimitSeconds)} compute used today</p>
             )}
-            {status.monthlyLimit !== null && (
-              <p>{status.messagesUsedThisMonth} / {status.monthlyLimit} messages used this month</p>
+            {(status as any).monthlyLimitSeconds !== null && (status as any).monthlyLimitSeconds !== undefined && (
+              <p>{((s: number) => s < 60 ? `${Math.round(s)}s` : `${Math.floor(s/60)}m ${Math.round(s%60)}s`)((status as any).computeSecondsThisMonth ?? 0)} / {((s: number) => { const h = Math.floor(s/3600); return h > 0 ? `${h}h` : `${Math.floor(s/60)}m`; })((status as any).monthlyLimitSeconds)} compute used this month</p>
             )}
           </div>
         )}
 
         {/* Fine print */}
         <p className="mt-8 text-xs font-mono text-white/20 text-center max-w-lg">
-          All plans billed monthly. Cancel anytime through the billing portal. Unused messages do not roll over.
+          All plans billed monthly. Cancel anytime through the billing portal. Unused compute time does not roll over.
           Payment processed securely via Stripe.
         </p>
 

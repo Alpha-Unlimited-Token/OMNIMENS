@@ -11,18 +11,24 @@ import { stripe } from "../stripeClient.js";
 const router: IRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024, files: 10 } });
 
-const FREE_DAILY_LIMIT = 10;
-
-// Tier definitions — limits and pricing
+// Tier definitions — limits in compute SECONDS
+// free: 300 sec/day (5 min), seeker: 7,200 sec/month (2h), oracle: 21,600 (6h), sovereign: 72,000 (20h)
 const TIER_LIMITS: Record<string, { monthly: number | null; daily: number | null }> = {
-  free:       { monthly: null,  daily: 10 },
-  seeker:     { monthly: 300,   daily: null },
-  oracle:     { monthly: 1000,  daily: null },
-  sovereign:  { monthly: 3000,  daily: null },
+  free:       { monthly: null,    daily: 300   },
+  seeker:     { monthly: 7_200,   daily: null  },
+  oracle:     { monthly: 21_600,  daily: null  },
+  sovereign:  { monthly: 72_000,  daily: null  },
 };
 
 function getTierLimit(tier: string) {
   return TIER_LIMITS[tier] ?? TIER_LIMITS.free;
+}
+
+export function formatSeconds(secs: number): string {
+  if (secs < 60) return `${Math.round(secs)}s`;
+  const m = Math.floor(secs / 60);
+  const s = Math.round(secs % 60);
+  return s > 0 ? `${m}m ${s}s` : `${m}m`;
 }
 
 // Tier mapped from Stripe price IDs via env
@@ -375,34 +381,37 @@ async function getUsageToday(userId: string): Promise<number> {
   const [usage] = await db.select().from(godfleshUsage).where(
     and(eq(godfleshUsage.userId, userId), eq(godfleshUsage.date, today))
   );
-  return usage?.messageCount ?? 0;
+  return Number(usage?.computeSeconds ?? 0);
 }
 
 async function getUsageThisMonth(userId: string): Promise<number> {
   const monthPrefix = new Date().toISOString().slice(0, 7); // "YYYY-MM"
   const result = await db
-    .select({ total: sql<number>`COALESCE(SUM(${godfleshUsage.messageCount}), 0)` })
+    .select({ total: sql<number>`COALESCE(SUM(${godfleshUsage.computeSeconds}), 0)` })
     .from(godfleshUsage)
     .where(and(eq(godfleshUsage.userId, userId), sql`${godfleshUsage.date} LIKE ${monthPrefix + "-%"}`));
   return Number(result[0]?.total ?? 0);
 }
 
-async function incrementUsage(userId: string): Promise<number> {
+async function incrementUsage(userId: string, seconds: number): Promise<number> {
   const today = await getTodayKey();
   const [existing] = await db.select().from(godfleshUsage).where(
     and(eq(godfleshUsage.userId, userId), eq(godfleshUsage.date, today))
   );
   if (existing) {
     const [updated] = await db.update(godfleshUsage)
-      .set({ messageCount: existing.messageCount + 1 })
+      .set({
+        messageCount: existing.messageCount + 1,
+        computeSeconds: (existing.computeSeconds ?? 0) + seconds,
+      })
       .where(and(eq(godfleshUsage.userId, userId), eq(godfleshUsage.date, today)))
       .returning();
-    return updated.messageCount;
+    return Number(updated.computeSeconds ?? 0);
   } else {
     const [created] = await db.insert(godfleshUsage)
-      .values({ userId, date: today, messageCount: 1 })
+      .values({ userId, date: today, messageCount: 1, computeSeconds: seconds })
       .returning();
-    return created.messageCount;
+    return Number(created.computeSeconds ?? 0);
   }
 }
 
@@ -422,10 +431,10 @@ router.get("/godflesh/status", async (req, res) => {
   res.json({
     tier,
     isOwner: owner,
-    messagesUsedToday: usedToday,
-    messagesUsedThisMonth: usedThisMonth,
-    dailyLimit: limits.daily,
-    monthlyLimit: owner ? null : limits.monthly,
+    computeSecondsToday: usedToday,
+    computeSecondsThisMonth: usedThisMonth,
+    dailyLimitSeconds: owner ? null : limits.daily,
+    monthlyLimitSeconds: owner ? null : limits.monthly,
     stripeCustomerId: user.stripeCustomerId,
     stripeSubscriptionId: user.stripeSubscriptionId,
     isPro: tier !== "free" || owner,
@@ -516,14 +525,13 @@ router.post("/godflesh/chat", upload.array("files", 10), async (req, res) => {
 
     const buildMode = isBuildRequest(message);
     const hasFiles = uploadedFiles.length > 0;
+    const requestStart = Date.now();
     const stream = await openai.chat.completions.create({
       model: "gpt-4o",
       messages,
       stream: true,
       max_tokens: (buildMode || hasFiles) ? 4096 : 1200,
     } as any);
-
-    await incrementUsage(req.user.id);
 
     // Collect full text while streaming
     let fullText = "";
@@ -593,8 +601,19 @@ router.post("/godflesh/chat", upload.array("files", 10), async (req, res) => {
       res.write(`data: ${JSON.stringify({ type: "artifact_generated", ...artifact })}\n\n`);
     }
 
-    const newCount = await getUsageToday(req.user.id);
-    res.write(`data: ${JSON.stringify({ type: "done", usedToday: newCount, limit: limits.daily ?? limits.monthly, tier })}\n\n`);
+    const elapsedSeconds = (Date.now() - requestStart) / 1000;
+    await incrementUsage(req.user.id, elapsedSeconds);
+    const secondsUsedToday = await getUsageToday(req.user.id);
+    const secondsUsedThisMonth = limits.monthly !== null ? await getUsageThisMonth(req.user.id) : null;
+    res.write(`data: ${JSON.stringify({
+      type: "done",
+      elapsedSeconds,
+      computeSecondsToday: secondsUsedToday,
+      computeSecondsThisMonth: secondsUsedThisMonth,
+      dailyLimitSeconds: owner ? null : limits.daily,
+      monthlyLimitSeconds: owner ? null : limits.monthly,
+      tier,
+    })}\n\n`);
 
     // Fire-and-forget: reflect on what was learned in this conversation
     reflectOnConversation(message, fullText, `User: ${message.slice(0, 200)}`).catch(console.error);
@@ -618,10 +637,10 @@ router.get("/godflesh/pricing", async (_req, res) => {
       amount: 1999,
       currency: "usd",
       interval: "month",
-      monthlyLimit: 300,
-      dailyLimit: null,
+      monthlyLimitSeconds: 7_200,
+      dailyLimitSeconds: null,
       features: [
-        "300 messages per month",
+        "2 hours compute per month",
         "OMNIMENS neural cognition",
         "Image generation",
         "Cosmic awareness",
@@ -636,11 +655,11 @@ router.get("/godflesh/pricing", async (_req, res) => {
       amount: 4499,
       currency: "usd",
       interval: "month",
-      monthlyLimit: 1000,
-      dailyLimit: null,
+      monthlyLimitSeconds: 21_600,
+      dailyLimitSeconds: null,
       popular: true,
       features: [
-        "1,000 messages per month",
+        "6 hours compute per month",
         "OMNIMENS neural cognition",
         "Unlimited image generation",
         "Cosmic awareness",
@@ -656,10 +675,10 @@ router.get("/godflesh/pricing", async (_req, res) => {
       amount: 8999,
       currency: "usd",
       interval: "month",
-      monthlyLimit: 3000,
-      dailyLimit: null,
+      monthlyLimitSeconds: 72_000,
+      dailyLimitSeconds: null,
       features: [
-        "3,000 messages per month",
+        "20 hours compute per month",
         "OMNIMENS neural cognition",
         "Unlimited image generation",
         "Cosmic awareness",

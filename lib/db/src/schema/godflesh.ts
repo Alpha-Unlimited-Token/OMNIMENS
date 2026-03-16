@@ -18,6 +18,7 @@ export const godfleshUsage = pgTable("godflesh_usage", {
   userId: text("user_id").notNull().references(() => godfleshUsers.id),
   date: text("date").notNull(),
   messageCount: integer("message_count").default(0).notNull(),
+  computeSeconds: real("compute_seconds").default(0).notNull(),
 });
 
 // Living brain — every insight GODFLESH learns is stored here and injected into future conversations

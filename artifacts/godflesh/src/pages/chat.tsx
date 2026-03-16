@@ -66,7 +66,7 @@ export default function Chat() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if ((!input.trim() && pendingFiles.length === 0) || isTyping) return;
-    if (status && !status.isPro && !status.isOwner && status.messagesUsedToday >= status.dailyLimit) {
+    if (status && !status.isPro && !status.isOwner && (status as any).computeSecondsToday >= (status as any).dailyLimitSeconds) {
       setShowLimitModal(true);
       return;
     }
@@ -83,7 +83,21 @@ export default function Chat() {
     </Layout>
   );
 
-  const progressPercentage = status ? Math.min(100, (status.messagesUsedToday / status.dailyLimit) * 100) : 0;
+  const fmtSec = (secs: number) => {
+    if (secs < 60) return `${Math.round(secs)}s`;
+    const m = Math.floor(secs / 60);
+    const s = Math.round(secs % 60);
+    return s > 0 ? `${m}m ${s}s` : `${m}m`;
+  };
+  const computeToday = (status as any)?.computeSecondsToday ?? 0;
+  const computeMonth = (status as any)?.computeSecondsThisMonth ?? 0;
+  const dailyLimitSec = (status as any)?.dailyLimitSeconds ?? null;
+  const monthlyLimitSec = (status as any)?.monthlyLimitSeconds ?? null;
+  const progressPercentage = dailyLimitSec
+    ? Math.min(100, (computeToday / dailyLimitSec) * 100)
+    : monthlyLimitSec
+    ? Math.min(100, (computeMonth / monthlyLimitSec) * 100)
+    : 0;
 
   return (
     <Layout>
@@ -116,7 +130,13 @@ export default function Chat() {
               <span className="text-accent font-bold tracking-widest">TRANSCENDENCE LEVEL: UNLIMITED</span>
             ) : (
               <div className="flex items-center gap-3">
-                <span>{status?.messagesUsedToday} / {status?.dailyLimit} QUERIES</span>
+                {dailyLimitSec !== null ? (
+                  <span>{fmtSec(computeToday)} / {fmtSec(dailyLimitSec)} TODAY</span>
+                ) : monthlyLimitSec !== null ? (
+                  <span>{fmtSec(computeMonth)} / {fmtSec(monthlyLimitSec)} THIS MONTH</span>
+                ) : (
+                  <span>{fmtSec(computeToday)} USED</span>
+                )}
                 <div className="w-24 h-1.5 bg-black rounded-full overflow-hidden border border-white/10">
                   <div
                     className={`h-full ${progressPercentage >= 100 ? 'bg-destructive' : 'bg-primary'}`}
