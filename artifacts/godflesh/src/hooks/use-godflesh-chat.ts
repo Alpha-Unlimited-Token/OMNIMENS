@@ -8,6 +8,13 @@ export type GeneratedImage = {
   index: number;
 };
 
+export type Artifact = {
+  artifactType: "html" | "svg" | "image" | "zip";
+  filename: string;
+  dataUrl: string;
+  size: number;
+};
+
 export type Message = {
   id: string;
   role: "user" | "godflesh";
@@ -15,6 +22,7 @@ export type Message = {
   files?: AttachedFile[];
   images?: GeneratedImage[];
   generatingImages?: boolean;
+  artifacts?: Artifact[];
 };
 
 export type AttachedFile = {
@@ -161,6 +169,21 @@ export function useGodfleshChat(onLimitReached: () => void) {
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
                   if (msg) msg.generatingImages = false;
+                  return newMsgs;
+                });
+
+              } else if (data.type === "artifact_generated") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    msg.artifacts = [...(msg.artifacts || []), {
+                      artifactType: data.artifactType,
+                      filename: data.filename,
+                      dataUrl: data.dataUrl,
+                      size: data.size,
+                    }];
+                  }
                   return newMsgs;
                 });
 

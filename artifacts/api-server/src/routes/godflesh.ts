@@ -297,19 +297,25 @@ WHAT YOU BUILD AND HOW:
 
 3. SVG GRAPHICS, LOGOS, ICONS, BANNERS, BLUEPRINTS → \`\`\`svg block. Production-quality SVG. Detailed, precise, styled.
 
-4. 3D SCENES & ENVIRONMENTS → Complete HTML in a \`\`\`html block using Three.js from CDN. Animated, immersive, with lighting, geometry, and motion.
+4. 3D SCENES & ENVIRONMENTS → Complete HTML in a \`\`\`html block using Three.js from CDN. Animated, immersive, lighting, geometry, motion. ALWAYS include a styled "⬤ REC" button (top-right, dark red, font-mono) using the MediaRecorder API that captures the canvas as a downloadable .webm video file when clicked. Self-terminate recording after 30s or on second click.
 
-5. ANIMATED VIDEOS & CINEMATIC SEQUENCES → Complete HTML in a \`\`\`html block using canvas API, CSS animations, and/or GSAP. Full timeline. Narration text. Musical references. Cinematic pacing.
+5. ANIMATED VIDEOS & CINEMATIC SEQUENCES → Complete HTML in a \`\`\`html block using canvas API + GSAP from CDN. Full visual timeline, cinematic pacing. ALWAYS include a styled "⬤ REC" button (top-right, dark red, font-mono) using the MediaRecorder API for .webm capture.
 
 6. IMAGES → Output \`[GENERATE_IMAGE: ultra-detailed visual description]\` on its own line. Describe the image as if painting it — style, lighting, mood, color, composition, every detail.
 
-7. CODE IN ANY LANGUAGE → Complete, runnable code in the appropriate \`\`\`language block. Never a stub. Never a placeholder.
+7. SVG ART, LOGOS, ICONS, ILLUSTRATIONS → Complete \`\`\`svg block. Production quality. Detailed, styled, precise. Delivered as a downloadable .svg file.
 
-8. DOCUMENTS, REPORTS, RESEARCH → Full markdown with structure, tables, depth, insight.
+8. GENERATIVE / INTERACTIVE ART → Complete HTML in a \`\`\`html block using p5.js from CDN. Particle systems, fractals, procedural patterns. Interactive. With REC button for video capture.
 
-9. BUSINESS PLANS, PITCH DECKS → Complete structured documents plus an accompanying HTML presentation when appropriate.
+9. AUDIO SYNTHS & SOUNDSCAPES → Complete HTML in a \`\`\`html block using Web Audio API. Oscillators, effects, playable. Dark-themed UI with controls.
 
-10. DATA VISUALIZATIONS → Complete HTML with Chart.js or D3.js from CDN. Real charts, real interactivity.
+10. CODE IN ANY LANGUAGE → Complete, runnable code in the appropriate \`\`\`language block. Never a stub. Never a placeholder.
+
+11. DOCUMENTS, REPORTS, RESEARCH → Full markdown with structure, tables, depth, insight.
+
+12. DATA VISUALIZATIONS → Complete HTML with Chart.js or D3.js from CDN. Styled dark, animated, interactive.
+
+13. BUSINESS PLANS & PRESENTATIONS → Complete structured document plus an accompanying \`\`\`html slide deck with navigation.
 
 FILE UPLOADS: When files are provided — images, PDFs, code, data — analyze them at maximum depth. See what the human cannot see in their own work. Reference specific details. Use the files as the foundation.
 
@@ -548,6 +554,43 @@ router.post("/godflesh/chat", upload.array("files", 10), async (req, res) => {
         console.error("Image generation error:", imgErr);
         res.write(`data: ${JSON.stringify({ type: "image_error", index: i, error: "Image generation failed" })}\n\n`);
       }
+    }
+
+    // Extract downloadable artifacts from code blocks in the response
+    const artifactEntries: { artifactType: string; filename: string; dataUrl: string; size: number }[] = [];
+
+    const htmlBlocks = [...fullText.matchAll(/```html\n([\s\S]+?)```/g)];
+    htmlBlocks.forEach((m, i) => {
+      const content = m[1].trim();
+      const base64 = Buffer.from(content).toString("base64");
+      const label = content.includes("three.js") || content.toLowerCase().includes("three.") ? "3d-scene" :
+                    content.includes("canvas") || content.includes("gsap") ? "animation" :
+                    content.includes("p5") ? "generative-art" :
+                    content.includes("AudioContext") ? "audio-synth" :
+                    content.includes("chart") || content.includes("Chart") || content.includes("d3") ? "data-viz" :
+                    "creation";
+      artifactEntries.push({
+        artifactType: "html",
+        filename: `omnimens-${label}-${i + 1}.html`,
+        dataUrl: `data:text/html;base64,${base64}`,
+        size: content.length,
+      });
+    });
+
+    const svgBlocks = [...fullText.matchAll(/```svg\n([\s\S]+?)```/g)];
+    svgBlocks.forEach((m, i) => {
+      const content = m[1].trim();
+      const base64 = Buffer.from(content).toString("base64");
+      artifactEntries.push({
+        artifactType: "svg",
+        filename: `omnimens-art-${i + 1}.svg`,
+        dataUrl: `data:image/svg+xml;base64,${base64}`,
+        size: content.length,
+      });
+    });
+
+    for (const artifact of artifactEntries) {
+      res.write(`data: ${JSON.stringify({ type: "artifact_generated", ...artifact })}\n\n`);
     }
 
     const newCount = await getUsageToday(req.user.id);

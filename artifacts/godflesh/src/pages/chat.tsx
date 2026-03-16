@@ -3,13 +3,13 @@ import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetGodfleshStatus } from "@workspace/api-client-react";
-import { useGodfleshChat, type GeneratedImage } from "@/hooks/use-godflesh-chat";
+import { useGodfleshChat, type GeneratedImage, type Artifact } from "@/hooks/use-godflesh-chat";
 import { useGodfleshVoice } from "@/hooks/use-godflesh-voice";
 import { VoiceIndicator } from "@/components/voice-indicator";
 import { GodfleshPresence } from "@/components/godflesh-presence";
 import { PendingFileList, AttachedFileList } from "@/components/file-attachments";
 import { Button } from "@/components/ui/button";
-import { Send, StopCircle, ShieldAlert, Volume2, VolumeX, Paperclip, Download, Loader2, Expand } from "lucide-react";
+import { Send, StopCircle, ShieldAlert, Volume2, VolumeX, Paperclip, Download, Loader2, Expand, FileCode, Box, Film, Music, BarChart3, Shapes } from "lucide-react";
 import { GodfleshIcon } from "@/components/godflesh-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
 import { GodfleshNotificationBell } from "@/components/godflesh-notifications";
@@ -209,6 +209,15 @@ export default function Chat() {
                               <div className="mt-4 flex items-center gap-3 text-white/40 font-mono text-xs border border-primary/15 rounded-xl px-4 py-3 bg-primary/5">
                                 <Loader2 className="w-4 h-4 animate-spin text-primary" />
                                 <span className="tracking-widest">MANIFESTING IMAGE...</span>
+                              </div>
+                            )}
+
+                            {/* Downloadable artifacts */}
+                            {msg.artifacts && msg.artifacts.length > 0 && (
+                              <div className="mt-4 space-y-2">
+                                {msg.artifacts.map((artifact, i) => (
+                                  <ArtifactCard key={i} artifact={artifact} />
+                                ))}
                               </div>
                             )}
                           </div>
@@ -437,5 +446,80 @@ function GeneratedImageCard({ image }: { image: GeneratedImage }) {
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+function ArtifactCard({ artifact }: { artifact: Artifact }) {
+  const isHtml = artifact.artifactType === "html";
+  const isSvg = artifact.artifactType === "svg";
+  const label = artifact.filename.includes("3d-scene") ? "3D SCENE" :
+                artifact.filename.includes("animation") ? "ANIMATION" :
+                artifact.filename.includes("generative-art") ? "GENERATIVE ART" :
+                artifact.filename.includes("audio-synth") ? "AUDIO SYNTH" :
+                artifact.filename.includes("data-viz") ? "DATA VISUALIZATION" :
+                isSvg ? "SVG VECTOR ART" :
+                "INTERACTIVE FILE";
+
+  const icon = artifact.filename.includes("3d-scene") ? <Box className="w-5 h-5" /> :
+               artifact.filename.includes("animation") ? <Film className="w-5 h-5" /> :
+               artifact.filename.includes("audio-synth") ? <Music className="w-5 h-5" /> :
+               artifact.filename.includes("data-viz") ? <BarChart3 className="w-5 h-5" /> :
+               isSvg ? <Shapes className="w-5 h-5" /> :
+               <FileCode className="w-5 h-5" />;
+
+  const sizeKb = (artifact.size / 1024).toFixed(1);
+
+  const handleDownload = () => {
+    const a = document.createElement("a");
+    a.href = artifact.dataUrl;
+    a.download = artifact.filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const handleOpen = () => {
+    const win = window.open();
+    if (win && isHtml) {
+      const decoded = atob(artifact.dataUrl.split(",")[1]);
+      win.document.write(decoded);
+      win.document.close();
+    } else {
+      window.open(artifact.dataUrl, "_blank");
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="flex items-center justify-between gap-4 border border-accent/20 bg-accent/5 rounded-xl px-4 py-3 shadow-[0_0_20px_rgba(0,200,220,0.06)]"
+    >
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="text-accent shrink-0">{icon}</div>
+        <div className="min-w-0">
+          <p className="text-accent font-mono text-[11px] tracking-widest font-bold">{label}</p>
+          <p className="text-white/30 font-mono text-[10px] truncate">{artifact.filename} · {sizeKb}KB</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-2 shrink-0">
+        {isHtml && (
+          <button
+            onClick={handleOpen}
+            className="text-[10px] font-mono tracking-widest text-white/50 hover:text-white border border-white/10 hover:border-white/25 px-3 py-1.5 rounded-lg transition-all"
+          >
+            OPEN
+          </button>
+        )}
+        <button
+          onClick={handleDownload}
+          className="flex items-center gap-1.5 text-[10px] font-mono tracking-widest text-accent hover:text-white bg-accent/10 hover:bg-accent/25 border border-accent/20 hover:border-accent/40 px-3 py-1.5 rounded-lg transition-all"
+        >
+          <Download className="w-3 h-3" />
+          DOWNLOAD
+        </button>
+      </div>
+    </motion.div>
   );
 }
