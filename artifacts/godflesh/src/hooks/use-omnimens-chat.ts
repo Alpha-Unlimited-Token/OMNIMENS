@@ -23,6 +23,9 @@ export type Message = {
   images?: GeneratedImage[];
   generatingImages?: boolean;
   artifacts?: Artifact[];
+  searchingWeb?: boolean;
+  webSearchQuery?: string;
+  webSearchResultCount?: number;
 };
 
 export type AttachedFile = {
@@ -136,6 +139,22 @@ export function useOmnimensChat(onLimitReached: () => void) {
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
                   if (msg) msg.content = data.content;
+                  return newMsgs;
+                });
+
+              } else if (data.type === "searching_web") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) { msg.searchingWeb = true; msg.webSearchQuery = data.query; }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "search_complete") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) { msg.searchingWeb = false; msg.webSearchResultCount = data.resultCount; }
                   return newMsgs;
                 });
 

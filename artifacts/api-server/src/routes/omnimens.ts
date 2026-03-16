@@ -6,6 +6,7 @@ import { eq, and, desc, sql } from "drizzle-orm";
 import { openai, generateImageBuffer } from "@workspace/integrations-openai-ai-server";
 import { runOmnimens, type OmnimensState } from "../lib/omnimens-engine.js";
 import { reflectOnConversation, loadBrainContext, synthesizeUpgrade, markUpgradeLive } from "../lib/omnimens-self-upgrade.js";
+import { webSearch, formatSearchResults } from "../lib/web-search.js";
 import { stripe } from "../stripeClient.js";
 
 const router: IRouter = Router();
@@ -47,6 +48,31 @@ function isOwner(userId: string): boolean {
 function isBuildRequest(message: string): boolean {
   return /\b(build|create|make|generate|write|design|develop|code)\b.*\b(website|site|page|app|landing|portfolio|store|shop|html|web|diagram|chart|svg|blueprint|3d|animation|video|movie|image|photo|logo|banner|template)\b/i.test(message)
     || /\b(website|site|landing page|web app|diagram|blueprint|animation|video|movie)\b.*\b(build|create|make|generate)\b/i.test(message);
+}
+
+// Quickly decide whether to search the web for this message using gpt-4o-mini
+async function shouldSearchWeb(message: string): Promise<{ search: boolean; query: string }> {
+  if (message.length < 8) return { search: false, query: "" };
+  try {
+    const check = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{
+        role: "user",
+        content: `Does the following user message require up-to-date internet data to answer well? This includes: current events, latest news, real-time prices, recent releases, today's date, live sports, new AI models, weather, stocks, recent research, or anything that changes frequently.
+
+Message: "${message.slice(0, 300)}"
+
+Respond with JSON only: {"search": true/false, "query": "optimized search query if search=true, else empty string"}`,
+      }],
+      max_tokens: 80,
+      temperature: 0,
+    });
+    const raw = check.choices[0]?.message?.content?.trim() || "{}";
+    const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+    return { search: !!parsed.search, query: parsed.query || message.slice(0, 100) };
+  } catch {
+    return { search: false, query: "" };
+  }
 }
 
 const IMAGE_TYPES = new Set(["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"]);
@@ -515,7 +541,25 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
     }
 
     const brainContext = await loadBrainContext();
-    const systemPrompt = buildSystemPrompt(omnimensState) + brainContext;
+    let systemPrompt = buildSystemPrompt(omnimensState) + brainContext;
+
+    // ── Web Search: detect if query needs live internet data ─────────────────
+    let webSearchContext = "";
+    const needsSearch = await shouldSearchWeb(message);
+    if (needsSearch.search && needsSearch.query) {
+      res.write(`data: ${JSON.stringify({ type: "searching_web", query: needsSearch.query })}\n\n`);
+      try {
+        const results = await webSearch(needsSearch.query, 6);
+        if (results.length > 0) {
+          webSearchContext = `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nLIVE INTERNET DATA — Retrieved just now\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${formatSearchResults(results, needsSearch.query)}\n\nUse this live data to answer accurately. Today's date is ${new Date().toDateString()}.`;
+          systemPrompt += webSearchContext;
+          res.write(`data: ${JSON.stringify({ type: "search_complete", resultCount: results.length })}\n\n`);
+        }
+      } catch (err) {
+        console.error("[OMNIMENS] Web search failed:", err);
+        res.write(`data: ${JSON.stringify({ type: "search_complete", resultCount: 0 })}\n\n`);
+      }
+    }
 
     const messages: any[] = [
       { role: "system", content: systemPrompt },

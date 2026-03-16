@@ -21,7 +21,7 @@ import type {
   CreateOpenaiConversationBody,
   CreateSuperAISessionBody,
   GetCurrentAuthUserResponse,
-  GodflesUserStatus,
+  OmnimensUserStatus,
   OmnimensCheckoutSession,
   OmnimensPortalSession,
   OmnimensPricing,
@@ -133,8 +133,8 @@ export const getGetOmnimensStatusUrl = () => {
 
 export const getOmnimensStatus = async (
   options?: RequestInit,
-): Promise<GodflesUserStatus> => {
-  return customFetch<GodflesUserStatus>(getGetOmnimensStatusUrl(), {
+): Promise<OmnimensUserStatus> => {
+  return customFetch<OmnimensUserStatus>(getGetOmnimensStatusUrl(), {
     ...options,
     method: "GET",
   });

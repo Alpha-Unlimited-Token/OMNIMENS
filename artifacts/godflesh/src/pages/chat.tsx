@@ -9,13 +9,25 @@ import { VoiceIndicator } from "@/components/voice-indicator";
 import { OmnimensPresence } from "@/components/omnimens-presence";
 import { PendingFileList, AttachedFileList } from "@/components/file-attachments";
 import { Button } from "@/components/ui/button";
-import { Send, StopCircle, ShieldAlert, Volume2, VolumeX, Paperclip, Download, Loader2, Expand, FileCode, Box, Film, Music, BarChart3, Shapes } from "lucide-react";
+import { Send, StopCircle, ShieldAlert, Volume2, VolumeX, Paperclip, Download, Loader2, Expand, FileCode, Box, Film, Music, BarChart3, Shapes, Globe } from "lucide-react";
 import { OmnimensIcon } from "@/components/omnimens-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
 import { OmnimensNotificationBell } from "@/components/omnimens-notifications";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { motion, AnimatePresence } from "framer-motion";
+
+function WebSearchBadge({ query, done, resultCount }: { query: string; done: boolean; resultCount?: number }) {
+  return (
+    <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-lg bg-accent/8 border border-accent/15 font-mono text-xs text-accent/70 w-fit">
+      <Globe className={`w-3 h-3 shrink-0 ${done ? "text-accent/50" : "text-accent animate-pulse"}`} />
+      {done
+        ? <span className="text-accent/50">Searched: <span className="text-accent/70">{query}</span>{resultCount ? ` · ${resultCount} results` : ""}</span>
+        : <span>Scanning internet: <span className="text-white/60 italic">{query}</span></span>
+      }
+    </div>
+  );
+}
 
 function ImageGeneratingBadge() {
   const [elapsed, setElapsed] = useState(0);
@@ -249,6 +261,13 @@ export default function Chat() {
                             )}
 
                             {/* Generating indicator with elapsed timer */}
+                            {(msg.searchingWeb || msg.webSearchQuery) && (
+                              <WebSearchBadge
+                                query={msg.webSearchQuery || ""}
+                                done={!msg.searchingWeb}
+                                resultCount={msg.webSearchResultCount}
+                              />
+                            )}
                             {msg.generatingImages && (
                               <ImageGeneratingBadge />
                             )}

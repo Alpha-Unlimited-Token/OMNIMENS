@@ -5,6 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { authMiddleware } from "./middlewares/authMiddleware";
 import router from "./routes";
+import { startAutonomousLearning } from "./lib/omnimens-self-upgrade.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,6 +19,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(authMiddleware);
 
 app.use("/api", router);
+
+// Start OMNIMENS autonomous internet learning loop
+startAutonomousLearning();
 
 // In production, serve the OMNIMENS frontend static build
 if (process.env.NODE_ENV === "production") {

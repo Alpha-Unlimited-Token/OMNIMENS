@@ -14,7 +14,7 @@ export * from "./getCurrentAuthUserResponse";
 export * from "./omnimensCheckoutSession";
 export * from "./omnimensPortalSession";
 export * from "./omnimensPricing";
-export * from "./godflesUserStatus";
+export * from "./omnimensUserStatus";
 export * from "./healthStatus";
 export * from "./openaiConversation";
 export * from "./openaiConversationWithMessages";

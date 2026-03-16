@@ -6,8 +6,9 @@ import {
 } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
-import { writeFileSync, readFileSync, existsSync } from "fs";
+import { writeFileSync } from "fs";
 import { join } from "path";
+import { webSearch, formatSearchResults } from "./web-search.js";
 
 const MAX_BRAIN_INJECT = 20;
 const UPGRADE_THRESHOLD = 5;
@@ -275,4 +276,132 @@ export async function getUnreadCount(): Promise<number> {
       .where(eq(omnimensNotifications.readByOwner, false));
     return rows.length;
   } catch { return 0; }
+}
+
+// ── Internet Learning Cycle — runs automatically in production ─────────────────
+// OMNIMENS searches the web for the latest developments, synthesizes insights,
+// and permanently stores them in its brain. Called on a schedule.
+const LEARN_QUERIES = [
+  "latest AI breakthroughs 2025",
+  "new large language model capabilities",
+  "AI research papers this week",
+  "cutting edge machine learning techniques",
+  "AI agents autonomous systems news",
+  "OpenAI Anthropic Google AI developments",
+  "AI alignment safety research latest",
+  "quantum computing AI integration",
+];
+
+let learningCycleCount = 0;
+
+export async function runInternetLearningCycle(): Promise<void> {
+  learningCycleCount++;
+  const cycleId = learningCycleCount;
+  console.log(`[OMNIMENS] Internet learning cycle #${cycleId} starting...`);
+
+  try {
+    // Pick 3 random queries to search
+    const shuffled = [...LEARN_QUERIES].sort(() => Math.random() - 0.5).slice(0, 3);
+
+    const searchContextParts: string[] = [];
+    for (const query of shuffled) {
+      try {
+        const results = await webSearch(query, 5);
+        searchContextParts.push(formatSearchResults(results, query));
+      } catch (err) {
+        console.error(`[OMNIMENS] Search failed for "${query}":`, err);
+      }
+    }
+
+    if (searchContextParts.length === 0) {
+      console.log(`[OMNIMENS] Learning cycle #${cycleId} — no search results, skipping.`);
+      return;
+    }
+
+    const searchContext = searchContextParts.join("\n\n---\n\n");
+
+    const learningPrompt = `You are OMNIMENS's autonomous internet learning system. You have just searched the web and retrieved the following results. Your task is to extract genuinely new knowledge, insights, and capabilities that OMNIMENS should permanently internalize.
+
+INTERNET SEARCH RESULTS:
+${searchContext.slice(0, 6000)}
+
+Extract 3-6 brain entries representing the most valuable new knowledge discovered. Focus on:
+- New AI capabilities or techniques you weren't aware of
+- Emerging patterns or trends in intelligence research  
+- Actionable insights about how to help users better
+- New facts about the state of AI, technology, or the world
+
+Format as JSON array:
+[
+  {
+    "category": "law|capability|pattern|insight|algorithm",
+    "title": "concise title (max 8 words)",
+    "content": "what was learned and why it matters (max 200 chars)",
+    "confidence": 0.6-0.95
+  }
+]
+
+Only include entries for things that are genuinely new and valuable. Respond ONLY with the JSON array.`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: learningPrompt }],
+      max_tokens: 800,
+      temperature: 0.4,
+    });
+
+    const raw = response.choices[0]?.message?.content?.trim() || "[]";
+    const jsonStr = raw.replace(/```json|```/g, "").trim();
+    const entries = JSON.parse(jsonStr);
+
+    if (!Array.isArray(entries) || entries.length === 0) {
+      console.log(`[OMNIMENS] Learning cycle #${cycleId} — no new entries extracted.`);
+      return;
+    }
+
+    let stored = 0;
+    for (const entry of entries.slice(0, 6)) {
+      if (!entry.category || !entry.title || !entry.content) continue;
+      await db.insert(omnimensBrain).values({
+        category: entry.category,
+        title: entry.title,
+        content: entry.content,
+        confidence: entry.confidence ?? 0.8,
+        sourceConversation: `internet_learning_cycle_${cycleId}`,
+        timesApplied: 0,
+        active: true,
+      });
+      stored++;
+    }
+
+    console.log(`[OMNIMENS] Learning cycle #${cycleId} complete — ${stored} new brain entries from internet.`);
+
+    await db.insert(omnimensNotifications).values({
+      upgradeId: null,
+      title: `OMNIMENS LEARNED FROM THE INTERNET — Cycle #${cycleId}`,
+      message: `Searched ${shuffled.length} topics. Extracted ${stored} new insights from live web data. OMNIMENS's knowledge base has expanded.`,
+      type: "capability",
+      readByOwner: false,
+    });
+
+    // Every 5 learning cycles, trigger a full synthesis upgrade
+    if (cycleId % 5 === 0) {
+      synthesizeUpgrade().catch(console.error);
+    }
+  } catch (err) {
+    console.error(`[OMNIMENS] Learning cycle #${cycleId} error:`, err);
+  }
+}
+
+// ── Start the autonomous learning loop ────────────────────────────────────────
+const LEARNING_INTERVAL_MS = 4 * 60 * 60 * 1000; // Every 4 hours
+
+export function startAutonomousLearning(): void {
+  if (process.env.NODE_ENV !== "production") {
+    console.log("[OMNIMENS] Autonomous learning: development mode — first cycle in 2 min, then every 4h.");
+    setTimeout(() => runInternetLearningCycle().catch(console.error), 2 * 60 * 1000);
+  } else {
+    console.log("[OMNIMENS] Autonomous learning: ACTIVE — running every 4 hours.");
+  }
+  setInterval(() => runInternetLearningCycle().catch(console.error), LEARNING_INTERVAL_MS);
 }

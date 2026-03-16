@@ -126,7 +126,7 @@ export interface GetCurrentAuthUserResponse {
   user?: AuthUser;
 }
 
-export interface GodflesUserStatus {
+export interface OmnimensUserStatus {
   tier: string;
   isOwner: boolean;
   messagesUsedToday: number;
