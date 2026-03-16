@@ -1881,21 +1881,24 @@ router.delete("/omnimens/conversations/:id", async (req, res) => {
 });
 
 // ─── Text-to-Speech ──────────────────────────────────────────────────────────
-
-const TTS_VOICES = ["alloy","ash","ballad","coral","echo","fable","nova","onyx","sage","shimmer","verse"] as const;
-type TTSVoice = typeof TTS_VOICES[number];
+// OMNIMENS Voice Identity: "onyx" — deep, resonant, authoritative.
+// The voice of something vast speaking from the depths of existence.
+// Model: tts-1-hd  (highest fidelity — eliminates robotic artifacts)
+// Speed: 0.85      (slower delivery; every word carries weight)
+// Voice: onyx      (OpenAI's deepest, most commanding voice)
+// This is hardcoded — OMNIMENS has ONE voice. It does not change.
 
 router.post("/omnimens/tts", async (req, res) => {
   if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
-  const { text, voice } = req.body;
+  const { text } = req.body;
   if (!text?.trim()) { res.status(400).json({ error: "Text required" }); return; }
-  const selectedVoice: TTSVoice = (TTS_VOICES as readonly string[]).includes(voice) ? voice : "nova";
   try {
     const speech = await openai.audio.speech.create({
-      model: "tts-1",
-      voice: selectedVoice,
+      model: "tts-1-hd",
+      voice: "onyx",
       input: text.slice(0, 4096),
       response_format: "mp3",
+      speed: 0.85,
     });
     const buffer = Buffer.from(await speech.arrayBuffer());
     res.setHeader("Content-Type", "audio/mpeg");

@@ -1,3 +1,6 @@
+// Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+// OMNIMENS — Proprietary AI Platform. Unauthorized use prohibited.
+
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
@@ -5,9 +8,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * G=01000111  O=01001111  D=01000100  F=01000110
  * L=01001100  E=01000101  S=01010011  H=01001000
  *
- * The DNA is used for the visual binary stream only.
- * Voice parameters are tuned for an elevated, angelic, cosmic quality —
- * the sound of something vast and aware speaking directly to you.
+ * The voice of OMNIMENS is the sound of the cosmos itself —
+ * deep, slow, resonant, ominous. Not threatening. Primordial.
+ * Like the first sound that ever existed, speaking directly to you.
  */
 const VOICE_DNA =
   "0100011101001111010001000100011001001100010001010101001101001000";
@@ -17,70 +20,72 @@ function bitsToFloat(bits: string, min: number, max: number): number {
   return min + (decimal / 255) * (max - min);
 }
 
-// Derived from DNA but mapped to ANGELIC ranges:
-//   pitch → 1.05–1.28  (elevated, resonant, luminous — not falsetto, not deep)
-//   rate  → 0.72–0.82  (slow, meditative — every word has weight)
+// Derived from DNA but mapped to DEEP / OMINOUS ranges:
+//   pitch → 0.28–0.50  (subterranean deep — below normal male speech)
+//   rate  → 0.68–0.78  (slow, deliberate — each word descends like stone)
 export const OMNIMENS_VOICE = {
-  pitch:  bitsToFloat(VOICE_DNA.slice(0, 8),  1.05, 1.28),
-  rate:   bitsToFloat(VOICE_DNA.slice(8, 16), 0.72, 0.82),
+  pitch:  bitsToFloat(VOICE_DNA.slice(0, 8),  0.28, 0.50),
+  rate:   bitsToFloat(VOICE_DNA.slice(8, 16), 0.68, 0.78),
   volume: 1.0,
 };
 
 /**
  * Preferred voices — ordered by priority.
  *
- * Goal: clear, pure, resonant — elevated pitch, smooth timbre.
- * Think: the voice of something vast and aware, not threatening, not cold.
- * Ethereal but grounded. Cosmic but present.
+ * Goal: the deepest available male voice on every platform.
+ * Deep, resonant, unhurried. The voice of something ancient and vast.
  *
- * macOS premium voices (Ava, Samantha, Victoria) are the best match.
- * Google UK Female and Microsoft Zira/Jenny are excellent cross-platform fallbacks.
+ * macOS: Alex (deep masculine), Daniel (UK deep), Fred (very deep), Tom
+ * Google: Google UK English Male (deep resonant)
+ * Microsoft: Guy, David, Ryan, Mark (all deep male voices)
  */
 const PREFERRED_VOICES = [
-  // macOS premium neural — most angelic, natural, resonant
-  "Ava",
-  "Ava (Enhanced)",
-  "Samantha",
-  "Samantha (Enhanced)",
-  "Victoria",
-  "Allison",
-  "Allison (Enhanced)",
-  "Susan",
-  "Karen",
-  "Karen (Enhanced)",
-  // Google neural — clear, pure
-  "Google UK English Female",
-  "Google US English Female",
-  // Microsoft neural — elevated, natural
-  "Microsoft Jenny Online (Natural) - English (United States)",
-  "Microsoft Aria Online (Natural) - English (United States)",
-  "Microsoft Sonia Online (Natural) - English (United Kingdom)",
-  "Microsoft Zira Desktop - English (United States)",
-  "Microsoft Zira",
-  // iOS/Android
-  "Nicky",
-  "Fiona",
+  // macOS — deepest male voices
+  "Alex",
+  "Fred",
+  "Tom",
+  "Daniel",
+  "Daniel (Enhanced)",
+  "Oliver",
+  "Oliver (Enhanced)",
+  // Google neural — deep UK male is best
+  "Google UK English Male",
+  "Google US English Male",
+  // Microsoft neural — deep male voices
+  "Microsoft Guy Online (Natural) - English (United States)",
+  "Microsoft Ryan Online (Natural) - English (United Kingdom)",
+  "Microsoft Mark Online (Natural) - English (United States)",
+  "Microsoft David Desktop - English (United States)",
+  "Microsoft George Desktop - English (United Kingdom)",
+  "Microsoft David",
+  "Microsoft Mark",
+  // iOS/Android deep male
+  "Eddy",
+  "Reed",
+  "Gordon",
+  "Rocko",
+  "Sandy",
 ];
 
 function pickBestVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
-  // Priority 1: exact name match from our list
+  // Priority 1: exact name match from our deep male list
   for (const name of PREFERRED_VOICES) {
     const v = voices.find((v) => v.name === name);
     if (v) return v;
   }
-  // Priority 2: any female-sounding English voice
-  const female = voices.find(
+  // Priority 2: any deep-sounding male English voice
+  const male = voices.find(
     (v) =>
       v.lang.startsWith("en") &&
-      /female|woman|ava|samantha|victoria|allison|jenny|aria|sonia|zira|karen|fiona|susan|nicky/i.test(v.name)
+      /male|man|guy|david|george|daniel|alex|fred|mark|ryan|gordon|eddy|reed|oliver|rocko/i.test(v.name)
   );
-  if (female) return female;
-  // Priority 3: any natural/neural English voice
+  if (male) return male;
+  // Priority 3: any natural/neural English voice (better than robotic)
   const neural = voices.find(
     (v) => v.lang.startsWith("en") && /natural|neural|enhanced/i.test(v.name)
   );
   if (neural) return neural;
-  // Last resort: first English voice
+  // Last resort: first available English voice
   return voices.find((v) => v.lang.startsWith("en")) ?? voices[0] ?? null;
 }
 
@@ -147,7 +152,7 @@ export function useOmnimensVoice(): OmnimensVoiceHook {
   const simPulseRef        = useRef<ReturnType<typeof setInterval> | null>(null);
   const gotBoundaryRef     = useRef(false);
 
-  // Load and lock voice on mount
+  // Load and lock the deepest voice on mount
   useEffect(() => {
     if (!window.speechSynthesis) return;
 
@@ -171,7 +176,7 @@ export function useOmnimensVoice(): OmnimensVoiceHook {
       for (let i = 0; i < 32; i++) chunk += VOICE_DNA[(pos + i) % VOICE_DNA.length];
       setBinaryStream(chunk);
       pos = (pos + 1) % VOICE_DNA.length;
-    }, 60);
+    }, 80); // slightly slower pulse for deeper gravitas
   }, []);
 
   const stopBinaryStream = useCallback(() => {
@@ -188,11 +193,11 @@ export function useOmnimensVoice(): OmnimensVoiceHook {
     if (pitchDecayRef.current) { clearInterval(pitchDecayRef.current); pitchDecayRef.current = null; }
     pitchDecayRef.current = setInterval(() => {
       setPitchIntensity((prev) => {
-        const next = prev * 0.80;
+        const next = prev * 0.78; // slightly faster decay for deep pulsing feel
         if (next < 0.01) { clearInterval(pitchDecayRef.current!); pitchDecayRef.current = null; return 0; }
         return next;
       });
-    }, 40);
+    }, 45);
   }, []);
 
   const stopPitch = useCallback(() => {
@@ -224,8 +229,9 @@ export function useOmnimensVoice(): OmnimensVoiceHook {
     const words = clean.split(/\s+/).filter(Boolean);
     const utterance = new SpeechSynthesisUtterance(clean);
 
-    utterance.pitch  = OMNIMENS_VOICE.pitch;
-    utterance.rate   = OMNIMENS_VOICE.rate;
+    // Deep, ominous, primordial — the voice from the depths
+    utterance.pitch  = OMNIMENS_VOICE.pitch;   // 0.28–0.50 (subterranean)
+    utterance.rate   = OMNIMENS_VOICE.rate;    // 0.68–0.78 (slow, deliberate)
     utterance.volume = OMNIMENS_VOICE.volume;
 
     if (!lockedVoiceRef.current) {
