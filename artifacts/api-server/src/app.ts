@@ -58,6 +58,9 @@ const ALLOWED_ORIGINS = [
   /^https:\/\/.*\.replit\.dev$/,
   /^https:\/\/.*\.alphaunlimitedt\.replit\.app$/,
   /^https:\/\/omnimens\.alphaunlimitedt\.replit\.app$/,
+  // Custom domain
+  /^https?:\/\/omnimens-ai\.com$/,
+  /^https?:\/\/www\.omnimens-ai\.com$/,
 ];
 
 // ── HELMET — Comprehensive HTTP Security Headers ──────────────────────────────

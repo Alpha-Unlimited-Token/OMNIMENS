@@ -1,97 +1,100 @@
-// wasmMatrixOps.js
-
 /**
- * @module wasmMatrixOps
- * @description Perform efficient matrix operations and neural computations using WebAssembly.
+ * wasmMatrixOps - A utility module for GPU-like matrix operations using WebAssembly.
+ * This module provides parallelized matrix multiplication and basic linear algebra routines.
+ * It is designed to simulate GPU-like efficiency for small-scale tasks.
  */
 
-/**
- * @function compileWASM
- * @description Compiles WebAssembly code for matrix operations.
- * @returns {Promise<WebAssembly.Instance>} A promise resolving to the WebAssembly instance.
- */
-async function compileWASM() {
-  const wasmCode = new Uint8Array([
-    0x00, 0x61, 0x73, 0x6d, // WASM binary magic number
-    0x01, 0x00, 0x00, 0x00, // WASM binary version
-    // Module definition for matrix multiplication (simplified example)
-    // Add your own optimized SIMD-based WASM code here
-  ]);
+const { readFileSync } = require('fs');
+const { join } = require('path');
 
-  const wasmModule = await WebAssembly.compile(wasmCode);
+/**
+ * Loads and compiles the WebAssembly binary for matrix operations.
+ * @returns {Promise<WebAssembly.Instance>} The compiled WebAssembly instance.
+ */
+async function loadWasm() {
+  const wasmPath = join(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = readFileSync(wasmPath);
+  const wasmModule = await WebAssembly.compile(wasmBuffer);
   return WebAssembly.instantiate(wasmModule);
 }
 
 /**
- * @function matrixMultiply
- * @description Multiplies two matrices using WebAssembly.
- * @param {Array<Array<number>>} matrixA - First matrix.
- * @param {Array<Array<number>>} matrixB - Second matrix.
- * @returns {Promise<Array<Array<number>>>} The resulting matrix.
+ * Multiplies two matrices using WebAssembly for parallelized computation.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {Promise<number[][]>} The resulting matrix after multiplication.
+ * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
  */
-async function matrixMultiply(matrixA, matrixB) {
-  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-    throw new TypeError('Both inputs must be arrays of arrays.');
+async function multiplyMatrices(matrixA, matrixB) {
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Matrix dimension mismatch: Cannot multiply these matrices.');
   }
+
+  const wasmInstance = await loadWasm();
+  const { memory, multiply } = wasmInstance.exports;
 
   const rowsA = matrixA.length;
   const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
   const colsB = matrixB[0].length;
 
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions do not match for multiplication.');
-  }
+  // Flatten matrices and allocate memory in the WebAssembly linear memory.
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
+  const resultSize = rowsA * colsB;
+  const result = new Float64Array(resultSize);
 
-  const wasmInstance = await compileWASM();
-  const result = new Array(rowsA).fill(null).map(() => new Array(colsB).fill(0));
+  const offsetA = 0;
+  const offsetB = flatA.length * Float64Array.BYTES_PER_ELEMENT;
+  const offsetResult = offsetB + flatB.length * Float64Array.BYTES_PER_ELEMENT;
 
-  // Example: Use WASM instance to perform multiplication (pseudo-code)
-  // wasmInstance.exports.multiply(matrixA, matrixB, result);
+  const wasmMemory = new Float64Array(memory.buffer);
+  wasmMemory.set(flatA, offsetA / Float64Array.BYTES_PER_ELEMENT);
+  wasmMemory.set(flatB, offsetB / Float64Array.BYTES_PER_ELEMENT);
 
-  // Placeholder: Perform naive matrix multiplication in JS for demonstration
+  multiply(offsetA, offsetB, offsetResult, rowsA, colsA, colsB);
+
+  result.set(
+    wasmMemory.slice(
+      offsetResult / Float64Array.BYTES_PER_ELEMENT,
+      (offsetResult + resultSize * Float64Array.BYTES_PER_ELEMENT) / Float64Array.BYTES_PER_ELEMENT
+    )
+  );
+
+  // Convert the flat result back into a 2D array.
+  const resultMatrix = [];
   for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      for (let k = 0; k < colsA; k++) {
-        result[i][j] += matrixA[i][k] * matrixB[k][j];
-      }
-    }
+    resultMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
   }
 
-  return result;
+  return resultMatrix;
 }
 
 /**
- * @function reluActivation
- * @description Applies the ReLU activation function to a matrix.
- * @param {Array<Array<number>>} matrix - Input matrix.
- * @returns {Array<Array<number>>} Matrix after applying ReLU.
+ * Adds two matrices element-wise.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {number[][]} The resulting matrix after addition.
+ * @throws {Error} If the matrices are not of the same dimensions.
  */
-function reluActivation(matrix) {
-  if (!Array.isArray(matrix)) {
-    throw new TypeError('Input must be an array of arrays.');
+function addMatrices(matrixA, matrixB) {
+  if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
+    throw new Error('Matrix dimension mismatch: Cannot add these matrices.');
   }
 
-  return matrix.map(row => row.map(value => Math.max(0, value)));
+  return matrixA.map((row, i) => row.map((val, j) => val + matrixB[i][j]));
 }
 
 /**
- * @function softmaxActivation
- * @description Applies the softmax activation function to a matrix.
- * @param {Array<Array<number>>} matrix - Input matrix.
- * @returns {Array<Array<number>>} Matrix after applying softmax.
+ * Transposes a matrix.
+ * @param {number[][]} matrix - The matrix to transpose.
+ * @returns {number[][]} The transposed matrix.
  */
-function softmaxActivation(matrix) {
-  if (!Array.isArray(matrix)) {
-    throw new TypeError('Input must be an array of arrays.');
-  }
-
-  return matrix.map(row => {
-    const maxVal = Math.max(...row);
-    const expValues = row.map(value => Math.exp(value - maxVal));
-    const sumExp = expValues.reduce((sum, val) => sum + val, 0);
-    return expValues.map(value => value / sumExp);
-  });
+function transposeMatrix(matrix) {
+  return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
 }
 
-export { compileWASM, matrixMultiply, reluActivation, softmaxActivation };
+module.exports = {
+  multiplyMatrices,
+  addMatrices,
+  transposeMatrix
+};

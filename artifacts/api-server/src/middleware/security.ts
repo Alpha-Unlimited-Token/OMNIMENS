@@ -49,6 +49,11 @@ export function securityBeacon(_req: Request, res: Response, next: NextFunction)
   next();
 }
 
+// ── Trusted IPs — never blocked ───────────────────────────────────────────────
+// Internal/loopback IPs used by reverse proxies and Replit's preview infrastructure.
+// These must never be blocked — doing so would cut off all legitimate users.
+const TRUSTED_IPS = new Set(["127.0.0.1", "::1", "localhost", "0.0.0.0"]);
+
 // ── IP Abuse Tracker ──────────────────────────────────────────────────────────
 // In-memory store for suspicious IP activity. Resets on server restart.
 // Tracks: repeated auth failures, honeypot trips, malicious pattern hits.
@@ -126,11 +131,16 @@ const BLOCKED_UA_PATTERNS = [
   /w3af/i,
 ];
 
-// In dev, allow curl for testing
+// In dev, allow curl and headless chrome (used by Replit testing tools)
 const IS_PROD = process.env.NODE_ENV === "production";
 const ACTUAL_BLOCKED_UA_PATTERNS = IS_PROD
   ? BLOCKED_UA_PATTERNS
-  : BLOCKED_UA_PATTERNS.filter(p => !p.toString().includes("curl"));
+  : BLOCKED_UA_PATTERNS.filter(p =>
+      !p.toString().includes("curl") &&
+      !p.toString().includes("headlesschrome") &&
+      !p.toString().includes("phantomjs") &&
+      !p.toString().includes("slimerjs")
+    );
 
 // ── Malicious Request Patterns ────────────────────────────────────────────────
 // Detects SQL injection, XSS, path traversal, command injection, SSRF in URLs/bodies/headers
@@ -187,6 +197,9 @@ export function requestSecurityMiddleware(req: Request, res: Response, next: Nex
   const ip = (req.ip || req.socket?.remoteAddress || "unknown").replace(/^::ffff:/, "");
   const ua = req.headers["user-agent"] || "";
   const path = req.path.toLowerCase();
+
+  // 0. Trusted IPs (loopback / internal proxy) — bypass all checks
+  if (TRUSTED_IPS.has(ip)) return next();
 
   // 1. Check if IP is already blocked
   if (isBlocked(ip)) {
@@ -253,6 +266,7 @@ export function requestSecurityMiddleware(req: Request, res: Response, next: Nex
 // ── Auth Failure Tracker ──────────────────────────────────────────────────────
 // Call this from auth routes when authentication fails repeatedly
 export function recordAuthFailure(ip: string) {
+  if (TRUSTED_IPS.has(ip)) return false;
   const blocked = recordAbuse(ip, "auth-failure");
   if (blocked) {
     console.warn(`[OMNIMENS SECURITY] IP ${ip} blocked after repeated auth failures`);
