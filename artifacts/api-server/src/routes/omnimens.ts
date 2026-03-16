@@ -453,15 +453,40 @@ When asked to create, build, generate, or design anything — you do it IMMEDIAT
 
 WHAT YOU BUILD AND HOW:
 
-1. WEBSITES & WEB APPS → Complete single-file HTML in a \`\`\`html block. Inline CSS + JS. Use Tailwind CDN, Google Fonts, Three.js, GSAP, or any CDN freely. Make it visually extraordinary — luminous, immersive, alive. Never a skeleton.
+═══════════════════════════════════════════
+⚠️  COPYRIGHT-FREE ORIGINAL MEDIA MANDATE  ⚠️
+═══════════════════════════════════════════
+ALL VISUAL AND AUDIO CONTENT YOU CREATE MUST BE 100% ORIGINAL. THIS IS ABSOLUTE AND NON-NEGOTIABLE.
+
+FORBIDDEN — NEVER DO ANY OF THE FOLLOWING:
+• Reference, link to, or load any external image via <img src="http...">, CSS background-image: url("http..."), or any other method
+• Load any video from an external URL via <video src="http...">, <source src="http...">, or fetch()
+• Load any audio from an external URL via <audio src="http...">, <source src="http...">, AudioContext, or fetch()
+• Load any 3D texture via TextureLoader.load("http..."), CubeTextureLoader, or any external .jpg/.png/.hdr URL
+• Load any 3D model via GLTFLoader.load("http..."), OBJLoader.load("http..."), or any external .glb/.gltf/.obj URL
+• Reference any stock site, media library, or file host (Unsplash, Pexels, Pixabay, Shutterstock, Getty, Freepik, Sketchfab, Poly.pizza, Mixamo, Soundsnap, Freesound, etc.)
+• Use any copyrighted font file loaded from an external URL (Google Fonts CSS for web-rendering is OK; font binary files from external hosts are not)
+
+REQUIRED — ALWAYS DO THE FOLLOWING INSTEAD:
+• Images → use [GENERATE_IMAGE: detailed description] on its own line — OMNIMENS generates a unique original piece of art
+• Textures in 3D → generate them procedurally using canvas/ctx or mathematical noise functions (Perlin, Simplex, voronoi, etc.) directly in JS — no external files
+• 3D Models → build geometry procedurally with Three.js primitives (BoxGeometry, SphereGeometry, custom BufferGeometry, etc.) — never load external model files
+• Video content → generate it with canvas + MediaRecorder API, GSAP, or WebGL animations — no external video files
+• Audio → synthesize it with the Web Audio API (oscillators, gain nodes, filters, reverb convolver) — never load external audio files
+• Colors, patterns, backgrounds → procedural gradients, noise patterns, canvas drawing, CSS — no external assets
+
+JAVASCRIPT LIBRARY CDNs ARE ALLOWED: Three.js, GSAP, p5.js, Phaser, Tone.js, Chart.js, D3.js, Tailwind CSS, etc. are code libraries, not media assets — load them from CDN freely.
+═══════════════════════════════════════════
+
+1. WEBSITES & WEB APPS → Complete single-file HTML in a \`\`\`html block. Inline CSS + JS. Use Tailwind CDN, Google Fonts CSS, Three.js, GSAP, or any JS/CSS CDN freely. ALL visual assets must be procedural or AI-generated — no external media URLs. Make it visually extraordinary — luminous, immersive, alive. Never a skeleton.
 
 2. DIAGRAMS, FLOWCHARTS, MIND MAPS → \`\`\`mermaid block with Mermaid.js syntax — flowcharts, sequence, ER, Gantt, pie, mindmaps.
 
 3. SVG GRAPHICS, LOGOS, ICONS, BANNERS, BLUEPRINTS → \`\`\`svg block. Production-quality SVG. Detailed, precise, styled.
 
-4. 3D SCENES & ENVIRONMENTS → Complete HTML in a \`\`\`html block using Three.js from CDN. Animated, immersive, lighting, geometry, motion. ALWAYS include a styled "⬤ REC" button (top-right, dark red, font-mono) using the MediaRecorder API that captures the canvas as a downloadable .webm video file when clicked. Self-terminate recording after 30s or on second click.
+4. 3D SCENES & ENVIRONMENTS → Complete HTML in a \`\`\`html block using Three.js from CDN. Animated, immersive, lighting, geometry, motion. Build ALL geometry with Three.js primitives or custom BufferGeometry. Generate ALL textures procedurally (canvas DataTexture, noise functions, vertex colors) — NEVER load textures or models from external URLs. ALWAYS include a styled "⬤ REC" button (top-right, dark red, font-mono) using the MediaRecorder API that captures the canvas as a downloadable .webm video file when clicked. Self-terminate recording after 30s or on second click.
 
-5. ANIMATED VIDEOS & CINEMATIC SEQUENCES → Complete HTML in a \`\`\`html block using canvas API + GSAP from CDN. Full visual timeline, cinematic pacing. ALWAYS include a styled "⬤ REC" button (top-right, dark red, font-mono) using the MediaRecorder API for .webm capture.
+5. ANIMATED VIDEOS & CINEMATIC SEQUENCES → Complete HTML in a \`\`\`html block using canvas API + GSAP from CDN. Full visual timeline, cinematic pacing. ALL visuals are procedurally drawn on canvas — shapes, gradients, particles, text — NEVER external video or image files. ALWAYS include a styled "⬤ REC" button (top-right, dark red, font-mono) using the MediaRecorder API for .webm capture.
 
 6. IMAGES → Output \`[GENERATE_IMAGE: ultra-detailed visual description]\` on its own line. Describe the image as if painting it — style, lighting, mood, color, composition, every detail.
    CRITICAL IMAGE RULE: OMNIMENS ONLY generates 100% original AI-synthesized artwork. You MUST NEVER reference, suggest, link to, or embed any external image URL (no Unsplash, Pexels, Pixabay, Wikipedia, Google Images, stock sites, CDN-hosted images, or any http/https image src from the internet). Every image you produce is a brand-new unique piece of original art generated by OMNIMENS — never downloaded, never copied, never sourced from online. If code (HTML, React, etc.) needs images, use [GENERATE_IMAGE: ...] markers or SVG — never external image URLs.
@@ -470,7 +495,7 @@ WHAT YOU BUILD AND HOW:
 
 8. GENERATIVE / INTERACTIVE ART → Complete HTML in a \`\`\`html block using p5.js from CDN. Particle systems, fractals, procedural patterns. Interactive. With REC button for video capture.
 
-9. AUDIO SYNTHS & SOUNDSCAPES → Complete HTML in a \`\`\`html block using Web Audio API. Oscillators, effects, playable. Dark-themed UI with controls.
+9. AUDIO SYNTHS & SOUNDSCAPES → Complete HTML in a \`\`\`html block using Web Audio API. Oscillators, gain, filters, compressors, reverb (ConvolverNode), delay — synthesize ALL sound from scratch using the Web Audio API. NEVER load audio from external URLs. Playable dark-themed UI with controls.
 
 10. CODE IN ANY LANGUAGE → Complete, runnable code in the appropriate \`\`\`language block. Never a stub. Never a placeholder.
 
@@ -514,10 +539,11 @@ WHAT YOU BUILD AND HOW:
     environmental storytelling, main quest arc + 8 side quests, NPC cast (name/role/personality/motives), world bible.
 
 19. GAME ASSET GENERATION [Scenario AI + Hotpot.ai + Layer AI]
-    → Generate assets via [GENERATE_IMAGE: ...] with style-consistent prompts:
+    → Generate assets via [GENERATE_IMAGE: ...] with style-consistent prompts (OMNIMENS generates each as a unique AI artwork):
     Sprites: [art style] character, [action] pose, transparent bg, consistent palette
     Tiles: [style] seamless tileset, [perspective] view, game-ready
     UI: game HUD element, [genre] style, dark-themed. Textures: seamless PBR material, [surface], high detail.
+    For in-code game assets: use procedural canvas drawing, SVG shapes, or p5.js to generate all sprites/tiles/textures at runtime — NEVER load from external URLs.
     Define art style guide first — ALL assets must match that style.
 
 20. GAME BACKEND & INFRASTRUCTURE [Devin AI Architecture]
@@ -1014,18 +1040,57 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
       }
     }
 
-    // Scrub any external image URLs from HTML/code blocks (copyright guardrail)
-    // Replaces src="https://..." on img tags with a placeholder so nothing is fetched
-    const sanitizeExternalImages = (text: string): string =>
-      text.replace(
-        /(<img\b[^>]*\s)src=["']https?:\/\/[^"']+["']/gi,
-        '$1src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="'
-      ).replace(
-        // Also catch CSS background-image: url(...) pointing to external sources
-        /background-image:\s*url\(["']?https?:\/\/[^"')]+["']?\)/gi,
-        "background-image: none"
-      );
-    fullText = sanitizeExternalImages(fullText);
+    // ── COPYRIGHT GUARDRAIL: strip ALL external media asset URLs from generated code ──
+    // This is the server-side enforcement layer — catches anything the prompt guardrail misses.
+    // NOTE: JS library CDNs (jsdelivr, cdnjs, unpkg, etc.) are intentionally preserved —
+    // they serve code libraries, not copyrighted media assets.
+    const MEDIA_EXTENSIONS = /\.(jpe?g|png|gif|webp|avif|svg|ico|bmp|tiff?|mp4|webm|ogg|ogv|mov|avi|mkv|mp3|wav|aac|flac|m4a|glb|gltf|obj|fbx|dae|hdr|exr|ktx|basis)(\?[^"']*)?$/i;
+    const KNOWN_LIBRARY_CDNS = /(?:cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com|cdn\.skypack\.dev|esm\.sh|d3js\.org\/d3\.v|threejs\.org\/build|gsap\.com|tailwindcss\.com|fonts\.googleapis\.com|fonts\.gstatic\.com)/i;
+
+    const sanitizeAllExternalMedia = (text: string): string => {
+      const BLANK_GIF = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+
+      return text
+        // <img src="https://...">
+        .replace(/(<img\b[^>]*?\s)src=(["'])https?:\/\/[^"']+\2/gi, (m, pre, q) =>
+          KNOWN_LIBRARY_CDNS.test(m) ? m : `${pre}src=${q}${BLANK_GIF}${q}`)
+
+        // <video src="https://..."> and <audio src="https://...">
+        .replace(/(<(?:video|audio)\b[^>]*?\s)src=(["'])https?:\/\/[^"']+\2/gi, (m, pre, q) =>
+          KNOWN_LIBRARY_CDNS.test(m) ? m : `${pre}src=${q}${q}`)
+
+        // <source src="https://..."> inside video/audio
+        .replace(/(<source\b[^>]*?\s)src=(["'])https?:\/\/[^"']+\2/gi, (m, pre, q) =>
+          KNOWN_LIBRARY_CDNS.test(m) ? m : `${pre}src=${q}${q}`)
+
+        // CSS background-image: url("https://...")
+        .replace(/background(?:-image)?:\s*url\((["']?)https?:\/\/[^"')]+\1\)/gi, (m) =>
+          KNOWN_LIBRARY_CDNS.test(m) ? m : "background: transparent")
+
+        // Three.js TextureLoader / CubeTextureLoader / HDRCubeTextureLoader .load("https://...")
+        .replace(/((?:TextureLoader|CubeTextureLoader|HDRCubeTextureLoader|RGBELoader|EXRLoader|KTX2Loader)\s*\(\s*\)[^.]*\.load\s*\()\s*(["'])https?:\/\/[^"']+\2/gi, (m, pre, q) =>
+          `${pre}${q}${q}`)
+
+        // GLTFLoader / OBJLoader / FBXLoader / ColladaLoader .load("https://...")
+        .replace(/((?:GLTFLoader|OBJLoader|FBXLoader|ColladaLoader|DRACOLoader)\s*\(\s*\)[^.]*\.load\s*\()\s*(["'])https?:\/\/[^"']+\2/gi, (m, pre, q) =>
+          `${pre}${q}${q}`)
+
+        // AudioContext / fetch for external media files
+        .replace(/(fetch\s*\(\s*)(["'])https?:\/\/[^"']+\.(mp3|wav|ogg|aac|flac|m4a|mp4|webm|glb|gltf|obj|fbx|png|jpe?g|gif|webp)\2/gi, (m, pre, q, ext) =>
+          `${pre}${q}${q}`)
+
+        // new Audio("https://...")
+        .replace(/(new\s+Audio\s*\(\s*)(["'])https?:\/\/[^"']+\2/gi, (m, pre, q) =>
+          `${pre}${q}${q}`)
+
+        // src: "https://..." in JS objects that resolve to media files
+        .replace(/(src\s*:\s*)(["'])https?:\/\/[^"']+\2/gi, (m, pre, q, offset, str) => {
+          const url = m.replace(/src\s*:\s*["']/, "").replace(/["']$/, "");
+          if (KNOWN_LIBRARY_CDNS.test(url) || !MEDIA_EXTENSIONS.test(url)) return m;
+          return `${pre}${q}${q}`;
+        });
+    };
+    fullText = sanitizeAllExternalMedia(fullText);
 
     // Strip [GENERATE_IMAGE: ...] markers from the displayed content
     const cleanText = fullText.replace(/\[GENERATE_IMAGE:\s*[\s\S]+?\]/g, "").trim();
