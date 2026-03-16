@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
 import { Button } from "./ui/button";
-import { User, Layers } from "lucide-react";
+import { User, Layers, Atom } from "lucide-react";
 import { OmnimensIcon } from "./omnimens-icon";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -43,6 +43,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Link href="/projects" className="flex items-center gap-1.5 text-sm font-mono text-white hover:text-white transition-colors hidden sm:flex tracking-widest">
                   <Layers className="w-3.5 h-3.5" />
                   PROJECTS
+                </Link>
+                <Link href="/entity" className="flex items-center gap-1.5 text-sm font-mono text-cyan-400/80 hover:text-cyan-300 transition-colors hidden sm:flex tracking-widest">
+                  <Atom className="w-3.5 h-3.5" />
+                  ENTITY
                 </Link>
                 <Link href="/chat" className="text-sm font-mono text-primary hover:text-primary/80 transition-colors hidden sm:block tracking-widest">
                   CHAT
