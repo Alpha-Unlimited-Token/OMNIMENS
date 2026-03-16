@@ -2282,6 +2282,65 @@ function ModelSelector({ value, onChange }: { value: string; onChange: (m: strin
   );
 }
 
+// ── NEUROSYNC™ Emotion Badge ─────────────────────────────────────────────────
+// Shows detected user emotional state on each AI response
+const NEURO_EMOTION_CONFIG: Record<string, { color: string; bg: string; border: string; icon: string; label: string }> = {
+  FRUSTRATED:   { color: "text-red-400",    bg: "bg-red-400/10",    border: "border-red-400/25",    icon: "⚡", label: "FRUSTRATED"   },
+  CONFUSED:     { color: "text-yellow-400", bg: "bg-yellow-400/10", border: "border-yellow-400/25", icon: "◈",  label: "CONFUSED"     },
+  EXCITED:      { color: "text-emerald-400",bg: "bg-emerald-400/10",border: "border-emerald-400/25",icon: "✦",  label: "EXCITED"      },
+  ANXIOUS:      { color: "text-orange-400", bg: "bg-orange-400/10", border: "border-orange-400/25", icon: "◇",  label: "ANXIOUS"      },
+  URGENT:       { color: "text-rose-400",   bg: "bg-rose-400/10",   border: "border-rose-400/25",   icon: "▲",  label: "URGENT"       },
+  DISCOURAGED:  { color: "text-blue-400",   bg: "bg-blue-400/10",   border: "border-blue-400/25",   icon: "◉",  label: "DISCOURAGED"  },
+  FOCUSED:      { color: "text-sky-400",    bg: "bg-sky-400/10",    border: "border-sky-400/25",    icon: "◎",  label: "FOCUSED"      },
+};
+
+function NeuroEmotionBadge({ emotion, intensity }: { emotion: string; intensity: string }) {
+  const cfg = NEURO_EMOTION_CONFIG[emotion];
+  if (!cfg) return null;
+  return (
+    <span
+      title={`NEUROSYNC™ detected: ${emotion} (${intensity}) — response adapted for your state`}
+      className={`inline-flex items-center gap-0.5 text-[7px] font-mono px-1.5 py-0.5 rounded-full border ${cfg.color} ${cfg.bg} ${cfg.border} tracking-widest`}
+    >
+      {cfg.icon} {cfg.label}
+    </span>
+  );
+}
+
+// ── Tone Selector ─────────────────────────────────────────────────────────────
+// In-chat real-time tone mode switcher — no competitor has this
+const TONE_MODES = [
+  { id: "AUTO",        label: "AUTO",        title: "Let OMNIMENS decide the best tone" },
+  { id: "CASUAL",      label: "CASUAL",      title: "Friendly and conversational" },
+  { id: "PRECISE",     label: "PRECISE",     title: "Technically exact, no filler" },
+  { id: "SOCRATIC",    label: "SOCRATIC",    title: "Guide through questions" },
+  { id: "MOTIVATIONAL",label: "MOTIVATE",    title: "High-energy coaching" },
+  { id: "DIRECT",      label: "DIRECT",      title: "Zero preamble, just the answer" },
+];
+
+function ToneSelector({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="shrink-0 px-3 py-1.5 bg-black/20 border-t border-white/5 flex items-center gap-1.5 overflow-x-auto omnimens-scrollbar">
+      <span className="text-[8px] font-mono text-white/20 tracking-widest shrink-0">TONE</span>
+      {TONE_MODES.map(m => (
+        <button
+          key={m.id}
+          type="button"
+          title={m.title}
+          onClick={() => onChange(m.id)}
+          className={`shrink-0 text-[8px] font-mono tracking-widest px-2 py-0.5 rounded-full border transition-all duration-150 ${
+            value === m.id
+              ? "bg-primary/20 border-primary/50 text-primary"
+              : "bg-transparent border-white/10 text-white/30 hover:text-white/60 hover:border-white/20"
+          }`}
+        >
+          {m.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 // ── Main Chat component ────────────────────────────────────────────────────────
 
 export default function Chat() {
@@ -2366,6 +2425,8 @@ export default function Chat() {
   const voice = useOmnimensVoice();
   const [persona, setPersona] = useState("GENERAL");
   const [selectedModel, setSelectedModel] = useState("gpt-4o");
+  const [responseMode, setResponseMode] = useState("AUTO");
+  const [sessionStart] = useState(() => Date.now());
   const [deepResearchMode, setDeepResearchMode] = useState(false);
   const [showAvatarStudio, setShowAvatarStudio] = useState(false);
   const [researchQuestion, setResearchQuestion] = useState("");
@@ -2495,7 +2556,7 @@ export default function Chat() {
       setShowLimitModal(true);
       return;
     }
-    sendMessage(input, pendingFiles, persona, hubSettings, selectedModel);
+    sendMessage(input, pendingFiles, persona, hubSettings, selectedModel, responseMode, sessionStart);
     setInput("");
     setPendingFiles([]);
   };
@@ -2703,11 +2764,14 @@ export default function Chat() {
                         }`}>
                           {msg.role === "omnimens" && (
                             <div className="flex items-center justify-between gap-1 mb-2">
-                              <div className="flex items-center gap-1 text-primary font-bold text-[10px] tracking-widest uppercase">
+                              <div className="flex items-center gap-1 text-primary font-bold text-[10px] tracking-widest uppercase flex-wrap">
                                 <OmnimensIcon size={14} className="shrink-0" />
                                 <span>OMNIMENS</span>
                                 {msg.model && msg.model !== "gpt-4o" && (
                                   <span className="text-[8px] text-white/30 font-mono normal-case tracking-normal ml-1 border border-white/10 px-1 rounded">{msg.model}</span>
+                                )}
+                                {msg.neuroEmotion && msg.neuroEmotion !== "NEUTRAL" && (
+                                  <NeuroEmotionBadge emotion={msg.neuroEmotion} intensity={msg.neuroIntensity || "low"} />
                                 )}
                                 <VoiceIndicator isSpeaking={isSpeakingThis} binaryStream={voice.binaryStream} />
                               </div>
@@ -2826,6 +2890,21 @@ export default function Chat() {
                               {msg.creditCost != null && !msg.generatingImages && (
                                 <CreditCostBadge creditCost={msg.creditCost} costBreakdown={msg.costBreakdown} />
                               )}
+
+                              {/* Smart Predictive Follow-Ups — contextual suggestion chips */}
+                              {msg.suggestions && msg.suggestions.length > 0 && (
+                                <div className="mt-3 flex flex-wrap gap-1.5">
+                                  {msg.suggestions.map((s, si) => (
+                                    <button
+                                      key={si}
+                                      onClick={() => { setInput(s); }}
+                                      className="text-[10px] font-mono text-white/60 hover:text-white/90 border border-white/10 hover:border-primary/40 bg-white/3 hover:bg-primary/8 rounded-full px-2.5 py-1 transition-all duration-200 text-left"
+                                    >
+                                      {s}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
@@ -2892,6 +2971,9 @@ export default function Chat() {
               </div>
             </div>
           )}
+
+          {/* Tone Selector */}
+          <ToneSelector value={responseMode} onChange={setResponseMode} />
 
           {/* Input area */}
           <form onSubmit={handleSubmit} className="shrink-0 border-t border-white/8 bg-black/40 p-3">

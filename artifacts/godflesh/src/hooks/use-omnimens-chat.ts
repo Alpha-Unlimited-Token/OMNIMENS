@@ -143,6 +143,9 @@ export type Message = {
   redFlagAlert?: RedFlagAlert;
   toolResults?: ToolResult[];
   cogniSync?: CogniSyncState;
+  neuroEmotion?: string;
+  neuroIntensity?: string;
+  suggestions?: string[];
 };
 
 export type AttachedFile = {
@@ -186,7 +189,7 @@ export function useOmnimensChat(
     setMessages(mapped);
   };
 
-  const sendMessage = async (content: string, files: File[] = [], persona = "GENERAL", hubSettings?: any, model = "gpt-4o") => {
+  const sendMessage = async (content: string, files: File[] = [], persona = "GENERAL", hubSettings?: any, model = "gpt-4o", responseMode = "AUTO", sessionStart?: number) => {
     if (!content.trim() && files.length === 0) return;
     if (isTyping) return;
 
@@ -256,6 +259,8 @@ export function useOmnimensChat(
       if (hubSettings) {
         form.append("hubSettings", JSON.stringify(hubSettings));
       }
+      form.append("responseMode", responseMode);
+      if (sessionStart) form.append("sessionStart", String(sessionStart));
       for (const file of files) {
         form.append("files", file);
       }
@@ -536,6 +541,25 @@ export function useOmnimensChat(
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
                   if (msg) msg.cogniSync = cs;
+                  return newMsgs;
+                });
+
+              } else if (data.type === "neuro_state") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    msg.neuroEmotion = data.emotion;
+                    msg.neuroIntensity = data.intensity;
+                  }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "suggestions") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) msg.suggestions = data.suggestions;
                   return newMsgs;
                 });
 
