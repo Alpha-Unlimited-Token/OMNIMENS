@@ -8,6 +8,17 @@ export type GeneratedImage = {
   index: number;
 };
 
+export type Generated3DModel = {
+  glbBase64: string;
+  glbSizeBytes: number;
+  threejsHtml: string;
+  vertexCount: number;
+  faceCount: number;
+  prompt: string;
+  index: number;
+  toolUsed?: "blender" | "openscad" | "trimesh";
+};
+
 export type Artifact = {
   artifactType: "html" | "svg" | "image" | "zip";
   filename: string;
@@ -43,6 +54,8 @@ export type Message = {
   files?: AttachedFile[];
   images?: GeneratedImage[];
   generatingImages?: boolean;
+  models3d?: Generated3DModel[];
+  generating3d?: boolean;
   artifacts?: Artifact[];
   searchingWeb?: boolean;
   webSearchQuery?: string;
@@ -291,6 +304,42 @@ export function useOmnimensChat(onLimitReached: () => void) {
                   return newMsgs;
                 });
 
+              } else if (data.type === "3d_generating") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) msg.generating3d = true;
+                  return newMsgs;
+                });
+
+              } else if (data.type === "3d_generated") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    msg.models3d = [...(msg.models3d || []), {
+                      glbBase64: data.glbBase64,
+                      glbSizeBytes: data.glbSizeBytes,
+                      threejsHtml: data.threejsHtml,
+                      vertexCount: data.vertexCount,
+                      faceCount: data.faceCount,
+                      prompt: data.prompt,
+                      index: data.index,
+                      toolUsed: data.toolUsed,
+                    }];
+                    msg.generating3d = false;
+                  }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "3d_error") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) msg.generating3d = false;
+                  return newMsgs;
+                });
+
               } else if (data.type === "red_flag_alert") {
                 setMessages((prev) => {
                   const newMsgs = [...prev];
@@ -329,6 +378,7 @@ export function useOmnimensChat(onLimitReached: () => void) {
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
                   if (msg) {
                     msg.generatingImages = false;
+                    msg.generating3d = false;
                     if (data.creditCost)     msg.creditCost    = data.creditCost;
                     if (data.costBreakdown)  msg.costBreakdown = data.costBreakdown;
                   }

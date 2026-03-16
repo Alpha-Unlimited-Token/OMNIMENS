@@ -4,7 +4,7 @@ import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { useQuery, useQueryClient as useQC } from "@tanstack/react-query";
-import { useOmnimensChat, type GeneratedImage, type Artifact, type CostBreakdown, type TaskPlan, type RedFlagAlert } from "@/hooks/use-omnimens-chat";
+import { useOmnimensChat, type GeneratedImage, type Generated3DModel, type Artifact, type CostBreakdown, type TaskPlan, type RedFlagAlert } from "@/hooks/use-omnimens-chat";
 import { useOmnimensVoice } from "@/hooks/use-omnimens-voice";
 import { VoiceIndicator } from "@/components/voice-indicator";
 import { OmnimensPresence } from "@/components/omnimens-presence";
@@ -59,6 +59,30 @@ function ImageGeneratingBadge() {
       </div>
       {elapsed > 15 && (
         <p className="text-white text-[10px]">Neural image synthesis in progress — typically 20–60 seconds.</p>
+      )}
+    </div>
+  );
+}
+
+function Model3DGeneratingBadge() {
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setElapsed((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const pct = Math.min(95, (elapsed / 75) * 100);
+  return (
+    <div className="mt-4 border border-cyan-500/20 rounded-xl px-4 py-3 bg-cyan-950/20 font-mono text-xs space-y-2">
+      <div className="flex items-center gap-3 text-white/70">
+        <Loader2 className="w-4 h-4 animate-spin text-cyan-400 shrink-0" />
+        <span className="tracking-widest text-cyan-300">SCULPTING 3D MODEL...</span>
+        <span className="ml-auto text-cyan-400/70">{elapsed}s</span>
+      </div>
+      <div className="w-full h-0.5 bg-white/10 rounded-full overflow-hidden">
+        <div className="h-full bg-cyan-400/60 transition-all duration-1000" style={{ width: `${pct}%` }} />
+      </div>
+      {elapsed > 20 && (
+        <p className="text-white/50 text-[10px]">Python 3D pipeline running — trimesh mesh synthesis typically 30–90 seconds.</p>
       )}
     </div>
   );
@@ -1107,6 +1131,16 @@ export default function Chat() {
                                 />
                               )}
                               {msg.generatingImages && <ImageGeneratingBadge />}
+                              {msg.generating3d && <Model3DGeneratingBadge />}
+
+                              {/* Generated 3D models — interactive Three.js PBR viewer */}
+                              {msg.models3d && msg.models3d.length > 0 && (
+                                <div className="mt-4 space-y-4">
+                                  {msg.models3d.map((model) => (
+                                    <Model3DCard key={model.index} model={model} />
+                                  ))}
+                                </div>
+                              )}
 
                               {/* Downloadable artifacts */}
                               {msg.artifacts && msg.artifacts.length > 0 && (
@@ -1394,6 +1428,144 @@ function InlineImageCard({ image }: { image: GeneratedImage }) {
                 CLOSE
               </button>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
+// ── 3D Model viewer card ──────────────────────────────────────────────────────
+
+function Model3DCard({ model }: { model: Generated3DModel }) {
+  const [expanded, setExpanded] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const blobUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (model.threejsHtml) {
+      const blob = new Blob([model.threejsHtml], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      blobUrlRef.current = url;
+      if (iframeRef.current) iframeRef.current.src = url;
+    }
+    return () => { if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current); };
+  }, [model.threejsHtml]);
+
+  const handleDownloadGlb = () => {
+    const a = document.createElement("a");
+    a.href = `data:model/gltf-binary;base64,${model.glbBase64}`;
+    a.download = `omnimens-3d-${model.index + 1}.glb`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const toolLabel = model.toolUsed === "blender" ? "⬡ BLENDER 4.4"
+    : model.toolUsed === "openscad" ? "⬡ OPENSCAD"
+    : "⬡ TRIMESH";
+  const toolColor = model.toolUsed === "blender" ? "text-orange-400"
+    : model.toolUsed === "openscad" ? "text-yellow-400"
+    : "text-cyan-400";
+
+  return (
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="rounded-xl overflow-hidden border border-cyan-500/25 bg-black/60 shadow-[0_0_30px_rgba(0,200,255,0.10)]"
+      >
+        {/* Compact preview (320px tall) */}
+        <div
+          className="relative cursor-pointer group"
+          style={{ height: 320 }}
+          onClick={() => setExpanded(true)}
+        >
+          <iframe
+            ref={iframeRef}
+            className="w-full h-full border-0 rounded-t-xl pointer-events-none"
+            sandbox="allow-scripts"
+            title="3D model preview"
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <div className="bg-black/70 px-4 py-2 rounded-xl font-mono text-xs text-cyan-300 tracking-widest border border-cyan-500/30">
+              EXPAND 3D VIEW
+            </div>
+          </div>
+        </div>
+
+        {/* Info bar */}
+        <div className="flex items-center justify-between px-4 py-3 border-t border-white/8 bg-black/40">
+          <div className="flex-1 min-w-0 pr-4">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className={`font-mono text-[9px] tracking-widest ${toolColor}`}>{toolLabel}</span>
+              <span className="text-white/25 text-[9px]">·</span>
+              <span className="font-mono text-[9px] text-white/40 tracking-widest">
+                {model.vertexCount.toLocaleString()}V / {model.faceCount.toLocaleString()}F / {(model.glbSizeBytes / 1024).toFixed(0)}KB
+              </span>
+            </div>
+            <p className="font-mono text-[10px] text-white/60 truncate">
+              {model.prompt.slice(0, 80)}{model.prompt.length > 80 ? "…" : ""}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => setExpanded(true)}
+              className="flex items-center gap-1.5 text-[10px] font-mono text-white/60 hover:text-white border border-white/10 hover:border-white/25 px-3 py-1.5 rounded-lg transition-all"
+            >
+              <Expand className="w-3 h-3" />
+              3D
+            </button>
+            <button
+              onClick={handleDownloadGlb}
+              className="flex items-center gap-1.5 text-[10px] font-mono text-cyan-400 hover:text-white bg-cyan-500/10 hover:bg-cyan-500/25 border border-cyan-500/25 hover:border-cyan-500/50 px-3 py-1.5 rounded-lg transition-all"
+            >
+              <Download className="w-3 h-3" />
+              .GLB
+            </button>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Fullscreen 3D viewer */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] bg-black/98 backdrop-blur-md flex flex-col"
+          >
+            <div className="flex items-center justify-between px-6 py-3 border-b border-white/8 shrink-0">
+              <div>
+                <span className={`font-mono text-xs tracking-widest ${toolColor}`}>{toolLabel}</span>
+                <span className="text-white/25 mx-2">·</span>
+                <span className="font-mono text-[10px] text-white/50">{model.vertexCount.toLocaleString()} verts · {model.faceCount.toLocaleString()} faces</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleDownloadGlb}
+                  className="flex items-center gap-2 bg-cyan-500/15 hover:bg-cyan-500/30 border border-cyan-500/30 text-cyan-300 font-mono text-xs tracking-widest px-4 py-2 rounded-xl transition-all"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  DOWNLOAD .GLB
+                </button>
+                <button
+                  onClick={() => setExpanded(false)}
+                  className="text-white/50 hover:text-white font-mono text-xs tracking-widest px-4 py-2 rounded-xl border border-white/10 hover:border-white/20 transition-all"
+                >
+                  CLOSE
+                </button>
+              </div>
+            </div>
+            <iframe
+              src={blobUrlRef.current || ""}
+              className="flex-1 border-0"
+              sandbox="allow-scripts"
+              title="3D model fullscreen"
+              allow="accelerometer; fullscreen"
+            />
           </motion.div>
         )}
       </AnimatePresence>

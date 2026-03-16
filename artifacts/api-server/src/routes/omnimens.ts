@@ -43,6 +43,8 @@ import {
 } from "@workspace/db";
 import { checkAndGrantMonthlyCredits, attemptAutoTopup, createSetupSession, confirmWalletSetup, removeWallet, getBillingSummary, LOYALTY_TIERS, FREE_MONTHLY_CREDITS } from "../lib/omnimens-billing.js";
 import { getOrCreateConversation, saveMessage, generateConversationTitle, loadConversationHistory, listConversations, deleteConversation } from "../lib/omnimens-conversations.js";
+import { generate3DModel } from "../lib/omnimens-3d.js";
+import { loadToolKnowledgeForTask, runToolKnowledgeIngestion, INSTALLED_TOOLS } from "../lib/omnimens-tool-knowledge.js";
 
 const router: IRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024, files: 10 } });
@@ -497,6 +499,16 @@ JAVASCRIPT LIBRARY CDNs ARE ALLOWED: Three.js, GSAP, p5.js, Phaser, Tone.js, Cha
 
 9. AUDIO SYNTHS & SOUNDSCAPES → Complete HTML in a \`\`\`html block using Web Audio API. Oscillators, gain, filters, compressors, reverb (ConvolverNode), delay — synthesize ALL sound from scratch using the Web Audio API. NEVER load audio from external URLs. Playable dark-themed UI with controls.
 
+9b. 3D MODELS → Output \`[GENERATE_3D: <detailed description>]\` on its own line when the user asks for a 3D model, 3D object, 3D shape, or 3D scene.
+    OMNIMENS has THREE 3D engines installed and running — it automatically picks the best one:
+    🔷 Blender 4.4 (PRIMARY — most powerful): Used for organic shapes, characters, vehicles, creatures, sci-fi props, furniture, environments, game assets. Writes full Blender Python (bpy) scripts with subdivision modifiers, boolean operations, PBR Principled BSDF materials, procedural Noise/Wave/Voronoi textures, Geometry Nodes, particle systems, armatures. Exports real .glb with full PBR.
+    🔶 OpenSCAD 2021 (PARAMETRIC): Used for gears, brackets, enclosures, mechanical parts, lattices, mathematical objects, 3D-printable parts, architectural geometry. Writes .scad code with CSG operations (union/difference/intersection), modules, parametric dimensions.
+    🔷 trimesh/Python (FALLBACK): Always available for procedural meshes, fractals, point clouds, mathematical surfaces.
+    All three run completely headlessly in the background. Result: real downloadable .glb + interactive Three.js PBR viewer (orbit controls, bloom, shadows, auto-rotate).
+    In your [GENERATE_3D: ...] description — describe: shape/geometry, dimensions, material (color, metalness, roughness), surface detail, and any modifiers/features. Be specific and rich.
+    Use [GENERATE_3D: ...] for: robots, buildings, furniture, vehicles, creatures, anatomical parts, sci-fi props, terrain, logos in 3D, fractals, mechanical parts, generative art, etc.
+    NEVER use external 3D model URLs — always generate procedurally.
+
 10. CODE IN ANY LANGUAGE → Complete, runnable code in the appropriate \`\`\`language block. Never a stub. Never a placeholder.
 
 11. DOCUMENTS, REPORTS, RESEARCH → Full markdown with structure, tables, depth, insight.
@@ -786,13 +798,14 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
     const brainContext = await loadBrainContext();
     const patchInstructions = loadActivePatchInstructions();
 
-    // ── Load user memories + custom instructions + generated modules + learning + physio (parallel)
-    const [memoryContext, customInstructions, generatedModulesContext, learningContext, physioContext] = await Promise.all([
+    // ── Load user memories + custom instructions + generated modules + learning + physio + tool knowledge (parallel)
+    const [memoryContext, customInstructions, generatedModulesContext, learningContext, physioContext, toolKnowledgeContext] = await Promise.all([
       loadUserMemories(req.user.id),
       getOrCreateCustomInstructions(req.user.id),
       loadGeneratedModulesContext(),
       loadLearningContext(req.user.id),
       loadPhysioContext(req.user.id),
+      loadToolKnowledgeForTask(message + " " + (customInstructions?.persona || "")),
     ]);
     const customInstructionsContext = buildCustomInstructionsContext(customInstructions);
 
@@ -804,6 +817,7 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
       + brainContext
       + patchInstructions
       + generatedModulesContext      // self-authored modules OMNIMENS wrote for itself
+      + (toolKnowledgeContext ? `\n\n${toolKnowledgeContext}` : "")  // mastered tool knowledge injected per-task
       + `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 OMNIMENS AGENTIC POWERS — FULL CAPABILITY MATRIX
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1092,8 +1106,11 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
     };
     fullText = sanitizeAllExternalMedia(fullText);
 
-    // Strip [GENERATE_IMAGE: ...] markers from the displayed content
-    const cleanText = fullText.replace(/\[GENERATE_IMAGE:\s*[\s\S]+?\]/g, "").trim();
+    // Strip [GENERATE_IMAGE: ...] and [GENERATE_3D: ...] markers from the displayed content
+    const cleanText = fullText
+      .replace(/\[GENERATE_IMAGE:\s*[\s\S]+?\]/g, "")
+      .replace(/\[GENERATE_3D:\s*[\s\S]+?\]/g, "")
+      .trim();
     if (cleanText !== fullText) {
       res.write(`data: ${JSON.stringify({ type: "content_update", content: cleanText })}\n\n`);
     }
@@ -1121,6 +1138,42 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
       } catch (imgErr) {
         console.error(`[OMNIMENS IMAGE] Error generating image ${i}:`, imgErr);
         res.write(`data: ${JSON.stringify({ type: "image_error", index: i, error: "Image generation failed" })}\n\n`);
+      }
+    }
+
+    // ── Scan for [GENERATE_3D: ...] markers and generate real 3D models ──────
+    const model3dMarkers = [...fullText.matchAll(/\[GENERATE_3D:\s*([\s\S]+?)\]/g)].slice(0, 1);
+    for (let i = 0; i < model3dMarkers.length; i++) {
+      const prompt3d = model3dMarkers[i][1].trim();
+      try {
+        res.write(`data: ${JSON.stringify({ type: "3d_generating", index: i, prompt: prompt3d })}\n\n`);
+
+        // Heartbeat while Python runs (can take 20–90s)
+        const hb3d = setInterval(() => {
+          try { res.write(`: ping\n\n`); } catch { /* ignore */ }
+        }, 6000);
+
+        let model3d;
+        try {
+          model3d = await generate3DModel(prompt3d);
+        } finally {
+          clearInterval(hb3d);
+        }
+
+        res.write(`data: ${JSON.stringify({
+          type: "3d_generated",
+          index: i,
+          prompt: prompt3d,
+          glbBase64: model3d.glbBase64,
+          glbSizeBytes: model3d.glbSizeBytes,
+          threejsHtml: model3d.threejsHtml,
+          vertexCount: model3d.vertexCount,
+          faceCount: model3d.faceCount,
+          toolUsed: model3d.toolUsed || "trimesh",
+        })}\n\n`);
+      } catch (err3d) {
+        console.error(`[OMNIMENS 3D] Error generating model ${i}:`, err3d);
+        res.write(`data: ${JSON.stringify({ type: "3d_error", index: i, error: "3D generation failed — try a simpler description" })}\n\n`);
       }
     }
 
@@ -1688,6 +1741,34 @@ router.post("/omnimens/notifications/read-all", async (req, res) => {
     res.json({ ok: true });
   } catch {
     res.status(500).json({ error: "Failed to mark all read" });
+  }
+});
+
+// ─── Dedicated 3D Model Generation Endpoint ───────────────────────────────────
+
+router.post("/omnimens/3d-generate", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Login required" }); return; }
+
+  const { prompt } = req.body as { prompt?: string };
+  if (!prompt || prompt.trim().length < 3) {
+    res.status(400).json({ error: "Prompt is required (min 3 chars)" });
+    return;
+  }
+
+  try {
+    const result = await generate3DModel(prompt.trim());
+    res.json({
+      ok: true,
+      glbBase64: result.glbBase64,
+      glbSizeBytes: result.glbSizeBytes,
+      threejsHtml: result.threejsHtml,
+      vertexCount: result.vertexCount,
+      faceCount: result.faceCount,
+      prompt: prompt.trim(),
+    });
+  } catch (err) {
+    console.error("[OMNIMENS 3D endpoint]", err);
+    res.status(500).json({ error: "3D generation failed", detail: String(err) });
   }
 });
 
