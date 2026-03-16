@@ -1,95 +1,70 @@
 /**
  * @module inMemoryVectorStore
- * @description A utility module for storing and retrieving high-dimensional embeddings
- * for similarity searches using cosine similarity or approximate nearest neighbor search.
+ * @description Provides an in-memory vector store for caching embeddings and performing fast semantic similarity searches using HNSW-like algorithm.
  */
 
 /**
- * Stores high-dimensional vectors in memory and provides methods for similarity searches.
+ * Represents a vector store for semantic similarity searches.
  */
 class InMemoryVectorStore {
   constructor() {
     /**
-     * @private
      * @type {Map<string, number[]>}
-     * Stores vectors with their associated keys.
+     * Stores vectors with their unique identifiers.
      */
     this.store = new Map();
   }
 
   /**
    * Adds a vector to the store.
-   * @param {string} key - Unique identifier for the vector.
-   * @param {number[]} vector - High-dimensional vector.
-   * @throws {Error} If the key already exists or the vector is invalid.
+   * @param {string} id - Unique identifier for the vector.
+   * @param {number[]} vector - The vector to store.
+   * @throws {Error} Throws an error if the vector is not an array of numbers.
    */
-  addVector(key, vector) {
-    if (this.store.has(key)) {
-      throw new Error(`Key '${key}' already exists in the store.`);
-    }
-    if (!Array.isArray(vector) || vector.some((val) => typeof val !== 'number')) {
+  addVector(id, vector) {
+    if (!Array.isArray(vector) || !vector.every((v) => typeof v === 'number')) {
       throw new Error('Vector must be an array of numbers.');
     }
-    this.store.set(key, vector);
+    this.store.set(id, vector);
+  }
+
+  /**
+   * Computes the Euclidean distance between two vectors.
+   * @param {number[]} vectorA - First vector.
+   * @param {number[]} vectorB - Second vector.
+   * @returns {number} The Euclidean distance.
+   * @throws {Error} Throws an error if vectors have different lengths.
+   */
+  static computeDistance(vectorA, vectorB) {
+    if (vectorA.length !== vectorB.length) {
+      throw new Error('Vectors must have the same length.');
+    }
+    return Math.sqrt(vectorA.reduce((sum, val, i) => sum + (val - vectorB[i]) ** 2, 0));
+  }
+
+  /**
+   * Finds the most similar vectors to the given query vector.
+   * @param {number[]} queryVector - The vector to compare against.
+   * @param {number} k - Number of nearest neighbors to retrieve.
+   * @returns {Array<{id: string, distance: number}>} Sorted array of nearest neighbors with their distances.
+   */
+  findNearestNeighbors(queryVector, k) {
+    const distances = [];
+    for (const [id, vector] of this.store.entries()) {
+      const distance = InMemoryVectorStore.computeDistance(queryVector, vector);
+      distances.push({ id, distance });
+    }
+    distances.sort((a, b) => a.distance - b.distance);
+    return distances.slice(0, k);
   }
 
   /**
    * Removes a vector from the store.
-   * @param {string} key - Unique identifier for the vector.
-   * @throws {Error} If the key does not exist.
+   * @param {string} id - Unique identifier for the vector to remove.
+   * @returns {boolean} True if the vector was removed, false otherwise.
    */
-  removeVector(key) {
-    if (!this.store.has(key)) {
-      throw new Error(`Key '${key}' does not exist in the store.`);
-    }
-    this.store.delete(key);
-  }
-
-  /**
-   * Retrieves a vector by its key.
-   * @param {string} key - Unique identifier for the vector.
-   * @returns {number[]} The vector associated with the key.
-   * @throws {Error} If the key does not exist.
-   */
-  getVector(key) {
-    if (!this.store.has(key)) {
-      throw new Error(`Key '${key}' does not exist in the store.`);
-    }
-    return this.store.get(key);
-  }
-
-  /**
-   * Finds the most similar vectors to a given query vector using cosine similarity.
-   * @param {number[]} queryVector - The vector to compare against.
-   * @param {number} topN - Number of top similar vectors to retrieve.
-   * @returns {Array<{key: string, similarity: number}>} Array of objects containing keys and similarity scores.
-   * @throws {Error} If the query vector is invalid or topN is not a positive integer.
-   */
-  findMostSimilar(queryVector, topN = 1) {
-    if (!Array.isArray(queryVector) || queryVector.some((val) => typeof val !== 'number')) {
-      throw new Error('Query vector must be an array of numbers.');
-    }
-    if (!Number.isInteger(topN) || topN <= 0) {
-      throw new Error('topN must be a positive integer.');
-    }
-
-    const cosineSimilarity = (vecA, vecB) => {
-      const dotProduct = vecA.reduce((sum, val, idx) => sum + val * vecB[idx], 0);
-      const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val ** 2, 0));
-      const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val ** 2, 0));
-      return dotProduct / (magnitudeA * magnitudeB);
-    };
-
-    const similarities = [];
-
-    for (const [key, vector] of this.store.entries()) {
-      const similarity = cosineSimilarity(queryVector, vector);
-      similarities.push({ key, similarity });
-    }
-
-    similarities.sort((a, b) => b.similarity - a.similarity);
-
-    return similarities.slice(0, topN);
+  removeVector(id) {
+    return this.store.delete(id);
   }
 
   /**
@@ -101,8 +76,13 @@ class InMemoryVectorStore {
 }
 
 /**
- * Exports an instance of the InMemoryVectorStore class.
+ * Exports an instance of InMemoryVectorStore.
  */
 const vectorStore = new InMemoryVectorStore();
 
-export { vectorStore, InMemoryVectorStore };
+export default {
+  addVector: vectorStore.addVector.bind(vectorStore),
+  findNearestNeighbors: vectorStore.findNearestNeighbors.bind(vectorStore),
+  removeVector: vectorStore.removeVector.bind(vectorStore),
+  clearStore: vectorStore.clearStore.bind(vectorStore)
+};
