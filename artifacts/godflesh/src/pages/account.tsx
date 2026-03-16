@@ -136,6 +136,8 @@ export default function Account() {
 
   const isOwner = user?.id === OWNER_ID;
 
+  const [theme, setTheme] = useState<"dark"|"auto">("dark");
+
   useEffect(() => {
     if (!isLoading && !isAuthenticated) setLocation("/");
   }, [isLoading, isAuthenticated, setLocation]);
@@ -253,8 +255,6 @@ export default function Account() {
 
   const activePatches = patches.filter(p => p.active);
   const inactivePatches = patches.filter(p => !p.active);
-
-  const [theme, setTheme] = useState<"dark"|"auto">("dark");
 
   return (
     <Layout>
