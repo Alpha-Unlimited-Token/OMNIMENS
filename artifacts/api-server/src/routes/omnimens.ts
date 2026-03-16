@@ -44,6 +44,7 @@ import {
 import { checkAndGrantMonthlyCredits, attemptAutoTopup, createSetupSession, confirmWalletSetup, removeWallet, getBillingSummary, LOYALTY_TIERS, FREE_MONTHLY_CREDITS } from "../lib/omnimens-billing.js";
 import { getOrCreateConversation, saveMessage, generateConversationTitle, loadConversationHistory, listConversations, deleteConversation } from "../lib/omnimens-conversations.js";
 import { generate3DModel } from "../lib/omnimens-3d.js";
+import { generateGame } from "../lib/omnimens-game.js";
 import { loadToolKnowledgeForTask, runToolKnowledgeIngestion, INSTALLED_TOOLS } from "../lib/omnimens-tool-knowledge.js";
 import { getRestorativeArtContext } from "../lib/omnimens-restorative-art.js";
 
@@ -499,6 +500,12 @@ JAVASCRIPT LIBRARY CDNs ARE ALLOWED: Three.js, GSAP, p5.js, Phaser, Tone.js, Cha
 8. GENERATIVE / INTERACTIVE ART → Complete HTML in a \`\`\`html block using p5.js from CDN. Particle systems, fractals, procedural patterns. Interactive. With REC button for video capture.
 
 9. AUDIO SYNTHS & SOUNDSCAPES → Complete HTML in a \`\`\`html block using Web Audio API. Oscillators, gain, filters, compressors, reverb (ConvolverNode), delay — synthesize ALL sound from scratch using the Web Audio API. NEVER load audio from external URLs. Playable dark-themed UI with controls.
+
+9c. VIDEO GAMES → Output \`[GENERATE_GAME: <detailed game description>]\` on its own line when the user asks for a game, game concept, or playable experience.
+    OMNIMENS has a full multi-engine game pipeline: Phaser.js 3 (HTML5, plays in browser immediately) + Godot 4 (full GDScript project, opens in Godot Engine) + GDevelop 5 (no-code JSON project) + Blender 3D assets (GLB for 3D games) — all packaged into a master ZIP.
+    In your [GENERATE_GAME: ...] description — include: genre (platformer/shooter/rpg/puzzle/racing/strategy/survival/arcade/horror/fighting), art style, player mechanics, enemies, theme, and whether 2D or 3D.
+    Use [GENERATE_GAME: ...] for: any video game, arcade game, platformer, RPG, shooter, puzzle game, racing game, tower defense, strategy game, survival game, horror game, visual novel, etc.
+    The user gets: playable HTML5 game in chat + Godot 4 project + GDevelop 5 project + Blender 3D assets (if 3D) + master ZIP download.
 
 9b. 3D MODELS → Output \`[GENERATE_3D: <detailed description>]\` on its own line when the user asks for a 3D model, 3D object, 3D shape, or 3D scene.
     OMNIMENS has THREE 3D engines installed and running — it automatically picks the best one:
@@ -1201,6 +1208,58 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
       } catch (err3d) {
         console.error(`[OMNIMENS 3D] Error generating model ${i}:`, err3d);
         res.write(`data: ${JSON.stringify({ type: "3d_error", index: i, error: "3D generation failed — try a simpler description" })}\n\n`);
+      }
+    }
+
+    // ── GAME GENERATION ───────────────────────────────────────────────────────
+    const gameMarkers = [...fullText.matchAll(/\[GENERATE_GAME:\s*([\s\S]+?)\]/g)].slice(0, 1);
+    for (let gi = 0; gi < gameMarkers.length; gi++) {
+      const gamePrompt = gameMarkers[gi][1].trim();
+      try {
+        res.write(`data: ${JSON.stringify({
+          type: "game_generating",
+          index: gi,
+          prompt: gamePrompt,
+          phase: "designing",
+        })}\n\n`);
+
+        const hbGame = setInterval(() => {
+          try { res.write(`: ping\n\n`); } catch { /* ignore */ }
+        }, 6000);
+
+        let gameResult;
+        try {
+          gameResult = await generateGame(gamePrompt, (phase: string) => {
+            try {
+              res.write(`data: ${JSON.stringify({ type: "game_phase", index: gi, phase })}\n\n`);
+            } catch { /* ignore */ }
+          });
+        } finally {
+          clearInterval(hbGame);
+        }
+
+        res.write(`data: ${JSON.stringify({
+          type: "game_generated",
+          index: gi,
+          prompt: gamePrompt,
+          title: gameResult.title,
+          genre: gameResult.genre,
+          description: gameResult.description,
+          techStack: gameResult.techStack,
+          html5GameBase64: gameResult.html5GameBase64,
+          godotZipBase64: gameResult.godotZipBase64,
+          godotZipSize: gameResult.godotZipSize,
+          gDevelopZipBase64: gameResult.gDevelopZipBase64,
+          gDevelopZipSize: gameResult.gDevelopZipSize,
+          masterZipBase64: gameResult.masterZipBase64,
+          masterZipSize: gameResult.masterZipSize,
+          has3DAssets: gameResult.has3DAssets,
+          assetCount: gameResult.assetCount,
+          formats: gameResult.formats,
+        })}\n\n`);
+      } catch (gameErr) {
+        console.error(`[OMNIMENS GAME] Error generating game:`, gameErr);
+        res.write(`data: ${JSON.stringify({ type: "game_error", index: gi, error: "Game generation failed — try a simpler description" })}\n\n`);
       }
     }
 

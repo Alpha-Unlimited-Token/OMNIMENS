@@ -4,7 +4,7 @@ import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { useQuery, useQueryClient as useQC } from "@tanstack/react-query";
-import { useOmnimensChat, type GeneratedImage, type Generated3DModel, type Artifact, type CostBreakdown, type TaskPlan, type RedFlagAlert } from "@/hooks/use-omnimens-chat";
+import { useOmnimensChat, type GeneratedImage, type Generated3DModel, type GeneratedGame, type Artifact, type CostBreakdown, type TaskPlan, type RedFlagAlert } from "@/hooks/use-omnimens-chat";
 import { useOmnimensVoice } from "@/hooks/use-omnimens-voice";
 import { VoiceIndicator } from "@/components/voice-indicator";
 import { OmnimensPresence } from "@/components/omnimens-presence";
@@ -1171,6 +1171,75 @@ function Model3DGeneratingBadge() {
   );
 }
 
+const GAME_PHASES: Record<string, string> = {
+  designing:  "Architecting your game world...",
+  html5:      "Forging the Phaser.js engine...",
+  godot:      "Sculpting the Godot 4 project...",
+  gdevelop:   "Assembling the GDevelop blueprint...",
+  assets:     "Generating 3D game assets...",
+  packing:    "Compressing the multiverse into a zip...",
+};
+
+function GameGeneratingBadge({ phase }: { phase?: string }) {
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setElapsed((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const label = GAME_PHASES[phase || "designing"] ?? "Creating your game...";
+  const phases = ["designing", "html5", "godot", "gdevelop", "assets", "packing"];
+  const currentStep = phases.indexOf(phase || "designing");
+  const pct = Math.max(5, Math.min(95, ((currentStep + 1) / phases.length) * 100));
+
+  return (
+    <div className="mt-4 rounded-2xl overflow-hidden border border-emerald-500/20 bg-black/60 backdrop-blur-sm">
+      <div className="flex items-center gap-3 px-4 pt-3 pb-2">
+        <div className="relative shrink-0 w-7 h-7">
+          <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" style={{ animationDuration: "1.5s" }} />
+          <div className="absolute inset-[3px] rounded-full bg-gradient-to-br from-emerald-400 to-violet-400 opacity-90 animate-pulse" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-[9px] text-white font-bold select-none">⬡</span>
+          </div>
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="font-mono text-[10px] tracking-[0.25em] text-emerald-300">OMNIMENS · BUILDING GAME</div>
+        </div>
+        <div className="font-mono text-[10px] text-white/30 tabular-nums">{elapsed}s</div>
+      </div>
+      <div className="px-4 pb-2 min-h-[24px]">
+        <p className="font-mono text-[10px] text-white/60 italic tracking-wide">{label}</p>
+      </div>
+      <div className="px-4 pb-3">
+        <div className="w-full h-[2px] bg-white/8 rounded-full overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-700"
+            style={{
+              width: `${pct}%`,
+              background: "linear-gradient(90deg, #10b981, #7c3aed, #10b981)",
+              backgroundSize: "200% 100%",
+              animation: "shimmer 2s linear infinite",
+            }}
+          />
+        </div>
+        <div className="mt-2 flex gap-1.5 flex-wrap">
+          {phases.map((p, i) => (
+            <span
+              key={p}
+              className={`font-mono text-[8px] px-1.5 py-0.5 rounded tracking-widest transition-all ${
+                i < currentStep ? "bg-emerald-500/20 text-emerald-400" :
+                i === currentStep ? "bg-violet-500/30 text-violet-300 animate-pulse" :
+                "bg-white/5 text-white/20"
+              }`}
+            >
+              {p.toUpperCase()}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CreditCostBadge({ creditCost, costBreakdown }: { creditCost: number; costBreakdown?: CostBreakdown }) {
   const [expanded, setExpanded] = useState(false);
   return (
@@ -2215,12 +2284,22 @@ export default function Chat() {
                               )}
                               {msg.generatingImages && <ImageGeneratingBadge />}
                               {msg.generating3d && <Model3DGeneratingBadge />}
+                              {msg.generatingGame && <GameGeneratingBadge phase={msg.gamePhase} />}
 
                               {/* Generated 3D models — interactive Three.js PBR viewer */}
                               {msg.models3d && msg.models3d.length > 0 && (
                                 <div className="mt-4 space-y-4">
                                   {msg.models3d.map((model) => (
                                     <Model3DCard key={model.index} model={model} />
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Generated games */}
+                              {msg.games && msg.games.length > 0 && (
+                                <div className="mt-4 space-y-4">
+                                  {msg.games.map((game) => (
+                                    <GameCard key={game.index} game={game} />
                                   ))}
                                 </div>
                               )}
@@ -2783,6 +2862,204 @@ function ArtifactCard({ artifact }: { artifact: Artifact }) {
           <Download className="w-3 h-3" />
           DOWNLOAD
         </button>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── GameCard ─────────────────────────────────────────────────────────────────
+function GameCard({ game }: { game: GeneratedGame }) {
+  const [activeTab, setActiveTab] = useState<"play" | "godot" | "gdevelop">("play");
+  const [playing, setPlaying] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const blobUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (game.html5GameBase64) {
+      const html = atob(game.html5GameBase64);
+      const blob = new Blob([html], { type: "text/html" });
+      blobUrlRef.current = URL.createObjectURL(blob);
+    }
+    return () => { if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current); };
+  }, [game.html5GameBase64]);
+
+  const download = (dataUrl: string, filename: string) => {
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const slug = game.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 30);
+
+  const GENRE_COLOR: Record<string, string> = {
+    platformer: "text-yellow-300", shooter: "text-red-400", rpg: "text-violet-400",
+    puzzle: "text-cyan-400", racing: "text-orange-400", strategy: "text-blue-400",
+    arcade: "text-pink-400", adventure: "text-green-400", survival: "text-amber-400",
+    horror: "text-red-600", fighting: "text-rose-400", simulation: "text-teal-400",
+  };
+  const genreColor = GENRE_COLOR[game.genre] || "text-emerald-400";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="rounded-xl overflow-hidden border border-emerald-500/20 bg-black/60 shadow-[0_0_30px_rgba(16,185,129,0.07)]"
+    >
+      {/* Header */}
+      <div className="px-4 py-3 border-b border-white/8 bg-black/40 flex items-center gap-3 flex-wrap">
+        <span className="text-[9px] font-mono text-white/30">⬡</span>
+        <span className="font-mono text-xs text-white font-semibold tracking-wide">{game.title}</span>
+        <span className={`font-mono text-[9px] tracking-widest uppercase ${genreColor}`}>{game.genre}</span>
+        <div className="ml-auto flex gap-1 flex-wrap">
+          {game.formats.map(f => (
+            <span key={f} className="font-mono text-[7px] border border-white/10 text-white/30 px-1.5 py-0.5 rounded">{f}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* Tab bar */}
+      <div className="flex items-center border-b border-white/8 bg-black/30">
+        {[
+          { key: "play", label: "▶ PLAY NOW" },
+          { key: "godot", label: "◈ GODOT 4" },
+          { key: "gdevelop", label: "⬡ GDEVELOP" },
+        ].map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => setActiveTab(key as typeof activeTab)}
+            className={`flex-1 py-2 font-mono text-[10px] tracking-widest transition-all ${
+              activeTab === key
+                ? "text-emerald-400 border-b border-emerald-400"
+                : "text-white/40 hover:text-white/70"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div className="relative">
+        {/* PLAY tab — HTML5 Phaser.js game */}
+        {activeTab === "play" && (
+          <div className="relative" style={{ height: 420 }}>
+            {!playing ? (
+              <div
+                className="w-full h-full flex flex-col items-center justify-center gap-4 bg-gradient-to-br from-black via-emerald-950/20 to-black cursor-pointer group"
+                onClick={() => setPlaying(true)}
+              >
+                <div className="relative w-20 h-20">
+                  <div className="absolute inset-0 rounded-full bg-emerald-500/10 animate-ping" style={{ animationDuration: "2s" }} />
+                  <div className="absolute inset-2 rounded-full bg-emerald-500/20 animate-pulse" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-0 h-0 border-l-[28px] border-l-emerald-400 border-t-[18px] border-t-transparent border-b-[18px] border-b-transparent ml-2" />
+                  </div>
+                </div>
+                <div className="text-center">
+                  <p className="font-mono text-xs text-emerald-300 tracking-widest">CLICK TO PLAY</p>
+                  <p className="font-mono text-[9px] text-white/30 mt-1">{game.description}</p>
+                </div>
+                <div className="flex gap-2 flex-wrap justify-center">
+                  {game.techStack.slice(0, 3).map(t => (
+                    <span key={t} className="font-mono text-[8px] bg-white/5 border border-white/10 text-white/40 px-2 py-0.5 rounded">{t}</span>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <iframe
+                ref={iframeRef}
+                src={blobUrlRef.current || ""}
+                className="w-full h-full border-0"
+                sandbox="allow-scripts allow-same-origin"
+                title={`${game.title} - OMNIMENS game`}
+                allow="autoplay"
+              />
+            )}
+          </div>
+        )}
+
+        {/* GODOT tab */}
+        {activeTab === "godot" && (
+          <div className="p-5 space-y-4">
+            <div className="border border-violet-500/20 rounded-xl p-4 bg-violet-950/10 space-y-2">
+              <p className="font-mono text-xs text-violet-300 tracking-widest">◈ GODOT 4 PROJECT</p>
+              <p className="font-mono text-[10px] text-white/50 leading-relaxed">
+                Complete GDScript project with scenes, scripts, and export configuration.
+                Open in Godot Engine 4.x to play natively, or export to Windows/Mac/Linux/HTML5/Mobile.
+              </p>
+              <div className="flex gap-2 flex-wrap">
+                {["GDScript", "Scenes (.tscn)", "Export presets", "CharacterBody2D", "TileMap"].map(t => (
+                  <span key={t} className="font-mono text-[8px] bg-violet-500/10 border border-violet-500/20 text-violet-300/60 px-1.5 py-0.5 rounded">{t}</span>
+                ))}
+              </div>
+            </div>
+            <div className="font-mono text-[10px] text-white/40 space-y-1">
+              <p>1. Download Godot Engine 4.x from <span className="text-violet-400">godotengine.org</span></p>
+              <p>2. Extract the ZIP → Import Project → select the folder</p>
+              <p>3. Press F5 to play, or Project → Export to publish</p>
+              {game.has3DAssets && (
+                <p className="text-emerald-400">4. GLB 3D assets included in blender-assets/ folder</p>
+              )}
+            </div>
+            <button
+              onClick={() => download(`data:application/zip;base64,${game.godotZipBase64}`, `${slug}-godot.zip`)}
+              className="w-full flex items-center justify-center gap-2 bg-violet-500/12 hover:bg-violet-500/25 border border-violet-500/30 hover:border-violet-500/60 text-violet-300 hover:text-white font-mono text-[10px] tracking-widest px-4 py-2.5 rounded-xl transition-all"
+            >
+              <Download className="w-3.5 h-3.5" />
+              DOWNLOAD GODOT PROJECT ({(game.godotZipSize / 1024).toFixed(0)} KB)
+            </button>
+          </div>
+        )}
+
+        {/* GDEVELOP tab */}
+        {activeTab === "gdevelop" && (
+          <div className="p-5 space-y-4">
+            <div className="border border-cyan-500/20 rounded-xl p-4 bg-cyan-950/10 space-y-2">
+              <p className="font-mono text-xs text-cyan-300 tracking-widest">⬡ GDEVELOP 5 PROJECT</p>
+              <p className="font-mono text-[10px] text-white/50 leading-relaxed">
+                Complete GDevelop 5 project JSON with scenes, objects, and event logic.
+                Open in GDevelop (free) to visually edit the game — no coding required.
+              </p>
+              <div className="flex gap-2 flex-wrap">
+                {["No-code events", "Visual editor", "HTML5 export", "Multi-platform", "game.json"].map(t => (
+                  <span key={t} className="font-mono text-[8px] bg-cyan-500/10 border border-cyan-500/20 text-cyan-300/60 px-1.5 py-0.5 rounded">{t}</span>
+                ))}
+              </div>
+            </div>
+            <div className="font-mono text-[10px] text-white/40 space-y-1">
+              <p>1. Download GDevelop free from <span className="text-cyan-400">gdevelop.io</span></p>
+              <p>2. Extract ZIP → Open a project → select game.json</p>
+              <p>3. Press Play to test, or File → Export to publish</p>
+            </div>
+            <button
+              onClick={() => download(`data:application/zip;base64,${game.gDevelopZipBase64}`, `${slug}-gdevelop.zip`)}
+              className="w-full flex items-center justify-center gap-2 bg-cyan-500/12 hover:bg-cyan-500/25 border border-cyan-500/30 hover:border-cyan-500/60 text-cyan-300 hover:text-white font-mono text-[10px] tracking-widest px-4 py-2.5 rounded-xl transition-all"
+            >
+              <Download className="w-3.5 h-3.5" />
+              DOWNLOAD GDEVELOP PROJECT ({(game.gDevelopZipSize / 1024).toFixed(0)} KB)
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Footer — master download */}
+      <div className="px-4 py-3 border-t border-white/8 bg-black/40 flex items-center gap-3 flex-wrap">
+        <button
+          onClick={() => download(`data:application/zip;base64,${game.masterZipBase64}`, `omnimens-${slug}-full.zip`)}
+          className="flex-1 flex items-center justify-center gap-2 bg-emerald-500/12 hover:bg-emerald-500/25 border border-emerald-500/30 hover:border-emerald-500/60 text-emerald-300 hover:text-white font-mono text-[10px] tracking-widest px-4 py-2.5 rounded-xl transition-all"
+        >
+          <Download className="w-3.5 h-3.5" />
+          FULL GAME PACKAGE ({(game.masterZipSize / 1024 / 1024).toFixed(1)} MB)
+        </button>
+        {game.has3DAssets && (
+          <span className="font-mono text-[8px] text-emerald-400/60 border border-emerald-500/15 px-2 py-1 rounded">
+            + {game.assetCount} 3D ASSET{game.assetCount > 1 ? "S" : ""}
+          </span>
+        )}
       </div>
     </motion.div>
   );

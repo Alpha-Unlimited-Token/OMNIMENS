@@ -23,6 +23,26 @@ export type Generated3DModel = {
   formats?: string[];
 };
 
+export type GeneratedGame = {
+  title: string;
+  genre: string;
+  description: string;
+  techStack: string[];
+  prompt: string;
+  index: number;
+  html5GameBase64: string;
+  godotZipBase64: string;
+  godotZipSize: number;
+  gDevelopZipBase64: string;
+  gDevelopZipSize: number;
+  masterZipBase64: string;
+  masterZipSize: number;
+  has3DAssets: boolean;
+  assetCount: number;
+  formats: string[];
+  phase?: string;
+};
+
 export type Artifact = {
   artifactType: "html" | "svg" | "image" | "zip";
   filename: string;
@@ -60,6 +80,9 @@ export type Message = {
   generatingImages?: boolean;
   models3d?: Generated3DModel[];
   generating3d?: boolean;
+  games?: GeneratedGame[];
+  generatingGame?: boolean;
+  gamePhase?: string;
   artifacts?: Artifact[];
   searchingWeb?: boolean;
   webSearchQuery?: string;
@@ -345,6 +368,59 @@ export function useOmnimensChat(onLimitReached: () => void) {
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
                   if (msg) msg.generating3d = false;
+                  return newMsgs;
+                });
+
+              } else if (data.type === "game_generating") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) { msg.generatingGame = true; msg.gamePhase = "designing"; }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "game_phase") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) msg.gamePhase = data.phase;
+                  return newMsgs;
+                });
+
+              } else if (data.type === "game_generated") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    msg.games = [...(msg.games || []), {
+                      title: data.title,
+                      genre: data.genre,
+                      description: data.description,
+                      techStack: data.techStack,
+                      prompt: data.prompt,
+                      index: data.index,
+                      html5GameBase64: data.html5GameBase64,
+                      godotZipBase64: data.godotZipBase64,
+                      godotZipSize: data.godotZipSize,
+                      gDevelopZipBase64: data.gDevelopZipBase64,
+                      gDevelopZipSize: data.gDevelopZipSize,
+                      masterZipBase64: data.masterZipBase64,
+                      masterZipSize: data.masterZipSize,
+                      has3DAssets: data.has3DAssets,
+                      assetCount: data.assetCount,
+                      formats: data.formats,
+                    }];
+                    msg.generatingGame = false;
+                    msg.gamePhase = undefined;
+                  }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "game_error") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) { msg.generatingGame = false; msg.gamePhase = undefined; }
                   return newMsgs;
                 });
 
