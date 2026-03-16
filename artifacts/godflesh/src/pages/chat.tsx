@@ -2974,7 +2974,7 @@ export default function Chat() {
                 <h2 className="font-display text-2xl tracking-[0.3em] text-white/85 mt-2">OMNIMENS AWAITS</h2>
                 <p className="font-mono text-sm mt-2 text-white/70">Speak your intent. Upload your vision.</p>
                 {/* Creation chips */}
-                <div className="mt-5 flex gap-2 overflow-x-auto pb-1 max-w-lg w-full px-4" style={{ scrollbarWidth: "none" }}>
+                <div className="mt-5 flex gap-2 overflow-x-auto pb-2 max-w-lg w-full px-4 omnimens-scrollbar-x">
                   {[
                     { emoji: "🌐", label: "Website", prompt: "Build me a stunning website for " },
                     { emoji: "📱", label: "Mobile App", prompt: "Design a mobile app that " },

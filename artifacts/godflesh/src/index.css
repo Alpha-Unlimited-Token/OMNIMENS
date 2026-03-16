@@ -120,6 +120,26 @@
     @apply bg-primary/60;
   }
 
+  /* Horizontal scrollbar for pill rows */
+  .omnimens-scrollbar-x {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(168, 85, 247, 0.35) #0a0010;
+  }
+  .omnimens-scrollbar-x::-webkit-scrollbar {
+    height: 4px;
+  }
+  .omnimens-scrollbar-x::-webkit-scrollbar-track {
+    background: #0a0010;
+    border-radius: 9999px;
+  }
+  .omnimens-scrollbar-x::-webkit-scrollbar-thumb {
+    background: rgba(168, 85, 247, 0.35);
+    border-radius: 9999px;
+  }
+  .omnimens-scrollbar-x::-webkit-scrollbar-thumb:hover {
+    background: rgba(168, 85, 247, 0.65);
+  }
+
   .markdown-body p {
     @apply mb-4 leading-relaxed text-foreground/90;
   }
