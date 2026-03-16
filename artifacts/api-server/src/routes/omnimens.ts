@@ -14,6 +14,8 @@ import { db } from "@workspace/db";
 import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions, omnimensCodeRuns, omnimensConversations, omnimensMessages, omnimensMemories, omnimensCustomInstructions, omnimensHubSettings, omnimensSavedPrompts } from "@workspace/db";
 import { eq, and, desc, sql, asc, inArray } from "drizzle-orm";
 import { openai, generateImageBuffer } from "@workspace/integrations-openai-ai-server";
+import { getTogetherClient, isTogetherModel, TOGETHER_MODEL_IDS, TOGETHER_PRICING, type TogetherModel } from "../lib/together-ai.js";
+import { generateImageWithReplicate, replicateAvailable } from "../lib/replicate-images.js";
 import { runOmnimens, type OmnimensState } from "../lib/omnimens-engine.js";
 import { reflectOnConversation, loadBrainContext, synthesizeUpgrade, markUpgradeLive } from "../lib/omnimens-self-upgrade.js";
 import { webSearch, formatSearchResults } from "../lib/web-search.js";
@@ -72,18 +74,43 @@ import {
   generateColorPalette,
 } from "../lib/omnimens-tools-extended.js";
 
-const ALLOWED_MODELS = [
+const OPENAI_MODELS = [
   "gpt-4o",
   "gpt-4o-mini",
   "o3-mini",
   "gpt-4.1",
   "gpt-4.1-mini",
 ] as const;
+type OpenAIModel = typeof OPENAI_MODELS[number];
+
+// All models (OpenAI + Together AI open-source)
+const ALLOWED_MODELS = [
+  ...OPENAI_MODELS,
+  "llama-3.3-70b",
+  "llama-3.1-8b",
+  "mixtral-8x7b",
+  "mistral-7b",
+] as const;
 type AllowedModel = typeof ALLOWED_MODELS[number];
 
 function resolveModel(raw: string | undefined): AllowedModel {
   if (raw && (ALLOWED_MODELS as readonly string[]).includes(raw)) return raw as AllowedModel;
   return "gpt-4o";
+}
+
+// Free-tier auto-downgrade: if user has only signup credits left (never purchased),
+// silently route them to Llama 3.3 70B via Together AI — same great OMNIMENS experience,
+// costs ~20x less, so the free pool serves far more users.
+function shouldAutoDowngradeToTogether(
+  selectedModel: AllowedModel,
+  userCredits: number,
+  owner: boolean,
+): boolean {
+  if (owner) return false;
+  if (isTogetherModel(selectedModel)) return false; // already on Together AI
+  if (!getTogetherClient()) return false;            // Together AI not configured
+  // Auto-downgrade when user is clearly on free credits only (≤ free signup pool)
+  return userCredits <= FREE_SIGNUP_CREDITS;
 }
 
 const router: IRouter = Router();
@@ -99,6 +126,8 @@ const MODEL_PRICE_GPT4O_OUTPUT     = 10.00;   // $10.00/1M output tokens (gpt-4o
 const MODEL_PRICE_MINI_INPUT       = 0.15;    // $0.15/1M input  tokens  (gpt-4o-mini)
 const MODEL_PRICE_MINI_OUTPUT      = 0.60;    // $0.60/1M output tokens  (gpt-4o-mini)
 const IMAGE_COST_USD               = 0.07;    // ~$0.07 per image (gpt-image-1 medium)
+// Replicate / Flux 1.1 Pro pricing
+const IMAGE_COST_REPLICATE_USD     = 0.04;    // ~$0.04 per image (Flux 1.1 Pro)
 
 // Markup: 3× actual cost → ~200% gross margin.
 // Covers OpenAI API fees + Replit hosting + platform overhead + profit.
@@ -735,7 +764,7 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
   const conversationIdInput = conversationIdRaw ? parseInt(String(conversationIdRaw)) : undefined;
   const personaRaw = (req.body.persona as string) || "GENERAL";
   const hubSettingsRaw = req.body.hubSettings;
-  const selectedModel = resolveModel(req.body.model as string | undefined);
+  let selectedModel = resolveModel(req.body.model as string | undefined);
   let clientHubSettings: any = null;
   try { if (hubSettingsRaw) clientHubSettings = typeof hubSettingsRaw === "string" ? JSON.parse(hubSettingsRaw) : hubSettingsRaw; } catch {}
 
@@ -754,6 +783,14 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
   // ── Monthly free credits + loyalty bonus check ────────────────────────────────
   if (!owner) {
     await checkAndGrantMonthlyCredits(req.user.id);
+  }
+
+  // ── Free-tier auto-downgrade to Together AI ───────────────────────────────────
+  // Free users (signup credits only, never purchased) get routed to Llama 3.3 70B.
+  // Same OMNIMENS system prompt, tools, and personality — just 20x cheaper to run,
+  // so the free tier pool serves far more users without draining the OpenAI account.
+  if (shouldAutoDowngradeToTogether(selectedModel, user.credits ?? 0, owner)) {
+    selectedModel = "llama-3.3-70b";
   }
 
   // ── Pre-flight credit check with auto-topup ───────────────────────────────────
@@ -1222,10 +1259,20 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
       : (buildMode || hasFiles || taskAnalysis.isComplex) ? 4096 : 1200;
     // Reasoning models (o3-mini) don't support temperature / max_tokens
     const isReasoningModel = selectedModel.startsWith("o3") || selectedModel.startsWith("o4");
+
+    // Route to Together AI for open-source models, OpenAI for everything else
+    const usingTogether = isTogetherModel(selectedModel);
+    const togetherClient = usingTogether ? getTogetherClient() : null;
+    const activeClient = (usingTogether && togetherClient) ? togetherClient : openai;
+    const activeModelId = usingTogether
+      ? TOGETHER_MODEL_IDS[selectedModel as TogetherModel]
+      : selectedModel;
+
     const streamParams: any = {
-      model: selectedModel,
+      model: activeModelId,
       messages,
       stream: true,
+      // Together AI supports include_usage; OpenAI also does
       stream_options: { include_usage: true },
     };
     if (!isReasoningModel) {
@@ -1233,7 +1280,7 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
       streamParams.max_tokens = dynamicMaxTokens;
     }
 
-    const stream = await openai.chat.completions.create(streamParams);
+    const stream = await activeClient.chat.completions.create(streamParams);
 
     // Collect full text while streaming — also capture token usage from final chunk
     let fullText = "";
@@ -1325,14 +1372,26 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
           try { res.write(`: ping\n\n`); } catch { /* ignore if closed */ }
         }, 8000);
         let imageBuffer: Buffer;
+        let imageProvider = "openai";
         try {
-          imageBuffer = await generateImageBuffer(prompt.slice(0, 4000), "1024x1024", "medium");
+          // Replicate / Flux 1.1 Pro: higher quality, faster, cheaper
+          if (replicateAvailable()) {
+            try {
+              imageBuffer = await generateImageWithReplicate(prompt.slice(0, 1500));
+              imageProvider = "replicate";
+            } catch (repErr) {
+              console.warn("[OMNIMENS IMAGE] Replicate failed, falling back to OpenAI:", repErr);
+              imageBuffer = await generateImageBuffer(prompt.slice(0, 4000), "1024x1024", "medium");
+            }
+          } else {
+            imageBuffer = await generateImageBuffer(prompt.slice(0, 4000), "1024x1024", "medium");
+          }
         } finally {
           clearInterval(heartbeat);
         }
         const dataUrl = `data:image/png;base64,${imageBuffer!.toString("base64")}`;
         generatedImages.push({ url: dataUrl, prompt });
-        res.write(`data: ${JSON.stringify({ type: "image_generated", url: dataUrl, prompt, index: i })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: "image_generated", url: dataUrl, prompt, index: i, provider: imageProvider })}\n\n`);
       } catch (imgErr) {
         console.error(`[OMNIMENS IMAGE] Error generating image ${i}:`, imgErr);
         res.write(`data: ${JSON.stringify({ type: "image_error", index: i, error: "Image generation failed" })}\n\n`);
@@ -1590,7 +1649,7 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
     await incrementUsage(req.user.id, elapsedSeconds);
 
     // ── Real-cost credit calculation ──────────────────────────────────────────
-    // Calculate actual OpenAI API cost from real token usage, then apply markup
+    // Calculate actual API cost from real token usage, then apply markup
     let creditsRemaining: number | null = null;
     let creditCost = MIN_CREDITS_MESSAGE;
     let actualCostUSD = 0;
@@ -1598,20 +1657,25 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
 
     const imagesGenerated = imageMarkers.length;
 
+    // Pick per-token pricing based on which provider/model was used
+    const togetherPricing = isTogetherModel(selectedModel) ? TOGETHER_PRICING[selectedModel as TogetherModel] : null;
+    const priceIn  = togetherPricing ? togetherPricing.input  : (selectedModel.includes("mini") ? MODEL_PRICE_MINI_INPUT  : MODEL_PRICE_GPT4O_INPUT);
+    const priceOut = togetherPricing ? togetherPricing.output : (selectedModel.includes("mini") ? MODEL_PRICE_MINI_OUTPUT : MODEL_PRICE_GPT4O_OUTPUT);
+
     if (tokenUsage) {
-      // GPT-4o conversation cost from real token counts
-      actualCostUSD += (tokenUsage.prompt_tokens     * MODEL_PRICE_GPT4O_INPUT)  / 1_000_000;
-      actualCostUSD += (tokenUsage.completion_tokens * MODEL_PRICE_GPT4O_OUTPUT) / 1_000_000;
+      actualCostUSD += (tokenUsage.prompt_tokens     * priceIn)  / 1_000_000;
+      actualCostUSD += (tokenUsage.completion_tokens * priceOut) / 1_000_000;
     } else {
-      // Fallback if usage not returned: estimate from message length
+      // Fallback estimate from message length
       const estimatedInputTokens  = Math.ceil((systemPrompt.length + message.length) / 4);
       const estimatedOutputTokens = Math.ceil(fullText.length / 4);
-      actualCostUSD += (estimatedInputTokens  * MODEL_PRICE_GPT4O_INPUT)  / 1_000_000;
-      actualCostUSD += (estimatedOutputTokens * MODEL_PRICE_GPT4O_OUTPUT) / 1_000_000;
+      actualCostUSD += (estimatedInputTokens  * priceIn)  / 1_000_000;
+      actualCostUSD += (estimatedOutputTokens * priceOut) / 1_000_000;
     }
 
-    // Add image generation costs
-    actualCostUSD += imagesGenerated * IMAGE_COST_USD;
+    // Add image generation costs (Replicate is cheaper than OpenAI)
+    const imgCostEach = replicateAvailable() ? IMAGE_COST_REPLICATE_USD : IMAGE_COST_USD;
+    actualCostUSD += imagesGenerated * imgCostEach;
 
     // Add web search overhead (gpt-4o-mini call if search was triggered)
     if (webSearchContext) {

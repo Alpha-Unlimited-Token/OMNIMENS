@@ -2223,11 +2223,17 @@ function TTSButton({ text, voice = "nova" }: { text: string; voice?: string }) {
 
 // ── Model selector ─────────────────────────────────────────────────────────────
 const MODEL_OPTIONS = [
-  { id: "gpt-4o",       label: "GPT-4o",       badge: "SMART" },
-  { id: "gpt-4o-mini",  label: "GPT-4o Mini",  badge: "FAST"  },
-  { id: "gpt-4.1",      label: "GPT-4.1",      badge: "NEW"   },
-  { id: "gpt-4.1-mini", label: "GPT-4.1 Mini", badge: "FAST"  },
-  { id: "o3-mini",      label: "o3-mini",       badge: "REASON"},
+  // ── OpenAI (paid) ──────────────────────────────────────────────────────────
+  { id: "gpt-4o",         label: "GPT-4o",         badge: "SMART",  group: "OpenAI"     },
+  { id: "gpt-4o-mini",    label: "GPT-4o Mini",    badge: "FAST",   group: "OpenAI"     },
+  { id: "gpt-4.1",        label: "GPT-4.1",        badge: "NEW",    group: "OpenAI"     },
+  { id: "gpt-4.1-mini",   label: "GPT-4.1 Mini",   badge: "FAST",   group: "OpenAI"     },
+  { id: "o3-mini",        label: "o3-mini",         badge: "REASON", group: "OpenAI"     },
+  // ── Together AI open-source (free tier) ───────────────────────────────────
+  { id: "llama-3.3-70b",  label: "Llama 3.3 70B",  badge: "FREE",   group: "Open-Source" },
+  { id: "llama-3.1-8b",   label: "Llama 3.1 8B",   badge: "FREE",   group: "Open-Source" },
+  { id: "mixtral-8x7b",   label: "Mixtral 8×7B",   badge: "FREE",   group: "Open-Source" },
+  { id: "mistral-7b",     label: "Mistral 7B",      badge: "FREE",   group: "Open-Source" },
 ];
 
 function ModelSelector({ value, onChange }: { value: string; onChange: (m: string) => void }) {
@@ -2245,17 +2251,30 @@ function ModelSelector({ value, onChange }: { value: string; onChange: (m: strin
         <ChevronDown className="w-2.5 h-2.5" />
       </button>
       {open && (
-        <div className="absolute bottom-full mb-1 left-0 z-50 bg-[#0a0a0f] border border-white/12 rounded-xl shadow-2xl overflow-hidden w-44">
-          {MODEL_OPTIONS.map(m => (
-            <button
-              key={m.id}
-              type="button"
-              onClick={() => { onChange(m.id); setOpen(false); }}
-              className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-mono hover:bg-primary/10 transition-colors ${value === m.id ? "text-primary" : "text-white/60"}`}
-            >
-              <span>{m.label}</span>
-              <span className={`text-[8px] px-1.5 py-0.5 rounded font-bold ${m.badge === "REASON" ? "bg-orange-400/15 text-orange-400" : m.badge === "NEW" ? "bg-emerald-400/15 text-emerald-400" : m.badge === "FAST" ? "bg-blue-400/15 text-blue-400" : "bg-primary/15 text-primary"}`}>{m.badge}</span>
-            </button>
+        <div className="absolute bottom-full mb-1 left-0 z-50 bg-[#0a0a0f] border border-white/12 rounded-xl shadow-2xl overflow-hidden w-52">
+          {["OpenAI", "Open-Source"].map(group => (
+            <div key={group}>
+              <div className="px-3 pt-2 pb-1 text-[8px] font-mono tracking-widest text-white/25 uppercase">
+                {group === "Open-Source" ? "Open-Source · FREE" : "OpenAI · Credits"}
+              </div>
+              {MODEL_OPTIONS.filter(m => m.group === group).map(m => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => { onChange(m.id); setOpen(false); }}
+                  className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-mono hover:bg-primary/10 transition-colors ${value === m.id ? "text-primary" : "text-white/60"}`}
+                >
+                  <span>{m.label}</span>
+                  <span className={`text-[8px] px-1.5 py-0.5 rounded font-bold ${
+                    m.badge === "FREE"   ? "bg-emerald-400/15 text-emerald-400" :
+                    m.badge === "REASON" ? "bg-orange-400/15 text-orange-400"  :
+                    m.badge === "NEW"    ? "bg-sky-400/15 text-sky-400"         :
+                    m.badge === "FAST"   ? "bg-blue-400/15 text-blue-400"       :
+                                          "bg-primary/15 text-primary"
+                  }`}>{m.badge}</span>
+                </button>
+              ))}
+            </div>
           ))}
         </div>
       )}
