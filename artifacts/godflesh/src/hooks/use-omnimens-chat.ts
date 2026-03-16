@@ -30,6 +30,12 @@ export type TaskPlan = {
   crewRoles: string[];
 };
 
+export type RedFlagAlert = {
+  urgency: "immediate_ER" | "urgent_MD" | "refer_out" | "monitor" | "none";
+  flags: string[];
+  recommendation: string;
+};
+
 export type Message = {
   id: string;
   role: "user" | "omnimens";
@@ -49,6 +55,7 @@ export type Message = {
   multiSearching?: boolean;
   multiSearchCount?: number;
   multiSearchComplete?: boolean;
+  redFlagAlert?: RedFlagAlert;
 };
 
 export type AttachedFile = {
@@ -264,6 +271,20 @@ export function useOmnimensChat(onLimitReached: () => void) {
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
                   if (msg) msg.generatingImages = false;
+                  return newMsgs;
+                });
+
+              } else if (data.type === "red_flag_alert") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    msg.redFlagAlert = {
+                      urgency: data.urgency,
+                      flags: data.flags,
+                      recommendation: data.recommendation,
+                    };
+                  }
                   return newMsgs;
                 });
 

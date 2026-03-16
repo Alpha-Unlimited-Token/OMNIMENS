@@ -3,7 +3,7 @@ import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
-import { useOmnimensChat, type GeneratedImage, type Artifact, type CostBreakdown, type TaskPlan } from "@/hooks/use-omnimens-chat";
+import { useOmnimensChat, type GeneratedImage, type Artifact, type CostBreakdown, type TaskPlan, type RedFlagAlert } from "@/hooks/use-omnimens-chat";
 import { useOmnimensVoice } from "@/hooks/use-omnimens-voice";
 import { VoiceIndicator } from "@/components/voice-indicator";
 import { OmnimensPresence } from "@/components/omnimens-presence";
@@ -15,7 +15,7 @@ import {
   Zap, Terminal, Play, Microscope, ChevronDown, Check, BookOpen, Brain,
   Cpu, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Image,
   FolderOpen, Activity, SlidersHorizontal, PanelLeftClose, PanelRightClose,
-  PanelLeft, PanelRight, X, Layers
+  PanelLeft, PanelRight, X, Layers, Stethoscope, AlertTriangle, HeartPulse
 } from "lucide-react";
 import { OmnimensIcon } from "@/components/omnimens-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
@@ -176,12 +176,14 @@ const PERSONA_ICONS: Record<string, React.ReactNode> = {
   TUTOR: <GraduationCap className="w-3.5 h-3.5" />,
   STRATEGIST: <Briefcase className="w-3.5 h-3.5" />,
   GAME_BUILDER: <Play className="w-3.5 h-3.5" />,
+  PHYSIO: <Stethoscope className="w-3.5 h-3.5" />,
 };
 
 const PERSONA_NAMES: Record<string, string> = {
   GENERAL: "OMNIMENS", CODER: "CODER", RESEARCHER: "RESEARCHER",
   WRITER: "WRITER", ANALYST: "ANALYST", CREATIVE: "CREATIVE",
   TUTOR: "TUTOR", STRATEGIST: "STRATEGIST", GAME_BUILDER: "GAME ARCHITECT",
+  PHYSIO: "PHYSIO AI",
 };
 
 const PERSONA_DESC: Record<string, string> = {
@@ -194,7 +196,137 @@ const PERSONA_DESC: Record<string, string> = {
   TUTOR: "Teach, explain, mentor",
   STRATEGIST: "Plans, decisions, vision",
   GAME_BUILDER: "Games, NPCs, worlds, PCG",
+  PHYSIO: "AI physical therapist & rehab coach",
 };
+
+// ── Red Flag Alert Component ────────────────────────────────────────────────────
+
+function RedFlagAlertCard({ alert }: { alert: RedFlagAlert }) {
+  const [expanded, setExpanded] = useState(true);
+  const urgencyConfig = {
+    immediate_ER: {
+      bg: "bg-red-950/60 border-red-500/50",
+      icon: <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />,
+      label: "🚨 EMERGENCY — GO TO THE ER NOW",
+      labelColor: "text-red-300",
+      badgeBg: "bg-red-500/20 border-red-500/40 text-red-200",
+    },
+    urgent_MD: {
+      bg: "bg-orange-950/50 border-orange-500/40",
+      icon: <AlertTriangle className="w-4 h-4 text-orange-400 shrink-0" />,
+      label: "⚠️ URGENT — MEDICAL EVALUATION REQUIRED",
+      labelColor: "text-orange-300",
+      badgeBg: "bg-orange-500/20 border-orange-500/40 text-orange-200",
+    },
+    refer_out: {
+      bg: "bg-amber-950/40 border-amber-500/35",
+      icon: <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />,
+      label: "⚕️ SPECIALIST REFERRAL RECOMMENDED",
+      labelColor: "text-amber-300",
+      badgeBg: "bg-amber-500/20 border-amber-500/40 text-amber-200",
+    },
+    monitor: {
+      bg: "bg-yellow-950/30 border-yellow-500/30",
+      icon: <HeartPulse className="w-4 h-4 text-yellow-400 shrink-0" />,
+      label: "MONITOR CLOSELY",
+      labelColor: "text-yellow-300",
+      badgeBg: "bg-yellow-500/20 border-yellow-500/40 text-yellow-200",
+    },
+    none: {
+      bg: "bg-white/5 border-white/10",
+      icon: <HeartPulse className="w-4 h-4 text-white/50 shrink-0" />,
+      label: "NO RED FLAGS",
+      labelColor: "text-white/60",
+      badgeBg: "bg-white/10 border-white/20 text-white/60",
+    },
+  };
+
+  const cfg = urgencyConfig[alert.urgency] || urgencyConfig.none;
+
+  return (
+    <div className={`mt-3 border rounded-xl font-mono text-xs overflow-hidden ${cfg.bg}`}>
+      <button
+        onClick={() => setExpanded((v) => !v)}
+        className="w-full px-4 py-2.5 flex items-center gap-2 hover:bg-white/5 transition-colors"
+      >
+        {cfg.icon}
+        <span className={`tracking-widest font-semibold uppercase ${cfg.labelColor}`}>{cfg.label}</span>
+        <ChevronDown className={`w-3 h-3 ml-auto transition-transform ${expanded ? "rotate-180" : ""}`} />
+      </button>
+      {expanded && (
+        <div className="px-4 pb-4 pt-2 space-y-3 border-t border-white/10">
+          {alert.flags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {alert.flags.map((flag, i) => (
+                <span key={i} className={`px-2 py-0.5 rounded-full border text-[10px] tracking-wider ${cfg.badgeBg}`}>{flag}</span>
+              ))}
+            </div>
+          )}
+          {alert.recommendation && (
+            <p className="text-white/85 leading-relaxed normal-case tracking-normal text-[11px]">{alert.recommendation}</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Exercise Program Card ─────────────────────────────────────────────────────
+
+function ExerciseCard({ exercise }: { exercise: { name: string; sets: number; reps?: string; hold?: number; rest: number; frequency: string; position: string; instructions: string; cues: string[]; painRule: string; progressionCriteria: string; category: string; equipment: string[] } }) {
+  const [open, setOpen] = useState(false);
+  const categoryColors: Record<string, string> = {
+    mobility: "text-sky-300 bg-sky-500/10 border-sky-500/25",
+    stretching: "text-emerald-300 bg-emerald-500/10 border-emerald-500/25",
+    strengthening: "text-violet-300 bg-violet-500/10 border-violet-500/25",
+    neuromuscular: "text-amber-300 bg-amber-500/10 border-amber-500/25",
+    aerobic: "text-rose-300 bg-rose-500/10 border-rose-500/25",
+    education: "text-white/60 bg-white/5 border-white/15",
+  };
+  const colors = categoryColors[exercise.category] || categoryColors.education;
+  const prescription = [
+    exercise.sets > 1 ? `${exercise.sets} sets` : "1 set",
+    exercise.reps ? `× ${exercise.reps}` : exercise.hold ? `× hold ${exercise.hold}s` : "",
+    `rest ${exercise.rest}s`,
+    exercise.frequency,
+  ].filter(Boolean).join(" · ");
+
+  return (
+    <div className={`border rounded-lg overflow-hidden ${colors}`}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full px-3 py-2 flex items-center gap-2 hover:bg-white/5 transition-colors text-left"
+      >
+        <HeartPulse className="w-3.5 h-3.5 shrink-0" />
+        <div className="flex-1 min-w-0">
+          <div className="font-semibold text-[11px] tracking-wide uppercase truncate">{exercise.name}</div>
+          <div className="text-[10px] text-white/50 mt-0.5">{prescription}</div>
+        </div>
+        <span className="text-[10px] text-white/40 capitalize shrink-0">{exercise.position}</span>
+        <ChevronDown className={`w-3 h-3 shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="px-3 pb-3 pt-2 space-y-2 border-t border-current/15 text-[11px]">
+          <p className="text-white/80 leading-relaxed">{exercise.instructions}</p>
+          {exercise.cues.length > 0 && (
+            <div className="space-y-1">
+              <div className="text-[10px] text-white/40 tracking-widest uppercase">Technique Cues</div>
+              {exercise.cues.map((cue, i) => (
+                <div key={i} className="flex gap-1.5 text-white/70"><span className="text-current shrink-0">→</span>{cue}</div>
+              ))}
+            </div>
+          )}
+          <div className="pt-1 border-t border-current/10 flex gap-3 text-[10px] text-white/50">
+            <span>🛑 {exercise.painRule}</span>
+          </div>
+          {exercise.equipment.length > 0 && (
+            <div className="text-[10px] text-white/40">Equipment: {exercise.equipment.join(", ")}</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ── Code block with run ────────────────────────────────────────────────────────
 
@@ -863,6 +995,11 @@ export default function Chat() {
                                     <InlineImageCard key={img.index} image={img} />
                                   ))}
                                 </div>
+                              )}
+
+                              {/* Physical Therapy Red Flag Alert — shown first for patient safety */}
+                              {msg.redFlagAlert && msg.redFlagAlert.urgency !== "none" && (
+                                <RedFlagAlertCard alert={msg.redFlagAlert} />
                               )}
 
                               {/* Agentic status badges */}

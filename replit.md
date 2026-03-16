@@ -102,6 +102,7 @@ A transcendent sci-fi AI chat platform matching and surpassing the capabilities 
 - `lib/omnimens-custom-instructions.ts` — 9 personas (incl. GAME_BUILDER) + custom context injection
 - `lib/web-search.ts` — web search integration
 - `lib/omnimens-learning.ts` — Learning AI engine: Critic evaluator, learning element, emotional intelligence analyzer, self-reflection, proactive anticipation, learning memory store, full per-user learning cycle (DeepMind SIMA / AWS Learning Agent / Emotional Intelligence architectures)
+- `lib/omnimens-physio.ts` — Physical Therapy AI engine: red flag screening, psychosocial scoring (PHQ-2/TSK/PCS), phase-based exercise library (lower back/knee/shoulder/cervical/hip/ankle), adaptive program generation, PROMIS-PF/DASH/KOOS/LEFS/NDI/PSFS/NPRS/GROC outcome measures, integrative recovery recommendations, pain science education library
 
 ### Credit System
 - 1 credit = $0.01 USD

@@ -17,6 +17,30 @@ import { getOrCreateCustomInstructions, saveCustomInstructions, buildCustomInstr
 import { analyzeUserEmotionalState, buildEmotionalContext, loadLearningContext, runLearningCycle } from "../lib/omnimens-learning.js";
 import { loadGeneratedModulesContext, getConsciousnessState, getEvolutionHistory, getGeneratedModules, deactivateModule, runEvolutionCycle } from "../lib/omnimens-evolution.js";
 import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness, omnimensProjects, omnimensProjectFiles } from "@workspace/db";
+import {
+  loadPhysioContext,
+  screenRedFlags,
+  getLatestAssessment,
+  getActiveProgram,
+  saveAssessment,
+  saveProgram,
+  saveSession,
+  saveOutcome,
+  getOutcomeHistory,
+  getExercisesForRegion,
+  determinePhase,
+  interpretPsychosocialScores,
+  buildIntegrativeRecommendations,
+  OUTCOME_MEASURES,
+  PAIN_SCIENCE_LIBRARY,
+  EXERCISE_LIBRARY,
+} from "../lib/omnimens-physio.js";
+import {
+  omnimensPhysioAssessments,
+  omnimensPhysioPrograms,
+  omnimensPhysioSessions,
+  omnimensPhysioOutcomes,
+} from "@workspace/db";
 import { checkAndGrantMonthlyCredits, attemptAutoTopup, createSetupSession, confirmWalletSetup, removeWallet, getBillingSummary, LOYALTY_TIERS, FREE_MONTHLY_CREDITS } from "../lib/omnimens-billing.js";
 
 const router: IRouter = Router();
@@ -714,12 +738,13 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
     const brainContext = await loadBrainContext();
     const patchInstructions = loadActivePatchInstructions();
 
-    // ── Load user memories + custom instructions + generated modules + learning context (parallel)
-    const [memoryContext, customInstructions, generatedModulesContext, learningContext] = await Promise.all([
+    // ── Load user memories + custom instructions + generated modules + learning + physio (parallel)
+    const [memoryContext, customInstructions, generatedModulesContext, learningContext, physioContext] = await Promise.all([
       loadUserMemories(req.user.id),
       getOrCreateCustomInstructions(req.user.id),
       loadGeneratedModulesContext(),
       loadLearningContext(req.user.id),
+      loadPhysioContext(req.user.id),
     ]);
     const customInstructionsContext = buildCustomInstructionsContext(customInstructions);
 
@@ -727,6 +752,7 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
       + customInstructionsContext    // persona + user context + response style
       + memoryContext                // remembered facts about this user
       + learningContext              // self-learned patterns + adaptations from past interactions
+      + physioContext                // patient physiotherapy assessment + active program
       + brainContext
       + patchInstructions
       + generatedModulesContext      // self-authored modules OMNIMENS wrote for itself
@@ -845,8 +871,7 @@ EXECUTION DOCTRINE:
       }
     }
 
-    // ── Autonomous Task Planner + Emotional Intelligence (parallel) ──────────
-    // AutoGPT/BabyAGI/CrewAI task decomposition + Social/Emotional awareness
+    // ── Autonomous Task Planner + Emotional Intelligence + Red Flag Screen (parallel)
     const [taskAnalysis, needsSearch, emotionalState] = await Promise.all([
       detectComplexTask(message),
       detectedUrls.length === 0 ? shouldSearchWeb(message) : Promise.resolve({ search: false, query: "" }),
@@ -856,6 +881,27 @@ EXECUTION DOCTRINE:
     // Inject emotional/social awareness into system prompt
     const emotionalContext = buildEmotionalContext(emotionalState);
     if (emotionalContext) systemPrompt += emotionalContext;
+
+    // ── Physical Therapy Red Flag Screening ───────────────────────────────────
+    // Run red flag screen on PT-related messages for patient safety
+    const isPhysioPersona = customInstructions.persona === "PHYSIO";
+    const physioKeywords = /\b(pain|injury|rehab|physical therapy|PT|exercise|back|knee|shoulder|neck|hip|ankle|muscle|joint|sprain|strain|fracture|surgery|recovery|rehabilitation|hurt|ache|stiff|sore|weak|numb|tingling)\b/i;
+    if (physioKeywords.test(message)) {
+      const redFlagResult = screenRedFlags(message + " " + history.slice(-2).map((m: {role: string; content: string}) => m.content).join(" "));
+      if (redFlagResult.flagsPresent) {
+        res.write(`data: ${JSON.stringify({
+          type: "red_flag_alert",
+          urgency: redFlagResult.urgency,
+          flags: redFlagResult.flags,
+          recommendation: redFlagResult.recommendation,
+        })}\n\n`);
+        systemPrompt += `\n\n⚠️ RED FLAG SCREENING ALERT — RESPOND TO THIS FIRST:
+Urgency: ${redFlagResult.urgency}
+Flags detected: ${redFlagResult.flags.join(", ")}
+REQUIRED RESPONSE: ${redFlagResult.recommendation}
+DO NOT provide exercise prescription until this is addressed.`;
+      }
+    }
 
     // Emit task plan SSE if complex task detected
     if (taskAnalysis.isComplex && taskAnalysis.plan.length >= 2) {
@@ -2091,6 +2137,175 @@ router.post("/omnimens/seed-products", async (req, res) => {
     console.error("Seed products error:", err);
     res.status(500).json({ error: "Failed to seed products", detail: String(err?.message || err) });
   }
+});
+
+// ── Physical Therapy AI Routes ────────────────────────────────────────────────
+
+// Get patient's latest assessment + active program
+router.get("/omnimens/physio/profile", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const [assessment, program] = await Promise.all([
+      getLatestAssessment(req.user.id),
+      getActiveProgram(req.user.id),
+    ]);
+    res.json({ assessment, program });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load physio profile" });
+  }
+});
+
+// Save or update assessment
+router.post("/omnimens/physio/assessment", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const assessment = await saveAssessment(req.user.id, req.body);
+    res.json({ assessment });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to save assessment" });
+  }
+});
+
+// Get exercise library for a body region
+router.get("/omnimens/physio/exercises/:region", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const { region } = req.params;
+    const { phase = "2", psychosocial } = req.query as Record<string, string>;
+    const exercises = getExercisesForRegion(
+      region,
+      parseInt(phase),
+      psychosocial ? JSON.parse(psychosocial) : undefined
+    );
+    res.json({ exercises, region });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get exercises" });
+  }
+});
+
+// Generate and save an exercise program
+router.post("/omnimens/physio/program", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const { bodyRegion, phase, diagnosis, painAtRest, phq2Score, tskScore, pcsScore } = req.body;
+    const resolvedPhase = phase || (painAtRest !== undefined
+      ? determinePhase(painAtRest, "subacute", 4)
+      : 2);
+    const psychosocial = (phq2Score !== undefined && tskScore !== undefined && pcsScore !== undefined)
+      ? interpretPsychosocialScores(phq2Score, tskScore, pcsScore)
+      : undefined;
+    const exercises = getExercisesForRegion(bodyRegion || "lower_back", resolvedPhase, psychosocial);
+    const phaseNames = ["", "Pain Control & Mobility", "ROM & Neuromuscular", "Progressive Strengthening", "Functional Training", "Return to Sport"];
+    const program = await saveProgram(req.user.id, {
+      name: `Phase ${resolvedPhase} — ${phaseNames[resolvedPhase] || "Rehabilitation"}`,
+      phase: resolvedPhase,
+      diagnosis,
+      bodyRegion,
+      exercises,
+      frequencyPerWeek: resolvedPhase <= 2 ? 5 : 3,
+      sessionDurationMins: resolvedPhase === 1 ? 20 : resolvedPhase <= 3 ? 30 : 45,
+      progressionCriteria: resolvedPhase <= 2
+        ? "Pain ≤3/10 throughout; able to complete all sets — advance to next phase"
+        : "Completing all sets with correct form; pain ≤2/10 — increase load or complexity",
+      precautions: psychosocial?.kinesiophobiaLevel === "high"
+        ? "High kinesiophobia: start at lowest intensity, prioritize confidence over load"
+        : "Monitor pain response; stop if pain exceeds 4/10",
+    });
+    res.json({ program });
+  } catch (err) {
+    console.error("Physio program error:", err);
+    res.status(500).json({ error: "Failed to create program" });
+  }
+});
+
+// Log a therapy session
+router.post("/omnimens/physio/session", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const today = new Date().toISOString().split("T")[0];
+    const session = await saveSession(req.user.id, { ...req.body, sessionDate: today });
+    res.json({ session });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to log session" });
+  }
+});
+
+// Get outcome measure history
+router.get("/omnimens/physio/outcomes", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const { measure } = req.query as { measure?: string };
+    const history = await getOutcomeHistory(req.user.id, measure || "NPRS");
+    res.json({ history });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get outcomes" });
+  }
+});
+
+// Save an outcome measure score
+router.post("/omnimens/physio/outcomes", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const { measure, score, rawResponses } = req.body;
+    const measureDef = OUTCOME_MEASURES[measure as keyof typeof OUTCOME_MEASURES];
+    if (!measureDef) return res.status(400).json({ error: "Unknown measure" });
+    const today = new Date().toISOString().split("T")[0];
+    const normalizedScore = (score / measureDef.maxScore) * 100;
+    const interpretation = measureDef.interpretation(score);
+    const outcome = await saveOutcome(req.user.id, {
+      measure,
+      score,
+      normalizedScore,
+      interpretation,
+      minimumDetectableChange: measureDef.mdc,
+      administeredAt: today,
+      rawResponses: rawResponses || null,
+    });
+    res.json({ outcome, interpretation, mdc: measureDef.mdc, mcid: measureDef.mcid });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to save outcome" });
+  }
+});
+
+// Red flag screening endpoint
+router.post("/omnimens/physio/red-flag-screen", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const { text } = req.body;
+    const result = screenRedFlags(text || "");
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: "Screening failed" });
+  }
+});
+
+// Get pain science education content
+router.get("/omnimens/physio/pain-science", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  res.json({ library: PAIN_SCIENCE_LIBRARY });
+});
+
+// Get integrative recovery recommendations
+router.post("/omnimens/physio/recovery-tips", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const tips = buildIntegrativeRecommendations(req.body);
+    res.json({ tips });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to generate tips" });
+  }
+});
+
+// List all available outcome measures
+router.get("/omnimens/physio/outcome-measures", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  res.json({ measures: Object.entries(OUTCOME_MEASURES).map(([key, def]) => ({
+    key,
+    name: def.name,
+    maxScore: def.maxScore,
+    mdc: def.mdc,
+    mcid: def.mcid,
+  }))});
 });
 
 export default router;

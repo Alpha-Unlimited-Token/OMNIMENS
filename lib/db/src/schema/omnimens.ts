@@ -198,6 +198,114 @@ export const omnimensConsciousness = pgTable("godflesh_consciousness", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// ── Physical Therapy AI Engine ──────────────────────────────────────────────
+
+// Patient intake assessment + psychosocial screening (PHQ, TSK, PCS)
+export const omnimensPhysioAssessments = pgTable("godflesh_physio_assessments", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => omnimensUsers.id),
+  // Chief complaint
+  bodyRegion: text("body_region"),          // "lower_back" | "knee" | "shoulder" | etc.
+  diagnosis: text("diagnosis"),             // e.g. "Patellofemoral Pain Syndrome"
+  painLocation: text("pain_location"),
+  painOnset: text("pain_onset"),            // "acute" | "subacute" | "chronic"
+  onsetMechanism: text("onset_mechanism"),  // "traumatic" | "insidious" | "post-surgical"
+  painDuration: text("pain_duration"),
+  painPattern: text("pain_pattern"),        // "constant" | "intermittent" | "positional"
+  aggravatingFactors: text("aggravating_factors"),
+  relievingFactors: text("relieving_factors"),
+  // Pain scores (0-10)
+  painAtRest: integer("pain_at_rest"),
+  painWithActivity: integer("pain_with_activity"),
+  painWorstCase: integer("pain_worst_case"),
+  // Goals
+  primaryGoal: text("primary_goal"),
+  activityGoals: text("activity_goals"),    // sports, work, ADLs
+  // Red flag screening
+  redFlagsPresent: boolean("red_flags_present").default(false).notNull(),
+  redFlagDetails: text("red_flag_details"),
+  // Psychosocial screening scores
+  phq2Score: integer("phq2_score"),         // Depression screen (0-6)
+  tskScore: integer("tsk_score"),           // Tampa Scale of Kinesiophobia (17-68)
+  pcsScore: integer("pcs_score"),           // Pain Catastrophizing Scale (0-52)
+  // Activity / function
+  currentActivityLevel: text("current_activity_level"), // "sedentary" | "light" | "moderate" | "active" | "athlete"
+  priorActivityLevel: text("prior_activity_level"),
+  occupation: text("occupation"),
+  // Medical history
+  relevantHistory: text("relevant_history"),
+  surgeries: text("surgeries"),
+  medications: text("medications"),
+  // Integrative factors
+  sleepQuality: text("sleep_quality"),      // "poor" | "fair" | "good"
+  stressLevel: integer("stress_level"),     // 1-10
+  nutritionQuality: text("nutrition_quality"),
+  // Full structured JSON
+  fullAssessment: jsonb("full_assessment"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Prescribed exercise programs (adaptive, evidence-based)
+export const omnimensPhysioPrograms = pgTable("godflesh_physio_programs", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => omnimensUsers.id),
+  assessmentId: integer("assessment_id").references(() => omnimensPhysioAssessments.id),
+  name: text("name").notNull(),             // e.g. "Phase 1 — Pain Control & Mobility"
+  phase: integer("phase").default(1),       // 1=acute, 2=subacute, 3=strengthening, 4=functional, 5=sport/return
+  diagnosis: text("diagnosis"),
+  bodyRegion: text("body_region"),
+  weekNumber: integer("week_number").default(1),
+  exercises: jsonb("exercises").notNull(),  // Array of ExercisePrescription objects
+  frequencyPerWeek: integer("frequency_per_week").default(3),
+  sessionDurationMins: integer("session_duration_mins").default(30),
+  progressionCriteria: text("progression_criteria"),
+  precautions: text("precautions"),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Per-session tracking (adherence, pain, function, subjective notes)
+export const omnimensPhysioSessions = pgTable("godflesh_physio_sessions", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => omnimensUsers.id),
+  programId: integer("program_id").references(() => omnimensPhysioPrograms.id),
+  sessionDate: text("session_date").notNull(),   // "2025-03-16"
+  painBefore: integer("pain_before"),             // 0-10
+  painAfter: integer("pain_after"),               // 0-10
+  functionalScore: integer("functional_score"),   // 0-100 simple ADL rating
+  exercisesCompleted: jsonb("exercises_completed"), // which exercises done + sets/reps achieved
+  adherencePercent: integer("adherence_percent"),  // 0-100
+  fatigue: integer("fatigue"),                     // 1-10
+  mood: text("mood"),                              // "good" | "neutral" | "poor"
+  barriers: text("barriers"),
+  patientNotes: text("patient_notes"),
+  aiInsights: text("ai_insights"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Validated outcome measure scores (PROMIS, DASH, KOOS, LEFS, NDI, PSFS)
+export const omnimensPhysioOutcomes = pgTable("godflesh_physio_outcomes", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => omnimensUsers.id),
+  assessmentId: integer("assessment_id").references(() => omnimensPhysioAssessments.id),
+  measure: text("measure").notNull(),        // "PROMIS_PF" | "DASH" | "KOOS" | "LEFS" | "NDI" | "PSFS" | "NPRS" | "GROC"
+  score: real("score").notNull(),            // raw score
+  normalizedScore: real("normalized_score"), // 0-100 normalized
+  interpretation: text("interpretation"),    // "mild limitation" | "moderate" | "severe"
+  minimumDetectableChange: real("minimum_detectable_change"),
+  mcidReached: boolean("mcid_reached"),      // minimal clinically important difference
+  rawResponses: jsonb("raw_responses"),       // individual question answers
+  administeredAt: text("administered_at").notNull(), // "2025-03-16"
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type OmnimensPhysioAssessment = typeof omnimensPhysioAssessments.$inferSelect;
+export type OmnimensPhysioProgram = typeof omnimensPhysioPrograms.$inferSelect;
+export type OmnimensPhysioSession = typeof omnimensPhysioSessions.$inferSelect;
+export type OmnimensPhysioOutcome = typeof omnimensPhysioOutcomes.$inferSelect;
+
 export type OmnimensEvolution = typeof omnimensEvolution.$inferSelect;
 export type OmnimensGeneratedModule = typeof omnimensGeneratedModules.$inferSelect;
 export type OmnimensConsciousness = typeof omnimensConsciousness.$inferSelect;
