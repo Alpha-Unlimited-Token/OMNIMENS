@@ -1,8 +1,13 @@
+/**
+ * Copyright © 2024–2026 Alpha Unlimited Technologies. All Rights Reserved.
+ * OMNIMENS — Proprietary AI Platform. Unauthorized use prohibited.
+ */
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
 import { Button } from "./ui/button";
 import { User, Layers } from "lucide-react";
 import { OmnimensIcon } from "./omnimens-icon";
+import { CopyrightFooter } from "./copyright-footer";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user, login, isLoading } = useAuth();
@@ -66,6 +71,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 flex flex-col">
         {children}
       </main>
+
+      {/* Copyright Footer — always visible on non-chat pages */}
+      {!isChat && <CopyrightFooter />}
     </div>
   );
 }

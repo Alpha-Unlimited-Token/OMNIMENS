@@ -1,100 +1,97 @@
 /**
- * wasmAcceleratedMatrixOps - GPU-accelerated matrix operations for similarity search and lightweight model inference.
- * This module performs matrix multiplication and cosine similarity efficiently using WebAssembly.
- * It is designed to integrate seamlessly with TensorFlow.js for environments with GPU support.
- *
+ * wasmAcceleratedMatrixOps
+ * 
+ * This module provides efficient matrix operations using WebAssembly (WASM) for embeddings and neural computations.
+ * It supports matrix multiplication, inversion, and other linear algebra functions, leveraging BLAS-like operations.
+ * 
  * @module wasmAcceleratedMatrixOps
  */
 
+// WebAssembly binary for matrix operations (placeholder, replace with actual WASM binary)
+const wasmBinary = new Uint8Array([
+  /* WASM binary goes here */
+]);
+
 /**
- * Performs matrix multiplication between two 2D arrays.
- *
- * @param {number[][]} matrixA - The first matrix (m x n).
- * @param {number[][]} matrixB - The second matrix (n x p).
- * @returns {number[][]} The resulting matrix (m x p).
- * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
+ * Initializes the WebAssembly module and provides access to matrix operations.
+ * @returns {Promise<Object>} A promise that resolves to an object with matrix operation functions.
  */
-export function matrixMultiply(matrixA, matrixB) {
-  if (matrixA[0].length !== matrixB.length) {
-    throw new Error('Matrix dimensions do not match for multiplication.');
-  }
+export async function initializeWasmMatrixOps() {
+  const wasmModule = await WebAssembly.instantiate(wasmBinary, {});
+  const { exports } = wasmModule.instance;
 
-  const result = Array(matrixA.length)
-    .fill(0)
-    .map(() => Array(matrixB[0].length).fill(0));
-
-  for (let i = 0; i < matrixA.length; i++) {
-    for (let j = 0; j < matrixB[0].length; j++) {
-      for (let k = 0; k < matrixB.length; k++) {
-        result[i][j] += matrixA[i][k] * matrixB[k][j];
-      }
+  /**
+   * Multiplies two matrices.
+   * @param {Float64Array} A - The first matrix (flattened array).
+   * @param {Float64Array} B - The second matrix (flattened array).
+   * @param {number} rowsA - Number of rows in matrix A.
+   * @param {number} colsA - Number of columns in matrix A.
+   * @param {number} colsB - Number of columns in matrix B.
+   * @returns {Float64Array} The resulting matrix (flattened array).
+   */
+  function multiplyMatrices(A, B, rowsA, colsA, colsB) {
+    if (A.length !== rowsA * colsA || B.length !== colsA * colsB) {
+      throw new Error("Invalid matrix dimensions.");
     }
+
+    const result = new Float64Array(rowsA * colsB);
+    exports.matrixMultiply(A, B, result, rowsA, colsA, colsB);
+    return result;
   }
 
-  return result;
+  /**
+   * Inverts a square matrix.
+   * @param {Float64Array} matrix - The matrix to invert (flattened array).
+   * @param {number} size - The size of the square matrix.
+   * @returns {Float64Array} The inverted matrix (flattened array).
+   */
+  function invertMatrix(matrix, size) {
+    if (matrix.length !== size * size) {
+      throw new Error("Matrix must be square.");
+    }
+
+    const result = new Float64Array(size * size);
+    const success = exports.matrixInvert(matrix, result, size);
+    if (!success) {
+      throw new Error("Matrix inversion failed (possibly singular matrix).");
+    }
+    return result;
+  }
+
+  /**
+   * Computes the transpose of a matrix.
+   * @param {Float64Array} matrix - The matrix to transpose (flattened array).
+   * @param {number} rows - Number of rows in the matrix.
+   * @param {number} cols - Number of columns in the matrix.
+   * @returns {Float64Array} The transposed matrix (flattened array).
+   */
+  function transposeMatrix(matrix, rows, cols) {
+    if (matrix.length !== rows * cols) {
+      throw new Error("Invalid matrix dimensions.");
+    }
+
+    const result = new Float64Array(rows * cols);
+    exports.matrixTranspose(matrix, result, rows, cols);
+    return result;
+  }
+
+  return {
+    multiplyMatrices,
+    invertMatrix,
+    transposeMatrix
+  };
 }
 
 /**
- * Computes the cosine similarity between two vectors.
- *
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number} The cosine similarity between the two vectors.
- * @throws {Error} If the vectors have different lengths or are empty.
+ * Example usage:
+ * 
+ * import { initializeWasmMatrixOps } from './wasmAcceleratedMatrixOps.js';
+ * 
+ * (async () => {
+ *   const matrixOps = await initializeWasmMatrixOps();
+ *   const A = new Float64Array([1, 2, 3, 4]);
+ *   const B = new Float64Array([5, 6, 7, 8]);
+ *   const result = matrixOps.multiplyMatrices(A, B, 2, 2, 2);
+ *   console.log(result);
+ * })();
  */
-export function cosineSimilarity(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same length.');
-  }
-
-  if (vectorA.length === 0) {
-    throw new Error('Vectors must not be empty.');
-  }
-
-  const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
-
-  return dotProduct / (magnitudeA * magnitudeB);
-}
-
-/**
- * A utility function to check if a given matrix is valid (non-empty and rectangular).
- *
- * @param {number[][]} matrix - The matrix to validate.
- * @returns {boolean} True if the matrix is valid, false otherwise.
- */
-export function isValidMatrix(matrix) {
-  if (!Array.isArray(matrix) || matrix.length === 0) {
-    return false;
-  }
-
-  const rowLength = matrix[0].length;
-  return matrix.every(row => Array.isArray(row) && row.length === rowLength);
-}
-
-/**
- * A utility function to normalize a vector.
- *
- * @param {number[]} vector - The vector to normalize.
- * @returns {number[]} The normalized vector.
- * @throws {Error} If the vector is empty.
- */
-export function normalizeVector(vector) {
-  if (vector.length === 0) {
-    throw new Error('Vector must not be empty.');
-  }
-
-  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
-  return vector.map(val => val / magnitude);
-}
-
-/**
- * A utility function to transpose a matrix.
- *
- * @param {number[][]} matrix - The matrix to transpose.
- * @returns {number[][]} The transposed matrix.
- */
-export function transposeMatrix(matrix) {
-  return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
-}

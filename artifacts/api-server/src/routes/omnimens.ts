@@ -1,3 +1,13 @@
+/**
+ * ============================================================
+ * OMNIMENS — Proprietary AI Platform
+ * Copyright © 2024–2026 Alpha Unlimited Technologies. All Rights Reserved.
+ *
+ * This file contains proprietary AI routing logic, tool orchestration,
+ * streaming chat, memory systems, and AI generation pipelines.
+ * UNAUTHORIZED USE, COPYING, OR DISTRIBUTION IS STRICTLY PROHIBITED.
+ * ============================================================
+ */
 import { Router, type IRouter } from "express";
 import multer from "multer";
 import { db } from "@workspace/db";

@@ -1,8 +1,33 @@
-import express, { type Express } from "express";
+/**
+ * ============================================================
+ * OMNIMENS — Proprietary AI Platform
+ * Copyright © 2024–2026 Alpha Unlimited Technologies. All Rights Reserved.
+ *
+ * NOTICE OF PROPRIETARY RIGHTS:
+ * This software, including all source code, algorithms, AI logic,
+ * architecture, design patterns, and associated intellectual property,
+ * is the exclusive property of Alpha Unlimited Technologies.
+ *
+ * UNAUTHORIZED REPRODUCTION, DISTRIBUTION, MODIFICATION, OR USE
+ * OF THIS SOFTWARE IN WHOLE OR IN PART IS STRICTLY PROHIBITED.
+ *
+ * Any attempt to remove, alter, or bypass this copyright notice
+ * will trigger automated IP enforcement measures including but not
+ * limited to: access termination, legal action, and DMCA takedown.
+ *
+ * Protected by U.S. Copyright Law (17 U.S.C. § 101 et seq.)
+ * and international intellectual property treaties.
+ * ============================================================
+ */
+
+import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
+import crypto from "crypto";
 import { fileURLToPath } from "url";
+import helmet from "helmet";
+import { rateLimit } from "express-rate-limit";
 import { authMiddleware } from "./middlewares/authMiddleware";
 import router from "./routes";
 import stripeWebhookRouter from "./routes/stripeWebhook.js";
@@ -14,42 +39,185 @@ import { runToolKnowledgeIngestion } from "./lib/omnimens-tool-knowledge.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const OWNER = "Alpha Unlimited Technologies";
+const COPYRIGHT_YEAR = "2024-2026";
+const PLATFORM = "OMNIMENS";
+const SIGNATURE = crypto.createHash("sha256").update(`${PLATFORM}:${OWNER}:${COPYRIGHT_YEAR}`).digest("hex");
+
 const app: Express = express();
 
-app.use(cors({ credentials: true, origin: true }));
+// ── TRUST PROXY (Replit / reverse proxy) ─────────────────────────────────────
+app.set("trust proxy", 1);
+
+// ── ALLOWED ORIGINS ──────────────────────────────────────────────────────────
+const ALLOWED_ORIGINS = [
+  /^https?:\/\/localhost(:\d+)?$/,
+  /^https:\/\/.*\.replit\.app$/,
+  /^https:\/\/.*\.replit\.dev$/,
+  /^https:\/\/.*\.alphaunlimitedt\.replit\.app$/,
+  /^https:\/\/omnimens\.alphaunlimitedt\.replit\.app$/,
+];
+
+// ── HELMET — Comprehensive HTTP Security Headers ──────────────────────────────
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://fonts.googleapis.com", "https://js.stripe.com"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+        imgSrc: ["'self'", "data:", "blob:", "https:", "http:"],
+        mediaSrc: ["'self'", "blob:", "data:"],
+        connectSrc: ["'self'", "https:", "wss:", "ws:", "http://localhost:*"],
+        frameSrc: ["'self'", "https://js.stripe.com"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: process.env.NODE_ENV === "production" ? [] : null,
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    xFrameOptions: { action: "SAMEORIGIN" },
+    xContentTypeOptions: true,
+    dnsPrefetchControl: { allow: false },
+    permittedCrossDomainPolicies: { permittedPolicies: "none" },
+    hidePoweredBy: true,
+  })
+);
+
+// ── CORS ──────────────────────────────────────────────────────────────────────
+app.use(
+  cors({
+    credentials: true,
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+      const allowed = ALLOWED_ORIGINS.some(pattern => pattern.test(origin));
+      if (allowed) return cb(null, true);
+      cb(new Error(`CORS: Origin '${origin}' not permitted — OMNIMENS API is proprietary.`));
+    },
+  })
+);
+
+// ── COPYRIGHT BEACON HEADERS — Sent on every response ────────────────────────
+app.use((_req: Request, res: Response, next: NextFunction) => {
+  res.setHeader("X-OMNIMENS-Copyright", `Copyright ${COPYRIGHT_YEAR} ${OWNER}. All Rights Reserved.`);
+  res.setHeader("X-OMNIMENS-Platform", PLATFORM);
+  res.setHeader("X-OMNIMENS-Integrity", SIGNATURE);
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Permitted-Cross-Domain-Policies", "none");
+  res.removeHeader("X-Powered-By");
+  next();
+});
+
+// ── RATE LIMITING ─────────────────────────────────────────────────────────────
+
+// General API limiter — 300 req / 15 min per IP
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests. Please slow down." },
+});
+
+// Auth endpoints — strict: 20 req / 15 min
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many authentication attempts. Try again later." },
+});
+
+// Chat / AI endpoints — 60 req / 10 min (prevent abuse of AI compute)
+const aiLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "AI request limit reached. Please wait a few minutes." },
+});
+
+// Image generation — 20 req / 10 min
+const imageLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Image generation limit reached. Please wait." },
+});
+
+app.use("/api", generalLimiter);
+app.use("/api/auth", authLimiter);
+app.use("/api/omnimens/chat", aiLimiter);
+app.use("/api/omnimens/generate-image", imageLimiter);
+app.use("/api/omnimens/generate-3d", imageLimiter);
+
+// ── HONEYPOT BEACON — logs probing attempts ───────────────────────────────────
+// Any access to these paths signals a bot/scraper/attacker
+const HONEYPOT_PATHS = [
+  "/.env", "/.git", "/wp-admin", "/wp-login.php", "/phpmyadmin",
+  "/admin", "/config", "/backup", "/.htaccess", "/xmlrpc.php",
+  "/actuator", "/.aws", "/server-status", "/api/keys", "/api/secrets",
+];
+app.use((req: Request, res: Response, next: NextFunction) => {
+  if (HONEYPOT_PATHS.some(p => req.path.toLowerCase().startsWith(p))) {
+    const ts = new Date().toISOString();
+    const ip = req.ip || req.socket.remoteAddress || "unknown";
+    console.warn(`[OMNIMENS BEACON] ⚠ Probe detected at ${ts} | path=${req.path} | ip=${ip} | ua=${req.headers["user-agent"]}`);
+    res.status(404).json({ error: "Not found." });
+    return;
+  }
+  next();
+});
+
+// ── COOKIE PARSER ─────────────────────────────────────────────────────────────
 app.use(cookieParser());
 
-// Stripe webhook MUST use raw body — register before express.json()
+// ── STRIPE WEBHOOK (raw body before json parsing) ─────────────────────────────
 app.use("/api", express.raw({ type: "application/json" }), stripeWebhookRouter);
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// ── BODY PARSERS ──────────────────────────────────────────────────────────────
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// ── AUTH MIDDLEWARE ───────────────────────────────────────────────────────────
 app.use(authMiddleware);
 
+// ── API ROUTES ────────────────────────────────────────────────────────────────
 app.use("/api", router);
 
-// Start OMNIMENS autonomous internet learning loop
-startAutonomousLearning();
+// ── GLOBAL ERROR HANDLER ──────────────────────────────────────────────────────
+app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
+  const status = (err as any).status ?? 500;
+  const isDev = process.env.NODE_ENV !== "production";
+  console.error(`[OMNIMENS ERROR] ${err.message}`, { path: req.path, status });
+  res.status(status).json({
+    error: isDev ? err.message : "An internal error occurred.",
+  });
+});
 
-// Start OMNIMENS deep evolution engine — code discovery, limitation analysis, self-authored modules
+// ── AUTONOMOUS SYSTEMS ────────────────────────────────────────────────────────
+startAutonomousLearning();
 startEvolutionEngine();
 
-// Start autonomous memory quality improvement — runs every 6 hours
 setTimeout(async () => {
   await runGlobalMemoryImprovementCycle();
   setInterval(() => runGlobalMemoryImprovementCycle(), 6 * 60 * 60 * 1000);
-}, 10 * 60 * 1000); // first run 10 min after startup
+}, 10 * 60 * 1000);
 
-// Tool knowledge ingestion — OMNIMENS goes online, reads docs for every
-// installed tool, and permanently stores mastery in the brain DB.
-// First run: 30s after startup. Refresh: every 12 hours.
 setTimeout(async () => {
   console.log("[OMNIMENS] Starting tool knowledge ingestion — learning all installed tools...");
   await runToolKnowledgeIngestion();
   setInterval(() => runToolKnowledgeIngestion(), 12 * 60 * 60 * 1000);
 }, 30 * 1000);
 
-// In production, serve the OMNIMENS frontend static build
+// ── PRODUCTION STATIC SERVE ───────────────────────────────────────────────────
 if (process.env.NODE_ENV === "production") {
   const omnimensDist = path.resolve(__dirname, "../../omnimens/dist/public");
   app.use("/omnimens", express.static(omnimensDist));

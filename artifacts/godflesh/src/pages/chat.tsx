@@ -1,3 +1,13 @@
+/**
+ * ============================================================
+ * OMNIMENS — Proprietary AI Platform
+ * Copyright © 2024–2026 Alpha Unlimited Technologies. All Rights Reserved.
+ *
+ * Proprietary AI chat interface — streaming intelligence, persistent
+ * memory, multi-modal generation, and specialist personas.
+ * UNAUTHORIZED USE OR REPRODUCTION IS STRICTLY PROHIBITED.
+ * ============================================================
+ */
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
