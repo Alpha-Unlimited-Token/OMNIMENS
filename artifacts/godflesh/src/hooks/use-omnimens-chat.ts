@@ -71,6 +71,31 @@ export type RedFlagAlert = {
   recommendation: string;
 };
 
+export type CogniSyncState = {
+  primaryMode: "creative" | "analytical" | "urgent" | "exploratory" | "directive" | "conversational";
+  signals: {
+    cognitiveLoad: number;
+    expertiseLevel: number;
+    emotionalUrgency: number;
+    creativeMode: number;
+    analyticalMode: number;
+    decisionFatigue: number;
+  };
+  responseArchitecture: {
+    density: string;
+    structure: string;
+    vocabularyRegister: string;
+    toneCalibration: string;
+    verbosity: string;
+    leadWithAction: boolean;
+    useAnalogies: boolean;
+    giveRecommendation: boolean;
+  };
+  semanticDomains: string[];
+  resonanceInsights: string[];
+  summary: string;
+};
+
 export type ToolResult = {
   type: "weather" | "news" | "academic" | "stock" | "currency" | "translate" | "video" | "units" | "qr" | "color_palette";
   result?: string;
@@ -117,6 +142,7 @@ export type Message = {
   multiSearchComplete?: boolean;
   redFlagAlert?: RedFlagAlert;
   toolResults?: ToolResult[];
+  cogniSync?: CogniSyncState;
 };
 
 export type AttachedFile = {
@@ -131,6 +157,7 @@ export function useOmnimensChat(onLimitReached: () => void) {
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentConversationId, setCurrentConversationId] = useState<number | undefined>();
+  const [activeCogniSync, setActiveCogniSync] = useState<CogniSyncState | null>(null);
   const queryClient = useQueryClient();
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -463,6 +490,23 @@ export function useOmnimensChat(onLimitReached: () => void) {
                   return newMsgs;
                 });
 
+              } else if (data.type === "cognisync_state") {
+                const cs: CogniSyncState = {
+                  primaryMode: data.primaryMode,
+                  signals: data.signals,
+                  responseArchitecture: data.responseArchitecture,
+                  semanticDomains: data.semanticDomains,
+                  resonanceInsights: data.resonanceInsights,
+                  summary: data.summary,
+                };
+                setActiveCogniSync(cs);
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) msg.cogniSync = cs;
+                  return newMsgs;
+                });
+
               } else if (data.type?.startsWith("tool_")) {
                 // Handle all extended tool results (weather, news, academic, stock, qr, etc.)
                 const toolType = data.type.replace("tool_", "") as ToolResult["type"];
@@ -556,5 +600,6 @@ export function useOmnimensChat(onLimitReached: () => void) {
     currentConversationId,
     startNewConversation,
     loadConversation,
+    activeCogniSync,
   };
 }

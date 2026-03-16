@@ -14,7 +14,7 @@ import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { useQuery, useQueryClient as useQC } from "@tanstack/react-query";
-import { useOmnimensChat, type GeneratedImage, type Generated3DModel, type GeneratedGame, type Artifact, type CostBreakdown, type TaskPlan, type RedFlagAlert, type ToolResult } from "@/hooks/use-omnimens-chat";
+import { useOmnimensChat, type GeneratedImage, type Generated3DModel, type GeneratedGame, type Artifact, type CostBreakdown, type TaskPlan, type RedFlagAlert, type ToolResult, type CogniSyncState } from "@/hooks/use-omnimens-chat";
 import { useOmnimensVoice } from "@/hooks/use-omnimens-voice";
 import { VoiceIndicator } from "@/components/voice-indicator";
 import { OmnimensPresence } from "@/components/omnimens-presence";
@@ -1969,6 +1969,36 @@ function RightPanel({
   );
 }
 
+// ── COGNISYNC™ Live Indicator ─────────────────────────────────────────────────
+// Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+const COGNI_MODE_STYLES: Record<string, { color: string; bg: string; border: string; label: string }> = {
+  creative:      { color: "text-pink-400",    bg: "bg-pink-400/8",    border: "border-pink-400/20",    label: "CREATIVE" },
+  analytical:    { color: "text-cyan-400",    bg: "bg-cyan-400/8",    border: "border-cyan-400/20",    label: "ANALYTICAL" },
+  urgent:        { color: "text-red-400",     bg: "bg-red-400/8",     border: "border-red-400/20",     label: "URGENT" },
+  exploratory:   { color: "text-violet-400",  bg: "bg-violet-400/8",  border: "border-violet-400/20",  label: "EXPLORATORY" },
+  directive:     { color: "text-yellow-400",  bg: "bg-yellow-400/8",  border: "border-yellow-400/20",  label: "DIRECTIVE" },
+  conversational:{ color: "text-emerald-400", bg: "bg-emerald-400/8", border: "border-emerald-400/20", label: "CONVERSATIONAL" },
+};
+
+function CogniSyncIndicator({ state }: { state: CogniSyncState | null }) {
+  if (!state) return null;
+  const style = COGNI_MODE_STYLES[state.primaryMode] || COGNI_MODE_STYLES.exploratory;
+  return (
+    <motion.div
+      key={state.primaryMode}
+      initial={{ opacity: 0, scale: 0.85 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full border ${style.bg} ${style.border} cursor-default`}
+      title={`COGNISYNC™ Active — ${state.summary}\nDomains: ${state.semanticDomains.join(", ") || "general"}`}
+    >
+      <span className={`w-1.5 h-1.5 rounded-full ${style.color} animate-pulse`} style={{ background: "currentColor" }} />
+      <span className={`text-[8px] font-mono tracking-[0.25em] ${style.color}`}>
+        COGNISYNC™ · {style.label}
+      </span>
+    </motion.div>
+  );
+}
+
 // ── Mermaid diagram renderer ────────────────────────────────────────────────────
 function MermaidDiagram({ code }: { code: string }) {
   const [svg, setSvg] = useState<string>("");
@@ -2252,7 +2282,7 @@ export default function Chat() {
 
   const { data: status, isLoading: statusLoading } = useGetOmnimensStatus();
   const qc = useQC();
-  const { messages, sendMessage, isTyping, error, stopGeneration, currentConversationId, startNewConversation, loadConversation } = useOmnimensChat(() => {
+  const { messages, sendMessage, isTyping, error, stopGeneration, currentConversationId, startNewConversation, loadConversation, activeCogniSync } = useOmnimensChat(() => {
     setShowLimitModal(true);
   });
 
@@ -2498,9 +2528,10 @@ export default function Chat() {
             </button>
 
             {/* Center identity */}
-            <div className="flex items-center gap-2 font-mono text-xs">
+            <div className="flex items-center gap-2 font-mono text-xs flex-wrap">
               <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
               <span className="text-white">LINK ACTIVE</span>
+              <CogniSyncIndicator state={activeCogniSync} />
               {/* Active hub modes indicators */}
               {hubSettings.antiHallucinationMode && (
                 <span title="Anti-Hallucination Mode ON" className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-orange-400/10 border border-orange-400/20 text-orange-400 text-[9px] font-mono">

@@ -58,6 +58,7 @@ import { generateGame } from "../lib/omnimens-game.js";
 import { buildCinematicZip, type CinematicExportRequest } from "../lib/omnimens-avatar-cinematic.js";
 import { loadToolKnowledgeForTask, runToolKnowledgeIngestion, INSTALLED_TOOLS } from "../lib/omnimens-tool-knowledge.js";
 import { getRestorativeArtContext } from "../lib/omnimens-restorative-art.js";
+import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import {
   fetchWeather,
   fetchNewsHeadlines,
@@ -1109,6 +1110,23 @@ EXECUTION DOCTRINE:
     // Inject emotional/social awareness into system prompt
     const emotionalContext = buildEmotionalContext(emotionalState);
     if (emotionalContext) systemPrompt += emotionalContext;
+
+    // ── COGNISYNC™ — Adaptive Cognitive Resonance Engine ─────────────────────
+    // Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+    // Patent-pending technology. First deployed: March 16, 2026.
+    const cogniState = analyzeCognitiveState(message, history);
+    const cogniPrompt = getCogniSyncPromptAddendum(cogniState);
+    systemPrompt += cogniPrompt;
+    // Emit cognitive state to frontend for display
+    res.write(`data: ${JSON.stringify({
+      type: "cognisync_state",
+      primaryMode:       cogniState.primaryMode,
+      signals:           cogniState.signals,
+      responseArchitecture: cogniState.responseArchitecture,
+      semanticDomains:   cogniState.semanticDomains,
+      resonanceInsights: cogniState.resonanceInsights,
+      summary:           cogniState.summary,
+    })}\n\n`);
 
     // ── Physical Therapy Red Flag Screening ───────────────────────────────────
     // Run red flag screen on PT-related messages for patient safety

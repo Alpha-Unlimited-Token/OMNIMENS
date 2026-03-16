@@ -1,9 +1,10 @@
-import { motion } from "framer-motion";
+import { motion, useAnimationFrame } from "framer-motion";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
-import { Sparkles, Brain, Zap } from "lucide-react";
+import { Sparkles, Brain, Zap, Activity, Cpu, GitBranch, Layers } from "lucide-react";
 import { OmnimensPresence } from "@/components/omnimens-presence";
 
 export default function Home() {
@@ -150,7 +151,261 @@ export default function Home() {
           </motion.div>
         </div>
       </div>
+
+      {/* ── COGNISYNC™ Promo Section ──────────────────────────────────────── */}
+      <div className="w-full border-t border-white/5 py-24 relative z-10 overflow-hidden">
+        {/* Animated background aurora */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[400px] bg-cyan-500/5 blur-[140px] rounded-full" />
+          <div className="absolute bottom-0 right-1/4 w-[500px] h-[300px] bg-violet-500/6 blur-[120px] rounded-full" />
+        </div>
+        <div className="container mx-auto px-4 relative">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="text-center mb-14"
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyan-400/25 bg-cyan-400/6 mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+              <span className="text-[10px] font-mono text-cyan-400 tracking-[0.35em] uppercase">World-First Technology</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-display font-black tracking-widest text-white uppercase mb-4"
+              style={{ textShadow: "0 0 40px rgba(6,182,212,0.25)" }}>
+              COGNISYNC<span className="text-cyan-400">™</span>
+            </h2>
+            <p className="text-base font-mono text-white/50 tracking-widest uppercase">
+              Adaptive Cognitive Resonance Engine
+            </p>
+            <div className="w-24 h-px bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent mx-auto mt-6" />
+          </motion.div>
+
+          {/* Main card */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.15 }}
+            className="max-w-5xl mx-auto"
+          >
+            <div className="relative rounded-3xl border border-cyan-400/15 bg-gradient-to-br from-[#020813] via-[#030c18] to-[#060816] overflow-hidden shadow-[0_0_80px_rgba(6,182,212,0.08)]">
+
+              {/* Top strip accent */}
+              <div className="h-px w-full bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent" />
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+
+                {/* LEFT — Neural visualization */}
+                <div className="relative flex items-center justify-center p-10 lg:p-14 border-b lg:border-b-0 lg:border-r border-white/5">
+                  <CogniSyncVisualizer />
+                </div>
+
+                {/* RIGHT — Content */}
+                <div className="p-10 lg:p-14 flex flex-col justify-center">
+                  <p className="text-white/80 font-sans text-lg leading-relaxed mb-8">
+                    COGNISYNC reads your mind — not metaphorically. It analyzes{" "}
+                    <span className="text-cyan-400 font-semibold">6 cognitive dimensions</span> in every
+                    message and dynamically reshapes how OMNIMENS thinks and communicates with you.
+                    No AI on Earth has ever done this.
+                  </p>
+
+                  <div className="space-y-4 mb-10">
+                    {[
+                      { icon: <Activity className="w-4 h-4 text-cyan-400" />, label: "Cognitive Load", desc: "Detects mental demand and simplifies when you're overwhelmed" },
+                      { icon: <Cpu className="w-4 h-4 text-violet-400" />,   label: "Expertise Detection", desc: "Calibrates vocabulary and depth to your exact knowledge level" },
+                      { icon: <Zap className="w-4 h-4 text-yellow-400" />,   label: "Urgency & Emotion", desc: "Leads with action when you're stressed — no preamble" },
+                      { icon: <GitBranch className="w-4 h-4 text-emerald-400" />, label: "Semantic Momentum", desc: "Surfaces cross-domain insights you haven't thought to ask for" },
+                      { icon: <Layers className="w-4 h-4 text-pink-400" />,  label: "Decision Fatigue", desc: "Detects choice overload and commits to one clear recommendation" },
+                      { icon: <Brain className="w-4 h-4 text-primary" />,    label: "Creative vs Analytical", desc: "Shifts between expansive prose and structured precision instantly" },
+                    ].map((item, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: 12 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 * i, duration: 0.4 }}
+                        className="flex items-start gap-3"
+                      >
+                        <div className="shrink-0 mt-0.5 w-7 h-7 rounded-lg bg-white/4 border border-white/8 flex items-center justify-center">
+                          {item.icon}
+                        </div>
+                        <div>
+                          <p className="text-white/85 text-sm font-semibold font-mono tracking-wide">{item.label}</p>
+                          <p className="text-white/40 text-xs font-mono leading-relaxed">{item.desc}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 h-px bg-white/6" />
+                    <span className="text-[9px] font-mono text-white/25 tracking-[0.3em] uppercase whitespace-nowrap">
+                      Copyright 2026 · Alpha Unlimited Technologies · Patent Pending
+                    </span>
+                    <div className="flex-1 h-px bg-white/6" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom strip accent */}
+              <div className="h-px w-full bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent" />
+            </div>
+          </motion.div>
+
+          {/* Mode chips */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="flex flex-wrap justify-center gap-2 mt-10"
+          >
+            {[
+              { mode: "CREATIVE",      color: "text-pink-400 border-pink-400/20 bg-pink-400/5" },
+              { mode: "ANALYTICAL",    color: "text-cyan-400 border-cyan-400/20 bg-cyan-400/5" },
+              { mode: "URGENT",        color: "text-red-400 border-red-400/20 bg-red-400/5" },
+              { mode: "EXPLORATORY",   color: "text-violet-400 border-violet-400/20 bg-violet-400/5" },
+              { mode: "DIRECTIVE",     color: "text-yellow-400 border-yellow-400/20 bg-yellow-400/5" },
+              { mode: "CONVERSATIONAL",color: "text-emerald-400 border-emerald-400/20 bg-emerald-400/5" },
+            ].map(({ mode, color }) => (
+              <span key={mode} className={`px-3 py-1 rounded-full border text-[9px] font-mono tracking-[0.25em] uppercase ${color}`}>
+                {mode}
+              </span>
+            ))}
+          </motion.div>
+          <p className="text-center text-[10px] font-mono text-white/20 mt-3 tracking-widest">
+            Six cognitive modes — detected automatically, every message
+          </p>
+        </div>
+      </div>
     </Layout>
+  );
+}
+
+// ── COGNISYNC™ Neural Visualizer (animated SVG) ──────────────────────────────
+function CogniSyncVisualizer() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const NODES = [
+    { x: 0.5,  y: 0.15, label: "Cognitive Load",   color: "#06b6d4" },
+    { x: 0.85, y: 0.35, label: "Expertise",         color: "#8b5cf6" },
+    { x: 0.82, y: 0.72, label: "Urgency",           color: "#f59e0b" },
+    { x: 0.5,  y: 0.88, label: "Decision Fatigue",  color: "#ef4444" },
+    { x: 0.18, y: 0.72, label: "Creative Mode",     color: "#ec4899" },
+    { x: 0.15, y: 0.35, label: "Analytical Mode",   color: "#10b981" },
+  ];
+
+  const EDGES = [
+    [0,1],[1,2],[2,3],[3,4],[4,5],[5,0],
+    [0,3],[1,4],[2,5],
+  ];
+
+  useAnimationFrame((t) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    const time = t * 0.001;
+
+    // Draw animated edges
+    EDGES.forEach(([a, b], i) => {
+      const na = NODES[a], nb = NODES[b];
+      const x1 = na.x * W, y1 = na.y * H;
+      const x2 = nb.x * W, y2 = nb.y * H;
+      const pulse = 0.5 + 0.5 * Math.sin(time * 1.8 + i * 0.7);
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = `rgba(6,182,212,${0.06 + pulse * 0.12})`;
+      ctx.lineWidth = 1 + pulse * 0.8;
+      ctx.stroke();
+
+      // Traveling pulse dot
+      const progress = (time * 0.4 + i * 0.17) % 1;
+      const px = x1 + (x2 - x1) * progress;
+      const py = y1 + (y2 - y1) * progress;
+      ctx.beginPath();
+      ctx.arc(px, py, 1.8, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(6,182,212,${0.4 + pulse * 0.5})`;
+      ctx.fill();
+    });
+
+    // Draw nodes
+    NODES.forEach((node, i) => {
+      const x = node.x * W, y = node.y * H;
+      const pulse = 0.5 + 0.5 * Math.sin(time * 2.2 + i * 1.1);
+      const r = 16 + pulse * 6;
+
+      // Glow
+      const grd = ctx.createRadialGradient(x, y, 0, x, y, r * 2.5);
+      grd.addColorStop(0, node.color + "40");
+      grd.addColorStop(1, "transparent");
+      ctx.beginPath();
+      ctx.arc(x, y, r * 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = grd;
+      ctx.fill();
+
+      // Core circle
+      ctx.beginPath();
+      ctx.arc(x, y, r * 0.55, 0, Math.PI * 2);
+      ctx.fillStyle = node.color + "25";
+      ctx.strokeStyle = node.color + "90";
+      ctx.lineWidth = 1.5;
+      ctx.fill();
+      ctx.stroke();
+
+      // Inner dot
+      ctx.beginPath();
+      ctx.arc(x, y, 3 + pulse * 2, 0, Math.PI * 2);
+      ctx.fillStyle = node.color;
+      ctx.fill();
+    });
+
+    // Center COGNISYNC core
+    const cx = W * 0.5, cy = H * 0.52;
+    const coreR = 18 + 4 * Math.sin(time * 3);
+    const coreGrd = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreR * 3);
+    coreGrd.addColorStop(0, "rgba(6,182,212,0.35)");
+    coreGrd.addColorStop(0.5, "rgba(139,92,246,0.12)");
+    coreGrd.addColorStop(1, "transparent");
+    ctx.beginPath();
+    ctx.arc(cx, cy, coreR * 3, 0, Math.PI * 2);
+    ctx.fillStyle = coreGrd;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, coreR * 0.7, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(6,182,212,0.15)";
+    ctx.strokeStyle = "rgba(6,182,212,0.7)";
+    ctx.lineWidth = 1.5;
+    ctx.fill();
+    ctx.stroke();
+
+    // Labels
+    ctx.font = "9px monospace";
+    ctx.textAlign = "center";
+    NODES.forEach((node, i) => {
+      const x = node.x * W, y = node.y * H;
+      const labelY = node.y < 0.5 ? y - 28 : y + 30;
+      ctx.fillStyle = node.color + "cc";
+      ctx.fillText(node.label.toUpperCase(), x, labelY);
+    });
+  });
+
+  return (
+    <div className="relative flex flex-col items-center gap-4">
+      <canvas
+        ref={canvasRef}
+        width={320}
+        height={280}
+        className="w-[280px] h-[245px]"
+      />
+      <div className="flex items-center gap-2">
+        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+        <span className="text-[9px] font-mono text-cyan-400/60 tracking-[0.3em] uppercase">Live Cognitive Analysis</span>
+      </div>
+    </div>
   );
 }
 
