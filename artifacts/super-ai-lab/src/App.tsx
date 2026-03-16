@@ -11,30 +11,43 @@ import BlueprintPage from "@/pages/blueprint";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
-  defaultOptions: { 
-    queries: { 
-      retry: false, 
-      refetchOnWindowFocus: false 
-    } 
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false
+    }
   }
 });
 
-// ── Owner gate: only the platform owner can access this lab.
-// Everyone else is silently sent to OMNIMENS.
-function OwnerGate({ children }: { children: React.ReactNode }) {
-  const [status, setStatus] = useState<"checking" | "owner" | "redirect">("checking");
+// ── Double-lock gate ──────────────────────────────────────────────────────────
+// Lock 1: The request path must contain the secret token.
+// Lock 2: The authenticated session must belong to the platform owner.
+// Either lock failing silently sends the visitor to OMNIMENS with no hint given.
+
+const _k = "/dLdFrQJk4IwoKwlPi8O_JPls";
+
+function LabGate({ children }: { children: React.ReactNode }) {
+  const [status, setStatus] = useState<"checking" | "granted" | "denied">("checking");
 
   useEffect(() => {
+    // Lock 1 — path must begin with the secret segment
+    const hasToken = window.location.pathname.startsWith(_k);
+    if (!hasToken) {
+      setStatus("denied");
+      return;
+    }
+
+    // Lock 2 — session must be the owner
     fetch("/api/omnimens/status", { credentials: "include" })
       .then(r => r.ok ? r.json() : null)
       .then(d => {
-        if (d?.isOwner) {
-          setStatus("owner");
+        if (d?.isOwner === true) {
+          setStatus("granted");
         } else {
-          setStatus("redirect");
+          setStatus("denied");
         }
       })
-      .catch(() => setStatus("redirect"));
+      .catch(() => setStatus("denied"));
   }, []);
 
   if (status === "checking") {
@@ -45,7 +58,7 @@ function OwnerGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (status === "redirect") {
+  if (status === "denied") {
     window.location.replace("/godflesh/");
     return null;
   }
@@ -70,11 +83,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <OwnerGate>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+        <LabGate>
+          <WouterRouter base={_k}>
             <Router />
           </WouterRouter>
-        </OwnerGate>
+        </LabGate>
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
