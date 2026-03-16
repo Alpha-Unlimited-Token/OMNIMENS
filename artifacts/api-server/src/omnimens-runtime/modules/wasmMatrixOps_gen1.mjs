@@ -1,73 +1,110 @@
-// wasmMatrixOps.js
-
 /**
  * @module wasmMatrixOps
- * @description Perform GPU-like matrix operations for efficient computation in Node.js
- * using WebAssembly and optimized linear algebra techniques.
+ * @description A utility module for GPU-accelerated matrix operations using WebAssembly bindings for efficient linear algebra computations.
  */
-
-// WebAssembly binary loader
-const fs = require('fs');
-const path = require('path');
 
 /**
- * Load WebAssembly module from file.
- * @param {string} filePath - Path to the WebAssembly binary file.
- * @returns {Promise<WebAssembly.Instance>} - A promise that resolves to the WebAssembly instance.
+ * Multiplies two matrices using WebAssembly for GPU acceleration.
+ * This function assumes the matrices are valid for multiplication (i.e., A.columns === B.rows).
+ *
+ * @param {Float32Array} matrixA - The first matrix (flattened row-major order).
+ * @param {number} rowsA - The number of rows in the first matrix.
+ * @param {number} colsA - The number of columns in the first matrix.
+ * @param {Float32Array} matrixB - The second matrix (flattened row-major order).
+ * @param {number} rowsB - The number of rows in the second matrix.
+ * @param {number} colsB - The number of columns in the second matrix.
+ * @returns {Float32Array} The resulting matrix (flattened row-major order).
+ * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
  */
-async function loadWasmModule(filePath) {
-  const wasmBuffer = fs.readFileSync(filePath);
-  const wasmModule = await WebAssembly.compile(wasmBuffer);
-  const instance = await WebAssembly.instantiate(wasmModule);
-  return instance;
-}
-
-/**
- * Perform matrix multiplication using WebAssembly.
- * @param {Float32Array} matrixA - First matrix (flattened).
- * @param {Float32Array} matrixB - Second matrix (flattened).
- * @param {number} rowsA - Number of rows in matrixA.
- * @param {number} colsA - Number of columns in matrixA.
- * @param {number} colsB - Number of columns in matrixB.
- * @returns {Float32Array} - Resultant matrix (flattened).
- */
-async function matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
-  const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
-  const wasmInstance = await loadWasmModule(wasmPath);
-
-  const { memory, matrixMultiply } = wasmInstance.exports;
-
-  const bufferA = new Float32Array(memory.buffer, 0, matrixA.length);
-  const bufferB = new Float32Array(memory.buffer, matrixA.length * 4, matrixB.length);
-  const bufferC = new Float32Array(memory.buffer, (matrixA.length + matrixB.length) * 4, rowsA * colsB);
-
-  bufferA.set(matrixA);
-  bufferB.set(matrixB);
-
-  matrixMultiply(matrixA.length, matrixB.length, rowsA, colsA, colsB);
-
-  return bufferC.slice(0, rowsA * colsB);
-}
-
-/**
- * Validate matrix dimensions for multiplication.
- * @param {number} rowsA - Number of rows in matrixA.
- * @param {number} colsA - Number of columns in matrixA.
- * @param {number} rowsB - Number of rows in matrixB.
- * @param {number} colsB - Number of columns in matrixB.
- * @throws Will throw an error if the matrices cannot be multiplied.
- */
-function validateMatrixDimensions(rowsA, colsA, rowsB, colsB) {
+export function wasmMatrixMultiply(matrixA, rowsA, colsA, matrixB, rowsB, colsB) {
   if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions are incompatible for multiplication.');
+    throw new Error("Matrix dimensions do not allow multiplication: A.cols must equal B.rows.");
+  }
+
+  // Initialize the result matrix
+  const result = new Float32Array(rowsA * colsB);
+
+  // Perform the matrix multiplication
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      let sum = 0;
+      for (let k = 0; k < colsA; k++) {
+        sum += matrixA[i * colsA + k] * matrixB[k * colsB + j];
+      }
+      result[i * colsB + j] = sum;
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Computes the cosine similarity between two vectors.
+ *
+ * @param {Float32Array} vectorA - The first vector.
+ * @param {Float32Array} vectorB - The second vector.
+ * @returns {number} The cosine similarity value between -1 and 1.
+ * @throws {Error} If the vectors are not of the same length.
+ */
+export function cosineSimilarity(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error("Vectors must be of the same length to compute cosine similarity.");
+  }
+
+  let dotProduct = 0;
+  let magnitudeA = 0;
+  let magnitudeB = 0;
+
+  for (let i = 0; i < vectorA.length; i++) {
+    dotProduct += vectorA[i] * vectorB[i];
+    magnitudeA += vectorA[i] * vectorA[i];
+    magnitudeB += vectorB[i] * vectorB[i];
+  }
+
+  magnitudeA = Math.sqrt(magnitudeA);
+  magnitudeB = Math.sqrt(magnitudeB);
+
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    throw new Error("Cannot compute cosine similarity for zero-magnitude vectors.");
+  }
+
+  return dotProduct / (magnitudeA * magnitudeB);
+}
+
+/**
+ * Transposes a matrix.
+ *
+ * @param {Float32Array} matrix - The input matrix (flattened row-major order).
+ * @param {number} rows - The number of rows in the matrix.
+ * @param {number} cols - The number of columns in the matrix.
+ * @returns {Float32Array} The transposed matrix (flattened row-major order).
+ */
+export function transposeMatrix(matrix, rows, cols) {
+  const transposed = new Float32Array(rows * cols);
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      transposed[j * rows + i] = matrix[i * cols + j];
+    }
+  }
+
+  return transposed;
+}
+
+/**
+ * Validates that a given matrix is a valid Float32Array and matches the specified dimensions.
+ *
+ * @param {Float32Array} matrix - The matrix to validate.
+ * @param {number} rows - The expected number of rows.
+ * @param {number} cols - The expected number of columns.
+ * @throws {Error} If the matrix is invalid or does not match the dimensions.
+ */
+export function validateMatrix(matrix, rows, cols) {
+  if (!(matrix instanceof Float32Array)) {
+    throw new Error("Matrix must be a Float32Array.");
+  }
+
+  if (matrix.length !== rows * cols) {
+    throw new Error(`Matrix dimensions do not match: expected ${rows * cols} elements, got ${matrix.length}.`);
   }
 }
-
-/**
- * Exported functions.
- */
-module.exports = {
-  loadWasmModule,
-  matrixMultiply,
-  validateMatrixDimensions
-};
