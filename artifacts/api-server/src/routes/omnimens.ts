@@ -700,7 +700,8 @@ You have access to the following tools. Mention and use them proactively:
     }
 
     // After text stream — scan for [GENERATE_IMAGE: ...] markers and generate images
-    const imageMarkers = [...fullText.matchAll(/\[GENERATE_IMAGE:\s*([\s\S]+?)\]/g)];
+    // Limit to 1 image per response to prevent multi-image generation loops
+    const imageMarkers = [...fullText.matchAll(/\[GENERATE_IMAGE:\s*([\s\S]+?)\]/g)].slice(0, 1);
     for (let i = 0; i < imageMarkers.length; i++) {
       const prompt = imageMarkers[i][1].trim();
       try {

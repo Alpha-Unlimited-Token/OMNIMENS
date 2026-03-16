@@ -118,6 +118,7 @@ export function useOmnimensChat(onLimitReached: () => void) {
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let assistantContent = "";
+      let sseBuffer = ""; // accumulate incomplete SSE lines across chunks
 
       setMessages((prev) => [...prev, { id: assistantMsgId, role: "omnimens", content: "" }]);
 
@@ -125,12 +126,16 @@ export function useOmnimensChat(onLimitReached: () => void) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split("\n");
+        // Append new chunk to buffer
+        sseBuffer += decoder.decode(value, { stream: true });
+
+        // Split on newlines, but keep the last (possibly incomplete) piece in the buffer
+        const lines = sseBuffer.split("\n");
+        sseBuffer = lines.pop() ?? ""; // last element may be partial — hold it for next chunk
 
         for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            try {
+          if (!line.startsWith("data: ")) continue;
+          try {
               const data = JSON.parse(line.slice(6));
 
               if (data.type === "chunk") {
@@ -252,9 +257,8 @@ export function useOmnimensChat(onLimitReached: () => void) {
             } catch {
               // Ignore parse errors on incomplete chunks
             }
-          }
-        }
-      }
+        } // end for (line of lines)
+      } // end while
     } catch (err: any) {
       if (err.name !== "AbortError") {
         setError(err.message || "An unknown error occurred.");
