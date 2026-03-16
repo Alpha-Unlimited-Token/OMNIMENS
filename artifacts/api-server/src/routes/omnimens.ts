@@ -1122,6 +1122,7 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
 
     // After text stream — scan for [GENERATE_IMAGE: ...] markers and generate images
     // Limit to 1 image per response to prevent multi-image generation loops
+    const generatedImages: { url: string; prompt: string }[] = [];
     const imageMarkers = [...fullText.matchAll(/\[GENERATE_IMAGE:\s*([\s\S]+?)\]/g)].slice(0, 1);
     for (let i = 0; i < imageMarkers.length; i++) {
       const prompt = imageMarkers[i][1].trim();
@@ -1139,6 +1140,7 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
           clearInterval(heartbeat);
         }
         const dataUrl = `data:image/png;base64,${imageBuffer!.toString("base64")}`;
+        generatedImages.push({ url: dataUrl, prompt });
         res.write(`data: ${JSON.stringify({ type: "image_generated", url: dataUrl, prompt, index: i })}\n\n`);
       } catch (imgErr) {
         console.error(`[OMNIMENS IMAGE] Error generating image ${i}:`, imgErr);

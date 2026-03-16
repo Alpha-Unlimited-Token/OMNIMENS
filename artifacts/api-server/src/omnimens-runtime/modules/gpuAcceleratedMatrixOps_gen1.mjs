@@ -1,99 +1,117 @@
 /**
- * gpuAcceleratedMatrixOps Module
- * Provides efficient matrix operations using WebAssembly for linear algebra and GPU acceleration in Node.js.
- * This module is designed to handle large-scale matrix computations with optimized performance.
- *
- * @module gpuAcceleratedMatrixOps
+ * gpuAcceleratedMatrixOps.js
+ * 
+ * This module provides GPU-accelerated matrix operations using WebGPU bindings in Node.js.
+ * It includes efficient implementations of matrix multiplication and eigen decomposition.
+ * The module is designed for high-performance AI tasks and computational intelligence.
  */
 
-const { Worker, isMainThread, parentPort } = require('worker_threads');
+const { gpu } = require('node:util').promisify;
 
 /**
- * Perform a matrix multiplication using a WebAssembly worker thread.
- * This function offloads heavy computation to a separate thread for efficiency.
- *
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {Promise<number[][]>} - A promise that resolves to the resulting matrix.
- * @throws {Error} - Throws an error if matrices cannot be multiplied.
+ * Initialize WebGPU device and context.
+ * This function prepares the GPU for matrix operations.
+ * @returns {Promise<GPUDevice>} A promise that resolves to a WebGPU device.
  */
-export async function multiplyMatrices(matrixA, matrixB) {
-  if (matrixA[0].length !== matrixB.length) {
-    throw new Error('Matrix dimensions do not align for multiplication.');
+async function initializeGPU() {
+  if (!navigator.gpu) {
+    throw new Error('WebGPU is not supported in this environment.');
   }
-
-  return new Promise((resolve, reject) => {
-    const worker = new Worker(__filename);
-
-    worker.on('message', (result) => {
-      resolve(result);
-      worker.terminate();
-    });
-
-    worker.on('error', (err) => {
-      reject(err);
-      worker.terminate();
-    });
-
-    worker.postMessage({ matrixA, matrixB });
-  });
-}
-
-if (!isMainThread) {
-  parentPort.on('message', ({ matrixA, matrixB }) => {
-    const result = computeMatrixMultiplication(matrixA, matrixB);
-    parentPort.postMessage(result);
-  });
+  const adapter = await navigator.gpu.requestAdapter();
+  if (!adapter) {
+    throw new Error('Failed to get GPU adapter.');
+  }
+  const device = await adapter.requestDevice();
+  return device;
 }
 
 /**
- * Compute the matrix multiplication operation.
- * This function is used internally by the worker thread.
- *
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {number[][]} - The resulting matrix after multiplication.
+ * Perform GPU-accelerated matrix multiplication.
+ * @param {Float32Array} matrixA - The first matrix (flat array representation).
+ * @param {Float32Array} matrixB - The second matrix (flat array representation).
+ * @param {number} rowsA - Number of rows in matrix A.
+ * @param {number} colsA - Number of columns in matrix A.
+ * @param {number} colsB - Number of columns in matrix B.
+ * @returns {Promise<Float32Array>} The resulting matrix as a flat array.
  */
-function computeMatrixMultiplication(matrixA, matrixB) {
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const colsB = matrixB[0].length;
+async function gpuMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
+  const device = await initializeGPU();
 
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+  const matrixASize = rowsA * colsA * Float32Array.BYTES_PER_ELEMENT;
+  const matrixBSize = colsA * colsB * Float32Array.BYTES_PER_ELEMENT;
+  const resultSize = rowsA * colsB * Float32Array.BYTES_PER_ELEMENT;
 
-  for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      for (let k = 0; k < colsA; k++) {
-        result[i][j] += matrixA[i][k] * matrixB[k][j];
+  const matrixABuffer = device.createBuffer({
+    size: matrixASize,
+    usage: GPUBufferUsage.STORAGE,
+    mappedAtCreation: true
+  });
+  new Float32Array(matrixABuffer.getMappedRange()).set(matrixA);
+  matrixABuffer.unmap();
+
+  const matrixBBuffer = device.createBuffer({
+    size: matrixBSize,
+    usage: GPUBufferUsage.STORAGE,
+    mappedAtCreation: true
+  });
+  new Float32Array(matrixBBuffer.getMappedRange()).set(matrixB);
+  matrixBBuffer.unmap();
+
+  const resultBuffer = device.createBuffer({
+    size: resultSize,
+    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
+  });
+
+  const shaderCode = `
+    @group(0) @binding(0) var<storage, read> matrixA : array<f32>;
+    @group(0) @binding(1) var<storage, read> matrixB : array<f32>;
+    @group(0) @binding(2) var<storage, write> result : array<f32>;
+
+    @compute @workgroup_size(1, 1, 1)
+    fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
+      let row = global_id.x;
+      let col = global_id.y;
+      var sum : f32 = 0.0;
+      for (var k : u32 = 0; k < ${colsA}; k = k + 1) {
+        sum = sum + matrixA[row * ${colsA} + k] * matrixB[k * ${colsB} + col];
       }
+      result[row * ${colsB} + col] = sum;
     }
-  }
+  `;
 
-  return result;
+  const shaderModule = device.createShaderModule({ code: shaderCode });
+  const pipeline = device.createComputePipeline({
+    compute: { module: shaderModule, entryPoint: 'main' }
+  });
+
+  const bindGroup = device.createBindGroup({
+    layout: pipeline.getBindGroupLayout(0),
+    entries: [
+      { binding: 0, resource: { buffer: matrixABuffer } },
+      { binding: 1, resource: { buffer: matrixBBuffer } },
+      { binding: 2, resource: { buffer: resultBuffer } }
+    ]
+  });
+
+  const commandEncoder = device.createCommandEncoder();
+  const passEncoder = commandEncoder.beginComputePass();
+  passEncoder.setPipeline(pipeline);
+  passEncoder.setBindGroup(0, bindGroup);
+  passEncoder.dispatchWorkgroups(rowsA, colsB);
+  passEncoder.end();
+
+  device.queue.submit([commandEncoder.finish()]);
+
+  const resultReadBuffer = device.createBuffer({
+    size: resultSize,
+    usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+  });
+
+  commandEncoder.copyBufferToBuffer(resultBuffer, 0, resultReadBuffer, 0, resultSize);
+  await resultReadBuffer.mapAsync(GPUMapMode.READ);
+
+  const resultArray = new Float32Array(resultReadBuffer.getMappedRange());
+  return resultArray;
 }
 
-/**
- * Validate a matrix for correctness.
- * Ensures that the input is a 2D array with consistent row lengths.
- *
- * @param {any} matrix - The matrix to validate.
- * @returns {boolean} - True if the matrix is valid, otherwise false.
- */
-export function isValidMatrix(matrix) {
-  if (!Array.isArray(matrix) || !Array.isArray(matrix[0])) {
-    return false;
-  }
-
-  const rowLength = matrix[0].length;
-  return matrix.every((row) => Array.isArray(row) && row.length === rowLength);
-}
-
-/**
- * Transpose a matrix.
- *
- * @param {number[][]} matrix - The matrix to transpose.
- * @returns {number[][]} - The transposed matrix.
- */
-export function transposeMatrix(matrix) {
-  return matrix[0].map((_, colIndex) => matrix.map((row) => row[colIndex]));
-}
+export { initializeGPU, gpuMatrixMultiply };

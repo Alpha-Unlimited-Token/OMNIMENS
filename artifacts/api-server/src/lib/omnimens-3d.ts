@@ -117,8 +117,25 @@ Output the .glb to os.environ['OUTPUT_PATH'].`,
 
   let script = response.choices[0]?.message?.content || "";
 
-  // Strip markdown code fences if present
-  script = script.replace(/^```python\n?/m, "").replace(/^```\n?/m, "").replace(/```$/m, "").trim();
+  // Extract Python code block — handles GPT-4o preamble prose and any fence style
+  // Strategy 1: pull out ```python ... ``` or ``` ... ``` block
+  const fenceMatch = script.match(/```(?:python)?\s*\n([\s\S]+?)\n```/);
+  if (fenceMatch) {
+    script = fenceMatch[1].trim();
+  } else {
+    // Strategy 2: find first line that starts with "import" or "#!" and use from there
+    const lines = script.split("\n");
+    const codeStart = lines.findIndex(l => /^(import |from |#!|#\s*-\*-|output_path|os\.environ)/.test(l.trim()));
+    if (codeStart > 0) {
+      script = lines.slice(codeStart).join("\n").trim();
+    } else {
+      // Strategy 3: strip everything up to and including the first blank line after prose
+      script = script.replace(/^[\s\S]*?(?=^import\s|^from\s)/m, "").trim();
+    }
+  }
+
+  // Final cleanup — remove any trailing markdown or explanation text
+  script = script.replace(/\n```[\s\S]*$/, "").trim();
 
   // Ensure the output path env var is used
   if (!script.includes("OUTPUT_PATH")) {
@@ -441,33 +458,33 @@ export async function generate3DModel(
   referenceImageMimeType?: string
 ): Promise<Generated3DModel> {
   const tool = await classifyPromptFor3DTool(prompt);
-
   console.log(`[OMNIMENS 3D] Tool selected: ${tool.toUpperCase()} for prompt: "${prompt.slice(0, 80)}"`);
 
-  // ── Try Blender (primary — best quality) ────────────────────────────────
-  if (tool === "blender") {
-    try {
-      const result = await generateWithBlender(prompt, referenceImageBase64, referenceImageMimeType);
-      return {
-        glbBase64: result.glbBase64,
-        glbSizeBytes: result.glbSizeBytes,
-        threejsHtml: result.threejsHtml,
-        pythonScript: result.blenderScript,
-        description: prompt,
-        vertexCount: result.vertexCount,
-        faceCount: result.faceCount,
-        toolUsed: "blender" as const,
-        previewImageBase64: result.previewImageBase64,
-        zipBase64: result.zipBase64,
-        zipSizeBytes: result.zipSizeBytes,
-        formats: result.formats,
-      };
-    } catch (blenderErr) {
-      console.warn("[OMNIMENS 3D] Blender failed, falling back to trimesh:", blenderErr);
-    }
+  // ── ALWAYS try Blender first — it is the primary engine for ALL prompts ──
+  // Blender handles organic, artistic, mechanical, fantasy, sci-fi, characters,
+  // vehicles, architecture — everything. OpenSCAD is a secondary specialisation.
+  try {
+    console.log("[OMNIMENS 3D] Attempting Blender generation...");
+    const result = await generateWithBlender(prompt, referenceImageBase64, referenceImageMimeType);
+    return {
+      glbBase64: result.glbBase64,
+      glbSizeBytes: result.glbSizeBytes,
+      threejsHtml: result.threejsHtml,
+      pythonScript: result.blenderScript,
+      description: prompt,
+      vertexCount: result.vertexCount,
+      faceCount: result.faceCount,
+      toolUsed: "blender" as const,
+      previewImageBase64: result.previewImageBase64,
+      zipBase64: result.zipBase64,
+      zipSizeBytes: result.zipSizeBytes,
+      formats: result.formats,
+    };
+  } catch (blenderErr) {
+    console.warn("[OMNIMENS 3D] Blender failed, trying OpenSCAD then trimesh:", (blenderErr as Error).message?.slice(0, 200));
   }
 
-  // ── Try OpenSCAD (parametric/mechanical) ────────────────────────────────
+  // ── Try OpenSCAD for parametric/mechanical (if Blender failed) ──────────
   if (tool === "openscad") {
     try {
       const result = await generateWithOpenSCAD(prompt);
@@ -482,7 +499,7 @@ export async function generate3DModel(
         toolUsed: "openscad" as const,
       };
     } catch (scadErr) {
-      console.warn("[OMNIMENS 3D] OpenSCAD failed, falling back to trimesh:", scadErr);
+      console.warn("[OMNIMENS 3D] OpenSCAD also failed, using trimesh:", (scadErr as Error).message?.slice(0, 100));
     }
   }
 
