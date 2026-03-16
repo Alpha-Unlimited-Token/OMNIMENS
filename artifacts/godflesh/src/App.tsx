@@ -11,6 +11,7 @@ import Account from "@/pages/account";
 import Projects from "@/pages/projects";
 import Memory from "@/pages/memory";
 import Tools from "@/pages/tools";
+import FAQ from "@/pages/faq";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,6 +32,7 @@ function Router() {
       <Route path="/projects" component={Projects} />
       <Route path="/memory" component={Memory} />
       <Route path="/tools" component={Tools} />
+      <Route path="/faq" component={FAQ} />
       <Route component={NotFound} />
     </Switch>
   );

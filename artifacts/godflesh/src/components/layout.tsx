@@ -36,9 +36,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
           <nav className="flex items-center gap-6">
             {!isChat && (
-              <Link href="/pricing" className="text-sm font-mono text-white/80 hover:text-white transition-colors tracking-widest">
-                PRICING
-              </Link>
+              <>
+                <Link href="/pricing" className="text-sm font-mono text-white/80 hover:text-white transition-colors tracking-widest">
+                  PRICING
+                </Link>
+                <Link href="/faq" className="text-sm font-mono text-white/80 hover:text-white transition-colors tracking-widest hidden sm:inline">
+                  FAQ
+                </Link>
+              </>
             )}
 
             {isLoading ? (
