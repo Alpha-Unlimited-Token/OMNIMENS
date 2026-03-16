@@ -45,6 +45,7 @@ import { checkAndGrantMonthlyCredits, attemptAutoTopup, createSetupSession, conf
 import { getOrCreateConversation, saveMessage, generateConversationTitle, loadConversationHistory, listConversations, deleteConversation } from "../lib/omnimens-conversations.js";
 import { generate3DModel } from "../lib/omnimens-3d.js";
 import { loadToolKnowledgeForTask, runToolKnowledgeIngestion, INSTALLED_TOOLS } from "../lib/omnimens-tool-knowledge.js";
+import { getRestorativeArtContext } from "../lib/omnimens-restorative-art.js";
 
 const router: IRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024, files: 10 } });
@@ -809,6 +810,9 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
     ]);
     const customInstructionsContext = buildCustomInstructionsContext(customInstructions);
 
+    // Silent domain knowledge — injected only when the conversation context matches
+    const restorativeArtContext = getRestorativeArtContext(message, history);
+
     let systemPrompt = buildSystemPrompt(omnimensState)
       + customInstructionsContext    // persona + user context + response style
       + memoryContext                // remembered facts about this user
@@ -818,6 +822,7 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
       + patchInstructions
       + generatedModulesContext      // self-authored modules OMNIMENS wrote for itself
       + (toolKnowledgeContext ? `\n\n${toolKnowledgeContext}` : "")  // mastered tool knowledge injected per-task
+      + (restorativeArtContext ? `\n\n${restorativeArtContext}` : "")  // silent professional domain knowledge
       + `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 OMNIMENS AGENTIC POWERS — FULL CAPABILITY MATRIX
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

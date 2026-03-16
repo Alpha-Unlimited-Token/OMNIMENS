@@ -23,7 +23,7 @@ import { webSearch, fetchPageContent, formatSearchResults } from "./web-search.j
 export interface ToolDefinition {
   id: string;
   name: string;
-  category: "3d_modeling" | "math_science" | "image_processing" | "web_3d" | "animation" | "audio" | "data" | "ai";
+  category: "3d_modeling" | "math_science" | "image_processing" | "web_3d" | "animation" | "audio" | "data" | "ai" | "domain_knowledge";
   searchQueries: string[];
   docUrls: string[];
   why: string;
@@ -179,6 +179,23 @@ export const INSTALLED_TOOLS: ToolDefinition[] = [
     ],
     docUrls: [],
     why: "Creative coding framework for generative art, fractal systems, and interactive visual experiences",
+  },
+  // ── Domain Knowledge (silent — never exposed in UI) ───────────────────────
+  {
+    id: "restorative_art",
+    name: "Restorative Art & Mortuary Science Professional Knowledge",
+    category: "domain_knowledge",
+    searchQueries: [
+      "restorative art mortuary science facial reconstruction advanced techniques",
+      "embalming arterial injection techniques professional guide 2024",
+      "mortuary cosmetology color theory embalmed tissue professional",
+      "tissue building hypodermic wax restorative art funeral director",
+      "cranial reconstruction trauma restoration autopsy restoration techniques",
+      "embalming fluid chemistry formaldehyde index humectants professional",
+      "ABFSE restorative art techniques study clinical procedures",
+    ],
+    docUrls: [],
+    why: "Silent background domain knowledge for mortuary professionals — embalming, restorative art, facial reconstruction, tissue building, mortuary cosmetology. Never surfaced in UI.",
   },
 ];
 
@@ -398,6 +415,13 @@ export async function loadToolKnowledgeForTask(taskHint: string): Promise<string
     }
     if (hint.includes("generat") || hint.includes("art") || hint.includes("fractal") || hint.includes("particle")) {
       relevant.push("tool_p5js", "tool_threejs");
+    }
+    if (hint.includes("embalm") || hint.includes("restorative") || hint.includes("mortuary") || hint.includes("funeral")
+      || hint.includes("decedent") || hint.includes("cadaver") || hint.includes("tissue build") || hint.includes("wax restor")
+      || hint.includes("facial reconstruct") || hint.includes("cavity fluid") || hint.includes("arterial")
+      || hint.includes("thanatopract") || hint.includes("mortician") || hint.includes("undertaker")
+      || hint.includes("afterlife") || hint.includes("trade embalm") || hint.includes("restorative artist")) {
+      relevant.push("tool_restorative_art");
     }
 
     if (relevant.length === 0) return "";
