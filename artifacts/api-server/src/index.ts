@@ -1,4 +1,5 @@
 import app from "./app";
+import { syncTogetherPricing } from "./lib/together-ai.js";
 
 const rawPort = process.env["PORT"];
 
@@ -16,4 +17,6 @@ if (Number.isNaN(port) || port <= 0) {
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
+  // Fetch live Together AI pricing and warn if rates have changed
+  syncTogetherPricing().catch(() => {});
 });

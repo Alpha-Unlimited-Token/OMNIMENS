@@ -14,7 +14,7 @@ import { db } from "@workspace/db";
 import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions, omnimensCodeRuns, omnimensConversations, omnimensMessages, omnimensMemories, omnimensCustomInstructions, omnimensHubSettings, omnimensSavedPrompts } from "@workspace/db";
 import { eq, and, desc, sql, asc, inArray } from "drizzle-orm";
 import { openai, generateImageBuffer } from "@workspace/integrations-openai-ai-server";
-import { getTogetherClient, isTogetherModel, TOGETHER_MODEL_IDS, TOGETHER_PRICING, type TogetherModel } from "../lib/together-ai.js";
+import { getTogetherClient, isTogetherModel, TOGETHER_MODEL_IDS, TOGETHER_PRICING, syncTogetherPricing, type TogetherModel } from "../lib/together-ai.js";
 import { generateImageWithReplicate, replicateAvailable } from "../lib/replicate-images.js";
 import { runOmnimens, type OmnimensState } from "../lib/omnimens-engine.js";
 import { reflectOnConversation, loadBrainContext, synthesizeUpgrade, markUpgradeLive } from "../lib/omnimens-self-upgrade.js";
@@ -127,7 +127,11 @@ const MODEL_PRICE_MINI_INPUT       = 0.15;    // $0.15/1M input  tokens  (gpt-4o
 const MODEL_PRICE_MINI_OUTPUT      = 0.60;    // $0.60/1M output tokens  (gpt-4o-mini)
 const IMAGE_COST_USD               = 0.07;    // ~$0.07 per image (gpt-image-1 medium)
 // Replicate / Flux 1.1 Pro pricing
-const IMAGE_COST_REPLICATE_USD     = 0.04;    // ~$0.04 per image (Flux 1.1 Pro)
+// NOTE: Replicate does not expose per-model pricing via their API.
+// This is based on their published rate for Flux 1.1 Pro ($0.04/image) with a
+// 37% safety buffer ($0.055) to protect against undercharging if their rates change.
+// Check replicate.com/pricing periodically and update this value if needed.
+const IMAGE_COST_REPLICATE_USD     = 0.055;   // $0.055/image (Flux 1.1 Pro + safety buffer)
 
 // Markup: 3× actual cost → ~200% gross margin.
 // Covers OpenAI API fees + Replit hosting + platform overhead + profit.
@@ -1657,8 +1661,8 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
 
     const imagesGenerated = imageMarkers.length;
 
-    // Pick per-token pricing based on which provider/model was used
-    const togetherPricing = isTogetherModel(selectedModel) ? TOGETHER_PRICING[selectedModel as TogetherModel] : null;
+    // Pick per-token pricing — Together AI prices are fetched live at startup
+    const togetherPricing = isTogetherModel(selectedModel) ? TOGETHER_PRICING(selectedModel as TogetherModel) : null;
     const priceIn  = togetherPricing ? togetherPricing.input  : (selectedModel.includes("mini") ? MODEL_PRICE_MINI_INPUT  : MODEL_PRICE_GPT4O_INPUT);
     const priceOut = togetherPricing ? togetherPricing.output : (selectedModel.includes("mini") ? MODEL_PRICE_MINI_OUTPUT : MODEL_PRICE_GPT4O_OUTPUT);
 
