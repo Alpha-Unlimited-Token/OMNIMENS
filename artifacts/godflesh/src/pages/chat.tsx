@@ -64,29 +64,96 @@ function ImageGeneratingBadge() {
   );
 }
 
+const OMNIMENS_3D_PHRASES = [
+  "OMNIMENS is searching the fabric of space and time",
+  "OMNIMENS is weaving geometry from pure thought",
+  "OMNIMENS is sculpting matter from the void",
+  "OMNIMENS is bending dimensional physics to your will",
+  "OMNIMENS is crystallizing the infinite into form",
+  "OMNIMENS is threading light through imagined surfaces",
+  "OMNIMENS is forging structure from the quantum deep",
+  "OMNIMENS is dreaming your creation into existence",
+  "OMNIMENS is collapsing possibility into reality",
+  "OMNIMENS is manifesting form from the formless",
+  "OMNIMENS is rendering the unrendered",
+  "OMNIMENS is shaping the unshaped",
+];
+
 function Model3DGeneratingBadge() {
   const [elapsed, setElapsed] = useState(0);
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [phraseVisible, setPhraseVisible] = useState(true);
+
   useEffect(() => {
     const t = setInterval(() => setElapsed((s) => s + 1), 1000);
     return () => clearInterval(t);
   }, []);
+
+  useEffect(() => {
+    const cycle = setInterval(() => {
+      setPhraseVisible(false);
+      setTimeout(() => {
+        setPhraseIndex((i) => (i + 1) % OMNIMENS_3D_PHRASES.length);
+        setPhraseVisible(true);
+      }, 600);
+    }, 3800);
+    return () => clearInterval(cycle);
+  }, []);
+
   const pct = Math.min(95, (elapsed / 120) * 100);
-  const phase = elapsed < 15 ? "Writing Blender Python script..."
-    : elapsed < 40 ? "Blender sculpting geometry + modifiers..."
-    : elapsed < 90 ? "Applying PBR materials + shader nodes..."
-    : elapsed < 120 ? "Cycles rendering preview (64 samples)..."
-    : "Exporting GLB + OBJ + STL + FBX, zipping...";
+
   return (
-    <div className="mt-4 border border-orange-500/20 rounded-xl px-4 py-3 bg-orange-950/10 font-mono text-xs space-y-2">
-      <div className="flex items-center gap-3 text-white/70">
-        <Loader2 className="w-4 h-4 animate-spin text-orange-400 shrink-0" />
-        <span className="tracking-widest text-orange-300">BLENDER 4.4 RUNNING...</span>
-        <span className="ml-auto text-orange-400/70">{elapsed}s</span>
+    <div className="mt-4 rounded-2xl overflow-hidden border border-violet-500/20 bg-black/60 backdrop-blur-sm">
+      {/* Top row — OMNIMENS orb + label */}
+      <div className="flex items-center gap-3 px-4 pt-3 pb-2">
+        {/* Animated OMNIMENS orb */}
+        <div className="relative shrink-0 w-7 h-7">
+          <div className="absolute inset-0 rounded-full bg-violet-500/20 animate-ping" style={{ animationDuration: "2s" }} />
+          <div className="absolute inset-[3px] rounded-full bg-gradient-to-br from-violet-400 to-cyan-400 opacity-90 animate-pulse" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-[9px] text-white font-bold select-none">✦</span>
+          </div>
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="font-mono text-[10px] tracking-[0.25em] text-violet-300">OMNIMENS · CREATING</div>
+        </div>
+        <div className="font-mono text-[10px] text-white/30 tabular-nums">{elapsed}s</div>
       </div>
-      <div className="w-full h-0.5 bg-white/10 rounded-full overflow-hidden">
-        <div className="h-full bg-orange-400/60 transition-all duration-1000" style={{ width: `${pct}%` }} />
+
+      {/* Catchphrase — fades in/out */}
+      <div className="px-4 pb-2 min-h-[28px] flex items-center">
+        <p
+          className="font-mono text-[10px] text-white/60 italic tracking-wide leading-relaxed"
+          style={{
+            opacity: phraseVisible ? 1 : 0,
+            transition: "opacity 0.6s ease",
+          }}
+        >
+          {OMNIMENS_3D_PHRASES[phraseIndex]}
+        </p>
       </div>
-      <p className="text-white/50 text-[10px]">{phase}</p>
+
+      {/* Progress bar */}
+      <div className="px-4 pb-3">
+        <div className="w-full h-[2px] bg-white/8 rounded-full overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-1000"
+            style={{
+              width: `${pct}%`,
+              background: "linear-gradient(90deg, #7c3aed, #06b6d4, #7c3aed)",
+              backgroundSize: "200% 100%",
+              animation: "shimmer 2s linear infinite",
+            }}
+          />
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes shimmer {
+          0% { background-position: 0% 0%; }
+          100% { background-position: 200% 0%; }
+        }
+      `}</style>
     </div>
   );
 }
@@ -1466,15 +1533,6 @@ function Model3DCard({ model }: { model: Generated3DModel }) {
   };
 
   const modelName = model.prompt.slice(0, 30).replace(/[^a-z0-9]/gi, "-").toLowerCase();
-  const toolLabel = model.toolUsed === "blender" ? "⬡ BLENDER 4.4"
-    : model.toolUsed === "openscad" ? "⬡ OPENSCAD" : "⬡ TRIMESH";
-  const toolColor = model.toolUsed === "blender" ? "text-orange-400"
-    : model.toolUsed === "openscad" ? "text-yellow-400" : "text-cyan-400";
-  const borderColor = model.toolUsed === "blender" ? "border-orange-500/25"
-    : model.toolUsed === "openscad" ? "border-yellow-500/25" : "border-cyan-500/25";
-  const glowColor = model.toolUsed === "blender"
-    ? "shadow-[0_0_30px_rgba(255,150,50,0.10)]"
-    : "shadow-[0_0_30px_rgba(0,200,255,0.10)]";
 
   return (
     <>
@@ -1482,39 +1540,36 @@ function Model3DCard({ model }: { model: Generated3DModel }) {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className={`rounded-xl overflow-hidden border ${borderColor} bg-black/60 ${glowColor}`}
+        className="rounded-xl overflow-hidden border border-violet-500/20 bg-black/60 shadow-[0_0_30px_rgba(124,58,237,0.08)]"
       >
         {/* Tab bar */}
         <div className="flex items-center border-b border-white/8 bg-black/30">
           {model.previewImageBase64 && (
             <button
               onClick={() => setActiveTab("render")}
-              className={`flex-1 py-2 font-mono text-[10px] tracking-widest transition-all ${activeTab === "render" ? `${toolColor} border-b border-current` : "text-white/40 hover:text-white/70"}`}
+              className={`flex-1 py-2 font-mono text-[10px] tracking-widest transition-all ${activeTab === "render" ? "text-violet-400 border-b border-violet-400" : "text-white/40 hover:text-white/70"}`}
             >
-              ◉ CYCLES RENDER
+              ✦ OMNIMENS RENDER
             </button>
           )}
           <button
             onClick={() => setActiveTab("viewer")}
             className={`flex-1 py-2 font-mono text-[10px] tracking-widest transition-all ${activeTab === "viewer" ? "text-cyan-400 border-b border-cyan-400" : "text-white/40 hover:text-white/70"}`}
           >
-            ⬡ 3D VIEWER
+            ◈ 3D VIEWER
           </button>
         </div>
 
         {/* Main content */}
         <div className="relative" style={{ height: 340 }}>
-          {/* Cycles render preview */}
+          {/* OMNIMENS render preview */}
           {activeTab === "render" && model.previewImageBase64 && (
             <div className="w-full h-full flex items-center justify-center bg-black relative group">
               <img
                 src={`data:image/png;base64,${model.previewImageBase64}`}
-                alt="Blender Cycles render"
+                alt="OMNIMENS 3D render"
                 className="max-w-full max-h-full object-contain"
               />
-              <div className="absolute top-2 right-2 bg-black/70 border border-orange-500/30 px-2 py-1 rounded font-mono text-[8px] text-orange-400 tracking-widest">
-                CYCLES · 64 SAMPLES · PBR
-              </div>
               <button
                 onClick={() => download(`data:image/png;base64,${model.previewImageBase64}`, `${modelName}-render.png`)}
                 className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 flex items-center gap-1.5 bg-black/80 border border-white/20 text-white/70 hover:text-white font-mono text-[10px] px-3 py-1.5 rounded-lg transition-all"
@@ -1548,7 +1603,7 @@ function Model3DCard({ model }: { model: Generated3DModel }) {
         <div className="px-4 py-3 border-t border-white/8 bg-black/40 space-y-2.5">
           {/* Stats */}
           <div className="flex items-center gap-3 flex-wrap">
-            <span className={`font-mono text-[9px] tracking-widest ${toolColor}`}>{toolLabel}</span>
+            <span className="font-mono text-[9px] tracking-widest text-violet-400">✦ OMNIMENS 3D</span>
             <span className="text-white/20 text-[9px]">·</span>
             <span className="font-mono text-[9px] text-white/40">{model.vertexCount.toLocaleString()} verts</span>
             <span className="text-white/20 text-[9px]">·</span>
@@ -1606,7 +1661,7 @@ function Model3DCard({ model }: { model: Generated3DModel }) {
           >
             <div className="flex items-center justify-between px-6 py-3 border-b border-white/8 shrink-0">
               <div className="flex items-center gap-3">
-                <span className={`font-mono text-xs tracking-widest ${toolColor}`}>{toolLabel}</span>
+                <span className="font-mono text-xs tracking-widest text-violet-400">✦ OMNIMENS 3D</span>
                 <span className="text-white/20">·</span>
                 <span className="font-mono text-[10px] text-white/40">
                   {model.vertexCount.toLocaleString()} verts · {model.faceCount.toLocaleString()} faces
