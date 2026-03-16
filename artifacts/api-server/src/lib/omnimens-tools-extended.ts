@@ -28,7 +28,7 @@ async function geocodeLocation(location: string): Promise<{ lat: number; lon: nu
   try {
     const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`;
     const resp = await fetch(url, { headers: { "User-Agent": "OMNIMENS/1.0" } });
-    const data = await resp.json();
+    const data = await resp.json() as any[];
     if (!data.length) return null;
     return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), displayName: data[0].display_name };
   } catch { return null; }
@@ -41,7 +41,7 @@ export async function fetchWeather(location: string): Promise<string> {
 
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${geo.lat}&longitude=${geo.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m,precipitation,visibility&wind_speed_unit=mph&temperature_unit=fahrenheit&timezone=auto&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_sum&forecast_days=5`;
     const resp = await fetch(url);
-    const d = await resp.json();
+    const d = await resp.json() as any;
     const c = d.current;
     const daily = d.daily;
 
@@ -139,7 +139,7 @@ export async function fetchStockData(ticker: string): Promise<string> {
     const resp = await fetch(url, {
       headers: { "User-Agent": "Mozilla/5.0", "Accept": "application/json" }
     });
-    const data = await resp.json();
+    const data = await resp.json() as any;
     const meta = data?.chart?.result?.[0]?.meta;
     if (!meta) return `No data found for ticker: ${symbol}`;
 
@@ -179,7 +179,7 @@ export async function fetchCurrencyRate(from: string, to: string, amount = 1): P
     const T = to.toUpperCase().trim();
     const url = `https://open.er-api.com/v6/latest/${F}`;
     const resp = await fetch(url);
-    const data = await resp.json();
+    const data = await resp.json() as any;
     if (data.result !== "success") return `Currency data not available for ${F}.`;
     const rate = data.rates[T];
     if (!rate) return `Currency ${T} not found. Try 3-letter codes like USD, EUR, GBP, JPY.`;
@@ -235,7 +235,7 @@ export async function analyzeVideoUrl(url: string): Promise<string> {
     let metadata = { title: "Unknown", author_name: "Unknown" };
     try {
       const oResp = await fetch(oembedUrl);
-      if (oResp.ok) metadata = await oResp.json();
+      if (oResp.ok) metadata = await oResp.json() as { title: string; author_name: string };
     } catch {}
 
     // Try to fetch transcript via a third-party transcript API
@@ -245,7 +245,7 @@ export async function analyzeVideoUrl(url: string): Promise<string> {
         headers: { "Accept": "application/json" }
       });
       if (tResp.ok) {
-        const tData = await tResp.json();
+        const tData = await tResp.json() as any;
         const captions = tData?.captions ?? [];
         transcript = captions.slice(0, 200).map((c: any) => c.text).join(" ").trim().slice(0, 8000);
       }

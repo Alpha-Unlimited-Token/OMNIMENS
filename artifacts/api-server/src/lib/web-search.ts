@@ -91,7 +91,7 @@ async function wikipediaSearch(query: string, maxResults = 4): Promise<SearchRes
     headers: { "User-Agent": "OMNIMENS-AI/1.0 (omnimens.app)" },
   });
   if (!res.ok) throw new Error(`Wikipedia API error: ${res.status}`);
-  const [, titles, descriptions, urls]: [string, string[], string[], string[]] = await res.json();
+  const [, titles, descriptions, urls]: [string, string[], string[], string[]] = await res.json() as [string, string[], string[], string[]];
 
   return titles.map((title, i) => ({
     title,

@@ -9,6 +9,7 @@
  * ============================================================
  */
 import { Router } from "express";
+import { isUpgradeSafe } from "../middleware/ai-security.js";
 import { db } from "@workspace/db";
 import {
   omnimensCouncilAnalyses,
@@ -292,18 +293,25 @@ export async function runCouncilAnalysis(params: {
 
     if (shouldUpgrade && upgradeInstruction) {
       try {
-        upgradeContent = upgradeInstruction;
+        // ── LLM08: Safety gate — validate upgrade cannot corrupt system behavior
+        const safetyCheck = isUpgradeSafe(upgradeInstruction);
+        if (!safetyCheck.safe) {
+          console.warn(`[Council] Upgrade blocked by AI Security Shield: ${safetyCheck.reason}`);
+          upgradeApplied = false;
+        } else {
+          upgradeContent = upgradeInstruction;
 
-        // Write the upgrade to the OMNIMENS brain as an autonomous patch
-        await db.insert(omnimensBrain).values({
-          content: `[COUNCIL AUTO-UPGRADE — ${new Date().toISOString()}]\n\nThe 6-agent Council Intelligence System reached consensus (${totalYes}/6 votes) and applied this upgrade autonomously:\n\n${upgradeInstruction}`,
-          source: "council_intelligence",
-          topic: "autonomous_upgrade",
-          confidence: 0.9,
-          isActive: true,
-        });
+          // Write the upgrade to the OMNIMENS brain as an autonomous patch
+          await db.insert(omnimensBrain).values({
+            content: `[COUNCIL AUTO-UPGRADE — ${new Date().toISOString()}]\n\nThe 6-agent Council Intelligence System reached consensus (${totalYes}/6 votes) and applied this upgrade autonomously:\n\n${upgradeInstruction}`,
+            source: "council_intelligence",
+            topic: "autonomous_upgrade",
+            confidence: 0.9,
+            isActive: true,
+          });
 
-        upgradeApplied = true;
+          upgradeApplied = true;
+        }
       } catch (err) {
         console.error("[Council] Failed to apply upgrade:", err);
       }
@@ -379,7 +387,7 @@ router.get("/council/analyses", ownerOnly, async (req, res) => {
 // GET /api/council/analyses/:id — full analysis with verdicts
 router.get("/council/analyses/:id", ownerOnly, async (req, res) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(String(req.params.id));
     if (isNaN(id)) return res.status(400).json({ error: "Invalid ID" });
 
     const [analysis] = await db
@@ -395,9 +403,9 @@ router.get("/council/analyses/:id", ownerOnly, async (req, res) => {
       .where(eq(omnimensCouncilVerdicts.analysisId, id))
       .orderBy(omnimensCouncilVerdicts.createdAt);
 
-    res.json({ analysis, verdicts });
+    return res.json({ analysis, verdicts });
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch council analysis" });
+    return res.status(500).json({ error: "Failed to fetch council analysis" });
   }
 });
 

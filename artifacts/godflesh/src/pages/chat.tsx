@@ -2179,6 +2179,19 @@ function CogniSyncIndicator({ state }: { state: CogniSyncState | null }) {
 }
 
 // ── Mermaid diagram renderer ────────────────────────────────────────────────────
+function sanitizeDiagramSVG(raw: string): string {
+  return raw
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/\bon\w+\s*=\s*["'][^"']*["']/gi, "")
+    .replace(/\bon\w+\s*=\s*[^\s>]*/gi, "")
+    .replace(/\bhref\s*=\s*["']\s*javascript:[^"']*["']/gi, 'href="#"')
+    .replace(/\bxlink:href\s*=\s*["']\s*javascript:[^"']*["']/gi, 'xlink:href="#"')
+    .replace(/<use\b[^>]*\bhref\s*=\s*["'][^#][^"']*["'][^>]*>/gi, "")
+    .replace(/<foreignObject\b[^<]*(?:(?!<\/foreignObject>)<[^<]*)*<\/foreignObject>/gi, "")
+    .replace(/vbscript:/gi, "")
+    .replace(/expression\s*\([^)]*\)/gi, "");
+}
+
 function MermaidDiagram({ code }: { code: string }) {
   const [svg, setSvg] = useState<string>("");
   const [err, setErr] = useState<string>("");
@@ -2187,10 +2200,10 @@ function MermaidDiagram({ code }: { code: string }) {
     (async () => {
       try {
         const mermaid = (await import("mermaid")).default;
-        mermaid.initialize({ startOnLoad: false, theme: "dark", securityLevel: "loose" });
+        mermaid.initialize({ startOnLoad: false, theme: "dark", securityLevel: "antiscript" });
         const id = `mm-${Math.random().toString(36).slice(2)}`;
         const { svg: rendered } = await mermaid.render(id, code);
-        if (!cancelled) setSvg(rendered);
+        if (!cancelled) setSvg(sanitizeDiagramSVG(rendered));
       } catch (e: any) {
         if (!cancelled) setErr(e.message || "Diagram error");
       }

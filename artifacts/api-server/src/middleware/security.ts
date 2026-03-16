@@ -247,7 +247,7 @@ export function requestSecurityMiddleware(req: Request, res: Response, next: Nex
     }
   }
 
-  next();
+  return next();
 }
 
 // ── Auth Failure Tracker ──────────────────────────────────────────────────────

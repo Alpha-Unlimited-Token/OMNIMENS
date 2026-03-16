@@ -364,6 +364,7 @@ print(f"OMNIMENS_DONE glb={_os.path.getsize(GLB_PATH)} render={_os.path.getsize(
 export interface Blender3DResult {
   glbBase64: string;
   glbSizeBytes: number;
+  glbBuffer?: Buffer;
   threejsHtml: string;
   vertexCount: number;
   faceCount: number;

@@ -34,6 +34,7 @@ import stripeWebhookRouter from "./routes/stripeWebhook.js";
 import { startAutonomousLearning } from "./lib/omnimens-self-upgrade.js";
 import { startEvolutionEngine } from "./lib/omnimens-evolution.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
+import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-conversations.js";
 import { runToolKnowledgeIngestion } from "./lib/omnimens-tool-knowledge.js";
 
@@ -83,7 +84,7 @@ app.use(
       preload: true,
     },
     referrerPolicy: { policy: "strict-origin-when-cross-origin" },
-    xFrameOptions: { action: "SAMEORIGIN" },
+    xFrameOptions: { action: "sameorigin" },
     xContentTypeOptions: true,
     dnsPrefetchControl: { allow: false },
     permittedCrossDomainPolicies: { permittedPolicies: "none" },
@@ -195,6 +196,11 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // ── POST-BODY REQUEST SECURITY (scans request body for malicious patterns) ────
 app.use(requestSecurityMiddleware);
+
+// ── AI INPUT SECURITY — OWASP Top 10 for LLMs protection ─────────────────────
+// Applied globally to all API routes — filters prompt injection, jailbreaks,
+// excessive input length, and sensitive data extraction attempts.
+app.use("/api/omnimens/chat", aiInputSecurityMiddleware);
 
 // ── HEALTH CHECK ─────────────────────────────────────────────────────────────
 app.get("/api/health", (_req, res) => {

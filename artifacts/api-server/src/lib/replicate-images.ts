@@ -52,7 +52,7 @@ export async function generateImageWithReplicate(prompt: string): Promise<Buffer
     const pollRes = await fetch(`${REPLICATE_API}/predictions/${prediction.id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    prediction = await pollRes.json();
+    prediction = await pollRes.json() as typeof prediction;
     polls++;
   }
 
