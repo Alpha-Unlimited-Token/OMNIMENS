@@ -14,7 +14,7 @@ import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { useQuery, useQueryClient as useQC } from "@tanstack/react-query";
-import { useOmnimensChat, type GeneratedImage, type Generated3DModel, type GeneratedGame, type Artifact, type CostBreakdown, type TaskPlan, type RedFlagAlert } from "@/hooks/use-omnimens-chat";
+import { useOmnimensChat, type GeneratedImage, type Generated3DModel, type GeneratedGame, type Artifact, type CostBreakdown, type TaskPlan, type RedFlagAlert, type ToolResult } from "@/hooks/use-omnimens-chat";
 import { useOmnimensVoice } from "@/hooks/use-omnimens-voice";
 import { VoiceIndicator } from "@/components/voice-indicator";
 import { OmnimensPresence } from "@/components/omnimens-presence";
@@ -38,6 +38,7 @@ import remarkGfm from "remark-gfm";
 import { motion, AnimatePresence } from "framer-motion";
 import { ControlHub, loadHubSettingsFromStorage, saveHubSettingsToStorage, type HubSettings } from "@/components/control-hub";
 import { SmartTemplates } from "@/components/smart-templates";
+import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 // ── Small reusable badges ──────────────────────────────────────────────────────
 
@@ -1968,6 +1969,269 @@ function RightPanel({
   );
 }
 
+// ── Mermaid diagram renderer ────────────────────────────────────────────────────
+function MermaidDiagram({ code }: { code: string }) {
+  const [svg, setSvg] = useState<string>("");
+  const [err, setErr] = useState<string>("");
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const mermaid = (await import("mermaid")).default;
+        mermaid.initialize({ startOnLoad: false, theme: "dark", securityLevel: "loose" });
+        const id = `mm-${Math.random().toString(36).slice(2)}`;
+        const { svg: rendered } = await mermaid.render(id, code);
+        if (!cancelled) setSvg(rendered);
+      } catch (e: any) {
+        if (!cancelled) setErr(e.message || "Diagram error");
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [code]);
+  if (err) return <div className="text-red-400/70 text-xs font-mono p-2">[Diagram error: {err}]</div>;
+  if (!svg) return <div className="flex items-center gap-2 text-primary/50 text-xs font-mono p-2"><Loader2 className="w-3 h-3 animate-spin" />Rendering diagram…</div>;
+  return (
+    <div
+      className="mt-3 rounded-xl border border-white/10 bg-black/40 p-3 overflow-x-auto"
+      dangerouslySetInnerHTML={{ __html: svg }}
+    />
+  );
+}
+
+// ── Inline chart renderer ──────────────────────────────────────────────────────
+const CHART_COLORS = ["#8b5cf6","#06b6d4","#10b981","#f59e0b","#ef4444","#ec4899","#6366f1","#84cc16"];
+
+function InlineChart({ spec }: { spec: any }) {
+  const { type = "bar", title, data = [], xKey = "name", yKey = "value", color = "#8b5cf6" } = spec;
+  const h = 220;
+  if (!data.length) return null;
+  return (
+    <div className="mt-3 rounded-xl border border-white/10 bg-black/40 p-4">
+      {title && <p className="text-xs font-mono text-white/50 mb-3 tracking-widest uppercase">{title}</p>}
+      <ResponsiveContainer width="100%" height={h}>
+        {type === "line" ? (
+          <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+            <XAxis dataKey={xKey} tick={{ fill: "#ffffff60", fontSize: 10 }} />
+            <YAxis tick={{ fill: "#ffffff60", fontSize: 10 }} />
+            <Tooltip contentStyle={{ background: "#0a0a0a", border: "1px solid #ffffff15", borderRadius: 8, fontSize: 11 }} />
+            <Line type="monotone" dataKey={yKey} stroke={color} strokeWidth={2} dot={{ r: 3, fill: color }} />
+          </LineChart>
+        ) : type === "pie" ? (
+          <PieChart>
+            <Pie data={data} dataKey={yKey} nameKey={xKey} cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
+              {data.map((_: any, i: number) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+            </Pie>
+            <Tooltip contentStyle={{ background: "#0a0a0a", border: "1px solid #ffffff15", borderRadius: 8, fontSize: 11 }} />
+            <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 10, color: "#ffffff80" }} />
+          </PieChart>
+        ) : type === "area" ? (
+          <AreaChart data={data}>
+            <defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={color} stopOpacity={0.3} /><stop offset="95%" stopColor={color} stopOpacity={0} /></linearGradient></defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+            <XAxis dataKey={xKey} tick={{ fill: "#ffffff60", fontSize: 10 }} />
+            <YAxis tick={{ fill: "#ffffff60", fontSize: 10 }} />
+            <Tooltip contentStyle={{ background: "#0a0a0a", border: "1px solid #ffffff15", borderRadius: 8, fontSize: 11 }} />
+            <Area type="monotone" dataKey={yKey} stroke={color} strokeWidth={2} fill="url(#areaGrad)" />
+          </AreaChart>
+        ) : (
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+            <XAxis dataKey={xKey} tick={{ fill: "#ffffff60", fontSize: 10 }} />
+            <YAxis tick={{ fill: "#ffffff60", fontSize: 10 }} />
+            <Tooltip contentStyle={{ background: "#0a0a0a", border: "1px solid #ffffff15", borderRadius: 8, fontSize: 11 }} />
+            <Bar dataKey={yKey} fill={color} radius={[4, 4, 0, 0]}>
+              {data.map((_: any, i: number) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+            </Bar>
+          </BarChart>
+        )}
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+function parseChartMarkers(text: string): { before: string; spec: any }[] {
+  const parts: { before: string; spec: any }[] = [];
+  const re = /\[CHART:\s*(\{[\s\S]*?\})\]/g;
+  let last = 0, m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    try {
+      const spec = JSON.parse(m[1]);
+      parts.push({ before: text.slice(last, m.index), spec });
+      last = m.index + m[0].length;
+    } catch {}
+  }
+  if (last < text.length || parts.length === 0) parts.push({ before: text.slice(last), spec: null });
+  return parts;
+}
+
+// ── Tool result cards ──────────────────────────────────────────────────────────
+function ToolResultCard({ tool }: { tool: ToolResult }) {
+  if (tool.type === "qr") {
+    return (
+      <div className="mt-3 flex flex-col items-center gap-2 p-4 rounded-xl border border-primary/20 bg-black/40 w-fit">
+        <p className="text-[9px] font-mono text-primary/50 tracking-widest uppercase">QR Code</p>
+        {tool.dataUrl && <img src={tool.dataUrl} alt="QR Code" className="w-40 h-40 rounded-lg border border-white/10" />}
+        {tool.text && <p className="text-[9px] font-mono text-white/40 text-center max-w-[160px] break-all">{tool.text}</p>}
+      </div>
+    );
+  }
+  if (tool.type === "color_palette" && tool.palette) {
+    return (
+      <div className="mt-3 p-4 rounded-xl border border-white/10 bg-black/40">
+        <p className="text-[9px] font-mono text-white/40 mb-3 tracking-widest uppercase">Color Palette{tool.theme ? ` — ${tool.theme}` : ""}</p>
+        <div className="flex flex-wrap gap-2">
+          {tool.palette.map((c, i) => (
+            <div key={i} className="flex flex-col items-center gap-1">
+              <div className="w-10 h-10 rounded-lg border border-white/10 shadow-sm" style={{ background: c.hex }} />
+              <span className="text-[8px] font-mono text-white/50">{c.hex}</span>
+              <span className="text-[7px] font-mono text-white/30 text-center max-w-[44px]">{c.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  if (tool.type === "weather" || tool.type === "stock" || tool.type === "currency" || tool.type === "translate" || tool.type === "units") {
+    const icons: Record<string, React.ReactNode> = {
+      weather: <span className="text-base">🌤️</span>,
+      stock: <BarChart2 className="w-3.5 h-3.5 text-emerald-400" />,
+      currency: <span className="text-base">💱</span>,
+      translate: <Globe className="w-3.5 h-3.5 text-blue-400" />,
+      units: <Zap className="w-3.5 h-3.5 text-yellow-400" />,
+    };
+    const labels: Record<string, string> = {
+      weather: `Weather${tool.location ? ` — ${tool.location}` : ""}`,
+      stock: `Stock${tool.ticker ? ` — ${tool.ticker}` : ""}`,
+      currency: `Currency${tool.from && tool.to ? ` — ${tool.from} → ${tool.to}` : ""}`,
+      translate: `Translation${tool.language ? ` → ${tool.language}` : ""}`,
+      units: "Unit Conversion",
+    };
+    return (
+      <div className="mt-2 flex items-start gap-2 px-3 py-2.5 rounded-xl border border-white/10 bg-black/40 text-xs font-mono">
+        <span className="shrink-0 mt-0.5">{icons[tool.type]}</span>
+        <div>
+          <p className="text-[9px] text-white/40 tracking-widest uppercase mb-1">{labels[tool.type]}</p>
+          <p className="text-white/70 whitespace-pre-wrap text-[11px] leading-relaxed">{tool.result}</p>
+        </div>
+      </div>
+    );
+  }
+  if (tool.type === "news" || tool.type === "academic" || tool.type === "video") {
+    const icons: Record<string, React.ReactNode> = {
+      news: <Globe className="w-3.5 h-3.5 text-blue-400" />,
+      academic: <GraduationCap className="w-3.5 h-3.5 text-violet-400" />,
+      video: <Film className="w-3.5 h-3.5 text-red-400" />,
+    };
+    const labels: Record<string, string> = {
+      news: `News${tool.topic ? ` — ${tool.topic}` : ""}`,
+      academic: `Academic Search${tool.query ? ` — ${tool.query}` : ""}`,
+      video: `Video Analysis${tool.url ? ` — ${tool.url?.slice(0, 40)}…` : ""}`,
+    };
+    return (
+      <div className="mt-2 flex items-start gap-2 px-3 py-2.5 rounded-xl border border-white/10 bg-black/40 text-xs font-mono">
+        <span className="shrink-0 mt-0.5">{icons[tool.type]}</span>
+        <div>
+          <p className="text-[9px] text-white/40 tracking-widest uppercase mb-1">{labels[tool.type]}</p>
+          <p className="text-white/70 whitespace-pre-wrap text-[11px] leading-relaxed max-h-40 overflow-y-auto omnimens-scrollbar">{tool.result}</p>
+        </div>
+      </div>
+    );
+  }
+  return null;
+}
+
+// ── TTS Button ─────────────────────────────────────────────────────────────────
+function TTSButton({ text, voice = "nova" }: { text: string; voice?: string }) {
+  const [loading, setLoading] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const handlePlay = async () => {
+    if (playing) {
+      audioRef.current?.pause();
+      setPlaying(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch("/api/omnimens/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ text: text.slice(0, 4000), voice }),
+      });
+      if (!res.ok) throw new Error("TTS failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      audio.onended = () => { setPlaying(false); URL.revokeObjectURL(url); };
+      audio.onerror = () => setPlaying(false);
+      audio.play();
+      setPlaying(true);
+    } catch {
+      setPlaying(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => () => { audioRef.current?.pause(); }, []);
+
+  return (
+    <button
+      onClick={handlePlay}
+      title={playing ? "Pause TTS" : "Read aloud"}
+      className="text-white/25 hover:text-primary/60 transition-colors p-1 rounded"
+    >
+      {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : playing ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
+    </button>
+  );
+}
+
+// ── Model selector ─────────────────────────────────────────────────────────────
+const MODEL_OPTIONS = [
+  { id: "gpt-4o",       label: "GPT-4o",       badge: "SMART" },
+  { id: "gpt-4o-mini",  label: "GPT-4o Mini",  badge: "FAST"  },
+  { id: "gpt-4.1",      label: "GPT-4.1",      badge: "NEW"   },
+  { id: "gpt-4.1-mini", label: "GPT-4.1 Mini", badge: "FAST"  },
+  { id: "o3-mini",      label: "o3-mini",       badge: "REASON"},
+];
+
+function ModelSelector({ value, onChange }: { value: string; onChange: (m: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const current = MODEL_OPTIONS.find(m => m.id === value) || MODEL_OPTIONS[0];
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className="flex items-center gap-1 text-[9px] font-mono text-white/40 hover:text-primary/70 transition-colors px-1.5 py-1 rounded border border-white/8 hover:border-primary/20"
+      >
+        <Cpu className="w-2.5 h-2.5" />
+        {current.label}
+        <ChevronDown className="w-2.5 h-2.5" />
+      </button>
+      {open && (
+        <div className="absolute bottom-full mb-1 left-0 z-50 bg-[#0a0a0f] border border-white/12 rounded-xl shadow-2xl overflow-hidden w-44">
+          {MODEL_OPTIONS.map(m => (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => { onChange(m.id); setOpen(false); }}
+              className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-mono hover:bg-primary/10 transition-colors ${value === m.id ? "text-primary" : "text-white/60"}`}
+            >
+              <span>{m.label}</span>
+              <span className={`text-[8px] px-1.5 py-0.5 rounded font-bold ${m.badge === "REASON" ? "bg-orange-400/15 text-orange-400" : m.badge === "NEW" ? "bg-emerald-400/15 text-emerald-400" : m.badge === "FAST" ? "bg-blue-400/15 text-blue-400" : "bg-primary/15 text-primary"}`}>{m.badge}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main Chat component ────────────────────────────────────────────────────────
 
 export default function Chat() {
@@ -2017,6 +2281,20 @@ export default function Chat() {
     } catch {}
   }, [currentConversationId, startNewConversation, refetchConversations]);
 
+  const handleExportConversation = useCallback(async (fmt: "markdown" | "json" = "markdown") => {
+    if (!currentConversationId) return;
+    try {
+      const res = await fetch(`/api/omnimens/conversations/${currentConversationId}/export?format=${fmt}`, { credentials: "include" });
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const ext = fmt === "json" ? "json" : "md";
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `omnimens-chat-${currentConversationId}.${ext}`; a.click();
+      URL.revokeObjectURL(url);
+    } catch {}
+  }, [currentConversationId]);
+
   // Refresh conversation list after each message
   useEffect(() => {
     if (!isTyping && currentConversationId) {
@@ -2025,6 +2303,7 @@ export default function Chat() {
   }, [isTyping, currentConversationId]);
   const voice = useOmnimensVoice();
   const [persona, setPersona] = useState("GENERAL");
+  const [selectedModel, setSelectedModel] = useState("gpt-4o");
   const [deepResearchMode, setDeepResearchMode] = useState(false);
   const [showAvatarStudio, setShowAvatarStudio] = useState(false);
   const [researchQuestion, setResearchQuestion] = useState("");
@@ -2154,7 +2433,7 @@ export default function Chat() {
       setShowLimitModal(true);
       return;
     }
-    sendMessage(input, pendingFiles, persona, hubSettings);
+    sendMessage(input, pendingFiles, persona, hubSettings, selectedModel);
     setInput("");
     setPendingFiles([]);
   };
@@ -2259,6 +2538,17 @@ export default function Chat() {
                 <Settings className="w-3.5 h-3.5" />
                 <span className="hidden sm:block">HUB</span>
               </button>
+              {/* Export conversation */}
+              {currentConversationId && (
+                <button
+                  onClick={() => handleExportConversation("markdown")}
+                  className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-white/40 hover:text-primary/70 hover:bg-primary/10 transition-all text-[9px] font-mono border border-transparent hover:border-primary/20"
+                  title="Export conversation as Markdown"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span className="hidden sm:block">EXPORT</span>
+                </button>
+              )}
               {/* Right panel toggle */}
               <button
                 onClick={() => setRightOpen(o => !o)}
@@ -2329,10 +2619,16 @@ export default function Chat() {
                               }`
                         }`}>
                           {msg.role === "omnimens" && (
-                            <div className="flex items-center gap-1 mb-2 text-primary font-bold text-[10px] tracking-widest uppercase">
-                              <OmnimensIcon size={14} className="shrink-0" />
-                              <span>OMNIMENS</span>
-                              <VoiceIndicator isSpeaking={isSpeakingThis} binaryStream={voice.binaryStream} />
+                            <div className="flex items-center justify-between gap-1 mb-2">
+                              <div className="flex items-center gap-1 text-primary font-bold text-[10px] tracking-widest uppercase">
+                                <OmnimensIcon size={14} className="shrink-0" />
+                                <span>OMNIMENS</span>
+                                {msg.model && msg.model !== "gpt-4o" && (
+                                  <span className="text-[8px] text-white/30 font-mono normal-case tracking-normal ml-1 border border-white/10 px-1 rounded">{msg.model}</span>
+                                )}
+                                <VoiceIndicator isSpeaking={isSpeakingThis} binaryStream={voice.binaryStream} />
+                              </div>
+                              {msg.content && <TTSButton text={msg.content} />}
                             </div>
                           )}
 
@@ -2349,19 +2645,27 @@ export default function Chat() {
                                   <WebsitePreview key={i} html={seg.value} index={i} />
                                 ) : (
                                   <div key={i} className="markdown-body">
-                                    <ReactMarkdown
-                                      remarkPlugins={[remarkGfm]}
-                                      components={{
-                                        code({ node, className, children, ...props }: any) {
-                                          const match = /language-(\w+)/.exec(className || "");
-                                          const isBlock = !props.inline && match;
-                                          const lang = match ? match[1] : "";
-                                          const codeStr = String(children).replace(/\n$/, "");
-                                          if (isBlock) return <CodeBlockWithRun code={codeStr} language={lang} />;
-                                          return <code className={`font-mono text-primary/80 bg-primary/10 px-1 rounded text-sm ${className || ""}`} {...props}>{children}</code>;
-                                        },
-                                      }}
-                                    >{seg.value}</ReactMarkdown>
+                                    {parseChartMarkers(seg.value).map((chunk, ci) => (
+                                      <div key={ci}>
+                                        {chunk.before && (
+                                          <ReactMarkdown
+                                            remarkPlugins={[remarkGfm]}
+                                            components={{
+                                              code({ node, className, children, ...props }: any) {
+                                                const match = /language-(\w+)/.exec(className || "");
+                                                const isBlock = !props.inline && match;
+                                                const lang = match ? match[1] : "";
+                                                const codeStr = String(children).replace(/\n$/, "");
+                                                if (isBlock && lang === "mermaid") return <MermaidDiagram code={codeStr} />;
+                                                if (isBlock) return <CodeBlockWithRun code={codeStr} language={lang} />;
+                                                return <code className={`font-mono text-primary/80 bg-primary/10 px-1 rounded text-sm ${className || ""}`} {...props}>{children}</code>;
+                                              },
+                                            }}
+                                          >{chunk.before}</ReactMarkdown>
+                                        )}
+                                        {chunk.spec && <InlineChart spec={chunk.spec} />}
+                                      </div>
+                                    ))}
                                   </div>
                                 )
                               )}
@@ -2422,6 +2726,15 @@ export default function Chat() {
                                 <div className="mt-4 space-y-2">
                                   {msg.artifacts.map((artifact, i) => (
                                     <ArtifactCard key={i} artifact={artifact} />
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Extended tool results (weather, news, academic, stock, QR, etc.) */}
+                              {msg.toolResults && msg.toolResults.length > 0 && (
+                                <div className="mt-3 space-y-2">
+                                  {msg.toolResults.map((tool, ti) => (
+                                    <ToolResultCard key={ti} tool={tool} />
                                   ))}
                                 </div>
                               )}
@@ -2560,9 +2873,12 @@ export default function Chat() {
               </div>
             </div>
             <div className="flex items-center justify-between mt-1.5 px-1">
-              <span className="text-[9px] font-mono text-white/70">
-                {PERSONA_NAMES[persona]} · URLS AUTO-ANALYZED · MEMORY ACTIVE
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-[9px] font-mono text-white/40">
+                  {PERSONA_NAMES[persona]} · MEMORY ACTIVE
+                </span>
+                <ModelSelector value={selectedModel} onChange={setSelectedModel} />
+              </div>
               <div className="flex items-center gap-2">
                 {hubSettings.antiHallucinationMode && (
                   <span className="flex items-center gap-0.5 text-[8px] font-mono text-orange-400/70">

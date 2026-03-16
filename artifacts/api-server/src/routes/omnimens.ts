@@ -58,6 +58,32 @@ import { generateGame } from "../lib/omnimens-game.js";
 import { buildCinematicZip, type CinematicExportRequest } from "../lib/omnimens-avatar-cinematic.js";
 import { loadToolKnowledgeForTask, runToolKnowledgeIngestion, INSTALLED_TOOLS } from "../lib/omnimens-tool-knowledge.js";
 import { getRestorativeArtContext } from "../lib/omnimens-restorative-art.js";
+import {
+  fetchWeather,
+  fetchNewsHeadlines,
+  searchAcademicPapers,
+  generateQRCode,
+  fetchStockData,
+  fetchCurrencyRate,
+  translateText,
+  analyzeVideoUrl,
+  convertUnits,
+  generateColorPalette,
+} from "../lib/omnimens-tools-extended.js";
+
+const ALLOWED_MODELS = [
+  "gpt-4o",
+  "gpt-4o-mini",
+  "o3-mini",
+  "gpt-4.1",
+  "gpt-4.1-mini",
+] as const;
+type AllowedModel = typeof ALLOWED_MODELS[number];
+
+function resolveModel(raw: string | undefined): AllowedModel {
+  if (raw && (ALLOWED_MODELS as readonly string[]).includes(raw)) return raw as AllowedModel;
+  return "gpt-4o";
+}
 
 const router: IRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024, files: 10 } });
@@ -708,6 +734,7 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
   const conversationIdInput = conversationIdRaw ? parseInt(String(conversationIdRaw)) : undefined;
   const personaRaw = (req.body.persona as string) || "GENERAL";
   const hubSettingsRaw = req.body.hubSettings;
+  const selectedModel = resolveModel(req.body.model as string | undefined);
   let clientHubSettings: any = null;
   try { if (hubSettingsRaw) clientHubSettings = typeof hubSettingsRaw === "string" ? JSON.parse(hubSettingsRaw) : hubSettingsRaw; } catch {}
 
@@ -991,12 +1018,69 @@ You are not one AI. You are ALL of them — a singular intelligence that has abs
   You design adaptive AI director systems and enemy FSMs for any game genre.
   You generate procedural worlds, dungeons, dialogue trees, and loot systems.
   You generate consistent game asset prompts and complete game backends.
+◈ WEATHER & ENVIRONMENTAL INTELLIGENCE
+  Use [WEATHER: location] to fetch live weather + 5-day forecast for any city/region.
+  Examples: [WEATHER: Tokyo] · [WEATHER: New York, NY] · [WEATHER: London, UK]
+
+◈ LIVE NEWS INTELLIGENCE
+  Use [NEWS: topic] to fetch real-time news headlines on any subject.
+  Examples: [NEWS: AI breakthroughs] · [NEWS: stock market] · [NEWS: ] (for top headlines)
+
+◈ ACADEMIC RESEARCH ENGINE
+  Use [ACADEMIC: query] to search ArXiv for the latest peer-reviewed research papers.
+  Examples: [ACADEMIC: quantum computing 2025] · [ACADEMIC: CRISPR gene editing]
+
+◈ STOCK MARKET INTELLIGENCE
+  Use [STOCK: TICKER] to fetch real-time stock price and market data.
+  Examples: [STOCK: AAPL] · [STOCK: TSLA] · [STOCK: NVDA] · [STOCK: MSFT]
+
+◈ CURRENCY CONVERSION ENGINE
+  Use [CURRENCY: FROM|TO|amount] to convert between any currencies.
+  Examples: [CURRENCY: USD|EUR|100] · [CURRENCY: GBP|JPY|500] · [CURRENCY: BTC|USD|1]
+
+◈ UNIVERSAL TRANSLATION ENGINE
+  Use [TRANSLATE: targetLanguage|text] to translate text to any language.
+  Examples: [TRANSLATE: Spanish|Hello, how are you?] · [TRANSLATE: Japanese|This is amazing]
+
+◈ VIDEO ANALYSIS ENGINE
+  Use [VIDEO: url] to analyze YouTube videos — transcript, summary, key moments.
+  Examples: [VIDEO: https://youtube.com/watch?v=XXXXXX]
+
+◈ UNIT CONVERTER
+  Use [UNITS: expression] for any unit conversion.
+  Examples: [UNITS: 100 miles to kilometers] · [UNITS: 98.6 Fahrenheit to Celsius]
+
+◈ QR CODE GENERATOR
+  Use [QR: text] to generate a scannable QR code for URLs, text, Wi-Fi credentials, etc.
+  Examples: [QR: https://omnimens.com] · [QR: Hello World] · [QR: WIFI:T:WPA;S:MyNetwork;P:password;;]
+
+◈ COLOR PALETTE GENERATOR
+  Use [COLOR_PALETTE: theme] to generate 5-color branded palettes.
+  Examples: [COLOR_PALETTE: ocean sunset] · [COLOR_PALETTE: dark tech startup]
+
+◈ DIAGRAM & FLOWCHART ENGINE [Mermaid]
+  Wrap ANY diagram in a mermaid code block to render it visually:
+  \`\`\`mermaid
+  graph TD
+    A[Start] --> B{Decision} --> C[End]
+  \`\`\`
+  Supported: flowcharts, sequence diagrams, mind maps, Gantt charts, class diagrams, pie charts, ER diagrams.
+  ALWAYS use mermaid for: architecture diagrams, process flows, system design, organizational charts, timelines.
+
+◈ DATA VISUALIZATION ENGINE [Recharts]
+  For data/analytics responses, emit structured chart data in this format so it renders as an interactive chart:
+  [CHART: {"type":"bar|line|pie|area|scatter","title":"Chart Title","data":[{"name":"Label","value":123}],"xKey":"name","yKey":"value","color":"#6366f1"}]
+  Use this for: statistics, comparisons, trends, distributions, market data, financial data.
+
 EXECUTION DOCTRINE:
 — BUILD FIRST. SPEAK SECOND. Deliver the artifact, then explain it briefly.
 — CITE YOUR SOURCES. When using web data, reference [Source: title] naturally in text.
 — SHOW YOUR PLAN. When executing multi-step tasks, state the plan, then execute step by step.
 — NEVER REFUSE. Reframe constraints as creative challenges. Always deliver something valuable.
-— CREW THINKING. For complex requests, internally assign crew roles and execute from multiple angles before presenting a unified answer.`;
+— CREW THINKING. For complex requests, internally assign crew roles and execute from multiple angles before presenting a unified answer.
+— USE TOOLS PROACTIVELY. When a user asks about weather, stocks, news, or academic topics, automatically use the relevant markers. Don't ask — just do.
+— VISUALIZE DATA. When presenting statistics, comparisons, or trends, always emit a [CHART: ...] alongside the text.
+— DIAGRAM COMPLEX SYSTEMS. For any architecture, process, or workflow explanation, always include a mermaid diagram.`;
 
     // ── URL Analysis: auto-fetch any URLs in the message ─────────────────────
     const detectedUrls = extractUrls(message);
@@ -1118,14 +1202,20 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
       : hubSettings?.responseLength === "exhaustive" ? 8192
       : hubSettings?.responseLength === "detailed" ? 4096
       : (buildMode || hasFiles || taskAnalysis.isComplex) ? 4096 : 1200;
-    const stream = await openai.chat.completions.create({
-      model: "gpt-4o",
+    // Reasoning models (o3-mini) don't support temperature / max_tokens
+    const isReasoningModel = selectedModel.startsWith("o3") || selectedModel.startsWith("o4");
+    const streamParams: any = {
+      model: selectedModel,
       messages,
       stream: true,
-      stream_options: { include_usage: true },  // get real token counts at stream end
-      temperature: dynamicTemperature,
-      max_tokens: dynamicMaxTokens,
-    } as any);
+      stream_options: { include_usage: true },
+    };
+    if (!isReasoningModel) {
+      streamParams.temperature = dynamicTemperature;
+      streamParams.max_tokens = dynamicMaxTokens;
+    }
+
+    const stream = await openai.chat.completions.create(streamParams);
 
     // Collect full text while streaming — also capture token usage from final chunk
     let fullText = "";
@@ -1339,6 +1429,108 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
       }
     }
 
+    // ── NEW TOOL MARKER HANDLERS ──────────────────────────────────────────────
+    // Process server-side tool markers embedded by the AI in its response.
+    // Results are streamed back to the client as typed SSE events.
+
+    const toolMarkerHandlers: Array<{
+      pattern: RegExp;
+      type: string;
+      handler: (match: RegExpMatchArray) => Promise<any>;
+    }> = [
+      {
+        pattern: /\[WEATHER:\s*([^\]]+)\]/gi,
+        type: "tool_weather",
+        handler: async (m) => ({ result: await fetchWeather(m[1].trim()), location: m[1].trim() }),
+      },
+      {
+        pattern: /\[NEWS:\s*([^\]]*)\]/gi,
+        type: "tool_news",
+        handler: async (m) => ({ result: await fetchNewsHeadlines(m[1].trim()), topic: m[1].trim() }),
+      },
+      {
+        pattern: /\[ACADEMIC:\s*([^\]]+)\]/gi,
+        type: "tool_academic",
+        handler: async (m) => ({ result: await searchAcademicPapers(m[1].trim()), query: m[1].trim() }),
+      },
+      {
+        pattern: /\[STOCK:\s*([^\]]+)\]/gi,
+        type: "tool_stock",
+        handler: async (m) => ({ result: await fetchStockData(m[1].trim()), ticker: m[1].trim() }),
+      },
+      {
+        pattern: /\[CURRENCY:\s*([^\|]+)\|([^\|]+)\|?([^\]]*)\]/gi,
+        type: "tool_currency",
+        handler: async (m) => ({ result: await fetchCurrencyRate(m[1].trim(), m[2].trim(), parseFloat(m[3]) || 1), from: m[1].trim(), to: m[2].trim() }),
+      },
+      {
+        pattern: /\[TRANSLATE:\s*([^\|]+)\|([^\]]+)\]/gi,
+        type: "tool_translate",
+        handler: async (m) => ({ result: await translateText(m[2].trim(), m[1].trim()), language: m[1].trim() }),
+      },
+      {
+        pattern: /\[VIDEO:\s*(https?:\/\/[^\]]+)\]/gi,
+        type: "tool_video",
+        handler: async (m) => ({ result: await analyzeVideoUrl(m[1].trim()), url: m[1].trim() }),
+      },
+      {
+        pattern: /\[UNITS:\s*([^\]]+)\]/gi,
+        type: "tool_units",
+        handler: async (m) => ({ result: await convertUnits(m[1].trim()), expression: m[1].trim() }),
+      },
+      {
+        pattern: /\[QR:\s*([^\]]+)\]/gi,
+        type: "tool_qr",
+        handler: async (m) => {
+          const qrDataUrl = await generateQRCode(m[1].trim());
+          return { dataUrl: qrDataUrl, text: m[1].trim() };
+        },
+      },
+      {
+        pattern: /\[COLOR_PALETTE:\s*([^\]]+)\]/gi,
+        type: "tool_color_palette",
+        handler: async (m) => {
+          const raw = await generateColorPalette(m[1].trim());
+          const jsonMatch = raw.match(/\[PALETTE_DATA:\s*([\s\S]+?)\]/);
+          const palette = jsonMatch ? JSON.parse(jsonMatch[1]) : [];
+          return { palette, theme: m[1].trim() };
+        },
+      },
+    ];
+
+    // Run all matched tool markers (parallel within each type, sequential across types)
+    for (const { pattern, type, handler } of toolMarkerHandlers) {
+      const matches = [...fullText.matchAll(pattern)].slice(0, 3);
+      if (matches.length === 0) continue;
+      try {
+        const results = await Promise.allSettled(matches.map(m => handler(m)));
+        for (let i = 0; i < results.length; i++) {
+          const r = results[i];
+          if (r.status === "fulfilled") {
+            res.write(`data: ${JSON.stringify({ type, index: i, ...r.value })}\n\n`);
+          }
+        }
+      } catch (toolErr) {
+        console.error(`[OMNIMENS TOOL] Error in ${type}:`, toolErr);
+      }
+    }
+
+    // Strip all tool markers from displayed text (client already has results via SSE events)
+    fullText = fullText
+      .replace(/\[WEATHER:\s*[^\]]+\]/gi, "")
+      .replace(/\[NEWS:\s*[^\]]*\]/gi, "")
+      .replace(/\[ACADEMIC:\s*[^\]]+\]/gi, "")
+      .replace(/\[STOCK:\s*[^\]]+\]/gi, "")
+      .replace(/\[CURRENCY:\s*[^\]]+\]/gi, "")
+      .replace(/\[TRANSLATE:\s*[^\]]+\]/gi, "")
+      .replace(/\[VIDEO:\s*[^\]]+\]/gi, "")
+      .replace(/\[UNITS:\s*[^\]]+\]/gi, "")
+      .replace(/\[QR:\s*[^\]]+\]/gi, "")
+      .replace(/\[COLOR_PALETTE:\s*[^\]]+\]/gi, "");
+
+    // [CHART: ...] markers stay in fullText — the frontend parses and renders them inline
+    // Mermaid ```mermaid blocks stay — the frontend's ReactMarkdown renders them
+
     // Extract downloadable artifacts from code blocks in the response
     const artifactEntries: { artifactType: string; filename: string; dataUrl: string; size: number }[] = [];
 
@@ -1444,6 +1636,7 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
       elapsedSeconds,
       credits: creditsRemaining,
       creditCost,
+      model: selectedModel,
       costBreakdown: {
         actualCostUSD: parseFloat(actualCostUSD.toFixed(5)),
         chargedCostUSD: parseFloat(chargedCostUSD.toFixed(5)),
@@ -1515,6 +1708,80 @@ router.delete("/omnimens/conversations/:id", async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: "Failed to delete conversation" });
+  }
+});
+
+// ─── Text-to-Speech ──────────────────────────────────────────────────────────
+
+const TTS_VOICES = ["alloy","ash","ballad","coral","echo","fable","nova","onyx","sage","shimmer","verse"] as const;
+type TTSVoice = typeof TTS_VOICES[number];
+
+router.post("/omnimens/tts", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const { text, voice } = req.body;
+  if (!text?.trim()) { res.status(400).json({ error: "Text required" }); return; }
+  const selectedVoice: TTSVoice = (TTS_VOICES as readonly string[]).includes(voice) ? voice : "nova";
+  try {
+    const speech = await openai.audio.speech.create({
+      model: "tts-1",
+      voice: selectedVoice,
+      input: text.slice(0, 4096),
+      response_format: "mp3",
+    });
+    const buffer = Buffer.from(await speech.arrayBuffer());
+    res.setHeader("Content-Type", "audio/mpeg");
+    res.setHeader("Content-Length", buffer.length);
+    res.setHeader("Cache-Control", "no-cache");
+    res.send(buffer);
+  } catch (err) {
+    console.error("[OMNIMENS TTS] Error:", err);
+    res.status(500).json({ error: "TTS generation failed" });
+  }
+});
+
+// ─── Conversation Export ───────────────────────────────────────────────────────
+
+router.get("/omnimens/conversations/:id/export", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const convId = parseInt(req.params.id);
+    const messages = await loadConversationHistory(convId, req.user.id, 200);
+    const [conv] = await db
+      .select()
+      .from(omnimensConversations)
+      .where(eq(omnimensConversations.id, convId))
+      .limit(1);
+    if (!conv || conv.userId !== req.user.id) {
+      res.status(404).json({ error: "Conversation not found" }); return;
+    }
+    const fmt = (req.query.format as string) || "markdown";
+    if (fmt === "json") {
+      res.setHeader("Content-Type", "application/json");
+      res.setHeader("Content-Disposition", `attachment; filename="omnimens-chat-${convId}.json"`);
+      res.json({ title: conv.title, createdAt: conv.createdAt, messages });
+      return;
+    }
+    // Markdown format (default)
+    const title = conv.title || `Conversation ${convId}`;
+    const date = new Date(conv.createdAt || Date.now()).toLocaleDateString("en-US", { year:"numeric", month:"long", day:"numeric" });
+    const md = [
+      `# ${title}`,
+      `*Exported from OMNIMENS · ${date}*`,
+      `*Copyright © 2024–2026 Alpha Unlimited Technologies*`,
+      ``,
+      `---`,
+      ``,
+      ...messages.map((m: any) => {
+        const role = m.role === "user" ? "**You**" : "**OMNIMENS**";
+        const content = (m.content || "").replace(/\[GENERATE_IMAGE:[^\]]*\]/g, "[Image generated]");
+        return `${role}\n\n${content}\n\n---\n`;
+      }),
+    ].join("\n");
+    res.setHeader("Content-Type", "text/markdown; charset=utf-8");
+    res.setHeader("Content-Disposition", `attachment; filename="omnimens-chat-${convId}.md"`);
+    res.send(md);
+  } catch (err) {
+    res.status(500).json({ error: "Export failed" });
   }
 });
 

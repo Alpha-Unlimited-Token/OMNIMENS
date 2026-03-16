@@ -9,6 +9,8 @@ import Chat from "@/pages/chat";
 import Pricing from "@/pages/pricing";
 import Account from "@/pages/account";
 import Projects from "@/pages/projects";
+import Memory from "@/pages/memory";
+import Tools from "@/pages/tools";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,6 +29,8 @@ function Router() {
       <Route path="/pricing" component={Pricing} />
       <Route path="/account" component={Account} />
       <Route path="/projects" component={Projects} />
+      <Route path="/memory" component={Memory} />
+      <Route path="/tools" component={Tools} />
       <Route component={NotFound} />
     </Switch>
   );

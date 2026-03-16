@@ -71,10 +71,30 @@ export type RedFlagAlert = {
   recommendation: string;
 };
 
+export type ToolResult = {
+  type: "weather" | "news" | "academic" | "stock" | "currency" | "translate" | "video" | "units" | "qr" | "color_palette";
+  result?: string;
+  dataUrl?: string;
+  palette?: Array<{ hex: string; name: string; rgb: string; usage: string }>;
+  location?: string;
+  topic?: string;
+  query?: string;
+  ticker?: string;
+  from?: string;
+  to?: string;
+  language?: string;
+  url?: string;
+  expression?: string;
+  text?: string;
+  theme?: string;
+  index: number;
+};
+
 export type Message = {
   id: string;
   role: "user" | "omnimens";
   content: string;
+  model?: string;
   files?: AttachedFile[];
   images?: GeneratedImage[];
   generatingImages?: boolean;
@@ -96,6 +116,7 @@ export type Message = {
   multiSearchCount?: number;
   multiSearchComplete?: boolean;
   redFlagAlert?: RedFlagAlert;
+  toolResults?: ToolResult[];
 };
 
 export type AttachedFile = {
@@ -129,7 +150,7 @@ export function useOmnimensChat(onLimitReached: () => void) {
     setMessages(mapped);
   };
 
-  const sendMessage = async (content: string, files: File[] = [], persona = "GENERAL", hubSettings?: any) => {
+  const sendMessage = async (content: string, files: File[] = [], persona = "GENERAL", hubSettings?: any, model = "gpt-4o") => {
     if (!content.trim() && files.length === 0) return;
     if (isTyping) return;
 
@@ -169,6 +190,7 @@ export function useOmnimensChat(onLimitReached: () => void) {
       form.append("message", content);
       form.append("history", JSON.stringify(history));
       form.append("persona", persona);
+      form.append("model", model);
       if (currentConversationId !== undefined) {
         form.append("conversationId", String(currentConversationId));
       }
@@ -441,6 +463,36 @@ export function useOmnimensChat(onLimitReached: () => void) {
                   return newMsgs;
                 });
 
+              } else if (data.type?.startsWith("tool_")) {
+                // Handle all extended tool results (weather, news, academic, stock, qr, etc.)
+                const toolType = data.type.replace("tool_", "") as ToolResult["type"];
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    const toolResult: ToolResult = {
+                      type: toolType,
+                      result: data.result,
+                      dataUrl: data.dataUrl,
+                      palette: data.palette,
+                      location: data.location,
+                      topic: data.topic,
+                      query: data.query,
+                      ticker: data.ticker,
+                      from: data.from,
+                      to: data.to,
+                      language: data.language,
+                      url: data.url,
+                      expression: data.expression,
+                      text: data.text,
+                      theme: data.theme,
+                      index: data.index ?? 0,
+                    };
+                    msg.toolResults = [...(msg.toolResults || []), toolResult];
+                  }
+                  return newMsgs;
+                });
+
               } else if (data.type === "artifact_generated") {
                 setMessages((prev) => {
                   const newMsgs = [...prev];
@@ -468,6 +520,7 @@ export function useOmnimensChat(onLimitReached: () => void) {
                     msg.generating3d = false;
                     if (data.creditCost)     msg.creditCost    = data.creditCost;
                     if (data.costBreakdown)  msg.costBreakdown = data.costBreakdown;
+                    if (data.model)          msg.model         = data.model;
                   }
                   return newMsgs;
                 });
