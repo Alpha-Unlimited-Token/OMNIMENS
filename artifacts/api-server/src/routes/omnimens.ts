@@ -7,6 +7,7 @@ import { openai, generateImageBuffer } from "@workspace/integrations-openai-ai-s
 import { runOmnimens, type OmnimensState } from "../lib/omnimens-engine.js";
 import { reflectOnConversation, loadBrainContext, synthesizeUpgrade, markUpgradeLive } from "../lib/omnimens-self-upgrade.js";
 import { webSearch, formatSearchResults } from "../lib/web-search.js";
+import { loadActivePatchInstructions, getPatchSummary, getAllPatches, deactivatePatch } from "../lib/omnimens-patches.js";
 import { stripe } from "../stripeClient.js";
 
 const router: IRouter = Router();
@@ -541,7 +542,8 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
     }
 
     const brainContext = await loadBrainContext();
-    let systemPrompt = buildSystemPrompt(omnimensState) + brainContext;
+    const patchInstructions = loadActivePatchInstructions();  // OMNIMENS's self-executed upgrades — loaded fresh every request
+    let systemPrompt = buildSystemPrompt(omnimensState) + brainContext + patchInstructions;
 
     // ── Web Search: detect if query needs live internet data ─────────────────
     let webSearchContext = "";
@@ -848,6 +850,31 @@ router.post("/omnimens/upgrade-now", async (req, res) => {
   synthesizeUpgrade()
     .then(() => res.json({ ok: true, message: "Upgrade cycle initiated" }))
     .catch(err => res.status(500).json({ error: String(err) }));
+});
+
+// ─── Self-Executed Behavioral Patches (owner only) ────────────────────────────
+
+router.get("/omnimens/patches", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const summary = getPatchSummary();
+    const patches = getAllPatches();
+    res.json({ summary, patches });
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+router.delete("/omnimens/patches/:id", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  const deactivated = deactivatePatch(req.params.id);
+  res.json({ ok: deactivated });
 });
 
 // ─── Checkout ─────────────────────────────────────────────────────────────────

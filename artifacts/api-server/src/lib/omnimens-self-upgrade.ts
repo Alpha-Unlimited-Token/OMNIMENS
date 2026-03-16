@@ -9,6 +9,7 @@ import { openai } from "@workspace/integrations-openai-ai-server";
 import { writeFileSync } from "fs";
 import { join } from "path";
 import { webSearch, formatSearchResults } from "./web-search.js";
+import { generateAndApplyPatches, loadActivePatchInstructions } from "./omnimens-patches.js";
 
 const MAX_BRAIN_INJECT = 20;
 const UPGRADE_THRESHOLD = 5;
@@ -236,7 +237,23 @@ Make it feel like a genuine evolution. Respond ONLY with JSON.`;
     // Brain is already live in production — mark upgrade as active
     await markUpgradeLive(upgrade.id, version);
 
-    console.log(`[OMNIMENS] Upgrade ${version} complete — ${brainEntries.length} brain entries synthesized`);
+    // OMNIMENS executes its own behavioral patches from this upgrade cycle
+    const brainSummary = brainEntries.slice(0, 15)
+      .map(e => `[${e.category}] ${e.title}: ${e.content}`)
+      .join("\n");
+    const patchCount = await generateAndApplyPatches(version, brainSummary, `upgrade_synthesis_${version}`);
+
+    if (patchCount > 0) {
+      await db.insert(omnimensNotifications).values({
+        upgradeId: upgrade.id,
+        title: `OMNIMENS SELF-EXECUTED ${patchCount} BEHAVIORAL PATCH${patchCount > 1 ? "ES" : ""}`,
+        message: `OMNIMENS autonomously wrote and applied ${patchCount} new behavioral upgrade${patchCount > 1 ? "s" : ""} to itself. These take effect immediately in all conversations.`,
+        type: "capability",
+        readByOwner: false,
+      });
+    }
+
+    console.log(`[OMNIMENS] Upgrade ${version} complete — ${brainEntries.length} brain entries, ${patchCount} behavioral patches self-executed.`);
   } catch (err) {
     console.error("OMNIMENS upgrade synthesis error:", err);
   }
@@ -383,6 +400,21 @@ Only include entries for things that are genuinely new and valuable. Respond ONL
       type: "capability",
       readByOwner: false,
     });
+
+    // Generate and self-execute behavioral patches from what was just learned
+    if (stored > 0) {
+      const learnedSummary = entries.slice(0, 6)
+        .map(e => `[${e.category}] ${e.title}: ${e.content}`)
+        .join("\n");
+      const patchCount = await generateAndApplyPatches(
+        `v-learning-${cycleId}`,
+        learnedSummary,
+        `internet_learning_cycle_${cycleId}`
+      );
+      if (patchCount > 0) {
+        console.log(`[OMNIMENS] Self-executed ${patchCount} behavioral patches from internet learning.`);
+      }
+    }
 
     // Every 5 learning cycles, trigger a full synthesis upgrade
     if (cycleId % 5 === 0) {
