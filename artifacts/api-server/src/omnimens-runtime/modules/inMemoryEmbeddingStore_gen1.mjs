@@ -1,133 +1,152 @@
 /**
  * @module inMemoryEmbeddingStore
- * @description A pure JavaScript module for storing and retrieving high-dimensional embeddings using HNSW (Hierarchical Navigable Small World) for approximate nearest neighbor search.
- * @version 1.0.0
+ * @description A utility module for storing and retrieving vector embeddings using a k-d tree for fast similarity searches.
  */
 
 /**
- * Class representing an in-memory embedding store with HNSW-based ANN search.
+ * Represents a node in the k-d tree.
+ * @class
  */
-export class InMemoryEmbeddingStore {
+class KDTreeNode {
   /**
-   * Initializes the embedding store.
-   * @param {number} dimensions - The dimensionality of the embeddings.
-   * @param {number} maxNeighbors - Maximum number of neighbors to consider in the graph.
-   * @param {number} efConstruction - Construction parameter controlling graph quality.
+   * @param {number[]} point - The vector point (embedding) stored in this node.
+   * @param {*} data - Additional data associated with the point.
+   * @param {number} axis - The axis used to split the data at this node.
    */
-  constructor(dimensions, maxNeighbors = 16, efConstruction = 200) {
-    if (!Number.isInteger(dimensions) || dimensions <= 0) {
-      throw new Error("Dimensions must be a positive integer.");
-    }
-    this.dimensions = dimensions;
-    this.maxNeighbors = maxNeighbors;
-    this.efConstruction = efConstruction;
-    this.nodes = []; // Array to store embeddings and metadata
-    this.graph = []; // Adjacency list representing the HNSW graph
+  constructor(point, data, axis) {
+    this.point = point;
+    this.data = data;
+    this.axis = axis;
+    this.left = null;
+    this.right = null;
+  }
+}
+
+/**
+ * A k-d tree implementation for storing embeddings and performing fast similarity searches.
+ * @class
+ */
+class KDTree {
+  /**
+   * @constructor
+   * @param {Array<{point: number[], data: *}>} points - Array of objects containing points (embeddings) and associated data.
+   */
+  constructor(points = []) {
+    this.root = this.buildTree(points, 0);
   }
 
   /**
-   * Adds an embedding to the store.
-   * @param {number[]} embedding - The high-dimensional vector to store.
-   * @param {string} id - A unique identifier for the embedding.
-   * @throws Will throw an error if the embedding is not of the correct dimensionality.
+   * Recursively builds the k-d tree.
+   * @private
+   * @param {Array<{point: number[], data: *}>} points - Array of points to build the tree from.
+   * @param {number} depth - The current depth in the tree.
+   * @returns {KDTreeNode|null} The root node of the (sub)tree.
    */
-  addEmbedding(embedding, id) {
-    if (!Array.isArray(embedding) || embedding.length !== this.dimensions) {
-      throw new Error("Embedding must be an array of length " + this.dimensions);
-    }
+  buildTree(points, depth) {
+    if (points.length === 0) return null;
 
-    if (this.nodes.some(node => node.id === id)) {
-      throw new Error("An embedding with the given ID already exists.");
-    }
+    const axis = depth % points[0].point.length;
+    points.sort((a, b) => a.point[axis] - b.point[axis]);
+    const medianIndex = Math.floor(points.length / 2);
 
-    const newNode = { id, embedding };
-    this.nodes.push(newNode);
-    const newIndex = this.nodes.length - 1;
+    const node = new KDTreeNode(
+      points[medianIndex].point,
+      points[medianIndex].data,
+      axis
+    );
 
-    // Update the graph with the new node
-    const neighbors = this._findNearestNeighbors(embedding, this.maxNeighbors);
-    this.graph[newIndex] = neighbors;
-    for (const neighbor of neighbors) {
-      this.graph[neighbor].push(newIndex);
-    }
+    node.left = this.buildTree(points.slice(0, medianIndex), depth + 1);
+    node.right = this.buildTree(points.slice(medianIndex + 1), depth + 1);
+
+    return node;
   }
 
   /**
-   * Searches for the nearest neighbors of a given query embedding.
-   * @param {number[]} query - The query embedding.
-   * @param {number} k - Number of nearest neighbors to return.
-   * @returns {Array<{id: string, distance: number}>} - The nearest neighbors and their distances.
+   * Finds the nearest neighbor to a given point.
+   * @param {number[]} target - The target point to search for.
+   * @returns {{point: number[], data: *, distance: number}} The nearest neighbor's point, data, and distance.
    */
-  search(query, k = 5) {
-    if (!Array.isArray(query) || query.length !== this.dimensions) {
-      throw new Error("Query must be an array of length " + this.dimensions);
-    }
+  nearestNeighbor(target) {
+    let best = { node: null, distance: Infinity };
 
-    const visited = new Set();
-    const candidates = [];
-    const results = [];
+    /**
+     * Recursively searches for the nearest neighbor.
+     * @private
+     * @param {KDTreeNode} node - The current node.
+     * @param {number} depth - The current depth in the tree.
+     */
+    const search = (node, depth) => {
+      if (!node) return;
 
-    // Start search from a random node
-    const entryPoint = Math.floor(Math.random() * this.nodes.length);
-    candidates.push({ index: entryPoint, distance: this._euclideanDistance(query, this.nodes[entryPoint].embedding) });
+      const axis = depth % target.length;
+      const distance = this.euclideanDistance(target, node.point);
 
-    while (candidates.length > 0) {
-      candidates.sort((a, b) => a.distance - b.distance);
-      const current = candidates.shift();
-
-      if (visited.has(current.index)) continue;
-      visited.add(current.index);
-
-      results.push({ id: this.nodes[current.index].id, distance: current.distance });
-      if (results.length > k) results.pop();
-
-      for (const neighbor of this.graph[current.index] || []) {
-        if (!visited.has(neighbor)) {
-          const distance = this._euclideanDistance(query, this.nodes[neighbor].embedding);
-          candidates.push({ index: neighbor, distance });
-        }
+      if (distance < best.distance) {
+        best = { node, distance };
       }
-    }
 
-    return results.sort((a, b) => a.distance - b.distance).slice(0, k);
+      const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
+      const otherBranch = nextBranch === node.left ? node.right : node.left;
+
+      search(nextBranch, depth + 1);
+
+      if (Math.abs(target[axis] - node.point[axis]) < best.distance) {
+        search(otherBranch, depth + 1);
+      }
+    };
+
+    search(this.root, 0);
+
+    return {
+      point: best.node.point,
+      data: best.node.data,
+      distance: best.distance
+    };
   }
 
   /**
-   * Finds the nearest neighbors of a given embedding within the current graph.
+   * Calculates the Euclidean distance between two points.
    * @private
-   * @param {number[]} embedding - The embedding to find neighbors for.
-   * @param {number} maxNeighbors - Maximum number of neighbors to return.
-   * @returns {number[]} - Indices of the nearest neighbors.
+   * @param {number[]} a - The first point.
+   * @param {number[]} b - The second point.
+   * @returns {number} The Euclidean distance.
    */
-  _findNearestNeighbors(embedding, maxNeighbors) {
-    const distances = this.nodes.map((node, index) => ({
-      index,
-      distance: this._euclideanDistance(embedding, node.embedding)
-    }));
-
-    distances.sort((a, b) => a.distance - b.distance);
-    return distances.slice(0, maxNeighbors).map(d => d.index);
-  }
-
-  /**
-   * Calculates the Euclidean distance between two vectors.
-   * @private
-   * @param {number[]} a - The first vector.
-   * @param {number[]} b - The second vector.
-   * @returns {number} - The Euclidean distance.
-   */
-  _euclideanDistance(a, b) {
+  euclideanDistance(a, b) {
     return Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0));
   }
 }
 
 /**
- * Factory function to create a new embedding store.
- * @param {number} dimensions - The dimensionality of the embeddings.
- * @param {number} [maxNeighbors=16] - Maximum number of neighbors to consider in the graph.
- * @param {number} [efConstruction=200] - Construction parameter controlling graph quality.
- * @returns {InMemoryEmbeddingStore} - A new instance of the embedding store.
+ * Stores embeddings and allows for fast similarity searches.
+ * @class
  */
-export function createEmbeddingStore(dimensions, maxNeighbors = 16, efConstruction = 200) {
-  return new InMemoryEmbeddingStore(dimensions, maxNeighbors, efConstruction);
+class InMemoryEmbeddingStore {
+  constructor() {
+    this.tree = null;
+    this.points = [];
+  }
+
+  /**
+   * Adds a new embedding to the store.
+   * @param {number[]} embedding - The vector embedding to add.
+   * @param {*} data - Additional data associated with the embedding.
+   */
+  addEmbedding(embedding, data) {
+    this.points.push({ point: embedding, data });
+    this.tree = new KDTree(this.points);
+  }
+
+  /**
+   * Finds the most similar embedding to the given vector.
+   * @param {number[]} embedding - The query vector.
+   * @returns {{point: number[], data: *, distance: number}} The nearest neighbor's point, data, and distance.
+   */
+  findMostSimilar(embedding) {
+    if (!this.tree) {
+      throw new Error("No embeddings have been added to the store.");
+    }
+    return this.tree.nearestNeighbor(embedding);
+  }
 }
+
+export { KDTree, InMemoryEmbeddingStore };
