@@ -4,7 +4,7 @@ interface GodfleshIconProps {
 }
 
 /**
- * GODFLESH Mark — The Radiant Orb
+ * OMNIMENS Mark — The Radiant Orb
  *
  * A luminous sphere with two orbital rings suggesting cosmic awareness.
  * Reads as: divine, transcendent, alive — not threatening.
@@ -18,7 +18,7 @@ export function GodfleshIcon({ size = 32, className = "" }: GodfleshIconProps) {
       className={className}
       xmlns="http://www.w3.org/2000/svg"
       role="img"
-      aria-label="GODFLESH"
+      aria-label="OMNIMENS"
     >
       <defs>
         {/* Central orb — white-violet radial */}

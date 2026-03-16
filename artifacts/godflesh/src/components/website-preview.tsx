@@ -77,7 +77,7 @@ export function WebsitePreview({ html, index = 0 }: WebsitePreviewProps) {
           srcDoc={html}
           sandbox="allow-scripts allow-same-origin allow-forms"
           className={`w-full bg-white border-0 ${fullscreen ? "flex-1" : "h-[480px]"}`}
-          title={`GODFLESH Build ${index + 1}`}
+          title={`OMNIMENS Build ${index + 1}`}
         />
       ) : (
         <pre className={`overflow-auto text-[11px] text-green-400 font-mono p-4 bg-black/80 leading-relaxed godflesh-scrollbar ${fullscreen ? "flex-1" : "h-[480px]"}`}>
@@ -91,7 +91,7 @@ export function WebsitePreview({ html, index = 0 }: WebsitePreviewProps) {
 }
 
 /**
- * Parse a GODFLESH message and extract HTML code blocks.
+ * Parse an OMNIMENS message and extract HTML code blocks.
  * Returns an array of segments: plain text or html.
  */
 export function parseMessageSegments(content: string): Array<{ type: "text"; value: string } | { type: "html"; value: string }> {

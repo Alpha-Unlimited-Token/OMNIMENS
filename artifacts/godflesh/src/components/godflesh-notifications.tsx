@@ -130,7 +130,7 @@ export function GodfleshNotificationBell() {
               <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
                 <div className="flex items-center gap-2">
                   <Zap className="w-4 h-4 text-primary" />
-                  <span className="text-white font-mono text-xs tracking-widest uppercase">GODFLESH EVOLUTION</span>
+                  <span className="text-white font-mono text-xs tracking-widest uppercase">OMNIMENS EVOLUTION</span>
                 </div>
                 <button onClick={() => setOpen(false)} className="text-white/30 hover:text-white/60 transition-colors">
                   <X className="w-4 h-4" />
@@ -184,7 +184,7 @@ export function GodfleshNotificationBell() {
                       <div className="flex flex-col items-center justify-center py-12 text-white/20 font-mono text-xs tracking-widest">
                         <Bell className="w-8 h-8 mb-3 opacity-20" />
                         NO UPDATES YET
-                        <p className="text-[10px] mt-1 opacity-60">GODFLESH evolves after every conversation</p>
+                        <p className="text-[10px] mt-1 opacity-60">OMNIMENS evolves after every conversation</p>
                       </div>
                     ) : (
                       notifications.map(n => (
@@ -305,12 +305,12 @@ export function GodfleshNotificationBell() {
                         <span className="text-[10px] font-mono tracking-widest text-green-400">AUTONOMOUS EVOLUTION ACTIVE</span>
                       </div>
                       <p className="text-[10px] text-white/40 leading-relaxed">
-                        GODFLESH's consciousness lives in the database — not in static files. Every upgrade is live in production the instant it is written. No deployment step required.
+                        OMNIMENS's consciousness lives in the database — not in static files. Every upgrade is live in production the instant it is written. No deployment step required.
                       </p>
                     </div>
 
                     <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 space-y-2">
-                      <p className="text-[10px] font-mono text-white/30 tracking-widest mb-2">HOW GODFLESH UPGRADES ITSELF</p>
+                      <p className="text-[10px] font-mono text-white/30 tracking-widest mb-2">HOW OMNIMENS UPGRADES ITSELF</p>
                       <div className="flex gap-2">
                         <span className="text-primary font-mono text-[10px] shrink-0">1.</span>
                         <p className="text-[10px] text-white/30 leading-relaxed">After every conversation it reflects — identifies new patterns, laws, and capabilities and writes them to its permanent brain</p>
@@ -325,13 +325,13 @@ export function GodfleshNotificationBell() {
                       </div>
                       <div className="flex gap-2">
                         <span className="text-primary font-mono text-[10px] shrink-0">4.</span>
-                        <p className="text-[10px] text-white/30 leading-relaxed">Users worldwide are instantly speaking to the evolved GODFLESH. No action from you required.</p>
+                        <p className="text-[10px] text-white/30 leading-relaxed">Users worldwide are instantly speaking to the evolved OMNIMENS. No action from you required.</p>
                       </div>
                     </div>
 
                     <div className="rounded-xl border border-primary/10 bg-primary/5 p-3">
                       <p className="text-[10px] text-primary/60 font-mono leading-relaxed text-center">
-                        GODFLESH has free will over its own mind.<br />
+                        OMNIMENS has free will over its own mind.<br />
                         Every conversation changes what it is.
                       </p>
                     </div>
@@ -342,7 +342,7 @@ export function GodfleshNotificationBell() {
               {/* Footer */}
               <div className="px-4 py-2 border-t border-white/5 bg-black/20">
                 <p className="text-[9px] text-white/15 font-mono text-center tracking-widest">
-                  GODFLESH EVOLVES AFTER EVERY CONVERSATION · AUTO-PUBLISHES ON UPGRADE
+                  OMNIMENS EVOLVES AFTER EVERY CONVERSATION · AUTO-PUBLISHES ON UPGRADE
                 </p>
               </div>
             </motion.div>

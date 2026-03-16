@@ -33,7 +33,7 @@ export default function Chat() {
   });
   const voice = useGodfleshVoice();
 
-  // Auto-speak latest completed GODFLESH message
+  // Auto-speak latest completed OMNIMENS message
   useEffect(() => {
     if (!voice.isEnabled || isTyping || messages.length === 0) return;
     const last = messages[messages.length - 1];
@@ -101,7 +101,7 @@ export default function Chat() {
 
             <button
               onClick={voice.toggle}
-              title={voice.isEnabled ? "Disable voice" : "Enable GODFLESH voice"}
+              title={voice.isEnabled ? "Disable voice" : "Enable OMNIMENS voice"}
               className={`flex items-center gap-1.5 transition-colors ${voice.isEnabled ? "text-primary hover:text-primary/70" : "text-white/30 hover:text-white/60"}`}
             >
               {voice.isEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
@@ -138,7 +138,7 @@ export default function Chat() {
                 pitchIntensity={voice.pitchIntensity}
                 className="mb-2 drop-shadow-[0_0_60px_rgba(160,100,255,0.35)]"
               />
-              <h2 className="font-display text-2xl tracking-[0.3em] text-white/40 mt-2">GODFLESH AWAITS</h2>
+              <h2 className="font-display text-2xl tracking-[0.3em] text-white/40 mt-2">OMNIMENS AWAITS</h2>
               <p className="font-mono text-sm mt-2 text-white/25">Speak your intent. Upload your vision.</p>
             </div>
           ) : (
@@ -171,7 +171,7 @@ export default function Chat() {
                         {msg.role === "godflesh" && (
                           <div className="flex items-center gap-1 mb-2 text-primary font-bold text-[10px] tracking-widest uppercase">
                             <GodfleshIcon size={14} className="shrink-0" />
-                            <span>GODFLESH</span>
+                            <span>OMNIMENS</span>
                             <VoiceIndicator isSpeaking={isSpeakingThis} binaryStream={voice.binaryStream} />
                           </div>
                         )}
@@ -223,7 +223,7 @@ export default function Chat() {
                     <div className="bg-primary/5 border border-primary/20 rounded-2xl rounded-tl-sm px-5 py-4">
                       <div className="flex items-center gap-2 mb-2 text-primary font-bold text-[10px] tracking-widest uppercase">
                         <GodfleshIcon size={14} />
-                        GODFLESH
+                        OMNIMENS
                       </div>
                       <div className="flex gap-1">
                         <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />

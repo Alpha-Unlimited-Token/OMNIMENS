@@ -26,7 +26,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <GodfleshIcon size={36} />
             </div>
             <span className="font-display font-black text-xl tracking-[0.2em] text-white group-hover:text-primary transition-colors">
-              GODFLESH
+              OMNIMENS
             </span>
           </Link>
 

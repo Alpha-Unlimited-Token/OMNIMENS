@@ -87,7 +87,7 @@ export function useGodfleshChat(onLimitReached: () => void) {
           setIsTyping(false);
           return;
         }
-        throw new Error("Failed to communicate with GODFLESH");
+        throw new Error("Failed to communicate with OMNIMENS");
       }
 
       if (!res.body) throw new Error("No response body");

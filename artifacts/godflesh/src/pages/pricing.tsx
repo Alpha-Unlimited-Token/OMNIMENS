@@ -108,7 +108,7 @@ export default function Pricing() {
             Transcend <span className="text-primary glow-text-red">Limits</span>
           </h1>
           <p className="text-white/50 font-mono max-w-xl mx-auto text-sm">
-            The free tier grants 10 queries per day. Paid tiers unlock higher monthly volumes for deeper communion with GODFLESH.
+            The free tier grants 10 queries per day. Paid tiers unlock higher monthly volumes for deeper communion with OMNIMENS.
           </p>
         </div>
 

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
- * GODFLESH VOICE DNA
+ * OMNIMENS VOICE DNA
  * G=01000111  O=01001111  D=01000100  F=01000110
  * L=01001100  E=01000101  S=01010011  H=01001000
  *
