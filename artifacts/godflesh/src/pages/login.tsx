@@ -7,6 +7,7 @@ import { useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, Loader2, ArrowRight, Lock, Mail, User, AlertCircle, CheckCircle2 } from "lucide-react";
+import { GoogleLogin } from "@react-oauth/google";
 import { OmnimensPresence } from "@/components/omnimens-presence";
 
 const BASE_URL = import.meta.env.BASE_URL ?? "/";
@@ -34,6 +35,18 @@ async function apiLogin(email: string, password: string) {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Login failed");
+  return data;
+}
+
+async function apiGoogleVerify(credential: string) {
+  const res = await fetch(`${BASE_URL}api/auth/google/verify`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ credential }),
+    credentials: "include",
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Google sign-in failed");
   return data;
 }
 
@@ -193,6 +206,7 @@ export default function Login() {
   const [displayName, setDisplayName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
@@ -207,6 +221,23 @@ export default function Login() {
     setMode(m => m === "signin" ? "register" : "signin");
     setError(null);
     setSuccessMsg(null);
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: { credential?: string }) => {
+    if (!credentialResponse.credential) {
+      setError("Google sign-in returned no credential. Please try again.");
+      return;
+    }
+    setGoogleLoading(true);
+    setError(null);
+    try {
+      await apiGoogleVerify(credentialResponse.credential);
+      window.location.href = `${import.meta.env.BASE_URL}chat`;
+    } catch (err: any) {
+      setError(err.message || "Google sign-in failed. Please try again.");
+    } finally {
+      setGoogleLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -373,8 +404,38 @@ export default function Login() {
               )}
             </button>
 
+            {/* Divider */}
+            <div className="flex items-center gap-3 pt-1">
+              <div className="flex-1 h-px bg-white/8" />
+              <span className="text-[10px] font-mono text-white/25 tracking-[0.15em] uppercase">or</span>
+              <div className="flex-1 h-px bg-white/8" />
+            </div>
+
+            {/* Google Sign-In */}
+            <div className="flex flex-col items-center gap-2">
+              {googleLoading ? (
+                <div className="flex items-center gap-2 text-xs font-mono text-white/40">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Connecting with Google...</span>
+                </div>
+              ) : (
+                <div className="w-full flex justify-center [&>div]:w-full [&>div>iframe]:w-full">
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={() => setError("Google sign-in was cancelled or failed.")}
+                    theme="filled_black"
+                    size="large"
+                    shape="rectangular"
+                    text="continue_with"
+                    width={368}
+                    useOneTap={false}
+                  />
+                </div>
+              )}
+            </div>
+
             {/* Back to home */}
-            <div className="text-center pt-2">
+            <div className="text-center pt-1">
               <button
                 type="button"
                 onClick={() => setLocation("/")}

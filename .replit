@@ -41,3 +41,5 @@ STRIPE_PUBLISHABLE_KEY = "pk_test_51TBMhgIoyf122ZOheTYgUJwGkjvL2o5QYguayj7GAB7NY
 STRIPE_PRICE_SPARK = "price_1TBQ36Ioyf122ZOhFxqnwZ6I"
 STRIPE_PRICE_SURGE = "price_1TBQ36Ioyf122ZOh9TZXptNa"
 STRIPE_PRICE_APEX = "price_1TBQ36Ioyf122ZOhD02tVgBm"
+GOOGLE_CLIENT_ID = "66165770155-u1kvuca2nifdrt7an8jrtsc77bf6sn97.apps.googleusercontent.com"
+VITE_GOOGLE_CLIENT_ID = "66165770155-u1kvuca2nifdrt7an8jrtsc77bf6sn97.apps.googleusercontent.com"
