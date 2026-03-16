@@ -3,7 +3,7 @@ import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
-import { useOmnimensChat, type GeneratedImage, type Artifact, type CostBreakdown } from "@/hooks/use-omnimens-chat";
+import { useOmnimensChat, type GeneratedImage, type Artifact, type CostBreakdown, type TaskPlan } from "@/hooks/use-omnimens-chat";
 import { useOmnimensVoice } from "@/hooks/use-omnimens-voice";
 import { VoiceIndicator } from "@/components/voice-indicator";
 import { OmnimensPresence } from "@/components/omnimens-presence";
@@ -56,7 +56,7 @@ function ImageGeneratingBadge() {
         <div className="h-full bg-primary/60 transition-all duration-1000" style={{ width: `${pct}%` }} />
       </div>
       {elapsed > 15 && (
-        <p className="text-white/50 text-[10px]">Neural image synthesis in progress — typically 20–60 seconds.</p>
+        <p className="text-white text-[10px]">Neural image synthesis in progress — typically 20–60 seconds.</p>
       )}
     </div>
   );
@@ -72,7 +72,7 @@ function CreditCostBadge({ creditCost, costBreakdown }: { creditCost: number; co
         className="hover:text-white transition-colors cursor-pointer font-semibold"
       >
         {creditCost} credit{creditCost !== 1 ? "s" : ""}
-        {costBreakdown && <span className="ml-1 text-white/50">(${costBreakdown.chargedCostUSD.toFixed(4)})</span>}
+        {costBreakdown && <span className="ml-1 text-white">(${costBreakdown.chargedCostUSD.toFixed(4)})</span>}
       </button>
       {expanded && costBreakdown && (
         <div className="ml-2 text-white/60 flex flex-wrap gap-x-2 gap-y-0.5">
@@ -93,6 +93,73 @@ function UrlAnalysisBadge({ count, done }: { count: number; done: boolean }) {
     <div className="mt-3 border border-blue-500/20 rounded-xl px-4 py-2 bg-blue-500/5 font-mono text-xs flex items-center gap-3 text-white/70">
       {done ? <Globe className="w-3.5 h-3.5 text-blue-400 shrink-0" /> : <Loader2 className="w-3.5 h-3.5 text-blue-400 animate-spin shrink-0" />}
       <span className="tracking-wider">{done ? `${count} WEB PAGE${count > 1 ? "S" : ""} ANALYZED` : `READING ${count} WEB PAGE${count > 1 ? "S" : ""}...`}</span>
+    </div>
+  );
+}
+
+const AGENT_MODE_COLORS: Record<string, string> = {
+  RESEARCHER: "text-blue-300 border-blue-500/30 bg-blue-500/8",
+  BUILDER: "text-emerald-300 border-emerald-500/30 bg-emerald-500/8",
+  ANALYST: "text-violet-300 border-violet-500/30 bg-violet-500/8",
+  WRITER: "text-amber-300 border-amber-500/30 bg-amber-500/8",
+  STRATEGIST: "text-rose-300 border-rose-500/30 bg-rose-500/8",
+  OPERATOR: "text-cyan-300 border-cyan-500/30 bg-cyan-500/8",
+  GENERAL: "text-white/70 border-white/15 bg-white/5",
+};
+
+function TaskPlanCard({ plan }: { plan: TaskPlan }) {
+  const [expanded, setExpanded] = useState(true);
+  const colorClass = AGENT_MODE_COLORS[plan.agentMode] || AGENT_MODE_COLORS.GENERAL;
+  return (
+    <div className={`mt-3 border rounded-xl font-mono text-xs overflow-hidden ${colorClass}`}>
+      <button
+        onClick={() => setExpanded((v) => !v)}
+        className="w-full px-4 py-2.5 flex items-center gap-2 hover:bg-white/5 transition-colors"
+      >
+        <Zap className="w-3 h-3 shrink-0" />
+        <span className="tracking-widest font-semibold uppercase">{plan.agentMode} MODE</span>
+        <span className="ml-1 text-white/50">·</span>
+        <span className="text-white/70 normal-case tracking-normal capitalize">{plan.taskType} task</span>
+        {plan.crewRoles.length > 0 && (
+          <span className="ml-auto text-white/50 text-[10px]">{plan.crewRoles.length} agents</span>
+        )}
+        <ChevronDown className={`w-3 h-3 ml-1 transition-transform ${expanded ? "rotate-180" : ""}`} />
+      </button>
+      {expanded && (
+        <div className="px-4 pb-3 space-y-2 border-t border-current/10">
+          {plan.crewRoles.length > 0 && (
+            <div className="pt-2 flex flex-wrap gap-1.5">
+              {plan.crewRoles.map((role, i) => (
+                <span key={i} className="px-2 py-0.5 rounded-full border border-current/20 text-[10px] tracking-wider text-white/80">{role}</span>
+              ))}
+            </div>
+          )}
+          <ol className="pt-1 space-y-1.5">
+            {plan.plan.map((step, i) => (
+              <li key={i} className="flex gap-2 text-white/85">
+                <span className="shrink-0 w-4 h-4 rounded-full bg-current/15 flex items-center justify-center text-[9px] font-bold">{i + 1}</span>
+                <span className="leading-relaxed">{step}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MultiSearchBadge({ count, done }: { count: number; done: boolean }) {
+  return (
+    <div className="mt-3 border border-violet-500/25 rounded-xl px-4 py-2.5 bg-violet-500/6 font-mono text-xs flex items-center gap-3">
+      {done
+        ? <Globe className="w-3.5 h-3.5 text-violet-400 shrink-0" />
+        : <Loader2 className="w-3.5 h-3.5 text-violet-400 animate-spin shrink-0" />}
+      <div className="flex flex-col gap-0.5">
+        <span className="tracking-widest text-violet-300 font-semibold">
+          {done ? `${count} PARALLEL SEARCHES COMPLETE` : `RUNNING ${count} SIMULTANEOUS SEARCHES...`}
+        </span>
+        {!done && <span className="text-white/60 text-[10px] tracking-wide">Perplexity-style multi-source research</span>}
+      </div>
     </div>
   );
 }
@@ -183,7 +250,7 @@ function CodeBlockWithRun({ code, language }: { code: string; language: string }
           </div>
           {result.stdout && <pre className="text-green-300/80 whitespace-pre-wrap mb-1">{result.stdout}</pre>}
           {result.stderr && <pre className="text-red-400/80 whitespace-pre-wrap">{result.stderr}</pre>}
-          {!result.stdout && !result.stderr && <span className="text-white/40">No output</span>}
+          {!result.stdout && !result.stderr && <span className="text-white/85">No output</span>}
         </div>
       )}
     </div>
@@ -222,7 +289,7 @@ function LeftPanel({
 
       {/* Persona selector */}
       <div>
-        <p className="font-mono text-[9px] tracking-[0.2em] text-white/30 uppercase mb-2 px-1">MODE</p>
+        <p className="font-mono text-[9px] tracking-[0.2em] text-white/75 uppercase mb-2 px-1">MODE</p>
         <div className="space-y-0.5">
           {personas.map(p => (
             <button
@@ -231,13 +298,13 @@ function LeftPanel({
               className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-all ${
                 persona === p
                   ? "bg-primary/15 text-primary border border-primary/25"
-                  : "text-white/50 hover:bg-white/5 hover:text-white border border-transparent"
+                  : "text-white hover:bg-white/5 hover:text-white border border-transparent"
               }`}
             >
               <span className="shrink-0">{PERSONA_ICONS[p]}</span>
               <div className="min-w-0">
                 <p className="text-[10px] font-mono font-bold tracking-wider truncate">{PERSONA_NAMES[p]}</p>
-                <p className={`text-[8px] font-mono truncate ${persona === p ? "text-primary/60" : "text-white/25"}`}>{PERSONA_DESC[p]}</p>
+                <p className={`text-[8px] font-mono truncate ${persona === p ? "text-primary/60" : "text-white/70"}`}>{PERSONA_DESC[p]}</p>
               </div>
               {persona === p && <Check className="w-3 h-3 ml-auto shrink-0" />}
             </button>
@@ -247,7 +314,7 @@ function LeftPanel({
 
       {/* Capabilities */}
       <div className="border-t border-white/8 pt-3">
-        <p className="font-mono text-[9px] tracking-[0.2em] text-white/30 uppercase mb-2 px-1">CAPABILITIES</p>
+        <p className="font-mono text-[9px] tracking-[0.2em] text-white/75 uppercase mb-2 px-1">CAPABILITIES</p>
         <div className="space-y-1">
           {[
             { icon: <Image className="w-3 h-3" />, label: "Image Generation", color: "text-pink-400" },
@@ -259,7 +326,7 @@ function LeftPanel({
           ].map(cap => (
             <div key={cap.label} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg">
               <span className={`shrink-0 ${cap.color}`}>{cap.icon}</span>
-              <span className="text-[10px] font-mono text-white/50">{cap.label}</span>
+              <span className="text-[10px] font-mono text-white">{cap.label}</span>
               <div className="ml-auto w-1.5 h-1.5 rounded-full bg-green-400/70 shrink-0" />
             </div>
           ))}
@@ -269,7 +336,7 @@ function LeftPanel({
       {/* Projects shortcut */}
       <div className="border-t border-white/8 pt-3">
         <a href={`${window.location.origin}/godflesh/projects`}
-          className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[10px] font-mono font-bold tracking-wider border border-white/10 text-white/40 hover:text-white/70 hover:border-white/20 transition-all">
+          className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[10px] font-mono font-bold tracking-wider border border-white/10 text-white/85 hover:text-white/70 hover:border-white/20 transition-all">
           <Layers className="w-3.5 h-3.5" />
           MY PROJECTS
         </a>
@@ -282,7 +349,7 @@ function LeftPanel({
           className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border ${
             voice.isEnabled
               ? "text-primary border-primary/25 bg-primary/10"
-              : "text-white/40 border-white/10 hover:text-white/70 hover:border-white/20"
+              : "text-white/85 border-white/10 hover:text-white/70 hover:border-white/20"
           }`}
         >
           {voice.isEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
@@ -294,7 +361,7 @@ function LeftPanel({
           className={`w-full flex items-center gap-2 px-2.5 py-2 mt-1 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border ${
             deepResearchMode
               ? "text-violet-300 border-violet-400/30 bg-violet-400/10"
-              : "text-white/40 border-white/10 hover:text-white/70 hover:border-white/20"
+              : "text-white/85 border-white/10 hover:text-white/70 hover:border-white/20"
           }`}
         >
           <Microscope className="w-3.5 h-3.5" />
@@ -353,16 +420,16 @@ function RightPanel({
     <div className="flex flex-col h-full overflow-y-auto omnimens-scrollbar p-3 gap-3">
       {/* Credit/status card */}
       <div className="rounded-xl border border-white/8 bg-white/3 p-3">
-        <p className="font-mono text-[9px] tracking-[0.2em] text-white/40 uppercase mb-2">SESSION STATUS</p>
+        <p className="font-mono text-[9px] tracking-[0.2em] text-white/85 uppercase mb-2">SESSION STATUS</p>
         {status?.isOwner ? (
           <p className="font-mono text-[10px] text-accent font-bold tracking-widest">⚡ CREATOR — UNLIMITED</p>
         ) : credits != null ? (
           <div>
             <p className="font-mono text-xs text-white font-bold">{credits} credits</p>
-            <p className="font-mono text-[9px] text-white/40 mt-0.5">≈ ${(credits * 0.01).toFixed(2)} balance</p>
+            <p className="font-mono text-[9px] text-white/85 mt-0.5">≈ ${(credits * 0.01).toFixed(2)} balance</p>
           </div>
         ) : (
-          <p className="font-mono text-[10px] text-white/40">Loading...</p>
+          <p className="font-mono text-[10px] text-white/85">Loading...</p>
         )}
       </div>
 
@@ -370,12 +437,12 @@ function RightPanel({
       <div>
         <div className="flex items-center gap-2 px-1 mb-2">
           <Image className="w-3.5 h-3.5 text-pink-400 shrink-0" />
-          <p className="font-mono text-[9px] tracking-[0.2em] text-white/40 uppercase">IMAGES ({allImages.length})</p>
+          <p className="font-mono text-[9px] tracking-[0.2em] text-white/85 uppercase">IMAGES ({allImages.length})</p>
         </div>
         {allImages.length === 0 ? (
           <div className="rounded-xl border border-dashed border-white/10 p-4 text-center">
-            <Image className="w-6 h-6 text-white/15 mx-auto mb-1" />
-            <p className="font-mono text-[9px] text-white/25">Generated images appear here</p>
+            <Image className="w-6 h-6 text-white/65 mx-auto mb-1" />
+            <p className="font-mono text-[9px] text-white/70">Generated images appear here</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-1.5">
@@ -414,7 +481,7 @@ function RightPanel({
         <div>
           <div className="flex items-center gap-2 px-1 mb-2">
             <FolderOpen className="w-3.5 h-3.5 text-accent shrink-0" />
-            <p className="font-mono text-[9px] tracking-[0.2em] text-white/40 uppercase">FILES ({allArtifacts.length})</p>
+            <p className="font-mono text-[9px] tracking-[0.2em] text-white/85 uppercase">FILES ({allArtifacts.length})</p>
           </div>
           <div className="space-y-1.5">
             {allArtifacts.map((artifact, i) => (
@@ -422,7 +489,7 @@ function RightPanel({
                 <p className="font-mono text-[9px] text-accent/80 font-bold tracking-widest truncate mb-1">
                   {artifact.artifactType.toUpperCase()}
                 </p>
-                <p className="font-mono text-[9px] text-white/50 truncate mb-2">{artifact.filename}</p>
+                <p className="font-mono text-[9px] text-white truncate mb-2">{artifact.filename}</p>
                 <div className="flex gap-1.5">
                   {artifact.artifactType === "html" && (
                     <button
@@ -658,7 +725,7 @@ export default function Chat() {
             {/* Left panel toggle */}
             <button
               onClick={() => setLeftOpen(o => !o)}
-              className="hidden lg:flex items-center gap-1.5 text-white/30 hover:text-white/70 transition-colors p-1.5 rounded"
+              className="hidden lg:flex items-center gap-1.5 text-white/75 hover:text-white/70 transition-colors p-1.5 rounded"
               title={leftOpen ? "Hide left panel" : "Show left panel"}
             >
               {leftOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeft className="w-4 h-4" />}
@@ -667,14 +734,14 @@ export default function Chat() {
             {/* Center identity */}
             <div className="flex items-center gap-2 font-mono text-xs">
               <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-white/50">LINK ACTIVE</span>
+              <span className="text-white">LINK ACTIVE</span>
               {status?.isOwner && <OmnimensNotificationBell />}
             </div>
 
             {/* Right controls */}
             <div className="flex items-center gap-2">
               {statusLoading ? (
-                <span className="font-mono text-[10px] text-white/30">READING...</span>
+                <span className="font-mono text-[10px] text-white/75">READING...</span>
               ) : status?.isOwner ? (
                 <span className="font-mono text-[10px] text-accent font-bold tracking-widest hidden sm:block">⚡ CREATOR — UNLIMITED</span>
               ) : status?.isPro ? (
@@ -683,7 +750,7 @@ export default function Chat() {
               {/* Right panel toggle */}
               <button
                 onClick={() => setRightOpen(o => !o)}
-                className="hidden lg:flex items-center gap-1.5 text-white/30 hover:text-white/70 transition-colors p-1.5 rounded"
+                className="hidden lg:flex items-center gap-1.5 text-white/75 hover:text-white/70 transition-colors p-1.5 rounded"
                 title={rightOpen ? "Hide right panel" : "Show right panel"}
               >
                 {rightOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRight className="w-4 h-4" />}
@@ -724,8 +791,8 @@ export default function Chat() {
                   pitchIntensity={voice.pitchIntensity}
                   className="mb-2 drop-shadow-[0_0_60px_rgba(160,100,255,0.35)]"
                 />
-                <h2 className="font-display text-2xl tracking-[0.3em] text-white/40 mt-2">OMNIMENS AWAITS</h2>
-                <p className="font-mono text-sm mt-2 text-white/25">Speak your intent. Upload your vision.</p>
+                <h2 className="font-display text-2xl tracking-[0.3em] text-white/85 mt-2">OMNIMENS AWAITS</h2>
+                <p className="font-mono text-sm mt-2 text-white/70">Speak your intent. Upload your vision.</p>
               </div>
             ) : (
               <>
@@ -796,7 +863,11 @@ export default function Chat() {
                                 </div>
                               )}
 
-                              {/* Status badges */}
+                              {/* Agentic status badges */}
+                              {msg.taskPlan && <TaskPlanCard plan={msg.taskPlan} />}
+                              {(msg.multiSearching || msg.multiSearchComplete) && (
+                                <MultiSearchBadge count={msg.multiSearchCount || 2} done={!!msg.multiSearchComplete && !msg.multiSearching} />
+                              )}
                               {(msg.analyzingUrls || msg.urlCount) && (
                                 <UrlAnalysisBadge count={msg.urlCount || 1} done={!msg.analyzingUrls} />
                               )}
@@ -867,7 +938,7 @@ export default function Chat() {
                   DEEP RESEARCH REPORT
                   <span className="text-violet-400/50">· {researchResult.totalResults} sources · {researchResult.subQueries?.length} searches</span>
                 </div>
-                <button onClick={() => setResearchResult(null)} className="text-white/40 hover:text-white text-xs">✕</button>
+                <button onClick={() => setResearchResult(null)} className="text-white/85 hover:text-white text-xs">✕</button>
               </div>
               <div className="p-4 bg-black/60">
                 <div className="markdown-body text-sm">
@@ -875,7 +946,7 @@ export default function Chat() {
                 </div>
                 {researchResult.sources?.length > 0 && (
                   <div className="mt-4 pt-4 border-t border-white/10">
-                    <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest mb-2">Sources ({researchResult.sources.length})</p>
+                    <p className="text-[10px] font-mono text-white/85 uppercase tracking-widest mb-2">Sources ({researchResult.sources.length})</p>
                     <div className="space-y-1">
                       {researchResult.sources.map((s: any, i: number) => (
                         <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" className="block text-xs text-primary/60 hover:text-primary font-mono truncate">
@@ -902,7 +973,7 @@ export default function Chat() {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isTyping || pendingFiles.length >= 10}
                 title="Attach files"
-                className={`absolute left-3 z-10 transition-colors ${pendingFiles.length > 0 ? "text-primary" : "text-white/30 hover:text-white/70"} disabled:opacity-30`}
+                className={`absolute left-3 z-10 transition-colors ${pendingFiles.length > 0 ? "text-primary" : "text-white/75 hover:text-white/70"} disabled:opacity-30`}
               >
                 <Paperclip className="w-4 h-4" />
                 {pendingFiles.length > 0 && (
@@ -928,7 +999,7 @@ export default function Chat() {
                   </Button>
                 )}
                 {isTyping ? (
-                  <Button type="button" onClick={stopGeneration} size="icon" variant="ghost" className="text-white/50 hover:text-white">
+                  <Button type="button" onClick={stopGeneration} size="icon" variant="ghost" className="text-white hover:text-white">
                     <StopCircle className="w-5 h-5" />
                   </Button>
                 ) : (
@@ -942,7 +1013,7 @@ export default function Chat() {
               </div>
             </div>
             <div className="flex items-center gap-2 mt-1.5 px-1">
-              <span className="text-[9px] font-mono text-white/20">
+              <span className="text-[9px] font-mono text-white/70">
                 {PERSONA_NAMES[persona]} · URLS AUTO-ANALYZED · MEMORY ACTIVE
               </span>
             </div>
@@ -990,7 +1061,7 @@ export default function Chat() {
               </p>
               <div className="flex flex-col gap-3">
                 <Button onClick={() => setLocation("/pricing")} size="lg" className="w-full">ASCEND NOW — $9.99/mo</Button>
-                <Button onClick={() => setShowLimitModal(false)} variant="ghost" className="w-full text-white/40">Return to Silence</Button>
+                <Button onClick={() => setShowLimitModal(false)} variant="ghost" className="w-full text-white/85">Return to Silence</Button>
               </div>
             </motion.div>
           </motion.div>
@@ -1037,7 +1108,7 @@ function InlineImageCard({ image }: { image: GeneratedImage }) {
         {/* Controls bar */}
         <div className="flex items-center justify-between px-4 py-3 border-t border-white/8 bg-black/40">
           <div className="flex-1 min-w-0 pr-4">
-            <p className="text-[9px] font-mono text-white/40 uppercase tracking-widest mb-0.5">PROMPT</p>
+            <p className="text-[9px] font-mono text-white/85 uppercase tracking-widest mb-0.5">PROMPT</p>
             <p className="text-white/70 font-mono text-[10px] truncate">
               {image.prompt.slice(0, 90)}{image.prompt.length > 90 ? "..." : ""}
             </p>
@@ -1153,7 +1224,7 @@ function ArtifactCard({ artifact }: { artifact: Artifact }) {
         <div className="text-accent shrink-0">{icon}</div>
         <div className="min-w-0">
           <p className="text-accent font-mono text-[11px] tracking-widest font-bold">{label}</p>
-          <p className="text-white/50 font-mono text-[10px] truncate">{artifact.filename} · {sizeKb}KB</p>
+          <p className="text-white font-mono text-[10px] truncate">{artifact.filename} · {sizeKb}KB</p>
         </div>
       </div>
       <div className="flex items-center gap-2 shrink-0">

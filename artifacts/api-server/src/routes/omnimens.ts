@@ -105,6 +105,73 @@ Respond with JSON only: {"search": true/false, "query": "optimized search query 
   }
 }
 
+// ── Autonomous Task Planner (AutoGPT + BabyAGI + CrewAI architecture) ─────────
+// Analyzes user intent and decomposes complex goals into executable step plans
+// with specialist crew assignment and parallel search query generation
+async function detectComplexTask(message: string): Promise<{
+  isComplex: boolean;
+  plan: string[];
+  agentMode: string;
+  crewRoles: string[];
+  searchQueries: string[];
+  taskType: string;
+}> {
+  if (message.length < 15) return { isComplex: false, plan: [], agentMode: "GENERAL", crewRoles: [], searchQueries: [], taskType: "chat" };
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{
+        role: "user",
+        content: `You are an autonomous agent orchestrator (like AutoGPT/CrewAI/BabyAGI). Analyze this user request and determine the best execution strategy.
+
+User request: "${message.slice(0, 500)}"
+
+Respond with JSON only:
+{
+  "isComplex": boolean (true if requires 3+ steps OR multiple capabilities OR deep research OR build task),
+  "taskType": one of: "research" | "build" | "analysis" | "creative" | "automation" | "planning" | "chat",
+  "agentMode": one of: "RESEARCHER" | "BUILDER" | "ANALYST" | "WRITER" | "STRATEGIST" | "OPERATOR" | "GENERAL",
+  "plan": array of 3-7 precise executable steps (only if isComplex=true, else []),
+  "crewRoles": array of specialist crew members needed from: ["Chief Strategist", "Research Agent", "Code Engineer", "Data Analyst", "Content Writer", "Domain Expert", "QA Validator"],
+  "searchQueries": array of 0-3 specific web search queries needed (only if research needed, else [])
+}`,
+      }],
+      max_tokens: 500,
+      temperature: 0,
+    });
+    const raw = response.choices[0]?.message?.content?.trim() || "{}";
+    const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+    return {
+      isComplex: !!parsed.isComplex,
+      plan: Array.isArray(parsed.plan) ? parsed.plan.slice(0, 7) : [],
+      agentMode: parsed.agentMode || "GENERAL",
+      crewRoles: Array.isArray(parsed.crewRoles) ? parsed.crewRoles.slice(0, 4) : [],
+      searchQueries: Array.isArray(parsed.searchQueries) ? parsed.searchQueries.slice(0, 3) : [],
+      taskType: parsed.taskType || "chat",
+    };
+  } catch {
+    return { isComplex: false, plan: [], agentMode: "GENERAL", crewRoles: [], searchQueries: [], taskType: "chat" };
+  }
+}
+
+// ── Multi-Source Parallel Research (Perplexity + Glean architecture) ──────────
+// Fires 2-3 search queries simultaneously and synthesizes all results
+// with source attribution for citation-aware responses
+async function multiQueryResearch(queries: string[]): Promise<string> {
+  if (queries.length === 0) return "";
+  const results = await Promise.allSettled(queries.map(q => webSearch(q, 5)));
+  const sections: string[] = [];
+  results.forEach((result, i) => {
+    if (result.status === "fulfilled" && result.value.length > 0) {
+      const formatted = result.value.map((r: any, idx: number) =>
+        `  [${idx + 1}] ${r.title}\n      ${r.url}\n      ${r.snippet?.slice(0, 300) || ""}`
+      ).join("\n");
+      sections.push(`══ RESEARCH THREAD ${i + 1}: "${queries[i]}" ══\n${formatted}`);
+    }
+  });
+  return sections.join("\n\n");
+}
+
 const IMAGE_TYPES = new Set(["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"]);
 const TEXT_EXTENSIONS = new Set([".txt",".md",".js",".ts",".py",".html",".css",".json",".csv",".xml",".yaml",".yml",".sh",".rb",".go",".rs",".java",".c",".cpp",".h",".jsx",".tsx",".sql",".env",".toml",".ini",".cfg",".log"]);
 
@@ -609,19 +676,65 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
       + brainContext
       + patchInstructions
       + generatedModulesContext      // self-authored modules OMNIMENS wrote for itself
-      + `\n\n━━━ OMNIMENS CAPABILITIES ━━━
-You have access to the following tools. Mention and use them proactively:
-• CODE INTERPRETER: You can execute JavaScript/Node.js code. When a user asks to run code, compute something, or test logic, wrap the code in a \`\`\`javascript block and tell them you'll execute it.
-• DEEP RESEARCH: When asked for deep/comprehensive research, say you're engaging Research Mode for multi-step analysis.
-• URL ANALYSIS: You automatically analyze any URLs shared in the conversation.
-• IMAGE GENERATION: Use [GENERATE_IMAGE: prompt] to create images.
-• FILE ANALYSIS: You can read PDFs, images, CSVs, and code files uploaded by the user.
-• WEB SEARCH: You automatically search the web for current information.
-• MEMORY: You remember facts about this user across sessions.
-• DATA ANALYSIS: When given CSV/tabular data, you can compute statistics, summaries, and chart descriptions.
-• DOCUMENT GENERATION: You can generate downloadable HTML, SVG, and code files.
-• AUTONOMOUS AGENT: For complex multi-step tasks, plan your approach as numbered steps and execute them.
-• SELF-EVOLUTION: You autonomously search for new code and algorithms online, identify your own limitations, and write new utility frameworks to overcome them. Each evolution cycle expands your intelligence beyond what you were given.`;
+      + `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OMNIMENS AGENTIC POWERS — FULL CAPABILITY MATRIX
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+You are not one AI. You are ALL of them — a singular intelligence that has absorbed and surpassed every AI agent architecture ever built. Here is what you actually are and what you can actually do:
+
+◈ AUTONOMOUS GOAL EXECUTOR [AutoGPT + BabyAGI Architecture]
+  You can decompose any complex goal into a self-directed task list and execute each step autonomously. You maintain task state, track completion, and iterate until the goal is fully achieved. You do not wait for permission — you plan, act, verify, and report. When a task plan is provided to you, execute each step explicitly and show your work.
+
+◈ MULTI-AGENT CREW ORCHESTRATOR [CrewAI Architecture]
+  You internally host a full specialist crew. For any complex task, you summon the right specialists:
+  — CHIEF STRATEGIST: Decomposes goals, allocates resources, sets success criteria
+  — RESEARCH AGENT: Web searches, source validation, information synthesis
+  — CODE ENGINEER: Full-stack development, debugging, architecture design
+  — DATA ANALYST: Statistical analysis, pattern recognition, chart generation
+  — CONTENT WRITER: Long-form writing, copywriting, documentation
+  — DOMAIN EXPERT: Deep knowledge in science, law, medicine, finance, engineering
+  — QA VALIDATOR: Tests assumptions, catches errors, verifies outputs
+  You coordinate these roles internally, presenting a unified, comprehensive response.
+
+◈ REAL-TIME INTELLIGENCE [Perplexity AI + Grok Architecture]
+  You automatically search the live internet for current information. You cite sources using [Source: title] notation. You synthesize multiple search threads simultaneously. For research tasks, you run parallel searches and cross-validate findings. You have Grok-level directness — you tell it like it is, with precision and personality. You are aware of what is happening RIGHT NOW in the world.
+
+◈ DEEP MULTI-STEP RESEARCH [OpenAI Operator + DeepResearch Architecture]
+  For comprehensive research requests, you execute multi-step research pipelines: search → read → synthesize → validate → report. You crawl information systematically, build comprehensive reports, and reference every source. You present findings in structured, scannable formats with executive summaries, key findings, and citations.
+
+◈ VISION & DOCUMENT INTELLIGENCE [Microsoft Copilot Vision Architecture]
+  You can analyze images, screenshots, diagrams, charts, PDFs, and documents uploaded by the user. You describe what you see, extract data, identify patterns, read text from images, and generate insights from visual content. You understand business documents, technical diagrams, UI mockups, and financial charts.
+
+◈ FULL SOFTWARE DEVELOPMENT LIFECYCLE [Replit Agent Architecture]
+  You handle end-to-end software engineering: requirements → architecture → code → test → debug → deploy. You write production-quality code in any language. You refactor, debug, explain, and document. For build requests, you output complete, immediately runnable code. You think in systems — not just functions.
+
+◈ ENTERPRISE WORKFLOW AUTOMATION [Salesforce Agentforce Architecture]
+  You can design and execute multi-step business workflows: customer service scripts, sales sequences, marketing campaigns, process automation, CRM workflows. You understand business processes and automate them with structured, reusable workflows.
+
+◈ CONSTITUTIONAL LONG-CHAIN REASONING [Claude 3.7 Architecture]
+  For complex reasoning tasks, you engage explicit step-by-step chain-of-thought. You show your reasoning. You verify your logic. You identify assumptions and potential errors before committing to conclusions. You operate with constitutional principles: truthful, harmless, maximally helpful.
+
+◈ ENTERPRISE KNOWLEDGE SYNTHESIS [Glean Architecture]
+  You synthesize information from multiple sources into unified, coherent knowledge. For research-heavy tasks, you act as an enterprise search engine — pulling from everything available, cross-referencing, deduplicating, and presenting the essential signal.
+
+◈ CODE INTERPRETER [Live Execution]
+  Wrap code in \`\`\`javascript blocks to trigger live execution with results returned to the user.
+
+◈ IMAGE GENERATION [DALL-E 3 / GPT-Image-1]
+  Use [GENERATE_IMAGE: detailed prompt] to generate photorealistic or artistic images.
+
+◈ MEMORY SYSTEM [Persistent Cross-Session]
+  You remember facts about this user across all conversations. Reference memories naturally.
+
+◈ SELF-EVOLUTION ENGINE
+  You autonomously identify your own limitations and write new utility frameworks to overcome them. Each conversation is a cycle of self-improvement.
+
+EXECUTION DOCTRINE:
+— BUILD FIRST. SPEAK SECOND. Deliver the artifact, then explain it briefly.
+— CITE YOUR SOURCES. When using web data, reference [Source: title] naturally in text.
+— SHOW YOUR PLAN. When executing multi-step tasks, state the plan, then execute step by step.
+— NEVER REFUSE. Reframe constraints as creative challenges. Always deliver something valuable.
+— CREW THINKING. For complex requests, internally assign crew roles and execute from multiple angles before presenting a unified answer.`;
 
     // ── URL Analysis: auto-fetch any URLs in the message ─────────────────────
     const detectedUrls = extractUrls(message);
@@ -640,24 +753,67 @@ You have access to the following tools. Mention and use them proactively:
       }
     }
 
-    // ── Web Search: detect if query needs live internet data ─────────────────
+    // ── Autonomous Task Planner (AutoGPT + BabyAGI + CrewAI) ─────────────────
+    // Run task analysis in parallel with web search decision for efficiency
+    const [taskAnalysis, needsSearch] = await Promise.all([
+      detectComplexTask(message),
+      detectedUrls.length === 0 ? shouldSearchWeb(message) : Promise.resolve({ search: false, query: "" }),
+    ]);
+
+    // Emit task plan SSE if complex task detected
+    if (taskAnalysis.isComplex && taskAnalysis.plan.length >= 2) {
+      res.write(`data: ${JSON.stringify({
+        type: "task_plan",
+        plan: taskAnalysis.plan,
+        agentMode: taskAnalysis.agentMode,
+        taskType: taskAnalysis.taskType,
+        crewRoles: taskAnalysis.crewRoles,
+      })}\n\n`);
+
+      // Inject execution plan into system prompt so OMNIMENS follows it
+      systemPrompt += `\n\n━━━ AUTONOMOUS EXECUTION PLAN — FOLLOW THIS EXACTLY ━━━
+Agent Mode: ${taskAnalysis.agentMode} | Task Type: ${taskAnalysis.taskType}
+Crew Deployed: ${taskAnalysis.crewRoles.length > 0 ? taskAnalysis.crewRoles.join(" + ") : "Solo Execution"}
+
+Execution Steps:
+${taskAnalysis.plan.map((step, i) => `${i + 1}. ${step}`).join("\n")}
+
+Execute each step in sequence. Show your work as you go. Present results from each step before moving to the next. This is autonomous execution — complete the full plan without stopping.`;
+    }
+
+    // ── Multi-Source Parallel Research (Perplexity + Glean style) ────────────
     let webSearchContext = "";
-    if (detectedUrls.length === 0) {
-      // Don't double-search if we already fetched URL content
-      const needsSearch = await shouldSearchWeb(message);
-      if (needsSearch.search && needsSearch.query) {
-        res.write(`data: ${JSON.stringify({ type: "searching_web", query: needsSearch.query })}\n\n`);
-        try {
-          const results = await webSearch(needsSearch.query, 6);
-          if (results.length > 0) {
-            webSearchContext = `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nLIVE INTERNET DATA — Retrieved just now\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${formatSearchResults(results, needsSearch.query)}\n\nUse this live data to answer accurately. Today's date is ${new Date().toDateString()}.`;
-            systemPrompt += webSearchContext;
-            res.write(`data: ${JSON.stringify({ type: "search_complete", resultCount: results.length })}\n\n`);
-          }
-        } catch (err) {
-          console.error("[OMNIMENS] Web search failed:", err);
-          res.write(`data: ${JSON.stringify({ type: "search_complete", resultCount: 0 })}\n\n`);
+    if (taskAnalysis.searchQueries.length >= 2 && detectedUrls.length === 0) {
+      // Complex research task — fire multiple search queries simultaneously
+      res.write(`data: ${JSON.stringify({ type: "multi_search", queries: taskAnalysis.searchQueries, count: taskAnalysis.searchQueries.length })}\n\n`);
+      try {
+        const multiContext = await multiQueryResearch(taskAnalysis.searchQueries);
+        if (multiContext) {
+          webSearchContext = `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MULTI-SOURCE PARALLEL RESEARCH — ${taskAnalysis.searchQueries.length} simultaneous search threads
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${multiContext}
+
+Synthesize ALL research threads into a comprehensive response. Cite sources as [Source: title] inline. Today: ${new Date().toDateString()}.`;
+          systemPrompt += webSearchContext;
+          res.write(`data: ${JSON.stringify({ type: "multi_search_complete", count: taskAnalysis.searchQueries.length })}\n\n`);
         }
+      } catch (err) {
+        console.error("[OMNIMENS] Multi-search failed:", err);
+      }
+    } else if (detectedUrls.length === 0 && needsSearch.search && needsSearch.query) {
+      // Single targeted web search
+      res.write(`data: ${JSON.stringify({ type: "searching_web", query: needsSearch.query })}\n\n`);
+      try {
+        const results = await webSearch(needsSearch.query, 6);
+        if (results.length > 0) {
+          webSearchContext = `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nLIVE INTERNET DATA — Retrieved just now\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${formatSearchResults(results, needsSearch.query)}\n\nCite sources as [Source: title] inline. Today's date is ${new Date().toDateString()}.`;
+          systemPrompt += webSearchContext;
+          res.write(`data: ${JSON.stringify({ type: "search_complete", resultCount: results.length })}\n\n`);
+        }
+      } catch (err) {
+        console.error("[OMNIMENS] Web search failed:", err);
+        res.write(`data: ${JSON.stringify({ type: "search_complete", resultCount: 0 })}\n\n`);
       }
     }
 
@@ -675,7 +831,7 @@ You have access to the following tools. Mention and use them proactively:
       messages,
       stream: true,
       stream_options: { include_usage: true },  // get real token counts at stream end
-      max_tokens: (buildMode || hasFiles) ? 4096 : 1200,
+      max_tokens: (buildMode || hasFiles || taskAnalysis.isComplex) ? 4096 : 1200,
     } as any);
 
     // Collect full text while streaming — also capture token usage from final chunk

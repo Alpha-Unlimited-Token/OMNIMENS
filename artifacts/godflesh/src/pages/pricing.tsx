@@ -114,12 +114,12 @@ function HowItWorks() {
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl mb-16">
       {steps.map((s, i) => (
         <div key={i} className="relative bg-black/30 border border-white/8 rounded-2xl p-7">
-          <div className="absolute -top-4 left-6 bg-black border border-white/10 rounded-full px-3 py-1 font-mono text-xs text-white/30">
+          <div className="absolute -top-4 left-6 bg-black border border-white/10 rounded-full px-3 py-1 font-mono text-xs text-white/75">
             {s.num}
           </div>
           <div className="text-primary mb-4">{s.icon}</div>
           <div className="font-mono font-bold text-white tracking-widest text-sm mb-2">{s.title}</div>
-          <p className="text-xs font-mono text-white/40 leading-relaxed">{s.body}</p>
+          <p className="text-xs font-mono text-white/85 leading-relaxed">{s.body}</p>
         </div>
       ))}
     </div>
@@ -129,13 +129,13 @@ function HowItWorks() {
 function UsageCostTable({ costs }: { costs: { label: string; credits: number; dollarValue: string }[] }) {
   return (
     <div className="w-full max-w-5xl mb-10">
-      <h2 className="font-mono font-bold text-white/50 tracking-widest text-xs mb-4">USAGE COSTS</h2>
+      <h2 className="font-mono font-bold text-white tracking-widest text-xs mb-4">USAGE COSTS</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {costs.map(c => (
           <div key={c.label} className="bg-black/30 border border-white/8 rounded-xl p-4 text-center">
-            <div className="text-xs font-mono text-white/30 mb-2 tracking-wider">{c.label}</div>
+            <div className="text-xs font-mono text-white/75 mb-2 tracking-wider">{c.label}</div>
             <div className="font-bold text-white font-mono text-lg">{c.credits}</div>
-            <div className="text-xs font-mono text-white/20">credits · ${c.dollarValue}</div>
+            <div className="text-xs font-mono text-white/70">credits · ${c.dollarValue}</div>
           </div>
         ))}
       </div>
@@ -149,16 +149,16 @@ function LoyaltyTable({ tiers }: { tiers: any[] }) {
       <div className="flex items-center gap-3 mb-5">
         <Star className="w-4 h-4 text-accent" />
         <h2 className="font-mono font-bold text-white tracking-widest text-sm">MONTHLY LOYALTY BONUSES</h2>
-        <span className="text-xs font-mono text-white/30">(based on prior month's paid spend)</span>
+        <span className="text-xs font-mono text-white/75">(based on prior month's paid spend)</span>
       </div>
       <div className="bg-black/30 border border-white/8 rounded-2xl overflow-hidden">
-        <div className="grid grid-cols-3 px-6 py-3 border-b border-white/5 text-xs font-mono text-white/30 tracking-widest">
+        <div className="grid grid-cols-3 px-6 py-3 border-b border-white/5 text-xs font-mono text-white/75 tracking-widest">
           <div>TIER</div>
           <div className="text-center">MIN SPEND</div>
           <div className="text-right">FREE CREDITS NEXT MONTH</div>
         </div>
         {tiers.map((t, i) => (
-          <div key={t.label} className={`grid grid-cols-3 px-6 py-4 ${i < tiers.length - 1 ? "border-b border-white/5" : ""} ${i === 0 ? "text-white/50" : "text-white"}`}>
+          <div key={t.label} className={`grid grid-cols-3 px-6 py-4 ${i < tiers.length - 1 ? "border-b border-white/5" : ""} ${i === 0 ? "text-white" : "text-white"}`}>
             <div className="font-mono font-bold tracking-widest text-sm">
               <span className={
                 t.label === "LEGEND" ? "text-accent glow-text-gold" :
@@ -172,12 +172,12 @@ function LoyaltyTable({ tiers }: { tiers: any[] }) {
             </div>
             <div className="text-right font-mono text-sm">
               <span className="text-green-400 font-bold">${t.bonusDollars} free</span>
-              <span className="text-white/30 ml-1">({t.bonusCredits.toLocaleString()} cr)</span>
+              <span className="text-white/75 ml-1">({t.bonusCredits.toLocaleString()} cr)</span>
             </div>
           </div>
         ))}
       </div>
-      <p className="text-xs font-mono text-white/20 mt-3 px-1">
+      <p className="text-xs font-mono text-white/70 mt-3 px-1">
         Free credits granted on the 1st of each month based on the prior month's paid usage.
         Base $20 is given to every user regardless of spend.
       </p>
@@ -214,25 +214,25 @@ function WalletPanel({
 
   return (
     <div className="w-full max-w-5xl mb-10">
-      <h2 className="font-mono font-bold text-white/50 tracking-widest text-xs mb-4">YOUR WALLET</h2>
+      <h2 className="font-mono font-bold text-white tracking-widest text-xs mb-4">YOUR WALLET</h2>
       <div className="bg-black/40 border border-white/10 rounded-2xl p-6">
 
         {/* Current balance */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-white/8">
           <div>
-            <div className="text-xs font-mono text-white/30 tracking-widest mb-1">CREDIT BALANCE</div>
+            <div className="text-xs font-mono text-white/75 tracking-widest mb-1">CREDIT BALANCE</div>
             <div className="text-3xl font-black text-white font-mono">
               {billing?.credits?.toLocaleString() ?? "—"}
-              <span className="text-sm text-white/30 font-normal ml-2">credits</span>
+              <span className="text-sm text-white/75 font-normal ml-2">credits</span>
             </div>
-            <div className="text-xs font-mono text-white/30 mt-1">
+            <div className="text-xs font-mono text-white/75 mt-1">
               ≈ {Math.floor((billing?.credits ?? 0) / 10)} chat messages
             </div>
           </div>
           <div className="text-right">
-            <div className="text-xs font-mono text-white/30 tracking-widest mb-1">THIS MONTH SPEND</div>
+            <div className="text-xs font-mono text-white/75 tracking-widest mb-1">THIS MONTH SPEND</div>
             <div className="text-xl font-bold text-white">${billing?.currentMonthSpendDollars ?? "0.00"}</div>
-            <div className="text-xs font-mono text-white/20 mt-1">
+            <div className="text-xs font-mono text-white/70 mt-1">
               next bonus: <span className="text-green-400">${billing?.nextBonusCredits ? (billing.nextBonusCredits / 100).toFixed(0) : "20"} free</span>
             </div>
           </div>
@@ -246,7 +246,7 @@ function WalletPanel({
                 <CreditCard className="w-5 h-5 text-green-400" />
               </div>
               <div>
-                <div className="text-xs font-mono text-white/30 tracking-widest mb-0.5">SAVED CARD</div>
+                <div className="text-xs font-mono text-white/75 tracking-widest mb-0.5">SAVED CARD</div>
                 <div className="font-mono text-white font-bold">
                   {card?.brand?.toUpperCase() ?? "CARD"} •••• {card?.last4 ?? "????"}
                 </div>
@@ -267,11 +267,11 @@ function WalletPanel({
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-white/8">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center">
-                <Wallet className="w-5 h-5 text-white/40" />
+                <Wallet className="w-5 h-5 text-white/85" />
               </div>
               <div>
-                <div className="text-xs font-mono text-white/30 tracking-widest mb-0.5">NO WALLET CONNECTED</div>
-                <div className="text-xs font-mono text-white/40">
+                <div className="text-xs font-mono text-white/75 tracking-widest mb-0.5">NO WALLET CONNECTED</div>
+                <div className="text-xs font-mono text-white/85">
                   Connect a card to continue using OMNIMENS after free credits run out
                 </div>
               </div>
@@ -289,7 +289,7 @@ function WalletPanel({
         {/* Manual topup */}
         {hasWallet && (
           <div>
-            <div className="text-xs font-mono text-white/30 tracking-widest mb-3">ADD CREDITS NOW</div>
+            <div className="text-xs font-mono text-white/75 tracking-widest mb-3">ADD CREDITS NOW</div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {topupOptions.map(opt => (
                 <button
@@ -299,7 +299,7 @@ function WalletPanel({
                   className="bg-black/40 border border-white/10 hover:border-primary/50 hover:bg-primary/5 rounded-xl p-4 text-center transition-all font-mono disabled:opacity-50"
                 >
                   <div className="text-xl font-black text-white">{opt.label}</div>
-                  <div className="text-xs text-white/30 mt-1">{opt.credits} credits</div>
+                  <div className="text-xs text-white/75 mt-1">{opt.credits} credits</div>
                 </button>
               ))}
             </div>
@@ -309,7 +309,7 @@ function WalletPanel({
         {/* Connect CTA if no wallet */}
         {!hasWallet && (
           <div className="text-center">
-            <p className="text-xs font-mono text-white/30 mb-4">
+            <p className="text-xs font-mono text-white/75 mb-4">
               You still have <span className="text-white">{billing?.credits ?? 0} free credits</span> remaining.
               Connect your wallet now so usage never gets interrupted.
             </p>
@@ -422,7 +422,7 @@ export default function Pricing() {
           <h1 className="text-4xl md:text-6xl font-display font-black tracking-widest text-white mb-4 uppercase">
             Usage-Based <span className="text-primary glow-text-red">Billing</span>
           </h1>
-          <p className="text-white/50 font-mono max-w-xl mx-auto text-sm leading-relaxed">
+          <p className="text-white font-mono max-w-xl mx-auto text-sm leading-relaxed">
             Start free. Connect a card only when you need more.
             Earn loyalty bonuses every month based on your usage.
           </p>
@@ -474,9 +474,9 @@ export default function Pricing() {
         {/* Sign in prompt */}
         {!isAuthenticated && (
           <div className="w-full max-w-5xl mb-12 bg-black/30 border border-white/10 rounded-2xl p-10 text-center">
-            <Shield className="w-10 h-10 text-white/20 mx-auto mb-4" />
+            <Shield className="w-10 h-10 text-white/70 mx-auto mb-4" />
             <div className="font-mono font-bold text-white tracking-widest mb-2">SIGN IN TO GET STARTED</div>
-            <p className="text-xs font-mono text-white/30 mb-6">Create an account and receive $20 free credits instantly. No card required.</p>
+            <p className="text-xs font-mono text-white/75 mb-6">Create an account and receive $20 free credits instantly. No card required.</p>
             <Button onClick={login} size="lg" className="font-mono px-8">
               SIGN IN / CREATE ACCOUNT
               <ChevronRight className="w-4 h-4 ml-2" />
@@ -490,7 +490,7 @@ export default function Pricing() {
         )}
 
         {/* FAQ */}
-        <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-6 text-xs font-mono text-white/30 mt-4">
+        <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-6 text-xs font-mono text-white/75 mt-4">
           {[
             {
               q: "WHEN AM I CHARGED?",
@@ -506,7 +506,7 @@ export default function Pricing() {
             },
           ].map(({ q, a }) => (
             <div key={q}>
-              <div className="text-white/50 mb-1 font-bold">{q}</div>
+              <div className="text-white mb-1 font-bold">{q}</div>
               <p>{a}</p>
             </div>
           ))}

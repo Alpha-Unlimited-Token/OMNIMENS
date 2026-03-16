@@ -33,13 +33,13 @@ export function WebsitePreview({ html, index = 0 }: WebsitePreviewProps) {
         <div className="flex items-center gap-1">
           <button
             onClick={() => setTab("preview")}
-            className={`px-3 py-1 rounded text-[11px] font-mono tracking-widest transition-colors ${tab === "preview" ? "bg-primary/20 text-primary border border-primary/40" : "text-white/40 hover:text-white/70"}`}
+            className={`px-3 py-1 rounded text-[11px] font-mono tracking-widest transition-colors ${tab === "preview" ? "bg-primary/20 text-primary border border-primary/40" : "text-white/85 hover:text-white/70"}`}
           >
             PREVIEW
           </button>
           <button
             onClick={() => setTab("code")}
-            className={`px-3 py-1 rounded text-[11px] font-mono tracking-widest transition-colors flex items-center gap-1 ${tab === "code" ? "bg-primary/20 text-primary border border-primary/40" : "text-white/40 hover:text-white/70"}`}
+            className={`px-3 py-1 rounded text-[11px] font-mono tracking-widest transition-colors flex items-center gap-1 ${tab === "code" ? "bg-primary/20 text-primary border border-primary/40" : "text-white/85 hover:text-white/70"}`}
           >
             <Code2 className="w-3 h-3" />
             SOURCE
@@ -50,21 +50,21 @@ export function WebsitePreview({ html, index = 0 }: WebsitePreviewProps) {
           <button
             onClick={openInTab}
             title="Open in new tab"
-            className="p-1.5 text-white/40 hover:text-white/80 transition-colors"
+            className="p-1.5 text-white/85 hover:text-white/80 transition-colors"
           >
             <ExternalLink className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={download}
             title="Download HTML"
-            className="p-1.5 text-white/40 hover:text-primary transition-colors"
+            className="p-1.5 text-white/85 hover:text-primary transition-colors"
           >
             <Download className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => setFullscreen((f) => !f)}
             title={fullscreen ? "Exit fullscreen" : "Fullscreen"}
-            className="p-1.5 text-white/40 hover:text-white/80 transition-colors"
+            className="p-1.5 text-white/85 hover:text-white/80 transition-colors"
           >
             {fullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
           </button>

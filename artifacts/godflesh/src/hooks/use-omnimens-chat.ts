@@ -23,6 +23,13 @@ export type CostBreakdown = {
   imagesGenerated: number;
 };
 
+export type TaskPlan = {
+  plan: string[];
+  agentMode: string;
+  taskType: string;
+  crewRoles: string[];
+};
+
 export type Message = {
   id: string;
   role: "user" | "omnimens";
@@ -38,6 +45,10 @@ export type Message = {
   urlCount?: number;
   creditCost?: number;
   costBreakdown?: CostBreakdown;
+  taskPlan?: TaskPlan;
+  multiSearching?: boolean;
+  multiSearchCount?: number;
+  multiSearchComplete?: boolean;
 };
 
 export type AttachedFile = {
@@ -189,6 +200,37 @@ export function useOmnimensChat(onLimitReached: () => void) {
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
                   if (msg) { msg.searchingWeb = false; msg.webSearchResultCount = data.resultCount; }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "task_plan") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    msg.taskPlan = {
+                      plan: data.plan,
+                      agentMode: data.agentMode,
+                      taskType: data.taskType,
+                      crewRoles: data.crewRoles,
+                    };
+                  }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "multi_search") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) { msg.multiSearching = true; msg.multiSearchCount = data.count; }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "multi_search_complete") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) { msg.multiSearching = false; msg.multiSearchComplete = true; msg.multiSearchCount = data.count; }
                   return newMsgs;
                 });
 

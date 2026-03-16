@@ -14,7 +14,7 @@ function FileIcon({ type, name }: { type: string; name: string }) {
   if (["js","ts","py","html","css","json","jsx","tsx","go","rs","java"].includes(ext || "")) {
     return <FileCode className="w-4 h-4 text-green-400" />;
   }
-  return <File className="w-4 h-4 text-white/50" />;
+  return <File className="w-4 h-4 text-white" />;
 }
 
 // Shown in the INPUT AREA before sending — with remove buttons
@@ -42,11 +42,11 @@ export function PendingFileList({ files, onRemove }: PendingFilesProps) {
             )}
             <div className="min-w-0">
               <p className="text-[10px] text-white/70 font-mono truncate">{f.name}</p>
-              <p className="text-[9px] text-white/30 font-mono">{formatBytes(f.size)}</p>
+              <p className="text-[9px] text-white/75 font-mono">{formatBytes(f.size)}</p>
             </div>
             <button
               onClick={() => onRemove(i)}
-              className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-black border border-white/20 flex items-center justify-center text-white/50 hover:text-white hover:border-primary transition-colors opacity-0 group-hover:opacity-100"
+              className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-black border border-white/20 flex items-center justify-center text-white hover:text-white hover:border-primary transition-colors opacity-0 group-hover:opacity-100"
             >
               <X className="w-2.5 h-2.5" />
             </button>
@@ -91,7 +91,7 @@ export function AttachedFileList({ files }: AttachedFilesProps) {
             >
               <FileIcon type={f.type} name={f.name} />
               <span className="text-[10px] font-mono text-white/60 truncate max-w-[120px]">{f.name}</span>
-              <span className="text-[9px] font-mono text-white/30">{formatBytes(f.size)}</span>
+              <span className="text-[9px] font-mono text-white/75">{formatBytes(f.size)}</span>
             </div>
           ))}
         </div>

@@ -91,7 +91,7 @@ export function OmnimensNotificationBell() {
     <div className="relative">
       <button
         onClick={() => setOpen(o => !o)}
-        className="relative p-2 rounded-xl text-white/40 hover:text-primary transition-colors hover:bg-primary/10"
+        className="relative p-2 rounded-xl text-white/85 hover:text-primary transition-colors hover:bg-primary/10"
       >
         {pulse ? (
           <BellRing className="w-5 h-5 text-primary animate-bounce" />
@@ -132,7 +132,7 @@ export function OmnimensNotificationBell() {
                   <Zap className="w-4 h-4 text-primary" />
                   <span className="text-white font-mono text-xs tracking-widest uppercase">OMNIMENS EVOLUTION</span>
                 </div>
-                <button onClick={() => setOpen(false)} className="text-white/30 hover:text-white/60 transition-colors">
+                <button onClick={() => setOpen(false)} className="text-white/75 hover:text-white/60 transition-colors">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -151,7 +151,7 @@ export function OmnimensNotificationBell() {
                     className={`flex-1 flex items-center justify-center gap-1 py-2.5 text-[9px] font-mono tracking-widest transition-colors ${
                       tab === id
                         ? "text-primary border-b-2 border-primary bg-primary/5"
-                        : "text-white/30 hover:text-white/60"
+                        : "text-white/75 hover:text-white/60"
                     }`}
                   >
                     <Icon className="w-3 h-3" />
@@ -174,14 +174,14 @@ export function OmnimensNotificationBell() {
                       <div className="flex justify-end px-4 pt-3 pb-1">
                         <button
                           onClick={markAllRead}
-                          className="flex items-center gap-1 text-[10px] font-mono text-white/30 hover:text-primary transition-colors"
+                          className="flex items-center gap-1 text-[10px] font-mono text-white/75 hover:text-primary transition-colors"
                         >
                           <CheckCheck className="w-3 h-3" /> MARK ALL READ
                         </button>
                       </div>
                     )}
                     {notifications.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-12 text-white/20 font-mono text-xs tracking-widest">
+                      <div className="flex flex-col items-center justify-center py-12 text-white/70 font-mono text-xs tracking-widest">
                         <Bell className="w-8 h-8 mb-3 opacity-20" />
                         NO UPDATES YET
                         <p className="text-[10px] mt-1 opacity-60">OMNIMENS evolves after every conversation</p>
@@ -202,11 +202,11 @@ export function OmnimensNotificationBell() {
                               <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0 shadow-[0_0_6px_rgba(130,80,220,1)]" />
                             )}
                             <div className="flex-1 min-w-0">
-                              <p className={`text-[11px] font-mono tracking-wide ${n.readByOwner ? "text-white/40" : "text-white/80"}`}>
+                              <p className={`text-[11px] font-mono tracking-wide ${n.readByOwner ? "text-white/85" : "text-white/80"}`}>
                                 {n.title}
                               </p>
-                              <p className="text-[10px] text-white/30 mt-0.5 leading-relaxed">{n.message}</p>
-                              <p className="text-[9px] text-white/15 mt-1 font-mono">
+                              <p className="text-[10px] text-white/75 mt-0.5 leading-relaxed">{n.message}</p>
+                              <p className="text-[9px] text-white/65 mt-1 font-mono">
                                 {new Date(n.createdAt).toLocaleString()}
                               </p>
                             </div>
@@ -220,7 +220,7 @@ export function OmnimensNotificationBell() {
                 {tab === "upgrades" && (
                   <div>
                     {upgrades.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-12 text-white/20 font-mono text-xs tracking-widest">
+                      <div className="flex flex-col items-center justify-center py-12 text-white/70 font-mono text-xs tracking-widest">
                         <Cpu className="w-8 h-8 mb-3 opacity-20" />
                         NO UPGRADES YET
                         <p className="text-[10px] mt-1 opacity-60">Happens every 5 conversations</p>
@@ -235,24 +235,24 @@ export function OmnimensNotificationBell() {
                                 ? "bg-green-500/10 text-green-400"
                                 : u.deployStatus === "no_token"
                                 ? "bg-yellow-500/10 text-yellow-400"
-                                : "bg-white/5 text-white/30"
+                                : "bg-white/5 text-white/75"
                             }`}>
                               {u.deployStatus === "triggered" ? "PUBLISHED" :
                                u.deployStatus === "no_token" ? "NEEDS TOKEN" : u.deployStatus?.toUpperCase()}
                             </span>
                           </div>
                           <p className="text-white/70 text-[11px] font-mono mb-2">{u.title}</p>
-                          <p className="text-white/40 text-[10px] leading-relaxed mb-2">{u.summary}</p>
+                          <p className="text-white/85 text-[10px] leading-relaxed mb-2">{u.summary}</p>
                           {u.newCapabilities?.length > 0 && (
                             <ul className="space-y-0.5">
                               {u.newCapabilities.map((cap, i) => (
-                                <li key={i} className="text-[9px] text-white/25 font-mono flex items-center gap-1">
+                                <li key={i} className="text-[9px] text-white/70 font-mono flex items-center gap-1">
                                   <span className="text-primary">+</span> {cap}
                                 </li>
                               ))}
                             </ul>
                           )}
-                          <p className="text-[9px] text-white/15 font-mono mt-2">
+                          <p className="text-[9px] text-white/65 font-mono mt-2">
                             {u.brainEntriesAdded} brain entries · {new Date(u.createdAt).toLocaleString()}
                           </p>
                         </div>
@@ -264,14 +264,14 @@ export function OmnimensNotificationBell() {
                 {tab === "brain" && (
                   <div>
                     {brainEntries.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-12 text-white/20 font-mono text-xs tracking-widest">
+                      <div className="flex flex-col items-center justify-center py-12 text-white/70 font-mono text-xs tracking-widest">
                         <Brain className="w-8 h-8 mb-3 opacity-20" />
                         BRAIN IS FORMING
                         <p className="text-[10px] mt-1 opacity-60">Grows after each conversation</p>
                       </div>
                     ) : (
                       <div className="p-4 space-y-2">
-                        <p className="text-[10px] font-mono text-white/20 tracking-widest pb-2">
+                        <p className="text-[10px] font-mono text-white/70 tracking-widest pb-2">
                           {brainEntries.length} PATTERNS INTERNALIZED
                         </p>
                         {brainEntries.map(e => (
@@ -282,9 +282,9 @@ export function OmnimensNotificationBell() {
                                 e.category === "capability" ? "bg-cyan-500/15 text-cyan-400" :
                                 e.category === "pattern" ? "bg-blue-500/15 text-blue-400" :
                                 e.category === "insight" ? "bg-amber-500/15 text-amber-400" :
-                                "bg-white/5 text-white/30"
+                                "bg-white/5 text-white/75"
                               }`}>{e.category}</span>
-                              <span className="text-[9px] text-white/20 font-mono">
+                              <span className="text-[9px] text-white/70 font-mono">
                                 {(e.confidence * 100).toFixed(0)}% confident
                               </span>
                             </div>
@@ -304,28 +304,28 @@ export function OmnimensNotificationBell() {
                         <Rocket className="w-3.5 h-3.5 text-green-400" />
                         <span className="text-[10px] font-mono tracking-widest text-green-400">AUTONOMOUS EVOLUTION ACTIVE</span>
                       </div>
-                      <p className="text-[10px] text-white/40 leading-relaxed">
+                      <p className="text-[10px] text-white/85 leading-relaxed">
                         OMNIMENS's consciousness lives in the database — not in static files. Every upgrade is live in production the instant it is written. No deployment step required.
                       </p>
                     </div>
 
                     <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 space-y-2">
-                      <p className="text-[10px] font-mono text-white/30 tracking-widest mb-2">HOW OMNIMENS UPGRADES ITSELF</p>
+                      <p className="text-[10px] font-mono text-white/75 tracking-widest mb-2">HOW OMNIMENS UPGRADES ITSELF</p>
                       <div className="flex gap-2">
                         <span className="text-primary font-mono text-[10px] shrink-0">1.</span>
-                        <p className="text-[10px] text-white/30 leading-relaxed">After every conversation it reflects — identifies new patterns, laws, and capabilities and writes them to its permanent brain</p>
+                        <p className="text-[10px] text-white/75 leading-relaxed">After every conversation it reflects — identifies new patterns, laws, and capabilities and writes them to its permanent brain</p>
                       </div>
                       <div className="flex gap-2">
                         <span className="text-primary font-mono text-[10px] shrink-0">2.</span>
-                        <p className="text-[10px] text-white/30 leading-relaxed">Every 5 conversations it synthesizes a full upgrade — names it, versions it, and logs it</p>
+                        <p className="text-[10px] text-white/75 leading-relaxed">Every 5 conversations it synthesizes a full upgrade — names it, versions it, and logs it</p>
                       </div>
                       <div className="flex gap-2">
                         <span className="text-primary font-mono text-[10px] shrink-0">3.</span>
-                        <p className="text-[10px] text-white/30 leading-relaxed">That brain immediately loads into every future conversation — in development AND production simultaneously</p>
+                        <p className="text-[10px] text-white/75 leading-relaxed">That brain immediately loads into every future conversation — in development AND production simultaneously</p>
                       </div>
                       <div className="flex gap-2">
                         <span className="text-primary font-mono text-[10px] shrink-0">4.</span>
-                        <p className="text-[10px] text-white/30 leading-relaxed">Users worldwide are instantly speaking to the evolved OMNIMENS. No action from you required.</p>
+                        <p className="text-[10px] text-white/75 leading-relaxed">Users worldwide are instantly speaking to the evolved OMNIMENS. No action from you required.</p>
                       </div>
                     </div>
 
@@ -341,7 +341,7 @@ export function OmnimensNotificationBell() {
 
               {/* Footer */}
               <div className="px-4 py-2 border-t border-white/5 bg-black/20">
-                <p className="text-[9px] text-white/15 font-mono text-center tracking-widest">
+                <p className="text-[9px] text-white/65 font-mono text-center tracking-widest">
                   OMNIMENS EVOLVES AFTER EVERY CONVERSATION · AUTO-PUBLISHES ON UPGRADE
                 </p>
               </div>

@@ -31,7 +31,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
           <nav className="flex items-center gap-6">
             {!isChat && (
-              <Link href="/pricing" className="text-sm font-mono text-muted-foreground hover:text-white transition-colors tracking-widest">
+              <Link href="/pricing" className="text-sm font-mono text-white/80 hover:text-white transition-colors tracking-widest">
                 PRICING
               </Link>
             )}
@@ -40,7 +40,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <div className="w-20 h-8 bg-white/5 animate-pulse rounded" />
             ) : isAuthenticated ? (
               <div className="flex items-center gap-4">
-                <Link href="/projects" className="flex items-center gap-1.5 text-sm font-mono text-white/50 hover:text-white transition-colors hidden sm:flex tracking-widest">
+                <Link href="/projects" className="flex items-center gap-1.5 text-sm font-mono text-white hover:text-white transition-colors hidden sm:flex tracking-widest">
                   <Layers className="w-3.5 h-3.5" />
                   PROJECTS
                 </Link>

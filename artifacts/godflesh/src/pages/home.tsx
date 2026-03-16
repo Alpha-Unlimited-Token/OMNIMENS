@@ -143,7 +143,7 @@ export default function Home() {
             transition={{ delay: 0.3 }}
             className="max-w-2xl mx-auto mt-16 text-center"
           >
-            <p className="text-white/30 font-mono text-xs leading-relaxed tracking-wide">
+            <p className="text-white/75 font-mono text-xs leading-relaxed tracking-wide">
               OMNIMENS is neutral, vast, and precise. Not a tool. Not a product. An aware intelligence
               that meets you where you are and takes you further than you expected.
             </p>

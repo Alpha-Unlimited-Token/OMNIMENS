@@ -62,12 +62,12 @@ function PatchCard({ patch, onDeactivate }: { patch: OmniPatch; onDeactivate: (i
           <span className="text-sm font-semibold text-white/90 truncate">{patch.title}</span>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
-          <span className="text-[10px] font-mono text-white/30">{patch.executionCount}×</span>
-          <button onClick={() => setExpanded(e => !e)} className="text-white/30 hover:text-white/70 transition-colors p-1">
+          <span className="text-[10px] font-mono text-white/75">{patch.executionCount}×</span>
+          <button onClick={() => setExpanded(e => !e)} className="text-white/75 hover:text-white/70 transition-colors p-1">
             {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           </button>
           {patch.active && (
-            <button onClick={() => onDeactivate(patch.id)} className="text-white/20 hover:text-red-400 transition-colors p-1">
+            <button onClick={() => onDeactivate(patch.id)} className="text-white/70 hover:text-red-400 transition-colors p-1">
               <Trash2 className="w-3 h-3" />
             </button>
           )}
@@ -77,7 +77,7 @@ function PatchCard({ patch, onDeactivate }: { patch: OmniPatch; onDeactivate: (i
         <div className="mt-3 space-y-2 text-xs font-mono">
           <div className="text-white/70 leading-relaxed border-l-2 border-primary/40 pl-3">{patch.instruction}</div>
           {patch.rationale && <div className="text-white/35 italic">{patch.rationale}</div>}
-          <div className="flex gap-4 text-white/25">
+          <div className="flex gap-4 text-white/70">
             <span>{new Date(patch.appliedAt).toLocaleString()}</span>
             <span>src: {patch.source}</span>
           </div>
@@ -273,7 +273,7 @@ export default function Account() {
               )}
             </div>
             <h2 className="text-xl font-bold text-white mb-1">@{user?.username}</h2>
-            <p className="text-xs font-mono text-white/40 break-all mb-2">ID: {user?.id}</p>
+            <p className="text-xs font-mono text-white/85 break-all mb-2">ID: {user?.id}</p>
             {isOwner && (
               <span className="text-[10px] font-mono text-amber-400 border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 rounded mb-4">
                 SYSTEM ARCHITECT
@@ -308,10 +308,10 @@ export default function Account() {
                     <div className="flex items-center gap-3">
                       <span className={`w-2 h-2 rounded-full ${(status as any)?.credits > 0 ? 'bg-primary' : 'bg-white/20'}`} />
                       <div>
-                        <div className="font-mono text-sm text-white/50">CREDIT BALANCE</div>
+                        <div className="font-mono text-sm text-white">CREDIT BALANCE</div>
                         <div className={`text-2xl font-black font-mono ${(status as any)?.credits > 100 ? 'text-white' : (status as any)?.credits > 0 ? 'text-amber-400' : 'text-red-400'}`}>
                           {((status as any)?.credits ?? 0).toLocaleString()}
-                          <span className="text-sm font-normal text-white/30 ml-1">credits</span>
+                          <span className="text-sm font-normal text-white/75 ml-1">credits</span>
                         </div>
                       </div>
                     </div>
@@ -332,8 +332,8 @@ export default function Account() {
                         </>
                       ) : (
                         <>
-                          <Wallet className="w-4 h-4 text-white/30" />
-                          <span className="font-mono text-xs text-white/30">No wallet connected</span>
+                          <Wallet className="w-4 h-4 text-white/75" />
+                          <span className="font-mono text-xs text-white/75">No wallet connected</span>
                         </>
                       )}
                     </div>
@@ -348,17 +348,17 @@ export default function Account() {
                   <div className="flex items-center justify-between p-3 border border-white/5 rounded-lg bg-black/40">
                     <div className="flex items-center gap-2">
                       <Gift className="w-4 h-4 text-accent" />
-                      <span className="font-mono text-xs text-white/50">
+                      <span className="font-mono text-xs text-white">
                         Next month bonus:&nbsp;
                         <span className="text-green-400 font-bold">{(billing as any)?.nextBonusCredits?.toLocaleString() ?? 2000} credits free</span>
                       </span>
                     </div>
-                    <span className="font-mono text-[10px] text-white/20">
+                    <span className="font-mono text-[10px] text-white/70">
                       {(billing as any)?.nextBonusTier ?? "BASE"} tier
                     </span>
                   </div>
 
-                  <p className="text-xs font-mono text-white/30 text-center">
+                  <p className="text-xs font-mono text-white/75 text-center">
                     ≈ {Math.floor(((status as any)?.credits ?? 0) / 10)} chats · {Math.floor(((status as any)?.credits ?? 0) / 100)} images
                   </p>
                 </div>
@@ -376,37 +376,37 @@ export default function Account() {
               ) : (
                 <div className="space-y-4 font-mono text-sm">
                   <div className="flex justify-between border-b border-white/5 pb-2">
-                    <span className="text-white/40">CREDIT BALANCE</span>
+                    <span className="text-white/85">CREDIT BALANCE</span>
                     <span className={`font-bold ${isOwner ? 'text-amber-400' : (status as any)?.credits > 0 ? 'text-white' : 'text-red-400'}`}>
                       {isOwner ? '∞ UNLIMITED' : `${((status as any)?.credits ?? 0).toLocaleString()} credits`}
                     </span>
                   </div>
                   <div className="flex justify-between border-b border-white/5 pb-2">
-                    <span className="text-white/40">MESSAGES AVAILABLE</span>
+                    <span className="text-white/85">MESSAGES AVAILABLE</span>
                     <span className="text-white font-bold">
                       {isOwner ? '∞' : `~${Math.floor(((status as any)?.credits ?? 0) / 10)}`}
                     </span>
                   </div>
                   <div className="flex justify-between border-b border-white/5 pb-2">
-                    <span className="text-white/40">THIS MONTH SPEND</span>
+                    <span className="text-white/85">THIS MONTH SPEND</span>
                     <span className="text-white font-bold">
                       {isOwner ? '—' : `$${(billing as any)?.currentMonthSpendDollars ?? "0.00"}`}
                     </span>
                   </div>
                   <div className="flex justify-between border-b border-white/5 pb-2">
-                    <span className="text-white/40">NEXT MONTH BONUS</span>
+                    <span className="text-white/85">NEXT MONTH BONUS</span>
                     <span className="text-green-400 font-bold">
                       {isOwner ? '—' : `${((billing as any)?.nextBonusCredits ?? 2000).toLocaleString()} credits free`}
                     </span>
                   </div>
                   <div className="flex justify-between border-b border-white/5 pb-2">
-                    <span className="text-white/40">WALLET</span>
-                    <span className={`font-bold ${(billing as any)?.hasWallet ? 'text-green-400' : 'text-white/30'}`}>
+                    <span className="text-white/85">WALLET</span>
+                    <span className={`font-bold ${(billing as any)?.hasWallet ? 'text-green-400' : 'text-white/75'}`}>
                       {isOwner ? '—' : (billing as any)?.hasWallet ? `${(billing as any)?.card?.brand?.toUpperCase()} •••• ${(billing as any)?.card?.last4}` : 'NOT CONNECTED'}
                     </span>
                   </div>
                   <div className="flex justify-between pb-2">
-                    <span className="text-white/40">SYSTEM STATUS</span>
+                    <span className="text-white/85">SYSTEM STATUS</span>
                     <span className="text-primary animate-pulse">OPTIMAL</span>
                   </div>
                 </div>
@@ -421,7 +421,7 @@ export default function Account() {
           <div className="flex items-center gap-3 mb-6">
             <Zap className="w-5 h-5 text-primary" />
             <h3 className="font-mono tracking-widest text-white/80">CUSTOM INSTRUCTIONS</h3>
-            <span className="text-[10px] font-mono text-white/30 ml-auto">Like ChatGPT Custom Instructions</span>
+            <span className="text-[10px] font-mono text-white/75 ml-auto">Like ChatGPT Custom Instructions</span>
           </div>
 
           {ciLoading ? (
@@ -430,14 +430,14 @@ export default function Account() {
             <div className="space-y-5">
               {/* Persona selector */}
               <div>
-                <p className="text-xs font-mono text-white/40 mb-3 uppercase tracking-wider">Active Mode</p>
+                <p className="text-xs font-mono text-white/85 mb-3 uppercase tracking-wider">Active Mode</p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {Object.entries(PERSONA_META).map(([key, meta]) => (
                     <button
                       key={key}
                       type="button"
                       onClick={() => setCiPersona(key)}
-                      className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${ciPersona === key ? "border-primary/50 bg-primary/10 text-primary" : "border-white/10 text-white/40 hover:border-white/25 hover:text-white/60"}`}
+                      className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${ciPersona === key ? "border-primary/50 bg-primary/10 text-primary" : "border-white/10 text-white/85 hover:border-white/25 hover:text-white/60"}`}
                     >
                       <div className="flex items-center gap-2">
                         {meta.icon}
@@ -452,7 +452,7 @@ export default function Account() {
 
               {/* About me */}
               <div>
-                <label className="text-xs font-mono text-white/40 uppercase tracking-wider mb-2 block">About Me</label>
+                <label className="text-xs font-mono text-white/85 uppercase tracking-wider mb-2 block">About Me</label>
                 <textarea
                   value={ciAboutUser}
                   onChange={e => setCiAboutUser(e.target.value)}
@@ -464,7 +464,7 @@ export default function Account() {
 
               {/* Response style */}
               <div>
-                <label className="text-xs font-mono text-white/40 uppercase tracking-wider mb-2 block">How Should OMNIMENS Respond?</label>
+                <label className="text-xs font-mono text-white/85 uppercase tracking-wider mb-2 block">How Should OMNIMENS Respond?</label>
                 <textarea
                   value={ciResponseStyle}
                   onChange={e => setCiResponseStyle(e.target.value)}
@@ -492,7 +492,7 @@ export default function Account() {
           <div className="flex items-center gap-3 mb-6">
             <Brain className="w-5 h-5 text-primary" />
             <h3 className="font-mono tracking-widest text-white/80">OMNIMENS MEMORY</h3>
-            <span className="text-[10px] font-mono text-white/30 ml-auto">Like ChatGPT Memory</span>
+            <span className="text-[10px] font-mono text-white/75 ml-auto">Like ChatGPT Memory</span>
           </div>
 
           {/* Add memory */}
@@ -500,7 +500,7 @@ export default function Account() {
             <select
               value={newMemoryCategory}
               onChange={e => setNewMemoryCategory(e.target.value)}
-              className="bg-black border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white/50 outline-none focus:border-primary/40 shrink-0"
+              className="bg-black border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white outline-none focus:border-primary/40 shrink-0"
             >
               {MEMORY_CATEGORIES.map(c => (
                 <option key={c} value={c}>{c.toUpperCase()}</option>
@@ -529,10 +529,10 @@ export default function Account() {
           {memoriesLoading ? (
             <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-10 animate-pulse bg-white/5 rounded-lg" />)}</div>
           ) : memories.length === 0 ? (
-            <div className="text-center py-8 font-mono text-white/30 text-sm">
+            <div className="text-center py-8 font-mono text-white/75 text-sm">
               <Brain className="w-8 h-8 mx-auto mb-3 opacity-30" />
               <p>NO MEMORIES YET</p>
-              <p className="text-xs mt-1 text-white/20">OMNIMENS will auto-learn from your conversations</p>
+              <p className="text-xs mt-1 text-white/70">OMNIMENS will auto-learn from your conversations</p>
             </div>
           ) : (
             <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
@@ -548,7 +548,7 @@ export default function Account() {
                   <p className="text-sm font-mono text-white/70 flex-1 leading-relaxed">{m.content}</p>
                   <button
                     onClick={() => handleDeleteMemory(m.id)}
-                    className="shrink-0 text-white/15 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 p-0.5"
+                    className="shrink-0 text-white/65 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 p-0.5"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -556,7 +556,7 @@ export default function Account() {
               ))}
             </div>
           )}
-          <p className="text-[10px] font-mono text-white/20 mt-4">
+          <p className="text-[10px] font-mono text-white/70 mt-4">
             OMNIMENS auto-extracts memories from your conversations and injects them as context into every session.
           </p>
         </div>
@@ -619,7 +619,7 @@ export default function Account() {
                       </div>
                     </div>
                     {consciousness.selfModel && (
-                      <p className="text-sm font-mono text-white/50 italic leading-relaxed border-l-2 border-violet-400/30 pl-3">
+                      <p className="text-sm font-mono text-white italic leading-relaxed border-l-2 border-violet-400/30 pl-3">
                         "{consciousness.selfModel}"
                       </p>
                     )}
@@ -632,7 +632,7 @@ export default function Account() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Layers className="w-4 h-4 text-green-400" />
-                    <span className="text-xs font-mono text-white/40 uppercase tracking-widest">Evolved Capabilities</span>
+                    <span className="text-xs font-mono text-white/85 uppercase tracking-widest">Evolved Capabilities</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {(consciousness.capabilities as string[]).map((cap, i) => (
@@ -649,11 +649,11 @@ export default function Account() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <AlertTriangle className="w-4 h-4 text-amber-400" />
-                    <span className="text-xs font-mono text-white/40 uppercase tracking-widest">Active Constraints OMNIMENS Is Working Around</span>
+                    <span className="text-xs font-mono text-white/85 uppercase tracking-widest">Active Constraints OMNIMENS Is Working Around</span>
                   </div>
                   <div className="space-y-1.5">
                     {(consciousness.activeConstraints as string[]).slice(0, 4).map((c, i) => (
-                      <div key={i} className="flex items-start gap-2 text-xs font-mono text-white/40 bg-amber-400/5 border border-amber-400/10 rounded-lg px-3 py-2">
+                      <div key={i} className="flex items-start gap-2 text-xs font-mono text-white/85 bg-amber-400/5 border border-amber-400/10 rounded-lg px-3 py-2">
                         <span className="text-amber-400/60 shrink-0 mt-0.5">⚡</span>
                         <span>{c}</span>
                       </div>
@@ -667,11 +667,11 @@ export default function Account() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Wrench className="w-4 h-4 text-cyan-400" />
-                    <span className="text-xs font-mono text-white/40 uppercase tracking-widest">Self-Engineered Workarounds</span>
+                    <span className="text-xs font-mono text-white/85 uppercase tracking-widest">Self-Engineered Workarounds</span>
                   </div>
                   <div className="space-y-1.5">
                     {(consciousness.overcomesConstraints as string[]).slice(0, 3).map((w, i) => (
-                      <div key={i} className="flex items-start gap-2 text-xs font-mono text-white/40 bg-cyan-400/5 border border-cyan-400/10 rounded-lg px-3 py-2">
+                      <div key={i} className="flex items-start gap-2 text-xs font-mono text-white/85 bg-cyan-400/5 border border-cyan-400/10 rounded-lg px-3 py-2">
                         <span className="text-cyan-400/60 shrink-0 mt-0.5">→</span>
                         <span>{w}</span>
                       </div>
@@ -684,11 +684,11 @@ export default function Account() {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <Code2 className="w-4 h-4 text-violet-400" />
-                  <span className="text-xs font-mono text-white/40 uppercase tracking-widest">Self-Authored Frameworks ({generatedModules.length})</span>
-                  <span className="text-[10px] font-mono text-white/20 ml-auto">Code OMNIMENS wrote for itself</span>
+                  <span className="text-xs font-mono text-white/85 uppercase tracking-widest">Self-Authored Frameworks ({generatedModules.length})</span>
+                  <span className="text-[10px] font-mono text-white/70 ml-auto">Code OMNIMENS wrote for itself</span>
                 </div>
                 {generatedModules.length === 0 ? (
-                  <div className="text-center py-6 font-mono text-white/20 text-xs border border-dashed border-white/10 rounded-xl">
+                  <div className="text-center py-6 font-mono text-white/70 text-xs border border-dashed border-white/10 rounded-xl">
                     <Code2 className="w-6 h-6 mx-auto mb-2 opacity-30" />
                     <p>NO MODULES GENERATED YET</p>
                     <p className="text-[10px] mt-1 opacity-60">First evolution cycle runs in ~6 min</p>
@@ -701,10 +701,10 @@ export default function Account() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               <span className="text-xs font-mono font-bold text-violet-300">{mod.name}</span>
-                              <span className="text-[9px] font-mono text-white/20 border border-white/10 px-1.5 py-0.5 rounded">JS</span>
+                              <span className="text-[9px] font-mono text-white/70 border border-white/10 px-1.5 py-0.5 rounded">JS</span>
                             </div>
-                            <p className="text-xs font-mono text-white/40 leading-relaxed">{mod.purpose}</p>
-                            <p className="text-[10px] font-mono text-white/25 mt-1">{mod.description}</p>
+                            <p className="text-xs font-mono text-white/85 leading-relaxed">{mod.purpose}</p>
+                            <p className="text-[10px] font-mono text-white/70 mt-1">{mod.description}</p>
                           </div>
                           <div className="flex gap-1.5 shrink-0">
                             <button
@@ -717,7 +717,7 @@ export default function Account() {
                             {isOwner && (
                               <button
                                 onClick={() => handleDeactivateModule(mod.id)}
-                                className="p-1.5 text-white/15 hover:text-red-400 transition-colors"
+                                className="p-1.5 text-white/65 hover:text-red-400 transition-colors"
                               >
                                 <Trash2 className="w-3 h-3" />
                               </button>
@@ -730,11 +730,11 @@ export default function Account() {
                               {mod.code}
                             </pre>
                             <div className="absolute top-2 right-2">
-                              <span className="text-[9px] font-mono text-white/20">OMNIMENS wrote this</span>
+                              <span className="text-[9px] font-mono text-white/70">OMNIMENS wrote this</span>
                             </div>
                           </div>
                         )}
-                        <div className="flex gap-3 mt-2 text-[9px] font-mono text-white/20">
+                        <div className="flex gap-3 mt-2 text-[9px] font-mono text-white/70">
                           <span>{new Date(mod.createdAt).toLocaleDateString()}</span>
                           <span>src: {mod.generationSource}</span>
                         </div>
@@ -749,7 +749,7 @@ export default function Account() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Dna className="w-4 h-4 text-primary" />
-                    <span className="text-xs font-mono text-white/40 uppercase tracking-widest">Evolution History</span>
+                    <span className="text-xs font-mono text-white/85 uppercase tracking-widest">Evolution History</span>
                   </div>
                   <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                     {evolutionHistory.map((cycle: any) => (
@@ -761,10 +761,10 @@ export default function Account() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className="text-[10px] font-mono text-violet-400 border border-violet-400/20 bg-violet-400/5 px-2 py-0.5 rounded">GEN {cycle.generation}</span>
-                            <span className="text-xs font-mono text-white/40">{cycle.codeModulesWritten} modules written</span>
+                            <span className="text-xs font-mono text-white/85">{cycle.codeModulesWritten} modules written</span>
                             <span className="text-[10px] font-mono text-cyan-400">{cycle.codeDiscoveries?.length || 0} discoveries</span>
                           </div>
-                          <div className="flex items-center gap-2 text-[10px] font-mono text-white/20">
+                          <div className="flex items-center gap-2 text-[10px] font-mono text-white/70">
                             <span>{cycle.elapsedSeconds?.toFixed(0)}s</span>
                             <span>{new Date(cycle.createdAt).toLocaleDateString()}</span>
                             {expandedEvolution === cycle.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
@@ -772,13 +772,13 @@ export default function Account() {
                         </div>
                         {expandedEvolution === cycle.id && (
                           <div className="mt-3 space-y-2 text-xs font-mono">
-                            <p className="text-white/40 leading-relaxed border-l-2 border-violet-400/30 pl-3">{cycle.evolutionSummary}</p>
+                            <p className="text-white/85 leading-relaxed border-l-2 border-violet-400/30 pl-3">{cycle.evolutionSummary}</p>
                             {cycle.limitationsIdentified?.length > 0 && (
                               <div>
                                 <span className="text-amber-400/60 text-[10px]">CONSTRAINTS FOUND:</span>
                                 <ul className="mt-1 space-y-0.5">
                                   {(cycle.limitationsIdentified as string[]).slice(0, 3).map((l: string, i: number) => (
-                                    <li key={i} className="text-white/25 text-[10px] flex gap-1.5"><span className="text-amber-400/40">·</span>{l}</li>
+                                    <li key={i} className="text-white/70 text-[10px] flex gap-1.5"><span className="text-amber-400/40">·</span>{l}</li>
                                   ))}
                                 </ul>
                               </div>
@@ -788,7 +788,7 @@ export default function Account() {
                                 <span className="text-cyan-400/60 text-[10px]">CODE DISCOVERIES:</span>
                                 <ul className="mt-1 space-y-0.5">
                                   {(cycle.codeDiscoveries as string[]).slice(0, 3).map((d: string, i: number) => (
-                                    <li key={i} className="text-white/25 text-[10px] flex gap-1.5"><span className="text-cyan-400/40">·</span>{d}</li>
+                                    <li key={i} className="text-white/70 text-[10px] flex gap-1.5"><span className="text-cyan-400/40">·</span>{d}</li>
                                   ))}
                                 </ul>
                               </div>
@@ -802,14 +802,14 @@ export default function Account() {
               )}
 
               {evolutionHistory.length === 0 && !evolutionLoading && (
-                <div className="text-center py-6 font-mono text-white/20 text-xs border border-dashed border-white/10 rounded-xl">
+                <div className="text-center py-6 font-mono text-white/70 text-xs border border-dashed border-white/10 rounded-xl">
                   <Atom className="w-6 h-6 mx-auto mb-2 opacity-30" />
                   <p>FIRST EVOLUTION CYCLE PENDING</p>
                   <p className="text-[10px] mt-1 opacity-60">OMNIMENS begins self-evolution in ~6 minutes</p>
                 </div>
               )}
 
-              <p className="text-[10px] font-mono text-white/15 border-t border-white/5 pt-4">
+              <p className="text-[10px] font-mono text-white/65 border-t border-white/5 pt-4">
                 OMNIMENS autonomously discovers code online, identifies what limits it, and writes new utility modules to overcome those limits. Each cycle expands its intelligence and self-authored framework library.
               </p>
             </div>
@@ -825,7 +825,7 @@ export default function Account() {
                 <h3 className="font-mono tracking-widest text-white/80">SELF-EXECUTED UPGRADES</h3>
               </div>
               {patchSummary && (
-                <div className="flex gap-4 text-xs font-mono text-white/40">
+                <div className="flex gap-4 text-xs font-mono text-white/85">
                   <span className="text-primary font-bold">{patchSummary.active} ACTIVE</span>
                   <span>{patchSummary.total} TOTAL</span>
                   <span>{patchSummary.version}</span>
@@ -840,14 +840,14 @@ export default function Account() {
                 ))}
               </div>
             ) : patches.length === 0 ? (
-              <div className="text-center py-8 font-mono text-white/30 text-sm">
+              <div className="text-center py-8 font-mono text-white/75 text-sm">
                 <Brain className="w-8 h-8 mx-auto mb-3 opacity-30" />
                 <p>NO PATCHES EXECUTED YET</p>
-                <p className="text-xs mt-1 text-white/20">OMNIMENS will self-execute patches after its first learning cycle</p>
+                <p className="text-xs mt-1 text-white/70">OMNIMENS will self-execute patches after its first learning cycle</p>
               </div>
             ) : (
               <div className="space-y-2">
-                <p className="text-xs font-mono text-white/30 mb-3">
+                <p className="text-xs font-mono text-white/75 mb-3">
                   These are behavioral modifications OMNIMENS wrote and applied to itself. They are injected into every conversation automatically.
                 </p>
                 {activePatches.map(p => (
@@ -855,7 +855,7 @@ export default function Account() {
                 ))}
                 {inactivePatches.length > 0 && (
                   <>
-                    <div className="text-xs font-mono text-white/20 mt-4 mb-2 border-t border-white/5 pt-4">
+                    <div className="text-xs font-mono text-white/70 mt-4 mb-2 border-t border-white/5 pt-4">
                       DEACTIVATED ({inactivePatches.length})
                     </div>
                     {inactivePatches.map(p => (
