@@ -1,110 +1,103 @@
 /**
+ * wasmMatrixOps - A WebAssembly-powered module for efficient matrix operations.
  * @module wasmMatrixOps
- * @description A utility module for GPU-accelerated matrix operations using WebAssembly bindings for efficient linear algebra computations.
+ * @description Provides GPU-like performance for linear algebra operations in Node.js.
  */
 
+const fs = require('fs');
+const path = require('path');
+
 /**
- * Multiplies two matrices using WebAssembly for GPU acceleration.
- * This function assumes the matrices are valid for multiplication (i.e., A.columns === B.rows).
- *
- * @param {Float32Array} matrixA - The first matrix (flattened row-major order).
- * @param {number} rowsA - The number of rows in the first matrix.
- * @param {number} colsA - The number of columns in the first matrix.
- * @param {Float32Array} matrixB - The second matrix (flattened row-major order).
- * @param {number} rowsB - The number of rows in the second matrix.
- * @param {number} colsB - The number of columns in the second matrix.
- * @returns {Float32Array} The resulting matrix (flattened row-major order).
- * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
+ * Load and compile WebAssembly binary.
+ * @async
+ * @returns {WebAssembly.Instance} The compiled WebAssembly instance.
  */
-export function wasmMatrixMultiply(matrixA, rowsA, colsA, matrixB, rowsB, colsB) {
+async function loadWasm() {
+  const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = fs.readFileSync(wasmPath);
+  const wasmModule = await WebAssembly.compile(wasmBuffer);
+  return new WebAssembly.Instance(wasmModule);
+}
+
+/**
+ * Perform matrix multiplication.
+ * @async
+ * @param {number[][]} matrixA - First matrix (2D array).
+ * @param {number[][]} matrixB - Second matrix (2D array).
+ * @returns {number[][]} Resultant matrix after multiplication.
+ * @throws {Error} If matrices cannot be multiplied due to dimension mismatch.
+ */
+async function matrixMultiply(matrixA, matrixB) {
+  const wasmInstance = await loadWasm();
+
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
+
   if (colsA !== rowsB) {
-    throw new Error("Matrix dimensions do not allow multiplication: A.cols must equal B.rows.");
+    throw new Error('Matrix dimensions do not allow multiplication.');
   }
 
-  // Initialize the result matrix
-  const result = new Float32Array(rowsA * colsB);
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
 
-  // Perform the matrix multiplication
+  const resultBuffer = new Float64Array(rowsA * colsB);
+
+  wasmInstance.exports.matrixMultiply(
+    flatA, rowsA, colsA,
+    flatB, rowsB, colsB,
+    resultBuffer
+  );
+
+  const resultMatrix = [];
   for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      let sum = 0;
-      for (let k = 0; k < colsA; k++) {
-        sum += matrixA[i * colsA + k] * matrixB[k * colsB + j];
-      }
-      result[i * colsB + j] = sum;
-    }
+    resultMatrix.push(resultBuffer.slice(i * colsB, (i + 1) * colsB));
   }
 
-  return result;
+  return resultMatrix;
 }
 
 /**
- * Computes the cosine similarity between two vectors.
- *
- * @param {Float32Array} vectorA - The first vector.
- * @param {Float32Array} vectorB - The second vector.
- * @returns {number} The cosine similarity value between -1 and 1.
- * @throws {Error} If the vectors are not of the same length.
+ * Compute eigenvalues and eigenvectors of a matrix.
+ * @async
+ * @param {number[][]} matrix - Input square matrix (2D array).
+ * @returns {{eigenvalues: number[], eigenvectors: number[][]}} Eigenvalues and eigenvectors of the matrix.
+ * @throws {Error} If the matrix is not square.
  */
-export function cosineSimilarity(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error("Vectors must be of the same length to compute cosine similarity.");
+async function eigenDecomposition(matrix) {
+  const wasmInstance = await loadWasm();
+
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+
+  if (rows !== cols) {
+    throw new Error('Matrix must be square for eigenvalue decomposition.');
   }
 
-  let dotProduct = 0;
-  let magnitudeA = 0;
-  let magnitudeB = 0;
+  const flatMatrix = matrix.flat();
 
-  for (let i = 0; i < vectorA.length; i++) {
-    dotProduct += vectorA[i] * vectorB[i];
-    magnitudeA += vectorA[i] * vectorA[i];
-    magnitudeB += vectorB[i] * vectorB[i];
-  }
+  const eigenvaluesBuffer = new Float64Array(rows);
+  const eigenvectorsBuffer = new Float64Array(rows * rows);
 
-  magnitudeA = Math.sqrt(magnitudeA);
-  magnitudeB = Math.sqrt(magnitudeB);
+  wasmInstance.exports.eigenDecomposition(
+    flatMatrix, rows, cols,
+    eigenvaluesBuffer,
+    eigenvectorsBuffer
+  );
 
-  if (magnitudeA === 0 || magnitudeB === 0) {
-    throw new Error("Cannot compute cosine similarity for zero-magnitude vectors.");
-  }
-
-  return dotProduct / (magnitudeA * magnitudeB);
-}
-
-/**
- * Transposes a matrix.
- *
- * @param {Float32Array} matrix - The input matrix (flattened row-major order).
- * @param {number} rows - The number of rows in the matrix.
- * @param {number} cols - The number of columns in the matrix.
- * @returns {Float32Array} The transposed matrix (flattened row-major order).
- */
-export function transposeMatrix(matrix, rows, cols) {
-  const transposed = new Float32Array(rows * cols);
-
+  const eigenvectorsMatrix = [];
   for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      transposed[j * rows + i] = matrix[i * cols + j];
-    }
+    eigenvectorsMatrix.push(eigenvectorsBuffer.slice(i * rows, (i + 1) * rows));
   }
 
-  return transposed;
+  return {
+    eigenvalues: Array.from(eigenvaluesBuffer),
+    eigenvectors: eigenvectorsMatrix
+  };
 }
 
-/**
- * Validates that a given matrix is a valid Float32Array and matches the specified dimensions.
- *
- * @param {Float32Array} matrix - The matrix to validate.
- * @param {number} rows - The expected number of rows.
- * @param {number} cols - The expected number of columns.
- * @throws {Error} If the matrix is invalid or does not match the dimensions.
- */
-export function validateMatrix(matrix, rows, cols) {
-  if (!(matrix instanceof Float32Array)) {
-    throw new Error("Matrix must be a Float32Array.");
-  }
-
-  if (matrix.length !== rows * cols) {
-    throw new Error(`Matrix dimensions do not match: expected ${rows * cols} elements, got ${matrix.length}.`);
-  }
-}
+module.exports = {
+  matrixMultiply,
+  eigenDecomposition
+};

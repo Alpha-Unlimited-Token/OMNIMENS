@@ -315,6 +315,33 @@ export type OmnimensUsage = typeof omnimensUsage.$inferSelect;
 export type OmnimensCreditTransaction = typeof omnimensCreditTransactions.$inferSelect;
 export type OmnimensBrain = typeof omnimensBrain.$inferSelect;
 export type OmnimensUpgrade = typeof omnimensUpgrades.$inferSelect;
+// ─── Persistent Conversation History ─────────────────────────────────────────
+// Each session the user starts is a "conversation" — stored forever in DB
+export const omnimensConversations = pgTable("godflesh_conversations", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => omnimensUsers.id),
+  title: text("title").notNull().default("New Conversation"),
+  persona: text("persona").default("GENERAL").notNull(),
+  messageCount: integer("message_count").default(0).notNull(),
+  lastMessageAt: timestamp("last_message_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Individual messages within a conversation
+export const omnimensMessages = pgTable("godflesh_messages", {
+  id: serial("id").primaryKey(),
+  conversationId: integer("conversation_id").notNull().references(() => omnimensConversations.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull().references(() => omnimensUsers.id),
+  role: text("role").notNull(),              // "user" | "assistant"
+  content: text("content").notNull(),
+  imageUrl: text("image_url"),               // for image generation responses
+  creditsUsed: integer("credits_used"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type OmnimensConversation = typeof omnimensConversations.$inferSelect;
+export type OmnimensMessage = typeof omnimensMessages.$inferSelect;
+
 export type OmnimensNotification = typeof omnimensNotifications.$inferSelect;
 export type OmnimensProject = typeof omnimensProjects.$inferSelect;
 export type OmnimensProjectFile = typeof omnimensProjectFiles.$inferSelect;

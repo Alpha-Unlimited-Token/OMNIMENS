@@ -69,8 +69,25 @@ export function useOmnimensChat(onLimitReached: () => void) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentConversationId, setCurrentConversationId] = useState<number | undefined>();
   const queryClient = useQueryClient();
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  const startNewConversation = () => {
+    setMessages([]);
+    setCurrentConversationId(undefined);
+    setError(null);
+  };
+
+  const loadConversation = (conversationId: number, dbMessages: { role: "user" | "assistant"; content: string }[]) => {
+    setCurrentConversationId(conversationId);
+    const mapped: Message[] = dbMessages.map((m, i) => ({
+      id: `db-${conversationId}-${i}`,
+      role: m.role === "user" ? "user" : "omnimens",
+      content: m.content,
+    }));
+    setMessages(mapped);
+  };
 
   const sendMessage = async (content: string, files: File[] = [], persona = "GENERAL") => {
     if (!content.trim() && files.length === 0) return;
@@ -112,6 +129,9 @@ export function useOmnimensChat(onLimitReached: () => void) {
       form.append("message", content);
       form.append("history", JSON.stringify(history));
       form.append("persona", persona);
+      if (currentConversationId !== undefined) {
+        form.append("conversationId", String(currentConversationId));
+      }
       for (const file of files) {
         form.append("files", file);
       }
@@ -137,7 +157,7 @@ export function useOmnimensChat(onLimitReached: () => void) {
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let assistantContent = "";
-      let sseBuffer = ""; // accumulate incomplete SSE lines across chunks
+      let sseBuffer = "";
 
       setMessages((prev) => [...prev, { id: assistantMsgId, role: "omnimens", content: "" }]);
 
@@ -145,19 +165,19 @@ export function useOmnimensChat(onLimitReached: () => void) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        // Append new chunk to buffer
         sseBuffer += decoder.decode(value, { stream: true });
-
-        // Split on newlines, but keep the last (possibly incomplete) piece in the buffer
         const lines = sseBuffer.split("\n");
-        sseBuffer = lines.pop() ?? ""; // last element may be partial — hold it for next chunk
+        sseBuffer = lines.pop() ?? "";
 
         for (const line of lines) {
           if (!line.startsWith("data: ")) continue;
           try {
               const data = JSON.parse(line.slice(6));
 
-              if (data.type === "chunk") {
+              if (data.type === "conversation_id") {
+                setCurrentConversationId(data.conversationId);
+
+              } else if (data.type === "chunk") {
                 assistantContent += data.content;
                 setMessages((prev) => {
                   const newMsgs = [...prev];
@@ -169,7 +189,6 @@ export function useOmnimensChat(onLimitReached: () => void) {
                 });
 
               } else if (data.type === "content_update") {
-                // Server stripped [GENERATE_IMAGE: ...] markers — replace displayed text
                 assistantContent = data.content;
                 setMessages((prev) => {
                   const newMsgs = [...prev];
@@ -242,7 +261,6 @@ export function useOmnimensChat(onLimitReached: () => void) {
                 });
 
               } else if (data.type === "image_generating") {
-                // Show a "generating..." placeholder on the message
                 setMessages((prev) => {
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
@@ -251,7 +269,6 @@ export function useOmnimensChat(onLimitReached: () => void) {
                 });
 
               } else if (data.type === "image_generated") {
-                // Append the real image to the message
                 setMessages((prev) => {
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
@@ -321,8 +338,8 @@ export function useOmnimensChat(onLimitReached: () => void) {
             } catch {
               // Ignore parse errors on incomplete chunks
             }
-        } // end for (line of lines)
-      } // end while
+        }
+      }
     } catch (err: any) {
       if (err.name !== "AbortError") {
         setError(err.message || "An unknown error occurred.");
@@ -340,5 +357,14 @@ export function useOmnimensChat(onLimitReached: () => void) {
     }
   };
 
-  return { messages, sendMessage, isTyping, error, stopGeneration };
+  return {
+    messages,
+    sendMessage,
+    isTyping,
+    error,
+    stopGeneration,
+    currentConversationId,
+    startNewConversation,
+    loadConversation,
+  };
 }

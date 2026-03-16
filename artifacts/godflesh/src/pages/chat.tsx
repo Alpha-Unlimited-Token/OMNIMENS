@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
+import { useQuery, useQueryClient as useQC } from "@tanstack/react-query";
 import { useOmnimensChat, type GeneratedImage, type Artifact, type CostBreakdown, type TaskPlan, type RedFlagAlert } from "@/hooks/use-omnimens-chat";
 import { useOmnimensVoice } from "@/hooks/use-omnimens-voice";
 import { VoiceIndicator } from "@/components/voice-indicator";
@@ -15,7 +16,8 @@ import {
   Zap, Terminal, Play, Microscope, ChevronDown, Check, BookOpen, Brain,
   Cpu, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Image,
   FolderOpen, Activity, SlidersHorizontal, PanelLeftClose, PanelRightClose,
-  PanelLeft, PanelRight, X, Layers, Stethoscope, AlertTriangle, HeartPulse
+  PanelLeft, PanelRight, X, Layers, Stethoscope, AlertTriangle, HeartPulse,
+  MessageSquare, PlusCircle, Trash2
 } from "lucide-react";
 import { OmnimensIcon } from "@/components/omnimens-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
@@ -400,6 +402,11 @@ function LeftPanel({
   onToggleDeepResearch,
   voice,
   status,
+  conversations,
+  currentConversationId,
+  onNewChat,
+  onLoadConversation,
+  onDeleteConversation,
 }: {
   persona: string;
   onPersonaChange: (p: string) => void;
@@ -407,6 +414,11 @@ function LeftPanel({
   onToggleDeepResearch: () => void;
   voice: any;
   status: any;
+  conversations: { id: number; title: string | null; updatedAt: string | null }[];
+  currentConversationId: number | undefined;
+  onNewChat: () => void;
+  onLoadConversation: (id: number) => void;
+  onDeleteConversation: (id: number) => void;
 }) {
   const personas = Object.keys(PERSONA_NAMES);
 
@@ -418,6 +430,45 @@ function LeftPanel({
         <p className="font-mono text-[9px] tracking-[0.25em] text-primary/70 mt-1">OMNIMENS</p>
         {status?.isOwner && (
           <span className="font-mono text-[8px] tracking-widest text-accent/80 bg-accent/10 border border-accent/20 px-2 py-0.5 rounded-full">CREATOR</span>
+        )}
+      </div>
+
+      {/* New Chat + History */}
+      <div>
+        <button
+          onClick={onNewChat}
+          className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[10px] font-mono font-bold tracking-wider border border-primary/30 text-primary hover:bg-primary/10 transition-all"
+        >
+          <PlusCircle className="w-3.5 h-3.5" />
+          NEW CHAT
+        </button>
+        {conversations.length > 0 && (
+          <div className="mt-2">
+            <p className="font-mono text-[9px] tracking-[0.2em] text-white/75 uppercase mb-1 px-1">HISTORY</p>
+            <div className="space-y-0.5 max-h-48 overflow-y-auto omnimens-scrollbar">
+              {conversations.map(conv => (
+                <div
+                  key={conv.id}
+                  className={`group flex items-center gap-1.5 px-2 py-1.5 rounded-lg cursor-pointer transition-all ${
+                    currentConversationId === conv.id
+                      ? "bg-primary/15 border border-primary/25 text-primary"
+                      : "hover:bg-white/5 text-white/70 border border-transparent"
+                  }`}
+                  onClick={() => onLoadConversation(conv.id)}
+                >
+                  <MessageSquare className="w-3 h-3 shrink-0 opacity-60" />
+                  <span className="text-[10px] font-mono truncate flex-1">{conv.title || "Untitled"}</span>
+                  <button
+                    onClick={e => { e.stopPropagation(); onDeleteConversation(conv.id); }}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity text-white/40 hover:text-red-400 shrink-0"
+                    title="Delete"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
 
@@ -703,9 +754,42 @@ export default function Chat() {
   const [rightOpen, setRightOpen] = useState(true);
 
   const { data: status, isLoading: statusLoading } = useGetOmnimensStatus();
-  const { messages, sendMessage, isTyping, error, stopGeneration } = useOmnimensChat(() => {
+  const qc = useQC();
+  const { messages, sendMessage, isTyping, error, stopGeneration, currentConversationId, startNewConversation, loadConversation } = useOmnimensChat(() => {
     setShowLimitModal(true);
   });
+
+  const { data: conversations = [], refetch: refetchConversations } = useQuery<{ id: number; title: string | null; updatedAt: string | null }[]>({
+    queryKey: ["omnimens-conversations"],
+    queryFn: () => fetch("/api/omnimens/conversations", { credentials: "include" }).then(r => r.json()),
+    refetchInterval: 30000,
+  });
+
+  const handleNewChat = useCallback(() => {
+    startNewConversation();
+  }, [startNewConversation]);
+
+  const handleLoadConversation = useCallback(async (id: number) => {
+    try {
+      const data = await fetch(`/api/omnimens/conversations/${id}`, { credentials: "include" }).then(r => r.json());
+      loadConversation(id, data.messages || []);
+    } catch {}
+  }, [loadConversation]);
+
+  const handleDeleteConversation = useCallback(async (id: number) => {
+    try {
+      await fetch(`/api/omnimens/conversations/${id}`, { method: "DELETE", credentials: "include" });
+      if (currentConversationId === id) startNewConversation();
+      refetchConversations();
+    } catch {}
+  }, [currentConversationId, startNewConversation, refetchConversations]);
+
+  // Refresh conversation list after each message
+  useEffect(() => {
+    if (!isTyping && currentConversationId) {
+      refetchConversations();
+    }
+  }, [isTyping, currentConversationId]);
   const voice = useOmnimensVoice();
   const [persona, setPersona] = useState("GENERAL");
   const [deepResearchMode, setDeepResearchMode] = useState(false);
@@ -846,6 +930,11 @@ export default function Chat() {
                 onToggleDeepResearch={() => setDeepResearchMode(m => !m)}
                 voice={voice}
                 status={status}
+                conversations={conversations}
+                currentConversationId={currentConversationId}
+                onNewChat={handleNewChat}
+                onLoadConversation={handleLoadConversation}
+                onDeleteConversation={handleDeleteConversation}
               />
             </motion.div>
           )}

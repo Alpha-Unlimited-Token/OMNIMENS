@@ -8,6 +8,7 @@ import router from "./routes";
 import stripeWebhookRouter from "./routes/stripeWebhook.js";
 import { startAutonomousLearning } from "./lib/omnimens-self-upgrade.js";
 import { startEvolutionEngine } from "./lib/omnimens-evolution.js";
+import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-conversations.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,6 +32,12 @@ startAutonomousLearning();
 
 // Start OMNIMENS deep evolution engine — code discovery, limitation analysis, self-authored modules
 startEvolutionEngine();
+
+// Start autonomous memory quality improvement — runs every 6 hours
+setTimeout(async () => {
+  await runGlobalMemoryImprovementCycle();
+  setInterval(() => runGlobalMemoryImprovementCycle(), 6 * 60 * 60 * 1000);
+}, 10 * 60 * 1000); // first run 10 min after startup
 
 // In production, serve the OMNIMENS frontend static build
 if (process.env.NODE_ENV === "production") {

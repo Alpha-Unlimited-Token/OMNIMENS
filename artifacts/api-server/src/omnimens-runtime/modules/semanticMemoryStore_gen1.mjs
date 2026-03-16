@@ -1,140 +1,119 @@
-// semanticMemoryStore.js
-
 /**
  * @module semanticMemoryStore
- * @description Provides fast semantic search and retrieval for conversational continuity using HNSW (Hierarchical Navigable Small World).
+ * @description A utility module for storing and retrieving semantic embeddings using in-memory approximate nearest neighbor (ANN) search.
  */
 
 /**
- * Node.js built-in modules used
- */
-const crypto = require('crypto');
-
-/**
- * @typedef {Object} VectorNode
- * @property {string} id - Unique identifier for the vector node.
- * @property {number[]} vector - The vector embedding.
- * @property {Object} neighbors - Map of neighbor IDs to their distances.
- */
-
-/**
- * @class SemanticMemoryStore
- * @description Implements HNSW for approximate nearest neighbor search.
+ * Represents a semantic memory store using HNSW-like graph-based ANN search.
  */
 class SemanticMemoryStore {
   constructor() {
     /**
-     * @type {Map<string, VectorNode>} nodes - Stores all vector nodes.
+     * @type {Map<number, {id: string, vector: number[]}>}
+     * Internal storage for embeddings, keyed by unique numeric IDs.
      */
-    this.nodes = new Map();
+    this.store = new Map();
 
     /**
-     * @type {number} maxNeighbors - Maximum number of neighbors per node.
+     * @type {Map<number, Set<number>>}
+     * Graph-based adjacency list for approximate nearest neighbor search.
      */
-    this.maxNeighbors = 10;
+    this.graph = new Map();
+
+    /**
+     * @type {number}
+     * Counter for generating unique numeric IDs for embeddings.
+     */
+    this.idCounter = 0;
   }
 
   /**
-   * @private
-   * @param {number[]} vectorA - First vector.
-   * @param {number[]} vectorB - Second vector.
-   * @returns {number} - Euclidean distance between the two vectors.
+   * Adds a new embedding to the store.
+   * @param {string} id - A unique identifier for the embedding.
+   * @param {number[]} vector - The embedding vector to store.
+   * @throws {Error} If the vector is not a valid numeric array.
    */
-  _calculateDistance(vectorA, vectorB) {
-    if (vectorA.length !== vectorB.length) {
-      throw new Error('Vectors must be of the same dimension.');
-    }
-    return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
-  }
-
-  /**
-   * @private
-   * @param {VectorNode} node - Node to update neighbors for.
-   */
-  _updateNeighbors(node) {
-    const distances = Array.from(this.nodes.values())
-      .filter(n => n.id !== node.id)
-      .map(n => ({ id: n.id, distance: this._calculateDistance(node.vector, n.vector) }));
-
-    distances.sort((a, b) => a.distance - b.distance);
-
-    node.neighbors = distances.slice(0, this.maxNeighbors).reduce((map, { id, distance }) => {
-      map[id] = distance;
-      return map;
-    }, {});
-  }
-
-  /**
-   * @public
-   * @param {string} id - Unique identifier for the vector node.
-   * @param {number[]} vector - The vector embedding.
-   */
-  addNode(id, vector) {
-    if (this.nodes.has(id)) {
-      throw new Error(`Node with ID '${id}' already exists.`);
+  addEmbedding(id, vector) {
+    if (!Array.isArray(vector) || vector.some((v) => typeof v !== 'number')) {
+      throw new Error('Vector must be an array of numbers.');
     }
 
-    const newNode = { id, vector, neighbors: {} };
-    this.nodes.set(id, newNode);
+    const newId = this.idCounter++;
+    this.store.set(newId, { id, vector });
 
-    // Update neighbors for all nodes
-    this.nodes.forEach(node => this._updateNeighbors(node));
+    // Update graph connections (basic HNSW-like graph construction)
+    this.graph.set(newId, new Set());
+    for (const [existingId, { vector: existingVector }] of this.store.entries()) {
+      if (existingId === newId) continue;
+      const similarity = this._cosineSimilarity(vector, existingVector);
+
+      // Connect nodes if similarity exceeds a threshold (e.g., 0.8)
+      if (similarity > 0.8) {
+        this.graph.get(newId).add(existingId);
+        this.graph.get(existingId).add(newId);
+      }
+    }
   }
 
   /**
-   * @public
-   * @param {number[]} queryVector - The vector to search for nearest neighbors.
-   * @param {number} [k=5] - Number of nearest neighbors to retrieve.
-   * @returns {Array<{id: string, distance: number}>} - List of nearest neighbors with distances.
+   * Finds the most similar embeddings to a given query vector.
+   * @param {number[]} queryVector - The query vector for similarity search.
+   * @param {number} k - The number of nearest neighbors to return.
+   * @returns {Array<{id: string, similarity: number}>} The top-k most similar embeddings.
+   * @throws {Error} If the query vector is not a valid numeric array.
    */
-  search(queryVector, k = 5) {
-    const distances = Array.from(this.nodes.values()).map(node => ({
-      id: node.id,
-      distance: this._calculateDistance(queryVector, node.vector)
-    }));
+  findNearestNeighbors(queryVector, k) {
+    if (!Array.isArray(queryVector) || queryVector.some((v) => typeof v !== 'number')) {
+      throw new Error('Query vector must be an array of numbers.');
+    }
 
-    distances.sort((a, b) => a.distance - b.distance);
+    const visited = new Set();
+    const candidates = [...this.store.keys()];
+    const results = [];
 
-    return distances.slice(0, k);
+    // Perform a graph traversal to find nearest neighbors
+    while (candidates.length > 0) {
+      const currentId = candidates.pop();
+      if (visited.has(currentId)) continue;
+      visited.add(currentId);
+
+      const { id, vector } = this.store.get(currentId);
+      const similarity = this._cosineSimilarity(queryVector, vector);
+
+      results.push({ id, similarity });
+      results.sort((a, b) => b.similarity - a.similarity);
+      if (results.length > k) results.pop();
+
+      // Add neighbors to candidates
+      for (const neighbor of this.graph.get(currentId)) {
+        if (!visited.has(neighbor)) {
+          candidates.push(neighbor);
+        }
+      }
+    }
+
+    return results;
   }
 
   /**
-   * @public
-   * @returns {Array<string>} - List of all node IDs in the store.
+   * Computes the cosine similarity between two vectors.
+   * @private
+   * @param {number[]} vectorA - The first vector.
+   * @param {number[]} vectorB - The second vector.
+   * @returns {number} The cosine similarity between the two vectors.
    */
-  getAllNodeIds() {
-    return Array.from(this.nodes.keys());
+  _cosineSimilarity(vectorA, vectorB) {
+    const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
+    const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a * a, 0));
+    const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b * b, 0));
+    return dotProduct / (magnitudeA * magnitudeB || 1);
   }
 }
 
 /**
- * @type {SemanticMemoryStore}
+ * Creates a new semantic memory store instance.
+ * @returns {SemanticMemoryStore} A new instance of the semantic memory store.
  */
-const semanticMemoryStore = new SemanticMemoryStore();
-
-module.exports = {
-  semanticMemoryStore,
-  /**
-   * @function addNode
-   * @description Adds a vector node to the semantic memory store.
-   * @param {string} id - Unique identifier for the vector node.
-   * @param {number[]} vector - The vector embedding.
-   */
-  addNode: semanticMemoryStore.addNode.bind(semanticMemoryStore),
-
-  /**
-   * @function search
-   * @description Searches for the nearest neighbors of a given vector.
-   * @param {number[]} queryVector - The vector to search for nearest neighbors.
-   * @param {number} [k=5] - Number of nearest neighbors to retrieve.
-   * @returns {Array<{id: string, distance: number}>} - List of nearest neighbors with distances.
-   */
-  search: semanticMemoryStore.search.bind(semanticMemoryStore),
-
-  /**
-   * @function getAllNodeIds
-   * @description Retrieves all node IDs in the semantic memory store.
-   * @returns {Array<string>} - List of all node IDs in the store.
-   */
-  getAllNodeIds: semanticMemoryStore.getAllNodeIds.bind(semanticMemoryStore)
-};
+export function createSemanticMemoryStore() {
+  return new SemanticMemoryStore();
+}

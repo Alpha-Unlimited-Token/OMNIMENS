@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import multer from "multer";
 import { db } from "@workspace/db";
-import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions, omnimensCodeRuns } from "@workspace/db";
+import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions, omnimensCodeRuns, omnimensConversations } from "@workspace/db";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { openai, generateImageBuffer } from "@workspace/integrations-openai-ai-server";
 import { runOmnimens, type OmnimensState } from "../lib/omnimens-engine.js";
@@ -42,6 +42,7 @@ import {
   omnimensPhysioOutcomes,
 } from "@workspace/db";
 import { checkAndGrantMonthlyCredits, attemptAutoTopup, createSetupSession, confirmWalletSetup, removeWallet, getBillingSummary, LOYALTY_TIERS, FREE_MONTHLY_CREDITS } from "../lib/omnimens-billing.js";
+import { getOrCreateConversation, saveMessage, generateConversationTitle, loadConversationHistory, listConversations, deleteConversation } from "../lib/omnimens-conversations.js";
 
 const router: IRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024, files: 10 } });
@@ -645,7 +646,11 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
 
   const message = (req.body.message as string) || "";
   const historyRaw = req.body.history;
-  const history: { role: "user" | "assistant"; content: string }[] =
+  const conversationIdRaw = req.body.conversationId;
+  const conversationIdInput = conversationIdRaw ? parseInt(String(conversationIdRaw)) : undefined;
+  const personaRaw = (req.body.persona as string) || "GENERAL";
+
+  let history: { role: "user" | "assistant"; content: string }[] =
     typeof historyRaw === "string" ? JSON.parse(historyRaw) : (historyRaw || []);
   const uploadedFiles = (req.files as Express.Multer.File[]) || [];
 
@@ -709,9 +714,25 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
     }
   }
 
+  // ── Get or create conversation, load DB history if no history sent ────────────
+  let conversationId: number;
+  try {
+    conversationId = await getOrCreateConversation(req.user.id, conversationIdInput, personaRaw);
+    // If client sends no history (fresh page load), load from DB
+    if (history.length === 0 && conversationIdInput) {
+      history = await loadConversationHistory(conversationIdInput, req.user.id, 40);
+    }
+  } catch (err) {
+    console.error("[OMNIMENS] Conversation init error:", err);
+    conversationId = await getOrCreateConversation(req.user.id, undefined, personaRaw);
+  }
+
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
+
+  // Send conversationId to client immediately so it can persist it
+  res.write(`data: ${JSON.stringify({ type: "conversation_id", conversationId })}\n\n`);
 
   try {
     const omnimensState = await runOmnimens(message || "analyze the uploaded files");
@@ -1143,11 +1164,63 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
     reflectOnConversation(message, fullText, `User: ${message.slice(0, 200)}`).catch(console.error);
     // Learning cycle: critic evaluates quality → learning element updates → memory stores insights
     runLearningCycle(req.user.id, message, fullText, taskAnalysis.taskType || "chat").catch(console.error);
+
+    // ── Persist conversation messages to DB ───────────────────────────────────
+    const isFirstMessage = (conversationIdInput === undefined || conversationIdInput !== conversationId);
+    Promise.all([
+      saveMessage(conversationId, req.user.id, "user", message || "[file upload]"),
+      saveMessage(conversationId, req.user.id, "assistant", fullText, generatedImages[0]?.url, creditCost),
+    ]).then(() => {
+      if (isFirstMessage && message.trim()) {
+        generateConversationTitle(conversationId, message).catch(() => {});
+      }
+    }).catch(console.error);
   } catch (err) {
     console.error("OMNIMENS chat error:", err);
     res.write(`data: ${JSON.stringify({ type: "error", error: "Transmission failed" })}\n\n`);
   } finally {
     res.end();
+  }
+});
+
+// ─── Conversations ────────────────────────────────────────────────────────────
+
+router.get("/omnimens/conversations", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const convs = await listConversations(req.user.id, 40);
+    res.json(convs);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load conversations" });
+  }
+});
+
+router.get("/omnimens/conversations/:id", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const convId = parseInt(req.params.id);
+    const messages = await loadConversationHistory(convId, req.user.id, 100);
+    const [conv] = await db
+      .select()
+      .from(omnimensConversations)
+      .where(eq(omnimensConversations.id, convId))
+      .limit(1);
+    if (!conv || conv.userId !== req.user.id) {
+      res.status(404).json({ error: "Conversation not found" }); return;
+    }
+    res.json({ conversation: conv, messages });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load conversation" });
+  }
+});
+
+router.delete("/omnimens/conversations/:id", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    await deleteConversation(parseInt(req.params.id), req.user.id);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete conversation" });
   }
 });
 
