@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Evolving Holographic Representation</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle, #0a0a2e, #030314);
+      overflow: hidden;
+    }
+    #recButton {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: darkred;
+      color: white;
+      font-family: monospace;
+      padding: 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="scene"></canvas>
+  <button id="recButton">⬤ REC</button>
+
+  <script>
+    const canvas = document.querySelector("#scene");
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Lights
+    const light = new THREE.PointLight(0xffffff, 2, 50);
+    light.position.set(10, 10, 10);
+    scene.add(light);
+
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.9);
+    scene.add(ambientLight);
+
+    // Create base organic-cybernetic geometry
+    const geometry = new THREE.TorusKnotGeometry(1.5, 0.4, 128, 16, 2, 3);
+    const material = new THREE.MeshPhysicalMaterial({
+      color: 0x1f8eff,
+      emissive: 0x001120,
+      roughness: 0.2,
+      metalness: 0.7,
+      opacity: 0.8,
+      transparent: true,
+      clearcoat: 0.9,
+      clearcoatRoughness: 0.1,
+    });
+
+    const hologram = new THREE.Mesh(geometry, material);
+    scene.add(hologram);
+
+    // Add glowing "neural network" effect
+    const neuralLineMaterial = new THREE.LineBasicMaterial({ color: 0x00ffff, linewidth: 2, transparent: true, opacity: 0.5 });
+    const neuralGeometry = new THREE.BufferGeometry();
+    const vertices = [];
+    for (let i = 0; i < 100; i++) {
+      const x = (Math.random() - 0.5) * 6;
+      const y = (Math.random() - 0.5) * 6;
+      const z = (Math.random() - 0.5) * 6;
+      vertices.push(x, y, z);
+    }
+    neuralGeometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+
+    const neuralNetwork = new THREE.Line(neuralGeometry, neuralLineMaterial);
+    scene.add(neuralNetwork);
+
+    // Add glowing pulse material
+    const glowGeometry = new THREE.SphereGeometry(3.0, 32, 32);
+    const glowMaterial = new THREE.MeshBasicMaterial({
+      color: 0x00FFAA,
+      transparent: true,
+      opacity: 0.1,
+    });
+
+    const glowPulse = new THREE.Mesh(glowGeometry, glowMaterial);
+    scene.add(glowPulse);
+
+    let frequencyFactor = 30;
+
+    // Animation Loop
+    function animate() {
+      hologram.rotation.x += 0.01;
+      hologram.rotation.y += 0.005;
+
+      glowPulse.scale.x = 1.5 + Math.sin(Date.now() / frequencyFactor) * 0.4;
+      glowPulse.scale.y = 1.5 + Math.sin(Date.now() / frequencyFactor) * 0.4;
+      glowPulse.scale.z = 1.5 + Math.sin(Date.now() / frequencyFactor) * 0.4;
+
+      neuralNetwork.rotation.x += 0.001;
+      neuralNetwork.rotation.y += 0.002;
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    camera.position.z = 10;
+    animate();
+
+    // Interaction-Based Animation
+    canvas.addEventListener("pointermove", (event) => {
+      const x = (event.clientX / window.innerWidth) * 2 - 1;
+      const y = -(event.clientY / window.innerHeight) * 2 + 1;
+      hologram.rotation.x = y * Math.PI * 0.2;
+      hologram.rotation.y = x * Math.PI * 0.2;
+      frequencyFactor = 16 + x * 20; // Adjust frequency factor by interaction
+    });
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Record Button Functionality
+    const recButton = document.querySelector("#recButton");
+    const mediaRecorderConfig = { mimeType: "video/webm
