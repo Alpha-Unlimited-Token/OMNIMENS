@@ -20,7 +20,7 @@ function bitsToFloat(bits: string, min: number, max: number): number {
 // Derived from DNA but mapped to ANGELIC ranges:
 //   pitch → 1.05–1.28  (elevated, resonant, luminous — not falsetto, not deep)
 //   rate  → 0.72–0.82  (slow, meditative — every word has weight)
-export const GODFLESH_VOICE = {
+export const OMNIMENS_VOICE = {
   pitch:  bitsToFloat(VOICE_DNA.slice(0, 8),  1.05, 1.28),
   rate:   bitsToFloat(VOICE_DNA.slice(8, 16), 0.72, 0.82),
   volume: 1.0,
@@ -120,7 +120,7 @@ function estimatePitch(word: string): number {
   return Math.max(0.06, Math.min(1.0, p));
 }
 
-export interface GodfleshVoiceHook {
+export interface OmnimensVoiceHook {
   isEnabled: boolean;
   isSpeaking: boolean;
   speakingMessageId: string | null;
@@ -129,11 +129,11 @@ export interface GodfleshVoiceHook {
   toggle: () => void;
   speak: (text: string, messageId: string) => void;
   stop: () => void;
-  voiceParams: typeof GODFLESH_VOICE;
+  voiceParams: typeof OMNIMENS_VOICE;
   voiceDna: string;
 }
 
-export function useGodfleshVoice(): GodfleshVoiceHook {
+export function useOmnimensVoice(): OmnimensVoiceHook {
   const [isEnabled, setIsEnabled]         = useState(false);
   const [isSpeaking, setIsSpeaking]       = useState(false);
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
@@ -224,9 +224,9 @@ export function useGodfleshVoice(): GodfleshVoiceHook {
     const words = clean.split(/\s+/).filter(Boolean);
     const utterance = new SpeechSynthesisUtterance(clean);
 
-    utterance.pitch  = GODFLESH_VOICE.pitch;
-    utterance.rate   = GODFLESH_VOICE.rate;
-    utterance.volume = GODFLESH_VOICE.volume;
+    utterance.pitch  = OMNIMENS_VOICE.pitch;
+    utterance.rate   = OMNIMENS_VOICE.rate;
+    utterance.volume = OMNIMENS_VOICE.volume;
 
     if (!lockedVoiceRef.current) {
       lockedVoiceRef.current = pickBestVoice(window.speechSynthesis.getVoices());
@@ -254,7 +254,7 @@ export function useGodfleshVoice(): GodfleshVoiceHook {
 
       const checkTimer = setTimeout(() => {
         if (!gotBoundaryRef.current) {
-          const msPerWord = (1000 / (GODFLESH_VOICE.rate * 2.2));
+          const msPerWord = (1000 / (OMNIMENS_VOICE.rate * 2.2));
           simPulseRef.current = setInterval(() => {
             const word = words[wordIdx % words.length];
             wordIdx++;
@@ -298,7 +298,7 @@ export function useGodfleshVoice(): GodfleshVoiceHook {
   return {
     isEnabled, isSpeaking, speakingMessageId, pitchIntensity, binaryStream,
     toggle, speak, stop,
-    voiceParams: GODFLESH_VOICE,
+    voiceParams: OMNIMENS_VOICE,
     voiceDna: VOICE_DNA,
   };
 }

@@ -25,7 +25,7 @@ interface GFUpgrade {
   createdAt: string;
 }
 
-export function GodfleshNotificationBell() {
+export function OmnimensNotificationBell() {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<GFNotification[]>([]);
   const [upgrades, setUpgrades] = useState<GFUpgrade[]>([]);
@@ -37,8 +37,8 @@ export function GodfleshNotificationBell() {
   const fetchAll = useCallback(async () => {
     try {
       const [nRes, uRes] = await Promise.all([
-        fetch("/api/godflesh/notifications", { credentials: "include" }),
-        fetch("/api/godflesh/upgrades", { credentials: "include" }),
+        fetch("/api/omnimens/notifications", { credentials: "include" }),
+        fetch("/api/omnimens/upgrades", { credentials: "include" }),
       ]);
       if (nRes.ok) {
         const n = await nRes.json();
@@ -56,7 +56,7 @@ export function GodfleshNotificationBell() {
 
   const fetchBrain = useCallback(async () => {
     try {
-      const res = await fetch("/api/godflesh/brain", { credentials: "include" });
+      const res = await fetch("/api/omnimens/brain", { credentials: "include" });
       if (res.ok) setBrainEntries(await res.json());
     } catch {}
   }, []);
@@ -72,7 +72,7 @@ export function GodfleshNotificationBell() {
   }, [open, tab]);
 
   const markAllRead = async () => {
-    await fetch("/api/godflesh/notifications/read-all", {
+    await fetch("/api/omnimens/notifications/read-all", {
       method: "POST",
       credentials: "include",
     });
@@ -80,7 +80,7 @@ export function GodfleshNotificationBell() {
   };
 
   const markRead = async (id: number) => {
-    await fetch(`/api/godflesh/notifications/${id}/read`, {
+    await fetch(`/api/omnimens/notifications/${id}/read`, {
       method: "POST",
       credentials: "include",
     });

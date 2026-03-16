@@ -15,7 +15,7 @@ export function WebsitePreview({ html, index = 0 }: WebsitePreviewProps) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `godflesh-build-${index + 1}.html`;
+    a.download = `omnimens-build-${index + 1}.html`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -80,7 +80,7 @@ export function WebsitePreview({ html, index = 0 }: WebsitePreviewProps) {
           title={`OMNIMENS Build ${index + 1}`}
         />
       ) : (
-        <pre className={`overflow-auto text-[11px] text-green-400 font-mono p-4 bg-black/80 leading-relaxed godflesh-scrollbar ${fullscreen ? "flex-1" : "h-[480px]"}`}>
+        <pre className={`overflow-auto text-[11px] text-green-400 font-mono p-4 bg-black/80 leading-relaxed omnimens-scrollbar ${fullscreen ? "flex-1" : "h-[480px]"}`}>
           {html}
         </pre>
       )}

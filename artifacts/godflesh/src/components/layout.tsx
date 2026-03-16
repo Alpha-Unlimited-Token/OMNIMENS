@@ -3,7 +3,7 @@ import { useAuth } from "@workspace/replit-auth-web";
 import { Button } from "./ui/button";
 import { User } from "lucide-react";
 import { motion } from "framer-motion";
-import { GodfleshIcon } from "./godflesh-icon";
+import { OmnimensIcon } from "./omnimens-icon";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user, login, logout, isLoading } = useAuth();
@@ -23,7 +23,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="group-hover:drop-shadow-[0_0_10px_rgba(124,58,237,0.7)] transition-all duration-300">
-              <GodfleshIcon size={36} />
+              <OmnimensIcon size={36} />
             </div>
             <span className="font-display font-black text-xl tracking-[0.2em] text-white group-hover:text-primary transition-colors">
               OMNIMENS

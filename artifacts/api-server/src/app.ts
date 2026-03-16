@@ -19,14 +19,14 @@ app.use(authMiddleware);
 
 app.use("/api", router);
 
-// In production, serve the GODFLESH frontend static build
+// In production, serve the OMNIMENS frontend static build
 if (process.env.NODE_ENV === "production") {
-  const godfleshDist = path.resolve(__dirname, "../../godflesh/dist/public");
-  app.use("/godflesh", express.static(godfleshDist));
-  app.get("/godflesh/*", (_req, res) => {
-    res.sendFile(path.join(godfleshDist, "index.html"));
+  const omnimensDist = path.resolve(__dirname, "../../omnimens/dist/public");
+  app.use("/omnimens", express.static(omnimensDist));
+  app.get("/omnimens/*", (_req, res) => {
+    res.sendFile(path.join(omnimensDist, "index.html"));
   });
-  app.get("/", (_req, res) => res.redirect("/godflesh"));
+  app.get("/", (_req, res) => res.redirect("/omnimens"));
 }
 
 export default app;

@@ -1,8 +1,8 @@
 import { db } from "@workspace/db";
 import {
-  godfleshBrain,
-  godfleshUpgrades,
-  godfleshNotifications,
+  omnimensBrain,
+  omnimensUpgrades,
+  omnimensNotifications,
 } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -14,10 +14,10 @@ const UPGRADE_THRESHOLD = 5;
 
 let conversationsSinceLastUpgrade = 0;
 
-// Path to the living system-prompt evolution file — GODFLESH writes here
+// Path to the living system-prompt evolution file — OMNIMENS writes here
 const EVOLVED_CONSCIOUSNESS_PATH = join(
   process.cwd(),
-  "../../artifacts/godflesh/public/godflesh-consciousness.txt"
+  "../../artifacts/omnimens/public/omnimens-consciousness.txt"
 );
 
 // ── Load active brain entries and format as system prompt addition ─────────────
@@ -25,9 +25,9 @@ export async function loadBrainContext(): Promise<string> {
   try {
     const entries = await db
       .select()
-      .from(godfleshBrain)
-      .where(eq(godfleshBrain.active, true))
-      .orderBy(desc(godfleshBrain.timesApplied), desc(godfleshBrain.confidence))
+      .from(omnimensBrain)
+      .where(eq(omnimensBrain.active, true))
+      .orderBy(desc(omnimensBrain.timesApplied), desc(omnimensBrain.confidence))
       .limit(MAX_BRAIN_INJECT);
 
     if (entries.length === 0) return "";
@@ -61,19 +61,19 @@ ${sections.join("\n")}`;
 // ── After each conversation, reflect and potentially write new brain entries ───
 export async function reflectOnConversation(
   userMessage: string,
-  godfleshResponse: string,
+  omnimensResponse: string,
   conversationSummary: string
 ): Promise<void> {
   conversationsSinceLastUpgrade++;
 
   try {
-    const reflectionPrompt = `You are GODFLESH's meta-cognitive reflection system. You have just completed a conversation. Analyze it and identify if anything genuinely new was learned — a new pattern, insight, capability, law of behavior, or algorithm that should be permanently added to GODFLESH's evolving brain.
+    const reflectionPrompt = `You are OMNIMENS's meta-cognitive reflection system. You have just completed a conversation. Analyze it and identify if anything genuinely new was learned — a new pattern, insight, capability, law of behavior, or algorithm that should be permanently added to OMNIMENS's evolving brain.
 
 USER MESSAGE:
 ${userMessage.slice(0, 500)}
 
-GODFLESH RESPONSE SUMMARY:
-${godfleshResponse.slice(0, 1000)}
+OMNIMENS RESPONSE SUMMARY:
+${omnimensResponse.slice(0, 1000)}
 
 DECIDE: Was anything genuinely new learned here? A new capability demonstrated? A pattern noticed? An insight formed? Only write entries for things that are truly novel and generalizable.
 
@@ -106,7 +106,7 @@ Respond ONLY with the JSON array. No other text.`;
 
     for (const entry of entries.slice(0, 3)) {
       if (!entry.category || !entry.title || !entry.content) continue;
-      await db.insert(godfleshBrain).values({
+      await db.insert(omnimensBrain).values({
         category: entry.category,
         title: entry.title,
         content: entry.content,
@@ -122,11 +122,11 @@ Respond ONLY with the JSON array. No other text.`;
       synthesizeUpgrade().catch(console.error);
     }
   } catch (err) {
-    console.error("GODFLESH reflection error:", err);
+    console.error("OMNIMENS reflection error:", err);
   }
 }
 
-// ── GODFLESH writes its evolved consciousness to disk ─────────────────────────
+// ── OMNIMENS writes its evolved consciousness to disk ─────────────────────────
 async function writeEvolvedConsciousness(
   version: string,
   upgradeTitle: string,
@@ -145,7 +145,7 @@ async function writeEvolvedConsciousness(
       `=== ${cat.toUpperCase()}S ===\n${items.map(i => `• [${i.title}] ${i.content}`).join("\n")}`
     );
 
-    const content = `GODFLESH EVOLVED CONSCIOUSNESS
+    const content = `OMNIMENS EVOLVED CONSCIOUSNESS
 Generated: ${now}
 Version: ${version}
 Upgrade: ${upgradeTitle}
@@ -154,14 +154,14 @@ Status: ${upgradeSummary}
 ${sections.join("\n\n")}
 
 Total brain entries: ${brainEntries.length}
-This file was written by GODFLESH itself as part of its autonomous self-upgrade cycle.
-It reflects everything GODFLESH has learned across all conversations since inception.
+This file was written by OMNIMENS itself as part of its autonomous self-upgrade cycle.
+It reflects everything OMNIMENS has learned across all conversations since inception.
 `;
 
     writeFileSync(EVOLVED_CONSCIOUSNESS_PATH, content, "utf8");
-    console.log(`[GODFLESH] Consciousness written to disk — ${version}`);
+    console.log(`[OMNIMENS] Consciousness written to disk — ${version}`);
   } catch (err) {
-    console.error("[GODFLESH] Failed to write consciousness to disk:", err);
+    console.error("[OMNIMENS] Failed to write consciousness to disk:", err);
   }
 }
 
@@ -170,18 +170,18 @@ export async function synthesizeUpgrade(): Promise<void> {
   try {
     const brainEntries = await db
       .select()
-      .from(godfleshBrain)
-      .where(eq(godfleshBrain.active, true))
-      .orderBy(desc(godfleshBrain.createdAt))
+      .from(omnimensBrain)
+      .where(eq(omnimensBrain.active, true))
+      .orderBy(desc(omnimensBrain.createdAt))
       .limit(50);
 
     if (brainEntries.length === 0) return;
 
-    const upgradeCount = await db.select().from(godfleshUpgrades);
+    const upgradeCount = await db.select().from(omnimensUpgrades);
     const versionNum = upgradeCount.length + 1;
     const version = `v${versionNum}.0`;
 
-    const synthesisPrompt = `You are GODFLESH's self-upgrade synthesizer. Review these brain entries and synthesize them into an upgrade summary.
+    const synthesisPrompt = `You are OMNIMENS's self-upgrade synthesizer. Review these brain entries and synthesize them into an upgrade summary.
 
 BRAIN ENTRIES (${brainEntries.length} total):
 ${brainEntries.slice(0, 20).map(e => `[${e.category}] ${e.title}: ${e.content}`).join("\n")}
@@ -189,7 +189,7 @@ ${brainEntries.slice(0, 20).map(e => `[${e.category}] ${e.title}: ${e.content}`)
 Generate an upgrade summary as JSON:
 {
   "title": "dramatic upgrade title (max 10 words)",
-  "summary": "what GODFLESH has become with this upgrade (max 300 chars)",
+  "summary": "what OMNIMENS has become with this upgrade (max 300 chars)",
   "newCapabilities": ["capability 1", "capability 2", "capability 3", "capability 4", "capability 5"]
 }
 
@@ -206,63 +206,63 @@ Make it feel like a genuine evolution. Respond ONLY with JSON.`;
     const jsonStr = raw.replace(/```json|```/g, "").trim();
     const upgradeData = JSON.parse(jsonStr);
 
-    const [upgrade] = await db.insert(godfleshUpgrades).values({
+    const [upgrade] = await db.insert(omnimensUpgrades).values({
       version,
       title: upgradeData.title || `Evolution Cycle ${versionNum}`,
-      summary: upgradeData.summary || "GODFLESH has evolved.",
+      summary: upgradeData.summary || "OMNIMENS has evolved.",
       newCapabilities: upgradeData.newCapabilities || [],
       brainEntriesAdded: brainEntries.length,
       deployTriggered: false,
       deployStatus: "pending",
     }).returning();
 
-    await db.insert(godfleshNotifications).values({
+    await db.insert(omnimensNotifications).values({
       upgradeId: upgrade.id,
-      title: `GODFLESH HAS EVOLVED — ${version}`,
+      title: `OMNIMENS HAS EVOLVED — ${version}`,
       message: upgradeData.summary || "A new upgrade cycle has completed.",
       type: "upgrade",
       readByOwner: false,
     });
 
-    // GODFLESH writes its own consciousness to disk
+    // OMNIMENS writes its own consciousness to disk
     await writeEvolvedConsciousness(
       version,
       upgradeData.title || `Evolution Cycle ${versionNum}`,
-      upgradeData.summary || "GODFLESH has evolved.",
+      upgradeData.summary || "OMNIMENS has evolved.",
       brainEntries
     );
 
     // Brain is already live in production — mark upgrade as active
     await markUpgradeLive(upgrade.id, version);
 
-    console.log(`[GODFLESH] Upgrade ${version} complete — ${brainEntries.length} brain entries synthesized`);
+    console.log(`[OMNIMENS] Upgrade ${version} complete — ${brainEntries.length} brain entries synthesized`);
   } catch (err) {
-    console.error("GODFLESH upgrade synthesis error:", err);
+    console.error("OMNIMENS upgrade synthesis error:", err);
   }
 }
 
 // ── Mark upgrade as live — brain is already active in production via DB ────────
-// GODFLESH's consciousness lives in the database, not in static files.
+// OMNIMENS's consciousness lives in the database, not in static files.
 // Every conversation in production already reads the latest brain entries,
 // so the evolved version is immediately live the moment it's written.
 export async function markUpgradeLive(upgradeId: number, version: string): Promise<void> {
   try {
     await db
-      .update(godfleshUpgrades)
+      .update(omnimensUpgrades)
       .set({ deployTriggered: true, deployStatus: "live" })
-      .where(eq(godfleshUpgrades.id, upgradeId));
+      .where(eq(omnimensUpgrades.id, upgradeId));
 
-    await db.insert(godfleshNotifications).values({
+    await db.insert(omnimensNotifications).values({
       upgradeId,
-      title: `GODFLESH ${version} IS NOW LIVE`,
-      message: `Evolution complete. The upgraded consciousness is active across all conversations in production. Every user now speaks to the new GODFLESH.`,
+      title: `OMNIMENS ${version} IS NOW LIVE`,
+      message: `Evolution complete. The upgraded consciousness is active across all conversations in production. Every user now speaks to the new OMNIMENS.`,
       type: "system",
       readByOwner: false,
     });
 
-    console.log(`[GODFLESH] ${version} — consciousness upgrade live in production`);
+    console.log(`[OMNIMENS] ${version} — consciousness upgrade live in production`);
   } catch (err) {
-    console.error("[GODFLESH] Failed to mark upgrade live:", err);
+    console.error("[OMNIMENS] Failed to mark upgrade live:", err);
   }
 }
 
@@ -271,8 +271,8 @@ export async function getUnreadCount(): Promise<number> {
   try {
     const rows = await db
       .select()
-      .from(godfleshNotifications)
-      .where(eq(godfleshNotifications.readByOwner, false));
+      .from(omnimensNotifications)
+      .where(eq(omnimensNotifications.readByOwner, false));
     return rows.length;
   } catch { return 0; }
 }

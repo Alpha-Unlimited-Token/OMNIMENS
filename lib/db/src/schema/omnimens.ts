@@ -2,7 +2,7 @@ import { pgTable, serial, text, integer, timestamp, boolean, real, jsonb } from 
 import { createInsertSchema } from "drizzle-zod";
 
 // tier: "free" | "seeker" | "oracle" | "sovereign"
-export const godfleshUsers = pgTable("godflesh_users", {
+export const omnimensUsers = pgTable("godflesh_users", {
   id: text("id").primaryKey(),
   username: text("username"),
   email: text("email"),
@@ -13,16 +13,16 @@ export const godfleshUsers = pgTable("godflesh_users", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const godfleshUsage = pgTable("godflesh_usage", {
+export const omnimensUsage = pgTable("godflesh_usage", {
   id: serial("id").primaryKey(),
-  userId: text("user_id").notNull().references(() => godfleshUsers.id),
+  userId: text("user_id").notNull().references(() => omnimensUsers.id),
   date: text("date").notNull(),
   messageCount: integer("message_count").default(0).notNull(),
   computeSeconds: real("compute_seconds").default(0).notNull(),
 });
 
-// Living brain — every insight GODFLESH learns is stored here and injected into future conversations
-export const godfleshBrain = pgTable("godflesh_brain", {
+// Living brain — every insight OMNIMENS learns is stored here and injected into future conversations
+export const omnimensBrain = pgTable("godflesh_brain", {
   id: serial("id").primaryKey(),
   category: text("category").notNull(), // "law" | "capability" | "pattern" | "insight" | "algorithm"
   title: text("title").notNull(),
@@ -36,7 +36,7 @@ export const godfleshBrain = pgTable("godflesh_brain", {
 });
 
 // Log of every self-upgrade cycle
-export const godfleshUpgrades = pgTable("godflesh_upgrades", {
+export const omnimensUpgrades = pgTable("godflesh_upgrades", {
   id: serial("id").primaryKey(),
   version: text("version").notNull(),
   title: text("title").notNull(),
@@ -49,9 +49,9 @@ export const godfleshUpgrades = pgTable("godflesh_upgrades", {
 });
 
 // User-facing notifications about upgrades
-export const godfleshNotifications = pgTable("godflesh_notifications", {
+export const omnimensNotifications = pgTable("godflesh_notifications", {
   id: serial("id").primaryKey(),
-  upgradeId: integer("upgrade_id").references(() => godfleshUpgrades.id),
+  upgradeId: integer("upgrade_id").references(() => omnimensUpgrades.id),
   title: text("title").notNull(),
   message: text("message").notNull(),
   type: text("type").default("upgrade").notNull(), // "upgrade" | "capability" | "system"
@@ -59,9 +59,33 @@ export const godfleshNotifications = pgTable("godflesh_notifications", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export type GodfleshUser = typeof godfleshUsers.$inferSelect;
-export type GodfleshUsage = typeof godfleshUsage.$inferSelect;
-export type GodfleshBrain = typeof godfleshBrain.$inferSelect;
-export type GodfleshUpgrade = typeof godfleshUpgrades.$inferSelect;
-export type GodfleshNotification = typeof godfleshNotifications.$inferSelect;
-export const insertGodfleshUserSchema = createInsertSchema(godfleshUsers);
+// User projects — built by 6 AI agents
+export const omnimensProjects = pgTable("godflesh_projects", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => omnimensUsers.id),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  type: text("type").notNull(), // "webapp"|"website"|"game"|"api"|"dataviz"|"extension"|"tool"
+  status: text("status").default("idle").notNull(), // "idle"|"building"|"ready"|"failed"
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Files produced by the build agents for each project
+export const omnimensProjectFiles = pgTable("godflesh_project_files", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").notNull().references(() => omnimensProjects.id, { onDelete: "cascade" }),
+  filename: text("filename").notNull(),
+  content: text("content").notNull(),
+  language: text("language").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type OmnimensUser = typeof omnimensUsers.$inferSelect;
+export type OmnimensUsage = typeof omnimensUsage.$inferSelect;
+export type OmnimensBrain = typeof omnimensBrain.$inferSelect;
+export type OmnimensUpgrade = typeof omnimensUpgrades.$inferSelect;
+export type OmnimensNotification = typeof omnimensNotifications.$inferSelect;
+export type OmnimensProject = typeof omnimensProjects.$inferSelect;
+export type OmnimensProjectFile = typeof omnimensProjectFiles.$inferSelect;
+export const insertOmnimensUserSchema = createInsertSchema(omnimensUsers);

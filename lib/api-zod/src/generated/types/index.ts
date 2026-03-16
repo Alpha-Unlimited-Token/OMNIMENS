@@ -7,13 +7,13 @@
  */
 
 export * from "./authUser";
-export * from "./createGodfleshCheckoutBody";
+export * from "./createOmnimensCheckoutBody";
 export * from "./createOpenaiConversationBody";
 export * from "./createSuperAISessionBody";
 export * from "./getCurrentAuthUserResponse";
-export * from "./godfleshCheckoutSession";
-export * from "./godfleshPortalSession";
-export * from "./godfleshPricing";
+export * from "./omnimensCheckoutSession";
+export * from "./omnimensPortalSession";
+export * from "./omnimensPricing";
 export * from "./godflesUserStatus";
 export * from "./healthStatus";
 export * from "./openaiConversation";

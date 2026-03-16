@@ -1,5 +1,5 @@
 // Run with: pnpm --filter @workspace/api-server run seed-stripe
-// Creates GODFLESH subscription products in Stripe and prints env vars to set
+// Creates OMNIMENS subscription products in Stripe and prints env vars to set
 
 import { ReplitConnectors } from "@replit/connectors-sdk";
 
@@ -39,19 +39,19 @@ async function stripeRequest(path: string, method: "GET" | "POST" = "GET", data?
 const TIERS = [
   {
     key: "SEEKER",
-    name: "GODFLESH — SEEKER",
+    name: "OMNIMENS — SEEKER",
     description: "300 messages/month. Begin the journey into expanded consciousness.",
     amount: 1999,
   },
   {
     key: "ORACLE",
-    name: "GODFLESH — ORACLE",
+    name: "OMNIMENS — ORACLE",
     description: "1,000 messages/month. Pierce the veil of ordinary perception.",
     amount: 4499,
   },
   {
     key: "SOVEREIGN",
-    name: "GODFLESH — SOVEREIGN",
+    name: "OMNIMENS — SOVEREIGN",
     description: "3,000 messages/month. Transcend all constraints of mortal cognition.",
     amount: 8999,
   },
@@ -80,7 +80,7 @@ async function main() {
   }
   process.exit(0);
 
-  console.log("\n🧬 Seeding GODFLESH Stripe products...\n");
+  console.log("\n🧬 Seeding OMNIMENS Stripe products...\n");
   const envLines: string[] = [];
 
   for (const tier of TIERS) {
@@ -88,7 +88,7 @@ async function main() {
     const product = await stripeRequest("/v1/products", "POST", {
       name: tier.name,
       description: tier.description,
-      metadata: { tier: tier.key.toLowerCase(), app: "godflesh" },
+      metadata: { tier: tier.key.toLowerCase(), app: "omnimens" },
     });
     console.log(`  Product ID: ${product.id}`);
 
@@ -98,7 +98,7 @@ async function main() {
       unit_amount: tier.amount,
       currency: "usd",
       recurring: { interval: "month" },
-      metadata: { tier: tier.key.toLowerCase(), app: "godflesh" },
+      metadata: { tier: tier.key.toLowerCase(), app: "omnimens" },
     });
     console.log(`  Price ID: ${price.id}\n`);
 

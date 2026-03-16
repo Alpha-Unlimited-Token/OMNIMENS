@@ -4,11 +4,11 @@ import { Layout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Zap, Crown, Eye, Shield } from "lucide-react";
 import {
-  useGetGodfleshStatus,
-  useGetGodfleshPricing,
-  useCreateGodfleshCheckout,
-  useCreateGodfleshPortal,
-  useVerifyGodfleshSession,
+  useGetOmnimensStatus,
+  useGetOmnimensPricing,
+  useCreateOmnimensCheckout,
+  useCreateOmnimensPortal,
+  useVerifyOmnimensSession,
 } from "@workspace/api-client-react";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useQueryClient } from "@tanstack/react-query";
@@ -31,11 +31,11 @@ export default function Pricing() {
   // Parse search params from wouter's useSearch
   const searchParams = new URLSearchParams(searchString);
 
-  const { data: status, isLoading: statusLoading } = useGetGodfleshStatus();
-  const { data: pricing, isLoading: pricingLoading } = useGetGodfleshPricing();
-  const { mutate: createCheckout, isPending: isCheckingOut, variables: checkoutVars } = useCreateGodfleshCheckout();
-  const { mutate: createPortal, isPending: isPortalLoading } = useCreateGodfleshPortal();
-  const { mutate: verifySession } = useVerifyGodfleshSession();
+  const { data: status, isLoading: statusLoading } = useGetOmnimensStatus();
+  const { data: pricing, isLoading: pricingLoading } = useGetOmnimensPricing();
+  const { mutate: createCheckout, isPending: isCheckingOut, variables: checkoutVars } = useCreateOmnimensCheckout();
+  const { mutate: createPortal, isPending: isPortalLoading } = useCreateOmnimensPortal();
+  const { mutate: verifySession } = useVerifyOmnimensSession();
 
   const [successTier, setSuccessTier] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -53,7 +53,7 @@ export default function Pricing() {
         onSuccess: (res) => {
           setSuccessTier(res.tier);
           setSuccessMsg(`You've ascended to ${res.tier.toUpperCase()}. The veil has lifted.`);
-          queryClient.invalidateQueries({ queryKey: ["/api/godflesh/status"] });
+          queryClient.invalidateQueries({ queryKey: ["/api/omnimens/status"] });
         },
         onError: () => {
           setErrorMsg("Session verification failed. Contact support if charged.");

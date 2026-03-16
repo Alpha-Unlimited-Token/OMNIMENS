@@ -1,4 +1,4 @@
-# GODFLESH
+# OMNIMENS
 
 > *Named by council vote of 6 specialized AI agents after 3 rounds of self-improvement.*
 

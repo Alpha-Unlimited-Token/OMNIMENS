@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { getGetGodfleshStatusQueryKey } from "@workspace/api-client-react";
+import { getGetOmnimensStatusQueryKey } from "@workspace/api-client-react";
 
 export type GeneratedImage = {
   url: string;
@@ -17,7 +17,7 @@ export type Artifact = {
 
 export type Message = {
   id: string;
-  role: "user" | "godflesh";
+  role: "user" | "omnimens";
   content: string;
   files?: AttachedFile[];
   images?: GeneratedImage[];
@@ -32,7 +32,7 @@ export type AttachedFile = {
   preview?: string;
 };
 
-export function useGodfleshChat(onLimitReached: () => void) {
+export function useOmnimensChat(onLimitReached: () => void) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -82,7 +82,7 @@ export function useGodfleshChat(onLimitReached: () => void) {
         form.append("files", file);
       }
 
-      const res = await fetch("/api/godflesh/chat", {
+      const res = await fetch("/api/omnimens/chat", {
         method: "POST",
         body: form,
         signal: abortControllerRef.current.signal,
@@ -104,7 +104,7 @@ export function useGodfleshChat(onLimitReached: () => void) {
       const decoder = new TextDecoder();
       let assistantContent = "";
 
-      setMessages((prev) => [...prev, { id: assistantMsgId, role: "godflesh", content: "" }]);
+      setMessages((prev) => [...prev, { id: assistantMsgId, role: "omnimens", content: "" }]);
 
       while (true) {
         const { done, value } = await reader.read();
@@ -123,7 +123,7 @@ export function useGodfleshChat(onLimitReached: () => void) {
                 setMessages((prev) => {
                   const newMsgs = [...prev];
                   const lastMsg = newMsgs[newMsgs.length - 1];
-                  if (lastMsg?.role === "godflesh") {
+                  if (lastMsg?.role === "omnimens") {
                     lastMsg.content = assistantContent;
                   }
                   return newMsgs;
@@ -211,7 +211,7 @@ export function useGodfleshChat(onLimitReached: () => void) {
     } finally {
       setIsTyping(false);
       abortControllerRef.current = null;
-      queryClient.invalidateQueries({ queryKey: getGetGodfleshStatusQueryKey() });
+      queryClient.invalidateQueries({ queryKey: getGetOmnimensStatusQueryKey() });
     }
   };
 

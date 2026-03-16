@@ -2,15 +2,15 @@ import { useEffect } from "react";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
-import { useGetGodfleshStatus, useCreateGodfleshPortal } from "@workspace/api-client-react";
+import { useGetOmnimensStatus, useCreateOmnimensPortal } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { User, LogOut, Activity, Zap, Shield } from "lucide-react";
 
 export default function Account() {
   const { isAuthenticated, user, isLoading, logout } = useAuth();
   const [, setLocation] = useLocation();
-  const { data: status, isLoading: statusLoading } = useGetGodfleshStatus();
-  const { mutate: createPortal, isPending: isPortalLoading } = useCreateGodfleshPortal();
+  const { data: status, isLoading: statusLoading } = useGetOmnimensStatus();
+  const { mutate: createPortal, isPending: isPortalLoading } = useCreateOmnimensPortal();
 
   // Protect route
   useEffect(() => {

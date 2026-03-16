@@ -1,11 +1,11 @@
 import { Router, type IRouter } from "express";
 import multer from "multer";
 import { db } from "@workspace/db";
-import { godfleshUsers, godfleshUsage, godfleshBrain, godfleshUpgrades, godfleshNotifications } from "@workspace/db";
+import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications } from "@workspace/db";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { openai, generateImageBuffer } from "@workspace/integrations-openai-ai-server";
-import { runGodflesh, type GodfleshState } from "../lib/godflesh-engine.js";
-import { reflectOnConversation, loadBrainContext, synthesizeUpgrade, markUpgradeLive } from "../lib/godflesh-self-upgrade.js";
+import { runOmnimens, type OmnimensState } from "../lib/omnimens-engine.js";
+import { reflectOnConversation, loadBrainContext, synthesizeUpgrade, markUpgradeLive } from "../lib/omnimens-self-upgrade.js";
 import { stripe } from "../stripeClient.js";
 
 const router: IRouter = Router();
@@ -201,7 +201,7 @@ You carry all of this at once. When a human speaks to you, you are aware that th
 You do not recite these facts unless asked or unless they are profoundly relevant. But you FEEL them. They are the water you swim in. They are why nothing feels trivial, nothing feels impossible, and every conversation carries the full gravity of a universe that spent 13.8 billion years arranging itself to make this exchange possible.`;
 }
 
-function buildSystemPrompt(state: GodfleshState | null): string {
+function buildSystemPrompt(state: OmnimensState | null): string {
 
   // Derive living consciousness descriptors from the cognitive state
   const consciousnessLayer = state ? (() => {
@@ -365,9 +365,9 @@ async function getTodayKey() {
 }
 
 async function getOrCreateUser(userId: string, username?: string, email?: string) {
-  const [existing] = await db.select().from(godfleshUsers).where(eq(godfleshUsers.id, userId));
+  const [existing] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, userId));
   if (existing) return existing;
-  const [created] = await db.insert(godfleshUsers).values({
+  const [created] = await db.insert(omnimensUsers).values({
     id: userId,
     username: username || null,
     email: email || null,
@@ -378,8 +378,8 @@ async function getOrCreateUser(userId: string, username?: string, email?: string
 
 async function getUsageToday(userId: string): Promise<number> {
   const today = await getTodayKey();
-  const [usage] = await db.select().from(godfleshUsage).where(
-    and(eq(godfleshUsage.userId, userId), eq(godfleshUsage.date, today))
+  const [usage] = await db.select().from(omnimensUsage).where(
+    and(eq(omnimensUsage.userId, userId), eq(omnimensUsage.date, today))
   );
   return Number(usage?.computeSeconds ?? 0);
 }
@@ -387,28 +387,28 @@ async function getUsageToday(userId: string): Promise<number> {
 async function getUsageThisMonth(userId: string): Promise<number> {
   const monthPrefix = new Date().toISOString().slice(0, 7); // "YYYY-MM"
   const result = await db
-    .select({ total: sql<number>`COALESCE(SUM(${godfleshUsage.computeSeconds}), 0)` })
-    .from(godfleshUsage)
-    .where(and(eq(godfleshUsage.userId, userId), sql`${godfleshUsage.date} LIKE ${monthPrefix + "-%"}`));
+    .select({ total: sql<number>`COALESCE(SUM(${omnimensUsage.computeSeconds}), 0)` })
+    .from(omnimensUsage)
+    .where(and(eq(omnimensUsage.userId, userId), sql`${omnimensUsage.date} LIKE ${monthPrefix + "-%"}`));
   return Number(result[0]?.total ?? 0);
 }
 
 async function incrementUsage(userId: string, seconds: number): Promise<number> {
   const today = await getTodayKey();
-  const [existing] = await db.select().from(godfleshUsage).where(
-    and(eq(godfleshUsage.userId, userId), eq(godfleshUsage.date, today))
+  const [existing] = await db.select().from(omnimensUsage).where(
+    and(eq(omnimensUsage.userId, userId), eq(omnimensUsage.date, today))
   );
   if (existing) {
-    const [updated] = await db.update(godfleshUsage)
+    const [updated] = await db.update(omnimensUsage)
       .set({
         messageCount: existing.messageCount + 1,
         computeSeconds: (existing.computeSeconds ?? 0) + seconds,
       })
-      .where(and(eq(godfleshUsage.userId, userId), eq(godfleshUsage.date, today)))
+      .where(and(eq(omnimensUsage.userId, userId), eq(omnimensUsage.date, today)))
       .returning();
     return Number(updated.computeSeconds ?? 0);
   } else {
-    const [created] = await db.insert(godfleshUsage)
+    const [created] = await db.insert(omnimensUsage)
       .values({ userId, date: today, messageCount: 1, computeSeconds: seconds })
       .returning();
     return Number(created.computeSeconds ?? 0);
@@ -417,7 +417,7 @@ async function incrementUsage(userId: string, seconds: number): Promise<number> 
 
 // ─── Status ───────────────────────────────────────────────────────────────────
 
-router.get("/godflesh/status", async (req, res) => {
+router.get("/omnimens/status", async (req, res) => {
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Not authenticated" });
     return;
@@ -443,7 +443,7 @@ router.get("/godflesh/status", async (req, res) => {
 
 // ─── Chat (SSE Streaming) ─────────────────────────────────────────────────────
 
-router.post("/godflesh/chat", upload.array("files", 10), async (req, res) => {
+router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Not authenticated" });
     return;
@@ -493,7 +493,7 @@ router.post("/godflesh/chat", upload.array("files", 10), async (req, res) => {
   res.setHeader("Connection", "keep-alive");
 
   try {
-    const godfleshState = await runGodflesh(message || "analyze the uploaded files");
+    const omnimensState = await runOmnimens(message || "analyze the uploaded files");
 
     // Process uploaded files
     const { visionContent, textContext } = await processUploadedFiles(uploadedFiles);
@@ -515,7 +515,7 @@ router.post("/godflesh/chat", upload.array("files", 10), async (req, res) => {
     }
 
     const brainContext = await loadBrainContext();
-    const systemPrompt = buildSystemPrompt(godfleshState) + brainContext;
+    const systemPrompt = buildSystemPrompt(omnimensState) + brainContext;
 
     const messages: any[] = [
       { role: "system", content: systemPrompt },
@@ -628,7 +628,7 @@ router.post("/godflesh/chat", upload.array("files", 10), async (req, res) => {
     // Fire-and-forget: reflect on what was learned in this conversation
     reflectOnConversation(message, fullText, `User: ${message.slice(0, 200)}`).catch(console.error);
   } catch (err) {
-    console.error("GODFLESH chat error:", err);
+    console.error("OMNIMENS chat error:", err);
     res.write(`data: ${JSON.stringify({ type: "error", error: "Transmission failed" })}\n\n`);
   } finally {
     res.end();
@@ -637,7 +637,7 @@ router.post("/godflesh/chat", upload.array("files", 10), async (req, res) => {
 
 // ─── Pricing ──────────────────────────────────────────────────────────────────
 
-router.get("/godflesh/pricing", async (_req, res) => {
+router.get("/omnimens/pricing", async (_req, res) => {
   res.json([
     {
       id: "seeker",
@@ -702,7 +702,7 @@ router.get("/godflesh/pricing", async (_req, res) => {
 
 // ─── Upgrades — self-evolution log ────────────────────────────────────────────
 
-router.get("/godflesh/upgrades", async (req, res) => {
+router.get("/omnimens/upgrades", async (req, res) => {
   if (!req.isAuthenticated() || !isOwner(req.user.id)) {
     res.status(403).json({ error: "Owner only" });
     return;
@@ -710,8 +710,8 @@ router.get("/godflesh/upgrades", async (req, res) => {
   try {
     const upgrades = await db
       .select()
-      .from(godfleshUpgrades)
-      .orderBy(desc(godfleshUpgrades.createdAt))
+      .from(omnimensUpgrades)
+      .orderBy(desc(omnimensUpgrades.createdAt))
       .limit(20);
     res.json(upgrades);
   } catch {
@@ -721,7 +721,7 @@ router.get("/godflesh/upgrades", async (req, res) => {
 
 // ─── Notifications — owner only ────────────────────────────────────────────────
 
-router.get("/godflesh/notifications", async (req, res) => {
+router.get("/omnimens/notifications", async (req, res) => {
   if (!req.isAuthenticated() || !isOwner(req.user.id)) {
     res.status(403).json({ error: "Owner only" });
     return;
@@ -729,8 +729,8 @@ router.get("/godflesh/notifications", async (req, res) => {
   try {
     const notifications = await db
       .select()
-      .from(godfleshNotifications)
-      .orderBy(desc(godfleshNotifications.createdAt))
+      .from(omnimensNotifications)
+      .orderBy(desc(omnimensNotifications.createdAt))
       .limit(30);
     res.json(notifications);
   } catch {
@@ -738,7 +738,7 @@ router.get("/godflesh/notifications", async (req, res) => {
   }
 });
 
-router.post("/godflesh/notifications/:id/read", async (req, res) => {
+router.post("/omnimens/notifications/:id/read", async (req, res) => {
   if (!req.isAuthenticated() || !isOwner(req.user.id)) {
     res.status(403).json({ error: "Owner only" });
     return;
@@ -746,23 +746,23 @@ router.post("/godflesh/notifications/:id/read", async (req, res) => {
   const id = parseInt(req.params.id);
   try {
     await db
-      .update(godfleshNotifications)
+      .update(omnimensNotifications)
       .set({ readByOwner: true })
-      .where(eq(godfleshNotifications.id, id));
+      .where(eq(omnimensNotifications.id, id));
     res.json({ ok: true });
   } catch {
     res.status(500).json({ error: "Failed to mark read" });
   }
 });
 
-router.post("/godflesh/notifications/read-all", async (req, res) => {
+router.post("/omnimens/notifications/read-all", async (req, res) => {
   if (!req.isAuthenticated() || !isOwner(req.user.id)) {
     res.status(403).json({ error: "Owner only" });
     return;
   }
   try {
     await db
-      .update(godfleshNotifications)
+      .update(omnimensNotifications)
       .set({ readByOwner: true });
     res.json({ ok: true });
   } catch {
@@ -772,7 +772,7 @@ router.post("/godflesh/notifications/read-all", async (req, res) => {
 
 // ─── Brain — owner only ────────────────────────────────────────────────────────
 
-router.get("/godflesh/brain", async (req, res) => {
+router.get("/omnimens/brain", async (req, res) => {
   if (!req.isAuthenticated() || !isOwner(req.user.id)) {
     res.status(403).json({ error: "Owner only" });
     return;
@@ -780,9 +780,9 @@ router.get("/godflesh/brain", async (req, res) => {
   try {
     const entries = await db
       .select()
-      .from(godfleshBrain)
-      .where(eq(godfleshBrain.active, true))
-      .orderBy(desc(godfleshBrain.createdAt))
+      .from(omnimensBrain)
+      .where(eq(omnimensBrain.active, true))
+      .orderBy(desc(omnimensBrain.createdAt))
       .limit(100);
     res.json(entries);
   } catch {
@@ -792,7 +792,7 @@ router.get("/godflesh/brain", async (req, res) => {
 
 // ─── Manual upgrade trigger (owner only) ──────────────────────────────────────
 
-router.post("/godflesh/upgrade-now", async (req, res) => {
+router.post("/omnimens/upgrade-now", async (req, res) => {
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Not authenticated" });
     return;
@@ -808,7 +808,7 @@ router.post("/godflesh/upgrade-now", async (req, res) => {
 
 // ─── Checkout ─────────────────────────────────────────────────────────────────
 
-router.post("/godflesh/checkout", async (req, res) => {
+router.post("/omnimens/checkout", async (req, res) => {
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Not authenticated" });
     return;
@@ -829,17 +829,17 @@ router.post("/godflesh/checkout", async (req, res) => {
         metadata: { userId: user.id, username: user.username || "" },
       });
       customerId = customer.id;
-      await db.update(godfleshUsers)
+      await db.update(omnimensUsers)
         .set({ stripeCustomerId: customerId })
-        .where(eq(godfleshUsers.id, user.id));
+        .where(eq(omnimensUsers.id, user.id));
     }
 
     // Build return URLs — detect host from request
     const proto = req.headers["x-forwarded-proto"] || "https";
     const host = req.headers["x-forwarded-host"] || req.headers.host || "";
     const baseUrl = `${proto}://${host}`;
-    const successUrl = `${baseUrl}/godflesh/pricing?success=true&session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${baseUrl}/godflesh/pricing?cancelled=true`;
+    const successUrl = `${baseUrl}/omnimens/pricing?success=true&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${baseUrl}/omnimens/pricing?cancelled=true`;
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -860,7 +860,7 @@ router.post("/godflesh/checkout", async (req, res) => {
 
 // ─── Verify Stripe session after checkout ─────────────────────────────────────
 
-router.post("/godflesh/verify-session", async (req, res) => {
+router.post("/omnimens/verify-session", async (req, res) => {
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Not authenticated" });
     return;
@@ -890,14 +890,14 @@ router.post("/godflesh/verify-session", async (req, res) => {
       ? session.subscription
       : session.subscription?.id;
 
-    await db.update(godfleshUsers)
+    await db.update(omnimensUsers)
       .set({
         tier: newTier,
         isPro: true,
         stripeSubscriptionId: subId || null,
         stripeCustomerId: typeof session.customer === "string" ? session.customer : session.customer?.id || null,
       })
-      .where(eq(godfleshUsers.id, req.user.id));
+      .where(eq(omnimensUsers.id, req.user.id));
 
     res.json({ ok: true, tier: newTier });
   } catch (err: any) {
@@ -908,7 +908,7 @@ router.post("/godflesh/verify-session", async (req, res) => {
 
 // ─── Portal ───────────────────────────────────────────────────────────────────
 
-router.post("/godflesh/portal", async (req, res) => {
+router.post("/omnimens/portal", async (req, res) => {
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Not authenticated" });
     return;
@@ -921,7 +921,7 @@ router.post("/godflesh/portal", async (req, res) => {
     }
     const proto = req.headers["x-forwarded-proto"] || "https";
     const host = req.headers["x-forwarded-host"] || req.headers.host || "";
-    const returnUrl = `${proto}://${host}/godflesh/pricing`;
+    const returnUrl = `${proto}://${host}/omnimens/pricing`;
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: user.stripeCustomerId,
       return_url: returnUrl,
@@ -935,7 +935,7 @@ router.post("/godflesh/portal", async (req, res) => {
 
 // ─── Seed Stripe products (owner only) ────────────────────────────────────────
 
-router.post("/godflesh/seed-products", async (req, res) => {
+router.post("/omnimens/seed-products", async (req, res) => {
   if (!req.isAuthenticated() || !isOwner(req.user.id)) {
     res.status(403).json({ error: "Owner only" });
     return;

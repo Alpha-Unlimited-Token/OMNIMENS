@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-interface GodfleshPresenceProps {
+interface OmnimensPresenceProps {
   size?: number;
   isSpeaking: boolean;
   pitchIntensity: number;
@@ -125,12 +125,12 @@ function drawSacredTriangle(
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export function GodfleshPresence({
+export function OmnimensPresence({
   size = 260,
   isSpeaking,
   pitchIntensity,
   className = "",
-}: GodfleshPresenceProps) {
+}: OmnimensPresenceProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isSpeakingRef    = useRef(isSpeaking);
   const pitchRef         = useRef(pitchIntensity);

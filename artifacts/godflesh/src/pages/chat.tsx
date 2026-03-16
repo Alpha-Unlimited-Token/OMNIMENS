@@ -2,17 +2,17 @@ import { useEffect, useRef, useState } from "react";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
-import { useGetGodfleshStatus } from "@workspace/api-client-react";
-import { useGodfleshChat, type GeneratedImage, type Artifact } from "@/hooks/use-godflesh-chat";
-import { useGodfleshVoice } from "@/hooks/use-godflesh-voice";
+import { useGetOmnimensStatus } from "@workspace/api-client-react";
+import { useOmnimensChat, type GeneratedImage, type Artifact } from "@/hooks/use-omnimens-chat";
+import { useOmnimensVoice } from "@/hooks/use-omnimens-voice";
 import { VoiceIndicator } from "@/components/voice-indicator";
-import { GodfleshPresence } from "@/components/godflesh-presence";
+import { OmnimensPresence } from "@/components/omnimens-presence";
 import { PendingFileList, AttachedFileList } from "@/components/file-attachments";
 import { Button } from "@/components/ui/button";
 import { Send, StopCircle, ShieldAlert, Volume2, VolumeX, Paperclip, Download, Loader2, Expand, FileCode, Box, Film, Music, BarChart3, Shapes } from "lucide-react";
-import { GodfleshIcon } from "@/components/godflesh-icon";
+import { OmnimensIcon } from "@/components/omnimens-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
-import { GodfleshNotificationBell } from "@/components/godflesh-notifications";
+import { OmnimensNotificationBell } from "@/components/omnimens-notifications";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { motion, AnimatePresence } from "framer-motion";
@@ -51,17 +51,17 @@ export default function Chat() {
   const [showLimitModal, setShowLimitModal] = useState(false);
   const lastSpokenIdRef = useRef<string | null>(null);
 
-  const { data: status, isLoading: statusLoading } = useGetGodfleshStatus();
-  const { messages, sendMessage, isTyping, error, stopGeneration } = useGodfleshChat(() => {
+  const { data: status, isLoading: statusLoading } = useGetOmnimensStatus();
+  const { messages, sendMessage, isTyping, error, stopGeneration } = useOmnimensChat(() => {
     setShowLimitModal(true);
   });
-  const voice = useGodfleshVoice();
+  const voice = useOmnimensVoice();
 
   // Auto-speak latest completed OMNIMENS message
   useEffect(() => {
     if (!voice.isEnabled || isTyping || messages.length === 0) return;
     const last = messages[messages.length - 1];
-    if (last.role !== "godflesh") return;
+    if (last.role !== "omnimens") return;
     if (last.id === lastSpokenIdRef.current) return;
     lastSpokenIdRef.current = last.id;
     voice.speak(last.content, last.id);
@@ -135,7 +135,7 @@ export default function Chat() {
           </div>
 
           <div className="flex items-center gap-4">
-            {status?.isOwner && <GodfleshNotificationBell />}
+            {status?.isOwner && <OmnimensNotificationBell />}
 
             <button
               onClick={voice.toggle}
@@ -173,10 +173,10 @@ export default function Chat() {
         </div>
 
         {/* Chat Area */}
-        <div className="flex-1 overflow-y-auto godflesh-scrollbar bg-black/40 border border-white/5 rounded-xl p-4 md:p-6 mb-4 relative shadow-inner">
+        <div className="flex-1 overflow-y-auto omnimens-scrollbar bg-black/40 border border-white/5 rounded-xl p-4 md:p-6 mb-4 relative shadow-inner">
           {messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center select-none">
-              <GodfleshPresence
+              <OmnimensPresence
                 size={240}
                 isSpeaking={voice.isSpeaking}
                 pitchIntensity={voice.pitchIntensity}
@@ -188,7 +188,7 @@ export default function Chat() {
           ) : (
             <>
               <div className="absolute top-3 right-3 z-10 pointer-events-none">
-                <GodfleshPresence
+                <OmnimensPresence
                   size={88}
                   isSpeaking={voice.isSpeaking}
                   pitchIntensity={voice.pitchIntensity}
@@ -212,9 +212,9 @@ export default function Chat() {
                               isSpeakingThis ? "border-primary/50 shadow-[0_0_28px_rgba(180,140,255,0.20)]" : "border-primary/15"
                             }`
                       }`}>
-                        {msg.role === "godflesh" && (
+                        {msg.role === "omnimens" && (
                           <div className="flex items-center gap-1 mb-2 text-primary font-bold text-[10px] tracking-widest uppercase">
-                            <GodfleshIcon size={14} className="shrink-0" />
+                            <OmnimensIcon size={14} className="shrink-0" />
                             <span>OMNIMENS</span>
                             <VoiceIndicator isSpeaking={isSpeakingThis} binaryStream={voice.binaryStream} />
                           </div>
@@ -272,7 +272,7 @@ export default function Chat() {
                   <div className="flex justify-start">
                     <div className="bg-primary/5 border border-primary/20 rounded-2xl rounded-tl-sm px-5 py-4">
                       <div className="flex items-center gap-2 mb-2 text-primary font-bold text-[10px] tracking-widest uppercase">
-                        <GodfleshIcon size={14} />
+                        <OmnimensIcon size={14} />
                         OMNIMENS
                       </div>
                       <div className="flex gap-1">
@@ -343,7 +343,7 @@ export default function Chat() {
                 }
               }}
               placeholder={pendingFiles.length > 0 ? "Describe what to create with these files..." : "Query the intelligence... or attach files to build something"}
-              className="w-full bg-black border border-white/20 focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-xl pl-10 pr-24 py-4 text-white font-mono text-sm resize-none h-[60px] godflesh-scrollbar outline-none transition-all placeholder:text-white/20"
+              className="w-full bg-black border border-white/20 focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-xl pl-10 pr-24 py-4 text-white font-mono text-sm resize-none h-[60px] omnimens-scrollbar outline-none transition-all placeholder:text-white/20"
               disabled={isTyping}
             />
 
@@ -410,7 +410,7 @@ function GeneratedImageCard({ image }: { image: GeneratedImage }) {
   const handleDownload = () => {
     const a = document.createElement("a");
     a.href = image.url;
-    a.download = `godflesh-${image.index + 1}.png`;
+    a.download = `omnimens-${image.index + 1}.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

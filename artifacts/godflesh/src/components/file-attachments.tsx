@@ -1,5 +1,5 @@
 import { X, FileText, FileCode, FileImage, File } from "lucide-react";
-import type { AttachedFile } from "@/hooks/use-godflesh-chat";
+import type { AttachedFile } from "@/hooks/use-omnimens-chat";
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes}B`;

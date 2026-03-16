@@ -1,8 +1,8 @@
 'use strict';
 
 /**
- * GODFLESH Core Runner
- * Runs GODFLESH's own computational pipeline against each chat message.
+ * OMNIMENS Core Runner
+ * Runs OMNIMENS's own computational pipeline against each chat message.
  * Accepts JSON via stdin: { message: string }
  * Outputs JSON to stdout: { iq, training, memory, hopfield, plasticity, outputHash }
  */
@@ -30,7 +30,7 @@ function nowMs() {
   return Number(process.hrtime.bigint()) / 1e6;
 }
 
-// Encode a text message as a binary vector for GODFLESH's memory system
+// Encode a text message as a binary vector for OMNIMENS's memory system
 function messageToVec(message, length) {
   const vec = new Array(length).fill(0);
   for (let i = 0; i < message.length; i++) {
@@ -171,7 +171,7 @@ async function main() {
     steps.push({ name: e.name, ms: Number(e.ms.toFixed(3)) });
   });
 
-  // Score GODFLESH's own intelligence
+  // Score OMNIMENS's own intelligence
   const sie = new SelfImprovementEngine({
     rootDir: path.join(__dirname),
     mainFile: 'runner.js',
@@ -182,7 +182,7 @@ async function main() {
 
   const input = ACP.serialize({
     from: 'user',
-    to: 'godflesh',
+    to: 'omnimens',
     type: 'query',
     payload: {
       ts: Date.now(),
@@ -208,6 +208,6 @@ async function main() {
 }
 
 main().catch((e) => {
-  process.stderr.write('GODFLESH_RUNNER_ERROR: ' + (e && e.stack ? e.stack : String(e)) + '\n');
+  process.stderr.write('OMNIMENS_RUNNER_ERROR: ' + (e && e.stack ? e.stack : String(e)) + '\n');
   process.exit(1);
 });

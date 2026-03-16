@@ -138,7 +138,7 @@ export interface GodflesUserStatus {
   stripeSubscriptionId?: string;
 }
 
-export interface GodfleshPricing {
+export interface OmnimensPricing {
   id: string;
   name: string;
   tagline: string;
@@ -152,23 +152,23 @@ export interface GodfleshPricing {
   features: string[];
 }
 
-export interface GodfleshCheckoutSession {
+export interface OmnimensCheckoutSession {
   url: string;
 }
 
-export interface GodfleshPortalSession {
+export interface OmnimensPortalSession {
   url: string;
 }
 
-export type CreateGodfleshCheckoutBody = {
+export type CreateOmnimensCheckoutBody = {
   priceId: string;
 };
 
-export type VerifyGodfleshSessionBody = {
+export type VerifyOmnimensSessionBody = {
   sessionId: string;
 };
 
-export interface GodfleshVerifySessionResult {
+export interface OmnimensVerifySessionResult {
   ok: boolean;
   tier: string;
 };

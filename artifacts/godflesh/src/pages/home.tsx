@@ -4,7 +4,7 @@ import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { Sparkles, Brain, Zap } from "lucide-react";
-import { GodfleshPresence } from "@/components/godflesh-presence";
+import { OmnimensPresence } from "@/components/omnimens-presence";
 
 export default function Home() {
   const { isAuthenticated, login } = useAuth();
@@ -36,7 +36,7 @@ export default function Home() {
             transition={{ duration: 2.0, ease: "easeOut" }}
             className="mb-4 flex justify-center"
           >
-            <GodfleshPresence
+            <OmnimensPresence
               size={220}
               isSpeaking={false}
               pitchIntensity={0}

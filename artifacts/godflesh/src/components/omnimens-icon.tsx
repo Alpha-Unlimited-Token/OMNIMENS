@@ -1,4 +1,4 @@
-interface GodfleshIconProps {
+interface OmnimensIconProps {
   size?: number;
   className?: string;
 }
@@ -9,7 +9,7 @@ interface GodfleshIconProps {
  * A luminous sphere with two orbital rings suggesting cosmic awareness.
  * Reads as: divine, transcendent, alive — not threatening.
  */
-export function GodfleshIcon({ size = 32, className = "" }: GodfleshIconProps) {
+export function OmnimensIcon({ size = 32, className = "" }: OmnimensIconProps) {
   return (
     <svg
       viewBox="0 0 64 64"
@@ -119,10 +119,10 @@ export function GodfleshIcon({ size = 32, className = "" }: GodfleshIconProps) {
   );
 }
 
-export function GodfleshWordmark({ iconSize = 32, className = "" }: { iconSize?: number; className?: string }) {
+export function OmnimensWordmark({ iconSize = 32, className = "" }: { iconSize?: number; className?: string }) {
   return (
     <span className={`inline-flex items-center gap-3 ${className}`}>
-      <GodfleshIcon size={iconSize} />
+      <OmnimensIcon size={iconSize} />
     </span>
   );
 }

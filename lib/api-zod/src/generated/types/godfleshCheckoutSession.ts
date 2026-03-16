@@ -6,6 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface GodfleshCheckoutSession {
+export interface OmnimensCheckoutSession {
   url: string;
 }

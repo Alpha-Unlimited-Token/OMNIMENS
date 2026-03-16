@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export interface GodfleshState {
+export interface OmnimensState {
   iq: number;
   training: { loss: number; acc: number; ms: number; iters: number };
   memory: { top3: { id: string; dist: number }[]; patternCount: number };
@@ -17,9 +17,9 @@ export interface GodfleshState {
   outputHash: string;
 }
 
-export async function runGodflesh(message: string): Promise<GodfleshState | null> {
+export async function runOmnimens(message: string): Promise<OmnimensState | null> {
   return new Promise((resolve) => {
-    const runnerPath = path.join(__dirname, "../godflesh/runner.js");
+    const runnerPath = path.join(__dirname, "../omnimens/runner.js");
     const child = spawn("node", [runnerPath], {
       stdio: ["pipe", "pipe", "pipe"],
       timeout: 20000,
@@ -36,8 +36,8 @@ export async function runGodflesh(message: string): Promise<GodfleshState | null
 
     child.on("close", (code) => {
       if (code !== 0) {
-        const errLine = stderr.split("\n").find(l => l.startsWith("GODFLESH_RUNNER_ERROR"));
-        console.error("GODFLESH engine error:", errLine || stderr.slice(0, 500));
+        const errLine = stderr.split("\n").find(l => l.startsWith("OMNIMENS_RUNNER_ERROR"));
+        console.error("OMNIMENS engine error:", errLine || stderr.slice(0, 500));
         resolve(null);
         return;
       }
@@ -45,15 +45,15 @@ export async function runGodflesh(message: string): Promise<GodfleshState | null
         // stdout may contain GD training lines (from math_engine) — find the JSON line
         const jsonLine = stdout.trim().split("\n").find(l => l.startsWith("{"));
         if (!jsonLine) { resolve(null); return; }
-        resolve(JSON.parse(jsonLine) as GodfleshState);
+        resolve(JSON.parse(jsonLine) as OmnimensState);
       } catch (e) {
-        console.error("GODFLESH parse error:", e);
+        console.error("OMNIMENS parse error:", e);
         resolve(null);
       }
     });
 
     child.on("error", (err) => {
-      console.error("GODFLESH spawn error:", err);
+      console.error("OMNIMENS spawn error:", err);
       resolve(null);
     });
   });
