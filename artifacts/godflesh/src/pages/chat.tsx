@@ -3,13 +3,13 @@ import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
-import { useOmnimensChat, type GeneratedImage, type Artifact } from "@/hooks/use-omnimens-chat";
+import { useOmnimensChat, type GeneratedImage, type Artifact, type CostBreakdown } from "@/hooks/use-omnimens-chat";
 import { useOmnimensVoice } from "@/hooks/use-omnimens-voice";
 import { VoiceIndicator } from "@/components/voice-indicator";
 import { OmnimensPresence } from "@/components/omnimens-presence";
 import { PendingFileList, AttachedFileList } from "@/components/file-attachments";
 import { Button } from "@/components/ui/button";
-import { Send, StopCircle, ShieldAlert, Volume2, VolumeX, Paperclip, Download, Loader2, Expand, FileCode, Box, Film, Music, BarChart3, Shapes, Globe } from "lucide-react";
+import { Send, StopCircle, ShieldAlert, Volume2, VolumeX, Paperclip, Download, Loader2, Expand, FileCode, Box, Film, Music, BarChart3, Shapes, Globe, Zap } from "lucide-react";
 import { OmnimensIcon } from "@/components/omnimens-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
 import { OmnimensNotificationBell } from "@/components/omnimens-notifications";
@@ -48,6 +48,32 @@ function ImageGeneratingBadge() {
       </div>
       {elapsed > 15 && (
         <p className="text-white/25 text-[10px]">Neural image synthesis in progress — typically 20–60 seconds.</p>
+      )}
+    </div>
+  );
+}
+
+function CreditCostBadge({ creditCost, costBreakdown }: { creditCost: number; costBreakdown?: CostBreakdown }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="mt-2 font-mono text-[10px] text-white/20 flex items-center gap-2 select-none">
+      <Zap className="w-2.5 h-2.5 text-primary/40 shrink-0" />
+      <button
+        onClick={() => setExpanded((v) => !v)}
+        className="hover:text-white/40 transition-colors cursor-pointer"
+      >
+        {creditCost} credit{creditCost !== 1 ? "s" : ""}
+        {costBreakdown && <span className="ml-1 text-white/15">(${costBreakdown.chargedCostUSD.toFixed(4)})</span>}
+      </button>
+      {expanded && costBreakdown && (
+        <div className="ml-2 text-white/20 space-x-2">
+          {costBreakdown.tokens && (
+            <span>{costBreakdown.tokens.prompt_tokens}in / {costBreakdown.tokens.completion_tokens}out tokens</span>
+          )}
+          <span>· actual ${costBreakdown.actualCostUSD.toFixed(5)}</span>
+          <span>· {costBreakdown.markup}× markup</span>
+          {costBreakdown.imagesGenerated > 0 && <span>· {costBreakdown.imagesGenerated} image{costBreakdown.imagesGenerated > 1 ? "s" : ""}</span>}
+        </div>
       )}
     </div>
   );
@@ -279,6 +305,11 @@ export default function Chat() {
                                   <ArtifactCard key={i} artifact={artifact} />
                                 ))}
                               </div>
+                            )}
+
+                            {/* Credit cost badge — shown after message is complete */}
+                            {msg.creditCost != null && !msg.generatingImages && (
+                              <CreditCostBadge creditCost={msg.creditCost} costBreakdown={msg.costBreakdown} />
                             )}
                           </div>
                         )}

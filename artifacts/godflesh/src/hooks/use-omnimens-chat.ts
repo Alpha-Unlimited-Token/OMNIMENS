@@ -15,6 +15,14 @@ export type Artifact = {
   size: number;
 };
 
+export type CostBreakdown = {
+  actualCostUSD: number;
+  chargedCostUSD: number;
+  markup: number;
+  tokens: { prompt_tokens: number; completion_tokens: number } | null;
+  imagesGenerated: number;
+};
+
 export type Message = {
   id: string;
   role: "user" | "omnimens";
@@ -26,6 +34,8 @@ export type Message = {
   searchingWeb?: boolean;
   webSearchQuery?: string;
   webSearchResultCount?: number;
+  creditCost?: number;          // credits deducted for this message
+  costBreakdown?: CostBreakdown; // detailed cost info
 };
 
 export type AttachedFile = {
@@ -206,14 +216,18 @@ export function useOmnimensChat(onLimitReached: () => void) {
                   return newMsgs;
                 });
 
-              } else if (data.type === "limit_reached") {
+              } else if (data.type === "limit_reached" || data.type === "out_of_credits") {
                 onLimitReached();
 
               } else if (data.type === "done") {
                 setMessages((prev) => {
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
-                  if (msg) msg.generatingImages = false;
+                  if (msg) {
+                    msg.generatingImages = false;
+                    if (data.creditCost)     msg.creditCost    = data.creditCost;
+                    if (data.costBreakdown)  msg.costBreakdown = data.costBreakdown;
+                  }
                   return newMsgs;
                 });
               }

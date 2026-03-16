@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
-import { useGetOmnimensStatus, useCreateOmnimensPortal } from "@workspace/api-client-react";
+import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -78,7 +78,6 @@ export default function Account() {
   const { isAuthenticated, user, isLoading, logout } = useAuth();
   const [, setLocation] = useLocation();
   const { data: status, isLoading: statusLoading } = useGetOmnimensStatus();
-  const { mutate: createPortal, isPending: isPortalLoading } = useCreateOmnimensPortal();
 
   const [patches, setPatches] = useState<OmniPatch[]>([]);
   const [patchSummary, setPatchSummary] = useState<PatchSummary | null>(null);
@@ -116,12 +115,6 @@ export default function Account() {
   };
 
   if (isLoading || !isAuthenticated) return <Layout><div className="flex-1" /></Layout>;
-
-  const handleManage = () => {
-    createPortal(undefined, {
-      onSuccess: (res) => { window.location.href = res.url; }
-    });
-  };
 
   const activePatches = patches.filter(p => p.active);
   const inactivePatches = patches.filter(p => !p.active);
@@ -169,25 +162,32 @@ export default function Account() {
               
               {statusLoading ? (
                 <div className="h-16 animate-pulse bg-white/5 rounded-lg" />
+              ) : isOwner ? (
+                <div className="flex items-center gap-3 p-4 border border-amber-500/20 rounded-lg bg-amber-400/5">
+                  <span className="w-2 h-2 rounded-full bg-amber-400" />
+                  <span className="text-lg font-bold text-amber-400">SYSTEM ARCHITECT — UNLIMITED</span>
+                </div>
               ) : (
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 border border-white/5 rounded-lg bg-black/60">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${status?.isPro ? 'bg-accent glow-text-gold' : 'bg-white/40'}`} />
-                      <span className={`text-lg font-bold ${status?.isPro ? 'text-accent' : 'text-white/60'}`}>
-                        {status?.isPro ? 'TRANSCENDENT (PRO)' : 'MORTAL (FREE)'}
-                      </span>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-4 border border-white/5 rounded-lg bg-black/60">
+                    <div className="flex items-center gap-3">
+                      <span className={`w-2 h-2 rounded-full ${(status as any)?.credits > 0 ? 'bg-primary' : 'bg-white/20'}`} />
+                      <div>
+                        <div className="font-mono text-sm text-white/50">CREDIT BALANCE</div>
+                        <div className={`text-2xl font-black font-mono ${(status as any)?.credits > 10 ? 'text-white' : (status as any)?.credits > 0 ? 'text-amber-400' : 'text-red-400'}`}>
+                          {(status as any)?.credits ?? 0}
+                          <span className="text-sm font-normal text-white/30 ml-1">credits</span>
+                        </div>
+                      </div>
                     </div>
+                    <Button onClick={() => setLocation("/omnimens/pricing")} size="sm" variant={(status as any)?.credits === 0 ? "default" : "secondary"}>
+                      {(status as any)?.credits === 0 ? "BUY CREDITS" : "TOP UP"}
+                    </Button>
                   </div>
-                  
-                  {status?.isPro ? (
-                    <Button onClick={handleManage} disabled={isPortalLoading} variant="gold" size="sm">
-                      {isPortalLoading ? "LOADING..." : "MANAGE BILLING"}
-                    </Button>
-                  ) : (
-                    <Button onClick={() => setLocation("/pricing")} size="sm">
-                      UPGRADE
-                    </Button>
+                  {(status as any)?.credits > 0 && (
+                    <p className="text-xs font-mono text-white/30 text-center">
+                      ≈ {Math.floor(((status as any)?.credits ?? 0) / 10)} chat messages remaining · {Math.floor(((status as any)?.credits ?? 0) / 100)} image generations
+                    </p>
                   )}
                 </div>
               )}
@@ -204,12 +204,22 @@ export default function Account() {
               ) : (
                 <div className="space-y-4 font-mono text-sm">
                   <div className="flex justify-between border-b border-white/5 pb-2">
-                    <span className="text-white/40">COMPUTE TODAY</span>
-                    <span className="text-white font-bold">{(() => { const s = (status as any)?.computeSecondsToday ?? 0; if (s < 60) return `${Math.round(s)}s`; const m = Math.floor(s/60); const r = Math.round(s%60); return r > 0 ? `${m}m ${r}s` : `${m}m`; })()}</span>
+                    <span className="text-white/40">CREDIT BALANCE</span>
+                    <span className={`font-bold ${isOwner ? 'text-amber-400' : (status as any)?.credits > 0 ? 'text-white' : 'text-red-400'}`}>
+                      {isOwner ? '∞ UNLIMITED' : `${(status as any)?.credits ?? 0} credits`}
+                    </span>
                   </div>
                   <div className="flex justify-between border-b border-white/5 pb-2">
-                    <span className="text-white/40">DAILY BUDGET</span>
-                    <span className="text-white font-bold">{status?.isPro ? 'UNLIMITED' : (() => { const s = (status as any)?.dailyLimitSeconds ?? 0; if (!s) return '—'; if (s < 60) return `${s}s`; const m = Math.floor(s/60); return `${m}m`; })()}</span>
+                    <span className="text-white/40">MESSAGES AVAILABLE</span>
+                    <span className="text-white font-bold">
+                      {isOwner ? '∞' : `~${Math.floor(((status as any)?.credits ?? 0) / 10)}`}
+                    </span>
+                  </div>
+                  <div className="flex justify-between border-b border-white/5 pb-2">
+                    <span className="text-white/40">IMAGES AVAILABLE</span>
+                    <span className="text-white font-bold">
+                      {isOwner ? '∞' : `~${Math.floor(((status as any)?.credits ?? 0) / 100)}`}
+                    </span>
                   </div>
                   <div className="flex justify-between pb-2">
                     <span className="text-white/40">SYSTEM STATUS</span>

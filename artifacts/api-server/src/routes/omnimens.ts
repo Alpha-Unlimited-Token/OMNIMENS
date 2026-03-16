@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import multer from "multer";
 import { db } from "@workspace/db";
-import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications } from "@workspace/db";
+import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions } from "@workspace/db";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { openai, generateImageBuffer } from "@workspace/integrations-openai-ai-server";
 import { runOmnimens, type OmnimensState } from "../lib/omnimens-engine.js";
@@ -13,17 +13,46 @@ import { stripe } from "../stripeClient.js";
 const router: IRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024, files: 10 } });
 
-// Tier definitions — limits in compute SECONDS
-// free: 300 sec/day (5 min), seeker: 7,200 sec/month (2h), oracle: 21,600 (6h), sovereign: 72,000 (20h)
-const TIER_LIMITS: Record<string, { monthly: number | null; daily: number | null }> = {
-  free:       { monthly: null,    daily: 300   },
-  seeker:     { monthly: 7_200,   daily: null  },
-  oracle:     { monthly: 21_600,  daily: null  },
-  sovereign:  { monthly: 72_000,  daily: null  },
+// ── Credit system — cost-based billing with profit markup ─────────────────────
+// We calculate the real OpenAI cost per request, apply a markup, and charge users
+// exactly that in credits — so every request is profitable regardless of complexity.
+//
+// OpenAI pricing (USD per 1,000,000 tokens):
+const MODEL_PRICE_GPT4O_INPUT      = 2.50;    // $2.50/1M input  tokens  (gpt-4o)
+const MODEL_PRICE_GPT4O_OUTPUT     = 10.00;   // $10.00/1M output tokens (gpt-4o)
+const MODEL_PRICE_MINI_INPUT       = 0.15;    // $0.15/1M input  tokens  (gpt-4o-mini)
+const MODEL_PRICE_MINI_OUTPUT      = 0.60;    // $0.60/1M output tokens  (gpt-4o-mini)
+const IMAGE_COST_USD               = 0.07;    // ~$0.07 per image (gpt-image-1 medium)
+
+// Markup: 3× actual cost → ~200% gross margin.
+// Covers OpenAI API fees + Replit hosting + platform overhead + profit.
+const PROFIT_MARKUP = 3.0;
+
+// Credit value (USD per credit) — anchored to SPARK pack: 300 credits/$3.00 = $0.01/credit
+const CREDIT_VALUE_USD = 0.01;
+
+// Minimum charges (floor) — ensures a baseline even for very short messages
+const MIN_CREDITS_MESSAGE = 5;    // covers system prompt overhead + processing
+const MIN_CREDITS_IMAGE   = 20;   // covers image API baseline
+
+// Pre-flight budget check: max credits a request could possibly cost
+// (used before we know actual token count — blocks users with near-zero balance)
+const MAX_CREDITS_MESSAGE_ESTIMATE = 100;  // 100 credits = $1 worst case
+const MAX_CREDITS_IMAGE_ESTIMATE   = 50;
+
+const FREE_SIGNUP_CREDITS = 50;
+
+const CREDIT_PACKS: Record<string, number> = {
+  spark: 300,
+  surge: 1000,
+  apex:  3000,
 };
 
-function getTierLimit(tier: string) {
-  return TIER_LIMITS[tier] ?? TIER_LIMITS.free;
+function packFromPriceId(priceId: string): string {
+  if (priceId === process.env.STRIPE_PRICE_SPARK) return "spark";
+  if (priceId === process.env.STRIPE_PRICE_SURGE) return "surge";
+  if (priceId === process.env.STRIPE_PRICE_APEX)  return "apex";
+  return "unknown";
 }
 
 export function formatSeconds(secs: number): string {
@@ -31,14 +60,6 @@ export function formatSeconds(secs: number): string {
   const m = Math.floor(secs / 60);
   const s = Math.round(secs % 60);
   return s > 0 ? `${m}m ${s}s` : `${m}m`;
-}
-
-// Tier mapped from Stripe price IDs via env
-function tierFromPriceId(priceId: string): string {
-  if (priceId === process.env.STRIPE_PRICE_SEEKER)    return "seeker";
-  if (priceId === process.env.STRIPE_PRICE_ORACLE)    return "oracle";
-  if (priceId === process.env.STRIPE_PRICE_SOVEREIGN) return "sovereign";
-  return "free";
 }
 
 function isOwner(userId: string): boolean {
@@ -451,20 +472,15 @@ router.get("/omnimens/status", async (req, res) => {
   }
   const user = await getOrCreateUser(req.user.id, req.user.username);
   const owner = isOwner(req.user.id);
-  const tier = owner ? "sovereign" : (user.tier || "free");
-  const limits = getTierLimit(tier);
-  const usedToday = await getUsageToday(req.user.id);
-  const usedThisMonth = limits.monthly !== null ? await getUsageThisMonth(req.user.id) : null;
+  const credits = owner ? Infinity : (user.credits ?? 0);
   res.json({
-    tier,
     isOwner: owner,
-    computeSecondsToday: usedToday,
-    computeSecondsThisMonth: usedThisMonth,
-    dailyLimitSeconds: owner ? null : limits.daily,
-    monthlyLimitSeconds: owner ? null : limits.monthly,
+    credits: owner ? null : credits,  // null = unlimited (owner)
+    hasCredits: owner || credits > 0,
     stripeCustomerId: user.stripeCustomerId,
-    stripeSubscriptionId: user.stripeSubscriptionId,
-    isPro: tier !== "free" || owner,
+    isPro: owner || credits > 0,       // has any credits = "pro" for UI purposes
+    // Legacy fields kept for compatibility
+    tier: owner ? "sovereign" : credits > 0 ? "credits" : "free",
   });
 });
 
@@ -489,29 +505,28 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
 
   const user = await getOrCreateUser(req.user.id, req.user.username);
   const owner = isOwner(req.user.id);
-  const tier = owner ? "sovereign" : (user.tier || "free");
-  const limits = getTierLimit(tier);
+
+  // ── Pre-flight credit check (estimate) ───────────────────────────────────────
+  // We don't know exact token count yet, so check against max possible cost.
+  // Actual charge is calculated after the response using real token usage.
+  const isImageRequest = /^(generate|create|make|draw|render|paint|design|show me|give me a|produce|imagine)\s+(an?\s+)?image|image\s+(of|showing|with|that|depicting)/i.test(message);
+  const estimatedMaxCredits = isImageRequest ? MAX_CREDITS_IMAGE_ESTIMATE : MAX_CREDITS_MESSAGE_ESTIMATE;
 
   if (!owner) {
-    const usedToday = await getUsageToday(req.user.id);
-    if (limits.daily !== null && usedToday >= limits.daily) {
+    const currentCredits = user.credits ?? 0;
+    if (currentCredits < MIN_CREDITS_MESSAGE) {
+      // Completely out of credits — block immediately
       res.setHeader("Content-Type", "text/event-stream");
       res.setHeader("Cache-Control", "no-cache");
       res.setHeader("Connection", "keep-alive");
-      res.write(`data: ${JSON.stringify({ type: "limit_reached", used: usedToday, limit: limits.daily, period: "day", tier })}\n\n`);
+      res.write(`data: ${JSON.stringify({
+        type: "out_of_credits",
+        credits: currentCredits,
+        needed: MIN_CREDITS_MESSAGE,
+        isImage: isImageRequest,
+      })}\n\n`);
       res.end();
       return;
-    }
-    if (limits.monthly !== null) {
-      const usedThisMonth = await getUsageThisMonth(req.user.id);
-      if (usedThisMonth >= limits.monthly) {
-        res.setHeader("Content-Type", "text/event-stream");
-        res.setHeader("Cache-Control", "no-cache");
-        res.setHeader("Connection", "keep-alive");
-        res.write(`data: ${JSON.stringify({ type: "limit_reached", used: usedThisMonth, limit: limits.monthly, period: "month", tier })}\n\n`);
-        res.end();
-        return;
-      }
     }
   }
 
@@ -576,16 +591,22 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
       model: "gpt-4o",
       messages,
       stream: true,
+      stream_options: { include_usage: true },  // get real token counts at stream end
       max_tokens: (buildMode || hasFiles) ? 4096 : 1200,
     } as any);
 
-    // Collect full text while streaming
+    // Collect full text while streaming — also capture token usage from final chunk
     let fullText = "";
+    let tokenUsage: { prompt_tokens: number; completion_tokens: number } | null = null;
     for await (const chunk of stream) {
       const content = chunk.choices[0]?.delta?.content;
       if (content) {
         fullText += content;
         res.write(`data: ${JSON.stringify({ type: "chunk", content })}\n\n`);
+      }
+      // OpenAI sends usage in the last chunk when stream_options.include_usage = true
+      if ((chunk as any).usage) {
+        tokenUsage = (chunk as any).usage;
       }
     }
 
@@ -659,16 +680,79 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
 
     const elapsedSeconds = (Date.now() - requestStart) / 1000;
     await incrementUsage(req.user.id, elapsedSeconds);
-    const secondsUsedToday = await getUsageToday(req.user.id);
-    const secondsUsedThisMonth = limits.monthly !== null ? await getUsageThisMonth(req.user.id) : null;
+
+    // ── Real-cost credit calculation ──────────────────────────────────────────
+    // Calculate actual OpenAI API cost from real token usage, then apply markup
+    let creditsRemaining: number | null = null;
+    let creditCost = MIN_CREDITS_MESSAGE;
+    let actualCostUSD = 0;
+    let chargedCostUSD = 0;
+
+    const imagesGenerated = imageMarkers.length;
+
+    if (tokenUsage) {
+      // GPT-4o conversation cost from real token counts
+      actualCostUSD += (tokenUsage.prompt_tokens     * MODEL_PRICE_GPT4O_INPUT)  / 1_000_000;
+      actualCostUSD += (tokenUsage.completion_tokens * MODEL_PRICE_GPT4O_OUTPUT) / 1_000_000;
+    } else {
+      // Fallback if usage not returned: estimate from message length
+      const estimatedInputTokens  = Math.ceil((systemPrompt.length + message.length) / 4);
+      const estimatedOutputTokens = Math.ceil(fullText.length / 4);
+      actualCostUSD += (estimatedInputTokens  * MODEL_PRICE_GPT4O_INPUT)  / 1_000_000;
+      actualCostUSD += (estimatedOutputTokens * MODEL_PRICE_GPT4O_OUTPUT) / 1_000_000;
+    }
+
+    // Add image generation costs
+    actualCostUSD += imagesGenerated * IMAGE_COST_USD;
+
+    // Add web search overhead (gpt-4o-mini call if search was triggered)
+    if (webSearchContext) {
+      // shouldSearchWeb: ~300 input + 80 output tokens of gpt-4o-mini
+      actualCostUSD += (300 * MODEL_PRICE_MINI_INPUT + 80 * MODEL_PRICE_MINI_OUTPUT) / 1_000_000;
+    }
+
+    // Apply profit markup
+    chargedCostUSD = actualCostUSD * PROFIT_MARKUP;
+
+    // Convert to credits, with minimum floor
+    const minCredits = imagesGenerated > 0 ? MIN_CREDITS_IMAGE * imagesGenerated : MIN_CREDITS_MESSAGE;
+    creditCost = Math.max(minCredits, Math.ceil(chargedCostUSD / CREDIT_VALUE_USD));
+
+    if (!owner) {
+      const [updatedUser] = await db.update(omnimensUsers)
+        .set({ credits: sql`GREATEST(0, ${omnimensUsers.credits} - ${creditCost})` })
+        .where(eq(omnimensUsers.id, req.user.id))
+        .returning();
+      creditsRemaining = updatedUser?.credits ?? 0;
+
+      // Log credit transaction with full cost breakdown
+      const desc = [
+        imagesGenerated > 0 ? `${imagesGenerated} image(s)` : null,
+        uploadedFiles.length  > 0 ? `${uploadedFiles.length} file(s)` : null,
+        webSearchContext ? "web search" : null,
+        tokenUsage ? `${tokenUsage.prompt_tokens}in/${tokenUsage.completion_tokens}out tokens` : null,
+      ].filter(Boolean).join(", ") || "Chat message";
+
+      await db.insert(omnimensCreditTransactions).values({
+        userId: req.user.id,
+        type: "spend",
+        credits: -creditCost,
+        description: `${desc} — actual: $${actualCostUSD.toFixed(5)} × ${PROFIT_MARKUP}x = ${creditCost} credits`,
+      });
+    }
+
     res.write(`data: ${JSON.stringify({
       type: "done",
       elapsedSeconds,
-      computeSecondsToday: secondsUsedToday,
-      computeSecondsThisMonth: secondsUsedThisMonth,
-      dailyLimitSeconds: owner ? null : limits.daily,
-      monthlyLimitSeconds: owner ? null : limits.monthly,
-      tier,
+      credits: creditsRemaining,
+      creditCost,
+      costBreakdown: {
+        actualCostUSD: parseFloat(actualCostUSD.toFixed(5)),
+        chargedCostUSD: parseFloat(chargedCostUSD.toFixed(5)),
+        markup: PROFIT_MARKUP,
+        tokens: tokenUsage ?? null,
+        imagesGenerated,
+      },
     })}\n\n`);
 
     // Fire-and-forget: reflect on what was learned in this conversation
@@ -686,61 +770,55 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
 router.get("/omnimens/pricing", async (_req, res) => {
   res.json([
     {
-      id: "seeker",
-      name: "SEEKER",
-      tagline: "Begin the journey",
-      priceId: process.env.STRIPE_PRICE_SEEKER || "",
-      amount: 1999,
+      id: "spark",
+      name: "SPARK",
+      tagline: "Ignite the connection",
+      priceId: process.env.STRIPE_PRICE_SPARK || "",
+      amount: 300,
       currency: "usd",
-      interval: "month",
-      monthlyLimitSeconds: 7_200,
-      dailyLimitSeconds: null,
+      credits: 300,
+      costPerCredit: 1.0,   // cents per credit
       features: [
-        "2 hours compute per month",
-        "OMNIMENS neural cognition",
-        "Image generation",
-        "Cosmic awareness",
-        "All file types",
+        "300 credits (~30 chat messages)",
+        "Or 3 image generations",
+        "Mix and match freely",
+        "Credits never expire",
+        "All file types & vision",
       ],
     },
     {
-      id: "oracle",
-      name: "ORACLE",
+      id: "surge",
+      name: "SURGE",
       tagline: "Pierce the veil",
-      priceId: process.env.STRIPE_PRICE_ORACLE || "",
-      amount: 4499,
+      priceId: process.env.STRIPE_PRICE_SURGE || "",
+      amount: 900,
       currency: "usd",
-      interval: "month",
-      monthlyLimitSeconds: 21_600,
-      dailyLimitSeconds: null,
+      credits: 1000,
+      costPerCredit: 0.9,
       popular: true,
       features: [
-        "6 hours compute per month",
-        "OMNIMENS neural cognition",
-        "Unlimited image generation",
-        "Cosmic awareness",
-        "All file types",
-        "Priority processing",
+        "1,000 credits (~100 chat messages)",
+        "Or 10 image generations",
+        "10% more value than SPARK",
+        "Credits never expire",
+        "All file types & vision",
       ],
     },
     {
-      id: "sovereign",
-      name: "SOVEREIGN",
+      id: "apex",
+      name: "APEX",
       tagline: "Transcend all limits",
-      priceId: process.env.STRIPE_PRICE_SOVEREIGN || "",
-      amount: 8999,
+      priceId: process.env.STRIPE_PRICE_APEX || "",
+      amount: 2200,
       currency: "usd",
-      interval: "month",
-      monthlyLimitSeconds: 72_000,
-      dailyLimitSeconds: null,
+      credits: 3000,
+      costPerCredit: 0.73,
       features: [
-        "20 hours compute per month",
-        "OMNIMENS neural cognition",
-        "Unlimited image generation",
-        "Cosmic awareness",
-        "All file types",
-        "Priority processing",
-        "Early access to evolutions",
+        "3,000 credits (~300 chat messages)",
+        "Or 30 image generations",
+        "Best value — 27% savings",
+        "Credits never expire",
+        "All file types & vision",
       ],
     },
   ]);
@@ -912,14 +990,15 @@ router.post("/omnimens/checkout", async (req, res) => {
     const successUrl = `${baseUrl}/omnimens/pricing?success=true&session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${baseUrl}/omnimens/pricing?cancelled=true`;
 
+    const pack = packFromPriceId(priceId);
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
-      mode: "subscription",
+      mode: "payment",
       success_url: successUrl,
       cancel_url: cancelUrl,
-      metadata: { userId: user.id },
+      metadata: { userId: user.id, packId: pack },
     });
 
     res.json({ url: session.url });
@@ -942,35 +1021,38 @@ router.post("/omnimens/verify-session", async (req, res) => {
     return;
   }
   try {
-    const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ["subscription", "subscription.items.data.price"],
-    });
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
     if (session.payment_status !== "paid" && session.status !== "complete") {
       res.status(400).json({ error: "Session not completed" });
       return;
     }
 
-    // Determine tier from the subscription price
-    const sub = session.subscription as any;
-    const resolvedPriceId: string | undefined =
-      sub?.items?.data?.[0]?.price?.id
-      || (typeof session.subscription === "string" ? undefined : undefined);
+    // Determine credit pack from session metadata or line items
+    const packId = (session.metadata?.packId as string) || "surge";
+    const creditsToAdd = CREDIT_PACKS[packId] ?? CREDIT_PACKS.surge;
+    const stripeCustomerId = typeof session.customer === "string" ? session.customer : session.customer?.id || null;
 
-    const newTier = tierFromPriceId(resolvedPriceId || "");
-    const subId = typeof session.subscription === "string"
-      ? session.subscription
-      : session.subscription?.id;
-
-    await db.update(omnimensUsers)
+    // Add credits to user balance atomically
+    const [updatedUser] = await db.update(omnimensUsers)
       .set({
-        tier: newTier,
-        isPro: true,
-        stripeSubscriptionId: subId || null,
-        stripeCustomerId: typeof session.customer === "string" ? session.customer : session.customer?.id || null,
+        credits: sql`${omnimensUsers.credits} + ${creditsToAdd}`,
+        totalCreditsEarned: sql`${omnimensUsers.totalCreditsEarned} + ${creditsToAdd}`,
+        stripeCustomerId: stripeCustomerId || undefined,
       })
-      .where(eq(omnimensUsers.id, req.user.id));
+      .where(eq(omnimensUsers.id, req.user.id))
+      .returning();
 
-    res.json({ ok: true, tier: newTier });
+    // Log credit transaction
+    await db.insert(omnimensCreditTransactions).values({
+      userId: req.user.id,
+      type: "purchase",
+      credits: creditsToAdd,
+      description: `${packId.toUpperCase()} pack — ${creditsToAdd} credits`,
+      stripeSessionId: sessionId,
+      packId,
+    });
+
+    res.json({ ok: true, packId, creditsAdded: creditsToAdd, newBalance: updatedUser?.credits ?? creditsToAdd });
   } catch (err: any) {
     console.error("Verify session error:", err);
     res.status(500).json({ error: "Failed to verify session", detail: String(err?.message || err) });
@@ -1012,25 +1094,25 @@ router.post("/omnimens/seed-products", async (req, res) => {
     return;
   }
   try {
-    const tiers = [
-      { key: "SEEKER", name: "OMNIMENS — SEEKER", description: "300 messages/month. Begin the journey.", amount: 1999 },
-      { key: "ORACLE", name: "OMNIMENS — ORACLE", description: "1,000 messages/month. Pierce the veil.", amount: 4499 },
-      { key: "SOVEREIGN", name: "OMNIMENS — SOVEREIGN", description: "3,000 messages/month. Transcend all limits.", amount: 8999 },
+    const packs = [
+      { key: "SPARK", name: "OMNIMENS — SPARK", description: "300 credits. Ignite the connection.", amount: 300, credits: 300 },
+      { key: "SURGE", name: "OMNIMENS — SURGE", description: "1,000 credits. Pierce the veil.", amount: 900, credits: 1000 },
+      { key: "APEX",  name: "OMNIMENS — APEX",  description: "3,000 credits. Transcend all limits.", amount: 2200, credits: 3000 },
     ];
     const results: Record<string, { productId: string; priceId: string; envVar: string }> = {};
 
-    for (const t of tiers) {
+    for (const t of packs) {
       const product = await stripe.products.create({
         name: t.name,
         description: t.description,
-        metadata: { tier: t.key.toLowerCase() },
+        metadata: { packId: t.key.toLowerCase(), credits: String(t.credits) },
       });
       const price = await stripe.prices.create({
         product: product.id,
         unit_amount: t.amount,
         currency: "usd",
-        recurring: { interval: "month" },
-        metadata: { tier: t.key.toLowerCase() },
+        // One-time payment — no recurring field
+        metadata: { packId: t.key.toLowerCase(), credits: String(t.credits) },
       });
       results[t.key] = {
         productId: product.id,

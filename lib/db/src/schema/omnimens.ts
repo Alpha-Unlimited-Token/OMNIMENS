@@ -1,24 +1,40 @@
 import { pgTable, serial, text, integer, timestamp, boolean, real, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 
-// tier: "free" | "seeker" | "oracle" | "sovereign"
+// credits: each user has a running balance — buy packs, spend per message/image
 export const omnimensUsers = pgTable("godflesh_users", {
   id: text("id").primaryKey(),
   username: text("username"),
   email: text("email"),
   stripeCustomerId: text("stripe_customer_id"),
-  stripeSubscriptionId: text("stripe_subscription_id"),
-  isPro: boolean("is_pro").default(false).notNull(),
-  tier: text("tier").default("free").notNull(),
+  stripeSubscriptionId: text("stripe_subscription_id"),  // kept for migration safety, unused
+  isPro: boolean("is_pro").default(false).notNull(),     // kept for migration safety, unused
+  tier: text("tier").default("free").notNull(),          // kept for migration safety, unused
+  credits: integer("credits").default(50).notNull(),     // current credit balance (50 free on signup)
+  totalCreditsEarned: integer("total_credits_earned").default(50).notNull(), // lifetime purchased
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Per-day usage tracking (for admin insight)
 export const omnimensUsage = pgTable("godflesh_usage", {
   id: serial("id").primaryKey(),
   userId: text("user_id").notNull().references(() => omnimensUsers.id),
   date: text("date").notNull(),
   messageCount: integer("message_count").default(0).notNull(),
   computeSeconds: real("compute_seconds").default(0).notNull(),
+  creditsSpent: integer("credits_spent").default(0).notNull(),
+});
+
+// Credit purchase/spend history
+export const omnimensCreditTransactions = pgTable("godflesh_credit_transactions", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => omnimensUsers.id),
+  type: text("type").notNull(),          // "purchase" | "spend" | "bonus"
+  credits: integer("credits").notNull(), // positive = earned, negative = spent
+  description: text("description").notNull(),
+  stripeSessionId: text("stripe_session_id"),
+  packId: text("pack_id"),              // "spark" | "surge" | "apex"
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 // Living brain — every insight OMNIMENS learns is stored here and injected into future conversations
@@ -83,6 +99,7 @@ export const omnimensProjectFiles = pgTable("godflesh_project_files", {
 
 export type OmnimensUser = typeof omnimensUsers.$inferSelect;
 export type OmnimensUsage = typeof omnimensUsage.$inferSelect;
+export type OmnimensCreditTransaction = typeof omnimensCreditTransactions.$inferSelect;
 export type OmnimensBrain = typeof omnimensBrain.$inferSelect;
 export type OmnimensUpgrade = typeof omnimensUpgrades.$inferSelect;
 export type OmnimensNotification = typeof omnimensNotifications.$inferSelect;
