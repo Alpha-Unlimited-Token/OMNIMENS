@@ -4,7 +4,20 @@ import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check, Atom, Code2, Layers, Eye, AlertTriangle, Wrench, Dna, Play } from "lucide-react";
+import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check, Atom, Code2, Layers, Eye, AlertTriangle, Wrench, Dna, Play, Wallet, CreditCard, Gift, TrendingUp } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+
+function useBillingInfo() {
+  return useQuery({
+    queryKey: ["/api/omnimens/billing"],
+    queryFn: async () => {
+      const r = await fetch("/godflesh/api/omnimens/billing", { credentials: "include" });
+      if (!r.ok) return null;
+      return r.json();
+    },
+    retry: false,
+  });
+}
 
 const OWNER_ID = "50777126";
 
@@ -91,6 +104,7 @@ export default function Account() {
   const { isAuthenticated, user, isLoading, logout } = useAuth();
   const [, setLocation] = useLocation();
   const { data: status, isLoading: statusLoading } = useGetOmnimensStatus();
+  const { data: billing } = useBillingInfo();
 
   const [patches, setPatches] = useState<OmniPatch[]>([]);
   const [patchSummary, setPatchSummary] = useState<PatchSummary | null>(null);
@@ -295,21 +309,58 @@ export default function Account() {
                       <span className={`w-2 h-2 rounded-full ${(status as any)?.credits > 0 ? 'bg-primary' : 'bg-white/20'}`} />
                       <div>
                         <div className="font-mono text-sm text-white/50">CREDIT BALANCE</div>
-                        <div className={`text-2xl font-black font-mono ${(status as any)?.credits > 10 ? 'text-white' : (status as any)?.credits > 0 ? 'text-amber-400' : 'text-red-400'}`}>
-                          {(status as any)?.credits ?? 0}
+                        <div className={`text-2xl font-black font-mono ${(status as any)?.credits > 100 ? 'text-white' : (status as any)?.credits > 0 ? 'text-amber-400' : 'text-red-400'}`}>
+                          {((status as any)?.credits ?? 0).toLocaleString()}
                           <span className="text-sm font-normal text-white/30 ml-1">credits</span>
                         </div>
                       </div>
                     </div>
-                    <Button onClick={() => setLocation("/omnimens/pricing")} size="sm" variant={(status as any)?.credits === 0 ? "default" : "secondary"}>
-                      {(status as any)?.credits === 0 ? "BUY CREDITS" : "TOP UP"}
+                    <Button onClick={() => setLocation("/omnimens/pricing")} size="sm" variant={(status as any)?.credits < 100 ? "default" : "secondary"}>
+                      {(status as any)?.credits < 100 ? "ADD CREDITS" : "MANAGE WALLET"}
                     </Button>
                   </div>
-                  {(status as any)?.credits > 0 && (
-                    <p className="text-xs font-mono text-white/30 text-center">
-                      ≈ {Math.floor(((status as any)?.credits ?? 0) / 10)} chat messages remaining · {Math.floor(((status as any)?.credits ?? 0) / 100)} image generations
-                    </p>
-                  )}
+
+                  {/* Wallet status */}
+                  <div className="flex items-center justify-between p-3 border border-white/5 rounded-lg bg-black/40">
+                    <div className="flex items-center gap-2">
+                      {(billing as any)?.hasWallet ? (
+                        <>
+                          <CreditCard className="w-4 h-4 text-green-400" />
+                          <span className="font-mono text-xs text-green-400">
+                            {(billing as any)?.card?.brand?.toUpperCase()} •••• {(billing as any)?.card?.last4} · Auto-topup on
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <Wallet className="w-4 h-4 text-white/30" />
+                          <span className="font-mono text-xs text-white/30">No wallet connected</span>
+                        </>
+                      )}
+                    </div>
+                    {!(billing as any)?.hasWallet && (
+                      <button onClick={() => setLocation("/omnimens/pricing")} className="text-xs font-mono text-primary hover:underline">
+                        connect →
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Monthly loyalty */}
+                  <div className="flex items-center justify-between p-3 border border-white/5 rounded-lg bg-black/40">
+                    <div className="flex items-center gap-2">
+                      <Gift className="w-4 h-4 text-accent" />
+                      <span className="font-mono text-xs text-white/50">
+                        Next month bonus:&nbsp;
+                        <span className="text-green-400 font-bold">{(billing as any)?.nextBonusCredits?.toLocaleString() ?? 2000} credits free</span>
+                      </span>
+                    </div>
+                    <span className="font-mono text-[10px] text-white/20">
+                      {(billing as any)?.nextBonusTier ?? "BASE"} tier
+                    </span>
+                  </div>
+
+                  <p className="text-xs font-mono text-white/30 text-center">
+                    ≈ {Math.floor(((status as any)?.credits ?? 0) / 10)} chats · {Math.floor(((status as any)?.credits ?? 0) / 100)} images
+                  </p>
                 </div>
               )}
             </div>
@@ -327,7 +378,7 @@ export default function Account() {
                   <div className="flex justify-between border-b border-white/5 pb-2">
                     <span className="text-white/40">CREDIT BALANCE</span>
                     <span className={`font-bold ${isOwner ? 'text-amber-400' : (status as any)?.credits > 0 ? 'text-white' : 'text-red-400'}`}>
-                      {isOwner ? '∞ UNLIMITED' : `${(status as any)?.credits ?? 0} credits`}
+                      {isOwner ? '∞ UNLIMITED' : `${((status as any)?.credits ?? 0).toLocaleString()} credits`}
                     </span>
                   </div>
                   <div className="flex justify-between border-b border-white/5 pb-2">
@@ -337,9 +388,21 @@ export default function Account() {
                     </span>
                   </div>
                   <div className="flex justify-between border-b border-white/5 pb-2">
-                    <span className="text-white/40">IMAGES AVAILABLE</span>
+                    <span className="text-white/40">THIS MONTH SPEND</span>
                     <span className="text-white font-bold">
-                      {isOwner ? '∞' : `~${Math.floor(((status as any)?.credits ?? 0) / 100)}`}
+                      {isOwner ? '—' : `$${(billing as any)?.currentMonthSpendDollars ?? "0.00"}`}
+                    </span>
+                  </div>
+                  <div className="flex justify-between border-b border-white/5 pb-2">
+                    <span className="text-white/40">NEXT MONTH BONUS</span>
+                    <span className="text-green-400 font-bold">
+                      {isOwner ? '—' : `${((billing as any)?.nextBonusCredits ?? 2000).toLocaleString()} credits free`}
+                    </span>
+                  </div>
+                  <div className="flex justify-between border-b border-white/5 pb-2">
+                    <span className="text-white/40">WALLET</span>
+                    <span className={`font-bold ${(billing as any)?.hasWallet ? 'text-green-400' : 'text-white/30'}`}>
+                      {isOwner ? '—' : (billing as any)?.hasWallet ? `${(billing as any)?.card?.brand?.toUpperCase()} •••• ${(billing as any)?.card?.last4}` : 'NOT CONNECTED'}
                     </span>
                   </div>
                   <div className="flex justify-between pb-2">

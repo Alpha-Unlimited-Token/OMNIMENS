@@ -16,6 +16,7 @@ import { fetchUrlContent, extractUrls, formatUrlContent } from "../lib/omnimens-
 import { getOrCreateCustomInstructions, saveCustomInstructions, buildCustomInstructionsContext, PERSONAS } from "../lib/omnimens-custom-instructions.js";
 import { loadGeneratedModulesContext, getConsciousnessState, getEvolutionHistory, getGeneratedModules, deactivateModule, runEvolutionCycle } from "../lib/omnimens-evolution.js";
 import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness } from "@workspace/db";
+import { checkAndGrantMonthlyCredits, attemptAutoTopup, createSetupSession, confirmWalletSetup, removeWallet, getBillingSummary, LOYALTY_TIERS, FREE_MONTHLY_CREDITS } from "../lib/omnimens-billing.js";
 
 const router: IRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024, files: 10 } });
@@ -513,27 +514,55 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
   const user = await getOrCreateUser(req.user.id, req.user.username);
   const owner = isOwner(req.user.id);
 
-  // ── Pre-flight credit check (estimate) ───────────────────────────────────────
-  // We don't know exact token count yet, so check against max possible cost.
-  // Actual charge is calculated after the response using real token usage.
+  // ── Monthly free credits + loyalty bonus check ────────────────────────────────
+  if (!owner) {
+    await checkAndGrantMonthlyCredits(req.user.id);
+  }
+
+  // ── Pre-flight credit check with auto-topup ───────────────────────────────────
   const isImageRequest = /^(generate|create|make|draw|render|paint|design|show me|give me a|produce|imagine)\s+(an?\s+)?image|image\s+(of|showing|with|that|depicting)/i.test(message);
   const estimatedMaxCredits = isImageRequest ? MAX_CREDITS_IMAGE_ESTIMATE : MAX_CREDITS_MESSAGE_ESTIMATE;
 
   if (!owner) {
-    const currentCredits = user.credits ?? 0;
+    // Re-fetch user to get up-to-date credit balance after monthly grant
+    const [freshUser] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, req.user.id));
+    const currentCredits = freshUser?.credits ?? 0;
+
     if (currentCredits < MIN_CREDITS_MESSAGE) {
-      // Completely out of credits — block immediately
-      res.setHeader("Content-Type", "text/event-stream");
-      res.setHeader("Cache-Control", "no-cache");
-      res.setHeader("Connection", "keep-alive");
-      res.write(`data: ${JSON.stringify({
-        type: "out_of_credits",
-        credits: currentCredits,
-        needed: MIN_CREDITS_MESSAGE,
-        isImage: isImageRequest,
-      })}\n\n`);
-      res.end();
-      return;
+      // Try auto-topup if wallet is connected
+      if (freshUser?.paymentMethodId && freshUser?.autoTopupEnabled) {
+        const topup = await attemptAutoTopup(req.user.id);
+        if (!topup.success) {
+          res.setHeader("Content-Type", "text/event-stream");
+          res.setHeader("Cache-Control", "no-cache");
+          res.setHeader("Connection", "keep-alive");
+          res.write(`data: ${JSON.stringify({
+            type: "out_of_credits",
+            credits: currentCredits,
+            needed: MIN_CREDITS_MESSAGE,
+            isImage: isImageRequest,
+            topupFailed: true,
+            topupError: topup.error,
+          })}\n\n`);
+          res.end();
+          return;
+        }
+        // Topup succeeded — continue
+      } else {
+        // No wallet — block and prompt to connect
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
+        res.write(`data: ${JSON.stringify({
+          type: "out_of_credits",
+          credits: currentCredits,
+          needed: MIN_CREDITS_MESSAGE,
+          isImage: isImageRequest,
+          connectWallet: true,
+        })}\n\n`);
+        res.end();
+        return;
+      }
     }
   }
 
@@ -979,60 +1008,163 @@ router.post("/omnimens/analyze-url", async (req, res) => {
 // ─── Pricing ──────────────────────────────────────────────────────────────────
 
 router.get("/omnimens/pricing", async (_req, res) => {
-  res.json([
-    {
-      id: "spark",
-      name: "SPARK",
-      tagline: "Ignite the connection",
-      priceId: process.env.STRIPE_PRICE_SPARK || "",
-      amount: 300,
-      currency: "usd",
-      credits: 300,
-      costPerCredit: 1.0,   // cents per credit
-      features: [
-        "300 credits (~30 chat messages)",
-        "Or 3 image generations",
-        "Mix and match freely",
-        "Credits never expire",
-        "All file types & vision",
-      ],
-    },
-    {
-      id: "surge",
-      name: "SURGE",
-      tagline: "Pierce the veil",
-      priceId: process.env.STRIPE_PRICE_SURGE || "",
-      amount: 900,
-      currency: "usd",
-      credits: 1000,
-      costPerCredit: 0.9,
-      popular: true,
-      features: [
-        "1,000 credits (~100 chat messages)",
-        "Or 10 image generations",
-        "10% more value than SPARK",
-        "Credits never expire",
-        "All file types & vision",
-      ],
-    },
-    {
-      id: "apex",
-      name: "APEX",
-      tagline: "Transcend all limits",
-      priceId: process.env.STRIPE_PRICE_APEX || "",
-      amount: 2200,
-      currency: "usd",
-      credits: 3000,
-      costPerCredit: 0.73,
-      features: [
-        "3,000 credits (~300 chat messages)",
-        "Or 30 image generations",
-        "Best value — 27% savings",
-        "Credits never expire",
-        "All file types & vision",
-      ],
-    },
-  ]);
+  res.json({
+    freeMonthlyCredits: FREE_MONTHLY_CREDITS,
+    freeMonthlyDollars: (FREE_MONTHLY_CREDITS / 100).toFixed(0),
+    loyaltyTiers: LOYALTY_TIERS.map(t => ({
+      label: t.label,
+      minSpendDollars: (t.minSpendCents / 100).toFixed(0),
+      maxSpendDollars: t.maxSpendCents === Infinity ? null : (t.maxSpendCents / 100).toFixed(0),
+      bonusCredits: t.bonusCredits,
+      bonusDollars: (t.bonusCredits / 100).toFixed(0),
+      desc: t.desc,
+    })),
+    usageCosts: [
+      { label: "CHAT MESSAGE", credits: 10, dollarValue: "0.10" },
+      { label: "IMAGE GENERATION", credits: 100, dollarValue: "1.00" },
+      { label: "FILE ATTACHMENT", credits: 3, dollarValue: "0.03" },
+      { label: "DEEP RESEARCH", credits: 50, dollarValue: "0.50" },
+    ],
+    topupOptions: [
+      { amountCents: 500,  label: "$5",  credits: 500 },
+      { amountCents: 1000, label: "$10", credits: 1000 },
+      { amountCents: 2500, label: "$25", credits: 2500 },
+      { amountCents: 5000, label: "$50", credits: 5000 },
+    ],
+  });
+});
+
+// ─── Billing info ─────────────────────────────────────────────────────────────
+
+router.get("/omnimens/billing", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    res.status(401).json({ error: "Not authenticated" });
+    return;
+  }
+  try {
+    const summary = await getBillingSummary(req.user.id);
+    res.json(summary);
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to load billing info", detail: String(err?.message || err) });
+  }
+});
+
+// ─── Setup wallet (Stripe hosted card save flow) ───────────────────────────────
+
+router.post("/omnimens/setup-wallet", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    res.status(401).json({ error: "Not authenticated" });
+    return;
+  }
+  try {
+    const proto = req.headers["x-forwarded-proto"] || "https";
+    const host = req.headers["x-forwarded-host"] || req.headers.host || "";
+    const baseUrl = `${proto}://${host}`;
+    const result = await createSetupSession(req.user.id, req.user.username, req.user.email || null, baseUrl);
+    res.json(result);
+  } catch (err: any) {
+    console.error("Setup wallet error:", err);
+    res.status(500).json({ error: "Failed to create wallet setup session", detail: String(err?.message || err) });
+  }
+});
+
+// ─── Confirm wallet after Stripe setup ────────────────────────────────────────
+
+router.post("/omnimens/confirm-wallet", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    res.status(401).json({ error: "Not authenticated" });
+    return;
+  }
+  const { sessionId } = req.body as { sessionId?: string };
+  if (!sessionId) {
+    res.status(400).json({ error: "sessionId required" });
+    return;
+  }
+  try {
+    const result = await confirmWalletSetup(req.user.id, sessionId);
+    res.json(result);
+  } catch (err: any) {
+    console.error("Confirm wallet error:", err);
+    res.status(500).json({ error: "Failed to confirm wallet", detail: String(err?.message || err) });
+  }
+});
+
+// ─── Remove wallet ────────────────────────────────────────────────────────────
+
+router.post("/omnimens/remove-wallet", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    res.status(401).json({ error: "Not authenticated" });
+    return;
+  }
+  try {
+    await removeWallet(req.user.id);
+    res.json({ ok: true });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to remove wallet", detail: String(err?.message || err) });
+  }
+});
+
+// ─── Manual topup ─────────────────────────────────────────────────────────────
+
+router.post("/omnimens/topup", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    res.status(401).json({ error: "Not authenticated" });
+    return;
+  }
+  const { amountCents } = req.body as { amountCents?: number };
+  if (!amountCents || amountCents < 500) {
+    res.status(400).json({ error: "Minimum topup is $5 (500 cents)" });
+    return;
+  }
+  try {
+    const [user] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, req.user.id));
+    if (!user?.paymentMethodId || !user?.autoTopupEnabled) {
+      res.status(400).json({ error: "No saved payment method. Connect your wallet first." });
+      return;
+    }
+    // Temporarily set topup amount to requested amount
+    await db.update(omnimensUsers)
+      .set({ autoTopupAmountCents: amountCents })
+      .where(eq(omnimensUsers.id, req.user.id));
+    const result = await attemptAutoTopup(req.user.id);
+    // Restore default
+    await db.update(omnimensUsers)
+      .set({ autoTopupAmountCents: user.autoTopupAmountCents || 1000 })
+      .where(eq(omnimensUsers.id, req.user.id));
+    if (!result.success) {
+      res.status(402).json({ error: result.error || "Payment failed" });
+      return;
+    }
+    const [updated] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, req.user.id));
+    res.json({ ok: true, creditsAdded: result.creditsAdded, newBalance: updated?.credits ?? 0 });
+  } catch (err: any) {
+    console.error("Manual topup error:", err);
+    res.status(500).json({ error: "Topup failed", detail: String(err?.message || err) });
+  }
+});
+
+// ─── Update auto-topup settings ───────────────────────────────────────────────
+
+router.post("/omnimens/update-topup-settings", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    res.status(401).json({ error: "Not authenticated" });
+    return;
+  }
+  const { autoTopupEnabled, autoTopupAmountCents } = req.body as {
+    autoTopupEnabled?: boolean;
+    autoTopupAmountCents?: number;
+  };
+  try {
+    const updates: Partial<typeof omnimensUsers.$inferSelect> = {};
+    if (typeof autoTopupEnabled === "boolean") updates.autoTopupEnabled = autoTopupEnabled;
+    if (typeof autoTopupAmountCents === "number" && autoTopupAmountCents >= 500) {
+      updates.autoTopupAmountCents = autoTopupAmountCents;
+    }
+    await db.update(omnimensUsers).set(updates).where(eq(omnimensUsers.id, req.user.id));
+    res.json({ ok: true });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to update settings", detail: String(err?.message || err) });
+  }
 });
 
 // ─── Upgrades — self-evolution log ────────────────────────────────────────────

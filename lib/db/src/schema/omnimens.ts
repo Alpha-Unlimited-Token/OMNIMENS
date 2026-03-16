@@ -1,7 +1,7 @@
 import { pgTable, serial, text, integer, timestamp, boolean, real, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 
-// credits: each user has a running balance — buy packs, spend per message/image
+// credits: each user has a running balance — free monthly grant + paid auto-topup
 export const omnimensUsers = pgTable("godflesh_users", {
   id: text("id").primaryKey(),
   username: text("username"),
@@ -10,8 +10,17 @@ export const omnimensUsers = pgTable("godflesh_users", {
   stripeSubscriptionId: text("stripe_subscription_id"),  // kept for migration safety, unused
   isPro: boolean("is_pro").default(false).notNull(),     // kept for migration safety, unused
   tier: text("tier").default("free").notNull(),          // kept for migration safety, unused
-  credits: integer("credits").default(50).notNull(),     // current credit balance (50 free on signup)
-  totalCreditsEarned: integer("total_credits_earned").default(50).notNull(), // lifetime purchased
+  credits: integer("credits").default(2000).notNull(),   // current balance (2000 = $20 free on signup)
+  totalCreditsEarned: integer("total_credits_earned").default(2000).notNull(), // lifetime credits
+  // ── Wallet / Auto-topup ──────────────────────────────────────────────────────
+  paymentMethodId: text("payment_method_id"),            // Stripe PM ID (saved card)
+  autoTopupEnabled: boolean("auto_topup_enabled").default(false).notNull(),
+  autoTopupAmountCents: integer("auto_topup_amount_cents").default(1000).notNull(), // $10 default
+  // ── Monthly billing tracking ──────────────────────────────────────────────────
+  monthlyPaidSpendCents: integer("monthly_paid_spend_cents").default(0).notNull(), // this month's paid
+  currentMonthKey: text("current_month_key"),            // "2025-03" — for monthly reset
+  lastBonusMonth: text("last_bonus_month"),              // last month bonus was granted
+  totalPaidSpendCents: integer("total_paid_spend_cents").default(0).notNull(), // lifetime paid
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

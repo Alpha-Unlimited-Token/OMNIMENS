@@ -14,7 +14,9 @@ A transcendent sci-fi AI chat platform matching and surpassing the capabilities 
 
 **Frontend:** `artifacts/godflesh/` — React + Vite app at `/godflesh/`  
 **API Routes:** `artifacts/api-server/src/routes/omnimens.ts`  
-**Business model:** Usage-based credits — buy SPARK (300/$3), SURGE (1000/$9), APEX (3000/$22). 50 free credits on signup.
+**Business model:** Wallet-based auto-topup. $20 free monthly (2,000 credits). Auto-charges saved Stripe card when free credits run out. Monthly loyalty bonuses based on prior month's paid spend (10% cashback, up to $500 free). 3× markup on OpenAI costs = ~67% gross margin, 10% loyalty = ~3.3% cost = always profitable.
+
+**Loyalty Tiers:** BASE ($0 spend → $20 free), SPARK ($10→$20), RISE ($50→$22), SURGE ($100→$25), APEX ($250→$35), ELITE ($500→$50), PRIME ($1K→$100), APEX+ ($2K→$200), LEGEND ($5K→$500).
 
 ### Platform Capabilities
 
@@ -60,9 +62,13 @@ A transcendent sci-fi AI chat platform matching and surpassing the capabilities 
 - `POST /api/omnimens/execute-code` — run JavaScript in sandboxed subprocess
 - `POST /api/omnimens/deep-research` — SSE multi-step research with synthesis
 - `POST /api/omnimens/analyze-url` — fetch + extract content from URL
-- `GET /api/omnimens/pricing` — credit pack definitions
-- `POST /api/omnimens/checkout` — Stripe checkout session
-- `POST /api/omnimens/verify-session` — verify Stripe payment + add credits
+- `GET /api/omnimens/pricing` — billing model info + loyalty tiers
+- `GET /api/omnimens/billing` — user's billing summary (wallet, spend, next bonus)
+- `POST /api/omnimens/setup-wallet` — create Stripe hosted card-save session
+- `POST /api/omnimens/confirm-wallet` — confirm wallet after Stripe setup
+- `POST /api/omnimens/remove-wallet` — remove saved payment method
+- `POST /api/omnimens/topup` — manual topup (charge saved card, amountCents)
+- `POST /api/omnimens/update-topup-settings` — toggle auto-topup / change amount
 - `GET /api/omnimens/patches` — (owner only) behavioral patches
 - `DELETE /api/omnimens/patches/:id` — deactivate patch
 - `POST /api/omnimens/seed-products` — (owner only) create Stripe products
@@ -88,9 +94,10 @@ A transcendent sci-fi AI chat platform matching and surpassing the capabilities 
 - Owner (`REPL_OWNER_ID=50777126`) bypasses all credit checks
 
 ### Stripe
-- Mode: `"payment"` (one-time)
-- SPARK: `STRIPE_PRICE_SPARK`, SURGE: `STRIPE_PRICE_SURGE`, APEX: `STRIPE_PRICE_APEX`
-- Verify-session adds credits to user balance
+- Mode: `"setup"` for wallet save, manual PaymentIntent for topup charges
+- `createSetupSession()` → Stripe hosted setup page → saves card as payment method
+- `attemptAutoTopup()` → PaymentIntent with `off_session: true` using saved payment method
+- Auto-topup triggered in chat route when credits < MIN_CREDITS_MESSAGE and wallet connected
 
 ### SSE Chat Events
 - `{ type: "chunk", content }` — streaming token
