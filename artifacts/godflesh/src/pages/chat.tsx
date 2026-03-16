@@ -23,7 +23,7 @@ function ImageGeneratingBadge() {
     const t = setInterval(() => setElapsed((s) => s + 1), 1000);
     return () => clearInterval(t);
   }, []);
-  const pct = Math.min(100, (elapsed / 90) * 100);
+  const pct = Math.min(95, (elapsed / 45) * 100);
   return (
     <div className="mt-4 border border-primary/20 rounded-xl px-4 py-3 bg-primary/5 font-mono text-xs space-y-2">
       <div className="flex items-center gap-3 text-white/50">
@@ -34,8 +34,8 @@ function ImageGeneratingBadge() {
       <div className="w-full h-0.5 bg-white/5 rounded-full overflow-hidden">
         <div className="h-full bg-primary/60 transition-all duration-1000" style={{ width: `${pct}%` }} />
       </div>
-      {elapsed > 20 && (
-        <p className="text-white/25 text-[10px]">High-resolution synthesis in progress — this can take up to 2 minutes.</p>
+      {elapsed > 15 && (
+        <p className="text-white/25 text-[10px]">Neural image synthesis in progress — typically 20–60 seconds.</p>
       )}
     </div>
   );

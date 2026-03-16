@@ -562,7 +562,7 @@ router.post("/godflesh/chat", upload.array("files", 10), async (req, res) => {
         }, 8000);
         let imageBuffer: Buffer;
         try {
-          imageBuffer = await generateImageBuffer(prompt.slice(0, 4000), "1024x1024");
+          imageBuffer = await generateImageBuffer(prompt.slice(0, 4000), "1024x1024", "medium");
         } finally {
           clearInterval(heartbeat);
         }
