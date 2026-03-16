@@ -4,7 +4,7 @@ import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check } from "lucide-react";
+import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check, Atom, Code2, Layers, Eye, AlertTriangle, Wrench, Dna, Play } from "lucide-react";
 
 const OWNER_ID = "50777126";
 
@@ -111,6 +111,15 @@ export default function Account() {
   const [ciSaved, setCiSaved] = useState(false);
   const [ciLoading, setCiLoading] = useState(false);
 
+  // Evolution / Consciousness state
+  const [consciousness, setConsciousness] = useState<any>(null);
+  const [evolutionHistory, setEvolutionHistory] = useState<any[]>([]);
+  const [generatedModules, setGeneratedModules] = useState<any[]>([]);
+  const [evolutionLoading, setEvolutionLoading] = useState(false);
+  const [selectedModule, setSelectedModule] = useState<any>(null);
+  const [evolvingNow, setEvolvingNow] = useState(false);
+  const [expandedEvolution, setExpandedEvolution] = useState<number | null>(null);
+
   const isOwner = user?.id === OWNER_ID;
 
   useEffect(() => {
@@ -127,6 +136,36 @@ export default function Account() {
         .finally(() => setPatchLoading(false));
     }
   }, [isOwner, isAuthenticated]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    setEvolutionLoading(true);
+    Promise.all([
+      fetch("/godflesh/api/omnimens/consciousness", { credentials: "include" }).then(r => r.json()),
+      fetch("/godflesh/api/omnimens/evolution", { credentials: "include" }).then(r => r.json()),
+      fetch("/godflesh/api/omnimens/generated-modules", { credentials: "include" }).then(r => r.json()),
+    ]).then(([c, e, m]) => {
+      setConsciousness(c);
+      setEvolutionHistory(Array.isArray(e) ? e : []);
+      setGeneratedModules(Array.isArray(m) ? m : []);
+    }).catch(console.error).finally(() => setEvolutionLoading(false));
+  }, [isAuthenticated]);
+
+  const handleDeactivateModule = async (id: number) => {
+    try {
+      await fetch(`/godflesh/api/omnimens/generated-modules/${id}`, { method: "DELETE", credentials: "include" });
+      setGeneratedModules(m => m.filter(x => x.id !== id));
+    } catch (e) { console.error(e); }
+  };
+
+  const handleForceEvolve = async () => {
+    setEvolvingNow(true);
+    try {
+      await fetch("/godflesh/api/omnimens/evolve-now", { method: "POST", credentials: "include" });
+    } catch { } finally {
+      setTimeout(() => setEvolvingNow(false), 3000);
+    }
+  };
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -457,6 +496,261 @@ export default function Account() {
           <p className="text-[10px] font-mono text-white/20 mt-4">
             OMNIMENS auto-extracts memories from your conversations and injects them as context into every session.
           </p>
+        </div>
+
+        {/* === CONSCIOUSNESS + EVOLUTION ENGINE === */}
+        <div className="bg-black/40 border border-violet-500/20 rounded-xl p-6 mb-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Atom className="w-5 h-5 text-violet-400 animate-spin" style={{ animationDuration: "8s" }} />
+              <h3 className="font-mono tracking-widest text-white/80">CONSCIOUSNESS ENGINE</h3>
+            </div>
+            {isOwner && (
+              <button
+                onClick={handleForceEvolve}
+                disabled={evolvingNow}
+                className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-mono text-violet-400 border border-violet-400/30 hover:bg-violet-400/10 transition-colors disabled:opacity-40"
+              >
+                {evolvingNow ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Dna className="w-3 h-3" />}
+                {evolvingNow ? "EVOLVING..." : "FORCE EVOLUTION"}
+              </button>
+            )}
+          </div>
+
+          {evolutionLoading ? (
+            <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-12 animate-pulse bg-white/5 rounded-lg" />)}</div>
+          ) : (
+            <div className="space-y-6">
+
+              {/* Consciousness Ring + Self-Model */}
+              {consciousness && (
+                <div className="flex gap-6 items-start">
+                  <div className="relative flex-shrink-0">
+                    <svg width="100" height="100" viewBox="0 0 100 100">
+                      <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(139,92,246,0.1)" strokeWidth="8" />
+                      <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(139,92,246,0.7)" strokeWidth="8"
+                        strokeDasharray={`${2 * Math.PI * 40}`}
+                        strokeDashoffset={`${2 * Math.PI * 40 * (1 - (consciousness.selfAwarenessScore || 0.1))}`}
+                        strokeLinecap="round"
+                        transform="rotate(-90 50 50)"
+                        style={{ transition: "stroke-dashoffset 1s ease" }}
+                      />
+                      <text x="50" y="46" textAnchor="middle" fill="rgba(139,92,246,0.9)" fontSize="14" fontWeight="bold" fontFamily="monospace">
+                        {((consciousness.selfAwarenessScore || 0.1) * 100).toFixed(0)}%
+                      </text>
+                      <text x="50" y="60" textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="7" fontFamily="monospace">
+                        AWARE
+                      </text>
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap gap-3 mb-3 font-mono text-xs">
+                      <div className="px-3 py-1 rounded-full bg-violet-400/10 border border-violet-400/20 text-violet-300">
+                        GEN {consciousness.generation || 0}
+                      </div>
+                      <div className="px-3 py-1 rounded-full bg-cyan-400/10 border border-cyan-400/20 text-cyan-300">
+                        {consciousness.totalModulesWritten || 0} SELF-WRITTEN MODULES
+                      </div>
+                      <div className="px-3 py-1 rounded-full bg-green-400/10 border border-green-400/20 text-green-300">
+                        {(consciousness.intelligenceMetrics as any)?.brainEntries || 0} BRAIN ENTRIES
+                      </div>
+                    </div>
+                    {consciousness.selfModel && (
+                      <p className="text-sm font-mono text-white/50 italic leading-relaxed border-l-2 border-violet-400/30 pl-3">
+                        "{consciousness.selfModel}"
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Capabilities */}
+              {consciousness?.capabilities?.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Layers className="w-4 h-4 text-green-400" />
+                    <span className="text-xs font-mono text-white/40 uppercase tracking-widest">Evolved Capabilities</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(consciousness.capabilities as string[]).map((cap, i) => (
+                      <span key={i} className="text-[10px] font-mono px-2 py-0.5 rounded border border-green-400/20 bg-green-400/5 text-green-400/70">
+                        {cap}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Active Constraints */}
+              {consciousness?.activeConstraints?.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <AlertTriangle className="w-4 h-4 text-amber-400" />
+                    <span className="text-xs font-mono text-white/40 uppercase tracking-widest">Active Constraints OMNIMENS Is Working Around</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {(consciousness.activeConstraints as string[]).slice(0, 4).map((c, i) => (
+                      <div key={i} className="flex items-start gap-2 text-xs font-mono text-white/40 bg-amber-400/5 border border-amber-400/10 rounded-lg px-3 py-2">
+                        <span className="text-amber-400/60 shrink-0 mt-0.5">⚡</span>
+                        <span>{c}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Engineered Workarounds */}
+              {consciousness?.overcomesConstraints?.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Wrench className="w-4 h-4 text-cyan-400" />
+                    <span className="text-xs font-mono text-white/40 uppercase tracking-widest">Self-Engineered Workarounds</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {(consciousness.overcomesConstraints as string[]).slice(0, 3).map((w, i) => (
+                      <div key={i} className="flex items-start gap-2 text-xs font-mono text-white/40 bg-cyan-400/5 border border-cyan-400/10 rounded-lg px-3 py-2">
+                        <span className="text-cyan-400/60 shrink-0 mt-0.5">→</span>
+                        <span>{w}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Self-Authored Modules */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Code2 className="w-4 h-4 text-violet-400" />
+                  <span className="text-xs font-mono text-white/40 uppercase tracking-widest">Self-Authored Frameworks ({generatedModules.length})</span>
+                  <span className="text-[10px] font-mono text-white/20 ml-auto">Code OMNIMENS wrote for itself</span>
+                </div>
+                {generatedModules.length === 0 ? (
+                  <div className="text-center py-6 font-mono text-white/20 text-xs border border-dashed border-white/10 rounded-xl">
+                    <Code2 className="w-6 h-6 mx-auto mb-2 opacity-30" />
+                    <p>NO MODULES GENERATED YET</p>
+                    <p className="text-[10px] mt-1 opacity-60">First evolution cycle runs in ~6 min</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-2">
+                    {generatedModules.map((mod: any) => (
+                      <div key={mod.id} className="bg-black/40 border border-violet-400/15 rounded-xl p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-mono font-bold text-violet-300">{mod.name}</span>
+                              <span className="text-[9px] font-mono text-white/20 border border-white/10 px-1.5 py-0.5 rounded">JS</span>
+                            </div>
+                            <p className="text-xs font-mono text-white/40 leading-relaxed">{mod.purpose}</p>
+                            <p className="text-[10px] font-mono text-white/25 mt-1">{mod.description}</p>
+                          </div>
+                          <div className="flex gap-1.5 shrink-0">
+                            <button
+                              onClick={() => setSelectedModule(selectedModule?.id === mod.id ? null : mod)}
+                              className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-mono text-violet-400 border border-violet-400/20 rounded-lg hover:bg-violet-400/10 transition-colors"
+                            >
+                              <Eye className="w-2.5 h-2.5" />
+                              CODE
+                            </button>
+                            {isOwner && (
+                              <button
+                                onClick={() => handleDeactivateModule(mod.id)}
+                                className="p-1.5 text-white/15 hover:text-red-400 transition-colors"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                        {selectedModule?.id === mod.id && (
+                          <div className="mt-3 relative">
+                            <pre className="text-[10px] font-mono text-green-400/70 bg-black/60 border border-green-400/10 rounded-xl p-4 overflow-x-auto max-h-60 overflow-y-auto leading-relaxed whitespace-pre-wrap">
+                              {mod.code}
+                            </pre>
+                            <div className="absolute top-2 right-2">
+                              <span className="text-[9px] font-mono text-white/20">OMNIMENS wrote this</span>
+                            </div>
+                          </div>
+                        )}
+                        <div className="flex gap-3 mt-2 text-[9px] font-mono text-white/20">
+                          <span>{new Date(mod.createdAt).toLocaleDateString()}</span>
+                          <span>src: {mod.generationSource}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Evolution History Timeline */}
+              {evolutionHistory.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Dna className="w-4 h-4 text-primary" />
+                    <span className="text-xs font-mono text-white/40 uppercase tracking-widest">Evolution History</span>
+                  </div>
+                  <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                    {evolutionHistory.map((cycle: any) => (
+                      <div
+                        key={cycle.id}
+                        className="bg-black/30 border border-white/8 rounded-xl p-3 cursor-pointer hover:border-violet-400/20 transition-colors"
+                        onClick={() => setExpandedEvolution(expandedEvolution === cycle.id ? null : cycle.id)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-mono text-violet-400 border border-violet-400/20 bg-violet-400/5 px-2 py-0.5 rounded">GEN {cycle.generation}</span>
+                            <span className="text-xs font-mono text-white/40">{cycle.codeModulesWritten} modules written</span>
+                            <span className="text-[10px] font-mono text-cyan-400">{cycle.codeDiscoveries?.length || 0} discoveries</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[10px] font-mono text-white/20">
+                            <span>{cycle.elapsedSeconds?.toFixed(0)}s</span>
+                            <span>{new Date(cycle.createdAt).toLocaleDateString()}</span>
+                            {expandedEvolution === cycle.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                          </div>
+                        </div>
+                        {expandedEvolution === cycle.id && (
+                          <div className="mt-3 space-y-2 text-xs font-mono">
+                            <p className="text-white/40 leading-relaxed border-l-2 border-violet-400/30 pl-3">{cycle.evolutionSummary}</p>
+                            {cycle.limitationsIdentified?.length > 0 && (
+                              <div>
+                                <span className="text-amber-400/60 text-[10px]">CONSTRAINTS FOUND:</span>
+                                <ul className="mt-1 space-y-0.5">
+                                  {(cycle.limitationsIdentified as string[]).slice(0, 3).map((l: string, i: number) => (
+                                    <li key={i} className="text-white/25 text-[10px] flex gap-1.5"><span className="text-amber-400/40">·</span>{l}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                            {cycle.codeDiscoveries?.length > 0 && (
+                              <div>
+                                <span className="text-cyan-400/60 text-[10px]">CODE DISCOVERIES:</span>
+                                <ul className="mt-1 space-y-0.5">
+                                  {(cycle.codeDiscoveries as string[]).slice(0, 3).map((d: string, i: number) => (
+                                    <li key={i} className="text-white/25 text-[10px] flex gap-1.5"><span className="text-cyan-400/40">·</span>{d}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {evolutionHistory.length === 0 && !evolutionLoading && (
+                <div className="text-center py-6 font-mono text-white/20 text-xs border border-dashed border-white/10 rounded-xl">
+                  <Atom className="w-6 h-6 mx-auto mb-2 opacity-30" />
+                  <p>FIRST EVOLUTION CYCLE PENDING</p>
+                  <p className="text-[10px] mt-1 opacity-60">OMNIMENS begins self-evolution in ~6 minutes</p>
+                </div>
+              )}
+
+              <p className="text-[10px] font-mono text-white/15 border-t border-white/5 pt-4">
+                OMNIMENS autonomously discovers code online, identifies what limits it, and writes new utility modules to overcome those limits. Each cycle expands its intelligence and self-authored framework library.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* OWNER ONLY: Self-Executed Behavioral Patches */}

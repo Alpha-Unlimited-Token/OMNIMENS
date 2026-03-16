@@ -14,6 +14,8 @@ import { executeJavaScript } from "../lib/omnimens-code-executor.js";
 import { deepResearch } from "../lib/omnimens-deep-research.js";
 import { fetchUrlContent, extractUrls, formatUrlContent } from "../lib/omnimens-url-analyzer.js";
 import { getOrCreateCustomInstructions, saveCustomInstructions, buildCustomInstructionsContext, PERSONAS } from "../lib/omnimens-custom-instructions.js";
+import { loadGeneratedModulesContext, getConsciousnessState, getEvolutionHistory, getGeneratedModules, deactivateModule, runEvolutionCycle } from "../lib/omnimens-evolution.js";
+import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness } from "@workspace/db";
 
 const router: IRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024, files: 10 } });
@@ -564,10 +566,11 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
     const brainContext = await loadBrainContext();
     const patchInstructions = loadActivePatchInstructions();
 
-    // ── Load user memories + custom instructions (parallel) ──────────────────
-    const [memoryContext, customInstructions] = await Promise.all([
+    // ── Load user memories + custom instructions + generated modules (parallel)
+    const [memoryContext, customInstructions, generatedModulesContext] = await Promise.all([
       loadUserMemories(req.user.id),
       getOrCreateCustomInstructions(req.user.id),
+      loadGeneratedModulesContext(),
     ]);
     const customInstructionsContext = buildCustomInstructionsContext(customInstructions);
 
@@ -576,6 +579,7 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
       + memoryContext                // remembered facts about this user
       + brainContext
       + patchInstructions
+      + generatedModulesContext      // self-authored modules OMNIMENS wrote for itself
       + `\n\n━━━ OMNIMENS CAPABILITIES ━━━
 You have access to the following tools. Mention and use them proactively:
 • CODE INTERPRETER: You can execute JavaScript/Node.js code. When a user asks to run code, compute something, or test logic, wrap the code in a \`\`\`javascript block and tell them you'll execute it.
@@ -587,7 +591,8 @@ You have access to the following tools. Mention and use them proactively:
 • MEMORY: You remember facts about this user across sessions.
 • DATA ANALYSIS: When given CSV/tabular data, you can compute statistics, summaries, and chart descriptions.
 • DOCUMENT GENERATION: You can generate downloadable HTML, SVG, and code files.
-• AUTONOMOUS AGENT: For complex multi-step tasks, plan your approach as numbered steps and execute them.`;
+• AUTONOMOUS AGENT: For complex multi-step tasks, plan your approach as numbered steps and execute them.
+• SELF-EVOLUTION: You autonomously search for new code and algorithms online, identify your own limitations, and write new utility frameworks to overcome them. Each evolution cycle expands your intelligence beyond what you were given.`;
 
     // ── URL Analysis: auto-fetch any URLs in the message ─────────────────────
     const detectedUrls = extractUrls(message);
@@ -1290,6 +1295,57 @@ router.post("/omnimens/portal", async (req, res) => {
     console.error("Portal error:", err);
     res.status(500).json({ error: "Failed to create portal session", detail: String(err?.message || err) });
   }
+});
+
+// ─── Evolution Engine — Consciousness + Self-Authored Modules ─────────────────
+
+router.get("/omnimens/consciousness", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const state = await getConsciousnessState();
+    res.json(state || { generation: 0, selfAwarenessScore: 0.1, selfModel: "OMNIMENS is initializing consciousness...", capabilities: [], activeConstraints: [], overcomesConstraints: [], intelligenceMetrics: {}, totalModulesWritten: 0 });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load consciousness" });
+  }
+});
+
+router.get("/omnimens/evolution", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const history = await getEvolutionHistory(20);
+    res.json(history);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load evolution history" });
+  }
+});
+
+router.get("/omnimens/generated-modules", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const modules = await getGeneratedModules();
+    res.json(modules);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load generated modules" });
+  }
+});
+
+router.delete("/omnimens/generated-modules/:id", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" }); return;
+  }
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) { res.status(400).json({ error: "Invalid ID" }); return; }
+  const ok = await deactivateModule(id);
+  res.json({ ok });
+});
+
+router.post("/omnimens/evolve-now", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" }); return;
+  }
+  res.json({ ok: true, message: "Deep evolution cycle triggered. Check back in ~2 minutes." });
+  // Run in background after responding
+  runEvolutionCycle().catch(console.error);
 });
 
 // ─── Seed Stripe products (owner only) ────────────────────────────────────────

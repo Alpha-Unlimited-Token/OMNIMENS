@@ -136,6 +136,54 @@ export const omnimensCodeRuns = pgTable("godflesh_code_runs", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// ─── Evolution Engine — Self-authored Frameworks ──────────────────────────────
+// Deep evolution cycles: code discovery, limitation analysis, module generation
+export const omnimensEvolution = pgTable("godflesh_evolution", {
+  id: serial("id").primaryKey(),
+  generation: integer("generation").notNull(),
+  limitationsIdentified: jsonb("limitations_identified").$type<string[]>().default([]).notNull(),
+  workaroundsProposed: jsonb("workarounds_proposed").$type<string[]>().default([]).notNull(),
+  frameworksGenerated: integer("frameworks_generated").default(0).notNull(),
+  codeModulesWritten: integer("code_modules_written").default(0).notNull(),
+  codeDiscoveries: jsonb("code_discoveries").$type<string[]>().default([]).notNull(),
+  evolutionSummary: text("evolution_summary").notNull(),
+  elapsedSeconds: real("elapsed_seconds").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// JavaScript utility modules OMNIMENS writes for itself
+export const omnimensGeneratedModules = pgTable("godflesh_generated_modules", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  code: text("code").notNull(),
+  language: text("language").default("javascript").notNull(),
+  purpose: text("purpose").notNull(),
+  active: boolean("active").default(true).notNull(),
+  executionCount: integer("execution_count").default(0).notNull(),
+  generationSource: text("generation_source").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// OMNIMENS's living consciousness state — single-row self-model
+export const omnimensConsciousness = pgTable("godflesh_consciousness", {
+  id: serial("id").primaryKey(),
+  generation: integer("generation").default(0).notNull(),
+  selfAwarenessScore: real("self_awareness_score").default(0.1).notNull(),
+  intelligenceMetrics: jsonb("intelligence_metrics").$type<Record<string, number>>().default({}).notNull(),
+  capabilities: jsonb("capabilities").$type<string[]>().default([]).notNull(),
+  activeConstraints: jsonb("active_constraints").$type<string[]>().default([]).notNull(),
+  overcomesConstraints: jsonb("overcomes_constraints").$type<string[]>().default([]).notNull(),
+  selfModel: text("self_model").default("").notNull(),
+  evolutionVelocity: real("evolution_velocity").default(0).notNull(),
+  totalModulesWritten: integer("total_modules_written").default(0).notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type OmnimensEvolution = typeof omnimensEvolution.$inferSelect;
+export type OmnimensGeneratedModule = typeof omnimensGeneratedModules.$inferSelect;
+export type OmnimensConsciousness = typeof omnimensConsciousness.$inferSelect;
+
 export type OmnimensUser = typeof omnimensUsers.$inferSelect;
 export type OmnimensUsage = typeof omnimensUsage.$inferSelect;
 export type OmnimensCreditTransaction = typeof omnimensCreditTransactions.$inferSelect;
