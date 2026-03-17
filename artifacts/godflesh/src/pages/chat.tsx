@@ -2780,7 +2780,197 @@ function LeftPanel({
   );
 }
 
-// ── Right Panel ────────────────────────────────────────────────────────────────
+// ── Dev IDE Activity Bar ────────────────────────────────────────────────────────
+
+function DevActivityBar({
+  activeTab,
+  onSelect,
+}: {
+  activeTab: string;
+  onSelect: (tab: string) => void;
+}) {
+  const items = [
+    { id: "chats",  icon: <MessageSquare className="w-[18px] h-[18px]" />, label: "Chats" },
+    { id: "search", icon: <Search className="w-[18px] h-[18px]" />,        label: "Search" },
+    { id: "files",  icon: <HardDrive className="w-[18px] h-[18px]" />,     label: "Files" },
+    { id: "memory", icon: <MemoryStick className="w-[18px] h-[18px]" />,   label: "Memory" },
+    { id: "tools",  icon: <Wrench className="w-[18px] h-[18px]" />,        label: "Tools" },
+  ];
+  return (
+    <div
+      className="shrink-0 flex flex-col items-center py-2 gap-0.5 border-r z-10"
+      style={{ width: 44, background: "#0D1117", borderColor: "#21262d" }}
+    >
+      <div className="w-7 h-7 flex items-center justify-center mb-3 shrink-0">
+        <OmnimensIcon size={20} />
+      </div>
+      {items.map(item => (
+        <button
+          key={item.id}
+          title={item.label}
+          onClick={() => onSelect(item.id)}
+          className="relative w-9 h-9 rounded flex items-center justify-center transition-all shrink-0"
+          style={{
+            color: activeTab === item.id ? "#fff" : "rgba(255,255,255,0.35)",
+            background: activeTab === item.id ? "rgba(255,255,255,0.08)" : "transparent",
+            borderLeft: activeTab === item.id ? "2px solid #a855f7" : "2px solid transparent",
+          }}
+        >
+          {item.icon}
+        </button>
+      ))}
+      <div className="flex-1" />
+      <button
+        title="Settings"
+        className="w-9 h-9 rounded flex items-center justify-center transition-all shrink-0"
+        style={{ color: "rgba(255,255,255,0.25)" }}
+      >
+        <Settings className="w-[16px] h-[16px]" />
+      </button>
+    </div>
+  );
+}
+
+// ── Dev IDE Right Panel Tabs ─────────────────────────────────────────────────
+
+function DevRightPanel({
+  allImages,
+  allArtifacts,
+  status,
+  credits,
+  messages,
+}: {
+  allImages: GeneratedImage[];
+  allArtifacts: Artifact[];
+  status: any;
+  credits?: number;
+  messages: any[];
+}) {
+  const [tab, setTab] = useState<"output"|"preview"|"shell">("output");
+
+  const lastCodeBlock = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const content = messages[i].content || "";
+      const match = content.match(/```(?:\w+)?\n([\s\S]*?)```/);
+      if (match) return match[0];
+    }
+    return null;
+  }, [messages]);
+
+  const lastHtml = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const content = messages[i].content || "";
+      const m = content.match(/```html\n([\s\S]*?)```/);
+      if (m) return m[1];
+    }
+    return null;
+  }, [messages]);
+
+  return (
+    <div className="flex flex-col h-full" style={{ background: "#0D1117" }}>
+      {/* Tab bar */}
+      <div className="shrink-0 flex border-b" style={{ borderColor: "#21262d" }}>
+        {(["output","preview","shell"] as const).map(t => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className="px-4 py-2 text-[10px] font-mono uppercase tracking-widest transition-all border-b-2"
+            style={{
+              color: tab === t ? "#fff" : "rgba(255,255,255,0.35)",
+              borderColor: tab === t ? "#a855f7" : "transparent",
+              background: "transparent",
+            }}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "thin" }}>
+        {tab === "output" && (
+          <div className="p-3 space-y-3">
+            {/* Session status */}
+            <div className="rounded border p-3" style={{ borderColor: "#21262d", background: "#161b22" }}>
+              <p className="font-mono text-[9px] tracking-[0.2em] mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>SESSION</p>
+              {status?.isOwner ? (
+                <p className="font-mono text-[10px] font-bold" style={{ color: "#a855f7" }}>⚡ CREATOR — UNLIMITED</p>
+              ) : credits != null ? (
+                <div>
+                  <p className="font-mono text-xs font-bold text-white">{credits} credits</p>
+                  <p className="font-mono text-[9px] mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>≈ ${(credits * 0.01).toFixed(2)} balance</p>
+                </div>
+              ) : (
+                <p className="font-mono text-[10px]" style={{ color: "rgba(255,255,255,0.4)" }}>Loading...</p>
+              )}
+            </div>
+            {/* Last code block */}
+            {lastCodeBlock ? (
+              <div className="rounded border overflow-hidden" style={{ borderColor: "#21262d" }}>
+                <div className="px-3 py-1.5 border-b flex items-center gap-2" style={{ borderColor: "#21262d", background: "#161b22" }}>
+                  <FileCode className="w-3 h-3" style={{ color: "#a855f7" }} />
+                  <span className="font-mono text-[9px]" style={{ color: "rgba(255,255,255,0.5)" }}>LATEST CODE</span>
+                </div>
+                <pre className="p-3 text-[10px] font-mono overflow-x-auto" style={{ color: "rgba(255,255,255,0.7)", background: "#0d1117", scrollbarWidth: "thin" }}>
+                  {lastCodeBlock}
+                </pre>
+              </div>
+            ) : (
+              <div className="rounded border border-dashed p-6 text-center" style={{ borderColor: "#21262d" }}>
+                <Terminal className="w-6 h-6 mx-auto mb-2" style={{ color: "rgba(255,255,255,0.15)" }} />
+                <p className="font-mono text-[9px]" style={{ color: "rgba(255,255,255,0.25)" }}>Code output appears here</p>
+              </div>
+            )}
+            {/* Images */}
+            {allImages.length > 0 && (
+              <div>
+                <p className="font-mono text-[9px] mb-1.5 px-1" style={{ color: "rgba(255,255,255,0.4)" }}>IMAGES ({allImages.length})</p>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {allImages.map(img => (
+                    <img key={img.index} src={img.url} alt={img.prompt} className="w-full aspect-square object-cover rounded border" style={{ borderColor: "#21262d" }} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {tab === "preview" && (
+          <div className="p-3">
+            {lastHtml ? (
+              <iframe
+                srcDoc={lastHtml}
+                className="w-full rounded border"
+                style={{ height: "calc(100vh - 200px)", borderColor: "#21262d", background: "#fff" }}
+                sandbox="allow-scripts"
+                title="Preview"
+              />
+            ) : (
+              <div className="rounded border border-dashed p-8 text-center" style={{ borderColor: "#21262d" }}>
+                <Monitor className="w-8 h-8 mx-auto mb-2" style={{ color: "rgba(255,255,255,0.12)" }} />
+                <p className="font-mono text-[9px]" style={{ color: "rgba(255,255,255,0.25)" }}>HTML preview appears here</p>
+                <p className="font-mono text-[8px] mt-1" style={{ color: "rgba(255,255,255,0.15)" }}>Ask OMNIMENS to build a website</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {tab === "shell" && (
+          <div className="p-3">
+            <div className="rounded border p-3 font-mono text-[10px]" style={{ borderColor: "#21262d", background: "#161b22" }}>
+              <p style={{ color: "#4ade80" }}>omnimens@workspace:~$</p>
+              <p className="mt-1" style={{ color: "rgba(255,255,255,0.5)" }}>OMNIMENS shell integration active.</p>
+              <p className="mt-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>Ask OMNIMENS to run commands via the chat.</p>
+              <p className="mt-2 animate-pulse" style={{ color: "#a855f7" }}>▋</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Right Panel (default) ───────────────────────────────────────────────────────
 
 function RightPanel({
   allImages,
@@ -3420,6 +3610,8 @@ export default function Chat() {
   const [showPlusMenu, setShowPlusMenu] = useState(false);
   const [agentMode, setAgentMode] = useState<"swift"|"omni"|"apex">("omni");
   const [showAgentModes, setShowAgentModes] = useState(false);
+  const [devLayout, setDevLayout] = useState(false);
+  const [devActivityTab, setDevActivityTab] = useState("chats");
   const [showTasksPanel, setShowTasksPanel] = useState(false);
   const [tasks, setTasks] = useState<Array<{id:string;title:string;status:"pending"|"running"|"done"}>>([]);
   const [newTaskInput, setNewTaskInput] = useState("");
@@ -3608,7 +3800,23 @@ export default function Chat() {
     <ActiveProjectCtx.Provider value={activeProject}>
     <Layout>
       {/* 3-panel workspace */}
-      <div className="flex flex-1 overflow-hidden" style={{ height: "calc(100vh - 4rem)" }}>
+      <div
+        className="flex flex-1 overflow-hidden"
+        style={{
+          height: "calc(100vh - 4rem)",
+          background: devLayout ? "#0D1117" : undefined,
+        }}
+      >
+        {/* ── IDE ACTIVITY BAR (dev layout only) ──────────────────── */}
+        {devLayout && (
+          <DevActivityBar
+            activeTab={devActivityTab}
+            onSelect={(tab) => {
+              setDevActivityTab(tab);
+              if (!leftOpen) setLeftOpen(true);
+            }}
+          />
+        )}
 
         {/* ── LEFT PANEL ──────────────────────────────────────────── */}
         <AnimatePresence initial={false}>
@@ -3618,8 +3826,12 @@ export default function Chat() {
               animate={{ width: 220, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="shrink-0 border-r border-white/8 bg-black/60 overflow-hidden hidden lg:block"
-              style={{ minWidth: 0 }}
+              className="shrink-0 overflow-hidden hidden lg:block"
+              style={{
+                minWidth: 0,
+                borderRight: devLayout ? "1px solid #21262d" : "1px solid rgba(255,255,255,0.08)",
+                background: devLayout ? "#161b22" : "rgba(0,0,0,0.6)",
+              }}
             >
               <LeftPanel
                 persona={persona}
@@ -3648,8 +3860,86 @@ export default function Chat() {
         {/* ── CENTER — CHAT ────────────────────────────────────────── */}
         <div className="flex-1 flex flex-col overflow-hidden min-w-0">
 
+          {/* ── IDE Tab Bar (dev layout only) ─────────────────────── */}
+          {devLayout && (
+            <div
+              className="shrink-0 flex items-center border-b"
+              style={{ background: "#161b22", borderColor: "#21262d", minHeight: 38 }}
+            >
+              {/* Left panel toggle */}
+              <button
+                onClick={() => setLeftOpen(o => !o)}
+                className="hidden lg:flex items-center justify-center transition-colors p-2.5 shrink-0"
+                title={leftOpen ? "Hide panel" : "Show panel"}
+                style={{ color: "rgba(255,255,255,0.4)" }}
+              >
+                {leftOpen ? <PanelLeftClose className="w-3.5 h-3.5" /> : <PanelLeft className="w-3.5 h-3.5" />}
+              </button>
+
+              {/* File tabs */}
+              <div className="flex items-center overflow-x-auto flex-1" style={{ scrollbarWidth: "none" }}>
+                {conversations.slice(0, 6).map(conv => (
+                  <button
+                    key={conv.id}
+                    onClick={() => handleLoadConversation(conv.id)}
+                    className="flex items-center gap-1.5 px-4 py-2 border-r shrink-0 transition-all text-[11px] font-mono"
+                    style={{
+                      borderColor: "#21262d",
+                      background: currentConversationId === conv.id ? "#0D1117" : "transparent",
+                      color: currentConversationId === conv.id ? "#fff" : "rgba(255,255,255,0.35)",
+                      borderBottom: currentConversationId === conv.id ? "1px solid #0D1117" : "1px solid transparent",
+                    }}
+                  >
+                    <FileText className="w-3 h-3 shrink-0" style={{ color: currentConversationId === conv.id ? "#a855f7" : undefined }} />
+                    <span className="max-w-[120px] truncate">{conv.title || "untitled.omni"}</span>
+                    <X
+                      className="w-3 h-3 ml-1 shrink-0 opacity-0 hover:opacity-100"
+                      style={{ color: "rgba(255,255,255,0.4)" }}
+                      onClick={e => { e.stopPropagation(); handleDeleteConversation(conv.id); }}
+                    />
+                  </button>
+                ))}
+                <button
+                  onClick={handleNewChat}
+                  className="flex items-center justify-center w-8 h-full shrink-0 transition-all"
+                  title="New chat (Ctrl+K)"
+                  style={{ color: "rgba(255,255,255,0.25)" }}
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Right controls */}
+              <div className="flex items-center gap-1 px-2 shrink-0">
+                <button
+                  onClick={toggleTheme}
+                  title="Toggle theme"
+                  className="w-7 h-7 flex items-center justify-center rounded transition-all"
+                  style={{ color: "rgba(255,255,255,0.35)" }}
+                >
+                  {theme === "light" ? <Sun className="w-3.5 h-3.5 text-yellow-400" /> : <Moon className="w-3.5 h-3.5" />}
+                </button>
+                <button
+                  onClick={() => setRightOpen(o => !o)}
+                  className="hidden lg:flex items-center justify-center w-7 h-7 rounded transition-all"
+                  style={{ color: "rgba(255,255,255,0.35)" }}
+                >
+                  {rightOpen ? <PanelRightClose className="w-3.5 h-3.5" /> : <PanelRight className="w-3.5 h-3.5" />}
+                </button>
+                <button
+                  onClick={() => setDevLayout(false)}
+                  title="Exit IDE Mode"
+                  className="flex items-center gap-1 px-2 py-1 rounded text-[9px] font-mono font-bold transition-all border"
+                  style={{ color: "#a855f7", borderColor: "rgba(168,85,247,0.3)", background: "rgba(168,85,247,0.08)" }}
+                >
+                  <Monitor className="w-3 h-3" /> IDE
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Top bar */}
-          <div className="shrink-0 flex items-center justify-between px-3 py-2 border-b border-white/8 bg-black/40">
+          <div className={`shrink-0 flex items-center justify-between px-3 py-2 border-b border-white/8 bg-black/40 ${devLayout ? "hidden" : ""}`}>
             {/* Left panel toggle */}
             <button
               onClick={() => setLeftOpen(o => !o)}
@@ -3778,6 +4068,19 @@ export default function Chat() {
               >
                 {rightOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRight className="w-4 h-4" />}
               </button>
+              {/* IDE Layout toggle */}
+              <button
+                onClick={() => setDevLayout(d => !d)}
+                title={devLayout ? "Exit IDE Mode" : "Developer IDE Mode — Replit-style layout"}
+                className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all border text-[9px] font-mono font-bold tracking-wider ${
+                  devLayout
+                    ? "text-primary border-primary/30 bg-primary/10"
+                    : "text-white/35 border-transparent hover:text-white/60 hover:bg-white/[0.05]"
+                }`}
+              >
+                <Monitor className="w-3.5 h-3.5" />
+                <span className="hidden sm:block">IDE</span>
+              </button>
             </div>
           </div>
 
@@ -3805,7 +4108,10 @@ export default function Chat() {
           )}
 
           {/* Messages area */}
-          <div className="flex-1 overflow-y-auto omnimens-scrollbar p-4 bg-black/20 relative">
+          <div
+            className="flex-1 overflow-y-auto omnimens-scrollbar p-4 relative"
+            style={{ background: devLayout ? "#0D1117" : "rgba(0,0,0,0.12)" }}
+          >
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center select-none">
                 <OmnimensPresence
@@ -4321,6 +4627,34 @@ export default function Chat() {
             onClose={() => setShowTemplates(false)}
             onUseTemplate={(t) => { setInput(t); setShowTemplates(false); }}
           />
+
+          {/* ── IDE Status Bar (dev layout only) ─────────────────── */}
+          {devLayout && (
+            <div
+              className="shrink-0 flex items-center justify-between px-3"
+              style={{ background: "#a855f7", height: 22, minHeight: 22 }}
+            >
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-[9px] text-white/80 font-bold tracking-wider">
+                  {PERSONA_NAMES[persona] || persona}
+                </span>
+                <span className="font-mono text-[9px] text-white/60">
+                  {selectedModel}
+                </span>
+                <span className="font-mono text-[9px] text-white/60">
+                  {messages.length} messages
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-[9px] text-white/70">
+                  OMNIMENS IDE
+                </span>
+                <span className="font-mono text-[9px] text-white/60">
+                  {agentMode.toUpperCase()} MODE
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ── RIGHT PANEL ─────────────────────────────────────────── */}
@@ -4328,18 +4662,32 @@ export default function Chat() {
           {rightOpen && (
             <motion.div
               initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 260, opacity: 1 }}
+              animate={{ width: devLayout ? 300 : 260, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="shrink-0 border-l border-white/8 bg-black/60 overflow-hidden hidden lg:block"
-              style={{ minWidth: 0 }}
+              className="shrink-0 overflow-hidden hidden lg:block"
+              style={{
+                minWidth: 0,
+                borderLeft: devLayout ? "1px solid #21262d" : "1px solid rgba(255,255,255,0.08)",
+                background: devLayout ? "#0D1117" : "rgba(0,0,0,0.6)",
+              }}
             >
-              <RightPanel
-                allImages={allImages}
-                allArtifacts={allArtifacts}
-                status={status}
-                credits={(status as any)?.credits}
-              />
+              {devLayout ? (
+                <DevRightPanel
+                  allImages={allImages}
+                  allArtifacts={allArtifacts}
+                  status={status}
+                  credits={(status as any)?.credits}
+                  messages={messages}
+                />
+              ) : (
+                <RightPanel
+                  allImages={allImages}
+                  allArtifacts={allArtifacts}
+                  status={status}
+                  credits={(status as any)?.credits}
+                />
+              )}
             </motion.div>
           )}
         </AnimatePresence>
