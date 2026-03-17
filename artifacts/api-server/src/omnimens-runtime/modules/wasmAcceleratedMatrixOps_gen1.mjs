@@ -1,97 +1,107 @@
+// wasmAcceleratedMatrixOps.js
+
 /**
- * wasmAcceleratedMatrixOps
- * 
- * This module provides efficient matrix operations using WebAssembly (WASM) for embeddings and neural computations.
- * It supports matrix multiplication, inversion, and other linear algebra functions, leveraging BLAS-like operations.
- * 
  * @module wasmAcceleratedMatrixOps
+ * @description This module provides high-performance matrix operations using WebAssembly (Wasm) for tasks such as embedding similarity and neural computations.
  */
 
-// WebAssembly binary for matrix operations (placeholder, replace with actual WASM binary)
-const wasmBinary = new Uint8Array([
-  /* WASM binary goes here */
-]);
+const { readFile } = require('fs/promises');
+const path = require('path');
 
 /**
- * Initializes the WebAssembly module and provides access to matrix operations.
- * @returns {Promise<Object>} A promise that resolves to an object with matrix operation functions.
+ * Loads the WebAssembly binary and initializes the Wasm module.
+ * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the initialized WebAssembly instance.
  */
-export async function initializeWasmMatrixOps() {
-  const wasmModule = await WebAssembly.instantiate(wasmBinary, {});
-  const { exports } = wasmModule.instance;
-
-  /**
-   * Multiplies two matrices.
-   * @param {Float64Array} A - The first matrix (flattened array).
-   * @param {Float64Array} B - The second matrix (flattened array).
-   * @param {number} rowsA - Number of rows in matrix A.
-   * @param {number} colsA - Number of columns in matrix A.
-   * @param {number} colsB - Number of columns in matrix B.
-   * @returns {Float64Array} The resulting matrix (flattened array).
-   */
-  function multiplyMatrices(A, B, rowsA, colsA, colsB) {
-    if (A.length !== rowsA * colsA || B.length !== colsA * colsB) {
-      throw new Error("Invalid matrix dimensions.");
-    }
-
-    const result = new Float64Array(rowsA * colsB);
-    exports.matrixMultiply(A, B, result, rowsA, colsA, colsB);
-    return result;
-  }
-
-  /**
-   * Inverts a square matrix.
-   * @param {Float64Array} matrix - The matrix to invert (flattened array).
-   * @param {number} size - The size of the square matrix.
-   * @returns {Float64Array} The inverted matrix (flattened array).
-   */
-  function invertMatrix(matrix, size) {
-    if (matrix.length !== size * size) {
-      throw new Error("Matrix must be square.");
-    }
-
-    const result = new Float64Array(size * size);
-    const success = exports.matrixInvert(matrix, result, size);
-    if (!success) {
-      throw new Error("Matrix inversion failed (possibly singular matrix).");
-    }
-    return result;
-  }
-
-  /**
-   * Computes the transpose of a matrix.
-   * @param {Float64Array} matrix - The matrix to transpose (flattened array).
-   * @param {number} rows - Number of rows in the matrix.
-   * @param {number} cols - Number of columns in the matrix.
-   * @returns {Float64Array} The transposed matrix (flattened array).
-   */
-  function transposeMatrix(matrix, rows, cols) {
-    if (matrix.length !== rows * cols) {
-      throw new Error("Invalid matrix dimensions.");
-    }
-
-    const result = new Float64Array(rows * cols);
-    exports.matrixTranspose(matrix, result, rows, cols);
-    return result;
-  }
-
-  return {
-    multiplyMatrices,
-    invertMatrix,
-    transposeMatrix
-  };
+async function initializeWasm() {
+  const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = await readFile(wasmPath);
+  const wasmModule = await WebAssembly.instantiate(wasmBuffer);
+  return wasmModule.instance;
 }
 
 /**
- * Example usage:
- * 
- * import { initializeWasmMatrixOps } from './wasmAcceleratedMatrixOps.js';
- * 
- * (async () => {
- *   const matrixOps = await initializeWasmMatrixOps();
- *   const A = new Float64Array([1, 2, 3, 4]);
- *   const B = new Float64Array([5, 6, 7, 8]);
- *   const result = matrixOps.multiplyMatrices(A, B, 2, 2, 2);
- *   console.log(result);
- * })();
+ * Multiplies two matrices using Wasm for high performance.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @param {WebAssembly.Instance} wasmInstance - The initialized Wasm instance.
+ * @returns {number[][]} The resulting matrix after multiplication.
+ * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
  */
+function multiplyMatrices(matrixA, matrixB, wasmInstance) {
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
+
+  if (colsA !== rowsB) {
+    throw new Error('Matrix dimensions do not match for multiplication.');
+  }
+
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
+  const result = new Float64Array(rowsA * colsB);
+
+  const { memory, multiply_matrices } = wasmInstance.exports;
+
+  const aPtr = wasmInstance.exports.malloc(flatA.length * 8);
+  const bPtr = wasmInstance.exports.malloc(flatB.length * 8);
+  const resultPtr = wasmInstance.exports.malloc(result.length * 8);
+
+  const memoryView = new Float64Array(memory.buffer);
+  memoryView.set(flatA, aPtr / 8);
+  memoryView.set(flatB, bPtr / 8);
+
+  multiply_matrices(aPtr, bPtr, resultPtr, rowsA, colsA, colsB);
+
+  result.set(memoryView.subarray(resultPtr / 8, resultPtr / 8 + result.length));
+
+  wasmInstance.exports.free(aPtr);
+  wasmInstance.exports.free(bPtr);
+  wasmInstance.exports.free(resultPtr);
+
+  const outputMatrix = [];
+  for (let i = 0; i < rowsA; i++) {
+    outputMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
+  }
+
+  return outputMatrix;
+}
+
+/**
+ * Computes the dot product of two vectors using Wasm for high performance.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @param {WebAssembly.Instance} wasmInstance - The initialized Wasm instance.
+ * @returns {number} The dot product of the two vectors.
+ * @throws {Error} If the vectors have different lengths.
+ */
+function dotProduct(vectorA, vectorB, wasmInstance) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must be of the same length for dot product.');
+  }
+
+  const flatA = new Float64Array(vectorA);
+  const flatB = new Float64Array(vectorB);
+
+  const { memory, dot_product } = wasmInstance.exports;
+
+  const aPtr = wasmInstance.exports.malloc(flatA.length * 8);
+  const bPtr = wasmInstance.exports.malloc(flatB.length * 8);
+
+  const memoryView = new Float64Array(memory.buffer);
+  memoryView.set(flatA, aPtr / 8);
+  memoryView.set(flatB, bPtr / 8);
+
+  const result = dot_product(aPtr, bPtr, flatA.length);
+
+  wasmInstance.exports.free(aPtr);
+  wasmInstance.exports.free(bPtr);
+
+  return result;
+}
+
+module.exports = {
+  initializeWasm,
+  multiplyMatrices,
+  dotProduct
+};
