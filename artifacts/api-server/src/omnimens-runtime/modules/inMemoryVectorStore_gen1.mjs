@@ -1,145 +1,93 @@
 /**
  * @module inMemoryVectorStore
- * @description Provides high-speed vector operations and embedding retrieval using HNSW (Hierarchical Navigable Small World) graphs.
- * This module is designed for approximate nearest neighbor search in high-dimensional spaces.
+ * @description A utility module for storing high-dimensional embeddings and performing fast semantic similarity searches using cosine similarity.
  */
 
 /**
- * Represents a node in the HNSW graph.
- * @class
- */
-class HNSWNode {
-  /**
-   * @param {number[]} vector - The vector associated with this node.
-   * @param {number} id - Unique identifier for the node.
-   */
-  constructor(vector, id) {
-    this.vector = vector;
-    this.id = id;
-    this.neighbors = new Map(); // Map of level -> Set of neighbors
-  }
-}
-
-/**
- * HNSW-based in-memory vector store for approximate nearest neighbor search.
- * @class
+ * Class representing an in-memory vector store with approximate nearest neighbor search.
  */
 class InMemoryVectorStore {
   constructor() {
-    this.nodes = new Map(); // Map of id -> HNSWNode
-    this.entryPoint = null; // Entry point for the graph
-    this.levels = 0; // Number of levels in the graph
+    /**
+     * @type {Map<string, number[]>}
+     * @private
+     * A map to store vectors, keyed by unique IDs.
+     */
+    this.vectorMap = new Map();
   }
 
   /**
    * Adds a vector to the store.
-   * @param {number[]} vector - The vector to add.
-   * @param {number} id - Unique identifier for the vector.
+   * @param {string} id - A unique identifier for the vector.
+   * @param {number[]} vector - The high-dimensional vector to store.
+   * @throws {Error} If the vector is not an array of numbers.
    */
-  addVector(vector, id) {
-    if (this.nodes.has(id)) {
-      throw new Error(`Vector with id ${id} already exists.`);
+  addVector(id, vector) {
+    if (!Array.isArray(vector) || !vector.every((val) => typeof val === 'number')) {
+      throw new Error('Vector must be an array of numbers.');
     }
-
-    const newNode = new HNSWNode(vector, id);
-    this.nodes.set(id, newNode);
-
-    if (!this.entryPoint) {
-      this.entryPoint = newNode;
-      this.levels = 1;
-      return;
-    }
-
-    this._insertNode(newNode);
+    this.vectorMap.set(id, vector);
   }
 
   /**
-   * Finds the nearest neighbors for a given query vector.
-   * @param {number[]} queryVector - The query vector.
-   * @param {number} k - Number of nearest neighbors to retrieve.
-   * @returns {Array<{id: number, distance: number}>} The k-nearest neighbors.
+   * Computes the cosine similarity between two vectors.
+   * @param {number[]} vecA - The first vector.
+   * @param {number[]} vecB - The second vector.
+   * @returns {number} The cosine similarity between vecA and vecB.
    */
-  search(queryVector, k) {
-    if (!this.entryPoint) {
-      throw new Error("The vector store is empty.");
+  static cosineSimilarity(vecA, vecB) {
+    const dotProduct = vecA.reduce((sum, val, i) => sum + val * vecB[i], 0);
+    const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val ** 2, 0));
+    const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val ** 2, 0));
+    return dotProduct / (magnitudeA * magnitudeB);
+  }
+
+  /**
+   * Finds the nearest neighbors to a given vector.
+   * @param {number[]} queryVector - The vector to search for.
+   * @param {number} k - The number of nearest neighbors to return.
+   * @returns {Array<{id: string, similarity: number}>} An array of nearest neighbors with their IDs and similarity scores.
+   */
+  findNearestNeighbors(queryVector, k = 1) {
+    if (!Array.isArray(queryVector) || !queryVector.every((val) => typeof val === 'number')) {
+      throw new Error('Query vector must be an array of numbers.');
     }
 
-    const visited = new Set();
-    const candidates = [this.entryPoint];
-    const results = [];
+    const similarities = [];
 
-    while (candidates.length > 0) {
-      const current = candidates.pop();
-
-      if (visited.has(current.id)) {
-        continue;
-      }
-
-      visited.add(current.id);
-
-      const distance = this._euclideanDistance(queryVector, current.vector);
-      results.push({ id: current.id, distance });
-
-      for (const neighbor of current.neighbors.get(0) || []) {
-        if (!visited.has(neighbor.id)) {
-          candidates.push(neighbor);
-        }
-      }
+    for (const [id, vector] of this.vectorMap.entries()) {
+      const similarity = InMemoryVectorStore.cosineSimilarity(queryVector, vector);
+      similarities.push({ id, similarity });
     }
 
-    return results
-      .sort((a, b) => a.distance - b.distance)
+    return similarities
+      .sort((a, b) => b.similarity - a.similarity)
       .slice(0, k);
   }
 
   /**
-   * Inserts a node into the graph.
-   * @private
-   * @param {HNSWNode} newNode - The node to insert.
+   * Removes a vector from the store by its ID.
+   * @param {string} id - The unique identifier of the vector to remove.
+   * @returns {boolean} True if the vector was removed, false if not found.
    */
-  _insertNode(newNode) {
-    const entryPoint = this.entryPoint;
-    const distance = this._euclideanDistance(newNode.vector, entryPoint.vector);
-
-    if (!entryPoint.neighbors.has(0)) {
-      entryPoint.neighbors.set(0, new Set());
-    }
-
-    entryPoint.neighbors.get(0).add(newNode);
-    newNode.neighbors.set(0, new Set([entryPoint]));
+  removeVector(id) {
+    return this.vectorMap.delete(id);
   }
 
   /**
-   * Calculates the Euclidean distance between two vectors.
-   * @private
-   * @param {number[]} vector1 - The first vector.
-   * @param {number[]} vector2 - The second vector.
-   * @returns {number} The Euclidean distance.
+   * Clears all vectors from the store.
    */
-  _euclideanDistance(vector1, vector2) {
-    if (vector1.length !== vector2.length) {
-      throw new Error("Vectors must have the same dimensionality.");
-    }
+  clear() {
+    this.vectorMap.clear();
+  }
 
-    return Math.sqrt(
-      vector1.reduce((sum, val, i) => sum + Math.pow(val - vector2[i], 2), 0)
-    );
+  /**
+   * Returns the total number of vectors in the store.
+   * @returns {number} The number of stored vectors.
+   */
+  size() {
+    return this.vectorMap.size;
   }
 }
 
-/**
- * Creates a new instance of the in-memory vector store.
- * @returns {InMemoryVectorStore} The vector store instance.
- */
-export function createVectorStore() {
-  return new InMemoryVectorStore();
-}
-
-/**
- * Example usage of the module.
- * Uncomment the following lines to test the functionality.
- */
-// const store = createVectorStore();
-// store.addVector([1, 2, 3], 1);
-// store.addVector([4, 5, 6], 2);
-// console.log(store.search([1, 2, 3], 1));
+export { InMemoryVectorStore };

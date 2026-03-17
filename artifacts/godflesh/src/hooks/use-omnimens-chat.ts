@@ -293,6 +293,7 @@ export function useOmnimensChat(
   onLimitReached: () => void,
   gpuCompressor?: GpuCompressorFn,
   onOutOfCredits?: (reason: OutOfCreditsReason) => void,
+  onNewConversation?: (conversationId: number, firstMessage: string) => void,
 ) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -305,6 +306,7 @@ export function useOmnimensChat(
   const [activeCogniSync, setActiveCogniSync] = useState<CogniSyncState | null>(null);
   const queryClient = useQueryClient();
   const abortControllerRef = useRef<AbortController | null>(null);
+  const newConvFirstMsgRef = useRef<string | null>(null);
 
   const startNewConversation = () => {
     setMessages([]);
@@ -325,6 +327,9 @@ export function useOmnimensChat(
   const sendMessage = async (content: string, files: File[] = [], persona = "GENERAL", hubSettings?: any, model = "gpt-4o", responseMode = "AUTO", sessionStart?: number) => {
     if (!content.trim() && files.length === 0) return;
     if (isTyping) return;
+    if (currentConversationId === undefined && content.trim()) {
+      newConvFirstMsgRef.current = content.trim();
+    }
 
     const userMsgId = Date.now().toString();
     const assistantMsgId = (Date.now() + 1).toString();
@@ -438,6 +443,11 @@ export function useOmnimensChat(
 
               if (data.type === "conversation_id") {
                 setCurrentConversationId(data.conversationId);
+                if (newConvFirstMsgRef.current !== null) {
+                  const firstMsg = newConvFirstMsgRef.current;
+                  newConvFirstMsgRef.current = null;
+                  onNewConversation?.(data.conversationId, firstMsg);
+                }
 
               } else if (data.type === "chunk") {
                 assistantContent += data.content;

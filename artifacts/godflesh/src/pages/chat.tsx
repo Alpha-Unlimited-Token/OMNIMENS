@@ -1972,6 +1972,7 @@ function LeftPanel({
   onSetActiveProject,
   theme,
   onToggleTheme,
+  projectsVersion,
 }: {
   persona: string;
   onPersonaChange: (p: string) => void;
@@ -1991,6 +1992,7 @@ function LeftPanel({
   onConvSearchChange: (s: string) => void;
   activeProject: ActiveProject;
   onSetActiveProject: (p: ActiveProject) => void;
+  projectsVersion?: number;
 }) {
   const personas = Object.keys(PERSONA_NAMES);
   const filteredConversations = conversations.filter(c =>
@@ -2074,7 +2076,7 @@ function LeftPanel({
       .then(r => r.json())
       .then(d => setProjects(Array.isArray(d) ? d : []))
       .catch(() => {});
-  }, []);
+  }, [projectsVersion]); // re-fetch whenever a project is created externally
 
   // Load files for a project when expanded
   const toggleExpandProject = (id: number) => {
@@ -3741,6 +3743,7 @@ export default function Chat() {
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
   const [activeProject, setActiveProject] = useState<ActiveProject>(null);
+  const [projectsVersion, setProjectsVersion] = useState(0);
   const autoSavedMsgIds = useRef<Set<number>>(new Set());
   const [showControlHub, setShowControlHub] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
@@ -3769,6 +3772,22 @@ export default function Chat() {
       } else if (reason.type === "topup_failed") {
         setCreditsAlert({ kind: "topup_failed", msg: reason.error });
       }
+    },
+    async (conversationId, firstMessage) => {
+      try {
+        const projectName = firstMessage.slice(0, 60).trim() || "New Chat";
+        const r = await fetch("/api/omnimens/projects", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: projectName, description: `Chat started: ${new Date().toLocaleDateString()}`, type: "chat" }),
+        });
+        if (r.ok) {
+          const project = await r.json();
+          setActiveProject({ id: project.id, name: project.name });
+          setProjectsVersion(v => v + 1);
+        }
+      } catch {}
     },
   );
 
@@ -4088,6 +4107,7 @@ export default function Chat() {
                 onSetActiveProject={setActiveProject}
                 theme={theme}
                 onToggleTheme={toggleTheme}
+                projectsVersion={projectsVersion}
               />
             </motion.div>
           )}
