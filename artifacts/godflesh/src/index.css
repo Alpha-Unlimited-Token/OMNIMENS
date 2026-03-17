@@ -120,6 +120,41 @@
     @apply bg-primary/60;
   }
 
+  /* Main chat scrollbar — visible, interactive, glows on hover */
+  .omnimens-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(168, 85, 247, 0.40) rgba(168, 85, 247, 0.06);
+  }
+  .omnimens-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    cursor: pointer;
+  }
+  .omnimens-scrollbar::-webkit-scrollbar-track {
+    background: rgba(168, 85, 247, 0.06);
+    border-radius: 9999px;
+    border: 1px solid rgba(168, 85, 247, 0.08);
+  }
+  .omnimens-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(168, 85, 247, 0.40);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .omnimens-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(168, 85, 247, 0.80);
+    background-clip: padding-box;
+    box-shadow: 0 0 8px rgba(168, 85, 247, 0.60), 0 0 16px rgba(168, 85, 247, 0.30);
+  }
+  .omnimens-scrollbar::-webkit-scrollbar-thumb:active {
+    background: rgba(168, 85, 247, 1);
+    background-clip: padding-box;
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.80), 0 0 24px rgba(168, 85, 247, 0.40);
+  }
+  .omnimens-scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
   /* Horizontal scrollbar for pill rows */
   .omnimens-scrollbar-x {
     scrollbar-width: thin;
