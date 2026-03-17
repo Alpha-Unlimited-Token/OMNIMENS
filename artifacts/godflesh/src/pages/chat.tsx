@@ -45,6 +45,12 @@ import { ControlHub, loadHubSettingsFromStorage, saveHubSettingsToStorage, type 
 import { SmartTemplates } from "@/components/smart-templates";
 import { useTheme } from "@/hooks/use-theme";
 import { MobileTrigger } from "@/components/mobile-ide";
+import {
+  AgentBuildPanel, NewAppModal, BuildTriggerButton,
+  createInitialBuildSteps, isBuildIntent, extractFilesFromMarkdown,
+  buildPreviewHtml, useBuildStepAnimator,
+  type BuildPanelState,
+} from "@/components/agent-builder";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import hljs from "highlight.js/lib/core";
 import hljsHtml from "highlight.js/lib/languages/xml";
@@ -2332,6 +2338,8 @@ function LeftPanel({
   theme,
   onToggleTheme,
   projectsVersion,
+  onOpenNewApp,
+  onQuickBuild,
 }: {
   persona: string;
   onPersonaChange: (p: string) => void;
@@ -2352,6 +2360,8 @@ function LeftPanel({
   activeProject: ActiveProject;
   onSetActiveProject: (p: ActiveProject) => void;
   projectsVersion?: number;
+  onOpenNewApp: () => void;
+  onQuickBuild: (prompt: string, type: string) => void;
 }) {
   const personas = Object.keys(PERSONA_NAMES);
   const filteredConversations = conversations.filter(c =>
@@ -2523,6 +2533,44 @@ function LeftPanel({
         {/* ── CHATS TAB ── */}
         {panelTab === "chats" && (
           <div className="space-y-3">
+
+            {/* ── OMNIMENS AGENT BUILDER CTA ── */}
+            <div className="rounded-xl overflow-hidden border" style={{ borderColor: "rgba(168,85,247,0.3)", background: "rgba(168,85,247,0.08)" }}>
+              <div className="px-3 pt-3 pb-2">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-5 h-5 rounded-lg flex items-center justify-center" style={{ background: "rgba(168,85,247,0.2)" }}>
+                    <Wand2 className="w-3 h-3" style={{ color: "#a855f7" }} />
+                  </div>
+                  <span className="font-mono text-[9px] tracking-widest font-bold uppercase" style={{ color: "#a855f7" }}>OMNIMENS Agent</span>
+                </div>
+                <p className="font-mono text-[9px] text-white/40 mb-2.5 leading-relaxed">Build full-stack apps, websites, and tools with natural language</p>
+                <button
+                  onClick={onOpenNewApp}
+                  className="w-full flex items-center justify-center gap-2 py-2 rounded-xl font-mono text-[10px] font-bold transition-all"
+                  style={{ background: "#a855f7", color: "#fff" }}>
+                  <Wand2 className="w-3 h-3" /> Build a New App
+                </button>
+              </div>
+              {/* Quick templates row */}
+              <div className="flex gap-1 px-3 pb-3 overflow-x-auto scrollbar-hide">
+                {[
+                  { label: "Website", prompt: "Build me a stunning modern website with hero, features, and pricing sections. Dark themed with animations." },
+                  { label: "Dashboard", prompt: "Build a data analytics dashboard with KPI cards, charts, and a data table. Dark themed with violet accents." },
+                  { label: "Landing", prompt: "Create a high-converting SaaS landing page with hero, social proof, features, pricing, and CTA sections." },
+                  { label: "Chatbot", prompt: "Build a beautiful AI chatbot interface with message history, typing indicator, and dark theme." },
+                  { label: "Game", prompt: "Create a fun browser game using HTML5 Canvas with game loop, scoring, and particle effects." },
+                ].map(t => (
+                  <button
+                    key={t.label}
+                    onClick={() => onQuickBuild(t.prompt, t.label)}
+                    className="shrink-0 px-2.5 py-1.5 rounded-lg font-mono text-[8px] whitespace-nowrap transition-all border"
+                    style={{ borderColor: "rgba(168,85,247,0.2)", color: "rgba(168,85,247,0.8)", background: "rgba(168,85,247,0.06)" }}>
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Active Project Picker */}
             <div className="rounded-xl border border-white/8 bg-white/3 overflow-hidden">
               <div className="flex items-center justify-between px-2.5 py-2 border-b border-white/5">
@@ -4214,6 +4262,8 @@ export default function Chat() {
   const autoSavedMsgIds = useRef<Set<number>>(new Set());
   const [showControlHub, setShowControlHub] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [showNewAppModal, setShowNewAppModal] = useState(false);
+  const [buildPanel, setBuildPanel] = useState<BuildPanelState | null>(null);
   const [hubSettings, setHubSettings] = useState<HubSettings>(() => loadHubSettingsFromStorage());
   const [convSearch, setConvSearch] = useState("");
 
@@ -4505,10 +4555,47 @@ export default function Chat() {
       setShowLimitModal(true);
       return;
     }
+    // Detect build intent → launch agent build panel
+    const text = input.trim();
+    if (text && isBuildIntent(text)) {
+      const appName = text.replace(/^(build|create|make|develop|write|generate|code)\s+(me\s+|us\s+|a\s+|an\s+|the\s+)*/i, "").slice(0, 60) || "New App";
+      setBuildPanel({
+        appName,
+        appType: "AI Agent Build",
+        steps: createInitialBuildSteps(),
+        files: [],
+        previewHtml: null,
+        status: "building",
+        startedAt: Date.now(),
+      });
+    }
     sendMessage(input, pendingFiles, persona, hubSettings, selectedModel, responseMode, sessionStart);
     setInput("");
     setPendingFiles([]);
   };
+
+  // Animate build steps while typing
+  useBuildStepAnimator(buildPanel, setBuildPanel as any);
+
+  // When AI finishes typing, finalise the build panel with extracted files
+  const prevIsTyping = useRef(false);
+  useEffect(() => {
+    if (prevIsTyping.current && !isTyping && buildPanel?.status === "building") {
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg?.role === "assistant") {
+        const files = extractFilesFromMarkdown(lastMsg.content);
+        const previewHtml = buildPreviewHtml(files);
+        setBuildPanel(prev => prev ? {
+          ...prev,
+          status: "done",
+          files,
+          previewHtml,
+          steps: prev.steps.map(s => ({ ...s, status: "done" as const })),
+        } : null);
+      }
+    }
+    prevIsTyping.current = isTyping;
+  }, [isTyping]);
 
   if (isLoading || !isAuthenticated) return (
     <Layout>
@@ -4575,6 +4662,19 @@ export default function Chat() {
                 theme={theme}
                 onToggleTheme={toggleTheme}
                 projectsVersion={projectsVersion}
+                onOpenNewApp={() => setShowNewAppModal(true)}
+                onQuickBuild={(prompt, type) => {
+                  setBuildPanel({
+                    appName: type,
+                    appType: `AI Agent Build · ${type}`,
+                    steps: createInitialBuildSteps(),
+                    files: [],
+                    previewHtml: null,
+                    status: "building",
+                    startedAt: Date.now(),
+                  });
+                  sendMessage(prompt, [], persona, hubSettings, selectedModel, responseMode, sessionStart);
+                }}
               />
             </motion.div>
           )}
@@ -5167,7 +5267,18 @@ export default function Chat() {
                     );
                   })}
 
-                  {isTyping && messages[messages.length - 1]?.role === "user" && (
+                  {/* ── Agent Build Panel ── */}
+                  <AnimatePresence>
+                    {buildPanel && (
+                      <AgentBuildPanel
+                        state={buildPanel}
+                        onClose={() => setBuildPanel(null)}
+                        onDeploy={() => window.open("https://omnimens-ai.com/godflesh/", "_blank")}
+                      />
+                    )}
+                  </AnimatePresence>
+
+                  {isTyping && messages[messages.length - 1]?.role === "user" && !buildPanel && (
                     <div className="flex justify-start">
                       <div className="bg-primary/5 border border-primary/20 rounded-2xl rounded-tl-sm px-5 py-4">
                         <div className="flex items-center gap-2 mb-2 text-primary font-bold text-[10px] tracking-widest uppercase">
@@ -5330,6 +5441,8 @@ export default function Chat() {
                 disabled={isTyping}
               />
               <div className="absolute right-2 flex items-center gap-1">
+                {/* New App builder button */}
+                <BuildTriggerButton onClick={() => setShowNewAppModal(true)} />
                 {/* Templates picker */}
                 <button
                   type="button"
@@ -5666,6 +5779,27 @@ export default function Chat() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* ── New App Modal ── */}
+        {showNewAppModal && (
+          <NewAppModal
+            onClose={() => setShowNewAppModal(false)}
+            onSelect={(prompt, type) => {
+              setShowNewAppModal(false);
+              const appName = type;
+              setBuildPanel({
+                appName,
+                appType: `AI Agent Build · ${type}`,
+                steps: createInitialBuildSteps(),
+                files: [],
+                previewHtml: null,
+                status: "building",
+                startedAt: Date.now(),
+              });
+              sendMessage(prompt, [], persona, hubSettings, selectedModel, responseMode, sessionStart);
+            }}
+          />
+        )}
 
         {/* ── Control Hub Modal ── */}
         {showControlHub && (
