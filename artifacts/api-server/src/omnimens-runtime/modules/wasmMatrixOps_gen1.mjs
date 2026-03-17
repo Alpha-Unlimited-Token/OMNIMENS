@@ -1,81 +1,89 @@
 /**
- * wasmMatrixOps: Perform efficient matrix operations using WebAssembly for neural computations.
- * This module leverages WebAssembly for fast, GPU-like matrix operations, enabling advanced neural computations.
+ * wasmMatrixOps - A utility module for efficient matrix operations using WebAssembly.
+ * This module provides linear algebra operations (e.g., matrix multiplication) implemented in WebAssembly,
+ * exposed to JavaScript for high-performance computation.
  */
 
-const fs = require('fs');
-const path = require('path');
+// Import necessary built-in modules
+import { readFile } from 'fs/promises';
+import { join } from 'path';
 
 /**
- * Loads a WebAssembly binary file and initializes the WebAssembly instance.
- * @param {string} filePath - Path to the WebAssembly binary file.
- * @returns {Promise<WebAssembly.Instance>} - A promise that resolves to the WebAssembly instance.
+ * Load and compile the WebAssembly module for matrix operations.
+ * @returns {Promise<WebAssembly.WebAssemblyInstantiatedSource>} A promise resolving to the compiled WebAssembly module.
  */
-async function loadWasmModule(filePath) {
-  const wasmBuffer = await fs.promises.readFile(filePath);
-  const wasmModule = await WebAssembly.compile(wasmBuffer);
-  const wasmInstance = await WebAssembly.instantiate(wasmModule);
-  return wasmInstance;
+async function loadWasmModule() {
+  const wasmPath = join(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = await readFile(wasmPath);
+  return WebAssembly.instantiate(wasmBuffer);
 }
 
 /**
- * Performs matrix multiplication using WebAssembly.
- * @param {Float32Array} matrixA - The first matrix as a flat Float32Array.
- * @param {Float32Array} matrixB - The second matrix as a flat Float32Array.
- * @param {number} rowsA - Number of rows in matrix A.
- * @param {number} colsA - Number of columns in matrix A.
- * @param {number} colsB - Number of columns in matrix B.
- * @returns {Float32Array} - The result matrix as a flat Float32Array.
- * @throws {Error} - Throws if matrix dimensions are incompatible.
+ * Multiply two matrices using WebAssembly.
+ * @param {number[][]} matrixA - The first matrix (2D array of numbers).
+ * @param {number[][]} matrixB - The second matrix (2D array of numbers).
+ * @returns {Promise<number[][]>} A promise resolving to the resulting matrix (2D array of numbers).
+ * @throws {Error} If the matrices are incompatible for multiplication.
  */
-async function wasmMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
-  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+export async function multiplyMatrices(matrixA, matrixB) {
+  // Validate input matrices
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
+
+  if (colsA !== rowsB) {
     throw new Error('Matrix dimensions are incompatible for multiplication.');
   }
 
-  const wasmInstance = await loadWasmModule(path.join(__dirname, 'matrix_ops.wasm'));
+  // Flatten matrices into 1D arrays for WebAssembly
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
 
-  const { memory, multiplyMatrices } = wasmInstance.exports;
+  // Load and instantiate the WebAssembly module
+  const { instance } = await loadWasmModule();
+  const { memory, multiply_matrices } = instance.exports;
 
-  const resultSize = rowsA * colsB;
-  const resultOffset = multiplyMatrices(
-    matrixA.byteOffset,
-    matrixB.byteOffset,
-    rowsA,
-    colsA,
-    colsB
-  );
+  // Allocate memory for input and output matrices
+  const inputOffsetA = 0;
+  const inputOffsetB = flatA.length * 4; // Each float is 4 bytes
+  const outputOffset = inputOffsetB + flatB.length * 4;
 
-  return new Float32Array(memory.buffer, resultOffset, resultSize);
+  const wasmMemory = new Float32Array(memory.buffer);
+  wasmMemory.set(flatA, inputOffsetA / 4);
+  wasmMemory.set(flatB, inputOffsetB / 4);
+
+  // Perform matrix multiplication in WebAssembly
+  multiply_matrices(inputOffsetA, rowsA, colsA, inputOffsetB, rowsB, colsB, outputOffset);
+
+  // Extract the result from WebAssembly memory
+  const result = [];
+  for (let i = 0; i < rowsA; i++) {
+    result.push(Array.from(wasmMemory.subarray(outputOffset / 4 + i * colsB, outputOffset / 4 + (i + 1) * colsB)));
+  }
+
+  return result;
 }
 
 /**
- * Validates input matrices and prepares them for WebAssembly operations.
- * @param {Array<Array<number>>} matrix - 2D array representation of a matrix.
- * @returns {Float32Array} - Flat Float32Array representation of the matrix.
+ * Example usage of the module.
+ * Uncomment the following lines to test the module in Node.js.
  */
-function prepareMatrix(matrix) {
-  const rows = matrix.length;
-  const cols = matrix[0].length;
+// (async () => {
+//   const matrixA = [
+//     [1, 2, 3],
+//     [4, 5, 6]
+//   ];
+//   const matrixB = [
+//     [7, 8],
+//     [9, 10],
+//     [11, 12]
+//   ];
 
-  for (let i = 1; i < rows; i++) {
-    if (matrix[i].length !== cols) {
-      throw new Error('All rows in the matrix must have the same number of columns.');
-    }
-  }
-
-  const flatMatrix = new Float32Array(rows * cols);
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      flatMatrix[i * cols + j] = matrix[i][j];
-    }
-  }
-
-  return flatMatrix;
-}
-
-module.exports = {
-  loadWasmModule,
-  wasmMatrixMultiply,
-  prepareMatrix
-};
+//   try {
+//     const result = await multiplyMatrices(matrixA, matrixB);
+//     console.log('Result:', result);
+//   } catch (error) {
+//     console.error('Error:', error);
+//   }
+// })();
