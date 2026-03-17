@@ -4,8 +4,16 @@ attached_assets
 node_modules
 artifacts/*/node_modules
 artifacts/*/dist
+artifacts/mockup-sandbox
 artifacts/godflesh/public/avatar-studio.html
 .local
+.cache
+**/.cache
+**/__pycache__
+**/*.pyc
+**/*.pyo
 *.log
 *.md
 .env*
+.pythonlibs/lib/python3.11/site-packages/tensorflow*
+.pythonlibs/lib/python3.11/site-packages/keras*
