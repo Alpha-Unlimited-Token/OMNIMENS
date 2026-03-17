@@ -279,9 +279,6 @@ importers:
       '@react-oauth/google':
         specifier: ^0.13.4
         version: 0.13.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      mermaid:
-        specifier: ^11.13.0
-        version: 11.13.0
       react-markdown:
         specifier: ^10.1.0
         version: 10.1.0(@types/react@19.2.14)(react@19.1.0)

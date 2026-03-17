@@ -3006,6 +3006,17 @@ function sanitizeDiagramSVG(raw: string): string {
     .replace(/expression\s*\([^)]*\)/gi, "");
 }
 
+function loadMermaidFromCDN(): Promise<any> {
+  return new Promise((resolve, reject) => {
+    if ((window as any).mermaid) { resolve((window as any).mermaid); return; }
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js";
+    script.onload = () => resolve((window as any).mermaid);
+    script.onerror = () => reject(new Error("Failed to load mermaid from CDN"));
+    document.head.appendChild(script);
+  });
+}
+
 function MermaidDiagram({ code }: { code: string }) {
   const [svg, setSvg] = useState<string>("");
   const [err, setErr] = useState<string>("");
@@ -3013,7 +3024,7 @@ function MermaidDiagram({ code }: { code: string }) {
     let cancelled = false;
     (async () => {
       try {
-        const mermaid = (await import("mermaid")).default;
+        const mermaid = await loadMermaidFromCDN();
         mermaid.initialize({ startOnLoad: false, theme: "dark", securityLevel: "antiscript" });
         const id = `mm-${Math.random().toString(36).slice(2)}`;
         const { svg: rendered } = await mermaid.render(id, code);

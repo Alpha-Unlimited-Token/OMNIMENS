@@ -79,7 +79,6 @@
   "dependencies": {
     "@mlc-ai/web-llm": "^0.2.82",
     "@react-oauth/google": "^0.13.4",
-    "mermaid": "^11.13.0",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1"
   }
