@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OMNIMENS Avatar</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; background: transparent; overflow: hidden; }
+  canvas { display: block; width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  canvas.width = canvas.offsetWidth || window.innerWidth;
+  canvas.height = canvas.offsetHeight || window.innerHeight;
+}
+resize();
+window.addEventListener('resize', () => { resize(); });
+
+// ── State ──────────────────────────────────────────────────────────────────────
+let speaking = false;
+let jawOpen = 0;
+let jawTarget = 0;
+let blinkState = 1;
+let blinking = false;
+let blinkTimer = randomBlinkInterval();
+let blinkPhase = 0;
+let breathPhase = 0;
+let swayPhase = 0;
+let pulsePhase = 0;
+let t = 0;
+let lastTime = performance.now();
+
+function randomBlinkInterval() {
+  return 2800 + Math.random() * 3800;
+}
+
+// ── Particles ─────────────────────────────────────────────────────────────────
+const PARTICLE_COUNT = 38;
+const particles = Array.from({ length: PARTICLE_COUNT }, () => makeParticle());
+
+function makeParticle() {
+  const angle = Math.random() * Math.PI * 2;
+  const dist = 0.28 + Math.random() * 0.38;
+  return {
+    angle,
+    dist,
+    speed: (Math.random() - 0.5) * 0.0006,
+    life: Math.random(),
+    lifeSpeed: 0.002 + Math.random() * 0.003,
+    size: 0.6 + Math.random() * 1.8,
+    hue: Math.random() > 0.55 ? 270 + Math.random() * 30 : 185 + Math.random() * 20,
+    vertOsc: Math.random() * Math.PI * 2,
+    vertSpeed: 0.0008 + Math.random() * 0.0012,
+  };
+}
+
+// ── postMessage API ────────────────────────────────────────────────────────────
+window.addEventListener('message', e => {
+  if (!e.data || typeof e.data !== 'object') return;
+  if (e.data.type === 'speak') speaking = true;
+  if (e.data.type === 'idle')  speaking = false;
+});
+
+// ── Draw helpers ───────────────────────────────────────────────────────────────
+function octagon(cx, cy, r, rot) {
+  ctx.beginPath();
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2 + rot;
+    const x = cx + Math.cos(a) * r;
+    const y = cy + Math.sin(a) * r;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+}
+
+function glow(x, y, r, color, alpha) {
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, color.replace('A)', `${alpha})`).replace('rgb(', 'rgba('));
+  g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// ── Main loop ──────────────────────────────────────────────────────────────────
+function draw(now) {
+  requestAnimationFrame(draw);
+
+  const dt = Math.min(now - lastTime, 50);
+  lastTime = now;
+  t += dt;
+
+  breathPhase += dt * 0.0014;
+  swayPhase   += dt * 0.0007;
+  pulsePhase  += dt * 0.0025;
+
+  const W = canvas.width;
+  const H = canvas.height;
+  const S = Math.min(W, H) * 0.46; // base scale
+
+  ctx.clearRect(0, 0, W, H);
+
+  // ── blink logic ──
+  blinkTimer -= dt;
+  if (blinkTimer <= 0 && !blinking) {
+    blinking = true;
+    blinkPhase = 0;
+    blinkTimer = randomBlinkInterval();
+  }
+  if (blinking) {
+    blinkPhase += dt / 90;
+    blinkState = blinkPhase < 0.5
+      ? 1 - blinkPhase * 2
+      : (blinkPhase - 0.5) * 2;
+    if (blinkPhase >= 1) { blinking = false; blinkState = 1; }
+  }
+
+  // ── jaw logic ──
+  if (speaking) {
+    jawTarget = 0.22 + Math.sin(t * 0.012) * 0.15 + Math.sin(t * 0.021) * 0.08;
+  } else {
+    jawTarget = 0;
+  }
+  jawOpen += (jawTarget - jawOpen) * 0.14;
+
+  const breathe = Math.sin(breathPhase) * 0.016;
+  const sway    = Math.sin(swayPhase) * 0.022;
+  const pulse   = Math.sin(pulsePhase);
+
+  const cx = W * 0.5 + sway * W;
+  const cy = H * 0.44;
+
+  ctx.save();
+  ctx.translate(cx, cy);
+
+  // ── AMBIENT AURA ──
+  const aura = ctx.createRadialGradient(0, 0, 0, 0, 0, S * 1.1);
+  aura.addColorStop(0, `rgba(90,30,200,${0.12 + pulse * 0.04})`);
+  aura.addColorStop(0.5, `rgba(0,180,255,${0.06 + pulse * 0.02})`);
+  aura.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = aura;
+  ctx.beginPath();
+  ctx.arc(0, 0, S * 1.1, 0, Math.PI * 2);
+  ctx.fill();
+
+  // ── BODY ──
+  const bodyY  = S * 0.38;
+  const bodyH  = S * 0.52;
+  const bodyW  = S * 0.28;
+  const bScale = 1 + breathe;
+
+  ctx.save();
+  ctx.scale(bScale, bScale);
+
+  // Body glow
+  const bGlow = ctx.createRadialGradient(0, bodyY + bodyH * 0.3, 0, 0, bodyY + bodyH * 0.2, S * 0.55);
+  bGlow.addColorStop(0, `rgba(100,30,220,${0.18 + pulse * 0.06})`);
+  bGlow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = bGlow;
+  ctx.beginPath();
+  ctx.ellipse(0, bodyY + bodyH * 0.3, S * 0.5, S * 0.55, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Shoulders
+  ctx.beginPath();
+  ctx.moveTo(-S * 0.42, bodyY - S * 0.04);
+  ctx.lineTo(-bodyW,    bodyY);
+  ctx.lineTo( bodyW,    bodyY);
+  ctx.lineTo( S * 0.42, bodyY - S * 0.04);
+  ctx.lineTo( S * 0.36, bodyY - S * 0.12);
+  ctx.lineTo(-S * 0.36, bodyY - S * 0.12);
+  ctx.closePath();
+  const shGrad = ctx.createLinearGradient(-S * 0.4, 0, S * 0.4, 0);
+  shGrad.addColorStop(0,   'rgba(15,4,55,0)');
+  shGrad.addColorStop(0.22,'rgba(65,18,160,0.88)');
+  shGrad.addColorStop(0.78,'rgba(65,18,160,0.88)');
+  shGrad.addColorStop(1,   'rgba(15,4,55,0)');
+  ctx.fillStyle = shGrad;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(130,60,255,0.5)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Torso
+  ctx.beginPath();
+  ctx.moveTo(-bodyW,       bodyY);
+  ctx.lineTo( bodyW,       bodyY);
+  ctx.lineTo( bodyW * 0.7, bodyY + bodyH);
+  ctx.lineTo(-bodyW * 0.7, bodyY + bodyH);
+  ctx.closePath();
+  const tGrad = ctx.createLinearGradient(0, bodyY, 0, bodyY + bodyH);
+  tGrad.addColorStop(0, 'rgba(70,18,160,0.9)');
+  tGrad.addColorStop(1, 'rgba(18,4,55,0.8)');
+  ctx.fillStyle = tGrad;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(120,50,255,0.45)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Chest circuit lines
+  ctx.strokeStyle = `rgba(0,210,255,${0.25 + pulse * 0.08})`;
+  ctx.lineWidth = 0.6;
+  ctx.beginPath();
+  ctx.moveTo(-bodyW * 0.6, bodyY + bodyH * 0.18);
+  ctx.lineTo( bodyW * 0.6, bodyY + bodyH * 0.18);
+  ctx.moveTo(0, bodyY + bodyH * 0.18);
+  ctx.lineTo(0, bodyY + bodyH * 0.44);
+  ctx.moveTo(-bodyW * 0.45, bodyY + bodyH * 0.44);
+  ctx.lineTo( bodyW * 0.45, bodyY + bodyH * 0.44);
+  ctx.moveTo(-bodyW * 0.28, bodyY + bodyH * 0.62);
+  ctx.lineTo( bodyW * 0.28, bodyY + bodyH * 0.62);
+  ctx.stroke();
+
+  // Core gem glow
+  const coreR = S * 0.065 * (1 + Math.abs(pulse) * 0.12);
+  const coreG = ctx.createRadialGradient(0, bodyY + bodyH * 0.3, 0, 0, bodyY + bodyH * 0.3, coreR * 2.2);
+  coreG.addColorStop(0,   `rgba(0,240,255,${0.9 + pulse * 0.08})`);
+  coreG.addColorStop(0.4, `rgba(100,40,255,0.55)`);
+  coreG.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.fillStyle = coreG;
+  ctx.beginPath();
+  ctx.arc(0, bodyY + bodyH * 0.3, coreR * 2.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = `rgba(0,240,255,${0.85 + pulse * 0.12})`;
+  ctx.beginPath();
+  ctx.arc(0, bodyY + bodyH * 0.3, coreR, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Neck
+  const neckW = S * 0.07;
+  ctx.fillStyle = 'rgba(40,10,100,0.75)';
+  ctx.beginPath();
+  ctx.moveTo(-neckW, S * 0.2);
+  ctx.lineTo( neckW, S * 0.2);
+  ctx.lineTo( neckW * 1.2, bodyY - S * 0.01);
+  ctx.lineTo(-neckW * 1.2, bodyY - S * 0.01);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(100,50,220,0.35)';
+  ctx.lineWidth = 0.6;
+  ctx.stroke();
+
+  ctx.restore(); // body scale
+
+  // ── HEAD ──
+  const headR = S * 0.24;
+  const headY = 0;
+
+  // Head outer glow
+  const hGlow = ctx.createRadialGradient(0, headY, 0, 0, headY, headR * 1.7);
+  hGlow.addColorStop(0,   `rgba(100,35,230,${0.18 + pulse * 0.06})`);
+  hGlow.addColorStop(0.6, `rgba(0,180,255,${0.06 + pulse * 0.02})`);
+  hGlow.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.fillStyle = hGlow;
+  ctx.beginPath();
+  ctx.arc(0, headY, headR * 1.7, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Head octagon
+  octagon(0, headY, headR, Math.PI / 8);
+  const hFill = ctx.createRadialGradient(0, headY - headR * 0.3, 0, 0, headY, headR * 1.2);
+  hFill.addColorStop(0,   'rgba(55,16,130,0.97)');
+  hFill.addColorStop(0.65,'rgba(28,7,70,0.94)');
+  hFill.addColorStop(1,   'rgba(8,2,22,0.9)');
+  ctx.fillStyle = hFill;
+  ctx.fill();
+  ctx.strokeStyle = `rgba(${110 + pulse * 15},50,255,0.75)`;
+  ctx.lineWidth = 1.4;
+  ctx.stroke();
+
+  // Inner head detail ring
+  octagon(0, headY, headR * 0.82, Math.PI / 8);
+  ctx.strokeStyle = `rgba(0,200,255,${0.10 + pulse * 0.04})`;
+  ctx.lineWidth = 0.5;
+  ctx.stroke();
+
+  // Forehead rune mark
+  ctx.strokeStyle = `rgba(0,200,255,${0.3 + pulse * 0.1})`;
+  ctx.lineWidth = 0.7;
+  ctx.beginPath();
+  ctx.moveTo(-headR * 0.22, headY - headR * 0.52);
+  ctx.lineTo(0,              headY - headR * 0.68);
+  ctx.lineTo( headR * 0.22, headY - headR * 0.52);
+  ctx.moveTo(-headR * 0.12, headY - headR * 0.52);
+  ctx.lineTo(-headR * 0.12, headY - headR * 0.42);
+  ctx.moveTo( headR * 0.12, headY - headR * 0.52);
+  ctx.lineTo( headR * 0.12, headY - headR * 0.42);
+  ctx.stroke();
+
+  // Cheek circuit lines
+  ctx.strokeStyle = `rgba(0,200,255,${0.18 + pulse * 0.05})`;
+  ctx.lineWidth = 0.55;
+  ctx.beginPath();
+  ctx.moveTo(-headR * 0.72, headY - headR * 0.12);
+  ctx.lineTo(-headR * 0.52, headY - headR * 0.12);
+  ctx.moveTo(-headR * 0.72, headY + headR * 0.08);
+  ctx.lineTo(-headR * 0.60, headY + headR * 0.08);
+  ctx.moveTo( headR * 0.72, headY - headR * 0.12);
+  ctx.lineTo( headR * 0.52, headY - headR * 0.12);
+  ctx.moveTo( headR * 0.72, headY + headR * 0.08);
+  ctx.lineTo( headR * 0.60, headY + headR * 0.08);
+  ctx.stroke();
+
+  // ── EYES ──
+  const eyeX   = headR * 0.36;
+  const eyeY   = headY - headR * 0.1;
+  const eyeRX  = headR * 0.175;
+  const eyeRY  = headR * 0.12 * blinkState;
+
+  for (const side of [-1, 1]) {
+    const ex = side * eyeX;
+    const ey = eyeY;
+
+    // Eye glow halo
+    const eHalo = ctx.createRadialGradient(ex, ey, 0, ex, ey, eyeRX * 3.5);
+    eHalo.addColorStop(0,   `rgba(0,230,255,${0.4 + pulse * 0.1})`);
+    eHalo.addColorStop(0.5, `rgba(80,30,255,${0.12 + pulse * 0.04})`);
+    eHalo.addColorStop(1,   'rgba(0,0,0,0)');
+    ctx.fillStyle = eHalo;
+    ctx.beginPath();
+    ctx.arc(ex, ey, eyeRX * 3.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Eye socket (dark)
+    ctx.fillStyle = 'rgba(3,1,12,0.95)';
+    ctx.beginPath();
+    ctx.ellipse(ex, ey, eyeRX * 1.15, eyeRX * 0.85, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    if (blinkState > 0.05) {
+      const visRY = eyeRY < eyeRX * 0.85 ? eyeRY : eyeRX * 0.85;
+
+      // Iris
+      const irisG = ctx.createRadialGradient(ex, ey, 0, ex, ey, eyeRX * 0.95);
+      irisG.addColorStop(0,    'rgba(255,255,255,0.92)');
+      irisG.addColorStop(0.12, 'rgba(0,235,255,1)');
+      irisG.addColorStop(0.45, 'rgba(0,160,255,0.9)');
+      irisG.addColorStop(0.78, 'rgba(0,70,200,0.75)');
+      irisG.addColorStop(1,    'rgba(0,20,80,0.5)');
+      ctx.fillStyle = irisG;
+      ctx.beginPath();
+      ctx.ellipse(ex, ey, eyeRX * 0.9, Math.min(visRY * 0.92, eyeRX * 0.9), 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pupil
+      ctx.fillStyle = 'rgba(0,0,0,0.96)';
+      ctx.beginPath();
+      ctx.ellipse(ex, ey, eyeRX * 0.38, Math.min(visRY * 0.38 / (blinkState + 0.001), eyeRX * 0.38) * blinkState, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pupil vertical slit shine
+      ctx.strokeStyle = `rgba(0,240,255,${0.5 + pulse * 0.2})`;
+      ctx.lineWidth = 0.6;
+      ctx.beginPath();
+      ctx.moveTo(ex, ey - visRY * 0.6);
+      ctx.lineTo(ex, ey + visRY * 0.6);
+      ctx.stroke();
+
+      // Eye shine
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.beginPath();
+      ctx.ellipse(ex - eyeRX * 0.22, ey - visRY * 0.22, eyeRX * 0.11, visRY * 0.14, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Upper eyelid closing
+      const lidAmt = 1 - blinkState;
+      if (lidAmt > 0.04) {
+        ctx.fillStyle = 'rgba(28,7,70,0.97)';
+        ctx.beginPath();
+        ctx.ellipse(ex, ey - visRY * 0.45, eyeRX * 1.15, eyeRX * 0.85 * lidAmt * 1.3, 0, Math.PI, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(ex, ey + visRY * 0.45, eyeRX * 1.15, eyeRX * 0.85 * lidAmt * 1.3, 0, 0, Math.PI);
+        ctx.fill();
+      }
+    }
+
+    // Eye socket outline
+    ctx.strokeStyle = `rgba(80,35,200,${0.5 + pulse * 0.15})`;
+    ctx.lineWidth = 0.9;
+    ctx.beginPath();
+    ctx.ellipse(ex, ey, eyeRX * 1.15, eyeRX * 0.85, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // ── NOSE BRIDGE ──
+  ctx.strokeStyle = `rgba(80,35,200,${0.25 + pulse * 0.06})`;
+  ctx.lineWidth = 0.7;
+  ctx.beginPath();
+  ctx.moveTo(0, headY + headR * 0.04);
+  ctx.lineTo(0, headY + headR * 0.3);
+  ctx.stroke();
+
+  // ── JAW / MOUTH ──
+  const jawMaxPx  = S * 0.1;
+  const jawPx     = jawOpen * jawMaxPx;
+  const mouthW    = headR * 0.52;
+  const mouthY    = headY + headR * 0.44;
+
+  // Upper jaw plate
+  ctx.fillStyle = 'rgba(22,6,55,0.96)';
+  ctx.beginPath();
+  ctx.moveTo(-mouthW, mouthY - jawPx * 0.1 - 1);
+  ctx.lineTo( mouthW, mouthY - jawPx * 0.1 - 1);
+  ctx.lineTo( mouthW * 0.72, mouthY + 5);
+  ctx.lineTo(-mouthW * 0.72, mouthY + 5);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(110,50,240,0.6)';
+  ctx.lineWidth = 0.8;
+  ctx.stroke();
+
+  // Mouth cavity + tongue + teeth
+  if (jawPx > 0.5) {
+    // Mouth interior
+    ctx.fillStyle = 'rgba(4,0,14,0.97)';
+    ctx.beginPath();
+    ctx.ellipse(0, mouthY + jawPx * 0.55 + 3, mouthW * 0.66, jawPx * 0.52 + 1, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Tongue
+    const tongueVis = Math.min(jawPx / (jawMaxPx * 0.4), 1);
+    const tR = Math.min(jawPx * 0.38, mouthW * 0.46);
+    const ty = mouthY + jawPx * 0.6 + 4;
+    if (tongueVis > 0.1 && tR > 0) {
+      const tGrad = ctx.createRadialGradient(0, ty - tR * 0.1, 0, 0, ty, tR * 1.2);
+      tGrad.addColorStop(0,   `rgba(240,80,190,${0.95 * tongueVis})`);
+      tGrad.addColorStop(0.55,`rgba(180,40,140,${0.85 * tongueVis})`);
+      tGrad.addColorStop(1,   `rgba(120,20,100,${0.5 * tongueVis})`);
+      ctx.fillStyle = tGrad;
+      ctx.beginPath();
+      ctx.ellipse(0, ty + tR * 0.12, tR, tR * 0.7, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Tongue center groove
+      ctx.strokeStyle = `rgba(150,30,110,${0.4 * tongueVis})`;
+      ctx.lineWidth = 0.6;
+      ctx.beginPath();
+      ctx.moveTo(0, ty - tR * 0.5);
+      ctx.lineTo(0, ty + tR * 0.6);
+      ctx.stroke();
+    }
+
+    // Upper teeth
+    ctx.fillStyle = 'rgba(210,190,255,0.88)';
+    const toothCount = 5;
+    const toothW = (mouthW * 1.2) / toothCount;
+    for (let i = 0; i < toothCount; i++) {
+      const tx = -mouthW * 0.6 + i * toothW + toothW * 0.08;
+      const th = Math.min(jawPx * 0.28, 7);
+      ctx.beginPath();
+      ctx.roundRect(tx, mouthY - jawPx * 0.06 + 1, toothW * 0.84, th, 1);
+      ctx.fill();
+    }
+
+    // Lower teeth
+    ctx.fillStyle = 'rgba(190,170,245,0.75)';
+    const lowerY = mouthY + jawPx + 3;
+    for (let i = 0; i < toothCount - 1; i++) {
+      const tx = -mouthW * 0.48 + i * toothW + toothW * 0.08;
+      const th = Math.min(jawPx * 0.22, 5);
+      ctx.beginPath();
+      ctx.roundRect(tx, lowerY - th, toothW * 0.84, th, 1);
+      ctx.fill();
+    }
+  }
+
+  // Lower jaw plate
+  ctx.fillStyle = 'rgba(28,7,70,0.92)';
+  ctx.beginPath();
+  ctx.moveTo(-mouthW * 0.88, mouthY + jawPx + 2);
+  ctx.lineTo( mouthW * 0.88, mouthY + jawPx + 2);
+  ctx.lineTo( mouthW * 0.64, mouthY + jawPx + 15);
+  ctx.lineTo(-mouthW * 0.64, mouthY + jawPx + 15);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(110,50,240,0.5)';
+  ctx.lineWidth = 0.8;
+  ctx.stroke();
+
+  // Chin
+  ctx.fillStyle = 'rgba(28,7,70,0.88)';
+  ctx.beginPath();
+  ctx.moveTo(-mouthW * 0.64, mouthY + jawPx + 15);
+  ctx.lineTo( mouthW * 0.64, mouthY + jawPx + 15);
+  ctx.quadraticCurveTo( mouthW * 0.28, mouthY + jawPx + 25, 0, mouthY + jawPx + 25);
+  ctx.quadraticCurveTo(-mouthW * 0.28, mouthY + jawPx + 25, -mouthW * 0.64, mouthY + jawPx + 15);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(100,45,220,0.4)';
+  ctx.lineWidth = 0.7;
+  ctx.stroke();
+
+  ctx.restore(); // translate
+
+  // ── PARTICLES ──
+  for (const p of particles) {
+    p.angle += p.speed;
+    p.vertOsc += p.vertSpeed;
+    p.life += p.lifeSpeed;
+    if (p.life > 1) p.life -= 1;
+
+    const px = W * 0.5 + Math.cos(p.angle) * p.dist * W * 0.42 + sway * W * 0.5;
+    const py = H * 0.44 + Math.sin(p.angle) * p.dist * H * 0.32 + Math.sin(p.vertOsc) * H * 0.045;
+    const alpha = Math.sin(p.life * Math.PI) * 0.72;
+    const sz = p.size * (W / 260);
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    const pg = ctx.createRadialGradient(px, py, 0, px, py, sz * 2.5);
+    pg.addColorStop(0, `hsl(${p.hue}, 100%, 82%)`);
+    pg.addColorStop(1, `hsla(${p.hue}, 100%, 60%, 0)`);
+    ctx.fillStyle = pg;
+    ctx.beginPath();
+    ctx.arc(px, py, sz * 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>

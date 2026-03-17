@@ -1977,11 +1977,19 @@ function LeftPanel({
   convSearch: string;
   theme: string;
   onToggleTheme: () => void;
+  isTyping: boolean;
   onConvSearchChange: (s: string) => void;
   activeProject: ActiveProject;
   onSetActiveProject: (p: ActiveProject) => void;
 }) {
   const personas = Object.keys(PERSONA_NAMES);
+  const avatarRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    const iframe = avatarRef.current;
+    if (!iframe || !iframe.contentWindow) return;
+    iframe.contentWindow.postMessage({ type: isTyping ? "speak" : "idle" }, "*");
+  }, [isTyping]);
   const filteredConversations = conversations.filter(c =>
     !convSearch || (c.title || "").toLowerCase().includes(convSearch.toLowerCase())
   );
@@ -2128,6 +2136,26 @@ function LeftPanel({
         <button onClick={onNewChat} className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] font-mono font-bold border border-primary/30 text-primary hover:bg-primary/10 transition-all shrink-0">
           <PlusCircle className="w-3 h-3" /> NEW
         </button>
+      </div>
+
+      {/* OMNIMENS Avatar */}
+      <div className="shrink-0 w-full border-b border-white/8 bg-black/20 relative overflow-hidden" style={{ height: 190 }}>
+        <iframe
+          ref={avatarRef}
+          src={`${import.meta.env.BASE_URL}omnimens-avatar.html`}
+          title="OMNIMENS Avatar"
+          style={{ width: "100%", height: "100%", border: "none", background: "transparent", display: "block" }}
+          allow="autoplay"
+          sandbox="allow-scripts allow-same-origin"
+          onLoad={() => {
+            if (avatarRef.current?.contentWindow) {
+              avatarRef.current.contentWindow.postMessage({ type: isTyping ? "speak" : "idle" }, "*");
+            }
+          }}
+        />
+        <div className="absolute bottom-1.5 left-0 right-0 flex justify-center pointer-events-none">
+          <span className="text-[7px] font-mono tracking-[0.22em] text-primary/30 uppercase">OMNIMENS</span>
+        </div>
       </div>
 
       {/* Scrollable tab bar */}
@@ -3704,6 +3732,7 @@ export default function Chat() {
                 onSetActiveProject={setActiveProject}
                 theme={theme}
                 onToggleTheme={toggleTheme}
+                isTyping={isTyping}
               />
             </motion.div>
           )}
