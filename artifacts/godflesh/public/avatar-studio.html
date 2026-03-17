@@ -51,12 +51,19 @@
     font-size: 9px; color: var(--muted); text-align: left;
   }
   .gate-feature-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); opacity: 0.6; flex-shrink: 0; }
+  .gate-buttons { display: flex; flex-direction: column; gap: 8px; }
   #btn-enable {
     width: 100%; padding: 12px; font-family: inherit; font-size: 10px; letter-spacing: 0.25em;
     background: rgba(0,255,200,0.08); border: 1px solid rgba(0,255,200,0.3);
     color: var(--primary); border-radius: 10px; cursor: pointer; transition: all 0.2s;
   }
   #btn-enable:hover { background: rgba(0,255,200,0.16); border-color: rgba(0,255,200,0.6); }
+  #btn-skip-camera {
+    width: 100%; padding: 10px; font-family: inherit; font-size: 9px; letter-spacing: 0.2em;
+    background: transparent; border: 1px solid rgba(255,255,255,0.1);
+    color: var(--muted); border-radius: 10px; cursor: pointer; transition: all 0.2s;
+  }
+  #btn-skip-camera:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.2); color: var(--text); }
   #gate-error { font-size: 9px; color: var(--danger); margin-top: 10px; display: none; }
 
   /* ── Studio Layout ── */
@@ -93,6 +100,20 @@
   .sb-btn:disabled { opacity: 0.35; cursor: not-allowed; }
   .sb-btn.active { border-color: var(--rec); color: var(--rec); background: rgba(255,51,51,0.1); animation: rec-blink 1s steps(1) infinite; }
   @keyframes rec-blink { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+  /* Expression grid */
+  .expr-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
+  .expr-btn {
+    padding: 6px 4px; font-family: inherit; font-size: 8px; letter-spacing: 0.05em;
+    border-radius: 6px; cursor: pointer; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); transition: all 0.15s; text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  .expr-btn .expr-emoji { font-size: 14px; }
+  .expr-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); background: rgba(255,255,255,0.04); }
+  .expr-btn.active { border-color: rgba(0,255,200,0.5); color: var(--primary); background: rgba(0,255,200,0.08); }
+
+  /* Style grid */
   .style-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
   .style-chip {
     padding: 6px 4px; font-family: inherit; font-size: 8px; letter-spacing: 0.1em;
@@ -101,6 +122,12 @@
   }
   .style-chip.selected { border-color: rgba(124,58,237,0.5); color: #a78bfa; background: rgba(124,58,237,0.1); }
   .style-chip:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
+  /* Sliders */
+  .sb-slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .sb-slider-label { font-size: 8px; color: var(--muted); width: 52px; flex-shrink: 0; }
+  .sb-slider { flex: 1; height: 3px; border-radius: 2px; cursor: pointer; accent-color: var(--primary); }
+
   #avatar-info { font-size: 8px; color: var(--muted); line-height: 1.5; margin-top: 4px; }
   #rec-timer { font-size: 18px; color: var(--rec); letter-spacing: 0.1em; text-align: center; padding: 4px 0; display: none; }
   #frame-count { font-size: 9px; color: var(--muted); text-align: center; }
@@ -120,6 +147,7 @@
     width: 160px; height: 120px; border-radius: 10px; overflow: hidden;
     border: 1px solid var(--border); background: #000;
   }
+  #pip.hidden { display: none; }
   #webcam { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
   #tracking-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
@@ -137,6 +165,7 @@
   .hud-dot.green { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
   .hud-dot.yellow { background: #eab308; }
   .hud-dot.red { background: var(--rec); box-shadow: 0 0 6px var(--rec); animation: rec-blink 1s steps(1) infinite; }
+  .hud-dot.grey { background: rgba(255,255,255,0.3); }
   #rec-hud { display: none; position: absolute; top: 12px; right: 12px; }
   .rec-badge {
     font-size: 9px; letter-spacing: 0.2em; padding: 4px 10px; border-radius: 6px;
@@ -185,21 +214,24 @@
     <div class="gate-orb">⬡</div>
     <div class="gate-title">OMNIMENS AVATAR STUDIO</div>
     <div class="gate-sub">
-      Live face tracking · Real-time 3D avatar · Cinematic Blender export<br/>
-      Powered by Google MediaPipe · Three.js · Open-source technologies
+      Live face tracking · Real-time 3D avatar · VRM support · Cinematic export<br/>
+      Powered by Google MediaPipe · Three.js · @pixiv/three-vrm
     </div>
     <div class="gate-warning">
-      ⚠ Camera Permission Required — Your camera is NEVER recorded or transmitted to any server.
+      ⚠ Camera is NEVER recorded or sent to any server.
       All face tracking runs entirely in your browser. You control when it starts and stops.
     </div>
     <div class="gate-features">
-      <div class="gate-feature"><div class="gate-feature-dot"></div>MediaPipe face mesh (468 landmarks, real-time)</div>
-      <div class="gate-feature"><div class="gate-feature-dot"></div>Three.js 3D avatar — mirrors your expressions live</div>
-      <div class="gate-feature"><div class="gate-feature-dot"></div>VRM avatar support — load your VRoid/Ready Player Me character</div>
-      <div class="gate-feature"><div class="gate-feature-dot"></div>Record performance → export cinematic Blender scene</div>
-      <div class="gate-feature"><div class="gate-feature-dot"></div>Cinematic styles: Studio, Sci-Fi, Film Noir, Documentary</div>
+      <div class="gate-feature"><div class="gate-feature-dot"></div>MediaPipe face mesh — eyes blink, mouth moves, head tracks live</div>
+      <div class="gate-feature"><div class="gate-feature-dot"></div>Load any VRM file — VRoid Studio, Ready Player Me, Booth.pm</div>
+      <div class="gate-feature"><div class="gate-feature-dot"></div>Full body animation — breathing, shoulder sway, spine movement</div>
+      <div class="gate-feature"><div class="gate-feature-dot"></div>Expression triggers — happy, sad, angry, surprised and more</div>
+      <div class="gate-feature"><div class="gate-feature-dot"></div>Record performance → export cinematic Blender ZIP</div>
     </div>
-    <button id="btn-enable">⬡ ENABLE CAMERA &amp; LAUNCH STUDIO</button>
+    <div class="gate-buttons">
+      <button id="btn-enable">⬡ ENABLE CAMERA &amp; LAUNCH WITH FACE TRACKING</button>
+      <button id="btn-skip-camera">◯ LAUNCH WITHOUT CAMERA — VIEW &amp; POSE ONLY</button>
+    </div>
     <div id="gate-error"></div>
   </div>
 </div>
@@ -214,10 +246,46 @@
     <!-- Avatar section -->
     <div class="sb-section">
       <div class="sb-label">AVATAR</div>
-      <button class="sb-btn primary" id="btn-load-vrm">LOAD VRM FILE</button>
+      <button class="sb-btn primary" id="btn-load-vrm">⬆ LOAD VRM FILE</button>
       <input type="file" id="vrm-file" accept=".vrm" style="display:none" />
-      <button class="sb-btn" id="btn-default-avatar">DEFAULT AVATAR</button>
-      <div id="avatar-info">⬡ OMNIMENS default — stylized 3D head<br/>Upload a .vrm file for custom avatar</div>
+      <button class="sb-btn" id="btn-default-avatar">◯ DEFAULT AVATAR</button>
+      <div id="avatar-info">⬡ OMNIMENS default avatar active<br/>Upload a .vrm for your character</div>
+    </div>
+
+    <!-- Expressions section -->
+    <div class="sb-section">
+      <div class="sb-label">EXPRESSIONS</div>
+      <div class="expr-grid">
+        <button class="expr-btn" data-expr="neutral"><span class="expr-emoji">😐</span>NEUTRAL</button>
+        <button class="expr-btn" data-expr="happy"><span class="expr-emoji">😊</span>HAPPY</button>
+        <button class="expr-btn" data-expr="sad"><span class="expr-emoji">😢</span>SAD</button>
+        <button class="expr-btn" data-expr="angry"><span class="expr-emoji">😠</span>ANGRY</button>
+        <button class="expr-btn" data-expr="surprised"><span class="expr-emoji">😲</span>SURP.</button>
+        <button class="expr-btn" data-expr="relaxed"><span class="expr-emoji">😌</span>RELAX</button>
+      </div>
+      <div style="margin-top:8px;">
+        <div class="sb-label" style="margin-bottom:6px;">INTENSITY</div>
+        <div class="sb-slider-row">
+          <input type="range" class="sb-slider" id="expr-intensity" min="0" max="100" value="80">
+        </div>
+      </div>
+    </div>
+
+    <!-- Body posing -->
+    <div class="sb-section">
+      <div class="sb-label">BODY ANIMATION</div>
+      <div class="sb-slider-row">
+        <span class="sb-slider-label">BREATHING</span>
+        <input type="range" class="sb-slider" id="sl-breathe" min="0" max="100" value="60">
+      </div>
+      <div class="sb-slider-row">
+        <span class="sb-slider-label">BODY SWAY</span>
+        <input type="range" class="sb-slider" id="sl-sway" min="0" max="100" value="40">
+      </div>
+      <div class="sb-slider-row">
+        <span class="sb-slider-label">HEAD BOB</span>
+        <input type="range" class="sb-slider" id="sl-headbob" min="0" max="100" value="20">
+      </div>
     </div>
 
     <!-- Cinematic style -->
@@ -230,18 +298,6 @@
         <button class="style-chip" data-style="noir">FILM NOIR</button>
         <button class="style-chip" data-style="documentary">DOCUM.</button>
         <button class="style-chip" data-style="fantasy">FANTASY</button>
-      </div>
-    </div>
-
-    <!-- Blender integration -->
-    <div class="sb-section">
-      <div class="sb-label">3D TOOLS INTEGRATION</div>
-      <div style="font-size:8px;color:var(--muted);line-height:1.7;margin-bottom:8px;">
-        Export connects to:<br/>
-        ✦ Blender 4 (cinematic render)<br/>
-        ✦ GLB/VRM mesh pipeline<br/>
-        ✦ OpenSCAD prosthetics<br/>
-        ✦ Game engine (Phaser/Godot)
       </div>
     </div>
 
@@ -258,9 +314,10 @@
     <div class="sb-footer">
       <div class="help-text">
         Free VRM avatars:<br/>
-        <a class="help-link" href="https://hub.vroid.com" target="_blank">hub.vroid.com</a><br/>
-        <a class="help-link" href="https://readyplayer.me" target="_blank">readyplayer.me</a><br/><br/>
-        Export ZIP contains Blender .py scene + animation data. Open in Blender 4 and press F12 to render.
+        <a class="help-link" href="https://hub.vroid.com" target="_blank">hub.vroid.com</a> — VRoid characters<br/>
+        <a class="help-link" href="https://readyplayer.me" target="_blank">readyplayer.me</a> — realistic avatars<br/>
+        <a class="help-link" href="https://booth.pm" target="_blank">booth.pm</a> — artist VRM models<br/><br/>
+        Export ZIP → Blender 4 (.py scene + animation). Press F12 to render.
       </div>
     </div>
   </div>
@@ -272,10 +329,13 @@
     <!-- HUD -->
     <div id="hud">
       <div class="hud-badge">
-        <div class="hud-dot green" id="track-dot"></div>
-        <span id="track-label">TRACKING</span>
+        <div class="hud-dot grey" id="track-dot"></div>
+        <span id="track-label">IDLE MODE</span>
       </div>
       <div class="hud-badge" id="fps-badge">FPS: <span id="fps-val">--</span></div>
+      <div class="hud-badge" id="expr-hud" style="display:none">
+        EXPR: <span id="expr-val">NEUTRAL</span>
+      </div>
     </div>
 
     <!-- Rec badge -->
@@ -287,7 +347,7 @@
     </div>
 
     <!-- PiP webcam -->
-    <div id="pip">
+    <div id="pip" class="hidden">
       <video id="webcam" autoplay muted playsinline></video>
       <canvas id="tracking-overlay"></canvas>
     </div>
@@ -306,11 +366,11 @@
 <!-- Toast -->
 <div id="toast"></div>
 
-<!-- MediaPipe CDN (global scripts) -->
+<!-- MediaPipe CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/face_mesh.js" crossorigin="anonymous"></script>
 
-<!-- Three.js importmap + main module -->
+<!-- Three.js importmap -->
 <script type="importmap">
 {
   "imports": {
@@ -328,6 +388,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 // ─── State ────────────────────────────────────────────────────────────────────
 const state = {
   tracking: false,
+  cameraMode: false,  // true = webcam active
   recording: false,
   frames: [],
   recordStart: 0,
@@ -337,11 +398,29 @@ const state = {
   fps: 0,
   lastFpsTime: 0,
   frameCount: 0,
+  activeExpr: 'neutral',
+  exprIntensity: 0.8,
+  breatheAmt: 0.6,
+  swayAmt: 0.4,
+  headBobAmt: 0.2,
+  idleTime: 0,
 };
 
-// Face tracking targets (smoothed)
+// Face tracking targets (smoothed) + expression targets
 const target = { yaw: 0, pitch: 0, roll: 0, eyeL: 1, eyeR: 1, mouth: 0, brow: 0 };
 const current = { yaw: 0, pitch: 0, roll: 0, eyeL: 1, eyeR: 1, mouth: 0, brow: 0 };
+
+// Expression blend targets per VRM expression name
+const VRM_EXPRESSIONS = {
+  neutral:   {},
+  happy:     { happy: 1 },
+  sad:       { sad: 1 },
+  angry:     { angry: 1 },
+  surprised: { surprised: 1 },
+  relaxed:   { relaxed: 1 },
+};
+
+const currentExprBlends = {};
 
 // ─── Three.js Setup ───────────────────────────────────────────────────────────
 const canvas = document.getElementById('avatar-canvas');
@@ -351,73 +430,76 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x050508);
-scene.fog = new THREE.FogExp2(0x050508, 0.08);
+scene.fog = new THREE.FogExp2(0x050508, 0.06);
 
-const camera3d = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-camera3d.position.set(0, 0.15, 4.5);
+const camera3d = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+camera3d.position.set(0, 0.5, 3.5);
 
 const controls = new OrbitControls(camera3d, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.target.set(0, 0.1, 0);
-controls.minDistance = 2;
-controls.maxDistance = 8;
+controls.target.set(0, 0.5, 0);
+controls.minDistance = 0.5;
+controls.maxDistance = 12;
 controls.update();
 
-// ─── Lights for default studio style ─────────────────────────────────────────
+// ─── Lighting ─────────────────────────────────────────────────────────────────
 let lights = [];
 function setupLights(style) {
   lights.forEach(l => scene.remove(l));
   lights = [];
 
+  const add = (...ls) => { ls.forEach(l => { scene.add(l); lights.push(l); }); };
+
   if (style === 'studio') {
-    const key = new THREE.DirectionalLight(0xfff5e8, 3); key.position.set(3, 4, 3); key.castShadow = true; scene.add(key); lights.push(key);
-    const fill = new THREE.DirectionalLight(0xe8f0ff, 1.2); fill.position.set(-3, 2, 2); scene.add(fill); lights.push(fill);
-    const rim = new THREE.DirectionalLight(0xffffff, 1.5); rim.position.set(0, 3, -4); scene.add(rim); lights.push(rim);
-    const amb = new THREE.AmbientLight(0x404060, 0.5); scene.add(amb); lights.push(amb);
-    scene.background = new THREE.Color(0x101018);
-    scene.fog = new THREE.FogExp2(0x101018, 0.06);
+    const key = new THREE.DirectionalLight(0xfff5e8, 3); key.position.set(3, 4, 3); key.castShadow = true;
+    const fill = new THREE.DirectionalLight(0xe8f0ff, 1.2); fill.position.set(-3, 2, 2);
+    const rim = new THREE.DirectionalLight(0xffffff, 1.5); rim.position.set(0, 3, -4);
+    const amb = new THREE.AmbientLight(0x404060, 0.5);
+    add(key, fill, rim, amb);
+    scene.background = new THREE.Color(0x101018); scene.fog = new THREE.FogExp2(0x101018, 0.05);
   } else if (style === 'cinematic') {
-    const key = new THREE.SpotLight(0xff9944, 8, 20, Math.PI/5, 0.3); key.position.set(4, 5, 2); key.castShadow = true; scene.add(key); lights.push(key);
-    const fill = new THREE.DirectionalLight(0x2244aa, 0.5); fill.position.set(-4, 1, 1); scene.add(fill); lights.push(fill);
-    const rim = new THREE.DirectionalLight(0x00ffcc, 1); rim.position.set(-1, 4, -5); scene.add(rim); lights.push(rim);
-    const amb = new THREE.AmbientLight(0x0a0820, 0.3); scene.add(amb); lights.push(amb);
-    scene.background = new THREE.Color(0x020206);
-    scene.fog = new THREE.FogExp2(0x020206, 0.05);
+    const key = new THREE.SpotLight(0xff9944, 8, 20, Math.PI/5, 0.3); key.position.set(4, 5, 2); key.castShadow = true;
+    const fill = new THREE.DirectionalLight(0x2244aa, 0.5); fill.position.set(-4, 1, 1);
+    const rim = new THREE.DirectionalLight(0x00ffcc, 1); rim.position.set(-1, 4, -5);
+    const amb = new THREE.AmbientLight(0x0a0820, 0.3);
+    add(key, fill, rim, amb);
+    scene.background = new THREE.Color(0x020206); scene.fog = new THREE.FogExp2(0x020206, 0.04);
   } else if (style === 'scifi') {
-    const key = new THREE.DirectionalLight(0x00ffcc, 2); key.position.set(3, 4, 2); scene.add(key); lights.push(key);
-    const fill = new THREE.DirectionalLight(0x7c3aed, 1.5); fill.position.set(-4, 2, 1); scene.add(fill); lights.push(fill);
-    const rim = new THREE.PointLight(0x00ccff, 3, 12); rim.position.set(0, 4, -4); scene.add(rim); lights.push(rim);
-    const floor = new THREE.PointLight(0x7c3aed, 2, 8); floor.position.set(0, -3, 0); scene.add(floor); lights.push(floor);
-    const amb = new THREE.AmbientLight(0x020a18, 0.4); scene.add(amb); lights.push(amb);
-    scene.background = new THREE.Color(0x020608);
-    scene.fog = new THREE.FogExp2(0x020608, 0.04);
+    const key = new THREE.DirectionalLight(0x00ffcc, 2); key.position.set(3, 4, 2);
+    const fill = new THREE.DirectionalLight(0x7c3aed, 1.5); fill.position.set(-4, 2, 1);
+    const rim = new THREE.PointLight(0x00ccff, 3, 12); rim.position.set(0, 4, -4);
+    const floor = new THREE.PointLight(0x7c3aed, 2, 8); floor.position.set(0, -3, 0);
+    const amb = new THREE.AmbientLight(0x020a18, 0.4);
+    add(key, fill, rim, floor, amb);
+    scene.background = new THREE.Color(0x020608); scene.fog = new THREE.FogExp2(0x020608, 0.035);
   } else if (style === 'noir') {
-    const key = new THREE.SpotLight(0xffffff, 10, 15, Math.PI/8, 0.1); key.position.set(2, 6, 1); key.castShadow = true; scene.add(key); lights.push(key);
-    const amb = new THREE.AmbientLight(0x0a0808, 0.2); scene.add(amb); lights.push(amb);
-    scene.background = new THREE.Color(0x000000);
-    scene.fog = new THREE.FogExp2(0x000000, 0.07);
+    const key = new THREE.SpotLight(0xffffff, 10, 15, Math.PI/8, 0.1); key.position.set(2, 6, 1); key.castShadow = true;
+    const amb = new THREE.AmbientLight(0x0a0808, 0.2);
+    add(key, amb);
+    scene.background = new THREE.Color(0x000000); scene.fog = new THREE.FogExp2(0x000000, 0.06);
   } else if (style === 'documentary') {
-    const key = new THREE.DirectionalLight(0xfff8f0, 2.5); key.position.set(2, 3, 4); scene.add(key); lights.push(key);
-    const fill = new THREE.DirectionalLight(0xf0f8ff, 1); fill.position.set(-2, 1, 3); scene.add(fill); lights.push(fill);
-    const amb = new THREE.AmbientLight(0x808080, 0.6); scene.add(amb); lights.push(amb);
-    scene.background = new THREE.Color(0x1a1a22);
-    scene.fog = new THREE.FogExp2(0x1a1a22, 0.04);
+    const key = new THREE.DirectionalLight(0xfff8f0, 2.5); key.position.set(2, 3, 4);
+    const fill = new THREE.DirectionalLight(0xf0f8ff, 1); fill.position.set(-2, 1, 3);
+    const amb = new THREE.AmbientLight(0x808080, 0.6);
+    add(key, fill, amb);
+    scene.background = new THREE.Color(0x1a1a22); scene.fog = new THREE.FogExp2(0x1a1a22, 0.04);
   } else if (style === 'fantasy') {
-    const key = new THREE.PointLight(0xffc060, 4, 15); key.position.set(3, 4, 2); scene.add(key); lights.push(key);
-    const fill = new THREE.PointLight(0x60b0ff, 2, 12); fill.position.set(-4, 2, -1); scene.add(fill); lights.push(fill);
-    const rim = new THREE.PointLight(0xff60c0, 3, 10); rim.position.set(0, -2, -4); scene.add(rim); lights.push(rim);
-    const amb = new THREE.AmbientLight(0x100820, 0.5); scene.add(amb); lights.push(amb);
-    scene.background = new THREE.Color(0x060210);
-    scene.fog = new THREE.FogExp2(0x060210, 0.05);
+    const key = new THREE.PointLight(0xffc060, 4, 15); key.position.set(3, 4, 2);
+    const fill = new THREE.PointLight(0x60b0ff, 2, 12); fill.position.set(-4, 2, -1);
+    const rim = new THREE.PointLight(0xff60c0, 3, 10); rim.position.set(0, -2, -4);
+    const amb = new THREE.AmbientLight(0x100820, 0.5);
+    add(key, fill, rim, amb);
+    scene.background = new THREE.Color(0x060210); scene.fog = new THREE.FogExp2(0x060210, 0.04);
   }
 }
 setupLights('studio');
 
-// ─── Default Procedural Avatar ────────────────────────────────────────────────
+// ─── Default Procedural Avatar (head + body) ──────────────────────────────────
 let avatarGroup = null;
 let avatarParts = {};
 
@@ -427,186 +509,241 @@ function buildDefaultAvatar() {
   avatarParts = {};
 
   const skinColor = 0xd4956a;
-  const skinMat = new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.75, metalness: 0.0 });
+  const skinMat = () => new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.75, metalness: 0.0 });
   const eyeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8f8f8, roughness: 0.5 });
   const irisMat = new THREE.MeshStandardMaterial({ color: 0x00c8a0, roughness: 0.3, metalness: 0.1, emissive: 0x006644, emissiveIntensity: 0.3 });
   const pupilMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.4 });
   const hairMat = new THREE.MeshStandardMaterial({ color: 0x1a0a00, roughness: 0.9 });
   const lipMat = new THREE.MeshStandardMaterial({ color: 0xb06050, roughness: 0.7 });
   const toothMat = new THREE.MeshStandardMaterial({ color: 0xf0f0e8, roughness: 0.5 });
+  const clothMat = new THREE.MeshStandardMaterial({ color: 0x1a1a2e, roughness: 0.8 });
 
-  // ── Head skull ──
-  const headGeo = new THREE.SphereGeometry(1, 48, 48);
-  const head = new THREE.Mesh(headGeo, skinMat);
+  // Root group for body sway
+  avatarParts.bodyRoot = new THREE.Group();
+  avatarGroup.add(avatarParts.bodyRoot);
+
+  // ── Torso ──
+  avatarParts.torso = new THREE.Group();
+  avatarParts.torso.position.set(0, -2.2, 0);
+  avatarParts.bodyRoot.add(avatarParts.torso);
+
+  const torsoMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.45, 1.8, 24), clothMat);
+  torsoMesh.castShadow = true;
+  avatarParts.torso.add(torsoMesh);
+
+  // Shoulders
+  for (const side of [-1, 1]) {
+    const shoulder = new THREE.Mesh(new THREE.SphereGeometry(0.28, 16, 12), clothMat);
+    shoulder.position.set(side * 0.72, 0.55, 0);
+    shoulder.scale.set(1, 0.8, 0.9);
+    avatarParts.torso.add(shoulder);
+    // Upper arm
+    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.14, 0.9, 14), clothMat);
+    arm.position.set(side * 0.85, 0.05, 0);
+    arm.rotation.z = side * 0.18;
+    avatarParts.torso.add(arm);
+    // Forearm
+    const forearm = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.11, 0.85, 14), skinMat());
+    forearm.position.set(side * 0.98, -0.7, 0.08);
+    forearm.rotation.z = side * 0.3;
+    avatarParts.torso.add(forearm);
+    // Hand
+    const hand = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 10), skinMat());
+    hand.scale.set(1.1, 0.85, 0.7);
+    hand.position.set(side * 1.08, -1.3, 0.14);
+    avatarParts.torso.add(hand);
+  }
+
+  // Neck
+  const neckMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.26, 0.5, 18), skinMat());
+  neckMesh.position.set(0, 0.9, 0.05);
+  neckMesh.castShadow = true;
+  avatarParts.torso.add(neckMesh);
+
+  // ── Head group (sits on neck) ──
+  avatarParts.headGroup = new THREE.Group();
+  avatarParts.headGroup.position.set(0, 1.55, 0);
+  avatarParts.torso.add(avatarParts.headGroup);
+
+  // Head skull
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.9, 48, 48), skinMat());
   head.scale.set(0.92, 1.08, 0.88);
   head.castShadow = true;
-  avatarGroup.add(head);
-  avatarParts.head = avatarGroup; // we rotate the whole group for head movement
+  avatarParts.headGroup.add(head);
 
-  // ── Neck ──
-  const neckMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.32, 0.6, 20), skinMat);
-  neckMesh.position.set(0, -1.12, 0);
-  neckMesh.castShadow = true;
-  avatarGroup.add(neckMesh);
-
-  // ── Eye sockets (darkened) ──
+  // Eye sockets (darkened)
   const socketMat = new THREE.MeshStandardMaterial({ color: 0xb07050, roughness: 0.9 });
   for (const side of [-1, 1]) {
-    const socket = new THREE.Mesh(new THREE.SphereGeometry(0.19, 20, 20), socketMat);
-    socket.position.set(side * 0.33, 0.2, 0.82);
+    const socket = new THREE.Mesh(new THREE.SphereGeometry(0.165, 20, 20), socketMat);
+    socket.position.set(side * 0.295, 0.18, 0.74);
     socket.scale.set(1, 0.85, 0.5);
-    avatarGroup.add(socket);
+    avatarParts.headGroup.add(socket);
   }
 
-  // ── Eye whites ──
-  avatarParts.eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.155, 20, 20), eyeWhiteMat);
-  avatarParts.eyeL.position.set(-0.33, 0.2, 0.83);
-  avatarGroup.add(avatarParts.eyeL);
+  // Eye whites
+  avatarParts.eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.14, 20, 20), eyeWhiteMat);
+  avatarParts.eyeL.position.set(-0.295, 0.18, 0.745);
+  avatarParts.headGroup.add(avatarParts.eyeL);
+  avatarParts.eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.14, 20, 20), eyeWhiteMat);
+  avatarParts.eyeR.position.set(0.295, 0.18, 0.745);
+  avatarParts.headGroup.add(avatarParts.eyeR);
 
-  avatarParts.eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.155, 20, 20), eyeWhiteMat);
-  avatarParts.eyeR.position.set(0.33, 0.2, 0.83);
-  avatarGroup.add(avatarParts.eyeR);
-
-  // ── Irises ──
+  // Irises + pupils
   for (const [side, eyePart] of [[-1, avatarParts.eyeL], [1, avatarParts.eyeR]]) {
-    const iris = new THREE.Mesh(new THREE.CircleGeometry(0.085, 32), irisMat);
-    iris.position.copy(eyePart.position); iris.position.z += 0.135;
-    avatarGroup.add(iris);
-    const pupil = new THREE.Mesh(new THREE.CircleGeometry(0.04, 20), pupilMat);
+    const iris = new THREE.Mesh(new THREE.CircleGeometry(0.075, 32), irisMat);
+    iris.position.copy(eyePart.position); iris.position.z += 0.12;
+    avatarParts.headGroup.add(iris);
+    const pupil = new THREE.Mesh(new THREE.CircleGeometry(0.035, 20), pupilMat);
     pupil.position.copy(iris.position); pupil.position.z += 0.001;
-    avatarGroup.add(pupil);
+    avatarParts.headGroup.add(pupil);
   }
 
-  // ── Eyelids (upper) — these animate for blink ──
+  // Eyelids (upper) — animate for blink
   avatarParts.lidL = new THREE.Mesh(
-    new THREE.SphereGeometry(0.165, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2),
+    new THREE.SphereGeometry(0.15, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2),
     new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.7, side: THREE.FrontSide })
   );
   avatarParts.lidL.rotation.x = Math.PI;
   avatarParts.lidL.position.copy(avatarParts.eyeL.position);
-  avatarGroup.add(avatarParts.lidL);
+  avatarParts.headGroup.add(avatarParts.lidL);
 
   avatarParts.lidR = new THREE.Mesh(
-    new THREE.SphereGeometry(0.165, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2),
+    new THREE.SphereGeometry(0.15, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2),
     new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.7, side: THREE.FrontSide })
   );
   avatarParts.lidR.rotation.x = Math.PI;
   avatarParts.lidR.position.copy(avatarParts.eyeR.position);
-  avatarGroup.add(avatarParts.lidR);
+  avatarParts.headGroup.add(avatarParts.lidR);
 
-  // ── Nose ──
-  const noseMesh = new THREE.Mesh(new THREE.SphereGeometry(0.13, 16, 12), skinMat);
-  noseMesh.scale.set(1.2, 0.8, 1);
-  noseMesh.position.set(0, -0.12, 0.88);
-  noseMesh.castShadow = false;
-  avatarGroup.add(noseMesh);
-  const noseB = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 10), skinMat);
-  noseB.position.set(0, -0.18, 0.86);
-  avatarGroup.add(noseB);
-  // Nostrils
+  // Nose
+  const noseBridge = new THREE.Mesh(new THREE.SphereGeometry(0.075, 12, 8), skinMat());
+  noseBridge.scale.set(0.7, 1.4, 0.8);
+  noseBridge.position.set(0, -0.1, 0.79);
+  avatarParts.headGroup.add(noseBridge);
+  const noseB = new THREE.Mesh(new THREE.SphereGeometry(0.055, 12, 10), skinMat());
+  noseB.position.set(0, -0.16, 0.77);
+  avatarParts.headGroup.add(noseB);
   for (const s of [-1, 1]) {
-    const nostril = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 8), new THREE.MeshStandardMaterial({ color: 0x8b5e45, roughness: 0.9 }));
-    nostril.position.set(s * 0.1, -0.22, 0.83);
+    const nostril = new THREE.Mesh(new THREE.SphereGeometry(0.045, 10, 8), new THREE.MeshStandardMaterial({ color: 0x8b5e45, roughness: 0.9 }));
+    nostril.position.set(s * 0.09, -0.2, 0.74);
     nostril.scale.set(0.9, 0.6, 0.5);
-    avatarGroup.add(nostril);
+    avatarParts.headGroup.add(nostril);
   }
 
-  // ── Mouth ──
+  // Mouth group
   avatarParts.mouthGroup = new THREE.Group();
-  avatarParts.mouthGroup.position.set(0, -0.44, 0.82);
-  avatarGroup.add(avatarParts.mouthGroup);
+  avatarParts.mouthGroup.position.set(0, -0.39, 0.73);
+  avatarParts.headGroup.add(avatarParts.mouthGroup);
 
-  // Upper lip
-  const upperLip = new THREE.Mesh(new THREE.SphereGeometry(0.18, 20, 8), lipMat);
+  const upperLip = new THREE.Mesh(new THREE.SphereGeometry(0.16, 20, 8), lipMat);
   upperLip.scale.set(1.5, 0.55, 0.6);
-  upperLip.position.set(0, 0.035, 0);
+  upperLip.position.set(0, 0.03, 0);
   avatarParts.mouthGroup.add(upperLip);
 
-  // Lower lip (jaw group — animates for mouth open)
   avatarParts.jaw = new THREE.Group();
-  avatarParts.jaw.position.set(0, 0, 0);
   avatarParts.mouthGroup.add(avatarParts.jaw);
-
-  const lowerLip = new THREE.Mesh(new THREE.SphereGeometry(0.2, 20, 8), lipMat);
+  const lowerLip = new THREE.Mesh(new THREE.SphereGeometry(0.18, 20, 8), lipMat);
   lowerLip.scale.set(1.4, 0.5, 0.6);
-  lowerLip.position.set(0, -0.055, 0);
+  lowerLip.position.set(0, -0.05, 0);
   avatarParts.jaw.add(lowerLip);
-
-  // Teeth (hidden when mouth closed)
-  avatarParts.teeth = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.08, 0.05), toothMat);
+  avatarParts.teeth = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.07, 0.05), toothMat);
   avatarParts.teeth.position.set(0, -0.01, 0.02);
   avatarParts.jaw.add(avatarParts.teeth);
   avatarParts.teeth.visible = false;
 
-  // ── Eyebrows ──
+  // Eyebrows
   for (const side of [-1, 1]) {
-    const browGeo = new THREE.BoxGeometry(0.22, 0.04, 0.04);
-    const brow = new THREE.Mesh(browGeo, hairMat);
-    brow.position.set(side * 0.33, 0.42, 0.84);
+    const brow = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.035, 0.035), hairMat);
+    brow.position.set(side * 0.295, 0.375, 0.755);
     brow.rotation.z = side * 0.08;
     if (side === -1) avatarParts.browL = brow;
     else avatarParts.browR = brow;
-    avatarGroup.add(brow);
+    avatarParts.headGroup.add(brow);
   }
 
-  // ── Hair (simple cap) ──
-  const hairCap = new THREE.Mesh(new THREE.SphereGeometry(1.02, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.45), hairMat);
+  // Hair cap
+  const hairCap = new THREE.Mesh(new THREE.SphereGeometry(0.93, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.45), hairMat);
   hairCap.scale.set(0.93, 1.1, 0.89);
-  hairCap.position.y = 0.1;
+  hairCap.position.y = 0.09;
   hairCap.castShadow = true;
-  avatarGroup.add(hairCap);
-
-  // Side hair
+  avatarParts.headGroup.add(hairCap);
   for (const side of [-1, 1]) {
-    const sideHair = new THREE.Mesh(new THREE.SphereGeometry(0.5, 20, 12), hairMat);
+    const sideHair = new THREE.Mesh(new THREE.SphereGeometry(0.45, 20, 12), hairMat);
     sideHair.scale.set(0.5, 1.1, 0.6);
-    sideHair.position.set(side * 0.88, -0.25, 0);
-    avatarGroup.add(sideHair);
+    sideHair.position.set(side * 0.8, -0.22, 0);
+    avatarParts.headGroup.add(sideHair);
   }
 
-  // ── Ears ──
+  // Ears
   for (const side of [-1, 1]) {
-    const ear = new THREE.Mesh(new THREE.SphereGeometry(0.14, 16, 12), skinMat);
+    const ear = new THREE.Mesh(new THREE.SphereGeometry(0.13, 16, 12), skinMat());
     ear.scale.set(0.45, 0.75, 0.5);
-    ear.position.set(side * 0.9, 0.05, 0);
-    avatarGroup.add(ear);
+    ear.position.set(side * 0.82, 0.05, 0);
+    avatarParts.headGroup.add(ear);
   }
 
-  // ── Position the avatar ──
+  // Position avatar
   avatarGroup.position.set(0, 0, 0);
   scene.add(avatarGroup);
 
+  // Frame camera nicely
+  camera3d.position.set(0, 1.2, 3.2);
+  controls.target.set(0, 0.6, 0);
+  controls.update();
+
   state.currentAvatar = 'default';
-  document.getElementById('avatar-info').textContent = '⬡ OMNIMENS default avatar active\nUpload a .vrm file for custom avatar';
+  document.getElementById('avatar-info').textContent = '⬡ OMNIMENS default avatar active\nUpload a .vrm for your character';
 }
 
 buildDefaultAvatar();
 
-// ─── VRM Support ──────────────────────────────────────────────────────────────
+// ─── VRM Loading ──────────────────────────────────────────────────────────────
 async function loadVRM(file) {
   try {
     toast('Loading VRM avatar…');
     const { VRMLoaderPlugin, VRMUtils } = await import('https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@2.1.0/lib/three-vrm.module.js');
+
     const loader = new GLTFLoader();
     loader.register((parser) => new VRMLoaderPlugin(parser));
+
     const url = URL.createObjectURL(file);
-    const gltf = await new Promise((res, rej) => loader.load(url, res, null, rej));
+    const gltf = await new Promise((res, rej) => loader.load(url, res, (xhr) => {
+      const pct = Math.round(xhr.loaded / (xhr.total || 1) * 100);
+      document.getElementById('avatar-info').textContent = `Loading… ${pct}%`;
+    }, rej));
+
     const vrm = gltf.userData.vrm;
+    if (!vrm) throw new Error('File does not contain VRM data');
+
     VRMUtils.removeUnnecessaryJoints(vrm.scene);
+
+    // Remove old avatar
     if (avatarGroup) scene.remove(avatarGroup);
     state.vrm = vrm;
     state.currentAvatar = 'vrm';
-    vrm.scene.rotation.y = Math.PI;
-    vrm.scene.position.y = -1.5;
-    vrm.scene.scale.setScalar(1.8);
+
+    // Correct facing + scale
+    VRMUtils.rotateVRM0(vrm);
     scene.add(vrm.scene);
     avatarGroup = vrm.scene;
+
+    // Auto-frame: compute bounding box and fit camera
+    const box = new THREE.Box3().setFromObject(vrm.scene);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const height = size.y;
+
+    camera3d.position.set(center.x, center.y + height * 0.1, height * 1.8);
+    controls.target.set(center.x, center.y + height * 0.05, 0);
+    controls.update();
+
     document.getElementById('avatar-info').textContent = `✓ VRM loaded: ${file.name}`;
-    toast('VRM avatar loaded!', 'success');
+    toast('VRM avatar loaded! Face tracking drives eyes, mouth & head.', 'success');
     URL.revokeObjectURL(url);
   } catch (e) {
-    toast('VRM load failed — using default avatar', 'error');
+    toast('VRM load failed: ' + e.message, 'error');
     console.error(e);
+    document.getElementById('avatar-info').textContent = '✗ VRM load failed — check console';
   }
 }
 
@@ -635,11 +772,13 @@ function initMediaPipe(videoEl) {
   });
   mpCamera.start();
   state.tracking = true;
+  document.getElementById('track-dot').className = 'hud-dot yellow';
   document.getElementById('track-label').textContent = 'INITIALIZING…';
+  document.getElementById('pip').classList.remove('hidden');
 }
 
 // ─── Landmark Math ────────────────────────────────────────────────────────────
-function ear(lm, upper, lower, cL, cR) {
+function eyeAspectRatio(lm, upper, lower, cL, cR) {
   const v = Math.hypot(lm[upper].x - lm[lower].x, lm[upper].y - lm[lower].y);
   const h = Math.hypot(lm[cL].x - lm[cR].x, lm[cL].y - lm[cR].y);
   return Math.min(1, Math.max(0, (v / (h + 0.0001)) / 0.25));
@@ -660,18 +799,19 @@ function computeHeadRotation(lm) {
 }
 
 function onFaceMeshResults(results) {
-  document.getElementById('track-label').textContent = results.multiFaceLandmarks?.length ? 'TRACKING' : 'SEARCHING…';
-  document.getElementById('track-dot').className = 'hud-dot ' + (results.multiFaceLandmarks?.length ? 'green' : 'yellow');
+  const detected = results.multiFaceLandmarks?.length > 0;
+  document.getElementById('track-label').textContent = detected ? 'TRACKING' : 'SEARCHING…';
+  document.getElementById('track-dot').className = 'hud-dot ' + (detected ? 'green' : 'yellow');
 
-  if (!results.multiFaceLandmarks?.length) return;
+  if (!detected) return;
   const lm = results.multiFaceLandmarks[0];
 
   const rot = computeHeadRotation(lm);
   target.yaw = rot.yaw;
   target.pitch = rot.pitch;
   target.roll = rot.roll;
-  target.eyeL = ear(lm, 159, 145, 33, 133);
-  target.eyeR = ear(lm, 386, 374, 362, 263);
+  target.eyeL = eyeAspectRatio(lm, 159, 145, 33, 133);
+  target.eyeR = eyeAspectRatio(lm, 386, 374, 362, 263);
 
   const upper = lm[13], lower = lm[14], mL = lm[78], mR = lm[308];
   const mv = Math.abs(upper.y - lower.y);
@@ -688,65 +828,143 @@ function onFaceMeshResults(results) {
     updateRecTimer(t);
   }
 
-  // Draw tracking overlay on PiP
   drawTrackingOverlay(lm);
 }
 
 // ─── Drive Default Avatar ─────────────────────────────────────────────────────
-function driveDefaultAvatar(dt) {
+function driveDefaultAvatar(dt, idleT) {
   const SMOOTH = 1 - Math.exp(-dt * 8);
   for (const k of Object.keys(current)) current[k] += (target[k] - current[k]) * SMOOTH;
 
-  if (!avatarGroup || state.currentAvatar !== 'default') return;
+  if (!avatarParts.headGroup) return;
 
-  // Head rotation
-  avatarGroup.rotation.y = current.yaw;
-  avatarGroup.rotation.x = current.pitch * 0.7;
-  avatarGroup.rotation.z = current.roll * 0.4;
+  // Idle breathing on torso
+  const breatheAmt = state.breatheAmt * 0.022;
+  if (avatarParts.torso) {
+    avatarParts.torso.scale.x = 1 + Math.sin(idleT * 0.9) * breatheAmt * 0.6;
+    avatarParts.torso.scale.z = 1 + Math.sin(idleT * 0.9) * breatheAmt;
+    avatarParts.torso.position.y = -2.2 + Math.sin(idleT * 0.9) * breatheAmt * 8;
+  }
 
-  // Eye blink — scale eyelids down to cover eye
+  // Idle body sway
+  const swayAmt = state.swayAmt * 0.012;
+  if (avatarParts.bodyRoot) {
+    avatarParts.bodyRoot.rotation.z = Math.sin(idleT * 0.45) * swayAmt;
+    avatarParts.bodyRoot.rotation.x = Math.sin(idleT * 0.6) * swayAmt * 0.4;
+  }
+
+  // Head
+  const headBob = state.headBobAmt * 0.008;
+  avatarParts.headGroup.rotation.y = current.yaw;
+  avatarParts.headGroup.rotation.x = current.pitch * 0.7 + Math.sin(idleT * 0.9) * headBob;
+  avatarParts.headGroup.rotation.z = current.roll * 0.4;
+
+  // Eyelids blink
   if (avatarParts.lidL) {
     const blinkL = 1 - current.eyeL;
     avatarParts.lidL.scale.y = 0.15 + blinkL * 0.85;
-    avatarParts.lidL.position.y = avatarParts.eyeL.position.y - (blinkL * 0.1);
+    avatarParts.lidL.position.y = avatarParts.eyeL.position.y - (blinkL * 0.09);
   }
   if (avatarParts.lidR) {
     const blinkR = 1 - current.eyeR;
     avatarParts.lidR.scale.y = 0.15 + blinkR * 0.85;
-    avatarParts.lidR.position.y = avatarParts.eyeR.position.y - (blinkR * 0.1);
+    avatarParts.lidR.position.y = avatarParts.eyeR.position.y - (blinkR * 0.09);
   }
 
-  // Mouth
+  // Mouth jaw
   if (avatarParts.jaw) {
-    avatarParts.jaw.position.y = -current.mouth * 0.12;
+    avatarParts.jaw.position.y = -current.mouth * 0.11;
     avatarParts.teeth.visible = current.mouth > 0.2;
   }
 
   // Eyebrows
   if (avatarParts.browL) {
-    avatarParts.browL.position.y = 0.42 + current.brow * 0.08;
-    avatarParts.browR.position.y = 0.42 + current.brow * 0.08;
+    avatarParts.browL.position.y = 0.375 + current.brow * 0.07;
+    avatarParts.browR.position.y = 0.375 + current.brow * 0.07;
   }
 }
 
-function driveVRMAvatar(dt) {
+// ─── Drive VRM Avatar ─────────────────────────────────────────────────────────
+const VRM_EXPR_NAMES = ['happy', 'sad', 'angry', 'surprised', 'relaxed', 'neutral'];
+
+function driveVRMAvatar(dt, idleT) {
   if (!state.vrm) return;
+
   const SMOOTH = 1 - Math.exp(-dt * 8);
   for (const k of Object.keys(current)) current[k] += (target[k] - current[k]) * SMOOTH;
 
   const vrm = state.vrm;
-  // VRM head bone
-  try {
-    const head = vrm.humanoid?.getNormalizedBoneNode('head');
-    if (head) { head.rotation.y = current.yaw; head.rotation.x = -current.pitch; head.rotation.z = current.roll; }
-    const neck = vrm.humanoid?.getNormalizedBoneNode('neck');
-    if (neck) { neck.rotation.y = current.yaw * 0.3; neck.rotation.x = -current.pitch * 0.3; }
-    // Blink
-    vrm.expressionManager?.setValue('blinkLeft', 1 - current.eyeL);
-    vrm.expressionManager?.setValue('blinkRight', 1 - current.eyeR);
-    // Mouth
-    vrm.expressionManager?.setValue('aa', current.mouth);
-  } catch (_) {}
+  const hum = vrm.humanoid;
+  const em = vrm.expressionManager;
+
+  // ── Blink ──
+  if (em) {
+    em.setValue('blinkLeft', Math.max(0, 1 - current.eyeL));
+    em.setValue('blinkRight', Math.max(0, 1 - current.eyeR));
+
+    // ── Mouth (lip sync "aa") ──
+    em.setValue('aa', current.mouth * 0.9);
+
+    // ── Expression blending ──
+    const targetBlends = VRM_EXPRESSIONS[state.activeExpr] || {};
+    for (const name of VRM_EXPR_NAMES) {
+      const tgt = (targetBlends[name] || 0) * state.exprIntensity;
+      currentExprBlends[name] = (currentExprBlends[name] || 0);
+      currentExprBlends[name] += (tgt - currentExprBlends[name]) * (dt * 3);
+      try { em.setValue(name, Math.max(0, Math.min(1, currentExprBlends[name]))); } catch (_) {}
+    }
+  }
+
+  if (hum) {
+    // ── Head rotation ──
+    const head = hum.getNormalizedBoneNode('head');
+    if (head) {
+      const headBob = state.headBobAmt * 0.006;
+      head.rotation.y = current.yaw;
+      head.rotation.x = -current.pitch + Math.sin(idleT * 0.9) * headBob;
+      head.rotation.z = current.roll * 0.5;
+    }
+
+    // ── Neck ──
+    const neck = hum.getNormalizedBoneNode('neck');
+    if (neck) {
+      neck.rotation.y = current.yaw * 0.35;
+      neck.rotation.x = -current.pitch * 0.35;
+    }
+
+    // ── Spine / chest breathing ──
+    const breatheAmt = state.breatheAmt * 0.018;
+    const breathe = Math.sin(idleT * 0.9) * breatheAmt;
+    const chest = hum.getNormalizedBoneNode('chest');
+    if (chest) { chest.rotation.x = breathe * 0.5; }
+    const spine = hum.getNormalizedBoneNode('spine');
+    if (spine) {
+      spine.rotation.x = breathe;
+      spine.rotation.z = Math.sin(idleT * 0.45) * state.swayAmt * 0.009;
+    }
+    const upperChest = hum.getNormalizedBoneNode('upperChest');
+    if (upperChest) { upperChest.rotation.x = breathe * 0.3; }
+
+    // ── Hips sway ──
+    const hips = hum.getNormalizedBoneNode('hips');
+    if (hips) {
+      hips.rotation.z = Math.sin(idleT * 0.45) * state.swayAmt * 0.006;
+      hips.rotation.x = Math.sin(idleT * 0.6 + 1) * state.swayAmt * 0.004;
+    }
+
+    // ── Shoulders (subtle breathing rise) ──
+    for (const side of ['left', 'right']) {
+      const shoulderKey = side + 'Shoulder';
+      const shoulder = hum.getNormalizedBoneNode(shoulderKey);
+      if (shoulder) { shoulder.rotation.z = (side === 'left' ? 1 : -1) * breathe * 0.25; }
+      // Arms subtle idle
+      const upperArm = hum.getNormalizedBoneNode(side + 'UpperArm');
+      if (upperArm) {
+        upperArm.rotation.z = (side === 'left' ? 0.15 : -0.15) + Math.sin(idleT * 0.5 + (side === 'left' ? 0 : 1)) * state.swayAmt * 0.01;
+      }
+    }
+  }
+
   vrm.update(dt);
 }
 
@@ -758,13 +976,10 @@ function drawTrackingOverlay(lm) {
   overlay.height = pip.clientHeight;
   const ctx = overlay.getContext('2d');
   ctx.clearRect(0, 0, overlay.width, overlay.height);
-
-  // Draw key landmarks
   const KEY = [10, 152, 234, 454, 1, 33, 263, 13, 14, 78, 308, 70, 300, 159, 145, 386, 374, 133, 362];
-  ctx.fillStyle = 'rgba(0,255,200,0.6)';
+  ctx.fillStyle = 'rgba(0,255,200,0.7)';
   for (const i of KEY) {
     const p = lm[i];
-    // Mirror because video is mirrored
     ctx.beginPath();
     ctx.arc((1 - p.x) * overlay.width, p.y * overlay.height, 1.5, 0, Math.PI * 2);
     ctx.fill();
@@ -777,15 +992,16 @@ function animate(now) {
   requestAnimationFrame(animate);
   const dt = Math.min((now - lastTime) / 1000, 0.05);
   lastTime = now;
+  state.idleTime += dt;
+  const idleT = state.idleTime;
 
   controls.update();
 
-  if (state.currentAvatar === 'default') driveDefaultAvatar(dt);
-  else driveVRMAvatar(dt);
+  if (state.currentAvatar === 'default') driveDefaultAvatar(dt, idleT);
+  else if (state.currentAvatar === 'vrm') driveVRMAvatar(dt, idleT);
 
   renderer.render(scene, camera3d);
 
-  // FPS
   state.frameCount++;
   if (now - state.lastFpsTime > 1000) {
     document.getElementById('fps-val').textContent = state.frameCount;
@@ -796,7 +1012,6 @@ function animate(now) {
 animate(0);
 
 // ─── Recording ────────────────────────────────────────────────────────────────
-let recInterval;
 function updateRecTimer(secs) {
   const m = Math.floor(secs / 60), s = Math.floor(secs % 60);
   const txt = `${m}:${s.toString().padStart(2,'0')}`;
@@ -821,7 +1036,7 @@ function stopRecording() {
   document.getElementById('rec-hud').style.display = 'none';
   document.getElementById('btn-record').textContent = '⏺ START RECORDING';
   document.getElementById('btn-record').className = 'sb-btn primary';
-  document.getElementById('frame-count').textContent = `${state.frames.length} frames captured (${(state.frames.length / 30).toFixed(1)}s)`;
+  document.getElementById('frame-count').textContent = `${state.frames.length} frames (${(state.frames.length / 30).toFixed(1)}s)`;
   document.getElementById('btn-export').disabled = state.frames.length === 0;
   if (state.frames.length > 0) toast(`Captured ${state.frames.length} frames — ready to export!`, 'success');
 }
@@ -833,14 +1048,9 @@ async function exportCinematic() {
   const status = document.getElementById('export-status');
   overlay.classList.add('show');
   status.textContent = 'Sending animation data to OMNIMENS…';
-
   try {
-    // Get API base URL — parent page tells us via window.name or we compute from location
-    const baseUrl = window.location.origin;
-    const apiBase = baseUrl.includes('localhost') ? '' : '';
-    
     status.textContent = 'Generating Blender cinematic scene…';
-    const resp = await fetch(`${apiBase}/api/omnimens/avatar/export-cinematic`, {
+    const resp = await fetch(`/api/omnimens/avatar/export-cinematic`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -851,7 +1061,6 @@ async function exportCinematic() {
         totalDuration: state.frames.length / 30,
       }),
     });
-
     if (!resp.ok) throw new Error(await resp.text());
     status.textContent = 'Building ZIP package…';
     const blob = await resp.blob();
@@ -876,7 +1085,23 @@ function toast(msg, type = '') {
   el.textContent = msg;
   el.className = 'show ' + type;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.className = ''; }, 3000);
+  toastTimer = setTimeout(() => { el.className = ''; }, 3500);
+}
+
+// ─── Launch Studio (with or without camera) ────────────────────────────────────
+function launchStudio(withCamera) {
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('studio').style.display = 'grid';
+  onResize();
+
+  if (withCamera) {
+    document.getElementById('track-dot').className = 'hud-dot yellow';
+    document.getElementById('track-label').textContent = 'INITIALIZING…';
+  } else {
+    document.getElementById('track-dot').className = 'hud-dot grey';
+    document.getElementById('track-label').textContent = 'IDLE MODE';
+    toast('Camera off — load a VRM and use expressions & body controls', 'success');
+  }
 }
 
 // ─── UI Wiring ────────────────────────────────────────────────────────────────
@@ -885,22 +1110,26 @@ document.getElementById('btn-enable').addEventListener('click', async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240, facingMode: 'user' }, audio: false });
     const video = document.getElementById('webcam');
     video.srcObject = stream;
-    document.getElementById('gate').style.display = 'none';
-    document.getElementById('studio').style.display = 'grid';
-    onResize();
+    state.cameraMode = true;
+    launchStudio(true);
     initMediaPipe(video);
     toast('Camera active — face tracking started', 'success');
   } catch (e) {
     const err = document.getElementById('gate-error');
     err.style.display = 'block';
     err.textContent = e.name === 'NotAllowedError'
-      ? '⚠ Camera permission denied. Please allow camera access in your browser settings and try again.'
+      ? '⚠ Camera permission denied. Allow camera access in your browser settings.'
       : `⚠ Camera error: ${e.message}`;
   }
 });
 
+document.getElementById('btn-skip-camera').addEventListener('click', () => {
+  launchStudio(false);
+});
+
 document.getElementById('btn-load-vrm').addEventListener('click', () => document.getElementById('vrm-file').click());
 document.getElementById('vrm-file').addEventListener('change', (e) => { if (e.target.files[0]) loadVRM(e.target.files[0]); });
+
 document.getElementById('btn-default-avatar').addEventListener('click', () => {
   if (state.vrm?.scene) scene.remove(state.vrm.scene);
   state.vrm = null;
@@ -908,19 +1137,48 @@ document.getElementById('btn-default-avatar').addEventListener('click', () => {
   toast('Switched to default avatar');
 });
 
+// Expression buttons
+document.querySelectorAll('.expr-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const expr = btn.dataset.expr;
+    state.activeExpr = expr;
+    document.querySelectorAll('.expr-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('expr-hud').style.display = 'flex';
+    document.getElementById('expr-val').textContent = expr.toUpperCase();
+    toast(`Expression: ${expr}`);
+    // For default avatar — visual brow/eye hint
+    if (expr === 'surprised') { target.brow = 0.9; }
+    else if (expr === 'angry') { target.brow = 0; }
+    else if (expr === 'sad') { target.brow = 0.3; }
+    else { target.brow = 0.5; }
+  });
+});
+
+// Expression intensity slider
+document.getElementById('expr-intensity').addEventListener('input', e => {
+  state.exprIntensity = e.target.value / 100;
+});
+
+// Body sliders
+document.getElementById('sl-breathe').addEventListener('input', e => { state.breatheAmt = e.target.value / 100; });
+document.getElementById('sl-sway').addEventListener('input', e => { state.swayAmt = e.target.value / 100; });
+document.getElementById('sl-headbob').addEventListener('input', e => { state.headBobAmt = e.target.value / 100; });
+
+// Record
 document.getElementById('btn-record').addEventListener('click', () => {
   state.recording ? stopRecording() : startRecording();
 });
-
 document.getElementById('btn-export').addEventListener('click', exportCinematic);
 
+// Cinematic styles
 document.querySelectorAll('.style-chip').forEach(chip => {
   chip.addEventListener('click', () => {
     document.querySelectorAll('.style-chip').forEach(c => c.classList.remove('selected'));
     chip.classList.add('selected');
     state.cinematicStyle = chip.dataset.style;
     setupLights(state.cinematicStyle);
-    toast(`Cinematic style: ${chip.textContent}`);
+    toast(`Style: ${chip.textContent}`);
   });
 });
 </script>
