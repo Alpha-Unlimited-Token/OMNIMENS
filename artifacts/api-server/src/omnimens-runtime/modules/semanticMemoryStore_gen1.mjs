@@ -1,88 +1,107 @@
-// semanticMemoryStore.js
-
 /**
  * @module semanticMemoryStore
- * @description A utility module for maintaining and retrieving persistent semantic memory across sessions.
- * Implements approximate nearest neighbor search using a custom vector store.
+ * @description Provides an in-memory vectorized embedding storage and retrieval system for semantic search.
+ * This module is designed to integrate with vector search libraries like Faiss through a Node.js wrapper.
  */
 
 /**
- * @typedef {Object} MemoryEntry
- * @property {string} id - Unique identifier for the memory entry.
- * @property {number[]} vector - Semantic vector representing the memory entry.
- * @property {string} data - Associated data for the memory entry.
+ * A class representing an in-memory vectorized embedding store.
+ * It enables fast storage, retrieval, and similarity search for semantic embeddings.
  */
-
-/**
- * @typedef {Object} SearchResult
- * @property {string} id - Identifier of the matched memory entry.
- * @property {number} similarity - Similarity score between the query and the matched entry.
- * @property {string} data - Associated data of the matched memory entry.
- */
-
-/**
- * Internal vector store to persist semantic memory entries.
- * @type {MemoryEntry[]}
- */
-const vectorStore = [];
-
-/**
- * Adds a new memory entry to the vector store.
- * @param {string} id - Unique identifier for the memory entry.
- * @param {number[]} vector - Semantic vector representing the memory entry.
- * @param {string} data - Associated data for the memory entry.
- * @throws {Error} If the vector is not an array of numbers.
- */
-function addMemory(id, vector, data) {
-  if (!Array.isArray(vector) || !vector.every((v) => typeof v === 'number')) {
-    throw new Error('Vector must be an array of numbers.');
-  }
-  vectorStore.push({ id, vector, data });
-}
-
-/**
- * Computes the cosine similarity between two vectors.
- * @param {number[]} vectorA - First vector.
- * @param {number[]} vectorB - Second vector.
- * @returns {number} Cosine similarity score.
- */
-function cosineSimilarity(vectorA, vectorB) {
-  const dotProduct = vectorA.reduce((sum, a, i) => sum + a * (vectorB[i] || 0), 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a * a, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b * b, 0));
-  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
-}
-
-/**
- * Searches the vector store for the most similar memory entries to the given query vector.
- * @param {number[]} queryVector - Semantic vector representing the query.
- * @param {number} topK - Number of top results to return.
- * @returns {SearchResult[]} Array of top matching memory entries sorted by similarity.
- * @throws {Error} If the query vector is not an array of numbers.
- */
-function searchMemory(queryVector, topK = 1) {
-  if (!Array.isArray(queryVector) || !queryVector.every((v) => typeof v === 'number')) {
-    throw new Error('Query vector must be an array of numbers.');
+class SemanticMemoryStore {
+  constructor() {
+    /**
+     * @private
+     * @type {Map<string, Float32Array>}
+     * A map to store embeddings with their associated keys.
+     */
+    this.store = new Map();
   }
 
-  const results = vectorStore.map((entry) => {
-    const similarity = cosineSimilarity(queryVector, entry.vector);
-    return { id: entry.id, similarity, data: entry.data };
-  });
+  /**
+   * Adds an embedding to the store.
+   * @param {string} key - The unique identifier for the embedding.
+   * @param {Float32Array} embedding - The vectorized embedding to store.
+   * @throws {Error} If the key already exists or the embedding is invalid.
+   */
+  addEmbedding(key, embedding) {
+    if (this.store.has(key)) {
+      throw new Error(`Key '${key}' already exists in the store.`);
+    }
+    if (!(embedding instanceof Float32Array)) {
+      throw new Error('Embedding must be a Float32Array.');
+    }
+    this.store.set(key, embedding);
+  }
 
-  return results
-    .sort((a, b) => b.similarity - a.similarity)
-    .slice(0, topK);
+  /**
+   * Retrieves an embedding from the store by its key.
+   * @param {string} key - The unique identifier for the embedding.
+   * @returns {Float32Array|null} The embedding if found, or null if not.
+   */
+  getEmbedding(key) {
+    return this.store.get(key) || null;
+  }
+
+  /**
+   * Finds the most similar embedding in the store to a given query embedding.
+   * Uses cosine similarity as the similarity metric.
+   * @param {Float32Array} queryEmbedding - The query embedding.
+   * @returns {{ key: string, similarity: number } | null} The most similar embedding's key and similarity score, or null if the store is empty.
+   */
+  findMostSimilar(queryEmbedding) {
+    if (!(queryEmbedding instanceof Float32Array)) {
+      throw new Error('Query embedding must be a Float32Array.');
+    }
+    if (this.store.size === 0) {
+      return null;
+    }
+
+    let mostSimilar = null;
+    let highestSimilarity = -Infinity;
+
+    for (const [key, embedding] of this.store.entries()) {
+      const similarity = this._cosineSimilarity(queryEmbedding, embedding);
+      if (similarity > highestSimilarity) {
+        highestSimilarity = similarity;
+        mostSimilar = { key, similarity };
+      }
+    }
+
+    return mostSimilar;
+  }
+
+  /**
+   * Calculates the cosine similarity between two embeddings.
+   * @private
+   * @param {Float32Array} a - The first embedding.
+   * @param {Float32Array} b - The second embedding.
+   * @returns {number} The cosine similarity score.
+   */
+  _cosineSimilarity(a, b) {
+    if (a.length !== b.length) {
+      throw new Error('Embeddings must have the same dimensionality.');
+    }
+
+    let dotProduct = 0;
+    let magnitudeA = 0;
+    let magnitudeB = 0;
+
+    for (let i = 0; i < a.length; i++) {
+      dotProduct += a[i] * b[i];
+      magnitudeA += a[i] ** 2;
+      magnitudeB += b[i] ** 2;
+    }
+
+    magnitudeA = Math.sqrt(magnitudeA);
+    magnitudeB = Math.sqrt(magnitudeB);
+
+    return magnitudeA === 0 || magnitudeB === 0 ? 0 : dotProduct / (magnitudeA * magnitudeB);
+  }
 }
 
 /**
- * Clears all memory entries in the vector store.
+ * Exports an instance of the SemanticMemoryStore class.
+ * @type {SemanticMemoryStore}
  */
-function clearMemory() {
-  vectorStore.length = 0;
-}
-
-/**
- * Exports the module's functions.
- */
-export { addMemory, searchMemory, clearMemory };
+export const semanticMemoryStore = new SemanticMemoryStore();
