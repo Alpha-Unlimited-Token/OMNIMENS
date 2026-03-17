@@ -1748,12 +1748,14 @@ function SaveToProjectModal({
   );
 }
 
-function CodeBlockWithRun({ code, language }: { code: string; language: string }) {
+function CodeBlockWithRun({ code, language, defaultCollapsed = false }: { code: string; language: string; defaultCollapsed?: boolean }) {
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<{ stdout: string; stderr: string; exitCode: number; durationMs: number } | null>(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const activeProject = useActiveProject();
   const isRunnable = ["javascript", "js", "typescript", "ts", "node"].includes(language.toLowerCase());
+  const lineCount = code.split("\n").length;
 
   const runCode = async () => {
     if (running) return;
@@ -1778,11 +1780,20 @@ function CodeBlockWithRun({ code, language }: { code: string; language: string }
   return (
     <>
     {showSaveModal && <SaveToProjectModal code={code} language={language} onClose={() => setShowSaveModal(false)} />}
-    <div className="my-3 rounded-xl border border-white/10 overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/8">
-        <span className="text-[10px] font-mono text-white/60 uppercase tracking-wider">{language || "code"}</span>
-        <div className="flex items-center gap-2">
-          {activeProject ? (
+    <div className="my-2 rounded-lg border border-white/10 overflow-hidden max-w-full">
+      {/* ── Header — always visible ── */}
+      <div
+        className="flex items-center justify-between px-3 py-2 bg-white/5 cursor-pointer select-none hover:bg-white/8 transition-colors"
+        onClick={() => setCollapsed(c => !c)}
+      >
+        <div className="flex items-center gap-2 min-w-0">
+          <Code2 className="w-3 h-3 text-primary/60 shrink-0" />
+          <span className="text-[10px] font-mono text-white/70 uppercase tracking-wider shrink-0">{language || "code"}</span>
+          <span className="text-[10px] font-mono text-white/30">·</span>
+          <span className="text-[10px] font-mono text-white/30">{lineCount} {lineCount === 1 ? "line" : "lines"}</span>
+        </div>
+        <div className="flex items-center gap-2 shrink-0" onClick={e => e.stopPropagation()}>
+          {!collapsed && activeProject ? (
             <span
               className="flex items-center gap-1.5 px-2 py-1 text-[9px] font-mono text-green-400/80 border border-green-500/20 bg-green-500/5 rounded"
               title={`Auto-saving to: ${activeProject.name}`}
@@ -1790,44 +1801,51 @@ function CodeBlockWithRun({ code, language }: { code: string; language: string }
               <div className="w-1 h-1 rounded-full bg-green-400" style={{ boxShadow: "0 0 4px #4ade80" }} />
               {activeProject.name}
             </span>
-          ) : (
+          ) : (!collapsed && !activeProject) ? (
             <button
               onClick={() => setShowSaveModal(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono text-white/50 hover:text-primary border border-white/10 hover:border-primary/40 rounded transition-colors"
+              className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-mono text-white/50 hover:text-primary border border-white/10 hover:border-primary/40 rounded transition-colors"
               title="Save to Project"
             >
               <FolderOpen className="w-3 h-3" />
               SAVE
             </button>
-          )}
-          {isRunnable && (
+          ) : null}
+          {!collapsed && isRunnable && (
             <button
               onClick={runCode}
               disabled={running}
-              className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono text-primary/70 hover:text-primary border border-primary/20 hover:border-primary/50 rounded transition-colors disabled:opacity-40"
+              className="flex items-center gap-1.5 px-2 py-1 text-[10px] font-mono text-primary/70 hover:text-primary border border-primary/20 hover:border-primary/50 rounded transition-colors disabled:opacity-40"
             >
               {running ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
               {running ? "RUNNING..." : "RUN"}
             </button>
           )}
+          <ChevronDown className={`w-3.5 h-3.5 text-white/30 transition-transform duration-200 ${collapsed ? "" : "rotate-180"}`} />
         </div>
       </div>
-      <pre className="p-4 overflow-x-auto text-sm text-white/80 font-mono bg-black/40 omnimens-scrollbar">
-        <code>{code}</code>
-      </pre>
-      {result && (
-        <div className="border-t border-white/8 bg-black/60 px-4 py-3 font-mono text-xs">
-          <div className="flex items-center gap-2 mb-2 text-white/60">
-            <Terminal className="w-3 h-3" />
-            <span>EXECUTION RESULT</span>
-            <span className={`ml-auto ${result.exitCode === 0 ? "text-green-400" : "text-red-400"}`}>
-              exit:{result.exitCode} · {result.durationMs}ms
-            </span>
-          </div>
-          {result.stdout && <pre className="text-green-300/80 whitespace-pre-wrap mb-1">{result.stdout}</pre>}
-          {result.stderr && <pre className="text-red-400/80 whitespace-pre-wrap">{result.stderr}</pre>}
-          {!result.stdout && !result.stderr && <span className="text-white/85">No output</span>}
-        </div>
+
+      {/* ── Code body — hidden when collapsed ── */}
+      {!collapsed && (
+        <>
+          <pre className="p-4 overflow-x-auto text-sm text-white/80 font-mono bg-black/40 omnimens-scrollbar max-w-full">
+            <code>{code}</code>
+          </pre>
+          {result && (
+            <div className="border-t border-white/8 bg-black/60 px-4 py-3 font-mono text-xs">
+              <div className="flex items-center gap-2 mb-2 text-white/60">
+                <Terminal className="w-3 h-3" />
+                <span>EXECUTION RESULT</span>
+                <span className={`ml-auto ${result.exitCode === 0 ? "text-green-400" : "text-red-400"}`}>
+                  exit:{result.exitCode} · {result.durationMs}ms
+                </span>
+              </div>
+              {result.stdout && <pre className="text-green-300/80 whitespace-pre-wrap mb-1">{result.stdout}</pre>}
+              {result.stderr && <pre className="text-red-400/80 whitespace-pre-wrap">{result.stderr}</pre>}
+              {!result.stdout && !result.stderr && <span className="text-white/85">No output</span>}
+            </div>
+          )}
+        </>
       )}
     </div>
     </>
@@ -4396,7 +4414,7 @@ export default function Chat() {
                                                 const lang = match ? match[1] : "";
                                                 const codeStr = String(children).replace(/\n$/, "");
                                                 if (isBlock && lang === "mermaid") return <MermaidDiagram code={codeStr} />;
-                                                if (isBlock) return <CodeBlockWithRun code={codeStr} language={lang} />;
+                                                if (isBlock) return <CodeBlockWithRun code={codeStr} language={lang} defaultCollapsed={!devLayout} />;
                                                 return <code className={`font-mono text-primary/80 bg-primary/10 px-1 rounded text-sm ${className || ""}`} {...props}>{children}</code>;
                                               },
                                             }}
