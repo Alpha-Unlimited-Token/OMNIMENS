@@ -2419,6 +2419,7 @@ const MODEL_OPTIONS = [
   { id: "gpt-4o-mini",    label: "GPT-4o Mini",    badge: "FAST",   group: "OpenAI"     },
   { id: "gpt-4.1",        label: "GPT-4.1",        badge: "NEW",    group: "OpenAI"     },
   { id: "gpt-4.1-mini",   label: "GPT-4.1 Mini",   badge: "FAST",   group: "OpenAI"     },
+  { id: "o3",             label: "o3",              badge: "APEX",   group: "OpenAI"     },
   { id: "o3-mini",        label: "o3-mini",         badge: "REASON", group: "OpenAI"     },
   // ── Together AI open-source (free tier) ───────────────────────────────────
   { id: "llama-3.3-70b",  label: "Llama 3.3 70B",  badge: "FREE",   group: "Open-Source" },

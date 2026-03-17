@@ -79,6 +79,7 @@ import {
 const OPENAI_MODELS = [
   "gpt-4o",
   "gpt-4o-mini",
+  "o3",
   "o3-mini",
   "gpt-4.1",
   "gpt-4.1-mini",
@@ -127,6 +128,8 @@ const MODEL_PRICE_GPT4O_INPUT      = 2.50;    // $2.50/1M input  tokens  (gpt-4o
 const MODEL_PRICE_GPT4O_OUTPUT     = 10.00;   // $10.00/1M output tokens (gpt-4o)
 const MODEL_PRICE_MINI_INPUT       = 0.15;    // $0.15/1M input  tokens  (gpt-4o-mini)
 const MODEL_PRICE_MINI_OUTPUT      = 0.60;    // $0.60/1M output tokens  (gpt-4o-mini)
+const MODEL_PRICE_O3_INPUT         = 10.00;   // $10.00/1M input  tokens (o3)
+const MODEL_PRICE_O3_OUTPUT        = 40.00;   // $40.00/1M output tokens (o3)
 const IMAGE_COST_USD               = 0.07;    // ~$0.07 per image (gpt-image-1 medium)
 // Replicate / Flux 1.1 Pro pricing
 // NOTE: Replicate does not expose per-model pricing via their API.
@@ -1705,8 +1708,14 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
 
     // Pick per-token pricing — Together AI prices are fetched live at startup
     const togetherPricing = isTogetherModel(selectedModel) ? TOGETHER_PRICING(selectedModel as TogetherModel) : null;
-    const priceIn  = togetherPricing ? togetherPricing.input  : (selectedModel.includes("mini") ? MODEL_PRICE_MINI_INPUT  : MODEL_PRICE_GPT4O_INPUT);
-    const priceOut = togetherPricing ? togetherPricing.output : (selectedModel.includes("mini") ? MODEL_PRICE_MINI_OUTPUT : MODEL_PRICE_GPT4O_OUTPUT);
+    const priceIn  = togetherPricing ? togetherPricing.input
+      : selectedModel === "o3"           ? MODEL_PRICE_O3_INPUT
+      : selectedModel.includes("mini")   ? MODEL_PRICE_MINI_INPUT
+      : MODEL_PRICE_GPT4O_INPUT;
+    const priceOut = togetherPricing ? togetherPricing.output
+      : selectedModel === "o3"           ? MODEL_PRICE_O3_OUTPUT
+      : selectedModel.includes("mini")   ? MODEL_PRICE_MINI_OUTPUT
+      : MODEL_PRICE_GPT4O_OUTPUT;
 
     if (tokenUsage) {
       actualCostUSD += (tokenUsage.prompt_tokens     * priceIn)  / 1_000_000;
