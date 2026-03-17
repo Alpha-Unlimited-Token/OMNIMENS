@@ -3766,12 +3766,25 @@ function Model3DCard({ model }: { model: Generated3DModel }) {
   }, [model.threejsHtml]);
 
   const download = (dataUrl: string, filename: string) => {
+    let href = dataUrl;
+    let blobUrl: string | null = null;
+    if (dataUrl.startsWith("data:")) {
+      const [header, b64] = dataUrl.split(",");
+      const mime = header.replace("data:", "").replace(";base64", "");
+      const binary = atob(b64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const blob = new Blob([bytes], { type: mime });
+      blobUrl = URL.createObjectURL(blob);
+      href = blobUrl;
+    }
     const a = document.createElement("a");
-    a.href = dataUrl;
+    a.href = href;
     a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+    if (blobUrl) setTimeout(() => URL.revokeObjectURL(blobUrl!), 10000);
   };
 
   const modelName = model.prompt.slice(0, 30).replace(/[^a-z0-9]/gi, "-").toLowerCase();
@@ -4034,12 +4047,25 @@ function GameCard({ game }: { game: GeneratedGame }) {
   }, [game.html5GameBase64]);
 
   const download = (dataUrl: string, filename: string) => {
+    let href = dataUrl;
+    let blobUrl: string | null = null;
+    if (dataUrl.startsWith("data:")) {
+      const [header, b64] = dataUrl.split(",");
+      const mime = header.replace("data:", "").replace(";base64", "");
+      const binary = atob(b64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const blob = new Blob([bytes], { type: mime });
+      blobUrl = URL.createObjectURL(blob);
+      href = blobUrl;
+    }
     const a = document.createElement("a");
-    a.href = dataUrl;
+    a.href = href;
     a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+    if (blobUrl) setTimeout(() => URL.revokeObjectURL(blobUrl!), 10000);
   };
 
   const slug = game.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 30);
