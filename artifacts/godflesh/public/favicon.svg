@@ -13,65 +13,104 @@
     </radialGradient>
 
     <radialGradient id="gf-glow-bg" cx="50%" cy="50%" r="50%">
-      <stop offset="0%"   stop-color="#b085ff" stop-opacity="0.3" />
+      <stop offset="0%"   stop-color="#b085ff" stop-opacity="0.35" />
       <stop offset="100%" stop-color="#4a1fa8" stop-opacity="0" />
     </radialGradient>
 
-    <linearGradient id="gf-ring-a" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%"   stop-color="#c4a8ff" stop-opacity="0" />
-      <stop offset="30%"  stop-color="#e0d0ff" stop-opacity="0.9" />
-      <stop offset="70%"  stop-color="#c4a8ff" stop-opacity="0.9" />
-      <stop offset="100%" stop-color="#c4a8ff" stop-opacity="0" />
-    </linearGradient>
-
-    <linearGradient id="gf-ring-b" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%"   stop-color="#a0d4ff" stop-opacity="0" />
-      <stop offset="40%"  stop-color="#c8e8ff" stop-opacity="0.85" />
-      <stop offset="60%"  stop-color="#c8e8ff" stop-opacity="0.85" />
-      <stop offset="100%" stop-color="#a0d4ff" stop-opacity="0" />
-    </linearGradient>
-
     <filter id="gf-orb-glow" x="-60%" y="-60%" width="220%" height="220%">
-      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feGaussianBlur stdDeviation="2.5" result="blur" />
       <feMerge>
         <feMergeNode in="blur" />
         <feMergeNode in="SourceGraphic" />
       </feMerge>
     </filter>
 
-    <filter id="gf-soft-glow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="1.5" result="blur" />
+    <filter id="gf-soft-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="blur" />
       <feMerge>
         <feMergeNode in="blur" />
         <feMergeNode in="SourceGraphic" />
       </feMerge>
     </filter>
+
+    <filter id="gf-particle-glow" x="-200%" y="-200%" width="500%" height="500%">
+      <feGaussianBlur stdDeviation="1.0" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <path id="path-ring-a" d="M 54,32 A 22,7 0 1,1 53.99,31.93 Z" />
+    <path id="path-ring-b" d="M 32,10 C 39,10 40,54 32,54 C 24,54 24,10 32,10 Z" />
   </defs>
 
-  <!-- Dark background with rounded corners -->
+  <!-- Dark background -->
   <rect width="64" height="64" rx="14" fill="url(#bg-fill)" />
 
-  <!-- Background corona -->
-  <circle cx="32" cy="32" r="28" fill="url(#gf-glow-bg)" />
+  <!-- Pulsing background corona -->
+  <circle cx="32" cy="32" r="28" fill="url(#gf-glow-bg)">
+    <animate attributeName="opacity" values="0.7;1;0.7" dur="3s" repeatCount="indefinite" />
+  </circle>
 
-  <!-- Orbital ring A — horizontal tilt (ellipse, wide) -->
-  <ellipse cx="32" cy="32" rx="22" ry="7" fill="none" stroke="url(#gf-ring-a)" stroke-width="1.2" filter="url(#gf-soft-glow)" />
+  <!-- Orbital ring A — spins clockwise -->
+  <g filter="url(#gf-soft-glow)">
+    <ellipse cx="32" cy="32" rx="22" ry="7" fill="none" stroke="#c4a8ff" stroke-width="1.1" stroke-opacity="0.75">
+      <animateTransform attributeName="transform" type="rotate"
+        from="0 32 32" to="360 32 32"
+        dur="4s" repeatCount="indefinite" />
+    </ellipse>
+  </g>
 
-  <!-- Orbital ring B — vertical tilt (ellipse, tall) -->
-  <ellipse cx="32" cy="32" rx="8" ry="22" fill="none" stroke="url(#gf-ring-b)" stroke-width="1.0" filter="url(#gf-soft-glow)" />
+  <!-- Orbital ring B — spins counter-clockwise, tilted 75deg -->
+  <g filter="url(#gf-soft-glow)" transform="rotate(75 32 32)">
+    <ellipse cx="32" cy="32" rx="7" ry="22" fill="none" stroke="#a0d4ff" stroke-width="0.9" stroke-opacity="0.7">
+      <animateTransform attributeName="transform" type="rotate"
+        from="0 32 32" to="-360 32 32"
+        dur="5.5s" repeatCount="indefinite" />
+    </ellipse>
+  </g>
 
-  <!-- Particle nodes at ring intersections -->
-  <circle cx="54" cy="32" r="1.4" fill="#e0d8ff" fill-opacity="0.9" />
-  <circle cx="10" cy="32" r="1.4" fill="#e0d8ff" fill-opacity="0.9" />
-  <circle cx="32" cy="10" r="1.2" fill="#c8e8ff" fill-opacity="0.85" />
-  <circle cx="32" cy="54" r="1.2" fill="#c8e8ff" fill-opacity="0.85" />
+  <!-- Orbital ring C — third ring at -45deg -->
+  <g filter="url(#gf-soft-glow)" transform="rotate(-45 32 32)">
+    <ellipse cx="32" cy="32" rx="18" ry="5.5" fill="none" stroke="#b8a0ff" stroke-width="0.8" stroke-opacity="0.5">
+      <animateTransform attributeName="transform" type="rotate"
+        from="0 32 32" to="360 32 32"
+        dur="7s" repeatCount="indefinite" />
+    </ellipse>
+  </g>
+
+  <!-- Particle A — orbits ring A -->
+  <circle r="2.2" fill="#e8d8ff" filter="url(#gf-particle-glow)">
+    <animateMotion dur="4s" repeatCount="indefinite">
+      <mpath href="#path-ring-a" />
+    </animateMotion>
+  </circle>
+
+  <!-- Particle B — orbits ring A, offset half-way -->
+  <circle r="1.6" fill="#c8e8ff" fill-opacity="0.85" filter="url(#gf-particle-glow)">
+    <animateMotion dur="4s" begin="-2s" repeatCount="indefinite">
+      <mpath href="#path-ring-a" />
+    </animateMotion>
+  </circle>
+
+  <!-- Particle C — orbits ring B path -->
+  <circle r="1.8" fill="#d0c0ff" fill-opacity="0.9" filter="url(#gf-particle-glow)">
+    <animateMotion dur="5.5s" repeatCount="indefinite">
+      <mpath href="#path-ring-b" />
+    </animateMotion>
+  </circle>
 
   <!-- Central orb -->
-  <circle cx="32" cy="32" r="11" fill="url(#gf-orb)" filter="url(#gf-orb-glow)" />
+  <circle cx="32" cy="32" r="11" fill="url(#gf-orb)" filter="url(#gf-orb-glow)">
+    <animate attributeName="r" values="11;11.5;11" dur="2.5s" repeatCount="indefinite" />
+  </circle>
 
   <!-- Specular highlight -->
-  <ellipse cx="27.5" cy="27" rx="3.5" ry="2.2" fill="white" fill-opacity="0.55" transform="rotate(-20, 27.5, 27)" />
+  <ellipse cx="27.5" cy="27" rx="3.5" ry="2.2" fill="white" fill-opacity="0.5" transform="rotate(-20 27.5 27)" />
 
-  <!-- Tiny bright center point -->
-  <circle cx="32" cy="32" r="2.5" fill="white" fill-opacity="0.9" />
+  <!-- Bright center point -->
+  <circle cx="32" cy="32" r="2.5" fill="white" fill-opacity="0.9">
+    <animate attributeName="fill-opacity" values="0.9;1;0.9" dur="1.8s" repeatCount="indefinite" />
+  </circle>
 </svg>
