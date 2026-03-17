@@ -1960,6 +1960,7 @@ function LeftPanel({
   onSetActiveProject,
   theme,
   onToggleTheme,
+  isTyping,
 }: {
   persona: string;
   onPersonaChange: (p: string) => void;
