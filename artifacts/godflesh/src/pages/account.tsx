@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check, Atom, Code2, Layers, Eye, AlertTriangle, Wrench, Dna, Play, Wallet, CreditCard, Gift, TrendingUp, ChevronRight, Bell, Sun, HelpCircle, BookOpen, Info, Settings, ExternalLink, Share2, Star } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check, Atom, Code2, Layers, Eye, AlertTriangle, Wrench, Dna, Play, Wallet, CreditCard, Gift, TrendingUp, ChevronRight, Bell, Sun, HelpCircle, BookOpen, Info, Settings, ExternalLink, Share2, Star, ToggleLeft, ToggleRight, Loader2, X } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 function useBillingInfo() {
   return useQuery({
@@ -100,11 +100,33 @@ const PERSONA_META: Record<string, { icon: React.ReactNode; label: string; desc:
 
 const MEMORY_CATEGORIES = ["preference", "fact", "goal", "context", "instruction"];
 
+const TOPUP_OPTIONS = [
+  { amountCents: 500,  label: "$5"  },
+  { amountCents: 1000, label: "$10" },
+  { amountCents: 1500, label: "$15" },
+  { amountCents: 2000, label: "$20" },
+  { amountCents: 2500, label: "$25" },
+  { amountCents: 3000, label: "$30" },
+  { amountCents: 4000, label: "$40" },
+  { amountCents: 5000, label: "$50" },
+];
+
 export default function Account() {
   const { isAuthenticated, user, isLoading, logout } = useAuth();
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
   const { data: status, isLoading: statusLoading } = useGetOmnimensStatus();
-  const { data: billing } = useBillingInfo();
+  const { data: billing, refetch: refetchBilling } = useBillingInfo();
+
+  const [walletLoading, setWalletLoading] = useState(false);
+  const [walletError, setWalletError] = useState("");
+  const [walletSuccess, setWalletSuccess] = useState("");
+  const [topupLoading, setTopupLoading] = useState(false);
+  const [topupResult, setTopupResult] = useState("");
+  const [removeLoading, setRemoveLoading] = useState(false);
+  const [savingAuto, setSavingAuto] = useState(false);
+  const [autoEnabled, setAutoEnabled] = useState<boolean | null>(null);
+  const [autoAmt, setAutoAmt] = useState<number | null>(null);
 
   const [patches, setPatches] = useState<OmniPatch[]>([]);
   const [patchSummary, setPatchSummary] = useState<PatchSummary | null>(null);
@@ -141,6 +163,111 @@ export default function Account() {
   useEffect(() => {
     if (!isLoading && !isAuthenticated) setLocation("/login");
   }, [isLoading, isAuthenticated, setLocation]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const params = new URLSearchParams(window.location.search);
+    const walletResult = params.get("wallet");
+    const sessionId = params.get("session_id");
+    if (walletResult === "connected" && sessionId) {
+      window.history.replaceState({}, "", window.location.pathname);
+      fetch("/api/omnimens/confirm-wallet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ sessionId }),
+      }).then(() => {
+        refetchBilling();
+        setWalletSuccess("Card connected — auto top-up is now active.");
+        setTimeout(() => setWalletSuccess(""), 5000);
+      }).catch(() => setWalletError("Card saved, but confirmation failed. Try refreshing."));
+    } else if (walletResult === "cancelled") {
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (billing) {
+      if (autoEnabled === null) setAutoEnabled(!!(billing as any).autoTopupEnabled);
+      if (autoAmt === null) setAutoAmt((billing as any).autoTopupAmountCents || 1000);
+    }
+  }, [billing]);
+
+  const connectWallet = useCallback(async () => {
+    setWalletLoading(true);
+    setWalletError("");
+    try {
+      const r = await fetch("/api/omnimens/setup-wallet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ returnPath: `${import.meta.env.BASE_URL}account` }),
+      });
+      const data = await r.json();
+      if (data.url) window.location.href = data.url;
+      else setWalletError(data.error || "Failed to start card setup.");
+    } catch {
+      setWalletError("Network error. Try again.");
+    } finally {
+      setWalletLoading(false);
+    }
+  }, []);
+
+  const removeWallet = useCallback(async () => {
+    if (!confirm("Remove your saved card? Auto top-up will be disabled.")) return;
+    setRemoveLoading(true);
+    try {
+      await fetch("/api/omnimens/remove-wallet", { method: "POST", credentials: "include" });
+      setAutoEnabled(false);
+      refetchBilling();
+    } catch {
+      setWalletError("Failed to remove card.");
+    } finally {
+      setRemoveLoading(false);
+    }
+  }, [refetchBilling]);
+
+  const saveAutoTopupSettings = useCallback(async () => {
+    setSavingAuto(true);
+    try {
+      await fetch("/api/omnimens/update-topup-settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ autoTopupEnabled: autoEnabled, autoTopupAmountCents: autoAmt }),
+      });
+      refetchBilling();
+    } finally {
+      setSavingAuto(false);
+    }
+  }, [autoEnabled, autoAmt, refetchBilling]);
+
+  const triggerTopup = useCallback(async () => {
+    if (!autoAmt) return;
+    setTopupLoading(true);
+    setTopupResult("");
+    try {
+      const r = await fetch("/api/omnimens/topup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ amountCents: autoAmt }),
+      });
+      const data = await r.json();
+      if (data.ok || data.credits) {
+        setTopupResult(`Success — ${(autoAmt! / 100 * 100).toLocaleString()} credits added.`);
+        queryClient.invalidateQueries({ queryKey: ["/api/omnimens/user-status"] });
+        refetchBilling();
+      } else {
+        setTopupResult(`Failed: ${data.error || "Unknown error"}`);
+      }
+    } catch {
+      setTopupResult("Network error. Try again.");
+    } finally {
+      setTopupLoading(false);
+      setTimeout(() => setTopupResult(""), 5000);
+    }
+  }, [autoAmt, queryClient, refetchBilling]);
 
   useEffect(() => {
     if (isOwner && isAuthenticated) {
@@ -272,7 +399,7 @@ export default function Account() {
           </div>
         </div>
 
-        {/* USAGE */}
+        {/* USAGE & BILLING */}
         {billing && (
           <div className="mb-2">
             <p className="text-[10px] font-mono text-white/35 tracking-widest uppercase px-1 mb-1">Usage</p>
@@ -296,6 +423,151 @@ export default function Account() {
                   {(status as any)?.isOwner ? "CREATOR" : (status as any)?.isPro ? "UNLIMITED" : "FREE"}
                 </span>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* AUTO TOP-UP / PAY AS YOU GO */}
+        {!isOwner && (
+          <div className="mt-5 mb-2">
+            <p className="text-[10px] font-mono text-white/35 tracking-widest uppercase px-1 mb-1">Auto Top-up</p>
+            <div className="bg-black/30 border border-white/8 rounded-xl overflow-hidden">
+
+              {/* Success / error banners */}
+              {walletSuccess && (
+                <div className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500/10 border-b border-emerald-500/20">
+                  <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span className="text-[12px] text-emerald-400">{walletSuccess}</span>
+                </div>
+              )}
+              {walletError && (
+                <div className="flex items-center gap-2 px-4 py-2.5 bg-red-500/10 border-b border-red-500/20">
+                  <AlertTriangle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                  <span className="text-[12px] text-red-400">{walletError}</span>
+                  <button onClick={() => setWalletError("")} className="ml-auto text-red-400/60 hover:text-red-400"><X className="w-3 h-3" /></button>
+                </div>
+              )}
+
+              {!(billing as any)?.hasWallet ? (
+                /* ── No card connected ── */
+                <div className="px-4 py-5">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+                      <CreditCard className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-[13px] text-white font-medium mb-1">Pay as you go</p>
+                      <p className="text-[12px] text-white/50 leading-relaxed">
+                        Connect a card and we'll automatically top up your credits whenever you run low. You set the amount — only charged when needed.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-4 gap-1.5 mb-4">
+                    {TOPUP_OPTIONS.map(o => (
+                      <div key={o.amountCents} className="flex flex-col items-center py-2 px-1 rounded-lg bg-white/4 border border-white/8">
+                        <span className="text-[11px] font-mono font-bold text-white">{o.label}</span>
+                        <span className="text-[9px] text-white/40 mt-0.5">{o.amountCents / 10} cr</span>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={connectWallet}
+                    disabled={walletLoading}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-primary text-black text-[13px] font-bold hover:bg-primary/90 transition-colors disabled:opacity-60"
+                  >
+                    {walletLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
+                    {walletLoading ? "Opening Stripe…" : "Connect Card"}
+                  </button>
+                  <p className="text-[10px] text-white/30 text-center mt-2">Secured by Stripe · No charge until you run out of credits</p>
+                </div>
+              ) : (
+                /* ── Card connected ── */
+                <div>
+                  {/* Card info row */}
+                  <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/6">
+                    <div className="flex items-center gap-2.5">
+                      <CreditCard className="w-4 h-4 text-emerald-400" />
+                      <span className="text-[13px] text-white font-medium">
+                        {(billing as any)?.card?.brand?.toUpperCase()} •••• {(billing as any)?.card?.last4}
+                      </span>
+                      <span className="text-[10px] font-mono text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-1.5 py-0.5 rounded">ACTIVE</span>
+                    </div>
+                    <button
+                      onClick={removeWallet}
+                      disabled={removeLoading}
+                      className="text-[11px] font-mono text-white/35 hover:text-red-400 transition-colors disabled:opacity-50"
+                    >
+                      {removeLoading ? "…" : "remove"}
+                    </button>
+                  </div>
+
+                  {/* Auto top-up toggle */}
+                  <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/6">
+                    <div>
+                      <p className="text-[13px] text-white/80">Auto top-up</p>
+                      <p className="text-[11px] text-white/40">Charge card when credits run out</p>
+                    </div>
+                    <button
+                      onClick={() => setAutoEnabled(v => !v)}
+                      className={`transition-colors ${autoEnabled ? "text-primary" : "text-white/25"}`}
+                    >
+                      {autoEnabled
+                        ? <ToggleRight className="w-7 h-7" />
+                        : <ToggleLeft  className="w-7 h-7" />}
+                    </button>
+                  </div>
+
+                  {/* Top-up amount */}
+                  <div className="px-4 py-3.5 border-b border-white/6">
+                    <p className="text-[12px] text-white/60 mb-2.5">Top-up amount <span className="text-white/30 text-[10px]">(charged when you run out)</span></p>
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {TOPUP_OPTIONS.map(o => (
+                        <button
+                          key={o.amountCents}
+                          onClick={() => setAutoAmt(o.amountCents)}
+                          className={`py-2 rounded-lg border text-[12px] font-mono font-bold transition-all ${
+                            autoAmt === o.amountCents
+                              ? "bg-primary/15 border-primary/50 text-primary"
+                              : "bg-white/3 border-white/8 text-white/60 hover:border-white/20"
+                          }`}
+                        >
+                          {o.label}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-[10px] text-white/30 mt-2">
+                      = {((autoAmt ?? 1000) / 10).toLocaleString()} credits · auto-charged when balance hits 0
+                    </p>
+                  </div>
+
+                  {/* Save settings + manual topup */}
+                  <div className="flex gap-2 px-4 py-3.5">
+                    <button
+                      onClick={saveAutoTopupSettings}
+                      disabled={savingAuto}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-white/6 border border-white/10 hover:bg-white/10 text-[12px] font-mono text-white/70 transition-colors disabled:opacity-50"
+                    >
+                      {savingAuto ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+                      Save Settings
+                    </button>
+                    <button
+                      onClick={triggerTopup}
+                      disabled={topupLoading || !autoEnabled}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-primary/10 border border-primary/30 hover:bg-primary/20 text-[12px] font-mono text-primary transition-colors disabled:opacity-40"
+                      title={!autoEnabled ? "Enable auto top-up first" : `Add ${(autoAmt ?? 1000) / 10} credits now`}
+                    >
+                      {topupLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3" />}
+                      Top Up Now
+                    </button>
+                  </div>
+
+                  {topupResult && (
+                    <div className={`px-4 py-2 text-[12px] font-mono border-t border-white/6 ${topupResult.startsWith("Success") ? "text-emerald-400" : "text-red-400"}`}>
+                      {topupResult}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}

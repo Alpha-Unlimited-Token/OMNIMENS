@@ -1,121 +1,82 @@
 /**
- * wasmMatrixOps: A WebAssembly-based module for efficient matrix operations in Node.js.
- * This module provides matrix multiplication, inversion, and other linear algebra utilities.
- * It is designed to operate without GPU support, leveraging WebAssembly for performance.
+ * wasmMatrixOps - A WebAssembly-powered module for efficient matrix operations.
+ * This module leverages WebAssembly SIMD for GPU-like parallelism in matrix operations, 
+ * enabling high-performance embedding manipulation and similarity search.
+ * 
+ * @module wasmMatrixOps
  */
 
-// WebAssembly module inlined as a base64 string for portability
-const wasmCode = Buffer.from(
-  "AGFzbQEAAAABBgFgAX8BfwMCAQAHBwEDZmFjdG9yaWFsAG1hdHJpeE11bHRpcGx5AG1hdHJpeEludmVyc2UAAQECAX8BQwEABQAAAwECAQAABwQFBg==",
-  "base64"
-);
-const wasmModule = new WebAssembly.Module(wasmCode);
-const wasmInstance = new WebAssembly.Instance(wasmModule, {});
+const { readFileSync } = require('fs');
+const { join } = require('path');
 
 /**
- * Multiplies two matrices and returns the resulting matrix.
- * @param {number[][]} A - The first matrix.
- * @param {number[][]} B - The second matrix.
- * @returns {number[][]} The resulting matrix after multiplication.
- * @throws {Error} If matrices are incompatible for multiplication.
+ * Load and compile the WebAssembly module for matrix operations.
+ * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WebAssembly instance.
  */
-export function matrixMultiply(A, B) {
-  const rowsA = A.length;
-  const colsA = A[0].length;
-  const rowsB = B.length;
-  const colsB = B[0].length;
-
-  if (colsA !== rowsB) {
-    throw new Error("Incompatible matrices for multiplication.");
-  }
-
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
-
-  for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      for (let k = 0; k < colsA; k++) {
-        result[i][j] += A[i][k] * B[k][j];
-      }
-    }
-  }
-
-  return result;
+async function loadWasmModule() {
+  const wasmFilePath = join(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = readFileSync(wasmFilePath);
+  const wasmModule = await WebAssembly.compile(wasmBuffer);
+  return WebAssembly.instantiate(wasmModule);
 }
 
 /**
- * Inverts a square matrix.
- * @param {number[][]} matrix - The matrix to invert.
- * @returns {number[][]} The inverted matrix.
- * @throws {Error} If the matrix is not square or is singular.
+ * Perform a matrix multiplication using WebAssembly.
+ * @param {Float32Array} matrixA - The first matrix (flattened, row-major order).
+ * @param {Float32Array} matrixB - The second matrix (flattened, row-major order).
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA.
+ * @param {number} colsB - Number of columns in matrixB.
+ * @returns {Float32Array} The resulting matrix (flattened, row-major order).
+ * @throws {Error} If dimensions are incompatible for multiplication.
  */
-export function matrixInverse(matrix) {
-  const n = matrix.length;
-  if (!matrix.every(row => row.length === n)) {
-    throw new Error("Matrix must be square.");
+async function multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB) {
+  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+    throw new Error('Matrix dimensions do not match the specified sizes.');
   }
 
-  // Create augmented matrix
-  const augmented = matrix.map((row, i) => [
-    ...row,
-    ...Array.from({ length: n }, (_, j) => (i === j ? 1 : 0))
-  ]);
+  const wasmInstance = await loadWasmModule();
+  const { memory, multiply_matrices } = wasmInstance.exports;
 
-  // Perform Gaussian elimination
-  for (let i = 0; i < n; i++) {
-    // Find pivot
-    let maxRow = i;
-    for (let k = i + 1; k < n; k++) {
-      if (Math.abs(augmented[k][i]) > Math.abs(augmented[maxRow][i])) {
-        maxRow = k;
-      }
-    }
+  const matrixAOffset = 0;
+  const matrixBOffset = matrixAOffset + matrixA.length * 4;
+  const resultOffset = matrixBOffset + matrixB.length * 4;
 
-    // Swap rows
-    [augmented[i], augmented[maxRow]] = [augmented[maxRow], augmented[i]];
+  const wasmMemory = new Float32Array(memory.buffer);
+  wasmMemory.set(matrixA, matrixAOffset / 4);
+  wasmMemory.set(matrixB, matrixBOffset / 4);
 
-    // Check for singular matrix
-    if (augmented[i][i] === 0) {
-      throw new Error("Matrix is singular and cannot be inverted.");
-    }
+  multiply_matrices(matrixAOffset, matrixBOffset, resultOffset, rowsA, colsA, colsB);
 
-    // Normalize pivot row
-    const pivot = augmented[i][i];
-    for (let j = 0; j < 2 * n; j++) {
-      augmented[i][j] /= pivot;
-    }
-
-    // Eliminate column
-    for (let k = 0; k < n; k++) {
-      if (k !== i) {
-        const factor = augmented[k][i];
-        for (let j = 0; j < 2 * n; j++) {
-          augmented[k][j] -= factor * augmented[i][j];
-        }
-      }
-    }
-  }
-
-  // Extract inverse matrix
-  return augmented.map(row => row.slice(n));
+  return new Float32Array(memory.buffer, resultOffset, rowsA * colsB);
 }
 
 /**
- * Transposes a matrix.
- * @param {number[][]} matrix - The matrix to transpose.
- * @returns {number[][]} The transposed matrix.
+ * Compute cosine similarity between two vectors.
+ * @param {Float32Array} vectorA - The first vector.
+ * @param {Float32Array} vectorB - The second vector.
+ * @returns {number} The cosine similarity between vectorA and vectorB.
+ * @throws {Error} If vectors are of different lengths.
  */
-export function matrixTranspose(matrix) {
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-  const result = Array.from({ length: cols }, () => Array(rows).fill(0));
-
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      result[j][i] = matrix[i][j];
-    }
+function cosineSimilarity(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must be of the same length.');
   }
 
-  return result;
+  let dotProduct = 0;
+  let normA = 0;
+  let normB = 0;
+
+  for (let i = 0; i < vectorA.length; i++) {
+    dotProduct += vectorA[i] * vectorB[i];
+    normA += vectorA[i] ** 2;
+    normB += vectorB[i] ** 2;
+  }
+
+  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
 }
 
-export default { matrixMultiply, matrixInverse, matrixTranspose };
+module.exports = {
+  multiplyMatrices,
+  cosineSimilarity
+};

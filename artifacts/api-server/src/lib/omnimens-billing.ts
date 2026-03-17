@@ -178,7 +178,8 @@ export async function createSetupSession(
   userId: string,
   username: string | null,
   email: string | null,
-  returnBaseUrl: string
+  returnBaseUrl: string,
+  returnPath = "/omnimens/pricing"
 ): Promise<{ url: string }> {
   const user = await ensureStripeCustomer(userId, username, email);
 
@@ -186,8 +187,8 @@ export async function createSetupSession(
     customer: user.stripeCustomerId!,
     mode: "setup",
     payment_method_types: ["card"],
-    success_url: `${returnBaseUrl}/omnimens/pricing?wallet=connected&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${returnBaseUrl}/omnimens/pricing?wallet=cancelled`,
+    success_url: `${returnBaseUrl}${returnPath}?wallet=connected&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url:  `${returnBaseUrl}${returnPath}?wallet=cancelled`,
     metadata: { userId, type: "wallet_setup" },
   });
 

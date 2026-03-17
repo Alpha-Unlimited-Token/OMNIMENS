@@ -361,9 +361,13 @@ function WalletPanel({
   isConnecting: boolean; isRemoving: boolean; isTopupping: boolean; isManagingBilling: boolean;
 }) {
   const topupOptions = [
-    { cents: 500,  label: "$5",  credits: 500 },
+    { cents: 500,  label: "$5",  credits: 500  },
     { cents: 1000, label: "$10", credits: 1000 },
+    { cents: 1500, label: "$15", credits: 1500 },
+    { cents: 2000, label: "$20", credits: 2000 },
     { cents: 2500, label: "$25", credits: 2500 },
+    { cents: 3000, label: "$30", credits: 3000 },
+    { cents: 4000, label: "$40", credits: 4000 },
     { cents: 5000, label: "$50", credits: 5000 },
   ];
 
@@ -441,12 +445,12 @@ function WalletPanel({
         {hasWallet && (
           <div>
             <div className="text-xs font-mono text-white/75 tracking-widest mb-3">ADD CREDITS NOW</div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
               {topupOptions.map(opt => (
                 <button key={opt.cents} onClick={() => onTopup(opt.cents)} disabled={isTopupping}
-                  className="bg-black/40 border border-white/10 hover:border-primary/50 hover:bg-primary/5 rounded-xl p-4 text-center transition-all font-mono disabled:opacity-50">
-                  <div className="text-xl font-black text-white">{opt.label}</div>
-                  <div className="text-xs text-white/75 mt-1">{opt.credits} credits</div>
+                  className="bg-black/40 border border-white/10 hover:border-primary/50 hover:bg-primary/5 rounded-xl p-3 text-center transition-all font-mono disabled:opacity-50">
+                  <div className="text-base font-black text-white">{opt.label}</div>
+                  <div className="text-[10px] text-white/75 mt-0.5">{opt.credits} cr</div>
                 </button>
               ))}
             </div>

@@ -2518,9 +2518,13 @@ router.get("/omnimens/pricing", async (_req, res) => {
       { label: "FILE OPERATION",  credits: DEV_TOOL_CREDITS.file_op,   dollarValue: (DEV_TOOL_CREDITS.file_op   * CREDIT_VALUE_USD).toFixed(2), desc: "Diff, ZIP, convert, validate" },
     ],
     topupOptions: [
-      { amountCents: 500,  label: "$5",  credits: 500 },
+      { amountCents: 500,  label: "$5",  credits: 500  },
       { amountCents: 1000, label: "$10", credits: 1000 },
+      { amountCents: 1500, label: "$15", credits: 1500 },
+      { amountCents: 2000, label: "$20", credits: 2000 },
       { amountCents: 2500, label: "$25", credits: 2500 },
+      { amountCents: 3000, label: "$30", credits: 3000 },
+      { amountCents: 4000, label: "$40", credits: 4000 },
       { amountCents: 5000, label: "$50", credits: 5000 },
     ],
     monthlyPlans: [
@@ -2707,7 +2711,9 @@ router.post("/omnimens/setup-wallet", async (req, res) => {
     const proto = req.headers["x-forwarded-proto"] || "https";
     const host = req.headers["x-forwarded-host"] || req.headers.host || "";
     const baseUrl = `${proto}://${host}`;
-    const result = await createSetupSession(req.user.id, req.user.username, req.user.email || null, baseUrl);
+    const { returnPath } = req.body as { returnPath?: string };
+    const safePath = (returnPath && returnPath.startsWith("/")) ? returnPath : "/omnimens/pricing";
+    const result = await createSetupSession(req.user.id, req.user.username, req.user.email || null, baseUrl, safePath);
     res.json(result);
   } catch (err: any) {
     console.error("Setup wallet error:", err);
