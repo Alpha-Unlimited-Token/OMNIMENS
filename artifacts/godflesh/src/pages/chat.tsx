@@ -2571,8 +2571,17 @@ export default function Chat() {
 
   const { data: conversations = [], refetch: refetchConversations } = useQuery<{ id: number; title: string | null; updatedAt: string | null }[]>({
     queryKey: ["omnimens-conversations"],
-    queryFn: () => fetch("/api/omnimens/conversations", { credentials: "include" }).then(r => r.json()),
-    refetchInterval: 30000,
+    queryFn: async () => {
+      const r = await fetch("/api/omnimens/conversations", { credentials: "include" });
+      if (!r.ok) throw new Error("not authenticated");
+      const data = await r.json();
+      return Array.isArray(data) ? data : [];
+    },
+    refetchInterval: 15000,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    retry: 2,
+    retryDelay: 2000,
   });
 
   const handleNewChat = useCallback(() => {
@@ -2608,12 +2617,19 @@ export default function Chat() {
     } catch {}
   }, [currentConversationId]);
 
-  // Refresh conversation list after each message
+  // Refresh conversation list after each AI response completes
   useEffect(() => {
     if (!isTyping && currentConversationId) {
       refetchConversations();
     }
   }, [isTyping, currentConversationId]);
+
+  // Fetch conversation list on mount and after a short delay (handles session cookie timing)
+  useEffect(() => {
+    refetchConversations();
+    const t = setTimeout(() => refetchConversations(), 1500);
+    return () => clearTimeout(t);
+  }, []);
   const voice = useOmnimensVoice();
   const [persona, setPersona] = useState("GENERAL");
   const [selectedModel, setSelectedModel] = useState("gpt-4o");
