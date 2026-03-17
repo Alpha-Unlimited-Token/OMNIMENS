@@ -2635,7 +2635,7 @@ router.post("/omnimens/portal", async (req, res) => {
     }
     const proto = req.headers["x-forwarded-proto"] || "https";
     const host = req.headers["x-forwarded-host"] || req.headers.host || "";
-    const returnUrl = `${proto}://${host}/omnimens/pricing`;
+    const returnUrl = `${proto}://${host}/godflesh/pricing`;
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: user.stripeCustomerId,
       return_url: returnUrl,

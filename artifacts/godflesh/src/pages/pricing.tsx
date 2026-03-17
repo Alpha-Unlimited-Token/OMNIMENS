@@ -56,6 +56,20 @@ function useConfirmWallet() {
   });
 }
 
+function useManageBilling() {
+  return useMutation({
+    mutationFn: async () => {
+      const r = await fetch(API("/omnimens/portal"), {
+        method: "POST",
+        credentials: "include",
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || "Failed to open billing portal");
+      return d as { url: string };
+    },
+  });
+}
+
 function useRemoveWallet() {
   return useMutation({
     mutationFn: async () => {
@@ -206,17 +220,21 @@ function WalletPanel({
   onConnect,
   onRemove,
   onTopup,
+  onManageBilling,
   isConnecting,
   isRemoving,
   isTopupping,
+  isManagingBilling,
 }: {
   billing: any;
   onConnect: () => void;
   onRemove: () => void;
   onTopup: (cents: number) => void;
+  onManageBilling: () => void;
   isConnecting: boolean;
   isRemoving: boolean;
   isTopupping: boolean;
+  isManagingBilling: boolean;
 }) {
   const topupOptions = [
     { cents: 500, label: "$5", credits: 500 },
@@ -269,15 +287,26 @@ function WalletPanel({
                 <div className="text-xs font-mono text-green-400 mt-0.5">✓ Auto-topup enabled</div>
               </div>
             </div>
-            <Button
-              onClick={onRemove}
-              disabled={isRemoving}
-              variant="ghost"
-              size="sm"
-              className="text-red-400/70 hover:text-red-400 hover:bg-red-500/10 border border-red-500/20 font-mono text-xs"
-            >
-              {isRemoving ? "REMOVING..." : "REMOVE WALLET"}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={onManageBilling}
+                disabled={isManagingBilling}
+                variant="ghost"
+                size="sm"
+                className="text-white/60 hover:text-white hover:bg-white/10 border border-white/15 font-mono text-xs"
+              >
+                {isManagingBilling ? "OPENING..." : "MANAGE BILLING"}
+              </Button>
+              <Button
+                onClick={onRemove}
+                disabled={isRemoving}
+                variant="ghost"
+                size="sm"
+                className="text-red-400/70 hover:text-red-400 hover:bg-red-500/10 border border-red-500/20 font-mono text-xs"
+              >
+                {isRemoving ? "REMOVING..." : "REMOVE WALLET"}
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-white/8">
@@ -361,6 +390,7 @@ export default function Pricing() {
   const { mutate: setupWallet, isPending: isConnecting } = useSetupWallet();
   const { mutate: confirmWallet } = useConfirmWallet();
   const { mutate: removeWallet, isPending: isRemoving } = useRemoveWallet();
+  const { mutate: manageBilling, isPending: isManagingBilling } = useManageBilling();
   const { mutate: manualTopup, isPending: isTopupping } = useManualTopup();
   const { mutate: checkout, isPending: isCheckingOut, variables: checkoutVar } = useCheckout();
 
@@ -439,6 +469,13 @@ export default function Pricing() {
     });
   };
 
+  const handleManageBilling = () => {
+    manageBilling(undefined, {
+      onSuccess: (r) => { window.location.href = r.url; },
+      onError: (e: any) => showToast("error", e.message || "Failed to open billing portal"),
+    });
+  };
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-16 flex-1 flex flex-col items-center">
@@ -495,9 +532,11 @@ export default function Pricing() {
             onConnect={handleConnect}
             onRemove={handleRemove}
             onTopup={handleTopup}
+            onManageBilling={handleManageBilling}
             isConnecting={isConnecting}
             isRemoving={isRemoving}
             isTopupping={isTopupping}
+            isManagingBilling={isManagingBilling}
           />
         )}
 
