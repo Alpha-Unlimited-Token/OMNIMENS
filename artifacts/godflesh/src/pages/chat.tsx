@@ -34,7 +34,8 @@ import {
   Globe2, Sparkles, Bolt, Monitor, Code2, FileText, Gamepad2,
   Presentation, Table2, Wand2,
   HardDrive, Rocket, ExternalLink, ChevronRight, RefreshCw, Star,
-  File, Eye, Lock, Unlock, Upload, Server, MemoryStick, Wrench, CircleDot
+  File, Eye, Lock, Unlock, Upload, Server, MemoryStick, Wrench, CircleDot,
+  Sun, Moon
 } from "lucide-react";
 import { OmnimensIcon } from "@/components/omnimens-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
@@ -44,6 +45,7 @@ import remarkGfm from "remark-gfm";
 import { motion, AnimatePresence } from "framer-motion";
 import { ControlHub, loadHubSettingsFromStorage, saveHubSettingsToStorage, type HubSettings } from "@/components/control-hub";
 import { SmartTemplates } from "@/components/smart-templates";
+import { useTheme } from "@/hooks/use-theme";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 // ── Active Project Context ─────────────────────────────────────────────────────
@@ -1956,6 +1958,8 @@ function LeftPanel({
   onConvSearchChange,
   activeProject,
   onSetActiveProject,
+  theme,
+  onToggleTheme,
 }: {
   persona: string;
   onPersonaChange: (p: string) => void;
@@ -1971,6 +1975,8 @@ function LeftPanel({
   onLoadConversation: (id: number) => void;
   onDeleteConversation: (id: number) => void;
   convSearch: string;
+  theme: string;
+  onToggleTheme: () => void;
   onConvSearchChange: (s: string) => void;
   activeProject: ActiveProject;
   onSetActiveProject: (p: ActiveProject) => void;
@@ -2729,6 +2735,13 @@ function LeftPanel({
                 <div className="rounded-xl border border-white/8 bg-white/3 p-3 space-y-3">
                   <p className="font-mono text-[8px] tracking-[0.2em] text-white/35 uppercase">INTERFACE</p>
                   {[
+                    { label: "Appearance", desc: "Switch between dark and light mode", action: (
+                      <button onClick={onToggleTheme}
+                        className={`flex items-center gap-1.5 text-[7px] font-mono px-2 py-1 rounded border transition-all ${theme === "light" ? "border-yellow-400/30 text-yellow-500 bg-yellow-400/10" : "border-primary/30 text-primary bg-primary/10"}`}>
+                        {theme === "light" ? <Sun className="w-2.5 h-2.5" /> : <Moon className="w-2.5 h-2.5" />}
+                        {theme === "light" ? "LIGHT" : "DARK"}
+                      </button>
+                    )},
                     { label: "Voice Responses", desc: "OMNIMENS speaks answers aloud", action: <button onClick={voice.toggle} className={`text-[7px] font-mono px-2 py-1 rounded border transition-all ${voice.isEnabled ? "border-primary/30 text-primary bg-primary/10" : "border-white/10 text-white/30"}`}>{voice.isEnabled ? "ON" : "OFF"}</button> },
                     { label: "Deep Research", desc: "Extended multi-source research mode", action: <button onClick={onToggleDeepResearch} className={`text-[7px] font-mono px-2 py-1 rounded border transition-all ${deepResearchMode ? "border-violet-400/30 text-violet-300 bg-violet-400/10" : "border-white/10 text-white/30"}`}>{deepResearchMode ? "ON" : "OFF"}</button> },
                   ].map(item => (
@@ -3446,6 +3459,7 @@ export default function Chat() {
     return () => clearTimeout(t);
   }, []);
   const voice = useOmnimensVoice();
+  const { theme, toggle: toggleTheme } = useTheme();
   const [persona, setPersona] = useState("GENERAL");
   const [selectedModel, setSelectedModel] = useState("gpt-4o");
   const [responseMode, setResponseMode] = useState("AUTO");
@@ -3688,6 +3702,8 @@ export default function Chat() {
                 onConvSearchChange={setConvSearch}
                 activeProject={activeProject}
                 onSetActiveProject={setActiveProject}
+                theme={theme}
+                onToggleTheme={toggleTheme}
               />
             </motion.div>
           )}
@@ -3760,6 +3776,15 @@ export default function Chat() {
               ) : status?.isPro ? (
                 <span className="font-mono text-[10px] text-accent font-bold tracking-widest hidden sm:block mr-1">UNLIMITED</span>
               ) : null}
+              {/* Theme toggle */}
+              <button
+                onClick={toggleTheme}
+                title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all border text-white/50 border-transparent hover:text-white/70 hover:bg-white/[0.05] text-[9px] font-mono font-bold tracking-wider"
+              >
+                {theme === "light" ? <Sun className="w-3.5 h-3.5 text-yellow-400" /> : <Moon className="w-3.5 h-3.5" />}
+              </button>
+
               {/* Voice toggle — always visible */}
               <button
                 onClick={voice.toggle}

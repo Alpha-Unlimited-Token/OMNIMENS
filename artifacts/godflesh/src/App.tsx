@@ -2,6 +2,7 @@ import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { initTheme } from "@/hooks/use-theme";
 import NotFound from "@/pages/not-found";
 
 import Home from "@/pages/home";
@@ -13,6 +14,8 @@ import Projects from "@/pages/projects";
 import Memory from "@/pages/memory";
 import Tools from "@/pages/tools";
 import FAQ from "@/pages/faq";
+
+initTheme();
 
 const queryClient = new QueryClient({
   defaultOptions: {

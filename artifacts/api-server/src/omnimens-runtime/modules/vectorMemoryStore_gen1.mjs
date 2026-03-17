@@ -1,95 +1,105 @@
-// vectorMemoryStore.js
-
 /**
  * @module vectorMemoryStore
- * @description Provides fast, in-memory storage and retrieval of vector embeddings using nearest neighbor search.
- * Designed for dynamic context management and efficient embedding indexing.
+ * @description A utility module for in-memory vector-based retrieval using cosine similarity and K-Nearest Neighbors (KNN) indexing.
+ * @version 1.0.0
+ * @author OMNIMENS
  */
 
 /**
- * Stores vector embeddings in memory and allows efficient nearest neighbor search.
- * @type {Map<string, number[]>}
- */
-const embeddingStore = new Map();
-
-/**
- * Adds a new embedding to the store.
- * @param {string} id - Unique identifier for the embedding.
- * @param {number[]} vector - The embedding vector.
- * @throws {Error} Throws if the vector is not a valid array of numbers.
- */
-export function addEmbedding(id, vector) {
-  if (!Array.isArray(vector) || vector.some(v => typeof v !== 'number')) {
-    throw new Error('Vector must be an array of numbers.');
-  }
-  embeddingStore.set(id, vector);
-}
-
-/**
- * Finds the nearest neighbor to a given query vector.
- * @param {number[]} queryVector - The vector to search for nearest neighbors.
- * @returns {{id: string, distance: number}[]} An array of nearest neighbors sorted by distance.
- * @throws {Error} Throws if the query vector is not a valid array of numbers.
- */
-export function findNearestNeighbors(queryVector) {
-  if (!Array.isArray(queryVector) || queryVector.some(v => typeof v !== 'number')) {
-    throw new Error('Query vector must be an array of numbers.');
-  }
-
-  const results = [];
-
-  for (const [id, vector] of embeddingStore.entries()) {
-    if (vector.length !== queryVector.length) {
-      continue; // Skip vectors of mismatched dimensions.
-    }
-
-    const distance = calculateEuclideanDistance(queryVector, vector);
-    results.push({ id, distance });
-  }
-
-  // Sort results by ascending distance.
-  return results.sort((a, b) => a.distance - b.distance);
-}
-
-/**
- * Clears all embeddings from the store.
- */
-export function clearEmbeddings() {
-  embeddingStore.clear();
-}
-
-/**
- * Calculates the Euclidean distance between two vectors.
+ * Computes the cosine similarity between two vectors.
  * @param {number[]} vectorA - The first vector.
  * @param {number[]} vectorB - The second vector.
- * @returns {number} The Euclidean distance.
+ * @returns {number} The cosine similarity between the two vectors.
+ * @throws {Error} If the vectors are not of the same length or are empty.
  */
-function calculateEuclideanDistance(vectorA, vectorB) {
-  return Math.sqrt(vectorA.reduce((sum, val, index) => sum + Math.pow(val - vectorB[index], 2), 0));
+export function cosineSimilarity(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length || vectorA.length === 0) {
+    throw new Error("Vectors must be of the same length and non-empty.");
+  }
+
+  const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
+
+  return magnitudeA === 0 || magnitudeB === 0 ? 0 : dotProduct / (magnitudeA * magnitudeB);
 }
 
 /**
- * Retrieves all stored embeddings.
- * @returns {Map<string, number[]>} A map of all embeddings.
+ * A class representing an in-memory vector store with KNN search capabilities.
  */
-export function getAllEmbeddings() {
-  return new Map(embeddingStore);
+export class VectorMemoryStore {
+  constructor() {
+    /**
+     * @type {Map<string, number[]>}
+     * @private
+     */
+    this.store = new Map();
+  }
+
+  /**
+   * Adds a vector to the store.
+   * @param {string} key - The unique key associated with the vector.
+   * @param {number[]} vector - The vector to store.
+   * @throws {Error} If the key already exists or the vector is invalid.
+   */
+  addVector(key, vector) {
+    if (this.store.has(key)) {
+      throw new Error(`Key "${key}" already exists in the store.`);
+    }
+    if (!Array.isArray(vector) || vector.length === 0) {
+      throw new Error("Vector must be a non-empty array of numbers.");
+    }
+    this.store.set(key, vector);
+  }
+
+  /**
+   * Retrieves the K nearest neighbors to a given vector.
+   * @param {number[]} queryVector - The query vector.
+   * @param {number} k - The number of nearest neighbors to retrieve.
+   * @returns {Array<{ key: string, similarity: number }>} An array of the K nearest neighbors and their similarities.
+   * @throws {Error} If the query vector is invalid or K is not a positive integer.
+   */
+  getKNearestNeighbors(queryVector, k) {
+    if (!Array.isArray(queryVector) || queryVector.length === 0) {
+      throw new Error("Query vector must be a non-empty array of numbers.");
+    }
+    if (!Number.isInteger(k) || k <= 0) {
+      throw new Error("K must be a positive integer.");
+    }
+
+    const similarities = [];
+
+    for (const [key, vector] of this.store.entries()) {
+      const similarity = cosineSimilarity(queryVector, vector);
+      similarities.push({ key, similarity });
+    }
+
+    return similarities
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, k);
+  }
+
+  /**
+   * Clears all vectors from the store.
+   */
+  clearStore() {
+    this.store.clear();
+  }
+
+  /**
+   * Returns the number of vectors in the store.
+   * @returns {number} The number of vectors in the store.
+   */
+  size() {
+    return this.store.size;
+  }
 }
 
 /**
- * Retrieves an embedding by its ID.
- * @param {string} id - The ID of the embedding to retrieve.
- * @returns {number[] | undefined} The embedding vector, or undefined if not found.
+ * Example usage:
+ * const store = new VectorMemoryStore();
+ * store.addVector('item1', [0.1, 0.2, 0.3]);
+ * store.addVector('item2', [0.4, 0.5, 0.6]);
+ * const neighbors = store.getKNearestNeighbors([0.1, 0.2, 0.3], 1);
+ * console.log(neighbors);
  */
-export function getEmbeddingById(id) {
-  return embeddingStore.get(id);
-}
-
-/**
- * Removes an embedding by its ID.
- * @param {string} id - The ID of the embedding to remove.
- * @returns {boolean} True if the embedding was removed, false if not found.
- */
-export function removeEmbeddingById(id) {
-  return embeddingStore.delete(id);
-}

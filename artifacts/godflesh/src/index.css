@@ -69,6 +69,87 @@
   --destructive-foreground: 0 0% 100%;
 }
 
+/* ── Light Mode Variables ──────────────────────────────────────────────────── */
+html.light {
+  color-scheme: light;
+  --background: 220 18% 96%;
+  --foreground: 220 20% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 20% 10%;
+  --border: 220 15% 82%;
+  --input: 220 15% 88%;
+  --ring: 265 65% 52%;
+  --primary: 265 65% 50%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 15% 88%;
+  --secondary-foreground: 220 15% 18%;
+  --muted: 220 15% 91%;
+  --muted-foreground: 220 10% 40%;
+  --accent: 190 70% 38%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 70% 48%;
+  --destructive-foreground: 0 0% 100%;
+}
+
+/* Structural overrides for hardcoded Tailwind classes in light mode */
+html.light body {
+  background-image: radial-gradient(ellipse at 50% 0%, rgba(130, 80, 220, 0.05) 0%, transparent 65%);
+}
+
+html.light .bg-black { background-color: hsl(220, 18%, 97%) !important; }
+html.light .bg-black\/95 { background-color: rgba(240, 241, 246, 0.97) !important; }
+html.light .bg-black\/90 { background-color: rgba(240, 241, 246, 0.92) !important; }
+html.light .bg-black\/80 { background-color: rgba(240, 241, 246, 0.85) !important; }
+html.light .bg-black\/70 { background-color: rgba(240, 241, 246, 0.78) !important; }
+html.light .bg-black\/60 { background-color: rgba(240, 241, 246, 0.70) !important; }
+html.light .bg-black\/50 { background-color: rgba(240, 241, 246, 0.60) !important; }
+html.light .bg-black\/40 { background-color: rgba(240, 241, 246, 0.50) !important; }
+html.light .bg-black\/30 { background-color: rgba(240, 241, 246, 0.40) !important; }
+html.light .bg-black\/20 { background-color: rgba(240, 241, 246, 0.28) !important; }
+html.light .bg-black\/10 { background-color: rgba(240, 241, 246, 0.16) !important; }
+
+html.light .text-white { color: hsl(220, 20%, 10%) !important; }
+html.light .text-white\/90 { color: rgba(14, 18, 32, 0.90) !important; }
+html.light .text-white\/85 { color: rgba(14, 18, 32, 0.85) !important; }
+html.light .text-white\/80 { color: rgba(14, 18, 32, 0.80) !important; }
+html.light .text-white\/70 { color: rgba(14, 18, 32, 0.70) !important; }
+html.light .text-white\/60 { color: rgba(14, 18, 32, 0.60) !important; }
+html.light .text-white\/55 { color: rgba(14, 18, 32, 0.55) !important; }
+html.light .text-white\/50 { color: rgba(14, 18, 32, 0.50) !important; }
+html.light .text-white\/40 { color: rgba(14, 18, 32, 0.40) !important; }
+html.light .text-white\/30 { color: rgba(14, 18, 32, 0.30) !important; }
+html.light .text-white\/25 { color: rgba(14, 18, 32, 0.25) !important; }
+html.light .text-white\/20 { color: rgba(14, 18, 32, 0.20) !important; }
+html.light .text-white\/15 { color: rgba(14, 18, 32, 0.15) !important; }
+html.light .text-white\/10 { color: rgba(14, 18, 32, 0.10) !important; }
+
+html.light .border-white { border-color: hsl(220, 15%, 25%) !important; }
+html.light .border-white\/20 { border-color: rgba(14, 18, 32, 0.20) !important; }
+html.light .border-white\/15 { border-color: rgba(14, 18, 32, 0.15) !important; }
+html.light .border-white\/10 { border-color: rgba(14, 18, 32, 0.10) !important; }
+html.light .border-white\/8 { border-color: rgba(14, 18, 32, 0.08) !important; }
+html.light .border-white\/5 { border-color: rgba(14, 18, 32, 0.05) !important; }
+
+html.light .bg-white\/5 { background-color: rgba(14, 18, 32, 0.04) !important; }
+html.light .bg-white\/4 { background-color: rgba(14, 18, 32, 0.03) !important; }
+html.light .bg-white\/3 { background-color: rgba(14, 18, 32, 0.03) !important; }
+html.light .bg-white\/2 { background-color: rgba(14, 18, 32, 0.02) !important; }
+
+html.light .hover\:bg-white\/5:hover { background-color: rgba(14, 18, 32, 0.05) !important; }
+html.light .hover\:bg-white\/4:hover { background-color: rgba(14, 18, 32, 0.04) !important; }
+
+html.light .from-black { --tw-gradient-from: hsl(220, 18%, 96%) !important; }
+html.light .via-black { --tw-gradient-via: hsl(220, 18%, 96%) !important; }
+html.light .to-black { --tw-gradient-to: hsl(220, 18%, 96%) !important; }
+
+html.light .markdown-body pre { @apply bg-slate-100 border-slate-200 text-slate-800; }
+html.light .markdown-body code { @apply bg-slate-100 text-purple-700; }
+html.light .markdown-body pre code { @apply bg-transparent text-slate-800; }
+html.light .markdown-body h1, html.light .markdown-body h2, html.light .markdown-body h3 { @apply border-slate-200; }
+
+html.light .omnimens-scrollbar { scrollbar-color: rgba(130, 80, 220, 0.35) rgba(130, 80, 220, 0.06); }
+html.light .omnimens-scrollbar-x { scrollbar-color: rgba(130, 80, 220, 0.30) hsl(220, 18%, 92%); }
+
 @layer base {
   * {
     @apply border-border;
