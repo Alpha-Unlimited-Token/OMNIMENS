@@ -97,7 +97,8 @@ export type CogniSyncState = {
 };
 
 export type ToolResult = {
-  type: "weather" | "news" | "academic" | "stock" | "currency" | "translate" | "video" | "units" | "qr" | "color_palette";
+  type: "weather" | "news" | "academic" | "stock" | "currency" | "translate" | "video" | "units" | "qr" | "color_palette"
+      | "code_run" | "web_fetch" | "git" | "sys_info" | "file_op";
   result?: string;
   dataUrl?: string;
   palette?: Array<{ hex: string; name: string; rgb: string; usage: string }>;
@@ -113,6 +114,47 @@ export type ToolResult = {
   text?: string;
   theme?: string;
   index: number;
+  // Developer platform tool payloads
+  success?: boolean;
+  error?: string;
+  stdout?: string;
+  stderr?: string;
+  exit_code?: number;
+  elapsed_sec?: number;
+  elapsed_ms?: number;
+  lang?: string;
+  status?: number;
+  content_type?: string;
+  char_count?: number;
+  links?: Array<{ text: string; url: string }>;
+  link_count?: number;
+  title?: string;
+  description?: string;
+  h1?: string[];
+  h2?: string[];
+  json?: any;
+  branch?: string;
+  log?: string[];
+  remotes?: string;
+  contributors?: string[];
+  files?: string[];
+  file_count?: number;
+  recent_commits?: string[];
+  diff?: string;
+  stat?: string;
+  scope?: string;
+  cpu?: any;
+  memory?: any;
+  disk?: any;
+  processes?: any[];
+  platform?: any;
+  network?: any;
+  valid?: boolean;
+  changed_lines?: number;
+  count?: number;
+  members?: any[];
+  output?: string;
+  op?: string;
 };
 
 export type ChartResult = {
@@ -758,6 +800,47 @@ export function useOmnimensChat(
                       text: data.text,
                       theme: data.theme,
                       index: data.index ?? 0,
+                      // Developer platform fields
+                      success: data.success,
+                      error: data.error,
+                      stdout: data.stdout,
+                      stderr: data.stderr,
+                      exit_code: data.exit_code,
+                      elapsed_sec: data.elapsed_sec,
+                      elapsed_ms: data.elapsed_ms,
+                      lang: data.language ?? data.lang,
+                      status: data.status,
+                      content_type: data.content_type,
+                      char_count: data.char_count,
+                      links: data.links,
+                      link_count: data.link_count,
+                      title: data.title,
+                      description: data.description,
+                      h1: data.h1,
+                      h2: data.h2,
+                      json: data.json,
+                      branch: data.branch,
+                      log: data.log,
+                      remotes: data.remotes,
+                      contributors: data.contributors,
+                      files: data.files,
+                      file_count: data.file_count,
+                      recent_commits: data.recent_commits,
+                      diff: data.diff,
+                      stat: data.stat,
+                      scope: data.scope,
+                      cpu: data.cpu,
+                      memory: data.memory,
+                      disk: data.disk,
+                      processes: data.processes,
+                      platform: data.platform,
+                      network: data.network,
+                      valid: data.valid,
+                      changed_lines: data.changed_lines,
+                      count: data.count,
+                      members: data.members,
+                      output: data.output,
+                      op: data.op,
                     };
                     msg.toolResults = [...(msg.toolResults || []), toolResult];
                   }

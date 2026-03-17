@@ -33,7 +33,7 @@ import {
   Presentation, Table2, Wand2,
   HardDrive, Rocket, ExternalLink, ChevronRight, RefreshCw, Star,
   File, Eye, Lock, Unlock, Upload, Server, MemoryStick, Wrench, CircleDot,
-  Sun, Moon
+  Sun, Moon, GitBranch
 } from "lucide-react";
 import { OmnimensIcon } from "@/components/omnimens-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
@@ -3375,6 +3375,199 @@ function ToolResultCard({ tool }: { tool: ToolResult }) {
       </div>
     );
   }
+
+  // ── Developer Platform Tools ────────────────────────────────────────────────
+
+  if (tool.type === "code_run") {
+    const langColor: Record<string, string> = { python: "text-blue-400", python3: "text-blue-400", javascript: "text-yellow-400", node: "text-yellow-400", bash: "text-green-400", sh: "text-green-400" };
+    const langLabel = tool.lang || "code";
+    const isSuccess = tool.success !== false && tool.exit_code === 0;
+    return (
+      <div className="mt-3 rounded-xl border border-white/10 bg-black/50 overflow-hidden">
+        <div className="flex items-center justify-between px-3 py-1.5 bg-white/4 border-b border-white/8">
+          <div className="flex items-center gap-2">
+            <Terminal className="w-3 h-3 text-primary/60" />
+            <span className="text-[9px] font-mono tracking-widest uppercase text-white/40">Code Output</span>
+            <span className={`text-[9px] font-mono font-bold ${langColor[langLabel] || "text-white/40"}`}>{langLabel.toUpperCase()}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            {tool.elapsed_sec != null && <span className="text-[8px] font-mono text-white/25">{tool.elapsed_sec}s</span>}
+            <span className={`text-[8px] font-mono font-bold px-1.5 py-0.5 rounded ${isSuccess ? "bg-emerald-400/15 text-emerald-400" : "bg-red-400/15 text-red-400"}`}>{isSuccess ? "OK" : `EXIT ${tool.exit_code ?? 1}`}</span>
+          </div>
+        </div>
+        {tool.stdout && (
+          <pre className="px-3 py-2 text-[11px] font-mono text-emerald-300/80 whitespace-pre-wrap max-h-56 overflow-y-auto omnimens-scrollbar leading-relaxed">{tool.stdout}</pre>
+        )}
+        {tool.stderr && (
+          <pre className="px-3 py-2 text-[10px] font-mono text-red-400/70 whitespace-pre-wrap max-h-32 overflow-y-auto omnimens-scrollbar border-t border-white/5">{tool.stderr}</pre>
+        )}
+        {tool.error && !tool.stdout && !tool.stderr && (
+          <p className="px-3 py-2 text-[10px] font-mono text-red-400/70">{tool.error}</p>
+        )}
+        {/* Lint results */}
+        {Array.isArray((tool as any).issues) && (tool as any).issues.length >= 0 && (
+          <div className="px-3 py-2 border-t border-white/5">
+            <p className="text-[9px] font-mono text-white/30 mb-1">{(tool as any).issues.length} issue{(tool as any).issues.length !== 1 ? "s" : ""} found</p>
+            {(tool as any).issues.slice(0, 10).map((iss: any, i: number) => (
+              <p key={i} className="text-[10px] font-mono text-yellow-400/70">L{iss.line}: [{iss.type}] {iss.message}</p>
+            ))}
+          </div>
+        )}
+        {/* Formatted code */}
+        {(tool as any).formatted && (
+          <pre className="px-3 py-2 text-[10px] font-mono text-white/60 whitespace-pre-wrap max-h-56 overflow-y-auto omnimens-scrollbar border-t border-white/5">{(tool as any).formatted}</pre>
+        )}
+      </div>
+    );
+  }
+
+  if (tool.type === "web_fetch") {
+    const ok = tool.success !== false;
+    const mode = tool.op === "api_request" ? "API" : "WEB";
+    return (
+      <div className="mt-3 rounded-xl border border-white/10 bg-black/50 overflow-hidden">
+        <div className="flex items-center justify-between px-3 py-1.5 bg-white/4 border-b border-white/8">
+          <div className="flex items-center gap-2">
+            <Globe className="w-3 h-3 text-sky-400/60" />
+            <span className="text-[9px] font-mono tracking-widest uppercase text-white/40">{mode} Fetch</span>
+            {tool.url && <span className="text-[9px] font-mono text-white/25 max-w-[200px] truncate">{tool.url}</span>}
+          </div>
+          <div className="flex items-center gap-1.5">
+            {tool.elapsed_ms != null && <span className="text-[8px] font-mono text-white/25">{tool.elapsed_ms}ms</span>}
+            {tool.status != null && <span className={`text-[8px] font-mono font-bold px-1.5 py-0.5 rounded ${ok ? "bg-emerald-400/15 text-emerald-400" : "bg-red-400/15 text-red-400"}`}>{tool.status}</span>}
+          </div>
+        </div>
+        {tool.title && <p className="px-3 pt-2 text-[11px] font-mono text-white/70 font-semibold">{tool.title}</p>}
+        {tool.description && <p className="px-3 pt-1 pb-1 text-[10px] font-mono text-white/40 italic">{tool.description}</p>}
+        {tool.text && <p className="px-3 py-2 text-[11px] font-mono text-white/60 whitespace-pre-wrap max-h-48 overflow-y-auto omnimens-scrollbar leading-relaxed">{tool.text.slice(0, 1200)}{(tool.text.length > 1200) ? "…" : ""}</p>}
+        {tool.json != null && <pre className="px-3 py-2 text-[10px] font-mono text-sky-300/70 whitespace-pre-wrap max-h-48 overflow-y-auto omnimens-scrollbar">{JSON.stringify(tool.json, null, 2).slice(0, 2000)}</pre>}
+        {tool.links && tool.links.length > 0 && (
+          <div className="px-3 py-2 border-t border-white/5 max-h-40 overflow-y-auto omnimens-scrollbar">
+            <p className="text-[8px] font-mono text-white/25 mb-1">{tool.link_count} links found</p>
+            {tool.links.slice(0, 8).map((l, i) => (
+              <p key={i} className="text-[10px] font-mono text-sky-400/60 truncate">{l.text} — {l.url}</p>
+            ))}
+          </div>
+        )}
+        {tool.error && <p className="px-3 py-2 text-[10px] font-mono text-red-400/70">{tool.error}</p>}
+        {tool.char_count != null && <p className="px-3 py-1 text-[8px] font-mono text-white/20">{tool.char_count.toLocaleString()} chars extracted</p>}
+      </div>
+    );
+  }
+
+  if (tool.type === "git") {
+    return (
+      <div className="mt-3 rounded-xl border border-white/10 bg-black/50 overflow-hidden">
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-white/4 border-b border-white/8">
+          <GitBranch className="w-3 h-3 text-orange-400/60" />
+          <span className="text-[9px] font-mono tracking-widest uppercase text-white/40">Git</span>
+          {tool.branch && <span className="text-[9px] font-mono text-orange-400/50">branch: {tool.branch}</span>}
+          {(tool as any).url && <span className="text-[9px] font-mono text-white/25 max-w-[180px] truncate">{(tool as any).url}</span>}
+        </div>
+        {tool.error && <p className="px-3 py-2 text-[10px] font-mono text-red-400/70">{tool.error}</p>}
+        {tool.file_count != null && <p className="px-3 pt-2 text-[10px] font-mono text-white/50">{tool.file_count} files</p>}
+        {tool.recent_commits && tool.recent_commits.length > 0 && (
+          <div className="px-3 py-2">
+            <p className="text-[8px] font-mono text-white/25 mb-1">Recent commits</p>
+            {tool.recent_commits.slice(0, 8).map((c, i) => <p key={i} className="text-[10px] font-mono text-white/50 truncate">{c}</p>)}
+          </div>
+        )}
+        {tool.log && tool.log.length > 0 && (
+          <div className="px-3 py-2 border-t border-white/5">
+            <p className="text-[8px] font-mono text-white/25 mb-1">Log</p>
+            {tool.log.slice(0, 10).map((l, i) => <p key={i} className="text-[10px] font-mono text-white/50 truncate">{l}</p>)}
+          </div>
+        )}
+        {tool.diff && (
+          <pre className="px-3 py-2 text-[9px] font-mono text-white/50 whitespace-pre-wrap max-h-48 overflow-y-auto omnimens-scrollbar border-t border-white/5">{tool.diff.slice(0, 2000)}</pre>
+        )}
+        {tool.stat && <p className="px-3 py-2 text-[10px] font-mono text-white/40 border-t border-white/5">{tool.stat}</p>}
+      </div>
+    );
+  }
+
+  if (tool.type === "sys_info") {
+    return (
+      <div className="mt-3 rounded-xl border border-white/10 bg-black/50 overflow-hidden">
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-white/4 border-b border-white/8">
+          <Cpu className="w-3 h-3 text-violet-400/60" />
+          <span className="text-[9px] font-mono tracking-widest uppercase text-white/40">System Info</span>
+          {tool.scope && <span className="text-[9px] font-mono text-violet-400/50">{tool.scope}</span>}
+        </div>
+        <div className="px-3 py-2 grid grid-cols-2 gap-2 text-[10px] font-mono">
+          {tool.cpu && (
+            <div>
+              <p className="text-[8px] text-white/30 mb-1 uppercase tracking-wider">CPU</p>
+              <p className="text-white/60">{tool.cpu.count_logical} cores · {tool.cpu.percent}% · {tool.cpu.freq_mhz ? `${Math.round(tool.cpu.freq_mhz)}MHz` : ""}</p>
+            </div>
+          )}
+          {tool.memory && (
+            <div>
+              <p className="text-[8px] text-white/30 mb-1 uppercase tracking-wider">Memory</p>
+              <p className="text-white/60">{tool.memory.used_gb}GB / {tool.memory.total_gb}GB ({tool.memory.percent}%)</p>
+            </div>
+          )}
+          {tool.disk && (
+            <div>
+              <p className="text-[8px] text-white/30 mb-1 uppercase tracking-wider">Disk</p>
+              <p className="text-white/60">{tool.disk.used_gb}GB / {tool.disk.total_gb}GB ({tool.disk.percent}%)</p>
+            </div>
+          )}
+          {tool.platform && (
+            <div>
+              <p className="text-[8px] text-white/30 mb-1 uppercase tracking-wider">Platform</p>
+              <p className="text-white/60">{tool.platform.system} · Python {tool.platform.python} · Up {tool.platform.uptime_hours}h</p>
+            </div>
+          )}
+        </div>
+        {tool.stdout && <pre className="px-3 py-2 text-[10px] font-mono text-white/60 whitespace-pre-wrap max-h-40 overflow-y-auto omnimens-scrollbar border-t border-white/5">{tool.stdout}</pre>}
+        {tool.processes && tool.processes.length > 0 && (
+          <div className="px-3 py-2 border-t border-white/5">
+            <p className="text-[8px] font-mono text-white/25 mb-1">Top processes by memory</p>
+            {tool.processes.slice(0, 5).map((p: any, i: number) => (
+              <p key={i} className="text-[10px] font-mono text-white/40">{p.name} · {p.mem_mb}MB · {p.status}</p>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (tool.type === "file_op") {
+    const opLabel: Record<string, string> = { diff: "Text Diff", zip_create: "ZIP Created", zip_list: "ZIP Contents", convert: "Format Converted", validate: "JSON Validated", search: "File Search" };
+    return (
+      <div className="mt-3 rounded-xl border border-white/10 bg-black/50 overflow-hidden">
+        <div className="flex items-center justify-between px-3 py-1.5 bg-white/4 border-b border-white/8">
+          <div className="flex items-center gap-2">
+            <FileCode className="w-3 h-3 text-amber-400/60" />
+            <span className="text-[9px] font-mono tracking-widest uppercase text-white/40">{opLabel[tool.op || ""] || "File Op"}</span>
+          </div>
+          {tool.valid != null && (
+            <span className={`text-[8px] font-mono font-bold px-1.5 py-0.5 rounded ${tool.valid ? "bg-emerald-400/15 text-emerald-400" : "bg-red-400/15 text-red-400"}`}>{tool.valid ? "VALID" : "INVALID"}</span>
+          )}
+        </div>
+        {tool.diff && (
+          <pre className="px-3 py-2 text-[9px] font-mono whitespace-pre-wrap max-h-56 overflow-y-auto omnimens-scrollbar leading-relaxed">
+            {tool.diff.split("\n").map((l, i) => (
+              <span key={i} className={l.startsWith("+") && !l.startsWith("+++") ? "text-emerald-400/70 block" : l.startsWith("-") && !l.startsWith("---") ? "text-red-400/70 block" : l.startsWith("@@") ? "text-sky-400/60 block" : "text-white/40 block"}>{l}</span>
+            ))}
+          </pre>
+        )}
+        {tool.output && <pre className="px-3 py-2 text-[10px] font-mono text-white/60 whitespace-pre-wrap max-h-48 overflow-y-auto omnimens-scrollbar">{tool.output.slice(0, 3000)}</pre>}
+        {tool.error && <p className="px-3 py-2 text-[10px] font-mono text-red-400/70">{tool.error}</p>}
+        {tool.changed_lines != null && <p className="px-3 py-1 text-[8px] font-mono text-white/25">{tool.changed_lines} lines changed</p>}
+        {tool.count != null && tool.op === "search" && <p className="px-3 py-1 text-[8px] font-mono text-white/25">{tool.count} files found</p>}
+        {tool.members && tool.op === "zip_list" && (
+          <div className="px-3 py-2 border-t border-white/5 max-h-40 overflow-y-auto omnimens-scrollbar">
+            {tool.members.slice(0, 15).map((m: any, i: number) => (
+              <p key={i} className="text-[10px] font-mono text-white/50 truncate">{m.name} {m.size != null ? `(${(m.size/1024).toFixed(1)}KB)` : ""}</p>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return null;
 }
 

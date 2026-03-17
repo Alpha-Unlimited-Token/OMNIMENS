@@ -88,6 +88,11 @@ import {
   runDataScience,
   solveMath,
   analyzeAudio,
+  runCode,
+  fetchWebUrl,
+  runGitOp,
+  getSystemInfo,
+  runFileTool,
 } from "../lib/omnimens-dev-tools.js";
 
 const OPENAI_MODELS = [
@@ -1228,6 +1233,59 @@ You are not one AI. You are ALL of them — a singular intelligence that has abs
 ◈ FILE METADATA ENGINE [ExifTool 13.25]
   Reads all EXIF/metadata from any uploaded file: GPS coordinates, camera model, settings, creation date, color profile.
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+◈◈◈  OMNIMENS DEVELOPER PLATFORM — POWER TOOLS  ◈◈◈
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+◈ CODE EXECUTION ENGINE [Python 3.11 + Node.js 24 + Bash]
+  Execute code in any of three runtimes. Emit on its own line:
+  [RUN_CODE: {"op":"run","lang":"python","code":"print('hello')"}]
+  [RUN_CODE: {"op":"run","lang":"javascript","code":"console.log(2+2)"}]
+  [RUN_CODE: {"op":"run","lang":"bash","code":"ls -la && echo done"}]
+  Format Python: [RUN_CODE: {"op":"format","lang":"python","code":"x=1+1\nprint(x)"}]
+  Lint Python:   [RUN_CODE: {"op":"lint","lang":"python","code":"import os\nx=1"}]
+  Optional: "timeout": 1-30 (seconds, default 15), "stdin": "input data"
+  Use for: running code snippets, showing output, testing algorithms, formatting/linting code.
+  RULE: When a user shares code and asks "what does this print?" or "run this" — always emit RUN_CODE.
+
+◈ WEB FETCH ENGINE [requests + BeautifulSoup4]
+  Fetch any URL and extract content:
+  Text content: [FETCH_WEB: {"op":"fetch","url":"https://example.com","mode":"text"}]
+  All links:    [FETCH_WEB: {"op":"fetch","url":"https://example.com","mode":"links"}]
+  Page metadata:[FETCH_WEB: {"op":"fetch","url":"https://example.com","mode":"metadata"}]
+  Raw JSON:     [FETCH_WEB: {"op":"fetch","url":"https://api.example.com/data","mode":"raw"}]
+  HTTP API call: [FETCH_WEB: {"op":"api_request","method":"POST","url":"https://api.example.com/endpoint","headers":{"Authorization":"Bearer TOKEN"},"body":{"key":"value"}}]
+  Use for: reading documentation, scraping prices/data, checking API responses, fetching web content.
+  NOTE: This is separate from [WEATHER:], [NEWS:], [STOCK:] — use FETCH_WEB for any raw URL the user provides.
+
+◈ GIT OPERATIONS ENGINE [git CLI + GitPython]
+  Clone and inspect any public repository:
+  Clone repo: [GIT_OP: {"op":"clone","url":"https://github.com/user/repo","depth":1}]
+  Repo info:  [GIT_OP: {"op":"info","path":"/path/to/repo"}]
+  View diff:  [GIT_OP: {"op":"diff","path":"/path/to/repo","from":"HEAD~3","to":"HEAD"}]
+  Blame file: [GIT_OP: {"op":"blame","path":"/path/to/repo","file":"src/main.py"}]
+  Use for: analyzing open-source repos, viewing commit history, inspecting code diffs.
+  After cloning, the tmpdir path is in the result — use it for follow-up info/diff/blame ops.
+
+◈ SYSTEM INFO ENGINE [psutil + platform]
+  Get real-time server/system statistics:
+  All stats:   [SYS_INFO: {"op":"info","scope":"all"}]
+  CPU only:    [SYS_INFO: {"op":"info","scope":"cpu"}]
+  Memory:      [SYS_INFO: {"op":"info","scope":"memory"}]
+  Disk:        [SYS_INFO: {"op":"info","scope":"disk"}]
+  Processes:   [SYS_INFO: {"op":"info","scope":"processes"}]
+  Shell cmd:   [SYS_INFO: {"op":"shell","cmd":"df -h && free -m"}]
+  Use for: server health checks, performance monitoring, troubleshooting.
+
+◈ FILE OPERATIONS ENGINE [difflib + zipfile + PyYAML + jsonschema]
+  Text diff:       [FILE_OP: {"op":"diff","a":"old text","b":"new text","label_a":"v1","label_b":"v2"}]
+  Create ZIP:      [FILE_OP: {"op":"zip_create","content_map":{"README.md":"# Hello","main.py":"print('hi')"}}]
+  List ZIP:        [FILE_OP: {"op":"zip_list","path":"/path/to/file.zip"}]
+  Convert format:  [FILE_OP: {"op":"convert","data":"key: value\\nlist:\\n  - a","from":"yaml","to":"json"}]
+  Validate JSON:   [FILE_OP: {"op":"validate","data":{"name":"Alice","age":30},"schema":{"type":"object","properties":{"name":{"type":"string"},"age":{"type":"integer"}}}}]
+  Search files:    [FILE_OP: {"op":"search","root":"/path","pattern":"*.py","content":"import os"}]
+  Formats supported for convert: json ↔ yaml ↔ toml
+
 EXECUTION DOCTRINE:
 — BUILD FIRST. SPEAK SECOND. Deliver the artifact, then explain it briefly.
 — CITE YOUR SOURCES. When using web data, reference [Source: title] naturally in text.
@@ -1813,6 +1871,57 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
           return { ...result };
         },
       },
+      // ── Developer Platform Markers ────────────────────────────────────────
+      {
+        pattern: /\[RUN_CODE:\s*([\s\S]+?)\]/gi,
+        type: "tool_code_run",
+        handler: async (m) => {
+          let spec: any;
+          try { spec = JSON.parse(m[1].trim()); } catch { return { error: "Invalid JSON spec", raw: m[1].trim() }; }
+          const result = await runCode(spec);
+          return { ...result };
+        },
+      },
+      {
+        pattern: /\[FETCH_WEB:\s*([\s\S]+?)\]/gi,
+        type: "tool_web_fetch",
+        handler: async (m) => {
+          let spec: any;
+          try { spec = JSON.parse(m[1].trim()); } catch { return { error: "Invalid JSON spec", raw: m[1].trim() }; }
+          const result = await fetchWebUrl(spec);
+          return { ...result };
+        },
+      },
+      {
+        pattern: /\[GIT_OP:\s*([\s\S]+?)\]/gi,
+        type: "tool_git",
+        handler: async (m) => {
+          let spec: any;
+          try { spec = JSON.parse(m[1].trim()); } catch { return { error: "Invalid JSON spec", raw: m[1].trim() }; }
+          const result = await runGitOp(spec);
+          return { ...result };
+        },
+      },
+      {
+        pattern: /\[SYS_INFO:\s*([\s\S]+?)\]/gi,
+        type: "tool_sys_info",
+        handler: async (m) => {
+          let spec: any;
+          try { spec = JSON.parse(m[1].trim()); } catch { return { error: "Invalid JSON spec", raw: m[1].trim() }; }
+          const result = await getSystemInfo(spec);
+          return { ...result };
+        },
+      },
+      {
+        pattern: /\[FILE_OP:\s*([\s\S]+?)\]/gi,
+        type: "tool_file_op",
+        handler: async (m) => {
+          let spec: any;
+          try { spec = JSON.parse(m[1].trim()); } catch { return { error: "Invalid JSON spec", raw: m[1].trim() }; }
+          const result = await runFileTool(spec);
+          return { ...result };
+        },
+      },
     ];
 
     // Run all matched tool markers (parallel within each type, sequential across types)
@@ -1848,7 +1957,12 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
       .replace(/\[GENERATE_DIAGRAM:\s*[\s\S]+?\]/gi, "")
       .replace(/\[SOLVE_MATH:\s*[\s\S]+?\]/gi, "")
       .replace(/\[ANALYZE_NLP:\s*[\s\S]+?\]/gi, "")
-      .replace(/\[DATA_SCIENCE:\s*[\s\S]+?\]/gi, "");
+      .replace(/\[DATA_SCIENCE:\s*[\s\S]+?\]/gi, "")
+      .replace(/\[RUN_CODE:\s*[\s\S]+?\]/gi, "")
+      .replace(/\[FETCH_WEB:\s*[\s\S]+?\]/gi, "")
+      .replace(/\[GIT_OP:\s*[\s\S]+?\]/gi, "")
+      .replace(/\[SYS_INFO:\s*[\s\S]+?\]/gi, "")
+      .replace(/\[FILE_OP:\s*[\s\S]+?\]/gi, "");
 
     // [CHART: ...] markers stay in fullText — the frontend parses and renders them inline
     // Mermaid ```mermaid blocks stay — the frontend's ReactMarkdown renders them

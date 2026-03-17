@@ -22,7 +22,11 @@ A transcendent sci-fi AI chat platform matching and surpassing the capabilities 
 
 | Feature | Equivalent | Implementation |
 |---|---|---|
-| **Code Interpreter** | ChatGPT Code Interpreter | Execute JS/Node.js in subprocess; "Run" button on all code blocks |
+| **Code Execution** | ChatGPT Code Interpreter | Python 3.11 + Node.js 24 + Bash; `[RUN_CODE:]` marker; format/lint support |
+| **Web Fetch & API Testing** | Postman / curl | `[FETCH_WEB:]` marker; scrape URLs, make HTTP API calls with headers/auth |
+| **Git Operations** | GitHub Copilot | `[GIT_OP:]` clone/diff/log/blame any public repo |
+| **System Monitor** | htop / top | `[SYS_INFO:]` real-time CPU/mem/disk/process/network via psutil |
+| **File Operations** | VS Code diff | `[FILE_OP:]` text diff, ZIP create/list, JSON↔YAML↔TOML, JSON schema validation |
 | **Persistent Memory** | ChatGPT Memory | Auto-extract facts from conversations; inject as context; manage in account |
 | **Deep Research** | Perplexity Pro Research | 5 parallel sub-queries → synthesis with citations; 30-credit cost |
 | **Custom Instructions** | ChatGPT Custom Instructions | Per-user "About Me" + "Response Style" injected every request |

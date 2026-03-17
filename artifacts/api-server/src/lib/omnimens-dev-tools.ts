@@ -196,6 +196,88 @@ export async function analyzeAudio(spec: {
   return runPythonTool("audio_analyzer.py", spec, 60_000);
 }
 
+// ── Code Runner (Python / Node / Bash) ───────────────────────────────────────
+
+export async function runCode(spec: {
+  op: "run" | "format" | "lint";
+  lang?: "python" | "python3" | "javascript" | "node" | "bash";
+  code: string;
+  stdin?: string;
+  timeout?: number;
+}): Promise<any> {
+  console.log(`[DEV TOOLS] Code runner: op=${spec.op} lang=${spec.lang}`);
+  return runPythonTool("code_runner.py", spec, (spec.timeout || 15) * 1000 + 5000);
+}
+
+// ── Web Tools (Fetch URL / API Request) ───────────────────────────────────────
+
+export async function fetchWebUrl(spec: {
+  op: "fetch" | "api_request";
+  url: string;
+  mode?: "text" | "links" | "metadata" | "raw";
+  method?: string;
+  headers?: Record<string, string>;
+  body?: any;
+  params?: Record<string, string>;
+  timeout?: number;
+}): Promise<any> {
+  console.log(`[DEV TOOLS] Web ${spec.op}: ${spec.url}`);
+  return runPythonTool("web_tools.py", spec, 30_000);
+}
+
+// ── Git Tools ─────────────────────────────────────────────────────────────────
+
+export async function runGitOp(spec: {
+  op: "clone" | "info" | "diff" | "blame";
+  url?: string;
+  path?: string;
+  branch?: string;
+  depth?: number;
+  from?: string;
+  to?: string;
+  file?: string;
+}): Promise<any> {
+  console.log(`[DEV TOOLS] Git ${spec.op}: ${spec.url || spec.path}`);
+  return runPythonTool("git_tools.py", spec, 90_000);
+}
+
+// ── System Tools ──────────────────────────────────────────────────────────────
+
+export async function getSystemInfo(spec: {
+  op: "info" | "shell";
+  scope?: "all" | "cpu" | "memory" | "disk" | "processes" | "platform" | "network";
+  cmd?: string;
+  timeout?: number;
+}): Promise<any> {
+  console.log(`[DEV TOOLS] System ${spec.op}`);
+  return runPythonTool("system_tools.py", spec, 30_000);
+}
+
+// ── File Tools (Diff / Zip / Convert / Validate) ─────────────────────────────
+
+export async function runFileTool(spec: {
+  op: "diff" | "zip_create" | "zip_list" | "convert" | "validate" | "search";
+  a?: string;
+  b?: string;
+  label_a?: string;
+  label_b?: string;
+  context?: number;
+  files?: string[];
+  content_map?: Record<string, string>;
+  output?: string;
+  path?: string;
+  data?: any;
+  from?: string;
+  to?: string;
+  schema?: object;
+  root?: string;
+  pattern?: string;
+  content?: string;
+}): Promise<any> {
+  console.log(`[DEV TOOLS] File tool: ${spec.op}`);
+  return runPythonTool("file_tools.py", spec, 30_000);
+}
+
 // ── Tool availability check ───────────────────────────────────────────────────
 
 export async function checkAllTools(): Promise<Record<string, boolean>> {
@@ -221,6 +303,7 @@ export function detectDevToolIntent(message: string): {
   chart: boolean; pdf: boolean; docx: boolean; excel: boolean; csv: boolean;
   ocr: boolean; nlp: boolean; ffmpeg: boolean; diagram: boolean;
   datascience: boolean; math: boolean; audio: boolean;
+  code_run: boolean; web_fetch: boolean; git: boolean; system: boolean; file_tools: boolean;
 } {
   const m = message.toLowerCase();
   return {
@@ -236,5 +319,10 @@ export function detectDevToolIntent(message: string): {
     datascience: /\b(cluster|clustering|k.?means|machine learning|ml model|train.*model|predict|regression|correlation matrix|anomaly|pca)\b/.test(m),
     math: /\b(solve|equation|derivative|integral|calculus|factor.*polynomial|simplify.*expr|matrix.*det|eigenvalue|symbolic math|taylor series)\b/.test(m),
     audio: /\b(audio.*analys|beat.*detect|tempo|bpm|spectrogram|waveform.*audio|librosa|music.*analys)\b/.test(m),
+    code_run: /\b(run|execute|run this code|execute this|run the|output of|what does this.*print|test this code|format.*code|lint.*code|check.*syntax|pylint|black.*format)\b/.test(m),
+    web_fetch: /\b(fetch|scrape|crawl|get.*page|parse.*html|extract.*from.*url|check.*website|api.*request|http.*request|post.*to|put.*to|call.*api|curl|wget)\b/.test(m),
+    git: /\b(git|clone.*repo|repository|commit.*log|git.*diff|git.*blame|git.*status|pull request|branch.*history|github\.com|gitlab\.com)\b/.test(m),
+    system: /\b(system info|cpu usage|memory usage|disk space|running processes|server.*stats|uptime|ram usage|system.*monitor|server.*health)\b/.test(m),
+    file_tools: /\b(diff.*files|compare.*files|zip|unzip|archive|convert.*json.*yaml|convert.*yaml.*json|validate.*json|json.*schema|search.*files|find.*files)\b/.test(m),
   };
 }
