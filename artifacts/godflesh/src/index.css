@@ -200,7 +200,7 @@ html.light input, html.light textarea, html.light select {
   border-color: rgba(20, 23, 34, 0.22) !important;
 }
 html.light input::placeholder, html.light textarea::placeholder {
-  color: rgba(20, 23, 34, 0.40) !important;
+  color: rgba(20, 23, 34, 0.52) !important;
 }
 
 /* ── Buttons that use white/black directly ───────────────────────────────── */

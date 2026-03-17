@@ -3708,8 +3708,8 @@ const TONE_MODES = [
 
 function ToneSelector({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
-    <div className="shrink-0 px-3 py-1.5 bg-black/20 border-t border-white/5 flex items-center gap-1.5 overflow-x-auto omnimens-scrollbar">
-      <span className="text-[8px] font-mono text-white/20 tracking-widest shrink-0">TONE</span>
+    <div className="shrink-0 px-3 py-1.5 bg-black/20 border-t border-white/10 flex items-center gap-1.5 overflow-x-auto omnimens-scrollbar">
+      <span className="text-[8px] font-mono text-white/50 tracking-widest shrink-0">TONE</span>
       {TONE_MODES.map(m => (
         <button
           key={m.id}
@@ -3719,7 +3719,7 @@ function ToneSelector({ value, onChange }: { value: string; onChange: (v: string
           className={`shrink-0 text-[8px] font-mono tracking-widest px-2 py-0.5 rounded-full border transition-all duration-150 ${
             value === m.id
               ? "bg-primary/20 border-primary/50 text-primary"
-              : "bg-transparent border-white/10 text-white/30 hover:text-white/60 hover:border-white/20"
+              : "bg-transparent border-white/20 text-white/65 hover:text-white/90 hover:border-white/35"
           }`}
         >
           {m.label}
@@ -4859,7 +4859,7 @@ export default function Chat() {
                   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(e); }
                 }}
                 placeholder={pendingFiles.length > 0 ? "Describe what to create with these files..." : "Query the intelligence... or attach files to build something"}
-                className="w-full bg-black border border-white/15 focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-xl pl-10 pr-28 py-3.5 text-white font-mono text-sm resize-none h-[56px] omnimens-scrollbar outline-none transition-all placeholder:text-white/25"
+                className="w-full bg-black border border-white/15 focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-xl pl-10 pr-28 py-3.5 text-white font-mono text-sm resize-none h-[56px] omnimens-scrollbar outline-none transition-all placeholder:text-white/50"
                 disabled={isTyping}
               />
               <div className="absolute right-2 flex items-center gap-1">
@@ -4888,7 +4888,7 @@ export default function Chat() {
             </div>
             <div className="flex items-center justify-between mt-1.5 px-1">
               <div className="flex items-center gap-2">
-                <span className="text-[9px] font-mono text-white/40">
+                <span className="text-[9px] font-mono text-white/70">
                   {PERSONA_NAMES[persona]} · MEMORY ACTIVE
                 </span>
                 <ModelSelector value={selectedModel} onChange={setSelectedModel} />
