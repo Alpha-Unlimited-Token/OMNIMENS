@@ -1,121 +1,99 @@
 /**
  * @module webAssemblyMatrixOps
- * @description Provides efficient matrix and numerical operations using WebAssembly for optimized performance in JavaScript.
+ * @description This module enables efficient matrix operations using WebAssembly, designed for numerical computation tasks in Node.js.
  */
 
-const fs = require('fs');
-const path = require('path');
+const { readFileSync } = require('fs');
+const { join } = require('path');
 
 /**
- * Compiles and initializes the WebAssembly module for matrix operations.
- * @returns {Promise<WebAssembly.Instance>} A promise resolving to the WebAssembly instance.
+ * Loads and initializes the WebAssembly module for matrix operations.
+ * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WebAssembly instance.
  */
 async function initializeWasm() {
-  const wasmPath = path.join(__dirname, 'matrix_ops.wasm');
-  const wasmBuffer = fs.readFileSync(wasmPath);
+  const wasmPath = join(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = readFileSync(wasmPath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
-  const wasmInstance = await WebAssembly.instantiate(wasmModule, {});
-  return wasmInstance;
+  return WebAssembly.instantiate(wasmModule);
 }
 
 /**
- * Multiplies two matrices using WebAssembly for optimized performance.
+ * Adds two matrices using WebAssembly.
  * @param {number[][]} matrixA - The first matrix.
  * @param {number[][]} matrixB - The second matrix.
- * @returns {Promise<number[][]>} A promise resolving to the resulting matrix.
- * @throws {Error} Throws if matrices are incompatible for multiplication.
+ * @returns {Promise<number[][]>} The resulting matrix after addition.
+ * @throws {Error} If matrices are not of the same dimensions.
+ */
+async function addMatrices(matrixA, matrixB) {
+  if (!validateMatrices(matrixA, matrixB)) {
+    throw new Error('Matrices must have the same dimensions for addition.');
+  }
+
+  const wasmInstance = await initializeWasm();
+  const { add_matrices } = wasmInstance.exports;
+
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
+  const result = new Float64Array(flatA.length);
+
+  add_matrices(flatA, flatB, result, matrixA.length, matrixA[0].length);
+
+  return reshapeMatrix(result, matrixA.length, matrixA[0].length);
+}
+
+/**
+ * Multiplies two matrices using WebAssembly.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {Promise<number[][]>} The resulting matrix after multiplication.
+ * @throws {Error} If the number of columns in matrixA does not match the number of rows in matrixB.
  */
 async function multiplyMatrices(matrixA, matrixB) {
   if (matrixA[0].length !== matrixB.length) {
-    throw new Error('Matrix dimensions do not match for multiplication.');
+    throw new Error('Number of columns in matrixA must match the number of rows in matrixB for multiplication.');
   }
 
   const wasmInstance = await initializeWasm();
-  const { memory, multiply_matrices } = wasmInstance.exports;
+  const { multiply_matrices } = wasmInstance.exports;
 
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const colsB = matrixB[0].length;
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
+  const result = new Float64Array(matrixA.length * matrixB[0].length);
 
-  const buffer = new Float64Array(memory.buffer);
-  const offsetA = 0;
-  const offsetB = rowsA * colsA;
-  const offsetC = offsetB + colsA * colsB;
+  multiply_matrices(flatA, flatB, result, matrixA.length, matrixA[0].length, matrixB[0].length);
 
-  let index = 0;
-  for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsA; j++) {
-      buffer[offsetA + index++] = matrixA[i][j];
-    }
-  }
-
-  index = 0;
-  for (let i = 0; i < colsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      buffer[offsetB + index++] = matrixB[i][j];
-    }
-  }
-
-  multiply_matrices(offsetA, offsetB, offsetC, rowsA, colsA, colsB);
-
-  const result = [];
-  index = 0;
-  for (let i = 0; i < rowsA; i++) {
-    const row = [];
-    for (let j = 0; j < colsB; j++) {
-      row.push(buffer[offsetC + index++]);
-    }
-    result.push(row);
-  }
-
-  return result;
+  return reshapeMatrix(result, matrixA.length, matrixB[0].length);
 }
 
 /**
- * Inverts a square matrix using WebAssembly for optimized performance.
- * @param {number[][]} matrix - The matrix to invert.
- * @returns {Promise<number[][]>} A promise resolving to the inverted matrix.
- * @throws {Error} Throws if the matrix is not square or inversion fails.
+ * Validates that two matrices have the same dimensions.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {boolean} True if the matrices have the same dimensions, false otherwise.
  */
-async function invertMatrix(matrix) {
-  if (matrix.length !== matrix[0].length) {
-    throw new Error('Matrix must be square to invert.');
+function validateMatrices(matrixA, matrixB) {
+  return (
+    matrixA.length === matrixB.length &&
+    matrixA[0].length === matrixB[0].length
+  );
+}
+
+/**
+ * Reshapes a flat array into a 2D matrix.
+ * @param {Float64Array} flatArray - The flat array to reshape.
+ * @param {number} rows - The number of rows in the resulting matrix.
+ * @param {number} cols - The number of columns in the resulting matrix.
+ * @returns {number[][]} The reshaped 2D matrix.
+ */
+function reshapeMatrix(flatArray, rows, cols) {
+  const matrix = [];
+  for (let i = 0; i < rows; i++) {
+    matrix.push(Array.from(flatArray.slice(i * cols, (i + 1) * cols)));
   }
-
-  const wasmInstance = await initializeWasm();
-  const { memory, invert_matrix } = wasmInstance.exports;
-
-  const size = matrix.length;
-  const buffer = new Float64Array(memory.buffer);
-  const offsetMatrix = 0;
-  const offsetResult = size * size;
-
-  let index = 0;
-  for (let i = 0; i < size; i++) {
-    for (let j = 0; j < size; j++) {
-      buffer[offsetMatrix + index++] = matrix[i][j];
-    }
-  }
-
-  const success = invert_matrix(offsetMatrix, offsetResult, size);
-  if (!success) {
-    throw new Error('Matrix inversion failed (likely singular matrix).');
-  }
-
-  const result = [];
-  index = 0;
-  for (let i = 0; i < size; i++) {
-    const row = [];
-    for (let j = 0; j < size; j++) {
-      row.push(buffer[offsetResult + index++]);
-    }
-    result.push(row);
-  }
-
-  return result;
+  return matrix;
 }
 
 module.exports = {
-  multiplyMatrices,
-  invertMatrix
+  addMatrices,
+  multiplyMatrices
 };

@@ -1,87 +1,100 @@
-// vectorStoreRedis.js
-
 /**
  * @module vectorStoreRedis
- * @description This module provides efficient similarity search and dynamic embedding updates using Redis with vector indexing.
+ * @description A module to simulate an in-memory vector store for embeddings using Redis for fast key-based access.
+ * @requires Node.js 20+ with no external dependencies.
  */
 
-const net = require('net');
+const { createClient } = require('redis');
 
 /**
- * Sends a command to the Redis server and returns the response.
- * @param {string} command - The Redis command to execute.
- * @returns {Promise<string>} - The response from the Redis server.
+ * Creates and manages a Redis-backed vector store.
+ * @class
  */
-async function sendRedisCommand(command) {
-  return new Promise((resolve, reject) => {
-    const client = net.createConnection({ host: '127.0.0.1', port: 6379 }, () => {
-      client.write(`${command}\r\n`);
-    });
+class VectorStoreRedis {
+  /**
+   * Initializes the Redis client and connects to the Redis server.
+   * @param {Object} [options] - Configuration options for the Redis client.
+   * @param {string} [options.url="redis://localhost:6379"] - Redis connection URL.
+   */
+  constructor(options = {}) {
+    const { url = 'redis://localhost:6379' } = options;
+    this.client = createClient({ url });
+    this.connected = false;
+  }
 
-    let response = '';
-    client.on('data', (data) => {
-      response += data.toString();
-      if (response.includes('\r\n')) {
-        client.end();
-      }
-    });
+  /**
+   * Connects to the Redis server.
+   * @returns {Promise<void>} Resolves when the connection is established.
+   */
+  async connect() {
+    if (!this.connected) {
+      await this.client.connect();
+      this.connected = true;
+    }
+  }
 
-    client.on('end', () => resolve(response.trim()));
-    client.on('error', (err) => reject(err));
-  });
+  /**
+   * Disconnects from the Redis server.
+   * @returns {Promise<void>} Resolves when the connection is closed.
+   */
+  async disconnect() {
+    if (this.connected) {
+      await this.client.disconnect();
+      this.connected = false;
+    }
+  }
+
+  /**
+   * Stores a vector (embedding) in the Redis store.
+   * @param {string} key - The key to associate with the vector.
+   * @param {number[]} vector - The embedding vector to store.
+   * @returns {Promise<void>} Resolves when the vector is successfully stored.
+   * @throws {Error} If the key or vector is invalid.
+   */
+  async storeVector(key, vector) {
+    if (typeof key !== 'string' || !Array.isArray(vector) || vector.some(isNaN)) {
+      throw new Error('Invalid key or vector format. Key must be a string and vector must be an array of numbers.');
+    }
+    const vectorString = JSON.stringify(vector);
+    await this.client.set(key, vectorString);
+  }
+
+  /**
+   * Retrieves a vector (embedding) from the Redis store.
+   * @param {string} key - The key associated with the vector.
+   * @returns {Promise<number[]|null>} Resolves with the retrieved vector, or null if the key does not exist.
+   */
+  async getVector(key) {
+    if (typeof key !== 'string') {
+      throw new Error('Key must be a string.');
+    }
+    const vectorString = await this.client.get(key);
+    return vectorString ? JSON.parse(vectorString) : null;
+  }
+
+  /**
+   * Deletes a vector (embedding) from the Redis store.
+   * @param {string} key - The key associated with the vector.
+   * @returns {Promise<boolean>} Resolves with true if the key was deleted, false otherwise.
+   */
+  async deleteVector(key) {
+    if (typeof key !== 'string') {
+      throw new Error('Key must be a string.');
+    }
+    const result = await this.client.del(key);
+    return result > 0;
+  }
+
+  /**
+   * Retrieves all keys currently stored in the Redis store.
+   * @returns {Promise<string[]>} Resolves with an array of all keys.
+   */
+  async listKeys() {
+    return await this.client.keys('*');
+  }
 }
 
 /**
- * Adds or updates a vector in the Redis vector store.
- * @param {string} key - The key for the vector.
- * @param {number[]} vector - The embedding vector.
- * @returns {Promise<void>} - Resolves when the operation is complete.
+ * Exports the VectorStoreRedis class.
  */
-async function addOrUpdateVector(key, vector) {
-  const vectorString = vector.join(' ');
-  await sendRedisCommand(`HSET ${key} vector "${vectorString}"`);
-}
-
-/**
- * Searches for the nearest neighbors of a given vector in the Redis vector store.
- * @param {number[]} queryVector - The query vector.
- * @param {number} k - The number of nearest neighbors to retrieve.
- * @returns {Promise<Object[]>} - The nearest neighbors and their similarity scores.
- */
-async function searchNearestNeighbors(queryVector, k) {
-  const queryString = queryVector.join(' ');
-  const response = await sendRedisCommand(`FT.SEARCH my_vector_index "[${queryString}]=>[KNN ${k}]"`);
-
-  // Parse response (basic parsing for demonstration purposes)
-  const results = response.split('\n').slice(1).map((line) => {
-    const [key, score] = line.split(' ');
-    return { key, score: parseFloat(score) };
-  });
-
-  return results;
-}
-
-/**
- * Creates a vector index in Redis for efficient similarity search.
- * @param {string} indexName - The name of the index.
- * @returns {Promise<void>} - Resolves when the index is created.
- */
-async function createVectorIndex(indexName) {
-  await sendRedisCommand(`FT.CREATE ${indexName} ON HASH PREFIX 1 vector SCHEMA vector VECTOR FLAT 6 DIM 128 DISTANCE COSINE`);
-}
-
-/**
- * Deletes a vector from the Redis vector store.
- * @param {string} key - The key for the vector to delete.
- * @returns {Promise<void>} - Resolves when the vector is deleted.
- */
-async function deleteVector(key) {
-  await sendRedisCommand(`DEL ${key}`);
-}
-
-module.exports = {
-  addOrUpdateVector,
-  searchNearestNeighbors,
-  createVectorIndex,
-  deleteVector
-};
+module.exports = { VectorStoreRedis };
