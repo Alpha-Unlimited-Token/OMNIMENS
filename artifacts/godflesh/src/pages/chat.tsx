@@ -1951,6 +1951,93 @@ function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onTasks, 
   );
 }
 
+// ── Deploy Stats Panel ─────────────────────────────────────────────────────────
+
+function DeployStatsPanel() {
+  const [stats, setStats] = React.useState<{
+    today: { messageCount: number; creditsSpent: number; computeSeconds: number };
+    totalConversations: number;
+    totalMessages: number;
+    totalMemories: number;
+  } | null>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    fetch("/api/omnimens/usage-stats")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { setStats(d); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const Row = ({ label, value, color = "text-white/60" }: { label: string; value: string | number; color?: string }) => (
+    <div className="flex justify-between items-center">
+      <span className="text-[8px] font-mono text-white/30">{label}</span>
+      <span className={`text-[8px] font-mono ${color}`}>{value}</span>
+    </div>
+  );
+
+  return (
+    <div className="space-y-2">
+      {/* Analytics */}
+      <div className="rounded-xl border border-white/8 bg-white/3 p-3 space-y-1.5">
+        <div className="flex items-center gap-2 mb-2">
+          <BarChart2 className="w-3 h-3 text-purple-400" />
+          <p className="font-mono text-[8px] tracking-[0.2em] text-white/35 uppercase">ANALYTICS</p>
+        </div>
+        {loading ? (
+          <p className="text-[8px] font-mono text-white/25 text-center py-1">Loading…</p>
+        ) : stats ? (
+          <>
+            <Row label="Today — Messages" value={stats.today.messageCount} color="text-purple-300" />
+            <Row label="Today — Credits Used" value={stats.today.creditsSpent} color="text-amber-300" />
+            <div className="border-t border-white/6 my-1.5" />
+            <Row label="All-time Messages" value={stats.totalMessages.toLocaleString()} />
+            <Row label="All-time Conversations" value={stats.totalConversations.toLocaleString()} />
+            <Row label="Memory Entries" value={stats.totalMemories.toLocaleString()} />
+          </>
+        ) : (
+          <p className="text-[8px] font-mono text-white/25 text-center py-1">Sign in to view stats</p>
+        )}
+      </div>
+
+      {/* Manage links */}
+      <div className="rounded-xl border border-white/8 bg-white/3 p-3 space-y-1.5">
+        <div className="flex items-center gap-2 mb-2">
+          <Settings className="w-3 h-3 text-orange-400" />
+          <p className="font-mono text-[8px] tracking-[0.2em] text-white/35 uppercase">MANAGE</p>
+        </div>
+        <a
+          href="https://omnimens-ai.com/godflesh/"
+          target="_blank" rel="noreferrer"
+          className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[9px] font-mono text-white/70 hover:text-white hover:bg-white/5 transition-all"
+        >
+          <Globe className="w-2.5 h-2.5 text-green-400 shrink-0" />
+          View Live Site
+          <ExternalLink className="w-2 h-2 ml-auto text-white/25 shrink-0" />
+        </a>
+        <a
+          href="https://replit.com/@alphaunlimited/OMNIMENS"
+          target="_blank" rel="noreferrer"
+          className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[9px] font-mono text-white/70 hover:text-white hover:bg-white/5 transition-all"
+        >
+          <Server className="w-2.5 h-2.5 text-blue-400 shrink-0" />
+          Replit Workspace
+          <ExternalLink className="w-2 h-2 ml-auto text-white/25 shrink-0" />
+        </a>
+        <a
+          href="https://replit.com/@alphaunlimited/OMNIMENS/deployments"
+          target="_blank" rel="noreferrer"
+          className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[9px] font-mono text-white/70 hover:text-white hover:bg-white/5 transition-all"
+        >
+          <Gauge className="w-2.5 h-2.5 text-cyan-400 shrink-0" />
+          Deployment Dashboard
+          <ExternalLink className="w-2 h-2 ml-auto text-white/25 shrink-0" />
+        </a>
+      </div>
+    </div>
+  );
+}
+
 // ── Left Panel ─────────────────────────────────────────────────────────────────
 
 function LeftPanel({
@@ -2519,37 +2606,8 @@ function LeftPanel({
               </a>
             </div>
 
-            {/* Quick actions */}
-            <div>
-              <p className="font-mono text-[8px] tracking-[0.2em] text-white/35 uppercase mb-2 px-1">QUICK ACTIONS</p>
-              <div className="space-y-1">
-                <a href="https://replit.com/@alphaunlimited/OMNIMENS?tab=overview" target="_blank" rel="noreferrer"
-                  className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[9px] font-mono text-white/70 hover:text-white border border-white/8 hover:border-white/15 hover:bg-white/5 transition-all">
-                  <Server className="w-3 h-3 text-blue-400" /> Overview &amp; Status
-                  <ExternalLink className="w-2.5 h-2.5 ml-auto text-white/25" />
-                </a>
-                <a href="https://replit.com/@alphaunlimited/OMNIMENS?tab=logs" target="_blank" rel="noreferrer"
-                  className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[9px] font-mono text-white/70 hover:text-white border border-white/8 hover:border-white/15 hover:bg-white/5 transition-all">
-                  <Activity className="w-3 h-3 text-yellow-400" /> Deployment Logs
-                  <ExternalLink className="w-2.5 h-2.5 ml-auto text-white/25" />
-                </a>
-                <a href="https://replit.com/@alphaunlimited/OMNIMENS?tab=analytics" target="_blank" rel="noreferrer"
-                  className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[9px] font-mono text-white/70 hover:text-white border border-white/8 hover:border-white/15 hover:bg-white/5 transition-all">
-                  <BarChart2 className="w-3 h-3 text-purple-400" /> Analytics
-                  <ExternalLink className="w-2.5 h-2.5 ml-auto text-white/25" />
-                </a>
-                <a href="https://replit.com/@alphaunlimited/OMNIMENS?tab=resources" target="_blank" rel="noreferrer"
-                  className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[9px] font-mono text-white/70 hover:text-white border border-white/8 hover:border-white/15 hover:bg-white/5 transition-all">
-                  <Gauge className="w-3 h-3 text-cyan-400" /> Resources &amp; Usage
-                  <ExternalLink className="w-2.5 h-2.5 ml-auto text-white/25" />
-                </a>
-                <a href="https://replit.com/@alphaunlimited/OMNIMENS?tab=settings" target="_blank" rel="noreferrer"
-                  className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[9px] font-mono text-white/70 hover:text-white border border-white/8 hover:border-white/15 hover:bg-white/5 transition-all">
-                  <Settings className="w-3 h-3 text-orange-400" /> Manage Deployment
-                  <ExternalLink className="w-2.5 h-2.5 ml-auto text-white/25" />
-                </a>
-              </div>
-            </div>
+            {/* Analytics / Usage Stats */}
+            <DeployStatsPanel />
 
             {/* Domain info */}
             <div className="rounded-xl border border-white/8 bg-white/3 p-3 space-y-1.5">
