@@ -1,95 +1,118 @@
+// redisVectorStore.js
+
 /**
  * @module redisVectorStore
- * @description This module provides an in-memory vector embedding storage and similarity search mechanism using cosine similarity.
- * @author OMNIMENS
+ * @description In-memory vector storage for fast similarity search and embedding indexing using Redis.
+ * This module leverages Redis sorted sets and hash maps to store and query high-dimensional vectors efficiently.
  */
 
-/**
- * Stores vector embeddings in memory.
- * @type {Map<string, number[]>}
- */
-const vectorStore = new Map();
+const { createClient } = require('redis');
 
 /**
- * Adds a vector embedding to the store.
+ * Initialize a Redis client.
+ * @returns {RedisClientType} Redis client instance.
+ */
+async function initializeRedisClient() {
+  const client = createClient();
+  client.on('error', (err) => console.error('Redis Client Error', err));
+  await client.connect();
+  return client;
+}
+
+/**
+ * Add a vector to the Redis store.
+ * @param {RedisClientType} client - Redis client instance.
+ * @param {string} key - The key for the vector store.
  * @param {string} id - Unique identifier for the vector.
- * @param {number[]} vector - The vector embedding to store.
- * @throws {Error} If the vector is not a valid array of numbers.
+ * @param {number[]} vector - High-dimensional vector.
  */
-export function addVector(id, vector) {
-  if (!Array.isArray(vector) || !vector.every((num) => typeof num === 'number')) {
-    throw new Error('Vector must be an array of numbers.');
+async function addVector(client, key, id, vector) {
+  const vectorString = JSON.stringify(vector);
+  await client.hSet(key, id, vectorString);
+  const magnitude = calculateMagnitude(vector);
+  await client.zAdd(`${key}:index`, { score: magnitude, value: id });
+}
+
+/**
+ * Retrieve a vector from the Redis store.
+ * @param {RedisClientType} client - Redis client instance.
+ * @param {string} key - The key for the vector store.
+ * @param {string} id - Unique identifier for the vector.
+ * @returns {number[] | null} The vector or null if not found.
+ */
+async function getVector(client, key, id) {
+  const vectorString = await client.hGet(key, id);
+  return vectorString ? JSON.parse(vectorString) : null;
+}
+
+/**
+ * Perform similarity search for a given query vector.
+ * @param {RedisClientType} client - Redis client instance.
+ * @param {string} key - The key for the vector store.
+ * @param {number[]} queryVector - Query vector for similarity search.
+ * @param {number} topN - Number of top similar vectors to retrieve.
+ * @returns {Promise<Array<{id: string, similarity: number}>>} List of top N similar vectors.
+ */
+async function similaritySearch(client, key, queryVector, topN) {
+  const allVectors = await client.hGetAll(key);
+  const results = [];
+
+  for (const [id, vectorString] of Object.entries(allVectors)) {
+    const vector = JSON.parse(vectorString);
+    const similarity = cosineSimilarity(queryVector, vector);
+    results.push({ id, similarity });
   }
-  vectorStore.set(id, vector);
+
+  results.sort((a, b) => b.similarity - a.similarity);
+  return results.slice(0, topN);
 }
 
 /**
- * Removes a vector embedding from the store.
- * @param {string} id - Unique identifier for the vector to remove.
- * @returns {boolean} True if the vector was removed, false if it did not exist.
+ * Calculate the magnitude of a vector.
+ * @param {number[]} vector - High-dimensional vector.
+ * @returns {number} Magnitude of the vector.
  */
-export function removeVector(id) {
-  return vectorStore.delete(id);
+function calculateMagnitude(vector) {
+  return Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
 }
 
 /**
- * Computes the cosine similarity between two vectors.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number} The cosine similarity between the two vectors.
- * @throws {Error} If the vectors are not of the same length or are invalid.
+ * Compute cosine similarity between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} Cosine similarity score.
  */
 function cosineSimilarity(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must be of the same length.');
-  }
-
-  const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a ** 2, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b ** 2, 0));
-
-  if (magnitudeA === 0 || magnitudeB === 0) {
-    return 0; // Handle edge case where one of the vectors has zero magnitude.
-  }
-
-  return dotProduct / (magnitudeA * magnitudeB);
+  const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
+  const magnitudeA = calculateMagnitude(vectorA);
+  const magnitudeB = calculateMagnitude(vectorB);
+  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
 }
 
 /**
- * Finds the most similar vectors to a given query vector.
- * @param {number[]} queryVector - The query vector.
- * @param {number} topK - The number of top similar vectors to return.
- * @returns {Array<{id: string, similarity: number}>} An array of objects containing vector IDs and their similarity scores.
- * @throws {Error} If the query vector is invalid.
+ * Remove a vector from the Redis store.
+ * @param {RedisClientType} client - Redis client instance.
+ * @param {string} key - The key for the vector store.
+ * @param {string} id - Unique identifier for the vector.
  */
-export function searchSimilarVectors(queryVector, topK = 5) {
-  if (!Array.isArray(queryVector) || !queryVector.every((num) => typeof num === 'number')) {
-    throw new Error('Query vector must be an array of numbers.');
-  }
-
-  const similarities = [];
-
-  for (const [id, vector] of vectorStore.entries()) {
-    const similarity = cosineSimilarity(queryVector, vector);
-    similarities.push({ id, similarity });
-  }
-
-  return similarities
-    .sort((a, b) => b.similarity - a.similarity) // Sort by descending similarity.
-    .slice(0, topK); // Return the top K results.
+async function removeVector(client, key, id) {
+  await client.hDel(key, id);
+  await client.zRem(`${key}:index`, id);
 }
 
 /**
- * Clears all vectors from the store.
+ * Close the Redis client connection.
+ * @param {RedisClientType} client - Redis client instance.
  */
-export function clearStore() {
-  vectorStore.clear();
+async function closeRedisClient(client) {
+  await client.quit();
 }
 
-/**
- * Retrieves the current size of the vector store.
- * @returns {number} The number of vectors stored.
- */
-export function getStoreSize() {
-  return vectorStore.size;
-}
+module.exports = {
+  initializeRedisClient,
+  addVector,
+  getVector,
+  similaritySearch,
+  removeVector,
+  closeRedisClient
+};

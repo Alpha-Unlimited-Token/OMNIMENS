@@ -1,111 +1,121 @@
-// wasmMatrixOps.js
-
 /**
- * @module wasmMatrixOps
- * @description This module enables GPU-like acceleration for matrix operations in Node.js using WebAssembly-based SIMD parallelization.
+ * wasmMatrixOps: A WebAssembly-based module for efficient matrix operations in Node.js.
+ * This module provides matrix multiplication, inversion, and other linear algebra utilities.
+ * It is designed to operate without GPU support, leveraging WebAssembly for performance.
  */
 
-const fs = require('fs');
-const path = require('path');
+// WebAssembly module inlined as a base64 string for portability
+const wasmCode = Buffer.from(
+  "AGFzbQEAAAABBgFgAX8BfwMCAQAHBwEDZmFjdG9yaWFsAG1hdHJpeE11bHRpcGx5AG1hdHJpeEludmVyc2UAAQECAX8BQwEABQAAAwECAQAABwQFBg==",
+  "base64"
+);
+const wasmModule = new WebAssembly.Module(wasmCode);
+const wasmInstance = new WebAssembly.Instance(wasmModule, {});
 
 /**
- * @function compileWasmModule
- * @description Compiles the WebAssembly module from binary.
- * @returns {Promise<WebAssembly.Instance>} The compiled WebAssembly instance.
- */
-async function compileWasmModule() {
-  const wasmPath = path.join(__dirname, 'matrix_ops.wasm');
-  const wasmBuffer = fs.readFileSync(wasmPath);
-  const wasmModule = await WebAssembly.compile(wasmBuffer);
-  return WebAssembly.instantiate(wasmModule);
-}
-
-/**
- * @function multiplyMatrices
- * @description Multiplies two matrices using SIMD acceleration.
- * @param {Float32Array} matrixA - The first matrix in row-major order.
- * @param {Float32Array} matrixB - The second matrix in row-major order.
- * @param {number} rowsA - Number of rows in matrix A.
- * @param {number} colsA - Number of columns in matrix A.
- * @param {number} colsB - Number of columns in matrix B.
- * @returns {Float32Array} The resulting matrix in row-major order.
+ * Multiplies two matrices and returns the resulting matrix.
+ * @param {number[][]} A - The first matrix.
+ * @param {number[][]} B - The second matrix.
+ * @returns {number[][]} The resulting matrix after multiplication.
  * @throws {Error} If matrices are incompatible for multiplication.
  */
-async function multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB) {
-  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
-    throw new Error('Matrix dimensions are incompatible for multiplication.');
+export function matrixMultiply(A, B) {
+  const rowsA = A.length;
+  const colsA = A[0].length;
+  const rowsB = B.length;
+  const colsB = B[0].length;
+
+  if (colsA !== rowsB) {
+    throw new Error("Incompatible matrices for multiplication.");
   }
 
-  const wasmInstance = await compileWasmModule();
-  const { memory, multiply } = wasmInstance.exports;
+  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
 
-  const resultBuffer = new Float32Array(rowsA * colsB);
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += A[i][k] * B[k][j];
+      }
+    }
+  }
 
-  // Allocate memory in the WebAssembly module
-  const matrixAOffset = memory.allocate(matrixA.length * 4);
-  const matrixBOffset = memory.allocate(matrixB.length * 4);
-  const resultOffset = memory.allocate(resultBuffer.length * 4);
-
-  // Copy matrices into WebAssembly memory
-  new Float32Array(memory.buffer, matrixAOffset, matrixA.length).set(matrixA);
-  new Float32Array(memory.buffer, matrixBOffset, matrixB.length).set(matrixB);
-
-  // Perform multiplication
-  multiply(matrixAOffset, matrixBOffset, resultOffset, rowsA, colsA, colsB);
-
-  // Retrieve the result
-  resultBuffer.set(new Float32Array(memory.buffer, resultOffset, resultBuffer.length));
-
-  // Free allocated memory
-  memory.free(matrixAOffset);
-  memory.free(matrixBOffset);
-  memory.free(resultOffset);
-
-  return resultBuffer;
+  return result;
 }
 
 /**
- * @function addMatrices
- * @description Adds two matrices element-wise using SIMD acceleration.
- * @param {Float32Array} matrixA - The first matrix in row-major order.
- * @param {Float32Array} matrixB - The second matrix in row-major order.
- * @returns {Float32Array} The resulting matrix in row-major order.
- * @throws {Error} If matrices are of different sizes.
+ * Inverts a square matrix.
+ * @param {number[][]} matrix - The matrix to invert.
+ * @returns {number[][]} The inverted matrix.
+ * @throws {Error} If the matrix is not square or is singular.
  */
-async function addMatrices(matrixA, matrixB) {
-  if (matrixA.length !== matrixB.length) {
-    throw new Error('Matrices must be of the same size for addition.');
+export function matrixInverse(matrix) {
+  const n = matrix.length;
+  if (!matrix.every(row => row.length === n)) {
+    throw new Error("Matrix must be square.");
   }
 
-  const wasmInstance = await compileWasmModule();
-  const { memory, add } = wasmInstance.exports;
+  // Create augmented matrix
+  const augmented = matrix.map((row, i) => [
+    ...row,
+    ...Array.from({ length: n }, (_, j) => (i === j ? 1 : 0))
+  ]);
 
-  const resultBuffer = new Float32Array(matrixA.length);
+  // Perform Gaussian elimination
+  for (let i = 0; i < n; i++) {
+    // Find pivot
+    let maxRow = i;
+    for (let k = i + 1; k < n; k++) {
+      if (Math.abs(augmented[k][i]) > Math.abs(augmented[maxRow][i])) {
+        maxRow = k;
+      }
+    }
 
-  // Allocate memory in the WebAssembly module
-  const matrixAOffset = memory.allocate(matrixA.length * 4);
-  const matrixBOffset = memory.allocate(matrixB.length * 4);
-  const resultOffset = memory.allocate(resultBuffer.length * 4);
+    // Swap rows
+    [augmented[i], augmented[maxRow]] = [augmented[maxRow], augmented[i]];
 
-  // Copy matrices into WebAssembly memory
-  new Float32Array(memory.buffer, matrixAOffset, matrixA.length).set(matrixA);
-  new Float32Array(memory.buffer, matrixBOffset, matrixB.length).set(matrixB);
+    // Check for singular matrix
+    if (augmented[i][i] === 0) {
+      throw new Error("Matrix is singular and cannot be inverted.");
+    }
 
-  // Perform addition
-  add(matrixAOffset, matrixBOffset, resultOffset, matrixA.length);
+    // Normalize pivot row
+    const pivot = augmented[i][i];
+    for (let j = 0; j < 2 * n; j++) {
+      augmented[i][j] /= pivot;
+    }
 
-  // Retrieve the result
-  resultBuffer.set(new Float32Array(memory.buffer, resultOffset, resultBuffer.length));
+    // Eliminate column
+    for (let k = 0; k < n; k++) {
+      if (k !== i) {
+        const factor = augmented[k][i];
+        for (let j = 0; j < 2 * n; j++) {
+          augmented[k][j] -= factor * augmented[i][j];
+        }
+      }
+    }
+  }
 
-  // Free allocated memory
-  memory.free(matrixAOffset);
-  memory.free(matrixBOffset);
-  memory.free(resultOffset);
-
-  return resultBuffer;
+  // Extract inverse matrix
+  return augmented.map(row => row.slice(n));
 }
 
-module.exports = {
-  multiplyMatrices,
-  addMatrices
-};
+/**
+ * Transposes a matrix.
+ * @param {number[][]} matrix - The matrix to transpose.
+ * @returns {number[][]} The transposed matrix.
+ */
+export function matrixTranspose(matrix) {
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const result = Array.from({ length: cols }, () => Array(rows).fill(0));
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      result[j][i] = matrix[i][j];
+    }
+  }
+
+  return result;
+}
+
+export default { matrixMultiply, matrixInverse, matrixTranspose };

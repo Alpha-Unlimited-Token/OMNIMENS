@@ -2,9 +2,12 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { build as esbuild } from "esbuild";
 import { rm, readFile } from "fs/promises";
+import { execSync } from "child_process";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const ROOT = path.resolve(__dirname, "..", "..");
 
 // server deps to bundle to reduce openat(2) syscalls
 // which helps cold start times without risking some
@@ -35,7 +38,21 @@ const allowlist = [
   "zod-validation-error",
 ];
 
+function runFrontendBuild(filter: string, basePath: string) {
+  console.log(`building frontend: ${filter} (BASE_PATH=${basePath})...`);
+  execSync(`pnpm --filter ${filter} run build`, {
+    cwd: ROOT,
+    stdio: "inherit",
+    env: { ...process.env, BASE_PATH: basePath, NODE_ENV: "production" },
+  });
+}
+
 async function buildAll() {
+  // ── 1. Build the two frontend apps that the server will statically serve ──
+  runFrontendBuild("@workspace/godflesh", "/godflesh/");
+  runFrontendBuild("@workspace/super-ai-lab", "/dLdFrQJk4IwoKwlPi8O_JPls/");
+
+  // ── 2. Build the API server itself ────────────────────────────────────────
   const distDir = path.resolve(__dirname, "dist");
   await rm(distDir, { recursive: true, force: true });
 
