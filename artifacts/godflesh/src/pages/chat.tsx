@@ -16,13 +16,11 @@ import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { useQuery, useQueryClient as useQC } from "@tanstack/react-query";
 import { useOmnimensChat, type GeneratedImage, type Generated3DModel, type GeneratedGame, type Artifact, type CostBreakdown, type TaskPlan, type RedFlagAlert, type ToolResult, type CogniSyncState } from "@/hooks/use-omnimens-chat";
 import { useWebGpuLlm } from "@/hooks/use-webgpu-llm";
-import { useOmnimensVoice } from "@/hooks/use-omnimens-voice";
-import { VoiceIndicator } from "@/components/voice-indicator";
 import { OmnimensPresence } from "@/components/omnimens-presence";
 import { PendingFileList, AttachedFileList } from "@/components/file-attachments";
 import { Button } from "@/components/ui/button";
 import {
-  Send, StopCircle, ShieldAlert, Volume2, VolumeX, Paperclip, Download,
+  Send, StopCircle, ShieldAlert, Paperclip, Download,
   Loader2, Expand, FileCode, Box, Film, Music, BarChart3, Shapes, Globe,
   Zap, Terminal, Play, Microscope, ChevronDown, Check, BookOpen, Brain,
   Cpu, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Image,
@@ -1837,15 +1835,13 @@ function CodeBlockWithRun({ code, language }: { code: string; language: string }
 }
 
 // ── Plus Menu Component ────────────────────────────────────────────────────────
-function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onVoice, onTasks, onSelectSkill, voice }: {
+function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onTasks, onSelectSkill }: {
   onClose: () => void;
   onUpload: () => void;
   onDatabase: () => void;
   onWebSearch: () => void;
-  onVoice: () => void;
   onTasks: () => void;
   onSelectSkill: (skill: typeof OMNIMENS_SKILLS[number]) => void;
-  voice: any;
 }) {
   const [showSkills, setShowSkills] = useState(false);
   const [skillQ, setSkillQ] = useState("");
@@ -1899,7 +1895,6 @@ function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onVoice, 
     { icon: <Paperclip className="w-4 h-4" />, label: "Upload a file", sub: "Image, PDF, code, CSV…", color: "text-white/80", onClick: onUpload },
     { icon: <Database className="w-4 h-4" />, label: "Database", sub: "SQL queries & data modeling", color: "text-cyan-400", onClick: onDatabase },
     { icon: <Globe className="w-4 h-4" />, label: "Web Search", sub: "Enable deep research mode", color: "text-blue-400", onClick: onWebSearch },
-    { icon: voice.isEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />, label: voice.isEnabled ? "Voice ON" : "Voice OFF", sub: voice.isEnabled ? "Click to disable voice" : "Click to enable voice", color: voice.isEnabled ? "text-primary" : "text-white/80", onClick: onVoice },
     { icon: <ListChecks className="w-4 h-4" />, label: "Tasks", sub: "Background tasks & planning", color: "text-emerald-400", onClick: onTasks },
   ];
 
@@ -1947,7 +1942,6 @@ function LeftPanel({
   onToggleDeepResearch,
   onOpenAvatarStudio,
   onOpenHub,
-  voice,
   status,
   conversations,
   currentConversationId,
@@ -1960,7 +1954,6 @@ function LeftPanel({
   onSetActiveProject,
   theme,
   onToggleTheme,
-  isTyping,
 }: {
   persona: string;
   onPersonaChange: (p: string) => void;
@@ -1968,7 +1961,6 @@ function LeftPanel({
   onToggleDeepResearch: () => void;
   onOpenAvatarStudio: () => void;
   onOpenHub: () => void;
-  voice: any;
   status: any;
   conversations: { id: number; title: string | null; updatedAt: string | null }[];
   currentConversationId: number | undefined;
@@ -1978,19 +1970,11 @@ function LeftPanel({
   convSearch: string;
   theme: string;
   onToggleTheme: () => void;
-  isTyping: boolean;
   onConvSearchChange: (s: string) => void;
   activeProject: ActiveProject;
   onSetActiveProject: (p: ActiveProject) => void;
 }) {
   const personas = Object.keys(PERSONA_NAMES);
-  const avatarRef = useRef<HTMLIFrameElement>(null);
-
-  useEffect(() => {
-    const iframe = avatarRef.current;
-    if (!iframe || !iframe.contentWindow) return;
-    iframe.contentWindow.postMessage({ type: isTyping ? "speak" : "idle" }, "*");
-  }, [isTyping]);
   const filteredConversations = conversations.filter(c =>
     !convSearch || (c.title || "").toLowerCase().includes(convSearch.toLowerCase())
   );
@@ -2129,7 +2113,7 @@ function LeftPanel({
     <div className="flex flex-col h-full">
       {/* OMNIMENS identity header */}
       <div className="flex items-center gap-2.5 px-3 py-2.5 border-b border-white/8 shrink-0">
-        <OmnimensPresence size={32} isSpeaking={voice.isSpeaking} pitchIntensity={voice.pitchIntensity} />
+        <OmnimensPresence size={32} />
         <div className="min-w-0 flex-1">
           <p className="font-mono text-[9px] tracking-[0.2em] text-primary/70 font-bold">OMNIMENS</p>
           {status?.isOwner && <span className="font-mono text-[7px] tracking-widest text-accent/70">CREATOR MODE</span>}
@@ -2137,26 +2121,6 @@ function LeftPanel({
         <button onClick={onNewChat} className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] font-mono font-bold border border-primary/30 text-primary hover:bg-primary/10 transition-all shrink-0">
           <PlusCircle className="w-3 h-3" /> NEW
         </button>
-      </div>
-
-      {/* OMNIMENS Avatar */}
-      <div className="shrink-0 w-full border-b border-white/8 bg-black/20 relative overflow-hidden" style={{ height: 190 }}>
-        <iframe
-          ref={avatarRef}
-          src={`${import.meta.env.BASE_URL}omnimens-avatar.html`}
-          title="OMNIMENS Avatar"
-          style={{ width: "100%", height: "100%", border: "none", background: "transparent", display: "block" }}
-          allow="autoplay"
-          sandbox="allow-scripts allow-same-origin"
-          onLoad={() => {
-            if (avatarRef.current?.contentWindow) {
-              avatarRef.current.contentWindow.postMessage({ type: isTyping ? "speak" : "idle" }, "*");
-            }
-          }}
-        />
-        <div className="absolute bottom-1.5 left-0 right-0 flex justify-center pointer-events-none">
-          <span className="text-[7px] font-mono tracking-[0.22em] text-primary/30 uppercase">OMNIMENS</span>
-        </div>
       </div>
 
       {/* Scrollable tab bar */}
@@ -2376,10 +2340,6 @@ function LeftPanel({
             </div>
             {/* Action buttons */}
             <div className="space-y-1 border-t border-white/8 pt-3">
-              <button onClick={voice.toggle} className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border ${voice.isEnabled ? "text-primary border-primary/25 bg-primary/10" : "text-white/85 border-white/10 hover:text-white/70 hover:border-white/20"}`}>
-                {voice.isEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-                {voice.isEnabled ? "VOICE ON" : "VOICE OFF"}
-              </button>
               <button onClick={onToggleDeepResearch} className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border ${deepResearchMode ? "text-violet-300 border-violet-400/30 bg-violet-400/10" : "text-white/85 border-white/10 hover:text-white/70 hover:border-white/20"}`}>
                 <Microscope className="w-3.5 h-3.5" /> DEEP RESEARCH
               </button>
@@ -2771,7 +2731,6 @@ function LeftPanel({
                         {theme === "light" ? "LIGHT" : "DARK"}
                       </button>
                     )},
-                    { label: "Voice Responses", desc: "OMNIMENS speaks answers aloud", action: <button onClick={voice.toggle} className={`text-[7px] font-mono px-2 py-1 rounded border transition-all ${voice.isEnabled ? "border-primary/30 text-primary bg-primary/10" : "border-white/10 text-white/30"}`}>{voice.isEnabled ? "ON" : "OFF"}</button> },
                     { label: "Deep Research", desc: "Extended multi-source research mode", action: <button onClick={onToggleDeepResearch} className={`text-[7px] font-mono px-2 py-1 rounded border transition-all ${deepResearchMode ? "border-violet-400/30 text-violet-300 bg-violet-400/10" : "border-white/10 text-white/30"}`}>{deepResearchMode ? "ON" : "OFF"}</button> },
                   ].map(item => (
                     <div key={item.label} className="flex items-center justify-between gap-2">
@@ -3218,55 +3177,6 @@ function ToolResultCard({ tool }: { tool: ToolResult }) {
   return null;
 }
 
-// ── TTS Button ─────────────────────────────────────────────────────────────────
-function TTSButton({ text, voice = "nova" }: { text: string; voice?: string }) {
-  const [loading, setLoading] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  const handlePlay = async () => {
-    if (playing) {
-      audioRef.current?.pause();
-      setPlaying(false);
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await fetch("/api/omnimens/tts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ text: text.slice(0, 4000), voice }),
-      });
-      if (!res.ok) throw new Error("TTS failed");
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const audio = new Audio(url);
-      audioRef.current = audio;
-      audio.onended = () => { setPlaying(false); URL.revokeObjectURL(url); };
-      audio.onerror = () => setPlaying(false);
-      audio.play();
-      setPlaying(true);
-    } catch {
-      setPlaying(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => () => { audioRef.current?.pause(); }, []);
-
-  return (
-    <button
-      onClick={handlePlay}
-      title={playing ? "Pause TTS" : "Read aloud"}
-      className="text-white/25 hover:text-primary/60 transition-colors p-1 rounded"
-    >
-      {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : playing ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
-    </button>
-  );
-}
-
 // ── Model selector ─────────────────────────────────────────────────────────────
 const MODEL_OPTIONS = [
   // ── OpenAI (paid) ──────────────────────────────────────────────────────────
@@ -3398,7 +3308,6 @@ export default function Chat() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showLimitModal, setShowLimitModal] = useState(false);
-  const lastSpokenIdRef = useRef<string | null>(null);
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
   const [activeProject, setActiveProject] = useState<ActiveProject>(null);
@@ -3487,7 +3396,6 @@ export default function Chat() {
     const t = setTimeout(() => refetchConversations(), 1500);
     return () => clearTimeout(t);
   }, []);
-  const voice = useOmnimensVoice();
   const { theme, toggle: toggleTheme } = useTheme();
   const [persona, setPersona] = useState("GENERAL");
   const [selectedModel, setSelectedModel] = useState("gpt-4o");
@@ -3550,11 +3458,10 @@ export default function Chat() {
       if ((e.ctrlKey || e.metaKey) && e.key === "/") { e.preventDefault(); setShowControlHub(c => !c); }
       if ((e.ctrlKey || e.metaKey) && e.key === "k") { e.preventDefault(); handleNewChat(); }
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "R") { e.preventDefault(); setDeepResearchMode(m => !m); }
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "V") { e.preventDefault(); voice.toggle(); }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [voice]);
+  }, []);
 
   const handlePersonaChange = async (p: string) => {
     setPersona(p);
@@ -3603,16 +3510,6 @@ export default function Chat() {
       setIsResearching(false);
     }
   };
-
-  // Auto-speak
-  useEffect(() => {
-    if (!voice.isEnabled || isTyping || messages.length === 0) return;
-    const last = messages[messages.length - 1];
-    if (last.role !== "omnimens") return;
-    if (last.id === lastSpokenIdRef.current) return;
-    lastSpokenIdRef.current = last.id;
-    voice.speak(last.content, last.id);
-  }, [messages, isTyping, voice.isEnabled]);
 
   // Route guard
   useEffect(() => {
@@ -3720,7 +3617,6 @@ export default function Chat() {
                 onToggleDeepResearch={() => setDeepResearchMode(m => !m)}
                 onOpenAvatarStudio={() => setShowAvatarStudio(true)}
                 onOpenHub={() => setShowControlHub(true)}
-                voice={voice}
                 status={status}
                 conversations={conversations}
                 currentConversationId={currentConversationId}
@@ -3733,7 +3629,6 @@ export default function Chat() {
                 onSetActiveProject={setActiveProject}
                 theme={theme}
                 onToggleTheme={toggleTheme}
-                isTyping={isTyping}
               />
             </motion.div>
           )}
@@ -3833,19 +3728,6 @@ export default function Chat() {
                 {theme === "light" ? <Sun className="w-3.5 h-3.5 text-yellow-400" /> : <Moon className="w-3.5 h-3.5" />}
               </button>
 
-              {/* Voice toggle — always visible */}
-              <button
-                onClick={voice.toggle}
-                title={voice.isEnabled ? "Voice ON — click to disable (Ctrl+Shift+V)" : "Voice OFF — click to enable"}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all border text-[9px] font-mono font-bold tracking-wider ${
-                  voice.isEnabled
-                    ? "text-primary border-primary/30 bg-primary/10"
-                    : "text-white/50 border-transparent hover:text-white/70 hover:bg-white/[0.05]"
-                }`}
-              >
-                {voice.isEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-                <span className="hidden sm:block">VOICE</span>
-              </button>
               {/* Agent Mode indicator + switcher */}
               <button
                 onClick={() => setShowAgentModes(true)}
@@ -3917,8 +3799,6 @@ export default function Chat() {
               <div className="h-full flex flex-col items-center justify-center text-center select-none">
                 <OmnimensPresence
                   size={200}
-                  isSpeaking={voice.isSpeaking}
-                  pitchIntensity={voice.pitchIntensity}
                   className="mb-2 drop-shadow-[0_0_60px_rgba(160,100,255,0.35)]"
                 />
                 <h2 className="font-display text-2xl tracking-[0.3em] text-white/85 mt-2">OMNIMENS AWAITS</h2>
@@ -3952,12 +3832,8 @@ export default function Chat() {
               </div>
             ) : (
               <>
-                <div className="absolute top-3 right-3 z-10 pointer-events-none">
-                  <OmnimensPresence size={72} isSpeaking={voice.isSpeaking} pitchIntensity={voice.pitchIntensity} className="opacity-60" />
-                </div>
                 <div className="space-y-6 max-w-3xl mx-auto">
                   {messages.map((msg) => {
-                    const isSpeakingThis = voice.speakingMessageId === msg.id;
                     return (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
@@ -3968,9 +3844,7 @@ export default function Chat() {
                         <div className={`max-w-[92%] w-full ${
                           msg.role === "user"
                             ? "bg-white/10 border border-white/20 text-white rounded-2xl rounded-tr-sm px-5 py-3 font-sans"
-                            : `bg-primary/5 border rounded-2xl rounded-tl-sm px-5 py-4 font-mono shadow-[0_0_15px_rgba(130,80,220,0.06)] text-white/90 transition-all duration-300 ${
-                                isSpeakingThis ? "border-primary/50 shadow-[0_0_28px_rgba(180,140,255,0.20)]" : "border-primary/15"
-                              }`
+                            : `bg-primary/5 border border-primary/15 rounded-2xl rounded-tl-sm px-5 py-4 font-mono shadow-[0_0_15px_rgba(130,80,220,0.06)] text-white/90`
                         }`}>
                           {msg.role === "omnimens" && (
                             <div className="flex items-center justify-between gap-1 mb-2">
@@ -3983,9 +3857,7 @@ export default function Chat() {
                                 {msg.neuroEmotion && msg.neuroEmotion !== "NEUTRAL" && (
                                   <NeuroEmotionBadge emotion={msg.neuroEmotion} intensity={msg.neuroIntensity || "low"} />
                                 )}
-                                <VoiceIndicator isSpeaking={isSpeakingThis} binaryStream={voice.binaryStream} />
                               </div>
-                              {msg.content && <TTSButton text={msg.content} />}
                             </div>
                           )}
 
@@ -4225,14 +4097,12 @@ export default function Chat() {
                         onUpload={() => { fileInputRef.current?.click(); setShowPlusMenu(false); }}
                         onDatabase={() => { setInput(v => (v ? v + "\n" : "") + "Help me with a database query: "); setShowPlusMenu(false); }}
                         onWebSearch={() => { setDeepResearchMode(true); setShowPlusMenu(false); }}
-                        onVoice={() => { voice.toggle(); setShowPlusMenu(false); }}
                         onTasks={() => { setShowTasksPanel(true); setShowPlusMenu(false); }}
                         onSelectSkill={(skill) => {
                           handlePersonaChange(skill.persona);
                           setInput(v => (v ? v + "\n" : "") + `Using ${skill.name}: `);
                           setShowPlusMenu(false);
                         }}
-                        voice={voice}
                       />
                     </motion.div>
                   )}
@@ -4258,11 +4128,6 @@ export default function Chat() {
                 >
                   <LayoutTemplate className="w-3.5 h-3.5" />
                 </button>
-                {voice.isSpeaking && (
-                  <Button type="button" onClick={voice.stop} size="icon" variant="ghost" title="Stop speaking" className="text-primary/70 hover:text-primary w-8 h-8">
-                    <VolumeX className="w-4 h-4" />
-                  </Button>
-                )}
                 {isTyping ? (
                   <Button type="button" onClick={stopGeneration} size="icon" variant="ghost" className="text-white hover:text-white">
                     <StopCircle className="w-5 h-5" />

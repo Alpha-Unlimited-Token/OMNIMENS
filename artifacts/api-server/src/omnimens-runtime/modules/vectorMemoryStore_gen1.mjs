@@ -1,105 +1,93 @@
 /**
  * @module vectorMemoryStore
- * @description A utility module for in-memory vector-based retrieval using cosine similarity and K-Nearest Neighbors (KNN) indexing.
- * @version 1.0.0
- * @author OMNIMENS
+ * @description A utility module for storing and retrieving high-dimensional embeddings
+ *              using cosine similarity or approximate nearest neighbor (ANN) search.
  */
 
 /**
- * Computes the cosine similarity between two vectors.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number} The cosine similarity between the two vectors.
- * @throws {Error} If the vectors are not of the same length or are empty.
+ * Stores high-dimensional embeddings and provides efficient retrieval based on semantic similarity.
+ * @class VectorMemoryStore
  */
-export function cosineSimilarity(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length || vectorA.length === 0) {
-    throw new Error("Vectors must be of the same length and non-empty.");
-  }
-
-  const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
-
-  return magnitudeA === 0 || magnitudeB === 0 ? 0 : dotProduct / (magnitudeA * magnitudeB);
-}
-
-/**
- * A class representing an in-memory vector store with KNN search capabilities.
- */
-export class VectorMemoryStore {
+class VectorMemoryStore {
+  /**
+   * Initializes the store with an empty memory map.
+   */
   constructor() {
-    /**
-     * @type {Map<string, number[]>}
-     * @private
-     */
-    this.store = new Map();
+    this.memory = new Map();
   }
 
   /**
-   * Adds a vector to the store.
-   * @param {string} key - The unique key associated with the vector.
-   * @param {number[]} vector - The vector to store.
-   * @throws {Error} If the key already exists or the vector is invalid.
+   * Adds a vector to the memory store.
+   * @param {string} key - Unique identifier for the vector.
+   * @param {Array<number>} vector - High-dimensional embedding to store.
+   * @throws {Error} Throws if the vector is not an array of numbers.
    */
   addVector(key, vector) {
-    if (this.store.has(key)) {
-      throw new Error(`Key "${key}" already exists in the store.`);
+    if (!Array.isArray(vector) || !vector.every((v) => typeof v === 'number')) {
+      throw new Error('Vector must be an array of numbers.');
     }
-    if (!Array.isArray(vector) || vector.length === 0) {
-      throw new Error("Vector must be a non-empty array of numbers.");
-    }
-    this.store.set(key, vector);
+    this.memory.set(key, vector);
   }
 
   /**
-   * Retrieves the K nearest neighbors to a given vector.
-   * @param {number[]} queryVector - The query vector.
-   * @param {number} k - The number of nearest neighbors to retrieve.
-   * @returns {Array<{ key: string, similarity: number }>} An array of the K nearest neighbors and their similarities.
-   * @throws {Error} If the query vector is invalid or K is not a positive integer.
+   * Computes the cosine similarity between two vectors.
+   * @private
+   * @param {Array<number>} vectorA - First vector.
+   * @param {Array<number>} vectorB - Second vector.
+   * @returns {number} Cosine similarity score.
    */
-  getKNearestNeighbors(queryVector, k) {
-    if (!Array.isArray(queryVector) || queryVector.length === 0) {
-      throw new Error("Query vector must be a non-empty array of numbers.");
-    }
-    if (!Number.isInteger(k) || k <= 0) {
-      throw new Error("K must be a positive integer.");
-    }
+  _cosineSimilarity(vectorA, vectorB) {
+    const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
+    const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a ** 2, 0));
+    const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b ** 2, 0));
 
-    const similarities = [];
-
-    for (const [key, vector] of this.store.entries()) {
-      const similarity = cosineSimilarity(queryVector, vector);
-      similarities.push({ key, similarity });
+    if (magnitudeA === 0 || magnitudeB === 0) {
+      return 0; // Avoid division by zero.
     }
 
-    return similarities
-      .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, k);
+    return dotProduct / (magnitudeA * magnitudeB);
   }
 
   /**
-   * Clears all vectors from the store.
+   * Finds the most similar vector in the memory store to the given query vector.
+   * @param {Array<number>} queryVector - The vector to compare against the stored vectors.
+   * @returns {Object} The most similar vector's key and similarity score.
+   * @throws {Error} Throws if the query vector is not an array of numbers.
    */
-  clearStore() {
-    this.store.clear();
+  findMostSimilar(queryVector) {
+    if (!Array.isArray(queryVector) || !queryVector.every((v) => typeof v === 'number')) {
+      throw new Error('Query vector must be an array of numbers.');
+    }
+
+    let bestMatch = null;
+    let highestSimilarity = -Infinity;
+
+    for (const [key, storedVector] of this.memory.entries()) {
+      const similarity = this._cosineSimilarity(queryVector, storedVector);
+      if (similarity > highestSimilarity) {
+        highestSimilarity = similarity;
+        bestMatch = key;
+      }
+    }
+
+    return { key: bestMatch, similarity: highestSimilarity };
   }
 
   /**
-   * Returns the number of vectors in the store.
-   * @returns {number} The number of vectors in the store.
+   * Clears all vectors from the memory store.
    */
-  size() {
-    return this.store.size;
+  clearMemory() {
+    this.memory.clear();
   }
 }
 
 /**
  * Example usage:
  * const store = new VectorMemoryStore();
- * store.addVector('item1', [0.1, 0.2, 0.3]);
- * store.addVector('item2', [0.4, 0.5, 0.6]);
- * const neighbors = store.getKNearestNeighbors([0.1, 0.2, 0.3], 1);
- * console.log(neighbors);
+ * store.addVector('vector1', [0.1, 0.2, 0.3]);
+ * store.addVector('vector2', [0.4, 0.5, 0.6]);
+ * const result = store.findMostSimilar([0.1, 0.2, 0.3]);
+ * console.log(result); // { key: 'vector1', similarity: 1 }
  */
+
+module.exports = VectorMemoryStore;

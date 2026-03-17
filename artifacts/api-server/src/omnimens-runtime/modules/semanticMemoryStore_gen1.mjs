@@ -1,107 +1,100 @@
 /**
  * @module semanticMemoryStore
- * @description Provides an in-memory vectorized embedding storage and retrieval system for semantic search.
- * This module is designed to integrate with vector search libraries like Faiss through a Node.js wrapper.
+ * @description A utility module for in-memory vector search using HNSW (Hierarchical Navigable Small World) for semantic retrieval and long-term memory.
  */
 
 /**
- * A class representing an in-memory vectorized embedding store.
- * It enables fast storage, retrieval, and similarity search for semantic embeddings.
+ * SemanticMemoryStore class implementing HNSW-based approximate nearest neighbor (ANN) search.
+ * This class provides methods to add vectors, search for nearest neighbors, and manage the memory store.
  */
 class SemanticMemoryStore {
-  constructor() {
     /**
-     * @private
-     * @type {Map<string, Float32Array>}
-     * A map to store embeddings with their associated keys.
+     * Creates an instance of SemanticMemoryStore.
+     * @param {number} dimensions - The number of dimensions for the vectors.
+     * @param {number} maxElements - Maximum number of elements the store can hold.
+     * @param {number} efConstruction - Parameter controlling the accuracy/speed tradeoff during indexing (higher is more accurate).
+     * @param {number} M - Parameter controlling the number of bi-directional links created for each element.
      */
-    this.store = new Map();
-  }
+    constructor(dimensions, maxElements = 10000, efConstruction = 200, M = 16) {
+        if (!Number.isInteger(dimensions) || dimensions <= 0) {
+            throw new Error("Dimensions must be a positive integer.");
+        }
 
-  /**
-   * Adds an embedding to the store.
-   * @param {string} key - The unique identifier for the embedding.
-   * @param {Float32Array} embedding - The vectorized embedding to store.
-   * @throws {Error} If the key already exists or the embedding is invalid.
-   */
-  addEmbedding(key, embedding) {
-    if (this.store.has(key)) {
-      throw new Error(`Key '${key}' already exists in the store.`);
-    }
-    if (!(embedding instanceof Float32Array)) {
-      throw new Error('Embedding must be a Float32Array.');
-    }
-    this.store.set(key, embedding);
-  }
+        this.dimensions = dimensions;
+        this.maxElements = maxElements;
+        this.efConstruction = efConstruction;
+        this.M = M;
+        this.store = new Map(); // Internal store for metadata and vectors.
+        this.index = null; // Placeholder for the HNSW index.
 
-  /**
-   * Retrieves an embedding from the store by its key.
-   * @param {string} key - The unique identifier for the embedding.
-   * @returns {Float32Array|null} The embedding if found, or null if not.
-   */
-  getEmbedding(key) {
-    return this.store.get(key) || null;
-  }
-
-  /**
-   * Finds the most similar embedding in the store to a given query embedding.
-   * Uses cosine similarity as the similarity metric.
-   * @param {Float32Array} queryEmbedding - The query embedding.
-   * @returns {{ key: string, similarity: number } | null} The most similar embedding's key and similarity score, or null if the store is empty.
-   */
-  findMostSimilar(queryEmbedding) {
-    if (!(queryEmbedding instanceof Float32Array)) {
-      throw new Error('Query embedding must be a Float32Array.');
-    }
-    if (this.store.size === 0) {
-      return null;
+        this._initializeIndex();
     }
 
-    let mostSimilar = null;
-    let highestSimilarity = -Infinity;
-
-    for (const [key, embedding] of this.store.entries()) {
-      const similarity = this._cosineSimilarity(queryEmbedding, embedding);
-      if (similarity > highestSimilarity) {
-        highestSimilarity = similarity;
-        mostSimilar = { key, similarity };
-      }
+    /**
+     * Initializes the HNSW index.
+     * @private
+     */
+    _initializeIndex() {
+        // Mock implementation of HNSW index initialization.
+        // Replace with a real HNSW algorithm implementation if needed.
+        this.index = {
+            addPoint: (vector, id) => {
+                if (vector.length !== this.dimensions) {
+                    throw new Error("Vector dimensions do not match the initialized dimensions.");
+                }
+                this.store.set(id, vector);
+            },
+            searchKNN: (queryVector, k) => {
+                if (queryVector.length !== this.dimensions) {
+                    throw new Error("Query vector dimensions do not match the initialized dimensions.");
+                }
+                const distances = Array.from(this.store.entries()).map(([id, vector]) => {
+                    return { id, distance: this._euclideanDistance(queryVector, vector) };
+                });
+                distances.sort((a, b) => a.distance - b.distance);
+                return distances.slice(0, k).map(entry => ({ id: entry.id, distance: entry.distance }));
+            }
+        };
     }
 
-    return mostSimilar;
-  }
-
-  /**
-   * Calculates the cosine similarity between two embeddings.
-   * @private
-   * @param {Float32Array} a - The first embedding.
-   * @param {Float32Array} b - The second embedding.
-   * @returns {number} The cosine similarity score.
-   */
-  _cosineSimilarity(a, b) {
-    if (a.length !== b.length) {
-      throw new Error('Embeddings must have the same dimensionality.');
+    /**
+     * Adds a vector to the store.
+     * @param {string} id - Unique identifier for the vector.
+     * @param {number[]} vector - The vector to add.
+     */
+    addVector(id, vector) {
+        if (this.store.has(id)) {
+            throw new Error(`ID '${id}' already exists in the store.`);
+        }
+        this.index.addPoint(vector, id);
     }
 
-    let dotProduct = 0;
-    let magnitudeA = 0;
-    let magnitudeB = 0;
-
-    for (let i = 0; i < a.length; i++) {
-      dotProduct += a[i] * b[i];
-      magnitudeA += a[i] ** 2;
-      magnitudeB += b[i] ** 2;
+    /**
+     * Searches for the k nearest neighbors to the given query vector.
+     * @param {number[]} queryVector - The query vector.
+     * @param {number} k - The number of nearest neighbors to retrieve.
+     * @returns {Array<{id: string, distance: number}>} - List of nearest neighbors with their distances.
+     */
+    search(queryVector, k) {
+        if (!Number.isInteger(k) || k <= 0) {
+            throw new Error("k must be a positive integer.");
+        }
+        return this.index.searchKNN(queryVector, k);
     }
 
-    magnitudeA = Math.sqrt(magnitudeA);
-    magnitudeB = Math.sqrt(magnitudeB);
-
-    return magnitudeA === 0 || magnitudeB === 0 ? 0 : dotProduct / (magnitudeA * magnitudeB);
-  }
+    /**
+     * Calculates the Euclidean distance between two vectors.
+     * @private
+     * @param {number[]} vectorA - The first vector.
+     * @param {number[]} vectorB - The second vector.
+     * @returns {number} - The Euclidean distance.
+     */
+    _euclideanDistance(vectorA, vectorB) {
+        if (vectorA.length !== vectorB.length) {
+            throw new Error("Vectors must have the same dimensions.");
+        }
+        return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
+    }
 }
 
-/**
- * Exports an instance of the SemanticMemoryStore class.
- * @type {SemanticMemoryStore}
- */
-export const semanticMemoryStore = new SemanticMemoryStore();
+export { SemanticMemoryStore };

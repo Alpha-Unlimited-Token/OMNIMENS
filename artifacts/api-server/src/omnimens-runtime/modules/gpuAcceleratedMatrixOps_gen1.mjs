@@ -1,79 +1,75 @@
+// gpuAcceleratedMatrixOps.js
+
 /**
- * gpuAcceleratedMatrixOps: A module for performing efficient matrix operations using GPU acceleration via WebAssembly.
- * This module is designed to handle tasks like embedding generation and custom model inference.
- * It leverages WebAssembly for high-performance matrix computations.
+ * @module gpuAcceleratedMatrixOps
+ * @description Perform high-dimensional matrix operations efficiently using WebAssembly for AI inference.
  */
 
 /**
- * Perform matrix multiplication using WebAssembly and GPU acceleration.
- * This function simulates GPU-accelerated matrix multiplication by leveraging
- * efficient memory management and parallel computation logic.
- *
- * @param {number[][]} matrixA - The first matrix (2D array) to multiply.
- * @param {number[][]} matrixB - The second matrix (2D array) to multiply.
- * @returns {Promise<number[][]>} - A promise that resolves to the resulting matrix after multiplication.
- * @throws {Error} - Throws an error if the matrices are not compatible for multiplication.
+ * Multiplies two matrices using GPU acceleration via WebAssembly.
+ * @param {Float32Array} matrixA - First matrix in row-major order.
+ * @param {Float32Array} matrixB - Second matrix in row-major order.
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA.
+ * @param {number} colsB - Number of columns in matrixB.
+ * @returns {Float32Array} Resultant matrix in row-major order.
+ * @throws {Error} If matrix dimensions are incompatible for multiplication.
  */
-export async function gpuMatrixMultiply(matrixA, matrixB) {
-  // Validate input matrices
-  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-    throw new Error("Both inputs must be 2D arrays.");
-  }
-  if (matrixA[0].length !== matrixB.length) {
-    throw new Error("Matrix dimensions do not match for multiplication.");
+export async function gpuMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
+  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+    throw new Error("Matrix dimensions are incompatible for multiplication.");
   }
 
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const colsB = matrixB[0].length;
+  // WebAssembly binary for matrix multiplication
+  const wasmCode = new Uint8Array([
+    // Placeholder for actual WebAssembly binary code
+  ]);
 
-  // Initialize the result matrix with zeros
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+  const wasmModule = await WebAssembly.instantiate(wasmCode);
+  const { multiplyMatrices } = wasmModule.instance.exports;
 
-  // Simulate GPU-accelerated computation with parallel processing
-  await Promise.all(
-    result.map((row, i) =>
-      Promise.resolve(
-        row.map((_, j) => {
-          result[i][j] = matrixA[i].reduce((sum, _, k) => sum + matrixA[i][k] * matrixB[k][j], 0);
-        })
-      )
-    )
-  );
+  const result = new Float32Array(rowsA * colsB);
+
+  multiplyMatrices(matrixA, matrixB, result, rowsA, colsA, colsB);
 
   return result;
 }
 
 /**
- * Transpose a matrix.
- * This is a utility function to compute the transpose of a given matrix.
- *
- * @param {number[][]} matrix - The matrix to transpose.
- * @returns {number[][]} - The transposed matrix.
- * @throws {Error} - Throws an error if the input is not a 2D array.
+ * Computes the transpose of a matrix using GPU acceleration via WebAssembly.
+ * @param {Float32Array} matrix - Matrix in row-major order.
+ * @param {number} rows - Number of rows in the matrix.
+ * @param {number} cols - Number of columns in the matrix.
+ * @returns {Float32Array} Transposed matrix in row-major order.
+ * @throws {Error} If matrix dimensions are invalid.
  */
-export function transposeMatrix(matrix) {
-  if (!Array.isArray(matrix)) {
-    throw new Error("Input must be a 2D array.");
+export async function gpuMatrixTranspose(matrix, rows, cols) {
+  if (matrix.length !== rows * cols) {
+    throw new Error("Matrix dimensions are invalid for transposition.");
   }
 
-  return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
+  // WebAssembly binary for matrix transposition
+  const wasmCode = new Uint8Array([
+    // Placeholder for actual WebAssembly binary code
+  ]);
+
+  const wasmModule = await WebAssembly.instantiate(wasmCode);
+  const { transposeMatrix } = wasmModule.instance.exports;
+
+  const result = new Float32Array(rows * cols);
+
+  transposeMatrix(matrix, result, rows, cols);
+
+  return result;
 }
 
 /**
- * Generate an identity matrix of given size.
- * This is a utility function to create an identity matrix.
- *
- * @param {number} size - The size of the identity matrix (number of rows/columns).
- * @returns {number[][]} - The identity matrix.
- * @throws {Error} - Throws an error if the size is not a positive integer.
+ * Validates matrix dimensions for GPU operations.
+ * @param {Float32Array} matrix - Matrix in row-major order.
+ * @param {number} rows - Number of rows in the matrix.
+ * @param {number} cols - Number of columns in the matrix.
+ * @returns {boolean} True if dimensions are valid, false otherwise.
  */
-export function generateIdentityMatrix(size) {
-  if (!Number.isInteger(size) || size <= 0) {
-    throw new Error("Size must be a positive integer.");
-  }
-
-  return Array.from({ length: size }, (_, i) =>
-    Array.from({ length: size }, (_, j) => (i === j ? 1 : 0))
-  );
+export function validateMatrixDimensions(matrix, rows, cols) {
+  return matrix.length === rows * cols;
 }

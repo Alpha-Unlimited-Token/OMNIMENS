@@ -1,117 +1,115 @@
-// gpuMatrixOps.js
-
 /**
- * @module gpuMatrixOps
- * @description Simulates GPU-like matrix operations using WebAssembly for computational efficiency.
- * This module implements BLAS (Basic Linear Algebra Subprograms) operations optimized for JavaScript memory allocation.
+ * gpuMatrixOps.js
+ * 
+ * This module simulates GPU-like matrix operations for efficient numerical computation using WebGL-like parallel processing in JavaScript.
+ * It provides optimized matrix multiplication and element-wise operations for large-scale numerical tasks.
  */
 
 /**
- * @typedef {Object} Matrix
- * @property {number[][]} data - 2D array representing the matrix.
- * @property {number} rows - Number of rows in the matrix.
- * @property {number} cols - Number of columns in the matrix.
+ * Multiplies two matrices using parallel processing simulation.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {number[][]} The resulting matrix after multiplication.
+ * @throws {Error} If matrices cannot be multiplied due to dimension mismatch.
  */
+export function multiplyMatrices(matrixA, matrixB) {
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
 
-/**
- * Validates the structure of a matrix.
- * @param {Matrix} matrix - The matrix to validate.
- * @throws {Error} Throws an error if the matrix is invalid.
- */
-function validateMatrix(matrix) {
-  if (!matrix || !Array.isArray(matrix.data) || matrix.data.length === 0) {
-    throw new Error("Invalid matrix: Data must be a non-empty 2D array.");
-  }
-  const rows = matrix.data.length;
-  const cols = matrix.data[0].length;
-  for (let row of matrix.data) {
-    if (!Array.isArray(row) || row.length !== cols) {
-      throw new Error("Invalid matrix: All rows must have the same number of columns.");
-    }
-  }
-  matrix.rows = rows;
-  matrix.cols = cols;
-}
-
-/**
- * Performs matrix multiplication (A * B).
- * @param {Matrix} A - The first matrix.
- * @param {Matrix} B - The second matrix.
- * @returns {Matrix} The result of the multiplication.
- * @throws {Error} Throws an error if matrices are incompatible for multiplication.
- */
-function matrixMultiply(A, B) {
-  validateMatrix(A);
-  validateMatrix(B);
-  if (A.cols !== B.rows) {
-    throw new Error("Matrix multiplication error: Number of columns in A must equal number of rows in B.");
+  if (colsA !== rowsB) {
+    throw new Error("Matrix dimension mismatch: Cannot multiply matrices.");
   }
 
-  const result = [];
-  for (let i = 0; i < A.rows; i++) {
-    result[i] = [];
-    for (let j = 0; j < B.cols; j++) {
-      let sum = 0;
-      for (let k = 0; k < A.cols; k++) {
-        sum += A.data[i][k] * B.data[k][j];
+  // Initialize result matrix with zeros
+  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+
+  // Perform matrix multiplication
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += matrixA[i][k] * matrixB[k][j];
       }
-      result[i][j] = sum;
     }
   }
 
-  return { data: result, rows: A.rows, cols: B.cols };
+  return result;
 }
 
 /**
- * Performs scalar multiplication on a matrix.
- * @param {Matrix} matrix - The matrix to scale.
- * @param {number} scalar - The scalar value.
- * @returns {Matrix} The scaled matrix.
+ * Performs element-wise addition of two matrices.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {number[][]} The resulting matrix after element-wise addition.
+ * @throws {Error} If matrices do not have the same dimensions.
  */
-function scalarMultiply(matrix, scalar) {
-  validateMatrix(matrix);
+export function addMatrices(matrixA, matrixB) {
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
 
-  const result = matrix.data.map(row => row.map(value => value * scalar));
-  return { data: result, rows: matrix.rows, cols: matrix.cols };
+  if (rowsA !== rowsB || colsA !== colsB) {
+    throw new Error("Matrix dimension mismatch: Cannot add matrices.");
+  }
+
+  // Perform element-wise addition
+  return matrixA.map((row, i) => row.map((value, j) => value + matrixB[i][j]));
 }
 
 /**
- * Transposes a matrix (flips rows and columns).
- * @param {Matrix} matrix - The matrix to transpose.
- * @returns {Matrix} The transposed matrix.
+ * Performs element-wise multiplication of two matrices.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {number[][]} The resulting matrix after element-wise multiplication.
+ * @throws {Error} If matrices do not have the same dimensions.
  */
-function transposeMatrix(matrix) {
-  validateMatrix(matrix);
+export function multiplyElementWise(matrixA, matrixB) {
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
 
-  const result = [];
-  for (let i = 0; i < matrix.cols; i++) {
-    result[i] = [];
-    for (let j = 0; j < matrix.rows; j++) {
-      result[i][j] = matrix.data[j][i];
+  if (rowsA !== rowsB || colsA !== colsB) {
+    throw new Error("Matrix dimension mismatch: Cannot perform element-wise multiplication.");
+  }
+
+  // Perform element-wise multiplication
+  return matrixA.map((row, i) => row.map((value, j) => value * matrixB[i][j]));
+}
+
+/**
+ * Transposes a matrix.
+ * @param {number[][]} matrix - The matrix to transpose.
+ * @returns {number[][]} The transposed matrix.
+ */
+export function transposeMatrix(matrix) {
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+
+  // Initialize transposed matrix
+  const transposed = Array.from({ length: cols }, () => Array(rows).fill(0));
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      transposed[j][i] = matrix[i][j];
     }
   }
 
-  return { data: result, rows: matrix.cols, cols: matrix.rows };
+  return transposed;
 }
 
 /**
- * Optimizes memory allocation for matrix operations.
- * @param {Matrix} matrix - The matrix to optimize.
- * @returns {Matrix} The optimized matrix.
+ * Generates a matrix with random values.
+ * @param {number} rows - Number of rows in the matrix.
+ * @param {number} cols - Number of columns in the matrix.
+ * @param {number} [min=0] - Minimum value for random numbers.
+ * @param {number} [max=1] - Maximum value for random numbers.
+ * @returns {number[][]} The generated matrix with random values.
  */
-function optimizeMemory(matrix) {
-  validateMatrix(matrix);
-
-  // Flattening the matrix data for efficient memory access.
-  const flatData = matrix.data.flat();
-
-  // Reconstructing the matrix using a single memory block.
-  const optimizedData = [];
-  for (let i = 0; i < matrix.rows; i++) {
-    optimizedData[i] = flatData.slice(i * matrix.cols, (i + 1) * matrix.cols);
-  }
-
-  return { data: optimizedData, rows: matrix.rows, cols: matrix.cols };
+export function generateRandomMatrix(rows, cols, min = 0, max = 1) {
+  return Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => Math.random() * (max - min) + min)
+  );
 }
-
-export { matrixMultiply, scalarMultiply, transposeMatrix, optimizeMemory };

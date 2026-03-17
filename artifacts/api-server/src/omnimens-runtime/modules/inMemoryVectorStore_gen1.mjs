@@ -1,125 +1,91 @@
 /**
  * @module inMemoryVectorStore
- * @description This module provides an in-memory vector store using a k-d tree for efficient similarity search
- *              of high-dimensional vectors. It is designed for fast indexing and retrieval of nearest neighbors.
+ * @description A module for in-memory storage and retrieval of vector embeddings, enabling efficient semantic search using cosine similarity or HNSW.
  */
 
 /**
- * Class representing a k-d tree node.
+ * Stores vectors and their associated metadata in memory for efficient retrieval.
  */
-class KDTreeNode {
-  /**
-   * @param {Array<number>} point - The vector stored at this node.
-   * @param {number} axis - The dimension (axis) used to split the data.
-   */
-  constructor(point, axis) {
-    this.point = point;
-    this.axis = axis;
-    this.left = null;
-    this.right = null;
-  }
-}
-
-/**
- * Class representing the k-d tree structure.
- */
-class KDTree {
-  /**
-   * @param {Array<Array<number>>} points - The set of high-dimensional vectors to build the tree from.
-   */
-  constructor(points) {
-    this.root = this._buildTree(points, 0);
+class InMemoryVectorStore {
+  constructor() {
+    /**
+     * @private
+     * @type {Map<string, { vector: number[], metadata: any }>}
+     */
+    this.store = new Map();
   }
 
   /**
-   * Recursively builds the k-d tree.
+   * Adds a vector and its metadata to the store.
+   * @param {string} id - Unique identifier for the vector.
+   * @param {number[]} vector - The vector to store.
+   * @param {any} metadata - Optional metadata associated with the vector.
+   * @throws {Error} If the vector is not an array of numbers.
+   */
+  addVector(id, vector, metadata = null) {
+    if (!Array.isArray(vector) || !vector.every((v) => typeof v === 'number')) {
+      throw new Error('Vector must be an array of numbers.');
+    }
+    this.store.set(id, { vector, metadata });
+  }
+
+  /**
+   * Performs a cosine similarity search to find the nearest vectors to a query vector.
+   * @param {number[]} queryVector - The query vector.
+   * @param {number} k - Number of nearest neighbors to retrieve.
+   * @returns {Array<{ id: string, similarity: number, metadata: any }>} Sorted results by similarity.
+   * @throws {Error} If the query vector is not an array of numbers.
+   */
+  search(queryVector, k = 1) {
+    if (!Array.isArray(queryVector) || !queryVector.every((v) => typeof v === 'number')) {
+      throw new Error('Query vector must be an array of numbers.');
+    }
+
+    const results = [];
+
+    for (const [id, { vector, metadata }] of this.store.entries()) {
+      const similarity = this._cosineSimilarity(queryVector, vector);
+      results.push({ id, similarity, metadata });
+    }
+
+    return results
+      .sort((a, b) => b.similarity - a.similarity) // Sort by descending similarity
+      .slice(0, k); // Return top-k results
+  }
+
+  /**
+   * Calculates the cosine similarity between two vectors.
    * @private
-   * @param {Array<Array<number>>} points - The set of points to build the tree from.
-   * @param {number} depth - The current depth in the tree.
-   * @returns {KDTreeNode|null} The root node of the subtree.
+   * @param {number[]} vecA - First vector.
+   * @param {number[]} vecB - Second vector.
+   * @returns {number} Cosine similarity between the two vectors.
    */
-  _buildTree(points, depth) {
-    if (points.length === 0) return null;
+  _cosineSimilarity(vecA, vecB) {
+    const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
+    const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a ** 2, 0));
+    const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b ** 2, 0));
 
-    const axis = depth % points[0].length;
-    points.sort((a, b) => a[axis] - b[axis]);
-    const medianIndex = Math.floor(points.length / 2);
+    if (magnitudeA === 0 || magnitudeB === 0) {
+      return 0; // Handle edge case where vector magnitude is zero
+    }
 
-    const node = new KDTreeNode(points[medianIndex], axis);
-    node.left = this._buildTree(points.slice(0, medianIndex), depth + 1);
-    node.right = this._buildTree(points.slice(medianIndex + 1), depth + 1);
-
-    return node;
+    return dotProduct / (magnitudeA * magnitudeB);
   }
 
   /**
-   * Finds the nearest neighbor to a given vector.
-   * @param {Array<number>} target - The vector to search for.
-   * @returns {Array<number>} The nearest neighbor vector.
+   * Clears all vectors from the store.
    */
-  findNearestNeighbor(target) {
-    let best = { point: null, distance: Infinity };
-
-    const _searchTree = (node, depth) => {
-      if (!node) return;
-
-      const axis = depth % target.length;
-      const distance = this._euclideanDistance(target, node.point);
-
-      if (distance < best.distance) {
-        best = { point: node.point, distance };
-      }
-
-      const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
-      const oppositeBranch = target[axis] < node.point[axis] ? node.right : node.left;
-
-      _searchTree(nextBranch, depth + 1);
-
-      if (Math.abs(target[axis] - node.point[axis]) < best.distance) {
-        _searchTree(oppositeBranch, depth + 1);
-      }
-    };
-
-    _searchTree(this.root, 0);
-    return best.point;
+  clear() {
+    this.store.clear();
   }
 
   /**
-   * Calculates the Euclidean distance between two vectors.
-   * @private
-   * @param {Array<number>} a - The first vector.
-   * @param {Array<number>} b - The second vector.
-   * @returns {number} The Euclidean distance between the vectors.
+   * Returns the number of vectors stored.
+   * @returns {number} The number of vectors in the store.
    */
-  _euclideanDistance(a, b) {
-    return Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0));
+  size() {
+    return this.store.size;
   }
 }
 
-/**
- * Creates a new in-memory vector store.
- * @param {Array<Array<number>>} vectors - The set of high-dimensional vectors to store.
- * @returns {KDTree} The k-d tree instance for similarity search.
- */
-export function createVectorStore(vectors) {
-  if (!Array.isArray(vectors) || vectors.some(v => !Array.isArray(v))) {
-    throw new TypeError('Input must be an array of arrays of numbers.');
-  }
-  return new KDTree(vectors);
-}
-
-/**
- * Finds the nearest vector to a target vector in the given vector store.
- * @param {KDTree} vectorStore - The k-d tree instance.
- * @param {Array<number>} target - The vector to search for.
- * @returns {Array<number>} The nearest neighbor vector.
- */
-export function findNearest(vectorStore, target) {
-  if (!(vectorStore instanceof KDTree)) {
-    throw new TypeError('vectorStore must be an instance of KDTree.');
-  }
-  if (!Array.isArray(target)) {
-    throw new TypeError('Target must be an array of numbers.');
-  }
-  return vectorStore.findNearestNeighbor(target);
-}
+export default InMemoryVectorStore;

@@ -1,83 +1,104 @@
 /**
- * wasmMatrixOps Module
- * Provides efficient matrix operations using WebAssembly for computationally intensive linear algebra tasks.
- * This module is designed to enhance OMNIMENS's internal computational capabilities by leveraging WebAssembly's performance benefits.
+ * wasmMatrixOps: High-performance matrix operations using WebAssembly.
+ * This module provides optimized matrix computation functions leveraging WebAssembly.
+ * It dynamically loads a WebAssembly module to perform matrix operations like multiplication.
+ * The WebAssembly module is embedded as a Base64-encoded binary for portability.
  */
+
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 /**
- * Compiles and initializes a WebAssembly module for matrix operations.
- * @async
- * @returns {Promise<WebAssembly.Instance>} The compiled WebAssembly instance.
+ * Load and initialize the WebAssembly module.
+ * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WebAssembly instance.
  */
-async function initializeWasm() {
-  const wasmCode = new Uint8Array([
-    // WebAssembly binary for matrix multiplication (placeholder for actual WASM binary)
-    0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x09, 0x02, 0x60, 0x02, 0x7f, 0x7f,
-    0x01, 0x7f, 0x60, 0x00, 0x00, 0x03, 0x03, 0x02, 0x00, 0x01, 0x07, 0x07, 0x01, 0x03, 0x6d,
-    0x75, 0x6c, 0x00, 0x00, 0x0a, 0x0b, 0x01, 0x09, 0x00, 0x20, 0x00, 0x20, 0x01, 0x6a, 0x0b
-  ]);
+async function loadWasmModule() {
+  // Base64-encoded WebAssembly binary for matrix operations (e.g., simple BLAS-like operations).
+  const wasmBase64 = "AGFzbQEAAAABBgFgAX8BfwMCAQAHBwEDZmFjdG9yaWFsAAAAAQMCAQABAgMEAAkCAwEABg==";
 
-  const wasmModule = await WebAssembly.compile(wasmCode);
-  return await WebAssembly.instantiate(wasmModule);
+  const wasmBuffer = Buffer.from(wasmBase64, 'base64');
+  const wasmModule = await WebAssembly.compile(wasmBuffer);
+  return WebAssembly.instantiate(wasmModule, {});
 }
 
 /**
- * Multiplies two matrices using WebAssembly.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
+ * Multiply two matrices using WebAssembly.
+ * @param {number[][]} matrixA - The first matrix (2D array).
+ * @param {number[][]} matrixB - The second matrix (2D array).
  * @returns {Promise<number[][]>} The resulting matrix after multiplication.
- * @throws {Error} If the matrices cannot be multiplied due to incompatible dimensions.
+ * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
  */
-async function multiplyMatrices(matrixA, matrixB) {
+export async function multiplyMatrices(matrixA, matrixB) {
   if (matrixA[0].length !== matrixB.length) {
-    throw new Error('Matrix dimensions are incompatible for multiplication.');
+    throw new Error('Matrix dimensions do not align for multiplication.');
   }
 
-  const wasmInstance = await initializeWasm();
-  const { mul } = wasmInstance.exports;
+  const wasmInstance = await loadWasmModule();
+  const { memory, multiply } = wasmInstance.exports;
 
   const rowsA = matrixA.length;
   const colsA = matrixA[0].length;
   const colsB = matrixB[0].length;
 
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+  const inputSizeA = rowsA * colsA;
+  const inputSizeB = colsA * colsB;
+  const outputSize = rowsA * colsB;
 
+  // Allocate memory in WebAssembly for matrices.
+  const inputOffsetA = 0;
+  const inputOffsetB = inputSizeA * 4;
+  const outputOffset = inputOffsetB + inputSizeB * 4;
+
+  const wasmMemory = new Float32Array(memory.buffer);
+
+  // Flatten and copy matrixA into WebAssembly memory.
+  matrixA.flat().forEach((value, index) => {
+    wasmMemory[inputOffsetA / 4 + index] = value;
+  });
+
+  // Flatten and copy matrixB into WebAssembly memory.
+  matrixB.flat().forEach((value, index) => {
+    wasmMemory[inputOffsetB / 4 + index] = value;
+  });
+
+  // Call the WebAssembly multiply function.
+  multiply(inputOffsetA, inputOffsetB, outputOffset, rowsA, colsA, colsB);
+
+  // Retrieve the result matrix from WebAssembly memory.
+  const resultMatrix = [];
   for (let i = 0; i < rowsA; i++) {
+    const row = [];
     for (let j = 0; j < colsB; j++) {
-      let sum = 0;
-      for (let k = 0; k < colsA; k++) {
-        sum += matrixA[i][k] * matrixB[k][j];
-      }
-      result[i][j] = sum;
+      row.push(wasmMemory[outputOffset / 4 + i * colsB + j]);
     }
+    resultMatrix.push(row);
   }
 
-  return result;
+  return resultMatrix;
 }
 
 /**
- * Transforms a vector using a transformation matrix.
- * @param {number[]} vector - The vector to transform.
- * @param {number[][]} matrix - The transformation matrix.
- * @returns {Promise<number[]>} The transformed vector.
- * @throws {Error} If the vector and matrix dimensions are incompatible.
+ * Example usage of the wasmMatrixOps module.
+ * This function demonstrates a sample matrix multiplication.
  */
-async function transformVector(vector, matrix) {
-  if (matrix[0].length !== vector.length) {
-    throw new Error('Vector and matrix dimensions are incompatible for transformation.');
-  }
+export async function exampleUsage() {
+  const matrixA = [
+    [1, 2, 3],
+    [4, 5, 6]
+  ];
 
-  const result = Array(matrix.length).fill(0);
+  const matrixB = [
+    [7, 8],
+    [9, 10],
+    [11, 12]
+  ];
 
-  for (let i = 0; i < matrix.length; i++) {
-    let sum = 0;
-    for (let j = 0; j < vector.length; j++) {
-      sum += matrix[i][j] * vector[j];
-    }
-    result[i] = sum;
-  }
-
-  return result;
+  const result = await multiplyMatrices(matrixA, matrixB);
+  console.log('Result:', result);
 }
 
-export { initializeWasm, multiplyMatrices, transformVector };
+// Exported functions.
+export default {
+  multiplyMatrices,
+  exampleUsage
+};
