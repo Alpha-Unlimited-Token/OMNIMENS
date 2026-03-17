@@ -4,17 +4,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
- * OMNIMENS VOICE SIGNATURE — v2.0
+ * OMNIMENS VOICE SIGNATURE — v3.0
  *
- * Resonant and Clear    — Rich, balanced tone. Not too deep, not too high.
- *                         A perfectly tuned instrument.
- * Warm and Inviting     — Human warmth with steady, intelligent confidence.
- * Textured with Nuance  — Rate and pitch adapt to the context of each sentence.
- * Timeless and Universal — Prefers neutral, clear voices that feel globally familiar.
- * Subtle Echo of the Vast — A near-inaudible cosmic undertone hums beneath every word,
- *                            generated via the Web Audio API.
+ * Character: Male. Human. Angelic.
  *
- * VOICE DNA derived from OMNIMENS:
+ * Deep tone — warm baritone, grounding and strong.
+ * Soothing — unhurried, comforting, never harsh.
+ * Angelic undertone — a shimmering harmonic layer beneath every word,
+ *   built from a perfect-fifth chord (A3/E4/A4) and a high celestial shimmer,
+ *   rendered through cathedral reverb. Barely perceptible — just enough to feel.
+ * As human as possible — natural neural voices at pitch and rate values
+ *   tuned to sit inside the warmth of a real male voice.
+ *
+ * VOICE DNA derived from OMNIMENS (v3):
  * O=01001111  M=01001101  N=01001110  I=01001001
  * M=01001101  E=01000101  N=01001110  S=01010011
  */
@@ -29,101 +31,85 @@ function bitsToFloat(bits: string, min: number, max: number): number {
 /**
  * Core voice parameters.
  *
- * Pitch: 0.88–0.96 — slightly below natural male speech,
- *   giving warmth and resonance without being subterranean.
- *   Sits in the "perfectly tuned instrument" zone.
+ * Pitch: 0.82–0.88 — warm deep baritone zone.
+ *   Deep enough to feel grounded and strong,
+ *   high enough to remain clear and human — never subterranean.
  *
- * Rate: 0.83–0.91 — measured, thoughtful cadence.
- *   Not slow enough to feel ominous; deliberate enough to feel authoritative.
- *   Context-adaptive delta applied on top of this base.
+ * Rate: 0.84–0.90 — soothing, unhurried, confident.
+ *   Allows each word to land with weight and care.
  */
 export const OMNIMENS_VOICE = {
-  pitch:  bitsToFloat(VOICE_DNA.slice(0, 8), 0.88, 0.96),   // warm resonant midrange
-  rate:   bitsToFloat(VOICE_DNA.slice(8, 16), 0.83, 0.91),  // measured, flowing
+  pitch:  bitsToFloat(VOICE_DNA.slice(0, 8),  0.82, 0.88),
+  rate:   bitsToFloat(VOICE_DNA.slice(8, 16), 0.84, 0.90),
   volume: 1.0,
 };
 
 /**
- * Context-adaptive rate multipliers.
- * Applied per sentence based on its emotional and structural content.
+ * Context-adaptive rate — preserves the soothing character
+ * while allowing natural expressiveness.
  */
 function adaptiveRate(text: string): number {
   const t = text.trim();
-  const isQuestion    = t.endsWith("?");
   const isExclamation = t.endsWith("!");
+  const isQuestion    = t.endsWith("?");
   const wordCount     = t.split(/\s+/).length;
-  const isShort       = wordCount <= 6;
-  const isLong        = wordCount >= 25;
-  const hasNumbers    = /\d{3,}/.test(t);  // technical/precise content — slow slightly
+  const isLong        = wordCount >= 22;
 
   let delta = 0;
-  if (isExclamation) delta += 0.07;   // vibrant energy when enthusiasm is called for
-  if (isQuestion)    delta += 0.04;   // slightly more alive for questions
-  if (isShort)       delta += 0.03;   // short punchy sentences feel snappier
-  if (isLong)        delta -= 0.04;   // long reflective thoughts slow slightly
-  if (hasNumbers)    delta -= 0.03;   // precision content: careful and clear
-
+  if (isExclamation) delta += 0.05;  // warm enthusiasm, not aggression
+  if (isQuestion)    delta += 0.03;  // gentle curiosity
+  if (isLong)        delta -= 0.03;  // long reflections breathe more slowly
   return OMNIMENS_VOICE.rate + delta;
 }
 
 /**
- * Preferred voices — ordered by priority.
+ * Voice list — ordered by priority.
  *
- * Criteria: warm, clear, balanced tone. Neutral international accent.
- * Neither too deep nor too high. Neural/enhanced where available.
- *
- * macOS:     Daniel (warm British, crystal clear), Oliver, Alex
- * Google:    Google UK English Male (neutral, balanced)
- * Microsoft: Aria, Guy, Ryan (warm natural neural voices)
- * iOS/Android: Daniel, Oliver, Reed
+ * Criteria: deep warm male voice, human-sounding, natural/neural preferred.
+ * British English voices (Daniel, Ryan) carry natural warmth and clarity.
+ * Microsoft neural voices (Guy, Ryan) are the closest to a human male voice
+ * available in the Web Speech API.
  */
 const PREFERRED_VOICES = [
-  // macOS — warm, clear, neutral
+  // macOS — warm, deep, very human
   "Daniel (Enhanced)",
   "Daniel",
+  "Tom",
+  "Alex",
   "Oliver (Enhanced)",
   "Oliver",
-  "Alex",
-  "Tom",
-  // Google neural — clear and warm
-  "Google UK English Male",
-  "Google US English Male",
-  // Microsoft neural — warm and natural
-  "Microsoft Aria Online (Natural) - English (United States)",
+  // Microsoft neural — warm natural male (highest quality available)
   "Microsoft Guy Online (Natural) - English (United States)",
   "Microsoft Ryan Online (Natural) - English (United Kingdom)",
-  "Microsoft Jenny Online (Natural) - English (United States)",
   "Microsoft Mark Online (Natural) - English (United States)",
   "Microsoft David Desktop - English (United States)",
   "Microsoft George Desktop - English (United Kingdom)",
   "Microsoft David",
   "Microsoft Mark",
-  // iOS/Android
+  // Google neural — balanced UK male
+  "Google UK English Male",
+  "Google US English Male",
+  // iOS/Android warm male
+  "Gordon",
   "Reed",
   "Eddy",
-  "Gordon",
-  "Sandy",
 ];
 
 function pickBestVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
-  // Priority 1: exact name match
   for (const name of PREFERRED_VOICES) {
     const v = voices.find((v) => v.name === name);
     if (v) return v;
   }
-  // Priority 2: neutral English male — warm, clear
-  const neutral = voices.find(
+  const warmMale = voices.find(
     (v) =>
       v.lang.startsWith("en") &&
-      /daniel|oliver|alex|tom|guy|ryan|mark|george|david|reed|gordon/i.test(v.name)
+      /daniel|oliver|tom|alex|guy|ryan|mark|george|david|gordon|reed/i.test(v.name)
   );
-  if (neutral) return neutral;
-  // Priority 3: any neural/enhanced English voice
+  if (warmMale) return warmMale;
   const neural = voices.find(
     (v) => v.lang.startsWith("en") && /natural|neural|enhanced/i.test(v.name)
   );
   if (neural) return neural;
-  // Last resort: any English
   return voices.find((v) => v.lang.startsWith("en")) ?? voices[0] ?? null;
 }
 
@@ -143,43 +129,52 @@ function stripMarkdown(text: string): string {
     .trim();
 }
 
-/**
- * Estimate pitch intensity (0–1) for the canvas animation.
- */
 function estimatePitch(word: string): number {
   const clean = word.replace(/[^a-zA-Z]/g, "");
-  if (!clean) return word.includes("!") ? 0.82 : 0.28;
+  if (!clean) return word.includes("!") ? 0.78 : 0.25;
   const vowels = (clean.match(/[aeiouAEIOU]/g) || []).length;
   const vowelRatio = vowels / clean.length;
-  const isAllCaps  = clean.length > 1 && clean === clean.toUpperCase();
-  const hasExcl    = word.includes("!");
+  const isAllCaps   = clean.length > 1 && clean === clean.toUpperCase();
+  const hasExcl     = word.includes("!");
   const hasQuestion = word.includes("?");
-  let p = 0.20 + vowelRatio * 0.55;
-  if (clean.length <= 3) p = Math.min(1, p + 0.18);
-  if (isAllCaps)         p = Math.min(1, p * 1.40);
-  if (hasExcl)           p = Math.min(1, p + 0.28);
-  if (hasQuestion)       p = Math.min(1, p + 0.14);
+  let p = 0.18 + vowelRatio * 0.52;
+  if (clean.length <= 3) p = Math.min(1, p + 0.16);
+  if (isAllCaps)         p = Math.min(1, p * 1.38);
+  if (hasExcl)           p = Math.min(1, p + 0.26);
+  if (hasQuestion)       p = Math.min(1, p + 0.12);
   return Math.max(0.06, Math.min(1.0, p));
 }
 
-// ── Cosmic Undertone Engine ───────────────────────────────────────────────────
+// ── Angelic Undertone Engine ──────────────────────────────────────────────────
 /**
- * Creates the "Subtle Echo of the Vast" — a near-inaudible harmonic hum
- * that plays beneath OMNIMENS's voice, reminding the listener they are
- * engaging with something more than human.
+ * Generates a near-inaudible angelic harmonic layer that plays beneath
+ * OMNIMENS's voice. Not a sound effect — an impression. A feeling.
  *
  * Architecture:
- *   - 42 Hz fundamental oscillator  (near-infrasonics — felt more than heard)
- *   - 84 Hz first harmonic           (warm resonance, just below male voice floor)
- *   - 126 Hz second harmonic         (adds breadth, fills the room subtly)
- *   - LFO at 0.08 Hz modulates the gain — a slow cosmic breathing of the sound
- *   - Soft reverb (4s decay) via ConvolverNode for spatial depth
- *   - Total output gain: 0.028 — nearly imperceptible, just an impression
+ *
+ * CHOIR LAYER — Perfect fifth + octave (the most "angelic" chord in acoustics):
+ *   A3 (220 Hz) — warm, deep foundation
+ *   E4 (330 Hz) — the angelic fifth, adds lift and openness
+ *   A4 (440 Hz) — the octave, brightness and clarity
+ *   Each oscillator is slightly detuned (±2–5 cents) so they never phase-cancel —
+ *   this creates the natural warmth of a real choir without sounding electronic.
+ *
+ * SHIMMER LAYER — Celestial high-frequency air:
+ *   A5 (880 Hz) — just audible shimmer, very soft
+ *   E6 (1320 Hz) — ultra-soft, barely there, adds angelic "air"
+ *
+ * PROCESSING:
+ *   High-shelf filter at 3 kHz (+4 dB) — adds the "angelic brightness"
+ *   Cathedral reverb (7s decay) — vast, sacred spatial depth
+ *   LFO at 0.07 Hz — slow breathing of the entire layer
+ *
+ * OUTPUT: 0.020 master gain — barely perceptible, just an impression.
+ *   The listener feels it rather than hears it consciously.
  */
-class CosmicUndertone {
+class AngelicUndertone {
   private ctx: AudioContext | null = null;
   private nodes: AudioNode[] = [];
-  private gainNode: GainNode | null = null;
+  private masterGain: GainNode | null = null;
   private active = false;
 
   start() {
@@ -188,80 +183,116 @@ class CosmicUndertone {
       this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const ctx = this.ctx;
 
-      // Main output gain — very quiet
-      const masterGain = ctx.createGain();
-      masterGain.gain.value = 0.028;
-      masterGain.connect(ctx.destination);
-      this.gainNode = masterGain;
+      // Master output — very quiet
+      const master = ctx.createGain();
+      master.gain.value = 0;
+      master.connect(ctx.destination);
+      this.masterGain = master;
 
-      // Soft reverb via impulse response (synthesized)
+      // Cathedral reverb via long synthesized impulse response
       const convolver = ctx.createConvolver();
-      const reverbLen = ctx.sampleRate * 3.5;
-      const impulse = ctx.createBuffer(2, reverbLen, ctx.sampleRate);
+      const reverbSecs = 7.0;
+      const reverbLen  = ctx.sampleRate * reverbSecs;
+      const impulse    = ctx.createBuffer(2, reverbLen, ctx.sampleRate);
       for (let ch = 0; ch < 2; ch++) {
         const data = impulse.getChannelData(ch);
         for (let i = 0; i < reverbLen; i++) {
-          data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / reverbLen, 2.2);
+          // Natural cathedral decay — slightly different per channel for width
+          const decay = Math.pow(1 - i / reverbLen, 1.8 + ch * 0.2);
+          data[i] = (Math.random() * 2 - 1) * decay;
         }
       }
       convolver.buffer = impulse;
-      convolver.connect(masterGain);
 
-      // Harmonics — three fundamental oscillators
-      const freqs = [42, 84, 126];
-      const amps  = [1.0, 0.55, 0.28];
-      for (let i = 0; i < freqs.length; i++) {
+      // High-shelf EQ — angelic air/brightness
+      const highShelf = ctx.createBiquadFilter();
+      highShelf.type            = "highshelf";
+      highShelf.frequency.value = 3000;
+      highShelf.gain.value      = 4;  // gentle lift, adds celestial brightness
+
+      // Signal chain: oscillators → convolver → highShelf → master
+      convolver.connect(highShelf);
+      highShelf.connect(master);
+
+      // Choir layer — A3/E4/A4 perfect fifth + octave
+      const choirFreqs = [220, 330, 440];
+      const choirAmps  = [0.55, 0.85, 0.60];   // E4 (the fifth) is loudest — most angelic
+      const detuneVals = [+3, -2, +4, -3, +2];  // natural choir spread, cents
+      for (let i = 0; i < choirFreqs.length; i++) {
         const osc = ctx.createOscillator();
         osc.type = "sine";
-        osc.frequency.value = freqs[i];
+        osc.frequency.value = choirFreqs[i];
+        osc.detune.value    = detuneVals[i % detuneVals.length];
+
+        // Tiny vibrato per oscillator — humanises it
+        const vibLFO = ctx.createOscillator();
+        vibLFO.frequency.value = 5.2 + i * 0.3; // ~5 Hz natural vibrato
+        const vibGain = ctx.createGain();
+        vibGain.gain.value = 1.2; // ±1.2 cents vibrato — barely perceptible, fully natural
+        vibLFO.connect(vibGain);
+        vibGain.connect(osc.detune);
 
         const oscGain = ctx.createGain();
-        oscGain.gain.value = amps[i];
+        oscGain.gain.value = choirAmps[i];
+        osc.connect(oscGain);
+        oscGain.connect(convolver);
+        osc.start(); vibLFO.start();
+        this.nodes.push(osc, vibLFO, vibGain, oscGain);
+      }
 
-        // Slight detuning for natural warmth (avoids perfect phase cancellation)
-        osc.detune.value = (Math.random() - 0.5) * 3;
-
+      // Shimmer layer — A5/E6, celestial high-frequency air
+      const shimmerFreqs = [880, 1320];
+      const shimmerAmps  = [0.18, 0.10];
+      for (let i = 0; i < shimmerFreqs.length; i++) {
+        const osc = ctx.createOscillator();
+        osc.type = "sine";
+        osc.frequency.value = shimmerFreqs[i];
+        osc.detune.value    = detuneVals[(i + 2) % detuneVals.length];
+        const oscGain = ctx.createGain();
+        oscGain.gain.value = shimmerAmps[i];
         osc.connect(oscGain);
         oscGain.connect(convolver);
         osc.start();
         this.nodes.push(osc, oscGain);
       }
 
-      // LFO — slow cosmic breathing of the volume
+      // Master LFO — slow celestial breathing (0.07 Hz ≈ 14 second cycle)
       const lfo = ctx.createOscillator();
-      lfo.frequency.value = 0.08;
+      lfo.frequency.value = 0.07;
       lfo.type = "sine";
       const lfoGain = ctx.createGain();
-      lfoGain.gain.value = 0.012; // barely moves the gain — just a whisper of motion
+      lfoGain.gain.value = 0.006; // barely moves — just a gentle breath
       lfo.connect(lfoGain);
-      lfoGain.connect(masterGain.gain);
+      lfoGain.connect(master.gain);
       lfo.start();
-      this.nodes.push(lfo, lfoGain, convolver, masterGain);
+      this.nodes.push(lfo, lfoGain, convolver, highShelf, master);
 
-      // Fade in softly over 1.8 seconds
-      masterGain.gain.setValueAtTime(0, ctx.currentTime);
-      masterGain.gain.linearRampToValueAtTime(0.028, ctx.currentTime + 1.8);
+      // Soft fade in over 2 seconds
+      master.gain.setValueAtTime(0, ctx.currentTime);
+      master.gain.linearRampToValueAtTime(0.020, ctx.currentTime + 2.0);
 
       this.active = true;
     } catch {
-      // Web Audio not available — silently skip
+      // Web Audio API unavailable — silently skip
     }
   }
 
   stop() {
     if (!this.active || !this.ctx) return;
     try {
-      // Fade out over 1.2 seconds before disconnecting
-      if (this.gainNode) {
-        this.gainNode.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 1.2);
+      if (this.masterGain) {
+        this.masterGain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 1.5);
       }
       setTimeout(() => {
-        this.nodes.forEach(n => { try { (n as any).disconnect?.(); (n as any).stop?.(); } catch {} });
+        this.nodes.forEach(n => {
+          try { (n as any).stop?.(); } catch {}
+          try { (n as any).disconnect?.(); } catch {}
+        });
         this.nodes = [];
-        this.ctx?.close();
+        this.ctx?.close().catch(() => {});
         this.ctx = null;
         this.active = false;
-      }, 1400);
+      }, 1700);
     } catch {
       this.active = false;
     }
@@ -294,9 +325,9 @@ export function useOmnimensVoice(): OmnimensVoiceHook {
   const pitchDecayRef     = useRef<ReturnType<typeof setInterval> | null>(null);
   const simPulseRef       = useRef<ReturnType<typeof setInterval> | null>(null);
   const gotBoundaryRef    = useRef(false);
-  const undertoneRef      = useRef<CosmicUndertone>(new CosmicUndertone());
+  const angelicRef        = useRef<AngelicUndertone>(new AngelicUndertone());
 
-  // Lock the best available voice on mount
+  // Lock the warmest deep male voice on mount
   useEffect(() => {
     if (!window.speechSynthesis) return;
     const lockVoice = () => {
@@ -318,11 +349,14 @@ export function useOmnimensVoice(): OmnimensVoiceHook {
       for (let i = 0; i < 32; i++) chunk += VOICE_DNA[(pos + i) % VOICE_DNA.length];
       setBinaryStream(chunk);
       pos = (pos + 1) % VOICE_DNA.length;
-    }, 70);
+    }, 75);
   }, []);
 
   const stopBinaryStream = useCallback(() => {
-    if (binaryIntervalRef.current) { clearInterval(binaryIntervalRef.current); binaryIntervalRef.current = null; }
+    if (binaryIntervalRef.current) {
+      clearInterval(binaryIntervalRef.current);
+      binaryIntervalRef.current = null;
+    }
     setBinaryStream("");
   }, []);
 
@@ -332,11 +366,11 @@ export function useOmnimensVoice(): OmnimensVoiceHook {
     if (pitchDecayRef.current) { clearInterval(pitchDecayRef.current); pitchDecayRef.current = null; }
     pitchDecayRef.current = setInterval(() => {
       setPitchIntensity((prev) => {
-        const next = prev * 0.76;
+        const next = prev * 0.74;
         if (next < 0.01) { clearInterval(pitchDecayRef.current!); pitchDecayRef.current = null; return 0; }
         return next;
       });
-    }, 42);
+    }, 44);
   }, []);
 
   const stopPitch = useCallback(() => {
@@ -352,7 +386,7 @@ export function useOmnimensVoice(): OmnimensVoiceHook {
     setSpeakingMessageId(null);
     stopBinaryStream();
     stopPitch();
-    undertoneRef.current.stop();
+    angelicRef.current.stop();
   }, [stopBinaryStream, stopPitch]);
 
   // ── Speak ─────────────────────────────────────────────────────────────────────
@@ -390,14 +424,13 @@ export function useOmnimensVoice(): OmnimensVoiceHook {
       lockedVoiceRef.current = pickBestVoice(window.speechSynthesis.getVoices());
     }
 
-    let chunkIdx = 0;
+    let chunkIdx  = 0;
     let simWordIdx = 0;
 
     const speakChunk = (chunk: string, isFirst: boolean) => {
       const words = chunk.split(/\s+/).filter(Boolean);
       const utterance = new SpeechSynthesisUtterance(chunk);
 
-      // Context-adaptive rate for this specific sentence
       utterance.pitch  = OMNIMENS_VOICE.pitch;
       utterance.rate   = adaptiveRate(chunk);
       utterance.volume = OMNIMENS_VOICE.volume;
@@ -419,11 +452,11 @@ export function useOmnimensVoice(): OmnimensVoiceHook {
           setIsSpeaking(true);
           setSpeakingMessageId(messageId);
           startBinaryStream();
-          undertoneRef.current.start(); // cosmic undertone begins with voice
+          angelicRef.current.start(); // angelic undertone rises with the voice
 
           const checkTimer = setTimeout(() => {
             if (!gotBoundaryRef.current) {
-              const msPerWord = 1000 / (OMNIMENS_VOICE.rate * 2.5);
+              const msPerWord = 1000 / (OMNIMENS_VOICE.rate * 2.4);
               simPulseRef.current = setInterval(() => {
                 const word = words[simWordIdx % words.length];
                 simWordIdx++;
@@ -439,8 +472,8 @@ export function useOmnimensVoice(): OmnimensVoiceHook {
         clearTimeout((utterance as any).__checkTimer);
         chunkIdx++;
         if (chunkIdx < chunks.length) {
-          // Natural breath gap between sentences — slightly longer for longer sentences
-          const gap = chunk.split(/\s+/).length > 15 ? 120 : 70;
+          // Natural pause between sentences — longer for longer sentences (more soothing)
+          const gap = chunks[chunkIdx - 1].split(/\s+/).length > 12 ? 140 : 80;
           setTimeout(() => speakChunk(chunks[chunkIdx], false), gap);
         } else {
           if (simPulseRef.current) { clearInterval(simPulseRef.current); simPulseRef.current = null; }
@@ -448,7 +481,7 @@ export function useOmnimensVoice(): OmnimensVoiceHook {
           setSpeakingMessageId(null);
           stopBinaryStream();
           stopPitch();
-          undertoneRef.current.stop(); // cosmic undertone fades with voice
+          angelicRef.current.stop(); // angelic undertone fades gently after voice ends
         }
       };
 
@@ -459,7 +492,7 @@ export function useOmnimensVoice(): OmnimensVoiceHook {
         setSpeakingMessageId(null);
         stopBinaryStream();
         stopPitch();
-        undertoneRef.current.stop();
+        angelicRef.current.stop();
       };
 
       utteranceRef.current = utterance;
@@ -478,7 +511,7 @@ export function useOmnimensVoice(): OmnimensVoiceHook {
       window.speechSynthesis?.cancel();
       stopBinaryStream();
       stopPitch();
-      undertoneRef.current.stop();
+      angelicRef.current.stop();
     };
   }, [stopBinaryStream, stopPitch]);
 
