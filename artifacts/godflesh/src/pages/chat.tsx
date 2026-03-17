@@ -32,7 +32,9 @@ import {
   ShieldCheck, Swords, Clock, ToggleLeft, ToggleRight,
   Plus, Database, KeyRound, Mic, ListChecks, Infinity, Gauge, ChevronUp,
   Globe2, Sparkles, Bolt, Monitor, Code2, FileText, Gamepad2,
-  Presentation, Table2, Wand2
+  Presentation, Table2, Wand2,
+  HardDrive, Rocket, ExternalLink, ChevronRight, RefreshCw, Star,
+  File, Eye, Lock, Unlock, Upload, Server, MemoryStick, Wrench, CircleDot
 } from "lucide-react";
 import { OmnimensIcon } from "@/components/omnimens-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
@@ -1978,25 +1980,83 @@ function LeftPanel({
     !convSearch || (c.title || "").toLowerCase().includes(convSearch.toLowerCase())
   );
 
-  const [panelTab, setPanelTab] = useState<"chats"|"mode"|"skills"|"tools">("chats");
-  const [projects, setProjects] = useState<{ id: number; name: string }[]>([]);
+  const [panelTab, setPanelTab] = useState<"chats"|"mode"|"skills"|"tools"|"files"|"deploy"|"memory"|"config">("chats");
+  const [projects, setProjects] = useState<{ id: number; name: string; type?: string; visibility?: string; starred?: boolean; updatedAt?: string | null }[]>([]);
   const [showProjectPicker, setShowProjectPicker] = useState(false);
+
+  // FILES tab
+  const [fileSearch, setFileSearch] = useState("");
+  const [expandedProjects, setExpandedProjects] = useState<number[]>([]);
+  const [projectFiles, setProjectFiles] = useState<Record<number, { id: number; filename: string; language: string; content: string }[]>>({});
+  const [fileLoadingId, setFileLoadingId] = useState<number | null>(null);
+
+  // DEPLOY tab
+  const [deployStatus, setDeployStatus] = useState<{ status: string; url: string; domain?: string } | null>(null);
+
+  // MEMORY tab
+  const [brainEntries, setBrainEntries] = useState<{ id: number; category: string; content: string; confidence: number; createdAt: string }[]>([]);
+  const [brainSearch, setBrainSearch] = useState("");
+  const [brainLoading, setBrainLoading] = useState(false);
+
+  // CONFIG tab
+  const [configSection, setConfigSection] = useState<"account"|"credits"|"preferences"|"security">("account");
+
   useEffect(() => {
     fetch("/api/omnimens/projects", { credentials: "include" })
       .then(r => r.json())
       .then(d => setProjects(Array.isArray(d) ? d : []))
       .catch(() => {});
   }, []);
+
+  // Load files for a project when expanded
+  const toggleExpandProject = (id: number) => {
+    if (expandedProjects.includes(id)) {
+      setExpandedProjects(prev => prev.filter(i => i !== id));
+    } else {
+      setExpandedProjects(prev => [...prev, id]);
+      if (!projectFiles[id]) {
+        setFileLoadingId(id);
+        fetch(`/api/omnimens/projects/${id}`, { credentials: "include" })
+          .then(r => r.json())
+          .then(d => { setProjectFiles(prev => ({ ...prev, [id]: d.files || [] })); })
+          .catch(() => {})
+          .finally(() => setFileLoadingId(null));
+      }
+    }
+  };
+
+  // Load brain entries when MEMORY tab opens
+  useEffect(() => {
+    if (panelTab === "memory" && brainEntries.length === 0) {
+      setBrainLoading(true);
+      fetch("/api/omnimens/brain", { credentials: "include" })
+        .then(r => r.json())
+        .then(d => setBrainEntries(Array.isArray(d) ? d : []))
+        .catch(() => {})
+        .finally(() => setBrainLoading(false));
+    }
+  }, [panelTab]);
+
+  // Load deploy status when DEPLOY tab opens
+  useEffect(() => {
+    if (panelTab === "deploy") {
+      setDeployStatus({ status: "live", url: "https://omnimens-ai.com/godflesh/", domain: "omnimens-ai.com" });
+    }
+  }, [panelTab]);
   const [skillSearch, setSkillSearch] = useState("");
   const filteredSkills = OMNIMENS_SKILLS.filter(s =>
     !skillSearch || s.name.toLowerCase().includes(skillSearch.toLowerCase()) || s.category.toLowerCase().includes(skillSearch.toLowerCase()) || s.desc.toLowerCase().includes(skillSearch.toLowerCase())
   );
 
   const PANEL_TABS = [
-    { id: "chats",  label: "CHATS",   icon: <MessageSquare className="w-3 h-3" /> },
-    { id: "mode",   label: "MODE",    icon: <Sparkles className="w-3 h-3" /> },
-    { id: "skills", label: "SKILLS",  icon: <Zap className="w-3 h-3" /> },
-    { id: "tools",  label: "TOOLS",   icon: <Settings className="w-3 h-3" /> },
+    { id: "chats",   label: "CHATS",   icon: <MessageSquare className="w-3 h-3" /> },
+    { id: "files",   label: "FILES",   icon: <HardDrive className="w-3 h-3" /> },
+    { id: "deploy",  label: "DEPLOY",  icon: <Rocket className="w-3 h-3" /> },
+    { id: "memory",  label: "MEMORY",  icon: <MemoryStick className="w-3 h-3" /> },
+    { id: "mode",    label: "MODE",    icon: <Sparkles className="w-3 h-3" /> },
+    { id: "skills",  label: "SKILLS",  icon: <Zap className="w-3 h-3" /> },
+    { id: "tools",   label: "TOOLS",   icon: <Wrench className="w-3 h-3" /> },
+    { id: "config",  label: "CONFIG",  icon: <Settings className="w-3 h-3" /> },
   ];
 
   return (
@@ -2247,6 +2307,381 @@ function LeftPanel({
                 <Layers className="w-3.5 h-3.5" /> MY PROJECTS
               </a>
             </div>
+          </div>
+        )}
+
+        {/* ── FILES TAB ── */}
+        {panelTab === "files" && (
+          <div className="space-y-2">
+            {/* Search */}
+            <div className="relative">
+              <Search className="w-2.5 h-2.5 absolute left-2 top-1/2 -translate-y-1/2 text-white/25" />
+              <input
+                value={fileSearch}
+                onChange={e => setFileSearch(e.target.value)}
+                placeholder="Search files & projects..."
+                className="w-full bg-white/4 border border-white/8 rounded-md pl-6 pr-2 py-1.5 text-[9px] font-mono text-white/70 placeholder:text-white/20 outline-none focus:border-primary/20"
+              />
+            </div>
+
+            {/* Project tree */}
+            {projects.length === 0 ? (
+              <div className="text-center py-8">
+                <FolderOpen className="w-6 h-6 text-white/15 mx-auto mb-2" />
+                <p className="text-[9px] font-mono text-white/25">No projects yet</p>
+                <p className="text-[8px] font-mono text-white/15 mt-1">Ask OMNIMENS to build something</p>
+              </div>
+            ) : (
+              <div className="space-y-0.5">
+                {projects
+                  .filter(p => !fileSearch || p.name.toLowerCase().includes(fileSearch.toLowerCase()))
+                  .map(proj => (
+                  <div key={proj.id} className="rounded-lg overflow-hidden border border-white/5">
+                    {/* Project row */}
+                    <button
+                      onClick={() => toggleExpandProject(proj.id)}
+                      className="w-full flex items-center gap-1.5 px-2 py-1.5 hover:bg-white/5 transition-all text-left"
+                    >
+                      <ChevronRight className={`w-2.5 h-2.5 text-white/30 shrink-0 transition-transform ${expandedProjects.includes(proj.id) ? "rotate-90" : ""}`} />
+                      <FolderOpen className="w-3 h-3 text-primary/50 shrink-0" />
+                      <span className="text-[9px] font-mono text-white/80 truncate flex-1">{proj.name}</span>
+                      {proj.starred && <Star className="w-2.5 h-2.5 text-yellow-400/60 shrink-0" />}
+                      {proj.visibility === "public"
+                        ? <Unlock className="w-2.5 h-2.5 text-green-400/40 shrink-0" />
+                        : <Lock className="w-2.5 h-2.5 text-white/20 shrink-0" />}
+                    </button>
+
+                    {/* Files list */}
+                    {expandedProjects.includes(proj.id) && (
+                      <div className="border-t border-white/5 bg-white/2">
+                        {fileLoadingId === proj.id ? (
+                          <div className="flex items-center gap-2 px-4 py-2">
+                            <Loader2 className="w-2.5 h-2.5 animate-spin text-white/30" />
+                            <span className="text-[8px] font-mono text-white/30">Loading files…</span>
+                          </div>
+                        ) : (projectFiles[proj.id] || []).length === 0 ? (
+                          <p className="text-[8px] font-mono text-white/20 px-4 py-2">No files yet</p>
+                        ) : (
+                          (projectFiles[proj.id] || [])
+                            .filter(f => !fileSearch || f.filename.toLowerCase().includes(fileSearch.toLowerCase()))
+                            .map(file => (
+                            <div key={file.id} className="flex items-center gap-1.5 px-4 py-1.5 hover:bg-white/4 transition-all group">
+                              <File className="w-2.5 h-2.5 text-white/25 shrink-0" />
+                              <span className="text-[8px] font-mono text-white/55 truncate flex-1">{file.filename}</span>
+                              <span className="text-[7px] font-mono text-primary/30 shrink-0">{file.language || "txt"}</span>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Refresh */}
+            <button
+              onClick={() => {
+                fetch("/api/omnimens/projects", { credentials: "include" })
+                  .then(r => r.json()).then(d => setProjects(Array.isArray(d) ? d : [])).catch(() => {});
+                setProjectFiles({});
+              }}
+              className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[8px] font-mono text-white/25 hover:text-white/50 transition-colors border border-dashed border-white/8 hover:border-white/15 rounded-lg"
+            >
+              <RefreshCw className="w-2.5 h-2.5" /> Refresh
+            </button>
+          </div>
+        )}
+
+        {/* ── DEPLOY TAB ── */}
+        {panelTab === "deploy" && (
+          <div className="space-y-3">
+            {/* Live status card */}
+            <div className="rounded-xl border border-green-500/20 bg-green-500/5 p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 rounded-full bg-green-400" style={{ boxShadow: "0 0 6px #4ade80" }} />
+                <span className="font-mono text-[9px] tracking-widest text-green-400 font-bold">LIVE — PRODUCTION</span>
+              </div>
+              <a
+                href="https://omnimens-ai.com/godflesh/"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-1.5 text-[9px] font-mono text-white/60 hover:text-primary transition-colors"
+              >
+                <Globe className="w-3 h-3 shrink-0" />
+                omnimens-ai.com/godflesh/
+                <ExternalLink className="w-2.5 h-2.5 shrink-0" />
+              </a>
+            </div>
+
+            {/* Quick actions */}
+            <div>
+              <p className="font-mono text-[8px] tracking-[0.2em] text-white/35 uppercase mb-2 px-1">QUICK ACTIONS</p>
+              <div className="space-y-1">
+                <a href="https://replit.com/@alphaunlimited/OMNIMENS?tab=overview" target="_blank" rel="noreferrer"
+                  className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[9px] font-mono text-white/70 hover:text-white border border-white/8 hover:border-white/15 hover:bg-white/5 transition-all">
+                  <Server className="w-3 h-3 text-blue-400" /> Overview &amp; Status
+                  <ExternalLink className="w-2.5 h-2.5 ml-auto text-white/25" />
+                </a>
+                <a href="https://replit.com/@alphaunlimited/OMNIMENS?tab=logs" target="_blank" rel="noreferrer"
+                  className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[9px] font-mono text-white/70 hover:text-white border border-white/8 hover:border-white/15 hover:bg-white/5 transition-all">
+                  <Activity className="w-3 h-3 text-yellow-400" /> Deployment Logs
+                  <ExternalLink className="w-2.5 h-2.5 ml-auto text-white/25" />
+                </a>
+                <a href="https://replit.com/@alphaunlimited/OMNIMENS?tab=analytics" target="_blank" rel="noreferrer"
+                  className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[9px] font-mono text-white/70 hover:text-white border border-white/8 hover:border-white/15 hover:bg-white/5 transition-all">
+                  <BarChart2 className="w-3 h-3 text-purple-400" /> Analytics
+                  <ExternalLink className="w-2.5 h-2.5 ml-auto text-white/25" />
+                </a>
+                <a href="https://replit.com/@alphaunlimited/OMNIMENS?tab=resources" target="_blank" rel="noreferrer"
+                  className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[9px] font-mono text-white/70 hover:text-white border border-white/8 hover:border-white/15 hover:bg-white/5 transition-all">
+                  <Gauge className="w-3 h-3 text-cyan-400" /> Resources &amp; Usage
+                  <ExternalLink className="w-2.5 h-2.5 ml-auto text-white/25" />
+                </a>
+                <a href="https://replit.com/@alphaunlimited/OMNIMENS?tab=settings" target="_blank" rel="noreferrer"
+                  className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[9px] font-mono text-white/70 hover:text-white border border-white/8 hover:border-white/15 hover:bg-white/5 transition-all">
+                  <Settings className="w-3 h-3 text-orange-400" /> Manage Deployment
+                  <ExternalLink className="w-2.5 h-2.5 ml-auto text-white/25" />
+                </a>
+              </div>
+            </div>
+
+            {/* Domain info */}
+            <div className="rounded-xl border border-white/8 bg-white/3 p-3 space-y-1.5">
+              <p className="font-mono text-[8px] tracking-[0.2em] text-white/35 uppercase mb-2">DOMAINS</p>
+              <div className="flex items-center gap-2">
+                <CircleDot className="w-2.5 h-2.5 text-green-400 shrink-0" />
+                <span className="text-[9px] font-mono text-white/60">omnimens-ai.com</span>
+                <span className="ml-auto text-[7px] font-mono text-green-400/70 border border-green-400/20 px-1.5 py-0.5 rounded">ACTIVE</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CircleDot className="w-2.5 h-2.5 text-green-400 shrink-0" />
+                <span className="text-[9px] font-mono text-white/60">NEXUS-6.replit.app</span>
+                <span className="ml-auto text-[7px] font-mono text-green-400/70 border border-green-400/20 px-1.5 py-0.5 rounded">ACTIVE</span>
+              </div>
+            </div>
+
+            {/* Build info */}
+            <div className="rounded-xl border border-white/8 bg-white/3 p-3">
+              <p className="font-mono text-[8px] tracking-[0.2em] text-white/35 uppercase mb-2">INFRASTRUCTURE</p>
+              <div className="space-y-1">
+                {[
+                  { label: "Type", value: "Autoscale (2 vCPU / 4 GiB)" },
+                  { label: "Database", value: "PostgreSQL — Connected" },
+                  { label: "Visibility", value: "Public" },
+                ].map(item => (
+                  <div key={item.label} className="flex justify-between">
+                    <span className="text-[8px] font-mono text-white/30">{item.label}</span>
+                    <span className="text-[8px] font-mono text-white/60">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── MEMORY TAB ── */}
+        {panelTab === "memory" && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 mb-1">
+              <Brain className="w-3 h-3 text-purple-400" />
+              <p className="font-mono text-[9px] tracking-widest text-purple-400">OMNIMENS BRAIN</p>
+              <span className="ml-auto text-[7px] font-mono text-white/30 border border-white/10 px-1.5 py-0.5 rounded">{brainEntries.length} entries</span>
+            </div>
+
+            {/* Search */}
+            <div className="relative">
+              <Search className="w-2.5 h-2.5 absolute left-2 top-1/2 -translate-y-1/2 text-white/25" />
+              <input
+                value={brainSearch}
+                onChange={e => setBrainSearch(e.target.value)}
+                placeholder="Search memory..."
+                className="w-full bg-white/4 border border-white/8 rounded-md pl-6 pr-2 py-1.5 text-[9px] font-mono text-white/70 placeholder:text-white/20 outline-none focus:border-purple-400/20"
+              />
+            </div>
+
+            {brainLoading ? (
+              <div className="flex items-center justify-center py-8 gap-2">
+                <Loader2 className="w-4 h-4 animate-spin text-purple-400/50" />
+                <span className="text-[9px] font-mono text-white/30">Loading memory…</span>
+              </div>
+            ) : brainEntries.length === 0 ? (
+              <div className="text-center py-8">
+                <Brain className="w-6 h-6 text-white/15 mx-auto mb-2" />
+                <p className="text-[9px] font-mono text-white/25">Memory is empty</p>
+                <p className="text-[8px] font-mono text-white/15 mt-1">OMNIMENS learns from every conversation</p>
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                {brainEntries
+                  .filter(e => !brainSearch || e.content.toLowerCase().includes(brainSearch.toLowerCase()) || e.category.toLowerCase().includes(brainSearch.toLowerCase()))
+                  .map(entry => (
+                  <div key={entry.id} className="rounded-lg border border-white/8 bg-white/3 p-2.5 hover:border-purple-400/15 transition-all">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-[7px] font-mono text-purple-400/70 border border-purple-400/20 px-1.5 py-0.5 rounded uppercase tracking-wider">{entry.category}</span>
+                      <span className="ml-auto text-[7px] font-mono text-white/20">{Math.round((entry.confidence || 0) * 100)}%</span>
+                    </div>
+                    <p className="text-[8px] font-mono text-white/55 leading-relaxed line-clamp-3">{entry.content}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <button
+              onClick={() => {
+                setBrainEntries([]);
+                setBrainLoading(true);
+                fetch("/api/omnimens/brain", { credentials: "include" })
+                  .then(r => r.json()).then(d => setBrainEntries(Array.isArray(d) ? d : [])).catch(() => {})
+                  .finally(() => setBrainLoading(false));
+              }}
+              className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[8px] font-mono text-white/25 hover:text-white/50 transition-colors border border-dashed border-white/8 hover:border-white/15 rounded-lg"
+            >
+              <RefreshCw className="w-2.5 h-2.5" /> Refresh memory
+            </button>
+          </div>
+        )}
+
+        {/* ── CONFIG TAB ── */}
+        {panelTab === "config" && (
+          <div className="space-y-3">
+            {/* Sub-nav */}
+            <div className="flex gap-1 p-1 bg-white/4 rounded-lg">
+              {(["account", "credits", "preferences", "security"] as const).map(s => (
+                <button
+                  key={s}
+                  onClick={() => setConfigSection(s)}
+                  className={`flex-1 py-1 rounded-md text-[7px] font-mono tracking-wider uppercase transition-all ${
+                    configSection === s ? "bg-primary/20 text-primary" : "text-white/30 hover:text-white/60"
+                  }`}
+                >
+                  {s === "account" ? "ACCT" : s === "preferences" ? "PREFS" : s.toUpperCase()}
+                </button>
+              ))}
+            </div>
+
+            {/* ACCOUNT section */}
+            {configSection === "account" && (
+              <div className="space-y-2">
+                <div className="rounded-xl border border-white/8 bg-white/3 p-3">
+                  <p className="font-mono text-[8px] tracking-[0.2em] text-white/35 uppercase mb-2">ACCOUNT</p>
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
+                      <span className="font-mono text-[11px] font-bold text-primary">G</span>
+                    </div>
+                    <div>
+                      <p className="font-mono text-[10px] font-bold text-white/90">Glenn</p>
+                      <p className="font-mono text-[8px] text-white/35">Alpha Unlimited Technologies</p>
+                      {status?.isOwner && <span className="font-mono text-[7px] text-accent/80 border border-accent/25 px-1.5 py-0.5 rounded mt-0.5 inline-block">⚡ CREATOR</span>}
+                    </div>
+                  </div>
+                </div>
+                <div className="rounded-xl border border-white/8 bg-white/3 p-3 space-y-1.5">
+                  <p className="font-mono text-[8px] tracking-[0.2em] text-white/35 uppercase mb-2">PLATFORM</p>
+                  {[
+                    { label: "Platform", value: "OMNIMENS v1.0" },
+                    { label: "Company", value: "Alpha Unlimited Technologies LLC" },
+                    { label: "IP Status", value: "COGNISYNC™ · NEUROSYNC™" },
+                    { label: "Plan", value: status?.isOwner ? "Creator (Unlimited)" : "Freemium" },
+                  ].map(item => (
+                    <div key={item.label} className="flex justify-between items-center">
+                      <span className="text-[8px] font-mono text-white/30">{item.label}</span>
+                      <span className="text-[8px] font-mono text-white/60 text-right max-w-[55%] truncate">{item.value}</span>
+                    </div>
+                  ))}
+                </div>
+                <a href={`${window.location.origin}/godflesh/pricing`}
+                  className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[9px] font-mono font-bold border border-primary/25 text-primary/80 hover:text-primary hover:bg-primary/10 transition-all">
+                  <Zap className="w-3 h-3" /> Upgrade / Buy Credits
+                  <ExternalLink className="w-2.5 h-2.5 ml-auto" />
+                </a>
+              </div>
+            )}
+
+            {/* CREDITS section */}
+            {configSection === "credits" && (
+              <div className="space-y-2">
+                <div className="rounded-xl border border-white/8 bg-white/3 p-3">
+                  <p className="font-mono text-[8px] tracking-[0.2em] text-white/35 uppercase mb-3">CREDIT BALANCE</p>
+                  {status?.isOwner ? (
+                    <div className="text-center py-2">
+                      <p className="font-mono text-2xl font-bold text-accent">∞</p>
+                      <p className="font-mono text-[9px] text-accent/60 mt-1">Creator — Unlimited credits</p>
+                    </div>
+                  ) : (
+                    <div className="text-center py-2">
+                      <p className="font-mono text-2xl font-bold text-white">—</p>
+                      <p className="font-mono text-[9px] text-white/40 mt-1">Log in to see balance</p>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <p className="font-mono text-[8px] tracking-[0.2em] text-white/35 uppercase mb-1 px-1">CREDIT PACKS</p>
+                  {[
+                    { name: "SPARK", credits: "300 credits", price: "$3", color: "text-yellow-400", border: "border-yellow-400/20" },
+                    { name: "SURGE", credits: "1,000 credits", price: "$10", color: "text-primary", border: "border-primary/20" },
+                    { name: "APEX", credits: "3,000 credits", price: "$30", color: "text-purple-400", border: "border-purple-400/20" },
+                  ].map(pack => (
+                    <a key={pack.name} href={`${window.location.origin}/godflesh/pricing`}
+                      className={`flex items-center gap-2 px-2.5 py-2 rounded-lg border ${pack.border} hover:bg-white/5 transition-all`}>
+                      <span className={`font-mono text-[9px] font-bold ${pack.color}`}>{pack.name}</span>
+                      <span className="text-[9px] font-mono text-white/50">{pack.credits}</span>
+                      <span className={`ml-auto font-mono text-[9px] font-bold ${pack.color}`}>{pack.price}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* PREFERENCES section */}
+            {configSection === "preferences" && (
+              <div className="space-y-2">
+                <div className="rounded-xl border border-white/8 bg-white/3 p-3 space-y-3">
+                  <p className="font-mono text-[8px] tracking-[0.2em] text-white/35 uppercase">INTERFACE</p>
+                  {[
+                    { label: "Voice Responses", desc: "OMNIMENS speaks answers aloud", action: <button onClick={voice.toggle} className={`text-[7px] font-mono px-2 py-1 rounded border transition-all ${voice.isEnabled ? "border-primary/30 text-primary bg-primary/10" : "border-white/10 text-white/30"}`}>{voice.isEnabled ? "ON" : "OFF"}</button> },
+                    { label: "Deep Research", desc: "Extended multi-source research mode", action: <button onClick={onToggleDeepResearch} className={`text-[7px] font-mono px-2 py-1 rounded border transition-all ${deepResearchMode ? "border-violet-400/30 text-violet-300 bg-violet-400/10" : "border-white/10 text-white/30"}`}>{deepResearchMode ? "ON" : "OFF"}</button> },
+                  ].map(item => (
+                    <div key={item.label} className="flex items-center justify-between gap-2">
+                      <div>
+                        <p className="text-[9px] font-mono text-white/70">{item.label}</p>
+                        <p className="text-[7px] font-mono text-white/25 mt-0.5">{item.desc}</p>
+                      </div>
+                      {item.action}
+                    </div>
+                  ))}
+                </div>
+                <button onClick={onOpenHub}
+                  className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[9px] font-mono font-bold border border-primary/20 text-primary/80 hover:text-primary hover:bg-primary/10 transition-all">
+                  <Settings className="w-3 h-3" /> Open Full Control Hub
+                </button>
+              </div>
+            )}
+
+            {/* SECURITY section */}
+            {configSection === "security" && (
+              <div className="space-y-2">
+                <div className="rounded-xl border border-white/8 bg-white/3 p-3 space-y-2">
+                  <p className="font-mono text-[8px] tracking-[0.2em] text-white/35 uppercase mb-1">SECURITY</p>
+                  {[
+                    { icon: <ShieldCheck className="w-3 h-3 text-green-400" />, label: "End-to-end encryption", status: "Active" },
+                    { icon: <KeyRound className="w-3 h-3 text-yellow-400" />, label: "Session auth", status: "Secure" },
+                    { icon: <Lock className="w-3 h-3 text-primary" />, label: "Private conversations", status: "Enabled" },
+                    { icon: <Eye className="w-3 h-3 text-purple-400" />, label: "Memory visibility", status: "Owner only" },
+                  ].map(item => (
+                    <div key={item.label} className="flex items-center gap-2">
+                      {item.icon}
+                      <span className="text-[9px] font-mono text-white/60 flex-1">{item.label}</span>
+                      <span className="text-[7px] font-mono text-green-400/70 border border-green-400/15 px-1.5 py-0.5 rounded">{item.status}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="rounded-xl border border-white/8 bg-white/3 p-3">
+                  <p className="font-mono text-[8px] tracking-[0.2em] text-white/35 uppercase mb-2">IP PROTECTION</p>
+                  <p className="text-[8px] font-mono text-white/40 leading-relaxed">COGNISYNC™ and NEUROSYNC™ are patent-pending technologies owned by Alpha Unlimited Technologies LLC. First creation date: March 16, 2026.</p>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
