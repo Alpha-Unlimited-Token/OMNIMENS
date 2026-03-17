@@ -2,13 +2,13 @@ import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, lazy, Suspense } from "react";
 import { Layout } from "@/components/layout";
-import Home from "@/pages/home";
-import SessionPage from "@/pages/session";
-import BlueprintPage from "@/pages/blueprint";
 import NotFound from "@/pages/not-found";
+
+const Home = lazy(() => import("@/pages/home"));
+const SessionPage = lazy(() => import("@/pages/session"));
+const BlueprintPage = lazy(() => import("@/pages/blueprint"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -69,12 +69,18 @@ function LabGate({ children }: { children: React.ReactNode }) {
 function Router() {
   return (
     <Layout>
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/session/:id" component={SessionPage} />
-        <Route path="/blueprint/:id" component={BlueprintPage} />
-        <Route component={NotFound} />
-      </Switch>
+      <Suspense fallback={
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+        </div>
+      }>
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route path="/session/:id" component={SessionPage} />
+          <Route path="/blueprint/:id" component={BlueprintPage} />
+          <Route component={NotFound} />
+        </Switch>
+      </Suspense>
     </Layout>
   );
 }

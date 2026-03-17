@@ -275,12 +275,21 @@ setTimeout(async () => {
 
 // ── PRODUCTION STATIC SERVE ───────────────────────────────────────────────────
 if (process.env.NODE_ENV === "production") {
-  const omnimensDist = path.resolve(__dirname, "../../omnimens/dist/public");
-  app.use("/omnimens", express.static(omnimensDist));
-  app.get("/omnimens/*splat", (_req, res) => {
-    res.sendFile(path.join(omnimensDist, "index.html"));
+  // OMNIMENS public platform
+  const godfleshDist = path.resolve(__dirname, "../../godflesh/dist/public");
+  app.use("/godflesh", express.static(godfleshDist, { maxAge: "1h" }));
+  app.get("/godflesh/*splat", (_req, res) => {
+    res.sendFile(path.join(godfleshDist, "index.html"));
   });
-  app.get("/", (_req, res) => res.redirect("/omnimens"));
+
+  // Super AI Lab — served at secret path, no directory listing
+  const labDist = path.resolve(__dirname, "../../super-ai-lab/dist/public");
+  app.use("/dLdFrQJk4IwoKwlPi8O_JPls", express.static(labDist, { maxAge: "1h" }));
+  app.get("/dLdFrQJk4IwoKwlPi8O_JPls/*splat", (_req, res) => {
+    res.sendFile(path.join(labDist, "index.html"));
+  });
+
+  app.get("/", (_req, res) => res.redirect("/godflesh"));
 }
 
 export default app;

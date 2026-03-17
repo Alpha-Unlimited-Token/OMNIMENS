@@ -1,21 +1,22 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
+import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { initTheme } from "@/hooks/use-theme";
 import NotFound from "@/pages/not-found";
 
-import Home from "@/pages/home";
-import Login from "@/pages/login";
-import Chat from "@/pages/chat";
-import Pricing from "@/pages/pricing";
-import Account from "@/pages/account";
-import Projects from "@/pages/projects";
-import Memory from "@/pages/memory";
-import Tools from "@/pages/tools";
-import FAQ from "@/pages/faq";
-import Developer from "@/pages/developer";
-import Support from "@/pages/support";
+const Home = lazy(() => import("@/pages/home"));
+const Login = lazy(() => import("@/pages/login"));
+const Chat = lazy(() => import("@/pages/chat"));
+const Pricing = lazy(() => import("@/pages/pricing"));
+const Account = lazy(() => import("@/pages/account"));
+const Projects = lazy(() => import("@/pages/projects"));
+const Memory = lazy(() => import("@/pages/memory"));
+const Tools = lazy(() => import("@/pages/tools"));
+const FAQ = lazy(() => import("@/pages/faq"));
+const Developer = lazy(() => import("@/pages/developer"));
+const Support = lazy(() => import("@/pages/support"));
 
 initTheme();
 
@@ -28,22 +29,32 @@ const queryClient = new QueryClient({
   },
 });
 
+function PageFallback() {
+  return (
+    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <div className="w-8 h-8 rounded-full border-2 border-violet-500 border-t-transparent animate-spin" />
+    </div>
+  );
+}
+
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/login" component={Login} />
-      <Route path="/chat" component={Chat} />
-      <Route path="/pricing" component={Pricing} />
-      <Route path="/account" component={Account} />
-      <Route path="/projects" component={Projects} />
-      <Route path="/memory" component={Memory} />
-      <Route path="/tools" component={Tools} />
-      <Route path="/faq" component={FAQ} />
-      <Route path="/dev" component={Developer} />
-      <Route path="/support" component={Support} />
-      <Route component={NotFound} />
-    </Switch>
+    <Suspense fallback={<PageFallback />}>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/login" component={Login} />
+        <Route path="/chat" component={Chat} />
+        <Route path="/pricing" component={Pricing} />
+        <Route path="/account" component={Account} />
+        <Route path="/projects" component={Projects} />
+        <Route path="/memory" component={Memory} />
+        <Route path="/tools" component={Tools} />
+        <Route path="/faq" component={FAQ} />
+        <Route path="/dev" component={Developer} />
+        <Route path="/support" component={Support} />
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 

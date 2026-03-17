@@ -1,94 +1,111 @@
+// wasmMatrixOps.js
+
 /**
- * wasmMatrixOps - A WebAssembly-powered module for efficient high-dimensional matrix operations.
- * This module provides core linear algebra routines such as matrix multiplication and singular value decomposition (SVD).
- * It is designed for high performance and seamless integration with Node.js.
+ * @module wasmMatrixOps
+ * @description This module enables GPU-like acceleration for matrix operations in Node.js using WebAssembly-based SIMD parallelization.
  */
 
 const fs = require('fs');
 const path = require('path');
 
 /**
- * Load WebAssembly binary and compile it.
- * @returns {Promise<WebAssembly.Instance>} - The compiled WebAssembly instance.
+ * @function compileWasmModule
+ * @description Compiles the WebAssembly module from binary.
+ * @returns {Promise<WebAssembly.Instance>} The compiled WebAssembly instance.
  */
-async function loadWasm() {
-  const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
+async function compileWasmModule() {
+  const wasmPath = path.join(__dirname, 'matrix_ops.wasm');
   const wasmBuffer = fs.readFileSync(wasmPath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
   return WebAssembly.instantiate(wasmModule);
 }
 
 /**
- * Perform matrix multiplication using WebAssembly.
- * @param {number[][]} matrixA - First matrix.
- * @param {number[][]} matrixB - Second matrix.
- * @returns {number[][]} - Resultant matrix after multiplication.
- * @throws {Error} - If matrices are incompatible for multiplication.
+ * @function multiplyMatrices
+ * @description Multiplies two matrices using SIMD acceleration.
+ * @param {Float32Array} matrixA - The first matrix in row-major order.
+ * @param {Float32Array} matrixB - The second matrix in row-major order.
+ * @param {number} rowsA - Number of rows in matrix A.
+ * @param {number} colsA - Number of columns in matrix A.
+ * @param {number} colsB - Number of columns in matrix B.
+ * @returns {Float32Array} The resulting matrix in row-major order.
+ * @throws {Error} If matrices are incompatible for multiplication.
  */
-async function matrixMultiply(matrixA, matrixB) {
-  if (matrixA[0].length !== matrixB.length) {
+async function multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB) {
+  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
     throw new Error('Matrix dimensions are incompatible for multiplication.');
   }
 
-  const wasmInstance = await loadWasm();
-  const { multiply } = wasmInstance.exports;
+  const wasmInstance = await compileWasmModule();
+  const { memory, multiply } = wasmInstance.exports;
 
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const colsB = matrixB[0].length;
+  const resultBuffer = new Float32Array(rowsA * colsB);
 
-  const flatA = matrixA.flat();
-  const flatB = matrixB.flat();
+  // Allocate memory in the WebAssembly module
+  const matrixAOffset = memory.allocate(matrixA.length * 4);
+  const matrixBOffset = memory.allocate(matrixB.length * 4);
+  const resultOffset = memory.allocate(resultBuffer.length * 4);
 
-  const resultBuffer = new Float64Array(rowsA * colsB);
+  // Copy matrices into WebAssembly memory
+  new Float32Array(memory.buffer, matrixAOffset, matrixA.length).set(matrixA);
+  new Float32Array(memory.buffer, matrixBOffset, matrixB.length).set(matrixB);
 
-  multiply(flatA, rowsA, colsA, flatB, colsB, resultBuffer);
+  // Perform multiplication
+  multiply(matrixAOffset, matrixBOffset, resultOffset, rowsA, colsA, colsB);
 
-  const resultMatrix = [];
-  for (let i = 0; i < rowsA; i++) {
-    resultMatrix.push(resultBuffer.slice(i * colsB, (i + 1) * colsB));
-  }
+  // Retrieve the result
+  resultBuffer.set(new Float32Array(memory.buffer, resultOffset, resultBuffer.length));
 
-  return resultMatrix;
+  // Free allocated memory
+  memory.free(matrixAOffset);
+  memory.free(matrixBOffset);
+  memory.free(resultOffset);
+
+  return resultBuffer;
 }
 
 /**
- * Perform Singular Value Decomposition (SVD) using WebAssembly.
- * @param {number[][]} matrix - Matrix to decompose.
- * @returns {Object} - Object containing U, S, and V matrices.
- * @throws {Error} - If matrix is not valid for SVD.
+ * @function addMatrices
+ * @description Adds two matrices element-wise using SIMD acceleration.
+ * @param {Float32Array} matrixA - The first matrix in row-major order.
+ * @param {Float32Array} matrixB - The second matrix in row-major order.
+ * @returns {Float32Array} The resulting matrix in row-major order.
+ * @throws {Error} If matrices are of different sizes.
  */
-async function singularValueDecomposition(matrix) {
-  const wasmInstance = await loadWasm();
-  const { svd } = wasmInstance.exports;
-
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-
-  const flatMatrix = matrix.flat();
-
-  const uBuffer = new Float64Array(rows * rows);
-  const sBuffer = new Float64Array(Math.min(rows, cols));
-  const vBuffer = new Float64Array(cols * cols);
-
-  svd(flatMatrix, rows, cols, uBuffer, sBuffer, vBuffer);
-
-  const U = [];
-  const S = Array.from(sBuffer);
-  const V = [];
-
-  for (let i = 0; i < rows; i++) {
-    U.push(uBuffer.slice(i * rows, (i + 1) * rows));
+async function addMatrices(matrixA, matrixB) {
+  if (matrixA.length !== matrixB.length) {
+    throw new Error('Matrices must be of the same size for addition.');
   }
 
-  for (let i = 0; i < cols; i++) {
-    V.push(vBuffer.slice(i * cols, (i + 1) * cols));
-  }
+  const wasmInstance = await compileWasmModule();
+  const { memory, add } = wasmInstance.exports;
 
-  return { U, S, V };
+  const resultBuffer = new Float32Array(matrixA.length);
+
+  // Allocate memory in the WebAssembly module
+  const matrixAOffset = memory.allocate(matrixA.length * 4);
+  const matrixBOffset = memory.allocate(matrixB.length * 4);
+  const resultOffset = memory.allocate(resultBuffer.length * 4);
+
+  // Copy matrices into WebAssembly memory
+  new Float32Array(memory.buffer, matrixAOffset, matrixA.length).set(matrixA);
+  new Float32Array(memory.buffer, matrixBOffset, matrixB.length).set(matrixB);
+
+  // Perform addition
+  add(matrixAOffset, matrixBOffset, resultOffset, matrixA.length);
+
+  // Retrieve the result
+  resultBuffer.set(new Float32Array(memory.buffer, resultOffset, resultBuffer.length));
+
+  // Free allocated memory
+  memory.free(matrixAOffset);
+  memory.free(matrixBOffset);
+  memory.free(resultOffset);
+
+  return resultBuffer;
 }
 
 module.exports = {
-  matrixMultiply,
-  singularValueDecomposition
+  multiplyMatrices,
+  addMatrices
 };
