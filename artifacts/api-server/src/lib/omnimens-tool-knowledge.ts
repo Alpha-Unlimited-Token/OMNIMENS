@@ -391,17 +391,6 @@ export const INSTALLED_TOOLS: ToolDefinition[] = [
   },
   // ── Utilities ─────────────────────────────────────────────────────────────
   {
-    id: "python_barcode",
-    name: "python-barcode 0.16 — Barcode Generator",
-    category: "utilities",
-    searchQueries: [
-      "python-barcode generate barcode EAN13 Code128 UPC SVG PNG python example",
-      "python-barcode EAN-13 Code-128 UPC-A barcode image generation python",
-    ],
-    docUrls: [],
-    why: "Generates industry barcodes: EAN-13, Code-128, UPC-A as SVG or PNG images. Use when user asks for a barcode (NOT QR code — QR codes are handled by the built-in [QR: text] marker which is already wired).",
-  },
-  {
     id: "exiftool",
     name: "ExifTool 13.25 — File Metadata Reader",
     category: "utilities",

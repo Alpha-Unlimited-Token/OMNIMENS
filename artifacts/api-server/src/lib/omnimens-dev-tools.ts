@@ -220,7 +220,7 @@ export async function checkAllTools(): Promise<Record<string, boolean>> {
 export function detectDevToolIntent(message: string): {
   chart: boolean; pdf: boolean; docx: boolean; excel: boolean; csv: boolean;
   ocr: boolean; nlp: boolean; ffmpeg: boolean; diagram: boolean;
-  datascience: boolean; math: boolean; audio: boolean; barcode: boolean;
+  datascience: boolean; math: boolean; audio: boolean;
 } {
   const m = message.toLowerCase();
   return {
@@ -236,6 +236,5 @@ export function detectDevToolIntent(message: string): {
     datascience: /\b(cluster|clustering|k.?means|machine learning|ml model|train.*model|predict|regression|correlation matrix|anomaly|pca)\b/.test(m),
     math: /\b(solve|equation|derivative|integral|calculus|factor.*polynomial|simplify.*expr|matrix.*det|eigenvalue|symbolic math|taylor series)\b/.test(m),
     audio: /\b(audio.*analys|beat.*detect|tempo|bpm|spectrogram|waveform.*audio|librosa|music.*analys)\b/.test(m),
-    barcode: /\b(barcode|qr code|generate.*barcode|create.*qr)\b/.test(m),
   };
 }

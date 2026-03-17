@@ -17,3 +17,12 @@ artifacts/godflesh/public/avatar-studio.html
 .env*
 .pythonlibs/lib/python3.11/site-packages/tensorflow*
 .pythonlibs/lib/python3.11/site-packages/keras*
+.pythonlibs/lib/python3.11/site-packages/ml_dtypes*
+.pythonlibs/lib/python3.11/site-packages/clang*
+.pythonlibs/lib/python3.11/site-packages/numba*
+.pythonlibs/lib/python3.11/site-packages/llvmlite*
+.pythonlibs/lib/python3.11/site-packages/scikit_image*
+.pythonlibs/lib/python3.11/site-packages/skimage*
+.pythonlibs/lib/python3.11/site-packages/qrcode*
+.pythonlibs/lib/python3.11/site-packages/barcode*
+.pythonlibs/lib/python3.11/site-packages/python_barcode*
