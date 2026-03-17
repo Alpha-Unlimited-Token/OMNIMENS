@@ -85,12 +85,44 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
+// ── Type auto-detection ────────────────────────────────────────────────────────
+
+function detectProjectType(desc: string): ProjectType | null {
+  const d = desc.toLowerCase();
+  if (/\bgame\b|3d game|canvas game|webgl|sprite|platformer|shooter|puzzle game|rpg|arcade/.test(d)) return "game";
+  if (/dashboard|analytics|chart|graph|data.?viz|visualization|reporting|metrics|heatmap/.test(d)) return "dataviz";
+  if (/\bapi\b|\brest\b|endpoint|backend|microservice|graphql|server.?side|webhook|data.?service/.test(d)) return "api";
+  if (/\btool\b|utility|cli|command.?line|converter|generator|parser|formatter|linter|calculator/.test(d)) return "tool";
+  if (/\bapp\b|application|\bsaas\b|platform|portal|dashboard app|interactive|web app/.test(d)) return "webapp";
+  if (/website|landing.?page|portfolio|blog|\bsite\b|homepage|showcase|marketing/.test(d)) return "website";
+  return null;
+}
+
 // ── Create Project Modal ───────────────────────────────────────────────────────
 
 function CreateProjectModal({ onClose, onCreate }: { onClose: () => void; onCreate: (p: { name: string; description: string; type: ProjectType }) => void }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [type, setType] = useState<ProjectType>("website");
+  const [type, setType] = useState<ProjectType | null>(null);
+  const [manualType, setManualType] = useState(false);
+
+  useEffect(() => {
+    if (manualType) return;
+    const detected = detectProjectType(description);
+    setType(detected);
+  }, [description, manualType]);
+
+  const handleSelectType = (val: ProjectType) => {
+    setType(val);
+    setManualType(true);
+  };
+
+  const handleClearManual = () => {
+    setManualType(false);
+    setType(detectProjectType(description));
+  };
+
+  const effectiveType: ProjectType = type || "website";
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -123,7 +155,7 @@ function CreateProjectModal({ onClose, onCreate }: { onClose: () => void; onCrea
             <label className="block text-xs font-mono text-white uppercase tracking-widest mb-1.5">Description (used as AI build brief)</label>
             <textarea
               value={description} onChange={e => setDescription(e.target.value)}
-              placeholder="Describe what you want to build. The more detail, the better the result..."
+              placeholder="Describe what you want to build — OMNIMENS will auto-detect the project type from your prompt..."
               rows={3}
               className="w-full bg-white/5 border border-white/10 focus:border-primary rounded-lg px-4 py-2.5 text-white font-mono text-sm outline-none transition-all placeholder:text-white/20 resize-none"
             />
@@ -131,17 +163,37 @@ function CreateProjectModal({ onClose, onCreate }: { onClose: () => void; onCrea
 
           {/* Type */}
           <div>
-            <label className="block text-xs font-mono text-white uppercase tracking-widest mb-2">Project Type</label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-xs font-mono text-white uppercase tracking-widest">Project Type</label>
+              <div className="flex items-center gap-2">
+                {!manualType && type && (
+                  <span className="text-[9px] font-mono text-primary/80 bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded">
+                    AUTO-DETECTED
+                  </span>
+                )}
+                {manualType && (
+                  <button onClick={handleClearManual} className="text-[9px] font-mono text-white/40 hover:text-white/70 underline transition-colors">
+                    reset to auto
+                  </button>
+                )}
+                {!type && !manualType && (
+                  <span className="text-[9px] font-mono text-white/30 italic">type a description to auto-detect</span>
+                )}
+              </div>
+            </div>
             <div className="grid grid-cols-3 gap-2">
               {PROJECT_TYPES.map(pt => (
-                <button key={pt.value} onClick={() => setType(pt.value)}
-                  className={`flex flex-col items-start gap-1 p-3 rounded-xl border transition-all text-left ${
-                    type === pt.value ? pt.color : "border-white/8 bg-white/3 text-white hover:border-white/20"
+                <button key={pt.value} onClick={() => handleSelectType(pt.value)}
+                  className={`flex flex-col items-start gap-1 p-3 rounded-xl border transition-all text-left relative ${
+                    type === pt.value ? pt.color : "border-white/8 bg-white/3 text-white/60 hover:text-white hover:border-white/20"
                   }`}
                 >
                   {pt.icon}
                   <p className="text-[11px] font-mono font-bold">{pt.label}</p>
                   <p className="text-[9px] font-mono opacity-70">{pt.desc}</p>
+                  {type === pt.value && !manualType && (
+                    <span className="absolute top-1.5 right-1.5 text-[7px] font-mono bg-primary/20 text-primary px-1 rounded">AUTO</span>
+                  )}
                 </button>
               ))}
             </div>
@@ -151,7 +203,7 @@ function CreateProjectModal({ onClose, onCreate }: { onClose: () => void; onCrea
         <div className="flex gap-3 mt-6">
           <Button onClick={onClose} variant="ghost" className="flex-1 text-white/85">Cancel</Button>
           <Button
-            onClick={() => { if (name.trim()) { onCreate({ name: name.trim(), description: description.trim(), type }); onClose(); } }}
+            onClick={() => { if (name.trim()) { onCreate({ name: name.trim(), description: description.trim(), type: effectiveType }); onClose(); } }}
             disabled={!name.trim()}
             className="flex-1 gap-2"
           >

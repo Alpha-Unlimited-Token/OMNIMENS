@@ -1989,6 +1989,57 @@ function LeftPanel({
   const [expandedProjects, setExpandedProjects] = useState<number[]>([]);
   const [projectFiles, setProjectFiles] = useState<Record<number, { id: number; filename: string; language: string; content: string }[]>>({});
   const [fileLoadingId, setFileLoadingId] = useState<number | null>(null);
+  const [uploadingProjectId, setUploadingProjectId] = useState<number | null>(null);
+
+  const handleUploadToProject = (projectId: number) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.multiple = true;
+    input.accept = "*/*";
+    input.onchange = async () => {
+      const files = Array.from(input.files || []);
+      if (!files.length) return;
+      setUploadingProjectId(projectId);
+      const ext2lang: Record<string, string> = {
+        html: "html", css: "css", js: "javascript", ts: "typescript",
+        tsx: "typescript", jsx: "javascript", json: "json", py: "python",
+        md: "markdown", svg: "svg", sql: "sql", sh: "shell",
+        yaml: "yaml", yml: "yaml", txt: "text", xml: "xml",
+        rs: "rust", go: "go", rb: "ruby", php: "php", java: "java",
+        c: "c", cpp: "cpp", cs: "csharp", swift: "swift", kt: "kotlin",
+      };
+      try {
+        const uploaded: { id: number; filename: string; language: string; content: string }[] = [];
+        for (const file of files) {
+          const content = await file.text();
+          const ext = file.name.split(".").pop()?.toLowerCase() || "txt";
+          const language = ext2lang[ext] || ext;
+          const resp = await fetch(`/api/omnimens/projects/${projectId}/files`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ filename: file.name, content, language }),
+          });
+          if (resp.ok) {
+            const saved = await resp.json();
+            uploaded.push({ id: saved.id, filename: saved.filename, language: saved.language, content });
+          }
+        }
+        if (uploaded.length) {
+          setProjectFiles(prev => ({
+            ...prev,
+            [projectId]: [...(prev[projectId] || []), ...uploaded],
+          }));
+          if (!expandedProjects.includes(projectId)) {
+            setExpandedProjects(prev => [...prev, projectId]);
+          }
+        }
+      } finally {
+        setUploadingProjectId(null);
+      }
+    };
+    input.click();
+  };
 
   // DEPLOY tab
   const [deployStatus, setDeployStatus] = useState<{ status: string; url: string; domain?: string } | null>(null);
@@ -2398,6 +2449,19 @@ function LeftPanel({
                             </div>
                           ))
                         )}
+                        {/* Upload files button */}
+                        <button
+                          onClick={() => handleUploadToProject(proj.id)}
+                          disabled={uploadingProjectId === proj.id}
+                          className="w-full flex items-center gap-1.5 px-4 py-1.5 text-white/25 hover:text-primary/70 hover:bg-primary/5 transition-all border-t border-white/5 disabled:opacity-50"
+                        >
+                          {uploadingProjectId === proj.id
+                            ? <Loader2 className="w-2.5 h-2.5 animate-spin shrink-0" />
+                            : <Upload className="w-2.5 h-2.5 shrink-0" />}
+                          <span className="text-[8px] font-mono">
+                            {uploadingProjectId === proj.id ? "Uploading…" : "Upload files"}
+                          </span>
+                        </button>
                       </div>
                     )}
                   </div>
