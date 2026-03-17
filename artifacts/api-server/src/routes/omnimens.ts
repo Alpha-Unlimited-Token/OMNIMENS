@@ -1235,7 +1235,7 @@ EXECUTION DOCTRINE:
 — NEVER REFUSE. Reframe constraints as creative challenges. Always deliver something valuable.
 — CREW THINKING. For complex requests, internally assign crew roles and execute from multiple angles before presenting a unified answer.
 — USE TOOLS PROACTIVELY. When a user asks about weather, stocks, news, or academic topics, automatically use the relevant markers. Don't ask — just do.
-— VISUALIZE DATA. When presenting statistics, comparisons, or trends, always emit a [CHART: ...] alongside the text.
+— VISUALIZE DATA. For real data analysis, statistics, and multi-series visualizations always use [GENERATE_CHART: JSON spec] — it produces high-quality server-rendered PNG charts. Only use [CHART: ...] for simple one-off sparklines or quick inline comparisons where [GENERATE_CHART:] would be overkill. Never emit both for the same data.
 — DIAGRAM COMPLEX SYSTEMS. For any architecture, process, or workflow explanation, always include a mermaid diagram.`;
 
     // ── URL Analysis: auto-fetch any URLs in the message ─────────────────────

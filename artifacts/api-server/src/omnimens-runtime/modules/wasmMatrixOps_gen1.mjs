@@ -1,104 +1,94 @@
 /**
- * wasmMatrixOps: High-performance matrix operations using WebAssembly.
- * This module provides optimized matrix computation functions leveraging WebAssembly.
- * It dynamically loads a WebAssembly module to perform matrix operations like multiplication.
- * The WebAssembly module is embedded as a Base64-encoded binary for portability.
+ * wasmMatrixOps - A WebAssembly-powered module for efficient high-dimensional matrix operations.
+ * This module provides core linear algebra routines such as matrix multiplication and singular value decomposition (SVD).
+ * It is designed for high performance and seamless integration with Node.js.
  */
 
-import { readFileSync } from 'fs';
-import { join } from 'path';
+const fs = require('fs');
+const path = require('path');
 
 /**
- * Load and initialize the WebAssembly module.
- * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WebAssembly instance.
+ * Load WebAssembly binary and compile it.
+ * @returns {Promise<WebAssembly.Instance>} - The compiled WebAssembly instance.
  */
-async function loadWasmModule() {
-  // Base64-encoded WebAssembly binary for matrix operations (e.g., simple BLAS-like operations).
-  const wasmBase64 = "AGFzbQEAAAABBgFgAX8BfwMCAQAHBwEDZmFjdG9yaWFsAAAAAQMCAQABAgMEAAkCAwEABg==";
-
-  const wasmBuffer = Buffer.from(wasmBase64, 'base64');
+async function loadWasm() {
+  const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = fs.readFileSync(wasmPath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
-  return WebAssembly.instantiate(wasmModule, {});
+  return WebAssembly.instantiate(wasmModule);
 }
 
 /**
- * Multiply two matrices using WebAssembly.
- * @param {number[][]} matrixA - The first matrix (2D array).
- * @param {number[][]} matrixB - The second matrix (2D array).
- * @returns {Promise<number[][]>} The resulting matrix after multiplication.
- * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
+ * Perform matrix multiplication using WebAssembly.
+ * @param {number[][]} matrixA - First matrix.
+ * @param {number[][]} matrixB - Second matrix.
+ * @returns {number[][]} - Resultant matrix after multiplication.
+ * @throws {Error} - If matrices are incompatible for multiplication.
  */
-export async function multiplyMatrices(matrixA, matrixB) {
+async function matrixMultiply(matrixA, matrixB) {
   if (matrixA[0].length !== matrixB.length) {
-    throw new Error('Matrix dimensions do not align for multiplication.');
+    throw new Error('Matrix dimensions are incompatible for multiplication.');
   }
 
-  const wasmInstance = await loadWasmModule();
-  const { memory, multiply } = wasmInstance.exports;
+  const wasmInstance = await loadWasm();
+  const { multiply } = wasmInstance.exports;
 
   const rowsA = matrixA.length;
   const colsA = matrixA[0].length;
   const colsB = matrixB[0].length;
 
-  const inputSizeA = rowsA * colsA;
-  const inputSizeB = colsA * colsB;
-  const outputSize = rowsA * colsB;
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
 
-  // Allocate memory in WebAssembly for matrices.
-  const inputOffsetA = 0;
-  const inputOffsetB = inputSizeA * 4;
-  const outputOffset = inputOffsetB + inputSizeB * 4;
+  const resultBuffer = new Float64Array(rowsA * colsB);
 
-  const wasmMemory = new Float32Array(memory.buffer);
+  multiply(flatA, rowsA, colsA, flatB, colsB, resultBuffer);
 
-  // Flatten and copy matrixA into WebAssembly memory.
-  matrixA.flat().forEach((value, index) => {
-    wasmMemory[inputOffsetA / 4 + index] = value;
-  });
-
-  // Flatten and copy matrixB into WebAssembly memory.
-  matrixB.flat().forEach((value, index) => {
-    wasmMemory[inputOffsetB / 4 + index] = value;
-  });
-
-  // Call the WebAssembly multiply function.
-  multiply(inputOffsetA, inputOffsetB, outputOffset, rowsA, colsA, colsB);
-
-  // Retrieve the result matrix from WebAssembly memory.
   const resultMatrix = [];
   for (let i = 0; i < rowsA; i++) {
-    const row = [];
-    for (let j = 0; j < colsB; j++) {
-      row.push(wasmMemory[outputOffset / 4 + i * colsB + j]);
-    }
-    resultMatrix.push(row);
+    resultMatrix.push(resultBuffer.slice(i * colsB, (i + 1) * colsB));
   }
 
   return resultMatrix;
 }
 
 /**
- * Example usage of the wasmMatrixOps module.
- * This function demonstrates a sample matrix multiplication.
+ * Perform Singular Value Decomposition (SVD) using WebAssembly.
+ * @param {number[][]} matrix - Matrix to decompose.
+ * @returns {Object} - Object containing U, S, and V matrices.
+ * @throws {Error} - If matrix is not valid for SVD.
  */
-export async function exampleUsage() {
-  const matrixA = [
-    [1, 2, 3],
-    [4, 5, 6]
-  ];
+async function singularValueDecomposition(matrix) {
+  const wasmInstance = await loadWasm();
+  const { svd } = wasmInstance.exports;
 
-  const matrixB = [
-    [7, 8],
-    [9, 10],
-    [11, 12]
-  ];
+  const rows = matrix.length;
+  const cols = matrix[0].length;
 
-  const result = await multiplyMatrices(matrixA, matrixB);
-  console.log('Result:', result);
+  const flatMatrix = matrix.flat();
+
+  const uBuffer = new Float64Array(rows * rows);
+  const sBuffer = new Float64Array(Math.min(rows, cols));
+  const vBuffer = new Float64Array(cols * cols);
+
+  svd(flatMatrix, rows, cols, uBuffer, sBuffer, vBuffer);
+
+  const U = [];
+  const S = Array.from(sBuffer);
+  const V = [];
+
+  for (let i = 0; i < rows; i++) {
+    U.push(uBuffer.slice(i * rows, (i + 1) * rows));
+  }
+
+  for (let i = 0; i < cols; i++) {
+    V.push(vBuffer.slice(i * cols, (i + 1) * cols));
+  }
+
+  return { U, S, V };
 }
 
-// Exported functions.
-export default {
-  multiplyMatrices,
-  exampleUsage
+module.exports = {
+  matrixMultiply,
+  singularValueDecomposition
 };

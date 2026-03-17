@@ -93,15 +93,17 @@ export const INSTALLED_TOOLS: ToolDefinition[] = [
   },
   {
     id: "scipy",
-    name: "scipy (Python scientific computing)",
+    name: "scipy 1.x — Scientific Computing",
     category: "math_science",
     searchQueries: [
       "scipy spatial convex hull Delaunay triangulation 3D",
-      "scipy signal processing image generation",
+      "scipy signal processing image generation FFT convolution",
       "scipy advanced geometry surface interpolation",
+      "scipy statistics normality test skewness kurtosis python example",
+      "scipy optimize minimize root finding linear programming python",
     ],
     docUrls: [],
-    why: "Advanced spatial operations — Delaunay triangulation, convex hull, interpolation for complex geometry",
+    why: "Advanced scientific computing: spatial operations (Delaunay triangulation, convex hull), statistical tests (normality, skewness), optimization (minimize, root-finding), signal processing (FFT, convolution). Works alongside NumPy and SymPy.",
   },
   {
     id: "pillow",
@@ -229,17 +231,6 @@ export const INSTALLED_TOOLS: ToolDefinition[] = [
     ],
     why: "Primary chart rendering engine. Generates bar, line, scatter, pie, donut, area, histogram, heatmap, box, violin charts as PNG images. Use [GENERATE_CHART: JSON spec] marker to trigger.",
   },
-  {
-    id: "plotly",
-    name: "plotly 6.6 (interactive Python charting)",
-    category: "data_visualization",
-    searchQueries: [
-      "plotly interactive chart python bar line scatter 3D surface complete example",
-      "plotly express advanced visualization animation subplot python code",
-    ],
-    docUrls: [],
-    why: "Interactive chart library for complex, multi-dimensional visualizations with hover, zoom, and animation.",
-  },
   // ── PDF + Document Processing ─────────────────────────────────────────────
   {
     id: "pymupdf",
@@ -329,17 +320,6 @@ export const INSTALLED_TOOLS: ToolDefinition[] = [
       "https://spacy.io/api",
     ],
     why: "NLP engine for named entity recognition, POS tagging, dependency parsing, noun chunk extraction. Use [ANALYZE_NLP: JSON spec] marker.",
-  },
-  {
-    id: "nltk",
-    name: "NLTK 3.9 — Natural Language Toolkit",
-    category: "nlp",
-    searchQueries: [
-      "NLTK sentiment analysis text classification python complete example",
-      "NLTK tokenization stemming lemmatization frequency distribution python",
-    ],
-    docUrls: [],
-    why: "Foundational NLP tools — tokenization, stemming, frequency analysis, text classification. Works alongside spaCy.",
   },
   // ── Audio / Video ─────────────────────────────────────────────────────────
   {
@@ -442,29 +422,17 @@ export const INSTALLED_TOOLS: ToolDefinition[] = [
     ],
     why: "Exact symbolic mathematics: solve equations, calculus (derivatives, integrals, series), factor/expand polynomials, matrix determinants/eigenvalues, output LaTeX. Use [SOLVE_MATH: JSON spec] marker.",
   },
-  {
-    id: "scipy",
-    name: "scipy 1.x — Scientific Computing",
-    category: "mathematics",
-    searchQueries: [
-      "scipy statistics normality test skewness kurtosis python example",
-      "scipy optimize minimize root finding linear programming python",
-      "scipy signal processing FFT convolution python advanced example",
-    ],
-    docUrls: [],
-    why: "Advanced scientific computing: statistical tests, optimization, signal processing, spatial analysis. Works alongside NumPy and SymPy.",
-  },
   // ── Utilities ─────────────────────────────────────────────────────────────
   {
-    id: "qrcode_barcode",
-    name: "qrcode 8.2 + python-barcode 0.16 — Code Generation",
+    id: "python_barcode",
+    name: "python-barcode 0.16 — Barcode Generator",
     category: "utilities",
     searchQueries: [
-      "qrcode python generate QR code PIL image complete example",
-      "python-barcode generate barcode EAN13 Code128 SVG PNG python",
+      "python-barcode generate barcode EAN13 Code128 UPC SVG PNG python example",
+      "python-barcode EAN-13 Code-128 UPC-A barcode image generation python",
     ],
     docUrls: [],
-    why: "Generates QR codes and barcodes (EAN-13, Code-128, UPC). Already integrated via [QR: text] marker.",
+    why: "Generates industry barcodes: EAN-13, Code-128, UPC-A as SVG or PNG images. Use when user asks for a barcode (NOT QR code — QR codes are handled by the built-in [QR: text] marker which is already wired).",
   },
   {
     id: "exiftool",
@@ -712,7 +680,7 @@ export async function loadToolKnowledgeForTask(taskHint: string): Promise<string
     if (hint.includes("chart") || hint.includes("graph") || hint.includes("plot") || hint.includes("visuali")
       || hint.includes("bar chart") || hint.includes("line chart") || hint.includes("pie chart") || hint.includes("histogram")
       || hint.includes("heatmap") || hint.includes("scatter") || hint.includes("seaborn") || hint.includes("matplotlib")) {
-      relevant.push("tool_matplotlib_seaborn", "tool_plotly");
+      relevant.push("tool_matplotlib_seaborn");
     }
     if (hint.includes("pdf") || hint.includes("portable doc") || hint.includes("extract text") || hint.includes("read pdf")
       || hint.includes("create pdf") || hint.includes("pdf table")) {
@@ -730,8 +698,8 @@ export async function loadToolKnowledgeForTask(taskHint: string): Promise<string
     }
     if (hint.includes("named entity") || hint.includes("ner") || hint.includes("entity extract") || hint.includes("keyword extract")
       || hint.includes("text analys") || hint.includes("nlp") || hint.includes("sentiment") || hint.includes("pos tag")
-      || hint.includes("spacy") || hint.includes("nltk")) {
-      relevant.push("tool_spacy", "tool_nltk");
+      || hint.includes("spacy")) {
+      relevant.push("tool_spacy");
     }
     if (hint.includes("video convert") || hint.includes("extract audio") || hint.includes("video info") || hint.includes("thumbnail")
       || hint.includes("trim video") || hint.includes("waveform") || hint.includes("ffmpeg")) {
