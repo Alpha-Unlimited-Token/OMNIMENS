@@ -9,7 +9,7 @@ import {
   RefreshCw, ChevronRight, Eye, EyeOff, Copy, Check,
   ArrowLeft, MoreVertical, ExternalLink, Play, Shield,
   BarChart2, Server, Zap, AlertTriangle, Search, Plus,
-  Table2, Layers, KeyRound, Activity, X
+  Table2, Layers, KeyRound, Activity, X, Settings, Clock
 } from "lucide-react";
 
 const V = "#a855f7";        // violet primary
@@ -76,8 +76,10 @@ function Row({ label, value, action }: { label: string; value?: React.ReactNode;
 // ── Deploy / Publishing ───────────────────────────────────────────────────────
 
 function DeployView() {
-  const [deployTab, setDeployTab] = useState<"overview" | "logs" | "analytics" | "resources">("overview");
+  const [deployTab, setDeployTab] = useState<"overview" | "logs" | "analytics" | "resources" | "domains" | "manage">("overview");
   const [stats, setStats] = useState<any>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const refresh = () => { setRefreshing(true); fetch("/api/omnimens/usage-stats").then(r=>r.ok?r.json():null).then(d=>{setStats(d);setRefreshing(false);}).catch(()=>setRefreshing(false)); };
 
   useEffect(() => {
     fetch("/api/omnimens/usage-stats")
@@ -85,7 +87,7 @@ function DeployView() {
       .then(setStats).catch(() => {});
   }, []);
 
-  const tabs = ["overview", "logs", "analytics", "resources"] as const;
+  const tabs = ["overview", "logs", "analytics", "resources", "domains", "manage"] as const;
 
   return (
     <div className="flex flex-col h-full">
@@ -228,6 +230,64 @@ function DeployView() {
             ))}
           </div>
         )}
+
+        {deployTab === "domains" && (
+          <div className="p-4 space-y-3">
+            <p className="font-mono text-[10px] tracking-widest px-1" style={{ color: TXT_FAINT }}>CONNECTED DOMAINS</p>
+            {[
+              { domain: "omnimens-ai.com", type: "Custom", primary: true, status: "Active" },
+              { domain: "NEXUS-6.replit.app", type: "Replit", primary: false, status: "Active" },
+              { domain: "omnimens.replit.app", type: "Replit", primary: false, status: "Active" },
+            ].map(d => (
+              <div key={d.domain} className="flex items-center gap-3 p-4 rounded-2xl border" style={{ borderColor: BORDER_MID, background: CARD }}>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: VD, border: `1px solid ${BORDER}` }}>
+                  <Globe className="w-5 h-5" style={{ color: "#4ade80" }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-mono text-sm font-bold truncate" style={{ color: TXT }}>{d.domain}</p>
+                  <p className="font-mono text-xs mt-0.5" style={{ color: TXT_FAINT }}>{d.type}{d.primary ? " · Primary" : ""}</p>
+                </div>
+                <Pill label={d.status} />
+              </div>
+            ))}
+            <button className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border font-mono text-xs transition-all active:scale-[0.98]"
+              style={{ borderColor: BORDER, color: V, background: VD }}>
+              + Connect domain
+            </button>
+          </div>
+        )}
+
+        {deployTab === "manage" && (
+          <div className="p-4 space-y-3">
+            <p className="font-mono text-[10px] tracking-widest px-1" style={{ color: TXT_FAINT }}>MANAGEMENT</p>
+            {[
+              { label: "Preview", desc: "Open live preview of your app", icon: Eye },
+              { label: "Adjust settings", desc: "Scale, region, environment vars", icon: Settings },
+              { label: "Run security scan", desc: "Scan for vulnerabilities", icon: Shield },
+              { label: "Deployment history", desc: "View all past deployments", icon: Clock },
+            ].map(item => (
+              <button key={item.label}
+                className="w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all active:scale-[0.98]"
+                style={{ borderColor: BORDER_MID, background: CARD }}>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: VD, border: `1px solid ${BORDER}` }}>
+                  <item.icon className="w-5 h-5" style={{ color: V }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-mono text-sm font-bold" style={{ color: TXT }}>{item.label}</p>
+                  <p className="font-mono text-xs mt-0.5" style={{ color: TXT_FAINT }}>{item.desc}</p>
+                </div>
+                <ExternalLink className="w-4 h-4 shrink-0" style={{ color: TXT_FAINT }} />
+              </button>
+            ))}
+            <div className="pt-1">
+              <button className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border font-mono text-sm font-bold transition-all active:scale-[0.98]"
+                style={{ borderColor: "rgba(248,113,113,0.25)", color: "#f87171", background: "rgba(248,113,113,0.06)" }}>
+                Delete deployment
+              </button>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
