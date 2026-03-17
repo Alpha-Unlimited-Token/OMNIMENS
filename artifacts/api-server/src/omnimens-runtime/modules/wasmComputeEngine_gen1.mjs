@@ -1,113 +1,86 @@
 // wasmComputeEngine.js
 
 /**
- * @module wasmComputeEngine
- * @description High-performance numerical computations using WebAssembly, integrating BLAS-like matrix operations with Node.js.
+ * wasmComputeEngine - A WebAssembly-powered computational engine for Node.js.
+ * This module leverages WebAssembly to execute high-performance matrix operations
+ * and computationally intensive tasks using linear algebra libraries.
  */
 
-const { readFileSync } = require('fs');
-const { join } = require('path');
-
-/**
- * @typedef {Object} Matrix
- * @property {number[][]} data - 2D array representing matrix values.
- * @property {number} rows - Number of rows in the matrix.
- * @property {number} cols - Number of columns in the matrix.
- */
+import { readFile } from 'fs/promises';
+import { join } from 'path';
 
 /**
- * @function loadWasm
- * @description Loads and compiles a WebAssembly binary file.
- * @param {string} filePath - Path to the WebAssembly binary file.
- * @returns {Promise<WebAssembly.Instance>} - Compiled WebAssembly instance.
+ * Load a WebAssembly module from a file.
+ * @param {string} filePath - The relative path to the WebAssembly (.wasm) file.
+ * @returns {Promise<WebAssembly.Instance>} - A promise that resolves to the WebAssembly instance.
  */
-async function loadWasm(filePath) {
-  const wasmBuffer = readFileSync(filePath);
+export async function loadWasmModule(filePath) {
+  const absolutePath = join(process.cwd(), filePath);
+  const wasmBuffer = await readFile(absolutePath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
-  const wasmInstance = await WebAssembly.instantiate(wasmModule);
-  return wasmInstance;
+  const instance = await WebAssembly.instantiate(wasmModule);
+  return instance;
 }
 
 /**
- * @function multiplyMatrices
- * @description Multiplies two matrices using WebAssembly.
- * @param {Matrix} matrixA - First matrix.
- * @param {Matrix} matrixB - Second matrix.
- * @param {WebAssembly.Instance} wasmInstance - WebAssembly instance with matrix multiplication logic.
- * @returns {Matrix} - Resultant matrix after multiplication.
- * @throws {Error} - If matrices cannot be multiplied due to dimension mismatch.
+ * Perform matrix multiplication using WebAssembly.
+ * @param {WebAssembly.Instance} wasmInstance - The loaded WebAssembly instance.
+ * @param {Float32Array} matrixA - The first matrix (flattened, row-major order).
+ * @param {Float32Array} matrixB - The second matrix (flattened, row-major order).
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA (and rows in matrixB).
+ * @param {number} colsB - Number of columns in matrixB.
+ * @returns {Float32Array} - The resulting matrix (flattened, row-major order).
  */
-function multiplyMatrices(matrixA, matrixB, wasmInstance) {
-  if (matrixA.cols !== matrixB.rows) {
-    throw new Error('Matrix dimension mismatch: Cannot multiply matrices.');
+export function wasmMatrixMultiply(wasmInstance, matrixA, matrixB, rowsA, colsA, colsB) {
+  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+    throw new Error('Matrix dimensions do not match the provided sizes.');
   }
 
-  const result = {
-    rows: matrixA.rows,
-    cols: matrixB.cols,
-    data: Array(matrixA.rows).fill(null).map(() => Array(matrixB.cols).fill(0))
-  };
+  const { memory, multiply_matrices } = wasmInstance.exports;
 
-  const { multiply } = wasmInstance.exports;
+  // Allocate memory for the matrices and result
+  const memoryView = new Float32Array(memory.buffer);
+  const offsetA = 0;
+  const offsetB = offsetA + matrixA.length;
+  const offsetC = offsetB + matrixB.length;
 
-  for (let i = 0; i < matrixA.rows; i++) {
-    for (let j = 0; j < matrixB.cols; j++) {
-      let sum = 0;
-      for (let k = 0; k < matrixA.cols; k++) {
-        sum += matrixA.data[i][k] * matrixB.data[k][j];
-      }
-      result.data[i][j] = sum;
-    }
-  }
+  memoryView.set(matrixA, offsetA);
+  memoryView.set(matrixB, offsetB);
 
-  return result;
+  // Call the WebAssembly function
+  multiply_matrices(offsetA, offsetB, offsetC, rowsA, colsA, colsB);
+
+  // Extract the result matrix
+  return new Float32Array(memory.buffer, offsetC * Float32Array.BYTES_PER_ELEMENT, rowsA * colsB);
 }
 
 /**
- * @function initializeWasmComputeEngine
- * @description Initializes the WebAssembly compute engine by loading the binary file.
- * @param {string} wasmFilePath - Path to the WebAssembly binary file.
- * @returns {Promise<WebAssembly.Instance>} - Initialized WebAssembly instance.
+ * Example usage of the wasmComputeEngine.
+ * @returns {Promise<void>} - Resolves when the example completes.
  */
-async function initializeWasmComputeEngine(wasmFilePath) {
-  return await loadWasm(wasmFilePath);
+export async function exampleUsage() {
+  const wasmInstance = await loadWasmModule('./matrix_operations.wasm');
+
+  const matrixA = new Float32Array([
+    1, 2, 3,
+    4, 5, 6
+  ]); // 2x3 matrix
+
+  const matrixB = new Float32Array([
+    7, 8,
+    9, 10,
+    11, 12
+  ]); // 3x2 matrix
+
+  const rowsA = 2;
+  const colsA = 3;
+  const colsB = 2;
+
+  const result = wasmMatrixMultiply(wasmInstance, matrixA, matrixB, rowsA, colsA, colsB);
+
+  console.log('Resulting Matrix:', result);
 }
 
-/**
- * @function exampleUsage
- * @description Demonstrates matrix multiplication using the compute engine.
- * @returns {Promise<void>} - Example execution.
- */
-async function exampleUsage() {
-  const wasmFilePath = join(__dirname, 'matrixMultiply.wasm');
-  const wasmInstance = await initializeWasmComputeEngine(wasmFilePath);
-
-  const matrixA = {
-    rows: 2,
-    cols: 3,
-    data: [
-      [1, 2, 3],
-      [4, 5, 6]
-    ]
-  };
-
-  const matrixB = {
-    rows: 3,
-    cols: 2,
-    data: [
-      [7, 8],
-      [9, 10],
-      [11, 12]
-    ]
-  };
-
-  const result = multiplyMatrices(matrixA, matrixB, wasmInstance);
-  console.log('Resultant Matrix:', result);
-}
-
-module.exports = {
-  loadWasm,
-  multiplyMatrices,
-  initializeWasmComputeEngine,
-  exampleUsage
-};
+// Uncomment the following line to run the example when the module is executed directly.
+// exampleUsage();
