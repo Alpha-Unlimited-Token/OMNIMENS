@@ -218,6 +218,8 @@ app.use(authMiddleware);
 
 // ── API ROUTES ────────────────────────────────────────────────────────────────
 app.use("/api", router);
+// Also handle requests prefixed with /godflesh/api (from the godflesh frontend in production)
+app.use("/godflesh/api", router);
 
 // ── GLOBAL ERROR HANDLER ──────────────────────────────────────────────────────
 app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
