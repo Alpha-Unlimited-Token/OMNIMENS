@@ -8,7 +8,7 @@
  * UNAUTHORIZED USE OR REPRODUCTION IS STRICTLY PROHIBITED.
  * ============================================================
  */
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, createContext, useContext, useMemo } from "react";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
@@ -43,6 +43,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ControlHub, loadHubSettingsFromStorage, saveHubSettingsToStorage, type HubSettings } from "@/components/control-hub";
 import { SmartTemplates } from "@/components/smart-templates";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+
+// ── Active Project Context ─────────────────────────────────────────────────────
+type ActiveProject = { id: number; name: string } | null;
+const ActiveProjectCtx = createContext<ActiveProject>(null);
+function useActiveProject() { return useContext(ActiveProjectCtx); }
 
 // ── Small reusable badges ──────────────────────────────────────────────────────
 
@@ -1745,6 +1750,7 @@ function CodeBlockWithRun({ code, language }: { code: string; language: string }
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<{ stdout: string; stderr: string; exitCode: number; durationMs: number } | null>(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const activeProject = useActiveProject();
   const isRunnable = ["javascript", "js", "typescript", "ts", "node"].includes(language.toLowerCase());
 
   const runCode = async () => {
@@ -1774,14 +1780,24 @@ function CodeBlockWithRun({ code, language }: { code: string; language: string }
       <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/8">
         <span className="text-[10px] font-mono text-white/60 uppercase tracking-wider">{language || "code"}</span>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowSaveModal(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono text-white/50 hover:text-primary border border-white/10 hover:border-primary/40 rounded transition-colors"
-            title="Save to Project"
-          >
-            <FolderOpen className="w-3 h-3" />
-            SAVE
-          </button>
+          {activeProject ? (
+            <span
+              className="flex items-center gap-1.5 px-2 py-1 text-[9px] font-mono text-green-400/80 border border-green-500/20 bg-green-500/5 rounded"
+              title={`Auto-saving to: ${activeProject.name}`}
+            >
+              <div className="w-1 h-1 rounded-full bg-green-400" style={{ boxShadow: "0 0 4px #4ade80" }} />
+              {activeProject.name}
+            </span>
+          ) : (
+            <button
+              onClick={() => setShowSaveModal(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono text-white/50 hover:text-primary border border-white/10 hover:border-primary/40 rounded transition-colors"
+              title="Save to Project"
+            >
+              <FolderOpen className="w-3 h-3" />
+              SAVE
+            </button>
+          )}
           {isRunnable && (
             <button
               onClick={runCode}
@@ -1936,6 +1952,8 @@ function LeftPanel({
   onDeleteConversation,
   convSearch,
   onConvSearchChange,
+  activeProject,
+  onSetActiveProject,
 }: {
   persona: string;
   onPersonaChange: (p: string) => void;
@@ -1952,6 +1970,8 @@ function LeftPanel({
   onDeleteConversation: (id: number) => void;
   convSearch: string;
   onConvSearchChange: (s: string) => void;
+  activeProject: ActiveProject;
+  onSetActiveProject: (p: ActiveProject) => void;
 }) {
   const personas = Object.keys(PERSONA_NAMES);
   const filteredConversations = conversations.filter(c =>
@@ -1959,6 +1979,14 @@ function LeftPanel({
   );
 
   const [panelTab, setPanelTab] = useState<"chats"|"mode"|"skills"|"tools">("chats");
+  const [projects, setProjects] = useState<{ id: number; name: string }[]>([]);
+  const [showProjectPicker, setShowProjectPicker] = useState(false);
+  useEffect(() => {
+    fetch("/api/omnimens/projects", { credentials: "include" })
+      .then(r => r.json())
+      .then(d => setProjects(Array.isArray(d) ? d : []))
+      .catch(() => {});
+  }, []);
   const [skillSearch, setSkillSearch] = useState("");
   const filteredSkills = OMNIMENS_SKILLS.filter(s =>
     !skillSearch || s.name.toLowerCase().includes(skillSearch.toLowerCase()) || s.category.toLowerCase().includes(skillSearch.toLowerCase()) || s.desc.toLowerCase().includes(skillSearch.toLowerCase())
@@ -2006,6 +2034,69 @@ function LeftPanel({
         {/* ── CHATS TAB ── */}
         {panelTab === "chats" && (
           <div className="space-y-3">
+            {/* Active Project Picker */}
+            <div className="rounded-xl border border-white/8 bg-white/3 overflow-hidden">
+              <div className="flex items-center justify-between px-2.5 py-2 border-b border-white/5">
+                <div className="flex items-center gap-1.5">
+                  <FolderOpen className="w-3 h-3 text-primary/60" />
+                  <span className="text-[9px] font-mono font-bold tracking-widest text-white/50">WORKING PROJECT</span>
+                </div>
+                {activeProject && (
+                  <button
+                    onClick={() => onSetActiveProject(null)}
+                    className="text-white/25 hover:text-white/60 transition-colors"
+                    title="Clear active project"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+              {activeProject ? (
+                <div className="px-2.5 py-2">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" style={{ boxShadow: "0 0 6px #4ade80" }} />
+                    <span className="text-[10px] font-mono font-bold text-green-400 truncate">{activeProject.name}</span>
+                  </div>
+                  <p className="text-[8px] font-mono text-white/30 mt-0.5">Code auto-saves here</p>
+                </div>
+              ) : (
+                <div className="px-2.5 py-2">
+                  {showProjectPicker ? (
+                    <div className="space-y-1.5">
+                      {projects.length === 0 ? (
+                        <p className="text-[9px] font-mono text-white/30 text-center py-2">No projects yet</p>
+                      ) : (
+                        <div className="space-y-0.5 max-h-28 overflow-y-auto omnimens-scrollbar">
+                          {projects.map(p => (
+                            <button
+                              key={p.id}
+                              onClick={() => { onSetActiveProject(p); setShowProjectPicker(false); }}
+                              className="w-full text-left px-2 py-1.5 rounded-lg text-[9px] font-mono text-white/70 hover:text-white hover:bg-primary/10 hover:border-primary/20 border border-transparent transition-all truncate"
+                            >
+                              {p.name}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      <button
+                        onClick={() => setShowProjectPicker(false)}
+                        className="w-full text-[8px] font-mono text-white/30 hover:text-white/50 transition-colors py-1"
+                      >
+                        cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setShowProjectPicker(true)}
+                      className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[9px] font-mono text-white/35 hover:text-primary/70 transition-colors border border-dashed border-white/10 hover:border-primary/25 rounded-lg"
+                    >
+                      <Plus className="w-3 h-3" /> Set project
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
             {conversations.length > 0 && (
               <div>
                 <div className="relative mb-2">
@@ -2743,6 +2834,8 @@ export default function Chat() {
   const lastSpokenIdRef = useRef<string | null>(null);
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
+  const [activeProject, setActiveProject] = useState<ActiveProject>(null);
+  const autoSavedMsgIds = useRef<Set<number>>(new Set());
   const [showControlHub, setShowControlHub] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [hubSettings, setHubSettings] = useState<HubSettings>(() => loadHubSettingsFromStorage());
@@ -2963,6 +3056,48 @@ export default function Chat() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
+  // Auto-save to active project: fires when AI finishes a response
+  useEffect(() => {
+    if (!activeProject || isTyping || messages.length === 0) return;
+    const last = messages[messages.length - 1];
+    if (last.role !== "assistant") return;
+    const msgKey = last.id ?? messages.length;
+    if (autoSavedMsgIds.current.has(msgKey as number)) return;
+    const content = last.content || "";
+    const codeBlocks = [...content.matchAll(/```(\w+)?\n([\s\S]*?)```/g)];
+    if (codeBlocks.length === 0) return;
+    autoSavedMsgIds.current.add(msgKey as number);
+    const extMap: Record<string, string> = {
+      javascript: "js", js: "js", typescript: "ts", ts: "ts",
+      tsx: "tsx", jsx: "jsx", html: "html", css: "css",
+      python: "py", py: "py", json: "json", sql: "sql",
+      markdown: "md", md: "md", bash: "sh", shell: "sh",
+      yaml: "yaml", yml: "yaml", svg: "svg",
+    };
+    const defaultNames: Record<string, string> = {
+      javascript: "script.js", js: "script.js", typescript: "script.ts", ts: "script.ts",
+      tsx: "component.tsx", jsx: "component.jsx", html: "index.html", css: "style.css",
+      python: "main.py", py: "main.py", json: "data.json", sql: "query.sql",
+      markdown: "README.md", md: "README.md", bash: "run.sh", shell: "run.sh",
+      yaml: "config.yaml", yml: "config.yaml", svg: "image.svg",
+    };
+    const usedNames = new Set<string>();
+    codeBlocks.forEach(([, lang, code]) => {
+      const language = (lang || "txt").toLowerCase();
+      const ext = extMap[language] || language;
+      let filename = defaultNames[language] || `file.${ext}`;
+      let suffix = 2;
+      while (usedNames.has(filename)) { filename = filename.replace(`.${ext}`, `_${suffix++}.${ext}`); }
+      usedNames.add(filename);
+      fetch(`/api/omnimens/projects/${activeProject.id}/files`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename, content: code.trim(), language }),
+      }).catch(console.error);
+    });
+  }, [messages, isTyping, activeProject]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files || []);
     setPendingFiles((prev) => [...prev, ...selected].slice(0, 10));
@@ -2994,6 +3129,7 @@ export default function Chat() {
   );
 
   return (
+    <ActiveProjectCtx.Provider value={activeProject}>
     <Layout>
       {/* 3-panel workspace */}
       <div className="flex flex-1 overflow-hidden" style={{ height: "calc(100vh - 4rem)" }}>
@@ -3025,6 +3161,8 @@ export default function Chat() {
                 onDeleteConversation={handleDeleteConversation}
                 convSearch={convSearch}
                 onConvSearchChange={setConvSearch}
+                activeProject={activeProject}
+                onSetActiveProject={setActiveProject}
               />
             </motion.div>
           )}
@@ -3855,6 +3993,7 @@ export default function Chat() {
         )}
       </AnimatePresence>
     </Layout>
+    </ActiveProjectCtx.Provider>
   );
 }
 
