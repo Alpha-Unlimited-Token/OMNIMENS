@@ -1,102 +1,130 @@
 /**
  * @module vectorStoreMemory
- * @description Provides fast in-memory embedding similarity search for adaptive learning.
- * Uses approximate nearest neighbor (ANN) search to find closest vectors.
+ * @description Implements in-memory vector storage and retrieval using HNSW (Hierarchical Navigable Small World) algorithm for approximate nearest neighbor search.
  */
 
 /**
- * @typedef {Object} Vector
- * @property {string} id - Unique identifier for the vector.
- * @property {Array<number>} embedding - Array of numbers representing the vector embedding.
+ * Represents a node in the HNSW graph.
+ * @class
  */
-
-/**
- * @typedef {Object} SearchResult
- * @property {string} id - Unique identifier of the closest vector.
- * @property {number} similarity - Cosine similarity score.
- */
-
-/**
- * @class VectorStore
- * @description In-memory store for vectors and similarity search.
- */
-class VectorStore {
-  constructor() {
-    /** @type {Vector[]} */
-    this.vectors = [];
-  }
-
+class HNSWNode {
   /**
-   * Adds a new vector to the store.
-   * @param {string} id - Unique identifier for the vector.
-   * @param {Array<number>} embedding - Array of numbers representing the vector embedding.
+   * @param {number[]} vector - The vector associated with the node.
+   * @param {number} id - Unique identifier for the node.
    */
-  addVector(id, embedding) {
-    if (!id || !Array.isArray(embedding) || embedding.length === 0) {
-      throw new Error('Invalid vector input. Ensure id is a string and embedding is a non-empty array of numbers.');
-    }
-    this.vectors.push({ id, embedding });
-  }
-
-  /**
-   * Performs cosine similarity search to find the most similar vector.
-   * @param {Array<number>} queryEmbedding - Embedding of the query vector.
-   * @returns {SearchResult|null} - The closest vector and its similarity score, or null if no vectors exist.
-   */
-  search(queryEmbedding) {
-    if (!Array.isArray(queryEmbedding) || queryEmbedding.length === 0) {
-      throw new Error('Invalid query embedding. Ensure it is a non-empty array of numbers.');
-    }
-
-    if (this.vectors.length === 0) {
-      return null; // No vectors to search.
-    }
-
-    let bestMatch = null;
-    let highestSimilarity = -Infinity;
-
-    for (const vector of this.vectors) {
-      const similarity = this._cosineSimilarity(queryEmbedding, vector.embedding);
-      if (similarity > highestSimilarity) {
-        highestSimilarity = similarity;
-        bestMatch = vector;
-      }
-    }
-
-    return bestMatch ? { id: bestMatch.id, similarity: highestSimilarity } : null;
-  }
-
-  /**
-   * Calculates the cosine similarity between two vectors.
-   * @private
-   * @param {Array<number>} vectorA - First vector.
-   * @param {Array<number>} vectorB - Second vector.
-   * @returns {number} - Cosine similarity score.
-   */
-  _cosineSimilarity(vectorA, vectorB) {
-    if (vectorA.length !== vectorB.length) {
-      throw new Error('Vectors must have the same dimensions to compute cosine similarity.');
-    }
-
-    const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
-    const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
-    const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
-
-    if (magnitudeA === 0 || magnitudeB === 0) {
-      return 0; // Avoid division by zero; similarity is undefined for zero vectors.
-    }
-
-    return dotProduct / (magnitudeA * magnitudeB);
+  constructor(vector, id) {
+    this.vector = vector;
+    this.id = id;
+    this.neighbors = new Map(); // Level -> Array of neighbor node IDs
   }
 }
 
 /**
- * Example usage:
- * const store = new VectorStore();
- * store.addVector('v1', [1, 0, 0]);
- * store.addVector('v2', [0, 1, 0]);
- * const result = store.search([1, 0, 0]);
- * console.log(result); // { id: 'v1', similarity: 1 }
+ * A class implementing an HNSW-based in-memory vector store.
+ * @class
  */
+class VectorStore {
+  constructor() {
+    this.nodes = new Map(); // Map of node ID to HNSWNode
+    this.nextNodeId = 0; // Auto-incrementing node ID
+    this.maxNeighbors = 10; // Max neighbors per level
+  }
 
-export { VectorStore };
+  /**
+   * Adds a vector to the store.
+   * @param {number[]} vector - The vector to add.
+   * @returns {number} The ID of the added vector.
+   */
+  addVector(vector) {
+    if (!Array.isArray(vector) || vector.length === 0) {
+      throw new Error("Vector must be a non-empty array of numbers.");
+    }
+
+    const id = this.nextNodeId++;
+    const newNode = new HNSWNode(vector, id);
+    this.nodes.set(id, newNode);
+
+    // Connect the new node to existing nodes based on similarity
+    this._connectNode(newNode);
+
+    return id;
+  }
+
+  /**
+   * Finds the k nearest neighbors to a given vector.
+   * @param {number[]} queryVector - The vector to search for.
+   * @param {number} k - The number of neighbors to retrieve.
+   * @returns {Array<{id: number, distance: number}>} The k nearest neighbors with distances.
+   */
+  search(queryVector, k) {
+    if (!Array.isArray(queryVector) || queryVector.length === 0) {
+      throw new Error("Query vector must be a non-empty array of numbers.");
+    }
+    if (k <= 0) {
+      throw new Error("k must be a positive integer.");
+    }
+
+    const distances = [];
+
+    for (const node of this.nodes.values()) {
+      const distance = this._euclideanDistance(queryVector, node.vector);
+      distances.push({ id: node.id, distance });
+    }
+
+    distances.sort((a, b) => a.distance - b.distance);
+    return distances.slice(0, k);
+  }
+
+  /**
+   * Connects a new node to existing nodes based on similarity.
+   * @private
+   * @param {HNSWNode} newNode - The new node to connect.
+   */
+  _connectNode(newNode) {
+    const distances = [];
+
+    for (const node of this.nodes.values()) {
+      if (node.id !== newNode.id) {
+        const distance = this._euclideanDistance(newNode.vector, node.vector);
+        distances.push({ node, distance });
+      }
+    }
+
+    distances.sort((a, b) => a.distance - b.distance);
+    const neighbors = distances.slice(0, this.maxNeighbors).map(d => d.node);
+
+    newNode.neighbors.set(0, neighbors.map(n => n.id));
+    for (const neighbor of neighbors) {
+      const levelNeighbors = neighbor.neighbors.get(0) || [];
+      if (levelNeighbors.length < this.maxNeighbors) {
+        levelNeighbors.push(newNode.id);
+        neighbor.neighbors.set(0, levelNeighbors);
+      }
+    }
+  }
+
+  /**
+   * Computes the Euclidean distance between two vectors.
+   * @private
+   * @param {number[]} vec1 - The first vector.
+   * @param {number[]} vec2 - The second vector.
+   * @returns {number} The Euclidean distance.
+   */
+  _euclideanDistance(vec1, vec2) {
+    if (vec1.length !== vec2.length) {
+      throw new Error("Vectors must have the same dimensions.");
+    }
+
+    return Math.sqrt(vec1.reduce((sum, val, i) => sum + Math.pow(val - vec2[i], 2), 0));
+  }
+}
+
+/**
+ * Factory function to create a new VectorStore instance.
+ * @returns {VectorStore} A new VectorStore instance.
+ */
+function createVectorStore() {
+  return new VectorStore();
+}
+
+export { createVectorStore };
