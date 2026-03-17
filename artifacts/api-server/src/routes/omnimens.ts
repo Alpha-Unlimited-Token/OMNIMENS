@@ -2158,6 +2158,36 @@ router.get("/omnimens/pricing", async (_req, res) => {
       { amountCents: 2500, label: "$25", credits: 2500 },
       { amountCents: 5000, label: "$50", credits: 5000 },
     ],
+    creditPacks: [
+      {
+        id: "spark",
+        label: "SPARK",
+        price: "$3",
+        credits: 300,
+        priceId: process.env.STRIPE_PRICE_SPARK || "",
+        desc: "Quick boost for light users",
+        color: "blue",
+      },
+      {
+        id: "surge",
+        label: "SURGE",
+        price: "$10",
+        credits: 1000,
+        priceId: process.env.STRIPE_PRICE_SURGE || "",
+        desc: "Best value for regular use",
+        color: "violet",
+        popular: true,
+      },
+      {
+        id: "apex",
+        label: "APEX",
+        price: "$30",
+        credits: 3000,
+        priceId: process.env.STRIPE_PRICE_APEX || "",
+        desc: "Maximum power for heavy users",
+        color: "amber",
+      },
+    ],
   });
 });
 
@@ -2517,8 +2547,8 @@ router.post("/omnimens/checkout", async (req, res) => {
     const proto = req.headers["x-forwarded-proto"] || "https";
     const host = req.headers["x-forwarded-host"] || req.headers.host || "";
     const baseUrl = `${proto}://${host}`;
-    const successUrl = `${baseUrl}/omnimens/pricing?success=true&session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${baseUrl}/omnimens/pricing?cancelled=true`;
+    const successUrl = `${baseUrl}/godflesh/pricing?pack_success=true&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${baseUrl}/godflesh/pricing?pack_cancelled=true`;
 
     const pack = packFromPriceId(priceId);
     const session = await stripe.checkout.sessions.create({

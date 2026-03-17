@@ -12,7 +12,7 @@ import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const API = (path: string) => `/godflesh/api${path}`;
+const API = (path: string) => `/api${path}`;
 
 function useBilling() {
   return useQuery({
@@ -66,6 +66,22 @@ function useRemoveWallet() {
       const d = await r.json();
       if (!r.ok) throw new Error(d.error || "Failed");
       return d;
+    },
+  });
+}
+
+function useCheckout() {
+  return useMutation({
+    mutationFn: async (priceId: string) => {
+      const r = await fetch(API("/omnimens/checkout"), {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceId }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || "Checkout failed");
+      return d as { url: string };
     },
   });
 }
@@ -346,6 +362,7 @@ export default function Pricing() {
   const { mutate: confirmWallet } = useConfirmWallet();
   const { mutate: removeWallet, isPending: isRemoving } = useRemoveWallet();
   const { mutate: manualTopup, isPending: isTopupping } = useManualTopup();
+  const { mutate: checkout, isPending: isCheckingOut, variables: checkoutVar } = useCheckout();
 
   const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
   const showToast = (type: "success" | "error", msg: string) => {
@@ -375,6 +392,19 @@ export default function Pricing() {
     } else if (walletResult === "cancelled") {
       window.history.replaceState(null, "", window.location.pathname);
       showToast("error", "Wallet setup cancelled. Your account is unchanged.");
+    }
+
+    // Handle credit pack checkout return
+    const packSuccess = searchParams.get("pack_success");
+    const packCancelled = searchParams.get("pack_cancelled");
+    if (packSuccess === "true") {
+      window.history.replaceState(null, "", window.location.pathname);
+      showToast("success", "Payment successful! Your credits will appear in your account within a few seconds.");
+      queryClient.invalidateQueries({ queryKey: ["/api/omnimens/billing"] });
+      refetchBilling();
+    } else if (packCancelled === "true") {
+      window.history.replaceState(null, "", window.location.pathname);
+      showToast("error", "Purchase cancelled. Your account is unchanged.");
     }
   }, []);
 
@@ -481,6 +511,74 @@ export default function Pricing() {
               SIGN IN / CREATE ACCOUNT
               <ChevronRight className="w-4 h-4 ml-2" />
             </Button>
+          </div>
+        )}
+
+        {/* Credit packs */}
+        {pricingData?.creditPacks && !pricingLoading && (
+          <div className="w-full max-w-5xl mb-12">
+            <div className="flex items-center gap-3 mb-6">
+              <Zap className="w-5 h-5 text-primary" />
+              <h2 className="font-mono font-bold text-white tracking-widest text-sm">CREDIT PACKS — BUY ONCE, NEVER EXPIRE</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {(pricingData.creditPacks as Array<{
+                id: string; label: string; price: string; credits: number;
+                priceId: string; desc: string; color: string; popular?: boolean;
+              }>).map(pack => {
+                const buying = isCheckingOut && checkoutVar === pack.priceId;
+                const colorMap: Record<string, string> = {
+                  blue: "border-blue-500/40 bg-blue-500/5 hover:border-blue-500/60",
+                  violet: "border-primary/50 bg-primary/5 hover:border-primary/70",
+                  amber: "border-amber-400/40 bg-amber-400/5 hover:border-amber-400/60",
+                };
+                const badgeMap: Record<string, string> = {
+                  blue: "text-blue-400 border-blue-500/30 bg-blue-500/10",
+                  violet: "text-primary border-primary/30 bg-primary/10",
+                  amber: "text-amber-400 border-amber-400/30 bg-amber-400/10",
+                };
+                return (
+                  <div
+                    key={pack.id}
+                    className={`relative rounded-2xl border p-7 transition-all ${colorMap[pack.color] || colorMap.violet}`}
+                  >
+                    {pack.popular && (
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-black font-mono text-xs font-bold px-3 py-1 rounded-full tracking-widest">
+                        MOST POPULAR
+                      </div>
+                    )}
+                    <div className={`inline-flex items-center gap-1.5 border rounded-full px-2.5 py-0.5 font-mono text-xs font-bold tracking-widest mb-4 ${badgeMap[pack.color] || badgeMap.violet}`}>
+                      <Zap className="w-3 h-3" />
+                      {pack.label}
+                    </div>
+                    <div className="font-mono font-black text-white text-4xl mb-1">{pack.price}</div>
+                    <div className="font-mono text-white/70 text-sm mb-1">{pack.credits.toLocaleString()} credits</div>
+                    <div className="text-xs font-mono text-white/50 mb-6">{pack.desc}</div>
+                    <button
+                      onClick={() => {
+                        if (!isAuthenticated) { setLocation("/login"); return; }
+                        if (!pack.priceId) { showToast("error", "This pack is temporarily unavailable."); return; }
+                        checkout(pack.priceId, {
+                          onSuccess: (d) => { window.location.href = d.url; },
+                          onError: (e: any) => showToast("error", e.message || "Checkout failed. Please try again."),
+                        });
+                      }}
+                      disabled={buying}
+                      className={`w-full py-3 rounded-xl font-mono font-bold text-sm tracking-widest transition-all disabled:opacity-50 ${
+                        pack.popular
+                          ? "bg-primary text-black hover:bg-primary/90"
+                          : "bg-white/10 text-white hover:bg-white/15 border border-white/10"
+                      }`}
+                    >
+                      {buying ? "OPENING..." : isAuthenticated ? `BUY ${pack.label}` : "SIGN IN TO BUY"}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="text-xs font-mono text-white/40 text-center mt-4">
+              One-time purchase · Credits never expire · Processed securely by Stripe
+            </p>
           </div>
         )}
 
