@@ -213,6 +213,12 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", platform: "OMNIMENS", timestamp: new Date().toISOString() });
 });
 
+// ── GOOGLE SEARCH CONSOLE VERIFICATION ───────────────────────────────────────
+app.get("/googleb0b7c87dcdf2b2bb.html", (_req, res) => {
+  res.set("Content-Type", "text/html");
+  res.send("google-site-verification: googleb0b7c87dcdf2b2bb.html");
+});
+
 // ── AUTH MIDDLEWARE ───────────────────────────────────────────────────────────
 app.use(authMiddleware);
 
