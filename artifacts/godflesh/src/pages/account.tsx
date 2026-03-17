@@ -139,7 +139,7 @@ export default function Account() {
   const [theme, setTheme] = useState<"dark"|"auto">("dark");
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) setLocation("/");
+    if (!isLoading && !isAuthenticated) setLocation("/login");
   }, [isLoading, isAuthenticated, setLocation]);
 
   useEffect(() => {
@@ -488,7 +488,7 @@ export default function Account() {
                         </div>
                       </div>
                     </div>
-                    <Button onClick={() => setLocation("/omnimens/pricing")} size="sm" variant={(status as any)?.credits < 100 ? "default" : "secondary"}>
+                    <Button onClick={() => setLocation("/pricing")} size="sm" variant={(status as any)?.credits < 100 ? "default" : "secondary"}>
                       {(status as any)?.credits < 100 ? "ADD CREDITS" : "MANAGE WALLET"}
                     </Button>
                   </div>
@@ -511,7 +511,7 @@ export default function Account() {
                       )}
                     </div>
                     {!(billing as any)?.hasWallet && (
-                      <button onClick={() => setLocation("/omnimens/pricing")} className="text-xs font-mono text-primary hover:underline">
+                      <button onClick={() => setLocation("/pricing")} className="text-xs font-mono text-primary hover:underline">
                         connect →
                       </button>
                     )}

@@ -189,10 +189,10 @@ export default function FAQ() {
               <div className="grid md:grid-cols-2 gap-4">
                 <FeatureCard
                   icon={<User className="w-4 h-4" />}
-                  title="Sign In with Replit"
+                  title="Sign In — Free to Start"
                   badge="FREE"
                   badgeColor="bg-green-400/20 text-green-400"
-                  description="Click CONNECT in the top navigation and sign in with your Replit account. You'll receive 2,000 free credits instantly — no card required."
+                  description="Click CONNECT in the top navigation. Sign in with your email or Google account. You'll receive 2,000 free credits instantly — no card required."
                 />
                 <FeatureCard
                   icon={<MessageSquare className="w-4 h-4" />}
@@ -639,7 +639,7 @@ export default function FAQ() {
                 <FeatureCard
                   icon={<User className="w-4 h-4" />}
                   title="Authentication"
-                  description="Sign-in is powered by Replit's secure OAuth system. No passwords are stored by OMNIMENS — authentication is handled entirely by Replit's identity infrastructure."
+                  description="Sign-in supports email/password and Google OAuth. Passwords are bcrypt-hashed and never stored in plaintext. Google sign-in uses secure OAuth 2.0 — no OMNIMENS system ever touches your Google password."
                 />
               </div>
             </Section>
@@ -647,7 +647,7 @@ export default function FAQ() {
             {/* ── FAQ ── */}
             <Section id="faq" icon={<HelpCircle className="w-4 h-4 text-white/60" />} title="Frequently Asked Questions" color="bg-white/5">
               <div className="space-y-3">
-                <FaqItem q="Do I need a credit card to start?" a="No. Every account gets 2,000 free credits every month automatically when you sign in with Replit. A card is only needed if you want to add more credits after the free grant is used." />
+                <FaqItem q="Do I need a credit card to start?" a="No. Every account gets 2,000 free credits every month automatically when you sign in. A card is only needed if you want to add more credits after the free grant is used." />
                 <FaqItem q="What's the difference between free models and GPT-4o?" a="Free models (Llama 3.3 70B, Mistral, Mixtral) cost 0 credits and are surprisingly capable — great for most everyday tasks. GPT-4o and GPT-4.1 are OpenAI's latest frontier models, offering the highest accuracy, reasoning, and instruction-following, especially for complex tasks like coding, research, and nuanced writing." />
                 <FaqItem q="What happens if I run out of credits?" a="Your chat will pause until you add more credits. If you've enabled Auto Top-up, your balance is automatically refilled. Your conversations, memories, and settings are all preserved — nothing is lost." />
                 <FaqItem q="What does COGNISYNC™ actually do?" a="COGNISYNC™ reads your message in real time — before the AI responds — and detects what thinking mode is most useful: creative, analytical, urgent, exploratory, or directive. It then injects a calibrated instruction into the AI's system context so the response is shaped for your actual intent, not just your literal words." />

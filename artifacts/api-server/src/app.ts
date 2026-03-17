@@ -131,10 +131,10 @@ const generalLimiter = rateLimit({
   message: { error: "Too many requests. Please slow down." },
 });
 
-// Auth endpoints — strict: 20 req / 15 min
+// Auth endpoints — 200 req / 15 min (SPA checks auth on every page load)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: 200,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many authentication attempts. Try again later." },

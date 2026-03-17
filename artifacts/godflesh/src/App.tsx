@@ -51,6 +51,7 @@ function Router() {
         <Route path="/tools" component={Tools} />
         <Route path="/faq" component={FAQ} />
         <Route path="/dev" component={Developer} />
+        <Route path="/developer" component={Developer} />
         <Route path="/support" component={Support} />
         <Route component={NotFound} />
       </Switch>

@@ -69,7 +69,7 @@ export default function MemoryPage() {
   };
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) navigate("/");
+    if (!isLoading && !isAuthenticated) navigate("/login");
     if (isAuthenticated) fetchMemories();
   }, [isAuthenticated, isLoading]);
 

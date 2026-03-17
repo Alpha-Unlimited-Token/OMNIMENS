@@ -761,7 +761,7 @@ export default function Projects() {
   const [collapsedFolders, setCollapsedFolders] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) setLocation("/");
+    if (!isLoading && !isAuthenticated) setLocation("/login");
   }, [isLoading, isAuthenticated, setLocation]);
 
   const loadProjects = async () => {

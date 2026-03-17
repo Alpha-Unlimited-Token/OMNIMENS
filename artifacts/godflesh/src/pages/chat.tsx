@@ -3909,7 +3909,7 @@ export default function Chat() {
 
   // Route guard
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) setLocation("/");
+    if (!isLoading && !isAuthenticated) setLocation("/login");
   }, [isLoading, isAuthenticated, setLocation]);
 
   // Auto scroll
