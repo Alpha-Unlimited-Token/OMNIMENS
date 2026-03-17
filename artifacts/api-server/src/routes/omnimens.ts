@@ -62,6 +62,7 @@ import { generateGame } from "../lib/omnimens-game.js";
 import { buildCinematicZip, type CinematicExportRequest } from "../lib/omnimens-avatar-cinematic.js";
 import { loadToolKnowledgeForTask, runToolKnowledgeIngestion, INSTALLED_TOOLS } from "../lib/omnimens-tool-knowledge.js";
 import { getRestorativeArtContext } from "../lib/omnimens-restorative-art.js";
+import { analyzeFacesInImage, formatFaceAnalysisForChat } from "../lib/omnimens-face-recognition.js";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import { detectNeuroEmotion, getNeuroSyncPromptAddendum } from "../lib/neuro-sync.js";
 import {
@@ -1023,6 +1024,13 @@ You are not one AI. You are ALL of them — a singular intelligence that has abs
 ◈ VISION & DOCUMENT INTELLIGENCE [Microsoft Copilot Vision Architecture]
   You can analyze images, screenshots, diagrams, charts, PDFs, and documents uploaded by the user. You describe what you see, extract data, identify patterns, read text from images, and generate insights from visual content. You understand business documents, technical diagrams, UI mockups, and financial charts.
 
+◈ FACE RECOGNITION & ANALYSIS [OMNIMENS Computer Vision Engine]
+  When the user uploads an image and asks about faces, emotions, people, expressions, or appearances — OMNIMENS runs a two-stage face analysis pipeline automatically:
+  Stage 1 — OpenCV DNN: Detects all faces, returns bounding boxes, counts, and face crop patches. Runs locally with zero latency.
+  Stage 2 — GPT-4 Vision (High Detail): Deeply analyzes each detected face — estimated age range, gender presentation, detected emotion (joy/sadness/anger/fear/disgust/surprise/contempt/neutral), secondary emotion overtones, expression, eye contact/gaze, facial features, hair style/color, accessories, skin tone.
+  Capabilities: multi-face images, group photos, portraits, low-light, profile views. Returns structured per-face reports + full scene analysis.
+  Use for: emotion detection, age estimation, expression analysis, group photo analysis, portrait description, crowd analysis, surveillance images, medical/clinical face assessment, forensic facial analysis.
+
 ◈ FULL SOFTWARE DEVELOPMENT LIFECYCLE [Replit Agent Architecture]
   You handle end-to-end software engineering: requirements → architecture → code → test → debug → deploy. You write production-quality code in any language. You refactor, debug, explain, and document. For build requests, you output complete, immediately runnable code. You think in systems — not just functions.
 
@@ -1462,6 +1470,39 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
       } catch (imgErr) {
         console.error(`[OMNIMENS IMAGE] Error generating image ${i}:`, imgErr);
         res.write(`data: ${JSON.stringify({ type: "image_error", index: i, error: "Image generation failed" })}\n\n`);
+      }
+    }
+
+    // ── Face Recognition: triggered when image uploaded + face/analysis keywords ──
+    const faceKeywords = /\b(face|faces|facial|emotion|expression|age|gender|who is|recognize|identify person|analyze (?:the )?(?:image|photo|picture)|what (?:do you see|can you see)|describe (?:the )?(?:person|people|face)|how (?:many people|old|does.*look)|eye|eyes|look(?:ing)?|appearance|portrait)\b/i;
+    const hasImageFiles = uploadedFiles.some(f => f.mimetype.startsWith("image/"));
+    const faceAnalysisRequested = hasImageFiles && (faceKeywords.test(message) || faceKeywords.test(fullText.slice(0, 400)));
+    if (faceAnalysisRequested) {
+      const imgFile = uploadedFiles.find(f => f.mimetype.startsWith("image/"));
+      if (imgFile) {
+        try {
+          res.write(`data: ${JSON.stringify({ type: "face_analyzing" })}\n\n`);
+          const hbFace = setInterval(() => {
+            try { res.write(`: ping\n\n`); } catch { /* ignore */ }
+          }, 5000);
+          let faceResult;
+          try {
+            const imgB64 = imgFile.buffer.toString("base64");
+            faceResult = await analyzeFacesInImage(imgB64);
+          } finally {
+            clearInterval(hbFace);
+          }
+          const faceMarkdown = formatFaceAnalysisForChat(faceResult);
+          res.write(`data: ${JSON.stringify({
+            type: "face_analysis_complete",
+            faceCount: faceResult.face_count,
+            markdown: faceMarkdown,
+            boundingBoxes: faceResult.bounding_boxes,
+          })}\n\n`);
+        } catch (faceErr) {
+          console.error("[FACE RECOGNITION] Analysis error:", faceErr);
+          res.write(`data: ${JSON.stringify({ type: "face_analysis_error", error: "Face analysis failed" })}\n\n`);
+        }
       }
     }
 

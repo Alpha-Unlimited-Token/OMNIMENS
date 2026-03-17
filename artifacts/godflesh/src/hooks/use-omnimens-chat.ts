@@ -146,6 +146,13 @@ export type Message = {
   neuroEmotion?: string;
   neuroIntensity?: string;
   suggestions?: string[];
+  // Face recognition
+  analyzingFaces?: boolean;
+  faceAnalysis?: {
+    faceCount: number;
+    markdown: string;
+    boundingBoxes: { face_index: number; x: number; y: number; width: number; height: number; confidence: number }[];
+  };
 };
 
 export type AttachedFile = {
@@ -510,6 +517,37 @@ export function useOmnimensChat(
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
                   if (msg) { msg.generatingGame = false; msg.gamePhase = undefined; }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "face_analyzing") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) msg.analyzingFaces = true;
+                  return newMsgs;
+                });
+
+              } else if (data.type === "face_analysis_complete") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    msg.analyzingFaces = false;
+                    msg.faceAnalysis = {
+                      faceCount: data.faceCount,
+                      markdown: data.markdown,
+                      boundingBoxes: data.boundingBoxes || [],
+                    };
+                  }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "face_analysis_error") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) msg.analyzingFaces = false;
                   return newMsgs;
                 });
 

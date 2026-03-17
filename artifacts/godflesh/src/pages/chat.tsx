@@ -3931,6 +3931,27 @@ export default function Chat() {
                               {msg.generatingImages && <ImageGeneratingBadge />}
                               {msg.generating3d && <Model3DGeneratingBadge />}
                               {msg.generatingGame && <GameGeneratingBadge phase={msg.gamePhase} />}
+                              {msg.analyzingFaces && (
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-purple-500/10 border border-purple-500/30 text-purple-300 mt-2">
+                                  <span className="animate-pulse">👁️</span> Analyzing faces...
+                                </div>
+                              )}
+
+                              {/* Face analysis results */}
+                              {msg.faceAnalysis && (
+                                <div className="mt-4 rounded-xl border border-purple-500/30 bg-purple-500/5 p-4">
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <span className="text-purple-400 text-lg">👁️</span>
+                                    <span className="font-semibold text-purple-300 text-sm">Face Recognition Complete</span>
+                                    <span className="ml-auto px-2 py-0.5 rounded-full text-xs bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                      {msg.faceAnalysis.faceCount} face{msg.faceAnalysis.faceCount !== 1 ? "s" : ""} detected
+                                    </span>
+                                  </div>
+                                  <div className="prose prose-sm prose-invert max-w-none text-xs text-neutral-300 leading-relaxed whitespace-pre-wrap">
+                                    {msg.faceAnalysis.markdown}
+                                  </div>
+                                </div>
+                              )}
 
                               {/* Generated 3D models — interactive Three.js PBR viewer */}
                               {msg.models3d && msg.models3d.length > 0 && (

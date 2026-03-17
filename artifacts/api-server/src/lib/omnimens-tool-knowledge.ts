@@ -197,6 +197,21 @@ export const INSTALLED_TOOLS: ToolDefinition[] = [
     docUrls: [],
     why: "Silent background domain knowledge for mortuary professionals — embalming, restorative art, facial reconstruction, tissue building, mortuary cosmetology. Never surfaced in UI.",
   },
+  {
+    id: "face_recognition",
+    name: "OpenCV Face Recognition & InsightFace Analysis",
+    category: "computer_vision",
+    searchQueries: [
+      "OpenCV face detection Haar cascade DNN res10_300x300 python example code",
+      "InsightFace face analysis age gender emotion recognition python example",
+      "opencv python face recognition emotion detection age estimation complete script",
+      "face landmark detection expression recognition python opencv insightface 2024",
+    ],
+    docUrls: [
+      "https://docs.opencv.org/4.x/d0/dd4/tutorial_dnn_face.html",
+    ],
+    why: "Two-layer face analysis pipeline: OpenCV DNN detects faces + bounding boxes, GPT-4 Vision performs deep semantic analysis (age range, emotion, expression, gender presentation, features, accessories). Triggered automatically when user uploads image with face-related query.",
+  },
 ];
 
 // ── Fetch content from a doc URL ─────────────────────────────────────────────
@@ -422,6 +437,12 @@ export async function loadToolKnowledgeForTask(taskHint: string): Promise<string
       || hint.includes("thanatopract") || hint.includes("mortician") || hint.includes("undertaker")
       || hint.includes("afterlife") || hint.includes("trade embalm") || hint.includes("restorative artist")) {
       relevant.push("tool_restorative_art");
+    }
+    if (hint.includes("face") || hint.includes("facial") || hint.includes("emotion detect") || hint.includes("age detect")
+      || hint.includes("gender detect") || hint.includes("expression") || hint.includes("opencv") || hint.includes("insightface")
+      || hint.includes("face recogn") || hint.includes("face analy") || hint.includes("face detect")
+      || hint.includes("who is this") || hint.includes("how old") || hint.includes("person in")) {
+      relevant.push("tool_face_recognition");
     }
 
     if (relevant.length === 0) return "";
