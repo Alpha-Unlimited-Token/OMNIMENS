@@ -284,9 +284,15 @@ export type AttachedFile = {
 
 export type GpuCompressorFn = (msgs: { role: string; content: string }[]) => Promise<string | null>;
 
+export type OutOfCreditsReason =
+  | { type: "no_wallet" }
+  | { type: "topup_failed"; error: string }
+  | { type: "topup_succeeded"; creditsAdded: number };
+
 export function useOmnimensChat(
   onLimitReached: () => void,
   gpuCompressor?: GpuCompressorFn,
+  onOutOfCredits?: (reason: OutOfCreditsReason) => void,
 ) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -862,8 +868,16 @@ export function useOmnimensChat(
                   return newMsgs;
                 });
 
-              } else if (data.type === "limit_reached" || data.type === "out_of_credits") {
+              } else if (data.type === "limit_reached") {
                 onLimitReached();
+              } else if (data.type === "out_of_credits") {
+                if (data.connectWallet) {
+                  onOutOfCredits?.({ type: "no_wallet" });
+                } else if (data.topupFailed) {
+                  onOutOfCredits?.({ type: "topup_failed", error: data.topupError || "Payment failed" });
+                } else {
+                  onLimitReached();
+                }
 
               } else if (data.type === "done") {
                 setMessages((prev) => {

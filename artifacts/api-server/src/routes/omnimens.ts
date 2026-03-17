@@ -2395,8 +2395,16 @@ router.post("/omnimens/execute-code", async (req, res) => {
 
   // Code execution costs 2 credits minimum (covers compute)
   if (!owner && (user.credits ?? 0) < 2) {
-    res.status(402).json({ error: "Insufficient credits for code execution" });
-    return;
+    if (user.paymentMethodId && user.autoTopupEnabled) {
+      const topup = await attemptAutoTopup(req.user.id);
+      if (!topup.success) {
+        res.status(402).json({ error: "Auto-payment failed. Update your card in Account settings.", topupFailed: true });
+        return;
+      }
+    } else {
+      res.status(402).json({ error: "Insufficient credits. Connect a payment card in Account settings to continue automatically.", connectWallet: true });
+      return;
+    }
   }
 
   const lang = (language || "javascript").toLowerCase();
@@ -2447,8 +2455,21 @@ router.post("/omnimens/deep-research", async (req, res) => {
   // Deep research costs ~30 credits (5 searches + synthesis)
   const RESEARCH_COST = 30;
   if (!owner && (user.credits ?? 0) < RESEARCH_COST) {
-    res.status(402).json({ error: `Deep research requires ${RESEARCH_COST} credits. You have ${user.credits}.` });
-    return;
+    if (user.paymentMethodId && user.autoTopupEnabled) {
+      const topup = await attemptAutoTopup(req.user.id);
+      if (!topup.success) {
+        res.status(402).json({ error: "Auto-payment failed. Update your card in Account settings.", topupFailed: true });
+        return;
+      }
+    } else {
+      res.status(402).json({
+        error: `Deep research requires ${RESEARCH_COST} credits. Connect a payment card in Account settings to top up automatically.`,
+        connectWallet: true,
+        needed: RESEARCH_COST,
+        have: user.credits,
+      });
+      return;
+    }
   }
 
   res.setHeader("Content-Type", "text/event-stream");
