@@ -28,7 +28,7 @@ timeoutMs = 20000
 
 [nix]
 channel = "stable-25_05"
-packages = ["blender", "ffmpeg-full", "fontconfig", "freetype", "gdk-pixbuf", "geos", "glibcLocales", "gtk2-x11", "gumbo", "harfbuzz", "jbig2dec", "lcms2", "libGL", "libGLU", "libimagequant", "libjpeg", "libjpeg_turbo", "libpulseaudio", "libtiff", "libwebp", "libxcrypt", "mupdf", "oneDNN", "openal", "openjpeg", "openscad", "pkg-config", "re2", "swig", "tcl", "tesseract", "tk", "unzip", "xcbuild", "xcodebuild", "xsimd", "zlib", "graphviz", "exiftool"]
+packages = ["ffmpeg-full", "fontconfig", "freetype", "gdk-pixbuf", "geos", "glibcLocales", "gtk2-x11", "gumbo", "harfbuzz", "jbig2dec", "lcms2", "libGL", "libGLU", "libimagequant", "libjpeg", "libjpeg_turbo", "libpulseaudio", "libtiff", "libwebp", "libxcrypt", "mupdf", "oneDNN", "openal", "openjpeg", "pkg-config", "re2", "swig", "tcl", "tesseract", "tk", "unzip", "xcbuild", "xcodebuild", "xsimd", "zlib", "graphviz", "exiftool"]
 
 [userenv]
 

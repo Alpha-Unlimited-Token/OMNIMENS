@@ -30,39 +30,6 @@ export interface ToolDefinition {
 }
 
 export const INSTALLED_TOOLS: ToolDefinition[] = [
-  // ── 3D Software (headless, fully autonomous) ─────────────────────────────
-  {
-    id: "blender",
-    name: "Blender 4.4 (headless bpy Python API)",
-    category: "3d_modeling",
-    searchQueries: [
-      "Blender bpy Python API complete character model script example headless",
-      "Blender Python subdivision surface smooth organic character creature script bpy",
-      "Blender Principled BSDF procedural noise voronoi texture node script complete example",
-      "Blender Python script BMesh extrude loop cut inset detailed mesh modeling",
-      "Blender Python geometry nodes procedural mesh modifier stack complete script",
-    ],
-    docUrls: [
-      "https://docs.blender.org/api/current/bpy.ops.mesh.html",
-      "https://docs.blender.org/api/current/bpy.types.Modifier.html",
-    ],
-    why: "PRIMARY 3D engine — writes sophisticated bpy Python scripts for high-quality characters, organic shapes, PBR materials, modifiers, GLB export. Runs headlessly. Must produce cinema-quality output.",
-  },
-  {
-    id: "openscad",
-    name: "OpenSCAD 2021 (parametric 3D code)",
-    category: "3d_modeling",
-    searchQueries: [
-      "OpenSCAD parametric 3D modeling tutorial examples",
-      "OpenSCAD CSG union difference intersection advanced",
-      "OpenSCAD hull minkowski for loop module library",
-      "OpenSCAD mechanical gear bracket enclosure design",
-    ],
-    docUrls: [
-      "https://openscad.org/documentation.html",
-    ],
-    why: "Parametric 3D engine — writes .scad code for mechanical/geometric/mathematical objects. Runs headlessly, exports STL→GLB.",
-  },
   // ── Python 3D & Math ─────────────────────────────────────────────────────
   {
     id: "trimesh",
@@ -646,8 +613,8 @@ export async function loadToolKnowledgeForTask(taskHint: string): Promise<string
     const relevant: string[] = [];
     const hint = taskHint.toLowerCase();
 
-    if (hint.includes("3d") || hint.includes("model") || hint.includes("mesh") || hint.includes("glb") || hint.includes("stl") || hint.includes("blender") || hint.includes("bpy") || hint.includes("character") || hint.includes("sculpt")) {
-      relevant.push("tool_blender", "tool_openscad", "tool_trimesh", "tool_numpy", "tool_scipy", "tool_shapely", "tool_threejs");
+    if (hint.includes("3d") || hint.includes("model") || hint.includes("mesh") || hint.includes("glb") || hint.includes("stl") || hint.includes("character") || hint.includes("sculpt")) {
+      relevant.push("tool_trimesh", "tool_numpy", "tool_scipy", "tool_shapely", "tool_threejs");
     }
     if (hint.includes("three") || hint.includes("webgl") || hint.includes("scene") || hint.includes("render")) {
       relevant.push("tool_threejs", "tool_gsap");

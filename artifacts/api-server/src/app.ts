@@ -267,8 +267,7 @@ setTimeout(async () => {
 
 setTimeout(async () => {
   console.log("[OMNIMENS] Starting tool knowledge ingestion — learning all installed tools...");
-  // Force-refresh 3D engines first so Blender/OpenSCAD mastery is current and uses latest queries
-  await forceRefreshToolKnowledge(["blender", "openscad", "trimesh"]);
+  await forceRefreshToolKnowledge(["trimesh"]);
   await runToolKnowledgeIngestion();
   setInterval(() => runToolKnowledgeIngestion(), 12 * 60 * 60 * 1000);
 }, 30 * 1000);

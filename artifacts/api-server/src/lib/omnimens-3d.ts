@@ -25,23 +25,7 @@ const execFileAsync = promisify(execFile);
 // ── Tool classifier — GPT-4o decides which 3D tool fits best ─────────────────
 
 async function classifyPromptFor3DTool(prompt: string): Promise<"blender" | "openscad" | "trimesh"> {
-  const p = prompt.toLowerCase();
-
-  // OpenSCAD keywords — technical/parametric/mathematical
-  const openscadKeywords = [
-    "gear", "screw", "bolt", "nut", "bracket", "enclosure", "box", "case",
-    "parametric", "mechanical", "bearing", "casing", "lattice", "fractal",
-    "mathematical", "grid", "honeycomb", "truss", "pipe", "fitting",
-    "architectural", "building", "house", "room", "floor plan",
-    "3d print", "printable", "fdm", "cnc", "engineering"
-  ];
-
-  // Blender — everything else (organic, artistic, characters, vehicles, sci-fi, etc.)
-  const hasOpenSCAD = openscadKeywords.some(k => p.includes(k));
-  if (hasOpenSCAD) return "openscad";
-
-  // Blender handles everything else
-  return "blender";
+  return "trimesh";
 }
 
 export type Generated3DModel = {
