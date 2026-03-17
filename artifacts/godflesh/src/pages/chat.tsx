@@ -44,6 +44,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ControlHub, loadHubSettingsFromStorage, saveHubSettingsToStorage, type HubSettings } from "@/components/control-hub";
 import { SmartTemplates } from "@/components/smart-templates";
 import { useTheme } from "@/hooks/use-theme";
+import { MobileTrigger } from "@/components/mobile-ide";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import hljs from "highlight.js/lib/core";
 import hljsHtml from "highlight.js/lib/languages/xml";
@@ -5513,6 +5514,9 @@ export default function Chat() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Mobile IDE — appears only on small screens */}
+      <MobileTrigger />
     </Layout>
     </ActiveProjectCtx.Provider>
   );

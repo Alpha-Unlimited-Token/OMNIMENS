@@ -4203,6 +4203,81 @@ router.post("/v1/chat", async (req, res) => {
   }
 });
 
+// ─── Owner Mobile IDE Admin Endpoints ────────────────────────────────────────
+
+router.get("/omnimens/admin/tables", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  const ownerId = process.env.REPL_OWNER_ID || "50777126";
+  if (String(req.user.id) !== String(ownerId)) return res.status(403).json({ error: "Owner only" });
+  try {
+    const result = await db.execute(sql`
+      SELECT t.table_name, COALESCE(s.n_live_tup, 0)::int AS row_count
+      FROM information_schema.tables t
+      LEFT JOIN pg_stat_user_tables s ON s.relname = t.table_name
+      WHERE t.table_schema = 'public' AND t.table_type = 'BASE TABLE'
+      ORDER BY t.table_name
+    `);
+    res.json({ tables: result.rows || result });
+  } catch (e: any) {
+    res.status(500).json({ error: "Failed to list tables", details: e?.message });
+  }
+});
+
+router.get("/omnimens/admin/table/:name", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  const ownerId = process.env.REPL_OWNER_ID || "50777126";
+  if (String(req.user.id) !== String(ownerId)) return res.status(403).json({ error: "Owner only" });
+  const name = req.params.name.replace(/[^a-z0-9_]/gi, "");
+  try {
+    const countRes = await db.execute(sql.raw(`SELECT COUNT(*)::int AS count FROM "${name}"`));
+    const dataRes = await db.execute(sql.raw(`SELECT * FROM "${name}" ORDER BY 1 DESC LIMIT 50`));
+    const rows = dataRes.rows || dataRes;
+    const cols = rows.length > 0 ? Object.keys(rows[0] as object) : [];
+    res.json({ columns: cols, rows, total: Number((countRes.rows || countRes)[0]?.count || 0) });
+  } catch (e: any) {
+    res.status(500).json({ error: "Failed to query table", details: e?.message });
+  }
+});
+
+router.get("/omnimens/admin/users", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  const ownerId = process.env.REPL_OWNER_ID || "50777126";
+  if (String(req.user.id) !== String(ownerId)) return res.status(403).json({ error: "Owner only" });
+  try {
+    const users = await db.select({
+      id: omnimensUsers.id,
+      username: omnimensUsers.username,
+      email: omnimensUsers.email,
+      plan: omnimensUsers.plan,
+      credits: omnimensUsers.credits,
+      createdAt: omnimensUsers.createdAt,
+      lastActiveAt: omnimensUsers.lastActiveAt,
+    }).from(omnimensUsers).orderBy(desc(omnimensUsers.lastActiveAt)).limit(200);
+    res.json({ users, total: users.length });
+  } catch (e: any) {
+    res.status(500).json({ error: "Failed to load users" });
+  }
+});
+
+router.get("/omnimens/admin/env-keys", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  const ownerId = process.env.REPL_OWNER_ID || "50777126";
+  if (String(req.user.id) !== String(ownerId)) return res.status(403).json({ error: "Owner only" });
+  const knownKeys = [
+    "SESSION_SECRET", "DATABASE_URL", "AI_INTEGRATIONS_TOKEN", "AI_INTEGRATIONS_URL",
+    "STRIPE_SECRET_KEY", "STRIPE_PUBLISHABLE_KEY", "STRIPE_WEBHOOK_SECRET",
+    "REPLICATE_API_TOKEN", "TOGETHER_API_KEY", "GOOGLE_CLIENT_ID",
+    "STRIPE_PRICE_IGNITE", "STRIPE_PRICE_DEV", "STRIPE_PRICE_ULTRA",
+    "REPL_OWNER_ID", "NODE_ENV",
+  ];
+  const entries = knownKeys.map(key => ({
+    key,
+    set: !!process.env[key],
+    linked: ["REPLICATE_API_TOKEN", "STRIPE_WEBHOOK_SECRET", "TOGETHER_API_KEY", "STRIPE_SECRET_KEY", "STRIPE_PUBLISHABLE_KEY"].includes(key),
+  }));
+  res.json({ secrets: entries });
+});
+
 // ─── Support / Problem Reports ───────────────────────────────────────────────
 
 const VALID_CATEGORIES = ["account", "ai", "billing", "bug", "api", "feature", "other"];
