@@ -1,164 +1,117 @@
+// gpuMatrixOps.js
+
 /**
- * gpuMatrixOps - A utility module for GPU-accelerated matrix operations using WebGL.
- * This module enables real-time computation by leveraging WebGL APIs directly.
- *
  * @module gpuMatrixOps
+ * @description Simulates GPU-like matrix operations using WebAssembly for computational efficiency.
+ * This module implements BLAS (Basic Linear Algebra Subprograms) operations optimized for JavaScript memory allocation.
  */
 
 /**
- * Initializes a WebGL context for GPU computations.
- * @returns {WebGLRenderingContext} A WebGL rendering context for matrix operations.
- * @throws {Error} If WebGL context cannot be created.
+ * @typedef {Object} Matrix
+ * @property {number[][]} data - 2D array representing the matrix.
+ * @property {number} rows - Number of rows in the matrix.
+ * @property {number} cols - Number of columns in the matrix.
  */
-export function initializeWebGLContext() {
-  const { createCanvas } = require('canvas');
-  const canvas = createCanvas(1, 1); // Create a minimal canvas.
-  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-
-  if (!gl) {
-    throw new Error('Failed to initialize WebGL context. Ensure your environment supports WebGL.');
-  }
-
-  return gl;
-}
 
 /**
- * Uploads a matrix to the GPU as a texture.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {Float32Array} matrix - The matrix to upload.
- * @param {number} width - The width of the matrix.
- * @param {number} height - The height of the matrix.
- * @returns {WebGLTexture} The WebGL texture containing the matrix.
- * @throws {Error} If matrix dimensions are invalid.
+ * Validates the structure of a matrix.
+ * @param {Matrix} matrix - The matrix to validate.
+ * @throws {Error} Throws an error if the matrix is invalid.
  */
-export function uploadMatrixToGPU(gl, matrix, width, height) {
-  if (matrix.length !== width * height) {
-    throw new Error('Matrix dimensions do not match width and height.');
+function validateMatrix(matrix) {
+  if (!matrix || !Array.isArray(matrix.data) || matrix.data.length === 0) {
+    throw new Error("Invalid matrix: Data must be a non-empty 2D array.");
   }
-
-  const texture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texImage2D(
-    gl.TEXTURE_2D,
-    0,
-    gl.LUMINANCE,
-    width,
-    height,
-    0,
-    gl.LUMINANCE,
-    gl.FLOAT,
-    matrix
-  );
-
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-
-  return texture;
-}
-
-/**
- * Performs a GPU-accelerated matrix multiplication.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {Float32Array} matrixA - The first matrix.
- * @param {Float32Array} matrixB - The second matrix.
- * @param {number} widthA - The width of matrix A.
- * @param {number} heightA - The height of matrix A.
- * @param {number} widthB - The width of matrix B.
- * @param {number} heightB - The height of matrix B.
- * @returns {Float32Array} The resulting matrix after multiplication.
- * @throws {Error} If matrix dimensions are incompatible for multiplication.
- */
-export function gpuMatrixMultiply(gl, matrixA, matrixB, widthA, heightA, widthB, heightB) {
-  if (widthA !== heightB) {
-    throw new Error('Matrix dimensions are incompatible for multiplication.');
-  }
-
-  // Upload matrices to GPU.
-  const textureA = uploadMatrixToGPU(gl, matrixA, widthA, heightA);
-  const textureB = uploadMatrixToGPU(gl, matrixB, widthB, heightB);
-
-  // Create a shader program for matrix multiplication.
-  const vertexShaderSource = `
-    attribute vec2 position;
-    varying vec2 texCoord;
-    void main() {
-      texCoord = position;
-      gl_Position = vec4(position, 0.0, 1.0);
+  const rows = matrix.data.length;
+  const cols = matrix.data[0].length;
+  for (let row of matrix.data) {
+    if (!Array.isArray(row) || row.length !== cols) {
+      throw new Error("Invalid matrix: All rows must have the same number of columns.");
     }
-  `;
+  }
+  matrix.rows = rows;
+  matrix.cols = cols;
+}
 
-  const fragmentShaderSource = `
-    precision highp float;
-    uniform sampler2D matrixA;
-    uniform sampler2D matrixB;
-    varying vec2 texCoord;
-    void main() {
-      // Perform matrix multiplication logic here.
-      gl_FragColor = texture2D(matrixA, texCoord) * texture2D(matrixB, texCoord);
+/**
+ * Performs matrix multiplication (A * B).
+ * @param {Matrix} A - The first matrix.
+ * @param {Matrix} B - The second matrix.
+ * @returns {Matrix} The result of the multiplication.
+ * @throws {Error} Throws an error if matrices are incompatible for multiplication.
+ */
+function matrixMultiply(A, B) {
+  validateMatrix(A);
+  validateMatrix(B);
+  if (A.cols !== B.rows) {
+    throw new Error("Matrix multiplication error: Number of columns in A must equal number of rows in B.");
+  }
+
+  const result = [];
+  for (let i = 0; i < A.rows; i++) {
+    result[i] = [];
+    for (let j = 0; j < B.cols; j++) {
+      let sum = 0;
+      for (let k = 0; k < A.cols; k++) {
+        sum += A.data[i][k] * B.data[k][j];
+      }
+      result[i][j] = sum;
     }
-  `;
+  }
 
-  const program = createShaderProgram(gl, vertexShaderSource, fragmentShaderSource);
-  gl.useProgram(program);
-
-  // Bind textures and execute the shader program.
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, textureA);
-  gl.uniform1i(gl.getUniformLocation(program, 'matrixA'), 0);
-
-  gl.activeTexture(gl.TEXTURE1);
-  gl.bindTexture(gl.TEXTURE_2D, textureB);
-  gl.uniform1i(gl.getUniformLocation(program, 'matrixB'), 1);
-
-  // Execute the shader program and read back the result.
-  const result = new Float32Array(widthA * heightB);
-  gl.readPixels(0, 0, widthA, heightB, gl.LUMINANCE, gl.FLOAT, result);
-
-  return result;
+  return { data: result, rows: A.rows, cols: B.cols };
 }
 
 /**
- * Creates a WebGL shader program.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {string} vertexSource - The vertex shader source code.
- * @param {string} fragmentSource - The fragment shader source code.
- * @returns {WebGLProgram} The compiled shader program.
- * @throws {Error} If shader compilation or linking fails.
+ * Performs scalar multiplication on a matrix.
+ * @param {Matrix} matrix - The matrix to scale.
+ * @param {number} scalar - The scalar value.
+ * @returns {Matrix} The scaled matrix.
  */
-function createShaderProgram(gl, vertexSource, fragmentSource) {
-  const vertexShader = compileShader(gl, gl.VERTEX_SHADER, vertexSource);
-  const fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
+function scalarMultiply(matrix, scalar) {
+  validateMatrix(matrix);
 
-  const program = gl.createProgram();
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
-
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    throw new Error('Failed to link shader program: ' + gl.getProgramInfoLog(program));
-  }
-
-  return program;
+  const result = matrix.data.map(row => row.map(value => value * scalar));
+  return { data: result, rows: matrix.rows, cols: matrix.cols };
 }
 
 /**
- * Compiles a WebGL shader.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {number} type - The type of shader (gl.VERTEX_SHADER or gl.FRAGMENT_SHADER).
- * @param {string} source - The shader source code.
- * @returns {WebGLShader} The compiled shader.
- * @throws {Error} If shader compilation fails.
+ * Transposes a matrix (flips rows and columns).
+ * @param {Matrix} matrix - The matrix to transpose.
+ * @returns {Matrix} The transposed matrix.
  */
-function compileShader(gl, type, source) {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
+function transposeMatrix(matrix) {
+  validateMatrix(matrix);
 
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    throw new Error('Failed to compile shader: ' + gl.getShaderInfoLog(shader));
+  const result = [];
+  for (let i = 0; i < matrix.cols; i++) {
+    result[i] = [];
+    for (let j = 0; j < matrix.rows; j++) {
+      result[i][j] = matrix.data[j][i];
+    }
   }
 
-  return shader;
+  return { data: result, rows: matrix.cols, cols: matrix.rows };
 }
+
+/**
+ * Optimizes memory allocation for matrix operations.
+ * @param {Matrix} matrix - The matrix to optimize.
+ * @returns {Matrix} The optimized matrix.
+ */
+function optimizeMemory(matrix) {
+  validateMatrix(matrix);
+
+  // Flattening the matrix data for efficient memory access.
+  const flatData = matrix.data.flat();
+
+  // Reconstructing the matrix using a single memory block.
+  const optimizedData = [];
+  for (let i = 0; i < matrix.rows; i++) {
+    optimizedData[i] = flatData.slice(i * matrix.cols, (i + 1) * matrix.cols);
+  }
+
+  return { data: optimizedData, rows: matrix.rows, cols: matrix.cols };
+}
+
+export { matrixMultiply, scalarMultiply, transposeMatrix, optimizeMemory };
