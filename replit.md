@@ -14,7 +14,13 @@ A transcendent sci-fi AI chat platform matching and surpassing the capabilities 
 
 **Frontend:** `artifacts/godflesh/` — React + Vite app at `/godflesh/`  
 **API Routes:** `artifacts/api-server/src/routes/omnimens.ts`  
-**Business model:** Wallet-based auto-topup. $20 free monthly (2,000 credits). Auto-charges saved Stripe card when free credits run out. Monthly loyalty bonuses based on prior month's paid spend (10% cashback, up to $500 free). 3× markup on OpenAI costs = ~67% gross margin, 10% loyalty = ~3.3% cost = always profitable.
+**Business model:** Three revenue streams — Monthly subscriptions (MRR), one-time credit packs, and developer tool credit charges.
+- $20 free monthly grant to all users (2,000 credits). Loyalty bonuses up to $500/month for heavy spenders.
+- 3× markup on AI costs = ~67% gross margin. Dev tools = ~100% margin (pure compute, no API cost).
+- **Monthly Plans (MRR):** IGNITE $9/mo (1,000 cr), DEV $19/mo (2,500 cr), ULTRA $49/mo (7,000 cr).
+- **Credit Packs (one-time):** SPARK $3→300cr, SURGE $10→1,200cr (+20% bonus), APEX $30→4,000cr (+33% bonus).
+- **Dev tool billing:** Code exec 5cr, Web fetch 3cr, Git op 8cr, Sys info 1cr, File op 3cr. Zero API cost = pure profit.
+- **To activate monthly plans:** Run `pnpm --filter @workspace/api-server run seed-stripe` then set env vars: `STRIPE_PRICE_IGNITE`, `STRIPE_PRICE_DEV`, `STRIPE_PRICE_ULTRA`.
 
 **Loyalty Tiers:** BASE ($0 spend → $20 free), SPARK ($10→$20), RISE ($50→$22), SURGE ($100→$25), APEX ($250→$35), ELITE ($500→$50), PRIME ($1K→$100), APEX+ ($2K→$200), LEGEND ($5K→$500).
 

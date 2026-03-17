@@ -157,6 +157,15 @@ const IMAGE_COST_USD               = 0.07;    // ~$0.07 per image (gpt-image-1 m
 // Check replicate.com/pricing periodically and update this value if needed.
 const IMAGE_COST_REPLICATE_USD     = 0.055;   // $0.055/image (Flux 1.1 Pro + safety buffer)
 
+// Developer Platform Tool Credit Costs (no external API — pure server compute = ~100% gross margin)
+const DEV_TOOL_CREDITS: Record<string, number> = {
+  run_code:  5,  // code execution (Python/Node/Bash) · $0.05/run
+  fetch_web: 3,  // web fetch / HTTP API call         · $0.03/req
+  git_op:    8,  // git clone/diff/log/blame           · $0.08/op
+  sys_info:  1,  // system info / process stats        · $0.01/check
+  file_op:   3,  // file diff/zip/convert/validate     · $0.03/op
+};
+
 // Markup: 3× actual cost → ~200% gross margin.
 // Covers OpenAI API fees + Replit hosting + platform overhead + profit.
 const PROFIT_MARKUP = 3.0;
@@ -175,17 +184,33 @@ const MAX_CREDITS_IMAGE_ESTIMATE   = 50;
 
 const FREE_SIGNUP_CREDITS = 50;
 
+// One-time credit packs (buy once, never expire)
+// SURGE and APEX include volume bonuses to reward commitment
 const CREDIT_PACKS: Record<string, number> = {
-  spark: 300,
-  surge: 1000,
-  apex:  3000,
+  spark: 300,   // $3 → 100 cr/$1  (baseline)
+  surge: 1200,  // $10 → 120 cr/$1 (+20% bonus vs SPARK)
+  apex:  4000,  // $30 → 133 cr/$1 (+33% bonus vs SPARK)
+};
+
+// Monthly subscription plans — credits granted on each billing cycle
+const MONTHLY_PLANS: Record<string, { credits: number; label: string; priceCents: number; priceId: () => string }> = {
+  ignite: { credits: 1000, label: "IGNITE", priceCents:  900, priceId: () => process.env.STRIPE_PRICE_IGNITE || "" },
+  dev:    { credits: 2500, label: "DEV",    priceCents: 1900, priceId: () => process.env.STRIPE_PRICE_DEV    || "" },
+  ultra:  { credits: 7000, label: "ULTRA",  priceCents: 4900, priceId: () => process.env.STRIPE_PRICE_ULTRA  || "" },
 };
 
 function packFromPriceId(priceId: string): string {
-  if (priceId === process.env.STRIPE_PRICE_SPARK) return "spark";
-  if (priceId === process.env.STRIPE_PRICE_SURGE) return "surge";
-  if (priceId === process.env.STRIPE_PRICE_APEX)  return "apex";
+  if (priceId === process.env.STRIPE_PRICE_SPARK)  return "spark";
+  if (priceId === process.env.STRIPE_PRICE_SURGE)  return "surge";
+  if (priceId === process.env.STRIPE_PRICE_APEX)   return "apex";
+  if (priceId === process.env.STRIPE_PRICE_IGNITE) return "ignite";
+  if (priceId === process.env.STRIPE_PRICE_DEV)    return "dev";
+  if (priceId === process.env.STRIPE_PRICE_ULTRA)  return "ultra";
   return "unknown";
+}
+
+function planFromId(planId: string) {
+  return MONTHLY_PLANS[planId] ?? null;
 }
 
 export function formatSeconds(secs: number): string {
@@ -2016,6 +2041,20 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
 
     const imagesGenerated = imageMarkers.length;
 
+    // Count developer platform tool invocations (pure server compute — no external API cost)
+    const devRunCodeCount  = [...fullText.matchAll(/\[RUN_CODE:\s*([\s\S]+?)\]/gi)].length;
+    const devFetchWebCount = [...fullText.matchAll(/\[FETCH_WEB:\s*([\s\S]+?)\]/gi)].length;
+    const devGitOpCount    = [...fullText.matchAll(/\[GIT_OP:\s*([\s\S]+?)\]/gi)].length;
+    const devSysInfoCount  = [...fullText.matchAll(/\[SYS_INFO:\s*([\s\S]+?)\]/gi)].length;
+    const devFileOpCount   = [...fullText.matchAll(/\[FILE_OP:\s*([\s\S]+?)\]/gi)].length;
+    const devToolCreditCost = (
+      devRunCodeCount  * DEV_TOOL_CREDITS.run_code  +
+      devFetchWebCount * DEV_TOOL_CREDITS.fetch_web +
+      devGitOpCount    * DEV_TOOL_CREDITS.git_op    +
+      devSysInfoCount  * DEV_TOOL_CREDITS.sys_info  +
+      devFileOpCount   * DEV_TOOL_CREDITS.file_op
+    );
+
     // Pick per-token pricing — Together AI prices are fetched live at startup
     const togetherPricing = isTogetherModel(selectedModel) ? TOGETHER_PRICING(selectedModel as TogetherModel) : null;
     const priceIn  = togetherPricing ? togetherPricing.input
@@ -2053,7 +2092,8 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
 
     // Convert to credits, with minimum floor
     const minCredits = imagesGenerated > 0 ? MIN_CREDITS_IMAGE * imagesGenerated : MIN_CREDITS_MESSAGE;
-    creditCost = Math.max(minCredits, Math.ceil(chargedCostUSD / CREDIT_VALUE_USD));
+    // AI cost (token-based) + dev tool invocations (pure compute markup)
+    creditCost = Math.max(minCredits, Math.ceil(chargedCostUSD / CREDIT_VALUE_USD)) + devToolCreditCost;
 
     if (!owner) {
       const [updatedUser] = await db.update(omnimensUsers)
@@ -2063,10 +2103,18 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
       creditsRemaining = updatedUser?.credits ?? 0;
 
       // Log credit transaction with full cost breakdown
+      const devToolParts = [
+        devRunCodeCount  > 0 ? `${devRunCodeCount}× code exec`  : null,
+        devFetchWebCount > 0 ? `${devFetchWebCount}× web fetch` : null,
+        devGitOpCount    > 0 ? `${devGitOpCount}× git op`       : null,
+        devSysInfoCount  > 0 ? `${devSysInfoCount}× sys info`   : null,
+        devFileOpCount   > 0 ? `${devFileOpCount}× file op`     : null,
+      ].filter(Boolean).join(", ");
       const desc = [
         imagesGenerated > 0 ? `${imagesGenerated} image(s)` : null,
         uploadedFiles.length  > 0 ? `${uploadedFiles.length} file(s)` : null,
         webSearchContext ? "web search" : null,
+        devToolParts || null,
         tokenUsage ? `${tokenUsage.prompt_tokens}in/${tokenUsage.completion_tokens}out tokens` : null,
       ].filter(Boolean).join(", ") || "Chat message";
 
@@ -2457,10 +2505,17 @@ router.get("/omnimens/pricing", async (_req, res) => {
       desc: t.desc,
     })),
     usageCosts: [
-      { label: "CHAT MESSAGE", credits: 10, dollarValue: "0.10" },
-      { label: "IMAGE GENERATION", credits: 100, dollarValue: "1.00" },
-      { label: "FILE ATTACHMENT", credits: 3, dollarValue: "0.03" },
-      { label: "DEEP RESEARCH", credits: 50, dollarValue: "0.50" },
+      { label: "CHAT MESSAGE",    credits: 10,  dollarValue: "0.10", icon: "chat" },
+      { label: "IMAGE GENERATION",credits: 100, dollarValue: "1.00", icon: "image" },
+      { label: "FILE ATTACHMENT", credits: 3,   dollarValue: "0.03", icon: "file" },
+      { label: "DEEP RESEARCH",   credits: 50,  dollarValue: "0.50", icon: "search" },
+    ],
+    devToolCosts: [
+      { label: "CODE EXECUTION",  credits: DEV_TOOL_CREDITS.run_code,  dollarValue: (DEV_TOOL_CREDITS.run_code  * CREDIT_VALUE_USD).toFixed(2), desc: "Python, Node.js, Bash" },
+      { label: "WEB FETCH",       credits: DEV_TOOL_CREDITS.fetch_web, dollarValue: (DEV_TOOL_CREDITS.fetch_web * CREDIT_VALUE_USD).toFixed(2), desc: "Fetch URLs & test APIs" },
+      { label: "GIT OPERATION",   credits: DEV_TOOL_CREDITS.git_op,    dollarValue: (DEV_TOOL_CREDITS.git_op    * CREDIT_VALUE_USD).toFixed(2), desc: "Clone, diff, log, blame" },
+      { label: "SYSTEM INFO",     credits: DEV_TOOL_CREDITS.sys_info,  dollarValue: (DEV_TOOL_CREDITS.sys_info  * CREDIT_VALUE_USD).toFixed(2), desc: "CPU, memory, disk, procs" },
+      { label: "FILE OPERATION",  credits: DEV_TOOL_CREDITS.file_op,   dollarValue: (DEV_TOOL_CREDITS.file_op   * CREDIT_VALUE_USD).toFixed(2), desc: "Diff, ZIP, convert, validate" },
     ],
     topupOptions: [
       { amountCents: 500,  label: "$5",  credits: 500 },
@@ -2468,23 +2523,79 @@ router.get("/omnimens/pricing", async (_req, res) => {
       { amountCents: 2500, label: "$25", credits: 2500 },
       { amountCents: 5000, label: "$50", credits: 5000 },
     ],
+    monthlyPlans: [
+      {
+        id: "ignite",
+        label: "IGNITE",
+        price: "$9",
+        priceCents: 900,
+        creditsPerMonth: 1000,
+        priceId: process.env.STRIPE_PRICE_IGNITE || "",
+        color: "blue",
+        features: [
+          "1,000 credits every month",
+          "GPT-4o + all AI models",
+          "Developer platform tools",
+          "Image generation",
+          "Deep research mode",
+          "Persistent memory",
+        ],
+      },
+      {
+        id: "dev",
+        label: "DEV",
+        price: "$19",
+        priceCents: 1900,
+        creditsPerMonth: 2500,
+        priceId: process.env.STRIPE_PRICE_DEV || "",
+        color: "violet",
+        popular: true,
+        features: [
+          "2,500 credits every month",
+          "Everything in IGNITE",
+          "Priority processing queue",
+          "No per-session rate limits",
+          "Expanded context window",
+          "Advanced agent mode",
+        ],
+      },
+      {
+        id: "ultra",
+        label: "ULTRA",
+        price: "$49",
+        priceCents: 4900,
+        creditsPerMonth: 7000,
+        priceId: process.env.STRIPE_PRICE_ULTRA || "",
+        color: "amber",
+        features: [
+          "7,000 credits every month",
+          "Everything in DEV",
+          "o3 reasoning model access",
+          "API key for integrations",
+          "Highest priority queue",
+          "Early access to new features",
+        ],
+      },
+    ],
     creditPacks: [
       {
         id: "spark",
         label: "SPARK",
         price: "$3",
         credits: 300,
+        rate: "100 cr/$1",
         priceId: process.env.STRIPE_PRICE_SPARK || "",
-        desc: "Quick boost for light users",
+        desc: "Quick boost · no expiry",
         color: "blue",
       },
       {
         id: "surge",
         label: "SURGE",
         price: "$10",
-        credits: 1000,
+        credits: 1200,
+        rate: "120 cr/$1 · +20% bonus",
         priceId: process.env.STRIPE_PRICE_SURGE || "",
-        desc: "Best value for regular use",
+        desc: "Best pack value · no expiry",
         color: "violet",
         popular: true,
       },
@@ -2492,13 +2603,82 @@ router.get("/omnimens/pricing", async (_req, res) => {
         id: "apex",
         label: "APEX",
         price: "$30",
-        credits: 3000,
+        credits: 4000,
+        rate: "133 cr/$1 · +33% bonus",
         priceId: process.env.STRIPE_PRICE_APEX || "",
-        desc: "Maximum power for heavy users",
+        desc: "Maximum power · no expiry",
         color: "amber",
       },
     ],
   });
+});
+
+// ─── Monthly Plan Subscription ────────────────────────────────────────────────
+
+router.post("/omnimens/subscribe-plan", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const { planId } = req.body as { planId: string };
+  const plan = planFromId(planId);
+  if (!plan) { res.status(400).json({ error: "Invalid plan ID" }); return; }
+  const priceId = plan.priceId();
+  if (!priceId) { res.status(400).json({ error: "Plan pricing not yet configured" }); return; }
+  try {
+    const user = await getOrCreateUser(req.user.id, req.user.username);
+    const proto = req.headers["x-forwarded-proto"] || "https";
+    const host = req.headers["x-forwarded-host"] || req.headers.host || "";
+    const baseUrl = `${proto}://${host}`;
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      line_items: [{ price: priceId, quantity: 1 }],
+      ...(user.stripeCustomerId ? { customer: user.stripeCustomerId } : { customer_creation: "always" }),
+      success_url: `${baseUrl}/godflesh/pricing?plan_success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/godflesh/pricing?plan_cancelled=true`,
+      metadata: { userId: req.user.id, planId, purpose: "monthly_plan" },
+    });
+    res.json({ url: session.url });
+  } catch (err: any) {
+    console.error("Subscribe plan error:", err);
+    res.status(500).json({ error: "Failed to create subscription checkout", detail: String(err?.message || err) });
+  }
+});
+
+router.post("/omnimens/confirm-plan", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const { sessionId } = req.body as { sessionId: string };
+  if (!sessionId) { res.status(400).json({ error: "sessionId required" }); return; }
+  try {
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    if (session.status !== "complete") { res.status(400).json({ error: "Session not completed" }); return; }
+    const planId = session.metadata?.planId as string | undefined;
+    const plan = planId ? planFromId(planId) : null;
+    if (!plan) { res.status(400).json({ error: "Unknown plan in session metadata" }); return; }
+    const subscriptionId = typeof session.subscription === "string" ? session.subscription : (session.subscription as any)?.id;
+    const stripeCustomerId = typeof session.customer === "string" ? session.customer : (session.customer as any)?.id || null;
+    const creditsToAdd = plan.credits;
+    const [updatedUser] = await db.update(omnimensUsers)
+      .set({
+        credits: sql`${omnimensUsers.credits} + ${creditsToAdd}`,
+        totalCreditsEarned: sql`${omnimensUsers.totalCreditsEarned} + ${creditsToAdd}`,
+        tier: planId,
+        isPro: true,
+        stripeSubscriptionId: subscriptionId || undefined,
+        ...(stripeCustomerId ? { stripeCustomerId } : {}),
+      })
+      .where(eq(omnimensUsers.id, req.user.id))
+      .returning();
+    await db.insert(omnimensCreditTransactions).values({
+      userId: req.user.id,
+      type: "purchase",
+      credits: creditsToAdd,
+      description: `${plan.label} Monthly Plan — ${creditsToAdd.toLocaleString()} credits (first month)`,
+      stripeSessionId: sessionId,
+      packId: planId,
+    });
+    res.json({ ok: true, planId, planLabel: plan.label, creditsAdded: creditsToAdd, newBalance: updatedUser?.credits ?? creditsToAdd });
+  } catch (err: any) {
+    console.error("Confirm plan error:", err);
+    res.status(500).json({ error: "Failed to confirm plan", detail: String(err?.message || err) });
+  }
 });
 
 // ─── Billing info ─────────────────────────────────────────────────────────────
