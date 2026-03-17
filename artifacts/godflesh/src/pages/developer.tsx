@@ -1049,12 +1049,72 @@ export default function DeveloperPage() {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-white/5 mt-20 py-6">
-        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between text-xs text-white/20 font-mono">
-          <span>© 2026 Alpha Unlimited Technologies LLC — OMNIMENS™ Developer Platform</span>
-          <span>COGNISYNC™ · NEUROSYNC™</span>
+      <footer className="border-t border-white/6 mt-20">
+        <div className="max-w-6xl mx-auto px-6 py-10">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-8">
+            {/* Brand */}
+            <div className="col-span-2 sm:col-span-1">
+              <div className="flex items-center gap-2 mb-3">
+                <Cpu className="w-4 h-4 text-primary" />
+                <span className="font-semibold text-white text-sm tracking-tight">OMNIMENS</span>
+              </div>
+              <p className="text-white/25 text-xs leading-relaxed mb-3">Transcendent AI platform by Alpha Unlimited Technologies LLC.</p>
+              <p className="text-white/15 text-[11px] font-mono">COGNISYNC™ · NEUROSYNC™</p>
+            </div>
+            {/* API */}
+            <div>
+              <p className="text-white/30 text-xs font-mono uppercase tracking-wider mb-3">Developer</p>
+              <div className="space-y-2">
+                {[
+                  { label: "Overview", tab: "overview" },
+                  { label: "API Keys", tab: "keys" },
+                  { label: "Documentation", tab: "docs" },
+                  { label: "Playground", tab: "playground" },
+                  { label: "SDKs", tab: "sdks" },
+                ].map(l => (
+                  <button key={l.tab} onClick={() => setActiveTab(l.tab as DevTab)}
+                    className="block text-white/35 text-xs hover:text-white/65 transition-colors">{l.label}</button>
+                ))}
+              </div>
+            </div>
+            {/* Platform */}
+            <div>
+              <p className="text-white/30 text-xs font-mono uppercase tracking-wider mb-3">Platform</p>
+              <div className="space-y-2">
+                {[
+                  { label: "Home", href: `${window.location.origin}/godflesh/` },
+                  { label: "Chat", href: `${window.location.origin}/godflesh/chat` },
+                  { label: "Pricing", href: `${window.location.origin}/godflesh/pricing` },
+                  { label: "FAQ", href: `${window.location.origin}/godflesh/faq` },
+                  { label: "Account", href: `${window.location.origin}/godflesh/account` },
+                ].map(l => (
+                  <a key={l.label} href={l.href} className="block text-white/35 text-xs hover:text-white/65 transition-colors">{l.label}</a>
+                ))}
+              </div>
+            </div>
+            {/* Support */}
+            <div>
+              <p className="text-white/30 text-xs font-mono uppercase tracking-wider mb-3">Support</p>
+              <div className="space-y-2">
+                <a href={`${window.location.origin}/godflesh/support`}
+                  className="flex items-center gap-1.5 text-xs text-red-400/70 hover:text-red-400 transition-colors font-medium">
+                  <AlertTriangle className="w-3 h-3" /> Report a Problem
+                </a>
+                <a href={`${window.location.origin}/godflesh/faq`} className="block text-white/35 text-xs hover:text-white/65 transition-colors">FAQ</a>
+                <a href={`${window.location.origin}/godflesh/support`} className="block text-white/35 text-xs hover:text-white/65 transition-colors">Contact Us</a>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-white/6 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-white/20 text-xs font-mono">© 2026 Alpha Unlimited Technologies LLC — All rights reserved.</p>
+            <div className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-white/20 text-xs font-mono">API Operational</span>
+            </div>
+          </div>
         </div>
-      </div>
+      </footer>
     </div>
   );
 }

@@ -30,7 +30,7 @@ import { getOrCreateCustomInstructions, saveCustomInstructions, buildCustomInstr
 import { analyzeUserEmotionalState, buildEmotionalContext, loadLearningContext, runLearningCycle } from "../lib/omnimens-learning.js";
 import { loadGeneratedModulesContext, getConsciousnessState, getEvolutionHistory, getGeneratedModules, deactivateModule, runEvolutionCycle } from "../lib/omnimens-evolution.js";
 import { runCouncilAnalysis } from "./council.js";
-import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness, omnimensProjects, omnimensProjectFiles, omnimensApiKeys } from "@workspace/db";
+import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness, omnimensProjects, omnimensProjectFiles, omnimensApiKeys, omnimensProblemReports } from "@workspace/db";
 import {
   loadPhysioContext,
   screenRedFlags,
@@ -3684,6 +3684,45 @@ router.post("/v1/chat", async (req, res) => {
   } catch (e: any) {
     console.error("[Dev API] Error:", e?.message);
     res.status(500).json({ error: "OMNIMENS API error", details: e?.message });
+  }
+});
+
+// ─── Support / Problem Reports ───────────────────────────────────────────────
+
+const VALID_CATEGORIES = ["account", "ai", "billing", "bug", "api", "feature", "other"];
+
+router.post("/omnimens/support/report", async (req, res) => {
+  const { description, category = "other", severity = "medium", contactEmail, context } = req.body || {};
+  if (!description || typeof description !== "string" || description.trim().length < 10) {
+    return res.status(400).json({ error: "Please provide a description of at least 10 characters." });
+  }
+  const cat = VALID_CATEGORIES.includes(category) ? category : "other";
+  try {
+    const [report] = await db.insert(omnimensProblemReports).values({
+      userId: req.user?.id || null,
+      description: description.trim(),
+      category: cat,
+      context: context || null,
+      status: "open",
+    }).returning();
+    console.log(`[SUPPORT] New ${cat} report #${report.id}${contactEmail ? ` from ${contactEmail}` : ""}: ${description.slice(0, 80)}`);
+    res.json({ success: true, ticketId: `OM-${String(report.id).padStart(5, "0")}`, reportId: report.id });
+  } catch (e: any) {
+    res.status(500).json({ error: "Failed to submit report" });
+  }
+});
+
+// Owner-only: list all reports
+router.get("/omnimens/support/reports", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  const ownerId = process.env.REPL_OWNER_ID || "50777126";
+  if (String(req.user.id) !== String(ownerId)) return res.status(403).json({ error: "Owner only" });
+  try {
+    const reports = await db.select().from(omnimensProblemReports)
+      .orderBy(desc(omnimensProblemReports.createdAt)).limit(200);
+    res.json({ reports });
+  } catch (e) {
+    res.status(500).json({ error: "Failed to load reports" });
   }
 });
 

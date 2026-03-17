@@ -3814,6 +3814,14 @@ export default function Chat() {
                 <Code2 className="w-3 h-3" />
                 API
               </a>
+              {/* Report a Problem */}
+              <a
+                href={`${window.location.origin}/godflesh/support`}
+                title="Report a problem or contact support"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg transition-all border text-[9px] font-mono font-bold tracking-wider text-white/25 border-transparent hover:text-red-400/80 hover:bg-red-400/8 hidden sm:flex"
+              >
+                <AlertTriangle className="w-3 h-3" />
+              </a>
 
               {/* Theme toggle */}
               <button

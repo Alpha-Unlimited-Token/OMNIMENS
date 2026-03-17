@@ -456,3 +456,16 @@ export const omnimensApiKeys = pgTable("godflesh_api_keys", {
 });
 
 export type OmnimensApiKey = typeof omnimensApiKeys.$inferSelect;
+
+// ─── Problem Reports ─────────────────────────────────────────────────────────
+export const omnimensProblemReports = pgTable("godflesh_problem_reports", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").references(() => omnimensUsers.id),
+  description: text("description").notNull(),
+  context: text("context"),          // URL or page where the problem occurred
+  category: text("category").default("general").notNull(),
+  status: text("status").default("open").notNull(), // open | reviewing | resolved
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type OmnimensProblemReport = typeof omnimensProblemReports.$inferSelect;

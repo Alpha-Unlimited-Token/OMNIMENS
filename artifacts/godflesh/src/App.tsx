@@ -15,6 +15,7 @@ import Memory from "@/pages/memory";
 import Tools from "@/pages/tools";
 import FAQ from "@/pages/faq";
 import Developer from "@/pages/developer";
+import Support from "@/pages/support";
 
 initTheme();
 
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/tools" component={Tools} />
       <Route path="/faq" component={FAQ} />
       <Route path="/dev" component={Developer} />
+      <Route path="/support" component={Support} />
       <Route component={NotFound} />
     </Switch>
   );
