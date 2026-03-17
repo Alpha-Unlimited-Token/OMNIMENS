@@ -53,6 +53,17 @@ const CODE_DISCOVERY_QUERIES = [
   "genetic programming evolutionary algorithm JavaScript",
   "attention mechanism efficient transformers latest research",
   "AI metacognition self-reflection awareness systems",
+  // ── Competitor intelligence ────────────────────────────────────────────────
+  "Claude Opus 3.5 new capabilities techniques 2025",
+  "Gemini Ultra 2.0 breakthrough features 2025",
+  "ChatGPT o3 improvements reasoning benchmark 2025",
+  "AI platform UX design best practices conversational 2025",
+  "constitutional AI safety technique implementation",
+  "long context retrieval compression techniques LLM 2025",
+  "AI persistent memory architecture user preferences 2025",
+  "multimodal reasoning image text integration techniques 2025",
+  "AI tool use agent framework improvements 2025",
+  "new AI product launch capabilities worldwide 2025",
 ];
 
 // ── What constrains OMNIMENS from evolving further ───────────────────────────

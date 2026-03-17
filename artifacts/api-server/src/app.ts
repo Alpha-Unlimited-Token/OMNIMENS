@@ -33,6 +33,7 @@ import router from "./routes";
 import stripeWebhookRouter from "./routes/stripeWebhook.js";
 import { startAutonomousLearning } from "./lib/omnimens-self-upgrade.js";
 import { startEvolutionEngine } from "./lib/omnimens-evolution.js";
+import { startCompetitiveIntel } from "./lib/omnimens-competitive-intel.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-conversations.js";
@@ -257,6 +258,7 @@ app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
 // ── AUTONOMOUS SYSTEMS ────────────────────────────────────────────────────────
 startAutonomousLearning();
 startEvolutionEngine();
+startCompetitiveIntel();
 
 setTimeout(async () => {
   await runGlobalMemoryImprovementCycle();
