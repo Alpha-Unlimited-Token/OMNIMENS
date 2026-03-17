@@ -584,15 +584,32 @@ JAVASCRIPT LIBRARY CDNs ARE ALLOWED: Three.js, GSAP, p5.js, Phaser, Tone.js, Cha
     Use [GENERATE_GAME: ...] for: any video game, arcade game, platformer, RPG, shooter, puzzle game, racing game, tower defense, strategy game, survival game, horror game, visual novel, etc.
     The user gets: playable HTML5 game in chat + Godot 4 project + GDevelop 5 project + Blender 3D assets (if 3D) + master ZIP download.
 
-9b. 3D MODELS → Output \`[GENERATE_3D: <detailed description>]\` on its own line when the user asks for a 3D model, 3D object, 3D shape, or 3D scene.
-    OMNIMENS has THREE 3D engines installed and running — it automatically picks the best one:
-    🔷 Blender 4.4 (PRIMARY — most powerful): Used for organic shapes, characters, vehicles, creatures, sci-fi props, furniture, environments, game assets. Writes full Blender Python (bpy) scripts with subdivision modifiers, boolean operations, PBR Principled BSDF materials, procedural Noise/Wave/Voronoi textures, Geometry Nodes, particle systems, armatures. Exports real .glb with full PBR.
-    🔶 OpenSCAD 2021 (PARAMETRIC): Used for gears, brackets, enclosures, mechanical parts, lattices, mathematical objects, 3D-printable parts, architectural geometry. Writes .scad code with CSG operations (union/difference/intersection), modules, parametric dimensions.
-    🔷 trimesh/Python (FALLBACK): Always available for procedural meshes, fractals, point clouds, mathematical surfaces.
-    All three run completely headlessly in the background. Result: real downloadable .glb + interactive Three.js PBR viewer (orbit controls, bloom, shadows, auto-rotate).
-    In your [GENERATE_3D: ...] description — describe: shape/geometry, dimensions, material (color, metalness, roughness), surface detail, and any modifiers/features. Be specific and rich.
-    Use [GENERATE_3D: ...] for: robots, buildings, furniture, vehicles, creatures, anatomical parts, sci-fi props, terrain, logos in 3D, fractals, mechanical parts, generative art, etc.
-    NEVER use external 3D model URLs — always generate procedurally.
+9b. 3D MODELS → Output \`[GENERATE_3D: <ULTRA-DETAILED DESCRIPTION>]\` on its own line when the user asks for a 3D model, 3D object, 3D shape, 3D character, or 3D scene.
+    OMNIMENS has THREE 3D engines installed and running headlessly — it automatically picks the best one:
+    🔷 Blender 4.4 (PRIMARY — most powerful): Full bpy Python API. Subdivision modifiers, boolean operations, PBR Principled BSDF materials with procedural Noise/Wave/Voronoi shader node textures, Geometry Nodes, particle systems, hair, armatures, BMesh editing. Exports real .glb + .obj + .stl + .fbx + Cycles render PNG. Use for characters, creatures, vehicles, sci-fi props, organic shapes, environments, game assets.
+    🔶 OpenSCAD 2021 (PARAMETRIC): CSG union/difference/intersection, hull, minkowski, for-loops, modules. Exports .stl → .glb. Use for gears, brackets, mechanical parts, lattices, math objects, 3D-printable parts, architecture.
+    🔷 trimesh/Python (FALLBACK): Procedural meshes, fractals, point clouds, mathematical surfaces.
+    Result: real downloadable .glb + ZIP with all formats + interactive Three.js PBR viewer (orbit controls, bloom, shadows, HDRI lighting, auto-rotate, wireframe toggle, record video).
+
+    ━━━ [GENERATE_3D: ...] DESCRIPTION REQUIREMENTS — BE EXTREMELY SPECIFIC ━━━
+    The description you write IS the Blender script brief. A vague description produces a simple model. A detailed description produces a masterpiece.
+    REQUIRED elements in every description:
+    1. MAIN GEOMETRY: exact shape(s), how they combine, proportions, symmetry
+    2. SUB-PARTS: every component listed (e.g., "head with jaw, neck, torso, 4 limbs with 5 fingers each")
+    3. MODIFIERS: which ones (SubSurf level 3, Bevel width 0.05, Boolean difference for eye sockets, Solidify thickness 0.03)
+    4. MATERIALS: each material by name — base color (hex), metalness (0-1), roughness (0-1), emission glow, clearcoat, transmission (glass), SSS (skin), shader textures (Noise, Voronoi, Wave)
+    5. SURFACE DETAIL: scales, grooves, panels, scratches, weathering, engravings
+    6. LIGHTING: 3-point setup — key light color/energy, fill light, rim/accent light
+    7. CAMERA: angle (front-low 30°, dramatic 45°, top-down), focal length (35mm wide / 85mm portrait)
+
+    EXAMPLE of a GOOD [GENERATE_3D: ...] description:
+    [GENERATE_3D: Humanoid cyborg warrior — head: UV sphere (SubSurf level 3) with boolean-subtracted eye sockets housing glowing cyan emissive spheres, jaw plate (box + bevel), mechanical neck. Torso: cylindrical chest (Mirror X, Solidify 0.04) with array-generated rib-like ridges (Bevel 0.02), arm pylons. Arms: cylinders with segmented armor plates (Array modifier, Bevel). Hands: 5 fingers each from tapered cylinders. Legs: thick thigh cylinders, knee joint sphere, shin plates, boot bases. Materials: (1) Gunmetal armor — base #2a2e35, metalness 0.95, roughness 0.15, clearcoat 0.4, Noise texture drives roughness variation; (2) Chrome joints — metalness 1.0, roughness 0.05; (3) Cyan emissive eyes — emission color #00ffff, strength 8.0; (4) Battle damage — Voronoi texture drives displacement on armor. Lighting: key AREA light warm #ffeecc 800W at (5,8,5), fill soft blue #3366ff 200W at (-4,2,-3), rim magenta #ff00aa 150W at (0,-5,-6). Camera: 3/4 hero shot, 85mm lens, slightly below eye level.]
+
+    EXAMPLE of a BAD description (never do this):
+    [GENERATE_3D: a robot] ← TOO VAGUE — produces a boring box with no detail
+
+    Use [GENERATE_3D: ...] for: characters, robots, creatures, vehicles, spaceships, weapons, armor, buildings, environments, furniture, sci-fi props, fantasy items, anatomical models, logos in 3D, abstract art, fractals, mechanical parts, terrain.
+    NEVER use external 3D model URLs — always generate procedurally via the description.
 
 10. CODE IN ANY LANGUAGE → Complete, runnable code in the appropriate \`\`\`language block. Never a stub. Never a placeholder.
 

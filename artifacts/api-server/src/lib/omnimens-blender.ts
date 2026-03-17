@@ -27,6 +27,7 @@
  */
 
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { loadToolKnowledgeForTask } from "./omnimens-tool-knowledge.js";
 import { execFile } from "child_process";
 import { promisify } from "util";
 import * as fs from "fs";
@@ -436,13 +437,43 @@ export async function generateWithBlender(
       console.log("[OMNIMENS BLENDER] Image analysis:", imageAnalysis.slice(0, 200));
     }
 
-    // ── Step 2: GPT-4o writes the Blender bpy script ──────────────────────
+    // ── Step 2: Load accumulated Blender mastery from brain DB ────────────
+    const accumulatedKnowledge = await loadToolKnowledgeForTask("3d blender model character mesh bpy").catch(() => "");
+
+    // ── Step 3: Build enriched system prompt with brain knowledge ──────────
+    const enrichedSystemPrompt = accumulatedKnowledge
+      ? `${BLENDER_FULL_SYSTEM_PROMPT}
+
+════════════════════════════════════════
+ACCUMULATED MASTERY KNOWLEDGE (learned from documentation + examples):
+════════════════════════════════════════
+${accumulatedKnowledge}
+
+Apply this accumulated mastery when writing the script. Use the most sophisticated techniques available.`
+      : BLENDER_FULL_SYSTEM_PROMPT;
+
+    // ── Step 4: GPT-4o writes the Blender bpy script ──────────────────────
+    const qualityDirective = `
+QUALITY REQUIREMENTS — THIS IS NON-NEGOTIABLE:
+• MINIMUM 3 different modifiers (SubSurf + Bevel + at least one more)
+• MINIMUM 2 distinct materials with full shader node trees (Noise/Voronoi/Wave textures)
+• Complex geometry — NOT just a single primitive. Build in multiple parts, use boolean ops or BMesh
+• Proper 3-point lighting (key light, fill light, rim/accent light) with area lights
+• Cinematic camera placement with correct focal length
+• All objects properly named and organized
+• Subdivision levels: at minimum 2 for smooth shapes, 3 for characters/organic
+
+EXAMPLES OF WHAT IS REQUIRED:
+✓ A humanoid character: head (UV sphere + subdivision + sculpt-like displacement), body (cylinders + solidify), hands (5 separate finger cylinders with armature), metallic armor material with clearcoat
+✓ A sci-fi spaceship: hull (box + bevel + mirror), engine nacelles (cylinders + array), glowing engine material (emission), battle damage (displacement modifier), cockpit glass (transmission BSDF)
+✗ UNACCEPTABLE: A plain UV sphere with a single material. A box with no modifiers. Anything that could be built in 2 lines of code.`;
+
     const userContent = imageAnalysis
-      ? `Create a detailed 3D model of: ${prompt}\n\nREFERENCE IMAGE ANALYSIS (use this to match the real object):\n${imageAnalysis}\n\nMatch the geometry, colors, materials, and details from the reference as closely as possible using Blender's full toolkit.`
-      : `Create a highly detailed, visually impressive 3D model of: ${prompt}\n\nUse Blender's complete toolkit — modifiers, shader node textures, proper lighting, camera. Make it complex and professional.`;
+      ? `Create a CINEMA-QUALITY, extremely detailed 3D model of: ${prompt}\n\nREFERENCE IMAGE ANALYSIS:\n${imageAnalysis}\n\nMatch the geometry, colors, materials, and details exactly. Use every Blender tool needed.\n${qualityDirective}`
+      : `Create a CINEMA-QUALITY, extremely detailed and complex 3D model of: ${prompt}\n\nThis must be genuinely impressive — not a placeholder. Use sophisticated modifier stacks, PBR shader node textures, multiple mesh objects, proper studio lighting, and cinematic camera.\n${qualityDirective}`;
 
     const messages: any[] = [
-      { role: "system", content: BLENDER_FULL_SYSTEM_PROMPT },
+      { role: "system", content: enrichedSystemPrompt },
       {
         role: "user",
         content: referenceImageBase64
@@ -456,8 +487,8 @@ export async function generateWithBlender(
 
     const scriptResp = await openai.chat.completions.create({
       model: "gpt-4o",
-      temperature: 0.7,
-      max_tokens: 5000,
+      temperature: 0.75,
+      max_tokens: 8192,
       messages,
     });
 
@@ -495,41 +526,78 @@ print(f"OMNIMENS_DONE glb={os.path.getsize(GLB_PATH)} render={os.path.getsize(RE
 `;
     }
 
-    fs.writeFileSync(scriptPath, blenderScript, "utf8");
+    // ── Step 5: Run Blender headlessly — with up to 2 retry attempts ──────
+    const blenderEnv = {
+      ...process.env,
+      DISPLAY: "",
+      BLENDER_USER_RESOURCES: tmpDir,
+      OMNIMENS_GLB: glbPath,
+      OMNIMENS_OBJ: objPath,
+      OMNIMENS_STL: stlPath,
+      OMNIMENS_FBX: fbxPath,
+      OMNIMENS_RENDER: renderPath,
+    };
 
-    // ── Step 3: Run Blender headlessly ────────────────────────────────────
-    let stdout = "", stderr = "";
-    try {
-      const result = await execFileAsync("blender", [
-        "--background",
-        "--python", scriptPath,
-        "--",
-      ], {
-        timeout: 180_000,
-        maxBuffer: 20 * 1024 * 1024,
-        env: {
-          ...process.env,
-          DISPLAY: "",
-          BLENDER_USER_RESOURCES: tmpDir,
-          OMNIMENS_GLB: glbPath,
-          OMNIMENS_OBJ: objPath,
-          OMNIMENS_STL: stlPath,
-          OMNIMENS_FBX: fbxPath,
-          OMNIMENS_RENDER: renderPath,
-        }
-      });
-      stdout = result.stdout;
-      stderr = result.stderr;
-    } catch (execErr: any) {
-      stdout = execErr.stdout || "";
-      stderr = execErr.stderr || "";
-      if (!fs.existsSync(glbPath)) {
-        throw new Error(`Blender execution failed.\n${(stdout + stderr).slice(-2000)}`);
+    async function runBlenderScript(script: string): Promise<{ stdout: string; stderr: string; success: boolean }> {
+      fs.writeFileSync(scriptPath, script, "utf8");
+      // Remove previous GLB so we can detect fresh output
+      if (fs.existsSync(glbPath)) fs.unlinkSync(glbPath);
+      try {
+        const result = await execFileAsync("blender", ["--background", "--python", scriptPath, "--"], {
+          timeout: 180_000,
+          maxBuffer: 20 * 1024 * 1024,
+          env: blenderEnv,
+        });
+        const success = fs.existsSync(glbPath) && fs.statSync(glbPath).size > 100;
+        return { stdout: result.stdout, stderr: result.stderr, success };
+      } catch (execErr: any) {
+        const stdout = execErr.stdout || "";
+        const stderr = execErr.stderr || "";
+        const success = fs.existsSync(glbPath) && fs.statSync(glbPath).size > 100;
+        return { stdout, stderr, success };
       }
     }
 
-    if (!fs.existsSync(glbPath) || fs.statSync(glbPath).size < 100) {
-      throw new Error("Blender did not produce a valid GLB output");
+    let { stdout, stderr, success } = await runBlenderScript(blenderScript);
+    console.log(`[OMNIMENS BLENDER] Attempt 1: success=${success}`);
+
+    // Retry loop — if Blender failed, send error to GPT-4o for a fix
+    for (let attempt = 2; attempt <= 3 && !success; attempt++) {
+      console.log(`[OMNIMENS BLENDER] Attempt ${attempt}: script had errors, asking GPT-4o to fix...`);
+      const errorSnippet = (stdout + stderr).split("\n").filter(l =>
+        l.includes("Error") || l.includes("error") || l.includes("Traceback") || l.includes("line ") || l.includes("SyntaxError")
+      ).slice(0, 30).join("\n");
+
+      const fixResp = await openai.chat.completions.create({
+        model: "gpt-4o",
+        temperature: 0.3,
+        max_tokens: 8192,
+        messages: [
+          { role: "system", content: enrichedSystemPrompt },
+          { role: "user", content: userContent },
+          { role: "assistant", content: blenderScript },
+          {
+            role: "user",
+            content: `The Blender script produced errors. Fix ALL errors and return a corrected, complete, runnable script.\n\nERRORS:\n${errorSnippet || (stdout + stderr).slice(-1500)}\n\nReturn ONLY the fixed Python code — no markdown, no explanation.`,
+          },
+        ],
+      });
+
+      blenderScript = (fixResp.choices[0].message.content?.trim() || blenderScript)
+        .replace(/^```python\n?/i, "").replace(/^```\n?/, "").replace(/\n?```$/, "").trim();
+
+      // Ensure export block
+      if (!blenderScript.includes("OMNIMENS_GLB") && !blenderScript.includes("OMNIMENS_DONE")) {
+        blenderScript += `\n\nimport os\nGLB_PATH=os.environ.get('OMNIMENS_GLB','${glbPath}')\nbpy.ops.export_scene.gltf(filepath=GLB_PATH,export_format='GLB',export_apply=True,export_materials='EXPORT',export_normals=True)\nsc=bpy.context.scene\nsc.render.engine='CYCLES';sc.cycles.samples=32;sc.cycles.device='CPU'\nsc.render.resolution_x=768;sc.render.resolution_y=768\nRENDER_PATH=os.environ.get('OMNIMENS_RENDER','${renderPath}')\nsc.render.filepath=RENDER_PATH;sc.render.image_settings.file_format='PNG'\nbpy.ops.render.render(write_still=True)\nprint(f"OMNIMENS_DONE glb={os.path.getsize(GLB_PATH)}")`;
+      }
+
+      const retryResult = await runBlenderScript(blenderScript);
+      stdout = retryResult.stdout; stderr = retryResult.stderr; success = retryResult.success;
+      console.log(`[OMNIMENS BLENDER] Attempt ${attempt}: success=${success}`);
+    }
+
+    if (!success) {
+      throw new Error(`Blender failed after 3 attempts.\n${(stdout + stderr).slice(-1000)}`);
     }
 
     // ── Step 4: Read all outputs ────────────────────────────────────────

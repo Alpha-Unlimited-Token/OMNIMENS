@@ -36,17 +36,17 @@ export const INSTALLED_TOOLS: ToolDefinition[] = [
     name: "Blender 4.4 (headless bpy Python API)",
     category: "3d_modeling",
     searchQueries: [
-      "Blender bpy Python API scripting tutorial 2024",
-      "Blender Python modifier subdivision boolean bevel procedural",
-      "Blender Principled BSDF material nodes procedural texture bpy",
-      "Blender geometry nodes Python API examples",
-      "Blender export GLB GLTF Python bpy ops",
+      "Blender bpy Python API complete character model script example headless",
+      "Blender Python subdivision surface smooth organic character creature script bpy",
+      "Blender Principled BSDF procedural noise voronoi texture node script complete example",
+      "Blender Python script BMesh extrude loop cut inset detailed mesh modeling",
+      "Blender Python geometry nodes procedural mesh modifier stack complete script",
     ],
     docUrls: [
       "https://docs.blender.org/api/current/bpy.ops.mesh.html",
-      "https://docs.blender.org/api/current/bpy.ops.export_scene.html",
+      "https://docs.blender.org/api/current/bpy.types.Modifier.html",
     ],
-    why: "Primary 3D engine — writes bpy Python scripts for organic shapes, PBR materials, modifiers, GLB export. Runs headlessly.",
+    why: "PRIMARY 3D engine — writes sophisticated bpy Python scripts for high-quality characters, organic shapes, PBR materials, modifiers, GLB export. Runs headlessly. Must produce cinema-quality output.",
   },
   {
     id: "openscad",
@@ -312,7 +312,7 @@ async function learnTool(tool: ToolDefinition): Promise<number> {
 
   // Search the web for this tool
   const searchParts: string[] = [];
-  for (const query of tool.searchQueries.slice(0, 2)) {
+  for (const query of tool.searchQueries.slice(0, 4)) {
     try {
       const results = await webSearch(query, 5);
       searchParts.push(formatSearchResults(results, query));
@@ -398,8 +398,8 @@ export async function loadToolKnowledgeForTask(taskHint: string): Promise<string
     const relevant: string[] = [];
     const hint = taskHint.toLowerCase();
 
-    if (hint.includes("3d") || hint.includes("model") || hint.includes("mesh") || hint.includes("glb") || hint.includes("stl")) {
-      relevant.push("tool_trimesh", "tool_numpy", "tool_scipy", "tool_shapely", "tool_threejs");
+    if (hint.includes("3d") || hint.includes("model") || hint.includes("mesh") || hint.includes("glb") || hint.includes("stl") || hint.includes("blender") || hint.includes("bpy") || hint.includes("character") || hint.includes("sculpt")) {
+      relevant.push("tool_blender", "tool_openscad", "tool_trimesh", "tool_numpy", "tool_scipy", "tool_shapely", "tool_threejs");
     }
     if (hint.includes("three") || hint.includes("webgl") || hint.includes("scene") || hint.includes("render")) {
       relevant.push("tool_threejs", "tool_gsap");
@@ -472,4 +472,27 @@ export async function learnNewTool(toolId: string): Promise<void> {
     return;
   }
   await learnTool(tool);
+}
+
+// ── Force-refresh: wipe old entries for a tool, then re-learn from scratch ──
+
+export async function forceRefreshToolKnowledge(toolIds: string[]): Promise<void> {
+  console.log(`[OMNIMENS KNOWLEDGE] Force-refreshing knowledge for: ${toolIds.join(", ")}`);
+  for (const toolId of toolIds) {
+    const tool = INSTALLED_TOOLS.find(t => t.id === toolId);
+    if (!tool) continue;
+    try {
+      // Delete all existing brain entries for this tool
+      await db
+        .delete(omnimensBrain)
+        .where(like(omnimensBrain.category, `tool_${toolId}%`));
+      console.log(`[OMNIMENS KNOWLEDGE] Cleared old entries for ${tool.name}`);
+      // Re-learn with improved queries
+      const stored = await learnTool(tool);
+      console.log(`[OMNIMENS KNOWLEDGE] Force-refresh complete: ${stored} new entries for ${tool.name}`);
+      await new Promise(r => setTimeout(r, 2000));
+    } catch (err) {
+      console.error(`[OMNIMENS KNOWLEDGE] Force-refresh failed for ${toolId}:`, err);
+    }
+  }
 }

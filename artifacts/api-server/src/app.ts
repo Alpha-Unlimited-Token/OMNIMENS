@@ -37,7 +37,7 @@ import { startCompetitiveIntel } from "./lib/omnimens-competitive-intel.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-conversations.js";
-import { runToolKnowledgeIngestion } from "./lib/omnimens-tool-knowledge.js";
+import { runToolKnowledgeIngestion, forceRefreshToolKnowledge } from "./lib/omnimens-tool-knowledge.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -267,6 +267,8 @@ setTimeout(async () => {
 
 setTimeout(async () => {
   console.log("[OMNIMENS] Starting tool knowledge ingestion — learning all installed tools...");
+  // Force-refresh 3D engines first so Blender/OpenSCAD mastery is current and uses latest queries
+  await forceRefreshToolKnowledge(["blender", "openscad", "trimesh"]);
   await runToolKnowledgeIngestion();
   setInterval(() => runToolKnowledgeIngestion(), 12 * 60 * 60 * 1000);
 }, 30 * 1000);
