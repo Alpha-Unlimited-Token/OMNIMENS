@@ -1,100 +1,104 @@
+// semanticMemoryStore.js
+
 /**
  * @module semanticMemoryStore
- * @description A utility module for in-memory vector search using HNSW (Hierarchical Navigable Small World) for semantic retrieval and long-term memory.
+ * @description Simulates an in-memory vector store using PostgreSQL for fast semantic search and recall.
  */
+
+const { Client } = require('pg');
+const crypto = require('crypto');
 
 /**
- * SemanticMemoryStore class implementing HNSW-based approximate nearest neighbor (ANN) search.
- * This class provides methods to add vectors, search for nearest neighbors, and manage the memory store.
+ * Initialize a PostgreSQL client and set up the required table for vector storage.
+ * @param {string} connectionString - PostgreSQL connection string.
+ * @returns {Promise<void>} Resolves when the table is created.
  */
-class SemanticMemoryStore {
-    /**
-     * Creates an instance of SemanticMemoryStore.
-     * @param {number} dimensions - The number of dimensions for the vectors.
-     * @param {number} maxElements - Maximum number of elements the store can hold.
-     * @param {number} efConstruction - Parameter controlling the accuracy/speed tradeoff during indexing (higher is more accurate).
-     * @param {number} M - Parameter controlling the number of bi-directional links created for each element.
-     */
-    constructor(dimensions, maxElements = 10000, efConstruction = 200, M = 16) {
-        if (!Number.isInteger(dimensions) || dimensions <= 0) {
-            throw new Error("Dimensions must be a positive integer.");
-        }
+async function initializeDatabase(connectionString) {
+  const client = new Client({ connectionString });
+  await client.connect();
 
-        this.dimensions = dimensions;
-        this.maxElements = maxElements;
-        this.efConstruction = efConstruction;
-        this.M = M;
-        this.store = new Map(); // Internal store for metadata and vectors.
-        this.index = null; // Placeholder for the HNSW index.
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS semantic_vectors (
+      id SERIAL PRIMARY KEY,
+      key TEXT UNIQUE NOT NULL,
+      embedding JSONB NOT NULL,
+      metadata JSONB
+    );
+    CREATE INDEX IF NOT EXISTS embedding_gin ON semantic_vectors USING gin (embedding jsonb_path_ops);
+  `;
 
-        this._initializeIndex();
-    }
-
-    /**
-     * Initializes the HNSW index.
-     * @private
-     */
-    _initializeIndex() {
-        // Mock implementation of HNSW index initialization.
-        // Replace with a real HNSW algorithm implementation if needed.
-        this.index = {
-            addPoint: (vector, id) => {
-                if (vector.length !== this.dimensions) {
-                    throw new Error("Vector dimensions do not match the initialized dimensions.");
-                }
-                this.store.set(id, vector);
-            },
-            searchKNN: (queryVector, k) => {
-                if (queryVector.length !== this.dimensions) {
-                    throw new Error("Query vector dimensions do not match the initialized dimensions.");
-                }
-                const distances = Array.from(this.store.entries()).map(([id, vector]) => {
-                    return { id, distance: this._euclideanDistance(queryVector, vector) };
-                });
-                distances.sort((a, b) => a.distance - b.distance);
-                return distances.slice(0, k).map(entry => ({ id: entry.id, distance: entry.distance }));
-            }
-        };
-    }
-
-    /**
-     * Adds a vector to the store.
-     * @param {string} id - Unique identifier for the vector.
-     * @param {number[]} vector - The vector to add.
-     */
-    addVector(id, vector) {
-        if (this.store.has(id)) {
-            throw new Error(`ID '${id}' already exists in the store.`);
-        }
-        this.index.addPoint(vector, id);
-    }
-
-    /**
-     * Searches for the k nearest neighbors to the given query vector.
-     * @param {number[]} queryVector - The query vector.
-     * @param {number} k - The number of nearest neighbors to retrieve.
-     * @returns {Array<{id: string, distance: number}>} - List of nearest neighbors with their distances.
-     */
-    search(queryVector, k) {
-        if (!Number.isInteger(k) || k <= 0) {
-            throw new Error("k must be a positive integer.");
-        }
-        return this.index.searchKNN(queryVector, k);
-    }
-
-    /**
-     * Calculates the Euclidean distance between two vectors.
-     * @private
-     * @param {number[]} vectorA - The first vector.
-     * @param {number[]} vectorB - The second vector.
-     * @returns {number} - The Euclidean distance.
-     */
-    _euclideanDistance(vectorA, vectorB) {
-        if (vectorA.length !== vectorB.length) {
-            throw new Error("Vectors must have the same dimensions.");
-        }
-        return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
-    }
+  await client.query(createTableQuery);
+  await client.end();
 }
 
-export { SemanticMemoryStore };
+/**
+ * Insert a vector embedding and its metadata into the database.
+ * @param {string} connectionString - PostgreSQL connection string.
+ * @param {string} key - Unique key for the vector.
+ * @param {number[]} embedding - Vector embedding as an array of numbers.
+ * @param {Object} metadata - Optional metadata associated with the vector.
+ * @returns {Promise<void>} Resolves when the vector is inserted.
+ */
+async function insertVector(connectionString, key, embedding, metadata = {}) {
+  const client = new Client({ connectionString });
+  await client.connect();
+
+  const query = `
+    INSERT INTO semantic_vectors (key, embedding, metadata)
+    VALUES ($1, $2, $3)
+    ON CONFLICT (key) DO UPDATE SET embedding = $2, metadata = $3;
+  `;
+
+  await client.query(query, [key, JSON.stringify(embedding), JSON.stringify(metadata)]);
+  await client.end();
+}
+
+/**
+ * Perform a semantic search to find the most similar vectors based on cosine similarity.
+ * @param {string} connectionString - PostgreSQL connection string.
+ * @param {number[]} queryVector - Query vector for similarity search.
+ * @param {number} topK - Number of top results to return.
+ * @returns {Promise<Object[]>} Resolves with an array of results sorted by similarity.
+ */
+async function searchVectors(connectionString, queryVector, topK = 5) {
+  const client = new Client({ connectionString });
+  await client.connect();
+
+  const query = `
+    SELECT key, metadata, embedding,
+      (SELECT SUM((embedding->>index)::FLOAT * $2[index])
+       FROM generate_series(0, jsonb_array_length(embedding) - 1) AS index) AS dot_product,
+      (SELECT SQRT(SUM(POWER((embedding->>index)::FLOAT, 2)))
+       FROM generate_series(0, jsonb_array_length(embedding) - 1) AS index) AS norm_a,
+      (SELECT SQRT(SUM(POWER($2[index], 2)))
+       FROM generate_series(0, jsonb_array_length(embedding) - 1) AS index) AS norm_b
+    FROM semantic_vectors
+    ORDER BY dot_product / (norm_a * norm_b) DESC
+    LIMIT $3;
+  `;
+
+  const result = await client.query(query, [JSON.stringify(queryVector), topK]);
+  await client.end();
+
+  return result.rows.map(row => ({
+    key: row.key,
+    metadata: row.metadata,
+    similarity: row.dot_product / (row.norm_a * row.norm_b)
+  }));
+}
+
+/**
+ * Generate a unique key for a vector entry.
+ * @param {string} prefix - Optional prefix for the key.
+ * @returns {string} A unique key.
+ */
+function generateKey(prefix = 'vector') {
+  return `${prefix}-${crypto.randomUUID()}`;
+}
+
+module.exports = {
+  initializeDatabase,
+  insertVector,
+  searchVectors,
+  generateKey
+};
