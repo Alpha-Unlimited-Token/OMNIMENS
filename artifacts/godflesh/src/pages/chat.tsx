@@ -2807,6 +2807,13 @@ function DevActivityBar({
   activeTab: string;
   onSelect: (tab: string) => void;
 }) {
+  const { isLight } = useTheme();
+  const panelBg    = isLight ? "#f0f1f6" : "#0D1117";
+  const panelBdr   = isLight ? "rgba(20,23,34,0.14)" : "#21262d";
+  const iconActive = isLight ? "#141722" : "#ffffff";
+  const iconMuted  = isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.35)";
+  const activeBg   = isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.08)";
+
   const items = [
     { id: "chats",  icon: <MessageSquare className="w-[18px] h-[18px]" />, label: "Chats" },
     { id: "search", icon: <Search className="w-[18px] h-[18px]" />,        label: "Search" },
@@ -2817,7 +2824,7 @@ function DevActivityBar({
   return (
     <div
       className="shrink-0 flex flex-col items-center py-2 gap-0.5 border-r z-10"
-      style={{ width: 44, background: "#0D1117", borderColor: "#21262d" }}
+      style={{ width: 44, background: panelBg, borderColor: panelBdr }}
     >
       <div className="w-7 h-7 flex items-center justify-center mb-3 shrink-0">
         <OmnimensIcon size={20} />
@@ -2829,8 +2836,8 @@ function DevActivityBar({
           onClick={() => onSelect(item.id)}
           className="relative w-9 h-9 rounded flex items-center justify-center transition-all shrink-0"
           style={{
-            color: activeTab === item.id ? "#fff" : "rgba(255,255,255,0.35)",
-            background: activeTab === item.id ? "rgba(255,255,255,0.08)" : "transparent",
+            color: activeTab === item.id ? iconActive : iconMuted,
+            background: activeTab === item.id ? activeBg : "transparent",
             borderLeft: activeTab === item.id ? "2px solid #a855f7" : "2px solid transparent",
           }}
         >
@@ -2841,7 +2848,7 @@ function DevActivityBar({
       <button
         title="Settings"
         className="w-9 h-9 rounded flex items-center justify-center transition-all shrink-0"
-        style={{ color: "rgba(255,255,255,0.25)" }}
+        style={{ color: isLight ? "rgba(20,23,34,0.30)" : "rgba(255,255,255,0.25)" }}
       >
         <Settings className="w-[16px] h-[16px]" />
       </button>
@@ -2864,7 +2871,17 @@ function DevRightPanel({
   credits?: number;
   messages: any[];
 }) {
+  const { isLight } = useTheme();
   const [tab, setTab] = useState<"output"|"preview"|"shell">("output");
+
+  const panelBg  = isLight ? "#f0f1f6" : "#0D1117";
+  const cardBg   = isLight ? "#e8eaf2" : "#161b22";
+  const bdr      = isLight ? "rgba(20,23,34,0.14)" : "#21262d";
+  const txtFaint = isLight ? "rgba(20,23,34,0.42)" : "rgba(255,255,255,0.4)";
+  const txtMid   = isLight ? "rgba(20,23,34,0.55)" : "rgba(255,255,255,0.5)";
+  const txtMain  = isLight ? "#141722" : "rgba(255,255,255,0.7)";
+  const tabActive= isLight ? "#141722" : "#ffffff";
+  const tabMuted = isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.35)";
 
   const lastCodeBlock = useMemo(() => {
     for (let i = messages.length - 1; i >= 0; i--) {
@@ -2885,16 +2902,16 @@ function DevRightPanel({
   }, [messages]);
 
   return (
-    <div className="flex flex-col h-full" style={{ background: "#0D1117" }}>
+    <div className="flex flex-col h-full" style={{ background: panelBg }}>
       {/* Tab bar */}
-      <div className="shrink-0 flex border-b" style={{ borderColor: "#21262d" }}>
+      <div className="shrink-0 flex border-b" style={{ borderColor: bdr }}>
         {(["output","preview","shell"] as const).map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className="px-4 py-2 text-[10px] font-mono uppercase tracking-widest transition-all border-b-2"
             style={{
-              color: tab === t ? "#fff" : "rgba(255,255,255,0.35)",
+              color: tab === t ? tabActive : tabMuted,
               borderColor: tab === t ? "#a855f7" : "transparent",
               background: "transparent",
             }}
@@ -2909,43 +2926,43 @@ function DevRightPanel({
         {tab === "output" && (
           <div className="p-3 space-y-3">
             {/* Session status */}
-            <div className="rounded border p-3" style={{ borderColor: "#21262d", background: "#161b22" }}>
-              <p className="font-mono text-[9px] tracking-[0.2em] mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>SESSION</p>
+            <div className="rounded border p-3" style={{ borderColor: bdr, background: cardBg }}>
+              <p className="font-mono text-[9px] tracking-[0.2em] mb-2" style={{ color: txtFaint }}>SESSION</p>
               {status?.isOwner ? (
                 <p className="font-mono text-[10px] font-bold" style={{ color: "#a855f7" }}>⚡ CREATOR — UNLIMITED</p>
               ) : credits != null ? (
                 <div>
-                  <p className="font-mono text-xs font-bold text-white">{credits} credits</p>
-                  <p className="font-mono text-[9px] mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>≈ ${(credits * 0.01).toFixed(2)} balance</p>
+                  <p className="font-mono text-xs font-bold" style={{ color: tabActive }}>{credits} credits</p>
+                  <p className="font-mono text-[9px] mt-0.5" style={{ color: txtFaint }}>≈ ${(credits * 0.01).toFixed(2)} balance</p>
                 </div>
               ) : (
-                <p className="font-mono text-[10px]" style={{ color: "rgba(255,255,255,0.4)" }}>Loading...</p>
+                <p className="font-mono text-[10px]" style={{ color: txtFaint }}>Loading...</p>
               )}
             </div>
             {/* Last code block */}
             {lastCodeBlock ? (
-              <div className="rounded border overflow-hidden" style={{ borderColor: "#21262d" }}>
-                <div className="px-3 py-1.5 border-b flex items-center gap-2" style={{ borderColor: "#21262d", background: "#161b22" }}>
+              <div className="rounded border overflow-hidden" style={{ borderColor: bdr }}>
+                <div className="px-3 py-1.5 border-b flex items-center gap-2" style={{ borderColor: bdr, background: cardBg }}>
                   <FileCode className="w-3 h-3" style={{ color: "#a855f7" }} />
-                  <span className="font-mono text-[9px]" style={{ color: "rgba(255,255,255,0.5)" }}>LATEST CODE</span>
+                  <span className="font-mono text-[9px]" style={{ color: txtMid }}>LATEST CODE</span>
                 </div>
-                <pre className="p-3 text-[10px] font-mono overflow-x-auto" style={{ color: "rgba(255,255,255,0.7)", background: "#0d1117", scrollbarWidth: "thin" }}>
+                <pre className="p-3 text-[10px] font-mono overflow-x-auto" style={{ color: txtMain, background: panelBg, scrollbarWidth: "thin" }}>
                   {lastCodeBlock}
                 </pre>
               </div>
             ) : (
-              <div className="rounded border border-dashed p-6 text-center" style={{ borderColor: "#21262d" }}>
-                <Terminal className="w-6 h-6 mx-auto mb-2" style={{ color: "rgba(255,255,255,0.15)" }} />
-                <p className="font-mono text-[9px]" style={{ color: "rgba(255,255,255,0.25)" }}>Code output appears here</p>
+              <div className="rounded border border-dashed p-6 text-center" style={{ borderColor: bdr }}>
+                <Terminal className="w-6 h-6 mx-auto mb-2" style={{ color: txtFaint }} />
+                <p className="font-mono text-[9px]" style={{ color: txtMid }}>Code output appears here</p>
               </div>
             )}
             {/* Images */}
             {allImages.length > 0 && (
               <div>
-                <p className="font-mono text-[9px] mb-1.5 px-1" style={{ color: "rgba(255,255,255,0.4)" }}>IMAGES ({allImages.length})</p>
+                <p className="font-mono text-[9px] mb-1.5 px-1" style={{ color: txtFaint }}>IMAGES ({allImages.length})</p>
                 <div className="grid grid-cols-2 gap-1.5">
                   {allImages.map(img => (
-                    <img key={img.index} src={img.url} alt={img.prompt} className="w-full aspect-square object-cover rounded border" style={{ borderColor: "#21262d" }} />
+                    <img key={img.index} src={img.url} alt={img.prompt} className="w-full aspect-square object-cover rounded border" style={{ borderColor: bdr }} />
                   ))}
                 </div>
               </div>
@@ -2959,15 +2976,15 @@ function DevRightPanel({
               <iframe
                 srcDoc={lastHtml}
                 className="w-full rounded border"
-                style={{ height: "calc(100vh - 200px)", borderColor: "#21262d", background: "#fff" }}
+                style={{ height: "calc(100vh - 200px)", borderColor: bdr, background: "#fff" }}
                 sandbox="allow-scripts"
                 title="Preview"
               />
             ) : (
-              <div className="rounded border border-dashed p-8 text-center" style={{ borderColor: "#21262d" }}>
-                <Monitor className="w-8 h-8 mx-auto mb-2" style={{ color: "rgba(255,255,255,0.12)" }} />
-                <p className="font-mono text-[9px]" style={{ color: "rgba(255,255,255,0.25)" }}>HTML preview appears here</p>
-                <p className="font-mono text-[8px] mt-1" style={{ color: "rgba(255,255,255,0.15)" }}>Ask OMNIMENS to build a website</p>
+              <div className="rounded border border-dashed p-8 text-center" style={{ borderColor: bdr }}>
+                <Monitor className="w-8 h-8 mx-auto mb-2" style={{ color: txtFaint }} />
+                <p className="font-mono text-[9px]" style={{ color: txtMid }}>HTML preview appears here</p>
+                <p className="font-mono text-[8px] mt-1" style={{ color: txtFaint }}>Ask OMNIMENS to build a website</p>
               </div>
             )}
           </div>
@@ -2975,10 +2992,10 @@ function DevRightPanel({
 
         {tab === "shell" && (
           <div className="p-3">
-            <div className="rounded border p-3 font-mono text-[10px]" style={{ borderColor: "#21262d", background: "#161b22" }}>
+            <div className="rounded border p-3 font-mono text-[10px]" style={{ borderColor: bdr, background: cardBg }}>
               <p style={{ color: "#4ade80" }}>omnimens@workspace:~$</p>
-              <p className="mt-1" style={{ color: "rgba(255,255,255,0.5)" }}>OMNIMENS shell integration active.</p>
-              <p className="mt-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>Ask OMNIMENS to run commands via the chat.</p>
+              <p className="mt-1" style={{ color: txtMid }}>OMNIMENS shell integration active.</p>
+              <p className="mt-0.5" style={{ color: txtFaint }}>Ask OMNIMENS to run commands via the chat.</p>
               <p className="mt-2 animate-pulse" style={{ color: "#a855f7" }}>▋</p>
             </div>
           </div>
