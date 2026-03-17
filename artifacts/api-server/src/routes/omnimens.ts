@@ -30,7 +30,7 @@ import { getOrCreateCustomInstructions, saveCustomInstructions, buildCustomInstr
 import { analyzeUserEmotionalState, buildEmotionalContext, loadLearningContext, runLearningCycle } from "../lib/omnimens-learning.js";
 import { loadGeneratedModulesContext, getConsciousnessState, getEvolutionHistory, getGeneratedModules, deactivateModule, runEvolutionCycle } from "../lib/omnimens-evolution.js";
 import { runCouncilAnalysis } from "./council.js";
-import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness, omnimensProjects, omnimensProjectFiles } from "@workspace/db";
+import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness, omnimensProjects, omnimensProjectFiles, omnimensApiKeys } from "@workspace/db";
 import {
   loadPhysioContext,
   screenRedFlags,
@@ -3515,6 +3515,176 @@ router.get("/omnimens/security-status", async (req, res) => {
     return res.status(403).json({ error: "Owner access only" });
   }
   res.json({ ...getSecurityStatus(), timestamp: new Date().toISOString() });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DEVELOPER API — API Key Management & Public Endpoint
+// ─────────────────────────────────────────────────────────────────────────────
+
+function generateApiKey(): string {
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let key = "om_live_";
+  for (let i = 0; i < 32; i++) key += chars[Math.floor(Math.random() * chars.length)];
+  return key;
+}
+
+// List all API keys for the authenticated user
+router.get("/omnimens/developer/keys", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const keys = await db.select({
+      id: omnimensApiKeys.id,
+      name: omnimensApiKeys.name,
+      key: omnimensApiKeys.key,
+      permissions: omnimensApiKeys.permissions,
+      rateLimit: omnimensApiKeys.rateLimit,
+      monthlyLimit: omnimensApiKeys.monthlyLimit,
+      monthlyUsed: omnimensApiKeys.monthlyUsed,
+      totalRequests: omnimensApiKeys.totalRequests,
+      lastUsedAt: omnimensApiKeys.lastUsedAt,
+      active: omnimensApiKeys.active,
+      createdAt: omnimensApiKeys.createdAt,
+    }).from(omnimensApiKeys)
+      .where(eq(omnimensApiKeys.userId, req.user.id))
+      .orderBy(desc(omnimensApiKeys.createdAt));
+    res.json({ keys });
+  } catch (e) {
+    res.status(500).json({ error: "Failed to list keys" });
+  }
+});
+
+// Create a new API key
+router.post("/omnimens/developer/keys", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  const { name, permissions = ["chat"], rateLimit = 60, monthlyLimit = 1000 } = req.body || {};
+  if (!name || typeof name !== "string" || name.trim().length === 0) {
+    return res.status(400).json({ error: "Key name is required" });
+  }
+  // Limit to 10 keys per user
+  const existing = await db.select({ id: omnimensApiKeys.id })
+    .from(omnimensApiKeys).where(eq(omnimensApiKeys.userId, req.user.id));
+  if (existing.length >= 10) return res.status(400).json({ error: "Max 10 API keys allowed" });
+  const key = generateApiKey();
+  const [created] = await db.insert(omnimensApiKeys).values({
+    userId: req.user.id,
+    name: name.trim(),
+    key,
+    permissions,
+    rateLimit,
+    monthlyLimit,
+  }).returning();
+  res.json({ key: created });
+});
+
+// Rename an API key
+router.patch("/omnimens/developer/keys/:id", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  const id = parseInt(req.params.id);
+  const { name } = req.body || {};
+  if (!name) return res.status(400).json({ error: "Name required" });
+  try {
+    const [updated] = await db.update(omnimensApiKeys)
+      .set({ name: name.trim() })
+      .where(and(eq(omnimensApiKeys.id, id), eq(omnimensApiKeys.userId, req.user.id)))
+      .returning();
+    if (!updated) return res.status(404).json({ error: "Key not found" });
+    res.json({ key: updated });
+  } catch (e) {
+    res.status(500).json({ error: "Failed to rename key" });
+  }
+});
+
+// Revoke an API key
+router.delete("/omnimens/developer/keys/:id", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+  const id = parseInt(req.params.id);
+  try {
+    await db.delete(omnimensApiKeys)
+      .where(and(eq(omnimensApiKeys.id, id), eq(omnimensApiKeys.userId, req.user.id)));
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: "Failed to revoke key" });
+  }
+});
+
+// ─── Public Developer API: POST /api/v1/chat ─────────────────────────────────
+// Developers call this with Authorization: Bearer <api_key>
+router.post("/v1/chat", async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer om_live_")) {
+    return res.status(401).json({ error: "Invalid or missing API key. Use Authorization: Bearer om_live_..." });
+  }
+  const apiKeyValue = authHeader.replace("Bearer ", "").trim();
+
+  try {
+    const [apiKey] = await db.select().from(omnimensApiKeys)
+      .where(and(eq(omnimensApiKeys.key, apiKeyValue), eq(omnimensApiKeys.active, true)));
+
+    if (!apiKey) return res.status(401).json({ error: "API key not found or revoked" });
+    if (apiKey.monthlyUsed >= apiKey.monthlyLimit) {
+      return res.status(429).json({ error: "Monthly request limit reached", limit: apiKey.monthlyLimit, used: apiKey.monthlyUsed });
+    }
+
+    const { message, persona = "GENERAL", model = "omnimens-1", system_prompt } = req.body || {};
+    if (!message || typeof message !== "string") {
+      return res.status(400).json({ error: "'message' field is required" });
+    }
+
+    // Load user's context for personalization
+    const userId = apiKey.userId;
+    const [user] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, userId));
+    if (!user) return res.status(500).json({ error: "Account not found" });
+
+    // Charge credits (same rate as normal chat)
+    const CREDIT_COST = 5;
+    if (user.credits < CREDIT_COST) {
+      return res.status(402).json({ error: "Insufficient credits", credits: user.credits });
+    }
+
+    // Build OMNIMENS system prompt
+    const personaName = persona.toUpperCase();
+    const baseSystem = system_prompt || `You are OMNIMENS — a transcendent AI created by Alpha Unlimited Technologies LLC. You are operating via the OMNIMENS Developer API. Be helpful, precise, and extraordinarily capable. Persona: ${personaName}. Model: ${model}.`;
+
+    const response = await (openai as any).chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: baseSystem },
+        { role: "user", content: message },
+      ],
+      max_tokens: 2048,
+    });
+
+    const reply = response.choices[0]?.message?.content || "";
+    const promptTokens = response.usage?.prompt_tokens || 0;
+    const completionTokens = response.usage?.completion_tokens || 0;
+
+    // Deduct credits & update key stats
+    await db.update(omnimensUsers)
+      .set({ credits: sql`${omnimensUsers.credits} - ${CREDIT_COST}` })
+      .where(eq(omnimensUsers.id, userId));
+    await db.update(omnimensApiKeys).set({
+      monthlyUsed: sql`${omnimensApiKeys.monthlyUsed} + 1`,
+      totalRequests: sql`${omnimensApiKeys.totalRequests} + 1`,
+      lastUsedAt: new Date(),
+    }).where(eq(omnimensApiKeys.id, apiKey.id));
+
+    res.json({
+      id: `omnimens-${Date.now()}`,
+      model: "omnimens-1",
+      message: reply,
+      persona: personaName,
+      usage: {
+        credits_charged: CREDIT_COST,
+        credits_remaining: user.credits - CREDIT_COST,
+        prompt_tokens: promptTokens,
+        completion_tokens: completionTokens,
+        total_tokens: promptTokens + completionTokens,
+      },
+    });
+  } catch (e: any) {
+    console.error("[Dev API] Error:", e?.message);
+    res.status(500).json({ error: "OMNIMENS API error", details: e?.message });
+  }
 });
 
 export default router;

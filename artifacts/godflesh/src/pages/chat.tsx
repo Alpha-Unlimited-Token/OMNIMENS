@@ -3805,6 +3805,16 @@ export default function Chat() {
               ) : status?.isPro ? (
                 <span className="font-mono text-[10px] text-accent font-bold tracking-widest hidden sm:block mr-1">UNLIMITED</span>
               ) : null}
+              {/* Developer Portal link */}
+              <a
+                href={`${window.location.origin}/godflesh/dev`}
+                title="Developer API — Build with OMNIMENS"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg transition-all border text-[9px] font-mono font-bold tracking-wider text-white/35 border-transparent hover:text-primary hover:bg-primary/8 hover:border-primary/20 hidden sm:flex"
+              >
+                <Code2 className="w-3 h-3" />
+                API
+              </a>
+
               {/* Theme toggle */}
               <button
                 onClick={toggleTheme}

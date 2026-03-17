@@ -14,6 +14,7 @@ import Projects from "@/pages/projects";
 import Memory from "@/pages/memory";
 import Tools from "@/pages/tools";
 import FAQ from "@/pages/faq";
+import Developer from "@/pages/developer";
 
 initTheme();
 
@@ -38,6 +39,7 @@ function Router() {
       <Route path="/memory" component={Memory} />
       <Route path="/tools" component={Tools} />
       <Route path="/faq" component={FAQ} />
+      <Route path="/dev" component={Developer} />
       <Route component={NotFound} />
     </Switch>
   );
