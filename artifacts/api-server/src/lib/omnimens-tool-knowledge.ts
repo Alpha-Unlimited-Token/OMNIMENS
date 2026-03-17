@@ -212,6 +212,271 @@ export const INSTALLED_TOOLS: ToolDefinition[] = [
     ],
     why: "Two-layer face analysis pipeline: OpenCV DNN detects faces + bounding boxes, GPT-4 Vision performs deep semantic analysis (age range, emotion, expression, gender presentation, features, accessories). Triggered automatically when user uploads image with face-related query.",
   },
+  // ── Data Visualization ────────────────────────────────────────────────────
+  {
+    id: "matplotlib_seaborn",
+    name: "matplotlib 3.10 + seaborn 0.13 (Python data visualization)",
+    category: "data_visualization",
+    searchQueries: [
+      "matplotlib advanced chart types bar line scatter pie histogram heatmap python code",
+      "seaborn statistical visualization heatmap violin boxplot pairplot python example",
+      "matplotlib dark theme styling professional chart publication quality python",
+      "matplotlib subplots multiple charts layout tight_layout colormap python",
+    ],
+    docUrls: [
+      "https://matplotlib.org/stable/gallery/index.html",
+      "https://seaborn.pydata.org/examples/index.html",
+    ],
+    why: "Primary chart rendering engine. Generates bar, line, scatter, pie, donut, area, histogram, heatmap, box, violin charts as PNG images. Use [GENERATE_CHART: JSON spec] marker to trigger.",
+  },
+  {
+    id: "plotly",
+    name: "plotly 6.6 (interactive Python charting)",
+    category: "data_visualization",
+    searchQueries: [
+      "plotly interactive chart python bar line scatter 3D surface complete example",
+      "plotly express advanced visualization animation subplot python code",
+    ],
+    docUrls: [],
+    why: "Interactive chart library for complex, multi-dimensional visualizations with hover, zoom, and animation.",
+  },
+  // ── PDF + Document Processing ─────────────────────────────────────────────
+  {
+    id: "pymupdf",
+    name: "PyMuPDF (fitz) 1.27 — PDF reading engine",
+    category: "document_processing",
+    searchQueries: [
+      "PyMuPDF fitz extract text from PDF python complete code example",
+      "PyMuPDF read PDF pages metadata table of contents python script",
+      "PyMuPDF extract images annotations from PDF python advanced",
+    ],
+    docUrls: [
+      "https://pymupdf.readthedocs.io/en/latest/tutorial.html",
+    ],
+    why: "Fast PDF text extraction. Use when user uploads a PDF and asks to read/summarize/analyze it. Trigger: [READ_PDF] or automatic on PDF upload.",
+  },
+  {
+    id: "pdfplumber",
+    name: "pdfplumber 0.11 — PDF table extraction",
+    category: "document_processing",
+    searchQueries: [
+      "pdfplumber extract tables from PDF python complete code",
+      "pdfplumber detect table cells rows columns python example",
+    ],
+    docUrls: [],
+    why: "Specialized PDF table extractor — finds and parses tables from scanned or structured PDFs. Use alongside PyMuPDF.",
+  },
+  {
+    id: "reportlab",
+    name: "reportlab 4.4 — PDF generation",
+    category: "document_processing",
+    searchQueries: [
+      "reportlab create PDF python SimpleDocTemplate Paragraph Table advanced example",
+      "reportlab professional PDF styled tables headers footers python complete",
+    ],
+    docUrls: [],
+    why: "Generates professional PDFs with styled tables, headings, paragraphs. Use when user asks to create/export a PDF document.",
+  },
+  {
+    id: "python_docx",
+    name: "python-docx 1.2 — Word document processing",
+    category: "document_processing",
+    searchQueries: [
+      "python-docx create Word document headings tables styles python complete example",
+      "python-docx read extract text paragraphs tables from .docx python",
+    ],
+    docUrls: [],
+    why: "Reads and creates .docx Word documents. Trigger when user uploads .docx or asks to create a Word document.",
+  },
+  {
+    id: "openpyxl",
+    name: "openpyxl 3.1 — Excel (.xlsx) processing",
+    category: "document_processing",
+    searchQueries: [
+      "openpyxl create Excel spreadsheet multiple sheets styling python complete example",
+      "openpyxl read Excel xlsx workbook sheets cells python advanced",
+      "openpyxl chart conditional formatting formula python example",
+    ],
+    docUrls: [],
+    why: "Reads and creates .xlsx Excel spreadsheets with formatted headers, multiple sheets, column auto-sizing. Trigger on Excel upload or when user asks to create a spreadsheet.",
+  },
+  // ── OCR ───────────────────────────────────────────────────────────────────
+  {
+    id: "tesseract_ocr",
+    name: "Tesseract 5.5 + pytesseract — Optical Character Recognition",
+    category: "computer_vision",
+    searchQueries: [
+      "pytesseract tesseract OCR extract text from image python complete example",
+      "tesseract OCR preprocessing opencv grayscale threshold denoise accuracy",
+      "pytesseract confidence word-level data extraction image_to_data python",
+    ],
+    docUrls: [
+      "https://tesseract-ocr.github.io/tessdoc/",
+    ],
+    why: "Extracts text from any image using Tesseract OCR with OpenCV preprocessing (denoise, threshold, upscale) for maximum accuracy. Returns text, line positions, per-word confidence scores.",
+  },
+  // ── NLP ───────────────────────────────────────────────────────────────────
+  {
+    id: "spacy",
+    name: "spaCy 3.8 — Natural Language Processing",
+    category: "nlp",
+    searchQueries: [
+      "spaCy named entity recognition NER python complete example code",
+      "spaCy en_core_web_sm text analysis noun chunks dependency parse python",
+      "spaCy pipeline tokenization POS tagging lemmatization advanced python",
+    ],
+    docUrls: [
+      "https://spacy.io/api",
+    ],
+    why: "NLP engine for named entity recognition, POS tagging, dependency parsing, noun chunk extraction. Use [ANALYZE_NLP: JSON spec] marker.",
+  },
+  {
+    id: "nltk",
+    name: "NLTK 3.9 — Natural Language Toolkit",
+    category: "nlp",
+    searchQueries: [
+      "NLTK sentiment analysis text classification python complete example",
+      "NLTK tokenization stemming lemmatization frequency distribution python",
+    ],
+    docUrls: [],
+    why: "Foundational NLP tools — tokenization, stemming, frequency analysis, text classification. Works alongside spaCy.",
+  },
+  // ── Audio / Video ─────────────────────────────────────────────────────────
+  {
+    id: "ffmpeg",
+    name: "FFmpeg 7.1 — Video/Audio Processing",
+    category: "media_processing",
+    searchQueries: [
+      "ffmpeg video conversion python subprocess command line complete examples",
+      "ffmpeg extract audio thumbnail trim video python command line",
+      "ffmpeg waveform visualization filter_complex showwavespic python",
+      "ffmpeg video info ffprobe JSON output streams format python",
+    ],
+    docUrls: [
+      "https://ffmpeg.org/ffmpeg-filters.html",
+    ],
+    why: "Complete video/audio processing: extract thumbnails, convert formats, trim clips, extract audio, generate waveform visualizations, get detailed video/audio metadata. Available for any uploaded media file.",
+  },
+  {
+    id: "librosa",
+    name: "librosa 0.11 — Audio Analysis",
+    category: "media_processing",
+    searchQueries: [
+      "librosa audio analysis beat detection tempo BPM python complete example",
+      "librosa spectrogram mel MFCC spectral features python advanced example",
+      "librosa chroma key detection musical analysis python code",
+    ],
+    docUrls: [
+      "https://librosa.org/doc/latest/tutorial.html",
+    ],
+    why: "Deep audio analysis: BPM/tempo detection, beat tracking, spectrogram generation, MFCC feature extraction, musical key estimation, harmonic vs percussive separation. Trigger on audio file uploads.",
+  },
+  // ── Diagrams / Graphs ─────────────────────────────────────────────────────
+  {
+    id: "graphviz",
+    name: "Graphviz 12.2 — Graph Visualization",
+    category: "diagramming",
+    searchQueries: [
+      "graphviz DOT language advanced graph visualization node edge attributes",
+      "graphviz directed graph dependency tree flowchart DOT syntax examples",
+      "graphviz subgraph cluster layout neato fdp sfdp engine comparison",
+    ],
+    docUrls: [
+      "https://graphviz.org/documentation/",
+    ],
+    why: "Renders DOT-language graphs as SVG/PNG: dependency graphs, flowcharts, network maps, tree structures. Use [GENERATE_DIAGRAM: JSON spec with code field] marker.",
+  },
+  {
+    id: "networkx",
+    name: "networkx 3.6 — Network Graph Analysis",
+    category: "diagramming",
+    searchQueries: [
+      "networkx graph analysis betweenness centrality shortest path python example",
+      "networkx directed graph DiGraph community detection algorithms python",
+      "networkx spring layout circular kamada_kawai visualization matplotlib",
+    ],
+    docUrls: [],
+    why: "Network graph analysis and visualization: degree centrality, shortest paths, community detection, clustering coefficient. Renders colored network graphs with matplotlib.",
+  },
+  // ── Data Science / ML ─────────────────────────────────────────────────────
+  {
+    id: "scikit_learn",
+    name: "scikit-learn 1.8 — Machine Learning",
+    category: "machine_learning",
+    searchQueries: [
+      "scikit-learn KMeans clustering StandardScaler PCA python complete example",
+      "scikit-learn LinearRegression train test split R2 score python code",
+      "scikit-learn IsolationForest anomaly detection outlier python example",
+      "scikit-learn classification RandomForest accuracy precision recall python",
+    ],
+    docUrls: [
+      "https://scikit-learn.org/stable/supervised_learning.html",
+    ],
+    why: "Full ML pipeline: K-Means clustering, linear/ridge regression, anomaly detection, classification, PCA dimensionality reduction. Use [DATA_SCIENCE: JSON spec] marker.",
+  },
+  {
+    id: "pandas",
+    name: "pandas 3.0 — Data Analysis",
+    category: "data_science",
+    searchQueries: [
+      "pandas DataFrame advanced analysis groupby agg pivot_table python example",
+      "pandas CSV Excel JSON reading cleaning transformation python advanced",
+      "pandas statistical analysis describe correlation value_counts python",
+    ],
+    docUrls: [],
+    why: "Core data manipulation: read CSV/Excel/JSON, clean data, group/aggregate, statistical describe, correlation matrices. Works alongside scikit-learn and matplotlib.",
+  },
+  // ── Math / Science ────────────────────────────────────────────────────────
+  {
+    id: "sympy",
+    name: "sympy 1.14 — Symbolic Mathematics",
+    category: "mathematics",
+    searchQueries: [
+      "sympy solve equation system of equations symbolic python complete example",
+      "sympy differentiate integrate symbolic calculus python advanced",
+      "sympy factor expand simplify polynomial matrix operations python",
+      "sympy LaTeX output mathematical expression rendering python",
+    ],
+    docUrls: [
+      "https://docs.sympy.org/latest/tutorials/intro-tutorial/",
+    ],
+    why: "Exact symbolic mathematics: solve equations, calculus (derivatives, integrals, series), factor/expand polynomials, matrix determinants/eigenvalues, output LaTeX. Use [SOLVE_MATH: JSON spec] marker.",
+  },
+  {
+    id: "scipy",
+    name: "scipy 1.x — Scientific Computing",
+    category: "mathematics",
+    searchQueries: [
+      "scipy statistics normality test skewness kurtosis python example",
+      "scipy optimize minimize root finding linear programming python",
+      "scipy signal processing FFT convolution python advanced example",
+    ],
+    docUrls: [],
+    why: "Advanced scientific computing: statistical tests, optimization, signal processing, spatial analysis. Works alongside NumPy and SymPy.",
+  },
+  // ── Utilities ─────────────────────────────────────────────────────────────
+  {
+    id: "qrcode_barcode",
+    name: "qrcode 8.2 + python-barcode 0.16 — Code Generation",
+    category: "utilities",
+    searchQueries: [
+      "qrcode python generate QR code PIL image complete example",
+      "python-barcode generate barcode EAN13 Code128 SVG PNG python",
+    ],
+    docUrls: [],
+    why: "Generates QR codes and barcodes (EAN-13, Code-128, UPC). Already integrated via [QR: text] marker.",
+  },
+  {
+    id: "exiftool",
+    name: "ExifTool 13.25 — File Metadata Reader",
+    category: "utilities",
+    searchQueries: [
+      "exiftool read EXIF metadata image video GPS camera settings command line",
+      "exiftool extract all metadata from file list supported formats",
+    ],
+    docUrls: [],
+    why: "Reads all EXIF/metadata from images, videos, PDFs: GPS coordinates, camera model/settings, creation date, dimensions, color profile.",
+  },
 ];
 
 // ── Fetch content from a doc URL ─────────────────────────────────────────────
@@ -443,6 +708,56 @@ export async function loadToolKnowledgeForTask(taskHint: string): Promise<string
       || hint.includes("face recogn") || hint.includes("face analy") || hint.includes("face detect")
       || hint.includes("who is this") || hint.includes("how old") || hint.includes("person in")) {
       relevant.push("tool_face_recognition");
+    }
+    if (hint.includes("chart") || hint.includes("graph") || hint.includes("plot") || hint.includes("visuali")
+      || hint.includes("bar chart") || hint.includes("line chart") || hint.includes("pie chart") || hint.includes("histogram")
+      || hint.includes("heatmap") || hint.includes("scatter") || hint.includes("seaborn") || hint.includes("matplotlib")) {
+      relevant.push("tool_matplotlib_seaborn", "tool_plotly");
+    }
+    if (hint.includes("pdf") || hint.includes("portable doc") || hint.includes("extract text") || hint.includes("read pdf")
+      || hint.includes("create pdf") || hint.includes("pdf table")) {
+      relevant.push("tool_pymupdf", "tool_pdfplumber", "tool_reportlab");
+    }
+    if (hint.includes("word doc") || hint.includes("docx") || hint.includes(".docx") || hint.includes("word file")) {
+      relevant.push("tool_python_docx");
+    }
+    if (hint.includes("excel") || hint.includes("xlsx") || hint.includes("spreadsheet") || hint.includes("workbook")) {
+      relevant.push("tool_openpyxl");
+    }
+    if (hint.includes("ocr") || hint.includes("read text from image") || hint.includes("extract text from image")
+      || hint.includes("text from image") || hint.includes("recognize text") || hint.includes("optical char")) {
+      relevant.push("tool_tesseract_ocr");
+    }
+    if (hint.includes("named entity") || hint.includes("ner") || hint.includes("entity extract") || hint.includes("keyword extract")
+      || hint.includes("text analys") || hint.includes("nlp") || hint.includes("sentiment") || hint.includes("pos tag")
+      || hint.includes("spacy") || hint.includes("nltk")) {
+      relevant.push("tool_spacy", "tool_nltk");
+    }
+    if (hint.includes("video convert") || hint.includes("extract audio") || hint.includes("video info") || hint.includes("thumbnail")
+      || hint.includes("trim video") || hint.includes("waveform") || hint.includes("ffmpeg")) {
+      relevant.push("tool_ffmpeg");
+    }
+    if (hint.includes("audio analys") || hint.includes("beat detect") || hint.includes("tempo") || hint.includes("bpm")
+      || hint.includes("spectrogram") || hint.includes("librosa") || hint.includes("music analys")) {
+      relevant.push("tool_librosa");
+    }
+    if (hint.includes("diagram") || hint.includes("flowchart") || hint.includes("network graph") || hint.includes("graphviz")
+      || hint.includes("dot language") || hint.includes("dependency graph") || hint.includes("flow diagram")) {
+      relevant.push("tool_graphviz", "tool_networkx");
+    }
+    if (hint.includes("cluster") || hint.includes("machine learn") || hint.includes("ml model") || hint.includes("train model")
+      || hint.includes("predict") || hint.includes("regression") || hint.includes("anomaly") || hint.includes("pca")
+      || hint.includes("scikit") || hint.includes("sklearn")) {
+      relevant.push("tool_scikit_learn", "tool_pandas");
+    }
+    if (hint.includes("csv") || hint.includes("dataframe") || hint.includes("data analys") || hint.includes("pandas")) {
+      relevant.push("tool_pandas", "tool_scikit_learn");
+    }
+    if (hint.includes("solve") || hint.includes("equation") || hint.includes("derivative") || hint.includes("integral")
+      || hint.includes("calculus") || hint.includes("factor polynom") || hint.includes("simplify expr")
+      || hint.includes("matrix det") || hint.includes("eigenvalue") || hint.includes("symbolic math")
+      || hint.includes("taylor series") || hint.includes("sympy")) {
+      relevant.push("tool_sympy", "tool_scipy");
     }
 
     if (relevant.length === 0) return "";

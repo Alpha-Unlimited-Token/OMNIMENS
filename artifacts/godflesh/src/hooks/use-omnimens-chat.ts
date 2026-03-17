@@ -115,6 +115,78 @@ export type ToolResult = {
   index: number;
 };
 
+export type ChartResult = {
+  index: number;
+  chart_png?: string;
+  chart_type?: string;
+  title?: string;
+  error?: string;
+};
+
+export type DiagramResult = {
+  index: number;
+  diagram_png?: string;
+  diagram_svg?: string;
+  diagram_type?: string;
+  error?: string;
+};
+
+export type MathResult = {
+  index: number;
+  action?: string;
+  expression?: string;
+  result?: string;
+  solutions?: string[];
+  solutions_latex?: string[];
+  latex?: string;
+  derivative?: string;
+  factored?: string;
+  expanded?: string;
+  series?: string;
+  plot_png?: string;
+  numeric?: number;
+  mean?: number;
+  median?: number;
+  std?: number;
+  results?: any;
+  error?: string;
+  success?: boolean;
+};
+
+export type NLPResult = {
+  index: number;
+  action?: string;
+  stats?: any;
+  keywords?: any[];
+  named_entities?: any;
+  sentiment?: any;
+  key_phrases?: string[];
+  grouped?: any;
+  error?: string;
+  success?: boolean;
+};
+
+export type DataScienceResult = {
+  index: number;
+  action?: string;
+  shape?: number[];
+  columns?: string[];
+  cluster_counts?: any;
+  n_clusters_found?: number;
+  scatter_plot_png?: string;
+  heatmap_png?: string;
+  r2_score?: number;
+  rmse?: number;
+  coefficients?: any;
+  anomaly_count?: number;
+  anomaly_rate?: number;
+  describe?: any;
+  correlation_matrix?: any;
+  top_correlations?: any[];
+  error?: string;
+  success?: boolean;
+};
+
 export type Message = {
   id: string;
   role: "user" | "omnimens";
@@ -153,6 +225,12 @@ export type Message = {
     markdown: string;
     boundingBoxes: { face_index: number; x: number; y: number; width: number; height: number; confidence: number }[];
   };
+  // Developer Power Tools
+  chartResults?: ChartResult[];
+  diagramResults?: DiagramResult[];
+  mathResults?: MathResult[];
+  nlpResults?: NLPResult[];
+  dataScienceResults?: DataScienceResult[];
 };
 
 export type AttachedFile = {
@@ -548,6 +626,61 @@ export function useOmnimensChat(
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
                   if (msg) msg.analyzingFaces = false;
+                  return newMsgs;
+                });
+
+              } else if (data.type === "tool_chart") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    if (!msg.chartResults) msg.chartResults = [];
+                    msg.chartResults.push({ index: data.index, chart_png: data.chart_png, chart_type: data.chart_type, title: data.title, error: data.error });
+                  }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "tool_diagram") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    if (!msg.diagramResults) msg.diagramResults = [];
+                    msg.diagramResults.push({ index: data.index, diagram_png: data.diagram_png, diagram_svg: data.diagram_svg, diagram_type: data.diagram_type, error: data.error });
+                  }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "tool_math") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    if (!msg.mathResults) msg.mathResults = [];
+                    msg.mathResults.push({ ...data, index: data.index });
+                  }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "tool_nlp") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    if (!msg.nlpResults) msg.nlpResults = [];
+                    msg.nlpResults.push({ ...data, index: data.index });
+                  }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "tool_data_science") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    if (!msg.dataScienceResults) msg.dataScienceResults = [];
+                    msg.dataScienceResults.push({ ...data, index: data.index });
+                  }
                   return newMsgs;
                 });
 

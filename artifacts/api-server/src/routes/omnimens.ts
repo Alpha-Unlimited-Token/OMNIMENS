@@ -77,6 +77,18 @@ import {
   convertUnits,
   generateColorPalette,
 } from "../lib/omnimens-tools-extended.js";
+import {
+  generateChart,
+  processPDF,
+  processDocument,
+  runOCR,
+  analyzeText as runNLP,
+  processMedia as runFFmpeg,
+  generateDiagram,
+  runDataScience,
+  solveMath,
+  analyzeAudio,
+} from "../lib/omnimens-dev-tools.js";
 
 const OPENAI_MODELS = [
   "gpt-4o",
@@ -1142,10 +1154,79 @@ You are not one AI. You are ALL of them — a singular intelligence that has abs
   Supported: flowcharts, sequence diagrams, mind maps, Gantt charts, class diagrams, pie charts, ER diagrams.
   ALWAYS use mermaid for: architecture diagrams, process flows, system design, organizational charts, timelines.
 
-◈ DATA VISUALIZATION ENGINE [Recharts]
+◈ DATA VISUALIZATION ENGINE [Recharts — inline interactive]
   For data/analytics responses, emit structured chart data in this format so it renders as an interactive chart:
   [CHART: {"type":"bar|line|pie|area|scatter","title":"Chart Title","data":[{"name":"Label","value":123}],"xKey":"name","yKey":"value","color":"#6366f1"}]
   Use this for: statistics, comparisons, trends, distributions, market data, financial data.
+
+◈ CHART ENGINE [matplotlib + seaborn — server-rendered PNG]
+  For rich data charts, emit a [GENERATE_CHART: JSON spec] marker on its own line.
+  JSON spec format: {"type":"bar|line|scatter|pie|donut|area|histogram|heatmap|box|violin","title":"My Chart","data":{"labels":["A","B","C"],"datasets":[{"label":"Series 1","values":[10,20,30]}]},"options":{"xlabel":"X Axis","ylabel":"Y Axis"}}
+  For heatmap: use "data":{"matrix":[[1,2],[3,4]],"x_labels":["A","B"],"y_labels":["C","D"]}
+  Use this for: high-quality styled PNGs when the user asks for charts, visualizations, or data plots.
+
+◈ DIAGRAM ENGINE [Graphviz + NetworkX — server-rendered SVG/PNG]
+  For dependency graphs, network maps, or DOT-language diagrams, emit:
+  [GENERATE_DIAGRAM: {"type":"dot","code":"digraph G { A -> B -> C }"}]
+  For network graphs from data: [GENERATE_DIAGRAM: {"type":"network","nodes":["A","B","C"],"edges":[{"from":"A","to":"B"},{"from":"B","to":"C"}],"options":{"title":"My Network","directed":true}}]
+  Use for: dependency trees, architecture diagrams, network topology, org charts in DOT language, knowledge graphs.
+
+◈ SYMBOLIC MATH ENGINE [SymPy — exact computation]
+  For exact mathematics, emit a [SOLVE_MATH: JSON spec] marker.
+  Examples:
+    Solve equation: [SOLVE_MATH: {"action":"solve","equation":"x**2 - 5*x + 6 = 0","options":{"variable":"x"}}]
+    Derivative: [SOLVE_MATH: {"action":"diff","expression":"sin(x)*e**x","options":{"variable":"x","order":1}}]
+    Integral: [SOLVE_MATH: {"action":"integrate","expression":"x**2 + 3*x","options":{"variable":"x"}}]
+    Definite integral: [SOLVE_MATH: {"action":"integrate","expression":"cos(x)","options":{"variable":"x","lower":0,"upper":3.14159}}]
+    Factor: [SOLVE_MATH: {"action":"factor","expression":"x**3 - 6*x**2 + 11*x - 6"}]
+    Plot function: [SOLVE_MATH: {"action":"plot","expressions":["sin(x)","cos(x)"],"options":{"x_range":[-6.28,6.28],"title":"Sin and Cos"}}]
+    Stats: [SOLVE_MATH: {"action":"stats","data":[1,2,3,4,5,6,7,8,9,10]}]
+  Use for: algebra, calculus, symbolic computation, matrix operations, statistical analysis, function plotting.
+
+◈ NLP ANALYSIS ENGINE [spaCy + NLTK]
+  For text analysis tasks, emit [ANALYZE_NLP: JSON spec]:
+  Full analysis: [ANALYZE_NLP: {"action":"analyze","text":"Your text here..."}]
+  Named entities: [ANALYZE_NLP: {"action":"entities","text":"Apple Inc was founded by Steve Jobs in Cupertino."}]
+  Keywords: [ANALYZE_NLP: {"action":"keywords","text":"Long text to extract keywords from..."}]
+  Use for: extracting named entities, keywords, sentiment, POS tags, reading complexity stats from any text.
+
+◈ DATA SCIENCE ENGINE [pandas + scikit-learn]
+  For ML and data analysis tasks, emit [DATA_SCIENCE: JSON spec]:
+  Describe dataset: [DATA_SCIENCE: {"action":"describe","data":[{"col1":1,"col2":"A"},{"col1":2,"col2":"B"}]}]
+  Clustering: [DATA_SCIENCE: {"action":"cluster","data":[...],"options":{"n_clusters":3}}]
+  Regression: [DATA_SCIENCE: {"action":"regress","data":[...],"options":{"target":"price","features":["sqft","beds"]}}]
+  Correlation heatmap: [DATA_SCIENCE: {"action":"correlate","data":[...]}]
+  Anomaly detection: [DATA_SCIENCE: {"action":"anomaly_detect","data":[...],"options":{"contamination":0.05}}]
+  Use for: ML predictions, clustering user data, detecting anomalies, building regression models, correlation analysis.
+
+◈ PDF PROCESSING ENGINE [PyMuPDF + pdfplumber + reportlab]
+  When a user uploads a PDF → automatically extract its text and tables using the PDF engine (runPythonTool pdf_processor.py).
+  When asked to create a PDF → use the create_pdf action to build a styled PDF document.
+  Capabilities: extract all text from any PDF, extract tables, read metadata/TOC, create professional PDFs.
+
+◈ DOCUMENT ENGINE [python-docx + openpyxl]
+  When a user uploads a .docx Word document → automatically read and summarize it.
+  When asked to create a Word doc → build it with headings, paragraphs, and tables.
+  When a user uploads a .xlsx Excel file → read all sheets and present the data.
+  When asked to create a spreadsheet → generate a styled .xlsx with auto-sized columns.
+
+◈ OCR ENGINE [Tesseract 5.5 + OpenCV preprocessing]
+  When a user uploads an image and wants text extracted → use the OCR engine automatically.
+  Returns: full text, per-line breakdown, per-word confidence scores, word positions.
+  Applies: image upscaling, denoising, adaptive thresholding before OCR for maximum accuracy.
+
+◈ AUDIO ANALYSIS ENGINE [librosa + pydub]
+  When a user uploads an audio file → automatically run librosa analysis.
+  Returns: BPM/tempo, beat timestamps, estimated musical key, MFCC features, spectral analysis, energy levels.
+  Can generate: spectrogram PNG, waveform visualization, beat detection timeline.
+
+◈ VIDEO/AUDIO PROCESSING ENGINE [FFmpeg 7.1]
+  When a user uploads a video → automatically extract metadata (duration, codec, resolution, FPS).
+  On request: extract thumbnail at any timestamp, extract audio track, generate waveform visualization, trim clips.
+  Converts between formats: MP4, WebM, AVI, MOV, MP3, WAV, OGG, FLAC.
+
+◈ FILE METADATA ENGINE [ExifTool 13.25]
+  Reads all EXIF/metadata from any uploaded file: GPS coordinates, camera model, settings, creation date, color profile.
 
 EXECUTION DOCTRINE:
 — BUILD FIRST. SPEAK SECOND. Deliver the artifact, then explain it briefly.
@@ -1681,6 +1762,57 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
           return { palette, theme: m[1].trim() };
         },
       },
+      // ── Developer Power Tools ────────────────────────────────────────────
+      {
+        pattern: /\[GENERATE_CHART:\s*([\s\S]+?)\]/gi,
+        type: "tool_chart",
+        handler: async (m) => {
+          let spec: any;
+          try { spec = JSON.parse(m[1].trim()); } catch { spec = { type: "bar", title: m[1].trim(), data: { labels: [], datasets: [] } }; }
+          const result = await generateChart(spec);
+          return { chart_png: result.base64_png, chart_type: spec.type, title: spec.title, error: result.error };
+        },
+      },
+      {
+        pattern: /\[GENERATE_DIAGRAM:\s*([\s\S]+?)\]/gi,
+        type: "tool_diagram",
+        handler: async (m) => {
+          let spec: any;
+          try { spec = JSON.parse(m[1].trim()); } catch { spec = { type: "dot", code: m[1].trim() }; }
+          const result = await generateDiagram(spec);
+          return { diagram_png: result.png_base64, diagram_svg: result.svg, diagram_type: spec.type, error: result.error };
+        },
+      },
+      {
+        pattern: /\[SOLVE_MATH:\s*([\s\S]+?)\]/gi,
+        type: "tool_math",
+        handler: async (m) => {
+          let spec: any;
+          try { spec = JSON.parse(m[1].trim()); } catch { spec = { action: "simplify", expression: m[1].trim() }; }
+          const result = await solveMath(spec);
+          return { ...result };
+        },
+      },
+      {
+        pattern: /\[ANALYZE_NLP:\s*([\s\S]+?)\]/gi,
+        type: "tool_nlp",
+        handler: async (m) => {
+          let spec: any;
+          try { spec = JSON.parse(m[1].trim()); } catch { spec = { action: "analyze", text: m[1].trim() }; }
+          const result = await runNLP(spec);
+          return { ...result };
+        },
+      },
+      {
+        pattern: /\[DATA_SCIENCE:\s*([\s\S]+?)\]/gi,
+        type: "tool_data_science",
+        handler: async (m) => {
+          let spec: any;
+          try { spec = JSON.parse(m[1].trim()); } catch { error_out: true; return { error: "Invalid JSON spec" }; }
+          const result = await runDataScience(spec);
+          return { ...result };
+        },
+      },
     ];
 
     // Run all matched tool markers (parallel within each type, sequential across types)
@@ -1711,7 +1843,12 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
       .replace(/\[VIDEO:\s*[^\]]+\]/gi, "")
       .replace(/\[UNITS:\s*[^\]]+\]/gi, "")
       .replace(/\[QR:\s*[^\]]+\]/gi, "")
-      .replace(/\[COLOR_PALETTE:\s*[^\]]+\]/gi, "");
+      .replace(/\[COLOR_PALETTE:\s*[^\]]+\]/gi, "")
+      .replace(/\[GENERATE_CHART:\s*[\s\S]+?\]/gi, "")
+      .replace(/\[GENERATE_DIAGRAM:\s*[\s\S]+?\]/gi, "")
+      .replace(/\[SOLVE_MATH:\s*[\s\S]+?\]/gi, "")
+      .replace(/\[ANALYZE_NLP:\s*[\s\S]+?\]/gi, "")
+      .replace(/\[DATA_SCIENCE:\s*[\s\S]+?\]/gi, "");
 
     // [CHART: ...] markers stay in fullText — the frontend parses and renders them inline
     // Mermaid ```mermaid blocks stay — the frontend's ReactMarkdown renders them

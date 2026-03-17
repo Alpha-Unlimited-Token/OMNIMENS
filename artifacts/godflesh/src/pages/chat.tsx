@@ -3953,6 +3953,118 @@ export default function Chat() {
                                 </div>
                               )}
 
+                              {/* Developer Tools: Chart results */}
+                              {msg.chartResults && msg.chartResults.length > 0 && (
+                                <div className="mt-4 space-y-3">
+                                  {msg.chartResults.map((chart, i) => (
+                                    <div key={i} className="rounded-xl border border-blue-500/30 bg-blue-500/5 overflow-hidden">
+                                      <div className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 border-b border-blue-500/20">
+                                        <span className="text-blue-400">📊</span>
+                                        <span className="font-semibold text-blue-300 text-sm">{chart.title || "Chart"}</span>
+                                        {chart.chart_type && <span className="ml-auto px-2 py-0.5 rounded-full text-xs bg-blue-500/20 text-blue-300 border border-blue-500/30 capitalize">{chart.chart_type}</span>}
+                                      </div>
+                                      {chart.chart_png ? (
+                                        <img src={`data:image/png;base64,${chart.chart_png}`} alt={chart.title || "Chart"} className="w-full" />
+                                      ) : (
+                                        <p className="p-3 text-xs text-red-400">{chart.error || "Chart generation failed"}</p>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Developer Tools: Diagram results */}
+                              {msg.diagramResults && msg.diagramResults.length > 0 && (
+                                <div className="mt-4 space-y-3">
+                                  {msg.diagramResults.map((diag, i) => (
+                                    <div key={i} className="rounded-xl border border-teal-500/30 bg-teal-500/5 overflow-hidden">
+                                      <div className="flex items-center gap-2 px-4 py-2 bg-teal-500/10 border-b border-teal-500/20">
+                                        <span className="text-teal-400">🕸️</span>
+                                        <span className="font-semibold text-teal-300 text-sm">Graph Diagram</span>
+                                        {diag.diagram_type && <span className="ml-auto px-2 py-0.5 rounded-full text-xs bg-teal-500/20 text-teal-300 border border-teal-500/30 capitalize">{diag.diagram_type}</span>}
+                                      </div>
+                                      {diag.diagram_png ? (
+                                        <img src={`data:image/png;base64,${diag.diagram_png}`} alt="Diagram" className="w-full bg-white/5 p-2" />
+                                      ) : diag.diagram_svg ? (
+                                        <div className="p-4 overflow-auto" dangerouslySetInnerHTML={{ __html: diag.diagram_svg }} />
+                                      ) : (
+                                        <p className="p-3 text-xs text-red-400">{diag.error || "Diagram generation failed"}</p>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Developer Tools: Math results */}
+                              {msg.mathResults && msg.mathResults.length > 0 && (
+                                <div className="mt-4 space-y-3">
+                                  {msg.mathResults.map((math, i) => (
+                                    <div key={i} className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-amber-400">∑</span>
+                                        <span className="font-semibold text-amber-300 text-sm capitalize">{math.action || "Math Result"}</span>
+                                      </div>
+                                      {math.error ? (
+                                        <p className="text-xs text-red-400">{math.error}</p>
+                                      ) : (
+                                        <div className="space-y-1 text-xs text-neutral-300 font-mono">
+                                          {math.plot_png && <img src={`data:image/png;base64,${math.plot_png}`} alt="Math Plot" className="w-full rounded" />}
+                                          {math.solutions && math.solutions.length > 0 && <div><span className="text-amber-400">Solutions: </span>{math.solutions.join(", ")}</div>}
+                                          {math.result && <div><span className="text-amber-400">Result: </span>{math.result}</div>}
+                                          {math.latex && <div><span className="text-amber-400">LaTeX: </span><code className="bg-black/20 px-1 rounded">{math.latex}</code></div>}
+                                          {math.derivative && <div><span className="text-amber-400">Derivative: </span>{math.derivative}</div>}
+                                          {math.factored && <div><span className="text-amber-400">Factored: </span>{math.factored}</div>}
+                                          {typeof math.mean === "number" && <div className="grid grid-cols-3 gap-2 mt-2"><div>Mean: <span className="text-amber-300">{math.mean?.toFixed(3)}</span></div><div>Median: <span className="text-amber-300">{math.median?.toFixed(3)}</span></div><div>Std: <span className="text-amber-300">{math.std?.toFixed(3)}</span></div></div>}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Developer Tools: NLP results */}
+                              {msg.nlpResults && msg.nlpResults.length > 0 && (
+                                <div className="mt-4 space-y-3">
+                                  {msg.nlpResults.map((nlp, i) => (
+                                    <div key={i} className="rounded-xl border border-green-500/30 bg-green-500/5 p-4">
+                                      <div className="flex items-center gap-2 mb-3">
+                                        <span className="text-green-400">🧠</span>
+                                        <span className="font-semibold text-green-300 text-sm">NLP Analysis</span>
+                                        {nlp.action && <span className="ml-auto px-2 py-0.5 rounded-full text-xs bg-green-500/20 text-green-300 border border-green-500/30 capitalize">{nlp.action}</span>}
+                                      </div>
+                                      {nlp.stats && <div className="grid grid-cols-3 gap-2 text-xs mb-3">{Object.entries(nlp.stats).slice(0,6).map(([k,v]) => <div key={k} className="bg-black/20 rounded p-1"><div className="text-neutral-500 capitalize">{k.replace(/_/g," ")}</div><div className="text-green-300 font-semibold">{String(v)}</div></div>)}</div>}
+                                      {nlp.keywords && nlp.keywords.length > 0 && <div className="flex flex-wrap gap-1 mt-2">{nlp.keywords.slice(0,15).map((kw: any) => <span key={kw.word} className="px-2 py-0.5 rounded-full text-xs bg-green-500/10 text-green-300 border border-green-500/20">{kw.word} <span className="opacity-60">×{kw.count}</span></span>)}</div>}
+                                      {nlp.sentiment && <div className="mt-2 text-xs"><span className="text-neutral-400">Sentiment: </span><span className={nlp.sentiment.label === "positive" ? "text-green-400" : nlp.sentiment.label === "negative" ? "text-red-400" : "text-neutral-400"}>{nlp.sentiment.label}</span></div>}
+                                      {nlp.named_entities && Object.keys(nlp.named_entities).length > 0 && <div className="mt-2 text-xs"><div className="text-neutral-400 mb-1">Named Entities:</div><div className="flex flex-wrap gap-1">{Object.entries(nlp.named_entities).flatMap(([type, vals]: [string, any]) => (vals as string[]).slice(0,3).map((v: string) => <span key={`${type}-${v}`} className="px-2 py-0.5 rounded text-xs bg-purple-500/10 text-purple-300 border border-purple-500/20">{type}: {v}</span>))}</div></div>}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Developer Tools: Data Science results */}
+                              {msg.dataScienceResults && msg.dataScienceResults.length > 0 && (
+                                <div className="mt-4 space-y-3">
+                                  {msg.dataScienceResults.map((ds, i) => (
+                                    <div key={i} className="rounded-xl border border-rose-500/30 bg-rose-500/5 p-4">
+                                      <div className="flex items-center gap-2 mb-3">
+                                        <span className="text-rose-400">🤖</span>
+                                        <span className="font-semibold text-rose-300 text-sm capitalize">ML: {ds.action || "Data Science"}</span>
+                                      </div>
+                                      {ds.error ? <p className="text-xs text-red-400">{ds.error}</p> : (
+                                        <div className="space-y-2">
+                                          {(ds.scatter_plot_png || ds.heatmap_png) && <img src={`data:image/png;base64,${ds.scatter_plot_png || ds.heatmap_png}`} alt="ML Visualization" className="w-full rounded" />}
+                                          {ds.cluster_counts && <div className="text-xs"><span className="text-rose-400">Clusters found: </span><span className="text-neutral-300">{ds.n_clusters_found} — {JSON.stringify(ds.cluster_counts)}</span></div>}
+                                          {typeof ds.r2_score === "number" && <div className="grid grid-cols-2 gap-2 text-xs"><div className="bg-black/20 rounded p-2"><div className="text-neutral-500">R² Score</div><div className="text-rose-300 font-bold text-lg">{ds.r2_score?.toFixed(3)}</div></div><div className="bg-black/20 rounded p-2"><div className="text-neutral-500">RMSE</div><div className="text-rose-300 font-bold text-lg">{ds.rmse?.toFixed(3)}</div></div></div>}
+                                          {typeof ds.anomaly_count === "number" && <div className="text-xs"><span className="text-rose-400">Anomalies detected: </span><span className="text-neutral-300">{ds.anomaly_count} ({ds.anomaly_rate?.toFixed(1)}%)</span></div>}
+                                          {ds.top_correlations && <div className="text-xs mt-2"><div className="text-neutral-400 mb-1">Top correlations:</div>{ds.top_correlations.slice(0,5).map((c: any) => <div key={c.cols} className="flex justify-between"><span className="text-neutral-300">{c.cols}</span><span className={Math.abs(c.correlation) > 0.7 ? "text-rose-400" : "text-neutral-400"}>{c.correlation.toFixed(3)}</span></div>)}</div>}
+                                          {ds.shape && <div className="text-xs text-neutral-400">Dataset: {ds.shape[0]} rows × {ds.shape[1]} cols</div>}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
                               {/* Generated 3D models — interactive Three.js PBR viewer */}
                               {msg.models3d && msg.models3d.length > 0 && (
                                 <div className="mt-4 space-y-4">
