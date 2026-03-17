@@ -219,6 +219,23 @@ app.get("/googleb0b7c87dcdf2b2bb.html", (_req, res) => {
   res.send("google-site-verification: googleb0b7c87dcdf2b2bb.html");
 });
 
+// Root serves a minimal page with Google verification tag + redirect
+app.get("/", (_req, res) => {
+  res.set("Content-Type", "text/html");
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="google-site-verification" content="FXrJZk7h4Eit3koOwazLCus7PJCyrLdwqCwrv_59D2M" />
+  <meta http-equiv="refresh" content="0;url=/godflesh/" />
+  <title>OMNIMENS</title>
+</head>
+<body>
+  <script>window.location.href="/godflesh/";</script>
+</body>
+</html>`);
+});
+
 // ── AUTH MIDDLEWARE ───────────────────────────────────────────────────────────
 app.use(authMiddleware);
 
