@@ -2946,11 +2946,35 @@ function DevRightPanel({
   const lastCodeBlock = useMemo(() => {
     for (let i = messages.length - 1; i >= 0; i--) {
       const content = messages[i].content || "";
-      const match = content.match(/```(?:\w+)?\n([\s\S]*?)```/);
-      if (match) return match[0];
+      const match = content.match(/```(\w+)?\n([\s\S]*?)```/);
+      if (match) return { lang: match[1] || "txt", code: match[2].trimEnd() };
     }
     return null;
   }, [messages]);
+
+  const [codeExpanded, setCodeExpanded] = useState(false);
+  const prevCodeRef = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    const sig = lastCodeBlock ? lastCodeBlock.lang + lastCodeBlock.code.slice(0, 40) : null;
+    if (sig !== prevCodeRef.current) { prevCodeRef.current = sig; setCodeExpanded(false); }
+  }, [lastCodeBlock]);
+
+  const codeLabel = useMemo(() => {
+    if (!lastCodeBlock) return "";
+    const { lang, code } = lastCodeBlock;
+    const lines = code.split("\n");
+    // Try to extract a meaningful title from the code
+    if (lang === "html" || lang === "HTML") {
+      const titleMatch = code.match(/<title[^>]*>([^<]+)<\/title>/i);
+      if (titleMatch) return titleMatch[1].trim();
+    }
+    // First comment line
+    const commentMatch = code.match(/^(?:\/\/|#|<!--|\/\*)\s*(.+)/m);
+    if (commentMatch) return commentMatch[1].replace(/\*\/|-->/, "").trim();
+    // First non-blank line
+    const firstLine = lines.find(l => l.trim().length > 0) || "";
+    return firstLine.trim().slice(0, 60) || `${lang} file`;
+  }, [lastCodeBlock]);
 
   const lastHtml = useMemo(() => {
     for (let i = messages.length - 1; i >= 0; i--) {
@@ -2999,16 +3023,49 @@ function DevRightPanel({
                 <p className="font-mono text-[10px]" style={{ color: txtFaint }}>Loading...</p>
               )}
             </div>
-            {/* Last code block */}
+            {/* Last code block — collapsed file-tree style */}
             {lastCodeBlock ? (
               <div className="rounded border overflow-hidden" style={{ borderColor: bdr }}>
-                <div className="px-3 py-1.5 border-b flex items-center gap-2" style={{ borderColor: bdr, background: cardBg }}>
-                  <FileCode className="w-3 h-3" style={{ color: "#a855f7" }} />
-                  <span className="font-mono text-[9px]" style={{ color: txtMid }}>LATEST CODE</span>
-                </div>
-                <pre className="p-3 text-[10px] font-mono overflow-x-auto" style={{ color: txtMain, background: panelBg, scrollbarWidth: "thin" }}>
-                  {lastCodeBlock}
-                </pre>
+                {/* Header row — always visible */}
+                <button
+                  onClick={() => setCodeExpanded(x => !x)}
+                  className="w-full px-3 py-2 flex items-center gap-2 hover:opacity-80 transition-opacity text-left"
+                  style={{ background: cardBg, borderBottom: codeExpanded ? `1px solid ${bdr}` : "none" }}
+                >
+                  {/* chevron */}
+                  <span className="font-mono text-[8px] shrink-0" style={{ color: "#a855f7" }}>
+                    {codeExpanded ? "▾" : "▸"}
+                  </span>
+                  <FileCode className="w-3 h-3 shrink-0" style={{ color: "#a855f7" }} />
+                  {/* language badge */}
+                  <span
+                    className="font-mono text-[7px] px-1 py-0.5 rounded shrink-0 uppercase"
+                    style={{ background: "rgba(168,85,247,0.15)", color: "#a855f7" }}
+                  >
+                    {lastCodeBlock.lang}
+                  </span>
+                  {/* description label */}
+                  <span
+                    className="font-mono text-[9px] truncate flex-1"
+                    style={{ color: txtMid }}
+                    title={codeLabel}
+                  >
+                    {codeLabel}
+                  </span>
+                  {/* line count */}
+                  <span className="font-mono text-[8px] shrink-0" style={{ color: txtFaint }}>
+                    {lastCodeBlock.code.split("\n").length}L
+                  </span>
+                </button>
+                {/* Expanded code */}
+                {codeExpanded && (
+                  <pre
+                    className="p-3 text-[10px] font-mono overflow-x-auto"
+                    style={{ color: txtMain, background: panelBg, scrollbarWidth: "thin", maxHeight: "40vh", overflowY: "auto" }}
+                  >
+                    {lastCodeBlock.code}
+                  </pre>
+                )}
               </div>
             ) : (
               <div className="rounded border border-dashed p-6 text-center" style={{ borderColor: bdr }}>
