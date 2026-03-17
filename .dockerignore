@@ -1,0 +1,11 @@
+.git
+.gitignore
+attached_assets
+node_modules
+artifacts/*/node_modules
+artifacts/*/dist
+artifacts/godflesh/public/avatar-studio.html
+.local
+*.log
+*.md
+.env*
