@@ -2338,18 +2338,30 @@ function LeftPanel({
                   .map(proj => (
                   <div key={proj.id} className="rounded-lg overflow-hidden border border-white/5">
                     {/* Project row */}
-                    <button
-                      onClick={() => toggleExpandProject(proj.id)}
-                      className="w-full flex items-center gap-1.5 px-2 py-1.5 hover:bg-white/5 transition-all text-left"
-                    >
-                      <ChevronRight className={`w-2.5 h-2.5 text-white/30 shrink-0 transition-transform ${expandedProjects.includes(proj.id) ? "rotate-90" : ""}`} />
-                      <FolderOpen className="w-3 h-3 text-primary/50 shrink-0" />
-                      <span className="text-[9px] font-mono text-white/80 truncate flex-1">{proj.name}</span>
-                      {proj.starred && <Star className="w-2.5 h-2.5 text-yellow-400/60 shrink-0" />}
-                      {proj.visibility === "public"
-                        ? <Unlock className="w-2.5 h-2.5 text-green-400/40 shrink-0" />
-                        : <Lock className="w-2.5 h-2.5 text-white/20 shrink-0" />}
-                    </button>
+                    <div className="flex items-center group">
+                      <button
+                        onClick={() => toggleExpandProject(proj.id)}
+                        className="flex items-center gap-1.5 px-2 py-1.5 hover:bg-white/5 transition-all text-left flex-1 min-w-0"
+                      >
+                        <ChevronRight className={`w-2.5 h-2.5 text-white/30 shrink-0 transition-transform ${expandedProjects.includes(proj.id) ? "rotate-90" : ""}`} />
+                        <FolderOpen className="w-3 h-3 text-primary/50 shrink-0" />
+                        <span className="text-[9px] font-mono text-white/80 truncate flex-1">{proj.name}</span>
+                        {proj.starred && <Star className="w-2.5 h-2.5 text-yellow-400/60 shrink-0" />}
+                        {proj.visibility === "public"
+                          ? <Unlock className="w-2.5 h-2.5 text-green-400/40 shrink-0" />
+                          : <Lock className="w-2.5 h-2.5 text-white/20 shrink-0" />}
+                      </button>
+                      {/* Download ZIP button */}
+                      <a
+                        href={`/api/omnimens/projects/${proj.id}/download-zip`}
+                        download
+                        title="Download all files as ZIP"
+                        className="shrink-0 px-2 py-1.5 text-white/20 hover:text-primary transition-colors opacity-0 group-hover:opacity-100"
+                        onClick={e => e.stopPropagation()}
+                      >
+                        <Download className="w-3 h-3" />
+                      </a>
+                    </div>
 
                     {/* Files list */}
                     {expandedProjects.includes(proj.id) && (
@@ -2365,10 +2377,24 @@ function LeftPanel({
                           (projectFiles[proj.id] || [])
                             .filter(f => !fileSearch || f.filename.toLowerCase().includes(fileSearch.toLowerCase()))
                             .map(file => (
-                            <div key={file.id} className="flex items-center gap-1.5 px-4 py-1.5 hover:bg-white/4 transition-all group">
+                            <div key={file.id} className="flex items-center gap-1.5 px-4 py-1.5 hover:bg-white/4 transition-all group/file">
                               <File className="w-2.5 h-2.5 text-white/25 shrink-0" />
                               <span className="text-[8px] font-mono text-white/55 truncate flex-1">{file.filename}</span>
-                              <span className="text-[7px] font-mono text-primary/30 shrink-0">{file.language || "txt"}</span>
+                              <span className="text-[7px] font-mono text-primary/30 shrink-0 group-hover/file:hidden">{file.language || "txt"}</span>
+                              <button
+                                title={`Download ${file.filename}`}
+                                className="hidden group-hover/file:flex items-center shrink-0 text-white/25 hover:text-primary transition-colors"
+                                onClick={() => {
+                                  const blob = new Blob([file.content || ""], { type: "text/plain" });
+                                  const url = URL.createObjectURL(blob);
+                                  const a = document.createElement("a");
+                                  a.href = url; a.download = file.filename;
+                                  document.body.appendChild(a); a.click();
+                                  document.body.removeChild(a); URL.revokeObjectURL(url);
+                                }}
+                              >
+                                <Download className="w-2.5 h-2.5" />
+                              </button>
                             </div>
                           ))
                         )}

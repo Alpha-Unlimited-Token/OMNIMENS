@@ -10,6 +10,7 @@
  */
 import { Router, type IRouter } from "express";
 import multer from "multer";
+import JSZip from "jszip";
 import { db } from "@workspace/db";
 import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions, omnimensCodeRuns, omnimensConversations, omnimensMessages, omnimensMemories, omnimensCustomInstructions, omnimensHubSettings, omnimensSavedPrompts } from "@workspace/db";
 import { eq, and, desc, sql, asc, inArray } from "drizzle-orm";
@@ -3016,6 +3017,51 @@ router.post("/omnimens/projects/:id/files", async (req, res) => {
     res.json(file);
   } catch (err: any) {
     res.status(500).json({ error: "Failed to save file", detail: String(err?.message || err) });
+  }
+});
+
+// Download all project files as ZIP
+router.get("/omnimens/projects/:id/download-zip", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Unauthenticated" }); return; }
+  const projectId = Number(req.params.id);
+  try {
+    const [project] = await db
+      .select()
+      .from(omnimensProjects)
+      .where(and(eq(omnimensProjects.id, projectId), eq(omnimensProjects.userId, req.user.id)));
+    if (!project) { res.status(404).json({ error: "Project not found" }); return; }
+
+    const files = await db
+      .select()
+      .from(omnimensProjectFiles)
+      .where(eq(omnimensProjectFiles.projectId, projectId));
+
+    const zip = new JSZip();
+    const folder = zip.folder(project.name.replace(/[^a-z0-9_\-]/gi, "_"));
+
+    if (files.length === 0) {
+      folder!.file("README.txt", `Project: ${project.name}\nCreated by OMNIMENS\nNo files found.`);
+    } else {
+      for (const file of files) {
+        folder!.file(file.filename, file.content || "");
+      }
+      folder!.file("_manifest.json", JSON.stringify({
+        project: project.name,
+        description: project.description || "",
+        type: project.type || "general",
+        files: files.map(f => ({ filename: f.filename, language: f.language, size: (f.content || "").length })),
+        exportedAt: new Date().toISOString(),
+        exportedBy: "OMNIMENS — Alpha Unlimited Technologies LLC",
+      }, null, 2));
+    }
+
+    const buffer = await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE", compressionOptions: { level: 6 } });
+    const safeName = project.name.replace(/[^a-z0-9_\-]/gi, "_").toLowerCase();
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader("Content-Disposition", `attachment; filename="${safeName}.zip"`);
+    res.send(buffer);
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to build ZIP", detail: String(err?.message || err) });
   }
 });
 
