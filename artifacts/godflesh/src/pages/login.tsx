@@ -10,12 +10,10 @@ import { Eye, EyeOff, Loader2, ArrowRight, Lock, Mail, User, AlertCircle, CheckC
 import { GoogleLogin } from "@react-oauth/google";
 import { OmnimensPresence } from "@/components/omnimens-presence";
 
-const BASE_URL = import.meta.env.BASE_URL ?? "/";
-
 // ── API calls ─────────────────────────────────────────────────────────────────
 
 async function apiRegister(email: string, password: string, displayName: string) {
-  const res = await fetch(`${BASE_URL}api/auth/email/register`, {
+  const res = await fetch(`/api/auth/email/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password, displayName }),
@@ -27,7 +25,7 @@ async function apiRegister(email: string, password: string, displayName: string)
 }
 
 async function apiLogin(email: string, password: string) {
-  const res = await fetch(`${BASE_URL}api/auth/email/login`, {
+  const res = await fetch(`/api/auth/email/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -39,7 +37,7 @@ async function apiLogin(email: string, password: string) {
 }
 
 async function apiGoogleVerify(credential: string) {
-  const res = await fetch(`${BASE_URL}api/auth/google/verify`, {
+  const res = await fetch(`/api/auth/google/verify`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ credential }),
