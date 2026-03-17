@@ -1556,11 +1556,195 @@ function ExerciseCard({ exercise }: { exercise: { name: string; sets: number; re
   );
 }
 
-// ── Code block with run ────────────────────────────────────────────────────────
+// ── Save to Project Modal + Code Block ────────────────────────────────────────
+function SaveToProjectModal({
+  code, language, onClose,
+}: {
+  code: string; language: string; onClose: () => void;
+}) {
+  const [projects, setProjects] = useState<{ id: number; name: string; type: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState<number | "">("");
+  const [filename, setFilename] = useState(() => {
+    const extMap: Record<string, string> = {
+      javascript: "script.js", js: "script.js", typescript: "script.ts", ts: "script.ts",
+      tsx: "component.tsx", jsx: "component.jsx", html: "index.html", css: "style.css",
+      python: "main.py", py: "main.py", json: "data.json", sql: "query.sql",
+      markdown: "README.md", md: "README.md", bash: "run.sh", shell: "run.sh",
+      yaml: "config.yaml", svg: "image.svg",
+    };
+    return extMap[language.toLowerCase()] || `file.${language || "txt"}`;
+  });
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
+  const [showNew, setShowNew] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [creating, setCreating] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/omnimens/projects", { credentials: "include" })
+      .then(r => r.json())
+      .then(data => {
+        setProjects(Array.isArray(data) ? data : []);
+        if (data.length > 0) setSelectedId(data[0].id);
+        setLoading(false);
+      })
+      .catch(() => { setLoading(false); });
+  }, []);
+
+  const handleSave = async () => {
+    if (!selectedId || !filename.trim()) return;
+    setSaving(true);
+    setError("");
+    try {
+      const r = await fetch(`/api/omnimens/projects/${selectedId}/files`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: filename.trim(), content: code, language }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || "Failed to save");
+      setSaved(true);
+      setTimeout(onClose, 1500);
+    } catch (e: any) {
+      setError(e.message || "Save failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCreateProject = async () => {
+    if (!newName.trim()) return;
+    setCreating(true);
+    try {
+      const r = await fetch("/api/omnimens/projects", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newName.trim(), description: "Created from chat", type: "tool" }),
+      });
+      const p = await r.json();
+      if (!r.ok) throw new Error(p.error || "Failed");
+      setProjects(prev => [p, ...prev]);
+      setSelectedId(p.id);
+      setShowNew(false);
+      setNewName("");
+    } catch (e: any) {
+      setError(e.message || "Create failed");
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-[#0a0a12] border border-primary/30 rounded-2xl shadow-2xl w-full max-w-sm p-6">
+        <button onClick={onClose} className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors">
+          <X className="w-4 h-4" />
+        </button>
+
+        <div className="flex items-center gap-2 mb-5">
+          <FolderOpen className="w-4 h-4 text-primary" />
+          <h2 className="font-mono font-bold text-white tracking-widest text-sm">SAVE TO PROJECT</h2>
+        </div>
+
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-5 h-5 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {/* Filename */}
+            <div>
+              <label className="block text-[10px] font-mono text-white/60 tracking-widest mb-1.5">FILENAME</label>
+              <input
+                value={filename}
+                onChange={e => setFilename(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-primary/50 transition-colors"
+                placeholder="filename.ext"
+              />
+            </div>
+
+            {/* Project picker */}
+            <div>
+              <label className="block text-[10px] font-mono text-white/60 tracking-widest mb-1.5">PROJECT FOLDER</label>
+              {projects.length === 0 && !showNew ? (
+                <p className="text-xs font-mono text-white/50 mb-2">No projects yet. Create one below.</p>
+              ) : (
+                <select
+                  value={selectedId}
+                  onChange={e => setSelectedId(Number(e.target.value))}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-primary/50 transition-colors appearance-none mb-2"
+                >
+                  {projects.map(p => (
+                    <option key={p.id} value={p.id} className="bg-[#0a0a12]">
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              {/* Create new project inline */}
+              {showNew ? (
+                <div className="flex gap-2">
+                  <input
+                    value={newName}
+                    onChange={e => setNewName(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && handleCreateProject()}
+                    placeholder="Project name..."
+                    className="flex-1 bg-white/5 border border-primary/30 rounded-lg px-3 py-1.5 text-sm font-mono text-white focus:outline-none focus:border-primary/60 transition-colors"
+                    autoFocus
+                  />
+                  <button
+                    onClick={handleCreateProject}
+                    disabled={creating || !newName.trim()}
+                    className="px-3 py-1.5 bg-primary text-black rounded-lg font-mono text-xs font-bold hover:bg-primary/90 disabled:opacity-40 transition-colors"
+                  >
+                    {creating ? <Loader2 className="w-3 h-3 animate-spin" /> : "CREATE"}
+                  </button>
+                  <button onClick={() => setShowNew(false)} className="px-2 text-white/40 hover:text-white">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowNew(true)}
+                  className="text-[10px] font-mono text-primary/70 hover:text-primary transition-colors flex items-center gap-1"
+                >
+                  <Plus className="w-3 h-3" /> NEW PROJECT
+                </button>
+              )}
+            </div>
+
+            {error && <p className="text-xs font-mono text-red-400">{error}</p>}
+
+            <button
+              onClick={handleSave}
+              disabled={saving || saved || !selectedId || !filename.trim()}
+              className="w-full py-2.5 rounded-xl font-mono font-bold text-sm tracking-widest transition-all disabled:opacity-40 bg-primary text-black hover:bg-primary/90 flex items-center justify-center gap-2"
+            >
+              {saved ? (
+                <><Check className="w-4 h-4" /> SAVED!</>
+              ) : saving ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> SAVING...</>
+              ) : (
+                <><FolderOpen className="w-4 h-4" /> SAVE FILE</>
+              )}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function CodeBlockWithRun({ code, language }: { code: string; language: string }) {
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<{ stdout: string; stderr: string; exitCode: number; durationMs: number } | null>(null);
+  const [showSaveModal, setShowSaveModal] = useState(false);
   const isRunnable = ["javascript", "js", "typescript", "ts", "node"].includes(language.toLowerCase());
 
   const runCode = async () => {
@@ -1584,19 +1768,31 @@ function CodeBlockWithRun({ code, language }: { code: string; language: string }
   };
 
   return (
+    <>
+    {showSaveModal && <SaveToProjectModal code={code} language={language} onClose={() => setShowSaveModal(false)} />}
     <div className="my-3 rounded-xl border border-white/10 overflow-hidden">
       <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/8">
         <span className="text-[10px] font-mono text-white/60 uppercase tracking-wider">{language || "code"}</span>
-        {isRunnable && (
+        <div className="flex items-center gap-2">
           <button
-            onClick={runCode}
-            disabled={running}
-            className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono text-primary/70 hover:text-primary border border-primary/20 hover:border-primary/50 rounded transition-colors disabled:opacity-40"
+            onClick={() => setShowSaveModal(true)}
+            className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono text-white/50 hover:text-primary border border-white/10 hover:border-primary/40 rounded transition-colors"
+            title="Save to Project"
           >
-            {running ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
-            {running ? "RUNNING..." : "RUN"}
+            <FolderOpen className="w-3 h-3" />
+            SAVE
           </button>
-        )}
+          {isRunnable && (
+            <button
+              onClick={runCode}
+              disabled={running}
+              className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono text-primary/70 hover:text-primary border border-primary/20 hover:border-primary/50 rounded transition-colors disabled:opacity-40"
+            >
+              {running ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
+              {running ? "RUNNING..." : "RUN"}
+            </button>
+          )}
+        </div>
       </div>
       <pre className="p-4 overflow-x-auto text-sm text-white/80 font-mono bg-black/40 omnimens-scrollbar">
         <code>{code}</code>
@@ -1616,6 +1812,7 @@ function CodeBlockWithRun({ code, language }: { code: string; language: string }
         </div>
       )}
     </div>
+    </>
   );
 }
 

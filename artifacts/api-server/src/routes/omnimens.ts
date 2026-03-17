@@ -2989,6 +2989,36 @@ router.put("/omnimens/projects/:id/files/:fileId", async (req, res) => {
   }
 });
 
+// Add a single file to a project (from chat "Save to Project")
+router.post("/omnimens/projects/:id/files", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Unauthenticated" }); return; }
+  const projectId = Number(req.params.id);
+  const { filename, content, language } = req.body as { filename: string; content: string; language: string };
+  if (!filename || content === undefined) { res.status(400).json({ error: "filename and content required" }); return; }
+  try {
+    const [project] = await db.select({ id: omnimensProjects.id, userId: omnimensProjects.userId })
+      .from(omnimensProjects)
+      .where(and(eq(omnimensProjects.id, projectId), eq(omnimensProjects.userId, req.user.id)));
+    if (!project) { res.status(404).json({ error: "Project not found" }); return; }
+    const ext = filename.split(".").pop()?.toLowerCase() || "txt";
+    const langMap: Record<string, string> = {
+      html: "html", css: "css", js: "javascript", ts: "typescript",
+      tsx: "typescript", jsx: "javascript", json: "json", py: "python",
+      md: "markdown", svg: "svg", sql: "sql", sh: "shell", yaml: "yaml", yml: "yaml",
+    };
+    const [file] = await db.insert(omnimensProjectFiles).values({
+      projectId,
+      filename: filename.trim(),
+      content,
+      language: language || langMap[ext] || ext,
+    }).returning();
+    await db.update(omnimensProjects).set({ updatedAt: new Date() }).where(eq(omnimensProjects.id, projectId));
+    res.json(file);
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to save file", detail: String(err?.message || err) });
+  }
+});
+
 // Remove custom domain
 router.delete("/omnimens/projects/:id/domain", async (req, res) => {
   if (!req.isAuthenticated()) { res.status(401).json({ error: "Unauthenticated" }); return; }
