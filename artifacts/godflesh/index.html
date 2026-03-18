@@ -79,9 +79,18 @@
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
 
-    <!-- Fonts -->
+    <!-- PWA Manifest & Icons -->
+    <link rel="manifest" href="%BASE_URL%manifest.json" />
     <link rel="icon" type="image/png" href="%BASE_URL%images/emblem.png" />
     <link rel="apple-touch-icon" href="%BASE_URL%images/emblem.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="OMNIMENS" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="msapplication-TileColor" content="#a855f7" />
+    <meta name="theme-color" content="#a855f7" />
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -106,5 +115,20 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/godflesh/sw.js', { scope: '/godflesh/' })
+            .then(function(reg) {
+              reg.addEventListener('updatefound', function() {
+                var sw = reg.installing;
+                if (sw) { sw.addEventListener('statechange', function() {}); }
+              });
+            })
+            .catch(function() {});
+        });
+      }
+    </script>
   </body>
 </html>

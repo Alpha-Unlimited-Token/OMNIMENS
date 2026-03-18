@@ -45,6 +45,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ControlHub, loadHubSettingsFromStorage, saveHubSettingsToStorage, type HubSettings } from "@/components/control-hub";
 import { SmartTemplates } from "@/components/smart-templates";
 import { useTheme } from "@/hooks/use-theme";
+import { usePwaInstall } from "@/hooks/use-pwa-install";
 import { MobileTrigger } from "@/components/mobile-ide";
 import {
   AgentBuildPanel, NewAppModal, BuildTriggerButton,
@@ -2459,6 +2460,7 @@ function LeftPanel({
   const filteredConversations = conversations.filter(c =>
     !convSearch || (c.title || "").toLowerCase().includes(convSearch.toLowerCase())
   );
+  const { canInstall, install } = usePwaInstall();
 
   const [panelTab, setPanelTab] = useState<"chats"|"mode"|"skills"|"tools"|"files"|"deploy"|"memory"|"config">("chats");
   const [projects, setProjects] = useState<{ id: number; name: string; type?: string; visibility?: string; starred?: boolean; updatedAt?: string | null }[]>([]);
@@ -3217,6 +3219,20 @@ function LeftPanel({
           </div>
         )}
       </div>
+
+      {/* ── Install App footer (shows when browser allows PWA install) ── */}
+      {canInstall && (
+        <div className="shrink-0 px-3 py-2.5 border-t"
+          style={{ borderColor: isLight ? "rgba(20,23,34,0.10)" : "rgba(168,85,247,0.15)" }}>
+          <button
+            onClick={install}
+            className="w-full flex items-center justify-center gap-2 py-2 rounded-xl font-mono text-[10px] font-bold transition-all hover:opacity-80"
+            style={{ background: "rgba(168,85,247,0.12)", color: "#a855f7", border: "1px solid rgba(168,85,247,0.30)" }}>
+            <Download className="w-3.5 h-3.5" />
+            Install OMNIMENS App
+          </button>
+        </div>
+      )}
     </div>
   );
 }
