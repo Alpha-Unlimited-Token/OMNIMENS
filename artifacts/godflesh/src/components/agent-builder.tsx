@@ -589,6 +589,7 @@ export function NewAppModal({ onClose, onSelect }: {
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.95, y: 20 }}
           className="w-full max-w-2xl rounded-2xl overflow-hidden border"
+          data-theme="dark"
           style={{ borderColor: VB, background: "#0d0d1a", maxHeight: "90vh" }}>
 
           {/* Header */}

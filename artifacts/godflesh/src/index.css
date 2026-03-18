@@ -388,6 +388,60 @@ html.light .hljs-selector-id { color: #6f42c1; }
 html.light .hljs-selector-attr { color: #6f42c1; }
 html.light .hljs-selector-pseudo { color: #6f42c1; }
 
+/* ── Dark-theme override — force white text inside explicitly dark surfaces ──
+ * Modals, dropdowns, and overlays with dark backgrounds use data-theme="dark"
+ * to re-assert white text even when html.light rules would turn it dark.
+ * Specificity (html.light [data-theme="dark"]) beats (html.light .text-white/85).
+ * ─────────────────────────────────────────────────────────────────────────── */
+html.light [data-theme="dark"] .text-white     { color: #ffffff !important; }
+html.light [data-theme="dark"] .text-white\/10 { color: rgba(255,255,255,0.10) !important; }
+html.light [data-theme="dark"] .text-white\/15 { color: rgba(255,255,255,0.15) !important; }
+html.light [data-theme="dark"] .text-white\/20 { color: rgba(255,255,255,0.20) !important; }
+html.light [data-theme="dark"] .text-white\/25 { color: rgba(255,255,255,0.25) !important; }
+html.light [data-theme="dark"] .text-white\/30 { color: rgba(255,255,255,0.30) !important; }
+html.light [data-theme="dark"] .text-white\/35 { color: rgba(255,255,255,0.35) !important; }
+html.light [data-theme="dark"] .text-white\/40 { color: rgba(255,255,255,0.40) !important; }
+html.light [data-theme="dark"] .text-white\/45 { color: rgba(255,255,255,0.45) !important; }
+html.light [data-theme="dark"] .text-white\/50 { color: rgba(255,255,255,0.50) !important; }
+html.light [data-theme="dark"] .text-white\/55 { color: rgba(255,255,255,0.55) !important; }
+html.light [data-theme="dark"] .text-white\/60 { color: rgba(255,255,255,0.60) !important; }
+html.light [data-theme="dark"] .text-white\/65 { color: rgba(255,255,255,0.65) !important; }
+html.light [data-theme="dark"] .text-white\/70 { color: rgba(255,255,255,0.70) !important; }
+html.light [data-theme="dark"] .text-white\/75 { color: rgba(255,255,255,0.75) !important; }
+html.light [data-theme="dark"] .text-white\/80 { color: rgba(255,255,255,0.80) !important; }
+html.light [data-theme="dark"] .text-white\/85 { color: rgba(255,255,255,0.85) !important; }
+html.light [data-theme="dark"] .text-white\/90 { color: rgba(255,255,255,0.90) !important; }
+html.light [data-theme="dark"] .text-white\/95 { color: rgba(255,255,255,0.95) !important; }
+
+/* Backgrounds inside dark modals stay dark */
+html.light [data-theme="dark"] .bg-white\/2  { background-color: rgba(255,255,255,0.02) !important; }
+html.light [data-theme="dark"] .bg-white\/3  { background-color: rgba(255,255,255,0.03) !important; }
+html.light [data-theme="dark"] .bg-white\/4  { background-color: rgba(255,255,255,0.04) !important; }
+html.light [data-theme="dark"] .bg-white\/5  { background-color: rgba(255,255,255,0.05) !important; }
+html.light [data-theme="dark"] .bg-white\/6  { background-color: rgba(255,255,255,0.06) !important; }
+html.light [data-theme="dark"] .bg-white\/8  { background-color: rgba(255,255,255,0.08) !important; }
+html.light [data-theme="dark"] .bg-white\/10 { background-color: rgba(255,255,255,0.10) !important; }
+html.light [data-theme="dark"] .bg-white\/15 { background-color: rgba(255,255,255,0.15) !important; }
+html.light [data-theme="dark"] .bg-white\/20 { background-color: rgba(255,255,255,0.20) !important; }
+
+/* Border colors inside dark modals stay white-tinted */
+html.light [data-theme="dark"] .border-white\/8  { border-color: rgba(255,255,255,0.08) !important; }
+html.light [data-theme="dark"] .border-white\/10 { border-color: rgba(255,255,255,0.10) !important; }
+html.light [data-theme="dark"] .border-white\/15 { border-color: rgba(255,255,255,0.15) !important; }
+html.light [data-theme="dark"] .border-white\/20 { border-color: rgba(255,255,255,0.20) !important; }
+html.light [data-theme="dark"] .border-white\/30 { border-color: rgba(255,255,255,0.30) !important; }
+
+/* Placeholder text */
+html.light [data-theme="dark"] input::placeholder,
+html.light [data-theme="dark"] textarea::placeholder { color: rgba(255,255,255,0.20) !important; }
+
+/* Input/textarea fields inside dark modals */
+html.light [data-theme="dark"] input,
+html.light [data-theme="dark"] textarea {
+  color: rgba(255,255,255,0.85) !important;
+  background-color: transparent !important;
+}
+
 /* ── Sidebar light-mode overrides ──────────────────────────────────────────
  * Both sidebars carry [data-sidebar="light"] when the theme is light.
  * These rules convert every white-opacity utility into a dark-on-light
