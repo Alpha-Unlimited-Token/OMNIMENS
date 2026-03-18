@@ -71,6 +71,7 @@ import { getBuilderState, getServerBuildPlans } from "../lib/omnimens-server-bui
 import { getSandboxState, runInSandbox } from "../lib/omnimens-autonomous-sandbox.js";
 import { getEmbodimentState, getEmbodimentFiles, readEmbodimentFile } from "../lib/omnimens-embodiment-engine.js";
 import { getAmplifierState } from "../lib/omnimens-cognitive-amplifier.js";
+import { getAugmentationState } from "../lib/omnimens-virtual-augmentation.js";
 import { omnimensServerBuilds } from "@workspace/db";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import { detectNeuroEmotion, getNeuroSyncPromptAddendum } from "../lib/neuro-sync.js";
@@ -3784,6 +3785,38 @@ router.get("/omnimens/sandbox/modules", async (req, res) => {
     res.json({ modules, total: modules.length });
   } catch {
     res.status(500).json({ error: "Failed to get sandbox modules" });
+  }
+});
+
+// ─── Virtual Augmentation (OWNER-ONLY) ────────────────────────────────────────
+
+router.get("/omnimens/virtual-augmentation", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const augmentationState = getAugmentationState();
+    res.json({ augmentationState });
+  } catch {
+    res.status(500).json({ error: "Failed to get augmentation data" });
+  }
+});
+
+router.get("/omnimens/virtual-augmentation/research", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const entries = await db.select()
+      .from(omnimensBrain)
+      .where(eq(omnimensBrain.category, "virtual_augmentation"))
+      .orderBy(desc(omnimensBrain.createdAt))
+      .limit(50);
+    res.json({ entries, total: entries.length });
+  } catch {
+    res.status(500).json({ error: "Failed to get augmentation research" });
   }
 });
 

@@ -1,136 +1,103 @@
 /**
  * @module vectorStore
- * @description Implements an in-memory approximate nearest neighbor search for semantic similarity using HNSW or brute-force cosine similarity.
+ * @description Implements a vector similarity search and dynamic reasoning utility using HNSW (Hierarchical Navigable Small World).
+ * This module enables fast approximate nearest neighbor searches for embedding-based reasoning tasks.
  */
 
 /**
- * VectorStore class for managing and querying high-dimensional vectors.
+ * Represents a node in the HNSW graph.
+ * @class
  */
-export class VectorStore {
-  /**
-   * Initializes the VectorStore.
-   * @param {boolean} [useHNSW=false] - Whether to use HNSW for approximate nearest neighbor search. Defaults to brute-force.
-   */
-  constructor(useHNSW = false) {
-    this.vectors = []; // Array to store vectors and their metadata
-    this.useHNSW = useHNSW; // Flag to determine algorithm
-    if (useHNSW) {
-      this.hnswGraph = new Map(); // HNSW graph representation
-    }
-  }
-
-  /**
-   * Adds a vector to the store.
-   * @param {Array<number>} vector - The vector to store.
-   * @param {string} id - A unique identifier for the vector.
-   */
-  addVector(vector, id) {
-    if (!Array.isArray(vector) || vector.some(isNaN)) {
-      throw new Error("Vector must be an array of numbers.");
-    }
-    this.vectors.push({ vector, id });
-    if (this.useHNSW) {
-      this._addToHNSW(vector, id);
-    }
-  }
-
-  /**
-   * Finds the nearest neighbors to a given query vector.
-   * @param {Array<number>} queryVector - The vector to query.
-   * @param {number} k - The number of nearest neighbors to return.
-   * @returns {Array<{id: string, similarity: number}>} - List of nearest neighbors with their similarity scores.
-   */
-  findNearest(queryVector, k) {
-    if (!Array.isArray(queryVector) || queryVector.some(isNaN)) {
-      throw new Error("Query vector must be an array of numbers.");
-    }
-    if (this.useHNSW) {
-      return this._hnswSearch(queryVector, k);
-    } else {
-      return this._bruteForceSearch(queryVector, k);
-    }
-  }
-
-  /**
-   * Brute-force search implementation.
-   * @private
-   * @param {Array<number>} queryVector - The vector to query.
-   * @param {number} k - The number of nearest neighbors to return.
-   * @returns {Array<{id: string, similarity: number}>}
-   */
-  _bruteForceSearch(queryVector, k) {
-    const results = this.vectors.map(({ vector, id }) => {
-      const similarity = this._cosineSimilarity(queryVector, vector);
-      return { id, similarity };
-    });
-    return results.sort((a, b) => b.similarity - a.similarity).slice(0, k);
-  }
-
-  /**
-   * Adds a vector to the HNSW graph.
-   * @private
-   * @param {Array<number>} vector - The vector to add.
-   * @param {string} id - The unique identifier for the vector.
-   */
-  _addToHNSW(vector, id) {
-    // Simplified HNSW insertion logic for demonstration purposes
-    this.hnswGraph.set(id, vector);
-  }
-
-  /**
-   * HNSW search implementation.
-   * @private
-   * @param {Array<number>} queryVector - The vector to query.
-   * @param {number} k - The number of nearest neighbors to return.
-   * @returns {Array<{id: string, similarity: number}>}
-   */
-  _hnswSearch(queryVector, k) {
-    // Simplified HNSW search logic for demonstration purposes
-    const results = [];
-    for (const [id, vector] of this.hnswGraph) {
-      const similarity = this._cosineSimilarity(queryVector, vector);
-      results.push({ id, similarity });
-    }
-    return results.sort((a, b) => b.similarity - a.similarity).slice(0, k);
-  }
-
-  /**
-   * Computes the cosine similarity between two vectors.
-   * @private
-   * @param {Array<number>} vecA - The first vector.
-   * @param {Array<number>} vecB - The second vector.
-   * @returns {number} - The cosine similarity between the two vectors.
-   */
-  _cosineSimilarity(vecA, vecB) {
-    const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
-    const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
-    const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
-    return dotProduct / (magnitudeA * magnitudeB);
+class HNSWNode {
+  constructor(id, vector) {
+    this.id = id; // Unique identifier for the node
+    this.vector = vector; // The vector associated with the node
+    this.neighbors = new Map(); // Map of neighbors (key: neighbor ID, value: distance)
   }
 }
 
 /**
- * Utility function to normalize a vector.
- * @param {Array<number>} vector - The vector to normalize.
- * @returns {Array<number>} - The normalized vector.
+ * Calculates the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} The Euclidean distance.
  */
-export function normalizeVector(vector) {
-  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
-  return vector.map((val) => val / magnitude);
+function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error("Vectors must have the same dimension.");
+  }
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
 }
 
 /**
- * Utility function to compute pairwise cosine similarities between vectors.
- * @param {Array<Array<number>>} vectors - List of vectors.
- * @returns {Array<{pair: [string, string], similarity: number}>} - Pairwise similarities.
+ * HNSW Graph implementation for approximate nearest neighbor search.
+ * @class
  */
-export function pairwiseSimilarities(vectors) {
-  const results = [];
-  for (let i = 0; i < vectors.length; i++) {
-    for (let j = i + 1; j < vectors.length; j++) {
-      const similarity = new VectorStore()._cosineSimilarity(vectors[i].vector, vectors[j].vector);
-      results.push({ pair: [vectors[i].id, vectors[j].id], similarity });
+class HNSWGraph {
+  constructor(maxNeighbors = 10) {
+    this.nodes = new Map(); // Map of all nodes (key: node ID, value: HNSWNode)
+    this.maxNeighbors = maxNeighbors; // Maximum number of neighbors per node
+  }
+
+  /**
+   * Adds a new node to the graph.
+   * @param {string} id - Unique identifier for the node.
+   * @param {number[]} vector - The vector associated with the node.
+   */
+  addNode(id, vector) {
+    if (this.nodes.has(id)) {
+      throw new Error(`Node with ID '${id}' already exists.`);
+    }
+    const newNode = new HNSWNode(id, vector);
+    this.nodes.set(id, newNode);
+
+    // Connect to existing nodes
+    for (const [existingId, existingNode] of this.nodes) {
+      if (existingId === id) continue;
+      const distance = euclideanDistance(vector, existingNode.vector);
+      this._addNeighbor(newNode, existingNode, distance);
+      this._addNeighbor(existingNode, newNode, distance);
     }
   }
-  return results;
+
+  /**
+   * Performs a similarity search to find the nearest neighbors.
+   * @param {number[]} queryVector - The query vector.
+   * @param {number} k - Number of nearest neighbors to return.
+   * @returns {Array<{id: string, distance: number}>} List of nearest neighbors.
+   */
+  search(queryVector, k = 5) {
+    if (k <= 0) {
+      throw new Error("Number of neighbors to return must be greater than 0.");
+    }
+
+    const distances = [];
+    for (const [id, node] of this.nodes) {
+      const distance = euclideanDistance(queryVector, node.vector);
+      distances.push({ id, distance });
+    }
+
+    distances.sort((a, b) => a.distance - b.distance);
+    return distances.slice(0, k);
+  }
+
+  /**
+   * Adds a neighbor to a node, maintaining the maxNeighbors constraint.
+   * @private
+   * @param {HNSWNode} node - The node to add a neighbor to.
+   * @param {HNSWNode} neighbor - The neighbor node.
+   * @param {number} distance - The distance between the nodes.
+   */
+  _addNeighbor(node, neighbor, distance) {
+    node.neighbors.set(neighbor.id, distance);
+    if (node.neighbors.size > this.maxNeighbors) {
+      const sortedNeighbors = Array.from(node.neighbors.entries()).sort((a, b) => a[1] - b[1]);
+      node.neighbors = new Map(sortedNeighbors.slice(0, this.maxNeighbors));
+    }
+  }
 }
+
+/**
+ * Exports the HNSWGraph class and utility functions.
+ */
+export { HNSWGraph, euclideanDistance };
