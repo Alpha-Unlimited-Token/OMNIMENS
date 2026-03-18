@@ -1,108 +1,91 @@
+// vectorMemoryStore.js
+
 /**
  * @module vectorMemoryStore
- * @description Provides an in-memory store for embedding vectors with fast nearest neighbor search using cosine similarity.
- */
-
-const { createServer } = require('net');
-
-/**
- * @typedef {Object} VectorStore
- * @property {Map<string, number[]>} store - A map of unique keys to embedding vectors.
- * @property {number} vectorDimension - The dimension of embedding vectors stored.
+ * @description A lightweight approximate nearest neighbor (ANN) search implementation for fast in-memory vector searches and similarity queries.
  */
 
 /**
- * Creates a new vector memory store.
- * @param {number} vectorDimension - The dimensionality of the embedding vectors.
- * @returns {VectorStore} The initialized vector store.
+ * VectorMemoryStore class for storing vectors and performing approximate nearest neighbor searches.
  */
-function createVectorStore(vectorDimension) {
-  if (!Number.isInteger(vectorDimension) || vectorDimension <= 0) {
-    throw new Error('vectorDimension must be a positive integer.');
+class VectorMemoryStore {
+  constructor() {
+    /**
+     * @type {Map<number, Array<number>>} - Map to store vectors with unique IDs.
+     */
+    this.vectorMap = new Map();
   }
 
-  return {
-    store: new Map(),
-    vectorDimension
-  };
-}
-
-/**
- * Adds a vector to the store.
- * @param {VectorStore} vectorStore - The vector store instance.
- * @param {string} key - A unique identifier for the vector.
- * @param {number[]} vector - The embedding vector to store.
- * @throws Will throw an error if the vector dimension does not match the store's dimension.
- */
-function addVector(vectorStore, key, vector) {
-  if (vector.length !== vectorStore.vectorDimension) {
-    throw new Error(`Vector dimension mismatch. Expected ${vectorStore.vectorDimension}, got ${vector.length}.`);
+  /**
+   * Adds a vector to the store.
+   * @param {number} id - Unique identifier for the vector.
+   * @param {Array<number>} vector - The vector to store.
+   * @throws {Error} Throws if the vector is not an array of numbers.
+   */
+  addVector(id, vector) {
+    if (!Array.isArray(vector) || !vector.every((val) => typeof val === 'number')) {
+      throw new Error('Vector must be an array of numbers.');
+    }
+    this.vectorMap.set(id, vector);
   }
 
-  vectorStore.store.set(key, vector);
-}
-
-/**
- * Computes the cosine similarity between two vectors.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number} The cosine similarity between the vectors.
- */
-function cosineSimilarity(vectorA, vectorB) {
-  const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
-  return dotProduct / (magnitudeA * magnitudeB);
-}
-
-/**
- * Finds the nearest neighbors to a given vector in the store.
- * @param {VectorStore} vectorStore - The vector store instance.
- * @param {number[]} queryVector - The query vector.
- * @param {number} k - The number of nearest neighbors to retrieve.
- * @returns {Array<{key: string, similarity: number}>} The k nearest neighbors with their similarity scores.
- */
-function findNearestNeighbors(vectorStore, queryVector, k) {
-  if (queryVector.length !== vectorStore.vectorDimension) {
-    throw new Error(`Query vector dimension mismatch. Expected ${vectorStore.vectorDimension}, got ${queryVector.length}.`);
+  /**
+   * Removes a vector from the store.
+   * @param {number} id - Unique identifier for the vector to remove.
+   * @returns {boolean} True if the vector was removed, false if it did not exist.
+   */
+  removeVector(id) {
+    return this.vectorMap.delete(id);
   }
 
-  const similarities = Array.from(vectorStore.store.entries()).map(([key, vector]) => ({
-    key,
-    similarity: cosineSimilarity(queryVector, vector)
-  }));
+  /**
+   * Finds the nearest neighbors to a given query vector.
+   * @param {Array<number>} queryVector - The vector to search for neighbors.
+   * @param {number} k - Number of nearest neighbors to return.
+   * @returns {Array<{id: number, distance: number}>} An array of nearest neighbors sorted by distance.
+   * @throws {Error} Throws if the queryVector is not an array of numbers.
+   */
+  findNearestNeighbors(queryVector, k) {
+    if (!Array.isArray(queryVector) || !queryVector.every((val) => typeof val === 'number')) {
+      throw new Error('Query vector must be an array of numbers.');
+    }
 
-  return similarities
-    .sort((a, b) => b.similarity - a.similarity)
-    .slice(0, k);
+    const distances = [];
+
+    for (const [id, vector] of this.vectorMap.entries()) {
+      const distance = this._calculateEuclideanDistance(queryVector, vector);
+      distances.push({ id, distance });
+    }
+
+    distances.sort((a, b) => a.distance - b.distance);
+
+    return distances.slice(0, k);
+  }
+
+  /**
+   * Calculates the Euclidean distance between two vectors.
+   * @param {Array<number>} vectorA - First vector.
+   * @param {Array<number>} vectorB - Second vector.
+   * @returns {number} The Euclidean distance between the vectors.
+   * @throws {Error} Throws if vectors are not of the same length.
+   */
+  _calculateEuclideanDistance(vectorA, vectorB) {
+    if (vectorA.length !== vectorB.length) {
+      throw new Error('Vectors must be of the same length.');
+    }
+
+    return Math.sqrt(
+      vectorA.reduce((sum, val, index) => sum + Math.pow(val - vectorB[index], 2), 0)
+    );
+  }
 }
 
 /**
- * Starts a simple TCP server for querying the vector store.
- * @param {VectorStore} vectorStore - The vector store instance.
- * @param {number} port - The port number to listen on.
+ * Creates a new instance of the VectorMemoryStore.
+ * @returns {VectorMemoryStore} A new VectorMemoryStore instance.
  */
-function startServer(vectorStore, port) {
-  const server = createServer((socket) => {
-    socket.on('data', (data) => {
-      try {
-        const { queryVector, k } = JSON.parse(data.toString());
-        const neighbors = findNearestNeighbors(vectorStore, queryVector, k);
-        socket.write(JSON.stringify(neighbors));
-      } catch (err) {
-        socket.write(JSON.stringify({ error: err.message }));
-      }
-    });
-  });
-
-  server.listen(port, () => {
-    console.log(`Vector memory store server running on port ${port}`);
-  });
+function createVectorMemoryStore() {
+  return new VectorMemoryStore();
 }
 
-module.exports = {
-  createVectorStore,
-  addVector,
-  findNearestNeighbors,
-  startServer
-};
+export { createVectorMemoryStore, VectorMemoryStore };

@@ -9,9 +9,10 @@
  */
 import { Router, type Request, type Response } from "express";
 import bcrypt from "bcryptjs";
-import { db, usersTable } from "@workspace/db";
+import { db, usersTable, omnimensUsers } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { createSession, clearSession, SESSION_COOKIE, SESSION_TTL } from "../lib/auth.js";
+import * as OTPAuth from "otpauth";
 
 const router = Router();
 
@@ -140,6 +141,49 @@ router.post("/auth/email/login", async (req: Request, res: Response) => {
     if (!passwordValid) {
       res.status(401).json({ error: "Invalid email or password." });
       return;
+    }
+
+    const [omniUser] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, user.id)).limit(1);
+    if (omniUser?.twoFactorEnabled && omniUser.twoFactorSecret) {
+      const { twoFactorCode } = req.body as any;
+      if (!twoFactorCode) {
+        res.json({ twoFactorRequired: true });
+        return;
+      }
+
+      if (omniUser.lockedUntil && new Date(omniUser.lockedUntil) > new Date()) {
+        res.status(429).json({ error: "Too many failed attempts. Try again later.", twoFactorRequired: true });
+        return;
+      }
+
+      const totp = new OTPAuth.TOTP({
+        issuer: "OMNIMENS",
+        label: user.email || user.id,
+        algorithm: "SHA1",
+        digits: 6,
+        period: 30,
+        secret: OTPAuth.Secret.fromBase32(omniUser.twoFactorSecret),
+      });
+      const delta = totp.validate({ token: twoFactorCode, window: 1 });
+      const codeUpper = twoFactorCode.toUpperCase();
+      const isBackupCode = omniUser.twoFactorBackupCodes?.includes(codeUpper);
+
+      if (delta === null && !isBackupCode) {
+        const attempts = (omniUser.failedLoginAttempts || 0) + 1;
+        const lockUpdate: Record<string, any> = { failedLoginAttempts: attempts };
+        if (attempts >= 5) {
+          lockUpdate.lockedUntil = new Date(Date.now() + 15 * 60 * 1000);
+        }
+        await db.update(omnimensUsers).set(lockUpdate).where(eq(omnimensUsers.id, user.id));
+        res.status(401).json({ error: "Invalid 2FA code.", twoFactorRequired: true });
+        return;
+      }
+
+      const resetUpdate: Record<string, any> = { failedLoginAttempts: 0, lockedUntil: null };
+      if (isBackupCode) {
+        resetUpdate.twoFactorBackupCodes = (omniUser.twoFactorBackupCodes || []).filter((c: string) => c !== codeUpper);
+      }
+      await db.update(omnimensUsers).set(resetUpdate).where(eq(omnimensUsers.id, user.id));
     }
 
     const sid = await createSession({

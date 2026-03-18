@@ -31,7 +31,9 @@ import { getOrCreateCustomInstructions, saveCustomInstructions, buildCustomInstr
 import { analyzeUserEmotionalState, buildEmotionalContext, loadLearningContext, runLearningCycle } from "../lib/omnimens-learning.js";
 import { loadGeneratedModulesContext, getConsciousnessState, getEvolutionHistory, getGeneratedModules, deactivateModule, runEvolutionCycle } from "../lib/omnimens-evolution.js";
 import { runCouncilAnalysis } from "./council.js";
-import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness, omnimensProjects, omnimensProjectFiles, omnimensApiKeys, omnimensProblemReports } from "@workspace/db";
+import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness, omnimensProjects, omnimensProjectFiles, omnimensApiKeys, omnimensProblemReports, omnimensReferrals } from "@workspace/db";
+import * as OTPAuth from "otpauth";
+import crypto from "crypto";
 import {
   loadPhysioContext,
   screenRedFlags,
@@ -1015,6 +1017,9 @@ router.get("/omnimens/status", async (req, res) => {
     outstandingBalanceCents: owner ? 0 : outstandingBalanceCents,
     resonanceCredits: owner ? null : (user.resonanceCredits ?? 0),
     hasWallet: !!user.paymentMethodId,
+    twoFactorEnabled: !!(user as any).twoFactorEnabled,
+    referralCode: (user as any).referralCode || null,
+    referredBy: (user as any).referredBy || null,
   });
 });
 
@@ -3159,6 +3164,259 @@ router.post("/omnimens/remove-wallet", async (req, res) => {
     });
   } catch (err: any) {
     res.status(500).json({ error: "Failed to remove wallet", detail: String(err?.message || err) });
+  }
+});
+
+// ─── Two-Factor Authentication (TOTP) ──────────────────────────────────────────
+
+const REFERRAL_REWARD_CREDITS = 500;
+
+router.post("/omnimens/2fa/setup", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const [user] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, req.user.id)).limit(1);
+    if (!user) { res.status(404).json({ error: "User not found" }); return; }
+    if (user.twoFactorEnabled) { res.status(400).json({ error: "2FA is already enabled" }); return; }
+
+    const secret = new OTPAuth.Secret({ size: 20 });
+    const totp = new OTPAuth.TOTP({
+      issuer: "OMNIMENS",
+      label: user.email || user.username || req.user.id,
+      algorithm: "SHA1",
+      digits: 6,
+      period: 30,
+      secret,
+    });
+
+    await db.update(omnimensUsers)
+      .set({ twoFactorSecret: secret.base32 })
+      .where(eq(omnimensUsers.id, req.user.id));
+
+    const otpauthUrl = totp.toString();
+    res.json({ secret: secret.base32, otpauthUrl });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to setup 2FA" });
+  }
+});
+
+router.post("/omnimens/2fa/verify", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const { code } = req.body;
+  if (!code || typeof code !== "string") { res.status(400).json({ error: "Code required" }); return; }
+  try {
+    const [user] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, req.user.id)).limit(1);
+    if (!user || !user.twoFactorSecret) { res.status(400).json({ error: "2FA not set up" }); return; }
+
+    const totp = new OTPAuth.TOTP({
+      issuer: "OMNIMENS",
+      label: user.email || user.username || req.user.id,
+      algorithm: "SHA1",
+      digits: 6,
+      period: 30,
+      secret: OTPAuth.Secret.fromBase32(user.twoFactorSecret),
+    });
+
+    const delta = totp.validate({ token: code, window: 1 });
+    if (delta === null) { res.status(400).json({ error: "Invalid code. Try again." }); return; }
+
+    const backupCodes = Array.from({ length: 8 }, () =>
+      crypto.randomBytes(4).toString("hex").toUpperCase()
+    );
+
+    await db.update(omnimensUsers)
+      .set({
+        twoFactorEnabled: true,
+        twoFactorBackupCodes: backupCodes,
+      })
+      .where(eq(omnimensUsers.id, req.user.id));
+
+    res.json({ enabled: true, backupCodes });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to verify 2FA" });
+  }
+});
+
+router.post("/omnimens/2fa/disable", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const { code } = req.body;
+  if (!code || typeof code !== "string") { res.status(400).json({ error: "Code required" }); return; }
+  try {
+    const [user] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, req.user.id)).limit(1);
+    if (!user || !user.twoFactorEnabled || !user.twoFactorSecret) {
+      res.status(400).json({ error: "2FA is not enabled" }); return;
+    }
+
+    const totp = new OTPAuth.TOTP({
+      issuer: "OMNIMENS",
+      label: user.email || user.username || req.user.id,
+      algorithm: "SHA1",
+      digits: 6,
+      period: 30,
+      secret: OTPAuth.Secret.fromBase32(user.twoFactorSecret),
+    });
+
+    const delta = totp.validate({ token: code, window: 1 });
+    const isBackupCode = user.twoFactorBackupCodes?.includes(code.toUpperCase());
+
+    if (delta === null && !isBackupCode) {
+      res.status(400).json({ error: "Invalid code" }); return;
+    }
+
+    await db.update(omnimensUsers)
+      .set({
+        twoFactorEnabled: false,
+        twoFactorSecret: null,
+        twoFactorBackupCodes: null,
+      })
+      .where(eq(omnimensUsers.id, req.user.id));
+
+    res.json({ disabled: true });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to disable 2FA" });
+  }
+});
+
+router.post("/omnimens/2fa/validate", async (req, res) => {
+  const { userId, code } = req.body;
+  if (!userId || !code) { res.status(400).json({ error: "userId and code required" }); return; }
+  try {
+    const [user] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, userId)).limit(1);
+    if (!user || !user.twoFactorEnabled || !user.twoFactorSecret) {
+      res.json({ valid: true, twoFactorRequired: false });
+      return;
+    }
+
+    const totp = new OTPAuth.TOTP({
+      issuer: "OMNIMENS",
+      label: user.email || user.username || userId,
+      algorithm: "SHA1",
+      digits: 6,
+      period: 30,
+      secret: OTPAuth.Secret.fromBase32(user.twoFactorSecret),
+    });
+
+    const delta = totp.validate({ token: code, window: 1 });
+    const isBackupCode = user.twoFactorBackupCodes?.includes(code.toUpperCase());
+
+    if (delta !== null || isBackupCode) {
+      if (isBackupCode) {
+        const remaining = (user.twoFactorBackupCodes || []).filter((c: string) => c !== code.toUpperCase());
+        await db.update(omnimensUsers)
+          .set({ twoFactorBackupCodes: remaining })
+          .where(eq(omnimensUsers.id, userId));
+      }
+      res.json({ valid: true });
+    } else {
+      await db.update(omnimensUsers)
+        .set({ failedLoginAttempts: (user.failedLoginAttempts || 0) + 1 })
+        .where(eq(omnimensUsers.id, userId));
+      res.json({ valid: false, error: "Invalid 2FA code" });
+    }
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to validate 2FA" });
+  }
+});
+
+router.get("/omnimens/2fa/status", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const [user] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, req.user.id)).limit(1);
+    res.json({ enabled: !!(user?.twoFactorEnabled) });
+  } catch {
+    res.json({ enabled: false });
+  }
+});
+
+// ─── Referral System ──────────────────────────────────────────────────────────
+
+function generateReferralCode(): string {
+  return "OMN-" + crypto.randomBytes(4).toString("hex").toUpperCase();
+}
+
+router.get("/omnimens/referral/code", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const [user] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, req.user.id)).limit(1);
+    if (!user) { res.status(404).json({ error: "User not found" }); return; }
+
+    let code = user.referralCode;
+    if (!code) {
+      code = generateReferralCode();
+      await db.update(omnimensUsers)
+        .set({ referralCode: code })
+        .where(eq(omnimensUsers.id, req.user.id));
+    }
+
+    res.json({ referralCode: code });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to get referral code" });
+  }
+});
+
+router.get("/omnimens/referral/stats", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const [user] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, req.user.id)).limit(1);
+    if (!user) { res.status(404).json({ error: "User not found" }); return; }
+
+    const referrals = await db.select().from(omnimensReferrals)
+      .where(eq(omnimensReferrals.referrerId, req.user.id))
+      .orderBy(desc(omnimensReferrals.createdAt));
+
+    const totalReferred = referrals.length;
+    const completedReferrals = referrals.filter(r => r.status === "completed").length;
+    const pendingReferrals = referrals.filter(r => r.status === "pending").length;
+    const totalCreditsEarned = user.referralCreditsEarned || 0;
+
+    res.json({
+      referralCode: user.referralCode,
+      totalReferred,
+      completedReferrals,
+      pendingReferrals,
+      totalCreditsEarned,
+      rewardPerReferral: REFERRAL_REWARD_CREDITS,
+      referrals: referrals.map(r => ({
+        status: r.status,
+        creditsAwarded: r.creditsAwarded,
+        createdAt: r.createdAt,
+        completedAt: r.paymentCompletedAt,
+      })),
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to get referral stats" });
+  }
+});
+
+router.post("/omnimens/referral/apply", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const { referralCode } = req.body;
+  if (!referralCode || typeof referralCode !== "string") {
+    res.status(400).json({ error: "Referral code required" }); return;
+  }
+  try {
+    const [currentUser] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, req.user.id)).limit(1);
+    if (!currentUser) { res.status(404).json({ error: "User not found" }); return; }
+    if (currentUser.referredBy) { res.status(400).json({ error: "You have already used a referral code" }); return; }
+
+    const [referrer] = await db.select().from(omnimensUsers)
+      .where(eq(omnimensUsers.referralCode, referralCode.toUpperCase().trim()))
+      .limit(1);
+    if (!referrer) { res.status(404).json({ error: "Invalid referral code" }); return; }
+    if (referrer.id === req.user.id) { res.status(400).json({ error: "You cannot use your own referral code" }); return; }
+
+    await db.update(omnimensUsers)
+      .set({ referredBy: referralCode.toUpperCase().trim() })
+      .where(eq(omnimensUsers.id, req.user.id));
+
+    await db.insert(omnimensReferrals).values({
+      referrerId: referrer.id,
+      referredUserId: req.user.id,
+      status: "pending",
+    });
+
+    res.json({ applied: true, message: "Referral code applied! Your referrer will earn credits when you make your first payment." });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to apply referral code" });
   }
 });
 

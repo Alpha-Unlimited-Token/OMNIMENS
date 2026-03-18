@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
 import { motion, AnimatePresence } from "framer-motion";
-import { Eye, EyeOff, Loader2, ArrowRight, Lock, Mail, User, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowRight, Lock, Mail, User, AlertCircle, CheckCircle2, ShieldCheck } from "lucide-react";
 import { GoogleLogin } from "@react-oauth/google";
 import { OmnimensPresence } from "@/components/omnimens-presence";
 
@@ -24,14 +24,15 @@ async function apiRegister(email: string, password: string, displayName: string)
   return data;
 }
 
-async function apiLogin(email: string, password: string) {
+async function apiLogin(email: string, password: string, twoFactorCode?: string) {
   const res = await fetch(`/api/auth/email/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, ...(twoFactorCode ? { twoFactorCode } : {}) }),
     credentials: "include",
   });
   const data = await res.json();
+  if (data.twoFactorRequired && !twoFactorCode) return data;
   if (!res.ok) throw new Error(data.error || "Login failed");
   return data;
 }
@@ -207,8 +208,9 @@ export default function Login() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [twoFactorStep, setTwoFactorStep] = useState(false);
+  const [twoFactorCode, setTwoFactorCode] = useState("");
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
       setLocation("/chat");
@@ -219,6 +221,8 @@ export default function Login() {
     setMode(m => m === "signin" ? "register" : "signin");
     setError(null);
     setSuccessMsg(null);
+    setTwoFactorStep(false);
+    setTwoFactorCode("");
   };
 
   const handleGoogleSuccess = async (credentialResponse: { credential?: string }) => {
@@ -251,11 +255,27 @@ export default function Login() {
     setSubmitting(true);
     try {
       if (mode === "signin") {
-        await apiLogin(email.trim(), password);
+        const result = await apiLogin(email.trim(), password, twoFactorStep ? twoFactorCode : undefined);
+        if (result.twoFactorRequired && !twoFactorStep) {
+          setTwoFactorStep(true);
+          setSubmitting(false);
+          return;
+        }
       } else {
         await apiRegister(email.trim(), password, displayName.trim());
       }
-      // Full navigation so useAuth re-fetches with fresh session cookie
+      const storedRef = localStorage.getItem("omnimens_referral_code");
+      if (storedRef) {
+        try {
+          const applyRes = await fetch("/api/omnimens/referral/apply", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ referralCode: storedRef }),
+          });
+          if (applyRes.ok) localStorage.removeItem("omnimens_referral_code");
+        } catch {}
+      }
       window.location.href = `${import.meta.env.BASE_URL}chat`;
     } catch (err: any) {
       setError(err.message || "Something went wrong. Please try again.");
@@ -373,6 +393,23 @@ export default function Login() {
                 </button>
               }
             />
+
+            <AnimatePresence>
+              {twoFactorStep && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
+                  <InputField
+                    icon={<ShieldCheck className="w-4 h-4" />}
+                    type="text"
+                    value={twoFactorCode}
+                    onChange={setTwoFactorCode}
+                    placeholder="Enter 2FA code or backup code"
+                    autoComplete="one-time-code"
+                    disabled={submitting}
+                  />
+                  <p className="text-xs text-white/40 mt-1 ml-1">Enter the code from your authenticator app</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <AnimatePresence>
               {error && <StatusMessage type="error" message={error} />}

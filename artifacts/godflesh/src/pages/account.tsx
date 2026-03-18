@@ -4,7 +4,7 @@ import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check, Atom, Code2, Layers, Eye, AlertTriangle, Wrench, Dna, Play, Wallet, CreditCard, Gift, TrendingUp, ChevronRight, Bell, Sun, HelpCircle, BookOpen, Info, Settings, ExternalLink, Share2, Star, ToggleLeft, ToggleRight, Loader2, X } from "lucide-react";
+import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check, Atom, Code2, Layers, Eye, AlertTriangle, Wrench, Dna, Play, Wallet, CreditCard, Gift, TrendingUp, ChevronRight, Bell, Sun, HelpCircle, BookOpen, Info, Settings, ExternalLink, Share2, Star, ToggleLeft, ToggleRight, Loader2, X, Lock, Copy, Link, Users } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 function useBillingInfo() {
@@ -1318,6 +1318,12 @@ export default function Account() {
           </div>
         )}
 
+        {/* ── TWO-FACTOR AUTHENTICATION ──────────────────────────────────── */}
+        <TwoFactorSection />
+
+        {/* ── REFERRAL PROGRAM ────────────────────────────────────────────── */}
+        <ReferralSection />
+
         {/* ── DELETE ACCOUNT ─────────────────────────────────────────────── */}
         {!isOwner && (
           <DeleteAccountSection />
@@ -1415,6 +1421,413 @@ function DeleteAccountSection() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function TwoFactorSection() {
+  const [phase, setPhase] = useState<"idle" | "setup" | "verify" | "enabled" | "disabling">("idle");
+  const [secret, setSecret] = useState("");
+  const [otpauthUrl, setOtpauthUrl] = useState("");
+  const [code, setCode] = useState("");
+  const [backupCodes, setBackupCodes] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+
+  const { data: tfStatus } = useQuery({
+    queryKey: ["/api/omnimens/2fa/status"],
+    queryFn: async () => {
+      const r = await fetch("/api/omnimens/2fa/status", { credentials: "include" });
+      if (!r.ok) return { enabled: false };
+      return r.json();
+    },
+  });
+
+  const isEnabled = tfStatus?.enabled || phase === "enabled";
+
+  const startSetup = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/omnimens/2fa/setup", { method: "POST", credentials: "include" });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error); return; }
+      setSecret(data.secret);
+      setOtpauthUrl(data.otpauthUrl);
+      setPhase("setup");
+    } catch { setError("Failed to start setup"); }
+    finally { setLoading(false); }
+  };
+
+  const verifyCode = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/omnimens/2fa/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error); return; }
+      setBackupCodes(data.backupCodes || []);
+      setPhase("enabled");
+      queryClient.invalidateQueries({ queryKey: ["/api/omnimens/2fa/status"] });
+    } catch { setError("Verification failed"); }
+    finally { setLoading(false); }
+  };
+
+  const disable2FA = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/omnimens/2fa/disable", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error); return; }
+      setPhase("idle");
+      setCode("");
+      setSecret("");
+      setBackupCodes([]);
+      queryClient.invalidateQueries({ queryKey: ["/api/omnimens/2fa/status"] });
+    } catch { setError("Failed to disable 2FA"); }
+    finally { setLoading(false); }
+  };
+
+  return (
+    <div data-theme="dark" className="rounded-2xl border border-white/8 p-6 space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
+          <Lock className="w-4 h-4 text-violet-400" />
+        </div>
+        <div>
+          <h3 className="text-white font-semibold text-sm tracking-wide">Two-Factor Authentication</h3>
+          <p className="text-white/40 text-xs font-mono">
+            {isEnabled ? "ENABLED — Your account is protected" : "Add an extra layer of security"}
+          </p>
+        </div>
+        {isEnabled && (
+          <div className="ml-auto px-2.5 py-1 rounded-full bg-green-500/15 border border-green-500/30">
+            <span className="text-green-400 text-[10px] font-mono font-bold tracking-wider">ACTIVE</span>
+          </div>
+        )}
+      </div>
+
+      {error && (
+        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300 text-xs font-mono">{error}</div>
+      )}
+
+      {!isEnabled && phase === "idle" && (
+        <div className="space-y-3">
+          <p className="text-white/50 text-xs">
+            Use an authenticator app (Google Authenticator, Authy, etc.) to generate a verification code each time you log in.
+          </p>
+          <button
+            onClick={startSetup}
+            disabled={loading}
+            className="px-4 py-2 rounded-lg bg-violet-600 text-white font-mono text-xs font-bold tracking-widest hover:bg-violet-500 transition-colors disabled:opacity-40"
+          >
+            {loading ? "SETTING UP..." : "ENABLE 2FA"}
+          </button>
+        </div>
+      )}
+
+      {phase === "setup" && (
+        <div className="space-y-4">
+          <p className="text-white/60 text-xs">
+            Scan this QR code with your authenticator app, or manually enter the secret key below:
+          </p>
+          <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
+            <img
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpauthUrl)}`}
+              alt="2FA QR Code"
+              className="w-48 h-48 rounded-lg"
+            />
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/40 border border-white/10">
+              <code className="text-white/70 text-xs font-mono tracking-wider">{secret}</code>
+              <button onClick={() => navigator.clipboard.writeText(secret)} className="text-white/30 hover:text-white/60 transition-colors">
+                <Copy className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+          <div>
+            <label className="text-white/50 text-xs font-mono block mb-1.5">Enter the 6-digit code from your app:</label>
+            <div className="flex items-center gap-3">
+              <input
+                type="text"
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                placeholder="000000"
+                maxLength={6}
+                className="w-36 px-3 py-2 rounded-lg border border-white/15 bg-black/40 text-white font-mono text-sm tracking-[0.3em] text-center focus:outline-none focus:border-violet-500/50"
+              />
+              <button
+                onClick={verifyCode}
+                disabled={code.length !== 6 || loading}
+                className="px-4 py-2 rounded-lg bg-violet-600 text-white font-mono text-xs font-bold tracking-widest hover:bg-violet-500 transition-colors disabled:opacity-40"
+              >
+                {loading ? "VERIFYING..." : "VERIFY"}
+              </button>
+              <button
+                onClick={() => { setPhase("idle"); setCode(""); setError(null); }}
+                className="px-3 py-2 rounded-lg border border-white/10 text-white/40 font-mono text-xs hover:text-white/70 transition-colors"
+              >
+                CANCEL
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {phase === "enabled" && backupCodes.length > 0 && (
+        <div className="space-y-3">
+          <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
+            <div className="flex items-center gap-2 mb-2">
+              <AlertTriangle className="w-4 h-4 text-amber-400" />
+              <span className="text-amber-300 text-xs font-mono font-bold tracking-wider">SAVE YOUR BACKUP CODES</span>
+            </div>
+            <p className="text-white/50 text-xs mb-3">
+              Store these codes somewhere safe. Each code can be used once if you lose access to your authenticator app.
+            </p>
+            <div className="grid grid-cols-2 gap-1.5">
+              {backupCodes.map((c, i) => (
+                <code key={i} className="text-white/70 text-xs font-mono bg-black/30 px-2 py-1 rounded">{c}</code>
+              ))}
+            </div>
+            <button
+              onClick={() => navigator.clipboard.writeText(backupCodes.join("\n"))}
+              className="mt-3 flex items-center gap-1.5 text-white/40 text-xs font-mono hover:text-white/70 transition-colors"
+            >
+              <Copy className="w-3 h-3" /> Copy all codes
+            </button>
+          </div>
+          <button
+            onClick={() => setBackupCodes([])}
+            className="text-white/30 text-xs font-mono hover:text-white/50 transition-colors"
+          >
+            I've saved my backup codes
+          </button>
+        </div>
+      )}
+
+      {isEnabled && phase !== "setup" && backupCodes.length === 0 && (
+        <div className="space-y-3">
+          <p className="text-white/40 text-xs">
+            Two-factor authentication is active. Enter a code from your authenticator app to disable it.
+          </p>
+          {phase === "disabling" ? (
+            <div className="flex items-center gap-3">
+              <input
+                type="text"
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                placeholder="000000"
+                maxLength={6}
+                className="w-36 px-3 py-2 rounded-lg border border-white/15 bg-black/40 text-white font-mono text-sm tracking-[0.3em] text-center focus:outline-none focus:border-red-500/50"
+              />
+              <button
+                onClick={disable2FA}
+                disabled={code.length !== 6 || loading}
+                className="px-4 py-2 rounded-lg bg-red-600 text-white font-mono text-xs font-bold tracking-widest hover:bg-red-500 transition-colors disabled:opacity-40"
+              >
+                {loading ? "DISABLING..." : "CONFIRM DISABLE"}
+              </button>
+              <button
+                onClick={() => { setPhase("idle"); setCode(""); setError(null); }}
+                className="px-3 py-2 rounded-lg border border-white/10 text-white/40 font-mono text-xs hover:text-white/70 transition-colors"
+              >
+                CANCEL
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => { setPhase("disabling"); setCode(""); setError(null); }}
+              className="px-4 py-2 rounded-lg border border-red-500/30 text-red-400 font-mono text-xs font-bold tracking-widest hover:bg-red-500/10 transition-colors"
+            >
+              DISABLE 2FA
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ReferralSection() {
+  const [referralCode, setReferralCode] = useState("");
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
+  const [applyCode, setApplyCode] = useState("");
+  const [applyMsg, setApplyMsg] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const [applying, setApplying] = useState(false);
+  const { data: status } = useGetOmnimensStatus();
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const [codeRes, statsRes] = await Promise.all([
+          fetch("/api/omnimens/referral/code", { credentials: "include" }),
+          fetch("/api/omnimens/referral/stats", { credentials: "include" }),
+        ]);
+        if (codeRes.ok) {
+          const codeData = await codeRes.json();
+          setReferralCode(codeData.referralCode);
+        }
+        if (statsRes.ok) {
+          const statsData = await statsRes.json();
+          setStats(statsData);
+        }
+      } catch {}
+      setLoading(false);
+    })();
+  }, []);
+
+  const shareUrl = referralCode
+    ? `${window.location.origin}/godflesh/?ref=${referralCode}`
+    : "";
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const copyCode = () => {
+    navigator.clipboard.writeText(referralCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleApplyCode = async () => {
+    if (!applyCode.trim()) return;
+    setApplying(true);
+    setApplyMsg(null);
+    try {
+      const res = await fetch("/api/omnimens/referral/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ referralCode: applyCode.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setApplyMsg({ type: "success", msg: data.message || "Referral code applied!" });
+        setApplyCode("");
+      } else {
+        setApplyMsg({ type: "error", msg: data.error || "Invalid referral code" });
+      }
+    } catch {
+      setApplyMsg({ type: "error", msg: "Failed to apply code" });
+    }
+    setApplying(false);
+  };
+
+  if (loading) return null;
+
+  const hasReferrer = !!(status as any)?.referredBy;
+
+  return (
+    <div data-theme="dark" className="rounded-2xl border border-white/8 p-6 space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+          <Users className="w-4 h-4 text-cyan-400" />
+        </div>
+        <div>
+          <h3 className="text-white font-semibold text-sm tracking-wide">Referral Program</h3>
+          <p className="text-white/40 text-xs font-mono">Earn 500 credits for every friend who makes a purchase</p>
+        </div>
+      </div>
+
+      <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-500/5 to-violet-500/5 border border-white/8 space-y-3">
+        <div>
+          <label className="text-white/40 text-[10px] font-mono tracking-wider block mb-1">YOUR REFERRAL CODE</label>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-black/40 border border-white/10">
+              <code className="text-white font-mono text-sm tracking-[0.2em] font-bold">{referralCode}</code>
+            </div>
+            <button
+              onClick={copyCode}
+              className="px-3 py-2 rounded-lg border border-white/10 text-white/50 hover:text-white/80 transition-colors"
+              title="Copy code"
+            >
+              {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label className="text-white/40 text-[10px] font-mono tracking-wider block mb-1">SHARE LINK</label>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 px-3 py-2 rounded-lg bg-black/40 border border-white/10 overflow-hidden">
+              <code className="text-white/60 text-xs font-mono truncate block">{shareUrl}</code>
+            </div>
+            <button
+              onClick={copyLink}
+              className="px-3 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-500 transition-colors flex items-center gap-1.5"
+            >
+              <Link className="w-3.5 h-3.5" />
+              <span className="text-xs font-mono font-bold tracking-wider">
+                {copied ? "COPIED!" : "COPY"}
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {stats && (
+        <div className="grid grid-cols-3 gap-3">
+          <div className="p-3 rounded-xl bg-white/3 border border-white/6 text-center">
+            <div className="text-white font-bold text-lg">{stats.totalReferred}</div>
+            <div className="text-white/30 text-[10px] font-mono tracking-wider">REFERRED</div>
+          </div>
+          <div className="p-3 rounded-xl bg-white/3 border border-white/6 text-center">
+            <div className="text-green-400 font-bold text-lg">{stats.completedReferrals}</div>
+            <div className="text-white/30 text-[10px] font-mono tracking-wider">COMPLETED</div>
+          </div>
+          <div className="p-3 rounded-xl bg-white/3 border border-white/6 text-center">
+            <div className="text-cyan-400 font-bold text-lg">{stats.totalCreditsEarned}</div>
+            <div className="text-white/30 text-[10px] font-mono tracking-wider">CREDITS EARNED</div>
+          </div>
+        </div>
+      )}
+
+      {!hasReferrer && (
+        <div className="space-y-2">
+          <label className="text-white/40 text-[10px] font-mono tracking-wider block">HAVE A REFERRAL CODE?</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={applyCode}
+              onChange={(e) => setApplyCode(e.target.value.toUpperCase())}
+              placeholder="OMN-XXXXXXXX"
+              className="flex-1 max-w-xs px-3 py-2 rounded-lg border border-white/15 bg-black/40 text-white font-mono text-xs tracking-wider focus:outline-none focus:border-cyan-500/50"
+            />
+            <button
+              onClick={handleApplyCode}
+              disabled={!applyCode.trim() || applying}
+              className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white/70 font-mono text-xs font-bold tracking-widest hover:bg-white/10 transition-colors disabled:opacity-40"
+            >
+              {applying ? "APPLYING..." : "APPLY"}
+            </button>
+          </div>
+          {applyMsg && (
+            <p className={`text-xs font-mono ${applyMsg.type === "success" ? "text-green-400" : "text-red-400"}`}>
+              {applyMsg.msg}
+            </p>
+          )}
+        </div>
+      )}
+
+      <p className="text-white/25 text-[10px] font-mono">
+        Share your code with friends. When they make their first purchase (any credit pack or subscription), you receive 500 bonus credits.
+      </p>
     </div>
   );
 }

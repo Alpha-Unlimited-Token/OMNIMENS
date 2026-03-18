@@ -23,6 +23,14 @@ export const omnimensUsers = pgTable("godflesh_users", {
   totalPaidSpendCents: integer("total_paid_spend_cents").default(0).notNull(), // lifetime paid
   resonanceCredits: integer("resonance_credits").default(0).notNull(),
   resonanceTotalEarned: integer("resonance_total_earned").default(0).notNull(),
+  twoFactorSecret: text("two_factor_secret"),
+  twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
+  twoFactorBackupCodes: jsonb("two_factor_backup_codes").$type<string[]>(),
+  referralCode: text("referral_code").unique(),
+  referredBy: text("referred_by"),
+  referralCreditsEarned: integer("referral_credits_earned").default(0).notNull(),
+  failedLoginAttempts: integer("failed_login_attempts").default(0).notNull(),
+  lockedUntil: timestamp("locked_until"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -34,6 +42,17 @@ export const omnimensUsage = pgTable("godflesh_usage", {
   messageCount: integer("message_count").default(0).notNull(),
   computeSeconds: real("compute_seconds").default(0).notNull(),
   creditsSpent: integer("credits_spent").default(0).notNull(),
+});
+
+// Referral tracking
+export const omnimensReferrals = pgTable("godflesh_referrals", {
+  id: serial("id").primaryKey(),
+  referrerId: text("referrer_id").notNull().references(() => omnimensUsers.id),
+  referredUserId: text("referred_user_id").notNull().references(() => omnimensUsers.id),
+  status: text("status").default("pending").notNull(),
+  creditsAwarded: integer("credits_awarded").default(0).notNull(),
+  paymentCompletedAt: timestamp("payment_completed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 // Credit purchase/spend history

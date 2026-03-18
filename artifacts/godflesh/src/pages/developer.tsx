@@ -994,7 +994,7 @@ export default function DeveloperPage() {
       <div className="border-b border-white/8 sticky top-0 z-30 bg-black/95 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/godflesh/chat">
+            <Link href="/chat">
               <button className="flex items-center gap-1.5 text-white/30 hover:text-white/70 text-sm transition-colors">
                 <ArrowLeft className="w-4 h-4" /> Back
               </button>

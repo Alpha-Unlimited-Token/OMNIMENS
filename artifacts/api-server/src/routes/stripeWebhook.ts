@@ -1,10 +1,51 @@
 import { Router } from "express";
 import { stripe } from "../stripeClient.js";
 import { db } from "@workspace/db";
-import { omnimensUsers, omnimensCreditTransactions, omnimensNotifications } from "@workspace/db";
-import { eq, sql } from "drizzle-orm";
+import { omnimensUsers, omnimensCreditTransactions, omnimensNotifications, omnimensReferrals } from "@workspace/db";
+import { eq, and, sql } from "drizzle-orm";
+
+const REFERRAL_REWARD_CREDITS = 500;
 
 const router = Router();
+
+async function awardReferralCredits(payingUserId: string) {
+  try {
+    const [pendingRef] = await db.select().from(omnimensReferrals)
+      .where(and(
+        eq(omnimensReferrals.referredUserId, payingUserId),
+        eq(omnimensReferrals.status, "pending"),
+      ))
+      .limit(1);
+    if (!pendingRef) return;
+
+    await db.update(omnimensUsers)
+      .set({
+        credits: sql`${omnimensUsers.credits} + ${REFERRAL_REWARD_CREDITS}`,
+        totalCreditsEarned: sql`${omnimensUsers.totalCreditsEarned} + ${REFERRAL_REWARD_CREDITS}`,
+        referralCreditsEarned: sql`${omnimensUsers.referralCreditsEarned} + ${REFERRAL_REWARD_CREDITS}`,
+      })
+      .where(eq(omnimensUsers.id, pendingRef.referrerId));
+
+    await db.update(omnimensReferrals)
+      .set({
+        status: "completed",
+        creditsAwarded: REFERRAL_REWARD_CREDITS,
+        paymentCompletedAt: new Date(),
+      })
+      .where(eq(omnimensReferrals.id, pendingRef.id));
+
+    await db.insert(omnimensCreditTransactions).values({
+      userId: pendingRef.referrerId,
+      type: "bonus",
+      credits: REFERRAL_REWARD_CREDITS,
+      description: `Referral bonus — referred user completed first payment`,
+    });
+
+    console.log(`[Referral] Awarded ${REFERRAL_REWARD_CREDITS} credits to ${pendingRef.referrerId} for referring ${payingUserId}`);
+  } catch (err) {
+    console.error("[Referral] Failed to award referral credits:", err);
+  }
+}
 
 // One-time credit packs
 const CREDIT_PACKS: Record<string, number> = {
@@ -97,6 +138,7 @@ router.post(
             } as any).catch(() => {});
 
             console.log(`[Stripe Webhook] Credited ${creditsToAdd} credits to ${userId} (pack: ${packId})`);
+            await awardReferralCredits(userId);
 
           // ── Monthly plan subscription started ──────────────────────────────
           } else if (purpose === "monthly_plan" && session.mode === "subscription") {
@@ -136,6 +178,7 @@ router.post(
             } as any).catch(() => {});
 
             console.log(`[Stripe Webhook] ${plan.label} plan activated for ${userId} — ${plan.credits} credits`);
+            await awardReferralCredits(userId);
 
           // ── Wallet setup ───────────────────────────────────────────────────
           } else if (purpose === "wallet_setup" && session.setup_intent) {

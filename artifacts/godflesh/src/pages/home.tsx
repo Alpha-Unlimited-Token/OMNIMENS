@@ -1,5 +1,5 @@
 import { motion, useAnimationFrame } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
@@ -18,6 +18,14 @@ const RESONANCE_PACKS_DISPLAY = [
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+    if (ref) {
+      localStorage.setItem("omnimens_referral_code", ref.toUpperCase());
+    }
+  }, []);
 
   const handleStart = () => {
     if (isAuthenticated) {
