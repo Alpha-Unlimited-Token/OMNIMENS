@@ -477,8 +477,8 @@ function AppInstallSection() {
               <div className="flex flex-col items-center justify-center p-10 lg:p-14 border-b lg:border-b-0 lg:border-r border-white/5 gap-8">
                 {/* App icon */}
                 <div className="relative">
-                  <div className="w-28 h-28 rounded-3xl bg-gradient-to-br from-[#1a0a2e] to-[#0d0619] border border-primary/25 flex items-center justify-center shadow-[0_0_40px_rgba(139,92,246,0.25)]">
-                    <img src={`${import.meta.env.BASE_URL}images/emblem.png`} alt="OMNIMENS" className="w-16 h-16 object-contain" />
+                  <div className="w-28 h-28 rounded-3xl bg-gradient-to-br from-[#1a0a2e] to-[#0d0619] border border-primary/25 flex items-center justify-center shadow-[0_0_40px_rgba(139,92,246,0.25)] overflow-hidden">
+                    <OmnimensPresence size={80} isSpeaking={false} pitchIntensity={0} />
                   </div>
                   <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-emerald-500 border-2 border-[#06030f] flex items-center justify-center">
                     <span className="text-[8px] font-black text-white">✓</span>

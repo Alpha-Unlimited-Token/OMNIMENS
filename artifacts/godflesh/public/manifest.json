@@ -12,7 +12,7 @@
   "lang": "en",
   "icons": [
     {
-      "src": "/godflesh/images/emblem.png",
+      "src": "/godflesh/images/emblem-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
@@ -25,7 +25,7 @@
     },
     {
       "src": "/godflesh/images/emblem.png",
-      "sizes": "1024x1024",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     }
