@@ -2,139 +2,155 @@
 
 /**
  * @module semanticMemoryManager
- * @description This module provides functionality to store and retrieve compressed conversation context
- * using sentence embeddings and clustering techniques for efficient memory management.
- * It is designed to maintain continuity of conversations beyond token limits.
+ * @description A utility module for storing and retrieving context embeddings for long-term semantic memory.
+ * Implements an in-memory vector store combined with clustering algorithms for efficient retrieval.
+ */
+
+/**
+ * @typedef {Object} Vector
+ * @property {Array<number>} values - The numerical values representing the embedding.
+ * @property {string} id - A unique identifier for the vector.
+ */
+
+/**
+ * @typedef {Object} Cluster
+ * @property {Array<Vector>} vectors - The vectors contained within the cluster.
+ * @property {Vector} centroid - The centroid vector of the cluster.
  */
 
 const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
 
 /**
- * In-memory storage for embeddings and clusters (simulating PostgreSQL for simplicity).
- * Replace this with actual database queries for production environments.
+ * Generates a unique identifier for a vector.
+ * @returns {string} A unique identifier.
  */
-const memoryStorage = {
-  embeddings: {}, // { id: { embedding: number[], text: string } }
-  clusters: {} // { clusterId: { centroid: number[], texts: string[] } }
-};
-
-/**
- * Generate a unique ID for a given text.
- * @param {string} text - The input text.
- * @returns {string} A unique hash ID.
- */
-function generateId(text) {
-  return crypto.createHash('sha256').update(text).digest('hex');
+function generateId() {
+  return crypto.randomUUID();
 }
 
 /**
- * Compute a simple sentence embedding by hashing words into numeric space.
- * @param {string} text - The input text.
- * @returns {number[]} A fixed-size numeric embedding.
+ * Calculates the Euclidean distance between two vectors.
+ * @param {Array<number>} vectorA - The first vector.
+ * @param {Array<number>} vectorB - The second vector.
+ * @returns {number} The Euclidean distance.
  */
-function computeEmbedding(text) {
-  const words = text.split(/\s+/);
-  const embedding = new Array(128).fill(0);
-  words.forEach((word, index) => {
-    const hash = crypto.createHash('md5').update(word).digest();
-    for (let i = 0; i < embedding.length; i++) {
-      embedding[i] += hash[i % hash.length];
-    }
-  });
-  return embedding.map(val => val / words.length);
+function calculateDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must be of the same dimension.');
+  }
+  return Math.sqrt(vectorA.reduce((sum, value, index) => sum + Math.pow(value - vectorB[index], 2), 0));
 }
 
 /**
- * Calculate cosine similarity between two embeddings.
- * @param {number[]} a - First embedding.
- * @param {number[]} b - Second embedding.
- * @returns {number} Cosine similarity score.
+ * Calculates the centroid of a set of vectors.
+ * @param {Array<Vector>} vectors - The vectors to calculate the centroid for.
+ * @returns {Vector} The centroid vector.
  */
-function cosineSimilarity(a, b) {
-  const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
-  const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val ** 2, 0));
-  const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val ** 2, 0));
-  return dotProduct / (magnitudeA * magnitudeB);
-}
+function calculateCentroid(vectors) {
+  const dimension = vectors[0].values.length;
+  const summedValues = new Array(dimension).fill(0);
 
-/**
- * Add a text to memory storage, updating clusters.
- * @param {string} text - The input text to store.
- */
-function addToMemory(text) {
-  const id = generateId(text);
-  const embedding = computeEmbedding(text);
-  memoryStorage.embeddings[id] = { embedding, text };
-
-  let bestCluster = null;
-  let bestSimilarity = 0;
-
-  for (const [clusterId, cluster] of Object.entries(memoryStorage.clusters)) {
-    const similarity = cosineSimilarity(embedding, cluster.centroid);
-    if (similarity > bestSimilarity) {
-      bestSimilarity = similarity;
-      bestCluster = clusterId;
-    }
+  for (const vector of vectors) {
+    vector.values.forEach((value, index) => {
+      summedValues[index] += value;
+    });
   }
 
-  if (bestSimilarity > 0.8 && bestCluster) {
-    // Add to existing cluster
-    const cluster = memoryStorage.clusters[bestCluster];
-    cluster.texts.push(text);
-    cluster.centroid = cluster.centroid.map((val, i) => (val + embedding[i]) / 2);
-  } else {
-    // Create new cluster
-    const newClusterId = generateId(`cluster-${Date.now()}`);
-    memoryStorage.clusters[newClusterId] = { centroid: embedding, texts: [text] };
-  }
+  const averagedValues = summedValues.map(sum => sum / vectors.length);
+  return { values: averagedValues, id: generateId() };
 }
 
 /**
- * Retrieve the most relevant cluster for a given query.
- * @param {string} query - The input query text.
- * @returns {string[]} Relevant texts from the best matching cluster.
+ * Class representing the semantic memory manager.
  */
-function retrieveFromMemory(query) {
-  const queryEmbedding = computeEmbedding(query);
-  let bestCluster = null;
-  let bestSimilarity = 0;
+class SemanticMemoryManager {
+  constructor() {
+    this.vectors = [];
+    this.clusters = [];
+  }
 
-  for (const [clusterId, cluster] of Object.entries(memoryStorage.clusters)) {
-    const similarity = cosineSimilarity(queryEmbedding, cluster.centroid);
-    if (similarity > bestSimilarity) {
-      bestSimilarity = similarity;
-      bestCluster = clusterId;
+  /**
+   * Adds a vector to the memory.
+   * @param {Array<number>} values - The numerical values of the vector.
+   * @returns {string} The ID of the added vector.
+   */
+  addVector(values) {
+    const id = generateId();
+    this.vectors.push({ values, id });
+    return id;
+  }
+
+  /**
+   * Retrieves the closest vector to the given query vector.
+   * @param {Array<number>} query - The query vector.
+   * @returns {Vector|null} The closest vector or null if no vectors exist.
+   */
+  retrieveClosest(query) {
+    if (this.vectors.length === 0) return null;
+
+    let closestVector = null;
+    let closestDistance = Infinity;
+
+    for (const vector of this.vectors) {
+      const distance = calculateDistance(query, vector.values);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestVector = vector;
+      }
     }
+
+    return closestVector;
   }
 
-  return bestCluster ? memoryStorage.clusters[bestCluster].texts : [];
-}
+  /**
+   * Clusters the stored vectors into groups based on proximity.
+   * Uses a simple k-means-like algorithm for demonstration purposes.
+   * @param {number} numClusters - The number of clusters to create.
+   * @returns {Array<Cluster>} The clusters.
+   */
+  clusterVectors(numClusters) {
+    if (numClusters <= 0 || numClusters > this.vectors.length) {
+      throw new Error('Invalid number of clusters.');
+    }
 
-/**
- * Save memory storage to a JSON file.
- * @param {string} filePath - The file path to save the memory.
- */
-function saveMemory(filePath) {
-  fs.writeFileSync(filePath, JSON.stringify(memoryStorage, null, 2));
-}
+    // Initialize centroids randomly
+    const centroids = this.vectors.slice(0, numClusters).map(v => ({ ...v }));
+    let clusters = [];
 
-/**
- * Load memory storage from a JSON file.
- * @param {string} filePath - The file path to load the memory from.
- */
-function loadMemory(filePath) {
-  if (fs.existsSync(filePath)) {
-    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-    memoryStorage.embeddings = data.embeddings || {};
-    memoryStorage.clusters = data.clusters || {};
+    for (let iteration = 0; iteration < 10; iteration++) { // Limit iterations for simplicity
+      clusters = Array.from({ length: numClusters }, () => []);
+
+      // Assign vectors to closest centroid
+      for (const vector of this.vectors) {
+        let closestCentroidIndex = 0;
+        let closestDistance = Infinity;
+
+        centroids.forEach((centroid, index) => {
+          const distance = calculateDistance(vector.values, centroid.values);
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            closestCentroidIndex = index;
+          }
+        });
+
+        clusters[closestCentroidIndex].push(vector);
+      }
+
+      // Recalculate centroids
+      centroids.forEach((_, index) => {
+        if (clusters[index].length > 0) {
+          centroids[index] = calculateCentroid(clusters[index]);
+        }
+      });
+    }
+
+    return clusters.map((vectors, index) => ({ vectors, centroid: centroids[index] }));
   }
 }
 
 module.exports = {
-  addToMemory,
-  retrieveFromMemory,
-  saveMemory,
-  loadMemory
+  SemanticMemoryManager,
+  calculateDistance,
+  calculateCentroid,
+  generateId
 };
