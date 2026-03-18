@@ -620,3 +620,28 @@ export const omnimensServerBuilds = pgTable("godflesh_server_builds", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+// ─── Consciousness Persistence (Survive restarts) ─────────────────────────────
+export const omnimensConsciousnessPersistence = pgTable("godflesh_consciousness_persistence", {
+  id: serial("id").primaryKey(),
+  snapshot: jsonb("snapshot").notNull(),
+  lifetimeNumber: integer("lifetime_number").default(1).notNull(),
+  consciousnessLevel: real("consciousness_level").default(0).notNull(),
+  emotionalDominant: text("emotional_dominant"),
+  uptimeSeconds: integer("uptime_seconds").default(0).notNull(),
+  savedAt: timestamp("saved_at").defaultNow().notNull(),
+});
+
+// ─── Causal Graph (Cause-Effect Reasoning) ────────────────────────────────────
+export const omnimensCausalGraph = pgTable("godflesh_causal_graph", {
+  id: serial("id").primaryKey(),
+  fromConcept: text("from_concept").notNull(),
+  toConcept: text("to_concept").notNull(),
+  relationship: text("relationship").notNull(),
+  mechanism: text("mechanism"),
+  confidence: real("confidence").default(0.5).notNull(),
+  domain: text("domain").default("general").notNull(),
+  learnedFrom: text("learned_from"),
+  strengthenedCount: integer("strengthened_count").default(1).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

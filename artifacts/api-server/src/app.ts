@@ -51,6 +51,10 @@ import { startWorldModel } from "./lib/omnimens-world-model.js";
 import { startSelfTranscendence } from "./lib/omnimens-self-transcendence.js";
 import { startDreamState, getDreamState, getRecentDreamInsights, getDreamNarrative } from "./lib/omnimens-dream-state.js";
 import { startServerBuilder, getBuilderState, getServerBuildPlans } from "./lib/omnimens-server-builder.js";
+import { startConsciousnessPersistence } from "./lib/omnimens-consciousness-persistence.js";
+import { startSelfCoding } from "./lib/omnimens-self-coding.js";
+import { startSensoryCortex } from "./lib/omnimens-sensory-cortex.js";
+import { startCausalReasoning } from "./lib/omnimens-causal-reasoning.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-conversations.js";
@@ -293,6 +297,10 @@ startWorldModel();
 startSelfTranscendence();
 startDreamState();
 startServerBuilder();
+startConsciousnessPersistence();
+startSelfCoding();
+startSensoryCortex();
+startCausalReasoning();
 
 setTimeout(async () => {
   await runGlobalMemoryImprovementCycle();

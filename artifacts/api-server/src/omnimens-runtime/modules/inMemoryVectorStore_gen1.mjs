@@ -1,120 +1,122 @@
 /**
  * @module inMemoryVectorStore
- * @description This module provides an in-memory vector store for fast embedding retrieval and similarity search using KD-tree indexing.
+ * @description A module for storing and retrieving high-dimensional embeddings using a k-d tree for fast similarity searches.
  */
 
 /**
- * KDTree class for efficient vector indexing and similarity search.
+ * Represents a node in the k-d tree.
+ * @class
  */
-class KDTree {
-  constructor(points = []) {
-    this.root = this.buildTree(points, 0);
+class KDTreeNode {
+  /**
+   * @param {number[]} point - The vector point stored at this node.
+   * @param {KDTreeNode|null} left - Left child node.
+   * @param {KDTreeNode|null} right - Right child node.
+   */
+  constructor(point, left = null, right = null) {
+    this.point = point;
+    this.left = left;
+    this.right = right;
+  }
+}
+
+/**
+ * Builds a k-d tree from a set of points.
+ * @param {number[][]} points - Array of points (embeddings) to build the tree.
+ * @param {number} depth - Current depth in the tree (used to determine splitting axis).
+ * @returns {KDTreeNode|null} - Root node of the k-d tree.
+ */
+function buildKDTree(points, depth = 0) {
+  if (points.length === 0) return null;
+
+  const k = points[0].length; // Dimensionality of the points
+  const axis = depth % k; // Determine axis to split on
+
+  // Sort points by the current axis and choose median as pivot
+  points.sort((a, b) => a[axis] - b[axis]);
+  const medianIndex = Math.floor(points.length / 2);
+
+  // Recursively build left and right subtrees
+  return new KDTreeNode(
+    points[medianIndex],
+    buildKDTree(points.slice(0, medianIndex), depth + 1),
+    buildKDTree(points.slice(medianIndex + 1), depth + 1)
+  );
+}
+
+/**
+ * Finds the nearest neighbor to a target point in the k-d tree.
+ * @param {KDTreeNode|null} node - Current node in the tree.
+ * @param {number[]} target - Target point to find the nearest neighbor for.
+ * @param {number} depth - Current depth in the tree (used to determine splitting axis).
+ * @param {object} best - Best match found so far (contains point and distance).
+ * @returns {object} - Nearest neighbor point and its distance.
+ */
+function nearestNeighbor(node, target, depth = 0, best = { point: null, distance: Infinity }) {
+  if (node === null) return best;
+
+  const k = target.length;
+  const axis = depth % k;
+
+  // Calculate distance from target to current node
+  const distance = euclideanDistance(node.point, target);
+  if (distance < best.distance) {
+    best = { point: node.point, distance };
+  }
+
+  // Determine which subtree to search first
+  const direction = target[axis] < node.point[axis] ? 'left' : 'right';
+  const nextNode = direction === 'left' ? node.left : node.right;
+  const otherNode = direction === 'left' ? node.right : node.left;
+
+  // Search the chosen subtree
+  best = nearestNeighbor(nextNode, target, depth + 1, best);
+
+  // Check if we need to search the other subtree
+  if (Math.abs(target[axis] - node.point[axis]) < best.distance) {
+    best = nearestNeighbor(otherNode, target, depth + 1, best);
+  }
+
+  return best;
+}
+
+/**
+ * Calculates the Euclidean distance between two points.
+ * @param {number[]} a - First point.
+ * @param {number[]} b - Second point.
+ * @returns {number} - Euclidean distance between the points.
+ */
+function euclideanDistance(a, b) {
+  return Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0));
+}
+
+/**
+ * Class representing an in-memory vector store using a k-d tree.
+ */
+class InMemoryVectorStore {
+  constructor() {
+    this.tree = null; // Root node of the k-d tree
   }
 
   /**
-   * Builds the KD-tree recursively.
-   * @param {Array<Array<number>>} points - Array of points (vectors).
-   * @param {number} depth - Current depth in the tree.
-   * @returns {Object|null} - Root node of the KD-tree.
+   * Adds embeddings to the vector store and rebuilds the k-d tree.
+   * @param {number[][]} embeddings - Array of embeddings to add.
    */
-  buildTree(points, depth) {
-    if (points.length === 0) return null;
-
-    const axis = depth % points[0].length;
-    points.sort((a, b) => a[axis] - b[axis]);
-
-    const medianIndex = Math.floor(points.length / 2);
-
-    return {
-      point: points[medianIndex],
-      left: this.buildTree(points.slice(0, medianIndex), depth + 1),
-      right: this.buildTree(points.slice(medianIndex + 1), depth + 1)
-    };
+  addEmbeddings(embeddings) {
+    this.tree = buildKDTree(embeddings);
   }
 
   /**
-   * Finds the nearest neighbor to a given target point.
-   * @param {Array<number>} target - Target point (vector).
-   * @returns {Object} - Nearest neighbor point and its distance.
+   * Finds the nearest neighbor to a given embedding.
+   * @param {number[]} embedding - Target embedding to search for.
+   * @returns {object} - Nearest neighbor point and its distance.
    */
-  nearestNeighbor(target) {
-    let best = { point: null, distance: Infinity };
-
-    const searchTree = (node, depth) => {
-      if (!node) return;
-
-      const axis = depth % target.length;
-      const distance = this.euclideanDistance(target, node.point);
-
-      if (distance < best.distance) {
-        best = { point: node.point, distance };
-      }
-
-      const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
-      const oppositeBranch = nextBranch === node.left ? node.right : node.left;
-
-      searchTree(nextBranch, depth + 1);
-
-      if (Math.abs(target[axis] - node.point[axis]) < best.distance) {
-        searchTree(oppositeBranch, depth + 1);
-      }
-    };
-
-    searchTree(this.root, 0);
-    return best;
-  }
-
-  /**
-   * Calculates the Euclidean distance between two points.
-   * @param {Array<number>} pointA - First point.
-   * @param {Array<number>} pointB - Second point.
-   * @returns {number} - Euclidean distance.
-   */
-  euclideanDistance(pointA, pointB) {
-    return Math.sqrt(pointA.reduce((sum, value, index) => sum + Math.pow(value - pointB[index], 2), 0));
+  findNearestNeighbor(embedding) {
+    if (!this.tree) {
+      throw new Error('Vector store is empty. Add embeddings first.');
+    }
+    return nearestNeighbor(this.tree, embedding);
   }
 }
 
-/**
- * @function createKDTree
- * @description Creates a KDTree instance from a set of vectors.
- * @param {Array<Array<number>>} vectors - Array of vectors.
- * @returns {KDTree} - KDTree instance.
- */
-export function createKDTree(vectors) {
-  if (!Array.isArray(vectors) || vectors.some(v => !Array.isArray(v) || v.some(n => typeof n !== 'number'))) {
-    throw new TypeError('Invalid input: vectors must be an array of numeric arrays.');
-  }
-  return new KDTree(vectors);
-}
-
-/**
- * @function findNearestVector
- * @description Finds the nearest vector to a given target vector using a KDTree.
- * @param {KDTree} tree - KDTree instance.
- * @param {Array<number>} target - Target vector.
- * @returns {Object} - Nearest vector and its distance.
- */
-export function findNearestVector(tree, target) {
-  if (!(tree instanceof KDTree)) {
-    throw new TypeError('Invalid input: tree must be an instance of KDTree.');
-  }
-  if (!Array.isArray(target) || target.some(n => typeof n !== 'number')) {
-    throw new TypeError('Invalid input: target must be a numeric array.');
-  }
-  return tree.nearestNeighbor(target);
-}
-
-/**
- * @function euclideanDistance
- * @description Calculates the Euclidean distance between two vectors.
- * @param {Array<number>} vectorA - First vector.
- * @param {Array<number>} vectorB - Second vector.
- * @returns {number} - Euclidean distance.
- */
-export function euclideanDistance(vectorA, vectorB) {
-  if (!Array.isArray(vectorA) || !Array.isArray(vectorB) || vectorA.some(n => typeof n !== 'number') || vectorB.some(n => typeof n !== 'number')) {
-    throw new TypeError('Invalid input: vectors must be numeric arrays.');
-  }
-  return Math.sqrt(vectorA.reduce((sum, value, index) => sum + Math.pow(value - vectorB[index], 2), 0));
-}
+export { InMemoryVectorStore };
