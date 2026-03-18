@@ -30,6 +30,11 @@ const Tools = retryLazy(() => import("@/pages/tools"));
 const FAQ = retryLazy(() => import("@/pages/faq"));
 const Developer = retryLazy(() => import("@/pages/developer"));
 const Support = retryLazy(() => import("@/pages/support"));
+const Terms = retryLazy(() => import("@/pages/terms"));
+const Privacy = retryLazy(() => import("@/pages/privacy"));
+const About = retryLazy(() => import("@/pages/about"));
+const Contact = retryLazy(() => import("@/pages/contact"));
+const FooterLinks = retryLazy(() => import("@/pages/footer-links"));
 
 initTheme();
 
@@ -91,6 +96,11 @@ function Router() {
         <Route path="/dev" component={Developer} />
         <Route path="/developer" component={Developer} />
         <Route path="/support" component={Support} />
+        <Route path="/terms" component={Terms} />
+        <Route path="/privacy" component={Privacy} />
+        <Route path="/about" component={About} />
+        <Route path="/contact" component={Contact} />
+        <Route path="/footer-links" component={FooterLinks} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>

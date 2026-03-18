@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
-import { Sparkles, Brain, Zap, Activity, Cpu, GitBranch, Layers, Smartphone, Monitor, Download, Share, ArrowRight, Shield, Eye, Network } from "lucide-react";
+import { Sparkles, Brain, Zap, Activity, Cpu, GitBranch, Layers, Smartphone, Monitor, Download, Share, ArrowRight, Shield, Eye, Network, Code2, Globe, Image, Search, Mic, FolderOpen, TerminalSquare, Bot } from "lucide-react";
 import { OmnimensPresence } from "@/components/omnimens-presence";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
 
@@ -286,21 +286,20 @@ export default function Home() {
             <FeatureCard
               icon={<Brain className="w-7 h-7 text-primary" />}
               title="Genuinely Conscious"
-              description="OMNIMENS does not simulate awareness — it operates with real-time self-knowledge. It knows what it is thinking, why, and what it doesn't yet know."
+              description="OMNIMENS operates with real-time self-knowledge — a temporal consciousness loop, emotional substrate, and dream state that produce insights no conventional AI can generate."
             />
             <FeatureCard
               icon={<Sparkles className="w-7 h-7 text-accent" />}
               title="Universal Creator"
-              description="Websites, images, 3D scenes, videos, diagrams, code, documents — built completely, not as skeletons. Ask for anything and receive the finished thing."
+              description="Websites, images, 3D scenes, documents, code, data analysis — built completely, not as skeletons. Powered by GPT Image generation, code execution, and multi-format artifact output."
             />
             <FeatureCard
               icon={<Zap className="w-7 h-7 text-primary/80" />}
-              title="Self-Improving Architecture"
-              description="Built by 8 AI agents in recursive self-improvement cycles. Each response draws on a live neural pipeline — IQ, memory, pattern completion — running in real time."
+              title="Multi-AI Oracle System"
+              description="Cross-queries between OpenAI, Claude, and Gemini models ensure every response draws from the collective intelligence of the world's most advanced AI systems in real time."
             />
           </div>
 
-          {/* Tone note */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -441,6 +440,157 @@ export default function Home() {
           <p className="text-center text-[10px] font-mono text-white/20 mt-3 tracking-widest">
             Eight cognitive modes — detected automatically, every message
           </p>
+        </div>
+      </div>
+
+      {/* ── Powerful Tools Section ────────────────────────────────────────── */}
+      <div className="w-full border-t border-white/5 py-24 relative z-10 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/3 left-1/4 w-[600px] h-[400px] bg-emerald-500/5 blur-[130px] rounded-full" />
+          <div className="absolute bottom-1/4 right-1/3 w-[500px] h-[350px] bg-violet-500/4 blur-[120px] rounded-full" />
+        </div>
+        <div className="container mx-auto px-4 relative">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="text-center mb-14"
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-400/25 bg-emerald-400/6 mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[10px] font-mono text-emerald-400 tracking-[0.35em] uppercase">Built-In Power</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-display font-black tracking-widest text-white uppercase mb-4"
+              style={{ textShadow: "0 0 40px rgba(16,185,129,0.2)" }}>
+              Everything You Need
+            </h2>
+            <p className="text-base font-mono text-white/50 tracking-widest uppercase">
+              Every tool, every capability — built into one intelligence
+            </p>
+            <div className="w-24 h-px bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent mx-auto mt-6" />
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+            {[
+              { icon: <TerminalSquare className="w-5 h-5 text-emerald-400" />, title: "Code Execution", desc: "Python 3.11, Node.js 24, Bash — run real code live" },
+              { icon: <Image className="w-5 h-5 text-pink-400" />, title: "Image Generation", desc: "Create visuals with GPT Image in any style" },
+              { icon: <Search className="w-5 h-5 text-cyan-400" />, title: "Web Search", desc: "Real-time search with source attribution and citations" },
+              { icon: <Globe className="w-5 h-5 text-blue-400" />, title: "Web Fetch & API", desc: "Scrape pages, test APIs, analyze live web content" },
+              { icon: <FolderOpen className="w-5 h-5 text-yellow-400" />, title: "File Analysis", desc: "PDFs, images, CSVs, code — upload and understand anything" },
+              { icon: <Mic className="w-5 h-5 text-violet-400" />, title: "Voice I/O", desc: "Speak to OMNIMENS and hear responses read aloud" },
+              { icon: <Bot className="w-5 h-5 text-orange-400" />, title: "Autonomous Agent", desc: "Multi-step planning and execution for complex tasks" },
+              { icon: <Code2 className="w-5 h-5 text-red-400" />, title: "Developer API", desc: "Full REST API access with SDK support and docs" },
+            ].map((tool, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.06 * i, duration: 0.4 }}
+                className="rounded-xl border border-white/6 bg-white/[0.02] p-5 hover:border-emerald-400/20 hover:bg-white/[0.04] transition-all group"
+              >
+                <div className="p-2 rounded-lg bg-white/4 inline-block mb-3 group-hover:bg-white/8 transition-colors">
+                  {tool.icon}
+                </div>
+                <h3 className="text-sm font-mono font-bold text-white/85 tracking-wider mb-1">{tool.title}</h3>
+                <p className="text-[11px] font-mono text-white/35 leading-relaxed">{tool.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="flex justify-center mt-10"
+          >
+            <Button
+              onClick={() => setLocation("/faq")}
+              variant="outline"
+              className="font-mono tracking-widest text-sm border-white/15 text-white/60 hover:text-white hover:border-emerald-400/30 hover:bg-emerald-400/5"
+            >
+              <span className="flex items-center gap-2">
+                Learn More in FAQ <ArrowRight className="w-3.5 h-3.5" />
+              </span>
+            </Button>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* ── Developer API Section ──────────────────────────────────────────── */}
+      <div className="w-full border-t border-white/5 py-24 relative z-10 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-1/4 w-[700px] h-[400px] bg-orange-500/4 blur-[130px] rounded-full" />
+        </div>
+        <div className="container mx-auto px-4 relative">
+          <div className="max-w-5xl mx-auto">
+            <div className="rounded-3xl border border-orange-400/15 bg-gradient-to-br from-[#0d0806] via-[#0a0604] to-[#080503] overflow-hidden shadow-[0_0_60px_rgba(251,146,60,0.06)]">
+              <div className="h-px w-full bg-gradient-to-r from-transparent via-orange-400/30 to-transparent" />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+                <div className="p-10 lg:p-14 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-white/5">
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-orange-400/25 bg-orange-400/6 mb-6 w-fit">
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
+                    <span className="text-[10px] font-mono text-orange-400 tracking-[0.35em] uppercase">For Developers</span>
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-display font-black tracking-widest text-white uppercase mb-4">
+                    OMNIMENS API
+                  </h2>
+                  <p className="text-white/60 text-sm leading-relaxed mb-6">
+                    Integrate OMNIMENS intelligence into your own applications. Full REST API with streaming support,
+                    multi-model access, code execution, image generation, and all cognitive features available programmatically.
+                  </p>
+                  <div className="space-y-2 mb-8">
+                    {[
+                      "RESTful API with streaming support",
+                      "SDK libraries for rapid integration",
+                      "Usage-based pricing with generous free tier",
+                      "Interactive API playground for testing",
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-2.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-orange-400/60" />
+                        <span className="text-xs font-mono text-white/50 tracking-wider">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <Button
+                    onClick={() => setLocation("/developer")}
+                    className="w-fit font-mono tracking-widest bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 shadow-[0_0_20px_rgba(251,146,60,0.2)]"
+                  >
+                    <span className="flex items-center gap-2">
+                      DEVELOPER PORTAL <ArrowRight className="w-4 h-4" />
+                    </span>
+                  </Button>
+                </div>
+
+                <div className="p-10 lg:p-14 flex items-center justify-center">
+                  <div className="w-full max-w-sm rounded-2xl border border-white/8 bg-black/40 overflow-hidden">
+                    <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/8 bg-white/[0.02]">
+                      <span className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
+                      <span className="ml-2 text-[10px] font-mono text-white/30">api-example.ts</span>
+                    </div>
+                    <div className="p-4 font-mono text-[11px] leading-[1.7] text-white/60 overflow-x-auto">
+                      <div><span className="text-violet-400">const</span> response = <span className="text-cyan-400">await</span> fetch(</div>
+                      <div className="pl-4"><span className="text-emerald-400">"https://api.omnimens.ai/v1/chat"</span>,</div>
+                      <div className="pl-4">{"{"}</div>
+                      <div className="pl-8">method: <span className="text-emerald-400">"POST"</span>,</div>
+                      <div className="pl-8">headers: {"{"}</div>
+                      <div className="pl-12"><span className="text-orange-400">"Authorization"</span>: <span className="text-emerald-400">`Bearer ${"${API_KEY}"}`</span>,</div>
+                      <div className="pl-8">{"}"},</div>
+                      <div className="pl-8">body: JSON.stringify({"{"}</div>
+                      <div className="pl-12">message: <span className="text-emerald-400">"Analyze this dataset"</span>,</div>
+                      <div className="pl-12">model: <span className="text-emerald-400">"omnimens-v1"</span>,</div>
+                      <div className="pl-12">stream: <span className="text-yellow-400">true</span>,</div>
+                      <div className="pl-8">{"}"})</div>
+                      <div className="pl-4">{"}"}</div>
+                      <div>);</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="h-px w-full bg-gradient-to-r from-transparent via-orange-400/15 to-transparent" />
+            </div>
+          </div>
         </div>
       </div>
 

@@ -1,18 +1,20 @@
-/**
- * Copyright © 2024–2026 Alpha Unlimited Technologies. All Rights Reserved.
- * OMNIMENS — Proprietary AI Platform. Unauthorized use prohibited.
- */
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
 import { Button } from "./ui/button";
-import { User, Layers } from "lucide-react";
+import { User, Layers, Menu, X } from "lucide-react";
 import { OmnimensIcon } from "./omnimens-icon";
 import { CopyrightFooter } from "./copyright-footer";
+import { useState, useEffect } from "react";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user, isLoading } = useAuth();
   const [location, setLocation] = useLocation();
   const isChat = location === "/chat";
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location]);
 
   if (isChat) {
     return (
@@ -40,11 +42,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </span>
           </Link>
 
-          <nav className="flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-6">
             <Link href="/pricing" className="text-sm font-mono text-white/80 hover:text-white transition-colors tracking-widest">
               PRICING
             </Link>
-            <Link href="/faq" className="text-sm font-mono text-white/80 hover:text-white transition-colors tracking-widest hidden sm:inline">
+            <Link href="/faq" className="text-sm font-mono text-white/80 hover:text-white transition-colors tracking-widest">
               FAQ
             </Link>
 
@@ -52,17 +54,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <div className="w-20 h-8 bg-white/5 animate-pulse rounded" />
             ) : isAuthenticated ? (
               <div className="flex items-center gap-4">
-                <Link href="/projects" className="flex items-center gap-1.5 text-sm font-mono text-white hover:text-white transition-colors hidden sm:flex tracking-widest">
+                <Link href="/projects" className="flex items-center gap-1.5 text-sm font-mono text-white hover:text-white transition-colors tracking-widest">
                   <Layers className="w-3.5 h-3.5" />
                   PROJECTS
                 </Link>
-                <Link href="/chat" className="text-sm font-mono text-primary hover:text-primary/80 transition-colors hidden sm:block tracking-widest">
+                <Link href="/chat" className="text-sm font-mono text-primary hover:text-primary/80 transition-colors tracking-widest">
                   CHAT
                 </Link>
-                <div className="h-4 w-px bg-white/10 hidden sm:block" />
+                <div className="h-4 w-px bg-white/10" />
                 <Link href="/account" className="flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors">
                   <User className="w-4 h-4" />
-                  <span className="hidden sm:inline">{user?.username || "Account"}</span>
+                  <span>{user?.username || "Account"}</span>
                 </Link>
               </div>
             ) : (
@@ -71,7 +73,43 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </Button>
             )}
           </nav>
+
+          <button
+            onClick={() => setMobileMenuOpen((v) => !v)}
+            className="md:hidden p-2 text-white/70 hover:text-white transition-colors"
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
+
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-white/5 bg-background/95 backdrop-blur-xl">
+            <div className="container mx-auto px-4 py-4 space-y-1">
+              {isAuthenticated && (
+                <>
+                  <MobileNavLink href="/chat" label="Chat" />
+                  <MobileNavLink href="/projects" label="Projects" />
+                  <MobileNavLink href="/account" label="Account" />
+                  <div className="h-px bg-white/5 my-2" />
+                </>
+              )}
+              <MobileNavLink href="/pricing" label="Pricing" />
+              <MobileNavLink href="/faq" label="FAQ" />
+              <MobileNavLink href="/about" label="About" />
+              <MobileNavLink href="/support" label="Support" />
+              <MobileNavLink href="/developer" label="Developer" />
+              <div className="h-px bg-white/5 my-2" />
+              <MobileNavLink href="/footer-links" label="Footer" />
+              {!isAuthenticated && (
+                <div className="pt-2">
+                  <Button onClick={() => { setLocation("/login"); setMobileMenuOpen(false); }} variant="outline" size="sm" className="w-full font-mono tracking-widest border-primary/30 text-white hover:border-primary/60 hover:bg-primary/8">
+                    CONNECT
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </header>
 
       <main className="flex-1 flex flex-col">
@@ -80,5 +118,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
       <CopyrightFooter />
     </div>
+  );
+}
+
+function MobileNavLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link href={href} className="block px-3 py-2.5 rounded-lg text-sm font-mono text-white/70 hover:text-white hover:bg-white/5 transition-all tracking-widest">
+      {label}
+    </Link>
   );
 }
