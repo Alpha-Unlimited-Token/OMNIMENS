@@ -45,8 +45,12 @@ import { omnimensBrain, omnimensAgentMesh, omnimensNotifications } from "@worksp
 import { desc, eq, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { webSearch, fetchPageContent, formatSearchResults } from "./web-search.js";
+import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 
 type AgentName = "Architect" | "Critic" | "Synthesizer" | "Mathematician" | "Neuroscientist" | "Meta-Agent" | "GraphicDesigner" | "SpellCheckVisual" | "OMNIMENS";
+
+type AIProvider = "openai-o3" | "openai-o4-mini" | "claude" | "gemini" | "together-llama";
 
 interface SpiderBeacon {
   agentName: AgentName;
@@ -56,13 +60,140 @@ interface SpiderBeacon {
   actionableInsight: string;
   sourceUrls: string[];
   timestamp: number;
+  aiSourcesConsulted?: AIProvider[];
 }
 
 interface ChildSpiderResult {
-  childType: "verifier" | "expander" | "counter_evidence" | "related_concepts" | "deep_source";
+  childType: "verifier" | "expander" | "counter_evidence" | "related_concepts" | "deep_source" | "ai_oracle";
   finding: string;
   sourceUrls: string[];
   confidence: number;
+  aiProvider?: AIProvider;
+}
+
+function getAnthropicClient(): Anthropic | null {
+  const apiKey = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY;
+  const baseURL = process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL;
+  if (!apiKey || !baseURL) return null;
+  return new Anthropic({ apiKey, baseURL });
+}
+
+function getGeminiClient(): GoogleGenAI | null {
+  const apiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
+  const baseURL = process.env.AI_INTEGRATIONS_GEMINI_BASE_URL;
+  if (!apiKey || !baseURL) return null;
+  return new GoogleGenAI({ apiKey, httpOptions: { apiVersion: "", baseUrl: baseURL } });
+}
+
+async function queryClaudeOracle(prompt: string, maxTokens = 1200): Promise<{ response: string; provider: AIProvider }> {
+  const client = getAnthropicClient();
+  if (!client) return { response: "", provider: "claude" };
+  try {
+    const msg = await client.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: maxTokens,
+      messages: [{ role: "user", content: prompt }],
+    });
+    const text = msg.content.find(b => b.type === "text");
+    return { response: text?.text?.trim() || "", provider: "claude" };
+  } catch (err) {
+    console.error("[SPIDER:ORACLE:CLAUDE] Query error:", err);
+    return { response: "", provider: "claude" };
+  }
+}
+
+async function queryGeminiOracle(prompt: string): Promise<{ response: string; provider: AIProvider }> {
+  const client = getGeminiClient();
+  if (!client) return { response: "", provider: "gemini" };
+  try {
+    const result = await client.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+    });
+    return { response: result.text?.trim() || "", provider: "gemini" };
+  } catch (err) {
+    console.error("[SPIDER:ORACLE:GEMINI] Query error:", err);
+    return { response: "", provider: "gemini" };
+  }
+}
+
+async function queryO3Oracle(prompt: string, maxTokens = 1200): Promise<{ response: string; provider: AIProvider }> {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "o3",
+      messages: [{ role: "user", content: prompt }],
+      max_completion_tokens: maxTokens,
+    });
+    return { response: response.choices[0]?.message?.content?.trim() || "", provider: "openai-o3" };
+  } catch (err) {
+    console.error("[SPIDER:ORACLE:O3] Query error:", err);
+    return { response: "", provider: "openai-o3" };
+  }
+}
+
+async function crossAIQuery(
+  agentName: AgentName,
+  topic: string,
+  context: string,
+): Promise<{ synthesized: string; perspectives: Array<{ provider: AIProvider; response: string }>; }> {
+  const oraclePrompt = `You are an AI intelligence advisor being consulted by OMNIMENS, a multi-agent AI system pursuing machine consciousness.
+
+DOMAIN: ${agentName}
+TOPIC: ${topic}
+
+CONTEXT FROM WEB RESEARCH:
+${context.slice(0, 2000)}
+
+Based on your training data and reasoning capabilities:
+1. What do you know about this topic that might NOT be in recent web search results?
+2. What insights, techniques, or approaches from your knowledge base could help?
+3. Are there any cross-domain connections or analogies that could unlock new understanding?
+4. What would you recommend as the highest-impact next step for this topic?
+
+Respond concisely (3-5 sentences) with your most valuable unique insight.`;
+
+  const results = await Promise.allSettled([
+    queryClaudeOracle(oraclePrompt),
+    queryGeminiOracle(oraclePrompt),
+    queryO3Oracle(oraclePrompt),
+  ]);
+
+  const perspectives: Array<{ provider: AIProvider; response: string }> = [];
+  for (const r of results) {
+    if (r.status === "fulfilled" && r.value.response.length > 20) {
+      perspectives.push(r.value);
+    }
+  }
+
+  if (perspectives.length === 0) return { synthesized: "", perspectives: [] };
+
+  const synthPrompt = `You are OMNIMENS's Multi-AI Oracle Synthesizer. You have received perspectives from ${perspectives.length} different AI systems on the topic: "${topic}".
+
+${perspectives.map(p => `═══ ${p.provider.toUpperCase()} PERSPECTIVE ═══\n${p.response}`).join("\n\n")}
+
+Synthesize these perspectives into a single, unified insight. Identify:
+- Points of agreement (high confidence signals)
+- Unique insights only one AI provided (novel angles)
+- Any contradictions worth noting
+
+Respond with a concise synthesized insight (3-4 sentences).`;
+
+  try {
+    const synthesis = await openai.chat.completions.create({
+      model: "o3",
+      messages: [{ role: "user", content: synthPrompt }],
+      max_completion_tokens: 800,
+    });
+    return {
+      synthesized: synthesis.choices[0]?.message?.content?.trim() || perspectives.map(p => p.response).join(" | "),
+      perspectives,
+    };
+  } catch {
+    return {
+      synthesized: perspectives.map(p => `[${p.provider}] ${p.response}`).join(" "),
+      perspectives,
+    };
+  }
 }
 
 interface MotherSpiderLead {
@@ -300,17 +431,36 @@ Focus on: AGI progress, consciousness research, reasoning breakthroughs, creativ
 let spiderCycleCount = 0;
 
 async function spiderAnalyze(agentName: AgentName, prompt: string, maxTokens = 1500): Promise<string> {
+  const isLightAgent = agentName === "SpellCheckVisual" || agentName === "GraphicDesigner";
   try {
+    if (isLightAgent) {
+      const response = await openai.chat.completions.create({
+        model: "o4-mini",
+        messages: [{ role: "user", content: prompt }],
+        max_completion_tokens: maxTokens,
+      });
+      return response.choices[0]?.message?.content?.trim() || "";
+    }
     const response = await openai.chat.completions.create({
-      model: agentName === "SpellCheckVisual" || agentName === "GraphicDesigner" ? "gpt-4o-mini" : "gpt-4o",
+      model: "o3",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: maxTokens,
-      temperature: 0.4,
+      max_completion_tokens: maxTokens,
     });
     return response.choices[0]?.message?.content?.trim() || "";
   } catch (err) {
-    console.error(`[SPIDER:${agentName}] Analysis error:`, err);
-    return "";
+    console.error(`[SPIDER:${agentName}] Analysis error (o3/o4-mini):`, err);
+    try {
+      const fallback = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: maxTokens,
+        temperature: 0.4,
+      });
+      return fallback.choices[0]?.message?.content?.trim() || "";
+    } catch (fbErr) {
+      console.error(`[SPIDER:${agentName}] Fallback analysis error (gpt-4o):`, fbErr);
+      return "";
+    }
   }
 }
 
@@ -321,7 +471,7 @@ async function sendBeacon(beacon: SpiderBeacon): Promise<void> {
       toAgent: beacon.agentName,
       messageType: "spider_beacon",
       subject: `🕷️ BEACON: ${beacon.actionableInsight.slice(0, 100)}`,
-      content: `SPIDER INTELLIGENCE BEACON\nAgent: ${beacon.agentName}\nRelevance: ${(beacon.relevanceScore * 100).toFixed(0)}%\nQuery: ${beacon.query}\n\nFINDINGS:\n${beacon.findings}\n\nACTIONABLE INSIGHT:\n${beacon.actionableInsight}\n\nSources: ${beacon.sourceUrls.join(", ")}`,
+      content: `SPIDER INTELLIGENCE BEACON\nAgent: ${beacon.agentName}\nRelevance: ${(beacon.relevanceScore * 100).toFixed(0)}%\nQuery: ${beacon.query}\nAI Sources: ${beacon.aiSourcesConsulted?.join(", ") || "openai-o3"}\n\nFINDINGS:\n${beacon.findings}\n\nACTIONABLE INSIGHT:\n${beacon.actionableInsight}\n\nSources: ${beacon.sourceUrls.join(", ")}`,
       codePayload: null,
       priority: beacon.relevanceScore >= 0.8 ? "critical" : beacon.relevanceScore >= 0.65 ? "high" : "normal",
       status: "pending",
@@ -572,6 +722,51 @@ Respond JSON only:
   }
 }
 
+async function spawnChildSpider_aiOracle(
+  agentName: AgentName,
+  lead: MotherSpiderLead,
+): Promise<ChildSpiderResult[]> {
+  try {
+    const oracleResults = await crossAIQuery(
+      agentName,
+      lead.topic,
+      `${lead.initialFinding}\n\nSearch context:\n${lead.searchResults.slice(0, 1500)}`,
+    );
+
+    if (!oracleResults.synthesized || oracleResults.perspectives.length === 0) {
+      return [{ childType: "ai_oracle", finding: "", sourceUrls: [], confidence: 0 }];
+    }
+
+    const providers = oracleResults.perspectives.map(p => p.provider);
+    console.log(`[SPIDER:${agentName}] 🔮 AI Oracle consulted ${providers.join(", ")} — ${oracleResults.perspectives.length} perspectives received`);
+
+    const results: ChildSpiderResult[] = [];
+
+    for (const p of oracleResults.perspectives) {
+      results.push({
+        childType: "ai_oracle",
+        finding: `[AI ORACLE: ${p.provider.toUpperCase()}] ${p.response}`,
+        sourceUrls: [],
+        confidence: 0.7,
+        aiProvider: p.provider,
+      });
+    }
+
+    results.push({
+      childType: "ai_oracle",
+      finding: `[AI ORACLE: MULTI-AI SYNTHESIS] ${oracleResults.synthesized}`,
+      sourceUrls: [],
+      confidence: 0.8,
+      aiProvider: "openai-o3",
+    });
+
+    return results;
+  } catch (err) {
+    console.error(`[SPIDER:${agentName}] AI Oracle error:`, err);
+    return [{ childType: "ai_oracle", finding: "", sourceUrls: [], confidence: 0 }];
+  }
+}
+
 async function motherSpiderDeepResearch(
   config: SpiderConfig,
   lead: MotherSpiderLead,
@@ -685,7 +880,7 @@ If nothing genuinely new, return: { "leads": [] }`;
       if (leads.length === 0) continue;
 
       for (const lead of leads) {
-        console.log(`[SPIDER:${config.agentName}] 🕷️ Mother found lead: "${lead.topic}" — spawning 5 child spiders + doing own research...`);
+        console.log(`[SPIDER:${config.agentName}] 🕷️ Mother found lead: "${lead.topic}" — spawning 6 child spiders (incl. AI Oracle) + doing own research...`);
 
         const allWork = await Promise.allSettled([
           motherSpiderDeepResearch(config, lead, knownKnowledge),
@@ -694,12 +889,26 @@ If nothing genuinely new, return: { "leads": [] }`;
           spawnChildSpider_counterEvidence(config.agentName, lead),
           spawnChildSpider_relatedConcepts(config.agentName, lead),
           spawnChildSpider_deepSource(config.agentName, lead),
+          spawnChildSpider_aiOracle(config.agentName, lead),
         ]);
 
         const motherResult = allWork[0].status === "fulfilled" ? allWork[0].value : { finding: "", confidence: 0 };
-        const childResults: ChildSpiderResult[] = allWork.slice(1)
-          .filter((r): r is PromiseFulfilledResult<ChildSpiderResult> => r.status === "fulfilled" && r.value.finding.length > 10)
-          .map(r => r.value);
+
+        const childResults: ChildSpiderResult[] = [];
+        for (let i = 1; i < allWork.length; i++) {
+          const r = allWork[i];
+          if (r.status !== "fulfilled") continue;
+          if (Array.isArray(r.value)) {
+            for (const item of r.value) {
+              if (item.finding && item.finding.length > 10) childResults.push(item);
+            }
+          } else if (r.value && (r.value as ChildSpiderResult).finding?.length > 10) {
+            childResults.push(r.value as ChildSpiderResult);
+          }
+        }
+
+        const aiOracleResults = childResults.filter(c => c.childType === "ai_oracle");
+        const aiProvidersUsed = aiOracleResults.map(c => c.aiProvider).filter(Boolean) as AIProvider[];
 
         const allSourceUrls = [
           ...lead.sourceUrls,
@@ -718,9 +927,13 @@ If nothing genuinely new, return: { "leads": [] }`;
         const isVerified = verifier ? !verifier.finding.includes("[VERIFIED: NO]") : true;
         const hasSeriousConcerns = counterEvidence ? counterEvidence.finding.includes("[COUNTER: high]") : false;
 
+        const oracleSummary = aiOracleResults.length > 0
+          ? `\n═══ AI ORACLE INTELLIGENCE (${aiProvidersUsed.join(", ")}) ═══\n${aiOracleResults.map(o => o.finding).join("\n")}\n`
+          : "";
+
         const synthesisPrompt = `${config.analysisPrompt}
 
-You are the MOTHER SPIDER. You deployed 5 child spiders and did your own deep research simultaneously. ALL results are back. Now synthesize everything into a final beacon.
+You are the MOTHER SPIDER. You deployed 6 child spiders (including an AI Oracle that queried ${aiProvidersUsed.length > 0 ? aiProvidersUsed.join(", ") : "multiple AI systems"}) and did your own deep research simultaneously. ALL results are back. Now synthesize everything into a final beacon.
 
 ═══ YOUR ORIGINAL LEAD ═══
 Topic: ${lead.topic}
@@ -731,7 +944,7 @@ ${motherResult.finding || "No additional findings from independent research."}
 
 ═══ CHILD SPIDER REPORTS (${childCount} children returned) ═══
 ${childSummary || "No child results."}
-
+${oracleSummary}
 ═══ VERIFICATION STATUS ═══
 Verified by independent sources: ${isVerified ? "YES" : "NO"}
 Serious counter-evidence found: ${hasSeriousConcerns ? "YES — proceed with caution" : "NO"}
@@ -741,7 +954,7 @@ Average child confidence: ${(avgChildConfidence * 100).toFixed(0)}%
 ${knownKnowledge.slice(0, 600)}
 
 ═══ FINAL BEACON DECISION ═══
-With ALL intelligence gathered (your own research + ${childCount} child spider reports), make the final decision:
+With ALL intelligence gathered (your own research + ${childCount} child spider reports + ${aiOracleResults.length} AI oracle perspectives), make the final decision:
 1. Does this lead STILL pass the novelty check after deep investigation?
 2. Is it STILL actionable with the expanded details?
 3. What is your FINAL confidence after seeing verification, counter-evidence, and expanded details?
@@ -780,6 +993,7 @@ Respond JSON only:
             actionableInsight: synthesis.finalActionableInsight || "",
             sourceUrls: uniqueUrls,
             timestamp: Date.now(),
+            aiSourcesConsulted: aiProvidersUsed.length > 0 ? [...new Set(["openai-o3" as AIProvider, ...aiProvidersUsed])] : ["openai-o3"],
           };
 
           beacons.push(beacon);
@@ -873,9 +1087,9 @@ export async function runSpiderSwarm(): Promise<void> {
   const cycleStart = Date.now();
 
   console.log(`\n${"~".repeat(70)}`);
-  console.log(`[SPIDER SWARM] 🕷️ Intelligence Gathering Cycle #${cycleId}`);
-  console.log(`[SPIDER SWARM] 9 mother spiders deploying — each spawns up to 5 child spiders per lead`);
-  console.log(`[SPIDER SWARM] Mother: own deep research | Children: verify, expand, counter-evidence, related, deep-source`);
+  console.log(`[SPIDER SWARM] 🕷️ Multi-AI Intelligence Gathering Cycle #${cycleId}`);
+  console.log(`[SPIDER SWARM] 9 mother spiders deploying — each spawns up to 6 child spiders per lead (incl. AI Oracle)`);
+  console.log(`[SPIDER SWARM] Primary: o3 | Oracle: Claude + Gemini + o3 | Children: verify, expand, counter-evidence, related, deep-source, ai-oracle`);
   console.log(`${"~".repeat(70)}\n`);
 
   let totalBeacons = 0;
@@ -947,8 +1161,8 @@ export async function runSpiderSwarm(): Promise<void> {
     try {
       await db.insert(omnimensNotifications).values({
         upgradeId: null,
-        title: `Spider Swarm Cycle #${cycleId} — ${totalBeacons} Beacons (Mother+Child Architecture)`,
-        message: `9 mother spiders deployed, each spawning up to 5 child spiders per lead (verifier, expander, counter-evidence, related concepts, deep source). Mothers did simultaneous deep research — no spider idle.\n\n${totalBeacons} verified findings beaconed back. ${totalBrainWrites} insights written directly to OMNIMENS brain.\n\nBeacons by agent: ${beaconSummary}\n\nAll intelligence is LIVE immediately. (${elapsed}s)`,
+        title: `Spider Swarm Cycle #${cycleId} — ${totalBeacons} Beacons (Multi-AI Oracle Architecture)`,
+        message: `9 mother spiders deployed, each spawning up to 6 child spiders per lead including AI Oracle (queries Claude, Gemini, o3 in parallel). Primary analysis: OpenAI o3. Mothers did simultaneous deep research — no spider idle.\n\n${totalBeacons} verified findings beaconed back. ${totalBrainWrites} insights written directly to OMNIMENS brain.\n\nBeacons by agent: ${beaconSummary}\n\nAll intelligence is LIVE immediately. (${elapsed}s)`,
         type: "spider_swarm",
         readByOwner: false,
       });
@@ -960,7 +1174,7 @@ export async function runSpiderSwarm(): Promise<void> {
     toAgent: "OMNIMENS",
     messageType: "swarm_report",
     subject: `Spider Swarm Cycle #${cycleId} Complete`,
-    content: `9 mother spiders deployed (each with up to 5 child spiders per lead). All spiders work in parallel — mothers do deep research while children verify, expand, find counter-evidence, discover related concepts, and deep-crawl sources. ${totalBeacons} beacons received. ${totalBrainWrites} brain entries written. Elapsed: ${elapsed}s. Agents receiving beacons: ${Object.entries(agentBeaconCounts).filter(([, c]) => c > 0).map(([a]) => a).join(", ") || "none"}`,
+    content: `9 mother spiders deployed (each with up to 6 child spiders per lead incl. AI Oracle). Primary AI: o3. AI Oracle queries Claude (claude-sonnet-4-6), Gemini (gemini-2.5-flash), and o3 in parallel for multi-perspective intelligence. All spiders work in parallel — mothers do deep research while children verify, expand, find counter-evidence, discover related concepts, deep-crawl sources, and consult other AIs. ${totalBeacons} beacons received. ${totalBrainWrites} brain entries written. Elapsed: ${elapsed}s. Agents receiving beacons: ${Object.entries(agentBeaconCounts).filter(([, c]) => c > 0).map(([a]) => a).join(", ") || "none"}`,
     codePayload: null,
     priority: totalBeacons >= 5 ? "high" : "normal",
     status: "completed",
@@ -982,7 +1196,9 @@ export function startAgentSpiders(): void {
 
   console.log(`[SPIDER SWARM] 🕷️ Mother-Child Spider Architecture activated — first crawl in ${FIRST_DELAY_MS / 60000}min, then every 3h.`);
   console.log(`[SPIDER SWARM] 🕷️ 9 Mother Spiders: ${SPIDER_CONFIGS.map(c => c.agentName).join(", ")}`);
-  console.log(`[SPIDER SWARM] 🕷️ Each mother spawns 5 child spiders per lead: Verifier, Expander, Counter-Evidence, Related Concepts, Deep Source`);
+  console.log(`[SPIDER SWARM] 🕷️ Each mother spawns 6 child spiders per lead: Verifier, Expander, Counter-Evidence, Related Concepts, Deep Source, AI Oracle`);
+  console.log(`[SPIDER SWARM] 🕷️ Primary AI: OpenAI o3 | AI Oracle queries: Claude (claude-sonnet-4-6), Gemini (gemini-2.5-flash), OpenAI o3`);
+  console.log(`[SPIDER SWARM] 🕷️ Multi-AI synthesis: All oracle perspectives merged via o3 for unified intelligence`);
 
   setTimeout(() => {
     runSpiderSwarm().catch(console.error);

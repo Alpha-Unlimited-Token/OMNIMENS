@@ -52,7 +52,8 @@ Both OMNIMENS and Super AI Lab frontends are built with React, Vite, Tailwind CS
 - **Database Schema:** Postgres tables prefixed with `godflesh_` manage users, usage, credit transactions, OMNIMENS's knowledge base, upgrades, notifications, projects, memories, custom instructions, code runs, evolution logs, generated modules, consciousness state, council analyses, and agent mesh communications.
 - **API Endpoints:** A comprehensive set of RESTful API endpoints for chat, memory management, custom instructions, code execution, deep research, billing, project management (create, build, publish, custom domains), and owner-only administrative tasks.
 - **Frontend Pages:** Dedicated routes for `/`, `/chat`, `/projects`, `/pricing`, and `/account`.
-- **Core Library Files:** Modular TypeScript files (`lib/omnimens-*.ts`) encapsulate AI engine functionalities like neural pipeline, self-upgrade, patching, memory, code execution, deep research, URL analysis, custom instructions, web search, learning engine, agent spiders, global workspace consciousness, predictive processing, emotional substrate, knowledge graph, homeostatic drives, synaptic mesh, inner voice, and physical therapy AI engine.
+- **Core Library Files:** Modular TypeScript files (`lib/omnimens-*.ts`) encapsulate AI engine functionalities like neural pipeline, self-upgrade, patching, memory, code execution, deep research, URL analysis, custom instructions, web search, learning engine, agent spiders (Multi-AI Oracle architecture — o3 primary + Claude/Gemini cross-querying), global workspace consciousness, predictive processing, emotional substrate, knowledge graph, homeostatic drives, synaptic mesh, inner voice, and physical therapy AI engine.
+- **Security:** Two-factor authentication (TOTP) with brute-force protection, referral system with auto-apply from URL params, account lockdown for failed payments.
 
 **Super AI Lab Architecture:**
 - **Agent Mesh Intelligence System:** A 5-phase autonomous cycle running every 5 hours: Web Research, Agent Discoveries (Chain-of-Thought, metacognition), Adversarial Debate (Critic-led, anti-conformity, groupthink detection), Meta-Agent Synthesis (Tree-of-Thoughts synthesis, generates brain entries/code modules/manual changes), and Apply Upgrades (writes to DB, owner notifications).
@@ -67,7 +68,7 @@ Both OMNIMENS and Super AI Lab frontends are built with React, Vite, Tailwind CS
 
 ## External Dependencies
 
-- **AI Providers:** OpenAI (via Replit AI Integrations proxy).
+- **AI Providers:** OpenAI o3/o4-mini (via Replit AI Integrations proxy), Anthropic Claude claude-sonnet-4-6 (via Replit AI Integrations proxy), Google Gemini gemini-2.5-flash (via Replit AI Integrations proxy), Together AI (Llama, Mixtral, Mistral — via user API key).
 - **Authentication:** Replit OIDC (openid-client).
 - **Payments:** Stripe SDK for managing subscriptions, credit packs, and auto-topups.
 - **Database:** PostgreSQL.

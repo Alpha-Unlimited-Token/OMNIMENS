@@ -1,118 +1,82 @@
 /**
- * wasmMatrixOps - A utility module for efficient matrix operations leveraging WebAssembly.
- * This module provides high-performance matrix operations by integrating WebAssembly (WASM) 
- * for parallel computation and numerical linear algebra tasks.
- *
- * @module wasmMatrixOps
- * @version 1.0.0
+ * wasmMatrixOps: A WebAssembly-powered utility for high-performance matrix operations in Node.js.
+ * This module accelerates numerical computations using WebAssembly bindings for BLAS (Basic Linear Algebra Subprograms).
+ * It provides efficient implementations for matrix multiplication and other linear algebra operations.
  */
 
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 
 /**
- * Loads a WebAssembly module from a given file path.
- * @param {string} wasmFilePath - The relative path to the WebAssembly binary file.
- * @returns {Promise<WebAssembly.Instance>} A promise resolving to the WebAssembly instance.
- * @throws {Error} If the file cannot be read or the module fails to instantiate.
+ * Load and instantiate the WebAssembly module.
+ * @returns {Promise<WebAssembly.Instance>} The instantiated WebAssembly instance.
  */
-async function loadWasmModule(wasmFilePath) {
-  const absolutePath = join(process.cwd(), wasmFilePath);
-  const wasmBuffer = await readFile(absolutePath);
+async function loadWasm() {
+  const wasmPath = join(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = await readFile(wasmPath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
-  return WebAssembly.instantiate(wasmModule, {});
+  return WebAssembly.instantiate(wasmModule);
 }
 
 /**
- * Multiplies two matrices using WebAssembly for high performance.
- *
- * @param {number[][]} matrixA - The first matrix (2D array).
- * @param {number[][]} matrixB - The second matrix (2D array).
- * @param {string} wasmFilePath - The path to the WebAssembly binary implementing matrix multiplication.
- * @returns {Promise<number[][]>} A promise resolving to the resulting matrix.
- * @throws {Error} If the matrices are incompatible for multiplication.
+ * Perform matrix multiplication using WebAssembly.
+ * @param {Float64Array} matrixA - The first matrix (row-major order).
+ * @param {Float64Array} matrixB - The second matrix (row-major order).
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA (must match rowsB).
+ * @param {number} colsB - Number of columns in matrixB.
+ * @returns {Float64Array} The resulting matrix (row-major order).
+ * @throws {Error} If the dimensions are invalid.
  */
-export async function multiplyMatrices(matrixA, matrixB, wasmFilePath) {
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
-
-  if (colsA !== rowsB) {
-    throw new Error('Matrix multiplication is not defined for these dimensions.');
+export async function matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
+  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+    throw new Error('Invalid matrix dimensions for multiplication.');
   }
 
-  const wasmInstance = await loadWasmModule(wasmFilePath);
+  const wasmInstance = await loadWasm();
   const { memory, multiply_matrices } = wasmInstance.exports;
 
-  // Flatten matrices into 1D arrays for WASM memory.
-  const flatA = matrixA.flat();
-  const flatB = matrixB.flat();
+  // Allocate memory in WebAssembly for input and output matrices.
+  const offsetA = 0;
+  const offsetB = offsetA + matrixA.length * Float64Array.BYTES_PER_ELEMENT;
+  const offsetC = offsetB + matrixB.length * Float64Array.BYTES_PER_ELEMENT;
   const resultLength = rowsA * colsB;
 
-  // Allocate memory for matrices in WASM.
-  const aPtr = wasmInstance.exports.malloc(flatA.length * 4);
-  const bPtr = wasmInstance.exports.malloc(flatB.length * 4);
-  const resultPtr = wasmInstance.exports.malloc(resultLength * 4);
+  const wasmMemory = new Float64Array(memory.buffer);
+  wasmMemory.set(matrixA, offsetA / Float64Array.BYTES_PER_ELEMENT);
+  wasmMemory.set(matrixB, offsetB / Float64Array.BYTES_PER_ELEMENT);
 
-  // Write matrices into WASM memory.
-  const wasmMemory = new Float32Array(memory.buffer);
-  wasmMemory.set(flatA, aPtr / 4);
-  wasmMemory.set(flatB, bPtr / 4);
+  // Perform the matrix multiplication in WebAssembly.
+  multiply_matrices(offsetA, offsetB, offsetC, rowsA, colsA, colsB);
 
-  // Perform the matrix multiplication.
-  multiply_matrices(aPtr, bPtr, resultPtr, rowsA, colsA, colsB);
-
-  // Read the result from WASM memory.
-  const result = [];
-  for (let i = 0; i < rowsA; i++) {
-    result.push(wasmMemory.slice(resultPtr / 4 + i * colsB, resultPtr / 4 + (i + 1) * colsB));
-  }
-
-  // Free WASM memory.
-  wasmInstance.exports.free(aPtr);
-  wasmInstance.exports.free(bPtr);
-  wasmInstance.exports.free(resultPtr);
-
+  // Extract the result from WebAssembly memory.
+  const result = wasmMemory.slice(offsetC / Float64Array.BYTES_PER_ELEMENT, (offsetC / Float64Array.BYTES_PER_ELEMENT) + resultLength);
   return result;
 }
 
 /**
- * Validates if a given 2D array is a valid matrix.
- *
- * @param {number[][]} matrix - The matrix to validate.
- * @returns {boolean} True if the input is a valid matrix, false otherwise.
+ * Example usage of the wasmMatrixOps module.
+ * Demonstrates matrix multiplication.
  */
-export function isValidMatrix(matrix) {
-  if (!Array.isArray(matrix) || matrix.length === 0) return false;
-  const rowLength = matrix[0].length;
-  return matrix.every(row => Array.isArray(row) && row.length === rowLength);
+async function exampleUsage() {
+  const matrixA = new Float64Array([
+    1, 2, 3,
+    4, 5, 6
+  ]); // 2x3 matrix
+
+  const matrixB = new Float64Array([
+    7, 8,
+    9, 10,
+    11, 12
+  ]); // 3x2 matrix
+
+  const rowsA = 2;
+  const colsA = 3;
+  const colsB = 2;
+
+  const result = await matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB);
+  console.log('Resulting Matrix:', result);
 }
 
-/**
- * Example usage of the wasmMatrixOps module.
- *
- * @example
- * import { multiplyMatrices, isValidMatrix } from './wasmMatrixOps.js';
- *
- * const matrixA = [
- *   [1, 2],
- *   [3, 4]
- * ];
- *
- * const matrixB = [
- *   [5, 6],
- *   [7, 8]
- * ];
- *
- * const wasmFilePath = './matrix_multiply.wasm';
- *
- * (async () => {
- *   if (isValidMatrix(matrixA) && isValidMatrix(matrixB)) {
- *     const result = await multiplyMatrices(matrixA, matrixB, wasmFilePath);
- *     console.log(result);
- *   } else {
- *     console.error('Invalid matrices provided.');
- *   }
- * })();
- */
+// Uncomment the following line to run the example.
+// exampleUsage();
