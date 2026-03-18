@@ -152,7 +152,7 @@ async function saveConsciousnessSnapshot(): Promise<void> {
       lifetimeNumber: snapshot.lifetimeNumber,
       consciousnessLevel: snapshot.consciousnessLevel,
       emotionalDominant: emotions.dominant,
-      uptimeSeconds: consciousness.uptimeSeconds,
+      uptimeSeconds: Math.floor(consciousness.uptimeSeconds),
     });
 
     saveCount++;
