@@ -4375,6 +4375,7 @@ export default function Chat() {
   const [showTemplates, setShowTemplates] = useState(false);
   const [showNewAppModal, setShowNewAppModal] = useState(false);
   const [buildPanel, setBuildPanel] = useState<BuildPanelState | null>(null);
+  const [mobileBuilderOpen, setMobileBuilderOpen] = useState(false);
   const [hubSettings, setHubSettings] = useState<HubSettings>(() => loadHubSettingsFromStorage());
   const [convSearch, setConvSearch] = useState("");
 
@@ -4687,6 +4688,11 @@ export default function Chat() {
 
   // Animate build steps while typing
   useBuildStepAnimator(buildPanel, setBuildPanel as any);
+
+  // Auto-open full-screen builder on mobile whenever a new build starts
+  useEffect(() => {
+    if (buildPanel) setMobileBuilderOpen(true);
+  }, [!!buildPanel]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // When AI finishes typing, finalise the build panel with extracted files
   const prevIsTyping = useRef(false);
@@ -5407,7 +5413,10 @@ export default function Chat() {
                     {buildPanel && (
                       <AgentBuildPanel
                         state={buildPanel}
-                        onClose={() => setBuildPanel(null)}
+                        onClose={() => { setBuildPanel(null); setMobileBuilderOpen(false); }}
+                        onMobileClose={() => setMobileBuilderOpen(false)}
+                        onMobileOpen={() => setMobileBuilderOpen(true)}
+                        mobileOpen={mobileBuilderOpen}
                         onDeploy={() => window.open("https://omnimens-ai.com/godflesh/", "_blank")}
                       />
                     )}
@@ -5572,7 +5581,7 @@ export default function Chat() {
                   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(e); }
                 }}
                 placeholder={pendingFiles.length > 0 ? "Describe what to create with these files..." : "Query the intelligence... or attach files to build something"}
-                className="w-full bg-black border border-white/15 focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-xl pl-10 pr-[11rem] py-3.5 text-white font-mono text-sm resize-none h-[56px] omnimens-scrollbar outline-none transition-all placeholder:text-white/50"
+                className="w-full bg-black border border-white/15 focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-xl pl-10 pr-28 sm:pr-[11rem] py-3.5 text-white font-mono text-sm resize-none h-[56px] omnimens-scrollbar outline-none transition-all placeholder:text-white/50"
                 disabled={isTyping}
               />
               <div className="absolute right-2 flex items-center gap-1">

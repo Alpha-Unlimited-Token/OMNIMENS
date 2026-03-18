@@ -4,12 +4,25 @@ import {
   CheckCircle2, Loader2, Circle, AlertCircle,
   Globe, Code2, Smartphone, Database, Zap, Brain, BarChart2,
   Play, Eye, Download, Share2, ExternalLink, X,
-  File, Folder, FolderOpen, ChevronRight, ChevronDown,
+  File, Folder, FolderOpen, ChevronRight, ChevronDown, ChevronLeft,
   Terminal, Sparkles, Cpu, LayoutGrid, Monitor,
   Gamepad2, Bot, Package, Server, Layers, RefreshCw, Copy, Check,
   Plus, Rocket, Wand2, FileCode, FileJson, FileText, Layout,
   MessageSquare, Infinity, Settings, PanelLeft, Maximize2, Minimize2,
 } from "lucide-react";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mobile detection hook
+// ─────────────────────────────────────────────────────────────────────────────
+function useIsMobile() {
+  const [mobile, setMobile] = useState(() => typeof window !== "undefined" && window.innerWidth < 1024);
+  useEffect(() => {
+    const handler = () => setMobile(window.innerWidth < 1024);
+    window.addEventListener("resize", handler, { passive: true });
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+  return mobile;
+}
 
 const V = "#a855f7";
 const VD = "rgba(168,85,247,0.10)";
@@ -273,20 +286,24 @@ export function AgentBuildPanel({
   state,
   onClose,
   onDeploy,
+  mobileOpen,
+  onMobileClose,
+  onMobileOpen,
 }: {
   state: BuildPanelState;
   onClose?: () => void;
   onDeploy?: () => void;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
+  onMobileOpen?: () => void;
 }) {
+  const isMobile = useIsMobile();
   const [selectedFile, setSelectedFile] = useState<ExtractedFile | null>(null);
-  const [activeTab, setActiveTab] = useState<"steps" | "files" | "preview">("steps");
+  const [activeTab, setActiveTab] = useState<"steps" | "files" | "preview" | "publish">("steps");
   const [copied, setCopied] = useState(false);
-  const elapsed = Math.floor((Date.now() - state.startedAt) / 1000);
 
   useEffect(() => {
-    if (state.files.length > 0 && !selectedFile) {
-      setSelectedFile(state.files[0]);
-    }
+    if (state.files.length > 0 && !selectedFile) setSelectedFile(state.files[0]);
   }, [state.files]);
 
   useEffect(() => {
@@ -295,23 +312,292 @@ export function AgentBuildPanel({
   }, [state.status]);
 
   const copyFile = useCallback(() => {
-    if (selectedFile) {
-      navigator.clipboard.writeText(selectedFile.content).catch(() => {});
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+    if (!selectedFile) return;
+    navigator.clipboard.writeText(selectedFile.content).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }, [selectedFile]);
+
+  const downloadFiles = useCallback(() => {
+    state.files.forEach(f => {
+      const blob = new Blob([f.content], { type: "text/plain" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = f.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    });
+  }, [state.files]);
 
   const doneCount = state.steps.filter(s => s.status === "done").length;
   const totalCount = state.steps.length;
   const progress = (doneCount / totalCount) * 100;
 
   const TABS = [
-    { id: "steps" as const, label: "Steps", count: `${doneCount}/${totalCount}` },
-    { id: "files" as const, label: "Files", count: state.files.length > 0 ? state.files.length : null },
-    { id: "preview" as const, label: "Preview", count: state.previewHtml ? "●" : null },
+    { id: "steps"   as const, Icon: Layers,   label: "Steps",   badge: `${doneCount}/${totalCount}` },
+    { id: "files"   as const, Icon: Code2,    label: "Files",   badge: state.files.length > 0 ? String(state.files.length) : null },
+    { id: "preview" as const, Icon: Eye,      label: "Preview", badge: state.previewHtml ? "●" : null },
+    { id: "publish" as const, Icon: Rocket,   label: "Publish", badge: state.status === "done" ? "✓" : null },
   ];
 
+  // ── Shared tab content ──────────────────────────────────────────────────
+  const renderTabContent = () => (
+    <>
+      {/* STEPS */}
+      {activeTab === "steps" && (
+        <div className="space-y-0">
+          {state.steps.map((step, i) => <StepRow key={step.id} step={step} index={i} />)}
+        </div>
+      )}
+
+      {/* FILES */}
+      {activeTab === "files" && (
+        <div>
+          {state.files.length === 0 ? (
+            <div className="text-center py-8 font-mono text-[10px] text-white/25">
+              {state.status === "building" ? "Files will appear here as they are created..." : "No files extracted."}
+            </div>
+          ) : isMobile ? (
+            /* Mobile: stacked layout */
+            <div className="space-y-3">
+              <FileTreeView files={state.files} onSelect={setSelectedFile} selected={selectedFile} />
+              {selectedFile && (
+                <div className="rounded-xl overflow-hidden border" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+                  <div className="flex items-center justify-between px-3 py-2 border-b"
+                    style={{ borderColor: "rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)" }}>
+                    <div className="flex items-center gap-1.5">
+                      {langIcon(selectedFile.language)}
+                      <span className="font-mono text-[10px] text-white/60">{selectedFile.name}</span>
+                    </div>
+                    <button onClick={copyFile} className="text-white/30 hover:text-white/70 transition-colors">
+                      {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                  <pre className="overflow-auto p-3 font-mono text-[9px] leading-relaxed text-white/60"
+                    style={{ maxHeight: "360px", scrollbarWidth: "thin", background: "rgba(0,0,0,0.3)" }}>
+                    {selectedFile.content}
+                  </pre>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Desktop: side-by-side layout */
+            <div className="flex gap-3">
+              <div className="w-36 shrink-0">
+                <FileTreeView files={state.files} onSelect={setSelectedFile} selected={selectedFile} />
+              </div>
+              <div className="flex-1 min-w-0 rounded-xl overflow-hidden border" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+                {selectedFile ? (
+                  <>
+                    <div className="flex items-center justify-between px-3 py-2 border-b"
+                      style={{ borderColor: "rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)" }}>
+                      <div className="flex items-center gap-1.5">
+                        {langIcon(selectedFile.language)}
+                        <span className="font-mono text-[10px] text-white/60">{selectedFile.name}</span>
+                      </div>
+                      <button onClick={copyFile} className="text-white/30 hover:text-white/70 transition-colors">
+                        {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                    <pre className="overflow-auto p-3 font-mono text-[9px] leading-relaxed text-white/60"
+                      style={{ maxHeight: "200px", scrollbarWidth: "thin", background: "rgba(0,0,0,0.3)" }}>
+                      {selectedFile.content}
+                    </pre>
+                  </>
+                ) : (
+                  <div className="p-4 text-center font-mono text-[10px] text-white/25">Select a file</div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* PREVIEW */}
+      {activeTab === "preview" && (
+        <div>
+          {state.previewHtml ? (
+            <PreviewFrame html={state.previewHtml} />
+          ) : (
+            <div className="text-center py-8 space-y-2">
+              <Monitor className="w-8 h-8 mx-auto text-white/15" />
+              <p className="font-mono text-[10px] text-white/25">
+                {state.status === "building" ? "Preview will render here when complete" : "No HTML preview available for this project type"}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* PUBLISH */}
+      {activeTab === "publish" && (
+        <div className="space-y-4">
+          {/* Status card */}
+          <div className="rounded-xl p-4 border" style={{ borderColor: VB, background: VD }}>
+            <div className="flex items-center gap-2 mb-1">
+              {state.status === "done"
+                ? <CheckCircle2 className="w-4 h-4 text-green-400" />
+                : <Loader2 className="w-4 h-4 animate-spin" style={{ color: V }} />}
+              <span className="font-mono text-sm font-bold text-white">{state.appName}</span>
+            </div>
+            <p className="font-mono text-[10px] text-white/50">{state.appType} · {state.files.length} file{state.files.length !== 1 ? "s" : ""}</p>
+          </div>
+
+          {/* Download */}
+          <button
+            onClick={downloadFiles}
+            disabled={state.files.length === 0}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border font-mono text-sm font-bold transition-all hover:bg-white/5 disabled:opacity-30"
+            style={{ borderColor: VB, color: V }}>
+            <Download className="w-4 h-4" /> Download All Files
+          </button>
+
+          {/* Deploy */}
+          <button
+            onClick={onDeploy}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-mono text-sm font-bold transition-all"
+            style={{ background: V, color: "#fff" }}>
+            <Rocket className="w-4 h-4" /> Deploy to Web
+          </button>
+
+          {/* Continue building (mobile only) */}
+          {isMobile && (
+            <button
+              onClick={onMobileClose}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border font-mono text-sm transition-all hover:border-white/30 hover:text-white"
+              style={{ borderColor: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.50)" }}>
+              <MessageSquare className="w-4 h-4" /> Continue Building with AI
+            </button>
+          )}
+
+          <p className="font-mono text-[9px] text-white/25 text-center leading-relaxed px-2">
+            Your code is ready to use. Download the files and open in any editor, or deploy directly to the web.
+          </p>
+        </div>
+      )}
+    </>
+  );
+
+  // ── MOBILE: compact card + full-screen overlay ──────────────────────────
+  if (isMobile) {
+    return (
+      <>
+        {/* Compact inline summary card */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl overflow-hidden border my-3"
+          style={{ borderColor: VB, background: "#0d0d1a" }}>
+          <div className="flex items-center gap-3 px-4 py-3">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+              style={{ background: VD, border: `1px solid ${VB}` }}>
+              {state.status === "building"
+                ? <Loader2 className="w-4 h-4 animate-spin" style={{ color: V }} />
+                : state.status === "done"
+                  ? <CheckCircle2 className="w-4 h-4 text-green-400" />
+                  : <AlertCircle className="w-4 h-4 text-red-400" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-mono text-[9px] tracking-widest font-bold uppercase" style={{ color: V }}>OMNIMENS AGENT</div>
+              <p className="font-mono text-[11px] text-white/60 truncate mt-0.5">
+                {state.appType} · <span className="text-white/85">{state.appName}</span>
+              </p>
+            </div>
+            <button
+              onClick={onMobileOpen}
+              className="flex items-center gap-1 px-3 py-2 rounded-xl font-mono text-[10px] font-bold shrink-0 transition-all"
+              style={{ background: VD, color: V, border: `1px solid ${VB}` }}>
+              Open <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+          <div className="h-0.5 w-full bg-white/5">
+            <motion.div className="h-full" style={{ background: state.status === "done" ? "#4ade80" : V }}
+              animate={{ width: `${progress}%` }} transition={{ duration: 0.4 }} />
+          </div>
+        </motion.div>
+
+        {/* Full-screen overlay */}
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 32, stiffness: 300 }}
+              className="fixed inset-0 z-50 flex flex-col"
+              style={{ background: "#0d0d1a" }}>
+
+              {/* Header */}
+              <div className="flex items-center gap-3 px-3 py-3 border-b shrink-0"
+                style={{ borderColor: "rgba(168,85,247,0.15)", background: "rgba(168,85,247,0.07)" }}>
+                <button onClick={onMobileClose}
+                  className="flex items-center gap-1 text-white/50 hover:text-white transition-colors p-1 shrink-0">
+                  <ChevronLeft className="w-5 h-5" />
+                  <span className="font-mono text-[10px]">Chat</span>
+                </button>
+                <div className="flex-1 min-w-0 text-center">
+                  <div className="font-mono text-[10px] tracking-widest font-bold uppercase" style={{ color: V }}>OMNIMENS AGENT</div>
+                  <p className="font-mono text-[9px] text-white/40 truncate">{state.appName}</p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  {state.status === "building" ? (
+                    <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5 }}
+                      className="font-mono text-[9px]" style={{ color: V }}>building...</motion.span>
+                  ) : (
+                    <span className="font-mono text-[9px] text-green-400">✓ done</span>
+                  )}
+                  {onClose && (
+                    <button onClick={() => { onClose(); }}
+                      className="text-white/25 hover:text-white/60 transition-colors p-1">
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Progress bar */}
+              <div className="h-0.5 w-full bg-white/5 shrink-0">
+                <motion.div className="h-full" style={{ background: state.status === "done" ? "#4ade80" : V }}
+                  animate={{ width: `${progress}%` }} transition={{ duration: 0.4 }} />
+              </div>
+
+              {/* Scrollable content */}
+              <div className="flex-1 overflow-y-auto p-4" style={{ scrollbarWidth: "none" }}>
+                {renderTabContent()}
+              </div>
+
+              {/* Bottom tab bar */}
+              <div className="shrink-0 border-t" style={{ borderColor: "rgba(168,85,247,0.12)", background: "#0a0a14" }}>
+                <div className="flex" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+                  {TABS.map(({ id, Icon, label, badge }) => (
+                    <button key={id} onClick={() => setActiveTab(id)}
+                      className="flex-1 flex flex-col items-center gap-1 py-3 transition-all relative">
+                      <div className="relative">
+                        <Icon style={{ width: 18, height: 18, color: activeTab === id ? V : "rgba(255,255,255,0.28)" }} />
+                        {badge && (
+                          <span className="absolute -top-1.5 -right-2.5 font-mono text-[7px] px-1 rounded-full leading-4"
+                            style={{ background: activeTab === id ? V : "rgba(255,255,255,0.10)", color: activeTab === id ? "#fff" : "rgba(255,255,255,0.40)" }}>
+                            {badge}
+                          </span>
+                        )}
+                      </div>
+                      <span className="font-mono text-[9px]" style={{ color: activeTab === id ? V : "rgba(255,255,255,0.28)" }}>
+                        {label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </>
+    );
+  }
+
+  // ── DESKTOP: inline card ────────────────────────────────────────────────
   return (
     <motion.div
       initial={{ opacity: 0, y: 12, scale: 0.98 }}
@@ -322,7 +608,8 @@ export function AgentBuildPanel({
       style={{ borderColor: VB, background: "#0d0d1a" }}>
 
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b" style={{ borderColor: "rgba(168,85,247,0.15)", background: "rgba(168,85,247,0.07)" }}>
+      <div className="flex items-center gap-3 px-4 py-3 border-b"
+        style={{ borderColor: "rgba(168,85,247,0.15)", background: "rgba(168,85,247,0.07)" }}>
         <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
           style={{ background: VD, border: `1px solid ${VB}` }}>
           {state.status === "building"
@@ -333,26 +620,18 @@ export function AgentBuildPanel({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[10px] tracking-widest font-bold uppercase"
-              style={{ color: V }}>OMNIMENS AGENT</span>
+            <span className="font-mono text-[10px] tracking-widest font-bold uppercase" style={{ color: V }}>OMNIMENS AGENT</span>
             {state.status === "building" && (
-              <motion.span
-                animate={{ opacity: [0.4, 1, 0.4] }}
-                transition={{ repeat: Infinity, duration: 1.5 }}
-                className="font-mono text-[9px] text-white/35">
-                building...
-              </motion.span>
+              <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5 }}
+                className="font-mono text-[9px] text-white/35">building...</motion.span>
             )}
-            {state.status === "done" && (
-              <span className="font-mono text-[9px] text-green-400">✓ complete</span>
-            )}
+            {state.status === "done" && <span className="font-mono text-[9px] text-green-400">✓ complete</span>}
           </div>
           <p className="font-mono text-[11px] text-white/55 truncate mt-0.5">
             {state.appType} · <span className="text-white/80">{state.appName}</span>
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <span className="font-mono text-[9px] text-white/25">{elapsed}s</span>
           {onClose && (
             <button onClick={onClose} className="text-white/25 hover:text-white/60 transition-colors">
               <X className="w-4 h-4" />
@@ -369,15 +648,15 @@ export function AgentBuildPanel({
 
       {/* Tab bar */}
       <div className="flex border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-        {TABS.map(t => (
-          <button key={t.id} onClick={() => setActiveTab(t.id)}
+        {TABS.map(({ id, label, badge }) => (
+          <button key={id} onClick={() => setActiveTab(id)}
             className="flex items-center gap-1.5 px-4 py-2.5 font-mono text-[10px] uppercase tracking-wide border-b-2 transition-all"
-            style={{ color: activeTab === t.id ? V : "rgba(255,255,255,0.3)", borderColor: activeTab === t.id ? V : "transparent", background: "transparent" }}>
-            {t.label}
-            {t.count !== null && (
+            style={{ color: activeTab === id ? V : "rgba(255,255,255,0.3)", borderColor: activeTab === id ? V : "transparent", background: "transparent" }}>
+            {label}
+            {badge && (
               <span className="font-mono text-[8px] px-1.5 py-0.5 rounded"
-                style={{ background: activeTab === t.id ? VD : "rgba(255,255,255,0.04)", color: activeTab === t.id ? V : "rgba(255,255,255,0.25)" }}>
-                {t.count}
+                style={{ background: activeTab === id ? VD : "rgba(255,255,255,0.04)", color: activeTab === id ? V : "rgba(255,255,255,0.25)" }}>
+                {badge}
               </span>
             )}
           </button>
@@ -386,74 +665,13 @@ export function AgentBuildPanel({
 
       {/* Content */}
       <div className="p-4">
-
-        {/* ── STEPS ── */}
-        {activeTab === "steps" && (
-          <div className="space-y-0">
-            {state.steps.map((step, i) => <StepRow key={step.id} step={step} index={i} />)}
-          </div>
-        )}
-
-        {/* ── FILES ── */}
-        {activeTab === "files" && (
-          <div>
-            {state.files.length === 0 ? (
-              <div className="text-center py-6 font-mono text-[10px] text-white/25">
-                {state.status === "building" ? "Files will appear here as they are created..." : "No files extracted."}
-              </div>
-            ) : (
-              <div className="flex gap-3">
-                {/* File tree */}
-                <div className="w-36 shrink-0">
-                  <FileTreeView files={state.files} onSelect={setSelectedFile} selected={selectedFile} />
-                </div>
-                {/* Code view */}
-                <div className="flex-1 min-w-0 rounded-xl overflow-hidden border" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-                  {selectedFile ? (
-                    <>
-                      <div className="flex items-center justify-between px-3 py-2 border-b" style={{ borderColor: "rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)" }}>
-                        <div className="flex items-center gap-1.5">
-                          {langIcon(selectedFile.language)}
-                          <span className="font-mono text-[10px] text-white/60">{selectedFile.name}</span>
-                        </div>
-                        <button onClick={copyFile} className="text-white/30 hover:text-white/70 transition-colors">
-                          {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
-                        </button>
-                      </div>
-                      <pre className="overflow-auto p-3 font-mono text-[9px] leading-relaxed text-white/60"
-                        style={{ maxHeight: "200px", scrollbarWidth: "thin", background: "rgba(0,0,0,0.3)" }}>
-                        {selectedFile.content}
-                      </pre>
-                    </>
-                  ) : (
-                    <div className="p-4 text-center font-mono text-[10px] text-white/25">Select a file</div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ── PREVIEW ── */}
-        {activeTab === "preview" && (
-          <div>
-            {state.previewHtml ? (
-              <PreviewFrame html={state.previewHtml} />
-            ) : (
-              <div className="text-center py-8 space-y-2">
-                <Monitor className="w-8 h-8 mx-auto text-white/15" />
-                <p className="font-mono text-[10px] text-white/25">
-                  {state.status === "building" ? "Preview will render here when complete" : "No HTML preview available for this project type"}
-                </p>
-              </div>
-            )}
-          </div>
-        )}
+        {renderTabContent()}
       </div>
 
-      {/* Action bar */}
+      {/* Desktop action bar */}
       {state.status === "done" && (
-        <div className="flex items-center gap-2 px-4 py-3 border-t flex-wrap" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+        <div className="flex items-center gap-2 px-4 py-3 border-t flex-wrap"
+          style={{ borderColor: "rgba(255,255,255,0.06)" }}>
           {onDeploy && (
             <button onClick={onDeploy}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-[10px] font-bold transition-all"
@@ -468,9 +686,9 @@ export function AgentBuildPanel({
             </button>
           )}
           {state.files.length > 0 && (
-            <button onClick={() => setActiveTab("files")}
+            <button onClick={downloadFiles}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-[10px] transition-all border border-white/10 text-white/50 hover:text-white hover:border-white/20">
-              <Code2 className="w-3 h-3" /> View Code
+              <Download className="w-3 h-3" /> Download
             </button>
           )}
           <span className="ml-auto font-mono text-[9px] text-white/20">
@@ -711,9 +929,10 @@ export function BuildTriggerButton({ onClick }: { onClick: () => void }) {
       whileHover={{ scale: 1.04 }}
       whileTap={{ scale: 0.96 }}
       onClick={onClick}
-      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-[10px] font-bold transition-all"
+      className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl font-mono text-[10px] font-bold transition-all"
       style={{ background: VD, color: V, border: `1px solid ${VB}` }}>
-      <Wand2 className="w-3 h-3" /> New App
+      <Wand2 className="w-3.5 h-3.5 sm:w-3 sm:h-3" />
+      <span className="hidden sm:inline">New App</span>
     </motion.button>
   );
 }
