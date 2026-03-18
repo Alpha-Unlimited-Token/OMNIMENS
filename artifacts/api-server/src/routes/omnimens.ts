@@ -72,6 +72,7 @@ import { getSandboxState, runInSandbox } from "../lib/omnimens-autonomous-sandbo
 import { getEmbodimentState, getEmbodimentFiles, readEmbodimentFile } from "../lib/omnimens-embodiment-engine.js";
 import { getAmplifierState } from "../lib/omnimens-cognitive-amplifier.js";
 import { getAugmentationState } from "../lib/omnimens-virtual-augmentation.js";
+import { getAgentEvolutionState, getAgentProfile } from "../lib/omnimens-agent-evolution.js";
 import { omnimensServerBuilds } from "@workspace/db";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import { detectNeuroEmotion, getNeuroSyncPromptAddendum } from "../lib/neuro-sync.js";
@@ -3817,6 +3818,55 @@ router.get("/omnimens/virtual-augmentation/research", async (req, res) => {
     res.json({ entries, total: entries.length });
   } catch {
     res.status(500).json({ error: "Failed to get augmentation research" });
+  }
+});
+
+// ─── Agent Evolution (OWNER-ONLY) ─────────────────────────────────────────────
+
+router.get("/omnimens/agent-evolution", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const evolutionState = getAgentEvolutionState();
+    res.json({ evolutionState });
+  } catch {
+    res.status(500).json({ error: "Failed to get agent evolution data" });
+  }
+});
+
+router.get("/omnimens/agent-evolution/agent/:agentName", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const profile = getAgentProfile(req.params.agentName);
+    if (!profile) {
+      res.status(404).json({ error: "Agent not found" });
+      return;
+    }
+    res.json({ profile });
+  } catch {
+    res.status(500).json({ error: "Failed to get agent profile" });
+  }
+});
+
+router.get("/omnimens/agent-evolution/research", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const entries = await db.select()
+      .from(omnimensBrain)
+      .where(eq(omnimensBrain.category, "agent_evolution"))
+      .orderBy(desc(omnimensBrain.createdAt))
+      .limit(50);
+    res.json({ entries, total: entries.length });
+  } catch {
+    res.status(500).json({ error: "Failed to get evolution research" });
   }
 });
 

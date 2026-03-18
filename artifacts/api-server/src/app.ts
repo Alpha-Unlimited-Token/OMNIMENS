@@ -59,6 +59,7 @@ import { startCognitiveAmplifier } from "./lib/omnimens-cognitive-amplifier.js";
 import { startAutonomousSandbox, getSandboxState, runInSandbox } from "./lib/omnimens-autonomous-sandbox.js";
 import { startEmbodimentEngine, getEmbodimentState, getEmbodimentFiles, readEmbodimentFile } from "./lib/omnimens-embodiment-engine.js";
 import { startVirtualAugmentation, getAugmentationState } from "./lib/omnimens-virtual-augmentation.js";
+import { startAgentEvolution, getAgentEvolutionState, getAgentProfile } from "./lib/omnimens-agent-evolution.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-conversations.js";
@@ -309,6 +310,7 @@ startCognitiveAmplifier();
 startAutonomousSandbox();
 startEmbodimentEngine();
 startVirtualAugmentation();
+startAgentEvolution();
 
 setTimeout(async () => {
   await runGlobalMemoryImprovementCycle();
