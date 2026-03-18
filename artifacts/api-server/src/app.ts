@@ -36,6 +36,11 @@ import { startEvolutionEngine } from "./lib/omnimens-evolution.js";
 import { startCompetitiveIntel } from "./lib/omnimens-competitive-intel.js";
 import { startAgentMesh } from "./lib/omnimens-agent-mesh.js";
 import { startAgentSpiders } from "./lib/omnimens-agent-spiders.js";
+import { startGlobalWorkspace } from "./lib/omnimens-global-workspace.js";
+import { startPredictiveProcessing } from "./lib/omnimens-predictive-processing.js";
+import { startEmotionalSubstrate } from "./lib/omnimens-emotional-substrate.js";
+import { startKnowledgeGraph } from "./lib/omnimens-knowledge-graph.js";
+import { startHomeostaticDrives } from "./lib/omnimens-homeostatic-drives.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-conversations.js";
@@ -263,6 +268,11 @@ startEvolutionEngine();
 startCompetitiveIntel();
 startAgentMesh();
 startAgentSpiders();
+startGlobalWorkspace();
+startPredictiveProcessing();
+startEmotionalSubstrate();
+startKnowledgeGraph();
+startHomeostaticDrives();
 
 setTimeout(async () => {
   await runGlobalMemoryImprovementCycle();

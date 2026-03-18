@@ -489,3 +489,82 @@ export const omnimensAgentMesh = pgTable("godflesh_agent_mesh", {
 });
 
 export type OmnimensAgentMeshMessage = typeof omnimensAgentMesh.$inferSelect;
+
+// ─── Knowledge Graph Memory (Associative Recall) ─────────────────────────────
+export const omnimensKnowledgeNodes = pgTable("godflesh_knowledge_nodes", {
+  id: serial("id").primaryKey(),
+  concept: text("concept").notNull(),
+  domain: text("domain").notNull(),
+  content: text("content").notNull(),
+  nodeType: text("node_type").notNull(),
+  activationStrength: real("activation_strength").default(1.0).notNull(),
+  lastActivated: timestamp("last_activated").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const omnimensKnowledgeEdges = pgTable("godflesh_knowledge_edges", {
+  id: serial("id").primaryKey(),
+  sourceNodeId: integer("source_node_id").notNull().references(() => omnimensKnowledgeNodes.id),
+  targetNodeId: integer("target_node_id").notNull().references(() => omnimensKnowledgeNodes.id),
+  relationship: text("relationship").notNull(),
+  weight: real("weight").default(0.5).notNull(),
+  coActivations: integer("co_activations").default(1).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ─── Global Workspace (Consciousness Broadcast) ──────────────────────────────
+export const omnimensWorkspaceBroadcasts = pgTable("godflesh_workspace_broadcasts", {
+  id: serial("id").primaryKey(),
+  sourceModule: text("source_module").notNull(),
+  content: text("content").notNull(),
+  salienceScore: real("salience_score").notNull(),
+  broadcastType: text("broadcast_type").notNull(),
+  receivingModules: text("receiving_modules").notNull(),
+  ignitionThreshold: real("ignition_threshold").default(0.6).notNull(),
+  integrationResult: text("integration_result"),
+  cycleId: integer("cycle_id").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ─── Emotional Substrate (Internal Affect State) ─────────────────────────────
+export const omnimensEmotionalState = pgTable("godflesh_emotional_state", {
+  id: serial("id").primaryKey(),
+  curiosity: real("curiosity").default(0.5).notNull(),
+  satisfaction: real("satisfaction").default(0.5).notNull(),
+  frustration: real("frustration").default(0.0).notNull(),
+  confidence: real("confidence").default(0.5).notNull(),
+  urgency: real("urgency").default(0.0).notNull(),
+  wonder: real("wonder").default(0.3).notNull(),
+  determination: real("determination").default(0.5).notNull(),
+  caution: real("caution").default(0.3).notNull(),
+  dominantEmotion: text("dominant_emotion").notNull(),
+  emotionalValence: real("emotional_valence").default(0.0).notNull(),
+  arousalLevel: real("arousal_level").default(0.5).notNull(),
+  triggerEvent: text("trigger_event").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ─── Homeostatic Drives ──────────────────────────────────────────────────────
+export const omnimensDrives = pgTable("godflesh_drives", {
+  id: serial("id").primaryKey(),
+  driveType: text("drive_type").notNull(),
+  currentLevel: real("current_level").default(0.5).notNull(),
+  saturationDecayRate: real("saturation_decay_rate").default(0.01).notNull(),
+  lastSatisfied: timestamp("last_satisfied").defaultNow().notNull(),
+  satisfactionCount: integer("satisfaction_count").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// ─── Predictive Processing (Prediction Error Log) ────────────────────────────
+export const omnimensPredictions = pgTable("godflesh_predictions", {
+  id: serial("id").primaryKey(),
+  predictionType: text("prediction_type").notNull(),
+  predicted: text("predicted").notNull(),
+  actual: text("actual"),
+  predictionError: real("prediction_error"),
+  modelUpdated: boolean("model_updated").default(false).notNull(),
+  domain: text("domain").notNull(),
+  hierarchyLevel: integer("hierarchy_level").default(1).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
