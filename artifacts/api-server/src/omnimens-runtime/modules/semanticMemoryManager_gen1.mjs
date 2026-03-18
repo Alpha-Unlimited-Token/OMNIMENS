@@ -1,100 +1,99 @@
 /**
  * @module semanticMemoryManager
- * @description Implements fast semantic search and reasoning over embeddings using cosine similarity.
+ * @description Provides fast semantic search and retrieval using Redis-based vector stores for approximate nearest neighbor search.
  */
 
-/**
- * Stores vector embeddings in memory for fast semantic search.
- *
- * @type {Object<string, number[]>}
- */
-const embeddingStore = {};
+const { createClient } = require('redis');
+const crypto = require('crypto');
 
 /**
- * Adds a new embedding to the store.
- *
- * @param {string} key - Unique identifier for the embedding.
- * @param {number[]} vector - The embedding vector.
- * @throws {Error} If the vector is not an array of numbers.
+ * @class SemanticMemoryManager
+ * @description Class to manage semantic memory using Redis and vector-based search.
  */
-export function addEmbedding(key, vector) {
-  if (!Array.isArray(vector) || !vector.every((val) => typeof val === 'number')) {
-    throw new Error('Vector must be an array of numbers.');
-  }
-  embeddingStore[key] = vector;
-}
-
-/**
- * Computes the cosine similarity between two vectors.
- *
- * @param {number[]} vectorA - First vector.
- * @param {number[]} vectorB - Second vector.
- * @returns {number} Cosine similarity score.
- * @throws {Error} If vectors are not of the same length.
- */
-function cosineSimilarity(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must be of the same length.');
+class SemanticMemoryManager {
+  /**
+   * @constructor
+   * @param {Object} config - Configuration object.
+   * @param {string} config.redisHost - Redis server hostname.
+   * @param {number} config.redisPort - Redis server port.
+   */
+  constructor({ redisHost = '127.0.0.1', redisPort = 6379 } = {}) {
+    this.redisClient = createClient({ socket: { host: redisHost, port: redisPort } });
+    this.namespace = 'semanticMemory';
   }
 
-  const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
-
-  return dotProduct / (magnitudeA * magnitudeB);
-}
-
-/**
- * Finds the most similar embedding in the store to the given query vector.
- *
- * @param {number[]} queryVector - The query embedding vector.
- * @returns {{ key: string, similarity: number } | null} Most similar embedding and its similarity score, or null if the store is empty.
- */
-export function findMostSimilar(queryVector) {
-  if (Object.keys(embeddingStore).length === 0) {
-    return null;
+  /**
+   * Connects to the Redis server.
+   * @returns {Promise<void>} Resolves when connection is established.
+   */
+  async connect() {
+    await this.redisClient.connect();
   }
 
-  let bestMatch = { key: null, similarity: -Infinity };
+  /**
+   * Disconnects from the Redis server.
+   * @returns {Promise<void>} Resolves when connection is closed.
+   */
+  async disconnect() {
+    await this.redisClient.disconnect();
+  }
 
-  for (const [key, storedVector] of Object.entries(embeddingStore)) {
-    const similarity = cosineSimilarity(queryVector, storedVector);
-    if (similarity > bestMatch.similarity) {
-      bestMatch = { key, similarity };
+  /**
+   * Stores a vector embedding and its associated metadata in Redis.
+   * @param {string} key - Unique identifier for the embedding.
+   * @param {Array<number>} embedding - Vector embedding to store.
+   * @param {Object} metadata - Associated metadata.
+   * @returns {Promise<void>} Resolves when the embedding is stored.
+   */
+  async storeEmbedding(key, embedding, metadata = {}) {
+    const vectorKey = `${this.namespace}:vector:${key}`;
+    const metaKey = `${this.namespace}:meta:${key}`;
+
+    await this.redisClient.hSet(vectorKey, 'vector', JSON.stringify(embedding));
+    await this.redisClient.hSet(metaKey, metadata);
+  }
+
+  /**
+   * Performs an approximate nearest neighbor search.
+   * @param {Array<number>} queryVector - The query vector.
+   * @param {number} topK - Number of nearest neighbors to return.
+   * @returns {Promise<Array<{ key: string, score: number, metadata: Object }>>} List of nearest neighbors.
+   */
+  async search(queryVector, topK = 5) {
+    const keys = await this.redisClient.keys(`${this.namespace}:vector:*`);
+    const results = [];
+
+    for (const key of keys) {
+      const vectorString = await this.redisClient.hGet(key, 'vector');
+      const vector = JSON.parse(vectorString);
+      const score = this._cosineSimilarity(queryVector, vector);
+      results.push({ key: key.replace(`${this.namespace}:vector:`, ''), score });
     }
+
+    results.sort((a, b) => b.score - a.score);
+
+    const topResults = results.slice(0, topK);
+    for (const result of topResults) {
+      const metaKey = `${this.namespace}:meta:${result.key}`;
+      result.metadata = await this.redisClient.hGetAll(metaKey);
+    }
+
+    return topResults;
   }
 
-  return bestMatch;
-}
-
-/**
- * Clears all embeddings from the store.
- */
-export function clearEmbeddings() {
-  for (const key in embeddingStore) {
-    delete embeddingStore[key];
+  /**
+   * Calculates the cosine similarity between two vectors.
+   * @private
+   * @param {Array<number>} vectorA - First vector.
+   * @param {Array<number>} vectorB - Second vector.
+   * @returns {number} Cosine similarity score.
+   */
+  _cosineSimilarity(vectorA, vectorB) {
+    const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
+    const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a ** 2, 0));
+    const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b ** 2, 0));
+    return dotProduct / (magnitudeA * magnitudeB);
   }
 }
 
-/**
- * Retrieves all embeddings currently stored.
- *
- * @returns {Object<string, number[]>} All embeddings in the store.
- */
-export function getAllEmbeddings() {
-  return { ...embeddingStore };
-}
-
-/**
- * Removes a specific embedding by its key.
- *
- * @param {string} key - The key of the embedding to remove.
- * @returns {boolean} True if the embedding was removed, false if it did not exist.
- */
-export function removeEmbedding(key) {
-  if (key in embeddingStore) {
-    delete embeddingStore[key];
-    return true;
-  }
-  return false;
-}
+module.exports = SemanticMemoryManager;
