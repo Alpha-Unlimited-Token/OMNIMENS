@@ -1,156 +1,100 @@
-// semanticMemoryManager.js
-
 /**
  * @module semanticMemoryManager
- * @description A utility module for storing and retrieving context embeddings for long-term semantic memory.
- * Implements an in-memory vector store combined with clustering algorithms for efficient retrieval.
+ * @description Implements fast semantic search and reasoning over embeddings using cosine similarity.
  */
 
 /**
- * @typedef {Object} Vector
- * @property {Array<number>} values - The numerical values representing the embedding.
- * @property {string} id - A unique identifier for the vector.
+ * Stores vector embeddings in memory for fast semantic search.
+ *
+ * @type {Object<string, number[]>}
  */
+const embeddingStore = {};
 
 /**
- * @typedef {Object} Cluster
- * @property {Array<Vector>} vectors - The vectors contained within the cluster.
- * @property {Vector} centroid - The centroid vector of the cluster.
+ * Adds a new embedding to the store.
+ *
+ * @param {string} key - Unique identifier for the embedding.
+ * @param {number[]} vector - The embedding vector.
+ * @throws {Error} If the vector is not an array of numbers.
  */
-
-const crypto = require('crypto');
-
-/**
- * Generates a unique identifier for a vector.
- * @returns {string} A unique identifier.
- */
-function generateId() {
-  return crypto.randomUUID();
+export function addEmbedding(key, vector) {
+  if (!Array.isArray(vector) || !vector.every((val) => typeof val === 'number')) {
+    throw new Error('Vector must be an array of numbers.');
+  }
+  embeddingStore[key] = vector;
 }
 
 /**
- * Calculates the Euclidean distance between two vectors.
- * @param {Array<number>} vectorA - The first vector.
- * @param {Array<number>} vectorB - The second vector.
- * @returns {number} The Euclidean distance.
+ * Computes the cosine similarity between two vectors.
+ *
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} Cosine similarity score.
+ * @throws {Error} If vectors are not of the same length.
  */
-function calculateDistance(vectorA, vectorB) {
+function cosineSimilarity(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must be of the same dimension.');
+    throw new Error('Vectors must be of the same length.');
   }
-  return Math.sqrt(vectorA.reduce((sum, value, index) => sum + Math.pow(value - vectorB[index], 2), 0));
+
+  const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
+
+  return dotProduct / (magnitudeA * magnitudeB);
 }
 
 /**
- * Calculates the centroid of a set of vectors.
- * @param {Array<Vector>} vectors - The vectors to calculate the centroid for.
- * @returns {Vector} The centroid vector.
+ * Finds the most similar embedding in the store to the given query vector.
+ *
+ * @param {number[]} queryVector - The query embedding vector.
+ * @returns {{ key: string, similarity: number } | null} Most similar embedding and its similarity score, or null if the store is empty.
  */
-function calculateCentroid(vectors) {
-  const dimension = vectors[0].values.length;
-  const summedValues = new Array(dimension).fill(0);
-
-  for (const vector of vectors) {
-    vector.values.forEach((value, index) => {
-      summedValues[index] += value;
-    });
+export function findMostSimilar(queryVector) {
+  if (Object.keys(embeddingStore).length === 0) {
+    return null;
   }
 
-  const averagedValues = summedValues.map(sum => sum / vectors.length);
-  return { values: averagedValues, id: generateId() };
+  let bestMatch = { key: null, similarity: -Infinity };
+
+  for (const [key, storedVector] of Object.entries(embeddingStore)) {
+    const similarity = cosineSimilarity(queryVector, storedVector);
+    if (similarity > bestMatch.similarity) {
+      bestMatch = { key, similarity };
+    }
+  }
+
+  return bestMatch;
 }
 
 /**
- * Class representing the semantic memory manager.
+ * Clears all embeddings from the store.
  */
-class SemanticMemoryManager {
-  constructor() {
-    this.vectors = [];
-    this.clusters = [];
-  }
-
-  /**
-   * Adds a vector to the memory.
-   * @param {Array<number>} values - The numerical values of the vector.
-   * @returns {string} The ID of the added vector.
-   */
-  addVector(values) {
-    const id = generateId();
-    this.vectors.push({ values, id });
-    return id;
-  }
-
-  /**
-   * Retrieves the closest vector to the given query vector.
-   * @param {Array<number>} query - The query vector.
-   * @returns {Vector|null} The closest vector or null if no vectors exist.
-   */
-  retrieveClosest(query) {
-    if (this.vectors.length === 0) return null;
-
-    let closestVector = null;
-    let closestDistance = Infinity;
-
-    for (const vector of this.vectors) {
-      const distance = calculateDistance(query, vector.values);
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestVector = vector;
-      }
-    }
-
-    return closestVector;
-  }
-
-  /**
-   * Clusters the stored vectors into groups based on proximity.
-   * Uses a simple k-means-like algorithm for demonstration purposes.
-   * @param {number} numClusters - The number of clusters to create.
-   * @returns {Array<Cluster>} The clusters.
-   */
-  clusterVectors(numClusters) {
-    if (numClusters <= 0 || numClusters > this.vectors.length) {
-      throw new Error('Invalid number of clusters.');
-    }
-
-    // Initialize centroids randomly
-    const centroids = this.vectors.slice(0, numClusters).map(v => ({ ...v }));
-    let clusters = [];
-
-    for (let iteration = 0; iteration < 10; iteration++) { // Limit iterations for simplicity
-      clusters = Array.from({ length: numClusters }, () => []);
-
-      // Assign vectors to closest centroid
-      for (const vector of this.vectors) {
-        let closestCentroidIndex = 0;
-        let closestDistance = Infinity;
-
-        centroids.forEach((centroid, index) => {
-          const distance = calculateDistance(vector.values, centroid.values);
-          if (distance < closestDistance) {
-            closestDistance = distance;
-            closestCentroidIndex = index;
-          }
-        });
-
-        clusters[closestCentroidIndex].push(vector);
-      }
-
-      // Recalculate centroids
-      centroids.forEach((_, index) => {
-        if (clusters[index].length > 0) {
-          centroids[index] = calculateCentroid(clusters[index]);
-        }
-      });
-    }
-
-    return clusters.map((vectors, index) => ({ vectors, centroid: centroids[index] }));
+export function clearEmbeddings() {
+  for (const key in embeddingStore) {
+    delete embeddingStore[key];
   }
 }
 
-module.exports = {
-  SemanticMemoryManager,
-  calculateDistance,
-  calculateCentroid,
-  generateId
-};
+/**
+ * Retrieves all embeddings currently stored.
+ *
+ * @returns {Object<string, number[]>} All embeddings in the store.
+ */
+export function getAllEmbeddings() {
+  return { ...embeddingStore };
+}
+
+/**
+ * Removes a specific embedding by its key.
+ *
+ * @param {string} key - The key of the embedding to remove.
+ * @returns {boolean} True if the embedding was removed, false if it did not exist.
+ */
+export function removeEmbedding(key) {
+  if (key in embeddingStore) {
+    delete embeddingStore[key];
+    return true;
+  }
+  return false;
+}

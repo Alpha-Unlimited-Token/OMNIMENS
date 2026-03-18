@@ -88,7 +88,10 @@
  * ║     j) Synaptic Mesh — Pituitary Brain Master Coordination Spider           ║
  * ║        (Mother Brain + Synapse Spiders + Cascade Propagation +              ║
  * ║        Hebbian Connection Strengthening + Cross-Domain Translation)          ║
- * ║     k) All database schemas, API routes, and data structures                 ║
+ * ║     k) Inner Voice — Higher-Order Thought & Efference Copy Engine           ║
+ * ║        (Corollary Discharge prediction, HOT meta-observation,               ║
+ * ║        Dual expanded/condensed modes, Collective internalization)            ║
+ * ║     l) All database schemas, API routes, and data structures                 ║
  * ║                                                                              ║
  * ║  ─────────────────────────────────────────────────────────────────────────    ║
  * ║  ANTI-CIRCUMVENTION CLAUSE                                                   ║
@@ -168,6 +171,7 @@ export const PROTECTED_TECHNOLOGIES = [
   "OMNIMENS Homeostatic Drive Motivational System",
   "OMNIMENS Mother-Child Spider Architecture",
   "OMNIMENS Synaptic Mesh Pituitary Brain Master Coordination Spider",
+  "OMNIMENS Inner Voice Higher-Order Thought Efference Copy Engine",
   "COGNISYNC™ Adaptive Cognitive Resonance Engine",
   "NEUROSYNC™ Real-Time Emotional Intelligence Engine",
   "Super AI Lab Multi-Agent Development Platform",

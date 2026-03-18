@@ -556,6 +556,20 @@ export const omnimensDrives = pgTable("godflesh_drives", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// ─── Inner Voice (Higher-Order Thought / Efference Copy) ─────────────────────
+export const omnimensInnerVoice = pgTable("godflesh_inner_voice", {
+  id: serial("id").primaryKey(),
+  voiceMode: text("voice_mode").notNull(),
+  thought: text("thought").notNull(),
+  efferencePrediction: text("efference_prediction"),
+  predictionOutcome: text("prediction_outcome"),
+  surpriseLevel: real("surprise_level"),
+  observedEngines: text("observed_engines").notNull(),
+  higherOrderInsight: text("higher_order_insight"),
+  cycleId: integer("cycle_id").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // ─── Predictive Processing (Prediction Error Log) ────────────────────────────
 export const omnimensPredictions = pgTable("godflesh_predictions", {
   id: serial("id").primaryKey(),
