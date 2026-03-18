@@ -1,133 +1,156 @@
 /**
  * @module inMemoryVectorSearch
- * @description This module provides an in-memory vector search utility using a KD-tree algorithm for fast semantic search and retrieval of embeddings.
+ * @description A utility module for fast similarity search using in-memory vector store with HNSW graph implementation.
  */
 
 /**
- * Represents a node in the KD-tree.
+ * Represents a node in the HNSW graph.
  * @class
  */
-class KDTreeNode {
-  constructor(point, index, axis) {
-    this.point = point; // The vector (embedding) stored at this node
-    this.index = index; // The index of the vector in the original dataset
-    this.axis = axis; // The axis (dimension) used to split at this node
-    this.left = null; // Left subtree
-    this.right = null; // Right subtree
+class HNSWNode {
+  /**
+   * @constructor
+   * @param {number[]} vector - The embedding vector for the node.
+   * @param {number} id - Unique identifier for the node.
+   */
+  constructor(vector, id) {
+    this.vector = vector;
+    this.id = id;
+    this.connections = new Map(); // Stores connections by layer
   }
 }
 
 /**
- * KDTree class for indexing and searching embeddings.
+ * Calculates the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} - Euclidean distance.
  */
-class KDTree {
+function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error("Vectors must have the same dimensions.");
+  }
+  return Math.sqrt(vectorA.reduce((sum, value, index) => sum + Math.pow(value - vectorB[index], 2), 0));
+}
+
+/**
+ * HNSW Graph for approximate nearest neighbor search.
+ * @class
+ */
+class HNSWGraph {
   /**
-   * Constructs a KDTree from a dataset of embeddings.
-   * @param {number[][]} points - Array of vectors (embeddings) to index.
+   * @constructor
+   * @param {number} maxConnections - Maximum connections per node per layer.
+   * @param {number} maxLayers - Maximum number of layers in the graph.
    */
-  constructor(points) {
-    this.root = this._buildTree(points, 0, 0, points.length - 1);
+  constructor(maxConnections = 16, maxLayers = 5) {
+    this.maxConnections = maxConnections;
+    this.maxLayers = maxLayers;
+    this.nodes = new Map(); // Store all nodes by ID
+    this.entryNode = null; // Entry point for search
   }
 
   /**
-   * Recursively builds the KD-tree.
+   * Adds a new vector to the graph.
+   * @param {number[]} vector - The embedding vector.
+   * @param {number} id - Unique identifier for the vector.
+   */
+  addNode(vector, id) {
+    const newNode = new HNSWNode(vector, id);
+    this.nodes.set(id, newNode);
+
+    if (!this.entryNode) {
+      this.entryNode = newNode; // First node becomes the entry point
+      return;
+    }
+
+    this._linkNode(newNode);
+  }
+
+  /**
+   * Links a new node to existing nodes in the graph.
    * @private
-   * @param {number[][]} points - Array of vectors (embeddings).
-   * @param {number} depth - Current depth in the tree.
-   * @param {number} start - Start index of the subset of points.
-   * @param {number} end - End index of the subset of points.
-   * @returns {KDTreeNode} - The root node of the subtree.
+   * @param {HNSWNode} newNode - The node to link.
    */
-  _buildTree(points, depth, start, end) {
-    if (start > end) return null;
+  _linkNode(newNode) {
+    let currentNode = this.entryNode;
 
-    const axis = depth % points[0].length; // Cycle through dimensions
-    const medianIndex = Math.floor((start + end) / 2);
+    for (let layer = this.maxLayers - 1; layer >= 0; layer--) {
+      const nearestNeighbors = this._searchLayer(newNode.vector, currentNode, layer, this.maxConnections);
 
-    // Sort points by the current axis
-    points.sort((a, b) => a[axis] - b[axis]);
-
-    const node = new KDTreeNode(points[medianIndex], medianIndex, axis);
-    node.left = this._buildTree(points, depth + 1, start, medianIndex - 1);
-    node.right = this._buildTree(points, depth + 1, medianIndex + 1, end);
-
-    return node;
-  }
-
-  /**
-   * Searches for the k nearest neighbors of a query vector.
-   * @param {number[]} query - The query vector.
-   * @param {number} k - The number of nearest neighbors to find.
-   * @returns {Array<{index: number, distance: number}>} - Array of nearest neighbors with their indices and distances.
-   */
-  search(query, k) {
-    const neighbors = [];
-
-    /**
-     * Recursively searches the KD-tree for the nearest neighbors.
-     * @private
-     * @param {KDTreeNode} node - The current node.
-     * @param {number[]} query - The query vector.
-     */
-    const searchTree = (node) => {
-      if (!node) return;
-
-      const distance = this._euclideanDistance(query, node.point);
-      const axis = node.axis;
-
-      // Add current node to the neighbors list if it's closer than the farthest neighbor
-      if (neighbors.length < k || distance < neighbors[neighbors.length - 1].distance) {
-        neighbors.push({ index: node.index, distance });
-        neighbors.sort((a, b) => a.distance - b.distance);
-        if (neighbors.length > k) neighbors.pop();
+      for (const neighbor of nearestNeighbors) {
+        this._connectNodes(newNode, neighbor, layer);
       }
 
-      // Determine which subtree to search first
-      const diff = query[axis] - node.point[axis];
-      const first = diff <= 0 ? node.left : node.right;
-      const second = diff <= 0 ? node.right : node.left;
-
-      // Search the closer subtree first
-      searchTree(first);
-
-      // Check if we need to search the other subtree
-      if (neighbors.length < k || Math.abs(diff) < neighbors[neighbors.length - 1].distance) {
-        searchTree(second);
-      }
-    };
-
-    searchTree(this.root);
-    return neighbors;
+      currentNode = nearestNeighbors[0]; // Move to the closest neighbor
+    }
   }
 
   /**
-   * Calculates the Euclidean distance between two vectors.
+   * Connects two nodes in the graph at a specific layer.
    * @private
-   * @param {number[]} a - The first vector.
-   * @param {number[]} b - The second vector.
-   * @returns {number} - The Euclidean distance.
+   * @param {HNSWNode} nodeA - First node.
+   * @param {HNSWNode} nodeB - Second node.
+   * @param {number} layer - Layer index.
    */
-  _euclideanDistance(a, b) {
-    return Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0));
+  _connectNodes(nodeA, nodeB, layer) {
+    if (!nodeA.connections.has(layer)) {
+      nodeA.connections.set(layer, []);
+    }
+    if (!nodeB.connections.has(layer)) {
+      nodeB.connections.set(layer, []);
+    }
+
+    nodeA.connections.get(layer).push(nodeB);
+    nodeB.connections.get(layer).push(nodeA);
+  }
+
+  /**
+   * Searches for nearest neighbors in a specific layer.
+   * @private
+   * @param {number[]} targetVector - The vector to search for.
+   * @param {HNSWNode} entryNode - Entry point for the search.
+   * @param {number} layer - Layer index.
+   * @param {number} k - Number of neighbors to return.
+   * @returns {HNSWNode[]} - Nearest neighbors.
+   */
+  _searchLayer(targetVector, entryNode, layer, k) {
+    const visited = new Set();
+    const candidates = [{ node: entryNode, distance: euclideanDistance(targetVector, entryNode.vector) }];
+
+    while (candidates.length > 0) {
+      const candidate = candidates.pop();
+      visited.add(candidate.node.id);
+
+      const neighbors = candidate.node.connections.get(layer) || [];
+      for (const neighbor of neighbors) {
+        if (!visited.has(neighbor.id)) {
+          const distance = euclideanDistance(targetVector, neighbor.vector);
+          candidates.push({ node: neighbor, distance });
+        }
+      }
+
+      candidates.sort((a, b) => a.distance - b.distance);
+    }
+
+    return candidates.slice(0, k).map(candidate => candidate.node);
+  }
+
+  /**
+   * Searches for the nearest neighbors to a given vector.
+   * @param {number[]} vector - The vector to search for.
+   * @param {number} k - Number of neighbors to return.
+   * @returns {HNSWNode[]} - Nearest neighbors.
+   */
+  search(vector, k = 1) {
+    if (!this.entryNode) {
+      throw new Error("Graph is empty.");
+    }
+    return this._searchLayer(vector, this.entryNode, this.maxLayers - 1, k);
   }
 }
 
 /**
- * Creates a KDTree instance from a dataset.
- * @param {number[][]} embeddings - Array of vectors (embeddings) to index.
- * @returns {KDTree} - A KDTree instance for fast semantic search.
+ * Exports the HNSWGraph class and utility functions.
  */
-export function createKDTree(embeddings) {
-  return new KDTree(embeddings);
-}
-
-/**
- * Searches for the k nearest neighbors of a query vector in a KDTree.
- * @param {KDTree} tree - The KDTree instance.
- * @param {number[]} query - The query vector.
- * @param {number} k - The number of nearest neighbors to find.
- * @returns {Array<{index: number, distance: number}>} - Array of nearest neighbors with their indices and distances.
- */
-export function searchKDTree(tree, query, k) {
-  return tree.search(query, k);
-}
+export { HNSWGraph, euclideanDistance };
