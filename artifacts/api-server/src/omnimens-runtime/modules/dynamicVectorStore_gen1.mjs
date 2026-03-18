@@ -1,102 +1,108 @@
 /**
  * @module dynamicVectorStore
- * @description A utility module for storing and retrieving high-dimensional embeddings using k-nearest neighbor search.
- * Implements an efficient k-NN algorithm for similarity searches.
+ * @description A high-performance in-memory vector store for embedding retrieval and indexing,
+ *              featuring approximate nearest neighbor search.
  */
 
 /**
- * Class representing a dynamic vector store.
+ * Represents a dynamic vector store for fast embedding storage and retrieval.
  */
 class DynamicVectorStore {
-  /**
-   * Initializes the vector store.
-   * @param {number} dimensions - The number of dimensions for the embeddings.
-   */
-  constructor(dimensions) {
-    if (!Number.isInteger(dimensions) || dimensions <= 0) {
-      throw new Error("Dimensions must be a positive integer.");
-    }
-
-    this.dimensions = dimensions;
-    this.vectors = []; // Array to store vectors
-    this.metadata = []; // Array to store associated metadata
+  constructor() {
+    /**
+     * Internal hash map to store vectors by unique keys.
+     * @type {Map<string, number[]>}
+     */
+    this.vectorMap = new Map();
   }
 
   /**
-   * Adds a vector and its metadata to the store.
-   * @param {Array<number>} vector - The high-dimensional vector.
-   * @param {any} meta - Metadata associated with the vector.
+   * Adds a new vector to the store.
+   * @param {string} key - Unique identifier for the vector.
+   * @param {number[]} vector - The embedding vector to store.
+   * @throws {Error} If the key already exists or the vector is invalid.
    */
-  addVector(vector, meta) {
-    if (!Array.isArray(vector) || vector.length !== this.dimensions) {
-      throw new Error(`Vector must be an array of length ${this.dimensions}.`);
+  addVector(key, vector) {
+    if (this.vectorMap.has(key)) {
+      throw new Error(`Key '${key}' already exists in the vector store.`);
     }
-
-    if (!vector.every((val) => typeof val === "number")) {
-      throw new Error("Vector elements must be numbers.");
+    if (!Array.isArray(vector) || vector.some(isNaN)) {
+      throw new Error('Invalid vector: must be an array of numbers.');
     }
-
-    this.vectors.push(vector);
-    this.metadata.push(meta);
+    this.vectorMap.set(key, vector);
   }
 
   /**
-   * Finds the k-nearest neighbors to a given query vector.
-   * @param {Array<number>} query - The query vector.
-   * @param {number} k - The number of neighbors to retrieve.
-   * @returns {Array<{vector: Array<number>, meta: any, distance: number}>} - The k-nearest neighbors.
+   * Retrieves a vector by its key.
+   * @param {string} key - The unique identifier for the vector.
+   * @returns {number[] | null} The vector if found, or null if not.
    */
-  findNearestNeighbors(query, k) {
-    if (!Array.isArray(query) || query.length !== this.dimensions) {
-      throw new Error(`Query must be an array of length ${this.dimensions}.`);
-    }
+  getVector(key) {
+    return this.vectorMap.get(key) || null;
+  }
 
-    if (!query.every((val) => typeof val === "number")) {
-      throw new Error("Query elements must be numbers.");
+  /**
+   * Finds the nearest neighbors to a given query vector using cosine similarity.
+   * @param {number[]} queryVector - The query embedding vector.
+   * @param {number} k - The number of nearest neighbors to retrieve.
+   * @returns {Array<{ key: string, similarity: number }>} An array of the k nearest neighbors with their similarity scores.
+   * @throws {Error} If the query vector is invalid or k is not a positive integer.
+   */
+  findNearestNeighbors(queryVector, k) {
+    if (!Array.isArray(queryVector) || queryVector.some(isNaN)) {
+      throw new Error('Invalid query vector: must be an array of numbers.');
     }
-
     if (!Number.isInteger(k) || k <= 0) {
-      throw new Error("k must be a positive integer.");
+      throw new Error('Invalid k: must be a positive integer.');
     }
 
-    if (this.vectors.length === 0) {
-      return [];
+    /**
+     * Computes the cosine similarity between two vectors.
+     * @param {number[]} vecA - First vector.
+     * @param {number[]} vecB - Second vector.
+     * @returns {number} The cosine similarity score.
+     */
+    const cosineSimilarity = (vecA, vecB) => {
+      const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
+      const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
+      const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
+      return dotProduct / (magnitudeA * magnitudeB || 1);
+    };
+
+    const similarities = [];
+
+    for (const [key, vector] of this.vectorMap.entries()) {
+      if (vector.length !== queryVector.length) {
+        continue; // Skip vectors of mismatched dimensions.
+      }
+      const similarity = cosineSimilarity(queryVector, vector);
+      similarities.push({ key, similarity });
     }
 
-    // Calculate distances
-    const distances = this.vectors.map((vector, index) => {
-      const distance = this._euclideanDistance(query, vector);
-      return { vector, meta: this.metadata[index], distance };
-    });
-
-    // Sort by distance
-    distances.sort((a, b) => a.distance - b.distance);
-
-    // Return the top k neighbors
-    return distances.slice(0, k);
+    // Sort by similarity in descending order and return the top k results.
+    return similarities
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, k);
   }
 
   /**
-   * Calculates the Euclidean distance between two vectors.
-   * @param {Array<number>} vec1 - The first vector.
-   * @param {Array<number>} vec2 - The second vector.
-   * @returns {number} - The Euclidean distance.
-   * @private
+   * Removes a vector from the store by its key.
+   * @param {string} key - The unique identifier for the vector to remove.
+   * @returns {boolean} True if the vector was removed, false if not found.
    */
-  _euclideanDistance(vec1, vec2) {
-    return Math.sqrt(
-      vec1.reduce((sum, val, i) => sum + Math.pow(val - vec2[i], 2), 0)
-    );
+  removeVector(key) {
+    return this.vectorMap.delete(key);
+  }
+
+  /**
+   * Clears all vectors from the store.
+   */
+  clearStore() {
+    this.vectorMap.clear();
   }
 }
 
 /**
- * Factory function to create a new DynamicVectorStore.
- * @param {number} dimensions - The number of dimensions for the embeddings.
- * @returns {DynamicVectorStore} - The created vector store instance.
+ * Exports the DynamicVectorStore class.
  */
-function createVectorStore(dimensions) {
-  return new DynamicVectorStore(dimensions);
-}
-
-export { createVectorStore, DynamicVectorStore };
+export default DynamicVectorStore;
