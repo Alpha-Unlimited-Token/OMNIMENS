@@ -30,7 +30,6 @@ const Tools = retryLazy(() => import("@/pages/tools"));
 const FAQ = retryLazy(() => import("@/pages/faq"));
 const Developer = retryLazy(() => import("@/pages/developer"));
 const Support = retryLazy(() => import("@/pages/support"));
-const FooterInfo = retryLazy(() => import("@/pages/footer-info"));
 
 initTheme();
 
@@ -92,7 +91,6 @@ function Router() {
         <Route path="/dev" component={Developer} />
         <Route path="/developer" component={Developer} />
         <Route path="/support" component={Support} />
-        <Route path="/footer-info" component={FooterInfo} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>

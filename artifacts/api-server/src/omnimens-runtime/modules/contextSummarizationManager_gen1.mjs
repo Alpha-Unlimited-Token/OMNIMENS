@@ -1,101 +1,99 @@
-// contextSummarizationManager.js
-
 /**
  * @module contextSummarizationManager
- * @description Summarizes and retains early context in long conversations using a sliding window summarization algorithm with semantic embedding compression.
+ * @description This module manages long-term context by summarizing and chunking older parts of conversations, enabling efficient retrieval of relevant context.
  */
 
 /**
- * Maintains conversation context and summarizes older parts dynamically.
- * @class
+ * Summarizes a given text using a sliding window approach.
+ * @param {string} text - The input text to summarize.
+ * @param {number} windowSize - The size of the sliding window in characters.
+ * @param {number} stepSize - The step size for the sliding window in characters.
+ * @returns {string[]} - An array of summarized chunks.
  */
-class ContextSummarizationManager {
-  constructor(windowSize = 5, embeddingCompressionFactor = 0.5) {
-    /**
-     * @type {number} The maximum number of recent messages to retain before summarization.
-     */
-    this.windowSize = windowSize;
-
-    /**
-     * @type {number} Factor for reducing semantic embedding size during compression (0 < factor <= 1).
-     */
-    this.embeddingCompressionFactor = embeddingCompressionFactor;
-
-    /**
-     * @type {Array<string>} Stores the recent conversation messages.
-     */
-    this.recentMessages = [];
-
-    /**
-     * @type {Array<string>} Stores summarized context.
-     */
-    this.summarizedContext = [];
+export function summarizeText(text, windowSize = 500, stepSize = 250) {
+  if (typeof text !== 'string' || text.length === 0) {
+    throw new Error('Input text must be a non-empty string.');
+  }
+  if (windowSize <= 0 || stepSize <= 0) {
+    throw new Error('Window size and step size must be positive integers.');
   }
 
-  /**
-   * Adds a new message to the conversation context.
-   * @param {string} message - The message to add.
-   */
-  addMessage(message) {
-    if (typeof message !== 'string' || message.trim() === '') {
-      throw new Error('Message must be a non-empty string.');
-    }
-
-    this.recentMessages.push(message);
-
-    if (this.recentMessages.length > this.windowSize) {
-      this.summarizeContext();
-    }
+  const chunks = [];
+  for (let i = 0; i < text.length; i += stepSize) {
+    const window = text.slice(i, i + windowSize);
+    const summary = summarizeChunk(window);
+    chunks.push(summary);
   }
 
-  /**
-   * Summarizes the oldest messages in the recentMessages array.
-   * Uses a semantic embedding compression simulation.
-   */
-  summarizeContext() {
-    const messagesToSummarize = this.recentMessages.splice(0, Math.floor(this.windowSize / 2));
-    const summarized = this.simulateSemanticCompression(messagesToSummarize);
-    this.summarizedContext.push(summarized);
-  }
-
-  /**
-   * Simulates semantic embedding compression for a set of messages.
-   * @param {Array<string>} messages - The messages to compress.
-   * @returns {string} A single summarized string.
-   */
-  simulateSemanticCompression(messages) {
-    const combinedText = messages.join(' ');
-    const compressedLength = Math.max(1, Math.floor(combinedText.length * this.embeddingCompressionFactor));
-
-    // Simulate compression by truncating and appending ellipsis.
-    return combinedText.substring(0, compressedLength) + (compressedLength < combinedText.length ? '...' : '');
-  }
-
-  /**
-   * Retrieves the full conversation context, including summarized and recent messages.
-   * @returns {string} The complete conversation context as a single string.
-   */
-  getFullContext() {
-    return [...this.summarizedContext, ...this.recentMessages].join(' ');
-  }
-
-  /**
-   * Clears all stored context.
-   */
-  clearContext() {
-    this.recentMessages = [];
-    this.summarizedContext = [];
-  }
+  return chunks;
 }
 
 /**
- * Factory function to create a new ContextSummarizationManager instance.
- * @param {number} [windowSize=5] - The maximum number of recent messages to retain.
- * @param {number} [embeddingCompressionFactor=0.5] - Factor for reducing semantic embedding size during compression.
- * @returns {ContextSummarizationManager} A new instance of the manager.
+ * Summarizes a single chunk of text.
+ * @private
+ * @param {string} chunk - The chunk of text to summarize.
+ * @returns {string} - A summarized version of the chunk.
  */
-function createContextSummarizationManager(windowSize = 5, embeddingCompressionFactor = 0.5) {
-  return new ContextSummarizationManager(windowSize, embeddingCompressionFactor);
+function summarizeChunk(chunk) {
+  // Naive summarization: Take the first and last 100 characters of the chunk.
+  const start = chunk.slice(0, 100);
+  const end = chunk.slice(-100);
+  return `${start} ... ${end}`;
 }
 
-export { createContextSummarizationManager };
+/**
+ * Computes similarity between two pieces of text using a simple character overlap metric.
+ * @param {string} text1 - The first text input.
+ * @param {string} text2 - The second text input.
+ * @returns {number} - A similarity score between 0 and 1.
+ */
+export function computeSimilarity(text1, text2) {
+  if (typeof text1 !== 'string' || typeof text2 !== 'string') {
+    throw new Error('Both inputs must be strings.');
+  }
+
+  const set1 = new Set(text1);
+  const set2 = new Set(text2);
+  const intersection = new Set([...set1].filter(char => set2.has(char)));
+  const union = new Set([...set1, ...set2]);
+
+  return intersection.size / union.size;
+}
+
+/**
+ * Retrieves the most relevant summarized chunk based on similarity to a query.
+ * @param {string} query - The query text to match against.
+ * @param {string[]} summaries - An array of summarized chunks.
+ * @returns {string} - The most relevant summarized chunk.
+ */
+export function retrieveRelevantChunk(query, summaries) {
+  if (typeof query !== 'string' || !Array.isArray(summaries)) {
+    throw new Error('Invalid input: query must be a string and summaries must be an array of strings.');
+  }
+
+  let maxSimilarity = 0;
+  let bestMatch = '';
+
+  for (const summary of summaries) {
+    const similarity = computeSimilarity(query, summary);
+    if (similarity > maxSimilarity) {
+      maxSimilarity = similarity;
+      bestMatch = summary;
+    }
+  }
+
+  return bestMatch;
+}
+
+/**
+ * Manages context by summarizing and chunking older parts of a conversation.
+ * @param {string} conversation - The full conversation text.
+ * @param {string} query - The query to retrieve relevant context for.
+ * @param {number} windowSize - The size of the sliding window in characters.
+ * @param {number} stepSize - The step size for the sliding window in characters.
+ * @returns {string} - The most relevant summarized chunk.
+ */
+export function manageContext(conversation, query, windowSize = 500, stepSize = 250) {
+  const summaries = summarizeText(conversation, windowSize, stepSize);
+  return retrieveRelevantChunk(query, summaries);
+}
