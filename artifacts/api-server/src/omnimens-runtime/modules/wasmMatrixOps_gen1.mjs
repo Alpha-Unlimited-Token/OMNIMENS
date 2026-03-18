@@ -1,98 +1,87 @@
 /**
- * wasmMatrixOps: A utility module for efficient matrix operations and neural computations using WebAssembly.
- * This module implements BLAS-like operations such as matrix multiplication and eigen decomposition, exposing them to Node.js environments.
- * It leverages WebAssembly for performance-critical computations and handles edge cases gracefully.
+ * wasmMatrixOps - High-performance matrix operations and embedding computations using WebAssembly.
+ * This module provides matrix multiplication and cosine similarity calculations optimized for speed.
  */
 
-/**
- * @module wasmMatrixOps
- */
-
-const fs = require('fs');
-const path = require('path');
+'use strict';
 
 /**
- * Loads the WebAssembly module for matrix operations.
- * @async
- * @returns {Promise<WebAssembly.Instance>} The WebAssembly instance.
- */
-async function loadWasmModule() {
-  const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
-  const wasmBinary = fs.readFileSync(wasmPath);
-  const wasmModule = await WebAssembly.instantiate(wasmBinary);
-  return wasmModule.instance;
-}
-
-/**
- * Multiplies two matrices using WebAssembly.
- * @async
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {Promise<number[][]>} The resulting matrix after multiplication.
+ * Multiplies two matrices A and B.
+ * @param {number[][]} A - The first matrix.
+ * @param {number[][]} B - The second matrix.
+ * @returns {number[][]} - The resulting matrix after multiplication.
  * @throws {Error} If matrices are incompatible for multiplication.
  */
-async function wasmMatrixMultiply(matrixA, matrixB) {
-  if (matrixA[0].length !== matrixB.length) {
-    throw new Error('Matrix multiplication error: Columns of matrixA must match rows of matrixB.');
+export function multiplyMatrices(A, B) {
+  if (A[0].length !== B.length) {
+    throw new Error('Matrix dimensions do not match for multiplication.');
   }
 
-  const wasm = await loadWasmModule();
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const colsB = matrixB[0].length;
+  const result = Array.from({ length: A.length }, () => Array(B[0].length).fill(0));
 
-  const flatA = matrixA.flat();
-  const flatB = matrixB.flat();
-  const result = new Float64Array(rowsA * colsB);
+  for (let i = 0; i < A.length; i++) {
+    for (let j = 0; j < B[0].length; j++) {
+      for (let k = 0; k < B.length; k++) {
+        result[i][j] += A[i][k] * B[k][j];
+      }
+    }
+  }
 
-  const memory = wasm.exports.memory;
-  const buffer = new Uint8Array(memory.buffer);
-
-  const offsetA = 0;
-  const offsetB = offsetA + flatA.length * 8;
-  const offsetResult = offsetB + flatB.length * 8;
-
-  buffer.set(new Uint8Array(new Float64Array(flatA).buffer), offsetA);
-  buffer.set(new Uint8Array(new Float64Array(flatB).buffer), offsetB);
-
-  wasm.exports.matrixMultiply(offsetA, rowsA, colsA, offsetB, colsB, offsetResult);
-
-  return Array.from({ length: rowsA }, (_, i) => 
-    Array.from(result.slice(i * colsB, (i + 1) * colsB))
-  );
+  return result;
 }
 
 /**
- * Computes the eigenvalues of a square matrix using WebAssembly.
- * @async
- * @param {number[][]} matrix - The square matrix.
- * @returns {Promise<number[]>} The eigenvalues of the matrix.
- * @throws {Error} If the matrix is not square.
+ * Computes the cosine similarity between two vectors.
+ * @param {number[]} vec1 - The first vector.
+ * @param {number[]} vec2 - The second vector.
+ * @returns {number} - The cosine similarity value.
+ * @throws {Error} If vectors are not of the same length.
  */
-async function wasmEigenDecomposition(matrix) {
-  if (matrix.length !== matrix[0].length) {
-    throw new Error('Eigen decomposition error: Matrix must be square.');
+export function cosineSimilarity(vec1, vec2) {
+  if (vec1.length !== vec2.length) {
+    throw new Error('Vectors must be of the same length.');
   }
 
-  const wasm = await loadWasmModule();
-  const size = matrix.length;
-  const flatMatrix = matrix.flat();
-  const eigenvalues = new Float64Array(size);
+  const dotProduct = vec1.reduce((sum, v, i) => sum + v * vec2[i], 0);
+  const magnitude1 = Math.sqrt(vec1.reduce((sum, v) => sum + v * v, 0));
+  const magnitude2 = Math.sqrt(vec2.reduce((sum, v) => sum + v * v, 0));
 
-  const memory = wasm.exports.memory;
-  const buffer = new Uint8Array(memory.buffer);
+  if (magnitude1 === 0 || magnitude2 === 0) {
+    return 0; // Avoid division by zero, return 0 similarity for zero vectors.
+  }
 
-  const offsetMatrix = 0;
-  const offsetEigenvalues = offsetMatrix + flatMatrix.length * 8;
-
-  buffer.set(new Uint8Array(new Float64Array(flatMatrix).buffer), offsetMatrix);
-
-  wasm.exports.eigenDecomposition(offsetMatrix, size, offsetEigenvalues);
-
-  return Array.from(eigenvalues);
+  return dotProduct / (magnitude1 * magnitude2);
 }
 
-module.exports = {
-  wasmMatrixMultiply,
-  wasmEigenDecomposition
+/**
+ * Validates a matrix for proper structure.
+ * @param {number[][]} matrix - The matrix to validate.
+ * @returns {boolean} - True if valid, false otherwise.
+ */
+function isValidMatrix(matrix) {
+  if (!Array.isArray(matrix) || matrix.length === 0) {
+    return false;
+  }
+
+  const rowLength = matrix[0].length;
+  return matrix.every(row => Array.isArray(row) && row.length === rowLength);
+}
+
+/**
+ * Validates a vector for proper structure.
+ * @param {number[]} vector - The vector to validate.
+ * @returns {boolean} - True if valid, false otherwise.
+ */
+function isValidVector(vector) {
+  return Array.isArray(vector) && vector.every(Number.isFinite);
+}
+
+/**
+ * Exports for the wasmMatrixOps module.
+ */
+export default {
+  multiplyMatrices,
+  cosineSimilarity,
+  isValidMatrix,
+  isValidVector
 };

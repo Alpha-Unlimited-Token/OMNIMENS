@@ -2,82 +2,100 @@
 
 /**
  * @module hierarchicalMemoryManager
- * @description This module maintains long-term context by summarizing and storing conversation chunks hierarchically.
- * It uses a sliding window approach to condense older context into compact representations for efficient memory management.
+ * @description Compresses and manages long-term conversational context within the token window using hierarchical summarization and attention-based retrieval.
  */
 
 /**
- * Summarizes a chunk of text using a naive summarization algorithm.
- * This function is a placeholder for GPT-based summarization logic.
- *
- * @param {string} text - The text to summarize.
- * @returns {string} - A summarized version of the input text.
+ * Summarizes a list of text chunks hierarchically.
+ * Breaks down input into smaller summaries and recursively condenses them.
+ * @param {string[]} chunks - Array of text chunks to summarize.
+ * @param {number} maxLength - Maximum length of the summarized output.
+ * @returns {string} - Hierarchically summarized text.
  */
-function summarizeText(text) {
-  const sentences = text.split('.');
-  const summary = sentences.slice(0, Math.ceil(sentences.length / 3)).join('.') + '.';
-  return summary.trim();
+function hierarchicalSummarize(chunks, maxLength) {
+  if (chunks.length === 0) return '';
+
+  // Base case: If the combined length is below maxLength, concatenate and return.
+  const combined = chunks.join(' ');
+  if (combined.length <= maxLength) return combined;
+
+  // Split into smaller groups for recursive summarization.
+  const groupSize = Math.ceil(chunks.length / 2);
+  const groupedSummaries = [];
+
+  for (let i = 0; i < chunks.length; i += groupSize) {
+    const group = chunks.slice(i, i + groupSize);
+    groupedSummaries.push(hierarchicalSummarize(group, maxLength / 2));
+  }
+
+  return hierarchicalSummarize(groupedSummaries, maxLength);
 }
 
 /**
- * Manages hierarchical memory by summarizing and storing conversation chunks.
+ * Retrieves the most relevant context based on attention scores.
+ * Uses cosine similarity for relevance ranking.
+ * @param {string[]} contexts - Array of context strings.
+ * @param {string} query - Query to match against.
+ * @param {number} topN - Number of top relevant contexts to retrieve.
+ * @returns {string[]} - Array of top relevant context strings.
  */
-class HierarchicalMemoryManager {
-  /**
-   * @constructor
-   * @param {number} chunkSize - The size of each conversation chunk (in characters).
-   * @param {number} maxChunks - The maximum number of chunks to retain in memory.
-   */
-  constructor(chunkSize = 1000, maxChunks = 10) {
-    this.chunkSize = chunkSize;
-    this.maxChunks = maxChunks;
-    this.memory = [];
-  }
+function attentionBasedRetrieval(contexts, query, topN) {
+  const scores = contexts.map(context => cosineSimilarity(vectorize(context), vectorize(query)));
 
-  /**
-   * Adds a new conversation chunk to memory.
-   * If the memory exceeds the maximum number of chunks, older chunks are summarized and condensed.
-   *
-   * @param {string} chunk - The new conversation chunk to add.
-   */
-  addChunk(chunk) {
-    if (chunk.length > this.chunkSize) {
-      throw new Error(`Chunk size exceeds the maximum allowed size of ${this.chunkSize} characters.`);
-    }
+  // Pair contexts with scores and sort by relevance.
+  const scoredContexts = contexts.map((context, index) => ({ context, score: scores[index] }));
+  scoredContexts.sort((a, b) => b.score - a.score);
 
-    this.memory.push(chunk);
-
-    if (this.memory.length > this.maxChunks) {
-      this._condenseMemory();
-    }
-  }
-
-  /**
-   * Retrieves the current memory hierarchy.
-   *
-   * @returns {Array<string>} - The hierarchical memory, with older chunks summarized.
-   */
-  getMemory() {
-    return [...this.memory];
-  }
-
-  /**
-   * Condenses the memory by summarizing older chunks and retaining the most recent ones.
-   * This method is called automatically when memory exceeds the maximum allowed chunks.
-   *
-   * @private
-   */
-  _condenseMemory() {
-    const half = Math.floor(this.memory.length / 2);
-    const olderChunks = this.memory.slice(0, half);
-    const summarizedChunk = summarizeText(olderChunks.join(' '));
-    this.memory = [summarizedChunk, ...this.memory.slice(half)];
-
-    // Ensure memory size does not exceed maxChunks after condensing
-    while (this.memory.length > this.maxChunks) {
-      this.memory.shift();
-    }
-  }
+  return scoredContexts.slice(0, topN).map(item => item.context);
 }
 
-export { HierarchicalMemoryManager, summarizeText };
+/**
+ * Converts a string into a vector representation.
+ * Simple character-based vectorization for demonstration purposes.
+ * @param {string} text - Input text.
+ * @returns {number[]} - Vector representation of the text.
+ */
+function vectorize(text) {
+  const vector = new Array(256).fill(0);
+  for (const char of text) {
+    const code = char.charCodeAt(0);
+    if (code < 256) vector[code]++;
+  }
+  return vector;
+}
+
+/**
+ * Calculates cosine similarity between two vectors.
+ * @param {number[]} vecA - First vector.
+ * @param {number[]} vecB - Second vector.
+ * @returns {number} - Cosine similarity score.
+ */
+function cosineSimilarity(vecA, vecB) {
+  const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
+  const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
+  const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
+
+  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
+}
+
+/**
+ * Compresses and retrieves relevant conversational context.
+ * Combines hierarchical summarization and attention-based retrieval.
+ * @param {string[]} contextHistory - Array of past conversational context strings.
+ * @param {string} currentQuery - Current query or conversational input.
+ * @param {number} tokenLimit - Maximum token limit for compressed context.
+ * @returns {string} - Condensed and relevant conversational context.
+ */
+function manageContext(contextHistory, currentQuery, tokenLimit) {
+  const relevantContexts = attentionBasedRetrieval(contextHistory, currentQuery, Math.ceil(contextHistory.length / 2));
+  return hierarchicalSummarize(relevantContexts, tokenLimit);
+}
+
+// Export functions
+export {
+  hierarchicalSummarize,
+  attentionBasedRetrieval,
+  vectorize,
+  cosineSimilarity,
+  manageContext
+};
