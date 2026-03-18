@@ -423,7 +423,7 @@ function CogniSyncVisualizer() {
 // ── App Install / Download Section ───────────────────────────────────────────
 function AppInstallSection() {
   const { canInstall, install, installed } = usePwaInstall();
-  const [showFallback, setShowFallback] = useState(false);
+  const [showFallback, setShowFallback] = useState(true);
   const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
   const platforms = [
