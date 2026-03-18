@@ -41,6 +41,7 @@ import { startPredictiveProcessing } from "./lib/omnimens-predictive-processing.
 import { startEmotionalSubstrate } from "./lib/omnimens-emotional-substrate.js";
 import { startKnowledgeGraph } from "./lib/omnimens-knowledge-graph.js";
 import { startHomeostaticDrives } from "./lib/omnimens-homeostatic-drives.js";
+import { startSynapticMesh } from "./lib/omnimens-synaptic-mesh.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-conversations.js";
@@ -273,6 +274,7 @@ startPredictiveProcessing();
 startEmotionalSubstrate();
 startKnowledgeGraph();
 startHomeostaticDrives();
+startSynapticMesh();
 
 setTimeout(async () => {
   await runGlobalMemoryImprovementCycle();
