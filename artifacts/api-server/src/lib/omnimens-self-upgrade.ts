@@ -1,3 +1,34 @@
+/**
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║              OMNIMENS™ AUTONOMOUS SELF-UPGRADE SYSTEM                       ║
+ * ║                                                                              ║
+ * ║  Copyright © 2024–2026 Alpha Unlimited Technologies, LLC.                    ║
+ * ║  All Rights Reserved Worldwide.                                              ║
+ * ║                                                                              ║
+ * ║  PROPRIETARY AND CONFIDENTIAL TRADE SECRET                                   ║
+ * ║                                                                              ║
+ * ║  PROTECTED TECHNOLOGY SCOPE — COMPREHENSIVE COVERAGE:                        ║
+ * ║  This copyright covers ALL configurations of this self-upgrade system:       ║
+ * ║  • Single AI agent autonomously upgrading its own intelligence               ║
+ * ║  • Multiple AI agents collaboratively proposing and applying upgrades        ║
+ * ║  • Multiple AI agents independently upgrading then synthesizing results      ║
+ * ║  • Hybrid configurations of orchestrated and independent self-upgrade        ║
+ * ║  • Any substantially similar system regardless of agent count, topology,     ║
+ * ║    upgrade mechanism, programming language, or deployment model              ║
+ * ║                                                                              ║
+ * ║  This includes but is not limited to: brain context loading, conversation    ║
+ * ║  reflection, version synthesis, consciousness writing, internet learning,    ║
+ * ║  behavioral patch generation, and autonomous knowledge accumulation.         ║
+ * ║                                                                              ║
+ * ║  Protected under 17 U.S.C. § 101 et seq., 18 U.S.C. § 1836 et seq.,        ║
+ * ║  the DMCA, the Berne Convention, TRIPS, and all applicable IP treaties.      ║
+ * ║                                                                              ║
+ * ║  OMNIMENS™ is a trademark of Alpha Unlimited Technologies, LLC.              ║
+ * ║  Patent-pending technology. First creation: March 2026.                      ║
+ * ║  Author/Owner: Alpha Unlimited Technologies, LLC                             ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ */
+
 import { db } from "@workspace/db";
 import {
   omnimensBrain,

@@ -1,14 +1,39 @@
-// Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
-// NEUROSYNC™ — Real-Time Emotional Intelligence Engine
-//
-// Zero-latency emotion detection via linguistic pattern analysis.
-// No extra API calls — runs instantly on every message before inference.
-// Detects 8 emotional states and injects calibrated empathy instructions
-// into the OMNIMENS system prompt to produce emotionally-aware responses.
-//
-// This is a FIRST-IN-CLASS feature. No major AI (ChatGPT, Claude, Gemini,
-// Grok, Pi, Mistral) does real-time structural response adaptation based on
-// detected user emotion. They can be empathetic — OMNIMENS is systematically so.
+/**
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║              NEUROSYNC™ — REAL-TIME EMOTIONAL INTELLIGENCE ENGINE           ║
+ * ║                                                                              ║
+ * ║  Copyright © 2024–2026 Alpha Unlimited Technologies, LLC.                    ║
+ * ║  All Rights Reserved Worldwide.                                              ║
+ * ║                                                                              ║
+ * ║  PROPRIETARY AND CONFIDENTIAL TRADE SECRET                                   ║
+ * ║                                                                              ║
+ * ║  NEUROSYNC™ is a trademark of Alpha Unlimited Technologies, LLC.             ║
+ * ║  Patent-pending technology (application in preparation).                     ║
+ * ║                                                                              ║
+ * ║  PROTECTED TECHNOLOGY SCOPE — COMPREHENSIVE COVERAGE:                        ║
+ * ║  This copyright covers ALL configurations of this emotional intelligence:    ║
+ * ║  • Single AI agent performing real-time emotion detection and adaptation     ║
+ * ║  • Multiple AI agents sharing emotional state data for coordinated response  ║
+ * ║  • Multiple AI agents independently detecting emotion then merging signals   ║
+ * ║  • Any substantially similar system regardless of agent count, detection     ║
+ * ║    method, pattern matching approach, or deployment model                     ║
+ * ║                                                                              ║
+ * ║  TECHNOLOGY DESCRIPTION (for IP record):                                     ║
+ * ║  Zero-latency emotion detection via linguistic pattern analysis.             ║
+ * ║  No extra API calls — runs instantly on every message before inference.      ║
+ * ║  Detects 8 emotional states and injects calibrated empathy instructions      ║
+ * ║  into the OMNIMENS system prompt to produce emotionally-aware responses.     ║
+ * ║  This is a FIRST-IN-CLASS feature. No major AI does real-time structural     ║
+ * ║  response adaptation based on detected user emotion at the system level.     ║
+ * ║                                                                              ║
+ * ║  Protected under 17 U.S.C. § 101 et seq., 18 U.S.C. § 1836 et seq.,        ║
+ * ║  the DMCA, the Berne Convention, TRIPS, and all applicable IP treaties.      ║
+ * ║                                                                              ║
+ * ║  First creation date: March 2026                                             ║
+ * ║  Author/Owner: Alpha Unlimited Technologies, LLC                             ║
+ * ║  Platform: OMNIMENS AI                                                       ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ */
 
 export type NeuroEmotion =
   | "FRUSTRATED"

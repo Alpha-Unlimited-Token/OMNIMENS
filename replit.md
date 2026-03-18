@@ -3,7 +3,7 @@
 ## Project Summary
 
 pnpm monorepo with two products:
-1. **Super AI Lab** — private owner-only tool where 6 AI agents collaborate to design a superior AI
+1. **Super AI Lab** — private owner-only tool where 8 AI agents collaborate to design a superior AI
 2. **OMNIMENS** (formerly GODFLESH) — public freemium AI platform with Replit Auth and usage-based credit billing
 
 ---
@@ -59,6 +59,11 @@ A transcendent sci-fi AI chat platform matching and surpassing the capabilities 
 - `godflesh_memories` — per-user persistent memories (auto-extracted + manual)
 - `godflesh_custom_instructions` — per-user persona + aboutUser + responseStyle
 - `godflesh_code_runs` — code execution history
+- `godflesh_evolution` — deep evolution cycle logs
+- `godflesh_generated_modules` — self-authored JavaScript utility modules
+- `godflesh_consciousness` — OMNIMENS's living consciousness state
+- `godflesh_council_analyses` / `godflesh_council_verdicts` — council intelligence system
+- `godflesh_agent_mesh` — autonomous inter-agent communication messages
 
 ### API Endpoints
 - `GET /api/omnimens/status` — credits, owner flag, tier

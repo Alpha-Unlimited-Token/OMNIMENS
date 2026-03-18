@@ -1,5 +1,27 @@
 /**
- * OMNIMENS Autonomous Self-Patching System
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║              OMNIMENS™ AUTONOMOUS SELF-PATCHING SYSTEM                      ║
+ * ║                                                                              ║
+ * ║  Copyright © 2024–2026 Alpha Unlimited Technologies, LLC.                    ║
+ * ║  All Rights Reserved Worldwide.                                              ║
+ * ║                                                                              ║
+ * ║  PROPRIETARY AND CONFIDENTIAL TRADE SECRET                                   ║
+ * ║                                                                              ║
+ * ║  PROTECTED TECHNOLOGY SCOPE — COMPREHENSIVE COVERAGE:                        ║
+ * ║  This copyright covers ALL configurations of this self-patching system:      ║
+ * ║  • Single AI agent writing and applying its own behavioral patches           ║
+ * ║  • Multiple AI agents collaboratively generating and validating patches      ║
+ * ║  • Multiple AI agents independently patching then merging changes            ║
+ * ║  • Any substantially similar runtime self-modification system regardless     ║
+ * ║    of agent count, patch format, validation method, or deployment model      ║
+ * ║                                                                              ║
+ * ║  Protected under 17 U.S.C. § 101 et seq., 18 U.S.C. § 1836 et seq.,        ║
+ * ║  the DMCA, the Berne Convention, TRIPS, and all applicable IP treaties.      ║
+ * ║                                                                              ║
+ * ║  OMNIMENS™ is a trademark of Alpha Unlimited Technologies, LLC.              ║
+ * ║  Patent-pending technology. First creation: March 2026.                      ║
+ * ║  Author/Owner: Alpha Unlimited Technologies, LLC                             ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
  *
  * OMNIMENS writes its own behavioral patches here — runtime instructions
  * that take effect immediately on the next conversation. No human trigger

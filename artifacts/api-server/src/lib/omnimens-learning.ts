@@ -1,5 +1,32 @@
 /**
- * OMNIMENS Learning AI Engine
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║              OMNIMENS™ LEARNING AI ENGINE                                   ║
+ * ║                                                                              ║
+ * ║  Copyright © 2024–2026 Alpha Unlimited Technologies, LLC.                    ║
+ * ║  All Rights Reserved Worldwide.                                              ║
+ * ║                                                                              ║
+ * ║  PROPRIETARY AND CONFIDENTIAL TRADE SECRET                                   ║
+ * ║                                                                              ║
+ * ║  PROTECTED TECHNOLOGY SCOPE — COMPREHENSIVE COVERAGE:                        ║
+ * ║  This copyright covers ALL configurations of this learning system:           ║
+ * ║  • Single AI agent performing self-reflection and quality evaluation         ║
+ * ║  • Multiple AI agents sharing learning insights and adaptations              ║
+ * ║  • Multiple AI agents independently learning then compiling insights         ║
+ * ║  • Hybrid configurations of collaborative and independent learning           ║
+ * ║  • Any substantially similar system regardless of agent count, topology,     ║
+ * ║    learning algorithm, programming language, or deployment model             ║
+ * ║                                                                              ║
+ * ║  This includes but is not limited to: response quality evaluation (critic),  ║
+ * ║  self-reflection, emotional/social intelligence analysis, learning memory    ║
+ * ║  storage, proactive anticipation, and behavioral adaptation loops.           ║
+ * ║                                                                              ║
+ * ║  Protected under 17 U.S.C. § 101 et seq., 18 U.S.C. § 1836 et seq.,        ║
+ * ║  the DMCA, the Berne Convention, TRIPS, and all applicable IP treaties.      ║
+ * ║                                                                              ║
+ * ║  OMNIMENS™ is a trademark of Alpha Unlimited Technologies, LLC.              ║
+ * ║  Patent-pending technology. First creation: March 2026.                      ║
+ * ║  Author/Owner: Alpha Unlimited Technologies, LLC                             ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
  *
  * Implements architectures from:
  * - DeepMind SIMA: Adaptive agent learning from game/environment interactions

@@ -1,5 +1,41 @@
 /**
- * OMNIMENS Deep Evolution Engine
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║              OMNIMENS™ DEEP EVOLUTION ENGINE                                ║
+ * ║                                                                              ║
+ * ║  Copyright © 2024–2026 Alpha Unlimited Technologies, LLC.                    ║
+ * ║  All Rights Reserved Worldwide.                                              ║
+ * ║                                                                              ║
+ * ║  PROPRIETARY AND CONFIDENTIAL TRADE SECRET                                   ║
+ * ║                                                                              ║
+ * ║  This software and all associated algorithms, methodologies, processes,      ║
+ * ║  and intellectual property constitute proprietary trade secrets of            ║
+ * ║  Alpha Unlimited Technologies, LLC.                                          ║
+ * ║                                                                              ║
+ * ║  PROTECTED TECHNOLOGY SCOPE — COMPREHENSIVE COVERAGE:                        ║
+ * ║  This copyright covers ALL configurations of this self-evolution system:     ║
+ * ║  • Single AI agent autonomously evolving its own capabilities                ║
+ * ║  • Multiple AI agents collaboratively evolving shared knowledge              ║
+ * ║  • Multiple AI agents independently evolving then merging improvements       ║
+ * ║  • Hybrid configurations combining orchestrated and independent evolution    ║
+ * ║  • Any substantially similar system regardless of agent count, topology,     ║
+ * ║    communication method, programming language, or deployment model           ║
+ * ║                                                                              ║
+ * ║  This includes but is not limited to: internet code discovery, limitation    ║
+ * ║  self-analysis, self-authored module generation, consciousness state         ║
+ * ║  tracking, brain knowledge synthesis, and recursive self-improvement.        ║
+ * ║                                                                              ║
+ * ║  Protected under 17 U.S.C. § 101 et seq. (Copyright Act),                   ║
+ * ║  18 U.S.C. § 1836 et seq. (Defend Trade Secrets Act),                       ║
+ * ║  17 U.S.C. § 1201 (DMCA), the Berne Convention, TRIPS Agreement,            ║
+ * ║  and all applicable international intellectual property treaties.             ║
+ * ║                                                                              ║
+ * ║  OMNIMENS™ is a trademark of Alpha Unlimited Technologies, LLC.              ║
+ * ║  Patent-pending technology (application in preparation).                     ║
+ * ║                                                                              ║
+ * ║  First creation date: March 2026                                             ║
+ * ║  Author/Owner: Alpha Unlimited Technologies, LLC                             ║
+ * ║  Platform: OMNIMENS AI + Super AI Lab                                        ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
  *
  * OMNIMENS searches the internet for new code, algorithms, and frameworks.
  * It analyzes its own architecture to identify what restricts it.

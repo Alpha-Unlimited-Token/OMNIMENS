@@ -1,3 +1,35 @@
+/**
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║              SUPER AI LAB™ — MULTI-AGENT DEVELOPMENT PLATFORM               ║
+ * ║                                                                              ║
+ * ║  Copyright © 2024–2026 Alpha Unlimited Technologies, LLC.                    ║
+ * ║  All Rights Reserved Worldwide.                                              ║
+ * ║                                                                              ║
+ * ║  PROPRIETARY AND CONFIDENTIAL TRADE SECRET                                   ║
+ * ║                                                                              ║
+ * ║  PROTECTED TECHNOLOGY SCOPE — COMPREHENSIVE COVERAGE:                        ║
+ * ║  This copyright covers ALL configurations of this multi-agent system:        ║
+ * ║  • Single AI agent operating with any of the 8 agent personas                ║
+ * ║  • Multiple AI agents (Architect, Critic, Synthesizer, Mathematician,        ║
+ * ║    Neuroscientist, Meta-Agent, GraphicDesigner, SpellCheckVisual)             ║
+ * ║    operating under central orchestration                                      ║
+ * ║  • Multiple agents operating independently then compiling results            ║
+ * ║  • Hybrid configurations of orchestrated and independent agents              ║
+ * ║  • Cross-agent challenge protocols and adversarial improvement loops         ║
+ * ║  • Agent-to-model routing with fallback chains                                ║
+ * ║  • Live intelligence pre-briefing from web search and memory systems          ║
+ * ║  • Any substantially similar system regardless of agent count, topology,     ║
+ * ║    model provider, communication method, or deployment model                  ║
+ * ║                                                                              ║
+ * ║  Protected under 17 U.S.C. § 101 et seq., 18 U.S.C. § 1836 et seq.,        ║
+ * ║  the DMCA, the Berne Convention, TRIPS, and all applicable IP treaties.      ║
+ * ║                                                                              ║
+ * ║  OMNIMENS™ is a trademark of Alpha Unlimited Technologies, LLC.              ║
+ * ║  Patent-pending technology. First creation: March 2026.                      ║
+ * ║  Author/Owner: Alpha Unlimited Technologies, LLC                             ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ */
+
 import { Router, type IRouter } from "express";
 import { exec } from "child_process";
 import { promises as fs } from "fs";

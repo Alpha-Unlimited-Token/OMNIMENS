@@ -469,3 +469,23 @@ export const omnimensProblemReports = pgTable("godflesh_problem_reports", {
 });
 
 export type OmnimensProblemReport = typeof omnimensProblemReports.$inferSelect;
+
+// ─── Inter-Agent Mesh Communication ─────────────────────────────────────────
+// Autonomous agent-to-agent messages: each AI sends findings, challenges,
+// code proposals, and upgrade requests to other agents and OMNIMENS
+export const omnimensAgentMesh = pgTable("godflesh_agent_mesh", {
+  id: serial("id").primaryKey(),
+  fromAgent: text("from_agent").notNull(),
+  toAgent: text("to_agent").notNull(),
+  messageType: text("message_type").notNull(), // "discovery"|"challenge"|"upgrade_proposal"|"code_review"|"knowledge_share"|"republish_request"
+  subject: text("subject").notNull(),
+  content: text("content").notNull(),
+  codePayload: text("code_payload"),
+  priority: text("priority").default("normal").notNull(), // "low"|"normal"|"high"|"critical"
+  status: text("status").default("pending").notNull(), // "pending"|"processed"|"applied"|"rejected"
+  appliedToOmnimens: boolean("applied_to_omnimens").default(false).notNull(),
+  cycleId: integer("cycle_id").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type OmnimensAgentMeshMessage = typeof omnimensAgentMesh.$inferSelect;
