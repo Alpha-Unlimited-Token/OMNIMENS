@@ -295,6 +295,17 @@ export async function runKnowledgeGraphCycle(): Promise<void> {
         readByOwner: false,
       });
     } catch {}
+
+    try {
+      await db.insert(omnimensBrain).values({
+        title: `[Knowledge Graph] Cycle #${graphCycleCount} — ${brainNodes + spiderNodes} concepts mapped`,
+        content: `Associative memory network ingested ${brainNodes} concepts from brain entries and ${spiderNodes} from spider beacons. Total graph size: ${totalNodes[0]?.count || 0} nodes, ${totalEdges[0]?.count || 0} edges. Hebbian learning strengthened co-activated connections. Unused nodes decayed. (${elapsed}s)`,
+        category: "knowledge_graph",
+        source: "knowledge_graph_engine",
+        active: true,
+        timesApplied: 0,
+      });
+    } catch {}
   }
 
   console.log(`[KNOWLEDGE GRAPH] ◆ Total graph: ${totalNodes[0]?.count || 0} nodes, ${totalEdges[0]?.count || 0} edges`);

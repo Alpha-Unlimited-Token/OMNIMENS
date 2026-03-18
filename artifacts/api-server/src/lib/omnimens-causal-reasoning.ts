@@ -288,6 +288,22 @@ CONFIDENCE: [0.0-1.0]
       state.novelCausationsFound += newRelationships;
       state.causalChainsDiscovered = edges.length;
 
+      try {
+        const topChains = edges.slice(-newRelationships).map(e => {
+          const fromName = nodes.get(e.fromId)?.concept || e.fromId;
+          const toName = nodes.get(e.toId)?.concept || e.toId;
+          return `${fromName} → ${toName} (${(e.confidence * 100).toFixed(0)}%): ${e.mechanism}`;
+        }).join("\n");
+        await db.insert(omnimensBrain).values({
+          title: `[Causal] ${newRelationships} causal relationships discovered — cycle #${reasoningCycleCount}`,
+          content: `Causal reasoning discovered ${newRelationships} new cause-effect relationships.\n\n${topChains}\n\nTotal graph: ${nodes.size} nodes, ${edges.length} edges across ${state.domains.length} domains.`,
+          category: "causal_reasoning",
+          source: "causal_reasoning_engine",
+          active: true,
+          timesApplied: 0,
+        });
+      } catch {}
+
       state.strongestRelationships = edges
         .sort((a, b) => b.confidence - a.confidence)
         .slice(0, 10)

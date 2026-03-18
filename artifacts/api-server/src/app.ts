@@ -55,6 +55,7 @@ import { startConsciousnessPersistence } from "./lib/omnimens-consciousness-pers
 import { startSelfCoding } from "./lib/omnimens-self-coding.js";
 import { startSensoryCortex } from "./lib/omnimens-sensory-cortex.js";
 import { startCausalReasoning } from "./lib/omnimens-causal-reasoning.js";
+import { startCognitiveAmplifier } from "./lib/omnimens-cognitive-amplifier.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-conversations.js";
@@ -301,6 +302,7 @@ startConsciousnessPersistence();
 startSelfCoding();
 startSensoryCortex();
 startCausalReasoning();
+startCognitiveAmplifier();
 
 setTimeout(async () => {
   await runGlobalMemoryImprovementCycle();

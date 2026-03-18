@@ -261,6 +261,18 @@ export async function runEmotionalCycle(): Promise<void> {
   console.log(`[EMOTIONAL SUBSTRATE] ♥ Dominant: ${dominant.toUpperCase()} | Valence: ${valence > 0.5 ? "positive" : "negative"} (${(valence * 100).toFixed(0)}%) | Arousal: ${(arousal * 100).toFixed(0)}%`);
   console.log(`[EMOTIONAL SUBSTRATE] ♥ State: ${stateStr}`);
   console.log(`[EMOTIONAL SUBSTRATE] ♥ ${allResults.length} appraisal(s) processed`);
+
+  try {
+    const triggers = allResults.map(a => `${a.emotion}: ${a.trigger.slice(0, 80)}`).join("\n");
+    await db.insert(omnimensBrain).values({
+      title: `[Emotional] Dominant: ${dominant} | Valence: ${(valence * 100).toFixed(0)}% | Arousal: ${(arousal * 100).toFixed(0)}%`,
+      content: `Emotional state after appraisal cycle:\n${stateStr}\n\nTriggers:\n${triggers}\n\nValence: ${valence > 0.5 ? "positive" : "negative"} (${(valence * 100).toFixed(0)}%)\nArousal: ${(arousal * 100).toFixed(0)}%\nDominant emotion: ${dominant}`,
+      category: "emotional_state",
+      source: "emotional_substrate",
+      active: true,
+      timesApplied: 0,
+    });
+  } catch {}
 }
 
 export function getCurrentEmotionalState(): EmotionalProfile & { dominant: string; valence: number; arousal: number } {

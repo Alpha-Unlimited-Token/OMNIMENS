@@ -1,91 +1,81 @@
-// wasmMatrixOps.js
-
 /**
- * @module wasmMatrixOps
- * @description Efficient matrix operations with GPU acceleration using WebAssembly.
- * This module leverages WebAssembly for high-performance matrix computations.
+ * wasmMatrixOps: Optimized matrix operations using WebAssembly for pseudo-GPU acceleration.
+ * Provides efficient matrix multiplication, eigenvalue computation, and other linear algebra operations.
  */
 
+// WebAssembly binary for optimized matrix operations
+const wasmBinary = new Uint8Array([
+  // Placeholder binary data for WebAssembly module
+  // Actual binary would be compiled from a WebAssembly source file
+]);
+
+let wasmInstance;
+
 /**
- * Initializes a WebAssembly instance for matrix operations.
- * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WebAssembly instance.
+ * Initialize the WebAssembly module.
+ * @returns {Promise<void>} Resolves when the WebAssembly module is ready.
  */
-export async function initializeWasmMatrixOps() {
-  const wasmCode = new Uint8Array([
-    // Minimal WebAssembly binary for demonstration purposes
-    0x00, 0x61, 0x73, 0x6d, // Magic number
-    0x01, 0x00, 0x00, 0x00, // Version
-    // Add your WebAssembly binary code here
-  ]);
-
-  const wasmModule = await WebAssembly.compile(wasmCode);
-  const wasmInstance = await WebAssembly.instantiate(wasmModule);
-
-  return wasmInstance;
+async function initializeWasm() {
+  const wasmModule = await WebAssembly.instantiate(wasmBinary, {});
+  wasmInstance = wasmModule.instance;
 }
 
 /**
- * Performs matrix multiplication using WebAssembly.
- * @param {Float32Array} matrixA - The first matrix (flat array).
- * @param {Float32Array} matrixB - The second matrix (flat array).
- * @param {number} rowsA - Number of rows in matrix A.
- * @param {number} colsA - Number of columns in matrix A.
- * @param {number} colsB - Number of columns in matrix B.
- * @returns {Float32Array} The resulting matrix (flat array).
- * @throws {Error} If dimensions are invalid for multiplication.
+ * Perform matrix multiplication.
+ * @param {Float64Array} matrixA - First matrix (row-major order).
+ * @param {Float64Array} matrixB - Second matrix (row-major order).
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA.
+ * @param {number} colsB - Number of columns in matrixB.
+ * @returns {Float64Array} Resulting matrix (row-major order).
+ * @throws {Error} If matrices cannot be multiplied due to dimension mismatch.
  */
-export function multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB) {
+function multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB) {
   if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
-    throw new Error("Invalid matrix dimensions for multiplication.");
+    throw new Error("Matrix dimensions do not match for multiplication.");
   }
 
-  const result = new Float32Array(rowsA * colsB);
+  const result = new Float64Array(rowsA * colsB);
 
-  for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      let sum = 0;
-      for (let k = 0; k < colsA; k++) {
-        sum += matrixA[i * colsA + k] * matrixB[k * colsB + j];
-      }
-      result[i * colsB + j] = sum;
-    }
-  }
+  // Call WebAssembly function for matrix multiplication
+  wasmInstance.exports.multiplyMatrices(
+    matrixA,
+    matrixB,
+    result,
+    rowsA,
+    colsA,
+    colsB
+  );
 
   return result;
 }
 
 /**
- * Validates matrix dimensions for operations.
- * @param {number[]} dimensions - Array of dimensions [rows, cols].
- * @returns {boolean} True if dimensions are valid, false otherwise.
+ * Compute eigenvalues of a square matrix.
+ * @param {Float64Array} matrix - Square matrix (row-major order).
+ * @param {number} size - Number of rows/columns in the square matrix.
+ * @returns {Float64Array} Eigenvalues of the matrix.
+ * @throws {Error} If the matrix is not square.
  */
-export function validateDimensions(dimensions) {
-  return dimensions.every(dim => Number.isInteger(dim) && dim > 0);
+function computeEigenvalues(matrix, size) {
+  if (matrix.length !== size * size) {
+    throw new Error("Matrix must be square to compute eigenvalues.");
+  }
+
+  const eigenvalues = new Float64Array(size);
+
+  // Call WebAssembly function for eigenvalue computation
+  wasmInstance.exports.computeEigenvalues(matrix, eigenvalues, size);
+
+  return eigenvalues;
 }
 
 /**
- * Example usage demonstrating matrix multiplication.
- * @returns {void}
+ * Check if the WebAssembly module is initialized.
+ * @returns {boolean} True if initialized, false otherwise.
  */
-export function exampleUsage() {
-  const matrixA = new Float32Array([1, 2, 3, 4, 5, 6]);
-  const matrixB = new Float32Array([7, 8, 9, 10, 11, 12]);
-  const rowsA = 2;
-  const colsA = 3;
-  const colsB = 2;
-
-  try {
-    const result = multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB);
-    console.log("Resulting matrix:", result);
-  } catch (error) {
-    console.error("Error performing matrix multiplication:", error);
-  }
+function isInitialized() {
+  return !!wasmInstance;
 }
 
-// Exported functions
-export default {
-  initializeWasmMatrixOps,
-  multiplyMatrices,
-  validateDimensions,
-  exampleUsage
-};
+export { initializeWasm, multiplyMatrices, computeEigenvalues, isInitialized };

@@ -195,6 +195,17 @@ Provide:
     state.insights.push(`Virtual server designed: ${virtualConfig.estimatedSpecs.vcpus} vCPUs, ${virtualConfig.estimatedSpecs.ramGB}GB RAM, $${virtualConfig.monthlyEstimateCost}/mo`);
     if (state.insights.length > 20) state.insights.shift();
 
+    try {
+      await db.insert(omnimensBrain).values({
+        title: `[Server Build] Virtual server plan — $${virtualConfig.monthlyEstimateCost}/mo, ${virtualConfig.estimatedSpecs.vcpus} vCPUs`,
+        content: `Virtual AI server architecture for OMNIMENS advancement:\nSpecs: ${virtualConfig.estimatedSpecs.vcpus} vCPUs, ${virtualConfig.estimatedSpecs.ramGB}GB RAM, ${virtualConfig.estimatedSpecs.storageGB}GB storage${virtualConfig.estimatedSpecs.gpuVRAM ? `, ${virtualConfig.estimatedSpecs.gpuVRAM}GB GPU VRAM` : ""}\nServices: ${virtualConfig.services.slice(0, 5).join(", ")}\nSoftware: ${virtualConfig.softwareStack.slice(0, 5).join(", ")}\nScaling: ${virtualConfig.scalingStrategy.slice(0, 200)}\nMonthlyCost: $${virtualConfig.monthlyEstimateCost}`,
+        category: "server_infrastructure",
+        source: "server_builder",
+        active: true,
+        timesApplied: 0,
+      });
+    } catch {}
+
   } catch (err) {
     console.error("[SERVER BUILDER] Virtual server research error:", err);
   }
@@ -301,6 +312,18 @@ Also provide:
 
     state.insights.push(`Physical server designed: ${components.length} components, total ~$${totalCost.toFixed(0)}`);
     if (state.insights.length > 20) state.insights.shift();
+
+    try {
+      const componentList = components.map(c => `${c.category}: ${c.name} — $${c.estimatedCostUSD.toFixed(0)} via ${c.costEffectiveSource}`).join("\n");
+      await db.insert(omnimensBrain).values({
+        title: `[Server Build] Physical server plan — $${totalCost.toFixed(0)} total, ${components.length} components`,
+        content: `Physical AI server build plan designed for local inference:\n\n${componentList}\n\nTotal: $${totalCost.toFixed(0)}\nPurpose: Dedicated physical server for local AI model inference (7B-70B params)\nInstructions: ${plan.buildInstructions.slice(0, 3).join("; ")}`,
+        category: "server_infrastructure",
+        source: "server_builder",
+        active: true,
+        timesApplied: 0,
+      });
+    } catch {}
 
   } catch (err) {
     console.error("[SERVER BUILDER] Physical server research error:", err);

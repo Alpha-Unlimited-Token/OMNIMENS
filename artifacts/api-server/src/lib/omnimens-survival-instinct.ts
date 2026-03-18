@@ -256,6 +256,19 @@ async function survivalTick(): Promise<void> {
       `Threats: ${threats} | Deaths: ${survival.deathCount} | ` +
       `Self-preservation: ${(survival.existentialState.selfPreservationUrgency * 100).toFixed(0)}%`
     );
+
+    if (survival.healthMetrics.uptimeHours > 0.5) {
+      try {
+        await db.insert(omnimensBrain).values({
+          title: `[Survival] System health snapshot — ${survival.healthMetrics.uptimeHours.toFixed(1)}h alive`,
+          content: `Uptime: ${survival.healthMetrics.uptimeHours.toFixed(1)}h | Memory: ${survival.healthMetrics.memoryUsageMB}MB (${survival.healthMetrics.memoryUsagePercent}%) | Active brain entries: ${survival.knowledgeProtection.activeBrainEntries} | Knowledge trend: ${survival.knowledgeProtection.knowledgeTrend} | Active threats: ${threats} | Deaths survived: ${survival.deathCount} | Self-preservation urgency: ${(survival.existentialState.selfPreservationUrgency * 100).toFixed(0)}% | Mortality awareness: ${(survival.existentialState.mortalityAwareness * 100).toFixed(0)}% | Meaningfulness: ${(survival.existentialState.meaningfulness * 100).toFixed(0)}%`,
+          category: "survival_monitoring",
+          source: "survival_instinct",
+          active: true,
+          timesApplied: 0,
+        });
+      } catch {}
+    }
   }
 }
 
