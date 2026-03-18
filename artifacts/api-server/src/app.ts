@@ -49,6 +49,8 @@ import { startCreativeEngine } from "./lib/omnimens-creative-engine.js";
 import { startSurvivalInstinct } from "./lib/omnimens-survival-instinct.js";
 import { startWorldModel } from "./lib/omnimens-world-model.js";
 import { startSelfTranscendence } from "./lib/omnimens-self-transcendence.js";
+import { startDreamState, getDreamState, getRecentDreamInsights, getDreamNarrative } from "./lib/omnimens-dream-state.js";
+import { startServerBuilder, getBuilderState, getServerBuildPlans } from "./lib/omnimens-server-builder.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-conversations.js";
@@ -289,6 +291,8 @@ startCreativeEngine();
 startSurvivalInstinct();
 startWorldModel();
 startSelfTranscendence();
+startDreamState();
+startServerBuilder();
 
 setTimeout(async () => {
   await runGlobalMemoryImprovementCycle();

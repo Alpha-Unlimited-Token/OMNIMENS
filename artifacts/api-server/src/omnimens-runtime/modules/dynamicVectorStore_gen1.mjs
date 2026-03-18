@@ -1,108 +1,155 @@
 /**
  * @module dynamicVectorStore
- * @description A high-performance in-memory vector store for embedding retrieval and indexing,
- *              featuring approximate nearest neighbor search.
+ * @description Provides fast, in-memory storage and retrieval of vector embeddings using KD-tree for efficient querying.
+ * Designed for contextual reasoning and advanced AI capabilities.
  */
 
 /**
- * Represents a dynamic vector store for fast embedding storage and retrieval.
+ * Node.js built-in modules used
  */
-class DynamicVectorStore {
-  constructor() {
-    /**
-     * Internal hash map to store vectors by unique keys.
-     * @type {Map<string, number[]>}
-     */
-    this.vectorMap = new Map();
-  }
+const { performance } = require('perf_hooks');
 
-  /**
-   * Adds a new vector to the store.
-   * @param {string} key - Unique identifier for the vector.
-   * @param {number[]} vector - The embedding vector to store.
-   * @throws {Error} If the key already exists or the vector is invalid.
-   */
-  addVector(key, vector) {
-    if (this.vectorMap.has(key)) {
-      throw new Error(`Key '${key}' already exists in the vector store.`);
-    }
-    if (!Array.isArray(vector) || vector.some(isNaN)) {
-      throw new Error('Invalid vector: must be an array of numbers.');
-    }
-    this.vectorMap.set(key, vector);
-  }
-
-  /**
-   * Retrieves a vector by its key.
-   * @param {string} key - The unique identifier for the vector.
-   * @returns {number[] | null} The vector if found, or null if not.
-   */
-  getVector(key) {
-    return this.vectorMap.get(key) || null;
-  }
-
-  /**
-   * Finds the nearest neighbors to a given query vector using cosine similarity.
-   * @param {number[]} queryVector - The query embedding vector.
-   * @param {number} k - The number of nearest neighbors to retrieve.
-   * @returns {Array<{ key: string, similarity: number }>} An array of the k nearest neighbors with their similarity scores.
-   * @throws {Error} If the query vector is invalid or k is not a positive integer.
-   */
-  findNearestNeighbors(queryVector, k) {
-    if (!Array.isArray(queryVector) || queryVector.some(isNaN)) {
-      throw new Error('Invalid query vector: must be an array of numbers.');
-    }
-    if (!Number.isInteger(k) || k <= 0) {
-      throw new Error('Invalid k: must be a positive integer.');
-    }
-
-    /**
-     * Computes the cosine similarity between two vectors.
-     * @param {number[]} vecA - First vector.
-     * @param {number[]} vecB - Second vector.
-     * @returns {number} The cosine similarity score.
-     */
-    const cosineSimilarity = (vecA, vecB) => {
-      const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
-      const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
-      const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
-      return dotProduct / (magnitudeA * magnitudeB || 1);
-    };
-
-    const similarities = [];
-
-    for (const [key, vector] of this.vectorMap.entries()) {
-      if (vector.length !== queryVector.length) {
-        continue; // Skip vectors of mismatched dimensions.
-      }
-      const similarity = cosineSimilarity(queryVector, vector);
-      similarities.push({ key, similarity });
-    }
-
-    // Sort by similarity in descending order and return the top k results.
-    return similarities
-      .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, k);
-  }
-
-  /**
-   * Removes a vector from the store by its key.
-   * @param {string} key - The unique identifier for the vector to remove.
-   * @returns {boolean} True if the vector was removed, false if not found.
-   */
-  removeVector(key) {
-    return this.vectorMap.delete(key);
-  }
-
-  /**
-   * Clears all vectors from the store.
-   */
-  clearStore() {
-    this.vectorMap.clear();
+/**
+ * Represents a KD-tree node.
+ * @class
+ */
+class KDTreeNode {
+  constructor(point, axis) {
+    this.point = point; // The vector point stored in this node
+    this.axis = axis; // The axis used for splitting
+    this.left = null; // Left child node
+    this.right = null; // Right child node
   }
 }
 
 /**
- * Exports the DynamicVectorStore class.
+ * Builds a KD-tree from a set of points.
+ * @param {Array<number[]>} points - Array of vector embeddings.
+ * @param {number} depth - Current depth in the tree.
+ * @returns {KDTreeNode} Root node of the KD-tree.
  */
-export default DynamicVectorStore;
+function buildKDTree(points, depth = 0) {
+  if (points.length === 0) return null;
+
+  const axis = depth % points[0].length;
+  points.sort((a, b) => a[axis] - b[axis]);
+  const medianIndex = Math.floor(points.length / 2);
+
+  const node = new KDTreeNode(points[medianIndex], axis);
+  node.left = buildKDTree(points.slice(0, medianIndex), depth + 1);
+  node.right = buildKDTree(points.slice(medianIndex + 1), depth + 1);
+
+  return node;
+}
+
+/**
+ * Finds the nearest neighbor to a given point in the KD-tree.
+ * @param {KDTreeNode} node - Root node of the KD-tree.
+ * @param {number[]} target - Target vector to search for.
+ * @param {KDTreeNode|null} best - Current best match.
+ * @param {number} bestDistance - Distance of the current best match.
+ * @returns {Object} Nearest neighbor and its distance.
+ */
+function nearestNeighbor(node, target, best = null, bestDistance = Infinity) {
+  if (!node) return { best, bestDistance };
+
+  const distance = euclideanDistance(node.point, target);
+  let nextBest = best;
+  let nextBestDistance = bestDistance;
+
+  if (distance < bestDistance) {
+    nextBest = node;
+    nextBestDistance = distance;
+  }
+
+  const axis = node.axis;
+  const direction = target[axis] < node.point[axis] ? 'left' : 'right';
+
+  const { best: newBest, bestDistance: newBestDistance } = nearestNeighbor(
+    node[direction],
+    target,
+    nextBest,
+    nextBestDistance
+  );
+
+  nextBest = newBest;
+  nextBestDistance = newBestDistance;
+
+  const otherDirection = direction === 'left' ? 'right' : 'left';
+  if (Math.abs(target[axis] - node.point[axis]) < nextBestDistance) {
+    const { best: otherBest, bestDistance: otherBestDistance } = nearestNeighbor(
+      node[otherDirection],
+      target,
+      nextBest,
+      nextBestDistance
+    );
+
+    if (otherBestDistance < nextBestDistance) {
+      nextBest = otherBest;
+      nextBestDistance = otherBestDistance;
+    }
+  }
+
+  return { best: nextBest, bestDistance: nextBestDistance };
+}
+
+/**
+ * Calculates Euclidean distance between two points.
+ * @param {number[]} pointA - First vector.
+ * @param {number[]} pointB - Second vector.
+ * @returns {number} Euclidean distance.
+ */
+function euclideanDistance(pointA, pointB) {
+  return Math.sqrt(
+    pointA.reduce((sum, value, index) => sum + (value - pointB[index]) ** 2, 0)
+  );
+}
+
+/**
+ * Stores and queries vector embeddings using KD-tree.
+ * @class
+ */
+class DynamicVectorStore {
+  constructor() {
+    this.points = [];
+    this.tree = null;
+  }
+
+  /**
+   * Adds a vector embedding to the store.
+   * @param {number[]} vector - Vector embedding to add.
+   */
+  addVector(vector) {
+    if (!Array.isArray(vector) || vector.some(isNaN)) {
+      throw new Error('Invalid vector: must be an array of numbers.');
+    }
+    this.points.push(vector);
+    this.tree = buildKDTree(this.points);
+  }
+
+  /**
+   * Finds the nearest vector embedding to the given target.
+   * @param {number[]} target - Target vector to search for.
+   * @returns {Object} Nearest vector and its distance.
+   */
+  findNearest(target) {
+    if (!this.tree) {
+      throw new Error('No vectors stored. Add vectors before querying.');
+    }
+    if (!Array.isArray(target) || target.some(isNaN)) {
+      throw new Error('Invalid target: must be an array of numbers.');
+    }
+    const { best, bestDistance } = nearestNeighbor(this.tree, target);
+    return { vector: best.point, distance: bestDistance };
+  }
+}
+
+/**
+ * Exports
+ */
+module.exports = {
+  DynamicVectorStore,
+  buildKDTree,
+  nearestNeighbor,
+  euclideanDistance
+};

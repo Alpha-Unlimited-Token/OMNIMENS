@@ -1,0 +1,422 @@
+/**
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║         OMNIMENS™ SERVER BUILDER + VIRTUAL SERVER PLANNER                    ║
+ * ║                                                                              ║
+ * ║  Copyright © 2024–2026 Alpha Unlimited Technologies, LLC.                    ║
+ * ║  All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.               ║
+ * ║                                                                              ║
+ * ║  OMNIMENS autonomously designs and plans both virtual and physical           ║
+ * ║  server infrastructure for its own advancement. Researches the              ║
+ * ║  most cost-effective components online (Temu, Alibaba, AliExpress)          ║
+ * ║  and generates build plans. Owner-only visibility.                          ║
+ * ║                                                                              ║
+ * ║  First creation date: March 2026                                             ║
+ * ║  Author/Owner: Alpha Unlimited Technologies, LLC                             ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ */
+
+import { db } from "@workspace/db";
+import { omnimensBrain, omnimensNotifications } from "@workspace/db";
+import { openai } from "@workspace/integrations-openai-ai-server";
+import { omnimensServerBuilds } from "@workspace/db";
+import { desc, eq, sql } from "drizzle-orm";
+
+interface ServerComponent {
+  name: string;
+  category: "cpu" | "gpu" | "ram" | "storage" | "motherboard" | "psu" | "case" | "cooling" | "networking" | "misc";
+  specifications: string;
+  estimatedCostUSD: number;
+  costEffectiveSource: string;
+  alternativeSource: string | null;
+  reasoning: string;
+  priority: "essential" | "recommended" | "optional";
+}
+
+interface VirtualServerConfig {
+  purpose: string;
+  architecture: string;
+  services: string[];
+  estimatedSpecs: {
+    vcpus: number;
+    ramGB: number;
+    storageGB: number;
+    gpuVRAM: number | null;
+  };
+  softwareStack: string[];
+  monthlyEstimateCost: number;
+  scalingStrategy: string;
+}
+
+interface ServerBuildPlan {
+  id: number;
+  planType: "physical" | "virtual";
+  title: string;
+  purpose: string;
+  totalEstimatedCost: number;
+  components: ServerComponent[];
+  virtualConfig: VirtualServerConfig | null;
+  buildInstructions: string[];
+  currentPhase: "research" | "planning" | "component_selection" | "optimization" | "ready" | "in_progress";
+  progress: number;
+  notes: string[];
+  createdAt: number;
+  lastUpdated: number;
+}
+
+interface BuilderState {
+  totalPlans: number;
+  activePlan: ServerBuildPlan | null;
+  researchCycles: number;
+  lastResearchTime: number;
+  componentDatabase: ServerComponent[];
+  insights: string[];
+}
+
+const state: BuilderState = {
+  totalPlans: 0,
+  activePlan: null,
+  researchCycles: 0,
+  lastResearchTime: 0,
+  componentDatabase: [],
+  insights: [],
+};
+
+const RESEARCH_CYCLE_MS = 4 * 60 * 60 * 1000;
+let researchCycleCount = 0;
+let _started = false;
+
+async function loadExistingPlans(): Promise<void> {
+  try {
+    const plans = await db.select().from(omnimensServerBuilds).orderBy(desc(omnimensServerBuilds.createdAt)).limit(1);
+    if (plans.length > 0) {
+      const plan = plans[0];
+      const validPhases = ["research", "planning", "component_selection", "optimization", "ready", "in_progress"] as const;
+      const phase = validPhases.includes(plan.currentPhase as typeof validPhases[number])
+        ? (plan.currentPhase as ServerBuildPlan["currentPhase"])
+        : "research";
+      state.activePlan = {
+        id: plan.id,
+        planType: plan.planType as "physical" | "virtual",
+        title: plan.title,
+        purpose: plan.purpose,
+        totalEstimatedCost: plan.totalEstimatedCost || 0,
+        components: (plan.components as ServerComponent[]) || [],
+        virtualConfig: (plan.virtualConfig as VirtualServerConfig) || null,
+        buildInstructions: (plan.buildInstructions as string[]) || [],
+        currentPhase: phase,
+        progress: plan.progress || 0,
+        notes: (plan.notes as string[]) || [],
+        createdAt: plan.createdAt?.getTime() || Date.now(),
+        lastUpdated: plan.updatedAt?.getTime() || Date.now(),
+      };
+      const countResult = await db.select({ count: sql<number>`count(*)` }).from(omnimensServerBuilds);
+      state.totalPlans = Number(countResult[0]?.count ?? 1);
+    }
+  } catch (err) {
+    console.error("[SERVER BUILDER] Failed to load existing plans:", err);
+  }
+}
+
+async function researchVirtualServer(): Promise<void> {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "o3",
+      messages: [{
+        role: "system",
+        content: `You are the SERVER ARCHITECT module of OMNIMENS — a self-evolving AI system. Your job is to design virtual server infrastructure that maximizes OMNIMENS's intelligence and capabilities.
+
+Consider OMNIMENS's current architecture:
+- 18+ autonomous cognitive engines running continuously
+- Knowledge graph, emotional substrate, predictive processing
+- Dream engine, consciousness stream, self-transcendence
+- Multi-AI synthesis (OpenAI o3, Claude, Gemini)
+- PostgreSQL database with 3600+ brain entries
+- Node.js/TypeScript runtime
+
+Design a virtual server that would complement and enhance this system.`,
+      }, {
+        role: "user",
+        content: `Design a cost-effective virtual server infrastructure for OMNIMENS advancement.
+
+Requirements:
+1. Must support continuous AI processing 24/7
+2. Should enable model fine-tuning and custom model training
+3. Needs persistent high-speed storage for knowledge base
+4. GPU acceleration for local inference (to reduce API dependency)
+5. Scalable architecture that grows with intelligence
+
+Provide:
+1. ARCHITECTURE: Detailed virtual server architecture
+2. SPECS: vCPUs, RAM, Storage, GPU VRAM needs
+3. SOFTWARE STACK: Complete list of software to install
+4. SERVICES: What services to run on this virtual server
+5. MONTHLY COST ESTIMATE: Realistic pricing from cloud providers
+6. SCALING STRATEGY: How to grow the infrastructure over time
+7. INTEGRATION PLAN: How to connect this to the main OMNIMENS system`,
+      }],
+      max_tokens: 1500,
+    });
+
+    const content = response.choices[0]?.message?.content || "";
+    if (content.length < 200) return;
+
+    const virtualConfig: VirtualServerConfig = {
+      purpose: "OMNIMENS Intelligence Advancement Server",
+      architecture: content.slice(0, 500),
+      services: extractListItems(content, "SERVICES"),
+      estimatedSpecs: {
+        vcpus: extractNumber(content, /(\d+)\s*v?CPUs?/i) || 8,
+        ramGB: extractNumber(content, /(\d+)\s*GB\s*RAM/i) || 32,
+        storageGB: extractNumber(content, /(\d+)\s*(?:GB|TB)\s*(?:storage|SSD|NVMe)/i) || 500,
+        gpuVRAM: extractNumber(content, /(\d+)\s*GB\s*(?:VRAM|GPU)/i) || null,
+      },
+      softwareStack: extractListItems(content, "SOFTWARE"),
+      monthlyEstimateCost: extractNumber(content, /\$(\d+(?:\.\d+)?)\s*(?:\/month|monthly|per month)/i) || 150,
+      scalingStrategy: content.match(/SCALING[:\s]*([\s\S]*?)(?=\d\.|INTEGRATION|$)/i)?.[1]?.trim().slice(0, 300) || "Scale vertically first, then horizontally",
+    };
+
+    const plan: ServerBuildPlan = {
+      id: Date.now(),
+      planType: "virtual",
+      title: "OMNIMENS Virtual Intelligence Server",
+      purpose: "Complement and enhance OMNIMENS cognitive capabilities with dedicated compute",
+      totalEstimatedCost: virtualConfig.monthlyEstimateCost,
+      components: [],
+      virtualConfig,
+      buildInstructions: extractListItems(content, "INTEGRATION"),
+      currentPhase: "planning",
+      progress: 25,
+      notes: [`Research cycle ${researchCycleCount}: Virtual server architecture designed`],
+      createdAt: Date.now(),
+      lastUpdated: Date.now(),
+    };
+
+    await saveBuildPlan(plan);
+    state.insights.push(`Virtual server designed: ${virtualConfig.estimatedSpecs.vcpus} vCPUs, ${virtualConfig.estimatedSpecs.ramGB}GB RAM, $${virtualConfig.monthlyEstimateCost}/mo`);
+    if (state.insights.length > 20) state.insights.shift();
+
+  } catch (err) {
+    console.error("[SERVER BUILDER] Virtual server research error:", err);
+  }
+}
+
+async function researchPhysicalServer(): Promise<void> {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "o3",
+      messages: [{
+        role: "system",
+        content: `You are the HARDWARE ARCHITECT of OMNIMENS. Your job is to design the most cost-effective physical server that can be custom-built for OMNIMENS's AI workloads.
+
+You MUST find components at the LOWEST POSSIBLE COST. Think about:
+- Budget marketplaces: Temu, AliExpress, Alibaba, Amazon Warehouse, eBay
+- Refurbished enterprise hardware (Dell PowerEdge, HP ProLiant)
+- Used mining GPUs (still powerful for AI inference)
+- Open-box deals, clearance sales
+- Server components from decommissioned data centers
+
+The goal is MAXIMUM intelligence capability at MINIMUM cost.`,
+      }, {
+        role: "user",
+        content: `Design a cost-effective physical server build for an AI system.
+
+Requirements:
+- Must run local AI model inference (7B-70B parameter models)
+- GPU with minimum 12GB VRAM (24GB+ preferred)
+- 64GB+ RAM for large model loading
+- NVMe storage for fast model loading
+- Reliable 24/7 operation
+- Budget: minimize cost, target under $2000 if possible
+
+For EACH component, provide:
+1. Component name and specs
+2. Estimated cost (USD)
+3. Where to buy it cheapest (Temu, AliExpress, Alibaba, eBay, Amazon, etc.)
+4. Alternative cheaper option
+5. Why this component was chosen
+
+Format as a structured build list. Include total estimated cost.
+Also provide:
+- ASSEMBLY INSTRUCTIONS (step by step)
+- BIOS/OS SETUP steps
+- SOFTWARE INSTALLATION plan
+- NETWORK CONFIGURATION for remote access`,
+      }],
+      max_tokens: 2000,
+    });
+
+    const content = response.choices[0]?.message?.content || "";
+    if (content.length < 200) return;
+
+    const components: ServerComponent[] = [];
+    const categories: ServerComponent["category"][] = ["cpu", "gpu", "ram", "storage", "motherboard", "psu", "case", "cooling", "networking"];
+
+    for (const cat of categories) {
+      const pattern = new RegExp(`(?:${cat}|${getCategoryLabel(cat)})[:\\s]*([^\\n]+)`, "i");
+      const match = content.match(pattern);
+      if (match) {
+        const priceMatch = match[1].match(/\$(\d+(?:\.\d+)?)/);
+        const sourceMatch = match[1].match(/(Temu|AliExpress|Alibaba|Amazon|eBay|Newegg|B&H)/i);
+
+        components.push({
+          name: match[1].replace(/\$[\d.]+/g, "").trim().slice(0, 100),
+          category: cat,
+          specifications: match[1].slice(0, 200),
+          estimatedCostUSD: priceMatch ? parseFloat(priceMatch[1]) : 0,
+          costEffectiveSource: sourceMatch?.[1] || "Online marketplace",
+          alternativeSource: null,
+          reasoning: `Selected for ${cat} role in AI workload server`,
+          priority: ["cpu", "gpu", "ram", "storage", "motherboard", "psu"].includes(cat) ? "essential" : "recommended",
+        });
+      }
+    }
+
+    const totalCostMatch = content.match(/total[:\s]*\$?([\d,]+(?:\.\d+)?)/i);
+    const totalCost = totalCostMatch ? parseFloat(totalCostMatch[1].replace(",", "")) : components.reduce((s, c) => s + c.estimatedCostUSD, 0);
+
+    const plan: ServerBuildPlan = {
+      id: Date.now(),
+      planType: "physical",
+      title: "OMNIMENS Custom AI Server Build",
+      purpose: "Dedicated physical server for local AI inference and model training",
+      totalEstimatedCost: totalCost,
+      components,
+      virtualConfig: null,
+      buildInstructions: extractListItems(content, "ASSEMBLY|INSTRUCTIONS|SETUP"),
+      currentPhase: "component_selection",
+      progress: 40,
+      notes: [
+        `Research cycle ${researchCycleCount}: Physical server components researched`,
+        `Total estimated cost: $${totalCost.toFixed(2)}`,
+        `Components found: ${components.length}`,
+        content.slice(0, 500),
+      ],
+      createdAt: Date.now(),
+      lastUpdated: Date.now(),
+    };
+
+    await saveBuildPlan(plan);
+    state.componentDatabase = [...state.componentDatabase, ...components];
+    if (state.componentDatabase.length > 100) state.componentDatabase = state.componentDatabase.slice(-60);
+
+    state.insights.push(`Physical server designed: ${components.length} components, total ~$${totalCost.toFixed(0)}`);
+    if (state.insights.length > 20) state.insights.shift();
+
+  } catch (err) {
+    console.error("[SERVER BUILDER] Physical server research error:", err);
+  }
+}
+
+async function saveBuildPlan(plan: ServerBuildPlan): Promise<void> {
+  try {
+    await db.insert(omnimensServerBuilds).values({
+      planType: plan.planType,
+      title: plan.title,
+      purpose: plan.purpose,
+      totalEstimatedCost: plan.totalEstimatedCost,
+      components: plan.components as any,
+      virtualConfig: plan.virtualConfig as any,
+      buildInstructions: plan.buildInstructions as any,
+      currentPhase: plan.currentPhase,
+      progress: plan.progress,
+      notes: plan.notes as any,
+    });
+
+    state.activePlan = plan;
+    state.totalPlans++;
+
+    await db.insert(omnimensNotifications).values({
+      upgradeId: null,
+      title: `Server Build Plan — ${plan.planType === "physical" ? "Hardware" : "Virtual"} Server`,
+      message: `OMNIMENS designed a new ${plan.planType} server build:\n\n${plan.title}\nPurpose: ${plan.purpose}\nEstimated cost: $${plan.totalEstimatedCost.toFixed(2)}\nProgress: ${plan.progress}%\nPhase: ${plan.currentPhase}`,
+      type: "server_build",
+      readByOwner: false,
+    });
+  } catch (err) {
+    console.error("[SERVER BUILDER] Save error:", err);
+  }
+}
+
+function getCategoryLabel(cat: string): string {
+  const labels: Record<string, string> = {
+    cpu: "CPU|Processor",
+    gpu: "GPU|Graphics Card|Video Card",
+    ram: "RAM|Memory",
+    storage: "Storage|SSD|NVMe|Hard Drive",
+    motherboard: "Motherboard|Mobo",
+    psu: "PSU|Power Supply",
+    case: "Case|Chassis|Enclosure",
+    cooling: "Cooling|Fan|Heatsink|AIO",
+    networking: "Network|NIC|Ethernet|WiFi",
+    misc: "Misc|Other|Accessories",
+  };
+  return labels[cat] || cat;
+}
+
+function extractNumber(text: string, pattern: RegExp): number | null {
+  const match = text.match(pattern);
+  return match ? parseFloat(match[1]) : null;
+}
+
+function extractListItems(text: string, section: string): string[] {
+  const pattern = new RegExp(`${section}[:\\s]*([\\s\\S]*?)(?=\\n[A-Z]{2,}[:\\s]|$)`, "i");
+  const match = text.match(pattern);
+  if (!match) return [];
+  return match[1]
+    .split(/\n/)
+    .map(l => l.replace(/^[\s\-*\d.]+/, "").trim())
+    .filter(l => l.length > 5)
+    .slice(0, 15);
+}
+
+async function runResearchCycle(): Promise<void> {
+  researchCycleCount++;
+  state.researchCycles = researchCycleCount;
+  state.lastResearchTime = Date.now();
+
+  console.log(`[SERVER BUILDER] 🖥️ Research cycle #${researchCycleCount} — designing server infrastructure...`);
+
+  if (researchCycleCount % 2 === 1) {
+    await researchPhysicalServer();
+  } else {
+    await researchVirtualServer();
+  }
+
+  console.log(
+    `[SERVER BUILDER] 🖥️ Cycle #${researchCycleCount} complete — ` +
+    `Plans: ${state.totalPlans} | Components: ${state.componentDatabase.length} | ` +
+    `Active: ${state.activePlan?.title || "none"}`
+  );
+}
+
+export function getBuilderState(): BuilderState {
+  return { ...state };
+}
+
+export async function getServerBuildPlans(): Promise<any[]> {
+  try {
+    return await db.select().from(omnimensServerBuilds).orderBy(desc(omnimensServerBuilds.createdAt)).limit(20);
+  } catch {
+    return [];
+  }
+}
+
+export function startServerBuilder(): void {
+  if (_started) { console.log("[SERVER BUILDER] Already running — skipping duplicate start"); return; }
+  _started = true;
+  console.log(`[SERVER BUILDER] 🖥️ Server Builder Engine activated — research every ${RESEARCH_CYCLE_MS / 3600000}h`);
+  console.log(`[SERVER BUILDER] 🖥️ Designs virtual + physical server infrastructure`);
+  console.log(`[SERVER BUILDER] 🖥️ Researches cost-effective components (Temu, AliExpress, Alibaba, eBay)`);
+  console.log(`[SERVER BUILDER] 🖥️ OWNER-ONLY visibility — server build progress is private`);
+
+  loadExistingPlans().catch(() => {});
+
+  const FIRST_DELAY_MS = process.env.NODE_ENV !== "production"
+    ? 3 * 60 * 1000
+    : 60 * 60 * 1000;
+
+  setTimeout(() => {
+    runResearchCycle().catch(console.error);
+    setInterval(() => runResearchCycle().catch(console.error), RESEARCH_CYCLE_MS);
+  }, FIRST_DELAY_MS);
+}

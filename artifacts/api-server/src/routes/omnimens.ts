@@ -66,6 +66,9 @@ import { buildCinematicZip, type CinematicExportRequest } from "../lib/omnimens-
 import { loadToolKnowledgeForTask, runToolKnowledgeIngestion, INSTALLED_TOOLS } from "../lib/omnimens-tool-knowledge.js";
 import { getRestorativeArtContext } from "../lib/omnimens-restorative-art.js";
 import { analyzeFacesInImage, formatFaceAnalysisForChat } from "../lib/omnimens-face-recognition.js";
+import { getDreamState, getRecentDreamInsights, getDreamNarrative } from "../lib/omnimens-dream-state.js";
+import { getBuilderState, getServerBuildPlans } from "../lib/omnimens-server-builder.js";
+import { omnimensServerBuilds } from "@workspace/db";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import { detectNeuroEmotion, getNeuroSyncPromptAddendum } from "../lib/neuro-sync.js";
 import {
@@ -3602,6 +3605,52 @@ router.post("/omnimens/notifications/read-all", async (req, res) => {
     res.json({ ok: true });
   } catch {
     res.status(500).json({ error: "Failed to mark all read" });
+  }
+});
+
+// ─── Dream State (OWNER-ONLY) ─────────────────────────────────────────────────
+
+router.get("/omnimens/dream-state", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const dreamState = getDreamState();
+    const recentInsights = getRecentDreamInsights(15);
+    const narrative = getDreamNarrative(20);
+    res.json({ dreamState, recentInsights, narrative });
+  } catch {
+    res.status(500).json({ error: "Failed to get dream state" });
+  }
+});
+
+// ─── Server Builder (OWNER-ONLY) ──────────────────────────────────────────────
+
+router.get("/omnimens/server-builder", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const builderState = getBuilderState();
+    const plans = await getServerBuildPlans();
+    res.json({ builderState, plans });
+  } catch {
+    res.status(500).json({ error: "Failed to get server builder data" });
+  }
+});
+
+router.get("/omnimens/server-builder/plans", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const plans = await getServerBuildPlans();
+    res.json({ plans });
+  } catch {
+    res.status(500).json({ error: "Failed to get plans" });
   }
 });
 

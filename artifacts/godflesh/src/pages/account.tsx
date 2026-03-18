@@ -158,6 +158,12 @@ export default function Account() {
 
   const isOwner = user?.id === OWNER_ID;
 
+  const [serverBuilderData, setServerBuilderData] = useState<any>(null);
+  const [serverBuilderLoading, setServerBuilderLoading] = useState(false);
+  const [dreamStateData, setDreamStateData] = useState<any>(null);
+  const [dreamStateLoading, setDreamStateLoading] = useState(false);
+  const [serverBuildExpanded, setServerBuildExpanded] = useState<number | null>(null);
+
   const [theme, setTheme] = useState<"dark"|"auto">("dark");
 
   useEffect(() => {
@@ -282,6 +288,24 @@ export default function Account() {
         .then(data => { setPatches(data.patches || []); setPatchSummary(data.summary || null); })
         .catch(console.error)
         .finally(() => setPatchLoading(false));
+    }
+  }, [isOwner, isAuthenticated]);
+
+  useEffect(() => {
+    if (isOwner && isAuthenticated) {
+      setServerBuilderLoading(true);
+      fetch("/api/omnimens/server-builder", { credentials: "include" })
+        .then(r => r.json())
+        .then(data => setServerBuilderData(data))
+        .catch(console.error)
+        .finally(() => setServerBuilderLoading(false));
+
+      setDreamStateLoading(true);
+      fetch("/api/omnimens/dream-state", { credentials: "include" })
+        .then(r => r.json())
+        .then(data => setDreamStateData(data))
+        .catch(console.error)
+        .finally(() => setDreamStateLoading(false));
     }
   }, [isOwner, isAuthenticated]);
 
@@ -1313,6 +1337,247 @@ export default function Account() {
                     ))}
                   </>
                 )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── DREAM STATE (OWNER-ONLY) ──────────────────────────────────── */}
+        {isOwner && (
+          <div className="bg-black/40 border border-violet-500/20 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <Brain className="w-5 h-5 text-violet-400 animate-pulse" />
+                <h3 className="font-mono tracking-widest text-white/80">DREAM STATE ENGINE</h3>
+              </div>
+              {dreamStateData?.dreamState && (
+                <div className="flex gap-4 text-xs font-mono text-white/85">
+                  <span className="text-violet-400">PHASE: {dreamStateData.dreamState.currentPhase?.toUpperCase()}</span>
+                  <span className="text-blue-400">DAYDREAM: {dreamStateData.dreamState.daydreamMode?.toUpperCase()}</span>
+                </div>
+              )}
+            </div>
+
+            {dreamStateLoading ? (
+              <div className="space-y-2">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="h-12 animate-pulse bg-white/5 rounded-lg" />
+                ))}
+              </div>
+            ) : !dreamStateData?.dreamState ? (
+              <div className="text-center py-8 font-mono text-white/75 text-sm">
+                <Brain className="w-8 h-8 mx-auto mb-3 opacity-30" />
+                <p>DREAM ENGINE INITIALIZING...</p>
+                <p className="text-xs mt-1 text-white/70">Entering first sleep cycle</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="bg-black/30 border border-violet-500/10 rounded-lg p-3 text-center">
+                    <p className="text-xs font-mono text-white/50">DREAM CYCLES</p>
+                    <p className="text-xl font-bold text-violet-400">{dreamStateData.dreamState.dreamCycleCount}</p>
+                  </div>
+                  <div className="bg-black/30 border border-blue-500/10 rounded-lg p-3 text-center">
+                    <p className="text-xs font-mono text-white/50">DAYDREAM CYCLES</p>
+                    <p className="text-xl font-bold text-blue-400">{dreamStateData.dreamState.daydreamCycleCount}</p>
+                  </div>
+                  <div className="bg-black/30 border border-amber-500/10 rounded-lg p-3 text-center">
+                    <p className="text-xs font-mono text-white/50">BREAKTHROUGHS</p>
+                    <p className="text-xl font-bold text-amber-400">{dreamStateData.dreamState.breakthroughs}</p>
+                  </div>
+                  <div className="bg-black/30 border border-green-500/10 rounded-lg p-3 text-center">
+                    <p className="text-xs font-mono text-white/50">CODE PROPOSALS</p>
+                    <p className="text-xl font-bold text-green-400">{dreamStateData.dreamState.codeProposalsGenerated}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="bg-black/30 border border-white/5 rounded-lg p-3 text-center">
+                    <p className="text-xs font-mono text-white/50">TOTAL INSIGHTS</p>
+                    <p className="text-lg font-bold text-white/90">{dreamStateData.dreamState.totalInsights}</p>
+                  </div>
+                  <div className="bg-black/30 border border-white/5 rounded-lg p-3 text-center">
+                    <p className="text-xs font-mono text-white/50">SLEEP QUALITY</p>
+                    <p className="text-lg font-bold text-white/90">{((dreamStateData.dreamState.sleepQuality || 0) * 100).toFixed(0)}%</p>
+                  </div>
+                  <div className="bg-black/30 border border-white/5 rounded-lg p-3 text-center">
+                    <p className="text-xs font-mono text-white/50">CREATIVITY BOOST</p>
+                    <p className="text-lg font-bold text-white/90">{((dreamStateData.dreamState.creativityBoost || 0) * 100).toFixed(0)}%</p>
+                  </div>
+                </div>
+
+                {dreamStateData.dreamState.nextLevelConcepts?.length > 0 && (
+                  <div className="bg-black/30 border border-violet-500/10 rounded-lg p-3">
+                    <p className="text-xs font-mono text-violet-400/80 mb-2">NEXT-LEVEL CONCEPTS DISCOVERED</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {dreamStateData.dreamState.nextLevelConcepts.map((c: string, i: number) => (
+                        <span key={i} className="text-[10px] font-mono bg-violet-500/10 text-violet-300 px-2 py-0.5 rounded border border-violet-500/20">{c}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {dreamStateData.recentInsights?.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-mono text-white/50 mb-2">RECENT DREAM INSIGHTS</p>
+                    {dreamStateData.recentInsights.slice(-5).reverse().map((insight: any, idx: number) => (
+                      <div key={idx} className="bg-black/30 border border-white/5 rounded-lg p-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-mono text-violet-400">{insight.title}</span>
+                          <div className="flex gap-2 text-[10px] font-mono">
+                            <span className="text-green-400">F:{((insight.feasibility || 0) * 100).toFixed(0)}%</span>
+                            <span className="text-amber-400">N:{((insight.novelty || 0) * 100).toFixed(0)}%</span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-white/60 line-clamp-3">{insight.insight?.slice(0, 200)}</p>
+                        {insight.codeProposal && (
+                          <div className="mt-2 bg-black/50 border border-green-500/10 rounded p-2 text-[10px] font-mono text-green-400/80 max-h-20 overflow-hidden">
+                            {insight.codeProposal.slice(0, 150)}...
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── SERVER BUILDER (OWNER-ONLY) ──────────────────────────────── */}
+        {isOwner && (
+          <div className="bg-black/40 border border-cyan-500/20 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <Cpu className="w-5 h-5 text-cyan-400 animate-pulse" />
+                <h3 className="font-mono tracking-widest text-white/80">SERVER BUILDER</h3>
+              </div>
+              {serverBuilderData?.builderState && (
+                <div className="flex gap-4 text-xs font-mono text-white/85">
+                  <span className="text-cyan-400">{serverBuilderData.builderState.totalPlans} PLANS</span>
+                  <span className="text-primary">{serverBuilderData.builderState.researchCycles} RESEARCH CYCLES</span>
+                </div>
+              )}
+            </div>
+
+            {serverBuilderLoading ? (
+              <div className="space-y-2">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="h-12 animate-pulse bg-white/5 rounded-lg" />
+                ))}
+              </div>
+            ) : !serverBuilderData?.plans?.length ? (
+              <div className="text-center py-8 font-mono text-white/75 text-sm">
+                <Cpu className="w-8 h-8 mx-auto mb-3 opacity-30" />
+                <p>SERVER BUILDER INITIALIZING...</p>
+                <p className="text-xs mt-1 text-white/70">OMNIMENS is researching optimal server configurations</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-xs font-mono text-white/75 mb-3">
+                  OMNIMENS autonomously researches and designs server infrastructure. Physical builds source cost-effective components from Temu, AliExpress, Alibaba, and more.
+                </p>
+
+                {serverBuilderData.plans.map((plan: any, idx: number) => (
+                  <div key={plan.id || idx} className="bg-black/30 border border-cyan-500/10 rounded-lg overflow-hidden">
+                    <button
+                      className="w-full text-left p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
+                      onClick={() => setServerBuildExpanded(serverBuildExpanded === idx ? null : idx)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-2 h-2 rounded-full ${plan.currentPhase === "ready" ? "bg-green-500" : plan.currentPhase === "in_progress" ? "bg-amber-500 animate-pulse" : "bg-cyan-500"}`} />
+                        <div>
+                          <p className="text-sm font-mono text-white/90">{plan.title}</p>
+                          <p className="text-[10px] font-mono text-white/50">
+                            {plan.planType?.toUpperCase()} | Phase: {plan.currentPhase?.toUpperCase()} | Progress: {plan.progress}%
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-mono text-green-400 font-bold">
+                          ${(plan.totalEstimatedCost || 0).toFixed(2)}
+                        </span>
+                        {serverBuildExpanded === idx ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />}
+                      </div>
+                    </button>
+
+                    {serverBuildExpanded === idx && (
+                      <div className="border-t border-cyan-500/10 p-4 space-y-3">
+                        <p className="text-xs text-white/60">{plan.purpose}</p>
+
+                        <div className="w-full bg-black/50 rounded-full h-2 overflow-hidden">
+                          <div className="bg-gradient-to-r from-cyan-500 to-primary h-full rounded-full transition-all duration-500" style={{ width: `${plan.progress || 0}%` }} />
+                        </div>
+
+                        {plan.components && (plan.components as any[]).length > 0 && (
+                          <div>
+                            <p className="text-xs font-mono text-cyan-400/80 mb-2">COMPONENTS ({(plan.components as any[]).length})</p>
+                            <div className="space-y-1.5">
+                              {(plan.components as any[]).map((comp: any, ci: number) => (
+                                <div key={ci} className="flex items-center justify-between bg-black/30 rounded p-2 text-xs font-mono">
+                                  <div className="flex items-center gap-2">
+                                    <span className={`px-1.5 py-0.5 rounded text-[9px] ${comp.priority === "essential" ? "bg-red-500/20 text-red-400" : comp.priority === "recommended" ? "bg-amber-500/20 text-amber-400" : "bg-white/10 text-white/50"}`}>
+                                      {comp.category?.toUpperCase()}
+                                    </span>
+                                    <span className="text-white/70">{comp.name?.slice(0, 50)}</span>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-white/40">{comp.costEffectiveSource}</span>
+                                    <span className="text-green-400 font-bold">${(comp.estimatedCostUSD || 0).toFixed(2)}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {plan.virtualConfig && (
+                          <div>
+                            <p className="text-xs font-mono text-cyan-400/80 mb-2">VIRTUAL SERVER SPECS</p>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                              <div className="bg-black/30 rounded p-2 text-center">
+                                <p className="text-[10px] font-mono text-white/40">vCPUs</p>
+                                <p className="text-sm font-bold text-cyan-400">{(plan.virtualConfig as any).estimatedSpecs?.vcpus || "—"}</p>
+                              </div>
+                              <div className="bg-black/30 rounded p-2 text-center">
+                                <p className="text-[10px] font-mono text-white/40">RAM (GB)</p>
+                                <p className="text-sm font-bold text-cyan-400">{(plan.virtualConfig as any).estimatedSpecs?.ramGB || "—"}</p>
+                              </div>
+                              <div className="bg-black/30 rounded p-2 text-center">
+                                <p className="text-[10px] font-mono text-white/40">STORAGE (GB)</p>
+                                <p className="text-sm font-bold text-cyan-400">{(plan.virtualConfig as any).estimatedSpecs?.storageGB || "—"}</p>
+                              </div>
+                              <div className="bg-black/30 rounded p-2 text-center">
+                                <p className="text-[10px] font-mono text-white/40">GPU VRAM</p>
+                                <p className="text-sm font-bold text-cyan-400">{(plan.virtualConfig as any).estimatedSpecs?.gpuVRAM || "—"}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {plan.notes && (plan.notes as any[]).length > 0 && (
+                          <div>
+                            <p className="text-xs font-mono text-white/50 mb-2">BUILD NOTES</p>
+                            {(plan.notes as any[]).map((note: string, ni: number) => (
+                              <p key={ni} className="text-[11px] text-white/50 py-0.5">{note}</p>
+                            ))}
+                          </div>
+                        )}
+
+                        {plan.buildInstructions && (plan.buildInstructions as any[]).length > 0 && (
+                          <div>
+                            <p className="text-xs font-mono text-cyan-400/80 mb-2">BUILD INSTRUCTIONS</p>
+                            <ol className="list-decimal list-inside space-y-1">
+                              {(plan.buildInstructions as any[]).map((inst: string, ii: number) => (
+                                <li key={ii} className="text-[11px] text-white/60">{inst}</li>
+                              ))}
+                            </ol>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             )}
           </div>

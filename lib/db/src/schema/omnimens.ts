@@ -603,3 +603,20 @@ export const omnimensPredictions = pgTable("godflesh_predictions", {
   hierarchyLevel: integer("hierarchy_level").default(1).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// ─── Server Builder (OWNER-ONLY) ─────────────────────────────────────────────
+export const omnimensServerBuilds = pgTable("godflesh_server_builds", {
+  id: serial("id").primaryKey(),
+  planType: text("plan_type").notNull(),
+  title: text("title").notNull(),
+  purpose: text("purpose").notNull(),
+  totalEstimatedCost: real("total_estimated_cost").default(0).notNull(),
+  components: jsonb("components").$type<any[]>().default([]),
+  virtualConfig: jsonb("virtual_config"),
+  buildInstructions: jsonb("build_instructions").$type<string[]>().default([]),
+  currentPhase: text("current_phase").default("research").notNull(),
+  progress: integer("progress").default(0).notNull(),
+  notes: jsonb("notes").$type<string[]>().default([]),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
