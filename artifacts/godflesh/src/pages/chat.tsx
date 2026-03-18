@@ -4892,6 +4892,11 @@ export default function Chat() {
         credentials: "include",
         body: JSON.stringify({ question: q }),
       });
+      if (res.status === 403) {
+        try { const err = await res.json(); if (err.accountLocked) { setResonancePhase("idle"); return; } } catch {}
+        setResonancePhase("idle");
+        return;
+      }
       if (!res.ok) {
         setResonancePhase("idle");
         return;
@@ -4923,6 +4928,14 @@ export default function Chat() {
         credentials: "include",
         body: JSON.stringify({ question, context }),
       });
+      if (res.status === 403) {
+        try {
+          const err = await res.json();
+          if (err.accountLocked) { setResonancePhase("idle"); return; }
+        } catch {}
+        setResonancePhase("idle");
+        return;
+      }
       if (res.status === 402) {
         try {
           const err = await res.json();
@@ -5056,8 +5069,11 @@ export default function Chat() {
     setPendingFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const accountLocked = !!(status as any)?.accountLocked;
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (accountLocked) return;
     if ((!input.trim() && pendingFiles.length === 0) || isTyping) return;
     if (status && !status.isPro && !status.isOwner && (status as any).computeSecondsToday >= (status as any).dailyLimitSeconds) {
       setShowLimitModal(true);
@@ -5912,34 +5928,36 @@ export default function Chat() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(e); }
                 }}
-                placeholder={pendingFiles.length > 0 ? "Describe what to create with these files..." : "Query the intelligence... or attach files to build something"}
+                placeholder={accountLocked ? "ACCOUNT LOCKED — Pay outstanding balance to continue" : pendingFiles.length > 0 ? "Describe what to create with these files..." : "Query the intelligence... or attach files to build something"}
                 className="w-full rounded-xl pl-10 pr-28 sm:pr-[11rem] py-3.5 font-mono text-sm resize-none h-[56px] omnimens-scrollbar outline-none transition-all border focus:border-primary focus:ring-1 focus:ring-primary/50"
                 style={{
                   background: isLight ? "#f4f5f8" : "#0d1117",
-                  borderColor: isLight ? "rgba(168,85,247,0.25)" : "rgba(255,255,255,0.15)",
+                  borderColor: accountLocked ? "rgba(239,68,68,0.5)" : isLight ? "rgba(168,85,247,0.25)" : "rgba(255,255,255,0.15)",
                   color: isLight ? "#141722" : "#fff",
                 }}
-                disabled={isTyping}
+                disabled={isTyping || accountLocked}
               />
               <div className="absolute right-2 flex items-center gap-1">
-                {/* New App builder button */}
-                <BuildTriggerButton onClick={() => setShowNewAppModal(true)} />
-                {/* Templates picker */}
-                <button
-                  type="button"
-                  onClick={() => setShowTemplates(t => !t)}
-                  title="Smart Templates"
-                  className="text-white/40 hover:text-primary transition-colors w-7 h-7 flex items-center justify-center rounded"
-                >
-                  <LayoutTemplate className="w-3.5 h-3.5" />
-                </button>
+                {!accountLocked && (
+                  <>
+                    <BuildTriggerButton onClick={() => setShowNewAppModal(true)} />
+                    <button
+                      type="button"
+                      onClick={() => setShowTemplates(t => !t)}
+                      title="Smart Templates"
+                      className="text-white/40 hover:text-primary transition-colors w-7 h-7 flex items-center justify-center rounded"
+                    >
+                      <LayoutTemplate className="w-3.5 h-3.5" />
+                    </button>
+                  </>
+                )}
                 {isTyping ? (
                   <Button type="button" onClick={stopGeneration} size="icon" variant="ghost" className="text-white hover:text-white">
                     <StopCircle className="w-5 h-5" />
                   </Button>
                 ) : (
                   <Button type="submit" size="icon" variant="default"
-                    disabled={!input.trim() && pendingFiles.length === 0}
+                    disabled={(!input.trim() && pendingFiles.length === 0) || accountLocked}
                     className="rounded-lg w-10 h-10 shadow-none border-none"
                   >
                     <Send className="w-4 h-4 ml-1" />
@@ -6310,6 +6328,44 @@ export default function Chat() {
           isLight={isLight}
         />
 
+        {accountLocked && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }}
+              className="bg-[#0a0a12] border border-red-500/50 p-8 rounded-2xl max-w-lg w-full shadow-[0_0_80px_rgba(239,68,68,0.15)] text-center relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-red-500 via-red-400 to-red-500 animate-pulse" />
+              <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-5">
+                <Lock className="w-8 h-8 text-red-400" />
+              </div>
+              <h2 className="text-2xl font-display font-bold text-white tracking-[0.25em] mb-2 uppercase">Account Locked</h2>
+              <p className="text-red-300/80 font-mono text-xs tracking-wider mb-2">OUTSTANDING BALANCE DETECTED</p>
+              <p className="text-white/50 font-mono text-sm mb-2">
+                {(status as any)?.lockReason || "Your account has a negative credit balance."}
+              </p>
+              <p className="text-white/70 font-mono text-sm mb-8">
+                All platform features are suspended until your balance is settled.
+                {(status as any)?.outstandingBalanceCents > 0 && (
+                  <span className="block mt-2 text-red-400 font-bold text-base">
+                    Amount owed: ${((status as any).outstandingBalanceCents / 100).toFixed(2)}
+                  </span>
+                )}
+              </p>
+              <div className="flex flex-col gap-3">
+                <Button onClick={() => setLocation("/account")} size="lg" className="w-full bg-red-600 hover:bg-red-500 text-white border-none">
+                  <ArrowRight className="w-4 h-4 mr-2" />
+                  GO TO ACCOUNT — SETTLE BALANCE
+                </Button>
+                <p className="text-white/30 font-mono text-[10px]">
+                  Add or update your payment method to automatically settle the balance.
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
         {showLimitModal && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}

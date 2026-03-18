@@ -419,6 +419,14 @@ export function useOmnimensChat(
 
       if (!res.ok) {
         if (res.status === 403) {
+          try {
+            const errBody = await res.json();
+            if (errBody.accountLocked) {
+              setMessages((prev) => prev.filter((m) => m.id !== userMsgId));
+              setIsTyping(false);
+              return;
+            }
+          } catch {}
           onLimitReached();
           setMessages((prev) => prev.filter((m) => m.id !== userMsgId));
           setIsTyping(false);

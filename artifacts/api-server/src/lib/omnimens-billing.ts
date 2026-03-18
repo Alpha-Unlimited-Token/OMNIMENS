@@ -388,18 +388,24 @@ export async function settleOutstandingBalance(userId: string): Promise<{ settle
 export const settleResonanceBalance = settleOutstandingBalance;
 
 // ── Remove saved wallet ────────────────────────────────────────────────────────
-// Auto-settles ALL outstanding balances before removing the card
-export async function removeWallet(userId: string): Promise<{ ok: boolean; chargedCents?: number; error?: string }> {
+// If user owes money: charge their current card, THEN remove it.
+// If charge fails: block removal — they must add a new card first to cover the balance.
+export async function removeWallet(userId: string): Promise<{ ok: boolean; chargedCents?: number; error?: string; requireNewCard?: boolean }> {
   const [user] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, userId)).limit(1);
   if (!user) return { ok: true };
 
-  const hasNegativeRegular = (user.credits ?? 0) < 0;
-  const hasNegativeResonance = (user.resonanceCredits ?? 0) < 0;
+  const regularOwed = Math.abs(Math.min(0, user.credits ?? 0));
+  const resonanceOwed = Math.abs(Math.min(0, user.resonanceCredits ?? 0));
+  const totalOwed = regularOwed + resonanceOwed;
 
-  if (hasNegativeRegular || hasNegativeResonance) {
+  if (totalOwed > 0) {
     const settlement = await settleOutstandingBalance(userId);
     if (!settlement.settled) {
-      return { ok: false, error: settlement.error || "Cannot remove wallet — outstanding balance must be settled first." };
+      return {
+        ok: false,
+        requireNewCard: true,
+        error: `You owe $${(totalOwed / 100).toFixed(2)}. Your current card could not be charged. You must add a new payment method and settle the balance before removing your card.`,
+      };
     }
     await db.update(omnimensUsers)
       .set({ paymentMethodId: null, autoTopupEnabled: false })

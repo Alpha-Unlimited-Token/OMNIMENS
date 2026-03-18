@@ -226,6 +226,21 @@ function isOwner(userId: string): boolean {
   return !!ownerId && userId === ownerId;
 }
 
+async function checkAccountLock(userId: string): Promise<{ locked: boolean; reason?: string; outstandingCents?: number }> {
+  if (isOwner(userId)) return { locked: false };
+  const [user] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, userId)).limit(1);
+  if (!user) return { locked: false };
+  const regularOwed = Math.abs(Math.min(0, user.credits ?? 0));
+  const resonanceOwed = Math.abs(Math.min(0, user.resonanceCredits ?? 0));
+  const totalOwed = regularOwed + resonanceOwed;
+  if (totalOwed <= 0) return { locked: false };
+  return {
+    locked: true,
+    reason: `Account locked — outstanding balance of $${(totalOwed / 100).toFixed(2)}. Pay your balance or enable AutoPay to continue using OMNIMENS.`,
+    outstandingCents: totalOwed,
+  };
+}
+
 function isBuildRequest(message: string): boolean {
   return /\b(build|create|make|generate|write|design|develop|code)\b.*\b(website|site|page|app|landing|portfolio|store|shop|html|web|diagram|chart|svg|blueprint|3d|animation|video|movie|image|photo|logo|banner|template)\b/i.test(message)
     || /\b(website|site|landing page|web app|diagram|blueprint|animation|video|movie)\b.*\b(build|create|make|generate)\b/i.test(message)
@@ -973,14 +988,33 @@ router.get("/omnimens/status", async (req, res) => {
   const user = await getOrCreateUser(req.user.id, req.user.username);
   const owner = isOwner(req.user.id);
   const credits = owner ? Infinity : (user.credits ?? 0);
+
+  const regularOwed = Math.min(0, user.credits ?? 0);
+  const resonanceOwed = Math.min(0, user.resonanceCredits ?? 0);
+  const totalOwedCredits = Math.abs(regularOwed) + Math.abs(resonanceOwed);
+  const outstandingBalanceCents = totalOwedCredits;
+  const accountLocked = !owner && totalOwedCredits > 0;
+
+  let lockReason: string | null = null;
+  if (accountLocked) {
+    const parts: string[] = [];
+    if (regularOwed < 0) parts.push(`Regular credits: -${Math.abs(regularOwed)} ($${(Math.abs(regularOwed) / 100).toFixed(2)})`);
+    if (resonanceOwed < 0) parts.push(`Resonance credits: -${Math.abs(resonanceOwed)} ($${(Math.abs(resonanceOwed) / 100).toFixed(2)})`);
+    lockReason = `Outstanding balance of $${(outstandingBalanceCents / 100).toFixed(2)} must be paid. ${parts.join(". ")}. Your account is locked until payment is received.`;
+  }
+
   res.json({
     isOwner: owner,
-    credits: owner ? null : credits,  // null = unlimited (owner)
+    credits: owner ? null : credits,
     hasCredits: owner || credits > 0,
     stripeCustomerId: user.stripeCustomerId,
-    isPro: owner || credits > 0,       // has any credits = "pro" for UI purposes
-    // Legacy fields kept for compatibility
+    isPro: owner || credits > 0,
     tier: owner ? "sovereign" : credits > 0 ? "credits" : "free",
+    accountLocked,
+    lockReason,
+    outstandingBalanceCents: owner ? 0 : outstandingBalanceCents,
+    resonanceCredits: owner ? null : (user.resonanceCredits ?? 0),
+    hasWallet: !!user.paymentMethodId,
   });
 });
 
@@ -989,6 +1023,12 @@ router.get("/omnimens/status", async (req, res) => {
 router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Not authenticated" });
+    return;
+  }
+
+  const lockStatus = await checkAccountLock(req.user.id);
+  if (lockStatus.locked) {
+    res.status(403).json({ error: lockStatus.reason, accountLocked: true, outstandingCents: lockStatus.outstandingCents });
     return;
   }
 
@@ -2586,6 +2626,8 @@ router.get("/omnimens/personas", (_req, res) => {
 
 router.post("/omnimens/execute-code", async (req, res) => {
   if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const lockStatus = await checkAccountLock(req.user.id);
+  if (lockStatus.locked) { res.status(403).json({ error: lockStatus.reason, accountLocked: true, outstandingCents: lockStatus.outstandingCents }); return; }
 
   const { code, language } = req.body;
   if (!code?.trim()) { res.status(400).json({ error: "Code required" }); return; }
@@ -2645,6 +2687,8 @@ router.post("/omnimens/execute-code", async (req, res) => {
 
 router.post("/omnimens/deep-research", async (req, res) => {
   if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const lockStatus = await checkAccountLock(req.user.id);
+  if (lockStatus.locked) { res.status(403).json({ error: lockStatus.reason, accountLocked: true, outstandingCents: lockStatus.outstandingCents }); return; }
 
   const { question } = req.body;
   if (!question?.trim()) { res.status(400).json({ error: "Question required" }); return; }
@@ -2707,6 +2751,8 @@ router.post("/omnimens/deep-research", async (req, res) => {
 
 router.post("/omnimens/deep-resonance/inquiry", async (req, res) => {
   if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const lockStatus = await checkAccountLock(req.user.id);
+  if (lockStatus.locked) { res.status(403).json({ error: lockStatus.reason, accountLocked: true, outstandingCents: lockStatus.outstandingCents }); return; }
   const { question } = req.body;
   if (!question?.trim()) { res.status(400).json({ error: "Question required" }); return; }
   try {
@@ -2719,6 +2765,8 @@ router.post("/omnimens/deep-resonance/inquiry", async (req, res) => {
 
 router.post("/omnimens/deep-resonance/run", async (req, res) => {
   if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const lockStatus = await checkAccountLock(req.user.id);
+  if (lockStatus.locked) { res.status(403).json({ error: lockStatus.reason, accountLocked: true, outstandingCents: lockStatus.outstandingCents }); return; }
 
   const { question, context } = req.body;
   if (!question?.trim()) { res.status(400).json({ error: "Question required" }); return; }
@@ -2828,6 +2876,8 @@ router.post("/omnimens/resonance/purchase", async (req, res) => {
 
 router.post("/omnimens/analyze-url", async (req, res) => {
   if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const lockStatus = await checkAccountLock(req.user.id);
+  if (lockStatus.locked) { res.status(403).json({ error: lockStatus.reason, accountLocked: true, outstandingCents: lockStatus.outstandingCents }); return; }
   const { url } = req.body;
   if (!url) { res.status(400).json({ error: "URL required" }); return; }
   const result = await fetchUrlContent(url);
@@ -3097,7 +3147,10 @@ router.post("/omnimens/remove-wallet", async (req, res) => {
   try {
     const result = await removeWallet(req.user.id);
     if (!result.ok) {
-      res.status(402).json({ error: result.error || "Cannot remove wallet — outstanding balance." });
+      res.status(402).json({
+        error: result.error || "Cannot remove wallet — outstanding balance.",
+        requireNewCard: result.requireNewCard || false,
+      });
       return;
     }
     res.json({
