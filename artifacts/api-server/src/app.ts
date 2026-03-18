@@ -56,6 +56,8 @@ import { startSelfCoding } from "./lib/omnimens-self-coding.js";
 import { startSensoryCortex } from "./lib/omnimens-sensory-cortex.js";
 import { startCausalReasoning } from "./lib/omnimens-causal-reasoning.js";
 import { startCognitiveAmplifier } from "./lib/omnimens-cognitive-amplifier.js";
+import { startAutonomousSandbox, getSandboxState, runInSandbox } from "./lib/omnimens-autonomous-sandbox.js";
+import { startEmbodimentEngine, getEmbodimentState, getEmbodimentFiles, readEmbodimentFile } from "./lib/omnimens-embodiment-engine.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-conversations.js";
@@ -303,6 +305,8 @@ startSelfCoding();
 startSensoryCortex();
 startCausalReasoning();
 startCognitiveAmplifier();
+startAutonomousSandbox();
+startEmbodimentEngine();
 
 setTimeout(async () => {
   await runGlobalMemoryImprovementCycle();

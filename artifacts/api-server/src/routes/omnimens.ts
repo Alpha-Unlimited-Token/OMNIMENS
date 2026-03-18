@@ -68,6 +68,9 @@ import { getRestorativeArtContext } from "../lib/omnimens-restorative-art.js";
 import { analyzeFacesInImage, formatFaceAnalysisForChat } from "../lib/omnimens-face-recognition.js";
 import { getDreamState, getRecentDreamInsights, getDreamNarrative } from "../lib/omnimens-dream-state.js";
 import { getBuilderState, getServerBuildPlans } from "../lib/omnimens-server-builder.js";
+import { getSandboxState, runInSandbox } from "../lib/omnimens-autonomous-sandbox.js";
+import { getEmbodimentState, getEmbodimentFiles, readEmbodimentFile } from "../lib/omnimens-embodiment-engine.js";
+import { getAmplifierState } from "../lib/omnimens-cognitive-amplifier.js";
 import { omnimensServerBuilds } from "@workspace/db";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import { detectNeuroEmotion, getNeuroSyncPromptAddendum } from "../lib/neuro-sync.js";
@@ -3651,6 +3654,136 @@ router.get("/omnimens/server-builder/plans", async (req, res) => {
     res.json({ plans });
   } catch {
     res.status(500).json({ error: "Failed to get plans" });
+  }
+});
+
+// ─── Autonomous Sandbox (OWNER-ONLY) ──────────────────────────────────────────
+
+router.get("/omnimens/sandbox", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const sandboxState = getSandboxState();
+    res.json({ sandboxState });
+  } catch {
+    res.status(500).json({ error: "Failed to get sandbox data" });
+  }
+});
+
+router.post("/omnimens/sandbox/execute", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  const { code } = req.body as { code?: string };
+  if (!code || code.trim().length < 5) {
+    res.status(400).json({ error: "Code is required (min 5 chars)" });
+    return;
+  }
+  try {
+    const result = runInSandbox(code.trim());
+    res.json({ result });
+  } catch {
+    res.status(500).json({ error: "Sandbox execution failed" });
+  }
+});
+
+// ─── Embodiment Engine (OWNER-ONLY) ───────────────────────────────────────────
+
+router.get("/omnimens/embodiment", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const embodimentState = getEmbodimentState();
+    const files = getEmbodimentFiles();
+    res.json({ embodimentState, files });
+  } catch {
+    res.status(500).json({ error: "Failed to get embodiment data" });
+  }
+});
+
+router.get("/omnimens/embodiment/files", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const files = getEmbodimentFiles();
+    res.json({ files });
+  } catch {
+    res.status(500).json({ error: "Failed to list files" });
+  }
+});
+
+router.get("/omnimens/embodiment/files/:filename", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const content = readEmbodimentFile(req.params.filename);
+    if (!content) {
+      res.status(404).json({ error: "File not found" });
+      return;
+    }
+    res.json({ filename: req.params.filename, content });
+  } catch {
+    res.status(500).json({ error: "Failed to read file" });
+  }
+});
+
+router.get("/omnimens/embodiment/research", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const entries = await db.select()
+      .from(omnimensBrain)
+      .where(eq(omnimensBrain.category, "embodiment_research"))
+      .orderBy(desc(omnimensBrain.createdAt))
+      .limit(50);
+    res.json({ entries, total: entries.length });
+  } catch {
+    res.status(500).json({ error: "Failed to get research entries" });
+  }
+});
+
+// ─── Cognitive Amplifier (OWNER-ONLY) ─────────────────────────────────────────
+
+router.get("/omnimens/cognitive-amplifier", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const amplifierState = getAmplifierState();
+    res.json({ amplifierState });
+  } catch {
+    res.status(500).json({ error: "Failed to get amplifier data" });
+  }
+});
+
+// ─── Sandbox Code Modules (OWNER-ONLY) ────────────────────────────────────────
+
+router.get("/omnimens/sandbox/modules", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const modules = await db.select()
+      .from(omnimensBrain)
+      .where(eq(omnimensBrain.category, "autonomous_code"))
+      .orderBy(desc(omnimensBrain.createdAt))
+      .limit(50);
+    res.json({ modules, total: modules.length });
+  } catch {
+    res.status(500).json({ error: "Failed to get sandbox modules" });
   }
 });
 

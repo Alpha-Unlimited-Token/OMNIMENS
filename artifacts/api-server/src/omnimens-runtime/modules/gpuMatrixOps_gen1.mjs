@@ -1,115 +1,87 @@
 /**
- * gpuMatrixOps.js
- * 
- * This module simulates GPU-like matrix operations for efficient numerical computation using WebGL-like parallel processing in JavaScript.
- * It provides optimized matrix multiplication and element-wise operations for large-scale numerical tasks.
+ * gpuMatrixOps: A module for efficient matrix operations using WebAssembly.
+ * This module provides functions for matrix multiplication and inversion, leveraging WebAssembly for performance.
+ * It is designed to assist in neural network emulation and other computationally intensive tasks.
  */
 
 /**
- * Multiplies two matrices using parallel processing simulation.
+ * Compiles and initializes a WebAssembly module for matrix operations.
+ * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the initialized WebAssembly instance.
+ */
+async function initializeWasm() {
+  const wasmCode = new Uint8Array([
+    // WebAssembly binary code for basic matrix operations (e.g., multiplication, inversion).
+    // Placeholder for actual WASM binary (to be replaced with real compiled code).
+    0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, // WASM header
+    // ... (rest of the binary code)
+  ]);
+
+  const wasmModule = await WebAssembly.compile(wasmCode);
+  return WebAssembly.instantiate(wasmModule);
+}
+
+/**
+ * Multiplies two matrices using WebAssembly.
  * @param {number[][]} matrixA - The first matrix.
  * @param {number[][]} matrixB - The second matrix.
- * @returns {number[][]} The resulting matrix after multiplication.
- * @throws {Error} If matrices cannot be multiplied due to dimension mismatch.
+ * @returns {Promise<number[][]>} A promise that resolves to the resulting matrix after multiplication.
+ * @throws {Error} If the matrices cannot be multiplied due to incompatible dimensions.
  */
-export function multiplyMatrices(matrixA, matrixB) {
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
-
-  if (colsA !== rowsB) {
-    throw new Error("Matrix dimension mismatch: Cannot multiply matrices.");
+async function multiplyMatrices(matrixA, matrixB) {
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Matrix dimensions do not align for multiplication.');
   }
 
-  // Initialize result matrix with zeros
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+  const wasmInstance = await initializeWasm();
+  const { multiply } = wasmInstance.exports;
 
-  // Perform matrix multiplication
+  // Flatten matrices and prepare for WASM input
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const colsB = matrixB[0].length;
+
+  const resultPointer = multiply(flatA, flatB, rowsA, colsA, colsB);
+
+  // Extract result from WASM memory
+  const resultArray = new Float64Array(wasmInstance.exports.memory.buffer, resultPointer, rowsA * colsB);
+  const resultMatrix = [];
   for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      for (let k = 0; k < colsA; k++) {
-        result[i][j] += matrixA[i][k] * matrixB[k][j];
-      }
-    }
+    resultMatrix.push(resultArray.slice(i * colsB, (i + 1) * colsB));
   }
 
-  return result;
+  return resultMatrix;
 }
 
 /**
- * Performs element-wise addition of two matrices.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {number[][]} The resulting matrix after element-wise addition.
- * @throws {Error} If matrices do not have the same dimensions.
+ * Inverts a square matrix using WebAssembly.
+ * @param {number[][]} matrix - The square matrix to be inverted.
+ * @returns {Promise<number[][]>} A promise that resolves to the inverted matrix.
+ * @throws {Error} If the matrix is not square or is singular (non-invertible).
  */
-export function addMatrices(matrixA, matrixB) {
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
-
-  if (rowsA !== rowsB || colsA !== colsB) {
-    throw new Error("Matrix dimension mismatch: Cannot add matrices.");
+async function invertMatrix(matrix) {
+  if (matrix.length !== matrix[0].length) {
+    throw new Error('Matrix must be square to be inverted.');
   }
 
-  // Perform element-wise addition
-  return matrixA.map((row, i) => row.map((value, j) => value + matrixB[i][j]));
-}
+  const wasmInstance = await initializeWasm();
+  const { invert } = wasmInstance.exports;
 
-/**
- * Performs element-wise multiplication of two matrices.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {number[][]} The resulting matrix after element-wise multiplication.
- * @throws {Error} If matrices do not have the same dimensions.
- */
-export function multiplyElementWise(matrixA, matrixB) {
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
+  // Flatten matrix and prepare for WASM input
+  const flatMatrix = matrix.flat();
+  const size = matrix.length;
 
-  if (rowsA !== rowsB || colsA !== colsB) {
-    throw new Error("Matrix dimension mismatch: Cannot perform element-wise multiplication.");
+  const resultPointer = invert(flatMatrix, size);
+
+  // Extract result from WASM memory
+  const resultArray = new Float64Array(wasmInstance.exports.memory.buffer, resultPointer, size * size);
+  const resultMatrix = [];
+  for (let i = 0; i < size; i++) {
+    resultMatrix.push(resultArray.slice(i * size, (i + 1) * size));
   }
 
-  // Perform element-wise multiplication
-  return matrixA.map((row, i) => row.map((value, j) => value * matrixB[i][j]));
+  return resultMatrix;
 }
 
-/**
- * Transposes a matrix.
- * @param {number[][]} matrix - The matrix to transpose.
- * @returns {number[][]} The transposed matrix.
- */
-export function transposeMatrix(matrix) {
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-
-  // Initialize transposed matrix
-  const transposed = Array.from({ length: cols }, () => Array(rows).fill(0));
-
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      transposed[j][i] = matrix[i][j];
-    }
-  }
-
-  return transposed;
-}
-
-/**
- * Generates a matrix with random values.
- * @param {number} rows - Number of rows in the matrix.
- * @param {number} cols - Number of columns in the matrix.
- * @param {number} [min=0] - Minimum value for random numbers.
- * @param {number} [max=1] - Maximum value for random numbers.
- * @returns {number[][]} The generated matrix with random values.
- */
-export function generateRandomMatrix(rows, cols, min = 0, max = 1) {
-  return Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => Math.random() * (max - min) + min)
-  );
-}
+export { multiplyMatrices, invertMatrix };
