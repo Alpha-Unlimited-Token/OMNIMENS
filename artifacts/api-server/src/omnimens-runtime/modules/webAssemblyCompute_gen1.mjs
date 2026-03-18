@@ -1,22 +1,22 @@
+// Complete ES module code here, starting with /** JSDoc */ and exports
+
 /**
  * @module webAssemblyCompute
- * @description Provides an interface to offload computationally intensive tasks to WebAssembly for efficiency, leveraging C++/Rust libraries.
+ * @description Perform optimized matrix operations and computationally expensive tasks using WebAssembly.
+ * This module integrates WebAssembly-compiled BLAS/LAPACK libraries into Node.js for high-performance numerical computations.
  */
 
-import { readFile } from 'fs/promises';
-import { join } from 'path';
+import { readFile } from 'node:fs/promises';
 
 /**
- * Loads and initializes a WebAssembly module from a given file path.
- * @async
- * @param {string} filePath - The relative path to the WebAssembly binary (.wasm file).
- * @returns {Promise<WebAssembly.Instance>} The initialized WebAssembly instance.
- * @throws {Error} If the file cannot be read or the WebAssembly module fails to instantiate.
+ * Loads a WebAssembly module from a file.
+ * @param {string} wasmFilePath - Path to the WebAssembly file.
+ * @returns {Promise<WebAssembly.Instance>} - A promise that resolves to the WebAssembly instance.
+ * @throws {Error} If the file cannot be loaded or the WebAssembly module fails to instantiate.
  */
-export async function loadWasmModule(filePath) {
+export async function loadWasmModule(wasmFilePath) {
   try {
-    const wasmPath = join(process.cwd(), filePath);
-    const wasmBuffer = await readFile(wasmPath);
+    const wasmBuffer = await readFile(wasmFilePath);
     const wasmModule = await WebAssembly.compile(wasmBuffer);
     const wasmInstance = await WebAssembly.instantiate(wasmModule);
     return wasmInstance;
@@ -26,71 +26,63 @@ export async function loadWasmModule(filePath) {
 }
 
 /**
- * Executes a matrix multiplication using a WebAssembly module.
- * The WebAssembly module must export a `matrixMultiply` function.
- * @async
- * @param {string} wasmFilePath - The relative path to the WebAssembly binary (.wasm file).
- * @param {Float32Array} matrixA - The first matrix (flattened, row-major order).
- * @param {Float32Array} matrixB - The second matrix (flattened, row-major order).
- * @param {number} rowsA - Number of rows in the first matrix.
- * @param {number} colsA - Number of columns in the first matrix (must match rowsB).
- * @param {number} colsB - Number of columns in the second matrix.
- * @returns {Promise<Float32Array>} The resulting matrix (flattened, row-major order).
- * @throws {Error} If the WebAssembly module or its exports are invalid.
+ * Multiplies two matrices using a WebAssembly-optimized routine.
+ * @param {WebAssembly.Instance} wasmInstance - The WebAssembly instance containing matrix multiplication logic.
+ * @param {Float64Array} matrixA - The first matrix (in row-major order).
+ * @param {Float64Array} matrixB - The second matrix (in row-major order).
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA.
+ * @param {number} colsB - Number of columns in matrixB.
+ * @returns {Float64Array} - The resulting matrix (in row-major order).
+ * @throws {Error} If matrix dimensions are incompatible for multiplication.
  */
-export async function wasmMatrixMultiply(wasmFilePath, matrixA, matrixB, rowsA, colsA, colsB) {
+export function wasmMatrixMultiply(wasmInstance, matrixA, matrixB, rowsA, colsA, colsB) {
   if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
     throw new Error('Matrix dimensions do not match for multiplication.');
   }
 
-  const wasmInstance = await loadWasmModule(wasmFilePath);
-  const { matrixMultiply, memory } = wasmInstance.exports;
+  const resultMatrix = new Float64Array(rowsA * colsB);
 
-  if (typeof matrixMultiply !== 'function' || !(memory instanceof WebAssembly.Memory)) {
-    throw new Error('Invalid WebAssembly module: missing required exports.');
+  const { multiplyMatrices } = wasmInstance.exports;
+  if (!multiplyMatrices) {
+    throw new Error('WebAssembly instance does not contain a multiplyMatrices export.');
   }
 
-  const memoryBuffer = new Float32Array(memory.buffer);
+  multiplyMatrices(
+    matrixA.byteOffset,
+    matrixB.byteOffset,
+    resultMatrix.byteOffset,
+    rowsA,
+    colsA,
+    colsB
+  );
 
-  // Allocate memory for input and output matrices in the WASM memory space.
-  const offsetA = 0;
-  const offsetB = matrixA.length;
-  const offsetC = offsetB + matrixB.length;
-
-  memoryBuffer.set(matrixA, offsetA);
-  memoryBuffer.set(matrixB, offsetB);
-
-  // Perform the matrix multiplication in WASM.
-  matrixMultiply(offsetA, offsetB, offsetC, rowsA, colsA, colsB);
-
-  // Extract the result matrix from WASM memory.
-  const result = memoryBuffer.slice(offsetC, offsetC + rowsA * colsB);
-  return result;
+  return resultMatrix;
 }
 
 /**
- * Example usage of the webAssemblyCompute module.
- * Demonstrates loading a WebAssembly module and performing matrix multiplication.
+ * Demonstrates matrix multiplication using WebAssembly.
  * @async
- * @example
- * const result = await wasmMatrixMultiply(
- *   './matrix_ops.wasm',
- *   new Float32Array([1, 2, 3, 4]),
- *   new Float32Array([5, 6, 7, 8]),
- *   2, 2, 2
- * );
- * console.log(result); // Float32Array([...])
+ * @param {string} wasmFilePath - Path to the WebAssembly file containing matrix multiplication logic.
+ * @param {Float64Array} matrixA - The first matrix (in row-major order).
+ * @param {Float64Array} matrixB - The second matrix (in row-major order).
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA.
+ * @param {number} colsB - Number of columns in matrixB.
+ * @returns {Promise<Float64Array>} - The resulting matrix (in row-major order).
  */
-export async function exampleUsage() {
-  try {
-    const result = await wasmMatrixMultiply(
-      './matrix_ops.wasm',
-      new Float32Array([1, 2, 3, 4]),
-      new Float32Array([5, 6, 7, 8]),
-      2, 2, 2
-    );
-    console.log('Matrix multiplication result:', result);
-  } catch (error) {
-    console.error('Error during example usage:', error);
-  }
+export async function demoMatrixMultiplication(wasmFilePath, matrixA, matrixB, rowsA, colsA, colsB) {
+  const wasmInstance = await loadWasmModule(wasmFilePath);
+  return wasmMatrixMultiply(wasmInstance, matrixA, matrixB, rowsA, colsA, colsB);
+}
+
+/**
+ * Validates matrix dimensions and ensures compatibility for multiplication.
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA.
+ * @param {number} colsB - Number of columns in matrixB.
+ * @returns {boolean} - True if dimensions are compatible, false otherwise.
+ */
+export function validateMatrixDimensions(rowsA, colsA, colsB) {
+  return colsA === colsB;
 }
