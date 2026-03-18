@@ -4,7 +4,7 @@
  * Enables offline support and PWA installability.
  */
 
-const CACHE_NAME = "omnimens-v3";
+const CACHE_NAME = "omnimens-v4";
 
 const PRECACHE = [
   "/godflesh/",
@@ -31,39 +31,29 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const { request } = event;
 
-  // Only handle GET requests
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);
 
-  // Never cache API calls — always go to network
   if (url.pathname.startsWith("/api/")) return;
 
-  // For navigation requests: network-first so fresh content always loads
-  if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((c) => c.put(request, clone));
-          return response;
-        })
-        .catch(() => caches.match("/godflesh/") || caches.match(request))
-    );
-    return;
-  }
-
-  // For static assets: cache-first
   event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request).then((response) => {
-        if (response.ok && (url.pathname.match(/\.(js|css|png|jpg|svg|woff2?|ttf)$/))) {
+    fetch(request)
+      .then((response) => {
+        if (response.ok) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((c) => c.put(request, clone));
         }
         return response;
-      });
-    })
+      })
+      .catch(() => {
+        return caches.match(request).then((cached) => {
+          if (cached) return cached;
+          if (request.mode === "navigate") {
+            return caches.match("/godflesh/");
+          }
+          return new Response("Offline", { status: 503 });
+        });
+      })
   );
 });
