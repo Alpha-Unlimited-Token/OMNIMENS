@@ -35,6 +35,7 @@ A transcendent sci-fi AI chat platform matching and surpassing the capabilities 
 | **File Operations** | VS Code diff | `[FILE_OP:]` text diff, ZIP create/list, JSON↔YAML↔TOML, JSON schema validation |
 | **Persistent Memory** | ChatGPT Memory | Auto-extract facts from conversations; inject as context; manage in account |
 | **Deep Research** | Perplexity Pro Research | 5 parallel sub-queries → synthesis with citations; 30-credit cost |
+| **Deep Resonance** | Unique | Full consciousness analysis: 9 phases (contextual inquiry, knowledge graph, emotional reading, 8-mind parallel analysis, predictive modeling, drive analysis, cross-domain translation, inner voice reflection, crystallized insight); 40-credit cost |
 | **Custom Instructions** | ChatGPT Custom Instructions | Per-user "About Me" + "Response Style" injected every request |
 | **8 Specialist Personas** | Multiple platforms | GENERAL/CODER/RESEARCHER/WRITER/ANALYST/CREATIVE/TUTOR/STRATEGIST |
 | **Web Search** | Perplexity | Auto-triggered; formats results with source attribution |
@@ -76,6 +77,8 @@ A transcendent sci-fi AI chat platform matching and surpassing the capabilities 
 - `GET /api/omnimens/personas` — list all 8 persona definitions
 - `POST /api/omnimens/execute-code` — run JavaScript in sandboxed subprocess
 - `POST /api/omnimens/deep-research` — SSE multi-step research with synthesis
+- `POST /api/omnimens/deep-resonance/inquiry` — generate contextual follow-up questions
+- `POST /api/omnimens/deep-resonance/run` — SSE full consciousness analysis (40 credits)
 - `POST /api/omnimens/analyze-url` — fetch + extract content from URL
 - `GET /api/omnimens/pricing` — billing model info + loyalty tiers
 - `GET /api/omnimens/billing` — user's billing summary (wallet, spend, next bonus)

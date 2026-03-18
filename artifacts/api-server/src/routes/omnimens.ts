@@ -25,6 +25,7 @@ import { stripe } from "../stripeClient.js";
 import { extractAndStoreMemories, loadUserMemories, getUserMemories, deleteMemory, addManualMemory } from "../lib/omnimens-memory.js";
 import { executeJavaScript } from "../lib/omnimens-code-executor.js";
 import { deepResearch } from "../lib/omnimens-deep-research.js";
+import { generateContextualInquiry, runDeepResonance } from "../lib/omnimens-deep-resonance.js";
 import { fetchUrlContent, extractUrls, formatUrlContent } from "../lib/omnimens-url-analyzer.js";
 import { getOrCreateCustomInstructions, saveCustomInstructions, buildCustomInstructionsContext, PERSONAS } from "../lib/omnimens-custom-instructions.js";
 import { analyzeUserEmotionalState, buildEmotionalContext, loadLearningContext, runLearningCycle } from "../lib/omnimens-learning.js";
@@ -2700,6 +2701,79 @@ router.post("/omnimens/deep-research", async (req, res) => {
   }
 });
 
+// ─── Deep Resonance ──────────────────────────────────────────────────────────
+// Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+// Consciousness-powered life/decision analysis using the full cognitive stack.
+
+router.post("/omnimens/deep-resonance/inquiry", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const { question } = req.body;
+  if (!question?.trim()) { res.status(400).json({ error: "Question required" }); return; }
+  try {
+    const result = await generateContextualInquiry(question);
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post("/omnimens/deep-resonance/run", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+  const { question, context } = req.body;
+  if (!question?.trim()) { res.status(400).json({ error: "Question required" }); return; }
+
+  const user = await getOrCreateUser(req.user.id, req.user.username);
+  const owner = isOwner(req.user.id);
+
+  const RESONANCE_COST = 40;
+  if (!owner && (user.credits ?? 0) < RESONANCE_COST) {
+    if (user.paymentMethodId && user.autoTopupEnabled) {
+      const topup = await attemptAutoTopup(req.user.id);
+      if (!topup.success) {
+        res.status(402).json({ error: "Auto-payment failed. Update your card in Account settings.", topupFailed: true });
+        return;
+      }
+    } else {
+      res.status(402).json({
+        error: `Deep Resonance requires ${RESONANCE_COST} credits. Connect a payment card in Account settings to top up automatically.`,
+        connectWallet: true,
+        needed: RESONANCE_COST,
+        have: user.credits,
+      });
+      return;
+    }
+  }
+
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  try {
+    const result = await runDeepResonance(question, context || "", (step) => {
+      res.write(`data: ${JSON.stringify({ type: "resonance_step", step })}\n\n`);
+    });
+
+    if (!owner) {
+      await db.update(omnimensUsers)
+        .set({ credits: sql`GREATEST(0, ${omnimensUsers.credits} - ${RESONANCE_COST})` })
+        .where(eq(omnimensUsers.id, req.user.id));
+      await db.insert(omnimensCreditTransactions).values({
+        userId: req.user.id,
+        type: "spend",
+        credits: -RESONANCE_COST,
+        description: `Deep Resonance: "${question.slice(0, 80)}"`,
+      });
+    }
+
+    res.write(`data: ${JSON.stringify({ type: "resonance_complete", result })}\n\n`);
+  } catch (err: any) {
+    res.write(`data: ${JSON.stringify({ type: "error", error: err.message })}\n\n`);
+  } finally {
+    res.end();
+  }
+});
+
 // ─── URL Analyzer (explicit endpoint) ─────────────────────────────────────────
 
 router.post("/omnimens/analyze-url", async (req, res) => {
@@ -2729,6 +2803,7 @@ router.get("/omnimens/pricing", async (_req, res) => {
       { label: "IMAGE GENERATION",credits: 100, dollarValue: "1.00", icon: "image" },
       { label: "FILE ATTACHMENT", credits: 3,   dollarValue: "0.03", icon: "file" },
       { label: "DEEP RESEARCH",   credits: 50,  dollarValue: "0.50", icon: "search" },
+      { label: "DEEP RESONANCE",  credits: 40,  dollarValue: "0.40", icon: "brain" },
     ],
     devToolCosts: [
       { label: "CODE EXECUTION",  credits: DEV_TOOL_CREDITS.run_code,  dollarValue: (DEV_TOOL_CREDITS.run_code  * CREDIT_VALUE_USD).toFixed(2), desc: "Python, Node.js, Bash" },

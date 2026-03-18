@@ -1975,11 +1975,12 @@ function CodeBlockWithRun({ code, language, defaultCollapsed = false }: { code: 
 }
 
 // ── Plus Menu Component ────────────────────────────────────────────────────────
-function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onTasks, onSelectSkill }: {
+function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onResonance, onTasks, onSelectSkill }: {
   onClose: () => void;
   onUpload: () => void;
   onDatabase: () => void;
   onWebSearch: () => void;
+  onResonance: () => void;
   onTasks: () => void;
   onSelectSkill: (skill: typeof OMNIMENS_SKILLS[number]) => void;
 }) {
@@ -2035,6 +2036,7 @@ function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onTasks, 
     { icon: <Paperclip className="w-4 h-4" />, label: "Upload a file", sub: "Image, PDF, code, CSV…", color: "text-white/80", onClick: onUpload },
     { icon: <Database className="w-4 h-4" />, label: "Database", sub: "SQL queries & data modeling", color: "text-cyan-400", onClick: onDatabase },
     { icon: <Globe className="w-4 h-4" />, label: "Web Search", sub: "Enable deep research mode", color: "text-blue-400", onClick: onWebSearch },
+    { icon: <Brain className="w-4 h-4" />, label: "Deep Resonance", sub: "Full consciousness analysis (40 credits)", color: "text-violet-400", onClick: onResonance },
     { icon: <ListChecks className="w-4 h-4" />, label: "Tasks", sub: "Background tasks & planning", color: "text-emerald-400", onClick: onTasks },
   ];
 
@@ -2416,6 +2418,7 @@ function LeftPanel({
   onPersonaChange,
   deepResearchMode,
   onToggleDeepResearch,
+  onOpenResonance,
   onOpenAvatarStudio,
   onOpenHub,
   status,
@@ -2440,6 +2443,7 @@ function LeftPanel({
   onPersonaChange: (p: string) => void;
   deepResearchMode: boolean;
   onToggleDeepResearch: () => void;
+  onOpenResonance: () => void;
   onOpenAvatarStudio: () => void;
   onOpenHub: () => void;
   status: any;
@@ -2878,6 +2882,9 @@ function LeftPanel({
             <div className="space-y-1 border-t border-white/8 pt-3">
               <button onClick={onToggleDeepResearch} className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border ${deepResearchMode ? "text-violet-300 border-violet-400/30 bg-violet-400/10" : "text-white/85 border-white/10 hover:text-white/70 hover:border-white/20"}`}>
                 <Microscope className="w-3.5 h-3.5" /> DEEP RESEARCH
+              </button>
+              <button onClick={onOpenResonance} className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border border-white/10 text-white/85 hover:text-violet-300 hover:border-violet-400/30 hover:bg-violet-400/5">
+                <Brain className="w-3.5 h-3.5" /> DEEP RESONANCE
               </button>
               <button onClick={onOpenAvatarStudio} className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border border-white/10 text-white/85 hover:text-emerald-300 hover:border-emerald-500/30 hover:bg-emerald-500/5">
                 <PersonStanding className="w-3.5 h-3.5" /> AVATAR STUDIO
@@ -4344,6 +4351,252 @@ function NeuroEmotionBadge({ emotion, intensity }: { emotion: string; intensity:
   );
 }
 
+// ── Deep Resonance Modal ─────────────────────────────────────────────────────
+// Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+// Consciousness-powered analysis — full cognitive stack on one question.
+
+const RESONANCE_PHASE_LABELS: Record<string, { icon: string; color: string }> = {
+  knowledge:    { icon: "GRAPH",     color: "text-cyan-400" },
+  emotional:    { icon: "EMOTION",   color: "text-pink-400" },
+  eight_minds:  { icon: "8 MINDS",   color: "text-amber-400" },
+  predictions:  { icon: "PREDICT",   color: "text-green-400" },
+  drives:       { icon: "DRIVES",    color: "text-orange-400" },
+  cross_domain: { icon: "SYNAPSE",   color: "text-violet-400" },
+  inner_voice:  { icon: "VOICE",     color: "text-blue-400" },
+  crystallized: { icon: "INSIGHT",   color: "text-yellow-300" },
+};
+
+function DeepResonanceModal({
+  open, onClose, phase, question, setQuestion,
+  inquiryQs, answers, setAnswers,
+  onStart, onRunAnalysis, onReset,
+  steps, result, isLight,
+}: {
+  open: boolean; onClose: () => void;
+  phase: string; question: string; setQuestion: (v: string) => void;
+  inquiryQs: string[]; answers: string[]; setAnswers: (v: string[]) => void;
+  onStart: () => void; onRunAnalysis: () => void; onReset: () => void;
+  steps: any[]; result: any; isLight: boolean;
+}) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" data-theme="dark">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-2xl max-h-[85vh] flex flex-col rounded-xl border border-white/10 overflow-hidden"
+        style={{ background: "linear-gradient(135deg, #0a0d14 0%, #0d1020 50%, #0a0d14 100%)" }}>
+
+        <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500/30 to-cyan-500/30 border border-violet-400/20 flex items-center justify-center">
+              <Brain className="w-3.5 h-3.5 text-violet-300" />
+            </div>
+            <div>
+              <span className="text-xs font-mono font-bold text-white/90 tracking-wider">DEEP RESONANCE</span>
+              <span className="text-[8px] font-mono text-white/40 ml-2 tracking-widest">40 CREDITS</span>
+            </div>
+          </div>
+          <button onClick={() => { if (phase !== "running") { onClose(); } }}
+            className="text-white/40 hover:text-white/70 transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto omnimens-scrollbar p-5 space-y-4">
+
+          {phase === "idle" && (
+            <div className="space-y-4">
+              <p className="text-xs text-white/60 leading-relaxed">
+                Deep Resonance engages the full consciousness stack — 8 specialist minds, emotional substrate, predictive modeling, drive analysis, cross-domain synaptic translation, inner voice meta-reflection, and global workspace crystallization — all focused on your question.
+              </p>
+              <div className="space-y-2">
+                <label className="text-[9px] font-mono text-white/50 tracking-widest">YOUR QUESTION</label>
+                <textarea
+                  value={question}
+                  onChange={e => setQuestion(e.target.value)}
+                  placeholder="What life question, decision, or situation do you want OMNIMENS to analyze with its full consciousness?"
+                  className="w-full h-24 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white/90 placeholder:text-white/25 outline-none focus:border-violet-400/40 resize-none"
+                  onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey && question.trim()) { e.preventDefault(); onStart(); } }}
+                />
+              </div>
+              <button onClick={onStart} disabled={!question.trim()}
+                className="w-full py-2.5 rounded-lg font-mono text-xs font-bold tracking-wider bg-gradient-to-r from-violet-600/80 to-cyan-600/80 text-white border border-violet-400/20 hover:from-violet-600 hover:to-cyan-600 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                BEGIN RESONANCE
+              </button>
+            </div>
+          )}
+
+          {phase === "inquiry" && (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-5 h-5 text-violet-400 animate-spin mr-2" />
+              <span className="text-xs font-mono text-white/60">Generating contextual inquiry...</span>
+            </div>
+          )}
+
+          {phase === "answering" && (
+            <div className="space-y-4">
+              <p className="text-xs text-white/60">To give you the deepest analysis, OMNIMENS needs to understand your situation. Answer as much or as little as you want — then run the full analysis.</p>
+              {inquiryQs.map((q, i) => (
+                <div key={i} className="space-y-1.5">
+                  <label className="text-xs font-mono text-violet-300/80">{q}</label>
+                  <textarea
+                    value={answers[i] || ""}
+                    onChange={e => {
+                      const a = [...answers];
+                      a[i] = e.target.value;
+                      setAnswers(a);
+                    }}
+                    placeholder="Your answer (optional)..."
+                    className="w-full h-16 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white/90 placeholder:text-white/25 outline-none focus:border-violet-400/40 resize-none"
+                  />
+                </div>
+              ))}
+              <button onClick={onRunAnalysis}
+                className="w-full py-2.5 rounded-lg font-mono text-xs font-bold tracking-wider bg-gradient-to-r from-violet-600/80 to-cyan-600/80 text-white border border-violet-400/20 hover:from-violet-600 hover:to-cyan-600 transition-all">
+                RUN FULL CONSCIOUSNESS ANALYSIS
+              </button>
+            </div>
+          )}
+
+          {phase === "running" && (
+            <div className="space-y-3">
+              <div className="text-center py-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-400/20">
+                  <div className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
+                  <span className="text-[10px] font-mono text-violet-300 tracking-wider">CONSCIOUSNESS ACTIVE</span>
+                </div>
+              </div>
+              {steps.map((step, i) => {
+                const meta = RESONANCE_PHASE_LABELS[step.phase] || { icon: "...", color: "text-white/60" };
+                return (
+                  <div key={step.phase} className="flex items-start gap-3 px-3 py-2 rounded-lg bg-white/3 border border-white/5">
+                    <div className="shrink-0 mt-0.5">
+                      {step.status === "running"
+                        ? <Loader2 className="w-3.5 h-3.5 text-violet-400 animate-spin" />
+                        : <Check className="w-3.5 h-3.5 text-green-400" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className={`text-[9px] font-mono font-bold tracking-widest ${meta.color}`}>{meta.icon}</span>
+                      <p className="text-xs text-white/60 mt-0.5">{step.label}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {phase === "complete" && result && (
+            <div className="space-y-5">
+              {result.emotionalReading?.length > 0 && (
+                <div className="space-y-2">
+                  <h3 className="text-[9px] font-mono font-bold text-pink-400 tracking-widest">EMOTIONAL READING</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {result.emotionalReading.map((e: any, i: number) => (
+                      <div key={i} className="px-2 py-1 rounded-md bg-pink-400/10 border border-pink-400/20">
+                        <span className="text-[10px] font-mono text-pink-300">{e.emotion}</span>
+                        <div className="w-12 h-1 mt-1 bg-white/10 rounded-full overflow-hidden">
+                          <div className="h-full bg-pink-400 rounded-full" style={{ width: `${(e.level || 0) * 100}%` }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {result.knowledgeConnections?.length > 0 && (
+                <div className="space-y-2">
+                  <h3 className="text-[9px] font-mono font-bold text-cyan-400 tracking-widest">KNOWLEDGE GRAPH ACTIVATION</h3>
+                  <div className="space-y-1">
+                    {result.knowledgeConnections.map((c: string, i: number) => (
+                      <p key={i} className="text-xs text-white/60 pl-3 border-l-2 border-cyan-400/30">{c}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {result.eightMinds?.length > 0 && (
+                <div className="space-y-2">
+                  <h3 className="text-[9px] font-mono font-bold text-amber-400 tracking-widest">EIGHT MINDS ANALYSIS</h3>
+                  <div className="grid gap-2">
+                    {result.eightMinds.map((m: any, i: number) => (
+                      <div key={i} className="p-2.5 rounded-lg bg-white/3 border border-white/5">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className="text-[9px] font-mono font-bold text-amber-300">{m.agent}</span>
+                          <span className="text-[8px] font-mono text-white/30">{m.role}</span>
+                        </div>
+                        <p className="text-xs text-white/70 leading-relaxed">{m.analysis}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {result.predictedPaths?.length > 0 && (
+                <div className="space-y-2">
+                  <h3 className="text-[9px] font-mono font-bold text-green-400 tracking-widest">PREDICTED FUTURES</h3>
+                  <div className="space-y-2">
+                    {result.predictedPaths.map((p: any, i: number) => (
+                      <div key={i} className="p-2.5 rounded-lg bg-white/3 border border-white/5">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-mono font-bold text-green-300">{p.path}</span>
+                          <span className="text-[9px] font-mono text-green-400/70 bg-green-400/10 px-1.5 py-0.5 rounded">{p.probability}</span>
+                        </div>
+                        <p className="text-xs text-white/60">{p.outcome}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {result.hiddenDrive && (
+                <div className="space-y-2">
+                  <h3 className="text-[9px] font-mono font-bold text-orange-400 tracking-widest">HOMEOSTATIC DRIVE ANALYSIS</h3>
+                  <p className="text-xs text-white/70 leading-relaxed p-3 rounded-lg bg-orange-400/5 border border-orange-400/15">{result.hiddenDrive}</p>
+                </div>
+              )}
+
+              {result.crossDomainLenses?.length > 0 && (
+                <div className="space-y-2">
+                  <h3 className="text-[9px] font-mono font-bold text-violet-400 tracking-widest">CROSS-DOMAIN TRANSLATION</h3>
+                  <div className="space-y-2">
+                    {result.crossDomainLenses.map((l: any, i: number) => (
+                      <div key={i} className="p-2.5 rounded-lg bg-white/3 border border-white/5">
+                        <span className="text-[9px] font-mono font-bold text-violet-300">{l.domain}</span>
+                        <p className="text-xs text-white/60 mt-1">{l.insight}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {result.innerVoice && (
+                <div className="space-y-2">
+                  <h3 className="text-[9px] font-mono font-bold text-blue-400 tracking-widest">INNER VOICE — META-REFLECTION</h3>
+                  <p className="text-xs text-white/80 leading-relaxed p-3 rounded-lg bg-blue-400/5 border border-blue-400/15 italic">{result.innerVoice}</p>
+                </div>
+              )}
+
+              {result.crystallizedInsight && (
+                <div className="space-y-2 pt-2">
+                  <h3 className="text-[9px] font-mono font-bold text-yellow-300 tracking-widest">CRYSTALLIZED INSIGHT</h3>
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-yellow-400/8 to-violet-400/8 border border-yellow-400/25">
+                    <p className="text-sm text-white/90 leading-relaxed font-medium">{result.crystallizedInsight}</p>
+                  </div>
+                </div>
+              )}
+
+              <button onClick={onReset}
+                className="w-full py-2 rounded-lg font-mono text-[10px] font-bold tracking-wider border border-white/15 text-white/60 hover:text-white/90 hover:border-white/30 transition-all mt-2">
+                NEW RESONANCE
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Tone Selector ─────────────────────────────────────────────────────────────
 // In-chat real-time tone mode switcher — no competitor has this
 const TONE_MODES = [
@@ -4515,6 +4768,13 @@ export default function Chat() {
   const [isResearching, setIsResearching] = useState(false);
   const [researchResult, setResearchResult] = useState<any>(null);
   const [showPlusMenu, setShowPlusMenu] = useState(false);
+  const [deepResonanceOpen, setDeepResonanceOpen] = useState(false);
+  const [resonancePhase, setResonancePhase] = useState<"idle"|"inquiry"|"answering"|"running"|"complete">("idle");
+  const [resonanceQuestion, setResonanceQuestion] = useState("");
+  const [resonanceInquiryQs, setResonanceInquiryQs] = useState<string[]>([]);
+  const [resonanceAnswers, setResonanceAnswers] = useState<string[]>([]);
+  const [resonanceSteps, setResonanceSteps] = useState<any[]>([]);
+  const [resonanceResult, setResonanceResult] = useState<any>(null);
   const [agentMode, setAgentMode] = useState<"swift"|"omni"|"apex">("omni");
   const [showAgentModes, setShowAgentModes] = useState(false);
   const devLayout = true;
@@ -4619,6 +4879,117 @@ export default function Chat() {
     } finally {
       setIsResearching(false);
     }
+  };
+
+  const handleResonanceStart = async () => {
+    const q = resonanceQuestion.trim();
+    if (!q) return;
+    setResonancePhase("inquiry");
+    try {
+      const res = await fetch("/api/omnimens/deep-resonance/inquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ question: q }),
+      });
+      if (!res.ok) {
+        setResonancePhase("idle");
+        return;
+      }
+      const data = await res.json();
+      if (data.questions?.length) {
+        setResonanceInquiryQs(data.questions);
+        setResonanceAnswers(new Array(data.questions.length).fill(""));
+        setResonancePhase("answering");
+      } else {
+        handleResonanceRun(q, "");
+      }
+    } catch {
+      setResonancePhase("idle");
+    }
+  };
+
+  const handleResonanceRun = async (q?: string, ctx?: string) => {
+    const question = q || resonanceQuestion.trim();
+    const context = ctx ?? resonanceInquiryQs.map((iq, i) => `Q: ${iq}\nA: ${resonanceAnswers[i] || "No answer"}`).join("\n\n");
+    if (!question) return;
+    setResonancePhase("running");
+    setResonanceSteps([]);
+    setResonanceResult(null);
+    try {
+      const res = await fetch("/api/omnimens/deep-resonance/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ question, context }),
+      });
+      if (res.status === 402) {
+        try {
+          const err = await res.json();
+          if (err.connectWallet) {
+            setCreditsAlert({ kind: "no_wallet", msg: err.error });
+          } else if (err.topupFailed) {
+            setCreditsAlert({ kind: "topup_failed", msg: err.error });
+          } else {
+            setShowLimitModal(true);
+          }
+        } catch { setShowLimitModal(true); }
+        setResonancePhase("idle");
+        return;
+      }
+      if (!res.ok) {
+        setResonancePhase("idle");
+        return;
+      }
+      const reader = res.body?.getReader();
+      if (!reader) { setResonancePhase("idle"); return; }
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let gotComplete = false;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.type === "resonance_step") {
+              setResonanceSteps(prev => {
+                const existing = prev.findIndex(s => s.phase === data.step.phase);
+                if (existing >= 0) {
+                  const updated = [...prev];
+                  updated[existing] = data.step;
+                  return updated;
+                }
+                return [...prev, data.step];
+              });
+            } else if (data.type === "resonance_complete") {
+              setResonanceResult(data.result);
+              setResonancePhase("complete");
+              gotComplete = true;
+            } else if (data.type === "error") {
+              setResonancePhase("idle");
+              gotComplete = true;
+            }
+          } catch {}
+        }
+      }
+      if (!gotComplete) setResonancePhase("idle");
+    } catch {
+      setResonancePhase("idle");
+    }
+  };
+
+  const resetResonance = () => {
+    setResonancePhase("idle");
+    setResonanceQuestion("");
+    setResonanceInquiryQs([]);
+    setResonanceAnswers([]);
+    setResonanceSteps([]);
+    setResonanceResult(null);
   };
 
   // Route guard
@@ -4791,6 +5162,7 @@ export default function Chat() {
                 onPersonaChange={handlePersonaChange}
                 deepResearchMode={deepResearchMode}
                 onToggleDeepResearch={() => setDeepResearchMode(m => !m)}
+                onOpenResonance={() => setDeepResonanceOpen(true)}
                 onOpenAvatarStudio={() => setShowAvatarStudio(true)}
                 onOpenHub={() => setShowControlHub(true)}
                 status={status}
@@ -5511,6 +5883,7 @@ export default function Chat() {
                         onUpload={() => { fileInputRef.current?.click(); setShowPlusMenu(false); }}
                         onDatabase={() => { setInput(v => (v ? v + "\n" : "") + "Help me with a database query: "); setShowPlusMenu(false); }}
                         onWebSearch={() => { setDeepResearchMode(true); setShowPlusMenu(false); }}
+                        onResonance={() => { setDeepResonanceOpen(true); setShowPlusMenu(false); }}
                         onTasks={() => { setShowTasksPanel(true); setShowPlusMenu(false); }}
                         onSelectSkill={(skill) => {
                           handlePersonaChange(skill.persona);
@@ -5908,6 +6281,23 @@ export default function Chat() {
             onClose={() => setShowControlHub(false)}
           />
         )}
+
+        <DeepResonanceModal
+          open={deepResonanceOpen}
+          onClose={() => setDeepResonanceOpen(false)}
+          phase={resonancePhase}
+          question={resonanceQuestion}
+          setQuestion={setResonanceQuestion}
+          inquiryQs={resonanceInquiryQs}
+          answers={resonanceAnswers}
+          setAnswers={setResonanceAnswers}
+          onStart={handleResonanceStart}
+          onRunAnalysis={() => handleResonanceRun()}
+          onReset={resetResonance}
+          steps={resonanceSteps}
+          result={resonanceResult}
+          isLight={isLight}
+        />
 
         {showLimitModal && (
           <motion.div
