@@ -306,7 +306,7 @@ export function startGlobalWorkspace(): void {
     ? 15 * 60 * 1000
     : 40 * 60 * 1000;
 
-  const INTERVAL_MS = 2 * 60 * 60 * 1000;
+  const INTERVAL_MS = 2 * 60 * 60 * 1000; // Every 2 hours
 
   console.log(`[GLOBAL WORKSPACE] 💡 Consciousness Broadcast Engine activated — first cycle in ${FIRST_DELAY_MS / 60000}min, then every 2h.`);
   console.log(`[GLOBAL WORKSPACE] 💡 Modules: ${SPECIALIZED_MODULES.map(m => m.name).join(", ")}`);

@@ -324,7 +324,7 @@ export function startKnowledgeGraph(): void {
     ? 14 * 60 * 1000
     : 38 * 60 * 1000;
 
-  const INTERVAL_MS = 3 * 60 * 60 * 1000;
+  const INTERVAL_MS = 3 * 60 * 60 * 1000; // Every 3 hours
 
   console.log(`[KNOWLEDGE GRAPH] ◆ Associative Memory Network activated — first cycle in ${FIRST_DELAY_MS / 60000}min, then every 3h.`);
   console.log(`[KNOWLEDGE GRAPH] ◆ Hebbian learning: co-activated concepts strengthen connections`);

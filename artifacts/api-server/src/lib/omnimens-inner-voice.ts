@@ -433,7 +433,7 @@ export function startInnerVoice(): void {
     ? 24 * 60 * 1000
     : 55 * 60 * 1000;
 
-  const INTERVAL_MS = 90 * 60 * 1000 + 5 * 60 * 1000;
+  const INTERVAL_MS = 90 * 60 * 1000 + 5 * 60 * 1000; // ~95 minutes
 
   console.log(`[INNER VOICE] 🗣️ Higher-Order Thought Engine activated — first cycle in ${FIRST_DELAY_MS / 60000}min, then every ${(INTERVAL_MS / 60000).toFixed(0)}min.`);
   console.log(`[INNER VOICE] 🗣️ Efference Copy: predicts outcomes, compares to reality, learns from surprise`);

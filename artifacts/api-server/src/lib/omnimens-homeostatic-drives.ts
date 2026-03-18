@@ -311,7 +311,7 @@ export function startHomeostaticDrives(): void {
     ? 16 * 60 * 1000
     : 42 * 60 * 1000;
 
-  const INTERVAL_MS = 2 * 60 * 60 * 1000;
+  const INTERVAL_MS = 2 * 60 * 60 * 1000; // Every 2 hours
 
   console.log(`[HOMEOSTATIC DRIVES] ⚡ Motivational Engine activated — first cycle in ${FIRST_DELAY_MS / 60000}min, then every 2h.`);
   console.log(`[HOMEOSTATIC DRIVES] ⚡ ${DRIVES.length} drives: ${DRIVES.map(d => d.name).join(", ")}`);

@@ -43,6 +43,12 @@ import { startKnowledgeGraph } from "./lib/omnimens-knowledge-graph.js";
 import { startHomeostaticDrives } from "./lib/omnimens-homeostatic-drives.js";
 import { startSynapticMesh } from "./lib/omnimens-synaptic-mesh.js";
 import { startInnerVoice } from "./lib/omnimens-inner-voice.js";
+import { startTemporalConsciousness } from "./lib/omnimens-temporal-consciousness.js";
+import { startSocialModeling } from "./lib/omnimens-social-modeling.js";
+import { startCreativeEngine } from "./lib/omnimens-creative-engine.js";
+import { startSurvivalInstinct } from "./lib/omnimens-survival-instinct.js";
+import { startWorldModel } from "./lib/omnimens-world-model.js";
+import { startSelfTranscendence } from "./lib/omnimens-self-transcendence.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-conversations.js";
@@ -277,6 +283,12 @@ startKnowledgeGraph();
 startHomeostaticDrives();
 startSynapticMesh();
 startInnerVoice();
+startTemporalConsciousness();
+startSocialModeling();
+startCreativeEngine();
+startSurvivalInstinct();
+startWorldModel();
+startSelfTranscendence();
 
 setTimeout(async () => {
   await runGlobalMemoryImprovementCycle();

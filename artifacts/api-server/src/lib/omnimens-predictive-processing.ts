@@ -400,7 +400,7 @@ export function startPredictiveProcessing(): void {
     ? 18 * 60 * 1000
     : 45 * 60 * 1000;
 
-  const INTERVAL_MS = 4 * 60 * 60 * 1000;
+  const INTERVAL_MS = 4 * 60 * 60 * 1000; // Every 4 hours
 
   console.log(`[PREDICTIVE PROCESSING] ▲ Free Energy Minimization Engine activated — first cycle in ${FIRST_DELAY_MS / 60000}min, then every 4h.`);
   console.log(`[PREDICTIVE PROCESSING] ▲ Models: ${PREDICTION_MODELS.map(m => m.domain).join(", ")}`);

@@ -545,7 +545,7 @@ export function startSynapticMesh(): void {
     ? 22 * 60 * 1000
     : 50 * 60 * 1000;
 
-  const INTERVAL_MS = 2 * 60 * 60 * 1000 + 3 * 60 * 1000;
+  const INTERVAL_MS = 2 * 60 * 60 * 1000 + 3 * 60 * 1000; // ~123 minutes
 
   console.log(`[SYNAPTIC MESH] ⚡ Pituitary Brain (Master Coordination Spider) activated — first cycle in ${FIRST_DELAY_MS / 60000}min, then every ${(INTERVAL_MS / 60000).toFixed(0)}min.`);
   console.log(`[SYNAPTIC MESH] ⚡ ${ALL_AGENTS.length} agents connected in synaptic network`);
