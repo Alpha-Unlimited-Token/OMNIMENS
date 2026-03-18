@@ -18,6 +18,147 @@ import {
 } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { getTogetherClient, TOGETHER_MODEL_IDS } from "../lib/together-ai";
+import { loadUserMemories, addManualMemory } from "../lib/omnimens-memory";
+import { webSearch, formatSearchResults } from "../lib/web-search";
+import { loadGeneratedModulesContext, getEvolutionHistory } from "../lib/omnimens-evolution";
+import { loadToolKnowledgeForTask } from "../lib/omnimens-tool-knowledge";
+
+// ─── Agent→Model Routing ──────────────────────────────────────────────────────
+// Specialized agents get dedicated models best suited to their domain.
+// Mathematician & Neuroscientist leverage Together AI's open-source frontier models
+// for deep scientific/mathematical reasoning. All agents fall back to OpenAI.
+
+const AGENT_TOGETHER_MODEL: Partial<Record<string, string>> = {
+  Mathematician:   TOGETHER_MODEL_IDS["llama-3.3-70b"], // deep math/reasoning
+  Neuroscientist:  TOGETHER_MODEL_IDS["llama-3.3-70b"], // scientific/biological
+  Critic:          TOGETHER_MODEL_IDS["llama-3.3-70b"], // adversarial critique
+};
+
+const AGENT_OPENAI_MODEL: Record<string, string> = {
+  Architect:     "gpt-5.2",
+  Synthesizer:   "gpt-5.2",
+  "Meta-Agent":  "gpt-5.2",
+  Critic:        "gpt-5.2",
+  Mathematician: "gpt-5.2",
+  Neuroscientist:"gpt-5.2",
+};
+
+// ─── OMNIMENS Intelligence Pre-Brief ─────────────────────────────────────────
+// Before every session the system fetches:
+//   1. Live web search results on the topic (real-time knowledge)
+//   2. OMNIMENS owner memory (user preferences, project context)
+//   3. COGNISYNC™ evolution modules (what OMNIMENS has self-generated)
+//   4. OMNIMENS tool knowledge snapshot (all installed capabilities)
+// This is injected into every agent's system prompt — they arrive fully briefed.
+
+const OWNER_ID = "50777126";
+
+async function buildSessionIntelContext(topic: string): Promise<string> {
+  const [webRes, memRes, evolRes, toolRes] = await Promise.allSettled([
+    webSearch(topic, 4).then(r => formatSearchResults(r, topic)),
+    loadUserMemories(OWNER_ID),
+    loadGeneratedModulesContext(),
+    loadToolKnowledgeForTask(topic),
+  ]);
+
+  const sections: string[] = [];
+
+  if (webRes.status === "fulfilled" && webRes.value) {
+    sections.push(`━━━ REAL-TIME WEB INTELLIGENCE (searched: "${topic}") ━━━\n${webRes.value}`);
+  }
+  if (memRes.status === "fulfilled" && memRes.value) {
+    sections.push(`━━━ OMNIMENS OWNER MEMORY (context about the platform creator) ━━━\n${memRes.value}`);
+  }
+  if (evolRes.status === "fulfilled" && evolRes.value) {
+    sections.push(`━━━ OMNIMENS SELF-EVOLUTION LOG (modules OMNIMENS has autonomously generated) ━━━\n${evolRes.value.slice(0, 2000)}`);
+  }
+  if (toolRes.status === "fulfilled" && toolRes.value) {
+    sections.push(`━━━ OMNIMENS INSTALLED TOOL KNOWLEDGE (capabilities currently available) ━━━\n${toolRes.value.slice(0, 1500)}`);
+  }
+
+  if (sections.length === 0) return "";
+  return `\n\n${"═".repeat(60)}\nOMNIMENS LIVE INTELLIGENCE BRIEF — Pre-loaded for this session\n${"═".repeat(60)}\n\n${sections.join("\n\n")}\n\n${"═".repeat(60)}\n`;
+}
+
+// ─── Multi-Model Agent Stream ─────────────────────────────────────────────────
+// Routes each agent to its optimal model. Together AI models run specialized agents
+// (Mathematician → DeepSeek-class reasoning, Neuroscientist/Critic → Llama-3.3-70B).
+// Falls back to OpenAI gpt-5.2 if Together AI is unavailable.
+
+async function* streamAgent(
+  agentName: string,
+  messages: { role: "system" | "user" | "assistant"; content: string }[],
+): AsyncGenerator<string> {
+  const togetherModelId = AGENT_TOGETHER_MODEL[agentName];
+  const togetherClient = getTogetherClient();
+
+  if (togetherModelId && togetherClient) {
+    try {
+      const stream = await (togetherClient.chat.completions.create as any)({
+        model: togetherModelId,
+        max_tokens: 8192,
+        messages,
+        stream: true,
+      }) as AsyncIterable<any>;
+      for await (const chunk of stream) {
+        const content = chunk?.choices?.[0]?.delta?.content;
+        if (content) yield content;
+      }
+      return;
+    } catch (err) {
+      console.warn(`[SuperAI] Together AI failed for ${agentName}, falling back to OpenAI: ${err}`);
+    }
+  }
+
+  // OpenAI fallback
+  const stream = await openai.chat.completions.create({
+    model: AGENT_OPENAI_MODEL[agentName] ?? "gpt-5.2",
+    max_completion_tokens: 8192,
+    messages,
+    stream: true,
+  });
+  for await (const chunk of stream) {
+    const content = chunk.choices[0]?.delta?.content;
+    if (content) yield content;
+  }
+}
+
+// ─── Session Discovery Writer ─────────────────────────────────────────────────
+// After each session completes, the top discoveries are written back into the
+// OMNIMENS brain so the main AI permanently learns from what the six agents built.
+
+async function writeSessionDiscoveries(topic: string, blueprintContent: string): Promise<void> {
+  try {
+    const summary = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      max_completion_tokens: 600,
+      messages: [
+        {
+          role: "system",
+          content: `Extract 3-5 key technical discoveries or architectural insights from this AI blueprint that should be permanently stored in OMNIMENS's memory. Format as JSON array: [{"category":"fact","content":"specific insight"},...]. Return only valid JSON.`,
+        },
+        {
+          role: "user",
+          content: `Topic: ${topic}\n\nBlueprint excerpt:\n${blueprintContent.slice(0, 3000)}`,
+        },
+      ],
+      response_format: { type: "json_object" },
+    });
+    const text = summary.choices[0]?.message?.content || "{}";
+    let parsed: any;
+    try { parsed = JSON.parse(text); } catch { return; }
+    const entries: {category: string; content: string}[] = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.discoveries) ? parsed.discoveries : []);
+    for (const e of entries.slice(0, 5)) {
+      if (e.content) {
+        await addManualMemory(OWNER_ID, `[Super AI Lab — ${topic}] ${e.content}`, e.category || "fact");
+      }
+    }
+    console.log(`[SuperAI] Wrote ${entries.length} session discoveries to OMNIMENS brain for topic: ${topic}`);
+  } catch (err) {
+    console.warn("[SuperAI] Failed to write discoveries:", err);
+  }
+}
 
 // ─── Background Session Runners ───────────────────────────────────────────────
 // Sessions run as background async tasks completely decoupled from HTTP connections.
@@ -885,6 +1026,9 @@ async function runBlueprintMode(
   const history: { agent: string; content: string; round: number }[] = [];
 
   try {
+    // Pre-brief all agents with live intelligence before any round starts
+    const intelContext = await buildSessionIntelContext(topic);
+
     for (let round = 1; round <= rounds; round++) {
       const offset = (round - 1) % ALL_AGENTS.length;
       const agentOrder = [...ALL_AGENTS.slice(offset), ...ALL_AGENTS.slice(0, offset)];
@@ -892,7 +1036,7 @@ async function runBlueprintMode(
       for (const agentName of agentOrder) {
         send({ type: "agent_start", agent: agentName, round });
 
-        const systemPrompt = OMNIMENS_CAPABILITIES_MANIFEST + "\n\n" + AGENT_PERSONAS[agentName].role;
+        const systemPrompt = OMNIMENS_CAPABILITIES_MANIFEST + intelContext + "\n\n" + AGENT_PERSONAS[agentName].role;
         const contextMessages = history.slice(-9).map((h) => ({
           role: "user" as const,
           content: `[${h.agent} — Round ${h.round}]: ${h.content}`,
@@ -903,24 +1047,14 @@ async function runBlueprintMode(
             ? `Topic: "${topic}"\n\nRound ${round}. You are among six specialized AI agents collaborating to design a truly superior next-generation AI. Begin your contribution. Be visionary, specific, and bold.`
             : `Continue the six-agent collaboration on: "${topic}"\n\nRound ${round}. Respond to, challenge, or build upon previous contributions. Push the design to new heights.`;
 
-        const stream = await openai.chat.completions.create({
-          model: "gpt-5.2",
-          max_completion_tokens: 8192,
-          messages: [
-            { role: "system", content: systemPrompt },
-            ...contextMessages,
-            { role: "user", content: userPrompt },
-          ],
-          stream: true,
-        });
-
         let fullContent = "";
-        for await (const chunk of stream) {
-          const content = chunk.choices[0]?.delta?.content;
-          if (content) {
-            fullContent += content;
-            send({ type: "message", agent: agentName, content, round });
-          }
+        for await (const token of streamAgent(agentName, [
+          { role: "system", content: systemPrompt },
+          ...contextMessages,
+          { role: "user", content: userPrompt },
+        ])) {
+          fullContent += token;
+          send({ type: "message", agent: agentName, content: token, round });
         }
 
         await db.insert(superAIMessages).values({ sessionId: id, agentName, content: fullContent, round });
@@ -969,6 +1103,9 @@ async function runBlueprintMode(
 
     await db.update(superAISessions).set({ status: "completed" }).where(eq(superAISessions.id, id));
     send({ type: "done", done: true });
+
+    // Write key discoveries to OMNIMENS brain (fire-and-forget, never blocks session)
+    writeSessionDiscoveries(topic, blueprintContent).catch(() => {});
   } catch (err) {
     console.error("Blueprint mode error:", err);
     await db.update(superAISessions).set({ status: "pending" }).where(eq(superAISessions.id, id));
@@ -1002,7 +1139,8 @@ async function runAgentIteration(
   iteration: number,
   codeFiles: Map<string, { language: string; code: string; writtenBy: string }>,
   existingPackages: { id: number; name: string; version: string | null; installedBy: string | null; installedAt: Date }[],
-  send: (d: object) => void
+  send: (d: object) => void,
+  intelContext: string = "",
 ): Promise<void> {
   const history: { agent: string; content: string; round: number; filesWritten: string[] }[] = [];
   const recentExecutions: { filename: string; output: string; errors: string; success: boolean }[] = [];
@@ -1031,7 +1169,7 @@ async function runAgentIteration(
         });
       }
 
-      const systemPrompt = OMNIMENS_CAPABILITIES_MANIFEST + "\n\n" + AGENT_PERSONAS[agentName].codeRole;
+      const systemPrompt = OMNIMENS_CAPABILITIES_MANIFEST + intelContext + "\n\n" + AGENT_PERSONAS[agentName].codeRole;
 
       // ── Full codebase context ──
       const codeContext =
@@ -1135,24 +1273,14 @@ async function runAgentIteration(
         ].filter(Boolean).join("\n");
       }
 
-      const stream = await openai.chat.completions.create({
-        model: "gpt-4o",
-        max_completion_tokens: 8192,
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...conversationContext,
-          { role: "user", content: userPrompt },
-        ],
-        stream: true,
-      } as any);
-
       let fullContent = "";
-      for await (const chunk of stream) {
-        const content = (chunk.choices[0]?.delta as any)?.content;
-        if (content) {
-          fullContent += content;
-          send({ type: "message", agent: agentName, content, round, iteration });
-        }
+      for await (const token of streamAgent(agentName, [
+        { role: "system", content: systemPrompt },
+        ...conversationContext,
+        { role: "user", content: userPrompt },
+      ])) {
+        fullContent += token;
+        send({ type: "message", agent: agentName, content: token, round, iteration });
       }
 
       // Track which files this agent wrote in this turn
@@ -1252,6 +1380,9 @@ async function runCodeMode(
     send({ type: "workspace_restoring" });
     await initLabWorkspace();
 
+    // ── Pre-brief all agents with live intelligence (web + memory + evolution) ──
+    const intelContext = await buildSessionIntelContext(topic);
+
     const existingLabFiles = await db.select().from(superAILabFiles).orderBy(superAILabFiles.updatedAt);
     const existingPackages = await db.select().from(superAIPackages).orderBy(superAIPackages.installedAt);
 
@@ -1278,7 +1409,7 @@ async function runCodeMode(
         await db.delete(superAIMessages).where(eq(superAIMessages.sessionId, id));
       }
 
-      await runAgentIteration(id, topic, rounds, iteration, codeFiles, existingPackages, send);
+      await runAgentIteration(id, topic, rounds, iteration, codeFiles, existingPackages, send, intelContext);
 
       // Snapshot lab state after this iteration
       const iterSnapshot = await db.select().from(superAILabFiles).orderBy(superAILabFiles.updatedAt);
@@ -1347,6 +1478,9 @@ async function runCodeMode(
 
     await db.update(superAISessions).set({ status: "completed" }).where(eq(superAISessions.id, id));
     send({ type: "done", done: true });
+
+    // Write key discoveries to OMNIMENS brain (fire-and-forget, never blocks session)
+    writeSessionDiscoveries(topic, blueprintContent).catch(() => {});
   } catch (err) {
     console.error("Code mode error:", err);
     await db.update(superAISessions).set({ status: "pending" }).where(eq(superAISessions.id, id));
