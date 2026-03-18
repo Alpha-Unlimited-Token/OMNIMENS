@@ -2590,10 +2590,12 @@ function LeftPanel({
     { id: "config",  label: "CONFIG",  icon: <Settings className="w-3 h-3" /> },
   ];
 
+  const isLight = theme === "light";
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" data-sidebar={isLight ? "light" : "dark"}>
       {/* OMNIMENS identity header */}
-      <div className="flex items-center gap-2.5 px-3 py-2.5 border-b border-white/8 shrink-0">
+      <div className="flex items-center gap-2.5 px-3 py-2.5 border-b border-white/8 shrink-0" style={{ borderColor: isLight ? "rgba(20,23,34,0.1)" : undefined }}>
         <OmnimensPresence size={32} />
         <div className="min-w-0 flex-1">
           <p className="font-mono text-[9px] tracking-[0.2em] text-primary/70 font-bold">OMNIMENS</p>
@@ -2605,16 +2607,20 @@ function LeftPanel({
       </div>
 
       {/* Scrollable tab bar */}
-      <div className="flex border-b border-white/8 shrink-0 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+      <div className="flex shrink-0 overflow-x-auto" style={{ scrollbarWidth: "none", borderBottom: `1px solid ${isLight ? "rgba(20,23,34,0.1)" : "rgba(255,255,255,0.08)"}` }}>
         {PANEL_TABS.map(tab => (
           <button
             key={tab.id}
             onClick={() => setPanelTab(tab.id as typeof panelTab)}
-            className={`flex items-center gap-1 px-3 py-2 font-mono text-[9px] tracking-widest whitespace-nowrap transition-all border-b-2 flex-shrink-0 ${
-              panelTab === tab.id ? "text-primary border-primary" : "text-white/35 border-transparent hover:text-white/60"
-            }`}
+            className="flex items-center gap-1 px-3 py-2 font-mono text-[9px] tracking-widest whitespace-nowrap transition-all border-b-2 flex-shrink-0"
+            style={{
+              color: panelTab === tab.id ? undefined : isLight ? "rgba(20,23,34,0.38)" : "rgba(255,255,255,0.35)",
+              borderBottomColor: panelTab === tab.id ? undefined : "transparent",
+            }}
+            data-active={panelTab === tab.id ? "true" : undefined}
           >
-            {tab.icon} {tab.label}
+            <span className={panelTab === tab.id ? "text-primary border-b-2 border-primary" : ""}>{tab.icon}</span>
+            <span className={panelTab === tab.id ? "text-primary" : ""}>{tab.label}</span>
           </button>
         ))}
       </div>
@@ -3628,6 +3634,18 @@ function RightPanel({
   credits?: number;
 }) {
   const [lightboxImg, setLightboxImg] = useState<GeneratedImage | null>(null);
+  const { isLight } = useTheme();
+  const rp = {
+    cardBg:    isLight ? "rgba(20,23,34,0.06)"  : "rgba(255,255,255,0.03)",
+    cardBdr:   isLight ? "rgba(20,23,34,0.12)"  : "rgba(255,255,255,0.08)",
+    label:     isLight ? "rgba(20,23,34,0.50)"  : "rgba(255,255,255,0.85)",
+    txt:       isLight ? "rgba(20,23,34,0.85)"  : "rgba(255,255,255,1)",
+    txtMuted:  isLight ? "rgba(20,23,34,0.45)"  : "rgba(255,255,255,0.60)",
+    emptyBdr:  isLight ? "rgba(20,23,34,0.14)"  : "rgba(255,255,255,0.10)",
+    imgBdr:    isLight ? "rgba(20,23,34,0.12)"  : "rgba(255,255,255,0.08)",
+    btnBdr:    isLight ? "rgba(20,23,34,0.14)"  : "rgba(255,255,255,0.10)",
+    btnHoverTxt: isLight ? "#141722"             : "#ffffff",
+  };
 
   const handleDownloadImg = (img: GeneratedImage) => {
     const a = document.createElement("a");
@@ -3659,19 +3677,19 @@ function RightPanel({
   };
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto omnimens-scrollbar p-3 gap-3">
+    <div className="flex flex-col h-full overflow-y-auto omnimens-scrollbar p-3 gap-3" data-sidebar={isLight ? "light" : "dark"}>
       {/* Credit/status card */}
-      <div className="rounded-xl border border-white/8 bg-white/3 p-3">
-        <p className="font-mono text-[9px] tracking-[0.2em] text-white/85 uppercase mb-2">SESSION STATUS</p>
+      <div className="rounded-xl p-3" style={{ background: rp.cardBg, border: `1px solid ${rp.cardBdr}` }}>
+        <p className="font-mono text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: rp.label }}>SESSION STATUS</p>
         {status?.isOwner ? (
           <p className="font-mono text-[10px] text-accent font-bold tracking-widest">⚡ CREATOR — UNLIMITED</p>
         ) : credits != null ? (
           <div>
-            <p className="font-mono text-xs text-white font-bold">{credits} credits</p>
-            <p className="font-mono text-[9px] text-white/85 mt-0.5">≈ ${(credits * 0.01).toFixed(2)} balance</p>
+            <p className="font-mono text-xs font-bold" style={{ color: rp.txt }}>{credits} credits</p>
+            <p className="font-mono text-[9px] mt-0.5" style={{ color: rp.label }}>≈ ${(credits * 0.01).toFixed(2)} balance</p>
           </div>
         ) : (
-          <p className="font-mono text-[10px] text-white/85">Loading...</p>
+          <p className="font-mono text-[10px]" style={{ color: rp.label }}>Loading...</p>
         )}
       </div>
 
@@ -3679,17 +3697,17 @@ function RightPanel({
       <div>
         <div className="flex items-center gap-2 px-1 mb-2">
           <Image className="w-3.5 h-3.5 text-pink-400 shrink-0" />
-          <p className="font-mono text-[9px] tracking-[0.2em] text-white/85 uppercase">IMAGES ({allImages.length})</p>
+          <p className="font-mono text-[9px] tracking-[0.2em] uppercase" style={{ color: rp.label }}>IMAGES ({allImages.length})</p>
         </div>
         {allImages.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-white/10 p-4 text-center">
-            <Image className="w-6 h-6 text-white/65 mx-auto mb-1" />
-            <p className="font-mono text-[9px] text-white/70">Generated images appear here</p>
+          <div className="rounded-xl border-dashed p-4 text-center" style={{ border: `1px dashed ${rp.emptyBdr}` }}>
+            <Image className="w-6 h-6 mx-auto mb-1" style={{ color: rp.txtMuted }} />
+            <p className="font-mono text-[9px]" style={{ color: rp.txtMuted }}>Generated images appear here</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-1.5">
             {allImages.map((img) => (
-              <div key={img.index} className="relative group rounded-lg overflow-hidden border border-white/8 cursor-pointer bg-black/40">
+              <div key={img.index} className="relative group rounded-lg overflow-hidden cursor-pointer" style={{ border: `1px solid ${rp.imgBdr}`, background: isLight ? "rgba(20,23,34,0.04)" : "rgba(0,0,0,0.4)" }}>
                 <img
                   src={img.url}
                   alt={img.prompt}
@@ -3723,7 +3741,7 @@ function RightPanel({
         <div>
           <div className="flex items-center gap-2 px-1 mb-2">
             <FolderOpen className="w-3.5 h-3.5 text-accent shrink-0" />
-            <p className="font-mono text-[9px] tracking-[0.2em] text-white/85 uppercase">FILES ({allArtifacts.length})</p>
+            <p className="font-mono text-[9px] tracking-[0.2em] uppercase" style={{ color: rp.label }}>FILES ({allArtifacts.length})</p>
           </div>
           <div className="space-y-1.5">
             {allArtifacts.map((artifact, i) => (
@@ -3731,12 +3749,13 @@ function RightPanel({
                 <p className="font-mono text-[9px] text-accent/80 font-bold tracking-widest truncate mb-1">
                   {artifact.artifactType.toUpperCase()}
                 </p>
-                <p className="font-mono text-[9px] text-white truncate mb-2">{artifact.filename}</p>
+                <p className="font-mono text-[9px] truncate mb-2" style={{ color: rp.txt }}>{artifact.filename}</p>
                 <div className="flex gap-1.5">
                   {artifact.artifactType === "html" && (
                     <button
                       onClick={() => handleOpenArtifact(artifact)}
-                      className="flex-1 text-[9px] font-mono text-white/60 hover:text-white border border-white/10 hover:border-white/25 py-1 rounded transition-all text-center"
+                      className="flex-1 text-[9px] font-mono py-1 rounded transition-all text-center hover:text-primary"
+                      style={{ color: rp.txtMuted, border: `1px solid ${rp.btnBdr}` }}
                     >
                       OPEN
                     </button>
@@ -4461,7 +4480,7 @@ export default function Chat() {
     const t = setTimeout(() => refetchConversations(), 1500);
     return () => clearTimeout(t);
   }, []);
-  const { theme, toggle: toggleTheme } = useTheme();
+  const { theme, toggle: toggleTheme, isLight } = useTheme();
   const [persona, setPersona] = useState("GENERAL");
   const [selectedModel, setSelectedModel] = useState("gpt-4o");
   const [responseMode, setResponseMode] = useState("AUTO");
@@ -4730,8 +4749,12 @@ export default function Chat() {
               className="shrink-0 overflow-hidden hidden lg:block"
               style={{
                 minWidth: 0,
-                borderRight: devLayout ? "1px solid #21262d" : "1px solid rgba(255,255,255,0.08)",
-                background: devLayout ? "#161b22" : "rgba(0,0,0,0.6)",
+                borderRight: isLight
+                  ? "1px solid rgba(20,23,34,0.1)"
+                  : devLayout ? "1px solid #21262d" : "1px solid rgba(255,255,255,0.08)",
+                background: isLight
+                  ? "#f0f1f6"
+                  : devLayout ? "#161b22" : "rgba(0,0,0,0.6)",
               }}
             >
               <LeftPanel
@@ -5654,8 +5677,12 @@ export default function Chat() {
               className="shrink-0 overflow-hidden hidden lg:block"
               style={{
                 minWidth: 0,
-                borderLeft: devLayout ? "1px solid #21262d" : "1px solid rgba(255,255,255,0.08)",
-                background: devLayout ? "#0D1117" : "rgba(0,0,0,0.6)",
+                borderLeft: isLight
+                  ? "1px solid rgba(20,23,34,0.1)"
+                  : devLayout ? "1px solid #21262d" : "1px solid rgba(255,255,255,0.08)",
+                background: isLight
+                  ? "#f0f1f6"
+                  : devLayout ? "#0D1117" : "rgba(0,0,0,0.6)",
               }}
             >
               {devLayout ? (

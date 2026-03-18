@@ -387,3 +387,67 @@ html.light .hljs-selector-class { color: #6f42c1; }
 html.light .hljs-selector-id { color: #6f42c1; }
 html.light .hljs-selector-attr { color: #6f42c1; }
 html.light .hljs-selector-pseudo { color: #6f42c1; }
+
+/* ── Sidebar light-mode overrides ──────────────────────────────────────────
+ * Both sidebars carry [data-sidebar="light"] when the theme is light.
+ * These rules convert every white-opacity utility into a dark-on-light
+ * equivalent without touching every element individually.
+ * ─────────────────────────────────────────────────────────────────────── */
+
+/* Borders */
+[data-sidebar="light"] .border-white\/8,
+[data-sidebar="light"] .border-white\/10,
+[data-sidebar="light"] .border-white\/12,
+[data-sidebar="light"] .border-white\/15 {
+  border-color: rgba(20, 23, 34, 0.10) !important;
+}
+
+/* Backgrounds — translucent white → translucent dark */
+[data-sidebar="light"] .bg-white\/3   { background-color: rgba(20, 23, 34, 0.04) !important; }
+[data-sidebar="light"] .bg-white\/5   { background-color: rgba(20, 23, 34, 0.05) !important; }
+[data-sidebar="light"] .bg-white\/6   { background-color: rgba(20, 23, 34, 0.06) !important; }
+[data-sidebar="light"] .bg-white\/8   { background-color: rgba(20, 23, 34, 0.07) !important; }
+[data-sidebar="light"] .bg-white\/10  { background-color: rgba(20, 23, 34, 0.08) !important; }
+[data-sidebar="light"] .hover\:bg-white\/10:hover { background-color: rgba(20, 23, 34, 0.08) !important; }
+[data-sidebar="light"] .bg-black\/40,
+[data-sidebar="light"] .bg-black\/60  { background-color: rgba(20, 23, 34, 0.06) !important; }
+
+/* Text — white/alpha → dark/alpha */
+[data-sidebar="light"] .text-white     { color: rgba(20, 23, 34, 0.92) !important; }
+[data-sidebar="light"] .text-white\/85 { color: rgba(20, 23, 34, 0.70) !important; }
+[data-sidebar="light"] .text-white\/70 { color: rgba(20, 23, 34, 0.58) !important; }
+[data-sidebar="light"] .text-white\/65 { color: rgba(20, 23, 34, 0.52) !important; }
+[data-sidebar="light"] .text-white\/60 { color: rgba(20, 23, 34, 0.48) !important; }
+[data-sidebar="light"] .text-white\/55 { color: rgba(20, 23, 34, 0.44) !important; }
+[data-sidebar="light"] .text-white\/50 { color: rgba(20, 23, 34, 0.40) !important; }
+[data-sidebar="light"] .text-white\/45 { color: rgba(20, 23, 34, 0.36) !important; }
+[data-sidebar="light"] .text-white\/40 { color: rgba(20, 23, 34, 0.34) !important; }
+[data-sidebar="light"] .text-white\/35 { color: rgba(20, 23, 34, 0.30) !important; }
+[data-sidebar="light"] .text-white\/30 { color: rgba(20, 23, 34, 0.26) !important; }
+[data-sidebar="light"] .text-white\/25 { color: rgba(20, 23, 34, 0.22) !important; }
+[data-sidebar="light"] .text-white\/20 { color: rgba(20, 23, 34, 0.18) !important; }
+
+/* Inputs */
+[data-sidebar="light"] input,
+[data-sidebar="light"] textarea {
+  color: rgba(20, 23, 34, 0.85) !important;
+  background-color: rgba(20, 23, 34, 0.04) !important;
+  border-color: rgba(20, 23, 34, 0.12) !important;
+}
+[data-sidebar="light"] input::placeholder,
+[data-sidebar="light"] textarea::placeholder {
+  color: rgba(20, 23, 34, 0.35) !important;
+}
+
+/* Selected / active conversation item */
+[data-sidebar="light"] .bg-primary\/10  { background-color: rgba(168, 85, 247, 0.08) !important; }
+[data-sidebar="light"] .bg-primary\/15  { background-color: rgba(168, 85, 247, 0.10) !important; }
+
+/* Hover states on conversation/item rows */
+[data-sidebar="light"] .hover\:bg-white\/5:hover  { background-color: rgba(20, 23, 34, 0.05) !important; }
+[data-sidebar="light"] .hover\:bg-white\/8:hover  { background-color: rgba(20, 23, 34, 0.06) !important; }
+[data-sidebar="light"] .hover\:text-white:hover   { color: rgba(20, 23, 34, 0.90) !important; }
+
+/* Dividers */
+[data-sidebar="light"] hr,
+[data-sidebar="light"] .divide-white\/8 > * + * { border-color: rgba(20, 23, 34, 0.09) !important; }
