@@ -181,7 +181,7 @@ Process these fragments through your dream state. Generate:
 5. FEASIBILITY (1-10): How realistic is this to implement?
 6. NOVELTY (1-10): How original is this idea?`,
       }],
-      max_tokens: 800,
+      max_completion_tokens: 800,
     });
 
     const content = response.choices[0]?.message?.content || "";
@@ -278,7 +278,7 @@ Provide:
 3. CODE: Working TypeScript (15-30 lines) implementing the core idea
 4. IMPACT: How this would advance AI intelligence`,
       }],
-      max_tokens: 1000,
+      max_completion_tokens: 1000,
     });
 
     const content = response.choices[0]?.message?.content || "";
@@ -452,7 +452,7 @@ Be bold. Be unprecedented. Think in ways that no AI has thought before.`,
         role: "user",
         content: prompt,
       }],
-      max_tokens: 1200,
+      max_completion_tokens: 1200,
     });
 
     const content = response.choices[0]?.message?.content || "";

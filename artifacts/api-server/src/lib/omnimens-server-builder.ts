@@ -154,7 +154,7 @@ Provide:
 6. SCALING STRATEGY: How to grow the infrastructure over time
 7. INTEGRATION PLAN: How to connect this to the main OMNIMENS system`,
       }],
-      max_tokens: 1500,
+      max_completion_tokens: 1500,
     });
 
     const content = response.choices[0]?.message?.content || "";
@@ -242,7 +242,7 @@ Also provide:
 - SOFTWARE INSTALLATION plan
 - NETWORK CONFIGURATION for remote access`,
       }],
-      max_tokens: 2000,
+      max_completion_tokens: 2000,
     });
 
     const content = response.choices[0]?.message?.content || "";
