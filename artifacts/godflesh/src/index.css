@@ -77,7 +77,7 @@ html.light {
   --foreground: 220 20% 8%;
   --card: 0 0% 100%;
   --card-foreground: 220 20% 8%;
-  --border: 220 15% 78%;
+  --border: 265 40% 82%;
   --input: 220 15% 86%;
   --ring: 265 65% 52%;
   --primary: 265 65% 50%;
@@ -168,26 +168,26 @@ html.light .hover\:text-white\/70:hover { color: rgba(20, 23, 34, 0.80) !importa
 html.light .hover\:text-white\/80:hover { color: rgba(20, 23, 34, 0.88) !important; }
 html.light .hover\:text-white\/90:hover { color: rgba(20, 23, 34, 0.94) !important; }
 
-/* ── border-white overrides ─────────────────────────────────────────────── */
-html.light .border-white     { border-color: #141722 !important; }
-html.light .border-white\/5  { border-color: rgba(20, 23, 34, 0.08) !important; }
-html.light .border-white\/6  { border-color: rgba(20, 23, 34, 0.10) !important; }
-html.light .border-white\/8  { border-color: rgba(20, 23, 34, 0.12) !important; }
-html.light .border-white\/10 { border-color: rgba(20, 23, 34, 0.15) !important; }
-html.light .border-white\/12 { border-color: rgba(20, 23, 34, 0.18) !important; }
-html.light .border-white\/15 { border-color: rgba(20, 23, 34, 0.22) !important; }
-html.light .border-white\/20 { border-color: rgba(20, 23, 34, 0.28) !important; }
-html.light .border-white\/25 { border-color: rgba(20, 23, 34, 0.34) !important; }
-html.light .border-white\/30 { border-color: rgba(20, 23, 34, 0.40) !important; }
+/* ── border-white overrides (violet-tinted in light mode) ──────────────── */
+html.light .border-white     { border-color: rgba(168, 85, 247, 0.30) !important; }
+html.light .border-white\/5  { border-color: rgba(168, 85, 247, 0.10) !important; }
+html.light .border-white\/6  { border-color: rgba(168, 85, 247, 0.11) !important; }
+html.light .border-white\/8  { border-color: rgba(168, 85, 247, 0.13) !important; }
+html.light .border-white\/10 { border-color: rgba(168, 85, 247, 0.15) !important; }
+html.light .border-white\/12 { border-color: rgba(168, 85, 247, 0.17) !important; }
+html.light .border-white\/15 { border-color: rgba(168, 85, 247, 0.20) !important; }
+html.light .border-white\/20 { border-color: rgba(168, 85, 247, 0.25) !important; }
+html.light .border-white\/25 { border-color: rgba(168, 85, 247, 0.30) !important; }
+html.light .border-white\/30 { border-color: rgba(168, 85, 247, 0.35) !important; }
 
-html.light .hover\:border-white\/10:hover { border-color: rgba(20, 23, 34, 0.16) !important; }
-html.light .hover\:border-white\/12:hover { border-color: rgba(20, 23, 34, 0.20) !important; }
-html.light .hover\:border-white\/14:hover { border-color: rgba(20, 23, 34, 0.22) !important; }
-html.light .hover\:border-white\/15:hover { border-color: rgba(20, 23, 34, 0.24) !important; }
-html.light .hover\:border-white\/20:hover { border-color: rgba(20, 23, 34, 0.30) !important; }
-html.light .hover\:border-white\/25:hover { border-color: rgba(20, 23, 34, 0.36) !important; }
-html.light .hover\:border-white\/30:hover { border-color: rgba(20, 23, 34, 0.42) !important; }
-html.light .hover\:border-white\/35:hover { border-color: rgba(20, 23, 34, 0.48) !important; }
+html.light .hover\:border-white\/10:hover { border-color: rgba(168, 85, 247, 0.20) !important; }
+html.light .hover\:border-white\/12:hover { border-color: rgba(168, 85, 247, 0.24) !important; }
+html.light .hover\:border-white\/14:hover { border-color: rgba(168, 85, 247, 0.26) !important; }
+html.light .hover\:border-white\/15:hover { border-color: rgba(168, 85, 247, 0.28) !important; }
+html.light .hover\:border-white\/20:hover { border-color: rgba(168, 85, 247, 0.33) !important; }
+html.light .hover\:border-white\/25:hover { border-color: rgba(168, 85, 247, 0.38) !important; }
+html.light .hover\:border-white\/30:hover { border-color: rgba(168, 85, 247, 0.42) !important; }
+html.light .hover\:border-white\/35:hover { border-color: rgba(168, 85, 247, 0.48) !important; }
 
 /* ── Gradients ───────────────────────────────────────────────────────────── */
 html.light .from-black { --tw-gradient-from: #f0f1f6 !important; }
@@ -198,7 +198,11 @@ html.light .to-black   { --tw-gradient-to:   #f0f1f6 !important; }
 html.light input, html.light textarea, html.light select {
   background-color: #ffffff !important;
   color: #141722 !important;
-  border-color: rgba(20, 23, 34, 0.22) !important;
+  border-color: rgba(168, 85, 247, 0.22) !important;
+}
+html.light input:focus, html.light textarea:focus, html.light select:focus {
+  border-color: rgba(168, 85, 247, 0.5) !important;
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.1) !important;
 }
 html.light input::placeholder, html.light textarea::placeholder {
   color: rgba(20, 23, 34, 0.52) !important;

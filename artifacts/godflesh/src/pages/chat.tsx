@@ -2433,6 +2433,8 @@ function LeftPanel({
   projectsVersion,
   onOpenNewApp,
   onQuickBuild,
+  activePanelTab,
+  onPanelTabChange,
 }: {
   persona: string;
   onPersonaChange: (p: string) => void;
@@ -2455,6 +2457,8 @@ function LeftPanel({
   projectsVersion?: number;
   onOpenNewApp: () => void;
   onQuickBuild: (prompt: string, type: string) => void;
+  activePanelTab?: string;
+  onPanelTabChange?: (tab: string) => void;
 }) {
   const personas = Object.keys(PERSONA_NAMES);
   const filteredConversations = conversations.filter(c =>
@@ -2462,7 +2466,12 @@ function LeftPanel({
   );
   const { canInstall, install } = usePwaInstall();
 
-  const [panelTab, setPanelTab] = useState<"chats"|"mode"|"skills"|"tools"|"files"|"deploy"|"memory"|"config">("chats");
+  const [panelTabInternal, setPanelTabInternal] = useState<"chats"|"mode"|"skills"|"tools"|"files"|"deploy"|"memory"|"config">("chats");
+  const panelTab = (activePanelTab as typeof panelTabInternal) || panelTabInternal;
+  const setPanelTab = (tab: typeof panelTabInternal) => {
+    setPanelTabInternal(tab);
+    onPanelTabChange?.(tab);
+  };
   const [projects, setProjects] = useState<{ id: number; name: string; type?: string; visibility?: string; starred?: boolean; updatedAt?: string | null }[]>([]);
   const [showProjectPicker, setShowProjectPicker] = useState(false);
 
@@ -2596,33 +2605,33 @@ function LeftPanel({
 
   return (
     <div className="flex flex-col h-full" data-sidebar={isLight ? "light" : "dark"}>
-      {/* OMNIMENS identity header */}
-      <div className="flex items-center gap-2.5 px-3 py-2.5 border-b border-white/8 shrink-0" style={{ borderColor: isLight ? "rgba(20,23,34,0.1)" : undefined }}>
-        <OmnimensPresence size={32} />
+      {/* Workspace header */}
+      <div className="flex items-center gap-2 px-3 py-2 border-b shrink-0" style={{ borderColor: isLight ? "rgba(20,23,34,0.08)" : "#21262d" }}>
         <div className="min-w-0 flex-1">
-          <p className="font-mono text-[9px] tracking-[0.2em] text-primary/70 font-bold">OMNIMENS</p>
-          {status?.isOwner && <span className="font-mono text-[7px] tracking-widest text-accent/70">CREATOR MODE</span>}
+          <p className="font-mono text-[10px] font-bold" style={{ color: isLight ? "#141722" : "#fff" }}>Workspace</p>
+          {status?.isOwner && <span className="font-mono text-[8px] tracking-wider" style={{ color: "#a855f7" }}>CREATOR</span>}
         </div>
-        <button onClick={onNewChat} className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] font-mono font-bold border border-primary/30 text-primary hover:bg-primary/10 transition-all shrink-0">
-          <PlusCircle className="w-3 h-3" /> NEW
+        <button onClick={onNewChat} className="flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[10px] font-mono font-bold transition-all shrink-0" style={{ background: "#a855f7", color: "#fff" }}>
+          <PlusCircle className="w-3 h-3" /> New
         </button>
       </div>
 
-      {/* Scrollable tab bar */}
-      <div className="flex shrink-0 overflow-x-auto" style={{ scrollbarWidth: "none", borderBottom: `1px solid ${isLight ? "rgba(20,23,34,0.1)" : "rgba(255,255,255,0.08)"}` }}>
+      {/* Tab bar */}
+      <div className="flex shrink-0 overflow-x-auto" style={{ scrollbarWidth: "none", borderBottom: `1px solid ${isLight ? "rgba(20,23,34,0.08)" : "#21262d"}` }}>
         {PANEL_TABS.map(tab => (
           <button
             key={tab.id}
             onClick={() => setPanelTab(tab.id as typeof panelTab)}
-            className="flex items-center gap-1 px-3 py-2 font-mono text-[9px] tracking-widest whitespace-nowrap transition-all border-b-2 flex-shrink-0"
+            className="flex items-center gap-1 px-2.5 py-2 font-mono text-[9px] tracking-wider whitespace-nowrap transition-all border-b-2 flex-shrink-0"
             style={{
-              color: panelTab === tab.id ? undefined : isLight ? "rgba(20,23,34,0.38)" : "rgba(255,255,255,0.35)",
-              borderBottomColor: panelTab === tab.id ? undefined : "transparent",
+              color: panelTab === tab.id
+                ? "#a855f7"
+                : isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.35)",
+              borderBottomColor: panelTab === tab.id ? "#a855f7" : "transparent",
             }}
-            data-active={panelTab === tab.id ? "true" : undefined}
           >
-            <span className={panelTab === tab.id ? "text-primary border-b-2 border-primary" : ""}>{tab.icon}</span>
-            <span className={panelTab === tab.id ? "text-primary" : ""}>{tab.label}</span>
+            {tab.icon}
+            {tab.label}
           </button>
         ))}
       </div>
@@ -3247,33 +3256,30 @@ function DevActivityBar({
   onSelect: (tab: string) => void;
 }) {
   const { isLight } = useTheme();
-  const panelBg    = isLight ? "#f0f1f6" : "#0D1117";
-  const panelBdr   = isLight ? "rgba(20,23,34,0.14)" : "#21262d";
-  const iconActive = isLight ? "#141722" : "#ffffff";
-  const iconMuted  = isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.35)";
-  const activeBg   = isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.08)";
+  const panelBg    = isLight ? "#ffffff" : "#0D1117";
+  const panelBdr   = isLight ? "rgba(168,85,247,0.12)" : "#21262d";
+  const iconActive = "#a855f7";
+  const iconMuted  = isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.35)";
+  const activeBg   = isLight ? "rgba(168,85,247,0.08)" : "rgba(168,85,247,0.12)";
 
   const items = [
     { id: "chats",  icon: <MessageSquare className="w-[18px] h-[18px]" />, label: "Chats" },
-    { id: "search", icon: <Search className="w-[18px] h-[18px]" />,        label: "Search" },
     { id: "files",  icon: <HardDrive className="w-[18px] h-[18px]" />,     label: "Files" },
-    { id: "memory", icon: <MemoryStick className="w-[18px] h-[18px]" />,   label: "Memory" },
     { id: "tools",  icon: <Wrench className="w-[18px] h-[18px]" />,        label: "Tools" },
+    { id: "memory", icon: <MemoryStick className="w-[18px] h-[18px]" />,   label: "Memory" },
+    { id: "deploy", icon: <Rocket className="w-[18px] h-[18px]" />,        label: "Deploy" },
   ];
   return (
     <div
       className="shrink-0 flex flex-col items-center py-2 gap-0.5 border-r z-10"
-      style={{ width: 44, background: panelBg, borderColor: panelBdr }}
+      style={{ width: 46, background: panelBg, borderColor: panelBdr }}
     >
-      <div className="w-7 h-7 flex items-center justify-center mb-3 shrink-0">
-        <OmnimensIcon size={20} />
-      </div>
       {items.map(item => (
         <button
           key={item.id}
           title={item.label}
           onClick={() => onSelect(item.id)}
-          className="relative w-9 h-9 rounded flex items-center justify-center transition-all shrink-0"
+          className="relative w-9 h-9 rounded-md flex items-center justify-center transition-all shrink-0"
           style={{
             color: activeTab === item.id ? iconActive : iconMuted,
             background: activeTab === item.id ? activeBg : "transparent",
@@ -3286,7 +3292,8 @@ function DevActivityBar({
       <div className="flex-1" />
       <button
         title="Settings"
-        className="w-9 h-9 rounded flex items-center justify-center transition-all shrink-0"
+        onClick={() => onSelect("config")}
+        className="w-9 h-9 rounded-md flex items-center justify-center transition-all shrink-0"
         style={{ color: isLight ? "rgba(20,23,34,0.30)" : "rgba(255,255,255,0.25)" }}
       >
         <Settings className="w-[16px] h-[16px]" />
@@ -4510,7 +4517,7 @@ export default function Chat() {
   const [showPlusMenu, setShowPlusMenu] = useState(false);
   const [agentMode, setAgentMode] = useState<"swift"|"omni"|"apex">("omni");
   const [showAgentModes, setShowAgentModes] = useState(false);
-  const [devLayout, setDevLayout] = useState(false);
+  const devLayout = true;
   const [devActivityTab, setDevActivityTab] = useState("chats");
   const [showTasksPanel, setShowTasksPanel] = useState(false);
   const [tasks, setTasks] = useState<Array<{id:string;title:string;status:"pending"|"running"|"done"}>>([]);
@@ -4745,12 +4752,12 @@ export default function Chat() {
       <div
         className="flex flex-1 overflow-hidden"
         style={{
-          height: "calc(100vh - 4rem)",
-          background: devLayout ? "#0D1117" : undefined,
+          height: "100vh",
+          background: isLight ? "#f4f5f8" : "#0D1117",
         }}
       >
-        {/* ── IDE ACTIVITY BAR (dev layout only) ──────────────────── */}
-        {devLayout && (
+        {/* ── Activity Bar ──────────────────── */}
+        <div className="hidden sm:block">
           <DevActivityBar
             activeTab={devActivityTab}
             onSelect={(tab) => {
@@ -4758,7 +4765,7 @@ export default function Chat() {
               if (!leftOpen) setLeftOpen(true);
             }}
           />
-        )}
+        </div>
 
         {/* ── LEFT PANEL ──────────────────────────────────────────── */}
         <AnimatePresence initial={false}>
@@ -4773,10 +4780,10 @@ export default function Chat() {
                 minWidth: 0,
                 borderRight: isLight
                   ? "1px solid rgba(20,23,34,0.1)"
-                  : devLayout ? "1px solid #21262d" : "1px solid rgba(255,255,255,0.08)",
+                  : "1px solid #21262d",
                 background: isLight
                   ? "#f0f1f6"
-                  : devLayout ? "#161b22" : "rgba(0,0,0,0.6)",
+                  : "#161b22",
               }}
             >
               <LeftPanel
@@ -4800,6 +4807,8 @@ export default function Chat() {
                 onToggleTheme={toggleTheme}
                 projectsVersion={projectsVersion}
                 onOpenNewApp={() => setShowNewAppModal(true)}
+                activePanelTab={devActivityTab}
+                onPanelTabChange={(tab) => setDevActivityTab(tab)}
                 onQuickBuild={(prompt, type) => {
                   setBuildPanel({
                     appName: type,
@@ -4820,226 +4829,149 @@ export default function Chat() {
         {/* ── CENTER — CHAT ────────────────────────────────────────── */}
         <div className="flex-1 flex flex-col overflow-hidden min-w-0">
 
-          {/* ── IDE Tab Bar (dev layout only) ─────────────────────── */}
-          {devLayout && (
-            <div
-              className="shrink-0 flex items-center border-b"
-              style={{ background: "#161b22", borderColor: "#21262d", minHeight: 38 }}
-            >
-              {/* Left panel toggle */}
+          {/* ── Unified Top Bar (Replit-style) ─────────────────────── */}
+          <div
+            className="shrink-0 flex items-center border-b"
+            style={{
+              background: isLight ? "#ffffff" : "#161b22",
+              borderColor: isLight ? "rgba(20,23,34,0.1)" : "#21262d",
+              minHeight: 40,
+            }}
+          >
+            {/* Left: Logo + panel toggle (mobile: hamburger) */}
+            <div className="flex items-center shrink-0">
               <button
                 onClick={() => setLeftOpen(o => !o)}
-                className="hidden lg:flex items-center justify-center transition-colors p-2.5 shrink-0"
+                className="flex items-center justify-center transition-colors p-2.5 shrink-0"
                 title={leftOpen ? "Hide panel" : "Show panel"}
-                style={{ color: "rgba(255,255,255,0.4)" }}
+                style={{ color: isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.4)" }}
               >
-                {leftOpen ? <PanelLeftClose className="w-3.5 h-3.5" /> : <PanelLeft className="w-3.5 h-3.5" />}
+                {leftOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeft className="w-4 h-4" />}
               </button>
-
-              {/* File tabs */}
-              <div className="flex items-center overflow-x-auto flex-1" style={{ scrollbarWidth: "none" }}>
-                {conversations.slice(0, 6).map(conv => (
-                  <button
-                    key={conv.id}
-                    onClick={() => handleLoadConversation(conv.id)}
-                    className="flex items-center gap-1.5 px-4 py-2 border-r shrink-0 transition-all text-[11px] font-mono"
-                    style={{
-                      borderColor: "#21262d",
-                      background: currentConversationId === conv.id ? "#0D1117" : "transparent",
-                      color: currentConversationId === conv.id ? "#fff" : "rgba(255,255,255,0.35)",
-                      borderBottom: currentConversationId === conv.id ? "1px solid #0D1117" : "1px solid transparent",
-                    }}
-                  >
-                    <FileText className="w-3 h-3 shrink-0" style={{ color: currentConversationId === conv.id ? "#a855f7" : undefined }} />
-                    <span className="max-w-[120px] truncate">{conv.title || "untitled.omni"}</span>
-                    <X
-                      className="w-3 h-3 ml-1 shrink-0 opacity-0 hover:opacity-100"
-                      style={{ color: "rgba(255,255,255,0.4)" }}
-                      onClick={e => { e.stopPropagation(); handleDeleteConversation(conv.id); }}
-                    />
-                  </button>
-                ))}
-                <button
-                  onClick={handleNewChat}
-                  className="flex items-center justify-center w-8 h-full shrink-0 transition-all"
-                  title="New chat (Ctrl+K)"
-                  style={{ color: "rgba(255,255,255,0.25)" }}
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              {/* Right controls */}
-              <div className="flex items-center gap-1 px-2 shrink-0">
-                <button
-                  onClick={toggleTheme}
-                  title="Toggle theme"
-                  className="w-7 h-7 flex items-center justify-center rounded transition-all"
-                  style={{ color: "rgba(255,255,255,0.35)" }}
-                >
-                  {theme === "light" ? <Sun className="w-3.5 h-3.5 text-yellow-400" /> : <Moon className="w-3.5 h-3.5" />}
-                </button>
-                <button
-                  onClick={() => setRightOpen(o => !o)}
-                  className="hidden lg:flex items-center justify-center w-7 h-7 rounded transition-all"
-                  style={{ color: "rgba(255,255,255,0.35)" }}
-                >
-                  {rightOpen ? <PanelRightClose className="w-3.5 h-3.5" /> : <PanelRight className="w-3.5 h-3.5" />}
-                </button>
-                <button
-                  onClick={() => setDevLayout(false)}
-                  title="Exit IDE Mode"
-                  className="flex items-center gap-1 px-2 py-1 rounded text-[9px] font-mono font-bold transition-all border"
-                  style={{ color: "#a855f7", borderColor: "rgba(168,85,247,0.3)", background: "rgba(168,85,247,0.08)" }}
-                >
-                  <Monitor className="w-3 h-3" /> IDE
-                </button>
-              </div>
+              <Link href="/" className="flex items-center gap-2 mr-3 sm:mr-0">
+                <OmnimensIcon size={20} />
+                <span className="font-display font-black text-[11px] tracking-[0.15em] hidden sm:inline" style={{ color: isLight ? "#141722" : "#fff" }}>
+                  OMNIMENS
+                </span>
+              </Link>
             </div>
-          )}
 
-          {/* Top bar */}
-          <div className={`shrink-0 flex items-center justify-between px-3 py-2 border-b border-white/8 bg-black/40 ${devLayout ? "hidden" : ""}`}>
-            {/* Left panel toggle */}
-            <button
-              onClick={() => setLeftOpen(o => !o)}
-              className="hidden lg:flex items-center gap-1.5 text-white/75 hover:text-white/70 transition-colors p-1.5 rounded"
-              title={leftOpen ? "Hide left panel" : "Show left panel"}
-            >
-              {leftOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeft className="w-4 h-4" />}
-            </button>
+            {/* Center: File tabs */}
+            <div className="flex items-center overflow-x-auto flex-1 min-w-0" style={{ scrollbarWidth: "none" }}>
+              {conversations.slice(0, 6).map(conv => (
+                <button
+                  key={conv.id}
+                  onClick={() => handleLoadConversation(conv.id)}
+                  className="flex items-center gap-1.5 px-3 py-2 border-r shrink-0 transition-all text-[11px] font-mono"
+                  style={{
+                    borderColor: isLight ? "rgba(20,23,34,0.08)" : "#21262d",
+                    background: currentConversationId === conv.id
+                      ? (isLight ? "#f4f5f8" : "#0D1117")
+                      : "transparent",
+                    color: currentConversationId === conv.id
+                      ? (isLight ? "#141722" : "#fff")
+                      : (isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.35)"),
+                    borderBottom: currentConversationId === conv.id
+                      ? `2px solid #a855f7`
+                      : "2px solid transparent",
+                  }}
+                >
+                  <FileText className="w-3 h-3 shrink-0" style={{ color: currentConversationId === conv.id ? "#a855f7" : undefined }} />
+                  <span className="max-w-[100px] truncate">{conv.title || "untitled.omni"}</span>
+                  <X
+                    className="w-3 h-3 ml-1 shrink-0 opacity-0 hover:opacity-100"
+                    style={{ color: isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.4)" }}
+                    onClick={e => { e.stopPropagation(); handleDeleteConversation(conv.id); }}
+                  />
+                </button>
+              ))}
+              <button
+                onClick={handleNewChat}
+                className="flex items-center justify-center w-8 h-full shrink-0 transition-all"
+                title="New chat (Ctrl+K)"
+                style={{ color: isLight ? "rgba(20,23,34,0.3)" : "rgba(255,255,255,0.25)" }}
+              >
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            </div>
 
-            {/* Center identity */}
-            <div className="flex items-center gap-2 font-mono text-xs flex-wrap">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-white">LINK ACTIVE</span>
-              <CogniSyncIndicator state={activeCogniSync} />
-              {/* WebGPU accelerator badge */}
-              {gpu.supported && gpu.status !== "unsupported" && (
-                gpu.status === "loading" ? (
-                  <span
-                    title={`Loading local GPU model… ${gpu.progress}%\n${gpu.progressText}`}
-                    className="flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-sky-400/20 bg-sky-400/8 text-sky-400 text-[8px] font-mono tracking-widest cursor-default"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" style={{}} />
+            {/* Right: Status badges + controls */}
+            <div className="flex items-center gap-0.5 px-2 shrink-0">
+              {/* Status badges — desktop only */}
+              <div className="hidden sm:flex items-center gap-1.5 mr-1">
+                <CogniSyncIndicator state={activeCogniSync} />
+                {gpu.supported && gpu.status === "ready" && (
+                  <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-sky-400/25 bg-sky-400/10 text-sky-400 text-[8px] font-mono tracking-widest cursor-default">
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400" style={{ boxShadow: "0 0 6px #38bdf8" }} />
+                    GPU
+                  </span>
+                )}
+                {gpu.supported && gpu.status === "loading" && (
+                  <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-sky-400/20 bg-sky-400/8 text-sky-400 text-[8px] font-mono tracking-widest cursor-default">
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
                     GPU {gpu.progress}%
                   </span>
-                ) : gpu.status === "ready" ? (
-                  <span
-                    title="WebGPU local acceleration active — context is compressed locally on your GPU before sending"
-                    className="flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-sky-400/25 bg-sky-400/10 text-sky-400 text-[8px] font-mono tracking-widest cursor-default"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400" style={{ boxShadow: "0 0 6px #38bdf8" }} />
-                    GPU ACTIVE
+                )}
+                {hubSettings.antiHallucinationMode && (
+                  <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-orange-400/10 border border-orange-400/20 text-orange-400 text-[8px] font-mono">
+                    <ShieldCheck className="w-2.5 h-2.5" /> VERIFIED
                   </span>
-                ) : null
-              )}
-              {/* Active hub modes indicators */}
-              {hubSettings.antiHallucinationMode && (
-                <span title="Anti-Hallucination Mode ON" className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-orange-400/10 border border-orange-400/20 text-orange-400 text-[9px] font-mono">
-                  <ShieldCheck className="w-2.5 h-2.5" /> VERIFIED
-                </span>
-              )}
-              {hubSettings.debateMode && (
-                <span title="Debate Mode ON" className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-violet-400/10 border border-violet-400/20 text-violet-400 text-[9px] font-mono">
-                  <Swords className="w-2.5 h-2.5" /> DEBATE
-                </span>
-              )}
-              {hubSettings.responseLanguage && hubSettings.responseLanguage !== "auto" && (
-                <span className="px-1.5 py-0.5 rounded bg-blue-400/10 border border-blue-400/20 text-blue-400 text-[9px] font-mono uppercase">
-                  {hubSettings.responseLanguage}
-                </span>
-              )}
-              {status?.isOwner && <OmnimensNotificationBell />}
-            </div>
+                )}
+                {hubSettings.debateMode && (
+                  <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-violet-400/10 border border-violet-400/20 text-violet-400 text-[8px] font-mono">
+                    <Swords className="w-2.5 h-2.5" /> DEBATE
+                  </span>
+                )}
+                {statusLoading ? null : status?.isOwner ? (
+                  <span className="font-mono text-[9px] text-primary font-bold tracking-widest">CREATOR</span>
+                ) : status?.isPro ? (
+                  <span className="font-mono text-[9px] text-primary font-bold tracking-widest">PRO</span>
+                ) : null}
+                {status?.isOwner && <OmnimensNotificationBell />}
+              </div>
 
-            {/* Right controls */}
-            <div className="flex items-center gap-1">
-              {statusLoading ? (
-                <span className="font-mono text-[10px] text-white/75">READING...</span>
-              ) : status?.isOwner ? (
-                <span className="font-mono text-[10px] text-accent font-bold tracking-widest hidden sm:block mr-1">⚡ CREATOR</span>
-              ) : status?.isPro ? (
-                <span className="font-mono text-[10px] text-accent font-bold tracking-widest hidden sm:block mr-1">UNLIMITED</span>
-              ) : null}
-              {/* Developer Portal link */}
-              <a
-                href={`${window.location.origin}/godflesh/dev`}
-                title="Developer API — Build with OMNIMENS"
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg transition-all border text-[9px] font-mono font-bold tracking-wider text-white/35 border-transparent hover:text-primary hover:bg-primary/8 hover:border-primary/20 hidden sm:flex"
-              >
-                <Code2 className="w-3 h-3" />
-                API
-              </a>
-              {/* Report a Problem */}
-              <a
-                href={`${window.location.origin}/godflesh/support`}
-                title="Report a problem or contact support"
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg transition-all border text-[9px] font-mono font-bold tracking-wider text-white/25 border-transparent hover:text-red-400/80 hover:bg-red-400/8 hidden sm:flex"
-              >
-                <AlertTriangle className="w-3 h-3" />
-              </a>
-
-              {/* Theme toggle */}
-              <button
-                onClick={toggleTheme}
-                title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all border text-white/50 border-transparent hover:text-white/70 hover:bg-white/[0.05] text-[9px] font-mono font-bold tracking-wider"
-              >
-                {theme === "light" ? <Sun className="w-3.5 h-3.5 text-yellow-400" /> : <Moon className="w-3.5 h-3.5" />}
-              </button>
-
-              {/* Agent Mode indicator + switcher */}
+              {/* Agent mode */}
               <button
                 onClick={() => setShowAgentModes(true)}
                 title="Agent Mode"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-white/50 hover:text-white/70 hover:bg-white/[0.05] transition-all border border-transparent text-[9px] font-mono font-bold tracking-wider"
+                className="flex items-center gap-1 px-2 py-1.5 rounded-md transition-all text-[9px] font-mono font-bold tracking-wider"
+                style={{ color: isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.45)" }}
               >
                 {agentMode === "swift" && <Zap className="w-3.5 h-3.5 text-yellow-400" />}
                 {agentMode === "omni" && <Sparkles className="w-3.5 h-3.5 text-primary" />}
                 {agentMode === "apex" && <Infinity className="w-3.5 h-3.5 text-emerald-400" />}
                 <span className="hidden sm:block">{agentMode.toUpperCase()}</span>
               </button>
-              {/* Control Hub button */}
+
+              {/* Control Hub */}
               <button
                 onClick={() => setShowControlHub(true)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-white/70 hover:text-primary hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 text-[9px] font-mono font-bold tracking-wider"
-                title="Control Hub (Ctrl+/)"
+                className="flex items-center gap-1 px-2 py-1.5 rounded-md transition-all text-[9px] font-mono font-bold tracking-wider hover:bg-primary/10"
+                style={{ color: isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.45)" }}
+                title="Control Hub"
               >
                 <Settings className="w-3.5 h-3.5" />
                 <span className="hidden sm:block">HUB</span>
               </button>
-              {/* Export conversation */}
-              {currentConversationId && (
-                <button
-                  onClick={() => handleExportConversation("markdown")}
-                  className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-white/40 hover:text-primary/70 hover:bg-primary/10 transition-all text-[9px] font-mono border border-transparent hover:border-primary/20"
-                  title="Export conversation as Markdown"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span className="hidden sm:block">EXPORT</span>
-                </button>
-              )}
+
+              {/* Theme toggle */}
+              <button
+                onClick={toggleTheme}
+                title={theme === "light" ? "Dark Mode" : "Light Mode"}
+                className="w-7 h-7 flex items-center justify-center rounded-md transition-all"
+                style={{ color: isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.35)" }}
+              >
+                {theme === "light" ? <Sun className="w-3.5 h-3.5 text-yellow-500" /> : <Moon className="w-3.5 h-3.5" />}
+              </button>
+
               {/* Right panel toggle */}
               <button
                 onClick={() => setRightOpen(o => !o)}
-                className="hidden lg:flex items-center gap-1.5 text-white/75 hover:text-white/70 transition-colors p-1.5 rounded"
-                title={rightOpen ? "Hide right panel" : "Show right panel"}
+                className="hidden lg:flex items-center justify-center w-7 h-7 rounded-md transition-all"
+                style={{ color: isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.35)" }}
+                title={rightOpen ? "Hide panel" : "Show panel"}
               >
-                {rightOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRight className="w-4 h-4" />}
-              </button>
-              {/* IDE Layout toggle */}
-              <button
-                onClick={() => setDevLayout(d => !d)}
-                title={devLayout ? "Exit IDE Mode" : "Developer IDE Mode — Replit-style layout"}
-                className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all border text-[9px] font-mono font-bold tracking-wider ${
-                  devLayout
-                    ? "text-primary border-primary/30 bg-primary/10"
-                    : "text-white/35 border-transparent hover:text-white/60 hover:bg-white/[0.05]"
-                }`}
-              >
-                <Monitor className="w-3.5 h-3.5" />
-                <span className="hidden sm:block">IDE</span>
+                {rightOpen ? <PanelRightClose className="w-3.5 h-3.5" /> : <PanelRight className="w-3.5 h-3.5" />}
               </button>
             </div>
           </div>
@@ -5070,7 +5002,7 @@ export default function Chat() {
           {/* Messages area */}
           <div
             className="flex-1 overflow-y-auto omnimens-scrollbar p-4 relative"
-            style={{ background: devLayout ? "#0D1117" : "rgba(0,0,0,0.12)" }}
+            style={{ background: isLight ? "#f4f5f8" : "#0D1117" }}
           >
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center select-none">
@@ -5540,7 +5472,7 @@ export default function Chat() {
           )}
 
           {/* Input area */}
-          <form onSubmit={handleSubmit} className="shrink-0 border-t border-white/8 bg-black/40 p-3" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
+          <form onSubmit={handleSubmit} className="shrink-0 border-t p-3" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))", borderColor: isLight ? "rgba(20,23,34,0.1)" : "#21262d", background: isLight ? "#ffffff" : "#161b22" }}>
             <PendingFileList files={pendingFiles} onRemove={removeFile} />
             <div className="relative flex items-center">
               <input ref={fileInputRef} type="file" multiple
@@ -5597,7 +5529,12 @@ export default function Chat() {
                   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(e); }
                 }}
                 placeholder={pendingFiles.length > 0 ? "Describe what to create with these files..." : "Query the intelligence... or attach files to build something"}
-                className="w-full bg-black border border-white/15 focus:border-primary focus:ring-1 focus:ring-primary/50 rounded-xl pl-10 pr-28 sm:pr-[11rem] py-3.5 text-white font-mono text-sm resize-none h-[56px] omnimens-scrollbar outline-none transition-all placeholder:text-white/50"
+                className="w-full rounded-xl pl-10 pr-28 sm:pr-[11rem] py-3.5 font-mono text-sm resize-none h-[56px] omnimens-scrollbar outline-none transition-all border focus:border-primary focus:ring-1 focus:ring-primary/50"
+                style={{
+                  background: isLight ? "#f4f5f8" : "#0d1117",
+                  borderColor: isLight ? "rgba(168,85,247,0.25)" : "rgba(255,255,255,0.15)",
+                  color: isLight ? "#141722" : "#fff",
+                }}
                 disabled={isTyping}
               />
               <div className="absolute right-2 flex items-center gap-1">
@@ -5662,12 +5599,11 @@ export default function Chat() {
             onUseTemplate={(t) => { setInput(t); setShowTemplates(false); }}
           />
 
-          {/* ── IDE Status Bar (dev layout only) ─────────────────── */}
-          {devLayout && (
-            <div
-              className="shrink-0 flex items-center justify-between px-3"
-              style={{ background: "#a855f7", height: 22, minHeight: 22, paddingBottom: "env(safe-area-inset-bottom)" }}
-            >
+          {/* ── Status Bar ─────────────────── */}
+          <div
+            className="shrink-0 flex items-center justify-between px-3"
+            style={{ background: "#a855f7", height: 22, minHeight: 22, paddingBottom: "env(safe-area-inset-bottom)" }}
+          >
               <div className="flex items-center gap-3">
                 <span className="font-mono text-[9px] text-white/80 font-bold tracking-wider">
                   {PERSONA_NAMES[persona] || persona}
@@ -5688,7 +5624,6 @@ export default function Chat() {
                 </span>
               </div>
             </div>
-          )}
         </div>
 
         {/* ── RIGHT PANEL ─────────────────────────────────────────── */}
@@ -5696,7 +5631,7 @@ export default function Chat() {
           {rightOpen && (
             <motion.div
               initial={{ width: 0, opacity: 0 }}
-              animate={{ width: devLayout ? 300 : 260, opacity: 1 }}
+              animate={{ width: 300, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
               className="shrink-0 overflow-hidden hidden lg:block"
@@ -5704,28 +5639,19 @@ export default function Chat() {
                 minWidth: 0,
                 borderLeft: isLight
                   ? "1px solid rgba(20,23,34,0.1)"
-                  : devLayout ? "1px solid #21262d" : "1px solid rgba(255,255,255,0.08)",
+                  : "1px solid #21262d",
                 background: isLight
                   ? "#f0f1f6"
-                  : devLayout ? "#0D1117" : "rgba(0,0,0,0.6)",
+                  : "#0D1117",
               }}
             >
-              {devLayout ? (
-                <DevRightPanel
-                  allImages={allImages}
-                  allArtifacts={allArtifacts}
-                  status={status}
-                  credits={(status as any)?.credits}
-                  messages={messages}
-                />
-              ) : (
-                <RightPanel
-                  allImages={allImages}
-                  allArtifacts={allArtifacts}
-                  status={status}
-                  credits={(status as any)?.credits}
-                />
-              )}
+              <DevRightPanel
+                allImages={allImages}
+                allArtifacts={allArtifacts}
+                status={status}
+                credits={(status as any)?.credits}
+                messages={messages}
+              />
             </motion.div>
           )}
         </AnimatePresence>
