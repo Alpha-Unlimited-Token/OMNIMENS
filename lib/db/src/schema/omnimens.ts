@@ -21,6 +21,8 @@ export const omnimensUsers = pgTable("godflesh_users", {
   currentMonthKey: text("current_month_key"),            // "2025-03" — for monthly reset
   lastBonusMonth: text("last_bonus_month"),              // last month bonus was granted
   totalPaidSpendCents: integer("total_paid_spend_cents").default(0).notNull(), // lifetime paid
+  resonanceCredits: integer("resonance_credits").default(0).notNull(),
+  resonanceTotalEarned: integer("resonance_total_earned").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

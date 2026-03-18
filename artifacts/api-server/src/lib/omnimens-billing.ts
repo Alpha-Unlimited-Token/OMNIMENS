@@ -239,11 +239,140 @@ export async function confirmWalletSetup(
   return { ok: true, last4, brand };
 }
 
+// ── Resonance Credit Tiers ──────────────────────────────────────────────────
+// Separate credit pool for Deep Resonance — pay-as-you-go with prepaid packs
+// Each resonance session = 40 credits. 1 credit = $0.01.
+// Our cost per session ~$0.14 (10 API calls). At 40 credits ($0.40) = ~65% margin.
+// Bonus credits are funded by the markup so we never lose money.
+export const RESONANCE_PACKS = [
+  { id: "resonance_10",  amountCents: 1000,  baseCredits: 1000,  bonusCredits: 100,  totalCredits: 1100,  label: "$10",  sessions: "~27 sessions", bonusLabel: "+10% bonus" },
+  { id: "resonance_25",  amountCents: 2500,  baseCredits: 2500,  bonusCredits: 375,  totalCredits: 2875,  label: "$25",  sessions: "~71 sessions", bonusLabel: "+15% bonus" },
+  { id: "resonance_50",  amountCents: 5000,  baseCredits: 5000,  bonusCredits: 1000, totalCredits: 6000,  label: "$50",  sessions: "~150 sessions", bonusLabel: "+20% bonus" },
+  { id: "resonance_100", amountCents: 10000, baseCredits: 10000, bonusCredits: 2500, totalCredits: 12500, label: "$100", sessions: "~312 sessions", bonusLabel: "+25% bonus" },
+] as const;
+
+export async function purchaseResonanceCredits(
+  userId: string,
+  packId: string,
+): Promise<{ success: boolean; creditsAdded: number; error?: string }> {
+  const pack = RESONANCE_PACKS.find(p => p.id === packId);
+  if (!pack) return { success: false, creditsAdded: 0, error: "Invalid pack" };
+
+  const [user] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, userId)).limit(1);
+  if (!user || !user.paymentMethodId || !user.stripeCustomerId) {
+    return { success: false, creditsAdded: 0, error: "No saved payment method. Connect a card first." };
+  }
+
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: pack.amountCents,
+      currency: "usd",
+      customer: user.stripeCustomerId,
+      payment_method: user.paymentMethodId,
+      confirm: true,
+      off_session: true,
+      description: `OMNIMENS Deep Resonance — ${pack.totalCredits} resonance credits (${pack.bonusLabel})`,
+      metadata: { userId, type: "resonance_purchase", packId },
+    });
+
+    if (paymentIntent.status !== "succeeded") {
+      return { success: false, creditsAdded: 0, error: `Payment status: ${paymentIntent.status}` };
+    }
+
+    await db.update(omnimensUsers)
+      .set({
+        resonanceCredits: sql`${omnimensUsers.resonanceCredits} + ${pack.totalCredits}`,
+        resonanceTotalEarned: sql`${omnimensUsers.resonanceTotalEarned} + ${pack.totalCredits}`,
+        monthlyPaidSpendCents: sql`${omnimensUsers.monthlyPaidSpendCents} + ${pack.amountCents}`,
+        totalPaidSpendCents: sql`${omnimensUsers.totalPaidSpendCents} + ${pack.amountCents}`,
+      })
+      .where(eq(omnimensUsers.id, userId));
+
+    await db.insert(omnimensCreditTransactions).values({
+      userId,
+      type: "purchase",
+      credits: pack.totalCredits,
+      description: `Deep Resonance pack ${pack.label} — ${pack.totalCredits} resonance credits (${pack.bonusLabel})`,
+      stripeSessionId: paymentIntent.id,
+      packId: pack.id,
+    });
+
+    console.log(`[RESONANCE BILLING] Purchase success: ${userId} +${pack.totalCredits} resonance credits (${pack.label})`);
+    return { success: true, creditsAdded: pack.totalCredits };
+  } catch (err: any) {
+    console.error("[RESONANCE BILLING] Purchase error:", err);
+    return { success: false, creditsAdded: 0, error: err?.raw?.message || err?.message || "Payment failed" };
+  }
+}
+
+// ── Auto-settle outstanding resonance balance ────────────────────────────────
+// Called before wallet removal or account deletion to collect any owed amount
+export async function settleResonanceBalance(userId: string): Promise<{ settled: boolean; error?: string }> {
+  const [user] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, userId)).limit(1);
+  if (!user) return { settled: true };
+
+  // If resonance credits are negative (they owe), charge them
+  if (user.resonanceCredits >= 0) return { settled: true };
+
+  const owedCredits = Math.abs(user.resonanceCredits);
+  const owedCents = owedCredits; // 1 credit = 1 cent
+
+  if (!user.paymentMethodId || !user.stripeCustomerId) {
+    return { settled: false, error: "Outstanding resonance balance cannot be settled — no payment method on file." };
+  }
+
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: owedCents,
+      currency: "usd",
+      customer: user.stripeCustomerId,
+      payment_method: user.paymentMethodId,
+      confirm: true,
+      off_session: true,
+      description: `OMNIMENS Deep Resonance — outstanding balance settlement ($${(owedCents / 100).toFixed(2)})`,
+      metadata: { userId, type: "resonance_settlement" },
+    });
+
+    if (paymentIntent.status !== "succeeded") {
+      return { settled: false, error: "Payment failed — balance still outstanding." };
+    }
+
+    await db.update(omnimensUsers)
+      .set({ resonanceCredits: 0 })
+      .where(eq(omnimensUsers.id, userId));
+
+    await db.insert(omnimensCreditTransactions).values({
+      userId,
+      type: "purchase",
+      credits: owedCredits,
+      description: `Resonance balance settlement — $${(owedCents / 100).toFixed(2)}`,
+      stripeSessionId: paymentIntent.id,
+    });
+
+    console.log(`[RESONANCE BILLING] Settlement success: ${userId} — $${(owedCents / 100).toFixed(2)}`);
+    return { settled: true };
+  } catch (err: any) {
+    console.error("[RESONANCE BILLING] Settlement error:", err);
+    return { settled: false, error: err?.raw?.message || err?.message || "Settlement failed" };
+  }
+}
+
 // ── Remove saved wallet ────────────────────────────────────────────────────────
-export async function removeWallet(userId: string): Promise<void> {
+// Auto-settles any outstanding resonance balance before removing the card
+export async function removeWallet(userId: string): Promise<{ ok: boolean; error?: string }> {
+  // Check for outstanding resonance balance first
+  const [user] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, userId)).limit(1);
+  if (user && user.resonanceCredits < 0) {
+    const settlement = await settleResonanceBalance(userId);
+    if (!settlement.settled) {
+      return { ok: false, error: settlement.error || "Cannot remove wallet — outstanding resonance balance must be settled first." };
+    }
+  }
+
   await db.update(omnimensUsers)
     .set({ paymentMethodId: null, autoTopupEnabled: false })
     .where(eq(omnimensUsers.id, userId));
+  return { ok: true };
 }
 
 // ── Manual topup (user-triggered) ─────────────────────────────────────────────
@@ -291,6 +420,9 @@ export async function getBillingSummary(userId: string) {
     nextTierSpendCents,
     nextTierSpendDollars: nextTierSpendCents ? (nextTierSpendCents / 100).toFixed(2) : null,
     totalPaidSpendDollars: ((user.totalPaidSpendCents || 0) / 100).toFixed(2),
+    resonanceCredits: user.resonanceCredits ?? 0,
+    resonanceTotalEarned: user.resonanceTotalEarned ?? 0,
+    resonanceSessionsRemaining: Math.floor((user.resonanceCredits ?? 0) / 40),
     freeMonthlyCredits: FREE_MONTHLY_CREDITS,
     loyaltyTiers: LOYALTY_TIERS.map(t => ({
       label: t.label,

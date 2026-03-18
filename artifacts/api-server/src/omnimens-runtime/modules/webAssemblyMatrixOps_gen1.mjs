@@ -1,96 +1,121 @@
 /**
  * @module webAssemblyMatrixOps
- * @description This module enables GPU-like matrix operations using WebAssembly for faster ML computations in Node.js.
+ * @description A WebAssembly-powered matrix operations library for efficient AI computations in Node.js.
  */
 
 const fs = require('fs');
 const path = require('path');
 
 /**
- * Compiles the WebAssembly module from a binary file.
- * @param {Buffer} wasmBuffer - The buffer containing the WebAssembly binary.
- * @returns {Promise<WebAssembly.Instance>} - A promise that resolves to the WebAssembly instance.
+ * Loads and compiles the WebAssembly module for matrix operations.
+ * @returns {Promise<WebAssembly.Instance>} The compiled WebAssembly instance.
  */
-async function compileWasm(wasmBuffer) {
+async function loadWasmModule() {
+  const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = fs.readFileSync(wasmPath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
   return WebAssembly.instantiate(wasmModule);
 }
 
 /**
- * Initializes the WebAssembly module for matrix operations.
- * @returns {Promise<Object>} - A promise that resolves to an object with matrix operation functions.
+ * Multiplies two matrices using WebAssembly.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {Promise<number[][]>} The resulting matrix after multiplication.
+ * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
  */
-async function initMatrixOps() {
-  const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
-  const wasmBuffer = fs.readFileSync(wasmPath);
-  const wasmInstance = await compileWasm(wasmBuffer);
+async function multiplyMatrices(matrixA, matrixB) {
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Matrix dimensions do not allow multiplication.');
+  }
 
-  const { memory, multiply_matrices, add_vectors } = wasmInstance.exports;
+  const wasmInstance = await loadWasmModule();
+  const { memory, multiply } = wasmInstance.exports;
 
-  return {
-    /**
-     * Multiplies two matrices.
-     * @param {Float32Array} matrixA - The first matrix in row-major order.
-     * @param {Float32Array} matrixB - The second matrix in row-major order.
-     * @param {number} rowsA - The number of rows in matrix A.
-     * @param {number} colsA - The number of columns in matrix A.
-     * @param {number} colsB - The number of columns in matrix B.
-     * @returns {Float32Array} - The resulting matrix in row-major order.
-     */
-    multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB) {
-      const result = new Float32Array(rowsA * colsB);
-      const offsetA = 0;
-      const offsetB = matrixA.length * Float32Array.BYTES_PER_ELEMENT;
-      const offsetResult = offsetB + matrixB.length * Float32Array.BYTES_PER_ELEMENT;
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const colsB = matrixB[0].length;
 
-      const wasmMemory = new Float32Array(memory.buffer);
-      wasmMemory.set(matrixA, offsetA / Float32Array.BYTES_PER_ELEMENT);
-      wasmMemory.set(matrixB, offsetB / Float32Array.BYTES_PER_ELEMENT);
+  const inputSizeA = rowsA * colsA;
+  const inputSizeB = colsA * colsB;
+  const outputSize = rowsA * colsB;
 
-      multiply_matrices(offsetA, offsetB, offsetResult, rowsA, colsA, colsB);
+  const memoryView = new Float64Array(memory.buffer);
 
-      result.set(
-        wasmMemory.subarray(
-          offsetResult / Float32Array.BYTES_PER_ELEMENT,
-          (offsetResult / Float32Array.BYTES_PER_ELEMENT) + result.length
-        )
-      );
+  // Allocate memory for input and output matrices
+  const offsetA = 0;
+  const offsetB = offsetA + inputSizeA;
+  const offsetC = offsetB + inputSizeB;
 
-      return result;
-    },
+  // Flatten and copy matrixA into memory
+  matrixA.flat().forEach((value, index) => {
+    memoryView[offsetA + index] = value;
+  });
 
-    /**
-     * Adds two vectors.
-     * @param {Float32Array} vectorA - The first vector.
-     * @param {Float32Array} vectorB - The second vector.
-     * @returns {Float32Array} - The resulting vector.
-     */
-    addVectors(vectorA, vectorB) {
-      if (vectorA.length !== vectorB.length) {
-        throw new Error('Vectors must be of the same length');
-      }
+  // Flatten and copy matrixB into memory
+  matrixB.flat().forEach((value, index) => {
+    memoryView[offsetB + index] = value;
+  });
 
-      const result = new Float32Array(vectorA.length);
-      const offsetA = 0;
-      const offsetB = vectorA.length * Float32Array.BYTES_PER_ELEMENT;
-      const offsetResult = offsetB + vectorB.length * Float32Array.BYTES_PER_ELEMENT;
+  // Perform matrix multiplication
+  multiply(offsetA, rowsA, colsA, offsetB, colsB, offsetC);
 
-      const wasmMemory = new Float32Array(memory.buffer);
-      wasmMemory.set(vectorA, offsetA / Float32Array.BYTES_PER_ELEMENT);
-      wasmMemory.set(vectorB, offsetB / Float32Array.BYTES_PER_ELEMENT);
-
-      add_vectors(offsetA, offsetB, offsetResult, vectorA.length);
-
-      result.set(
-        wasmMemory.subarray(
-          offsetResult / Float32Array.BYTES_PER_ELEMENT,
-          (offsetResult / Float32Array.BYTES_PER_ELEMENT) + result.length
-        )
-      );
-
-      return result;
+  // Retrieve the result matrix
+  const result = [];
+  for (let i = 0; i < rowsA; i++) {
+    const row = [];
+    for (let j = 0; j < colsB; j++) {
+      row.push(memoryView[offsetC + i * colsB + j]);
     }
-  };
+    result.push(row);
+  }
+
+  return result;
 }
 
-module.exports = { initMatrixOps };
+/**
+ * Transposes a matrix using WebAssembly.
+ * @param {number[][]} matrix - The matrix to transpose.
+ * @returns {Promise<number[][]>} The transposed matrix.
+ */
+async function transposeMatrix(matrix) {
+  const wasmInstance = await loadWasmModule();
+  const { memory, transpose } = wasmInstance.exports;
+
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+
+  const inputSize = rows * cols;
+  const outputSize = cols * rows;
+
+  const memoryView = new Float64Array(memory.buffer);
+
+  // Allocate memory for input and output matrices
+  const offsetInput = 0;
+  const offsetOutput = offsetInput + inputSize;
+
+  // Flatten and copy matrix into memory
+  matrix.flat().forEach((value, index) => {
+    memoryView[offsetInput + index] = value;
+  });
+
+  // Perform matrix transposition
+  transpose(offsetInput, rows, cols, offsetOutput);
+
+  // Retrieve the result matrix
+  const result = [];
+  for (let i = 0; i < cols; i++) {
+    const row = [];
+    for (let j = 0; j < rows; j++) {
+      row.push(memoryView[offsetOutput + i * rows + j]);
+    }
+    result.push(row);
+  }
+
+  return result;
+}
+
+module.exports = {
+  multiplyMatrices,
+  transposeMatrix
+};

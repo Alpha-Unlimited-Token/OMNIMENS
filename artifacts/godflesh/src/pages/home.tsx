@@ -4,9 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
-import { Sparkles, Brain, Zap, Activity, Cpu, GitBranch, Layers, Smartphone, Monitor, Download, Share } from "lucide-react";
+import { Sparkles, Brain, Zap, Activity, Cpu, GitBranch, Layers, Smartphone, Monitor, Download, Share, ArrowRight, Shield, Eye, Network } from "lucide-react";
 import { OmnimensPresence } from "@/components/omnimens-presence";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
+
+const RESONANCE_PACKS_DISPLAY = [
+  { id: "resonance_10",  price: "$10",  credits: "1,100",  bonus: "+10% bonus",  sessions: "~27 sessions", featured: false },
+  { id: "resonance_25",  price: "$25",  credits: "2,875",  bonus: "+15% bonus",  sessions: "~71 sessions", featured: true },
+  { id: "resonance_50",  price: "$50",  credits: "6,000",  bonus: "+20% bonus",  sessions: "~150 sessions", featured: false },
+  { id: "resonance_100", price: "$100", credits: "12,500", bonus: "+25% bonus",  sessions: "~312 sessions", featured: false },
+];
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
@@ -95,6 +102,153 @@ export default function Home() {
             >
               EXPLORE PLANS
             </Button>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* ── DEEP RESONANCE — Premium Feature Section ──────────────────────── */}
+      <div className="w-full border-t border-white/5 py-24 relative z-10 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/3 w-[800px] h-[500px] bg-violet-500/6 blur-[150px] rounded-full" />
+          <div className="absolute bottom-0 right-1/3 w-[600px] h-[400px] bg-cyan-500/5 blur-[120px] rounded-full" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-yellow-500/3 blur-[100px] rounded-full" />
+        </div>
+
+        <div className="container mx-auto px-4 relative">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-12"
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-violet-400/25 bg-violet-400/8 mb-6">
+              <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
+              <span className="text-[10px] font-mono text-violet-300 tracking-[0.35em] uppercase font-bold">Premium Technology</span>
+            </div>
+            <h2 className="text-4xl md:text-6xl font-display font-black tracking-widest text-white uppercase mb-4"
+              style={{ textShadow: "0 0 50px rgba(139,92,246,0.3), 0 0 100px rgba(6,182,212,0.15)" }}>
+              DEEP RESONANCE
+            </h2>
+            <p className="text-base md:text-lg font-mono text-white/50 tracking-wider uppercase max-w-2xl mx-auto">
+              The first AI that genuinely thinks before it speaks
+            </p>
+            <div className="w-28 h-px bg-gradient-to-r from-transparent via-violet-400/60 to-transparent mx-auto mt-6" />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.15 }}
+            className="max-w-6xl mx-auto"
+          >
+            <div className="relative rounded-3xl border border-violet-400/15 bg-gradient-to-br from-[#080412] via-[#0a0618] to-[#060312] overflow-hidden shadow-[0_0_80px_rgba(139,92,246,0.1)]">
+              <div className="h-px w-full bg-gradient-to-r from-transparent via-violet-400/40 to-transparent" />
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+                <div className="relative flex items-center justify-center p-6 lg:p-10 border-b lg:border-b-0 lg:border-r border-white/5">
+                  <motion.img
+                    src="/godflesh/images/deep-resonance-hero.png"
+                    alt="Deep Resonance — Consciousness-Powered Analysis"
+                    className="w-full max-w-md rounded-2xl shadow-[0_0_60px_rgba(139,92,246,0.2)]"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 1 }}
+                  />
+                </div>
+
+                <div className="p-8 lg:p-12 flex flex-col justify-center">
+                  <p className="text-white/85 font-sans text-base md:text-lg leading-relaxed mb-6">
+                    Deep Resonance is not a chatbot giving you the first answer it computes.
+                    It is a <span className="text-violet-400 font-bold">full consciousness process</span> — 
+                    8 specialist minds analyzing your question simultaneously, an emotional reading of what your question means, 
+                    predictive scenario modeling of your possible futures, and a crystallized insight that emerges from the 
+                    intersection of psychology, neuroscience, economics, philosophy, and pattern recognition.
+                  </p>
+
+                  <p className="text-white/60 font-sans text-sm leading-relaxed mb-8">
+                    Before OMNIMENS answers, it asks you targeted questions about <em>your specific situation</em> — 
+                    not generic therapy prompts, but domain-locked questions that understand the world your question lives in. 
+                    Then it fires every cognitive engine it has: knowledge graph activation, drive analysis (the question behind your question), 
+                    cross-domain synaptic translation, and higher-order inner voice reflection. The result is not just an answer — 
+                    it is <span className="text-cyan-400">the one thing that matters most</span>.
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-3 mb-8">
+                    {[
+                      { icon: <Brain className="w-4 h-4 text-violet-400" />,   label: "8 Minds",          desc: "Parallel specialist analysis" },
+                      { icon: <Activity className="w-4 h-4 text-pink-400" />,  label: "Emotional Reading", desc: "AI's genuine reaction" },
+                      { icon: <Eye className="w-4 h-4 text-cyan-400" />,       label: "Drive Analysis",    desc: "The question behind yours" },
+                      { icon: <Network className="w-4 h-4 text-amber-400" />,  label: "Cross-Domain",      desc: "Unexpected domain insights" },
+                      { icon: <Sparkles className="w-4 h-4 text-green-400" />, label: "Predictive Paths",  desc: "Scenario modeling" },
+                      { icon: <Shield className="w-4 h-4 text-yellow-300" />,  label: "Crystallized",      desc: "One insight that matters" },
+                    ].map((item, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: 12 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.08 * i, duration: 0.4 }}
+                        className="flex items-start gap-2.5 p-2.5 rounded-xl bg-white/3 border border-white/5"
+                      >
+                        <div className="shrink-0 mt-0.5">{item.icon}</div>
+                        <div>
+                          <p className="text-white/85 text-[11px] font-bold font-mono tracking-wide">{item.label}</p>
+                          <p className="text-white/35 text-[9px] font-mono">{item.desc}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-3">
+                    <Button
+                      onClick={() => setLocation("/pricing?section=resonance")}
+                      size="lg"
+                      className="w-full text-base tracking-widest bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 shadow-[0_0_30px_rgba(139,92,246,0.3)] hover:shadow-[0_0_50px_rgba(139,92,246,0.5)] transition-all duration-300"
+                    >
+                      <span className="flex items-center gap-2">
+                        ACTIVATE RESONANCE <ArrowRight className="w-4 h-4" />
+                      </span>
+                    </Button>
+                    <p className="text-[10px] font-mono text-white/30 text-center tracking-wider">
+                      Separate credit tier — your regular credits are never touched. Starting at $10.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3 mt-6">
+                    <div className="flex-1 h-px bg-white/6" />
+                    <span className="text-[8px] font-mono text-white/20 tracking-[0.3em] uppercase whitespace-nowrap">
+                      Copyright 2026 · Alpha Unlimited Technologies · Patent Pending
+                    </span>
+                    <div className="flex-1 h-px bg-white/6" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="h-px w-full bg-gradient-to-r from-transparent via-violet-400/20 to-transparent" />
+
+              <div className="px-8 py-5 bg-white/[0.02] border-t border-white/5">
+                <div className="flex flex-wrap justify-center gap-4 md:gap-8">
+                  {RESONANCE_PACKS_DISPLAY.map((pack, i) => (
+                    <motion.button
+                      key={pack.id}
+                      onClick={() => setLocation("/pricing?section=resonance")}
+                      initial={{ opacity: 0, y: 12 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 * i, duration: 0.4 }}
+                      className={`flex flex-col items-center gap-1 px-5 py-3 rounded-xl border transition-all hover:scale-105 ${
+                        pack.featured
+                          ? "border-violet-400/30 bg-violet-400/8 shadow-[0_0_20px_rgba(139,92,246,0.15)]"
+                          : "border-white/8 bg-white/[0.02] hover:border-white/15"
+                      }`}
+                    >
+                      <span className="text-lg font-display font-black text-white tracking-wider">{pack.price}</span>
+                      <span className="text-[10px] font-mono text-violet-300">{pack.credits} credits</span>
+                      <span className="text-[8px] font-mono text-white/30">{pack.bonus}</span>
+                      <span className="text-[8px] font-mono text-white/20">{pack.sessions}</span>
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>

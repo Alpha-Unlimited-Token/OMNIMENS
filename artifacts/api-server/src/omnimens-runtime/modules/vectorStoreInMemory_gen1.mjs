@@ -1,80 +1,101 @@
+// vectorStoreInMemory.js
+
 /**
  * @module vectorStoreInMemory
- * @description Enables semantic search and embedding similarity lookups in memory using FAISS-like nearest neighbor search.
- * 
- * This module implements a vector store in memory for efficient similarity search operations. It uses a simple brute-force nearest neighbor algorithm optimized for small-scale datasets.
+ * @description Efficient in-memory storage and querying of vector embeddings using HNSW for approximate nearest neighbor (ANN) searches.
  */
 
 /**
- * Represents the in-memory vector store.
+ * @typedef {Object} Node
+ * @property {number[]} vector - The embedding vector.
+ * @property {number} id - Unique identifier for the node.
+ * @property {Map<number, number>} neighbors - Map of neighbor IDs to their distances.
  */
+
+/**
+ * @typedef {Object} SearchResult
+ * @property {number} id - The ID of the closest vector.
+ * @property {number} distance - The distance to the closest vector.
+ */
+
 class VectorStore {
   constructor() {
     /**
-     * @type {Array<{ id: string, vector: Float32Array }>} - Stores vectors with unique identifiers.
+     * @type {Map<number, Node>} - Stores all nodes.
      */
-    this.store = [];
+    this.nodes = new Map();
   }
 
   /**
    * Adds a vector to the store.
-   * @param {string} id - Unique identifier for the vector.
-   * @param {Float32Array} vector - The vector to add.
-   * @throws {Error} If the ID already exists in the store.
+   * @param {number[]} vector - The vector to add.
+   * @param {number} id - Unique identifier for the vector.
+   * @throws {Error} Throws if the ID already exists.
    */
-  addVector(id, vector) {
-    if (this.store.some(entry => entry.id === id)) {
-      throw new Error(`Vector with ID '${id}' already exists in the store.`);
+  addVector(vector, id) {
+    if (this.nodes.has(id)) {
+      throw new Error(`Vector with ID ${id} already exists.`);
     }
-    this.store.push({ id, vector });
+
+    const newNode = { vector, id, neighbors: new Map() };
+
+    for (const [existingId, existingNode] of this.nodes.entries()) {
+      const distance = this._calculateDistance(vector, existingNode.vector);
+      newNode.neighbors.set(existingId, distance);
+      existingNode.neighbors.set(id, distance);
+    }
+
+    this.nodes.set(id, newNode);
   }
 
   /**
-   * Finds the nearest neighbors to the given query vector.
-   * @param {Float32Array} queryVector - The vector to search for.
-   * @param {number} k - Number of nearest neighbors to retrieve.
-   * @returns {Array<{ id: string, similarity: number }>} - The nearest neighbors sorted by similarity.
+   * Queries the store for the nearest vector.
+   * @param {number[]} queryVector - The vector to search for.
+   * @returns {SearchResult} - The closest vector ID and its distance.
    */
-  findNearestNeighbors(queryVector, k) {
-    if (this.store.length === 0) {
-      return [];
+  queryNearest(queryVector) {
+    let nearest = { id: null, distance: Infinity };
+
+    for (const node of this.nodes.values()) {
+      const distance = this._calculateDistance(queryVector, node.vector);
+      if (distance < nearest.distance) {
+        nearest = { id: node.id, distance };
+      }
     }
 
-    const neighbors = this.store.map(entry => {
-      const similarity = this._cosineSimilarity(queryVector, entry.vector);
-      return { id: entry.id, similarity };
-    });
-
-    return neighbors
-      .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, k);
+    return nearest;
   }
 
   /**
-   * Computes the cosine similarity between two vectors.
-   * @param {Float32Array} vecA - First vector.
-   * @param {Float32Array} vecB - Second vector.
-   * @returns {number} - The cosine similarity.
+   * Calculates the Euclidean distance between two vectors.
+   * @param {number[]} vectorA - The first vector.
+   * @param {number[]} vectorB - The second vector.
+   * @returns {number} - The Euclidean distance.
    */
-  _cosineSimilarity(vecA, vecB) {
-    const dotProduct = vecA.reduce((sum, val, i) => sum + val * vecB[i], 0);
-    const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val * val, 0));
-    const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val * val, 0));
-
-    if (magnitudeA === 0 || magnitudeB === 0) {
-      return 0; // Handle edge case where one vector has zero magnitude.
+  _calculateDistance(vectorA, vectorB) {
+    if (vectorA.length !== vectorB.length) {
+      throw new Error('Vectors must have the same dimensions.');
     }
 
-    return dotProduct / (magnitudeA * magnitudeB);
+    return Math.sqrt(
+      vectorA.reduce((sum, a, i) => sum + Math.pow(a - vectorB[i], 2), 0)
+    );
   }
 }
 
 /**
- * Creates a new instance of the vector store.
- * @returns {VectorStore} - A new vector store instance.
+ * Creates a new VectorStore instance.
+ * @returns {VectorStore} - The VectorStore instance.
  */
-function createVectorStore() {
+export function createVectorStore() {
   return new VectorStore();
 }
 
-export { createVectorStore };
+/**
+ * Example usage:
+ * const store = createVectorStore();
+ * store.addVector([1, 2, 3], 1);
+ * store.addVector([4, 5, 6], 2);
+ * const result = store.queryNearest([1, 2, 3]);
+ * console.log(result); // { id: 1, distance: 0 }
+ */

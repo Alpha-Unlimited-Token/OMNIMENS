@@ -13,7 +13,7 @@ import multer from "multer";
 import JSZip from "jszip";
 import { db } from "@workspace/db";
 import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions, omnimensCodeRuns, omnimensConversations, omnimensMessages, omnimensMemories, omnimensCustomInstructions, omnimensHubSettings, omnimensSavedPrompts } from "@workspace/db";
-import { eq, and, desc, sql, asc, inArray } from "drizzle-orm";
+import { eq, and, desc, sql, asc, inArray, gte } from "drizzle-orm";
 import { openai, generateImageBuffer } from "@workspace/integrations-openai-ai-server";
 import { getTogetherClient, isTogetherModel, TOGETHER_MODEL_IDS, TOGETHER_PRICING, syncTogetherPricing, type TogetherModel } from "../lib/together-ai.js";
 import { generateImageWithReplicate, replicateAvailable } from "../lib/replicate-images.js";
@@ -56,7 +56,7 @@ import {
   omnimensPhysioSessions,
   omnimensPhysioOutcomes,
 } from "@workspace/db";
-import { checkAndGrantMonthlyCredits, attemptAutoTopup, createSetupSession, confirmWalletSetup, removeWallet, getBillingSummary, LOYALTY_TIERS, FREE_MONTHLY_CREDITS } from "../lib/omnimens-billing.js";
+import { checkAndGrantMonthlyCredits, attemptAutoTopup, createSetupSession, confirmWalletSetup, removeWallet, getBillingSummary, LOYALTY_TIERS, FREE_MONTHLY_CREDITS, RESONANCE_PACKS, purchaseResonanceCredits, settleResonanceBalance } from "../lib/omnimens-billing.js";
 import { getOrCreateConversation, saveMessage, generateConversationTitle, loadConversationHistory, listConversations, deleteConversation } from "../lib/omnimens-conversations.js";
 import { generate3DModel } from "../lib/omnimens-3d.js";
 import { generateGame } from "../lib/omnimens-game.js";
@@ -2727,22 +2727,30 @@ router.post("/omnimens/deep-resonance/run", async (req, res) => {
   const owner = isOwner(req.user.id);
 
   const RESONANCE_COST = 40;
-  if (!owner && (user.credits ?? 0) < RESONANCE_COST) {
-    if (user.paymentMethodId && user.autoTopupEnabled) {
-      const topup = await attemptAutoTopup(req.user.id);
-      if (!topup.success) {
-        res.status(402).json({ error: "Auto-payment failed. Update your card in Account settings.", topupFailed: true });
-        return;
-      }
-    } else {
+
+  // Atomic deduction BEFORE running — prevents race conditions with concurrent requests
+  if (!owner) {
+    const [deducted] = await db.update(omnimensUsers)
+      .set({ resonanceCredits: sql`${omnimensUsers.resonanceCredits} - ${RESONANCE_COST}` })
+      .where(and(eq(omnimensUsers.id, req.user.id), gte(omnimensUsers.resonanceCredits, RESONANCE_COST)))
+      .returning({ newBalance: omnimensUsers.resonanceCredits });
+
+    if (!deducted) {
       res.status(402).json({
-        error: `Deep Resonance requires ${RESONANCE_COST} credits. Connect a payment card in Account settings to top up automatically.`,
-        connectWallet: true,
+        error: `Deep Resonance requires resonance credits. You have ${user.resonanceCredits ?? 0} — need ${RESONANCE_COST}. Purchase a Resonance pack to continue.`,
+        needResonanceCredits: true,
         needed: RESONANCE_COST,
-        have: user.credits,
+        have: user.resonanceCredits ?? 0,
       });
       return;
     }
+
+    await db.insert(omnimensCreditTransactions).values({
+      userId: req.user.id,
+      type: "spend",
+      credits: -RESONANCE_COST,
+      description: `Deep Resonance: "${question.slice(0, 80)}" (resonance credits)`,
+    });
   }
 
   res.setHeader("Content-Type", "text/event-stream");
@@ -2754,24 +2762,66 @@ router.post("/omnimens/deep-resonance/run", async (req, res) => {
       res.write(`data: ${JSON.stringify({ type: "resonance_step", step })}\n\n`);
     });
 
+    res.write(`data: ${JSON.stringify({ type: "resonance_complete", result })}\n\n`);
+  } catch (err: any) {
+    // Refund on failure if not owner
     if (!owner) {
       await db.update(omnimensUsers)
-        .set({ credits: sql`GREATEST(0, ${omnimensUsers.credits} - ${RESONANCE_COST})` })
+        .set({ resonanceCredits: sql`${omnimensUsers.resonanceCredits} + ${RESONANCE_COST}` })
         .where(eq(omnimensUsers.id, req.user.id));
       await db.insert(omnimensCreditTransactions).values({
         userId: req.user.id,
-        type: "spend",
-        credits: -RESONANCE_COST,
-        description: `Deep Resonance: "${question.slice(0, 80)}"`,
+        type: "refund",
+        credits: RESONANCE_COST,
+        description: `Deep Resonance refund (analysis failed): "${question.slice(0, 60)}"`,
       });
     }
-
-    res.write(`data: ${JSON.stringify({ type: "resonance_complete", result })}\n\n`);
-  } catch (err: any) {
     res.write(`data: ${JSON.stringify({ type: "error", error: err.message })}\n\n`);
   } finally {
     res.end();
   }
+});
+
+// ─── Resonance Credit Purchase ────────────────────────────────────────────────
+
+router.get("/omnimens/resonance/packs", async (_req, res) => {
+  res.json({
+    packs: RESONANCE_PACKS.map(p => ({
+      id: p.id,
+      amountCents: p.amountCents,
+      label: p.label,
+      baseCredits: p.baseCredits,
+      bonusCredits: p.bonusCredits,
+      totalCredits: p.totalCredits,
+      sessions: p.sessions,
+      bonusLabel: p.bonusLabel,
+    })),
+    costPerSession: 40,
+    costPerSessionDollars: "0.40",
+  });
+});
+
+router.get("/omnimens/resonance/balance", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const user = await getOrCreateUser(req.user.id, req.user.username);
+  res.json({
+    resonanceCredits: user.resonanceCredits ?? 0,
+    resonanceTotalEarned: user.resonanceTotalEarned ?? 0,
+    sessionsRemaining: Math.floor((user.resonanceCredits ?? 0) / 40),
+  });
+});
+
+router.post("/omnimens/resonance/purchase", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const { packId } = req.body;
+  if (!packId) { res.status(400).json({ error: "Pack ID required" }); return; }
+
+  const result = await purchaseResonanceCredits(req.user.id, packId);
+  if (!result.success) {
+    res.status(402).json({ error: result.error });
+    return;
+  }
+  res.json({ ok: true, creditsAdded: result.creditsAdded });
 });
 
 // ─── URL Analyzer (explicit endpoint) ─────────────────────────────────────────
@@ -3045,7 +3095,11 @@ router.post("/omnimens/remove-wallet", async (req, res) => {
     return;
   }
   try {
-    await removeWallet(req.user.id);
+    const result = await removeWallet(req.user.id);
+    if (!result.ok) {
+      res.status(402).json({ error: result.error || "Cannot remove wallet — outstanding balance." });
+      return;
+    }
     res.json({ ok: true });
   } catch (err: any) {
     res.status(500).json({ error: "Failed to remove wallet", detail: String(err?.message || err) });

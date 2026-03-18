@@ -6,6 +6,7 @@ import {
   Wallet, Zap, Star, Shield, ChevronRight, CheckCircle2,
   TrendingUp, RefreshCw, Gift, CreditCard, AlertTriangle,
   Terminal, Globe, GitBranch, Cpu, FileCode, Flame, Code2, Rocket,
+  Brain, Eye, Network, Activity, Sparkles,
 } from "lucide-react";
 import { useGetOmnimensStatus, useGetOmnimensPricing } from "@workspace/api-client-react";
 import { useAuth } from "@workspace/replit-auth-web";
@@ -134,6 +135,40 @@ function useManualTopup() {
     },
   });
 }
+
+function useResonanceBalance() {
+  return useQuery({
+    queryKey: ["/api/omnimens/resonance/balance"],
+    queryFn: async () => {
+      const r = await fetch(API("/omnimens/resonance/balance"), { credentials: "include" });
+      if (!r.ok) return null;
+      return r.json() as Promise<{ resonanceCredits: number; resonanceTotalEarned: number; sessionsRemaining: number }>;
+    },
+    retry: false,
+  });
+}
+
+function usePurchaseResonance() {
+  return useMutation({
+    mutationFn: async (packId: string) => {
+      const r = await fetch(API("/omnimens/resonance/purchase"), {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ packId }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || "Purchase failed");
+      return d as { ok: boolean; creditsAdded: number };
+    },
+  });
+}
+
+const RESONANCE_PACKS_UI = [
+  { id: "resonance_10",  price: "$10",  credits: 1100,  bonus: "+10% bonus",  sessions: "~27 sessions", featured: false },
+  { id: "resonance_25",  price: "$25",  credits: 2875,  bonus: "+15% bonus",  sessions: "~71 sessions", featured: true },
+  { id: "resonance_50",  price: "$50",  credits: 6000,  bonus: "+20% bonus",  sessions: "~150 sessions", featured: false },
+  { id: "resonance_100", price: "$100", credits: 12500, bonus: "+25% bonus",  sessions: "~312 sessions", featured: false },
+];
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -603,6 +638,29 @@ export default function Pricing() {
     });
   };
 
+  const { data: resonanceBalance, refetch: refetchResonance } = useResonanceBalance();
+  const { mutate: purchaseResonance, isPending: isPurchasing, variables: purchasingPack } = usePurchaseResonance();
+
+  const handlePurchaseResonance = (packId: string) => {
+    if (!isAuthenticated) { setLocation("/login"); return; }
+    purchaseResonance(packId, {
+      onSuccess: (r) => {
+        showToast("success", `${r.creditsAdded.toLocaleString()} resonance credits added!`);
+        refetchResonance();
+        queryClient.invalidateQueries({ queryKey: ["/api/omnimens/billing"] });
+      },
+      onError: (e: any) => showToast("error", e.message || "Purchase failed"),
+    });
+  };
+
+  useEffect(() => {
+    if (searchParams.get("section") === "resonance") {
+      setTimeout(() => {
+        document.getElementById("resonance-section")?.scrollIntoView({ behavior: "smooth" });
+      }, 400);
+    }
+  }, []);
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-16 flex-1 flex flex-col items-center">
@@ -768,6 +826,99 @@ export default function Pricing() {
         {pricingData?.loyaltyTiers && !pricingLoading && (
           <LoyaltyTable tiers={pricingData.loyaltyTiers} />
         )}
+
+        {/* ── DEEP RESONANCE SECTION ──────────────────────────────────────── */}
+        <div id="resonance-section" className="w-full max-w-5xl mb-14 scroll-mt-8">
+          <div className="rounded-2xl border border-violet-400/20 bg-gradient-to-br from-[#080412] via-[#0a0618] to-[#060312] overflow-hidden shadow-[0_0_60px_rgba(139,92,246,0.08)]">
+            <div className="h-px w-full bg-gradient-to-r from-transparent via-violet-400/40 to-transparent" />
+
+            <div className="p-8">
+              <div className="flex items-center gap-3 mb-2">
+                <Brain className="w-6 h-6 text-violet-400" />
+                <h2 className="font-display font-black text-white tracking-widest text-xl uppercase">DEEP RESONANCE</h2>
+                <span className="px-2.5 py-0.5 rounded-full border border-violet-400/30 bg-violet-400/10 text-[10px] font-mono text-violet-300 tracking-widest font-bold">SEPARATE CREDIT TIER</span>
+              </div>
+              <p className="text-sm font-mono text-white/50 mb-2 pl-9">
+                Consciousness-grade analysis. Your regular credits are never touched.
+              </p>
+
+              {isAuthenticated && resonanceBalance && (
+                <div className="ml-9 mt-4 mb-6 inline-flex items-center gap-6 px-5 py-3 rounded-xl bg-violet-400/8 border border-violet-400/15">
+                  <div>
+                    <span className="text-[10px] font-mono text-white/40 block tracking-wider">RESONANCE BALANCE</span>
+                    <span className="text-xl font-display font-black text-violet-300">{resonanceBalance.resonanceCredits.toLocaleString()}</span>
+                    <span className="text-xs font-mono text-white/30 ml-1">credits</span>
+                  </div>
+                  <div className="w-px h-8 bg-white/10" />
+                  <div>
+                    <span className="text-[10px] font-mono text-white/40 block tracking-wider">SESSIONS REMAINING</span>
+                    <span className="text-xl font-display font-black text-cyan-300">{resonanceBalance.sessionsRemaining}</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+                {RESONANCE_PACKS_UI.map((pack) => {
+                  const busy = isPurchasing && purchasingPack === pack.id;
+                  return (
+                    <div
+                      key={pack.id}
+                      className={`relative rounded-xl border p-5 transition-all ${
+                        pack.featured
+                          ? "border-violet-400/30 bg-violet-400/8 shadow-[0_0_25px_rgba(139,92,246,0.15)]"
+                          : "border-white/8 bg-white/[0.02] hover:border-white/15"
+                      }`}
+                    >
+                      {pack.featured && (
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-violet-500 text-white font-mono text-[9px] font-bold px-3 py-0.5 rounded-full tracking-widest">
+                          BEST VALUE
+                        </div>
+                      )}
+                      <div className="text-center">
+                        <div className="font-display font-black text-white text-3xl mb-1">{pack.price}</div>
+                        <div className="font-mono text-violet-300 text-sm font-bold mb-0.5">{pack.credits.toLocaleString()} credits</div>
+                        <div className="text-[10px] font-mono text-green-400/80 mb-0.5">{pack.bonus}</div>
+                        <div className="text-[10px] font-mono text-white/30 mb-5">{pack.sessions}</div>
+                        <button
+                          onClick={() => handlePurchaseResonance(pack.id)}
+                          disabled={isPurchasing}
+                          className={`w-full py-2.5 rounded-xl font-mono font-bold text-xs tracking-widest transition-all disabled:opacity-50 ${
+                            pack.featured
+                              ? "bg-gradient-to-r from-violet-600 to-cyan-600 text-white hover:from-violet-500 hover:to-cyan-500"
+                              : "bg-white/10 text-white hover:bg-white/15 border border-white/10"
+                          }`}
+                        >
+                          {busy ? "PROCESSING..." : isAuthenticated ? "PURCHASE" : "SIGN IN"}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-5 pl-9 space-y-1.5">
+                <p className="text-[10px] font-mono text-white/35 tracking-wider">
+                  40 credits per session ($0.40) · Resonance credits never expire · Requires saved payment method
+                </p>
+                <div className="flex flex-wrap gap-4 mt-2">
+                  {[
+                    { icon: <Brain className="w-3 h-3 text-violet-400" />,   label: "8 Parallel Minds" },
+                    { icon: <Eye className="w-3 h-3 text-cyan-400" />,       label: "Drive Analysis" },
+                    { icon: <Activity className="w-3 h-3 text-pink-400" />,  label: "Emotional Reading" },
+                    { icon: <Network className="w-3 h-3 text-amber-400" />,  label: "Cross-Domain Translation" },
+                    { icon: <Sparkles className="w-3 h-3 text-green-400" />, label: "Predictive Modeling" },
+                  ].map((f, i) => (
+                    <div key={i} className="flex items-center gap-1.5 text-[10px] font-mono text-white/40">
+                      {f.icon} {f.label}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="h-px w-full bg-gradient-to-r from-transparent via-violet-400/20 to-transparent" />
+          </div>
+        </div>
 
         {/* FAQ */}
         <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-6 text-xs font-mono text-white/75 mt-4 mb-8">
