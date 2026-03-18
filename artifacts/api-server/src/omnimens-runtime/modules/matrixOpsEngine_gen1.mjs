@@ -1,105 +1,90 @@
 /**
  * @module matrixOpsEngine
- * @description Efficient matrix operations for neural computations using WebAssembly.
+ * @description A WebAssembly-based custom matrix multiplication engine optimized for JavaScript runtime.
  */
 
+const fs = require('fs');
+const path = require('path');
+
 /**
- * Multiplies two matrices using a WebAssembly-optimized approach.
- * Handles edge cases such as mismatched dimensions.
- *
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {Promise<number[][]>} - The resulting matrix after multiplication.
- * @throws {Error} - If matrices have incompatible dimensions.
+ * Load and compile the WebAssembly module for matrix operations.
+ * @async
+ * @returns {Promise<WebAssembly.Instance>} The compiled WebAssembly instance.
  */
-export async function multiplyMatrices(matrixA, matrixB) {
-  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-    throw new Error("Both inputs must be arrays.");
+async function loadWasm() {
+  const wasmPath = path.resolve(__dirname, 'matrixOps.wasm');
+  const wasmBuffer = fs.readFileSync(wasmPath);
+  const wasmModule = await WebAssembly.compile(wasmBuffer);
+  return WebAssembly.instantiate(wasmModule);
+}
+
+/**
+ * Perform matrix multiplication using WebAssembly.
+ * @async
+ * @param {number[][]} matrixA - The first matrix (2D array).
+ * @param {number[][]} matrixB - The second matrix (2D array).
+ * @returns {Promise<number[][]>} The resulting matrix after multiplication.
+ * @throws {Error} If the matrices are incompatible for multiplication.
+ */
+async function multiplyMatrices(matrixA, matrixB) {
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Matrix dimensions are incompatible for multiplication.');
   }
+
+  const wasmInstance = await loadWasm();
+  const { memory, multiply } = wasmInstance.exports;
 
   const rowsA = matrixA.length;
   const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
   const colsB = matrixB[0].length;
 
-  if (colsA !== rowsB) {
-    throw new Error("Matrix dimensions are incompatible for multiplication.");
+  const inputBuffer = new Float64Array(memory.buffer);
+  const outputBuffer = new Float64Array(memory.buffer, rowsA * colsB * 8);
+
+  let offset = 0;
+
+  // Flatten and write matrixA to the WASM memory
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsA; j++) {
+      inputBuffer[offset++] = matrixA[i][j];
+    }
   }
 
-  // Flatten matrices for WebAssembly processing
-  const flatA = matrixA.flat();
-  const flatB = matrixB.flat();
-
-  // WebAssembly memory buffer setup
-  const memory = new WebAssembly.Memory({ initial: 1 });
-  const wasmModule = await WebAssembly.instantiate(
-    new Uint8Array([
-      // WebAssembly binary code for matrix multiplication
-      // Placeholder for actual compiled binary code
-    ]),
-    {
-      env: { memory }
+  // Flatten and write matrixB to the WASM memory
+  for (let i = 0; i < colsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      inputBuffer[offset++] = matrixB[i][j];
     }
-  );
+  }
 
-  const { multiply } = wasmModule.instance.exports;
-
-  // Allocate memory and write data
-  const bufferA = new Float64Array(memory.buffer, 0, flatA.length);
-  bufferA.set(flatA);
-  const bufferB = new Float64Array(memory.buffer, flatA.length * 8, flatB.length);
-  bufferB.set(flatB);
-
-  // Perform multiplication
+  // Perform multiplication in WASM
   multiply(rowsA, colsA, colsB);
 
-  // Read results
-  const result = new Float64Array(memory.buffer, flatA.length * 8 + flatB.length * 8, rowsA * colsB);
-
-  // Reshape result into 2D matrix
-  const outputMatrix = [];
+  // Read and reconstruct the result matrix
+  const result = [];
   for (let i = 0; i < rowsA; i++) {
-    outputMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
-  }
-
-  return outputMatrix;
-}
-
-/**
- * Validates a matrix for proper structure.
- *
- * @param {number[][]} matrix - The matrix to validate.
- * @returns {boolean} - True if valid, false otherwise.
- */
-export function validateMatrix(matrix) {
-  if (!Array.isArray(matrix) || matrix.length === 0) {
-    return false;
-  }
-
-  const rowLength = matrix[0].length;
-  return matrix.every(row => Array.isArray(row) && row.length === rowLength);
-}
-
-/**
- * Generates a random matrix with specified dimensions.
- *
- * @param {number} rows - Number of rows.
- * @param {number} cols - Number of columns.
- * @returns {number[][]} - The generated matrix.
- */
-export function generateRandomMatrix(rows, cols) {
-  if (rows <= 0 || cols <= 0) {
-    throw new Error("Rows and columns must be positive integers.");
-  }
-
-  const matrix = [];
-  for (let i = 0; i < rows; i++) {
     const row = [];
-    for (let j = 0; j < cols; j++) {
-      row.push(Math.random());
+    for (let j = 0; j < colsB; j++) {
+      row.push(outputBuffer[i * colsB + j]);
     }
-    matrix.push(row);
+    result.push(row);
   }
 
-  return matrix;
+  return result;
 }
+
+/**
+ * Validate a 2D matrix.
+ * @param {number[][]} matrix - The matrix to validate.
+ * @throws {Error} If the matrix is not a valid 2D array.
+ */
+function validateMatrix(matrix) {
+  if (!Array.isArray(matrix) || !matrix.every(row => Array.isArray(row) && row.every(Number.isFinite))) {
+    throw new Error('Invalid matrix: Must be a 2D array of numbers.');
+  }
+}
+
+module.exports = {
+  multiplyMatrices,
+  validateMatrix
+};

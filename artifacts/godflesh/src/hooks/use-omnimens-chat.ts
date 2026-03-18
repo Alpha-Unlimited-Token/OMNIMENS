@@ -2,10 +2,14 @@ import { useState, useRef, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getGetOmnimensStatusQueryKey } from "@workspace/api-client-react";
 
+export type SpellCorrection = { original: string; corrected: string };
+
 export type GeneratedImage = {
   url: string;
   prompt: string;
   index: number;
+  spellCorrected?: boolean;
+  spellCorrections?: SpellCorrection[];
 };
 
 export type Generated3DModel = {
@@ -237,6 +241,9 @@ export type Message = {
   files?: AttachedFile[];
   images?: GeneratedImage[];
   generatingImages?: boolean;
+  imageSpellStatus?: "scanning" | "found" | "correcting" | "clean" | null;
+  imageSpellWords?: string[];
+  imageSpellCorrections?: SpellCorrection[];
   models3d?: Generated3DModel[];
   generating3d?: boolean;
   games?: GeneratedGame[];
@@ -536,7 +543,39 @@ export function useOmnimensChat(
                 setMessages((prev) => {
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
-                  if (msg) msg.generatingImages = true;
+                  if (msg) { msg.generatingImages = true; msg.imageSpellStatus = null; }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "image_spell_scanning") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) msg.imageSpellStatus = "scanning";
+                  return newMsgs;
+                });
+
+              } else if (data.type === "image_spell_found") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) { msg.imageSpellStatus = "found"; msg.imageSpellWords = data.words || []; }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "image_spell_correcting") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) { msg.imageSpellStatus = "correcting"; msg.imageSpellCorrections = data.corrections || []; }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "image_spell_clean") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) msg.imageSpellStatus = "clean";
                   return newMsgs;
                 });
 
@@ -549,8 +588,11 @@ export function useOmnimensChat(
                       url: data.url,
                       prompt: data.prompt,
                       index: data.index,
+                      spellCorrected: data.spellCorrected || false,
+                      spellCorrections: data.spellCorrections || [],
                     }];
                     msg.generatingImages = false;
+                    msg.imageSpellStatus = null;
                   }
                   return newMsgs;
                 });

@@ -1,84 +1,78 @@
 /**
  * @module contextSummarizer
- * @description Summarizes and compresses conversation context using embeddings and periodic summarization.
+ * @description Summarizes conversation history recursively to preserve context within token limits using abstraction and compression techniques.
  */
 
 /**
- * Generates embeddings for text using a simple hashing mechanism to simulate sentence transformers.
- * This avoids external dependencies while still providing a representation of text similarity.
- * @param {string} text - The input text to generate an embedding for.
- * @returns {number[]} - A fixed-size array representing the embedding.
+ * Recursively summarizes a conversation history while preserving essential context.
+ * @param {Array<string>} history - Array of conversation strings.
+ * @param {number} tokenLimit - Maximum token limit for the summarized output.
+ * @returns {string} - Summarized conversation history.
  */
-export function generateEmbedding(text) {
-  const hash = Array(128).fill(0);
-  for (let i = 0; i < text.length; i++) {
-    const charCode = text.charCodeAt(i);
-    hash[i % hash.length] = (hash[i % hash.length] + charCode) % 256;
-  }
-  return hash;
-}
-
-/**
- * Summarizes a list of context strings by compressing their embeddings into a single representative embedding.
- * @param {string[]} contexts - An array of context strings to summarize.
- * @returns {string} - A summarized string representing the combined context.
- */
-export function summarizeContext(contexts) {
-  if (!Array.isArray(contexts) || contexts.length === 0) {
-    throw new Error("contexts must be a non-empty array of strings");
+export function summarizeContext(history, tokenLimit) {
+  if (!Array.isArray(history) || history.length === 0) {
+    throw new Error("Invalid input: history must be a non-empty array of strings.");
   }
 
-  const combinedEmbedding = Array(128).fill(0);
+  if (typeof tokenLimit !== "number" || tokenLimit <= 0) {
+    throw new Error("Invalid input: tokenLimit must be a positive number.");
+  }
 
-  contexts.forEach((context) => {
-    const embedding = generateEmbedding(context);
-    for (let i = 0; i < combinedEmbedding.length; i++) {
-      combinedEmbedding[i] += embedding[i];
+  /**
+   * Calculates the approximate token count for a given string.
+   * GPT-4o token approximation assumes ~4 characters per token.
+   * @param {string} text - Input text.
+   * @returns {number} - Approximate token count.
+   */
+  function calculateTokens(text) {
+    return Math.ceil(text.length / 4);
+  }
+
+  /**
+   * Compresses a list of strings into a single summary.
+   * @param {Array<string>} segments - Array of strings to compress.
+   * @returns {string} - Compressed summary of the input segments.
+   */
+  function compressSegments(segments) {
+    return segments.join(" ").replace(/\s+/g, " ").trim();
+  }
+
+  /**
+   * Recursively compresses history until it fits within the token limit.
+   * @param {Array<string>} segments - Array of conversation strings.
+   * @param {number} limit - Token limit.
+   * @returns {string} - Final compressed summary.
+   */
+  function recursiveSummarize(segments, limit) {
+    const combined = compressSegments(segments);
+    const tokenCount = calculateTokens(combined);
+
+    if (tokenCount <= limit) {
+      return combined;
     }
-  });
 
-  // Normalize the combined embedding
-  const normalizedEmbedding = combinedEmbedding.map((value) => Math.round(value / contexts.length));
+    // Split into smaller chunks for recursive summarization.
+    const mid = Math.ceil(segments.length / 2);
+    const left = recursiveSummarize(segments.slice(0, mid), limit);
+    const right = recursiveSummarize(segments.slice(mid), limit);
 
-  // Convert back to a summarized string
-  return normalizedEmbedding.map((num) => String.fromCharCode((num % 95) + 32)).join("");
+    return recursiveSummarize([left, right], limit);
+  }
+
+  return recursiveSummarize(history, tokenLimit);
 }
 
 /**
- * Periodically compresses the context to ensure it stays within a manageable size.
- * @param {string[]} contextHistory - The history of context strings.
- * @param {number} maxSize - The maximum allowed size of the context history.
- * @returns {string[]} - The updated context history.
+ * Validates conversation history and token limit before summarizing.
+ * @param {Array<string>} history - Array of conversation strings.
+ * @param {number} tokenLimit - Maximum token limit for the summarized output.
+ * @returns {string} - Summarized conversation history.
  */
-export function compressContextHistory(contextHistory, maxSize) {
-  if (!Array.isArray(contextHistory) || typeof maxSize !== "number" || maxSize <= 0) {
-    throw new Error("Invalid inputs: contextHistory must be an array and maxSize must be a positive number");
+export function validateAndSummarize(history, tokenLimit) {
+  try {
+    return summarizeContext(history, tokenLimit);
+  } catch (error) {
+    console.error("Error summarizing context:", error.message);
+    return "Error: Unable to summarize context.";
   }
-
-  while (contextHistory.length > maxSize) {
-    const summary = summarizeContext(contextHistory.slice(0, 2));
-    contextHistory = [summary, ...contextHistory.slice(2)];
-  }
-
-  return contextHistory;
 }
-
-/**
- * Example usage of the context summarizer module.
- */
-export function exampleUsage() {
-  const contextHistory = [
-    "JavaScript performance optimization V8 engine techniques",
-    "new graph algorithms computational intelligence implementation",
-    "emerging programming paradigms functional reactive 2025",
-    "zero-shot learning few-shot prompting advanced techniques"
-  ];
-
-  console.log("Original Context History:", contextHistory);
-
-  const compressedHistory = compressContextHistory(contextHistory, 2);
-  console.log("Compressed Context History:", compressedHistory);
-}
-
-// Uncomment to run the example usage
-// exampleUsage();

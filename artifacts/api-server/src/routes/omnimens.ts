@@ -330,6 +330,105 @@ async function multiQueryResearch(queries: string[]): Promise<string> {
 }
 
 const IMAGE_TYPES = new Set(["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"]);
+
+/**
+ * Pre-render image spell gate.
+ * After OMNIMENS generates an image, this scans it for embedded text using
+ * GPT-4o vision (like Google Lens). If spelling errors are found, it notifies
+ * the pipeline and regenerates the image with a corrected prompt — before
+ * final delivery to the user.
+ */
+async function preRenderSpellCheck(
+  imageBuffer: Buffer,
+  originalPrompt: string,
+  generateFn: (prompt: string) => Promise<{ buffer: Buffer; provider: string }>,
+  sendEvent: (data: object) => void,
+  index: number,
+): Promise<{ buffer: Buffer; provider: string; spellCorrected: boolean; corrections: { original: string; corrected: string }[] }> {
+  try {
+    // ── Step 1: Extract all visible text from the generated image ──
+    sendEvent({ type: "image_spell_scanning", index, message: "Scanning generated image for text…" });
+    const b64 = imageBuffer.toString("base64");
+
+    const visionResp = await openai.chat.completions.create({
+      model: "gpt-4o",
+      max_tokens: 400,
+      messages: [{
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: `Carefully scan this image for ALL visible text, lettering, typography, words, or phrases — including stylized/graphic text, logos, titles, labels, watermarks, and any characters that form words, even if decorative.\n\nIf you find NO text at all, reply with only: NO_TEXT\n\nIf text is present, list each distinct word or short phrase exactly as it appears in the image, one per line. Do not add any explanation — only the words/phrases.`,
+          },
+          { type: "image_url", image_url: { url: `data:image/png;base64,${b64}`, detail: "high" } },
+        ],
+      }],
+    });
+
+    const extracted = visionResp.choices[0]?.message?.content?.trim() ?? "";
+    if (!extracted || extracted === "NO_TEXT") {
+      return { buffer: imageBuffer, provider: "original", spellCorrected: false, corrections: [] };
+    }
+
+    const foundWords = extracted.split("\n").map(w => w.trim()).filter(Boolean);
+    sendEvent({ type: "image_spell_found", index, words: foundWords });
+
+    // ── Step 2: Spell-check the extracted words ──
+    const spellResp = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      max_tokens: 400,
+      messages: [{
+        role: "user",
+        content: `You are a spelling expert reviewing text found inside a graphic design image.\n\nCheck each word/phrase below for spelling errors.\n\nRules:\n- Ignore brand names, deliberate stylizations (all-caps logos, camelCase), acronyms, proper nouns, and intentional abbreviations\n- Only flag clear, unambiguous real-word spelling errors (e.g. "Bussiness"→"Business", "Managment"→"Management")\n- Do NOT flag correctly spelled words\n\nWords found in image:\n${foundWords.join("\n")}\n\nRespond ONLY with a valid JSON array. If no errors: []\nFormat: [{"original":"misspeled","corrected":"misspelled"}]`,
+      }],
+    });
+
+    const spellRaw = spellResp.choices[0]?.message?.content?.trim() ?? "[]";
+    let corrections: { original: string; corrected: string }[] = [];
+    try {
+      const jsonMatch = spellRaw.match(/\[[\s\S]*?\]/);
+      corrections = JSON.parse(jsonMatch?.[0] ?? "[]");
+      if (!Array.isArray(corrections)) corrections = [];
+    } catch { corrections = []; }
+
+    if (corrections.length === 0) {
+      sendEvent({ type: "image_spell_clean", index });
+      return { buffer: imageBuffer, provider: "original", spellCorrected: false, corrections: [] };
+    }
+
+    // ── Step 3: Build corrected prompt + regenerate ──
+    sendEvent({
+      type: "image_spell_correcting",
+      index,
+      corrections,
+      message: `Found ${corrections.length} spelling error${corrections.length > 1 ? "s" : ""} — regenerating with corrected text…`,
+    });
+
+    let correctedPrompt = originalPrompt;
+    for (const { original, corrected } of corrections) {
+      const safePattern = original.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      correctedPrompt = correctedPrompt.replace(new RegExp(safePattern, "gi"), corrected);
+    }
+    // Append letter-by-letter enforcement so the model hardens the correct spelling
+    const enforcement = corrections
+      .map(c => `"${c.corrected}" (spell exactly: ${c.corrected.toUpperCase().split("").join("-")})`)
+      .join("; ");
+    correctedPrompt += ` CRITICAL: spell every text element with perfect accuracy. ${enforcement}.`;
+
+    try {
+      const { buffer: correctedBuffer, provider } = await generateFn(correctedPrompt);
+      console.log(`[OMNIMENS SPELL GATE] Regenerated with ${corrections.length} correction(s): ${corrections.map(c => `${c.original}→${c.corrected}`).join(", ")}`);
+      return { buffer: correctedBuffer, provider, spellCorrected: true, corrections };
+    } catch (regenErr) {
+      console.warn("[OMNIMENS SPELL GATE] Regeneration failed — keeping original:", regenErr);
+      return { buffer: imageBuffer, provider: "original", spellCorrected: false, corrections };
+    }
+  } catch (err) {
+    // Non-blocking — if spell gate fails for any reason, original image is returned unchanged
+    console.warn("[OMNIMENS SPELL GATE] Skipped:", (err as Error).message);
+    return { buffer: imageBuffer, provider: "original", spellCorrected: false, corrections: [] };
+  }
+}
 const TEXT_EXTENSIONS = new Set([".txt",".md",".js",".ts",".py",".html",".css",".json",".csv",".xml",".yaml",".yml",".sh",".rb",".go",".rs",".java",".c",".cpp",".h",".jsx",".tsx",".sql",".env",".toml",".ini",".cfg",".log"]);
 
 function getExt(name: string): string {
@@ -1615,27 +1714,58 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
         const heartbeat = setInterval(() => {
           try { res.write(`: ping\n\n`); } catch { /* ignore if closed */ }
         }, 8000);
+        // ── Shared generate function — used for initial render + spell-gate regeneration ──
+        const generateImageFn = async (p: string): Promise<{ buffer: Buffer; provider: string }> => {
+          if (replicateAvailable()) {
+            try {
+              const buf = await generateImageWithReplicate(p.slice(0, 1500));
+              return { buffer: buf, provider: "replicate" };
+            } catch {
+              const buf = await generateImageBuffer(p.slice(0, 4000), "1024x1024", "medium");
+              return { buffer: buf, provider: "openai" };
+            }
+          }
+          const buf = await generateImageBuffer(p.slice(0, 4000), "1024x1024", "medium");
+          return { buffer: buf, provider: "openai" };
+        };
+
         let imageBuffer: Buffer;
         let imageProvider = "openai";
         try {
           // Replicate / Flux 1.1 Pro: higher quality, faster, cheaper
-          if (replicateAvailable()) {
-            try {
-              imageBuffer = await generateImageWithReplicate(prompt.slice(0, 1500));
-              imageProvider = "replicate";
-            } catch (repErr) {
-              console.warn("[OMNIMENS IMAGE] Replicate failed, falling back to OpenAI:", repErr);
-              imageBuffer = await generateImageBuffer(prompt.slice(0, 4000), "1024x1024", "medium");
-            }
-          } else {
-            imageBuffer = await generateImageBuffer(prompt.slice(0, 4000), "1024x1024", "medium");
-          }
+          const initial = await generateImageFn(prompt);
+          imageBuffer = initial.buffer;
+          imageProvider = initial.provider;
         } finally {
           clearInterval(heartbeat);
         }
+
+        // ── Pre-render spell gate ──
+        // Scan the generated image for text, spell-check it, and regenerate if errors found
+        const spellHeartbeat = setInterval(() => {
+          try { res.write(`: ping\n\n`); } catch { /* ignore */ }
+        }, 8000);
+        let spellCorrected = false;
+        let spellCorrections: { original: string; corrected: string }[] = [];
+        try {
+          const spellResult = await preRenderSpellCheck(
+            imageBuffer!,
+            prompt,
+            generateImageFn,
+            (data) => res.write(`data: ${JSON.stringify(data)}\n\n`),
+            i,
+          );
+          imageBuffer = spellResult.buffer;
+          if (spellResult.provider !== "original") imageProvider = spellResult.provider;
+          spellCorrected = spellResult.spellCorrected;
+          spellCorrections = spellResult.corrections;
+        } finally {
+          clearInterval(spellHeartbeat);
+        }
+
         const dataUrl = `data:image/png;base64,${imageBuffer!.toString("base64")}`;
         generatedImages.push({ url: dataUrl, prompt });
-        res.write(`data: ${JSON.stringify({ type: "image_generated", url: dataUrl, prompt, index: i, provider: imageProvider })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: "image_generated", url: dataUrl, prompt, index: i, provider: imageProvider, spellCorrected, spellCorrections })}\n\n`);
       } catch (imgErr) {
         console.error(`[OMNIMENS IMAGE] Error generating image ${i}:`, imgErr);
         res.write(`data: ${JSON.stringify({ type: "image_error", index: i, error: "Image generation failed" })}\n\n`);

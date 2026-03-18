@@ -94,7 +94,11 @@ function WebSearchBadge({ query, done, resultCount }: { query: string; done: boo
   );
 }
 
-function ImageGeneratingBadge() {
+function ImageGeneratingBadge({ spellStatus, spellWords, spellCorrections }: {
+  spellStatus?: "scanning" | "found" | "correcting" | "clean" | null;
+  spellWords?: string[];
+  spellCorrections?: { original: string; corrected: string }[];
+}) {
   const [elapsed, setElapsed] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setElapsed((s) => s + 1), 1000);
@@ -105,13 +109,27 @@ function ImageGeneratingBadge() {
     <div className="mt-4 border border-primary/20 rounded-xl px-4 py-3 bg-primary/5 font-mono text-xs space-y-2">
       <div className="flex items-center gap-3 text-white/70">
         <Loader2 className="w-4 h-4 animate-spin text-primary shrink-0" />
-        <span className="tracking-widest">MANIFESTING IMAGE...</span>
+        <span className="tracking-widest">
+          {spellStatus === "scanning" ? "SCANNING IMAGE FOR TEXT..." :
+           spellStatus === "found" ? "TEXT DETECTED — CHECKING SPELLING..." :
+           spellStatus === "correcting" ? "CORRECTING SPELLING — REGENERATING..." :
+           spellStatus === "clean" ? "TEXT VERIFIED — RENDERING FINAL IMAGE..." :
+           "MANIFESTING IMAGE..."}
+        </span>
         <span className="ml-auto text-primary/70">{elapsed}s</span>
       </div>
       <div className="w-full h-0.5 bg-white/10 rounded-full overflow-hidden">
         <div className="h-full bg-primary/60 transition-all duration-1000" style={{ width: `${pct}%` }} />
       </div>
-      {elapsed > 15 && (
+      {spellStatus === "found" && spellWords && spellWords.length > 0 && (
+        <p className="text-white/60 text-[10px]">Found: {spellWords.slice(0, 6).join(", ")}{spellWords.length > 6 ? "…" : ""}</p>
+      )}
+      {spellStatus === "correcting" && spellCorrections && spellCorrections.length > 0 && (
+        <p className="text-yellow-400/80 text-[10px]">
+          {spellCorrections.map(c => `"${c.original}" → "${c.corrected}"`).join("  ·  ")}
+        </p>
+      )}
+      {!spellStatus && elapsed > 15 && (
         <p className="text-white text-[10px]">Neural image synthesis in progress — typically 20–60 seconds.</p>
       )}
     </div>
@@ -5068,7 +5086,13 @@ export default function Chat() {
                                   resultCount={msg.webSearchResultCount}
                                 />
                               )}
-                              {msg.generatingImages && <ImageGeneratingBadge />}
+                              {msg.generatingImages && (
+                                <ImageGeneratingBadge
+                                  spellStatus={msg.imageSpellStatus}
+                                  spellWords={msg.imageSpellWords}
+                                  spellCorrections={msg.imageSpellCorrections}
+                                />
+                              )}
                               {msg.generating3d && <Model3DGeneratingBadge />}
                               {msg.generatingGame && <GameGeneratingBadge phase={msg.gamePhase} />}
                               {msg.analyzingFaces && (
@@ -5882,6 +5906,24 @@ function InlineImageCard({ image }: { image: GeneratedImage }) {
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100 rounded-t-xl">
             <Expand className="w-8 h-8 text-white drop-shadow-lg" />
           </div>
+          {/* Spell correction badge — top-right corner of image */}
+          {image.spellCorrected && image.spellCorrections && image.spellCorrections.length > 0 && (
+            <div className="absolute top-2 right-2 z-10 group/badge">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-teal-500/90 border border-teal-300/50 shadow-lg backdrop-blur-sm cursor-default">
+                <CheckCircle2 className="w-3 h-3 text-white" />
+                <span className="text-[9px] font-bold text-white tracking-wide uppercase">Spell Fixed</span>
+              </div>
+              {/* Tooltip on hover */}
+              <div className="absolute top-full right-0 mt-1 w-48 hidden group-hover/badge:block z-20">
+                <div className="bg-black/90 border border-teal-400/30 rounded-lg px-3 py-2 text-[9px] font-mono">
+                  <p className="text-teal-400 font-bold mb-1 uppercase tracking-widest">Corrections</p>
+                  {image.spellCorrections.map((c, i) => (
+                    <p key={i} className="text-white/70">"{c.original}" → "{c.corrected}"</p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Controls bar */}
