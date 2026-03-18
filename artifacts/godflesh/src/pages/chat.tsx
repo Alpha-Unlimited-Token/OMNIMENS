@@ -3236,6 +3236,17 @@ function LeftPanel({
         )}
       </div>
 
+      <div className="shrink-0 px-3 py-2 border-t" style={{ borderColor: isLight ? "rgba(20,23,34,0.06)" : "rgba(255,255,255,0.06)" }}>
+        <a
+          href={`${window.location.origin}/godflesh/footer-info`}
+          className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[9px] font-mono text-white/35 hover:text-white/60 hover:bg-white/5 transition-all"
+        >
+          <FileText className="w-3 h-3" />
+          Footer · Links · FAQ
+          <ExternalLink className="w-2.5 h-2.5 ml-auto opacity-40" />
+        </a>
+      </div>
+
       {/* ── Install App footer (shows when browser allows PWA install) ── */}
       {canInstall && (
         <div className="shrink-0 px-3 py-2.5 border-t"
