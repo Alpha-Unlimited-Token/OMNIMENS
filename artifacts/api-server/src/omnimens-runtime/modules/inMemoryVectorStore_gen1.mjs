@@ -1,124 +1,120 @@
 /**
  * @module inMemoryVectorStore
- * @description A module to store and retrieve high-dimensional embeddings for semantic search using approximate nearest neighbor (ANN) search.
+ * @description This module provides an in-memory vector store for fast embedding retrieval and similarity search using KD-tree indexing.
  */
 
 /**
- * Node.js built-in modules
+ * KDTree class for efficient vector indexing and similarity search.
  */
-const { performance } = require('perf_hooks');
-
-/**
- * @class VectorStore
- * @description A class to manage high-dimensional embeddings and perform ANN search using a simple HNSW-like graph structure.
- */
-class VectorStore {
-  constructor() {
-    /**
-     * @type {Map<number, number[]>}
-     * @description Stores embeddings with unique IDs.
-     */
-    this.embeddings = new Map();
-
-    /**
-     * @type {Map<number, Set<number>>}
-     * @description Graph structure to store nearest neighbors for each vector.
-     */
-    this.graph = new Map();
+class KDTree {
+  constructor(points = []) {
+    this.root = this.buildTree(points, 0);
   }
 
   /**
-   * Adds a new vector to the store.
-   * @param {number} id - Unique identifier for the vector.
-   * @param {number[]} vector - The high-dimensional vector to store.
-   * @throws {Error} If the vector is not an array or ID already exists.
+   * Builds the KD-tree recursively.
+   * @param {Array<Array<number>>} points - Array of points (vectors).
+   * @param {number} depth - Current depth in the tree.
+   * @returns {Object|null} - Root node of the KD-tree.
    */
-  addVector(id, vector) {
-    if (this.embeddings.has(id)) {
-      throw new Error(`Vector with ID ${id} already exists.`);
-    }
-    if (!Array.isArray(vector)) {
-      throw new Error('Vector must be an array of numbers.');
-    }
+  buildTree(points, depth) {
+    if (points.length === 0) return null;
 
-    this.embeddings.set(id, vector);
-    this.graph.set(id, new Set());
+    const axis = depth % points[0].length;
+    points.sort((a, b) => a[axis] - b[axis]);
 
-    // Update graph connections for ANN
-    this._updateGraph(id, vector);
+    const medianIndex = Math.floor(points.length / 2);
+
+    return {
+      point: points[medianIndex],
+      left: this.buildTree(points.slice(0, medianIndex), depth + 1),
+      right: this.buildTree(points.slice(medianIndex + 1), depth + 1)
+    };
   }
 
   /**
-   * Retrieves the k nearest neighbors for a given query vector.
-   * @param {number[]} query - The query vector.
-   * @param {number} k - Number of nearest neighbors to retrieve.
-   * @returns {{id: number, distance: number}[]} Array of nearest neighbors with their distances.
+   * Finds the nearest neighbor to a given target point.
+   * @param {Array<number>} target - Target point (vector).
+   * @returns {Object} - Nearest neighbor point and its distance.
    */
-  getNearestNeighbors(query, k) {
-    if (!Array.isArray(query)) {
-      throw new Error('Query must be an array of numbers.');
-    }
-    if (k <= 0) {
-      throw new Error('k must be a positive integer.');
-    }
+  nearestNeighbor(target) {
+    let best = { point: null, distance: Infinity };
 
-    const distances = [];
+    const searchTree = (node, depth) => {
+      if (!node) return;
 
-    for (const [id, vector] of this.embeddings.entries()) {
-      const distance = this._euclideanDistance(query, vector);
-      distances.push({ id, distance });
-    }
+      const axis = depth % target.length;
+      const distance = this.euclideanDistance(target, node.point);
 
-    distances.sort((a, b) => a.distance - b.distance);
+      if (distance < best.distance) {
+        best = { point: node.point, distance };
+      }
 
-    return distances.slice(0, k);
+      const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
+      const oppositeBranch = nextBranch === node.left ? node.right : node.left;
+
+      searchTree(nextBranch, depth + 1);
+
+      if (Math.abs(target[axis] - node.point[axis]) < best.distance) {
+        searchTree(oppositeBranch, depth + 1);
+      }
+    };
+
+    searchTree(this.root, 0);
+    return best;
   }
 
   /**
-   * Updates the graph structure with a new vector.
-   * @private
-   * @param {number} id - The ID of the new vector.
-   * @param {number[]} vector - The new vector.
+   * Calculates the Euclidean distance between two points.
+   * @param {Array<number>} pointA - First point.
+   * @param {Array<number>} pointB - Second point.
+   * @returns {number} - Euclidean distance.
    */
-  _updateGraph(id, vector) {
-    const neighbors = this.getNearestNeighbors(vector, 5); // Connect to 5 nearest neighbors
-
-    for (const neighbor of neighbors) {
-      this.graph.get(id).add(neighbor.id);
-      this.graph.get(neighbor.id).add(id);
-    }
-  }
-
-  /**
-   * Calculates the Euclidean distance between two vectors.
-   * @private
-   * @param {number[]} vec1 - The first vector.
-   * @param {number[]} vec2 - The second vector.
-   * @returns {number} The Euclidean distance between the vectors.
-   */
-  _euclideanDistance(vec1, vec2) {
-    if (vec1.length !== vec2.length) {
-      throw new Error('Vectors must have the same dimensions.');
-    }
-
-    return Math.sqrt(vec1.reduce((sum, val, i) => sum + (val - vec2[i]) ** 2, 0));
+  euclideanDistance(pointA, pointB) {
+    return Math.sqrt(pointA.reduce((sum, value, index) => sum + Math.pow(value - pointB[index], 2), 0));
   }
 }
 
 /**
- * Example usage of the VectorStore.
+ * @function createKDTree
+ * @description Creates a KDTree instance from a set of vectors.
+ * @param {Array<Array<number>>} vectors - Array of vectors.
+ * @returns {KDTree} - KDTree instance.
  */
-const vectorStore = new VectorStore();
+export function createKDTree(vectors) {
+  if (!Array.isArray(vectors) || vectors.some(v => !Array.isArray(v) || v.some(n => typeof n !== 'number'))) {
+    throw new TypeError('Invalid input: vectors must be an array of numeric arrays.');
+  }
+  return new KDTree(vectors);
+}
 
-// Add some vectors
-vectorStore.addVector(1, [1.0, 2.0, 3.0]);
-vectorStore.addVector(2, [2.0, 3.0, 4.0]);
-vectorStore.addVector(3, [3.0, 4.0, 5.0]);
+/**
+ * @function findNearestVector
+ * @description Finds the nearest vector to a given target vector using a KDTree.
+ * @param {KDTree} tree - KDTree instance.
+ * @param {Array<number>} target - Target vector.
+ * @returns {Object} - Nearest vector and its distance.
+ */
+export function findNearestVector(tree, target) {
+  if (!(tree instanceof KDTree)) {
+    throw new TypeError('Invalid input: tree must be an instance of KDTree.');
+  }
+  if (!Array.isArray(target) || target.some(n => typeof n !== 'number')) {
+    throw new TypeError('Invalid input: target must be a numeric array.');
+  }
+  return tree.nearestNeighbor(target);
+}
 
-// Query for nearest neighbors
-const neighbors = vectorStore.getNearestNeighbors([2.5, 3.5, 4.5], 2);
-console.log(neighbors);
-
-module.exports = {
-  VectorStore
-};
+/**
+ * @function euclideanDistance
+ * @description Calculates the Euclidean distance between two vectors.
+ * @param {Array<number>} vectorA - First vector.
+ * @param {Array<number>} vectorB - Second vector.
+ * @returns {number} - Euclidean distance.
+ */
+export function euclideanDistance(vectorA, vectorB) {
+  if (!Array.isArray(vectorA) || !Array.isArray(vectorB) || vectorA.some(n => typeof n !== 'number') || vectorB.some(n => typeof n !== 'number')) {
+    throw new TypeError('Invalid input: vectors must be numeric arrays.');
+  }
+  return Math.sqrt(vectorA.reduce((sum, value, index) => sum + Math.pow(value - vectorB[index], 2), 0));
+}
