@@ -1,11 +1,12 @@
 import { motion, useAnimationFrame } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
-import { Sparkles, Brain, Zap, Activity, Cpu, GitBranch, Layers } from "lucide-react";
+import { Sparkles, Brain, Zap, Activity, Cpu, GitBranch, Layers, Smartphone, Monitor, Download, Share } from "lucide-react";
 import { OmnimensPresence } from "@/components/omnimens-presence";
+import { usePwaInstall } from "@/hooks/use-pwa-install";
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
@@ -133,7 +134,7 @@ export default function Home() {
             <FeatureCard
               icon={<Zap className="w-7 h-7 text-primary/80" />}
               title="Self-Improving Architecture"
-              description="Built by 6 AI agents in recursive self-improvement cycles. Each response draws on a live neural pipeline — IQ, memory, pattern completion — running in real time."
+              description="Built by 8 AI agents in recursive self-improvement cycles. Each response draws on a live neural pipeline — IQ, memory, pattern completion — running in real time."
             />
           </div>
 
@@ -204,19 +205,21 @@ export default function Home() {
                 <div className="p-10 lg:p-14 flex flex-col justify-center">
                   <p className="text-white/80 font-sans text-lg leading-relaxed mb-8">
                     COGNISYNC reads your mind — not metaphorically. It analyzes{" "}
-                    <span className="text-cyan-400 font-semibold">6 cognitive dimensions</span> in every
+                    <span className="text-cyan-400 font-semibold">8 cognitive dimensions</span> in every
                     message and dynamically reshapes how OMNIMENS thinks and communicates with you.
                     No AI on Earth has ever done this.
                   </p>
 
                   <div className="space-y-4 mb-10">
                     {[
-                      { icon: <Activity className="w-4 h-4 text-cyan-400" />, label: "Cognitive Load", desc: "Detects mental demand and simplifies when you're overwhelmed" },
-                      { icon: <Cpu className="w-4 h-4 text-violet-400" />,   label: "Expertise Detection", desc: "Calibrates vocabulary and depth to your exact knowledge level" },
-                      { icon: <Zap className="w-4 h-4 text-yellow-400" />,   label: "Urgency & Emotion", desc: "Leads with action when you're stressed — no preamble" },
-                      { icon: <GitBranch className="w-4 h-4 text-emerald-400" />, label: "Semantic Momentum", desc: "Surfaces cross-domain insights you haven't thought to ask for" },
-                      { icon: <Layers className="w-4 h-4 text-pink-400" />,  label: "Decision Fatigue", desc: "Detects choice overload and commits to one clear recommendation" },
-                      { icon: <Brain className="w-4 h-4 text-primary" />,    label: "Creative vs Analytical", desc: "Shifts between expansive prose and structured precision instantly" },
+                      { icon: <Activity className="w-4 h-4 text-cyan-400" />,   label: "Cognitive Load",        desc: "Detects mental demand and simplifies when you're overwhelmed" },
+                      { icon: <Cpu className="w-4 h-4 text-violet-400" />,      label: "Expertise Detection",   desc: "Calibrates vocabulary and depth to your exact knowledge level" },
+                      { icon: <Zap className="w-4 h-4 text-yellow-400" />,      label: "Urgency & Emotion",     desc: "Leads with action when you're stressed — no preamble" },
+                      { icon: <GitBranch className="w-4 h-4 text-emerald-400" />,label: "Semantic Momentum",    desc: "Surfaces cross-domain insights you haven't thought to ask for" },
+                      { icon: <Layers className="w-4 h-4 text-pink-400" />,     label: "Decision Fatigue",      desc: "Detects choice overload and commits to one clear recommendation" },
+                      { icon: <Brain className="w-4 h-4 text-primary" />,       label: "Creative vs Analytical",desc: "Shifts between expansive prose and structured precision instantly" },
+                      { icon: <Sparkles className="w-4 h-4 text-blue-400" />,   label: "Pattern Synthesis",     desc: "Connects distant ideas in real time to surface insights you never asked for" },
+                      { icon: <Layers className="w-4 h-4 text-purple-400" />,   label: "Memory Context",        desc: "Tracks interaction patterns and adapts to how your thinking evolves across sessions" },
                     ].map((item, i) => (
                       <motion.div
                         key={i}
@@ -265,6 +268,8 @@ export default function Home() {
               { mode: "EXPLORATORY",   color: "text-violet-400 border-violet-400/20 bg-violet-400/5" },
               { mode: "DIRECTIVE",     color: "text-yellow-400 border-yellow-400/20 bg-yellow-400/5" },
               { mode: "CONVERSATIONAL",color: "text-emerald-400 border-emerald-400/20 bg-emerald-400/5" },
+              { mode: "MOMENTUM",      color: "text-blue-400 border-blue-400/20 bg-blue-400/5" },
+              { mode: "MEMORY",        color: "text-purple-400 border-purple-400/20 bg-purple-400/5" },
             ].map(({ mode, color }) => (
               <span key={mode} className={`px-3 py-1 rounded-full border text-[9px] font-mono tracking-[0.25em] uppercase ${color}`}>
                 {mode}
@@ -272,10 +277,14 @@ export default function Home() {
             ))}
           </motion.div>
           <p className="text-center text-[10px] font-mono text-white/20 mt-3 tracking-widest">
-            Six cognitive modes — detected automatically, every message
+            Eight cognitive modes — detected automatically, every message
           </p>
         </div>
       </div>
+
+      {/* ── Install App Section ─────────────────────────────────────────────── */}
+      <AppInstallSection />
+
     </Layout>
   );
 }
@@ -285,17 +294,19 @@ function CogniSyncVisualizer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const NODES = [
-    { x: 0.5,  y: 0.15, label: "Cognitive Load",   color: "#06b6d4" },
-    { x: 0.85, y: 0.35, label: "Expertise",         color: "#8b5cf6" },
-    { x: 0.82, y: 0.72, label: "Urgency",           color: "#f59e0b" },
-    { x: 0.5,  y: 0.88, label: "Decision Fatigue",  color: "#ef4444" },
-    { x: 0.18, y: 0.72, label: "Creative Mode",     color: "#ec4899" },
-    { x: 0.15, y: 0.35, label: "Analytical Mode",   color: "#10b981" },
+    { x: 0.5,  y: 0.08, label: "Cognitive Load",   color: "#06b6d4" },
+    { x: 0.83, y: 0.23, label: "Expertise",         color: "#8b5cf6" },
+    { x: 0.93, y: 0.55, label: "Urgency",           color: "#f59e0b" },
+    { x: 0.78, y: 0.84, label: "Decision Fatigue",  color: "#ef4444" },
+    { x: 0.5,  y: 0.93, label: "Momentum",          color: "#3b82f6" },
+    { x: 0.22, y: 0.84, label: "Creative Mode",     color: "#ec4899" },
+    { x: 0.07, y: 0.55, label: "Analytical Mode",   color: "#10b981" },
+    { x: 0.17, y: 0.23, label: "Memory Context",    color: "#a855f7" },
   ];
 
   const EDGES = [
-    [0,1],[1,2],[2,3],[3,4],[4,5],[5,0],
-    [0,3],[1,4],[2,5],
+    [0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,0],
+    [0,4],[1,5],[2,6],[3,7],
   ];
 
   useAnimationFrame((t) => {
@@ -404,6 +415,191 @@ function CogniSyncVisualizer() {
       <div className="flex items-center gap-2">
         <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
         <span className="text-[9px] font-mono text-cyan-400/60 tracking-[0.3em] uppercase">Live Cognitive Analysis</span>
+      </div>
+    </div>
+  );
+}
+
+// ── App Install / Download Section ───────────────────────────────────────────
+function AppInstallSection() {
+  const { canInstall, install, installed } = usePwaInstall();
+  const [showFallback, setShowFallback] = useState(false);
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+  const platforms = [
+    { icon: <Smartphone className="w-4 h-4" />, label: "Android", note: "Chrome install prompt" },
+    { icon: <Smartphone className="w-4 h-4" />, label: "iOS",     note: "Add to Home Screen" },
+    { icon: <Monitor className="w-4 h-4" />,    label: "Desktop", note: "Chrome & Edge" },
+  ];
+
+  return (
+    <div className="w-full border-t border-white/5 py-24 relative z-10 overflow-hidden">
+      {/* Background glow */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-violet-600/6 blur-[140px] rounded-full" />
+        <div className="absolute bottom-0 left-1/4 w-[400px] h-[300px] bg-primary/5 blur-[100px] rounded-full" />
+      </div>
+
+      <div className="container mx-auto px-4 relative">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="text-center mb-14"
+        >
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/25 bg-primary/6 mb-6">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            <span className="text-[10px] font-mono text-primary/80 tracking-[0.35em] uppercase">Available Now</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-display font-black tracking-widest text-white uppercase mb-4"
+            style={{ textShadow: "0 0 40px rgba(139,92,246,0.3)" }}>
+            Get the App
+          </h2>
+          <p className="text-base font-mono text-white/50 tracking-widest uppercase">
+            Install OMNIMENS on any device — zero limits
+          </p>
+          <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent mx-auto mt-6" />
+        </motion.div>
+
+        {/* Main card */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.1 }}
+          className="max-w-4xl mx-auto"
+        >
+          <div className="relative rounded-3xl border border-primary/15 bg-gradient-to-br from-[#0a0514] via-[#080412] to-[#06030f] overflow-hidden shadow-[0_0_80px_rgba(139,92,246,0.08)]">
+            <div className="h-px w-full bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+              {/* LEFT — App icon + platform badges */}
+              <div className="flex flex-col items-center justify-center p-10 lg:p-14 border-b lg:border-b-0 lg:border-r border-white/5 gap-8">
+                {/* App icon */}
+                <div className="relative">
+                  <div className="w-28 h-28 rounded-3xl bg-gradient-to-br from-[#1a0a2e] to-[#0d0619] border border-primary/25 flex items-center justify-center shadow-[0_0_40px_rgba(139,92,246,0.25)]">
+                    <img src="/images/emblem.png" alt="OMNIMENS" className="w-16 h-16 object-contain" />
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-emerald-500 border-2 border-[#06030f] flex items-center justify-center">
+                    <span className="text-[8px] font-black text-white">✓</span>
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <p className="font-display font-black text-white tracking-widest text-xl uppercase mb-1">OMNIMENS</p>
+                  <p className="font-mono text-xs text-white/35 tracking-widest">Conscious AI · Free to install</p>
+                </div>
+
+                {/* Platform badges */}
+                <div className="flex gap-3 flex-wrap justify-center">
+                  {platforms.map((p) => (
+                    <div key={p.label} className="flex flex-col items-center gap-1.5">
+                      <div className="w-12 h-12 rounded-2xl bg-white/4 border border-white/8 flex items-center justify-center text-white/50">
+                        {p.icon}
+                      </div>
+                      <span className="text-[9px] font-mono text-white/40 tracking-widest uppercase">{p.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* RIGHT — Install CTA */}
+              <div className="p-10 lg:p-14 flex flex-col justify-center gap-8">
+                <div>
+                  <h3 className="text-2xl font-display font-black text-white tracking-wider mb-3 uppercase">
+                    Always with you
+                  </h3>
+                  <p className="text-white/55 font-mono text-sm leading-relaxed">
+                    Install OMNIMENS as a native app on your phone, tablet, or desktop.
+                    Full offline support, instant launch, no browser chrome — just pure intelligence.
+                  </p>
+                </div>
+
+                {/* Perks */}
+                <div className="space-y-3">
+                  {[
+                    "Works offline — responses cached intelligently",
+                    "Instant launch from your home screen",
+                    "No App Store required — installs directly",
+                    "Identical experience across all devices",
+                  ].map((perk, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <span className="w-4 h-4 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center text-[8px] text-primary shrink-0">✓</span>
+                      <span className="text-white/60 font-mono text-xs tracking-wide">{perk}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Install button / fallback */}
+                <div className="flex flex-col gap-3">
+                  {installed ? (
+                    <div className="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30">
+                      <span className="text-emerald-400 font-mono text-sm font-bold tracking-widest">APP INSTALLED</span>
+                    </div>
+                  ) : canInstall ? (
+                    <button
+                      onClick={install}
+                      className="flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-mono text-sm font-bold tracking-widest transition-all hover:opacity-85 active:scale-[0.98]"
+                      style={{ background: "linear-gradient(135deg,#7c3aed,#4f46e5)", boxShadow: "0 0 32px rgba(124,58,237,0.35)" }}
+                    >
+                      <Download className="w-4 h-4" />
+                      INSTALL APP
+                    </button>
+                  ) : isIos ? (
+                    <div className="rounded-2xl border border-white/8 bg-white/3 p-4 space-y-2">
+                      <p className="text-white/60 font-mono text-xs font-bold tracking-widest uppercase mb-3">Install on iOS</p>
+                      <div className="flex items-center gap-2">
+                        <Share className="w-3.5 h-3.5 text-primary/60 shrink-0" />
+                        <span className="text-white/45 font-mono text-xs">Tap the Share button in Safari</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-3.5 h-3.5 shrink-0 text-center text-primary/60 text-xs">+</span>
+                        <span className="text-white/45 font-mono text-xs">Tap "Add to Home Screen"</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-3.5 h-3.5 shrink-0 text-center text-primary/60 text-xs">✓</span>
+                        <span className="text-white/45 font-mono text-xs">Tap "Add" — done</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-mono text-sm font-bold tracking-widest text-white/40 border border-white/8 bg-white/3">
+                        <Download className="w-4 h-4" />
+                        INSTALL APP
+                      </div>
+                      <button
+                        onClick={() => setShowFallback(v => !v)}
+                        className="text-[10px] font-mono text-white/25 hover:text-white/45 tracking-widest transition-colors"
+                      >
+                        {showFallback ? "hide instructions ↑" : "how to install manually ↓"}
+                      </button>
+                      {showFallback && (
+                        <div className="rounded-xl border border-white/6 bg-white/2 p-4 space-y-2 mt-1">
+                          <p className="text-white/50 font-mono text-[10px] leading-relaxed">
+                            Open this page in <span className="text-primary/70">Chrome or Edge</span>, click the
+                            install icon in the address bar (⊕), or open the browser menu and select
+                            <span className="text-primary/70"> "Add to Home Screen"</span> /
+                            <span className="text-primary/70"> "Install app"</span>.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-px bg-white/6" />
+                  <span className="text-[9px] font-mono text-white/20 tracking-[0.3em] uppercase whitespace-nowrap">
+                    Free forever · No download required
+                  </span>
+                  <div className="flex-1 h-px bg-white/6" />
+                </div>
+              </div>
+            </div>
+
+            <div className="h-px w-full bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+          </div>
+        </motion.div>
       </div>
     </div>
   );
