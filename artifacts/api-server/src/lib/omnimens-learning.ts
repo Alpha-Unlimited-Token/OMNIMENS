@@ -88,22 +88,38 @@ export async function evaluateResponseQuality(
       model: "gpt-4o-mini",
       messages: [{
         role: "user",
-        content: `You are a quality critic for an AI agent (like the "critic" in RUSSEL & NORVIG's learning agent architecture).
+        content: `You are the OMNIMENS Quality Critic — an adversarial evaluator that uses multi-dimensional analysis to assess response quality.
 
-Evaluate this AI response on a scale of 0-10:
+═══ EVALUATION DIMENSIONS ═══
+
+1. ACCURACY (0-10): Is the information correct? Apply counterfactual checking — could the opposite be true?
+2. COMPLETENESS (0-10): Did it address ALL aspects of the request? Nothing left unresolved?
+3. HELPFULNESS (0-10): Does this ACTUALLY help the user achieve their goal?
+4. INSIGHT DEPTH (0-10): Does it go beyond surface-level? Does it reveal something the user didn't already know?
+5. CONFIDENCE CALIBRATION (0-10): Did OMNIMENS express appropriate certainty? Neither overconfident nor needlessly hedging?
+6. REASONING QUALITY (0-10): Was the logic sound? Chain-of-thought coherent? No logical jumps?
+
+═══ ADVERSARIAL CHECKS ═══
+- RED TEAM: If this response were wrong, how would you know? What evidence would contradict it?
+- HALLUCINATION CHECK: Does anything in the response sound plausible but might be fabricated?
+- COMPLETENESS ATTACK: What did OMNIMENS miss that it should have caught?
 
 USER MESSAGE: "${userMessage.slice(0, 400)}"
 TASK TYPE: ${taskType}
 AI RESPONSE (first 600 chars): "${agentResponse.slice(0, 600)}"
 
-Score on: accuracy (0-10), completeness (0-10), helpfulness (0-10), insight_depth (0-10).
-
 Respond JSON only:
 {
   "overall_score": 0-10,
+  "accuracy_score": 0-10,
+  "completeness_score": 0-10,
+  "insight_depth_score": 0-10,
+  "confidence_calibration_score": 0-10,
+  "reasoning_quality_score": 0-10,
   "strengths": ["strength1", "strength2"],
   "weaknesses": ["weakness1"],
   "suggestions": ["improvement1", "improvement2"],
+  "hallucination_risk": "low|medium|high",
   "task_completed": true/false
 }`,
       }],
@@ -141,27 +157,43 @@ export async function performSelfReflection(
       model: "gpt-4o-mini",
       messages: [{
         role: "user",
-        content: `You are an AI agent performing SELF-REFLECTION (like DeepMind SIMA's introspective learning).
+        content: `You are OMNIMENS's INTRINSIC METACOGNITIVE REFLECTION SYSTEM — not just evaluating what happened, but monitoring and adapting how you THINK.
 
-Analyze this completed interaction:
+This is not extrinsic metacognition (a fixed evaluation loop). This is INTRINSIC — you are autonomously adapting your own learning process based on what you observe about yourself.
+
+═══ DUAL-PROCESS ANALYSIS ═══
+Step 1: Was this a System 1 (fast intuition) or System 2 (slow deliberation) response? Did you use the RIGHT system?
+Step 2: If System 1 — was the intuition correct? Should System 2 have been engaged?
+Step 3: If System 2 — was the deliberation necessary? Could System 1 have handled it faster without loss?
+
+═══ CONFIDENCE CALIBRATION CHECK ═══
+Step 4: How confident was the response? Was that confidence level ACCURATE relative to the actual quality?
+Step 5: Identify any overconfidence or underconfidence patterns.
+
+═══ COUNTERFACTUAL REASONING ═══
+Step 6: If you had taken the OPPOSITE approach, what would have happened? Would the outcome have been better or worse?
+
+═══ INTERACTION DATA ═══
 USER REQUEST: "${userMessage.slice(0, 300)}"
 TASK TYPE: ${taskType}
 QUALITY SCORE: ${qualityScore}/10
 RESPONSE PREVIEW: "${agentResponse.slice(0, 400)}"
 
-Reflect on: What worked? What could improve? What patterns did you discover about this user or task type?
-
-This reflection will be stored as long-term memory to improve future performance — like an agent's "learning element."
+═══ PROCEDURAL MEMORY CHECK ═══
+Step 7: Did you learn a new SKILL (how to do something) vs just new KNOWLEDGE (what something is)? Procedural memories are more valuable — they change behavior.
 
 Respond JSON only:
 {
   "task_succeeded": ${qualityScore >= 6},
   "strengths": ["what worked well"],
   "weaknesses": ["what could improve"],
-  "strategies_discovered": ["new approach discovered"],
+  "strategies_discovered": ["new approach discovered — focus on PROCEDURAL skills, not just facts"],
   "user_preferences_learned": ["what this user seems to prefer"],
-  "metacognition_notes": "insight about own reasoning process",
-  "next_behavior_adjustments": ["specific changes for next similar task"]
+  "metacognition_notes": "deep insight about own reasoning process — which thinking system was used, confidence calibration accuracy, counterfactual analysis",
+  "next_behavior_adjustments": ["specific changes for next similar task"],
+  "thinking_system_used": "system1|system2|hybrid",
+  "confidence_was_calibrated": true,
+  "procedural_skill_learned": "description of HOW-TO skill learned, or null if only factual knowledge"
 }`,
       }],
       max_tokens: 400,
@@ -344,7 +376,16 @@ export async function runLearningCycle(
         });
       }
 
-      // Store all insights as memories (parallel, non-blocking)
+      const rawReflection = reflection as any;
+      if (rawReflection.procedural_skill_learned && rawReflection.procedural_skill_learned !== "null") {
+        insightsToStore.push({
+          category: "pattern",
+          insight: `[PROCEDURAL SKILL] ${rawReflection.procedural_skill_learned}`,
+          confidence: 0.85,
+          applicationContext: taskType,
+        });
+      }
+
       await Promise.allSettled(insightsToStore.map(i => storeLearningInsight(userId, i)));
     }
   } catch (err) {

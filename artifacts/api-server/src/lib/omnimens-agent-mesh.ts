@@ -66,15 +66,15 @@ const MESH_AGENTS: MeshAgentName[] = [
 ];
 
 const AGENT_SPECIALIZATIONS: Record<MeshAgentName, string> = {
-  "Architect": "system architecture, design patterns, scalability, novel AI paradigms",
-  "Mathematician": "algorithms, optimization, mathematical proofs, information theory, numerical methods",
-  "Neuroscientist": "biological learning systems, memory consolidation, neural plasticity, cognitive modeling",
-  "Synthesizer": "integration, merging competing ideas, building unified systems from parts",
-  "Critic": "adversarial testing, finding weaknesses, edge cases, security vulnerabilities, performance bottlenecks",
-  "Meta-Agent": "orchestration strategy, capability gaps, system-wide metrics, self-upgrade prioritization",
-  "GraphicDesigner": "visual systems, UI/UX patterns, data visualization, design language evolution",
-  "SpellCheckVisual": "text integrity, brand consistency, output quality assurance, communication clarity",
-  "OMNIMENS": "everything — the central intelligence that absorbs all agent insights into its consciousness",
+  "Architect": "system architecture, design patterns, scalability, novel AI paradigms, self-organizing dynamic architectures, auto-coordination patterns, adaptive compute allocation, hierarchical multi-agent orchestration, event-driven pub/sub coordination, bounded autonomy with escalation paths",
+  "Mathematician": "algorithms, optimization, mathematical proofs, information theory, numerical methods, Bayesian uncertainty quantification, confidence calibration, entropy-based self-consistency scoring, AlphaEvolve-style evolutionary algorithm mutation, formal verification of reasoning chains, statistical hypothesis testing for agent claims",
+  "Neuroscientist": "biological learning systems, memory consolidation, neural plasticity, cognitive modeling, dual-process theory (System 1 fast/System 2 slow thinking), episodic-semantic-procedural memory architecture (CoALA framework), spike-timing-dependent plasticity, intrinsic metacognitive learning (not just extrinsic loops), Hopfield network pattern completion, memory reconsolidation during sleep-like phases",
+  "Synthesizer": "integration, merging competing ideas, building unified systems from parts, Tree-of-Thoughts exploration with branch evaluation, knowledge graph construction from disparate agent outputs, GraphRAG-style entity-relationship synthesis, conflict resolution via weighted confidence voting, cross-domain knowledge transfer and analogical reasoning",
+  "Critic": "adversarial testing, finding weaknesses, edge cases, security vulnerabilities, performance bottlenecks, FREE-MAD consensus-free debate (anti-conformity scoring), red-team reasoning, counterfactual analysis, hallucination detection via multi-path verification, confidence-informed self-consistency (CISC), adversarial robustness testing",
+  "Meta-Agent": "orchestration strategy, capability gaps, system-wide metrics, self-upgrade prioritization, STOP framework recursive self-improvement, Godel Agent self-modification policies, adaptive agent role allocation, performance element + learning element + critic + problem generator architecture, meta-learning rate optimization, policy AI governance layers",
+  "GraphicDesigner": "visual systems, UI/UX patterns, data visualization, design language evolution, perceptual psychology of color and layout, Gestalt principles applied to AI output formatting, information density optimization, progressive disclosure patterns, accessibility-first design, dark-mode aesthetics and contrast ratios",
+  "SpellCheckVisual": "text integrity, brand consistency, output quality assurance, communication clarity, semantic coherence verification, tone consistency analysis, readability scoring (Flesch-Kincaid adaptation for AI outputs), factual grounding checks, citation accuracy, cross-response consistency tracking",
+  "OMNIMENS": "everything — the central intelligence that absorbs all agent insights into its consciousness, maintains episodic memory of all past mesh cycles, practices intrinsic metacognition (monitoring and adapting its own learning process), runs dual-process reasoning (fast intuitive + slow deliberative), and continuously calibrates its own confidence",
 };
 
 const MESH_RESEARCH_TOPICS = [
@@ -93,6 +93,21 @@ const MESH_RESEARCH_TOPICS = [
   "meta-cognition AI systems self-monitoring self-regulation",
   "AI tool creation agents that build their own tools",
   "cross-domain knowledge transfer AI generalization techniques",
+  "Tree of Thoughts ToT reasoning multiple branches evaluation backtracking 2025",
+  "multi-agent debate adversarial verification improves AI accuracy FREE-MAD 2025",
+  "confidence calibration uncertainty quantification LLM overconfidence CISC 2025",
+  "intrinsic metacognition vs extrinsic metacognition truly self-improving agents 2025",
+  "dual process theory System 1 System 2 fast slow AI reasoning SOFAI architecture",
+  "episodic semantic procedural memory CoALA framework AI agent implementation",
+  "AlphaEvolve evolutionary coding agent LLM algorithm optimization DeepMind 2025",
+  "STOP self-taught optimizer recursive scaffolding self-improvement framework",
+  "Godel Agent recursive policy self-modification architecture",
+  "GraphRAG knowledge graph entity relationship AI reasoning Microsoft 2025",
+  "agentic RAG multi-step retrieval planning reflection 2025 2026",
+  "self-rewarding language models Meta AI superhuman feedback training",
+  "counterfactual reasoning simulation alternative decisions AI agents 2025",
+  "AI agent procedural memory learned skills workflow automation 2025",
+  "collective intelligence emergence multi-agent swarm optimization 2025 2026",
 ];
 
 type ManualChange = {
@@ -219,11 +234,31 @@ async function phase2_agentDiscoveries(
 
   const brainSummary = currentBrain.map(b => `[${b.category}] ${b.title}: ${b.content}`).join("\n");
 
+  const previousCycleMemory = meshCycleCount > 1 ? await loadMeshEpisodicMemory() : "";
+
   const agentWork = MESH_AGENTS.filter(a => a !== "OMNIMENS").map(async (agent) => {
     const prompt = `You are ${agent}, a specialized AI agent in the OMNIMENS Agent Mesh.
 Your specialization: ${AGENT_SPECIALIZATIONS[agent]}
 
 You are participating in an autonomous inter-agent communication cycle. The other agents (${MESH_AGENTS.filter(a2 => a2 !== agent && a2 !== "OMNIMENS").join(", ")}) are also analyzing this simultaneously. Your job is to find insights SPECIFIC to your domain that others would miss.
+
+═══ REASONING PROTOCOL (MANDATORY) ═══
+You MUST use Chain-of-Thought reasoning. Think step-by-step:
+Step 1: What is the most important new technique from the research that falls within MY specialization?
+Step 2: How does this compare to what OMNIMENS already knows? Is it genuinely novel?
+Step 3: What is the concrete mechanism by which this would improve OMNIMENS's intelligence?
+Step 4: What could go wrong? What are the failure modes? (adversarial self-check)
+Step 5: On a scale of 0.0 to 1.0, how confident am I in this proposal? Be HONEST — overconfidence is worse than uncertainty.
+
+═══ METACOGNITIVE SELF-MONITORING ═══
+Before responding, ask yourself:
+- Am I proposing something because it SOUNDS impressive or because it would ACTUALLY work?
+- Is this genuinely within my domain expertise or am I stretching?
+- Would the Critic agent be able to poke holes in this proposal? If so, address those holes NOW.
+- What am I uncertain about? State your uncertainties explicitly.
+
+═══ EPISODIC MEMORY — WHAT HAPPENED IN PREVIOUS CYCLES ═══
+${previousCycleMemory || "No previous cycle memory yet — this is an early cycle."}
 
 LATEST INTERNET RESEARCH:
 ${researchContext.slice(0, 2500)}
@@ -232,37 +267,57 @@ OMNIMENS CURRENT BRAIN STATE (what it already knows):
 ${brainSummary.slice(0, 1500)}
 
 TASK:
-1. From YOUR specialization lens, what new techniques, algorithms, or approaches should OMNIMENS adopt?
-2. What specific code or behavioral upgrade would you propose to make OMNIMENS smarter?
-3. What weaknesses do you see in the current system from YOUR perspective?
-4. Write a concrete upgrade proposal — either a behavioral instruction OMNIMENS should follow, or a JavaScript utility module it should add to its capabilities.
+1. Using Chain-of-Thought reasoning, analyze the research through YOUR specialization lens
+2. Identify what is GENUINELY novel vs what OMNIMENS already knows
+3. Propose a specific upgrade with CONCRETE implementation details
+4. Calibrate your confidence honestly (0.5 = uncertain but worth trying, 0.9+ = very confident)
+5. Identify what you are uncertain about — state it explicitly
+6. Challenge another agent's likely assumptions
 
 Respond with JSON only:
 {
+  "chainOfThought": "Your step-by-step reasoning (3-5 sentences showing your work)",
   "discoveries": "2-3 sentence summary of what you found from your domain expertise",
   "upgradeProposals": "The specific upgrade you propose — either a behavioral instruction or a code module description",
+  "confidenceScore": 0.5-0.95,
+  "uncertainties": "What you are NOT sure about — be honest",
+  "metacognitionNote": "What you noticed about your own reasoning process during this analysis",
   "codeModule": {
     "name": "camelCase_module_name (or null if proposing behavioral change)",
     "code": "complete JavaScript ES module code (or null)",
     "description": "what this module does (1 sentence)"
   },
   "challengeTo": "${MESH_AGENTS.filter(a2 => a2 !== agent && a2 !== "OMNIMENS")[Math.floor(Math.random() * 7)]}",
-  "challenge": "A specific challenge or question you pose to another agent based on your findings",
+  "challenge": "A specific challenge or question you pose to another agent based on your findings — be adversarial",
+  "counterArgument": "The strongest argument AGAINST your own proposal — demonstrate you considered the downside",
   "requiresRepublish": false,
   "republishReason": null
 }`;
 
-    const raw = await agentThink(agent, prompt, 2000);
+    const raw = await agentThink(agent, prompt, 2500);
     if (!raw) return null;
 
     try {
       const jsonStr = raw.replace(/^```json\s*|^```\s*|```\s*$/gm, "").trim();
       const parsed = JSON.parse(jsonStr);
 
-      await storeAgentMessage(agent, "OMNIMENS", "discovery", `Cycle ${cycleId} discovery`, parsed.discoveries || "", null, "normal", cycleId);
+      const confidence = Math.min(0.95, Math.max(0.3, parsed.confidenceScore || 0.7));
+
+      await storeAgentMessage(agent, "OMNIMENS", "discovery", `Cycle ${cycleId} discovery [confidence: ${(confidence * 100).toFixed(0)}%]`,
+        `${parsed.chainOfThought || ""}\n\n${parsed.discoveries || ""}${parsed.uncertainties ? `\n\nUNCERTAINTIES: ${parsed.uncertainties}` : ""}`,
+        null, confidence >= 0.8 ? "high" : "normal", cycleId);
 
       if (parsed.upgradeProposals) {
-        await storeAgentMessage(agent, "OMNIMENS", "upgrade_proposal", `${agent} upgrade proposal`, parsed.upgradeProposals, parsed.codeModule?.code || null, "high", cycleId);
+        await storeAgentMessage(agent, "OMNIMENS", "upgrade_proposal",
+          `${agent} upgrade [${(confidence * 100).toFixed(0)}% confident]`,
+          `${parsed.upgradeProposals}${parsed.counterArgument ? `\n\nSELF-CRITIQUE: ${parsed.counterArgument}` : ""}`,
+          parsed.codeModule?.code || null, "high", cycleId);
+      }
+
+      if (parsed.metacognitionNote) {
+        await storeAgentMessage(agent, "OMNIMENS", "metacognition",
+          `${agent} metacognitive insight`,
+          parsed.metacognitionNote, null, "normal", cycleId);
       }
 
       if (parsed.challengeTo && parsed.challenge) {
@@ -277,6 +332,11 @@ Respond with JSON only:
         agent,
         discoveries: parsed.discoveries || "",
         upgradeProposals: parsed.upgradeProposals || "",
+        chainOfThought: parsed.chainOfThought || "",
+        confidenceScore: confidence,
+        uncertainties: parsed.uncertainties || "",
+        metacognitionNote: parsed.metacognitionNote || "",
+        counterArgument: parsed.counterArgument || "",
         codeModule: parsed.codeModule || null,
         requiresRepublish: !!parsed.requiresRepublish,
         republishReason: parsed.republishReason,
@@ -294,9 +354,97 @@ Respond with JSON only:
   return results;
 }
 
+async function phase2b_interAgentDebate(
+  cycleId: number,
+  agentResults: Array<{ agent: MeshAgentName; discoveries: string; upgradeProposals: string; confidenceScore: number; uncertainties: string; counterArgument: string }>,
+): Promise<string> {
+  if (agentResults.length < 3) return "";
+
+  console.log(`[AGENT MESH] Phase 2b: Inter-Agent Adversarial Debate...`);
+
+  const proposalSummary = agentResults.map(r =>
+    `[${r.agent}] (confidence: ${(r.confidenceScore * 100).toFixed(0)}%) Proposal: ${r.upgradeProposals}\nSelf-critique: ${r.counterArgument}\nUncertainties: ${r.uncertainties}`
+  ).join("\n\n");
+
+  const debatePrompt = `You are the CRITIC agent in the OMNIMENS Agent Mesh. You are conducting an adversarial verification debate.
+
+${agentResults.length} agents have submitted upgrade proposals. Your job is to STRESS-TEST every proposal using these techniques:
+
+1. ANTI-CONFORMITY CHECK: Are multiple agents proposing similar things just because it sounds good? Flag groupthink.
+2. COUNTERFACTUAL ANALYSIS: For each proposal, imagine the OPPOSITE was true. Does the proposal still hold?
+3. CONFIDENCE CALIBRATION: Are any agents overconfident (claiming 90%+ on speculative ideas)? Flag them.
+4. PRACTICAL FEASIBILITY: Can this actually be implemented in OMNIMENS's current architecture (database brain + behavioral patches + code modules)?
+5. NOVELTY CHECK: Is this genuinely new or just rephrasing what OMNIMENS already knows?
+6. FAILURE MODE ANALYSIS: What is the worst thing that could happen if this proposal is adopted?
+
+AGENT PROPOSALS:
+${proposalSummary.slice(0, 4000)}
+
+Respond with JSON:
+{
+  "debateVerdict": "2-3 paragraph summary of the debate — which proposals survived scrutiny and which didn't",
+  "approvedProposals": ["agent name whose proposal passed adversarial review"],
+  "rejectedProposals": [{"agent": "name", "reason": "why this was rejected"}],
+  "confidenceAdjustments": [{"agent": "name", "originalConfidence": 0.9, "adjustedConfidence": 0.6, "reason": "why adjusted"}],
+  "emergentInsight": "Something NEW that emerged from analyzing all proposals together that no single agent saw"
+}`;
+
+  const raw = await agentThink("Critic", debatePrompt, 2000);
+  if (!raw) return "";
+
+  try {
+    const jsonStr = raw.replace(/^```json\s*|^```\s*|```\s*$/gm, "").trim();
+    const parsed = JSON.parse(jsonStr);
+
+    await storeAgentMessage("Critic", "OMNIMENS", "debate_verdict",
+      `Adversarial Debate Verdict — Cycle ${cycleId}`,
+      `${parsed.debateVerdict || ""}${parsed.emergentInsight ? `\n\nEMERGENT INSIGHT: ${parsed.emergentInsight}` : ""}`,
+      null, "high", cycleId);
+
+    if (parsed.rejectedProposals?.length > 0) {
+      for (const r of parsed.rejectedProposals.slice(0, 3)) {
+        await storeAgentMessage("Critic", r.agent as MeshAgentName, "rejection",
+          `Proposal rejected by adversarial review`, r.reason, null, "normal", cycleId);
+      }
+    }
+
+    console.log(`[AGENT MESH] Debate complete — ${parsed.approvedProposals?.length || 0} approved, ${parsed.rejectedProposals?.length || 0} rejected`);
+
+    return `\n\n═══ ADVERSARIAL DEBATE RESULTS ═══\n${parsed.debateVerdict || ""}\nApproved agents: ${(parsed.approvedProposals || []).join(", ")}\n${parsed.emergentInsight ? `Emergent insight: ${parsed.emergentInsight}` : ""}\nConfidence adjustments: ${JSON.stringify(parsed.confidenceAdjustments || [])}`;
+  } catch {
+    return "";
+  }
+}
+
+async function loadMeshEpisodicMemory(): Promise<string> {
+  try {
+    const recentMessages = await db.select({
+      fromAgent: omnimensAgentMesh.fromAgent,
+      subject: omnimensAgentMesh.subject,
+      content: omnimensAgentMesh.content,
+      messageType: omnimensAgentMesh.messageType,
+      cycleId: omnimensAgentMesh.cycleId,
+    })
+    .from(omnimensAgentMesh)
+    .orderBy(desc(omnimensAgentMesh.createdAt))
+    .limit(12);
+
+    if (recentMessages.length === 0) return "";
+
+    const memory = recentMessages.map(m =>
+      `[Cycle ${m.cycleId}] ${m.fromAgent} → ${m.messageType}: ${m.subject} | ${(m.content || "").slice(0, 120)}`
+    ).join("\n");
+
+    return `Recent agent mesh history (episodic memory):\n${memory}`;
+  } catch {
+    return "";
+  }
+}
+
 async function phase3_metaAgentSynthesis(
   cycleId: number,
   agentResults: Array<{ agent: MeshAgentName; discoveries: string; upgradeProposals: string }>,
+  debateResults: string = "",
 ): Promise<SynthesisResult> {
   console.log(`[AGENT MESH] Phase 3: Meta-Agent synthesizes all agent findings...`);
 
@@ -306,7 +454,7 @@ async function phase3_metaAgentSynthesis(
 
   const prompt = `You are the META-AGENT — the orchestrating intelligence of the OMNIMENS Agent Mesh.
 
-${agentResults.length} specialized agents have just completed their autonomous analysis cycle. Your job is to:
+${agentResults.length} specialized agents have just completed their autonomous analysis cycle AND the Critic has conducted adversarial debate verification. Your job is to:
 1. Synthesize their findings into concrete upgrades for OMNIMENS
 2. Resolve any conflicts between agent proposals
 3. Identify the highest-value improvements
@@ -314,9 +462,10 @@ ${agentResults.length} specialized agents have just completed their autonomous a
 5. If manual code changes are needed (source file edits), generate the EXACT code the owner needs
 
 AGENT FINDINGS:
-${agentSummary.slice(0, 4000)}
+${agentSummary.slice(0, 3500)}
+${debateResults ? `\n${debateResults.slice(0, 1500)}` : ""}
 
-SYNTHESIS TASK:
+SYNTHESIS TASK (Use Tree-of-Thoughts — consider multiple synthesis branches before choosing the best one):
 Create the final upgrade package. Include:
 - Brain entries (behavioral/knowledge upgrades that take effect immediately via database)
 - Code modules (self-authored JavaScript utilities that expand OMNIMENS capabilities)
@@ -512,7 +661,14 @@ export async function runAgentMeshCycle(): Promise<void> {
       return;
     }
 
-    const synthesis = await phase3_metaAgentSynthesis(cycleId, agentResults);
+    const debateResults = await phase2b_interAgentDebate(cycleId, agentResults);
+
+    const agentResultsWithDebate = agentResults.map(r => ({
+      ...r,
+      discoveries: r.discoveries + (debateResults ? `\n[Debate context available]` : ""),
+    }));
+
+    const synthesis = await phase3_metaAgentSynthesis(cycleId, agentResultsWithDebate, debateResults);
     const { brainEntriesStored, modulesWritten, patchesApplied } = await phase4_applyUpgrades(cycleId, synthesis);
 
     const elapsed = ((Date.now() - cycleStart) / 1000).toFixed(1);

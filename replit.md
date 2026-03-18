@@ -117,7 +117,7 @@ A transcendent sci-fi AI chat platform matching and surpassing the capabilities 
 - `lib/omnimens-url-analyzer.ts` — URL fetch + content extraction
 - `lib/omnimens-custom-instructions.ts` — 9 personas (incl. GAME_BUILDER) + custom context injection
 - `lib/web-search.ts` — web search integration
-- `lib/omnimens-learning.ts` — Learning AI engine: Critic evaluator, learning element, emotional intelligence analyzer, self-reflection, proactive anticipation, learning memory store, full per-user learning cycle (DeepMind SIMA / AWS Learning Agent / Emotional Intelligence architectures)
+- `lib/omnimens-learning.ts` — Learning AI engine: Multi-dimensional adversarial critic (6-axis scoring + hallucination detection + red-team checks), intrinsic metacognitive self-reflection (dual-process System 1/2 analysis, confidence calibration, counterfactual reasoning, procedural skill learning), emotional intelligence analyzer, proactive anticipation, learning memory store, full per-user learning cycle (DeepMind SIMA / AWS Learning Agent / CoALA / SOFAI architectures)
 - `lib/omnimens-physio.ts` — Physical Therapy AI engine: red flag screening, psychosocial scoring (PHQ-2/TSK/PCS), phase-based exercise library (lower back/knee/shoulder/cervical/hip/ankle), adaptive program generation, PROMIS-PF/DASH/KOOS/LEFS/NDI/PSFS/NPRS/GROC outcome measures, integrative recovery recommendations, pain science education library
 
 ### Credit System
@@ -154,7 +154,16 @@ A transcendent sci-fi AI chat platform matching and surpassing the capabilities 
 
 A full-stack React + Express app where 6 specialized AI agents collaborate to design a superior next-generation AI.
 
-**Agents:** Architect (blue), Critic (orange), Synthesizer (purple), Mathematician (emerald), Neuroscientist/Bio-Mech Bridge (pink), Meta-Agent (yellow)  
+**Agents:** Architect (blue), Critic (orange), Synthesizer (purple), Mathematician (emerald), Neuroscientist/Bio-Mech Bridge (pink), Meta-Agent (yellow), GraphicDesigner, SpellCheckVisual  
+
+### Agent Mesh Intelligence System (omnimens-agent-mesh.ts)
+5-phase autonomous cycle every 5 hours:
+1. **Phase 1 — Web Research**: Searches 3 random cutting-edge topics from 30 research areas
+2. **Phase 2 — Agent Discoveries**: All 8 agents analyze research using Chain-of-Thought reasoning, confidence calibration, metacognitive self-monitoring, and episodic memory of past cycles
+3. **Phase 2b — Adversarial Debate**: Critic conducts FREE-MAD-style debate — anti-conformity checks, counterfactual analysis, confidence recalibration, groupthink detection, failure mode analysis. Approves/rejects proposals
+4. **Phase 3 — Meta-Agent Synthesis**: Tree-of-Thoughts synthesis incorporating debate results; generates brain entries, code modules, and manual change instructions
+5. **Phase 4 — Apply Upgrades**: Writes to database (immediate effect) + generates owner notifications with exact copy-paste code for manual changes
+
 **Routes:** `artifacts/api-server/src/routes/superai.ts`  
 **Frontend:** `artifacts/super-ai-lab/` — React + Vite app at `/`  
 **Protection:** Owner-only middleware (`ownerOnly.ts`) gates all `/api/superai/*` routes

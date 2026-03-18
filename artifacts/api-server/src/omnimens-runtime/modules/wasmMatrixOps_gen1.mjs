@@ -1,107 +1,100 @@
 /**
- * wasmMatrixOps - A WebAssembly-based module for high-performance matrix operations.
- * This module leverages WebAssembly to perform GPU-like matrix computations in Node.js.
- * It provides basic linear algebra operations such as matrix multiplication and transposition.
- *
+ * wasmMatrixOps - A utility module for efficient matrix operations leveraging WebAssembly (Wasm) and SIMD for high-performance computations.
+ * This module is designed for tasks such as embeddings, neural computations, and other matrix-intensive operations.
+ * 
  * @module wasmMatrixOps
  */
 
-// Import Node.js built-in module for working with WebAssembly
 const fs = require('fs');
 const path = require('path');
 
 /**
- * Load and initialize the WebAssembly module.
- *
- * @returns {Promise<WebAssembly.Instance>} - A promise that resolves to the WebAssembly instance.
+ * Loads and initializes the WebAssembly module for matrix operations.
+ * @returns {Promise<WebAssembly.Instance>} A promise resolving to the WebAssembly instance.
  */
 async function loadWasmModule() {
-  const wasmPath = path.join(__dirname, 'matrix_ops.wasm');
-  const wasmBuffer = fs.readFileSync(wasmPath);
+  const wasmFilePath = path.resolve(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = fs.readFileSync(wasmFilePath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
-  return WebAssembly.instantiate(wasmModule);
+  return WebAssembly.instantiate(wasmModule, {});
 }
 
 /**
- * Perform matrix multiplication using WebAssembly.
- *
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {Promise<number[][]>} - A promise that resolves to the resulting matrix.
- * @throws {Error} - Throws an error if matrices are incompatible for multiplication.
+ * Multiplies two matrices using WebAssembly for performance optimization.
+ * @param {number[][]} matrixA - The first matrix (2D array).
+ * @param {number[][]} matrixB - The second matrix (2D array).
+ * @returns {Promise<number[][]>} A promise resolving to the resulting matrix after multiplication.
+ * @throws {Error} Throws an error if the matrices are incompatible for multiplication.
  */
 async function multiplyMatrices(matrixA, matrixB) {
   if (matrixA[0].length !== matrixB.length) {
-    throw new Error('Matrix dimensions do not match for multiplication.');
+    throw new Error('Matrix dimensions are incompatible for multiplication.');
   }
 
   const wasmInstance = await loadWasmModule();
-  const { memory, multiply } = wasmInstance.exports;
+  const { memory, multiply_matrices } = wasmInstance.exports;
 
-  // Flatten matrices into 1D arrays for WebAssembly
-  const flatA = matrixA.flat();
-  const flatB = matrixB.flat();
   const rowsA = matrixA.length;
   const colsA = matrixA[0].length;
   const colsB = matrixB[0].length;
 
-  // Allocate memory for input matrices and result matrix
-  const offsetA = 0;
-  const offsetB = offsetA + flatA.length * 4;
-  const offsetC = offsetB + flatB.length * 4;
-  const resultSize = rowsA * colsB;
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
+  const resultLength = rowsA * colsB;
+  const result = new Float32Array(resultLength);
 
   const memoryBuffer = new Float32Array(memory.buffer);
-  memoryBuffer.set(flatA, offsetA / 4);
-  memoryBuffer.set(flatB, offsetB / 4);
+  const offsetA = 0;
+  const offsetB = offsetA + flatA.length;
+  const offsetResult = offsetB + flatB.length;
 
-  // Call the WebAssembly multiply function
-  multiply(offsetA, rowsA, colsA, offsetB, colsB, offsetC);
+  memoryBuffer.set(flatA, offsetA);
+  memoryBuffer.set(flatB, offsetB);
 
-  // Extract the result matrix from memory
-  const result = [];
-  for (let i = 0; i < rowsA; i++) {
-    result.push(Array.from(memoryBuffer.slice(offsetC / 4 + i * colsB, offsetC / 4 + (i + 1) * colsB)));
+  multiply_matrices(offsetA, rowsA, colsA, offsetB, colsB, offsetResult);
+
+  for (let i = 0; i < resultLength; i++) {
+    result[i] = memoryBuffer[offsetResult + i];
   }
 
-  return result;
+  const resultMatrix = [];
+  for (let i = 0; i < rowsA; i++) {
+    resultMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
+  }
+
+  return resultMatrix;
 }
 
 /**
- * Transpose a matrix using WebAssembly.
- *
- * @param {number[][]} matrix - The input matrix.
- * @returns {Promise<number[][]>} - A promise that resolves to the transposed matrix.
+ * Computes the dot product of two vectors using WebAssembly for performance optimization.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {Promise<number>} A promise resolving to the dot product of the two vectors.
+ * @throws {Error} Throws an error if the vectors are of different lengths.
  */
-async function transposeMatrix(matrix) {
+async function dotProduct(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must be of the same length to compute dot product.');
+  }
+
   const wasmInstance = await loadWasmModule();
-  const { memory, transpose } = wasmInstance.exports;
+  const { memory, dot_product } = wasmInstance.exports;
 
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-  const flatMatrix = matrix.flat();
-
-  // Allocate memory for input matrix and result matrix
-  const offsetInput = 0;
-  const offsetOutput = offsetInput + flatMatrix.length * 4;
+  const length = vectorA.length;
 
   const memoryBuffer = new Float32Array(memory.buffer);
-  memoryBuffer.set(flatMatrix, offsetInput / 4);
+  const offsetA = 0;
+  const offsetB = offsetA + length;
 
-  // Call the WebAssembly transpose function
-  transpose(offsetInput, rows, cols, offsetOutput);
+  memoryBuffer.set(vectorA, offsetA);
+  memoryBuffer.set(vectorB, offsetB);
 
-  // Extract the result matrix from memory
-  const result = [];
-  for (let i = 0; i < cols; i++) {
-    result.push(Array.from(memoryBuffer.slice(offsetOutput / 4 + i * rows, offsetOutput / 4 + (i + 1) * rows)));
-  }
+  const result = dot_product(offsetA, offsetB, length);
 
   return result;
 }
 
-// Export the module functions
 module.exports = {
   multiplyMatrices,
-  transposeMatrix
+  dotProduct
 };
