@@ -1,22 +1,35 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, Component, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { initTheme } from "@/hooks/use-theme";
 import NotFound from "@/pages/not-found";
 
-const Home = lazy(() => import("@/pages/home"));
-const Login = lazy(() => import("@/pages/login"));
-const Chat = lazy(() => import("@/pages/chat"));
-const Pricing = lazy(() => import("@/pages/pricing"));
-const Account = lazy(() => import("@/pages/account"));
-const Projects = lazy(() => import("@/pages/projects"));
-const Memory = lazy(() => import("@/pages/memory"));
-const Tools = lazy(() => import("@/pages/tools"));
-const FAQ = lazy(() => import("@/pages/faq"));
-const Developer = lazy(() => import("@/pages/developer"));
-const Support = lazy(() => import("@/pages/support"));
+function retryLazy(factory: () => Promise<any>, retries = 2): ReturnType<typeof lazy> {
+  return lazy(() =>
+    factory().catch((err: any) => {
+      if (retries > 0) {
+        return new Promise<any>((resolve) => setTimeout(resolve, 800)).then(() =>
+          retryLazy(factory, retries - 1) as any
+        );
+      }
+      throw err;
+    })
+  );
+}
+
+const Home = retryLazy(() => import("@/pages/home"));
+const Login = retryLazy(() => import("@/pages/login"));
+const Chat = retryLazy(() => import("@/pages/chat"));
+const Pricing = retryLazy(() => import("@/pages/pricing"));
+const Account = retryLazy(() => import("@/pages/account"));
+const Projects = retryLazy(() => import("@/pages/projects"));
+const Memory = retryLazy(() => import("@/pages/memory"));
+const Tools = retryLazy(() => import("@/pages/tools"));
+const FAQ = retryLazy(() => import("@/pages/faq"));
+const Developer = retryLazy(() => import("@/pages/developer"));
+const Support = retryLazy(() => import("@/pages/support"));
 
 initTheme();
 
@@ -35,6 +48,31 @@ function PageFallback() {
       <div className="w-8 h-8 rounded-full border-2 border-violet-500 border-t-transparent animate-spin" />
     </div>
   );
+}
+
+class ChunkErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-[#0a0a0f] flex flex-col items-center justify-center gap-4 text-white">
+          <p className="font-mono text-sm text-white/60 tracking-widest">OMNIMENS could not load. Please refresh.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-mono tracking-widest rounded-lg transition-colors"
+          >
+            RELOAD
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
 function Router() {
@@ -63,9 +101,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
-        </WouterRouter>
+        <ChunkErrorBoundary>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <Router />
+          </WouterRouter>
+        </ChunkErrorBoundary>
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
