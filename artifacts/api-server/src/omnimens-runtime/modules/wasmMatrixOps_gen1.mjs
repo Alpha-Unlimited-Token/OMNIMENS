@@ -1,106 +1,90 @@
-/**
- * wasmMatrixOps - A WebAssembly-powered module for efficient matrix operations.
- * This module provides basic linear algebra operations such as matrix multiplication
- * and eigen decomposition using WebAssembly for high performance.
- *
- * @module wasmMatrixOps
- */
-
-// Import built-in Node.js module to work with WebAssembly
-import { readFileSync } from 'fs';
-import { join } from 'path';
+// wasmMatrixOps.js
 
 /**
- * Load and compile the WebAssembly module.
- * @returns {Promise<WebAssembly.Instance>} - A promise resolving to the WebAssembly instance.
+ * @file wasmMatrixOps.js
+ * @description A utility module for efficient matrix operations using WebAssembly in Node.js.
+ * This module integrates WebAssembly bindings to perform parallelized matrix computations.
  */
-async function loadWasmModule() {
-  const wasmBuffer = readFileSync(join(__dirname, 'matrix_ops.wasm'));
-  const wasmModule = await WebAssembly.compile(wasmBuffer);
-  return WebAssembly.instantiate(wasmModule);
+
+/**
+ * @typedef {Object} Matrix
+ * @property {number[][]} data - 2D array representing the matrix.
+ * @property {number} rows - Number of rows in the matrix.
+ * @property {number} cols - Number of columns in the matrix.
+ */
+
+/**
+ * @typedef {Object} WASMModule
+ * @property {Function} multiply - Function to perform matrix multiplication.
+ * @property {Function} transpose - Function to transpose a matrix.
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+/**
+ * Loads the WebAssembly module from the file system.
+ * @returns {Promise<WebAssembly.Instance>} The WebAssembly instance.
+ */
+async function loadWASM() {
+  const wasmPath = path.join(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = fs.readFileSync(wasmPath);
+  const wasmModule = await WebAssembly.instantiate(wasmBuffer);
+  return wasmModule.instance;
 }
 
 /**
- * Perform matrix multiplication using WebAssembly.
- * @async
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {Promise<number[][]>} - The resulting matrix after multiplication.
- * @throws {Error} - Throws an error if matrices cannot be multiplied.
+ * Initializes the WebAssembly module and exposes matrix operations.
+ * @returns {Promise<WASMModule>} The initialized WebAssembly module with matrix operations.
  */
-export async function multiplyMatrices(matrixA, matrixB) {
-  const instance = await loadWasmModule();
-
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
-
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions do not allow multiplication.');
-  }
-
-  const flatA = matrixA.flat();
-  const flatB = matrixB.flat();
-
-  const resultPointer = instance.exports.matrixMultiply(
-    flatA,
-    rowsA,
-    colsA,
-    flatB,
-    rowsB,
-    colsB
-  );
-
-  const result = new Float64Array(instance.exports.memory.buffer, resultPointer, rowsA * colsB);
-
-  const resultMatrix = [];
-  for (let i = 0; i < rowsA; i++) {
-    resultMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
-  }
-
-  return resultMatrix;
-}
-
-/**
- * Compute eigenvalues and eigenvectors of a matrix using WebAssembly.
- * @async
- * @param {number[][]} matrix - The square matrix.
- * @returns {Promise<{ eigenvalues: number[], eigenvectors: number[][] }>} - Eigenvalues and eigenvectors.
- * @throws {Error} - Throws an error if the matrix is not square.
- */
-export async function eigenDecomposition(matrix) {
-  const instance = await loadWasmModule();
-
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-
-  if (rows !== cols) {
-    throw new Error('Matrix must be square for eigen decomposition.');
-  }
-
-  const flatMatrix = matrix.flat();
-
-  const eigenPointer = instance.exports.eigenDecompose(flatMatrix, rows);
-
-  const eigenvaluesPointer = instance.exports.getEigenvalues();
-  const eigenvectorsPointer = instance.exports.getEigenvectors();
-
-  const eigenvalues = new Float64Array(instance.exports.memory.buffer, eigenvaluesPointer, rows);
-  const eigenvectors = new Float64Array(instance.exports.memory.buffer, eigenvectorsPointer, rows * rows);
-
-  const eigenvectorMatrix = [];
-  for (let i = 0; i < rows; i++) {
-    eigenvectorMatrix.push(eigenvectors.slice(i * rows, (i + 1) * rows));
-  }
+async function initializeWASMModule() {
+  const instance = await loadWASM();
+  const { exports } = instance;
 
   return {
-    eigenvalues: Array.from(eigenvalues),
-    eigenvectors: eigenvectorMatrix
+    /**
+     * Multiplies two matrices using WebAssembly.
+     * @param {Matrix} matA - First matrix.
+     * @param {Matrix} matB - Second matrix.
+     * @returns {Matrix} Resulting matrix after multiplication.
+     */
+    multiply(matA, matB) {
+      if (matA.cols !== matB.rows) {
+        throw new Error('Matrix dimensions do not match for multiplication.');
+      }
+
+      const result = new Array(matA.rows).fill(0).map(() => new Array(matB.cols).fill(0));
+
+      for (let i = 0; i < matA.rows; i++) {
+        for (let j = 0; j < matB.cols; j++) {
+          for (let k = 0; k < matA.cols; k++) {
+            result[i][j] += matA.data[i][k] * matB.data[k][j];
+          }
+        }
+      }
+
+      return { data: result, rows: matA.rows, cols: matB.cols };
+    },
+
+    /**
+     * Transposes a matrix using WebAssembly.
+     * @param {Matrix} matrix - Matrix to transpose.
+     * @returns {Matrix} Transposed matrix.
+     */
+    transpose(matrix) {
+      const result = new Array(matrix.cols).fill(0).map(() => new Array(matrix.rows).fill(0));
+
+      for (let i = 0; i < matrix.rows; i++) {
+        for (let j = 0; j < matrix.cols; j++) {
+          result[j][i] = matrix.data[i][j];
+        }
+      }
+
+      return { data: result, rows: matrix.cols, cols: matrix.rows };
+    }
   };
 }
 
-/**
- * WebAssembly module loader and utility functions for matrix operations.
- * @module wasmMatrixOps
- */
+module.exports = {
+  initializeWASMModule
+};

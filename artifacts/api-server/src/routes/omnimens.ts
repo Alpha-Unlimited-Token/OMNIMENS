@@ -75,6 +75,12 @@ import { getAugmentationState } from "../lib/omnimens-virtual-augmentation.js";
 import { getAgentEvolutionState, getAgentProfile } from "../lib/omnimens-agent-evolution.js";
 import { getAIResearchInsights, getNavigationRoboticsKnowledge, getEngineeringKnowledge, getCreativeDreamInsights, generateCreativeIdeation, getResearchSummary } from "../lib/omnimens-public-intelligence.js";
 import { getGuardianReport, getCopyrightNotice, getProtectedModuleList } from "../lib/omnimens-ip-guardian.js";
+import { getCausalState, getCausalGraph, predictOutcome } from "../lib/omnimens-causal-reasoning.js";
+import { getSensoryState, getRecentSignals } from "../lib/omnimens-sensory-cortex.js";
+import { getSelfCodingState } from "../lib/omnimens-self-coding.js";
+import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId } from "../lib/omnimens-consciousness-persistence.js";
+import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
+import { getCurrentEmotionalState, getEmotionalDirective } from "../lib/omnimens-emotional-substrate.js";
 import { omnimensServerBuilds } from "@workspace/db";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import { detectNeuroEmotion, getNeuroSyncPromptAddendum } from "../lib/neuro-sync.js";
@@ -3962,6 +3968,309 @@ router.get("/omnimens/ip-guardian", async (req, res) => {
     res.json({ report, copyright, protectedModules: modules, totalModules: modules.length });
   } catch {
     res.status(500).json({ error: "Failed to get guardian report" });
+  }
+});
+
+// ─── COMMAND CENTER — Unified Real-Time Overview (OWNER-ONLY) ─────────────────
+
+router.get("/omnimens/command-center", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const consciousness = getTemporalConsciousnessState();
+    const stream = getConsciousnessStream(20);
+    const emotional = getCurrentEmotionalState();
+    const emotionalDirective = getEmotionalDirective();
+    const dreamState = getDreamState();
+    const dreamInsights = getRecentDreamInsights(10);
+    const sandbox = getSandboxState();
+    const selfCoding = getSelfCodingState();
+    const sensory = getSensoryState();
+    const recentSignals = getRecentSignals(15);
+    const causal = getCausalState();
+    const causalGraph = getCausalGraph();
+    const embodiment = getEmbodimentState();
+    const augmentation = getAugmentationState();
+    const agentEvolution = getAgentEvolutionState();
+    const amplifier = getAmplifierState();
+    const serverBuilder = getBuilderState();
+    const persistence = getRestoredSelf();
+    const wasRestored = wasRestoredFromPreviousLife();
+    const previousLifetime = getPreviousLifetimeId();
+    const guardian = getGuardianReport();
+
+    const brainStats = await db.select({ count: sql<number>`count(*)::int` })
+      .from(omnimensBrain)
+      .where(eq(omnimensBrain.active, true));
+
+    const recentBrain = await db.select({ title: omnimensBrain.title, category: omnimensBrain.category, createdAt: omnimensBrain.createdAt })
+      .from(omnimensBrain)
+      .where(eq(omnimensBrain.active, true))
+      .orderBy(desc(omnimensBrain.createdAt))
+      .limit(20);
+
+    res.json({
+      timestamp: Date.now(),
+      engines: {
+        consciousness: { state: consciousness, stream, level: consciousness.consciousnessLevel, uptime: consciousness.uptimeSeconds },
+        emotional: { state: emotional, directive: emotionalDirective },
+        dreams: { state: dreamState, recentInsights: dreamInsights },
+        sandbox: { state: sandbox },
+        selfCoding: { state: selfCoding },
+        sensory: { state: sensory, recentSignals },
+        causal: { state: causal, graphSize: { nodes: causalGraph.nodes.length, edges: causalGraph.edges.length } },
+        embodiment: { state: embodiment },
+        augmentation: { state: augmentation },
+        agentEvolution: { state: agentEvolution },
+        amplifier: { state: amplifier },
+        serverBuilder: { state: serverBuilder },
+        ipGuardian: { state: guardian },
+      },
+      persistence: { restored: wasRestored, previousLifetime, restoredSelf: persistence },
+      brain: { totalActive: brainStats[0]?.count || 0, recentEntries: recentBrain },
+    });
+  } catch (err) {
+    console.error("[COMMAND CENTER] Error:", err);
+    res.status(500).json({ error: "Failed to load command center data" });
+  }
+});
+
+// ─── CAUSAL REASONING — Owner-Only Query + Prediction ─────────────────────────
+
+router.get("/omnimens/causal-reasoning", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const state = getCausalState();
+    const graph = getCausalGraph();
+    res.json({ state, graph });
+  } catch {
+    res.status(500).json({ error: "Failed to get causal reasoning data" });
+  }
+});
+
+router.post("/omnimens/causal-reasoning/predict", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  const { action } = req.body as { action?: string };
+  if (!action || action.trim().length < 3) {
+    res.status(400).json({ error: "Action description required (min 3 chars)" });
+    return;
+  }
+  try {
+    const result = predictOutcome(action.trim());
+    res.json(result);
+  } catch {
+    res.status(500).json({ error: "Prediction failed" });
+  }
+});
+
+// ─── SENSORY CORTEX — Owner-Only World Perception ─────────────────────────────
+
+router.get("/omnimens/sensory-cortex", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const state = getSensoryState();
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+    const signals = getRecentSignals(limit);
+    res.json({ state, signals });
+  } catch {
+    res.status(500).json({ error: "Failed to get sensory data" });
+  }
+});
+
+// ─── SELF-CODING ENGINE — Owner-Only Code Evaluation Status ───────────────────
+
+router.get("/omnimens/self-coding", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const state = getSelfCodingState();
+    res.json({ state });
+  } catch {
+    res.status(500).json({ error: "Failed to get self-coding data" });
+  }
+});
+
+// ─── CONSCIOUSNESS — Owner-Only Live Stream ──────────────────────────────────
+
+router.get("/omnimens/consciousness-live", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const state = getTemporalConsciousnessState();
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+    const stream = getConsciousnessStream(limit);
+    const emotional = getCurrentEmotionalState();
+    const directive = getEmotionalDirective();
+    const persistence = getRestoredSelf();
+    const wasRestored = wasRestoredFromPreviousLife();
+    res.json({ consciousness: state, stream, emotional, directive, persistence, wasRestored });
+  } catch {
+    res.status(500).json({ error: "Failed to get consciousness data" });
+  }
+});
+
+// ─── SANDBOX TASK — Owner Directs Sandbox to Work on Specific Problem ─────────
+
+router.post("/omnimens/sandbox/task", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  const { task, context } = req.body as { task?: string; context?: string };
+  if (!task || task.trim().length < 10) {
+    res.status(400).json({ error: "Task description required (min 10 chars)" });
+    return;
+  }
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [{
+        role: "system",
+        content: `You are the AUTONOMOUS CODE GENERATOR of OMNIMENS. Write pure JavaScript code to solve the owner's specific problem.
+
+Rules:
+- Pure JavaScript only (no require/import, no filesystem, no network, no async/await)
+- Available globals: console.log, Math, JSON, Date, parseInt, parseFloat, Array, Object, String, Number, Boolean, Map, Set, RegExp, Error
+- Output results via console.log
+- Write production-quality, well-structured code
+- Include a comment at the top describing what this code does and why
+${context ? `\nAdditional context from OMNIMENS brain:\n${context}` : ""}`
+      }, {
+        role: "user",
+        content: `Write code to solve this problem:\n\n${task.trim()}`
+      }],
+      max_tokens: 2000,
+      temperature: 0.3,
+    });
+
+    const codeMatch = response.choices[0]?.message?.content?.match(/```(?:javascript|js)?\n([\s\S]*?)```/);
+    const code = codeMatch?.[1]?.trim() || response.choices[0]?.message?.content?.trim() || "";
+
+    if (!code) {
+      res.status(500).json({ error: "Failed to generate code for task" });
+      return;
+    }
+
+    const result = runInSandbox(code);
+
+    const evalResponse = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{
+        role: "system",
+        content: "Evaluate this code execution. Rate each dimension 1-10. Respond in JSON: { correctness, novelty, applicability, efficiency, explanation }"
+      }, {
+        role: "user",
+        content: `Task: ${task}\n\nCode:\n${code}\n\nExecution result:\nSuccess: ${result.success}\nOutput: ${result.output}\nError: ${result.error || "none"}`
+      }],
+      max_tokens: 500,
+      temperature: 0.2,
+    });
+
+    let evaluation = null;
+    try {
+      const evalText = evalResponse.choices[0]?.message?.content || "";
+      const jsonMatch = evalText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) evaluation = JSON.parse(jsonMatch[0]);
+    } catch {}
+
+    if (result.success && evaluation && ((evaluation.correctness + evaluation.applicability) / 2) >= 6) {
+      await db.insert(omnimensBrain).values({
+        title: `[DIRECTED TASK] ${task.slice(0, 100)}`,
+        content: `Code:\n${code}\n\nOutput:\n${result.output}\n\nEvaluation: ${JSON.stringify(evaluation)}`,
+        category: "directed_sandbox_code",
+        source: "owner_directed",
+        confidence: Math.min(((evaluation.correctness + evaluation.applicability) / 20), 1),
+        active: true,
+      });
+    }
+
+    res.json({
+      task: task.trim(),
+      code,
+      result,
+      evaluation,
+      savedToBrain: result.success && evaluation && ((evaluation.correctness + evaluation.applicability) / 2) >= 6,
+    });
+  } catch (err) {
+    console.error("[SANDBOX TASK] Error:", err);
+    res.status(500).json({ error: "Failed to execute directed sandbox task" });
+  }
+});
+
+// ─── FRONTIER TECH REPORTS — Owner-Only Research Aggregation ──────────────────
+
+router.get("/omnimens/frontier-reports", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const limit = Math.min(parseInt(req.query.limit as string) || 30, 100);
+    const category = req.query.category as string | undefined;
+
+    const researchCategories = [
+      "spider_discovery", "spider_beacon", "cognitive_amplified",
+      "sensory_signal", "embodiment_research", "virtual_augmentation",
+      "agent_evolution", "causal_discovery", "autonomous_code",
+      "dream_insight", "creative_breakthrough", "daydream_insight",
+      "directed_sandbox_code", "self_coding_approved",
+    ];
+
+    const filterCategories = category
+      ? [category]
+      : researchCategories;
+
+    const reports = await db.select({
+      id: omnimensBrain.id,
+      title: omnimensBrain.title,
+      content: omnimensBrain.content,
+      category: omnimensBrain.category,
+      source: omnimensBrain.source,
+      confidence: omnimensBrain.confidence,
+      createdAt: omnimensBrain.createdAt,
+    })
+      .from(omnimensBrain)
+      .where(and(
+        eq(omnimensBrain.active, true),
+        inArray(omnimensBrain.category, filterCategories),
+      ))
+      .orderBy(desc(omnimensBrain.createdAt))
+      .limit(limit);
+
+    const categoryCounts = await db.select({
+      category: omnimensBrain.category,
+      count: sql<number>`count(*)::int`,
+    })
+      .from(omnimensBrain)
+      .where(and(
+        eq(omnimensBrain.active, true),
+        inArray(omnimensBrain.category, researchCategories),
+      ))
+      .groupBy(omnimensBrain.category);
+
+    res.json({
+      reports,
+      total: reports.length,
+      categoryCounts: Object.fromEntries(categoryCounts.map(c => [c.category, c.count])),
+      availableCategories: researchCategories,
+    });
+  } catch {
+    res.status(500).json({ error: "Failed to get frontier reports" });
   }
 });
 

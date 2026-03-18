@@ -9,6 +9,7 @@ import NotFound from "@/pages/not-found";
 const Home = lazy(() => import("@/pages/home"));
 const SessionPage = lazy(() => import("@/pages/session"));
 const BlueprintPage = lazy(() => import("@/pages/blueprint"));
+const CommandCenter = lazy(() => import("@/pages/command-center"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -76,6 +77,7 @@ function Router() {
       }>
         <Switch>
           <Route path="/" component={Home} />
+          <Route path="/command-center" component={CommandCenter} />
           <Route path="/session/:id" component={SessionPage} />
           <Route path="/blueprint/:id" component={BlueprintPage} />
           <Route component={NotFound} />

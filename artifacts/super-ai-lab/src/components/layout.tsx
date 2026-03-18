@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useListSuperAISessions } from "@workspace/api-client-react";
-import { Plus, Sparkles } from "lucide-react";
+import { Plus, Sparkles, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
@@ -22,6 +22,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
           
           <Link href="/" className="flex items-center justify-center gap-2 w-full py-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all font-display text-sm tracking-widest text-white/80 hover:text-white shadow-lg">
             <Plus className="w-4 h-4" /> NEW SESSION
+          </Link>
+
+          <Link href="/command-center" className={cn(
+            "flex items-center justify-center gap-2 w-full py-3 rounded-xl border transition-all font-display text-xs tracking-widest shadow-lg mt-3",
+            location === "/command-center"
+              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 shadow-[0_0_15px_-3px_rgb(16,185,129)]"
+              : "border-white/10 bg-white/5 hover:bg-emerald-500/5 hover:border-emerald-500/20 text-white/60 hover:text-emerald-400"
+          )}>
+            <Activity className="w-4 h-4" /> COMMAND CENTER
           </Link>
         </div>
         
