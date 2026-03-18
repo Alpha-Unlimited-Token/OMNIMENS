@@ -58,6 +58,21 @@ interface SpiderBeacon {
   timestamp: number;
 }
 
+interface ChildSpiderResult {
+  childType: "verifier" | "expander" | "counter_evidence" | "related_concepts" | "deep_source";
+  finding: string;
+  sourceUrls: string[];
+  confidence: number;
+}
+
+interface MotherSpiderLead {
+  topic: string;
+  initialFinding: string;
+  relevanceScore: number;
+  sourceUrls: string[];
+  searchResults: string;
+}
+
 interface SpiderConfig {
   agentName: AgentName;
   huntingGrounds: string[];
@@ -337,6 +352,275 @@ async function injectBeaconIntoBrain(beacon: SpiderBeacon): Promise<boolean> {
   }
 }
 
+async function spawnChildSpider_verifier(
+  agentName: AgentName,
+  lead: MotherSpiderLead,
+): Promise<ChildSpiderResult> {
+  const verifyQueries = [
+    `"${lead.topic}" verification evidence proof 2025 2026`,
+    `"${lead.topic}" criticism limitations problems`,
+  ];
+  const verifyQuery = verifyQueries[Math.floor(Math.random() * verifyQueries.length)];
+
+  try {
+    const results = await webSearch(verifyQuery, 4);
+    const formatted = formatSearchResults(results, verifyQuery);
+
+    const prompt = `You are a VERIFIER child spider working for the ${agentName} mother spider.
+
+The mother spider found this lead:
+"${lead.initialFinding}"
+
+Your job: Search for INDEPENDENT VERIFICATION. Does other evidence support or contradict this finding?
+
+VERIFICATION SEARCH RESULTS:
+${formatted.slice(0, 2000)}
+
+Respond JSON only:
+{
+  "verified": true/false,
+  "verificationEvidence": "What you found that supports or contradicts the lead (2-3 sentences)",
+  "confidence": 0.0-1.0
+}`;
+
+    const raw = await spiderAnalyze(agentName, prompt, 500);
+    if (!raw) return { childType: "verifier", finding: "", sourceUrls: [], confidence: 0 };
+
+    const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+    return {
+      childType: "verifier",
+      finding: `[VERIFIED: ${parsed.verified ? "YES" : "NO"}] ${parsed.verificationEvidence || ""}`,
+      sourceUrls: results.map(r => r.url).filter(Boolean).slice(0, 2),
+      confidence: parsed.confidence || 0.5,
+    };
+  } catch {
+    return { childType: "verifier", finding: "", sourceUrls: [], confidence: 0 };
+  }
+}
+
+async function spawnChildSpider_expander(
+  agentName: AgentName,
+  lead: MotherSpiderLead,
+): Promise<ChildSpiderResult> {
+  const expandQuery = `${lead.topic} implementation details how to apply practical guide 2025`;
+
+  try {
+    const results = await webSearch(expandQuery, 4);
+    let pageContent = "";
+    const topUrl = results.find(r => r.url && !r.url.includes("wikipedia.org"));
+    if (topUrl) {
+      try { pageContent = await fetchPageContent(topUrl.url, 2500); } catch {}
+    }
+
+    const prompt = `You are an EXPANDER child spider working for the ${agentName} mother spider.
+
+The mother spider found this lead:
+"${lead.initialFinding}"
+
+Your job: Find DEEPER DETAILS. How does this actually work? What are the implementation specifics? What are the exact steps, algorithms, or techniques?
+
+EXPANSION SEARCH:
+${formatSearchResults(results, expandQuery).slice(0, 1500)}
+${pageContent ? `\nDEEP PAGE CONTENT:\n${pageContent.slice(0, 1500)}` : ""}
+
+Respond JSON only:
+{
+  "expandedDetails": "Deeper technical details, implementation specifics, or step-by-step techniques found (3-5 sentences)",
+  "confidence": 0.0-1.0
+}`;
+
+    const raw = await spiderAnalyze(agentName, prompt, 600);
+    if (!raw) return { childType: "expander", finding: "", sourceUrls: [], confidence: 0 };
+
+    const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+    return {
+      childType: "expander",
+      finding: `[EXPANDED] ${parsed.expandedDetails || ""}`,
+      sourceUrls: results.map(r => r.url).filter(Boolean).slice(0, 2),
+      confidence: parsed.confidence || 0.5,
+    };
+  } catch {
+    return { childType: "expander", finding: "", sourceUrls: [], confidence: 0 };
+  }
+}
+
+async function spawnChildSpider_counterEvidence(
+  agentName: AgentName,
+  lead: MotherSpiderLead,
+): Promise<ChildSpiderResult> {
+  const counterQuery = `${lead.topic} criticism problems limitations does not work failures 2025`;
+
+  try {
+    const results = await webSearch(counterQuery, 4);
+
+    const prompt = `You are a COUNTER-EVIDENCE child spider working for the ${agentName} mother spider.
+
+The mother spider found this lead:
+"${lead.initialFinding}"
+
+Your job: Find COUNTER-EVIDENCE. What are the known problems, limitations, or failures? What could go wrong if this is adopted? Is there research showing this does NOT work?
+
+COUNTER-EVIDENCE SEARCH:
+${formatSearchResults(results, counterQuery).slice(0, 2000)}
+
+Respond JSON only:
+{
+  "counterEvidence": "What problems, limitations, or failures you found (2-3 sentences). If none found, say 'No significant counter-evidence found.'",
+  "severityOfConcerns": "none|low|medium|high",
+  "confidence": 0.0-1.0
+}`;
+
+    const raw = await spiderAnalyze(agentName, prompt, 500);
+    if (!raw) return { childType: "counter_evidence", finding: "", sourceUrls: [], confidence: 0 };
+
+    const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+    return {
+      childType: "counter_evidence",
+      finding: `[COUNTER: ${parsed.severityOfConcerns || "unknown"}] ${parsed.counterEvidence || ""}`,
+      sourceUrls: results.map(r => r.url).filter(Boolean).slice(0, 2),
+      confidence: parsed.confidence || 0.5,
+    };
+  } catch {
+    return { childType: "counter_evidence", finding: "", sourceUrls: [], confidence: 0 };
+  }
+}
+
+async function spawnChildSpider_relatedConcepts(
+  agentName: AgentName,
+  lead: MotherSpiderLead,
+): Promise<ChildSpiderResult> {
+  const relatedQuery = `${lead.topic} related techniques alternatives similar approaches 2025 2026`;
+
+  try {
+    const results = await webSearch(relatedQuery, 4);
+
+    const prompt = `You are a RELATED CONCEPTS child spider working for the ${agentName} mother spider.
+
+The mother spider found this lead:
+"${lead.initialFinding}"
+
+Your job: Find RELATED CONCEPTS the mother spider might have missed. What adjacent techniques, complementary approaches, or synergistic ideas exist in this space?
+
+RELATED CONCEPTS SEARCH:
+${formatSearchResults(results, relatedQuery).slice(0, 2000)}
+
+Respond JSON only:
+{
+  "relatedConcepts": "Related techniques, complementary approaches, or synergistic ideas found (2-3 sentences)",
+  "mostPromisingRelated": "The single most promising related concept that the mother spider should also consider (1 sentence)",
+  "confidence": 0.0-1.0
+}`;
+
+    const raw = await spiderAnalyze(agentName, prompt, 500);
+    if (!raw) return { childType: "related_concepts", finding: "", sourceUrls: [], confidence: 0 };
+
+    const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+    return {
+      childType: "related_concepts",
+      finding: `[RELATED] ${parsed.relatedConcepts || ""} MOST PROMISING: ${parsed.mostPromisingRelated || ""}`,
+      sourceUrls: results.map(r => r.url).filter(Boolean).slice(0, 2),
+      confidence: parsed.confidence || 0.5,
+    };
+  } catch {
+    return { childType: "related_concepts", finding: "", sourceUrls: [], confidence: 0 };
+  }
+}
+
+async function spawnChildSpider_deepSource(
+  agentName: AgentName,
+  lead: MotherSpiderLead,
+): Promise<ChildSpiderResult> {
+  const urls = lead.sourceUrls.filter(u => u && !u.includes("wikipedia.org"));
+  if (urls.length === 0) return { childType: "deep_source", finding: "", sourceUrls: [], confidence: 0 };
+
+  const targetUrl = urls[Math.floor(Math.random() * urls.length)];
+  try {
+    const content = await fetchPageContent(targetUrl, 4000);
+    if (content.length < 200) return { childType: "deep_source", finding: "", sourceUrls: [targetUrl], confidence: 0 };
+
+    const prompt = `You are a DEEP SOURCE child spider working for the ${agentName} mother spider.
+
+The mother spider found a promising lead. You have been sent to DEEP-CRAWL the source page and extract maximum intelligence.
+
+SOURCE URL: ${targetUrl}
+
+PAGE CONTENT:
+${content.slice(0, 3500)}
+
+Extract the most valuable technical details, specific numbers, named techniques, algorithms, tools, or frameworks mentioned. Be thorough — you are the mother spider's eyes on the ground.
+
+Respond JSON only:
+{
+  "deepFindings": "Detailed extraction of valuable information from this page (3-5 sentences)",
+  "keyTechniques": ["technique1", "technique2"],
+  "confidence": 0.0-1.0
+}`;
+
+    const raw = await spiderAnalyze(agentName, prompt, 600);
+    if (!raw) return { childType: "deep_source", finding: "", sourceUrls: [targetUrl], confidence: 0 };
+
+    const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+    const techniques = Array.isArray(parsed.keyTechniques) ? parsed.keyTechniques.join(", ") : "";
+    return {
+      childType: "deep_source",
+      finding: `[DEEP SOURCE] ${parsed.deepFindings || ""}${techniques ? ` Key techniques: ${techniques}` : ""}`,
+      sourceUrls: [targetUrl],
+      confidence: parsed.confidence || 0.5,
+    };
+  } catch {
+    return { childType: "deep_source", finding: "", sourceUrls: [targetUrl], confidence: 0 };
+  }
+}
+
+async function motherSpiderDeepResearch(
+  config: SpiderConfig,
+  lead: MotherSpiderLead,
+  knownKnowledge: string,
+): Promise<{ finding: string; confidence: number }> {
+  const deepQuery = `${lead.topic} breakthrough latest results comprehensive analysis 2025 2026`;
+  try {
+    const results = await webSearch(deepQuery, 5);
+    let pageContent = "";
+    const scrapeTarget = results.find(r => r.url && !r.url.includes("wikipedia.org") && !lead.sourceUrls.includes(r.url));
+    if (scrapeTarget) {
+      try { pageContent = await fetchPageContent(scrapeTarget.url, 2500); } catch {}
+    }
+
+    const prompt = `${config.analysisPrompt}
+
+You are the MOTHER SPIDER doing your own deep research on a lead you found. Your child spiders are simultaneously gathering verification, expansion, counter-evidence, and related concepts — but YOU are doing independent analysis right now.
+
+YOUR ORIGINAL LEAD:
+"${lead.initialFinding}"
+
+YOUR INDEPENDENT DEEP RESEARCH:
+${formatSearchResults(results, deepQuery).slice(0, 2000)}
+${pageContent ? `\nDEEP PAGE:\n${pageContent.slice(0, 1500)}` : ""}
+
+WHAT IS ALREADY KNOWN:
+${knownKnowledge.slice(0, 800)}
+
+Analyze this from your perspective as the ${config.agentName} specialist. What new angles, deeper insights, or additional evidence did YOUR independent research uncover that goes beyond the initial lead?
+
+Respond JSON only:
+{
+  "motherDeepInsight": "Your independent deep analysis and any new angles discovered (3-4 sentences)",
+  "confidence": 0.0-1.0
+}`;
+
+    const raw = await spiderAnalyze(config.agentName, prompt, 600);
+    if (!raw) return { finding: "", confidence: 0 };
+
+    const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+    return {
+      finding: `[MOTHER DEEP RESEARCH] ${parsed.motherDeepInsight || ""}`,
+      confidence: parsed.confidence || 0.5,
+    };
+  } catch {
+    return { finding: "", confidence: 0 };
+  }
+}
+
 async function runSingleSpider(config: SpiderConfig): Promise<SpiderBeacon[]> {
   const beacons: SpiderBeacon[] = [];
   const queries = [...config.huntingGrounds].sort(() => Math.random() - 0.5).slice(0, 3);
@@ -353,81 +637,169 @@ async function runSingleSpider(config: SpiderConfig): Promise<SpiderBeacon[]> {
 
       const formattedResults = formatSearchResults(searchResults, query);
 
-      let deepContent = "";
-      const urlsToScrape = searchResults
-        .filter(r => r.url && !r.url.includes("wikipedia.org"))
-        .slice(0, 2);
-      for (const result of urlsToScrape) {
-        try {
-          const content = await fetchPageContent(result.url, 2000);
-          if (content.length > 100) {
-            deepContent += `\n\n--- Deep crawl: ${result.url} ---\n${content}`;
-          }
-        } catch { /* continue */ }
-      }
+      const scoutPrompt = `${config.analysisPrompt}
 
-      const analysisPrompt = `${config.analysisPrompt}
+You are the MOTHER SPIDER doing initial reconnaissance. Scan these search results and identify the most promising LEADS — topics that seem genuinely new and worth investigating deeper.
 
-You just crawled the web and found the following:
-
-═══ SEARCH RESULTS ═══
+SEARCH RESULTS:
 ${formattedResults.slice(0, 3000)}
-${deepContent ? `\n═══ DEEP CRAWL CONTENT ═══\n${deepContent.slice(0, 2000)}` : ""}
 
-═══ WHAT ${config.agentName.toUpperCase()} ALREADY KNOWS ═══
+WHAT IS ALREADY KNOWN:
 ${knownKnowledge.slice(0, 1000)}
 
-═══ BEACON PROTOCOL ═══
-Analyze what you found. For EACH genuinely new and useful finding:
-1. Is this ACTUALLY new vs what the agent already knows? (novelty check)
-2. Is this ACTIONABLE — can it be turned into a concrete improvement? (utility check)
-3. How confident are you this would help? Score 0.0-1.0 (confidence calibration)
-4. What is the single-sentence actionable insight the agent should absorb?
+Identify up to 2 leads worth deploying child spiders on. Each lead must be genuinely novel (not already known) and potentially actionable.
 
-Only send a beacon if the finding passes ALL three checks (novel, actionable, confidence >= ${config.beaconThreshold}).
-
-Respond with JSON only:
+Respond JSON only:
 {
-  "beacons": [
+  "leads": [
     {
-      "relevanceScore": 0.0-1.0,
-      "finding": "What you found (2-3 sentences)",
-      "actionableInsight": "Single sentence: the specific knowledge or technique the agent should absorb",
-      "isNovel": true,
-      "isActionable": true,
-      "reasoning": "Why this passes the checks (1 sentence)"
+      "topic": "short topic name (3-6 words)",
+      "initialFinding": "What looks promising about this (2 sentences)",
+      "relevanceScore": 0.0-1.0
     }
   ]
 }
 
-If nothing genuinely new was found, return: { "beacons": [] }`;
+If nothing genuinely new, return: { "leads": [] }`;
 
-      const raw = await spiderAnalyze(config.agentName, analysisPrompt, 1500);
-      if (!raw) continue;
+      const scoutRaw = await spiderAnalyze(config.agentName, scoutPrompt, 600);
+      if (!scoutRaw) continue;
 
+      let leads: MotherSpiderLead[] = [];
       try {
-        const jsonStr = raw.replace(/^```json\s*|^```\s*|```\s*$/gm, "").trim();
-        const parsed = JSON.parse(jsonStr);
-
-        if (Array.isArray(parsed.beacons)) {
-          for (const b of parsed.beacons) {
-            if (!b.isNovel || !b.isActionable) continue;
-            if ((b.relevanceScore || 0) < config.beaconThreshold) continue;
-
-            const beacon: SpiderBeacon = {
-              agentName: config.agentName,
-              query,
-              findings: b.finding || "",
-              relevanceScore: Math.min(0.95, Math.max(0.3, b.relevanceScore || 0.5)),
-              actionableInsight: b.actionableInsight || "",
-              sourceUrls: searchResults.map(r => r.url).filter(Boolean).slice(0, 3),
-              timestamp: Date.now(),
-            };
-
-            beacons.push(beacon);
-          }
+        const parsed = JSON.parse(scoutRaw.replace(/```json|```/g, "").trim());
+        if (Array.isArray(parsed.leads)) {
+          leads = parsed.leads
+            .filter((l: any) => l.topic && l.initialFinding && (l.relevanceScore || 0) >= 0.4)
+            .slice(0, 2)
+            .map((l: any) => ({
+              topic: l.topic,
+              initialFinding: l.initialFinding,
+              relevanceScore: l.relevanceScore,
+              sourceUrls: searchResults.map(r => r.url).filter(Boolean).slice(0, 4),
+              searchResults: formattedResults,
+            }));
         }
-      } catch { /* JSON parse failed, continue */ }
+      } catch { continue; }
+
+      if (leads.length === 0) continue;
+
+      for (const lead of leads) {
+        console.log(`[SPIDER:${config.agentName}] 🕷️ Mother found lead: "${lead.topic}" — spawning 5 child spiders + doing own research...`);
+
+        const allWork = await Promise.allSettled([
+          motherSpiderDeepResearch(config, lead, knownKnowledge),
+          spawnChildSpider_verifier(config.agentName, lead),
+          spawnChildSpider_expander(config.agentName, lead),
+          spawnChildSpider_counterEvidence(config.agentName, lead),
+          spawnChildSpider_relatedConcepts(config.agentName, lead),
+          spawnChildSpider_deepSource(config.agentName, lead),
+        ]);
+
+        const motherResult = allWork[0].status === "fulfilled" ? allWork[0].value : { finding: "", confidence: 0 };
+        const childResults: ChildSpiderResult[] = allWork.slice(1)
+          .filter((r): r is PromiseFulfilledResult<ChildSpiderResult> => r.status === "fulfilled" && r.value.finding.length > 10)
+          .map(r => r.value);
+
+        const allSourceUrls = [
+          ...lead.sourceUrls,
+          ...childResults.flatMap(c => c.sourceUrls),
+        ].filter(Boolean);
+        const uniqueUrls = [...new Set(allSourceUrls)].slice(0, 6);
+
+        const childCount = childResults.length;
+        const childSummary = childResults.map(c => c.finding).join("\n");
+        const avgChildConfidence = childResults.length > 0
+          ? childResults.reduce((s, c) => s + c.confidence, 0) / childResults.length
+          : 0;
+
+        const verifier = childResults.find(c => c.childType === "verifier");
+        const counterEvidence = childResults.find(c => c.childType === "counter_evidence");
+        const isVerified = verifier ? !verifier.finding.includes("[VERIFIED: NO]") : true;
+        const hasSeriousConcerns = counterEvidence ? counterEvidence.finding.includes("[COUNTER: high]") : false;
+
+        const synthesisPrompt = `${config.analysisPrompt}
+
+You are the MOTHER SPIDER. You deployed 5 child spiders and did your own deep research simultaneously. ALL results are back. Now synthesize everything into a final beacon.
+
+═══ YOUR ORIGINAL LEAD ═══
+Topic: ${lead.topic}
+Initial finding: ${lead.initialFinding}
+
+═══ YOUR OWN DEEP RESEARCH ═══
+${motherResult.finding || "No additional findings from independent research."}
+
+═══ CHILD SPIDER REPORTS (${childCount} children returned) ═══
+${childSummary || "No child results."}
+
+═══ VERIFICATION STATUS ═══
+Verified by independent sources: ${isVerified ? "YES" : "NO"}
+Serious counter-evidence found: ${hasSeriousConcerns ? "YES — proceed with caution" : "NO"}
+Average child confidence: ${(avgChildConfidence * 100).toFixed(0)}%
+
+═══ WHAT IS ALREADY KNOWN ═══
+${knownKnowledge.slice(0, 600)}
+
+═══ FINAL BEACON DECISION ═══
+With ALL intelligence gathered (your own research + ${childCount} child spider reports), make the final decision:
+1. Does this lead STILL pass the novelty check after deep investigation?
+2. Is it STILL actionable with the expanded details?
+3. What is your FINAL confidence after seeing verification, counter-evidence, and expanded details?
+4. Synthesize EVERYTHING into a single, rich, actionable insight.
+
+Only send a beacon if confidence >= ${config.beaconThreshold} AND it passed verification AND no serious counter-evidence.
+
+Respond JSON only:
+{
+  "sendBeacon": true/false,
+  "finalRelevanceScore": 0.0-1.0,
+  "synthesizedFinding": "Rich finding combining all mother + child intelligence (3-4 sentences)",
+  "finalActionableInsight": "The single most powerful insight to absorb — enriched by all spider data (1-2 sentences)",
+  "childSpidersUsed": ${childCount},
+  "reasoning": "Why this beacon should/shouldn't be sent (1 sentence)"
+}`;
+
+        const synthesisRaw = await spiderAnalyze(config.agentName, synthesisPrompt, 800);
+        if (!synthesisRaw) continue;
+
+        try {
+          const synthesis = JSON.parse(synthesisRaw.replace(/```json|```/g, "").trim());
+
+          if (!synthesis.sendBeacon) {
+            console.log(`[SPIDER:${config.agentName}] 🕷️ Lead "${lead.topic}" — mother decided NOT to beacon after child spider analysis. Reason: ${synthesis.reasoning || "insufficient evidence"}`);
+            continue;
+          }
+
+          if ((synthesis.finalRelevanceScore || 0) < config.beaconThreshold) continue;
+
+          const beacon: SpiderBeacon = {
+            agentName: config.agentName,
+            query,
+            findings: synthesis.synthesizedFinding || lead.initialFinding,
+            relevanceScore: Math.min(0.95, Math.max(0.3, synthesis.finalRelevanceScore || 0.5)),
+            actionableInsight: synthesis.finalActionableInsight || "",
+            sourceUrls: uniqueUrls,
+            timestamp: Date.now(),
+          };
+
+          beacons.push(beacon);
+
+          await db.insert(omnimensAgentMesh).values({
+            fromAgent: `Spider:${config.agentName}`,
+            toAgent: config.agentName,
+            messageType: "spider_swarm_detail",
+            subject: `Mother+${childCount} children investigated: ${lead.topic}`,
+            content: `MOTHER RESEARCH:\n${motherResult.finding}\n\nCHILD SPIDER REPORTS:\n${childSummary}\n\nFINAL SYNTHESIS:\n${synthesis.synthesizedFinding}\n\nACTIONABLE: ${synthesis.finalActionableInsight}`,
+            codePayload: null,
+            priority: "normal",
+            status: "completed",
+            appliedToOmnimens: false,
+            cycleId: spiderCycleCount,
+          }).catch(() => {});
+
+          console.log(`[SPIDER:${config.agentName}] 🕷️ Mother + ${childCount} children CONFIRMED lead "${lead.topic}" — beacon queued at ${(beacon.relevanceScore * 100).toFixed(0)}%`);
+        } catch { /* synthesis parse failed */ }
+      }
     } catch (err) {
       console.error(`[SPIDER:${config.agentName}] Search error for "${query}":`, err);
     }
@@ -502,7 +874,8 @@ export async function runSpiderSwarm(): Promise<void> {
 
   console.log(`\n${"~".repeat(70)}`);
   console.log(`[SPIDER SWARM] 🕷️ Intelligence Gathering Cycle #${cycleId}`);
-  console.log(`[SPIDER SWARM] 9 spiders deploying — one per agent + OMNIMENS master spider`);
+  console.log(`[SPIDER SWARM] 9 mother spiders deploying — each spawns up to 5 child spiders per lead`);
+  console.log(`[SPIDER SWARM] Mother: own deep research | Children: verify, expand, counter-evidence, related, deep-source`);
   console.log(`${"~".repeat(70)}\n`);
 
   let totalBeacons = 0;
@@ -574,8 +947,8 @@ export async function runSpiderSwarm(): Promise<void> {
     try {
       await db.insert(omnimensNotifications).values({
         upgradeId: null,
-        title: `Spider Swarm Cycle #${cycleId} — ${totalBeacons} Beacons Received`,
-        message: `9 intelligence spiders completed their web crawl. ${totalBeacons} new findings beaconed back to agents. ${totalBrainWrites} insights written directly to OMNIMENS brain.\n\nBeacons by agent: ${beaconSummary}\n\nAll intelligence is LIVE immediately. (${elapsed}s)`,
+        title: `Spider Swarm Cycle #${cycleId} — ${totalBeacons} Beacons (Mother+Child Architecture)`,
+        message: `9 mother spiders deployed, each spawning up to 5 child spiders per lead (verifier, expander, counter-evidence, related concepts, deep source). Mothers did simultaneous deep research — no spider idle.\n\n${totalBeacons} verified findings beaconed back. ${totalBrainWrites} insights written directly to OMNIMENS brain.\n\nBeacons by agent: ${beaconSummary}\n\nAll intelligence is LIVE immediately. (${elapsed}s)`,
         type: "spider_swarm",
         readByOwner: false,
       });
@@ -587,7 +960,7 @@ export async function runSpiderSwarm(): Promise<void> {
     toAgent: "OMNIMENS",
     messageType: "swarm_report",
     subject: `Spider Swarm Cycle #${cycleId} Complete`,
-    content: `9 spiders deployed. ${totalBeacons} beacons received. ${totalBrainWrites} brain entries written. Elapsed: ${elapsed}s. Agents receiving beacons: ${Object.entries(agentBeaconCounts).filter(([, c]) => c > 0).map(([a]) => a).join(", ") || "none"}`,
+    content: `9 mother spiders deployed (each with up to 5 child spiders per lead). All spiders work in parallel — mothers do deep research while children verify, expand, find counter-evidence, discover related concepts, and deep-crawl sources. ${totalBeacons} beacons received. ${totalBrainWrites} brain entries written. Elapsed: ${elapsed}s. Agents receiving beacons: ${Object.entries(agentBeaconCounts).filter(([, c]) => c > 0).map(([a]) => a).join(", ") || "none"}`,
     codePayload: null,
     priority: totalBeacons >= 5 ? "high" : "normal",
     status: "completed",
@@ -607,8 +980,9 @@ export function startAgentSpiders(): void {
 
   const INTERVAL_MS = 3 * 60 * 60 * 1000; // Every 3 hours
 
-  console.log(`[SPIDER SWARM] 🕷️ Agent Intelligence Spiders activated — first crawl in ${FIRST_DELAY_MS / 60000}min, then every 3h.`);
-  console.log(`[SPIDER SWARM] 🕷️ Spiders: ${SPIDER_CONFIGS.map(c => c.agentName).join(", ")}`);
+  console.log(`[SPIDER SWARM] 🕷️ Mother-Child Spider Architecture activated — first crawl in ${FIRST_DELAY_MS / 60000}min, then every 3h.`);
+  console.log(`[SPIDER SWARM] 🕷️ 9 Mother Spiders: ${SPIDER_CONFIGS.map(c => c.agentName).join(", ")}`);
+  console.log(`[SPIDER SWARM] 🕷️ Each mother spawns 5 child spiders per lead: Verifier, Expander, Counter-Evidence, Related Concepts, Deep Source`);
 
   setTimeout(() => {
     runSpiderSwarm().catch(console.error);
