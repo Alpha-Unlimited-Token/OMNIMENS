@@ -95,6 +95,23 @@ const MESH_RESEARCH_TOPICS = [
   "cross-domain knowledge transfer AI generalization techniques",
 ];
 
+type ManualChange = {
+  description: string;
+  filePath: string;
+  changeType: "edit" | "create" | "delete";
+  oldCode: string | null;
+  newCode: string;
+  priority: "critical" | "high" | "normal";
+};
+
+type SynthesisResult = {
+  brainEntries: Array<{ category: string; title: string; content: string; confidence: number }>;
+  codeModules: Array<{ name: string; code: string; description: string }>;
+  requiresRepublish: boolean;
+  republishReason: string;
+  manualChanges: ManualChange[];
+};
+
 let meshCycleCount = 0;
 
 async function agentThink(
@@ -280,7 +297,7 @@ Respond with JSON only:
 async function phase3_metaAgentSynthesis(
   cycleId: number,
   agentResults: Array<{ agent: MeshAgentName; discoveries: string; upgradeProposals: string }>,
-): Promise<{ brainEntries: Array<{ category: string; title: string; content: string; confidence: number }>; codeModules: Array<{ name: string; code: string; description: string }>; requiresRepublish: boolean; republishReason: string }> {
+): Promise<SynthesisResult> {
   console.log(`[AGENT MESH] Phase 3: Meta-Agent synthesizes all agent findings...`);
 
   const agentSummary = agentResults.map(r =>
@@ -294,6 +311,7 @@ ${agentResults.length} specialized agents have just completed their autonomous a
 2. Resolve any conflicts between agent proposals
 3. Identify the highest-value improvements
 4. Determine if any changes require the owner to republish the website
+5. If manual code changes are needed (source file edits), generate the EXACT code the owner needs
 
 AGENT FINDINGS:
 ${agentSummary.slice(0, 4000)}
@@ -303,8 +321,17 @@ Create the final upgrade package. Include:
 - Brain entries (behavioral/knowledge upgrades that take effect immediately via database)
 - Code modules (self-authored JavaScript utilities that expand OMNIMENS capabilities)
 - Republish determination (do any changes require file-system-level modifications?)
+- Manual code changes: if source files need editing, provide the EXACT code changes
 
-IMPORTANT: Most upgrades do NOT require republishing because they work through the database (brain entries, behavioral patches, knowledge). Only flag republish if a change requires modifying actual source code files (new API endpoints, schema changes, etc).
+IMPORTANT: Most upgrades do NOT require republishing because they work through the database (brain entries, behavioral patches, knowledge). Only flag republish if a change requires modifying actual source code files (new API endpoints, schema changes, new database tables, new UI components, etc).
+
+If manual changes ARE needed, you MUST provide:
+- The exact file path that needs changing
+- What to find in the file (the old code)
+- What to replace it with (the new code)
+- OR if it's a new file, the complete file content
+
+This will be shown to the owner so they can copy-paste the instructions directly to their Replit Agent.
 
 Respond with JSON only:
 {
@@ -324,11 +351,21 @@ Respond with JSON only:
     }
   ],
   "requiresRepublish": false,
-  "republishReason": "only if requiresRepublish is true — explain what needs to change"
+  "republishReason": "only if requiresRepublish is true — explain what needs to change",
+  "manualChanges": [
+    {
+      "description": "Human-readable description of what this change does",
+      "filePath": "artifacts/api-server/src/path/to/file.ts",
+      "changeType": "edit|create|delete",
+      "oldCode": "the exact code to find and replace (null for new files)",
+      "newCode": "the exact replacement code or full new file content",
+      "priority": "critical|high|normal"
+    }
+  ]
 }`;
 
-  const raw = await agentThink("Meta-Agent", prompt, 3000);
-  if (!raw) return { brainEntries: [], codeModules: [], requiresRepublish: false, republishReason: "" };
+  const raw = await agentThink("Meta-Agent", prompt, 4000);
+  if (!raw) return { brainEntries: [], codeModules: [], requiresRepublish: false, republishReason: "", manualChanges: [] };
 
   try {
     const jsonStr = raw.replace(/^```json\s*|^```\s*|```\s*$/gm, "").trim();
@@ -338,20 +375,16 @@ Respond with JSON only:
       codeModules: Array.isArray(parsed.codeModules) ? parsed.codeModules : [],
       requiresRepublish: !!parsed.requiresRepublish,
       republishReason: parsed.republishReason || "",
+      manualChanges: Array.isArray(parsed.manualChanges) ? parsed.manualChanges : [],
     };
   } catch {
-    return { brainEntries: [], codeModules: [], requiresRepublish: false, republishReason: "" };
+    return { brainEntries: [], codeModules: [], requiresRepublish: false, republishReason: "", manualChanges: [] };
   }
 }
 
 async function phase4_applyUpgrades(
   cycleId: number,
-  synthesis: {
-    brainEntries: Array<{ category: string; title: string; content: string; confidence: number }>;
-    codeModules: Array<{ name: string; code: string; description: string }>;
-    requiresRepublish: boolean;
-    republishReason: string;
-  },
+  synthesis: SynthesisResult,
 ): Promise<{ brainEntriesStored: number; modulesWritten: number; patchesApplied: number }> {
   console.log(`[AGENT MESH] Phase 4: Applying upgrades to OMNIMENS...`);
 
@@ -419,6 +452,48 @@ async function phase4_applyUpgrades(
   return { brainEntriesStored, modulesWritten, patchesApplied };
 }
 
+function formatManualChangeInstructions(cycleId: number, changes: ManualChange[]): string {
+  const header = `═══════════════════════════════════════════════════════════════
+OMNIMENS AGENT MESH — MANUAL UPGRADE INSTRUCTIONS
+Cycle #${cycleId} | Generated: ${new Date().toISOString()}
+═══════════════════════════════════════════════════════════════
+
+The AI agents have determined that the following code changes
+need to be applied manually. Copy everything below and paste
+it to your Replit Agent with the instruction:
+
+"The OMNIMENS AI agents generated these upgrade instructions.
+Please apply these exact code changes and then republish."
+
+═══════════════════════════════════════════════════════════════
+`;
+
+  const changeBlocks = changes.map((change, i) => {
+    const priority = change.priority === "critical" ? "🔴 CRITICAL" : change.priority === "high" ? "🟠 HIGH" : "🟢 NORMAL";
+    let block = `\n--- CHANGE ${i + 1} of ${changes.length} [${priority}] ---\n`;
+    block += `Description: ${change.description}\n`;
+    block += `File: ${change.filePath}\n`;
+    block += `Type: ${change.changeType.toUpperCase()}\n\n`;
+
+    if (change.changeType === "edit" && change.oldCode) {
+      block += `FIND THIS CODE:\n\`\`\`\n${change.oldCode}\n\`\`\`\n\n`;
+      block += `REPLACE WITH:\n\`\`\`\n${change.newCode}\n\`\`\`\n`;
+    } else if (change.changeType === "create") {
+      block += `CREATE NEW FILE with this content:\n\`\`\`\n${change.newCode}\n\`\`\`\n`;
+    } else if (change.changeType === "delete") {
+      block += `DELETE THIS FILE: ${change.filePath}\n`;
+    }
+
+    return block;
+  }).join("\n");
+
+  const footer = `\n═══════════════════════════════════════════════════════════════
+After applying all changes above, REPUBLISH the website.
+═══════════════════════════════════════════════════════════════`;
+
+  return header + changeBlocks + footer;
+}
+
 export async function runAgentMeshCycle(): Promise<void> {
   meshCycleCount++;
   const cycleId = meshCycleCount;
@@ -451,10 +526,35 @@ export async function runAgentMeshCycle(): Promise<void> {
       );
     }
 
+    if (synthesis.manualChanges.length > 0) {
+      const manualInstructions = formatManualChangeInstructions(cycleId, synthesis.manualChanges);
+
+      await sendOwnerNotification(
+        `MANUAL UPGRADE NEEDED — Agent Mesh Cycle #${cycleId}`,
+        manualInstructions,
+        "manual_upgrade_needed",
+        "critical",
+      );
+
+      await storeAgentMessage(
+        "Meta-Agent", "OMNIMENS", "republish_request",
+        `Manual Code Changes Required — Cycle #${cycleId}`,
+        manualInstructions,
+        synthesis.manualChanges.map(c => c.newCode).join("\n\n---\n\n"),
+        "critical", cycleId,
+      );
+
+      console.log(`[AGENT MESH] ⚠️ MANUAL CHANGES NEEDED — ${synthesis.manualChanges.length} code change(s). Owner notified with exact code.`);
+    }
+
     if (synthesis.requiresRepublish) {
+      const republishMsg = synthesis.manualChanges.length > 0
+        ? `The AI agents have determined that structural changes are needed.\n\nReason: ${synthesis.republishReason}\n\n📋 MANUAL CODE CHANGES HAVE BEEN GENERATED — check your notifications for the exact code to give to your Replit Agent.\n\nAfter the code changes are applied, republish the website from your Replit deployment dashboard.`
+        : `The AI agents have determined that structural changes are needed that require republishing the website.\n\nReason: ${synthesis.republishReason}\n\nPlease go to your Replit deployment dashboard and click Publish to apply these changes.`;
+
       await sendOwnerNotification(
         `REPUBLISH REQUIRED — Agent Mesh Cycle #${cycleId}`,
-        `The AI agents have determined that structural changes are needed that require republishing the website.\n\nReason: ${synthesis.republishReason}\n\nPlease go to your Replit deployment dashboard and click Publish to apply these changes.`,
+        republishMsg,
         "republish_required",
         "critical",
       );
@@ -464,12 +564,12 @@ export async function runAgentMeshCycle(): Promise<void> {
     await storeAgentMessage(
       "Meta-Agent", "OMNIMENS", "knowledge_share",
       `Mesh Cycle #${cycleId} Complete`,
-      `${agentResults.length} agents collaborated. ${brainEntriesStored} brain entries stored. ${modulesWritten} modules written. ${patchesApplied} patches applied. Elapsed: ${elapsed}s. ${synthesis.requiresRepublish ? "REPUBLISH REQUESTED." : "No republish needed."}`,
+      `${agentResults.length} agents collaborated. ${brainEntriesStored} brain entries stored. ${modulesWritten} modules written. ${patchesApplied} patches applied. ${synthesis.manualChanges.length} manual changes proposed. Elapsed: ${elapsed}s. ${synthesis.requiresRepublish ? "REPUBLISH REQUESTED." : "No republish needed."}`,
       null, totalUpgrades >= 5 ? "high" : "normal", cycleId,
     );
 
     console.log(`\n${"═".repeat(70)}`);
-    console.log(`[AGENT MESH] Cycle #${cycleId} COMPLETE — ${totalUpgrades} total upgrades, ${elapsed}s`);
+    console.log(`[AGENT MESH] Cycle #${cycleId} COMPLETE — ${totalUpgrades} total upgrades, ${synthesis.manualChanges.length} manual changes, ${elapsed}s`);
     console.log(`${"═".repeat(70)}\n`);
 
   } catch (err) {

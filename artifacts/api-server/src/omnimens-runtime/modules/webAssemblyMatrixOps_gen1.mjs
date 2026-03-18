@@ -1,81 +1,99 @@
 /**
  * @module webAssemblyMatrixOps
- * @description Provides GPU-like parallelism for matrix operations using WebAssembly SIMD in Node.js.
- * @exports {Object} - Functions for matrix addition, multiplication, and transposition.
+ * @description This module provides high-performance matrix operations using WebAssembly
+ *              by integrating BLAS (Basic Linear Algebra Subprograms) or LAPACK (Linear Algebra PACKage)
+ *              libraries compiled to WebAssembly. It is designed for numerical tasks requiring fast
+ *              and efficient linear algebra computations.
  */
 
-// WebAssembly binary for SIMD matrix operations
-const wasmCode = new Uint8Array([
-  0x00, 0x61, 0x73, 0x6d, // WASM binary magic header
-  0x01, 0x00, 0x00, 0x00, // WASM binary version
-  // Module definition for matrix operations with SIMD
-  // (Binary omitted for brevity; would include SIMD instructions for matrix ops)
-]);
+const fs = require('fs');
+const path = require('path');
 
 /**
- * Initializes the WebAssembly module.
- * @returns {Promise<WebAssembly.Instance>} - A promise resolving to the WebAssembly instance.
+ * Loads a WebAssembly module from a file.
+ * @param {string} filePath - The path to the WebAssembly binary file.
+ * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WebAssembly instance.
  */
-async function initializeWasm() {
-  const wasmModule = await WebAssembly.instantiate(wasmCode);
-  return wasmModule.instance;
+async function loadWasm(filePath) {
+  const wasmBuffer = fs.readFileSync(filePath);
+  const wasmModule = await WebAssembly.compile(wasmBuffer);
+  const wasmInstance = await WebAssembly.instantiate(wasmModule);
+  return wasmInstance;
 }
 
 /**
- * Adds two matrices using WebAssembly SIMD.
- * @param {Float32Array} matrixA - The first matrix (flattened).
- * @param {Float32Array} matrixB - The second matrix (flattened).
- * @param {number} rows - Number of rows in the matrices.
- * @param {number} cols - Number of columns in the matrices.
- * @returns {Float32Array} - The resulting matrix (flattened).
+ * Performs matrix multiplication using WebAssembly.
+ * @param {Float64Array} matrixA - The first matrix (m x n) in row-major order.
+ * @param {Float64Array} matrixB - The second matrix (n x p) in row-major order.
+ * @param {number} m - The number of rows in matrixA.
+ * @param {number} n - The number of columns in matrixA and rows in matrixB.
+ * @param {number} p - The number of columns in matrixB.
+ * @returns {Float64Array} The resulting matrix (m x p) in row-major order.
+ * @throws {Error} If the matrices' dimensions are incompatible for multiplication.
  */
-async function addMatrices(matrixA, matrixB, rows, cols) {
-  const wasmInstance = await initializeWasm();
-  const result = new Float32Array(rows * cols);
+async function multiplyMatrices(matrixA, matrixB, m, n, p) {
+  if (matrixA.length !== m * n || matrixB.length !== n * p) {
+    throw new Error('Matrix dimensions do not match for multiplication.');
+  }
 
-  wasmInstance.exports.addMatrices(
-    matrixA, matrixB, result, rows, cols
-  );
+  // Load the WebAssembly module
+  const wasmInstance = await loadWasm(path.resolve(__dirname, 'blas_lapack.wasm'));
 
-  return result;
+  // Allocate memory for the matrices and result
+  const memory = wasmInstance.exports.memory;
+  const matrixASize = matrixA.length * Float64Array.BYTES_PER_ELEMENT;
+  const matrixBSize = matrixB.length * Float64Array.BYTES_PER_ELEMENT;
+  const resultSize = m * p * Float64Array.BYTES_PER_ELEMENT;
+  const totalSize = matrixASize + matrixBSize + resultSize;
+
+  const memoryBuffer = new Uint8Array(memory.buffer);
+  const matrixAOffset = 0;
+  const matrixBOffset = matrixASize;
+  const resultOffset = matrixASize + matrixBSize;
+
+  // Copy matrices into the WebAssembly memory
+  memoryBuffer.set(new Uint8Array(matrixA.buffer), matrixAOffset);
+  memoryBuffer.set(new Uint8Array(matrixB.buffer), matrixBOffset);
+
+  // Perform the matrix multiplication
+  wasmInstance.exports.multiply(matrixAOffset, matrixBOffset, resultOffset, m, n, p);
+
+  // Extract the result from WebAssembly memory
+  const resultBuffer = memoryBuffer.slice(resultOffset, resultOffset + resultSize);
+  return new Float64Array(resultBuffer.buffer);
 }
 
 /**
- * Multiplies two matrices using WebAssembly SIMD.
- * @param {Float32Array} matrixA - The first matrix (flattened).
- * @param {Float32Array} matrixB - The second matrix (flattened).
- * @param {number} rowsA - Number of rows in the first matrix.
- * @param {number} colsA - Number of columns in the first matrix.
- * @param {number} colsB - Number of columns in the second matrix.
- * @returns {Float32Array} - The resulting matrix (flattened).
+ * Example usage of the WebAssembly matrix multiplication module.
+ * @returns {Promise<void>} A promise that resolves when the example completes.
  */
-async function multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB) {
-  const wasmInstance = await initializeWasm();
-  const result = new Float32Array(rowsA * colsB);
+async function exampleUsage() {
+  const matrixA = new Float64Array([
+    1, 2, 3,
+    4, 5, 6
+  ]); // 2x3 matrix
 
-  wasmInstance.exports.multiplyMatrices(
-    matrixA, matrixB, result, rowsA, colsA, colsB
-  );
+  const matrixB = new Float64Array([
+    7, 8,
+    9, 10,
+    11, 12
+  ]); // 3x2 matrix
 
-  return result;
+  const m = 2, n = 3, p = 2;
+
+  try {
+    const result = await multiplyMatrices(matrixA, matrixB, m, n, p);
+    console.log('Result:', result);
+  } catch (error) {
+    console.error('Error:', error);
+  }
 }
 
-/**
- * Transposes a matrix using WebAssembly SIMD.
- * @param {Float32Array} matrix - The matrix to transpose (flattened).
- * @param {number} rows - Number of rows in the matrix.
- * @param {number} cols - Number of columns in the matrix.
- * @returns {Float32Array} - The transposed matrix (flattened).
- */
-async function transposeMatrix(matrix, rows, cols) {
-  const wasmInstance = await initializeWasm();
-  const result = new Float32Array(rows * cols);
+// Uncomment to run the example
+// exampleUsage();
 
-  wasmInstance.exports.transposeMatrix(
-    matrix, result, rows, cols
-  );
-
-  return result;
-}
-
-export { addMatrices, multiplyMatrices, transposeMatrix };
+module.exports = {
+  loadWasm,
+  multiplyMatrices,
+  exampleUsage
+};
