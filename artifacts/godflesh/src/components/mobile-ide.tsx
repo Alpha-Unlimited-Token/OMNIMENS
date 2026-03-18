@@ -804,8 +804,8 @@ export function MobileTrigger() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="sm:hidden fixed bottom-5 right-4 z-[200] w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all active:scale-95"
-        style={{ background: VD, border: `1.5px solid ${BORDER}`, boxShadow: `0 0 20px rgba(168,85,247,0.3)` }}
+        className="sm:hidden fixed right-4 z-[200] w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all active:scale-95"
+        style={{ background: VD, border: `1.5px solid ${BORDER}`, boxShadow: `0 0 20px rgba(168,85,247,0.3)`, bottom: "max(20px, calc(env(safe-area-inset-bottom) + 12px))" }}
         aria-label="Open mobile IDE"
       >
         <Layers className="w-5 h-5" style={{ color: V }} />

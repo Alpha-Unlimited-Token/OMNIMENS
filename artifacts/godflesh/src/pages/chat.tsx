@@ -5540,7 +5540,7 @@ export default function Chat() {
           )}
 
           {/* Input area */}
-          <form onSubmit={handleSubmit} className="shrink-0 border-t border-white/8 bg-black/40 p-3">
+          <form onSubmit={handleSubmit} className="shrink-0 border-t border-white/8 bg-black/40 p-3" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
             <PendingFileList files={pendingFiles} onRemove={removeFile} />
             <div className="relative flex items-center">
               <input ref={fileInputRef} type="file" multiple
@@ -5666,7 +5666,7 @@ export default function Chat() {
           {devLayout && (
             <div
               className="shrink-0 flex items-center justify-between px-3"
-              style={{ background: "#a855f7", height: 22, minHeight: 22 }}
+              style={{ background: "#a855f7", height: 22, minHeight: 22, paddingBottom: "env(safe-area-inset-bottom)" }}
             >
               <div className="flex items-center gap-3">
                 <span className="font-mono text-[9px] text-white/80 font-bold tracking-wider">
@@ -6007,8 +6007,8 @@ export default function Chat() {
         )}
       </AnimatePresence>
 
-      {/* Mobile IDE — appears only on small screens */}
-      <MobileTrigger />
+      {/* Mobile IDE — appears only on small screens, hidden when build panel is open */}
+      {!mobileBuilderOpen && <MobileTrigger />}
     </Layout>
     </ActiveProjectCtx.Provider>
   );
