@@ -10,15 +10,20 @@ export function usePwaInstall() {
   const [installed, setInstalled] = useState(false);
 
   useEffect(() => {
+    if ((window as any).__pwaPrompt) {
+      setPrompt((window as any).__pwaPrompt as BeforeInstallPromptEvent);
+      (window as any).__pwaPrompt = null;
+    }
+
     const handler = (e: Event) => {
       e.preventDefault();
       setPrompt(e as BeforeInstallPromptEvent);
     };
     window.addEventListener("beforeinstallprompt", handler);
 
-    const installed = window.matchMedia("(display-mode: standalone)").matches
+    const isInstalled = window.matchMedia("(display-mode: standalone)").matches
       || (navigator as any).standalone === true;
-    if (installed) setInstalled(true);
+    if (isInstalled) setInstalled(true);
 
     return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);

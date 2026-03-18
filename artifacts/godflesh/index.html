@@ -115,6 +115,14 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- Capture PWA install prompt early (before React mounts) -->
+    <script>
+      window.__pwaPrompt = null;
+      window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        window.__pwaPrompt = e;
+      });
+    </script>
     <!-- Service Worker Registration -->
     <script>
       if ('serviceWorker' in navigator) {

@@ -4,7 +4,7 @@
  * Enables offline support and PWA installability.
  */
 
-const CACHE_NAME = "omnimens-v1";
+const CACHE_NAME = "omnimens-v2";
 
 const PRECACHE = [
   "/godflesh/",
