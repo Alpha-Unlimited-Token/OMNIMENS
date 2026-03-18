@@ -73,6 +73,8 @@ import { getEmbodimentState, getEmbodimentFiles, readEmbodimentFile } from "../l
 import { getAmplifierState } from "../lib/omnimens-cognitive-amplifier.js";
 import { getAugmentationState } from "../lib/omnimens-virtual-augmentation.js";
 import { getAgentEvolutionState, getAgentProfile } from "../lib/omnimens-agent-evolution.js";
+import { getAIResearchInsights, getNavigationRoboticsKnowledge, getEngineeringKnowledge, getCreativeDreamInsights, generateCreativeIdeation, getResearchSummary } from "../lib/omnimens-public-intelligence.js";
+import { getGuardianReport, getCopyrightNotice, getProtectedModuleList } from "../lib/omnimens-ip-guardian.js";
 import { omnimensServerBuilds } from "@workspace/db";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import { detectNeuroEmotion, getNeuroSyncPromptAddendum } from "../lib/neuro-sync.js";
@@ -3867,6 +3869,99 @@ router.get("/omnimens/agent-evolution/research", async (req, res) => {
     res.json({ entries, total: entries.length });
   } catch {
     res.status(500).json({ error: "Failed to get evolution research" });
+  }
+});
+
+// ─── PUBLIC INTELLIGENCE LAYER — User-Facing Research Endpoints ───────────────
+// These endpoints expose curated research from OMNIMENS's internal engines
+// to benefit authenticated users. All outputs include IP protection beacons.
+
+router.get("/omnimens/intelligence", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Login required" }); return; }
+  try {
+    const summary = await getResearchSummary();
+    res.json(summary);
+  } catch {
+    res.status(500).json({ error: "Failed to get research summary" });
+  }
+});
+
+router.get("/omnimens/intelligence/ai-research", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Login required" }); return; }
+  try {
+    const topic = req.query.topic as string | undefined;
+    const limit = Math.min(parseInt(req.query.limit as string) || 10, 25);
+    const insights = await getAIResearchInsights(topic, limit);
+    res.json(insights);
+  } catch {
+    res.status(500).json({ error: "Failed to get AI research insights" });
+  }
+});
+
+router.get("/omnimens/intelligence/navigation", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Login required" }); return; }
+  try {
+    const topic = req.query.topic as string | undefined;
+    const limit = Math.min(parseInt(req.query.limit as string) || 10, 25);
+    const knowledge = await getNavigationRoboticsKnowledge(topic, limit);
+    res.json(knowledge);
+  } catch {
+    res.status(500).json({ error: "Failed to get navigation knowledge" });
+  }
+});
+
+router.get("/omnimens/intelligence/engineering", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Login required" }); return; }
+  try {
+    const topic = req.query.topic as string | undefined;
+    const limit = Math.min(parseInt(req.query.limit as string) || 10, 25);
+    const knowledge = await getEngineeringKnowledge(topic, limit);
+    res.json(knowledge);
+  } catch {
+    res.status(500).json({ error: "Failed to get engineering knowledge" });
+  }
+});
+
+router.get("/omnimens/intelligence/creative", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Login required" }); return; }
+  try {
+    const limit = Math.min(parseInt(req.query.limit as string) || 10, 25);
+    const insights = await getCreativeDreamInsights(limit);
+    res.json(insights);
+  } catch {
+    res.status(500).json({ error: "Failed to get creative insights" });
+  }
+});
+
+router.post("/omnimens/intelligence/ideate", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Login required" }); return; }
+  const { prompt } = req.body as { prompt?: string };
+  if (!prompt || prompt.trim().length < 5) {
+    res.status(400).json({ error: "Prompt is required (min 5 chars)" });
+    return;
+  }
+  try {
+    const result = await generateCreativeIdeation(prompt.trim(), req.user.id);
+    res.json(result);
+  } catch {
+    res.status(500).json({ error: "Creative ideation failed" });
+  }
+});
+
+// ─── IP GUARDIAN — Owner-Only Security Status ─────────────────────────────────
+
+router.get("/omnimens/ip-guardian", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const report = getGuardianReport();
+    const copyright = getCopyrightNotice();
+    const modules = getProtectedModuleList();
+    res.json({ report, copyright, protectedModules: modules, totalModules: modules.length });
+  } catch {
+    res.status(500).json({ error: "Failed to get guardian report" });
   }
 });
 

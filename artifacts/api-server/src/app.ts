@@ -60,6 +60,7 @@ import { startAutonomousSandbox, getSandboxState, runInSandbox } from "./lib/omn
 import { startEmbodimentEngine, getEmbodimentState, getEmbodimentFiles, readEmbodimentFile } from "./lib/omnimens-embodiment-engine.js";
 import { startVirtualAugmentation, getAugmentationState } from "./lib/omnimens-virtual-augmentation.js";
 import { startAgentEvolution, getAgentEvolutionState, getAgentProfile } from "./lib/omnimens-agent-evolution.js";
+import { startIPGuardian, getResponseBeaconHeaders } from "./lib/omnimens-ip-guardian.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-conversations.js";
@@ -211,6 +212,15 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // ── SECURITY BEACON — Cryptographic ownership signature on all responses ──────
 app.use(securityBeacon);
 
+// ── IP GUARDIAN BEACON — Spider tracking + tamper detection on all responses ──
+app.use((_req, res, next) => {
+  const headers = getResponseBeaconHeaders();
+  for (const [key, value] of Object.entries(headers)) {
+    res.setHeader(key, value);
+  }
+  next();
+});
+
 // ── PRE-BODY REQUEST SECURITY (URL, headers, UA) ─────────────────────────────
 app.use(requestSecurityMiddleware);
 
@@ -311,6 +321,7 @@ startAutonomousSandbox();
 startEmbodimentEngine();
 startVirtualAugmentation();
 startAgentEvolution();
+startIPGuardian();
 
 setTimeout(async () => {
   await runGlobalMemoryImprovementCycle();
