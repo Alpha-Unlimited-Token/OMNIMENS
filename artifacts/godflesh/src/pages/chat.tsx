@@ -33,7 +33,8 @@ import {
   Presentation, Table2, Wand2,
   HardDrive, Rocket, ExternalLink, ChevronRight, RefreshCw, Star,
   File, Eye, Lock, Unlock, Upload, Server, MemoryStick, Wrench, CircleDot,
-  Sun, Moon, GitBranch
+  Sun, Moon, GitBranch,
+  AlertCircle, ArrowRight, CheckCircle2
 } from "lucide-react";
 import { OmnimensIcon } from "@/components/omnimens-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
@@ -112,8 +113,10 @@ function ImageGeneratingBadge({ spellStatus, spellWords, spellCorrections }: {
         <span className="tracking-widest">
           {spellStatus === "scanning" ? "SCANNING IMAGE FOR TEXT..." :
            spellStatus === "found" ? "TEXT DETECTED — CHECKING SPELLING..." :
+           spellStatus === "confirming" ? "WAITING FOR YOUR INPUT ON SPELLING..." :
            spellStatus === "correcting" ? "CORRECTING SPELLING — REGENERATING..." :
            spellStatus === "clean" ? "TEXT VERIFIED — RENDERING FINAL IMAGE..." :
+           spellStatus === "kept" ? "SPELLING CONFIRMED — FINALIZING IMAGE..." :
            "MANIFESTING IMAGE..."}
         </span>
         <span className="ml-auto text-primary/70">{elapsed}s</span>
@@ -133,6 +136,77 @@ function ImageGeneratingBadge({ spellStatus, spellWords, spellCorrections }: {
         <p className="text-white text-[10px]">Neural image synthesis in progress — typically 20–60 seconds.</p>
       )}
     </div>
+  );
+}
+
+function ImageSpellConfirmCard({ spellRequestId, corrections, foundWords, onDecision }: {
+  spellRequestId: string;
+  corrections: { original: string; corrected: string }[];
+  foundWords: string[];
+  onDecision: (decision: "keep" | "fix") => void;
+}) {
+  const [loading, setLoading] = useState<"keep" | "fix" | null>(null);
+
+  const handleDecision = async (decision: "keep" | "fix") => {
+    setLoading(decision);
+    try {
+      await fetch("/api/omnimens/image-spell-confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ spellRequestId, decision }),
+        credentials: "include",
+      });
+      onDecision(decision);
+    } catch {
+      setLoading(null);
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mt-3 rounded-xl border border-amber-400/30 bg-amber-400/5 overflow-hidden"
+    >
+      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-amber-400/15">
+        <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+        <span className="text-[10px] font-bold tracking-[0.2em] text-amber-400 uppercase">Spelling Check — Your Input Needed</span>
+      </div>
+      <div className="px-4 py-3 space-y-2.5">
+        <p className="text-[11px] text-white/70">
+          OMNIMENS scanned the generated image and found text that <span className="text-amber-300">may be misspelled</span>. Was this intentional?
+        </p>
+        <div className="space-y-1.5">
+          {corrections.map((c, i) => (
+            <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/30 border border-white/8">
+              <span className="font-mono text-[12px] text-red-300/90">"{c.original}"</span>
+              <ArrowRight className="w-3 h-3 text-white/30 shrink-0" />
+              <span className="font-mono text-[12px] text-emerald-300/90">"{c.corrected}"</span>
+              <span className="text-[9px] text-white/30 ml-auto">suggested fix</span>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2 pt-1">
+          <button
+            disabled={!!loading}
+            onClick={() => handleDecision("keep")}
+            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-white/5 border border-white/15 text-white/70 text-[11px] font-medium hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50"
+          >
+            {loading === "keep" ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+            Yes, it's intentional — keep it
+          </button>
+          <button
+            disabled={!!loading}
+            onClick={() => handleDecision("fix")}
+            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-500/15 border border-emerald-500/35 text-emerald-300 text-[11px] font-medium hover:bg-emerald-500/25 transition-colors disabled:opacity-50"
+          >
+            {loading === "fix" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
+            Fix the spelling before rendering
+          </button>
+        </div>
+        <p className="text-[9px] text-white/25 text-center">Auto-continues in 3 minutes if no response (keeps original spelling)</p>
+      </div>
+    </motion.div>
   );
 }
 
@@ -5091,6 +5165,20 @@ export default function Chat() {
                                   spellStatus={msg.imageSpellStatus}
                                   spellWords={msg.imageSpellWords}
                                   spellCorrections={msg.imageSpellCorrections}
+                                />
+                              )}
+                              {msg.imageSpellStatus === "confirming" && msg.imageSpellRequestId && (
+                                <ImageSpellConfirmCard
+                                  spellRequestId={msg.imageSpellRequestId}
+                                  corrections={msg.imageSpellCorrections || []}
+                                  foundWords={msg.imageSpellWords || []}
+                                  onDecision={(decision) => {
+                                    setMessages((prev) => prev.map((m) =>
+                                      m.id === msg.id
+                                        ? { ...m, imageSpellStatus: decision === "fix" ? "correcting" : "kept", imageSpellRequestId: null }
+                                        : m
+                                    ));
+                                  }}
                                 />
                               )}
                               {msg.generating3d && <Model3DGeneratingBadge />}

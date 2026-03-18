@@ -241,9 +241,10 @@ export type Message = {
   files?: AttachedFile[];
   images?: GeneratedImage[];
   generatingImages?: boolean;
-  imageSpellStatus?: "scanning" | "found" | "correcting" | "clean" | null;
+  imageSpellStatus?: "scanning" | "found" | "confirming" | "correcting" | "clean" | "kept" | null;
   imageSpellWords?: string[];
   imageSpellCorrections?: SpellCorrection[];
+  imageSpellRequestId?: string | null;
   models3d?: Generated3DModel[];
   generating3d?: boolean;
   games?: GeneratedGame[];
@@ -563,11 +564,33 @@ export function useOmnimensChat(
                   return newMsgs;
                 });
 
+              } else if (data.type === "image_spell_confirm") {
+                // Pause: ask user whether spelling was intentional
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    msg.imageSpellStatus = "confirming";
+                    msg.imageSpellCorrections = data.corrections || [];
+                    msg.imageSpellWords = data.foundWords || [];
+                    msg.imageSpellRequestId = data.spellRequestId;
+                  }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "image_spell_kept") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) { msg.imageSpellStatus = "kept"; msg.imageSpellRequestId = null; }
+                  return newMsgs;
+                });
+
               } else if (data.type === "image_spell_correcting") {
                 setMessages((prev) => {
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
-                  if (msg) { msg.imageSpellStatus = "correcting"; msg.imageSpellCorrections = data.corrections || []; }
+                  if (msg) { msg.imageSpellStatus = "correcting"; msg.imageSpellCorrections = data.corrections || []; msg.imageSpellRequestId = null; }
                   return newMsgs;
                 });
 

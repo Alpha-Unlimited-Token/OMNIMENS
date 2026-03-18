@@ -331,12 +331,19 @@ async function multiQueryResearch(queries: string[]): Promise<string> {
 
 const IMAGE_TYPES = new Set(["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"]);
 
+// ── Image Spell Gate — pending user confirmations ──────────────────────────
+// When OMNIMENS finds suspected spelling errors in a generated image, it pauses
+// and waits for the user to confirm whether the spelling was intentional.
+// This map stores the resolver for each pending decision, keyed by a unique ID.
+const pendingImageSpellDecisions = new Map<string, (decision: "keep" | "fix") => void>();
+
 /**
  * Pre-render image spell gate.
- * After OMNIMENS generates an image, this scans it for embedded text using
- * GPT-4o vision (like Google Lens). If spelling errors are found, it notifies
- * the pipeline and regenerates the image with a corrected prompt — before
- * final delivery to the user.
+ *
+ * Scans a generated image for text using GPT-4o vision (Google Lens-style).
+ * If potential spelling errors are found, PAUSES and asks the user whether the
+ * spelling was intentional before doing anything — never auto-corrects.
+ * Only regenerates if the user explicitly chooses "fix".
  */
 async function preRenderSpellCheck(
   imageBuffer: Buffer,
@@ -373,13 +380,13 @@ async function preRenderSpellCheck(
     const foundWords = extracted.split("\n").map(w => w.trim()).filter(Boolean);
     sendEvent({ type: "image_spell_found", index, words: foundWords });
 
-    // ── Step 2: Spell-check the extracted words ──
+    // ── Step 2: Detect potential spelling errors ──
     const spellResp = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       max_tokens: 400,
       messages: [{
         role: "user",
-        content: `You are a spelling expert reviewing text found inside a graphic design image.\n\nCheck each word/phrase below for spelling errors.\n\nRules:\n- Ignore brand names, deliberate stylizations (all-caps logos, camelCase), acronyms, proper nouns, and intentional abbreviations\n- Only flag clear, unambiguous real-word spelling errors (e.g. "Bussiness"→"Business", "Managment"→"Management")\n- Do NOT flag correctly spelled words\n\nWords found in image:\n${foundWords.join("\n")}\n\nRespond ONLY with a valid JSON array. If no errors: []\nFormat: [{"original":"misspeled","corrected":"misspelled"}]`,
+        content: `You are a spelling expert reviewing text found inside a graphic design image.\n\nCheck each word/phrase below for potential spelling errors.\n\nRules:\n- Ignore brand names, deliberate stylizations (all-caps logos, camelCase), acronyms, proper nouns, and intentional abbreviations\n- Only flag clear, unambiguous real-word spelling errors (e.g. "Bussiness"→"Business", "Managment"→"Management")\n- Do NOT flag correctly spelled words\n\nWords found in image:\n${foundWords.join("\n")}\n\nRespond ONLY with a valid JSON array. If no errors: []\nFormat: [{"original":"misspeled","corrected":"misspelled"}]`,
       }],
     });
 
@@ -396,12 +403,40 @@ async function preRenderSpellCheck(
       return { buffer: imageBuffer, provider: "original", spellCorrected: false, corrections: [] };
     }
 
-    // ── Step 3: Build corrected prompt + regenerate ──
+    // ── Step 3: ASK the user — never auto-correct ──
+    // Generate a unique ID for this spell decision, pause, and wait for user input.
+    const spellRequestId = `imgspell_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+    const userDecision = await new Promise<"keep" | "fix">((resolve) => {
+      pendingImageSpellDecisions.set(spellRequestId, resolve);
+      sendEvent({
+        type: "image_spell_confirm",
+        index,
+        spellRequestId,
+        corrections,
+        foundWords,
+        message: `Found ${corrections.length} potential spelling issue${corrections.length > 1 ? "s" : ""} in the generated image — please confirm before rendering.`,
+      });
+      // Auto-keep after 3 minutes if user doesn't respond
+      setTimeout(() => {
+        if (pendingImageSpellDecisions.has(spellRequestId)) {
+          pendingImageSpellDecisions.delete(spellRequestId);
+          resolve("keep");
+        }
+      }, 3 * 60 * 1000);
+    });
+
+    if (userDecision === "keep") {
+      sendEvent({ type: "image_spell_kept", index, corrections });
+      return { buffer: imageBuffer, provider: "original", spellCorrected: false, corrections: [] };
+    }
+
+    // ── Step 4: User chose "fix" — regenerate with corrected prompt ──
     sendEvent({
       type: "image_spell_correcting",
       index,
       corrections,
-      message: `Found ${corrections.length} spelling error${corrections.length > 1 ? "s" : ""} — regenerating with corrected text…`,
+      message: `Correcting spelling and regenerating image…`,
     });
 
     let correctedPrompt = originalPrompt;
@@ -424,7 +459,7 @@ async function preRenderSpellCheck(
       return { buffer: imageBuffer, provider: "original", spellCorrected: false, corrections };
     }
   } catch (err) {
-    // Non-blocking — if spell gate fails for any reason, original image is returned unchanged
+    // Non-blocking — if spell gate errors for any reason, original image is returned unchanged
     console.warn("[OMNIMENS SPELL GATE] Skipped:", (err as Error).message);
     return { buffer: imageBuffer, provider: "original", spellCorrected: false, corrections: [] };
   }
@@ -4416,6 +4451,23 @@ router.get("/omnimens/admin/env-keys", async (req, res) => {
 // ─── Support / Problem Reports ───────────────────────────────────────────────
 
 const VALID_CATEGORIES = ["account", "ai", "billing", "bug", "api", "feature", "other"];
+
+// ── Image Spell Gate — user confirmation endpoint ──────────────────────────
+// Called by the frontend when the user decides whether a flagged spelling
+// in a generated image was intentional ("keep") or an error ("fix").
+router.post("/omnimens/image-spell-confirm", (req, res) => {
+  const { spellRequestId, decision } = req.body as { spellRequestId: string; decision: "keep" | "fix" };
+  if (!spellRequestId || !["keep", "fix"].includes(decision)) {
+    return res.status(400).json({ error: "Missing spellRequestId or invalid decision" });
+  }
+  const resolver = pendingImageSpellDecisions.get(spellRequestId);
+  if (!resolver) {
+    return res.status(404).json({ error: "No pending spell decision found — may have already timed out" });
+  }
+  pendingImageSpellDecisions.delete(spellRequestId);
+  resolver(decision);
+  res.json({ ok: true, decision });
+});
 
 router.post("/omnimens/support/report", async (req, res) => {
   const { description, category = "other", severity = "medium", contactEmail, context } = req.body || {};
