@@ -7,11 +7,11 @@ import {
   Brain, ShieldAlert, Cpu, Sparkles, ArrowRight, Play, CheckCircle2,
   Trash2, FlaskConical, Network, Eye, Terminal, FileCode, Package,
   Loader2, ChevronRight, MessageSquare, Download, Zap, RotateCcw,
-  Swords,
+  Swords, Palette, TextCursorInput, AlertCircle, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
-import type { AgentName, CodeFile, ExecutionResult, CrossChallenge } from "@/hooks/use-superai-stream";
+import type { AgentName, CodeFile, ExecutionResult, CrossChallenge, SpellGateWord } from "@/hooks/use-superai-stream";
 
 type AgentKey = AgentName;
 
@@ -55,9 +55,21 @@ const AGENT_CONFIG: Record<AgentKey, {
     border: "border-yellow-400/50", bg: "bg-yellow-400/10",
     dot: "bg-yellow-400", badge: "border-yellow-400/30 bg-yellow-400/5 text-yellow-400",
   },
+  GraphicDesigner: {
+    icon: Palette, description: "Visual design & aesthetic quality",
+    color: "text-fuchsia-400", glow: "rgba(232,121,249,0.6)",
+    border: "border-fuchsia-400/50", bg: "bg-fuchsia-400/10",
+    dot: "bg-fuchsia-400", badge: "border-fuchsia-400/30 bg-fuchsia-400/5 text-fuchsia-400",
+  },
+  SpellCheckVisual: {
+    icon: TextCursorInput, description: "Text integrity guardian",
+    color: "text-teal-400", glow: "rgba(45,212,191,0.6)",
+    border: "border-teal-400/50", bg: "bg-teal-400/10",
+    dot: "bg-teal-400", badge: "border-teal-400/30 bg-teal-400/5 text-teal-400",
+  },
 };
 
-const AGENT_ORDER: AgentKey[] = ["Architect", "Mathematician", "Critic", "Neuroscientist", "Synthesizer", "Meta-Agent"];
+const AGENT_ORDER: AgentKey[] = ["Architect", "Mathematician", "Critic", "Neuroscientist", "Synthesizer", "Meta-Agent", "GraphicDesigner", "SpellCheckVisual"];
 
 const AgentCard = ({ name, isActive }: { name: AgentKey; isActive: boolean }) => {
   const cfg = AGENT_CONFIG[name];
@@ -375,7 +387,7 @@ export default function SessionPage() {
   const { data: sessionData, isLoading } = useGetSuperAISession(sessionId);
   const { mutateAsync: deleteSession, isPending: isDeleting } = useDeleteSuperAISession();
   const {
-    startStream, isStreaming, streamedMessages, activeAgent,
+    startStream, isStreaming, streamedMessages, activeAgents, spellGateWords,
     codeFiles, executions, executingFile, installingPackages,
     restoringWorkspace, restoredWorkspace,
     iterationStatus, isPackaging, packageReady, downloadUrl,
@@ -513,9 +525,9 @@ export default function SessionPage() {
       )}
 
       {/* Agent Grid */}
-      <div className="grid grid-cols-6 gap-2 mb-2 shrink-0">
+      <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 mb-2 shrink-0">
         {AGENT_ORDER.map((name) => (
-          <AgentCard key={name} name={name} isActive={activeAgent === name} />
+          <AgentCard key={name} name={name} isActive={activeAgents.has(name)} />
         ))}
       </div>
 
@@ -660,6 +672,67 @@ export default function SessionPage() {
                     </div>
                   );
                 })}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Spell Gate Dialog */}
+      <AnimatePresence>
+        {spellGateWords.length > 0 && (
+          <motion.div key="spell-gate"
+            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          >
+            <div className="w-full max-w-lg rounded-2xl border border-teal-400/30 bg-[#0a0e17] shadow-2xl overflow-hidden">
+              <div className="flex items-center gap-2.5 px-5 py-4 border-b border-white/8">
+                <TextCursorInput className="w-4 h-4 text-teal-400 shrink-0" />
+                <span className="text-[11px] font-bold tracking-[0.2em] text-teal-400 uppercase">Spell Check Gate</span>
+                <AlertCircle className="w-3.5 h-3.5 text-yellow-400 ml-auto shrink-0" />
+                <span className="text-[10px] text-yellow-400">Review before packaging</span>
+              </div>
+              <div className="px-5 py-4">
+                <p className="text-[11px] text-white/60 mb-3">SpellCheckVisual flagged the following words. Are these intentional stylizations (brand names, technical terms, etc.) or spelling errors?</p>
+                <div className="space-y-2 max-h-56 overflow-y-auto">
+                  {spellGateWords.map((w: SpellGateWord, i: number) => (
+                    <div key={i} className="rounded-lg border border-white/8 bg-white/3 px-3 py-2">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-mono text-[12px] font-bold text-teal-300">"{w.word}"</span>
+                        <span className="text-[9px] text-white/30 ml-auto">{w.filename}</span>
+                      </div>
+                      <p className="text-[10px] text-white/45 font-mono truncate">…{w.context}…</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-2 px-5 pb-5">
+                <button
+                  onClick={async () => {
+                    const sessionIdNum = parseInt(params.id || "0");
+                    await fetch(`/api/superai/sessions/${sessionIdNum}/spell-response`, {
+                      method: "POST", headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ approved: true }),
+                    });
+                  }}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-teal-500/20 border border-teal-500/40 text-teal-300 text-[11px] font-medium hover:bg-teal-500/30 transition-colors"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  Keep All — They're Intentional
+                </button>
+                <button
+                  onClick={async () => {
+                    const sessionIdNum = parseInt(params.id || "0");
+                    await fetch(`/api/superai/sessions/${sessionIdNum}/spell-response`, {
+                      method: "POST", headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ approved: false }),
+                    });
+                  }}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-orange-500/15 border border-orange-500/35 text-orange-300 text-[11px] font-medium hover:bg-orange-500/25 transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  Fix Errors Before Packaging
+                </button>
               </div>
             </div>
           </motion.div>

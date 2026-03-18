@@ -8,7 +8,15 @@ export type AgentName =
   | "Synthesizer"
   | "Mathematician"
   | "Neuroscientist"
-  | "Meta-Agent";
+  | "Meta-Agent"
+  | "GraphicDesigner"
+  | "SpellCheckVisual";
+
+export type SpellGateWord = {
+  word: string;
+  context: string;
+  filename: string;
+};
 
 export type StreamedMessage = {
   agentName: AgentName;
@@ -72,7 +80,7 @@ export type CrossChallenge = {
 export function useSuperAIStream(sessionId: number) {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamedMessages, setStreamedMessages] = useState<StreamedMessage[]>([]);
-  const [activeAgent, setActiveAgent] = useState<AgentName | null>(null);
+  const [activeAgents, setActiveAgents] = useState<Set<AgentName>>(new Set());
   const [codeFiles, setCodeFiles] = useState<CodeFile[]>([]);
   const [executions, setExecutions] = useState<ExecutionResult[]>([]);
   const [executingFile, setExecutingFile] = useState<string | null>(null);
@@ -83,6 +91,7 @@ export function useSuperAIStream(sessionId: number) {
   const [isPackaging, setIsPackaging] = useState(false);
   const [packageReady, setPackageReady] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [spellGateWords, setSpellGateWords] = useState<SpellGateWord[]>([]);
   // Cross-agent challenge events
   const [crossChallenges, setCrossChallenges] = useState<CrossChallenge[]>([]);
   const queryClient = useQueryClient();
@@ -97,7 +106,7 @@ export function useSuperAIStream(sessionId: number) {
   const startStream = async (rounds: number = 3, continuationPrompt?: string) => {
     setIsStreaming(true);
     setStreamedMessages([]);
-    setActiveAgent(null);
+    setActiveAgents(new Set());
     setCodeFiles([]);
     setExecutions([]);
     setExecutingFile(null);
@@ -108,6 +117,7 @@ export function useSuperAIStream(sessionId: number) {
     setIsPackaging(false);
     setPackageReady(false);
     setDownloadUrl(null);
+    setSpellGateWords([]);
     setCrossChallenges([]);
     abortControllerRef.current = new AbortController();
 
@@ -146,7 +156,7 @@ export function useSuperAIStream(sessionId: number) {
 
             if (parsed.done || parsed.type === "done") {
               finished = true;
-              setActiveAgent(null);
+              setActiveAgents(new Set());
               break;
             }
 
@@ -199,10 +209,18 @@ export function useSuperAIStream(sessionId: number) {
             // ── Agent lifecycle ──
             if (parsed.type === "agent_start" && parsed.agent) {
               setRestoringWorkspace(false);
-              setActiveAgent(parsed.agent as AgentName);
+              setActiveAgents((prev) => new Set([...prev, parsed.agent as AgentName]));
             }
-            if (parsed.type === "agent_done") {
-              setActiveAgent(null);
+            if (parsed.type === "agent_done" && parsed.agent) {
+              setActiveAgents((prev) => { const next = new Set(prev); next.delete(parsed.agent as AgentName); return next; });
+            }
+
+            // ── Spell gate ──
+            if (parsed.type === "spell_gate" && parsed.words) {
+              setSpellGateWords(parsed.words as SpellGateWord[]);
+            }
+            if (parsed.type === "spell_gate_clear") {
+              setSpellGateWords([]);
             }
 
             // ── Cross-agent challenges ──
@@ -283,7 +301,7 @@ export function useSuperAIStream(sessionId: number) {
             // ── Packaging ──
             if (parsed.type === "packaging") {
               setIsPackaging(true);
-              setActiveAgent(null);
+              setActiveAgents(new Set());
             }
             if (parsed.type === "package_ready") {
               setIsPackaging(false);
@@ -301,7 +319,7 @@ export function useSuperAIStream(sessionId: number) {
       }
     } finally {
       setIsStreaming(false);
-      setActiveAgent(null);
+      setActiveAgents(new Set());
       setExecutingFile(null);
       setInstallingPackages(null);
       setRestoringWorkspace(false);
@@ -313,7 +331,7 @@ export function useSuperAIStream(sessionId: number) {
     startStream,
     isStreaming,
     streamedMessages,
-    activeAgent,
+    activeAgents,
     codeFiles,
     executions,
     executingFile,
@@ -324,6 +342,7 @@ export function useSuperAIStream(sessionId: number) {
     isPackaging,
     packageReady,
     downloadUrl,
+    spellGateWords,
     crossChallenges,
   };
 }

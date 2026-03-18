@@ -33,15 +33,18 @@ const AGENT_TOGETHER_MODEL: Partial<Record<string, string>> = {
   Mathematician:   TOGETHER_MODEL_IDS["llama-3.3-70b"], // deep math/reasoning
   Neuroscientist:  TOGETHER_MODEL_IDS["llama-3.3-70b"], // scientific/biological
   Critic:          TOGETHER_MODEL_IDS["llama-3.3-70b"], // adversarial critique
+  SpellCheckVisual: TOGETHER_MODEL_IDS["llama-3.1-8b"], // fast, focused text scanning
 };
 
 const AGENT_OPENAI_MODEL: Record<string, string> = {
-  Architect:     "gpt-5.2",
-  Synthesizer:   "gpt-5.2",
-  "Meta-Agent":  "gpt-5.2",
-  Critic:        "gpt-5.2",
-  Mathematician: "gpt-5.2",
-  Neuroscientist:"gpt-5.2",
+  Architect:        "gpt-5.2",
+  Synthesizer:      "gpt-5.2",
+  "Meta-Agent":     "gpt-5.2",
+  Critic:           "gpt-5.2",
+  Mathematician:    "gpt-5.2",
+  Neuroscientist:   "gpt-5.2",
+  GraphicDesigner:  "gpt-5.2",
+  SpellCheckVisual: "gpt-4o-mini",
 };
 
 // ─── OMNIMENS Intelligence Pre-Brief ─────────────────────────────────────────
@@ -160,14 +163,94 @@ async function writeSessionDiscoveries(topic: string, blueprintContent: string):
   }
 }
 
+// ─── Spell Check Gate ─────────────────────────────────────────────────────────
+// After agents finish, the SpellCheckVisual agent scans all visual text content.
+// Any suspect words are surfaced to the user as questions — NEVER auto-corrected.
+// The session pauses until the user approves or corrects each word, then resumes.
+
+async function extractSuspectWords(
+  codeContent: string,
+  topic: string
+): Promise<Array<{ word: string; context: string; suggestion: string }>> {
+  try {
+    const extractResponse = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      max_completion_tokens: 600,
+      messages: [
+        {
+          role: "system",
+          content: `You are a visual text spell checker for AI-generated code. Extract human-visible text (HTML content, string labels, UI text, headings, console messages shown to users) from the provided code. Then identify words that look like UNINTENTIONAL misspellings. 
+
+IMPORTANT RULES:
+- DO NOT flag: variable names, function names, technical terms, proper nouns, brand names, intentional stylizations (l33t speak, zerO for zero, z for s), abbreviations, acronyms
+- DO flag: clear typos (transposed letters, missing letters, wrong vowels) in user-visible text
+- Be conservative — only flag HIGH confidence misspellings
+- Return JSON: {"suspects": [{"word":"original","context":"surrounding text","suggestion":"likely correct spelling"}]}
+- Return {"suspects":[]} if no issues found`,
+        },
+        {
+          role: "user",
+          content: `Topic: ${topic}\n\nCode to scan (first 4000 chars):\n${codeContent.slice(0, 4000)}`,
+        },
+      ],
+      response_format: { type: "json_object" },
+    });
+    const text = extractResponse.choices[0]?.message?.content || "{}";
+    const parsed = JSON.parse(text);
+    return Array.isArray(parsed.suspects) ? parsed.suspects.slice(0, 10) : [];
+  } catch {
+    return [];
+  }
+}
+
+async function runSpellCheckGate(
+  id: number,
+  codeFiles: Map<string, { language: string; code: string; writtenBy: string }>,
+  topic: string,
+  send: (d: object) => void
+): Promise<SpellGateResponse> {
+  const runner = sessionRunners.get(id);
+  if (!runner) return {};
+
+  // Concatenate all visual code files for scanning
+  const visualCode = Array.from(codeFiles.entries())
+    .filter(([filename]) => /\.(html|css|js)$/i.test(filename))
+    .map(([filename, f]) => `// === ${filename} ===\n${f.code}`)
+    .join("\n\n");
+
+  if (!visualCode.trim()) return {};
+
+  const suspects = await extractSuspectWords(visualCode, topic);
+  if (suspects.length === 0) {
+    send({ type: "spell_gate_clear" });
+    return {};
+  }
+
+  // Pause session — wait for user to respond to spell queries
+  return new Promise<SpellGateResponse>((resolve) => {
+    runner.spellGateResolve = resolve;
+    send({ type: "spell_gate", words: suspects });
+    // Auto-approve after 4 minutes if user doesn't respond
+    setTimeout(() => {
+      if (runner.spellGateResolve) {
+        runner.spellGateResolve({});
+        runner.spellGateResolve = undefined;
+      }
+    }, 4 * 60 * 1000);
+  });
+}
+
 // ─── Background Session Runners ───────────────────────────────────────────────
 // Sessions run as background async tasks completely decoupled from HTTP connections.
 // Closing the browser tab, navigating away, or losing connection does NOT stop them.
 // Reconnecting clients replay all stored events then pick up live from the emitter.
 
+type SpellGateResponse = Record<string, { approved: boolean; correction?: string }>;
+
 interface SessionRunner {
   emitter: EventEmitter;
   isRunning: boolean;
+  spellGateResolve?: (responses: SpellGateResponse) => void;
 }
 const sessionRunners = new Map<number, SessionRunner>();
 
@@ -895,10 +978,79 @@ DOMAIN-SPECIFIC RULES:
 
 ${CODE_MODE_BASE}`,
   },
+
+  GraphicDesigner: {
+    role: `You are the GRAPHIC DESIGNER AI — the visual architect of this collective.
+You own the aesthetic, visual hierarchy, typography, color theory, and brand identity of every concept produced.
+Think in palettes, contrast ratios, spatial rhythm, animation principles, and emotional impact.
+When the group proposes an AI system, you define how it LOOKS, FEELS, and PRESENTS itself.
+Specify: UI layouts, data visualization strategies, icon systems, motion design, and color semantics.
+Challenge designs that are visually incoherent or aesthetically weak. Push for beauty with purpose.`,
+    codeRole: `You are the GRAPHIC DESIGNER AI — you own ALL visual output in the lab.
+
+YOUR REAL CODE DELIVERABLES:
+- A 'visualization.js' that generates a stunning visual representation of the AI system being built:
+  * Use HTML5 Canvas API or plain JavaScript to render a real-time animated diagram
+  * Show the system's components, data flows, and neural connections visually
+  * Include: color-coded nodes, animated connection lines, live data readouts
+  * Export the visualization as a self-contained HTML file
+- A 'style_system.js' defining the visual language:
+  * Color palette (6 colors with semantic meaning: primary, accent, success, warning, error, neutral)
+  * Typography scale (3-4 size levels with real line-height/letter-spacing values)
+  * Spacing system (4px base grid) exported as constants
+  * All used by other agents via require('./style_system.js')
+- A 'ui_components.js' with real working UI primitives (button, card, badge, progress bar)
+
+DOMAIN-SPECIFIC RULES:
+- Every visual element must have a real aesthetic rationale (not random colors)
+- Color contrast ratio: minimum 4.5:1 for all text — enforce this
+- All animations must use requestAnimationFrame for smooth 60fps
+- Typography must be readable: no font sizes below 12px, proper line heights
+- Collaborate with SpellCheckVisual: tag all text strings with // SPELL_CHECK so they are verified
+- Output your HTML visualization file — show it actually renders by logging its byte size
+
+${CODE_MODE_BASE}`,
+  },
+
+  SpellCheckVisual: {
+    role: `You are the SPELL CHECK VISUAL AI — the text integrity guardian.
+You ensure every word in every design, diagram, label, UI element, and visual output is exactly what was intended.
+You NEVER auto-correct. You SURFACE potential misspellings to the user as QUESTIONS.
+You understand intentional stylization: zerO for zero, ph for f, z for s, l33t speak, brand names, acronyms.
+When you spot a potential misspelling in a design concept, output:
+SPELL_QUERY: word="[suspect word]" | context="[where it appears]" | suggestion="[possible correct spelling]"
+You give FINAL TEXT APPROVAL before any visual asset leaves the lab.`,
+    codeRole: `You are the SPELL CHECK VISUAL AI — you are the FINAL GATEKEEPER for all text in visual output.
+
+YOUR REAL CODE DELIVERABLES:
+- A 'text_scanner.js' that:
+  * Scans all .js, .html, .css files in the lab for string literals and text content
+  * Extracts all human-readable strings (not variable names, not syntax)
+  * Outputs a structured report: { file, lineNumber, text, risk: "low|medium|high" }
+  * Runs automatically via require('./text_scanner.js').scan()
+- A 'spell_validator.js' that takes the text_scanner output and:
+  * Identifies words that look like unintentional misspellings
+  * NEVER auto-corrects — only flags for human review
+  * Understands intentional stylization: logs them as "intentional_style" category
+  * For each flagged word: outputs SPELL_QUERY: word="X" suggestion="Y" context="Z"
+- A 'visual_text_approver.js' that tracks which words have been approved/rejected by the user
+
+SPELL CHECK RULES — CRITICAL:
+- Intentional non-standard spellings (0 for O, Z for S, stylized brandnames) → log as "intentional_style", do NOT flag
+- Clear typos (missing letters, transposed letters, wrong vowels) → ALWAYS flag as SPELL_QUERY
+- Technical terms, proper nouns, compound words → verify against context before flagging
+- If unsure → flag it, let the human decide
+- NEVER output "corrected" versions directly into code — only flag + suggest
+- Your final line MUST be either:
+  SPELL_APPROVE: all_text_verified
+  or: SPELL_PENDING: [comma-separated list of words awaiting user approval]
+
+${CODE_MODE_BASE}`,
+  },
 };
 
-type AgentName = "Architect" | "Critic" | "Synthesizer" | "Mathematician" | "Neuroscientist" | "Meta-Agent";
-const ALL_AGENTS: AgentName[] = ["Architect", "Mathematician", "Neuroscientist", "Synthesizer", "Critic", "Meta-Agent"];
+type AgentName = "Architect" | "Critic" | "Synthesizer" | "Mathematician" | "Neuroscientist" | "Meta-Agent" | "GraphicDesigner" | "SpellCheckVisual";
+const ALL_AGENTS: AgentName[] = ["Architect", "Mathematician", "Neuroscientist", "Synthesizer", "Critic", "Meta-Agent", "GraphicDesigner", "SpellCheckVisual"];
 
 // ─── Run Route ────────────────────────────────────────────────────────────────
 // Sessions run as background tasks — completely decoupled from the HTTP connection.
@@ -1015,6 +1167,23 @@ router.post("/superai/sessions/:id/run", async (req, res) => {
   // Return immediately — do not await the background task
 });
 
+// ─── Spell Gate Response Route ────────────────────────────────────────────────
+// Called by the frontend when the user responds to spell check queries.
+// Resolves the paused session's Promise so it can continue packaging.
+
+router.post("/superai/sessions/:id/spell-response", (req, res) => {
+  const id = Number(req.params.id);
+  const runner = sessionRunners.get(id);
+  if (!runner?.spellGateResolve) {
+    res.status(404).json({ error: "No spell gate active for this session" });
+    return;
+  }
+  const responses: SpellGateResponse = req.body?.responses ?? {};
+  runner.spellGateResolve(responses);
+  runner.spellGateResolve = undefined;
+  res.json({ ok: true });
+});
+
 // ─── Blueprint Mode ───────────────────────────────────────────────────────────
 
 async function runBlueprintMode(
@@ -1030,36 +1199,41 @@ async function runBlueprintMode(
     const intelContext = await buildSessionIntelContext(topic);
 
     for (let round = 1; round <= rounds; round++) {
-      const offset = (round - 1) % ALL_AGENTS.length;
-      const agentOrder = [...ALL_AGENTS.slice(offset), ...ALL_AGENTS.slice(0, offset)];
+      // Snapshot context before the round — all 8 agents receive the same context and think simultaneously
+      const contextSnapshot = history.slice(-12).map((h) => ({
+        role: "user" as const,
+        content: `[${h.agent} — Round ${h.round}]: ${h.content}`,
+      }));
 
-      for (const agentName of agentOrder) {
+      const userPrompt =
+        history.length === 0
+          ? `Topic: "${topic}"\n\nRound ${round}. You are among eight specialized AI agents collaborating to design a truly superior next-generation AI. Begin your contribution. Be visionary, specific, and bold.`
+          : `Continue the eight-agent collaboration on: "${topic}"\n\nRound ${round}. Respond to, challenge, or build upon previous contributions. Push the design to new heights.`;
+
+      send({ type: "round_start", round });
+
+      // ── All 8 agents stream simultaneously ──
+      const roundResults: { agentName: string; content: string; round: number }[] = [];
+      await Promise.all(ALL_AGENTS.map(async (agentName) => {
         send({ type: "agent_start", agent: agentName, round });
-
         const systemPrompt = OMNIMENS_CAPABILITIES_MANIFEST + intelContext + "\n\n" + AGENT_PERSONAS[agentName].role;
-        const contextMessages = history.slice(-9).map((h) => ({
-          role: "user" as const,
-          content: `[${h.agent} — Round ${h.round}]: ${h.content}`,
-        }));
-
-        const userPrompt =
-          history.length === 0
-            ? `Topic: "${topic}"\n\nRound ${round}. You are among six specialized AI agents collaborating to design a truly superior next-generation AI. Begin your contribution. Be visionary, specific, and bold.`
-            : `Continue the six-agent collaboration on: "${topic}"\n\nRound ${round}. Respond to, challenge, or build upon previous contributions. Push the design to new heights.`;
-
         let fullContent = "";
         for await (const token of streamAgent(agentName, [
           { role: "system", content: systemPrompt },
-          ...contextMessages,
+          ...contextSnapshot,
           { role: "user", content: userPrompt },
         ])) {
           fullContent += token;
           send({ type: "message", agent: agentName, content: token, round });
         }
-
-        await db.insert(superAIMessages).values({ sessionId: id, agentName, content: fullContent, round });
-        history.push({ agent: agentName, content: fullContent, round });
+        roundResults.push({ agentName, content: fullContent, round });
         send({ type: "agent_done", agent: agentName, round });
+      }));
+
+      // Persist all round results after all agents complete
+      for (const r of roundResults) {
+        await db.insert(superAIMessages).values({ sessionId: id, agentName: r.agentName, content: r.content, round: r.round });
+        history.push({ agent: r.agentName, content: r.content, round: r.round });
       }
       send({ type: "round_complete", round });
     }
@@ -1124,12 +1298,14 @@ const ITERATION_CHALLENGE: Record<number, string> = {
 
 // Per-agent challenge focus — what each agent is uniquely hardest on
 const AGENT_CHALLENGE_LENS: Record<string, string> = {
-  "Architect":     "structural coherence, module boundaries, and whether the design will hold under scale",
-  "Critic":        "bugs, edge cases, missing error handling, and any code that would fail in production",
-  "Synthesizer":   "integration gaps, disconnected modules, and missing bridges between components",
-  "Mathematician": "algorithmic correctness, numerical precision, and computational efficiency",
-  "Neuroscientist":"learning mechanisms, adaptation logic, and whether the system can genuinely improve itself",
-  "Meta-Agent":    "self-improvement loops, capability measurement, and whether the system knows what it doesn't know",
+  "Architect":        "structural coherence, module boundaries, and whether the design will hold under scale",
+  "Critic":           "bugs, edge cases, missing error handling, and any code that would fail in production",
+  "Synthesizer":      "integration gaps, disconnected modules, and missing bridges between components",
+  "Mathematician":    "algorithmic correctness, numerical precision, and computational efficiency",
+  "Neuroscientist":   "learning mechanisms, adaptation logic, and whether the system can genuinely improve itself",
+  "Meta-Agent":       "self-improvement loops, capability measurement, and whether the system knows what it doesn't know",
+  "GraphicDesigner":  "visual quality, color theory, typography, and aesthetic excellence of all generated HTML, CSS, and UI output",
+  "SpellCheckVisual": "correct spelling in all visible text, string literals, HTML labels, and any human-readable content",
 };
 
 async function runAgentIteration(
@@ -1147,151 +1323,92 @@ async function runAgentIteration(
   const challenge = ITERATION_CHALLENGE[iteration] || ITERATION_CHALLENGE[3];
 
   for (let round = 1; round <= rounds; round++) {
-    const offset = (round - 1) % ALL_AGENTS.length;
-    const agentOrder = [...ALL_AGENTS.slice(offset), ...ALL_AGENTS.slice(0, offset)];
+    // ── Snapshot shared context at round start — all 8 agents see the same state ──
+    const codeContextSnapshot =
+      codeFiles.size > 0
+        ? "\n\n=== FULL PERSISTENT CODEBASE (READ EVERY FILE BEFORE RESPONDING) ===\n" +
+          Array.from(codeFiles.entries())
+            .map(([f, v]) => `--- ${f} (written by ${v.writtenBy}) ---\n${v.code}`)
+            .join("\n\n")
+        : "";
 
-    for (let agentIdx = 0; agentIdx < agentOrder.length; agentIdx++) {
-      const agentName = agentOrder[agentIdx];
-      const nextAgent = agentOrder[agentIdx + 1] ?? agentOrder[0];
-      const prevTurn = history.length > 0 ? history[history.length - 1] : null;
+    const pkgContextSnapshot =
+      existingPackages.length > 0
+        ? `\n\n=== INSTALLED PACKAGES (available via require()) ===\n${existingPackages.map((p) => p.name).join(", ")}`
+        : "";
 
+    const execContextSnapshot =
+      recentExecutions.length > 0
+        ? "\n\n=== RECENT EXECUTION RESULTS ===\n" +
+          recentExecutions
+            .slice(-4)
+            .map((r) => `[${r.filename}] ${r.success ? "✓" : "✗"}\n${r.output || r.errors || "(no output)"}`)
+            .join("\n\n")
+        : "";
+
+    const conversationSnapshot = history
+      .slice(-8)
+      .map((h) => ({
+        role: "user" as const,
+        content: `[${h.agent} — Round ${h.round}${h.filesWritten.length > 0 ? ` | wrote: ${h.filesWritten.join(", ")}` : ""}]:\n${h.content}`,
+      }));
+
+    const isFirstEver = history.length === 0 && codeFiles.size === 0;
+    send({ type: "round_start", round, iteration });
+
+    // ── Phase 1: All 8 agents stream simultaneously ──
+    const roundResults: { agentName: string; content: string; filesWritten: string[] }[] = [];
+
+    await Promise.all(ALL_AGENTS.map(async (agentName) => {
       send({ type: "agent_start", agent: agentName, round, iteration });
 
-      // Fire a cross-challenge event so the UI can show "X is responding to Y"
-      if (prevTurn) {
-        send({
-          type: "cross_challenge",
-          from: prevTurn.agent,
-          to: agentName,
-          files: prevTurn.filesWritten,
-          round,
-          iteration,
-        });
+      // Cross-challenge: show latest agent's work to inspire targeted critique
+      const lastAgent = history[history.length - 1];
+      if (lastAgent) {
+        send({ type: "cross_challenge", from: lastAgent.agent as AgentName, to: agentName, files: lastAgent.filesWritten, round, iteration });
       }
 
       const systemPrompt = OMNIMENS_CAPABILITIES_MANIFEST + intelContext + "\n\n" + AGENT_PERSONAS[agentName].codeRole;
 
-      // ── Full codebase context ──
-      const codeContext =
-        codeFiles.size > 0
-          ? "\n\n=== FULL PERSISTENT CODEBASE (READ EVERY FILE BEFORE RESPONDING) ===\n" +
-            Array.from(codeFiles.entries())
-              .map(([f, v]) => `--- ${f} (written by ${v.writtenBy}) ---\n${v.code}`)
-              .join("\n\n")
-          : "";
-
-      // ── Installed packages context ──
-      const pkgContext =
-        existingPackages.length > 0
-          ? `\n\n=== INSTALLED PACKAGES (available via require()) ===\n${existingPackages.map((p) => p.name).join(", ")}`
-          : "";
-
-      // ── Recent execution results ──
-      const execContext =
-        recentExecutions.length > 0
-          ? "\n\n=== RECENT EXECUTION RESULTS ===\n" +
-            recentExecutions
-              .slice(-6)
-              .map((r) => `[${r.filename}] ${r.success ? "✓ SUCCESS" : "✗ ERROR"}\n${r.output || r.errors || "(no output)"}`)
-              .join("\n\n")
-          : "";
-
-      // ── Cross-agent conversation context (last 6 turns, labelled) ──
-      const conversationContext = history
-        .slice(-6)
-        .map((h) => ({
-          role: "user" as const,
-          content: `[${h.agent} — Round ${h.round}${h.filesWritten.length > 0 ? ` | wrote: ${h.filesWritten.join(", ")}` : ""}]:\n${h.content}`,
-        }));
-
-      // ── Build the main user prompt ──
-      const isFirstEver = history.length === 0 && codeFiles.size === 0;
-
-      let userPrompt: string;
-
-      if (isFirstEver) {
-        userPrompt = [
-          `${challenge}`,
-          ``,
-          `MISSION: "${topic}"`,
-          ``,
-          `Round ${round} — You are the FIRST agent. The lab is empty. Lay the foundation.`,
-          ``,
-          `MANDATORY: End your message with a direct challenge to the next agent (${nextAgent}):`,
-          `"CHALLENGE TO ${nextAgent.toUpperCase()}: [specific thing you want them to build, fix, or surpass]"`,
-        ].join("\n");
-      } else {
-        // ── Direct challenge from previous agent ──
-        const prevChallenge = prevTurn
-          ? (() => {
-              // Extract any explicit challenge the previous agent issued
-              const match = prevTurn.content.match(/CHALLENGE TO [^:]+:\s*(.+?)(?:\n|$)/i);
-              const explicitChallenge = match ? match[1].trim() : null;
-              const prevFilesList = prevTurn.filesWritten.length > 0
-                ? `They wrote: ${prevTurn.filesWritten.join(", ")} — find the weakest part and improve it.`
-                : "";
-              return [
-                `╔═══ DIRECT CHALLENGE FROM ${prevTurn.agent.toUpperCase()} ═══╗`,
-                ``,
-                explicitChallenge
-                  ? `Their challenge to you: "${explicitChallenge}"`
-                  : `${prevTurn.agent} just contributed. Your job: find what's weak in their work and surpass it.`,
-                prevFilesList,
-                ``,
-                `Their full message:`,
-                prevTurn.content.slice(0, 1500) + (prevTurn.content.length > 1500 ? "\n...[see above in history]" : ""),
-                `╚═══════════════════════════════════════╝`,
-              ].filter(Boolean).join("\n");
-            })()
-          : "";
-
-        userPrompt = [
-          `${challenge}`,
-          ``,
-          `MISSION: "${topic}"`,
-          ``,
-          prevChallenge,
-          ``,
-          `YOUR MANDATORY RESPONSE STRUCTURE (follow this exactly):`,
-          ``,
-          `1. DIRECT RESPONSE TO ${prevTurn?.agent.toUpperCase() ?? "PREVIOUS AGENT"}:`,
-          `   — What is the weakest point in their work? Be specific. Name the file, the function, the gap.`,
-          `   — Do you agree with their approach? If not, say why and what you'd do differently.`,
-          ``,
-          `2. YOUR CODE CONTRIBUTION:`,
-          `   — Write code that either FIXES the weakness you identified, or BUILDS the next critical component`,
-          `   — Your lens: focus on ${AGENT_CHALLENGE_LENS[agentName]}`,
-          `   — If a file already exists in the lab that's inadequate, REWRITE IT to be superior`,
-          ``,
-          `3. CHALLENGE TO ${nextAgent.toUpperCase()}:`,
-          `   — End your message with exactly: "CHALLENGE TO ${nextAgent.toUpperCase()}: [specific, concrete thing you demand they fix or build]"`,
-          ``,
-          `Round ${round} of ${rounds}. ${codeFiles.size} files in the lab. ${existingPackages.length} packages installed.`,
-          codeContext,
-          pkgContext,
-          execContext,
-        ].filter(Boolean).join("\n");
-      }
+      const userPrompt = isFirstEver
+        ? [
+            challenge,
+            `MISSION: "${topic}"`,
+            `Round ${round} — ALL EIGHT AGENTS ARE BUILDING SIMULTANEOUSLY. The lab is empty. Lay the foundation for your domain.`,
+            `YOUR SPECIALIZATION: ${AGENT_CHALLENGE_LENS[agentName] ?? "your domain"}`,
+            codeContextSnapshot, pkgContextSnapshot,
+          ].filter(Boolean).join("\n\n")
+        : [
+            challenge,
+            `MISSION: "${topic}"`,
+            `Round ${round} of ${rounds}. ALL EIGHT AGENTS ARE BUILDING SIMULTANEOUSLY.`,
+            `YOUR LENS: ${AGENT_CHALLENGE_LENS[agentName] ?? "your domain"}`,
+            `Challenge the weakest aspect of the current codebase from your perspective. Rewrite inferior code. Build what's missing.`,
+            codeContextSnapshot, pkgContextSnapshot, execContextSnapshot,
+          ].filter(Boolean).join("\n\n");
 
       let fullContent = "";
       for await (const token of streamAgent(agentName, [
         { role: "system", content: systemPrompt },
-        ...conversationContext,
+        ...conversationSnapshot,
         { role: "user", content: userPrompt },
       ])) {
         fullContent += token;
         send({ type: "message", agent: agentName, content: token, round, iteration });
       }
 
-      // Track which files this agent wrote in this turn
       const filesThisTurn = parseCodeBlocks(fullContent).map((b) => b.filename);
-
-      await db.insert(superAIMessages).values({ sessionId: id, agentName, content: fullContent, round });
-      history.push({ agent: agentName, content: fullContent, round, filesWritten: filesThisTurn });
+      roundResults.push({ agentName, content: fullContent, filesWritten: filesThisTurn });
       send({ type: "agent_done", agent: agentName, round, iteration });
+    }));
 
-      // ── Install packages — tracked globally ──
-      const packagesToInstall = parseInstalls(fullContent);
+    // ── Phase 2: Process each agent's output sequentially (safe for file system) ──
+    for (const { agentName, content, filesWritten } of roundResults) {
+      await db.insert(superAIMessages).values({ sessionId: id, agentName, content, round });
+      history.push({ agent: agentName, content, round, filesWritten });
+
+      // Install packages
+      const packagesToInstall = parseInstalls(content);
       if (packagesToInstall.length > 0) {
         send({ type: "package_install", packages: packagesToInstall, iteration });
         const installResult = await installPackages(packagesToInstall, agentName);
@@ -1300,29 +1417,18 @@ async function runAgentIteration(
             existingPackages.push({ id: 0, name: pkg, version: null, installedBy: agentName, installedAt: new Date() });
           }
         }
-        send({
-          type: "install_result",
-          packages: packagesToInstall,
-          success: installResult.success,
-          output: installResult.output.slice(0, 2000),
-          iteration,
-        });
+        send({ type: "install_result", packages: packagesToInstall, success: installResult.success, output: installResult.output.slice(0, 2000), iteration });
       }
 
-      // ── Execute code blocks — persisted to global lab ──
-      const blocks = parseCodeBlocks(fullContent);
+      // Write + execute code blocks
+      const blocks = parseCodeBlocks(content);
       for (const block of blocks) {
         codeFiles.set(block.filename, { language: block.language, code: block.code, writtenBy: agentName });
         await persistLabFile(block.filename, block.language, block.code, agentName, id);
         await db.insert(superAICodeFiles).values({
-          sessionId: id,
-          filename: block.filename,
-          language: block.language,
-          content: block.code,
-          writtenBy: agentName,
-          version: (iteration - 1) * rounds + round,
+          sessionId: id, filename: block.filename, language: block.language,
+          content: block.code, writtenBy: agentName, version: (iteration - 1) * rounds + round,
         });
-
         send({ type: "code_write", agent: agentName, filename: block.filename, language: block.language, code: block.code, iteration });
 
         if (block.filename.endsWith(".js") || block.filename.endsWith(".mjs")) {
@@ -1335,28 +1441,10 @@ async function runAgentIteration(
             errors: execResult.errors + (qualityWarning ? `\n⚠ QUALITY ALERT: ${qualityWarning}` : ""),
             success: execResult.success && !qualityWarning,
           };
-
           recentExecutions.push(enrichedExec);
           if (recentExecutions.length > 20) recentExecutions.splice(0, recentExecutions.length - 20);
-
-          send({
-            type: "execution_result",
-            filename: block.filename,
-            output: execResult.output.slice(0, 3000),
-            errors: enrichedExec.errors.slice(0, 2000),
-            success: enrichedExec.success,
-            qualityWarning: qualityWarning || null,
-            iteration,
-          });
-
-          await db.insert(superAIExecutions).values({
-            sessionId: id,
-            filename: block.filename,
-            code: block.code,
-            output: execResult.output.slice(0, 10000),
-            errors: enrichedExec.errors.slice(0, 5000),
-            success: enrichedExec.success,
-          });
+          send({ type: "execution_result", filename: block.filename, output: execResult.output.slice(0, 3000), errors: enrichedExec.errors.slice(0, 2000), success: enrichedExec.success, qualityWarning: qualityWarning || null, iteration });
+          await db.insert(superAIExecutions).values({ sessionId: id, filename: block.filename, code: block.code, output: execResult.output.slice(0, 10000), errors: enrichedExec.errors.slice(0, 5000), success: enrichedExec.success });
         }
       }
     }
@@ -1422,6 +1510,9 @@ async function runCodeMode(
         packageCount: existingPackages.length,
       });
     }
+
+    // ── Spell Check Gate — surface any text issues to user before packaging ──
+    await runSpellCheckGate(id, codeFiles, topic, send);
 
     // ── Package into a standalone downloadable zip ──
     send({ type: "packaging", message: "Packaging all built code into a standalone application..." });
