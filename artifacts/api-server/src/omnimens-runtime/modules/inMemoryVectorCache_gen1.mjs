@@ -1,99 +1,121 @@
 /**
  * @module inMemoryVectorCache
- * @description A lightweight in-memory LRU cache for embeddings and semantic data, designed for fast retrieval and reasoning.
+ * @description Provides a fast in-memory caching mechanism for embeddings and vectorized data
+ *              using an LRU cache and efficient vector similarity search.
  */
 
 /**
- * Class representing an in-memory LRU cache.
+ * LRUCache class to manage least-recently-used caching.
+ * Stores embeddings and provides efficient similarity search.
  */
-class InMemoryVectorCache {
+class LRUCache {
   /**
-   * Creates an instance of InMemoryVectorCache.
-   * @param {number} maxSize - The maximum number of items the cache can hold.
+   * @param {number} capacity - Maximum number of items the cache can hold.
    */
-  constructor(maxSize = 100) {
-    if (maxSize <= 0) {
-      throw new Error('Cache size must be greater than 0.');
+  constructor(capacity) {
+    if (capacity <= 0) {
+      throw new Error('Cache capacity must be greater than zero.');
     }
-    this.maxSize = maxSize;
-    this.cache = new Map(); // Using Map to maintain insertion order for LRU logic
+    this.capacity = capacity;
+    this.cache = new Map(); // Stores key-value pairs
+    this.keys = new Set(); // Maintains the order of keys for LRU
   }
 
   /**
-   * Adds or updates an item in the cache.
-   * @param {string} key - The unique key for the item.
-   * @param {Array<number>} embedding - The embedding vector to cache.
+   * Adds a vector to the cache.
+   * @param {string} key - Unique identifier for the vector.
+   * @param {Array<number>} vector - The vector to cache.
    */
-  set(key, embedding) {
-    if (typeof key !== 'string') {
-      throw new TypeError('Key must be a string.');
-    }
-    if (!Array.isArray(embedding) || !embedding.every((val) => typeof val === 'number')) {
-      throw new TypeError('Embedding must be an array of numbers.');
+  set(key, vector) {
+    if (!Array.isArray(vector) || vector.some(isNaN)) {
+      throw new Error('Vector must be an array of numbers.');
     }
 
-    // If the key already exists, delete it to update its position in the LRU order
     if (this.cache.has(key)) {
-      this.cache.delete(key);
-    }
-
-    this.cache.set(key, embedding);
-
-    // If the cache exceeds the maximum size, remove the least recently used item
-    if (this.cache.size > this.maxSize) {
-      const oldestKey = this.cache.keys().next().value;
+      this.keys.delete(key);
+    } else if (this.cache.size >= this.capacity) {
+      const oldestKey = this.keys.values().next().value;
+      this.keys.delete(oldestKey);
       this.cache.delete(oldestKey);
     }
+
+    this.cache.set(key, vector);
+    this.keys.add(key);
   }
 
   /**
-   * Retrieves an item from the cache.
-   * @param {string} key - The unique key for the item.
-   * @returns {Array<number>|undefined} The cached embedding or undefined if not found.
+   * Retrieves a vector from the cache.
+   * @param {string} key - Unique identifier for the vector.
+   * @returns {Array<number>|undefined} - The cached vector or undefined if not found.
    */
   get(key) {
-    if (typeof key !== 'string') {
-      throw new TypeError('Key must be a string.');
-    }
+    if (!this.cache.has(key)) return undefined;
 
-    if (!this.cache.has(key)) {
-      return undefined;
-    }
+    // Update LRU order
+    this.keys.delete(key);
+    this.keys.add(key);
 
-    // Move the accessed item to the end to mark it as recently used
-    const value = this.cache.get(key);
-    this.cache.delete(key);
-    this.cache.set(key, value);
-
-    return value;
+    return this.cache.get(key);
   }
 
   /**
-   * Checks if a key exists in the cache.
-   * @param {string} key - The unique key for the item.
-   * @returns {boolean} True if the key exists, false otherwise.
+   * Finds the most similar vector in the cache based on cosine similarity.
+   * @param {Array<number>} queryVector - The query vector.
+   * @returns {{ key: string, similarity: number }|null} - The most similar vector's key and similarity score, or null if cache is empty.
    */
-  has(key) {
-    if (typeof key !== 'string') {
-      throw new TypeError('Key must be a string.');
+  findMostSimilar(queryVector) {
+    if (!Array.isArray(queryVector) || queryVector.some(isNaN)) {
+      throw new Error('Query vector must be an array of numbers.');
     }
-    return this.cache.has(key);
+
+    let bestMatch = null;
+    let highestSimilarity = -Infinity;
+
+    for (const [key, vector] of this.cache.entries()) {
+      const similarity = this._cosineSimilarity(queryVector, vector);
+      if (similarity > highestSimilarity) {
+        highestSimilarity = similarity;
+        bestMatch = { key, similarity };
+      }
+    }
+
+    return bestMatch;
   }
 
   /**
-   * Clears all items from the cache.
+   * Computes the cosine similarity between two vectors.
+   * @private
+   * @param {Array<number>} vecA - First vector.
+   * @param {Array<number>} vecB - Second vector.
+   * @returns {number} - Cosine similarity score.
    */
-  clear() {
-    this.cache.clear();
-  }
+  _cosineSimilarity(vecA, vecB) {
+    if (vecA.length !== vecB.length) {
+      throw new Error('Vectors must have the same length.');
+    }
 
-  /**
-   * Gets the current size of the cache.
-   * @returns {number} The number of items in the cache.
-   */
-  size() {
-    return this.cache.size;
+    const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
+    const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
+    const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
+
+    return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
   }
 }
 
-export default InMemoryVectorCache;
+/**
+ * Creates a new LRUCache instance.
+ * @param {number} capacity - Maximum number of items the cache can hold.
+ * @returns {LRUCache} - A new LRUCache instance.
+ */
+export function createCache(capacity) {
+  return new LRUCache(capacity);
+}
+
+/**
+ * Example usage:
+ * const cache = createCache(100);
+ * cache.set('vector1', [0.1, 0.2, 0.3]);
+ * cache.set('vector2', [0.4, 0.5, 0.6]);
+ * const mostSimilar = cache.findMostSimilar([0.1, 0.2, 0.3]);
+ * console.log(mostSimilar);
+ */
