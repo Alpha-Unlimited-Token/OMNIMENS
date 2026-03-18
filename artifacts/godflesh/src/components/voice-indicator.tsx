@@ -29,7 +29,7 @@ export function VoiceIndicator({ isSpeaking, binaryStream }: VoiceIndicatorProps
                 className="block w-[2px] rounded-full bg-primary"
                 animate={{ height: ["4px", "12px", "4px"] }}
                 transition={{
-                  repeat: Infinity,
+                  repeat: 1e9,
                   duration: 0.6,
                   delay: i * 0.12,
                   ease: "easeInOut",

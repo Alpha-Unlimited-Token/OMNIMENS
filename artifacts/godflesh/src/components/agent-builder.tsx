@@ -182,7 +182,7 @@ function StepRow({ step, index }: { step: BuildStep; index: number }) {
       {isActive && (
         <motion.span
           animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ repeat: Infinity, duration: 1.2 }}
+          transition={{ repeat: 1e9, duration: 1.2 }}
           className="font-mono text-[9px] shrink-0"
           style={{ color: V }}>
           working...
@@ -543,7 +543,7 @@ export function AgentBuildPanel({
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   {state.status === "building" ? (
-                    <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5 }}
+                    <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: 1e9, duration: 1.5 }}
                       className="font-mono text-[9px]" style={{ color: V }}>building...</motion.span>
                   ) : (
                     <span className="font-mono text-[9px] text-green-400">✓ done</span>
@@ -622,7 +622,7 @@ export function AgentBuildPanel({
           <div className="flex items-center gap-2">
             <span className="font-mono text-[10px] tracking-widest font-bold uppercase" style={{ color: V }}>OMNIMENS AGENT</span>
             {state.status === "building" && (
-              <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5 }}
+              <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: 1e9, duration: 1.5 }}
                 className="font-mono text-[9px] text-white/35">building...</motion.span>
             )}
             {state.status === "done" && <span className="font-mono text-[9px] text-green-400">✓ complete</span>}
