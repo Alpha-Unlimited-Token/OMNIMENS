@@ -118,6 +118,7 @@ A transcendent sci-fi AI chat platform matching and surpassing the capabilities 
 - `lib/omnimens-custom-instructions.ts` — 9 personas (incl. GAME_BUILDER) + custom context injection
 - `lib/web-search.ts` — web search integration
 - `lib/omnimens-learning.ts` — Learning AI engine: Multi-dimensional adversarial critic (6-axis scoring + hallucination detection + red-team checks), intrinsic metacognitive self-reflection (dual-process System 1/2 analysis, confidence calibration, counterfactual reasoning, procedural skill learning), emotional intelligence analyzer, proactive anticipation, learning memory store, full per-user learning cycle (DeepMind SIMA / AWS Learning Agent / CoALA / SOFAI architectures)
+- `lib/omnimens-agent-spiders.ts` — Agent Intelligence Spiders: 9 dedicated web spiders (one per agent + OMNIMENS master spider) that autonomously scour the internet for domain-specific intelligence and beacon findings back to their parent agents. Each spider has curated hunting grounds, deep-dive URLs, relevance thresholds, and sends beacon signals that inject knowledge directly into OMNIMENS's brain. Runs every 3 hours in batches of 3.
 - `lib/omnimens-physio.ts` — Physical Therapy AI engine: red flag screening, psychosocial scoring (PHQ-2/TSK/PCS), phase-based exercise library (lower back/knee/shoulder/cervical/hip/ankle), adaptive program generation, PROMIS-PF/DASH/KOOS/LEFS/NDI/PSFS/NPRS/GROC outcome measures, integrative recovery recommendations, pain science education library
 
 ### Credit System
