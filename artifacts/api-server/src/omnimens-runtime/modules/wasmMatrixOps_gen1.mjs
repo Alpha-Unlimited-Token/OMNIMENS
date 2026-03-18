@@ -1,90 +1,105 @@
-// wasmMatrixOps.js
-
 /**
- * @file wasmMatrixOps.js
- * @description A utility module for efficient matrix operations using WebAssembly in Node.js.
- * This module integrates WebAssembly bindings to perform parallelized matrix computations.
+ * wasmMatrixOps: Perform efficient matrix operations and lightweight neural network inference using WebAssembly.
+ * This module provides optimized matrix multiplication and basic linear algebra operations leveraging WebAssembly for CPU parallelism.
+ * It is designed to enhance AI inference capabilities by enabling high-performance computations within Node.js environments.
  */
 
-/**
- * @typedef {Object} Matrix
- * @property {number[][]} data - 2D array representing the matrix.
- * @property {number} rows - Number of rows in the matrix.
- * @property {number} cols - Number of columns in the matrix.
- */
+// Import WebAssembly utilities from Node.js
+const { readFileSync } = require('fs');
+const { join } = require('path');
 
 /**
- * @typedef {Object} WASMModule
- * @property {Function} multiply - Function to perform matrix multiplication.
- * @property {Function} transpose - Function to transpose a matrix.
+ * Load and compile the WebAssembly module for matrix operations.
+ * The WASM binary is precompiled and stored as 'matrix_ops.wasm' in the same directory.
+ * @returns {Promise<WebAssembly.Instance>} Compiled WebAssembly instance.
  */
-
-const fs = require('fs');
-const path = require('path');
-
-/**
- * Loads the WebAssembly module from the file system.
- * @returns {Promise<WebAssembly.Instance>} The WebAssembly instance.
- */
-async function loadWASM() {
-  const wasmPath = path.join(__dirname, 'matrix_ops.wasm');
-  const wasmBuffer = fs.readFileSync(wasmPath);
-  const wasmModule = await WebAssembly.instantiate(wasmBuffer);
-  return wasmModule.instance;
+async function loadWasmModule() {
+  const wasmPath = join(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = readFileSync(wasmPath);
+  const wasmModule = await WebAssembly.compile(wasmBuffer);
+  return WebAssembly.instantiate(wasmModule);
 }
 
 /**
- * Initializes the WebAssembly module and exposes matrix operations.
- * @returns {Promise<WASMModule>} The initialized WebAssembly module with matrix operations.
+ * Perform matrix multiplication using WebAssembly.
+ * @param {number[][]} matrixA - The first matrix (2D array).
+ * @param {number[][]} matrixB - The second matrix (2D array).
+ * @returns {Promise<number[][]>} The result of the matrix multiplication.
+ * @throws {Error} If input matrices are invalid or dimensions are incompatible.
  */
-async function initializeWASMModule() {
-  const instance = await loadWASM();
-  const { exports } = instance;
+async function multiplyMatrices(matrixA, matrixB) {
+  // Validate input matrices
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+    throw new Error('Both inputs must be 2D arrays.');
+  }
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Matrix dimensions are incompatible for multiplication.');
+  }
 
-  return {
-    /**
-     * Multiplies two matrices using WebAssembly.
-     * @param {Matrix} matA - First matrix.
-     * @param {Matrix} matB - Second matrix.
-     * @returns {Matrix} Resulting matrix after multiplication.
-     */
-    multiply(matA, matB) {
-      if (matA.cols !== matB.rows) {
-        throw new Error('Matrix dimensions do not match for multiplication.');
-      }
+  // Flatten matrices for WASM input
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const colsB = matrixB[0].length;
 
-      const result = new Array(matA.rows).fill(0).map(() => new Array(matB.cols).fill(0));
+  // Load and execute the WASM module
+  const wasmInstance = await loadWasmModule();
+  const { memory, multiply } = wasmInstance.exports;
 
-      for (let i = 0; i < matA.rows; i++) {
-        for (let j = 0; j < matB.cols; j++) {
-          for (let k = 0; k < matA.cols; k++) {
-            result[i][j] += matA.data[i][k] * matB.data[k][j];
-          }
-        }
-      }
+  // Allocate memory for input and output
+  const offsetA = 0;
+  const offsetB = offsetA + flatA.length * 4; // 4 bytes per float32
+  const offsetC = offsetB + flatB.length * 4;
+  const resultLength = rowsA * colsB;
 
-      return { data: result, rows: matA.rows, cols: matB.cols };
-    },
+  // Write data into WASM memory
+  const wasmMemory = new Float32Array(memory.buffer);
+  wasmMemory.set(flatA, offsetA / 4);
+  wasmMemory.set(flatB, offsetB / 4);
 
-    /**
-     * Transposes a matrix using WebAssembly.
-     * @param {Matrix} matrix - Matrix to transpose.
-     * @returns {Matrix} Transposed matrix.
-     */
-    transpose(matrix) {
-      const result = new Array(matrix.cols).fill(0).map(() => new Array(matrix.rows).fill(0));
+  // Perform multiplication
+  multiply(offsetA, offsetB, offsetC, rowsA, colsA, colsB);
 
-      for (let i = 0; i < matrix.rows; i++) {
-        for (let j = 0; j < matrix.cols; j++) {
-          result[j][i] = matrix.data[i][j];
-        }
-      }
+  // Read the result from WASM memory
+  const result = wasmMemory.slice(offsetC / 4, offsetC / 4 + resultLength);
 
-      return { data: result, rows: matrix.cols, cols: matrix.rows };
-    }
-  };
+  // Convert the flat result back to a 2D array
+  const resultMatrix = [];
+  for (let i = 0; i < rowsA; i++) {
+    resultMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
+  }
+
+  return resultMatrix;
 }
+
+/**
+ * Example usage of the wasmMatrixOps module.
+ * Demonstrates matrix multiplication.
+ */
+async function exampleUsage() {
+  const matrixA = [
+    [1, 2, 3],
+    [4, 5, 6]
+  ];
+  const matrixB = [
+    [7, 8],
+    [9, 10],
+    [11, 12]
+  ];
+
+  try {
+    const result = await multiplyMatrices(matrixA, matrixB);
+    console.log('Matrix Multiplication Result:', result);
+  } catch (error) {
+    console.error('Error:', error.message);
+  }
+}
+
+// Uncomment to run the example
+// exampleUsage();
 
 module.exports = {
-  initializeWASMModule
+  loadWasmModule,
+  multiplyMatrices
 };

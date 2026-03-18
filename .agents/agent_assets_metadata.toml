@@ -6,3 +6,9 @@ id = "5TQKPor_raRgzrkp52r3C"
 uri = "file://PREMIUM_TOOLS_LIST.txt"
 type = "text"
 title = "OMNIMENS Premium Paid Tools — Full List with Pricing"
+
+[[outputs]]
+id = "x0jI1j8ZhDrbhxi2KtJvr"
+uri = "file://.local/private/OMNIMENS-Licensing-Analysis.zip"
+type = "unspecified"
+title = "OMNIMENS Proprietary Technology Licensing Analysis"
