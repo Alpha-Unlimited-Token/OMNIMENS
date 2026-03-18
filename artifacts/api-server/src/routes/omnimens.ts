@@ -1499,6 +1499,11 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
     // Reasoning models (o3-mini) don't support temperature / max_tokens
     const isReasoningModel = selectedModel.startsWith("o3") || selectedModel.startsWith("o4");
 
+    // Vision override: Together AI doesn't support image content — force a vision-capable OpenAI model
+    if (visionContent.length > 0 && isTogetherModel(selectedModel)) {
+      selectedModel = "gpt-4o";
+    }
+
     // Route to Together AI for open-source models, OpenAI for everything else
     const usingTogether = isTogetherModel(selectedModel);
     const togetherClient = usingTogether ? getTogetherClient() : null;
