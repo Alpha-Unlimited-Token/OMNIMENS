@@ -56,7 +56,7 @@ import {
   omnimensPhysioSessions,
   omnimensPhysioOutcomes,
 } from "@workspace/db";
-import { checkAndGrantMonthlyCredits, attemptAutoTopup, createSetupSession, confirmWalletSetup, removeWallet, getBillingSummary, LOYALTY_TIERS, FREE_MONTHLY_CREDITS, RESONANCE_PACKS, purchaseResonanceCredits, settleResonanceBalance } from "../lib/omnimens-billing.js";
+import { checkAndGrantMonthlyCredits, attemptAutoTopup, createSetupSession, confirmWalletSetup, removeWallet, getBillingSummary, LOYALTY_TIERS, FREE_MONTHLY_CREDITS, RESONANCE_PACKS, purchaseResonanceCredits, settleOutstandingBalance } from "../lib/omnimens-billing.js";
 import { getOrCreateConversation, saveMessage, generateConversationTitle, loadConversationHistory, listConversations, deleteConversation } from "../lib/omnimens-conversations.js";
 import { generate3DModel } from "../lib/omnimens-3d.js";
 import { generateGame } from "../lib/omnimens-game.js";
@@ -3100,9 +3100,64 @@ router.post("/omnimens/remove-wallet", async (req, res) => {
       res.status(402).json({ error: result.error || "Cannot remove wallet — outstanding balance." });
       return;
     }
-    res.json({ ok: true });
+    res.json({
+      ok: true,
+      ...(result.chargedCents ? { settled: true, chargedCents: result.chargedCents, chargedDollars: (result.chargedCents / 100).toFixed(2) } : {}),
+    });
   } catch (err: any) {
     res.status(500).json({ error: "Failed to remove wallet", detail: String(err?.message || err) });
+  }
+});
+
+// ─── Delete / cancel account ─────────────────────────────────────────────────
+
+router.post("/omnimens/delete-account", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    res.status(401).json({ error: "Not authenticated" });
+    return;
+  }
+
+  const userId = req.user.id;
+
+  if (isOwner(userId)) {
+    res.status(403).json({ error: "System architect account cannot be deleted." });
+    return;
+  }
+
+  try {
+    const settlement = await settleOutstandingBalance(userId);
+    if (!settlement.settled) {
+      res.status(402).json({
+        error: settlement.error || "Outstanding balance must be settled before account deletion.",
+        details: settlement.details,
+        outstandingBalance: true,
+      });
+      return;
+    }
+
+    await db.delete(omnimensCreditTransactions).where(eq(omnimensCreditTransactions.userId, userId));
+    await db.delete(omnimensMessages).where(eq(omnimensMessages.userId, userId));
+    await db.delete(omnimensConversations).where(eq(omnimensConversations.userId, userId));
+    await db.delete(omnimensMemories).where(eq(omnimensMemories.userId, userId));
+    await db.delete(omnimensCustomInstructions).where(eq(omnimensCustomInstructions.userId, userId));
+    await db.delete(omnimensNotifications).where(eq(omnimensNotifications.userId, userId));
+    await db.delete(omnimensUsage).where(eq(omnimensUsage.userId, userId));
+    await db.delete(omnimensUsers).where(eq(omnimensUsers.id, userId));
+
+    console.log(`[ACCOUNT DELETION] User ${userId} account deleted. Settlement: $${(settlement.totalChargedCents / 100).toFixed(2)}`);
+
+    res.json({
+      ok: true,
+      ...(settlement.totalChargedCents > 0 ? {
+        settled: true,
+        chargedCents: settlement.totalChargedCents,
+        chargedDollars: (settlement.totalChargedCents / 100).toFixed(2),
+        settlementDetails: settlement.details,
+      } : {}),
+    });
+  } catch (err: any) {
+    console.error("[ACCOUNT DELETION] Error:", err);
+    res.status(500).json({ error: "Failed to delete account", detail: String(err?.message || err) });
   }
 });
 

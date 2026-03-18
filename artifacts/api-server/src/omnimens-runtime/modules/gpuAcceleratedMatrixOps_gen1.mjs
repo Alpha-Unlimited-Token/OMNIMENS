@@ -1,126 +1,157 @@
 /**
- * gpuAcceleratedMatrixOps.js
- * A module for GPU-accelerated matrix operations using WebGL for parallel computation.
- * Designed to enable efficient handling of large-scale matrix calculations.
- * This module is self-contained and works in Node.js 20+.
+ * gpuAcceleratedMatrixOps Module
+ * This module provides GPU-accelerated matrix operations using WebGPU for high-performance linear algebra computations.
+ * It is designed to enhance OMNIMENS's neural computations and embeddings processing capabilities.
  */
-
-'use strict';
 
 /**
- * Initializes a WebGL context for GPU computations.
- * @returns {WebGLRenderingContext} A WebGL rendering context.
- * @throws {Error} If WebGL is not supported in the environment.
+ * Initialize a WebGPU context.
+ * @returns {Promise<GPUDevice>} A promise that resolves to the GPUDevice instance.
+ * @throws {Error} If WebGPU is not supported or initialization fails.
  */
-function initializeWebGLContext() {
-  const { createCanvas } = require('node-canvas-webgl');
-  const canvas = createCanvas(1, 1);
-  const gl = canvas.getContext('webgl');
-
-  if (!gl) {
-    throw new Error('WebGL is not supported in this environment.');
+export async function initializeGPU() {
+  if (!navigator.gpu) {
+    throw new Error('WebGPU is not supported in this environment.');
   }
 
-  return gl;
+  const adapter = await navigator.gpu.requestAdapter();
+  if (!adapter) {
+    throw new Error('Failed to get GPU adapter.');
+  }
+
+  const device = await adapter.requestDevice();
+  return device;
 }
 
 /**
- * Compiles a WebGL shader.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {number} type - The type of shader (gl.VERTEX_SHADER or gl.FRAGMENT_SHADER).
- * @param {string} source - The GLSL source code for the shader.
- * @returns {WebGLShader} The compiled shader.
- * @throws {Error} If shader compilation fails.
- */
-function compileShader(gl, type, source) {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    const error = gl.getShaderInfoLog(shader);
-    gl.deleteShader(shader);
-    throw new Error(`Shader compilation failed: ${error}`);
-  }
-
-  return shader;
-}
-
-/**
- * Links a WebGL program using vertex and fragment shaders.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {WebGLShader} vertexShader - The compiled vertex shader.
- * @param {WebGLShader} fragmentShader - The compiled fragment shader.
- * @returns {WebGLProgram} The linked WebGL program.
- * @throws {Error} If program linking fails.
- */
-function createProgram(gl, vertexShader, fragmentShader) {
-  const program = gl.createProgram();
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
-
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    const error = gl.getProgramInfoLog(program);
-    gl.deleteProgram(program);
-    throw new Error(`Program linking failed: ${error}`);
-  }
-
-  return program;
-}
-
-/**
- * Performs a matrix multiplication operation on the GPU.
+ * Perform a GPU-accelerated matrix multiplication.
+ * @param {GPUDevice} device - The GPU device obtained from initializeGPU().
  * @param {Float32Array} matrixA - The first matrix (flattened, row-major order).
  * @param {Float32Array} matrixB - The second matrix (flattened, row-major order).
- * @param {number} rowsA - The number of rows in matrix A.
- * @param {number} colsA - The number of columns in matrix A.
- * @param {number} colsB - The number of columns in matrix B.
- * @returns {Float32Array} The resulting matrix (flattened, row-major order).
- * @throws {Error} If matrix dimensions are incompatible.
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA (and rows in matrixB).
+ * @param {number} colsB - Number of columns in matrixB.
+ * @returns {Promise<Float32Array>} A promise that resolves to the resulting matrix (flattened, row-major order).
+ * @throws {Error} If the dimensions are incompatible for multiplication.
  */
-function gpuMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
+export async function gpuMatrixMultiply(device, matrixA, matrixB, rowsA, colsA, colsB) {
   if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
-    throw new Error('Matrix dimensions are incompatible for multiplication.');
+    throw new Error('Matrix dimensions do not match the provided sizes.');
   }
 
-  const gl = initializeWebGLContext();
+  const resultSize = rowsA * colsB;
+  const resultBuffer = new Float32Array(resultSize);
 
-  // Vertex shader source
-  const vertexShaderSource = `
-    attribute vec2 a_position;
-    void main() {
-      gl_Position = vec4(a_position, 0.0, 1.0);
+  // Create GPU buffers
+  const bufferA = device.createBuffer({
+    size: matrixA.byteLength,
+    usage: GPUBufferUsage.STORAGE,
+    mappedAtCreation: true,
+  });
+  new Float32Array(bufferA.getMappedRange()).set(matrixA);
+  bufferA.unmap();
+
+  const bufferB = device.createBuffer({
+    size: matrixB.byteLength,
+    usage: GPUBufferUsage.STORAGE,
+    mappedAtCreation: true,
+  });
+  new Float32Array(bufferB.getMappedRange()).set(matrixB);
+  bufferB.unmap();
+
+  const bufferResult = device.createBuffer({
+    size: resultBuffer.byteLength,
+    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+  });
+
+  // Create a compute shader
+  const shaderCode = `
+    @group(0) @binding(0) var<storage, read> matrixA : array<f32>;
+    @group(0) @binding(1) var<storage, read> matrixB : array<f32>;
+    @group(0) @binding(2) var<storage, write> result : array<f32>;
+
+    @compute @workgroup_size(8, 8)
+    fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
+      let row = global_id.x;
+      let col = global_id.y;
+      let widthA = ${colsA};
+      let widthB = ${colsB};
+
+      var sum = 0.0;
+      for (var i = 0u; i < widthA; i = i + 1u) {
+        sum = sum + matrixA[row * widthA + i] * matrixB[i * widthB + col];
+      }
+
+      result[row * widthB + col] = sum;
     }
   `;
 
-  // Fragment shader source
-  const fragmentShaderSource = `
-    precision highp float;
-    uniform sampler2D u_matrixA;
-    uniform sampler2D u_matrixB;
-    uniform int u_rowsA;
-    uniform int u_colsA;
-    uniform int u_colsB;
-    void main() {
-      // Compute matrix multiplication here (simplified for brevity)
-      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); // Placeholder output
-    }
-  `;
+  const shaderModule = device.createShaderModule({ code: shaderCode });
 
-  const vertexShader = compileShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
-  const fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
-  const program = createProgram(gl, vertexShader, fragmentShader);
-  gl.useProgram(program);
+  // Create pipeline
+  const pipeline = device.createComputePipeline({
+    layout: 'auto',
+    compute: {
+      module: shaderModule,
+      entryPoint: 'main',
+    },
+  });
 
-  // TODO: Implement GPU-based matrix multiplication logic
+  // Create bind group
+  const bindGroup = device.createBindGroup({
+    layout: pipeline.getBindGroupLayout(0),
+    entries: [
+      { binding: 0, resource: { buffer: bufferA } },
+      { binding: 1, resource: { buffer: bufferB } },
+      { binding: 2, resource: { buffer: bufferResult } },
+    ],
+  });
 
-  return new Float32Array(rowsA * colsB); // Placeholder result
+  // Encode commands
+  const commandEncoder = device.createCommandEncoder();
+  const passEncoder = commandEncoder.beginComputePass();
+
+  passEncoder.setPipeline(pipeline);
+  passEncoder.setBindGroup(0, bindGroup);
+  passEncoder.dispatchWorkgroups(Math.ceil(rowsA / 8), Math.ceil(colsB / 8));
+  passEncoder.end();
+
+  commandEncoder.copyBufferToBuffer(bufferResult, 0, bufferResult, 0, resultBuffer.byteLength);
+
+  // Submit commands
+  device.queue.submit([commandEncoder.finish()]);
+
+  // Read back the result
+  await bufferResult.mapAsync(GPUMapMode.READ);
+  const arrayBuffer = bufferResult.getMappedRange();
+  resultBuffer.set(new Float32Array(arrayBuffer));
+  bufferResult.unmap();
+
+  return resultBuffer;
 }
 
-module.exports = {
-  initializeWebGLContext,
-  compileShader,
-  createProgram,
-  gpuMatrixMultiply
-};
+/**
+ * Example usage of the gpuAcceleratedMatrixOps module.
+ * Demonstrates initialization and matrix multiplication.
+ * @returns {Promise<void>} A promise that resolves when the example completes.
+ */
+export async function exampleUsage() {
+  const device = await initializeGPU();
+
+  const matrixA = new Float32Array([
+    1, 2, 3,
+    4, 5, 6,
+  ]);
+  const matrixB = new Float32Array([
+    7, 8,
+    9, 10,
+    11, 12,
+  ]);
+
+  const rowsA = 2;
+  const colsA = 3;
+  const colsB = 2;
+
+  const result = await gpuMatrixMultiply(device, matrixA, matrixB, rowsA, colsA, colsB);
+  console.log('Result:', result);
+}

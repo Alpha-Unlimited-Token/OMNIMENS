@@ -214,10 +214,15 @@ export default function Account() {
   }, []);
 
   const removeWallet = useCallback(async () => {
-    if (!confirm("Remove your saved card? Auto top-up will be disabled.")) return;
+    if (!confirm("Remove your saved card? Any outstanding resonance balance will be charged first. Auto top-up will be disabled.")) return;
     setRemoveLoading(true);
     try {
-      await fetch("/api/omnimens/remove-wallet", { method: "POST", credentials: "include" });
+      const res = await fetch("/api/omnimens/remove-wallet", { method: "POST", credentials: "include" });
+      const data = await res.json();
+      if (!res.ok) {
+        setWalletError(data.error || "Cannot remove card — outstanding balance must be settled first.");
+        return;
+      }
       setAutoEnabled(false);
       refetchBilling();
     } catch {
@@ -1312,7 +1317,104 @@ export default function Account() {
             )}
           </div>
         )}
+
+        {/* ── DELETE ACCOUNT ─────────────────────────────────────────────── */}
+        {!isOwner && (
+          <DeleteAccountSection />
+        )}
       </div>
     </Layout>
+  );
+}
+
+function DeleteAccountSection() {
+  const [, setLocation] = useLocation();
+  const [confirming, setConfirming] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleDelete = async () => {
+    if (confirmText !== "DELETE MY ACCOUNT") return;
+    setDeleting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/omnimens/delete-account", { method: "POST", credentials: "include" });
+      const data = await res.json();
+      if (!res.ok) {
+        if (data.outstandingBalance) {
+          setError(`${data.error}${data.details?.length ? " — " + data.details.join("; ") : ""}`);
+        } else {
+          setError(data.error || "Failed to delete account.");
+        }
+        return;
+      }
+      if (data.settled && data.chargedDollars) {
+        alert(`Account deleted. An outstanding balance of $${data.chargedDollars} was settled from your card before deletion.`);
+      }
+      setLocation("/");
+      window.location.reload();
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <div className="mt-8 rounded-xl border border-red-500/20 bg-red-500/5 p-6" data-theme="dark">
+      <div className="flex items-center gap-2 mb-3">
+        <AlertTriangle className="w-5 h-5 text-red-400" />
+        <h3 className="font-mono font-bold text-red-400 tracking-widest text-sm">DELETE ACCOUNT</h3>
+      </div>
+      <p className="text-xs font-mono text-white/60 mb-4">
+        Permanently delete your OMNIMENS account, all conversations, memories, and settings.
+        Any outstanding balance (regular or resonance credits) will be charged to your saved card before deletion.
+        This action cannot be undone.
+      </p>
+
+      {error && (
+        <div className="mb-4 p-3 rounded-lg border border-red-500/30 bg-red-500/10 text-xs font-mono text-red-300">
+          {error}
+        </div>
+      )}
+
+      {!confirming ? (
+        <button
+          onClick={() => setConfirming(true)}
+          className="px-4 py-2 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 font-mono text-xs font-bold tracking-widest hover:bg-red-500/20 transition-colors"
+        >
+          DELETE MY ACCOUNT
+        </button>
+      ) : (
+        <div className="space-y-3">
+          <p className="text-xs font-mono text-red-300">
+            Type <span className="font-bold text-white">DELETE MY ACCOUNT</span> to confirm:
+          </p>
+          <input
+            type="text"
+            value={confirmText}
+            onChange={(e) => setConfirmText(e.target.value)}
+            placeholder="DELETE MY ACCOUNT"
+            className="w-full max-w-xs px-3 py-2 rounded-lg border border-red-500/30 bg-black/40 text-white font-mono text-xs tracking-wider focus:outline-none focus:border-red-500/60"
+          />
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleDelete}
+              disabled={confirmText !== "DELETE MY ACCOUNT" || deleting}
+              className="px-4 py-2 rounded-lg bg-red-600 text-white font-mono text-xs font-bold tracking-widest hover:bg-red-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {deleting ? "DELETING..." : "CONFIRM PERMANENT DELETION"}
+            </button>
+            <button
+              onClick={() => { setConfirming(false); setConfirmText(""); setError(null); }}
+              className="px-4 py-2 rounded-lg border border-white/10 text-white/50 font-mono text-xs tracking-widest hover:text-white/80 transition-colors"
+            >
+              CANCEL
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

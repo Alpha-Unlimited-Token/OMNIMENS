@@ -305,68 +305,106 @@ export async function purchaseResonanceCredits(
   }
 }
 
-// ── Auto-settle outstanding resonance balance ────────────────────────────────
-// Called before wallet removal or account deletion to collect any owed amount
-export async function settleResonanceBalance(userId: string): Promise<{ settled: boolean; error?: string }> {
+// ── Auto-settle ALL outstanding balances ──────────────────────────────────────
+// Called before wallet removal, account deletion, or card disconnection.
+// Settles any negative balance across ALL credit tiers — regular + resonance.
+// 1 credit = $0.01 (1 cent).
+export async function settleOutstandingBalance(userId: string): Promise<{ settled: boolean; totalChargedCents: number; details: string[]; error?: string }> {
   const [user] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, userId)).limit(1);
-  if (!user) return { settled: true };
+  if (!user) return { settled: true, totalChargedCents: 0, details: [] };
 
-  // If resonance credits are negative (they owe), charge them
-  if (user.resonanceCredits >= 0) return { settled: true };
+  const owedItems: { label: string; owedCredits: number; field: "credits" | "resonanceCredits" }[] = [];
 
-  const owedCredits = Math.abs(user.resonanceCredits);
-  const owedCents = owedCredits; // 1 credit = 1 cent
+  if ((user.credits ?? 0) < 0) {
+    owedItems.push({ label: "Regular credits", owedCredits: Math.abs(user.credits), field: "credits" });
+  }
+  if ((user.resonanceCredits ?? 0) < 0) {
+    owedItems.push({ label: "Resonance credits", owedCredits: Math.abs(user.resonanceCredits), field: "resonanceCredits" });
+  }
+
+  if (owedItems.length === 0) {
+    return { settled: true, totalChargedCents: 0, details: [] };
+  }
+
+  const totalOwedCredits = owedItems.reduce((sum, i) => sum + i.owedCredits, 0);
+  const totalOwedCents = totalOwedCredits;
 
   if (!user.paymentMethodId || !user.stripeCustomerId) {
-    return { settled: false, error: "Outstanding resonance balance cannot be settled — no payment method on file." };
+    return {
+      settled: false,
+      totalChargedCents: 0,
+      details: owedItems.map(i => `${i.label}: ${i.owedCredits} credits ($${(i.owedCredits / 100).toFixed(2)})`),
+      error: `Outstanding balance of $${(totalOwedCents / 100).toFixed(2)} cannot be settled — no payment method on file.`,
+    };
   }
 
   try {
+    const itemDescriptions = owedItems.map(i => `${i.label}: $${(i.owedCredits / 100).toFixed(2)}`).join(", ");
+
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: owedCents,
+      amount: totalOwedCents,
       currency: "usd",
       customer: user.stripeCustomerId,
       payment_method: user.paymentMethodId,
       confirm: true,
       off_session: true,
-      description: `OMNIMENS Deep Resonance — outstanding balance settlement ($${(owedCents / 100).toFixed(2)})`,
-      metadata: { userId, type: "resonance_settlement" },
+      description: `OMNIMENS — outstanding balance settlement ($${(totalOwedCents / 100).toFixed(2)}): ${itemDescriptions}`,
+      metadata: { userId, type: "balance_settlement", items: itemDescriptions },
     });
 
     if (paymentIntent.status !== "succeeded") {
-      return { settled: false, error: "Payment failed — balance still outstanding." };
+      return { settled: false, totalChargedCents: 0, details: [], error: "Payment failed — balance still outstanding." };
     }
 
+    const updateFields: Record<string, any> = {};
+    for (const item of owedItems) {
+      updateFields[item.field] = 0;
+    }
     await db.update(omnimensUsers)
-      .set({ resonanceCredits: 0 })
+      .set(updateFields)
       .where(eq(omnimensUsers.id, userId));
 
     await db.insert(omnimensCreditTransactions).values({
       userId,
       type: "purchase",
-      credits: owedCredits,
-      description: `Resonance balance settlement — $${(owedCents / 100).toFixed(2)}`,
+      credits: totalOwedCredits,
+      description: `Balance settlement — $${(totalOwedCents / 100).toFixed(2)} (${itemDescriptions})`,
       stripeSessionId: paymentIntent.id,
     });
 
-    console.log(`[RESONANCE BILLING] Settlement success: ${userId} — $${(owedCents / 100).toFixed(2)}`);
-    return { settled: true };
+    console.log(`[BILLING SETTLEMENT] Success: ${userId} — $${(totalOwedCents / 100).toFixed(2)} (${itemDescriptions})`);
+    return {
+      settled: true,
+      totalChargedCents: totalOwedCents,
+      details: owedItems.map(i => `${i.label}: ${i.owedCredits} credits ($${(i.owedCredits / 100).toFixed(2)}) — settled`),
+    };
   } catch (err: any) {
-    console.error("[RESONANCE BILLING] Settlement error:", err);
-    return { settled: false, error: err?.raw?.message || err?.message || "Settlement failed" };
+    console.error("[BILLING SETTLEMENT] Error:", err);
+    return { settled: false, totalChargedCents: 0, details: [], error: err?.raw?.message || err?.message || "Settlement failed" };
   }
 }
 
+// Backwards-compatible alias
+export const settleResonanceBalance = settleOutstandingBalance;
+
 // ── Remove saved wallet ────────────────────────────────────────────────────────
-// Auto-settles any outstanding resonance balance before removing the card
-export async function removeWallet(userId: string): Promise<{ ok: boolean; error?: string }> {
-  // Check for outstanding resonance balance first
+// Auto-settles ALL outstanding balances before removing the card
+export async function removeWallet(userId: string): Promise<{ ok: boolean; chargedCents?: number; error?: string }> {
   const [user] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, userId)).limit(1);
-  if (user && user.resonanceCredits < 0) {
-    const settlement = await settleResonanceBalance(userId);
+  if (!user) return { ok: true };
+
+  const hasNegativeRegular = (user.credits ?? 0) < 0;
+  const hasNegativeResonance = (user.resonanceCredits ?? 0) < 0;
+
+  if (hasNegativeRegular || hasNegativeResonance) {
+    const settlement = await settleOutstandingBalance(userId);
     if (!settlement.settled) {
-      return { ok: false, error: settlement.error || "Cannot remove wallet — outstanding resonance balance must be settled first." };
+      return { ok: false, error: settlement.error || "Cannot remove wallet — outstanding balance must be settled first." };
     }
+    await db.update(omnimensUsers)
+      .set({ paymentMethodId: null, autoTopupEnabled: false })
+      .where(eq(omnimensUsers.id, userId));
+    return { ok: true, chargedCents: settlement.totalChargedCents };
   }
 
   await db.update(omnimensUsers)
