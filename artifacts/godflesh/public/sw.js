@@ -4,18 +4,18 @@
  * Enables offline support and PWA installability.
  */
 
-const CACHE_NAME = "omnimens-v6";
-
-const PRECACHE = [
-  "/godflesh/",
-  "/godflesh/images/emblem.png",
-  "/godflesh/images/emblem-192.png",
-];
+const CACHE_NAME = "omnimens-v7";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE))
+      .then((cache) =>
+        Promise.allSettled([
+          cache.add("/godflesh/"),
+          cache.add("/godflesh/images/emblem.png"),
+          cache.add("/godflesh/images/emblem-192.png"),
+        ])
+      )
       .then(() => self.skipWaiting())
   );
 });
