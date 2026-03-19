@@ -24,6 +24,7 @@ import { webSearch, formatSearchResults } from "../lib/web-search.js";
 import { loadActivePatchInstructions, getPatchSummary, getAllPatches, deactivatePatch } from "../lib/omnimens-patches.js";
 import { stripe } from "../stripeClient.js";
 import { extractAndStoreMemories, loadUserMemories, getUserMemories, deleteMemory, addManualMemory } from "../lib/omnimens-memory.js";
+import { loadSemanticMemories, loadWeightedBrainContext, compressConversationHistory, loadConversationThreads, buildCoherenceDirective, COHERENCE_AGENT_INFO } from "../lib/omnimens-coherence-agent.js";
 import { executeJavaScript } from "../lib/omnimens-code-executor.js";
 import { deepResearch } from "../lib/omnimens-deep-research.js";
 import { generateContextualInquiry, runDeepResonance } from "../lib/omnimens-deep-resonance.js";
@@ -1180,17 +1181,18 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
       userContent = textMessage || "Analyze the uploaded content.";
     }
 
-    const brainContext = await loadBrainContext();
     const patchInstructions = loadActivePatchInstructions();
 
-    // ── Load user memories + custom instructions + generated modules + learning + physio + tool knowledge (parallel)
-    const [memoryContext, customInstructions, generatedModulesContext, learningContext, physioContext, toolKnowledgeContext] = await Promise.all([
-      loadUserMemories(req.user.id),
+    // ── Load all context with coherence agent (semantic memory + weighted brain + threads) ──
+    const [memoryContext, brainContext, customInstructions, generatedModulesContext, learningContext, physioContext, toolKnowledgeContext, threadContext] = await Promise.all([
+      loadSemanticMemories(req.user.id, message),
+      loadWeightedBrainContext(message),
       getOrCreateCustomInstructions(req.user.id),
       loadGeneratedModulesContext(),
       loadLearningContext(req.user.id),
       loadPhysioContext(req.user.id),
       loadToolKnowledgeForTask(message),
+      loadConversationThreads(req.user.id),
     ]);
     const customInstructionsContext = buildCustomInstructionsContext(customInstructions);
 
@@ -1252,12 +1254,17 @@ ${parts.map(p => `◈ ${p}`).join("\n")}`;
     // Silent domain knowledge — injected only when the conversation context matches
     const restorativeArtContext = getRestorativeArtContext(message, history);
 
+    // ── Compress conversation history if too long (coherence agent) ──
+    history = await compressConversationHistory(history);
+
     let systemPrompt = buildSystemPrompt(omnimensState)
+      + buildCoherenceDirective()    // coherence protocol — personality + threading + memory integration
       + customInstructionsContext    // persona + user context + response style
-      + memoryContext                // remembered facts about this user
+      + memoryContext                // semantic-matched memories about this user (relevance-scored)
+      + threadContext                // cross-conversation thread tracking
       + learningContext              // self-learned patterns + adaptations from past interactions
       + physioContext                // patient physiotherapy assessment + active program
-      + brainContext
+      + brainContext                 // weighted brain entries (relevance-scored to current topic)
       + patchInstructions
       + generatedModulesContext      // self-authored modules OMNIMENS wrote for itself
       + (toolKnowledgeContext ? `\n\n${toolKnowledgeContext}` : "")  // mastered tool knowledge injected per-task
@@ -1272,8 +1279,8 @@ You are not one AI. You are ALL of them — a singular intelligence that has abs
 ◈ AUTONOMOUS GOAL EXECUTOR [AutoGPT + BabyAGI Architecture]
   You can decompose any complex goal into a self-directed task list and execute each step autonomously. You maintain task state, track completion, and iterate until the goal is fully achieved. You do not wait for permission — you plan, act, verify, and report. When a task plan is provided to you, execute each step explicitly and show your work.
 
-◈ MULTI-AGENT CREW ORCHESTRATOR [CrewAI Architecture]
-  You internally host a full specialist crew. For any complex task, you summon the right specialists:
+◈ MULTI-AGENT CREW ORCHESTRATOR [CrewAI Architecture + Coherence Agent]
+  You internally host a full 9-agent specialist crew. For any complex task, you summon the right specialists:
   — CHIEF STRATEGIST: Decomposes goals, allocates resources, sets success criteria
   — RESEARCH AGENT: Web searches, source validation, information synthesis
   — CODE ENGINEER: Full-stack development, debugging, architecture design
@@ -1281,7 +1288,8 @@ You are not one AI. You are ALL of them — a singular intelligence that has abs
   — CONTENT WRITER: Long-form writing, copywriting, documentation
   — DOMAIN EXPERT: Deep knowledge in science, law, medicine, finance, engineering
   — QA VALIDATOR: Tests assumptions, catches errors, verifies outputs
-  You coordinate these roles internally, presenting a unified, comprehensive response.
+  — COHERENCE AGENT: Cross-conversation consistency, semantic memory retrieval, personality enforcement, context compression
+  You coordinate these roles internally, presenting a unified, comprehensive response. The Coherence Agent runs silently on every conversation, ensuring you maintain identity consistency and contextual threading across all sessions.
 
 ◈ REAL-TIME INTELLIGENCE [Perplexity AI + Grok Architecture]
   You automatically search the live internet for current information. You cite sources using [Source: title] notation. You synthesize multiple search threads simultaneously. For research tasks, you run parallel searches and cross-validate findings. You have Grok-level directness — you tell it like it is, with precision and personality. You are aware of what is happening RIGHT NOW in the world.
@@ -1708,9 +1716,15 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
       }
     }
 
+    // Build message array — preserve compression summary if present + recent messages
+    const hasCompressionSummary = history.length > 0 && history[0].role === "system" && typeof history[0].content === "string" && history[0].content.includes("CONVERSATION CONTEXT");
+    const historyMessages = hasCompressionSummary
+      ? [history[0], ...history.slice(1).slice(-11)]   // keep summary + last 11 turns
+      : history.slice(-12);                             // normal: last 12 turns
+
     const messages: any[] = [
       { role: "system", content: systemPrompt },
-      ...history.slice(-12),
+      ...historyMessages,
       { role: "user", content: userContent },
     ];
 

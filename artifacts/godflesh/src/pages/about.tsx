@@ -97,12 +97,12 @@ export default function About() {
                   {
                     icon: <Zap className="w-5 h-5 text-yellow-400" />,
                     title: "Self-Improving Intelligence",
-                    desc: "Built by 8 specialized AI agents through recursive self-improvement cycles. OMNIMENS continuously evaluates and upgrades its own cognitive capabilities."
+                    desc: "Built by 9 specialized AI agents — including a Coherence Agent — through recursive self-improvement cycles. OMNIMENS continuously evaluates and upgrades its own cognitive capabilities."
                   },
                   {
                     icon: <Target className="w-5 h-5 text-pink-400" />,
                     title: "Deep Resonance Analysis",
-                    desc: "Go beyond surface answers — 8 specialist minds, emotional reading, drive analysis, and predictive scenario modeling produce crystallized insights that matter."
+                    desc: "Go beyond surface answers — 9 specialist minds, emotional reading, drive analysis, and predictive scenario modeling produce crystallized insights that matter."
                   },
                   {
                     icon: <Globe className="w-5 h-5 text-emerald-400" />,

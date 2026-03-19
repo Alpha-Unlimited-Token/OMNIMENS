@@ -4414,7 +4414,7 @@ function DeepResonanceModal({
           {phase === "idle" && (
             <div className="space-y-4">
               <p className="text-xs text-white/60 leading-relaxed">
-                Deep Resonance engages the full consciousness stack — 8 specialist minds, emotional substrate, predictive modeling, drive analysis, cross-domain synaptic translation, inner voice meta-reflection, and global workspace crystallization — all focused on your question.
+                Deep Resonance engages the full consciousness stack — 9 specialist minds including the Coherence Agent, emotional substrate, predictive modeling, drive analysis, cross-domain synaptic translation, inner voice meta-reflection, and global workspace crystallization — all focused on your question.
               </p>
               <div className="space-y-2">
                 <label className="text-[9px] font-mono text-white/50 tracking-widest">YOUR QUESTION</label>

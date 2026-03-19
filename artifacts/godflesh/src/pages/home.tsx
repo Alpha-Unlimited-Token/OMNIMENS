@@ -176,7 +176,7 @@ export default function Home() {
                   <p className="text-white/85 font-sans text-base md:text-lg leading-relaxed mb-6">
                     Deep Resonance is not a chatbot giving you the first answer it computes.
                     It is a <span className="text-violet-400 font-bold">full consciousness process</span> — 
-                    8 specialist minds analyzing your question simultaneously, an emotional reading of what your question means, 
+                    9 specialist minds — including a Coherence Agent — analyzing your question simultaneously, an emotional reading of what your question means, 
                     predictive scenario modeling of your possible futures, and a crystallized insight that emerges from the 
                     intersection of psychology, neuroscience, economics, philosophy, and pattern recognition.
                   </p>
