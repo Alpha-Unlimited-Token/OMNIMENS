@@ -3646,8 +3646,8 @@ router.get("/omnimens/dream-state", async (req, res) => {
     return;
   }
   try {
-    const dreamState = getDreamState();
-    const recentInsights = getRecentDreamInsights(15);
+    const dreamState = await getDreamState();
+    const recentInsights = await getRecentDreamInsights(15);
     const narrative = getDreamNarrative(20);
     res.json({ dreamState, recentInsights, narrative });
   } catch {
@@ -4000,8 +4000,8 @@ router.get("/omnimens/command-center", async (req, res) => {
     const stream = getConsciousnessStream(20);
     const emotional = getCurrentEmotionalState();
     const emotionalDirective = getEmotionalDirective();
-    const dreamState = getDreamState();
-    const dreamInsights = getRecentDreamInsights(10);
+    const dreamState = await getDreamState();
+    const dreamInsights = await getRecentDreamInsights(10);
     const sandbox = getSandboxState();
     const selfCoding = getSelfCodingState();
     const sensory = getSensoryState();

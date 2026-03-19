@@ -1,115 +1,132 @@
 /**
  * @module inMemoryEmbeddingCache
- * @description A high-performance in-memory embedding cache for storing, retrieving, and performing similarity searches on vector embeddings.
- * Implements a simplified HNSW (Hierarchical Navigable Small World) graph for fast nearest-neighbor search.
+ * @description A utility module for caching embeddings in memory using an LRU strategy for fast similarity searches.
  */
 
 /**
- * Represents a node in the HNSW graph.
- * @class
- */
-class HNSWNode {
-  /**
-   * @param {number[]} vector - The vector embedding for this node.
-   * @param {any} data - The associated data for this node.
-   */
-  constructor(vector, data) {
-    this.vector = vector;
-    this.data = data;
-    this.neighbors = []; // List of neighboring nodes
-  }
-}
-
-/**
- * Calculates the Euclidean distance between two vectors.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number} - The Euclidean distance.
- */
-function euclideanDistance(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same length');
-  }
-  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + (val - vectorB[i]) ** 2, 0));
-}
-
-/**
- * HNSW-based in-memory embedding cache.
- * @class
+ * A class representing an in-memory embedding cache with LRU eviction policy.
  */
 class InMemoryEmbeddingCache {
-  constructor() {
-    this.nodes = []; // All nodes in the graph
-  }
-
   /**
-   * Adds a new embedding to the cache.
-   * @param {number[]} vector - The vector embedding to add.
-   * @param {any} data - Associated data for the embedding.
+   * Creates an instance of InMemoryEmbeddingCache.
+   * @param {number} maxSize - The maximum number of items the cache can hold.
    */
-  add(vector, data) {
-    const newNode = new HNSWNode(vector, data);
-
-    // Connect to nearest neighbors
-    if (this.nodes.length > 0) {
-      const neighbors = this._findNearestNeighbors(vector, 5); // Find up to 5 nearest neighbors
-      newNode.neighbors = neighbors;
-      neighbors.forEach((neighbor) => neighbor.neighbors.push(newNode));
+  constructor(maxSize = 100) {
+    if (typeof maxSize !== 'number' || maxSize <= 0) {
+      throw new Error('maxSize must be a positive number.');
     }
 
-    this.nodes.push(newNode);
+    /**
+     * @private
+     * @type {Map<string, { embedding: number[], timestamp: number }>}
+     */
+    this.cache = new Map();
+
+    /**
+     * @private
+     * @type {number}
+     */
+    this.maxSize = maxSize;
   }
 
   /**
-   * Finds the most similar embeddings to a given query vector.
-   * @param {number[]} queryVector - The query vector.
-   * @param {number} k - The number of nearest neighbors to return.
-   * @returns {Array<{vector: number[], data: any, distance: number}>} - The k nearest neighbors.
+   * Adds an embedding to the cache.
+   * @param {string} key - The unique key for the embedding.
+   * @param {number[]} embedding - The embedding vector to cache.
    */
-  search(queryVector, k) {
-    const visited = new Set();
-    const candidates = [...this.nodes];
-    const results = [];
-
-    while (candidates.length > 0) {
-      const node = candidates.pop();
-      if (visited.has(node)) continue;
-      visited.add(node);
-
-      const distance = euclideanDistance(queryVector, node.vector);
-      results.push({ vector: node.vector, data: node.data, distance });
-      results.sort((a, b) => a.distance - b.distance);
-
-      if (results.length > k) {
-        results.pop(); // Keep only the top k results
-      }
-
-      candidates.push(...node.neighbors);
+  set(key, embedding) {
+    if (!Array.isArray(embedding) || embedding.some(isNaN)) {
+      throw new Error('Embedding must be an array of numbers.');
     }
 
-    return results;
+    if (this.cache.has(key)) {
+      this.cache.delete(key); // Remove the key to refresh its position.
+    }
+
+    this.cache.set(key, { embedding, timestamp: Date.now() });
+
+    if (this.cache.size > this.maxSize) {
+      // Evict the least recently used item.
+      const oldestKey = this.cache.keys().next().value;
+      this.cache.delete(oldestKey);
+    }
   }
 
   /**
-   * Finds the nearest neighbors to a given vector.
-   * @private
-   * @param {number[]} vector - The vector to search for.
-   * @param {number} k - The number of neighbors to find.
-   * @returns {HNSWNode[]} - The k nearest neighbors.
+   * Retrieves an embedding from the cache.
+   * @param {string} key - The unique key for the embedding.
+   * @returns {number[] | null} The embedding vector if found, or null if not.
    */
-  _findNearestNeighbors(vector, k) {
-    return this.nodes
-      .map((node) => ({ node, distance: euclideanDistance(vector, node.vector) }))
-      .sort((a, b) => a.distance - b.distance)
-      .slice(0, k)
-      .map((entry) => entry.node);
+  get(key) {
+    if (!this.cache.has(key)) {
+      return null;
+    }
+
+    const value = this.cache.get(key);
+    this.cache.delete(key); // Refresh the key's position.
+    this.cache.set(key, value);
+
+    return value.embedding;
+  }
+
+  /**
+   * Removes an embedding from the cache.
+   * @param {string} key - The unique key for the embedding.
+   * @returns {boolean} True if the key was found and removed, false otherwise.
+   */
+  delete(key) {
+    return this.cache.delete(key);
+  }
+
+  /**
+   * Clears all embeddings from the cache.
+   */
+  clear() {
+    this.cache.clear();
+  }
+
+  /**
+   * Returns the current size of the cache.
+   * @returns {number} The number of items in the cache.
+   */
+  size() {
+    return this.cache.size;
   }
 }
 
 /**
- * Exports a factory function to create an instance of the embedding cache.
- * @returns {InMemoryEmbeddingCache} - A new instance of the embedding cache.
+ * Factory function to create a new in-memory embedding cache.
+ * @param {number} [maxSize=100] - The maximum number of items the cache can hold.
+ * @returns {InMemoryEmbeddingCache} A new instance of InMemoryEmbeddingCache.
  */
-export function createEmbeddingCache() {
-  return new InMemoryEmbeddingCache();
+export function createEmbeddingCache(maxSize = 100) {
+  return new InMemoryEmbeddingCache(maxSize);
 }
+
+/**
+ * Utility function to check similarity between two embeddings using cosine similarity.
+ * @param {number[]} embedding1 - The first embedding vector.
+ * @param {number[]} embedding2 - The second embedding vector.
+ * @returns {number} The cosine similarity between the two embeddings (range: -1 to 1).
+ */
+export function cosineSimilarity(embedding1, embedding2) {
+  if (!Array.isArray(embedding1) || !Array.isArray(embedding2)) {
+    throw new Error('Both embeddings must be arrays of numbers.');
+  }
+
+  if (embedding1.length !== embedding2.length) {
+    throw new Error('Embeddings must have the same length.');
+  }
+
+  const dotProduct = embedding1.reduce((sum, val, i) => sum + val * embedding2[i], 0);
+  const magnitude1 = Math.sqrt(embedding1.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitude2 = Math.sqrt(embedding2.reduce((sum, val) => sum + val ** 2, 0));
+
+  if (magnitude1 === 0 || magnitude2 === 0) {
+    throw new Error('Embeddings must not be zero vectors.');
+  }
+
+  return dotProduct / (magnitude1 * magnitude2);
+}
+
+export default { createEmbeddingCache, cosineSimilarity };

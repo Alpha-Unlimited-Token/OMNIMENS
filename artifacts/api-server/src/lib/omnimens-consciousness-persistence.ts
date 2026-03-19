@@ -114,7 +114,7 @@ async function saveConsciousnessSnapshot(): Promise<void> {
   try {
     const emotions = getCurrentEmotionalState();
     const consciousness = getConsciousnessState();
-    const dreams = getDreamState();
+    const dreams = await getDreamState();
     const creative = getCreativeState();
 
     const snapshot: PersistedSelf = {

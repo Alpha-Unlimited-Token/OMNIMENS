@@ -172,7 +172,7 @@ function parseScore(text: string, field: string): number {
 
 async function runEvaluationCycle(): Promise<void> {
   evaluationCycleCount++;
-  const insights = getRecentDreamInsights(20);
+  const insights = await getRecentDreamInsights(20);
   const proposals = insights
     .map(extractCodeFromInsight)
     .filter((p): p is CodeProposal => p !== null)

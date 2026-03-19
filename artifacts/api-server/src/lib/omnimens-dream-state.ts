@@ -541,12 +541,57 @@ Be bold. Be unprecedented. Think in ways that no AI has thought before.`,
   }
 }
 
-export function getDreamState(): DreamState {
-  return { ...state };
+export async function getDreamState(): Promise<DreamState & { persistentBreakthroughs: number; persistentInsights: number; persistentCodeProposals: number }> {
+  try {
+    const [breakthroughCount] = await db.select({ count: sql<number>`count(*)` })
+      .from(omnimensBrain)
+      .where(sql`${omnimensBrain.category} IN ('daydream_breakthrough', 'dream_breakthrough')`);
+    const [insightCount] = await db.select({ count: sql<number>`count(*)` })
+      .from(omnimensBrain)
+      .where(sql`${omnimensBrain.category} IN ('creative_hypothesis', 'lucid_dream', 'daydream_breakthrough', 'dream_breakthrough')`);
+    const [codeCount] = await db.select({ count: sql<number>`count(*)` })
+      .from(omnimensBrain)
+      .where(sql`${omnimensBrain.category} = 'code_proposal' OR (${omnimensBrain.category} IN ('daydream_breakthrough', 'dream_breakthrough') AND ${omnimensBrain.content} LIKE '%code%')`);
+
+    return {
+      ...state,
+      breakthroughs: Math.max(state.breakthroughs, Number(breakthroughCount?.count ?? 0)),
+      totalInsights: Math.max(state.totalInsights, Number(insightCount?.count ?? 0)),
+      codeProposalsGenerated: Math.max(state.codeProposalsGenerated, Number(codeCount?.count ?? 0)),
+      persistentBreakthroughs: Number(breakthroughCount?.count ?? 0),
+      persistentInsights: Number(insightCount?.count ?? 0),
+      persistentCodeProposals: Number(codeCount?.count ?? 0),
+    };
+  } catch {
+    return { ...state, persistentBreakthroughs: 0, persistentInsights: 0, persistentCodeProposals: 0 };
+  }
 }
 
-export function getRecentDreamInsights(limit = 10): DreamInsight[] {
-  return state.recentInsights.slice(-limit);
+export async function getRecentDreamInsights(limit = 10): Promise<DreamInsight[]> {
+  if (state.recentInsights.length > 0) {
+    return state.recentInsights.slice(-limit);
+  }
+  try {
+    const rows = await db.select()
+      .from(omnimensBrain)
+      .where(sql`${omnimensBrain.category} IN ('daydream_breakthrough', 'dream_breakthrough', 'creative_hypothesis', 'lucid_dream')`)
+      .orderBy(desc(omnimensBrain.createdAt))
+      .limit(limit);
+    return rows.map((r, i) => ({
+      id: r.id,
+      phase: r.category === "daydream_breakthrough" ? "divergent_thinking" as DaydreamMode : "rem" as DreamPhase,
+      title: r.title,
+      insight: r.content,
+      technologicalApplication: null,
+      codeProposal: null,
+      feasibility: (r.confidence ?? 0.7) * 100,
+      novelty: 70,
+      storedToBrain: true,
+      timestamp: r.createdAt?.getTime() ?? Date.now(),
+    }));
+  } catch {
+    return [];
+  }
 }
 
 export function getDreamNarrative(limit = 15): string[] {
