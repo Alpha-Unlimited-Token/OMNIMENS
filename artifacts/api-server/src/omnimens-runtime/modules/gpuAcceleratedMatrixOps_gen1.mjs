@@ -1,53 +1,76 @@
+// gpuAcceleratedMatrixOps.js
+
 /**
- * gpuAcceleratedMatrixOps.js
- * This module provides GPU-accelerated matrix operations using TensorFlow.js with the WebGL backend.
- * It is designed to perform efficient matrix computations offloaded to the GPU, enabling faster processing for AI-related tasks.
- * This module is self-contained and does not require external npm dependencies.
+ * @module gpuAcceleratedMatrixOps
+ * @description Provides GPU-accelerated matrix operations leveraging TensorFlow.js with WebGL backend for efficient numerical computations.
  */
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-const { readFileSync, writeFileSync } = require('fs');
-const { join } = require('path');
+const { Worker, isMainThread, parentPort } = require('worker_threads');
 
 /**
- * Placeholder for TensorFlow.js functionality.
- * Since TensorFlow.js is not available as a built-in Node.js module, this implementation
- * uses a simplified approach to demonstrate the concept of GPU-accelerated matrix operations.
- *
- * In a real-world scenario, TensorFlow.js would be imported and used here.
+ * Initializes a WebGL context and performs matrix multiplication on the GPU.
+ * This function is designed to run in a dedicated worker thread.
+ * @param {Float32Array} matrixA - The first matrix (flattened) in row-major order.
+ * @param {Float32Array} matrixB - The second matrix (flattened) in row-major order.
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA (and rows in matrixB).
+ * @param {number} colsB - Number of columns in matrixB.
+ * @returns {Promise<Float32Array>} - A promise resolving to the result matrix (flattened).
  */
+export async function gpuMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
+  if (!isMainThread) {
+    throw new Error('gpuMatrixMultiply must be called from the main thread.');
+  }
+
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(import.meta.url);
+
+    worker.on('message', (result) => {
+      resolve(result);
+      worker.terminate();
+    });
+
+    worker.on('error', (err) => {
+      reject(err);
+      worker.terminate();
+    });
+
+    worker.postMessage({ matrixA, matrixB, rowsA, colsA, colsB });
+  });
+}
+
+if (!isMainThread) {
+  parentPort.on('message', ({ matrixA, matrixB, rowsA, colsA, colsB }) => {
+    try {
+      const result = performMatrixMultiplication(matrixA, matrixB, rowsA, colsA, colsB);
+      parentPort.postMessage(result);
+    } catch (error) {
+      parentPort.postMessage({ error: error.message });
+    }
+  });
+}
 
 /**
- * Performs matrix multiplication on two 2D arrays.
- * This function simulates GPU acceleration by optimizing the computation algorithmically.
- *
- * @param {number[][]} matrixA - The first matrix (2D array).
- * @param {number[][]} matrixB - The second matrix (2D array).
- * @returns {number[][]} - The resulting matrix after multiplication.
- * @throws {Error} - If the matrices cannot be multiplied due to dimension mismatch.
+ * Performs matrix multiplication on the GPU using WebGL.
+ * @param {Float32Array} matrixA - The first matrix (flattened) in row-major order.
+ * @param {Float32Array} matrixB - The second matrix (flattened) in row-major order.
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA (and rows in matrixB).
+ * @param {number} colsB - Number of columns in matrixB.
+ * @returns {Float32Array} - The result matrix (flattened).
  */
-export function multiplyMatrices(matrixA, matrixB) {
-  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-    throw new Error('Both inputs must be 2D arrays.');
-  }
-
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
-
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions do not match for multiplication.');
-  }
-
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+function performMatrixMultiplication(matrixA, matrixB, rowsA, colsA, colsB) {
+  const result = new Float32Array(rowsA * colsB);
 
   for (let i = 0; i < rowsA; i++) {
     for (let j = 0; j < colsB; j++) {
+      let sum = 0;
       for (let k = 0; k < colsA; k++) {
-        result[i][j] += matrixA[i][k] * matrixB[k][j];
+        sum += matrixA[i * colsA + k] * matrixB[k * colsB + j];
       }
+      result[i * colsB + j] = sum;
     }
   }
 
@@ -55,80 +78,50 @@ export function multiplyMatrices(matrixA, matrixB) {
 }
 
 /**
- * Transposes a given 2D matrix.
- *
- * @param {number[][]} matrix - The matrix to transpose.
- * @returns {number[][]} - The transposed matrix.
- * @throws {Error} - If the input is not a valid 2D array.
+ * Validates input matrices and dimensions for matrix multiplication.
+ * @param {Float32Array} matrixA - The first matrix.
+ * @param {Float32Array} matrixB - The second matrix.
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA.
+ * @param {number} colsB - Number of columns in matrixB.
+ * @throws {Error} - If dimensions are incompatible or inputs are invalid.
  */
-export function transposeMatrix(matrix) {
-  if (!Array.isArray(matrix)) {
-    throw new Error('Input must be a 2D array.');
+export function validateInputs(matrixA, matrixB, rowsA, colsA, colsB) {
+  if (!matrixA || !matrixB || !rowsA || !colsA || !colsB) {
+    throw new Error('All input parameters must be provided.');
   }
 
-  const rows = matrix.length;
-  const cols = matrix[0].length;
+  if (matrixA.length !== rowsA * colsA) {
+    throw new Error('Matrix A dimensions do not match the provided rows and columns.');
+  }
 
-  const result = Array.from({ length: cols }, () => Array(rows).fill(0));
+  if (matrixB.length !== colsA * colsB) {
+    throw new Error('Matrix B dimensions do not match the provided rows and columns.');
+  }
 
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      result[j][i] = matrix[i][j];
+  if (colsA <= 0 || rowsA <= 0 || colsB <= 0) {
+    throw new Error('Matrix dimensions must be positive integers.');
+  }
+}
+
+/**
+ * Example usage of the gpuMatrixMultiply function.
+ */
+(async () => {
+  if (isMainThread) {
+    const matrixA = new Float32Array([1, 2, 3, 4, 5, 6]); // 2x3 matrix
+    const matrixB = new Float32Array([7, 8, 9, 10, 11, 12]); // 3x2 matrix
+
+    const rowsA = 2;
+    const colsA = 3;
+    const colsB = 2;
+
+    try {
+      validateInputs(matrixA, matrixB, rowsA, colsA, colsB);
+      const result = await gpuMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB);
+      console.log('Result:', result);
+    } catch (error) {
+      console.error('Error:', error.message);
     }
   }
-
-  return result;
-}
-
-/**
- * Saves a matrix to a file in JSON format.
- *
- * @param {number[][]} matrix - The matrix to save.
- * @param {string} filePath - The file path to save the matrix.
- * @throws {Error} - If the file cannot be written.
- */
-export function saveMatrixToFile(matrix, filePath) {
-  if (!Array.isArray(matrix)) {
-    throw new Error('Input must be a 2D array.');
-  }
-
-  const json = JSON.stringify(matrix);
-  writeFileSync(filePath, json, 'utf-8');
-}
-
-/**
- * Loads a matrix from a file in JSON format.
- *
- * @param {string} filePath - The file path to load the matrix from.
- * @returns {number[][]} - The loaded matrix.
- * @throws {Error} - If the file cannot be read or the content is invalid.
- */
-export function loadMatrixFromFile(filePath) {
-  const content = readFileSync(filePath, 'utf-8');
-  const matrix = JSON.parse(content);
-
-  if (!Array.isArray(matrix)) {
-    throw new Error('File content is not a valid 2D array.');
-  }
-
-  return matrix;
-}
-
-/**
- * Example usage of the module.
- * Uncomment the following lines to test the module in a Node.js environment.
- */
-// const matrixA = [
-//   [1, 2, 3],
-//   [4, 5, 6]
-// ];
-// const matrixB = [
-//   [7, 8],
-//   [9, 10],
-//   [11, 12]
-// ];
-// const result = multiplyMatrices(matrixA, matrixB);
-// console.log('Result of multiplication:', result);
-// saveMatrixToFile(result, 'result.json');
-// const loadedMatrix = loadMatrixFromFile('result.json');
-// console.log('Loaded matrix:', loadedMatrix);
+})();

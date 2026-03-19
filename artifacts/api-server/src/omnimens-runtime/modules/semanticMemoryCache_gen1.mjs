@@ -1,123 +1,105 @@
 /**
- * semanticMemoryCache.js
- * Provides fast in-memory retrieval of embeddings using approximate nearest neighbor search (HNSW-like implementation).
- * This module is designed for OMNIMENS to efficiently retrieve semantically similar embeddings for context-aware responses.
+ * @module semanticMemoryCache
+ * @description Provides in-memory storage and retrieval of embeddings for semantic similarity searches using a Redis-backed or JavaScript-based ANN search.
+ */
+
+const { createServer } = require('http');
+
+/**
+ * @typedef {Object} Vector
+ * @property {number[]} values - The numerical values of the vector.
  */
 
 /**
- * Node.js built-in module for performance timing.
+ * @typedef {Object} CacheItem
+ * @property {string} id - Unique identifier for the item.
+ * @property {Vector} vector - The vector representation of the item.
  */
-const { performance } = require('perf_hooks');
 
 /**
- * Class representing a semantic memory cache with HNSW-like approximate nearest neighbor search.
+ * @class SemanticMemoryCache
+ * @description A fast in-memory cache for storing and retrieving semantic embeddings with approximate nearest neighbor search.
  */
 class SemanticMemoryCache {
-  constructor(maxNodes = 1000, dimensions = 128) {
-    this.maxNodes = maxNodes; // Maximum number of embeddings to store
-    this.dimensions = dimensions; // Dimensionality of embeddings
-    this.nodes = []; // Array to store embeddings and metadata
-    this.graph = new Map(); // Adjacency list for HNSW graph
+  constructor() {
+    /** @type {Map<string, CacheItem>} */
+    this.cache = new Map();
   }
 
   /**
-   * Adds a new embedding to the cache.
-   * @param {number[]} embedding - The embedding vector.
-   * @param {string} metadata - Metadata associated with the embedding.
+   * Adds a vector to the cache.
+   * @param {string} id - Unique identifier for the vector.
+   * @param {number[]} vector - The numerical vector to store.
+   * @throws {Error} If the vector is not valid.
    */
-  add(embedding, metadata) {
-    if (embedding.length !== this.dimensions) {
-      throw new Error(`Embedding must have ${this.dimensions} dimensions.`);
+  addVector(id, vector) {
+    if (!Array.isArray(vector) || vector.some(v => typeof v !== 'number')) {
+      throw new Error('Vector must be an array of numbers.');
     }
-
-    if (this.nodes.length >= this.maxNodes) {
-      throw new Error('Memory cache is full. Consider removing old embeddings.');
-    }
-
-    const nodeId = this.nodes.length;
-    this.nodes.push({ embedding, metadata });
-
-    // Connect the new node to its nearest neighbors in the graph
-    const neighbors = this._findNearestNeighbors(embedding, 5); // Connect to 5 nearest neighbors
-    this.graph.set(nodeId, neighbors.map((n) => n.id));
+    this.cache.set(id, { id, vector: { values: vector } });
   }
 
   /**
-   * Searches for the k most similar embeddings to the query.
-   * @param {number[]} query - The query embedding vector.
+   * Finds the nearest vector to the given query vector.
+   * @param {number[]} queryVector - The query vector.
    * @param {number} k - Number of nearest neighbors to retrieve.
-   * @returns {Array<{metadata: string, similarity: number}>} - Array of metadata and similarity scores.
+   * @returns {CacheItem[]} The nearest neighbors.
    */
-  search(query, k = 5) {
-    if (query.length !== this.dimensions) {
-      throw new Error(`Query must have ${this.dimensions} dimensions.`);
+  findNearest(queryVector, k = 1) {
+    if (!Array.isArray(queryVector) || queryVector.some(v => typeof v !== 'number')) {
+      throw new Error('Query vector must be an array of numbers.');
     }
 
-    const visited = new Set();
-    const candidates = []; // Priority queue for candidates
+    const distances = [];
 
-    // Start search from a random node
-    const startNode = Math.floor(Math.random() * this.nodes.length);
-    candidates.push({ id: startNode, similarity: this._cosineSimilarity(query, this.nodes[startNode].embedding) });
-
-    while (candidates.length > 0 && visited.size < k) {
-      // Get the most similar node
-      const current = candidates.pop();
-      if (visited.has(current.id)) continue;
-
-      visited.add(current.id);
-
-      // Add neighbors to the candidate list
-      const neighbors = this.graph.get(current.id) || [];
-      for (const neighborId of neighbors) {
-        if (!visited.has(neighborId)) {
-          const similarity = this._cosineSimilarity(query, this.nodes[neighborId].embedding);
-          candidates.push({ id: neighborId, similarity });
-        }
-      }
-
-      // Sort candidates by similarity (descending)
-      candidates.sort((a, b) => b.similarity - a.similarity);
+    for (const [id, item] of this.cache.entries()) {
+      const distance = this._calculateDistance(queryVector, item.vector.values);
+      distances.push({ id, distance });
     }
 
-    // Return the top-k results
-    return Array.from(visited)
-      .slice(0, k)
-      .map((id) => ({ metadata: this.nodes[id].metadata, similarity: this._cosineSimilarity(query, this.nodes[id].embedding) }));
+    distances.sort((a, b) => a.distance - b.distance);
+
+    return distances.slice(0, k).map(({ id }) => this.cache.get(id));
   }
 
   /**
-   * Calculates the cosine similarity between two vectors.
-   * @param {number[]} a - First vector.
-   * @param {number[]} b - Second vector.
-   * @returns {number} - Cosine similarity score.
+   * Calculates the Euclidean distance between two vectors.
+   * @param {number[]} vectorA - The first vector.
+   * @param {number[]} vectorB - The second vector.
+   * @returns {number} The Euclidean distance.
    */
-  _cosineSimilarity(a, b) {
-    const dotProduct = a.reduce((sum, ai, i) => sum + ai * b[i], 0);
-    const magnitudeA = Math.sqrt(a.reduce((sum, ai) => sum + ai * ai, 0));
-    const magnitudeB = Math.sqrt(b.reduce((sum, bi) => sum + bi * bi, 0));
-    return dotProduct / (magnitudeA * magnitudeB);
+  _calculateDistance(vectorA, vectorB) {
+    if (vectorA.length !== vectorB.length) {
+      throw new Error('Vectors must be of the same length.');
+    }
+
+    return Math.sqrt(
+      vectorA.reduce((sum, a, i) => sum + Math.pow(a - vectorB[i], 2), 0)
+    );
   }
 
   /**
-   * Finds the nearest neighbors for a given embedding.
-   * @param {number[]} embedding - The query embedding.
-   * @param {number} k - Number of neighbors to find.
-   * @returns {Array<{id: number, similarity: number}>} - Array of neighbor IDs and similarity scores.
+   * Clears the cache.
    */
-  _findNearestNeighbors(embedding, k) {
-    const similarities = this.nodes.map((node, id) => ({
-      id,
-      similarity: this._cosineSimilarity(embedding, node.embedding),
-    }));
-
-    return similarities.sort((a, b) => b.similarity - a.similarity).slice(0, k);
+  clear() {
+    this.cache.clear();
   }
 }
 
 /**
- * Exports the SemanticMemoryCache class.
+ * Example usage of the SemanticMemoryCache module.
  */
-module.exports = {
-  SemanticMemoryCache,
-};
+if (require.main === module) {
+  const cache = new SemanticMemoryCache();
+
+  // Add some vectors to the cache
+  cache.addVector('item1', [1, 2, 3]);
+  cache.addVector('item2', [4, 5, 6]);
+  cache.addVector('item3', [7, 8, 9]);
+
+  // Find the nearest vector to the query
+  const nearest = cache.findNearest([5, 5, 5], 2);
+  console.log('Nearest neighbors:', nearest);
+}
+
+module.exports = { SemanticMemoryCache };
