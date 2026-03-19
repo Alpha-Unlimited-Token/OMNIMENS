@@ -173,6 +173,21 @@ export default function Account() {
   const [serverBuildExpanded, setServerBuildExpanded] = useState<number | null>(null);
 
   const { theme: activeTheme, setTheme: applyTheme } = useTheme();
+  const [showNotifPanel, setShowNotifPanel] = useState(false);
+  const [notifPrefs, setNotifPrefs] = useState(() => {
+    try {
+      const stored = localStorage.getItem("omnimens-notif-prefs");
+      if (stored) return JSON.parse(stored);
+    } catch {}
+    return { systemUpdates: true, creditAlerts: true, newFeatures: true, tips: false };
+  });
+  const toggleNotifPref = useCallback((key: string) => {
+    setNotifPrefs((prev: Record<string, boolean>) => {
+      const next = { ...prev, [key]: !prev[key] };
+      try { localStorage.setItem("omnimens-notif-prefs", JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) setLocation("/login");
@@ -662,13 +677,40 @@ export default function Account() {
         <div className="mt-5 mb-2">
           <p className="text-[10px] font-mono text-white/35 tracking-widest uppercase px-1 mb-1">Notifications</p>
           <div className="bg-black/30 border border-white/8 rounded-xl overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3.5">
+            <button
+              onClick={() => setShowNotifPanel(p => !p)}
+              className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-white/3 transition-colors"
+            >
               <div className="flex items-center gap-3">
                 <Bell className="w-4 h-4 text-white/50" />
                 <span className="text-[13px] text-white/80">Notifications</span>
               </div>
-              <ChevronRight className="w-4 h-4 text-white/25" />
-            </div>
+              {showNotifPanel ? <ChevronDown className="w-4 h-4 text-white/25" /> : <ChevronRight className="w-4 h-4 text-white/25" />}
+            </button>
+            {showNotifPanel && (
+              <div className="border-t border-white/6 px-4 py-3 space-y-3">
+                {[
+                  { key: "systemUpdates", label: "System Updates", desc: "Maintenance, outages & platform changes" },
+                  { key: "creditAlerts", label: "Credit Alerts", desc: "Low balance & usage warnings" },
+                  { key: "newFeatures", label: "New Features", desc: "Agent launches & capability updates" },
+                  { key: "tips", label: "Tips & Tutorials", desc: "Get the most out of OMNIMENS" },
+                ].map(item => (
+                  <button
+                    key={item.key}
+                    onClick={() => toggleNotifPref(item.key)}
+                    className="w-full flex items-center justify-between py-1.5 group"
+                  >
+                    <div className="text-left">
+                      <p className="text-[12px] font-mono text-white/80">{item.label}</p>
+                      <p className="text-[10px] text-white/40 mt-0.5">{item.desc}</p>
+                    </div>
+                    <div className={`w-9 h-5 rounded-full flex items-center px-0.5 transition-colors ${notifPrefs[item.key] ? "bg-primary/80" : "bg-white/10"}`}>
+                      <div className={`w-4 h-4 rounded-full bg-white shadow transition-transform ${notifPrefs[item.key] ? "translate-x-4" : "translate-x-0"}`} />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
