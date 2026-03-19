@@ -4,7 +4,7 @@
  * Unauthorized reproduction, distribution, or use is strictly prohibited.
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -27,22 +27,39 @@ export function usePwaInstall() {
     };
     window.addEventListener("beforeinstallprompt", handler);
 
+    const installedHandler = () => {
+      setInstalled(true);
+      setPrompt(null);
+    };
+    window.addEventListener("appinstalled", installedHandler);
+
     const isInstalled = window.matchMedia("(display-mode: standalone)").matches
       || (navigator as any).standalone === true;
     if (isInstalled) setInstalled(true);
 
-    return () => window.removeEventListener("beforeinstallprompt", handler);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handler);
+      window.removeEventListener("appinstalled", installedHandler);
+    };
   }, []);
 
-  const install = async () => {
-    if (!prompt) return;
-    await prompt.prompt();
-    const { outcome } = await prompt.userChoice;
-    if (outcome === "accepted") {
-      setPrompt(null);
-      setInstalled(true);
+  const install = useCallback(async () => {
+    if (!prompt) {
+      console.warn("[PWA] No install prompt available");
+      return;
     }
-  };
+    try {
+      await prompt.prompt();
+      const { outcome } = await prompt.userChoice;
+      if (outcome === "accepted") {
+        setPrompt(null);
+        setInstalled(true);
+      }
+    } catch (err) {
+      console.error("[PWA] Install prompt failed:", err);
+      setPrompt(null);
+    }
+  }, [prompt]);
 
   return { canInstall: !!prompt && !installed, installed, install };
 }
