@@ -80,13 +80,34 @@ class ChunkErrorBoundary extends Component<{ children: ReactNode }, { hasError: 
     return { hasError: true };
   }
 
+  componentDidCatch() {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations().then((regs) => {
+        for (const r of regs) r.unregister();
+      });
+      caches.keys().then((keys) => {
+        for (const k of keys) caches.delete(k);
+      });
+    }
+  }
+
   render() {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-[#0a0a0f] flex flex-col items-center justify-center gap-4 text-white">
           <p className="font-mono text-sm text-white/60 tracking-widest">OMNIMENS could not load. Please refresh.</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              if ("serviceWorker" in navigator) {
+                navigator.serviceWorker.getRegistrations().then((regs) => {
+                  for (const r of regs) r.unregister();
+                });
+                caches.keys().then((keys) => {
+                  for (const k of keys) caches.delete(k);
+                });
+              }
+              window.location.reload();
+            }}
             className="px-6 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-mono tracking-widest rounded-lg transition-colors"
           >
             RELOAD

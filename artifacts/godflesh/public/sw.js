@@ -4,7 +4,7 @@
  * Enables offline support and PWA installability.
  */
 
-const CACHE_NAME = "omnimens-v4";
+const CACHE_NAME = "omnimens-v5";
 
 const PRECACHE = [
   "/godflesh/",
@@ -37,10 +37,12 @@ self.addEventListener("fetch", (event) => {
 
   if (url.pathname.startsWith("/api/")) return;
 
+  if (url.pathname.includes("/assets/")) return;
+
   event.respondWith(
     fetch(request)
       .then((response) => {
-        if (response.ok) {
+        if (response.ok && request.mode === "navigate") {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((c) => c.put(request, clone));
         }
