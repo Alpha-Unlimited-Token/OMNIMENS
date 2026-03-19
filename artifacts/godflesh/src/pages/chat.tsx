@@ -47,7 +47,7 @@ import { ControlHub, loadHubSettingsFromStorage, saveHubSettingsToStorage, type 
 import { SmartTemplates } from "@/components/smart-templates";
 import { useTheme } from "@/hooks/use-theme";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
-import { MobileTrigger } from "@/components/mobile-ide";
+import { MobileIDE } from "@/components/mobile-ide";
 import {
   AgentBuildPanel, NewAppModal, BuildTriggerButton,
   createInitialBuildSteps, isBuildIntent, extractFilesFromMarkdown,
@@ -4840,6 +4840,7 @@ export default function Chat() {
   const [showNewAppModal, setShowNewAppModal] = useState(false);
   const [buildPanel, setBuildPanel] = useState<BuildPanelState | null>(null);
   const [mobileBuilderOpen, setMobileBuilderOpen] = useState(false);
+  const [mobileIdeOpen, setMobileIdeOpen] = useState(false);
   const [hubSettings, setHubSettings] = useState<HubSettings>(() => loadHubSettingsFromStorage());
   const [convSearch, setConvSearch] = useState("");
 
@@ -6359,7 +6360,7 @@ export default function Chat() {
                     setLeftOpen(true);
                   } else {
                     setMobileNav("settings");
-                    setShowControlHub(true);
+                    setMobileIdeOpen(true);
                   }
                 }}
                 className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-all"
@@ -6749,7 +6750,7 @@ export default function Chat() {
       </AnimatePresence>
 
       {/* Mobile IDE — appears only on small screens, hidden when build panel is open */}
-      {!mobileBuilderOpen && <MobileTrigger />}
+      {mobileIdeOpen && <MobileIDE onClose={() => { setMobileIdeOpen(false); setMobileNav("chat"); }} />}
     </Layout>
     </ActiveProjectCtx.Provider>
   );
