@@ -34,7 +34,8 @@ import {
   HardDrive, Rocket, ExternalLink, ChevronRight, RefreshCw, Star,
   File, Eye, Lock, Unlock, Upload, Server, MemoryStick, Wrench, CircleDot,
   Sun, Moon, GitBranch,
-  AlertCircle, ArrowRight, CheckCircle2
+  AlertCircle, ArrowRight, CheckCircle2,
+  User, Wallet, CreditCard, LogOut, Bell, HelpCircle, Info, MoreVertical, SquarePlus, Shield
 } from "lucide-react";
 import { OmnimensIcon } from "@/components/omnimens-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
@@ -4773,7 +4774,7 @@ function CameraModal({ onCapture, onClose }: { onCapture: (file: File) => void; 
 // ── Main Chat component ────────────────────────────────────────────────────────
 
 export default function Chat() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const [, setLocation] = useLocation();
   const [input, setInput] = useState(() => {
     try { return localStorage.getItem("omnimens_draft") || ""; } catch { return ""; }
@@ -4831,7 +4832,7 @@ export default function Chat() {
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
   const [consoleOpen, setConsoleOpen] = useState(false);
-  const [mobileNav, setMobileNav] = useState<"chat"|"files"|"tools"|"settings">("chat");
+  const [mobileNav, setMobileNav] = useState<"apps"|"create"|"account">("create");
   const [activeProject, setActiveProject] = useState<ActiveProject>(null);
   const [projectsVersion, setProjectsVersion] = useState(0);
   const autoSavedMsgIds = useRef<Set<number>>(new Set());
@@ -5410,7 +5411,7 @@ export default function Chat() {
         {/* ── CENTER — CHAT ────────────────────────────────────────── */}
         <div className="flex-1 flex flex-col overflow-hidden min-w-0">
 
-          {/* ── Unified Top Bar (Replit IDE-style) ───────────────── */}
+          {/* ── Unified Top Bar ───────────────── */}
           <div
             className="shrink-0 flex items-center border-b"
             style={{
@@ -5419,24 +5420,42 @@ export default function Chat() {
               height: 38,
             }}
           >
-            <div className="flex items-center shrink-0">
+            {/* Desktop left controls */}
+            <div className="hidden sm:flex items-center shrink-0">
               <button
                 onClick={() => setLeftOpen(o => !o)}
-                className="hidden sm:flex items-center justify-center transition-colors shrink-0 w-10 h-[38px]"
+                className="flex items-center justify-center transition-colors shrink-0 w-10 h-[38px]"
                 title={leftOpen ? "Hide panel" : "Show panel"}
                 style={{ color: isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.4)" }}
               >
                 {leftOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeft className="w-4 h-4" />}
               </button>
-              <Link href="/" className="flex items-center gap-2 px-2 sm:px-0 sm:mr-1">
+              <Link href="/" className="flex items-center gap-2 sm:mr-1">
                 <OmnimensIcon size={18} />
-                <span className="font-display font-black text-[10px] tracking-[0.15em] sm:hidden" style={{ color: isLight ? "#141722" : "#fff" }}>
-                  OMNIMENS
-                </span>
               </Link>
             </div>
+            {/* Mobile top bar — workspace style */}
+            <div className="flex sm:hidden items-center justify-between w-full px-3 h-full">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
+                  <span className="text-[10px] font-bold text-primary">
+                    {(user as any)?.username?.slice(0, 2)?.toUpperCase() || "OM"}
+                  </span>
+                </div>
+                <span className="font-semibold text-sm tracking-wide" style={{ color: isLight ? "#141722" : "#fff" }}>
+                  {mobileNav === "apps" ? "Apps" : mobileNav === "account" ? "Account" : (activeProject?.name || "OMNIMENS")}
+                </span>
+              </div>
+              <button
+                onClick={() => setShowControlHub(true)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors"
+                style={{ color: isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.5)" }}
+              >
+                <MoreVertical className="w-4.5 h-4.5" />
+              </button>
+            </div>
 
-            <div className="flex items-center overflow-x-auto flex-1 min-w-0" style={{ scrollbarWidth: "none" }}>
+            <div className="hidden sm:flex items-center overflow-x-auto flex-1 min-w-0" style={{ scrollbarWidth: "none" }}>
               {conversations.slice(0, 6).map(conv => {
                 const active = currentConversationId === conv.id;
                 return (
@@ -5541,9 +5560,9 @@ export default function Chat() {
             </div>
           </div>
 
-          {/* Deep research panel (below topbar when active) */}
+          {/* Deep research panel (below topbar when active) — hide on mobile when not on create tab */}
           {deepResearchMode && (
-            <div className="shrink-0 flex items-center gap-2 px-3 py-2 bg-violet-950/30 border-b border-violet-400/15">
+            <div className={`shrink-0 flex items-center gap-2 px-3 py-2 bg-violet-950/30 border-b border-violet-400/15 ${mobileNav !== "create" ? "hidden sm:flex" : ""}`}>
               <Microscope className="w-3.5 h-3.5 text-violet-400 shrink-0" />
               <input
                 type="text"
@@ -5564,21 +5583,240 @@ export default function Chat() {
             </div>
           )}
 
-          {/* Messages area */}
+          {/* Messages / Mobile Tab Content area */}
           <div
             className="flex-1 overflow-y-auto omnimens-scrollbar p-4 relative"
             style={{ background: isLight ? "#f4f5f8" : "#0D1117" }}
           >
+            {/* ── MOBILE: Apps Tab ── */}
+            {mobileNav === "apps" && (
+              <div className="sm:hidden h-full">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold" style={{ color: isLight ? "#141722" : "#fff" }}>All Apps</h2>
+                  <button
+                    onClick={() => { handleNewChat(); setMobileNav("create"); }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/15 border border-primary/25 text-primary text-xs font-semibold transition-colors hover:bg-primary/25"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    New
+                  </button>
+                </div>
+                <div className="relative mb-4">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.3)" }} />
+                  <input
+                    type="text"
+                    value={convSearch}
+                    onChange={e => setConvSearch(e.target.value)}
+                    placeholder="Search conversations..."
+                    className="w-full pl-9 pr-3 py-2.5 rounded-xl text-sm outline-none border transition-colors"
+                    style={{
+                      background: isLight ? "#fff" : "#161b22",
+                      borderColor: isLight ? "rgba(20,23,34,0.1)" : "rgba(255,255,255,0.08)",
+                      color: isLight ? "#141722" : "#fff",
+                    }}
+                  />
+                </div>
+                {conversations.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center pt-20 text-center">
+                    <FolderOpen className="w-12 h-12 mb-3" style={{ color: isLight ? "rgba(20,23,34,0.15)" : "rgba(255,255,255,0.1)" }} />
+                    <p className="text-sm font-semibold mb-1" style={{ color: isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.4)" }}>No conversations yet</p>
+                    <p className="text-xs" style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.25)" }}>Start creating to see your apps here</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {conversations
+                      .filter(c => !convSearch || (c.title || "").toLowerCase().includes(convSearch.toLowerCase()))
+                      .map(conv => (
+                      <button
+                        key={conv.id}
+                        onClick={() => { handleLoadConversation(conv.id); setMobileNav("create"); }}
+                        className="w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left"
+                        style={{
+                          background: currentConversationId === conv.id
+                            ? (isLight ? "rgba(168,85,247,0.06)" : "rgba(168,85,247,0.08)")
+                            : (isLight ? "#fff" : "#161b22"),
+                          borderColor: currentConversationId === conv.id
+                            ? "rgba(168,85,247,0.25)"
+                            : (isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)"),
+                        }}
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                          <OmnimensIcon size={18} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold truncate" style={{ color: isLight ? "#141722" : "#fff" }}>
+                            {conv.title || "Untitled"}
+                          </p>
+                          <p className="text-[11px] mt-0.5" style={{ color: isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.35)" }}>
+                            {conv.updatedAt ? new Date(conv.updatedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : ""}
+                          </p>
+                        </div>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDeleteConversation(conv.id); }}
+                          className="p-1.5 rounded-lg transition-colors"
+                          style={{ color: isLight ? "rgba(20,23,34,0.25)" : "rgba(255,255,255,0.2)" }}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── MOBILE: Account Tab ── */}
+            {mobileNav === "account" && (
+              <div className="sm:hidden h-full">
+                {/* Profile header */}
+                <div className="flex items-center gap-4 mb-6 pb-5 border-b" style={{ borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }}>
+                  <div className="w-16 h-16 rounded-full bg-primary/15 border-2 border-primary/30 flex items-center justify-center">
+                    <span className="text-xl font-bold text-primary">
+                      {(user as any)?.username?.slice(0, 2)?.toUpperCase() || "OM"}
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold" style={{ color: isLight ? "#141722" : "#fff" }}>
+                      {(user as any)?.username || "OMNIMENS User"}
+                    </h3>
+                    {status && (status as any)?.isPro && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/15 border border-primary/25 text-primary text-[10px] font-bold tracking-wider mt-1">
+                        <Star className="w-3 h-3" /> PRO
+                      </span>
+                    )}
+                    {status && (status as any)?.isOwner && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-400/15 border border-amber-400/25 text-amber-400 text-[10px] font-bold tracking-wider mt-1">
+                        <Shield className="w-3 h-3" /> OWNER
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {/* Credits */}
+                {status && (
+                  <div className="mb-4 p-4 rounded-xl border" style={{
+                    background: isLight ? "#fff" : "#161b22",
+                    borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)",
+                  }}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-semibold" style={{ color: isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.4)" }}>Credits</span>
+                      <span className="text-lg font-bold text-primary">{(status as any)?.credits ?? 0}</span>
+                    </div>
+                  </div>
+                )}
+                {/* Menu items */}
+                <div className="space-y-1">
+                  {[
+                    { icon: <Wallet className="w-4.5 h-4.5" />, label: "Billing", href: "/account" },
+                    { icon: <Activity className="w-4.5 h-4.5" />, label: "Usage", href: "/account" },
+                    { icon: <User className="w-4.5 h-4.5" />, label: "Edit Profile", href: "/account" },
+                    { icon: <Zap className="w-4.5 h-4.5" />, label: "Buy Credits", href: "/pricing" },
+                  ].map(item => (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      className="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-colors"
+                      style={{ color: isLight ? "#141722" : "rgba(255,255,255,0.85)" }}
+                    >
+                      <span style={{ color: isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.4)" }}>{item.icon}</span>
+                      <span className="text-sm font-medium flex-1">{item.label}</span>
+                      <ChevronRight className="w-4 h-4" style={{ color: isLight ? "rgba(20,23,34,0.2)" : "rgba(255,255,255,0.15)" }} />
+                    </Link>
+                  ))}
+                </div>
+                {/* Theme */}
+                <div className="mt-4 pt-4 border-t" style={{ borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }}>
+                  <p className="text-[10px] font-bold tracking-widest uppercase mb-2 px-4" style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.25)" }}>Theme</p>
+                  <button
+                    onClick={toggleTheme}
+                    className="flex items-center gap-3 px-4 py-3.5 rounded-xl w-full transition-colors"
+                    style={{ color: isLight ? "#141722" : "rgba(255,255,255,0.85)" }}
+                  >
+                    <span style={{ color: isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.4)" }}>
+                      {theme === "light" ? <Sun className="w-4.5 h-4.5" /> : <Moon className="w-4.5 h-4.5" />}
+                    </span>
+                    <span className="text-sm font-medium flex-1 text-left">Theme — {theme === "light" ? "Light" : "Dark"}</span>
+                    <ChevronRight className="w-4 h-4" style={{ color: isLight ? "rgba(20,23,34,0.2)" : "rgba(255,255,255,0.15)" }} />
+                  </button>
+                </div>
+                {/* Support */}
+                <div className="mt-4 pt-4 border-t" style={{ borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }}>
+                  <p className="text-[10px] font-bold tracking-widest uppercase mb-2 px-4" style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.25)" }}>Support</p>
+                  {[
+                    { icon: <HelpCircle className="w-4.5 h-4.5" />, label: "Help", href: "/support" },
+                    { icon: <BookOpen className="w-4.5 h-4.5" />, label: "FAQ", href: "/faq" },
+                    { icon: <Info className="w-4.5 h-4.5" />, label: "About", href: "/about" },
+                  ].map(item => (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      className="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-colors"
+                      style={{ color: isLight ? "#141722" : "rgba(255,255,255,0.85)" }}
+                    >
+                      <span style={{ color: isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.4)" }}>{item.icon}</span>
+                      <span className="text-sm font-medium flex-1">{item.label}</span>
+                      <ChevronRight className="w-4 h-4" style={{ color: isLight ? "rgba(20,23,34,0.2)" : "rgba(255,255,255,0.15)" }} />
+                    </Link>
+                  ))}
+                </div>
+                {/* Other */}
+                <div className="mt-4 pt-4 border-t" style={{ borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }}>
+                  <p className="text-[10px] font-bold tracking-widest uppercase mb-2 px-4" style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.25)" }}>Other</p>
+                  <Link
+                    href="/terms"
+                    className="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-colors"
+                    style={{ color: isLight ? "#141722" : "rgba(255,255,255,0.85)" }}
+                  >
+                    <span style={{ color: isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.4)" }}><File className="w-4.5 h-4.5" /></span>
+                    <span className="text-sm font-medium flex-1">Terms of Service</span>
+                    <ChevronRight className="w-4 h-4" style={{ color: isLight ? "rgba(20,23,34,0.2)" : "rgba(255,255,255,0.15)" }} />
+                  </Link>
+                  <Link
+                    href="/privacy"
+                    className="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-colors"
+                    style={{ color: isLight ? "#141722" : "rgba(255,255,255,0.85)" }}
+                  >
+                    <span style={{ color: isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.4)" }}><Lock className="w-4.5 h-4.5" /></span>
+                    <span className="text-sm font-medium flex-1">Privacy Policy</span>
+                    <ChevronRight className="w-4 h-4" style={{ color: isLight ? "rgba(20,23,34,0.2)" : "rgba(255,255,255,0.15)" }} />
+                  </Link>
+                  <button
+                    onClick={() => { fetch("/api/auth/logout", { method: "POST", credentials: "include" }).then(() => setLocation("/")); }}
+                    className="flex items-center gap-3 px-4 py-3.5 rounded-xl w-full transition-colors text-left"
+                  >
+                    <span className="text-red-400"><LogOut className="w-4.5 h-4.5" /></span>
+                    <span className="text-sm font-medium flex-1 text-red-400">Log Out</span>
+                  </button>
+                </div>
+                <div className="h-8" />
+              </div>
+            )}
+
+            {/* ── Create Tab / Desktop: Normal chat content ── */}
+            {(mobileNav === "create" || typeof window === "undefined") && <>
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center select-none">
-                <OmnimensPresence
-                  size={200}
-                  className="mb-2 drop-shadow-[0_0_60px_rgba(160,100,255,0.35)]"
-                />
-                <h2 className="font-display text-2xl tracking-[0.3em] text-white/85 mt-2">OMNIMENS AWAITS</h2>
-                <p className="font-mono text-sm mt-2 text-white/70">Speak your intent. Upload your vision.</p>
-                {/* Creation chips */}
-                <div className="mt-5 flex gap-2 overflow-x-auto pb-2 max-w-lg w-full px-4 omnimens-scrollbar-x">
+                {/* Desktop: OMNIMENS presence */}
+                <div className="hidden sm:block">
+                  <OmnimensPresence
+                    size={200}
+                    isSpeaking={false}
+                    pitchIntensity={0}
+                    className="mb-2 drop-shadow-[0_0_60px_rgba(160,100,255,0.35)]"
+                  />
+                </div>
+                {/* Mobile: Replit-style greeting */}
+                <div className="sm:hidden w-full px-2">
+                  <h2 className="text-xl font-bold mb-1" style={{ color: isLight ? "#141722" : "#fff" }}>
+                    Hi {(user as any)?.username || "there"},
+                  </h2>
+                  <p className="text-base mb-6" style={{ color: isLight ? "rgba(20,23,34,0.6)" : "rgba(255,255,255,0.6)" }}>
+                    what do you want to make?
+                  </p>
+                </div>
+                <h2 className="hidden sm:block font-display text-2xl tracking-[0.3em] text-white/85 mt-2">OMNIMENS AWAITS</h2>
+                <p className="hidden sm:block font-mono text-sm mt-2 text-white/70">Speak your intent. Upload your vision.</p>
+                {/* Category chips */}
+                <div className="mt-5 flex gap-2 overflow-x-auto pb-2 max-w-lg w-full px-4 omnimens-scrollbar-x sm:justify-center">
                   {[
                     { emoji: "🌐", label: "Website", prompt: "Build me a stunning website for " },
                     { emoji: "📱", label: "Mobile App", prompt: "Design a mobile app that " },
@@ -5999,6 +6237,7 @@ export default function Chat() {
                 </div>
               </>
             )}
+            </>}
           </div>
 
           {/* Deep research result */}
@@ -6032,10 +6271,13 @@ export default function Chat() {
             </div>
           )}
 
-          {/* Tone Selector */}
+          {/* Tone Selector — hide on mobile when not on Create tab */}
+          <div className={mobileNav !== "create" ? "hidden sm:block" : ""}>
           <ToneSelector value={responseMode} onChange={setResponseMode} />
+          </div>
 
-          {/* Credit alert banner */}
+          {/* Credit alert banner — hide on mobile when not on Create tab */}
+          <div className={mobileNav !== "create" ? "hidden sm:block" : ""}>
           {creditsAlert && (
             <div className={`shrink-0 flex items-center justify-between gap-3 px-4 py-2.5 text-[12px] font-mono border-t ${
               creditsAlert.kind === "need_resonance"
@@ -6237,6 +6479,7 @@ export default function Chat() {
             onClose={() => setShowTemplates(false)}
             onUseTemplate={(t) => { setInputWithDraft(t); setShowTemplates(false); }}
           />
+          </div>{/* end mobile-create wrapper */}
 
           {/* ── Bottom Console Panel ────────── */}
           <AnimatePresence initial={false}>
@@ -6366,49 +6609,36 @@ export default function Chat() {
               </div>
             </div>
 
-          {/* ── Mobile Bottom Nav ────────────── */}
+          {/* ── Mobile Bottom Nav (Replit-style 3 tabs) ── */}
           {!mobileBuilderOpen && <div
             className="sm:hidden shrink-0 flex items-center justify-around border-t"
             style={{
-              background: isLight ? "#ffffff" : "#0D1117",
+              background: isLight ? "#ffffff" : "#0f0f14",
               borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)",
-              height: 48,
+              height: 56,
               paddingBottom: "env(safe-area-inset-bottom)",
             }}
           >
             {[
-              { id: "chat" as const, icon: <MessageSquare className="w-5 h-5" />, label: "Chat" },
-              { id: "files" as const, icon: <HardDrive className="w-5 h-5" />, label: "Files" },
-              { id: "tools" as const, icon: <Wrench className="w-5 h-5" />, label: "Tools" },
-              { id: "settings" as const, icon: <Settings className="w-5 h-5" />, label: "Settings" },
+              { id: "apps" as const, icon: <FolderOpen className="w-5 h-5" />, label: "Apps" },
+              { id: "create" as const, icon: <SquarePlus className="w-5 h-5" />, label: "Create" },
+              { id: "account" as const, icon: <User className="w-5 h-5" />, label: "Account" },
             ].map(item => (
               <button
                 key={item.id}
-                onClick={() => {
-                  if (item.id === "chat") {
-                    setMobileNav("chat");
-                  } else if (item.id === "files") {
-                    setMobileNav("files");
-                    setDevActivityTab("files");
-                    setLeftOpen(true);
-                  } else if (item.id === "tools") {
-                    setMobileNav("tools");
-                    setDevActivityTab("tools");
-                    setLeftOpen(true);
-                  } else {
-                    setMobileNav("settings");
-                    setMobileIdeOpen(true);
-                  }
-                }}
-                className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-all"
+                onClick={() => setMobileNav(item.id)}
+                className="flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all relative"
                 style={{
                   color: mobileNav === item.id
                     ? "#a855f7"
-                    : (isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.4)"),
+                    : (isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.4)"),
                 }}
               >
+                {mobileNav === item.id && (
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[3px] rounded-full bg-primary" />
+                )}
                 {item.icon}
-                <span className="font-mono text-[8px] tracking-wider">{item.label.toUpperCase()}</span>
+                <span className="text-[10px] font-semibold tracking-wide">{item.label}</span>
               </button>
             ))}
           </div>}
@@ -6692,6 +6922,7 @@ export default function Chat() {
         {/* ── Control Hub Modal ── */}
         {showControlHub && (
           <ControlHub
+            open={showControlHub}
             settings={hubSettings}
             onChange={(s) => {
               setHubSettings(s);
@@ -6704,6 +6935,8 @@ export default function Chat() {
               }).catch(() => {});
             }}
             onClose={() => setShowControlHub(false)}
+            onUsePrompt={(content) => setInputWithDraft(content)}
+            currentConversationId={currentConversationId ?? undefined}
           />
         )}
 
@@ -6787,7 +7020,7 @@ export default function Chat() {
       </AnimatePresence>
 
       {/* Mobile IDE — appears only on small screens, hidden when build panel is open */}
-      {mobileIdeOpen && <MobileIDE onClose={() => { setMobileIdeOpen(false); setMobileNav("chat"); }} />}
+      {mobileIdeOpen && <MobileIDE onClose={() => { setMobileIdeOpen(false); setMobileNav("create"); }} />}
     </Layout>
     </ActiveProjectCtx.Provider>
   );
