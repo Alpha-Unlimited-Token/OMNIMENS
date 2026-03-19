@@ -263,10 +263,23 @@ async function checkAccountLock(userId: string): Promise<{ locked: boolean; reas
   };
 }
 
+function isAiGeneratorRequest(message: string): boolean {
+  const m = message.toLowerCase();
+  const hasCodeKeyword = /\b(build|code|html|canvas|three\.?js|webgl|css|javascript|react|p5|gsap)\b/i.test(message);
+  if (/\b(generate|create|make|draw|paint|render)\b.*\b(image|picture|photo|artwork|illustration|portrait|poster|wallpaper)\b/i.test(message) && !hasCodeKeyword) return true;
+  if (/\b(image|picture|photo|artwork|illustration|portrait)\b.*\b(of|for|with|showing)\b/i.test(message) && !hasCodeKeyword) return true;
+  if (/\b(generate|create|make)\b.*\b(video|movie|clip|footage|cinematic|film)\b/i.test(message) && !hasCodeKeyword) return true;
+  if (/\b(generate|create|make)\b.*\b(3d model|3d object|3d character|3d asset|3d figure|3d sculpture)\b/i.test(message) && !hasCodeKeyword) return true;
+  return false;
+}
+
 function isBuildRequest(message: string): boolean {
-  if (/\b(generate|create|make)\b.*\b(video|movie|clip|footage)\b/i.test(message) && !/\b(build|code|html|canvas|three\.?js|webgl)\b/i.test(message)) return false;
-  return /\b(build|create|make|generate|write|design|develop|code)\b.*\b(website|site|page|app|landing|portfolio|store|shop|html|web|diagram|chart|svg|blueprint|3d|animation|image|photo|logo|banner|template)\b/i.test(message)
-    || /\b(website|site|landing page|web app|diagram|blueprint|animation)\b.*\b(build|create|make|generate)\b/i.test(message)
+  if (isAiGeneratorRequest(message)) return false;
+
+  return /\b(build|create|make|generate|write|design|develop|code)\b.*\b(website|site|page|app|landing|portfolio|store|shop|html|web|diagram|chart|svg|blueprint|animation|logo|banner|template|dashboard|component|ui|interface)\b/i.test(message)
+    || /\b(website|site|landing page|web app|diagram|blueprint|animation|dashboard)\b.*\b(build|create|make|generate)\b/i.test(message)
+    // 3D scene/environment building (HTML + Three.js — NOT 3D model generation)
+    || /\b(build|code|create)\b.*\b(3d scene|3d environment|3d world|three\.?js|webgl)\b/i.test(message)
     // Game build detection (Rosebud AI / GDevelop style)
     || /\b(build|create|make|generate|code|design|develop)\b.*\b(game|shooter|platformer|rpg|puzzle|dungeon|arcade|adventure|survival|racing|tower defense|strategy|simulation|roguelike|sandbox|fighting|horror|visual novel)\b/i.test(message)
     || /\b(game|shooter|platformer|rpg|arcade|dungeon crawler)\b.*\b(build|create|make|generate|code)\b/i.test(message)
@@ -1734,13 +1747,14 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
     ];
 
     const buildMode = isBuildRequest(message);
+    const aiGenMode = isAiGeneratorRequest(message);
     const hasFiles = uploadedFiles.length > 0;
     const requestStart = Date.now();
     const dynamicTemperature = hubSettings?.creativity != null ? hubSettings.creativity : 0.7;
     const dynamicMaxTokens = hubSettings?.responseLength === "brief" ? 600
       : hubSettings?.responseLength === "exhaustive" ? 8192
       : hubSettings?.responseLength === "detailed" ? 4096
-      : (buildMode || hasFiles || taskAnalysis.isComplex) ? 4096 : 1200;
+      : (buildMode || aiGenMode || hasFiles || taskAnalysis.isComplex) ? 4096 : 1200;
     // Reasoning models (o3-mini) don't support temperature / max_tokens
     const isReasoningModel = selectedModel.startsWith("o3") || selectedModel.startsWith("o4");
 
