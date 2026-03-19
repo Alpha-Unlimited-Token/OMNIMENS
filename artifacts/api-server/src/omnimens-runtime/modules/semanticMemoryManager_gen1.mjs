@@ -2,116 +2,114 @@
 
 /**
  * @module semanticMemoryManager
- * @description A utility module for maintaining conversational context by summarizing earlier conversation segments and storing them for long-term memory.
- */
-
-const { writeFile, readFile } = require('fs/promises');
-const path = require('path');
-
-/**
- * @typedef {Object} ConversationSegment
- * @property {number} id - Unique identifier for the segment.
- * @property {string} content - Original conversation text.
+ * @description Manages rolling context and long-term memory for conversations using a priority-based memory retention system.
  */
 
 /**
- * @typedef {Object} Summary
- * @property {number} id - Unique identifier for the summarized segment.
- * @property {string} summary - Condensed version of the conversation segment.
+ * Represents a single memory entry.
+ * @typedef {Object} MemoryEntry
+ * @property {string} token - The token or piece of information.
+ * @property {number} relevance - The relevance score of the token (0-1).
+ * @property {number} utility - The utility score of the token (0-1).
+ * @property {Date} timestamp - The timestamp when the token was added.
  */
-
-const MEMORY_FILE = path.resolve(__dirname, 'semanticMemory.json');
-const SLIDING_WINDOW_SIZE = 5; // Number of recent segments to keep in active memory.
 
 /**
- * Initializes the semantic memory storage file if not already present.
- * @returns {Promise<void>} Resolves when initialization is complete.
+ * MemoryManager class to manage rolling context and long-term memory.
  */
-async function initializeMemory() {
-  try {
-    await readFile(MEMORY_FILE);
-  } catch {
-    await writeFile(MEMORY_FILE, JSON.stringify({ activeMemory: [], longTermMemory: [] }, null, 2));
+class MemoryManager {
+  constructor() {
+    /**
+     * @private
+     * @type {MemoryEntry[]}
+     */
+    this.memory = [];
+
+    /**
+     * @private
+     * @type {number}
+     */
+    this.maxMemorySize = 1000; // Maximum number of tokens to retain in memory.
+
+    /**
+     * @private
+     * @type {number}
+     */
+    this.relevanceThreshold = 0.5; // Minimum relevance score for retention.
+
+    /**
+     * @private
+     * @type {number}
+     */
+    this.utilityThreshold = 0.5; // Minimum utility score for retention.
   }
-}
 
-/**
- * Loads the current state of semantic memory from the storage file.
- * @returns {Promise<{ activeMemory: ConversationSegment[], longTermMemory: Summary[] }>} Memory state.
- */
-async function loadMemory() {
-  const data = await readFile(MEMORY_FILE, 'utf-8');
-  return JSON.parse(data);
-}
+  /**
+   * Adds a new memory entry.
+   * @param {string} token - The token or piece of information.
+   * @param {number} relevance - The relevance score of the token (0-1).
+   * @param {number} utility - The utility score of the token (0-1).
+   */
+  addMemory(token, relevance, utility) {
+    if (typeof token !== 'string' || typeof relevance !== 'number' || typeof utility !== 'number') {
+      throw new TypeError('Invalid input types for addMemory.');
+    }
 
-/**
- * Saves the updated state of semantic memory to the storage file.
- * @param {{ activeMemory: ConversationSegment[], longTermMemory: Summary[] }} memoryState Updated memory state.
- * @returns {Promise<void>} Resolves when saving is complete.
- */
-async function saveMemory(memoryState) {
-  await writeFile(MEMORY_FILE, JSON.stringify(memoryState, null, 2));
-}
-
-/**
- * Summarizes a conversation segment using a basic algorithm.
- * @param {string} content Original conversation text.
- * @returns {string} Summarized version of the text.
- */
-function summarize(content) {
-  const sentences = content.split('. ');
-  return sentences.slice(0, Math.ceil(sentences.length / 2)).join('. ') + (sentences.length > 1 ? '...' : '');
-}
-
-/**
- * Adds a new conversation segment to active memory and manages sliding window.
- * @param {string} content New conversation text.
- * @returns {Promise<void>} Resolves when the memory is updated.
- */
-async function addConversationSegment(content) {
-  const memoryState = await loadMemory();
-
-  const newSegment = {
-    id: Date.now(),
-    content
-  };
-
-  memoryState.activeMemory.push(newSegment);
-
-  if (memoryState.activeMemory.length > SLIDING_WINDOW_SIZE) {
-    const [oldSegment] = memoryState.activeMemory.splice(0, 1);
-    const summary = {
-      id: oldSegment.id,
-      summary: summarize(oldSegment.content)
+    const entry = {
+      token,
+      relevance,
+      utility,
+      timestamp: new Date()
     };
-    memoryState.longTermMemory.push(summary);
+
+    this.memory.push(entry);
+    this._trimMemory();
   }
 
-  await saveMemory(memoryState);
+  /**
+   * Retrieves the most relevant and useful tokens.
+   * @param {number} count - Number of tokens to retrieve.
+   * @returns {MemoryEntry[]} - Array of memory entries sorted by relevance and utility.
+   */
+  getTopMemory(count = 10) {
+    if (typeof count !== 'number' || count <= 0) {
+      throw new TypeError('Invalid count parameter for getTopMemory.');
+    }
+
+    return this.memory
+      .filter(entry => entry.relevance >= this.relevanceThreshold && entry.utility >= this.utilityThreshold)
+      .sort((a, b) => (b.relevance + b.utility) - (a.relevance + a.utility))
+      .slice(0, count);
+  }
+
+  /**
+   * Clears all memory.
+   */
+  clearMemory() {
+    this.memory = [];
+  }
+
+  /**
+   * Trims the memory to fit within maxMemorySize.
+   * @private
+   */
+  _trimMemory() {
+    if (this.memory.length > this.maxMemorySize) {
+      this.memory = this.memory
+        .sort((a, b) => (b.relevance + b.utility) - (a.relevance + a.utility))
+        .slice(0, this.maxMemorySize);
+    }
+  }
 }
 
 /**
- * Retrieves the current active memory.
- * @returns {Promise<ConversationSegment[]>} List of active conversation segments.
+ * Creates a new MemoryManager instance.
+ * @returns {MemoryManager} - A new MemoryManager instance.
  */
-async function getActiveMemory() {
-  const memoryState = await loadMemory();
-  return memoryState.activeMemory;
+function createMemoryManager() {
+  return new MemoryManager();
 }
 
-/**
- * Retrieves the long-term memory summaries.
- * @returns {Promise<Summary[]>} List of summarized conversation segments.
- */
-async function getLongTermMemory() {
-  const memoryState = await loadMemory();
-  return memoryState.longTermMemory;
-}
-
-// Module exports
 module.exports = {
-  initializeMemory,
-  addConversationSegment,
-  getActiveMemory,
-  getLongTermMemory
+  createMemoryManager
 };
