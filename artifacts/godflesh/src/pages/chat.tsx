@@ -34,7 +34,7 @@ import {
   HardDrive, Rocket, ExternalLink, ChevronRight, RefreshCw, Star,
   File, Eye, Lock, Unlock, Upload, Server, MemoryStick, Wrench, CircleDot,
   Sun, Moon, GitBranch,
-  AlertCircle, ArrowRight, CheckCircle2,
+  AlertCircle, ArrowLeft, ArrowRight, CheckCircle2,
   User, Wallet, CreditCard, LogOut, Bell, HelpCircle, Info, MoreVertical, SquarePlus, Shield
 } from "lucide-react";
 import { OmnimensIcon } from "@/components/omnimens-icon";
@@ -4771,6 +4771,308 @@ function CameraModal({ onCapture, onClose }: { onCapture: (file: File) => void; 
   );
 }
 
+// ── Mobile Account Sub-Page Components ────────────────────────────────────────
+
+function MobileBillingPage({ isLight, status, onBack, onNavigate }: { isLight: boolean; status: any; onBack: () => void; onNavigate: (path: string) => void }) {
+  const [billingData, setBillingData] = useState<any>(null);
+  const [billingLoading, setBillingLoading] = useState(true);
+  const [portalLoading, setPortalLoading] = useState(false);
+  useEffect(() => {
+    fetch("/api/omnimens/billing", { credentials: "include" })
+      .then(r => r.json()).then(d => { setBillingData(d); setBillingLoading(false); })
+      .catch(() => setBillingLoading(false));
+  }, []);
+  const openPortal = () => {
+    setPortalLoading(true);
+    fetch("/api/omnimens/portal", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" } })
+      .then(r => r.json()).then(d => { if (d.url) window.open(d.url, "_blank"); })
+      .catch(() => {})
+      .finally(() => setPortalLoading(false));
+  };
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-5">
+        <button onClick={onBack} className="p-1.5 rounded-lg transition-colors" style={{ color: isLight ? "#141722" : "#fff" }}>
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <h2 className="text-lg font-bold" style={{ color: isLight ? "#141722" : "#fff" }}>Billing</h2>
+      </div>
+      {billingLoading ? (
+        <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
+      ) : (
+        <div className="space-y-4">
+          {!status?.isPro && !billingData?.hasWallet && (
+            <div className="p-4 rounded-xl border-2 border-primary/30" style={{ background: isLight ? "rgba(168,85,247,0.06)" : "rgba(168,85,247,0.08)" }}>
+              <div className="flex items-center gap-2 mb-2">
+                <Rocket className="w-5 h-5 text-primary" />
+                <span className="text-sm font-bold text-primary">Upgrade to Pro</span>
+              </div>
+              <p className="text-xs mb-3" style={{ color: isLight ? "rgba(20,23,34,0.6)" : "rgba(255,255,255,0.55)" }}>
+                Unlock premium models, faster processing, image generation, and more. Plans start at $9/mo.
+              </p>
+              <button onClick={() => onNavigate("/pricing")} className="w-full py-2.5 rounded-lg bg-primary text-white text-sm font-bold tracking-wider transition-colors hover:bg-primary/90">
+                VIEW PLANS
+              </button>
+            </div>
+          )}
+          <div className="p-4 rounded-xl border" style={{ background: isLight ? "#fff" : "#161b22", borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }}>
+            <p className="text-[10px] font-bold tracking-widest uppercase mb-3" style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.25)" }}>Current Balance</p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-bold text-primary">{billingData?.credits ?? status?.credits ?? 0}</span>
+              <span className="text-xs" style={{ color: isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.35)" }}>credits</span>
+            </div>
+            {billingData?.resonanceCredits > 0 && (
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-sm font-semibold text-violet-400">{billingData.resonanceCredits}</span>
+                <span className="text-[10px]" style={{ color: isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.35)" }}>resonance credits ({billingData.resonanceSessionsRemaining} sessions)</span>
+              </div>
+            )}
+          </div>
+          <div className="p-4 rounded-xl border" style={{ background: isLight ? "#fff" : "#161b22", borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }}>
+            <p className="text-[10px] font-bold tracking-widest uppercase mb-3" style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.25)" }}>Payment Method</p>
+            {billingData?.card ? (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <CreditCard className="w-5 h-5" style={{ color: isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.4)" }} />
+                  <p className="text-sm font-medium" style={{ color: isLight ? "#141722" : "#fff" }}>
+                    {(billingData.card.brand || "Card").charAt(0).toUpperCase() + (billingData.card.brand || "card").slice(1)} **** {billingData.card.last4}
+                  </p>
+                </div>
+                <button onClick={openPortal} disabled={portalLoading} className="text-xs text-primary font-semibold">
+                  {portalLoading ? "..." : "Manage"}
+                </button>
+              </div>
+            ) : billingData?.hasWallet ? (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CreditCard className="w-5 h-5" style={{ color: isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.4)" }} />
+                  <span className="text-sm" style={{ color: isLight ? "#141722" : "#fff" }}>Card on file</span>
+                </div>
+                <button onClick={openPortal} disabled={portalLoading} className="text-xs text-primary font-semibold">
+                  {portalLoading ? "..." : "Manage"}
+                </button>
+              </div>
+            ) : (
+              <div>
+                <p className="text-xs mb-3" style={{ color: isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.4)" }}>
+                  No payment method on file. Add a card to enable auto-topup and subscriptions.
+                </p>
+                <button
+                  onClick={() => {
+                    fetch("/api/omnimens/setup-wallet", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ returnPath: "/chat" }) })
+                      .then(r => r.json()).then(d => { if (d.url) window.location.href = d.url; });
+                  }}
+                  className="w-full py-2 rounded-lg border border-primary/30 text-primary text-sm font-semibold transition-colors hover:bg-primary/10"
+                >
+                  Add Payment Method
+                </button>
+              </div>
+            )}
+          </div>
+          {billingData?.autoTopupEnabled && (
+            <div className="p-4 rounded-xl border" style={{ background: isLight ? "#fff" : "#161b22", borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium" style={{ color: isLight ? "#141722" : "#fff" }}>Auto Top-Up</p>
+                  <p className="text-xs" style={{ color: isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.4)" }}>
+                    ${((billingData.autoTopupAmountCents || 0) / 100).toFixed(0)} when credits run out
+                  </p>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-green-500/15 border border-green-500/25 text-green-400 text-[10px] font-bold">ACTIVE</span>
+              </div>
+            </div>
+          )}
+          <div className="p-4 rounded-xl border" style={{ background: isLight ? "#fff" : "#161b22", borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }}>
+            <p className="text-[10px] font-bold tracking-widest uppercase mb-3" style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.25)" }}>Spending</p>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs" style={{ color: isLight ? "rgba(20,23,34,0.6)" : "rgba(255,255,255,0.5)" }}>This month</span>
+                <span className="text-sm font-semibold" style={{ color: isLight ? "#141722" : "#fff" }}>${billingData?.currentMonthSpendDollars || "0.00"}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs" style={{ color: isLight ? "rgba(20,23,34,0.6)" : "rgba(255,255,255,0.5)" }}>All time</span>
+                <span className="text-sm font-semibold" style={{ color: isLight ? "#141722" : "#fff" }}>${billingData?.totalPaidSpendDollars || "0.00"}</span>
+              </div>
+            </div>
+          </div>
+          {billingData?.nextBonusTier && (
+            <div className="p-4 rounded-xl border border-amber-500/20" style={{ background: isLight ? "rgba(245,158,11,0.04)" : "rgba(245,158,11,0.06)" }}>
+              <div className="flex items-center gap-2 mb-1">
+                <Star className="w-4 h-4 text-amber-400" />
+                <span className="text-xs font-bold text-amber-400 tracking-wider">{billingData.nextBonusTier} LOYALTY</span>
+              </div>
+              <p className="text-xs" style={{ color: isLight ? "rgba(20,23,34,0.6)" : "rgba(255,255,255,0.5)" }}>{billingData.nextBonusDesc}</p>
+              {billingData.nextTierSpendDollars && (
+                <p className="text-[10px] mt-1" style={{ color: isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.3)" }}>
+                  Spend ${billingData.nextTierSpendDollars} this month to reach the next tier
+                </p>
+              )}
+            </div>
+          )}
+          <div className="grid grid-cols-2 gap-3">
+            <button onClick={() => onNavigate("/pricing")} className="py-3 rounded-xl bg-primary text-white text-sm font-bold tracking-wider transition-colors hover:bg-primary/90">
+              Buy Credits
+            </button>
+            <button
+              onClick={openPortal}
+              disabled={portalLoading || !status?.stripeCustomerId}
+              className="py-3 rounded-xl border text-sm font-semibold transition-colors disabled:opacity-40"
+              style={{ borderColor: isLight ? "rgba(20,23,34,0.12)" : "rgba(255,255,255,0.1)", color: isLight ? "#141722" : "#fff" }}
+            >
+              {portalLoading ? "Loading..." : "Stripe Portal"}
+            </button>
+          </div>
+          <div className="h-4" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MobileUsagePage({ isLight, status, onBack, onNavigate }: { isLight: boolean; status: any; onBack: () => void; onNavigate: (path: string) => void }) {
+  const [usageData, setUsageData] = useState<any>(null);
+  const [usageLoading, setUsageLoading] = useState(true);
+  useEffect(() => {
+    fetch("/api/omnimens/billing", { credentials: "include" })
+      .then(r => r.json()).then(d => { setUsageData(d); setUsageLoading(false); })
+      .catch(() => setUsageLoading(false));
+  }, []);
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-5">
+        <button onClick={onBack} className="p-1.5 rounded-lg transition-colors" style={{ color: isLight ? "#141722" : "#fff" }}>
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <h2 className="text-lg font-bold" style={{ color: isLight ? "#141722" : "#fff" }}>Usage</h2>
+      </div>
+      {usageLoading ? (
+        <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
+      ) : (
+        <div className="space-y-4">
+          <div className="p-4 rounded-xl border" style={{ background: isLight ? "#fff" : "#161b22", borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }}>
+            <p className="text-[10px] font-bold tracking-widest uppercase mb-3" style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.25)" }}>Credits Overview</p>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm" style={{ color: isLight ? "rgba(20,23,34,0.7)" : "rgba(255,255,255,0.6)" }}>Current Balance</span>
+                <span className="text-lg font-bold text-primary">{usageData?.credits ?? status?.credits ?? 0}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm" style={{ color: isLight ? "rgba(20,23,34,0.7)" : "rgba(255,255,255,0.6)" }}>Resonance Credits</span>
+                <span className="text-lg font-bold text-violet-400">{usageData?.resonanceCredits ?? 0}</span>
+              </div>
+              <div className="h-px" style={{ background: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }} />
+              <div className="flex items-center justify-between">
+                <span className="text-sm" style={{ color: isLight ? "rgba(20,23,34,0.7)" : "rgba(255,255,255,0.6)" }}>Free monthly allowance</span>
+                <span className="text-sm font-medium" style={{ color: isLight ? "#141722" : "#fff" }}>{usageData?.freeMonthlyCredits ?? 25}</span>
+              </div>
+            </div>
+          </div>
+          <div className="p-4 rounded-xl border" style={{ background: isLight ? "#fff" : "#161b22", borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }}>
+            <p className="text-[10px] font-bold tracking-widest uppercase mb-3" style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.25)" }}>Spending History</p>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs" style={{ color: isLight ? "rgba(20,23,34,0.6)" : "rgba(255,255,255,0.5)" }}>This month</span>
+                <span className="text-sm font-semibold" style={{ color: isLight ? "#141722" : "#fff" }}>${usageData?.currentMonthSpendDollars || "0.00"}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs" style={{ color: isLight ? "rgba(20,23,34,0.6)" : "rgba(255,255,255,0.5)" }}>All time</span>
+                <span className="text-sm font-semibold" style={{ color: isLight ? "#141722" : "#fff" }}>${usageData?.totalPaidSpendDollars || "0.00"}</span>
+              </div>
+            </div>
+          </div>
+          {usageData?.loyaltyTiers && (
+            <div className="p-4 rounded-xl border" style={{ background: isLight ? "#fff" : "#161b22", borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }}>
+              <p className="text-[10px] font-bold tracking-widest uppercase mb-3" style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.25)" }}>Loyalty Tiers</p>
+              <div className="space-y-2">
+                {(usageData.loyaltyTiers as any[]).map((tier: any) => (
+                  <div key={tier.label} className="flex items-center justify-between py-2 border-b last:border-0" style={{ borderColor: isLight ? "rgba(20,23,34,0.06)" : "rgba(255,255,255,0.04)" }}>
+                    <div>
+                      <span className="text-xs font-bold" style={{ color: isLight ? "#141722" : "#fff" }}>{tier.label}</span>
+                      <p className="text-[10px]" style={{ color: isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.4)" }}>{tier.desc}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xs font-semibold text-primary">+{tier.bonusCredits} cr</span>
+                      <p className="text-[10px]" style={{ color: isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.3)" }}>${tier.minSpendDollars}/mo</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          <button onClick={() => onNavigate("/pricing")} className="w-full py-3 rounded-xl bg-primary text-white text-sm font-bold tracking-wider transition-colors hover:bg-primary/90">
+            Get More Credits
+          </button>
+          <div className="h-4" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MobileProfilePage({ isLight, status, user, theme, toggleTheme, onBack }: { isLight: boolean; status: any; user: any; theme: string; toggleTheme: () => void; onBack: () => void }) {
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-5">
+        <button onClick={onBack} className="p-1.5 rounded-lg transition-colors" style={{ color: isLight ? "#141722" : "#fff" }}>
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <h2 className="text-lg font-bold" style={{ color: isLight ? "#141722" : "#fff" }}>Profile</h2>
+      </div>
+      <div className="space-y-4">
+        <div className="flex flex-col items-center py-6">
+          <div className="w-20 h-20 rounded-full bg-primary/15 border-2 border-primary/30 flex items-center justify-center mb-3">
+            <span className="text-2xl font-bold text-primary">
+              {user?.username?.slice(0, 2)?.toUpperCase() || "OM"}
+            </span>
+          </div>
+          <h3 className="text-lg font-bold" style={{ color: isLight ? "#141722" : "#fff" }}>
+            {user?.username || "OMNIMENS User"}
+          </h3>
+          {user?.email && (
+            <p className="text-xs mt-1" style={{ color: isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.4)" }}>{user.email}</p>
+          )}
+        </div>
+        <div className="p-4 rounded-xl border" style={{ background: isLight ? "#fff" : "#161b22", borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }}>
+          <p className="text-[10px] font-bold tracking-widest uppercase mb-3" style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.25)" }}>Account Details</p>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs" style={{ color: isLight ? "rgba(20,23,34,0.6)" : "rgba(255,255,255,0.5)" }}>Username</span>
+              <span className="text-sm font-medium" style={{ color: isLight ? "#141722" : "#fff" }}>{user?.username || "—"}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs" style={{ color: isLight ? "rgba(20,23,34,0.6)" : "rgba(255,255,255,0.5)" }}>Tier</span>
+              <span className="text-sm font-medium text-primary">{status?.tier?.toUpperCase() || "FREE"}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs" style={{ color: isLight ? "rgba(20,23,34,0.6)" : "rgba(255,255,255,0.5)" }}>2FA</span>
+              <span className="text-sm font-medium" style={{ color: status?.twoFactorEnabled ? "#22c55e" : isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.4)" }}>
+                {status?.twoFactorEnabled ? "Enabled" : "Disabled"}
+              </span>
+            </div>
+            {status?.referralCode && (
+              <div className="flex items-center justify-between">
+                <span className="text-xs" style={{ color: isLight ? "rgba(20,23,34,0.6)" : "rgba(255,255,255,0.5)" }}>Referral Code</span>
+                <span className="text-xs font-mono font-semibold text-primary">{status.referralCode}</span>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="p-4 rounded-xl border" style={{ background: isLight ? "#fff" : "#161b22", borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }}>
+          <p className="text-[10px] font-bold tracking-widest uppercase mb-3" style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.25)" }}>Preferences</p>
+          <button onClick={toggleTheme} className="flex items-center justify-between w-full py-2">
+            <div className="flex items-center gap-3">
+              {theme === "light" ? <Sun className="w-4.5 h-4.5" style={{ color: isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.4)" }} /> : <Moon className="w-4.5 h-4.5" style={{ color: isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.4)" }} />}
+              <span className="text-sm" style={{ color: isLight ? "#141722" : "#fff" }}>Theme</span>
+            </div>
+            <span className="text-xs font-medium text-primary">{theme === "light" ? "Light" : "Dark"}</span>
+          </button>
+        </div>
+        <div className="h-4" />
+      </div>
+    </div>
+  );
+}
+
 // ── Main Chat component ────────────────────────────────────────────────────────
 
 export default function Chat() {
@@ -4833,6 +5135,7 @@ export default function Chat() {
   const [rightOpen, setRightOpen] = useState(true);
   const [consoleOpen, setConsoleOpen] = useState(false);
   const [mobileNav, setMobileNav] = useState<"apps"|"create"|"account">("create");
+  const [accountSubPage, setAccountSubPage] = useState<null|"billing"|"usage"|"profile">(null);
   const [activeProject, setActiveProject] = useState<ActiveProject>(null);
   const [projectsVersion, setProjectsVersion] = useState(0);
   const autoSavedMsgIds = useRef<Set<number>>(new Set());
@@ -5443,7 +5746,7 @@ export default function Chat() {
                   </span>
                 </div>
                 <span className="font-semibold text-sm tracking-wide" style={{ color: isLight ? "#141722" : "#fff" }}>
-                  {mobileNav === "apps" ? "Apps" : mobileNav === "account" ? "Account" : (activeProject?.name || "OMNIMENS")}
+                  {mobileNav === "apps" ? "Apps" : mobileNav === "account" ? (accountSubPage === "billing" ? "Billing" : accountSubPage === "usage" ? "Usage" : accountSubPage === "profile" ? "Profile" : "Account") : (activeProject?.name || "OMNIMENS")}
                 </span>
               </div>
               <button
@@ -5668,7 +5971,18 @@ export default function Chat() {
             {/* ── MOBILE: Account Tab ── */}
             {mobileNav === "account" && (
               <div className="sm:hidden h-full">
-                {/* Profile header */}
+                {accountSubPage === "billing" && (
+                  <MobileBillingPage isLight={isLight} status={status} onBack={() => setAccountSubPage(null)} onNavigate={setLocation} />
+                )}
+                {accountSubPage === "usage" && (
+                  <MobileUsagePage isLight={isLight} status={status} onBack={() => setAccountSubPage(null)} onNavigate={setLocation} />
+                )}
+                {accountSubPage === "profile" && (
+                  <MobileProfilePage isLight={isLight} status={status} user={user} theme={theme} toggleTheme={toggleTheme} onBack={() => setAccountSubPage(null)} />
+                )}
+
+                {/* ── Main Account Menu ── */}
+                {!accountSubPage && (<>
                 <div className="flex items-center gap-4 mb-6 pb-5 border-b" style={{ borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }}>
                   <div className="w-16 h-16 rounded-full bg-primary/15 border-2 border-primary/30 flex items-center justify-center">
                     <span className="text-xl font-bold text-primary">
@@ -5691,7 +6005,6 @@ export default function Chat() {
                     )}
                   </div>
                 </div>
-                {/* Credits */}
                 {status && (
                   <div className="mb-4 p-4 rounded-xl border" style={{
                     background: isLight ? "#fff" : "#161b22",
@@ -5701,29 +6014,35 @@ export default function Chat() {
                       <span className="text-xs font-semibold" style={{ color: isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.4)" }}>Credits</span>
                       <span className="text-lg font-bold text-primary">{(status as any)?.credits ?? 0}</span>
                     </div>
+                    {!(status as any)?.isPro && (
+                      <button
+                        onClick={() => setLocation("/pricing")}
+                        className="w-full mt-2 py-2 rounded-lg bg-primary/10 border border-primary/25 text-primary text-xs font-bold tracking-wider transition-colors hover:bg-primary/20"
+                      >
+                        UPGRADE FOR MORE
+                      </button>
+                    )}
                   </div>
                 )}
-                {/* Menu items */}
                 <div className="space-y-1">
                   {[
-                    { icon: <Wallet className="w-4.5 h-4.5" />, label: "Billing", href: "/account" },
-                    { icon: <Activity className="w-4.5 h-4.5" />, label: "Usage", href: "/account" },
-                    { icon: <User className="w-4.5 h-4.5" />, label: "Edit Profile", href: "/account" },
-                    { icon: <Zap className="w-4.5 h-4.5" />, label: "Buy Credits", href: "/pricing" },
+                    { icon: <Wallet className="w-4.5 h-4.5" />, label: "Billing", action: () => setAccountSubPage("billing") },
+                    { icon: <Activity className="w-4.5 h-4.5" />, label: "Usage", action: () => setAccountSubPage("usage") },
+                    { icon: <User className="w-4.5 h-4.5" />, label: "Profile", action: () => setAccountSubPage("profile") },
+                    { icon: <Zap className="w-4.5 h-4.5" />, label: "Buy Credits", action: () => setLocation("/pricing") },
                   ].map(item => (
-                    <Link
+                    <button
                       key={item.label}
-                      href={item.href}
-                      className="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-colors"
+                      onClick={item.action}
+                      className="flex items-center gap-3 px-4 py-3.5 rounded-xl w-full transition-colors text-left"
                       style={{ color: isLight ? "#141722" : "rgba(255,255,255,0.85)" }}
                     >
                       <span style={{ color: isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.4)" }}>{item.icon}</span>
                       <span className="text-sm font-medium flex-1">{item.label}</span>
                       <ChevronRight className="w-4 h-4" style={{ color: isLight ? "rgba(20,23,34,0.2)" : "rgba(255,255,255,0.15)" }} />
-                    </Link>
+                    </button>
                   ))}
                 </div>
-                {/* Theme */}
                 <div className="mt-4 pt-4 border-t" style={{ borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }}>
                   <p className="text-[10px] font-bold tracking-widest uppercase mb-2 px-4" style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.25)" }}>Theme</p>
                   <button
@@ -5738,7 +6057,6 @@ export default function Chat() {
                     <ChevronRight className="w-4 h-4" style={{ color: isLight ? "rgba(20,23,34,0.2)" : "rgba(255,255,255,0.15)" }} />
                   </button>
                 </div>
-                {/* Support */}
                 <div className="mt-4 pt-4 border-t" style={{ borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }}>
                   <p className="text-[10px] font-bold tracking-widest uppercase mb-2 px-4" style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.25)" }}>Support</p>
                   {[
@@ -5758,7 +6076,6 @@ export default function Chat() {
                     </Link>
                   ))}
                 </div>
-                {/* Other */}
                 <div className="mt-4 pt-4 border-t" style={{ borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }}>
                   <p className="text-[10px] font-bold tracking-widest uppercase mb-2 px-4" style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.25)" }}>Other</p>
                   <Link
@@ -5788,6 +6105,7 @@ export default function Chat() {
                   </button>
                 </div>
                 <div className="h-8" />
+                </>)}
               </div>
             )}
 
@@ -6626,7 +6944,7 @@ export default function Chat() {
             ].map(item => (
               <button
                 key={item.id}
-                onClick={() => setMobileNav(item.id)}
+                onClick={() => { setMobileNav(item.id); setAccountSubPage(null); }}
                 className="flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all relative"
                 style={{
                   color: mobileNav === item.id
