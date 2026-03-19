@@ -24,3 +24,9 @@ id = "ma_BGliTCAUUALYpAoWS1"
 uri = "file://Ohio_Lottery_Picks_2026.pdf"
 type = "pdf"
 title = "Ohio Lottery Picks — Powerball & Mega Millions (PDF)"
+
+[[outputs]]
+id = "zU0fj6vRBtCNays6PbXZN"
+uri = "file://attached_assets/generated_videos/humans_vs_ai_robots_war.mp4"
+type = "video"
+title = "Humans vs AI Robots War - 8 Second Video"
