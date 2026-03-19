@@ -9,12 +9,13 @@ import {
   Trash2, Edit3, ExternalLink, Copy, Check, ChevronRight, ChevronLeft,
   Upload, AlertCircle, RefreshCw, Send, Link, X, FileCode, Zap,
   Monitor, Smartphone, Server, Package, Rocket, Settings,
-  Search, Star, FolderOpen, Folder, Filter, Lock, Globe2, MoreVertical, FolderPlus
+  Search, Star, FolderOpen, Folder, Filter, Lock, Globe2, MoreVertical, FolderPlus,
+  Mic, BrainCircuit, Wand2, BookOpen, ShoppingCart, Presentation
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-type ProjectType = "website" | "webapp" | "game" | "dataviz" | "api" | "tool" | "extension";
+type ProjectType = "website" | "webapp" | "game" | "dataviz" | "api" | "tool" | "extension" | "voice" | "ai" | "ecommerce" | "education" | "presentation";
 
 type ProjectFile = {
   id: number;
@@ -48,12 +49,18 @@ type Project = {
 // ── Constants ──────────────────────────────────────────────────────────────────
 
 const PROJECT_TYPES: { value: ProjectType; label: string; desc: string; icon: React.ReactNode; color: string }[] = [
-  { value: "website", label: "Website", desc: "Landing page, portfolio, blog", icon: <Globe className="w-5 h-5" />, color: "text-blue-400 bg-blue-400/10 border-blue-400/20" },
-  { value: "webapp", label: "Web App", desc: "Full interactive application", icon: <Monitor className="w-5 h-5" />, color: "text-purple-400 bg-purple-400/10 border-purple-400/20" },
-  { value: "game", label: "Game", desc: "Browser game with canvas/WebGL", icon: <Gamepad2 className="w-5 h-5" />, color: "text-green-400 bg-green-400/10 border-green-400/20" },
-  { value: "dataviz", label: "Data Viz", desc: "Charts, dashboards, analytics", icon: <BarChart3 className="w-5 h-5" />, color: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20" },
-  { value: "api", label: "API / Backend", desc: "REST endpoints, data service", icon: <Server className="w-5 h-5" />, color: "text-pink-400 bg-pink-400/10 border-pink-400/20" },
-  { value: "tool", label: "Tool / Utility", desc: "Developer or productivity tool", icon: <Wrench className="w-5 h-5" />, color: "text-orange-400 bg-orange-400/10 border-orange-400/20" },
+  { value: "website",      label: "Website",       desc: "Landing page, portfolio, blog",      icon: <Globe className="w-5 h-5" />,         color: "text-blue-400 bg-blue-400/10 border-blue-400/20" },
+  { value: "webapp",       label: "Web App",        desc: "Full interactive application",       icon: <Monitor className="w-5 h-5" />,        color: "text-purple-400 bg-purple-400/10 border-purple-400/20" },
+  { value: "voice",        label: "Voice App",      desc: "Speech, audio, podcast, voice AI",   icon: <Mic className="w-5 h-5" />,            color: "text-rose-400 bg-rose-400/10 border-rose-400/20" },
+  { value: "game",         label: "Game",           desc: "Browser game with canvas/WebGL",     icon: <Gamepad2 className="w-5 h-5" />,       color: "text-green-400 bg-green-400/10 border-green-400/20" },
+  { value: "dataviz",      label: "Data Viz",       desc: "Charts, dashboards, analytics",      icon: <BarChart3 className="w-5 h-5" />,      color: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20" },
+  { value: "ai",           label: "AI Agent",       desc: "Autonomous agent, AI pipeline",      icon: <BrainCircuit className="w-5 h-5" />,   color: "text-violet-400 bg-violet-400/10 border-violet-400/20" },
+  { value: "api",          label: "API / Backend",  desc: "REST endpoints, data service",       icon: <Server className="w-5 h-5" />,         color: "text-pink-400 bg-pink-400/10 border-pink-400/20" },
+  { value: "ecommerce",    label: "E-Commerce",     desc: "Store, products, checkout, cart",    icon: <ShoppingCart className="w-5 h-5" />,   color: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20" },
+  { value: "education",    label: "Education",      desc: "Course, quiz, learning platform",    icon: <BookOpen className="w-5 h-5" />,       color: "text-sky-400 bg-sky-400/10 border-sky-400/20" },
+  { value: "presentation", label: "Presentation",   desc: "Slides, pitch deck, visual story",   icon: <Presentation className="w-5 h-5" />,   color: "text-amber-400 bg-amber-400/10 border-amber-400/20" },
+  { value: "tool",         label: "Tool / Utility", desc: "Developer or productivity tool",     icon: <Wrench className="w-5 h-5" />,         color: "text-orange-400 bg-orange-400/10 border-orange-400/20" },
+  { value: "extension",    label: "Extension",      desc: "Browser extension or plugin",        icon: <Package className="w-5 h-5" />,        color: "text-cyan-400 bg-cyan-400/10 border-cyan-400/20" },
 ];
 
 const STATUS_CONFIG = {
@@ -64,13 +71,18 @@ const STATUS_CONFIG = {
 };
 
 const TYPE_ICONS: Record<ProjectType, React.ReactNode> = {
-  website: <Globe className="w-4 h-4" />,
-  webapp: <Monitor className="w-4 h-4" />,
-  game: <Gamepad2 className="w-4 h-4" />,
-  dataviz: <BarChart3 className="w-4 h-4" />,
-  api: <Server className="w-4 h-4" />,
-  tool: <Wrench className="w-4 h-4" />,
-  extension: <Package className="w-4 h-4" />,
+  website:      <Globe className="w-4 h-4" />,
+  webapp:       <Monitor className="w-4 h-4" />,
+  voice:        <Mic className="w-4 h-4" />,
+  game:         <Gamepad2 className="w-4 h-4" />,
+  dataviz:      <BarChart3 className="w-4 h-4" />,
+  ai:           <BrainCircuit className="w-4 h-4" />,
+  api:          <Server className="w-4 h-4" />,
+  ecommerce:    <ShoppingCart className="w-4 h-4" />,
+  education:    <BookOpen className="w-4 h-4" />,
+  presentation: <Presentation className="w-4 h-4" />,
+  tool:         <Wrench className="w-4 h-4" />,
+  extension:    <Package className="w-4 h-4" />,
 };
 
 // ── Helper ─────────────────────────────────────────────────────────────────────
@@ -91,7 +103,13 @@ function detectProjectType(desc: string): ProjectType | null {
   const d = desc.toLowerCase();
   if (/\bgame\b|3d game|canvas game|webgl|sprite|platformer|shooter|puzzle game|rpg|arcade/.test(d)) return "game";
   if (/dashboard|analytics|chart|graph|data.?viz|visualization|reporting|metrics|heatmap/.test(d)) return "dataviz";
+  if (/\bvoice\b|speech|audio|podcast|transcri|text.?to.?speech|speech.?to.?text|whisper|tts\b|stt\b|narrat/.test(d)) return "voice";
+  if (/\bai\b|agent|llm|gpt|chatbot|openai|anthropic|pipeline|autonomous|neural|embedding|vector/.test(d)) return "ai";
+  if (/shop|store|e.?commerce|checkout|cart|product|payment|stripe|woocommerce|shopify/.test(d)) return "ecommerce";
+  if (/course|quiz|lesson|learn|education|tutor|curriculum|flashcard|lms\b|school/.test(d)) return "education";
+  if (/slide|presentation|pitch.?deck|deck|keynote|powerpoint|talk\b|seminar/.test(d)) return "presentation";
   if (/\bapi\b|\brest\b|endpoint|backend|microservice|graphql|server.?side|webhook|data.?service/.test(d)) return "api";
+  if (/extension|plugin|addon|browser.?extension|chrome.?extension|firefox.?extension/.test(d)) return "extension";
   if (/\btool\b|utility|cli|command.?line|converter|generator|parser|formatter|linter|calculator/.test(d)) return "tool";
   if (/\bapp\b|application|\bsaas\b|platform|portal|dashboard app|interactive|web app/.test(d)) return "webapp";
   if (/website|landing.?page|portfolio|blog|\bsite\b|homepage|showcase|marketing/.test(d)) return "website";
@@ -167,36 +185,49 @@ function CreateProjectModal({ onClose, onCreate }: { onClose: () => void; onCrea
               <label className="block text-xs font-mono text-white uppercase tracking-widest">Project Type</label>
               <div className="flex items-center gap-2">
                 {!manualType && type && (
-                  <span className="text-[9px] font-mono text-primary/80 bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded">
+                  <span className="text-[9px] font-mono text-primary/90 bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded">
                     AUTO-DETECTED
                   </span>
                 )}
-                {manualType && (
-                  <button onClick={handleClearManual} className="text-[9px] font-mono text-white/40 hover:text-white/70 underline transition-colors">
-                    reset to auto
-                  </button>
-                )}
                 {!type && !manualType && (
-                  <span className="text-[9px] font-mono text-white/30 italic">type a description to auto-detect</span>
+                  <span className="text-[9px] font-mono text-white/50 italic">type a description to auto-detect</span>
                 )}
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-4 gap-1.5 mb-1.5">
               {PROJECT_TYPES.map(pt => (
                 <button key={pt.value} onClick={() => handleSelectType(pt.value)}
-                  className={`flex flex-col items-start gap-1 p-3 rounded-xl border transition-all text-left relative ${
-                    type === pt.value ? pt.color : "border-white/8 bg-white/3 text-white/60 hover:text-white hover:border-white/20"
+                  className={`flex flex-col items-start gap-0.5 p-2.5 rounded-xl border transition-all text-left relative ${
+                    type === pt.value ? pt.color : "border-white/8 bg-white/3 text-white/70 hover:text-white hover:border-white/20"
                   }`}
                 >
                   {pt.icon}
-                  <p className="text-[11px] font-mono font-bold">{pt.label}</p>
-                  <p className="text-[9px] font-mono opacity-70">{pt.desc}</p>
+                  <p className="text-[10px] font-mono font-bold mt-1">{pt.label}</p>
+                  <p className="text-[8px] font-mono opacity-75 leading-tight">{pt.desc}</p>
                   {type === pt.value && !manualType && (
-                    <span className="absolute top-1.5 right-1.5 text-[7px] font-mono bg-primary/20 text-primary px-1 rounded">AUTO</span>
+                    <span className="absolute top-1 right-1 text-[6px] font-mono bg-primary/20 text-primary px-1 rounded">AUTO</span>
                   )}
                 </button>
               ))}
             </div>
+            {/* Auto tile — let OMNIMENS decide from the description */}
+            <button
+              onClick={handleClearManual}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all ${
+                !manualType
+                  ? "border-primary/40 bg-primary/8 text-primary"
+                  : "border-white/8 bg-white/3 text-white/60 hover:text-white hover:border-white/20"
+              }`}
+            >
+              <Wand2 className="w-4 h-4 shrink-0" />
+              <div className="text-left">
+                <p className="text-[11px] font-mono font-bold">Auto — Let OMNIMENS Decide</p>
+                <p className="text-[9px] font-mono opacity-75">OMNIMENS will analyze your description and pick the best type automatically</p>
+              </div>
+              {!manualType && (
+                <span className="ml-auto text-[8px] font-mono bg-primary/20 px-1.5 py-0.5 rounded shrink-0">ACTIVE</span>
+              )}
+            </button>
           </div>
         </div>
 
