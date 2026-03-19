@@ -73,11 +73,11 @@ function PageFallback() {
   );
 }
 
-class ChunkErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
-  state = { hasError: false };
+class ChunkErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; errorMsg: string }> {
+  state = { hasError: false, errorMsg: "" };
 
-  static getDerivedStateFromError() {
-    return { hasError: true };
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, errorMsg: `${error?.name}: ${error?.message}` };
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
@@ -98,6 +98,7 @@ class ChunkErrorBoundary extends Component<{ children: ReactNode }, { hasError: 
       return (
         <div className="min-h-screen bg-[#0a0a0f] flex flex-col items-center justify-center gap-4 text-white">
           <p className="font-mono text-sm text-white/60 tracking-widest">OMNIMENS could not load. Please refresh.</p>
+          <p className="font-mono text-[10px] text-red-400/70 max-w-md text-center break-all px-4">{this.state.errorMsg}</p>
           <button
             onClick={() => {
               if ("serviceWorker" in navigator) {
