@@ -4769,7 +4769,16 @@ function CameraModal({ onCapture, onClose }: { onCapture: (file: File) => void; 
 export default function Chat() {
   const { isAuthenticated, isLoading } = useAuth();
   const [, setLocation] = useLocation();
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(() => {
+    try { return localStorage.getItem("omnimens_draft") || ""; } catch { return ""; }
+  });
+  const setInputWithDraft = useCallback((v: string | ((prev: string) => string)) => {
+    setInput(prev => {
+      const next = typeof v === "function" ? v(prev) : v;
+      try { if (next) localStorage.setItem("omnimens_draft", next); else localStorage.removeItem("omnimens_draft"); } catch {}
+      return next;
+    });
+  }, []);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -4801,7 +4810,7 @@ export default function Chat() {
         else interim += e.results[i][0].transcript;
       }
       interimRef.current = interim;
-      if (final) setInput(prev => (prev ? prev.trimEnd() + " " : "") + final.trim());
+      if (final) setInputWithDraft(prev => (prev ? prev.trimEnd() + " " : "") + final.trim());
     };
     recognition.onend = () => setIsListening(false);
     recognition.onerror = () => setIsListening(false);
@@ -5265,7 +5274,7 @@ export default function Chat() {
       });
     }
     sendMessage(input, pendingFiles, persona, hubSettings, selectedModel, responseMode, sessionStart);
-    setInput("");
+    setInputWithDraft("");
     setPendingFiles([]);
   };
 
@@ -5593,7 +5602,7 @@ export default function Chat() {
                   ].map(chip => (
                     <button
                       key={chip.label}
-                      onClick={() => setInput(chip.prompt)}
+                      onClick={() => setInputWithDraft(chip.prompt)}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/12 bg-white/4 hover:bg-white/8 hover:border-primary/30 text-white/70 hover:text-white transition-all text-[11px] font-mono whitespace-nowrap shrink-0"
                     >
                       <span>{chip.emoji}</span>
@@ -5904,7 +5913,7 @@ export default function Chat() {
                                   {msg.suggestions.map((s, si) => (
                                     <button
                                       key={si}
-                                      onClick={() => { setInput(s); }}
+                                      onClick={() => { setInputWithDraft(s); }}
                                       className="text-[10px] font-mono text-white/60 hover:text-white/90 border border-white/10 hover:border-primary/40 bg-white/3 hover:bg-primary/8 rounded-full px-2.5 py-1 transition-all duration-200 text-left"
                                     >
                                       {s}
@@ -6081,16 +6090,16 @@ export default function Chat() {
                       <PlusMenuContent
                         onClose={() => setShowPlusMenu(false)}
                         onUpload={() => { fileInputRef.current?.click(); setShowPlusMenu(false); }}
-                        onDatabase={() => { setInput(v => (v ? v + "\n" : "") + "Help me with a database query: "); setShowPlusMenu(false); }}
+                        onDatabase={() => { setInputWithDraft(v => (v ? v + "\n" : "") + "Help me with a database query: "); setShowPlusMenu(false); }}
                         onWebSearch={() => { setDeepResearchMode(true); setShowPlusMenu(false); }}
                         onResonance={() => { setDeepResonanceOpen(true); setShowPlusMenu(false); }}
                         onTasks={() => { setShowTasksPanel(true); setShowPlusMenu(false); }}
-                        onGenerateImage={() => { setInput(v => (v ? v + "\n" : "") + "Generate an image of "); setShowPlusMenu(false); }}
-                        on3DModel={() => { setInput(v => (v ? v + "\n" : "") + "Build me an interactive Three.js 3D scene: "); setShowPlusMenu(false); }}
+                        onGenerateImage={() => { setInputWithDraft(v => (v ? v + "\n" : "") + "Generate an image of "); setShowPlusMenu(false); }}
+                        on3DModel={() => { setInputWithDraft(v => (v ? v + "\n" : "") + "Build me an interactive Three.js 3D scene: "); setShowPlusMenu(false); }}
                         onLipSync={() => { setLocation("/lip-sync"); setShowPlusMenu(false); }}
                         onSelectSkill={(skill) => {
                           handlePersonaChange(skill.persona);
-                          setInput(v => (v ? v + "\n" : "") + `Using ${skill.name}: `);
+                          setInputWithDraft(v => (v ? v + "\n" : "") + `Using ${skill.name}: `);
                           setShowPlusMenu(false);
                         }}
                       />
@@ -6100,7 +6109,7 @@ export default function Chat() {
               </div>
               <textarea
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => setInputWithDraft(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(e); }
                 }}
@@ -6196,7 +6205,7 @@ export default function Chat() {
           <SmartTemplates
             open={showTemplates}
             onClose={() => setShowTemplates(false)}
-            onUseTemplate={(t) => { setInput(t); setShowTemplates(false); }}
+            onUseTemplate={(t) => { setInputWithDraft(t); setShowTemplates(false); }}
           />
 
           {/* ── Status Bar ─────────────────── */}
@@ -6439,7 +6448,7 @@ export default function Chat() {
                         if (e.key === "Enter" && newTaskInput.trim()) {
                           const id = crypto.randomUUID?.() || Date.now().toString();
                           setTasks(ts => [...ts, { id, title: newTaskInput.trim(), status: "pending" }]);
-                          setInput(`Plan this task for me: ${newTaskInput.trim()}`);
+                          setInputWithDraft(`Plan this task for me: ${newTaskInput.trim()}`);
                           setNewTaskInput("");
                           setShowTasksPanel(false);
                         }
@@ -6452,7 +6461,7 @@ export default function Chat() {
                         if (!newTaskInput.trim()) return;
                         const id = crypto.randomUUID?.() || Date.now().toString();
                         setTasks(ts => [...ts, { id, title: newTaskInput.trim(), status: "pending" }]);
-                        setInput(`Plan this task for me: ${newTaskInput.trim()}`);
+                        setInputWithDraft(`Plan this task for me: ${newTaskInput.trim()}`);
                         setNewTaskInput("");
                         setShowTasksPanel(false);
                       }}

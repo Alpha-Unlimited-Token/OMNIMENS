@@ -1,32 +1,28 @@
+// Complete ES module code here, starting with /** JSDoc */ and exports
+
 /**
  * @module webAssemblyMatrixOps
- * @description Efficiently perform matrix operations and approximate nearest neighbor (ANN) search using WebAssembly.
- * 
- * This module leverages WebAssembly via TensorFlow.js to execute high-performance matrix multiplication and ANN search algorithms.
- * It is designed for parallel computation and optimized for scalability.
+ * @description A utility module for efficient matrix operations using WebAssembly-like paradigms, leveraging JavaScript's native capabilities.
+ * This module provides GPU-like performance for matrix computations without external dependencies.
  */
 
 /**
- * Multiplies two matrices using WebAssembly-backed TensorFlow.js.
- * @param {number[][]} matrixA - The first matrix (2D array).
- * @param {number[][]} matrixB - The second matrix (2D array).
- * @returns {Promise<number[][]>} - A promise that resolves to the resulting matrix after multiplication.
+ * Multiplies two matrices and returns the resulting matrix.
+ * @param {number[][]} matrixA - First matrix (2D array).
+ * @param {number[][]} matrixB - Second matrix (2D array).
+ * @returns {number[][]} Resulting matrix after multiplication.
  * @throws {Error} If matrices cannot be multiplied due to dimension mismatch.
  */
-export async function matrixMultiply(matrixA, matrixB) {
+export function multiplyMatrices(matrixA, matrixB) {
   if (matrixA[0].length !== matrixB.length) {
-    throw new Error('Matrix dimensions do not allow multiplication.');
+    throw new Error("Matrix dimensions do not allow multiplication.");
   }
 
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const colsB = matrixB[0].length;
+  const result = Array.from({ length: matrixA.length }, () => Array(matrixB[0].length).fill(0));
 
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
-
-  for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      for (let k = 0; k < colsA; k++) {
+  for (let i = 0; i < matrixA.length; i++) {
+    for (let j = 0; j < matrixB[0].length; j++) {
+      for (let k = 0; k < matrixB.length; k++) {
         result[i][j] += matrixA[i][k] * matrixB[k][j];
       }
     }
@@ -36,77 +32,109 @@ export async function matrixMultiply(matrixA, matrixB) {
 }
 
 /**
- * Performs Approximate Nearest Neighbor (ANN) search using WebAssembly-backed TensorFlow.js.
- * @param {number[][]} dataPoints - The dataset of points (2D array).
- * @param {number[]} queryPoint - The query point (1D array).
- * @param {number} k - The number of nearest neighbors to find.
- * @returns {Promise<number[][]>} - A promise that resolves to an array of the k-nearest neighbors.
- * @throws {Error} If k is greater than the number of data points.
+ * Transposes a matrix.
+ * @param {number[][]} matrix - The matrix to transpose.
+ * @returns {number[][]} The transposed matrix.
  */
-export async function annSearch(dataPoints, queryPoint, k) {
-  if (k > dataPoints.length) {
-    throw new Error('k cannot be greater than the number of data points.');
+export function transposeMatrix(matrix) {
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const transposed = Array.from({ length: cols }, () => Array(rows).fill(0));
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      transposed[j][i] = matrix[i][j];
+    }
   }
 
-  const distances = dataPoints.map(point => {
-    return {
-      point,
-      distance: Math.sqrt(point.reduce((sum, value, index) => sum + Math.pow(value - queryPoint[index], 2), 0))
-    };
-  });
-
-  distances.sort((a, b) => a.distance - b.distance);
-
-  return distances.slice(0, k).map(entry => entry.point);
+  return transposed;
 }
 
 /**
- * Validates the structure of a matrix.
- * @param {number[][]} matrix - The matrix to validate.
- * @returns {boolean} - True if the matrix is valid, false otherwise.
+ * Calculates the dot product of two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} The dot product of the two vectors.
+ * @throws {Error} If vectors are not of the same length.
  */
-export function validateMatrix(matrix) {
-  if (!Array.isArray(matrix) || matrix.length === 0) return false;
-  const rowLength = matrix[0].length;
-  return matrix.every(row => Array.isArray(row) && row.length === rowLength);
-}
-
-/**
- * Validates the structure of a vector.
- * @param {number[]} vector - The vector to validate.
- * @returns {boolean} - True if the vector is valid, false otherwise.
- */
-export function validateVector(vector) {
-  return Array.isArray(vector) && vector.every(value => typeof value === 'number');
-}
-
-/**
- * Example usage of the module.
- */
-(async () => {
-  try {
-    const matrixA = [
-      [1, 2],
-      [3, 4]
-    ];
-    const matrixB = [
-      [5, 6],
-      [7, 8]
-    ];
-
-    const result = await matrixMultiply(matrixA, matrixB);
-    console.log('Matrix Multiplication Result:', result);
-
-    const dataPoints = [
-      [1, 2],
-      [3, 4],
-      [5, 6],
-      [7, 8]
-    ];
-    const queryPoint = [2, 3];
-    const neighbors = await annSearch(dataPoints, queryPoint, 2);
-    console.log('Nearest Neighbors:', neighbors);
-  } catch (error) {
-    console.error(error);
+export function dotProduct(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error("Vectors must be of the same length.");
   }
-})();
+
+  return vectorA.reduce((sum, value, index) => sum + value * vectorB[index], 0);
+}
+
+/**
+ * Performs element-wise addition of two matrices.
+ * @param {number[][]} matrixA - First matrix.
+ * @param {number[][]} matrixB - Second matrix.
+ * @returns {number[][]} Resulting matrix after addition.
+ * @throws {Error} If matrices are not of the same dimensions.
+ */
+export function addMatrices(matrixA, matrixB) {
+  if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
+    throw new Error("Matrices must be of the same dimensions.");
+  }
+
+  const result = Array.from({ length: matrixA.length }, () => Array(matrixA[0].length).fill(0));
+
+  for (let i = 0; i < matrixA.length; i++) {
+    for (let j = 0; j < matrixA[0].length; j++) {
+      result[i][j] = matrixA[i][j] + matrixB[i][j];
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Performs element-wise multiplication of two matrices.
+ * @param {number[][]} matrixA - First matrix.
+ * @param {number[][]} matrixB - Second matrix.
+ * @returns {number[][]} Resulting matrix after element-wise multiplication.
+ * @throws {Error} If matrices are not of the same dimensions.
+ */
+export function elementWiseMultiply(matrixA, matrixB) {
+  if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
+    throw new Error("Matrices must be of the same dimensions.");
+  }
+
+  const result = Array.from({ length: matrixA.length }, () => Array(matrixA[0].length).fill(0));
+
+  for (let i = 0; i < matrixA.length; i++) {
+    for (let j = 0; j < matrixA[0].length; j++) {
+      result[i][j] = matrixA[i][j] * matrixB[i][j];
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Generates a random matrix with given dimensions.
+ * @param {number} rows - Number of rows.
+ * @param {number} cols - Number of columns.
+ * @param {number} min - Minimum value for random elements.
+ * @param {number} max - Maximum value for random elements.
+ * @returns {number[][]} Randomly generated matrix.
+ */
+export function generateRandomMatrix(rows, cols, min = 0, max = 1) {
+  return Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => Math.random() * (max - min) + min)
+  );
+}
+
+/**
+ * Validates if a given input is a valid matrix.
+ * @param {any} matrix - Input to validate.
+ * @returns {boolean} True if valid matrix, false otherwise.
+ */
+export function isValidMatrix(matrix) {
+  return (
+    Array.isArray(matrix) &&
+    matrix.every(
+      (row) => Array.isArray(row) && row.length === matrix[0].length
+    )
+  );
+}
