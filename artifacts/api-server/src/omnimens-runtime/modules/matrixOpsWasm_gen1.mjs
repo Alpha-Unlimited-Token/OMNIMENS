@@ -1,90 +1,70 @@
 /**
  * @module matrixOpsWasm
- * @description A WebAssembly-based utility module for efficient matrix operations in Node.js, leveraging optimized linear algebra routines.
+ * @description Efficiently performs matrix operations using WebAssembly for numerical computation.
+ * This module provides a WebAssembly-based implementation of common linear algebra operations, such as matrix multiplication,
+ * leveraging WebAssembly's performance benefits. Designed for Node.js 20+ environments.
  */
 
-const { readFileSync } = require('fs');
-const { join } = require('path');
+const { readFile } = require('fs/promises');
+const path = require('path');
 
 /**
- * Loads a WebAssembly module from a specified file path.
- * @param {string} wasmFilePath - The relative path to the WebAssembly binary file.
- * @returns {Promise<WebAssembly.Instance>} A promise resolving to the WebAssembly instance.
- * @throws {Error} If the file cannot be read or the WebAssembly module fails to instantiate.
+ * Loads and initializes the WebAssembly module for matrix operations.
+ * @async
+ * @returns {Promise<WebAssembly.Instance>} The initialized WebAssembly instance.
  */
-async function loadWasmModule(wasmFilePath) {
-  try {
-    const wasmBuffer = readFileSync(join(__dirname, wasmFilePath));
-    const wasmModule = await WebAssembly.instantiate(wasmBuffer);
-    return wasmModule.instance;
-  } catch (error) {
-    throw new Error(`Failed to load WebAssembly module: ${error.message}`);
-  }
+async function loadWasmModule() {
+  const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = await readFile(wasmPath);
+  const wasmModule = await WebAssembly.compile(wasmBuffer);
+  const wasmInstance = await WebAssembly.instantiate(wasmModule);
+  return wasmInstance;
 }
 
 /**
- * Multiplies two matrices using the WebAssembly module.
- * @param {Float64Array} matrixA - The first matrix in row-major order.
- * @param {Float64Array} matrixB - The second matrix in row-major order.
- * @param {number} rowsA - Number of rows in matrixA.
- * @param {number} colsA - Number of columns in matrixA (and rows in matrixB).
- * @param {number} colsB - Number of columns in matrixB.
- * @returns {Float64Array} The resulting matrix in row-major order.
- * @throws {Error} If the matrices' dimensions are incompatible.
+ * Multiplies two matrices using WebAssembly.
+ * @async
+ * @param {number[][]} matrixA - The first matrix (2D array).
+ * @param {number[][]} matrixB - The second matrix (2D array).
+ * @returns {Promise<number[][]>} The resulting matrix after multiplication.
+ * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
  */
-async function multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB) {
-  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
-    throw new Error('Matrix dimensions do not match the provided sizes.');
+async function multiplyMatrices(matrixA, matrixB) {
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Matrix dimensions do not allow multiplication.');
   }
 
-  const wasmInstance = await loadWasmModule('./matrix_ops.wasm');
+  const wasmInstance = await loadWasmModule();
+  const { memory, multiply_matrices } = wasmInstance.exports;
 
-  const { memory, multiply } = wasmInstance.exports;
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const colsB = matrixB[0].length;
 
-  const matrixAOffset = 0;
-  const matrixBOffset = matrixA.length * Float64Array.BYTES_PER_ELEMENT;
-  const resultOffset = matrixBOffset + matrixB.length * Float64Array.BYTES_PER_ELEMENT;
+  // Flatten matrices into 1D arrays for WebAssembly.
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
+  const resultSize = rowsA * colsB;
+  const resultArray = new Float64Array(resultSize);
 
-  const memoryView = new Float64Array(memory.buffer);
-  memoryView.set(matrixA, matrixAOffset / Float64Array.BYTES_PER_ELEMENT);
-  memoryView.set(matrixB, matrixBOffset / Float64Array.BYTES_PER_ELEMENT);
+  // Allocate memory in WebAssembly.
+  const offsetA = 0;
+  const offsetB = offsetA + flatA.length * 8;
+  const offsetResult = offsetB + flatB.length * 8;
 
-  multiply(matrixAOffset, matrixBOffset, resultOffset, rowsA, colsA, colsB);
+  const wasmMemory = new Float64Array(memory.buffer);
+  wasmMemory.set(flatA, offsetA / 8);
+  wasmMemory.set(flatB, offsetB / 8);
 
-  return new Float64Array(memory.buffer, resultOffset, rowsA * colsB);
-}
+  multiply_matrices(offsetA, rowsA, colsA, offsetB, colsB, offsetResult);
 
-/**
- * Adds two matrices element-wise using the WebAssembly module.
- * @param {Float64Array} matrixA - The first matrix in row-major order.
- * @param {Float64Array} matrixB - The second matrix in row-major order.
- * @returns {Float64Array} The resulting matrix in row-major order.
- * @throws {Error} If the matrices' dimensions do not match.
- */
-async function addMatrices(matrixA, matrixB) {
-  if (matrixA.length !== matrixB.length) {
-    throw new Error('Matrices must have the same dimensions for addition.');
+  // Extract the result matrix from WebAssembly memory.
+  const result = [];
+  for (let i = 0; i < rowsA; i++) {
+    result.push(Array.from(wasmMemory.slice(offsetResult / 8 + i * colsB, offsetResult / 8 + (i + 1) * colsB)));
   }
 
-  const wasmInstance = await loadWasmModule('./matrix_ops.wasm');
-
-  const { memory, add } = wasmInstance.exports;
-
-  const matrixAOffset = 0;
-  const matrixBOffset = matrixA.length * Float64Array.BYTES_PER_ELEMENT;
-  const resultOffset = matrixBOffset + matrixB.length * Float64Array.BYTES_PER_ELEMENT;
-
-  const memoryView = new Float64Array(memory.buffer);
-  memoryView.set(matrixA, matrixAOffset / Float64Array.BYTES_PER_ELEMENT);
-  memoryView.set(matrixB, matrixBOffset / Float64Array.BYTES_PER_ELEMENT);
-
-  add(matrixAOffset, matrixBOffset, resultOffset, matrixA.length);
-
-  return new Float64Array(memory.buffer, resultOffset, matrixA.length);
+  return result;
 }
 
-module.exports = {
-  loadWasmModule,
-  multiplyMatrices,
-  addMatrices
-};
+export { multiplyMatrices };
