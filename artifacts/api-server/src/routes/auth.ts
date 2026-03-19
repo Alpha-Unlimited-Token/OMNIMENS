@@ -24,6 +24,10 @@ const OIDC_COOKIE_TTL = 10 * 60 * 1000;
 const router: IRouter = Router();
 
 function getOrigin(req: Request): string {
+  const replitDomain = process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN;
+  if (replitDomain) {
+    return `https://${replitDomain}`;
+  }
   const proto = req.headers["x-forwarded-proto"] || "https";
   const host =
     req.headers["x-forwarded-host"] || req.headers["host"] || "localhost";
@@ -104,6 +108,10 @@ router.get("/login", async (req: Request, res: Response) => {
 
   const returnTo = getSafeReturnTo(req.query.returnTo);
 
+  const incomingHost = (req.headers["x-forwarded-host"] || req.headers["host"] || "") as string;
+  const replitDomain = process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || "";
+  const originHost = incomingHost !== replitDomain ? incomingHost : "";
+
   const state = oidc.randomState();
   const nonce = oidc.randomNonce();
   const codeVerifier = oidc.randomPKCECodeVerifier();
@@ -123,6 +131,7 @@ router.get("/login", async (req: Request, res: Response) => {
   setOidcCookie(res, "nonce", nonce);
   setOidcCookie(res, "state", state);
   setOidcCookie(res, "return_to", returnTo);
+  if (originHost) setOidcCookie(res, "origin_host", originHost);
 
   res.redirect(redirectTo.href);
 });
@@ -162,11 +171,13 @@ router.get("/callback", async (req: Request, res: Response) => {
   }
 
   const returnTo = getSafeReturnTo(req.cookies?.return_to);
+  const originHost = req.cookies?.origin_host || "";
 
   res.clearCookie("code_verifier", { path: "/" });
   res.clearCookie("nonce", { path: "/" });
   res.clearCookie("state", { path: "/" });
   res.clearCookie("return_to", { path: "/" });
+  res.clearCookie("origin_host", { path: "/" });
 
   const claims = tokens.claims();
   if (!claims) {
@@ -199,7 +210,12 @@ router.get("/callback", async (req: Request, res: Response) => {
 
   const sid = await createSession(sessionData);
   setSessionCookie(res, sid);
-  res.redirect(returnTo);
+
+  if (originHost) {
+    res.redirect(`https://${originHost}${returnTo}`);
+  } else {
+    res.redirect(returnTo);
+  }
 });
 
 router.get("/logout", async (req: Request, res: Response) => {
