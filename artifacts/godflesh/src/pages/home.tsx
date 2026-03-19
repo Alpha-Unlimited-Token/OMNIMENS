@@ -915,7 +915,7 @@ function CogniSyncVisualizer() {
 // ── App Install / Download Section ───────────────────────────────────────────
 function AppInstallSection() {
   const { canInstall, install, installed } = usePwaInstall();
-  const [showFallback, setShowFallback] = useState(true);
+  const [showFallback, setShowFallback] = useState(false);
   const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
   const platforms = [
@@ -1055,24 +1055,34 @@ function AppInstallSection() {
                     </div>
                   ) : (
                     <div className="flex flex-col gap-2">
-                      <div className="flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-mono text-sm font-bold tracking-widest text-white/85 border border-white/8 bg-white/3">
+                      <button
+                        onClick={async () => {
+                          const result = await install();
+                          if (!result) setShowFallback(true);
+                        }}
+                        className="flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-mono text-sm font-bold tracking-widest transition-all hover:opacity-85 active:scale-[0.98]"
+                        style={{ background: "linear-gradient(135deg,#7c3aed,#4f46e5)", boxShadow: "0 0 32px rgba(124,58,237,0.35)" }}
+                      >
                         <Download className="w-4 h-4" />
                         INSTALL APP
-                      </div>
-                      <button
-                        onClick={() => setShowFallback(v => !v)}
-                        className="text-[10px] font-mono text-white/80 hover:text-white/82 tracking-widest transition-colors"
-                      >
-                        {showFallback ? "hide instructions ↑" : "how to install manually ↓"}
                       </button>
                       {showFallback && (
-                        <div className="rounded-xl border border-white/6 bg-white/2 p-4 space-y-2 mt-1">
-                          <p className="text-white/75 font-mono text-[10px] leading-relaxed">
-                            Open this page in <span className="text-primary/70">Chrome or Edge</span>, click the
-                            install icon in the address bar (⊕), or open the browser menu and select
-                            <span className="text-primary/70"> "Add to Home Screen"</span> /
-                            <span className="text-primary/70"> "Install app"</span>.
-                          </p>
+                        <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3 mt-1">
+                          <p className="text-white/85 font-mono text-xs font-bold tracking-widest uppercase">How to install</p>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <span className="w-5 h-5 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-[9px] font-bold text-primary shrink-0">1</span>
+                              <span className="text-white/80 font-mono text-xs">Tap the browser menu <span className="text-primary/80">⋮</span> (three dots)</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="w-5 h-5 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-[9px] font-bold text-primary shrink-0">2</span>
+                              <span className="text-white/80 font-mono text-xs">Select <span className="text-primary/80">"Add to Home Screen"</span> or <span className="text-primary/80">"Install app"</span></span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="w-5 h-5 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-[9px] font-bold text-primary shrink-0">3</span>
+                              <span className="text-white/80 font-mono text-xs">Tap <span className="text-primary/80">"Install"</span> — OMNIMENS appears on your home screen</span>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>

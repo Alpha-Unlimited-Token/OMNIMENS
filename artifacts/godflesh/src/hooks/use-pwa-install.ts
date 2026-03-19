@@ -4,7 +4,7 @@
  * Unauthorized reproduction, distribution, or use is strictly prohibited.
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -14,22 +14,28 @@ interface BeforeInstallPromptEvent extends Event {
 export function usePwaInstall() {
   const [prompt, setPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
+  const promptRef = useRef<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
     if ((window as any).__pwaPrompt) {
-      setPrompt((window as any).__pwaPrompt as BeforeInstallPromptEvent);
+      const p = (window as any).__pwaPrompt as BeforeInstallPromptEvent;
+      setPrompt(p);
+      promptRef.current = p;
       (window as any).__pwaPrompt = null;
     }
 
     const handler = (e: Event) => {
       e.preventDefault();
-      setPrompt(e as BeforeInstallPromptEvent);
+      const p = e as BeforeInstallPromptEvent;
+      setPrompt(p);
+      promptRef.current = p;
     };
     window.addEventListener("beforeinstallprompt", handler);
 
     const installedHandler = () => {
       setInstalled(true);
       setPrompt(null);
+      promptRef.current = null;
     };
     window.addEventListener("appinstalled", installedHandler);
 
@@ -44,22 +50,28 @@ export function usePwaInstall() {
   }, []);
 
   const install = useCallback(async () => {
-    if (!prompt) {
+    const p = promptRef.current || prompt;
+    if (!p) {
       console.warn("[PWA] No install prompt available");
-      return;
+      return false;
     }
     try {
-      await prompt.prompt();
-      const { outcome } = await prompt.userChoice;
+      await p.prompt();
+      const { outcome } = await p.userChoice;
       if (outcome === "accepted") {
         setPrompt(null);
+        promptRef.current = null;
         setInstalled(true);
+        return true;
       }
+      return false;
     } catch (err) {
       console.error("[PWA] Install prompt failed:", err);
       setPrompt(null);
+      promptRef.current = null;
+      return false;
     }
   }, [prompt]);
 
-  return { canInstall: !!prompt && !installed, installed, install };
+  return { canInstall: (!!prompt || !!promptRef.current) && !installed, installed, install };
 }
