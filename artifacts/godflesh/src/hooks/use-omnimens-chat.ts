@@ -18,6 +18,14 @@ export type GeneratedImage = {
   spellCorrections?: SpellCorrection[];
 };
 
+export type GeneratedVideo = {
+  url: string;
+  prompt: string;
+  index: number;
+  provider?: string;
+  sizeBytes?: number;
+};
+
 export type Generated3DModel = {
   glbBase64: string;
   glbSizeBytes: number;
@@ -253,6 +261,8 @@ export type Message = {
   imageSpellRequestId?: string | null;
   models3d?: Generated3DModel[];
   generating3d?: boolean;
+  videos?: GeneratedVideo[];
+  generatingVideo?: boolean;
   games?: GeneratedGame[];
   generatingGame?: boolean;
   gamePhase?: string;
@@ -682,6 +692,39 @@ export function useOmnimensChat(
                   return newMsgs;
                 });
 
+              } else if (data.type === "video_generating") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) msg.generatingVideo = true;
+                  return newMsgs;
+                });
+
+              } else if (data.type === "video_generated") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    msg.videos = [...(msg.videos || []), {
+                      url: data.url,
+                      prompt: data.prompt,
+                      index: data.index,
+                      provider: data.provider,
+                      sizeBytes: data.sizeBytes,
+                    }];
+                    msg.generatingVideo = false;
+                  }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "video_error") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) msg.generatingVideo = false;
+                  return newMsgs;
+                });
+
               } else if (data.type === "game_generating") {
                 setMessages((prev) => {
                   const newMsgs = [...prev];
@@ -975,6 +1018,7 @@ export function useOmnimensChat(
                   if (msg) {
                     msg.generatingImages = false;
                     msg.generating3d = false;
+                    msg.generatingVideo = false;
                     if (data.creditCost)     msg.creditCost    = data.creditCost;
                     if (data.costBreakdown)  msg.costBreakdown = data.costBreakdown;
                     if (data.model)          msg.model         = data.model;

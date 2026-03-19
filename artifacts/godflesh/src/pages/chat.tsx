@@ -14,7 +14,7 @@ import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation, Link } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { useQuery, useQueryClient as useQC } from "@tanstack/react-query";
-import { useOmnimensChat, type GeneratedImage, type Generated3DModel, type GeneratedGame, type Artifact, type CostBreakdown, type TaskPlan, type RedFlagAlert, type ToolResult, type CogniSyncState } from "@/hooks/use-omnimens-chat";
+import { useOmnimensChat, type GeneratedImage, type GeneratedVideo, type Generated3DModel, type GeneratedGame, type Artifact, type CostBreakdown, type TaskPlan, type RedFlagAlert, type ToolResult, type CogniSyncState } from "@/hooks/use-omnimens-chat";
 import { useWebGpuLlm } from "@/hooks/use-webgpu-llm";
 import { OmnimensPresence } from "@/components/omnimens-presence";
 import { PendingFileList, AttachedFileList } from "@/components/file-attachments";
@@ -5682,6 +5682,37 @@ export default function Chat() {
                                 </div>
                               )}
 
+                              {msg.videos && msg.videos.length > 0 && (
+                                <div className="mt-4 space-y-4">
+                                  {msg.videos.map((vid) => (
+                                    <div key={vid.index} className="rounded-xl overflow-hidden border border-white/10 bg-black/40 max-w-lg">
+                                      <video
+                                        src={vid.url}
+                                        controls
+                                        autoPlay
+                                        loop
+                                        muted
+                                        playsInline
+                                        className="w-full rounded-t-xl"
+                                      />
+                                      <div className="px-3 py-2 flex items-center justify-between gap-2">
+                                        <span className="text-xs text-white/50 truncate">{vid.prompt.slice(0, 80)}{vid.prompt.length > 80 ? "…" : ""}</span>
+                                        <div className="flex items-center gap-2 shrink-0">
+                                          {vid.sizeBytes && <span className="text-[10px] text-white/30">{(vid.sizeBytes / (1024 * 1024)).toFixed(1)} MB</span>}
+                                          <a
+                                            href={vid.url}
+                                            download={`omnimens-video-${vid.index}.mp4`}
+                                            className="text-xs px-2 py-1 rounded bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 transition-colors"
+                                          >
+                                            Download
+                                          </a>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
                               {/* Physical Therapy Red Flag Alert — shown first for patient safety */}
                               {msg.redFlagAlert && msg.redFlagAlert.urgency !== "none" && (
                                 <RedFlagAlertCard alert={msg.redFlagAlert} />
@@ -5708,6 +5739,12 @@ export default function Chat() {
                                   spellWords={msg.imageSpellWords}
                                   spellCorrections={msg.imageSpellCorrections}
                                 />
+                              )}
+                              {msg.generatingVideo && (
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-purple-500/10 border border-purple-500/30 text-purple-300 mt-2">
+                                  <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
+                                  Generating AI video…
+                                </div>
                               )}
                               {msg.imageSpellStatus === "confirming" && msg.imageSpellRequestId && (
                                 <ImageSpellConfirmCard

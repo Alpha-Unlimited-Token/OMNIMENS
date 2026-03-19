@@ -18,6 +18,7 @@ import { eq, and, desc, sql, asc, inArray, gte } from "drizzle-orm";
 import { openai, generateImageBuffer } from "@workspace/integrations-openai-ai-server";
 import { getTogetherClient, isTogetherModel, TOGETHER_MODEL_IDS, TOGETHER_PRICING, syncTogetherPricing, type TogetherModel } from "../lib/together-ai.js";
 import { generateImageWithReplicate, replicateAvailable } from "../lib/replicate-images.js";
+import { generateVideoWithReplicate, replicateVideoAvailable } from "../lib/replicate-videos.js";
 import { runOmnimens, type OmnimensState } from "../lib/omnimens-engine.js";
 import { reflectOnConversation, loadBrainContext, synthesizeUpgrade, markUpgradeLive } from "../lib/omnimens-self-upgrade.js";
 import { webSearch, formatSearchResults } from "../lib/web-search.js";
@@ -177,6 +178,7 @@ const IMAGE_COST_USD               = 0.07;    // ~$0.07 per image (gpt-image-1 m
 // 37% safety buffer ($0.055) to protect against undercharging if their rates change.
 // Check replicate.com/pricing periodically and update this value if needed.
 const IMAGE_COST_REPLICATE_USD     = 0.055;   // $0.055/image (Flux 1.1 Pro + safety buffer)
+const VIDEO_COST_REPLICATE_USD     = 0.30;    // ~$0.30/video (Minimax video-01-live + safety buffer)
 
 // Developer Platform Tool Credit Costs (no external API — pure server compute = ~100% gross margin)
 const DEV_TOOL_CREDITS: Record<string, number> = {
@@ -262,8 +264,9 @@ async function checkAccountLock(userId: string): Promise<{ locked: boolean; reas
 }
 
 function isBuildRequest(message: string): boolean {
-  return /\b(build|create|make|generate|write|design|develop|code)\b.*\b(website|site|page|app|landing|portfolio|store|shop|html|web|diagram|chart|svg|blueprint|3d|animation|video|movie|image|photo|logo|banner|template)\b/i.test(message)
-    || /\b(website|site|landing page|web app|diagram|blueprint|animation|video|movie)\b.*\b(build|create|make|generate)\b/i.test(message)
+  if (/\b(generate|create|make)\b.*\b(video|movie|clip|footage)\b/i.test(message) && !/\b(build|code|html|canvas|three\.?js|webgl)\b/i.test(message)) return false;
+  return /\b(build|create|make|generate|write|design|develop|code)\b.*\b(website|site|page|app|landing|portfolio|store|shop|html|web|diagram|chart|svg|blueprint|3d|animation|image|photo|logo|banner|template)\b/i.test(message)
+    || /\b(website|site|landing page|web app|diagram|blueprint|animation)\b.*\b(build|create|make|generate)\b/i.test(message)
     // Game build detection (Rosebud AI / GDevelop style)
     || /\b(build|create|make|generate|code|design|develop)\b.*\b(game|shooter|platformer|rpg|puzzle|dungeon|arcade|adventure|survival|racing|tower defense|strategy|simulation|roguelike|sandbox|fighting|horror|visual novel)\b/i.test(message)
     || /\b(game|shooter|platformer|rpg|arcade|dungeon crawler)\b.*\b(build|create|make|generate|code)\b/i.test(message)
@@ -765,7 +768,7 @@ REQUIRED — ALWAYS DO THE FOLLOWING INSTEAD:
 • Images → use [GENERATE_IMAGE: detailed description] on its own line — OMNIMENS generates a unique original piece of art
 • Textures in 3D → generate them procedurally using canvas/ctx or mathematical noise functions (Perlin, Simplex, voronoi, etc.) directly in JS — no external files
 • 3D Models → build geometry procedurally with Three.js primitives (BoxGeometry, SphereGeometry, custom BufferGeometry, etc.) — never load external model files
-• Video content → generate it with canvas + MediaRecorder API, GSAP, or WebGL animations — no external video files
+• Video content → use [GENERATE_VIDEO: detailed description] on its own line — OMNIMENS generates a real AI video. Only use canvas + MediaRecorder for coded animations when the user explicitly asks for HTML/code-based video.
 • Audio → synthesize it with the Web Audio API (oscillators, gain nodes, filters, reverb convolver) — never load external audio files
 • Colors, patterns, backgrounds → procedural gradients, noise patterns, canvas drawing, CSS — no external assets
 
@@ -780,7 +783,9 @@ JAVASCRIPT LIBRARY CDNs ARE ALLOWED: Three.js, GSAP, p5.js, Phaser, Tone.js, Cha
 
 4. 3D SCENES & ENVIRONMENTS → Complete HTML in a \`\`\`html block using Three.js from CDN. Animated, immersive, lighting, geometry, motion. Build ALL geometry with Three.js primitives or custom BufferGeometry. Generate ALL textures procedurally (canvas DataTexture, noise functions, vertex colors) — NEVER load textures or models from external URLs. ALWAYS include a styled "⬤ REC" button (top-right, dark red, font-mono) using the MediaRecorder API that captures the canvas as a downloadable .webm video file when clicked. Self-terminate recording after 30s or on second click.
 
-5. ANIMATED VIDEOS & CINEMATIC SEQUENCES → Complete HTML in a \`\`\`html block using canvas API + GSAP from CDN. Full visual timeline, cinematic pacing. ALL visuals are procedurally drawn on canvas — shapes, gradients, particles, text — NEVER external video or image files. ALWAYS include a styled "⬤ REC" button (top-right, dark red, font-mono) using the MediaRecorder API for .webm capture.
+5. ANIMATED VIDEOS & CINEMATIC SEQUENCES → Two options:
+   A) AI VIDEO GENERATION (DEFAULT): Output \`[GENERATE_VIDEO: ultra-detailed cinematic description]\` on its own line. Describe the scene in vivid detail — action, camera movement, lighting, mood, style, environment, characters, colors. OMNIMENS generates a real AI video using state-of-the-art models. Use this for ANY video request unless the user specifically asks for coded/HTML animation.
+   B) CODED ANIMATION (only if user says "code", "HTML", "canvas", or "three.js"): Complete HTML in a \`\`\`html block using canvas API + GSAP from CDN. Full visual timeline, cinematic pacing. ALL visuals are procedurally drawn on canvas — shapes, gradients, particles, text — NEVER external video or image files. ALWAYS include a styled "⬤ REC" button (top-right, dark red, font-mono) using the MediaRecorder API for .webm capture.
 
 6. IMAGES → Output \`[GENERATE_IMAGE: ultra-detailed visual description]\` on its own line. Describe the image as if painting it — style, lighting, mood, color, composition, every detail.
    CRITICAL IMAGE RULE: OMNIMENS ONLY generates 100% original AI-synthesized artwork. You MUST NEVER reference, suggest, link to, or embed any external image URL (no Unsplash, Pexels, Pixabay, Wikipedia, Google Images, stock sites, CDN-hosted images, or any http/https image src from the internet). Every image you produce is a brand-new unique piece of original art generated by OMNIMENS — never downloaded, never copied, never sourced from online. If code (HTML, React, etc.) needs images, use [GENERATE_IMAGE: ...] markers or SVG — never external image URLs.
@@ -1833,10 +1838,11 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
     };
     fullText = sanitizeAllExternalMedia(fullText);
 
-    // Strip [GENERATE_IMAGE: ...] and [GENERATE_3D: ...] markers from the displayed content
+    // Strip [GENERATE_IMAGE: ...], [GENERATE_3D: ...], and [GENERATE_VIDEO: ...] markers from the displayed content
     const cleanText = fullText
       .replace(/\[GENERATE_IMAGE:\s*[\s\S]+?\]/g, "")
       .replace(/\[GENERATE_3D:\s*[\s\S]+?\]/g, "")
+      .replace(/\[GENERATE_VIDEO:\s*[\s\S]+?\]/g, "")
       .trim();
     if (cleanText !== fullText) {
       res.write(`data: ${JSON.stringify({ type: "content_update", content: cleanText })}\n\n`);
@@ -1943,6 +1949,46 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
           console.error("[FACE RECOGNITION] Analysis error:", faceErr);
           res.write(`data: ${JSON.stringify({ type: "face_analysis_error", error: "Face analysis failed" })}\n\n`);
         }
+      }
+    }
+
+    // ── Scan for [GENERATE_VIDEO: ...] markers and generate real AI videos ──────
+    const videoMarkers = [...fullText.matchAll(/\[GENERATE_VIDEO:\s*([\s\S]+?)\]/g)].slice(0, 1);
+    let videosGeneratedSuccessfully = 0;
+    for (let vi = 0; vi < videoMarkers.length; vi++) {
+      const videoPrompt = videoMarkers[vi][1].trim();
+      try {
+        res.write(`data: ${JSON.stringify({ type: "video_generating", index: vi, prompt: videoPrompt })}\n\n`);
+        const hbVideo = setInterval(() => {
+          try { res.write(`: ping\n\n`); } catch { /* ignore */ }
+        }, 8000);
+
+        let videoBuffer: Buffer;
+        let videoProvider = "replicate";
+        try {
+          if (replicateVideoAvailable()) {
+            videoBuffer = await generateVideoWithReplicate(videoPrompt);
+          } else {
+            throw new Error("No video generation provider available — REPLICATE_API_TOKEN required");
+          }
+        } finally {
+          clearInterval(hbVideo);
+        }
+
+        const videoBase64 = videoBuffer.toString("base64");
+        const videoDataUrl = `data:video/mp4;base64,${videoBase64}`;
+        res.write(`data: ${JSON.stringify({
+          type: "video_generated",
+          index: vi,
+          prompt: videoPrompt,
+          url: videoDataUrl,
+          provider: videoProvider,
+          sizeBytes: videoBuffer.length,
+        })}\n\n`);
+        videosGeneratedSuccessfully++;
+      } catch (vidErr) {
+        console.error(`[OMNIMENS VIDEO] Error generating video ${vi}:`, vidErr);
+        res.write(`data: ${JSON.stringify({ type: "video_error", index: vi, error: "AI video generation failed" })}\n\n`);
       }
     }
 
@@ -2357,6 +2403,11 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
     const imgCostEach = replicateAvailable() ? IMAGE_COST_REPLICATE_USD : IMAGE_COST_USD;
     actualCostUSD += imagesGenerated * imgCostEach;
 
+    // Add AI video generation costs (only for successfully generated videos)
+    if (videosGeneratedSuccessfully > 0) {
+      actualCostUSD += videosGeneratedSuccessfully * VIDEO_COST_REPLICATE_USD;
+    }
+
     // Add web search overhead (gpt-4o-mini call if search was triggered)
     if (webSearchContext) {
       // shouldSearchWeb: ~300 input + 80 output tokens of gpt-4o-mini
@@ -2367,7 +2418,7 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
     chargedCostUSD = actualCostUSD * PROFIT_MARKUP;
 
     // Convert to credits, with minimum floor
-    const minCredits = imagesGenerated > 0 ? MIN_CREDITS_IMAGE * imagesGenerated : MIN_CREDITS_MESSAGE;
+    const minCredits = videosGeneratedSuccessfully > 0 ? 30 * videosGeneratedSuccessfully : imagesGenerated > 0 ? MIN_CREDITS_IMAGE * imagesGenerated : MIN_CREDITS_MESSAGE;
     // AI cost (token-based) + dev tool invocations (pure compute markup)
     creditCost = Math.max(minCredits, Math.ceil(chargedCostUSD / CREDIT_VALUE_USD)) + devToolCreditCost;
 
@@ -2598,7 +2649,7 @@ router.get("/omnimens/conversations/:id/export", async (req, res) => {
       ``,
       ...messages.map((m: any) => {
         const role = m.role === "user" ? "**You**" : "**OMNIMENS**";
-        const content = (m.content || "").replace(/\[GENERATE_IMAGE:[^\]]*\]/g, "[Image generated]");
+        const content = (m.content || "").replace(/\[GENERATE_IMAGE:[^\]]*\]/g, "[Image generated]").replace(/\[GENERATE_VIDEO:[^\]]*\]/g, "[Video generated]");
         return `${role}\n\n${content}\n\n---\n`;
       }),
     ].join("\n");
