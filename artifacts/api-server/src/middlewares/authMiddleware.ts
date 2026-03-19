@@ -16,6 +16,7 @@ import {
   type SessionData,
 } from "../lib/auth";
 
+
 declare global {
   namespace Express {
     interface User extends AuthUser {}
@@ -86,6 +87,11 @@ export async function authMiddleware(
     await clearSession(res, sid);
     next();
     return;
+  }
+
+  if (!refreshed.user.username) {
+    refreshed.user.username = refreshed.user.firstName || refreshed.user.id;
+    updateSession(sid, refreshed).catch(() => {});
   }
 
   req.user = refreshed.user;

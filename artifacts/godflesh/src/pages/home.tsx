@@ -13,6 +13,7 @@ import { useLocation } from "wouter";
 import { Sparkles, Brain, Zap, Activity, Cpu, GitBranch, Layers, Smartphone, Monitor, Download, Share, ArrowRight, Shield, Eye, Network, Code2, Globe, Image, Search, Mic, FolderOpen, TerminalSquare, Bot, Mail, Building2 } from "lucide-react";
 import { OmnimensPresence } from "@/components/omnimens-presence";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
+import { SEO, seoData } from "@/components/seo";
 
 const RESONANCE_PACKS_DISPLAY = [
   { id: "resonance_10",  price: "$10",  credits: "1,100",  bonus: "+10% bonus",  sessions: "~27 sessions", featured: false },
@@ -43,6 +44,7 @@ export default function Home() {
 
   return (
     <Layout>
+      <SEO {...seoData.home} />
       <div className="flex-1 flex flex-col items-center justify-center w-full relative pt-20 pb-32 overflow-hidden">
 
         {/* Ambient background */}

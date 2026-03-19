@@ -11,6 +11,7 @@ import {
   HelpCircle, CheckCircle2, AlertCircle, Send, ChevronRight,
   Loader2, MessageSquare, Zap, Shield, RefreshCw,
 } from "lucide-react";
+import { SEO, seoData } from "@/components/seo";
 
 const API_BASE = "/api";
 
@@ -216,6 +217,7 @@ export default function SupportPage() {
 
   return (
     <div className="min-h-screen bg-black text-white" style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
+      <SEO {...seoData.support} />
 
       {/* Top bar */}
       <div className="border-b border-white/8 sticky top-0 z-30 bg-black/95 backdrop-blur-xl">

@@ -8,10 +8,12 @@ import { Layout } from "@/components/layout";
 import { motion } from "framer-motion";
 import { Mail, MessageSquare, HelpCircle, Code2, Shield, Clock, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
+import { SEO, seoData } from "@/components/seo";
 
 export default function Contact() {
   return (
     <Layout>
+      <SEO {...seoData.contact} />
       <div className="flex-1 py-20 relative z-10">
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div

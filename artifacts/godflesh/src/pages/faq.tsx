@@ -12,6 +12,7 @@ import {
   Eye, Target, Lightbulb, Volume2, FolderOpen, BarChart3,
   Microscope, Lock
 } from "lucide-react";
+import { SEO, seoData } from "@/components/seo";
 
 // ── Section component ─────────────────────────────────────────────────────────
 function Section({ id, icon, title, color, children }: {
@@ -127,6 +128,7 @@ export default function FAQ() {
 
   return (
     <Layout>
+      <SEO {...seoData.faq} />
       <div className="container mx-auto px-4 py-12 max-w-6xl">
 
         {/* Header */}

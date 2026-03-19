@@ -1,4 +1,27 @@
 User-agent: *
 Allow: /
+Disallow: /godflesh/account
+Disallow: /godflesh/memory
+Disallow: /godflesh/projects
+Disallow: /godflesh/tools
+Disallow: /godflesh/lip-sync
+Disallow: /api/
 
 Sitemap: https://omnimens-ai.com/godflesh/sitemap.xml
+
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /

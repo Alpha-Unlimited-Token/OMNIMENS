@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, Loader2, ArrowRight, Lock, Mail, User, AlertCircle, CheckCircle2, ShieldCheck } from "lucide-react";
 import { GoogleLogin } from "@react-oauth/google";
 import { OmnimensPresence } from "@/components/omnimens-presence";
+import { SEO, seoData } from "@/components/seo";
 
 // ── API calls ─────────────────────────────────────────────────────────────────
 
@@ -288,6 +289,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-[#050507] flex items-center justify-center relative overflow-hidden">
+      <SEO {...seoData.login} />
       {/* Background layers */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#0a0612] via-[#05050a] to-[#030308]" />
       <div className="absolute top-[-20%] left-[30%] w-[600px] h-[600px] bg-primary/5 blur-[140px] rounded-full pointer-events-none" />

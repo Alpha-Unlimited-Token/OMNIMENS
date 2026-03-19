@@ -7,10 +7,12 @@
 import { Layout } from "@/components/layout";
 import { motion } from "framer-motion";
 import { Scale } from "lucide-react";
+import { SEO, seoData } from "@/components/seo";
 
 export default function Terms() {
   return (
     <Layout>
+      <SEO {...seoData.terms} />
       <div className="flex-1 py-20 relative z-10">
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div

@@ -19,6 +19,7 @@ import {
   Mic, MicOff, BrainCircuit, Wand2, BookOpen, ShoppingCart, Presentation
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SEO, seoData } from "@/components/seo";
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 type ProjectType = "website" | "webapp" | "game" | "dataviz" | "api" | "tool" | "extension" | "voice" | "ai" | "ecommerce" | "education" | "presentation";
@@ -979,6 +980,7 @@ export default function Projects() {
 
   return (
     <Layout>
+      <SEO {...seoData.projects} />
       <div className="flex-1 flex flex-col overflow-hidden" style={{ height: "calc(100vh - 4rem)" }}>
         {activeProject ? (
           <ProjectDetail

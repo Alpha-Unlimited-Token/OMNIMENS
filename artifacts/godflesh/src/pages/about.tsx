@@ -8,10 +8,12 @@ import { Layout } from "@/components/layout";
 import { motion } from "framer-motion";
 import { Building2, Brain, Cpu, Sparkles, Users, Zap, Target, Globe } from "lucide-react";
 import { OmnimensPresence } from "@/components/omnimens-presence";
+import { SEO, seoData } from "@/components/seo";
 
 export default function About() {
   return (
     <Layout>
+      <SEO {...seoData.about} />
       <div className="flex-1 py-20 relative z-10">
         <div className="container mx-auto px-4 max-w-5xl">
           <motion.div

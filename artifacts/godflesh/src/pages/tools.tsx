@@ -15,6 +15,7 @@ import {
   Workflow, Bot, Shield, Star, Lock, ChevronRight, Video
 } from "lucide-react";
 import { useLocation } from "wouter";
+import { SEO, seoData } from "@/components/seo";
 
 type Tool = {
   id: string;
@@ -116,6 +117,7 @@ export default function ToolsPage() {
 
   return (
     <Layout>
+      <SEO {...seoData.tools} />
       <div className="flex-1 overflow-auto">
         <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
 

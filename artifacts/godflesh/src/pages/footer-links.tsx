@@ -11,6 +11,7 @@ import {
   MessageSquare, CreditCard, Code2, HelpCircle, LifeBuoy,
   Building2, Scale, ShieldCheck, Mail, Zap, Brain, Layers
 } from "lucide-react";
+import { SEO } from "@/components/seo";
 
 const LINK_SECTIONS = [
   {
@@ -45,6 +46,7 @@ const LINK_SECTIONS = [
 export default function FooterLinks() {
   return (
     <Layout>
+      <SEO title="Site Map" description="Navigate the OMNIMENS AI platform. Find links to all pages including AI chat, pricing, FAQ, support, developer tools, and more." keywords="OMNIMENS site map, AI platform navigation" path="/footer-links" />
       <div className="flex-1 py-20 relative z-10">
         <div className="container mx-auto px-4 max-w-3xl">
           <motion.div

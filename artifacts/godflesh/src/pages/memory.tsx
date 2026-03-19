@@ -14,6 +14,7 @@ import {
   Brain, Trash2, Plus, X, Search, RefreshCw, AlertTriangle,
   Tag, Clock, Lightbulb, User, Settings, BookOpen, Heart, Cpu
 } from "lucide-react";
+import { SEO, seoData } from "@/components/seo";
 
 type Memory = {
   id: number;
@@ -128,6 +129,7 @@ export default function MemoryPage() {
 
   return (
     <Layout>
+      <SEO {...seoData.memory} />
       <div className="flex-1 overflow-auto">
         <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
 

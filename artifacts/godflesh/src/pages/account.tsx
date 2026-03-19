@@ -12,6 +12,7 @@ import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check, Atom, Code2, Layers, Eye, AlertTriangle, Wrench, Dna, Play, Wallet, CreditCard, Gift, TrendingUp, ChevronRight, Bell, Sun, HelpCircle, BookOpen, Info, Settings, ExternalLink, Share2, Star, ToggleLeft, ToggleRight, Loader2, X, Lock, Copy, Link, Users } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { SEO, seoData } from "@/components/seo";
 
 function useBillingInfo() {
   return useQuery({
@@ -420,6 +421,7 @@ export default function Account() {
 
   return (
     <Layout>
+      <SEO {...seoData.account} />
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         {/* ─── Clean Settings Header ─────────────────────────────────── */}
         <div className="flex items-center gap-4 mb-6">

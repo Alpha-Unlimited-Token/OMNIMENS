@@ -179,9 +179,14 @@ router.get("/callback", async (req: Request, res: Response) => {
   );
 
   const now = Math.floor(Date.now() / 1000);
+  const username = (claims as Record<string, unknown>).preferred_username as string
+    || (claims as Record<string, unknown>).nickname as string
+    || dbUser.firstName
+    || dbUser.id;
   const sessionData: SessionData = {
     user: {
       id: dbUser.id,
+      username,
       email: dbUser.email,
       firstName: dbUser.firstName,
       lastName: dbUser.lastName,

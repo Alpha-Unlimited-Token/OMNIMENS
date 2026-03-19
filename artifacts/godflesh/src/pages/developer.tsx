@@ -13,6 +13,7 @@ import {
   ExternalLink, Play, RotateCcw, ChevronDown,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { SEO, seoData } from "@/components/seo";
 
 const API_BASE = "/api";
 
@@ -996,6 +997,7 @@ export default function DeveloperPage() {
 
   return (
     <div className="min-h-screen bg-black text-white" style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
+      <SEO {...seoData.developer} />
       {/* Top bar */}
       <div className="border-b border-white/8 sticky top-0 z-30 bg-black/95 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">

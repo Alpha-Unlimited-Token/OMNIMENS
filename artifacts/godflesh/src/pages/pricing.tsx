@@ -17,6 +17,7 @@ import {
 import { useGetOmnimensStatus, useGetOmnimensPricing } from "@workspace/api-client-react";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import { SEO, seoData } from "@/components/seo";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -669,6 +670,7 @@ export default function Pricing() {
 
   return (
     <Layout>
+      <SEO {...seoData.pricing} />
       <div className="container mx-auto px-4 py-16 flex-1 flex flex-col items-center">
 
         {/* Header */}

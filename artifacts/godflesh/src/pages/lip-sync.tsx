@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
+import { SEO, seoData } from "@/components/seo";
 
 // ── Audio analysis → mouth openness ───────────────────────────────────────────
 
@@ -296,6 +297,7 @@ export default function LipSync() {
 
   return (
     <Layout>
+      <SEO {...seoData.lipSync} />
       <div className="min-h-screen bg-[#0a0a0f] text-white">
         {/* Header */}
         <div className="border-b border-white/8 px-6 py-4">

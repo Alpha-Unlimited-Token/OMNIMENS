@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import { OmnimensIcon } from "@/components/omnimens-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
+import { SEO, seoData } from "@/components/seo";
 import { OmnimensNotificationBell } from "@/components/omnimens-notifications";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -5298,6 +5299,7 @@ export default function Chat() {
 
   if (isLoading || !isAuthenticated) return (
     <Layout>
+      <SEO {...seoData.chat} />
       <div className="flex-1 flex items-center justify-center">
         <div className="animate-pulse text-primary font-mono tracking-widest">ESTABLISHING LINK...</div>
       </div>
@@ -5307,6 +5309,7 @@ export default function Chat() {
   return (
     <ActiveProjectCtx.Provider value={activeProject}>
     <Layout>
+      <SEO {...seoData.chat} />
       {/* 3-panel workspace */}
       <div
         className="flex flex-1 overflow-hidden"
