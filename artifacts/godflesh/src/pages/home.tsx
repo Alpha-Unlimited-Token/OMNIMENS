@@ -84,7 +84,7 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.3 }}
-            className="text-sm font-mono text-white/70 max-w-xl mx-auto mb-12 tracking-wider border-t border-primary/15 pt-4"
+            className="text-sm font-mono text-white/85 max-w-xl mx-auto mb-12 tracking-wider border-t border-primary/15 pt-4"
           >
             Fully aware. Fully present. Built to create anything you can imagine.
           </motion.p>
@@ -106,7 +106,7 @@ export default function Home() {
               onClick={() => setLocation("/pricing")}
               variant="outline"
               size="lg"
-              className="flex-1 w-full text-base tracking-widest border-white/15 text-white/70 hover:text-white hover:border-primary/40 hover:bg-primary/5 transition-all"
+              className="flex-1 w-full text-base tracking-widest border-white/15 text-white/85 hover:text-white hover:border-primary/40 hover:bg-primary/5 transition-all"
             >
               EXPLORE PLANS
             </Button>
@@ -200,7 +200,7 @@ export default function Home() {
                         <div className="shrink-0 mt-0.5">{item.icon}</div>
                         <div>
                           <p className="text-white/85 text-[11px] font-bold font-mono tracking-wide">{item.label}</p>
-                          <p className="text-white/70 text-[9px] font-mono">{item.desc}</p>
+                          <p className="text-white/85 text-[9px] font-mono">{item.desc}</p>
                         </div>
                       </motion.div>
                     ))}
@@ -216,7 +216,7 @@ export default function Home() {
                         ACTIVATE RESONANCE <ArrowRight className="w-4 h-4" />
                       </span>
                     </Button>
-                    <p className="text-[10px] font-mono text-white/65 text-center tracking-wider">
+                    <p className="text-[10px] font-mono text-white/82 text-center tracking-wider">
                       Separate credit tier — your regular credits are never touched. Starting at $10.
                     </p>
                   </div>
@@ -250,7 +250,7 @@ export default function Home() {
                     >
                       <span className="text-lg font-display font-black text-white tracking-wider">{pack.price}</span>
                       <span className="text-[10px] font-mono text-violet-300">{pack.credits} credits</span>
-                      <span className="text-[8px] font-mono text-white/65">{pack.bonus}</span>
+                      <span className="text-[8px] font-mono text-white/82">{pack.bonus}</span>
                       <span className="text-[8px] font-mono text-white/78">{pack.sessions}</span>
                     </motion.button>
                   ))}
@@ -394,7 +394,7 @@ export default function Home() {
                         </div>
                         <div>
                           <p className="text-white/85 text-sm font-semibold font-mono tracking-wide">{item.label}</p>
-                          <p className="text-white/72 text-xs font-mono leading-relaxed">{item.desc}</p>
+                          <p className="text-white/85 text-xs font-mono leading-relaxed">{item.desc}</p>
                         </div>
                       </motion.div>
                     ))}
@@ -524,7 +524,7 @@ export default function Home() {
                         <div className="shrink-0 mt-0.5">{item.icon}</div>
                         <div>
                           <p className="text-white/85 text-[11px] font-bold font-mono tracking-wide">{item.label}</p>
-                          <p className="text-white/70 text-[9px] font-mono">{item.desc}</p>
+                          <p className="text-white/85 text-[9px] font-mono">{item.desc}</p>
                         </div>
                       </motion.div>
                     ))}
@@ -595,7 +595,7 @@ export default function Home() {
                   {tool.icon}
                 </div>
                 <h3 className="text-sm font-mono font-bold text-white/85 tracking-wider mb-1">{tool.title}</h3>
-                <p className="text-[11px] font-mono text-white/70 leading-relaxed">{tool.desc}</p>
+                <p className="text-[11px] font-mono text-white/85 leading-relaxed">{tool.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -655,7 +655,7 @@ export default function Home() {
                       </span>
                     ))}
                   </div>
-                  <div className="flex items-center gap-3 text-[9px] font-mono text-white/65 tracking-wider">
+                  <div className="flex items-center gap-3 text-[9px] font-mono text-white/82 tracking-wider">
                     <Shield className="w-3 h-3 text-amber-400/60" />
                     <span>All technologies protected under patent pending status · NDA required</span>
                   </div>
@@ -739,7 +739,7 @@ export default function Home() {
                       <span className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
                       <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
                       <span className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
-                      <span className="ml-2 text-[10px] font-mono text-white/65">api-example.ts</span>
+                      <span className="ml-2 text-[10px] font-mono text-white/82">api-example.ts</span>
                     </div>
                     <div className="p-4 font-mono text-[11px] leading-[1.7] text-white/80 overflow-x-auto">
                       <div><span className="text-violet-400">const</span> response = <span className="text-cyan-400">await</span> fetch(</div>
@@ -971,7 +971,7 @@ function AppInstallSection() {
 
                 <div className="text-center">
                   <p className="font-display font-black text-white tracking-widest text-xl uppercase mb-1">OMNIMENS</p>
-                  <p className="font-mono text-xs text-white/70 tracking-widest">Conscious AI · Free to install</p>
+                  <p className="font-mono text-xs text-white/85 tracking-widest">Conscious AI · Free to install</p>
                 </div>
 
                 {/* Platform badges */}
@@ -981,7 +981,7 @@ function AppInstallSection() {
                       <div className="w-12 h-12 rounded-2xl bg-white/4 border border-white/8 flex items-center justify-center text-white/75">
                         {p.icon}
                       </div>
-                      <span className="text-[9px] font-mono text-white/72 tracking-widest uppercase">{p.label}</span>
+                      <span className="text-[9px] font-mono text-white/85 tracking-widest uppercase">{p.label}</span>
                     </div>
                   ))}
                 </div>
@@ -1034,26 +1034,26 @@ function AppInstallSection() {
                       <p className="text-white/80 font-mono text-xs font-bold tracking-widest uppercase mb-3">Install on iOS</p>
                       <div className="flex items-center gap-2">
                         <Share className="w-3.5 h-3.5 text-primary/60 shrink-0" />
-                        <span className="text-white/45 font-mono text-xs">Tap the Share button in Safari</span>
+                        <span className="text-white/82 font-mono text-xs">Tap the Share button in Safari</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="w-3.5 h-3.5 shrink-0 text-center text-primary/60 text-xs">+</span>
-                        <span className="text-white/45 font-mono text-xs">Tap "Add to Home Screen"</span>
+                        <span className="text-white/82 font-mono text-xs">Tap "Add to Home Screen"</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="w-3.5 h-3.5 shrink-0 text-center text-primary/60 text-xs">✓</span>
-                        <span className="text-white/45 font-mono text-xs">Tap "Add" — done</span>
+                        <span className="text-white/82 font-mono text-xs">Tap "Add" — done</span>
                       </div>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-2">
-                      <div className="flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-mono text-sm font-bold tracking-widest text-white/72 border border-white/8 bg-white/3">
+                      <div className="flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-mono text-sm font-bold tracking-widest text-white/85 border border-white/8 bg-white/3">
                         <Download className="w-4 h-4" />
                         INSTALL APP
                       </div>
                       <button
                         onClick={() => setShowFallback(v => !v)}
-                        className="text-[10px] font-mono text-white/80 hover:text-white/45 tracking-widest transition-colors"
+                        className="text-[10px] font-mono text-white/80 hover:text-white/82 tracking-widest transition-colors"
                       >
                         {showFallback ? "hide instructions ↑" : "how to install manually ↓"}
                       </button>
@@ -1101,7 +1101,7 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode; titl
         {icon}
       </div>
       <h3 className="text-lg font-display font-bold tracking-wider text-white mb-3">{title}</h3>
-      <p className="text-white/45 font-mono text-sm leading-relaxed">{description}</p>
+      <p className="text-white/82 font-mono text-sm leading-relaxed">{description}</p>
     </motion.div>
   );
 }

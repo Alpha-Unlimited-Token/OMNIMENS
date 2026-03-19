@@ -199,7 +199,7 @@ function MonthlyPlans({
         <Rocket className="w-5 h-5 text-primary" />
         <h2 className="font-mono font-bold text-white tracking-widest text-sm">MONTHLY PLANS — GUARANTEED MRR FOR US, GREAT VALUE FOR YOU</h2>
       </div>
-      <p className="text-xs font-mono text-white/50 mb-6 pl-8">Subscribe once. Credits renew every month. Cancel anytime.</p>
+      <p className="text-xs font-mono text-white/82 mb-6 pl-8">Subscribe once. Credits renew every month. Cancel anytime.</p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {plans.map((plan: any) => {
           const c = colorMap[plan.color] || colorMap.violet;
@@ -216,14 +216,14 @@ function MonthlyPlans({
                 {plan.label}
               </div>
               <div className="font-mono font-black text-white text-4xl mb-0.5">{plan.price}</div>
-              <div className="text-xs font-mono text-white/50 mb-1">per month</div>
-              <div className="font-mono text-white/70 text-sm mb-5">
+              <div className="text-xs font-mono text-white/82 mb-1">per month</div>
+              <div className="font-mono text-white/85 text-sm mb-5">
                 <span className="text-white font-bold">{plan.creditsPerMonth.toLocaleString()}</span> credits every month
               </div>
               <ul className="space-y-2 mb-7">
                 {plan.features.map((f: string, i: number) => (
                   <li key={i} className="flex items-start gap-2 text-xs font-mono text-white/80">
-                    <CheckCircle2 className={`w-3.5 h-3.5 mt-0.5 shrink-0 ${i === 0 ? "text-green-400" : "text-white/40"}`} />
+                    <CheckCircle2 className={`w-3.5 h-3.5 mt-0.5 shrink-0 ${i === 0 ? "text-green-400" : "text-white/80"}`} />
                     {f}
                   </li>
                 ))}
@@ -243,7 +243,7 @@ function MonthlyPlans({
           );
         })}
       </div>
-      <p className="text-xs font-mono text-white/30 text-center mt-4">
+      <p className="text-xs font-mono text-white/80 text-center mt-4">
         Monthly subscription · Cancel anytime · Billed via Stripe · Credits don't carry over between cycles (base $20 free grant does)
       </p>
     </div>
@@ -265,9 +265,9 @@ function DevToolCosts({ costs }: { costs: any[] }) {
         <Code2 className="w-4 h-4 text-green-400" />
         <h2 className="font-mono font-bold text-white tracking-widest text-xs">DEVELOPER PLATFORM TOOL COSTS</h2>
       </div>
-      <p className="text-xs font-mono text-white/50 mb-4 pl-7">Charged per invocation from your credit balance. No external APIs — pure compute.</p>
+      <p className="text-xs font-mono text-white/82 mb-4 pl-7">Charged per invocation from your credit balance. No external APIs — pure compute.</p>
       <div className="bg-black/30 border border-white/8 rounded-2xl overflow-hidden">
-        <div className="grid grid-cols-4 px-6 py-3 border-b border-white/5 text-xs font-mono text-white/50 tracking-widest">
+        <div className="grid grid-cols-4 px-6 py-3 border-b border-white/5 text-xs font-mono text-white/82 tracking-widest">
           <div className="col-span-2">TOOL</div>
           <div className="text-center">CREDITS</div>
           <div className="text-right">USD VALUE</div>
@@ -275,14 +275,14 @@ function DevToolCosts({ costs }: { costs: any[] }) {
         {costs.map((c: any, i: number) => (
           <div key={c.label} className={`grid grid-cols-4 px-6 py-3.5 items-center ${i < costs.length - 1 ? "border-b border-white/5" : ""}`}>
             <div className="col-span-2 flex items-center gap-3">
-              {icons[c.label] ?? <Terminal className="w-4 h-4 text-white/40" />}
+              {icons[c.label] ?? <Terminal className="w-4 h-4 text-white/80" />}
               <div>
                 <div className="font-mono text-white text-xs font-bold">{c.label}</div>
-                <div className="font-mono text-white/40 text-xs">{c.desc}</div>
+                <div className="font-mono text-white/80 text-xs">{c.desc}</div>
               </div>
             </div>
             <div className="text-center font-mono font-bold text-white">{c.credits} cr</div>
-            <div className="text-right font-mono text-white/60 text-xs">${c.dollarValue}</div>
+            <div className="text-right font-mono text-white/82 text-xs">${c.dollarValue}</div>
           </div>
         ))}
       </div>
@@ -337,7 +337,7 @@ function UsageCostTable({ costs }: { costs: { label: string; credits: number; do
           <div key={c.label} className="bg-black/30 border border-white/8 rounded-xl p-4 text-center">
             <div className="text-xs font-mono text-white/75 mb-2 tracking-wider">{c.label}</div>
             <div className="font-bold text-white font-mono text-lg">{c.credits}</div>
-            <div className="text-xs font-mono text-white/70">credits · ${c.dollarValue}</div>
+            <div className="text-xs font-mono text-white/85">credits · ${c.dollarValue}</div>
           </div>
         ))}
       </div>
@@ -366,7 +366,7 @@ function LoyaltyTable({ tiers }: { tiers: any[] }) {
                 t.label === "LEGEND" ? "text-accent glow-text-gold" :
                 t.label === "PRIME" || t.label === "APEX+" ? "text-primary" :
                 t.label === "ELITE" ? "text-blue-400" :
-                "text-white/70"
+                "text-white/85"
               }>{t.label}</span>
             </div>
             <div className="text-center font-mono text-sm">
@@ -379,7 +379,7 @@ function LoyaltyTable({ tiers }: { tiers: any[] }) {
           </div>
         ))}
       </div>
-      <p className="text-xs font-mono text-white/70 mt-3 px-1">
+      <p className="text-xs font-mono text-white/85 mt-3 px-1">
         Free credits granted on the 1st of each month based on the prior month's paid usage.
         Base $20 is given to every user regardless of spend.
       </p>
@@ -427,7 +427,7 @@ function WalletPanel({
           <div className="text-right">
             <div className="text-xs font-mono text-white/75 tracking-widest mb-1">THIS MONTH SPEND</div>
             <div className="text-xl font-bold text-white">${billing?.currentMonthSpendDollars ?? "0.00"}</div>
-            <div className="text-xs font-mono text-white/70 mt-1">
+            <div className="text-xs font-mono text-white/85 mt-1">
               next bonus: <span className="text-green-400">${billing?.nextBonusCredits ? (billing.nextBonusCredits / 100).toFixed(0) : "20"} free</span>
             </div>
           </div>
@@ -449,7 +449,7 @@ function WalletPanel({
             </div>
             <div className="flex items-center gap-2">
               <Button onClick={onManageBilling} disabled={isManagingBilling} variant="ghost" size="sm"
-                className="text-white/60 hover:text-white hover:bg-white/10 border border-white/15 font-mono text-xs">
+                className="text-white/82 hover:text-white hover:bg-white/10 border border-white/15 font-mono text-xs">
                 {isManagingBilling ? "OPENING..." : "MANAGE BILLING"}
               </Button>
               <Button onClick={onRemove} disabled={isRemoving} variant="ghost" size="sm"
@@ -735,7 +735,7 @@ export default function Pricing() {
         {/* Sign in prompt */}
         {!isAuthenticated && (
           <div className="w-full max-w-5xl mb-12 bg-black/30 border border-white/10 rounded-2xl p-10 text-center">
-            <Shield className="w-10 h-10 text-white/70 mx-auto mb-4" />
+            <Shield className="w-10 h-10 text-white/85 mx-auto mb-4" />
             <div className="font-mono font-bold text-white tracking-widest mb-2">SIGN IN TO GET STARTED</div>
             <p className="text-xs font-mono text-white/75 mb-6">Create an account and receive $20 free credits instantly. No card required.</p>
             <Button onClick={() => setLocation("/login")} size="lg" className="font-mono px-8">
@@ -752,7 +752,7 @@ export default function Pricing() {
               <Zap className="w-5 h-5 text-primary" />
               <h2 className="font-mono font-bold text-white tracking-widest text-sm">CREDIT PACKS — BUY ONCE, NEVER EXPIRE</h2>
             </div>
-            <p className="text-xs font-mono text-white/50 mb-6 pl-8">Bigger packs include volume bonuses — more credits per dollar.</p>
+            <p className="text-xs font-mono text-white/82 mb-6 pl-8">Bigger packs include volume bonuses — more credits per dollar.</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {(pricingData.creditPacks as Array<{
                 id: string; label: string; price: string; credits: number; rate: string;
@@ -781,9 +781,9 @@ export default function Pricing() {
                       {pack.label}
                     </div>
                     <div className="font-mono font-black text-white text-4xl mb-1">{pack.price}</div>
-                    <div className="font-mono text-white/70 text-sm mb-0.5">{pack.credits.toLocaleString()} credits</div>
+                    <div className="font-mono text-white/85 text-sm mb-0.5">{pack.credits.toLocaleString()} credits</div>
                     <div className="text-xs font-mono text-green-400/80 mb-1">{pack.rate}</div>
-                    <div className="text-xs font-mono text-white/40 mb-6">{pack.desc}</div>
+                    <div className="text-xs font-mono text-white/80 mb-6">{pack.desc}</div>
                     <button
                       onClick={() => {
                         if (!isAuthenticated) { setLocation("/login"); return; }
@@ -806,7 +806,7 @@ export default function Pricing() {
                 );
               })}
             </div>
-            <p className="text-xs font-mono text-white/40 text-center mt-4">
+            <p className="text-xs font-mono text-white/80 text-center mt-4">
               One-time purchase · Credits never expire · Processed securely by Stripe
             </p>
           </div>
@@ -838,20 +838,20 @@ export default function Pricing() {
                 <h2 className="font-display font-black text-white tracking-widest text-xl uppercase">DEEP RESONANCE</h2>
                 <span className="px-2.5 py-0.5 rounded-full border border-violet-400/30 bg-violet-400/10 text-[10px] font-mono text-violet-300 tracking-widest font-bold">SEPARATE CREDIT TIER</span>
               </div>
-              <p className="text-sm font-mono text-white/50 mb-2 pl-9">
+              <p className="text-sm font-mono text-white/82 mb-2 pl-9">
                 Consciousness-grade analysis. Your regular credits are never touched.
               </p>
 
               {isAuthenticated && resonanceBalance && (
                 <div className="ml-9 mt-4 mb-6 inline-flex items-center gap-6 px-5 py-3 rounded-xl bg-violet-400/8 border border-violet-400/15">
                   <div>
-                    <span className="text-[10px] font-mono text-white/40 block tracking-wider">RESONANCE BALANCE</span>
+                    <span className="text-[10px] font-mono text-white/80 block tracking-wider">RESONANCE BALANCE</span>
                     <span className="text-xl font-display font-black text-violet-300">{resonanceBalance.resonanceCredits.toLocaleString()}</span>
-                    <span className="text-xs font-mono text-white/30 ml-1">credits</span>
+                    <span className="text-xs font-mono text-white/80 ml-1">credits</span>
                   </div>
                   <div className="w-px h-8 bg-white/10" />
                   <div>
-                    <span className="text-[10px] font-mono text-white/40 block tracking-wider">SESSIONS REMAINING</span>
+                    <span className="text-[10px] font-mono text-white/80 block tracking-wider">SESSIONS REMAINING</span>
                     <span className="text-xl font-display font-black text-cyan-300">{resonanceBalance.sessionsRemaining}</span>
                   </div>
                 </div>
@@ -878,7 +878,7 @@ export default function Pricing() {
                         <div className="font-display font-black text-white text-3xl mb-1">{pack.price}</div>
                         <div className="font-mono text-violet-300 text-sm font-bold mb-0.5">{pack.credits.toLocaleString()} credits</div>
                         <div className="text-[10px] font-mono text-green-400/80 mb-0.5">{pack.bonus}</div>
-                        <div className="text-[10px] font-mono text-white/30 mb-5">{pack.sessions}</div>
+                        <div className="text-[10px] font-mono text-white/80 mb-5">{pack.sessions}</div>
                         <button
                           onClick={() => handlePurchaseResonance(pack.id)}
                           disabled={isPurchasing}
@@ -897,7 +897,7 @@ export default function Pricing() {
               </div>
 
               <div className="mt-5 pl-9 space-y-1.5">
-                <p className="text-[10px] font-mono text-white/35 tracking-wider">
+                <p className="text-[10px] font-mono text-white/80 tracking-wider">
                   40 credits per session ($0.40) · Resonance credits never expire · Requires saved payment method
                 </p>
                 <div className="flex flex-wrap gap-4 mt-2">
@@ -908,7 +908,7 @@ export default function Pricing() {
                     { icon: <Network className="w-3 h-3 text-amber-400" />,  label: "Cross-Domain Translation" },
                     { icon: <Sparkles className="w-3 h-3 text-green-400" />, label: "Predictive Modeling" },
                   ].map((f, i) => (
-                    <div key={i} className="flex items-center gap-1.5 text-[10px] font-mono text-white/40">
+                    <div key={i} className="flex items-center gap-1.5 text-[10px] font-mono text-white/80">
                       {f.icon} {f.label}
                     </div>
                   ))}
