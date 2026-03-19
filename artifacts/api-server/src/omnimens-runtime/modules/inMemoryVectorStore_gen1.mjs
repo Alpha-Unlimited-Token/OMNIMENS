@@ -1,117 +1,102 @@
-// inMemoryVectorStore.js
-
 /**
  * @module inMemoryVectorStore
- * @description Provides fast embedding storage and retrieval for context-aware operations
- * using HNSW (Hierarchical Navigable Small World) for approximate nearest neighbor search.
+ * @description A utility module for caching and retrieving embeddings using cosine similarity for short-term memory during runtime.
  */
 
 /**
- * Represents a node in the HNSW graph.
- * @typedef {Object} Node
- * @property {number[]} vector - The embedding vector.
- * @property {Set<number>} neighbors - The indices of neighboring nodes.
+ * @typedef {Object} VectorStore
+ * @property {Object<string, number[]>} store - Key-value store where keys are identifiers and values are embedding vectors.
  */
 
 /**
- * Class implementing an in-memory vector store with HNSW-based approximate nearest neighbor search.
+ * @type {VectorStore}
  */
-class InMemoryVectorStore {
-  constructor() {
-    /**
-     * @private
-     * @type {Node[]}
-     */
-    this.nodes = [];
+const vectorStore = { store: {} };
 
-    /**
-     * @private
-     * @type {number}
-     */
-    this.dimension = null;
+/**
+ * Adds a vector to the store.
+ * @param {string} key - The unique identifier for the vector.
+ * @param {number[]} vector - The embedding vector to store.
+ * @throws {Error} If the vector is not an array of numbers.
+ */
+export function addVector(key, vector) {
+  if (!Array.isArray(vector) || !vector.every((v) => typeof v === 'number')) {
+    throw new Error('Vector must be an array of numbers.');
   }
-
-  /**
-   * Adds a new vector to the store.
-   * @param {number[]} vector - The embedding vector to add.
-   * @throws {Error} If vector dimension does not match existing vectors.
-   */
-  addVector(vector) {
-    if (!Array.isArray(vector)) {
-      throw new Error("Vector must be an array.");
-    }
-
-    if (this.dimension === null) {
-      this.dimension = vector.length;
-    } else if (vector.length !== this.dimension) {
-      throw new Error("Vector dimension mismatch.");
-    }
-
-    const node = { vector, neighbors: new Set() };
-    const index = this.nodes.length;
-
-    this.nodes.push(node);
-
-    // Connect the new node to existing nodes based on distance.
-    for (let i = 0; i < this.nodes.length - 1; i++) {
-      const neighborNode = this.nodes[i];
-      const distance = this._euclideanDistance(vector, neighborNode.vector);
-
-      if (distance < this._threshold()) {
-        node.neighbors.add(i);
-        neighborNode.neighbors.add(index);
-      }
-    }
-  }
-
-  /**
-   * Searches for the nearest neighbors of a given query vector.
-   * @param {number[]} queryVector - The query vector.
-   * @param {number} k - The number of neighbors to retrieve.
-   * @returns {Array<{index: number, distance: number}>} The nearest neighbors.
-   */
-  search(queryVector, k) {
-    if (queryVector.length !== this.dimension) {
-      throw new Error("Query vector dimension mismatch.");
-    }
-
-    const distances = this.nodes.map((node, index) => ({
-      index,
-      distance: this._euclideanDistance(queryVector, node.vector)
-    }));
-
-    distances.sort((a, b) => a.distance - b.distance);
-
-    return distances.slice(0, k);
-  }
-
-  /**
-   * Computes the Euclidean distance between two vectors.
-   * @private
-   * @param {number[]} vectorA - The first vector.
-   * @param {number[]} vectorB - The second vector.
-   * @returns {number} The Euclidean distance.
-   */
-  _euclideanDistance(vectorA, vectorB) {
-    return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
-  }
-
-  /**
-   * Determines the threshold for connecting nodes in the graph.
-   * @private
-   * @returns {number} The distance threshold.
-   */
-  _threshold() {
-    return 0.5; // Example threshold; adjust for specific use cases.
-  }
+  vectorStore.store[key] = vector;
 }
 
 /**
- * Factory function to create a new vector store instance.
- * @returns {InMemoryVectorStore} A new instance of the vector store.
+ * Removes a vector from the store.
+ * @param {string} key - The unique identifier for the vector.
  */
-function createVectorStore() {
-  return new InMemoryVectorStore();
+export function removeVector(key) {
+  delete vectorStore.store[key];
 }
 
-export { createVectorStore };
+/**
+ * Retrieves the vector associated with a key.
+ * @param {string} key - The unique identifier for the vector.
+ * @returns {number[] | null} The vector if found, or null if not.
+ */
+export function getVector(key) {
+  return vectorStore.store[key] || null;
+}
+
+/**
+ * Calculates the cosine similarity between two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} The cosine similarity score.
+ * @throws {Error} If the vectors are not of the same length or not arrays of numbers.
+ */
+function cosineSimilarity(vectorA, vectorB) {
+  if (!Array.isArray(vectorA) || !Array.isArray(vectorB)) {
+    throw new Error('Both inputs must be arrays.');
+  }
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must be of the same length.');
+  }
+
+  const dotProduct = vectorA.reduce((sum, val, index) => sum + val * vectorB[index], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
+
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    return 0; // Avoid division by zero
+  }
+
+  return dotProduct / (magnitudeA * magnitudeB);
+}
+
+/**
+ * Finds the most similar vector in the store based on cosine similarity.
+ * @param {number[]} queryVector - The vector to compare against.
+ * @returns {{ key: string, similarity: number } | null} The key and similarity score of the closest match, or null if the store is empty.
+ * @throws {Error} If the query vector is not an array of numbers.
+ */
+export function findMostSimilar(queryVector) {
+  if (!Array.isArray(queryVector) || !queryVector.every((v) => typeof v === 'number')) {
+    throw new Error('Query vector must be an array of numbers.');
+  }
+
+  let closestMatch = null;
+  let highestSimilarity = -Infinity;
+
+  for (const [key, storedVector] of Object.entries(vectorStore.store)) {
+    const similarity = cosineSimilarity(queryVector, storedVector);
+    if (similarity > highestSimilarity) {
+      highestSimilarity = similarity;
+      closestMatch = { key, similarity };
+    }
+  }
+
+  return closestMatch;
+}
+
+/**
+ * Clears all vectors from the store.
+ */
+export function clearStore() {
+  vectorStore.store = {};
+}
