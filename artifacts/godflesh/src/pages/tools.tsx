@@ -12,9 +12,9 @@ import {
   Volume2, Cloud, Newspaper, BookOpen, QrCode, TrendingUp,
   Languages, Youtube, Calculator, Palette, Map, Activity,
   Camera, Film, Music2, FileText, Mail, Search, BarChart3,
-  Workflow, Bot, Shield, Star, Lock, ChevronRight
+  Workflow, Bot, Shield, Star, Lock, ChevronRight, Video
 } from "lucide-react";
-import { useLink } from "wouter";
+import { useLocation } from "wouter";
 
 type Tool = {
   id: string;
@@ -24,6 +24,7 @@ type Tool = {
   category: string;
   status: "active" | "beta" | "pro" | "coming";
   tier: "free" | "pro" | "owner";
+  link?: string;
 };
 
 const TOOLS: Tool[] = [
@@ -63,7 +64,8 @@ const TOOLS: Tool[] = [
 
   // Specialist Engines
   { id: "physio",          name: "Physical Therapy Engine",description: "Clinical-grade PT assessment, program design, and outcome tracking.",icon: <Activity className="w-5 h-5" />, category: "Specialist",   status: "active",  tier: "pro" },
-  { id: "avatar",          name: "Avatar Studio",          description: "Build cinematic 3D avatars with live camera tracking.",            icon: <Film className="w-5 h-5" />,         category: "Specialist",   status: "active",  tier: "pro" },
+  { id: "lip-sync",        name: "Lip Sync Studio",        description: "Real-time voice lip sync, camera face overlay, video-to-audio sync, and live avatar with facial recognition.", icon: <Video className="w-5 h-5" />, category: "Specialist", status: "active", tier: "free", link: "/lip-sync" },
+  { id: "avatar",          name: "Avatar Studio",          description: "Cinematic 3D avatars with live camera tracking and lip sync overlay.", icon: <Film className="w-5 h-5" />,    category: "Specialist",   status: "active",  tier: "pro",  link: "/lip-sync" },
   { id: "restorative-art", name: "Restorative Art",        description: "Therapeutic art generation for emotional processing.",             icon: <Palette className="w-5 h-5" />,      category: "Specialist",   status: "active",  tier: "pro" },
   { id: "video-analysis",  name: "Video Analysis",         description: "Analyze YouTube videos — transcripts, summaries, key moments.",    icon: <Youtube className="w-5 h-5" />,      category: "Specialist",   status: "active",  tier: "free" },
 
@@ -98,6 +100,7 @@ const CATEGORIES = Array.from(new Set(TOOLS.map(t => t.category)));
 export default function ToolsPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [search, setSearch] = useState("");
+  const [, setLocation] = useLocation();
 
   const filtered = TOOLS.filter(t => {
     const matchCat = selectedCategory === "All" || t.category === selectedCategory;
@@ -165,10 +168,11 @@ export default function ToolsPage() {
                     key={tool.id}
                     initial={{ opacity: 0, y: 4 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`p-3.5 rounded-xl border transition-colors ${tool.status === "coming" ? "border-white/6 bg-white/1 opacity-60" : "border-white/8 bg-white/2 hover:border-white/14 hover:bg-white/4 cursor-default"}`}
+                    onClick={() => tool.link && setLocation(tool.link)}
+                    className={`p-3.5 rounded-xl border transition-colors ${tool.status === "coming" ? "border-white/6 bg-white/1 opacity-60" : tool.link ? "border-white/8 bg-white/2 hover:border-primary/35 hover:bg-primary/5 cursor-pointer" : "border-white/8 bg-white/2 hover:border-white/14 hover:bg-white/4 cursor-default"}`}
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg shrink-0 ${tool.status === "coming" ? "bg-white/5 text-white/20" : "bg-primary/8 text-primary/80"}`}>
+                      <div className={`p-2 rounded-lg shrink-0 ${tool.status === "coming" ? "bg-white/5 text-white/20" : tool.link ? "bg-primary/12 text-primary" : "bg-primary/8 text-primary/80"}`}>
                         {tool.icon}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -177,12 +181,14 @@ export default function ToolsPage() {
                           {tool.tier !== "free" && (
                             <Star className={`w-2.5 h-2.5 shrink-0 ${TIER_STYLES[tool.tier]}`} />
                           )}
+                          {tool.link && <ChevronRight className="w-3 h-3 text-primary/50 ml-auto" />}
                         </div>
                         <p className="text-[11px] text-white/40 leading-relaxed">{tool.description}</p>
                         <div className="flex items-center gap-1.5 mt-2">
                           <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono uppercase ${STATUS_STYLES[tool.status]}`}>
                             {tool.status === "active" ? "Active" : tool.status === "beta" ? "Beta" : tool.status === "coming" ? "Soon" : "Pro"}
                           </span>
+                          {tool.link && <span className="px-1.5 py-0.5 rounded text-[9px] font-mono text-primary/70 bg-primary/8 border border-primary/15">OPEN →</span>}
                         </div>
                       </div>
                     </div>

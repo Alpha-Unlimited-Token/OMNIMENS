@@ -35,6 +35,7 @@ const Privacy = retryLazy(() => import("@/pages/privacy"));
 const About = retryLazy(() => import("@/pages/about"));
 const Contact = retryLazy(() => import("@/pages/contact"));
 const FooterLinks = retryLazy(() => import("@/pages/footer-links"));
+const LipSync = retryLazy(() => import("@/pages/lip-sync"));
 
 initTheme();
 
@@ -101,6 +102,7 @@ function Router() {
         <Route path="/about" component={About} />
         <Route path="/contact" component={Contact} />
         <Route path="/footer-links" component={FooterLinks} />
+        <Route path="/lip-sync" component={LipSync} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>
