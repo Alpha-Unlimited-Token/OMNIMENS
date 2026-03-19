@@ -28,7 +28,7 @@ import {
   PanelLeft, PanelRight, X, Layers, Stethoscope, AlertTriangle, HeartPulse,
   MessageSquare, PlusCircle, Trash2, Settings, LayoutTemplate, Search,
   ShieldCheck, Swords, Clock, ToggleLeft, ToggleRight,
-  Plus, Database, KeyRound, Mic, ListChecks, Infinity, Gauge, ChevronUp,
+  Plus, Database, KeyRound, Mic, MicOff, Camera, CameraOff, ListChecks, Infinity, Gauge, ChevronUp,
   Globe2, Sparkles, Bolt, Monitor, Code2, FileText, Gamepad2,
   Presentation, Table2, Wand2,
   HardDrive, Rocket, ExternalLink, ChevronRight, RefreshCw, Star,
@@ -4631,6 +4631,132 @@ function ToneSelector({ value, onChange }: { value: string; onChange: (v: string
   );
 }
 
+// ── Camera Modal ───────────────────────────────────────────────────────────────
+
+function CameraModal({ onCapture, onClose }: { onCapture: (file: File) => void; onClose: () => void }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [captured, setCaptured] = useState<string | null>(null);
+
+  useEffect(() => {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+      .then(stream => {
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play();
+        }
+      })
+      .catch(() => setError("Camera access denied. Allow camera permission and try again."));
+    return () => {
+      streamRef.current?.getTracks().forEach(t => t.stop());
+    };
+  }, []);
+
+  const capture = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d")!.drawImage(video, 0, 0);
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+    setCaptured(dataUrl);
+    streamRef.current?.getTracks().forEach(t => t.stop());
+  };
+
+  const confirm = () => {
+    if (!captured) return;
+    fetch(captured)
+      .then(r => r.blob())
+      .then(blob => {
+        const file = new File([blob], `camera-${Date.now()}.jpg`, { type: "image/jpeg" });
+        onCapture(file);
+        onClose();
+      });
+  };
+
+  const retake = () => {
+    setCaptured(null);
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+      .then(stream => {
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play();
+        }
+      });
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-md p-4"
+      onClick={onClose}
+    >
+      <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }}
+        className="bg-black border border-white/15 rounded-2xl overflow-hidden w-full max-w-md shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+          <div className="flex items-center gap-2">
+            <Camera className="w-4 h-4 text-primary" />
+            <span className="text-sm font-mono font-bold text-white tracking-wider">CAMERA CAPTURE</span>
+          </div>
+          <button onClick={onClose} className="text-white/50 hover:text-white transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="relative bg-black aspect-video flex items-center justify-center">
+          {error ? (
+            <div className="text-center p-6">
+              <CameraOff className="w-10 h-10 text-red-400 mx-auto mb-3" />
+              <p className="text-sm font-mono text-red-400">{error}</p>
+            </div>
+          ) : captured ? (
+            <img src={captured} alt="Captured" className="w-full h-full object-contain" />
+          ) : (
+            <video ref={videoRef} className="w-full h-full object-cover" muted playsInline />
+          )}
+          <canvas ref={canvasRef} className="hidden" />
+        </div>
+
+        <div className="flex gap-3 p-4">
+          {captured ? (
+            <>
+              <button onClick={retake}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/15 text-white/70 hover:text-white hover:border-white/30 font-mono text-sm transition-all"
+              >
+                <RefreshCw className="w-4 h-4" /> Retake
+              </button>
+              <button onClick={confirm}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-black font-mono text-sm font-bold transition-all hover:bg-primary/90"
+              >
+                <Paperclip className="w-4 h-4" /> Attach to Message
+              </button>
+            </>
+          ) : (
+            <>
+              <button onClick={onClose}
+                className="flex-1 py-2.5 rounded-xl border border-white/15 text-white/70 hover:text-white font-mono text-sm transition-all"
+              >
+                Cancel
+              </button>
+              <button onClick={capture} disabled={!!error}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-black font-mono text-sm font-bold transition-all hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <Camera className="w-4 h-4" /> Capture Photo
+              </button>
+            </>
+          )}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 // ── Main Chat component ────────────────────────────────────────────────────────
 
 export default function Chat() {
@@ -4640,6 +4766,44 @@ export default function Chat() {
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // ── Voice input (speech-to-text) ──────────────────────────────────────────────
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const interimRef = useRef("");
+
+  const toggleVoiceInput = useCallback(() => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+    const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRec) { alert("Voice input is not supported in this browser. Try Chrome or Edge."); return; }
+    const recognition = new SpeechRec();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
+    recognitionRef.current = recognition;
+    interimRef.current = "";
+    recognition.onresult = (e: any) => {
+      let final = "";
+      let interim = "";
+      for (let i = 0; i < e.results.length; i++) {
+        if (e.results[i].isFinal) final += e.results[i][0].transcript;
+        else interim += e.results[i][0].transcript;
+      }
+      interimRef.current = interim;
+      if (final) setInput(prev => (prev ? prev.trimEnd() + " " : "") + final.trim());
+    };
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+    recognition.start();
+    setIsListening(true);
+  }, [isListening]);
+
+  // ── Camera (photo → attach as pending file) ───────────────────────────────────
+  const [showCamera, setShowCamera] = useState(false);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const [creditsAlert, setCreditsAlert] = useState<{ kind: "no_wallet" | "topup_failed" | "need_resonance"; msg?: string } | null>(null);
   const [leftOpen, setLeftOpen] = useState(true);
@@ -5949,6 +6113,28 @@ export default function Chat() {
                     >
                       <LayoutTemplate className="w-3.5 h-3.5" />
                     </button>
+                    {/* Camera capture button */}
+                    <button
+                      type="button"
+                      onClick={() => setShowCamera(true)}
+                      title="Camera — capture a photo to attach"
+                      className="text-white/40 hover:text-primary transition-colors w-7 h-7 flex items-center justify-center rounded"
+                    >
+                      <Camera className="w-3.5 h-3.5" />
+                    </button>
+                    {/* Voice input (speech-to-text) button */}
+                    <button
+                      type="button"
+                      onClick={toggleVoiceInput}
+                      title={isListening ? "Stop listening" : "Speak your message"}
+                      className={`transition-colors w-7 h-7 flex items-center justify-center rounded ${
+                        isListening
+                          ? "text-rose-400 animate-pulse bg-rose-400/10"
+                          : "text-white/40 hover:text-primary"
+                      }`}
+                    >
+                      {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+                    </button>
                   </>
                 )}
                 {isTyping ? (
@@ -6269,6 +6455,16 @@ export default function Chat() {
                 </div>
               </motion.div>
             </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── Camera Modal ── */}
+        <AnimatePresence>
+          {showCamera && (
+            <CameraModal
+              onCapture={(file) => setPendingFiles(prev => [...prev, file].slice(0, 10))}
+              onClose={() => setShowCamera(false)}
+            />
           )}
         </AnimatePresence>
 

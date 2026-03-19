@@ -10,7 +10,7 @@ import {
   Upload, AlertCircle, RefreshCw, Send, Link, X, FileCode, Zap,
   Monitor, Smartphone, Server, Package, Rocket, Settings,
   Search, Star, FolderOpen, Folder, Filter, Lock, Globe2, MoreVertical, FolderPlus,
-  Mic, BrainCircuit, Wand2, BookOpen, ShoppingCart, Presentation
+  Mic, MicOff, BrainCircuit, Wand2, BookOpen, ShoppingCart, Presentation
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -124,6 +124,30 @@ function CreateProjectModal({ onClose, onCreate }: { onClose: () => void; onCrea
   const [type, setType] = useState<ProjectType | null>(null);
   const [manualType, setManualType] = useState(false);
 
+  // ── Voice input ──────────────────────────────────────────────────────────────
+  const [listeningField, setListeningField] = useState<"name" | "description" | null>(null);
+  const modalRecognitionRef = useRef<any>(null);
+
+  const startListening = (field: "name" | "description") => {
+    const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRec) { alert("Voice input is not supported in this browser. Try Chrome or Edge."); return; }
+    if (listeningField) { modalRecognitionRef.current?.stop(); setListeningField(null); return; }
+    const recognition = new SpeechRec();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+    modalRecognitionRef.current = recognition;
+    recognition.onresult = (e: any) => {
+      const transcript = Array.from(e.results).map((r: any) => r[0].transcript).join(" ").trim();
+      if (field === "name") setName(prev => prev ? prev + " " + transcript : transcript);
+      else setDescription(prev => prev ? prev + " " + transcript : transcript);
+    };
+    recognition.onend = () => setListeningField(null);
+    recognition.onerror = () => setListeningField(null);
+    recognition.start();
+    setListeningField(field);
+  };
+
   useEffect(() => {
     if (manualType) return;
     const detected = detectProjectType(description);
@@ -160,23 +184,47 @@ function CreateProjectModal({ onClose, onCreate }: { onClose: () => void; onCrea
           {/* Name */}
           <div>
             <label className="block text-xs font-mono text-white uppercase tracking-widest mb-1.5">Project Name</label>
-            <input
-              value={name} onChange={e => setName(e.target.value)}
-              placeholder="My awesome project..."
-              className="w-full bg-white/5 border border-white/10 focus:border-primary rounded-lg px-4 py-2.5 text-white font-mono text-sm outline-none transition-all placeholder:text-white/20"
-              autoFocus
-            />
+            <div className="relative">
+              <input
+                value={name} onChange={e => setName(e.target.value)}
+                placeholder="My awesome project..."
+                className="w-full bg-white/5 border border-white/10 focus:border-primary rounded-lg px-4 pr-10 py-2.5 text-white font-mono text-sm outline-none transition-all placeholder:text-white/20"
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={() => startListening("name")}
+                title={listeningField === "name" ? "Stop listening" : "Speak project name"}
+                className={`absolute right-2.5 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded transition-all ${
+                  listeningField === "name" ? "text-rose-400 animate-pulse" : "text-white/30 hover:text-primary"
+                }`}
+              >
+                {listeningField === "name" ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+              </button>
+            </div>
           </div>
 
           {/* Description */}
           <div>
             <label className="block text-xs font-mono text-white uppercase tracking-widest mb-1.5">Description (used as AI build brief)</label>
-            <textarea
-              value={description} onChange={e => setDescription(e.target.value)}
-              placeholder="Describe what you want to build — OMNIMENS will auto-detect the project type from your prompt..."
-              rows={3}
-              className="w-full bg-white/5 border border-white/10 focus:border-primary rounded-lg px-4 py-2.5 text-white font-mono text-sm outline-none transition-all placeholder:text-white/20 resize-none"
-            />
+            <div className="relative">
+              <textarea
+                value={description} onChange={e => setDescription(e.target.value)}
+                placeholder="Describe what you want to build — OMNIMENS will auto-detect the project type from your prompt..."
+                rows={3}
+                className="w-full bg-white/5 border border-white/10 focus:border-primary rounded-lg px-4 pr-10 py-2.5 text-white font-mono text-sm outline-none transition-all placeholder:text-white/20 resize-none"
+              />
+              <button
+                type="button"
+                onClick={() => startListening("description")}
+                title={listeningField === "description" ? "Stop listening" : "Speak your description"}
+                className={`absolute right-2.5 top-3 w-6 h-6 flex items-center justify-center rounded transition-all ${
+                  listeningField === "description" ? "text-rose-400 animate-pulse" : "text-white/30 hover:text-primary"
+                }`}
+              >
+                {listeningField === "description" ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+              </button>
+            </div>
           </div>
 
           {/* Type */}
