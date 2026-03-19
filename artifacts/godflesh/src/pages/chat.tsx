@@ -6107,7 +6107,7 @@ export default function Chat() {
                   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(e); }
                 }}
                 placeholder={accountLocked ? "ACCOUNT LOCKED — Pay outstanding balance to continue" : pendingFiles.length > 0 ? "Describe what to create with these files..." : "Query the intelligence... or attach files to build something"}
-                className="w-full rounded-xl pl-10 pr-28 sm:pr-[11rem] py-3.5 font-mono text-sm resize-none h-[56px] omnimens-scrollbar outline-none transition-all border focus:border-primary focus:ring-1 focus:ring-primary/50"
+                className="w-full rounded-xl pl-10 pr-[6.5rem] sm:pr-[11rem] py-3.5 font-mono text-sm resize-none h-[56px] omnimens-scrollbar outline-none transition-all border focus:border-primary focus:ring-1 focus:ring-primary/50"
                 style={{
                   background: isLight ? "#f4f5f8" : "#0d1117",
                   borderColor: accountLocked ? "rgba(239,68,68,0.5)" : isLight ? "rgba(168,85,247,0.25)" : "rgba(255,255,255,0.15)",
@@ -6118,16 +6118,17 @@ export default function Chat() {
               <div className="absolute right-2 flex items-center gap-1">
                 {!accountLocked && (
                   <>
-                    <BuildTriggerButton onClick={() => setShowNewAppModal(true)} />
+                    <span className="hidden sm:flex">
+                      <BuildTriggerButton onClick={() => setShowNewAppModal(true)} />
+                    </span>
                     <button
                       type="button"
                       onClick={() => setShowTemplates(t => !t)}
                       title="Smart Templates"
-                      className="text-white/40 hover:text-primary transition-colors w-7 h-7 flex items-center justify-center rounded"
+                      className="hidden sm:flex text-white/40 hover:text-primary transition-colors w-7 h-7 items-center justify-center rounded"
                     >
                       <LayoutTemplate className="w-3.5 h-3.5" />
                     </button>
-                    {/* Camera capture button */}
                     <button
                       type="button"
                       onClick={() => setShowCamera(true)}
@@ -6136,7 +6137,6 @@ export default function Chat() {
                     >
                       <Camera className="w-3.5 h-3.5" />
                     </button>
-                    {/* Voice input (speech-to-text) button */}
                     <button
                       type="button"
                       onClick={toggleVoiceInput}
@@ -6166,27 +6166,27 @@ export default function Chat() {
               </div>
             </div>
             <div className="flex items-center justify-between mt-1.5 px-1">
-              <div className="flex items-center gap-2">
-                <span className="text-[9px] font-mono text-white/70">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-[9px] font-mono text-white/70 truncate">
                   {PERSONA_NAMES[persona]} · MEMORY ACTIVE
                 </span>
                 <ModelSelector value={selectedModel} onChange={setSelectedModel} />
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 {hubSettings.antiHallucinationMode && (
-                  <span className="flex items-center gap-0.5 text-[8px] font-mono text-orange-400/70">
+                  <span className="hidden sm:flex items-center gap-0.5 text-[8px] font-mono text-orange-400/70">
                     <ShieldCheck className="w-2.5 h-2.5" /> VERIFIED
                   </span>
                 )}
                 {hubSettings.debateMode && (
-                  <span className="flex items-center gap-0.5 text-[8px] font-mono text-violet-400/70">
+                  <span className="hidden sm:flex items-center gap-0.5 text-[8px] font-mono text-violet-400/70">
                     <Swords className="w-2.5 h-2.5" /> DEBATE
                   </span>
                 )}
                 <button
                   type="button"
                   onClick={() => setShowControlHub(true)}
-                  className="text-[8px] font-mono text-white/25 hover:text-primary/60 transition-colors flex items-center gap-0.5"
+                  className="hidden sm:flex text-[8px] font-mono text-white/25 hover:text-primary/60 transition-colors items-center gap-0.5"
                 >
                   <Settings className="w-2.5 h-2.5" /> HUB
                 </button>
