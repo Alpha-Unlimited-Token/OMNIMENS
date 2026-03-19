@@ -221,14 +221,34 @@ function CreateProjectModal({ onClose, onCreate }: { onClose: () => void; onCrea
 function ProjectCard({ project, onClick, onDelete, onStar }: { project: Project; onClick: () => void; onDelete: () => void; onStar: () => void }) {
   const s = STATUS_CONFIG[project.status];
   const typeConf = PROJECT_TYPES.find(t => t.value === project.type);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [menuOpen]);
+
+  const colorStrip = typeConf?.value === "website" ? "bg-blue-400/50"
+    : typeConf?.value === "webapp" ? "bg-purple-400/50"
+    : typeConf?.value === "game" ? "bg-green-400/50"
+    : typeConf?.value === "dataviz" ? "bg-yellow-400/50"
+    : typeConf?.value === "api" ? "bg-pink-400/50"
+    : "bg-orange-400/50";
+
+  const updatedDate = new Date(project.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       className="group relative bg-white/3 border border-white/8 hover:border-primary/30 rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-[0_0_25px_rgba(130,80,220,0.1)]"
       onClick={onClick}
     >
-      {/* Type color strip */}
-      <div className={`h-1 w-full ${typeConf?.value === "website" ? "bg-blue-400/50" : typeConf?.value === "webapp" ? "bg-purple-400/50" : typeConf?.value === "game" ? "bg-green-400/50" : typeConf?.value === "dataviz" ? "bg-yellow-400/50" : typeConf?.value === "api" ? "bg-pink-400/50" : "bg-orange-400/50"}`} />
+      <div className={`h-1 w-full ${colorStrip}`} />
 
       <div className="p-4">
         <div className="flex items-start justify-between gap-2 mb-3">
@@ -240,31 +260,59 @@ function ProjectCard({ project, onClick, onDelete, onStar }: { project: Project;
               <h3 className="font-bold text-white text-sm font-mono truncate">{project.name}</h3>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <p className="text-[9px] font-mono text-white/85 uppercase tracking-widest">{project.type}</p>
+                {project.starred && <Star className="w-2.5 h-2.5 text-amber-400 fill-amber-400" />}
                 {project.folder && (
-                  <span className="text-[9px] font-mono text-white/40 flex items-center gap-0.5">
+                  <span className="text-[9px] font-mono text-white/80 flex items-center gap-0.5">
                     <Folder className="w-2.5 h-2.5" />{project.folder}
                   </span>
                 )}
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-0.5">
+
+          {/* Always-visible ⋮ menu */}
+          <div ref={menuRef} className="relative" onClick={e => e.stopPropagation()}>
             <button
-              onClick={e => { e.stopPropagation(); onStar(); }}
-              className={`p-1 transition-all ${project.starred ? "text-amber-400" : "opacity-0 group-hover:opacity-100 text-white/40 hover:text-amber-400"}`}
+              onClick={() => setMenuOpen(v => !v)}
+              className="p-1.5 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all"
             >
-              <Star className={`w-3.5 h-3.5 ${project.starred ? "fill-amber-400" : ""}`} />
+              <MoreVertical className="w-3.5 h-3.5" />
             </button>
-            <button
-              onClick={e => { e.stopPropagation(); onDelete(); }}
-              className="opacity-0 group-hover:opacity-100 p-1 text-white/75 hover:text-red-400 transition-all"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
+            {menuOpen && (
+              <div className="absolute right-0 top-full mt-1 w-44 bg-[#0d0d18] border border-white/15 rounded-xl shadow-2xl z-50 py-1 overflow-hidden">
+                <button
+                  onClick={() => { setMenuOpen(false); onClick(); }}
+                  className="w-full px-3 py-2 text-left text-xs font-mono text-white/85 hover:bg-white/8 hover:text-white flex items-center gap-2 transition-colors"
+                >
+                  <FolderOpen className="w-3.5 h-3.5 text-primary" /> Open project
+                </button>
+                <button
+                  onClick={() => { setMenuOpen(false); setLocation("/chat"); }}
+                  className="w-full px-3 py-2 text-left text-xs font-mono text-white/85 hover:bg-white/8 hover:text-white flex items-center gap-2 transition-colors"
+                >
+                  <Send className="w-3.5 h-3.5 text-cyan-400" /> Continue in Chat
+                </button>
+                <div className="h-px bg-white/8 my-1" />
+                <button
+                  onClick={() => { setMenuOpen(false); onStar(); }}
+                  className="w-full px-3 py-2 text-left text-xs font-mono text-white/85 hover:bg-white/8 hover:text-white flex items-center gap-2 transition-colors"
+                >
+                  <Star className={`w-3.5 h-3.5 ${project.starred ? "text-amber-400 fill-amber-400" : "text-white/60"}`} />
+                  {project.starred ? "Unstar" : "Star"}
+                </button>
+                <div className="h-px bg-white/8 my-1" />
+                <button
+                  onClick={() => { setMenuOpen(false); onDelete(); }}
+                  className="w-full px-3 py-2 text-left text-xs font-mono text-red-400 hover:bg-red-500/10 flex items-center gap-2 transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" /> Delete
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
-        <p className="text-white text-xs font-mono line-clamp-2 mb-3">{project.description || "No description"}</p>
+        <p className="text-white/85 text-xs font-mono line-clamp-2 mb-3">{project.description || "No description"}</p>
 
         <div className="flex items-center justify-between">
           <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full border text-[10px] font-mono ${s.bg} ${s.color}`}>
@@ -273,14 +321,12 @@ function ProjectCard({ project, onClick, onDelete, onStar }: { project: Project;
           </div>
           <div className="flex items-center gap-2">
             {project.published && (
-              <div className="flex items-center gap-1 text-[9px] font-mono text-green-400/70">
-                <Rocket className="w-3 h-3" />
-                LIVE
+              <div className="flex items-center gap-1 text-[9px] font-mono text-green-400/80">
+                <Rocket className="w-3 h-3" /> LIVE
               </div>
             )}
-            <span className="text-[9px] font-mono text-white/70">
-              {project.fileCount || 0} file{project.fileCount !== 1 ? "s" : ""}
-            </span>
+            <span className="text-[9px] font-mono text-white/80">{project.fileCount || 0} file{project.fileCount !== 1 ? "s" : ""}</span>
+            <span className="text-[9px] font-mono text-white/50">{updatedDate}</span>
           </div>
         </div>
       </div>
