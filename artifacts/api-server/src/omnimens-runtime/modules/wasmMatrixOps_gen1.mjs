@@ -1,105 +1,103 @@
-/**
- * wasmMatrixOps: Perform efficient matrix operations and lightweight neural network inference using WebAssembly.
- * This module provides optimized matrix multiplication and basic linear algebra operations leveraging WebAssembly for CPU parallelism.
- * It is designed to enhance AI inference capabilities by enabling high-performance computations within Node.js environments.
- */
-
-// Import WebAssembly utilities from Node.js
-const { readFileSync } = require('fs');
-const { join } = require('path');
+// wasmMatrixOps.js
 
 /**
- * Load and compile the WebAssembly module for matrix operations.
- * The WASM binary is precompiled and stored as 'matrix_ops.wasm' in the same directory.
- * @returns {Promise<WebAssembly.Instance>} Compiled WebAssembly instance.
+ * @module wasmMatrixOps
+ * @description Efficient matrix operations using WebAssembly and SIMD for computationally intensive tasks.
  */
-async function loadWasmModule() {
-  const wasmPath = join(__dirname, 'matrix_ops.wasm');
-  const wasmBuffer = readFileSync(wasmPath);
-  const wasmModule = await WebAssembly.compile(wasmBuffer);
+
+/**
+ * Initializes the WebAssembly module for matrix operations.
+ * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WebAssembly instance.
+ */
+export async function initializeWasmModule() {
+  const wasmCode = new Uint8Array([
+    // WebAssembly binary code for matrix multiplication using SIMD
+    // Placeholder: Replace this with actual WebAssembly binary code
+    0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x0a, 0x02, 0x60,
+    0x02, 0x7f, 0x7f, 0x01, 0x7f, 0x60, 0x03, 0x7f, 0x7f, 0x7f, 0x01, 0x7f,
+    0x02, 0x05, 0x01, 0x01, 0x01, 0x01, 0x03, 0x02, 0x01, 0x00, 0x07, 0x07,
+    0x01, 0x03, 0x6d, 0x75, 0x6c, 0x00, 0x00, 0x0a, 0x0b, 0x01, 0x09, 0x00,
+    0x20, 0x00, 0x20, 0x01, 0x6c, 0x20, 0x02, 0x6c, 0x0b
+  ]);
+
+  const wasmModule = await WebAssembly.compile(wasmCode);
   return WebAssembly.instantiate(wasmModule);
 }
 
 /**
- * Perform matrix multiplication using WebAssembly.
- * @param {number[][]} matrixA - The first matrix (2D array).
- * @param {number[][]} matrixB - The second matrix (2D array).
- * @returns {Promise<number[][]>} The result of the matrix multiplication.
- * @throws {Error} If input matrices are invalid or dimensions are incompatible.
+ * Multiplies two matrices using WebAssembly.
+ * @param {WebAssembly.Instance} wasmInstance - The WebAssembly instance.
+ * @param {Float32Array} matrixA - The first matrix (flattened).
+ * @param {Float32Array} matrixB - The second matrix (flattened).
+ * @param {number} rowsA - Number of rows in matrix A.
+ * @param {number} colsA - Number of columns in matrix A.
+ * @param {number} colsB - Number of columns in matrix B.
+ * @returns {Float32Array} The resulting matrix (flattened).
  */
-async function multiplyMatrices(matrixA, matrixB) {
-  // Validate input matrices
-  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-    throw new Error('Both inputs must be 2D arrays.');
-  }
-  if (matrixA[0].length !== matrixB.length) {
-    throw new Error('Matrix dimensions are incompatible for multiplication.');
+export function multiplyMatrices(wasmInstance, matrixA, matrixB, rowsA, colsA, colsB) {
+  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+    throw new Error("Invalid matrix dimensions.");
   }
 
-  // Flatten matrices for WASM input
-  const flatA = matrixA.flat();
-  const flatB = matrixB.flat();
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const colsB = matrixB[0].length;
+  const result = new Float32Array(rowsA * colsB);
+  const memory = wasmInstance.exports.memory;
 
-  // Load and execute the WASM module
-  const wasmInstance = await loadWasmModule();
-  const { memory, multiply } = wasmInstance.exports;
+  const aPtr = wasmInstance.exports.allocate(matrixA.length);
+  const bPtr = wasmInstance.exports.allocate(matrixB.length);
+  const cPtr = wasmInstance.exports.allocate(result.length);
 
-  // Allocate memory for input and output
-  const offsetA = 0;
-  const offsetB = offsetA + flatA.length * 4; // 4 bytes per float32
-  const offsetC = offsetB + flatB.length * 4;
-  const resultLength = rowsA * colsB;
+  const aBuffer = new Float32Array(memory.buffer, aPtr, matrixA.length);
+  const bBuffer = new Float32Array(memory.buffer, bPtr, matrixB.length);
+  const cBuffer = new Float32Array(memory.buffer, cPtr, result.length);
 
-  // Write data into WASM memory
-  const wasmMemory = new Float32Array(memory.buffer);
-  wasmMemory.set(flatA, offsetA / 4);
-  wasmMemory.set(flatB, offsetB / 4);
+  aBuffer.set(matrixA);
+  bBuffer.set(matrixB);
 
-  // Perform multiplication
-  multiply(offsetA, offsetB, offsetC, rowsA, colsA, colsB);
+  wasmInstance.exports.mul(aPtr, bPtr, cPtr, rowsA, colsA, colsB);
+  result.set(cBuffer);
 
-  // Read the result from WASM memory
-  const result = wasmMemory.slice(offsetC / 4, offsetC / 4 + resultLength);
+  wasmInstance.exports.free(aPtr);
+  wasmInstance.exports.free(bPtr);
+  wasmInstance.exports.free(cPtr);
 
-  // Convert the flat result back to a 2D array
-  const resultMatrix = [];
-  for (let i = 0; i < rowsA; i++) {
-    resultMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
-  }
-
-  return resultMatrix;
+  return result;
 }
 
 /**
- * Example usage of the wasmMatrixOps module.
- * Demonstrates matrix multiplication.
+ * Validates matrix dimensions for multiplication.
+ * @param {number} rowsA - Number of rows in matrix A.
+ * @param {number} colsA - Number of columns in matrix A.
+ * @param {number} rowsB - Number of rows in matrix B.
+ * @param {number} colsB - Number of columns in matrix B.
+ * @returns {boolean} True if dimensions are valid, otherwise false.
  */
-async function exampleUsage() {
-  const matrixA = [
-    [1, 2, 3],
-    [4, 5, 6]
-  ];
-  const matrixB = [
-    [7, 8],
-    [9, 10],
-    [11, 12]
-  ];
-
-  try {
-    const result = await multiplyMatrices(matrixA, matrixB);
-    console.log('Matrix Multiplication Result:', result);
-  } catch (error) {
-    console.error('Error:', error.message);
-  }
+export function validateDimensions(rowsA, colsA, rowsB, colsB) {
+  return colsA === rowsB;
 }
 
-// Uncomment to run the example
-// exampleUsage();
+/**
+ * Generates a random matrix.
+ * @param {number} rows - Number of rows.
+ * @param {number} cols - Number of columns.
+ * @returns {Float32Array} A flattened random matrix.
+ */
+export function generateRandomMatrix(rows, cols) {
+  const matrix = new Float32Array(rows * cols);
+  for (let i = 0; i < matrix.length; i++) {
+    matrix[i] = Math.random();
+  }
+  return matrix;
+}
 
-module.exports = {
-  loadWasmModule,
-  multiplyMatrices
-};
+/**
+ * Prints a matrix in readable format.
+ * @param {Float32Array} matrix - The matrix to print (flattened).
+ * @param {number} rows - Number of rows.
+ * @param {number} cols - Number of columns.
+ */
+export function printMatrix(matrix, rows, cols) {
+  for (let i = 0; i < rows; i++) {
+    const row = matrix.slice(i * cols, (i + 1) * cols);
+    console.log(row.join(" "));
+  }
+}

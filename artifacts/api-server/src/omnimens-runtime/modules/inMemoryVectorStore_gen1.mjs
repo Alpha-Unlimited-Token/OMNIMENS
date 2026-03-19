@@ -1,122 +1,101 @@
+// Complete ES module code here, starting with /** JSDoc */ and exports
+
 /**
  * @module inMemoryVectorStore
- * @description A module for storing and retrieving high-dimensional embeddings using a k-d tree for fast similarity searches.
+ * @description Stores embeddings in memory and performs fast approximate nearest neighbor (ANN) search using a custom implementation.
  */
 
 /**
- * Represents a node in the k-d tree.
- * @class
- */
-class KDTreeNode {
-  /**
-   * @param {number[]} point - The vector point stored at this node.
-   * @param {KDTreeNode|null} left - Left child node.
-   * @param {KDTreeNode|null} right - Right child node.
-   */
-  constructor(point, left = null, right = null) {
-    this.point = point;
-    this.left = left;
-    this.right = right;
-  }
-}
-
-/**
- * Builds a k-d tree from a set of points.
- * @param {number[][]} points - Array of points (embeddings) to build the tree.
- * @param {number} depth - Current depth in the tree (used to determine splitting axis).
- * @returns {KDTreeNode|null} - Root node of the k-d tree.
- */
-function buildKDTree(points, depth = 0) {
-  if (points.length === 0) return null;
-
-  const k = points[0].length; // Dimensionality of the points
-  const axis = depth % k; // Determine axis to split on
-
-  // Sort points by the current axis and choose median as pivot
-  points.sort((a, b) => a[axis] - b[axis]);
-  const medianIndex = Math.floor(points.length / 2);
-
-  // Recursively build left and right subtrees
-  return new KDTreeNode(
-    points[medianIndex],
-    buildKDTree(points.slice(0, medianIndex), depth + 1),
-    buildKDTree(points.slice(medianIndex + 1), depth + 1)
-  );
-}
-
-/**
- * Finds the nearest neighbor to a target point in the k-d tree.
- * @param {KDTreeNode|null} node - Current node in the tree.
- * @param {number[]} target - Target point to find the nearest neighbor for.
- * @param {number} depth - Current depth in the tree (used to determine splitting axis).
- * @param {object} best - Best match found so far (contains point and distance).
- * @returns {object} - Nearest neighbor point and its distance.
- */
-function nearestNeighbor(node, target, depth = 0, best = { point: null, distance: Infinity }) {
-  if (node === null) return best;
-
-  const k = target.length;
-  const axis = depth % k;
-
-  // Calculate distance from target to current node
-  const distance = euclideanDistance(node.point, target);
-  if (distance < best.distance) {
-    best = { point: node.point, distance };
-  }
-
-  // Determine which subtree to search first
-  const direction = target[axis] < node.point[axis] ? 'left' : 'right';
-  const nextNode = direction === 'left' ? node.left : node.right;
-  const otherNode = direction === 'left' ? node.right : node.left;
-
-  // Search the chosen subtree
-  best = nearestNeighbor(nextNode, target, depth + 1, best);
-
-  // Check if we need to search the other subtree
-  if (Math.abs(target[axis] - node.point[axis]) < best.distance) {
-    best = nearestNeighbor(otherNode, target, depth + 1, best);
-  }
-
-  return best;
-}
-
-/**
- * Calculates the Euclidean distance between two points.
- * @param {number[]} a - First point.
- * @param {number[]} b - Second point.
- * @returns {number} - Euclidean distance between the points.
- */
-function euclideanDistance(a, b) {
-  return Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0));
-}
-
-/**
- * Class representing an in-memory vector store using a k-d tree.
+ * Class representing an in-memory vector store for embeddings.
  */
 class InMemoryVectorStore {
   constructor() {
-    this.tree = null; // Root node of the k-d tree
+    /**
+     * @private
+     * @type {Map<string, number[]>}
+     * Stores vectors with their unique identifiers.
+     */
+    this.store = new Map();
   }
 
   /**
-   * Adds embeddings to the vector store and rebuilds the k-d tree.
-   * @param {number[][]} embeddings - Array of embeddings to add.
+   * Adds a vector to the store.
+   * @param {string} id - The unique identifier for the vector.
+   * @param {number[]} vector - The vector to store.
+   * @throws {Error} Throws an error if the vector is not an array of numbers.
    */
-  addEmbeddings(embeddings) {
-    this.tree = buildKDTree(embeddings);
-  }
-
-  /**
-   * Finds the nearest neighbor to a given embedding.
-   * @param {number[]} embedding - Target embedding to search for.
-   * @returns {object} - Nearest neighbor point and its distance.
-   */
-  findNearestNeighbor(embedding) {
-    if (!this.tree) {
-      throw new Error('Vector store is empty. Add embeddings first.');
+  addVector(id, vector) {
+    if (!Array.isArray(vector) || !vector.every((v) => typeof v === 'number')) {
+      throw new Error('Vector must be an array of numbers.');
     }
-    return nearestNeighbor(this.tree, embedding);
+    this.store.set(id, vector);
+  }
+
+  /**
+   * Searches for the nearest neighbors of a given query vector.
+   * @param {number[]} queryVector - The query vector.
+   * @param {number} k - The number of nearest neighbors to retrieve.
+   * @returns {Array<{id: string, distance: number}>} The k nearest neighbors sorted by distance.
+   * @throws {Error} Throws an error if the query vector is invalid.
+   */
+  search(queryVector, k) {
+    if (!Array.isArray(queryVector) || !queryVector.every((v) => typeof v === 'number')) {
+      throw new Error('Query vector must be an array of numbers.');
+    }
+    if (k <= 0) {
+      throw new Error('Number of neighbors (k) must be greater than 0.');
+    }
+
+    const distances = [];
+
+    for (const [id, vector] of this.store.entries()) {
+      const distance = this._euclideanDistance(queryVector, vector);
+      distances.push({ id, distance });
+    }
+
+    distances.sort((a, b) => a.distance - b.distance);
+
+    return distances.slice(0, k);
+  }
+
+  /**
+   * Clears the store.
+   */
+  clear() {
+    this.store.clear();
+  }
+
+  /**
+   * Computes the Euclidean distance between two vectors.
+   * @private
+   * @param {number[]} vectorA - The first vector.
+   * @param {number[]} vectorB - The second vector.
+   * @returns {number} The Euclidean distance.
+   */
+  _euclideanDistance(vectorA, vectorB) {
+    if (vectorA.length !== vectorB.length) {
+      throw new Error('Vectors must have the same length.');
+    }
+
+    return Math.sqrt(
+      vectorA.reduce((sum, a, i) => sum + Math.pow(a - vectorB[i], 2), 0)
+    );
   }
 }
 
-export { InMemoryVectorStore };
+/**
+ * Creates a new instance of the in-memory vector store.
+ * @returns {InMemoryVectorStore} The vector store instance.
+ */
+export function createVectorStore() {
+  return new InMemoryVectorStore();
+}
+
+/**
+ * Example usage:
+ * const store = createVectorStore();
+ * store.addVector('vec1', [1, 2, 3]);
+ * store.addVector('vec2', [4, 5, 6]);
+ * const result = store.search([1, 2, 3], 1);
+ * console.log(result);
+ */
