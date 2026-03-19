@@ -1,4 +1,10 @@
 /**
+ * OMNIMENS — Proprietary AI Platform
+ * Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+ * Unauthorized reproduction, distribution, or use is strictly prohibited.
+ */
+
+/**
  * OMNIMENS URL Analyzer
  * Fetches web page content and makes it available for analysis.
  * Like Perplexity's "focus on URL" and Claude's URL attachment feature.

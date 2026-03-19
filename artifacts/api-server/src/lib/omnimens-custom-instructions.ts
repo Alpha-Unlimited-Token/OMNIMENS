@@ -1,4 +1,10 @@
 /**
+ * OMNIMENS — Proprietary AI Platform
+ * Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+ * Unauthorized reproduction, distribution, or use is strictly prohibited.
+ */
+
+/**
  * OMNIMENS Custom Instructions
  * Like ChatGPT's "Custom Instructions" feature — users define their context
  * and response preferences, injected into every system prompt.

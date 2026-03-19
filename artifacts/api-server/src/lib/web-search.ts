@@ -1,4 +1,10 @@
 /**
+ * OMNIMENS — Proprietary AI Platform
+ * Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+ * Unauthorized reproduction, distribution, or use is strictly prohibited.
+ */
+
+/**
  * OMNIMENS Web Search — Internet access layer
  *
  * Uses DuckDuckGo (free, no API key) for fast factual searches.

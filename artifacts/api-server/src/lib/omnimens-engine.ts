@@ -1,3 +1,9 @@
+/**
+ * OMNIMENS — Proprietary AI Platform
+ * Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+ * Unauthorized reproduction, distribution, or use is strictly prohibited.
+ */
+
 import { spawn } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";

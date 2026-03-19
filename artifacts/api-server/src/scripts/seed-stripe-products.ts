@@ -1,3 +1,9 @@
+/**
+ * OMNIMENS — Proprietary AI Platform
+ * Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+ * Unauthorized reproduction, distribution, or use is strictly prohibited.
+ */
+
 // Run with: pnpm --filter @workspace/api-server run seed-stripe
 // Creates OMNIMENS one-time credit packs + monthly subscription plans in Stripe
 // and prints the env vars to set in Replit Secrets.

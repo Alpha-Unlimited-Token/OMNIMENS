@@ -1,4 +1,10 @@
 /**
+ * OMNIMENS — Proprietary AI Platform
+ * Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+ * Unauthorized reproduction, distribution, or use is strictly prohibited.
+ */
+
+/**
  * OMNIMENS Deep Research Engine
  * Mirrors Perplexity Pro Research Mode — decomposes a question into multiple
  * targeted searches, fetches results in parallel, then synthesizes a comprehensive

@@ -1,4 +1,10 @@
 /**
+ * OMNIMENS — Proprietary AI Platform
+ * Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+ * Unauthorized reproduction, distribution, or use is strictly prohibited.
+ */
+
+/**
  * OMNIMENS BLENDER 4.4 PIPELINE — FULL CAPABILITY
  * ─────────────────────────────────────────────────────────────────────────────
  * GPT-4o writes a complete Blender Python (bpy) script with access to EVERY

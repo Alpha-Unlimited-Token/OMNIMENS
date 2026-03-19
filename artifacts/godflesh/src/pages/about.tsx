@@ -1,3 +1,9 @@
+/**
+ * OMNIMENS — Proprietary AI Platform
+ * Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+ * Unauthorized reproduction, distribution, or use is strictly prohibited.
+ */
+
 import { Layout } from "@/components/layout";
 import { motion } from "framer-motion";
 import { Building2, Brain, Cpu, Sparkles, Users, Zap, Target, Globe } from "lucide-react";

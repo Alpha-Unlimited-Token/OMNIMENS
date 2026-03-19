@@ -1,4 +1,10 @@
 /**
+ * OMNIMENS — Proprietary AI Platform
+ * Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+ * Unauthorized reproduction, distribution, or use is strictly prohibited.
+ */
+
+/**
  * OMNIMENS Persistent Memory System
  * Mirrors ChatGPT's Memory feature — auto-extracts facts about users from conversations,
  * stores them in DB, and injects the most relevant ones into every system prompt.

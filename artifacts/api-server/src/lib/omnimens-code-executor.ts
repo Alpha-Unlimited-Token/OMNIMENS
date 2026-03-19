@@ -1,4 +1,10 @@
 /**
+ * OMNIMENS — Proprietary AI Platform
+ * Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+ * Unauthorized reproduction, distribution, or use is strictly prohibited.
+ */
+
+/**
  * OMNIMENS Code Interpreter
  * Mirrors ChatGPT Code Interpreter — executes JavaScript/Node.js in a sandboxed
  * subprocess and returns stdout, stderr, and execution time.

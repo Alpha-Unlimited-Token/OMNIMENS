@@ -1,4 +1,10 @@
 /**
+ * OMNIMENS — Proprietary AI Platform
+ * Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+ * Unauthorized reproduction, distribution, or use is strictly prohibited.
+ */
+
+/**
  * OMNIMENS RESTORATIVE ART & MORTUARY SCIENCE KNOWLEDGE ENGINE
  * ─────────────────────────────────────────────────────────────
  * INTERNAL MODULE — NO UI EXPOSURE. This knowledge is silently woven into

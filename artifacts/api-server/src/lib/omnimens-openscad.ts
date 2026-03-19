@@ -1,4 +1,10 @@
 /**
+ * OMNIMENS — Proprietary AI Platform
+ * Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+ * Unauthorized reproduction, distribution, or use is strictly prohibited.
+ */
+
+/**
  * OMNIMENS OPENSCAD PIPELINE
  * ─────────────────────────────────────────────────────────────────────────────
  * GPT-4o writes OpenSCAD code (.scad) for parametric/geometric/mechanical
