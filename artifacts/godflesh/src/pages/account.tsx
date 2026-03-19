@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check, Atom, Code2, Layers, Eye, AlertTriangle, Wrench, Dna, Play, Wallet, CreditCard, Gift, TrendingUp, ChevronRight, Bell, Sun, HelpCircle, BookOpen, Info, Settings, ExternalLink, Share2, Star, ToggleLeft, ToggleRight, Loader2, X, Lock, Copy, Link, Users } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SEO, seoData } from "@/components/seo";
+import { useTheme } from "@/hooks/use-theme";
 
 function useBillingInfo() {
   return useQuery({
@@ -171,7 +172,7 @@ export default function Account() {
   const [dreamStateLoading, setDreamStateLoading] = useState(false);
   const [serverBuildExpanded, setServerBuildExpanded] = useState<number | null>(null);
 
-  const [theme, setTheme] = useState<"dark"|"auto">("dark");
+  const { theme: activeTheme, setTheme: applyTheme } = useTheme();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) setLocation("/login");
@@ -645,12 +646,12 @@ export default function Account() {
           <p className="text-[10px] font-mono text-white/35 tracking-widest uppercase px-1 mb-1">Theme</p>
           <div className="bg-black/30 border border-white/8 rounded-xl overflow-hidden">
             <button
-              onClick={() => setTheme(t => t === "dark" ? "auto" : "dark")}
+              onClick={() => applyTheme(activeTheme === "dark" ? "light" : "dark")}
               className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-white/3 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <Sun className="w-4 h-4 text-white/50" />
-                <span className="text-[13px] text-white/80">Theme · {theme === "dark" ? "Dark" : "Auto"}</span>
+                <span className="text-[13px] text-white/80">Theme · {activeTheme === "dark" ? "Dark" : "Light"}</span>
               </div>
               <ChevronRight className="w-4 h-4 text-white/25" />
             </button>
