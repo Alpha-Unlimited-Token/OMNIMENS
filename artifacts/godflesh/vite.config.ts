@@ -55,13 +55,15 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        manualChunks: {
-          "vendor-react": ["react", "react-dom"],
-          "vendor-ui": ["framer-motion", "wouter", "@tanstack/react-query"],
-          "vendor-icons": ["lucide-react"],
-          "vendor-recharts": ["recharts"],
-          "vendor-markdown": ["react-markdown", "remark-gfm"],
-          "vendor-oauth": ["@react-oauth/google"],
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (id.includes("/react-dom/") || id.includes("/react/")) return "vendor-ui";
+            if (id.includes("/framer-motion/") || id.includes("/wouter/") || id.includes("/@tanstack/react-query/")) return "vendor-ui";
+            if (id.includes("/lucide-react/")) return "vendor-icons";
+            if (id.includes("/recharts/") || id.includes("/d3-")) return "vendor-recharts";
+            if (id.includes("/react-markdown/") || id.includes("/remark-gfm/")) return "vendor-markdown";
+            if (id.includes("/@react-oauth/")) return "vendor-oauth";
+          }
         },
       },
     },
