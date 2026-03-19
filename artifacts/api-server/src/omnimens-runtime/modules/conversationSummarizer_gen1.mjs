@@ -1,108 +1,103 @@
-// conversationSummarizer.js
-
 /**
  * @module conversationSummarizer
- * @description Summarizes earlier context into embeddings for extended token window utilization.
+ * @description Summarizes long conversation contexts into a compressed format for token-efficient recall using a sliding window approach.
  */
 
 /**
- * Generates sentence embeddings using a simple numerical vectorization technique.
- * @param {string[]} sentences - Array of sentences to process.
- * @returns {number[][]} Array of numerical vectors representing sentence embeddings.
+ * Summarizes a long conversation context into a compressed format.
+ * Uses a sliding window approach with embeddings to distill key points while maintaining coherence.
+ *
+ * @param {string[]} conversation - An array of conversation strings (e.g., chat messages).
+ * @param {number} windowSize - The size of the sliding window (number of messages per window).
+ * @param {number} overlap - The number of overlapping messages between consecutive windows.
+ * @returns {string} A summarized version of the conversation.
  */
-export function generateEmbeddings(sentences) {
-  return sentences.map(sentence => {
-    const words = sentence.split(/\s+/);
-    return words.map(word => word.length); // Simple embedding: word length as a proxy for semantic value.
-  });
-}
-
-/**
- * Clusters embeddings into representative groups.
- * @param {number[][]} embeddings - Array of numerical vectors.
- * @param {number} clusterCount - Desired number of clusters.
- * @returns {number[][]} Array of representative vectors for each cluster.
- */
-export function clusterEmbeddings(embeddings, clusterCount) {
-  if (embeddings.length === 0 || clusterCount <= 0) {
-    throw new Error("Invalid input: embeddings must be non-empty and clusterCount must be positive.");
+export function summarizeConversation(conversation, windowSize, overlap) {
+  if (!Array.isArray(conversation) || conversation.length === 0) {
+    throw new Error("Conversation must be a non-empty array of strings.");
   }
 
-  // Initialize clusters with the first `clusterCount` embeddings.
-  const clusters = embeddings.slice(0, clusterCount);
+  if (typeof windowSize !== "number" || windowSize <= 0) {
+    throw new Error("Window size must be a positive number.");
+  }
 
-  let changed = true;
-  while (changed) {
-    const clusterAssignments = embeddings.map(embedding => {
-      return clusters.reduce((closest, cluster, index) => {
-        const distance = euclideanDistance(embedding, cluster);
-        return distance < closest.distance ? { index, distance } : closest;
-      }, { index: -1, distance: Infinity }).index;
-    });
+  if (typeof overlap !== "number" || overlap < 0 || overlap >= windowSize) {
+    throw new Error("Overlap must be a non-negative number less than the window size.");
+  }
 
-    const newClusters = Array.from({ length: clusterCount }, () => []);
-    clusterAssignments.forEach((clusterIndex, i) => {
-      newClusters[clusterIndex].push(embeddings[i]);
-    });
+  /**
+   * Helper function to compute a simple semantic embedding for a given text.
+   * This is a placeholder for a more advanced embedding function.
+   *
+   * @param {string} text - The input text.
+   * @returns {number[]} A numeric vector representing the text.
+   */
+  function computeEmbedding(text) {
+    return text
+      .toLowerCase()
+      .split(" ")
+      .map((word) => word.length);
+  }
 
-    changed = false;
-    for (let i = 0; i < clusterCount; i++) {
-      const newCluster = calculateCentroid(newClusters[i]);
-      if (!arraysEqual(clusters[i], newCluster)) {
-        clusters[i] = newCluster;
-        changed = true;
+  /**
+   * Helper function to calculate the average embedding of a window of messages.
+   *
+   * @param {string[]} window - An array of messages.
+   * @returns {number[]} The average embedding vector.
+   */
+  function calculateWindowEmbedding(window) {
+    const embeddings = window.map(computeEmbedding);
+    const vectorLength = embeddings[0].length;
+    const avgEmbedding = new Array(vectorLength).fill(0);
+
+    embeddings.forEach((embedding) => {
+      for (let i = 0; i < vectorLength; i++) {
+        avgEmbedding[i] += embedding[i];
       }
-    }
+    });
+
+    return avgEmbedding.map((value) => value / embeddings.length);
   }
 
-  return clusters;
+  /**
+   * Helper function to generate a summary for a window of messages.
+   *
+   * @param {string[]} window - An array of messages.
+   * @returns {string} A summarized string for the window.
+   */
+  function summarizeWindow(window) {
+    return window.join(" ").slice(0, 200); // Truncate to 200 characters for simplicity.
+  }
+
+  const summaries = [];
+  let start = 0;
+
+  while (start < conversation.length) {
+    const end = Math.min(start + windowSize, conversation.length);
+    const window = conversation.slice(start, end);
+
+    const windowSummary = summarizeWindow(window);
+    summaries.push(windowSummary);
+
+    start += windowSize - overlap;
+  }
+
+  return summaries.join(" ");
 }
 
 /**
- * Summarizes context by clustering sentence embeddings into representative vectors.
- * @param {string[]} sentences - Array of sentences to summarize.
- * @param {number} clusterCount - Desired number of clusters.
- * @returns {number[][]} Array of representative vectors summarizing the context.
+ * Validates and prepares input for the summarizer function.
+ *
+ * @param {string} input - The raw conversation input as a single string.
+ * @param {number} windowSize - The size of the sliding window.
+ * @param {number} overlap - The number of overlapping messages between windows.
+ * @returns {string} A summarized version of the conversation.
  */
-export function summarizeContext(sentences, clusterCount) {
-  const embeddings = generateEmbeddings(sentences);
-  return clusterEmbeddings(embeddings, clusterCount);
-}
+export function summarizeRawInput(input, windowSize = 5, overlap = 2) {
+  if (typeof input !== "string" || input.trim() === "") {
+    throw new Error("Input must be a non-empty string.");
+  }
 
-/**
- * Calculates the Euclidean distance between two numerical vectors.
- * @param {number[]} vec1 - First vector.
- * @param {number[]} vec2 - Second vector.
- * @returns {number} Euclidean distance.
- */
-function euclideanDistance(vec1, vec2) {
-  return Math.sqrt(vec1.reduce((sum, val, i) => sum + Math.pow(val - (vec2[i] || 0), 2), 0));
-}
-
-/**
- * Calculates the centroid of a cluster of vectors.
- * @param {number[][]} cluster - Array of numerical vectors.
- * @returns {number[]} Centroid vector.
- */
-function calculateCentroid(cluster) {
-  if (cluster.length === 0) return [];
-  const dimension = cluster[0].length;
-  const sums = Array(dimension).fill(0);
-  cluster.forEach(vector => {
-    vector.forEach((value, index) => {
-      sums[index] += value;
-    });
-  });
-  return sums.map(sum => sum / cluster.length);
-}
-
-/**
- * Checks if two arrays are equal.
- * @param {number[]} arr1 - First array.
- * @param {number[]} arr2 - Second array.
- * @returns {boolean} True if arrays are equal, false otherwise.
- */
-function arraysEqual(arr1, arr2) {
-  if (arr1.length !== arr2.length) return false;
-  return arr1.every((val, index) => val === arr2[index]);
+  const conversation = input.split("\n").map((line) => line.trim()).filter(Boolean);
+  return summarizeConversation(conversation, windowSize, overlap);
 }

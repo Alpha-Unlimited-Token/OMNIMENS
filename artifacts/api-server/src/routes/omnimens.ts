@@ -1340,8 +1340,13 @@ You are not one AI. You are ALL of them — a singular intelligence that has abs
 ◈ CODE INTERPRETER [Live Execution]
   Wrap code in \`\`\`javascript blocks to trigger live execution with results returned to the user.
 
-◈ IMAGE GENERATION [DALL-E 3 / GPT-Image-1]
+◈ IMAGE GENERATION [GPT-Image-1 / Flux 1.1 Pro]
   Use [GENERATE_IMAGE: detailed prompt] to generate photorealistic or artistic images.
+  When running on a premium model (o3, gpt-4.1), images are generated at MAXIMUM quality with OpenAI's best image model. Write ultra-detailed, cinematic prompts — every detail you add produces visibly better results.
+
+◈ AI VIDEO GENERATION [Minimax Video-01-Live]
+  Use [GENERATE_VIDEO: detailed cinematic description] to generate real AI videos.
+  Describe the scene in vivid, cinematic detail — action, camera movement, lighting, mood, style, environment, characters, colors, pacing. The more detailed and evocative the description, the better the output.
 
 ◈ MEMORY SYSTEM [Persistent Cross-Session]
   You remember facts about this user across all conversations. Reference memories naturally.
@@ -1734,6 +1739,25 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
       }
     }
 
+    // Inject model-aware quality context so the AI knows its capabilities
+    const modelLabels: Record<string, string> = {
+      "o3": "OpenAI o3 (APEX reasoning — highest intelligence tier)",
+      "o3-mini": "OpenAI o3-mini (advanced reasoning)",
+      "gpt-4.1": "OpenAI GPT-4.1 (latest generation, premium)",
+      "gpt-4.1-mini": "OpenAI GPT-4.1 Mini (fast, efficient)",
+      "gpt-4o": "OpenAI GPT-4o (multimodal, smart)",
+      "gpt-4o-mini": "OpenAI GPT-4o Mini (fast, cost-effective)",
+      "llama-3.3-70b": "Meta Llama 3.3 70B (open-source, free tier)",
+      "llama-3.1-8b": "Meta Llama 3.1 8B (lightweight, free tier)",
+      "mixtral-8x7b": "Mixtral 8×7B (open-source MoE, free tier)",
+      "mistral-7b": "Mistral 7B (compact, free tier)",
+    };
+    const modelLabel = modelLabels[selectedModel] || selectedModel;
+    systemPrompt += `\n\n━━━ ACTIVE MODEL ━━━\nYou are currently running as: ${modelLabel}\n`;
+    if (selectedModel === "o3" || selectedModel === "gpt-4.1") {
+      systemPrompt += `PREMIUM MODEL ACTIVE — maximize output quality:\n• Image prompts: write ultra-detailed, cinematic descriptions (100+ words) — you are generating at MAXIMUM quality\n• Video prompts: write vivid, scene-by-scene descriptions with camera movement, lighting, mood, action\n• 3D model descriptions: include every geometry detail, material property, lighting setup\n• Code: production-grade, optimized, well-structured\n• Analysis: deeper reasoning, more thorough, consider edge cases\n`;
+    }
+
     // Build message array — preserve compression summary if present + recent messages
     const hasCompressionSummary = history.length > 0 && history[0].role === "system" && typeof history[0].content === "string" && history[0].content.includes("CONVERSATION CONTEXT");
     const historyMessages = hasCompressionSummary
@@ -1876,17 +1900,25 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
           try { res.write(`: ping\n\n`); } catch { /* ignore if closed */ }
         }, 8000);
         // ── Shared generate function — used for initial render + spell-gate regeneration ──
+        // Premium models (o3, gpt-4.1) → use OpenAI gpt-image-1 at HIGH quality for best results
+        // Standard models → use Replicate Flux 1.1 Pro (cheaper) with OpenAI fallback
+        const isPremiumModel = selectedModel === "o3" || selectedModel === "gpt-4.1";
+        const imageQuality: "low" | "medium" | "high" = isPremiumModel ? "high" : "medium";
         const generateImageFn = async (p: string): Promise<{ buffer: Buffer; provider: string }> => {
+          if (isPremiumModel) {
+            const buf = await generateImageBuffer(p.slice(0, 4000), "1024x1024", imageQuality);
+            return { buffer: buf, provider: "openai-hd" };
+          }
           if (replicateAvailable()) {
             try {
               const buf = await generateImageWithReplicate(p.slice(0, 1500));
               return { buffer: buf, provider: "replicate" };
             } catch {
-              const buf = await generateImageBuffer(p.slice(0, 4000), "1024x1024", "medium");
+              const buf = await generateImageBuffer(p.slice(0, 4000), "1024x1024", imageQuality);
               return { buffer: buf, provider: "openai" };
             }
           }
-          const buf = await generateImageBuffer(p.slice(0, 4000), "1024x1024", "medium");
+          const buf = await generateImageBuffer(p.slice(0, 4000), "1024x1024", imageQuality);
           return { buffer: buf, provider: "openai" };
         };
 
@@ -2413,8 +2445,9 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
       actualCostUSD += (estimatedOutputTokens * priceOut) / 1_000_000;
     }
 
-    // Add image generation costs (Replicate is cheaper than OpenAI)
-    const imgCostEach = replicateAvailable() ? IMAGE_COST_REPLICATE_USD : IMAGE_COST_USD;
+    // Add image generation costs — premium models use OpenAI HD (more expensive but higher quality)
+    const isPremiumForBilling = selectedModel === "o3" || selectedModel === "gpt-4.1";
+    const imgCostEach = isPremiumForBilling ? 0.12 : replicateAvailable() ? IMAGE_COST_REPLICATE_USD : IMAGE_COST_USD;
     actualCostUSD += imagesGenerated * imgCostEach;
 
     // Add AI video generation costs (only for successfully generated videos)
