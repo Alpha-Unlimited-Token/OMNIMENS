@@ -53,11 +53,17 @@ async function awardReferralCredits(payingUserId: string) {
   }
 }
 
-// One-time credit packs
-const CREDIT_PACKS: Record<string, number> = {
-  spark: 300,
-  surge: 1200,
-  apex:  4000,
+const CREDIT_PACKS: Record<string, { credits: number; amountCents: number; label: string }> = {
+  spark: { credits: 300,  amountCents: 300,  label: "SPARK" },
+  surge: { credits: 1200, amountCents: 1000, label: "SURGE" },
+  apex:  { credits: 4000, amountCents: 3000, label: "APEX" },
+};
+
+const RESONANCE_PACKS: Record<string, { totalCredits: number; amountCents: number; label: string; bonusLabel: string }> = {
+  resonance_10:  { totalCredits: 1100,  amountCents: 1000,  label: "$10",  bonusLabel: "+10% bonus" },
+  resonance_25:  { totalCredits: 2875,  amountCents: 2500,  label: "$25",  bonusLabel: "+15% bonus" },
+  resonance_50:  { totalCredits: 6000,  amountCents: 5000,  label: "$50",  bonusLabel: "+20% bonus" },
+  resonance_100: { totalCredits: 12500, amountCents: 10000, label: "$100", bonusLabel: "+25% bonus" },
 };
 
 // Monthly subscription plan credits granted on each renewal cycle
@@ -104,11 +110,55 @@ router.post(
             break;
           }
 
+          const isResonance = session.metadata?.type === "resonance";
+          const stripeCustomerId =
+            typeof session.customer === "string" ? session.customer : session.customer?.id || null;
+
+          // ── Resonance credit pack purchase ────────────────────────────────
+          if (isResonance && packId && RESONANCE_PACKS[packId] && session.payment_status === "paid") {
+            const resPack = RESONANCE_PACKS[packId];
+
+            const [user] = await db
+              .select({ id: omnimensUsers.id })
+              .from(omnimensUsers)
+              .where(eq(omnimensUsers.id, userId))
+              .limit(1);
+
+            if (!user) { console.warn(`[Stripe Webhook] User not found: ${userId}`); break; }
+
+            await db.update(omnimensUsers)
+              .set({
+                resonanceCredits: sql`${omnimensUsers.resonanceCredits} + ${resPack.totalCredits}`,
+                resonanceTotalEarned: sql`${omnimensUsers.resonanceTotalEarned} + ${resPack.totalCredits}`,
+                monthlyPaidSpendCents: sql`${omnimensUsers.monthlyPaidSpendCents} + ${resPack.amountCents}`,
+                totalPaidSpendCents: sql`${omnimensUsers.totalPaidSpendCents} + ${resPack.amountCents}`,
+                ...(stripeCustomerId ? { stripeCustomerId } : {}),
+              })
+              .where(eq(omnimensUsers.id, userId));
+
+            await db.insert(omnimensCreditTransactions).values({
+              userId,
+              type: "purchase",
+              credits: resPack.totalCredits,
+              description: `Deep Resonance ${resPack.label} — ${resPack.totalCredits.toLocaleString()} resonance credits (${resPack.bonusLabel})`,
+              stripeSessionId: session.id,
+              packId,
+            });
+
+            await db.insert(omnimensNotifications).values({
+              upgradeId: null,
+              userId,
+              title: "Resonance Credits Added",
+              body: `${resPack.totalCredits.toLocaleString()} resonance credits have been added to your account.`,
+              type: "billing",
+            } as any).catch(() => {});
+
+            console.log(`[Stripe Webhook] Credited ${resPack.totalCredits} resonance credits to ${userId} (pack: ${packId})`);
+
           // ── One-time credit pack purchase ──────────────────────────────────
-          if (packId && CREDIT_PACKS[packId] && session.payment_status === "paid") {
-            const creditsToAdd = CREDIT_PACKS[packId];
-            const stripeCustomerId =
-              typeof session.customer === "string" ? session.customer : session.customer?.id || null;
+          } else if (packId && CREDIT_PACKS[packId] && session.payment_status === "paid") {
+            const packInfo = CREDIT_PACKS[packId];
+            const creditsToAdd = packInfo.credits;
 
             const [user] = await db
               .select({ id: omnimensUsers.id })
@@ -122,6 +172,8 @@ router.post(
               .set({
                 credits: sql`${omnimensUsers.credits} + ${creditsToAdd}`,
                 totalCreditsEarned: sql`${omnimensUsers.totalCreditsEarned} + ${creditsToAdd}`,
+                monthlyPaidSpendCents: sql`${omnimensUsers.monthlyPaidSpendCents} + ${packInfo.amountCents}`,
+                totalPaidSpendCents: sql`${omnimensUsers.totalPaidSpendCents} + ${packInfo.amountCents}`,
                 ...(stripeCustomerId ? { stripeCustomerId } : {}),
               })
               .where(eq(omnimensUsers.id, userId));
@@ -130,7 +182,7 @@ router.post(
               userId,
               type: "purchase",
               credits: creditsToAdd,
-              description: `${packId.toUpperCase()} pack — ${creditsToAdd.toLocaleString()} credits`,
+              description: `${packInfo.label} pack — ${creditsToAdd.toLocaleString()} credits`,
               stripeSessionId: session.id,
               packId,
             });

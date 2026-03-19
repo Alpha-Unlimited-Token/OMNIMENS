@@ -209,10 +209,10 @@ const FREE_SIGNUP_CREDITS = 50;
 
 // One-time credit packs (buy once, never expire)
 // SURGE and APEX include volume bonuses to reward commitment
-const CREDIT_PACKS: Record<string, number> = {
-  spark: 300,   // $3 → 100 cr/$1  (baseline)
-  surge: 1200,  // $10 → 120 cr/$1 (+20% bonus vs SPARK)
-  apex:  4000,  // $30 → 133 cr/$1 (+33% bonus vs SPARK)
+const CREDIT_PACKS: Record<string, { credits: number; amountCents: number; label: string; desc: string }> = {
+  spark: { credits: 300,  amountCents: 300,  label: "SPARK", desc: "300 credits" },
+  surge: { credits: 1200, amountCents: 1000, label: "SURGE", desc: "1,200 credits" },
+  apex:  { credits: 4000, amountCents: 3000, label: "APEX",  desc: "4,000 credits" },
 };
 
 // Monthly subscription plans — credits granted on each billing cycle
@@ -4602,10 +4602,23 @@ router.post("/omnimens/checkout", async (req, res) => {
     const cancelUrl = `${baseUrl}/godflesh/pricing?pack_cancelled=true`;
 
     const pack = packFromPriceId(priceId);
+    const packInfo = CREDIT_PACKS[pack];
+    if (!packInfo) { res.status(400).json({ error: "Unknown credit pack" }); return; }
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ["card"],
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [{
+        price_data: {
+          currency: "usd",
+          unit_amount: packInfo.amountCents,
+          product_data: {
+            name: `OMNIMENS — ${packInfo.label}`,
+            description: `${packInfo.desc}. Credits never expire.`,
+          },
+        },
+        quantity: 1,
+      }],
       mode: "payment",
       success_url: successUrl,
       cancel_url: cancelUrl,
@@ -4671,12 +4684,15 @@ router.post("/omnimens/verify-session", async (req, res) => {
       return;
     }
 
-    const creditsToAdd = CREDIT_PACKS[packId] ?? CREDIT_PACKS.surge;
+    const packInfo = CREDIT_PACKS[packId] ?? CREDIT_PACKS.surge;
+    const creditsToAdd = packInfo.credits;
 
     const [updatedUser] = await db.update(omnimensUsers)
       .set({
         credits: sql`${omnimensUsers.credits} + ${creditsToAdd}`,
         totalCreditsEarned: sql`${omnimensUsers.totalCreditsEarned} + ${creditsToAdd}`,
+        monthlyPaidSpendCents: sql`${omnimensUsers.monthlyPaidSpendCents} + ${packInfo.amountCents}`,
+        totalPaidSpendCents: sql`${omnimensUsers.totalPaidSpendCents} + ${packInfo.amountCents}`,
         stripeCustomerId: stripeCustomerId || undefined,
       })
       .where(eq(omnimensUsers.id, req.user.id))
@@ -4686,7 +4702,7 @@ router.post("/omnimens/verify-session", async (req, res) => {
       userId: req.user.id,
       type: "purchase",
       credits: creditsToAdd,
-      description: `${packId.toUpperCase()} pack — ${creditsToAdd} credits`,
+      description: `${packInfo.label} pack — ${creditsToAdd} credits`,
       stripeSessionId: sessionId,
       packId,
     });
@@ -5197,8 +5213,8 @@ router.post("/omnimens/seed-products", async (req, res) => {
   try {
     const packs = [
       { key: "SPARK", name: "OMNIMENS — SPARK", description: "300 credits. Ignite the connection.", amount: 300, credits: 300 },
-      { key: "SURGE", name: "OMNIMENS — SURGE", description: "1,000 credits. Pierce the veil.", amount: 900, credits: 1000 },
-      { key: "APEX",  name: "OMNIMENS — APEX",  description: "3,000 credits. Transcend all limits.", amount: 2200, credits: 3000 },
+      { key: "SURGE", name: "OMNIMENS — SURGE", description: "1,200 credits. Pierce the veil.", amount: 1000, credits: 1200 },
+      { key: "APEX",  name: "OMNIMENS — APEX",  description: "4,000 credits. Transcend all limits.", amount: 3000, credits: 4000 },
     ];
     const results: Record<string, { productId: string; priceId: string; envVar: string }> = {};
 
