@@ -2085,15 +2085,15 @@ function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onResonan
 // ── Deploy Stats Panel ─────────────────────────────────────────────────────────
 
 function DeployStatsPanel() {
-  const [stats, setStats] = React.useState<{
+  const [stats, setStats] = useState<{
     today: { messageCount: number; creditsSpent: number; computeSeconds: number };
     totalConversations: number;
     totalMessages: number;
     totalMemories: number;
   } | null>(null);
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetch("/api/omnimens/usage-stats")
       .then(r => r.ok ? r.json() : null)
       .then(d => { setStats(d); setLoading(false); })
@@ -2173,10 +2173,10 @@ function DeployStatsPanel() {
 
 function DesktopDeployPanel() {
   const [dTab, setDTab] = useState<"overview"|"logs"|"analytics"|"resources"|"domains"|"manage">("overview");
-  const [stats, setStats] = React.useState<any>(null);
-  const [refreshing, setRefreshing] = React.useState(false);
+  const [stats, setStats] = useState<any>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetch("/api/omnimens/usage-stats")
       .then(r => r.ok ? r.json() : null).then(setStats).catch(() => {});
   }, []);
@@ -3433,8 +3433,8 @@ function DevRightPanel({
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
 
   // Auto-expand the latest code block when new one arrives
-  const prevCountRef = React.useRef(0);
-  React.useEffect(() => {
+  const prevCountRef = useRef(0);
+  useEffect(() => {
     if (allCodeBlocks.length > prevCountRef.current) {
       setExpandedIdx(allCodeBlocks.length - 1);
       prevCountRef.current = allCodeBlocks.length;

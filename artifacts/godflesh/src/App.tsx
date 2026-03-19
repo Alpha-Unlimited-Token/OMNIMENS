@@ -80,7 +80,9 @@ class ChunkErrorBoundary extends Component<{ children: ReactNode }, { hasError: 
     return { hasError: true };
   }
 
-  componentDidCatch() {
+  componentDidCatch(error: Error, errorInfo: any) {
+    console.error("[OMNIMENS ERROR BOUNDARY]", error?.message, error?.stack);
+    console.error("[OMNIMENS ERROR BOUNDARY] Component stack:", errorInfo?.componentStack);
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistrations().then((regs) => {
         for (const r of regs) r.unregister();
