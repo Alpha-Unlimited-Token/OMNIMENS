@@ -1,121 +1,129 @@
 /**
  * @module inMemoryVectorCache
- * @description Provides a fast in-memory caching mechanism for embeddings and vectorized data
- *              using an LRU cache and efficient vector similarity search.
+ * @description A high-performance in-memory cache for storing and retrieving embeddings with an LRU eviction policy.
  */
 
 /**
- * LRUCache class to manage least-recently-used caching.
- * Stores embeddings and provides efficient similarity search.
+ * Node.js built-in modules
  */
-class LRUCache {
+const crypto = require('crypto');
+
+/**
+ * @typedef {Object} CacheEntry
+ * @property {string} key - The unique key for the embedding.
+ * @property {Float32Array} embedding - The embedding vector.
+ * @property {number} timestamp - The last access time for LRU eviction.
+ */
+
+class InMemoryVectorCache {
   /**
-   * @param {number} capacity - Maximum number of items the cache can hold.
+   * @param {number} maxSize - Maximum number of entries the cache can hold.
    */
-  constructor(capacity) {
-    if (capacity <= 0) {
-      throw new Error('Cache capacity must be greater than zero.');
+  constructor(maxSize = 1000) {
+    if (maxSize <= 0) {
+      throw new Error('maxSize must be a positive integer.');
     }
-    this.capacity = capacity;
-    this.cache = new Map(); // Stores key-value pairs
-    this.keys = new Set(); // Maintains the order of keys for LRU
+
+    this.maxSize = maxSize;
+    this.cache = new Map(); // Key-value store for embeddings.
   }
 
   /**
-   * Adds a vector to the cache.
-   * @param {string} key - Unique identifier for the vector.
-   * @param {Array<number>} vector - The vector to cache.
+   * Generates a unique hash for a given key.
+   * @private
+   * @param {string} key - The key to hash.
+   * @returns {string} - A hashed representation of the key.
    */
-  set(key, vector) {
-    if (!Array.isArray(vector) || vector.some(isNaN)) {
-      throw new Error('Vector must be an array of numbers.');
-    }
-
-    if (this.cache.has(key)) {
-      this.keys.delete(key);
-    } else if (this.cache.size >= this.capacity) {
-      const oldestKey = this.keys.values().next().value;
-      this.keys.delete(oldestKey);
-      this.cache.delete(oldestKey);
-    }
-
-    this.cache.set(key, vector);
-    this.keys.add(key);
+  _hashKey(key) {
+    return crypto.createHash('sha256').update(key).digest('hex');
   }
 
   /**
-   * Retrieves a vector from the cache.
-   * @param {string} key - Unique identifier for the vector.
-   * @returns {Array<number>|undefined} - The cached vector or undefined if not found.
+   * Adds or updates an embedding in the cache.
+   * @param {string} key - The unique identifier for the embedding.
+   * @param {Float32Array} embedding - The embedding vector to store.
+   */
+  set(key, embedding) {
+    if (!(embedding instanceof Float32Array)) {
+      throw new Error('Embedding must be a Float32Array.');
+    }
+
+    const hashedKey = this._hashKey(key);
+
+    // If the key already exists, update its timestamp and value.
+    if (this.cache.has(hashedKey)) {
+      this.cache.get(hashedKey).timestamp = Date.now();
+      this.cache.get(hashedKey).embedding = embedding;
+    } else {
+      // If the cache exceeds maxSize, evict the least recently used entry.
+      if (this.cache.size >= this.maxSize) {
+        this._evictLRU();
+      }
+
+      // Add the new entry.
+      this.cache.set(hashedKey, {
+        key,
+        embedding,
+        timestamp: Date.now()
+      });
+    }
+  }
+
+  /**
+   * Retrieves an embedding from the cache.
+   * @param {string} key - The unique identifier for the embedding.
+   * @returns {Float32Array|null} - The embedding vector, or null if not found.
    */
   get(key) {
-    if (!this.cache.has(key)) return undefined;
+    const hashedKey = this._hashKey(key);
 
-    // Update LRU order
-    this.keys.delete(key);
-    this.keys.add(key);
+    if (this.cache.has(hashedKey)) {
+      const entry = this.cache.get(hashedKey);
+      entry.timestamp = Date.now(); // Update access time for LRU.
+      return entry.embedding;
+    }
 
-    return this.cache.get(key);
+    return null; // Key not found.
   }
 
   /**
-   * Finds the most similar vector in the cache based on cosine similarity.
-   * @param {Array<number>} queryVector - The query vector.
-   * @returns {{ key: string, similarity: number }|null} - The most similar vector's key and similarity score, or null if cache is empty.
+   * Evicts the least recently used (LRU) entry from the cache.
+   * @private
    */
-  findMostSimilar(queryVector) {
-    if (!Array.isArray(queryVector) || queryVector.some(isNaN)) {
-      throw new Error('Query vector must be an array of numbers.');
-    }
+  _evictLRU() {
+    let oldestKey = null;
+    let oldestTimestamp = Infinity;
 
-    let bestMatch = null;
-    let highestSimilarity = -Infinity;
-
-    for (const [key, vector] of this.cache.entries()) {
-      const similarity = this._cosineSimilarity(queryVector, vector);
-      if (similarity > highestSimilarity) {
-        highestSimilarity = similarity;
-        bestMatch = { key, similarity };
+    // Find the LRU entry.
+    for (const [key, entry] of this.cache.entries()) {
+      if (entry.timestamp < oldestTimestamp) {
+        oldestTimestamp = entry.timestamp;
+        oldestKey = key;
       }
     }
 
-    return bestMatch;
+    if (oldestKey !== null) {
+      this.cache.delete(oldestKey);
+    }
   }
 
   /**
-   * Computes the cosine similarity between two vectors.
-   * @private
-   * @param {Array<number>} vecA - First vector.
-   * @param {Array<number>} vecB - Second vector.
-   * @returns {number} - Cosine similarity score.
+   * Clears all entries from the cache.
    */
-  _cosineSimilarity(vecA, vecB) {
-    if (vecA.length !== vecB.length) {
-      throw new Error('Vectors must have the same length.');
-    }
+  clear() {
+    this.cache.clear();
+  }
 
-    const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
-    const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
-    const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
-
-    return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
+  /**
+   * Returns the current size of the cache.
+   * @returns {number} - The number of entries in the cache.
+   */
+  size() {
+    return this.cache.size;
   }
 }
 
 /**
- * Creates a new LRUCache instance.
- * @param {number} capacity - Maximum number of items the cache can hold.
- * @returns {LRUCache} - A new LRUCache instance.
+ * Exports an instance of the InMemoryVectorCache class.
  */
-export function createCache(capacity) {
-  return new LRUCache(capacity);
-}
-
-/**
- * Example usage:
- * const cache = createCache(100);
- * cache.set('vector1', [0.1, 0.2, 0.3]);
- * cache.set('vector2', [0.4, 0.5, 0.6]);
- * const mostSimilar = cache.findMostSimilar([0.1, 0.2, 0.3]);
- * console.log(mostSimilar);
- */
+module.exports = { InMemoryVectorCache };
