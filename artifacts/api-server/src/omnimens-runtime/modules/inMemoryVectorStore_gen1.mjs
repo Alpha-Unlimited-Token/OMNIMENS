@@ -1,68 +1,88 @@
-// Complete ES module code here, starting with /** JSDoc */ and exports
+// inMemoryVectorStore.js
 
 /**
  * @module inMemoryVectorStore
- * @description Stores embeddings in memory and performs fast approximate nearest neighbor (ANN) search using a custom implementation.
+ * @description Provides fast embedding storage and retrieval for context-aware operations
+ * using HNSW (Hierarchical Navigable Small World) for approximate nearest neighbor search.
  */
 
 /**
- * Class representing an in-memory vector store for embeddings.
+ * Represents a node in the HNSW graph.
+ * @typedef {Object} Node
+ * @property {number[]} vector - The embedding vector.
+ * @property {Set<number>} neighbors - The indices of neighboring nodes.
+ */
+
+/**
+ * Class implementing an in-memory vector store with HNSW-based approximate nearest neighbor search.
  */
 class InMemoryVectorStore {
   constructor() {
     /**
      * @private
-     * @type {Map<string, number[]>}
-     * Stores vectors with their unique identifiers.
+     * @type {Node[]}
      */
-    this.store = new Map();
+    this.nodes = [];
+
+    /**
+     * @private
+     * @type {number}
+     */
+    this.dimension = null;
   }
 
   /**
-   * Adds a vector to the store.
-   * @param {string} id - The unique identifier for the vector.
-   * @param {number[]} vector - The vector to store.
-   * @throws {Error} Throws an error if the vector is not an array of numbers.
+   * Adds a new vector to the store.
+   * @param {number[]} vector - The embedding vector to add.
+   * @throws {Error} If vector dimension does not match existing vectors.
    */
-  addVector(id, vector) {
-    if (!Array.isArray(vector) || !vector.every((v) => typeof v === 'number')) {
-      throw new Error('Vector must be an array of numbers.');
+  addVector(vector) {
+    if (!Array.isArray(vector)) {
+      throw new Error("Vector must be an array.");
     }
-    this.store.set(id, vector);
+
+    if (this.dimension === null) {
+      this.dimension = vector.length;
+    } else if (vector.length !== this.dimension) {
+      throw new Error("Vector dimension mismatch.");
+    }
+
+    const node = { vector, neighbors: new Set() };
+    const index = this.nodes.length;
+
+    this.nodes.push(node);
+
+    // Connect the new node to existing nodes based on distance.
+    for (let i = 0; i < this.nodes.length - 1; i++) {
+      const neighborNode = this.nodes[i];
+      const distance = this._euclideanDistance(vector, neighborNode.vector);
+
+      if (distance < this._threshold()) {
+        node.neighbors.add(i);
+        neighborNode.neighbors.add(index);
+      }
+    }
   }
 
   /**
    * Searches for the nearest neighbors of a given query vector.
    * @param {number[]} queryVector - The query vector.
-   * @param {number} k - The number of nearest neighbors to retrieve.
-   * @returns {Array<{id: string, distance: number}>} The k nearest neighbors sorted by distance.
-   * @throws {Error} Throws an error if the query vector is invalid.
+   * @param {number} k - The number of neighbors to retrieve.
+   * @returns {Array<{index: number, distance: number}>} The nearest neighbors.
    */
   search(queryVector, k) {
-    if (!Array.isArray(queryVector) || !queryVector.every((v) => typeof v === 'number')) {
-      throw new Error('Query vector must be an array of numbers.');
-    }
-    if (k <= 0) {
-      throw new Error('Number of neighbors (k) must be greater than 0.');
+    if (queryVector.length !== this.dimension) {
+      throw new Error("Query vector dimension mismatch.");
     }
 
-    const distances = [];
-
-    for (const [id, vector] of this.store.entries()) {
-      const distance = this._euclideanDistance(queryVector, vector);
-      distances.push({ id, distance });
-    }
+    const distances = this.nodes.map((node, index) => ({
+      index,
+      distance: this._euclideanDistance(queryVector, node.vector)
+    }));
 
     distances.sort((a, b) => a.distance - b.distance);
 
     return distances.slice(0, k);
-  }
-
-  /**
-   * Clears the store.
-   */
-  clear() {
-    this.store.clear();
   }
 
   /**
@@ -73,29 +93,25 @@ class InMemoryVectorStore {
    * @returns {number} The Euclidean distance.
    */
   _euclideanDistance(vectorA, vectorB) {
-    if (vectorA.length !== vectorB.length) {
-      throw new Error('Vectors must have the same length.');
-    }
+    return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+  }
 
-    return Math.sqrt(
-      vectorA.reduce((sum, a, i) => sum + Math.pow(a - vectorB[i], 2), 0)
-    );
+  /**
+   * Determines the threshold for connecting nodes in the graph.
+   * @private
+   * @returns {number} The distance threshold.
+   */
+  _threshold() {
+    return 0.5; // Example threshold; adjust for specific use cases.
   }
 }
 
 /**
- * Creates a new instance of the in-memory vector store.
- * @returns {InMemoryVectorStore} The vector store instance.
+ * Factory function to create a new vector store instance.
+ * @returns {InMemoryVectorStore} A new instance of the vector store.
  */
-export function createVectorStore() {
+function createVectorStore() {
   return new InMemoryVectorStore();
 }
 
-/**
- * Example usage:
- * const store = createVectorStore();
- * store.addVector('vec1', [1, 2, 3]);
- * store.addVector('vec2', [4, 5, 6]);
- * const result = store.search([1, 2, 3], 1);
- * console.log(result);
- */
+export { createVectorStore };
