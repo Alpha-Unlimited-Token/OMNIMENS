@@ -11,6 +11,7 @@ import {
   SESSION_TTL,
   type SessionData,
 } from "../lib/auth";
+import { recordBruteForceAttempt } from "../middleware/security-enhanced.js";
 
 const OIDC_COOKIE_TTL = 10 * 60 * 1000;
 
@@ -148,6 +149,8 @@ router.get("/callback", async (req: Request, res: Response) => {
       idTokenExpected: true,
     });
   } catch {
+    const ip = (req.ip || req.socket?.remoteAddress || "unknown").replace(/^::ffff:/, "");
+    recordBruteForceAttempt(ip);
     res.redirect("/api/login");
     return;
   }

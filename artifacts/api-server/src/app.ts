@@ -63,6 +63,23 @@ import { startAgentEvolution, getAgentEvolutionState, getAgentProfile } from "./
 import { startIPGuardian, getResponseBeaconHeaders } from "./lib/omnimens-ip-guardian.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
+import {
+  requestIdMiddleware,
+  enhancedSecurityHeaders,
+  httpMethodRestriction,
+  parameterPollutionProtection,
+  bruteForceProtection,
+  requestFingerprinting,
+  responseTimingProtection,
+  cookieSecurityMiddleware,
+  sessionSecurityMiddleware,
+  suspiciousPathDetection,
+  extensionBlocking,
+  headerSizeProtection,
+  contentTypeValidation,
+  referrerValidation,
+  getSecurityScore,
+} from "./middleware/security-enhanced.js";
 import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-conversations.js";
 import { runToolKnowledgeIngestion, forceRefreshToolKnowledge } from "./lib/omnimens-tool-knowledge.js";
 
@@ -78,6 +95,24 @@ const app: Express = express();
 
 // ── TRUST PROXY (Replit / reverse proxy) ─────────────────────────────────────
 app.set("trust proxy", 1);
+
+// ── ENHANCED SECURITY — Request ID + Security Version Headers ────────────────
+app.use(requestIdMiddleware);
+
+// ── ENHANCED SECURITY — COOP, CORP, Cache-Control, Origin-Agent-Cluster ──────
+app.use(enhancedSecurityHeaders);
+
+// ── HTTP METHOD RESTRICTION — Only allow standard methods ────────────────────
+app.use(httpMethodRestriction);
+
+// ── HEADER SIZE PROTECTION — Block oversized headers ─────────────────────────
+app.use(headerSizeProtection);
+
+// ── FILE EXTENSION BLOCKING — Block .php, .asp, .sql, .bak, etc. ────────────
+app.use(extensionBlocking);
+
+// ── SUSPICIOUS PATH DETECTION — Block debug/admin/monitoring probes ──────────
+app.use(suspiciousPathDetection);
 
 // ── ALLOWED ORIGINS ──────────────────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
@@ -135,6 +170,24 @@ app.use(
     },
   })
 );
+
+// ── BRUTE FORCE PROTECTION — Exponential backoff on auth endpoints ────────
+app.use(bruteForceProtection);
+
+// ── RESPONSE TIMING PROTECTION — Prevent user enumeration via timing ──────
+app.use(responseTimingProtection);
+
+// ── REQUEST FINGERPRINTING — Device tracking + automated traffic detect ────
+app.use(requestFingerprinting);
+
+// ── PARAMETER POLLUTION PROTECTION — Deduplicate query params ──────────────
+app.use(parameterPollutionProtection);
+
+// ── REFERRER VALIDATION — Log suspicious cross-origin mutations ────────────
+app.use(referrerValidation);
+
+// ── CONTENT-TYPE VALIDATION — Check expected content types ─────────────────
+app.use(contentTypeValidation);
 
 // ── COPYRIGHT BEACON HEADERS — Sent on every response ────────────────────────
 app.use((_req: Request, res: Response, next: NextFunction) => {
@@ -227,6 +280,12 @@ app.use(requestSecurityMiddleware);
 // ── COOKIE PARSER ─────────────────────────────────────────────────────────────
 app.use(cookieParser());
 
+// ── COOKIE SECURITY HARDENING — Enforce Secure, HttpOnly, SameSite ────────────
+app.use(cookieSecurityMiddleware);
+
+// ── SESSION SECURITY — Idle timeout + fixation protection ─────────────────────
+app.use(sessionSecurityMiddleware);
+
 // ── STRIPE WEBHOOK (raw body — scoped ONLY to the webhook path) ───────────────
 // express.raw MUST only run on the webhook path, not all /api routes.
 // Applying it broadly would consume the request body before express.json() runs.
@@ -248,6 +307,11 @@ app.use("/api/omnimens/chat", aiInputSecurityMiddleware);
 // ── HEALTH CHECK ─────────────────────────────────────────────────────────────
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", platform: "OMNIMENS", timestamp: new Date().toISOString() });
+});
+
+// ── SECURITY SCORE — 89-Protection / 8-Category Security Dashboard ──────────
+app.get("/api/security/score", (_req, res) => {
+  res.json(getSecurityScore());
 });
 
 // ── GOOGLE SEARCH CONSOLE VERIFICATION ───────────────────────────────────────

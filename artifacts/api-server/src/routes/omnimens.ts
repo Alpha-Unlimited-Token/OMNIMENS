@@ -12,6 +12,7 @@ import { Router, type IRouter } from "express";
 import multer from "multer";
 import JSZip from "jszip";
 import { db } from "@workspace/db";
+import { recordBruteForceAttempt } from "../middleware/security-enhanced.js";
 import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions, omnimensCodeRuns, omnimensConversations, omnimensMessages, omnimensMemories, omnimensCustomInstructions, omnimensHubSettings, omnimensSavedPrompts } from "@workspace/db";
 import { eq, and, desc, sql, asc, inArray, gte } from "drizzle-orm";
 import { openai, generateImageBuffer } from "@workspace/integrations-openai-ai-server";
@@ -3326,6 +3327,8 @@ router.post("/omnimens/2fa/validate", async (req, res) => {
       await db.update(omnimensUsers)
         .set({ failedLoginAttempts: (user.failedLoginAttempts || 0) + 1 })
         .where(eq(omnimensUsers.id, userId));
+      const ip = (req.ip || req.socket?.remoteAddress || "unknown").replace(/^::ffff:/, "");
+      recordBruteForceAttempt(ip);
       res.json({ valid: false, error: "Invalid 2FA code" });
     }
   } catch (err: any) {
