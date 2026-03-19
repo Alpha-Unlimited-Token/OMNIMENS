@@ -1,88 +1,107 @@
 /**
+ * wasmAccelerator Module
+ * This module provides a WebAssembly-based acceleration for computationally expensive matrix operations.
+ * It compiles a minimal linear algebra library to WebAssembly and exposes it as a Node.js module.
+ * 
  * @module wasmAccelerator
- * @description Provides GPU-like acceleration for computationally intensive tasks using WebAssembly.
- * This module implements matrix operations (e.g., multiplication, eigenvalue decomposition) in WebAssembly
- * and exposes them to Node.js for high-performance computations.
  */
 
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
 /**
- * Loads a WebAssembly module from a file and returns the compiled instance.
- * @param {string} filePath - The path to the WebAssembly file.
- * @returns {Promise<WebAssembly.Instance>} The compiled WebAssembly instance.
+ * Loads and initializes the WebAssembly module for matrix operations.
+ * @async
+ * @returns {Promise<WebAssembly.Instance>} The initialized WebAssembly instance.
  */
-async function loadWasmModule(filePath) {
-  const wasmBuffer = readFileSync(filePath);
+async function initializeWasm() {
+  const wasmFilePath = join(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = await readFile(wasmFilePath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
-  return WebAssembly.instantiate(wasmModule);
+  const wasmInstance = await WebAssembly.instantiate(wasmModule, {});
+  return wasmInstance;
 }
 
 /**
- * Multiplies two matrices using WebAssembly.
- * @param {Float64Array} matrixA - The first matrix (flattened row-major order).
- * @param {Float64Array} matrixB - The second matrix (flattened row-major order).
+ * Performs matrix multiplication using the WebAssembly module.
+ * @async
+ * @param {Float32Array} matrixA - The first matrix (flattened array).
+ * @param {Float32Array} matrixB - The second matrix (flattened array).
  * @param {number} rowsA - Number of rows in matrixA.
- * @param {number} colsA - Number of columns in matrixA.
+ * @param {number} colsA - Number of columns in matrixA (and rows in matrixB).
  * @param {number} colsB - Number of columns in matrixB.
- * @returns {Promise<Float64Array>} The resulting matrix (flattened row-major order).
- * @throws {Error} If dimensions are incompatible for matrix multiplication.
+ * @returns {Promise<Float32Array>} The resulting matrix (flattened array).
+ * @throws {Error} If input dimensions are invalid or the WebAssembly module fails.
  */
 export async function multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB) {
   if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
-    throw new Error('Matrix dimensions do not match the specified sizes.');
+    throw new Error('Invalid matrix dimensions');
   }
 
-  const wasmInstance = await loadWasmModule(join(__dirname, 'matrix_ops.wasm'));
-  const { memory, multiply } = wasmInstance.exports;
+  const wasmInstance = await initializeWasm();
+  const { memory, multiply_matrices } = wasmInstance.exports;
 
-  const inputOffsetA = 0;
-  const inputOffsetB = inputOffsetA + matrixA.length * 8; // Float64Array -> 8 bytes per element
-  const outputOffset = inputOffsetB + matrixB.length * 8;
+  const memoryView = new Float32Array(memory.buffer);
+  const offsetA = 0;
+  const offsetB = offsetA + matrixA.length;
+  const offsetC = offsetB + matrixB.length;
 
-  const wasmMemory = new Float64Array(memory.buffer);
-  wasmMemory.set(matrixA, inputOffsetA / 8);
-  wasmMemory.set(matrixB, inputOffsetB / 8);
+  memoryView.set(matrixA, offsetA);
+  memoryView.set(matrixB, offsetB);
 
-  multiply(inputOffsetA, inputOffsetB, outputOffset, rowsA, colsA, colsB);
+  multiply_matrices(offsetA, offsetB, offsetC, rowsA, colsA, colsB);
 
-  return wasmMemory.subarray(outputOffset / 8, outputOffset / 8 + rowsA * colsB);
+  return memoryView.slice(offsetC, offsetC + rowsA * colsB);
 }
 
 /**
- * Computes the eigenvalues of a square matrix using WebAssembly.
- * @param {Float64Array} matrix - The square matrix (flattened row-major order).
- * @param {number} size - The number of rows/columns in the square matrix.
- * @returns {Promise<Float64Array>} The eigenvalues of the matrix.
- * @throws {Error} If the matrix is not square.
+ * Adds two matrices using the WebAssembly module.
+ * @async
+ * @param {Float32Array} matrixA - The first matrix (flattened array).
+ * @param {Float32Array} matrixB - The second matrix (flattened array).
+ * @param {number} rows - Number of rows in the matrices.
+ * @param {number} cols - Number of columns in the matrices.
+ * @returns {Promise<Float32Array>} The resulting matrix (flattened array).
+ * @throws {Error} If input dimensions are invalid or the WebAssembly module fails.
  */
-export async function computeEigenvalues(matrix, size) {
-  if (matrix.length !== size * size) {
-    throw new Error('Matrix must be square.');
+export async function addMatrices(matrixA, matrixB, rows, cols) {
+  if (matrixA.length !== rows * cols || matrixB.length !== rows * cols) {
+    throw new Error('Invalid matrix dimensions');
   }
 
-  const wasmInstance = await loadWasmModule(join(__dirname, 'matrix_ops.wasm'));
-  const { memory, eigenvalues } = wasmInstance.exports;
+  const wasmInstance = await initializeWasm();
+  const { memory, add_matrices } = wasmInstance.exports;
 
-  const inputOffset = 0;
-  const outputOffset = inputOffset + matrix.length * 8;
+  const memoryView = new Float32Array(memory.buffer);
+  const offsetA = 0;
+  const offsetB = offsetA + matrixA.length;
+  const offsetC = offsetB + matrixB.length;
 
-  const wasmMemory = new Float64Array(memory.buffer);
-  wasmMemory.set(matrix, inputOffset / 8);
+  memoryView.set(matrixA, offsetA);
+  memoryView.set(matrixB, offsetB);
 
-  eigenvalues(inputOffset, outputOffset, size);
+  add_matrices(offsetA, offsetB, offsetC, rows, cols);
 
-  return wasmMemory.subarray(outputOffset / 8, outputOffset / 8 + size);
+  return memoryView.slice(offsetC, offsetC + rows * cols);
 }
 
 /**
- * Initializes the WebAssembly accelerator by validating the module.
- * @returns {Promise<void>} Resolves if the WebAssembly module is valid.
+ * Initializes the WebAssembly module and performs example operations.
+ * This is for demonstration purposes and can be removed in production.
+ * @async
  */
-export async function initializeWasmAccelerator() {
-  const wasmInstance = await loadWasmModule(join(__dirname, 'matrix_ops.wasm'));
-  if (!wasmInstance.exports.multiply || !wasmInstance.exports.eigenvalues) {
-    throw new Error('WebAssembly module is missing required exports.');
+async function demo() {
+  const matrixA = new Float32Array([1, 2, 3, 4, 5, 6]);
+  const matrixB = new Float32Array([7, 8, 9, 10, 11, 12]);
+  const rowsA = 2, colsA = 3, colsB = 2;
+
+  try {
+    const result = await multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB);
+    console.log('Matrix multiplication result:', result);
+  } catch (error) {
+    console.error('Error during matrix multiplication:', error);
   }
 }
+
+// Uncomment the following line to run the demo when executing this module directly.
+// demo();
