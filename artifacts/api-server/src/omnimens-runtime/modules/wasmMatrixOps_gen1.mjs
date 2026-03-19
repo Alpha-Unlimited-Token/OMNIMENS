@@ -2,102 +2,94 @@
 
 /**
  * @module wasmMatrixOps
- * @description Efficient matrix operations using WebAssembly and SIMD for computationally intensive tasks.
+ * @description This module provides efficient matrix operations using WebAssembly, including matrix multiplication and eigenvector computation.
  */
+
+const fs = require('fs');
+const path = require('path');
 
 /**
- * Initializes the WebAssembly module for matrix operations.
- * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WebAssembly instance.
+ * WebAssembly binary loader for matrix operations.
+ * @returns {Promise<WebAssembly.Instance>} WebAssembly instance with exported matrix operations.
  */
-export async function initializeWasmModule() {
-  const wasmCode = new Uint8Array([
-    // WebAssembly binary code for matrix multiplication using SIMD
-    // Placeholder: Replace this with actual WebAssembly binary code
-    0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x0a, 0x02, 0x60,
-    0x02, 0x7f, 0x7f, 0x01, 0x7f, 0x60, 0x03, 0x7f, 0x7f, 0x7f, 0x01, 0x7f,
-    0x02, 0x05, 0x01, 0x01, 0x01, 0x01, 0x03, 0x02, 0x01, 0x00, 0x07, 0x07,
-    0x01, 0x03, 0x6d, 0x75, 0x6c, 0x00, 0x00, 0x0a, 0x0b, 0x01, 0x09, 0x00,
-    0x20, 0x00, 0x20, 0x01, 0x6c, 0x20, 0x02, 0x6c, 0x0b
-  ]);
-
-  const wasmModule = await WebAssembly.compile(wasmCode);
-  return WebAssembly.instantiate(wasmModule);
+async function loadWasm() {
+  const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
+  const wasmBinary = fs.readFileSync(wasmPath);
+  const wasmModule = await WebAssembly.compile(wasmBinary);
+  const wasmInstance = await WebAssembly.instantiate(wasmModule);
+  return wasmInstance;
 }
 
 /**
- * Multiplies two matrices using WebAssembly.
- * @param {WebAssembly.Instance} wasmInstance - The WebAssembly instance.
- * @param {Float32Array} matrixA - The first matrix (flattened).
- * @param {Float32Array} matrixB - The second matrix (flattened).
- * @param {number} rowsA - Number of rows in matrix A.
- * @param {number} colsA - Number of columns in matrix A.
- * @param {number} colsB - Number of columns in matrix B.
- * @returns {Float32Array} The resulting matrix (flattened).
+ * Perform matrix multiplication using WebAssembly.
+ * @param {Float64Array} matrixA - First matrix (m x n).
+ * @param {Float64Array} matrixB - Second matrix (n x p).
+ * @param {number} m - Rows in matrixA.
+ * @param {number} n - Columns in matrixA / Rows in matrixB.
+ * @param {number} p - Columns in matrixB.
+ * @returns {Float64Array} Resulting matrix (m x p).
  */
-export function multiplyMatrices(wasmInstance, matrixA, matrixB, rowsA, colsA, colsB) {
-  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
-    throw new Error("Invalid matrix dimensions.");
-  }
+async function wasmMatrixMultiply(matrixA, matrixB, m, n, p) {
+  const wasmInstance = await loadWasm();
+  const { memory, matrixMultiply } = wasmInstance.exports;
 
-  const result = new Float32Array(rowsA * colsB);
-  const memory = wasmInstance.exports.memory;
+  const matrixASize = m * n * Float64Array.BYTES_PER_ELEMENT;
+  const matrixBSize = n * p * Float64Array.BYTES_PER_ELEMENT;
+  const resultSize = m * p * Float64Array.BYTES_PER_ELEMENT;
 
-  const aPtr = wasmInstance.exports.allocate(matrixA.length);
-  const bPtr = wasmInstance.exports.allocate(matrixB.length);
-  const cPtr = wasmInstance.exports.allocate(result.length);
+  const totalSize = matrixASize + matrixBSize + resultSize;
 
-  const aBuffer = new Float32Array(memory.buffer, aPtr, matrixA.length);
-  const bBuffer = new Float32Array(memory.buffer, bPtr, matrixB.length);
-  const cBuffer = new Float32Array(memory.buffer, cPtr, result.length);
+  const buffer = new ArrayBuffer(totalSize);
+  const matrixAOffset = 0;
+  const matrixBOffset = matrixASize;
+  const resultOffset = matrixASize + matrixBSize;
 
-  aBuffer.set(matrixA);
-  bBuffer.set(matrixB);
+  const matrixAView = new Float64Array(buffer, matrixAOffset, m * n);
+  const matrixBView = new Float64Array(buffer, matrixBOffset, n * p);
+  const resultView = new Float64Array(buffer, resultOffset, m * p);
 
-  wasmInstance.exports.mul(aPtr, bPtr, cPtr, rowsA, colsA, colsB);
-  result.set(cBuffer);
+  matrixAView.set(matrixA);
+  matrixBView.set(matrixB);
 
-  wasmInstance.exports.free(aPtr);
-  wasmInstance.exports.free(bPtr);
-  wasmInstance.exports.free(cPtr);
+  memory.set(buffer);
 
-  return result;
+  matrixMultiply(matrixAOffset, matrixBOffset, resultOffset, m, n, p);
+
+  return new Float64Array(memory.buffer, resultOffset, m * p);
 }
 
 /**
- * Validates matrix dimensions for multiplication.
- * @param {number} rowsA - Number of rows in matrix A.
- * @param {number} colsA - Number of columns in matrix A.
- * @param {number} rowsB - Number of rows in matrix B.
- * @param {number} colsB - Number of columns in matrix B.
- * @returns {boolean} True if dimensions are valid, otherwise false.
+ * Compute eigenvectors using WebAssembly.
+ * @param {Float64Array} matrix - Square matrix (n x n).
+ * @param {number} n - Dimension of the square matrix.
+ * @returns {Float64Array} Eigenvectors of the matrix.
  */
-export function validateDimensions(rowsA, colsA, rowsB, colsB) {
-  return colsA === rowsB;
+async function wasmEigenvectors(matrix, n) {
+  const wasmInstance = await loadWasm();
+  const { memory, computeEigenvectors } = wasmInstance.exports;
+
+  const matrixSize = n * n * Float64Array.BYTES_PER_ELEMENT;
+  const eigenvectorSize = n * n * Float64Array.BYTES_PER_ELEMENT;
+
+  const totalSize = matrixSize + eigenvectorSize;
+
+  const buffer = new ArrayBuffer(totalSize);
+  const matrixOffset = 0;
+  const eigenvectorOffset = matrixSize;
+
+  const matrixView = new Float64Array(buffer, matrixOffset, n * n);
+  const eigenvectorView = new Float64Array(buffer, eigenvectorOffset, n * n);
+
+  matrixView.set(matrix);
+
+  memory.set(buffer);
+
+  computeEigenvectors(matrixOffset, eigenvectorOffset, n);
+
+  return new Float64Array(memory.buffer, eigenvectorOffset, n * n);
 }
 
-/**
- * Generates a random matrix.
- * @param {number} rows - Number of rows.
- * @param {number} cols - Number of columns.
- * @returns {Float32Array} A flattened random matrix.
- */
-export function generateRandomMatrix(rows, cols) {
-  const matrix = new Float32Array(rows * cols);
-  for (let i = 0; i < matrix.length; i++) {
-    matrix[i] = Math.random();
-  }
-  return matrix;
-}
-
-/**
- * Prints a matrix in readable format.
- * @param {Float32Array} matrix - The matrix to print (flattened).
- * @param {number} rows - Number of rows.
- * @param {number} cols - Number of columns.
- */
-export function printMatrix(matrix, rows, cols) {
-  for (let i = 0; i < rows; i++) {
-    const row = matrix.slice(i * cols, (i + 1) * cols);
-    console.log(row.join(" "));
-  }
-}
+module.exports = {
+  wasmMatrixMultiply,
+  wasmEigenvectors
+};

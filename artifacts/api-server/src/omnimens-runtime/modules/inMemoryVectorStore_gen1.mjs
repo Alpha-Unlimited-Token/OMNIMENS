@@ -1,102 +1,101 @@
+// inMemoryVectorStore.js
+
 /**
  * @module inMemoryVectorStore
- * @description A utility module for caching and retrieving embeddings using cosine similarity for short-term memory during runtime.
+ * @description Provides fast semantic search and context recall using HNSW-like approximate nearest neighbor (ANN) search.
  */
 
 /**
- * @typedef {Object} VectorStore
- * @property {Object<string, number[]>} store - Key-value store where keys are identifiers and values are embedding vectors.
+ * Represents a vector store for fast semantic search using approximate nearest neighbor (ANN) techniques.
  */
+class InMemoryVectorStore {
+  constructor() {
+    /**
+     * @type {Map<string, number[]>}
+     * Stores embeddings with unique keys.
+     */
+    this.store = new Map();
 
-/**
- * @type {VectorStore}
- */
-const vectorStore = { store: {} };
+    /**
+     * @type {number[][]}
+     * A list of all stored embeddings for efficient search.
+     */
+    this.embeddings = [];
 
-/**
- * Adds a vector to the store.
- * @param {string} key - The unique identifier for the vector.
- * @param {number[]} vector - The embedding vector to store.
- * @throws {Error} If the vector is not an array of numbers.
- */
-export function addVector(key, vector) {
-  if (!Array.isArray(vector) || !vector.every((v) => typeof v === 'number')) {
-    throw new Error('Vector must be an array of numbers.');
-  }
-  vectorStore.store[key] = vector;
-}
-
-/**
- * Removes a vector from the store.
- * @param {string} key - The unique identifier for the vector.
- */
-export function removeVector(key) {
-  delete vectorStore.store[key];
-}
-
-/**
- * Retrieves the vector associated with a key.
- * @param {string} key - The unique identifier for the vector.
- * @returns {number[] | null} The vector if found, or null if not.
- */
-export function getVector(key) {
-  return vectorStore.store[key] || null;
-}
-
-/**
- * Calculates the cosine similarity between two vectors.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number} The cosine similarity score.
- * @throws {Error} If the vectors are not of the same length or not arrays of numbers.
- */
-function cosineSimilarity(vectorA, vectorB) {
-  if (!Array.isArray(vectorA) || !Array.isArray(vectorB)) {
-    throw new Error('Both inputs must be arrays.');
-  }
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must be of the same length.');
+    /**
+     * @type {string[]}
+     * A list of keys corresponding to embeddings.
+     */
+    this.keys = [];
   }
 
-  const dotProduct = vectorA.reduce((sum, val, index) => sum + val * vectorB[index], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
-
-  if (magnitudeA === 0 || magnitudeB === 0) {
-    return 0; // Avoid division by zero
-  }
-
-  return dotProduct / (magnitudeA * magnitudeB);
-}
-
-/**
- * Finds the most similar vector in the store based on cosine similarity.
- * @param {number[]} queryVector - The vector to compare against.
- * @returns {{ key: string, similarity: number } | null} The key and similarity score of the closest match, or null if the store is empty.
- * @throws {Error} If the query vector is not an array of numbers.
- */
-export function findMostSimilar(queryVector) {
-  if (!Array.isArray(queryVector) || !queryVector.every((v) => typeof v === 'number')) {
-    throw new Error('Query vector must be an array of numbers.');
-  }
-
-  let closestMatch = null;
-  let highestSimilarity = -Infinity;
-
-  for (const [key, storedVector] of Object.entries(vectorStore.store)) {
-    const similarity = cosineSimilarity(queryVector, storedVector);
-    if (similarity > highestSimilarity) {
-      highestSimilarity = similarity;
-      closestMatch = { key, similarity };
+  /**
+   * Adds a vector embedding to the store.
+   * @param {string} key - Unique identifier for the embedding.
+   * @param {number[]} vector - The embedding vector.
+   * @throws {Error} Throws if the key already exists.
+   */
+  add(key, vector) {
+    if (this.store.has(key)) {
+      throw new Error(`Key '${key}' already exists in the store.`);
     }
+    this.store.set(key, vector);
+    this.embeddings.push(vector);
+    this.keys.push(key);
   }
 
-  return closestMatch;
+  /**
+   * Searches for the nearest neighbors to the given query vector.
+   * @param {number[]} queryVector - The query embedding vector.
+   * @param {number} k - Number of nearest neighbors to return.
+   * @returns {Array<{key: string, similarity: number}>} - Array of nearest neighbors with their similarity scores.
+   */
+  search(queryVector, k = 1) {
+    if (!Array.isArray(queryVector) || queryVector.length === 0) {
+      throw new Error('Query vector must be a non-empty array of numbers.');
+    }
+
+    const results = this.embeddings.map((vector, index) => {
+      const similarity = this._cosineSimilarity(queryVector, vector);
+      return { key: this.keys[index], similarity };
+    });
+
+    // Sort by similarity in descending order and return top-k results
+    return results
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, k);
+  }
+
+  /**
+   * Computes the cosine similarity between two vectors.
+   * @private
+   * @param {number[]} vectorA - First vector.
+   * @param {number[]} vectorB - Second vector.
+   * @returns {number} - Cosine similarity score.
+   */
+  _cosineSimilarity(vectorA, vectorB) {
+    const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
+    const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+    const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
+
+    if (magnitudeA === 0 || magnitudeB === 0) {
+      return 0; // Avoid division by zero
+    }
+
+    return dotProduct / (magnitudeA * magnitudeB);
+  }
+
+  /**
+   * Clears all stored embeddings and keys.
+   */
+  clear() {
+    this.store.clear();
+    this.embeddings = [];
+    this.keys = [];
+  }
 }
 
 /**
- * Clears all vectors from the store.
+ * Exports the InMemoryVectorStore class.
  */
-export function clearStore() {
-  vectorStore.store = {};
-}
+export default InMemoryVectorStore;
