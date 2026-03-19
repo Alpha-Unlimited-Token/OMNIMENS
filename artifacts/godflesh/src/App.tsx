@@ -20,6 +20,16 @@ function retryLazy(factory: () => Promise<any>, retries = 2): ReturnType<typeof 
           retryLazy(factory, retries - 1) as any
         );
       }
+      const isChunkError =
+        err?.message?.includes("Failed to fetch") ||
+        err?.message?.includes("Loading chunk") ||
+        err?.message?.includes("dynamically imported module") ||
+        err?.name === "ChunkLoadError";
+      if (isChunkError && !sessionStorage.getItem("chunk_reload")) {
+        sessionStorage.setItem("chunk_reload", "1");
+        window.location.reload();
+        return new Promise(() => {});
+      }
       throw err;
     })
   );
@@ -44,6 +54,7 @@ const FooterLinks = retryLazy(() => import("@/pages/footer-links"));
 const LipSync = retryLazy(() => import("@/pages/lip-sync"));
 
 initTheme();
+try { sessionStorage.removeItem("chunk_reload"); } catch {}
 
 const queryClient = new QueryClient({
   defaultOptions: {

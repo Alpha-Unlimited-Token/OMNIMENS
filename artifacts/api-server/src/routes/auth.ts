@@ -5,6 +5,7 @@
  */
 
 import * as oidc from "openid-client";
+import crypto from "crypto";
 import { Router, type IRouter, type Request, type Response } from "express";
 import { GetCurrentAuthUserResponse } from "@workspace/api-zod";
 import { db, usersTable } from "@workspace/db";
@@ -19,19 +20,86 @@ import {
 } from "../lib/auth";
 import { recordBruteForceAttempt } from "../middleware/security-enhanced.js";
 
-const OIDC_COOKIE_TTL = 10 * 60 * 1000;
+const OIDC_TX_TTL = 10 * 60 * 1000;
+const SESSION_EXCHANGE_TTL = 60_000;
+
+const ALLOWED_CUSTOM_DOMAINS = new Set([
+  "omnimens-ai.com",
+  "www.omnimens-ai.com",
+]);
+
+interface OidcTransaction {
+  codeVerifier: string;
+  nonce: string;
+  returnTo: string;
+  originHost: string;
+  expires: number;
+}
+
+const oidcTransactions = new Map<string, OidcTransaction>();
+const sessionExchangeTokens = new Map<string, { sid: string; targetHost: string; expires: number }>();
+
+function createExchangeToken(sid: string, targetHost: string): string {
+  const token = crypto.randomBytes(32).toString("hex");
+  sessionExchangeTokens.set(token, { sid, targetHost, expires: Date.now() + SESSION_EXCHANGE_TTL });
+  return token;
+}
+
+function consumeExchangeToken(token: string, requestHost: string): string | null {
+  const entry = sessionExchangeTokens.get(token);
+  if (!entry) return null;
+  sessionExchangeTokens.delete(token);
+  if (Date.now() > entry.expires) return null;
+  if (entry.targetHost && !requestHost.endsWith(entry.targetHost)) return null;
+  return entry.sid;
+}
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of sessionExchangeTokens) {
+    if (now > v.expires) sessionExchangeTokens.delete(k);
+  }
+  for (const [k, v] of oidcTransactions) {
+    if (now > v.expires) oidcTransactions.delete(k);
+  }
+}, 60_000);
 
 const router: IRouter = Router();
 
-function getOrigin(req: Request): string {
+function isReplitDomain(host: string): boolean {
+  return (
+    host.endsWith(".replit.dev") ||
+    host.endsWith(".replit.app") ||
+    host.endsWith(".repl.co") ||
+    host === "localhost"
+  );
+}
+
+function getFirstHost(raw: string): string {
+  return raw.split(",")[0].trim();
+}
+
+function getReplitOrigin(req: Request): string {
+  const proto = req.headers["x-forwarded-proto"] || "https";
+  const rawHost = String(req.headers["x-forwarded-host"] || req.headers["host"] || "localhost");
+  const host = getFirstHost(rawHost);
+
+  if (isReplitDomain(host)) {
+    return `${proto}://${host}`;
+  }
+
   const replitDomain = process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN;
   if (replitDomain) {
-    return `https://${replitDomain}`;
+    const first = getFirstHost(replitDomain);
+    return `https://${first}`;
   }
-  const proto = req.headers["x-forwarded-proto"] || "https";
-  const host =
-    req.headers["x-forwarded-host"] || req.headers["host"] || "localhost";
+
   return `${proto}://${host}`;
+}
+
+function getIncomingHost(req: Request): string {
+  const rawHost = String(req.headers["x-forwarded-host"] || req.headers["host"] || "localhost");
+  return getFirstHost(rawHost);
 }
 
 function setSessionCookie(res: Response, sid: string) {
@@ -41,16 +109,6 @@ function setSessionCookie(res: Response, sid: string) {
     sameSite: "lax",
     path: "/",
     maxAge: SESSION_TTL,
-  });
-}
-
-function setOidcCookie(res: Response, name: string, value: string) {
-  res.cookie(name, value, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: OIDC_COOKIE_TTL,
   });
 }
 
@@ -104,13 +162,14 @@ router.get("/auth/user", (req: Request, res: Response) => {
 
 router.get("/login", async (req: Request, res: Response) => {
   const config = await getOidcConfig();
-  const callbackUrl = `${getOrigin(req)}/api/callback`;
+  const callbackUrl = `${getReplitOrigin(req)}/api/callback`;
 
   const returnTo = getSafeReturnTo(req.query.returnTo);
 
-  const incomingHost = (req.headers["x-forwarded-host"] || req.headers["host"] || "") as string;
-  const replitDomain = process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || "";
-  const originHost = incomingHost !== replitDomain ? incomingHost : "";
+  const incomingHost = getIncomingHost(req);
+  const originHost = !isReplitDomain(incomingHost) && ALLOWED_CUSTOM_DOMAINS.has(incomingHost)
+    ? incomingHost
+    : "";
 
   const state = oidc.randomState();
   const nonce = oidc.randomNonce();
@@ -127,26 +186,31 @@ router.get("/login", async (req: Request, res: Response) => {
     nonce,
   });
 
-  setOidcCookie(res, "code_verifier", codeVerifier);
-  setOidcCookie(res, "nonce", nonce);
-  setOidcCookie(res, "state", state);
-  setOidcCookie(res, "return_to", returnTo);
-  if (originHost) setOidcCookie(res, "origin_host", originHost);
+  oidcTransactions.set(state, {
+    codeVerifier,
+    nonce,
+    returnTo,
+    originHost,
+    expires: Date.now() + OIDC_TX_TTL,
+  });
 
   res.redirect(redirectTo.href);
 });
 
-// Query params are not validated because the OIDC provider may include
-// parameters not expressed in the schema.
 router.get("/callback", async (req: Request, res: Response) => {
   const config = await getOidcConfig();
-  const callbackUrl = `${getOrigin(req)}/api/callback`;
+  const callbackUrl = `${getReplitOrigin(req)}/api/callback`;
 
-  const codeVerifier = req.cookies?.code_verifier;
-  const nonce = req.cookies?.nonce;
-  const expectedState = req.cookies?.state;
+  const stateParam = String(req.query.state || "");
+  const tx = oidcTransactions.get(stateParam);
 
-  if (!codeVerifier || !expectedState) {
+  if (!tx) {
+    res.redirect("/api/login");
+    return;
+  }
+  oidcTransactions.delete(stateParam);
+
+  if (Date.now() > tx.expires) {
     res.redirect("/api/login");
     return;
   }
@@ -158,9 +222,9 @@ router.get("/callback", async (req: Request, res: Response) => {
   let tokens: oidc.TokenEndpointResponse & oidc.TokenEndpointResponseHelpers;
   try {
     tokens = await oidc.authorizationCodeGrant(config, currentUrl, {
-      pkceCodeVerifier: codeVerifier,
-      expectedNonce: nonce,
-      expectedState,
+      pkceCodeVerifier: tx.codeVerifier,
+      expectedNonce: tx.nonce,
+      expectedState: stateParam,
       idTokenExpected: true,
     });
   } catch {
@@ -169,15 +233,6 @@ router.get("/callback", async (req: Request, res: Response) => {
     res.redirect("/api/login");
     return;
   }
-
-  const returnTo = getSafeReturnTo(req.cookies?.return_to);
-  const originHost = req.cookies?.origin_host || "";
-
-  res.clearCookie("code_verifier", { path: "/" });
-  res.clearCookie("nonce", { path: "/" });
-  res.clearCookie("state", { path: "/" });
-  res.clearCookie("return_to", { path: "/" });
-  res.clearCookie("origin_host", { path: "/" });
 
   const claims = tokens.claims();
   if (!claims) {
@@ -209,18 +264,35 @@ router.get("/callback", async (req: Request, res: Response) => {
   };
 
   const sid = await createSession(sessionData);
-  setSessionCookie(res, sid);
 
-  if (originHost) {
-    res.redirect(`https://${originHost}${returnTo}`);
+  if (tx.originHost) {
+    const exchangeToken = createExchangeToken(sid, tx.originHost);
+    const dest = `https://${tx.originHost}/api/exchange-session?token=${encodeURIComponent(exchangeToken)}&returnTo=${encodeURIComponent(tx.returnTo)}`;
+    res.redirect(dest);
   } else {
-    res.redirect(returnTo);
+    setSessionCookie(res, sid);
+    res.redirect(tx.returnTo);
   }
+});
+
+router.get("/exchange-session", (req: Request, res: Response) => {
+  const token = String(req.query.token || "");
+  const returnTo = getSafeReturnTo(req.query.returnTo);
+  const requestHost = getIncomingHost(req);
+
+  const sid = consumeExchangeToken(token, requestHost);
+  if (!sid) {
+    res.redirect(`/api/login?returnTo=${encodeURIComponent(returnTo)}`);
+    return;
+  }
+
+  setSessionCookie(res, sid);
+  res.redirect(returnTo);
 });
 
 router.get("/logout", async (req: Request, res: Response) => {
   const config = await getOidcConfig();
-  const origin = getOrigin(req);
+  const origin = getReplitOrigin(req);
 
   const sid = getSessionId(req);
   await clearSession(res, sid);

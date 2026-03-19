@@ -50,7 +50,7 @@ Both OMNIMENS and Super AI Lab frontends are built with React, Vite, Tailwind CS
 # External Dependencies
 
 - **AI Providers:** OpenAI o3/o4-mini (via Replit AI Integrations proxy), Anthropic Claude claude-sonnet-4-6 (via Replit AI Integrations proxy), Google Gemini gemini-2.5-flash (via Replit AI Integrations proxy), Together AI (Llama, Mixtral, Mistral — via user API key).
-- **Authentication:** Replit OIDC (openid-client).
+- **Authentication:** Replit OIDC (openid-client). OIDC transaction state (code_verifier, nonce, returnTo, originHost) is stored server-side keyed by the `state` parameter to support cross-domain login flows (custom domain → Replit callback → custom domain). A one-time exchange token mechanism (host-bound, 60s TTL) sets the session cookie on the correct domain after OIDC completes. Custom domains are validated against an allowlist (`ALLOWED_CUSTOM_DOMAINS` in auth.ts). Chunk-load errors after deployments are handled by `retryLazy` in App.tsx with a `sessionStorage` guard against infinite reload loops.
 - **Payments:** Stripe SDK for subscriptions, credit packs, and auto-topups.
 - **Database:** PostgreSQL.
 - **System Utilities:** `psutil` (for system monitoring).
