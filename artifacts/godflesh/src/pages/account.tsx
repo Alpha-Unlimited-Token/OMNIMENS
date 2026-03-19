@@ -1219,7 +1219,8 @@ export default function Account() {
                     <p className="text-[10px] mt-1 opacity-60">First evolution cycle runs in ~6 min</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 gap-2">
+                  <div className="max-h-[500px] overflow-y-auto rounded-xl border border-white/6 pr-1" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.15) transparent" }}>
+                  <div className="grid grid-cols-1 gap-2 p-1">
                     {generatedModules.map((mod: any) => (
                       <div key={mod.id} className="bg-black/40 border border-violet-400/15 rounded-xl p-4">
                         <div className="flex items-start justify-between gap-3">
@@ -1265,6 +1266,7 @@ export default function Account() {
                         </div>
                       </div>
                     ))}
+                  </div>
                   </div>
                 )}
               </div>
