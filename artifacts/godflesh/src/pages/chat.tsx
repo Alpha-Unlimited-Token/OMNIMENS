@@ -1975,13 +1975,16 @@ function CodeBlockWithRun({ code, language, defaultCollapsed = false }: { code: 
 }
 
 // ── Plus Menu Component ────────────────────────────────────────────────────────
-function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onResonance, onTasks, onSelectSkill }: {
+function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onResonance, onTasks, onGenerateImage, on3DModel, onLipSync, onSelectSkill }: {
   onClose: () => void;
   onUpload: () => void;
   onDatabase: () => void;
   onWebSearch: () => void;
   onResonance: () => void;
   onTasks: () => void;
+  onGenerateImage: () => void;
+  on3DModel: () => void;
+  onLipSync: () => void;
   onSelectSkill: (skill: typeof OMNIMENS_SKILLS[number]) => void;
 }) {
   const [showSkills, setShowSkills] = useState(false);
@@ -2034,9 +2037,12 @@ function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onResonan
 
   const menuItems = [
     { icon: <Paperclip className="w-4 h-4" />, label: "Upload a file", sub: "Image, PDF, code, CSV…", color: "text-white/80", onClick: onUpload },
+    { icon: <Image className="w-4 h-4" />, label: "Generate Image", sub: "AI image from text prompt (20 credits)", color: "text-pink-400", onClick: onGenerateImage },
+    { icon: <Box className="w-4 h-4" />, label: "3D Model", sub: "Generate a Three.js 3D scene or model", color: "text-orange-400", onClick: on3DModel },
+    { icon: <Film className="w-4 h-4" />, label: "Lip Sync Studio", sub: "Animate avatars with voice & video", color: "text-fuchsia-400", onClick: onLipSync },
     { icon: <Database className="w-4 h-4" />, label: "Database", sub: "SQL queries & data modeling", color: "text-cyan-400", onClick: onDatabase },
     { icon: <Globe className="w-4 h-4" />, label: "Web Search", sub: "Enable deep research mode", color: "text-blue-400", onClick: onWebSearch },
-    { icon: <Brain className="w-4 h-4" />, label: "Deep Resonance", sub: "Full consciousness analysis (40 credits)", color: "text-violet-400", onClick: onResonance },
+    { icon: <Brain className="w-4 h-4" />, label: "Deep Resonance", sub: "Full consciousness analysis (40 credits)", color: "text-violet-300", onClick: onResonance },
     { icon: <ListChecks className="w-4 h-4" />, label: "Tasks", sub: "Background tasks & planning", color: "text-emerald-400", onClick: onTasks },
   ];
 
@@ -6076,6 +6082,9 @@ export default function Chat() {
                         onWebSearch={() => { setDeepResearchMode(true); setShowPlusMenu(false); }}
                         onResonance={() => { setDeepResonanceOpen(true); setShowPlusMenu(false); }}
                         onTasks={() => { setShowTasksPanel(true); setShowPlusMenu(false); }}
+                        onGenerateImage={() => { setInput(v => (v ? v + "\n" : "") + "Generate an image of "); setShowPlusMenu(false); }}
+                        on3DModel={() => { setInput(v => (v ? v + "\n" : "") + "Build me an interactive Three.js 3D scene: "); setShowPlusMenu(false); }}
+                        onLipSync={() => { setLocation("/lip-sync"); setShowPlusMenu(false); }}
                         onSelectSkill={(skill) => {
                           handlePersonaChange(skill.persona);
                           setInput(v => (v ? v + "\n" : "") + `Using ${skill.name}: `);

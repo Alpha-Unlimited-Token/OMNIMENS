@@ -9,6 +9,8 @@ import {
   Gamepad2, Bot, Package, Server, Layers, RefreshCw, Copy, Check,
   Plus, Rocket, Wand2, FileCode, FileJson, FileText, Layout,
   MessageSquare, Infinity, Settings, PanelLeft, Maximize2, Minimize2,
+  ShoppingCart, Mic, BookOpen, Presentation, BarChart3,
+  Shield, ClipboardList, PenLine, Image, Workflow,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -81,7 +83,7 @@ export function createInitialBuildSteps(): BuildStep[] {
 }
 
 export function isBuildIntent(text: string): boolean {
-  return /\b(build|create|make|develop|write|generate|code|scaffold)\b.{0,60}\b(app|application|website|web app|page|component|dashboard|api|server|game|bot|tool|ui|interface|extension|mobile|site|landing|portfolio|chat|store|shop|blog)\b/i.test(text)
+  return /\b(build|create|make|develop|write|generate|code|scaffold)\b.{0,60}\b(app|application|website|web app|page|component|dashboard|api|server|game|bot|tool|ui|interface|extension|mobile|site|landing|portfolio|chat|store|shop|blog|voice|slides|presentation|quiz|form|admin|panel|e-?commerce|cart|checkout|diagram|chart|agent|automation|workflow|saas|platform|directory|gallery|timer|calculator|converter|tracker|planner|editor|studio)\b/i.test(text)
     || /\b(build|create|make)\b.{0,10}\b(me|us|a|an|the)\b/i.test(text);
 }
 
@@ -706,79 +708,205 @@ export function AgentBuildPanel({
 // ─────────────────────────────────────────────────────────────────────────────
 
 const APP_TEMPLATES = [
+  // Web & Sites
   {
     id: "website",
     label: "Website",
-    desc: "Full responsive site with HTML, CSS & JS",
+    desc: "Responsive site with hero, features & contact",
     icon: Globe,
     color: "#60a5fa",
     prompt: "Build me a stunning, fully responsive website with a hero section, features grid, pricing cards, and a contact form. Use modern CSS animations and glassmorphism effects. Make it dark themed and ultra-modern.",
   },
   {
-    id: "react",
-    label: "React App",
-    desc: "React component with hooks and state",
-    icon: Layers,
-    color: "#38bdf8",
-    prompt: "Build a complete React application with multiple components, useState/useEffect hooks, routing, and a polished dark UI. Include TypeScript types and modern styling.",
-  },
-  {
     id: "landing",
     label: "Landing Page",
-    desc: "Marketing page that converts",
+    desc: "High-converting SaaS marketing page",
     icon: Layout,
     color: "#a78bfa",
     prompt: "Create a high-converting SaaS landing page with a bold hero, social proof, feature highlights, pricing table, FAQ section, and CTA. Use gradient text and scroll animations.",
   },
   {
+    id: "blog",
+    label: "Blog / CMS",
+    desc: "Article-based site with categories & search",
+    icon: PenLine,
+    color: "#f9a8d4",
+    prompt: "Build a beautiful blog/CMS website with a featured articles hero, category filtering, article cards with cover images, pagination, a full article reader with markdown support, and a newsletter signup. Dark themed.",
+  },
+  {
+    id: "portfolio",
+    label: "Portfolio",
+    desc: "Developer/designer portfolio showcase",
+    icon: FileText,
+    color: "#2dd4bf",
+    prompt: "Build a stunning developer portfolio website with animated hero, skills section, project grid with hover effects, experience timeline, testimonials, and contact form. Dark, modern, impressive.",
+  },
+  // Apps & Dashboards
+  {
+    id: "react",
+    label: "React App",
+    desc: "React SPA with hooks, routing & state",
+    icon: Layers,
+    color: "#38bdf8",
+    prompt: "Build a complete React application with multiple components, useState/useEffect hooks, routing, and a polished dark UI. Include TypeScript types and modern styling.",
+  },
+  {
     id: "dashboard",
     label: "Dashboard",
-    desc: "Data analytics dashboard with charts",
+    desc: "Analytics dashboard with charts & tables",
     icon: BarChart2,
     color: "#34d399",
-    prompt: "Build a data analytics dashboard with KPI cards, line charts, bar charts, a data table with sorting, and a sidebar navigation. Dark themed with violet accents.",
+    prompt: "Build a data analytics dashboard with KPI cards, line charts, bar charts, a data table with sorting/filtering, sidebar navigation, and a dark theme with violet accents.",
+  },
+  {
+    id: "admin",
+    label: "Admin Panel",
+    desc: "Full CRUD admin with users & settings",
+    icon: Shield,
+    color: "#f87171",
+    prompt: "Build a complete admin panel with a sidebar, user management table (CRUD), settings page, role-based access indicators, stats overview cards, and a dark themed UI with clean typography.",
   },
   {
     id: "mobile",
     label: "Mobile App",
-    desc: "React Native / Expo app",
+    desc: "Mobile UI with bottom tabs & navigation",
     icon: Smartphone,
     color: "#fb923c",
-    prompt: "Create a mobile app UI in HTML that mimics a React Native layout with a bottom tab bar, screen navigation, card components, and smooth transitions. Mobile-first design.",
+    prompt: "Create a polished mobile app UI with a bottom tab bar, stack screen navigation, card-based content, smooth transitions, and a modern mobile-first design. Include a home, profile, explore, and settings screen.",
   },
+  // Commerce & SaaS
+  {
+    id: "ecommerce",
+    label: "E-Commerce",
+    desc: "Online store with cart & checkout",
+    icon: ShoppingCart,
+    color: "#4ade80",
+    prompt: "Build a complete e-commerce storefront with a product grid, product detail page, cart sidebar, checkout form with validation, order confirmation, and a dark themed UI with smooth animations.",
+  },
+  {
+    id: "saas",
+    label: "SaaS Platform",
+    desc: "Subscription app with auth & billing UI",
+    icon: Rocket,
+    color: "#818cf8",
+    prompt: "Build a SaaS platform UI with a marketing landing page, authentication screens (login/signup), a feature-rich dashboard, subscription/pricing modal, user settings, and a sidebar navigation. Modern dark design.",
+  },
+  {
+    id: "directory",
+    label: "Directory / Marketplace",
+    desc: "Searchable listings with filters & maps",
+    icon: LayoutGrid,
+    color: "#fb923c",
+    prompt: "Build a directory/marketplace website with a hero search bar, filterable listing cards, a sidebar with category filters, individual listing detail pages, and a map placeholder integration. Clean, modern UI.",
+  },
+  // Tools & Utilities
   {
     id: "api",
     label: "API Server",
-    desc: "Node.js/Express REST API",
+    desc: "Node.js/Express REST API with auth",
     icon: Server,
     color: "#f87171",
-    prompt: "Write a complete Node.js Express API server with authentication middleware, CRUD endpoints, database connection, error handling, rate limiting, and full documentation comments.",
+    prompt: "Write a complete Node.js Express API server with JWT authentication middleware, CRUD endpoints, database connection, request validation, error handling, rate limiting, and full documentation comments.",
   },
+  {
+    id: "tool",
+    label: "Tool / Utility",
+    desc: "Productivity or developer tool",
+    icon: Code2,
+    color: "#a3e635",
+    prompt: "Build a useful productivity tool with a clean single-page interface, intuitive controls, real-time output, keyboard shortcuts, copy-to-clipboard functionality, and a polished dark UI.",
+  },
+  {
+    id: "form",
+    label: "Form Builder",
+    desc: "Multi-step form with validation",
+    icon: ClipboardList,
+    color: "#67e8f9",
+    prompt: "Build a beautiful multi-step form builder with field validation, progress indicator, conditional logic, summary preview, and a success confirmation screen. Include text, select, radio, checkbox, and file upload fields.",
+  },
+  // AI & Bots
   {
     id: "chatbot",
     label: "AI Chatbot",
     desc: "Chat interface with AI integration",
     icon: Bot,
     color: "#c084fc",
-    prompt: "Build a beautiful AI chatbot interface with a message history, typing indicator, markdown rendering, code block highlighting, and an input with file upload. Dark themed.",
+    prompt: "Build a beautiful AI chatbot interface with a message history, typing indicator, markdown rendering, code block highlighting, voice input button, file attachment, and an input with send on Enter. Dark themed.",
   },
+  {
+    id: "agent",
+    label: "AI Agent",
+    desc: "Autonomous agent with tool use & memory",
+    icon: Brain,
+    color: "#a78bfa",
+    prompt: "Build an autonomous AI agent interface with a goal input, step-by-step execution log, tool use visualization (web search, code run, file read), memory panel, and a results display. Futuristic dark UI.",
+  },
+  {
+    id: "workflow",
+    label: "Automation / Workflow",
+    desc: "Visual workflow builder with triggers",
+    icon: Workflow,
+    color: "#f0abfc",
+    prompt: "Build a visual automation workflow builder with a drag-and-drop node canvas, trigger nodes (webhook, schedule, event), action nodes (API call, email, transform), connection arrows, and a run history panel.",
+  },
+  // Media & Creative
   {
     id: "game",
     label: "Game",
-    desc: "Browser game with canvas/WebGL",
+    desc: "Browser game with canvas & physics",
     icon: Gamepad2,
     color: "#fbbf24",
-    prompt: "Create a fun browser game using HTML5 Canvas with game loop, collision detection, scoring system, particle effects, and responsive controls. Make it visually impressive.",
+    prompt: "Create an impressive browser game using HTML5 Canvas with a smooth game loop, collision detection, progressive difficulty, particle effects, scoring system, high score board, and responsive controls.",
   },
   {
-    id: "portfolio",
-    label: "Portfolio",
-    desc: "Developer portfolio showcase",
-    icon: FileText,
-    color: "#2dd4bf",
-    prompt: "Build a stunning developer portfolio website with animated hero, skills section, project grid with hover effects, experience timeline, and contact form. Dark, modern, impressive.",
+    id: "presentation",
+    label: "Presentation",
+    desc: "Slide deck with animated transitions",
+    icon: Presentation,
+    color: "#f59e0b",
+    prompt: "Build an interactive presentation/slide deck with 8+ slides, animated transitions between slides, progress bar, keyboard navigation (arrow keys), a title slide, content slides with bullet points, charts, and a closing CTA slide. Dark themed.",
   },
-] as const;
+  {
+    id: "quiz",
+    label: "Quiz / Education",
+    desc: "Interactive quiz with scoring & feedback",
+    icon: BookOpen,
+    color: "#34d399",
+    prompt: "Build an interactive quiz application with multiple choice questions, a timer per question, instant feedback (correct/incorrect with explanation), a score tracker, progress bar, results summary, and a shareable score card.",
+  },
+  {
+    id: "voice",
+    label: "Voice App",
+    desc: "Speech input/output & voice UI",
+    icon: Mic,
+    color: "#fb7185",
+    prompt: "Build a voice-first web application with a large microphone button, real-time speech-to-text transcription display, text-to-speech playback for responses, voice waveform visualization, and a conversational UI. Dark futuristic design.",
+  },
+  {
+    id: "image-gen",
+    label: "Image Generator",
+    desc: "AI image generation UI with gallery",
+    icon: Image,
+    color: "#c084fc",
+    prompt: "Build an AI image generation UI with a prompt input, style selector (photorealistic, anime, abstract, etc.), aspect ratio picker, a generate button with loading state, a generated image display, and a gallery of recent generations. Dark themed.",
+  },
+  {
+    id: "data-viz",
+    label: "Data Visualization",
+    desc: "Interactive charts, maps & infographics",
+    icon: BarChart3,
+    color: "#38bdf8",
+    prompt: "Build an interactive data visualization dashboard with multiple chart types (line, bar, pie, scatter, area), a data table, date range filter, CSV import button, chart export option, and smooth animated transitions. Dark themed with vibrant chart colors.",
+  },
+  {
+    id: "extension",
+    label: "Browser Extension",
+    desc: "Chrome/Firefox extension popup UI",
+    icon: Package,
+    color: "#fb923c",
+    prompt: "Build a browser extension popup UI (300x500px) with a settings panel, toggle switches for features, a main action button, a mini dashboard with stats, and a clean compact design. Include the popup HTML, CSS, and JavaScript files.",
+  },
+];
 
 export function NewAppModal({ onClose, onSelect }: {
   onClose: () => void;
@@ -858,7 +986,7 @@ export function NewAppModal({ onClose, onSelect }: {
             </div>
 
             {/* Template grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
               {filtered.map(t => (
                 <motion.button
                   key={t.id}

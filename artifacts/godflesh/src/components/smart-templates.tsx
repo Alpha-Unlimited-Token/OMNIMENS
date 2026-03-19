@@ -59,6 +59,18 @@ const QUICK_TEMPLATES = [
     { label: "Meal Plan", prompt: "Create a [duration] meal plan for [dietary preference]. Include: all meals, snacks, shopping list by category, prep tips, and approximate calorie/macro estimates." },
     { label: "Budget Plan", prompt: "Help me create a monthly budget for income of $[amount]. My fixed expenses are: [expenses]. Goals: [financial goals]. Suggest a realistic budget allocation and savings strategy." },
   ]},
+  { category: "Build", emoji: "🔧", items: [
+    { label: "Website", prompt: "Build me a stunning, fully responsive website with a hero section, features grid, pricing cards, and a contact form. Use modern CSS animations and glassmorphism effects. Dark themed and ultra-modern." },
+    { label: "Dashboard", prompt: "Build a data analytics dashboard with KPI cards, line charts, bar charts, a filterable data table, and sidebar navigation. Dark themed with violet accents." },
+    { label: "AI Chatbot", prompt: "Build a beautiful AI chatbot interface with message history, typing indicator, markdown rendering, code block highlighting, voice input, and file attachment. Dark themed." },
+    { label: "E-Commerce Store", prompt: "Build a complete e-commerce storefront with a product grid, product detail page, cart sidebar with quantity controls, checkout form with validation, and order confirmation. Dark themed." },
+    { label: "Landing Page", prompt: "Create a high-converting SaaS landing page with bold hero, social proof, feature highlights, pricing table, FAQ section, and CTA. Gradient text and scroll animations." },
+    { label: "Game", prompt: "Create an impressive browser game using HTML5 Canvas with smooth game loop, collision detection, progressive difficulty, particle effects, scoring, and responsive controls." },
+    { label: "Admin Panel", prompt: "Build a complete admin panel with sidebar navigation, user management table with CRUD operations, settings page, stats cards, and a dark themed UI." },
+    { label: "Mobile App UI", prompt: "Create a polished mobile app UI with bottom tab bar, screen navigation, card-based content, smooth transitions, and modern mobile-first design." },
+    { label: "Presentation Deck", prompt: "Build an interactive slide deck with 8+ animated slides, keyboard navigation, progress bar, content slides with bullet points and visuals, and a strong closing CTA." },
+    { label: "Voice App", prompt: "Build a voice-first web app with large microphone button, real-time speech-to-text transcription display, text-to-speech playback, waveform visualization, and conversational UI." },
+  ]},
 ];
 
 export function SmartTemplates({ open, onClose, onUseTemplate }: {
