@@ -18,3 +18,9 @@ id = "K-85pOgCpUZHY29VJE0xL"
 uri = "file://artifacts/api-server/omnimens-embodiment-data/ohio_lottery_picks.md"
 type = "text"
 title = "Ohio Lottery Picks — Powerball & Mega Millions (Frequency-Optimized)"
+
+[[outputs]]
+id = "ma_BGliTCAUUALYpAoWS1"
+uri = "file://Ohio_Lottery_Picks_2026.pdf"
+type = "pdf"
+title = "Ohio Lottery Picks — Powerball & Mega Millions (PDF)"
