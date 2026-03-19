@@ -1,117 +1,114 @@
 /**
  * @module inMemoryVectorStore
- * @description This module provides an in-memory vector store for fast semantic search using Approximate Nearest Neighbor (ANN) search.
+ * @description A utility module for storing and retrieving high-dimensional embeddings efficiently in memory using k-d tree for fast similarity lookups.
  */
 
 /**
- * Represents an in-memory vector store using HNSW (Hierarchical Navigable Small World) graph for ANN search.
+ * Represents a node in the k-d tree.
+ * @typedef {Object} KDTreeNode
+ * @property {number[]} point - The high-dimensional point (embedding).
+ * @property {KDTreeNode|null} left - Left child node.
+ * @property {KDTreeNode|null} right - Right child node.
  */
-class InMemoryVectorStore {
-  constructor() {
-    /**
-     * @type {Map<string, number[]>}
-     * A map to store embeddings with their associated keys.
-     */
-    this.vectors = new Map();
 
-    /**
-     * @type {number[][]}
-     * A 2D array to store just the vectors for efficient computation.
-     */
-    this.vectorArray = [];
+/**
+ * Builds a k-d tree from a list of high-dimensional points.
+ * @param {number[][]} points - Array of high-dimensional points.
+ * @param {number} depth - Current depth of the tree.
+ * @returns {KDTreeNode|null} Root node of the k-d tree.
+ */
+function buildKDTree(points, depth = 0) {
+  if (points.length === 0) return null;
 
-    /**
-     * @type {string[]}
-     * An array to store the keys corresponding to the vectors.
-     */
-    this.keys = [];
-  }
+  const k = points[0].length; // Dimensionality of the points.
+  const axis = depth % k; // Determine splitting axis.
 
-  /**
-   * Adds a vector to the store.
-   * @param {string} key - The unique identifier for the vector.
-   * @param {number[]} vector - The embedding vector to store.
-   * @throws {Error} If the key already exists or the vector is invalid.
-   */
-  addVector(key, vector) {
-    if (this.vectors.has(key)) {
-      throw new Error(`Key '${key}' already exists in the vector store.`);
-    }
-    if (!Array.isArray(vector) || vector.some((val) => typeof val !== 'number')) {
-      throw new Error('Invalid vector: must be an array of numbers.');
-    }
+  // Sort points along the current axis.
+  points.sort((a, b) => a[axis] - b[axis]);
 
-    this.vectors.set(key, vector);
-    this.vectorArray.push(vector);
-    this.keys.push(key);
-  }
+  const medianIndex = Math.floor(points.length / 2);
 
-  /**
-   * Computes the cosine similarity between two vectors.
-   * @param {number[]} vectorA - The first vector.
-   * @param {number[]} vectorB - The second vector.
-   * @returns {number} The cosine similarity between the two vectors.
-   */
-  static cosineSimilarity(vectorA, vectorB) {
-    const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
-    const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
-    const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
-    return dotProduct / (magnitudeA * magnitudeB);
-  }
-
-  /**
-   * Finds the nearest neighbors to a given vector.
-   * @param {number[]} queryVector - The vector to search for.
-   * @param {number} k - The number of nearest neighbors to return.
-   * @returns {Array<{ key: string, similarity: number }>} An array of the top-k nearest neighbors with their similarity scores.
-   * @throws {Error} If the query vector is invalid or k is not a positive integer.
-   */
-  findNearestNeighbors(queryVector, k) {
-    if (!Array.isArray(queryVector) || queryVector.some((val) => typeof val !== 'number')) {
-      throw new Error('Invalid query vector: must be an array of numbers.');
-    }
-    if (!Number.isInteger(k) || k <= 0) {
-      throw new Error('Invalid k: must be a positive integer.');
-    }
-
-    const similarities = this.vectorArray.map((vector, index) => {
-      const similarity = InMemoryVectorStore.cosineSimilarity(queryVector, vector);
-      return { key: this.keys[index], similarity };
-    });
-
-    // Sort by similarity in descending order and return the top-k results.
-    return similarities
-      .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, k);
-  }
-
-  /**
-   * Removes a vector from the store.
-   * @param {string} key - The unique identifier for the vector to remove.
-   * @throws {Error} If the key does not exist.
-   */
-  removeVector(key) {
-    if (!this.vectors.has(key)) {
-      throw new Error(`Key '${key}' does not exist in the vector store.`);
-    }
-
-    const index = this.keys.indexOf(key);
-    this.keys.splice(index, 1);
-    this.vectorArray.splice(index, 1);
-    this.vectors.delete(key);
-  }
-
-  /**
-   * Clears all vectors from the store.
-   */
-  clear() {
-    this.vectors.clear();
-    this.vectorArray = [];
-    this.keys = [];
-  }
+  return {
+    point: points[medianIndex],
+    left: buildKDTree(points.slice(0, medianIndex), depth + 1),
+    right: buildKDTree(points.slice(medianIndex + 1), depth + 1)
+  };
 }
 
 /**
- * Exports the InMemoryVectorStore class.
+ * Searches for the nearest neighbor to a given point in the k-d tree.
+ * @param {KDTreeNode|null} node - Root node of the k-d tree.
+ * @param {number[]} target - Target point to search for.
+ * @param {number} depth - Current depth in the tree.
+ * @param {Object} best - Best match found so far.
+ * @returns {Object} Nearest neighbor and its distance.
  */
-export { InMemoryVectorStore };
+function nearestNeighborSearch(node, target, depth = 0, best = { point: null, distance: Infinity }) {
+  if (node === null) return best;
+
+  const k = target.length;
+  const axis = depth % k;
+
+  // Calculate distance to current node.
+  const dist = euclideanDistance(node.point, target);
+  if (dist < best.distance) {
+    best = { point: node.point, distance: dist };
+  }
+
+  // Determine which side to explore first.
+  const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
+  const otherBranch = target[axis] < node.point[axis] ? node.right : node.left;
+
+  // Recursively search.
+  best = nearestNeighborSearch(nextBranch, target, depth + 1, best);
+
+  // Check if we need to explore the other branch.
+  if (Math.abs(target[axis] - node.point[axis]) < best.distance) {
+    best = nearestNeighborSearch(otherBranch, target, depth + 1, best);
+  }
+
+  return best;
+}
+
+/**
+ * Calculates the Euclidean distance between two points.
+ * @param {number[]} a - First point.
+ * @param {number[]} b - Second point.
+ * @returns {number} Euclidean distance.
+ */
+function euclideanDistance(a, b) {
+  return Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0));
+}
+
+/**
+ * Stores high-dimensional embeddings and provides efficient similarity lookup.
+ */
+class InMemoryVectorStore {
+  constructor() {
+    this.tree = null;
+  }
+
+  /**
+   * Builds the vector store from a list of embeddings.
+   * @param {number[][]} embeddings - Array of high-dimensional embeddings.
+   */
+  build(embeddings) {
+    this.tree = buildKDTree(embeddings);
+  }
+
+  /**
+   * Finds the nearest neighbor to a given embedding.
+   * @param {number[]} embedding - Target embedding.
+   * @returns {Object} Nearest neighbor and its distance.
+   */
+  findNearest(embedding) {
+    if (!this.tree) {
+      throw new Error("Vector store is empty. Build the store first.");
+    }
+    return nearestNeighborSearch(this.tree, embedding);
+  }
+}
+
+module.exports = {
+  InMemoryVectorStore
+};

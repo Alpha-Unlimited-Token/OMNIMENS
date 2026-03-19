@@ -3270,11 +3270,10 @@ function DevActivityBar({
   onSelect: (tab: string) => void;
 }) {
   const { isLight } = useTheme();
-  const panelBg    = isLight ? "#ffffff" : "#0D1117";
-  const panelBdr   = isLight ? "rgba(168,85,247,0.12)" : "#21262d";
-  const iconActive = "#a855f7";
-  const iconMuted  = isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.35)";
-  const activeBg   = isLight ? "rgba(168,85,247,0.08)" : "rgba(168,85,247,0.12)";
+  const panelBg  = isLight ? "#f0f1f6" : "#0D1117";
+  const panelBdr = isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)";
+  const iconActive = isLight ? "#141722" : "rgba(255,255,255,0.95)";
+  const iconMuted  = isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.35)";
 
   const items = [
     { id: "chats",  icon: <MessageSquare className="w-[18px] h-[18px]" />, label: "Chats" },
@@ -3285,30 +3284,37 @@ function DevActivityBar({
   ];
   return (
     <div
-      className="shrink-0 flex flex-col items-center py-2 gap-0.5 border-r z-10"
-      style={{ width: 46, background: panelBg, borderColor: panelBdr }}
+      className="shrink-0 flex flex-col items-center py-1.5 gap-0.5 border-r z-10"
+      style={{ width: 48, background: panelBg, borderColor: panelBdr }}
     >
-      {items.map(item => (
-        <button
-          key={item.id}
-          title={item.label}
-          onClick={() => onSelect(item.id)}
-          className="relative w-9 h-9 rounded-md flex items-center justify-center transition-all shrink-0"
-          style={{
-            color: activeTab === item.id ? iconActive : iconMuted,
-            background: activeTab === item.id ? activeBg : "transparent",
-            borderLeft: activeTab === item.id ? "2px solid #a855f7" : "2px solid transparent",
-          }}
-        >
-          {item.icon}
-        </button>
-      ))}
+      {items.map(item => {
+        const isActive = activeTab === item.id;
+        return (
+          <button
+            key={item.id}
+            title={item.label}
+            onClick={() => onSelect(item.id)}
+            className="relative w-10 h-10 flex items-center justify-center transition-all shrink-0"
+            style={{
+              color: isActive ? iconActive : iconMuted,
+            }}
+          >
+            {isActive && (
+              <span
+                className="absolute left-0 top-[20%] bottom-[20%] w-[2px] rounded-r"
+                style={{ background: isLight ? "#141722" : "#fff" }}
+              />
+            )}
+            {item.icon}
+          </button>
+        );
+      })}
       <div className="flex-1" />
       <button
         title="Settings"
         onClick={() => onSelect("config")}
-        className="w-9 h-9 rounded-md flex items-center justify-center transition-all shrink-0"
-        style={{ color: isLight ? "rgba(20,23,34,0.30)" : "rgba(255,255,255,0.25)" }}
+        className="w-10 h-10 flex items-center justify-center transition-all shrink-0"
+        style={{ color: iconMuted }}
       >
         <Settings className="w-[16px] h-[16px]" />
       </button>
@@ -4824,6 +4830,8 @@ export default function Chat() {
   const [creditsAlert, setCreditsAlert] = useState<{ kind: "no_wallet" | "topup_failed" | "need_resonance"; msg?: string } | null>(null);
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
+  const [consoleOpen, setConsoleOpen] = useState(false);
+  const [mobileNav, setMobileNav] = useState<"chat"|"files"|"tools"|"settings">("chat");
   const [activeProject, setActiveProject] = useState<ActiveProject>(null);
   const [projectsVersion, setProjectsVersion] = useState(0);
   const autoSavedMsgIds = useRef<Set<number>>(new Set());
@@ -5401,65 +5409,64 @@ export default function Chat() {
         {/* ── CENTER — CHAT ────────────────────────────────────────── */}
         <div className="flex-1 flex flex-col overflow-hidden min-w-0">
 
-          {/* ── Unified Top Bar (Replit-style) ─────────────────────── */}
+          {/* ── Unified Top Bar (Replit IDE-style) ───────────────── */}
           <div
             className="shrink-0 flex items-center border-b"
             style={{
-              background: isLight ? "#ffffff" : "#161b22",
-              borderColor: isLight ? "rgba(20,23,34,0.1)" : "#21262d",
-              minHeight: 40,
+              background: isLight ? "#ffffff" : "#0D1117",
+              borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)",
+              height: 38,
             }}
           >
-            {/* Left: Logo + panel toggle (mobile: hamburger) */}
             <div className="flex items-center shrink-0">
               <button
                 onClick={() => setLeftOpen(o => !o)}
-                className="flex items-center justify-center transition-colors p-2.5 shrink-0"
+                className="hidden sm:flex items-center justify-center transition-colors shrink-0 w-10 h-[38px]"
                 title={leftOpen ? "Hide panel" : "Show panel"}
-                style={{ color: isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.4)" }}
+                style={{ color: isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.4)" }}
               >
                 {leftOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeft className="w-4 h-4" />}
               </button>
-              <Link href="/" className="flex items-center gap-2 mr-3 sm:mr-0">
-                <OmnimensIcon size={20} />
-                <span className="font-display font-black text-[11px] tracking-[0.15em] hidden sm:inline" style={{ color: isLight ? "#141722" : "#fff" }}>
+              <Link href="/" className="flex items-center gap-2 px-2 sm:px-0 sm:mr-1">
+                <OmnimensIcon size={18} />
+                <span className="font-display font-black text-[10px] tracking-[0.15em] sm:hidden" style={{ color: isLight ? "#141722" : "#fff" }}>
                   OMNIMENS
                 </span>
               </Link>
             </div>
 
-            {/* Center: File tabs */}
             <div className="flex items-center overflow-x-auto flex-1 min-w-0" style={{ scrollbarWidth: "none" }}>
-              {conversations.slice(0, 6).map(conv => (
-                <button
-                  key={conv.id}
-                  onClick={() => handleLoadConversation(conv.id)}
-                  className="flex items-center gap-1.5 px-3 py-2 border-r shrink-0 transition-all text-[11px] font-mono"
-                  style={{
-                    borderColor: isLight ? "rgba(20,23,34,0.08)" : "#21262d",
-                    background: currentConversationId === conv.id
-                      ? (isLight ? "#f4f5f8" : "#0D1117")
-                      : "transparent",
-                    color: currentConversationId === conv.id
-                      ? (isLight ? "#141722" : "#fff")
-                      : (isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.35)"),
-                    borderBottom: currentConversationId === conv.id
-                      ? `2px solid #a855f7`
-                      : "2px solid transparent",
-                  }}
-                >
-                  <FileText className="w-3 h-3 shrink-0" style={{ color: currentConversationId === conv.id ? "#a855f7" : undefined }} />
-                  <span className="max-w-[100px] truncate">{conv.title || "untitled.omni"}</span>
-                  <X
-                    className="w-3 h-3 ml-1 shrink-0 opacity-0 hover:opacity-100"
-                    style={{ color: isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.4)" }}
-                    onClick={e => { e.stopPropagation(); handleDeleteConversation(conv.id); }}
-                  />
-                </button>
-              ))}
+              {conversations.slice(0, 6).map(conv => {
+                const active = currentConversationId === conv.id;
+                return (
+                  <button
+                    key={conv.id}
+                    onClick={() => handleLoadConversation(conv.id)}
+                    className="group flex items-center gap-1.5 px-3 h-[38px] shrink-0 transition-all text-[11px] font-mono relative"
+                    style={{
+                      background: active
+                        ? (isLight ? "#f4f5f8" : "#161b22")
+                        : "transparent",
+                      color: active
+                        ? (isLight ? "#141722" : "rgba(255,255,255,0.9)")
+                        : (isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.4)"),
+                    }}
+                  >
+                    {active && (
+                      <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary" />
+                    )}
+                    <FileText className="w-3 h-3 shrink-0" style={{ color: active ? "#a855f7" : undefined }} />
+                    <span className="max-w-[90px] truncate">{conv.title || "untitled"}</span>
+                    <X
+                      className="w-3 h-3 ml-0.5 shrink-0 opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity"
+                      onClick={e => { e.stopPropagation(); handleDeleteConversation(conv.id); }}
+                    />
+                  </button>
+                );
+              })}
               <button
                 onClick={handleNewChat}
-                className="flex items-center justify-center w-8 h-full shrink-0 transition-all"
+                className="flex items-center justify-center w-[38px] h-[38px] shrink-0 transition-all hover:bg-white/5"
                 title="New chat (Ctrl+K)"
                 style={{ color: isLight ? "rgba(20,23,34,0.3)" : "rgba(255,255,255,0.25)" }}
               >
@@ -5467,9 +5474,7 @@ export default function Chat() {
               </button>
             </div>
 
-            {/* Right: Status badges + controls */}
             <div className="flex items-center gap-0.5 px-2 shrink-0">
-              {/* Status badges — desktop only */}
               <div className="hidden sm:flex items-center gap-1.5 mr-1">
                 <CogniSyncIndicator state={activeCogniSync} />
                 {gpu.supported && gpu.status === "ready" && (
@@ -5502,44 +5507,31 @@ export default function Chat() {
                 {status?.isOwner && <OmnimensNotificationBell />}
               </div>
 
-              {/* Agent mode */}
               <button
                 onClick={() => setShowAgentModes(true)}
                 title="Agent Mode"
-                className="flex items-center gap-1 px-2 py-1.5 rounded-md transition-all text-[9px] font-mono font-bold tracking-wider"
+                className="flex items-center gap-1 px-1.5 py-1 rounded transition-all text-[9px] font-mono font-bold tracking-wider hover:bg-white/5"
                 style={{ color: isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.45)" }}
               >
-                {agentMode === "swift" && <Zap className="w-3.5 h-3.5 text-yellow-400" />}
-                {agentMode === "omni" && <Sparkles className="w-3.5 h-3.5 text-primary" />}
-                {agentMode === "apex" && <Infinity className="w-3.5 h-3.5 text-emerald-400" />}
+                {agentMode === "swift" && <Zap className="w-3 h-3 text-yellow-400" />}
+                {agentMode === "omni" && <Sparkles className="w-3 h-3 text-primary" />}
+                {agentMode === "apex" && <Infinity className="w-3 h-3 text-emerald-400" />}
                 <span className="hidden sm:block">{agentMode.toUpperCase()}</span>
               </button>
 
-              {/* Control Hub */}
               <button
                 onClick={() => setShowControlHub(true)}
-                className="flex items-center gap-1 px-2 py-1.5 rounded-md transition-all text-[9px] font-mono font-bold tracking-wider hover:bg-primary/10"
+                className="hidden sm:flex items-center gap-1 px-1.5 py-1 rounded transition-all text-[9px] font-mono font-bold tracking-wider hover:bg-white/5"
                 style={{ color: isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.45)" }}
                 title="Control Hub"
               >
-                <Settings className="w-3.5 h-3.5" />
-                <span className="hidden sm:block">HUB</span>
+                <Settings className="w-3 h-3" />
+                <span className="hidden md:block">HUB</span>
               </button>
 
-              {/* Theme toggle */}
-              <button
-                onClick={toggleTheme}
-                title={theme === "light" ? "Dark Mode" : "Light Mode"}
-                className="w-7 h-7 flex items-center justify-center rounded-md transition-all"
-                style={{ color: isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.35)" }}
-              >
-                {theme === "light" ? <Sun className="w-3.5 h-3.5 text-yellow-500" /> : <Moon className="w-3.5 h-3.5" />}
-              </button>
-
-              {/* Right panel toggle */}
               <button
                 onClick={() => setRightOpen(o => !o)}
-                className="hidden lg:flex items-center justify-center w-7 h-7 rounded-md transition-all"
+                className="hidden lg:flex items-center justify-center w-7 h-[38px] transition-all hover:bg-white/5"
                 style={{ color: isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.35)" }}
                 title={rightOpen ? "Hide panel" : "Show panel"}
               >
@@ -6208,31 +6200,180 @@ export default function Chat() {
             onUseTemplate={(t) => { setInputWithDraft(t); setShowTemplates(false); }}
           />
 
-          {/* ── Status Bar ─────────────────── */}
+          {/* ── Bottom Console Panel ────────── */}
+          <AnimatePresence initial={false}>
+            {consoleOpen && (
+              <motion.div
+                initial={{ height: 0 }}
+                animate={{ height: 180 }}
+                exit={{ height: 0 }}
+                transition={{ duration: 0.15 }}
+                className="shrink-0 overflow-hidden border-t"
+                style={{
+                  background: isLight ? "#f8f9fb" : "#0D1117",
+                  borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)",
+                }}
+              >
+                <div
+                  className="flex items-center gap-2 px-3 border-b shrink-0"
+                  style={{
+                    height: 30,
+                    background: isLight ? "#f0f1f6" : "#161b22",
+                    borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)",
+                  }}
+                >
+                  <button
+                    className="flex items-center gap-1.5 px-2 h-[30px] text-[10px] font-mono font-bold tracking-wider transition-all"
+                    style={{ color: "#a855f7", borderBottom: "2px solid #a855f7" }}
+                  >
+                    <Terminal className="w-3 h-3" />
+                    CONSOLE
+                  </button>
+                  <button
+                    className="flex items-center gap-1.5 px-2 h-[30px] text-[10px] font-mono tracking-wider transition-all"
+                    style={{ color: isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.35)", borderBottom: "2px solid transparent" }}
+                  >
+                    <Activity className="w-3 h-3" />
+                    ACTIVITY
+                  </button>
+                  <div className="flex-1" />
+                  <button
+                    onClick={() => setConsoleOpen(false)}
+                    className="w-5 h-5 flex items-center justify-center transition-all"
+                    style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.3)" }}
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-3 font-mono text-[11px] leading-relaxed" style={{ color: isLight ? "rgba(20,23,34,0.6)" : "rgba(255,255,255,0.5)", height: 148 }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span style={{ color: "rgba(255,255,255,0.25)" }}>[system]</span>
+                    <span>OMNIMENS IDE ready — {messages.length} messages in session</span>
+                  </div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span style={{ color: "rgba(255,255,255,0.25)" }}>[model]</span>
+                    <span>{selectedModel} · {agentMode.toUpperCase()} mode</span>
+                  </div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span style={{ color: "rgba(255,255,255,0.25)" }}>[persona]</span>
+                    <span>{PERSONA_NAMES[persona] || persona}</span>
+                  </div>
+                  {isTyping && (
+                    <div className="flex items-center gap-2 mb-1">
+                      <span style={{ color: "#a855f7" }}>[active]</span>
+                      <span className="text-primary">Generating response...</span>
+                    </div>
+                  )}
+                  {hubSettings.antiHallucinationMode && (
+                    <div className="flex items-center gap-2 mb-1">
+                      <span style={{ color: "rgba(255,255,255,0.25)" }}>[verify]</span>
+                      <span>Anti-hallucination mode enabled</span>
+                    </div>
+                  )}
+                  {deepResearchMode && (
+                    <div className="flex items-center gap-2 mb-1">
+                      <span style={{ color: "rgba(255,255,255,0.25)" }}>[research]</span>
+                      <span>Deep research mode active</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <span style={{ color: "rgba(255,255,255,0.25)" }}>[status]</span>
+                    <span>Awaiting input<span className="animate-pulse">_</span></span>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ── Status Bar (Replit-style dark) ─── */}
           <div
-            className="shrink-0 flex items-center justify-between px-3"
-            style={{ background: "#a855f7", height: 22, minHeight: 22, paddingBottom: "env(safe-area-inset-bottom)" }}
+            className="shrink-0 hidden sm:flex items-center justify-between px-3"
+            style={{
+              background: isLight ? "#e8e9ef" : "#1C2333",
+              height: 22,
+              minHeight: 22,
+            }}
           >
               <div className="flex items-center gap-3">
-                <span className="font-mono text-[9px] text-white/80 font-bold tracking-wider">
+                <span className="flex items-center gap-1 font-mono text-[9px] font-bold tracking-wider" style={{ color: isLight ? "rgba(20,23,34,0.6)" : "rgba(255,255,255,0.6)" }}>
+                  <GitBranch className="w-3 h-3" />
                   {PERSONA_NAMES[persona] || persona}
                 </span>
-                <span className="font-mono text-[9px] text-white/60">
+                <span className="font-mono text-[9px]" style={{ color: isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.4)" }}>
                   {selectedModel}
                 </span>
-                <span className="font-mono text-[9px] text-white/60">
-                  {messages.length} messages
+                <span className="font-mono text-[9px]" style={{ color: isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.4)" }}>
+                  {messages.length} msg
                 </span>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-[9px] text-white/70">
-                  OMNIMENS IDE
-                </span>
-                <span className="font-mono text-[9px] text-white/60">
-                  {agentMode.toUpperCase()} MODE
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setConsoleOpen(o => !o)}
+                  className="flex items-center gap-1 font-mono text-[9px] transition-all hover:opacity-80"
+                  style={{ color: consoleOpen ? "#a855f7" : (isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.45)") }}
+                >
+                  <Terminal className="w-3 h-3" />
+                  Console
+                </button>
+                <button
+                  onClick={toggleTheme}
+                  className="flex items-center gap-1 transition-all"
+                  style={{ color: isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.35)" }}
+                >
+                  {theme === "light" ? <Sun className="w-3 h-3 text-yellow-500" /> : <Moon className="w-3 h-3" />}
+                </button>
+                <span className="font-mono text-[9px]" style={{ color: isLight ? "rgba(20,23,34,0.35)" : "rgba(255,255,255,0.35)" }}>
+                  {agentMode.toUpperCase()}
                 </span>
               </div>
             </div>
+
+          {/* ── Mobile Bottom Nav ────────────── */}
+          <div
+            className="sm:hidden shrink-0 flex items-center justify-around border-t"
+            style={{
+              background: isLight ? "#ffffff" : "#0D1117",
+              borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)",
+              height: 48,
+              paddingBottom: "env(safe-area-inset-bottom)",
+            }}
+          >
+            {[
+              { id: "chat" as const, icon: <MessageSquare className="w-5 h-5" />, label: "Chat" },
+              { id: "files" as const, icon: <HardDrive className="w-5 h-5" />, label: "Files" },
+              { id: "tools" as const, icon: <Wrench className="w-5 h-5" />, label: "Tools" },
+              { id: "settings" as const, icon: <Settings className="w-5 h-5" />, label: "Settings" },
+            ].map(item => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  if (item.id === "chat") {
+                    setMobileNav("chat");
+                  } else if (item.id === "files") {
+                    setMobileNav("files");
+                    setDevActivityTab("files");
+                    setLeftOpen(true);
+                  } else if (item.id === "tools") {
+                    setMobileNav("tools");
+                    setDevActivityTab("tools");
+                    setLeftOpen(true);
+                  } else {
+                    setMobileNav("settings");
+                    setShowControlHub(true);
+                  }
+                }}
+                className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-all"
+                style={{
+                  color: mobileNav === item.id
+                    ? "#a855f7"
+                    : (isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.4)"),
+                }}
+              >
+                {item.icon}
+                <span className="font-mono text-[8px] tracking-wider">{item.label.toUpperCase()}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* ── RIGHT PANEL ─────────────────────────────────────────── */}

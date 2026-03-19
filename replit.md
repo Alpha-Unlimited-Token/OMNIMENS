@@ -22,7 +22,7 @@ Do not make changes to the `lib/omnimens-physio.ts` file.
 The project utilizes a pnpm monorepo structure.
 
 **UI/UX Decisions:**
-Both OMNIMENS and Super AI Lab frontends are built with React, Vite, Tailwind CSS, shadcn/ui, and framer-motion, aiming for a modern and responsive user experience. OMNIMENS features a 3-panel AI workspace, while Super AI Lab has its own dedicated React application.
+Both OMNIMENS and Super AI Lab frontends are built with React, Vite, Tailwind CSS, shadcn/ui, and framer-motion, aiming for a modern and responsive user experience. OMNIMENS features a Replit IDE-style layout: left Activity Bar (48px icon strip with white left-edge active indicator), collapsible Left Panel (220px, tabs: Chats/Files/Deploy/Memory/Mode/Skills/Tools/Config), top Tab Bar (conversation tabs with file icons + close buttons + purple active indicator), center Chat area, collapsible Bottom Console Panel (180px, Console/Activity tabs), dark Status Bar (22px, branch/model/messages + console toggle + theme switch), collapsible Right Panel (300px, images/artifacts/credits), and a mobile-only Bottom Navigation bar (Chat/Files/Tools/Settings). Super AI Lab has its own dedicated React application.
 
 **Technical Implementations & Feature Specifications:**
 
