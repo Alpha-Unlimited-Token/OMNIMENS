@@ -112,7 +112,7 @@ export const seoData = {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD",
-        "description": "Free tier with $20 monthly credits. Premium plans from $9.99/month."
+        "description": "Free tier with $20 monthly credits. Premium plans from $9/month."
       },
       "description": "Free AI chat platform with GPT-4o, Llama 3, Mistral, image generation, code execution, deep research, persistent memory, and voice chat.",
       "featureList": "AI Chat, Image Generation, Code Execution, Deep Research, Persistent Memory, Voice Chat, Multiple AI Models, Free Tier",
@@ -134,7 +134,7 @@ export const seoData = {
 
   pricing: {
     title: "AI Pricing — Free Tier & Premium Plans",
-    description: "OMNIMENS AI pricing: $20 free credits every month — no credit card needed. Premium AI plans from $9.99/month. Access GPT-4o, Llama 3, Mistral, image generation, and all AI tools.",
+    description: "OMNIMENS AI pricing: $20 free credits every month — no credit card needed. Premium AI plans from $9/month. Access GPT-4o, Llama 3, Mistral, image generation, and all AI tools.",
     keywords: "AI pricing, free AI, AI cost, AI subscription, affordable AI, AI credits, AI plans, GPT-4o pricing, free AI platform",
     path: "/pricing",
     jsonLd: {
@@ -154,18 +154,26 @@ export const seoData = {
         },
         {
           "@type": "Offer",
-          "name": "Starter Plan",
-          "price": "9.99",
+          "name": "IGNITE Plan",
+          "price": "9",
           "priceCurrency": "USD",
-          "description": "Monthly subscription with guaranteed credits",
+          "description": "1,000 credits per month with GPT-4o, image generation, deep research, and developer tools",
           "availability": "https://schema.org/InStock"
         },
         {
           "@type": "Offer",
-          "name": "Pro Plan",
-          "price": "24.99",
+          "name": "DEV Plan",
+          "price": "19",
           "priceCurrency": "USD",
-          "description": "Professional AI access with premium features",
+          "description": "2,500 credits per month with priority processing, expanded context window, and advanced agent mode",
+          "availability": "https://schema.org/InStock"
+        },
+        {
+          "@type": "Offer",
+          "name": "ULTRA Plan",
+          "price": "49",
+          "priceCurrency": "USD",
+          "description": "7,000 credits per month with o3 reasoning model, API key access, and highest priority queue",
           "availability": "https://schema.org/InStock"
         }
       ]

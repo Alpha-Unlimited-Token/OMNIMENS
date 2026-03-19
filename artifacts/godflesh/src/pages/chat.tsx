@@ -6590,7 +6590,7 @@ export default function Chat() {
                 The mortal coil cannot sustain further connection today. Transcend your limits to unlock eternal access.
               </p>
               <div className="flex flex-col gap-3">
-                <Button onClick={() => setLocation("/pricing")} size="lg" className="w-full">ASCEND NOW — $9.99/mo</Button>
+                <Button onClick={() => setLocation("/pricing")} size="lg" className="w-full">ASCEND NOW — from $9/mo</Button>
                 <Button onClick={() => setShowLimitModal(false)} variant="ghost" className="w-full text-white/85">Return to Silence</Button>
               </div>
             </motion.div>

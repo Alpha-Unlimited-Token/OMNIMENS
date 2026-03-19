@@ -803,7 +803,7 @@ const APP_TEMPLATES = [
     desc: "Searchable listings with filters & maps",
     icon: LayoutGrid,
     color: "#fb923c",
-    prompt: "Build a directory/marketplace website with a hero search bar, filterable listing cards, a sidebar with category filters, individual listing detail pages, and a map placeholder integration. Clean, modern UI.",
+    prompt: "Build a directory/marketplace website with a hero search bar, filterable listing cards, a sidebar with category filters, individual listing detail pages, and an interactive map integration. Clean, modern UI.",
   },
   // Tools & Utilities
   {

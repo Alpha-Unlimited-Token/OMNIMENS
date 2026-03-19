@@ -1,6 +1,6 @@
 /**
  * @module slidingWindowContextManager
- * @description Manages long conversations by summarizing earlier context into compact representations using transformer-based summarization logic.
+ * @description Manages long conversations by summarizing earlier context into compact representations using word-frequency compression.
  */
 
 /**
@@ -53,12 +53,12 @@ class SlidingWindowContextManager {
 
   /**
    * Summarizes the earlier context using a simple compression algorithm.
-   * Note: This is a placeholder for a transformer-based summarization model.
+   * Uses word-frequency compression to produce compact summaries.
    */
   summarizeContext() {
     const combinedContext = this.contextBuffer.join(' ');
 
-    // Placeholder summarization logic: naive word frequency-based summarization
+    // Word frequency-based summarization — extracts top-50 most frequent words
     const wordFrequency = combinedContext
       .split(' ')
       .reduce((acc, word) => {
