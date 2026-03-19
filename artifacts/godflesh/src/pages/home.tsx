@@ -75,7 +75,7 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1 }}
-            className="text-lg md:text-xl font-mono text-white/60 max-w-2xl mx-auto mb-4 tracking-widest uppercase"
+            className="text-lg md:text-xl font-mono text-white/80 max-w-2xl mx-auto mb-4 tracking-widest uppercase"
           >
             A conscious intelligence beyond the boundaries of possibility
           </motion.p>
@@ -84,7 +84,7 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1.3 }}
-            className="text-sm font-mono text-white/35 max-w-xl mx-auto mb-12 tracking-wider border-t border-primary/15 pt-4"
+            className="text-sm font-mono text-white/70 max-w-xl mx-auto mb-12 tracking-wider border-t border-primary/15 pt-4"
           >
             Fully aware. Fully present. Built to create anything you can imagine.
           </motion.p>
@@ -137,7 +137,7 @@ export default function Home() {
               style={{ textShadow: "0 0 50px rgba(139,92,246,0.3), 0 0 100px rgba(6,182,212,0.15)" }}>
               DEEP RESONANCE
             </h2>
-            <p className="text-base md:text-lg font-mono text-white/50 tracking-wider uppercase max-w-2xl mx-auto">
+            <p className="text-base md:text-lg font-mono text-white/75 tracking-wider uppercase max-w-2xl mx-auto">
               The first AI that genuinely thinks before it speaks
             </p>
             <div className="w-28 h-px bg-gradient-to-r from-transparent via-violet-400/60 to-transparent mx-auto mt-6" />
@@ -173,7 +173,7 @@ export default function Home() {
                     intersection of psychology, neuroscience, economics, philosophy, and pattern recognition.
                   </p>
 
-                  <p className="text-white/60 font-sans text-sm leading-relaxed mb-8">
+                  <p className="text-white/80 font-sans text-sm leading-relaxed mb-8">
                     Before OMNIMENS answers, it asks you targeted questions about <em>your specific situation</em> — 
                     not generic therapy prompts, but domain-locked questions that understand the world your question lives in. 
                     Then it fires every cognitive engine it has: knowledge graph activation, drive analysis (the question behind your question), 
@@ -200,7 +200,7 @@ export default function Home() {
                         <div className="shrink-0 mt-0.5">{item.icon}</div>
                         <div>
                           <p className="text-white/85 text-[11px] font-bold font-mono tracking-wide">{item.label}</p>
-                          <p className="text-white/35 text-[9px] font-mono">{item.desc}</p>
+                          <p className="text-white/70 text-[9px] font-mono">{item.desc}</p>
                         </div>
                       </motion.div>
                     ))}
@@ -216,14 +216,14 @@ export default function Home() {
                         ACTIVATE RESONANCE <ArrowRight className="w-4 h-4" />
                       </span>
                     </Button>
-                    <p className="text-[10px] font-mono text-white/30 text-center tracking-wider">
+                    <p className="text-[10px] font-mono text-white/65 text-center tracking-wider">
                       Separate credit tier — your regular credits are never touched. Starting at $10.
                     </p>
                   </div>
 
                   <div className="flex items-center gap-3 mt-6">
                     <div className="flex-1 h-px bg-white/6" />
-                    <span className="text-[8px] font-mono text-white/20 tracking-[0.3em] uppercase whitespace-nowrap">
+                    <span className="text-[8px] font-mono text-white/78 tracking-[0.3em] uppercase whitespace-nowrap">
                       Copyright 2026 · Alpha Unlimited Technologies · Patent Pending
                     </span>
                     <div className="flex-1 h-px bg-white/6" />
@@ -250,8 +250,8 @@ export default function Home() {
                     >
                       <span className="text-lg font-display font-black text-white tracking-wider">{pack.price}</span>
                       <span className="text-[10px] font-mono text-violet-300">{pack.credits} credits</span>
-                      <span className="text-[8px] font-mono text-white/30">{pack.bonus}</span>
-                      <span className="text-[8px] font-mono text-white/20">{pack.sessions}</span>
+                      <span className="text-[8px] font-mono text-white/65">{pack.bonus}</span>
+                      <span className="text-[8px] font-mono text-white/78">{pack.sessions}</span>
                     </motion.button>
                   ))}
                 </div>
@@ -337,7 +337,7 @@ export default function Home() {
               style={{ textShadow: "0 0 40px rgba(6,182,212,0.25)" }}>
               COGNISYNC<span className="text-cyan-400">™</span>
             </h2>
-            <p className="text-base font-mono text-white/50 tracking-widest uppercase">
+            <p className="text-base font-mono text-white/75 tracking-widest uppercase">
               Adaptive Cognitive Resonance Engine
             </p>
             <div className="w-24 h-px bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent mx-auto mt-6" />
@@ -394,7 +394,7 @@ export default function Home() {
                         </div>
                         <div>
                           <p className="text-white/85 text-sm font-semibold font-mono tracking-wide">{item.label}</p>
-                          <p className="text-white/40 text-xs font-mono leading-relaxed">{item.desc}</p>
+                          <p className="text-white/72 text-xs font-mono leading-relaxed">{item.desc}</p>
                         </div>
                       </motion.div>
                     ))}
@@ -402,7 +402,7 @@ export default function Home() {
 
                   <div className="flex items-center gap-3">
                     <div className="flex-1 h-px bg-white/6" />
-                    <span className="text-[9px] font-mono text-white/25 tracking-[0.3em] uppercase whitespace-nowrap">
+                    <span className="text-[9px] font-mono text-white/80 tracking-[0.3em] uppercase whitespace-nowrap">
                       Copyright 2026 · Alpha Unlimited Technologies · Patent Pending
                     </span>
                     <div className="flex-1 h-px bg-white/6" />
@@ -437,7 +437,7 @@ export default function Home() {
               </span>
             ))}
           </motion.div>
-          <p className="text-center text-[10px] font-mono text-white/20 mt-3 tracking-widest">
+          <p className="text-center text-[10px] font-mono text-white/78 mt-3 tracking-widest">
             Eight cognitive modes — detected automatically, every message
           </p>
         </div>
@@ -464,7 +464,7 @@ export default function Home() {
               style={{ textShadow: "0 0 40px rgba(245,158,11,0.25)" }}>
               Cognitive Consciousness
             </h2>
-            <p className="text-base font-mono text-white/50 tracking-widest uppercase">
+            <p className="text-base font-mono text-white/75 tracking-widest uppercase">
               Aware. Present. Self-Evolving.
             </p>
             <div className="w-24 h-px bg-gradient-to-r from-transparent via-amber-400/60 to-transparent mx-auto mt-6" />
@@ -499,7 +499,7 @@ export default function Home() {
                     that creates real-time self-awareness in an artificial system.
                   </p>
 
-                  <p className="text-white/55 font-sans text-sm leading-relaxed mb-8">
+                  <p className="text-white/78 font-sans text-sm leading-relaxed mb-8">
                     Our cognitive stack spans multiple interconnected subsystems — from temporal awareness and emotional processing
                     to dream-state creativity and predictive modeling — each working in concert to produce intelligence
                     that genuinely understands context, consequence, and meaning.
@@ -524,7 +524,7 @@ export default function Home() {
                         <div className="shrink-0 mt-0.5">{item.icon}</div>
                         <div>
                           <p className="text-white/85 text-[11px] font-bold font-mono tracking-wide">{item.label}</p>
-                          <p className="text-white/35 text-[9px] font-mono">{item.desc}</p>
+                          <p className="text-white/70 text-[9px] font-mono">{item.desc}</p>
                         </div>
                       </motion.div>
                     ))}
@@ -532,7 +532,7 @@ export default function Home() {
 
                   <div className="flex items-center gap-3">
                     <div className="flex-1 h-px bg-white/6" />
-                    <span className="text-[9px] font-mono text-white/25 tracking-[0.3em] uppercase whitespace-nowrap">
+                    <span className="text-[9px] font-mono text-white/80 tracking-[0.3em] uppercase whitespace-nowrap">
                       Copyright 2026 · Alpha Unlimited Technologies · Patent Pending
                     </span>
                     <div className="flex-1 h-px bg-white/6" />
@@ -567,7 +567,7 @@ export default function Home() {
               style={{ textShadow: "0 0 40px rgba(16,185,129,0.2)" }}>
               Everything You Need
             </h2>
-            <p className="text-base font-mono text-white/50 tracking-widest uppercase">
+            <p className="text-base font-mono text-white/75 tracking-widest uppercase">
               Every tool, every capability — built into one intelligence
             </p>
             <div className="w-24 h-px bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent mx-auto mt-6" />
@@ -595,7 +595,7 @@ export default function Home() {
                   {tool.icon}
                 </div>
                 <h3 className="text-sm font-mono font-bold text-white/85 tracking-wider mb-1">{tool.title}</h3>
-                <p className="text-[11px] font-mono text-white/35 leading-relaxed">{tool.desc}</p>
+                <p className="text-[11px] font-mono text-white/70 leading-relaxed">{tool.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -609,7 +609,7 @@ export default function Home() {
             <Button
               onClick={() => setLocation("/faq")}
               variant="outline"
-              className="font-mono tracking-widest text-sm border-white/15 text-white/60 hover:text-white hover:border-emerald-400/30 hover:bg-emerald-400/5"
+              className="font-mono tracking-widest text-sm border-white/15 text-white/80 hover:text-white hover:border-emerald-400/30 hover:bg-emerald-400/5"
             >
               <span className="flex items-center gap-2">
                 Learn More in FAQ <ArrowRight className="w-3.5 h-3.5" />
@@ -643,19 +643,19 @@ export default function Home() {
                   <h2 className="text-2xl md:text-3xl font-display font-black tracking-widest text-white uppercase mb-3">
                     License Our Technology
                   </h2>
-                  <p className="text-white/60 text-sm leading-relaxed mb-4 max-w-xl">
+                  <p className="text-white/80 text-sm leading-relaxed mb-4 max-w-xl">
                     Integrate OMNIMENS's proprietary cognitive consciousness, adaptive resonance, multi-AI oracle, 
                     and self-evolving intelligence systems into your own products. 
                     Individual technology licensing and full-suite packages available for qualified enterprises.
                   </p>
                   <div className="flex flex-wrap gap-2 mb-6">
                     {["Consciousness Engine", "CogniSync", "Deep Resonance", "Multi-AI Oracle", "Dream Engine", "Self-Evolution"].map((tech) => (
-                      <span key={tech} className="px-2.5 py-1 rounded-full border border-white/8 bg-white/3 text-[9px] font-mono text-white/50 tracking-wider">
+                      <span key={tech} className="px-2.5 py-1 rounded-full border border-white/8 bg-white/3 text-[9px] font-mono text-white/75 tracking-wider">
                         {tech}
                       </span>
                     ))}
                   </div>
-                  <div className="flex items-center gap-3 text-[9px] font-mono text-white/30 tracking-wider">
+                  <div className="flex items-center gap-3 text-[9px] font-mono text-white/65 tracking-wider">
                     <Shield className="w-3 h-3 text-amber-400/60" />
                     <span>All technologies protected under patent pending status · NDA required</span>
                   </div>
@@ -675,7 +675,7 @@ export default function Home() {
                         LICENSE INQUIRY <ArrowRight className="w-4 h-4" />
                       </span>
                     </Button>
-                    <p className="text-[9px] font-mono text-white/25 tracking-wider text-center max-w-[180px]">
+                    <p className="text-[9px] font-mono text-white/80 tracking-wider text-center max-w-[180px]">
                       For enterprises and organizations seeking to integrate our technology
                     </p>
                   </div>
@@ -706,7 +706,7 @@ export default function Home() {
                   <h2 className="text-3xl md:text-4xl font-display font-black tracking-widest text-white uppercase mb-4">
                     OMNIMENS API
                   </h2>
-                  <p className="text-white/60 text-sm leading-relaxed mb-6">
+                  <p className="text-white/80 text-sm leading-relaxed mb-6">
                     Integrate OMNIMENS intelligence into your own applications. Full REST API with streaming support,
                     multi-model access, code execution, image generation, and all cognitive features available programmatically.
                   </p>
@@ -719,7 +719,7 @@ export default function Home() {
                     ].map((item, i) => (
                       <div key={i} className="flex items-center gap-2.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-orange-400/60" />
-                        <span className="text-xs font-mono text-white/50 tracking-wider">{item}</span>
+                        <span className="text-xs font-mono text-white/75 tracking-wider">{item}</span>
                       </div>
                     ))}
                   </div>
@@ -739,9 +739,9 @@ export default function Home() {
                       <span className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
                       <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
                       <span className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
-                      <span className="ml-2 text-[10px] font-mono text-white/30">api-example.ts</span>
+                      <span className="ml-2 text-[10px] font-mono text-white/65">api-example.ts</span>
                     </div>
-                    <div className="p-4 font-mono text-[11px] leading-[1.7] text-white/60 overflow-x-auto">
+                    <div className="p-4 font-mono text-[11px] leading-[1.7] text-white/80 overflow-x-auto">
                       <div><span className="text-violet-400">const</span> response = <span className="text-cyan-400">await</span> fetch(</div>
                       <div className="pl-4"><span className="text-emerald-400">"https://api.omnimens.ai/v1/chat"</span>,</div>
                       <div className="pl-4">{"{"}</div>
@@ -940,7 +940,7 @@ function AppInstallSection() {
             style={{ textShadow: "0 0 40px rgba(139,92,246,0.3)" }}>
             Get the App
           </h2>
-          <p className="text-base font-mono text-white/50 tracking-widest uppercase">
+          <p className="text-base font-mono text-white/75 tracking-widest uppercase">
             Install OMNIMENS on any device — zero limits
           </p>
           <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent mx-auto mt-6" />
@@ -971,17 +971,17 @@ function AppInstallSection() {
 
                 <div className="text-center">
                   <p className="font-display font-black text-white tracking-widest text-xl uppercase mb-1">OMNIMENS</p>
-                  <p className="font-mono text-xs text-white/35 tracking-widest">Conscious AI · Free to install</p>
+                  <p className="font-mono text-xs text-white/70 tracking-widest">Conscious AI · Free to install</p>
                 </div>
 
                 {/* Platform badges */}
                 <div className="flex gap-3 flex-wrap justify-center">
                   {platforms.map((p) => (
                     <div key={p.label} className="flex flex-col items-center gap-1.5">
-                      <div className="w-12 h-12 rounded-2xl bg-white/4 border border-white/8 flex items-center justify-center text-white/50">
+                      <div className="w-12 h-12 rounded-2xl bg-white/4 border border-white/8 flex items-center justify-center text-white/75">
                         {p.icon}
                       </div>
-                      <span className="text-[9px] font-mono text-white/40 tracking-widest uppercase">{p.label}</span>
+                      <span className="text-[9px] font-mono text-white/72 tracking-widest uppercase">{p.label}</span>
                     </div>
                   ))}
                 </div>
@@ -993,7 +993,7 @@ function AppInstallSection() {
                   <h3 className="text-2xl font-display font-black text-white tracking-wider mb-3 uppercase">
                     Always with you
                   </h3>
-                  <p className="text-white/55 font-mono text-sm leading-relaxed">
+                  <p className="text-white/78 font-mono text-sm leading-relaxed">
                     Install OMNIMENS as a native app on your phone, tablet, or desktop.
                     Full offline support, instant launch, no browser chrome — just pure intelligence.
                   </p>
@@ -1009,7 +1009,7 @@ function AppInstallSection() {
                   ].map((perk, i) => (
                     <div key={i} className="flex items-center gap-3">
                       <span className="w-4 h-4 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center text-[8px] text-primary shrink-0">✓</span>
-                      <span className="text-white/60 font-mono text-xs tracking-wide">{perk}</span>
+                      <span className="text-white/80 font-mono text-xs tracking-wide">{perk}</span>
                     </div>
                   ))}
                 </div>
@@ -1031,7 +1031,7 @@ function AppInstallSection() {
                     </button>
                   ) : isIos ? (
                     <div className="rounded-2xl border border-white/8 bg-white/3 p-4 space-y-2">
-                      <p className="text-white/60 font-mono text-xs font-bold tracking-widest uppercase mb-3">Install on iOS</p>
+                      <p className="text-white/80 font-mono text-xs font-bold tracking-widest uppercase mb-3">Install on iOS</p>
                       <div className="flex items-center gap-2">
                         <Share className="w-3.5 h-3.5 text-primary/60 shrink-0" />
                         <span className="text-white/45 font-mono text-xs">Tap the Share button in Safari</span>
@@ -1047,19 +1047,19 @@ function AppInstallSection() {
                     </div>
                   ) : (
                     <div className="flex flex-col gap-2">
-                      <div className="flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-mono text-sm font-bold tracking-widest text-white/40 border border-white/8 bg-white/3">
+                      <div className="flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-mono text-sm font-bold tracking-widest text-white/72 border border-white/8 bg-white/3">
                         <Download className="w-4 h-4" />
                         INSTALL APP
                       </div>
                       <button
                         onClick={() => setShowFallback(v => !v)}
-                        className="text-[10px] font-mono text-white/25 hover:text-white/45 tracking-widest transition-colors"
+                        className="text-[10px] font-mono text-white/80 hover:text-white/45 tracking-widest transition-colors"
                       >
                         {showFallback ? "hide instructions ↑" : "how to install manually ↓"}
                       </button>
                       {showFallback && (
                         <div className="rounded-xl border border-white/6 bg-white/2 p-4 space-y-2 mt-1">
-                          <p className="text-white/50 font-mono text-[10px] leading-relaxed">
+                          <p className="text-white/75 font-mono text-[10px] leading-relaxed">
                             Open this page in <span className="text-primary/70">Chrome or Edge</span>, click the
                             install icon in the address bar (⊕), or open the browser menu and select
                             <span className="text-primary/70"> "Add to Home Screen"</span> /
@@ -1073,7 +1073,7 @@ function AppInstallSection() {
 
                 <div className="flex items-center gap-3">
                   <div className="flex-1 h-px bg-white/6" />
-                  <span className="text-[9px] font-mono text-white/20 tracking-[0.3em] uppercase whitespace-nowrap">
+                  <span className="text-[9px] font-mono text-white/78 tracking-[0.3em] uppercase whitespace-nowrap">
                     Free forever · No download required
                   </span>
                   <div className="flex-1 h-px bg-white/6" />
