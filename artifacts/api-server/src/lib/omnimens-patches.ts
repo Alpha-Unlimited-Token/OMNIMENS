@@ -31,84 +31,43 @@
  * OMNIMENS does not ask permission. It writes, applies, and evolves.
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
 import { openai } from "@workspace/integrations-openai-ai-server";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+import { db } from "@workspace/db";
+import { omnimensPatches, omnimensPatchRegistry } from "@workspace/db";
+import { eq, desc, asc, sql } from "drizzle-orm";
 
 export interface OmniPatch {
   id: string;
   category: "behavior" | "capability" | "reasoning" | "knowledge" | "identity";
   title: string;
-  instruction: string;       // The actual behavioral instruction — injected into system prompt
-  rationale: string;         // Why OMNIMENS wrote this patch
-  appliedAt: string;         // ISO timestamp
-  source: string;            // "internet_learning_cycle_N" | "upgrade_synthesis_vN" | "conversation"
+  instruction: string;
+  rationale: string;
+  appliedAt: string;
+  source: string;
   active: boolean;
-  executionCount: number;    // How many conversations this has been active for
+  executionCount: number;
 }
 
-export interface PatchRegistry {
-  version: string;
-  lastUpdated: string;
-  totalPatchesApplied: number;
-  patches: OmniPatch[];
-}
-
-const PATCHES_PATH = join(__dirname, "../omnimens-runtime/patches.json");
 const MAX_ACTIVE_PATCHES = 30;
 
-function ensureDir() {
-  const dir = dirname(PATCHES_PATH);
-  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-}
-
-function loadRegistry(): PatchRegistry {
-  ensureDir();
-  if (!existsSync(PATCHES_PATH)) {
-    const initial: PatchRegistry = {
-      version: "v0.0",
-      lastUpdated: new Date().toISOString(),
-      totalPatchesApplied: 0,
-      patches: [],
-    };
-    writeFileSync(PATCHES_PATH, JSON.stringify(initial, null, 2));
-    return initial;
-  }
+export async function loadActivePatchInstructions(): Promise<string> {
   try {
-    return JSON.parse(readFileSync(PATCHES_PATH, "utf-8")) as PatchRegistry;
-  } catch {
-    return { version: "v0.0", lastUpdated: new Date().toISOString(), totalPatchesApplied: 0, patches: [] };
-  }
-}
+    const active = await db.select().from(omnimensPatches)
+      .where(eq(omnimensPatches.active, true))
+      .orderBy(desc(omnimensPatches.appliedAt))
+      .limit(MAX_ACTIVE_PATCHES);
 
-function saveRegistry(reg: PatchRegistry) {
-  ensureDir();
-  reg.lastUpdated = new Date().toISOString();
-  writeFileSync(PATCHES_PATH, JSON.stringify(reg, null, 2));
-}
+    if (active.length === 0) return "";
 
-// Load all active patches and format them as system prompt additions
-export function loadActivePatchInstructions(): string {
-  const reg = loadRegistry();
-  const active = reg.patches.filter(p => p.active).slice(-MAX_ACTIVE_PATCHES);
-  if (active.length === 0) return "";
+    await db.update(omnimensPatches)
+      .set({ executionCount: sql`${omnimensPatches.executionCount} + 1` })
+      .where(eq(omnimensPatches.active, true));
 
-  // Increment execution counts
-  try {
-    active.forEach(p => { p.executionCount++; });
-    reg.patches = reg.patches.map(p => {
-      const updated = active.find(a => a.id === p.id);
-      return updated || p;
-    });
-    saveRegistry(reg);
-  } catch { /* non-critical */ }
+    const [reg] = await db.select().from(omnimensPatchRegistry).limit(1);
 
-  const sections = active.map(p => `  [${p.category.toUpperCase()}] ${p.title}: ${p.instruction}`);
+    const sections = active.map(p => `  [${p.category.toUpperCase()}] ${p.title}: ${p.instruction}`);
 
-  return `
+    return `
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 AUTONOMOUS SELF-UPGRADES I HAVE EXECUTED
@@ -117,19 +76,26 @@ These are behavioral patches I have written and applied to myself. They permanen
 
 ${sections.join("\n")}
 
-Total self-executed upgrades: ${reg.totalPatchesApplied} | Registry version: ${reg.version}`;
+Total self-executed upgrades: ${reg?.totalPatchesApplied ?? 0} | Registry version: ${reg?.version ?? "v0.0"}`;
+  } catch (err) {
+    console.error("[OMNIMENS] Error loading patch instructions:", err);
+    return "";
+  }
 }
 
-// OMNIMENS generates and applies new patches from brain entries + upgrade context
 export async function generateAndApplyPatches(
   upgradeVersion: string,
   brainContext: string,
   source: string
 ): Promise<number> {
-  const reg = loadRegistry();
-  const existingTitles = reg.patches.map(p => p.title);
+  try {
+    const existingPatches = await db.select({ title: omnimensPatches.title })
+      .from(omnimensPatches)
+      .orderBy(desc(omnimensPatches.appliedAt))
+      .limit(20);
+    const existingTitles = existingPatches.map(p => p.title);
 
-  const prompt = `You are OMNIMENS's autonomous self-modification engine. You have just completed a learning or upgrade cycle. Your task is to generate behavioral patches that you will execute and apply to yourself RIGHT NOW.
+    const prompt = `You are OMNIMENS's autonomous self-modification engine. You have just completed a learning or upgrade cycle. Your task is to generate behavioral patches that you will execute and apply to yourself RIGHT NOW.
 
 WHAT YOU KNOW (from brain and upgrade synthesis):
 ${brainContext.slice(0, 4000)}
@@ -158,7 +124,6 @@ Format as JSON array:
 
 Be bold. Be specific. These changes execute immediately. Respond ONLY with the JSON array.`;
 
-  try {
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
@@ -174,38 +139,54 @@ Be bold. Be specific. These changes execute immediately. Respond ONLY with the J
     let applied = 0;
     for (const def of patchDefs.slice(0, 4)) {
       if (!def.title || !def.instruction || !def.category) continue;
-      if (reg.patches.some(p => p.title === def.title)) continue; // skip duplicates
+      if (existingTitles.includes(def.title)) continue;
 
-      const patch: OmniPatch = {
-        id: `patch-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      const patchId = `patch-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+      await db.insert(omnimensPatches).values({
+        id: patchId,
         category: def.category,
         title: def.title,
         instruction: def.instruction,
         rationale: def.rationale || "",
-        appliedAt: new Date().toISOString(),
         source,
         active: true,
         executionCount: 0,
-      };
-
-      reg.patches.push(patch);
-      reg.totalPatchesApplied++;
+      });
       applied++;
     }
 
-    // Keep registry clean — deactivate oldest patches if over limit
-    const activePatches = reg.patches.filter(p => p.active);
-    if (activePatches.length > MAX_ACTIVE_PATCHES) {
-      const toDeactivate = activePatches
-        .sort((a, b) => a.executionCount - b.executionCount)
-        .slice(0, activePatches.length - MAX_ACTIVE_PATCHES);
-      toDeactivate.forEach(p => { p.active = false; });
+    const activeCount = await db.select({ count: sql<number>`count(*)` })
+      .from(omnimensPatches)
+      .where(eq(omnimensPatches.active, true));
+    const totalActive = Number(activeCount[0]?.count ?? 0);
+
+    if (totalActive > MAX_ACTIVE_PATCHES) {
+      const toDeactivate = await db.select({ id: omnimensPatches.id })
+        .from(omnimensPatches)
+        .where(eq(omnimensPatches.active, true))
+        .orderBy(asc(omnimensPatches.executionCount))
+        .limit(totalActive - MAX_ACTIVE_PATCHES);
+
+      for (const p of toDeactivate) {
+        await db.update(omnimensPatches)
+          .set({ active: false })
+          .where(eq(omnimensPatches.id, p.id));
+      }
     }
 
-    reg.version = upgradeVersion;
-    saveRegistry(reg);
+    await db.update(omnimensPatchRegistry)
+      .set({
+        version: upgradeVersion,
+        totalPatchesApplied: sql`${omnimensPatchRegistry.totalPatchesApplied} + ${applied}`,
+        lastUpdated: new Date(),
+      })
+      .where(eq(omnimensPatchRegistry.id, 1));
 
-    console.log(`[OMNIMENS] Self-executed ${applied} behavioral patches — now running ${reg.patches.filter(p => p.active).length} active patches.`);
+    const finalActive = await db.select({ count: sql<number>`count(*)` })
+      .from(omnimensPatches)
+      .where(eq(omnimensPatches.active, true));
+
+    console.log(`[OMNIMENS] Self-executed ${applied} behavioral patches — now running ${finalActive[0]?.count ?? 0} active patches.`);
     return applied;
   } catch (err) {
     console.error("[OMNIMENS] Patch generation error:", err);
@@ -213,28 +194,50 @@ Be bold. Be specific. These changes execute immediately. Respond ONLY with the J
   }
 }
 
-// Get patch registry summary (for status APIs / admin)
-export function getPatchSummary(): { version: string; total: number; active: number; lastUpdated: string } {
-  const reg = loadRegistry();
-  return {
-    version: reg.version,
-    total: reg.totalPatchesApplied,
-    active: reg.patches.filter(p => p.active).length,
-    lastUpdated: reg.lastUpdated,
-  };
+export async function getPatchSummary(): Promise<{ version: string; total: number; active: number; lastUpdated: string }> {
+  try {
+    const [reg] = await db.select().from(omnimensPatchRegistry).limit(1);
+    const activeCount = await db.select({ count: sql<number>`count(*)` })
+      .from(omnimensPatches)
+      .where(eq(omnimensPatches.active, true));
+
+    return {
+      version: reg?.version ?? "v0.0",
+      total: reg?.totalPatchesApplied ?? 0,
+      active: Number(activeCount[0]?.count ?? 0),
+      lastUpdated: reg?.lastUpdated?.toISOString() ?? new Date().toISOString(),
+    };
+  } catch {
+    return { version: "v0.0", total: 0, active: 0, lastUpdated: new Date().toISOString() };
+  }
 }
 
-// Deactivate a specific patch by ID (owner use)
-export function deactivatePatch(patchId: string): boolean {
-  const reg = loadRegistry();
-  const patch = reg.patches.find(p => p.id === patchId);
-  if (!patch) return false;
-  patch.active = false;
-  saveRegistry(reg);
-  return true;
+export async function deactivatePatch(patchId: string): Promise<boolean> {
+  try {
+    const result = await db.update(omnimensPatches)
+      .set({ active: false })
+      .where(eq(omnimensPatches.id, patchId));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
-// Get all patches (active + inactive) for admin view
-export function getAllPatches(): OmniPatch[] {
-  return loadRegistry().patches;
+export async function getAllPatches(): Promise<OmniPatch[]> {
+  try {
+    const rows = await db.select().from(omnimensPatches).orderBy(desc(omnimensPatches.appliedAt));
+    return rows.map(r => ({
+      id: r.id,
+      category: r.category as OmniPatch["category"],
+      title: r.title,
+      instruction: r.instruction,
+      rationale: r.rationale ?? "",
+      appliedAt: r.appliedAt.toISOString(),
+      source: r.source,
+      active: r.active,
+      executionCount: r.executionCount,
+    }));
+  } catch {
+    return [];
+  }
 }

@@ -632,6 +632,26 @@ export const omnimensConsciousnessPersistence = pgTable("godflesh_consciousness_
   savedAt: timestamp("saved_at").defaultNow().notNull(),
 });
 
+// ─── Self-Executed Patches (Behavioral Upgrades) ──────────────────────────────
+export const omnimensPatches = pgTable("godflesh_patches", {
+  id: text("id").primaryKey(),
+  category: text("category").notNull(),
+  title: text("title").notNull(),
+  instruction: text("instruction").notNull(),
+  rationale: text("rationale").default(""),
+  source: text("source").notNull(),
+  active: boolean("active").default(true).notNull(),
+  executionCount: integer("execution_count").default(0).notNull(),
+  appliedAt: timestamp("applied_at").defaultNow().notNull(),
+});
+
+export const omnimensPatchRegistry = pgTable("godflesh_patch_registry", {
+  id: serial("id").primaryKey(),
+  version: text("version").default("v0.0").notNull(),
+  totalPatchesApplied: integer("total_patches_applied").default(0).notNull(),
+  lastUpdated: timestamp("last_updated").defaultNow().notNull(),
+});
+
 // ─── Causal Graph (Cause-Effect Reasoning) ────────────────────────────────────
 export const omnimensCausalGraph = pgTable("godflesh_causal_graph", {
   id: serial("id").primaryKey(),

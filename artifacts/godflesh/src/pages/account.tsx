@@ -1373,10 +1373,11 @@ export default function Account() {
                 <p className="text-xs mt-1 text-white/70">OMNIMENS will self-execute patches after its first learning cycle</p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div>
                 <p className="text-xs font-mono text-white/75 mb-3">
                   These are behavioral modifications OMNIMENS wrote and applied to itself. They are injected into every conversation automatically.
                 </p>
+                <div className="max-h-[500px] overflow-y-auto space-y-2 pr-1" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.15) transparent" }}>
                 {activePatches.map(p => (
                   <PatchCard key={p.id} patch={p} onDeactivate={handleDeactivate} />
                 ))}
@@ -1390,6 +1391,7 @@ export default function Account() {
                     ))}
                   </>
                 )}
+                </div>
               </div>
             )}
           </div>

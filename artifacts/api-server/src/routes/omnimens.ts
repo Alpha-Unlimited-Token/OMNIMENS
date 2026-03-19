@@ -1181,7 +1181,7 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
       userContent = textMessage || "Analyze the uploaded content.";
     }
 
-    const patchInstructions = loadActivePatchInstructions();
+    const patchInstructions = await loadActivePatchInstructions();
 
     // ── Load all context with coherence agent (semantic memory + weighted brain + threads) ──
     const [memoryContext, brainContext, customInstructions, generatedModulesContext, learningContext, physioContext, toolKnowledgeContext, threadContext] = await Promise.all([
@@ -4395,8 +4395,8 @@ router.get("/omnimens/patches", async (req, res) => {
     return;
   }
   try {
-    const summary = getPatchSummary();
-    const patches = getAllPatches();
+    const summary = await getPatchSummary();
+    const patches = await getAllPatches();
     res.json({ summary, patches });
   } catch (err) {
     res.status(500).json({ error: String(err) });
@@ -4408,7 +4408,7 @@ router.delete("/omnimens/patches/:id", async (req, res) => {
     res.status(403).json({ error: "Owner only" });
     return;
   }
-  const deactivated = deactivatePatch(req.params.id);
+  const deactivated = await deactivatePatch(req.params.id);
   res.json({ ok: deactivated });
 });
 
