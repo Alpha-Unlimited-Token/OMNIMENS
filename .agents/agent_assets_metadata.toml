@@ -12,3 +12,9 @@ id = "x0jI1j8ZhDrbhxi2KtJvr"
 uri = "file://.local/private/OMNIMENS-Licensing-Analysis.zip"
 type = "unspecified"
 title = "OMNIMENS Proprietary Technology Licensing Analysis"
+
+[[outputs]]
+id = "K-85pOgCpUZHY29VJE0xL"
+uri = "file://artifacts/api-server/omnimens-embodiment-data/ohio_lottery_picks.md"
+type = "text"
+title = "Ohio Lottery Picks — Powerball & Mega Millions (Frequency-Optimized)"
