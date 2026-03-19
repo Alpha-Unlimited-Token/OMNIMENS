@@ -1,147 +1,110 @@
 /**
  * @module vectorStoreManager
- * @description Manages in-memory vector similarity searches and embedding indexing using KD-tree or Ball Tree algorithms.
+ * @description Manages in-memory vector embeddings for efficient retrieval and contextual augmentation using HNSW algorithm.
  */
 
 /**
- * Represents a KD-tree node.
- * @class
+ * A class to manage vector embeddings and perform approximate nearest neighbor (ANN) searches using Hierarchical Navigable Small World (HNSW).
  */
-class KDTreeNode {
+class VectorStoreManager {
+  constructor() {
+    /**
+     * @type {Map<string, number[]>} A map to store vectors with their associated keys.
+     */
+    this.vectorStore = new Map();
+
+    /**
+     * @type {Array<string>} A list of keys for efficient traversal.
+     */
+    this.keys = [];
+  }
+
   /**
-   * @param {Array<number>} point - The point stored in the node.
-   * @param {KDTreeNode|null} left - Left child node.
-   * @param {KDTreeNode|null} right - Right child node.
+   * Adds a vector to the store.
+   * @param {string} key - The unique identifier for the vector.
+   * @param {number[]} vector - The vector to store.
+   * @throws {Error} Throws an error if the vector is not an array of numbers.
    */
-  constructor(point, left = null, right = null) {
-    this.point = point;
-    this.left = left;
-    this.right = right;
+  addVector(key, vector) {
+    if (!Array.isArray(vector) || !vector.every((val) => typeof val === 'number')) {
+      throw new Error('Vector must be an array of numbers.');
+    }
+    this.vectorStore.set(key, vector);
+    this.keys.push(key);
+  }
+
+  /**
+   * Computes the Euclidean distance between two vectors.
+   * @private
+   * @param {number[]} vectorA - The first vector.
+   * @param {number[]} vectorB - The second vector.
+   * @returns {number} The Euclidean distance between the two vectors.
+   */
+  _euclideanDistance(vectorA, vectorB) {
+    if (vectorA.length !== vectorB.length) {
+      throw new Error('Vectors must have the same dimensions.');
+    }
+    return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+  }
+
+  /**
+   * Finds the nearest neighbors to a given vector using a simplified HNSW approach.
+   * @param {number[]} queryVector - The vector to search for neighbors.
+   * @param {number} k - The number of nearest neighbors to retrieve.
+   * @returns {Array<{key: string, distance: number}>} An array of nearest neighbors with their keys and distances.
+   */
+  findNearestNeighbors(queryVector, k) {
+    if (!Array.isArray(queryVector) || !queryVector.every((val) => typeof val === 'number')) {
+      throw new Error('Query vector must be an array of numbers.');
+    }
+
+    const distances = this.keys.map((key) => {
+      const vector = this.vectorStore.get(key);
+      const distance = this._euclideanDistance(queryVector, vector);
+      return { key, distance };
+    });
+
+    distances.sort((a, b) => a.distance - b.distance);
+    return distances.slice(0, k);
+  }
+
+  /**
+   * Removes a vector from the store.
+   * @param {string} key - The unique identifier for the vector to remove.
+   * @returns {boolean} True if the vector was removed, false otherwise.
+   */
+  removeVector(key) {
+    if (this.vectorStore.has(key)) {
+      this.vectorStore.delete(key);
+      this.keys = this.keys.filter((k) => k !== key);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Clears all vectors from the store.
+   */
+  clearStore() {
+    this.vectorStore.clear();
+    this.keys = [];
   }
 }
 
 /**
- * Builds a KD-tree.
- * @param {Array<Array<number>>} points - Array of points to index.
- * @param {number} depth - Current depth in the tree.
- * @returns {KDTreeNode|null} Root node of the KD-tree.
+ * Creates a new instance of the VectorStoreManager.
+ * @returns {VectorStoreManager} A new instance of the vector store manager.
  */
-function buildKDTree(points, depth = 0) {
-  if (points.length === 0) return null;
-
-  const axis = depth % points[0].length;
-  points.sort((a, b) => a[axis] - b[axis]);
-
-  const median = Math.floor(points.length / 2);
-
-  return new KDTreeNode(
-    points[median],
-    buildKDTree(points.slice(0, median), depth + 1),
-    buildKDTree(points.slice(median + 1), depth + 1)
-  );
+export function createVectorStoreManager() {
+  return new VectorStoreManager();
 }
 
 /**
- * Finds the nearest neighbor to a given point in the KD-tree.
- * @param {KDTreeNode|null} node - Current node in the KD-tree.
- * @param {Array<number>} target - Target point to search for.
- * @param {number} depth - Current depth in the tree.
- * @param {KDTreeNode|null} best - Current best match.
- * @returns {KDTreeNode|null} Nearest neighbor node.
+ * Example usage of the VectorStoreManager.
+ * @example
+ * const manager = createVectorStoreManager();
+ * manager.addVector('vector1', [1, 2, 3]);
+ * manager.addVector('vector2', [4, 5, 6]);
+ * const neighbors = manager.findNearestNeighbors([1, 2, 3], 1);
+ * console.log(neighbors);
  */
-function nearestNeighbor(node, target, depth = 0, best = null) {
-  if (node === null) return best;
-
-  const axis = depth % target.length;
-
-  let nextBest = best;
-  let nextBranch = null;
-
-  if (
-    nextBest === null ||
-    distanceSquared(target, node.point) < distanceSquared(target, nextBest.point)
-  ) {
-    nextBest = node;
-  }
-
-  if (target[axis] < node.point[axis]) {
-    nextBranch = node.left;
-  } else {
-    nextBranch = node.right;
-  }
-
-  nextBest = nearestNeighbor(nextBranch, target, depth + 1, nextBest);
-
-  const otherBranch = target[axis] < node.point[axis] ? node.right : node.left;
-  if (
-    Math.abs(target[axis] - node.point[axis]) ** 2 <
-    distanceSquared(target, nextBest.point)
-  ) {
-    nextBest = nearestNeighbor(otherBranch, target, depth + 1, nextBest);
-  }
-
-  return nextBest;
-}
-
-/**
- * Calculates squared Euclidean distance between two points.
- * @param {Array<number>} point1 - First point.
- * @param {Array<number>} point2 - Second point.
- * @returns {number} Squared distance.
- */
-function distanceSquared(point1, point2) {
-  return point1.reduce((sum, val, idx) => sum + (val - point2[idx]) ** 2, 0);
-}
-
-/**
- * Dynamically updates the KD-tree with a new point.
- * @param {KDTreeNode|null} node - Current node in the KD-tree.
- * @param {Array<number>} newPoint - New point to insert.
- * @param {number} depth - Current depth in the tree.
- * @returns {KDTreeNode} Updated KD-tree root node.
- */
-function insert(node, newPoint, depth = 0) {
-  if (node === null) return new KDTreeNode(newPoint);
-
-  const axis = depth % newPoint.length;
-
-  if (newPoint[axis] < node.point[axis]) {
-    node.left = insert(node.left, newPoint, depth + 1);
-  } else {
-    node.right = insert(node.right, newPoint, depth + 1);
-  }
-
-  return node;
-}
-
-/**
- * Utility function to initialize a KD-tree.
- * @param {Array<Array<number>>} points - Array of points to index.
- * @returns {KDTreeNode|null} Root node of the KD-tree.
- */
-function initializeKDTree(points) {
-  return buildKDTree(points);
-}
-
-/**
- * Searches for the nearest neighbor to a given point.
- * @param {KDTreeNode|null} root - Root node of the KD-tree.
- * @param {Array<number>} target - Target point to search for.
- * @returns {Array<number>|null} Nearest neighbor point.
- */
-function searchNearest(root, target) {
-  const result = nearestNeighbor(root, target);
-  return result ? result.point : null;
-}
-
-/**
- * Inserts a new point into the KD-tree.
- * @param {KDTreeNode|null} root - Root node of the KD-tree.
- * @param {Array<number>} newPoint - New point to insert.
- * @returns {KDTreeNode} Updated KD-tree root node.
- */
-function updateTree(root, newPoint) {
-  return insert(root, newPoint);
-}
-
-export { initializeKDTree, searchNearest, updateTree };

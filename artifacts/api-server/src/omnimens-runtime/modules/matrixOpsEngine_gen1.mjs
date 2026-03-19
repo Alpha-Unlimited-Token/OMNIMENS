@@ -1,125 +1,118 @@
 /**
- * matrixOpsEngine - A module for efficient matrix operations using WebAssembly.
- * 
- * This module provides fast matrix multiplication and vector operations leveraging WebAssembly's SIMD capabilities.
- * It is designed to be used in Node.js 20+ environments.
- * 
  * @module matrixOpsEngine
+ * @description This module provides efficient matrix operations using WebAssembly for high-performance local computation of embeddings and neural network layers.
  */
 
-const fs = require('fs');
+const { readFile } = require('fs/promises');
 const path = require('path');
 
+let wasmInstance;
+
 /**
- * Load the WebAssembly binary file and initialize the module.
- * @async
- * @returns {Promise<WebAssembly.Instance>} The initialized WebAssembly instance.
+ * Initializes the WebAssembly module for matrix operations.
+ * Loads and compiles the WebAssembly binary.
+ * @returns {Promise<void>} Resolves when the WebAssembly module is ready.
  */
-async function initializeWasm() {
-  const wasmPath = path.resolve(__dirname, 'matrix_ops_engine.wasm');
-  const wasmBinary = await fs.promises.readFile(wasmPath);
-  const wasmModule = await WebAssembly.instantiate(wasmBinary);
-  return wasmModule.instance;
+export async function initializeWasm() {
+  const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = await readFile(wasmPath);
+  const wasmModule = await WebAssembly.compile(wasmBuffer);
+  const wasmEnv = {
+    env: {
+      memory: new WebAssembly.Memory({ initial: 256, maximum: 256 }),
+      abort: () => { throw new Error('WASM aborted'); }
+    }
+  };
+  wasmInstance = await WebAssembly.instantiate(wasmModule, wasmEnv);
 }
 
 /**
- * Perform matrix multiplication using WebAssembly.
- * @async
- * @param {number[][]} matrixA - The first matrix (2D array).
- * @param {number[][]} matrixB - The second matrix (2D array).
- * @returns {Promise<number[][]>} The resulting matrix after multiplication.
- * @throws {Error} If matrices are incompatible for multiplication.
+ * Multiplies two matrices using WebAssembly.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {number[][]} The resulting matrix after multiplication.
+ * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
  */
-async function multiplyMatrices(matrixA, matrixB) {
-  if (matrixA[0].length !== matrixB.length) {
-    throw new Error('Matrix dimensions are incompatible for multiplication.');
+export function multiplyMatrices(matrixA, matrixB) {
+  if (!wasmInstance) {
+    throw new Error('WASM module not initialized. Call initializeWasm() first.');
   }
 
-  const wasmInstance = await initializeWasm();
-  const { multiply_matrices } = wasmInstance.exports;
-
-  // Flatten matrices for WebAssembly input
   const rowsA = matrixA.length;
   const colsA = matrixA[0].length;
   const rowsB = matrixB.length;
   const colsB = matrixB[0].length;
 
-  const flatMatrixA = matrixA.flat();
-  const flatMatrixB = matrixB.flat();
-
-  // Allocate memory in WebAssembly
-  const memory = wasmInstance.exports.memory;
-  const matrixAOffset = wasmInstance.exports.allocate(rowsA * colsA);
-  const matrixBOffset = wasmInstance.exports.allocate(rowsB * colsB);
-  const resultOffset = wasmInstance.exports.allocate(rowsA * colsB);
-
-  const wasmMemory = new Float64Array(memory.buffer);
-
-  // Copy matrices to WebAssembly memory
-  wasmMemory.set(flatMatrixA, matrixAOffset / 8);
-  wasmMemory.set(flatMatrixB, matrixBOffset / 8);
-
-  // Perform multiplication
-  multiply_matrices(matrixAOffset, matrixBOffset, resultOffset, rowsA, colsA, colsB);
-
-  // Retrieve result from WebAssembly memory
-  const resultMatrix = [];
-  for (let i = 0; i < rowsA; i++) {
-    const row = wasmMemory.slice(resultOffset / 8 + i * colsB, resultOffset / 8 + (i + 1) * colsB);
-    resultMatrix.push(Array.from(row));
+  if (colsA !== rowsB) {
+    throw new Error('Matrix dimensions do not match for multiplication.');
   }
 
-  // Free allocated memory
-  wasmInstance.exports.free(matrixAOffset);
-  wasmInstance.exports.free(matrixBOffset);
-  wasmInstance.exports.free(resultOffset);
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
+  const result = new Array(rowsA * colsB).fill(0);
 
-  return resultMatrix;
+  const { multiply_matrices } = wasmInstance.exports;
+
+  const ptrA = wasmInstance.exports.malloc(flatA.length * 4);
+  const ptrB = wasmInstance.exports.malloc(flatB.length * 4);
+  const ptrResult = wasmInstance.exports.malloc(result.length * 4);
+
+  const memory = new Uint32Array(wasmInstance.exports.memory.buffer);
+  memory.set(flatA, ptrA / 4);
+  memory.set(flatB, ptrB / 4);
+
+  multiply_matrices(ptrA, rowsA, colsA, ptrB, rowsB, colsB, ptrResult);
+
+  const resultView = new Float32Array(wasmInstance.exports.memory.buffer, ptrResult, result.length);
+  const finalResult = [];
+  for (let i = 0; i < rowsA; i++) {
+    finalResult.push(Array.from(resultView.slice(i * colsB, (i + 1) * colsB)));
+  }
+
+  wasmInstance.exports.free(ptrA);
+  wasmInstance.exports.free(ptrB);
+  wasmInstance.exports.free(ptrResult);
+
+  return finalResult;
 }
 
 /**
- * Perform vector addition using WebAssembly.
- * @async
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {Promise<number[]>} The resulting vector after addition.
- * @throws {Error} If vectors are of different lengths.
+ * Multiplies a matrix and a vector using WebAssembly.
+ * @param {number[][]} matrix - The matrix.
+ * @param {number[]} vector - The vector.
+ * @returns {number[]} The resulting vector after multiplication.
+ * @throws {Error} If the matrix and vector dimensions do not align.
  */
-async function addVectors(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must be of the same length.');
-  }
-
-  const wasmInstance = await initializeWasm();
-  const { add_vectors } = wasmInstance.exports;
-
-  // Allocate memory in WebAssembly
-  const memory = wasmInstance.exports.memory;
-  const vectorAOffset = wasmInstance.exports.allocate(vectorA.length);
-  const vectorBOffset = wasmInstance.exports.allocate(vectorB.length);
-  const resultOffset = wasmInstance.exports.allocate(vectorA.length);
-
-  const wasmMemory = new Float64Array(memory.buffer);
-
-  // Copy vectors to WebAssembly memory
-  wasmMemory.set(vectorA, vectorAOffset / 8);
-  wasmMemory.set(vectorB, vectorBOffset / 8);
-
-  // Perform addition
-  add_vectors(vectorAOffset, vectorBOffset, resultOffset, vectorA.length);
-
-  // Retrieve result from WebAssembly memory
-  const resultVector = Array.from(wasmMemory.slice(resultOffset / 8, resultOffset / 8 + vectorA.length));
-
-  // Free allocated memory
-  wasmInstance.exports.free(vectorAOffset);
-  wasmInstance.exports.free(vectorBOffset);
-  wasmInstance.exports.free(resultOffset);
-
-  return resultVector;
+export function multiplyMatrixVector(matrix, vector) {
+  const vectorAsMatrix = vector.map(v => [v]);
+  const resultMatrix = multiplyMatrices(matrix, vectorAsMatrix);
+  return resultMatrix.map(row => row[0]);
 }
 
-module.exports = {
-  multiplyMatrices,
-  addVectors
-};
+/**
+ * Adds two vectors element-wise.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number[]} The resulting vector after addition.
+ * @throws {Error} If the vectors are not of the same length.
+ */
+export function addVectors(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must be of the same length for addition.');
+  }
+  return vectorA.map((val, idx) => val + vectorB[idx]);
+}
+
+/**
+ * Computes the dot product of two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} The dot product of the two vectors.
+ * @throws {Error} If the vectors are not of the same length.
+ */
+export function dotProduct(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must be of the same length for dot product.');
+  }
+  return vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
+}

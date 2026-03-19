@@ -1,130 +1,150 @@
 /**
  * @module vectorStoreMemory
- * @description Implements in-memory vector storage and retrieval using HNSW (Hierarchical Navigable Small World) algorithm for approximate nearest neighbor search.
+ * @description Provides an in-memory vector store for fast similarity searches and embeddings using KD-tree.
  */
 
 /**
- * Represents a node in the HNSW graph.
- * @class
+ * A class representing a node in the KD-tree.
  */
-class HNSWNode {
+class KDTreeNode {
   /**
-   * @param {number[]} vector - The vector associated with the node.
-   * @param {number} id - Unique identifier for the node.
+   * @param {number[]} point - The vector stored at this node.
+   * @param {number} axis - The axis used to split the space at this node.
    */
-  constructor(vector, id) {
-    this.vector = vector;
-    this.id = id;
-    this.neighbors = new Map(); // Level -> Array of neighbor node IDs
+  constructor(point, axis) {
+    this.point = point;
+    this.axis = axis;
+    this.left = null;
+    this.right = null;
   }
 }
 
 /**
- * A class implementing an HNSW-based in-memory vector store.
- * @class
+ * A class implementing a KD-tree for fast similarity search.
  */
-class VectorStore {
-  constructor() {
-    this.nodes = new Map(); // Map of node ID to HNSWNode
-    this.nextNodeId = 0; // Auto-incrementing node ID
-    this.maxNeighbors = 10; // Max neighbors per level
-  }
-
+class KDTree {
   /**
-   * Adds a vector to the store.
-   * @param {number[]} vector - The vector to add.
-   * @returns {number} The ID of the added vector.
+   * @param {number[][]} points - An array of vectors to build the KD-tree.
    */
-  addVector(vector) {
-    if (!Array.isArray(vector) || vector.length === 0) {
-      throw new Error("Vector must be a non-empty array of numbers.");
-    }
-
-    const id = this.nextNodeId++;
-    const newNode = new HNSWNode(vector, id);
-    this.nodes.set(id, newNode);
-
-    // Connect the new node to existing nodes based on similarity
-    this._connectNode(newNode);
-
-    return id;
+  constructor(points) {
+    this.root = this._buildTree(points, 0);
   }
 
   /**
-   * Finds the k nearest neighbors to a given vector.
-   * @param {number[]} queryVector - The vector to search for.
-   * @param {number} k - The number of neighbors to retrieve.
-   * @returns {Array<{id: number, distance: number}>} The k nearest neighbors with distances.
-   */
-  search(queryVector, k) {
-    if (!Array.isArray(queryVector) || queryVector.length === 0) {
-      throw new Error("Query vector must be a non-empty array of numbers.");
-    }
-    if (k <= 0) {
-      throw new Error("k must be a positive integer.");
-    }
-
-    const distances = [];
-
-    for (const node of this.nodes.values()) {
-      const distance = this._euclideanDistance(queryVector, node.vector);
-      distances.push({ id: node.id, distance });
-    }
-
-    distances.sort((a, b) => a.distance - b.distance);
-    return distances.slice(0, k);
-  }
-
-  /**
-   * Connects a new node to existing nodes based on similarity.
+   * Recursively builds the KD-tree.
    * @private
-   * @param {HNSWNode} newNode - The new node to connect.
+   * @param {number[][]} points - The points to build the tree from.
+   * @param {number} depth - The current depth in the tree.
+   * @returns {KDTreeNode|null} The root node of the subtree.
    */
-  _connectNode(newNode) {
-    const distances = [];
+  _buildTree(points, depth) {
+    if (points.length === 0) return null;
 
-    for (const node of this.nodes.values()) {
-      if (node.id !== newNode.id) {
-        const distance = this._euclideanDistance(newNode.vector, node.vector);
-        distances.push({ node, distance });
+    const axis = depth % points[0].length;
+    points.sort((a, b) => a[axis] - b[axis]);
+    const median = Math.floor(points.length / 2);
+
+    const node = new KDTreeNode(points[median], axis);
+    node.left = this._buildTree(points.slice(0, median), depth + 1);
+    node.right = this._buildTree(points.slice(median + 1), depth + 1);
+
+    return node;
+  }
+
+  /**
+   * Finds the nearest neighbor to a given vector.
+   * @param {number[]} target - The target vector to search for.
+   * @returns {Object} The nearest neighbor and its distance.
+   */
+  nearestNeighbor(target) {
+    let best = { node: null, distance: Infinity };
+
+    const _search = (node, depth) => {
+      if (!node) return;
+
+      const axis = depth % target.length;
+      const distance = this._euclideanDistance(target, node.point);
+
+      if (distance < best.distance) {
+        best = { node, distance };
       }
-    }
 
-    distances.sort((a, b) => a.distance - b.distance);
-    const neighbors = distances.slice(0, this.maxNeighbors).map(d => d.node);
+      const diff = target[axis] - node.point[axis];
+      const primary = diff <= 0 ? node.left : node.right;
+      const secondary = diff <= 0 ? node.right : node.left;
 
-    newNode.neighbors.set(0, neighbors.map(n => n.id));
-    for (const neighbor of neighbors) {
-      const levelNeighbors = neighbor.neighbors.get(0) || [];
-      if (levelNeighbors.length < this.maxNeighbors) {
-        levelNeighbors.push(newNode.id);
-        neighbor.neighbors.set(0, levelNeighbors);
+      _search(primary, depth + 1);
+
+      if (Math.abs(diff) < best.distance) {
+        _search(secondary, depth + 1);
       }
-    }
+    };
+
+    _search(this.root, 0);
+    return { point: best.node.point, distance: best.distance };
   }
 
   /**
    * Computes the Euclidean distance between two vectors.
    * @private
-   * @param {number[]} vec1 - The first vector.
-   * @param {number[]} vec2 - The second vector.
+   * @param {number[]} a - The first vector.
+   * @param {number[]} b - The second vector.
    * @returns {number} The Euclidean distance.
    */
-  _euclideanDistance(vec1, vec2) {
-    if (vec1.length !== vec2.length) {
-      throw new Error("Vectors must have the same dimensions.");
-    }
-
-    return Math.sqrt(vec1.reduce((sum, val, i) => sum + Math.pow(val - vec2[i], 2), 0));
+  _euclideanDistance(a, b) {
+    return Math.sqrt(a.reduce((sum, val, idx) => sum + (val - b[idx]) ** 2, 0));
   }
 }
 
 /**
- * Factory function to create a new VectorStore instance.
- * @returns {VectorStore} A new VectorStore instance.
+ * A utility class for managing an in-memory vector store.
  */
-function createVectorStore() {
-  return new VectorStore();
+export class VectorStore {
+  /**
+   * @constructor
+   */
+  constructor() {
+    this.vectors = [];
+    this.tree = null;
+  }
+
+  /**
+   * Adds a vector to the store.
+   * @param {number[]} vector - The vector to add.
+   */
+  addVector(vector) {
+    if (!Array.isArray(vector) || vector.some(isNaN)) {
+      throw new Error("Invalid vector: must be an array of numbers.");
+    }
+    this.vectors.push(vector);
+    this.tree = new KDTree(this.vectors);
+  }
+
+  /**
+   * Finds the nearest vector in the store to the target vector.
+   * @param {number[]} target - The target vector.
+   * @returns {Object} The nearest vector and its distance.
+   */
+  findNearest(target) {
+    if (!this.tree) {
+      throw new Error("Vector store is empty. Add vectors before searching.");
+    }
+    return this.tree.nearestNeighbor(target);
+  }
+
+  /**
+   * Clears all vectors from the store.
+   */
+  clear() {
+    this.vectors = [];
+    this.tree = null;
+  }
 }
 
-export { createVectorStore };
+/**
+ * Example usage:
+ * const store = new VectorStore();
+ * store.addVector([1, 2, 3]);
+ * store.addVector([4, 5, 6]);
+ * console.log(store.findNearest([3, 3, 3]));
+ */

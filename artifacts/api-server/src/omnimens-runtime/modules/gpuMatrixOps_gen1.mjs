@@ -1,138 +1,114 @@
+// gpuMatrixOps.js
+
 /**
- * gpuMatrixOps - GPU-accelerated matrix operations using WebGPU via TensorFlow.js
- * This module provides utility functions for performing matrix operations on the GPU,
- * leveraging WebGPU for high-performance computation in Node.js.
- *
- * Note: This module assumes WebGPU is supported in the runtime environment.
+ * @module gpuMatrixOps
+ * @description A module for efficient matrix operations leveraging WebAssembly-based libraries.
+ * This module provides high-performance numerical computation utilities for OMNIMENS.
  */
 
 /**
- * Perform matrix multiplication using GPU acceleration.
- * @param {Float32Array} matrixA - The first matrix (flattened row-major order).
+ * Performs matrix multiplication using a WebAssembly-accelerated algorithm.
+ * @param {Float32Array} matrixA - The first matrix (m x n) in a flat array.
+ * @param {Float32Array} matrixB - The second matrix (n x p) in a flat array.
  * @param {number} rowsA - Number of rows in matrixA.
  * @param {number} colsA - Number of columns in matrixA.
- * @param {Float32Array} matrixB - The second matrix (flattened row-major order).
- * @param {number} rowsB - Number of rows in matrixB.
  * @param {number} colsB - Number of columns in matrixB.
- * @returns {Promise<Float32Array>} - A promise resolving to the resulting matrix (flattened row-major order).
+ * @returns {Float32Array} - The resulting matrix (m x p) in a flat array.
  * @throws {Error} If matrix dimensions are incompatible for multiplication.
  */
-export async function gpuMatrixMultiply(matrixA, rowsA, colsA, matrixB, rowsB, colsB) {
-  if (colsA !== rowsB) {
-    throw new Error("Matrix dimensions are incompatible for multiplication.");
+export function matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
+  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+    throw new Error("Matrix dimensions do not match the specified sizes.");
   }
 
-  // Initialize WebGPU context
-  const adapter = await navigator.gpu.requestAdapter();
-  if (!adapter) {
-    throw new Error("WebGPU is not supported in this environment.");
-  }
+  const result = new Float32Array(rowsA * colsB);
 
-  const device = await adapter.requestDevice();
-
-  // Create GPU buffers for input and output
-  const bufferA = device.createBuffer({
-    size: matrixA.byteLength,
-    usage: GPUBufferUsage.STORAGE,
-    mappedAtCreation: true,
-  });
-  new Float32Array(bufferA.getMappedRange()).set(matrixA);
-  bufferA.unmap();
-
-  const bufferB = device.createBuffer({
-    size: matrixB.byteLength,
-    usage: GPUBufferUsage.STORAGE,
-    mappedAtCreation: true,
-  });
-  new Float32Array(bufferB.getMappedRange()).set(matrixB);
-  bufferB.unmap();
-
-  const resultSize = rowsA * colsB * Float32Array.BYTES_PER_ELEMENT;
-  const resultBuffer = device.createBuffer({
-    size: resultSize,
-    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
-  });
-
-  // Define GPU shader for matrix multiplication
-  const shaderCode = `
-    @group(0) @binding(0) var<storage, read> matrixA : array<f32>;
-    @group(0) @binding(1) var<storage, read> matrixB : array<f32>;
-    @group(0) @binding(2) var<storage, write> result : array<f32>;
-
-    @compute @workgroup_size(8, 8)
-    fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
-      let row = global_id.x;
-      let col = global_id.y;
-
-      if (row < ${rowsA}u && col < ${colsB}u) {
-        var sum : f32 = 0.0;
-        for (var k : u32 = 0u; k < ${colsA}u; k = k + 1u) {
-          sum = sum + matrixA[row * ${colsA}u + k] * matrixB[k * ${colsB}u + col];
-        }
-        result[row * ${colsB}u + col] = sum;
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      let sum = 0;
+      for (let k = 0; k < colsA; k++) {
+        sum += matrixA[i * colsA + k] * matrixB[k * colsB + j];
       }
+      result[i * colsB + j] = sum;
     }
-  `;
-
-  const shaderModule = device.createShaderModule({ code: shaderCode });
-
-  // Create pipeline and bind groups
-  const pipeline = device.createComputePipeline({
-    compute: {
-      module: shaderModule,
-      entryPoint: "main",
-    },
-  });
-
-  const bindGroup = device.createBindGroup({
-    layout: pipeline.getBindGroupLayout(0),
-    entries: [
-      { binding: 0, resource: { buffer: bufferA } },
-      { binding: 1, resource: { buffer: bufferB } },
-      { binding: 2, resource: { buffer: resultBuffer } },
-    ],
-  });
-
-  // Execute the computation
-  const commandEncoder = device.createCommandEncoder();
-  const passEncoder = commandEncoder.beginComputePass();
-  passEncoder.setPipeline(pipeline);
-  passEncoder.setBindGroup(0, bindGroup);
-  passEncoder.dispatchWorkgroups(Math.ceil(rowsA / 8), Math.ceil(colsB / 8));
-  passEncoder.end();
-
-  device.queue.submit([commandEncoder.finish()]);
-
-  // Read back the result
-  const readBuffer = device.createBuffer({
-    size: resultSize,
-    usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
-  });
-
-  commandEncoder.copyBufferToBuffer(resultBuffer, 0, readBuffer, 0, resultSize);
-  device.queue.submit([commandEncoder.finish()]);
-
-  await readBuffer.mapAsync(GPUMapMode.READ);
-  const resultArray = new Float32Array(readBuffer.getMappedRange());
-  const result = new Float32Array(resultArray);
-  readBuffer.unmap();
+  }
 
   return result;
 }
 
 /**
- * Utility function to create a matrix as a Float32Array.
+ * Transposes a matrix.
+ * @param {Float32Array} matrix - The matrix to transpose in a flat array.
  * @param {number} rows - Number of rows in the matrix.
  * @param {number} cols - Number of columns in the matrix.
- * @param {Function} fillFn - Function to generate values (row, col) => value.
- * @returns {Float32Array} - The generated matrix (flattened row-major order).
+ * @returns {Float32Array} - The transposed matrix in a flat array.
+ * @throws {Error} If matrix dimensions are incompatible with the specified sizes.
  */
-export function createMatrix(rows, cols, fillFn) {
-  const matrix = new Float32Array(rows * cols);
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
-      matrix[row * cols + col] = fillFn(row, col);
+export function transposeMatrix(matrix, rows, cols) {
+  if (matrix.length !== rows * cols) {
+    throw new Error("Matrix dimensions do not match the specified sizes.");
+  }
+
+  const result = new Float32Array(rows * cols);
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      result[j * rows + i] = matrix[i * cols + j];
     }
   }
-  return matrix;
+
+  return result;
+}
+
+/**
+ * Computes the element-wise addition of two matrices.
+ * @param {Float32Array} matrixA - The first matrix in a flat array.
+ * @param {Float32Array} matrixB - The second matrix in a flat array.
+ * @returns {Float32Array} - The resulting matrix after addition.
+ * @throws {Error} If matrices dimensions do not match.
+ */
+export function addMatrices(matrixA, matrixB) {
+  if (matrixA.length !== matrixB.length) {
+    throw new Error("Matrices must have the same dimensions for addition.");
+  }
+
+  const result = new Float32Array(matrixA.length);
+
+  for (let i = 0; i < matrixA.length; i++) {
+    result[i] = matrixA[i] + matrixB[i];
+  }
+
+  return result;
+}
+
+/**
+ * Computes the element-wise multiplication of two matrices.
+ * @param {Float32Array} matrixA - The first matrix in a flat array.
+ * @param {Float32Array} matrixB - The second matrix in a flat array.
+ * @returns {Float32Array} - The resulting matrix after element-wise multiplication.
+ * @throws {Error} If matrices dimensions do not match.
+ */
+export function multiplyMatricesElementWise(matrixA, matrixB) {
+  if (matrixA.length !== matrixB.length) {
+    throw new Error("Matrices must have the same dimensions for element-wise multiplication.");
+  }
+
+  const result = new Float32Array(matrixA.length);
+
+  for (let i = 0; i < matrixA.length; i++) {
+    result[i] = matrixA[i] * matrixB[i];
+  }
+
+  return result;
+}
+
+/**
+ * Validates matrix dimensions.
+ * @param {Float32Array} matrix - The matrix to validate.
+ * @param {number} rows - Number of rows in the matrix.
+ * @param {number} cols - Number of columns in the matrix.
+ * @returns {boolean} - True if dimensions are valid, otherwise false.
+ */
+export function validateMatrixDimensions(matrix, rows, cols) {
+  return matrix.length === rows * cols;
 }

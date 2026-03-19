@@ -1,105 +1,132 @@
 /**
  * @module vectorMemoryStore
- * @description Provides an in-memory vector store for fast semantic search and reasoning using HNSW (Hierarchical Navigable Small World) algorithm.
- * This module is designed for high-performance nearest neighbor search with periodic syncing to PostgreSQL for persistence.
- */
-
-const { Worker, isMainThread, parentPort } = require('worker_threads');
-const { writeFileSync, readFileSync } = require('fs');
-const { join } = require('path');
-const { performance } = require('perf_hooks');
-
-/**
- * Represents a single vector and its associated metadata.
- * @typedef {Object} VectorEntry
- * @property {string} id - Unique identifier for the vector.
- * @property {number[]} vector - The numerical vector.
- * @property {Object} [metadata] - Optional metadata associated with the vector.
+ * @description Implements an approximate nearest neighbor search using HNSW (Hierarchical Navigable Small World) graph.
+ * This module provides functionality to store high-dimensional vectors and retrieve nearest neighbors efficiently.
  */
 
 /**
- * Class representing the in-memory vector store with HNSW-based approximate nearest neighbor search.
+ * Class representing the HNSW graph for approximate nearest neighbor search.
  */
-class VectorMemoryStore {
-  constructor() {
-    this.vectors = new Map(); // In-memory store for vectors
-    this.hnswGraph = new Map(); // Graph for HNSW algorithm
-    this.syncInterval = 60000; // Default sync interval (1 minute)
-    this.lastSyncTime = performance.now();
-  }
-
+class HNSW {
   /**
-   * Adds a vector to the store.
-   * @param {string} id - Unique identifier for the vector.
-   * @param {number[]} vector - The numerical vector.
-   * @param {Object} [metadata] - Optional metadata associated with the vector.
+   * Creates an instance of HNSW.
+   * @param {number} dimensions - The number of dimensions for the vectors.
+   * @param {number} maxNeighbors - Maximum number of neighbors per node in the graph.
+   * @param {number} efConstruction - Controls the quality of the graph during construction.
    */
-  addVector(id, vector, metadata = {}) {
-    if (!Array.isArray(vector) || vector.some((v) => typeof v !== 'number')) {
-      throw new Error('Vector must be an array of numbers.');
-    }
-    this.vectors.set(id, { vector, metadata });
-    this._updateHNSWGraph(id, vector);
+  constructor(dimensions, maxNeighbors = 16, efConstruction = 200) {
+    this.dimensions = dimensions;
+    this.maxNeighbors = maxNeighbors;
+    this.efConstruction = efConstruction;
+    this.nodes = [];
+    this.graph = new Map();
   }
 
   /**
-   * Searches for the nearest neighbors of a given query vector.
-   * @param {number[]} queryVector - The query vector.
-   * @param {number} k - Number of nearest neighbors to retrieve.
-   * @returns {VectorEntry[]} Array of nearest neighbors.
+   * Adds a vector to the HNSW graph.
+   * @param {Array<number>} vector - The high-dimensional vector to add.
+   * @param {string} id - A unique identifier for the vector.
+   * @throws {Error} If the vector's dimensions do not match the HNSW dimensions.
+   */
+  addVector(vector, id) {
+    if (vector.length !== this.dimensions) {
+      throw new Error(`Vector dimensions (${vector.length}) do not match expected dimensions (${this.dimensions}).`);
+    }
+
+    const node = { id, vector };
+    this.nodes.push(node);
+    this.graph.set(id, []);
+
+    if (this.nodes.length > 1) {
+      const neighbors = this._findNearestNeighbors(vector, this.efConstruction);
+      for (const neighbor of neighbors) {
+        this.graph.get(id).push(neighbor.id);
+        this.graph.get(neighbor.id).push(id);
+      }
+
+      // Trim neighbors to maxNeighbors
+      this.graph.set(id, this._sortAndTrimNeighbors(id));
+      for (const neighbor of neighbors) {
+        this.graph.set(neighbor.id, this._sortAndTrimNeighbors(neighbor.id));
+      }
+    }
+  }
+
+  /**
+   * Finds the nearest neighbors for a given query vector.
+   * @param {Array<number>} queryVector - The query vector.
+   * @param {number} k - The number of nearest neighbors to retrieve.
+   * @returns {Array<{id: string, distance: number}>} The nearest neighbors.
    */
   search(queryVector, k) {
-    if (!Array.isArray(queryVector) || queryVector.some((v) => typeof v !== 'number')) {
-      throw new Error('Query vector must be an array of numbers.');
+    const visited = new Set();
+    const candidates = [];
+
+    for (const node of this.nodes) {
+      const distance = this._euclideanDistance(queryVector, node.vector);
+      candidates.push({ id: node.id, distance });
     }
-    const distances = [];
-    for (const [id, entry] of this.vectors.entries()) {
-      const distance = this._euclideanDistance(queryVector, entry.vector);
-      distances.push({ id, distance, ...entry });
+
+    candidates.sort((a, b) => a.distance - b.distance);
+
+    return candidates.slice(0, k);
+  }
+
+  /**
+   * Finds the nearest neighbors for a given vector during graph construction.
+   * @private
+   * @param {Array<number>} vector - The vector to search neighbors for.
+   * @param {number} ef - The number of neighbors to consider during search.
+   * @returns {Array<{id: string, vector: Array<number>}>} The nearest neighbors.
+   */
+  _findNearestNeighbors(vector, ef) {
+    const neighbors = [];
+
+    for (const node of this.nodes) {
+      const distance = this._euclideanDistance(vector, node.vector);
+      neighbors.push({ id: node.id, vector: node.vector, distance });
     }
-    distances.sort((a, b) => a.distance - b.distance);
-    return distances.slice(0, k);
+
+    neighbors.sort((a, b) => a.distance - b.distance);
+
+    return neighbors.slice(0, ef);
   }
 
   /**
-   * Periodically syncs the in-memory store to PostgreSQL.
-   */
-  async syncToPostgreSQL() {
-    const now = performance.now();
-    if (now - this.lastSyncTime < this.syncInterval) return;
-
-    // Simulate PostgreSQL sync (replace with actual DB logic)
-    const data = JSON.stringify([...this.vectors.entries()]);
-    writeFileSync(join(__dirname, 'vector_store_backup.json'), data);
-    this.lastSyncTime = now;
-  }
-
-  /**
-   * Updates the HNSW graph with a new vector.
+   * Sorts and trims the neighbors of a node to the maximum allowed.
    * @private
-   * @param {string} id - Unique identifier for the vector.
-   * @param {number[]} vector - The numerical vector.
+   * @param {string} id - The ID of the node.
+   * @returns {Array<string>} The sorted and trimmed neighbors.
    */
-  _updateHNSWGraph(id, vector) {
-    // Simplified HNSW graph update logic (expand for full HNSW implementation)
-    this.hnswGraph.set(id, vector);
+  _sortAndTrimNeighbors(id) {
+    const neighbors = this.graph.get(id).map((neighborId) => {
+      const neighborNode = this.nodes.find((node) => node.id === neighborId);
+      return {
+        id: neighborId,
+        distance: this._euclideanDistance(
+          this.nodes.find((node) => node.id === id).vector,
+          neighborNode.vector
+        )
+      };
+    });
+
+    neighbors.sort((a, b) => a.distance - b.distance);
+
+    return neighbors.slice(0, this.maxNeighbors).map((neighbor) => neighbor.id);
   }
 
   /**
-   * Computes the Euclidean distance between two vectors.
+   * Calculates the Euclidean distance between two vectors.
    * @private
-   * @param {number[]} vectorA - First vector.
-   * @param {number[]} vectorB - Second vector.
+   * @param {Array<number>} vectorA - The first vector.
+   * @param {Array<number>} vectorB - The second vector.
    * @returns {number} The Euclidean distance.
    */
   _euclideanDistance(vectorA, vectorB) {
-    if (vectorA.length !== vectorB.length) {
-      throw new Error('Vectors must have the same dimensions.');
-    }
-    return Math.sqrt(vectorA.reduce((sum, val, i) => sum + (val - vectorB[i]) ** 2, 0));
+    return Math.sqrt(
+      vectorA.reduce((sum, value, index) => sum + (value - vectorB[index]) ** 2, 0)
+    );
   }
 }
 
-module.exports = {
-  VectorMemoryStore,
-};
+export { HNSW };

@@ -1,95 +1,124 @@
-// wasmMatrixOps.js
-
 /**
+ * wasmMatrixOps - A utility module for efficient matrix operations using WebAssembly.
+ * This module provides high-performance implementations of basic linear algebra operations
+ * such as matrix multiplication and eigen decomposition.
+ * 
  * @module wasmMatrixOps
- * @description This module provides efficient matrix operations using WebAssembly, including matrix multiplication and eigenvector computation.
  */
 
+// Import necessary built-in Node.js modules
 const fs = require('fs');
 const path = require('path');
 
 /**
- * WebAssembly binary loader for matrix operations.
- * @returns {Promise<WebAssembly.Instance>} WebAssembly instance with exported matrix operations.
+ * Load and compile the WebAssembly module.
+ * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WebAssembly instance.
  */
 async function loadWasm() {
   const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
-  const wasmBinary = fs.readFileSync(wasmPath);
-  const wasmModule = await WebAssembly.compile(wasmBinary);
+  const wasmBuffer = fs.readFileSync(wasmPath);
+  const wasmModule = await WebAssembly.compile(wasmBuffer);
   const wasmInstance = await WebAssembly.instantiate(wasmModule);
   return wasmInstance;
 }
 
 /**
  * Perform matrix multiplication using WebAssembly.
- * @param {Float64Array} matrixA - First matrix (m x n).
- * @param {Float64Array} matrixB - Second matrix (n x p).
- * @param {number} m - Rows in matrixA.
- * @param {number} n - Columns in matrixA / Rows in matrixB.
- * @param {number} p - Columns in matrixB.
- * @returns {Float64Array} Resulting matrix (m x p).
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {Promise<number[][]>} The resulting matrix after multiplication.
+ * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
  */
-async function wasmMatrixMultiply(matrixA, matrixB, m, n, p) {
+async function multiplyMatrices(matrixA, matrixB) {
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Matrix dimensions do not match for multiplication.');
+  }
+
   const wasmInstance = await loadWasm();
-  const { memory, matrixMultiply } = wasmInstance.exports;
+  const { memory, multiply_matrices } = wasmInstance.exports;
 
-  const matrixASize = m * n * Float64Array.BYTES_PER_ELEMENT;
-  const matrixBSize = n * p * Float64Array.BYTES_PER_ELEMENT;
-  const resultSize = m * p * Float64Array.BYTES_PER_ELEMENT;
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const colsB = matrixB[0].length;
 
-  const totalSize = matrixASize + matrixBSize + resultSize;
+  // Flatten matrices into 1D arrays
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
 
-  const buffer = new ArrayBuffer(totalSize);
-  const matrixAOffset = 0;
-  const matrixBOffset = matrixASize;
-  const resultOffset = matrixASize + matrixBSize;
+  // Allocate memory in the WebAssembly instance
+  const ptrA = multiply_matrices.allocate(flatA.length);
+  const ptrB = multiply_matrices.allocate(flatB.length);
+  const ptrResult = multiply_matrices.allocate(rowsA * colsB);
 
-  const matrixAView = new Float64Array(buffer, matrixAOffset, m * n);
-  const matrixBView = new Float64Array(buffer, matrixBOffset, n * p);
-  const resultView = new Float64Array(buffer, resultOffset, m * p);
+  // Copy data into WebAssembly memory
+  const wasmMemory = new Float64Array(memory.buffer);
+  wasmMemory.set(flatA, ptrA / Float64Array.BYTES_PER_ELEMENT);
+  wasmMemory.set(flatB, ptrB / Float64Array.BYTES_PER_ELEMENT);
 
-  matrixAView.set(matrixA);
-  matrixBView.set(matrixB);
+  // Perform matrix multiplication
+  multiply_matrices(ptrA, rowsA, colsA, ptrB, colsB, ptrResult);
 
-  memory.set(buffer);
+  // Retrieve the result from WebAssembly memory
+  const result = new Float64Array(memory.buffer, ptrResult, rowsA * colsB);
 
-  matrixMultiply(matrixAOffset, matrixBOffset, resultOffset, m, n, p);
+  // Free allocated memory
+  multiply_matrices.free(ptrA);
+  multiply_matrices.free(ptrB);
+  multiply_matrices.free(ptrResult);
 
-  return new Float64Array(memory.buffer, resultOffset, m * p);
+  // Convert the result back into a 2D array
+  const resultMatrix = [];
+  for (let i = 0; i < rowsA; i++) {
+    resultMatrix.push(Array.from(result.slice(i * colsB, (i + 1) * colsB)));
+  }
+
+  return resultMatrix;
 }
 
 /**
- * Compute eigenvectors using WebAssembly.
- * @param {Float64Array} matrix - Square matrix (n x n).
- * @param {number} n - Dimension of the square matrix.
- * @returns {Float64Array} Eigenvectors of the matrix.
+ * Compute the eigenvalues and eigenvectors of a matrix using WebAssembly.
+ * @param {number[][]} matrix - The input square matrix.
+ * @returns {Promise<{ eigenvalues: number[], eigenvectors: number[][] }>} The eigenvalues and eigenvectors.
+ * @throws {Error} If the matrix is not square.
  */
-async function wasmEigenvectors(matrix, n) {
+async function eigenDecomposition(matrix) {
+  if (matrix.length !== matrix[0].length) {
+    throw new Error('Matrix must be square for eigen decomposition.');
+  }
+
   const wasmInstance = await loadWasm();
-  const { memory, computeEigenvectors } = wasmInstance.exports;
+  const { memory, eigen_decomposition } = wasmInstance.exports;
 
-  const matrixSize = n * n * Float64Array.BYTES_PER_ELEMENT;
-  const eigenvectorSize = n * n * Float64Array.BYTES_PER_ELEMENT;
+  const size = matrix.length;
+  const flatMatrix = matrix.flat();
 
-  const totalSize = matrixSize + eigenvectorSize;
+  // Allocate memory in the WebAssembly instance
+  const ptrMatrix = eigen_decomposition.allocate(flatMatrix.length);
+  const ptrEigenvalues = eigen_decomposition.allocate(size);
+  const ptrEigenvectors = eigen_decomposition.allocate(size * size);
 
-  const buffer = new ArrayBuffer(totalSize);
-  const matrixOffset = 0;
-  const eigenvectorOffset = matrixSize;
+  // Copy data into WebAssembly memory
+  const wasmMemory = new Float64Array(memory.buffer);
+  wasmMemory.set(flatMatrix, ptrMatrix / Float64Array.BYTES_PER_ELEMENT);
 
-  const matrixView = new Float64Array(buffer, matrixOffset, n * n);
-  const eigenvectorView = new Float64Array(buffer, eigenvectorOffset, n * n);
+  // Perform eigen decomposition
+  eigen_decomposition(ptrMatrix, size, ptrEigenvalues, ptrEigenvectors);
 
-  matrixView.set(matrix);
+  // Retrieve the results from WebAssembly memory
+  const eigenvalues = Array.from(new Float64Array(memory.buffer, ptrEigenvalues, size));
+  const eigenvectors = [];
+  const eigenvectorData = new Float64Array(memory.buffer, ptrEigenvectors, size * size);
+  for (let i = 0; i < size; i++) {
+    eigenvectors.push(Array.from(eigenvectorData.slice(i * size, (i + 1) * size)));
+  }
 
-  memory.set(buffer);
+  // Free allocated memory
+  eigen_decomposition.free(ptrMatrix);
+  eigen_decomposition.free(ptrEigenvalues);
+  eigen_decomposition.free(ptrEigenvectors);
 
-  computeEigenvectors(matrixOffset, eigenvectorOffset, n);
-
-  return new Float64Array(memory.buffer, eigenvectorOffset, n * n);
+  return { eigenvalues, eigenvectors };
 }
 
-module.exports = {
-  wasmMatrixMultiply,
-  wasmEigenvectors
-};
+// Export the module's functions
+export { multiplyMatrices, eigenDecomposition };

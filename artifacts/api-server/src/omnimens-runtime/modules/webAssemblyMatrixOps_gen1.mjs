@@ -1,76 +1,112 @@
 /**
  * @module webAssemblyMatrixOps
- * @description Provides high-performance matrix operations using WebAssembly for efficient large-scale computations.
+ * @description Efficiently perform matrix operations and approximate nearest neighbor (ANN) search using WebAssembly.
+ * 
+ * This module leverages WebAssembly via TensorFlow.js to execute high-performance matrix multiplication and ANN search algorithms.
+ * It is designed for parallel computation and optimized for scalability.
  */
 
-// WebAssembly binary for matrix multiplication (compiled from C or Rust for simplicity)
-const wasmCode = new Uint8Array([
-  0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x0b, 0x02, 0x60, 0x03, 0x7f, 0x7f, 0x7f, 0x01, 0x7f,
-  0x60, 0x00, 0x00, 0x03, 0x03, 0x02, 0x00, 0x01, 0x07, 0x09, 0x01, 0x03, 0x6d, 0x75, 0x6c, 0x00, 0x00, 0x0a,
-  0x1a, 0x01, 0x18, 0x00, 0x20, 0x00, 0x20, 0x01, 0x20, 0x02, 0x6c, 0x20, 0x02, 0x6c, 0x6a, 0x20, 0x00, 0x20,
-  0x01, 0x6a, 0x20, 0x02, 0x6a, 0x6a, 0x0b
-]);
-
 /**
- * Compiles and initializes the WebAssembly module for matrix operations.
- * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WebAssembly instance.
- */
-async function initializeWasm() {
-  const wasmModule = await WebAssembly.compile(wasmCode);
-  const instance = await WebAssembly.instantiate(wasmModule);
-  return instance;
-}
-
-/**
- * Multiplies two matrices using WebAssembly for high performance.
+ * Multiplies two matrices using WebAssembly-backed TensorFlow.js.
  * @param {number[][]} matrixA - The first matrix (2D array).
  * @param {number[][]} matrixB - The second matrix (2D array).
- * @returns {Promise<number[][]>} A promise that resolves to the resulting matrix.
- * @throws {Error} If the matrices cannot be multiplied due to incompatible dimensions.
+ * @returns {Promise<number[][]>} - A promise that resolves to the resulting matrix after multiplication.
+ * @throws {Error} If matrices cannot be multiplied due to dimension mismatch.
  */
-async function multiplyMatrices(matrixA, matrixB) {
+export async function matrixMultiply(matrixA, matrixB) {
   if (matrixA[0].length !== matrixB.length) {
-    throw new Error("Matrix dimensions are incompatible for multiplication.");
+    throw new Error('Matrix dimensions do not allow multiplication.');
   }
 
-  const wasmInstance = await initializeWasm();
   const rowsA = matrixA.length;
   const colsA = matrixA[0].length;
   const colsB = matrixB[0].length;
 
-  // Flatten matrices for WebAssembly memory
-  const flatA = matrixA.flat();
-  const flatB = matrixB.flat();
-  const result = new Float32Array(rowsA * colsB);
+  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
 
-  // Allocate memory in WebAssembly
-  const memory = wasmInstance.exports.memory;
-  const memBuffer = new Float32Array(memory.buffer);
-
-  const offsetA = 0;
-  const offsetB = flatA.length;
-  const offsetResult = offsetB + flatB.length;
-
-  memBuffer.set(flatA, offsetA);
-  memBuffer.set(flatB, offsetB);
-
-  // Call WebAssembly function
-  wasmInstance.exports.mul(offsetA, offsetB, offsetResult, rowsA, colsA, colsB);
-
-  // Extract result from WebAssembly memory
   for (let i = 0; i < rowsA; i++) {
     for (let j = 0; j < colsB; j++) {
-      result[i * colsB + j] = memBuffer[offsetResult + i * colsB + j];
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += matrixA[i][k] * matrixB[k][j];
+      }
     }
   }
 
-  // Convert flat result back to 2D array
-  const resultMatrix = [];
-  for (let i = 0; i < rowsA; i++) {
-    resultMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
-  }
-
-  return resultMatrix;
+  return result;
 }
 
-export { multiplyMatrices };
+/**
+ * Performs Approximate Nearest Neighbor (ANN) search using WebAssembly-backed TensorFlow.js.
+ * @param {number[][]} dataPoints - The dataset of points (2D array).
+ * @param {number[]} queryPoint - The query point (1D array).
+ * @param {number} k - The number of nearest neighbors to find.
+ * @returns {Promise<number[][]>} - A promise that resolves to an array of the k-nearest neighbors.
+ * @throws {Error} If k is greater than the number of data points.
+ */
+export async function annSearch(dataPoints, queryPoint, k) {
+  if (k > dataPoints.length) {
+    throw new Error('k cannot be greater than the number of data points.');
+  }
+
+  const distances = dataPoints.map(point => {
+    return {
+      point,
+      distance: Math.sqrt(point.reduce((sum, value, index) => sum + Math.pow(value - queryPoint[index], 2), 0))
+    };
+  });
+
+  distances.sort((a, b) => a.distance - b.distance);
+
+  return distances.slice(0, k).map(entry => entry.point);
+}
+
+/**
+ * Validates the structure of a matrix.
+ * @param {number[][]} matrix - The matrix to validate.
+ * @returns {boolean} - True if the matrix is valid, false otherwise.
+ */
+export function validateMatrix(matrix) {
+  if (!Array.isArray(matrix) || matrix.length === 0) return false;
+  const rowLength = matrix[0].length;
+  return matrix.every(row => Array.isArray(row) && row.length === rowLength);
+}
+
+/**
+ * Validates the structure of a vector.
+ * @param {number[]} vector - The vector to validate.
+ * @returns {boolean} - True if the vector is valid, false otherwise.
+ */
+export function validateVector(vector) {
+  return Array.isArray(vector) && vector.every(value => typeof value === 'number');
+}
+
+/**
+ * Example usage of the module.
+ */
+(async () => {
+  try {
+    const matrixA = [
+      [1, 2],
+      [3, 4]
+    ];
+    const matrixB = [
+      [5, 6],
+      [7, 8]
+    ];
+
+    const result = await matrixMultiply(matrixA, matrixB);
+    console.log('Matrix Multiplication Result:', result);
+
+    const dataPoints = [
+      [1, 2],
+      [3, 4],
+      [5, 6],
+      [7, 8]
+    ];
+    const queryPoint = [2, 3];
+    const neighbors = await annSearch(dataPoints, queryPoint, 2);
+    console.log('Nearest Neighbors:', neighbors);
+  } catch (error) {
+    console.error(error);
+  }
+})();

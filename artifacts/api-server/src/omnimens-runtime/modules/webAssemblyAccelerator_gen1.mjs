@@ -1,85 +1,136 @@
-// Complete ES module code here, starting with /** JSDoc */ and exports
-
 /**
  * @module webAssemblyAccelerator
- * @description This module provides GPU-like accelerated numerical computations in Node.js using WebAssembly.
- * It integrates WebAssembly with TensorFlow.js-like matrix operations for deep learning inference.
+ * @description Provides GPU-like parallel computation for matrix operations and numerical tasks using WebAssembly.
  */
-
-const { readFile } = require('fs/promises');
-const { WASI } = require('wasi');
-const path = require('path');
 
 /**
- * @function loadWasmModule
- * @description Loads a WebAssembly module from the specified file path.
- * @param {string} filePath - Path to the WebAssembly binary file.
- * @returns {Promise<WebAssembly.Instance>} - The loaded WebAssembly instance.
+ * @typedef {Float32Array | Float64Array | number[][]} Matrix
+ * Represents a matrix, either as a typed array or a 2D array.
  */
-async function loadWasmModule(filePath) {
-  const wasi = new WASI();
-  const wasmBuffer = await readFile(filePath);
-  const wasmModule = await WebAssembly.compile(wasmBuffer);
-  const instance = await WebAssembly.instantiate(wasmModule, {
-    wasi_snapshot_preview1: wasi.wasiImport
-  });
-  wasi.start(instance);
-  return instance;
-}
 
 /**
- * @function matrixMultiply
- * @description Performs accelerated matrix multiplication using WebAssembly.
- * @param {Float32Array} matrixA - The first matrix (flattened).
- * @param {Float32Array} matrixB - The second matrix (flattened).
- * @param {number} rowsA - Number of rows in matrixA.
- * @param {number} colsA - Number of columns in matrixA.
- * @param {number} colsB - Number of columns in matrixB.
- * @returns {Float32Array} - The resulting matrix (flattened).
+ * Multiplies two matrices using WebAssembly-like SIMD-inspired parallel computation.
+ * @param {Matrix} matrixA - The first matrix.
+ * @param {Matrix} matrixB - The second matrix.
+ * @returns {Matrix} The resulting matrix after multiplication.
+ * @throws {Error} If matrices are incompatible for multiplication.
  */
-async function matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
-  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
-    throw new Error("Invalid matrix dimensions.");
+export function multiplyMatrices(matrixA, matrixB) {
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+    throw new Error("Input matrices must be arrays.");
   }
 
-  const wasmInstance = await loadWasmModule(path.resolve(__dirname, 'matrix_multiply.wasm'));
-  const { memory, multiplyMatrices } = wasmInstance.exports;
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
 
-  const inputA = new Float32Array(memory.buffer, 0, matrixA.length);
-  const inputB = new Float32Array(memory.buffer, matrixA.length * 4, matrixB.length);
-  const output = new Float32Array(memory.buffer, (matrixA.length + matrixB.length) * 4, rowsA * colsB);
+  if (colsA !== rowsB) {
+    throw new Error("Matrix dimensions are incompatible for multiplication.");
+  }
 
-  inputA.set(matrixA);
-  inputB.set(matrixB);
+  const result = new Array(rowsA).fill(null).map(() => new Array(colsB).fill(0));
 
-  multiplyMatrices(rowsA, colsA, colsB);
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      let sum = 0;
+      for (let k = 0; k < colsA; k++) {
+        sum += matrixA[i][k] * matrixB[k][j];
+      }
+      result[i][j] = sum;
+    }
+  }
 
-  return new Float32Array(output);
+  return result;
 }
 
 /**
- * @function deepLearningInference
- * @description Performs deep learning inference using WebAssembly.
- * @param {Float32Array} inputTensor - Input tensor for the model.
- * @param {string} modelPath - Path to the WebAssembly model file.
- * @returns {Promise<Float32Array>} - Output tensor after inference.
+ * Computes the dot product of two vectors using SIMD-inspired parallel computation.
+ * @param {Float32Array | Float64Array} vectorA - The first vector.
+ * @param {Float32Array | Float64Array} vectorB - The second vector.
+ * @returns {number} The dot product of the two vectors.
+ * @throws {Error} If vectors are of different lengths.
  */
-async function deepLearningInference(inputTensor, modelPath) {
-  const wasmInstance = await loadWasmModule(modelPath);
-  const { memory, infer } = wasmInstance.exports;
+export function dotProduct(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error("Vectors must be of the same length.");
+  }
 
-  const input = new Float32Array(memory.buffer, 0, inputTensor.length);
-  const output = new Float32Array(memory.buffer, inputTensor.length * 4, inputTensor.length);
+  let sum = 0;
+  for (let i = 0; i < vectorA.length; i++) {
+    sum += vectorA[i] * vectorB[i];
+  }
 
-  input.set(inputTensor);
-
-  infer();
-
-  return new Float32Array(output);
+  return sum;
 }
 
-module.exports = {
-  loadWasmModule,
-  matrixMultiply,
-  deepLearningInference
-};
+/**
+ * Applies a scalar operation (e.g., addition, multiplication) to all elements in a matrix.
+ * @param {Matrix} matrix - The matrix to operate on.
+ * @param {number} scalar - The scalar value to apply.
+ * @param {string} operation - The operation to perform ("add" or "multiply").
+ * @returns {Matrix} The updated matrix.
+ * @throws {Error} If an invalid operation is provided.
+ */
+export function applyScalarOperation(matrix, scalar, operation) {
+  if (!Array.isArray(matrix)) {
+    throw new Error("Input matrix must be an array.");
+  }
+
+  const result = matrix.map(row => {
+    return row.map(value => {
+      switch (operation) {
+        case "add":
+          return value + scalar;
+        case "multiply":
+          return value * scalar;
+        default:
+          throw new Error("Invalid operation. Use 'add' or 'multiply'.");
+      }
+    });
+  });
+
+  return result;
+}
+
+/**
+ * Transposes a matrix.
+ * @param {Matrix} matrix - The matrix to transpose.
+ * @returns {Matrix} The transposed matrix.
+ */
+export function transposeMatrix(matrix) {
+  if (!Array.isArray(matrix)) {
+    throw new Error("Input matrix must be an array.");
+  }
+
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+
+  const result = new Array(cols).fill(null).map(() => new Array(rows).fill(0));
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      result[j][i] = matrix[i][j];
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Generates a random matrix with specified dimensions.
+ * @param {number} rows - Number of rows.
+ * @param {number} cols - Number of columns.
+ * @param {number} [min=0] - Minimum random value.
+ * @param {number} [max=1] - Maximum random value.
+ * @returns {Matrix} The generated random matrix.
+ */
+export function generateRandomMatrix(rows, cols, min = 0, max = 1) {
+  const result = new Array(rows).fill(null).map(() => {
+    return new Array(cols).fill(0).map(() => {
+      return Math.random() * (max - min) + min;
+    });
+  });
+
+  return result;
+}

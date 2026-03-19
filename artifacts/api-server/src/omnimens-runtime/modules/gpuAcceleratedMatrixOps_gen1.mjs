@@ -1,127 +1,120 @@
-// gpuAcceleratedMatrixOps.js
-
 /**
  * @module gpuAcceleratedMatrixOps
- * @description Provides GPU-accelerated matrix operations leveraging TensorFlow.js with WebGL backend for efficient numerical computations.
+ * @description Provides GPU-accelerated matrix operations using TensorFlow.js with WebGL backend for lightweight ML tasks.
  */
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-const { Worker, isMainThread, parentPort } = require('worker_threads');
+const { readFileSync } = require('fs');
+const { join } = require('path');
+
+// Load TensorFlow.js from a bundled script to avoid npm dependencies
+const tfjsScriptPath = join(__dirname, 'tf.min.js'); // Ensure tf.min.js is bundled with this module
+const tfjsScript = readFileSync(tfjsScriptPath, 'utf8');
+
+// Evaluate TensorFlow.js in the current context
+const vm = require('vm');
+vm.runInThisContext(tfjsScript);
 
 /**
- * Initializes a WebGL context and performs matrix multiplication on the GPU.
- * This function is designed to run in a dedicated worker thread.
- * @param {Float32Array} matrixA - The first matrix (flattened) in row-major order.
- * @param {Float32Array} matrixB - The second matrix (flattened) in row-major order.
- * @param {number} rowsA - Number of rows in matrixA.
- * @param {number} colsA - Number of columns in matrixA (and rows in matrixB).
- * @param {number} colsB - Number of columns in matrixB.
- * @returns {Promise<Float32Array>} - A promise resolving to the result matrix (flattened).
+ * Multiplies two matrices using TensorFlow.js with WebGL backend.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {Promise<number[][]>} The resulting matrix after multiplication.
+ * @throws {Error} If matrices cannot be multiplied due to dimension mismatch.
  */
-export async function gpuMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
-  if (!isMainThread) {
-    throw new Error('gpuMatrixMultiply must be called from the main thread.');
+export async function multiplyMatrices(matrixA, matrixB) {
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+    throw new Error('Both inputs must be 2D arrays.');
   }
 
-  return new Promise((resolve, reject) => {
-    const worker = new Worker(import.meta.url);
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0]?.length || 0;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0]?.length || 0;
 
-    worker.on('message', (result) => {
-      resolve(result);
-      worker.terminate();
-    });
-
-    worker.on('error', (err) => {
-      reject(err);
-      worker.terminate();
-    });
-
-    worker.postMessage({ matrixA, matrixB, rowsA, colsA, colsB });
-  });
-}
-
-if (!isMainThread) {
-  parentPort.on('message', ({ matrixA, matrixB, rowsA, colsA, colsB }) => {
-    try {
-      const result = performMatrixMultiplication(matrixA, matrixB, rowsA, colsA, colsB);
-      parentPort.postMessage(result);
-    } catch (error) {
-      parentPort.postMessage({ error: error.message });
-    }
-  });
-}
-
-/**
- * Performs matrix multiplication on the GPU using WebGL.
- * @param {Float32Array} matrixA - The first matrix (flattened) in row-major order.
- * @param {Float32Array} matrixB - The second matrix (flattened) in row-major order.
- * @param {number} rowsA - Number of rows in matrixA.
- * @param {number} colsA - Number of columns in matrixA (and rows in matrixB).
- * @param {number} colsB - Number of columns in matrixB.
- * @returns {Float32Array} - The result matrix (flattened).
- */
-function performMatrixMultiplication(matrixA, matrixB, rowsA, colsA, colsB) {
-  const result = new Float32Array(rowsA * colsB);
-
-  for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      let sum = 0;
-      for (let k = 0; k < colsA; k++) {
-        sum += matrixA[i * colsA + k] * matrixB[k * colsB + j];
-      }
-      result[i * colsB + j] = sum;
-    }
+  if (colsA !== rowsB) {
+    throw new Error('Matrix multiplication dimension mismatch: columns of A must match rows of B.');
   }
+
+  // Use TensorFlow.js tensors for GPU-accelerated computation
+  const tensorA = tf.tensor2d(matrixA, [rowsA, colsA]);
+  const tensorB = tf.tensor2d(matrixB, [rowsB, colsB]);
+
+  const resultTensor = tf.matMul(tensorA, tensorB);
+  const result = await resultTensor.array();
+
+  // Clean up tensors to free GPU memory
+  tensorA.dispose();
+  tensorB.dispose();
+  resultTensor.dispose();
 
   return result;
 }
 
 /**
- * Validates input matrices and dimensions for matrix multiplication.
- * @param {Float32Array} matrixA - The first matrix.
- * @param {Float32Array} matrixB - The second matrix.
- * @param {number} rowsA - Number of rows in matrixA.
- * @param {number} colsA - Number of columns in matrixA.
- * @param {number} colsB - Number of columns in matrixB.
- * @throws {Error} - If dimensions are incompatible or inputs are invalid.
+ * Calculates the dot product of two vectors using TensorFlow.js.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {Promise<number>} The dot product of the two vectors.
+ * @throws {Error} If vectors are not of the same length.
  */
-export function validateInputs(matrixA, matrixB, rowsA, colsA, colsB) {
-  if (!matrixA || !matrixB || !rowsA || !colsA || !colsB) {
-    throw new Error('All input parameters must be provided.');
+export async function dotProduct(vectorA, vectorB) {
+  if (!Array.isArray(vectorA) || !Array.isArray(vectorB)) {
+    throw new Error('Both inputs must be 1D arrays.');
   }
 
-  if (matrixA.length !== rowsA * colsA) {
-    throw new Error('Matrix A dimensions do not match the provided rows and columns.');
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must be of the same length.');
   }
 
-  if (matrixB.length !== colsA * colsB) {
-    throw new Error('Matrix B dimensions do not match the provided rows and columns.');
-  }
+  // Use TensorFlow.js tensors for GPU-accelerated computation
+  const tensorA = tf.tensor1d(vectorA);
+  const tensorB = tf.tensor1d(vectorB);
 
-  if (colsA <= 0 || rowsA <= 0 || colsB <= 0) {
-    throw new Error('Matrix dimensions must be positive integers.');
-  }
+  const resultTensor = tf.dot(tensorA, tensorB);
+  const result = await resultTensor.dataSync()[0];
+
+  // Clean up tensors to free GPU memory
+  tensorA.dispose();
+  tensorB.dispose();
+  resultTensor.dispose();
+
+  return result;
 }
 
 /**
- * Example usage of the gpuMatrixMultiply function.
+ * Performs element-wise addition of two matrices using TensorFlow.js.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {Promise<number[][]>} The resulting matrix after addition.
+ * @throws {Error} If matrices are not of the same dimensions.
  */
-(async () => {
-  if (isMainThread) {
-    const matrixA = new Float32Array([1, 2, 3, 4, 5, 6]); // 2x3 matrix
-    const matrixB = new Float32Array([7, 8, 9, 10, 11, 12]); // 3x2 matrix
-
-    const rowsA = 2;
-    const colsA = 3;
-    const colsB = 2;
-
-    try {
-      validateInputs(matrixA, matrixB, rowsA, colsA, colsB);
-      const result = await gpuMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB);
-      console.log('Result:', result);
-    } catch (error) {
-      console.error('Error:', error.message);
-    }
+export async function addMatrices(matrixA, matrixB) {
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+    throw new Error('Both inputs must be 2D arrays.');
   }
-})();
+
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0]?.length || 0;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0]?.length || 0;
+
+  if (rowsA !== rowsB || colsA !== colsB) {
+    throw new Error('Matrices must have the same dimensions for addition.');
+  }
+
+  // Use TensorFlow.js tensors for GPU-accelerated computation
+  const tensorA = tf.tensor2d(matrixA, [rowsA, colsA]);
+  const tensorB = tf.tensor2d(matrixB, [rowsB, colsB]);
+
+  const resultTensor = tf.add(tensorA, tensorB);
+  const result = await resultTensor.array();
+
+  // Clean up tensors to free GPU memory
+  tensorA.dispose();
+  tensorB.dispose();
+  resultTensor.dispose();
+
+  return result;
+}
