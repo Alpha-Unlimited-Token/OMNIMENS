@@ -6330,7 +6330,7 @@ export default function Chat() {
             </div>
 
           {/* ── Mobile Bottom Nav ────────────── */}
-          <div
+          {!mobileBuilderOpen && <div
             className="sm:hidden shrink-0 flex items-center justify-around border-t"
             style={{
               background: isLight ? "#ffffff" : "#0D1117",
@@ -6374,7 +6374,7 @@ export default function Chat() {
                 <span className="font-mono text-[8px] tracking-wider">{item.label.toUpperCase()}</span>
               </button>
             ))}
-          </div>
+          </div>}
         </div>
 
         {/* ── RIGHT PANEL ─────────────────────────────────────────── */}

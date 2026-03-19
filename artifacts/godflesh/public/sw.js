@@ -4,7 +4,7 @@
  * Enables offline support and PWA installability.
  */
 
-const CACHE_NAME = "omnimens-v12";
+const CACHE_NAME = "omnimens-v13";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
