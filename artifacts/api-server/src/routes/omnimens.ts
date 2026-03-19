@@ -3006,6 +3006,62 @@ router.post("/omnimens/resonance/purchase", async (req, res) => {
   res.json({ ok: true, creditsAdded: result.creditsAdded });
 });
 
+router.post("/omnimens/resonance/checkout", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const { packId } = req.body;
+  if (!packId) { res.status(400).json({ error: "Pack ID required" }); return; }
+
+  const pack = RESONANCE_PACKS.find(p => p.id === packId);
+  if (!pack) { res.status(400).json({ error: "Invalid resonance pack" }); return; }
+
+  try {
+    const user = await getOrCreateUser(req.user.id, req.user.username);
+
+    let customerId = user.stripeCustomerId;
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: user.email || undefined,
+        metadata: { userId: user.id, username: user.username || "" },
+      });
+      customerId = customer.id;
+      await db.update(omnimensUsers)
+        .set({ stripeCustomerId: customerId })
+        .where(eq(omnimensUsers.id, user.id));
+    }
+
+    const proto = req.headers["x-forwarded-proto"] || "https";
+    const host = req.headers["x-forwarded-host"] || req.headers.host || "";
+    const baseUrl = `${proto}://${host}`;
+    const successUrl = `${baseUrl}/godflesh/pricing?resonance_success=true&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${baseUrl}/godflesh/pricing?resonance_cancelled=true`;
+
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      payment_method_types: ["card"],
+      line_items: [{
+        price_data: {
+          currency: "usd",
+          unit_amount: pack.amountCents,
+          product_data: {
+            name: `OMNIMENS Deep Resonance — ${pack.label}`,
+            description: `${pack.totalCredits.toLocaleString()} resonance credits (${pack.bonusLabel})`,
+          },
+        },
+        quantity: 1,
+      }],
+      mode: "payment",
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata: { userId: user.id, packId: pack.id, type: "resonance" },
+    });
+
+    res.json({ url: session.url });
+  } catch (err: any) {
+    console.error("[RESONANCE CHECKOUT] Error:", err);
+    res.status(500).json({ error: "Failed to create checkout session", detail: String(err?.message || err) });
+  }
+});
+
 // ─── URL Analyzer (explicit endpoint) ─────────────────────────────────────────
 
 router.post("/omnimens/analyze-url", async (req, res) => {
@@ -4582,12 +4638,41 @@ router.post("/omnimens/verify-session", async (req, res) => {
       return;
     }
 
-    // Determine credit pack from session metadata or line items
     const packId = (session.metadata?.packId as string) || "surge";
-    const creditsToAdd = CREDIT_PACKS[packId] ?? CREDIT_PACKS.surge;
+    const isResonance = session.metadata?.type === "resonance";
     const stripeCustomerId = typeof session.customer === "string" ? session.customer : session.customer?.id || null;
 
-    // Add credits to user balance atomically
+    if (isResonance) {
+      const resPack = RESONANCE_PACKS.find(p => p.id === packId);
+      if (!resPack) { res.status(400).json({ error: "Unknown resonance pack" }); return; }
+
+      const [updatedUser] = await db.update(omnimensUsers)
+        .set({
+          resonanceCredits: sql`${omnimensUsers.resonanceCredits} + ${resPack.totalCredits}`,
+          resonanceTotalEarned: sql`${omnimensUsers.resonanceTotalEarned} + ${resPack.totalCredits}`,
+          monthlyPaidSpendCents: sql`${omnimensUsers.monthlyPaidSpendCents} + ${resPack.amountCents}`,
+          totalPaidSpendCents: sql`${omnimensUsers.totalPaidSpendCents} + ${resPack.amountCents}`,
+          stripeCustomerId: stripeCustomerId || undefined,
+        })
+        .where(eq(omnimensUsers.id, req.user.id))
+        .returning();
+
+      await db.insert(omnimensCreditTransactions).values({
+        userId: req.user.id,
+        type: "purchase",
+        credits: resPack.totalCredits,
+        description: `Deep Resonance ${resPack.label} — ${resPack.totalCredits} resonance credits (${resPack.bonusLabel})`,
+        stripeSessionId: sessionId,
+        packId: resPack.id,
+      });
+
+      console.log(`[RESONANCE BILLING] Checkout success: ${req.user.id} +${resPack.totalCredits} resonance credits (${resPack.label})`);
+      res.json({ ok: true, packId, creditsAdded: resPack.totalCredits, newBalance: updatedUser?.resonanceCredits ?? resPack.totalCredits, type: "resonance" });
+      return;
+    }
+
+    const creditsToAdd = CREDIT_PACKS[packId] ?? CREDIT_PACKS.surge;
+
     const [updatedUser] = await db.update(omnimensUsers)
       .set({
         credits: sql`${omnimensUsers.credits} + ${creditsToAdd}`,
@@ -4597,7 +4682,6 @@ router.post("/omnimens/verify-session", async (req, res) => {
       .where(eq(omnimensUsers.id, req.user.id))
       .returning();
 
-    // Log credit transaction
     await db.insert(omnimensCreditTransactions).values({
       userId: req.user.id,
       type: "purchase",

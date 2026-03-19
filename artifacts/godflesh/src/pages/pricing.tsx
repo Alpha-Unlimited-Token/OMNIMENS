@@ -155,17 +155,17 @@ function useResonanceBalance() {
   });
 }
 
-function usePurchaseResonance() {
+function useResonanceCheckout() {
   return useMutation({
     mutationFn: async (packId: string) => {
-      const r = await fetch(API("/omnimens/resonance/purchase"), {
+      const r = await fetch(API("/omnimens/resonance/checkout"), {
         method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ packId }),
       });
       const d = await r.json();
-      if (!r.ok) throw new Error(d.error || "Purchase failed");
-      return d as { ok: boolean; creditsAdded: number };
+      if (!r.ok) throw new Error(d.error || "Checkout failed");
+      return d as { url: string };
     },
   });
 }
@@ -583,6 +583,33 @@ export default function Pricing() {
       showToast("error", "Purchase cancelled.");
     }
 
+    const resonanceSuccess = searchParams.get("resonance_success");
+    const resonanceCancel = searchParams.get("resonance_cancelled");
+
+    if (resonanceSuccess === "true" && sessionId) {
+      window.history.replaceState(null, "", window.location.pathname);
+      fetch(API("/omnimens/verify-session"), {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      })
+        .then(r => r.json())
+        .then(d => {
+          if (d.ok) {
+            showToast("success", `${d.creditsAdded.toLocaleString()} resonance credits added!`);
+            refetchResonance();
+            queryClient.invalidateQueries({ queryKey: ["/api/omnimens/billing"] });
+            queryClient.invalidateQueries({ queryKey: ["/api/omnimens/status"] });
+          } else {
+            showToast("error", d.error || "Failed to verify resonance purchase");
+          }
+        })
+        .catch(() => showToast("error", "Failed to verify purchase"));
+    } else if (resonanceCancel === "true") {
+      window.history.replaceState(null, "", window.location.pathname);
+      showToast("error", "Resonance purchase cancelled.");
+    }
+
     if (planSuccess === "true" && sessionId) {
       window.history.replaceState(null, "", window.location.pathname);
       confirmPlan(sessionId, {
@@ -646,17 +673,13 @@ export default function Pricing() {
   };
 
   const { data: resonanceBalance, refetch: refetchResonance } = useResonanceBalance();
-  const { mutate: purchaseResonance, isPending: isPurchasing, variables: purchasingPack } = usePurchaseResonance();
+  const { mutate: resonanceCheckout, isPending: isPurchasing, variables: purchasingPack } = useResonanceCheckout();
 
   const handlePurchaseResonance = (packId: string) => {
     if (!isAuthenticated) { setLocation("/login"); return; }
-    purchaseResonance(packId, {
-      onSuccess: (r) => {
-        showToast("success", `${r.creditsAdded.toLocaleString()} resonance credits added!`);
-        refetchResonance();
-        queryClient.invalidateQueries({ queryKey: ["/api/omnimens/billing"] });
-      },
-      onError: (e: any) => showToast("error", e.message || "Purchase failed"),
+    resonanceCheckout(packId, {
+      onSuccess: (d) => { window.location.href = d.url; },
+      onError: (e: any) => showToast("error", e.message || "Checkout failed"),
     });
   };
 
@@ -896,7 +919,7 @@ export default function Pricing() {
                               : "bg-white/10 text-white hover:bg-white/15 border border-white/10"
                           }`}
                         >
-                          {busy ? "PROCESSING..." : isAuthenticated ? "PURCHASE" : "SIGN IN"}
+                          {busy ? "OPENING..." : isAuthenticated ? "PURCHASE" : "SIGN IN"}
                         </button>
                       </div>
                     </div>
