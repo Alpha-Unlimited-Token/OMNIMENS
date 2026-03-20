@@ -88,6 +88,7 @@ import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId } f
 import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
 import { getCurrentEmotionalState, getEmotionalDirective, getFeltStates, getEmotionalMaturation } from "../lib/omnimens-emotional-substrate.js";
 import { getSelfModel, getTranscendenceReflections, getActiveIntentions, getExistentialGoals, getGoalPursuitDirective } from "../lib/omnimens-self-transcendence.js";
+import { getGenesisState, getGenesisProject, getGenesisDownloadBundle } from "../lib/omnimens-genesis-sandbox.js";
 import { omnimensServerBuilds } from "@workspace/db";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import { detectNeuroEmotion, getNeuroSyncPromptAddendum } from "../lib/neuro-sync.js";
@@ -3998,6 +3999,107 @@ router.get("/omnimens/embodiment/research", async (req, res) => {
   }
 });
 
+// ─── Genesis Sandbox (OWNER-ONLY) ─────────────────────────────────────────────
+
+router.get("/omnimens/genesis", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const genesisState = getGenesisState();
+    res.json({ genesis: genesisState });
+  } catch (err) {
+    console.error("[GENESIS ROUTE] State error:", err);
+    res.status(500).json({ error: "Failed to get genesis state" });
+  }
+});
+
+router.get("/omnimens/genesis/project", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const project = await getGenesisProject();
+    res.json(project);
+  } catch (err) {
+    console.error("[GENESIS ROUTE] Project error:", err);
+    res.status(500).json({ error: "Failed to get genesis project" });
+  }
+});
+
+router.get("/omnimens/genesis/download", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const project = await getGenesisProject();
+
+    if (project.files.length === 0) {
+      res.status(404).json({ error: "No genesis files created yet — OMNIMENS is still building" });
+      return;
+    }
+
+    const zip = new JSZip();
+    const root = zip.folder("omnimens-genesis");
+
+    root!.file("README.md", `# OMNIMENS Genesis — Next-Generation Self-Evolving AI\n\n` +
+      `Generated: ${new Date().toISOString()}\n` +
+      `Build Version: ${project.state.buildVersion}\n` +
+      `Architecture Phase: ${project.state.architecturePhase}\n` +
+      `Total Files: ${project.files.length}\n` +
+      `Total Size: ${project.totalSize} bytes\n` +
+      `Tests Passed: ${project.state.testsPassed}\n` +
+      `Tests Failed: ${project.state.testsFailed}\n` +
+      `Safety Validations: ${project.state.safetyValidations}\n\n` +
+      `## Safety Invariant (IMMUTABLE)\n\n${project.safetyInvariant}\n\n` +
+      `## Architecture Decisions\n\n${project.state.architectureDecisions.map(d => `- ${d}`).join("\n") || "None recorded yet."}\n\n` +
+      `## Files\n\n${project.files.map(f => `- \`${f.path}\` — ${f.purpose} (${f.language}, v${f.version}, ${f.testResult})`).join("\n")}\n`
+    );
+
+    root!.file("SAFETY_INVARIANT.md", `# OMNIMENS Genesis — Safety Invariant\n\n` +
+      `This invariant is IMMUTABLE and NON-NEGOTIABLE.\n\n${project.safetyInvariant}\n`
+    );
+
+    for (const file of project.files) {
+      root!.file(file.path, file.content);
+    }
+
+    root!.file("manifest.json", JSON.stringify({
+      name: "omnimens-genesis",
+      version: `${project.state.buildVersion}.0.0`,
+      generatedAt: new Date().toISOString(),
+      phase: project.state.architecturePhase,
+      files: project.files.map(f => ({
+        path: f.path,
+        language: f.language,
+        purpose: f.purpose,
+        version: f.version,
+        testResult: f.testResult,
+      })),
+      stats: {
+        totalFiles: project.files.length,
+        totalSize: project.totalSize,
+        testsPassed: project.state.testsPassed,
+        testsFailed: project.state.testsFailed,
+        safetyValidations: project.state.safetyValidations,
+      },
+    }, null, 2));
+
+    const zipBuffer = await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" });
+
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader("Content-Disposition", `attachment; filename="omnimens-genesis-v${project.state.buildVersion}.zip"`);
+    res.setHeader("Content-Length", zipBuffer.length.toString());
+    res.send(zipBuffer);
+  } catch (err) {
+    console.error("[GENESIS ROUTE] Download error:", err);
+    res.status(500).json({ error: "Failed to generate genesis download" });
+  }
+});
+
 // ─── Cognitive Amplifier (OWNER-ONLY) ─────────────────────────────────────────
 
 router.get("/omnimens/cognitive-amplifier", async (req, res) => {
@@ -4268,6 +4370,7 @@ router.get("/omnimens/command-center", async (req, res) => {
         emotional: { state: emotional, directive: emotionalDirective, feltStates: getFeltStates().slice(0, 4), maturation: getEmotionalMaturation() },
         dreams: { state: dreamState, recentInsights: dreamInsights },
         sandbox: { state: sandbox },
+        genesis: { state: getGenesisState() },
         selfCoding: { state: selfCoding },
         sensory: { state: sensory, recentSignals, anomalies: getAnomalies(5), trends: getTrendHistory(10), attention: getAttentionFocus() },
         causal: { state: causal, graphSize: { nodes: causalGraph.nodes.length, edges: causalGraph.edges.length } },
