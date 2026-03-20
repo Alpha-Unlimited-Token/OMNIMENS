@@ -5,7 +5,8 @@ import {
   Home, MessageSquare, FolderOpen, Settings, CreditCard,
   Code2, HelpCircle, ChevronLeft, ChevronRight, LogOut,
   User, Zap, BookOpen, Shield, FileText, Mail, Info,
-  Layers, ExternalLink, Key, LifeBuoy, Rocket, Search
+  Layers, ExternalLink, Key, LifeBuoy, Rocket, Search,
+  Plus, Bell, Menu
 } from "lucide-react";
 import { OmnimensIcon } from "./omnimens-icon";
 import { NotificationBell } from "./notification-center";
@@ -19,23 +20,16 @@ type NavItem = {
 };
 
 const MAIN_NAV: NavItem[] = [
-  { icon: <Home className="w-5 h-5" />, label: "Home", href: "/" },
-  { icon: <MessageSquare className="w-5 h-5" />, label: "Create", href: "/chat" },
-  { icon: <FolderOpen className="w-5 h-5" />, label: "Projects", href: "/projects" },
-  { icon: <Layers className="w-5 h-5" />, label: "Templates", href: "/templates" },
+  { icon: <Home className="w-[18px] h-[18px]" />, label: "Home", href: "/" },
+  { icon: <FolderOpen className="w-[18px] h-[18px]" />, label: "My Projects", href: "/projects" },
+  { icon: <Layers className="w-[18px] h-[18px]" />, label: "Templates", href: "/templates" },
+  { icon: <Rocket className="w-[18px] h-[18px]" />, label: "Deployments", href: "/deploy" },
 ];
 
 const TOOLS_NAV: NavItem[] = [
-  { icon: <CreditCard className="w-5 h-5" />, label: "Pricing", href: "/pricing" },
-  { icon: <Rocket className="w-5 h-5" />, label: "Deploy", href: "/deploy" },
-  { icon: <Key className="w-5 h-5" />, label: "Developer", href: "/developer" },
-  { icon: <BookOpen className="w-5 h-5" />, label: "Memory", href: "/memory" },
-];
-
-const SUPPORT_NAV: NavItem[] = [
-  { icon: <HelpCircle className="w-5 h-5" />, label: "FAQ", href: "/faq" },
-  { icon: <LifeBuoy className="w-5 h-5" />, label: "Support", href: "/support" },
-  { icon: <Info className="w-5 h-5" />, label: "About", href: "/about" },
+  { icon: <BookOpen className="w-[18px] h-[18px]" />, label: "Memory", href: "/memory" },
+  { icon: <Key className="w-[18px] h-[18px]" />, label: "Developer", href: "/developer" },
+  { icon: <CreditCard className="w-[18px] h-[18px]" />, label: "Pricing", href: "/pricing" },
 ];
 
 export function Sidebar() {
@@ -61,95 +55,100 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`h-screen flex flex-col bg-[#0c0c14] border-r border-white/5 transition-all duration-200 ease-out z-40 shrink-0 ${
-        expanded ? "w-56" : "w-16"
+      className={`h-screen flex flex-col bg-[#1C2333] border-r border-[#2B3245] transition-all duration-200 ease-out z-40 shrink-0 ${
+        expanded ? "w-[220px]" : "w-[52px]"
       }`}
     >
-      <div className="flex items-center h-14 px-3 border-b border-white/5">
-        <Link href="/" className="flex items-center gap-2.5 group min-w-0">
-          <div className="shrink-0 group-hover:drop-shadow-[0_0_8px_rgba(124,58,237,0.6)] transition-all">
-            <OmnimensIcon size={28} />
+      <div className={`flex items-center h-12 ${expanded ? "px-3 justify-between" : "justify-center"} border-b border-[#2B3245]`}>
+        <Link href="/" className="flex items-center gap-2 group min-w-0">
+          <div className="shrink-0 group-hover:drop-shadow-[0_0_6px_rgba(124,58,237,0.5)] transition-all">
+            <OmnimensIcon size={24} />
           </div>
           {expanded && (
-            <span className="font-display font-black text-sm tracking-[0.15em] text-white truncate">
+            <span className="font-semibold text-[13px] tracking-wide text-white/90 truncate">
               OMNIMENS
             </span>
           )}
         </Link>
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className={`p-1 rounded-md text-white/40 hover:text-white/70 hover:bg-white/5 transition-all ${
-            expanded ? "ml-auto" : "hidden"
-          }`}
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
+        {expanded && (
+          <button
+            onClick={() => setExpanded(false)}
+            className="p-1 rounded text-white/40 hover:text-white/70 hover:bg-white/5 transition-all"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {!expanded && (
         <button
           onClick={() => setExpanded(true)}
-          className="flex items-center justify-center h-8 text-white/30 hover:text-white/50 transition-colors"
+          className="flex items-center justify-center h-7 text-white/25 hover:text-white/45 transition-colors"
         >
-          <ChevronRight className="w-3.5 h-3.5" />
+          <ChevronRight className="w-3 h-3" />
         </button>
       )}
 
-      <nav className="flex-1 flex flex-col gap-0.5 px-2 pt-2 overflow-y-auto overflow-x-hidden scrollbar-hide">
+      <div className={`${expanded ? "px-2 pt-2" : "px-1.5 pt-2"}`}>
+        <button
+          onClick={() => setLocation("/chat")}
+          className={`w-full flex items-center justify-center gap-2 rounded-lg bg-primary hover:bg-primary/90 text-white transition-all ${
+            expanded ? "px-3 py-2" : "p-2"
+          }`}
+        >
+          <Plus className="w-4 h-4" />
+          {expanded && <span className="text-[13px] font-medium">Create</span>}
+        </button>
+      </div>
+
+      <nav className="flex-1 flex flex-col gap-0.5 px-1.5 pt-3 overflow-y-auto overflow-x-hidden scrollbar-hide">
         <SearchTrigger expanded={expanded} />
 
-        <div className="h-px bg-white/5 my-2 mx-1" />
+        <div className="h-px bg-[#2B3245] my-1.5 mx-1" />
 
         <NavSection items={MAIN_NAV} location={location} expanded={expanded} />
 
-        <div className="h-px bg-white/5 my-2 mx-1" />
-
         {isAuthenticated && (
           <>
+            <div className="h-px bg-[#2B3245] my-1.5 mx-1" />
             <NavSection items={TOOLS_NAV} location={location} expanded={expanded} />
-            <div className="h-px bg-white/5 my-2 mx-1" />
           </>
         )}
-
-        <NavSection items={SUPPORT_NAV} location={location} expanded={expanded} />
       </nav>
 
-      <div className="border-t border-white/5 px-2 py-2 space-y-0.5">
+      <div className="border-t border-[#2B3245] px-1.5 py-1.5 space-y-0.5">
         {isAuthenticated && (
           <NotificationBell expanded={expanded} />
         )}
         {isAuthenticated ? (
           <Link
             href="/account"
-            className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-all group ${
+            className={`flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all ${
               location === "/account"
-                ? "bg-primary/10 text-primary"
+                ? "bg-primary/15 text-white"
                 : "text-white/60 hover:text-white hover:bg-white/5"
             }`}
           >
-            <div className="w-7 h-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
-              <User className="w-3.5 h-3.5 text-primary" />
+            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary/40 to-blue-500/30 flex items-center justify-center shrink-0 text-[10px] font-semibold text-white">
+              {((user as any)?.username || "U")[0].toUpperCase()}
             </div>
             {expanded && (
               <div className="min-w-0 flex-1">
-                <div className="text-xs font-mono font-bold truncate">
+                <div className="text-[13px] font-medium text-white/90 truncate">
                   {(user as any)?.username || "Account"}
                 </div>
-                <div className="text-[10px] font-mono text-white/40 tracking-wider">SETTINGS</div>
               </div>
             )}
           </Link>
         ) : (
           <button
             onClick={() => setLocation("/login")}
-            className="flex items-center gap-2.5 w-full px-2.5 py-2 rounded-lg text-primary hover:bg-primary/10 transition-all"
+            className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-primary hover:bg-primary/10 transition-all ${
+              expanded ? "" : "justify-center"
+            }`}
           >
-            <div className="w-7 h-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
-              <Zap className="w-3.5 h-3.5 text-primary" />
-            </div>
-            {expanded && (
-              <span className="text-xs font-mono font-bold tracking-widest">CONNECT</span>
-            )}
+            <Zap className="w-[18px] h-[18px]" />
+            {expanded && <span className="text-[13px] font-medium">Sign In</span>}
           </button>
         )}
       </div>
@@ -177,26 +176,26 @@ function NavSection({
           <Link
             key={item.href}
             href={item.href}
-            className={`group relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-all ${
+            className={`group relative flex items-center gap-2.5 px-2 py-1.5 rounded-lg transition-all ${
               isActive
-                ? "bg-primary/10 text-primary"
-                : "text-white/60 hover:text-white hover:bg-white/5"
+                ? "bg-white/10 text-white"
+                : "text-white/50 hover:text-white/80 hover:bg-white/5"
             }`}
           >
-            <div className="shrink-0 flex items-center justify-center w-5">
+            <div className="shrink-0 flex items-center justify-center w-[18px]">
               {item.icon}
             </div>
             {expanded ? (
-              <span className="text-xs font-mono font-medium tracking-wider truncate">
-                {item.label.toUpperCase()}
+              <span className="text-[13px] font-medium truncate">
+                {item.label}
               </span>
             ) : (
-              <div className="absolute left-full ml-2 px-2.5 py-1 rounded-md bg-[#1a1a2e] border border-white/10 text-xs font-mono text-white whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-xl">
+              <div className="absolute left-full ml-2 px-2 py-1 rounded-md bg-[#2B3245] border border-[#3D4659] text-xs text-white whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-lg">
                 {item.label}
               </div>
             )}
             {item.badge && expanded && (
-              <span className="ml-auto text-[9px] font-mono font-bold bg-primary/20 text-primary px-1.5 py-0.5 rounded-full">
+              <span className="ml-auto text-[10px] font-medium bg-primary/20 text-primary px-1.5 py-0.5 rounded-full">
                 {item.badge}
               </span>
             )}
@@ -216,14 +215,14 @@ function MobileBottomBar({
 }) {
   const tabs = [
     { icon: <Home className="w-5 h-5" />, label: "Home", href: "/" },
-    { icon: <MessageSquare className="w-5 h-5" />, label: "Create", href: "/chat" },
+    { icon: <Plus className="w-5 h-5" />, label: "Create", href: "/chat" },
     { icon: <FolderOpen className="w-5 h-5" />, label: "Projects", href: "/projects" },
     { icon: <Layers className="w-5 h-5" />, label: "Templates", href: "/templates" },
     { icon: <User className="w-5 h-5" />, label: "Account", href: isAuthenticated ? "/account" : "/login" },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#0c0c14]/95 backdrop-blur-xl border-t border-white/5 safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#1C2333]/95 backdrop-blur-xl border-t border-[#2B3245] safe-area-bottom">
       <div className="flex items-center justify-around h-14 px-2">
         {tabs.map((tab) => {
           const isActive = tab.href === "/"
@@ -235,11 +234,11 @@ function MobileBottomBar({
               key={tab.href}
               href={tab.href}
               className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-all ${
-                isActive ? "text-primary" : "text-white/50"
+                isActive ? "text-primary" : "text-white/45"
               }`}
             >
               {tab.icon}
-              <span className="text-[9px] font-mono tracking-wider">{tab.label.toUpperCase()}</span>
+              <span className="text-[10px] font-medium">{tab.label}</span>
             </Link>
           );
         })}

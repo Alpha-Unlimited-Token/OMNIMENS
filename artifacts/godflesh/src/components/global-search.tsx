@@ -20,15 +20,15 @@ type SearchResult = {
 const PAGES: SearchResult[] = [
   { id: "home", type: "page", title: "Home", subtitle: "Dashboard", icon: <Globe className="w-4 h-4" />, href: "/" },
   { id: "chat", type: "page", title: "Create", subtitle: "AI Chat", icon: <MessageSquare className="w-4 h-4" />, href: "/chat", shortcut: "C" },
-  { id: "projects", type: "page", title: "Projects", subtitle: "All projects", icon: <FolderOpen className="w-4 h-4" />, href: "/projects", shortcut: "P" },
-  { id: "templates", type: "page", title: "Templates", subtitle: "Marketplace", icon: <Rocket className="w-4 h-4" />, href: "/templates" },
+  { id: "projects", type: "page", title: "My Projects", subtitle: "All projects", icon: <FolderOpen className="w-4 h-4" />, href: "/projects", shortcut: "P" },
+  { id: "templates", type: "page", title: "Templates", subtitle: "Browse templates", icon: <Rocket className="w-4 h-4" />, href: "/templates" },
   { id: "pricing", type: "page", title: "Pricing", subtitle: "Plans & credits", icon: <CreditCard className="w-4 h-4" />, href: "/pricing" },
   { id: "account", type: "page", title: "Settings", subtitle: "Account & preferences", icon: <Settings className="w-4 h-4" />, href: "/account" },
   { id: "memory", type: "page", title: "Memory", subtitle: "AI memories", icon: <Brain className="w-4 h-4" />, href: "/memory" },
   { id: "developer", type: "page", title: "Developer", subtitle: "API & tools", icon: <Key className="w-4 h-4" />, href: "/developer" },
   { id: "tools", type: "page", title: "Tools", subtitle: "Built-in tools", icon: <Wrench className="w-4 h-4" />, href: "/tools" },
   { id: "faq", type: "page", title: "FAQ", subtitle: "Help & guides", icon: <HelpCircle className="w-4 h-4" />, href: "/faq" },
-  { id: "deploy", type: "page", title: "Deploy", subtitle: "Deployment panel", icon: <Rocket className="w-4 h-4" />, href: "/deploy" },
+  { id: "deploy", type: "page", title: "Deployments", subtitle: "Deploy projects", icon: <Rocket className="w-4 h-4" />, href: "/deploy" },
 ];
 
 const ACTIONS: SearchResult[] = [
@@ -107,32 +107,32 @@ export function GlobalSearch() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: -10 }}
             transition={{ duration: 0.15 }}
-            className="w-full max-w-lg bg-[#0d0d18] border border-white/10 rounded-xl shadow-2xl overflow-hidden"
+            className="w-full max-w-lg bg-[#1C2333] border border-[#2B3245] rounded-xl shadow-2xl overflow-hidden"
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
-              <Search className="w-5 h-5 text-white/30 shrink-0" />
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-[#2B3245]">
+              <Search className="w-5 h-5 text-[#9DA5B4] shrink-0" />
               <input
                 ref={inputRef}
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Search pages, projects, actions..."
-                className="flex-1 bg-transparent text-sm font-mono text-white placeholder:text-white/30 outline-none"
+                className="flex-1 bg-transparent text-sm text-white placeholder:text-[#9DA5B4]/60 outline-none"
               />
-              <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-white/10 text-[10px] font-mono text-white/30">
+              <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-[#2B3245] text-[10px] text-[#9DA5B4]">
                 ESC
               </kbd>
             </div>
             <div className="max-h-72 overflow-y-auto py-1">
               {results.length === 0 ? (
                 <div className="py-8 text-center">
-                  <Search className="w-8 h-8 text-white/15 mx-auto mb-2" />
-                  <p className="text-xs font-mono text-white/30">No results for "{query}"</p>
+                  <Search className="w-8 h-8 text-[#9DA5B4]/30 mx-auto mb-2" />
+                  <p className="text-sm text-[#9DA5B4]">No results for "{query}"</p>
                 </div>
               ) : (
                 <>
-                  {query === "" && <p className="px-4 pt-2 pb-1 text-[9px] font-mono text-white/25 uppercase tracking-widest">QUICK ACTIONS</p>}
+                  {query === "" && <p className="px-4 pt-2 pb-1 text-xs text-[#9DA5B4]/60">Quick Actions</p>}
                   {results.map((r, i) => (
                     <button
                       key={r.id}
@@ -142,23 +142,23 @@ export function GlobalSearch() {
                         i === selectedIndex ? "bg-primary/10" : "hover:bg-white/5"
                       }`}
                     >
-                      <div className="shrink-0 text-white/50">{r.icon}</div>
+                      <div className="shrink-0 text-[#9DA5B4]">{r.icon}</div>
                       <div className="min-w-0 flex-1">
-                        <span className="text-sm font-mono text-white/85">{r.title}</span>
-                        {r.subtitle && <span className="ml-2 text-xs font-mono text-white/30">{r.subtitle}</span>}
+                        <span className="text-sm text-white/85">{r.title}</span>
+                        {r.subtitle && <span className="ml-2 text-xs text-[#9DA5B4]">{r.subtitle}</span>}
                       </div>
                       {r.shortcut && (
-                        <kbd className="px-1.5 py-0.5 rounded border border-white/10 text-[10px] font-mono text-white/25">{r.shortcut}</kbd>
+                        <kbd className="px-1.5 py-0.5 rounded bg-[#2B3245] text-[10px] text-[#9DA5B4]">{r.shortcut}</kbd>
                       )}
                       {i === selectedIndex && (
-                        <CornerDownLeft className="w-3.5 h-3.5 text-white/25 shrink-0" />
+                        <CornerDownLeft className="w-3.5 h-3.5 text-[#9DA5B4]/50 shrink-0" />
                       )}
                     </button>
                   ))}
                 </>
               )}
             </div>
-            <div className="flex items-center gap-4 px-4 py-2 border-t border-white/5 text-[10px] font-mono text-white/20">
+            <div className="flex items-center gap-4 px-4 py-2 border-t border-[#2B3245] text-xs text-[#9DA5B4]/50">
               <span className="flex items-center gap-1"><CornerDownLeft className="w-3 h-3" /> Select</span>
               <span>Arrow keys to navigate</span>
               <span className="ml-auto">ESC to close</span>
@@ -178,18 +178,20 @@ export function SearchTrigger({ expanded }: { expanded: boolean }) {
   return (
     <button
       onClick={handleClick}
-      className="group relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-all text-white/60 hover:text-white hover:bg-white/5"
+      className={`group relative flex items-center gap-2.5 px-2 py-1.5 rounded-lg transition-all text-white/50 hover:text-white/80 hover:bg-white/5 ${
+        expanded ? "" : "justify-center"
+      }`}
     >
-      <div className="shrink-0 flex items-center justify-center w-5">
-        <Search className="w-5 h-5" />
+      <div className="shrink-0 flex items-center justify-center w-[18px]">
+        <Search className="w-[18px] h-[18px]" />
       </div>
       {expanded ? (
         <div className="flex items-center justify-between flex-1 min-w-0">
-          <span className="text-xs font-mono font-medium tracking-wider">SEARCH</span>
-          <kbd className="text-[9px] font-mono text-white/20 bg-white/5 px-1.5 py-0.5 rounded border border-white/10">⌘K</kbd>
+          <span className="text-[13px] font-medium">Search</span>
+          <kbd className="text-[10px] text-[#9DA5B4] bg-[#2B3245] px-1.5 py-0.5 rounded">⌘K</kbd>
         </div>
       ) : (
-        <div className="absolute left-full ml-2 px-2.5 py-1 rounded-md bg-[#1a1a2e] border border-white/10 text-xs font-mono text-white whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-xl">
+        <div className="absolute left-full ml-2 px-2 py-1 rounded-md bg-[#2B3245] border border-[#3D4659] text-xs text-white whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-lg">
           Search (⌘K)
         </div>
       )}

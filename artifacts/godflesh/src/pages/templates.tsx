@@ -36,15 +36,15 @@ const CATEGORIES = [
 ];
 
 const TYPE_COLORS: Record<string, string> = {
-  website: "text-blue-400 bg-blue-400/10 border-blue-400/20",
-  webapp: "text-purple-400 bg-purple-400/10 border-purple-400/20",
-  game: "text-green-400 bg-green-400/10 border-green-400/20",
-  dataviz: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20",
-  api: "text-pink-400 bg-pink-400/10 border-pink-400/20",
-  ai: "text-violet-400 bg-violet-400/10 border-violet-400/20",
-  ecommerce: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
-  education: "text-sky-400 bg-sky-400/10 border-sky-400/20",
-  tool: "text-orange-400 bg-orange-400/10 border-orange-400/20",
+  website: "text-blue-400 bg-blue-500/15",
+  webapp: "text-purple-400 bg-purple-500/15",
+  game: "text-green-400 bg-green-500/15",
+  dataviz: "text-yellow-400 bg-yellow-500/15",
+  api: "text-pink-400 bg-pink-500/15",
+  ai: "text-violet-400 bg-violet-500/15",
+  ecommerce: "text-emerald-400 bg-emerald-500/15",
+  education: "text-sky-400 bg-sky-500/15",
+  tool: "text-orange-400 bg-orange-500/15",
 };
 
 const TYPE_ICONS: Record<string, React.ReactNode> = {
@@ -102,38 +102,24 @@ export default function Templates() {
     <>
       <SEO title="Templates — OMNIMENS" description="Browse and fork community templates to jumpstart your next project." />
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="mb-8">
-              <h1 className="text-2xl font-display font-bold text-white mb-1">TEMPLATE MARKETPLACE</h1>
-              <p className="text-sm font-mono text-white/50">Fork a template and start building instantly</p>
+        <div className="max-w-5xl mx-auto px-6 py-8">
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+            <div className="mb-6">
+              <h1 className="text-xl font-semibold text-white mb-1">Templates</h1>
+              <p className="text-sm text-[#9DA5B4]">Fork a template and start building instantly</p>
             </div>
 
-            {!search && category === "all" && (
-              <section className="mb-10">
-                <div className="flex items-center gap-2 mb-4">
-                  <TrendingUp className="w-4 h-4 text-primary" />
-                  <h2 className="text-sm font-mono font-bold text-white tracking-widest">FEATURED</h2>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {featured.map(t => (
-                    <FeaturedCard key={t.id} template={t} onFork={() => setLocation("/chat")} />
-                  ))}
-                </div>
-              </section>
-            )}
-
-            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+            <div className="flex flex-col sm:flex-row gap-3 mb-5">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9DA5B4]" />
                 <input
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder="Search templates..."
-                  className="w-full bg-white/5 border border-white/8 rounded-lg pl-10 pr-4 py-2.5 text-sm font-mono text-white placeholder:text-white/30 focus:outline-none focus:border-primary/30 transition-colors"
+                  className="w-full bg-[#1C2333] border border-[#2B3245] rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder:text-[#9DA5B4]/60 focus:outline-none focus:border-primary/50 transition-colors"
                 />
                 {search && (
-                  <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white">
+                  <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9DA5B4] hover:text-white">
                     <X className="w-4 h-4" />
                   </button>
                 )}
@@ -141,28 +127,28 @@ export default function Templates() {
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setSort("popular")}
-                  className={`px-3 py-2 rounded-lg text-xs font-mono transition-all ${sort === "popular" ? "bg-primary/10 text-primary border border-primary/20" : "text-white/50 hover:text-white border border-white/8"}`}
+                  className={`px-3 py-2 rounded-lg text-sm transition-all ${sort === "popular" ? "bg-primary/15 text-primary border border-primary/25" : "text-[#9DA5B4] hover:text-white bg-[#1C2333] border border-[#2B3245]"}`}
                 >
-                  <Star className="w-3 h-3 inline mr-1" />Popular
+                  <Star className="w-3.5 h-3.5 inline mr-1.5" />Popular
                 </button>
                 <button
                   onClick={() => setSort("recent")}
-                  className={`px-3 py-2 rounded-lg text-xs font-mono transition-all ${sort === "recent" ? "bg-primary/10 text-primary border border-primary/20" : "text-white/50 hover:text-white border border-white/8"}`}
+                  className={`px-3 py-2 rounded-lg text-sm transition-all ${sort === "recent" ? "bg-primary/15 text-primary border border-primary/25" : "text-[#9DA5B4] hover:text-white bg-[#1C2333] border border-[#2B3245]"}`}
                 >
-                  <Clock className="w-3 h-3 inline mr-1" />Recent
+                  <Clock className="w-3.5 h-3.5 inline mr-1.5" />Recent
                 </button>
               </div>
             </div>
 
-            <div className="flex gap-1.5 mb-6 overflow-x-auto pb-1 scrollbar-none">
+            <div className="flex gap-2 mb-6 overflow-x-auto pb-1 scrollbar-none">
               {CATEGORIES.map(c => (
                 <button
                   key={c.id}
                   onClick={() => setCategory(c.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono whitespace-nowrap transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-all ${
                     category === c.id
-                      ? "bg-primary/15 text-primary border border-primary/30"
-                      : "text-white/50 hover:text-white border border-white/8 hover:border-white/20"
+                      ? "bg-primary/15 text-primary border border-primary/25"
+                      : "text-[#9DA5B4] hover:text-white bg-[#1C2333] border border-[#2B3245]"
                   }`}
                 >
                   {c.icon} {c.label}
@@ -170,7 +156,21 @@ export default function Templates() {
               ))}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {!search && category === "all" && (
+              <section className="mb-8">
+                <div className="flex items-center gap-2 mb-3">
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                  <h2 className="text-sm font-semibold text-white">Featured</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {featured.map(t => (
+                    <FeaturedCard key={t.id} template={t} onFork={() => setLocation("/chat")} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {filtered.map(t => (
                 <TemplateCard key={t.id} template={t} onFork={() => setLocation("/chat")} />
               ))}
@@ -178,8 +178,8 @@ export default function Templates() {
 
             {filtered.length === 0 && (
               <div className="flex flex-col items-center py-16">
-                <Search className="w-10 h-10 text-white/20 mb-4" />
-                <p className="text-sm font-mono text-white/40">No templates match your search</p>
+                <Search className="w-10 h-10 text-[#9DA5B4]/40 mb-4" />
+                <p className="text-sm text-[#9DA5B4]">No templates match your search</p>
               </div>
             )}
           </motion.div>
@@ -190,55 +190,55 @@ export default function Templates() {
 }
 
 function FeaturedCard({ template, onFork }: { template: Template; onFork: () => void }) {
-  const color = TYPE_COLORS[template.type] || "text-white/60 bg-white/5 border-white/10";
+  const color = TYPE_COLORS[template.type] || "text-white/50 bg-white/10";
   return (
-    <div className="relative p-5 rounded-xl bg-gradient-to-br from-primary/5 to-transparent border border-primary/15 hover:border-primary/30 transition-all group">
+    <div className="relative p-4 rounded-lg bg-[#1C2333] border border-primary/20 hover:border-primary/35 transition-all group cursor-pointer" onClick={onFork}>
       <div className="absolute top-3 right-3">
-        <span className="text-[9px] font-mono font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">FEATURED</span>
+        <span className="text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">Featured</span>
       </div>
-      <div className={`inline-flex p-2 rounded-lg border mb-3 ${color}`}>
+      <div className={`inline-flex p-2 rounded-lg mb-3 ${color}`}>
         {TYPE_ICONS[template.type]}
       </div>
-      <h3 className="text-sm font-mono font-bold text-white mb-1">{template.name}</h3>
-      <p className="text-[11px] font-mono text-white/50 line-clamp-2 mb-4">{template.description}</p>
+      <h3 className="text-sm font-semibold text-white mb-1">{template.name}</h3>
+      <p className="text-xs text-[#9DA5B4] line-clamp-2 mb-4">{template.description}</p>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3 text-[10px] font-mono text-white/40">
+        <div className="flex items-center gap-3 text-xs text-[#9DA5B4]">
           <span className="flex items-center gap-1"><Star className="w-3 h-3" />{template.stars}</span>
           <span className="flex items-center gap-1"><Download className="w-3 h-3" />{template.forks}</span>
         </div>
-        <button onClick={onFork} className="flex items-center gap-1 text-[10px] font-mono text-primary hover:text-white transition-colors">
+        <span className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
           Use Template <ArrowRight className="w-3 h-3" />
-        </button>
+        </span>
       </div>
     </div>
   );
 }
 
 function TemplateCard({ template, onFork }: { template: Template; onFork: () => void }) {
-  const color = TYPE_COLORS[template.type] || "text-white/60 bg-white/5 border-white/10";
+  const color = TYPE_COLORS[template.type] || "text-white/50 bg-white/10";
   return (
-    <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/5 hover:border-white/10 transition-all group">
+    <div className="p-4 rounded-lg bg-[#1C2333] border border-[#2B3245] hover:bg-[#222D3E] hover:border-[#3D4659] transition-all group cursor-pointer" onClick={onFork}>
       <div className="flex items-center gap-2.5 mb-3">
-        <div className={`p-1.5 rounded-lg border ${color}`}>
+        <div className={`p-1.5 rounded-lg ${color}`}>
           {TYPE_ICONS[template.type]}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-mono font-bold text-white/85 truncate">{template.name}</h3>
-          <span className="text-[9px] font-mono text-white/40">{template.author}</span>
+          <h3 className="text-sm font-medium text-white truncate">{template.name}</h3>
+          <span className="text-xs text-[#9DA5B4]">{template.author}</span>
         </div>
       </div>
-      <p className="text-[11px] font-mono text-white/50 line-clamp-2 mb-3">{template.description}</p>
+      <p className="text-xs text-[#9DA5B4] line-clamp-2 mb-3">{template.description}</p>
       <div className="flex flex-wrap gap-1 mb-3">
         {template.tags.slice(0, 3).map(tag => (
-          <span key={tag} className="text-[9px] font-mono text-white/35 bg-white/5 px-1.5 py-0.5 rounded">{tag}</span>
+          <span key={tag} className="text-[10px] text-[#9DA5B4]/70 bg-[#2B3245] px-1.5 py-0.5 rounded">{tag}</span>
         ))}
       </div>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3 text-[10px] font-mono text-white/40">
+        <div className="flex items-center gap-3 text-xs text-[#9DA5B4]">
           <span className="flex items-center gap-1"><Star className="w-3 h-3" />{template.stars}</span>
           <span className="flex items-center gap-1"><Download className="w-3 h-3" />{template.forks}</span>
         </div>
-        <button onClick={onFork} className="flex items-center gap-1 px-3 py-1 rounded-lg text-[10px] font-mono text-primary border border-primary/20 hover:bg-primary/10 transition-all opacity-0 group-hover:opacity-100">
+        <button className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs text-primary bg-primary/10 hover:bg-primary/20 transition-all opacity-0 group-hover:opacity-100">
           <Zap className="w-3 h-3" /> Fork
         </button>
       </div>

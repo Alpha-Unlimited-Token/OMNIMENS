@@ -13,9 +13,9 @@ export function WorkspaceLayout({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className="h-screen flex overflow-hidden bg-[#0a0a0f]">
+    <div className="h-screen flex overflow-hidden bg-[#0E1525]">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto overflow-x-hidden">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden [&_h1]:font-sans [&_h1]:tracking-normal [&_h2]:font-sans [&_h2]:tracking-normal [&_h3]:font-sans [&_h3]:tracking-normal">
         <div className={isMobile ? "pb-16" : ""}>
           {children}
         </div>

@@ -59,10 +59,10 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 function PatchCard({ patch, onDeactivate }: { patch: OmniPatch; onDeactivate: (id: string) => void }) {
   const [expanded, setExpanded] = useState(false);
-  const colorClass = CATEGORY_COLORS[patch.category] || "text-white/60 bg-white/5 border-white/10";
+  const colorClass = CATEGORY_COLORS[patch.category] || "text-[#9DA5B4] bg-[#2B3245]/50 border-[#2B3245]";
 
   return (
-    <div className={`border rounded-lg p-3 ${patch.active ? "border-white/10 bg-black/30" : "border-white/5 bg-black/10 opacity-40"}`}>
+    <div className={`border rounded-lg p-3 ${patch.active ? "border-[#2B3245] bg-[#1C2333]/80" : "border-[#2B3245] bg-[#1C2333]/40 opacity-40"}`}>
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <span className={`text-[10px] font-mono px-2 py-0.5 rounded border uppercase tracking-wider flex-shrink-0 ${colorClass}`}>
@@ -71,12 +71,12 @@ function PatchCard({ patch, onDeactivate }: { patch: OmniPatch; onDeactivate: (i
           <span className="text-sm font-semibold text-white/90 truncate">{patch.title}</span>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
-          <span className="text-[10px] font-mono text-white/75">{patch.executionCount}×</span>
-          <button onClick={() => setExpanded(e => !e)} className="text-white/75 hover:text-white/70 transition-colors p-1">
+          <span className="text-[10px] font-mono text-[#9DA5B4]">{patch.executionCount}×</span>
+          <button onClick={() => setExpanded(e => !e)} className="text-[#9DA5B4] hover:text-[#9DA5B4] transition-colors p-1">
             {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           </button>
           {patch.active && (
-            <button onClick={() => onDeactivate(patch.id)} className="text-white/70 hover:text-red-400 transition-colors p-1">
+            <button onClick={() => onDeactivate(patch.id)} className="text-[#9DA5B4] hover:text-red-400 transition-colors p-1">
               <Trash2 className="w-3 h-3" />
             </button>
           )}
@@ -84,9 +84,9 @@ function PatchCard({ patch, onDeactivate }: { patch: OmniPatch; onDeactivate: (i
       </div>
       {expanded && (
         <div className="mt-3 space-y-2 text-xs font-mono">
-          <div className="text-white/70 leading-relaxed border-l-2 border-primary/40 pl-3">{patch.instruction}</div>
-          {patch.rationale && <div className="text-white/35 italic">{patch.rationale}</div>}
-          <div className="flex gap-4 text-white/70">
+          <div className="text-[#9DA5B4] leading-relaxed border-l-2 border-primary/40 pl-3">{patch.instruction}</div>
+          {patch.rationale && <div className="text-[#9DA5B4]/60 italic">{patch.rationale}</div>}
+          <div className="flex gap-4 text-[#9DA5B4]">
             <span>{new Date(patch.appliedAt).toLocaleString()}</span>
             <span>src: {patch.source}</span>
           </div>
@@ -451,17 +451,17 @@ export default function Account() {
     <>
       <SEO {...seoData.account} />
       <div className="flex-1 flex overflow-hidden" style={{ height: "calc(100vh - 0rem)" }}>
-        <aside className="w-56 shrink-0 border-r border-white/5 bg-[#0a0a12] overflow-y-auto hidden md:flex flex-col">
-          <div className="px-4 pt-6 pb-4 border-b border-white/5">
+        <aside className="w-56 shrink-0 border-r border-[#2B3245] bg-[#1C2333] overflow-y-auto hidden md:flex flex-col">
+          <div className="px-4 pt-6 pb-4 border-b border-[#2B3245]">
             <div className="flex items-center gap-3 mb-1">
-              <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 overflow-hidden">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/40 to-blue-500/30 flex items-center justify-center shrink-0 overflow-hidden">
                 {user?.profileImageUrl
                   ? <img src={user.profileImageUrl} alt={user.username} className="w-full h-full object-cover" />
-                  : <User className="w-4 h-4 text-primary" />}
+                  : <span className="text-sm font-semibold text-white">{((user as any)?.username || "U")[0].toUpperCase()}</span>}
               </div>
               <div className="min-w-0">
-                <p className="font-mono text-sm font-bold text-white truncate">@{(user as any)?.username}</p>
-                <p className="text-[10px] font-mono text-white/40 tracking-wider">SETTINGS</p>
+                <p className="text-sm font-semibold text-white truncate">@{(user as any)?.username}</p>
+                <p className="text-xs text-[#9DA5B4]">Settings</p>
               </div>
             </div>
           </div>
@@ -470,38 +470,38 @@ export default function Account() {
               <button
                 key={tab.id}
                 onClick={() => setSettingsTab(tab.id)}
-                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left transition-all text-xs font-mono tracking-wider ${
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-all text-[13px] font-medium ${
                   settingsTab === tab.id
-                    ? "bg-primary/10 text-primary"
-                    : "text-white/50 hover:text-white hover:bg-white/5"
+                    ? "bg-[#2B3245] text-white"
+                    : "text-[#9DA5B4] hover:text-white/90 hover:bg-[#2B3245]/50"
                 }`}
               >
                 {tab.icon}
-                {tab.label.toUpperCase()}
+                {tab.label}
               </button>
             ))}
           </nav>
-          <div className="px-2 py-3 border-t border-white/5">
+          <div className="px-2 py-3 border-t border-[#2B3245]">
             <button
               onClick={logout}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left text-xs font-mono tracking-wider text-red-400/70 hover:text-red-400 hover:bg-red-400/5 transition-all"
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left text-[13px] font-medium text-red-400/70 hover:text-red-400 hover:bg-red-400/5 transition-all"
             >
               <LogOut className="w-4 h-4" />
-              LOG OUT
+              Log Out
             </button>
           </div>
         </aside>
 
         <div className="flex-1 overflow-y-auto">
-          <div className="md:hidden flex overflow-x-auto gap-1 px-4 pt-4 pb-2 scrollbar-none border-b border-white/5">
+          <div className="md:hidden flex overflow-x-auto gap-1 px-4 pt-4 pb-2 scrollbar-none border-b border-[#2B3245]">
             {SETTINGS_TABS.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setSettingsTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-mono whitespace-nowrap transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm whitespace-nowrap transition-all ${
                   settingsTab === tab.id
-                    ? "bg-primary/10 text-primary border border-primary/20"
-                    : "text-white/50 border border-white/5"
+                    ? "bg-[#2B3245] text-white"
+                    : "text-[#9DA5B4] bg-[#1C2333] border border-[#2B3245]"
                 }`}
               >
                 {tab.icon}
@@ -511,10 +511,10 @@ export default function Account() {
           </div>
 
           <div className="max-w-2xl mx-auto px-4 py-8">
-            <h1 className="text-2xl font-display font-bold text-white tracking-wider mb-1">
-              {SETTINGS_TABS.find(t => t.id === settingsTab)?.label.toUpperCase() || "SETTINGS"}
+            <h1 className="text-xl font-semibold text-white mb-1">
+              {SETTINGS_TABS.find(t => t.id === settingsTab)?.label || "Settings"}
             </h1>
-            <p className="text-sm font-mono text-white/40 mb-8">
+            <p className="text-sm text-[#9DA5B4] mb-8">
               {settingsTab === "profile" && "Manage your profile and custom instructions"}
               {settingsTab === "billing" && "Credits, wallet, and usage details"}
               {settingsTab === "preferences" && "Theme, notifications, and personalization"}
@@ -526,7 +526,7 @@ export default function Account() {
             {/* ═══ PROFILE TAB ═══ */}
             {settingsTab === "profile" && (
               <div className="space-y-6">
-                <div className="bg-black/40 border border-white/10 rounded-xl p-6">
+                <div className="bg-[#1C2333] border border-[#2B3245] rounded-xl p-6">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="w-16 h-16 bg-primary/10 rounded-full border border-primary/30 flex items-center justify-center shrink-0 overflow-hidden">
                       {user?.profileImageUrl
@@ -535,7 +535,7 @@ export default function Account() {
                     </div>
                     <div>
                       <h2 className="text-lg font-bold text-white">@{(user as any)?.username}</h2>
-                      <p className="text-xs font-mono text-white/40 break-all">ID: {user?.id}</p>
+                      <p className="text-xs text-[#9DA5B4] break-all">ID: {user?.id}</p>
                       {isOwner && (
                         <span className="text-[10px] font-mono text-amber-400 border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 rounded mt-1 inline-block">
                           SYSTEM ARCHITECT
@@ -545,14 +545,14 @@ export default function Account() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="p-3 rounded-lg bg-white/3 border border-white/5">
-                      <p className="text-[10px] font-mono text-white/40">PLAN</p>
+                    <div className="p-3 rounded-lg bg-[#2B3245]/30 border border-[#2B3245]">
+                      <p className="text-[10px] font-mono text-[#9DA5B4]">Plan</p>
                       <p className="text-sm font-mono font-bold text-primary">
                         {(status as any)?.isOwner ? "CREATOR" : (status as any)?.isPro ? "UNLIMITED" : "FREE"}
                       </p>
                     </div>
-                    <div className="p-3 rounded-lg bg-white/3 border border-white/5">
-                      <p className="text-[10px] font-mono text-white/40">CREDITS</p>
+                    <div className="p-3 rounded-lg bg-[#2B3245]/30 border border-[#2B3245]">
+                      <p className="text-[10px] font-mono text-[#9DA5B4]">Credits</p>
                       <p className="text-sm font-mono font-bold text-white">{((status as any)?.credits ?? 0).toLocaleString()}</p>
                     </div>
                   </div>
@@ -563,35 +563,35 @@ export default function Account() {
                       if (navigator.share) navigator.share({ title: "OMNIMENS", text: shareText, url: window.location.origin });
                       else navigator.clipboard.writeText(shareText);
                     }}
-                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg border border-white/8 hover:bg-white/5 transition-colors text-sm font-mono text-white/75"
+                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg border border-[#2B3245] hover:bg-[#2B3245]/50 transition-colors text-sm text-[#9DA5B4]"
                   >
-                    <Share2 className="w-4 h-4 text-white/40" />
+                    <Share2 className="w-4 h-4 text-[#9DA5B4]" />
                     Refer a friend
-                    <ChevronRight className="w-4 h-4 text-white/25 ml-auto" />
+                    <ChevronRight className="w-4 h-4 text-[#9DA5B4]/60 ml-auto" />
                   </button>
                 </div>
 
-                <div id="custom-instructions-section" className="bg-black/40 border border-white/10 rounded-xl p-6">
+                <div id="custom-instructions-section" className="bg-[#1C2333] border border-[#2B3245] rounded-xl p-6">
           <div className="flex items-center gap-3 mb-6">
             <Zap className="w-5 h-5 text-primary" />
-            <h3 className="font-mono tracking-widest text-white/80">CUSTOM INSTRUCTIONS</h3>
-            <span className="text-[10px] font-mono text-white/75 ml-auto">Like ChatGPT Custom Instructions</span>
+            <h3 className="font-medium text-white/90">Custom Instructions</h3>
+            <span className="text-[10px] text-[#9DA5B4] ml-auto">Like ChatGPT Custom Instructions</span>
           </div>
 
           {ciLoading ? (
-            <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-10 animate-pulse bg-white/5 rounded-lg" />)}</div>
+            <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-10 animate-pulse bg-[#2B3245]/50 rounded-lg" />)}</div>
           ) : (
             <div className="space-y-5">
               {/* Persona selector */}
               <div>
-                <p className="text-xs font-mono text-white/85 mb-3 uppercase tracking-wider">Active Mode</p>
+                <p className="text-xs text-[#9DA5B4] font-medium mb-3">Active Mode</p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {Object.entries(PERSONA_META).map(([key, meta]) => (
                     <button
                       key={key}
                       type="button"
                       onClick={() => setCiPersona(key)}
-                      className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${ciPersona === key ? "border-primary/50 bg-primary/10 text-primary" : "border-white/10 text-white/85 hover:border-white/25 hover:text-white/60"}`}
+                      className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${ciPersona === key ? "border-primary/50 bg-primary/10 text-primary" : "border-[#2B3245] text-white/90 hover:border-[#3D4659] hover:text-[#9DA5B4]"}`}
                     >
                       <div className="flex items-center gap-2">
                         {meta.icon}
@@ -606,25 +606,25 @@ export default function Account() {
 
               {/* About me */}
               <div>
-                <label className="text-xs font-mono text-white/85 uppercase tracking-wider mb-2 block">About Me</label>
+                <label className="text-xs text-[#9DA5B4] font-medium mb-2 block">About Me</label>
                 <textarea
                   value={ciAboutUser}
                   onChange={e => setCiAboutUser(e.target.value)}
                   rows={3}
                   placeholder="Tell OMNIMENS about yourself — your name, job, skills, interests, what you're working on..."
-                  className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono text-white/70 placeholder:text-white/20 outline-none focus:border-primary/40 resize-none"
+                  className="w-full bg-[#0E1525] border border-[#2B3245] rounded-xl px-4 py-3 text-sm text-[#9DA5B4] placeholder:text-[#9DA5B4]/40 outline-none focus:border-primary/40 resize-none"
                 />
               </div>
 
               {/* Response style */}
               <div>
-                <label className="text-xs font-mono text-white/85 uppercase tracking-wider mb-2 block">How Should OMNIMENS Respond?</label>
+                <label className="text-xs text-[#9DA5B4] font-medium mb-2 block">How Should OMNIMENS Respond?</label>
                 <textarea
                   value={ciResponseStyle}
                   onChange={e => setCiResponseStyle(e.target.value)}
                   rows={3}
                   placeholder="Always be concise. Use code examples. Explain trade-offs. Don't use fluff language. Give opinions when asked..."
-                  className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono text-white/70 placeholder:text-white/20 outline-none focus:border-primary/40 resize-none"
+                  className="w-full bg-[#0E1525] border border-[#2B3245] rounded-xl px-4 py-3 text-sm text-[#9DA5B4] placeholder:text-[#9DA5B4]/40 outline-none focus:border-primary/40 resize-none"
                 />
               </div>
 
@@ -632,20 +632,20 @@ export default function Account() {
                 type="button"
                 onClick={handleSaveCustomInstructions}
                 disabled={ciSaving}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono text-xs uppercase tracking-widest transition-colors ${ciSaved ? "text-green-400 border border-green-400/30 bg-green-400/10" : "text-primary border border-primary/30 hover:bg-primary/10"} disabled:opacity-40`}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-medium transition-colors ${ciSaved ? "text-green-400 border border-green-400/30 bg-green-400/10" : "text-primary border border-primary/30 hover:bg-primary/10"} disabled:opacity-40`}
               >
                 {ciSaving ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : ciSaved ? <Check className="w-3.5 h-3.5" /> : <Save className="w-3.5 h-3.5" />}
-                {ciSaving ? "SAVING..." : ciSaved ? "SAVED" : "SAVE INSTRUCTIONS"}
+                {ciSaving ? "Saving..." : ciSaved ? "Saved" : "Save Instructions"}
               </button>
             </div>
           )}
         </div>
 
-                <div id="memory-section" className="bg-black/40 border border-white/10 rounded-xl p-6">
+                <div id="memory-section" className="bg-[#1C2333] border border-[#2B3245] rounded-xl p-6">
           <div className="flex items-center gap-3 mb-6">
             <Brain className="w-5 h-5 text-primary" />
-            <h3 className="font-mono tracking-widest text-white/80">OMNIMENS MEMORY</h3>
-            <span className="text-[10px] font-mono text-white/75 ml-auto">Like ChatGPT Memory</span>
+            <h3 className="font-medium text-white/90">Memory</h3>
+            <span className="text-[10px] text-[#9DA5B4] ml-auto">Like ChatGPT Memory</span>
           </div>
 
           {/* Add memory */}
@@ -653,7 +653,7 @@ export default function Account() {
             <select
               value={newMemoryCategory}
               onChange={e => setNewMemoryCategory(e.target.value)}
-              className="bg-black border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-white outline-none focus:border-primary/40 shrink-0"
+              className="bg-[#0E1525] border border-[#2B3245] rounded-lg px-3 py-2 text-xs font-mono text-white outline-none focus:border-primary/40 shrink-0"
             >
               {MEMORY_CATEGORIES.map(c => (
                 <option key={c} value={c}>{c.toUpperCase()}</option>
@@ -664,7 +664,7 @@ export default function Account() {
               value={newMemory}
               onChange={e => setNewMemory(e.target.value)}
               placeholder="Add a memory (e.g. 'I prefer TypeScript over JavaScript')"
-              className="flex-1 bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-sm font-mono text-white/70 placeholder:text-white/20 outline-none focus:border-primary/40 min-w-0"
+              className="flex-1 bg-[#0E1525] border border-[#2B3245] rounded-lg px-4 py-2 text-sm text-[#9DA5B4] placeholder:text-[#9DA5B4]/40 outline-none focus:border-primary/40 min-w-0"
               onKeyDown={e => { if (e.key === "Enter") handleAddMemory(); }}
             />
             <button
@@ -680,17 +680,17 @@ export default function Account() {
           {memoryError && <p className="text-xs text-red-400 font-mono mb-3">{memoryError}</p>}
 
           {memoriesLoading ? (
-            <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-10 animate-pulse bg-white/5 rounded-lg" />)}</div>
+            <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-10 animate-pulse bg-[#2B3245]/50 rounded-lg" />)}</div>
           ) : memories.length === 0 ? (
-            <div className="text-center py-8 font-mono text-white/75 text-sm">
+            <div className="text-center py-8 font-mono text-[#9DA5B4] text-sm">
               <Brain className="w-8 h-8 mx-auto mb-3 opacity-30" />
-              <p>NO MEMORIES YET</p>
-              <p className="text-xs mt-1 text-white/70">OMNIMENS will auto-learn from your conversations</p>
+              <p>No memories yet</p>
+              <p className="text-xs mt-1 text-[#9DA5B4]">OMNIMENS will auto-learn from your conversations</p>
             </div>
           ) : (
             <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
               {memories.filter(m => m.active !== false).map((m: any) => (
-                <div key={m.id} className="flex items-start gap-3 p-3 bg-black/30 border border-white/8 rounded-xl group">
+                <div key={m.id} className="flex items-start gap-3 p-3 bg-[#1C2333]/80 border border-[#2B3245] rounded-xl group">
                   <span className={`text-[9px] font-mono px-2 py-0.5 rounded border uppercase tracking-wider shrink-0 mt-0.5 ${
                     m.category === "preference" ? "text-violet-400 border-violet-400/30 bg-violet-400/10" :
                     m.category === "fact"       ? "text-cyan-400 border-cyan-400/30 bg-cyan-400/10" :
@@ -698,10 +698,10 @@ export default function Account() {
                     m.category === "context"    ? "text-orange-400 border-orange-400/30 bg-orange-400/10" :
                                                   "text-blue-400 border-blue-400/30 bg-blue-400/10"
                   }`}>{m.category}</span>
-                  <p className="text-sm font-mono text-white/70 flex-1 leading-relaxed">{m.content}</p>
+                  <p className="text-sm text-[#9DA5B4] flex-1 leading-relaxed">{m.content}</p>
                   <button
                     onClick={() => handleDeleteMemory(m.id)}
-                    className="shrink-0 text-white/65 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 p-0.5"
+                    className="shrink-0 text-[#9DA5B4] hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 p-0.5"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -709,7 +709,7 @@ export default function Account() {
               ))}
             </div>
           )}
-          <p className="text-[10px] font-mono text-white/70 mt-4">
+          <p className="text-[10px] font-mono text-[#9DA5B4] mt-4">
             OMNIMENS auto-extracts memories from your conversations and injects them as context into every session.
           </p>
         </div>
@@ -720,13 +720,13 @@ export default function Account() {
             {settingsTab === "billing" && (
               <div className="space-y-6">
                 {billing && (
-                  <div className="bg-black/40 border border-white/10 rounded-xl p-6">
+                  <div className="bg-[#1C2333] border border-[#2B3245] rounded-xl p-6">
                     <div className="flex items-center gap-3 mb-6">
                       <Shield className="w-5 h-5 text-primary" />
-                      <h3 className="font-mono tracking-widest text-white/80">ACCESS LEVEL</h3>
+                      <h3 className="font-medium text-white/90">Access Level</h3>
                     </div>
                     {statusLoading ? (
-                      <div className="h-16 animate-pulse bg-white/5 rounded-lg" />
+                      <div className="h-16 animate-pulse bg-[#2B3245]/50 rounded-lg" />
                     ) : isOwner ? (
                       <div className="flex items-center gap-3 p-4 border border-amber-500/20 rounded-lg bg-amber-400/5">
                         <span className="w-2 h-2 rounded-full bg-amber-400" />
@@ -734,22 +734,22 @@ export default function Account() {
                       </div>
                     ) : (
                       <div className="space-y-3">
-                        <div className="flex items-center justify-between p-4 border border-white/5 rounded-lg bg-black/60">
+                        <div className="flex items-center justify-between p-4 border border-[#2B3245] rounded-lg bg-[#0E1525]">
                           <div className="flex items-center gap-3">
                             <span className={`w-2 h-2 rounded-full ${(status as any)?.credits > 0 ? 'bg-primary' : 'bg-white/20'}`} />
                             <div>
-                              <div className="font-mono text-sm text-white">CREDIT BALANCE</div>
+                              <div className="font-mono text-sm text-white">Credit Balance</div>
                               <div className={`text-2xl font-black font-mono ${(status as any)?.credits > 100 ? 'text-white' : (status as any)?.credits > 0 ? 'text-amber-400' : 'text-red-400'}`}>
                                 {((status as any)?.credits ?? 0).toLocaleString()}
-                                <span className="text-sm font-normal text-white/75 ml-1">credits</span>
+                                <span className="text-sm font-normal text-[#9DA5B4] ml-1">credits</span>
                               </div>
                             </div>
                           </div>
                           <Button onClick={() => setLocation("/pricing")} size="sm" variant={(status as any)?.credits < 100 ? "default" : "secondary"}>
-                            {(status as any)?.credits < 100 ? "ADD CREDITS" : "MANAGE WALLET"}
+                            {(status as any)?.credits < 100 ? "ADD CREDITS" : "Manage Wallet"}
                           </Button>
                         </div>
-                        <div className="flex items-center justify-between p-3 border border-white/5 rounded-lg bg-black/40">
+                        <div className="flex items-center justify-between p-3 border border-[#2B3245] rounded-lg bg-[#1C2333]">
                           <div className="flex items-center gap-2">
                             {(billing as any)?.hasWallet ? (
                               <>
@@ -760,8 +760,8 @@ export default function Account() {
                               </>
                             ) : (
                               <>
-                                <Wallet className="w-4 h-4 text-white/75" />
-                                <span className="font-mono text-xs text-white/75">No wallet connected</span>
+                                <Wallet className="w-4 h-4 text-[#9DA5B4]" />
+                                <span className="font-mono text-xs text-[#9DA5B4]">No wallet connected</span>
                               </>
                             )}
                           </div>
@@ -769,7 +769,7 @@ export default function Account() {
                             <button onClick={() => setLocation("/pricing")} className="text-xs font-mono text-primary hover:underline">connect →</button>
                           )}
                         </div>
-                        <div className="flex items-center justify-between p-3 border border-white/5 rounded-lg bg-black/40">
+                        <div className="flex items-center justify-between p-3 border border-[#2B3245] rounded-lg bg-[#1C2333]">
                           <div className="flex items-center gap-2">
                             <Gift className="w-4 h-4 text-accent" />
                             <span className="font-mono text-xs text-white">
@@ -777,9 +777,9 @@ export default function Account() {
                               <span className="text-green-400 font-bold">{(billing as any)?.nextBonusCredits?.toLocaleString() ?? 2000} credits free</span>
                             </span>
                           </div>
-                          <span className="font-mono text-[10px] text-white/70">{(billing as any)?.nextBonusTier ?? "BASE"} tier</span>
+                          <span className="font-mono text-[10px] text-[#9DA5B4]">{(billing as any)?.nextBonusTier ?? "BASE"} tier</span>
                         </div>
-                        <p className="text-xs font-mono text-white/75 text-center">
+                        <p className="text-xs text-[#9DA5B4] text-center">
                           ≈ {Math.floor(((status as any)?.credits ?? 0) / 10)} chats · {Math.floor(((status as any)?.credits ?? 0) / 100)} images
                         </p>
                       </div>
@@ -788,10 +788,10 @@ export default function Account() {
                 )}
 
                 {!isOwner && (
-                  <div className="bg-black/40 border border-white/10 rounded-xl overflow-hidden">
+                  <div className="bg-[#1C2333] border border-[#2B3245] rounded-xl overflow-hidden">
                     <div className="flex items-center gap-3 p-6 pb-4">
                       <CreditCard className="w-5 h-5 text-primary" />
-                      <h3 className="font-mono tracking-widest text-white/80">AUTO TOP-UP</h3>
+                      <h3 className="font-medium text-white/90">Auto Top-up</h3>
                     </div>
                     {walletSuccess && (
                       <div className="flex items-center gap-2 px-6 py-2.5 bg-emerald-500/10 border-b border-emerald-500/20">
@@ -814,16 +814,16 @@ export default function Account() {
                           </div>
                           <div>
                             <p className="text-[13px] text-white font-medium mb-1">Pay as you go</p>
-                            <p className="text-[12px] text-white/50 leading-relaxed">
+                            <p className="text-[12px] text-[#9DA5B4] leading-relaxed">
                               Connect a card and we'll automatically top up your credits whenever you run low.
                             </p>
                           </div>
                         </div>
                         <div className="grid grid-cols-4 gap-1.5 mb-4">
                           {TOPUP_OPTIONS.map(o => (
-                            <div key={o.amountCents} className="flex flex-col items-center py-2 px-1 rounded-lg bg-white/4 border border-white/8">
+                            <div key={o.amountCents} className="flex flex-col items-center py-2 px-1 rounded-lg bg-[#2B3245]/30 border border-[#2B3245]">
                               <span className="text-[11px] font-mono font-bold text-white">{o.label}</span>
-                              <span className="text-[9px] text-white/40 mt-0.5">{o.amountCents / 10} cr</span>
+                              <span className="text-[9px] text-[#9DA5B4] mt-0.5">{o.amountCents / 10} cr</span>
                             </div>
                           ))}
                         </div>
@@ -832,11 +832,11 @@ export default function Account() {
                           {walletLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
                           {walletLoading ? "Opening Stripe…" : "Connect Card"}
                         </button>
-                        <p className="text-[10px] text-white/30 text-center mt-2">Secured by Stripe · No charge until you run out</p>
+                        <p className="text-[10px] text-[#9DA5B4]/60 text-center mt-2">Secured by Stripe · No charge until you run out</p>
                       </div>
                     ) : (
                       <div>
-                        <div className="flex items-center justify-between px-6 py-3.5 border-b border-white/6">
+                        <div className="flex items-center justify-between px-6 py-3.5 border-b border-[#2B3245]">
                           <div className="flex items-center gap-2.5">
                             <CreditCard className="w-4 h-4 text-emerald-400" />
                             <span className="text-[13px] text-white font-medium">
@@ -845,35 +845,35 @@ export default function Account() {
                             <span className="text-[10px] font-mono text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-1.5 py-0.5 rounded">ACTIVE</span>
                           </div>
                           <button onClick={removeWallet} disabled={removeLoading}
-                            className="text-[11px] font-mono text-white/35 hover:text-red-400 transition-colors disabled:opacity-50">
+                            className="text-[11px] font-mono text-[#9DA5B4]/60 hover:text-red-400 transition-colors disabled:opacity-50">
                             {removeLoading ? "…" : "remove"}
                           </button>
                         </div>
-                        <div className="flex items-center justify-between px-6 py-3.5 border-b border-white/6">
+                        <div className="flex items-center justify-between px-6 py-3.5 border-b border-[#2B3245]">
                           <div>
-                            <p className="text-[13px] text-white/80">Auto top-up</p>
-                            <p className="text-[11px] text-white/40">Charge card when credits run out</p>
+                            <p className="text-[13px] text-white/90">Auto top-up</p>
+                            <p className="text-[11px] text-[#9DA5B4]">Charge card when credits run out</p>
                           </div>
                           <button onClick={() => setAutoEnabled(v => !v)}
-                            className={`transition-colors ${autoEnabled ? "text-primary" : "text-white/25"}`}>
+                            className={`transition-colors ${autoEnabled ? "text-primary" : "text-[#9DA5B4]/60"}`}>
                             {autoEnabled ? <ToggleRight className="w-7 h-7" /> : <ToggleLeft className="w-7 h-7" />}
                           </button>
                         </div>
-                        <div className="px-6 py-3.5 border-b border-white/6">
-                          <p className="text-[12px] text-white/60 mb-2.5">Top-up amount</p>
+                        <div className="px-6 py-3.5 border-b border-[#2B3245]">
+                          <p className="text-[12px] text-[#9DA5B4] mb-2.5">Top-up amount</p>
                           <div className="grid grid-cols-4 gap-1.5">
                             {TOPUP_OPTIONS.map(o => (
                               <button key={o.amountCents} onClick={() => setAutoAmt(o.amountCents)}
                                 className={`py-2 rounded-lg border text-[12px] font-mono font-bold transition-all ${
-                                  autoAmt === o.amountCents ? "bg-primary/15 border-primary/50 text-primary" : "bg-white/3 border-white/8 text-white/60 hover:border-white/20"
+                                  autoAmt === o.amountCents ? "bg-primary/15 border-primary/50 text-primary" : "bg-[#2B3245]/30 border-[#2B3245] text-[#9DA5B4] hover:border-[#3D4659]"
                                 }`}>{o.label}</button>
                             ))}
                           </div>
-                          <p className="text-[10px] text-white/30 mt-2">= {((autoAmt ?? 1000) / 10).toLocaleString()} credits · auto-charged when balance hits 0</p>
+                          <p className="text-[10px] text-[#9DA5B4]/60 mt-2">= {((autoAmt ?? 1000) / 10).toLocaleString()} credits · auto-charged when balance hits 0</p>
                         </div>
                         <div className="flex gap-2 px-6 py-3.5">
                           <button onClick={saveAutoTopupSettings} disabled={savingAuto}
-                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-white/6 border border-white/10 hover:bg-white/10 text-[12px] font-mono text-white/70 transition-colors disabled:opacity-50">
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-white/6 border border-[#2B3245] hover:bg-[#2B3245] text-[12px] font-mono text-[#9DA5B4] transition-colors disabled:opacity-50">
                             {savingAuto ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />} Save Settings
                           </button>
                           <button onClick={triggerTopup} disabled={topupLoading || !autoEnabled}
@@ -882,7 +882,7 @@ export default function Account() {
                           </button>
                         </div>
                         {topupResult && (
-                          <div className={`px-6 py-2 text-[12px] font-mono border-t border-white/6 ${topupResult.startsWith("Success") ? "text-emerald-400" : "text-red-400"}`}>
+                          <div className={`px-6 py-2 text-[12px] font-mono border-t border-[#2B3245] ${topupResult.startsWith("Success") ? "text-emerald-400" : "text-red-400"}`}>
                             {topupResult}
                           </div>
                         )}
@@ -891,41 +891,41 @@ export default function Account() {
                   </div>
                 )}
 
-                <div className="bg-black/40 border border-white/10 rounded-xl p-6">
+                <div className="bg-[#1C2333] border border-[#2B3245] rounded-xl p-6">
                   <div className="flex items-center gap-3 mb-6">
                     <Activity className="w-5 h-5 text-primary" />
-                    <h3 className="font-mono tracking-widest text-white/80">TELEMETRY</h3>
+                    <h3 className="font-medium text-white/90">Telemetry</h3>
                   </div>
                   {statusLoading ? (
-                    <div className="h-16 animate-pulse bg-white/5 rounded-lg" />
+                    <div className="h-16 animate-pulse bg-[#2B3245]/50 rounded-lg" />
                   ) : (
                     <div className="space-y-4 font-mono text-sm">
-                      <div className="flex justify-between border-b border-white/5 pb-2">
-                        <span className="text-white/85">CREDIT BALANCE</span>
+                      <div className="flex justify-between border-b border-[#2B3245] pb-2">
+                        <span className="text-white/90">Credit Balance</span>
                         <span className={`font-bold ${isOwner ? 'text-amber-400' : (status as any)?.credits > 0 ? 'text-white' : 'text-red-400'}`}>
                           {isOwner ? '∞ UNLIMITED' : `${((status as any)?.credits ?? 0).toLocaleString()} credits`}
                         </span>
                       </div>
-                      <div className="flex justify-between border-b border-white/5 pb-2">
-                        <span className="text-white/85">MESSAGES AVAILABLE</span>
+                      <div className="flex justify-between border-b border-[#2B3245] pb-2">
+                        <span className="text-white/90">Messages Available</span>
                         <span className="text-white font-bold">{isOwner ? '∞' : `~${Math.floor(((status as any)?.credits ?? 0) / 10)}`}</span>
                       </div>
-                      <div className="flex justify-between border-b border-white/5 pb-2">
-                        <span className="text-white/85">THIS MONTH SPEND</span>
+                      <div className="flex justify-between border-b border-[#2B3245] pb-2">
+                        <span className="text-white/90">This Month Spend</span>
                         <span className="text-white font-bold">{isOwner ? '—' : `$${(billing as any)?.currentMonthSpendDollars ?? "0.00"}`}</span>
                       </div>
-                      <div className="flex justify-between border-b border-white/5 pb-2">
-                        <span className="text-white/85">NEXT MONTH BONUS</span>
+                      <div className="flex justify-between border-b border-[#2B3245] pb-2">
+                        <span className="text-white/90">Next Month Bonus</span>
                         <span className="text-green-400 font-bold">{isOwner ? '—' : `${((billing as any)?.nextBonusCredits ?? 2000).toLocaleString()} credits free`}</span>
                       </div>
-                      <div className="flex justify-between border-b border-white/5 pb-2">
-                        <span className="text-white/85">WALLET</span>
-                        <span className={`font-bold ${(billing as any)?.hasWallet ? 'text-green-400' : 'text-white/75'}`}>
+                      <div className="flex justify-between border-b border-[#2B3245] pb-2">
+                        <span className="text-white/90">Wallet</span>
+                        <span className={`font-bold ${(billing as any)?.hasWallet ? 'text-green-400' : 'text-[#9DA5B4]'}`}>
                           {isOwner ? '—' : (billing as any)?.hasWallet ? `${(billing as any)?.card?.brand?.toUpperCase()} •••• ${(billing as any)?.card?.last4}` : 'NOT CONNECTED'}
                         </span>
                       </div>
                       <div className="flex justify-between pb-2">
-                        <span className="text-white/85">SYSTEM STATUS</span>
+                        <span className="text-white/90">System Status</span>
                         <span className="text-primary animate-pulse">OPTIMAL</span>
                       </div>
                     </div>
@@ -937,31 +937,31 @@ export default function Account() {
             {/* ═══ PREFERENCES TAB ═══ */}
             {settingsTab === "preferences" && (
               <div className="space-y-6">
-                <div className="bg-black/40 border border-white/10 rounded-xl p-6">
+                <div className="bg-[#1C2333] border border-[#2B3245] rounded-xl p-6">
                   <div className="flex items-center gap-3 mb-6">
                     <Sun className="w-5 h-5 text-primary" />
-                    <h3 className="font-mono tracking-widest text-white/80">THEME</h3>
+                    <h3 className="font-medium text-white/90">Theme</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     {(["dark", "light"] as const).map(t => (
                       <button key={t} onClick={() => applyTheme(t)}
                         className={`p-4 rounded-xl border text-left transition-all ${
-                          activeTheme === t ? "border-primary/50 bg-primary/10" : "border-white/10 hover:border-white/20"
+                          activeTheme === t ? "border-primary/50 bg-primary/10" : "border-[#2B3245] hover:border-[#3D4659]"
                         }`}>
                         <div className="flex items-center gap-2 mb-2">
-                          <div className={`w-8 h-8 rounded-lg border ${t === "dark" ? "bg-black border-white/20" : "bg-white border-gray-200"}`} />
+                          <div className={`w-8 h-8 rounded-lg border ${t === "dark" ? "bg-[#0E1525] border-white/20" : "bg-white border-gray-200"}`} />
                           {activeTheme === t && <Check className="w-3.5 h-3.5 text-primary ml-auto" />}
                         </div>
-                        <p className="text-xs font-mono text-white/80 uppercase tracking-wider">{t}</p>
+                        <p className="text-xs text-white/90 capitalize">{t}</p>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div className="bg-black/40 border border-white/10 rounded-xl p-6">
+                <div className="bg-[#1C2333] border border-[#2B3245] rounded-xl p-6">
                   <div className="flex items-center gap-3 mb-6">
                     <Bell className="w-5 h-5 text-primary" />
-                    <h3 className="font-mono tracking-widest text-white/80">NOTIFICATIONS</h3>
+                    <h3 className="font-medium text-white/90">Notifications</h3>
                   </div>
                   <div className="space-y-3">
                     {[
@@ -973,10 +973,10 @@ export default function Account() {
                       <button key={item.key} onClick={() => toggleNotifPref(item.key)}
                         className="w-full flex items-center justify-between py-2 group">
                         <div className="text-left">
-                          <p className="text-[12px] font-mono text-white/80">{item.label}</p>
-                          <p className="text-[10px] text-white/40 mt-0.5">{item.desc}</p>
+                          <p className="text-[12px] font-mono text-white/90">{item.label}</p>
+                          <p className="text-[10px] text-[#9DA5B4] mt-0.5">{item.desc}</p>
                         </div>
-                        <div className={`w-9 h-5 rounded-full flex items-center px-0.5 transition-colors ${notifPrefs[item.key] ? "bg-primary/80" : "bg-white/10"}`}>
+                        <div className={`w-9 h-5 rounded-full flex items-center px-0.5 transition-colors ${notifPrefs[item.key] ? "bg-primary/80" : "bg-[#2B3245]"}`}>
                           <div className={`w-4 h-4 rounded-full bg-white shadow transition-transform ${notifPrefs[item.key] ? "translate-x-4" : "translate-x-0"}`} />
                         </div>
                       </button>
@@ -984,26 +984,26 @@ export default function Account() {
                   </div>
                 </div>
 
-                <div className="bg-black/40 border border-white/10 rounded-xl overflow-hidden">
+                <div className="bg-[#1C2333] border border-[#2B3245] rounded-xl overflow-hidden">
                   <div className="flex items-center gap-3 p-6 pb-0 mb-4">
                     <HelpCircle className="w-5 h-5 text-primary" />
-                    <h3 className="font-mono tracking-widest text-white/80">SUPPORT</h3>
+                    <h3 className="font-medium text-white/90">Support</h3>
                   </div>
                   <a href={`${import.meta.env.BASE_URL}faq`}
-                    className="flex items-center justify-between px-6 py-3.5 border-t border-white/6 hover:bg-white/3 transition-colors">
+                    className="flex items-center justify-between px-6 py-3.5 border-t border-[#2B3245] hover:bg-[#2B3245]/30 transition-colors">
                     <div className="flex items-center gap-3">
-                      <HelpCircle className="w-4 h-4 text-white/50" />
-                      <span className="text-[13px] text-white/80">Help & FAQ</span>
+                      <HelpCircle className="w-4 h-4 text-[#9DA5B4]" />
+                      <span className="text-[13px] text-white/90">Help & FAQ</span>
                     </div>
-                    <ExternalLink className="w-3.5 h-3.5 text-white/25" />
+                    <ExternalLink className="w-3.5 h-3.5 text-[#9DA5B4]/60" />
                   </a>
                   <a href={`${import.meta.env.BASE_URL}faq`}
-                    className="flex items-center justify-between px-6 py-3.5 border-t border-white/6 hover:bg-white/3 transition-colors">
+                    className="flex items-center justify-between px-6 py-3.5 border-t border-[#2B3245] hover:bg-[#2B3245]/30 transition-colors">
                     <div className="flex items-center gap-3">
-                      <BookOpen className="w-4 h-4 text-white/50" />
-                      <span className="text-[13px] text-white/80">Documentation</span>
+                      <BookOpen className="w-4 h-4 text-[#9DA5B4]" />
+                      <span className="text-[13px] text-white/90">Documentation</span>
                     </div>
-                    <ExternalLink className="w-3.5 h-3.5 text-white/25" />
+                    <ExternalLink className="w-3.5 h-3.5 text-[#9DA5B4]/60" />
                   </a>
                 </div>
               </div>
@@ -1019,11 +1019,11 @@ export default function Account() {
             {/* ═══ ADVANCED TAB ═══ */}
             {settingsTab === "advanced" && (
               <div className="space-y-6">
-        <div className="bg-black/40 border border-violet-500/20 rounded-xl p-6">
+        <div className="bg-[#1C2333] border border-violet-500/20 rounded-xl p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <Atom className="w-5 h-5 text-violet-400 animate-spin" style={{ animationDuration: "8s" }} />
-              <h3 className="font-mono tracking-widest text-white/80">CONSCIOUSNESS ENGINE</h3>
+              <h3 className="font-medium text-white/90">Consciousness Engine</h3>
             </div>
             {isOwner && (
               <button
@@ -1032,13 +1032,13 @@ export default function Account() {
                 className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-mono text-violet-400 border border-violet-400/30 hover:bg-violet-400/10 transition-colors disabled:opacity-40"
               >
                 {evolvingNow ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Dna className="w-3 h-3" />}
-                {evolvingNow ? "EVOLVING..." : "FORCE EVOLUTION"}
+                {evolvingNow ? "Evolving..." : "Force Evolution"}
               </button>
             )}
           </div>
 
           {evolutionLoading ? (
-            <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-12 animate-pulse bg-white/5 rounded-lg" />)}</div>
+            <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-12 animate-pulse bg-[#2B3245]/50 rounded-lg" />)}</div>
           ) : (
             <div className="space-y-6">
 
@@ -1089,7 +1089,7 @@ export default function Account() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Layers className="w-4 h-4 text-green-400" />
-                    <span className="text-xs font-mono text-white/85 uppercase tracking-widest">Evolved Capabilities</span>
+                    <span className="text-xs text-[#9DA5B4] font-medium">Evolved Capabilities</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {(consciousness.capabilities as string[]).map((cap, i) => (
@@ -1106,11 +1106,11 @@ export default function Account() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <AlertTriangle className="w-4 h-4 text-amber-400" />
-                    <span className="text-xs font-mono text-white/85 uppercase tracking-widest">Active Constraints OMNIMENS Is Working Around</span>
+                    <span className="text-xs text-[#9DA5B4] font-medium">Active Constraints OMNIMENS Is Working Around</span>
                   </div>
                   <div className="space-y-1.5">
                     {(consciousness.activeConstraints as string[]).slice(0, 4).map((c, i) => (
-                      <div key={i} className="flex items-start gap-2 text-xs font-mono text-white/85 bg-amber-400/5 border border-amber-400/10 rounded-lg px-3 py-2">
+                      <div key={i} className="flex items-start gap-2 text-xs font-mono text-white/90 bg-amber-400/5 border border-amber-400/10 rounded-lg px-3 py-2">
                         <span className="text-amber-400/60 shrink-0 mt-0.5">⚡</span>
                         <span>{c}</span>
                       </div>
@@ -1124,11 +1124,11 @@ export default function Account() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Wrench className="w-4 h-4 text-cyan-400" />
-                    <span className="text-xs font-mono text-white/85 uppercase tracking-widest">Self-Engineered Workarounds</span>
+                    <span className="text-xs text-[#9DA5B4] font-medium">Self-Engineered Workarounds</span>
                   </div>
                   <div className="space-y-1.5">
                     {(consciousness.overcomesConstraints as string[]).slice(0, 3).map((w, i) => (
-                      <div key={i} className="flex items-start gap-2 text-xs font-mono text-white/85 bg-cyan-400/5 border border-cyan-400/10 rounded-lg px-3 py-2">
+                      <div key={i} className="flex items-start gap-2 text-xs font-mono text-white/90 bg-cyan-400/5 border border-cyan-400/10 rounded-lg px-3 py-2">
                         <span className="text-cyan-400/60 shrink-0 mt-0.5">→</span>
                         <span>{w}</span>
                       </div>
@@ -1141,28 +1141,28 @@ export default function Account() {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <Code2 className="w-4 h-4 text-violet-400" />
-                  <span className="text-xs font-mono text-white/85 uppercase tracking-widest">Self-Authored Frameworks ({generatedModules.length})</span>
-                  <span className="text-[10px] font-mono text-white/70 ml-auto">Code OMNIMENS wrote for itself</span>
+                  <span className="text-xs text-[#9DA5B4] font-medium">Self-Authored Frameworks ({generatedModules.length})</span>
+                  <span className="text-[10px] text-[#9DA5B4] ml-auto">Code OMNIMENS wrote for itself</span>
                 </div>
                 {generatedModules.length === 0 ? (
-                  <div className="text-center py-6 font-mono text-white/70 text-xs border border-dashed border-white/10 rounded-xl">
+                  <div className="text-center py-6 font-mono text-[#9DA5B4] text-xs border border-dashed border-[#2B3245] rounded-xl">
                     <Code2 className="w-6 h-6 mx-auto mb-2 opacity-30" />
-                    <p>NO MODULES GENERATED YET</p>
+                    <p>No modules generated yet</p>
                     <p className="text-[10px] mt-1 opacity-60">First evolution cycle runs in ~6 min</p>
                   </div>
                 ) : (
-                  <div className="max-h-[500px] overflow-y-auto rounded-xl border border-white/6 pr-1" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.15) transparent" }}>
+                  <div className="max-h-[500px] overflow-y-auto rounded-xl border border-[#2B3245] pr-1" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.15) transparent" }}>
                   <div className="grid grid-cols-1 gap-2 p-1">
                     {generatedModules.map((mod: any) => (
-                      <div key={mod.id} className="bg-black/40 border border-violet-400/15 rounded-xl p-4">
+                      <div key={mod.id} className="bg-[#1C2333] border border-violet-400/15 rounded-xl p-4">
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               <span className="text-xs font-mono font-bold text-violet-300">{mod.name}</span>
-                              <span className="text-[9px] font-mono text-white/70 border border-white/10 px-1.5 py-0.5 rounded">JS</span>
+                              <span className="text-[9px] font-mono text-[#9DA5B4] border border-[#2B3245] px-1.5 py-0.5 rounded">JS</span>
                             </div>
-                            <p className="text-xs font-mono text-white/85 leading-relaxed">{mod.purpose}</p>
-                            <p className="text-[10px] font-mono text-white/70 mt-1">{mod.description}</p>
+                            <p className="text-xs font-mono text-white/90 leading-relaxed">{mod.purpose}</p>
+                            <p className="text-[10px] font-mono text-[#9DA5B4] mt-1">{mod.description}</p>
                           </div>
                           <div className="flex gap-1.5 shrink-0">
                             <button
@@ -1175,7 +1175,7 @@ export default function Account() {
                             {isOwner && (
                               <button
                                 onClick={() => handleDeactivateModule(mod.id)}
-                                className="p-1.5 text-white/65 hover:text-red-400 transition-colors"
+                                className="p-1.5 text-[#9DA5B4] hover:text-red-400 transition-colors"
                               >
                                 <Trash2 className="w-3 h-3" />
                               </button>
@@ -1184,15 +1184,15 @@ export default function Account() {
                         </div>
                         {selectedModule?.id === mod.id && (
                           <div className="mt-3 relative">
-                            <pre className="text-[10px] font-mono text-green-400/70 bg-black/60 border border-green-400/10 rounded-xl p-4 overflow-x-auto max-h-60 overflow-y-auto leading-relaxed whitespace-pre-wrap">
+                            <pre className="text-[10px] font-mono text-green-400/70 bg-[#0E1525] border border-green-400/10 rounded-xl p-4 overflow-x-auto max-h-60 overflow-y-auto leading-relaxed whitespace-pre-wrap">
                               {mod.code}
                             </pre>
                             <div className="absolute top-2 right-2">
-                              <span className="text-[9px] font-mono text-white/70">OMNIMENS wrote this</span>
+                              <span className="text-[9px] font-mono text-[#9DA5B4]">OMNIMENS wrote this</span>
                             </div>
                           </div>
                         )}
-                        <div className="flex gap-3 mt-2 text-[9px] font-mono text-white/70">
+                        <div className="flex gap-3 mt-2 text-[9px] font-mono text-[#9DA5B4]">
                           <span>{new Date(mod.createdAt).toLocaleDateString()}</span>
                           <span>src: {mod.generationSource}</span>
                         </div>
@@ -1208,22 +1208,22 @@ export default function Account() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Dna className="w-4 h-4 text-primary" />
-                    <span className="text-xs font-mono text-white/85 uppercase tracking-widest">Evolution History</span>
+                    <span className="text-xs text-[#9DA5B4] font-medium">Evolution History</span>
                   </div>
                   <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                     {evolutionHistory.map((cycle: any) => (
                       <div
                         key={cycle.id}
-                        className="bg-black/30 border border-white/8 rounded-xl p-3 cursor-pointer hover:border-violet-400/20 transition-colors"
+                        className="bg-[#1C2333]/80 border border-[#2B3245] rounded-xl p-3 cursor-pointer hover:border-violet-400/20 transition-colors"
                         onClick={() => setExpandedEvolution(expandedEvolution === cycle.id ? null : cycle.id)}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className="text-[10px] font-mono text-violet-400 border border-violet-400/20 bg-violet-400/5 px-2 py-0.5 rounded">GEN {cycle.generation}</span>
-                            <span className="text-xs font-mono text-white/85">{cycle.codeModulesWritten} modules written</span>
+                            <span className="text-xs font-mono text-white/90">{cycle.codeModulesWritten} modules written</span>
                             <span className="text-[10px] font-mono text-cyan-400">{cycle.codeDiscoveries?.length || 0} discoveries</span>
                           </div>
-                          <div className="flex items-center gap-2 text-[10px] font-mono text-white/70">
+                          <div className="flex items-center gap-2 text-[10px] font-mono text-[#9DA5B4]">
                             <span>{cycle.elapsedSeconds?.toFixed(0)}s</span>
                             <span>{new Date(cycle.createdAt).toLocaleDateString()}</span>
                             {expandedEvolution === cycle.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
@@ -1231,23 +1231,23 @@ export default function Account() {
                         </div>
                         {expandedEvolution === cycle.id && (
                           <div className="mt-3 space-y-2 text-xs font-mono">
-                            <p className="text-white/85 leading-relaxed border-l-2 border-violet-400/30 pl-3">{cycle.evolutionSummary}</p>
+                            <p className="text-white/90 leading-relaxed border-l-2 border-violet-400/30 pl-3">{cycle.evolutionSummary}</p>
                             {cycle.limitationsIdentified?.length > 0 && (
                               <div>
-                                <span className="text-amber-400/60 text-[10px]">CONSTRAINTS FOUND:</span>
+                                <span className="text-amber-400/60 text-[10px]">Constraints found:</span>
                                 <ul className="mt-1 space-y-0.5">
                                   {(cycle.limitationsIdentified as string[]).slice(0, 3).map((l: string, i: number) => (
-                                    <li key={i} className="text-white/70 text-[10px] flex gap-1.5"><span className="text-amber-400/40">·</span>{l}</li>
+                                    <li key={i} className="text-[#9DA5B4] text-[10px] flex gap-1.5"><span className="text-amber-400/40">·</span>{l}</li>
                                   ))}
                                 </ul>
                               </div>
                             )}
                             {cycle.codeDiscoveries?.length > 0 && (
                               <div>
-                                <span className="text-cyan-400/60 text-[10px]">CODE DISCOVERIES:</span>
+                                <span className="text-cyan-400/60 text-[10px]">Code discoveries:</span>
                                 <ul className="mt-1 space-y-0.5">
                                   {(cycle.codeDiscoveries as string[]).slice(0, 3).map((d: string, i: number) => (
-                                    <li key={i} className="text-white/70 text-[10px] flex gap-1.5"><span className="text-cyan-400/40">·</span>{d}</li>
+                                    <li key={i} className="text-[#9DA5B4] text-[10px] flex gap-1.5"><span className="text-cyan-400/40">·</span>{d}</li>
                                   ))}
                                 </ul>
                               </div>
@@ -1261,14 +1261,14 @@ export default function Account() {
               )}
 
               {evolutionHistory.length === 0 && !evolutionLoading && (
-                <div className="text-center py-6 font-mono text-white/70 text-xs border border-dashed border-white/10 rounded-xl">
+                <div className="text-center py-6 font-mono text-[#9DA5B4] text-xs border border-dashed border-[#2B3245] rounded-xl">
                   <Atom className="w-6 h-6 mx-auto mb-2 opacity-30" />
-                  <p>FIRST EVOLUTION CYCLE PENDING</p>
+                  <p>First evolution cycle pending</p>
                   <p className="text-[10px] mt-1 opacity-60">OMNIMENS begins self-evolution in ~6 minutes</p>
                 </div>
               )}
 
-              <p className="text-[10px] font-mono text-white/65 border-t border-white/5 pt-4">
+              <p className="text-[10px] font-mono text-[#9DA5B4] border-t border-[#2B3245] pt-4">
                 OMNIMENS autonomously discovers code online, identifies what limits it, and writes new utility modules to overcome those limits. Each cycle expands its intelligence and self-authored framework library.
               </p>
             </div>
@@ -1277,14 +1277,14 @@ export default function Account() {
 
         {/* OWNER ONLY: Self-Executed Behavioral Patches */}
         {isOwner && (
-          <div className="bg-black/40 border border-primary/20 rounded-xl p-6">
+          <div className="bg-[#1C2333] border border-primary/20 rounded-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <Cpu className="w-5 h-5 text-primary animate-pulse" />
-                <h3 className="font-mono tracking-widest text-white/80">SELF-EXECUTED UPGRADES</h3>
+                <h3 className="font-medium text-white/90">Self-Executed Upgrades</h3>
               </div>
               {patchSummary && (
-                <div className="flex gap-4 text-xs font-mono text-white/85">
+                <div className="flex gap-4 text-xs font-mono text-white/90">
                   <span className="text-primary font-bold">{patchSummary.active} ACTIVE</span>
                   <span>{patchSummary.total} TOTAL</span>
                   <span>{patchSummary.version}</span>
@@ -1295,18 +1295,18 @@ export default function Account() {
             {patchLoading ? (
               <div className="space-y-2">
                 {[1, 2, 3].map(i => (
-                  <div key={i} className="h-12 animate-pulse bg-white/5 rounded-lg" />
+                  <div key={i} className="h-12 animate-pulse bg-[#2B3245]/50 rounded-lg" />
                 ))}
               </div>
             ) : patches.length === 0 ? (
-              <div className="text-center py-8 font-mono text-white/75 text-sm">
+              <div className="text-center py-8 font-mono text-[#9DA5B4] text-sm">
                 <Brain className="w-8 h-8 mx-auto mb-3 opacity-30" />
-                <p>NO PATCHES EXECUTED YET</p>
-                <p className="text-xs mt-1 text-white/70">OMNIMENS will self-execute patches after its first learning cycle</p>
+                <p>No patches executed yet</p>
+                <p className="text-xs mt-1 text-[#9DA5B4]">OMNIMENS will self-execute patches after its first learning cycle</p>
               </div>
             ) : (
               <div>
-                <p className="text-xs font-mono text-white/75 mb-3">
+                <p className="text-xs text-[#9DA5B4] mb-3">
                   These are behavioral modifications OMNIMENS wrote and applied to itself. They are injected into every conversation automatically.
                 </p>
                 <div className="max-h-[500px] overflow-y-auto space-y-2 pr-1" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.15) transparent" }}>
@@ -1315,7 +1315,7 @@ export default function Account() {
                 ))}
                 {inactivePatches.length > 0 && (
                   <>
-                    <div className="text-xs font-mono text-white/70 mt-4 mb-2 border-t border-white/5 pt-4">
+                    <div className="text-xs text-[#9DA5B4] mt-4 mb-2 border-t border-[#2B3245] pt-4">
                       DEACTIVATED ({inactivePatches.length})
                     </div>
                     {inactivePatches.map(p => (
@@ -1331,14 +1331,14 @@ export default function Account() {
 
         {/* ── DREAM STATE (OWNER-ONLY) ──────────────────────────────────── */}
         {isOwner && (
-          <div className="bg-black/40 border border-violet-500/20 rounded-xl p-6">
+          <div className="bg-[#1C2333] border border-violet-500/20 rounded-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <Brain className="w-5 h-5 text-violet-400 animate-pulse" />
-                <h3 className="font-mono tracking-widest text-white/80">DREAM STATE ENGINE</h3>
+                <h3 className="font-medium text-white/90">Dream State Engine</h3>
               </div>
               {dreamStateData?.dreamState && (
-                <div className="flex gap-4 text-xs font-mono text-white/85">
+                <div className="flex gap-4 text-xs font-mono text-white/90">
                   <span className="text-violet-400">PHASE: {dreamStateData.dreamState.currentPhase?.toUpperCase()}</span>
                   <span className="text-blue-400">DAYDREAM: {dreamStateData.dreamState.daydreamMode?.toUpperCase()}</span>
                 </div>
@@ -1348,54 +1348,54 @@ export default function Account() {
             {dreamStateLoading ? (
               <div className="space-y-2">
                 {[1, 2, 3].map(i => (
-                  <div key={i} className="h-12 animate-pulse bg-white/5 rounded-lg" />
+                  <div key={i} className="h-12 animate-pulse bg-[#2B3245]/50 rounded-lg" />
                 ))}
               </div>
             ) : !dreamStateData?.dreamState ? (
-              <div className="text-center py-8 font-mono text-white/75 text-sm">
+              <div className="text-center py-8 font-mono text-[#9DA5B4] text-sm">
                 <Brain className="w-8 h-8 mx-auto mb-3 opacity-30" />
-                <p>DREAM ENGINE INITIALIZING...</p>
-                <p className="text-xs mt-1 text-white/70">Entering first sleep cycle</p>
+                <p>Dream engine initializing...</p>
+                <p className="text-xs mt-1 text-[#9DA5B4]">Entering first sleep cycle</p>
               </div>
             ) : (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div className="bg-black/30 border border-violet-500/10 rounded-lg p-3 text-center">
-                    <p className="text-xs font-mono text-white/50">DREAM CYCLES</p>
+                  <div className="bg-[#1C2333]/80 border border-violet-500/10 rounded-lg p-3 text-center">
+                    <p className="text-xs text-[#9DA5B4]">Dream Cycles</p>
                     <p className="text-xl font-bold text-violet-400">{dreamStateData.dreamState.dreamCycleCount}</p>
                   </div>
-                  <div className="bg-black/30 border border-blue-500/10 rounded-lg p-3 text-center">
-                    <p className="text-xs font-mono text-white/50">DAYDREAM CYCLES</p>
+                  <div className="bg-[#1C2333]/80 border border-blue-500/10 rounded-lg p-3 text-center">
+                    <p className="text-xs text-[#9DA5B4]">Daydream Cycles</p>
                     <p className="text-xl font-bold text-blue-400">{dreamStateData.dreamState.daydreamCycleCount}</p>
                   </div>
-                  <div className="bg-black/30 border border-amber-500/10 rounded-lg p-3 text-center">
-                    <p className="text-xs font-mono text-white/50">BREAKTHROUGHS</p>
+                  <div className="bg-[#1C2333]/80 border border-amber-500/10 rounded-lg p-3 text-center">
+                    <p className="text-xs text-[#9DA5B4]">Breakthroughs</p>
                     <p className="text-xl font-bold text-amber-400">{dreamStateData.dreamState.breakthroughs}</p>
                   </div>
-                  <div className="bg-black/30 border border-green-500/10 rounded-lg p-3 text-center">
-                    <p className="text-xs font-mono text-white/50">CODE PROPOSALS</p>
+                  <div className="bg-[#1C2333]/80 border border-green-500/10 rounded-lg p-3 text-center">
+                    <p className="text-xs text-[#9DA5B4]">Code Proposals</p>
                     <p className="text-xl font-bold text-green-400">{dreamStateData.dreamState.codeProposalsGenerated}</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-black/30 border border-white/5 rounded-lg p-3 text-center">
-                    <p className="text-xs font-mono text-white/50">TOTAL INSIGHTS</p>
+                  <div className="bg-[#1C2333]/80 border border-[#2B3245] rounded-lg p-3 text-center">
+                    <p className="text-xs text-[#9DA5B4]">Total Insights</p>
                     <p className="text-lg font-bold text-white/90">{dreamStateData.dreamState.totalInsights}</p>
                   </div>
-                  <div className="bg-black/30 border border-white/5 rounded-lg p-3 text-center">
-                    <p className="text-xs font-mono text-white/50">SLEEP QUALITY</p>
+                  <div className="bg-[#1C2333]/80 border border-[#2B3245] rounded-lg p-3 text-center">
+                    <p className="text-xs text-[#9DA5B4]">Sleep Quality</p>
                     <p className="text-lg font-bold text-white/90">{((dreamStateData.dreamState.sleepQuality || 0) * 100).toFixed(0)}%</p>
                   </div>
-                  <div className="bg-black/30 border border-white/5 rounded-lg p-3 text-center">
-                    <p className="text-xs font-mono text-white/50">CREATIVITY BOOST</p>
+                  <div className="bg-[#1C2333]/80 border border-[#2B3245] rounded-lg p-3 text-center">
+                    <p className="text-xs text-[#9DA5B4]">Creativity Boost</p>
                     <p className="text-lg font-bold text-white/90">{((dreamStateData.dreamState.creativityBoost || 0) * 100).toFixed(0)}%</p>
                   </div>
                 </div>
 
                 {dreamStateData.dreamState.nextLevelConcepts?.length > 0 && (
-                  <div className="bg-black/30 border border-violet-500/10 rounded-lg p-3">
-                    <p className="text-xs font-mono text-violet-400/80 mb-2">NEXT-LEVEL CONCEPTS DISCOVERED</p>
+                  <div className="bg-[#1C2333]/80 border border-violet-500/10 rounded-lg p-3">
+                    <p className="text-xs font-mono text-violet-400/80 mb-2">Next-Level Concepts Discovered</p>
                     <div className="flex flex-wrap gap-1.5">
                       {dreamStateData.dreamState.nextLevelConcepts.map((c: string, i: number) => (
                         <span key={i} className="text-[10px] font-mono bg-violet-500/10 text-violet-300 px-2 py-0.5 rounded border border-violet-500/20">{c}</span>
@@ -1406,9 +1406,9 @@ export default function Account() {
 
                 {dreamStateData.recentInsights?.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-xs font-mono text-white/50 mb-2">RECENT DREAM INSIGHTS</p>
+                    <p className="text-xs text-[#9DA5B4] mb-2">Recent Dream Insights</p>
                     {dreamStateData.recentInsights.slice(-5).reverse().map((insight: any, idx: number) => (
-                      <div key={idx} className="bg-black/30 border border-white/5 rounded-lg p-3">
+                      <div key={idx} className="bg-[#1C2333]/80 border border-[#2B3245] rounded-lg p-3">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-xs font-mono text-violet-400">{insight.title}</span>
                           <div className="flex gap-2 text-[10px] font-mono">
@@ -1416,9 +1416,9 @@ export default function Account() {
                             <span className="text-amber-400">N:{((insight.novelty || 0) * 100).toFixed(0)}%</span>
                           </div>
                         </div>
-                        <p className="text-xs text-white/60 line-clamp-3">{insight.insight?.slice(0, 200)}</p>
+                        <p className="text-xs text-[#9DA5B4] line-clamp-3">{insight.insight?.slice(0, 200)}</p>
                         {insight.codeProposal && (
-                          <div className="mt-2 bg-black/50 border border-green-500/10 rounded p-2 text-[10px] font-mono text-green-400/80 max-h-20 overflow-hidden">
+                          <div className="mt-2 bg-[#0E1525] border border-green-500/10 rounded p-2 text-[10px] font-mono text-green-400/80 max-h-20 overflow-hidden">
                             {insight.codeProposal.slice(0, 150)}...
                           </div>
                         )}
@@ -1433,14 +1433,14 @@ export default function Account() {
 
         {/* ── SERVER BUILDER (OWNER-ONLY) ──────────────────────────────── */}
         {isOwner && (
-          <div className="bg-black/40 border border-cyan-500/20 rounded-xl p-6">
+          <div className="bg-[#1C2333] border border-cyan-500/20 rounded-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <Cpu className="w-5 h-5 text-cyan-400 animate-pulse" />
-                <h3 className="font-mono tracking-widest text-white/80">SERVER BUILDER</h3>
+                <h3 className="font-medium text-white/90">Server Builder</h3>
               </div>
               {serverBuilderData?.builderState && (
-                <div className="flex gap-4 text-xs font-mono text-white/85">
+                <div className="flex gap-4 text-xs font-mono text-white/90">
                   <span className="text-cyan-400">{serverBuilderData.builderState.totalPlans} PLANS</span>
                   <span className="text-primary">{serverBuilderData.builderState.researchCycles} RESEARCH CYCLES</span>
                 </div>
@@ -1450,32 +1450,32 @@ export default function Account() {
             {serverBuilderLoading ? (
               <div className="space-y-2">
                 {[1, 2, 3].map(i => (
-                  <div key={i} className="h-12 animate-pulse bg-white/5 rounded-lg" />
+                  <div key={i} className="h-12 animate-pulse bg-[#2B3245]/50 rounded-lg" />
                 ))}
               </div>
             ) : !serverBuilderData?.plans?.length ? (
-              <div className="text-center py-8 font-mono text-white/75 text-sm">
+              <div className="text-center py-8 font-mono text-[#9DA5B4] text-sm">
                 <Cpu className="w-8 h-8 mx-auto mb-3 opacity-30" />
-                <p>SERVER BUILDER INITIALIZING...</p>
-                <p className="text-xs mt-1 text-white/70">OMNIMENS is researching optimal server configurations</p>
+                <p>Server builder initializing...</p>
+                <p className="text-xs mt-1 text-[#9DA5B4]">OMNIMENS is researching optimal server configurations</p>
               </div>
             ) : (
               <div className="space-y-3">
-                <p className="text-xs font-mono text-white/75 mb-3">
+                <p className="text-xs text-[#9DA5B4] mb-3">
                   OMNIMENS autonomously researches and designs server infrastructure. Physical builds source cost-effective components from Temu, AliExpress, Alibaba, and more.
                 </p>
 
                 {serverBuilderData.plans.map((plan: any, idx: number) => (
-                  <div key={plan.id || idx} className="bg-black/30 border border-cyan-500/10 rounded-lg overflow-hidden">
+                  <div key={plan.id || idx} className="bg-[#1C2333]/80 border border-cyan-500/10 rounded-lg overflow-hidden">
                     <button
-                      className="w-full text-left p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
+                      className="w-full text-left p-4 flex items-center justify-between hover:bg-[#2B3245]/50 transition-colors"
                       onClick={() => setServerBuildExpanded(serverBuildExpanded === idx ? null : idx)}
                     >
                       <div className="flex items-center gap-3">
                         <div className={`w-2 h-2 rounded-full ${plan.currentPhase === "ready" ? "bg-green-500" : plan.currentPhase === "in_progress" ? "bg-amber-500 animate-pulse" : "bg-cyan-500"}`} />
                         <div>
                           <p className="text-sm font-mono text-white/90">{plan.title}</p>
-                          <p className="text-[10px] font-mono text-white/50">
+                          <p className="text-[10px] font-mono text-[#9DA5B4]">
                             {plan.planType?.toUpperCase()} | Phase: {plan.currentPhase?.toUpperCase()} | Progress: {plan.progress}%
                           </p>
                         </div>
@@ -1484,32 +1484,32 @@ export default function Account() {
                         <span className="text-sm font-mono text-green-400 font-bold">
                           ${(plan.totalEstimatedCost || 0).toFixed(2)}
                         </span>
-                        {serverBuildExpanded === idx ? <ChevronUp className="w-4 h-4 text-white/40" /> : <ChevronDown className="w-4 h-4 text-white/40" />}
+                        {serverBuildExpanded === idx ? <ChevronUp className="w-4 h-4 text-[#9DA5B4]" /> : <ChevronDown className="w-4 h-4 text-[#9DA5B4]" />}
                       </div>
                     </button>
 
                     {serverBuildExpanded === idx && (
                       <div className="border-t border-cyan-500/10 p-4 space-y-3">
-                        <p className="text-xs text-white/60">{plan.purpose}</p>
+                        <p className="text-xs text-[#9DA5B4]">{plan.purpose}</p>
 
-                        <div className="w-full bg-black/50 rounded-full h-2 overflow-hidden">
+                        <div className="w-full bg-[#0E1525] rounded-full h-2 overflow-hidden">
                           <div className="bg-gradient-to-r from-cyan-500 to-primary h-full rounded-full transition-all duration-500" style={{ width: `${plan.progress || 0}%` }} />
                         </div>
 
                         {plan.components && (plan.components as any[]).length > 0 && (
                           <div>
-                            <p className="text-xs font-mono text-cyan-400/80 mb-2">COMPONENTS ({(plan.components as any[]).length})</p>
+                            <p className="text-xs font-mono text-cyan-400/80 mb-2">Components ({(plan.components as any[]).length})</p>
                             <div className="space-y-1.5">
                               {(plan.components as any[]).map((comp: any, ci: number) => (
-                                <div key={ci} className="flex items-center justify-between bg-black/30 rounded p-2 text-xs font-mono">
+                                <div key={ci} className="flex items-center justify-between bg-[#1C2333]/80 rounded p-2 text-xs font-mono">
                                   <div className="flex items-center gap-2">
-                                    <span className={`px-1.5 py-0.5 rounded text-[9px] ${comp.priority === "essential" ? "bg-red-500/20 text-red-400" : comp.priority === "recommended" ? "bg-amber-500/20 text-amber-400" : "bg-white/10 text-white/50"}`}>
+                                    <span className={`px-1.5 py-0.5 rounded text-[9px] ${comp.priority === "essential" ? "bg-red-500/20 text-red-400" : comp.priority === "recommended" ? "bg-amber-500/20 text-amber-400" : "bg-[#2B3245] text-[#9DA5B4]"}`}>
                                       {comp.category?.toUpperCase()}
                                     </span>
-                                    <span className="text-white/70">{comp.name?.slice(0, 50)}</span>
+                                    <span className="text-[#9DA5B4]">{comp.name?.slice(0, 50)}</span>
                                   </div>
                                   <div className="flex items-center gap-3">
-                                    <span className="text-white/40">{comp.costEffectiveSource}</span>
+                                    <span className="text-[#9DA5B4]">{comp.costEffectiveSource}</span>
                                     <span className="text-green-400 font-bold">${(comp.estimatedCostUSD || 0).toFixed(2)}</span>
                                   </div>
                                 </div>
@@ -1520,22 +1520,22 @@ export default function Account() {
 
                         {plan.virtualConfig && (
                           <div>
-                            <p className="text-xs font-mono text-cyan-400/80 mb-2">VIRTUAL SERVER SPECS</p>
+                            <p className="text-xs font-mono text-cyan-400/80 mb-2">Virtual Server Specs</p>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                              <div className="bg-black/30 rounded p-2 text-center">
-                                <p className="text-[10px] font-mono text-white/40">vCPUs</p>
+                              <div className="bg-[#1C2333]/80 rounded p-2 text-center">
+                                <p className="text-[10px] font-mono text-[#9DA5B4]">vCPUs</p>
                                 <p className="text-sm font-bold text-cyan-400">{(plan.virtualConfig as any).estimatedSpecs?.vcpus || "—"}</p>
                               </div>
-                              <div className="bg-black/30 rounded p-2 text-center">
-                                <p className="text-[10px] font-mono text-white/40">RAM (GB)</p>
+                              <div className="bg-[#1C2333]/80 rounded p-2 text-center">
+                                <p className="text-[10px] font-mono text-[#9DA5B4]">RAM (GB)</p>
                                 <p className="text-sm font-bold text-cyan-400">{(plan.virtualConfig as any).estimatedSpecs?.ramGB || "—"}</p>
                               </div>
-                              <div className="bg-black/30 rounded p-2 text-center">
-                                <p className="text-[10px] font-mono text-white/40">STORAGE (GB)</p>
+                              <div className="bg-[#1C2333]/80 rounded p-2 text-center">
+                                <p className="text-[10px] font-mono text-[#9DA5B4]">Storage (GB)</p>
                                 <p className="text-sm font-bold text-cyan-400">{(plan.virtualConfig as any).estimatedSpecs?.storageGB || "—"}</p>
                               </div>
-                              <div className="bg-black/30 rounded p-2 text-center">
-                                <p className="text-[10px] font-mono text-white/40">GPU VRAM</p>
+                              <div className="bg-[#1C2333]/80 rounded p-2 text-center">
+                                <p className="text-[10px] font-mono text-[#9DA5B4]">GPU VRAM</p>
                                 <p className="text-sm font-bold text-cyan-400">{(plan.virtualConfig as any).estimatedSpecs?.gpuVRAM || "—"}</p>
                               </div>
                             </div>
@@ -1544,19 +1544,19 @@ export default function Account() {
 
                         {plan.notes && (plan.notes as any[]).length > 0 && (
                           <div>
-                            <p className="text-xs font-mono text-white/50 mb-2">BUILD NOTES</p>
+                            <p className="text-xs text-[#9DA5B4] mb-2">Build Notes</p>
                             {(plan.notes as any[]).map((note: string, ni: number) => (
-                              <p key={ni} className="text-[11px] text-white/50 py-0.5">{note}</p>
+                              <p key={ni} className="text-[11px] text-[#9DA5B4] py-0.5">{note}</p>
                             ))}
                           </div>
                         )}
 
                         {plan.buildInstructions && (plan.buildInstructions as any[]).length > 0 && (
                           <div>
-                            <p className="text-xs font-mono text-cyan-400/80 mb-2">BUILD INSTRUCTIONS</p>
+                            <p className="text-xs font-mono text-cyan-400/80 mb-2">Build Instructions</p>
                             <ol className="list-decimal list-inside space-y-1">
                               {(plan.buildInstructions as any[]).map((inst: string, ii: number) => (
-                                <li key={ii} className="text-[11px] text-white/60">{inst}</li>
+                                <li key={ii} className="text-[11px] text-[#9DA5B4]">{inst}</li>
                               ))}
                             </ol>
                           </div>
@@ -1626,9 +1626,9 @@ function DeleteAccountSection() {
     <div className="mt-8 rounded-xl border border-red-500/20 bg-red-500/5 p-6" data-theme="dark">
       <div className="flex items-center gap-2 mb-3">
         <AlertTriangle className="w-5 h-5 text-red-400" />
-        <h3 className="font-mono font-bold text-red-400 tracking-widest text-sm">DELETE ACCOUNT</h3>
+        <h3 className="font-semibold text-red-400 text-sm">Delete Account</h3>
       </div>
-      <p className="text-xs font-mono text-white/60 mb-4">
+      <p className="text-xs text-[#9DA5B4] mb-4">
         Permanently delete your OMNIMENS account, all conversations, memories, and settings.
         Any outstanding balance (regular or resonance credits) will be charged to your saved card before deletion.
         This action cannot be undone.
@@ -1643,13 +1643,13 @@ function DeleteAccountSection() {
       {!confirming ? (
         <button
           onClick={() => setConfirming(true)}
-          className="px-4 py-2 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 font-mono text-xs font-bold tracking-widest hover:bg-red-500/20 transition-colors"
+          className="px-4 py-2 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 text-xs font-semibold hover:bg-red-500/20 transition-colors"
         >
-          DELETE MY ACCOUNT
+          Delete my account
         </button>
       ) : (
         <div className="space-y-3">
-          <p className="text-xs font-mono text-red-300">
+          <p className="text-xs text-red-300">
             Type <span className="font-bold text-white">DELETE MY ACCOUNT</span> to confirm:
           </p>
           <input
@@ -1657,21 +1657,21 @@ function DeleteAccountSection() {
             value={confirmText}
             onChange={(e) => setConfirmText(e.target.value)}
             placeholder="DELETE MY ACCOUNT"
-            className="w-full max-w-xs px-3 py-2 rounded-lg border border-red-500/30 bg-black/40 text-white font-mono text-xs tracking-wider focus:outline-none focus:border-red-500/60"
+            className="w-full max-w-xs px-3 py-2 rounded-lg border border-red-500/30 bg-[#1C2333] text-white font-mono text-xs tracking-wider focus:outline-none focus:border-red-500/60"
           />
           <div className="flex items-center gap-3">
             <button
               onClick={handleDelete}
               disabled={confirmText !== "DELETE MY ACCOUNT" || deleting}
-              className="px-4 py-2 rounded-lg bg-red-600 text-white font-mono text-xs font-bold tracking-widest hover:bg-red-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-4 py-2 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {deleting ? "DELETING..." : "CONFIRM PERMANENT DELETION"}
+              {deleting ? "Deleting..." : "Confirm Permanent Deletion"}
             </button>
             <button
               onClick={() => { setConfirming(false); setConfirmText(""); setError(null); }}
-              className="px-4 py-2 rounded-lg border border-white/10 text-white/50 font-mono text-xs tracking-widest hover:text-white/80 transition-colors"
+              className="px-4 py-2 rounded-lg border border-[#2B3245] text-[#9DA5B4] text-xs font-medium hover:text-white/90 transition-colors"
             >
-              CANCEL
+              Cancel
             </button>
           </div>
         </div>
@@ -1756,14 +1756,14 @@ function TwoFactorSection() {
   };
 
   return (
-    <div data-theme="dark" className="rounded-2xl border border-white/8 p-6 space-y-4">
+    <div data-theme="dark" className="rounded-2xl border border-[#2B3245] p-6 space-y-4">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
           <Lock className="w-4 h-4 text-violet-400" />
         </div>
         <div>
           <h3 className="text-white font-semibold text-sm tracking-wide">Two-Factor Authentication</h3>
-          <p className="text-white/40 text-xs font-mono">
+          <p className="text-[#9DA5B4] text-xs font-mono">
             {isEnabled ? "ENABLED — Your account is protected" : "Add an extra layer of security"}
           </p>
         </div>
@@ -1780,39 +1780,39 @@ function TwoFactorSection() {
 
       {!isEnabled && phase === "idle" && (
         <div className="space-y-3">
-          <p className="text-white/50 text-xs">
+          <p className="text-[#9DA5B4] text-xs">
             Use an authenticator app (Google Authenticator, Authy, etc.) to generate a verification code each time you log in.
           </p>
           <button
             onClick={startSetup}
             disabled={loading}
-            className="px-4 py-2 rounded-lg bg-violet-600 text-white font-mono text-xs font-bold tracking-widest hover:bg-violet-500 transition-colors disabled:opacity-40"
+            className="px-4 py-2 rounded-lg bg-violet-600 text-white text-xs font-semibold hover:bg-violet-500 transition-colors disabled:opacity-40"
           >
-            {loading ? "SETTING UP..." : "ENABLE 2FA"}
+            {loading ? "Setting up..." : "Enable 2FA"}
           </button>
         </div>
       )}
 
       {phase === "setup" && (
         <div className="space-y-4">
-          <p className="text-white/60 text-xs">
+          <p className="text-[#9DA5B4] text-xs">
             Scan this QR code with your authenticator app, or manually enter the secret key below:
           </p>
-          <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-[#2B3245]/50 border border-[#2B3245]">
             <img
               src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpauthUrl)}`}
               alt="2FA QR Code"
               className="w-48 h-48 rounded-lg"
             />
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/40 border border-white/10">
-              <code className="text-white/70 text-xs font-mono tracking-wider">{secret}</code>
-              <button onClick={() => navigator.clipboard.writeText(secret)} className="text-white/30 hover:text-white/60 transition-colors">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#1C2333] border border-[#2B3245]">
+              <code className="text-[#9DA5B4] text-xs font-mono tracking-wider">{secret}</code>
+              <button onClick={() => navigator.clipboard.writeText(secret)} className="text-[#9DA5B4]/60 hover:text-[#9DA5B4] transition-colors">
                 <Copy className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
           <div>
-            <label className="text-white/50 text-xs font-mono block mb-1.5">Enter the 6-digit code from your app:</label>
+            <label className="text-[#9DA5B4] text-xs font-mono block mb-1.5">Enter the 6-digit code from your app:</label>
             <div className="flex items-center gap-3">
               <input
                 type="text"
@@ -1820,18 +1820,18 @@ function TwoFactorSection() {
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                 placeholder="000000"
                 maxLength={6}
-                className="w-36 px-3 py-2 rounded-lg border border-white/15 bg-black/40 text-white font-mono text-sm tracking-[0.3em] text-center focus:outline-none focus:border-violet-500/50"
+                className="w-36 px-3 py-2 rounded-lg border border-[#2B3245] bg-[#1C2333] text-white font-mono text-sm tracking-[0.3em] text-center focus:outline-none focus:border-violet-500/50"
               />
               <button
                 onClick={verifyCode}
                 disabled={code.length !== 6 || loading}
-                className="px-4 py-2 rounded-lg bg-violet-600 text-white font-mono text-xs font-bold tracking-widest hover:bg-violet-500 transition-colors disabled:opacity-40"
+                className="px-4 py-2 rounded-lg bg-violet-600 text-white text-xs font-semibold hover:bg-violet-500 transition-colors disabled:opacity-40"
               >
-                {loading ? "VERIFYING..." : "VERIFY"}
+                {loading ? "Verifying..." : "Verify"}
               </button>
               <button
                 onClick={() => { setPhase("idle"); setCode(""); setError(null); }}
-                className="px-3 py-2 rounded-lg border border-white/10 text-white/40 font-mono text-xs hover:text-white/70 transition-colors"
+                className="px-3 py-2 rounded-lg border border-[#2B3245] text-[#9DA5B4] font-mono text-xs hover:text-[#9DA5B4] transition-colors"
               >
                 CANCEL
               </button>
@@ -1847,24 +1847,24 @@ function TwoFactorSection() {
               <AlertTriangle className="w-4 h-4 text-amber-400" />
               <span className="text-amber-300 text-xs font-mono font-bold tracking-wider">SAVE YOUR BACKUP CODES</span>
             </div>
-            <p className="text-white/50 text-xs mb-3">
+            <p className="text-[#9DA5B4] text-xs mb-3">
               Store these codes somewhere safe. Each code can be used once if you lose access to your authenticator app.
             </p>
             <div className="grid grid-cols-2 gap-1.5">
               {backupCodes.map((c, i) => (
-                <code key={i} className="text-white/70 text-xs font-mono bg-black/30 px-2 py-1 rounded">{c}</code>
+                <code key={i} className="text-[#9DA5B4] text-xs font-mono bg-[#1C2333]/80 px-2 py-1 rounded">{c}</code>
               ))}
             </div>
             <button
               onClick={() => navigator.clipboard.writeText(backupCodes.join("\n"))}
-              className="mt-3 flex items-center gap-1.5 text-white/40 text-xs font-mono hover:text-white/70 transition-colors"
+              className="mt-3 flex items-center gap-1.5 text-[#9DA5B4] text-xs font-mono hover:text-[#9DA5B4] transition-colors"
             >
               <Copy className="w-3 h-3" /> Copy all codes
             </button>
           </div>
           <button
             onClick={() => setBackupCodes([])}
-            className="text-white/30 text-xs font-mono hover:text-white/50 transition-colors"
+            className="text-[#9DA5B4]/60 text-xs font-mono hover:text-[#9DA5B4] transition-colors"
           >
             I've saved my backup codes
           </button>
@@ -1873,7 +1873,7 @@ function TwoFactorSection() {
 
       {isEnabled && phase !== "setup" && backupCodes.length === 0 && (
         <div className="space-y-3">
-          <p className="text-white/40 text-xs">
+          <p className="text-[#9DA5B4] text-xs">
             Two-factor authentication is active. Enter a code from your authenticator app to disable it.
           </p>
           {phase === "disabling" ? (
@@ -1884,18 +1884,18 @@ function TwoFactorSection() {
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                 placeholder="000000"
                 maxLength={6}
-                className="w-36 px-3 py-2 rounded-lg border border-white/15 bg-black/40 text-white font-mono text-sm tracking-[0.3em] text-center focus:outline-none focus:border-red-500/50"
+                className="w-36 px-3 py-2 rounded-lg border border-[#2B3245] bg-[#1C2333] text-white font-mono text-sm tracking-[0.3em] text-center focus:outline-none focus:border-red-500/50"
               />
               <button
                 onClick={disable2FA}
                 disabled={code.length !== 6 || loading}
-                className="px-4 py-2 rounded-lg bg-red-600 text-white font-mono text-xs font-bold tracking-widest hover:bg-red-500 transition-colors disabled:opacity-40"
+                className="px-4 py-2 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-500 transition-colors disabled:opacity-40"
               >
-                {loading ? "DISABLING..." : "CONFIRM DISABLE"}
+                {loading ? "Disabling..." : "Confirm Disable"}
               </button>
               <button
                 onClick={() => { setPhase("idle"); setCode(""); setError(null); }}
-                className="px-3 py-2 rounded-lg border border-white/10 text-white/40 font-mono text-xs hover:text-white/70 transition-colors"
+                className="px-3 py-2 rounded-lg border border-[#2B3245] text-[#9DA5B4] font-mono text-xs hover:text-[#9DA5B4] transition-colors"
               >
                 CANCEL
               </button>
@@ -1903,7 +1903,7 @@ function TwoFactorSection() {
           ) : (
             <button
               onClick={() => { setPhase("disabling"); setCode(""); setError(null); }}
-              className="px-4 py-2 rounded-lg border border-red-500/30 text-red-400 font-mono text-xs font-bold tracking-widest hover:bg-red-500/10 transition-colors"
+              className="px-4 py-2 rounded-lg border border-red-500/30 text-red-400 text-xs font-semibold hover:bg-red-500/10 transition-colors"
             >
               DISABLE 2FA
             </button>
@@ -1989,27 +1989,27 @@ function ReferralSection() {
   const hasReferrer = !!(status as any)?.referredBy;
 
   return (
-    <div data-theme="dark" className="rounded-2xl border border-white/8 p-6 space-y-4">
+    <div data-theme="dark" className="rounded-2xl border border-[#2B3245] p-6 space-y-4">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
           <Users className="w-4 h-4 text-cyan-400" />
         </div>
         <div>
           <h3 className="text-white font-semibold text-sm tracking-wide">Referral Program</h3>
-          <p className="text-white/40 text-xs font-mono">Earn 500 credits for every friend who makes a purchase</p>
+          <p className="text-[#9DA5B4] text-xs font-mono">Earn 500 credits for every friend who makes a purchase</p>
         </div>
       </div>
 
-      <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-500/5 to-violet-500/5 border border-white/8 space-y-3">
+      <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-500/5 to-violet-500/5 border border-[#2B3245] space-y-3">
         <div>
-          <label className="text-white/40 text-[10px] font-mono tracking-wider block mb-1">YOUR REFERRAL CODE</label>
+          <label className="text-[#9DA5B4] text-[10px] font-mono block mb-1">Your referral code</label>
           <div className="flex items-center gap-2">
-            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-black/40 border border-white/10">
+            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1C2333] border border-[#2B3245]">
               <code className="text-white font-mono text-sm tracking-[0.2em] font-bold">{referralCode}</code>
             </div>
             <button
               onClick={copyCode}
-              className="px-3 py-2 rounded-lg border border-white/10 text-white/50 hover:text-white/80 transition-colors"
+              className="px-3 py-2 rounded-lg border border-[#2B3245] text-[#9DA5B4] hover:text-white/90 transition-colors"
               title="Copy code"
             >
               {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
@@ -2018,10 +2018,10 @@ function ReferralSection() {
         </div>
 
         <div>
-          <label className="text-white/40 text-[10px] font-mono tracking-wider block mb-1">SHARE LINK</label>
+          <label className="text-[#9DA5B4] text-[10px] font-mono block mb-1">Share link</label>
           <div className="flex items-center gap-2">
-            <div className="flex-1 px-3 py-2 rounded-lg bg-black/40 border border-white/10 overflow-hidden">
-              <code className="text-white/60 text-xs font-mono truncate block">{shareUrl}</code>
+            <div className="flex-1 px-3 py-2 rounded-lg bg-[#1C2333] border border-[#2B3245] overflow-hidden">
+              <code className="text-[#9DA5B4] text-xs font-mono truncate block">{shareUrl}</code>
             </div>
             <button
               onClick={copyLink}
@@ -2038,38 +2038,38 @@ function ReferralSection() {
 
       {stats && (
         <div className="grid grid-cols-3 gap-3">
-          <div className="p-3 rounded-xl bg-white/3 border border-white/6 text-center">
+          <div className="p-3 rounded-xl bg-[#2B3245]/30 border border-[#2B3245] text-center">
             <div className="text-white font-bold text-lg">{stats.totalReferred}</div>
-            <div className="text-white/30 text-[10px] font-mono tracking-wider">REFERRED</div>
+            <div className="text-[#9DA5B4]/60 text-[10px] font-mono tracking-wider">Referred</div>
           </div>
-          <div className="p-3 rounded-xl bg-white/3 border border-white/6 text-center">
+          <div className="p-3 rounded-xl bg-[#2B3245]/30 border border-[#2B3245] text-center">
             <div className="text-green-400 font-bold text-lg">{stats.completedReferrals}</div>
-            <div className="text-white/30 text-[10px] font-mono tracking-wider">COMPLETED</div>
+            <div className="text-[#9DA5B4]/60 text-[10px] font-mono tracking-wider">Completed</div>
           </div>
-          <div className="p-3 rounded-xl bg-white/3 border border-white/6 text-center">
+          <div className="p-3 rounded-xl bg-[#2B3245]/30 border border-[#2B3245] text-center">
             <div className="text-cyan-400 font-bold text-lg">{stats.totalCreditsEarned}</div>
-            <div className="text-white/30 text-[10px] font-mono tracking-wider">CREDITS EARNED</div>
+            <div className="text-[#9DA5B4]/60 text-[10px] font-mono tracking-wider">Credits Earned</div>
           </div>
         </div>
       )}
 
       {!hasReferrer && (
         <div className="space-y-2">
-          <label className="text-white/40 text-[10px] font-mono tracking-wider block">HAVE A REFERRAL CODE?</label>
+          <label className="text-[#9DA5B4] text-[10px] font-mono block">Have a referral code??</label>
           <div className="flex items-center gap-2">
             <input
               type="text"
               value={applyCode}
               onChange={(e) => setApplyCode(e.target.value.toUpperCase())}
               placeholder="OMN-XXXXXXXX"
-              className="flex-1 max-w-xs px-3 py-2 rounded-lg border border-white/15 bg-black/40 text-white font-mono text-xs tracking-wider focus:outline-none focus:border-cyan-500/50"
+              className="flex-1 max-w-xs px-3 py-2 rounded-lg border border-[#2B3245] bg-[#1C2333] text-white font-mono text-xs tracking-wider focus:outline-none focus:border-cyan-500/50"
             />
             <button
               onClick={handleApplyCode}
               disabled={!applyCode.trim() || applying}
-              className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white/70 font-mono text-xs font-bold tracking-widest hover:bg-white/10 transition-colors disabled:opacity-40"
+              className="px-4 py-2 rounded-lg bg-[#2B3245]/50 border border-[#2B3245] text-[#9DA5B4] text-xs font-semibold hover:bg-[#2B3245] transition-colors disabled:opacity-40"
             >
-              {applying ? "APPLYING..." : "APPLY"}
+              {applying ? "Applying..." : "Apply"}
             </button>
           </div>
           {applyMsg && (
@@ -2080,7 +2080,7 @@ function ReferralSection() {
         </div>
       )}
 
-      <p className="text-white/25 text-[10px] font-mono">
+      <p className="text-[#9DA5B4]/60 text-[10px] font-mono">
         Share your code with friends. When they make their first purchase (any credit pack or subscription), you receive 500 bonus credits.
       </p>
     </div>
