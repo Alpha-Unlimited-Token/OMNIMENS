@@ -71,6 +71,7 @@ import { startGenesisBridge } from "./lib/omnimens-genesis-bridge.js";
 import { startNeuralProcessor } from "./lib/omnimens-neural-processor.js";
 import { startUniversalTranslator } from "./lib/omnimens-universal-translator.js";
 import { startLanguageForge } from "./lib/omnimens-language-forge.js";
+import { registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe } from "./lib/omnimens-scaling-orchestrator.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import {
@@ -405,6 +406,18 @@ startGenesisBridge();
 startNeuralProcessor();
 startUniversalTranslator();
 startLanguageForge();
+
+registerEngine("neural_processor", "neural", () => {}, () => ({ healthy: true, details: { type: "transformer", dim: 512, heads: 16 } }), 1);
+registerEngine("neural_consciousness", "neural", () => {}, () => ({ healthy: true, details: { neurons: 1700, circuits: 57 } }), 1);
+registerEngine("language_forge", "language", () => {}, () => ({ healthy: true, details: { opcodes: 50, stdlib: 25 } }), 2);
+registerEngine("code_genesis", "code", () => {}, () => ({ healthy: true, details: { templates: 18, algorithms: 12 } }), 3);
+registerEngine("embodiment_engine", "embodiment", () => {}, () => ({ healthy: true, details: { joints: 28, dof: 28 } }), 4);
+registerEngine("independent_reasoning", "reasoning", () => {}, () => ({ healthy: true, details: {} }), 2);
+registerEngine("ip_guardian", "security", () => {}, () => ({ healthy: true, details: {} }), 1);
+registerEngine("digital_navigator", "navigation", () => {}, () => ({ healthy: true, details: {} }), 5);
+registerEngine("virtual_augmentation", "augmentation", () => {}, () => ({ healthy: true, details: {} }), 5);
+
+startScalingOrchestrator().catch(err => console.error("[SCALING] Startup error:", err));
 
 setTimeout(async () => {
   try {

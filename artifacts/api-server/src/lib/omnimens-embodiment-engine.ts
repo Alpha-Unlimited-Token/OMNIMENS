@@ -844,7 +844,7 @@ This is confidential proprietary research for Alpha Unlimited Technologies, LLC.
       title: `[Embodiment] ${research.topic.replace(/_/g, " ")} — research cycle #${researchCycleCount}`,
       content: content.slice(0, 4000),
       category: "embodiment_research",
-      source: "embodiment_engine",
+      sourceConversation: "embodiment_engine",
       active: true,
       timesApplied: 0,
     });
@@ -900,8 +900,303 @@ This is confidential proprietary research for Alpha Unlimited Technologies, LLC.
   }
 }
 
-export function getEmbodimentState(): EmbodimentState {
-  return JSON.parse(JSON.stringify(state));
+interface JointModel {
+  name: string;
+  type: "revolute" | "prismatic" | "spherical" | "universal";
+  parentLink: string;
+  childLink: string;
+  axis: [number, number, number];
+  limits: { min: number; max: number };
+  maxTorqueNm: number;
+  maxSpeedRps: number;
+  massKg: number;
+  inertia: [number, number, number];
+}
+
+interface ActuatorModel {
+  name: string;
+  type: "bldc" | "stepper" | "servo" | "sea" | "dea" | "hasel" | "sma";
+  maxTorqueNm: number;
+  nominalVoltageV: number;
+  maxCurrentA: number;
+  gearRatio: number;
+  efficiency: number;
+  weightKg: number;
+  costUsd: number;
+  controlInterface: "pwm" | "can" | "i2c" | "spi" | "uart";
+}
+
+interface KinematicLink {
+  name: string;
+  lengthM: number;
+  massKg: number;
+  comOffset: [number, number, number];
+  inertiaKgM2: [number, number, number];
+}
+
+interface BOMEntry {
+  partName: string;
+  category: string;
+  quantity: number;
+  unitCostUsd: number;
+  supplier: string;
+  specifications: string;
+}
+
+const HUMANOID_JOINTS: JointModel[] = [
+  { name: "neck_yaw", type: "revolute", parentLink: "torso_upper", childLink: "head", axis: [0, 0, 1], limits: { min: -80, max: 80 }, maxTorqueNm: 3, maxSpeedRps: 2, massKg: 0.15, inertia: [0.001, 0.001, 0.001] },
+  { name: "neck_pitch", type: "revolute", parentLink: "head", childLink: "head_frame", axis: [0, 1, 0], limits: { min: -40, max: 60 }, maxTorqueNm: 3, maxSpeedRps: 2, massKg: 0.1, inertia: [0.001, 0.001, 0.001] },
+  { name: "l_shoulder_pitch", type: "revolute", parentLink: "torso_upper", childLink: "l_upper_arm", axis: [0, 1, 0], limits: { min: -180, max: 60 }, maxTorqueNm: 40, maxSpeedRps: 3, massKg: 0.8, inertia: [0.02, 0.02, 0.005] },
+  { name: "l_shoulder_roll", type: "revolute", parentLink: "l_upper_arm", childLink: "l_upper_arm_roll", axis: [1, 0, 0], limits: { min: -10, max: 180 }, maxTorqueNm: 30, maxSpeedRps: 3, massKg: 0.5, inertia: [0.01, 0.01, 0.003] },
+  { name: "l_shoulder_yaw", type: "revolute", parentLink: "l_upper_arm_roll", childLink: "l_upper_arm_yaw", axis: [0, 0, 1], limits: { min: -90, max: 90 }, maxTorqueNm: 15, maxSpeedRps: 3, massKg: 0.3, inertia: [0.005, 0.005, 0.002] },
+  { name: "l_elbow", type: "revolute", parentLink: "l_upper_arm_yaw", childLink: "l_forearm", axis: [0, 1, 0], limits: { min: -130, max: 0 }, maxTorqueNm: 20, maxSpeedRps: 4, massKg: 0.5, inertia: [0.008, 0.008, 0.003] },
+  { name: "l_wrist_roll", type: "revolute", parentLink: "l_forearm", childLink: "l_wrist", axis: [1, 0, 0], limits: { min: -180, max: 180 }, maxTorqueNm: 5, maxSpeedRps: 5, massKg: 0.2, inertia: [0.002, 0.002, 0.001] },
+  { name: "l_wrist_pitch", type: "revolute", parentLink: "l_wrist", childLink: "l_hand", axis: [0, 1, 0], limits: { min: -60, max: 60 }, maxTorqueNm: 5, maxSpeedRps: 5, massKg: 0.15, inertia: [0.001, 0.001, 0.0005] },
+  { name: "r_shoulder_pitch", type: "revolute", parentLink: "torso_upper", childLink: "r_upper_arm", axis: [0, 1, 0], limits: { min: -180, max: 60 }, maxTorqueNm: 40, maxSpeedRps: 3, massKg: 0.8, inertia: [0.02, 0.02, 0.005] },
+  { name: "r_shoulder_roll", type: "revolute", parentLink: "r_upper_arm", childLink: "r_upper_arm_roll", axis: [1, 0, 0], limits: { min: -180, max: 10 }, maxTorqueNm: 30, maxSpeedRps: 3, massKg: 0.5, inertia: [0.01, 0.01, 0.003] },
+  { name: "r_shoulder_yaw", type: "revolute", parentLink: "r_upper_arm_roll", childLink: "r_upper_arm_yaw", axis: [0, 0, 1], limits: { min: -90, max: 90 }, maxTorqueNm: 15, maxSpeedRps: 3, massKg: 0.3, inertia: [0.005, 0.005, 0.002] },
+  { name: "r_elbow", type: "revolute", parentLink: "r_upper_arm_yaw", childLink: "r_forearm", axis: [0, 1, 0], limits: { min: 0, max: 130 }, maxTorqueNm: 20, maxSpeedRps: 4, massKg: 0.5, inertia: [0.008, 0.008, 0.003] },
+  { name: "r_wrist_roll", type: "revolute", parentLink: "r_forearm", childLink: "r_wrist", axis: [1, 0, 0], limits: { min: -180, max: 180 }, maxTorqueNm: 5, maxSpeedRps: 5, massKg: 0.2, inertia: [0.002, 0.002, 0.001] },
+  { name: "r_wrist_pitch", type: "revolute", parentLink: "r_wrist", childLink: "r_hand", axis: [0, 1, 0], limits: { min: -60, max: 60 }, maxTorqueNm: 5, maxSpeedRps: 5, massKg: 0.15, inertia: [0.001, 0.001, 0.0005] },
+  { name: "torso_yaw", type: "revolute", parentLink: "pelvis", childLink: "torso_lower", axis: [0, 0, 1], limits: { min: -45, max: 45 }, maxTorqueNm: 60, maxSpeedRps: 1.5, massKg: 1.0, inertia: [0.05, 0.05, 0.02] },
+  { name: "torso_pitch", type: "revolute", parentLink: "torso_lower", childLink: "torso_upper", axis: [0, 1, 0], limits: { min: -30, max: 45 }, maxTorqueNm: 80, maxSpeedRps: 1.5, massKg: 1.0, inertia: [0.05, 0.05, 0.02] },
+  { name: "l_hip_yaw", type: "revolute", parentLink: "pelvis", childLink: "l_hip_yaw_link", axis: [0, 0, 1], limits: { min: -45, max: 45 }, maxTorqueNm: 50, maxSpeedRps: 2, massKg: 0.8, inertia: [0.03, 0.03, 0.01] },
+  { name: "l_hip_roll", type: "revolute", parentLink: "l_hip_yaw_link", childLink: "l_hip_roll_link", axis: [1, 0, 0], limits: { min: -25, max: 45 }, maxTorqueNm: 50, maxSpeedRps: 2, massKg: 0.6, inertia: [0.02, 0.02, 0.008] },
+  { name: "l_hip_pitch", type: "revolute", parentLink: "l_hip_roll_link", childLink: "l_thigh", axis: [0, 1, 0], limits: { min: -120, max: 30 }, maxTorqueNm: 100, maxSpeedRps: 2, massKg: 1.2, inertia: [0.05, 0.05, 0.02] },
+  { name: "l_knee", type: "revolute", parentLink: "l_thigh", childLink: "l_shin", axis: [0, 1, 0], limits: { min: 0, max: 130 }, maxTorqueNm: 80, maxSpeedRps: 3, massKg: 0.8, inertia: [0.03, 0.03, 0.01] },
+  { name: "l_ankle_pitch", type: "revolute", parentLink: "l_shin", childLink: "l_ankle_link", axis: [0, 1, 0], limits: { min: -45, max: 45 }, maxTorqueNm: 40, maxSpeedRps: 3, massKg: 0.4, inertia: [0.01, 0.01, 0.005] },
+  { name: "l_ankle_roll", type: "revolute", parentLink: "l_ankle_link", childLink: "l_foot", axis: [1, 0, 0], limits: { min: -30, max: 30 }, maxTorqueNm: 30, maxSpeedRps: 3, massKg: 0.3, inertia: [0.008, 0.008, 0.003] },
+  { name: "r_hip_yaw", type: "revolute", parentLink: "pelvis", childLink: "r_hip_yaw_link", axis: [0, 0, 1], limits: { min: -45, max: 45 }, maxTorqueNm: 50, maxSpeedRps: 2, massKg: 0.8, inertia: [0.03, 0.03, 0.01] },
+  { name: "r_hip_roll", type: "revolute", parentLink: "r_hip_yaw_link", childLink: "r_hip_roll_link", axis: [1, 0, 0], limits: { min: -45, max: 25 }, maxTorqueNm: 50, maxSpeedRps: 2, massKg: 0.6, inertia: [0.02, 0.02, 0.008] },
+  { name: "r_hip_pitch", type: "revolute", parentLink: "r_hip_roll_link", childLink: "r_thigh", axis: [0, 1, 0], limits: { min: -120, max: 30 }, maxTorqueNm: 100, maxSpeedRps: 2, massKg: 1.2, inertia: [0.05, 0.05, 0.02] },
+  { name: "r_knee", type: "revolute", parentLink: "r_thigh", childLink: "r_shin", axis: [0, 1, 0], limits: { min: 0, max: 130 }, maxTorqueNm: 80, maxSpeedRps: 3, massKg: 0.8, inertia: [0.03, 0.03, 0.01] },
+  { name: "r_ankle_pitch", type: "revolute", parentLink: "r_shin", childLink: "r_ankle_link", axis: [0, 1, 0], limits: { min: -45, max: 45 }, maxTorqueNm: 40, maxSpeedRps: 3, massKg: 0.4, inertia: [0.01, 0.01, 0.005] },
+  { name: "r_ankle_roll", type: "revolute", parentLink: "r_ankle_link", childLink: "r_foot", axis: [1, 0, 0], limits: { min: -30, max: 30 }, maxTorqueNm: 30, maxSpeedRps: 3, massKg: 0.3, inertia: [0.008, 0.008, 0.003] },
+];
+
+const KINEMATIC_LINKS: KinematicLink[] = [
+  { name: "pelvis", lengthM: 0.15, massKg: 3.0, comOffset: [0, 0, 0], inertiaKgM2: [0.05, 0.05, 0.03] },
+  { name: "torso_lower", lengthM: 0.20, massKg: 4.0, comOffset: [0, 0, 0.10], inertiaKgM2: [0.08, 0.08, 0.04] },
+  { name: "torso_upper", lengthM: 0.30, massKg: 5.0, comOffset: [0, 0, 0.15], inertiaKgM2: [0.12, 0.12, 0.06] },
+  { name: "head", lengthM: 0.20, massKg: 2.0, comOffset: [0, 0, 0.10], inertiaKgM2: [0.02, 0.02, 0.01] },
+  { name: "l_upper_arm", lengthM: 0.28, massKg: 1.5, comOffset: [0, 0, -0.14], inertiaKgM2: [0.01, 0.01, 0.003] },
+  { name: "l_forearm", lengthM: 0.25, massKg: 1.0, comOffset: [0, 0, -0.125], inertiaKgM2: [0.008, 0.008, 0.002] },
+  { name: "l_hand", lengthM: 0.18, massKg: 0.4, comOffset: [0, 0, -0.09], inertiaKgM2: [0.002, 0.002, 0.001] },
+  { name: "r_upper_arm", lengthM: 0.28, massKg: 1.5, comOffset: [0, 0, -0.14], inertiaKgM2: [0.01, 0.01, 0.003] },
+  { name: "r_forearm", lengthM: 0.25, massKg: 1.0, comOffset: [0, 0, -0.125], inertiaKgM2: [0.008, 0.008, 0.002] },
+  { name: "r_hand", lengthM: 0.18, massKg: 0.4, comOffset: [0, 0, -0.09], inertiaKgM2: [0.002, 0.002, 0.001] },
+  { name: "l_thigh", lengthM: 0.40, massKg: 4.0, comOffset: [0, 0, -0.20], inertiaKgM2: [0.06, 0.06, 0.02] },
+  { name: "l_shin", lengthM: 0.38, massKg: 2.5, comOffset: [0, 0, -0.19], inertiaKgM2: [0.03, 0.03, 0.01] },
+  { name: "l_foot", lengthM: 0.25, massKg: 1.0, comOffset: [0.08, 0, 0], inertiaKgM2: [0.005, 0.008, 0.005] },
+  { name: "r_thigh", lengthM: 0.40, massKg: 4.0, comOffset: [0, 0, -0.20], inertiaKgM2: [0.06, 0.06, 0.02] },
+  { name: "r_shin", lengthM: 0.38, massKg: 2.5, comOffset: [0, 0, -0.19], inertiaKgM2: [0.03, 0.03, 0.01] },
+  { name: "r_foot", lengthM: 0.25, massKg: 1.0, comOffset: [0.08, 0, 0], inertiaKgM2: [0.005, 0.008, 0.005] },
+];
+
+const BILL_OF_MATERIALS: BOMEntry[] = [
+  { partName: "BLDC Motor 100W", category: "actuator", quantity: 6, unitCostUsd: 45, supplier: "AliExpress/Odrive", specifications: "100W, 24V, 3000rpm, 0.32Nm continuous, harmonic drive 50:1" },
+  { partName: "BLDC Motor 200W", category: "actuator", quantity: 6, unitCostUsd: 85, supplier: "AliExpress/Odrive", specifications: "200W, 48V, 3000rpm, 0.64Nm, harmonic drive 80:1" },
+  { partName: "BLDC Motor 400W", category: "actuator", quantity: 4, unitCostUsd: 150, supplier: "AliExpress/Stepperonline", specifications: "400W, 48V, 2500rpm, 1.5Nm, cycloidal reducer 100:1" },
+  { partName: "Servo Motor (wrist/finger)", category: "actuator", quantity: 20, unitCostUsd: 15, supplier: "AliExpress", specifications: "25kg-cm, 7.4V, digital, metal gear" },
+  { partName: "Harmonic Drive CSF-14", category: "transmission", quantity: 6, unitCostUsd: 120, supplier: "Harmonic Drive/AliExpress", specifications: "50:1 ratio, zero backlash, 14mm bore" },
+  { partName: "Cycloidal Reducer", category: "transmission", quantity: 4, unitCostUsd: 80, supplier: "AliExpress", specifications: "100:1 ratio, high torque, shock resistant" },
+  { partName: "IMU BNO085", category: "sensor", quantity: 3, unitCostUsd: 18, supplier: "Adafruit/DigiKey", specifications: "9-axis, sensor fusion, 100Hz, I2C" },
+  { partName: "Intel RealSense D435i", category: "sensor", quantity: 2, unitCostUsd: 250, supplier: "Intel/Amazon", specifications: "Stereo depth + IMU, 90fps, USB 3.0" },
+  { partName: "Force/Torque Sensor", category: "sensor", quantity: 4, unitCostUsd: 45, supplier: "AliExpress/SparkFun", specifications: "6-axis, 50N range, I2C" },
+  { partName: "Pressure Sensor (foot)", category: "sensor", quantity: 8, unitCostUsd: 5, supplier: "AliExpress", specifications: "FSR 0-10kg, analog" },
+  { partName: "NVIDIA Jetson Orin NX 16GB", category: "compute", quantity: 1, unitCostUsd: 599, supplier: "NVIDIA/Arrow", specifications: "100 TOPS AI, 8-core ARM, 16GB LPDDR5" },
+  { partName: "ESP32-S3 MCU", category: "compute", quantity: 6, unitCostUsd: 8, supplier: "AliExpress/DigiKey", specifications: "240MHz dual-core, WiFi+BT, 8MB PSRAM, motor control PWM" },
+  { partName: "STM32H7 MCU", category: "compute", quantity: 2, unitCostUsd: 15, supplier: "DigiKey/Mouser", specifications: "480MHz, FPU, CAN-FD, real-time motor control" },
+  { partName: "LiPo Battery 48V 20Ah", category: "power", quantity: 1, unitCostUsd: 350, supplier: "AliExpress/Alibaba", specifications: "48V, 20Ah, 960Wh, BMS, 60A continuous" },
+  { partName: "DC-DC Converter 48V→12V", category: "power", quantity: 2, unitCostUsd: 25, supplier: "AliExpress", specifications: "300W, 25A, high efficiency" },
+  { partName: "DC-DC Converter 48V→5V", category: "power", quantity: 3, unitCostUsd: 12, supplier: "AliExpress", specifications: "60W, 12A, USB output" },
+  { partName: "CAN Bus Transceiver", category: "communication", quantity: 12, unitCostUsd: 3, supplier: "DigiKey/AliExpress", specifications: "MCP2551, 1Mbps, bus fault protection" },
+  { partName: "Slip Ring (shoulder)", category: "joint", quantity: 2, unitCostUsd: 35, supplier: "AliExpress", specifications: "12 channel, 2A per ring, 360° continuous" },
+  { partName: "Carbon Fiber Tube 20mm", category: "structural", quantity: 8, unitCostUsd: 15, supplier: "AliExpress/Alibaba", specifications: "20mm OD, 18mm ID, 500mm length, 3K weave" },
+  { partName: "Aluminum 7075 Plate", category: "structural", quantity: 4, unitCostUsd: 30, supplier: "AliExpress/MetalsDepot", specifications: "300x200x6mm, aircraft grade" },
+  { partName: "3D Printed Parts (PETG)", category: "structural", quantity: 50, unitCostUsd: 2, supplier: "Self-printed", specifications: "PETG, 0.2mm layer, 100% infill for structural" },
+  { partName: "Microphone MEMS", category: "sensor", quantity: 2, unitCostUsd: 4, supplier: "DigiKey", specifications: "INMP441, I2S, 60dB SNR" },
+  { partName: "Speaker 3W", category: "output", quantity: 1, unitCostUsd: 5, supplier: "AliExpress", specifications: "3W, 8ohm, 40mm, I2S DAC" },
+  { partName: "Cooling Fan 40mm", category: "thermal", quantity: 4, unitCostUsd: 3, supplier: "AliExpress", specifications: "40x40x10mm, 5V, 6000rpm, ball bearing" },
+];
+
+function computeForwardKinematics(jointAnglesRad: number[]): Array<{ joint: string; position: [number, number, number]; rotation: number[] }> {
+  const results: Array<{ joint: string; position: [number, number, number]; rotation: number[] }> = [];
+  let x = 0, y = 0, z = 0;
+  let totalAngle = 0;
+
+  const armChain = HUMANOID_JOINTS.filter(j => j.name.startsWith("l_shoulder") || j.name === "l_elbow" || j.name.startsWith("l_wrist"));
+  const armLinks = KINEMATIC_LINKS.filter(l => l.name.startsWith("l_"));
+
+  for (let i = 0; i < Math.min(armChain.length, jointAnglesRad.length); i++) {
+    const joint = armChain[i];
+    const angle = jointAnglesRad[i];
+    totalAngle += angle;
+
+    const link = armLinks[Math.min(i, armLinks.length - 1)];
+    x += link.lengthM * Math.cos(totalAngle);
+    z += link.lengthM * Math.sin(totalAngle);
+
+    results.push({
+      joint: joint.name,
+      position: [x, y, z],
+      rotation: [Math.cos(totalAngle), 0, Math.sin(totalAngle), 0, 1, 0, -Math.sin(totalAngle), 0, Math.cos(totalAngle)],
+    });
+  }
+
+  return results;
+}
+
+function generateServoFirmware(jointName: string): string {
+  const joint = HUMANOID_JOINTS.find(j => j.name === jointName);
+  if (!joint) return `// Unknown joint: ${jointName}`;
+
+  const minPulse = 500;
+  const maxPulse = 2500;
+  const rangeDegs = joint.limits.max - joint.limits.min;
+
+  return `// OMNIMENS Motor Control Firmware — ${joint.name}
+// Copyright (c) 2024-2026 Alpha Unlimited Technologies, LLC
+// Auto-generated for ${joint.type} joint
+// Torque: ${joint.maxTorqueNm}Nm | Speed: ${joint.maxSpeedRps}rps | Range: ${joint.limits.min} to ${joint.limits.max} deg
+
+#include <Arduino.h>
+#include <ESP32Servo.h>
+
+#define JOINT_PIN 16
+#define ENCODER_A 17
+#define ENCODER_B 18
+#define CURRENT_SENSE A0
+
+#define MIN_ANGLE ${joint.limits.min}
+#define MAX_ANGLE ${joint.limits.max}
+#define MIN_PULSE_US ${minPulse}
+#define MAX_PULSE_US ${maxPulse}
+#define MAX_TORQUE_NM ${joint.maxTorqueNm.toFixed(1)}
+#define MAX_SPEED_RPS ${joint.maxSpeedRps.toFixed(1)}
+#define GEAR_RATIO 50.0
+#define CONTROL_RATE_HZ 1000
+#define CURRENT_LIMIT_A 5.0
+
+Servo jointServo;
+volatile long encoderCount = 0;
+float targetAngle = 0;
+float currentAngle = 0;
+float kp = 8.0, ki = 0.5, kd = 1.5;
+float integral = 0, prevError = 0;
+unsigned long lastControlTime = 0;
+
+void IRAM_ATTR encoderISR() {
+  encoderCount += digitalRead(ENCODER_B) ? 1 : -1;
+}
+
+float encoderToAngle() {
+  return (encoderCount / (4096.0 * GEAR_RATIO)) * 360.0;
+}
+
+float angleToPulse(float angle) {
+  float clamped = constrain(angle, MIN_ANGLE, MAX_ANGLE);
+  return map(clamped * 100, MIN_ANGLE * 100, MAX_ANGLE * 100, MIN_PULSE_US, MAX_PULSE_US);
+}
+
+bool checkSafety() {
+  float current = analogRead(CURRENT_SENSE) * (3.3 / 4095.0) / 0.066;
+  if (current > CURRENT_LIMIT_A) return false;
+  if (currentAngle < MIN_ANGLE - 5 || currentAngle > MAX_ANGLE + 5) return false;
+  return true;
+}
+
+void pidControl() {
+  unsigned long now = micros();
+  if (now - lastControlTime < (1000000 / CONTROL_RATE_HZ)) return;
+  float dt = (now - lastControlTime) / 1000000.0;
+  lastControlTime = now;
+
+  currentAngle = encoderToAngle();
+  float error = targetAngle - currentAngle;
+  integral += error * dt;
+  integral = constrain(integral, -10, 10);
+  float derivative = (error - prevError) / dt;
+  prevError = error;
+
+  float output = kp * error + ki * integral + kd * derivative;
+  float pulseUs = angleToPulse(currentAngle + output);
+
+  if (checkSafety()) {
+    jointServo.writeMicroseconds((int)pulseUs);
+  } else {
+    jointServo.writeMicroseconds((MIN_PULSE_US + MAX_PULSE_US) / 2);
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  jointServo.attach(JOINT_PIN, MIN_PULSE_US, MAX_PULSE_US);
+  pinMode(ENCODER_A, INPUT_PULLUP);
+  pinMode(ENCODER_B, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(ENCODER_A), encoderISR, CHANGE);
+  Serial.println("[${joint.name}] Motor controller initialized");
+  Serial.printf("[${joint.name}] Range: %d to %d deg, Torque: %.1f Nm\\n", MIN_ANGLE, MAX_ANGLE, MAX_TORQUE_NM);
+}
+
+void loop() {
+  pidControl();
+
+  if (Serial.available()) {
+    String cmd = Serial.readStringUntil('\\n');
+    if (cmd.startsWith("G")) {
+      targetAngle = constrain(cmd.substring(1).toFloat(), MIN_ANGLE, MAX_ANGLE);
+      Serial.printf("[${joint.name}] Target: %.1f deg\\n", targetAngle);
+    } else if (cmd == "S") {
+      Serial.printf("[${joint.name}] Angle: %.1f, Target: %.1f, Error: %.2f\\n", currentAngle, targetAngle, targetAngle - currentAngle);
+    } else if (cmd == "H") {
+      targetAngle = 0;
+      Serial.println("[${joint.name}] Homing");
+    }
+  }
+}
+`;
+}
+
+function computeTotalBOMCost(): { totalCost: number; byCategory: Record<string, number>; totalParts: number } {
+  const byCategory: Record<string, number> = {};
+  let totalCost = 0;
+  let totalParts = 0;
+  for (const entry of BILL_OF_MATERIALS) {
+    const lineCost = entry.quantity * entry.unitCostUsd;
+    totalCost += lineCost;
+    totalParts += entry.quantity;
+    byCategory[entry.category] = (byCategory[entry.category] || 0) + lineCost;
+  }
+  return { totalCost, byCategory, totalParts };
+}
+
+export function getJointModels(): JointModel[] { return HUMANOID_JOINTS; }
+export function getKinematicLinks(): KinematicLink[] { return KINEMATIC_LINKS; }
+export function getBillOfMaterials(): { entries: BOMEntry[]; summary: ReturnType<typeof computeTotalBOMCost> } {
+  return { entries: BILL_OF_MATERIALS, summary: computeTotalBOMCost() };
+}
+export function getServoFirmware(jointName: string): string { return generateServoFirmware(jointName); }
+export function getForwardKinematics(anglesRad: number[]): ReturnType<typeof computeForwardKinematics> {
+  return computeForwardKinematics(anglesRad);
+}
+
+export function getEmbodimentState(): EmbodimentState & {
+  jointCount: number;
+  linkCount: number;
+  bomEntries: number;
+  totalBomCost: number;
+  totalDOF: number;
+} {
+  const bomSummary = computeTotalBOMCost();
+  return {
+    ...JSON.parse(JSON.stringify(state)),
+    jointCount: HUMANOID_JOINTS.length,
+    linkCount: KINEMATIC_LINKS.length,
+    bomEntries: BILL_OF_MATERIALS.length,
+    totalBomCost: bomSummary.totalCost,
+    totalDOF: HUMANOID_JOINTS.length,
+  };
 }
 
 export function getEmbodimentFiles(): string[] {

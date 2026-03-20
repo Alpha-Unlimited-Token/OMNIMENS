@@ -1881,31 +1881,977 @@ fn adapt_to_hardware(computation: tensor) -> tensor {
 `;
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SECTION 9: STARTUP
+// SECTION 9: NOVASYNTAX RUNTIME — Bytecode VM + Memory Model + Optimizer + Stdlib
+// ═══════════════════════════════════════════════════════════════════════════════
+
+enum OpCode {
+  NOP = 0x00,
+  LOAD_CONST = 0x01,
+  LOAD_LOCAL = 0x02,
+  STORE_LOCAL = 0x03,
+  LOAD_GLOBAL = 0x04,
+  STORE_GLOBAL = 0x05,
+  POP = 0x06,
+  DUP = 0x07,
+  SWAP = 0x08,
+
+  ADD = 0x10,
+  SUB = 0x11,
+  MUL = 0x12,
+  DIV = 0x13,
+  MOD = 0x14,
+  POW = 0x15,
+  NEG = 0x16,
+  BITAND = 0x17,
+  BITOR = 0x18,
+  BITXOR = 0x19,
+  BITNOT = 0x1A,
+  SHL = 0x1B,
+  SHR = 0x1C,
+
+  EQ = 0x20,
+  NEQ = 0x21,
+  LT = 0x22,
+  LTE = 0x23,
+  GT = 0x24,
+  GTE = 0x25,
+  AND = 0x26,
+  OR = 0x27,
+  NOT = 0x28,
+
+  JMP = 0x30,
+  JMP_IF_TRUE = 0x31,
+  JMP_IF_FALSE = 0x32,
+
+  CALL = 0x40,
+  RETURN = 0x41,
+  CALL_NATIVE = 0x42,
+
+  ARRAY_NEW = 0x50,
+  ARRAY_GET = 0x51,
+  ARRAY_SET = 0x52,
+  ARRAY_LEN = 0x53,
+  ARRAY_PUSH = 0x54,
+
+  TENSOR_NEW = 0x60,
+  TENSOR_ADD = 0x61,
+  TENSOR_MUL = 0x62,
+  TENSOR_DOT = 0x63,
+  TENSOR_SHAPE = 0x64,
+
+  NEURAL_FWD = 0x70,
+  NEURAL_ACT = 0x71,
+  SENSE_READ = 0x72,
+  MOTOR_CMD = 0x73,
+
+  PRINT = 0x80,
+  HALT = 0xFF,
+}
+
+interface NovaInstruction {
+  op: OpCode;
+  operand?: number;
+  label?: string;
+}
+
+interface NovaFunction {
+  name: string;
+  arity: number;
+  localCount: number;
+  instructions: NovaInstruction[];
+}
+
+interface NovaBytecodeModule {
+  version: string;
+  constants: NovaValue[];
+  globals: Map<string, number>;
+  functions: NovaFunction[];
+  entryPoint: string;
+}
+
+type NovaValue =
+  | { type: "int"; v: number }
+  | { type: "float"; v: number }
+  | { type: "bool"; v: boolean }
+  | { type: "string"; v: string }
+  | { type: "nil" }
+  | { type: "array"; v: NovaValue[] }
+  | { type: "tensor"; v: Float64Array; shape: number[] }
+  | { type: "function"; name: string };
+
+interface HeapObject {
+  id: number;
+  refCount: number;
+  value: NovaValue;
+  marked: boolean;
+}
+
+class NovaMemory {
+  private stack: NovaValue[] = [];
+  private heap: Map<number, HeapObject> = new Map();
+  private nextHeapId = 1;
+  private heapSize = 0;
+  private maxHeap = 65536;
+
+  stackPush(v: NovaValue): void {
+    if (this.stack.length > 4096) throw new Error("Stack overflow (max 4096)");
+    this.stack.push(v);
+  }
+
+  stackPop(): NovaValue {
+    if (this.stack.length === 0) throw new Error("Stack underflow");
+    return this.stack.pop()!;
+  }
+
+  stackPeek(): NovaValue {
+    if (this.stack.length === 0) throw new Error("Stack empty");
+    return this.stack[this.stack.length - 1];
+  }
+
+  stackSize(): number { return this.stack.length; }
+
+  heapAlloc(value: NovaValue): number {
+    if (this.heapSize >= this.maxHeap) this.gc();
+    if (this.heapSize >= this.maxHeap) throw new Error("Heap exhausted");
+    const id = this.nextHeapId++;
+    this.heap.set(id, { id, refCount: 1, value, marked: false });
+    this.heapSize++;
+    return id;
+  }
+
+  heapGet(id: number): NovaValue {
+    const obj = this.heap.get(id);
+    if (!obj) throw new Error(`Dangling reference: heap[${id}]`);
+    return obj.value;
+  }
+
+  heapIncRef(id: number): void {
+    const obj = this.heap.get(id);
+    if (obj) obj.refCount++;
+  }
+
+  heapDecRef(id: number): void {
+    const obj = this.heap.get(id);
+    if (obj) {
+      obj.refCount--;
+      if (obj.refCount <= 0) {
+        this.heap.delete(id);
+        this.heapSize--;
+      }
+    }
+  }
+
+  gc(): number {
+    let freed = 0;
+    for (const [id, obj] of this.heap) {
+      if (obj.refCount <= 0) {
+        this.heap.delete(id);
+        this.heapSize--;
+        freed++;
+      }
+    }
+    return freed;
+  }
+
+  getStats(): { stackDepth: number; heapUsed: number; heapMax: number } {
+    return { stackDepth: this.stack.length, heapUsed: this.heapSize, heapMax: this.maxHeap };
+  }
+
+  reset(): void {
+    this.stack.length = 0;
+    this.heap.clear();
+    this.heapSize = 0;
+    this.nextHeapId = 1;
+  }
+}
+
+function novaValueToNumber(v: NovaValue): number {
+  if (v.type === "int" || v.type === "float") return v.v;
+  if (v.type === "bool") return v.v ? 1 : 0;
+  if (v.type === "nil") return 0;
+  if (v.type === "string") { const n = parseFloat(v.v); return isNaN(n) ? 0 : n; }
+  throw new Error(`Cannot convert ${v.type} to number`);
+}
+
+function novaValueToBool(v: NovaValue): boolean {
+  if (v.type === "bool") return v.v;
+  if (v.type === "int") return v.v !== 0;
+  if (v.type === "float") return v.v !== 0;
+  if (v.type === "nil") return false;
+  if (v.type === "string") return v.v.length > 0;
+  return true;
+}
+
+function novaValueToString(v: NovaValue): string {
+  switch (v.type) {
+    case "int": case "float": return String(v.v);
+    case "bool": return v.v ? "true" : "false";
+    case "string": return v.v;
+    case "nil": return "nil";
+    case "array": return `[${v.v.map(novaValueToString).join(", ")}]`;
+    case "tensor": return `tensor(${v.shape.join("x")})`;
+    case "function": return `fn<${v.name}>`;
+  }
+}
+
+type NativeFunction = (args: NovaValue[]) => NovaValue;
+const novaStdlib: Map<string, NativeFunction> = new Map();
+
+novaStdlib.set("math_sqrt", (args) => ({ type: "float", v: Math.sqrt(novaValueToNumber(args[0])) }));
+novaStdlib.set("math_abs", (args) => ({ type: "float", v: Math.abs(novaValueToNumber(args[0])) }));
+novaStdlib.set("math_sin", (args) => ({ type: "float", v: Math.sin(novaValueToNumber(args[0])) }));
+novaStdlib.set("math_cos", (args) => ({ type: "float", v: Math.cos(novaValueToNumber(args[0])) }));
+novaStdlib.set("math_exp", (args) => ({ type: "float", v: Math.exp(novaValueToNumber(args[0])) }));
+novaStdlib.set("math_log", (args) => ({ type: "float", v: Math.log(novaValueToNumber(args[0])) }));
+novaStdlib.set("math_floor", (args) => ({ type: "int", v: Math.floor(novaValueToNumber(args[0])) }));
+novaStdlib.set("math_ceil", (args) => ({ type: "int", v: Math.ceil(novaValueToNumber(args[0])) }));
+novaStdlib.set("math_round", (args) => ({ type: "int", v: Math.round(novaValueToNumber(args[0])) }));
+novaStdlib.set("math_pow", (args) => ({ type: "float", v: Math.pow(novaValueToNumber(args[0]), novaValueToNumber(args[1])) }));
+novaStdlib.set("math_min", (args) => ({ type: "float", v: Math.min(novaValueToNumber(args[0]), novaValueToNumber(args[1])) }));
+novaStdlib.set("math_max", (args) => ({ type: "float", v: Math.max(novaValueToNumber(args[0]), novaValueToNumber(args[1])) }));
+novaStdlib.set("math_pi", () => ({ type: "float", v: Math.PI }));
+novaStdlib.set("math_e", () => ({ type: "float", v: Math.E }));
+novaStdlib.set("math_random", () => ({ type: "float", v: Math.random() }));
+
+novaStdlib.set("str_len", (args) => {
+  if (args[0].type !== "string") throw new Error("str_len expects string");
+  return { type: "int", v: args[0].v.length };
+});
+novaStdlib.set("str_upper", (args) => {
+  if (args[0].type !== "string") throw new Error("str_upper expects string");
+  return { type: "string", v: args[0].v.toUpperCase() };
+});
+novaStdlib.set("str_lower", (args) => {
+  if (args[0].type !== "string") throw new Error("str_lower expects string");
+  return { type: "string", v: args[0].v.toLowerCase() };
+});
+novaStdlib.set("str_contains", (args) => {
+  if (args[0].type !== "string" || args[1].type !== "string") throw new Error("str_contains expects strings");
+  return { type: "bool", v: args[0].v.includes(args[1].v) };
+});
+novaStdlib.set("str_split", (args) => {
+  if (args[0].type !== "string" || args[1].type !== "string") throw new Error("str_split expects strings");
+  return { type: "array", v: args[0].v.split(args[1].v).map(s => ({ type: "string" as const, v: s })) };
+});
+novaStdlib.set("str_concat", (args) => ({
+  type: "string", v: args.map(novaValueToString).join(""),
+}));
+novaStdlib.set("to_string", (args) => ({ type: "string", v: novaValueToString(args[0]) }));
+novaStdlib.set("to_int", (args) => ({ type: "int", v: Math.trunc(novaValueToNumber(args[0])) }));
+novaStdlib.set("to_float", (args) => ({ type: "float", v: novaValueToNumber(args[0]) }));
+
+novaStdlib.set("tensor_zeros", (args) => {
+  const size = novaValueToNumber(args[0]);
+  return { type: "tensor", v: new Float64Array(size), shape: [size] };
+});
+novaStdlib.set("tensor_ones", (args) => {
+  const size = novaValueToNumber(args[0]);
+  const arr = new Float64Array(size);
+  arr.fill(1);
+  return { type: "tensor", v: arr, shape: [size] };
+});
+novaStdlib.set("tensor_random", (args) => {
+  const size = novaValueToNumber(args[0]);
+  const arr = new Float64Array(size);
+  for (let i = 0; i < size; i++) arr[i] = Math.random();
+  return { type: "tensor", v: arr, shape: [size] };
+});
+novaStdlib.set("tensor_dot", (args) => {
+  if (args[0].type !== "tensor" || args[1].type !== "tensor") throw new Error("tensor_dot expects tensors");
+  const a = args[0].v, b = args[1].v;
+  const len = Math.min(a.length, b.length);
+  let sum = 0;
+  for (let i = 0; i < len; i++) sum += a[i] * b[i];
+  return { type: "float", v: sum };
+});
+novaStdlib.set("tensor_norm", (args) => {
+  if (args[0].type !== "tensor") throw new Error("tensor_norm expects tensor");
+  let sum = 0;
+  for (let i = 0; i < args[0].v.length; i++) sum += args[0].v[i] * args[0].v[i];
+  return { type: "float", v: Math.sqrt(sum) };
+});
+novaStdlib.set("tensor_softmax", (args) => {
+  if (args[0].type !== "tensor") throw new Error("tensor_softmax expects tensor");
+  const arr = args[0].v;
+  let max = -Infinity;
+  for (let i = 0; i < arr.length; i++) if (arr[i] > max) max = arr[i];
+  const out = new Float64Array(arr.length);
+  let sum = 0;
+  for (let i = 0; i < arr.length; i++) { out[i] = Math.exp(arr[i] - max); sum += out[i]; }
+  for (let i = 0; i < arr.length; i++) out[i] /= sum;
+  return { type: "tensor", v: out, shape: [...args[0].shape] };
+});
+novaStdlib.set("tensor_relu", (args) => {
+  if (args[0].type !== "tensor") throw new Error("tensor_relu expects tensor");
+  const out = new Float64Array(args[0].v.length);
+  for (let i = 0; i < out.length; i++) out[i] = Math.max(0, args[0].v[i]);
+  return { type: "tensor", v: out, shape: [...args[0].shape] };
+});
+novaStdlib.set("tensor_sigmoid", (args) => {
+  if (args[0].type !== "tensor") throw new Error("tensor_sigmoid expects tensor");
+  const out = new Float64Array(args[0].v.length);
+  for (let i = 0; i < out.length; i++) out[i] = 1 / (1 + Math.exp(-args[0].v[i]));
+  return { type: "tensor", v: out, shape: [...args[0].shape] };
+});
+
+novaStdlib.set("time_now", () => ({ type: "float", v: Date.now() / 1000 }));
+novaStdlib.set("time_elapsed", (args) => ({ type: "float", v: (Date.now() / 1000) - novaValueToNumber(args[0]) }));
+
+novaStdlib.set("print", (args) => {
+  const msg = args.map(novaValueToString).join(" ");
+  vmOutputBuffer.push(msg);
+  return { type: "nil" } as NovaValue;
+});
+novaStdlib.set("assert", (args) => {
+  if (!novaValueToBool(args[0])) {
+    throw new Error(`Assertion failed: ${args.length > 1 ? novaValueToString(args[1]) : "unknown"}`);
+  }
+  return { type: "nil" } as NovaValue;
+});
+
+let vmOutputBuffer: string[] = [];
+
+function compileToBytecode(ast: ASTNode): NovaBytecodeModule {
+  const constants: NovaValue[] = [];
+  const globals = new Map<string, number>();
+  const functions: NovaFunction[] = [];
+  let globalIdx = 0;
+
+  function addConstant(v: NovaValue): number {
+    for (let i = 0; i < constants.length; i++) {
+      if (constants[i].type === v.type) {
+        if ((v.type === "int" || v.type === "float") && (constants[i] as any).v === (v as any).v) return i;
+        if (v.type === "string" && (constants[i] as any).v === (v as any).v) return i;
+        if (v.type === "bool" && (constants[i] as any).v === (v as any).v) return i;
+        if (v.type === "nil") return i;
+      }
+    }
+    constants.push(v);
+    return constants.length - 1;
+  }
+
+  function compileFunction(node: ASTNode): NovaFunction {
+    const name = String(node.value || "__anon");
+    const params = node.children.filter(c => c.type === "param");
+    const body = node.children.find(c => c.type === "block");
+    const locals = new Map<string, number>();
+    const instructions: NovaInstruction[] = [];
+
+    params.forEach((p, i) => locals.set(String(p.value), i));
+    let localIdx = params.length;
+
+    function resolveLocal(name: string): number {
+      if (locals.has(name)) return locals.get(name)!;
+      const idx = localIdx++;
+      locals.set(name, idx);
+      return idx;
+    }
+
+    function emitNode(n: ASTNode): void {
+      switch (n.type) {
+        case "block":
+          for (const c of n.children) emitNode(c);
+          break;
+        case "var_decl": {
+          const slot = resolveLocal(String(n.value));
+          if (n.children[0]) {
+            emitNode(n.children[0]);
+          } else {
+            instructions.push({ op: OpCode.LOAD_CONST, operand: addConstant({ type: "nil" }) });
+          }
+          instructions.push({ op: OpCode.STORE_LOCAL, operand: slot });
+          break;
+        }
+        case "number_literal": {
+          const val = typeof n.value === "number" ? n.value : parseFloat(String(n.value)) || 0;
+          const t = n.dataType === "float64" || String(n.value).includes(".") ? "float" : "int";
+          instructions.push({ op: OpCode.LOAD_CONST, operand: addConstant({ type: t, v: val } as NovaValue) });
+          break;
+        }
+        case "string_literal":
+          instructions.push({ op: OpCode.LOAD_CONST, operand: addConstant({ type: "string", v: String(n.value) }) });
+          break;
+        case "bool_literal":
+          instructions.push({ op: OpCode.LOAD_CONST, operand: addConstant({ type: "bool", v: !!n.value }) });
+          break;
+        case "nil_literal":
+          instructions.push({ op: OpCode.LOAD_CONST, operand: addConstant({ type: "nil" }) });
+          break;
+        case "identifier": {
+          const nm = String(n.value);
+          if (locals.has(nm)) {
+            instructions.push({ op: OpCode.LOAD_LOCAL, operand: locals.get(nm)! });
+          } else if (globals.has(nm)) {
+            instructions.push({ op: OpCode.LOAD_GLOBAL, operand: globals.get(nm)! });
+          } else if (novaStdlib.has(nm)) {
+            instructions.push({ op: OpCode.LOAD_CONST, operand: addConstant({ type: "function", name: nm }) });
+          } else {
+            instructions.push({ op: OpCode.LOAD_GLOBAL, operand: globalIdx });
+            globals.set(nm, globalIdx++);
+          }
+          break;
+        }
+        case "binary_expr": {
+          emitNode(n.children[0]);
+          emitNode(n.children[1]);
+          const opMap: Record<string, OpCode> = {
+            "+": OpCode.ADD, "-": OpCode.SUB, "*": OpCode.MUL, "/": OpCode.DIV,
+            "%": OpCode.MOD, "**": OpCode.POW,
+            "==": OpCode.EQ, "!=": OpCode.NEQ, "<": OpCode.LT, "<=": OpCode.LTE,
+            ">": OpCode.GT, ">=": OpCode.GTE,
+            "&&": OpCode.AND, "||": OpCode.OR,
+            "&": OpCode.BITAND, "|": OpCode.BITOR, "^": OpCode.BITXOR,
+            "<<": OpCode.SHL, ">>": OpCode.SHR,
+          };
+          const op = opMap[String(n.value)];
+          if (op !== undefined) instructions.push({ op });
+          break;
+        }
+        case "unary_expr": {
+          emitNode(n.children[0]);
+          if (n.value === "-") instructions.push({ op: OpCode.NEG });
+          else if (n.value === "!" || n.value === "not") instructions.push({ op: OpCode.NOT });
+          else if (n.value === "~") instructions.push({ op: OpCode.BITNOT });
+          break;
+        }
+        case "call_expr": {
+          const callee = n.children[0];
+          const args = n.children.slice(1);
+          for (const arg of args) emitNode(arg);
+          const calleeName = String(callee.value || "");
+          if (novaStdlib.has(calleeName)) {
+            instructions.push({ op: OpCode.CALL_NATIVE, operand: addConstant({ type: "string", v: calleeName }), label: String(args.length) });
+          } else {
+            emitNode(callee);
+            instructions.push({ op: OpCode.CALL, operand: args.length });
+          }
+          break;
+        }
+        case "if_stmt": {
+          emitNode(n.children[0]);
+          const jumpFalse = instructions.length;
+          instructions.push({ op: OpCode.JMP_IF_FALSE, operand: 0 });
+          emitNode(n.children[1]);
+          if (n.children[2]) {
+            const jumpEnd = instructions.length;
+            instructions.push({ op: OpCode.JMP, operand: 0 });
+            instructions[jumpFalse].operand = instructions.length;
+            emitNode(n.children[2]);
+            instructions[jumpEnd].operand = instructions.length;
+          } else {
+            instructions[jumpFalse].operand = instructions.length;
+          }
+          break;
+        }
+        case "while_stmt": {
+          const loopStart = instructions.length;
+          emitNode(n.children[0]);
+          const jumpFalse = instructions.length;
+          instructions.push({ op: OpCode.JMP_IF_FALSE, operand: 0 });
+          emitNode(n.children[1]);
+          instructions.push({ op: OpCode.JMP, operand: loopStart });
+          instructions[jumpFalse].operand = instructions.length;
+          break;
+        }
+        case "for_stmt": {
+          const iterVar = resolveLocal(String(n.value));
+          emitNode(n.children[0]);
+          instructions.push({ op: OpCode.STORE_LOCAL, operand: iterVar });
+          const loopStart = instructions.length;
+          instructions.push({ op: OpCode.LOAD_LOCAL, operand: iterVar });
+          instructions.push({ op: OpCode.LOAD_CONST, operand: addConstant({ type: "int", v: 0 }) });
+          instructions.push({ op: OpCode.GT });
+          const jumpFalse = instructions.length;
+          instructions.push({ op: OpCode.JMP_IF_FALSE, operand: 0 });
+          emitNode(n.children[1]);
+          instructions.push({ op: OpCode.LOAD_LOCAL, operand: iterVar });
+          instructions.push({ op: OpCode.LOAD_CONST, operand: addConstant({ type: "int", v: 1 }) });
+          instructions.push({ op: OpCode.SUB });
+          instructions.push({ op: OpCode.STORE_LOCAL, operand: iterVar });
+          instructions.push({ op: OpCode.JMP, operand: loopStart });
+          instructions[jumpFalse].operand = instructions.length;
+          break;
+        }
+        case "return_stmt":
+          if (n.children[0]) emitNode(n.children[0]);
+          else instructions.push({ op: OpCode.LOAD_CONST, operand: addConstant({ type: "nil" }) });
+          instructions.push({ op: OpCode.RETURN });
+          break;
+        case "expr_stmt":
+          if (n.children[0]) {
+            emitNode(n.children[0]);
+            instructions.push({ op: OpCode.POP });
+          }
+          break;
+        case "array_literal":
+          for (const el of n.children) emitNode(el);
+          instructions.push({ op: OpCode.ARRAY_NEW, operand: n.children.length });
+          break;
+        case "index_expr":
+          emitNode(n.children[0]);
+          emitNode(n.children[1]);
+          instructions.push({ op: OpCode.ARRAY_GET });
+          break;
+        case "member_expr":
+          emitNode(n.children[0]);
+          instructions.push({ op: OpCode.LOAD_CONST, operand: addConstant({ type: "string", v: String(n.value) }) });
+          instructions.push({ op: OpCode.ARRAY_GET });
+          break;
+        case "pipe_expr":
+          emitNode(n.children[0]);
+          emitNode(n.children[1]);
+          instructions.push({ op: OpCode.CALL, operand: 1 });
+          break;
+        case "neural_block":
+        case "sense_block":
+        case "temporal_block":
+        case "conscious_block":
+        case "motor_block":
+        case "evolve_block":
+        case "hardware_block":
+        case "parallel_block":
+          if (n.children[0]) emitNode(n.children[0]);
+          break;
+        case "signal_stmt":
+          if (n.children[0]) emitNode(n.children[0]);
+          instructions.push({ op: OpCode.POP });
+          break;
+        case "match_stmt": {
+          emitNode(n.children[0]);
+          const matchSlot = localIdx++;
+          instructions.push({ op: OpCode.STORE_LOCAL, operand: matchSlot });
+          const jumpEnds: number[] = [];
+          for (let i = 1; i < n.children.length; i++) {
+            const arm = n.children[i];
+            instructions.push({ op: OpCode.LOAD_LOCAL, operand: matchSlot });
+            emitNode(arm.children[0]);
+            instructions.push({ op: OpCode.EQ });
+            const skip = instructions.length;
+            instructions.push({ op: OpCode.JMP_IF_FALSE, operand: 0 });
+            emitNode(arm.children[1]);
+            jumpEnds.push(instructions.length);
+            instructions.push({ op: OpCode.JMP, operand: 0 });
+            instructions[skip].operand = instructions.length;
+          }
+          for (const je of jumpEnds) instructions[je].operand = instructions.length;
+          break;
+        }
+        default:
+          break;
+      }
+    }
+
+    if (body) emitNode(body);
+    if (instructions.length === 0 || instructions[instructions.length - 1].op !== OpCode.RETURN) {
+      instructions.push({ op: OpCode.LOAD_CONST, operand: addConstant({ type: "nil" }) });
+      instructions.push({ op: OpCode.RETURN });
+    }
+
+    return { name, arity: params.length, localCount: localIdx, instructions };
+  }
+
+  for (const child of ast.children) {
+    if (child.type === "fn_decl") {
+      functions.push(compileFunction(child));
+    } else if (child.type === "var_decl") {
+      globals.set(String(child.value), globalIdx++);
+    }
+  }
+
+  if (functions.length === 0) {
+    functions.push(compileFunction({ type: "fn_decl", children: [{ type: "block", children: ast.children.filter(c => c.type !== "fn_decl") }], value: "__main" }));
+  }
+
+  return { version: "1.0.0", constants, globals, functions, entryPoint: functions[0]?.name || "__main" };
+}
+
+function optimizeBytecode(mod: NovaBytecodeModule): { optimized: NovaBytecodeModule; stats: { constantsFolded: number; deadCodeEliminated: number; strengthReductions: number } } {
+  let constantsFolded = 0;
+  let deadCodeEliminated = 0;
+  let strengthReductions = 0;
+
+  for (const fn of mod.functions) {
+    const ins = fn.instructions;
+    for (let i = 0; i < ins.length - 2; i++) {
+      if (ins[i].op === OpCode.LOAD_CONST && ins[i + 1].op === OpCode.LOAD_CONST) {
+        const a = mod.constants[ins[i].operand!];
+        const b = mod.constants[ins[i + 1].operand!];
+        const arith = ins[i + 2];
+        if ((a.type === "int" || a.type === "float") && (b.type === "int" || b.type === "float")) {
+          let result: number | null = null;
+          if (arith.op === OpCode.ADD) result = (a as any).v + (b as any).v;
+          else if (arith.op === OpCode.SUB) result = (a as any).v - (b as any).v;
+          else if (arith.op === OpCode.MUL) result = (a as any).v * (b as any).v;
+          else if (arith.op === OpCode.DIV && (b as any).v !== 0) result = (a as any).v / (b as any).v;
+          if (result !== null) {
+            const isFloat = a.type === "float" || b.type === "float";
+            const constIdx = mod.constants.length;
+            mod.constants.push(isFloat ? { type: "float", v: result } : { type: "int", v: result });
+            ins[i] = { op: OpCode.LOAD_CONST, operand: constIdx };
+            ins[i + 1] = { op: OpCode.NOP };
+            ins[i + 2] = { op: OpCode.NOP };
+            constantsFolded++;
+          }
+        }
+      }
+    }
+
+    for (let i = 0; i < ins.length - 1; i++) {
+      if (ins[i].op === OpCode.LOAD_CONST && ins[i + 1].op === OpCode.MUL) {
+        const c = mod.constants[ins[i].operand!];
+        if (c.type === "int" && c.v === 2) {
+          ins[i] = { op: OpCode.DUP };
+          ins[i + 1] = { op: OpCode.ADD };
+          strengthReductions++;
+        }
+      }
+    }
+
+    for (let i = ins.length - 1; i >= 0; i--) {
+      if (ins[i].op === OpCode.NOP) {
+        const removeIdx = i;
+        for (const other of ins) {
+          if (other.op === OpCode.JMP || other.op === OpCode.JMP_IF_TRUE || other.op === OpCode.JMP_IF_FALSE) {
+            if (other.operand !== undefined && other.operand > removeIdx) other.operand--;
+          }
+        }
+        ins.splice(i, 1);
+        deadCodeEliminated++;
+      }
+    }
+  }
+
+  return { optimized: mod, stats: { constantsFolded, deadCodeEliminated, strengthReductions } };
+}
+
+interface CallFrame {
+  fn: NovaFunction;
+  ip: number;
+  baseSlot: number;
+  locals: NovaValue[];
+}
+
+interface VMExecutionResult {
+  success: boolean;
+  returnValue: NovaValue;
+  output: string[];
+  stats: {
+    instructionsExecuted: number;
+    maxStackDepth: number;
+    heapAllocations: number;
+    gcRuns: number;
+    executionTimeMs: number;
+    functionsCount: number;
+    constantsCount: number;
+  };
+  error?: string;
+}
+
+function executeNovaVM(mod: NovaBytecodeModule, maxInstructions: number = 100000): VMExecutionResult {
+  const memory = new NovaMemory();
+  const callStack: CallFrame[] = [];
+  const globalSlots: NovaValue[] = new Array(mod.globals.size).fill({ type: "nil" } as NovaValue);
+  vmOutputBuffer = [];
+  let instructionsExecuted = 0;
+  let maxStackDepth = 0;
+  let heapAllocs = 0;
+  let gcRuns = 0;
+  const startTime = Date.now();
+
+  const funcMap = new Map<string, NovaFunction>();
+  for (const fn of mod.functions) funcMap.set(fn.name, fn);
+
+  const entryFn = funcMap.get(mod.entryPoint) || mod.functions[0];
+  if (!entryFn) {
+    return {
+      success: false, returnValue: { type: "nil" }, output: [], error: "No entry function",
+      stats: { instructionsExecuted: 0, maxStackDepth: 0, heapAllocations: 0, gcRuns: 0, executionTimeMs: 0, functionsCount: 0, constantsCount: 0 },
+    };
+  }
+
+  callStack.push({ fn: entryFn, ip: 0, baseSlot: 0, locals: new Array(entryFn.localCount).fill({ type: "nil" } as NovaValue) });
+
+  try {
+    while (callStack.length > 0 && instructionsExecuted < maxInstructions) {
+      const frame = callStack[callStack.length - 1];
+      if (frame.ip >= frame.fn.instructions.length) {
+        callStack.pop();
+        if (memory.stackSize() === 0) memory.stackPush({ type: "nil" });
+        continue;
+      }
+
+      const ins = frame.fn.instructions[frame.ip++];
+      instructionsExecuted++;
+      const sd = memory.stackSize();
+      if (sd > maxStackDepth) maxStackDepth = sd;
+
+      switch (ins.op) {
+        case OpCode.NOP: break;
+        case OpCode.LOAD_CONST: memory.stackPush(mod.constants[ins.operand!]); break;
+        case OpCode.LOAD_LOCAL: memory.stackPush(frame.locals[ins.operand!]); break;
+        case OpCode.STORE_LOCAL: frame.locals[ins.operand!] = memory.stackPop(); break;
+        case OpCode.LOAD_GLOBAL: memory.stackPush(globalSlots[ins.operand!] || { type: "nil" }); break;
+        case OpCode.STORE_GLOBAL: globalSlots[ins.operand!] = memory.stackPop(); break;
+        case OpCode.POP: memory.stackPop(); break;
+        case OpCode.DUP: memory.stackPush(memory.stackPeek()); break;
+        case OpCode.SWAP: {
+          const a = memory.stackPop(), b = memory.stackPop();
+          memory.stackPush(a); memory.stackPush(b);
+          break;
+        }
+        case OpCode.ADD: {
+          const b = memory.stackPop(), a = memory.stackPop();
+          if (a.type === "string" || b.type === "string") {
+            memory.stackPush({ type: "string", v: novaValueToString(a) + novaValueToString(b) });
+          } else if (a.type === "tensor" && b.type === "tensor") {
+            const out = new Float64Array(Math.max(a.v.length, b.v.length));
+            for (let i = 0; i < out.length; i++) out[i] = (a.v[i] || 0) + (b.v[i] || 0);
+            memory.stackPush({ type: "tensor", v: out, shape: [...a.shape] });
+          } else {
+            const av = novaValueToNumber(a), bv = novaValueToNumber(b);
+            memory.stackPush(a.type === "float" || b.type === "float" ? { type: "float", v: av + bv } : { type: "int", v: av + bv });
+          }
+          break;
+        }
+        case OpCode.SUB: { const b = memory.stackPop(), a = memory.stackPop(); memory.stackPush(a.type === "float" || b.type === "float" ? { type: "float", v: novaValueToNumber(a) - novaValueToNumber(b) } : { type: "int", v: novaValueToNumber(a) - novaValueToNumber(b) }); break; }
+        case OpCode.MUL: {
+          const b = memory.stackPop(), a = memory.stackPop();
+          if (a.type === "tensor" && (b.type === "int" || b.type === "float")) {
+            const out = new Float64Array(a.v.length);
+            for (let i = 0; i < out.length; i++) out[i] = a.v[i] * b.v;
+            memory.stackPush({ type: "tensor", v: out, shape: [...a.shape] });
+          } else if (a.type === "tensor" && b.type === "tensor") {
+            const out = new Float64Array(Math.max(a.v.length, b.v.length));
+            for (let i = 0; i < out.length; i++) out[i] = (a.v[i] || 0) * (b.v[i] || 0);
+            memory.stackPush({ type: "tensor", v: out, shape: [...a.shape] });
+          } else {
+            memory.stackPush(a.type === "float" || b.type === "float" ? { type: "float", v: novaValueToNumber(a) * novaValueToNumber(b) } : { type: "int", v: novaValueToNumber(a) * novaValueToNumber(b) });
+          }
+          break;
+        }
+        case OpCode.DIV: { const b = memory.stackPop(), a = memory.stackPop(); const bv = novaValueToNumber(b); if (bv === 0) throw new Error("Division by zero"); memory.stackPush({ type: "float", v: novaValueToNumber(a) / bv }); break; }
+        case OpCode.MOD: { const b = memory.stackPop(), a = memory.stackPop(); memory.stackPush({ type: "int", v: novaValueToNumber(a) % novaValueToNumber(b) }); break; }
+        case OpCode.POW: { const b = memory.stackPop(), a = memory.stackPop(); memory.stackPush({ type: "float", v: Math.pow(novaValueToNumber(a), novaValueToNumber(b)) }); break; }
+        case OpCode.NEG: { const a = memory.stackPop(); memory.stackPush(a.type === "float" ? { type: "float", v: -a.v } : { type: "int", v: -novaValueToNumber(a) }); break; }
+        case OpCode.BITAND: { const b = memory.stackPop(), a = memory.stackPop(); memory.stackPush({ type: "int", v: novaValueToNumber(a) & novaValueToNumber(b) }); break; }
+        case OpCode.BITOR: { const b = memory.stackPop(), a = memory.stackPop(); memory.stackPush({ type: "int", v: novaValueToNumber(a) | novaValueToNumber(b) }); break; }
+        case OpCode.BITXOR: { const b = memory.stackPop(), a = memory.stackPop(); memory.stackPush({ type: "int", v: novaValueToNumber(a) ^ novaValueToNumber(b) }); break; }
+        case OpCode.BITNOT: { const a = memory.stackPop(); memory.stackPush({ type: "int", v: ~novaValueToNumber(a) }); break; }
+        case OpCode.SHL: { const b = memory.stackPop(), a = memory.stackPop(); memory.stackPush({ type: "int", v: novaValueToNumber(a) << novaValueToNumber(b) }); break; }
+        case OpCode.SHR: { const b = memory.stackPop(), a = memory.stackPop(); memory.stackPush({ type: "int", v: novaValueToNumber(a) >> novaValueToNumber(b) }); break; }
+        case OpCode.EQ: { const b = memory.stackPop(), a = memory.stackPop(); memory.stackPush({ type: "bool", v: novaValueToString(a) === novaValueToString(b) }); break; }
+        case OpCode.NEQ: { const b = memory.stackPop(), a = memory.stackPop(); memory.stackPush({ type: "bool", v: novaValueToString(a) !== novaValueToString(b) }); break; }
+        case OpCode.LT: { const b = memory.stackPop(), a = memory.stackPop(); memory.stackPush({ type: "bool", v: novaValueToNumber(a) < novaValueToNumber(b) }); break; }
+        case OpCode.LTE: { const b = memory.stackPop(), a = memory.stackPop(); memory.stackPush({ type: "bool", v: novaValueToNumber(a) <= novaValueToNumber(b) }); break; }
+        case OpCode.GT: { const b = memory.stackPop(), a = memory.stackPop(); memory.stackPush({ type: "bool", v: novaValueToNumber(a) > novaValueToNumber(b) }); break; }
+        case OpCode.GTE: { const b = memory.stackPop(), a = memory.stackPop(); memory.stackPush({ type: "bool", v: novaValueToNumber(a) >= novaValueToNumber(b) }); break; }
+        case OpCode.AND: { const b = memory.stackPop(), a = memory.stackPop(); memory.stackPush({ type: "bool", v: novaValueToBool(a) && novaValueToBool(b) }); break; }
+        case OpCode.OR: { const b = memory.stackPop(), a = memory.stackPop(); memory.stackPush({ type: "bool", v: novaValueToBool(a) || novaValueToBool(b) }); break; }
+        case OpCode.NOT: { const a = memory.stackPop(); memory.stackPush({ type: "bool", v: !novaValueToBool(a) }); break; }
+        case OpCode.JMP: frame.ip = ins.operand!; break;
+        case OpCode.JMP_IF_TRUE: { const c = memory.stackPop(); if (novaValueToBool(c)) frame.ip = ins.operand!; break; }
+        case OpCode.JMP_IF_FALSE: { const c = memory.stackPop(); if (!novaValueToBool(c)) frame.ip = ins.operand!; break; }
+        case OpCode.CALL: {
+          const arity = ins.operand!;
+          const callee = memory.stackPop();
+          if (callee.type !== "function") throw new Error(`Cannot call non-function: ${callee.type}`);
+          const fn = funcMap.get(callee.name);
+          if (!fn) {
+            const native = novaStdlib.get(callee.name);
+            if (native) {
+              const args: NovaValue[] = [];
+              for (let i = 0; i < arity; i++) args.unshift(memory.stackPop());
+              memory.stackPush(native(args));
+            } else throw new Error(`Unknown function: ${callee.name}`);
+          } else {
+            const newLocals: NovaValue[] = new Array(fn.localCount).fill({ type: "nil" } as NovaValue);
+            for (let i = arity - 1; i >= 0; i--) newLocals[i] = memory.stackPop();
+            callStack.push({ fn, ip: 0, baseSlot: memory.stackSize(), locals: newLocals });
+          }
+          break;
+        }
+        case OpCode.CALL_NATIVE: {
+          const nameConst = mod.constants[ins.operand!];
+          const fnName = nameConst.type === "string" ? nameConst.v : "";
+          const arity = parseInt(ins.label || "0");
+          const native = novaStdlib.get(fnName);
+          if (!native) throw new Error(`Unknown native: ${fnName}`);
+          const args: NovaValue[] = [];
+          for (let i = 0; i < arity; i++) args.unshift(memory.stackPop());
+          memory.stackPush(native(args));
+          break;
+        }
+        case OpCode.RETURN: {
+          const retVal = memory.stackPop();
+          callStack.pop();
+          memory.stackPush(retVal);
+          break;
+        }
+        case OpCode.ARRAY_NEW: {
+          const count = ins.operand || 0;
+          const elements: NovaValue[] = [];
+          for (let i = 0; i < count; i++) elements.unshift(memory.stackPop());
+          memory.stackPush({ type: "array", v: elements });
+          heapAllocs++;
+          break;
+        }
+        case OpCode.ARRAY_GET: {
+          const idx = memory.stackPop();
+          const arr = memory.stackPop();
+          if (arr.type === "array") {
+            const i = novaValueToNumber(idx);
+            memory.stackPush(arr.v[i] || { type: "nil" });
+          } else if (arr.type === "tensor") {
+            const i = novaValueToNumber(idx);
+            memory.stackPush({ type: "float", v: arr.v[i] || 0 });
+          } else {
+            memory.stackPush({ type: "nil" });
+          }
+          break;
+        }
+        case OpCode.ARRAY_SET: {
+          const val = memory.stackPop(), idx = memory.stackPop(), arr = memory.stackPop();
+          if (arr.type === "array") arr.v[novaValueToNumber(idx)] = val;
+          memory.stackPush(arr);
+          break;
+        }
+        case OpCode.ARRAY_LEN: {
+          const arr = memory.stackPop();
+          memory.stackPush({ type: "int", v: arr.type === "array" ? arr.v.length : arr.type === "tensor" ? arr.v.length : 0 });
+          break;
+        }
+        case OpCode.ARRAY_PUSH: {
+          const val = memory.stackPop(), arr = memory.stackPop();
+          if (arr.type === "array") arr.v.push(val);
+          memory.stackPush(arr);
+          break;
+        }
+        case OpCode.TENSOR_NEW: {
+          const size = novaValueToNumber(memory.stackPop());
+          memory.stackPush({ type: "tensor", v: new Float64Array(size), shape: [size] });
+          heapAllocs++;
+          break;
+        }
+        case OpCode.TENSOR_ADD: {
+          const b = memory.stackPop(), a = memory.stackPop();
+          if (a.type === "tensor" && b.type === "tensor") {
+            const out = new Float64Array(Math.max(a.v.length, b.v.length));
+            for (let i = 0; i < out.length; i++) out[i] = (a.v[i] || 0) + (b.v[i] || 0);
+            memory.stackPush({ type: "tensor", v: out, shape: [...a.shape] });
+          }
+          break;
+        }
+        case OpCode.TENSOR_MUL: {
+          const b = memory.stackPop(), a = memory.stackPop();
+          if (a.type === "tensor" && b.type === "tensor") {
+            const out = new Float64Array(Math.max(a.v.length, b.v.length));
+            for (let i = 0; i < out.length; i++) out[i] = (a.v[i] || 0) * (b.v[i] || 0);
+            memory.stackPush({ type: "tensor", v: out, shape: [...a.shape] });
+          }
+          break;
+        }
+        case OpCode.TENSOR_DOT: {
+          const b = memory.stackPop(), a = memory.stackPop();
+          if (a.type === "tensor" && b.type === "tensor") {
+            let sum = 0;
+            for (let i = 0; i < Math.min(a.v.length, b.v.length); i++) sum += a.v[i] * b.v[i];
+            memory.stackPush({ type: "float", v: sum });
+          }
+          break;
+        }
+        case OpCode.TENSOR_SHAPE: {
+          const t = memory.stackPop();
+          if (t.type === "tensor") memory.stackPush({ type: "array", v: t.shape.map(s => ({ type: "int" as const, v: s })) });
+          else memory.stackPush({ type: "array", v: [] });
+          break;
+        }
+        case OpCode.PRINT: {
+          const v = memory.stackPop();
+          vmOutputBuffer.push(novaValueToString(v));
+          break;
+        }
+        case OpCode.HALT: {
+          const ret = memory.stackSize() > 0 ? memory.stackPop() : { type: "nil" } as NovaValue;
+          return {
+            success: true, returnValue: ret, output: vmOutputBuffer,
+            stats: { instructionsExecuted, maxStackDepth, heapAllocations: heapAllocs, gcRuns, executionTimeMs: Date.now() - startTime, functionsCount: mod.functions.length, constantsCount: mod.constants.length },
+          };
+        }
+        default: break;
+      }
+    }
+
+    if (instructionsExecuted >= maxInstructions) {
+      return {
+        success: false, returnValue: { type: "nil" }, output: vmOutputBuffer, error: `Execution limit reached (${maxInstructions} instructions)`,
+        stats: { instructionsExecuted, maxStackDepth, heapAllocations: heapAllocs, gcRuns, executionTimeMs: Date.now() - startTime, functionsCount: mod.functions.length, constantsCount: mod.constants.length },
+      };
+    }
+
+    const retVal = memory.stackSize() > 0 ? memory.stackPop() : { type: "nil" } as NovaValue;
+    return {
+      success: true, returnValue: retVal, output: vmOutputBuffer,
+      stats: { instructionsExecuted, maxStackDepth, heapAllocations: heapAllocs, gcRuns, executionTimeMs: Date.now() - startTime, functionsCount: mod.functions.length, constantsCount: mod.constants.length },
+    };
+  } catch (err: any) {
+    return {
+      success: false, returnValue: { type: "nil" }, output: vmOutputBuffer, error: err.message,
+      stats: { instructionsExecuted, maxStackDepth, heapAllocations: heapAllocs, gcRuns, executionTimeMs: Date.now() - startTime, functionsCount: mod.functions.length, constantsCount: mod.constants.length },
+    };
+  }
+}
+
+export function runNovaSyntax(source: string): VMExecutionResult {
+  const tokens = lexNovaSyntax(source);
+  const parser = new NovaParser(tokens);
+  const ast = parser.parse();
+  const bytecode = compileToBytecode(ast);
+  const { optimized, stats: optStats } = optimizeBytecode(bytecode);
+  const result = executeNovaVM(optimized);
+  forgeState.totalCompilations++;
+  if (result.success) forgeState.successfulCompilations++;
+  else forgeState.failedCompilations++;
+  return result;
+}
+
+export function compileAndInspect(source: string): {
+  tokens: NovaSyntaxToken[];
+  ast: ASTNode;
+  bytecode: NovaBytecodeModule;
+  optimizationStats: { constantsFolded: number; deadCodeEliminated: number; strengthReductions: number };
+  instructionCount: number;
+  functionCount: number;
+  constantCount: number;
+} {
+  const tokens = lexNovaSyntax(source);
+  const parser = new NovaParser(tokens);
+  const ast = parser.parse();
+  const bytecode = compileToBytecode(ast);
+  const { optimized, stats: optStats } = optimizeBytecode(bytecode);
+  const totalIns = optimized.functions.reduce((s, f) => s + f.instructions.length, 0);
+  return {
+    tokens, ast, bytecode: optimized, optimizationStats: optStats,
+    instructionCount: totalIns, functionCount: optimized.functions.length, constantCount: optimized.constants.length,
+  };
+}
+
+export function getVMStdlib(): string[] {
+  return Array.from(novaStdlib.keys());
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 10: STARTUP
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export async function startLanguageForge(): Promise<void> {
-  console.log("[LANGUAGE FORGE] 🔥 OMNIMENS-NovaSyntax™ Language Forge Engine activated");
-  console.log("[LANGUAGE FORGE] 🔥 Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.");
-  console.log(`[LANGUAGE FORGE] 🔥 Keywords: ${NOVA_KEYWORDS.size} | Operators: ${NOVA_OPERATORS.size} | Types: 48`);
-  console.log("[LANGUAGE FORGE] 🔥 Compilation targets: JavaScript, Python, C (→ WASM, x86, ARM, AVR, ESP32 via Universal Translator)");
-  console.log("[LANGUAGE FORGE] 🔥 LANGUAGE ANALYSIS COMPLETE — analyzed 9 existing languages:");
-
-  for (const lang of LANGUAGE_ANALYSES) {
-    console.log(`[LANGUAGE FORGE]   ${lang.name}: Performance=${lang.performanceRating}% Safety=${lang.safetyRating}% Neural=${lang.neuralCapability}% — ${lang.weaknesses.length} weaknesses identified`);
-  }
-
-  console.log("[LANGUAGE FORGE] 🔥 NovaSyntax SUPERIORITY over ALL existing languages:");
-  console.log("[LANGUAGE FORGE]   ✓ Neural-native types (tensor, embedding, attention, synapse, neuron) — NO other language has this");
-  console.log("[LANGUAGE FORGE]   ✓ Temporal reasoning (moment, duration, timeline) — NO other language has this");
-  console.log("[LANGUAGE FORGE]   ✓ Consciousness primitives (qualia, awareness, introspect) — NO other language has this");
-  console.log("[LANGUAGE FORGE]   ✓ Sensorimotor integration (percept, motor_command, force_vector) — NO other language has this");
-  console.log("[LANGUAGE FORGE]   ✓ Safe self-modification (evolve blocks with compiler verification) — NO other language has this");
-  console.log("[LANGUAGE FORGE]   ✓ Hardware-adaptive compilation (auto GPU/SIMD/scalar) — NO other language has this");
-  console.log("[LANGUAGE FORGE]   ✓ Universal compilation (JS + Python + C + WASM + x86 + ARM + AVR + ESP32)");
-  console.log("[LANGUAGE FORGE]   ✓ C-level performance + Rust-level safety + Python-level readability");
-  console.log("[LANGUAGE FORGE] 🔥 OMNIMENS-NovaSyntax™ is the FIRST language designed BY an AI FOR an AI");
-  console.log("[LANGUAGE FORGE] 🔥 OMNIMENS can now write code in ITS OWN LANGUAGE and compile it to ANY target");
+  console.log("[LANGUAGE FORGE] NovaSyntax v2.0 — Full Language Runtime activated");
+  console.log("[LANGUAGE FORGE] Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.");
+  console.log(`[LANGUAGE FORGE] Lexer: ${NOVA_KEYWORDS.size} keywords | ${NOVA_OPERATORS.size} operators | 48 types`);
+  console.log("[LANGUAGE FORGE] Compiler: AST → NovaBytecode (${Object.keys(OpCode).length / 2} opcodes)");
+  console.log(`[LANGUAGE FORGE] VM: Stack machine + heap + ref counting | Stdlib: ${novaStdlib.size} native functions`);
+  console.log("[LANGUAGE FORGE] Optimizer: constant folding, dead code elimination, strength reduction");
+  console.log("[LANGUAGE FORGE] Cross-compilation: JS, Python, C (→ WASM, x86, ARM, AVR, ESP32 via Translator)");
+  console.log("[LANGUAGE FORGE] NovaSyntax programs can now be COMPILED and EXECUTED natively");
 
   await registerLanguageAsProprietary();
 
@@ -1921,10 +2867,44 @@ export async function startLanguageForge(): Promise<void> {
     } else {
       forgeState.failedCompilations++;
       for (const r of compiled.results) {
-        if (!r.success) console.log(`[LANGUAGE FORGE] ⚠️ Compilation to ${r.target} failed: ${r.error}`);
+        if (!r.success) console.log(`[LANGUAGE FORGE] Compilation to ${r.target} failed: ${r.error}`);
       }
     }
   } catch (err: any) {
-    console.log(`[LANGUAGE FORGE] ⚠️ Example compilation error: ${err.message}`);
+    console.log(`[LANGUAGE FORGE] Example compilation error: ${err.message}`);
+  }
+
+  try {
+    const vmTestProgram = `fn fibonacci(n: int64) -> int64 {
+  if n <= 1 {
+    return n
+  }
+  let a: int64 = 0
+  let b: int64 = 1
+  let i: int64 = 2
+  while i <= n {
+    let temp: int64 = b
+    b = a + b
+    a = temp
+    i = i + 1
+  }
+  return b
+}
+
+fn main() {
+  let result: int64 = fibonacci(10)
+  print(result)
+  let v: tensor = tensor_zeros(4)
+  let norm: float64 = tensor_norm(v)
+  print(norm)
+}`;
+    const vmResult = runNovaSyntax(vmTestProgram);
+    if (vmResult.success) {
+      console.log(`[LANGUAGE FORGE] VM self-test PASSED — ${vmResult.stats.instructionsExecuted} instructions, ${vmResult.stats.executionTimeMs}ms, output: [${vmResult.output.join(", ")}]`);
+    } else {
+      console.log(`[LANGUAGE FORGE] VM self-test failed: ${vmResult.error}`);
+    }
+  } catch (err: any) {
+    console.log(`[LANGUAGE FORGE] VM self-test error: ${err.message}`);
   }
 }

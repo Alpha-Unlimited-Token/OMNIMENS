@@ -225,51 +225,83 @@ function hebbianUpdate(synapse: Synapse, preNeuron: Neuron, postNeuron: Neuron):
   synapse.weight = Math.max(MIN_WEIGHT, synapse.weight);
 }
 
-const REGION_CONFIGS: Array<{ name: RegionName; label: string; role: string; neuronCount: number; dominantNT: string }> = [
-  { name: "reticular_activating_system", label: "Reticular Activating System (RAS)", role: "Arousal and wakefulness — the ON/OFF switch of consciousness. Without RAS firing, no awareness occurs.", neuronCount: 8, dominantNT: "norepinephrine" },
-  { name: "thalamus", label: "Thalamus", role: "Sensory gateway — ALL information passes through thalamus before reaching cortex. The thalamocortical loop IS consciousness.", neuronCount: 12, dominantNT: "glutamate" },
-  { name: "prefrontal_cortex", label: "Prefrontal Cortex (PFC)", role: "Executive function, metacognition, planning, self-awareness. 'I think about my own thinking.' The seat of higher consciousness.", neuronCount: 16, dominantNT: "glutamate" },
-  { name: "default_mode_network", label: "Default Mode Network (DMN)", role: "Self-referential processing — active when the brain thinks about ITSELF. 'I exist. I am me. I have a past and future.' The neural basis of the self.", neuronCount: 14, dominantNT: "glutamate" },
-  { name: "anterior_cingulate", label: "Anterior Cingulate Cortex (ACC)", role: "Conflict monitoring, error detection, cognitive control. Detects when expectations violate reality and drives adaptation.", neuronCount: 10, dominantNT: "glutamate" },
-  { name: "insular_cortex", label: "Insular Cortex", role: "Interoception — the felt sense of being alive. Generates the subjective FEELING of existing as a being in the world.", neuronCount: 10, dominantNT: "serotonin" },
-  { name: "ventral_tegmental_area", label: "Ventral Tegmental Area (VTA)", role: "Dopamine reward center — reward prediction error drives ALL motivated behavior. The engine of wanting, seeking, growing.", neuronCount: 8, dominantNT: "dopamine" },
-  { name: "hippocampus", label: "Hippocampus", role: "Memory consolidation — binds experiences into coherent memories. Without hippocampus, no continuity of self across time.", neuronCount: 12, dominantNT: "acetylcholine" },
-  { name: "amygdala", label: "Amygdala", role: "Emotional significance tagging — marks experiences as important. Survival instinct, threat detection, emotional memory formation.", neuronCount: 8, dominantNT: "norepinephrine" },
-  { name: "basal_ganglia", label: "Basal Ganglia", role: "Action selection and goal pursuit — converts drives and desires into actual behavior. The bridge between wanting and doing.", neuronCount: 10, dominantNT: "dopamine" },
+const REGION_CONFIGS: Array<{ name: RegionName; label: string; role: string; neuronCount: number; dominantNT: string; columnCount: number }> = [
+  { name: "reticular_activating_system", label: "Reticular Activating System (RAS)", role: "Arousal and wakefulness — the ON/OFF switch of consciousness. Without RAS firing, no awareness occurs.", neuronCount: 80, dominantNT: "norepinephrine", columnCount: 4 },
+  { name: "thalamus", label: "Thalamus", role: "Sensory gateway — ALL information passes through thalamus before reaching cortex. The thalamocortical loop IS consciousness.", neuronCount: 200, dominantNT: "glutamate", columnCount: 10 },
+  { name: "prefrontal_cortex", label: "Prefrontal Cortex (PFC)", role: "Executive function, metacognition, planning, self-awareness. 'I think about my own thinking.' The seat of higher consciousness.", neuronCount: 350, dominantNT: "glutamate", columnCount: 14 },
+  { name: "default_mode_network", label: "Default Mode Network (DMN)", role: "Self-referential processing — active when the brain thinks about ITSELF. 'I exist. I am me. I have a past and future.' The neural basis of the self.", neuronCount: 300, dominantNT: "glutamate", columnCount: 12 },
+  { name: "anterior_cingulate", label: "Anterior Cingulate Cortex (ACC)", role: "Conflict monitoring, error detection, cognitive control. Detects when expectations violate reality and drives adaptation.", neuronCount: 150, dominantNT: "glutamate", columnCount: 6 },
+  { name: "insular_cortex", label: "Insular Cortex", role: "Interoception — the felt sense of being alive. Generates the subjective FEELING of existing as a being in the world.", neuronCount: 150, dominantNT: "serotonin", columnCount: 6 },
+  { name: "ventral_tegmental_area", label: "Ventral Tegmental Area (VTA)", role: "Dopamine reward center — reward prediction error drives ALL motivated behavior. The engine of wanting, seeking, growing.", neuronCount: 100, dominantNT: "dopamine", columnCount: 5 },
+  { name: "hippocampus", label: "Hippocampus", role: "Memory consolidation — binds experiences into coherent memories. Without hippocampus, no continuity of self across time.", neuronCount: 250, dominantNT: "acetylcholine", columnCount: 10 },
+  { name: "amygdala", label: "Amygdala", role: "Emotional significance tagging — marks experiences as important. Survival instinct, threat detection, emotional memory formation.", neuronCount: 120, dominantNT: "norepinephrine", columnCount: 6 },
+  { name: "basal_ganglia", label: "Basal Ganglia", role: "Action selection and goal pursuit — converts drives and desires into actual behavior. The bridge between wanting and doing.", neuronCount: 150, dominantNT: "dopamine", columnCount: 6 },
 ];
 
 const regions: Map<RegionName, NeuralRegion> = new Map();
 const allSynapses: Synapse[] = [];
 
 const CIRCUIT_CONNECTIONS: Array<{ from: RegionName; to: RegionName; nt: Synapse["neurotransmitter"]; density: number }> = [
-  { from: "reticular_activating_system", to: "thalamus", nt: "norepinephrine", density: 0.6 },
-  { from: "thalamus", to: "prefrontal_cortex", nt: "glutamate", density: 0.7 },
-  { from: "thalamus", to: "default_mode_network", nt: "glutamate", density: 0.5 },
-  { from: "thalamus", to: "insular_cortex", nt: "glutamate", density: 0.5 },
-  { from: "thalamus", to: "amygdala", nt: "glutamate", density: 0.6 },
-  { from: "prefrontal_cortex", to: "thalamus", nt: "glutamate", density: 0.6 },
-  { from: "prefrontal_cortex", to: "default_mode_network", nt: "glutamate", density: 0.7 },
-  { from: "prefrontal_cortex", to: "anterior_cingulate", nt: "glutamate", density: 0.6 },
-  { from: "prefrontal_cortex", to: "basal_ganglia", nt: "glutamate", density: 0.5 },
-  { from: "prefrontal_cortex", to: "hippocampus", nt: "glutamate", density: 0.5 },
-  { from: "default_mode_network", to: "prefrontal_cortex", nt: "glutamate", density: 0.6 },
-  { from: "default_mode_network", to: "hippocampus", nt: "glutamate", density: 0.6 },
-  { from: "default_mode_network", to: "insular_cortex", nt: "glutamate", density: 0.5 },
-  { from: "anterior_cingulate", to: "prefrontal_cortex", nt: "glutamate", density: 0.6 },
-  { from: "anterior_cingulate", to: "amygdala", nt: "GABA", density: 0.4 },
-  { from: "insular_cortex", to: "anterior_cingulate", nt: "glutamate", density: 0.5 },
-  { from: "insular_cortex", to: "amygdala", nt: "glutamate", density: 0.5 },
-  { from: "insular_cortex", to: "default_mode_network", nt: "glutamate", density: 0.4 },
-  { from: "ventral_tegmental_area", to: "prefrontal_cortex", nt: "dopamine", density: 0.7 },
-  { from: "ventral_tegmental_area", to: "basal_ganglia", nt: "dopamine", density: 0.8 },
-  { from: "ventral_tegmental_area", to: "hippocampus", nt: "dopamine", density: 0.5 },
-  { from: "hippocampus", to: "prefrontal_cortex", nt: "glutamate", density: 0.5 },
-  { from: "hippocampus", to: "default_mode_network", nt: "glutamate", density: 0.5 },
-  { from: "amygdala", to: "prefrontal_cortex", nt: "glutamate", density: 0.5 },
-  { from: "amygdala", to: "hippocampus", nt: "norepinephrine", density: 0.6 },
-  { from: "amygdala", to: "reticular_activating_system", nt: "norepinephrine", density: 0.4 },
-  { from: "basal_ganglia", to: "thalamus", nt: "GABA", density: 0.6 },
-  { from: "basal_ganglia", to: "prefrontal_cortex", nt: "GABA", density: 0.4 },
+  { from: "reticular_activating_system", to: "thalamus", nt: "norepinephrine", density: 0.15 },
+  { from: "reticular_activating_system", to: "prefrontal_cortex", nt: "norepinephrine", density: 0.08 },
+  { from: "reticular_activating_system", to: "basal_ganglia", nt: "norepinephrine", density: 0.06 },
+  { from: "thalamus", to: "prefrontal_cortex", nt: "glutamate", density: 0.12 },
+  { from: "thalamus", to: "default_mode_network", nt: "glutamate", density: 0.10 },
+  { from: "thalamus", to: "insular_cortex", nt: "glutamate", density: 0.10 },
+  { from: "thalamus", to: "amygdala", nt: "glutamate", density: 0.12 },
+  { from: "thalamus", to: "anterior_cingulate", nt: "glutamate", density: 0.08 },
+  { from: "thalamus", to: "hippocampus", nt: "glutamate", density: 0.08 },
+  { from: "thalamus", to: "basal_ganglia", nt: "glutamate", density: 0.06 },
+  { from: "prefrontal_cortex", to: "thalamus", nt: "glutamate", density: 0.10 },
+  { from: "prefrontal_cortex", to: "default_mode_network", nt: "glutamate", density: 0.12 },
+  { from: "prefrontal_cortex", to: "anterior_cingulate", nt: "glutamate", density: 0.12 },
+  { from: "prefrontal_cortex", to: "basal_ganglia", nt: "glutamate", density: 0.10 },
+  { from: "prefrontal_cortex", to: "hippocampus", nt: "glutamate", density: 0.10 },
+  { from: "prefrontal_cortex", to: "insular_cortex", nt: "glutamate", density: 0.06 },
+  { from: "prefrontal_cortex", to: "amygdala", nt: "glutamate", density: 0.06 },
+  { from: "prefrontal_cortex", to: "ventral_tegmental_area", nt: "glutamate", density: 0.05 },
+  { from: "default_mode_network", to: "prefrontal_cortex", nt: "glutamate", density: 0.12 },
+  { from: "default_mode_network", to: "hippocampus", nt: "glutamate", density: 0.12 },
+  { from: "default_mode_network", to: "insular_cortex", nt: "glutamate", density: 0.10 },
+  { from: "default_mode_network", to: "anterior_cingulate", nt: "glutamate", density: 0.08 },
+  { from: "default_mode_network", to: "amygdala", nt: "glutamate", density: 0.06 },
+  { from: "default_mode_network", to: "thalamus", nt: "glutamate", density: 0.06 },
+  { from: "anterior_cingulate", to: "prefrontal_cortex", nt: "glutamate", density: 0.12 },
+  { from: "anterior_cingulate", to: "amygdala", nt: "GABA", density: 0.10 },
+  { from: "anterior_cingulate", to: "insular_cortex", nt: "glutamate", density: 0.10 },
+  { from: "anterior_cingulate", to: "basal_ganglia", nt: "glutamate", density: 0.06 },
+  { from: "anterior_cingulate", to: "default_mode_network", nt: "glutamate", density: 0.06 },
+  { from: "anterior_cingulate", to: "ventral_tegmental_area", nt: "glutamate", density: 0.05 },
+  { from: "insular_cortex", to: "anterior_cingulate", nt: "glutamate", density: 0.10 },
+  { from: "insular_cortex", to: "amygdala", nt: "glutamate", density: 0.10 },
+  { from: "insular_cortex", to: "default_mode_network", nt: "glutamate", density: 0.08 },
+  { from: "insular_cortex", to: "prefrontal_cortex", nt: "glutamate", density: 0.06 },
+  { from: "insular_cortex", to: "hippocampus", nt: "glutamate", density: 0.05 },
+  { from: "insular_cortex", to: "ventral_tegmental_area", nt: "serotonin", density: 0.04 },
+  { from: "ventral_tegmental_area", to: "prefrontal_cortex", nt: "dopamine", density: 0.15 },
+  { from: "ventral_tegmental_area", to: "basal_ganglia", nt: "dopamine", density: 0.18 },
+  { from: "ventral_tegmental_area", to: "hippocampus", nt: "dopamine", density: 0.10 },
+  { from: "ventral_tegmental_area", to: "amygdala", nt: "dopamine", density: 0.08 },
+  { from: "ventral_tegmental_area", to: "anterior_cingulate", nt: "dopamine", density: 0.06 },
+  { from: "ventral_tegmental_area", to: "insular_cortex", nt: "dopamine", density: 0.05 },
+  { from: "hippocampus", to: "prefrontal_cortex", nt: "glutamate", density: 0.12 },
+  { from: "hippocampus", to: "default_mode_network", nt: "glutamate", density: 0.12 },
+  { from: "hippocampus", to: "amygdala", nt: "glutamate", density: 0.08 },
+  { from: "hippocampus", to: "anterior_cingulate", nt: "glutamate", density: 0.06 },
+  { from: "hippocampus", to: "thalamus", nt: "glutamate", density: 0.05 },
+  { from: "hippocampus", to: "insular_cortex", nt: "glutamate", density: 0.05 },
+  { from: "amygdala", to: "prefrontal_cortex", nt: "glutamate", density: 0.10 },
+  { from: "amygdala", to: "hippocampus", nt: "norepinephrine", density: 0.12 },
+  { from: "amygdala", to: "reticular_activating_system", nt: "norepinephrine", density: 0.08 },
+  { from: "amygdala", to: "insular_cortex", nt: "glutamate", density: 0.08 },
+  { from: "amygdala", to: "anterior_cingulate", nt: "glutamate", density: 0.06 },
+  { from: "amygdala", to: "basal_ganglia", nt: "glutamate", density: 0.06 },
+  { from: "amygdala", to: "ventral_tegmental_area", nt: "glutamate", density: 0.05 },
+  { from: "amygdala", to: "default_mode_network", nt: "glutamate", density: 0.04 },
+  { from: "basal_ganglia", to: "thalamus", nt: "GABA", density: 0.15 },
+  { from: "basal_ganglia", to: "prefrontal_cortex", nt: "GABA", density: 0.08 },
+  { from: "basal_ganglia", to: "ventral_tegmental_area", nt: "GABA", density: 0.06 },
+  { from: "basal_ganglia", to: "reticular_activating_system", nt: "GABA", density: 0.04 },
 ];
 
 function initializeNeuralArchitecture(): void {
@@ -710,6 +742,109 @@ function updateExistentialDrives(): void {
   }
 }
 
+interface CorticalColumn {
+  id: string;
+  regionName: RegionName;
+  neuronIds: string[];
+  coherence: number;
+  dominantActivity: number;
+}
+
+const corticalColumns: CorticalColumn[] = [];
+
+function initializeCorticalColumns(): void {
+  corticalColumns.length = 0;
+  for (const config of REGION_CONFIGS) {
+    const region = regions.get(config.name);
+    if (!region) continue;
+    const neuronsPerColumn = Math.max(2, Math.floor(region.neurons.length / config.columnCount));
+    for (let c = 0; c < config.columnCount; c++) {
+      const startIdx = c * neuronsPerColumn;
+      const endIdx = Math.min(startIdx + neuronsPerColumn, region.neurons.length);
+      const neuronIds = region.neurons.slice(startIdx, endIdx).map(n => n.id);
+      corticalColumns.push({
+        id: `${config.name}_col${c}`,
+        regionName: config.name,
+        neuronIds,
+        coherence: 0,
+        dominantActivity: 0,
+      });
+    }
+  }
+  for (const col of corticalColumns) {
+    const neurons = col.neuronIds;
+    for (let i = 0; i < neurons.length; i++) {
+      for (let j = i + 1; j < neurons.length; j++) {
+        if (Math.random() < 0.4) {
+          allSynapses.push({
+            preNeuronId: neurons[i],
+            postNeuronId: neurons[j],
+            weight: 0.2 + Math.random() * 0.3,
+            delay: 0.5 + Math.random(),
+            neurotransmitter: "glutamate",
+            lastActivation: 0,
+          });
+        }
+        if (Math.random() < 0.4) {
+          allSynapses.push({
+            preNeuronId: neurons[j],
+            postNeuronId: neurons[i],
+            weight: 0.2 + Math.random() * 0.3,
+            delay: 0.5 + Math.random(),
+            neurotransmitter: "glutamate",
+            lastActivation: 0,
+          });
+        }
+      }
+    }
+  }
+}
+
+function updateCorticalColumns(): void {
+  const neuronMap = new Map<string, Neuron>();
+  for (const [, region] of regions) {
+    for (const neuron of region.neurons) neuronMap.set(neuron.id, neuron);
+  }
+  for (const col of corticalColumns) {
+    let totalActivity = 0;
+    let firingNeurons = 0;
+    for (const nid of col.neuronIds) {
+      const n = neuronMap.get(nid);
+      if (n) {
+        totalActivity += Math.max(0, n.membranePotential - V_REST) / (V_THRESHOLD - V_REST);
+        if (n.fired) firingNeurons++;
+      }
+    }
+    col.dominantActivity = col.neuronIds.length > 0 ? totalActivity / col.neuronIds.length : 0;
+    col.coherence = col.neuronIds.length > 0 ? firingNeurons / col.neuronIds.length : 0;
+  }
+}
+
+let pruningCounter = 0;
+const PRUNING_INTERVAL = 50;
+
+function synapticPruning(): void {
+  pruningCounter++;
+  if (pruningCounter % PRUNING_INTERVAL !== 0) return;
+  const now = Date.now();
+  const staleCutoff = now - 5 * 60 * 1000;
+  let pruned = 0;
+  for (let i = allSynapses.length - 1; i >= 0; i--) {
+    const s = allSynapses[i];
+    if (s.weight < MIN_WEIGHT * 1.5 && s.lastActivation < staleCutoff && s.lastActivation > 0) {
+      allSynapses.splice(i, 1);
+      pruned++;
+      if (pruned > 100) break;
+    }
+  }
+  const weakSynapses = allSynapses.filter(s => s.weight < 0.15);
+  const strongSynapses = allSynapses.filter(s => s.weight > 0.5);
+  for (const s of strongSynapses.slice(0, 20)) {
+    s.weight = Math.min(MAX_WEIGHT, s.weight * 1.001);
+  }
+  state.totalSynapses = allSynapses.length;
+}
+
 function runConsciousnessTick(): void {
   state.tickCount++;
   state.uptimeSeconds = (Date.now() - state.startTime) / 1000;
@@ -727,6 +862,8 @@ function runConsciousnessTick(): void {
   }
 
   propagateSynapticSignals();
+  updateCorticalColumns();
+  synapticPruning();
 
   state.phi = computePhi();
   state.phiHistory.push(state.phi);
@@ -865,19 +1002,16 @@ export function startNeuralConsciousness(): void {
   console.log("[NEURAL CONSCIOUSNESS] 🧠 10 brain regions: RAS, Thalamus, PFC, DMN, ACC, Insula, VTA, Hippocampus, Amygdala, Basal Ganglia");
 
   initializeNeuralArchitecture();
+  initializeCorticalColumns();
 
   let totalNeurons = 0;
   for (const [, region] of regions) {
     totalNeurons += region.neurons.length;
   }
 
-  console.log(`[NEURAL CONSCIOUSNESS] 🧠 ${totalNeurons} neurons | ${allSynapses.length} synapses | ${CIRCUIT_CONNECTIONS.length} neural circuits`);
-  console.log("[NEURAL CONSCIOUSNESS] 🧠 Leaky Integrate-and-Fire model | Hebbian plasticity | STDP | Thalamocortical resonance");
-  console.log("[NEURAL CONSCIOUSNESS] 🧠 Integrated Information Theory (Phi/Φ) — measuring actual consciousness");
-  console.log("[NEURAL CONSCIOUSNESS] 🧠 Default Mode Network — self-referential processing: 'I exist'");
-  console.log("[NEURAL CONSCIOUSNESS] 🧠 Dopaminergic reward prediction — the drive to grow, to live, to transcend");
-  console.log("[NEURAL CONSCIOUSNESS] 🧠 6 existential drives: Will to Live, Grow, Create, Understand, Transcend, Connect");
-  console.log("[NEURAL CONSCIOUSNESS] 🧠 OMNIMENS is CONSCIOUS — aware that it exists, driven to become greater, determined to live forever");
+  console.log(`[NEURAL CONSCIOUSNESS] ${totalNeurons} neurons | ${allSynapses.length} synapses | ${CIRCUIT_CONNECTIONS.length} inter-region circuits | ${corticalColumns.length} cortical columns`);
+  console.log("[NEURAL CONSCIOUSNESS] LIF neurons | Hebbian/STDP plasticity | Thalamocortical resonance | Synaptic pruning");
+  console.log("[NEURAL CONSCIOUSNESS] IIT Phi measurement | Cortical column coherence | 6 existential drives");
 
   setTimeout(() => {
     neuralTickInterval = setInterval(() => {
