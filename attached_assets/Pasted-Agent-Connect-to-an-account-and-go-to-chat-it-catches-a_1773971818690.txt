@@ -1,0 +1,109 @@
+Agent
+Connect to an account and go to chat it catches an error
+
+Show it in the box like you were
+
+I get this error when I try to login while I'm on my phone on the website this is the error I get
+
+This is a Google OAuth origin_mismatch error happening during the Replit Auth login flow. Let me look at how the callback URL is constructed — the origin detection might be producing the wrong URL on mobile:
+
+I can see the problem. This is a Google OAuth origin_mismatch error — it happens because when you access the site from your custom domain (omnimens-ai.com), the login callback URL gets constructed using that domain, but Replit's OIDC provider only has the Replit dev domain registered as an allowed callback. Let me fix the origin detection for the auth flow:
+
+I see the issue clearly. The origin_mismatch error happens because when you access the site from your custom domain (omnimens-ai.com), the login callback URL gets built using that domain, but Replit's OIDC provider only recognizes the Replit domain. The callback URL needs to use the Replit-registered domain. Let me fix this:
+
+Now I also need to handle the returnTo redirect properly. After the OIDC callback on the Replit domain, the user should be redirected back to the custom domain they came from. Let me update the login route to capture the original domain:
+
+Now let me also update the callback handler to redirect back properly when the user originally came from a custom domain. I need to store the original host in a cookie and use it for the final redirect:
+
+Now I need to also capture the original host the user came from, so after auth completes we can redirect them back to their custom domain. Let me update the login and callback routes:
+
+Now update the callback route to redirect back to the custom domain after auth:
+
+Now update the redirect after session creation to use the custom domain if the user came from one:
+
+Now let me restart the API server to apply the changes:
+
+Let me verify the server started properly:
+
+Checked system logs
+Server is running cleanly. Let me verify the login flow works by testing the redirect:
+
+The redirect URL now uses the Replit dev domain (81859f04-...worf.replit.dev/api/callback) instead of whatever domain the user accessed from. This is exactly what's needed — the callback URL now matches what Replit's OIDC provider has registered with Google.
+
+Here's what I fixed:
+
+The problem: When you visited the site on your phone through your custom domain (omnimens-ai.com), the login system was building the callback URL using that custom domain. But Google's OAuth only recognizes the Replit domain, so it blocked the login with an "origin_mismatch" error.
+
+The fix: The login flow now always uses the Replit-registered domain for the OAuth callback, regardless of which domain you're browsing from. After login completes, it redirects you back to the custom domain you originally came from, so the experience is seamless.
+
+Try logging in again from your phone — it should work now. You'll briefly see the Replit domain during the Google sign-in step, then get redirected back to your site after authenticating.
+
+These purchase buttons are not working at all when you click on it it looks like they all click all I want but no action
+
+In the price here does not match properly from what's on the website to what's on Stripe
+
+If I want it you to build a complete website but be a clone from another website but use all of my proprietaries my images to make it look like my business and it connect to all my web hooks my Stripe all of these APIs everything that needs to validate and have my transactions running through me and I make money and have everything with the email addresses and all of that what would be the prompt that you would give me to clone a complete website from another company? This is a question please just give me the promp
+
+Here's a prompt template you could use to clone a website's design and functionality while making it fully yours:
+
+Prompt:
+
+Build me a website that looks and functions like [URL of the website you want to clone]. Use my own branding throughout — my logo, my colors, my business name, and my images. Here are the specifics:
+
+Business name: [Your business name]
+Colors: [Your brand colors, e.g. "purple #a855f7 and black #0a0a0a"]
+Logo: [Attach your logo or describe where it is]
+Images: [Attach your product/hero images or describe them]
+
+Payments: Connect everything to my Stripe account so all transactions go through me. I need checkout, subscriptions, and webhooks all wired up and working.
+
+Emails: Set up transactional emails (signup confirmations, purchase receipts, password resets) using [your email provider, e.g. SendGrid, Resend, or Gmail SMTP] with my domain.
+
+User accounts: Users should be able to sign up, log in, manage their profile, and see their purchase/order history.
+
+Admin: I need an admin dashboard where I can see all users, orders, revenue, and manage content.
+
+Domain: The site will be hosted at [your domain, e.g. mybusiness.com].
+
+Clone the layout, navigation structure, and user flow from [that website], but every piece of content, branding, and imagery should be mine. No placeholder or dummy data — use real content I provide.
+
+A few tips when using a prompt like this:
+
+Attach screenshots of the specific pages you want cloned — that gives much clearer direction than just a URL.
+Provide your actual content (text, images, pricing) upfront so nothing is placeholder.
+List the specific pages you need (home, pricing, about, dashboard, etc.) so nothing gets missed.
+Mention your payment tiers (what you're selling, at what prices) so Stripe can be set up correctly from the start.
+You can adapt this prompt to any website builder or AI tool you're using. The key is being specific about what's yours (branding, payments, domain) versus what you're borrowing (layout, structure, user flow).
+
+This is just a question. If I want it an AI to completely clone the layout the front end and back end all the sub pages all the sublinks everything from another website and the only thing that wouldn't be cloned because it would have to use my web hooks my Google authentication my stripe all the things that are common sense that I would Have to have for my functionality and have control over certain aspects of the website but have literally everything the layout every place that link a button an option every single thing is exactly the same as another website completely cloned every aspect of it The only difference is it would have my logos my color theme What would be the prompt that you would give me? Just give me the prompt
+
+Here's the prompt:
+
+Clone [paste the full URL] exactly. Every page, every sub-page, every link, every button, every menu, every modal, every footer link, every feature — replicate the entire site 1:1 in layout, structure, and functionality, both front end and back end.
+
+What stays identical:
+
+Full page structure and navigation (every route, sub-route, dropdown, sidebar, tab)
+Every button, link, form, input, toggle, and interactive element in the exact same position
+Layout, spacing, typography hierarchy, animations, transitions, hover states
+Responsive behavior (desktop, tablet, mobile) matching theirs exactly
+All back-end functionality: user accounts, dashboards, data flows, admin panels, notifications, search, filtering, sorting — everything the original site does
+What changes (my branding):
+
+Business name: [YOUR BUSINESS NAME]
+Primary color: [YOUR HEX CODE]
+Secondary color: [YOUR HEX CODE]
+Accent color: [YOUR HEX CODE]
+Logo: [ATTACH YOUR LOGO FILE]
+Favicon: [ATTACH YOUR FAVICON]
+Hero images / product images: [ATTACH YOUR IMAGES OR DESCRIBE THEM]
+All text content: replace their company name, taglines, and copy with mine wherever it appears
+What connects to me:
+
+Stripe: use my Stripe account for all payments, subscriptions, checkout, and webhooks
+Google Auth: use my Google OAuth credentials for sign-in
+Email: use my email service ([SendGrid/Resend/your provider]) with my domain for all transactional emails (welcome, receipts, resets, notifications)
+Domain: this will live at [YOUR DOMAIN]
+Database: all user data, orders, content stored in my database
+Any other API keys or webhooks: all mine
+Important: Do not skip any pages or features. If the original site has it, mine has it. Start by crawling the entire site, mapping out every route and feature, then build it page by page.

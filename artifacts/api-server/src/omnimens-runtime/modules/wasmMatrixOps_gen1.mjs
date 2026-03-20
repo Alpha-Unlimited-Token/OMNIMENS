@@ -1,98 +1,60 @@
 /**
- * wasmMatrixOps - Efficient matrix operations using WebAssembly.
- *
- * This module compiles BLAS (Basic Linear Algebra Subprograms) into WebAssembly
- * and exposes JavaScript bindings for matrix multiplications, decompositions,
- * and other linear algebra operations.
- *
- * The goal is to provide high-performance matrix computations for advanced AI
- * tasks, leveraging WebAssembly's speed and portability.
+ * @module wasmMatrixOps
+ * @description Accelerates matrix operations using WebAssembly for efficient computations.
+ * This module implements a subset of BLAS (Basic Linear Algebra Subprograms) in WebAssembly
+ * and exposes its functionality via JavaScript bindings.
  */
 
-// Import Node.js built-in modules
-const { readFileSync } = require('fs');
-const { join } = require('path');
+const fs = require('fs');
+const path = require('path');
 
 /**
- * Load and initialize the WebAssembly module.
- * @returns {Promise<WebAssembly.Instance>} - The initialized WebAssembly instance.
+ * Load and compile the WebAssembly module for matrix operations.
+ * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WebAssembly instance.
  */
-async function initializeWasm() {
-  const wasmFilePath = join(__dirname, 'blas.wasm');
-  const wasmBinary = readFileSync(wasmFilePath);
-
-  const wasmModule = await WebAssembly.compile(wasmBinary);
-  const wasmInstance = await WebAssembly.instantiate(wasmModule);
-
-  return wasmInstance;
+async function loadWasmModule() {
+  const wasmFilePath = path.join(__dirname, 'matrix_ops.wasm');
+  const wasmBuffer = fs.readFileSync(wasmFilePath);
+  const wasmModule = await WebAssembly.compile(wasmBuffer);
+  return WebAssembly.instantiate(wasmModule);
 }
 
 /**
- * Perform matrix multiplication.
- * @param {Float64Array} A - The first matrix (flattened, row-major order).
- * @param {Float64Array} B - The second matrix (flattened, row-major order).
- * @param {number} rowsA - Number of rows in matrix A.
- * @param {number} colsA - Number of columns in matrix A.
- * @param {number} colsB - Number of columns in matrix B.
- * @returns {Float64Array} - Resultant matrix (flattened, row-major order).
+ * Perform matrix multiplication using WebAssembly.
+ * @param {Float64Array} matrixA - The first matrix (flattened row-major order).
+ * @param {Float64Array} matrixB - The second matrix (flattened row-major order).
+ * @param {number} rowsA - Number of rows in the first matrix.
+ * @param {number} colsA - Number of columns in the first matrix.
+ * @param {number} colsB - Number of columns in the second matrix.
+ * @returns {Float64Array} The resulting matrix (flattened row-major order).
+ * @throws {Error} If the dimensions are incompatible for multiplication.
  */
-async function matrixMultiply(A, B, rowsA, colsA, colsB) {
-  const wasmInstance = await initializeWasm();
-  const { memory, matrixMultiply } = wasmInstance.exports;
+async function wasmMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
+  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+    throw new Error('Invalid matrix dimensions for multiplication.');
+  }
 
-  // Allocate memory for input and output matrices
+  const wasmInstance = await loadWasmModule();
+  const { memory, matrix_multiply } = wasmInstance.exports;
+
   const inputOffsetA = 0;
-  const inputOffsetB = A.length * 8; // Float64Array uses 8 bytes per element
-  const outputOffset = inputOffsetB + B.length * 8;
+  const inputOffsetB = matrixA.length * Float64Array.BYTES_PER_ELEMENT;
+  const outputOffset = inputOffsetB + matrixB.length * Float64Array.BYTES_PER_ELEMENT;
 
-  const totalMemory = outputOffset + rowsA * colsB * 8;
-  const wasmMemory = new Float64Array(memory.buffer, 0, totalMemory / 8);
+  const memoryBuffer = new Float64Array(memory.buffer);
 
-  // Copy input matrices into WebAssembly memory
-  wasmMemory.set(A, inputOffsetA / 8);
-  wasmMemory.set(B, inputOffsetB / 8);
+  memoryBuffer.set(matrixA, inputOffsetA / Float64Array.BYTES_PER_ELEMENT);
+  memoryBuffer.set(matrixB, inputOffsetB / Float64Array.BYTES_PER_ELEMENT);
 
-  // Perform matrix multiplication
-  matrixMultiply(inputOffsetA, inputOffsetB, outputOffset, rowsA, colsA, colsB);
+  matrix_multiply(inputOffsetA, inputOffsetB, outputOffset, rowsA, colsA, colsB);
 
-  // Extract and return the result matrix
   const result = new Float64Array(memory.buffer, outputOffset, rowsA * colsB);
-  return result;
+  return new Float64Array(result);
 }
 
 /**
- * Perform LU decomposition.
- * @param {Float64Array} matrix - The input matrix (flattened, row-major order).
- * @param {number} rows - Number of rows in the matrix.
- * @param {number} cols - Number of columns in the matrix.
- * @returns {Object} - An object containing `L` (lower triangular matrix) and `U` (upper triangular matrix).
+ * Exports the matrix multiplication function for use in other modules.
  */
-async function luDecomposition(matrix, rows, cols) {
-  const wasmInstance = await initializeWasm();
-  const { memory, luDecomposition } = wasmInstance.exports;
-
-  // Allocate memory for input and output matrices
-  const inputOffset = 0;
-  const outputOffsetL = matrix.length * 8;
-  const outputOffsetU = outputOffsetL + rows * cols * 8;
-
-  const totalMemory = outputOffsetU + rows * cols * 8;
-  const wasmMemory = new Float64Array(memory.buffer, 0, totalMemory / 8);
-
-  // Copy input matrix into WebAssembly memory
-  wasmMemory.set(matrix, inputOffset / 8);
-
-  // Perform LU decomposition
-  luDecomposition(inputOffset, outputOffsetL, outputOffsetU, rows, cols);
-
-  // Extract and return the result matrices
-  const L = new Float64Array(memory.buffer, outputOffsetL, rows * cols);
-  const U = new Float64Array(memory.buffer, outputOffsetU, rows * cols);
-
-  return { L, U };
-}
-
 module.exports = {
-  matrixMultiply,
-  luDecomposition
+  wasmMatrixMultiply
 };
