@@ -30,3 +30,21 @@ id = "zU0fj6vRBtCNays6PbXZN"
 uri = "file://attached_assets/generated_videos/humans_vs_ai_robots_war.mp4"
 type = "video"
 title = "Humans vs AI Robots War - 8 Second Video"
+
+[[outputs]]
+id = "OUnx65RBvbEQ40G6a8gMQ"
+uri = "file://DARPA_Proposal_OMNIMENS.md"
+type = "text"
+title = "DARPA Proposal — OMNIMENS Autonomous Intelligence Platform"
+
+[[outputs]]
+id = "UB6VpCpyPYNIqfQ8bZwZo"
+uri = "file://DARPA_Negotiation_Guide.md"
+type = "text"
+title = "DARPA Negotiation Guide — Step-by-Step Strategy"
+
+[[outputs]]
+id = "2EkTwo9zQdS4_LhfoElye"
+uri = "file://OMNIMENS_Technology_Overview.md"
+type = "text"
+title = "OMNIMENS Technology Overview — For All Conversations"
