@@ -5,7 +5,6 @@
  */
 
 import React, { useEffect, useState, useCallback } from "react";
-import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
@@ -430,13 +429,13 @@ export default function Account() {
     } catch { } finally { setCiSaving(false); }
   };
 
-  if (isLoading || !isAuthenticated) return <Layout><div className="flex-1" /></Layout>;
+  if (isLoading || !isAuthenticated) return <div className="flex-1" />;
 
   const activePatches = patches.filter(p => p.active);
   const inactivePatches = patches.filter(p => !p.active);
 
   return (
-    <Layout>
+    <>
       <SEO {...seoData.account} />
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         {/* ─── Clean Settings Header ─────────────────────────────────── */}
@@ -1649,7 +1648,7 @@ export default function Account() {
           <DeleteAccountSection />
         )}
       </div>
-    </Layout>
+    </>
   );
 }
 

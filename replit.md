@@ -22,7 +22,18 @@ Do not make changes to the `lib/omnimens-physio.ts` file.
 The project utilizes a pnpm monorepo structure.
 
 **UI/UX Decisions:**
-Both OMNIMENS and Super AI Lab frontends are built with React, Vite, Tailwind CSS, shadcn/ui, and framer-motion, aiming for a modern and responsive user experience. OMNIMENS features a Replit IDE-style layout: left Activity Bar (48px icon strip with white left-edge active indicator), collapsible Left Panel (220px, tabs: Chats/Files/Deploy/Memory/Mode/Skills/Tools/Config), top Tab Bar (conversation tabs with file icons + close buttons + purple active indicator), center Chat area, collapsible Bottom Console Panel (180px, Console/Activity tabs), dark Status Bar (22px, branch/model/messages + console toggle + theme switch), collapsible Right Panel (300px, images/artifacts/credits). Mobile uses a Replit-style 3-tab bottom nav (Apps | Create | Account) with purple active-tab indicator bar. The Account tab has in-app sub-pages (Billing, Usage, Profile) accessed via `accountSubPage` state — each opens as a full sub-view with back arrow navigation, using `MobileBillingPage`, `MobileUsagePage`, and `MobileProfilePage` components defined before the main `Chat` function. Billing sub-page shows credit balance, payment method (Stripe), spending history, loyalty tiers, and upgrade prompts for free users. Tapping bottom nav always resets `accountSubPage` to `null`. Super AI Lab has its own dedicated React application.
+Both OMNIMENS and Super AI Lab frontends are built with React, Vite, Tailwind CSS, shadcn/ui, and framer-motion, aiming for a modern and responsive user experience.
+
+OMNIMENS uses a dual-layout architecture:
+- **Public pages** (home, FAQ, about, terms, privacy, contact, support, footer-links, lip-sync): Use the original `Layout` component with top navbar (OMNIMENS logo left, PRICING/FAQ/CONNECT right).
+- **Workspace pages** (projects, account, pricing, memory, tools, developer): Use `WorkspaceLayout` which provides a Replit-style sidebar (`src/components/sidebar.tsx`) + main content area. The sidebar is a vertical icon rail (64px collapsed, 224px expanded) with: OMNIMENS logo at top, main nav (Home/Create/Projects), tools nav (Pricing/Developer/Memory), support nav (FAQ/Support/About), and user account at bottom. Tooltips shown when collapsed. Mobile (< 768px) switches to a bottom tab bar (Home/Create/Projects/Account).
+- **Chat page** (`/chat`): Keeps its own full-screen layout with its own `Layout` wrapper (Replit IDE-style panels).
+- **Home page** (`/`): Shows marketing page for visitors, workspace dashboard for authenticated users.
+- **Dashboard** (`src/pages/dashboard.tsx`): Authenticated home showing greeting, credit balance, quick actions (New Chat, New Project, Deep Resonance, Get Credits), recent projects grid, starred projects, recent conversations, and 8 quick-start templates.
+
+The `WorkspaceLayout` wrapping is done at the router level in `App.tsx` — workspace pages themselves do NOT wrap in `<Layout>`. Public pages still self-wrap with `<Layout>`.
+
+Chat has in-app sub-pages for Account (Billing, Usage, Profile) accessed via `accountSubPage` state — each opens as a full sub-view with back arrow navigation, using `MobileBillingPage`, `MobileUsagePage`, and `MobileProfilePage` components defined before the main `Chat` function. Billing sub-page shows credit balance, payment method (Stripe), spending history, loyalty tiers, and upgrade prompts for free users. Tapping bottom nav always resets `accountSubPage` to `null`. Super AI Lab has its own dedicated React application.
 
 **Technical Implementations & Feature Specifications:**
 

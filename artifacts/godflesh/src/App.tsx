@@ -10,6 +10,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { initTheme } from "@/hooks/use-theme";
+import { useAuth } from "@workspace/replit-auth-web";
+import { WorkspaceLayout } from "@/components/workspace-layout";
 import NotFound from "@/pages/not-found";
 
 function retryLazy(factory: () => Promise<any>, retries = 2): ReturnType<typeof lazy> {
@@ -41,6 +43,7 @@ const Chat = retryLazy(() => import("@/pages/chat"));
 const Pricing = retryLazy(() => import("@/pages/pricing"));
 const Account = retryLazy(() => import("@/pages/account"));
 const Projects = retryLazy(() => import("@/pages/projects"));
+const Dashboard = retryLazy(() => import("@/pages/dashboard"));
 const Memory = retryLazy(() => import("@/pages/memory"));
 const Tools = retryLazy(() => import("@/pages/tools"));
 const FAQ = retryLazy(() => import("@/pages/faq"));
@@ -121,21 +124,34 @@ class ChunkErrorBoundary extends Component<{ children: ReactNode }, { hasError: 
   }
 }
 
+function WS({ children }: { children: ReactNode }) {
+  return <WorkspaceLayout>{children}</WorkspaceLayout>;
+}
+
+function HomePage() {
+  const { isAuthenticated, isLoading } = useAuth();
+  if (isLoading) return <PageFallback />;
+  if (isAuthenticated) return <WS><Dashboard /></WS>;
+  return <Home />;
+}
+
 function Router() {
   return (
     <Suspense fallback={<PageFallback />}>
       <Switch>
-        <Route path="/" component={Home} />
+        <Route path="/" component={HomePage} />
         <Route path="/login" component={Login} />
         <Route path="/chat" component={Chat} />
-        <Route path="/pricing" component={Pricing} />
-        <Route path="/account" component={Account} />
-        <Route path="/projects" component={Projects} />
-        <Route path="/memory" component={Memory} />
-        <Route path="/tools" component={Tools} />
+
+        <Route path="/projects">{() => <WS><Projects /></WS>}</Route>
+        <Route path="/account">{() => <WS><Account /></WS>}</Route>
+        <Route path="/pricing">{() => <WS><Pricing /></WS>}</Route>
+        <Route path="/memory">{() => <WS><Memory /></WS>}</Route>
+        <Route path="/developer">{() => <WS><Developer /></WS>}</Route>
+        <Route path="/dev">{() => <WS><Developer /></WS>}</Route>
+        <Route path="/tools">{() => <WS><Tools /></WS>}</Route>
+
         <Route path="/faq" component={FAQ} />
-        <Route path="/dev" component={Developer} />
-        <Route path="/developer" component={Developer} />
         <Route path="/support" component={Support} />
         <Route path="/terms" component={Terms} />
         <Route path="/privacy" component={Privacy} />

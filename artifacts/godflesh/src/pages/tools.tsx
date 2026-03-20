@@ -5,7 +5,6 @@
  * ============================================================
  */
 import { useState } from "react";
-import { Layout } from "@/components/layout";
 import { motion } from "framer-motion";
 import {
   Globe, Image, Code2, Brain, Microscope, Cpu, Layers, Zap,
@@ -116,7 +115,7 @@ export default function ToolsPage() {
   }
 
   return (
-    <Layout>
+    <>
       <SEO {...seoData.tools} />
       <div className="flex-1 overflow-auto">
         <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
@@ -223,6 +222,6 @@ export default function ToolsPage() {
 
         </div>
       </div>
-    </Layout>
+    </>
   );
 }

@@ -5,7 +5,6 @@
  * ============================================================
  */
 import { useState, useEffect } from "react";
-import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -120,15 +119,13 @@ export default function MemoryPage() {
   const categories = Array.from(new Set(memories.map(m => m.category)));
 
   if (isLoading) return (
-    <Layout>
-      <div className="flex-1 flex items-center justify-center">
-        <div className="animate-pulse text-primary font-mono tracking-widest">LOADING...</div>
-      </div>
-    </Layout>
+    <div className="flex-1 flex items-center justify-center">
+      <div className="animate-pulse text-primary font-mono tracking-widest">LOADING...</div>
+    </div>
   );
 
   return (
-    <Layout>
+    <>
       <SEO {...seoData.memory} />
       <div className="flex-1 overflow-auto">
         <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
@@ -297,6 +294,6 @@ export default function MemoryPage() {
 
         </div>
       </div>
-    </Layout>
+    </>
   );
 }

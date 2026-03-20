@@ -5,7 +5,6 @@
  */
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
@@ -971,15 +970,13 @@ export default function Projects() {
   }
 
   if (isLoading) return (
-    <Layout>
-      <div className="flex-1 flex items-center justify-center">
-        <div className="animate-pulse text-primary font-mono tracking-widest">LOADING...</div>
-      </div>
-    </Layout>
+    <div className="flex-1 flex items-center justify-center">
+      <div className="animate-pulse text-primary font-mono tracking-widest">LOADING...</div>
+    </div>
   );
 
   return (
-    <Layout>
+    <>
       <SEO {...seoData.projects} />
       <div className="flex-1 flex flex-col overflow-hidden" style={{ height: "calc(100vh - 4rem)" }}>
         {activeProject ? (
@@ -1163,6 +1160,6 @@ export default function Projects() {
           </motion.div>
         )}
       </AnimatePresence>
-    </Layout>
+    </>
   );
 }

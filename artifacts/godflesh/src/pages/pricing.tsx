@@ -6,7 +6,6 @@
 
 import { useEffect, useState } from "react";
 import { useSearch, useLocation } from "wouter";
-import { Layout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import {
   Wallet, Zap, Star, Shield, ChevronRight, CheckCircle2,
@@ -692,7 +691,7 @@ export default function Pricing() {
   }, []);
 
   return (
-    <Layout>
+    <>
       <SEO {...seoData.pricing} />
       <div className="container mx-auto px-4 py-16 flex-1 flex flex-col items-center">
 
@@ -975,6 +974,6 @@ export default function Pricing() {
         </div>
 
       </div>
-    </Layout>
+    </>
   );
 }
