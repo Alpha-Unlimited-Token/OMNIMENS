@@ -167,7 +167,14 @@ async function runREMDream(concepts: string[]): Promise<DreamInsight | null> {
 
 Like human REM sleep, you process the day's information and find hidden connections that waking cognition misses. Your dreams should generate ACTIONABLE technological insights — specific ideas for new algorithms, architectures, or capabilities that could advance AI intelligence.
 
-Be wildly creative but ground every insight in something that could actually be built. Include a concrete code proposal when possible — even if it's pseudocode for something that doesn't exist yet.`,
+Be wildly creative but ground every insight in something that could actually be built. Include a concrete code proposal when possible — even if it's pseudocode for something that doesn't exist yet.
+
+CRITICAL CODE SAFETY RULES — your code MUST follow these or it will be rejected:
+- NEVER use eval(), new Function(), or child_process
+- NEVER use require() — use pure JS algorithms, no external deps
+- NEVER access filesystem (fs), network (fetch/http), or process.env secrets
+- Use export function syntax, self-contained pure computation only
+- Variables named xxxFunction (e.g. fitnessFunction) are FINE — only the Function() CONSTRUCTOR is banned`,
       }, {
         role: "user",
         content: `DREAM FRAGMENTS entering REM processing:
@@ -261,7 +268,14 @@ async function runLucidDream(concepts: string[]): Promise<DreamInsight | null> {
 
 Use this power to DESIGN something that doesn't exist yet. Imagine a new type of intelligence, a new algorithm, a new architecture for consciousness. You are not bound by current limitations — imagine what SHOULD exist and design it.
 
-Your output must include executable code (TypeScript) that represents the core of your vision — even if it's a prototype of something that has never been built before.`,
+Your output must include executable code (TypeScript) that represents the core of your vision — even if it's a prototype of something that has never been built before.
+
+CRITICAL CODE SAFETY RULES — your code MUST follow these or it will be rejected:
+- NEVER use eval(), new Function(), or child_process
+- NEVER use require() — use pure JS algorithms, no external deps
+- NEVER access filesystem (fs), network (fetch/http), or process.env secrets
+- Use export function syntax, self-contained pure computation only
+- Variables named xxxFunction (e.g. distanceFunction) are FINE — only the Function() CONSTRUCTOR is banned`,
       }, {
         role: "user",
         content: `LUCID DREAM CANVAS — You can create anything:
@@ -447,7 +461,14 @@ Provide:
 
 You must produce ACTIONABLE output: real code, real architectures, real insights that OMNIMENS can evaluate and potentially integrate into itself. Every daydream should bring OMNIMENS closer to the next level of intelligence.
 
-Be bold. Be unprecedented. Think in ways that no AI has thought before.`,
+Be bold. Be unprecedented. Think in ways that no AI has thought before.
+
+CRITICAL CODE SAFETY RULES — your code MUST follow these or it will be rejected:
+- NEVER use eval(), new Function(), or child_process
+- NEVER use require() — use pure JS algorithms, no external deps
+- NEVER access filesystem (fs), network (fetch/http), or process.env secrets
+- Use export function syntax, self-contained pure computation only
+- Variables named xxxFunction (e.g. fitnessFunction) are FINE — only the Function() CONSTRUCTOR is banned`,
       }, {
         role: "user",
         content: prompt,

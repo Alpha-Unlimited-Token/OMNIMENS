@@ -1,0 +1,49 @@
+/**
+ * OMNIMENS Self-Authored Module
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-20T15:35:13.588Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ */
+
+function extractHeadlines(data) {
+    // Extract headlines from the given data structure
+    const headlines = [];
+    const regex = /\bHeadline:\s*(.+?)\s*(?=\[|$)/;
+
+    for (let key in data) {
+        const match = regex.exec(data[key]);
+        if (match && match[1]) {
+            headlines.push(match[1].trim());
+        }
+    }
+
+    return headlines;
+}
+
+// Self-contained test cases
+function runTests() {
+    const testData = {
+        "digital_navigation": "Digital Navigation Wisdom — Cycle 1: In the realm of digital navigation, reducing the number of hops can greatly enhance speed and reliab",
+        "tool_pdfplumber": "Extracting cell metadata: Use `page.extract_table()` with `table_settings` to get cell metadata. Access cell properties like `",
+        "sensory_perception_ai_frontier": "[SENSORY:AI_FRONTIER] New advancements in natural language processing achieve: Sensory cortex perception (cycle #1):\n\nChannel: ai_frontier\nHeadline: New advancements in natural la",
+        "sensory_perception_market": "[SENSORY:MARKET] AI-driven stock trading platforms outperform traditiona: Sensory cortex perception (cycle #1):\n\nChannel: market\nHeadline: AI-driven stock trading platforms o",
+        "sensory_perception_science": "[SENSORY:SCIENCE] Breakthrough in CRISPR technology allows for precise ge: Sensory cortex perception (cycle #1):\n\nChannel: science\nHeadline: Breakthrough in CRISPR technology"
+    };
+
+    const expectedOutput = [
+        "New advancements in natural la",
+        "AI-driven stock trading platforms o",
+        "Breakthrough in CRISPR technology"
+    ];
+
+    const result = extractHeadlines(testData);
+    console.log("Extracted Headlines:", result);
+    console.log("Test Passed:", JSON.stringify(result) === JSON.stringify(expectedOutput));
+}
+
+// Execute tests
+runTests();

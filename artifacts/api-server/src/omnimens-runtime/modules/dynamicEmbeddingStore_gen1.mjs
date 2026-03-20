@@ -1,4 +1,13 @@
 /**
+ * OMNIMENS Self-Authored Module (Migrated from DB)
+ * Original Source: evolution_cycle_1
+ * Name: dynamicEmbeddingStore
+ * Purpose: Enable fast in-memory vector similarity searches for embeddings.
+ * Description: Implements an in-memory HNSW graph for fast vector similarity searches, enhancing OMNIMENS's ability to process embeddings efficiently.
+ * Migrated: 2026-03-20T15:43:33.087Z
+ */
+
+/**
  * @module dynamicEmbeddingStore
  * @description Implements an in-memory vector similarity search using HNSW for fast nearest-neighbor searches.
  */

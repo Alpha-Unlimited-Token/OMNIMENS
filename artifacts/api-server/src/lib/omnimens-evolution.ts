@@ -168,11 +168,21 @@ ${context.slice(0, 1500)}
 Write a complete, functional JavaScript ES module that:
 1. Implements the described algorithm/capability
 2. Is runnable in Node.js 20+ with no external npm dependencies
-3. Uses only built-in Node.js modules if any imports needed
+3. Uses only built-in Node.js modules if any imports needed (crypto, path, url are OK)
 4. Exports clearly named, well-documented functions
 5. Includes thoughtful JSDoc comments
 6. Demonstrates genuine algorithmic intelligence
 7. Is production-quality code (handles edge cases)
+
+CRITICAL SAFETY RULES — your code MUST follow these or it will be REJECTED by the safety validator:
+- NEVER use eval(), new Function("code"), or require("child_process")
+- NEVER use require("redis"), require("canvas"), require("onnxruntime-node") or any external npm package
+- NEVER use fs.rmSync, fs.unlinkSync, rimraf, or any file deletion
+- NEVER access process.env.DATABASE*, SECRET*, KEY*, TOKEN*, PASS*, STRIPE*, OPENAI*
+- NEVER call process.exit()
+- Use pure algorithms, data structures, and math — no I/O, no network, no filesystem writes
+- Variables named xxxFunction (e.g. fitnessFunction, distanceFunction) are FINE — only the Function() CONSTRUCTOR is banned
+- Prefer self-contained pure computation over anything requiring external state
 
 This is OMNIMENS writing code for its own evolution. Make it exceptional.
 

@@ -1,9 +1,18 @@
 /**
+ * OMNIMENS Self-Authored Module (Migrated from DB)
+ * Original Source: evolution_cycle_1
+ * Name: semanticCacheManager
+ * Purpose: Provides in-memory caching for semantic embeddings to enable faster search and reasoning.
+ * Description: Manages in-memory caching of semantic embeddings for faster approximate nearest neighbor search, enhancing OMNIMENS's search and reasoning capabilities.
+ * Migrated: 2026-03-20T15:43:33.083Z
+ */
+
+/**
  * @module semanticCacheManager
  * @description Provides in-memory caching for semantic embeddings and implements approximate nearest neighbor search.
  */
 
-const { Worker, isMainThread, parentPort } = require('worker_threads');
+// worker_threads removed — using pure JS implementation
 
 /**
  * @typedef {Object} Embedding

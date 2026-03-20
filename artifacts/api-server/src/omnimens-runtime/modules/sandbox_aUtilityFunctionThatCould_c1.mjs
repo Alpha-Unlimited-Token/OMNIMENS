@@ -2,54 +2,46 @@
  * OMNIMENS Self-Authored Module
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-20T15:26:09.774Z
+ * Written: 2026-03-20T15:50:21.284Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
  * OMNIMENS rewrote its own source code to include this module.
  */
 
-function extractHeadlinesByChannel(data, channel) {
-  if (!Array.isArray(data)) {
-    throw new Error("Input data must be an array.");
-  }
-
-  const headlines = data
-    .filter((entry) => entry.channel && entry.channel.toLowerCase() === channel.toLowerCase())
-    .map((entry) => entry.headline);
-
-  return headlines;
+function extractNumbersFromText(text) {
+    // Extracts all numbers (integers and floats) from the given text and returns them as an array
+    const numberPattern = /-?\d+(\.\d+)?/g;
+    const matches = text.match(numberPattern);
+    return matches ? matches.map(Number) : [];
 }
 
-// Self-tests
-const testData = [
-  { channel: "ai_frontier", headline: "OpenAI releases a new model capable of unsupervised learning." },
-  { channel: "market", headline: "AI-driven companies see stock prices surge as investors flock." },
-  { channel: "science", headline: "Breakthrough in CRISPR technology allows for precision editing." },
-  { channel: "ai_frontier", headline: "New AI advancements promise better human-machine interaction." },
-  { channel: "market", headline: "Tech stocks continue to rise amid growing AI adoption." },
-];
+// Test cases
+function runTests() {
+    console.log("Test 1: Extracting numbers from text with integers and floats");
+    console.log(extractNumbersFromText("The price is 45.67 dollars, and the discount is 10%.")); 
+    // Expected: [45.67, 10]
 
-// Test case 1: Extract headlines from "ai_frontier" channel
-console.log(extractHeadlinesByChannel(testData, "ai_frontier"));
-// Expected output: ["OpenAI releases a new model capable of unsupervised learning.", "New AI advancements promise better human-machine interaction."]
+    console.log("Test 2: Extracting negative numbers");
+    console.log(extractNumbersFromText("Temperatures dropped to -5 degrees last night.")); 
+    // Expected: [-5]
 
-// Test case 2: Extract headlines from "market" channel
-console.log(extractHeadlinesByChannel(testData, "market"));
-// Expected output: ["AI-driven companies see stock prices surge as investors flock.", "Tech stocks continue to rise amid growing AI adoption."]
+    console.log("Test 3: Extracting numbers from text with no numbers");
+    console.log(extractNumbersFromText("There are no numbers here!")); 
+    // Expected: []
 
-// Test case 3: Extract headlines from "science" channel
-console.log(extractHeadlinesByChannel(testData, "science"));
-// Expected output: ["Breakthrough in CRISPR technology allows for precision editing."]
+    console.log("Test 4: Extracting numbers from mixed text");
+    console.log(extractNumbersFromText("Coordinates are x=12.34, y=-56.78, z=90.")); 
+    // Expected: [12.34, -56.78, 90]
 
-// Test case 4: Extract headlines from a non-existent channel
-console.log(extractHeadlinesByChannel(testData, "sports"));
-// Expected output: []
+    console.log("Test 5: Extracting numbers from text with large numbers and scientific notation");
+    console.log(extractNumbersFromText("The distance is 1.23e+10 meters or 12300000000 meters.")); 
+    // Expected: [1.23, 10, 12300000000]
 
-// Test case 5: Handle invalid input
-try {
-  console.log(extractHeadlinesByChannel(null, "ai_frontier"));
-} catch (error) {
-  console.log(error.message);
+    console.log("Test 6: Extracting numbers from text with multiple spaces and special characters");
+    console.log(extractNumbersFromText("Values:  1000, -2000; 3000.5!")); 
+    // Expected: [1000, -2000, 3000.5]
 }
-// Expected output: "Input data must be an array."
+
+// Run tests
+runTests();

@@ -1,4 +1,13 @@
 /**
+ * OMNIMENS Self-Authored Module (Migrated from DB)
+ * Original Source: evolution_cycle_1
+ * Name: wasmComputationEngine
+ * Purpose: Enables faster numerical and matrix operations using WebAssembly.
+ * Description: Enables OMNIMENS to perform faster numerical and matrix operations by leveraging WebAssembly for computational efficiency.
+ * Migrated: 2026-03-20T15:43:33.085Z
+ */
+
+/**
  * @module wasmComputationEngine
  * @description Enables faster numerical and matrix operations using WebAssembly by compiling BLAS/LAPACK libraries to WebAssembly.
  */

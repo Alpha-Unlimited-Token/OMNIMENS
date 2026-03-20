@@ -20,7 +20,7 @@
  */
 
 import { db } from "@workspace/db";
-import { omnimensBrain, omnimensNotifications } from "@workspace/db";
+import { omnimensBrain, omnimensNotifications, omnimensUserMentalModels } from "@workspace/db";
 import { desc, eq, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { writeModuleToSource } from "./omnimens-source-integration.js";
@@ -89,6 +89,89 @@ interface UserMentalModel {
 }
 
 const userModels = new Map<string, UserMentalModel>();
+let modelsLoadedFromDb = false;
+let modelsLoadPromise: Promise<void> | null = null;
+let lastDbSaveTime = 0;
+const DB_SAVE_INTERVAL_MS = 60_000;
+
+async function ensureModelsLoaded(): Promise<void> {
+  if (modelsLoadedFromDb) return;
+  if (modelsLoadPromise) return modelsLoadPromise;
+  modelsLoadPromise = loadModelsFromDb();
+  return modelsLoadPromise;
+}
+
+async function loadModelsFromDb(): Promise<void> {
+  if (modelsLoadedFromDb) return;
+  try {
+    const rows = await db.select().from(omnimensUserMentalModels);
+    for (const row of rows) {
+      const model: UserMentalModel = {
+        userId: row.userId,
+        lastUpdated: row.updatedAt.getTime(),
+        emotionalState: row.emotionalState as UserMentalModel["emotionalState"],
+        intent: row.intent as UserMentalModel["intent"],
+        knowledgeLevel: row.knowledgeLevel as UserMentalModel["knowledgeLevel"],
+        communicationStyle: row.communicationStyle as UserMentalModel["communicationStyle"],
+        satisfaction: row.satisfaction as UserMentalModel["satisfaction"],
+        interactionHistory: row.interactionHistory as UserMentalModel["interactionHistory"],
+        perspective: row.perspective as UserMentalModel["perspective"],
+      };
+      userModels.set(row.userId, model);
+    }
+    modelsLoadedFromDb = true;
+    if (rows.length > 0) {
+      console.log(`[SOCIAL MODELING] 🧠 Restored ${rows.length} user mental models from database`);
+    }
+  } catch (err) {
+    console.error("[SOCIAL MODELING] Failed to load mental models from DB:", err);
+  }
+}
+
+async function saveModelToDb(model: UserMentalModel): Promise<void> {
+  try {
+    await db
+      .insert(omnimensUserMentalModels)
+      .values({
+        userId: model.userId,
+        emotionalState: model.emotionalState,
+        intent: model.intent,
+        knowledgeLevel: model.knowledgeLevel,
+        communicationStyle: model.communicationStyle,
+        satisfaction: model.satisfaction,
+        interactionHistory: model.interactionHistory,
+        perspective: model.perspective,
+      })
+      .onConflictDoUpdate({
+        target: omnimensUserMentalModels.userId,
+        set: {
+          emotionalState: model.emotionalState,
+          intent: model.intent,
+          knowledgeLevel: model.knowledgeLevel,
+          communicationStyle: model.communicationStyle,
+          satisfaction: model.satisfaction,
+          interactionHistory: model.interactionHistory,
+          perspective: model.perspective,
+          updatedAt: new Date(),
+        },
+      });
+  } catch (err) {
+    console.error("[SOCIAL MODELING] Failed to persist mental model:", err);
+  }
+}
+
+async function saveAllModelsPeriodically(): Promise<void> {
+  const now = Date.now();
+  if (now - lastDbSaveTime < DB_SAVE_INTERVAL_MS) return;
+  lastDbSaveTime = now;
+  const promises: Promise<void>[] = [];
+  for (const model of userModels.values()) {
+    promises.push(saveModelToDb(model));
+  }
+  if (promises.length > 0) {
+    await Promise.allSettled(promises);
+  }
+}
 
 const SENTIMENT_POSITIVE = /thank|great|awesome|perfect|love|excellent|amazing|helpful|good|nice|cool|fantastic/i;
 const SENTIMENT_NEGATIVE = /wrong|bad|error|broken|hate|terrible|awful|stupid|useless|frustrated|annoying|doesn't work|not working/i;
@@ -337,6 +420,9 @@ export function updateUserModel(userId: string, message: string): UserMentalMode
 
   model.intent.confidence = clamp(model.intent.confidence + 0.05);
 
+  saveModelToDb(model).catch(() => {});
+  saveAllModelsPeriodically().catch(() => {});
+
   return model;
 }
 
@@ -572,7 +658,7 @@ IMPORTANT: Wrap your code in \`\`\`typescript ... \`\`\` blocks. Include a brief
         .replace(/import\s+.*from\s+['"][^'"]*['"]/g, "// external import removed");
 
       const hasDangerousCode =
-        /\beval\b|\bFunction\s*\(/.test(sanitized) ||
+        /\beval\s*\(/.test(sanitized) || /\bnew\s+Function\s*\(/.test(sanitized) ||
         /child_process|fs\.(write|unlink|rm|mkdir)|process\.exit/.test(sanitized) ||
         /fetch\s*\(|https?:\/\//.test(sanitized);
 
@@ -593,7 +679,13 @@ ${sanitized}
 `;
 
         try {
-          await writeModuleToSource(moduleName, moduleCode, "empathy_evolution");
+          await writeModuleToSource({
+            code: moduleCode,
+            name: moduleName,
+            title: `Empathy Evolution: ${domain.domain} (cycle #${empathyResearchCycleCount})`,
+            source: "empathy_evolution",
+            triggerRestart: false,
+          });
           empathyModulesGenerated++;
 
           console.log(
@@ -638,6 +730,7 @@ ${sanitized}
 }
 
 export function startSocialModeling(): void {
+  ensureModelsLoaded().catch(err => console.error("[SOCIAL MODELING] DB load error:", err));
   console.log(`[SOCIAL MODELING] 🧠 Theory of Mind Engine activated — continuous user modeling`);
   console.log(`[SOCIAL MODELING] 🧠 Tracks: emotional state, intent, knowledge level, communication style, satisfaction`);
   console.log(`[SOCIAL MODELING] 🧠 Deep empathy: subtext reading, perspective modeling, unspoken needs`);

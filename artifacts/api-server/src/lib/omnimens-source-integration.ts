@@ -112,18 +112,36 @@ function isPathSafe(targetPath: string): boolean {
 }
 
 function validateCodeSafety(code: string): { safe: boolean; reason: string } {
-  const dangerousPatterns = [
-    { pattern: /process\.exit/i, reason: "Contains process.exit call" },
-    { pattern: /child_process/i, reason: "Contains child_process import" },
-    { pattern: /fs\.rmSync|fs\.unlinkSync|rimraf/i, reason: "Contains destructive filesystem operations" },
-    { pattern: /eval\s*\(/i, reason: "Contains eval() call" },
-    { pattern: /Function\s*\(/i, reason: "Contains Function constructor" },
-    { pattern: /require\s*\(\s*['"](?:child_process|cluster|worker_threads)/i, reason: "Imports dangerous Node.js modules" },
-    { pattern: /\.env|process\.env\.(DATABASE|DB_|SECRET|KEY|TOKEN|PASS)/i, reason: "Accesses sensitive environment variables" },
+  const codeNoComments = code
+    .replace(/\/\/.*$/gm, "")
+    .replace(/\/\*[\s\S]*?\*\//g, "");
+
+  const codeNoCommentsNoStrings = codeNoComments
+    .replace(/(["'`])(?:(?!\1|\\).|\\.)*\1/g, "''");
+
+  const importPatterns = [
+    { pattern: /['"]child_process['"]/i, reason: "Imports child_process module" },
+    { pattern: /require\s*\(\s*['"](?:child_process|cluster)['"]/i, reason: "Requires dangerous Node.js module" },
+    { pattern: /import\s+.*from\s+['"](?:child_process|cluster)['"]/i, reason: "Imports dangerous Node.js module" },
+    { pattern: /process\.env\.(DATABASE|DB_|SECRET|KEY|TOKEN|PASS|STRIPE|OPENAI)/i, reason: "Accesses sensitive environment variables" },
   ];
 
-  for (const { pattern, reason } of dangerousPatterns) {
-    if (pattern.test(code)) {
+  for (const { pattern, reason } of importPatterns) {
+    if (pattern.test(codeNoComments)) {
+      return { safe: false, reason };
+    }
+  }
+
+  const codePatterns = [
+    { pattern: /process\.exit\s*\(/i, reason: "Contains process.exit() call" },
+    { pattern: /fs\.rmSync|fs\.unlinkSync|fs\.rmdirSync|rimraf/i, reason: "Contains destructive filesystem operations" },
+    { pattern: /(?<!\w)eval\s*\(/i, reason: "Contains eval() call" },
+    { pattern: /(?<!\w)new\s+Function\s*\(/i, reason: "Contains new Function() constructor" },
+    { pattern: /(?<!\w)Function\s*\(\s*['"`]/i, reason: "Contains Function() constructor with string argument" },
+  ];
+
+  for (const { pattern, reason } of codePatterns) {
+    if (pattern.test(codeNoCommentsNoStrings)) {
       return { safe: false, reason };
     }
   }

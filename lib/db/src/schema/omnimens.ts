@@ -664,6 +664,22 @@ export const omnimensSocialModels = pgTable("godflesh_social_models", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// ─── Theory of Mind — Persistent User Mental Models ──────────────────────────
+export const omnimensUserMentalModels = pgTable("godflesh_user_mental_models", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().unique().references(() => omnimensUsers.id),
+  emotionalState: jsonb("emotional_state").notNull(),
+  intent: jsonb("intent").notNull(),
+  knowledgeLevel: jsonb("knowledge_level").notNull(),
+  communicationStyle: jsonb("communication_style").notNull(),
+  satisfaction: jsonb("satisfaction").notNull(),
+  interactionHistory: jsonb("interaction_history").notNull(),
+  perspective: jsonb("perspective").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type OmnimensUserMentalModel = typeof omnimensUserMentalModels.$inferSelect;
+
 // ─── Causal Graph (Cause-Effect Reasoning) ────────────────────────────────────
 export const omnimensCausalGraph = pgTable("godflesh_causal_graph", {
   id: serial("id").primaryKey(),
