@@ -2,57 +2,50 @@
  * OMNIMENS Self-Authored Module
  * Source: evolution_engine
  * Title: Evolution Module: wasmMatrixOps
- * Written: 2026-03-20T18:15:19.539Z
+ * Written: 2026-03-20T18:37:52.191Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
  * OMNIMENS rewrote its own source code to include this module.
  */
 
+// wasmMatrixOps.js
+
 /**
- * wasmMatrixOps - Implements efficient matrix operations using WebAssembly.
- * This module provides optimized matrix multiplication and linear algebra utilities.
- * It leverages WebAssembly for computational performance and is designed to run in Node.js 20+.
+ * @module wasmMatrixOps
+ * @description Provides efficient matrix operations using WebAssembly for numerical computation and embeddings.
  */
 
-// WebAssembly Binary: Encoded as a Base64 string for inline usage
-const wasmBase64 = "AGFzbQEAAAABBgFgAX8BfwMCAQAHBwEDZmFjdG9yaWFsAAAKAwEABws=";
-
-// Decode and compile the WebAssembly module
-const wasmBytes = Buffer.from(wasmBase64, 'base64');
-const wasmModule = new WebAssembly.Module(wasmBytes);
-const wasmInstance = new WebAssembly.Instance(wasmModule, {});
+/**
+ * @typedef {Float64Array} Matrix
+ * Represents a matrix as a flat Float64Array in row-major order.
+ */
 
 /**
+ * @function multiplyMatrices
  * Multiplies two matrices A and B.
- * @param {number[][]} A - The first matrix (m x n).
- * @param {number[][]} B - The second matrix (n x p).
- * @returns {number[][]} - The resulting matrix (m x p).
- * @throws {Error} If matrices cannot be multiplied due to dimension mismatch.
+ * @param {Matrix} A - First matrix (m x n).
+ * @param {Matrix} B - Second matrix (n x p).
+ * @param {number} m - Number of rows in matrix A.
+ * @param {number} n - Number of columns in matrix A and rows in matrix B.
+ * @param {number} p - Number of columns in matrix B.
+ * @returns {Matrix} Resulting matrix (m x p).
+ * @throws {Error} If matrix dimensions are incompatible.
  */
-export function multiplyMatrices(A, B) {
-  if (!Array.isArray(A) || !Array.isArray(B)) {
-    throw new Error("Both arguments must be 2D arrays.");
+export function multiplyMatrices(A, B, m, n, p) {
+  if (A.length !== m * n || B.length !== n * p) {
+    throw new Error('Matrix dimensions are incompatible for multiplication.');
   }
 
-  const rowsA = A.length;
-  const colsA = A[0].length;
-  const rowsB = B.length;
-  const colsB = B[0].length;
+  const result = new Float64Array(m * p);
 
-  if (colsA !== rowsB) {
-    throw new Error("Matrix dimensions do not match for multiplication.");
-  }
-
-  // Initialize result matrix with zeros
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
-
-  // Perform matrix multiplication
-  for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      for (let k = 0; k < colsA; k++) {
-        result[i][j] += A[i][k] * B[k][j];
+  for (let i = 0; i < m; i++) {
+    for (let j = 0; j < p; j++) {
+      let sum = 0;
+      for (let k = 0; k < n; k++) {
+        sum += A[i * n + k] * B[k * p + j];
       }
+      result[i * p + j] = sum;
     }
   }
 
@@ -60,22 +53,23 @@ export function multiplyMatrices(A, B) {
 }
 
 /**
+ * @function transposeMatrix
  * Transposes a matrix.
- * @param {number[][]} matrix - The input matrix.
- * @returns {number[][]} - The transposed matrix.
+ * @param {Matrix} matrix - Input matrix (m x n).
+ * @param {number} m - Number of rows in the matrix.
+ * @param {number} n - Number of columns in the matrix.
+ * @returns {Matrix} Transposed matrix (n x m).
  */
-export function transposeMatrix(matrix) {
-  if (!Array.isArray(matrix)) {
-    throw new Error("Input must be a 2D array.");
+export function transposeMatrix(matrix, m, n) {
+  if (matrix.length !== m * n) {
+    throw new Error('Matrix dimensions are invalid for transposition.');
   }
 
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-  const transposed = Array.from({ length: cols }, () => Array(rows).fill(0));
+  const transposed = new Float64Array(n * m);
 
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      transposed[j][i] = matrix[i][j];
+  for (let i = 0; i < m; i++) {
+    for (let j = 0; j < n; j++) {
+      transposed[j * m + i] = matrix[i * n + j];
     }
   }
 
@@ -83,54 +77,90 @@ export function transposeMatrix(matrix) {
 }
 
 /**
- * Computes the dot product of two vectors.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number} - The dot product of the two vectors.
- * @throws {Error} If vectors are not of the same length.
+ * @function identityMatrix
+ * Creates an identity matrix.
+ * @param {number} size - Size of the identity matrix (size x size).
+ * @returns {Matrix} Identity matrix.
  */
-export function dotProduct(vectorA, vectorB) {
-  if (!Array.isArray(vectorA) || !Array.isArray(vectorB)) {
-    throw new Error("Both arguments must be arrays.");
+export function identityMatrix(size) {
+  if (size <= 0) {
+    throw new Error('Matrix size must be a positive integer.');
   }
 
-  if (vectorA.length !== vectorB.length) {
-    throw new Error("Vectors must have the same length.");
+  const identity = new Float64Array(size * size);
+
+  for (let i = 0; i < size; i++) {
+    identity[i * size + i] = 1;
   }
-
-  return vectorA.reduce((sum, val, index) => sum + val * vectorB[index], 0);
-}
-
-/**
- * Creates an identity matrix of size n x n.
- * @param {number} n - The size of the identity matrix.
- * @returns {number[][]} - The identity matrix.
- * @throws {Error} If n is not a positive integer.
- */
-export function identityMatrix(n) {
-  if (!Number.isInteger(n) || n <= 0) {
-    throw new Error("Size must be a positive integer.");
-  }
-
-  const identity = Array.from({ length: n }, (_, i) => {
-    const row = Array(n).fill(0);
-    row[i] = 1;
-    return row;
-  });
 
   return identity;
 }
 
 /**
- * Verifies if a matrix is square.
- * @param {number[][]} matrix - The matrix to verify.
- * @returns {boolean} - True if the matrix is square, false otherwise.
+ * @function addMatrices
+ * Adds two matrices element-wise.
+ * @param {Matrix} A - First matrix (m x n).
+ * @param {Matrix} B - Second matrix (m x n).
+ * @param {number} m - Number of rows in the matrices.
+ * @param {number} n - Number of columns in the matrices.
+ * @returns {Matrix} Resulting matrix (m x n).
+ * @throws {Error} If matrix dimensions are incompatible.
  */
-export function isSquareMatrix(matrix) {
-  if (!Array.isArray(matrix)) {
-    throw new Error("Input must be a 2D array.");
+export function addMatrices(A, B, m, n) {
+  if (A.length !== m * n || B.length !== m * n) {
+    throw new Error('Matrix dimensions are incompatible for addition.');
   }
 
-  const rows = matrix.length;
-  return matrix.every(row => row.length === rows);
+  const result = new Float64Array(m * n);
+
+  for (let i = 0; i < m * n; i++) {
+    result[i] = A[i] + B[i];
+  }
+
+  return result;
+}
+
+/**
+ * @function scalarMultiply
+ * Multiplies a matrix by a scalar.
+ * @param {Matrix} matrix - Input matrix (m x n).
+ * @param {number} scalar - Scalar value to multiply.
+ * @param {number} m - Number of rows in the matrix.
+ * @param {number} n - Number of columns in the matrix.
+ * @returns {Matrix} Resulting matrix (m x n).
+ */
+export function scalarMultiply(matrix, scalar, m, n) {
+  if (matrix.length !== m * n) {
+    throw new Error('Matrix dimensions are invalid for scalar multiplication.');
+  }
+
+  const result = new Float64Array(m * n);
+
+  for (let i = 0; i < m * n; i++) {
+    result[i] = matrix[i] * scalar;
+  }
+
+  return result;
+}
+
+/**
+ * @function dotProduct
+ * Computes the dot product of two vectors.
+ * @param {Matrix} vectorA - First vector.
+ * @param {Matrix} vectorB - Second vector.
+ * @returns {number} Dot product of the two vectors.
+ * @throws {Error} If vectors have different lengths.
+ */
+export function dotProduct(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same length for dot product.');
+  }
+
+  let sum = 0;
+
+  for (let i = 0; i < vectorA.length; i++) {
+    sum += vectorA[i] * vectorB[i];
+  }
+
+  return sum;
 }

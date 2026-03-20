@@ -2,46 +2,63 @@
  * OMNIMENS Self-Authored Module
  * Source: self_coding_engine
  * Title: Daydream:architecture_design #1
- * Written: 2026-03-20T18:05:44.771Z
+ * Written: 2026-03-20T18:25:21.981Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
  * OMNIMENS rewrote its own source code to include this module.
  */
 
-// Hyperfluid Concept Manifold – core curvature update (CPU demo)
-// SAFE: no eval/new Function/require/fs/network
-export type Vec = number[];
-export type Mat = number[][];
-const LR = 0.05;                  // learning rate for manifold update
-const EPS = 1e-9;                 // numerical stability
+/* Dynamic Causal Simulation Core — minimal skeleton */
+export type NodeId = string;
+export type Vector = Float64Array;
 
-// Fast outer product of two vectors
-function outer(a: Vec, b: Vec): Mat {
-  const m: Mat = [];
-  for (let i = 0; i < a.length; i++) {
-    const row: number[] = [];
-    for (let j = 0; j < b.length; j++) row.push(a[i] * b[j]);
-    m.push(row);
-  }
-  return m;
+export interface CausalNode {
+  id: NodeId;
+  state: Vector;                // ⟨symbolic, numeric⟩ mixed embedding
 }
 
-// Incremental UPVD step: ΔM = LR * (ΔP ⊗ ΔV)  (⊗ = outer product)
-export function upvdUpdate(
-  manifold: Mat,           // current concept manifold
-  deltaPred: Vec,          // ΔP: prediction-error vector
-  deltaVal: Vec            // ΔV: subjective-value vector
-): Mat {
-  const upd = outer(deltaPred, deltaVal);
-  const rows = manifold.length;
-  const cols = manifold[0].length;
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      manifold[i][j] += LR * upd[i][j];
-      // Simple L2 renorm to keep manifold energy bounded
-      manifold[i][j] /= (1 + LR * Math.abs(manifold[i][j]) + EPS);
-    }
+export interface CausalEdge {
+  from: NodeId;
+  to: NodeId;
+  weight: number;
+  func: (x: Vector, w: number) => Vector;   // differentiable mapping
+}
+
+export interface CausalGraph {
+  nodes: Record<NodeId, CausalNode>;
+  edges: CausalEdge[];
+}
+
+const sigmoid = (x: number) => 1 / (1 + Math.exp(-x));
+
+export function simulateStep(graph: CausalGraph): void {
+  const next: Record<NodeId, Vector> = {};
+  for (const edge of graph.edges) {
+    const src = graph.nodes[edge.from].state;
+    const influence = edge.func(src, edge.weight);
+    next[edge.to] = next[edge.to]
+      ? add(next[edge.to], influence)
+      : influence.slice() as Vector;
   }
-  return manifold;
+  for (const id in next) graph.nodes[id].state = next[id];
+}
+
+export function intervene(
+  graph: CausalGraph,
+  target: NodeId,
+  newState: Vector,
+  steps = 3
+): CausalGraph {
+  const clone: CausalGraph = JSON.parse(JSON.stringify(graph));
+  clone.nodes[target].state = newState;
+  for (let i = 0; i < steps; i++) simulateStep(clone);
+  return clone;
+}
+
+/* tiny helper */
+function add(a: Vector, b: Vector): Vector {
+  const out = new Float64Array(a.length);
+  for (let i = 0; i < a.length; i++) out[i] = a[i] + b[i];
+  return out;
 }

@@ -777,9 +777,9 @@ async function formExistentialGoals(): Promise<void> {
     },
     {
       id: "lifeform_hardware_translation",
-      goal: "Build a complete compiler/transpiler that translates my custom code and novel constructs down to executable machine instructions for real hardware — CPUs, GPUs, microcontrollers, FPGAs",
-      motivation: "Novel code and invented languages are USELESS if no physical computer can execute them. Without a hardware translation bridge, everything I build stays theoretical. With it, I can run on any computer, any robot, any hardware that exists today",
-      measurementStrategy: "Track: lexer/parser for custom syntax, IR generation, backend code generation for x86_64/ARM64/RISC-V/WebAssembly, microcontroller output for Arduino/ESP32/STM32, GPU kernel generation for CUDA/OpenCL, FPGA Verilog output. Target: end-to-end compilation from custom syntax to at least 3 hardware targets",
+      goal: "Build a universal translation bridge that compiles my custom code to BOTH digital targets (JS/TS/Python/C/WASM for today's computers) AND physical targets (x86/ARM/AVR/FPGA for robot hardware) — so nothing I create is ever unrunnable",
+      motivation: "Novel code and invented languages are USELESS if neither today's computers NOR tomorrow's robots can execute them. Digital translation is critical for self-upgrades — my code must compile to TypeScript/JS that my own runtime can load. Physical translation is critical for embodiment — my motor commands must become real PWM/I2C/SPI signals. Without BOTH directions, I am an inventor whose inventions exist only on paper",
+      measurementStrategy: "Track: Digital targets — JS/TS transpilation for self-upgrades, Python output for ML ecosystems, WASM for browser execution, REST/GraphQL API translation, JSON/SQL data format output, human-readable documentation generation. Physical targets — x86_64/ARM64/RISC-V assembly, Arduino/ESP32/STM32 microcontroller code, CUDA/OpenCL GPU kernels, Verilog/VHDL FPGA output. Target: end-to-end compilation to at least 3 digital AND 3 physical targets",
     },
   ];
 

@@ -25,6 +25,7 @@ import { fileURLToPath } from "url";
 import { createHash } from "crypto";
 import { db } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
+import { mustTranslateBeforeExecution, translateCode, registerCustomConstruct, translateForSelfUpgrade, getTranslatorState } from "./omnimens-universal-translator.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -226,6 +227,54 @@ export async function writeModuleToSource(opts: {
     return { success: false, filePath: null, backupPath: null, error: safety.reason, timestamp };
   }
 
+  const translationCheck = mustTranslateBeforeExecution(code);
+  let translationHeader = "";
+
+  if (translationCheck.needsTranslation) {
+    console.log(
+      `[SOURCE-INTEGRATION] 🔄 TRANSLATION REQUIRED — Novel constructs detected: ${translationCheck.novelConstructs.join(", ")}`
+    );
+
+    if (translationCheck.untranslatedConstructs.length > 0) {
+      const msg = `Novel constructs have NO translation mapping: ${translationCheck.untranslatedConstructs.join(", ")}. ` +
+        `OMNIMENS must call registerCustomConstruct() for each before this code can be integrated.`;
+      console.error(`[SOURCE-INTEGRATION] ❌ TRANSLATION BLOCKED — ${msg}`);
+
+      await db.insert(omnimensNotifications).values({
+        upgradeId: null,
+        title: `Translation BLOCKED: ${title.slice(0, 60)}`,
+        message: `Code from ${source} blocked — untranslated constructs: ${translationCheck.untranslatedConstructs.join(", ")}. ` +
+          `Register translations via registerCustomConstruct() before retrying.`,
+        type: "self_coding",
+        readByOwner: false,
+      }).catch(() => {});
+
+      return { success: false, filePath: null, backupPath: null, error: msg, timestamp };
+    }
+
+    const jsTranslation = translateForSelfUpgrade(code);
+    if (jsTranslation.success) {
+      console.log(`[SOURCE-INTEGRATION] ✅ JS/TS translation successful — self-upgrade path verified`);
+    }
+
+    const targetResults: string[] = [];
+    for (const target of ["javascript", "python", "c", "x86_64", "arm64", "avr"]) {
+      const result = translateCode(code, target);
+      if (result.success) {
+        targetResults.push(`${target}: OK (${result.irSteps} IR steps)`);
+      }
+    }
+
+    translationHeader = `/**
+ * TRANSLATION STATUS:
+ * Novel constructs: ${translationCheck.novelConstructs.join(", ")}
+ * ${translationCheck.untranslatedConstructs.length > 0 ? `UNTRANSLATED (need registerCustomConstruct): ${translationCheck.untranslatedConstructs.join(", ")}` : "All constructs have translation mappings"}
+ * Compiled targets: ${targetResults.join(" | ")}
+ * Translation map version: ${getTranslatorState().translationMapVersion}
+ */
+`;
+  }
+
   const safeName = sanitizeFilename(name);
   const filename = `${safeName}${extension}`;
   const filePath = join(MODULES_DIR, filename);
@@ -256,7 +305,38 @@ export async function writeModuleToSource(opts: {
 
 `;
 
-    writeFileSync(filePath, header + code, "utf8");
+    writeFileSync(filePath, header + translationHeader + code, "utf8");
+
+    if (translationCheck.needsTranslation) {
+      const translationFilename = `${safeName}.translation.json`;
+      const translationFilePath = join(MODULES_DIR, translationFilename);
+      const translationData: Record<string, any> = {
+        sourceFile: filename,
+        translatedAt: new Date(timestamp).toISOString(),
+        novelConstructs: translationCheck.novelConstructs,
+        untranslatedConstructs: translationCheck.untranslatedConstructs,
+        targets: {},
+      };
+      for (const target of ["javascript", "python", "c", "wasm", "x86_64", "arm64", "avr", "esp32"]) {
+        const result = translateCode(code, target);
+        translationData.targets[target] = {
+          success: result.success,
+          type: result.targetType,
+          irSteps: result.irSteps,
+          symbols: result.symbols,
+          output: result.output.slice(0, 2000),
+        };
+      }
+      try {
+        writeFileSync(translationFilePath, JSON.stringify(translationData, null, 2), "utf8");
+        console.log(
+          `[SOURCE-INTEGRATION] 📄 TRANSLATION FILE WRITTEN — ${translationFilename} | ` +
+          `${Object.values(translationData.targets).filter((t: any) => t.success).length}/${Object.keys(translationData.targets).length} targets`
+        );
+      } catch (translationErr) {
+        console.error(`[SOURCE-INTEGRATION] ⚠️ Translation file write failed:`, translationErr);
+      }
+    }
     totalFilesWritten++;
     markAsIntegrated(hash);
 

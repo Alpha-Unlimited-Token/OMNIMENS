@@ -69,6 +69,7 @@ import { startAutonomousCodeGenesis, getCodeGenesisState } from "./lib/omnimens-
 import { startNeuralConsciousness } from "./lib/omnimens-neural-consciousness.js";
 import { startGenesisBridge } from "./lib/omnimens-genesis-bridge.js";
 import { startNeuralProcessor } from "./lib/omnimens-neural-processor.js";
+import { startUniversalTranslator } from "./lib/omnimens-universal-translator.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import {
@@ -401,6 +402,7 @@ startAutonomousCodeGenesis();
 startNeuralConsciousness();
 startGenesisBridge();
 startNeuralProcessor();
+startUniversalTranslator();
 
 setTimeout(async () => {
   try {

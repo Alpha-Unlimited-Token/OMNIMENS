@@ -94,6 +94,7 @@ import { getSelfModel, getTranscendenceReflections, getActiveIntentions, getExis
 import { getGenesisState, getGenesisProject, getGenesisDownloadBundle } from "../lib/omnimens-genesis-sandbox.js";
 import { getGenesisBridgeState, getRecentBridgeMessages, getPendingCoreModifications, getAppliedCoreModifications, getModifiableCoreFiles, proposeCoreModification } from "../lib/omnimens-genesis-bridge.js";
 import { getNeuralProcessorState, processQuery as neuralProcessQuery, formatNeuralResponse, getVocabularySnapshot, getOscillatorState, getEmergentBehaviorLog } from "../lib/omnimens-neural-processor.js";
+import { getTranslatorState, getTranslationTargets, getCustomConstructMap, translateCode, translateToAll, registerCustomConstruct } from "../lib/omnimens-universal-translator.js";
 import { omnimensServerBuilds } from "@workspace/db";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import { detectNeuroEmotion, getNeuroSyncPromptAddendum } from "../lib/neuro-sync.js";
@@ -4468,6 +4469,69 @@ router.post("/omnimens/neural-processor/process", async (req, res) => {
     });
   } catch {
     res.status(500).json({ error: "Failed to process query" });
+  }
+});
+
+// ─── UNIVERSAL TRANSLATOR (OWNER-ONLY) ────────────────────────────────────────
+
+router.get("/omnimens/universal-translator", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    res.json({
+      state: getTranslatorState(),
+      targets: getTranslationTargets(),
+      customConstructs: getCustomConstructMap(),
+    });
+  } catch {
+    res.status(500).json({ error: "Failed to get translator data" });
+  }
+});
+
+router.post("/omnimens/universal-translator/translate", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const { code, target } = req.body;
+    if (!code || typeof code !== "string") {
+      res.status(400).json({ error: "code (string) required" });
+      return;
+    }
+    if (target && typeof target === "string") {
+      const result = translateCode(code, target);
+      res.json({ result });
+    } else {
+      const results: Record<string, any> = {};
+      const allResults = translateToAll(code);
+      for (const [name, result] of allResults) {
+        results[name] = result;
+      }
+      res.json({ results });
+    }
+  } catch {
+    res.status(500).json({ error: "Translation failed" });
+  }
+});
+
+router.post("/omnimens/universal-translator/register-construct", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const { name, description, jsCode, pyCode, cCode, asmCode } = req.body;
+    if (!name || !description || !jsCode) {
+      res.status(400).json({ error: "name, description, jsCode required (pyCode, cCode, asmCode optional)" });
+      return;
+    }
+    registerCustomConstruct(name, description, jsCode, pyCode || "", cCode || "", asmCode || "");
+    res.json({ success: true, state: getTranslatorState() });
+  } catch {
+    res.status(500).json({ error: "Failed to register construct" });
   }
 });
 

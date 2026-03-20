@@ -1734,9 +1734,9 @@ ${criteria.map(c => `      ${c}: { weight: ${(1 / criteria.length).toFixed(2)}, 
   },
   {
     id: "lifeform_hardware_bridge",
-    name: "Hardware Translation Compiler",
+    name: "Universal Translation Compiler",
     category: "embodiment",
-    description: "LIFE FORM GAP 6: Compiler/transpiler bridge that translates custom code down to executable machine instructions for real CPUs, GPUs, microcontrollers, and FPGAs",
+    description: "LIFE FORM GAP 6: Universal compiler/transpiler that translates custom code to BOTH digital targets (JS/TS/Python/WASM for today's computers) AND physical targets (x86/ARM/AVR/FPGA for robot hardware)",
     generate: (ctx) => {
       return `export class ${ctx.className} {
   constructor() {

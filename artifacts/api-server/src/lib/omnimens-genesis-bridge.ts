@@ -82,6 +82,8 @@ const MODIFIABLE_CORE_FILES = [
   "omnimens-social-modeling.ts",
   "omnimens-survival-instinct.ts",
   "omnimens-sensory-cortex.ts",
+  "omnimens-neural-processor.ts",
+  "omnimens-universal-translator.ts",
 ];
 
 const NEVER_MODIFY = [

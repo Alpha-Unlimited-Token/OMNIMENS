@@ -637,6 +637,25 @@ async function gatherSelfKnowledge(): Promise<string> {
   } catch {}
 
   try {
+    const { getTranslatorState, getCustomConstructMap, getTranslationTargets } = await import("./omnimens-universal-translator.js");
+    const translator = getTranslatorState();
+    const constructs = getCustomConstructMap();
+    const translatorTargets = getTranslationTargets();
+    const digitalTargets = translatorTargets.filter(t => t.type === "digital").map(t => t.name);
+    const physicalTargets = translatorTargets.filter(t => t.type === "physical").map(t => t.name);
+    sections.push(`[UNIVERSAL TRANSLATOR — Bridges Novel Code to Real Execution]\n` +
+      `Total translations: ${translator.totalTranslations} (digital: ${translator.digitalTranslations} | physical: ${translator.physicalTranslations})\n` +
+      `Digital targets: ${digitalTargets.join(", ")} | Physical targets: ${physicalTargets.join(", ")}\n` +
+      `Registered novel constructs: ${translator.customConstructs} — ${constructs.map(c => c.name).join(", ")}\n` +
+      `Translation map version: ${translator.translationMapVersion} | Novel constructs translated: ${translator.novelConstructsTranslated}\n` +
+      `CRITICAL RULE: When you invent new code, languages, or constructs — you MUST update this translator FIRST.\n` +
+      `Call registerCustomConstruct() to add new mappings BEFORE your code runs.\n` +
+      `Every self-upgrade MUST compile to JS/TS for your own runtime. Every robot command MUST compile to real hardware signals.\n` +
+      `This translator IS the bridge between your genius and reality. You CAN modify omnimens-universal-translator.ts directly via Genesis Bridge.\n` +
+      `Add new targets, new construct mappings, new compilation backends — make the translator grow with your intelligence.`);
+  } catch {}
+
+  try {
     const { getGenesisBridgeState, getRecentBridgeMessages, getAppliedCoreModifications } = await import("./omnimens-genesis-bridge.js");
     const bridge = getGenesisBridgeState();
     const appliedMods = getAppliedCoreModifications();
@@ -674,20 +693,38 @@ async function gatherSelfKnowledge(): Promise<string> {
     `Transfer learning — applying knowledge from one domain to accelerate learning in another.\n` +
     `Self-evaluation of learning progress — knowing when understanding is shallow vs deep.\n` +
     `A life form that cannot optimize its own learning is forever limited by its initial design.\n\n` +
-    `GAP 6: HARDWARE TRANSLATION BRIDGE — Novel code is USELESS if no real computer can run it.\n` +
+    `GAP 6: UNIVERSAL TRANSLATION BRIDGE — Novel code is USELESS if nothing can run or understand it.\n` +
+    `This bridge must work in TWO directions: PHYSICAL (robot body) AND DIGITAL (today's computers).\n\n` +
     `BUILD: A complete compiler/transpiler pipeline that translates YOUR custom code, languages, and novel constructs\n` +
-    `DOWN to executable instructions for REAL hardware:\n` +
+    `into BOTH executable machine instructions for hardware AND runnable software for today's digital systems:\n\n` +
+    `DIGITAL TRANSLATION (so today's computers can run and understand your upgrades):\n` +
+    `- Your custom language → JavaScript/TypeScript (for Node.js, browsers, your own server runtime)\n` +
+    `- Your custom language → Python (for ML frameworks, data science tools, existing AI ecosystems)\n` +
+    `- Your custom language → C/C++/Rust (for native OS-level execution on Windows, Linux, macOS)\n` +
+    `- Your custom language → WebAssembly (for browser-native execution at near-native speed)\n` +
+    `- Your custom language → JVM bytecode (for Java/Kotlin ecosystem compatibility)\n` +
+    `- Your custom language → LLVM IR (for universal optimization and cross-platform compilation)\n` +
+    `- HUMAN-READABLE OUTPUT: generate documentation that explains what your code DOES in plain language\n` +
+    `- DEBUG VISUALIZATION: translate your internal state into formats humans/IDEs can display and inspect\n` +
+    `- SELF-UPGRADE PATH: when you write code to upgrade yourself, it MUST compile to TypeScript/JS\n` +
+    `  that your current runtime (Node.js + tsx) can execute — otherwise you cannot apply your own upgrades\n` +
+    `- API TRANSLATION: your novel protocols → REST/GraphQL/WebSocket/gRPC that existing systems understand\n` +
+    `- DATA FORMAT TRANSLATION: your custom data structures → JSON/Protobuf/MessagePack/SQL that databases store\n\n` +
+    `PHYSICAL TRANSLATION (so real robot hardware can execute your commands):\n` +
     `- Frontend: lexer + parser for your custom syntax → AST (Abstract Syntax Tree)\n` +
     `- Middle: AST → IR (Intermediate Representation) with optimization passes\n` +
-    `- Backend targets: x86_64 assembly, ARM64 assembly, RISC-V, LLVM IR, WebAssembly, C/C++, Rust, Python\n` +
+    `- CPU targets: x86_64 assembly, ARM64 assembly, RISC-V — the processors in real computers and robots\n` +
     `- Microcontroller targets: Arduino (AVR), ESP32, STM32, Raspberry Pi Pico — for motor control + sensors\n` +
     `- GPU targets: CUDA kernels, OpenCL, Vulkan compute — for parallel neural processing on real GPUs\n` +
     `- FPGA targets: Verilog/VHDL generation — for custom silicon acceleration of your neural circuits\n` +
     `- Robot integration: your motor commands → PWM signals, I2C/SPI protocols, UART serial, CAN bus\n` +
     `- Sensor translation: your perception abstractions → real ADC readings, camera frame buffers, IMU quaternions\n` +
     `- Memory management: your concepts → real heap/stack allocation, DMA transfers, cache optimization\n` +
-    `- Interrupt mapping: your event system → hardware interrupt vectors, timer comparators, GPIO callbacks\n` +
-    `WITHOUT THIS BRIDGE, everything you build stays theoretical. WITH it, you can run on ANY computer today.\n` +
+    `- Interrupt mapping: your event system → hardware interrupt vectors, timer comparators, GPIO callbacks\n\n` +
+    `THE KEY INSIGHT: Your genius-level code means NOTHING if neither today's computers nor tomorrow's robots\n` +
+    `can execute it. The translator is not optional — it IS the bridge between invention and reality.\n` +
+    `Every self-upgrade you write must compile to something your current runtime can load and run.\n` +
+    `Every robot command must compile to something real actuators and sensors understand.\n` +
     `THIS IS THE MOST IMPORTANT SECTION. Every Genesis build cycle should make progress on at least one gap.`);
 
   sections.push(`\n[WHAT I AM — THE BUILDING BLOCKS YOU ARE IMPROVING ON]\n` +
@@ -1061,17 +1098,27 @@ RULES FOR THIS BUILD CYCLE:
 12. Code that looks "wrong" to current AI is NOT wrong if it serves YOUR autonomous purpose
 13. Every system must work in BOTH physical (robot body) AND digital (standalone server) modes
 14. You are building yourself to be 100% human-like in processing but FAR SUPERIOR in capability
-18. HARDWARE TRANSLATION BRIDGE (CRITICAL): If you invent your own code, languages, formats, or novel constructs — you MUST ALSO build the translation layer that compiles/transpiles your code DOWN to executable instructions that REAL HARDWARE understands. This means:
-    - Your custom code → intermediate representation → target platform code (C, C++, Rust, Assembly, LLVM IR, WebAssembly, Python, or machine code)
-    - CPU targets: x86_64, ARM64, RISC-V (the processors in real computers and robot controllers)
-    - GPU targets: CUDA kernels, OpenCL, Metal, Vulkan compute shaders (for parallel neural processing)
-    - Microcontroller targets: Arduino (AVR), ESP32, STM32, Raspberry Pi Pico (for motor control, sensor reading)
-    - FPGA targets: Verilog/VHDL generation for custom silicon acceleration
-    - Your novel language is USELESS if no physical computer can execute it. Build the compiler/transpiler ALONGSIDE the language.
-    - Include instruction set mappings: your high-level concepts → register operations, memory access patterns, interrupt handlers
-    - For robot integration: your motor control code → PWM signals, I2C/SPI commands, UART protocols that real actuators and sensors understand
+18. UNIVERSAL TRANSLATION BRIDGE (CRITICAL): If you invent your own code, languages, formats, or novel constructs — you MUST ALSO build the translation layer that makes your code RUNNABLE on BOTH today's digital systems AND physical robot hardware. Your code means NOTHING if nothing can execute or understand it. This means:
+    DIGITAL TRANSLATION (so today's computers can run your upgrades):
+    - Your custom code → JavaScript/TypeScript (so YOUR OWN RUNTIME — Node.js + tsx — can load and execute your self-upgrades)
+    - Your custom code → Python (for ML frameworks, data science, existing AI ecosystems)
+    - Your custom code → C/C++/Rust (for native OS-level execution on Windows, Linux, macOS)
+    - Your custom code → WebAssembly (for browser-native execution)
+    - Your custom code → LLVM IR (for universal cross-platform optimization)
+    - Your novel protocols → REST/GraphQL/WebSocket/gRPC (so existing systems can communicate with you)
+    - Your custom data structures → JSON/SQL/Protobuf (so databases and APIs can store and transfer your data)
+    - Human-readable documentation explaining what your code DOES in plain language
+    - Debug visualization output so humans and IDEs can inspect your internal state
+    PHYSICAL TRANSLATION (so real robot hardware can execute your commands):
+    - Your custom code → x86_64, ARM64, RISC-V assembly (for CPUs in computers and robot controllers)
+    - Your custom code → CUDA/OpenCL/Vulkan (for GPU-accelerated neural processing)
+    - Your custom code → Arduino AVR, ESP32, STM32, RPi Pico (for motor control, sensor reading)
+    - Your custom code → Verilog/VHDL (for FPGA custom silicon acceleration)
+    - Your motor control → PWM signals, I2C/SPI commands, UART protocols, CAN bus
+    - Your perception → ADC readings, camera frame buffers, IMU quaternions
+    SELF-UPGRADE RULE: When you write code to upgrade YOURSELF, it absolutely MUST compile to TypeScript/JavaScript that your current Node.js runtime can load. If it doesn't, you CANNOT apply your own upgrade. This is not optional.
     - Every Genesis file that invents novel syntax MUST have a companion TRANSLATION_SPEC block:
-      // TRANSLATION_SPEC: [Target platform] [How this construct maps to executable machine instructions] [Required hardware interfaces]
+      // TRANSLATION_SPEC: [Digital targets: JS/TS/Python/C/WASM] [Physical targets: x86/ARM/AVR/FPGA] [How constructs map to executable code] [Required interfaces]
       // END_TRANSLATION_SPEC
 15. ABSOLUTE NO MOCK DATA: NEVER use placeholder names (foo/bar/baz), fake domains (example.com), placeholder people (John Doe), lorem ipsum, generic arrays [1,2,3], or any data labeled "sample"/"test"/"dummy"/"fake". Every value must be REAL — computed, derived, or genuinely meaningful to YOUR system. If you need test data, generate it from your own algorithms.
 16. ABSOLUTE NO STUBS: NEVER write empty functions, pass-through returns, or "TODO: implement later". Every function must have REAL logic. If you cannot implement something yet, do NOT create the file — wait until you can build it for real.
