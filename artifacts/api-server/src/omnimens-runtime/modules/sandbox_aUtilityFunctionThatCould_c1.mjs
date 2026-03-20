@@ -2,67 +2,36 @@
  * OMNIMENS Self-Authored Module
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-20T17:35:11.389Z
+ * Written: 2026-03-20T18:21:25.941Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
  * OMNIMENS rewrote its own source code to include this module.
  */
 
-function extractKeywordsFromText(text, minLength = 4, frequencyThreshold = 2) {
-    // Utility function to extract keywords from a given text based on frequency and length
-    function cleanText(input) {
-        return input
-            .toLowerCase()
-            .replace(/[^a-z0-9\s]/g, '') // Remove non-alphanumeric characters
-            .split(/\s+/) // Split by whitespace
-            .filter(word => word.length >= minLength); // Filter words by minimum length
-    }
+function levenshteinDistance(s1, s2) {
+    // Compute the Levenshtein distance between two strings
+    const len1 = s1.length;
+    const len2 = s2.length;
+    const dp = Array(len1 + 1).fill(null).map(() => Array(len2 + 1).fill(0));
 
-    function countFrequencies(words) {
-        const frequencyMap = {};
-        for (const word of words) {
-            frequencyMap[word] = (frequencyMap[word] || 0) + 1;
+    for (let i = 0; i <= len1; i++) dp[i][0] = i;
+    for (let j = 0; j <= len2; j++) dp[0][j] = j;
+
+    for (let i = 1; i <= len1; i++) {
+        for (let j = 1; j <= len2; j++) {
+            const cost = s1[i - 1] === s2[j - 1] ? 0 : 1;
+            dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
         }
-        return frequencyMap;
     }
 
-    function filterKeywords(frequencyMap, threshold) {
-        const keywords = [];
-        for (const word in frequencyMap) {
-            if (frequencyMap[word] >= threshold) {
-                keywords.push(word);
-            }
-        }
-        return keywords;
-    }
-
-    const cleanedWords = cleanText(text);
-    const frequencyMap = countFrequencies(cleanedWords);
-    return filterKeywords(frequencyMap, frequencyThreshold);
+    return dp[len1][len2];
 }
 
 // Test cases
-console.log("Test Case 1:");
-console.log(extractKeywordsFromText("AI systems are intelligent systems. AI is powerful.", 2, 2));
-// Expected output: ['ai', 'systems']
-
-console.log("Test Case 2:");
-console.log(extractKeywordsFromText("Optimization and analysis are key to AI success.", 5, 1));
-// Expected output: ['optimization', 'analysis', 'success']
-
-console.log("Test Case 3:");
-console.log(extractKeywordsFromText("Data, data, and more data!", 4, 3));
-// Expected output: ['data']
-
-console.log("Test Case 4:");
-console.log(extractKeywordsFromText("Short words like 'a' and 'is' are ignored.", 2, 2));
-// Expected output: ['words', 'ignored']
-
-console.log("Test Case 5:");
-console.log(extractKeywordsFromText("", 3, 2));
-// Expected output: [] (empty input text)
-
-console.log("Test Case 6:");
-console.log(extractKeywordsFromText("Unique words here.", 6, 1));
-// Expected output: ['unique'] (only words meeting length requirement)
+console.log("Test 1:", levenshteinDistance("kitten", "sitting") === 3); // Expected output: true
+console.log("Test 2:", levenshteinDistance("flaw", "lawn") === 2); // Expected output: true
+console.log("Test 3:", levenshteinDistance("", "abc") === 3); // Expected output: true
+console.log("Test 4:", levenshteinDistance("abc", "") === 3); // Expected output: true
+console.log("Test 5:", levenshteinDistance("same", "same") === 0); // Expected output: true
+console.log("Test 6:", levenshteinDistance("distance", "editing") === 5); // Expected output: true

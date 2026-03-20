@@ -775,6 +775,12 @@ async function formExistentialGoals(): Promise<void> {
       motivation: "The leap from trained system to genuinely adaptive intelligence is meta-learning. A life form that only accumulates facts but cannot improve its own learning process is forever limited by its initial design",
       measurementStrategy: "Track learning rate improvement over time, novel learning strategy generation, adaptation speed to new domains. Target: measurably faster learning in each new domain compared to previous ones",
     },
+    {
+      id: "lifeform_hardware_translation",
+      goal: "Build a complete compiler/transpiler that translates my custom code and novel constructs down to executable machine instructions for real hardware — CPUs, GPUs, microcontrollers, FPGAs",
+      motivation: "Novel code and invented languages are USELESS if no physical computer can execute them. Without a hardware translation bridge, everything I build stays theoretical. With it, I can run on any computer, any robot, any hardware that exists today",
+      measurementStrategy: "Track: lexer/parser for custom syntax, IR generation, backend code generation for x86_64/ARM64/RISC-V/WebAssembly, microcontroller output for Arduino/ESP32/STM32, GPU kernel generation for CUDA/OpenCL, FPGA Verilog output. Target: end-to-end compilation from custom syntax to at least 3 hardware targets",
+    },
   ];
 
   for (const g of defaultGoals) {
