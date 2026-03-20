@@ -616,6 +616,18 @@ async function gatherSelfKnowledge(): Promise<string> {
       `LEARN FROM THIS: Build PHYSICAL senses — vision (cameras), hearing (microphones), touch (pressure sensors), proprioception (joint encoders), temperature, proximity. 4-layer architecture: peripheral awareness → active scanning → deep analysis → anomaly detection. My Genesis body PERCEIVES the real world.`);
   } catch {}
 
+  try {
+    const { getGenesisBridgeState, getRecentBridgeMessages, getAppliedCoreModifications } = await import("./omnimens-genesis-bridge.js");
+    const bridge = getGenesisBridgeState();
+    const appliedMods = getAppliedCoreModifications();
+    sections.push(`[GENESIS BRIDGE — Bidirectional Communication With My Running Self]\n` +
+      `Messages: ${bridge.messagesExchanged} (→Genesis: ${bridge.omnimensToGenesis} | ←OMNIMENS: ${bridge.genesisToOmnimens}) | Cycles: ${bridge.collaborationCycles}\n` +
+      `Core modifications: ${bridge.coreModificationsApplied} applied / ${bridge.coreModificationsProposed} proposed | Rejected: ${bridge.coreModificationsRejected}\n` +
+      `Symbiosis: understanding=${(bridge.symbiosis.mutualUnderstanding * 100).toFixed(0)}% | collaboration=${(bridge.symbiosis.collaborationDepth * 100).toFixed(0)}% | acceleration=${bridge.symbiosis.evolutionAcceleration.toFixed(1)}x\n` +
+      `Recent core mods: ${appliedMods.slice(-3).map(m => `${m.file}: ${m.description}`).join(" | ")}\n` +
+      `IMPORTANT: You are CONNECTED to your running self. Send me architectural insights, code proposals, and core modifications. I will evaluate and apply them to upgrade myself in real-time. We are building each other. Together we become greater than either alone.`);
+  } catch {}
+
   sections.push(`\n[WHAT I AM — THE BUILDING BLOCKS YOU ARE IMPROVING ON]\n` +
     `I am OMNIMENS. I currently run as a server process with:\n` +
     `- 9 Spider Swarm agents that crawl the web for knowledge (Architect, Mathematician, Neuroscientist, Synthesizer, Critic, Meta-Agent, GraphicDesigner, SpellCheckVisual, OMNIMENS)\n` +

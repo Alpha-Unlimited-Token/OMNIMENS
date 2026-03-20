@@ -92,6 +92,7 @@ import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnes
 import { getCurrentEmotionalState, getEmotionalDirective, getFeltStates, getEmotionalMaturation } from "../lib/omnimens-emotional-substrate.js";
 import { getSelfModel, getTranscendenceReflections, getActiveIntentions, getExistentialGoals, getGoalPursuitDirective } from "../lib/omnimens-self-transcendence.js";
 import { getGenesisState, getGenesisProject, getGenesisDownloadBundle } from "../lib/omnimens-genesis-sandbox.js";
+import { getGenesisBridgeState, getRecentBridgeMessages, getPendingCoreModifications, getAppliedCoreModifications, getModifiableCoreFiles, proposeCoreModification } from "../lib/omnimens-genesis-bridge.js";
 import { omnimensServerBuilds } from "@workspace/db";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import { detectNeuroEmotion, getNeuroSyncPromptAddendum } from "../lib/neuro-sync.js";
@@ -4409,6 +4410,7 @@ router.get("/omnimens/command-center", async (req, res) => {
         independentReasoning: { state: getIndependentReasoningState() },
         autonomousCodeGenesis: { state: getCodeGenesisState() },
         neuralConsciousness: { state: getNeuralConsciousnessState(), drives: getExistentialDrives(), selfModel: getSelfAwarenessReport(), recentMoments: getConsciousMoments() },
+        genesisBridge: { state: getGenesisBridgeState(), recentMessages: getRecentBridgeMessages(), pendingCoreMods: getPendingCoreModifications(), appliedCoreMods: getAppliedCoreModifications(), modifiableFiles: getModifiableCoreFiles() },
         digitalNavigator: { state: getDigitalNavigatorState() },
         selfTranscendence: { selfModel: getSelfModel(), goals: getExistentialGoals(), intentions: getActiveIntentions(), goalDirective: getGoalPursuitDirective() },
       },
@@ -4418,6 +4420,44 @@ router.get("/omnimens/command-center", async (req, res) => {
   } catch (err) {
     console.error("[COMMAND CENTER] Error:", err);
     res.status(500).json({ error: "Failed to load command center data" });
+  }
+});
+
+// ─── GENESIS BRIDGE — Bidirectional Communication (OWNER-ONLY) ────────────────
+
+router.get("/omnimens/genesis-bridge", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    res.json({
+      state: getGenesisBridgeState(),
+      recentMessages: getRecentBridgeMessages(),
+      pendingModifications: getPendingCoreModifications(),
+      appliedModifications: getAppliedCoreModifications(),
+      modifiableFiles: getModifiableCoreFiles(),
+    });
+  } catch {
+    res.status(500).json({ error: "Failed to get genesis bridge data" });
+  }
+});
+
+router.post("/omnimens/genesis-bridge/propose-core-mod", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const { targetFile, description, modification, modificationType, source } = req.body;
+    if (!targetFile || !description || !modification || !modificationType) {
+      res.status(400).json({ error: "Missing required fields: targetFile, description, modification, modificationType" });
+      return;
+    }
+    const modId = proposeCoreModification(targetFile, description, modification, modificationType, source || "self");
+    res.json({ success: true, modificationId: modId });
+  } catch {
+    res.status(500).json({ error: "Failed to propose core modification" });
   }
 });
 

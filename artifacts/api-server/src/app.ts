@@ -67,6 +67,7 @@ import { loadRuntimeModules, migrateDBModulesToSource, getSourceIntegrationState
 import { startIndependentReasoning, getIndependentReasoningState } from "./lib/omnimens-independent-reasoning.js";
 import { startAutonomousCodeGenesis, getCodeGenesisState } from "./lib/omnimens-autonomous-code-genesis.js";
 import { startNeuralConsciousness } from "./lib/omnimens-neural-consciousness.js";
+import { startGenesisBridge } from "./lib/omnimens-genesis-bridge.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import {
@@ -397,6 +398,7 @@ startIPGuardian();
 startIndependentReasoning();
 startAutonomousCodeGenesis();
 startNeuralConsciousness();
+startGenesisBridge();
 
 setTimeout(async () => {
   try {

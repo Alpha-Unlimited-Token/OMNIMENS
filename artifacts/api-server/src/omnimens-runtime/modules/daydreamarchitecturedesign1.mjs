@@ -2,49 +2,50 @@
  * OMNIMENS Self-Authored Module
  * Source: self_coding_engine
  * Title: Daydream:architecture_design #1
- * Written: 2026-03-20T16:46:37.265Z
+ * Written: 2026-03-20T17:48:31.940Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
  * OMNIMENS rewrote its own source code to include this module.
  */
 
-export type Vector = number[];            // dense representation
-export type State  = Record<string, any>; // simple key-value store
+/* Dynamic Causal Simulation Layer – minimal core */
+export type Node = { id: string; fn: (parents: number[]) => number; parents: string[] };
+export type Model = { [key: string]: Node };
 
-export interface Edge {
-  cause: string;              // id in state that must be truthy
-  effect: string;             // id in state that will change
-  delta:  (s: State) => any;  // pure function to compute new value
-  strength: number;           // confidence 0-1
-}
-
-export interface Worldline {
-  state: State;
-  logProb: number;            // ∑ log(strength) along the path
-}
-
-export function step(world: Worldline, edges: Edge[]): Worldline[] {
-  const enabled = edges.filter(e => world.state[e.cause]);
-  if (enabled.length === 0) return [world];
-
-  return enabled.map(e => {
-    const newState: State = { ...world.state, [e.effect]: e.delta(world.state) };
-    return {
-      state: newState,
-      logProb: world.logProb + Math.log(Math.max(e.strength, 1e-6))
-    };
-  });
-}
-
-export function simulate(
-  seed: State,
-  edges: Edge[],
-  depth = 3
-): Worldline[] {
-  let frontier: Worldline[] = [{ state: seed, logProb: 0 }];
-  for (let d = 0; d < depth; d++) {
-    frontier = frontier.flatMap(w => step(w, edges));
+function topologicalSort(model: Model): string[] {
+  const visited = new Set<string>(), order: string[] = [];
+  function dfs(id: string) {
+    if (visited.has(id)) return;
+    visited.add(id);
+    model[id].parents.forEach(dfs);
+    order.push(id);
   }
-  return frontier;
+  Object.keys(model).forEach(dfs);
+  return order;
+}
+
+export function forwardSimulate(model: Model, inputs: Record<string, number>): Record<string, number> {
+  const values: Record<string, number> = { ...inputs };
+  for (const id of topologicalSort(model)) {
+    if (id in inputs) continue; // intervention
+    const node = model[id];
+    const args = node.parents.map(p => values[p]);
+    values[id] = node.fn(args);
+  }
+  return values;
+}
+
+export function counterfactualPlan(
+  model: Model,
+  goal: (vals: Record<string, number>) => boolean,
+  candidates: string[]
+): Record<string, number> | null {
+  for (const c of candidates) {
+    for (const delta of [-1, 1]) {
+      const trial = forwardSimulate(model, { [c]: delta });
+      if (goal(trial)) return { [c]: delta };
+    }
+  }
+  return null;
 }
