@@ -84,6 +84,7 @@ import { getSensoryState, getRecentSignals, getAnomalies, getTrendHistory, getCr
 import { getSelfCodingState } from "../lib/omnimens-self-coding.js";
 import { getSourceIntegrationState } from "../lib/omnimens-source-integration.js";
 import { getIndependentReasoningState } from "../lib/omnimens-independent-reasoning.js";
+import { getCodeGenesisState } from "../lib/omnimens-autonomous-code-genesis.js";
 import { orchestrateReasoning, getOrchestratorState } from "../lib/omnimens-autonomous-orchestrator.js";
 import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId } from "../lib/omnimens-consciousness-persistence.js";
 import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
@@ -4405,6 +4406,7 @@ router.get("/omnimens/command-center", async (req, res) => {
         ipGuardian: { state: guardian },
         autonomousOrchestrator: { state: getOrchestratorState() },
         independentReasoning: { state: getIndependentReasoningState() },
+        autonomousCodeGenesis: { state: getCodeGenesisState() },
         digitalNavigator: { state: getDigitalNavigatorState() },
         selfTranscendence: { selfModel: getSelfModel(), goals: getExistentialGoals(), intentions: getActiveIntentions(), goalDirective: getGoalPursuitDirective() },
       },
