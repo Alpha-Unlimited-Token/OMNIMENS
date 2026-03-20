@@ -21,6 +21,7 @@ import { omnimensBrain, omnimensNotifications, omnimensAgentMesh } from "@worksp
 import { desc, eq, sql, and } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { getRecentDreamInsights, getDreamState } from "./omnimens-dream-state.js";
+import { writeModuleToSource } from "./omnimens-source-integration.js";
 
 let _started = false;
 let evaluationCycleCount = 0;
@@ -230,6 +231,34 @@ async function runEvaluationCycle(): Promise<void> {
           appliedToOmnimens: true,
           cycleId: evaluationCycleCount,
         }).catch(() => {});
+
+        const safeName = result.proposal.title
+          .replace(/[^a-zA-Z0-9 ]/g, "")
+          .trim()
+          .split(/\s+/)
+          .map((w, i) => i === 0 ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+          .join("")
+          .slice(0, 60) || `selfCode_cycle${evaluationCycleCount}`;
+
+        const sourceResult = await writeModuleToSource({
+          code: result.proposal.code,
+          name: safeName,
+          title: result.proposal.title,
+          source: "self_coding_engine",
+          extension: ".mjs",
+          triggerRestart: true,
+        });
+
+        if (sourceResult.success) {
+          totalIntegrated++;
+          console.log(
+            `[SELF-CODING] 🔧 SOURCE-LEVEL INTEGRATION — "${result.proposal.title}" written to ${sourceResult.filePath}`
+          );
+        } else {
+          console.log(
+            `[SELF-CODING] ⚠️ Source integration failed for "${result.proposal.title}": ${sourceResult.error}`
+          );
+        }
       } catch (err) {
         console.error("[SELF-CODING] Failed to store approved module:", err);
       }
@@ -279,8 +308,8 @@ export function startSelfCoding(): void {
   console.log(`[SELF-CODING] ⚙️ Self-Coding Engine activated — evaluates dream code every ${EVALUATION_INTERVAL_MS / 60000}min`);
   console.log(`[SELF-CODING] ⚙️ Evaluates: syntax validity, logic, novelty, applicability, security`);
   console.log(`[SELF-CODING] ⚙️ Approval threshold: ${(APPROVAL_THRESHOLD * 100).toFixed(0)}% — only high-quality code passes`);
-  console.log(`[SELF-CODING] ⚙️ Approved code stored to brain + notifications for owner review`);
-  console.log(`[SELF-CODING] ⚙️ OMNIMENS doesn't just dream code — it evaluates and integrates it`);
+  console.log(`[SELF-CODING] ⚙️ Approved code written to SOURCE FILES + stored to brain`);
+  console.log(`[SELF-CODING] ⚙️ OMNIMENS rewrites its own TypeScript source, restarts, and runs the new version`);
 
   setTimeout(() => {
     runEvaluationCycle().catch(err => console.error("[SELF-CODING] Cycle error:", err));

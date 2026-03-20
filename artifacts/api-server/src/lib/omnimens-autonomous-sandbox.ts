@@ -26,6 +26,7 @@ import { db } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { desc, eq, sql } from "drizzle-orm";
+import { writeModuleToSource } from "./omnimens-source-integration.js";
 
 let _started = false;
 let sandboxCycleCount = 0;
@@ -281,6 +282,31 @@ Only approve if average score > 65.`,
               type: "sandbox_code",
               readByOwner: false,
             });
+
+            const sandboxModuleName = codeType
+              .replace(/[^a-zA-Z0-9 ]/g, "")
+              .trim()
+              .split(/\s+/)
+              .slice(0, 5)
+              .map((w, i) => i === 0 ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+              .join("")
+              .slice(0, 60) || `sandbox_cycle${sandboxCycleCount}`;
+
+            const sourceResult = await writeModuleToSource({
+              code,
+              name: `sandbox_${sandboxModuleName}_c${sandboxCycleCount}`,
+              title: `Sandbox Approved: ${codeType.slice(0, 80)}`,
+              source: "autonomous_sandbox",
+              extension: ".mjs",
+              triggerRestart: true,
+            });
+
+            if (sourceResult.success) {
+              state.autonomousModulesGenerated++;
+              console.log(
+                `[SANDBOX] 🔧 SOURCE-LEVEL INTEGRATION — written to ${sourceResult.filePath}`
+              );
+            }
 
             console.log(
               `[SANDBOX] ✅ Module APPROVED — ${codeType.slice(0, 50)} | ` +

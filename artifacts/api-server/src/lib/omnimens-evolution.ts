@@ -59,6 +59,7 @@ import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { webSearch, formatSearchResults } from "./web-search.js";
+import { writeModuleToSource } from "./omnimens-source-integration.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MODULES_DIR = join(__dirname, "../omnimens-runtime/modules");
@@ -362,11 +363,19 @@ export async function runEvolutionCycle(): Promise<void> {
 
       if (generated) {
         const safeName = need.name.replace(/[^a-zA-Z0-9_]/g, "_");
-        const filename = `${safeName}_gen${gen}.mjs`;
 
-        try {
-          writeFileSync(join(MODULES_DIR, filename), generated.code, "utf8");
-        } catch { /* filesystem write optional */ }
+        const sourceResult = await writeModuleToSource({
+          code: generated.code,
+          name: `${safeName}_gen${gen}`,
+          title: `Evolution Module: ${need.name}`,
+          source: "evolution_engine",
+          extension: ".mjs",
+          triggerRestart: false,
+        });
+
+        if (sourceResult.success) {
+          console.log(`[OMNIMENS EVOLUTION] 🔧 SOURCE-LEVEL INTEGRATION — ${need.name} written to ${sourceResult.filePath}`);
+        }
 
         await db.insert(omnimensGeneratedModules).values({
           name: need.name,
@@ -392,6 +401,18 @@ export async function runEvolutionCycle(): Promise<void> {
         modulesWritten++;
         console.log(`[OMNIMENS EVOLUTION] Module written: ${need.name} — ${generated.description.slice(0, 80)}`);
       }
+    }
+
+    if (modulesWritten > 0) {
+      const { writeModuleToSource: triggerWrite } = await import("./omnimens-source-integration.js");
+      await triggerWrite({
+        code: `export const evolutionCycleMarker = { generation: ${gen}, modulesWritten: ${modulesWritten}, timestamp: ${Date.now()} };`,
+        name: `evolution_marker_gen${gen}`,
+        title: `Evolution Cycle ${gen} Complete — ${modulesWritten} modules`,
+        source: "evolution_engine",
+        extension: ".mjs",
+        triggerRestart: true,
+      });
     }
 
     // ── Step 4: Extract brain entries from code discoveries ───────────────────

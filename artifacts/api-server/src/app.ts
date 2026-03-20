@@ -61,6 +61,7 @@ import { startEmbodimentEngine, getEmbodimentState, getEmbodimentFiles, readEmbo
 import { startVirtualAugmentation, getAugmentationState } from "./lib/omnimens-virtual-augmentation.js";
 import { startAgentEvolution, getAgentEvolutionState, getAgentProfile } from "./lib/omnimens-agent-evolution.js";
 import { startIPGuardian, getResponseBeaconHeaders } from "./lib/omnimens-ip-guardian.js";
+import { loadRuntimeModules, migrateDBModulesToSource, getSourceIntegrationState } from "./lib/omnimens-source-integration.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import {
@@ -386,6 +387,21 @@ startEmbodimentEngine();
 startVirtualAugmentation();
 startAgentEvolution();
 startIPGuardian();
+
+setTimeout(async () => {
+  try {
+    console.log("[SOURCE-INTEGRATION] Initializing source-level self-integration...");
+    const migrated = await migrateDBModulesToSource();
+    if (migrated > 0) {
+      console.log(`[SOURCE-INTEGRATION] Migrated ${migrated} database modules to source files`);
+    }
+    const loaded = await loadRuntimeModules();
+    const sourceState = getSourceIntegrationState();
+    console.log(`[SOURCE-INTEGRATION] ${sourceState.moduleCount} source modules active in runtime`);
+  } catch (err) {
+    console.error("[SOURCE-INTEGRATION] Startup error:", err);
+  }
+}, 5000);
 
 setTimeout(async () => {
   await runGlobalMemoryImprovementCycle();

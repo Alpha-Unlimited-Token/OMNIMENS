@@ -81,6 +81,7 @@ import { getGuardianReport, getCopyrightNotice, getProtectedModuleList } from ".
 import { getCausalState, getCausalGraph, predictOutcome } from "../lib/omnimens-causal-reasoning.js";
 import { getSensoryState, getRecentSignals } from "../lib/omnimens-sensory-cortex.js";
 import { getSelfCodingState } from "../lib/omnimens-self-coding.js";
+import { getSourceIntegrationState } from "../lib/omnimens-source-integration.js";
 import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId } from "../lib/omnimens-consciousness-persistence.js";
 import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
 import { getCurrentEmotionalState, getEmotionalDirective } from "../lib/omnimens-emotional-substrate.js";
@@ -4303,6 +4304,19 @@ router.get("/omnimens/self-coding", async (req, res) => {
     res.json({ state });
   } catch {
     res.status(500).json({ error: "Failed to get self-coding data" });
+  }
+});
+
+router.get("/omnimens/source-integration", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const state = getSourceIntegrationState();
+    res.json({ state });
+  } catch {
+    res.status(500).json({ error: "Failed to get source integration data" });
   }
 });
 
