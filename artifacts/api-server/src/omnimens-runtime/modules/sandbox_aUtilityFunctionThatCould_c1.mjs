@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-20T19:01:19.574Z
+ * Written: 2026-03-20T21:26:09.049Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,66 +16,76 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function to perform KMP (Knuth-Morris-Pratt) pattern matching algorithm
-// This function finds all occurrences of a pattern in a given text and returns their starting indices
-function kmpPatternSearch(text, pattern) {
-    if (!text || !pattern) return [];
+function extractLinePositions(text) {
+    const lines = text.split('\n');
+    const positions = [];
+    let currentY = 0;
 
-    // Helper function to build the "longest prefix suffix" (LPS) array
-    function buildLPS(pattern) {
-        const lps = Array(pattern.length).fill(0);
-        let length = 0; // length of the previous longest prefix suffix
-        let i = 1;
-
-        while (i < pattern.length) {
-            if (pattern[i] === pattern[length]) {
-                length++;
-                lps[i] = length;
-                i++;
-            } else {
-                if (length !== 0) {
-                    length = lps[length - 1];
-                } else {
-                    lps[i] = 0;
-                    i++;
-                }
-            }
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line.length > 0) {
+            positions.push({ line: line, y: currentY });
         }
-        return lps;
+        currentY += 20; // Simulating line height increment
     }
 
-    const lps = buildLPS(pattern);
+    return positions;
+}
+
+function calculateWordConfidence(text, confidences) {
+    const words = text.split(/\s+/);
+    if (words.length !== confidences.length) {
+        throw new Error("Text and confidence scores length mismatch.");
+    }
+
     const result = [];
-    let i = 0; // index for text
-    let j = 0; // index for pattern
-
-    while (i < text.length) {
-        if (pattern[j] === text[i]) {
-            i++;
-            j++;
-        }
-
-        if (j === pattern.length) {
-            result.push(i - j); // Match found, store starting index
-            j = lps[j - 1];
-        } else if (i < text.length && pattern[j] !== text[i]) {
-            if (j !== 0) {
-                j = lps[j - 1];
-            } else {
-                i++;
-            }
-        }
+    for (let i = 0; i < words.length; i++) {
+        result.push({ word: words[i], confidence: confidences[i] });
     }
 
     return result;
 }
 
-// Test cases
-console.log(kmpPatternSearch("ababcabcabababd", "ababd")); // [10]
-console.log(kmpPatternSearch("aaaaa", "aa")); // [0, 1, 2, 3]
-console.log(kmpPatternSearch("abcde", "f")); // []
-console.log(kmpPatternSearch("abcabcabcabc", "abcabc")); // [0, 3, 6]
-console.log(kmpPatternSearch("", "a")); // []
-console.log(kmpPatternSearch("a", "")); // []
-console.log(kmpPatternSearch("", "")); // []
-console.log(kmpPatternSearch("ababcabcabababd", "ab")); // [0, 2, 5, 7, 10]
+function testExtractLinePositions() {
+    const text = "Line 1\nLine 2\nLine 3";
+    const positions = extractLinePositions(text);
+    console.log("Extract Line Positions Test:");
+    console.log(positions);
+}
+
+function testCalculateWordConfidence() {
+    const text = "This is a test";
+    const confidences = [90, 85, 80, 95];
+    const result = calculateWordConfidence(text, confidences);
+    console.log("Calculate Word Confidence Test:");
+    console.log(result);
+}
+
+function testEdgeCases() {
+    console.log("Edge Cases Test:");
+
+    // Test empty text for line positions
+    const emptyTextPositions = extractLinePositions("");
+    console.log(emptyTextPositions);
+
+    // Test empty text for word confidence
+    try {
+        const emptyWordConfidence = calculateWordConfidence("", []);
+        console.log(emptyWordConfidence);
+    } catch (error) {
+        console.log(error.message);
+    }
+
+    // Test mismatched confidence array length
+    try {
+        const mismatchedConfidence = calculateWordConfidence("Hello world", [90]);
+        console.log(mismatchedConfidence);
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+// Run tests
+testExtractLinePositions();
+testCalculateWordConfidence();
+testEdgeCases();
