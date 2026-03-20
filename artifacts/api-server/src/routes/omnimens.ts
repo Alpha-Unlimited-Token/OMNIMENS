@@ -80,7 +80,7 @@ import { getAgentEvolutionState, getAgentProfile } from "../lib/omnimens-agent-e
 import { getAIResearchInsights, getNavigationRoboticsKnowledge, getEngineeringKnowledge, getCreativeDreamInsights, generateCreativeIdeation, getResearchSummary } from "../lib/omnimens-public-intelligence.js";
 import { getGuardianReport, getCopyrightNotice, getProtectedModuleList } from "../lib/omnimens-ip-guardian.js";
 import { getCausalState, getCausalGraph, predictOutcome } from "../lib/omnimens-causal-reasoning.js";
-import { getSensoryState, getRecentSignals } from "../lib/omnimens-sensory-cortex.js";
+import { getSensoryState, getRecentSignals, getAnomalies, getTrendHistory, getCrossChannelCorrelations, getAttentionFocus } from "../lib/omnimens-sensory-cortex.js";
 import { getSelfCodingState } from "../lib/omnimens-self-coding.js";
 import { getSourceIntegrationState } from "../lib/omnimens-source-integration.js";
 import { orchestrateReasoning, getOrchestratorState } from "../lib/omnimens-autonomous-orchestrator.js";
@@ -4268,7 +4268,7 @@ router.get("/omnimens/command-center", async (req, res) => {
         dreams: { state: dreamState, recentInsights: dreamInsights },
         sandbox: { state: sandbox },
         selfCoding: { state: selfCoding },
-        sensory: { state: sensory, recentSignals },
+        sensory: { state: sensory, recentSignals, anomalies: getAnomalies(5), trends: getTrendHistory(10), attention: getAttentionFocus() },
         causal: { state: causal, graphSize: { nodes: causalGraph.nodes.length, edges: causalGraph.edges.length } },
         embodiment: { state: embodiment },
         augmentation: { state: augmentation },
@@ -4333,7 +4333,11 @@ router.get("/omnimens/sensory-cortex", async (req, res) => {
     const state = getSensoryState();
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
     const signals = getRecentSignals(limit);
-    res.json({ state, signals });
+    const anomalies = getAnomalies(10);
+    const trends = getTrendHistory(20);
+    const correlations = getCrossChannelCorrelations();
+    const attention = getAttentionFocus();
+    res.json({ state, signals, anomalies, trends, correlations, attention });
   } catch {
     res.status(500).json({ error: "Failed to get sensory data" });
   }
