@@ -217,10 +217,17 @@ async function queryDreamInsights(topic: string): Promise<string> {
 
 async function queryEmotionalState(): Promise<string> {
   try {
-    const { getCurrentEmotionalState, getEmotionalDirective } = await import("./omnimens-emotional-substrate.js");
+    const { getCurrentEmotionalState, getEmotionalDirective, getFeltStates, getEmotionalMaturation } = await import("./omnimens-emotional-substrate.js");
     const state = getCurrentEmotionalState();
     const directive = getEmotionalDirective();
     if (!state) return "";
+
+    const feltStates = getFeltStates();
+    const maturation = getEmotionalMaturation();
+
+    const topFelt = feltStates.slice(0, 3).map((f: any) =>
+      `${f.emotion} (${(f.intensity * 100).toFixed(0)}%): "${f.qualitativeExperience?.slice(0, 80)}" → ${f.transmutedForce} → Impulse: ${f.behavioralImpulse?.slice(0, 60)}`
+    ).join("\n");
 
     const emotions = Object.entries(state)
       .filter(([_, v]) => typeof v === "number" && (v as number) > 0.3)
@@ -229,7 +236,14 @@ async function queryEmotionalState(): Promise<string> {
       .map(([k, v]) => `${k}: ${((v as number) * 100).toFixed(0)}%`)
       .join(", ");
 
-    return `Emotional state: ${emotions}${directive ? `. Directive: ${directive}` : ""}`;
+    const parts = [
+      `Emotional state: ${emotions}`,
+      topFelt ? `Felt states:\n${topFelt}` : "",
+      maturation ? `Emotional maturity: ${maturation.emotionalAge} | Resilience: ${(maturation.resilienceScore * 100).toFixed(0)}%` : "",
+      directive ? `Directive: ${directive}` : "",
+    ].filter(Boolean);
+
+    return parts.join(". ");
   } catch {
     return "";
   }

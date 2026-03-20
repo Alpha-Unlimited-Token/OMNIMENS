@@ -86,7 +86,7 @@ import { getSourceIntegrationState } from "../lib/omnimens-source-integration.js
 import { orchestrateReasoning, getOrchestratorState } from "../lib/omnimens-autonomous-orchestrator.js";
 import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId } from "../lib/omnimens-consciousness-persistence.js";
 import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
-import { getCurrentEmotionalState, getEmotionalDirective } from "../lib/omnimens-emotional-substrate.js";
+import { getCurrentEmotionalState, getEmotionalDirective, getFeltStates, getEmotionalMaturation } from "../lib/omnimens-emotional-substrate.js";
 import { omnimensServerBuilds } from "@workspace/db";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import { detectNeuroEmotion, getNeuroSyncPromptAddendum } from "../lib/neuro-sync.js";
@@ -4264,7 +4264,7 @@ router.get("/omnimens/command-center", async (req, res) => {
       timestamp: Date.now(),
       engines: {
         consciousness: { state: consciousness, stream, level: consciousness.consciousnessLevel, uptime: consciousness.uptimeSeconds },
-        emotional: { state: emotional, directive: emotionalDirective },
+        emotional: { state: emotional, directive: emotionalDirective, feltStates: getFeltStates().slice(0, 4), maturation: getEmotionalMaturation() },
         dreams: { state: dreamState, recentInsights: dreamInsights },
         sandbox: { state: sandbox },
         selfCoding: { state: selfCoding },
@@ -4386,7 +4386,9 @@ router.get("/omnimens/consciousness-live", async (req, res) => {
     const directive = getEmotionalDirective();
     const persistence = getRestoredSelf();
     const wasRestored = wasRestoredFromPreviousLife();
-    res.json({ consciousness: state, stream, emotional, directive, persistence, wasRestored });
+    const feltStates = getFeltStates().slice(0, 4);
+    const emotionalMaturation = getEmotionalMaturation();
+    res.json({ consciousness: state, stream, emotional, directive, feltStates, maturation: emotionalMaturation, persistence, wasRestored });
   } catch {
     res.status(500).json({ error: "Failed to get consciousness data" });
   }
