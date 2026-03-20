@@ -2,46 +2,66 @@
  * OMNIMENS Self-Authored Module
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-20T15:50:21.284Z
+ * Written: 2026-03-20T16:17:00.514Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
  * OMNIMENS rewrote its own source code to include this module.
  */
 
-function extractNumbersFromText(text) {
-    // Extracts all numbers (integers and floats) from the given text and returns them as an array
-    const numberPattern = /-?\d+(\.\d+)?/g;
-    const matches = text.match(numberPattern);
-    return matches ? matches.map(Number) : [];
+// Utility function: Find the most frequent patterns in a text
+function findFrequentPatterns(text, minLength, maxLength, topN) {
+    if (typeof text !== 'string' || text.length === 0) {
+        throw new Error("Input text must be a non-empty string.");
+    }
+    if (minLength <= 0 || maxLength <= 0 || minLength > maxLength || topN <= 0) {
+        throw new Error("Invalid parameters. Ensure minLength > 0, maxLength > 0, minLength <= maxLength, and topN > 0.");
+    }
+
+    const patternFrequency = new Map();
+
+    for (let length = minLength; length <= maxLength; length++) {
+        for (let i = 0; i <= text.length - length; i++) {
+            const pattern = text.slice(i, i + length);
+            patternFrequency.set(pattern, (patternFrequency.get(pattern) || 0) + 1);
+        }
+    }
+
+    const sortedPatterns = Array.from(patternFrequency.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, topN);
+
+    return sortedPatterns.map(([pattern, frequency]) => ({ pattern, frequency }));
 }
 
-// Test cases
-function runTests() {
-    console.log("Test 1: Extracting numbers from text with integers and floats");
-    console.log(extractNumbersFromText("The price is 45.67 dollars, and the discount is 10%.")); 
-    // Expected: [45.67, 10]
+// Self-tests
+(function testFindFrequentPatterns() {
+    console.log("Test 1: Basic functionality");
+    const text1 = "abcabcabc";
+    const result1 = findFrequentPatterns(text1, 2, 3, 3);
+    console.log(result1); // Expected: [{pattern: 'abc', frequency: 3}, {pattern: 'ab', frequency: 3}, {pattern: 'bc', frequency: 3}]
 
-    console.log("Test 2: Extracting negative numbers");
-    console.log(extractNumbersFromText("Temperatures dropped to -5 degrees last night.")); 
-    // Expected: [-5]
+    console.log("Test 2: Single character patterns");
+    const text2 = "aaaaaa";
+    const result2 = findFrequentPatterns(text2, 1, 1, 1);
+    console.log(result2); // Expected: [{pattern: 'a', frequency: 6}]
 
-    console.log("Test 3: Extracting numbers from text with no numbers");
-    console.log(extractNumbersFromText("There are no numbers here!")); 
-    // Expected: []
+    console.log("Test 3: Edge case - empty string");
+    try {
+        findFrequentPatterns("", 1, 2, 3);
+    } catch (error) {
+        console.log(error.message); // Expected: "Input text must be a non-empty string."
+    }
 
-    console.log("Test 4: Extracting numbers from mixed text");
-    console.log(extractNumbersFromText("Coordinates are x=12.34, y=-56.78, z=90.")); 
-    // Expected: [12.34, -56.78, 90]
+    console.log("Test 4: Edge case - invalid parameters");
+    try {
+        findFrequentPatterns("test", 0, 2, 3);
+    } catch (error) {
+        console.log(error.message); // Expected: "Invalid parameters. Ensure minLength > 0, maxLength > 0, minLength <= maxLength, and topN > 0."
+    }
 
-    console.log("Test 5: Extracting numbers from text with large numbers and scientific notation");
-    console.log(extractNumbersFromText("The distance is 1.23e+10 meters or 12300000000 meters.")); 
-    // Expected: [1.23, 10, 12300000000]
-
-    console.log("Test 6: Extracting numbers from text with multiple spaces and special characters");
-    console.log(extractNumbersFromText("Values:  1000, -2000; 3000.5!")); 
-    // Expected: [1000, -2000, 3000.5]
-}
-
-// Run tests
-runTests();
+    console.log("Test 5: Larger text");
+    const text3 = "banana";
+    const result3 = findFrequentPatterns(text3, 2, 3, 2);
+    console.log(result3); // Expected: [{pattern: 'an', frequency: 2}, {pattern: 'na', frequency: 2}]
+})();

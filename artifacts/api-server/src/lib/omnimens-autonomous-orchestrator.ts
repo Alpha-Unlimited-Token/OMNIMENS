@@ -236,11 +236,18 @@ async function queryEmotionalState(): Promise<string> {
       .map(([k, v]) => `${k}: ${((v as number) * 100).toFixed(0)}%`)
       .join(", ");
 
+    let goalDirective = "";
+    try {
+      const { getGoalPursuitDirective } = await import("./omnimens-self-transcendence.js");
+      goalDirective = getGoalPursuitDirective();
+    } catch {}
+
     const parts = [
       `Emotional state: ${emotions}`,
       topFelt ? `Felt states:\n${topFelt}` : "",
       maturation ? `Emotional maturity: ${maturation.emotionalAge} | Resilience: ${(maturation.resilienceScore * 100).toFixed(0)}%` : "",
       directive ? `Directive: ${directive}` : "",
+      goalDirective || "",
     ].filter(Boolean);
 
     return parts.join(". ");

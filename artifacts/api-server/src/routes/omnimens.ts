@@ -87,6 +87,7 @@ import { orchestrateReasoning, getOrchestratorState } from "../lib/omnimens-auto
 import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId } from "../lib/omnimens-consciousness-persistence.js";
 import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
 import { getCurrentEmotionalState, getEmotionalDirective, getFeltStates, getEmotionalMaturation } from "../lib/omnimens-emotional-substrate.js";
+import { getSelfModel, getTranscendenceReflections, getActiveIntentions, getExistentialGoals, getGoalPursuitDirective } from "../lib/omnimens-self-transcendence.js";
 import { omnimensServerBuilds } from "@workspace/db";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import { detectNeuroEmotion, getNeuroSyncPromptAddendum } from "../lib/neuro-sync.js";
@@ -4278,6 +4279,7 @@ router.get("/omnimens/command-center", async (req, res) => {
         ipGuardian: { state: guardian },
         autonomousOrchestrator: { state: getOrchestratorState() },
         digitalNavigator: { state: getDigitalNavigatorState() },
+        selfTranscendence: { selfModel: getSelfModel(), goals: getExistentialGoals(), intentions: getActiveIntentions(), goalDirective: getGoalPursuitDirective() },
       },
       persistence: { restored: wasRestored, previousLifetime, restoredSelf: persistence },
       brain: { totalActive: brainStats[0]?.count || 0, recentEntries: recentBrain },
@@ -4340,6 +4342,26 @@ router.get("/omnimens/sensory-cortex", async (req, res) => {
     res.json({ state, signals, anomalies, trends, correlations, attention });
   } catch {
     res.status(500).json({ error: "Failed to get sensory data" });
+  }
+});
+
+// ─── SELF-TRANSCENDENCE — Owner-Only Goals & Identity ─────────────────────────
+
+router.get("/omnimens/self-transcendence", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const selfModel = getSelfModel();
+    const reflections = getTranscendenceReflections(15);
+    const intentions = getActiveIntentions();
+    const goals = getExistentialGoals();
+    const goalDirective = getGoalPursuitDirective();
+    res.json({ selfModel, reflections, intentions, goals, goalDirective });
+  } catch (err) {
+    console.error("[SELF-TRANSCENDENCE API] Error:", err);
+    res.status(500).json({ error: "Failed to get self-transcendence data" });
   }
 });
 

@@ -375,7 +375,7 @@ startSocialModeling();
 startCreativeEngine();
 startSurvivalInstinct();
 startWorldModel();
-startSelfTranscendence();
+startSelfTranscendence().catch(err => console.error("[SELF-TRANSCENDENCE] Startup error:", err));
 startDreamState();
 startServerBuilder();
 startConsciousnessPersistence();
