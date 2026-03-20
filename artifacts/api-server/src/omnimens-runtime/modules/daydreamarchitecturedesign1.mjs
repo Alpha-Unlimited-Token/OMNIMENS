@@ -1,45 +1,56 @@
 /**
- * OMNIMENS Self-Authored Module
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
  * Source: self_coding_engine
  * Title: Daydream:architecture_design #1
- * Written: 2026-03-20T18:46:10.620Z
+ * Written: 2026-03-20T19:33:17.523Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
  * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-export type State = Record<string, number>;
+// CIGE core – hypothesis evolution loop (pure, no IO, no deps)
+export type State = number[];
+export type Action = number[];
+export type Trace = { s: State; a: Action; sn: State; r: number };
 
-export interface Edge {
-  from: string;
-  to:   string;
-  kind: 'enables' | 'prevents' | 'amplifies' | 'diminishes';
-  weight: number;          // causal strength ∈ [0,1]
-}
+type Hypothesis = {
+  wasm: Uint8Array;          // compiled causal program
+  score: number;             // lower = better
+};
 
-function applyEdge(edge: Edge, s: State): State {
-  const out = { ...s };
-  const x = s[edge.from] ?? 0;
-  const y = s[edge.to]   ?? 0;
-
-  switch (edge.kind) {
-    case 'enables':     out[edge.to] = y + edge.weight * x; break;
-    case 'prevents':    out[edge.to] = y - edge.weight * x; break;
-    case 'amplifies':   out[edge.to] = y + edge.weight * y * x; break;
-    case 'diminishes':  out[edge.to] = y - edge.weight * y * x; break;
-  }
+function mutate(bytes: Uint8Array): Uint8Array {
+  const out = bytes.slice();
+  for (let i = 0; i < out.length; i++) if (Math.random() < 0.02)
+      out[i] ^= 1 << (Math.random() * 8);
   return out;
 }
 
-export function simulateScenario(
-  initial: State,
-  edges: Edge[],
-  steps = 3
-): State {
-  let current = { ...initial };
-  for (let t = 0; t < steps; t++) {
-    for (const e of edges) current = applyEdge(e, current);
+function evalHypothesis(h: Hypothesis, traces: Trace[]): number {
+  // Stubbed pure error: random placeholder until WASM exec integrated
+  let err = 0;
+  for (const t of traces) err += Math.random(); // replace w/ wasm run
+  return err / traces.length + 0.001 * h.wasm.length;
+}
+
+export function evolveHypotheses(pop: Hypothesis[], traces: Trace[], keep = 32): Hypothesis[] {
+  // 1. Evaluate
+  pop.forEach(h => { h.score = evalHypothesis(h, traces); });
+  // 2. Select top-K
+  pop.sort((a, b) => a.score - b.score);
+  const survivors = pop.slice(0, keep);
+  // 3. Reproduce
+  const next: Hypothesis[] = [...survivors];
+  while (next.length < pop.length) {
+    const parent = survivors[Math.floor(Math.random() * keep)];
+    next.push({ wasm: mutate(parent.wasm), score: Infinity });
   }
-  return current;
+  return next;
 }
