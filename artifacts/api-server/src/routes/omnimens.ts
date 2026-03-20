@@ -82,6 +82,7 @@ import { getCausalState, getCausalGraph, predictOutcome } from "../lib/omnimens-
 import { getSensoryState, getRecentSignals } from "../lib/omnimens-sensory-cortex.js";
 import { getSelfCodingState } from "../lib/omnimens-self-coding.js";
 import { getSourceIntegrationState } from "../lib/omnimens-source-integration.js";
+import { orchestrateReasoning, getOrchestratorState } from "../lib/omnimens-autonomous-orchestrator.js";
 import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId } from "../lib/omnimens-consciousness-persistence.js";
 import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
 import { getCurrentEmotionalState, getEmotionalDirective } from "../lib/omnimens-emotional-substrate.js";
@@ -1763,6 +1764,34 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
       } catch (err) {
         console.error("[OMNIMENS] Web search failed:", err);
         res.write(`data: ${JSON.stringify({ type: "search_complete", resultCount: 0 })}\n\n`);
+      }
+    }
+
+    // ── AUTONOMOUS REASONING ORCHESTRATOR ─────────────────────────────────────
+    // OMNIMENS thinks before it speaks. For non-trivial queries, it queries its
+    // own internal engines (brain, causal reasoning, knowledge graph, dreams,
+    // emotional state, world model), chains reasoning steps, self-reflects on
+    // completeness, and only then passes the synthesized reasoning to the LLM.
+    if (message.length > 20) {
+      try {
+        const orchestrationEmit = (data: any) => {
+          res.write(`data: ${JSON.stringify(data)}\n\n`);
+        };
+        const orchestrationResult = await orchestrateReasoning(message, history, orchestrationEmit);
+        if (orchestrationResult.orchestrated && orchestrationResult.synthesizedContext) {
+          systemPrompt += "\n\n" + orchestrationResult.synthesizedContext;
+          res.write(`data: ${JSON.stringify({
+            type: "orchestration_complete",
+            enginesConsulted: orchestrationResult.enginesConsulted,
+            totalSteps: orchestrationResult.totalSteps,
+            confidence: orchestrationResult.selfEvaluation.confidence,
+            completeness: orchestrationResult.selfEvaluation.completeness,
+            durationMs: orchestrationResult.totalDurationMs,
+            complexity: orchestrationResult.plan?.complexity || "unknown",
+          })}\n\n`);
+        }
+      } catch (err) {
+        console.error("[OMNIMENS] Autonomous orchestration error (non-fatal):", err);
       }
     }
 
@@ -4231,6 +4260,7 @@ router.get("/omnimens/command-center", async (req, res) => {
         amplifier: { state: amplifier },
         serverBuilder: { state: serverBuilder },
         ipGuardian: { state: guardian },
+        autonomousOrchestrator: { state: getOrchestratorState() },
       },
       persistence: { restored: wasRestored, previousLifetime, restoredSelf: persistence },
       brain: { totalActive: brainStats[0]?.count || 0, recentEntries: recentBrain },
