@@ -2,45 +2,86 @@
  * OMNIMENS Self-Authored Module
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-20T15:04:16.902Z
+ * Written: 2026-03-20T15:14:10.839Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
  * OMNIMENS rewrote its own source code to include this module.
  */
 
-function extractUniqueKeywords(textArray) {
-    // Utility function to extract unique keywords from an array of strings
-    // Removes common stopwords and returns a sorted list of unique keywords
-    const stopwords = new Set([
-        'and', 'or', 'the', 'is', 'to', 'in', 'of', 'a', 'on', 'with', 'for', 'by', 'an', 'at', 'as', 'this', 'that', 'it', 'be', 'from', 'are', 'was', 'but', 'if', 'not', 'they', 'their', 'we', 'you', 'your', 'our', 'can', 'will', 'has', 'have', 'had', 'do', 'does', 'did'
-    ]);
+function extractTablesFromText(text) {
+    // Extract tables from a given text input
+    const tables = [];
+    const tableRegex = /\[table\](.*?)\[\/table\]/gs;
 
-    const keywords = new Set();
+    let match;
+    while ((match = tableRegex.exec(text)) !== null) {
+        const tableContent = match[1].trim();
+        const rows = tableContent.split('\n').map(row => row.split('|').map(cell => cell.trim()));
+        tables.push(rows);
+    }
 
-    textArray.forEach(text => {
-        const words = text.toLowerCase().match(/\b[a-z]+\b/g);
-        if (words) {
-            words.forEach(word => {
-                if (!stopwords.has(word)) {
-                    keywords.add(word);
-                }
-            });
-        }
-    });
-
-    return Array.from(keywords).sort();
+    return tables;
 }
 
 // Test cases
-const testTexts = [
-    "A breakthrough AI model shows improved understanding of sensory cortex perception.",
-    "Major tech firms announce collaboration on developing sensory cortex perception.",
-    "New research reveals significant breakthroughs in sensory cortex perception."
-];
+function runTests() {
+    const testText1 = `
+        Some random text here.
+        [table]
+        Name | Age | Location
+        John | 25  | USA
+        Jane | 30  | UK
+        [/table]
+        More random text.
+    `;
 
-const result = extractUniqueKeywords(testTexts);
-console.log(result);
+    const testText2 = `
+        [table]
+        Product | Price | Quantity
+        Apple   | 1.00  | 10
+        Banana  | 0.50  | 20
+        [/table]
+        [table]
+        Day | Temperature | Condition
+        Mon | 22C         | Sunny
+        Tue | 18C         | Rainy
+        [/table]
+    `;
 
-// Expected output: A sorted array of unique keywords excluding stopwords
-// Example: ['ai', 'announce', 'breakthrough', 'breakthroughs', 'collaboration', 'cortex', 'developing', 'firms', 'improved', 'major', 'model', 'new', 'perception', 'research', 'reveals', 'sensory', 'shows', 'significant', 'understanding']
+    const testText3 = `
+        No tables here, just plain text.
+    `;
+
+    console.log("Test Case 1:");
+    console.log(extractTablesFromText(testText1));
+    console.log("Expected:", [
+        [
+            ["Name", "Age", "Location"],
+            ["John", "25", "USA"],
+            ["Jane", "30", "UK"]
+        ]
+    ]);
+
+    console.log("Test Case 2:");
+    console.log(extractTablesFromText(testText2));
+    console.log("Expected:", [
+        [
+            ["Product", "Price", "Quantity"],
+            ["Apple", "1.00", "10"],
+            ["Banana", "0.50", "20"]
+        ],
+        [
+            ["Day", "Temperature", "Condition"],
+            ["Mon", "22C", "Sunny"],
+            ["Tue", "18C", "Rainy"]
+        ]
+    ]);
+
+    console.log("Test Case 3:");
+    console.log(extractTablesFromText(testText3));
+    console.log("Expected:", []);
+}
+
+// Run tests
+runTests();

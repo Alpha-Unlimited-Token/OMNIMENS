@@ -75,6 +75,7 @@ import { getSandboxState, runInSandbox } from "../lib/omnimens-autonomous-sandbo
 import { getEmbodimentState, getEmbodimentFiles, readEmbodimentFile } from "../lib/omnimens-embodiment-engine.js";
 import { getAmplifierState } from "../lib/omnimens-cognitive-amplifier.js";
 import { getAugmentationState } from "../lib/omnimens-virtual-augmentation.js";
+import { getDigitalNavigatorState, getNavigationSummary, navigateTo, getDigitalMap } from "../lib/omnimens-digital-navigator.js";
 import { getAgentEvolutionState, getAgentProfile } from "../lib/omnimens-agent-evolution.js";
 import { getAIResearchInsights, getNavigationRoboticsKnowledge, getEngineeringKnowledge, getCreativeDreamInsights, generateCreativeIdeation, getResearchSummary } from "../lib/omnimens-public-intelligence.js";
 import { getGuardianReport, getCopyrightNotice, getProtectedModuleList } from "../lib/omnimens-ip-guardian.js";
@@ -4032,6 +4033,21 @@ router.get("/omnimens/sandbox/modules", async (req, res) => {
 
 // ─── Virtual Augmentation (OWNER-ONLY) ────────────────────────────────────────
 
+router.get("/omnimens/digital-navigator", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const navigatorState = getDigitalNavigatorState();
+    const summary = getNavigationSummary();
+    const map = getDigitalMap();
+    res.json({ navigatorState, summary, map });
+  } catch {
+    res.status(500).json({ error: "Failed to get digital navigator data" });
+  }
+});
+
 router.get("/omnimens/virtual-augmentation", async (req, res) => {
   if (!req.isAuthenticated() || !isOwner(req.user.id)) {
     res.status(403).json({ error: "Owner only" });
@@ -4261,6 +4277,7 @@ router.get("/omnimens/command-center", async (req, res) => {
         serverBuilder: { state: serverBuilder },
         ipGuardian: { state: guardian },
         autonomousOrchestrator: { state: getOrchestratorState() },
+        digitalNavigator: { state: getDigitalNavigatorState() },
       },
       persistence: { restored: wasRestored, previousLifetime, restoredSelf: persistence },
       brain: { totalActive: brainStats[0]?.count || 0, recentEntries: recentBrain },

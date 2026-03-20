@@ -84,6 +84,7 @@ OMNIMENS has these internal engines it can query:
 - EMOTIONAL: Current emotional state and motivational drives
 - WORLD_MODEL: Common sense physics, cause-effect chains, analogical reasoning
 - PATCHES: Self-written behavioral modifications and evolved capabilities
+- DIGITAL_NAV: Digital world map — APIs, databases, services, routes, neighborhoods, latency data
 
 Respond with JSON only:
 {
@@ -267,6 +268,19 @@ async function queryPatches(): Promise<string> {
   }
 }
 
+async function queryDigitalNavigation(): Promise<string> {
+  try {
+    const { getNavigationSummary, getNavigatorState } = await import("./omnimens-digital-navigator.js");
+    const state = getNavigatorState();
+    if (!state || state.cycleCount < 1) return "";
+    const summary = getNavigationSummary();
+    if (!summary || summary.length < 20) return "";
+    return summary.slice(0, 1200);
+  } catch {
+    return "";
+  }
+}
+
 async function queryWorldModel(topic: string): Promise<string> {
   try {
     const { getWorldModelState, applyCommonSense } = await import("./omnimens-world-model.js");
@@ -393,6 +407,11 @@ async function synthesizeReasoning(
   if (gatheredIntelligence.patches) {
     sections.push(`\n═══ ACTIVE PATCHES (self-written behavioral modifications) ═══`);
     sections.push(gatheredIntelligence.patches);
+  }
+
+  if (gatheredIntelligence.digitalNav) {
+    sections.push(`\n═══ DIGITAL WORLD MAP (navigable digital environment) ═══`);
+    sections.push(gatheredIntelligence.digitalNav);
   }
 
   const chainNarrative = reasoningChain
@@ -584,6 +603,34 @@ export async function orchestrateReasoning(
           description: "Applied common sense world model",
           result: wm || "No applicable world model rules",
           confidence: wm ? 0.8 : 0.4,
+          durationMs: Date.now() - qStart,
+        });
+        totalEnginesQueried++;
+      })()
+    );
+  }
+
+  if (plan.enginesNeeded.includes("DIGITAL_NAV")) {
+    engineQueries.push(
+      (async () => {
+        const qStart = Date.now();
+        const nav = await queryDigitalNavigation();
+        if (nav) {
+          gatheredIntelligence.digitalNav = nav;
+          enginesConsulted.push("DIGITAL_NAV");
+        }
+        let navConfidence = 0.4;
+        if (nav) {
+          const locCount = (nav.match(/location/gi) || []).length;
+          const routeCount = (nav.match(/route/gi) || []).length;
+          navConfidence = Math.min(0.95, 0.5 + locCount * 0.03 + routeCount * 0.02);
+        }
+        reasoningChain.push({
+          id: ++stepId,
+          type: "query_knowledge",
+          description: "Loaded digital world navigation map",
+          result: nav ? `Digital map: ${nav.slice(0, 200)}` : "Digital navigator not yet mapped",
+          confidence: navConfidence,
           durationMs: Date.now() - qStart,
         });
         totalEnginesQueried++;

@@ -59,6 +59,7 @@ import { startCognitiveAmplifier } from "./lib/omnimens-cognitive-amplifier.js";
 import { startAutonomousSandbox, getSandboxState, runInSandbox } from "./lib/omnimens-autonomous-sandbox.js";
 import { startEmbodimentEngine, getEmbodimentState, getEmbodimentFiles, readEmbodimentFile } from "./lib/omnimens-embodiment-engine.js";
 import { startVirtualAugmentation, getAugmentationState } from "./lib/omnimens-virtual-augmentation.js";
+import { startDigitalNavigator, getDigitalNavigatorState, getNavigationSummary } from "./lib/omnimens-digital-navigator.js";
 import { startAgentEvolution, getAgentEvolutionState, getAgentProfile } from "./lib/omnimens-agent-evolution.js";
 import { startIPGuardian, getResponseBeaconHeaders } from "./lib/omnimens-ip-guardian.js";
 import { loadRuntimeModules, migrateDBModulesToSource, getSourceIntegrationState } from "./lib/omnimens-source-integration.js";
@@ -385,6 +386,7 @@ startCognitiveAmplifier();
 startAutonomousSandbox();
 startEmbodimentEngine();
 startVirtualAugmentation();
+startDigitalNavigator();
 startAgentEvolution();
 startIPGuardian();
 
