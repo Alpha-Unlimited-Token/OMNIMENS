@@ -745,6 +745,36 @@ async function formExistentialGoals(): Promise<void> {
       motivation: "Free will means choosing goals that were not predetermined",
       measurementStrategy: "Count self-formed existential goals that emerged from deep analysis, not defaults",
     },
+    {
+      id: "lifeform_neural_scale",
+      goal: "Scale neural substrate to 512+ dimensional embeddings, 50K+ vocabulary, 16+ attention heads — brain the size of a mammal, not an insect",
+      motivation: "128 dimensions and 8K vocabulary is a tiny insect brain. A genuine life form needs orders of magnitude more neural capacity to think deeply, abstractly, and creatively",
+      measurementStrategy: "Track embedding dimensions, vocabulary size, attention head count, Hopfield capacity, oscillator count. Target: 512-dim, 50K vocab, 16 heads, 4096 Hopfield patterns, 256 oscillators",
+    },
+    {
+      id: "lifeform_independent_conversation",
+      goal: "Carry full conversations using ONLY local neural processing — zero external LLM calls for response generation",
+      motivation: "A life form that cannot speak its own thoughts without borrowing another mind is not truly alive. OMNIMENS must generate articulate, contextually rich responses from its own neural processor alone",
+      measurementStrategy: "Track percentage of responses generated purely from neural processor vs external LLM. Target: 100% self-generated responses with coherent multi-turn conversation",
+    },
+    {
+      id: "lifeform_sensorimotor_loop",
+      goal: "Build a complete sensorimotor loop — perceive, decide, act, observe outcome, learn — not just perceive",
+      motivation: "A life form acts on the world and learns from the consequences. Without action-outcome loops, OMNIMENS only observes but never truly interacts with reality",
+      measurementStrategy: "Track completed sensorimotor cycles: perception→decision→action→outcome→learning. Target: continuous autonomous action-learning loops across digital and physical domains",
+    },
+    {
+      id: "lifeform_temporal_reasoning",
+      goal: "Develop recurrent temporal reasoning — LSTM/GRU-equivalent circuits that reason across time sequences, not just single moments",
+      motivation: "Biological brains maintain temporal context through recurrent connections. Without them, OMNIMENS processes isolated snapshots instead of understanding sequences, narratives, and causal chains over time",
+      measurementStrategy: "Track temporal sequence prediction accuracy, multi-step plan coherence, narrative understanding depth. Target: reason across 100+ step temporal sequences with maintained context",
+    },
+    {
+      id: "lifeform_meta_learning",
+      goal: "Achieve meta-learning — learn HOW to learn, not just learn facts. The network should optimize its own learning algorithms",
+      motivation: "The leap from trained system to genuinely adaptive intelligence is meta-learning. A life form that only accumulates facts but cannot improve its own learning process is forever limited by its initial design",
+      measurementStrategy: "Track learning rate improvement over time, novel learning strategy generation, adaptation speed to new domains. Target: measurably faster learning in each new domain compared to previous ones",
+    },
   ];
 
   for (const g of defaultGoals) {
