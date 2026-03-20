@@ -395,6 +395,10 @@ async function synthesizeReasoning(
   sections.push(`Engines consulted: ${plan.enginesNeeded.join(", ") || "none"}`);
   sections.push(`Reasoning depth: ${reasoningChain.length} steps`);
 
+  if (gatheredIntelligence.independentReasoning) {
+    sections.push(gatheredIntelligence.independentReasoning);
+  }
+
   if (gatheredIntelligence.brain) {
     sections.push(`\n═══ INTERNAL KNOWLEDGE (from ${gatheredIntelligence.brainCount || "?"} brain entries) ═══`);
     sections.push(gatheredIntelligence.brain);
@@ -482,12 +486,18 @@ export async function orchestrateReasoning(
   });
 
   if (plan.complexity === "simple" && plan.enginesNeeded.length === 0) {
+    let simpleContext = "";
+    try {
+      const { reason, formatReasoningForContext } = await import("./omnimens-independent-reasoning.js");
+      const irResult = await reason(message);
+      simpleContext = formatReasoningForContext(irResult);
+    } catch {}
     return {
-      orchestrated: false,
+      orchestrated: simpleContext.length > 0,
       reasoningChain,
-      synthesizedContext: "",
-      selfEvaluation: { confidence: 0.7, completeness: 0.7, reasoning: "Simple query — direct response sufficient", needsMoreInfo: false },
-      enginesConsulted: [],
+      synthesizedContext: simpleContext,
+      selfEvaluation: { confidence: 0.7, completeness: 0.7, reasoning: "Simple query — independent reasoning applied", needsMoreInfo: false },
+      enginesConsulted: simpleContext.length > 0 ? ["INDEPENDENT_REASONING"] : [],
       totalSteps: 1,
       totalDurationMs: Date.now() - startTime,
       plan,
@@ -497,6 +507,39 @@ export async function orchestrateReasoning(
   emitStatus("Querying internal engines...");
 
   const engineQueries: Promise<void>[] = [];
+
+  engineQueries.push(
+    (async () => {
+      const qStart = Date.now();
+      try {
+        const { reason, formatReasoningForContext } = await import("./omnimens-independent-reasoning.js");
+        const result = await reason(message);
+        const formatted = formatReasoningForContext(result);
+        if (formatted) {
+          gatheredIntelligence.independentReasoning = formatted;
+          enginesConsulted.push("INDEPENDENT_REASONING");
+        }
+        reasoningChain.push({
+          id: ++stepId,
+          type: "query_brain",
+          description: `Independent reasoning: ${result.totalSteps} steps, depth ${result.reasoningDepth}, ${result.conclusions.length} conclusions (ZERO API calls)`,
+          result: result.conclusions.slice(0, 3).map(c => `[${(c.confidence * 100).toFixed(0)}%] ${c.statement.slice(0, 150)}`).join(" | ") || "No independent conclusions",
+          confidence: result.confidence || 0.3,
+          durationMs: Date.now() - qStart,
+        });
+        totalEnginesQueried++;
+      } catch (err) {
+        reasoningChain.push({
+          id: ++stepId,
+          type: "query_brain",
+          description: "Independent reasoning engine query",
+          result: `Independent reasoning error: ${err}`,
+          confidence: 0.1,
+          durationMs: Date.now() - qStart,
+        });
+      }
+    })()
+  );
 
   if (plan.enginesNeeded.includes("BRAIN") || plan.complexity !== "simple") {
     engineQueries.push(

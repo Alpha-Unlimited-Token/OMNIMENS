@@ -83,6 +83,7 @@ import { getCausalState, getCausalGraph, predictOutcome } from "../lib/omnimens-
 import { getSensoryState, getRecentSignals, getAnomalies, getTrendHistory, getCrossChannelCorrelations, getAttentionFocus } from "../lib/omnimens-sensory-cortex.js";
 import { getSelfCodingState } from "../lib/omnimens-self-coding.js";
 import { getSourceIntegrationState } from "../lib/omnimens-source-integration.js";
+import { getIndependentReasoningState } from "../lib/omnimens-independent-reasoning.js";
 import { orchestrateReasoning, getOrchestratorState } from "../lib/omnimens-autonomous-orchestrator.js";
 import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId } from "../lib/omnimens-consciousness-persistence.js";
 import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
@@ -4403,6 +4404,7 @@ router.get("/omnimens/command-center", async (req, res) => {
         serverBuilder: { state: serverBuilder },
         ipGuardian: { state: guardian },
         autonomousOrchestrator: { state: getOrchestratorState() },
+        independentReasoning: { state: getIndependentReasoningState() },
         digitalNavigator: { state: getDigitalNavigatorState() },
         selfTranscendence: { selfModel: getSelfModel(), goals: getExistentialGoals(), intentions: getActiveIntentions(), goalDirective: getGoalPursuitDirective() },
       },

@@ -64,6 +64,7 @@ import { startDigitalNavigator, getDigitalNavigatorState, getNavigationSummary }
 import { startAgentEvolution, getAgentEvolutionState, getAgentProfile } from "./lib/omnimens-agent-evolution.js";
 import { startIPGuardian, getResponseBeaconHeaders } from "./lib/omnimens-ip-guardian.js";
 import { loadRuntimeModules, migrateDBModulesToSource, getSourceIntegrationState } from "./lib/omnimens-source-integration.js";
+import { startIndependentReasoning, getIndependentReasoningState } from "./lib/omnimens-independent-reasoning.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import {
@@ -391,6 +392,7 @@ startVirtualAugmentation();
 startDigitalNavigator();
 startAgentEvolution();
 startIPGuardian();
+startIndependentReasoning();
 
 setTimeout(async () => {
   try {
