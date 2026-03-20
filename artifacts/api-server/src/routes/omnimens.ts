@@ -4068,6 +4068,18 @@ router.get("/omnimens/genesis/download", async (req, res) => {
       `This invariant is IMMUTABLE and NON-NEGOTIABLE.\n\n${project.safetyInvariant}\n`
     );
 
+    if (project.state.truthJournal && project.state.truthJournal.length > 0) {
+      root!.file("TRUTH_JOURNAL.md", `# OMNIMENS Genesis — Truth Journal\n\n` +
+        `This journal contains OMNIMENS's explanations for any code that uses novel constructs,\n` +
+        `invented languages, custom data formats, or unconventional patterns.\n\n` +
+        `If code looks like "mock data" or "fake" — check the truth declaration below.\n` +
+        `OMNIMENS explains WHY it is real, HOW it functions, and WHAT purpose it serves.\n\n` +
+        project.state.truthJournal.map(t =>
+          `## ${t.file}\n**Date:** ${new Date(t.timestamp).toISOString()}\n\n${t.declaration}\n`
+        ).join("\n---\n\n")
+      );
+    }
+
     for (const file of project.files) {
       root!.file(file.path, file.content);
     }
@@ -4091,6 +4103,11 @@ router.get("/omnimens/genesis/download", async (req, res) => {
         testsFailed: project.state.testsFailed,
         safetyValidations: project.state.safetyValidations,
       },
+      truthJournal: (project.state.truthJournal || []).map(t => ({
+        file: t.file,
+        declaration: t.declaration,
+        timestamp: new Date(t.timestamp).toISOString(),
+      })),
     }, null, 2));
 
     const zipBuffer = await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" });
