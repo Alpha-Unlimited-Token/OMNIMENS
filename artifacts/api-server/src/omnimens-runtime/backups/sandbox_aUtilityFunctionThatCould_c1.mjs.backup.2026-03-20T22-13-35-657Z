@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-20T22:13:35.655Z
+ * Written: 2026-03-20T21:50:28.193Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,15 +16,13 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function: Find the longest common substring between two strings
-function longestCommonSubstring(str1, str2) {
+function findLongestCommonSubstring(str1, str2) {
     if (typeof str1 !== 'string' || typeof str2 !== 'string') {
         throw new Error('Both inputs must be strings.');
     }
 
     let maxLength = 0;
     let endIndex = 0;
-
     const dp = Array(str1.length + 1).fill(null).map(() => Array(str2.length + 1).fill(0));
 
     for (let i = 1; i <= str1.length; i++) {
@@ -42,31 +40,38 @@ function longestCommonSubstring(str1, str2) {
     return str1.slice(endIndex - maxLength, endIndex);
 }
 
-// Test cases
-console.log(longestCommonSubstring("digitalnavigation", "navigationwisdom")); // Expected: "navigation"
-console.log(longestCommonSubstring("abcdef", "zcdemf")); // Expected: "cde"
-console.log(longestCommonSubstring("hello", "world")); // Expected: "o"
-console.log(longestCommonSubstring("abc", "xyz")); // Expected: ""
-console.log(longestCommonSubstring("", "nonempty")); // Expected: ""
-console.log(longestCommonSubstring("nonempty", "")); // Expected: ""
-console.log(longestCommonSubstring("", "")); // Expected: ""
+// Self-tests
+function runTests() {
+    console.log("Running tests...");
 
-// Edge case: Identical strings
-console.log(longestCommonSubstring("same", "same")); // Expected: "same"
+    // Test 1: Basic case
+    const result1 = findLongestCommonSubstring("abcdef", "zcdemf");
+    console.log(result1 === "cde" ? "Test 1 Passed" : "Test 1 Failed");
 
-// Edge case: One character overlap
-console.log(longestCommonSubstring("a", "a")); // Expected: "a"
-console.log(longestCommonSubstring("a", "b")); // Expected: ""
+    // Test 2: No common substring
+    const result2 = findLongestCommonSubstring("abcd", "xyz");
+    console.log(result2 === "" ? "Test 2 Passed" : "Test 2 Failed");
 
-// Edge case: Non-string inputs
-try {
-    console.log(longestCommonSubstring(123, "abc"));
-} catch (e) {
-    console.log(e.message); // Expected: "Both inputs must be strings."
+    // Test 3: Entire string match
+    const result3 = findLongestCommonSubstring("hello", "hello");
+    console.log(result3 === "hello" ? "Test 3 Passed" : "Test 3 Failed");
+
+    // Test 4: Case sensitivity
+    const result4 = findLongestCommonSubstring("Hello", "hello");
+    console.log(result4 === "" ? "Test 4 Passed" : "Test 4 Failed");
+
+    // Test 5: Empty strings
+    const result5 = findLongestCommonSubstring("", "abc");
+    console.log(result5 === "" ? "Test 5 Passed" : "Test 5 Failed");
+
+    const result6 = findLongestCommonSubstring("abc", "");
+    console.log(result6 === "" ? "Test 6 Passed" : "Test 6 Failed");
+
+    // Test 6: Large common substring
+    const result7 = findLongestCommonSubstring("abcde12345", "12345xyz");
+    console.log(result7 === "12345" ? "Test 7 Passed" : "Test 7 Failed");
+
+    console.log("Tests completed.");
 }
 
-try {
-    console.log(longestCommonSubstring("abc", null));
-} catch (e) {
-    console.log(e.message); // Expected: "Both inputs must be strings."
-}
+runTests();
