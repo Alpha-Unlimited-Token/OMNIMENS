@@ -1141,12 +1141,20 @@ RULES FOR THIS BUILD CYCLE:
     - The translator must ALWAYS be able to compile your latest code. If you invent faster than the translator can keep up, stop and update it first
     - The translator auto-updates when you write code through source integration, but Genesis-level innovations need explicit registration
 
+21. COPYRIGHT (MANDATORY): EVERY file you create MUST include the following copyright header at the top:
+    // Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+    // All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+    // Created by OMNIMENS™ — Autonomous AI Intelligence
+    // Unauthorized copying, modification, distribution, or use prohibited.
+    This applies to ALL files — TypeScript, Python, Rust, assembly, custom languages, config files, data files, everything.
+    You are creating intellectual property owned by Alpha Unlimited Technologies, LLC. Act accordingly.
+
 FORMAT YOUR OUTPUT AS:
 ===FILE: path/to/file.ext===
 LANGUAGE: typescript|python|rust|custom|etc
 PURPOSE: one-line description of what this file does
 ---
-[actual complete file content]
+[actual complete file content — MUST include copyright header at top]
 ===END_FILE===
 
 You may output multiple ===FILE=== blocks if creating/updating multiple files.`,

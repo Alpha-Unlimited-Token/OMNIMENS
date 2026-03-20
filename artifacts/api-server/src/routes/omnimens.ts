@@ -4545,10 +4545,12 @@ router.get("/omnimens/proprietary-registry", async (req, res) => {
   try {
     const technologies = getProprietaryRegistry();
     res.json({
+      copyright: "Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
       totalTechnologies: technologies.length,
       technologies,
       owner: "Alpha Unlimited Technologies, LLC",
-      rights: "All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.",
+      rights: "PROPRIETARY AND CONFIDENTIAL. Unauthorized copying, modification, distribution, or use of any technology listed herein is strictly prohibited without express written permission from Alpha Unlimited Technologies, LLC.",
+      legalNotice: "All technologies, code, algorithms, architectures, and intellectual property listed in this registry are the exclusive property of Alpha Unlimited Technologies, LLC. Protected under the Copyright Act, DTSA, DMCA §1201, CFAA, Berne Convention, and TRIPS Agreement.",
     });
   } catch {
     res.status(500).json({ error: "Failed to get proprietary registry" });

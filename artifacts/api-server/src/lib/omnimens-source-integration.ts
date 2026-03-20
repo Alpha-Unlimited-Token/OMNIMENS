@@ -293,7 +293,10 @@ export async function writeModuleToSource(opts: {
 
   try {
     const header = `/**
- * OMNIMENS Self-Authored Module
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
  * Source: ${source}
  * Title: ${title}
  * Written: ${new Date(timestamp).toISOString()}
@@ -301,6 +304,10 @@ export async function writeModuleToSource(opts: {
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
  * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
  */
 
 `;
@@ -311,6 +318,7 @@ export async function writeModuleToSource(opts: {
       const translationFilename = `${safeName}.translation.json`;
       const translationFilePath = join(MODULES_DIR, translationFilename);
       const translationData: Record<string, any> = {
+        copyright: "Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.",
         sourceFile: filename,
         translatedAt: new Date(timestamp).toISOString(),
         novelConstructs: translationCheck.novelConstructs,

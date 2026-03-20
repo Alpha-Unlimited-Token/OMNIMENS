@@ -2174,7 +2174,10 @@ async function writeGeneratedModule(mod: GeneratedModule): Promise<boolean> {
     }
 
     const header = `/**
- * OMNIMENS Autonomous Code Genesis — ZERO API CALLS
+ * OMNIMENS™ Autonomous Code Genesis — ZERO API CALLS
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
  * Generated: ${new Date().toISOString()}
  * Name: ${mod.name}
  * Purpose: ${mod.purpose}
@@ -2185,6 +2188,10 @@ async function writeGeneratedModule(mod: GeneratedModule): Promise<boolean> {
  * This code was generated entirely by OMNIMENS's own reasoning —
  * no ChatGPT, no Claude, no Gemini, no external AI of any kind.
  * Pure algorithmic code synthesis from accumulated knowledge patterns.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
  */
 
 `;

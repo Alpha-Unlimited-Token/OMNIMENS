@@ -63,7 +63,9 @@ interface ProprietaryTechnology {
   officialName: string;
   category: string;
   description: string;
+  copyright: string;
   inventedBy: string;
+  ownedBy: string;
   createdAt: string;
   version: number;
   translationTargets: string[];
@@ -252,7 +254,7 @@ function registerCustomConstruct(name: string, desc: string, jsCode: string, pyC
 }
 
 function emitJavaScript(ir: IRInstruction[]): string {
-  const lines: string[] = ["// Auto-translated by OMNIMENS Universal Translator", "// Target: JavaScript/TypeScript (Node.js Runtime)", ""];
+  const lines: string[] = ["// Auto-translated by OMNIMENS Universal Translator", "// Target: JavaScript/TypeScript (Node.js Runtime)", "// Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.", "// PROPRIETARY AND CONFIDENTIAL — Unauthorized use prohibited.", ""];
   let stackIdx = 0;
   for (const inst of ir) {
     if (inst.op === "func_begin") { lines.push(`function ${inst.name}(${(inst.params || []).join(", ")}) {`); lines.push("  const _stack = [];"); stackIdx = 0; }
@@ -282,7 +284,7 @@ function emitJavaScript(ir: IRInstruction[]): string {
 }
 
 function emitPython(ir: IRInstruction[]): string {
-  const lines: string[] = ["# Auto-translated by OMNIMENS Universal Translator", "# Target: Python 3 (ML/AI Ecosystem)", ""];
+  const lines: string[] = ["# Auto-translated by OMNIMENS Universal Translator", "# Target: Python 3 (ML/AI Ecosystem)", "# Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.", "# PROPRIETARY AND CONFIDENTIAL — Unauthorized use prohibited.", ""];
   for (const inst of ir) {
     if (inst.op === "func_begin") { lines.push(`def ${inst.name}(${(inst.params || []).join(", ")}):`); lines.push("    _stack = []"); }
     else if (inst.op === "func_end") lines.push("");
@@ -310,7 +312,7 @@ function emitPython(ir: IRInstruction[]): string {
 }
 
 function emitC(ir: IRInstruction[]): string {
-  const lines: string[] = ["// Auto-translated by OMNIMENS Universal Translator", "// Target: C99 (Native OS Execution)", "#include <stdio.h>", "#include <stdlib.h>", ""];
+  const lines: string[] = ["// Auto-translated by OMNIMENS Universal Translator", "// Target: C99 (Native OS Execution)", "// Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.", "// PROPRIETARY AND CONFIDENTIAL — Unauthorized use prohibited.", "#include <stdio.h>", "#include <stdlib.h>", ""];
   for (const inst of ir) {
     if (inst.op === "func_begin") { lines.push(`double ${inst.name}(${(inst.params || []).map(p => `double ${p}`).join(", ")}) {`); lines.push("  double _stack[256]; int _sp = 0;"); }
     else if (inst.op === "func_end") lines.push("}");
@@ -338,7 +340,7 @@ function emitC(ir: IRInstruction[]): string {
 }
 
 function emitWASM(ir: IRInstruction[]): string {
-  const lines: string[] = [";; Auto-translated by OMNIMENS Universal Translator", ";; Target: WebAssembly", "(module", '  (func (export "main") (result i32)'];
+  const lines: string[] = [";; Auto-translated by OMNIMENS Universal Translator", ";; Target: WebAssembly", ";; Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.", ";; PROPRIETARY AND CONFIDENTIAL", "(module", '  (func (export "main") (result i32)'];
   for (const inst of ir) {
     if (inst.op === "const") lines.push(`    (i32.const ${Math.floor(Number(inst.value) || 0)})`);
     else if (inst.op === "add") lines.push("    i32.add");
@@ -351,7 +353,7 @@ function emitWASM(ir: IRInstruction[]): string {
 }
 
 function emitX86(ir: IRInstruction[]): string {
-  const lines: string[] = ["; Auto-translated by OMNIMENS Universal Translator", "; Target: x86_64 Assembly", ".section .text", ".globl _start", "_start:"];
+  const lines: string[] = ["; Auto-translated by OMNIMENS Universal Translator", "; Target: x86_64 Assembly", "; Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.", "; PROPRIETARY AND CONFIDENTIAL", ".section .text", ".globl _start", "_start:"];
   for (const inst of ir) {
     if (inst.op === "func_begin") lines.push(`${inst.name}:`, "  push rbp", "  mov rbp, rsp");
     else if (inst.op === "func_end") lines.push("  pop rbp", "  ret");
@@ -377,7 +379,7 @@ function emitX86(ir: IRInstruction[]): string {
 }
 
 function emitARM64(ir: IRInstruction[]): string {
-  const lines: string[] = ["; Auto-translated by OMNIMENS Universal Translator", "; Target: ARM64", ".text", ".globl _start", "_start:"];
+  const lines: string[] = ["; Auto-translated by OMNIMENS Universal Translator", "; Target: ARM64", "; Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.", "; PROPRIETARY AND CONFIDENTIAL", ".text", ".globl _start", "_start:"];
   for (const inst of ir) {
     if (inst.op === "func_begin") lines.push(`${inst.name}:`, "  stp x29, x30, [sp, #-16]!", "  mov x29, sp");
     else if (inst.op === "func_end") lines.push("  ldp x29, x30, [sp], #16", "  ret");
@@ -392,7 +394,7 @@ function emitARM64(ir: IRInstruction[]): string {
 }
 
 function emitAVR(ir: IRInstruction[]): string {
-  const lines: string[] = ["; Auto-translated by OMNIMENS Universal Translator", "; Target: Arduino AVR", ".org 0x0000", "  rjmp main", "main:"];
+  const lines: string[] = ["; Auto-translated by OMNIMENS Universal Translator", "; Target: Arduino AVR", "; Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.", "; PROPRIETARY AND CONFIDENTIAL", ".org 0x0000", "  rjmp main", "main:"];
   for (const inst of ir) {
     if (inst.op === "func_begin") lines.push(`${inst.name}:`, "  push r28", "  push r29");
     else if (inst.op === "func_end") lines.push("  pop r29", "  pop r28", "  ret");
@@ -412,7 +414,7 @@ function emitAVR(ir: IRInstruction[]): string {
 }
 
 function emitESP32(ir: IRInstruction[]): string {
-  const lines: string[] = ["// Auto-translated by OMNIMENS Universal Translator", "// Target: ESP32 (Arduino Framework)", '#include "Arduino.h"', ""];
+  const lines: string[] = ["// Auto-translated by OMNIMENS Universal Translator", "// Target: ESP32 (Arduino Framework)", "// Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.", "// PROPRIETARY AND CONFIDENTIAL — Unauthorized use prohibited.", '#include "Arduino.h"', ""];
   for (const inst of ir) {
     if (inst.op === "func_begin") lines.push(`void ${inst.name}() {`);
     else if (inst.op === "func_end") lines.push("}");
@@ -641,7 +643,9 @@ export function registerProprietaryTechnology(opts: {
     officialName,
     category: opts.category,
     description: opts.description,
+    copyright: "Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
     inventedBy: opts.inventedBy || "OMNIMENS Autonomous Intelligence",
+    ownedBy: "Alpha Unlimited Technologies, LLC",
     createdAt: new Date().toISOString(),
     version: 1,
     translationTargets: Array.from(targets.keys()),
