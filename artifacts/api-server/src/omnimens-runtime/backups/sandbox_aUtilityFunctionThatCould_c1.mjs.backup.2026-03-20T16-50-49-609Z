@@ -1,0 +1,62 @@
+/**
+ * OMNIMENS Self-Authored Module
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-20T16:39:06.378Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ */
+
+function findMostFrequentWords(text, topN) {
+    // Function to find the most frequent words in a given text
+    if (typeof text !== 'string' || typeof topN !== 'number' || topN <= 0) {
+        throw new Error("Invalid input: text must be a string and topN must be a positive number.");
+    }
+
+    // Remove punctuation and convert text to lowercase
+    const cleanedText = text.replace(/[^\w\s]/g, '').toLowerCase();
+
+    // Split text into words
+    const words = cleanedText.split(/\s+/);
+
+    // Count word frequencies
+    const wordMap = new Map();
+    for (const word of words) {
+        if (word) {
+            wordMap.set(word, (wordMap.get(word) || 0) + 1);
+        }
+    }
+
+    // Convert Map to an array and sort by frequency
+    const sortedWords = Array.from(wordMap.entries()).sort((a, b) => b[1] - a[1]);
+
+    // Return the top N most frequent words
+    return sortedWords.slice(0, topN).map(entry => ({ word: entry[0], frequency: entry[1] }));
+}
+
+// Self-tests
+console.log("Test Case 1:");
+console.log(findMostFrequentWords("The quick brown fox jumps over the lazy dog. The dog was not amused.", 3));
+// Expected output: [{ word: 'the', frequency: 3 }, { word: 'dog', frequency: 2 }, { word: 'was', frequency: 1 }]
+
+console.log("Test Case 2:");
+console.log(findMostFrequentWords("Hello world! Hello universe. Universe is vast and beautiful.", 2));
+// Expected output: [{ word: 'hello', frequency: 2 }, { word: 'universe', frequency: 2 }]
+
+console.log("Test Case 3:");
+console.log(findMostFrequentWords("AI is transforming the world. AI is the future.", 1));
+// Expected output: [{ word: 'ai', frequency: 2 }]
+
+console.log("Test Case 4:");
+console.log(findMostFrequentWords("Single word test case single single.", 2));
+// Expected output: [{ word: 'single', frequency: 3 }, { word: 'word', frequency: 1 }]
+
+console.log("Test Case 5 (Edge Case):");
+console.log(findMostFrequentWords("", 3));
+// Expected output: []
+
+console.log("Test Case 6 (Edge Case):");
+console.log(findMostFrequentWords("!!!", 2));
+// Expected output: []

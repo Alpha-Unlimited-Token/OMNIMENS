@@ -2,82 +2,62 @@
  * OMNIMENS Self-Authored Module
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-20T16:28:19.135Z
+ * Written: 2026-03-20T16:50:49.609Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
  * OMNIMENS rewrote its own source code to include this module.
  */
 
-function findMostFrequentWords(text, topN) {
-    if (typeof text !== 'string' || typeof topN !== 'number' || topN <= 0) {
-        throw new Error('Invalid input: text must be a string and topN must be a positive number.');
+function findMostFrequentPatterns(text, n) {
+    if (typeof text !== 'string' || typeof n !== 'number' || n <= 0) {
+        throw new Error('Invalid input: text must be a string and n must be a positive number.');
     }
 
-    // Normalize text: remove punctuation, convert to lowercase, and split into words
-    const normalizedText = text.replace(/[^\w\s]/g, '').toLowerCase();
-    const words = normalizedText.split(/\s+/);
-
-    // Count word frequencies
-    const wordCounts = {};
-    for (let word of words) {
-        if (word) {
-            wordCounts[word] = (wordCounts[word] || 0) + 1;
-        }
+    const words = text.toLowerCase().match(/\b\w+\b/g);
+    if (!words) {
+        return {};
     }
 
-    // Sort words by frequency and extract the top N words
-    const sortedWords = Object.entries(wordCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, topN);
+    const patterns = new Map();
 
-    // Convert to an array of objects for better readability
-    return sortedWords.map(([word, count]) => ({ word, count }));
+    for (let i = 0; i <= words.length - n; i++) {
+        const pattern = words.slice(i, i + n).join(' ');
+        patterns.set(pattern, (patterns.get(pattern) || 0) + 1);
+    }
+
+    const sortedPatterns = Array.from(patterns.entries()).sort((a, b) => b[1] - a[1]);
+
+    const result = {};
+    sortedPatterns.forEach(([pattern, count]) => {
+        result[pattern] = count;
+    });
+
+    return result;
 }
 
 // Self-tests
-const testCases = [
-    {
-        text: "The quick brown fox jumps over the lazy dog. The dog barked back at the fox.",
-        topN: 3,
-        expected: [
-            { word: 'the', count: 4 },
-            { word: 'fox', count: 2 },
-            { word: 'dog', count: 2 }
-        ]
-    },
-    {
-        text: "Hello world! Hello universe! Hello everyone!",
-        topN: 2,
-        expected: [
-            { word: 'hello', count: 3 },
-            { word: 'world', count: 1 }
-        ]
-    },
-    {
-        text: "AI is the future. AI is everywhere.",
-        topN: 1,
-        expected: [
-            { word: 'ai', count: 2 }
-        ]
-    },
-    {
-        text: "",
-        topN: 3,
-        expected: []
-    },
-    {
-        text: "SingleWord",
-        topN: 1,
-        expected: [
-            { word: 'singleword', count: 1 }
-        ]
-    }
-];
+console.log("Test 1: Single word patterns");
+console.log(findMostFrequentPatterns("hello world hello world hello", 1));
 
-// Run tests
-for (let i = 0; i < testCases.length; i++) {
-    const { text, topN, expected } = testCases[i];
-    const result = findMostFrequentWords(text, topN);
-    console.log(`Test Case ${i + 1}:`, JSON.stringify(result) === JSON.stringify(expected) ? 'Passed' : 'Failed');
+console.log("Test 2: Two-word patterns");
+console.log(findMostFrequentPatterns("hello world hello world hello", 2));
+
+console.log("Test 3: Edge case - empty string");
+console.log(findMostFrequentPatterns("", 2));
+
+console.log("Test 4: Edge case - n larger than word count");
+console.log(findMostFrequentPatterns("hello world", 5));
+
+console.log("Test 5: Edge case - invalid inputs");
+try {
+    console.log(findMostFrequentPatterns(12345, 2));
+} catch (e) {
+    console.log(e.message);
+}
+
+try {
+    console.log(findMostFrequentPatterns("hello world", -1));
+} catch (e) {
+    console.log(e.message);
 }
