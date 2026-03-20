@@ -5,7 +5,7 @@
  * 
  * Source: self_coding_engine
  * Title: Daydream:architecture_design #1
- * Written: 2026-03-20T19:33:17.523Z
+ * Written: 2026-03-20T22:02:34.427Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,41 +16,48 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// CIGE core – hypothesis evolution loop (pure, no IO, no deps)
-export type State = number[];
-export type Action = number[];
-export type Trace = { s: State; a: Action; sn: State; r: number };
+// OmniCausal Sandbox – minimal pure-TS prototype (no I/O, no deps)
+export type Vector = number[];
+export type Node = { id: string; state: Vector };
+export type Edge = { from: string; to: string;
+                     fn: (x: Vector) => Vector }; // structural eq.
 
-type Hypothesis = {
-  wasm: Uint8Array;          // compiled causal program
-  score: number;             // lower = better
-};
-
-function mutate(bytes: Uint8Array): Uint8Array {
-  const out = bytes.slice();
-  for (let i = 0; i < out.length; i++) if (Math.random() < 0.02)
-      out[i] ^= 1 << (Math.random() * 8);
-  return out;
+export interface CausalGraph {
+  nodes: Record<string, Node>;
+  edges: Edge[];
 }
 
-function evalHypothesis(h: Hypothesis, traces: Trace[]): number {
-  // Stubbed pure error: random placeholder until WASM exec integrated
-  let err = 0;
-  for (const t of traces) err += Math.random(); // replace w/ wasm run
-  return err / traces.length + 0.001 * h.wasm.length;
-}
+/**
+ * Propagate causes through the graph once.
+ * No side-effects; returns a new graph instance.
+ */
+export function propagate(graph: CausalGraph): CausalGraph {
+  const nextNodes: Record<string, Node> = {};
+  // deep copy current states
+  Object.values(graph.nodes).forEach(n => nextNodes[n.id] = { ...n, state: [...n.state] });
 
-export function evolveHypotheses(pop: Hypothesis[], traces: Trace[], keep = 32): Hypothesis[] {
-  // 1. Evaluate
-  pop.forEach(h => { h.score = evalHypothesis(h, traces); });
-  // 2. Select top-K
-  pop.sort((a, b) => a.score - b.score);
-  const survivors = pop.slice(0, keep);
-  // 3. Reproduce
-  const next: Hypothesis[] = [...survivors];
-  while (next.length < pop.length) {
-    const parent = survivors[Math.floor(Math.random() * keep)];
-    next.push({ wasm: mutate(parent.wasm), score: Infinity });
+  for (const e of graph.edges) {
+    const src = graph.nodes[e.from];
+    const dst = nextNodes[e.to];
+    const delta = e.fn(src.state);        // causal influence
+    dst.state = dst.state.map((v, i) => v + delta[i]); // linear comb.
   }
-  return next;
+  return { nodes: nextNodes, edges: graph.edges };
+}
+
+/**
+ * Apply an intervention do(nodeId = value) and propagate N steps.
+ */
+export function counterfactual(
+  graph: CausalGraph,
+  nodeId: string,
+  value: Vector,
+  steps = 3
+): CausalGraph {
+  let g: CausalGraph = {
+    nodes: { ...graph.nodes, [nodeId]: { id: nodeId, state: [...value] } },
+    edges: graph.edges
+  };
+  for (let i = 0; i < steps; i++) g = propagate(g);
+  return g;
 }
