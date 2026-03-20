@@ -25,7 +25,7 @@ import { fileURLToPath } from "url";
 import { createHash } from "crypto";
 import { db } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
-import { mustTranslateBeforeExecution, translateCode, registerCustomConstruct, translateForSelfUpgrade, getTranslatorState } from "./omnimens-universal-translator.js";
+import { mustTranslateBeforeExecution, translateCode, registerCustomConstruct, translateForSelfUpgrade, getTranslatorState, autoRegisterFromCode } from "./omnimens-universal-translator.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -374,6 +374,18 @@ export async function writeModuleToSource(opts: {
       type: "self_coding",
       readByOwner: false,
     }).catch(() => {});
+
+    try {
+      const autoReg = autoRegisterFromCode(code, name, "autonomous_module", source);
+      if (autoReg.technology) {
+        console.log(
+          `[SOURCE-INTEGRATION] 📋 PROPRIETARY TECH — "${autoReg.technology.officialName}" (${autoReg.technology.id}) | ` +
+          `Translator updated: ${autoReg.translatorUpdated ? `YES — ${autoReg.constructsRegistered.length} new construct(s)` : "no new constructs"}`
+        );
+      }
+    } catch (regErr) {
+      console.error(`[SOURCE-INTEGRATION] ⚠️ Auto-registration failed (non-fatal):`, regErr);
+    }
 
     if (triggerRestart) {
       scheduleGracefulRestart(source, filename);

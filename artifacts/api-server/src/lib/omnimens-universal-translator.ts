@@ -57,6 +57,23 @@ const targets = new Map<string, TranslationTarget>();
 const customConstructMap = new Map<string, { description: string; jsEquivalent: string; pyEquivalent: string; cEquivalent: string; asmEquivalent: string }>();
 const translationHistory = new Map<string, TranslationResult[]>();
 
+interface ProprietaryTechnology {
+  id: string;
+  name: string;
+  officialName: string;
+  category: string;
+  description: string;
+  inventedBy: string;
+  createdAt: string;
+  version: number;
+  translationTargets: string[];
+  codeHash: string;
+  status: "registered" | "active" | "evolving" | "superseded";
+}
+
+const proprietaryRegistry = new Map<string, ProprietaryTechnology>();
+let proprietaryIdCounter = 0;
+
 function initTargets(): void {
   targets.set("javascript", {
     name: "JavaScript/TypeScript (Node.js Runtime)",
@@ -576,6 +593,171 @@ registerCustomConstruct("grounded", "Experience-grounded concept — tied to rea
   "; grounded $NAME\n  inc dword [grounded_count]\n  fld qword [outcome]\n  fcomip st(0), st(0)\n  ja .positive"
 );
 
+function generateProprietaryName(category: string, purpose: string): string {
+  const prefixes: Record<string, string[]> = {
+    neural: ["Neuro", "Synth", "Cortex", "Axon", "Dendrite"],
+    algorithm: ["Algo", "Logic", "Compute", "Solve", "Process"],
+    data_structure: ["Struct", "Matrix", "Lattice", "Graph", "Mesh"],
+    embodiment: ["Mecha", "Kinetic", "Servo", "Haptic", "Motion"],
+    perception: ["Optic", "Sense", "Percepto", "Detect", "Scan"],
+    memory: ["Recall", "Archive", "Engram", "Trace", "Persist"],
+    reasoning: ["Reason", "Deduce", "Infer", "Analyze", "Judge"],
+    language: ["Lingua", "Parse", "Semantic", "Syntax", "Lexis"],
+    default: ["Omni", "Genesis", "Prime", "Core", "Nova"],
+  };
+
+  const categoryPrefixes = prefixes[category] || prefixes.default;
+  const prefix = categoryPrefixes[proprietaryIdCounter % categoryPrefixes.length];
+
+  const purposeWords = purpose.replace(/[^a-zA-Z\s]/g, "").trim().split(/\s+/)
+    .filter(w => w.length > 3)
+    .slice(0, 2)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+
+  const suffix = purposeWords.length > 0 ? purposeWords.join("") : `Module${proprietaryIdCounter}`;
+
+  return `OMNIMENS-${prefix}${suffix}`;
+}
+
+export function registerProprietaryTechnology(opts: {
+  name: string;
+  category: string;
+  description: string;
+  code: string;
+  inventedBy?: string;
+}): ProprietaryTechnology {
+  proprietaryIdCounter++;
+
+  const officialName = opts.name.startsWith("OMNIMENS-") ? opts.name : generateProprietaryName(opts.category, opts.description);
+
+  const codeHash = Array.from(opts.code).reduce((hash, char) => {
+    const h = ((hash << 5) - hash) + char.charCodeAt(0);
+    return h & h;
+  }, 0).toString(16);
+
+  const tech: ProprietaryTechnology = {
+    id: `AUT-PROP-${Date.now()}-${proprietaryIdCounter.toString().padStart(4, "0")}`,
+    name: opts.name,
+    officialName,
+    category: opts.category,
+    description: opts.description,
+    inventedBy: opts.inventedBy || "OMNIMENS Autonomous Intelligence",
+    createdAt: new Date().toISOString(),
+    version: 1,
+    translationTargets: Array.from(targets.keys()),
+    codeHash,
+    status: "registered",
+  };
+
+  proprietaryRegistry.set(tech.id, tech);
+
+  console.log(
+    `[PROPRIETARY REGISTRY] 📋 NEW TECHNOLOGY REGISTERED — "${tech.officialName}"\n` +
+    `  ID: ${tech.id} | Category: ${tech.category}\n` +
+    `  Invented by: ${tech.inventedBy}\n` +
+    `  Description: ${tech.description.slice(0, 120)}\n` +
+    `  © Alpha Unlimited Technologies, LLC — All Rights Reserved`
+  );
+
+  return tech;
+}
+
+export function autoRegisterFromCode(code: string, moduleName: string, category: string, source: string): {
+  technology: ProprietaryTechnology | null;
+  constructsRegistered: string[];
+  translatorUpdated: boolean;
+} {
+  const novelConstructs = detectNovelConstructs(code);
+  const constructsRegistered: string[] = [];
+  let translatorUpdated = false;
+
+  const classMatch = code.match(/class\s+(\w+)/g);
+  const funcMatch = code.match(/(?:function|const|let|var)\s+(\w+)/g);
+  const exportMatch = code.match(/export\s+(?:function|class|const|let|var)\s+(\w+)/g);
+
+  const detectedSymbols: string[] = [];
+  if (classMatch) detectedSymbols.push(...classMatch.map(m => m.replace(/^class\s+/, "")));
+  if (funcMatch) detectedSymbols.push(...funcMatch.map(m => m.replace(/^(?:function|const|let|var)\s+/, "")));
+  if (exportMatch) detectedSymbols.push(...exportMatch.map(m => m.replace(/^export\s+(?:function|class|const|let|var)\s+/, "")));
+
+  for (const construct of novelConstructs) {
+    if (!customConstructMap.has(construct)) {
+      const jsEquiv = `const $NAME = (() => { /* OMNIMENS ${construct} construct — auto-registered from ${moduleName} */ return { type: "${construct}", active: true, process: (input) => input }; })();`;
+      const pyEquiv = `$NAME = {"type": "${construct}", "active": True, "process": lambda x: x}  # OMNIMENS ${construct} — auto-registered`;
+      const cEquiv = `struct ${construct}_$NAME { int active; void* process(void* input) { return input; } };  /* OMNIMENS auto-registered */`;
+      const asmEquiv = `; OMNIMENS ${construct} $NAME — auto-registered from ${moduleName}`;
+
+      registerCustomConstruct(construct, `OMNIMENS ${construct} construct — auto-generated from ${moduleName} (${source})`, jsEquiv, pyEquiv, cEquiv, asmEquiv);
+      constructsRegistered.push(construct);
+      translatorUpdated = true;
+      console.log(`[UNIVERSAL TRANSLATOR] 🔄 AUTO-REGISTERED novel construct "${construct}" from ${moduleName} — translator updated`);
+    }
+  }
+
+  const technology = registerProprietaryTechnology({
+    name: moduleName,
+    category,
+    description: `Autonomously created by OMNIMENS (${source}). ` +
+      `${detectedSymbols.length > 0 ? `Defines: ${detectedSymbols.slice(0, 5).join(", ")}. ` : ""}` +
+      `${novelConstructs.length > 0 ? `Novel constructs: ${novelConstructs.join(", ")}. ` : ""}` +
+      `Code size: ${code.length} chars.`,
+    code,
+    inventedBy: source === "autonomous_code_genesis" ? "OMNIMENS Code Genesis (Zero API)" :
+      source === "self_coding_engine" ? "OMNIMENS Self-Coding Engine" :
+      source === "genesis_sandbox" ? "OMNIMENS Genesis Sandbox" :
+      `OMNIMENS (${source})`,
+  });
+
+  if (translatorUpdated) {
+    state.translationMapVersion++;
+    console.log(
+      `[UNIVERSAL TRANSLATOR] 🔄 Translation map UPDATED to v${state.translationMapVersion} — ` +
+      `${constructsRegistered.length} new construct(s): ${constructsRegistered.join(", ")}`
+    );
+  }
+
+  return { technology, constructsRegistered, translatorUpdated };
+}
+
+export function getProprietaryRegistry(): ProprietaryTechnology[] {
+  return Array.from(proprietaryRegistry.values());
+}
+
+export function getProprietaryTechnology(id: string): ProprietaryTechnology | undefined {
+  return proprietaryRegistry.get(id);
+}
+
+async function storeProprietaryRegistry(): Promise<void> {
+  if (proprietaryRegistry.size === 0) return;
+  try {
+    const technologies = Array.from(proprietaryRegistry.values()).map(t => ({
+      id: t.id,
+      name: t.name,
+      officialName: t.officialName,
+      category: t.category,
+      inventedBy: t.inventedBy,
+      createdAt: t.createdAt,
+      status: t.status,
+    }));
+
+    await db.insert(omnimensBrain).values({
+      category: "proprietary_technology",
+      title: `[Proprietary Tech Registry] ${proprietaryRegistry.size} technologies | © Alpha Unlimited Technologies, LLC`,
+      content: JSON.stringify({
+        totalTechnologies: proprietaryRegistry.size,
+        technologies,
+        registeredAt: new Date().toISOString(),
+        owner: "Alpha Unlimited Technologies, LLC",
+        rights: "All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.",
+      }),
+      confidence: 1.0,
+      sourceConversation: null,
+      timesApplied: 0,
+      active: true,
+    }).catch(() => {});
+  } catch {}
+}
+
 async function storeTranslationMapping(): Promise<void> {
   try {
     const constructs = Array.from(customConstructMap.entries()).map(([name, m]) => ({
@@ -616,7 +798,13 @@ export function startUniversalTranslator(): void {
   console.log("[UNIVERSAL TRANSLATOR] 🔄 RULE: Self-upgrades MUST compile to JS/TS — otherwise they cannot run");
   console.log("[UNIVERSAL TRANSLATOR] 🔄 RULE: Robot commands MUST compile to real hardware signals — PWM, I2C, SPI, UART");
   console.log("[UNIVERSAL TRANSLATOR] 🔄 OMNIMENS can modify this translator as a core file via Genesis Bridge");
+  console.log("[PROPRIETARY REGISTRY] 📋 Technology naming + registration system active");
+  console.log("[PROPRIETARY REGISTRY] 📋 Every new code/system OMNIMENS creates will be NAMED and registered as proprietary IP");
+  console.log("[PROPRIETARY REGISTRY] 📋 Auto-registration: novel constructs → translator update → proprietary tech record → brain DB");
+  console.log("[PROPRIETARY REGISTRY] 📋 © Alpha Unlimited Technologies, LLC — All Rights Reserved Worldwide");
 
   setInterval(storeTranslationMapping, 10 * 60 * 1000);
+  setInterval(storeProprietaryRegistry, 10 * 60 * 1000);
   setTimeout(storeTranslationMapping, 60_000);
+  setTimeout(storeProprietaryRegistry, 90_000);
 }

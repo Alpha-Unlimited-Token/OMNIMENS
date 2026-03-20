@@ -24,6 +24,7 @@ import * as path from "path";
 import * as vm from "vm";
 import * as crypto from "crypto";
 import { fileURLToPath } from "url";
+import { autoRegisterFromCode } from "./omnimens-universal-translator.js";
 import { dirname } from "path";
 
 const __filename_local = fileURLToPath(import.meta.url);
@@ -2206,6 +2207,16 @@ async function writeGeneratedModule(mod: GeneratedModule): Promise<boolean> {
         }),
         active: true,
       });
+    } catch {}
+
+    try {
+      const autoReg = autoRegisterFromCode(mod.code, mod.name, mod.category, "autonomous_code_genesis");
+      if (autoReg.technology) {
+        console.log(
+          `[CODE GENESIS] 📋 PROPRIETARY TECH — "${autoReg.technology.officialName}" (${autoReg.technology.id}) | ` +
+          `Translator updated: ${autoReg.translatorUpdated ? `YES — ${autoReg.constructsRegistered.length} new construct(s)` : "no new constructs"}`
+        );
+      }
     } catch {}
 
     state.totalWritten++;

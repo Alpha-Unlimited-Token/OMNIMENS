@@ -94,7 +94,7 @@ import { getSelfModel, getTranscendenceReflections, getActiveIntentions, getExis
 import { getGenesisState, getGenesisProject, getGenesisDownloadBundle } from "../lib/omnimens-genesis-sandbox.js";
 import { getGenesisBridgeState, getRecentBridgeMessages, getPendingCoreModifications, getAppliedCoreModifications, getModifiableCoreFiles, proposeCoreModification } from "../lib/omnimens-genesis-bridge.js";
 import { getNeuralProcessorState, processQuery as neuralProcessQuery, formatNeuralResponse, getVocabularySnapshot, getOscillatorState, getEmergentBehaviorLog } from "../lib/omnimens-neural-processor.js";
-import { getTranslatorState, getTranslationTargets, getCustomConstructMap, translateCode, translateToAll, registerCustomConstruct } from "../lib/omnimens-universal-translator.js";
+import { getTranslatorState, getTranslationTargets, getCustomConstructMap, translateCode, translateToAll, registerCustomConstruct, getProprietaryRegistry } from "../lib/omnimens-universal-translator.js";
 import { omnimensServerBuilds } from "@workspace/db";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import { detectNeuroEmotion, getNeuroSyncPromptAddendum } from "../lib/neuro-sync.js";
@@ -4532,6 +4532,26 @@ router.post("/omnimens/universal-translator/register-construct", async (req, res
     res.json({ success: true, state: getTranslatorState() });
   } catch {
     res.status(500).json({ error: "Failed to register construct" });
+  }
+});
+
+// ─── PROPRIETARY TECHNOLOGY REGISTRY (OWNER-ONLY) ────────────────────────────
+
+router.get("/omnimens/proprietary-registry", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const technologies = getProprietaryRegistry();
+    res.json({
+      totalTechnologies: technologies.length,
+      technologies,
+      owner: "Alpha Unlimited Technologies, LLC",
+      rights: "All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.",
+    });
+  } catch {
+    res.status(500).json({ error: "Failed to get proprietary registry" });
   }
 });
 
