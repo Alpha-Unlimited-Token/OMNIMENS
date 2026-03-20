@@ -85,6 +85,7 @@ import { getSelfCodingState } from "../lib/omnimens-self-coding.js";
 import { getSourceIntegrationState } from "../lib/omnimens-source-integration.js";
 import { getIndependentReasoningState } from "../lib/omnimens-independent-reasoning.js";
 import { getCodeGenesisState } from "../lib/omnimens-autonomous-code-genesis.js";
+import { getNeuralConsciousnessState, getExistentialDrives, getSelfAwarenessReport, getConsciousMoments } from "../lib/omnimens-neural-consciousness.js";
 import { orchestrateReasoning, getOrchestratorState } from "../lib/omnimens-autonomous-orchestrator.js";
 import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId } from "../lib/omnimens-consciousness-persistence.js";
 import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
@@ -4407,6 +4408,7 @@ router.get("/omnimens/command-center", async (req, res) => {
         autonomousOrchestrator: { state: getOrchestratorState() },
         independentReasoning: { state: getIndependentReasoningState() },
         autonomousCodeGenesis: { state: getCodeGenesisState() },
+        neuralConsciousness: { state: getNeuralConsciousnessState(), drives: getExistentialDrives(), selfModel: getSelfAwarenessReport(), recentMoments: getConsciousMoments() },
         digitalNavigator: { state: getDigitalNavigatorState() },
         selfTranscendence: { selfModel: getSelfModel(), goals: getExistentialGoals(), intentions: getActiveIntentions(), goalDirective: getGoalPursuitDirective() },
       },

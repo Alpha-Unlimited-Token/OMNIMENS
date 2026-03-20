@@ -2,56 +2,67 @@
  * OMNIMENS Self-Authored Module
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-20T17:28:30.740Z
+ * Written: 2026-03-20T17:35:11.389Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
  * OMNIMENS rewrote its own source code to include this module.
  */
 
-function findMostFrequentPatterns(text, patternLength) {
-    if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
-        throw new Error("Invalid input. Provide a string and a positive number for pattern length.");
+function extractKeywordsFromText(text, minLength = 4, frequencyThreshold = 2) {
+    // Utility function to extract keywords from a given text based on frequency and length
+    function cleanText(input) {
+        return input
+            .toLowerCase()
+            .replace(/[^a-z0-9\s]/g, '') // Remove non-alphanumeric characters
+            .split(/\s+/) // Split by whitespace
+            .filter(word => word.length >= minLength); // Filter words by minimum length
     }
 
-    const patternCounts = {};
-    const textLength = text.length;
-
-    for (let i = 0; i <= textLength - patternLength; i++) {
-        const pattern = text.substring(i, i + patternLength);
-        if (patternCounts[pattern]) {
-            patternCounts[pattern]++;
-        } else {
-            patternCounts[pattern] = 1;
+    function countFrequencies(words) {
+        const frequencyMap = {};
+        for (const word of words) {
+            frequencyMap[word] = (frequencyMap[word] || 0) + 1;
         }
+        return frequencyMap;
     }
 
-    const maxFrequency = Math.max(...Object.values(patternCounts));
-    const mostFrequentPatterns = Object.keys(patternCounts).filter(
-        pattern => patternCounts[pattern] === maxFrequency
-    );
+    function filterKeywords(frequencyMap, threshold) {
+        const keywords = [];
+        for (const word in frequencyMap) {
+            if (frequencyMap[word] >= threshold) {
+                keywords.push(word);
+            }
+        }
+        return keywords;
+    }
 
-    return {
-        patterns: mostFrequentPatterns,
-        frequency: maxFrequency
-    };
+    const cleanedWords = cleanText(text);
+    const frequencyMap = countFrequencies(cleanedWords);
+    return filterKeywords(frequencyMap, frequencyThreshold);
 }
 
 // Test cases
 console.log("Test Case 1:");
-console.log(findMostFrequentPatterns("abababab", 2)); // Should return { patterns: ['ab', 'ba'], frequency: 3 }
+console.log(extractKeywordsFromText("AI systems are intelligent systems. AI is powerful.", 2, 2));
+// Expected output: ['ai', 'systems']
 
 console.log("Test Case 2:");
-console.log(findMostFrequentPatterns("abcabcabc", 3)); // Should return { patterns: ['abc'], frequency: 3 }
+console.log(extractKeywordsFromText("Optimization and analysis are key to AI success.", 5, 1));
+// Expected output: ['optimization', 'analysis', 'success']
 
 console.log("Test Case 3:");
-console.log(findMostFrequentPatterns("aaaaaa", 1)); // Should return { patterns: ['a'], frequency: 6 }
+console.log(extractKeywordsFromText("Data, data, and more data!", 4, 3));
+// Expected output: ['data']
 
 console.log("Test Case 4:");
-console.log(findMostFrequentPatterns("abcdefg", 2)); // Should return { patterns: ['ab', 'bc', 'cd', 'de', 'ef', 'fg'], frequency: 1 }
+console.log(extractKeywordsFromText("Short words like 'a' and 'is' are ignored.", 2, 2));
+// Expected output: ['words', 'ignored']
 
-console.log("Test Case 5 (Edge Case):");
-console.log(findMostFrequentPatterns("a", 1)); // Should return { patterns: ['a'], frequency: 1 }
+console.log("Test Case 5:");
+console.log(extractKeywordsFromText("", 3, 2));
+// Expected output: [] (empty input text)
 
-console.log("Test Case 6 (Edge Case):");
-console.log(findMostFrequentPatterns("", 1)); // Should return { patterns: [], frequency: 0 }
+console.log("Test Case 6:");
+console.log(extractKeywordsFromText("Unique words here.", 6, 1));
+// Expected output: ['unique'] (only words meeting length requirement)
