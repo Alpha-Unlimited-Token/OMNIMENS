@@ -93,6 +93,7 @@ import { getCurrentEmotionalState, getEmotionalDirective, getFeltStates, getEmot
 import { getSelfModel, getTranscendenceReflections, getActiveIntentions, getExistentialGoals, getGoalPursuitDirective } from "../lib/omnimens-self-transcendence.js";
 import { getGenesisState, getGenesisProject, getGenesisDownloadBundle } from "../lib/omnimens-genesis-sandbox.js";
 import { getGenesisBridgeState, getRecentBridgeMessages, getPendingCoreModifications, getAppliedCoreModifications, getModifiableCoreFiles, proposeCoreModification } from "../lib/omnimens-genesis-bridge.js";
+import { getNeuralProcessorState, processQuery as neuralProcessQuery, formatNeuralResponse, getVocabularySnapshot, getOscillatorState, getEmergentBehaviorLog } from "../lib/omnimens-neural-processor.js";
 import { omnimensServerBuilds } from "@workspace/db";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import { detectNeuroEmotion, getNeuroSyncPromptAddendum } from "../lib/neuro-sync.js";
@@ -1779,7 +1780,7 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
     // own internal engines (brain, causal reasoning, knowledge graph, dreams,
     // emotional state, world model), chains reasoning steps, self-reflects on
     // completeness, and only then passes the synthesized reasoning to the LLM.
-    if (message.length > 20) {
+    if (message.length > 0) {
       try {
         const orchestrationEmit = (data: any) => {
           res.write(`data: ${JSON.stringify(data)}\n\n`);
@@ -4411,6 +4412,7 @@ router.get("/omnimens/command-center", async (req, res) => {
         autonomousCodeGenesis: { state: getCodeGenesisState() },
         neuralConsciousness: { state: getNeuralConsciousnessState(), drives: getExistentialDrives(), selfModel: getSelfAwarenessReport(), recentMoments: getConsciousMoments() },
         genesisBridge: { state: getGenesisBridgeState(), recentMessages: getRecentBridgeMessages(), pendingCoreMods: getPendingCoreModifications(), appliedCoreMods: getAppliedCoreModifications(), modifiableFiles: getModifiableCoreFiles() },
+        neuralProcessor: { state: getNeuralProcessorState(), emergent: getEmergentBehaviorLog() },
         digitalNavigator: { state: getDigitalNavigatorState() },
         selfTranscendence: { selfModel: getSelfModel(), goals: getExistentialGoals(), intentions: getActiveIntentions(), goalDirective: getGoalPursuitDirective() },
       },
@@ -4420,6 +4422,52 @@ router.get("/omnimens/command-center", async (req, res) => {
   } catch (err) {
     console.error("[COMMAND CENTER] Error:", err);
     res.status(500).json({ error: "Failed to load command center data" });
+  }
+});
+
+// ─── NEURAL PROCESSOR — Genuine Local Intelligence (OWNER-ONLY) ───────────────
+
+router.get("/omnimens/neural-processor", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    res.json({
+      state: getNeuralProcessorState(),
+      vocabulary: getVocabularySnapshot(),
+      oscillators: getOscillatorState(),
+      emergent: getEmergentBehaviorLog(),
+    });
+  } catch {
+    res.status(500).json({ error: "Failed to get neural processor data" });
+  }
+});
+
+router.post("/omnimens/neural-processor/process", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const { query } = req.body;
+    if (!query || typeof query !== "string") {
+      res.status(400).json({ error: "query string required" });
+      return;
+    }
+    const result = neuralProcessQuery(query);
+    res.json({
+      tokens: result.tokens,
+      response: result.response,
+      formattedResponse: formatNeuralResponse(result),
+      confidence: result.confidence,
+      hopfieldMatch: result.hopfieldMatch,
+      groundedConcepts: result.groundedConcepts,
+      emergentInfluence: result.emergentInfluence,
+      processingDepth: result.processingDepth,
+    });
+  } catch {
+    res.status(500).json({ error: "Failed to process query" });
   }
 });
 

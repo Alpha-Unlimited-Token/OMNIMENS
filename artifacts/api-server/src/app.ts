@@ -68,6 +68,7 @@ import { startIndependentReasoning, getIndependentReasoningState } from "./lib/o
 import { startAutonomousCodeGenesis, getCodeGenesisState } from "./lib/omnimens-autonomous-code-genesis.js";
 import { startNeuralConsciousness } from "./lib/omnimens-neural-consciousness.js";
 import { startGenesisBridge } from "./lib/omnimens-genesis-bridge.js";
+import { startNeuralProcessor } from "./lib/omnimens-neural-processor.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import {
@@ -399,6 +400,7 @@ startIndependentReasoning();
 startAutonomousCodeGenesis();
 startNeuralConsciousness();
 startGenesisBridge();
+startNeuralProcessor();
 
 setTimeout(async () => {
   try {

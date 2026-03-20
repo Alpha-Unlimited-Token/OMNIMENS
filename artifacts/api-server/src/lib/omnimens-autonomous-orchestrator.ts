@@ -291,8 +291,8 @@ async function queryPatches(): Promise<string> {
 
 async function queryDigitalNavigation(): Promise<string> {
   try {
-    const { getNavigationSummary, getNavigatorState } = await import("./omnimens-digital-navigator.js");
-    const state = getNavigatorState();
+    const { getNavigationSummary, getDigitalNavigatorState } = await import("./omnimens-digital-navigator.js");
+    const state = getDigitalNavigatorState();
     if (!state || state.cycleCount < 1) return "";
     const summary = getNavigationSummary();
     if (!summary || summary.length < 20) return "";
@@ -487,17 +487,28 @@ export async function orchestrateReasoning(
 
   if (plan.complexity === "simple" && plan.enginesNeeded.length === 0) {
     let simpleContext = "";
+    const consulted: string[] = [];
     try {
       const { reason, formatReasoningForContext } = await import("./omnimens-independent-reasoning.js");
       const irResult = await reason(message);
       simpleContext = formatReasoningForContext(irResult);
+      if (simpleContext) consulted.push("INDEPENDENT_REASONING");
+    } catch {}
+    try {
+      const { processQuery: neuralProcess, formatNeuralResponse } = await import("./omnimens-neural-processor.js");
+      const nResult = neuralProcess(message);
+      if (nResult.response.length > 0) {
+        const neuralText = formatNeuralResponse(nResult);
+        simpleContext += `\n[NEURAL PROCESSOR — ZERO API] ${neuralText} (confidence: ${(nResult.confidence * 100).toFixed(0)}%, depth: ${(nResult.processingDepth * 100).toFixed(0)}%)`;
+        consulted.push("NEURAL_PROCESSOR");
+      }
     } catch {}
     return {
       orchestrated: simpleContext.length > 0,
       reasoningChain,
       synthesizedContext: simpleContext,
-      selfEvaluation: { confidence: 0.7, completeness: 0.7, reasoning: "Simple query — independent reasoning applied", needsMoreInfo: false },
-      enginesConsulted: simpleContext.length > 0 ? ["INDEPENDENT_REASONING"] : [],
+      selfEvaluation: { confidence: 0.7, completeness: 0.7, reasoning: "Simple query — independent reasoning + neural processor applied", needsMoreInfo: false },
+      enginesConsulted: consulted,
       totalSteps: 1,
       totalDurationMs: Date.now() - startTime,
       plan,
@@ -534,6 +545,39 @@ export async function orchestrateReasoning(
           type: "query_brain",
           description: "Independent reasoning engine query",
           result: `Independent reasoning error: ${err}`,
+          confidence: 0.1,
+          durationMs: Date.now() - qStart,
+        });
+      }
+    })()
+  );
+
+  engineQueries.push(
+    (async () => {
+      const qStart = Date.now();
+      try {
+        const { processQuery: neuralProcess, formatNeuralResponse } = await import("./omnimens-neural-processor.js");
+        const result = neuralProcess(message);
+        if (result.response.length > 0) {
+          const neuralText = formatNeuralResponse(result);
+          gatheredIntelligence.neuralProcessor = `[NEURAL PROCESSOR — ZERO API] Response: ${neuralText} | Confidence: ${(result.confidence * 100).toFixed(0)}% | Depth: ${(result.processingDepth * 100).toFixed(0)}% | Grounded concepts: ${result.groundedConcepts.join(", ") || "none"} | Hopfield match: ${result.hopfieldMatch || "none"} | Emergent influence: ${(result.emergentInfluence * 100).toFixed(1)}%`;
+          enginesConsulted.push("NEURAL_PROCESSOR");
+        }
+        reasoningChain.push({
+          id: ++stepId,
+          type: "query_brain",
+          description: `Neural processor: ${result.tokens.length} tokens, depth ${(result.processingDepth * 100).toFixed(0)}%, ${result.groundedConcepts.length} grounded concepts (ZERO API calls)`,
+          result: result.response.length > 0 ? `Neural response: ${result.response.slice(0, 8).join(" ")}` : "Insufficient training data",
+          confidence: result.confidence,
+          durationMs: Date.now() - qStart,
+        });
+        totalEnginesQueried++;
+      } catch (err) {
+        reasoningChain.push({
+          id: ++stepId,
+          type: "query_brain",
+          description: "Neural processor engine query",
+          result: `Neural processor error: ${err}`,
           confidence: 0.1,
           durationMs: Date.now() - qStart,
         });

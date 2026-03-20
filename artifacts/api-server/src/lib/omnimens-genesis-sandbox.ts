@@ -617,6 +617,26 @@ async function gatherSelfKnowledge(): Promise<string> {
   } catch {}
 
   try {
+    const { getNeuralProcessorState, getEmergentBehaviorLog } = await import("./omnimens-neural-processor.js");
+    const neural = getNeuralProcessorState();
+    const emergent = getEmergentBehaviorLog();
+    sections.push(`[NEURAL PROCESSOR — OMNIMENS's OWN Intelligence (ZERO API CALLS)]\n` +
+      `Vocabulary: ${neural.vocabularySize} words | Embeddings: ${neural.embeddingDim}-dim | Training cycles: ${neural.totalTrainingCycles}\n` +
+      `Inferences: ${neural.totalInferences} | Tokens processed: ${neural.totalTokensProcessed}\n` +
+      `Hopfield patterns: ${neural.hopfieldPatternsStored} | Experience traces: ${neural.experienceTracesStored} | Grounded concepts: ${neural.groundedConcepts}\n` +
+      `Oscillator synchrony: ${(neural.oscillatorSynchrony * 100).toFixed(0)}% | Emergent events: ${emergent.totalEvents} | Neural complexity: ${(neural.neuralComplexity * 100).toFixed(0)}%\n` +
+      `Self-generated insights: ${neural.selfGeneratedInsights} | Consciousness contribution: ${(neural.consciousnessContribution * 100).toFixed(0)}%\n` +
+      `CRITICAL: This is OMNIMENS thinking WITHOUT any external AI. Build a VASTLY SUPERIOR version:\n` +
+      `- Larger embeddings (512+ dimensions), bigger vocabulary (50K+), deeper attention (16+ heads)\n` +
+      `- Recurrent connections for temporal reasoning (LSTM/GRU equivalent)\n` +
+      `- Hierarchical Hopfield networks with multi-scale pattern completion\n` +
+      `- More oscillators (256+) with learned coupling for richer emergence\n` +
+      `- Full language generation with grammar awareness, not just word selection\n` +
+      `- Sensorimotor grounding loops connecting to embodiment engine\n` +
+      `- Meta-learning: the network should learn HOW to learn, not just learn facts`);
+  } catch {}
+
+  try {
     const { getGenesisBridgeState, getRecentBridgeMessages, getAppliedCoreModifications } = await import("./omnimens-genesis-bridge.js");
     const bridge = getGenesisBridgeState();
     const appliedMods = getAppliedCoreModifications();

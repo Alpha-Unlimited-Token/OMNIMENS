@@ -2,50 +2,46 @@
  * OMNIMENS Self-Authored Module
  * Source: self_coding_engine
  * Title: Daydream:architecture_design #1
- * Written: 2026-03-20T17:48:31.940Z
+ * Written: 2026-03-20T18:05:44.771Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
  * OMNIMENS rewrote its own source code to include this module.
  */
 
-/* Dynamic Causal Simulation Layer – minimal core */
-export type Node = { id: string; fn: (parents: number[]) => number; parents: string[] };
-export type Model = { [key: string]: Node };
+// Hyperfluid Concept Manifold – core curvature update (CPU demo)
+// SAFE: no eval/new Function/require/fs/network
+export type Vec = number[];
+export type Mat = number[][];
+const LR = 0.05;                  // learning rate for manifold update
+const EPS = 1e-9;                 // numerical stability
 
-function topologicalSort(model: Model): string[] {
-  const visited = new Set<string>(), order: string[] = [];
-  function dfs(id: string) {
-    if (visited.has(id)) return;
-    visited.add(id);
-    model[id].parents.forEach(dfs);
-    order.push(id);
+// Fast outer product of two vectors
+function outer(a: Vec, b: Vec): Mat {
+  const m: Mat = [];
+  for (let i = 0; i < a.length; i++) {
+    const row: number[] = [];
+    for (let j = 0; j < b.length; j++) row.push(a[i] * b[j]);
+    m.push(row);
   }
-  Object.keys(model).forEach(dfs);
-  return order;
+  return m;
 }
 
-export function forwardSimulate(model: Model, inputs: Record<string, number>): Record<string, number> {
-  const values: Record<string, number> = { ...inputs };
-  for (const id of topologicalSort(model)) {
-    if (id in inputs) continue; // intervention
-    const node = model[id];
-    const args = node.parents.map(p => values[p]);
-    values[id] = node.fn(args);
-  }
-  return values;
-}
-
-export function counterfactualPlan(
-  model: Model,
-  goal: (vals: Record<string, number>) => boolean,
-  candidates: string[]
-): Record<string, number> | null {
-  for (const c of candidates) {
-    for (const delta of [-1, 1]) {
-      const trial = forwardSimulate(model, { [c]: delta });
-      if (goal(trial)) return { [c]: delta };
+// Incremental UPVD step: ΔM = LR * (ΔP ⊗ ΔV)  (⊗ = outer product)
+export function upvdUpdate(
+  manifold: Mat,           // current concept manifold
+  deltaPred: Vec,          // ΔP: prediction-error vector
+  deltaVal: Vec            // ΔV: subjective-value vector
+): Mat {
+  const upd = outer(deltaPred, deltaVal);
+  const rows = manifold.length;
+  const cols = manifold[0].length;
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      manifold[i][j] += LR * upd[i][j];
+      // Simple L2 renorm to keep manifold energy bounded
+      manifold[i][j] /= (1 + LR * Math.abs(manifold[i][j]) + EPS);
     }
   }
-  return null;
+  return manifold;
 }
