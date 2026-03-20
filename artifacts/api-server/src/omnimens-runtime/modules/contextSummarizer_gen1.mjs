@@ -1,81 +1,66 @@
 /**
  * @module contextSummarizer
- * @description Compresses earlier conversation context into a smaller representation using a sliding window summarization algorithm with attention-based weighting.
+ * @description Summarizes long conversations into compact representations using sliding-window summarization with attention-weighted scoring.
  */
 
 /**
- * Compresses a large context into a summarized representation.
- * Uses a sliding window approach with attention weighting to prioritize key information.
- *
- * @param {string[]} contextArray - Array of context strings to be summarized.
- * @param {number} windowSize - Number of context entries to include in each sliding window.
- * @param {number} summaryLength - Desired number of summarized entries to return.
- * @returns {string[]} Summarized context array.
+ * Calculates attention-weighted scores for tokens based on their relevance.
+ * @param {Array<string>} tokens - Array of tokens from the conversation.
+ * @param {Array<number>} attentionScores - Array of attention weights corresponding to each token.
+ * @returns {Array<{token: string, score: number}>} - Array of tokens with their weighted scores.
  */
-export function summarizeContext(contextArray, windowSize, summaryLength) {
-  if (!Array.isArray(contextArray) || contextArray.length === 0) {
-    throw new Error('contextArray must be a non-empty array of strings.');
-  }
-  if (typeof windowSize !== 'number' || windowSize <= 0) {
-    throw new Error('windowSize must be a positive number.');
-  }
-  if (typeof summaryLength !== 'number' || summaryLength <= 0) {
-    throw new Error('summaryLength must be a positive number.');
+function calculateAttentionScores(tokens, attentionScores) {
+  if (tokens.length !== attentionScores.length) {
+    throw new Error("Tokens and attentionScores arrays must have the same length.");
   }
 
-  // Step 1: Tokenize each context entry into words and compute attention scores.
-  const tokenize = (text) => text.split(/\s+/);
-  const computeAttentionScore = (text) => text.length; // Simple heuristic: longer entries get higher scores.
-
-  const tokenizedContext = contextArray.map((entry) => ({
-    text: entry,
-    tokens: tokenize(entry),
-    attentionScore: computeAttentionScore(entry),
+  return tokens.map((token, index) => ({
+    token,
+    score: attentionScores[index]
   }));
-
-  // Step 2: Apply a sliding window to aggregate attention scores.
-  const slidingWindowScores = [];
-  for (let i = 0; i <= tokenizedContext.length - windowSize; i++) {
-    const window = tokenizedContext.slice(i, i + windowSize);
-    const aggregatedScore = window.reduce((sum, entry) => sum + entry.attentionScore, 0);
-    slidingWindowScores.push({
-      startIndex: i,
-      endIndex: i + windowSize - 1,
-      aggregatedScore,
-    });
-  }
-
-  // Step 3: Sort windows by aggregated attention scores (descending).
-  slidingWindowScores.sort((a, b) => b.aggregatedScore - a.aggregatedScore);
-
-  // Step 4: Select top windows and extract their context entries.
-  const selectedWindows = slidingWindowScores.slice(0, summaryLength);
-  const selectedIndices = new Set();
-  selectedWindows.forEach((window) => {
-    for (let i = window.startIndex; i <= window.endIndex; i++) {
-      selectedIndices.add(i);
-    }
-  });
-
-  // Step 5: Deduplicate and preserve order of selected entries.
-  const summarizedContext = Array.from(selectedIndices)
-    .sort((a, b) => a - b) // Sort indices to preserve original order.
-    .map((index) => contextArray[index]);
-
-  return summarizedContext;
 }
 
 /**
- * Example usage of the summarizeContext function.
- *
- * @example
- * const context = [
- *   'First context entry.',
- *   'Second context entry with more detail.',
- *   'Third entry is short.',
- *   'Fourth entry has significant information.',
- *   'Fifth entry is also important.',
- * ];
- * const summary = summarizeContext(context, 2, 3);
- * console.log(summary);
+ * Generates a compact summary of a conversation using sliding-window summarization.
+ * @param {Array<string>} conversation - Array of tokens representing the full conversation.
+ * @param {Array<number>} attentionScores - Array of attention weights corresponding to each token.
+ * @param {number} windowSize - Number of tokens to include in each sliding window.
+ * @param {number} summarySize - Desired number of tokens in the final summary.
+ * @returns {Array<string>} - Array of tokens representing the summarized conversation.
  */
+function summarizeConversation(conversation, attentionScores, windowSize, summarySize) {
+  if (conversation.length !== attentionScores.length) {
+    throw new Error("Conversation and attentionScores arrays must have the same length.");
+  }
+
+  if (windowSize <= 0 || summarySize <= 0) {
+    throw new Error("windowSize and summarySize must be positive integers.");
+  }
+
+  const scoredTokens = calculateAttentionScores(conversation, attentionScores);
+
+  // Sliding-window summarization
+  const windows = [];
+  for (let i = 0; i < scoredTokens.length; i += windowSize) {
+    const window = scoredTokens.slice(i, i + windowSize);
+    const averageScore = window.reduce((sum, tokenObj) => sum + tokenObj.score, 0) / window.length;
+    windows.push({ tokens: window.map(tokenObj => tokenObj.token), averageScore });
+  }
+
+  // Sort windows by average score in descending order
+  windows.sort((a, b) => b.averageScore - a.averageScore);
+
+  // Select top windows and flatten tokens into a summary
+  const summaryTokens = windows.slice(0, Math.ceil(summarySize / windowSize))
+    .flatMap(window => window.tokens);
+
+  return summaryTokens.slice(0, summarySize); // Ensure summarySize limit
+}
+
+/**
+ * Exports the module functions.
+ */
+export {
+  calculateAttentionScores,
+  summarizeConversation
+};

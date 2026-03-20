@@ -1,4 +1,5 @@
 import { Sidebar } from "./sidebar";
+import { GlobalSearch } from "./global-search";
 import { useEffect, useState } from "react";
 
 export function WorkspaceLayout({ children }: { children: React.ReactNode }) {
@@ -19,6 +20,7 @@ export function WorkspaceLayout({ children }: { children: React.ReactNode }) {
           {children}
         </div>
       </main>
+      <GlobalSearch />
     </div>
   );
 }

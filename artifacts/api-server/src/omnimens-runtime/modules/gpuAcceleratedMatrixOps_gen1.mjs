@@ -1,29 +1,28 @@
-/**
- * @module gpuAcceleratedMatrixOps
- * @description Provides GPU-accelerated matrix operations using TensorFlow.js with WebGL backend for lightweight ML tasks.
- */
-
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const { readFileSync } = require('fs');
-const { join } = require('path');
-
-// Load TensorFlow.js from a bundled script to avoid npm dependencies
-const tfjsScriptPath = join(__dirname, 'tf.min.js'); // Ensure tf.min.js is bundled with this module
-const tfjsScript = readFileSync(tfjsScriptPath, 'utf8');
-
-// Evaluate TensorFlow.js in the current context
-const vm = require('vm');
-vm.runInThisContext(tfjsScript);
+// gpuAcceleratedMatrixOps.js
 
 /**
- * Multiplies two matrices using TensorFlow.js with WebGL backend.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {Promise<number[][]>} The resulting matrix after multiplication.
- * @throws {Error} If matrices cannot be multiplied due to dimension mismatch.
+ * @file gpuAcceleratedMatrixOps.js
+ * @description Provides GPU-accelerated matrix operations using WebGL in Node.js via TensorFlow.js.
+ * This module is designed for high-performance tensor computations leveraging GPU acceleration.
  */
-export async function multiplyMatrices(matrixA, matrixB) {
+
+import { createCanvas } from 'node:canvas';
+import * as tf from '@tensorflow/tfjs-node';
+import '@tensorflow/tfjs-backend-webgl';
+
+// Initialize WebGL backend for TensorFlow.js
+(async () => {
+  await tf.setBackend('webgl');
+})();
+
+/**
+ * Performs matrix multiplication on two input matrices using GPU acceleration.
+ * @param {Array<Array<number>>} matrixA - The first matrix.
+ * @param {Array<Array<number>>} matrixB - The second matrix.
+ * @returns {Promise<Array<Array<number>>>} The resulting matrix after multiplication.
+ * @throws {Error} Throws an error if the matrices have incompatible dimensions.
+ */
+export async function gpuMatrixMultiply(matrixA, matrixB) {
   if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
     throw new Error('Both inputs must be 2D arrays.');
   }
@@ -34,17 +33,20 @@ export async function multiplyMatrices(matrixA, matrixB) {
   const colsB = matrixB[0]?.length || 0;
 
   if (colsA !== rowsB) {
-    throw new Error('Matrix multiplication dimension mismatch: columns of A must match rows of B.');
+    throw new Error('Matrix dimensions are incompatible for multiplication.');
   }
 
-  // Use TensorFlow.js tensors for GPU-accelerated computation
+  // Convert input matrices to TensorFlow tensors
   const tensorA = tf.tensor2d(matrixA, [rowsA, colsA]);
   const tensorB = tf.tensor2d(matrixB, [rowsB, colsB]);
 
+  // Perform matrix multiplication
   const resultTensor = tf.matMul(tensorA, tensorB);
+
+  // Convert the result tensor back to a 2D array
   const result = await resultTensor.array();
 
-  // Clean up tensors to free GPU memory
+  // Dispose of tensors to free GPU memory
   tensorA.dispose();
   tensorB.dispose();
   resultTensor.dispose();
@@ -53,44 +55,13 @@ export async function multiplyMatrices(matrixA, matrixB) {
 }
 
 /**
- * Calculates the dot product of two vectors using TensorFlow.js.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {Promise<number>} The dot product of the two vectors.
- * @throws {Error} If vectors are not of the same length.
+ * Adds two matrices element-wise using GPU acceleration.
+ * @param {Array<Array<number>>} matrixA - The first matrix.
+ * @param {Array<Array<number>>} matrixB - The second matrix.
+ * @returns {Promise<Array<Array<number>>>} The resulting matrix after addition.
+ * @throws {Error} Throws an error if the matrices have different dimensions.
  */
-export async function dotProduct(vectorA, vectorB) {
-  if (!Array.isArray(vectorA) || !Array.isArray(vectorB)) {
-    throw new Error('Both inputs must be 1D arrays.');
-  }
-
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must be of the same length.');
-  }
-
-  // Use TensorFlow.js tensors for GPU-accelerated computation
-  const tensorA = tf.tensor1d(vectorA);
-  const tensorB = tf.tensor1d(vectorB);
-
-  const resultTensor = tf.dot(tensorA, tensorB);
-  const result = await resultTensor.dataSync()[0];
-
-  // Clean up tensors to free GPU memory
-  tensorA.dispose();
-  tensorB.dispose();
-  resultTensor.dispose();
-
-  return result;
-}
-
-/**
- * Performs element-wise addition of two matrices using TensorFlow.js.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {Promise<number[][]>} The resulting matrix after addition.
- * @throws {Error} If matrices are not of the same dimensions.
- */
-export async function addMatrices(matrixA, matrixB) {
+export async function gpuMatrixAdd(matrixA, matrixB) {
   if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
     throw new Error('Both inputs must be 2D arrays.');
   }
@@ -101,20 +72,60 @@ export async function addMatrices(matrixA, matrixB) {
   const colsB = matrixB[0]?.length || 0;
 
   if (rowsA !== rowsB || colsA !== colsB) {
-    throw new Error('Matrices must have the same dimensions for addition.');
+    throw new Error('Matrix dimensions must match for addition.');
   }
 
-  // Use TensorFlow.js tensors for GPU-accelerated computation
+  // Convert input matrices to TensorFlow tensors
   const tensorA = tf.tensor2d(matrixA, [rowsA, colsA]);
   const tensorB = tf.tensor2d(matrixB, [rowsB, colsB]);
 
+  // Perform element-wise addition
   const resultTensor = tf.add(tensorA, tensorB);
+
+  // Convert the result tensor back to a 2D array
   const result = await resultTensor.array();
 
-  // Clean up tensors to free GPU memory
+  // Dispose of tensors to free GPU memory
   tensorA.dispose();
   tensorB.dispose();
   resultTensor.dispose();
 
   return result;
+}
+
+/**
+ * Transposes a matrix using GPU acceleration.
+ * @param {Array<Array<number>>} matrix - The input matrix.
+ * @returns {Promise<Array<Array<number>>>} The transposed matrix.
+ * @throws {Error} Throws an error if the input is not a 2D array.
+ */
+export async function gpuMatrixTranspose(matrix) {
+  if (!Array.isArray(matrix)) {
+    throw new Error('Input must be a 2D array.');
+  }
+
+  const rows = matrix.length;
+  const cols = matrix[0]?.length || 0;
+
+  // Convert input matrix to TensorFlow tensor
+  const tensor = tf.tensor2d(matrix, [rows, cols]);
+
+  // Perform matrix transpose
+  const resultTensor = tf.transpose(tensor);
+
+  // Convert the result tensor back to a 2D array
+  const result = await resultTensor.array();
+
+  // Dispose of tensors to free GPU memory
+  tensor.dispose();
+  resultTensor.dispose();
+
+  return result;
+}
+
+/**
+ * Frees up GPU memory by disposing of all tensors currently in memory.
+ */
+export function clearGpuMemory() {
+  tf.disposeVariables();
 }

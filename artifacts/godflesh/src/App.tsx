@@ -55,6 +55,8 @@ const About = retryLazy(() => import("@/pages/about"));
 const Contact = retryLazy(() => import("@/pages/contact"));
 const FooterLinks = retryLazy(() => import("@/pages/footer-links"));
 const LipSync = retryLazy(() => import("@/pages/lip-sync"));
+const Templates = retryLazy(() => import("@/pages/templates"));
+const Deploy = retryLazy(() => import("@/pages/deploy"));
 
 initTheme();
 try { sessionStorage.removeItem("chunk_reload"); } catch {}
@@ -150,6 +152,8 @@ function Router() {
         <Route path="/developer">{() => <WS><Developer /></WS>}</Route>
         <Route path="/dev">{() => <WS><Developer /></WS>}</Route>
         <Route path="/tools">{() => <WS><Tools /></WS>}</Route>
+        <Route path="/templates">{() => <WS><Templates /></WS>}</Route>
+        <Route path="/deploy">{() => <WS><Deploy /></WS>}</Route>
 
         <Route path="/faq" component={FAQ} />
         <Route path="/support" component={Support} />

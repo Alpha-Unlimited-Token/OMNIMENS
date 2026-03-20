@@ -5,9 +5,11 @@ import {
   Home, MessageSquare, FolderOpen, Settings, CreditCard,
   Code2, HelpCircle, ChevronLeft, ChevronRight, LogOut,
   User, Zap, BookOpen, Shield, FileText, Mail, Info,
-  Layers, ExternalLink, Key, LifeBuoy
+  Layers, ExternalLink, Key, LifeBuoy, Rocket, Search
 } from "lucide-react";
 import { OmnimensIcon } from "./omnimens-icon";
+import { NotificationBell } from "./notification-center";
+import { SearchTrigger } from "./global-search";
 
 type NavItem = {
   icon: React.ReactNode;
@@ -20,10 +22,12 @@ const MAIN_NAV: NavItem[] = [
   { icon: <Home className="w-5 h-5" />, label: "Home", href: "/" },
   { icon: <MessageSquare className="w-5 h-5" />, label: "Create", href: "/chat" },
   { icon: <FolderOpen className="w-5 h-5" />, label: "Projects", href: "/projects" },
+  { icon: <Layers className="w-5 h-5" />, label: "Templates", href: "/templates" },
 ];
 
 const TOOLS_NAV: NavItem[] = [
   { icon: <CreditCard className="w-5 h-5" />, label: "Pricing", href: "/pricing" },
+  { icon: <Rocket className="w-5 h-5" />, label: "Deploy", href: "/deploy" },
   { icon: <Key className="w-5 h-5" />, label: "Developer", href: "/developer" },
   { icon: <BookOpen className="w-5 h-5" />, label: "Memory", href: "/memory" },
 ];
@@ -92,6 +96,10 @@ export function Sidebar() {
       )}
 
       <nav className="flex-1 flex flex-col gap-0.5 px-2 pt-2 overflow-y-auto overflow-x-hidden scrollbar-hide">
+        <SearchTrigger expanded={expanded} />
+
+        <div className="h-px bg-white/5 my-2 mx-1" />
+
         <NavSection items={MAIN_NAV} location={location} expanded={expanded} />
 
         <div className="h-px bg-white/5 my-2 mx-1" />
@@ -106,7 +114,10 @@ export function Sidebar() {
         <NavSection items={SUPPORT_NAV} location={location} expanded={expanded} />
       </nav>
 
-      <div className="border-t border-white/5 px-2 py-2">
+      <div className="border-t border-white/5 px-2 py-2 space-y-0.5">
+        {isAuthenticated && (
+          <NotificationBell expanded={expanded} />
+        )}
         {isAuthenticated ? (
           <Link
             href="/account"
@@ -124,7 +135,7 @@ export function Sidebar() {
                 <div className="text-xs font-mono font-bold truncate">
                   {(user as any)?.username || "Account"}
                 </div>
-                <div className="text-[10px] font-mono text-white/40 tracking-wider">ACCOUNT</div>
+                <div className="text-[10px] font-mono text-white/40 tracking-wider">SETTINGS</div>
               </div>
             )}
           </Link>
@@ -207,6 +218,7 @@ function MobileBottomBar({
     { icon: <Home className="w-5 h-5" />, label: "Home", href: "/" },
     { icon: <MessageSquare className="w-5 h-5" />, label: "Create", href: "/chat" },
     { icon: <FolderOpen className="w-5 h-5" />, label: "Projects", href: "/projects" },
+    { icon: <Layers className="w-5 h-5" />, label: "Templates", href: "/templates" },
     { icon: <User className="w-5 h-5" />, label: "Account", href: isAuthenticated ? "/account" : "/login" },
   ];
 

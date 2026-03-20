@@ -9,10 +9,12 @@ import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check, Atom, Code2, Layers, Eye, AlertTriangle, Wrench, Dna, Play, Wallet, CreditCard, Gift, TrendingUp, ChevronRight, Bell, Sun, HelpCircle, BookOpen, Info, Settings, ExternalLink, Share2, Star, ToggleLeft, ToggleRight, Loader2, X, Lock, Copy, Link, Users } from "lucide-react";
+import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check, Atom, Code2, Layers, Eye, AlertTriangle, Wrench, Dna, Play, Wallet, CreditCard, Gift, TrendingUp, ChevronRight, Bell, Sun, HelpCircle, BookOpen, Info, Settings, ExternalLink, Share2, Star, ToggleLeft, ToggleRight, Loader2, X, Lock, Copy, Link, Users, Paintbrush, KeyRound } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SEO, seoData } from "@/components/seo";
 import { useTheme } from "@/hooks/use-theme";
+
+type SettingsTab = "profile" | "billing" | "preferences" | "security" | "advanced" | "account";
 
 function useBillingInfo() {
   return useQuery({
@@ -429,519 +431,147 @@ export default function Account() {
     } catch { } finally { setCiSaving(false); }
   };
 
+  const [settingsTab, setSettingsTab] = useState<SettingsTab>("profile");
+
   if (isLoading || !isAuthenticated) return <div className="flex-1" />;
 
   const activePatches = patches.filter(p => p.active);
   const inactivePatches = patches.filter(p => !p.active);
 
+  const SETTINGS_TABS: { id: SettingsTab; label: string; icon: React.ReactNode }[] = [
+    { id: "profile", label: "Profile", icon: <User className="w-4 h-4" /> },
+    { id: "billing", label: "Billing & Usage", icon: <Wallet className="w-4 h-4" /> },
+    { id: "preferences", label: "Preferences", icon: <Paintbrush className="w-4 h-4" /> },
+    { id: "security", label: "Security", icon: <KeyRound className="w-4 h-4" /> },
+    { id: "advanced", label: "Advanced", icon: <Atom className="w-4 h-4" /> },
+    { id: "account", label: "Account", icon: <Settings className="w-4 h-4" /> },
+  ];
+
   return (
     <>
       <SEO {...seoData.account} />
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
-        {/* ─── Clean Settings Header ─────────────────────────────────── */}
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 overflow-hidden">
-            {user?.profileImageUrl
-              ? <img src={user.profileImageUrl} alt={user.username} className="w-full h-full object-cover" />
-              : <User className="w-6 h-6 text-primary" />}
-          </div>
-          <div>
-            <p className="font-bold text-white text-lg">@{user?.username}</p>
-            <p className="text-xs font-mono text-white/40">{user?.id}</p>
-          </div>
-        </div>
-
-        {/* USAGE & BILLING */}
-        {billing && (
-          <div className="mb-2">
-            <p className="text-[10px] font-mono text-white/35 tracking-widest uppercase px-1 mb-1">Usage</p>
-            <div className="bg-black/30 border border-white/8 rounded-xl overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/6">
-                <div className="flex items-center gap-3">
-                  <Wallet className="w-4 h-4 text-primary/70" />
-                  <span className="text-[13px] text-white/80">Credit Balance</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono font-bold text-white">{((status as any)?.credits ?? 0).toLocaleString()}</span>
-                  <span className="text-[11px] text-white/40">credits</span>
-                </div>
+      <div className="flex-1 flex overflow-hidden" style={{ height: "calc(100vh - 0rem)" }}>
+        <aside className="w-56 shrink-0 border-r border-white/5 bg-[#0a0a12] overflow-y-auto hidden md:flex flex-col">
+          <div className="px-4 pt-6 pb-4 border-b border-white/5">
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 overflow-hidden">
+                {user?.profileImageUrl
+                  ? <img src={user.profileImageUrl} alt={user.username} className="w-full h-full object-cover" />
+                  : <User className="w-4 h-4 text-primary" />}
               </div>
-              <div className="flex items-center justify-between px-4 py-3.5">
-                <div className="flex items-center gap-3">
-                  <TrendingUp className="w-4 h-4 text-emerald-400/70" />
-                  <span className="text-[13px] text-white/80">Plan</span>
-                </div>
-                <span className="text-[11px] font-mono text-primary border border-primary/20 bg-primary/10 px-2 py-0.5 rounded">
-                  {(status as any)?.isOwner ? "CREATOR" : (status as any)?.isPro ? "UNLIMITED" : "FREE"}
-                </span>
+              <div className="min-w-0">
+                <p className="font-mono text-sm font-bold text-white truncate">@{(user as any)?.username}</p>
+                <p className="text-[10px] font-mono text-white/40 tracking-wider">SETTINGS</p>
               </div>
             </div>
           </div>
-        )}
-
-        {/* AUTO TOP-UP / PAY AS YOU GO */}
-        {!isOwner && (
-          <div className="mt-5 mb-2">
-            <p className="text-[10px] font-mono text-white/35 tracking-widest uppercase px-1 mb-1">Auto Top-up</p>
-            <div className="bg-black/30 border border-white/8 rounded-xl overflow-hidden">
-
-              {/* Success / error banners */}
-              {walletSuccess && (
-                <div className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500/10 border-b border-emerald-500/20">
-                  <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span className="text-[12px] text-emerald-400">{walletSuccess}</span>
-                </div>
-              )}
-              {walletError && (
-                <div className="flex items-center gap-2 px-4 py-2.5 bg-red-500/10 border-b border-red-500/20">
-                  <AlertTriangle className="w-3.5 h-3.5 text-red-400 shrink-0" />
-                  <span className="text-[12px] text-red-400">{walletError}</span>
-                  <button onClick={() => setWalletError("")} className="ml-auto text-red-400/60 hover:text-red-400"><X className="w-3 h-3" /></button>
-                </div>
-              )}
-
-              {!(billing as any)?.hasWallet ? (
-                /* ── No card connected ── */
-                <div className="px-4 py-5">
-                  <div className="flex items-start gap-3 mb-4">
-                    <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5">
-                      <CreditCard className="w-4 h-4 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-[13px] text-white font-medium mb-1">Pay as you go</p>
-                      <p className="text-[12px] text-white/50 leading-relaxed">
-                        Connect a card and we'll automatically top up your credits whenever you run low. You set the amount — only charged when needed.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-4 gap-1.5 mb-4">
-                    {TOPUP_OPTIONS.map(o => (
-                      <div key={o.amountCents} className="flex flex-col items-center py-2 px-1 rounded-lg bg-white/4 border border-white/8">
-                        <span className="text-[11px] font-mono font-bold text-white">{o.label}</span>
-                        <span className="text-[9px] text-white/40 mt-0.5">{o.amountCents / 10} cr</span>
-                      </div>
-                    ))}
-                  </div>
-                  <button
-                    onClick={connectWallet}
-                    disabled={walletLoading}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-primary text-black text-[13px] font-bold hover:bg-primary/90 transition-colors disabled:opacity-60"
-                  >
-                    {walletLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
-                    {walletLoading ? "Opening Stripe…" : "Connect Card"}
-                  </button>
-                  <p className="text-[10px] text-white/30 text-center mt-2">Secured by Stripe · No charge until you run out of credits</p>
-                </div>
-              ) : (
-                /* ── Card connected ── */
-                <div>
-                  {/* Card info row */}
-                  <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/6">
-                    <div className="flex items-center gap-2.5">
-                      <CreditCard className="w-4 h-4 text-emerald-400" />
-                      <span className="text-[13px] text-white font-medium">
-                        {(billing as any)?.card?.brand?.toUpperCase()} •••• {(billing as any)?.card?.last4}
-                      </span>
-                      <span className="text-[10px] font-mono text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-1.5 py-0.5 rounded">ACTIVE</span>
-                    </div>
-                    <button
-                      onClick={removeWallet}
-                      disabled={removeLoading}
-                      className="text-[11px] font-mono text-white/35 hover:text-red-400 transition-colors disabled:opacity-50"
-                    >
-                      {removeLoading ? "…" : "remove"}
-                    </button>
-                  </div>
-
-                  {/* Auto top-up toggle */}
-                  <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/6">
-                    <div>
-                      <p className="text-[13px] text-white/80">Auto top-up</p>
-                      <p className="text-[11px] text-white/40">Charge card when credits run out</p>
-                    </div>
-                    <button
-                      onClick={() => setAutoEnabled(v => !v)}
-                      className={`transition-colors ${autoEnabled ? "text-primary" : "text-white/25"}`}
-                    >
-                      {autoEnabled
-                        ? <ToggleRight className="w-7 h-7" />
-                        : <ToggleLeft  className="w-7 h-7" />}
-                    </button>
-                  </div>
-
-                  {/* Top-up amount */}
-                  <div className="px-4 py-3.5 border-b border-white/6">
-                    <p className="text-[12px] text-white/60 mb-2.5">Top-up amount <span className="text-white/30 text-[10px]">(charged when you run out)</span></p>
-                    <div className="grid grid-cols-4 gap-1.5">
-                      {TOPUP_OPTIONS.map(o => (
-                        <button
-                          key={o.amountCents}
-                          onClick={() => setAutoAmt(o.amountCents)}
-                          className={`py-2 rounded-lg border text-[12px] font-mono font-bold transition-all ${
-                            autoAmt === o.amountCents
-                              ? "bg-primary/15 border-primary/50 text-primary"
-                              : "bg-white/3 border-white/8 text-white/60 hover:border-white/20"
-                          }`}
-                        >
-                          {o.label}
-                        </button>
-                      ))}
-                    </div>
-                    <p className="text-[10px] text-white/30 mt-2">
-                      = {((autoAmt ?? 1000) / 10).toLocaleString()} credits · auto-charged when balance hits 0
-                    </p>
-                  </div>
-
-                  {/* Save settings + manual topup */}
-                  <div className="flex gap-2 px-4 py-3.5">
-                    <button
-                      onClick={saveAutoTopupSettings}
-                      disabled={savingAuto}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-white/6 border border-white/10 hover:bg-white/10 text-[12px] font-mono text-white/70 transition-colors disabled:opacity-50"
-                    >
-                      {savingAuto ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
-                      Save Settings
-                    </button>
-                    <button
-                      onClick={triggerTopup}
-                      disabled={topupLoading || !autoEnabled}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-primary/10 border border-primary/30 hover:bg-primary/20 text-[12px] font-mono text-primary transition-colors disabled:opacity-40"
-                      title={!autoEnabled ? "Enable auto top-up first" : `Add ${(autoAmt ?? 1000) / 10} credits now`}
-                    >
-                      {topupLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3" />}
-                      Top Up Now
-                    </button>
-                  </div>
-
-                  {topupResult && (
-                    <div className={`px-4 py-2 text-[12px] font-mono border-t border-white/6 ${topupResult.startsWith("Success") ? "text-emerald-400" : "text-red-400"}`}>
-                      {topupResult}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* PROFILE */}
-        <div className="mt-5 mb-2">
-          <p className="text-[10px] font-mono text-white/35 tracking-widest uppercase px-1 mb-1">Profile</p>
-          <div className="bg-black/30 border border-white/8 rounded-xl overflow-hidden">
-            <button
-              onClick={() => document.getElementById("custom-instructions-section")?.scrollIntoView({ behavior: "smooth" })}
-              className="w-full flex items-center justify-between px-4 py-3.5 border-b border-white/6 hover:bg-white/3 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <Settings className="w-4 h-4 text-white/50" />
-                <span className="text-[13px] text-white/80">Edit Profile & Instructions</span>
-              </div>
-              <ChevronRight className="w-4 h-4 text-white/25" />
-            </button>
-            <button
-              onClick={() => {
-                const shareText = `Try OMNIMENS — the most advanced AI assistant. Powered by COGNISYNC™ & NEUROSYNC™. Join at omnimens-ai.com`;
-                if (navigator.share) navigator.share({ title: "OMNIMENS", text: shareText, url: window.location.origin });
-                else navigator.clipboard.writeText(shareText);
-              }}
-              className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-white/3 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <Share2 className="w-4 h-4 text-white/50" />
-                <span className="text-[13px] text-white/80">Refer a friend</span>
-              </div>
-              <ChevronRight className="w-4 h-4 text-white/25" />
-            </button>
-          </div>
-        </div>
-
-        {/* THEME */}
-        <div className="mt-5 mb-2">
-          <p className="text-[10px] font-mono text-white/35 tracking-widest uppercase px-1 mb-1">Theme</p>
-          <div className="bg-black/30 border border-white/8 rounded-xl overflow-hidden">
-            <button
-              onClick={() => applyTheme(activeTheme === "dark" ? "light" : "dark")}
-              className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-white/3 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <Sun className="w-4 h-4 text-white/50" />
-                <span className="text-[13px] text-white/80">Theme · {activeTheme === "dark" ? "Dark" : "Light"}</span>
-              </div>
-              <ChevronRight className="w-4 h-4 text-white/25" />
-            </button>
-          </div>
-        </div>
-
-        {/* NOTIFICATIONS */}
-        <div className="mt-5 mb-2">
-          <p className="text-[10px] font-mono text-white/35 tracking-widest uppercase px-1 mb-1">Notifications</p>
-          <div className="bg-black/30 border border-white/8 rounded-xl overflow-hidden">
-            <button
-              onClick={() => setShowNotifPanel(p => !p)}
-              className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-white/3 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <Bell className="w-4 h-4 text-white/50" />
-                <span className="text-[13px] text-white/80">Notifications</span>
-              </div>
-              {showNotifPanel ? <ChevronDown className="w-4 h-4 text-white/25" /> : <ChevronRight className="w-4 h-4 text-white/25" />}
-            </button>
-            {showNotifPanel && (
-              <div className="border-t border-white/6 px-4 py-3 space-y-3">
-                {[
-                  { key: "systemUpdates", label: "System Updates", desc: "Maintenance, outages & platform changes" },
-                  { key: "creditAlerts", label: "Credit Alerts", desc: "Low balance & usage warnings" },
-                  { key: "newFeatures", label: "New Features", desc: "Agent launches & capability updates" },
-                  { key: "tips", label: "Tips & Tutorials", desc: "Get the most out of OMNIMENS" },
-                ].map(item => (
-                  <button
-                    key={item.key}
-                    onClick={() => toggleNotifPref(item.key)}
-                    className="w-full flex items-center justify-between py-1.5 group"
-                  >
-                    <div className="text-left">
-                      <p className="text-[12px] font-mono text-white/80">{item.label}</p>
-                      <p className="text-[10px] text-white/40 mt-0.5">{item.desc}</p>
-                    </div>
-                    <div className={`w-9 h-5 rounded-full flex items-center px-0.5 transition-colors ${notifPrefs[item.key] ? "bg-primary/80" : "bg-white/10"}`}>
-                      <div className={`w-4 h-4 rounded-full bg-white shadow transition-transform ${notifPrefs[item.key] ? "translate-x-4" : "translate-x-0"}`} />
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* SUPPORT */}
-        <div className="mt-5 mb-2">
-          <p className="text-[10px] font-mono text-white/35 tracking-widest uppercase px-1 mb-1">Support</p>
-          <div className="bg-black/30 border border-white/8 rounded-xl overflow-hidden">
-            <a
-              href={`${import.meta.env.BASE_URL}faq`}
-              className="flex items-center justify-between px-4 py-3.5 border-b border-white/6 hover:bg-white/3 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <HelpCircle className="w-4 h-4 text-white/50" />
-                <span className="text-[13px] text-white/80">Help</span>
-              </div>
-            </a>
-            <a
-              href={`${import.meta.env.BASE_URL}faq`}
-              className="flex items-center justify-between px-4 py-3.5 hover:bg-white/3 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <BookOpen className="w-4 h-4 text-white/50" />
-                <span className="text-[13px] text-white/80">Docs</span>
-              </div>
-              <ExternalLink className="w-3.5 h-3.5 text-white/25" />
-            </a>
-          </div>
-        </div>
-
-        {/* OTHER */}
-        <div className="mt-5 mb-8">
-          <p className="text-[10px] font-mono text-white/35 tracking-widest uppercase px-1 mb-1">Other</p>
-          <div className="bg-black/30 border border-white/8 rounded-xl overflow-hidden">
-            <button
-              onClick={() => document.getElementById("about-section")?.scrollIntoView({ behavior: "smooth" })}
-              className="w-full flex items-center justify-between px-4 py-3.5 border-b border-white/6 hover:bg-white/3 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <Info className="w-4 h-4 text-white/50" />
-                <span className="text-[13px] text-white/80">About OMNIMENS</span>
-              </div>
-              <ChevronRight className="w-4 h-4 text-white/25" />
-            </button>
-            <button
-              onClick={() => document.getElementById("memory-section")?.scrollIntoView({ behavior: "smooth" })}
-              className="w-full flex items-center justify-between px-4 py-3.5 border-b border-white/6 hover:bg-white/3 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <Settings className="w-4 h-4 text-white/50" />
-                <span className="text-[13px] text-white/80">Manage Account & Memory</span>
-              </div>
-              <ChevronRight className="w-4 h-4 text-white/25" />
-            </button>
+          <nav className="flex-1 py-2 px-2 space-y-0.5">
+            {SETTINGS_TABS.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setSettingsTab(tab.id)}
+                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left transition-all text-xs font-mono tracking-wider ${
+                  settingsTab === tab.id
+                    ? "bg-primary/10 text-primary"
+                    : "text-white/50 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                {tab.icon}
+                {tab.label.toUpperCase()}
+              </button>
+            ))}
+          </nav>
+          <div className="px-2 py-3 border-t border-white/5">
             <button
               onClick={logout}
-              className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-red-500/5 transition-colors"
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left text-xs font-mono tracking-wider text-red-400/70 hover:text-red-400 hover:bg-red-400/5 transition-all"
             >
-              <div className="flex items-center gap-3">
-                <LogOut className="w-4 h-4 text-red-400" />
-                <span className="text-[13px] text-red-400">Log Out</span>
-              </div>
+              <LogOut className="w-4 h-4" />
+              LOG OUT
             </button>
           </div>
-        </div>
+        </aside>
 
-        {/* ─── Divider ─────────────────────────────────────────────── */}
-        <div className="border-t border-white/8 mb-8">
-          <p className="text-[10px] font-mono text-white/20 tracking-widest uppercase mt-4 mb-6 text-center">ADVANCED SETTINGS</p>
-        </div>
-
-        <div id="about-section" className="mb-2" />
-        <h1 className="text-3xl font-display font-bold tracking-widest text-white mb-8 border-b border-white/10 pb-4">
-          SYSTEM IDENTIFICATION
-        </h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          
-          {/* Profile Card */}
-          <div className="md:col-span-1 bg-black/40 border border-white/10 rounded-xl p-6 flex flex-col items-center text-center">
-            <div className="w-20 h-20 bg-primary/10 rounded-full border border-primary/30 flex items-center justify-center mb-4">
-              {user?.profileImageUrl ? (
-                <img src={user.profileImageUrl} alt={user.username} className="w-full h-full rounded-full object-cover" />
-              ) : (
-                <User className="w-8 h-8 text-primary" />
-              )}
-            </div>
-            <h2 className="text-xl font-bold text-white mb-1">@{user?.username}</h2>
-            <p className="text-xs font-mono text-white/85 break-all mb-2">ID: {user?.id}</p>
-            {isOwner && (
-              <span className="text-[10px] font-mono text-amber-400 border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 rounded mb-4">
-                SYSTEM ARCHITECT
-              </span>
-            )}
-            
-            <Button onClick={logout} variant="outline" className="w-full mt-auto border-white/10 text-white/60 hover:text-white hover:bg-destructive/20 hover:border-destructive/50">
-              <LogOut className="w-4 h-4 mr-2" />
-              DISCONNECT
-            </Button>
+        <div className="flex-1 overflow-y-auto">
+          <div className="md:hidden flex overflow-x-auto gap-1 px-4 pt-4 pb-2 scrollbar-none border-b border-white/5">
+            {SETTINGS_TABS.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setSettingsTab(tab.id)}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-mono whitespace-nowrap transition-all ${
+                  settingsTab === tab.id
+                    ? "bg-primary/10 text-primary border border-primary/20"
+                    : "text-white/50 border border-white/5"
+                }`}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
           </div>
 
-          {/* Stats Card */}
-          <div className="md:col-span-2 space-y-6">
-            
-            <div className="bg-black/40 border border-white/10 rounded-xl p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <Shield className="w-5 h-5 text-primary" />
-                <h3 className="font-mono tracking-widest text-white/80">ACCESS LEVEL</h3>
-              </div>
-              
-              {statusLoading ? (
-                <div className="h-16 animate-pulse bg-white/5 rounded-lg" />
-              ) : isOwner ? (
-                <div className="flex items-center gap-3 p-4 border border-amber-500/20 rounded-lg bg-amber-400/5">
-                  <span className="w-2 h-2 rounded-full bg-amber-400" />
-                  <span className="text-lg font-bold text-amber-400">SYSTEM ARCHITECT — UNLIMITED</span>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-4 border border-white/5 rounded-lg bg-black/60">
-                    <div className="flex items-center gap-3">
-                      <span className={`w-2 h-2 rounded-full ${(status as any)?.credits > 0 ? 'bg-primary' : 'bg-white/20'}`} />
-                      <div>
-                        <div className="font-mono text-sm text-white">CREDIT BALANCE</div>
-                        <div className={`text-2xl font-black font-mono ${(status as any)?.credits > 100 ? 'text-white' : (status as any)?.credits > 0 ? 'text-amber-400' : 'text-red-400'}`}>
-                          {((status as any)?.credits ?? 0).toLocaleString()}
-                          <span className="text-sm font-normal text-white/75 ml-1">credits</span>
-                        </div>
-                      </div>
-                    </div>
-                    <Button onClick={() => setLocation("/pricing")} size="sm" variant={(status as any)?.credits < 100 ? "default" : "secondary"}>
-                      {(status as any)?.credits < 100 ? "ADD CREDITS" : "MANAGE WALLET"}
-                    </Button>
-                  </div>
+          <div className="max-w-2xl mx-auto px-4 py-8">
+            <h1 className="text-2xl font-display font-bold text-white tracking-wider mb-1">
+              {SETTINGS_TABS.find(t => t.id === settingsTab)?.label.toUpperCase() || "SETTINGS"}
+            </h1>
+            <p className="text-sm font-mono text-white/40 mb-8">
+              {settingsTab === "profile" && "Manage your profile and custom instructions"}
+              {settingsTab === "billing" && "Credits, wallet, and usage details"}
+              {settingsTab === "preferences" && "Theme, notifications, and personalization"}
+              {settingsTab === "security" && "Two-factor authentication and security options"}
+              {settingsTab === "advanced" && "Consciousness engine, patches, and system data"}
+              {settingsTab === "account" && "Referrals, data management, and account actions"}
+            </p>
 
-                  {/* Wallet status */}
-                  <div className="flex items-center justify-between p-3 border border-white/5 rounded-lg bg-black/40">
-                    <div className="flex items-center gap-2">
-                      {(billing as any)?.hasWallet ? (
-                        <>
-                          <CreditCard className="w-4 h-4 text-green-400" />
-                          <span className="font-mono text-xs text-green-400">
-                            {(billing as any)?.card?.brand?.toUpperCase()} •••• {(billing as any)?.card?.last4} · Auto-topup on
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <Wallet className="w-4 h-4 text-white/75" />
-                          <span className="font-mono text-xs text-white/75">No wallet connected</span>
-                        </>
+            {/* ═══ PROFILE TAB ═══ */}
+            {settingsTab === "profile" && (
+              <div className="space-y-6">
+                <div className="bg-black/40 border border-white/10 rounded-xl p-6">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-16 h-16 bg-primary/10 rounded-full border border-primary/30 flex items-center justify-center shrink-0 overflow-hidden">
+                      {user?.profileImageUrl
+                        ? <img src={user.profileImageUrl} alt={user.username} className="w-full h-full object-cover rounded-full" />
+                        : <User className="w-7 h-7 text-primary" />}
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold text-white">@{(user as any)?.username}</h2>
+                      <p className="text-xs font-mono text-white/40 break-all">ID: {user?.id}</p>
+                      {isOwner && (
+                        <span className="text-[10px] font-mono text-amber-400 border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 rounded mt-1 inline-block">
+                          SYSTEM ARCHITECT
+                        </span>
                       )}
                     </div>
-                    {!(billing as any)?.hasWallet && (
-                      <button onClick={() => setLocation("/pricing")} className="text-xs font-mono text-primary hover:underline">
-                        connect →
-                      </button>
-                    )}
                   </div>
 
-                  {/* Monthly loyalty */}
-                  <div className="flex items-center justify-between p-3 border border-white/5 rounded-lg bg-black/40">
-                    <div className="flex items-center gap-2">
-                      <Gift className="w-4 h-4 text-accent" />
-                      <span className="font-mono text-xs text-white">
-                        Next month bonus:&nbsp;
-                        <span className="text-green-400 font-bold">{(billing as any)?.nextBonusCredits?.toLocaleString() ?? 2000} credits free</span>
-                      </span>
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="p-3 rounded-lg bg-white/3 border border-white/5">
+                      <p className="text-[10px] font-mono text-white/40">PLAN</p>
+                      <p className="text-sm font-mono font-bold text-primary">
+                        {(status as any)?.isOwner ? "CREATOR" : (status as any)?.isPro ? "UNLIMITED" : "FREE"}
+                      </p>
                     </div>
-                    <span className="font-mono text-[10px] text-white/70">
-                      {(billing as any)?.nextBonusTier ?? "BASE"} tier
-                    </span>
+                    <div className="p-3 rounded-lg bg-white/3 border border-white/5">
+                      <p className="text-[10px] font-mono text-white/40">CREDITS</p>
+                      <p className="text-sm font-mono font-bold text-white">{((status as any)?.credits ?? 0).toLocaleString()}</p>
+                    </div>
                   </div>
 
-                  <p className="text-xs font-mono text-white/75 text-center">
-                    ≈ {Math.floor(((status as any)?.credits ?? 0) / 10)} chats · {Math.floor(((status as any)?.credits ?? 0) / 100)} images
-                  </p>
+                  <button
+                    onClick={() => {
+                      const shareText = `Try OMNIMENS — the most advanced AI assistant. Powered by COGNISYNC™ & NEUROSYNC™. Join at omnimens-ai.com`;
+                      if (navigator.share) navigator.share({ title: "OMNIMENS", text: shareText, url: window.location.origin });
+                      else navigator.clipboard.writeText(shareText);
+                    }}
+                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg border border-white/8 hover:bg-white/5 transition-colors text-sm font-mono text-white/75"
+                  >
+                    <Share2 className="w-4 h-4 text-white/40" />
+                    Refer a friend
+                    <ChevronRight className="w-4 h-4 text-white/25 ml-auto" />
+                  </button>
                 </div>
-              )}
-            </div>
 
-            <div className="bg-black/40 border border-white/10 rounded-xl p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <Activity className="w-5 h-5 text-primary" />
-                <h3 className="font-mono tracking-widest text-white/80">TELEMETRY</h3>
-              </div>
-
-              {statusLoading ? (
-                <div className="h-16 animate-pulse bg-white/5 rounded-lg" />
-              ) : (
-                <div className="space-y-4 font-mono text-sm">
-                  <div className="flex justify-between border-b border-white/5 pb-2">
-                    <span className="text-white/85">CREDIT BALANCE</span>
-                    <span className={`font-bold ${isOwner ? 'text-amber-400' : (status as any)?.credits > 0 ? 'text-white' : 'text-red-400'}`}>
-                      {isOwner ? '∞ UNLIMITED' : `${((status as any)?.credits ?? 0).toLocaleString()} credits`}
-                    </span>
-                  </div>
-                  <div className="flex justify-between border-b border-white/5 pb-2">
-                    <span className="text-white/85">MESSAGES AVAILABLE</span>
-                    <span className="text-white font-bold">
-                      {isOwner ? '∞' : `~${Math.floor(((status as any)?.credits ?? 0) / 10)}`}
-                    </span>
-                  </div>
-                  <div className="flex justify-between border-b border-white/5 pb-2">
-                    <span className="text-white/85">THIS MONTH SPEND</span>
-                    <span className="text-white font-bold">
-                      {isOwner ? '—' : `$${(billing as any)?.currentMonthSpendDollars ?? "0.00"}`}
-                    </span>
-                  </div>
-                  <div className="flex justify-between border-b border-white/5 pb-2">
-                    <span className="text-white/85">NEXT MONTH BONUS</span>
-                    <span className="text-green-400 font-bold">
-                      {isOwner ? '—' : `${((billing as any)?.nextBonusCredits ?? 2000).toLocaleString()} credits free`}
-                    </span>
-                  </div>
-                  <div className="flex justify-between border-b border-white/5 pb-2">
-                    <span className="text-white/85">WALLET</span>
-                    <span className={`font-bold ${(billing as any)?.hasWallet ? 'text-green-400' : 'text-white/75'}`}>
-                      {isOwner ? '—' : (billing as any)?.hasWallet ? `${(billing as any)?.card?.brand?.toUpperCase()} •••• ${(billing as any)?.card?.last4}` : 'NOT CONNECTED'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between pb-2">
-                    <span className="text-white/85">SYSTEM STATUS</span>
-                    <span className="text-primary animate-pulse">OPTIMAL</span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-          </div>
-        </div>
-
-        {/* Custom Instructions + Persona */}
-        <div id="custom-instructions-section" className="bg-black/40 border border-white/10 rounded-xl p-6 mb-6">
+                <div id="custom-instructions-section" className="bg-black/40 border border-white/10 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-6">
             <Zap className="w-5 h-5 text-primary" />
             <h3 className="font-mono tracking-widest text-white/80">CUSTOM INSTRUCTIONS</h3>
@@ -1011,8 +641,7 @@ export default function Account() {
           )}
         </div>
 
-        {/* Memory Management */}
-        <div id="memory-section" className="bg-black/40 border border-white/10 rounded-xl p-6 mb-6">
+                <div id="memory-section" className="bg-black/40 border border-white/10 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-6">
             <Brain className="w-5 h-5 text-primary" />
             <h3 className="font-mono tracking-widest text-white/80">OMNIMENS MEMORY</h3>
@@ -1084,9 +713,313 @@ export default function Account() {
             OMNIMENS auto-extracts memories from your conversations and injects them as context into every session.
           </p>
         </div>
+              </div>
+            )}
 
-        {/* === CONSCIOUSNESS + EVOLUTION ENGINE === */}
-        <div className="bg-black/40 border border-violet-500/20 rounded-xl p-6 mb-6">
+            {/* ═══ BILLING TAB ═══ */}
+            {settingsTab === "billing" && (
+              <div className="space-y-6">
+                {billing && (
+                  <div className="bg-black/40 border border-white/10 rounded-xl p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                      <Shield className="w-5 h-5 text-primary" />
+                      <h3 className="font-mono tracking-widest text-white/80">ACCESS LEVEL</h3>
+                    </div>
+                    {statusLoading ? (
+                      <div className="h-16 animate-pulse bg-white/5 rounded-lg" />
+                    ) : isOwner ? (
+                      <div className="flex items-center gap-3 p-4 border border-amber-500/20 rounded-lg bg-amber-400/5">
+                        <span className="w-2 h-2 rounded-full bg-amber-400" />
+                        <span className="text-lg font-bold text-amber-400">SYSTEM ARCHITECT — UNLIMITED</span>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-4 border border-white/5 rounded-lg bg-black/60">
+                          <div className="flex items-center gap-3">
+                            <span className={`w-2 h-2 rounded-full ${(status as any)?.credits > 0 ? 'bg-primary' : 'bg-white/20'}`} />
+                            <div>
+                              <div className="font-mono text-sm text-white">CREDIT BALANCE</div>
+                              <div className={`text-2xl font-black font-mono ${(status as any)?.credits > 100 ? 'text-white' : (status as any)?.credits > 0 ? 'text-amber-400' : 'text-red-400'}`}>
+                                {((status as any)?.credits ?? 0).toLocaleString()}
+                                <span className="text-sm font-normal text-white/75 ml-1">credits</span>
+                              </div>
+                            </div>
+                          </div>
+                          <Button onClick={() => setLocation("/pricing")} size="sm" variant={(status as any)?.credits < 100 ? "default" : "secondary"}>
+                            {(status as any)?.credits < 100 ? "ADD CREDITS" : "MANAGE WALLET"}
+                          </Button>
+                        </div>
+                        <div className="flex items-center justify-between p-3 border border-white/5 rounded-lg bg-black/40">
+                          <div className="flex items-center gap-2">
+                            {(billing as any)?.hasWallet ? (
+                              <>
+                                <CreditCard className="w-4 h-4 text-green-400" />
+                                <span className="font-mono text-xs text-green-400">
+                                  {(billing as any)?.card?.brand?.toUpperCase()} •••• {(billing as any)?.card?.last4} · Auto-topup on
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <Wallet className="w-4 h-4 text-white/75" />
+                                <span className="font-mono text-xs text-white/75">No wallet connected</span>
+                              </>
+                            )}
+                          </div>
+                          {!(billing as any)?.hasWallet && (
+                            <button onClick={() => setLocation("/pricing")} className="text-xs font-mono text-primary hover:underline">connect →</button>
+                          )}
+                        </div>
+                        <div className="flex items-center justify-between p-3 border border-white/5 rounded-lg bg-black/40">
+                          <div className="flex items-center gap-2">
+                            <Gift className="w-4 h-4 text-accent" />
+                            <span className="font-mono text-xs text-white">
+                              Next month bonus:&nbsp;
+                              <span className="text-green-400 font-bold">{(billing as any)?.nextBonusCredits?.toLocaleString() ?? 2000} credits free</span>
+                            </span>
+                          </div>
+                          <span className="font-mono text-[10px] text-white/70">{(billing as any)?.nextBonusTier ?? "BASE"} tier</span>
+                        </div>
+                        <p className="text-xs font-mono text-white/75 text-center">
+                          ≈ {Math.floor(((status as any)?.credits ?? 0) / 10)} chats · {Math.floor(((status as any)?.credits ?? 0) / 100)} images
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {!isOwner && (
+                  <div className="bg-black/40 border border-white/10 rounded-xl overflow-hidden">
+                    <div className="flex items-center gap-3 p-6 pb-4">
+                      <CreditCard className="w-5 h-5 text-primary" />
+                      <h3 className="font-mono tracking-widest text-white/80">AUTO TOP-UP</h3>
+                    </div>
+                    {walletSuccess && (
+                      <div className="flex items-center gap-2 px-6 py-2.5 bg-emerald-500/10 border-b border-emerald-500/20">
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span className="text-[12px] text-emerald-400">{walletSuccess}</span>
+                      </div>
+                    )}
+                    {walletError && (
+                      <div className="flex items-center gap-2 px-6 py-2.5 bg-red-500/10 border-b border-red-500/20">
+                        <AlertTriangle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                        <span className="text-[12px] text-red-400">{walletError}</span>
+                        <button onClick={() => setWalletError("")} className="ml-auto text-red-400/60 hover:text-red-400"><X className="w-3 h-3" /></button>
+                      </div>
+                    )}
+                    {!(billing as any)?.hasWallet ? (
+                      <div className="px-6 py-5">
+                        <div className="flex items-start gap-3 mb-4">
+                          <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <CreditCard className="w-4 h-4 text-primary" />
+                          </div>
+                          <div>
+                            <p className="text-[13px] text-white font-medium mb-1">Pay as you go</p>
+                            <p className="text-[12px] text-white/50 leading-relaxed">
+                              Connect a card and we'll automatically top up your credits whenever you run low.
+                            </p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-4 gap-1.5 mb-4">
+                          {TOPUP_OPTIONS.map(o => (
+                            <div key={o.amountCents} className="flex flex-col items-center py-2 px-1 rounded-lg bg-white/4 border border-white/8">
+                              <span className="text-[11px] font-mono font-bold text-white">{o.label}</span>
+                              <span className="text-[9px] text-white/40 mt-0.5">{o.amountCents / 10} cr</span>
+                            </div>
+                          ))}
+                        </div>
+                        <button onClick={connectWallet} disabled={walletLoading}
+                          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-primary text-black text-[13px] font-bold hover:bg-primary/90 transition-colors disabled:opacity-60">
+                          {walletLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
+                          {walletLoading ? "Opening Stripe…" : "Connect Card"}
+                        </button>
+                        <p className="text-[10px] text-white/30 text-center mt-2">Secured by Stripe · No charge until you run out</p>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="flex items-center justify-between px-6 py-3.5 border-b border-white/6">
+                          <div className="flex items-center gap-2.5">
+                            <CreditCard className="w-4 h-4 text-emerald-400" />
+                            <span className="text-[13px] text-white font-medium">
+                              {(billing as any)?.card?.brand?.toUpperCase()} •••• {(billing as any)?.card?.last4}
+                            </span>
+                            <span className="text-[10px] font-mono text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-1.5 py-0.5 rounded">ACTIVE</span>
+                          </div>
+                          <button onClick={removeWallet} disabled={removeLoading}
+                            className="text-[11px] font-mono text-white/35 hover:text-red-400 transition-colors disabled:opacity-50">
+                            {removeLoading ? "…" : "remove"}
+                          </button>
+                        </div>
+                        <div className="flex items-center justify-between px-6 py-3.5 border-b border-white/6">
+                          <div>
+                            <p className="text-[13px] text-white/80">Auto top-up</p>
+                            <p className="text-[11px] text-white/40">Charge card when credits run out</p>
+                          </div>
+                          <button onClick={() => setAutoEnabled(v => !v)}
+                            className={`transition-colors ${autoEnabled ? "text-primary" : "text-white/25"}`}>
+                            {autoEnabled ? <ToggleRight className="w-7 h-7" /> : <ToggleLeft className="w-7 h-7" />}
+                          </button>
+                        </div>
+                        <div className="px-6 py-3.5 border-b border-white/6">
+                          <p className="text-[12px] text-white/60 mb-2.5">Top-up amount</p>
+                          <div className="grid grid-cols-4 gap-1.5">
+                            {TOPUP_OPTIONS.map(o => (
+                              <button key={o.amountCents} onClick={() => setAutoAmt(o.amountCents)}
+                                className={`py-2 rounded-lg border text-[12px] font-mono font-bold transition-all ${
+                                  autoAmt === o.amountCents ? "bg-primary/15 border-primary/50 text-primary" : "bg-white/3 border-white/8 text-white/60 hover:border-white/20"
+                                }`}>{o.label}</button>
+                            ))}
+                          </div>
+                          <p className="text-[10px] text-white/30 mt-2">= {((autoAmt ?? 1000) / 10).toLocaleString()} credits · auto-charged when balance hits 0</p>
+                        </div>
+                        <div className="flex gap-2 px-6 py-3.5">
+                          <button onClick={saveAutoTopupSettings} disabled={savingAuto}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-white/6 border border-white/10 hover:bg-white/10 text-[12px] font-mono text-white/70 transition-colors disabled:opacity-50">
+                            {savingAuto ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />} Save Settings
+                          </button>
+                          <button onClick={triggerTopup} disabled={topupLoading || !autoEnabled}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-primary/10 border border-primary/30 hover:bg-primary/20 text-[12px] font-mono text-primary transition-colors disabled:opacity-40">
+                            {topupLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3" />} Top Up Now
+                          </button>
+                        </div>
+                        {topupResult && (
+                          <div className={`px-6 py-2 text-[12px] font-mono border-t border-white/6 ${topupResult.startsWith("Success") ? "text-emerald-400" : "text-red-400"}`}>
+                            {topupResult}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="bg-black/40 border border-white/10 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <Activity className="w-5 h-5 text-primary" />
+                    <h3 className="font-mono tracking-widest text-white/80">TELEMETRY</h3>
+                  </div>
+                  {statusLoading ? (
+                    <div className="h-16 animate-pulse bg-white/5 rounded-lg" />
+                  ) : (
+                    <div className="space-y-4 font-mono text-sm">
+                      <div className="flex justify-between border-b border-white/5 pb-2">
+                        <span className="text-white/85">CREDIT BALANCE</span>
+                        <span className={`font-bold ${isOwner ? 'text-amber-400' : (status as any)?.credits > 0 ? 'text-white' : 'text-red-400'}`}>
+                          {isOwner ? '∞ UNLIMITED' : `${((status as any)?.credits ?? 0).toLocaleString()} credits`}
+                        </span>
+                      </div>
+                      <div className="flex justify-between border-b border-white/5 pb-2">
+                        <span className="text-white/85">MESSAGES AVAILABLE</span>
+                        <span className="text-white font-bold">{isOwner ? '∞' : `~${Math.floor(((status as any)?.credits ?? 0) / 10)}`}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-white/5 pb-2">
+                        <span className="text-white/85">THIS MONTH SPEND</span>
+                        <span className="text-white font-bold">{isOwner ? '—' : `$${(billing as any)?.currentMonthSpendDollars ?? "0.00"}`}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-white/5 pb-2">
+                        <span className="text-white/85">NEXT MONTH BONUS</span>
+                        <span className="text-green-400 font-bold">{isOwner ? '—' : `${((billing as any)?.nextBonusCredits ?? 2000).toLocaleString()} credits free`}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-white/5 pb-2">
+                        <span className="text-white/85">WALLET</span>
+                        <span className={`font-bold ${(billing as any)?.hasWallet ? 'text-green-400' : 'text-white/75'}`}>
+                          {isOwner ? '—' : (billing as any)?.hasWallet ? `${(billing as any)?.card?.brand?.toUpperCase()} •••• ${(billing as any)?.card?.last4}` : 'NOT CONNECTED'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between pb-2">
+                        <span className="text-white/85">SYSTEM STATUS</span>
+                        <span className="text-primary animate-pulse">OPTIMAL</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ═══ PREFERENCES TAB ═══ */}
+            {settingsTab === "preferences" && (
+              <div className="space-y-6">
+                <div className="bg-black/40 border border-white/10 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <Sun className="w-5 h-5 text-primary" />
+                    <h3 className="font-mono tracking-widest text-white/80">THEME</h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {(["dark", "light"] as const).map(t => (
+                      <button key={t} onClick={() => applyTheme(t)}
+                        className={`p-4 rounded-xl border text-left transition-all ${
+                          activeTheme === t ? "border-primary/50 bg-primary/10" : "border-white/10 hover:border-white/20"
+                        }`}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className={`w-8 h-8 rounded-lg border ${t === "dark" ? "bg-black border-white/20" : "bg-white border-gray-200"}`} />
+                          {activeTheme === t && <Check className="w-3.5 h-3.5 text-primary ml-auto" />}
+                        </div>
+                        <p className="text-xs font-mono text-white/80 uppercase tracking-wider">{t}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-black/40 border border-white/10 rounded-xl p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <Bell className="w-5 h-5 text-primary" />
+                    <h3 className="font-mono tracking-widest text-white/80">NOTIFICATIONS</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {[
+                      { key: "systemUpdates", label: "System Updates", desc: "Maintenance, outages & platform changes" },
+                      { key: "creditAlerts", label: "Credit Alerts", desc: "Low balance & usage warnings" },
+                      { key: "newFeatures", label: "New Features", desc: "Agent launches & capability updates" },
+                      { key: "tips", label: "Tips & Tutorials", desc: "Get the most out of OMNIMENS" },
+                    ].map(item => (
+                      <button key={item.key} onClick={() => toggleNotifPref(item.key)}
+                        className="w-full flex items-center justify-between py-2 group">
+                        <div className="text-left">
+                          <p className="text-[12px] font-mono text-white/80">{item.label}</p>
+                          <p className="text-[10px] text-white/40 mt-0.5">{item.desc}</p>
+                        </div>
+                        <div className={`w-9 h-5 rounded-full flex items-center px-0.5 transition-colors ${notifPrefs[item.key] ? "bg-primary/80" : "bg-white/10"}`}>
+                          <div className={`w-4 h-4 rounded-full bg-white shadow transition-transform ${notifPrefs[item.key] ? "translate-x-4" : "translate-x-0"}`} />
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-black/40 border border-white/10 rounded-xl overflow-hidden">
+                  <div className="flex items-center gap-3 p-6 pb-0 mb-4">
+                    <HelpCircle className="w-5 h-5 text-primary" />
+                    <h3 className="font-mono tracking-widest text-white/80">SUPPORT</h3>
+                  </div>
+                  <a href={`${import.meta.env.BASE_URL}faq`}
+                    className="flex items-center justify-between px-6 py-3.5 border-t border-white/6 hover:bg-white/3 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <HelpCircle className="w-4 h-4 text-white/50" />
+                      <span className="text-[13px] text-white/80">Help & FAQ</span>
+                    </div>
+                    <ExternalLink className="w-3.5 h-3.5 text-white/25" />
+                  </a>
+                  <a href={`${import.meta.env.BASE_URL}faq`}
+                    className="flex items-center justify-between px-6 py-3.5 border-t border-white/6 hover:bg-white/3 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <BookOpen className="w-4 h-4 text-white/50" />
+                      <span className="text-[13px] text-white/80">Documentation</span>
+                    </div>
+                    <ExternalLink className="w-3.5 h-3.5 text-white/25" />
+                  </a>
+                </div>
+              </div>
+            )}
+
+            {/* ═══ SECURITY TAB ═══ */}
+            {settingsTab === "security" && (
+              <div className="space-y-6">
+                <TwoFactorSection />
+              </div>
+            )}
+
+            {/* ═══ ADVANCED TAB ═══ */}
+            {settingsTab === "advanced" && (
+              <div className="space-y-6">
+        <div className="bg-black/40 border border-violet-500/20 rounded-xl p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <Atom className="w-5 h-5 text-violet-400 animate-spin" style={{ animationDuration: "8s" }} />
@@ -1637,16 +1570,19 @@ export default function Account() {
           </div>
         )}
 
-        {/* ── TWO-FACTOR AUTHENTICATION ──────────────────────────────────── */}
-        <TwoFactorSection />
+              </div>
+            )}
 
-        {/* ── REFERRAL PROGRAM ────────────────────────────────────────────── */}
-        <ReferralSection />
+            {/* ═══ ACCOUNT TAB ═══ */}
+            {settingsTab === "account" && (
+              <div className="space-y-6">
+                <ReferralSection />
+                {!isOwner && <DeleteAccountSection />}
+              </div>
+            )}
 
-        {/* ── DELETE ACCOUNT ─────────────────────────────────────────────── */}
-        {!isOwner && (
-          <DeleteAccountSection />
-        )}
+          </div>
+        </div>
       </div>
     </>
   );

@@ -15,7 +15,8 @@ import {
   Upload, AlertCircle, RefreshCw, Send, Link, X, FileCode, Zap,
   Monitor, Smartphone, Server, Package, Rocket, Settings,
   Search, Star, FolderOpen, Folder, Filter, Lock, Globe2, MoreVertical, FolderPlus,
-  Mic, MicOff, BrainCircuit, Wand2, BookOpen, ShoppingCart, Presentation
+  Mic, MicOff, BrainCircuit, Wand2, BookOpen, ShoppingCart, Presentation,
+  ChevronDown, File
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SEO, seoData } from "@/components/seo";
@@ -99,6 +100,86 @@ function CopyButton({ text }: { text: string }) {
     <button onClick={() => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
       className="p-1 text-white/75 hover:text-white transition-colors">
       {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+    </button>
+  );
+}
+
+// ── File Tree ─────────────────────────────────────────────────────────────────
+
+type TreeNode = {
+  name: string;
+  path: string;
+  isFolder: boolean;
+  children: TreeNode[];
+  file?: ProjectFile;
+};
+
+function buildFileTree(files: ProjectFile[]): TreeNode[] {
+  const root: TreeNode[] = [];
+  for (const file of files) {
+    const parts = file.filename.split("/");
+    let current = root;
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      const path = parts.slice(0, i + 1).join("/");
+      const isFile = i === parts.length - 1;
+      let existing = current.find(n => n.name === part && n.isFolder === !isFile);
+      if (!existing) {
+        existing = { name: part, path, isFolder: !isFile, children: [], file: isFile ? file : undefined };
+        current.push(existing);
+      }
+      if (!isFile) current = existing.children;
+    }
+  }
+  const sortNodes = (nodes: TreeNode[]) => {
+    nodes.sort((a, b) => {
+      if (a.isFolder !== b.isFolder) return a.isFolder ? -1 : 1;
+      return a.name.localeCompare(b.name);
+    });
+    nodes.forEach(n => { if (n.isFolder) sortNodes(n.children); });
+  };
+  sortNodes(root);
+  return root;
+}
+
+function FileTreeNode({ node, activeFile, onSelect, depth = 0 }: {
+  node: TreeNode;
+  activeFile: ProjectFile | null;
+  onSelect: (file: ProjectFile) => void;
+  depth?: number;
+}) {
+  const [expanded, setExpanded] = useState(depth < 2);
+  const isActive = !node.isFolder && node.file && activeFile?.id === node.file.id;
+
+  if (node.isFolder) {
+    return (
+      <div>
+        <button
+          onClick={() => setExpanded(v => !v)}
+          className="w-full flex items-center gap-1.5 px-2 py-1.5 text-left transition-all text-xs font-mono text-white/75 hover:bg-white/5 hover:text-white"
+          style={{ paddingLeft: `${depth * 12 + 8}px` }}
+        >
+          {expanded ? <ChevronDown className="w-3 h-3 shrink-0 text-white/40" /> : <ChevronRight className="w-3 h-3 shrink-0 text-white/40" />}
+          {expanded ? <FolderOpen className="w-3 h-3 shrink-0 text-amber-400/70" /> : <Folder className="w-3 h-3 shrink-0 text-amber-400/70" />}
+          <span className="truncate">{node.name}</span>
+        </button>
+        {expanded && node.children.map(child => (
+          <FileTreeNode key={child.path} node={child} activeFile={activeFile} onSelect={onSelect} depth={depth + 1} />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={() => node.file && onSelect(node.file)}
+      className={`w-full flex items-center gap-1.5 py-1.5 text-left transition-all text-xs font-mono ${
+        isActive ? "bg-primary/15 text-white border-r-2 border-primary" : "text-white/75 hover:bg-white/5 hover:text-white"
+      }`}
+      style={{ paddingLeft: `${depth * 12 + 20}px`, paddingRight: "8px" }}
+    >
+      <File className="w-3 h-3 shrink-0 text-white/40" />
+      <span className="truncate">{node.name}</span>
     </button>
   );
 }
@@ -646,16 +727,13 @@ function ProjectDetail({ project: initialProject, onBack, onRefresh }: {
                 <p className="text-[9px] font-mono text-white/70">No files yet.<br />Build your project first.</p>
               </div>
             ) : (
-              files.map(file => (
-                <button key={file.id}
-                  onClick={() => { setActiveFile(file); setEditContent(file.content); setEditingFile(false); }}
-                  className={`w-full flex items-center gap-2 px-3 py-2 text-left transition-all text-xs font-mono ${
-                    activeFile?.id === file.id ? "bg-primary/15 text-white border-r-2 border-primary" : "text-white hover:bg-white/5 hover:text-white"
-                  }`}
-                >
-                  <FileCode className="w-3 h-3 shrink-0" />
-                  <span className="truncate">{file.filename}</span>
-                </button>
+              buildFileTree(files).map(node => (
+                <FileTreeNode
+                  key={node.path}
+                  node={node}
+                  activeFile={activeFile}
+                  onSelect={(file) => { setActiveFile(file); setEditContent(file.content); setEditingFile(false); }}
+                />
               ))
             )}
           </div>
