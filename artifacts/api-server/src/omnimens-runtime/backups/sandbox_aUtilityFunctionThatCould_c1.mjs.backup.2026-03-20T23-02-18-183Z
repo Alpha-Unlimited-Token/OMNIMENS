@@ -1,0 +1,79 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-20T23:00:56.489Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Utility function to perform text pattern matching and extraction
+function extractPatterns(text, patterns) {
+    if (typeof text !== 'string' || !Array.isArray(patterns)) {
+        throw new Error("Invalid input: text must be a string and patterns must be an array of strings.");
+    }
+
+    const results = {};
+    patterns.forEach(pattern => {
+        try {
+            const regex = new RegExp(pattern, 'g');
+            const matches = [];
+            let match;
+            while ((match = regex.exec(text)) !== null) {
+                matches.push(match[0]);
+            }
+            results[pattern] = matches;
+        } catch (e) {
+            results[pattern] = `Invalid pattern: ${pattern}`;
+        }
+    });
+
+    return results;
+}
+
+// Test cases
+(function testExtractPatterns() {
+    const text = "The quick brown fox jumps over the lazy dog. The fox is clever.";
+    const patterns = [
+        "\\bfox\\b",           // Match the word "fox"
+        "\\bthe\\b",           // Match the word "the" (case-sensitive)
+        "\\b[a-z]{4}\\b",      // Match any 4-letter word
+        "\\d+",                // Match any sequence of digits
+        "(?<=\\bquick\\s)\\w+" // Match the word after "quick"
+    ];
+
+    const result = extractPatterns(text, patterns);
+
+    console.log("Test Case 1:");
+    console.log(result);
+
+    // Edge Case: Empty text
+    const emptyText = "";
+    const resultEmptyText = extractPatterns(emptyText, patterns);
+
+    console.log("Test Case 2 (Empty Text):");
+    console.log(resultEmptyText);
+
+    // Edge Case: Invalid patterns
+    const invalidPatterns = ["\\bfox\\b", "[", "(unclosed"];
+    const resultInvalidPatterns = extractPatterns(text, invalidPatterns);
+
+    console.log("Test Case 3 (Invalid Patterns):");
+    console.log(resultInvalidPatterns);
+
+    // Edge Case: No matches
+    const noMatchPatterns = ["unicorn", "\\d+"];
+    const resultNoMatches = extractPatterns(text, noMatchPatterns);
+
+    console.log("Test Case 4 (No Matches):");
+    console.log(resultNoMatches);
+})();
