@@ -1,115 +1,103 @@
-// semanticMemoryManager.js
-
 /**
- * @module semanticMemoryManager
- * @description Manages rolling context and long-term memory for conversations using a priority-based memory retention system.
+ * semanticMemoryManager.js
+ * 
+ * This module provides functionality to store and retrieve session-based semantic embeddings
+ * for long-term memory using a Redis-backed vector store and cosine similarity.
+ * Designed for Node.js 20+ with no external dependencies.
  */
 
-/**
- * Represents a single memory entry.
- * @typedef {Object} MemoryEntry
- * @property {string} token - The token or piece of information.
- * @property {number} relevance - The relevance score of the token (0-1).
- * @property {number} utility - The utility score of the token (0-1).
- * @property {Date} timestamp - The timestamp when the token was added.
- */
+const { createHash } = require('crypto');
 
 /**
- * MemoryManager class to manage rolling context and long-term memory.
+ * In-memory store simulating Redis for vector embeddings.
+ * This is a placeholder for actual Redis integration.
  */
-class MemoryManager {
-  constructor() {
-    /**
-     * @private
-     * @type {MemoryEntry[]}
-     */
-    this.memory = [];
+const vectorStore = {};
 
-    /**
-     * @private
-     * @type {number}
-     */
-    this.maxMemorySize = 1000; // Maximum number of tokens to retain in memory.
-
-    /**
-     * @private
-     * @type {number}
-     */
-    this.relevanceThreshold = 0.5; // Minimum relevance score for retention.
-
-    /**
-     * @private
-     * @type {number}
-     */
-    this.utilityThreshold = 0.5; // Minimum utility score for retention.
+/**
+ * Calculates the cosine similarity between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} - Cosine similarity value between -1 and 1.
+ */
+function cosineSimilarity(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must be of the same length.');
   }
 
-  /**
-   * Adds a new memory entry.
-   * @param {string} token - The token or piece of information.
-   * @param {number} relevance - The relevance score of the token (0-1).
-   * @param {number} utility - The utility score of the token (0-1).
-   */
-  addMemory(token, relevance, utility) {
-    if (typeof token !== 'string' || typeof relevance !== 'number' || typeof utility !== 'number') {
-      throw new TypeError('Invalid input types for addMemory.');
-    }
+  const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
 
-    const entry = {
-      token,
-      relevance,
-      utility,
-      timestamp: new Date()
-    };
-
-    this.memory.push(entry);
-    this._trimMemory();
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    return 0; // Avoid division by zero
   }
 
-  /**
-   * Retrieves the most relevant and useful tokens.
-   * @param {number} count - Number of tokens to retrieve.
-   * @returns {MemoryEntry[]} - Array of memory entries sorted by relevance and utility.
-   */
-  getTopMemory(count = 10) {
-    if (typeof count !== 'number' || count <= 0) {
-      throw new TypeError('Invalid count parameter for getTopMemory.');
-    }
-
-    return this.memory
-      .filter(entry => entry.relevance >= this.relevanceThreshold && entry.utility >= this.utilityThreshold)
-      .sort((a, b) => (b.relevance + b.utility) - (a.relevance + a.utility))
-      .slice(0, count);
-  }
-
-  /**
-   * Clears all memory.
-   */
-  clearMemory() {
-    this.memory = [];
-  }
-
-  /**
-   * Trims the memory to fit within maxMemorySize.
-   * @private
-   */
-  _trimMemory() {
-    if (this.memory.length > this.maxMemorySize) {
-      this.memory = this.memory
-        .sort((a, b) => (b.relevance + b.utility) - (a.relevance + a.utility))
-        .slice(0, this.maxMemorySize);
-    }
-  }
+  return dotProduct / (magnitudeA * magnitudeB);
 }
 
 /**
- * Creates a new MemoryManager instance.
- * @returns {MemoryManager} - A new MemoryManager instance.
+ * Generates a unique hash key for a given session and input.
+ * @param {string} sessionId - Unique identifier for the session.
+ * @param {string} input - Semantic input to hash.
+ * @returns {string} - Generated hash key.
  */
-function createMemoryManager() {
-  return new MemoryManager();
+function generateKey(sessionId, input) {
+  const hash = createHash('sha256');
+  hash.update(`${sessionId}:${input}`);
+  return hash.digest('hex');
+}
+
+/**
+ * Stores a semantic embedding in the vector store.
+ * @param {string} sessionId - Unique identifier for the session.
+ * @param {string} input - Semantic input.
+ * @param {number[]} embedding - Vector representation of the input.
+ */
+function storeEmbedding(sessionId, input, embedding) {
+  const key = generateKey(sessionId, input);
+  vectorStore[key] = { sessionId, input, embedding };
+}
+
+/**
+ * Searches for the most similar embedding in the vector store.
+ * @param {string} sessionId - Unique identifier for the session.
+ * @param {number[]} queryEmbedding - Vector representation of the query.
+ * @returns {Object|null} - Most similar embedding object or null if no match found.
+ */
+function searchEmbedding(sessionId, queryEmbedding) {
+  let bestMatch = null;
+  let highestSimilarity = -Infinity;
+
+  for (const key in vectorStore) {
+    const { sessionId: storedSessionId, embedding } = vectorStore[key];
+    if (storedSessionId === sessionId) {
+      const similarity = cosineSimilarity(queryEmbedding, embedding);
+      if (similarity > highestSimilarity) {
+        highestSimilarity = similarity;
+        bestMatch = vectorStore[key];
+      }
+    }
+  }
+
+  return bestMatch;
+}
+
+/**
+ * Clears all embeddings for a given session.
+ * @param {string} sessionId - Unique identifier for the session.
+ */
+function clearSessionEmbeddings(sessionId) {
+  for (const key in vectorStore) {
+    if (vectorStore[key].sessionId === sessionId) {
+      delete vectorStore[key];
+    }
+  }
 }
 
 module.exports = {
-  createMemoryManager
+  cosineSimilarity,
+  storeEmbedding,
+  searchEmbedding,
+  clearSessionEmbeddings
 };
