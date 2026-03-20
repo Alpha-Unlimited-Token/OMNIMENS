@@ -1,78 +1,81 @@
 /**
  * @module contextSummarizer
- * @description Summarizes conversation history recursively to preserve context within token limits using abstraction and compression techniques.
+ * @description Compresses earlier conversation context into a smaller representation using a sliding window summarization algorithm with attention-based weighting.
  */
 
 /**
- * Recursively summarizes a conversation history while preserving essential context.
- * @param {Array<string>} history - Array of conversation strings.
- * @param {number} tokenLimit - Maximum token limit for the summarized output.
- * @returns {string} - Summarized conversation history.
+ * Compresses a large context into a summarized representation.
+ * Uses a sliding window approach with attention weighting to prioritize key information.
+ *
+ * @param {string[]} contextArray - Array of context strings to be summarized.
+ * @param {number} windowSize - Number of context entries to include in each sliding window.
+ * @param {number} summaryLength - Desired number of summarized entries to return.
+ * @returns {string[]} Summarized context array.
  */
-export function summarizeContext(history, tokenLimit) {
-  if (!Array.isArray(history) || history.length === 0) {
-    throw new Error("Invalid input: history must be a non-empty array of strings.");
+export function summarizeContext(contextArray, windowSize, summaryLength) {
+  if (!Array.isArray(contextArray) || contextArray.length === 0) {
+    throw new Error('contextArray must be a non-empty array of strings.');
+  }
+  if (typeof windowSize !== 'number' || windowSize <= 0) {
+    throw new Error('windowSize must be a positive number.');
+  }
+  if (typeof summaryLength !== 'number' || summaryLength <= 0) {
+    throw new Error('summaryLength must be a positive number.');
   }
 
-  if (typeof tokenLimit !== "number" || tokenLimit <= 0) {
-    throw new Error("Invalid input: tokenLimit must be a positive number.");
+  // Step 1: Tokenize each context entry into words and compute attention scores.
+  const tokenize = (text) => text.split(/\s+/);
+  const computeAttentionScore = (text) => text.length; // Simple heuristic: longer entries get higher scores.
+
+  const tokenizedContext = contextArray.map((entry) => ({
+    text: entry,
+    tokens: tokenize(entry),
+    attentionScore: computeAttentionScore(entry),
+  }));
+
+  // Step 2: Apply a sliding window to aggregate attention scores.
+  const slidingWindowScores = [];
+  for (let i = 0; i <= tokenizedContext.length - windowSize; i++) {
+    const window = tokenizedContext.slice(i, i + windowSize);
+    const aggregatedScore = window.reduce((sum, entry) => sum + entry.attentionScore, 0);
+    slidingWindowScores.push({
+      startIndex: i,
+      endIndex: i + windowSize - 1,
+      aggregatedScore,
+    });
   }
 
-  /**
-   * Calculates the approximate token count for a given string.
-   * GPT-4o token approximation assumes ~4 characters per token.
-   * @param {string} text - Input text.
-   * @returns {number} - Approximate token count.
-   */
-  function calculateTokens(text) {
-    return Math.ceil(text.length / 4);
-  }
+  // Step 3: Sort windows by aggregated attention scores (descending).
+  slidingWindowScores.sort((a, b) => b.aggregatedScore - a.aggregatedScore);
 
-  /**
-   * Compresses a list of strings into a single summary.
-   * @param {Array<string>} segments - Array of strings to compress.
-   * @returns {string} - Compressed summary of the input segments.
-   */
-  function compressSegments(segments) {
-    return segments.join(" ").replace(/\s+/g, " ").trim();
-  }
-
-  /**
-   * Recursively compresses history until it fits within the token limit.
-   * @param {Array<string>} segments - Array of conversation strings.
-   * @param {number} limit - Token limit.
-   * @returns {string} - Final compressed summary.
-   */
-  function recursiveSummarize(segments, limit) {
-    const combined = compressSegments(segments);
-    const tokenCount = calculateTokens(combined);
-
-    if (tokenCount <= limit) {
-      return combined;
+  // Step 4: Select top windows and extract their context entries.
+  const selectedWindows = slidingWindowScores.slice(0, summaryLength);
+  const selectedIndices = new Set();
+  selectedWindows.forEach((window) => {
+    for (let i = window.startIndex; i <= window.endIndex; i++) {
+      selectedIndices.add(i);
     }
+  });
 
-    // Split into smaller chunks for recursive summarization.
-    const mid = Math.ceil(segments.length / 2);
-    const left = recursiveSummarize(segments.slice(0, mid), limit);
-    const right = recursiveSummarize(segments.slice(mid), limit);
+  // Step 5: Deduplicate and preserve order of selected entries.
+  const summarizedContext = Array.from(selectedIndices)
+    .sort((a, b) => a - b) // Sort indices to preserve original order.
+    .map((index) => contextArray[index]);
 
-    return recursiveSummarize([left, right], limit);
-  }
-
-  return recursiveSummarize(history, tokenLimit);
+  return summarizedContext;
 }
 
 /**
- * Validates conversation history and token limit before summarizing.
- * @param {Array<string>} history - Array of conversation strings.
- * @param {number} tokenLimit - Maximum token limit for the summarized output.
- * @returns {string} - Summarized conversation history.
+ * Example usage of the summarizeContext function.
+ *
+ * @example
+ * const context = [
+ *   'First context entry.',
+ *   'Second context entry with more detail.',
+ *   'Third entry is short.',
+ *   'Fourth entry has significant information.',
+ *   'Fifth entry is also important.',
+ * ];
+ * const summary = summarizeContext(context, 2, 3);
+ * console.log(summary);
  */
-export function validateAndSummarize(history, tokenLimit) {
-  try {
-    return summarizeContext(history, tokenLimit);
-  } catch (error) {
-    console.error("Error summarizing context:", error.message);
-    return "Error: Unable to summarize context.";
-  }
-}

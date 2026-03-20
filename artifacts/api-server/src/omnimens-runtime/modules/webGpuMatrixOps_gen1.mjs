@@ -1,16 +1,25 @@
 /**
  * @module webGpuMatrixOps
- * @description This module provides GPU-accelerated matrix operations using the WebGPU API for efficient linear algebra computations.
+ * @description Perform efficient matrix operations using WebGPU for advanced numerical computations.
+ * This module leverages WebGPU for parallelized matrix multiplication and linear algebra tasks.
  */
 
 /**
- * Initialize a WebGPU device and context.
- * @returns {Promise<{device: GPUDevice, adapter: GPUAdapter}>} A promise resolving to the WebGPU device and adapter.
- * @throws {Error} If WebGPU is not supported or initialization fails.
+ * Checks if WebGPU is available in the current environment.
+ * @returns {boolean} - True if WebGPU is supported, otherwise false.
  */
-export async function initializeWebGPU() {
-  if (!navigator.gpu) {
-    throw new Error('WebGPU is not supported on this platform.');
+export function isWebGpuSupported() {
+  return typeof navigator !== 'undefined' && navigator.gpu !== undefined;
+}
+
+/**
+ * Initializes a WebGPU device and context.
+ * @returns {Promise<{device: GPUDevice, adapter: GPUAdapter}>} - A promise resolving to the WebGPU device and adapter.
+ * @throws {Error} - If WebGPU is not supported or initialization fails.
+ */
+export async function initializeWebGpu() {
+  if (!isWebGpuSupported()) {
+    throw new Error('WebGPU is not supported in this environment.');
   }
 
   const adapter = await navigator.gpu.requestAdapter();
@@ -23,11 +32,11 @@ export async function initializeWebGPU() {
 }
 
 /**
- * Create a GPU buffer.
+ * Creates a GPU buffer for a given array of data.
  * @param {GPUDevice} device - The WebGPU device.
  * @param {Float32Array} data - The data to store in the buffer.
  * @param {GPUBufferUsageFlags} usage - The usage flags for the buffer.
- * @returns {GPUBuffer} The created GPU buffer.
+ * @returns {GPUBuffer} - The created GPU buffer.
  */
 export function createBuffer(device, data, usage) {
   const buffer = device.createBuffer({
@@ -36,52 +45,60 @@ export function createBuffer(device, data, usage) {
     mappedAtCreation: true
   });
 
-  const mappedBuffer = new Float32Array(buffer.getMappedRange());
-  mappedBuffer.set(data);
+  const arrayBuffer = buffer.getMappedRange();
+  new Float32Array(arrayBuffer).set(data);
   buffer.unmap();
+
   return buffer;
 }
 
 /**
- * Perform matrix multiplication on the GPU.
+ * Performs matrix multiplication using WebGPU.
  * @param {GPUDevice} device - The WebGPU device.
- * @param {Float32Array} matrixA - The first matrix (MxN).
- * @param {Float32Array} matrixB - The second matrix (NxP).
- * @param {number} M - Number of rows in matrixA.
- * @param {number} N - Number of columns in matrixA and rows in matrixB.
- * @param {number} P - Number of columns in matrixB.
- * @returns {Promise<Float32Array>} The result matrix (MxP) as a Float32Array.
+ * @param {Float32Array} matrixA - The first matrix (in row-major order).
+ * @param {Float32Array} matrixB - The second matrix (in row-major order).
+ * @param {number} rowsA - Number of rows in matrix A.
+ * @param {number} colsA - Number of columns in matrix A (and rows in matrix B).
+ * @param {number} colsB - Number of columns in matrix B.
+ * @returns {Promise<Float32Array>} - A promise resolving to the resulting matrix (in row-major order).
  */
-export async function gpuMatrixMultiply(device, matrixA, matrixB, M, N, P) {
+export async function matrixMultiply(device, matrixA, matrixB, rowsA, colsA, colsB) {
   const shaderCode = `
     @group(0) @binding(0) var<storage, read> matrixA : array<f32>;
     @group(0) @binding(1) var<storage, read> matrixB : array<f32>;
     @group(0) @binding(2) var<storage, write> result : array<f32>;
 
-    @compute @workgroup_size(8, 8)
+    @compute @workgroup_size(16, 16)
     fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
-      let row = global_id.x;
-      let col = global_id.y;
+      let row = global_id.y;
+      let col = global_id.x;
 
-      if (row < ${M}u && col < ${P}u) {
-        var sum : f32 = 0.0;
-        for (var k : u32 = 0u; k < ${N}u; k = k + 1u) {
-          sum = sum + matrixA[row * ${N}u + k] * matrixB[k * ${P}u + col];
-        }
-        result[row * ${P}u + col] = sum;
+      if (row >= ${rowsA}u || col >= ${colsB}u) {
+        return;
       }
+
+      var sum : f32 = 0.0;
+      for (var i = 0u; i < ${colsA}u; i = i + 1u) {
+        sum = sum + matrixA[row * ${colsA}u + i] * matrixB[i * ${colsB}u + col];
+      }
+
+      result[row * ${colsB}u + col] = sum;
     }
   `;
 
   const shaderModule = device.createShaderModule({ code: shaderCode });
+
   const pipeline = device.createComputePipeline({
-    compute: { module: shaderModule, entryPoint: 'main' }
+    compute: {
+      module: shaderModule,
+      entryPoint: 'main'
+    }
   });
 
   const bufferA = createBuffer(device, matrixA, GPUBufferUsage.STORAGE);
   const bufferB = createBuffer(device, matrixB, GPUBufferUsage.STORAGE);
   const resultBuffer = device.createBuffer({
-    size: M * P * Float32Array.BYTES_PER_ELEMENT,
+    size: Float32Array.BYTES_PER_ELEMENT * rowsA * colsB,
     usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
   });
 
@@ -98,17 +115,25 @@ export async function gpuMatrixMultiply(device, matrixA, matrixB, M, N, P) {
   const passEncoder = commandEncoder.beginComputePass();
   passEncoder.setPipeline(pipeline);
   passEncoder.setBindGroup(0, bindGroup);
-  passEncoder.dispatchWorkgroups(Math.ceil(M / 8), Math.ceil(P / 8));
+  passEncoder.dispatchWorkgroups(Math.ceil(colsB / 16), Math.ceil(rowsA / 16));
   passEncoder.end();
 
-  commandEncoder.copyBufferToBuffer(resultBuffer, 0, resultBuffer, 0, M * P * Float32Array.BYTES_PER_ELEMENT);
   device.queue.submit([commandEncoder.finish()]);
 
   await device.queue.onSubmittedWorkDone();
 
-  const resultArrayBuffer = await resultBuffer.mapAsync(GPUMapMode.READ);
-  const resultArray = new Float32Array(resultArrayBuffer);
-  resultBuffer.unmap();
+  const readBuffer = device.createBuffer({
+    size: resultBuffer.size,
+    usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+  });
+
+  commandEncoder.copyBufferToBuffer(resultBuffer, 0, readBuffer, 0, resultBuffer.size);
+  device.queue.submit([commandEncoder.finish()]);
+
+  await readBuffer.mapAsync(GPUMapMode.READ);
+  const arrayBuffer = readBuffer.getMappedRange();
+  const resultArray = new Float32Array(arrayBuffer.slice(0));
+  readBuffer.unmap();
 
   return resultArray;
 }
