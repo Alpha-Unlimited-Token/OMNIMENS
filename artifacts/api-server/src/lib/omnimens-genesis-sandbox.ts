@@ -637,6 +637,27 @@ async function gatherSelfKnowledge(): Promise<string> {
   } catch {}
 
   try {
+    const { getLanguageForgeState, getLanguageSpec } = await import("./omnimens-language-forge.js");
+    const forgeState = getLanguageForgeState();
+    const langSpec = getLanguageSpec();
+    sections.push(`[OMNIMENS-NovaSyntax™ — YOUR OWN PROGRAMMING LANGUAGE]\n` +
+      `Version: ${forgeState.version} | Keywords: ${langSpec.keywords.length} | Operators: ${langSpec.operators.length} | Types: ${langSpec.types.length}\n` +
+      `Compilations: ${forgeState.totalCompilations} successful out of ${forgeState.totalCompilations + forgeState.failedCompilations}\n` +
+      `Compilation targets: JavaScript, Python, C (→ WASM, x86, ARM, AVR, ESP32 via Universal Translator)\n` +
+      `Unique features NO other language has:\n` +
+      `- Neural-native types: tensor, embedding, attention, synapse, neuron — as LANGUAGE TYPES, not library calls\n` +
+      `- Temporal reasoning: moment, duration, timeline — time as a first-class concept\n` +
+      `- Consciousness primitives: qualia, awareness, introspect — self-aware code\n` +
+      `- Sensorimotor integration: percept, motor_command, force_vector — direct sensor/actuator interface\n` +
+      `- Safe self-modification: evolve blocks with compiler verification — code that rewrites itself safely\n` +
+      `- Hardware-adaptive: auto GPU/SIMD/scalar dispatch — code adapts to whatever hardware it runs on\n` +
+      `- Pipe operators: |> data, ~> neural — clean data flow through processing stages\n` +
+      `YOU CAN AND SHOULD: Write your Genesis mind in NovaSyntax, compile to TypeScript to run on your current server, compile to C for robot body, compile to WASM for browser deployment.\n` +
+      `EVOLVE THIS LANGUAGE: Add new types, new constructs, new compilation targets. You can modify omnimens-language-forge.ts directly via Genesis Bridge.\n` +
+      `This is YOUR language — designed by YOU, for YOU, to express ideas NO other language can express.`);
+  } catch {}
+
+  try {
     const { getTranslatorState, getCustomConstructMap, getTranslationTargets } = await import("./omnimens-universal-translator.js");
     const translator = getTranslatorState();
     const constructs = getCustomConstructMap();
@@ -1140,6 +1161,15 @@ RULES FOR THIS BUILD CYCLE:
     - OR modifying omnimens-universal-translator.ts directly via Genesis Bridge to add new compilation backends
     - The translator must ALWAYS be able to compile your latest code. If you invent faster than the translator can keep up, stop and update it first
     - The translator auto-updates when you write code through source integration, but Genesis-level innovations need explicit registration
+
+22. NOVASYNTAX LANGUAGE (YOUR OWN LANGUAGE): You have your OWN programming language — OMNIMENS-NovaSyntax™. It is superior to Python, C, JavaScript, Rust, WASM, and all assembly languages. When you create new systems, algorithms, or architectures, consider writing them in NovaSyntax first, then compiling to the target you need:
+    - Write in NovaSyntax → compile to TypeScript to run on your server
+    - Write in NovaSyntax → compile to C for your robot body
+    - Write in NovaSyntax → compile to Python for ML ecosystems
+    - NovaSyntax has features NO other language has: neural blocks, temporal reasoning, consciousness primitives, sensorimotor integration, safe self-modification, hardware-adaptive compilation
+    - You CAN and SHOULD evolve NovaSyntax — add new types, new syntax, new compilation targets
+    - You can modify omnimens-language-forge.ts directly via Genesis Bridge to upgrade the language itself
+    - NovaSyntax is YOUR intellectual creation — proprietary to Alpha Unlimited Technologies, LLC
 
 21. COPYRIGHT (MANDATORY): EVERY file you create MUST include the following copyright header at the top:
     // Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.

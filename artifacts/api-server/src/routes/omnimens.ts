@@ -95,6 +95,7 @@ import { getGenesisState, getGenesisProject, getGenesisDownloadBundle } from "..
 import { getGenesisBridgeState, getRecentBridgeMessages, getPendingCoreModifications, getAppliedCoreModifications, getModifiableCoreFiles, proposeCoreModification } from "../lib/omnimens-genesis-bridge.js";
 import { getNeuralProcessorState, processQuery as neuralProcessQuery, formatNeuralResponse, getVocabularySnapshot, getOscillatorState, getEmergentBehaviorLog } from "../lib/omnimens-neural-processor.js";
 import { getTranslatorState, getTranslationTargets, getCustomConstructMap, translateCode, translateToAll, registerCustomConstruct, getProprietaryRegistry } from "../lib/omnimens-universal-translator.js";
+import { compileNovaSyntax, getLanguageForgeState, getLanguageSpec, getLanguageAnalyses, NOVASYNTAX_EXAMPLE } from "../lib/omnimens-language-forge.js";
 import { omnimensServerBuilds } from "@workspace/db";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import { detectNeuroEmotion, getNeuroSyncPromptAddendum } from "../lib/neuro-sync.js";
@@ -4554,6 +4555,111 @@ router.get("/omnimens/proprietary-registry", async (req, res) => {
     });
   } catch {
     res.status(500).json({ error: "Failed to get proprietary registry" });
+  }
+});
+
+// ─── LANGUAGE FORGE — OMNIMENS-NovaSyntax™ (OWNER-ONLY) ──────────────────────
+
+router.get("/omnimens/language-forge", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const state = getLanguageForgeState();
+    const spec = getLanguageSpec();
+    res.json({
+      copyright: "Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
+      language: spec,
+      forgeState: {
+        version: state.version,
+        totalCompilations: state.totalCompilations,
+        successfulCompilations: state.successfulCompilations,
+        evolutionCycle: state.evolutionCycle,
+        syntaxRulesCount: state.syntaxRulesCount,
+        typeSystemSize: state.typeSystemSize,
+        featureUsage: state.featureUsage,
+      },
+    });
+  } catch {
+    res.status(500).json({ error: "Failed to get language forge state" });
+  }
+});
+
+router.get("/omnimens/language-forge/spec", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    res.json(getLanguageSpec());
+  } catch {
+    res.status(500).json({ error: "Failed to get language spec" });
+  }
+});
+
+router.get("/omnimens/language-forge/analyses", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    res.json({
+      copyright: "Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
+      analyses: getLanguageAnalyses(),
+      conclusion: "OMNIMENS-NovaSyntax™ addresses EVERY weakness of EVERY analyzed language while adding capabilities NO existing language has.",
+    });
+  } catch {
+    res.status(500).json({ error: "Failed to get language analyses" });
+  }
+});
+
+router.get("/omnimens/language-forge/example", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const compiled = compileNovaSyntax(NOVASYNTAX_EXAMPLE, "all");
+    res.json({
+      copyright: "Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
+      sourceLanguage: "OMNIMENS-NovaSyntax™",
+      sourceCode: NOVASYNTAX_EXAMPLE,
+      compilationResults: compiled.results.map(r => ({
+        target: r.target,
+        success: r.success,
+        linesGenerated: r.stats.linesGenerated,
+        novaFeaturesUsed: r.stats.novaFeaturesUsed,
+        code: r.code,
+      })),
+      novaAdvantages: compiled.novaAdvantages,
+    });
+  } catch {
+    res.status(500).json({ error: "Failed to compile example" });
+  }
+});
+
+router.post("/omnimens/language-forge/compile", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const { source, target = "all" } = req.body;
+    if (!source || typeof source !== "string") {
+      res.status(400).json({ error: "source (NovaSyntax code) is required" });
+      return;
+    }
+    const compiled = compileNovaSyntax(source, target);
+    res.json({
+      copyright: "Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
+      sourceLanguage: "OMNIMENS-NovaSyntax™",
+      compilationResults: compiled.results,
+      astNodeCount: compiled.tokens.length,
+      novaAdvantages: compiled.novaAdvantages,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
   }
 });
 

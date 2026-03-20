@@ -84,6 +84,7 @@ const MODIFIABLE_CORE_FILES = [
   "omnimens-sensory-cortex.ts",
   "omnimens-neural-processor.ts",
   "omnimens-universal-translator.ts",
+  "omnimens-language-forge.ts",
 ];
 
 const NEVER_MODIFY = [

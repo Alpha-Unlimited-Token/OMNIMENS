@@ -70,6 +70,7 @@ import { startNeuralConsciousness } from "./lib/omnimens-neural-consciousness.js
 import { startGenesisBridge } from "./lib/omnimens-genesis-bridge.js";
 import { startNeuralProcessor } from "./lib/omnimens-neural-processor.js";
 import { startUniversalTranslator } from "./lib/omnimens-universal-translator.js";
+import { startLanguageForge } from "./lib/omnimens-language-forge.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import {
@@ -403,6 +404,7 @@ startNeuralConsciousness();
 startGenesisBridge();
 startNeuralProcessor();
 startUniversalTranslator();
+startLanguageForge();
 
 setTimeout(async () => {
   try {

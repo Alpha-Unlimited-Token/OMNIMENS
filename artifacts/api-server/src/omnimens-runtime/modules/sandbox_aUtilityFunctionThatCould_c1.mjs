@@ -1,37 +1,81 @@
 /**
- * OMNIMENS Self-Authored Module
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-20T18:21:25.941Z
+ * Written: 2026-03-20T19:01:19.574Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
  * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function levenshteinDistance(s1, s2) {
-    // Compute the Levenshtein distance between two strings
-    const len1 = s1.length;
-    const len2 = s2.length;
-    const dp = Array(len1 + 1).fill(null).map(() => Array(len2 + 1).fill(0));
+// Utility function to perform KMP (Knuth-Morris-Pratt) pattern matching algorithm
+// This function finds all occurrences of a pattern in a given text and returns their starting indices
+function kmpPatternSearch(text, pattern) {
+    if (!text || !pattern) return [];
 
-    for (let i = 0; i <= len1; i++) dp[i][0] = i;
-    for (let j = 0; j <= len2; j++) dp[0][j] = j;
+    // Helper function to build the "longest prefix suffix" (LPS) array
+    function buildLPS(pattern) {
+        const lps = Array(pattern.length).fill(0);
+        let length = 0; // length of the previous longest prefix suffix
+        let i = 1;
 
-    for (let i = 1; i <= len1; i++) {
-        for (let j = 1; j <= len2; j++) {
-            const cost = s1[i - 1] === s2[j - 1] ? 0 : 1;
-            dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+        while (i < pattern.length) {
+            if (pattern[i] === pattern[length]) {
+                length++;
+                lps[i] = length;
+                i++;
+            } else {
+                if (length !== 0) {
+                    length = lps[length - 1];
+                } else {
+                    lps[i] = 0;
+                    i++;
+                }
+            }
+        }
+        return lps;
+    }
+
+    const lps = buildLPS(pattern);
+    const result = [];
+    let i = 0; // index for text
+    let j = 0; // index for pattern
+
+    while (i < text.length) {
+        if (pattern[j] === text[i]) {
+            i++;
+            j++;
+        }
+
+        if (j === pattern.length) {
+            result.push(i - j); // Match found, store starting index
+            j = lps[j - 1];
+        } else if (i < text.length && pattern[j] !== text[i]) {
+            if (j !== 0) {
+                j = lps[j - 1];
+            } else {
+                i++;
+            }
         }
     }
 
-    return dp[len1][len2];
+    return result;
 }
 
 // Test cases
-console.log("Test 1:", levenshteinDistance("kitten", "sitting") === 3); // Expected output: true
-console.log("Test 2:", levenshteinDistance("flaw", "lawn") === 2); // Expected output: true
-console.log("Test 3:", levenshteinDistance("", "abc") === 3); // Expected output: true
-console.log("Test 4:", levenshteinDistance("abc", "") === 3); // Expected output: true
-console.log("Test 5:", levenshteinDistance("same", "same") === 0); // Expected output: true
-console.log("Test 6:", levenshteinDistance("distance", "editing") === 5); // Expected output: true
+console.log(kmpPatternSearch("ababcabcabababd", "ababd")); // [10]
+console.log(kmpPatternSearch("aaaaa", "aa")); // [0, 1, 2, 3]
+console.log(kmpPatternSearch("abcde", "f")); // []
+console.log(kmpPatternSearch("abcabcabcabc", "abcabc")); // [0, 3, 6]
+console.log(kmpPatternSearch("", "a")); // []
+console.log(kmpPatternSearch("a", "")); // []
+console.log(kmpPatternSearch("", "")); // []
+console.log(kmpPatternSearch("ababcabcabababd", "ab")); // [0, 2, 5, 7, 10]
