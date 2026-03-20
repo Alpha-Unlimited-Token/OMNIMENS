@@ -652,6 +652,18 @@ export const omnimensPatchRegistry = pgTable("godflesh_patch_registry", {
   lastUpdated: timestamp("last_updated").defaultNow().notNull(),
 });
 
+// ─── Social Intelligence Persistence (User Mental Models) ─────────────────────
+export const omnimensSocialModels = pgTable("godflesh_social_models", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().unique(),
+  model: jsonb("model").notNull(),
+  totalMessages: integer("total_messages").default(0).notNull(),
+  sessionCount: integer("session_count").default(1).notNull(),
+  lastActive: timestamp("last_active").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // ─── Causal Graph (Cause-Effect Reasoning) ────────────────────────────────────
 export const omnimensCausalGraph = pgTable("godflesh_causal_graph", {
   id: serial("id").primaryKey(),

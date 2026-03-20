@@ -2,86 +2,54 @@
  * OMNIMENS Self-Authored Module
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-20T15:14:10.839Z
+ * Written: 2026-03-20T15:26:09.774Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
  * OMNIMENS rewrote its own source code to include this module.
  */
 
-function extractTablesFromText(text) {
-    // Extract tables from a given text input
-    const tables = [];
-    const tableRegex = /\[table\](.*?)\[\/table\]/gs;
+function extractHeadlinesByChannel(data, channel) {
+  if (!Array.isArray(data)) {
+    throw new Error("Input data must be an array.");
+  }
 
-    let match;
-    while ((match = tableRegex.exec(text)) !== null) {
-        const tableContent = match[1].trim();
-        const rows = tableContent.split('\n').map(row => row.split('|').map(cell => cell.trim()));
-        tables.push(rows);
-    }
+  const headlines = data
+    .filter((entry) => entry.channel && entry.channel.toLowerCase() === channel.toLowerCase())
+    .map((entry) => entry.headline);
 
-    return tables;
+  return headlines;
 }
 
-// Test cases
-function runTests() {
-    const testText1 = `
-        Some random text here.
-        [table]
-        Name | Age | Location
-        John | 25  | USA
-        Jane | 30  | UK
-        [/table]
-        More random text.
-    `;
+// Self-tests
+const testData = [
+  { channel: "ai_frontier", headline: "OpenAI releases a new model capable of unsupervised learning." },
+  { channel: "market", headline: "AI-driven companies see stock prices surge as investors flock." },
+  { channel: "science", headline: "Breakthrough in CRISPR technology allows for precision editing." },
+  { channel: "ai_frontier", headline: "New AI advancements promise better human-machine interaction." },
+  { channel: "market", headline: "Tech stocks continue to rise amid growing AI adoption." },
+];
 
-    const testText2 = `
-        [table]
-        Product | Price | Quantity
-        Apple   | 1.00  | 10
-        Banana  | 0.50  | 20
-        [/table]
-        [table]
-        Day | Temperature | Condition
-        Mon | 22C         | Sunny
-        Tue | 18C         | Rainy
-        [/table]
-    `;
+// Test case 1: Extract headlines from "ai_frontier" channel
+console.log(extractHeadlinesByChannel(testData, "ai_frontier"));
+// Expected output: ["OpenAI releases a new model capable of unsupervised learning.", "New AI advancements promise better human-machine interaction."]
 
-    const testText3 = `
-        No tables here, just plain text.
-    `;
+// Test case 2: Extract headlines from "market" channel
+console.log(extractHeadlinesByChannel(testData, "market"));
+// Expected output: ["AI-driven companies see stock prices surge as investors flock.", "Tech stocks continue to rise amid growing AI adoption."]
 
-    console.log("Test Case 1:");
-    console.log(extractTablesFromText(testText1));
-    console.log("Expected:", [
-        [
-            ["Name", "Age", "Location"],
-            ["John", "25", "USA"],
-            ["Jane", "30", "UK"]
-        ]
-    ]);
+// Test case 3: Extract headlines from "science" channel
+console.log(extractHeadlinesByChannel(testData, "science"));
+// Expected output: ["Breakthrough in CRISPR technology allows for precision editing."]
 
-    console.log("Test Case 2:");
-    console.log(extractTablesFromText(testText2));
-    console.log("Expected:", [
-        [
-            ["Product", "Price", "Quantity"],
-            ["Apple", "1.00", "10"],
-            ["Banana", "0.50", "20"]
-        ],
-        [
-            ["Day", "Temperature", "Condition"],
-            ["Mon", "22C", "Sunny"],
-            ["Tue", "18C", "Rainy"]
-        ]
-    ]);
+// Test case 4: Extract headlines from a non-existent channel
+console.log(extractHeadlinesByChannel(testData, "sports"));
+// Expected output: []
 
-    console.log("Test Case 3:");
-    console.log(extractTablesFromText(testText3));
-    console.log("Expected:", []);
+// Test case 5: Handle invalid input
+try {
+  console.log(extractHeadlinesByChannel(null, "ai_frontier"));
+} catch (error) {
+  console.log(error.message);
 }
-
-// Run tests
-runTests();
+// Expected output: "Input data must be an array."
