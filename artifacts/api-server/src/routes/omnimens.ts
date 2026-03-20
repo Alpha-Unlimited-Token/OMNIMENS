@@ -142,19 +142,28 @@ function resolveModel(raw: string | undefined): AllowedModel {
   return "gpt-4o";
 }
 
-// Free-tier auto-downgrade: if user has only signup credits left (never purchased),
-// silently route them to Llama 3.3 70B via Together AI — same great OMNIMENS experience,
-// costs ~20x less, so the free pool serves far more users.
-function shouldAutoDowngradeToTogether(
-  selectedModel: AllowedModel,
-  userCredits: number,
+// Free-tier enforcement: users who have never paid (no saved payment method AND
+// $0 lifetime paid spend) are ALWAYS restricted from paid AI models.
+// This prevents free $20 monthly credits from being used on paid AI (OpenAI)
+// which costs real money. Users must connect a payment method to unlock paid models.
+function isUnpaidUser(
   owner: boolean,
+  hasPaymentMethod: boolean,
+  totalPaidSpendCents: number,
 ): boolean {
   if (owner) return false;
-  if (isTogetherModel(selectedModel)) return false; // already on Together AI
-  if (!getTogetherClient()) return false;            // Together AI not configured
-  // Auto-downgrade when user is clearly on free credits only (≤ free signup pool)
-  return userCredits <= FREE_SIGNUP_CREDITS;
+  return !hasPaymentMethod && totalPaidSpendCents <= 0;
+}
+
+function shouldForceFreeTier(
+  selectedModel: AllowedModel,
+  owner: boolean,
+  hasPaymentMethod: boolean,
+  totalPaidSpendCents: number,
+): boolean {
+  if (owner) return false;
+  if (isTogetherModel(selectedModel)) return false;
+  return isUnpaidUser(owner, hasPaymentMethod, totalPaidSpendCents);
 }
 
 const router: IRouter = Router();
@@ -1041,6 +1050,8 @@ router.get("/omnimens/status", async (req, res) => {
     lockReason = `Outstanding balance of $${(outstandingBalanceCents / 100).toFixed(2)} must be paid. ${parts.join(". ")}. Your account is locked until payment is received.`;
   }
 
+  const hasPaid = !!user.paymentMethodId || (user.totalPaidSpendCents ?? 0) > 0;
+
   res.json({
     isOwner: owner,
     credits: owner ? null : credits,
@@ -1048,6 +1059,7 @@ router.get("/omnimens/status", async (req, res) => {
     stripeCustomerId: user.stripeCustomerId,
     isPro: owner || credits > 0,
     tier: owner ? "sovereign" : credits > 0 ? "credits" : "free",
+    paidUser: owner || hasPaid,
     accountLocked,
     lockReason,
     outstandingBalanceCents: owner ? 0 : outstandingBalanceCents,
@@ -1102,12 +1114,26 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
     await checkAndGrantMonthlyCredits(req.user.id);
   }
 
-  // ── Free-tier auto-downgrade to Together AI ───────────────────────────────────
-  // Free users (signup credits only, never purchased) get routed to Llama 3.3 70B.
-  // Same OMNIMENS system prompt, tools, and personality — just 20x cheaper to run,
-  // so the free tier pool serves far more users without draining the OpenAI account.
-  if (shouldAutoDowngradeToTogether(selectedModel, user.credits ?? 0, owner)) {
-    selectedModel = "llama-3.3-70b";
+  // ── Free-tier enforcement: block paid AI models for non-paying users ─────────
+  // Users on free monthly credits (no payment method, no purchase history) are
+  // restricted to free open-source models only. Paid OpenAI models require a
+  // connected payment method or prior purchase history.
+  const userIsUnpaid = isUnpaidUser(owner, !!user.paymentMethodId, user.totalPaidSpendCents ?? 0);
+  if (shouldForceFreeTier(selectedModel, owner, !!user.paymentMethodId, user.totalPaidSpendCents ?? 0)) {
+    if (getTogetherClient()) {
+      selectedModel = "llama-3.3-70b";
+    } else {
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+      res.write(`data: ${JSON.stringify({
+        type: "model_locked",
+        message: "Paid AI models require a connected payment method. Please connect your debit/credit card in Settings → Billing to unlock premium models.",
+        connectWallet: true,
+      })}\n\n`);
+      res.end();
+      return;
+    }
   }
 
   // ── Pre-flight credit check with auto-topup ───────────────────────────────────
@@ -1782,9 +1808,15 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
     // Reasoning models (o3-mini) don't support temperature / max_tokens
     const isReasoningModel = selectedModel.startsWith("o3") || selectedModel.startsWith("o4");
 
-    // Vision override: Together AI doesn't support image content — force a vision-capable OpenAI model
+    // Vision override: Together AI doesn't support image content
+    // For PAID users: force gpt-4o for vision. For UNPAID users: strip vision content
+    // so they stay on free models and don't incur paid API costs.
     if (visionContent.length > 0 && isTogetherModel(selectedModel)) {
-      selectedModel = "gpt-4o";
+      if (userIsUnpaid) {
+        visionContent.length = 0;
+      } else {
+        selectedModel = "gpt-4o";
+      }
     }
 
     // Route to Together AI for open-source models, OpenAI for everything else

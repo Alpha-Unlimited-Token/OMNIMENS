@@ -1,105 +1,146 @@
 /**
  * @module vectorMemoryStore
- * @description Provides a utility for fast embedding retrieval and similarity search using HNSW (Hierarchical Navigable Small World) algorithm.
+ * @description A utility module for efficient vector embedding storage and similarity search using k-d tree algorithm.
+ * @exports {addVector, searchNearest, clearStore}
  */
 
 /**
- * Represents a node in the HNSW graph.
- * @class
+ * Internal k-d tree node representation.
+ * @typedef {Object} KDTreeNode
+ * @property {number[]} point - The vector point stored in the node.
+ * @property {KDTreeNode|null} left - Left child node.
+ * @property {KDTreeNode|null} right - Right child node.
  */
-class HNSWNode {
-  constructor(vector, id) {
-    this.vector = vector; // The embedding vector
-    this.id = id; // Unique identifier for the node
-    this.neighbors = []; // List of neighboring nodes
+
+/**
+ * Internal k-d tree root node.
+ * @type {KDTreeNode|null}
+ */
+let kdTreeRoot = null;
+
+/**
+ * Internal dimension of vectors stored in the tree.
+ * @type {number|null}
+ */
+let vectorDimension = null;
+
+/**
+ * Adds a new vector to the k-d tree.
+ * @param {number[]} vector - The vector to add.
+ * @throws {Error} If vector dimensions are inconsistent.
+ */
+function addVector(vector) {
+  if (!Array.isArray(vector) || vector.length === 0) {
+    throw new Error("Vector must be a non-empty array of numbers.");
   }
+
+  if (vectorDimension === null) {
+    vectorDimension = vector.length;
+  } else if (vector.length !== vectorDimension) {
+    throw new Error(`Vector dimension mismatch. Expected ${vectorDimension}, got ${vector.length}.`);
+  }
+
+  kdTreeRoot = insertKDTree(kdTreeRoot, vector, 0);
 }
 
 /**
- * A utility class for managing and querying a vector memory store using HNSW.
- * @class
+ * Inserts a vector into the k-d tree.
+ * @param {KDTreeNode|null} node - Current node.
+ * @param {number[]} point - Vector to insert.
+ * @param {number} depth - Current depth in the tree.
+ * @returns {KDTreeNode} Updated node.
  */
-class VectorMemoryStore {
-  constructor(maxNeighbors = 16) {
-    this.nodes = []; // All nodes in the graph
-    this.maxNeighbors = maxNeighbors; // Maximum neighbors per node
+function insertKDTree(node, point, depth) {
+  if (node === null) {
+    return { point, left: null, right: null };
   }
 
-  /**
-   * Adds a new vector to the memory store.
-   * @param {number[]} vector - The embedding vector to be added.
-   * @param {string} id - A unique identifier for the vector.
-   */
-  addVector(vector, id) {
-    if (!Array.isArray(vector) || vector.length === 0) {
-      throw new Error("Vector must be a non-empty array of numbers.");
-    }
-    const newNode = new HNSWNode(vector, id);
-    if (this.nodes.length === 0) {
-      this.nodes.push(newNode);
-      return;
-    }
-    this._connectNode(newNode);
-    this.nodes.push(newNode);
+  const axis = depth % vectorDimension;
+
+  if (point[axis] < node.point[axis]) {
+    node.left = insertKDTree(node.left, point, depth + 1);
+  } else {
+    node.right = insertKDTree(node.right, point, depth + 1);
   }
 
-  /**
-   * Finds the nearest neighbors for a given query vector.
-   * @param {number[]} queryVector - The query vector.
-   * @param {number} k - The number of nearest neighbors to retrieve.
-   * @returns {Array<{id: string, distance: number}>} The nearest neighbors with their distances.
-   */
-  findNearestNeighbors(queryVector, k) {
-    if (!Array.isArray(queryVector) || queryVector.length === 0) {
-      throw new Error("Query vector must be a non-empty array of numbers.");
-    }
-    if (k <= 0) {
-      throw new Error("Number of neighbors to retrieve must be greater than 0.");
-    }
-    const distances = this.nodes.map(node => ({
-      id: node.id,
-      distance: this._euclideanDistance(queryVector, node.vector)
-    }));
-    distances.sort((a, b) => a.distance - b.distance);
-    return distances.slice(0, k);
-  }
-
-  /**
-   * Connects a new node to its nearest neighbors in the graph.
-   * @private
-   * @param {HNSWNode} newNode - The new node to connect.
-   */
-  _connectNode(newNode) {
-    const distances = this.nodes.map(node => ({
-      node,
-      distance: this._euclideanDistance(newNode.vector, node.vector)
-    }));
-    distances.sort((a, b) => a.distance - b.distance);
-    const neighbors = distances.slice(0, this.maxNeighbors).map(d => d.node);
-    newNode.neighbors = neighbors;
-    for (const neighbor of neighbors) {
-      if (neighbor.neighbors.length < this.maxNeighbors) {
-        neighbor.neighbors.push(newNode);
-      }
-    }
-  }
-
-  /**
-   * Calculates the Euclidean distance between two vectors.
-   * @private
-   * @param {number[]} vectorA - The first vector.
-   * @param {number[]} vectorB - The second vector.
-   * @returns {number} The Euclidean distance between the two vectors.
-   */
-  _euclideanDistance(vectorA, vectorB) {
-    if (vectorA.length !== vectorB.length) {
-      throw new Error("Vectors must have the same dimensions.");
-    }
-    return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
-  }
+  return node;
 }
 
 /**
- * Exports the VectorMemoryStore class for external usage.
+ * Searches for the nearest vector to the given query.
+ * @param {number[]} query - The query vector.
+ * @returns {number[]|null} The nearest vector or null if the tree is empty.
  */
-export { VectorMemoryStore };
+function searchNearest(query) {
+  if (!Array.isArray(query) || query.length !== vectorDimension) {
+    throw new Error(`Query dimension mismatch. Expected ${vectorDimension}, got ${query.length}.`);
+  }
+
+  if (kdTreeRoot === null) {
+    return null;
+  }
+
+  return nearestNeighborSearch(kdTreeRoot, query, 0).point;
+}
+
+/**
+ * Performs nearest neighbor search in the k-d tree.
+ * @param {KDTreeNode} node - Current node.
+ * @param {number[]} query - Query vector.
+ * @param {number} depth - Current depth in the tree.
+ * @returns {KDTreeNode} Nearest node.
+ */
+function nearestNeighborSearch(node, query, depth) {
+  if (node === null) {
+    return { point: null, distance: Infinity };
+  }
+
+  const axis = depth % vectorDimension;
+  const nextBranch = query[axis] < node.point[axis] ? node.left : node.right;
+  const oppositeBranch = query[axis] < node.point[axis] ? node.right : node.left;
+
+  const best = closerDistance(
+    nearestNeighborSearch(nextBranch, query, depth + 1),
+    { point: node.point, distance: euclideanDistance(query, node.point) }
+  );
+
+  const distanceToAxis = Math.abs(query[axis] - node.point[axis]);
+  if (distanceToAxis < best.distance) {
+    best = closerDistance(
+      best,
+      nearestNeighborSearch(oppositeBranch, query, depth + 1)
+    );
+  }
+
+  return best;
+}
+
+/**
+ * Calculates the Euclidean distance between two vectors.
+ * @param {number[]} a - First vector.
+ * @param {number[]} b - Second vector.
+ * @returns {number} Euclidean distance.
+ */
+function euclideanDistance(a, b) {
+  return Math.sqrt(a.reduce((sum, val, idx) => sum + Math.pow(val - b[idx], 2), 0));
+}
+
+/**
+ * Compares two nodes and returns the one with the smaller distance.
+ * @param {KDTreeNode} a - First node.
+ * @param {KDTreeNode} b - Second node.
+ * @returns {KDTreeNode} Node with the smaller distance.
+ */
+function closerDistance(a, b) {
+  return a.distance < b.distance ? a : b;
+}
+
+/**
+ * Clears the k-d tree and resets the vector dimension.
+ */
+function clearStore() {
+  kdTreeRoot = null;
+  vectorDimension = null;
+}
+
+export { addVector, searchNearest, clearStore };

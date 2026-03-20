@@ -4294,9 +4294,10 @@ const MODEL_OPTIONS = [
   { id: "mistral-7b",     label: "Mistral 7B",      badge: "FREE",   group: "Open-Source" },
 ];
 
-function ModelSelector({ value, onChange }: { value: string; onChange: (m: string) => void }) {
+function ModelSelector({ value, onChange, paidUser }: { value: string; onChange: (m: string) => void; paidUser: boolean }) {
   const [open, setOpen] = useState(false);
   const current = MODEL_OPTIONS.find(m => m.id === value) || MODEL_OPTIONS[0];
+  const canUsePaid = paidUser;
   return (
     <div className="relative">
       <button
@@ -4313,27 +4314,43 @@ function ModelSelector({ value, onChange }: { value: string; onChange: (m: strin
           {["OpenAI", "Open-Source"].map(group => (
             <div key={group}>
               <div className="px-3 pt-2 pb-1 text-[8px] font-mono tracking-widest text-white/25 uppercase">
-                {group === "Open-Source" ? "Open-Source · FREE" : "OpenAI · Credits"}
+                {group === "Open-Source" ? "Open-Source · FREE" : canUsePaid ? "OpenAI · Credits" : "OpenAI · Requires Payment"}
               </div>
-              {MODEL_OPTIONS.filter(m => m.group === group).map(m => (
-                <button
-                  key={m.id}
-                  type="button"
-                  onClick={() => { onChange(m.id); setOpen(false); }}
-                  className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-mono hover:bg-primary/10 transition-colors ${value === m.id ? "text-primary" : "text-white/60"}`}
-                >
-                  <span>{m.label}</span>
-                  <span className={`text-[8px] px-1.5 py-0.5 rounded font-bold ${
-                    m.badge === "FREE"   ? "bg-emerald-400/15 text-emerald-400" :
-                    m.badge === "REASON" ? "bg-orange-400/15 text-orange-400"  :
-                    m.badge === "NEW"    ? "bg-sky-400/15 text-sky-400"         :
-                    m.badge === "FAST"   ? "bg-blue-400/15 text-blue-400"       :
-                                          "bg-primary/15 text-primary"
-                  }`}>{m.badge}</span>
-                </button>
-              ))}
+              {MODEL_OPTIONS.filter(m => m.group === group).map(m => {
+                const isPaidModel = m.group === "OpenAI";
+                const locked = isPaidModel && !canUsePaid;
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => { if (!locked) { onChange(m.id); setOpen(false); } }}
+                    className={`w-full flex items-center justify-between px-3 py-2 text-[10px] font-mono transition-colors ${
+                      locked ? "opacity-40 cursor-not-allowed" : "hover:bg-primary/10"
+                    } ${value === m.id ? "text-primary" : "text-white/60"}`}
+                    disabled={locked}
+                  >
+                    <span className="flex items-center gap-1">
+                      {m.label}
+                      {locked && <Lock className="w-2.5 h-2.5 text-white/30" />}
+                    </span>
+                    <span className={`text-[8px] px-1.5 py-0.5 rounded font-bold ${
+                      m.badge === "FREE"   ? "bg-emerald-400/15 text-emerald-400" :
+                      locked               ? "bg-white/5 text-white/25" :
+                      m.badge === "REASON" ? "bg-orange-400/15 text-orange-400"  :
+                      m.badge === "NEW"    ? "bg-sky-400/15 text-sky-400"         :
+                      m.badge === "FAST"   ? "bg-blue-400/15 text-blue-400"       :
+                                            "bg-primary/15 text-primary"
+                    }`}>{locked ? "PAID" : m.badge}</span>
+                  </button>
+                );
+              })}
             </div>
           ))}
+          {!canUsePaid && (
+            <div className="px-3 py-2 border-t border-white/8 text-[9px] font-mono text-amber-400/70">
+              Connect a payment method to unlock paid models
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -5253,6 +5270,15 @@ export default function Chat() {
   const { theme, toggle: toggleTheme, isLight } = useTheme();
   const [persona, setPersona] = useState("GENERAL");
   const [selectedModel, setSelectedModel] = useState("gpt-4o");
+  useEffect(() => {
+    if (status && !status.paidUser && !status.isOwner) {
+      const freeModels = MODEL_OPTIONS.filter(m => m.group === "Open-Source");
+      const isFreeModel = freeModels.some(m => m.id === selectedModel);
+      if (!isFreeModel) {
+        setSelectedModel("llama-3.3-70b");
+      }
+    }
+  }, [status?.paidUser, status?.isOwner]);
   const [responseMode, setResponseMode] = useState("AUTO");
   const [sessionStart] = useState(() => Date.now());
   const [deepResearchMode, setDeepResearchMode] = useState(false);
@@ -6767,7 +6793,7 @@ export default function Chat() {
                 <span className="text-[9px] font-mono text-white/70 truncate">
                   {PERSONA_NAMES[persona]} · MEMORY ACTIVE
                 </span>
-                <ModelSelector value={selectedModel} onChange={setSelectedModel} />
+                <ModelSelector value={selectedModel} onChange={setSelectedModel} paidUser={!!status?.paidUser} />
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 {hubSettings.antiHallucinationMode && (

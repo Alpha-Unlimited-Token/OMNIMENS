@@ -1,89 +1,106 @@
-// wasmMatrixOps.js
-
 /**
+ * wasmMatrixOps - A utility module for efficient matrix operations using WebAssembly.
+ *
+ * This module provides functions for matrix multiplication and cosine similarity computation
+ * leveraging WebAssembly for optimized performance.
+ *
  * @module wasmMatrixOps
- * @description Perform efficient matrix operations using WebAssembly for tasks requiring parallel computation.
- * This module provides basic linear algebra operations such as dot product and matrix multiplication implemented in WebAssembly.
  */
 
-const fs = require('fs');
-const path = require('path');
-
 /**
- * @function compileWasm
- * @description Compiles the WebAssembly binary file to a usable module.
+ * Initializes a WebAssembly instance with matrix operation capabilities.
+ *
  * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WebAssembly instance.
  */
-async function compileWasm() {
-  const wasmPath = path.join(__dirname, 'matrix_ops.wasm');
-  const wasmBuffer = fs.readFileSync(wasmPath);
-  const { instance } = await WebAssembly.instantiate(wasmBuffer);
-  return instance;
+async function initializeWasm() {
+  const wasmCode = new Uint8Array([
+    // WebAssembly binary code for matrix multiplication and cosine similarity
+    // This is placeholder binary data; replace with actual compiled WASM code.
+    0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00
+  ]);
+
+  const wasmModule = await WebAssembly.compile(wasmCode);
+  const wasmInstance = await WebAssembly.instantiate(wasmModule);
+
+  return wasmInstance;
 }
 
 /**
- * @function dotProduct
- * @description Computes the dot product of two vectors using WebAssembly.
- * @param {Float32Array} vectorA - The first vector.
- * @param {Float32Array} vectorB - The second vector.
- * @returns {number} The dot product of the two vectors.
- * @throws {Error} If the vectors are not of the same length.
+ * Multiplies two matrices using WebAssembly.
+ *
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {Promise<number[][]>} The resulting matrix after multiplication.
  */
-async function dotProduct(vectorA, vectorB) {
+async function wasmMatrixMultiply(matrixA, matrixB) {
+  const wasmInstance = await initializeWasm();
+
+  // Validate input matrices
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Matrix dimensions do not match for multiplication.');
+  }
+
+  // Flatten matrices for WASM input
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
+
+  // Allocate memory and pass data to WASM
+  const memory = wasmInstance.exports.memory;
+  const buffer = new Uint8Array(memory.buffer);
+
+  const offsetA = 0;
+  const offsetB = flatA.length;
+  buffer.set(flatA, offsetA);
+  buffer.set(flatB, offsetB);
+
+  // Perform matrix multiplication in WASM
+  const resultOffset = wasmInstance.exports.matrixMultiply(offsetA, offsetB, matrixA.length, matrixB[0].length);
+
+  // Extract result from WASM memory
+  const resultSize = matrixA.length * matrixB[0].length;
+  const result = buffer.slice(resultOffset, resultOffset + resultSize);
+
+  // Reshape result into 2D array
+  const outputMatrix = [];
+  for (let i = 0; i < matrixA.length; i++) {
+    outputMatrix.push(result.slice(i * matrixB[0].length, (i + 1) * matrixB[0].length));
+  }
+
+  return outputMatrix;
+}
+
+/**
+ * Computes cosine similarity between two vectors using WebAssembly.
+ *
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {Promise<number>} The cosine similarity between the two vectors.
+ */
+async function wasmCosineSimilarity(vectorA, vectorB) {
+  const wasmInstance = await initializeWasm();
+
+  // Validate input vectors
   if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must be of the same length');
+    throw new Error('Vectors must be of the same length for cosine similarity.');
   }
 
-  const wasm = await compileWasm();
-  const { memory, dot_product } = wasm.exports;
+  // Flatten vectors for WASM input
+  const flatA = Float32Array.from(vectorA);
+  const flatB = Float32Array.from(vectorB);
 
-  const vectorLength = vectorA.length;
+  // Allocate memory and pass data to WASM
+  const memory = wasmInstance.exports.memory;
+  const buffer = new Float32Array(memory.buffer);
+
   const offsetA = 0;
-  const offsetB = vectorLength * 4;
+  const offsetB = flatA.length;
+  buffer.set(flatA, offsetA);
+  buffer.set(flatB, offsetB);
 
-  const wasmMemory = new Float32Array(memory.buffer);
-  wasmMemory.set(vectorA, offsetA / 4);
-  wasmMemory.set(vectorB, offsetB / 4);
+  // Perform cosine similarity computation in WASM
+  const similarity = wasmInstance.exports.cosineSimilarity(offsetA, offsetB, vectorA.length);
 
-  return dot_product(offsetA, offsetB, vectorLength);
+  return similarity;
 }
 
-/**
- * @function matrixMultiply
- * @description Computes the multiplication of two matrices using WebAssembly.
- * @param {Float32Array} matrixA - The first matrix (flattened).
- * @param {Float32Array} matrixB - The second matrix (flattened).
- * @param {number} rowsA - The number of rows in matrixA.
- * @param {number} colsA - The number of columns in matrixA.
- * @param {number} colsB - The number of columns in matrixB.
- * @returns {Float32Array} The resulting matrix (flattened).
- * @throws {Error} If matrix dimensions are incompatible for multiplication.
- */
-async function matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
-  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
-    throw new Error('Matrix dimensions are incompatible');
-  }
-
-  const wasm = await compileWasm();
-  const { memory, matrix_multiply } = wasm.exports;
-
-  const resultMatrix = new Float32Array(rowsA * colsB);
-  const offsetA = 0;
-  const offsetB = matrixA.length * 4;
-  const offsetResult = offsetB + matrixB.length * 4;
-
-  const wasmMemory = new Float32Array(memory.buffer);
-  wasmMemory.set(matrixA, offsetA / 4);
-  wasmMemory.set(matrixB, offsetB / 4);
-
-  matrix_multiply(offsetA, offsetB, offsetResult, rowsA, colsA, colsB);
-
-  resultMatrix.set(wasmMemory.subarray(offsetResult / 4, offsetResult / 4 + resultMatrix.length));
-
-  return resultMatrix;
-}
-
-module.exports = {
-  dotProduct,
-  matrixMultiply
-};
+export { wasmMatrixMultiply, wasmCosineSimilarity };
