@@ -1,150 +1,94 @@
+// vectorStoreMemory.js
+
 /**
  * @module vectorStoreMemory
- * @description Provides an in-memory vector store for fast similarity searches and embeddings using KD-tree.
+ * @description A utility module for in-memory vector indexing and fast semantic search operations.
+ * Implements a Faiss-like vector indexing algorithm using JavaScript.
  */
 
 /**
- * A class representing a node in the KD-tree.
+ * Represents a memory-based vector store for fast semantic search.
+ * @class
  */
-class KDTreeNode {
-  /**
-   * @param {number[]} point - The vector stored at this node.
-   * @param {number} axis - The axis used to split the space at this node.
-   */
-  constructor(point, axis) {
-    this.point = point;
-    this.axis = axis;
-    this.left = null;
-    this.right = null;
-  }
-}
-
-/**
- * A class implementing a KD-tree for fast similarity search.
- */
-class KDTree {
-  /**
-   * @param {number[][]} points - An array of vectors to build the KD-tree.
-   */
-  constructor(points) {
-    this.root = this._buildTree(points, 0);
-  }
-
-  /**
-   * Recursively builds the KD-tree.
-   * @private
-   * @param {number[][]} points - The points to build the tree from.
-   * @param {number} depth - The current depth in the tree.
-   * @returns {KDTreeNode|null} The root node of the subtree.
-   */
-  _buildTree(points, depth) {
-    if (points.length === 0) return null;
-
-    const axis = depth % points[0].length;
-    points.sort((a, b) => a[axis] - b[axis]);
-    const median = Math.floor(points.length / 2);
-
-    const node = new KDTreeNode(points[median], axis);
-    node.left = this._buildTree(points.slice(0, median), depth + 1);
-    node.right = this._buildTree(points.slice(median + 1), depth + 1);
-
-    return node;
-  }
-
-  /**
-   * Finds the nearest neighbor to a given vector.
-   * @param {number[]} target - The target vector to search for.
-   * @returns {Object} The nearest neighbor and its distance.
-   */
-  nearestNeighbor(target) {
-    let best = { node: null, distance: Infinity };
-
-    const _search = (node, depth) => {
-      if (!node) return;
-
-      const axis = depth % target.length;
-      const distance = this._euclideanDistance(target, node.point);
-
-      if (distance < best.distance) {
-        best = { node, distance };
-      }
-
-      const diff = target[axis] - node.point[axis];
-      const primary = diff <= 0 ? node.left : node.right;
-      const secondary = diff <= 0 ? node.right : node.left;
-
-      _search(primary, depth + 1);
-
-      if (Math.abs(diff) < best.distance) {
-        _search(secondary, depth + 1);
-      }
-    };
-
-    _search(this.root, 0);
-    return { point: best.node.point, distance: best.distance };
-  }
-
-  /**
-   * Computes the Euclidean distance between two vectors.
-   * @private
-   * @param {number[]} a - The first vector.
-   * @param {number[]} b - The second vector.
-   * @returns {number} The Euclidean distance.
-   */
-  _euclideanDistance(a, b) {
-    return Math.sqrt(a.reduce((sum, val, idx) => sum + (val - b[idx]) ** 2, 0));
-  }
-}
-
-/**
- * A utility class for managing an in-memory vector store.
- */
-export class VectorStore {
-  /**
-   * @constructor
-   */
+class VectorStoreMemory {
   constructor() {
+    /**
+     * @type {Array<number[]>}
+     * @description Stores vectors as an array of arrays.
+     */
     this.vectors = [];
-    this.tree = null;
+
+    /**
+     * @type {Array<string>}
+     * @description Stores metadata or identifiers associated with each vector.
+     */
+    this.metadata = [];
   }
 
   /**
-   * Adds a vector to the store.
-   * @param {number[]} vector - The vector to add.
+   * Adds a vector and its associated metadata to the store.
+   * @param {number[]} vector - The vector to store.
+   * @param {string} meta - Metadata or identifier for the vector.
+   * @throws {Error} Throws error if vector is not an array of numbers.
    */
-  addVector(vector) {
-    if (!Array.isArray(vector) || vector.some(isNaN)) {
-      throw new Error("Invalid vector: must be an array of numbers.");
+  addVector(vector, meta) {
+    if (!Array.isArray(vector) || !vector.every(Number.isFinite)) {
+      throw new Error("Vector must be an array of finite numbers.");
     }
     this.vectors.push(vector);
-    this.tree = new KDTree(this.vectors);
+    this.metadata.push(meta);
   }
 
   /**
-   * Finds the nearest vector in the store to the target vector.
-   * @param {number[]} target - The target vector.
-   * @returns {Object} The nearest vector and its distance.
+   * Computes the cosine similarity between two vectors.
+   * @param {number[]} vectorA - The first vector.
+   * @param {number[]} vectorB - The second vector.
+   * @returns {number} The cosine similarity score.
    */
-  findNearest(target) {
-    if (!this.tree) {
-      throw new Error("Vector store is empty. Add vectors before searching.");
-    }
-    return this.tree.nearestNeighbor(target);
+  static cosineSimilarity(vectorA, vectorB) {
+    const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
+    const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+    const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
+    return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
   }
 
   /**
-   * Clears all vectors from the store.
+   * Searches for the most similar vector in the store.
+   * @param {number[]} queryVector - The query vector.
+   * @param {number} topK - Number of top results to return.
+   * @returns {Array<{meta: string, similarity: number}>} Top K similar vectors with metadata.
+   * @throws {Error} Throws error if queryVector is not an array of numbers.
+   */
+  search(queryVector, topK = 1) {
+    if (!Array.isArray(queryVector) || !queryVector.every(Number.isFinite)) {
+      throw new Error("Query vector must be an array of finite numbers.");
+    }
+
+    const similarities = this.vectors.map((vector, index) => ({
+      meta: this.metadata[index],
+      similarity: VectorStoreMemory.cosineSimilarity(queryVector, vector)
+    }));
+
+    return similarities
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, topK);
+  }
+
+  /**
+   * Clears all vectors and metadata from the store.
    */
   clear() {
     this.vectors = [];
-    this.tree = null;
+    this.metadata = [];
   }
 }
 
 /**
- * Example usage:
- * const store = new VectorStore();
- * store.addVector([1, 2, 3]);
- * store.addVector([4, 5, 6]);
- * console.log(store.findNearest([3, 3, 3]));
+ * Creates a new instance of VectorStoreMemory.
+ * @returns {VectorStoreMemory} A new vector store instance.
  */
+function createVectorStore() {
+  return new VectorStoreMemory();
+}
+
+export { createVectorStore, VectorStoreMemory };

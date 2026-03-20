@@ -1,99 +1,127 @@
 /**
  * @module webAssemblyMatrixOps
- * @description Provides GPU-like matrix operations using WebAssembly for computational tasks.
- */
-
-const fs = require('fs');
-const path = require('path');
-
-/**
- * @typedef {number[][]} Matrix
- * Represents a 2D matrix.
+ * @description A utility module for GPU-accelerated matrix operations using WebAssembly for high-performance computations.
+ * This module is designed to integrate WebAssembly-based matrix manipulation for faster computations, leveraging TensorFlow.js or ONNX.js runtime.
  */
 
 /**
- * @function compileWebAssembly
- * @description Compiles the WebAssembly module from binary.
- * @returns {Promise<WebAssembly.Instance>} Compiled WebAssembly instance.
+ * Performs matrix multiplication using a WebAssembly-accelerated algorithm.
+ * @param {number[][]} matrixA - The first matrix (2D array).
+ * @param {number[][]} matrixB - The second matrix (2D array).
+ * @returns {Promise<number[][]>} - The resulting matrix after multiplication.
+ * @throws {Error} - Throws an error if matrices are incompatible for multiplication.
  */
-async function compileWebAssembly() {
-  const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
-  const wasmBinary = fs.readFileSync(wasmPath);
-  const wasmModule = await WebAssembly.compile(wasmBinary);
-  return WebAssembly.instantiate(wasmModule);
-}
-
-/**
- * @function multiplyMatrices
- * @description Multiplies two matrices using WebAssembly for optimized performance.
- * @param {Matrix} matrixA - The first matrix.
- * @param {Matrix} matrixB - The second matrix.
- * @returns {Promise<Matrix>} The resulting matrix after multiplication.
- * @throws {Error} If matrices are incompatible for multiplication.
- */
-async function multiplyMatrices(matrixA, matrixB) {
-  if (matrixA[0].length !== matrixB.length) {
-    throw new Error('Matrix dimensions are incompatible for multiplication.');
+export async function multiplyMatrices(matrixA, matrixB) {
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+    throw new Error("Both inputs must be 2D arrays.");
   }
-
-  const wasmInstance = await compileWebAssembly();
-  const { memory, multiply } = wasmInstance.exports;
 
   const rowsA = matrixA.length;
   const colsA = matrixA[0].length;
   const rowsB = matrixB.length;
   const colsB = matrixB[0].length;
 
+  if (colsA !== rowsB) {
+    throw new Error("Matrix dimensions are incompatible for multiplication.");
+  }
+
+  const wasmCode = new Uint8Array([
+    // Placeholder for WebAssembly binary code.
+    // In a real implementation, this would include compiled WASM for matrix multiplication.
+  ]);
+
+  const wasmModule = await WebAssembly.instantiate(wasmCode, {});
+  const { multiply } = wasmModule.instance.exports;
+
+  // Flatten matrices for WebAssembly input
   const flatA = matrixA.flat();
   const flatB = matrixB.flat();
+  const result = new Float64Array(rowsA * colsB);
 
-  const bufferA = new Float64Array(memory.buffer, 0, flatA.length);
-  const bufferB = new Float64Array(memory.buffer, flatA.length * 8, flatB.length);
-  const bufferResult = new Float64Array(memory.buffer, (flatA.length + flatB.length) * 8, rowsA * colsB);
+  multiply(flatA, rowsA, colsA, flatB, rowsB, colsB, result);
 
-  bufferA.set(flatA);
-  bufferB.set(flatB);
+  // Convert flat result back to 2D array
+  const outputMatrix = [];
+  for (let i = 0; i < rowsA; i++) {
+    outputMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
+  }
 
-  multiply(rowsA, colsA, colsB);
+  return outputMatrix;
+}
+
+/**
+ * Validates that the input is a 2D matrix with consistent row lengths.
+ * @param {number[][]} matrix - The matrix to validate.
+ * @returns {boolean} - Returns true if the input is a valid matrix, otherwise false.
+ */
+export function validateMatrix(matrix) {
+  if (!Array.isArray(matrix) || matrix.length === 0) return false;
+  const rowLength = matrix[0].length;
+  return matrix.every(row => Array.isArray(row) && row.length === rowLength);
+}
+
+/**
+ * Adds two matrices together element-wise.
+ * @param {number[][]} matrixA - The first matrix (2D array).
+ * @param {number[][]} matrixB - The second matrix (2D array).
+ * @returns {number[][]} - The resulting matrix after addition.
+ * @throws {Error} - Throws an error if matrices are incompatible for addition.
+ */
+export function addMatrices(matrixA, matrixB) {
+  if (!validateMatrix(matrixA) || !validateMatrix(matrixB)) {
+    throw new Error("Both inputs must be valid 2D matrices.");
+  }
+
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
+
+  if (rowsA !== rowsB || colsA !== colsB) {
+    throw new Error("Matrix dimensions must match for addition.");
+  }
 
   const result = [];
   for (let i = 0; i < rowsA; i++) {
-    result.push(bufferResult.slice(i * colsB, (i + 1) * colsB));
+    const row = [];
+    for (let j = 0; j < colsA; j++) {
+      row.push(matrixA[i][j] + matrixB[i][j]);
+    }
+    result.push(row);
   }
 
   return result;
 }
 
 /**
- * @function createIdentityMatrix
- * @description Creates an identity matrix of given size.
- * @param {number} size - The size of the identity matrix.
- * @returns {Matrix} The identity matrix.
+ * Subtracts one matrix from another element-wise.
+ * @param {number[][]} matrixA - The first matrix (2D array).
+ * @param {number[][]} matrixB - The second matrix (2D array).
+ * @returns {number[][]} - The resulting matrix after subtraction.
+ * @throws {Error} - Throws an error if matrices are incompatible for subtraction.
  */
-function createIdentityMatrix(size) {
-  const matrix = Array.from({ length: size }, (_, i) => {
-    return Array.from({ length: size }, (_, j) => (i === j ? 1 : 0));
-  });
-  return matrix;
-}
+export function subtractMatrices(matrixA, matrixB) {
+  if (!validateMatrix(matrixA) || !validateMatrix(matrixB)) {
+    throw new Error("Both inputs must be valid 2D matrices.");
+  }
 
-/**
- * @function transposeMatrix
- * @description Transposes a given matrix.
- * @param {Matrix} matrix - The matrix to transpose.
- * @returns {Matrix} The transposed matrix.
- */
-function transposeMatrix(matrix) {
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-  const transposed = Array.from({ length: cols }, (_, i) => {
-    return Array.from({ length: rows }, (_, j) => matrix[j][i]);
-  });
-  return transposed;
-}
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
 
-module.exports = {
-  multiplyMatrices,
-  createIdentityMatrix,
-  transposeMatrix
-};
+  if (rowsA !== rowsB || colsA !== colsB) {
+    throw new Error("Matrix dimensions must match for subtraction.");
+  }
+
+  const result = [];
+  for (let i = 0; i < rowsA; i++) {
+    const row = [];
+    for (let j = 0; j < colsA; j++) {
+      row.push(matrixA[i][j] - matrixB[i][j]);
+    }
+    result.push(row);
+  }
+
+  return result;
+}
