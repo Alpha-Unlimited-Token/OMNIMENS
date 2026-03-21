@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-20T23:02:18.182Z
+ * Written: 2026-03-21T00:08:33.861Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,35 +16,50 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentWords(text, topN) {
-    if (typeof text !== 'string' || typeof topN !== 'number' || topN <= 0) {
-        throw new Error('Invalid input: text must be a string and topN must be a positive number.');
+// Utility function to find the longest common subsequence (LCS) between two strings
+function longestCommonSubsequence(str1, str2) {
+    const m = str1.length;
+    const n = str2.length;
+    const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+
+    // Build the LCS table
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (str1[i - 1] === str2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            } else {
+                dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
     }
 
-    const words = text.toLowerCase().match(/\b[a-z]+\b/g);
-    if (!words) return [];
-
-    const wordCounts = new Map();
-    for (const word of words) {
-        wordCounts.set(word, (wordCounts.get(word) || 0) + 1);
+    // Reconstruct the LCS from the table
+    let i = m, j = n;
+    let lcs = [];
+    while (i > 0 && j > 0) {
+        if (str1[i - 1] === str2[j - 1]) {
+            lcs.unshift(str1[i - 1]);
+            i--;
+            j--;
+        } else if (dp[i - 1][j] > dp[i][j - 1]) {
+            i--;
+        } else {
+            j--;
+        }
     }
 
-    const sortedWords = Array.from(wordCounts.entries()).sort((a, b) => b[1] - a[1]);
-    return sortedWords.slice(0, topN).map(([word, count]) => ({ word, count }));
+    return lcs.join('');
 }
 
 // Test cases
-console.log(findMostFrequentWords("This is a test. This test is only a test.", 3)); 
-// Expected output: [{ word: 'test', count: 3 }, { word: 'this', count: 2 }, { word: 'is', count: 2 }]
+function testLongestCommonSubsequence() {
+    console.log(longestCommonSubsequence("AGGTAB", "GXTXAYB")); // Expected: "GTAB"
+    console.log(longestCommonSubsequence("ABC", "AC"));         // Expected: "AC"
+    console.log(longestCommonSubsequence("12345", "54321"));    // Expected: "1"
+    console.log(longestCommonSubsequence("", "ABC"));           // Expected: ""
+    console.log(longestCommonSubsequence("ABC", ""));           // Expected: ""
+    console.log(longestCommonSubsequence("ABCDEF", "ABCDEF"));  // Expected: "ABCDEF"
+    console.log(longestCommonSubsequence("XMJYAUZ", "MZJAWXU")); // Expected: "MJAU"
+}
 
-console.log(findMostFrequentWords("Hello world! Hello universe. Hello everyone.", 2)); 
-// Expected output: [{ word: 'hello', count: 3 }, { word: 'world', count: 1 }]
-
-console.log(findMostFrequentWords("", 5)); 
-// Expected output: []
-
-console.log(findMostFrequentWords("Single-word!", 1)); 
-// Expected output: [{ word: 'single', count: 1 }]
-
-console.log(findMostFrequentWords("Edge case: numbers like 123 and symbols like #!", 3)); 
-// Expected output: [{ word: 'edge', count: 1 }, { word: 'case', count: 1 }, { word: 'numbers', count: 1 }]
+testLongestCommonSubsequence();
