@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-21T06:46:56.323Z
+ * Written: 2026-03-21T07:09:54.618Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,47 +17,59 @@
  */
 
 function findMostFrequentWords(text, topN) {
-    // Function to find the most frequent words in a given text
     if (typeof text !== 'string' || typeof topN !== 'number' || topN <= 0) {
-        throw new Error('Invalid input: text must be a string and topN must be a positive number.');
+        throw new Error("Invalid input: text must be a string and topN must be a positive number.");
     }
 
-    // Remove punctuation and convert to lowercase
-    const cleanedText = text.replace(/[^\w\s]/g, '').toLowerCase();
+    // Normalize text: remove punctuation, convert to lowercase
+    const normalizedText = text.replace(/[^\w\s]/g, "").toLowerCase();
 
     // Split text into words
-    const words = cleanedText.split(/\s+/);
+    const words = normalizedText.split(/\s+/).filter(word => word.length > 0);
 
-    // Count occurrences of each word
+    // Count word frequencies
     const wordCounts = {};
     for (let word of words) {
-        if (word) {
-            wordCounts[word] = (wordCounts[word] || 0) + 1;
-        }
+        wordCounts[word] = (wordCounts[word] || 0) + 1;
     }
 
-    // Convert wordCounts to an array of [word, count] pairs
-    const wordArray = Object.entries(wordCounts);
-
-    // Sort by count in descending order
-    wordArray.sort((a, b) => b[1] - a[1]);
+    // Convert word counts to an array and sort by frequency
+    const sortedWords = Object.entries(wordCounts).sort((a, b) => b[1] - a[1]);
 
     // Extract the top N words
-    return wordArray.slice(0, topN).map(([word, count]) => ({ word, count }));
+    const mostFrequentWords = sortedWords.slice(0, topN).map(entry => ({
+        word: entry[0],
+        count: entry[1]
+    }));
+
+    return mostFrequentWords;
 }
 
-// Test cases
-console.log(findMostFrequentWords("This is a test. This test is only a test.", 3));
-// Expected output: [{ word: 'test', count: 3 }, { word: 'this', count: 2 }, { word: 'is', count: 2 }]
+// Self-tests
+console.log("Test 1: Basic functionality");
+console.log(findMostFrequentWords("This is a test. This test is only a test.", 3)); // Expected: [{word: 'test', count: 3}, {word: 'this', count: 2}, {word: 'is', count: 2}]
 
-console.log(findMostFrequentWords("Hello world! Hello universe. Hello everyone.", 2));
-// Expected output: [{ word: 'hello', count: 3 }, { word: 'world', count: 1 }]
+console.log("Test 2: Edge case with empty string");
+console.log(findMostFrequentWords("", 3)); // Expected: []
 
-console.log(findMostFrequentWords("One fish, two fish, red fish, blue fish.", 4));
-// Expected output: [{ word: 'fish', count: 4 }, { word: 'one', count: 1 }, { word: 'two', count: 1 }, { word: 'red', count: 1 }]
+console.log("Test 3: Edge case with topN larger than unique words");
+console.log(findMostFrequentWords("apple banana apple cherry banana apple", 10)); // Expected: [{word: 'apple', count: 3}, {word: 'banana', count: 2}, {word: 'cherry', count: 1}]
 
-console.log(findMostFrequentWords("", 5));
-// Expected output: []
+console.log("Test 4: Single word text");
+console.log(findMostFrequentWords("word", 1)); // Expected: [{word: 'word', count: 1}]
 
-console.log(findMostFrequentWords("SingleWord", 1));
-// Expected output: [{ word: 'singleword', count: 1 }]
+console.log("Test 5: Text with special characters");
+console.log(findMostFrequentWords("Hello! Hello, world. World?", 2)); // Expected: [{word: 'hello', count: 2}, {word: 'world', count: 2}]
+
+console.log("Test 6: Invalid input handling");
+try {
+    console.log(findMostFrequentWords(12345, 3)); // Expected: Error
+} catch (e) {
+    console.log(e.message); // Expected: "Invalid input: text must be a string and topN must be a positive number."
+}
+
+try {
+    console.log(findMostFrequentWords("Valid text", -1)); // Expected: Error
+} catch (e) {
+    console.log(e.message); // Expected: "Invalid input: text must be a string and topN must be a positive number."
+}
