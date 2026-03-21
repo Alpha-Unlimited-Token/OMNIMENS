@@ -53,7 +53,7 @@ OMNIMENS features a dual-layout for public and workspace pages. Workspace pages 
 - **Independent Reasoning Engine:** A zero-API-call algorithmic reasoning engine with 6 modes (deductive, inductive, abductive, analogical, causal, world model), working memory, and contradiction detection.
 - **Autonomous Reasoning Orchestrator:** Orchestrates independent reasoning and internal engine queries before external LLM calls, ensuring local thought-first processing.
 - **Digital Environment Navigator:** OMNIMENS maps and navigates the digital world as a spatial environment, discovering routes and landmarks.
-- **Security:** Implements 89 protections across 8 categories, including network, authentication, data encryption, API security, content security, injection validation, bot defense, and AI-specific security.
+- **Security:** Implements 89 protections across 8 categories, including network, authentication, data encryption, API security, content security, injection validation, bot defense, and AI-specific security. Admin table query endpoint uses strict allowlist (no prefix fallback). All API error responses use generic messages — no `e.message` detail leaks. HTML artifact previews render inside sandboxed iframes (`sandbox="allow-scripts"`) with `noopener,noreferrer` popups to prevent XSS/tabnabbing. Helmet CSP, CORS origin allowlist, brute force protection, timing attack prevention, request fingerprinting, parameter pollution protection, and referrer validation all active.
 
 **Super AI Lab Architecture:**
 - **Agent Mesh Intelligence System:** A 5-phase autonomous cycle (Web Research, Agent Discoveries, Adversarial Debate, Meta-Agent Synthesis, Apply Upgrades) for continuous AI improvement.

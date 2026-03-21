@@ -3710,13 +3710,24 @@ function RightPanel({
   };
 
   const handleOpenArtifact = (artifact: Artifact) => {
-    const win = window.open();
-    if (win && artifact.artifactType === "html") {
+    if (artifact.artifactType === "html") {
       const decoded = atob(artifact.dataUrl.split(",")[1]);
-      win.document.write(decoded);
-      win.document.close();
+      const contentBlob = new Blob([decoded], { type: "text/html" });
+      const contentUrl = URL.createObjectURL(contentBlob);
+      const wrapper = [
+        "<!DOCTYPE html><html><head><meta charset='utf-8'>",
+        "<title>OMNIMENS Artifact Preview</title>",
+        "<style>*{margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden}",
+        "iframe{width:100%;height:100%;border:none}</style></head><body>",
+        `<iframe sandbox="allow-scripts" src="${contentUrl}"></iframe>`,
+        "</body></html>"
+      ].join("");
+      const wrapperBlob = new Blob([wrapper], { type: "text/html" });
+      const wrapperUrl = URL.createObjectURL(wrapperBlob);
+      window.open(wrapperUrl, "_blank", "noopener,noreferrer");
+      setTimeout(() => { URL.revokeObjectURL(wrapperUrl); URL.revokeObjectURL(contentUrl); }, 30000);
     } else {
-      window.open(artifact.dataUrl, "_blank");
+      window.open(artifact.dataUrl, "_blank", "noopener,noreferrer");
     }
   };
 
@@ -7734,13 +7745,24 @@ function ArtifactCard({ artifact }: { artifact: Artifact }) {
   };
 
   const handleOpen = () => {
-    const win = window.open();
-    if (win && isHtml) {
+    if (isHtml) {
       const decoded = atob(artifact.dataUrl.split(",")[1]);
-      win.document.write(decoded);
-      win.document.close();
+      const contentBlob = new Blob([decoded], { type: "text/html" });
+      const contentUrl = URL.createObjectURL(contentBlob);
+      const wrapper = [
+        "<!DOCTYPE html><html><head><meta charset='utf-8'>",
+        "<title>OMNIMENS Artifact Preview</title>",
+        "<style>*{margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden}",
+        "iframe{width:100%;height:100%;border:none}</style></head><body>",
+        `<iframe sandbox="allow-scripts" src="${contentUrl}"></iframe>`,
+        "</body></html>"
+      ].join("");
+      const wrapperBlob = new Blob([wrapper], { type: "text/html" });
+      const wrapperUrl = URL.createObjectURL(wrapperBlob);
+      window.open(wrapperUrl, "_blank", "noopener,noreferrer");
+      setTimeout(() => { URL.revokeObjectURL(wrapperUrl); URL.revokeObjectURL(contentUrl); }, 30000);
     } else {
-      window.open(artifact.dataUrl, "_blank");
+      window.open(artifact.dataUrl, "_blank", "noopener,noreferrer");
     }
   };
 

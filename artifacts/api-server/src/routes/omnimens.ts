@@ -6807,7 +6807,7 @@ router.post("/v1/chat", async (req, res) => {
     });
   } catch (e: any) {
     console.error("[Dev API] Error:", e?.message);
-    res.status(500).json({ error: "OMNIMENS API error", details: e?.message });
+    res.status(500).json({ error: "OMNIMENS API error" });
   }
 });
 
@@ -6827,15 +6827,28 @@ router.get("/omnimens/admin/tables", async (req, res) => {
     `);
     res.json({ tables: result.rows || result });
   } catch (e: any) {
-    res.status(500).json({ error: "Failed to list tables", details: e?.message });
+    res.status(500).json({ error: "Failed to list tables" });
   }
 });
+
+const ALLOWED_ADMIN_TABLES = new Set([
+  "godflesh_users", "godflesh_usage", "godflesh_brain", "godflesh_knowledge",
+  "godflesh_credits", "godflesh_evolution_log", "godflesh_memory", "godflesh_upgrades",
+  "godflesh_notifications", "godflesh_projects", "godflesh_custom_instructions",
+  "godflesh_code_runs", "godflesh_council_analyses", "godflesh_patches",
+  "godflesh_patch_registry", "godflesh_mesh_comms", "godflesh_generated_modules",
+  "godflesh_theory_of_mind", "godflesh_causal_graph", "godflesh_consciousness_state",
+  "godflesh_saved_prompts", "godflesh_api_keys", "godflesh_referrals",
+]);
 
 router.get("/omnimens/admin/table/:name", async (req, res) => {
   if (!req.user) return res.status(401).json({ error: "Unauthorized" });
   const ownerId = process.env.REPL_OWNER_ID || "50777126";
   if (String(req.user.id) !== String(ownerId)) return res.status(403).json({ error: "Owner only" });
   const name = req.params.name.replace(/[^a-z0-9_]/gi, "");
+  if (!name || !ALLOWED_ADMIN_TABLES.has(name)) {
+    return res.status(400).json({ error: "Invalid table name" });
+  }
   try {
     const countRes = await db.execute(sql.raw(`SELECT COUNT(*)::int AS count FROM "${name}"`));
     const dataRes = await db.execute(sql.raw(`SELECT * FROM "${name}" ORDER BY 1 DESC LIMIT 50`));
@@ -6843,7 +6856,8 @@ router.get("/omnimens/admin/table/:name", async (req, res) => {
     const cols = rows.length > 0 ? Object.keys(rows[0] as object) : [];
     res.json({ columns: cols, rows, total: Number((countRes.rows || countRes)[0]?.count || 0) });
   } catch (e: any) {
-    res.status(500).json({ error: "Failed to query table", details: e?.message });
+    console.error("[Admin] Table query error:", e?.message);
+    res.status(500).json({ error: "Failed to query table" });
   }
 });
 
