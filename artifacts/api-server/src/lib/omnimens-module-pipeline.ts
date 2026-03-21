@@ -125,11 +125,24 @@ function extractExports(code: string): string[] {
   const funcRegex = /export\s+(?:async\s+)?function\s+(\w+)/g;
   const classRegex = /export\s+class\s+(\w+)/g;
   const constRegex = /export\s+(?:const|let|var)\s+(\w+)/g;
+  const defaultRegex = /export\s+default\s+(?:function|class)\s*(\w*)/g;
+  const namedExportRegex = /export\s*\{\s*([^}]+)\s*\}/g;
 
   let match;
   while ((match = funcRegex.exec(code))) exports.push(match[1]);
   while ((match = classRegex.exec(code))) exports.push(match[1]);
   while ((match = constRegex.exec(code))) exports.push(match[1]);
+  while ((match = defaultRegex.exec(code))) exports.push(match[1] || "default");
+  while ((match = namedExportRegex.exec(code))) {
+    match[1].split(",").forEach((name) => {
+      const clean = name.trim().split(/\s+as\s+/).pop()?.trim();
+      if (clean) exports.push(clean);
+    });
+  }
+
+  if (exports.length === 0 && (code.includes("module.exports") || code.includes("exports."))) {
+    exports.push("default");
+  }
 
   return exports;
 }
@@ -170,6 +183,9 @@ export async function scanAndRegisterModules(): Promise<{
 
   const byStage: Record<string, number> = {};
   let registered = 0;
+  let skippedNoExports = 0;
+  let importFailed = 0;
+  let readFailed = 0;
 
   for (const file of files) {
     const filePath = join(MODULES_DIR, file);
@@ -179,7 +195,10 @@ export async function scanAndRegisterModules(): Promise<{
       const stage = classifyModule(file, code);
       const exports = extractExports(code);
 
-      if (exports.length === 0) continue;
+      if (exports.length === 0) {
+        skippedNoExports++;
+        continue;
+      }
 
       const existing = registry.modules[file];
       registry.modules[file] = {
@@ -199,10 +218,15 @@ export async function scanAndRegisterModules(): Promise<{
         liveModules.set(file, { module: mod, reg: registry.modules[file] });
         registered++;
         byStage[stage] = (byStage[stage] || 0) + 1;
-      } catch {
+      } catch (importErr: any) {
         registry.modules[file].active = false;
+        importFailed++;
+        if (importFailed <= 10) {
+          console.log(`[MODULE PIPELINE] ⚠️ Import failed: ${file} — ${importErr?.message?.slice(0, 100) || "unknown"}`);
+        }
       }
     } catch {
+      readFailed++;
       continue;
     }
   }
@@ -214,6 +238,9 @@ export async function scanAndRegisterModules(): Promise<{
   console.log(
     `[MODULE PIPELINE] 🔌 ${registered}/${files.length} modules wired into live pipeline`,
   );
+  if (skippedNoExports > 0 || importFailed > 0 || readFailed > 0) {
+    console.log(`[MODULE PIPELINE] ℹ️ Skipped: ${skippedNoExports} no exports, ${importFailed} import errors, ${readFailed} read errors`);
+  }
   for (const [stage, count] of Object.entries(byStage)) {
     console.log(`[MODULE PIPELINE]   ${stage}: ${count} modules`);
   }

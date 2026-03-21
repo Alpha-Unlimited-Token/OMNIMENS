@@ -3,8 +3,8 @@
  * @description This module provides efficient matrix operations using WebAssembly for high-performance local computation of embeddings and neural network layers.
  */
 
-const { readFile } = require('fs/promises');
-const path = require('path');
+import { readFile } from "fs/promises";
+import path from "path";
 
 let wasmInstance;
 

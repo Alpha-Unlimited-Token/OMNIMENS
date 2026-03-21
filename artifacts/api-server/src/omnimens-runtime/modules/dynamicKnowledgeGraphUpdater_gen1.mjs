@@ -7,7 +7,8 @@
  * Migrated: 2026-03-20T14:56:48.214Z
  */
 
-import { GraphRAG } from 'graph-rag-library';
+// STUBBED: import { GraphRAG } from 'graph-rag-library';
+const GraphRAG = class { constructor(){} async addDocument(){} async query(){return {results:[]};} };
 
 export class KnowledgeGraphUpdater {
   constructor() {

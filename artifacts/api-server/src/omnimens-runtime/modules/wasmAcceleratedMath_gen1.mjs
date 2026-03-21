@@ -3,15 +3,15 @@
  * @description This module provides high-speed matrix operations and embedding computations using WebAssembly for efficient numerical computation.
  */
 
-const { readFile } = require('fs/promises');
-const { join } = require('path');
+import { readFile } from "fs/promises";
+import { join } from "path";
 
 /**
  * Loads and initializes a WebAssembly module for high-performance matrix operations.
  * @async
  * @returns {Promise<WebAssembly.Instance>} The WebAssembly instance ready for computations.
  */
-async function initializeWasm() {
+export async function initializeWasm() {
   const wasmPath = join(__dirname, 'matrix_operations.wasm');
   const wasmBuffer = await readFile(wasmPath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
@@ -26,7 +26,7 @@ async function initializeWasm() {
  * @returns {Promise<number[][]>} The resulting matrix after multiplication.
  * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
  */
-async function multiplyMatrices(matrixA, matrixB) {
+export async function multiplyMatrices(matrixA, matrixB) {
   if (matrixA[0].length !== matrixB.length) {
     throw new Error('Matrix dimension mismatch: cannot multiply these matrices.');
   }
@@ -86,14 +86,9 @@ async function multiplyMatrices(matrixA, matrixB) {
  * @returns {Promise<number[]>} The resulting embedded vector.
  * @throws {Error} If the vector and matrix dimensions do not align.
  */
-async function computeEmbedding(vector, embeddingMatrix) {
+export async function computeEmbedding(vector, embeddingMatrix) {
   const vectorAsMatrix = vector.map(v => [v]);
   const resultMatrix = await multiplyMatrices(embeddingMatrix, vectorAsMatrix);
   return resultMatrix.flat();
 }
 
-module.exports = {
-  initializeWasm,
-  multiplyMatrices,
-  computeEmbedding
-};

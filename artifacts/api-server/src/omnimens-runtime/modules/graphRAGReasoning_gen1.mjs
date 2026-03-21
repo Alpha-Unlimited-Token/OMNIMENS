@@ -7,7 +7,8 @@
  * Migrated: 2026-03-20T14:56:48.207Z
  */
 
-import { Graph } from 'some-graph-library';
+// STUBBED: import { Graph } from 'some-graph-library';
+const Graph = class { constructor(){this.nodes=new Map();this.edges=[];} addNode(n,d){this.nodes.set(n,d);} addEdge(a,b,d){this.edges.push({from:a,to:b,...d});} getNeighbors(){return [];} };
 
 export class GraphRAGReasoner {
   constructor() {

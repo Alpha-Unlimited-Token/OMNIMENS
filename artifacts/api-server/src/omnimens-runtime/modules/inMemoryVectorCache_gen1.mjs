@@ -6,7 +6,7 @@
 /**
  * Node.js built-in modules
  */
-const crypto = require('crypto');
+import crypto from "crypto";
 
 /**
  * @typedef {Object} CacheEntry
@@ -15,7 +15,7 @@ const crypto = require('crypto');
  * @property {number} timestamp - The last access time for LRU eviction.
  */
 
-class InMemoryVectorCache {
+export class InMemoryVectorCache {
   /**
    * @param {number} maxSize - Maximum number of entries the cache can hold.
    */
@@ -126,4 +126,3 @@ class InMemoryVectorCache {
 /**
  * Exports an instance of the InMemoryVectorCache class.
  */
-module.exports = { InMemoryVectorCache };

@@ -126,7 +126,7 @@ function summarizeClusters(clusters) {
 /**
  * Example usage of the module.
  */
-if (require.main === module) {
+if (false) {
   const exampleContexts = [
     "new AI product launch capabilities worldwide 2025",
     "JavaScript performance optimization V8 engine techniques",

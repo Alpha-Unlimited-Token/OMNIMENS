@@ -5,8 +5,8 @@
  * leveraging WebAssembly's performance benefits. Designed for Node.js 20+ environments.
  */
 
-const { readFile } = require('fs/promises');
-const path = require('path');
+import { readFile } from "fs/promises";
+import path from "path";
 
 /**
  * Loads and initializes the WebAssembly module for matrix operations.

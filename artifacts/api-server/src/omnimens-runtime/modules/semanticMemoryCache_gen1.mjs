@@ -3,7 +3,7 @@
  * @description Provides in-memory storage and retrieval of embeddings for semantic similarity searches using a Redis-backed or JavaScript-based ANN search.
  */
 
-const { createServer } = require('http');
+import { createServer } from "http";
 
 /**
  * @typedef {Object} Vector
@@ -20,7 +20,7 @@ const { createServer } = require('http');
  * @class SemanticMemoryCache
  * @description A fast in-memory cache for storing and retrieving semantic embeddings with approximate nearest neighbor search.
  */
-class SemanticMemoryCache {
+export class SemanticMemoryCache {
   constructor() {
     /** @type {Map<string, CacheItem>} */
     this.cache = new Map();
@@ -89,7 +89,7 @@ class SemanticMemoryCache {
 /**
  * Example usage of the SemanticMemoryCache module.
  */
-if (require.main === module) {
+if (false) {
   const cache = new SemanticMemoryCache();
 
   // Add some vectors to the cache
@@ -102,4 +102,3 @@ if (require.main === module) {
   console.log('Nearest neighbors:', nearest);
 }
 
-module.exports = { SemanticMemoryCache };

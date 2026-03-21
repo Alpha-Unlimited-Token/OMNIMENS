@@ -7,8 +7,8 @@
  * @module gpuAcceleratedMathEngine
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from "fs";
+import path from "path";
 
 /**
  * Load and compile the WebAssembly binary.
@@ -30,7 +30,7 @@ async function loadWasm() {
  * @returns {Promise<number[][]>} The resulting matrix after multiplication.
  * @throws {Error} If the matrices are incompatible for multiplication.
  */
-async function matrixMultiply(matrixA, matrixB) {
+export async function matrixMultiply(matrixA, matrixB) {
   if (matrixA[0].length !== matrixB.length) {
     throw new Error('Matrix dimensions are incompatible for multiplication.');
   }
@@ -70,7 +70,7 @@ async function matrixMultiply(matrixA, matrixB) {
  * @returns {Promise<number>} The dot product of the two vectors.
  * @throws {Error} If the vectors are not of the same length.
  */
-async function dotProduct(vectorA, vectorB) {
+export async function dotProduct(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
     throw new Error('Vectors must be of the same length.');
   }
@@ -95,7 +95,7 @@ async function dotProduct(vectorA, vectorB) {
  * @returns {Promise<number[]>} The resulting vector after addition.
  * @throws {Error} If the vectors are not of the same length.
  */
-async function vectorAdd(vectorA, vectorB) {
+export async function vectorAdd(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
     throw new Error('Vectors must be of the same length.');
   }
@@ -115,8 +115,3 @@ async function vectorAdd(vectorA, vectorB) {
   return Array.from(bufferC);
 }
 
-module.exports = {
-  matrixMultiply,
-  dotProduct,
-  vectorAdd
-};

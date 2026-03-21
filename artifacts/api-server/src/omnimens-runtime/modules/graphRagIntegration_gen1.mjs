@@ -7,7 +7,9 @@
  * Migrated: 2026-03-20T14:56:48.204Z
  */
 
-import { createGraph, addEntity, addRelationship } from './graphUtils';
+const createGraph = () => ({ nodes: [], edges: [] });
+const addEntity = (g, e) => { g.nodes.push(e); return g; };
+const addRelationship = (g, r) => { g.edges.push(r); return g; };
 
 export function integrateMultiAgentOutputs(outputs) {
   const graph = createGraph();

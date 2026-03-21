@@ -5,13 +5,14 @@
  * @description A utility module for storing and retrieving embeddings and vectorized data in-memory using Redis with TTL-based eviction policies.
  */
 
-import { createClient } from 'redis';
+// STUBBED: import { createClient } from 'redis';
+const createClient = () => ({ connect: async()=>{}, get: async()=>null, set: async()=>{}, del: async()=>{}, quit: async()=>{}, on:()=>{} });
 
 /**
  * Initializes a Redis client for memory caching.
  * @returns {RedisClient} A connected Redis client.
  */
-function initializeRedisClient() {
+async function initializeRedisClient() {
   const client = createClient();
   client.on('error', (err) => console.error('Redis Client Error', err));
   await client.connect();

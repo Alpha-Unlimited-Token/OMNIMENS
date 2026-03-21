@@ -9,7 +9,7 @@
 
 export function simulateAdversarialCases(agentOutputs) {
   const edgeCases = generateEdgeCases();
-  const results = edgeCases.map(case => testAgentOutput(agentOutputs, case));
+  const results = edgeCases.map(testCase => testAgentOutput(agentOutputs, testCase));
   return analyzeResults(results);
 }
 

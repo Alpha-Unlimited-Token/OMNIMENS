@@ -4,13 +4,14 @@
  * @requires Node.js 20+ with no external dependencies.
  */
 
-const { createClient } = require('redis');
+// STUBBED: import { createClient } from "redis";
+const createClient = () => ({ connect: async()=>{}, get: async()=>null, set: async()=>{}, del: async()=>{}, quit: async()=>{}, on:()=>{} });
 
 /**
  * Creates and manages a Redis-backed vector store.
  * @class
  */
-class VectorStoreRedis {
+export class VectorStoreRedis {
   /**
    * Initializes the Redis client and connects to the Redis server.
    * @param {Object} [options] - Configuration options for the Redis client.
@@ -97,4 +98,3 @@ class VectorStoreRedis {
 /**
  * Exports the VectorStoreRedis class.
  */
-module.exports = { VectorStoreRedis };

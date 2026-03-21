@@ -5,15 +5,15 @@
  *              matrix multiplication and vector operations.
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from "fs";
+import path from "path";
 
 /**
  * Loads and compiles a WebAssembly module from a .wasm file.
  * @param {string} wasmFilePath - The file path to the WebAssembly binary.
  * @returns {Promise<WebAssembly.Instance>} The compiled WebAssembly instance.
  */
-async function loadWasmModule(wasmFilePath) {
+export async function loadWasmModule(wasmFilePath) {
   const wasmBuffer = fs.readFileSync(wasmFilePath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
   return WebAssembly.instantiate(wasmModule);
@@ -23,7 +23,7 @@ async function loadWasmModule(wasmFilePath) {
  * Initializes the WebAssembly module for GPU-like matrix operations.
  * @returns {Promise<Object>} An object containing the WASM matrix operations.
  */
-async function initializeWasmOps() {
+export async function initializeWasmOps() {
   const wasmFilePath = path.join(__dirname, 'matrix_ops.wasm');
   const wasmInstance = await loadWasmModule(wasmFilePath);
 
@@ -57,7 +57,3 @@ async function initializeWasmOps() {
   };
 }
 
-module.exports = {
-  loadWasmModule,
-  initializeWasmOps
-};

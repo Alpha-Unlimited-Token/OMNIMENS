@@ -91,7 +91,7 @@ export function compressContext(context, levels = 2, keywords = []) {
 /**
  * Example usage of the hierarchicalMemory module.
  */
-if (require.main === module) {
+if (false) {
   const testText = `Artificial Intelligence is evolving rapidly. Machine learning and deep learning are key areas. 
   Transformers have revolutionized natural language processing. Efficient attention mechanisms are critical. 
   Cognitive architectures are emerging to enhance memory and reasoning.`;

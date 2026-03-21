@@ -7,15 +7,16 @@
 /**
  * Imports required built-in Node.js modules.
  */
-const { Client } = require('pg');
-const crypto = require('crypto');
+// STUBBED: import { Client } from "pg";
+const Pool = class { constructor(){} async query(q,p) { return {rows:[]}; } async connect() { return {query: async()=>({rows:[]}), release:()=>{}}; } end(){} }; const Client = Pool;
+import crypto from "crypto";
 
 /**
  * Connects to a PostgreSQL database.
  * @param {string} connectionString - PostgreSQL connection string.
  * @returns {Promise<Client>} A connected PostgreSQL client instance.
  */
-async function connectToDatabase(connectionString) {
+export async function connectToDatabase(connectionString) {
   const client = new Client({ connectionString });
   await client.connect();
   return client;
@@ -26,7 +27,7 @@ async function connectToDatabase(connectionString) {
  * @param {Client} client - A connected PostgreSQL client instance.
  * @returns {Promise<void>} Resolves when the table is created.
  */
-async function initializeTable(client) {
+export async function initializeTable(client) {
   const query = `
     CREATE TABLE IF NOT EXISTS embeddings (
       id SERIAL PRIMARY KEY,
@@ -45,7 +46,7 @@ async function initializeTable(client) {
  * @param {Object} metadata - Optional metadata associated with the vector.
  * @returns {Promise<number>} The ID of the inserted embedding.
  */
-async function insertEmbedding(client, vector, metadata = {}) {
+export async function insertEmbedding(client, vector, metadata = {}) {
   const query = `
     INSERT INTO embeddings (vector, metadata)
     VALUES ($1, $2)
@@ -75,7 +76,7 @@ function cosineSimilarity(vectorA, vectorB) {
  * @param {number} limit - The maximum number of results to return.
  * @returns {Promise<Object[]>} An array of the most similar embeddings and their metadata.
  */
-async function searchEmbeddings(client, queryVector, limit = 10) {
+export async function searchEmbeddings(client, queryVector, limit = 10) {
   const query = `SELECT id, vector, metadata FROM embeddings;`;
   const result = await client.query(query);
 
@@ -95,14 +96,7 @@ async function searchEmbeddings(client, queryVector, limit = 10) {
  * @param {Client} client - A connected PostgreSQL client instance.
  * @returns {Promise<void>} Resolves when the client is disconnected.
  */
-async function disconnectFromDatabase(client) {
+export async function disconnectFromDatabase(client) {
   await client.end();
 }
 
-module.exports = {
-  connectToDatabase,
-  initializeTable,
-  insertEmbedding,
-  searchEmbeddings,
-  disconnectFromDatabase
-};

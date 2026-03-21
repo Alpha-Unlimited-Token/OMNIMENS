@@ -116,10 +116,7 @@ class SemanticCacheManager {
  * @returns {SemanticCacheManager} - A new instance of SemanticCacheManager.
  * @description Factory function to create a new SemanticCacheManager instance.
  */
-function createSemanticCacheManager() {
+export function createSemanticCacheManager() {
   return new SemanticCacheManager();
 }
 
-module.exports = {
-  createSemanticCacheManager
-};

@@ -4,7 +4,7 @@
  */
 
 // Import necessary built-in modules
-const crypto = require('crypto');
+import crypto from "crypto";
 
 /**
  * @typedef {Object} CacheItem

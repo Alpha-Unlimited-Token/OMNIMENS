@@ -4,8 +4,8 @@
  * This module provides SIMD-based matrix multiplication and neural network primitives.
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from "fs";
+import path from "path";
 
 /**
  * Loads and initializes the WebAssembly module.
@@ -28,7 +28,7 @@ async function loadWasmModule() {
  * @returns {Float32Array} The resulting matrix after multiplication.
  * @throws {Error} If dimensions are incompatible for multiplication.
  */
-async function wasmMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
+export async function wasmMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
   if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
     throw new Error('Matrix dimensions are incompatible for multiplication.');
   }
@@ -58,7 +58,7 @@ async function wasmMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
  * @param {number} outputSize - Size of the output vector.
  * @returns {Float32Array} The resulting output vector.
  */
-async function wasmNeuralPrimitive(inputs, weights, biases, inputSize, outputSize) {
+export async function wasmNeuralPrimitive(inputs, weights, biases, inputSize, outputSize) {
   if (inputs.length !== inputSize || weights.length !== inputSize * outputSize || biases.length !== outputSize) {
     throw new Error('Dimensions are incompatible for neural network operation.');
   }
@@ -81,7 +81,3 @@ async function wasmNeuralPrimitive(inputs, weights, biases, inputSize, outputSiz
   return wasmMemory.slice(resultOffset / Float32Array.BYTES_PER_ELEMENT, resultOffset / Float32Array.BYTES_PER_ELEMENT + outputSize);
 }
 
-module.exports = {
-  wasmMatrixMultiply,
-  wasmNeuralPrimitive
-};

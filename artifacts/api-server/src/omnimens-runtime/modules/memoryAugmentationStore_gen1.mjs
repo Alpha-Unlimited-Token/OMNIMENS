@@ -4,8 +4,10 @@
  *              using SQLite in memory mode, with approximate nearest neighbor search.
  */
 
-import { open } from 'sqlite';
-import sqlite3 from 'sqlite3';
+// STUBBED: import { open } from 'sqlite';
+const open = async () => ({ run: async()=>{}, get: async()=>null, all: async()=>[], exec: async()=>{}, close: async()=>{} });
+// STUBBED: sqlite3 not available
+const sqlite3 = { verbose: () => ({ Database: class { constructor(){} run(){} get(){} all(q,cb){if(cb)cb(null,[])} close(){} } }) };
 
 /**
  * Initialize an in-memory SQLite database for storing embeddings.

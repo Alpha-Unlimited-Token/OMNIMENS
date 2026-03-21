@@ -6,14 +6,11 @@
  * This module is designed for high-performance tensor computations leveraging GPU acceleration.
  */
 
-import { createCanvas } from 'node:canvas';
-import * as tf from '@tensorflow/tfjs-node';
-import '@tensorflow/tfjs-backend-webgl';
-
-// Initialize WebGL backend for TensorFlow.js
-(async () => {
-  await tf.setBackend('webgl');
-})();
+// STUBBED: import { createCanvas } from 'node:canvas';
+const createCanvas = (w,h) => ({ getContext: () => ({ fillRect:()=>{}, clearRect:()=>{}, fillText:()=>{}, beginPath:()=>{}, arc:()=>{}, fill:()=>{}, stroke:()=>{} }), width:w, height:h, toBuffer:()=>Buffer.alloc(0) });
+// STUBBED: @tensorflow/tfjs-node not available
+const tf = { tensor: (d) => ({ data: d, shape: [d.length], matMul: () => ({ dataSync: () => d }), add: () => ({ dataSync: () => d }), dataSync: () => d, dispose: () => {} }), tensor2d: (d, s) => ({ array: async () => d, transpose: () => ({ array: async () => d, dispose: () => {} }), dispose: () => {} }), transpose: (t) => t, matMul: (a,b) => a, add: (a,b) => a, dispose: () => {}, disposeVariables: () => {}, setBackend: async () => {} };
+// STUBBED: @tensorflow/tfjs-backend-webgl — no GPU in this environment
 
 /**
  * Performs matrix multiplication on two input matrices using GPU acceleration.

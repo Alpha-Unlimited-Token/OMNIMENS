@@ -5,15 +5,15 @@
  * @description Provides efficient matrix operations using WebAssembly for fast linear algebra computations.
  */
 
-const { readFile } = require('fs/promises');
-const path = require('path');
+import { readFile } from "fs/promises";
+import path from "path";
 
 /**
  * Load and compile WebAssembly module for matrix operations.
  * @async
  * @returns {Promise<WebAssembly.Instance>} Compiled WebAssembly instance.
  */
-async function loadWasmModule() {
+export async function loadWasmModule() {
   const wasmFilePath = path.resolve(__dirname, 'matrix_ops.wasm');
   const wasmBuffer = await readFile(wasmFilePath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
@@ -33,7 +33,7 @@ async function loadWasmModule() {
  * @returns {Promise<Float64Array>} Resulting matrix (row-major order).
  * @throws {Error} If matrix dimensions are incompatible for multiplication.
  */
-async function multiplyMatrices(matrixA, matrixB, rowsA, colsA, rowsB, colsB) {
+export async function multiplyMatrices(matrixA, matrixB, rowsA, colsA, rowsB, colsB) {
   if (colsA !== rowsB) {
     throw new Error('Matrix dimensions are incompatible for multiplication.');
   }
@@ -72,7 +72,7 @@ async function multiplyMatrices(matrixA, matrixB, rowsA, colsA, rowsB, colsB) {
  * @returns {Float64Array} Flattened matrix in row-major order.
  * @throws {Error} If matrix is not rectangular.
  */
-function formatMatrix(matrix) {
+export function formatMatrix(matrix) {
   const rows = matrix.length;
   const cols = matrix[0].length;
 
@@ -97,8 +97,3 @@ function formatMatrix(matrix) {
 /**
  * Exported functions.
  */
-module.exports = {
-  loadWasmModule,
-  multiplyMatrices,
-  formatMatrix
-};

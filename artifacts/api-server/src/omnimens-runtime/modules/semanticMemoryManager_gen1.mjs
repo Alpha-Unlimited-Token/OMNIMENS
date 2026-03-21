@@ -6,7 +6,7 @@
  * Designed for Node.js 20+ with no external dependencies.
  */
 
-const { createHash } = require('crypto');
+import { createHash } from "crypto";
 
 /**
  * In-memory store simulating Redis for vector embeddings.
@@ -20,7 +20,7 @@ const vectorStore = {};
  * @param {number[]} vectorB - Second vector.
  * @returns {number} - Cosine similarity value between -1 and 1.
  */
-function cosineSimilarity(vectorA, vectorB) {
+export function cosineSimilarity(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
     throw new Error('Vectors must be of the same length.');
   }
@@ -54,7 +54,7 @@ function generateKey(sessionId, input) {
  * @param {string} input - Semantic input.
  * @param {number[]} embedding - Vector representation of the input.
  */
-function storeEmbedding(sessionId, input, embedding) {
+export function storeEmbedding(sessionId, input, embedding) {
   const key = generateKey(sessionId, input);
   vectorStore[key] = { sessionId, input, embedding };
 }
@@ -65,7 +65,7 @@ function storeEmbedding(sessionId, input, embedding) {
  * @param {number[]} queryEmbedding - Vector representation of the query.
  * @returns {Object|null} - Most similar embedding object or null if no match found.
  */
-function searchEmbedding(sessionId, queryEmbedding) {
+export function searchEmbedding(sessionId, queryEmbedding) {
   let bestMatch = null;
   let highestSimilarity = -Infinity;
 
@@ -87,7 +87,7 @@ function searchEmbedding(sessionId, queryEmbedding) {
  * Clears all embeddings for a given session.
  * @param {string} sessionId - Unique identifier for the session.
  */
-function clearSessionEmbeddings(sessionId) {
+export function clearSessionEmbeddings(sessionId) {
   for (const key in vectorStore) {
     if (vectorStore[key].sessionId === sessionId) {
       delete vectorStore[key];
@@ -95,9 +95,3 @@ function clearSessionEmbeddings(sessionId) {
   }
 }
 
-module.exports = {
-  cosineSimilarity,
-  storeEmbedding,
-  searchEmbedding,
-  clearSessionEmbeddings
-};

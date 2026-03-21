@@ -10,8 +10,8 @@
  * It is designed to expand OMNIMENS's intelligence by enabling high-performance numerical computation.
  */
 
-const { readFileSync } = require('fs');
-const { join } = require('path');
+import { readFileSync } from "fs";
+import { join } from "path";
 
 /**
  * @function compileWasm
@@ -19,7 +19,7 @@ const { join } = require('path');
  * @param {Buffer} wasmBuffer - The binary content of the WebAssembly module.
  * @returns {Promise<WebAssembly.Instance>} A promise resolving to the compiled WebAssembly instance.
  */
-async function compileWasm(wasmBuffer) {
+export async function compileWasm(wasmBuffer) {
   const wasmModule = await WebAssembly.compile(wasmBuffer);
   const wasmInstance = await WebAssembly.instantiate(wasmModule);
   return wasmInstance;
@@ -31,7 +31,7 @@ async function compileWasm(wasmBuffer) {
  * @param {string} kernelName - The name of the kernel to load (e.g., 'matrixMultiply').
  * @returns {Promise<WebAssembly.Instance>} A promise resolving to the WebAssembly instance of the kernel.
  */
-async function loadWasmKernel(kernelName) {
+export async function loadWasmKernel(kernelName) {
   const kernelPath = join(__dirname, 'kernels', `${kernelName}.wasm`);
   const wasmBuffer = readFileSync(kernelPath);
   return await compileWasm(wasmBuffer);
@@ -47,7 +47,7 @@ async function loadWasmKernel(kernelName) {
  * @param {number} colsB - Number of columns in matrix B.
  * @returns {Float32Array} The resulting matrix (flattened array).
  */
-async function matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
+export async function matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
   const kernel = await loadWasmKernel('matrixMultiply');
   const { multiply } = kernel.exports;
 
@@ -75,7 +75,7 @@ async function matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
  * @param {number} kernelSize - Size of the convolution kernel (assumed square).
  * @returns {Float32Array} The resulting matrix (flattened array).
  */
-async function convolution(matrix, kernel, rows, cols, kernelSize) {
+export async function convolution(matrix, kernel, rows, cols, kernelSize) {
   const wasmKernel = await loadWasmKernel('convolution');
   const { convolve } = wasmKernel.exports;
 
@@ -98,7 +98,7 @@ async function convolution(matrix, kernel, rows, cols, kernelSize) {
  * @description Initializes the module and ensures all required kernels are available.
  * @returns {Promise<void>} Resolves when initialization is complete.
  */
-async function initialize() {
+export async function initialize() {
   const requiredKernels = ['matrixMultiply', 'convolution'];
   for (const kernel of requiredKernels) {
     const kernelPath = join(__dirname, 'kernels', `${kernel}.wasm`);
@@ -108,10 +108,3 @@ async function initialize() {
   }
 }
 
-module.exports = {
-  compileWasm,
-  loadWasmKernel,
-  matrixMultiply,
-  convolution,
-  initialize
-};

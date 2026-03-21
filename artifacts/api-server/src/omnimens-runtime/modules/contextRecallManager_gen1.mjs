@@ -3,15 +3,16 @@
  * @description A utility module for persisting and recalling extended conversation context using PostgreSQL, enabling dynamic retrieval of relevant data.
  */
 
-const { Client } = require('pg');
-const crypto = require('crypto');
+// STUBBED: import { Client } from "pg";
+const Pool = class { constructor(){} async query(q,p) { return {rows:[]}; } async connect() { return {query: async()=>({rows:[]}), release:()=>{}}; } end(){} }; const Client = Pool;
+import crypto from "crypto";
 
 /**
  * Hashes a given input string to create a unique identifier for context entries.
  * @param {string} input - The input string to hash.
  * @returns {string} - A SHA-256 hash of the input string.
  */
-function generateHash(input) {
+export function generateHash(input) {
   return crypto.createHash('sha256').update(input).digest('hex');
 }
 
@@ -20,7 +21,7 @@ function generateHash(input) {
  * @param {string} connectionString - The PostgreSQL connection string.
  * @returns {Client} - An instance of the PostgreSQL client.
  */
-function initializeDatabase(connectionString) {
+export function initializeDatabase(connectionString) {
   const client = new Client({ connectionString });
   client.connect();
   return client;
@@ -31,7 +32,7 @@ function initializeDatabase(connectionString) {
  * @param {Client} client - The PostgreSQL client instance.
  * @returns {Promise<void>} - Resolves when the table is created or verified.
  */
-async function ensureTable(client) {
+export async function ensureTable(client) {
   const query = `
     CREATE TABLE IF NOT EXISTS context (
       id SERIAL PRIMARY KEY,
@@ -49,7 +50,7 @@ async function ensureTable(client) {
  * @param {string} context - The context string to save.
  * @returns {Promise<void>} - Resolves when the context is saved.
  */
-async function saveContext(client, context) {
+export async function saveContext(client, context) {
   const contextHash = generateHash(context);
   const query = `
     INSERT INTO context (context_hash, context_data)
@@ -66,7 +67,7 @@ async function saveContext(client, context) {
  * @param {number} limit - The maximum number of entries to retrieve.
  * @returns {Promise<Array<{context_data: string, created_at: string}>>} - An array of matching context entries.
  */
-async function retrieveContext(client, searchTerm, limit = 5) {
+export async function retrieveContext(client, searchTerm, limit = 5) {
   const query = `
     SELECT context_data, created_at
     FROM context
@@ -83,16 +84,8 @@ async function retrieveContext(client, searchTerm, limit = 5) {
  * @param {Client} client - The PostgreSQL client instance.
  * @returns {Promise<void>} - Resolves when the connection is closed.
  */
-async function closeDatabase(client) {
+export async function closeDatabase(client) {
   await client.end();
 }
 
 // Exports
-module.exports = {
-  generateHash,
-  initializeDatabase,
-  ensureTable,
-  saveContext,
-  retrieveContext,
-  closeDatabase
-};

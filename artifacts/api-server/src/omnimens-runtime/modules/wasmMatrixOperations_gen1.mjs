@@ -5,8 +5,8 @@
  */
 
 // Import the WebAssembly module loader from Node.js
-const fs = require('fs');
-const path = require('path');
+import fs from "fs";
+import path from "path";
 
 /**
  * Load and initialize the WebAssembly module.
@@ -28,7 +28,7 @@ async function loadWasmModule() {
  * @param {number} n - Number of columns in matrix B.
  * @returns {Promise<Float64Array>} The resulting matrix C (m x n) in row-major order.
  */
-async function matrixMultiply(A, B, m, k, n) {
+export async function matrixMultiply(A, B, m, k, n) {
   if (A.length !== m * k || B.length !== k * n) {
     throw new Error('Matrix dimensions do not match the input sizes.');
   }
@@ -63,7 +63,7 @@ async function matrixMultiply(A, B, m, k, n) {
  * @param {number} n - Number of columns in the matrices.
  * @returns {Promise<Float64Array>} The resulting matrix C (m x n) in row-major order.
  */
-async function matrixAdd(A, B, m, n) {
+export async function matrixAdd(A, B, m, n) {
   if (A.length !== m * n || B.length !== m * n) {
     throw new Error('Matrix dimensions do not match the input sizes.');
   }
@@ -90,7 +90,3 @@ async function matrixAdd(A, B, m, n) {
   return C;
 }
 
-module.exports = {
-  matrixMultiply,
-  matrixAdd
-};

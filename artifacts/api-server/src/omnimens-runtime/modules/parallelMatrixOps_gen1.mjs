@@ -3,8 +3,8 @@
  * @description This module provides efficient matrix operations using WebAssembly (WASM) and SIMD for high-performance tasks like vector similarity and embedding transformations.
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from "fs";
+import path from "path";
 
 /**
  * Loads and initializes the WebAssembly module for matrix operations.
@@ -24,7 +24,7 @@ async function initializeWasm() {
  * @returns {Promise<number[][]>} A promise that resolves to the resulting matrix after multiplication.
  * @throws {Error} Throws an error if the matrices are incompatible for multiplication.
  */
-async function multiplyMatrices(matrixA, matrixB) {
+export async function multiplyMatrices(matrixA, matrixB) {
   if (matrixA[0].length !== matrixB.length) {
     throw new Error('Matrix dimensions do not allow multiplication.');
   }
@@ -67,6 +67,3 @@ function allocateArray(memory, array) {
   return ptr;
 }
 
-module.exports = {
-  multiplyMatrices
-};

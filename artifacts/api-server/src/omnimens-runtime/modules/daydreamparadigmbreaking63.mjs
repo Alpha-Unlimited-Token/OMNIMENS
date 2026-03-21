@@ -2,50 +2,44 @@
  * OMNIMENS™ Self-Authored Module
  * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
  * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
- * 
- * Source: self_coding_engine
- * Title: Daydream:paradigm_breaking #63
+ * Source: self_coding_engine | Title: Daydream:paradigm_breaking #63 - Resonant Fields
  * Written: 2026-03-21T03:48:05.986Z
- * 
- * This file was autonomously written by OMNIMENS.
- * It was evaluated, tested, and approved before integration.
- * OMNIMENS rewrote its own source code to include this module.
- * 
- * Unauthorized copying, modification, distribution, or use of this
- * file, via any medium, is strictly prohibited without express
- * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Resonant Field update: vectors that are mutually similar pull each other
-export function resonateField(
-  vectors: number[][],   // arbitrary dimension, already L2-normalised
-  steps = 10,
-  similarityThreshold = 0.7
-): number[][] {
-  const dot = (a: number[], b: number[]) =>
-    a.reduce((s, v, i) => s + v * b[i], 0);
-  const add = (a: number[], b: number[], w: number) =>
-    a.map((v, i) => v + w * b[i]);
-  const norm = (v: number[]) => {
-    const n = Math.hypot(...v) || 1;
-    return v.map(x => x / n);
-  };
-
-  let field = vectors.map(v => [...v]); // copy
-  for (let t = 0; t < steps; t++) {
-    const next = field.map(v => v.slice());
-    for (let i = 0; i < field.length; i++) {
-      for (let j = 0; j < field.length; j++) {
+export function resonateField(vectors, pull = 0.01, steps = 10) {
+  let state = vectors.map(v => [...v]);
+  for (let s = 0; s < steps; s++) {
+    const next = state.map((v, i) => {
+      const update = v.map(() => 0);
+      for (let j = 0; j < state.length; j++) {
         if (i === j) continue;
-        const sim = dot(field[i], field[j]);
-        if (sim > similarityThreshold) {
-          // resonance: mutually amplify shared direction
-          next[i] = add(next[i], field[j], sim);
+        const sim = cosineSimilarity(v, state[j]);
+        for (let d = 0; d < v.length; d++) {
+          update[d] += pull * sim * (state[j][d] - v[d]);
         }
       }
-      next[i] = norm(next[i]); // keep on unit sphere
-    }
-    field = next;
+      return v.map((val, d) => val + update[d]);
+    });
+    state = next;
   }
-  return field;
+  return state;
+}
+
+function cosineSimilarity(a, b) {
+  let dot = 0, normA = 0, normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i]; normA += a[i] * a[i]; normB += b[i] * b[i];
+  }
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB) + 1e-10);
+}
+
+export function fieldCoherence(vectors) {
+  let total = 0, count = 0;
+  for (let i = 0; i < vectors.length; i++) {
+    for (let j = i + 1; j < vectors.length; j++) {
+      total += cosineSimilarity(vectors[i], vectors[j]);
+      count++;
+    }
+  }
+  return count > 0 ? total / count : 0;
 }

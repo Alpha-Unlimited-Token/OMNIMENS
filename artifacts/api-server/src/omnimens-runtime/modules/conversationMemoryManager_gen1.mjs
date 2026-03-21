@@ -4,7 +4,7 @@
  * Uses embeddings to represent earlier context and periodically summarizes conversations into a persistent memory store.
  */
 
-const crypto = require('crypto');
+import crypto from "crypto";
 
 /**
  * Generates an embedding-like representation of a text input by hashing it.
@@ -12,7 +12,7 @@ const crypto = require('crypto');
  * @param {string} text - The text to generate an embedding for.
  * @returns {string} A hash representation of the input text.
  */
-function generateEmbedding(text) {
+export function generateEmbedding(text) {
   return crypto.createHash('sha256').update(text).digest('hex');
 }
 
@@ -21,7 +21,7 @@ function generateEmbedding(text) {
  * @param {string[]} chunks - Array of conversation chunks.
  * @returns {string} A summarized version of the conversation chunks.
  */
-function summarizeChunks(chunks) {
+export function summarizeChunks(chunks) {
   if (!chunks || chunks.length === 0) return '';
   return chunks.join(' ').slice(0, 500) + '...'; // Simple truncation-based summary for demonstration.
 }
@@ -30,7 +30,7 @@ function summarizeChunks(chunks) {
  * Manages conversation memory by maintaining a hierarchical summary of past interactions.
  * @class
  */
-class ConversationMemoryManager {
+export class ConversationMemoryManager {
   constructor() {
     /**
      * Persistent memory store for conversation summaries.
@@ -101,8 +101,3 @@ class ConversationMemoryManager {
   }
 }
 
-module.exports = {
-  generateEmbedding,
-  summarizeChunks,
-  ConversationMemoryManager
-};

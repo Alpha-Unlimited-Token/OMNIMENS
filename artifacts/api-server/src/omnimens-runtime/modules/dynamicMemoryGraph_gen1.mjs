@@ -7,7 +7,8 @@
  * Migrated: 2026-03-20T14:56:48.203Z
  */
 
-import { Graph } from 'graphlib';
+// STUBBED: import { Graph } from 'graphlib';
+const Graph = class { constructor(){this._nodes={};this._edges=[];} setNode(n,d){this._nodes[n]=d;} setEdge(a,b,d){this._edges.push({v:a,w:b,...d});} nodes(){return Object.keys(this._nodes);} node(n){return this._nodes[n];} edges(){return this._edges;} predecessors(){return[];} successors(){return[];} };
 
 export function dynamicMemoryGraph(memories) {
   const graph = new Graph();

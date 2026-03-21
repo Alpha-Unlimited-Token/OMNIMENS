@@ -6,15 +6,15 @@
  * This module integrates WebAssembly-based BLAS/LAPACK libraries for optimized linear algebra processing.
  */
 
-const { readFileSync } = require('fs');
-const { join } = require('path');
+import { readFileSync } from "fs";
+import { join } from "path";
 
 /**
  * Load a WebAssembly module from a file.
  * @param {string} wasmFilePath - Path to the WebAssembly file.
  * @returns {Promise<WebAssembly.Instance>} - A promise resolving to the WebAssembly instance.
  */
-async function loadWasmModule(wasmFilePath) {
+export async function loadWasmModule(wasmFilePath) {
   const wasmBuffer = readFileSync(wasmFilePath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
   return WebAssembly.instantiate(wasmModule);
@@ -30,7 +30,7 @@ async function loadWasmModule(wasmFilePath) {
  * @returns {Promise<Float64Array>} - The resulting matrix (m x p).
  * @throws {Error} If matrix dimensions are incompatible.
  */
-async function wasmMatrixMultiply(matrixA, matrixB, m, n, p) {
+export async function wasmMatrixMultiply(matrixA, matrixB, m, n, p) {
   if (matrixA.length !== m * n || matrixB.length !== n * p) {
     throw new Error('Matrix dimensions do not match for multiplication.');
   }
@@ -64,7 +64,7 @@ async function wasmMatrixMultiply(matrixA, matrixB, m, n, p) {
  * @param {number} n - Number of columns in the matrix.
  * @returns {Promise<Float64Array>} - The transposed matrix (n x m).
  */
-async function wasmMatrixTranspose(matrix, m, n) {
+export async function wasmMatrixTranspose(matrix, m, n) {
   if (matrix.length !== m * n) {
     throw new Error('Matrix dimensions do not match the provided size.');
   }
@@ -89,8 +89,3 @@ async function wasmMatrixTranspose(matrix, m, n) {
   return new Float64Array(memory.buffer, transposedOffset, n * m);
 }
 
-module.exports = {
-  loadWasmModule,
-  wasmMatrixMultiply,
-  wasmMatrixTranspose
-};

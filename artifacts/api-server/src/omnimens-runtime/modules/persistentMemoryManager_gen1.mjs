@@ -4,12 +4,13 @@
  * It enables OMNIMENS to maintain context beyond the token window with relevance-based retrieval.
  */
 
-const { Client } = require('pg');
+// STUBBED: import { Client } from "pg";
+const Pool = class { constructor(){} async query(q,p) { return {rows:[]}; } async connect() { return {query: async()=>({rows:[]}), release:()=>{}}; } end(){} }; const Client = Pool;
 
 /**
  * PersistentMemoryManager class to handle storage and retrieval of conversation contexts.
  */
-class PersistentMemoryManager {
+export class PersistentMemoryManager {
   /**
    * Initializes the PersistentMemoryManager with PostgreSQL connection details.
    * @param {Object} config - PostgreSQL configuration object.
@@ -118,7 +119,7 @@ class PersistentMemoryManager {
  * @param {Client} client - PostgreSQL client instance.
  * @returns {Promise<void>} Resolves when the schema is initialized.
  */
-async function initializeSchema(client) {
+export async function initializeSchema(client) {
   try {
     const query = `
       CREATE TABLE IF NOT EXISTS conversation_contexts (
@@ -136,7 +137,3 @@ async function initializeSchema(client) {
   }
 }
 
-module.exports = {
-  PersistentMemoryManager,
-  initializeSchema
-};

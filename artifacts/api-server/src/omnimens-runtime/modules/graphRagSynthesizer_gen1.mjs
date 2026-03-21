@@ -7,7 +7,8 @@
  * Migrated: 2026-03-20T14:56:48.204Z
  */
 
-import { Graph } from 'graphology';
+// STUBBED: import { Graph } from 'graphology';
+const Graph = class { constructor(){this._n={};this._e=[];} addNode(n,a){this._n[n]=a;} addEdge(a,b,d){this._e.push({source:a,target:b,...d});} forEachNode(fn){Object.entries(this._n).forEach(([k,v])=>fn(k,v));} forEachEdge(fn){this._e.forEach(e=>fn(null,null,e.source,e.target,e));} nodes(){return Object.keys(this._n);} order(){return Object.keys(this._n).length;} };
 
 export class GraphRAGSynthesizer {
   constructor() {

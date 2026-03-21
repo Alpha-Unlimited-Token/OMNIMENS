@@ -6,13 +6,14 @@
  * This module leverages Redis sorted sets and hash maps to store and query high-dimensional vectors efficiently.
  */
 
-const { createClient } = require('redis');
+// STUBBED: import { createClient } from "redis";
+const createClient = () => ({ connect: async()=>{}, get: async()=>null, set: async()=>{}, del: async()=>{}, quit: async()=>{}, on:()=>{} });
 
 /**
  * Initialize a Redis client.
  * @returns {RedisClientType} Redis client instance.
  */
-async function initializeRedisClient() {
+export async function initializeRedisClient() {
   const client = createClient();
   client.on('error', (err) => console.error('Redis Client Error', err));
   await client.connect();
@@ -26,7 +27,7 @@ async function initializeRedisClient() {
  * @param {string} id - Unique identifier for the vector.
  * @param {number[]} vector - High-dimensional vector.
  */
-async function addVector(client, key, id, vector) {
+export async function addVector(client, key, id, vector) {
   const vectorString = JSON.stringify(vector);
   await client.hSet(key, id, vectorString);
   const magnitude = calculateMagnitude(vector);
@@ -40,7 +41,7 @@ async function addVector(client, key, id, vector) {
  * @param {string} id - Unique identifier for the vector.
  * @returns {number[] | null} The vector or null if not found.
  */
-async function getVector(client, key, id) {
+export async function getVector(client, key, id) {
   const vectorString = await client.hGet(key, id);
   return vectorString ? JSON.parse(vectorString) : null;
 }
@@ -53,7 +54,7 @@ async function getVector(client, key, id) {
  * @param {number} topN - Number of top similar vectors to retrieve.
  * @returns {Promise<Array<{id: string, similarity: number}>>} List of top N similar vectors.
  */
-async function similaritySearch(client, key, queryVector, topN) {
+export async function similaritySearch(client, key, queryVector, topN) {
   const allVectors = await client.hGetAll(key);
   const results = [];
 
@@ -95,7 +96,7 @@ function cosineSimilarity(vectorA, vectorB) {
  * @param {string} key - The key for the vector store.
  * @param {string} id - Unique identifier for the vector.
  */
-async function removeVector(client, key, id) {
+export async function removeVector(client, key, id) {
   await client.hDel(key, id);
   await client.zRem(`${key}:index`, id);
 }
@@ -104,15 +105,7 @@ async function removeVector(client, key, id) {
  * Close the Redis client connection.
  * @param {RedisClientType} client - Redis client instance.
  */
-async function closeRedisClient(client) {
+export async function closeRedisClient(client) {
   await client.quit();
 }
 
-module.exports = {
-  initializeRedisClient,
-  addVector,
-  getVector,
-  similaritySearch,
-  removeVector,
-  closeRedisClient
-};

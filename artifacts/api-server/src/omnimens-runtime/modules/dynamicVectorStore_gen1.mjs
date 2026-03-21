@@ -7,7 +7,7 @@
 /**
  * Node.js built-in modules used
  */
-const { performance } = require('perf_hooks');
+import { performance } from "perf_hooks";
 
 /**
  * Represents a KD-tree node.
@@ -28,7 +28,7 @@ class KDTreeNode {
  * @param {number} depth - Current depth in the tree.
  * @returns {KDTreeNode} Root node of the KD-tree.
  */
-function buildKDTree(points, depth = 0) {
+export function buildKDTree(points, depth = 0) {
   if (points.length === 0) return null;
 
   const axis = depth % points[0].length;
@@ -50,7 +50,7 @@ function buildKDTree(points, depth = 0) {
  * @param {number} bestDistance - Distance of the current best match.
  * @returns {Object} Nearest neighbor and its distance.
  */
-function nearestNeighbor(node, target, best = null, bestDistance = Infinity) {
+export function nearestNeighbor(node, target, best = null, bestDistance = Infinity) {
   if (!node) return { best, bestDistance };
 
   const distance = euclideanDistance(node.point, target);
@@ -99,7 +99,7 @@ function nearestNeighbor(node, target, best = null, bestDistance = Infinity) {
  * @param {number[]} pointB - Second vector.
  * @returns {number} Euclidean distance.
  */
-function euclideanDistance(pointA, pointB) {
+export function euclideanDistance(pointA, pointB) {
   return Math.sqrt(
     pointA.reduce((sum, value, index) => sum + (value - pointB[index]) ** 2, 0)
   );
@@ -109,7 +109,7 @@ function euclideanDistance(pointA, pointB) {
  * Stores and queries vector embeddings using KD-tree.
  * @class
  */
-class DynamicVectorStore {
+export class DynamicVectorStore {
   constructor() {
     this.points = [];
     this.tree = null;
@@ -147,9 +147,3 @@ class DynamicVectorStore {
 /**
  * Exports
  */
-module.exports = {
-  DynamicVectorStore,
-  buildKDTree,
-  nearestNeighbor,
-  euclideanDistance
-};

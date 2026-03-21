@@ -3,13 +3,14 @@
  * @description Provides an in-memory vector store for embedding retrieval and similarity search using Redis.
  */
 
-const { createClient } = require('redis');
+// STUBBED: import { createClient } from "redis";
+const createClient = () => ({ connect: async()=>{}, get: async()=>null, set: async()=>{}, del: async()=>{}, quit: async()=>{}, on:()=>{} });
 
 /**
  * Initializes a Redis client for vector storage.
  * @returns {Promise<RedisClient>} A connected Redis client instance.
  */
-async function initializeRedisClient() {
+export async function initializeRedisClient() {
   const client = createClient();
 
   client.on('error', (err) => {
@@ -27,7 +28,7 @@ async function initializeRedisClient() {
  * @param {number[]} vector - The vector embedding to store.
  * @returns {Promise<void>} Resolves when the vector is stored.
  */
-async function storeVector(client, key, vector) {
+export async function storeVector(client, key, vector) {
   if (!Array.isArray(vector) || vector.some(isNaN)) {
     throw new Error('Vector must be an array of numbers.');
   }
@@ -42,7 +43,7 @@ async function storeVector(client, key, vector) {
  * @param {string} key - The unique key for the vector.
  * @returns {Promise<number[]>} The retrieved vector embedding.
  */
-async function getVector(client, key) {
+export async function getVector(client, key) {
   const vectorString = await client.get(key);
   if (!vectorString) {
     throw new Error(`Vector with key '${key}' not found.`);
@@ -57,7 +58,7 @@ async function getVector(client, key) {
  * @param {number[]} vectorB - The second vector.
  * @returns {number} The cosine similarity score.
  */
-function cosineSimilarity(vectorA, vectorB) {
+export function cosineSimilarity(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
     throw new Error('Vectors must be of the same length.');
   }
@@ -80,7 +81,7 @@ function cosineSimilarity(vectorA, vectorB) {
  * @param {string[]} keys - The keys of the stored vectors to search.
  * @returns {Promise<{ key: string, similarity: number }>} The nearest neighbor and its similarity score.
  */
-async function findNearestNeighbor(client, queryVector, keys) {
+export async function findNearestNeighbor(client, queryVector, keys) {
   let nearestNeighbor = null;
   let highestSimilarity = -Infinity;
 
@@ -102,15 +103,7 @@ async function findNearestNeighbor(client, queryVector, keys) {
  * @param {RedisClient} client - The Redis client instance.
  * @returns {Promise<void>} Resolves when the connection is closed.
  */
-async function closeRedisClient(client) {
+export async function closeRedisClient(client) {
   await client.disconnect();
 }
 
-module.exports = {
-  initializeRedisClient,
-  storeVector,
-  getVector,
-  cosineSimilarity,
-  findNearestNeighbor,
-  closeRedisClient
-};

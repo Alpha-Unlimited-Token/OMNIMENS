@@ -3,14 +3,15 @@
  * @description A utility module for managing and retrieving conversation context dynamically using a rolling buffer system with PostgreSQL.
  */
 
-const { Client } = require('pg');
+// STUBBED: import { Client } from "pg";
+const Pool = class { constructor(){} async query(q,p) { return {rows:[]}; } async connect() { return {query: async()=>({rows:[]}), release:()=>{}}; } end(){} }; const Client = Pool;
 
 /**
  * Initializes a PostgreSQL client and ensures the required table exists.
  * @param {string} connectionString - PostgreSQL connection string.
  * @returns {Promise<Client>} - A connected PostgreSQL client.
  */
-async function initializeDatabase(connectionString) {
+export async function initializeDatabase(connectionString) {
   const client = new Client({ connectionString });
   await client.connect();
   await client.query(`
@@ -29,7 +30,7 @@ async function initializeDatabase(connectionString) {
  * @param {Object} embedding - The context embedding to store.
  * @returns {Promise<void>} - Resolves when the embedding is stored.
  */
-async function storeContextSnapshot(client, embedding) {
+export async function storeContextSnapshot(client, embedding) {
   if (typeof embedding !== 'object' || embedding === null) {
     throw new Error('Embedding must be a non-null object.');
   }
@@ -44,7 +45,7 @@ async function storeContextSnapshot(client, embedding) {
  * @param {number} limit - Maximum number of snapshots to retrieve.
  * @returns {Promise<Object[]>} - An array of the most relevant context snapshots.
  */
-async function retrieveRelevantContexts(client, similarityFn, currentEmbedding, limit = 5) {
+export async function retrieveRelevantContexts(client, similarityFn, currentEmbedding, limit = 5) {
   if (typeof similarityFn !== 'function') {
     throw new Error('similarityFn must be a function.');
   }
@@ -67,7 +68,7 @@ async function retrieveRelevantContexts(client, similarityFn, currentEmbedding, 
  * @param {number} maxSnapshots - Maximum number of snapshots to retain.
  * @returns {Promise<void>} - Resolves when old snapshots are deleted.
  */
-async function maintainRollingBuffer(client, maxSnapshots) {
+export async function maintainRollingBuffer(client, maxSnapshots) {
   const result = await client.query('SELECT COUNT(*) FROM context_snapshots');
   const count = parseInt(result.rows[0].count, 10);
   if (count > maxSnapshots) {
@@ -88,14 +89,7 @@ async function maintainRollingBuffer(client, maxSnapshots) {
  * @param {Client} client - PostgreSQL client.
  * @returns {Promise<void>} - Resolves when the connection is closed.
  */
-async function closeDatabase(client) {
+export async function closeDatabase(client) {
   await client.end();
 }
 
-module.exports = {
-  initializeDatabase,
-  storeContextSnapshot,
-  retrieveRelevantContexts,
-  maintainRollingBuffer,
-  closeDatabase
-};

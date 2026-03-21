@@ -3,15 +3,15 @@
  * @description A WebAssembly-powered module for efficient matrix operations, enabling high-performance linear algebra for simulation and reasoning tasks.
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from "fs";
+import path from "path";
 
 /**
  * Load and compile the WebAssembly module.
  * @async
  * @returns {Promise<WebAssembly.Instance>} The compiled WebAssembly instance.
  */
-async function loadWasmModule() {
+export async function loadWasmModule() {
   const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
   const wasmBuffer = fs.readFileSync(wasmPath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
@@ -26,7 +26,7 @@ async function loadWasmModule() {
  * @returns {Promise<number[][]>} The resulting matrix after multiplication.
  * @throws {Error} If the matrices are incompatible for multiplication.
  */
-async function multiplyMatrices(matrixA, matrixB) {
+export async function multiplyMatrices(matrixA, matrixB) {
   if (matrixA[0].length !== matrixB.length) {
     throw new Error('Matrix dimensions do not allow multiplication.');
   }
@@ -76,14 +76,9 @@ async function multiplyMatrices(matrixA, matrixB) {
  * @param {number[][]} matrix - The matrix to validate.
  * @returns {boolean} True if the matrix is valid, false otherwise.
  */
-function isValidMatrix(matrix) {
+export function isValidMatrix(matrix) {
   if (!Array.isArray(matrix) || matrix.length === 0) return false;
   const rowLength = matrix[0].length;
   return matrix.every(row => Array.isArray(row) && row.length === rowLength);
 }
 
-module.exports = {
-  loadWasmModule,
-  multiplyMatrices,
-  isValidMatrix
-};

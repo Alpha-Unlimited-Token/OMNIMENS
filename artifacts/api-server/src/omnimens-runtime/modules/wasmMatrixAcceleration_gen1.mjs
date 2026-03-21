@@ -4,8 +4,8 @@
  * This module provides matrix multiplication, inversion, and other linear algebra operations.
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from "fs";
+import path from "path";
 
 /**
  * @function compileWasmModule
@@ -13,7 +13,7 @@ const path = require('path');
  * @param {Buffer} wasmBuffer - The binary data of the WebAssembly module.
  * @returns {Promise<WebAssembly.Instance>} - A promise that resolves to the WebAssembly instance.
  */
-async function compileWasmModule(wasmBuffer) {
+export async function compileWasmModule(wasmBuffer) {
   const wasmModule = await WebAssembly.compile(wasmBuffer);
   return WebAssembly.instantiate(wasmModule);
 }
@@ -24,7 +24,7 @@ async function compileWasmModule(wasmBuffer) {
  * @param {string} filePath - The path to the WebAssembly binary file.
  * @returns {Promise<WebAssembly.Instance>} - A promise that resolves to the WebAssembly instance.
  */
-async function loadWasmModule(filePath) {
+export async function loadWasmModule(filePath) {
   const wasmBuffer = fs.readFileSync(filePath);
   return compileWasmModule(wasmBuffer);
 }
@@ -36,7 +36,7 @@ async function loadWasmModule(filePath) {
  * @param {number[][]} matrixB - The second matrix.
  * @returns {Promise<number[][]>} - A promise that resolves to the resulting matrix.
  */
-async function matrixMultiply(matrixA, matrixB) {
+export async function matrixMultiply(matrixA, matrixB) {
   // Validate input dimensions
   if (matrixA[0].length !== matrixB.length) {
     throw new Error('Matrix dimensions are incompatible for multiplication.');
@@ -85,7 +85,7 @@ async function matrixMultiply(matrixA, matrixB) {
  * @param {number[][]} matrix - The matrix to invert.
  * @returns {Promise<number[][]>} - A promise that resolves to the inverted matrix.
  */
-async function matrixInvert(matrix) {
+export async function matrixInvert(matrix) {
   // Validate input dimensions
   if (matrix.length !== matrix[0].length) {
     throw new Error('Matrix inversion requires a square matrix.');
@@ -123,9 +123,3 @@ async function matrixInvert(matrix) {
   return result;
 }
 
-module.exports = {
-  compileWasmModule,
-  loadWasmModule,
-  matrixMultiply,
-  matrixInvert
-};

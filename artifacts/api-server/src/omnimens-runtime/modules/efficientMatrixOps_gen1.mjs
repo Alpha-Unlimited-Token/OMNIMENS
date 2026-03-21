@@ -3,8 +3,8 @@
  * @description This module provides efficient matrix operations using WebAssembly (WASM) for high-performance numerical computations in Node.js.
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from "fs";
+import path from "path";
 
 /**
  * Compiles and initializes the WebAssembly module.
@@ -27,7 +27,7 @@ async function initializeWASM() {
  * @returns {Promise<number[][]>} The resulting matrix after multiplication.
  * @throws {Error} If matrices are incompatible for multiplication.
  */
-async function multiplyMatrices(matrixA, matrixB) {
+export async function multiplyMatrices(matrixA, matrixB) {
   if (matrixA[0].length !== matrixB.length) {
     throw new Error('Incompatible matrix dimensions for multiplication.');
   }
@@ -68,7 +68,7 @@ async function multiplyMatrices(matrixA, matrixB) {
  * @returns {Promise<number[]>} The eigenvalues of the matrix.
  * @throws {Error} If the matrix is not square.
  */
-async function computeEigenvalues(matrix) {
+export async function computeEigenvalues(matrix) {
   if (matrix.length !== matrix[0].length) {
     throw new Error('Matrix must be square to compute eigenvalues.');
   }
@@ -91,7 +91,3 @@ async function computeEigenvalues(matrix) {
   return Array.from(eigenvalues);
 }
 
-module.exports = {
-  multiplyMatrices,
-  computeEigenvalues
-};
