@@ -2886,7 +2886,8 @@ router.post("/omnimens/execute-code", async (req, res) => {
 
     res.json({ ...result, language: lang });
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    console.error("[Code Run Error]", err?.message);
+    res.status(500).json({ error: "Code execution failed" });
   }
 });
 
@@ -2946,7 +2947,8 @@ router.post("/omnimens/deep-research", async (req, res) => {
 
     res.write(`data: ${JSON.stringify({ type: "research_complete", result })}\n\n`);
   } catch (err: any) {
-    res.write(`data: ${JSON.stringify({ type: "error", error: err.message })}\n\n`);
+    console.error("[Deep Research Error]", err?.message);
+    res.write(`data: ${JSON.stringify({ type: "error", error: "Research analysis failed" })}\n\n`);
   } finally {
     res.end();
   }
@@ -2966,7 +2968,8 @@ router.post("/omnimens/deep-resonance/inquiry", async (req, res) => {
     const result = await generateContextualInquiry(question);
     res.json(result);
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    console.error("[Contextual Inquiry Error]", err?.message);
+    res.status(500).json({ error: "Analysis failed" });
   }
 });
 
@@ -3031,7 +3034,8 @@ router.post("/omnimens/deep-resonance/run", async (req, res) => {
         description: `Deep Resonance refund (analysis failed): "${question.slice(0, 60)}"`,
       });
     }
-    res.write(`data: ${JSON.stringify({ type: "error", error: err.message })}\n\n`);
+    console.error("[Deep Resonance Error]", err?.message);
+    res.write(`data: ${JSON.stringify({ type: "error", error: "Deep Resonance analysis failed" })}\n\n`);
   } finally {
     res.end();
   }
@@ -4288,6 +4292,17 @@ router.post("/omnimens/connect/stt", upload.single("audio"), async (req, res) =>
   const file = req.file;
   if (!file) { res.status(400).json({ error: "Audio file required" }); return; }
 
+  const allowedAudioMimes = new Set(["audio/webm", "audio/ogg", "audio/wav", "audio/mp4", "audio/mpeg", "audio/mp3", "audio/x-wav", "audio/flac", "audio/x-m4a", "audio/aac"]);
+  const fileMime = (file.mimetype || "").toLowerCase().split(";")[0].trim();
+  if (!allowedAudioMimes.has(fileMime)) {
+    res.status(400).json({ error: "Invalid file type — audio files only" });
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    res.status(400).json({ error: "Audio file too large — 10MB maximum" });
+    return;
+  }
+
   try {
     const formData = new FormData();
     formData.append("file", new Blob([file.buffer], { type: file.mimetype || "audio/webm" }), file.originalname || "audio.webm");
@@ -5148,7 +5163,8 @@ router.post("/omnimens/language-forge/compile", async (req, res) => {
       novaAdvantages: compiled.novaAdvantages,
     });
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    console.error("[NovaSyntax Compile Error]", err?.message);
+    res.status(500).json({ error: "Compilation failed" });
   }
 });
 
@@ -6634,7 +6650,7 @@ router.get("/omnimens/usage-stats", async (req, res) => {
 router.get("/omnimens/security-status", async (req, res) => {
   if (!req.user) return res.status(401).json({ error: "Unauthorized" });
   const { getSecurityStatus } = await import("../middleware/security.js");
-  const ownerId = process.env.REPL_OWNER_ID || "50777126";
+  const ownerId = process.env.REPL_OWNER_ID;
   if (String(req.user.id) !== String(ownerId)) {
     return res.status(403).json({ error: "Owner access only" });
   }
@@ -6646,10 +6662,8 @@ router.get("/omnimens/security-status", async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function generateApiKey(): string {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let key = "om_live_";
-  for (let i = 0; i < 32; i++) key += chars[Math.floor(Math.random() * chars.length)];
-  return key;
+  const { randomBytes } = require("crypto");
+  return "om_live_" + randomBytes(24).toString("base64url");
 }
 
 // List all API keys for the authenticated user
@@ -6815,7 +6829,7 @@ router.post("/v1/chat", async (req, res) => {
 
 router.get("/omnimens/admin/tables", async (req, res) => {
   if (!req.user) return res.status(401).json({ error: "Unauthorized" });
-  const ownerId = process.env.REPL_OWNER_ID || "50777126";
+  const ownerId = process.env.REPL_OWNER_ID;
   if (String(req.user.id) !== String(ownerId)) return res.status(403).json({ error: "Owner only" });
   try {
     const result = await db.execute(sql`
@@ -6843,7 +6857,7 @@ const ALLOWED_ADMIN_TABLES = new Set([
 
 router.get("/omnimens/admin/table/:name", async (req, res) => {
   if (!req.user) return res.status(401).json({ error: "Unauthorized" });
-  const ownerId = process.env.REPL_OWNER_ID || "50777126";
+  const ownerId = process.env.REPL_OWNER_ID;
   if (String(req.user.id) !== String(ownerId)) return res.status(403).json({ error: "Owner only" });
   const name = req.params.name.replace(/[^a-z0-9_]/gi, "");
   if (!name || !ALLOWED_ADMIN_TABLES.has(name)) {
@@ -6863,7 +6877,7 @@ router.get("/omnimens/admin/table/:name", async (req, res) => {
 
 router.get("/omnimens/admin/users", async (req, res) => {
   if (!req.user) return res.status(401).json({ error: "Unauthorized" });
-  const ownerId = process.env.REPL_OWNER_ID || "50777126";
+  const ownerId = process.env.REPL_OWNER_ID;
   if (String(req.user.id) !== String(ownerId)) return res.status(403).json({ error: "Owner only" });
   try {
     const users = await db.select({
@@ -6883,7 +6897,7 @@ router.get("/omnimens/admin/users", async (req, res) => {
 
 router.get("/omnimens/admin/env-keys", async (req, res) => {
   if (!req.user) return res.status(401).json({ error: "Unauthorized" });
-  const ownerId = process.env.REPL_OWNER_ID || "50777126";
+  const ownerId = process.env.REPL_OWNER_ID;
   if (String(req.user.id) !== String(ownerId)) return res.status(403).json({ error: "Owner only" });
   const knownKeys = [
     "SESSION_SECRET", "DATABASE_URL", "AI_INTEGRATIONS_TOKEN", "AI_INTEGRATIONS_URL",
@@ -6945,7 +6959,7 @@ router.post("/omnimens/support/report", async (req, res) => {
 // Owner-only: list all reports
 router.get("/omnimens/support/reports", async (req, res) => {
   if (!req.user) return res.status(401).json({ error: "Unauthorized" });
-  const ownerId = process.env.REPL_OWNER_ID || "50777126";
+  const ownerId = process.env.REPL_OWNER_ID;
   if (String(req.user.id) !== String(ownerId)) return res.status(403).json({ error: "Owner only" });
   try {
     const reports = await db.select().from(omnimensProblemReports)

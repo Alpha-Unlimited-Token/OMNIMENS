@@ -53,7 +53,7 @@ Both OMNIMENS and Super AI Lab frontends are built with React, Vite, Tailwind CS
 - **Independent Reasoning Engine:** A zero-API-call algorithmic reasoning engine with 6 modes (deductive, inductive, abductive, analogical, causal, world model), working memory, and contradiction detection.
 - **Autonomous Reasoning Orchestrator:** Orchestrates independent reasoning and internal engine queries before external LLM calls.
 - **Digital Environment Navigator:** OMNIMENS maps and navigates the digital world as a spatial environment.
-- **Security:** Implements 89 protections across 8 categories, including network, authentication, data encryption, API security, content security, injection validation, bot defense, and AI-specific security.
+- **Security:** Implements 89 protections across 8 categories, including network, authentication, data encryption, API security, content security, injection validation, bot defense, and AI-specific security. Key hardening: ownerOnly middleware is fail-closed (503 when REPL_OWNER_ID unset); API keys use `crypto.randomBytes`; Stripe webhook has idempotency dedup via `stripeSessionId` + DB transactions for all credit-granting paths; STT endpoint validates exact audio MIME types (no wildcard); internal error messages are never exposed to clients; iframe sandbox excludes `allow-same-origin`; `sanitizeDiagramSVG()` applied to all diagram rendering; protected routes redirect unauthenticated users to login.
 
 **Super AI Lab Architecture:**
 - **Agent Mesh Intelligence System:** A 5-phase autonomous cycle (Web Research, Agent Discoveries, Adversarial Debate, Meta-Agent Synthesis, Apply Upgrades) for continuous AI improvement.

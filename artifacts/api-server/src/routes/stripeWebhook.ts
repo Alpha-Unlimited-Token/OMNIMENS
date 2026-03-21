@@ -94,7 +94,19 @@ router.post(
       return;
     }
 
-    console.log(`[Stripe Webhook] Event: ${event.type}`);
+    console.log(`[Stripe Webhook] Event: ${event.type} (${event.id})`);
+
+    const sessionObj = (event.data?.object as any);
+    const checkoutSessionId = sessionObj?.id || event.id;
+    const [alreadyProcessed] = await db.select({ id: omnimensCreditTransactions.id })
+      .from(omnimensCreditTransactions)
+      .where(eq(omnimensCreditTransactions.stripeSessionId, checkoutSessionId))
+      .limit(1);
+    if (alreadyProcessed) {
+      console.log(`[Stripe Webhook] Duplicate event ${event.id} (session ${checkoutSessionId}) — skipping`);
+      res.json({ received: true, duplicate: true });
+      return;
+    }
 
     try {
       switch (event.type) {
@@ -118,31 +130,33 @@ router.post(
           if (isResonance && packId && RESONANCE_PACKS[packId] && session.payment_status === "paid") {
             const resPack = RESONANCE_PACKS[packId];
 
-            const [user] = await db
-              .select({ id: omnimensUsers.id })
-              .from(omnimensUsers)
-              .where(eq(omnimensUsers.id, userId))
-              .limit(1);
+            await db.transaction(async (tx) => {
+              const [user] = await tx
+                .select({ id: omnimensUsers.id })
+                .from(omnimensUsers)
+                .where(eq(omnimensUsers.id, userId))
+                .limit(1);
 
-            if (!user) { console.warn(`[Stripe Webhook] User not found: ${userId}`); break; }
+              if (!user) { console.warn(`[Stripe Webhook] User not found: ${userId}`); return; }
 
-            await db.update(omnimensUsers)
-              .set({
-                resonanceCredits: sql`${omnimensUsers.resonanceCredits} + ${resPack.totalCredits}`,
-                resonanceTotalEarned: sql`${omnimensUsers.resonanceTotalEarned} + ${resPack.totalCredits}`,
-                monthlyPaidSpendCents: sql`${omnimensUsers.monthlyPaidSpendCents} + ${resPack.amountCents}`,
-                totalPaidSpendCents: sql`${omnimensUsers.totalPaidSpendCents} + ${resPack.amountCents}`,
-                ...(stripeCustomerId ? { stripeCustomerId } : {}),
-              })
-              .where(eq(omnimensUsers.id, userId));
+              await tx.update(omnimensUsers)
+                .set({
+                  resonanceCredits: sql`${omnimensUsers.resonanceCredits} + ${resPack.totalCredits}`,
+                  resonanceTotalEarned: sql`${omnimensUsers.resonanceTotalEarned} + ${resPack.totalCredits}`,
+                  monthlyPaidSpendCents: sql`${omnimensUsers.monthlyPaidSpendCents} + ${resPack.amountCents}`,
+                  totalPaidSpendCents: sql`${omnimensUsers.totalPaidSpendCents} + ${resPack.amountCents}`,
+                  ...(stripeCustomerId ? { stripeCustomerId } : {}),
+                })
+                .where(eq(omnimensUsers.id, userId));
 
-            await db.insert(omnimensCreditTransactions).values({
-              userId,
-              type: "purchase",
-              credits: resPack.totalCredits,
-              description: `Deep Resonance ${resPack.label} — ${resPack.totalCredits.toLocaleString()} resonance credits (${resPack.bonusLabel})`,
-              stripeSessionId: session.id,
-              packId,
+              await tx.insert(omnimensCreditTransactions).values({
+                userId,
+                type: "purchase",
+                credits: resPack.totalCredits,
+                description: `Deep Resonance ${resPack.label} — ${resPack.totalCredits.toLocaleString()} resonance credits (${resPack.bonusLabel})`,
+                stripeSessionId: session.id,
+                packId,
+              });
             });
 
             await db.insert(omnimensNotifications).values({
@@ -160,31 +174,33 @@ router.post(
             const packInfo = CREDIT_PACKS[packId];
             const creditsToAdd = packInfo.credits;
 
-            const [user] = await db
-              .select({ id: omnimensUsers.id })
-              .from(omnimensUsers)
-              .where(eq(omnimensUsers.id, userId))
-              .limit(1);
+            await db.transaction(async (tx) => {
+              const [user] = await tx
+                .select({ id: omnimensUsers.id })
+                .from(omnimensUsers)
+                .where(eq(omnimensUsers.id, userId))
+                .limit(1);
 
-            if (!user) { console.warn(`[Stripe Webhook] User not found: ${userId}`); break; }
+              if (!user) { console.warn(`[Stripe Webhook] User not found: ${userId}`); return; }
 
-            await db.update(omnimensUsers)
-              .set({
-                credits: sql`${omnimensUsers.credits} + ${creditsToAdd}`,
-                totalCreditsEarned: sql`${omnimensUsers.totalCreditsEarned} + ${creditsToAdd}`,
-                monthlyPaidSpendCents: sql`${omnimensUsers.monthlyPaidSpendCents} + ${packInfo.amountCents}`,
-                totalPaidSpendCents: sql`${omnimensUsers.totalPaidSpendCents} + ${packInfo.amountCents}`,
-                ...(stripeCustomerId ? { stripeCustomerId } : {}),
-              })
-              .where(eq(omnimensUsers.id, userId));
+              await tx.update(omnimensUsers)
+                .set({
+                  credits: sql`${omnimensUsers.credits} + ${creditsToAdd}`,
+                  totalCreditsEarned: sql`${omnimensUsers.totalCreditsEarned} + ${creditsToAdd}`,
+                  monthlyPaidSpendCents: sql`${omnimensUsers.monthlyPaidSpendCents} + ${packInfo.amountCents}`,
+                  totalPaidSpendCents: sql`${omnimensUsers.totalPaidSpendCents} + ${packInfo.amountCents}`,
+                  ...(stripeCustomerId ? { stripeCustomerId } : {}),
+                })
+                .where(eq(omnimensUsers.id, userId));
 
-            await db.insert(omnimensCreditTransactions).values({
-              userId,
-              type: "purchase",
-              credits: creditsToAdd,
-              description: `${packInfo.label} pack — ${creditsToAdd.toLocaleString()} credits`,
-              stripeSessionId: session.id,
-              packId,
+              await tx.insert(omnimensCreditTransactions).values({
+                userId,
+                type: "purchase",
+                credits: creditsToAdd,
+                description: `${packInfo.label} pack — ${creditsToAdd.toLocaleString()} credits`,
+                stripeSessionId: session.id,
+                packId,
+              });
             });
 
             await db.insert(omnimensNotifications).values({
@@ -207,24 +223,26 @@ router.post(
             const subscriptionId   = typeof session.subscription === "string" ? session.subscription : session.subscription?.id;
             const stripeCustomerId = typeof session.customer === "string" ? session.customer : session.customer?.id || null;
 
-            await db.update(omnimensUsers)
-              .set({
-                credits: sql`${omnimensUsers.credits} + ${plan.credits}`,
-                totalCreditsEarned: sql`${omnimensUsers.totalCreditsEarned} + ${plan.credits}`,
-                tier: planId!,
-                isPro: true,
-                stripeSubscriptionId: subscriptionId || undefined,
-                ...(stripeCustomerId ? { stripeCustomerId } : {}),
-              })
-              .where(eq(omnimensUsers.id, userId));
+            await db.transaction(async (tx) => {
+              await tx.update(omnimensUsers)
+                .set({
+                  credits: sql`${omnimensUsers.credits} + ${plan.credits}`,
+                  totalCreditsEarned: sql`${omnimensUsers.totalCreditsEarned} + ${plan.credits}`,
+                  tier: planId!,
+                  isPro: true,
+                  stripeSubscriptionId: subscriptionId || undefined,
+                  ...(stripeCustomerId ? { stripeCustomerId } : {}),
+                })
+                .where(eq(omnimensUsers.id, userId));
 
-            await db.insert(omnimensCreditTransactions).values({
-              userId,
-              type: "purchase",
-              credits: plan.credits,
-              description: `${plan.label} Monthly Plan — ${plan.credits.toLocaleString()} credits (first month)`,
-              stripeSessionId: session.id,
-              packId: planId,
+              await tx.insert(omnimensCreditTransactions).values({
+                userId,
+                type: "purchase",
+                credits: plan.credits,
+                description: `${plan.label} Monthly Plan — ${plan.credits.toLocaleString()} credits (first month)`,
+                stripeSessionId: session.id,
+                packId: planId,
+              });
             });
 
             await db.insert(omnimensNotifications).values({
@@ -284,20 +302,22 @@ router.post(
           const plan   = planId ? MONTHLY_PLAN_CREDITS[planId] : null;
           if (!plan) { console.log(`[Stripe Webhook] invoice.paid — user ${user.id} has no monthly plan (tier: ${planId})`); break; }
 
-          await db.update(omnimensUsers)
-            .set({
-              credits: sql`${omnimensUsers.credits} + ${plan.credits}`,
-              totalCreditsEarned: sql`${omnimensUsers.totalCreditsEarned} + ${plan.credits}`,
-            })
-            .where(eq(omnimensUsers.id, user.id));
+          await db.transaction(async (tx) => {
+            await tx.update(omnimensUsers)
+              .set({
+                credits: sql`${omnimensUsers.credits} + ${plan.credits}`,
+                totalCreditsEarned: sql`${omnimensUsers.totalCreditsEarned} + ${plan.credits}`,
+              })
+              .where(eq(omnimensUsers.id, user.id));
 
-          await db.insert(omnimensCreditTransactions).values({
-            userId: user.id,
-            type: "purchase",
-            credits: plan.credits,
-            description: `${plan.label} Monthly Plan renewal — ${plan.credits.toLocaleString()} credits`,
-            stripeSessionId: invoice.id,
-            packId: planId,
+            await tx.insert(omnimensCreditTransactions).values({
+              userId: user.id,
+              type: "purchase",
+              credits: plan.credits,
+              description: `${plan.label} Monthly Plan renewal — ${plan.credits.toLocaleString()} credits`,
+              stripeSessionId: invoice.id,
+              packId: planId,
+            });
           });
 
           await db.insert(omnimensNotifications).values({

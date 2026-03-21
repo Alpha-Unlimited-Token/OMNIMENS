@@ -6419,7 +6419,7 @@ export default function Chat() {
                                       {diag.diagram_png ? (
                                         <img src={`data:image/png;base64,${diag.diagram_png}`} alt="Diagram" className="w-full bg-white/5 p-2" />
                                       ) : diag.diagram_svg ? (
-                                        <div className="p-4 overflow-auto" dangerouslySetInnerHTML={{ __html: diag.diagram_svg }} />
+                                        <div className="p-4 overflow-auto" dangerouslySetInnerHTML={{ __html: sanitizeDiagramSVG(diag.diagram_svg) }} />
                                       ) : (
                                         <p className="p-3 text-xs text-red-400">{diag.error || "Diagram generation failed"}</p>
                                       )}

@@ -131,6 +131,16 @@ function WS({ children }: { children: ReactNode }) {
   return <WorkspaceLayout>{children}</WorkspaceLayout>;
 }
 
+function ProtectedRoute({ children }: { children: ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuth();
+  if (isLoading) return <PageFallback />;
+  if (!isAuthenticated) {
+    window.location.replace(import.meta.env.BASE_URL + "login");
+    return <PageFallback />;
+  }
+  return <WS>{children}</WS>;
+}
+
 function HomePage() {
   const { isAuthenticated, isLoading } = useAuth();
   if (isLoading) return <PageFallback />;
@@ -146,15 +156,15 @@ function Router() {
         <Route path="/login" component={Login} />
         <Route path="/chat" component={Chat} />
 
-        <Route path="/projects">{() => <WS><Projects /></WS>}</Route>
-        <Route path="/account">{() => <WS><Account /></WS>}</Route>
+        <Route path="/projects">{() => <ProtectedRoute><Projects /></ProtectedRoute>}</Route>
+        <Route path="/account">{() => <ProtectedRoute><Account /></ProtectedRoute>}</Route>
         <Route path="/pricing">{() => <WS><Pricing /></WS>}</Route>
-        <Route path="/memory">{() => <WS><Memory /></WS>}</Route>
-        <Route path="/developer">{() => <WS><Developer /></WS>}</Route>
-        <Route path="/dev">{() => <WS><Developer /></WS>}</Route>
-        <Route path="/tools">{() => <WS><Tools /></WS>}</Route>
+        <Route path="/memory">{() => <ProtectedRoute><Memory /></ProtectedRoute>}</Route>
+        <Route path="/developer">{() => <ProtectedRoute><Developer /></ProtectedRoute>}</Route>
+        <Route path="/dev">{() => <ProtectedRoute><Developer /></ProtectedRoute>}</Route>
+        <Route path="/tools">{() => <ProtectedRoute><Tools /></ProtectedRoute>}</Route>
         <Route path="/templates">{() => <WS><Templates /></WS>}</Route>
-        <Route path="/deploy">{() => <WS><Deploy /></WS>}</Route>
+        <Route path="/deploy">{() => <ProtectedRoute><Deploy /></ProtectedRoute>}</Route>
 
         <Route path="/faq" component={FAQ} />
         <Route path="/support" component={Support} />

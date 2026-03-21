@@ -81,7 +81,7 @@ export function WebsitePreview({ html, index = 0 }: WebsitePreviewProps) {
       {tab === "preview" ? (
         <iframe
           srcDoc={html}
-          sandbox="allow-scripts allow-same-origin allow-forms"
+          sandbox="allow-scripts allow-forms"
           className={`w-full bg-white border-0 ${fullscreen ? "flex-1" : "h-[480px]"}`}
           title={`OMNIMENS Build ${index + 1}`}
         />

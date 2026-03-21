@@ -15,8 +15,8 @@ export function ownerOnly(req: Request, res: Response, next: NextFunction) {
   }
 
   if (!ownerId) {
-    console.error("REPL_OWNER_ID not set — owner protection is disabled");
-    next();
+    console.error("REPL_OWNER_ID not set — owner routes are locked down (fail-closed)");
+    res.status(503).json({ error: "Owner verification unavailable" });
     return;
   }
 
