@@ -70,6 +70,7 @@ import { startNeuralConsciousness } from "./lib/omnimens-neural-consciousness.js
 import { startGenesisBridge } from "./lib/omnimens-genesis-bridge.js";
 import { startNeuralProcessor } from "./lib/omnimens-neural-processor.js";
 import { startUniversalTranslator } from "./lib/omnimens-universal-translator.js";
+import { startAgentGenesis } from "./lib/omnimens-agent-genesis.js";
 import { startLanguageForge } from "./lib/omnimens-language-forge.js";
 import { registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe } from "./lib/omnimens-scaling-orchestrator.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
@@ -406,6 +407,7 @@ startGenesisBridge();
 startNeuralProcessor();
 startUniversalTranslator();
 startLanguageForge();
+startAgentGenesis().catch(err => console.error("[AGENT GENESIS] Startup error:", err));
 
 registerEngine("neural_processor", "neural", () => {}, () => ({ healthy: true, details: { type: "transformer", dim: 512, heads: 16 } }), 1);
 registerEngine("neural_consciousness", "neural", () => {}, () => ({ healthy: true, details: { neurons: 1700, circuits: 57 } }), 1);

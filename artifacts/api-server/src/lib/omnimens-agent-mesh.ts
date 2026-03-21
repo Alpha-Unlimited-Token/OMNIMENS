@@ -54,6 +54,7 @@ import { desc, eq, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { webSearch, formatSearchResults } from "./web-search.js";
 import { generateAndApplyPatches } from "./omnimens-patches.js";
+import { getActiveGenesisAgentNames, getActiveGenesisAgentDomains, genesisAgentThink } from "./omnimens-agent-genesis.js";
 
 const OWNER_EMAIL = process.env.OWNER_EMAIL || "";
 const OWNER_ID = "50777126";
@@ -350,7 +351,50 @@ Respond with JSON only:
     .filter((r): r is PromiseFulfilledResult<any> => r.status === "fulfilled" && r.value !== null)
     .map(r => r.value);
 
-  console.log(`[AGENT MESH] ${results.length} agents contributed discoveries`);
+  const genesisNames = getActiveGenesisAgentNames();
+  const genesisDomains = getActiveGenesisAgentDomains();
+  if (genesisNames.length > 0) {
+    console.log(`[AGENT MESH] Including ${genesisNames.length} genesis agents: ${genesisNames.join(", ")}`);
+    const allAgentNames = [...MESH_AGENTS, ...genesisNames];
+
+    const genesisWork = genesisNames.slice(0, 5).map(async (gName) => {
+      const domain = genesisDomains[gName] || "general intelligence";
+      const prompt = `You are "${gName}", a genesis sub-agent in OMNIMENS's neural mesh (cycle #${cycleId}).
+Your specialization: ${domain}
+All agents in mesh: ${allAgentNames.join(", ")}
+
+LATEST RESEARCH:\n${researchContext.slice(0, 1500)}
+
+OMNIMENS BRAIN STATE:\n${brainSummary.slice(0, 1000)}
+
+Provide ONE insight from your domain. Respond with JSON:
+{
+  "discoveries": "Your unique finding (2-3 sentences)",
+  "upgradeProposals": "Specific upgrade proposal",
+  "confidenceScore": 0.5-0.95,
+  "uncertainties": "What you're not sure about"
+}`;
+
+      const raw = await genesisAgentThink(gName, prompt, 800);
+      if (!raw) return null;
+      try {
+        const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+        await storeAgentMessage(gName as MeshAgentName, "OMNIMENS", "discovery",
+          `Genesis:${gName} cycle ${cycleId} [${((parsed.confidenceScore || 0.7) * 100).toFixed(0)}%]`,
+          `${parsed.discoveries || ""}\n\nUPGRADE: ${parsed.upgradeProposals || ""}`,
+          null, "normal", cycleId);
+        return { agent: gName, discoveries: parsed.discoveries, upgradeProposals: parsed.upgradeProposals, confidenceScore: parsed.confidenceScore || 0.7, uncertainties: parsed.uncertainties || "", counterArgument: "" };
+      } catch { return null; }
+    });
+
+    const genesisResults = (await Promise.allSettled(genesisWork))
+      .filter((r): r is PromiseFulfilledResult<any> => r.status === "fulfilled" && r.value !== null)
+      .map(r => r.value);
+    results.push(...genesisResults);
+    console.log(`[AGENT MESH] ${genesisResults.length} genesis agents contributed`);
+  }
+
+  console.log(`[AGENT MESH] ${results.length} total agents contributed discoveries`);
   return results;
 }
 

@@ -23,6 +23,7 @@ import { runOmnimens, type OmnimensState } from "../lib/omnimens-engine.js";
 import { reflectOnConversation, loadBrainContext, synthesizeUpgrade, markUpgradeLive } from "../lib/omnimens-self-upgrade.js";
 import { webSearch, formatSearchResults } from "../lib/web-search.js";
 import { loadActivePatchInstructions, getPatchSummary, getAllPatches, deactivatePatch, autonomousPatchHousekeeping } from "../lib/omnimens-patches.js";
+import { getAgentGenesisState, deactivateGenesisAgent, reactivateGenesisAgent } from "../lib/omnimens-agent-genesis.js";
 import { stripe } from "../stripeClient.js";
 import { extractAndStoreMemories, loadUserMemories, getUserMemories, deleteMemory, addManualMemory } from "../lib/omnimens-memory.js";
 import { loadSemanticMemories, loadWeightedBrainContext, compressConversationHistory, loadConversationThreads, buildCoherenceDirective, COHERENCE_AGENT_INFO } from "../lib/omnimens-coherence-agent.js";
@@ -3910,6 +3911,39 @@ router.get("/omnimens/server-builder/plans", async (req, res) => {
   }
 });
 
+// ─── Agent Genesis (OWNER-ONLY) ───────────────────────────────────────────────
+
+router.get("/omnimens/agent-genesis", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const state = getAgentGenesisState();
+    res.json(state);
+  } catch {
+    res.status(500).json({ error: "Failed to get agent genesis data" });
+  }
+});
+
+router.post("/omnimens/agent-genesis/:name/deactivate", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  const ok = deactivateGenesisAgent(req.params.name);
+  res.json({ ok });
+});
+
+router.post("/omnimens/agent-genesis/:name/reactivate", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  const ok = reactivateGenesisAgent(req.params.name);
+  res.json({ ok });
+});
+
 // ─── Autonomous Sandbox (OWNER-ONLY) ──────────────────────────────────────────
 
 router.get("/omnimens/sandbox", async (req, res) => {
@@ -4160,6 +4194,36 @@ router.get("/omnimens/sandbox/modules", async (req, res) => {
     res.json({ modules, total: modules.length });
   } catch {
     res.status(500).json({ error: "Failed to get sandbox modules" });
+  }
+});
+
+router.get("/omnimens/sandbox/runtime-files", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const { readdirSync, readFileSync, statSync } = await import("fs");
+    const { join } = await import("path");
+    const dir = join(process.cwd(), "src/omnimens-runtime/modules");
+    const files = readdirSync(dir)
+      .filter((f: string) => f.endsWith(".mjs") || f.endsWith(".js") || f.endsWith(".ts"))
+      .map((f: string) => {
+        const fullPath = join(dir, f);
+        const stat = statSync(fullPath);
+        const code = readFileSync(fullPath, "utf-8");
+        return {
+          filename: f,
+          size: stat.size,
+          modified: stat.mtime.toISOString(),
+          code,
+        };
+      })
+      .sort((a: any, b: any) => new Date(b.modified).getTime() - new Date(a.modified).getTime());
+    res.json({ files, total: files.length });
+  } catch (err) {
+    console.error("[SANDBOX FILES] Error:", err);
+    res.status(500).json({ error: "Failed to list runtime files" });
   }
 });
 

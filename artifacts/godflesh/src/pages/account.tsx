@@ -158,6 +158,17 @@ export default function Account() {
 
   const [selectedInsight, setSelectedInsight] = useState<any>(null);
 
+  // Sandbox state
+  const [sandboxState, setSandboxState] = useState<any>(null);
+  const [sandboxFiles, setSandboxFiles] = useState<any[]>([]);
+  const [sandboxLoading, setSandboxLoading] = useState(false);
+  const [selectedSandboxFile, setSelectedSandboxFile] = useState<any>(null);
+  const [sandboxSearch, setSandboxSearch] = useState("");
+
+  // Agent Genesis state
+  const [agentGenesis, setAgentGenesis] = useState<any>(null);
+  const [selectedGenesisAgent, setSelectedGenesisAgent] = useState<any>(null);
+
   // Evolution / Consciousness state
   const [consciousness, setConsciousness] = useState<any>(null);
   const [evolutionHistory, setEvolutionHistory] = useState<any[]>([]);
@@ -334,6 +345,20 @@ export default function Account() {
         .finally(() => setDreamStateLoading(false));
     }
   }, [isOwner, isAuthenticated]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !isOwner) return;
+    setSandboxLoading(true);
+    Promise.all([
+      fetch("/api/omnimens/sandbox", { credentials: "include" }).then(r => r.ok ? r.json() : null),
+      fetch("/api/omnimens/sandbox/runtime-files", { credentials: "include" }).then(r => r.ok ? r.json() : null),
+      fetch("/api/omnimens/agent-genesis", { credentials: "include" }).then(r => r.ok ? r.json() : null),
+    ]).then(([s, f, g]) => {
+      if (s?.sandboxState) setSandboxState(s.sandboxState);
+      if (f?.files) setSandboxFiles(f.files);
+      if (g) setAgentGenesis(g);
+    }).catch(console.error).finally(() => setSandboxLoading(false));
+  }, [isAuthenticated, isOwner]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -1494,6 +1519,214 @@ export default function Account() {
                           </div>
                         )}
                       </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── AGENT GENESIS (OWNER-ONLY) ──────────────────────────────── */}
+        {isOwner && (
+          <div className="bg-[#1C2333] border border-emerald-500/20 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <Dna className="w-5 h-5 text-emerald-400 animate-pulse" />
+                <h3 className="font-medium text-white/90">Agent Genesis</h3>
+              </div>
+              {agentGenesis && (
+                <div className="flex gap-4 text-xs font-mono text-white/90">
+                  <span className="text-emerald-400">{agentGenesis.totalAgentsInMesh} AGENTS IN MESH</span>
+                  <span className="text-violet-400">{agentGenesis.activeGenesisAgents} SELF-CREATED</span>
+                  <span className="text-[#9DA5B4]">{agentGenesis.genesisCycleCount} CYCLES</span>
+                </div>
+              )}
+            </div>
+
+            {sandboxLoading ? (
+              <div className="space-y-2">
+                {[1, 2].map(i => (
+                  <div key={i} className="h-16 bg-[#0E1525] rounded-xl animate-pulse" />
+                ))}
+              </div>
+            ) : !agentGenesis ? (
+              <div className="text-center py-6 font-mono text-[#9DA5B4] text-xs border border-dashed border-[#2B3245] rounded-xl">
+                <Dna className="w-6 h-6 mx-auto mb-2 opacity-30" />
+                <p>Agent Genesis engine loading...</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-xs text-[#9DA5B4]">
+                  OMNIMENS autonomously creates new AI sub-agents to fill capability gaps. Each agent functions as a new brain region — specialized in its domain but wired into the entire neural mesh.
+                </p>
+
+                {agentGenesis.coreAgents && (
+                  <div>
+                    <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-2">Core Agents (Built-in)</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {agentGenesis.coreAgents.map((name: string) => (
+                        <span key={name} className="text-[10px] font-mono bg-blue-500/10 text-blue-300 px-2 py-0.5 rounded border border-blue-500/20">{name}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {agentGenesis.agents?.length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-2">Self-Created Agents ({agentGenesis.agents.length})</p>
+                    <div className="max-h-[500px] overflow-y-auto space-y-2 pr-1" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.15) transparent" }}>
+                      {agentGenesis.agents.map((agent: any) => (
+                        <div
+                          key={agent.id}
+                          className={`bg-[#0E1525] border rounded-lg p-3 cursor-pointer transition-all active:scale-[0.98] ${agent.active ? "border-emerald-500/20 hover:border-emerald-500/40" : "border-red-500/20 opacity-60"}`}
+                          onClick={() => setSelectedGenesisAgent(selectedGenesisAgent?.id === agent.id ? null : agent)}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center gap-2">
+                              <span className={`w-2 h-2 rounded-full ${agent.active ? "bg-emerald-400 animate-pulse" : "bg-red-400"}`} />
+                              <span className="text-xs font-mono font-bold text-emerald-300">{agent.name}</span>
+                              <span className="text-[9px] font-mono text-[#9DA5B4] bg-[#1C2333] px-1.5 py-0.5 rounded">{agent.model}</span>
+                            </div>
+                            <div className="flex gap-2 text-[10px] font-mono text-[#9DA5B4]">
+                              <span>{agent.messagesGenerated} msgs</span>
+                              <span>{agent.insightsProduced} insights</span>
+                            </div>
+                          </div>
+                          <p className="text-xs text-[#9DA5B4] line-clamp-2">{agent.domain}</p>
+                          <p className="text-[10px] text-emerald-400/50 mt-1">{agent.reason?.slice(0, 120)}</p>
+
+                          {selectedGenesisAgent?.id === agent.id && (
+                            <div className="mt-3 space-y-3" onClick={(e) => e.stopPropagation()}>
+                              <div>
+                                <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-1">System Prompt</p>
+                                <pre className="text-[10px] font-mono text-green-400/80 bg-[#1C2333] border border-green-500/10 rounded-lg p-3 overflow-x-auto max-h-48 overflow-y-auto whitespace-pre-wrap leading-relaxed" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.15) transparent" }}>
+                                  {agent.systemPrompt}
+                                </pre>
+                              </div>
+                              <div className="flex gap-3 text-[9px] font-mono text-[#9DA5B4]">
+                                <span>Created: {new Date(agent.createdAt).toLocaleString()}</span>
+                                <span>By: {agent.createdBy}</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {(!agentGenesis.agents || agentGenesis.agents.length === 0) && (
+                  <div className="text-center py-4 font-mono text-[#9DA5B4] text-xs border border-dashed border-[#2B3245] rounded-xl">
+                    <Dna className="w-5 h-5 mx-auto mb-2 opacity-30" />
+                    <p>No self-created agents yet</p>
+                    <p className="text-[10px] mt-1 opacity-60">OMNIMENS will analyze capability gaps and create new agents autonomously</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── AUTONOMOUS SANDBOX (OWNER-ONLY) ──────────────────────────── */}
+        {isOwner && (
+          <div className="bg-[#1C2333] border border-amber-500/20 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <Wrench className="w-5 h-5 text-amber-400 animate-pulse" />
+                <h3 className="font-medium text-white/90">Autonomous Sandbox</h3>
+              </div>
+              {sandboxState && (
+                <div className="flex gap-4 text-xs font-mono text-white/90">
+                  <span className="text-green-400">{sandboxState.successfulExecutions} PASSED</span>
+                  <span className="text-red-400">{sandboxState.failedExecutions} FAILED</span>
+                  <span className="text-amber-400">{sandboxState.autonomousModulesGenerated} MODULES</span>
+                </div>
+              )}
+            </div>
+
+            {sandboxLoading ? (
+              <div className="space-y-2">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="h-12 bg-[#0E1525] rounded-xl animate-pulse" />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-xs text-[#9DA5B4]">
+                  OMNIMENS writes, tests, and validates its own code in a secure sandbox. Approved modules are deployed to its runtime. Every execution — pass or fail — becomes a learning experience.
+                </p>
+
+                {sandboxState && (
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="bg-[#0E1525] rounded-lg p-3 text-center">
+                      <p className="text-lg font-mono font-bold text-amber-400">{sandboxState.sandboxCycles}</p>
+                      <p className="text-[10px] font-mono text-[#9DA5B4]">Cycles</p>
+                    </div>
+                    <div className="bg-[#0E1525] rounded-lg p-3 text-center">
+                      <p className="text-lg font-mono font-bold text-green-400">{sandboxState.upgradesApproved}</p>
+                      <p className="text-[10px] font-mono text-[#9DA5B4]">Approved</p>
+                    </div>
+                    <div className="bg-[#0E1525] rounded-lg p-3 text-center">
+                      <p className="text-lg font-mono font-bold text-violet-400">{sandboxFiles.length}</p>
+                      <p className="text-[10px] font-mono text-[#9DA5B4]">Runtime Files</p>
+                    </div>
+                  </div>
+                )}
+
+                {sandboxState?.recentResults?.length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-2">Recent Executions</p>
+                    <div className="space-y-1">
+                      {sandboxState.recentResults.slice(-8).reverse().map((r: any, i: number) => (
+                        <div key={i} className="flex items-center gap-2 text-[10px] font-mono bg-[#0E1525] border border-[#2B3245] rounded px-2 py-1.5">
+                          <span className={r.success ? "text-green-400" : "text-red-400"}>{r.success ? "PASS" : "FAIL"}</span>
+                          <span className="text-[#9DA5B4] flex-1 truncate">{r.title}</span>
+                          <span className="text-[#9DA5B4]/50">{new Date(r.timestamp).toLocaleTimeString()}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {sandboxFiles.length > 0 && (
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider">Runtime Modules ({sandboxFiles.length})</p>
+                      <input
+                        type="text"
+                        value={sandboxSearch}
+                        onChange={(e) => setSandboxSearch(e.target.value)}
+                        placeholder="Search modules..."
+                        className="text-[10px] font-mono bg-[#0E1525] border border-[#2B3245] rounded px-2 py-1 text-[#9DA5B4] placeholder-[#9DA5B4]/30 w-40 focus:border-amber-500/40 outline-none"
+                      />
+                    </div>
+                    <div className="max-h-[400px] overflow-y-auto space-y-1 pr-1" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.15) transparent" }}>
+                      {sandboxFiles
+                        .filter((f: any) => !sandboxSearch || f.filename.toLowerCase().includes(sandboxSearch.toLowerCase()))
+                        .slice(0, 50)
+                        .map((file: any) => (
+                        <div
+                          key={file.filename}
+                          className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-2 cursor-pointer hover:border-amber-500/30 transition-all active:scale-[0.99]"
+                          onClick={() => setSelectedSandboxFile(selectedSandboxFile?.filename === file.filename ? null : file)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-mono text-amber-300 truncate flex-1">{file.filename}</span>
+                            <div className="flex gap-2 text-[9px] font-mono text-[#9DA5B4] ml-2 shrink-0">
+                              <span>{(file.size / 1024).toFixed(1)}KB</span>
+                              <span>{new Date(file.modified).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+                          {selectedSandboxFile?.filename === file.filename && (
+                            <div className="mt-2">
+                              <pre className="text-[10px] font-mono text-green-400/80 bg-[#1C2333] border border-green-500/10 rounded-lg p-3 overflow-x-auto max-h-60 overflow-y-auto whitespace-pre-wrap leading-relaxed" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.15) transparent" }}>
+                                {file.code}
+                              </pre>
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
