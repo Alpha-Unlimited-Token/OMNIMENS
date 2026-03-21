@@ -79,7 +79,7 @@ const BUILD_STEPS_TEMPLATE: Omit<BuildStep, "status" | "durationMs">[] = [
 ];
 
 // Step timing in ms (cumulative from start)
-const STEP_TIMINGS = [0, 900, 2000, 3200, 4800, 6200, 7500];
+const STEP_TIMINGS = [0, 900, 2000, 3200, 4800, 6200, 7800, 9500];
 
 export function createInitialBuildSteps(): BuildStep[] {
   return BUILD_STEPS_TEMPLATE.map((s, i) => ({
