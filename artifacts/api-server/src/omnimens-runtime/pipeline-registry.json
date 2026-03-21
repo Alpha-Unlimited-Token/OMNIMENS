@@ -1175,13 +1175,9 @@
       "filename": "gpuMatrixOps_gen1.mjs",
       "stage": "vector_operations",
       "exports": [
-        "matrixMultiply",
-        "transposeMatrix",
-        "addMatrices",
-        "multiplyMatricesElementWise",
-        "validateMatrixDimensions"
+        "gpuMatrixMultiply"
       ],
-      "loadedAt": 1774111294640,
+      "loadedAt": 1774111667734,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3271,9 +3267,22 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": false
+    },
+    "inMemoryVectorStore_gen1.mjs": {
+      "filename": "inMemoryVectorStore_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "InMemoryVectorStore"
+      ],
+      "loadedAt": 1774111675857,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774111294677,
-  "totalModules": 233,
+  "totalModules": 235,
   "totalCalls": 0
 }
