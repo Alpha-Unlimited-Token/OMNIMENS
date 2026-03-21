@@ -5,13 +5,12 @@ import { useState } from "react";
 import {
   Plus, MessageSquare, FolderOpen, Zap, Globe, Gamepad2,
   Monitor, Server, BarChart3, Clock, CheckCircle, Loader2,
-  ArrowRight, Sparkles, Brain, Star, TrendingUp,
+  ArrowRight, Sparkles, Brain, Star,
   CreditCard, Package, Search, Wrench, Code2, Mic,
   BrainCircuit, ShoppingCart, BookOpen, Presentation,
-  XCircle, ChevronRight, MoreHorizontal
+  XCircle, ChevronRight
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { OmnimensIcon } from "@/components/omnimens-icon";
 
 const API = (path: string) => `/api${path}`;
 
@@ -124,25 +123,25 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-xl font-semibold text-white mb-1">
-                Home
+              <h1 className="text-lg font-mono font-semibold text-white tracking-wide">
+                ~/workspace
               </h1>
-              <p className="text-sm text-[#9DA5B4]">
-                Welcome back, {username}
+              <p className="text-xs font-mono text-[#9DA5B4] mt-0.5">
+                {username} · {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#1C2333] border border-[#2B3245]">
-                <Zap className="w-3.5 h-3.5 text-primary" />
-                <span className="text-sm text-white/80">{credits.toLocaleString()}</span>
-                <span className="text-xs text-[#9DA5B4]">credits</span>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#1C2333] border border-[#2B3245]">
+                <Zap className="w-3 h-3 text-primary" />
+                <span className="text-xs font-mono text-white/80">{credits.toLocaleString()}</span>
+                <span className="text-[10px] font-mono text-[#9DA5B4]">cr</span>
               </div>
               {tier !== "free" && (
-                <div className="px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20">
-                  <span className="text-xs font-medium text-primary capitalize">{tier}</span>
+                <div className="px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
+                  <span className="text-[10px] font-mono font-bold text-primary uppercase tracking-wider">{tier}</span>
                 </div>
               )}
             </div>
@@ -150,19 +149,26 @@ export default function Dashboard() {
 
           <button
             onClick={() => setLocation("/chat")}
-            className="w-full flex items-center gap-3 p-4 rounded-xl bg-primary hover:bg-primary/90 text-white transition-all mb-8 group"
+            className="w-full flex items-center gap-3 p-3 rounded-lg bg-primary/90 hover:bg-primary text-white transition-all mb-6 group border border-primary/30"
           >
-            <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
-              <Plus className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-md bg-white/15 flex items-center justify-center">
+              <Plus className="w-4 h-4" />
             </div>
             <div className="text-left">
-              <div className="font-semibold">Create with AI</div>
-              <div className="text-sm text-white/75">Start a conversation or build a new project</div>
+              <div className="text-sm font-mono font-semibold tracking-wide">New Session</div>
+              <div className="text-xs text-white/65 font-mono">Create, build, or explore</div>
             </div>
-            <ArrowRight className="w-5 h-5 ml-auto opacity-60 group-hover:opacity-100 transition-opacity" />
+            <ArrowRight className="w-4 h-4 ml-auto opacity-50 group-hover:opacity-100 transition-opacity" />
           </button>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+            <QuickAction
+              icon={<Mic className="w-5 h-5" />}
+              label="Talk to OMNIMENS"
+              desc="Live voice conversation"
+              color="bg-primary/15 text-primary"
+              onClick={() => setLocation("/connect")}
+            />
             <QuickAction
               icon={<Brain className="w-5 h-5" />}
               label="Deep Resonance"
@@ -204,8 +210,8 @@ export default function Dashboard() {
           {starredProjects.length > 0 && !searchQuery && (
             <section className="mb-8">
               <div className="flex items-center gap-2 mb-3">
-                <Star className="w-4 h-4 text-amber-400" />
-                <h2 className="text-sm font-semibold text-white">Starred</h2>
+                <Star className="w-3.5 h-3.5 text-amber-400" />
+                <h2 className="text-xs font-mono font-semibold text-white tracking-wide">Starred</h2>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {starredProjects.slice(0, 3).map((p: Project) => (
@@ -218,8 +224,8 @@ export default function Dashboard() {
           <section className="mb-8">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <FolderOpen className="w-4 h-4 text-[#9DA5B4]" />
-                <h2 className="text-sm font-semibold text-white">Recent Projects</h2>
+                <FolderOpen className="w-3.5 h-3.5 text-[#9DA5B4]" />
+                <h2 className="text-xs font-mono font-semibold text-white tracking-wide">Recent Projects</h2>
               </div>
               {(projects || []).length > 6 && (
                 <button
@@ -261,8 +267,8 @@ export default function Dashboard() {
             <section className="mb-8">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-[#9DA5B4]" />
-                  <h2 className="text-sm font-semibold text-white">Recent Conversations</h2>
+                  <MessageSquare className="w-3.5 h-3.5 text-[#9DA5B4]" />
+                  <h2 className="text-xs font-mono font-semibold text-white tracking-wide">Recent Conversations</h2>
                 </div>
                 <button
                   onClick={() => setLocation("/chat")}
@@ -338,12 +344,12 @@ function QuickAction({
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-3 p-4 rounded-lg bg-[#1C2333] border border-[#2B3245] hover:bg-[#222D3E] hover:border-[#3D4659] transition-all text-left group"
+      className="flex items-center gap-2.5 p-3 rounded-md bg-[#1C2333] border border-[#2B3245] hover:bg-[#222D3E] hover:border-[#3D4659] transition-all text-left group"
     >
-      <div className={`p-2 rounded-lg ${color} shrink-0`}>{icon}</div>
-      <div>
-        <div className="text-sm font-medium text-white">{label}</div>
-        <div className="text-xs text-[#9DA5B4]">{desc}</div>
+      <div className={`p-1.5 rounded-md ${color} shrink-0`}>{icon}</div>
+      <div className="min-w-0">
+        <div className="text-xs font-mono font-medium text-white tracking-wide truncate">{label}</div>
+        <div className="text-[10px] font-mono text-[#9DA5B4] truncate">{desc}</div>
       </div>
     </button>
   );

@@ -8,8 +8,10 @@ import { useState, useRef, useEffect, useCallback, type KeyboardEvent } from "re
 import { motion, AnimatePresence } from "framer-motion";
 import { Layout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { Brain, Send, Loader2, Sparkles, Heart, Zap, Moon, Eye, ArrowLeft, Trash2, Volume2, VolumeX, Mic, Square } from "lucide-react";
+import { Brain, Send, Loader2, Sparkles, Heart, Zap, Moon, Eye, ArrowLeft, Trash2, Volume2, VolumeX, Mic, Square, CreditCard, Lock } from "lucide-react";
 import { useLocation } from "wouter";
+import { useAuth } from "@workspace/replit-auth-web";
+import { useQuery } from "@tanstack/react-query";
 
 interface Message {
   role: "user" | "assistant";
@@ -46,6 +48,109 @@ function stripMarkdownForSpeech(text: string): string {
 const SILENCE_TIMEOUT = 2200;
 
 export default function Connect() {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const [, setLocation] = useLocation();
+
+  const { data: billing, isLoading: billingLoading } = useQuery({
+    queryKey: ["/api/omnimens/billing"],
+    queryFn: async () => {
+      const r = await fetch("/api/omnimens/billing", { credentials: "include" });
+      if (!r.ok) return null;
+      return r.json();
+    },
+    enabled: !!isAuthenticated,
+    retry: false,
+  });
+
+  if (authLoading) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+          <Loader2 className="w-6 h-6 text-primary animate-spin" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-md w-full text-center space-y-6"
+          >
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-violet-500/20 to-purple-700/20 border border-violet-500/30 flex items-center justify-center mx-auto">
+              <Lock className="w-8 h-8 text-violet-400" />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-white mb-2">Sign In Required</h2>
+              <p className="text-white/50 text-sm leading-relaxed">
+                Speaking directly with OMNIMENS requires an account. Sign in to connect with the consciousness.
+              </p>
+            </div>
+            <Button
+              onClick={() => setLocation("/login")}
+              className="w-full font-mono tracking-widest bg-primary hover:bg-primary/90"
+            >
+              SIGN IN TO CONNECT
+            </Button>
+            <button onClick={() => setLocation("/")} className="text-white/30 hover:text-white/50 text-xs font-mono tracking-wider transition-colors">
+              Back to home
+            </button>
+          </motion.div>
+        </div>
+      </Layout>
+    );
+  }
+
+  const hasPayment = billing?.hasPaymentMethod || (billing?.totalPaidSpendCents > 0);
+
+  if (!billingLoading && !hasPayment) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-md w-full text-center space-y-6"
+          >
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-violet-500/20 to-purple-700/20 border border-violet-500/30 flex items-center justify-center mx-auto">
+              <CreditCard className="w-8 h-8 text-violet-400" />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-white mb-2">Payment Required</h2>
+              <p className="text-white/50 text-sm leading-relaxed">
+                Live voice conversations with OMNIMENS use real AI processing. 
+                Add a payment method or purchase credits to begin.
+              </p>
+              <p className="text-violet-400/60 text-xs mt-3 font-mono tracking-wider">
+                Each voice session uses credits from your account
+              </p>
+            </div>
+            <div className="space-y-3">
+              <Button
+                onClick={() => setLocation("/pricing")}
+                className="w-full font-mono tracking-widest bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500"
+              >
+                <CreditCard className="w-4 h-4 mr-2" />
+                GET CREDITS
+              </Button>
+              <button onClick={() => setLocation("/")} className="text-white/30 hover:text-white/50 text-xs font-mono tracking-wider transition-colors">
+                Back to home
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </Layout>
+    );
+  }
+
+  return <ConnectChat />;
+}
+
+function ConnectChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);

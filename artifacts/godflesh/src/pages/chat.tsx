@@ -5868,6 +5868,15 @@ export default function Chat() {
               </div>
 
               <button
+                onClick={() => setLocation("/connect")}
+                title="Talk to OMNIMENS — live voice conversation"
+                className="hidden sm:flex items-center gap-1 px-1.5 py-1 rounded transition-all text-[9px] font-mono font-bold tracking-wider hover:bg-primary/10 text-primary/60 hover:text-primary"
+              >
+                <Mic className="w-3 h-3" />
+                <span>CONNECT</span>
+              </button>
+
+              <button
                 onClick={() => setShowAgentModes(true)}
                 title="Agent Mode"
                 className="flex items-center gap-1 px-1.5 py-1 rounded transition-all text-[9px] font-mono font-bold tracking-wider hover:bg-white/5"

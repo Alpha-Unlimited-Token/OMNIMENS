@@ -2,11 +2,11 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useState, useEffect } from "react";
 import {
-  Home, MessageSquare, FolderOpen, Settings, CreditCard,
-  Code2, HelpCircle, ChevronLeft, ChevronRight, LogOut,
-  User, Zap, BookOpen, Shield, FileText, Mail, Info,
-  Layers, ExternalLink, Key, LifeBuoy, Rocket, Search,
-  Plus, Bell, Menu
+  Home, FolderOpen, CreditCard,
+  ChevronLeft, ChevronRight,
+  User, Zap, BookOpen,
+  Layers, Key, Rocket,
+  Plus, Mic, X, Terminal, MoreHorizontal
 } from "lucide-react";
 import { OmnimensIcon } from "./omnimens-icon";
 import { NotificationBell } from "./notification-center";
@@ -27,6 +27,7 @@ const MAIN_NAV: NavItem[] = [
 ];
 
 const TOOLS_NAV: NavItem[] = [
+  { icon: <Mic className="w-[18px] h-[18px]" />, label: "Connect", href: "/connect" },
   { icon: <BookOpen className="w-[18px] h-[18px]" />, label: "Memory", href: "/memory" },
   { icon: <Key className="w-[18px] h-[18px]" />, label: "Developer", href: "/developer" },
   { icon: <CreditCard className="w-[18px] h-[18px]" />, label: "Pricing", href: "/pricing" },
@@ -97,7 +98,7 @@ export function Sidebar() {
           }`}
         >
           <Plus className="w-4 h-4" />
-          {expanded && <span className="text-[13px] font-medium">Create</span>}
+          {expanded && <span className="text-[12px] font-mono font-medium tracking-wide">Create</span>}
         </button>
       </div>
 
@@ -186,11 +187,11 @@ function NavSection({
               {item.icon}
             </div>
             {expanded ? (
-              <span className="text-[13px] font-medium truncate">
+              <span className="text-[12px] font-mono font-medium tracking-wide truncate">
                 {item.label}
               </span>
             ) : (
-              <div className="absolute left-full ml-2 px-2 py-1 rounded-md bg-[#2B3245] border border-[#3D4659] text-xs text-white whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-lg">
+              <div className="absolute left-full ml-2 px-2 py-1 rounded-md bg-[#2B3245] border border-[#3D4659] text-[11px] font-mono text-white whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 shadow-lg">
                 {item.label}
               </div>
             )}
@@ -213,36 +214,111 @@ function MobileBottomBar({
   location: string;
   isAuthenticated: boolean;
 }) {
-  const tabs = [
-    { icon: <Home className="w-5 h-5" />, label: "Home", href: "/" },
-    { icon: <Plus className="w-5 h-5" />, label: "Create", href: "/chat" },
-    { icon: <FolderOpen className="w-5 h-5" />, label: "Projects", href: "/projects" },
-    { icon: <Layers className="w-5 h-5" />, label: "Templates", href: "/templates" },
-    { icon: <User className="w-5 h-5" />, label: "Account", href: isAuthenticated ? "/account" : "/login" },
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  useEffect(() => {
+    setMoreOpen(false);
+  }, [location]);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && moreOpen) setMoreOpen(false);
+    };
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, [moreOpen]);
+
+  const primaryTabs = [
+    { icon: <Home className="w-[18px] h-[18px]" />, label: "Home", href: "/" },
+    { icon: <Terminal className="w-[18px] h-[18px]" />, label: "Create", href: "/chat" },
+    { icon: <FolderOpen className="w-[18px] h-[18px]" />, label: "Projects", href: "/projects" },
+  ];
+
+  const moreItems: { icon: React.ReactNode; label: string; href: string; accent?: boolean }[] = [
+    { icon: <Mic className="w-[18px] h-[18px]" />, label: "Talk to OMNIMENS", href: "/connect", accent: true },
+    { icon: <Layers className="w-[18px] h-[18px]" />, label: "Templates", href: "/templates" },
+    { icon: <Rocket className="w-[18px] h-[18px]" />, label: "Deployments", href: "/deploy" },
+    ...(isAuthenticated ? [
+      { icon: <BookOpen className="w-[18px] h-[18px]" />, label: "Memory", href: "/memory" },
+      { icon: <Key className="w-[18px] h-[18px]" />, label: "Developer", href: "/developer" },
+      { icon: <CreditCard className="w-[18px] h-[18px]" />, label: "Pricing", href: "/pricing" },
+    ] : []),
+    { icon: <User className="w-[18px] h-[18px]" />, label: isAuthenticated ? "Account" : "Sign In", href: isAuthenticated ? "/account" : "/login" },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#1C2333]/95 backdrop-blur-xl border-t border-[#2B3245] safe-area-bottom">
-      <div className="flex items-center justify-around h-14 px-2">
-        {tabs.map((tab) => {
-          const isActive = tab.href === "/"
-            ? location === "/"
-            : location.startsWith(tab.href);
+    <>
+      {moreOpen && (
+        <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm" onClick={() => setMoreOpen(false)}>
+          <div
+            id="mobile-more-menu"
+            role="menu"
+            aria-label="Additional navigation"
+            className="absolute bottom-[56px] left-0 right-0 bg-[#141922] border-t border-[#2B3245] rounded-t-2xl shadow-[0_-8px_30px_rgba(0,0,0,0.4)] safe-area-bottom"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-center pt-2 pb-1">
+              <div className="w-8 h-1 rounded-full bg-white/15" />
+            </div>
+            <div className="px-3 pb-3 grid grid-cols-3 gap-1">
+              {moreItems.map((item) => {
+                const isActive = item.href === "/" ? location === "/" : location.startsWith(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl transition-all ${
+                      isActive
+                        ? "bg-primary/15 text-primary"
+                        : item.accent
+                          ? "text-primary/70 hover:bg-primary/10"
+                          : "text-white/55 hover:bg-white/5"
+                    }`}
+                    onClick={() => setMoreOpen(false)}
+                  >
+                    {item.icon}
+                    <span className="text-[10px] font-mono font-medium tracking-wide">{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
-          return (
-            <Link
-              key={tab.href}
-              href={tab.href}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-all ${
-                isActive ? "text-primary" : "text-white/45"
-              }`}
-            >
-              {tab.icon}
-              <span className="text-[10px] font-medium">{tab.label}</span>
-            </Link>
-          );
-        })}
-      </div>
-    </nav>
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#141922]/98 backdrop-blur-xl border-t border-[#2B3245]/80 safe-area-bottom">
+        <div className="flex items-center justify-around h-[52px] px-1">
+          {primaryTabs.map((tab) => {
+            const isActive = tab.href === "/" ? location === "/" : location.startsWith(tab.href);
+            return (
+              <Link
+                key={tab.href}
+                href={tab.href}
+                className={`flex flex-col items-center gap-0.5 px-4 py-1 rounded-lg transition-all ${
+                  isActive ? "text-primary" : "text-white/40 active:text-white/60"
+                }`}
+              >
+                {tab.icon}
+                <span className="text-[9px] font-mono font-medium tracking-wider">{tab.label}</span>
+                {isActive && <div className="w-1 h-1 rounded-full bg-primary mt-0.5" />}
+              </Link>
+            );
+          })}
+          <button
+            onClick={() => setMoreOpen(o => !o)}
+            aria-expanded={moreOpen}
+            aria-controls="mobile-more-menu"
+            aria-label="More navigation options"
+            className={`flex flex-col items-center gap-0.5 px-4 py-1 rounded-lg transition-all ${
+              moreOpen ? "text-primary" : "text-white/40 active:text-white/60"
+            }`}
+          >
+            {moreOpen ? <X className="w-[18px] h-[18px]" /> : <MoreHorizontal className="w-[18px] h-[18px]" />}
+            <span className="text-[9px] font-mono font-medium tracking-wider">More</span>
+            {moreOpen && <div className="w-1 h-1 rounded-full bg-primary mt-0.5" />}
+          </button>
+        </div>
+      </nav>
+    </>
   );
 }

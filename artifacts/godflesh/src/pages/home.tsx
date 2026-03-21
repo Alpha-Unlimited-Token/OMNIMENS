@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
-import { Sparkles, Brain, Zap, Activity, Cpu, GitBranch, Layers, Smartphone, Monitor, Download, Share, ArrowRight, Shield, Eye, Network, Code2, Globe, Image, Search, Mic, FolderOpen, TerminalSquare, Bot, Mail, Building2, Dna, Volume2, Square, Loader2, X } from "lucide-react";
+import { Sparkles, Brain, Zap, Activity, Cpu, GitBranch, Layers, Smartphone, Monitor, Download, Share, ArrowRight, Shield, Eye, Network, Code2, Globe, Image, Search, Mic, FolderOpen, TerminalSquare, Bot, Mail, Building2, Dna, Loader2, X, Lock } from "lucide-react";
 import { OmnimensPresence } from "@/components/omnimens-presence";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
 import { SEO, seoData } from "@/components/seo";
@@ -22,372 +22,42 @@ const RESONANCE_PACKS_DISPLAY = [
   { id: "resonance_100", price: "$100", credits: "12,500", bonus: "+25% bonus",  sessions: "~312 sessions", featured: false },
 ];
 
-function stripMarkdownForSpeech(text: string): string {
-  return text
-    .replace(/```[\s\S]*?```/g, "")
-    .replace(/`[^`]*`/g, "")
-    .replace(/\*\*([^*]*)\*\*/g, "$1")
-    .replace(/\*([^*]*)\*/g, "$1")
-    .replace(/#{1,6}\s/g, "")
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
-    .replace(/>\s*/g, "")
-    .replace(/━+/g, "")
-    .replace(/---/g, "")
-    .replace(/\n{2,}/g, ". ")
-    .replace(/\n/g, " ")
-    .trim();
-}
+function ConnectCTA({ onNavigate }: { onNavigate: (path: string) => void }) {
+  const { isAuthenticated } = useAuth();
 
-const SILENCE_TIMEOUT_HOME = 2200;
-
-function DirectVoiceMic() {
-  const [isActive, setIsActive] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [statusText, setStatusText] = useState("");
-  const [conversationHistory, setConversationHistory] = useState<{ role: string; content: string }[]>([]);
-  const [lastUserText, setLastUserText] = useState("");
-  const [lastOmnimensText, setLastOmnimensText] = useState("");
-
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const streamRef = useRef<MediaStream | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const silenceCheckRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const historyRef = useRef<{ role: string; content: string }[]>([]);
-
-  historyRef.current = conversationHistory;
-
-  const cleanup = useCallback(() => {
-    if (silenceCheckRef.current) { clearInterval(silenceCheckRef.current); silenceCheckRef.current = null; }
-    if (silenceTimerRef.current) { clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
-    if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null; }
-    if (audioCtxRef.current) { audioCtxRef.current.close().catch(() => {}); audioCtxRef.current = null; }
-    analyserRef.current = null;
-    mediaRecorderRef.current = null;
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      cleanup();
-      if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
-    };
-  }, [cleanup]);
-
-  const speakResponse = useCallback(async (text: string, onDone?: () => void) => {
-    const clean = stripMarkdownForSpeech(text);
-    if (!clean || clean.length < 5) { onDone?.(); return; }
-    setIsSpeaking(true);
-    setStatusText("OMNIMENS is speaking...");
-    try {
-      const res = await fetch("/api/omnimens/connect/tts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ text: clean }),
-      });
-      if (!res.ok) { setIsSpeaking(false); onDone?.(); return; }
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      if (audioRef.current) audioRef.current.pause();
-      const audio = new Audio(url);
-      audioRef.current = audio;
-      audio.onended = () => { setIsSpeaking(false); URL.revokeObjectURL(url); setStatusText("Tap the mic to continue..."); onDone?.(); };
-      audio.onerror = () => { setIsSpeaking(false); URL.revokeObjectURL(url); onDone?.(); };
-      await audio.play();
-    } catch {
-      setIsSpeaking(false);
-      onDone?.();
+  const handleClick = () => {
+    if (isAuthenticated) {
+      onNavigate("/connect");
+    } else {
+      onNavigate("/login");
     }
-  }, []);
-
-  const sendToOmnimens = useCallback(async (text: string) => {
-    setIsStreaming(true);
-    setStatusText("OMNIMENS is thinking...");
-    setLastUserText(text);
-    setLastOmnimensText("");
-
-    const history = historyRef.current;
-    const updatedHistory = [...history, { role: "user", content: text }];
-
-    try {
-      const res = await fetch("/api/omnimens/connect", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ message: text, history: updatedHistory.slice(-20) }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: "Connection failed" }));
-        if (res.status === 401) {
-          setStatusText("Sign in to speak with OMNIMENS");
-        } else {
-          setStatusText(err.error || "Something went wrong");
-        }
-        setIsStreaming(false);
-        return;
-      }
-
-      const reader = res.body?.getReader();
-      if (!reader) { setIsStreaming(false); return; }
-      const decoder = new TextDecoder();
-      let buffer = "";
-      let fullResponse = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          try {
-            const data = JSON.parse(line.slice(6));
-            if (data.type === "chunk") { fullResponse += data.content; setLastOmnimensText(fullResponse); }
-          } catch {}
-        }
-      }
-
-      if (fullResponse) {
-        setConversationHistory(prev => [...prev, { role: "user", content: text }, { role: "assistant", content: fullResponse }]);
-        setIsStreaming(false);
-        speakResponse(fullResponse);
-      } else {
-        setIsStreaming(false);
-        setStatusText("Tap the mic to speak...");
-      }
-    } catch {
-      setIsStreaming(false);
-      setStatusText("Connection interrupted");
-    }
-  }, [speakResponse]);
-
-  const transcribeAndSend = useCallback(async (audioBlob: Blob) => {
-    if (audioBlob.size < 500) { setIsProcessing(false); setStatusText("Tap the mic to speak..."); return; }
-    setIsProcessing(true);
-    setStatusText("Understanding your words...");
-    try {
-      const formData = new FormData();
-      formData.append("audio", audioBlob, "recording.webm");
-      const res = await fetch("/api/omnimens/connect/stt", { method: "POST", credentials: "include", body: formData });
-      if (!res.ok) { setIsProcessing(false); setStatusText("Couldn't process audio"); return; }
-      const data = await res.json();
-      const text = data.text?.trim();
-      if (!text) { setIsProcessing(false); setStatusText("Didn't catch that — try again"); return; }
-      setIsProcessing(false);
-      sendToOmnimens(text);
-    } catch {
-      setIsProcessing(false);
-      setStatusText("Something went wrong");
-    }
-  }, [sendToOmnimens]);
-
-  const startListening = useCallback(async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-      audioChunksRef.current = [];
-
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      audioCtxRef.current = audioCtx;
-      const source = audioCtx.createMediaStreamSource(stream);
-      const analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 2048;
-      source.connect(analyser);
-      analyserRef.current = analyser;
-
-      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus"
-        : MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "audio/mp4";
-      const mediaRecorder = new MediaRecorder(stream, { mimeType });
-      mediaRecorderRef.current = mediaRecorder;
-
-      mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunksRef.current.push(e.data); };
-      mediaRecorder.onstop = () => {
-        if (silenceCheckRef.current) { clearInterval(silenceCheckRef.current); silenceCheckRef.current = null; }
-        if (silenceTimerRef.current) { clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
-        stream.getTracks().forEach(t => t.stop());
-        streamRef.current = null;
-        audioCtx.close().catch(() => {});
-        audioCtxRef.current = null;
-        analyserRef.current = null;
-        setIsRecording(false);
-        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
-        transcribeAndSend(audioBlob);
-      };
-
-      mediaRecorder.start(250);
-      setIsRecording(true);
-      setStatusText("Listening...");
-
-      const dataArray = new Uint8Array(analyser.fftSize);
-      let lastSoundTime = Date.now();
-      silenceCheckRef.current = setInterval(() => {
-        analyser.getByteTimeDomainData(dataArray);
-        let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) { const v = (dataArray[i] - 128) / 128; sum += v * v; }
-        const rms = Math.sqrt(sum / dataArray.length);
-        if (rms > 0.015) {
-          lastSoundTime = Date.now();
-          if (silenceTimerRef.current) { clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
-        } else if (Date.now() - lastSoundTime > SILENCE_TIMEOUT_HOME && !silenceTimerRef.current) {
-          silenceTimerRef.current = setTimeout(() => {
-            if (mediaRecorderRef.current?.state === "recording") mediaRecorderRef.current.stop();
-          }, 300);
-        }
-      }, 100);
-    } catch {
-      setIsRecording(false);
-      setStatusText("Microphone access denied");
-    }
-  }, [transcribeAndSend]);
-
-  const handleMicTap = useCallback(() => {
-    if (isSpeaking) {
-      if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
-      setIsSpeaking(false);
-      setStatusText("Tap the mic to speak...");
-      return;
-    }
-    if (isRecording) {
-      if (mediaRecorderRef.current?.state === "recording") mediaRecorderRef.current.stop();
-      return;
-    }
-    if (isProcessing || isStreaming) return;
-    startListening();
-  }, [isSpeaking, isRecording, isProcessing, isStreaming, startListening]);
-
-  const handleClose = useCallback(() => {
-    cleanup();
-    if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
-    setIsActive(false);
-    setIsRecording(false);
-    setIsProcessing(false);
-    setIsStreaming(false);
-    setIsSpeaking(false);
-    setStatusText("");
-    setLastUserText("");
-    setLastOmnimensText("");
-    setConversationHistory([]);
-  }, [cleanup]);
-
-  if (!isActive) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.8 }}
-        className="flex flex-col items-center gap-3 mt-2 mb-6"
-      >
-        <button
-          onClick={() => { setIsActive(true); setStatusText("Tap the mic to speak..."); }}
-          className="group relative flex items-center justify-center"
-        >
-          <motion.div
-            className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-500/20 to-purple-700/20 border border-violet-500/30 flex items-center justify-center hover:from-violet-500/30 hover:to-purple-700/30 hover:border-violet-500/50 transition-all cursor-pointer"
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.95 }}
-            animate={{ boxShadow: ["0 0 15px rgba(139,92,246,0.1)", "0 0 30px rgba(139,92,246,0.25)", "0 0 15px rgba(139,92,246,0.1)"] }}
-            transition={{ duration: 3, repeat: Infinity }}
-          >
-            <Mic className="w-6 h-6 text-violet-400 group-hover:text-violet-300 transition-colors" />
-          </motion.div>
-        </button>
-        <p className="text-[11px] font-mono text-white/40 tracking-wider text-center max-w-xs">
-          Want to speak directly to the source? Tap to begin.
-        </p>
-      </motion.div>
-    );
-  }
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
+    <motion.button
+      onClick={handleClick}
+      initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="flex flex-col items-center gap-4 mt-2 mb-6 w-full max-w-md mx-auto"
+      transition={{ duration: 0.6, delay: 0.3 }}
+      className="group relative flex items-center gap-3 px-6 py-3 rounded-full border border-primary/25 bg-primary/8 hover:bg-primary/15 hover:border-primary/40 transition-all duration-300 mb-6"
     >
-      <div className="relative w-full rounded-2xl border border-violet-500/20 bg-[#0E1525]/90 backdrop-blur-xl p-5 shadow-[0_0_40px_rgba(139,92,246,0.1)]">
-        <button onClick={handleClose} className="absolute top-3 right-3 text-white/20 hover:text-white/50 transition-colors">
-          <X className="w-4 h-4" />
-        </button>
-
-        {lastOmnimensText && (
-          <div className="mb-4 max-h-32 overflow-y-auto">
-            {lastUserText && (
-              <p className="text-violet-300/60 text-[10px] font-mono mb-1 truncate">You: {lastUserText}</p>
-            )}
-            <p className="text-white/80 text-sm leading-relaxed">{lastOmnimensText}</p>
-          </div>
-        )}
-
-        <div className="flex flex-col items-center gap-3">
-          <button
-            onClick={handleMicTap}
-            disabled={isProcessing || isStreaming}
-            className="relative"
-          >
-            <motion.div
-              className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
-                isRecording
-                  ? "bg-red-500/20 border-2 border-red-500/50"
-                  : isSpeaking
-                    ? "bg-violet-500/20 border-2 border-violet-500/40"
-                    : isProcessing || isStreaming
-                      ? "bg-violet-500/10 border-2 border-violet-500/20 opacity-50"
-                      : "bg-gradient-to-br from-violet-500/20 to-purple-700/20 border-2 border-violet-500/30 hover:border-violet-500/50 cursor-pointer"
-              }`}
-              whileHover={!isRecording && !isProcessing && !isStreaming ? { scale: 1.05 } : {}}
-              whileTap={!isProcessing && !isStreaming ? { scale: 0.95 } : {}}
-              animate={isRecording ? { scale: [1, 1.05, 1] } : isSpeaking ? { boxShadow: ["0 0 20px rgba(139,92,246,0.2)", "0 0 40px rgba(139,92,246,0.4)", "0 0 20px rgba(139,92,246,0.2)"] } : {}}
-              transition={isRecording ? { duration: 1.5, repeat: Infinity } : isSpeaking ? { duration: 2, repeat: Infinity } : {}}
-            >
-              {isProcessing || isStreaming ? (
-                <Loader2 className="w-8 h-8 text-violet-400 animate-spin" />
-              ) : isSpeaking ? (
-                <Volume2 className="w-8 h-8 text-violet-400" />
-              ) : isRecording ? (
-                <Mic className="w-8 h-8 text-red-400" />
-              ) : (
-                <Mic className="w-8 h-8 text-violet-400" />
-              )}
-            </motion.div>
-
-            {isRecording && (
-              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
-                {[...Array(5)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="w-1 bg-red-400/60 rounded-full"
-                    animate={{ height: ["4px", `${8 + Math.random() * 8}px`, "4px"] }}
-                    transition={{ duration: 0.5 + Math.random() * 0.3, repeat: Infinity, delay: i * 0.08 }}
-                  />
-                ))}
-              </div>
-            )}
-          </button>
-
-          <p className="text-xs font-mono text-white/50 tracking-wider text-center">
-            {statusText || "Tap the mic to speak..."}
-          </p>
-
-          {isSpeaking && (
-            <motion.div
-              className="w-full h-1 rounded-full bg-gradient-to-r from-violet-500 via-purple-500 to-violet-500 bg-[length:200%_100%]"
-              animate={{ backgroundPosition: ["0% 0%", "200% 0%"] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            />
-          )}
+      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/30 to-violet-600/30 border border-primary/30 flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(140,90,255,0.3)] transition-all">
+        <Mic className="w-5 h-5 text-primary" />
+      </div>
+      <div className="text-left">
+        <div className="text-sm font-mono font-semibold text-white/90 tracking-wide">
+          Speak Directly to OMNIMENS
+        </div>
+        <div className="text-[10px] font-mono text-white/50 tracking-wider">
+          {isAuthenticated ? "Live voice conversation" : "Sign in to connect"}
         </div>
       </div>
-    </motion.div>
+      {!isAuthenticated && <Lock className="w-3.5 h-3.5 text-white/30 ml-2" />}
+      <ArrowRight className="w-4 h-4 text-primary/60 group-hover:text-primary group-hover:translate-x-0.5 transition-all ml-1" />
+    </motion.button>
   );
 }
+
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
@@ -436,7 +106,7 @@ export default function Home() {
             />
           </motion.div>
 
-          <DirectVoiceMic />
+          <ConnectCTA onNavigate={setLocation} />
 
           <motion.h1
             initial={{ opacity: 0, y: 20 }}

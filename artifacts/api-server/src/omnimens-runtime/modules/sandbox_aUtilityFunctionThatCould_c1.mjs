@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-21T04:16:55.139Z
+ * Written: 2026-03-21T04:35:46.652Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,61 +16,55 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function: Extract unique words from a text and count their occurrences
-function extractUniqueWordsWithCount(text) {
-    if (typeof text !== "string") {
-        throw new Error("Input must be a string");
+function findMostFrequentPatterns(text, patternLength) {
+    if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
+        throw new Error('Invalid input: text must be a string and patternLength must be a positive number.');
     }
 
-    // Normalize text: convert to lowercase and remove non-alphanumeric characters
-    const normalizedText = text.toLowerCase().replace(/[^a-z0-9\s]/g, "");
+    const patternCounts = new Map();
+    const textLength = text.length;
 
-    // Split text into words
-    const words = normalizedText.split(/\s+/).filter(word => word.length > 0);
-
-    // Count occurrences of each unique word
-    const wordCounts = {};
-    for (let word of words) {
-        wordCounts[word] = (wordCounts[word] || 0) + 1;
+    for (let i = 0; i <= textLength - patternLength; i++) {
+        const pattern = text.substring(i, i + patternLength);
+        patternCounts.set(pattern, (patternCounts.get(pattern) || 0) + 1);
     }
 
-    return wordCounts;
+    const maxCount = Math.max(...patternCounts.values());
+    const mostFrequentPatterns = Array.from(patternCounts.entries())
+        .filter(([_, count]) => count === maxCount)
+        .map(([pattern]) => pattern);
+
+    return {
+        mostFrequentPatterns,
+        maxCount
+    };
 }
 
 // Test cases
-function runTests() {
-    console.log("Test 1: Basic functionality");
-    const text1 = "Hello world! Hello again, world.";
-    const result1 = extractUniqueWordsWithCount(text1);
-    console.log(result1); // Expected: { hello: 2, world: 2, again: 1 }
+console.log('Test Case 1:');
+console.log(findMostFrequentPatterns('abababab', 2)); 
+// Expected output: { mostFrequentPatterns: ['ab', 'ba'], maxCount: 4 }
 
-    console.log("Test 2: Case insensitivity and punctuation removal");
-    const text2 = "AI, ai, Ai... AI!";
-    const result2 = extractUniqueWordsWithCount(text2);
-    console.log(result2); // Expected: { ai: 4 }
+console.log('Test Case 2:');
+console.log(findMostFrequentPatterns('abcabcabc', 3)); 
+// Expected output: { mostFrequentPatterns: ['abc'], maxCount: 3 }
 
-    console.log("Test 3: Empty string");
-    const text3 = "";
-    const result3 = extractUniqueWordsWithCount(text3);
-    console.log(result3); // Expected: {}
+console.log('Test Case 3:');
+console.log(findMostFrequentPatterns('aaaaa', 1)); 
+// Expected output: { mostFrequentPatterns: ['a'], maxCount: 5 }
 
-    console.log("Test 4: String with only spaces");
-    const text4 = "     ";
-    const result4 = extractUniqueWordsWithCount(text4);
-    console.log(result4); // Expected: {}
+console.log('Test Case 4:');
+console.log(findMostFrequentPatterns('abcdef', 2)); 
+// Expected output: { mostFrequentPatterns: ['ab', 'bc', 'cd', 'de', 'ef'], maxCount: 1 }
 
-    console.log("Test 5: Complex string with numbers");
-    const text5 = "123 apples, 123 oranges, and 456 bananas.";
-    const result5 = extractUniqueWordsWithCount(text5);
-    console.log(result5); // Expected: { "123": 2, apples: 1, oranges: 1, and: 1, "456": 1, bananas: 1 }
+console.log('Test Case 5:');
+console.log(findMostFrequentPatterns('aabbccddeeff', 2)); 
+// Expected output: { mostFrequentPatterns: ['aa', 'bb', 'cc', 'dd', 'ee', 'ff'], maxCount: 1 }
 
-    console.log("Test 6: Non-string input (should throw error)");
-    try {
-        extractUniqueWordsWithCount(12345);
-    } catch (e) {
-        console.log(e.message); // Expected: "Input must be a string"
-    }
-}
+console.log('Test Case 6 (Edge case - Empty string):');
+console.log(findMostFrequentPatterns('', 2)); 
+// Expected output: { mostFrequentPatterns: [], maxCount: 0 }
 
-// Run tests
-runTests();
+console.log('Test Case 7 (Edge case - patternLength larger than text):');
+console.log(findMostFrequentPatterns('abc', 5)); 
+// Expected output: { mostFrequentPatterns: [], maxCount: 0 }
