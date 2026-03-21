@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-21T16:12:07.310Z
+ * Written: 2026-03-21T16:21:53.293Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,63 +16,54 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function: Find the most frequent patterns in a text
-function findFrequentPatterns(text, patternLength, topN) {
-    if (typeof text !== 'string' || typeof patternLength !== 'number' || typeof topN !== 'number') {
-        throw new Error('Invalid input types. Expected (string, number, number).');
-    }
-    if (patternLength <= 0 || topN <= 0) {
-        throw new Error('Pattern length and topN must be positive integers.');
-    }
-    const patternCounts = new Map();
-
-    // Extract all substrings of the given length
-    for (let i = 0; i <= text.length - patternLength; i++) {
-        const pattern = text.substring(i, i + patternLength);
-        patternCounts.set(pattern, (patternCounts.get(pattern) || 0) + 1);
+// Utility function: Find the most frequent patterns in a dataset (e.g., text, numbers, or mixed data)
+function findMostFrequentPatterns(data, topN) {
+    if (!Array.isArray(data)) {
+        throw new Error("Input data must be an array.");
     }
 
-    // Convert map to array and sort by frequency
-    const sortedPatterns = Array.from(patternCounts.entries())
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, topN);
+    const frequencyMap = new Map();
 
-    // Return the top N patterns and their frequencies
-    return sortedPatterns.map(([pattern, count]) => ({ pattern, count }));
+    // Count occurrences of each element in the data
+    for (let item of data) {
+        const key = JSON.stringify(item); // Use JSON.stringify to handle complex objects
+        frequencyMap.set(key, (frequencyMap.get(key) || 0) + 1);
+    }
+
+    // Convert frequency map to an array and sort by frequency (descending)
+    const sortedFrequencies = Array.from(frequencyMap.entries()).sort((a, b) => b[1] - a[1]);
+
+    // Extract the top N patterns
+    const topPatterns = sortedFrequencies.slice(0, topN).map(([key, frequency]) => ({
+        pattern: JSON.parse(key),
+        frequency: frequency
+    }));
+
+    return topPatterns;
 }
 
-// Self-tests
-function runTests() {
-    console.log("Test 1: Basic functionality");
-    const text1 = "abcabcabc";
-    const result1 = findFrequentPatterns(text1, 3, 2);
-    console.log(result1); // Expected: [{ pattern: 'abc', count: 3 }]
+// Test cases
+console.log("Test Case 1: Simple numeric data");
+const numericData = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4];
+console.log(findMostFrequentPatterns(numericData, 3));
+// Expected output: [{ pattern: 4, frequency: 4 }, { pattern: 3, frequency: 3 }, { pattern: 2, frequency: 2 }]
 
-    console.log("Test 2: Handling overlapping patterns");
-    const text2 = "aaaaaa";
-    const result2 = findFrequentPatterns(text2, 2, 2);
-    console.log(result2); // Expected: [{ pattern: 'aa', count: 5 }]
+console.log("Test Case 2: Text data");
+const textData = ["apple", "banana", "apple", "orange", "banana", "banana"];
+console.log(findMostFrequentPatterns(textData, 2));
+// Expected output: [{ pattern: "banana", frequency: 3 }, { pattern: "apple", frequency: 2 }]
 
-    console.log("Test 3: Multiple patterns with same frequency");
-    const text3 = "abababab";
-    const result3 = findFrequentPatterns(text3, 2, 2);
-    console.log(result3); // Expected: [{ pattern: 'ab', count: 4 }, { pattern: 'ba', count: 3 }]
+console.log("Test Case 3: Mixed data");
+const mixedData = [1, "apple", 1, "banana", "apple", { a: 1 }, { a: 1 }, { b: 2 }, { a: 1 }];
+console.log(findMostFrequentPatterns(mixedData, 3));
+// Expected output: [{ pattern: { a: 1 }, frequency: 3 }, { pattern: 1, frequency: 2 }, { pattern: "apple", frequency: 2 }]
 
-    console.log("Test 4: Edge case - pattern length longer than text");
-    const text4 = "short";
-    const result4 = findFrequentPatterns(text4, 10, 1);
-    console.log(result4); // Expected: []
+console.log("Test Case 4: Edge case - empty data");
+const emptyData = [];
+console.log(findMostFrequentPatterns(emptyData, 3));
+// Expected output: []
 
-    console.log("Test 5: Edge case - empty text");
-    const text5 = "";
-    const result5 = findFrequentPatterns(text5, 2, 1);
-    console.log(result5); // Expected: []
-
-    console.log("Test 6: Edge case - single character text");
-    const text6 = "a";
-    const result6 = findFrequentPatterns(text6, 1, 1);
-    console.log(result6); // Expected: [{ pattern: 'a', count: 1 }]
-}
-
-// Run tests
-runTests();
+console.log("Test Case 5: Edge case - requesting more patterns than available");
+const smallData = [1, 2];
+console.log(findMostFrequentPatterns(smallData, 5));
+// Expected output: [{ pattern: 1, frequency: 1 }, { pattern: 2, frequency: 1 }]
