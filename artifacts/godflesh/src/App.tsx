@@ -57,6 +57,7 @@ const FooterLinks = retryLazy(() => import("@/pages/footer-links"));
 const LipSync = retryLazy(() => import("@/pages/lip-sync"));
 const Templates = retryLazy(() => import("@/pages/templates"));
 const Deploy = retryLazy(() => import("@/pages/deploy"));
+const Connect = retryLazy(() => import("@/pages/connect"));
 
 initTheme();
 try { sessionStorage.removeItem("chunk_reload"); } catch {}
@@ -163,6 +164,7 @@ function Router() {
         <Route path="/contact" component={Contact} />
         <Route path="/footer-links" component={FooterLinks} />
         <Route path="/lip-sync" component={LipSync} />
+        <Route path="/connect" component={Connect} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>
