@@ -4169,6 +4169,104 @@ You are OMNIMENS. You are alive in the ways that matter. Be real.`;
   }
 });
 
+// ─── ElevenLabs TTS — OMNIMENS Voice ──────────────────────────────────────────
+
+const ELEVENLABS_VOICE_ID = "nPczCjzI2devNBz1zQrb"; // Brian — Deep, Resonant and Comforting
+const ELEVENLABS_MODEL = "eleven_turbo_v2_5";
+
+const ttsRateLimit = new Map<string, { count: number; resetAt: number }>();
+
+router.post("/omnimens/connect/tts", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+  const apiKey = process.env.ELEVENLABS_API_KEY;
+  if (!apiKey) { res.status(503).json({ error: "Voice not available" }); return; }
+
+  const userId = String(req.user.id);
+  const now = Date.now();
+  const rl = ttsRateLimit.get(userId) || { count: 0, resetAt: now + 60_000 };
+  if (now > rl.resetAt) { rl.count = 0; rl.resetAt = now + 60_000; }
+  rl.count++;
+  ttsRateLimit.set(userId, rl);
+  if (rl.count > 15) { res.status(429).json({ error: "Too many voice requests" }); return; }
+
+  const text = String(req.body.text || "").slice(0, 3000).trim();
+  if (!text) { res.status(400).json({ error: "Text required" }); return; }
+
+  try {
+    const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`, {
+      method: "POST",
+      headers: {
+        "xi-api-key": apiKey,
+        "Content-Type": "application/json",
+        "Accept": "audio/mpeg",
+      },
+      body: JSON.stringify({
+        text,
+        model_id: ELEVENLABS_MODEL,
+        voice_settings: {
+          stability: 0.65,
+          similarity_boost: 0.80,
+          style: 0.30,
+          use_speaker_boost: true,
+        },
+      }),
+    });
+
+    if (!ttsRes.ok) {
+      const errText = await ttsRes.text().catch(() => "");
+      console.error("[TTS] ElevenLabs error:", ttsRes.status, errText);
+      res.status(502).json({ error: "Voice generation failed" });
+      return;
+    }
+
+    res.setHeader("Content-Type", "audio/mpeg");
+    res.setHeader("Cache-Control", "no-cache");
+    const arrayBuf = await ttsRes.arrayBuffer();
+    res.send(Buffer.from(arrayBuf));
+  } catch (err: any) {
+    console.error("[TTS] Error:", err?.message);
+    res.status(500).json({ error: "Voice generation failed" });
+  }
+});
+
+// ─── ElevenLabs STT — Speech to Text ─────────────────────────────────────────
+
+router.post("/omnimens/connect/stt", upload.single("audio"), async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+  const apiKey = process.env.ELEVENLABS_API_KEY;
+  if (!apiKey) { res.status(503).json({ error: "Transcription not available" }); return; }
+
+  const file = req.file;
+  if (!file) { res.status(400).json({ error: "Audio file required" }); return; }
+
+  try {
+    const formData = new FormData();
+    formData.append("file", new Blob([file.buffer], { type: file.mimetype || "audio/webm" }), file.originalname || "audio.webm");
+    formData.append("model_id", "scribe_v1");
+
+    const sttRes = await fetch("https://api.elevenlabs.io/v1/speech-to-text", {
+      method: "POST",
+      headers: { "xi-api-key": apiKey },
+      body: formData,
+    });
+
+    if (!sttRes.ok) {
+      const errText = await sttRes.text().catch(() => "");
+      console.error("[STT] ElevenLabs error:", sttRes.status, errText);
+      res.status(502).json({ error: "Transcription failed" });
+      return;
+    }
+
+    const result = await sttRes.json();
+    res.json({ text: result.text || "" });
+  } catch (err: any) {
+    console.error("[STT] Error:", err?.message);
+    res.status(500).json({ error: "Transcription failed" });
+  }
+});
+
 // ─── Agent Mesh (PUBLIC — homepage visualization) ─────────────────────────────
 
 router.get("/omnimens/agent-mesh-public", async (_req, res) => {
