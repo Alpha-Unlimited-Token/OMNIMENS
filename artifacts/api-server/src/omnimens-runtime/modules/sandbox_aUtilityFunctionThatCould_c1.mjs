@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-21T06:02:09.798Z
+ * Written: 2026-03-21T06:24:45.023Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,66 +16,86 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function to calculate the moving average of a dataset
-function movingAverage(data, windowSize) {
-    if (!Array.isArray(data) || data.length === 0) {
-        throw new Error("Input data must be a non-empty array.");
-    }
-    if (typeof windowSize !== "number" || windowSize <= 0) {
-        throw new Error("Window size must be a positive integer.");
-    }
-    if (windowSize > data.length) {
-        throw new Error("Window size cannot be larger than the data length.");
+function findMostFrequentPatterns(text, patternLength) {
+    if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
+        throw new Error("Invalid input: text must be a string and patternLength must be a positive number.");
     }
 
-    const result = [];
-    let sum = 0;
+    const patternCounts = new Map();
 
-    for (let i = 0; i < data.length; i++) {
-        sum += data[i];
-        if (i >= windowSize - 1) {
-            result.push(sum / windowSize);
-            sum -= data[i - windowSize + 1];
-        }
+    for (let i = 0; i <= text.length - patternLength; i++) {
+        const pattern = text.slice(i, i + patternLength);
+        patternCounts.set(pattern, (patternCounts.get(pattern) || 0) + 1);
     }
 
-    return result;
+    const maxFrequency = Math.max(...patternCounts.values());
+    const mostFrequentPatterns = Array.from(patternCounts.entries())
+        .filter(([_, count]) => count === maxFrequency)
+        .map(([pattern]) => pattern);
+
+    return {
+        patterns: mostFrequentPatterns,
+        frequency: maxFrequency
+    };
 }
 
 // Test cases
-try {
-    console.log("Test Case 1: Basic functionality");
-    console.log(movingAverage([1, 2, 3, 4, 5], 3)); // Expected: [2, 3, 4]
+function runTests() {
+    console.log("Test 1: Basic functionality");
+    const result1 = findMostFrequentPatterns("abababab", 2);
+    console.log(result1); // { patterns: ['ab', 'ba'], frequency: 4 }
 
-    console.log("Test Case 2: Window size equals data length");
-    console.log(movingAverage([10, 20, 30, 40], 4)); // Expected: [25]
+    console.log("Test 2: Single character patterns");
+    const result2 = findMostFrequentPatterns("aabbcc", 1);
+    console.log(result2); // { patterns: ['a', 'b', 'c'], frequency: 2 }
 
-    console.log("Test Case 3: Window size of 1 (returns original array)");
-    console.log(movingAverage([5, 10, 15, 20], 1)); // Expected: [5, 10, 15, 20]
+    console.log("Test 3: Entire string as pattern");
+    const result3 = findMostFrequentPatterns("abcde", 5);
+    console.log(result3); // { patterns: ['abcde'], frequency: 1 }
 
-    console.log("Test Case 4: Edge case with smallest data and window size");
-    console.log(movingAverage([42], 1)); // Expected: [42]
-
-    console.log("Test Case 5: Error handling - empty array");
+    console.log("Test 4: Edge case with empty string");
     try {
-        console.log(movingAverage([], 3));
+        const result4 = findMostFrequentPatterns("", 2);
+        console.log(result4);
     } catch (e) {
-        console.log(e.message); // Expected: "Input data must be a non-empty array."
+        console.log(e.message); // Error message
     }
 
-    console.log("Test Case 6: Error handling - invalid window size");
+    console.log("Test 5: Pattern length greater than string length");
     try {
-        console.log(movingAverage([1, 2, 3], 0));
+        const result5 = findMostFrequentPatterns("abc", 5);
+        console.log(result5);
     } catch (e) {
-        console.log(e.message); // Expected: "Window size must be a positive integer."
+        console.log(e.message); // Error message
     }
 
-    console.log("Test Case 7: Error handling - window size larger than data length");
+    console.log("Test 6: Non-string input");
     try {
-        console.log(movingAverage([1, 2, 3], 5));
+        const result6 = findMostFrequentPatterns(12345, 2);
+        console.log(result6);
     } catch (e) {
-        console.log(e.message); // Expected: "Window size cannot be larger than the data length."
+        console.log(e.message); // Error message
     }
-} catch (e) {
-    console.log("Unexpected error:", e.message);
+
+    console.log("Test 7: Non-number pattern length");
+    try {
+        const result7 = findMostFrequentPatterns("abcdef", "two");
+        console.log(result7);
+    } catch (e) {
+        console.log(e.message); // Error message
+    }
+
+    console.log("Test 8: Pattern length of 0");
+    try {
+        const result8 = findMostFrequentPatterns("abcdef", 0);
+        console.log(result8);
+    } catch (e) {
+        console.log(e.message); // Error message
+    }
+
+    console.log("Test 9: Pattern length of 1 with repeated characters");
+    const result9 = findMostFrequentPatterns("aaaaa", 1);
+    console.log(result9); // { patterns: ['a'], frequency: 5 }
 }
+
+runTests();
