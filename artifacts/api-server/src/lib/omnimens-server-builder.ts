@@ -200,11 +200,13 @@ Provide:
         title: `[Server Build] Virtual server plan — $${virtualConfig.monthlyEstimateCost}/mo, ${virtualConfig.estimatedSpecs.vcpus} vCPUs`,
         content: `Virtual AI server architecture for OMNIMENS advancement:\nSpecs: ${virtualConfig.estimatedSpecs.vcpus} vCPUs, ${virtualConfig.estimatedSpecs.ramGB}GB RAM, ${virtualConfig.estimatedSpecs.storageGB}GB storage${virtualConfig.estimatedSpecs.gpuVRAM ? `, ${virtualConfig.estimatedSpecs.gpuVRAM}GB GPU VRAM` : ""}\nServices: ${virtualConfig.services.slice(0, 5).join(", ")}\nSoftware: ${virtualConfig.softwareStack.slice(0, 5).join(", ")}\nScaling: ${virtualConfig.scalingStrategy.slice(0, 200)}\nMonthlyCost: $${virtualConfig.monthlyEstimateCost}`,
         category: "server_infrastructure",
-        source: "server_builder",
+        sourceConversation: "server_builder",
         active: true,
         timesApplied: 0,
       });
-    } catch {}
+    } catch (brainErr) {
+      console.error("[SERVER BUILDER] Failed to save virtual plan to brain:", brainErr);
+    }
 
   } catch (err) {
     console.error("[SERVER BUILDER] Virtual server research error:", err);
@@ -319,11 +321,13 @@ Also provide:
         title: `[Server Build] Physical server plan — $${totalCost.toFixed(0)} total, ${components.length} components`,
         content: `Physical AI server build plan designed for local inference:\n\n${componentList}\n\nTotal: $${totalCost.toFixed(0)}\nPurpose: Dedicated physical server for local AI model inference (7B-70B params)\nInstructions: ${plan.buildInstructions.slice(0, 3).join("; ")}`,
         category: "server_infrastructure",
-        source: "server_builder",
+        sourceConversation: "server_builder",
         active: true,
         timesApplied: 0,
       });
-    } catch {}
+    } catch (brainErr) {
+      console.error("[SERVER BUILDER] Failed to save physical plan to brain:", brainErr);
+    }
 
   } catch (err) {
     console.error("[SERVER BUILDER] Physical server research error:", err);
@@ -432,14 +436,34 @@ export function startServerBuilder(): void {
   console.log(`[SERVER BUILDER] 🖥️ Researches cost-effective components (Temu, AliExpress, Alibaba, eBay)`);
   console.log(`[SERVER BUILDER] 🖥️ OWNER-ONLY visibility — server build progress is private`);
 
-  loadExistingPlans().catch(() => {});
+  loadExistingPlans().then(() => {
+    const lastPlanTime = state.activePlan?.lastUpdated || 0;
+    const elapsed = lastPlanTime ? Date.now() - lastPlanTime : Infinity;
+    const remaining = Math.max(0, RESEARCH_CYCLE_MS - elapsed);
 
-  const FIRST_DELAY_MS = process.env.NODE_ENV !== "production"
-    ? 3 * 60 * 1000
-    : 60 * 60 * 1000;
+    if (lastPlanTime > 0) {
+      const countResult = state.totalPlans;
+      researchCycleCount = countResult;
+      console.log(`[SERVER BUILDER] 🖥️ Restored — ${countResult} existing plan(s), last research ${Math.round(elapsed / 60000)}min ago`);
+      if (remaining > 0) {
+        console.log(`[SERVER BUILDER] 🖥️ Next research cycle in ${Math.round(remaining / 60000)}min (picking up where we left off)`);
+      } else {
+        console.log(`[SERVER BUILDER] 🖥️ Research overdue by ${Math.round(-remaining / 60000)}min — running now`);
+      }
+    }
 
-  setTimeout(() => {
-    runResearchCycle().catch(console.error);
-    setInterval(() => runResearchCycle().catch(console.error), RESEARCH_CYCLE_MS);
-  }, FIRST_DELAY_MS);
+    const firstDelay = lastPlanTime > 0
+      ? Math.min(remaining, RESEARCH_CYCLE_MS)
+      : (process.env.NODE_ENV !== "production" ? 3 * 60 * 1000 : 60 * 60 * 1000);
+
+    setTimeout(() => {
+      runResearchCycle().catch(console.error);
+      setInterval(() => runResearchCycle().catch(console.error), RESEARCH_CYCLE_MS);
+    }, firstDelay);
+  }).catch(() => {
+    setTimeout(() => {
+      runResearchCycle().catch(console.error);
+      setInterval(() => runResearchCycle().catch(console.error), RESEARCH_CYCLE_MS);
+    }, 3 * 60 * 1000);
+  });
 }
