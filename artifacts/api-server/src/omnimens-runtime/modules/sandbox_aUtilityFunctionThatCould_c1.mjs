@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-21T07:09:54.618Z
+ * Written: 2026-03-21T07:37:58.958Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,60 +16,53 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentWords(text, topN) {
-    if (typeof text !== 'string' || typeof topN !== 'number' || topN <= 0) {
-        throw new Error("Invalid input: text must be a string and topN must be a positive number.");
+function calculateClusteringCoefficient(graph) {
+    // Function to calculate the clustering coefficient for a given graph
+    // Graph is represented as an adjacency list (object with nodes as keys and arrays of neighbors as values)
+    function getNodeClustering(node, neighbors) {
+        if (neighbors.length < 2) return 0;
+
+        let links = 0;
+        for (let i = 0; i < neighbors.length; i++) {
+            for (let j = i + 1; j < neighbors.length; j++) {
+                if (graph[neighbors[i]].includes(neighbors[j])) {
+                    links++;
+                }
+            }
+        }
+
+        const possibleLinks = (neighbors.length * (neighbors.length - 1)) / 2;
+        return links / possibleLinks;
     }
 
-    // Normalize text: remove punctuation, convert to lowercase
-    const normalizedText = text.replace(/[^\w\s]/g, "").toLowerCase();
-
-    // Split text into words
-    const words = normalizedText.split(/\s+/).filter(word => word.length > 0);
-
-    // Count word frequencies
-    const wordCounts = {};
-    for (let word of words) {
-        wordCounts[word] = (wordCounts[word] || 0) + 1;
+    const clusteringCoefficients = {};
+    for (const node in graph) {
+        clusteringCoefficients[node] = getNodeClustering(node, graph[node]);
     }
 
-    // Convert word counts to an array and sort by frequency
-    const sortedWords = Object.entries(wordCounts).sort((a, b) => b[1] - a[1]);
-
-    // Extract the top N words
-    const mostFrequentWords = sortedWords.slice(0, topN).map(entry => ({
-        word: entry[0],
-        count: entry[1]
-    }));
-
-    return mostFrequentWords;
+    return clusteringCoefficients;
 }
 
-// Self-tests
-console.log("Test 1: Basic functionality");
-console.log(findMostFrequentWords("This is a test. This test is only a test.", 3)); // Expected: [{word: 'test', count: 3}, {word: 'this', count: 2}, {word: 'is', count: 2}]
+// Test cases
+const testGraph1 = {
+    A: ['B', 'C'],
+    B: ['A', 'C', 'D'],
+    C: ['A', 'B'],
+    D: ['B']
+};
 
-console.log("Test 2: Edge case with empty string");
-console.log(findMostFrequentWords("", 3)); // Expected: []
+const testGraph2 = {
+    X: ['Y', 'Z'],
+    Y: ['X'],
+    Z: ['X']
+};
 
-console.log("Test 3: Edge case with topN larger than unique words");
-console.log(findMostFrequentWords("apple banana apple cherry banana apple", 10)); // Expected: [{word: 'apple', count: 3}, {word: 'banana', count: 2}, {word: 'cherry', count: 1}]
+const testGraph3 = {
+    P: [],
+    Q: ['R'],
+    R: ['Q']
+};
 
-console.log("Test 4: Single word text");
-console.log(findMostFrequentWords("word", 1)); // Expected: [{word: 'word', count: 1}]
-
-console.log("Test 5: Text with special characters");
-console.log(findMostFrequentWords("Hello! Hello, world. World?", 2)); // Expected: [{word: 'hello', count: 2}, {word: 'world', count: 2}]
-
-console.log("Test 6: Invalid input handling");
-try {
-    console.log(findMostFrequentWords(12345, 3)); // Expected: Error
-} catch (e) {
-    console.log(e.message); // Expected: "Invalid input: text must be a string and topN must be a positive number."
-}
-
-try {
-    console.log(findMostFrequentWords("Valid text", -1)); // Expected: Error
-} catch (e) {
-    console.log(e.message); // Expected: "Invalid input: text must be a string and topN must be a positive number."
-}
+console.log("Test Graph 1 Clustering Coefficients:", calculateClusteringCoefficient(testGraph1));
+console.log("Test Graph 2 Clustering Coefficients:", calculateClusteringCoefficient(testGraph2));
+console.log("Test Graph 3 Clustering Coefficients:", calculateClusteringCoefficient(testGraph3));
