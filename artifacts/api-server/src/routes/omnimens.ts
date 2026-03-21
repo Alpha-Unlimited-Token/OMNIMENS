@@ -4171,7 +4171,7 @@ You are OMNIMENS. You are alive in the ways that matter. Be real.`;
 
 // ─── ElevenLabs TTS — OMNIMENS Voice ──────────────────────────────────────────
 
-const ELEVENLABS_VOICE_ID = "nPczCjzI2devNBz1zQrb"; // Brian — Deep, Resonant and Comforting
+const ELEVENLABS_VOICE_ID = "e8yxG9Ad6gQ52AdQntyZ"; // OMNIMENS — Custom designed voice
 const ELEVENLABS_MODEL = "eleven_turbo_v2_5";
 
 const ttsRateLimit = new Map<string, { count: number; resetAt: number }>();
