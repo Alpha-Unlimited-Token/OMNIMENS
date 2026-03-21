@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-21T00:27:18.051Z
+ * Written: 2026-03-21T00:56:00.531Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,47 +16,59 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function extractNumbersFromText(input) {
-    // Extracts all numbers (integers and floats) from a given text and returns them as an array of numbers.
-    if (typeof input !== 'string') {
-        throw new Error('Input must be a string');
+function findPatternsInText(text, patterns) {
+    if (typeof text !== 'string' || !Array.isArray(patterns)) {
+        throw new Error("Invalid input: text must be a string and patterns must be an array of strings.");
     }
 
-    const numberPattern = /-?\d+(\.\d+)?/g; // Matches integers and floats, including negative numbers
-    const matches = input.match(numberPattern);
-    return matches ? matches.map(Number) : [];
+    const results = {};
+    patterns.forEach(pattern => {
+        if (typeof pattern !== 'string') {
+            throw new Error("Invalid pattern: all patterns must be strings.");
+        }
+        const regex = new RegExp(pattern, 'g');
+        const matches = text.match(regex);
+        results[pattern] = matches ? matches : [];
+    });
+
+    return results;
 }
 
-// Test cases
+// Self-tests
 function runTests() {
-    console.log("Test Case 1: Basic integers");
-    console.log(extractNumbersFromText("The numbers are 42 and 17.")); // [42, 17]
+    console.log("Running tests...");
 
-    console.log("Test Case 2: Floats and negative numbers");
-    console.log(extractNumbersFromText("Temperature dropped to -3.5 degrees, then rose to 7.8 degrees.")); // [-3.5, 7.8]
+    // Test 1: Basic pattern matching
+    const text1 = "The quick brown fox jumps over the lazy dog.";
+    const patterns1 = ["quick", "fox", "dog"];
+    const result1 = findPatternsInText(text1, patterns1);
+    console.log(result1); // Expected: { quick: ['quick'], fox: ['fox'], dog: ['dog'] }
 
-    console.log("Test Case 3: No numbers");
-    console.log(extractNumbersFromText("No numbers here!")); // []
+    // Test 2: No matches
+    const text2 = "Hello world!";
+    const patterns2 = ["cat", "mouse"];
+    const result2 = findPatternsInText(text2, patterns2);
+    console.log(result2); // Expected: { cat: [], mouse: [] }
 
-    console.log("Test Case 4: Mixed content");
-    console.log(extractNumbersFromText("Pi is approximately 3.14159, and e is 2.718.")); // [3.14159, 2.718]
+    // Test 3: Multiple occurrences
+    const text3 = "abababab";
+    const patterns3 = ["ab"];
+    const result3 = findPatternsInText(text3, patterns3);
+    console.log(result3); // Expected: { ab: ['ab', 'ab', 'ab', 'ab'] }
 
-    console.log("Test Case 5: Edge case with only numbers");
-    console.log(extractNumbersFromText("123 -456 78.9")); // [123, -456, 78.9]
+    // Test 4: Edge case with empty text
+    const text4 = "";
+    const patterns4 = ["anything"];
+    const result4 = findPatternsInText(text4, patterns4);
+    console.log(result4); // Expected: { anything: [] }
 
-    console.log("Test Case 6: Empty string");
-    console.log(extractNumbersFromText("")); // []
+    // Test 5: Edge case with empty patterns
+    const text5 = "Some text here.";
+    const patterns5 = [];
+    const result5 = findPatternsInText(text5, patterns5);
+    console.log(result5); // Expected: {}
 
-    console.log("Test Case 7: Invalid input (non-string)");
-    try {
-        console.log(extractNumbersFromText(12345));
-    } catch (e) {
-        console.log(e.message); // "Input must be a string"
-    }
-
-    console.log("Test Case 8: Numbers with leading/trailing text");
-    console.log(extractNumbersFromText("abc123def -456ghi 78.9xyz")); // [123, -456, 78.9]
+    console.log("All tests completed.");
 }
 
-// Run tests
 runTests();
