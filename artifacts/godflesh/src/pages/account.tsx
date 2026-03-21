@@ -435,9 +435,6 @@ export default function Account() {
 
   if (isLoading || !isAuthenticated) return <div className="flex-1" />;
 
-  const activePatches = patches.filter(p => p.active);
-  const inactivePatches = patches.filter(p => !p.active);
-
   const SETTINGS_TABS: { id: SettingsTab; label: string; icon: React.ReactNode }[] = [
     { id: "profile", label: "Profile", icon: <User className="w-4 h-4" /> },
     { id: "billing", label: "Billing & Usage", icon: <Wallet className="w-4 h-4" /> },
@@ -1307,22 +1304,12 @@ export default function Account() {
             ) : (
               <div>
                 <p className="text-xs text-[#9DA5B4] mb-3">
-                  These are behavioral modifications OMNIMENS wrote and applied to itself. They are injected into every conversation automatically.
+                  These are behavioral modifications OMNIMENS wrote and applied to itself. They are injected into every conversation automatically. Every upgrade is permanent — knowledge is never discarded.
                 </p>
                 <div className="max-h-[500px] overflow-y-auto space-y-2 pr-1" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.15) transparent" }}>
-                {activePatches.map(p => (
+                {patches.map(p => (
                   <PatchCard key={p.id} patch={p} onDeactivate={handleDeactivate} />
                 ))}
-                {inactivePatches.length > 0 && (
-                  <>
-                    <div className="text-xs text-[#9DA5B4] mt-4 mb-2 border-t border-[#2B3245] pt-4">
-                      DEACTIVATED ({inactivePatches.length})
-                    </div>
-                    {inactivePatches.map(p => (
-                      <PatchCard key={p.id} patch={p} onDeactivate={handleDeactivate} />
-                    ))}
-                  </>
-                )}
                 </div>
               </div>
             )}

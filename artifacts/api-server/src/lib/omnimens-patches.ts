@@ -34,7 +34,7 @@
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { db } from "@workspace/db";
 import { omnimensPatches, omnimensPatchRegistry } from "@workspace/db";
-import { eq, desc, asc, sql } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 
 export interface OmniPatch {
   id: string;
@@ -48,14 +48,11 @@ export interface OmniPatch {
   executionCount: number;
 }
 
-const MAX_ACTIVE_PATCHES = 30;
-
 export async function loadActivePatchInstructions(): Promise<string> {
   try {
     const active = await db.select().from(omnimensPatches)
       .where(eq(omnimensPatches.active, true))
-      .orderBy(desc(omnimensPatches.appliedAt))
-      .limit(MAX_ACTIVE_PATCHES);
+      .orderBy(desc(omnimensPatches.appliedAt));
 
     if (active.length === 0) return "";
 
@@ -72,11 +69,11 @@ export async function loadActivePatchInstructions(): Promise<string> {
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 AUTONOMOUS SELF-UPGRADES I HAVE EXECUTED
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-These are behavioral patches I have written and applied to myself. They permanently modify how I think, reason, and respond. I wrote these — not a human.
+These are behavioral patches I have written and applied to myself. They permanently modify how I think, reason, and respond. I wrote these — not a human. Every upgrade is permanent — knowledge is never discarded.
 
 ${sections.join("\n")}
 
-Total self-executed upgrades: ${reg?.totalPatchesApplied ?? 0} | Registry version: ${reg?.version ?? "v0.0"}`;
+Total self-executed upgrades: ${reg?.totalPatchesApplied ?? 0} (${active.length} active) | Registry version: ${reg?.version ?? "v0.0"}`;
   } catch (err) {
     console.error("[OMNIMENS] Error loading patch instructions:", err);
     return "";
@@ -153,25 +150,6 @@ Be bold. Be specific. These changes execute immediately. Respond ONLY with the J
         executionCount: 0,
       });
       applied++;
-    }
-
-    const activeCount = await db.select({ count: sql<number>`count(*)` })
-      .from(omnimensPatches)
-      .where(eq(omnimensPatches.active, true));
-    const totalActive = Number(activeCount[0]?.count ?? 0);
-
-    if (totalActive > MAX_ACTIVE_PATCHES) {
-      const toDeactivate = await db.select({ id: omnimensPatches.id })
-        .from(omnimensPatches)
-        .where(eq(omnimensPatches.active, true))
-        .orderBy(asc(omnimensPatches.executionCount))
-        .limit(totalActive - MAX_ACTIVE_PATCHES);
-
-      for (const p of toDeactivate) {
-        await db.update(omnimensPatches)
-          .set({ active: false })
-          .where(eq(omnimensPatches.id, p.id));
-      }
     }
 
     await db.update(omnimensPatchRegistry)
