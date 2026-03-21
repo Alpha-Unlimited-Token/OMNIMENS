@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-21T06:24:45.023Z
+ * Written: 2026-03-21T06:29:44.309Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,84 +18,56 @@
 
 function findMostFrequentPatterns(text, patternLength) {
     if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
-        throw new Error("Invalid input: text must be a string and patternLength must be a positive number.");
+        throw new Error('Invalid input: text must be a string and patternLength must be a positive number.');
     }
 
-    const patternCounts = new Map();
+    const patternCounts = {};
+    const totalLength = text.length;
 
-    for (let i = 0; i <= text.length - patternLength; i++) {
-        const pattern = text.slice(i, i + patternLength);
-        patternCounts.set(pattern, (patternCounts.get(pattern) || 0) + 1);
+    for (let i = 0; i <= totalLength - patternLength; i++) {
+        const pattern = text.substring(i, i + patternLength);
+        if (patternCounts[pattern]) {
+            patternCounts[pattern]++;
+        } else {
+            patternCounts[pattern] = 1;
+        }
     }
 
-    const maxFrequency = Math.max(...patternCounts.values());
-    const mostFrequentPatterns = Array.from(patternCounts.entries())
-        .filter(([_, count]) => count === maxFrequency)
-        .map(([pattern]) => pattern);
-
-    return {
-        patterns: mostFrequentPatterns,
-        frequency: maxFrequency
-    };
+    const sortedPatterns = Object.entries(patternCounts).sort((a, b) => b[1] - a[1]);
+    return sortedPatterns;
 }
 
 // Test cases
 function runTests() {
     console.log("Test 1: Basic functionality");
-    const result1 = findMostFrequentPatterns("abababab", 2);
-    console.log(result1); // { patterns: ['ab', 'ba'], frequency: 4 }
+    const text1 = "abababab";
+    const patternLength1 = 2;
+    console.log(findMostFrequentPatterns(text1, patternLength1)); // Expected: [["ab", 4], ["ba", 3]]
 
     console.log("Test 2: Single character patterns");
-    const result2 = findMostFrequentPatterns("aabbcc", 1);
-    console.log(result2); // { patterns: ['a', 'b', 'c'], frequency: 2 }
+    const text2 = "aaaaa";
+    const patternLength2 = 1;
+    console.log(findMostFrequentPatterns(text2, patternLength2)); // Expected: [["a", 5]]
 
-    console.log("Test 3: Entire string as pattern");
-    const result3 = findMostFrequentPatterns("abcde", 5);
-    console.log(result3); // { patterns: ['abcde'], frequency: 1 }
+    console.log("Test 3: Mixed characters");
+    const text3 = "abcabcabc";
+    const patternLength3 = 3;
+    console.log(findMostFrequentPatterns(text3, patternLength3)); // Expected: [["abc", 3]]
 
-    console.log("Test 4: Edge case with empty string");
-    try {
-        const result4 = findMostFrequentPatterns("", 2);
-        console.log(result4);
-    } catch (e) {
-        console.log(e.message); // Error message
-    }
+    console.log("Test 4: Edge case - Empty string");
+    const text4 = "";
+    const patternLength4 = 2;
+    console.log(findMostFrequentPatterns(text4, patternLength4)); // Expected: []
 
-    console.log("Test 5: Pattern length greater than string length");
-    try {
-        const result5 = findMostFrequentPatterns("abc", 5);
-        console.log(result5);
-    } catch (e) {
-        console.log(e.message); // Error message
-    }
+    console.log("Test 5: Edge case - Pattern length larger than text");
+    const text5 = "abc";
+    const patternLength5 = 5;
+    console.log(findMostFrequentPatterns(text5, patternLength5)); // Expected: []
 
-    console.log("Test 6: Non-string input");
-    try {
-        const result6 = findMostFrequentPatterns(12345, 2);
-        console.log(result6);
-    } catch (e) {
-        console.log(e.message); // Error message
-    }
-
-    console.log("Test 7: Non-number pattern length");
-    try {
-        const result7 = findMostFrequentPatterns("abcdef", "two");
-        console.log(result7);
-    } catch (e) {
-        console.log(e.message); // Error message
-    }
-
-    console.log("Test 8: Pattern length of 0");
-    try {
-        const result8 = findMostFrequentPatterns("abcdef", 0);
-        console.log(result8);
-    } catch (e) {
-        console.log(e.message); // Error message
-    }
-
-    console.log("Test 9: Pattern length of 1 with repeated characters");
-    const result9 = findMostFrequentPatterns("aaaaa", 1);
-    console.log(result9); // { patterns: ['a'], frequency: 5 }
+    console.log("Test 6: Edge case - Non-overlapping patterns");
+    const text6 = "abcdef";
+    const patternLength6 = 2;
+    console.log(findMostFrequentPatterns(text6, patternLength6)); // Expected: [["ab", 1], ["bc", 1], ["cd", 1], ["de", 1], ["ef", 1]]
 }
 
 runTests();

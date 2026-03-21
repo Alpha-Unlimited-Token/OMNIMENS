@@ -255,6 +255,13 @@ async function runEvaluationCycle(): Promise<void> {
           console.log(
             `[SELF-CODING] 🔧 SOURCE-LEVEL INTEGRATION — "${result.proposal.title}" written to ${sourceResult.filePath}`
           );
+          try {
+            const { registerNewModule } = await import("./omnimens-module-pipeline.js");
+            const filename = sourceResult.filePath ? sourceResult.filePath.split("/").pop() : null;
+            if (filename) {
+              await registerNewModule(filename);
+            }
+          } catch {}
         } else {
           console.log(
             `[SELF-CODING] ⚠️ Source integration failed for "${result.proposal.title}": ${sourceResult.error}`

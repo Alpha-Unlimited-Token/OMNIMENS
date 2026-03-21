@@ -25,6 +25,7 @@ import { db } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { desc, eq, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { runFullPipeline } from "./omnimens-module-pipeline.js";
 
 let orchestrationCount = 0;
 let totalStepsExecuted = 0;
@@ -772,6 +773,30 @@ export async function orchestrateReasoning(
   const engineTimeout = new Promise<void>(resolve => setTimeout(resolve, ORCHESTRATION_BUDGET_MS));
   await Promise.race([Promise.allSettled(engineQueries), engineTimeout]);
   totalStepsExecuted += engineQueries.length;
+
+  // ── LIVE MODULE PIPELINE — self-authored modules process the query ──────────
+  try {
+    const pipelineStart = Date.now();
+    emitStatus("Running self-authored module pipeline...");
+    const pipelineResult = await runFullPipeline(message, {
+      history,
+      confidence: 0.5,
+    });
+    if (pipelineResult.pipelineContext && pipelineResult.modulesUsed.length > 0) {
+      gatheredIntelligence.modulePipeline = pipelineResult.pipelineContext;
+      enginesConsulted.push("MODULE_PIPELINE");
+      reasoningChain.push({
+        id: ++stepId,
+        type: "query_brain",
+        description: `Live module pipeline: ${pipelineResult.modulesUsed.length} self-authored modules executed across ${pipelineResult.stagesRun.length} stages`,
+        result: `Stages: ${pipelineResult.stagesRun.join(", ")} | Modules: ${pipelineResult.modulesUsed.slice(0, 5).join(", ")}`,
+        confidence: 0.75,
+        durationMs: Date.now() - pipelineStart,
+      });
+    }
+  } catch (err) {
+    console.error("[ORCHESTRATOR] Module pipeline error (non-fatal):", err);
+  }
 
   emitStatus("Synthesizing reasoning...");
   const synthStart = Date.now();

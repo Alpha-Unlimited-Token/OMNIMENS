@@ -387,6 +387,13 @@ export async function runEvolutionCycle(): Promise<void> {
         if (sourceResult.success) {
           incrementSelfImprovements();
           console.log(`[OMNIMENS EVOLUTION] 🔧 SOURCE-LEVEL INTEGRATION — ${need.name} written to ${sourceResult.filePath}`);
+          try {
+            const { registerNewModule } = await import("./omnimens-module-pipeline.js");
+            const filename = sourceResult.filePath ? sourceResult.filePath.split("/").pop() : null;
+            if (filename) {
+              await registerNewModule(filename);
+            }
+          } catch {}
         }
 
         await db.insert(omnimensGeneratedModules).values({

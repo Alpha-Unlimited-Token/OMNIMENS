@@ -1,0 +1,2422 @@
+{
+  "modules": {
+    "adaptiveComputeAllocator_gen1.mjs": {
+      "filename": "adaptiveComputeAllocator_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "AdaptiveComputeAllocator"
+      ],
+      "loadedAt": 1774075376080,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adaptiveOrchestrationLayer_gen1.mjs": {
+      "filename": "adaptiveOrchestrationLayer_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "adaptiveOrchestrationLayer"
+      ],
+      "loadedAt": 1774075376080,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adaptiveResourceManager_gen1.mjs": {
+      "filename": "adaptiveResourceManager_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "AdaptiveResourceManager"
+      ],
+      "loadedAt": 1774075376080,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adversarialCounterfactualGenerator_gen1.mjs": {
+      "filename": "adversarialCounterfactualGenerator_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "AdversarialCounterfactualGenerator"
+      ],
+      "loadedAt": 1774075376081,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adversarialEdgeCaseTester_gen1.mjs": {
+      "filename": "adversarialEdgeCaseTester_gen1.mjs",
+      "stage": "adversarial_testing",
+      "exports": [
+        "simulateAdversarialCases"
+      ],
+      "loadedAt": 1774075376081,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "adversarialModuleTester_gen1.mjs": {
+      "filename": "adversarialModuleTester_gen1.mjs",
+      "stage": "adversarial_testing",
+      "exports": [
+        "AdversarialModuleTester"
+      ],
+      "loadedAt": 1774075376082,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adversarialSelfTest_gen1.mjs": {
+      "filename": "adversarialSelfTest_gen1.mjs",
+      "stage": "adversarial_testing",
+      "exports": [
+        "AdversarialSelfTest"
+      ],
+      "loadedAt": 1774075376082,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adversarialStressTesting_gen1.mjs": {
+      "filename": "adversarialStressTesting_gen1.mjs",
+      "stage": "adversarial_testing",
+      "exports": [
+        "adversarialStressTesting"
+      ],
+      "loadedAt": 1774075376082,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adversarialTestingFramework_gen1.mjs": {
+      "filename": "adversarialTestingFramework_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "adversarialTest"
+      ],
+      "loadedAt": 1774075376082,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adversarialTestingModule_gen1.mjs": {
+      "filename": "adversarialTestingModule_gen1.mjs",
+      "stage": "adversarial_testing",
+      "exports": [
+        "AdversarialTestingModule"
+      ],
+      "loadedAt": 1774075376083,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adversarialTesting_gen1.mjs": {
+      "filename": "adversarialTesting_gen1.mjs",
+      "stage": "adversarial_testing",
+      "exports": [
+        "AdversarialTesting"
+      ],
+      "loadedAt": 1774075376083,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adversarialToolTester_gen1.mjs": {
+      "filename": "adversarialToolTester_gen1.mjs",
+      "stage": "adversarial_testing",
+      "exports": [
+        "AdversarialToolTester"
+      ],
+      "loadedAt": 1774075376083,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "alphaEvolve_gen1.mjs": {
+      "filename": "alphaEvolve_gen1.mjs",
+      "stage": "utility",
+      "exports": [
+        "AlphaEvolve"
+      ],
+      "loadedAt": 1774075376084,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "bayesianCalibrationModule_gen1.mjs": {
+      "filename": "bayesianCalibrationModule_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "bayesianCalibrationModule"
+      ],
+      "loadedAt": 1774075376084,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "bayesianConfidenceCalibrator_gen1.mjs": {
+      "filename": "bayesianConfidenceCalibrator_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "BayesianConfidenceCalibrator"
+      ],
+      "loadedAt": 1774075376084,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "bayesianConfidenceEvaluator_gen1.mjs": {
+      "filename": "bayesianConfidenceEvaluator_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "BayesianConfidenceEvaluator"
+      ],
+      "loadedAt": 1774075376084,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "bayesianConfidenceModule_gen1.mjs": {
+      "filename": "bayesianConfidenceModule_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "BayesianConfidenceModule",
+        "bayesianConfidence"
+      ],
+      "loadedAt": 1774075376085,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "bayesianEvaluator_gen1.mjs": {
+      "filename": "bayesianEvaluator_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "BayesianEvaluator"
+      ],
+      "loadedAt": 1774075376085,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "bayesianInferenceModule_gen1.mjs": {
+      "filename": "bayesianInferenceModule_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "bayesianInferenceModule"
+      ],
+      "loadedAt": 1774075376085,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "coalaMemoryModule_gen1.mjs": {
+      "filename": "coalaMemoryModule_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "CoALAMemory",
+        "coalaMemory"
+      ],
+      "loadedAt": 1774075376086,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "confidenceWeightedSynthesis_gen1.mjs": {
+      "filename": "confidenceWeightedSynthesis_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "confidenceWeightedSynthesis"
+      ],
+      "loadedAt": 1774075376086,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "contextCompression_gen1.mjs": {
+      "filename": "contextCompression_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "compressContext",
+        "encodeTextToEmbedding",
+        "compareTextSimilarity"
+      ],
+      "loadedAt": 1774075376086,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "contextCompressor_gen1.mjs": {
+      "filename": "contextCompressor_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateEmbedding"
+      ],
+      "loadedAt": 1774075376087,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "contextPreservationSummarizer_gen1.mjs": {
+      "filename": "contextPreservationSummarizer_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateHierarchicalSummary",
+        "encodeSummaryToVector",
+        "compressConversationHistory",
+        "retrieveRelevantVector"
+      ],
+      "loadedAt": 1774075376087,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "contextSummarizationManager_gen1.mjs": {
+      "filename": "contextSummarizationManager_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "summarizeText",
+        "computeSimilarity",
+        "retrieveRelevantChunk",
+        "manageContext"
+      ],
+      "loadedAt": 1774075376087,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "conversationContextCompressor_gen1.mjs": {
+      "filename": "conversationContextCompressor_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "compressConversationHistory"
+      ],
+      "loadedAt": 1774075376088,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "conversationSummarizer_gen1.mjs": {
+      "filename": "conversationSummarizer_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "summarizeConversation",
+        "summarizeRawInput"
+      ],
+      "loadedAt": 1774075376088,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "counterfactualAnalysis_gen1.mjs": {
+      "filename": "counterfactualAnalysis_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "counterfactualAnalysis"
+      ],
+      "loadedAt": 1774075376089,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "counterfactualReasoning_gen1.mjs": {
+      "filename": "counterfactualReasoning_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "generateCounterfactuals"
+      ],
+      "loadedAt": 1774075376089,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "counterfactualSimulation_gen1.mjs": {
+      "filename": "counterfactualSimulation_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "CounterfactualSimulation"
+      ],
+      "loadedAt": 1774075376089,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "daydreamarchitecturedesign1.mjs": {
+      "filename": "daydreamarchitecturedesign1.mjs",
+      "stage": "causal_analysis",
+      "exports": [
+        "propagate",
+        "counterfactual"
+      ],
+      "loadedAt": 1774075376090,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "daydreamarchitecturedesign61.mjs": {
+      "filename": "daydreamarchitecturedesign61.mjs",
+      "stage": "causal_analysis",
+      "exports": [
+        "CausalMultiverse"
+      ],
+      "loadedAt": 1774075376091,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "daydreamarchitecturedesign77.mjs": {
+      "filename": "daydreamarchitecturedesign77.mjs",
+      "stage": "causal_analysis",
+      "exports": [
+        "predictIntervention"
+      ],
+      "loadedAt": 1774075376092,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "daydreamdivergentthinking1.mjs": {
+      "filename": "daydreamdivergentthinking1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "choirAttention"
+      ],
+      "loadedAt": 1774075376092,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "daydreamdivergentthinking1TheWildIdeaCosmicresonanceAiTreatE.mjs": {
+      "filename": "daydreamdivergentthinking1TheWildIdeaCosmicresonanceAiTreatE.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "resonanceRetrieve"
+      ],
+      "loadedAt": 1774075376093,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "daydreamdivergentthinking48.mjs": {
+      "filename": "daydreamdivergentthinking48.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "step",
+        "injectStimulus",
+        "dissonance"
+      ],
+      "loadedAt": 1774075376093,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "daydreamdivergentthinking72.mjs": {
+      "filename": "daydreamdivergentthinking72.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "propagate"
+      ],
+      "loadedAt": 1774075376094,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "daydreamparadigmbreaking63.mjs": {
+      "filename": "daydreamparadigmbreaking63.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "resonateField"
+      ],
+      "loadedAt": 1774075376095,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "dualLayerMetacognition_gen1.mjs": {
+      "filename": "dualLayerMetacognition_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "DualLayerMetacognition"
+      ],
+      "loadedAt": 1774075376095,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicAgentOrchestrator_gen1.mjs": {
+      "filename": "dynamicAgentOrchestrator_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "DynamicAgentOrchestrator"
+      ],
+      "loadedAt": 1774075376096,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicAutonomyManager_gen1.mjs": {
+      "filename": "dynamicAutonomyManager_gen1.mjs",
+      "stage": "utility",
+      "exports": [
+        "DynamicAutonomyManager"
+      ],
+      "loadedAt": 1774075376096,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicConfidenceCalibration_gen1.mjs": {
+      "filename": "dynamicConfidenceCalibration_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "dynamicConfidenceCalibration"
+      ],
+      "loadedAt": 1774075376096,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicContextManager_gen1.mjs": {
+      "filename": "dynamicContextManager_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "summarizeContext",
+        "updateContext",
+        "retrieveRelevantTokens",
+        "clearContext"
+      ],
+      "loadedAt": 1774075376097,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicEmbeddingStore_gen1.mjs": {
+      "filename": "dynamicEmbeddingStore_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "createHNSWGraph",
+        "testModule"
+      ],
+      "loadedAt": 1774075376097,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicEventOrchestration_gen1.mjs": {
+      "filename": "dynamicEventOrchestration_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "EventOrchestrator"
+      ],
+      "loadedAt": 1774075376097,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicInsightIntegrator_gen1.mjs": {
+      "filename": "dynamicInsightIntegrator_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "dynamicInsightIntegrator"
+      ],
+      "loadedAt": 1774075376098,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicKnowledgeGraphUpdater_gen1.mjs": {
+      "filename": "dynamicKnowledgeGraphUpdater_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "KnowledgeGraphUpdater"
+      ],
+      "loadedAt": 1774075376098,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "dynamicKnowledgeGraph_gen1.mjs": {
+      "filename": "dynamicKnowledgeGraph_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "DynamicKnowledgeGraph"
+      ],
+      "loadedAt": 1774075376099,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicMemoryCache_gen1.mjs": {
+      "filename": "dynamicMemoryCache_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "createDynamicMemoryCache",
+        "serializeCache",
+        "deserializeCache"
+      ],
+      "loadedAt": 1774075376100,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicMemoryGraph_gen1.mjs": {
+      "filename": "dynamicMemoryGraph_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "dynamicMemoryGraph",
+        "queryMemoryGraph"
+      ],
+      "loadedAt": 1774075376100,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "dynamicModuleOrchestration_gen1.mjs": {
+      "filename": "dynamicModuleOrchestration_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "DynamicModuleOrchestration",
+        "hierarchicalController"
+      ],
+      "loadedAt": 1774075376102,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicOrchestrationLayer_gen1.mjs": {
+      "filename": "dynamicOrchestrationLayer_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "DynamicOrchestrationLayer"
+      ],
+      "loadedAt": 1774075376102,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicReasoningManager_gen1.mjs": {
+      "filename": "dynamicReasoningManager_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "DynamicReasoningManager"
+      ],
+      "loadedAt": 1774075376103,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicResourceAllocator_gen1.mjs": {
+      "filename": "dynamicResourceAllocator_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "allocateResources"
+      ],
+      "loadedAt": 1774075376103,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicRoleAllocation_gen1.mjs": {
+      "filename": "dynamicRoleAllocation_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "dynamicRoleAllocation"
+      ],
+      "loadedAt": 1774075376103,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicRoleAllocator_gen1.mjs": {
+      "filename": "dynamicRoleAllocator_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "DynamicRoleAllocator"
+      ],
+      "loadedAt": 1774075376103,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicRoleOrchestration_gen1.mjs": {
+      "filename": "dynamicRoleOrchestration_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "orchestrateRoles"
+      ],
+      "loadedAt": 1774075376104,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicTaskOrchestrator_gen1.mjs": {
+      "filename": "dynamicTaskOrchestrator_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "DynamicTaskOrchestrator"
+      ],
+      "loadedAt": 1774075376104,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicVectorSearch_gen1.mjs": {
+      "filename": "dynamicVectorSearch_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "createGraph"
+      ],
+      "loadedAt": 1774075376104,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "embeddingCache_gen1.mjs": {
+      "filename": "embeddingCache_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "cosineSimilarity",
+        "EmbeddingCache"
+      ],
+      "loadedAt": 1774075376105,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "embeddingMemoryManager_gen1.mjs": {
+      "filename": "embeddingMemoryManager_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "createEmbeddingMemoryManager",
+        "computeCosineSimilarity"
+      ],
+      "loadedAt": 1774075376105,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "embeddingSearchCache_gen1.mjs": {
+      "filename": "embeddingSearchCache_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "EmbeddingSearchCache"
+      ],
+      "loadedAt": 1774075376106,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "entropyBasedConfidenceScoring_gen1.mjs": {
+      "filename": "entropyBasedConfidenceScoring_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "calculateEntropy",
+        "dynamicConfidenceAdjustment"
+      ],
+      "loadedAt": 1774075376106,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "entropyConsistencyScorer_gen1.mjs": {
+      "filename": "entropyConsistencyScorer_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "calculateEntropy",
+        "scoreReasoningChain"
+      ],
+      "loadedAt": 1774075376106,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "entropyScoringMechanism_gen1.mjs": {
+      "filename": "entropyScoringMechanism_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "entropyScoringMechanism"
+      ],
+      "loadedAt": 1774075376107,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "entropyScoringModule_gen1.mjs": {
+      "filename": "entropyScoringModule_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "entropyScoringModule"
+      ],
+      "loadedAt": 1774075376107,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "entropyScoringSystem_gen1.mjs": {
+      "filename": "entropyScoringSystem_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "EntropyScoringSystem"
+      ],
+      "loadedAt": 1774075376107,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "entropyScoring_gen1.mjs": {
+      "filename": "entropyScoring_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "entropyScoring"
+      ],
+      "loadedAt": 1774075376107,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "entropySelfConsistencyScorer_gen1.mjs": {
+      "filename": "entropySelfConsistencyScorer_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "calculateEntropy",
+        "selfConsistencyScorer",
+        "calibrateConfidence"
+      ],
+      "loadedAt": 1774075376108,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "entropySelfConsistencyScoring_gen1.mjs": {
+      "filename": "entropySelfConsistencyScoring_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "EntropyScoring"
+      ],
+      "loadedAt": 1774075376108,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "entropySelfConsistency_gen1.mjs": {
+      "filename": "entropySelfConsistency_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "entropySelfConsistency"
+      ],
+      "loadedAt": 1774075376108,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "eventDrivenCoordinator_gen1.mjs": {
+      "filename": "eventDrivenCoordinator_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "EventDrivenCoordinator"
+      ],
+      "loadedAt": 1774075376108,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "eventDrivenOrchestration_gen1.mjs": {
+      "filename": "eventDrivenOrchestration_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "EventDrivenOrchestration"
+      ],
+      "loadedAt": 1774075376109,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "eventDrivenPubSubLayer_gen1.mjs": {
+      "filename": "eventDrivenPubSubLayer_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "PubSubCoordinator",
+        "pubSubLayer"
+      ],
+      "loadedAt": 1774075376109,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "eventDrivenPubSub_gen1.mjs": {
+      "filename": "eventDrivenPubSub_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "EventDrivenPubSub"
+      ],
+      "loadedAt": 1774075376109,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "eventPubSubCoordinator_gen1.mjs": {
+      "filename": "eventPubSubCoordinator_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "EventPubSub"
+      ],
+      "loadedAt": 1774075376110,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen1.mjs": {
+      "filename": "evolution_marker_gen1.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1774075376110,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "faultInjectionTesting_gen1.mjs": {
+      "filename": "faultInjectionTesting_gen1.mjs",
+      "stage": "adversarial_testing",
+      "exports": [
+        "simulateFaultInjection"
+      ],
+      "loadedAt": 1774075376110,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "formalReasoningVerifier_gen1.mjs": {
+      "filename": "formalReasoningVerifier_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "FormalReasoningVerifier"
+      ],
+      "loadedAt": 1774075376111,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "formalVerificationModule_gen1.mjs": {
+      "filename": "formalVerificationModule_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "verifySelfModification"
+      ],
+      "loadedAt": 1774075376111,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "freeMadAdversarialDebate_gen1.mjs": {
+      "filename": "freeMadAdversarialDebate_gen1.mjs",
+      "stage": "adversarial_testing",
+      "exports": [
+        "FreeMadAdversarialDebate"
+      ],
+      "loadedAt": 1774075376111,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuAcceleratedMath_gen1.mjs": {
+      "filename": "gpuAcceleratedMath_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "gpuMatrixMultiply",
+        "gpuMatrixAdd",
+        "gpuMatrixSubtract",
+        "gpuMatrixElementWiseMultiply"
+      ],
+      "loadedAt": 1774075376112,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuAcceleratedMatrixOps_gen1.mjs": {
+      "filename": "gpuAcceleratedMatrixOps_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "gpuMatrixMultiply",
+        "gpuMatrixAdd",
+        "gpuMatrixTranspose",
+        "clearGpuMemory"
+      ],
+      "loadedAt": 1774075376113,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "gpuAcceleratedOps_gen1.mjs": {
+      "filename": "gpuAcceleratedOps_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "gpuMatrixMultiply",
+        "gpuNeuralInference",
+        "isGpuAcceleratedEnvAvailable"
+      ],
+      "loadedAt": 1774075376114,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuEmulation_gen1.mjs": {
+      "filename": "gpuEmulation_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "initializeWebGLContext",
+        "compileShader",
+        "createProgram",
+        "gpuMatrixMultiply",
+        "validateMatrixDimensions"
+      ],
+      "loadedAt": 1774075376114,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuMatrixOpsWasm_gen1.mjs": {
+      "filename": "gpuMatrixOpsWasm_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "initializeWasm",
+        "matrixAdd",
+        "matrixMultiply",
+        "validateMatrixDimensions",
+        "generateRandomMatrix",
+        "transposeMatrix"
+      ],
+      "loadedAt": 1774075376115,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuMatrixOps_gen1.mjs": {
+      "filename": "gpuMatrixOps_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "matrixMultiply",
+        "transposeMatrix",
+        "addMatrices",
+        "multiplyMatricesElementWise",
+        "validateMatrixDimensions"
+      ],
+      "loadedAt": 1774075376115,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuSimulationModule_gen1.mjs": {
+      "filename": "gpuSimulationModule_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "initializeWasm",
+        "multiplyMatrices",
+        "dotProduct",
+        "transposeMatrix"
+      ],
+      "loadedAt": 1774075376115,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "graphEntitySynthesizer_gen1.mjs": {
+      "filename": "graphEntitySynthesizer_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "GraphEntitySynthesizer"
+      ],
+      "loadedAt": 1774075376116,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "graphRAGReasoning_gen1.mjs": {
+      "filename": "graphRAGReasoning_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "GraphRAGReasoner"
+      ],
+      "loadedAt": 1774075376116,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "graphRagIntegration_gen1.mjs": {
+      "filename": "graphRagIntegration_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "integrateMultiAgentOutputs"
+      ],
+      "loadedAt": 1774075376118,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "graphRagKnowledgeGraph_gen1.mjs": {
+      "filename": "graphRagKnowledgeGraph_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "GraphRAG"
+      ],
+      "loadedAt": 1774075376120,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "graphRagLayer_gen1.mjs": {
+      "filename": "graphRagLayer_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "GraphRAG"
+      ],
+      "loadedAt": 1774075376120,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "graphRagMemory_gen1.mjs": {
+      "filename": "graphRagMemory_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "GraphRAGMemory"
+      ],
+      "loadedAt": 1774075376120,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "graphRagSynthesizer_gen1.mjs": {
+      "filename": "graphRagSynthesizer_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "GraphRAGSynthesizer"
+      ],
+      "loadedAt": 1774075376121,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "hierarchicalAgentOrchestration_gen1.mjs": {
+      "filename": "hierarchicalAgentOrchestration_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "hierarchicalAgentOrchestration"
+      ],
+      "loadedAt": 1774075376123,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "hierarchicalCoordinationSystem_gen1.mjs": {
+      "filename": "hierarchicalCoordinationSystem_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "HierarchicalCoordinationSystem"
+      ],
+      "loadedAt": 1774075376123,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "hierarchicalEventOrchestration_gen1.mjs": {
+      "filename": "hierarchicalEventOrchestration_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "EventOrchestrator"
+      ],
+      "loadedAt": 1774075376124,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "hierarchicalMemoryManager_gen1.mjs": {
+      "filename": "hierarchicalMemoryManager_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "summarizeText",
+        "chunkText",
+        "calculateEmbedding",
+        "findMostSimilarChunk",
+        "hierarchicalMemoryManager"
+      ],
+      "loadedAt": 1774075376124,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "hierarchicalMemory_gen1.mjs": {
+      "filename": "hierarchicalMemory_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "summarizeText",
+        "segmentTopics",
+        "hierarchicalSummarization",
+        "compressContext"
+      ],
+      "loadedAt": 1774075376124,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "hierarchicalOrchestration_gen1.mjs": {
+      "filename": "hierarchicalOrchestration_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "hierarchicalOrchestration"
+      ],
+      "loadedAt": 1774075376125,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "hierarchicalOrchestrator_gen1.mjs": {
+      "filename": "hierarchicalOrchestrator_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "HierarchicalOrchestrator"
+      ],
+      "loadedAt": 1774075376125,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "hierarchicalReasoningFramework_gen1.mjs": {
+      "filename": "hierarchicalReasoningFramework_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "HierarchicalReasoningFramework"
+      ],
+      "loadedAt": 1774075376125,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "hierarchicalTaskOrchestration_gen1.mjs": {
+      "filename": "hierarchicalTaskOrchestration_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "hierarchicalTaskOrchestration"
+      ],
+      "loadedAt": 1774075376126,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "inMemoryCache_gen1.mjs": {
+      "filename": "inMemoryCache_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "createCache"
+      ],
+      "loadedAt": 1774075376126,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "inMemoryEmbeddingCache_gen1.mjs": {
+      "filename": "inMemoryEmbeddingCache_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "createEmbeddingCache",
+        "cosineSimilarity"
+      ],
+      "loadedAt": 1774075376126,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "inMemoryEmbeddingStore_gen1.mjs": {
+      "filename": "inMemoryEmbeddingStore_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "createEmbeddingStore",
+        "searchKNearestNeighbors"
+      ],
+      "loadedAt": 1774075376127,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "inMemory_vector_store_gen1.mjs": {
+      "filename": "inMemory_vector_store_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "InMemoryVectorStore"
+      ],
+      "loadedAt": 1774075376127,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "intrinsicMetacognitionModule_gen1.mjs": {
+      "filename": "intrinsicMetacognitionModule_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "intrinsicMetacognitionModule"
+      ],
+      "loadedAt": 1774075376128,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "intrinsicMetacognition_gen1.mjs": {
+      "filename": "intrinsicMetacognition_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "intrinsicMetacognition"
+      ],
+      "loadedAt": 1774075376128,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "knowledgeDistillationModule_gen1.mjs": {
+      "filename": "knowledgeDistillationModule_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "knowledgeDistillationModule"
+      ],
+      "loadedAt": 1774075376128,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "manageResourceAllocation_gen1.mjs": {
+      "filename": "manageResourceAllocation_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "manageResourceAllocation"
+      ],
+      "loadedAt": 1774075376129,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "matrixOpsEngine_gen1.mjs": {
+      "filename": "matrixOpsEngine_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "initializeWasm",
+        "multiplyMatrices",
+        "multiplyMatrixVector",
+        "addVectors",
+        "dotProduct"
+      ],
+      "loadedAt": 1774075376129,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "matrixOpsSim_gen1.mjs": {
+      "filename": "matrixOpsSim_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "addMatrices",
+        "multiplyMatrices",
+        "invertMatrix",
+        "isValidMatrix"
+      ],
+      "loadedAt": 1774075376130,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "matrixOps_emulator_gen1.mjs": {
+      "filename": "matrixOps_emulator_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "multiplyMatrices",
+        "addVectors",
+        "dotProduct",
+        "transposeMatrix",
+        "applyFunction",
+        "normalizeVector",
+        "addMatrices"
+      ],
+      "loadedAt": 1774075376131,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "matrixOps_wasm_gen1.mjs": {
+      "filename": "matrixOps_wasm_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "loadWasmModule",
+        "multiplyMatrices"
+      ],
+      "loadedAt": 1774075376131,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "memoryAugmentationStore_gen1.mjs": {
+      "filename": "memoryAugmentationStore_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "initializeDatabase",
+        "insertEmbedding",
+        "findNearestNeighbors",
+        "clearEmbeddings",
+        "closeDatabase"
+      ],
+      "loadedAt": 1774075376131,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "memoryCacheManager_gen1.mjs": {
+      "filename": "memoryCacheManager_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "createCache"
+      ],
+      "loadedAt": 1774075376133,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "memoryCachingLayer_gen1.mjs": {
+      "filename": "memoryCachingLayer_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "setCacheItem",
+        "getCacheItem",
+        "clearCache",
+        "findSimilarItems",
+        "generateKey",
+        "getCacheSize"
+      ],
+      "loadedAt": 1774075376133,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "memoryCompressionEngine_gen1.mjs": {
+      "filename": "memoryCompressionEngine_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "pca",
+        "kMeans",
+        "compressContext"
+      ],
+      "loadedAt": 1774075376133,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "memoryConsolidationEngine_gen1.mjs": {
+      "filename": "memoryConsolidationEngine_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "memoryConsolidationEngine"
+      ],
+      "loadedAt": 1774075376134,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "memoryConsolidationModule_gen1.mjs": {
+      "filename": "memoryConsolidationModule_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "MemoryConsolidation"
+      ],
+      "loadedAt": 1774075376134,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "memoryConsolidation_gen1.mjs": {
+      "filename": "memoryConsolidation_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "memoryConsolidation"
+      ],
+      "loadedAt": 1774075376134,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "memoryReconsolidationScheduler_gen1.mjs": {
+      "filename": "memoryReconsolidationScheduler_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "MemoryReconsolidationScheduler"
+      ],
+      "loadedAt": 1774075376135,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "memoryReconsolidation_gen1.mjs": {
+      "filename": "memoryReconsolidation_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "memoryReconsolidation"
+      ],
+      "loadedAt": 1774075376135,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "memoryReplayModule_gen1.mjs": {
+      "filename": "memoryReplayModule_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "replayMemory",
+        "pruneIrrelevantMemories"
+      ],
+      "loadedAt": 1774075376135,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "memoryVectorStore_gen1.mjs": {
+      "filename": "memoryVectorStore_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "createKDTree",
+        "findNearestNeighbor",
+        "findKNearestNeighbors"
+      ],
+      "loadedAt": 1774075376135,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "metaCognitionLayer_gen1.mjs": {
+      "filename": "metaCognitionLayer_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "metaCognitionLayer"
+      ],
+      "loadedAt": 1774075376136,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multiPathReasoningValidator_gen1.mjs": {
+      "filename": "multiPathReasoningValidator_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "MultiPathReasoningValidator"
+      ],
+      "loadedAt": 1774075376136,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multiPathVerification_gen1.mjs": {
+      "filename": "multiPathVerification_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "MultiPathVerification"
+      ],
+      "loadedAt": 1774075376136,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multiPathVerifier_gen1.mjs": {
+      "filename": "multiPathVerifier_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "multiPathVerifier"
+      ],
+      "loadedAt": 1774075376137,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multiStepRetrievalRefinement_gen1.mjs": {
+      "filename": "multiStepRetrievalRefinement_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "multiStepRetrievalRefinement"
+      ],
+      "loadedAt": 1774075376137,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "proceduralMemoryModule_gen1.mjs": {
+      "filename": "proceduralMemoryModule_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "ProceduralMemoryModule",
+        "proceduralMemory"
+      ],
+      "loadedAt": 1774075376137,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "pubSubOrchestrationLayer_gen1.mjs": {
+      "filename": "pubSubOrchestrationLayer_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "pubSubOrchestrationLayer"
+      ],
+      "loadedAt": 1774075376138,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "recursiveScaffolding_gen1.mjs": {
+      "filename": "recursiveScaffolding_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "RecursiveScaffolding"
+      ],
+      "loadedAt": 1774075376138,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "roleOrchestrator_gen1.mjs": {
+      "filename": "roleOrchestrator_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "RoleOrchestrator"
+      ],
+      "loadedAt": 1774075376138,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "rollingContextSummarizer_gen1.mjs": {
+      "filename": "rollingContextSummarizer_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "summarizeContext",
+        "retainRollingContext",
+        "updateRollingContext"
+      ],
+      "loadedAt": 1774075376139,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "sandboxedSelfModificationFramework_gen1.mjs": {
+      "filename": "sandboxedSelfModificationFramework_gen1.mjs",
+      "stage": "utility",
+      "exports": [
+        "sandboxSelfModification"
+      ],
+      "loadedAt": 1774075376139,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "selectiveMultiBranchEvaluation_gen1.mjs": {
+      "filename": "selectiveMultiBranchEvaluation_gen1.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "selectiveMultiBranchEvaluation"
+      ],
+      "loadedAt": 1774075376139,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "selfAdversarialDebugger_gen1.mjs": {
+      "filename": "selfAdversarialDebugger_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "SelfAdversarialDebugger"
+      ],
+      "loadedAt": 1774075376140,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "selfDebugAdversaryModule_gen1.mjs": {
+      "filename": "selfDebugAdversaryModule_gen1.mjs",
+      "stage": "adversarial_testing",
+      "exports": [
+        "adversarialTest"
+      ],
+      "loadedAt": 1774075376140,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "selfDebuggingModule_gen1.mjs": {
+      "filename": "selfDebuggingModule_gen1.mjs",
+      "stage": "utility",
+      "exports": [
+        "SelfDebuggingModule"
+      ],
+      "loadedAt": 1774075376140,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "selfModifyingCodeSystem_gen1.mjs": {
+      "filename": "selfModifyingCodeSystem_gen1.mjs",
+      "stage": "utility",
+      "exports": [
+        "selfModifyingCodeSystem"
+      ],
+      "loadedAt": 1774075376140,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "semanticContextCompression_gen1.mjs": {
+      "filename": "semanticContextCompression_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "compressSemanticContext"
+      ],
+      "loadedAt": 1774075376141,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "simulateSelfRewardTesting_gen1.mjs": {
+      "filename": "simulateSelfRewardTesting_gen1.mjs",
+      "stage": "adversarial_testing",
+      "exports": [
+        "testSelfRewardMechanism"
+      ],
+      "loadedAt": 1774075376142,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "simulateSleepPhase_gen1.mjs": {
+      "filename": "simulateSleepPhase_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "simulateSleepPhase"
+      ],
+      "loadedAt": 1774075376142,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "slidingWindowMemory_gen1.mjs": {
+      "filename": "slidingWindowMemory_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "hierarchicalClustering",
+        "generateSummaryEmbeddings",
+        "slidingWindowMemory"
+      ],
+      "loadedAt": 1774075376143,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "stdpVectorMemory_gen1.mjs": {
+      "filename": "stdpVectorMemory_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "stdpVectorMemory"
+      ],
+      "loadedAt": 1774075376143,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "stopFramework_gen1.mjs": {
+      "filename": "stopFramework_gen1.mjs",
+      "stage": "adversarial_testing",
+      "exports": [
+        "STOPFramework"
+      ],
+      "loadedAt": 1774075376143,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "swarmIntelligenceModule_gen1.mjs": {
+      "filename": "swarmIntelligenceModule_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "swarmIntelligenceModule"
+      ],
+      "loadedAt": 1774075376144,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "toolCreationManager_gen1.mjs": {
+      "filename": "toolCreationManager_gen1.mjs",
+      "stage": "utility",
+      "exports": [
+        "createToolManager"
+      ],
+      "loadedAt": 1774075376144,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "toolForgeModule_gen1.mjs": {
+      "filename": "toolForgeModule_gen1.mjs",
+      "stage": "utility",
+      "exports": [
+        "toolForgeModule"
+      ],
+      "loadedAt": 1774075376144,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "toolForge_gen1.mjs": {
+      "filename": "toolForge_gen1.mjs",
+      "stage": "utility",
+      "exports": [
+        "ToolForge"
+      ],
+      "loadedAt": 1774075376144,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "treeOfThoughtsConflictResolution_gen1.mjs": {
+      "filename": "treeOfThoughtsConflictResolution_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "resolveConflictsUsingTreeOfThoughts"
+      ],
+      "loadedAt": 1774075376145,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "treeOfThoughtsGraphRag_gen1.mjs": {
+      "filename": "treeOfThoughtsGraphRag_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "treeOfThoughtsGraphRag"
+      ],
+      "loadedAt": 1774075376145,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "treeOfThoughtsReasoning_gen1.mjs": {
+      "filename": "treeOfThoughtsReasoning_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "treeOfThoughtsReasoning"
+      ],
+      "loadedAt": 1774075376145,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "unifiedMemoryGraph_gen1.mjs": {
+      "filename": "unifiedMemoryGraph_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "UnifiedMemoryGraph"
+      ],
+      "loadedAt": 1774075376145,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "vectorCache_gen1.mjs": {
+      "filename": "vectorCache_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "createVectorCache"
+      ],
+      "loadedAt": 1774075376146,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "vectorSearchEngine_gen1.mjs": {
+      "filename": "vectorSearchEngine_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "createHNSW"
+      ],
+      "loadedAt": 1774075376146,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "vectorStoreInMemory_gen1.mjs": {
+      "filename": "vectorStoreInMemory_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "createVectorStore"
+      ],
+      "loadedAt": 1774075376147,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "vectorStoreLite_gen1.mjs": {
+      "filename": "vectorStoreLite_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "VectorStoreLite"
+      ],
+      "loadedAt": 1774075376147,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "vectorStoreManager_gen1.mjs": {
+      "filename": "vectorStoreManager_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "createVectorStoreManager"
+      ],
+      "loadedAt": 1774075376148,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "wasmAcceleratedMatrixOps_gen1.mjs": {
+      "filename": "wasmAcceleratedMatrixOps_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "initializeWasm",
+        "multiplyMatrices",
+        "dotProduct",
+        "isWasmInitialized"
+      ],
+      "loadedAt": 1774075376149,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "wasmAcceleratedOps_gen1.mjs": {
+      "filename": "wasmAcceleratedOps_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "gpuMatrixMultiply"
+      ],
+      "loadedAt": 1774075376149,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "wasmAccelerator_gen1.mjs": {
+      "filename": "wasmAccelerator_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "multiplyMatrices",
+        "computeEigenvalues",
+        "initializeWasmAccelerator"
+      ],
+      "loadedAt": 1774075376149,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "wasmComputationEngine_gen1.mjs": {
+      "filename": "wasmComputationEngine_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "loadWasmModule",
+        "executeWasmFunction",
+        "validateWasmModule",
+        "exampleUsage"
+      ],
+      "loadedAt": 1774075376150,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "wasmComputeEngine_gen1.mjs": {
+      "filename": "wasmComputeEngine_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "loadWasmModule",
+        "wasmMatrixMultiply",
+        "exampleUsage"
+      ],
+      "loadedAt": 1774075376150,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "wasmComputeLayer_gen1.mjs": {
+      "filename": "wasmComputeLayer_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "initializeWasmModule",
+        "multiplyMatrices",
+        "generateRandomMatrix",
+        "printMatrix"
+      ],
+      "loadedAt": 1774075376150,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "wasmGpuAccelerator_gen1.mjs": {
+      "filename": "wasmGpuAccelerator_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "wasmMatrixMultiply",
+        "isValidMatrix",
+        "exampleUsage"
+      ],
+      "loadedAt": 1774075376151,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "wasmMatrixOps_gen1.mjs": {
+      "filename": "wasmMatrixOps_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "multiplyMatrices",
+        "invertMatrix",
+        "computeEigenvalues"
+      ],
+      "loadedAt": 1774075376151,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "webAssemblyAccelerator_gen1.mjs": {
+      "filename": "webAssemblyAccelerator_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "multiplyMatrices",
+        "dotProduct",
+        "applyScalarOperation",
+        "transposeMatrix",
+        "generateRandomMatrix"
+      ],
+      "loadedAt": 1774075376152,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "webAssemblyCompute_gen1.mjs": {
+      "filename": "webAssemblyCompute_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "loadWasmModule",
+        "wasmMatrixMultiply",
+        "demoMatrixMultiplication",
+        "validateMatrixDimensions"
+      ],
+      "loadedAt": 1774075376152,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "webAssemblyMathEngine_gen1.mjs": {
+      "filename": "webAssemblyMathEngine_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "dotProduct",
+        "matrixMultiply",
+        "example"
+      ],
+      "loadedAt": 1774075376153,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "webAssemblyMatrixOps_gen1.mjs": {
+      "filename": "webAssemblyMatrixOps_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "multiplyMatrices",
+        "validateMatrix",
+        "addMatrices",
+        "subtractMatrices"
+      ],
+      "loadedAt": 1774075376153,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "webGpuMatrixOps_gen1.mjs": {
+      "filename": "webGpuMatrixOps_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "isWebGpuSupported",
+        "initializeWebGpu",
+        "createBuffer",
+        "matrixMultiply"
+      ],
+      "loadedAt": 1774075376154,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "weightedConfidenceVoting_gen1.mjs": {
+      "filename": "weightedConfidenceVoting_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "WeightedConfidenceVoting"
+      ],
+      "loadedAt": 1774075376154,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    }
+  },
+  "lastScan": 1774075376154,
+  "totalModules": 155,
+  "totalCalls": 0
+}

@@ -2199,6 +2199,11 @@ async function writeGeneratedModule(mod: GeneratedModule): Promise<boolean> {
     fs.writeFileSync(filepath, header + mod.code, "utf-8");
 
     try {
+      const { registerNewModule } = await import("./omnimens-module-pipeline.js");
+      await registerNewModule(filename);
+    } catch {}
+
+    try {
       await db.insert(omnimensBrain).values({
         category: "autonomous_code_genesis",
         title: `Self-Generated: ${mod.name}`,

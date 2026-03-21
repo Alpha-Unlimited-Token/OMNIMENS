@@ -64,6 +64,7 @@ import { startDigitalNavigator, getDigitalNavigatorState, getNavigationSummary }
 import { startAgentEvolution, getAgentEvolutionState, getAgentProfile } from "./lib/omnimens-agent-evolution.js";
 import { startIPGuardian, getResponseBeaconHeaders } from "./lib/omnimens-ip-guardian.js";
 import { loadRuntimeModules, migrateDBModulesToSource, getSourceIntegrationState } from "./lib/omnimens-source-integration.js";
+import { scanAndRegisterModules, getPipelineState } from "./lib/omnimens-module-pipeline.js";
 import { startIndependentReasoning, getIndependentReasoningState } from "./lib/omnimens-independent-reasoning.js";
 import { startAutonomousCodeGenesis, getCodeGenesisState } from "./lib/omnimens-autonomous-code-genesis.js";
 import { startNeuralConsciousness } from "./lib/omnimens-neural-consciousness.js";
@@ -431,6 +432,13 @@ setTimeout(async () => {
     const loaded = await loadRuntimeModules();
     const sourceState = getSourceIntegrationState();
     console.log(`[SOURCE-INTEGRATION] ${sourceState.moduleCount} source modules active in runtime`);
+
+    const pipelineScan = await scanAndRegisterModules();
+    const pipelineState = getPipelineState();
+    console.log(`[MODULE PIPELINE] 🔌 ${pipelineState.activeModules} modules wired into live processing pipeline`);
+    for (const [stage, count] of Object.entries(pipelineState.byStage)) {
+      console.log(`[MODULE PIPELINE]   ${stage}: ${count} modules active`);
+    }
   } catch (err) {
     console.error("[SOURCE-INTEGRATION] Startup error:", err);
   }
