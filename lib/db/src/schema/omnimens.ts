@@ -467,11 +467,13 @@ export const omnimensApiKeys = pgTable("godflesh_api_keys", {
   name: text("name").notNull(),
   key: text("key").notNull().unique(),
   permissions: jsonb("permissions").$type<string[]>().default(["chat"]).notNull(),
-  rateLimit: integer("rate_limit").default(60).notNull(),     // requests per minute
-  monthlyLimit: integer("monthly_limit").default(1000).notNull(), // requests per month
+  rateLimit: integer("rate_limit").default(60).notNull(),
+  monthlyLimit: integer("monthly_limit").default(1000).notNull(),
   monthlyUsed: integer("monthly_used").default(0).notNull(),
   totalRequests: integer("total_requests").default(0).notNull(),
   lastUsedAt: timestamp("last_used_at"),
+  expiresAt: timestamp("expires_at"),
+  allowedIps: jsonb("allowed_ips").$type<string[]>().default([]),
   active: boolean("active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

@@ -6680,6 +6680,8 @@ router.get("/omnimens/developer/keys", async (req, res) => {
       monthlyUsed: omnimensApiKeys.monthlyUsed,
       totalRequests: omnimensApiKeys.totalRequests,
       lastUsedAt: omnimensApiKeys.lastUsedAt,
+      expiresAt: omnimensApiKeys.expiresAt,
+      allowedIps: omnimensApiKeys.allowedIps,
       active: omnimensApiKeys.active,
       createdAt: omnimensApiKeys.createdAt,
     }).from(omnimensApiKeys)
@@ -6694,24 +6696,48 @@ router.get("/omnimens/developer/keys", async (req, res) => {
 // Create a new API key
 router.post("/omnimens/developer/keys", async (req, res) => {
   if (!req.user) return res.status(401).json({ error: "Unauthorized" });
-  const { name, permissions = ["chat"], rateLimit = 60, monthlyLimit = 1000 } = req.body || {};
+  const { name, permissions = ["chat"], rateLimit = 60, monthlyLimit = 1000, expiresIn, allowedIps = [] } = req.body || {};
   if (!name || typeof name !== "string" || name.trim().length === 0) {
     return res.status(400).json({ error: "Key name is required" });
   }
-  // Limit to 10 keys per user
-  const existing = await db.select({ id: omnimensApiKeys.id })
-    .from(omnimensApiKeys).where(eq(omnimensApiKeys.userId, req.user.id));
-  if (existing.length >= 10) return res.status(400).json({ error: "Max 10 API keys allowed" });
-  const key = generateApiKey();
-  const [created] = await db.insert(omnimensApiKeys).values({
-    userId: req.user.id,
-    name: name.trim(),
-    key,
-    permissions,
-    rateLimit,
-    monthlyLimit,
-  }).returning();
-  res.json({ key: created });
+  if (name.trim().length > 64) {
+    return res.status(400).json({ error: "Key name must be 64 characters or fewer" });
+  }
+  const validPermissions = ["chat", "images", "tts", "stt", "embeddings"];
+  const cleanPerms = (Array.isArray(permissions) ? permissions : ["chat"])
+    .filter((p: string) => validPermissions.includes(p));
+  if (cleanPerms.length === 0) cleanPerms.push("chat");
+  const cleanRate = Math.max(1, Math.min(Number(rateLimit) || 60, 1000));
+  const cleanMonthly = Math.max(100, Math.min(Number(monthlyLimit) || 1000, 1000000));
+  let expiresAt: Date | null = null;
+  if (expiresIn && typeof expiresIn === "string") {
+    const durations: Record<string, number> = { "30d": 30, "60d": 60, "90d": 90, "180d": 180, "365d": 365 };
+    const days = durations[expiresIn];
+    if (days) { expiresAt = new Date(Date.now() + days * 86400000); }
+  }
+  const cleanIps: string[] = (Array.isArray(allowedIps) ? allowedIps : [])
+    .map((ip: string) => String(ip).trim())
+    .filter((ip: string) => /^[\d./:a-fA-F]+$/.test(ip))
+    .slice(0, 20);
+  try {
+    const existing = await db.select({ id: omnimensApiKeys.id })
+      .from(omnimensApiKeys).where(eq(omnimensApiKeys.userId, req.user.id));
+    if (existing.length >= 10) return res.status(400).json({ error: "Max 10 API keys allowed" });
+    const key = generateApiKey();
+    const [created] = await db.insert(omnimensApiKeys).values({
+      userId: req.user.id,
+      name: name.trim(),
+      key,
+      permissions: cleanPerms,
+      rateLimit: cleanRate,
+      monthlyLimit: cleanMonthly,
+      expiresAt,
+      allowedIps: cleanIps,
+    }).returning();
+    res.json({ key: created });
+  } catch (e) {
+    res.status(500).json({ error: "Failed to create key" });
+  }
 });
 
 // Rename an API key
@@ -6759,6 +6785,18 @@ router.post("/v1/chat", async (req, res) => {
       .where(and(eq(omnimensApiKeys.key, apiKeyValue), eq(omnimensApiKeys.active, true)));
 
     if (!apiKey) return res.status(401).json({ error: "API key not found or revoked" });
+    if (apiKey.expiresAt && new Date(apiKey.expiresAt) < new Date()) {
+      return res.status(403).json({ error: "API key has expired" });
+    }
+    const perms = (apiKey.permissions as string[]) || [];
+    if (!perms.includes("chat")) {
+      return res.status(403).json({ error: "This API key does not have 'chat' permission" });
+    }
+    const clientIp = req.socket?.remoteAddress || "";
+    const ips = (apiKey.allowedIps as string[]) || [];
+    if (ips.length > 0 && !ips.includes(clientIp)) {
+      return res.status(403).json({ error: "Request from unauthorized IP address" });
+    }
     if (apiKey.monthlyUsed >= apiKey.monthlyLimit) {
       return res.status(429).json({ error: "Monthly request limit reached", limit: apiKey.monthlyLimit, used: apiKey.monthlyUsed });
     }

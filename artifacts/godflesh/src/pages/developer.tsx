@@ -27,6 +27,8 @@ type ApiKey = {
   monthlyUsed: number;
   totalRequests: number;
   lastUsedAt: string | null;
+  expiresAt: string | null;
+  allowedIps: string[];
   active: boolean;
   createdAt: string;
 };
@@ -198,22 +200,82 @@ function OverviewTab() {
 }
 
 // ─── API Keys Tab ──────────────────────────────────────────────────────────────
+const AVAILABLE_PERMISSIONS = [
+  { id: "chat", label: "Chat", desc: "Send messages and receive AI responses" },
+  { id: "images", label: "Images", desc: "Generate and manipulate images" },
+  { id: "tts", label: "Text-to-Speech", desc: "Convert text to spoken audio" },
+  { id: "stt", label: "Speech-to-Text", desc: "Transcribe audio to text" },
+  { id: "embeddings", label: "Embeddings", desc: "Generate text embeddings" },
+];
+
+const EXPIRY_OPTIONS = [
+  { value: "", label: "Never expires" },
+  { value: "30d", label: "30 days" },
+  { value: "60d", label: "60 days" },
+  { value: "90d", label: "90 days" },
+  { value: "180d", label: "6 months" },
+  { value: "365d", label: "1 year" },
+];
+
+const RATE_LIMIT_OPTIONS = [
+  { value: 10, label: "10/min" },
+  { value: 30, label: "30/min" },
+  { value: 60, label: "60/min (default)" },
+  { value: 120, label: "120/min" },
+  { value: 300, label: "300/min" },
+  { value: 600, label: "600/min" },
+  { value: 1000, label: "1000/min" },
+];
+
+const MONTHLY_LIMIT_OPTIONS = [
+  { value: 100, label: "100" },
+  { value: 500, label: "500" },
+  { value: 1000, label: "1,000 (default)" },
+  { value: 5000, label: "5,000" },
+  { value: 10000, label: "10,000" },
+  { value: 50000, label: "50,000" },
+  { value: 100000, label: "100,000" },
+  { value: 1000000, label: "1,000,000" },
+];
+
 function ApiKeysTab() {
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
-  const [newKeyName, setNewKeyName] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [visibleKeys, setVisibleKeys] = useState<Set<number>>(new Set());
   const [justCreated, setJustCreated] = useState<ApiKey | null>(null);
   const [error, setError] = useState("");
+  const [newKeyName, setNewKeyName] = useState("");
+  const [newPermissions, setNewPermissions] = useState<string[]>(["chat"]);
+  const [newRateLimit, setNewRateLimit] = useState(60);
+  const [newMonthlyLimit, setNewMonthlyLimit] = useState(1000);
+  const [newExpiresIn, setNewExpiresIn] = useState("");
+  const [newAllowedIps, setNewAllowedIps] = useState("");
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  const resetForm = () => {
+    setNewKeyName("");
+    setNewPermissions(["chat"]);
+    setNewRateLimit(60);
+    setNewMonthlyLimit(1000);
+    setNewExpiresIn("");
+    setNewAllowedIps("");
+    setShowAdvanced(false);
+    setError("");
+  };
 
   const fetchKeys = async () => {
     setLoading(true);
     try {
       const r = await fetch(`${API_BASE}/omnimens/developer/keys`, { credentials: "include" });
-      const data = await r.json();
+      if (!r.ok) { setKeys([]); return; }
+      const text = await r.text();
+      if (!text) { setKeys([]); return; }
+      const data = JSON.parse(text);
       setKeys(data.keys || []);
+    } catch {
+      setKeys([]);
     } finally {
       setLoading(false);
     }
@@ -221,22 +283,44 @@ function ApiKeysTab() {
 
   useEffect(() => { fetchKeys(); }, []);
 
+  const togglePermission = (perm: string) => {
+    setNewPermissions(prev =>
+      prev.includes(perm) ? prev.filter(p => p !== perm) : [...prev, perm]
+    );
+  };
+
   const createKey = async () => {
     if (!newKeyName.trim()) { setError("Enter a name for this key"); return; }
+    if (newPermissions.length === 0) { setError("Select at least one permission"); return; }
     setCreating(true); setError("");
     try {
+      const ipList = newAllowedIps.trim()
+        ? newAllowedIps.split(/[,\n]+/).map(ip => ip.trim()).filter(Boolean)
+        : [];
       const r = await fetch(`${API_BASE}/omnimens/developer/keys`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newKeyName.trim() }),
+        body: JSON.stringify({
+          name: newKeyName.trim(),
+          permissions: newPermissions,
+          rateLimit: newRateLimit,
+          monthlyLimit: newMonthlyLimit,
+          expiresIn: newExpiresIn || undefined,
+          allowedIps: ipList,
+        }),
       });
-      const data = await r.json();
+      const text = await r.text();
+      if (!text) { setError("Server returned an empty response — please try again"); return; }
+      let data: any;
+      try { data = JSON.parse(text); } catch { setError("Server error — please try again"); return; }
       if (!r.ok) { setError(data.error || "Failed to create key"); return; }
       setJustCreated(data.key);
       setShowCreate(false);
-      setNewKeyName("");
+      resetForm();
       fetchKeys();
+    } catch (e: any) {
+      setError(e.message?.includes("fetch") ? "Network error — check your connection" : "Failed to create key");
     } finally {
       setCreating(false);
     }
@@ -244,9 +328,11 @@ function ApiKeysTab() {
 
   const revokeKey = async (id: number) => {
     if (!confirm("Revoke this API key? Any integrations using it will stop working.")) return;
-    await fetch(`${API_BASE}/omnimens/developer/keys/${id}`, { method: "DELETE", credentials: "include" });
-    setKeys(k => k.filter(x => x.id !== id));
-    if (justCreated?.id === id) setJustCreated(null);
+    try {
+      await fetch(`${API_BASE}/omnimens/developer/keys/${id}`, { method: "DELETE", credentials: "include" });
+      setKeys(k => k.filter(x => x.id !== id));
+      if (justCreated?.id === id) setJustCreated(null);
+    } catch {}
   };
 
   const toggleVisibility = (id: number) => {
@@ -259,9 +345,12 @@ function ApiKeysTab() {
 
   const maskKey = (key: string) => key.slice(0, 12) + "••••••••••••••••••••••••••••";
 
+  const permLabel = (perms: string[]) => perms.map(p =>
+    AVAILABLE_PERMISSIONS.find(ap => ap.id === p)?.label || p
+  ).join(", ");
+
   return (
     <div className="space-y-6">
-      {/* Alert for just-created key */}
       <AnimatePresence>
         {justCreated && (
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
@@ -281,44 +370,122 @@ function ApiKeysTab() {
         )}
       </AnimatePresence>
 
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-white font-semibold">Your API Keys</h3>
-          <p className="text-white/40 text-sm mt-0.5">Max 10 keys. Each key has its own rate limit and monthly quota.</p>
+          <p className="text-white/40 text-sm mt-0.5">Max 10 keys. Each key has its own permissions, rate limit, and monthly quota.</p>
         </div>
-        <button onClick={() => { setShowCreate(true); setError(""); }}
+        <button onClick={() => { setShowCreate(true); resetForm(); }}
           className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 border border-primary/20 text-primary text-sm hover:bg-primary/20 transition-all">
           <Plus className="w-4 h-4" /> New Key
         </button>
       </div>
 
-      {/* Create form */}
       <AnimatePresence>
         {showCreate && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden">
-            <div className="rounded-xl border border-primary/20 bg-primary/3 p-5 space-y-4">
+            <div className="rounded-xl border border-primary/20 bg-primary/3 p-5 space-y-5">
               <h4 className="text-white/80 font-medium text-sm">Create New API Key</h4>
+
               <div>
-                <label className="text-white/40 text-xs mb-1.5 block">Key Name</label>
+                <label className="text-white/40 text-xs mb-1.5 block">Key Name *</label>
                 <input
                   autoFocus
                   value={newKeyName}
                   onChange={e => setNewKeyName(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && createKey()}
                   placeholder="e.g. Production App, Dev Testing, My Chatbot"
+                  maxLength={64}
                   className="w-full rounded-lg bg-black/40 border border-white/10 px-3 py-2.5 text-white text-sm outline-none focus:border-primary/40 placeholder:text-white/20"
                 />
               </div>
+
+              <div>
+                <label className="text-white/40 text-xs mb-2 block">Permissions *</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {AVAILABLE_PERMISSIONS.map(p => (
+                    <button key={p.id} type="button" onClick={() => togglePermission(p.id)}
+                      className={`flex items-start gap-2.5 px-3 py-2.5 rounded-lg border text-left transition-all ${
+                        newPermissions.includes(p.id)
+                          ? "border-primary/40 bg-primary/10 text-white"
+                          : "border-white/8 bg-white/2 text-white/40 hover:border-white/15"
+                      }`}>
+                      <div className={`w-4 h-4 rounded border mt-0.5 flex items-center justify-center shrink-0 ${
+                        newPermissions.includes(p.id) ? "border-primary bg-primary" : "border-white/20"
+                      }`}>
+                        {newPermissions.includes(p.id) && <Check className="w-3 h-3 text-black" />}
+                      </div>
+                      <div>
+                        <span className="text-sm font-medium block">{p.label}</span>
+                        <span className="text-[11px] text-white/30 block mt-0.5">{p.desc}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-white/40 text-xs mb-1.5 block">Rate Limit</label>
+                  <select value={newRateLimit} onChange={e => setNewRateLimit(Number(e.target.value))}
+                    className="w-full rounded-lg bg-black/40 border border-white/10 px-3 py-2.5 text-white text-sm outline-none focus:border-primary/40 appearance-none">
+                    {RATE_LIMIT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-white/40 text-xs mb-1.5 block">Monthly Request Limit</label>
+                  <select value={newMonthlyLimit} onChange={e => setNewMonthlyLimit(Number(e.target.value))}
+                    className="w-full rounded-lg bg-black/40 border border-white/10 px-3 py-2.5 text-white text-sm outline-none focus:border-primary/40 appearance-none">
+                    {MONTHLY_LIMIT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-white/40 text-xs mb-1.5 block">Expiration</label>
+                <select value={newExpiresIn} onChange={e => setNewExpiresIn(e.target.value)}
+                  className="w-full rounded-lg bg-black/40 border border-white/10 px-3 py-2.5 text-white text-sm outline-none focus:border-primary/40 appearance-none">
+                  {EXPIRY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <button type="button" onClick={() => setShowAdvanced(!showAdvanced)}
+                  className="flex items-center gap-1.5 text-white/30 text-xs hover:text-white/50 transition-colors">
+                  <ChevronDown className={`w-3 h-3 transition-transform ${showAdvanced ? "rotate-180" : ""}`} />
+                  Advanced Settings
+                </button>
+                <AnimatePresence>
+                  {showAdvanced && (
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden">
+                      <div className="mt-3 space-y-3">
+                        <div>
+                          <label className="text-white/40 text-xs mb-1.5 block">IP Allowlist</label>
+                          <textarea
+                            value={newAllowedIps}
+                            onChange={e => setNewAllowedIps(e.target.value)}
+                            placeholder="Leave empty to allow all IPs. Enter one IP per line or comma-separated (e.g. 203.0.113.5, 198.51.100.22)"
+                            rows={3}
+                            className="w-full rounded-lg bg-black/40 border border-white/10 px-3 py-2.5 text-white text-sm outline-none focus:border-primary/40 placeholder:text-white/20 resize-none font-mono"
+                          />
+                          <p className="text-white/20 text-[11px] mt-1">Only requests from these IPs will be accepted. Max 20 entries.</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
               {error && <p className="text-red-400 text-xs">{error}</p>}
-              <div className="flex gap-2">
+
+              <div className="flex gap-2 pt-1">
                 <button onClick={createKey} disabled={creating}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-black text-sm font-semibold hover:bg-primary/90 disabled:opacity-50 transition-all">
                   {creating ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Key className="w-4 h-4" />}
                   {creating ? "Creating..." : "Generate Key"}
                 </button>
-                <button onClick={() => { setShowCreate(false); setError(""); }}
+                <button onClick={() => { setShowCreate(false); resetForm(); }}
                   className="px-4 py-2 rounded-lg border border-white/10 text-white/50 text-sm hover:text-white/80 transition-all">Cancel</button>
               </div>
             </div>
@@ -326,7 +493,6 @@ function ApiKeysTab() {
         )}
       </AnimatePresence>
 
-      {/* Keys list */}
       {loading ? (
         <div className="flex items-center justify-center py-12 text-white/20">
           <RefreshCw className="w-5 h-5 animate-spin mr-2" /> Loading keys...
@@ -341,32 +507,36 @@ function ApiKeysTab() {
         <div className="space-y-3">
           {keys.map(k => {
             const visible = visibleKeys.has(k.id);
-            const pct = Math.round((k.monthlyUsed / k.monthlyLimit) * 100);
+            const pct = k.monthlyLimit > 0 ? Math.round((k.monthlyUsed / k.monthlyLimit) * 100) : 0;
+            const isExpired = k.expiresAt && new Date(k.expiresAt) < new Date();
             return (
               <div key={k.id} className="rounded-xl border border-white/8 bg-white/2 p-5 hover:border-white/12 transition-all">
                 <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className="text-white font-medium text-sm">{k.name}</span>
-                      <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${k.active ? "text-green-400 bg-green-400/10 border border-green-400/20" : "text-red-400 bg-red-400/10 border border-red-400/20"}`}>
-                        {k.active ? "ACTIVE" : "REVOKED"}
+                      <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
+                        !k.active ? "text-red-400 bg-red-400/10 border border-red-400/20"
+                        : isExpired ? "text-orange-400 bg-orange-400/10 border border-orange-400/20"
+                        : "text-green-400 bg-green-400/10 border border-green-400/20"
+                      }`}>
+                        {!k.active ? "REVOKED" : isExpired ? "EXPIRED" : "ACTIVE"}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <code className="text-white/50 text-xs font-mono">{visible ? k.key : maskKey(k.key)}</code>
-                      <button onClick={() => toggleVisibility(k.id)} className="text-white/20 hover:text-white/50 transition-colors">
+                      <code className="text-white/50 text-xs font-mono truncate">{visible ? k.key : maskKey(k.key)}</code>
+                      <button onClick={() => toggleVisibility(k.id)} className="text-white/20 hover:text-white/50 transition-colors shrink-0">
                         {visible ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                       </button>
                       <CopyButton text={k.key} size="xs" />
                     </div>
                   </div>
                   <button onClick={() => revokeKey(k.id)}
-                    className="p-2 rounded-lg text-white/20 hover:text-red-400 hover:bg-red-400/10 transition-all">
+                    className="p-2 rounded-lg text-white/20 hover:text-red-400 hover:bg-red-400/10 transition-all shrink-0">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
 
-                {/* Usage bar */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-white/30">Monthly Usage</span>
@@ -378,9 +548,16 @@ function ApiKeysTab() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 mt-3 text-xs text-white/25">
-                  <span>Total Requests: <strong className="text-white/40">{k.totalRequests.toLocaleString()}</strong></span>
-                  <span>Rate Limit: <strong className="text-white/40">{k.rateLimit}/min</strong></span>
+                <div className="flex items-center gap-3 mt-3 text-xs text-white/25 flex-wrap">
+                  <span>Permissions: <strong className="text-white/40">{permLabel(k.permissions)}</strong></span>
+                  <span>Rate: <strong className="text-white/40">{k.rateLimit}/min</strong></span>
+                  <span>Total: <strong className="text-white/40">{k.totalRequests.toLocaleString()}</strong></span>
+                  {k.expiresAt && (
+                    <span>Expires: <strong className={isExpired ? "text-red-400" : "text-white/40"}>{new Date(k.expiresAt).toLocaleDateString()}</strong></span>
+                  )}
+                  {k.allowedIps && k.allowedIps.length > 0 && (
+                    <span>IPs: <strong className="text-white/40">{k.allowedIps.length} allowed</strong></span>
+                  )}
                   {k.lastUsedAt && <span>Last Used: <strong className="text-white/40">{new Date(k.lastUsedAt).toLocaleDateString()}</strong></span>}
                   <span>Created: <strong className="text-white/40">{new Date(k.createdAt).toLocaleDateString()}</strong></span>
                 </div>
