@@ -156,6 +156,8 @@ export default function Account() {
   const [ciSaved, setCiSaved] = useState(false);
   const [ciLoading, setCiLoading] = useState(false);
 
+  const [selectedInsight, setSelectedInsight] = useState<any>(null);
+
   // Evolution / Consciousness state
   const [consciousness, setConsciousness] = useState<any>(null);
   const [evolutionHistory, setEvolutionHistory] = useState<any[]>([]);
@@ -1395,7 +1397,11 @@ export default function Account() {
                   <div className="space-y-2">
                     <p className="text-xs text-[#9DA5B4] mb-2">Recent Dream Insights</p>
                     {dreamStateData.recentInsights.slice(-5).reverse().map((insight: any, idx: number) => (
-                      <div key={idx} className="bg-[#1C2333]/80 border border-[#2B3245] rounded-lg p-3">
+                      <div
+                        key={idx}
+                        className="bg-[#1C2333]/80 border border-[#2B3245] rounded-lg p-3 cursor-pointer hover:border-violet-500/40 hover:bg-[#1C2333] transition-all active:scale-[0.98]"
+                        onClick={() => setSelectedInsight(insight)}
+                      >
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-xs font-mono text-violet-400">{insight.title}</span>
                           <div className="flex gap-2 text-[10px] font-mono">
@@ -1409,8 +1415,86 @@ export default function Account() {
                             {insight.codeProposal.slice(0, 150)}...
                           </div>
                         )}
+                        <p className="text-[10px] text-violet-400/50 mt-2 text-right">Tap to view full details</p>
                       </div>
                     ))}
+                  </div>
+                )}
+
+                {selectedInsight && (
+                  <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+                    onClick={() => setSelectedInsight(null)}
+                  >
+                    <div
+                      className="bg-[#0E1525] border border-violet-500/30 rounded-xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl shadow-violet-500/10"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="flex items-start justify-between p-4 border-b border-[#2B3245]">
+                        <div className="flex-1 min-w-0 mr-3">
+                          <h3 className="text-sm font-mono text-violet-400 font-medium break-words">{selectedInsight.title}</h3>
+                          <div className="flex gap-3 mt-1.5 text-xs font-mono">
+                            <span className="text-green-400">Feasibility: {((selectedInsight.feasibility || 0) * 100).toFixed(1)}%</span>
+                            <span className="text-amber-400">Novelty: {((selectedInsight.novelty || 0) * 100).toFixed(1)}%</span>
+                            {selectedInsight.impact && <span className="text-cyan-400">Impact: {((selectedInsight.impact || 0) * 100).toFixed(1)}%</span>}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setSelectedInsight(null)}
+                          className="p-1.5 rounded-lg hover:bg-[#2B3245] transition-colors text-[#9DA5B4] hover:text-white flex-shrink-0"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      <div className="overflow-y-auto p-4 space-y-4 flex-1" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.15) transparent" }}>
+                        <div>
+                          <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-1.5">Insight</p>
+                          <p className="text-sm text-[#c8cdd5] leading-relaxed whitespace-pre-wrap">{selectedInsight.insight || "No description available."}</p>
+                        </div>
+
+                        {selectedInsight.category && (
+                          <div>
+                            <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-1.5">Category</p>
+                            <span className="text-xs font-mono bg-violet-500/15 text-violet-300 px-2.5 py-1 rounded-full border border-violet-500/20">{selectedInsight.category}</span>
+                          </div>
+                        )}
+
+                        {selectedInsight.dreamType && (
+                          <div>
+                            <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-1.5">Dream Type</p>
+                            <span className="text-xs font-mono bg-cyan-500/15 text-cyan-300 px-2.5 py-1 rounded-full border border-cyan-500/20">{selectedInsight.dreamType}</span>
+                          </div>
+                        )}
+
+                        {selectedInsight.concepts && selectedInsight.concepts.length > 0 && (
+                          <div>
+                            <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-1.5">Concepts</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {selectedInsight.concepts.map((c: string, i: number) => (
+                                <span key={i} className="text-[10px] font-mono bg-[#1C2333] text-[#9DA5B4] px-2 py-0.5 rounded border border-[#2B3245]">{c}</span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {selectedInsight.codeProposal && (
+                          <div>
+                            <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-1.5">Code Proposal</p>
+                            <div className="bg-[#1C2333] border border-green-500/15 rounded-lg p-3 overflow-x-auto" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.15) transparent" }}>
+                              <pre className="text-xs font-mono text-green-400/90 whitespace-pre-wrap break-words">{selectedInsight.codeProposal}</pre>
+                            </div>
+                          </div>
+                        )}
+
+                        {selectedInsight.timestamp && (
+                          <div>
+                            <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-1.5">Discovered</p>
+                            <p className="text-xs text-[#9DA5B4]">{new Date(selectedInsight.timestamp).toLocaleString()}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>

@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-21T00:56:00.531Z
+ * Written: 2026-03-21T02:03:41.969Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,59 +16,48 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findPatternsInText(text, patterns) {
-    if (typeof text !== 'string' || !Array.isArray(patterns)) {
-        throw new Error("Invalid input: text must be a string and patterns must be an array of strings.");
+// Utility function: Extracts and counts unique words from a text, ignoring case and punctuation
+function extractUniqueWords(text) {
+    if (typeof text !== 'string') throw new Error("Input must be a string");
+
+    // Remove punctuation and normalize to lowercase
+    const cleanedText = text.replace(/[^\w\s]/g, '').toLowerCase();
+
+    // Split text into words and filter out empty strings
+    const words = cleanedText.split(/\s+/).filter(word => word.length > 0);
+
+    // Count occurrences of each unique word
+    const wordCounts = {};
+    for (let word of words) {
+        wordCounts[word] = (wordCounts[word] || 0) + 1;
     }
 
-    const results = {};
-    patterns.forEach(pattern => {
-        if (typeof pattern !== 'string') {
-            throw new Error("Invalid pattern: all patterns must be strings.");
-        }
-        const regex = new RegExp(pattern, 'g');
-        const matches = text.match(regex);
-        results[pattern] = matches ? matches : [];
-    });
-
-    return results;
+    return wordCounts;
 }
 
 // Self-tests
-function runTests() {
-    console.log("Running tests...");
+(function testExtractUniqueWords() {
+    console.log("Test 1: Basic sentence");
+    const result1 = extractUniqueWords("Hello world! Hello again, world.");
+    console.log(result1); // Expected: { hello: 2, world: 2, again: 1 }
 
-    // Test 1: Basic pattern matching
-    const text1 = "The quick brown fox jumps over the lazy dog.";
-    const patterns1 = ["quick", "fox", "dog"];
-    const result1 = findPatternsInText(text1, patterns1);
-    console.log(result1); // Expected: { quick: ['quick'], fox: ['fox'], dog: ['dog'] }
+    console.log("Test 2: Empty string");
+    const result2 = extractUniqueWords("");
+    console.log(result2); // Expected: {}
 
-    // Test 2: No matches
-    const text2 = "Hello world!";
-    const patterns2 = ["cat", "mouse"];
-    const result2 = findPatternsInText(text2, patterns2);
-    console.log(result2); // Expected: { cat: [], mouse: [] }
+    console.log("Test 3: Case insensitivity");
+    const result3 = extractUniqueWords("Case CASE case.");
+    console.log(result3); // Expected: { case: 3 }
 
-    // Test 3: Multiple occurrences
-    const text3 = "abababab";
-    const patterns3 = ["ab"];
-    const result3 = findPatternsInText(text3, patterns3);
-    console.log(result3); // Expected: { ab: ['ab', 'ab', 'ab', 'ab'] }
+    console.log("Test 4: Numbers and mixed content");
+    const result4 = extractUniqueWords("123 apples, 123 oranges, APPLES!");
+    console.log(result4); // Expected: { '123': 2, apples: 2, oranges: 1 }
 
-    // Test 4: Edge case with empty text
-    const text4 = "";
-    const patterns4 = ["anything"];
-    const result4 = findPatternsInText(text4, patterns4);
-    console.log(result4); // Expected: { anything: [] }
-
-    // Test 5: Edge case with empty patterns
-    const text5 = "Some text here.";
-    const patterns5 = [];
-    const result5 = findPatternsInText(text5, patterns5);
+    console.log("Test 5: Special characters");
+    const result5 = extractUniqueWords("!@#$%^&*()_+=-`~[]{}|;:'\",.<>?/\\");
     console.log(result5); // Expected: {}
 
-    console.log("All tests completed.");
-}
-
-runTests();
+    console.log("Test 6: Long text");
+    const result6 = extractUniqueWords("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum.");
+    console.log(result6); // Expected: { lorem: 2, ipsum: 2, dolor: 1, sit: 1, amet: 1, consectetur: 1, adipiscing: 1, elit: 1 }
+})();
