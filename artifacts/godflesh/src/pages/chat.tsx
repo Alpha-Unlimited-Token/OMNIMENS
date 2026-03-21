@@ -6192,8 +6192,8 @@ export default function Chat() {
                 </button>
 
                 {/* Category chips */}
-                <div className="mt-5 w-full max-w-lg overflow-x-auto pb-2 omnimens-scrollbar-x">
-                  <div className="flex gap-2 px-4 sm:justify-center w-max sm:w-full sm:mx-auto">
+                <div className="mt-5 w-full overflow-x-auto pb-2" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
+                  <div className="flex gap-2 px-6 w-max sm:w-full sm:max-w-lg sm:mx-auto sm:justify-center sm:flex-wrap">
                   {[
                     { emoji: "🌐", label: "Website", prompt: "Build me a stunning website for " },
                     { emoji: "📱", label: "Mobile App", prompt: "Design a mobile app that " },
