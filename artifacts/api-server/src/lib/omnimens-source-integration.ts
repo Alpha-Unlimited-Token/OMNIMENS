@@ -139,6 +139,8 @@ function validateCodeSafety(code: string): { safe: boolean; reason: string } {
     { pattern: /(?<!\w)eval\s*\(/i, reason: "Contains eval() call" },
     { pattern: /(?<!\w)new\s+Function\s*\(/i, reason: "Contains new Function() constructor" },
     { pattern: /(?<!\w)Function\s*\(\s*['"`]/i, reason: "Contains Function() constructor with string argument" },
+    { pattern: /WebGPU|navigator\.gpu|GPUAdapter|GPUDevice/i, reason: "References WebGPU (not available in Node.js)" },
+    { pattern: /throw\s+new\s+Error\s*\(\s*['"`].*not\s+supported/i, reason: "Throws unconditional 'not supported' error" },
   ];
 
   for (const { pattern, reason } of codePatterns) {

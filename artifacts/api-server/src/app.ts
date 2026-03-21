@@ -20,6 +20,13 @@
  * ============================================================
  */
 
+process.on("uncaughtException", (err) => {
+  console.error("[SAFETY] Uncaught exception caught — server stays alive:", err.message);
+});
+process.on("unhandledRejection", (reason) => {
+  console.error("[SAFETY] Unhandled rejection caught — server stays alive:", reason);
+});
+
 import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
