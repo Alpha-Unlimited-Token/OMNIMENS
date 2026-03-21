@@ -1,5 +1,5 @@
 kind = "web"
-previewPath = "/"
+previewPath = "/super-ai-lab/"
 title = "Super AI Lab"
 version = "1.0.0"
 id = "artifacts/super-ai-lab"
@@ -12,14 +12,14 @@ version = "1.0.0"
 [[services]]
 localPort = 26095
 name = "web"
-paths = ["/"]
+paths = ["/super-ai-lab/"]
 
 [services.development]
 run = "pnpm --filter @workspace/super-ai-lab run dev"
 
 [services.env]
 PORT = "26095"
-BASE_PATH = "/"
+BASE_PATH = "/super-ai-lab/"
 
 [services.production]
 build = ["pnpm", "--filter", "@workspace/super-ai-lab", "run", "build"]

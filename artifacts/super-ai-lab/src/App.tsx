@@ -32,7 +32,8 @@ function LabGate({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Lock 1 — path must begin with the secret segment
-    const hasToken = window.location.pathname.startsWith(_k);
+    const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+    const hasToken = window.location.pathname.startsWith(basePath + _k);
     if (!hasToken) {
       setStatus("denied");
       return;
