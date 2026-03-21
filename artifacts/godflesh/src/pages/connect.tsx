@@ -152,6 +152,7 @@ function ConnectChat() {
   const isHoldingRef = useRef(false);
   const messagesRef = useRef<Message[]>([]);
   const voiceEnabledRef = useRef(false);
+  const lastInputWasVoiceRef = useRef(false);
   const [, setLocation] = useLocation();
 
   messagesRef.current = messages;
@@ -172,8 +173,8 @@ function ConnectChat() {
     };
   }, []);
 
-  const speakText = useCallback(async (text: string, onDone?: () => void) => {
-    if (!voiceEnabledRef.current) { onDone?.(); return; }
+  const speakText = useCallback(async (text: string, onDone?: () => void, forceSpeak?: boolean) => {
+    if (!forceSpeak && !voiceEnabledRef.current) { onDone?.(); return; }
     const clean = stripMarkdownForSpeech(text);
     if (!clean || clean.length < 5) { onDone?.(); return; }
 
@@ -231,6 +232,7 @@ function ConnectChat() {
       const text = data.text?.trim();
       if (!text) { setIsProcessingVoice(false); return; }
       setIsProcessingVoice(false);
+      lastInputWasVoiceRef.current = true;
       await sendMessageDirect(text);
     } catch {
       setIsProcessingVoice(false);
@@ -427,14 +429,17 @@ function ConnectChat() {
         setMessages(prev => [...prev, { role: "assistant", content: fullResponse }]);
         setIsStreaming(false);
         setStreamingText("");
-        if (voiceEnabledRef.current) {
-          speakText(fullResponse);
+        const wasVoiceInput = lastInputWasVoiceRef.current;
+        lastInputWasVoiceRef.current = false;
+        if (voiceEnabledRef.current || wasVoiceInput) {
+          speakText(fullResponse, undefined, wasVoiceInput);
         }
       } else {
         setIsStreaming(false);
         setStreamingText("");
       }
     } catch {
+      lastInputWasVoiceRef.current = false;
       setMessages(prev => [...prev, { role: "assistant", content: "Connection interrupted. Please try again." }]);
       setIsStreaming(false);
       setStreamingText("");
@@ -446,6 +451,7 @@ function ConnectChat() {
     if (!msg || isStreaming) return;
     setInput("");
     if (inputRef.current) inputRef.current.style.height = "44px";
+    lastInputWasVoiceRef.current = false;
     await sendMessageDirect(msg);
   };
 
