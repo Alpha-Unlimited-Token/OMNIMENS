@@ -447,9 +447,13 @@ function scheduleGracefulRestart(source: string, filename: string): void {
       active: true,
     }).catch(() => {});
 
-    setTimeout(() => {
-      process.exit(0);
-    }, 2000);
+    if (process.env.NODE_ENV === "production" || process.env.REPL_SLUG) {
+      console.log(`[SOURCE-INTEGRATION] ⚠️ Skipping process.exit in production — new modules will load on next deployment`);
+    } else {
+      setTimeout(() => {
+        process.exit(0);
+      }, 2000);
+    }
   }, 30000);
 
   console.log(`[SOURCE-INTEGRATION] 🔄 Graceful restart scheduled in 30 seconds (batching pending writes)...`);

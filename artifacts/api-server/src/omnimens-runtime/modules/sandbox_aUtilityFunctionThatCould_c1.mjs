@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-21T07:37:58.958Z
+ * Written: 2026-03-21T16:12:07.310Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,53 +16,63 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function calculateClusteringCoefficient(graph) {
-    // Function to calculate the clustering coefficient for a given graph
-    // Graph is represented as an adjacency list (object with nodes as keys and arrays of neighbors as values)
-    function getNodeClustering(node, neighbors) {
-        if (neighbors.length < 2) return 0;
+// Utility function: Find the most frequent patterns in a text
+function findFrequentPatterns(text, patternLength, topN) {
+    if (typeof text !== 'string' || typeof patternLength !== 'number' || typeof topN !== 'number') {
+        throw new Error('Invalid input types. Expected (string, number, number).');
+    }
+    if (patternLength <= 0 || topN <= 0) {
+        throw new Error('Pattern length and topN must be positive integers.');
+    }
+    const patternCounts = new Map();
 
-        let links = 0;
-        for (let i = 0; i < neighbors.length; i++) {
-            for (let j = i + 1; j < neighbors.length; j++) {
-                if (graph[neighbors[i]].includes(neighbors[j])) {
-                    links++;
-                }
-            }
-        }
-
-        const possibleLinks = (neighbors.length * (neighbors.length - 1)) / 2;
-        return links / possibleLinks;
+    // Extract all substrings of the given length
+    for (let i = 0; i <= text.length - patternLength; i++) {
+        const pattern = text.substring(i, i + patternLength);
+        patternCounts.set(pattern, (patternCounts.get(pattern) || 0) + 1);
     }
 
-    const clusteringCoefficients = {};
-    for (const node in graph) {
-        clusteringCoefficients[node] = getNodeClustering(node, graph[node]);
-    }
+    // Convert map to array and sort by frequency
+    const sortedPatterns = Array.from(patternCounts.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, topN);
 
-    return clusteringCoefficients;
+    // Return the top N patterns and their frequencies
+    return sortedPatterns.map(([pattern, count]) => ({ pattern, count }));
 }
 
-// Test cases
-const testGraph1 = {
-    A: ['B', 'C'],
-    B: ['A', 'C', 'D'],
-    C: ['A', 'B'],
-    D: ['B']
-};
+// Self-tests
+function runTests() {
+    console.log("Test 1: Basic functionality");
+    const text1 = "abcabcabc";
+    const result1 = findFrequentPatterns(text1, 3, 2);
+    console.log(result1); // Expected: [{ pattern: 'abc', count: 3 }]
 
-const testGraph2 = {
-    X: ['Y', 'Z'],
-    Y: ['X'],
-    Z: ['X']
-};
+    console.log("Test 2: Handling overlapping patterns");
+    const text2 = "aaaaaa";
+    const result2 = findFrequentPatterns(text2, 2, 2);
+    console.log(result2); // Expected: [{ pattern: 'aa', count: 5 }]
 
-const testGraph3 = {
-    P: [],
-    Q: ['R'],
-    R: ['Q']
-};
+    console.log("Test 3: Multiple patterns with same frequency");
+    const text3 = "abababab";
+    const result3 = findFrequentPatterns(text3, 2, 2);
+    console.log(result3); // Expected: [{ pattern: 'ab', count: 4 }, { pattern: 'ba', count: 3 }]
 
-console.log("Test Graph 1 Clustering Coefficients:", calculateClusteringCoefficient(testGraph1));
-console.log("Test Graph 2 Clustering Coefficients:", calculateClusteringCoefficient(testGraph2));
-console.log("Test Graph 3 Clustering Coefficients:", calculateClusteringCoefficient(testGraph3));
+    console.log("Test 4: Edge case - pattern length longer than text");
+    const text4 = "short";
+    const result4 = findFrequentPatterns(text4, 10, 1);
+    console.log(result4); // Expected: []
+
+    console.log("Test 5: Edge case - empty text");
+    const text5 = "";
+    const result5 = findFrequentPatterns(text5, 2, 1);
+    console.log(result5); // Expected: []
+
+    console.log("Test 6: Edge case - single character text");
+    const text6 = "a";
+    const result6 = findFrequentPatterns(text6, 1, 1);
+    console.log(result6); // Expected: [{ pattern: 'a', count: 1 }]
+}
+
+// Run tests
+runTests();
