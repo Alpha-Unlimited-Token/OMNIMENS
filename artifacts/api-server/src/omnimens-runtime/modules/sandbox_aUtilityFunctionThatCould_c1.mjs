@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-21T03:28:24.221Z
+ * Written: 2026-03-21T03:36:32.927Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -21,56 +21,47 @@ function findMostFrequentWords(text, topN) {
         throw new Error("Invalid input: text must be a string and topN must be a positive number.");
     }
 
-    // Normalize text by converting to lowercase and removing non-alphanumeric characters
-    const normalizedText = text.toLowerCase().replace(/[^a-z0-9\s]/g, '');
-    const words = normalizedText.split(/\s+/).filter(word => word.length > 0);
+    // Normalize text: remove punctuation, convert to lowercase
+    const normalizedText = text.replace(/[^\w\s]/g, '').toLowerCase();
+
+    // Split text into words
+    const words = normalizedText.split(/\s+/);
 
     // Count word frequencies
-    const wordCounts = {};
-    for (const word of words) {
-        wordCounts[word] = (wordCounts[word] || 0) + 1;
+    const wordCount = {};
+    for (let word of words) {
+        if (word) {
+            wordCount[word] = (wordCount[word] || 0) + 1;
+        }
     }
 
-    // Convert wordCounts to an array and sort by frequency
-    const sortedWords = Object.entries(wordCounts).sort((a, b) => b[1] - a[1]);
+    // Sort words by frequency and extract topN
+    const sortedWords = Object.entries(wordCount).sort((a, b) => b[1] - a[1]);
+    const mostFrequentWords = sortedWords.slice(0, topN).map(entry => ({ word: entry[0], count: entry[1] }));
 
-    // Return the top N most frequent words
-    return sortedWords.slice(0, topN).map(([word, count]) => ({ word, count }));
+    return mostFrequentWords;
 }
 
 // Self-tests
-function runTests() {
-    console.log("Running tests...");
+console.log("Test Case 1:");
+console.log(findMostFrequentWords("This is a test. This test is only a test.", 3));
+// Expected output: [{word: 'test', count: 3}, {word: 'this', count: 2}, {word: 'is', count: 2}]
 
-    const text1 = "This is a test. This test is only a test.";
-    const result1 = findMostFrequentWords(text1, 2);
-    console.log(result1); // Expected: [{ word: 'test', count: 3 }, { word: 'this', count: 2 }]
+console.log("Test Case 2:");
+console.log(findMostFrequentWords("Hello world! Hello universe. Hello everyone.", 2));
+// Expected output: [{word: 'hello', count: 3}, {word: 'world', count: 1}]
 
-    const text2 = "Hello world! Hello again, world.";
-    const result2 = findMostFrequentWords(text2, 3);
-    console.log(result2); // Expected: [{ word: 'hello', count: 2 }, { word: 'world', count: 2 }, { word: 'again', count: 1 }]
+console.log("Test Case 3:");
+console.log(findMostFrequentWords("One fish two fish red fish blue fish.", 4));
+// Expected output: [{word: 'fish', count: 4}, {word: 'one', count: 1}, {word: 'two', count: 1}, {word: 'red', count: 1}]
 
-    const text3 = "A quick brown fox jumps over the lazy dog.";
-    const result3 = findMostFrequentWords(text3, 5);
-    console.log(result3); // Expected: [{ word: 'a', count: 1 }, { word: 'quick', count: 1 }, ...]
+console.log("Test Case 4:");
+console.log(findMostFrequentWords("", 5));
+// Expected output: []
 
-    const text4 = "Repeated repeated repeated words words.";
-    const result4 = findMostFrequentWords(text4, 1);
-    console.log(result4); // Expected: [{ word: 'repeated', count: 3 }]
-
-    try {
-        findMostFrequentWords(12345, 2);
-    } catch (e) {
-        console.log(e.message); // Expected: Error about invalid input
-    }
-
-    try {
-        findMostFrequentWords("Valid text", -1);
-    } catch (e) {
-        console.log(e.message); // Expected: Error about invalid input
-    }
-
-    console.log("All tests completed.");
+console.log("Test Case 5:");
+try {
+    console.log(findMostFrequentWords(12345, 3));
+} catch (e) {
+    console.log(e.message); // Expected: "Invalid input: text must be a string and topN must be a positive number."
 }
-
-runTests();
