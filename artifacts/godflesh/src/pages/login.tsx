@@ -13,6 +13,16 @@ import { SEO, seoData } from "@/components/seo";
 
 // ── API calls ─────────────────────────────────────────────────────────────────
 
+async function safeJson(res: Response): Promise<any> {
+  const text = await res.text();
+  if (!text) throw new Error("Server is temporarily unavailable. Please try again in a moment.");
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error("Server is temporarily unavailable. Please try again in a moment.");
+  }
+}
+
 async function apiRegister(email: string, password: string, displayName: string) {
   const res = await fetch(`/api/auth/email/register`, {
     method: "POST",
@@ -20,7 +30,7 @@ async function apiRegister(email: string, password: string, displayName: string)
     body: JSON.stringify({ email, password, displayName }),
     credentials: "include",
   });
-  const data = await res.json();
+  const data = await safeJson(res);
   if (!res.ok) throw new Error(data.error || "Registration failed");
   return data;
 }
@@ -32,7 +42,7 @@ async function apiLogin(email: string, password: string, twoFactorCode?: string)
     body: JSON.stringify({ email, password, ...(twoFactorCode ? { twoFactorCode } : {}) }),
     credentials: "include",
   });
-  const data = await res.json();
+  const data = await safeJson(res);
   if (data.twoFactorRequired && !twoFactorCode) return data;
   if (!res.ok) throw new Error(data.error || "Login failed");
   return data;
@@ -45,7 +55,7 @@ async function apiGoogleVerify(credential: string) {
     body: JSON.stringify({ credential }),
     credentials: "include",
   });
-  const data = await res.json();
+  const data = await safeJson(res);
   if (!res.ok) throw new Error(data.error || "Google sign-in failed");
   return data;
 }

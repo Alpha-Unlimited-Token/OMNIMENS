@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-21T02:03:41.969Z
+ * Written: 2026-03-21T02:08:54.614Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,48 +16,67 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function: Extracts and counts unique words from a text, ignoring case and punctuation
-function extractUniqueWords(text) {
-    if (typeof text !== 'string') throw new Error("Input must be a string");
-
-    // Remove punctuation and normalize to lowercase
-    const cleanedText = text.replace(/[^\w\s]/g, '').toLowerCase();
-
-    // Split text into words and filter out empty strings
-    const words = cleanedText.split(/\s+/).filter(word => word.length > 0);
-
-    // Count occurrences of each unique word
-    const wordCounts = {};
-    for (let word of words) {
-        wordCounts[word] = (wordCounts[word] || 0) + 1;
+// Utility function: Extract unique words from a text, count their occurrences, and sort by frequency
+function analyzeTextFrequency(inputText) {
+    if (typeof inputText !== 'string') {
+        throw new Error("Input must be a string");
     }
 
-    return wordCounts;
+    // Normalize text: convert to lowercase and remove non-alphanumeric characters
+    const normalizedText = inputText.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+
+    // Split text into words
+    const words = normalizedText.split(/\s+/).filter(word => word.length > 0);
+
+    // Count word occurrences
+    const wordFrequency = {};
+    for (const word of words) {
+        wordFrequency[word] = (wordFrequency[word] || 0) + 1;
+    }
+
+    // Convert to array and sort by frequency (descending), then alphabetically for ties
+    const sortedWordFrequency = Object.entries(wordFrequency)
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+
+    return sortedWordFrequency;
 }
 
 // Self-tests
-(function testExtractUniqueWords() {
-    console.log("Test 1: Basic sentence");
-    const result1 = extractUniqueWords("Hello world! Hello again, world.");
-    console.log(result1); // Expected: { hello: 2, world: 2, again: 1 }
+function runTests() {
+    console.log("Running tests...");
 
-    console.log("Test 2: Empty string");
-    const result2 = extractUniqueWords("");
-    console.log(result2); // Expected: {}
+    // Test 1: Basic text analysis
+    const text1 = "Hello world! Hello again, world.";
+    const result1 = analyzeTextFrequency(text1);
+    console.log(result1);
+    // Expected: [['hello', 2], ['world', 2], ['again', 1]]
 
-    console.log("Test 3: Case insensitivity");
-    const result3 = extractUniqueWords("Case CASE case.");
-    console.log(result3); // Expected: { case: 3 }
+    // Test 2: Case insensitivity and punctuation handling
+    const text2 = "Test, test, TEST! This is a test.";
+    const result2 = analyzeTextFrequency(text2);
+    console.log(result2);
+    // Expected: [['test', 4], ['this', 1], ['is', 1], ['a', 1]]
 
-    console.log("Test 4: Numbers and mixed content");
-    const result4 = extractUniqueWords("123 apples, 123 oranges, APPLES!");
-    console.log(result4); // Expected: { '123': 2, apples: 2, oranges: 1 }
+    // Test 3: Empty string
+    const text3 = "";
+    const result3 = analyzeTextFrequency(text3);
+    console.log(result3);
+    // Expected: []
 
-    console.log("Test 5: Special characters");
-    const result5 = extractUniqueWords("!@#$%^&*()_+=-`~[]{}|;:'\",.<>?/\\");
-    console.log(result5); // Expected: {}
+    // Test 4: Numbers and mixed content
+    const text4 = "123 123 test 456 test 123";
+    const result4 = analyzeTextFrequency(text4);
+    console.log(result4);
+    // Expected: [['123', 3], ['test', 2], ['456', 1]]
 
-    console.log("Test 6: Long text");
-    const result6 = extractUniqueWords("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum.");
-    console.log(result6); // Expected: { lorem: 2, ipsum: 2, dolor: 1, sit: 1, amet: 1, consectetur: 1, adipiscing: 1, elit: 1 }
-})();
+    // Test 5: Single word
+    const text5 = "word";
+    const result5 = analyzeTextFrequency(text5);
+    console.log(result5);
+    // Expected: [['word', 1]]
+
+    console.log("Tests completed.");
+}
+
+// Run the self-tests
+runTests();
