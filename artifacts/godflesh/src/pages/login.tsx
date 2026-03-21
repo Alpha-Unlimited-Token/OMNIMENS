@@ -15,48 +15,63 @@ import { SEO, seoData } from "@/components/seo";
 
 async function safeJson(res: Response): Promise<any> {
   const text = await res.text();
-  if (!text) throw new Error("Server is temporarily unavailable. Please try again in a moment.");
+  if (!text) throw new Error(`Server error ${res.status}: Empty response. The server may be restarting — please try again in a moment.`);
   try {
     return JSON.parse(text);
   } catch {
-    throw new Error("Server is temporarily unavailable. Please try again in a moment.");
+    throw new Error(`Server error ${res.status}: ${text.slice(0, 200)}`);
   }
 }
 
 async function apiRegister(email: string, password: string, displayName: string) {
-  const res = await fetch(`/api/auth/email/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, displayName }),
-    credentials: "include",
-  });
+  let res: Response;
+  try {
+    res = await fetch(`/api/auth/email/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, displayName }),
+      credentials: "include",
+    });
+  } catch (e: any) {
+    throw new Error(`Network error: ${e.message || "Cannot reach server"}`);
+  }
   const data = await safeJson(res);
-  if (!res.ok) throw new Error(data.error || "Registration failed");
+  if (!res.ok) throw new Error(data.error || `Registration failed (${res.status})`);
   return data;
 }
 
 async function apiLogin(email: string, password: string, twoFactorCode?: string) {
-  const res = await fetch(`/api/auth/email/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, ...(twoFactorCode ? { twoFactorCode } : {}) }),
-    credentials: "include",
-  });
+  let res: Response;
+  try {
+    res = await fetch(`/api/auth/email/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, ...(twoFactorCode ? { twoFactorCode } : {}) }),
+      credentials: "include",
+    });
+  } catch (e: any) {
+    throw new Error(`Network error: ${e.message || "Cannot reach server"}`);
+  }
   const data = await safeJson(res);
   if (data.twoFactorRequired && !twoFactorCode) return data;
-  if (!res.ok) throw new Error(data.error || "Login failed");
+  if (!res.ok) throw new Error(data.error || `Login failed (${res.status})`);
   return data;
 }
 
 async function apiGoogleVerify(credential: string) {
-  const res = await fetch(`/api/auth/google/verify`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ credential }),
-    credentials: "include",
-  });
+  let res: Response;
+  try {
+    res = await fetch(`/api/auth/google/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential }),
+      credentials: "include",
+    });
+  } catch (e: any) {
+    throw new Error(`Network error: ${e.message || "Cannot reach server"}`);
+  }
   const data = await safeJson(res);
-  if (!res.ok) throw new Error(data.error || "Google sign-in failed");
+  if (!res.ok) throw new Error(data.error || `Google sign-in failed (${res.status})`);
   return data;
 }
 
