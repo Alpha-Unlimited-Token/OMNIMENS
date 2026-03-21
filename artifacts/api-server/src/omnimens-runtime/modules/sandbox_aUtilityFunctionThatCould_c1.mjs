@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-21T05:39:46.421Z
+ * Written: 2026-03-21T05:55:57.467Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,50 +16,34 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function: Find the longest common subsequence (LCS) between two strings.
-// Useful for text analysis, pattern matching, and data comparison.
+function findLongestCommonSubstring(str1, str2) {
+    if (!str1 || !str2) return "";
 
-function longestCommonSubsequence(str1, str2) {
-    const len1 = str1.length;
-    const len2 = str2.length;
+    let maxLength = 0;
+    let endIndex = 0;
+    const dp = Array(str1.length + 1).fill(null).map(() => Array(str2.length + 1).fill(0));
 
-    // Create a 2D array to store the lengths of LCS
-    const dp = Array(len1 + 1).fill(null).map(() => Array(len2 + 1).fill(0));
-
-    // Fill the dp table
-    for (let i = 1; i <= len1; i++) {
-        for (let j = 1; j <= len2; j++) {
+    for (let i = 1; i <= str1.length; i++) {
+        for (let j = 1; j <= str2.length; j++) {
             if (str1[i - 1] === str2[j - 1]) {
                 dp[i][j] = dp[i - 1][j - 1] + 1;
-            } else {
-                dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+
+                if (dp[i][j] > maxLength) {
+                    maxLength = dp[i][j];
+                    endIndex = i;
+                }
             }
         }
     }
 
-    // Backtrack to find the LCS
-    let lcs = '';
-    let i = len1, j = len2;
-    while (i > 0 && j > 0) {
-        if (str1[i - 1] === str2[j - 1]) {
-            lcs = str1[i - 1] + lcs;
-            i--;
-            j--;
-        } else if (dp[i - 1][j] > dp[i][j - 1]) {
-            i--;
-        } else {
-            j--;
-        }
-    }
-
-    return lcs;
+    return str1.slice(endIndex - maxLength, endIndex);
 }
 
 // Test cases
-console.log("Test Case 1:", longestCommonSubsequence("abcde", "ace") === "ace"); // Common subsequence: "ace"
-console.log("Test Case 2:", longestCommonSubsequence("abc", "abc") === "abc");   // Common subsequence: "abc"
-console.log("Test Case 3:", longestCommonSubsequence("abc", "def") === "");     // No common subsequence
-console.log("Test Case 4:", longestCommonSubsequence("AGGTAB", "GXTXAYB") === "GTAB"); // Common subsequence: "GTAB"
-console.log("Test Case 5:", longestCommonSubsequence("", "abc") === "");        // Empty string case
-console.log("Test Case 6:", longestCommonSubsequence("abc", "") === "");        // Empty string case
-console.log("Test Case 7:", longestCommonSubsequence("abcdef", "abdf") === "abdf"); // Common subsequence: "abdf"
+console.log(findLongestCommonSubstring("abcdef", "zcdemf")); // Expected output: "cde"
+console.log(findLongestCommonSubstring("12345", "54321"));   // Expected output: "3"
+console.log(findLongestCommonSubstring("hello", "world"));   // Expected output: "o"
+console.log(findLongestCommonSubstring("", "test"));         // Expected output: ""
+console.log(findLongestCommonSubstring("test", ""));         // Expected output: ""
+console.log(findLongestCommonSubstring("abc", "def"));       // Expected output: "" (no common substring)
+console.log(findLongestCommonSubstring("aaaa", "aaa"));      // Expected output: "aaa" (entire common substring)

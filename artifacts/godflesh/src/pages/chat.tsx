@@ -6179,6 +6179,18 @@ export default function Chat() {
                 </div>
                 <h2 className="hidden sm:block font-display text-2xl tracking-[0.3em] text-white/85 mt-2">OMNIMENS AWAITS</h2>
                 <p className="hidden sm:block font-mono text-sm mt-2 text-white/70">Speak your intent. Upload your vision.</p>
+
+                {/* Talk to OMNIMENS mic button */}
+                <button
+                  onClick={() => setLocation("/connect")}
+                  className="mt-4 group flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-primary/25 bg-primary/8 hover:bg-primary/15 hover:border-primary/40 transition-all"
+                >
+                  <span className="w-8 h-8 rounded-full bg-primary/20 group-hover:bg-primary/30 flex items-center justify-center transition-colors">
+                    <Mic className="w-4 h-4 text-primary" />
+                  </span>
+                  <span className="text-white/70 group-hover:text-white text-sm font-mono tracking-wide transition-colors">Talk to OMNIMENS</span>
+                </button>
+
                 {/* Category chips */}
                 <div className="mt-5 w-full max-w-lg overflow-x-auto pb-2 omnimens-scrollbar-x">
                   <div className="flex gap-2 px-4 sm:justify-center w-max sm:w-full sm:mx-auto">

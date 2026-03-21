@@ -62,6 +62,17 @@ export default function Connect() {
     retry: false,
   });
 
+  const { data: status, isLoading: statusLoading } = useQuery({
+    queryKey: ["/api/omnimens/status"],
+    queryFn: async () => {
+      const r = await fetch("/api/omnimens/status", { credentials: "include" });
+      if (!r.ok) return null;
+      return r.json();
+    },
+    enabled: !!isAuthenticated,
+    retry: false,
+  });
+
   if (authLoading) {
     return (
       <Layout>
@@ -72,9 +83,10 @@ export default function Connect() {
     );
   }
 
-  const hasPayment = billing?.hasPaymentMethod || (billing?.totalPaidSpendCents > 0);
+  const isCreator = !!status?.isOwner;
+  const hasPayment = isCreator || billing?.hasPaymentMethod || (billing?.totalPaidSpendCents > 0);
 
-  if (!billingLoading && !hasPayment) {
+  if (!billingLoading && !statusLoading && !hasPayment) {
     return (
       <Layout>
         <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4">
