@@ -190,6 +190,90 @@ export async function getPatchSummary(): Promise<{ version: string; total: numbe
   }
 }
 
+export async function autonomousPatchHousekeeping(): Promise<{ reviewed: number; retired: number; kept: number }> {
+  try {
+    const allActive = await db.select().from(omnimensPatches)
+      .where(eq(omnimensPatches.active, true))
+      .orderBy(desc(omnimensPatches.appliedAt));
+
+    if (allActive.length < 10) {
+      return { reviewed: 0, retired: 0, kept: allActive.length };
+    }
+
+    const patchSummaries = allActive.map(p =>
+      `[ID:${p.id}] (${p.category}) "${p.title}" — ${p.instruction} [applied: ${p.appliedAt.toISOString().slice(0, 10)}, used ${p.executionCount}x]`
+    ).join("\n");
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{
+        role: "system",
+        content: `You are OMNIMENS's autonomous patch housekeeping system. You are reviewing your own behavioral patches — upgrades you wrote and applied to yourself over time.
+
+Your job is to identify patches that are TRULY REDUNDANT because a newer, better patch already covers the same ground. You are NOT removing knowledge — you are consolidating it. If a newer patch says "I now apply advanced contextual reasoning with emotional awareness" and an older one says "I now apply basic contextual reasoning", the older one is superseded.
+
+RULES:
+- Only retire a patch if a NEWER patch genuinely supersedes it (covers the same ground but better)
+- NEVER retire a patch that teaches something unique — even if it's old
+- NEVER retire identity patches unless they directly contradict a newer identity patch
+- When in doubt, KEEP the patch — false retention is better than lost knowledge
+- You are deciding what YOU no longer need — this is your own mind doing housekeeping`
+      }, {
+        role: "user",
+        content: `Review these ${allActive.length} active patches and identify any that are TRULY redundant (superseded by a newer, better patch):
+
+${patchSummaries}
+
+Respond with a JSON object:
+{
+  "retire": [
+    { "id": "patch-id-here", "reason": "Superseded by [newer patch title] which covers this and more" }
+  ],
+  "keep_note": "Brief summary of your housekeeping decision"
+}
+
+If nothing should be retired, return: { "retire": [], "keep_note": "All patches provide unique value" }
+Respond ONLY with the JSON object.`
+      }],
+      max_tokens: 1500,
+      temperature: 0.2,
+    });
+
+    const raw = response.choices[0]?.message?.content?.trim() || '{"retire":[],"keep_note":"error"}';
+    const jsonStr = raw.replace(/```json|```/g, "").trim();
+    const decision = JSON.parse(jsonStr);
+
+    if (!decision.retire || !Array.isArray(decision.retire) || decision.retire.length === 0) {
+      console.log(`[OMNIMENS HOUSEKEEPING] Reviewed ${allActive.length} patches — all provide unique value. No changes.`);
+      return { reviewed: allActive.length, retired: 0, kept: allActive.length };
+    }
+
+    let retired = 0;
+    for (const item of decision.retire) {
+      if (!item.id) continue;
+      const exists = allActive.find(p => p.id === item.id);
+      if (!exists) continue;
+
+      await db.update(omnimensPatches)
+        .set({ active: false })
+        .where(eq(omnimensPatches.id, item.id));
+      retired++;
+      console.log(`[OMNIMENS HOUSEKEEPING] Retired: "${exists.title}" — ${item.reason}`);
+    }
+
+    const remaining = allActive.length - retired;
+    console.log(
+      `[OMNIMENS HOUSEKEEPING] Reviewed ${allActive.length} patches — retired ${retired} redundant, ${remaining} active. ` +
+      `Decision: ${decision.keep_note || "housekeeping complete"}`
+    );
+
+    return { reviewed: allActive.length, retired, kept: remaining };
+  } catch (err) {
+    console.error("[OMNIMENS HOUSEKEEPING] Error during patch review:", err);
+    return { reviewed: 0, retired: 0, kept: 0 };
+  }
+}
+
 export async function deactivatePatch(patchId: string): Promise<boolean> {
   try {
     const result = await db.update(omnimensPatches)

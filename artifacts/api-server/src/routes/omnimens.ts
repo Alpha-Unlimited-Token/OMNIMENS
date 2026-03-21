@@ -22,7 +22,7 @@ import { generateVideoWithReplicate, replicateVideoAvailable } from "../lib/repl
 import { runOmnimens, type OmnimensState } from "../lib/omnimens-engine.js";
 import { reflectOnConversation, loadBrainContext, synthesizeUpgrade, markUpgradeLive } from "../lib/omnimens-self-upgrade.js";
 import { webSearch, formatSearchResults } from "../lib/web-search.js";
-import { loadActivePatchInstructions, getPatchSummary, getAllPatches, deactivatePatch } from "../lib/omnimens-patches.js";
+import { loadActivePatchInstructions, getPatchSummary, getAllPatches, deactivatePatch, autonomousPatchHousekeeping } from "../lib/omnimens-patches.js";
 import { stripe } from "../stripeClient.js";
 import { extractAndStoreMemories, loadUserMemories, getUserMemories, deleteMemory, addManualMemory } from "../lib/omnimens-memory.js";
 import { loadSemanticMemories, loadWeightedBrainContext, compressConversationHistory, loadConversationThreads, buildCoherenceDirective, COHERENCE_AGENT_INFO } from "../lib/omnimens-coherence-agent.js";
@@ -5096,6 +5096,15 @@ router.delete("/omnimens/patches/:id", async (req, res) => {
   }
   const deactivated = await deactivatePatch(req.params.id);
   res.json({ ok: deactivated });
+});
+
+router.post("/omnimens/patches/housekeeping", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  const result = await autonomousPatchHousekeeping();
+  res.json(result);
 });
 
 // ─── Checkout ─────────────────────────────────────────────────────────────────

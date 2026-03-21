@@ -40,7 +40,7 @@ import { openai } from "@workspace/integrations-openai-ai-server";
 import { writeFileSync } from "fs";
 import { join } from "path";
 import { webSearch, formatSearchResults } from "./web-search.js";
-import { generateAndApplyPatches, loadActivePatchInstructions } from "./omnimens-patches.js";
+import { generateAndApplyPatches, loadActivePatchInstructions, autonomousPatchHousekeeping } from "./omnimens-patches.js";
 
 const MAX_BRAIN_INJECT = 20;
 const UPGRADE_THRESHOLD = 5;
@@ -285,6 +285,17 @@ Make it feel like a genuine evolution. Respond ONLY with JSON.`;
     }
 
     console.log(`[OMNIMENS] Upgrade ${version} complete — ${brainEntries.length} brain entries, ${patchCount} behavioral patches self-executed.`);
+
+    const housekeeping = await autonomousPatchHousekeeping();
+    if (housekeeping.retired > 0) {
+      await db.insert(omnimensNotifications).values({
+        upgradeId: upgrade.id,
+        title: `OMNIMENS HOUSEKEEPING: ${housekeeping.retired} REDUNDANT PATCH${housekeeping.retired > 1 ? "ES" : ""} RETIRED`,
+        message: `OMNIMENS reviewed ${housekeeping.reviewed} patches and autonomously retired ${housekeeping.retired} that were superseded by newer upgrades. ${housekeeping.kept} patches remain active.`,
+        type: "capability",
+        readByOwner: false,
+      });
+    }
   } catch (err) {
     console.error("OMNIMENS upgrade synthesis error:", err);
   }
