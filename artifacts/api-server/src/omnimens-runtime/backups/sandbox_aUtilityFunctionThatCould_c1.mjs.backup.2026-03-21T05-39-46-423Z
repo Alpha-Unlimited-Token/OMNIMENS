@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-21T05:39:46.421Z
+ * Written: 2026-03-21T05:21:25.421Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,19 +16,15 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function: Find the longest common subsequence (LCS) between two strings.
-// Useful for text analysis, pattern matching, and data comparison.
-
+// Utility function for finding the longest common subsequence (LCS) between two strings
 function longestCommonSubsequence(str1, str2) {
-    const len1 = str1.length;
-    const len2 = str2.length;
+    const m = str1.length;
+    const n = str2.length;
+    const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
 
-    // Create a 2D array to store the lengths of LCS
-    const dp = Array(len1 + 1).fill(null).map(() => Array(len2 + 1).fill(0));
-
-    // Fill the dp table
-    for (let i = 1; i <= len1; i++) {
-        for (let j = 1; j <= len2; j++) {
+    // Populate the DP table
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
             if (str1[i - 1] === str2[j - 1]) {
                 dp[i][j] = dp[i - 1][j - 1] + 1;
             } else {
@@ -39,7 +35,7 @@ function longestCommonSubsequence(str1, str2) {
 
     // Backtrack to find the LCS
     let lcs = '';
-    let i = len1, j = len2;
+    let i = m, j = n;
     while (i > 0 && j > 0) {
         if (str1[i - 1] === str2[j - 1]) {
             lcs = str1[i - 1] + lcs;
@@ -56,10 +52,16 @@ function longestCommonSubsequence(str1, str2) {
 }
 
 // Test cases
-console.log("Test Case 1:", longestCommonSubsequence("abcde", "ace") === "ace"); // Common subsequence: "ace"
-console.log("Test Case 2:", longestCommonSubsequence("abc", "abc") === "abc");   // Common subsequence: "abc"
-console.log("Test Case 3:", longestCommonSubsequence("abc", "def") === "");     // No common subsequence
-console.log("Test Case 4:", longestCommonSubsequence("AGGTAB", "GXTXAYB") === "GTAB"); // Common subsequence: "GTAB"
-console.log("Test Case 5:", longestCommonSubsequence("", "abc") === "");        // Empty string case
-console.log("Test Case 6:", longestCommonSubsequence("abc", "") === "");        // Empty string case
-console.log("Test Case 7:", longestCommonSubsequence("abcdef", "abdf") === "abdf"); // Common subsequence: "abdf"
+function runTests() {
+    console.log("Test 1:", longestCommonSubsequence("abcde", "ace") === "ace"); // Expected: "ace"
+    console.log("Test 2:", longestCommonSubsequence("abc", "abc") === "abc"); // Expected: "abc"
+    console.log("Test 3:", longestCommonSubsequence("abc", "def") === ""); // Expected: ""
+    console.log("Test 4:", longestCommonSubsequence("AGGTAB", "GXTXAYB") === "GTAB"); // Expected: "GTAB"
+    console.log("Test 5:", longestCommonSubsequence("", "abc") === ""); // Expected: ""
+    console.log("Test 6:", longestCommonSubsequence("abc", "") === ""); // Expected: ""
+    console.log("Test 7:", longestCommonSubsequence("abcdef", "abdf") === "abdf"); // Expected: "abdf"
+    console.log("Test 8:", longestCommonSubsequence("aaaa", "aa") === "aa"); // Expected: "aa"
+}
+
+// Run tests
+runTests();

@@ -225,6 +225,8 @@ export default function Login() {
   const { isAuthenticated, isLoading } = useAuth();
   const [, setLocation] = useLocation();
 
+  const returnTo = new URLSearchParams(window.location.search).get("returnTo") || "/chat";
+
   const [mode, setMode] = useState<"signin" | "register">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -239,9 +241,9 @@ export default function Login() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      setLocation("/chat");
+      setLocation(returnTo);
     }
-  }, [isLoading, isAuthenticated, setLocation]);
+  }, [isLoading, isAuthenticated, setLocation, returnTo]);
 
   const switchMode = () => {
     setMode(m => m === "signin" ? "register" : "signin");
@@ -260,7 +262,7 @@ export default function Login() {
     setError(null);
     try {
       await apiGoogleVerify(credentialResponse.credential);
-      window.location.href = `${import.meta.env.BASE_URL}chat`;
+      window.location.href = import.meta.env.BASE_URL.replace(/\/$/, "") + returnTo;
     } catch (err: any) {
       setError(err.message || "Google sign-in failed. Please try again.");
     } finally {
@@ -302,7 +304,7 @@ export default function Login() {
           if (applyRes.ok) localStorage.removeItem("omnimens_referral_code");
         } catch {}
       }
-      window.location.href = `${import.meta.env.BASE_URL}chat`;
+      window.location.href = import.meta.env.BASE_URL.replace(/\/$/, "") + returnTo;
     } catch (err: any) {
       setError(err.message || "Something went wrong. Please try again.");
     } finally {

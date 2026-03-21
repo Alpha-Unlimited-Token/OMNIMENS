@@ -131,13 +131,15 @@ function WS({ children }: { children: ReactNode }) {
   return <WorkspaceLayout>{children}</WorkspaceLayout>;
 }
 
-function ProtectedRoute({ children }: { children: ReactNode }) {
+function ProtectedRoute({ children, layout = "ws" }: { children: ReactNode; layout?: "ws" | "none" }) {
   const { isAuthenticated, isLoading } = useAuth();
   if (isLoading) return <PageFallback />;
   if (!isAuthenticated) {
-    window.location.replace(import.meta.env.BASE_URL + "login");
+    const currentPath = window.location.pathname.replace(import.meta.env.BASE_URL.replace(/\/$/, ""), "") || "/";
+    window.location.replace(import.meta.env.BASE_URL + "login?returnTo=" + encodeURIComponent(currentPath));
     return <PageFallback />;
   }
+  if (layout === "none") return <>{children}</>;
   return <WS>{children}</WS>;
 }
 
@@ -174,7 +176,7 @@ function Router() {
         <Route path="/contact" component={Contact} />
         <Route path="/footer-links" component={FooterLinks} />
         <Route path="/lip-sync" component={LipSync} />
-        <Route path="/connect" component={Connect} />
+        <Route path="/connect">{() => <ProtectedRoute layout="none"><Connect /></ProtectedRoute>}</Route>
         <Route component={NotFound} />
       </Switch>
     </Suspense>
