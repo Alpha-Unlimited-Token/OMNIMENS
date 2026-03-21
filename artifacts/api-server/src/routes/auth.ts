@@ -114,7 +114,7 @@ function setSessionCookie(res: Response, sid: string) {
 
 function getSafeReturnTo(value: unknown): string {
   if (typeof value !== "string" || !value.startsWith("/") || value.startsWith("//")) {
-    return "/";
+    return "/chat";
   }
   return value;
 }
