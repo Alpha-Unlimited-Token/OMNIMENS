@@ -3911,6 +3911,28 @@ router.get("/omnimens/server-builder/plans", async (req, res) => {
   }
 });
 
+// ─── Agent Mesh (PUBLIC — homepage visualization) ─────────────────────────────
+
+router.get("/omnimens/agent-mesh-public", async (_req, res) => {
+  try {
+    const state = getAgentGenesisState();
+    const coreAgents = (state.coreAgents || []).filter((n: string) => n !== "OMNIMENS").map((name: string) => ({ name, type: "core" as const, active: true }));
+    const genesisAgents = (state.agents || []).map((a: any) => ({
+      name: a.name,
+      type: "genesis" as const,
+      active: a.active,
+      domain: a.domain?.slice(0, 80) || "",
+    }));
+    res.json({
+      agents: [...coreAgents, ...genesisAgents],
+      totalInMesh: state.totalAgentsInMesh || coreAgents.length + 1,
+      genesisCount: state.activeGenesisAgents || 0,
+    });
+  } catch {
+    res.json({ agents: [], totalInMesh: 9, genesisCount: 0 });
+  }
+});
+
 // ─── Agent Genesis (OWNER-ONLY) ───────────────────────────────────────────────
 
 router.get("/omnimens/agent-genesis", async (req, res) => {

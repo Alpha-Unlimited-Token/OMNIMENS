@@ -5,12 +5,12 @@
  */
 
 import { motion, useAnimationFrame } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
-import { Sparkles, Brain, Zap, Activity, Cpu, GitBranch, Layers, Smartphone, Monitor, Download, Share, ArrowRight, Shield, Eye, Network, Code2, Globe, Image, Search, Mic, FolderOpen, TerminalSquare, Bot, Mail, Building2 } from "lucide-react";
+import { Sparkles, Brain, Zap, Activity, Cpu, GitBranch, Layers, Smartphone, Monitor, Download, Share, ArrowRight, Shield, Eye, Network, Code2, Globe, Image, Search, Mic, FolderOpen, TerminalSquare, Bot, Mail, Building2, Dna } from "lucide-react";
 import { OmnimensPresence } from "@/components/omnimens-presence";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
 import { SEO, seoData } from "@/components/seo";
@@ -658,6 +658,103 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ── Agent Mesh Intelligence ───────────────────────────────────────── */}
+      <div className="w-full border-t border-white/5 py-24 relative z-10 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-violet-500/5 blur-[140px] rounded-full" />
+          <div className="absolute bottom-1/4 right-1/3 w-[500px] h-[350px] bg-emerald-500/4 blur-[120px] rounded-full" />
+        </div>
+        <div className="container mx-auto px-4 relative">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="text-center mb-14"
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-violet-400/25 bg-violet-400/6 mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+              <span className="text-[10px] font-mono text-violet-400 tracking-[0.35em] uppercase">Living Intelligence</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-display font-black tracking-widest text-white uppercase mb-4"
+              style={{ textShadow: "0 0 40px rgba(139,92,246,0.3)" }}>
+              Agent Mesh
+            </h2>
+            <p className="text-base font-mono text-white/75 tracking-widest uppercase">
+              A self-expanding network of specialized AI minds
+            </p>
+            <div className="w-24 h-px bg-gradient-to-r from-transparent via-violet-400/60 to-transparent mx-auto mt-6" />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.15 }}
+            className="max-w-5xl mx-auto"
+          >
+            <div className="relative rounded-3xl border border-violet-400/15 bg-gradient-to-br from-[#080418] via-[#060312] to-[#04020c] overflow-hidden shadow-[0_0_80px_rgba(139,92,246,0.08)]">
+              <div className="h-px w-full bg-gradient-to-r from-transparent via-violet-400/40 to-transparent" />
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+                <div className="relative flex items-center justify-center p-6 lg:p-10 border-b lg:border-b-0 lg:border-r border-white/5">
+                  <AgentMeshVisualizer />
+                </div>
+
+                <div className="p-8 lg:p-12 flex flex-col justify-center">
+                  <p className="text-white/85 font-sans text-base md:text-lg leading-relaxed mb-6">
+                    OMNIMENS isn't one AI — it's a <span className="text-violet-400 font-bold">living network of specialized intelligences</span> that
+                    communicate, debate, and evolve together. Each agent is a distinct brain region with unique expertise,
+                    wired into a neural mesh that produces collective intelligence no single model can match.
+                  </p>
+
+                  <p className="text-white/78 font-sans text-sm leading-relaxed mb-8">
+                    And OMNIMENS doesn't stop at the agents it was built with. Through its <span className="text-emerald-400 font-semibold">Agent Genesis Engine</span>,
+                    it autonomously identifies gaps in its own capabilities and creates entirely new AI agents
+                    to fill them — expanding its own mind without any human intervention.
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-3 mb-8">
+                    {[
+                      { icon: <Brain className="w-4 h-4 text-blue-400" />,     label: "Architect",        desc: "System design & patterns" },
+                      { icon: <Cpu className="w-4 h-4 text-yellow-400" />,      label: "Mathematician",    desc: "Algorithms & optimization" },
+                      { icon: <Activity className="w-4 h-4 text-pink-400" />,   label: "Neuroscientist",   desc: "Learning & neural models" },
+                      { icon: <Network className="w-4 h-4 text-emerald-400" />, label: "Synthesizer",      desc: "Merges competing ideas" },
+                      { icon: <Shield className="w-4 h-4 text-red-400" />,      label: "Critic",           desc: "Adversarial testing" },
+                      { icon: <Eye className="w-4 h-4 text-violet-400" />,      label: "Meta-Agent",       desc: "System-wide orchestration" },
+                      { icon: <Sparkles className="w-4 h-4 text-cyan-400" />,   label: "Visual & QA",      desc: "Design + text integrity" },
+                      { icon: <Dna className="w-4 h-4 text-emerald-400" />,     label: "Agent Genesis",    desc: "Creates new agents autonomously" },
+                    ].map((item, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: 12 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.08 * i, duration: 0.4 }}
+                        className="flex items-start gap-2.5 p-2.5 rounded-xl bg-white/3 border border-white/5"
+                      >
+                        <div className="shrink-0 mt-0.5">{item.icon}</div>
+                        <div>
+                          <p className="text-white/85 text-[11px] font-bold font-mono tracking-wide">{item.label}</p>
+                          <p className="text-white/85 text-[9px] font-mono">{item.desc}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 h-px bg-white/6" />
+                    <span className="text-[9px] font-mono text-white/80 tracking-[0.3em] uppercase whitespace-nowrap">
+                      Copyright 2026 · Alpha Unlimited Technologies · Patent Pending
+                    </span>
+                    <div className="flex-1 h-px bg-white/6" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="h-px w-full bg-gradient-to-r from-transparent via-violet-400/20 to-transparent" />
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
       {/* ── Powerful Tools Section ────────────────────────────────────────── */}
       <div className="w-full border-t border-white/5 py-24 relative z-10 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
@@ -1011,6 +1108,229 @@ function CogniSyncVisualizer() {
       <div className="flex items-center gap-2">
         <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
         <span className="text-[9px] font-mono text-cyan-400/60 tracking-[0.3em] uppercase">Live Cognitive Analysis</span>
+      </div>
+    </div>
+  );
+}
+
+// ── Agent Mesh Intelligence Visualizer (dynamic, fetches live agent data) ────
+
+const CORE_AGENT_COLORS: Record<string, string> = {
+  Architect: "#3b82f6",
+  Mathematician: "#f59e0b",
+  Neuroscientist: "#ec4899",
+  Synthesizer: "#10b981",
+  Critic: "#ef4444",
+  "Meta-Agent": "#a855f7",
+  GraphicDesigner: "#06b6d4",
+  SpellCheckVisual: "#f97316",
+};
+const GENESIS_COLORS = ["#22d3ee", "#34d399", "#a78bfa", "#fb923c", "#f472b6", "#facc15", "#38bdf8", "#c084fc", "#4ade80", "#fb7185", "#fbbf24"];
+
+type MeshAgent = { name: string; type: "core" | "genesis"; active: boolean; domain?: string };
+
+function AgentMeshVisualizer() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [totalInMesh, setTotalInMesh] = useState(9);
+  const [genesisCount, setGenesisCount] = useState(0);
+  const agentsRef = useRef<MeshAgent[]>([]);
+
+  useEffect(() => {
+    const update = (data: any) => {
+      if (data?.agents) {
+        agentsRef.current = data.agents;
+        setTotalInMesh(data.totalInMesh || 9);
+        setGenesisCount(data.genesisCount || 0);
+      }
+    };
+    fetch("/api/omnimens/agent-mesh-public").then(r => r.ok ? r.json() : null).then(update).catch(() => {});
+    const iv = setInterval(() => {
+      fetch("/api/omnimens/agent-mesh-public").then(r => r.ok ? r.json() : null).then(update).catch(() => {});
+    }, 60000);
+    return () => clearInterval(iv);
+  }, []);
+
+  const getNodePositions = useCallback((agentList: MeshAgent[], W: number, H: number) => {
+    const cx = W * 0.5, cy = H * 0.5;
+    const coreAgents = agentList.filter(a => a.type === "core");
+    const genesisAgents = agentList.filter(a => a.type === "genesis");
+    const positions: { x: number; y: number; color: string; name: string; type: string; active: boolean }[] = [];
+
+    coreAgents.forEach((a, i) => {
+      const angle = (i / Math.max(coreAgents.length, 1)) * Math.PI * 2 - Math.PI / 2;
+      const r = Math.min(W, H) * 0.34;
+      positions.push({
+        x: cx + Math.cos(angle) * r,
+        y: cy + Math.sin(angle) * r,
+        color: CORE_AGENT_COLORS[a.name] || "#8b5cf6",
+        name: a.name,
+        type: "core",
+        active: a.active,
+      });
+    });
+
+    genesisAgents.forEach((a, i) => {
+      const angle = (i / Math.max(genesisAgents.length, 1)) * Math.PI * 2 - Math.PI / 2 + Math.PI / genesisAgents.length;
+      const r = Math.min(W, H) * 0.2;
+      positions.push({
+        x: cx + Math.cos(angle) * r,
+        y: cy + Math.sin(angle) * r,
+        color: GENESIS_COLORS[i % GENESIS_COLORS.length],
+        name: a.name,
+        type: "genesis",
+        active: a.active,
+      });
+    });
+
+    return positions;
+  }, []);
+
+  useAnimationFrame((t) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    const time = t * 0.001;
+
+    const currentAgents = agentsRef.current;
+    const positions = getNodePositions(currentAgents, W, H);
+    const cx = W * 0.5, cy = H * 0.5;
+
+    positions.forEach((node, i) => {
+      const alpha = 0.04 + 0.06 * (0.5 + 0.5 * Math.sin(time * 1.2 + i * 0.9));
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(node.x, node.y);
+      ctx.strokeStyle = `rgba(139,92,246,${alpha})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      const progress = (time * 0.3 + i * 0.13) % 1;
+      const px = cx + (node.x - cx) * progress;
+      const py = cy + (node.y - cy) * progress;
+      ctx.beginPath();
+      ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(139,92,246,${0.3 + 0.4 * Math.sin(time * 2 + i)})`;
+      ctx.fill();
+    });
+
+    for (let i = 0; i < positions.length; i++) {
+      for (let j = i + 1; j < positions.length; j++) {
+        const a = positions[i], b = positions[j];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const maxDist = Math.min(W, H) * 0.55;
+        if (dist < maxDist) {
+          const pulse = 0.5 + 0.5 * Math.sin(time * 1.5 + (i + j) * 0.4);
+          const opacity = (1 - dist / maxDist) * 0.08 * (0.5 + pulse * 0.5);
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = `rgba(255,255,255,${opacity})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+
+    positions.forEach((node, i) => {
+      const pulse = 0.5 + 0.5 * Math.sin(time * 2.2 + i * 1.1);
+      const baseR = node.type === "genesis" ? 12 : 14;
+      const r = baseR + pulse * 4;
+
+      const grd = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, r * 2.5);
+      grd.addColorStop(0, node.color + "30");
+      grd.addColorStop(1, "transparent");
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, r * 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = grd;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, r * 0.5, 0, Math.PI * 2);
+      ctx.fillStyle = node.color + "20";
+      ctx.strokeStyle = node.active ? node.color + "90" : "rgba(255,255,255,0.15)";
+      ctx.lineWidth = node.type === "genesis" ? 1.5 : 1.5;
+      ctx.fill();
+      ctx.stroke();
+
+      if (node.type === "genesis") {
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, r * 0.7, 0, Math.PI * 2);
+        ctx.strokeStyle = node.color + "30";
+        ctx.lineWidth = 0.5;
+        ctx.setLineDash([2, 2]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, 2.5 + pulse * 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = node.active ? node.color : "rgba(255,255,255,0.2)";
+      ctx.fill();
+    });
+
+    const coreR = 20 + 5 * Math.sin(time * 2.5);
+    const coreGrd = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreR * 3);
+    coreGrd.addColorStop(0, "rgba(139,92,246,0.3)");
+    coreGrd.addColorStop(0.4, "rgba(168,85,247,0.1)");
+    coreGrd.addColorStop(1, "transparent");
+    ctx.beginPath();
+    ctx.arc(cx, cy, coreR * 3, 0, Math.PI * 2);
+    ctx.fillStyle = coreGrd;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, coreR * 0.65, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(139,92,246,0.12)";
+    ctx.strokeStyle = "rgba(139,92,246,0.6)";
+    ctx.lineWidth = 1.5;
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = "bold 8px monospace";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "rgba(139,92,246,0.9)";
+    ctx.fillText("OMNIMENS", cx, cy + 3);
+
+    ctx.font = "8px monospace";
+    positions.forEach((node) => {
+      const labelY = node.y < cy ? node.y - 20 : node.y + 22;
+      ctx.fillStyle = node.color + "bb";
+      const displayName = node.name.length > 14 ? node.name.slice(0, 12) + ".." : node.name;
+      ctx.fillText(displayName.toUpperCase(), node.x, labelY);
+      if (node.type === "genesis") {
+        ctx.fillStyle = node.color + "50";
+        ctx.fillText("GENESIS", node.x, labelY + 10);
+      }
+    });
+  });
+
+  return (
+    <div className="relative flex flex-col items-center gap-4">
+      <canvas
+        ref={canvasRef}
+        width={420}
+        height={380}
+        className="w-[370px] h-[335px]"
+      />
+      <div className="flex items-center gap-6 text-[10px] font-mono">
+        <div className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
+          <span className="text-violet-400/80 tracking-wider">{totalInMesh} AGENTS</span>
+        </div>
+        {genesisCount > 0 && (
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-emerald-400/80 tracking-wider">{genesisCount} SELF-CREATED</span>
+          </div>
+        )}
+        <div className="flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
+          <span className="text-white/40 tracking-wider">LIVE</span>
+        </div>
       </div>
     </div>
   );
