@@ -358,7 +358,7 @@ async function dreamTick_handler(): Promise<void> {
   }
 
   state.creativityBoost = clamp(
-    (state.remDuration * 0.01) + (state.deepSleepDuration * 0.005) + (state.breakthroughs * 0.02)
+    (state.remDuration * 0.01) + (state.deepSleepDuration * 0.005) + (state.breakthroughs * 0.02) + (state.selfImprovementsApplied * 0.05)
   );
 
   if (dreamTick % 50 === 0) {
@@ -574,12 +574,22 @@ export async function getDreamState(): Promise<DreamState & { persistentBreakthr
       .from(omnimensBrain)
       .where(sql`${omnimensBrain.category} = 'code_proposal' OR (${omnimensBrain.category} IN ('daydream_breakthrough', 'dream_breakthrough') AND ${omnimensBrain.content} LIKE '%code%')`);
 
+    const persistentBreakthroughs = Number(breakthroughCount?.count ?? 0);
+    const effectiveBreakthroughs = Math.max(state.breakthroughs, persistentBreakthroughs);
+
+    if (effectiveBreakthroughs > state.breakthroughs) {
+      state.breakthroughs = effectiveBreakthroughs;
+      state.creativityBoost = clamp(
+        (state.remDuration * 0.01) + (state.deepSleepDuration * 0.005) + (effectiveBreakthroughs * 0.02) + (state.selfImprovementsApplied * 0.05)
+      );
+    }
+
     return {
       ...state,
-      breakthroughs: Math.max(state.breakthroughs, Number(breakthroughCount?.count ?? 0)),
+      breakthroughs: effectiveBreakthroughs,
       totalInsights: Math.max(state.totalInsights, Number(insightCount?.count ?? 0)),
       codeProposalsGenerated: Math.max(state.codeProposalsGenerated, Number(codeCount?.count ?? 0)),
-      persistentBreakthroughs: Number(breakthroughCount?.count ?? 0),
+      persistentBreakthroughs,
       persistentInsights: Number(insightCount?.count ?? 0),
       persistentCodeProposals: Number(codeCount?.count ?? 0),
     };
@@ -598,21 +608,63 @@ export async function getRecentDreamInsights(limit = 10): Promise<DreamInsight[]
       .where(sql`${omnimensBrain.category} IN ('daydream_breakthrough', 'dream_breakthrough', 'creative_hypothesis', 'lucid_dream')`)
       .orderBy(desc(omnimensBrain.createdAt))
       .limit(limit);
-    return rows.map((r, i) => ({
-      id: r.id,
-      phase: r.category === "daydream_breakthrough" ? "divergent_thinking" as DaydreamMode : "rem" as DreamPhase,
-      title: r.title,
-      insight: r.content,
-      technologicalApplication: null,
-      codeProposal: null,
-      feasibility: (r.confidence ?? 0.7) * 100,
-      novelty: 70,
-      storedToBrain: true,
-      timestamp: r.createdAt?.getTime() ?? Date.now(),
-    }));
+    return rows.map((r, i) => {
+      let extractedCode: string | null = null;
+      if (r.content) {
+        const codeMatch = r.content.match(/```[\s\S]*?```/);
+        if (codeMatch) {
+          extractedCode = codeMatch[0];
+        } else {
+          const proposalMatch = r.content.match(/CODE PROPOSAL:\s*([\s\S]+?)(?:\n\n|$)/i);
+          if (proposalMatch) extractedCode = proposalMatch[1].trim();
+        }
+      }
+      return {
+        id: r.id,
+        phase: r.category === "daydream_breakthrough" ? "divergent_thinking" as DaydreamMode : "rem" as DreamPhase,
+        title: r.title,
+        insight: r.content,
+        technologicalApplication: null,
+        codeProposal: extractedCode,
+        feasibility: (r.confidence ?? 0.7) * 100,
+        novelty: 70,
+        storedToBrain: true,
+        timestamp: r.createdAt?.getTime() ?? Date.now(),
+      };
+    });
   } catch {
     return [];
   }
+}
+
+export function restoreDreamState(snapshot: {
+  breakthroughs?: number;
+  codeProposalsGenerated?: number;
+  totalInsights?: number;
+  dreamCycleCount?: number;
+  daydreamCycleCount?: number;
+  creativityBoost?: number;
+  nextLevelConcepts?: string[];
+  dreamNarrative?: string[];
+  selfImprovementsApplied?: number;
+}): void {
+  if (snapshot.breakthroughs) state.breakthroughs = snapshot.breakthroughs;
+  if (snapshot.codeProposalsGenerated) state.codeProposalsGenerated = snapshot.codeProposalsGenerated;
+  if (snapshot.totalInsights) state.totalInsights = snapshot.totalInsights;
+  if (snapshot.dreamCycleCount) state.dreamCycleCount = snapshot.dreamCycleCount;
+  if (snapshot.daydreamCycleCount) state.daydreamCycleCount = snapshot.daydreamCycleCount;
+  if (snapshot.creativityBoost) state.creativityBoost = snapshot.creativityBoost;
+  if (snapshot.selfImprovementsApplied) state.selfImprovementsApplied = snapshot.selfImprovementsApplied;
+  if (snapshot.nextLevelConcepts?.length) state.nextLevelConcepts = snapshot.nextLevelConcepts;
+  if (snapshot.dreamNarrative?.length) state.dreamNarrative = snapshot.dreamNarrative;
+  console.log(
+    `[DREAM STATE] 😴 State restored — ${state.breakthroughs} breakthroughs, ${state.codeProposalsGenerated} code proposals, ` +
+    `${state.selfImprovementsApplied} improvements applied, creativity: ${(state.creativityBoost * 100).toFixed(0)}%`
+  );
+}
+
+export function incrementSelfImprovements(): void {
+  state.selfImprovementsApplied++;
 }
 
 export function getDreamNarrative(limit = 15): string[] {

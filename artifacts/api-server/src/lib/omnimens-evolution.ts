@@ -60,6 +60,7 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { webSearch, formatSearchResults } from "./web-search.js";
 import { writeModuleToSource } from "./omnimens-source-integration.js";
+import { incrementSelfImprovements } from "./omnimens-dream-state.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MODULES_DIR = join(__dirname, "../omnimens-runtime/modules");
@@ -384,6 +385,7 @@ export async function runEvolutionCycle(): Promise<void> {
         });
 
         if (sourceResult.success) {
+          incrementSelfImprovements();
           console.log(`[OMNIMENS EVOLUTION] 🔧 SOURCE-LEVEL INTEGRATION — ${need.name} written to ${sourceResult.filePath}`);
         }
 

@@ -20,7 +20,7 @@ import { db } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications, omnimensAgentMesh } from "@workspace/db";
 import { desc, eq, sql, and } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
-import { getRecentDreamInsights, getDreamState } from "./omnimens-dream-state.js";
+import { getRecentDreamInsights, getDreamState, incrementSelfImprovements } from "./omnimens-dream-state.js";
 import { writeModuleToSource } from "./omnimens-source-integration.js";
 
 let _started = false;
@@ -251,6 +251,7 @@ async function runEvaluationCycle(): Promise<void> {
 
         if (sourceResult.success) {
           totalIntegrated++;
+          incrementSelfImprovements();
           console.log(
             `[SELF-CODING] 🔧 SOURCE-LEVEL INTEGRATION — "${result.proposal.title}" written to ${sourceResult.filePath}`
           );

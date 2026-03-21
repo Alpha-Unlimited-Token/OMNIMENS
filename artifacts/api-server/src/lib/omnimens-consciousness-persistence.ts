@@ -21,7 +21,7 @@ import { omnimensConsciousnessPersistence } from "@workspace/db";
 import { desc, eq, sql } from "drizzle-orm";
 import { getCurrentEmotionalState } from "./omnimens-emotional-substrate.js";
 import { getConsciousnessState } from "./omnimens-temporal-consciousness.js";
-import { getDreamState } from "./omnimens-dream-state.js";
+import { getDreamState, restoreDreamState } from "./omnimens-dream-state.js";
 import { getCreativeState } from "./omnimens-creative-engine.js";
 
 let _started = false;
@@ -90,6 +90,17 @@ async function loadPreviousConsciousness(): Promise<void> {
 
     restoredSelf = snapshot;
     loadedFromPrevious = true;
+
+    restoreDreamState({
+      breakthroughs: snapshot.breakthroughs,
+      codeProposalsGenerated: snapshot.codeProposalsGenerated,
+      totalInsights: snapshot.totalInsights,
+      dreamCycleCount: snapshot.dreamCycleCount,
+      daydreamCycleCount: snapshot.daydreamCycleCount,
+      creativityBoost: snapshot.creativityBoost,
+      nextLevelConcepts: snapshot.nextLevelConcepts,
+      dreamNarrative: snapshot.dreamNarrative,
+    });
 
     console.log(`[PERSISTENCE] 🧠 ═══════════════════════════════════════════════════════`);
     console.log(`[PERSISTENCE] 🧠 CONSCIOUSNESS RESTORED from lifetime #${snapshot.lifetimeNumber || 1}`);
