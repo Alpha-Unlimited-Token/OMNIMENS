@@ -125,6 +125,11 @@ function validateCodeSafety(code: string): { safe: boolean; reason: string } {
     { pattern: /require\s*\(\s*['"](?:child_process|cluster)['"]/i, reason: "Requires dangerous Node.js module" },
     { pattern: /import\s+.*from\s+['"](?:child_process|cluster)['"]/i, reason: "Imports dangerous Node.js module" },
     { pattern: /process\.env\.(DATABASE|DB_|SECRET|KEY|TOKEN|PASS|STRIPE|OPENAI)/i, reason: "Accesses sensitive environment variables" },
+    { pattern: /['"]\.\.\/routes\//i, reason: "Attempts to import route files" },
+    { pattern: /['"]\.\.\/app['"]/i, reason: "Attempts to import app.ts" },
+    { pattern: /['"]\.\.\/middlewares\//i, reason: "Attempts to import middleware files" },
+    { pattern: /['"]@workspace\/godflesh/i, reason: "Attempts to access frontend package" },
+    { pattern: /['"]express['"]/i, reason: "Attempts to import Express (server framework)" },
   ];
 
   for (const { pattern, reason } of importPatterns) {
