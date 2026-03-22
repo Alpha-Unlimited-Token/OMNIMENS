@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-22T04:28:20.098Z
+ * Written: 2026-03-22T05:04:43.225Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,66 +16,53 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findPatternsInText(text, patterns) {
-    if (typeof text !== 'string' || !Array.isArray(patterns)) {
-        throw new Error("Invalid input: text must be a string and patterns must be an array of strings.");
+// Utility function for finding the longest common subsequence (LCS) between two strings
+function longestCommonSubsequence(str1, str2) {
+    const m = str1.length;
+    const n = str2.length;
+
+    // Create a 2D array to store lengths of LCS
+    const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+
+    // Build the dp array from bottom-up
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (str1[i - 1] === str2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            } else {
+                dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
     }
 
-    const results = {};
-    for (let pattern of patterns) {
-        if (typeof pattern !== 'string') {
-            throw new Error("Invalid pattern: patterns must be an array of strings.");
+    // Reconstruct the LCS from the dp array
+    let lcs = '';
+    let i = m, j = n;
+    while (i > 0 && j > 0) {
+        if (str1[i - 1] === str2[j - 1]) {
+            lcs = str1[i - 1] + lcs;
+            i--;
+            j--;
+        } else if (dp[i - 1][j] > dp[i][j - 1]) {
+            i--;
+        } else {
+            j--;
         }
-        const regex = new RegExp(pattern, 'g');
-        const matches = text.match(regex);
-        results[pattern] = matches ? matches.length : 0;
     }
-    return results;
+
+    return lcs;
 }
 
-// Test cases
+// Self-tests
 function runTests() {
-    console.log("Running tests...");
-
-    // Test 1: Basic pattern matching
-    const text1 = "The quick brown fox jumps over the lazy dog. The fox is clever.";
-    const patterns1 = ["fox", "dog", "The"];
-    console.log(findPatternsInText(text1, patterns1)); // Expected: { fox: 2, dog: 1, The: 2 }
-
-    // Test 2: No matches
-    const text2 = "Hello world!";
-    const patterns2 = ["cat", "tree"];
-    console.log(findPatternsInText(text2, patterns2)); // Expected: { cat: 0, tree: 0 }
-
-    // Test 3: Edge case - empty text
-    const text3 = "";
-    const patterns3 = ["word"];
-    console.log(findPatternsInText(text3, patterns3)); // Expected: { word: 0 }
-
-    // Test 4: Edge case - empty patterns
-    const text4 = "Sample text.";
-    const patterns4 = [];
-    console.log(findPatternsInText(text4, patterns4)); // Expected: {}
-
-    // Test 5: Edge case - special characters in patterns
-    const text5 = "abc123!@#abc";
-    const patterns5 = ["abc", "\\d+", "!"];
-    console.log(findPatternsInText(text5, patterns5)); // Expected: { abc: 2, \\d+: 3, !: 1 }
-
-    // Test 6: Invalid inputs
-    try {
-        console.log(findPatternsInText(123, ["abc"])); // Expected: Error
-    } catch (e) {
-        console.log(e.message); // Expected error message
-    }
-
-    try {
-        console.log(findPatternsInText("text", [123])); // Expected: Error
-    } catch (e) {
-        console.log(e.message); // Expected error message
-    }
-
-    console.log("All tests completed.");
+    console.log("Test 1:", longestCommonSubsequence("abcdef", "acf") === "acf"); // True
+    console.log("Test 2:", longestCommonSubsequence("12345", "235") === "235"); // True
+    console.log("Test 3:", longestCommonSubsequence("abc", "def") === ""); // True
+    console.log("Test 4:", longestCommonSubsequence("AGGTAB", "GXTXAYB") === "GTAB"); // True
+    console.log("Test 5:", longestCommonSubsequence("aaaa", "aa") === "aa"); // True
+    console.log("Test 6:", longestCommonSubsequence("", "abc") === ""); // True
+    console.log("Test 7:", longestCommonSubsequence("abc", "") === ""); // True
+    console.log("Test 8:", longestCommonSubsequence("abc", "abc") === "abc"); // True
 }
 
 // Run the tests

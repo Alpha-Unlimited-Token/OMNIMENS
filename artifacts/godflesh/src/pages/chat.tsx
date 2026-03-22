@@ -2149,7 +2149,7 @@ function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onResonan
     return (
       <div>
         <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
-          <button onClick={() => setShowSkills(false)} className="text-white/40 hover:text-white transition-colors">
+          <button type="button" onClick={() => setShowSkills(false)} className="text-white/40 hover:text-white transition-colors">
             <ChevronDown className="w-3.5 h-3.5 rotate-90" />
           </button>
           <span className="font-mono text-[10px] text-white/70 tracking-widest font-bold">SKILLS</span>
@@ -2169,6 +2169,7 @@ function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onResonan
         <div className="max-h-64 overflow-y-auto omnimens-scrollbar py-1">
           {filtered.map(skill => (
             <button
+              type="button"
               key={skill.id}
               onClick={() => onSelectSkill(skill)}
               className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/6 transition-colors text-left"
@@ -2209,6 +2210,7 @@ function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onResonan
       <div className="py-1">
         {menuItems.map(item => (
           <button
+            type="button"
             key={item.label}
             onClick={item.onClick}
             className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/6 transition-colors text-left group"
@@ -2221,6 +2223,7 @@ function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onResonan
           </button>
         ))}
         <button
+          type="button"
           onClick={() => setShowSkills(true)}
           className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/6 transition-colors text-left border-t border-white/8 mt-1"
         >

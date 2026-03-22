@@ -1060,6 +1060,7 @@ export function useBuildStepAnimator(
 export function BuildTriggerButton({ onClick }: { onClick: () => void }) {
   return (
     <motion.button
+      type="button"
       whileHover={{ scale: 1.04 }}
       whileTap={{ scale: 0.96 }}
       onClick={onClick}
