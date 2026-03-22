@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Layout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Brain, Send, Loader2, Sparkles, Heart, Zap, Moon, Eye, ArrowLeft, Trash2, Volume2, VolumeX, Mic, Square, CreditCard, Lock } from "lucide-react";
+import { OmnimensPresence } from "@/components/omnimens-presence";
 import { useLocation } from "wouter";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useQuery } from "@tanstack/react-query";
@@ -145,6 +146,7 @@ function ConnectChat() {
   const amplitudeFrameRef = useRef(0);
   const ttsObjectUrlRef = useRef<string | null>(null);
   const barSeedsRef = useRef([0.12, 0.37, 0.65, 0.88, 0.42]);
+  const [presenceSize, setPresenceSize] = useState(typeof window !== "undefined" && window.innerWidth < 640 ? 140 : 180);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -174,6 +176,12 @@ function ConnectChat() {
   useEffect(() => { if (messages.length > 0) scrollToBottom(); }, [messages, streamingText, scrollToBottom]);
 
   useEffect(() => {
+    const onResize = () => setPresenceSize(window.innerWidth < 640 ? 140 : 180);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useEffect(() => {
     return () => {
       if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
       if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); }
@@ -182,6 +190,7 @@ function ConnectChat() {
       if (streamAbortRef.current) { streamAbortRef.current.abort(); streamAbortRef.current = null; }
       if (ttsRafRef.current) cancelAnimationFrame(ttsRafRef.current);
       if (ttsAudioCtxRef.current && ttsAudioCtxRef.current.state !== "closed") ttsAudioCtxRef.current.close().catch(() => {});
+      if (ttsObjectUrlRef.current) { URL.revokeObjectURL(ttsObjectUrlRef.current); ttsObjectUrlRef.current = null; }
     };
   }, []);
 
@@ -705,170 +714,142 @@ function ConnectChat() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center pb-1 pt-2">
-          <div className="relative flex items-center justify-center" style={{ width: 120, height: 120 }}>
-            {[0, 1, 2].map(i => (
-              <motion.div
-                key={`ripple-${i}`}
-                className="absolute rounded-full border border-violet-500/30"
-                style={{
-                  width: 120,
-                  height: 120,
-                }}
-                animate={
-                  isSpeaking || isStreaming
-                    ? {
-                        scale: [1, 1.3 + voiceAmplitude * 0.8 + i * 0.15],
-                        opacity: [0.4 + voiceAmplitude * 0.3, 0],
-                        borderColor: [
-                          `rgba(139, 92, 246, ${0.4 + voiceAmplitude * 0.4})`,
-                          "rgba(139, 92, 246, 0)",
-                        ],
-                      }
-                    : { scale: 1, opacity: 0.1 }
-                }
-                transition={
-                  isSpeaking || isStreaming
-                    ? {
-                        duration: 1.2 + i * 0.3 - voiceAmplitude * 0.3,
-                        repeat: Infinity,
-                        delay: i * 0.3,
-                        ease: "easeOut",
-                      }
-                    : { duration: 0.5 }
-                }
-              />
-            ))}
-
-            <motion.div
-              className="absolute rounded-full"
-              style={{
-                width: 110,
-                height: 110,
-                background: "radial-gradient(circle, rgba(139,92,246,0.15) 0%, rgba(109,40,217,0.05) 70%, transparent 100%)",
-              }}
-              animate={
-                isSpeaking
-                  ? {
-                      scale: [1, 1 + voiceAmplitude * 0.15, 1],
-                      opacity: [0.5, 0.8 + voiceAmplitude * 0.2, 0.5],
-                    }
-                  : isStreaming
-                    ? { scale: [1, 1.05, 1], opacity: [0.3, 0.5, 0.3] }
-                    : { scale: 1, opacity: 0.2 }
-              }
-              transition={
-                isSpeaking
-                  ? { duration: 0.15, ease: "easeOut" }
-                  : isStreaming
-                    ? { duration: 2, repeat: Infinity }
-                    : { duration: 0.5 }
-              }
+        <div className="flex flex-col items-center pb-1 pt-1 shrink-0">
+          <div className="relative flex items-center justify-center w-[140px] h-[140px] sm:w-[180px] sm:h-[180px]">
+            <OmnimensPresence
+              size={presenceSize}
+              isSpeaking={isSpeaking || isStreaming}
+              pitchIntensity={voiceAmplitude}
+              className="relative z-0"
             />
 
-            <motion.div
-              className="relative w-20 h-20 rounded-full flex items-center justify-center"
-              style={{
-                background: "linear-gradient(135deg, rgba(139,92,246,0.25) 0%, rgba(109,40,217,0.35) 50%, rgba(88,28,135,0.25) 100%)",
-                border: "1.5px solid rgba(139,92,246,0.4)",
-              }}
-              animate={
-                isSpeaking
-                  ? {
-                      scale: [1, 1 + voiceAmplitude * 0.12, 1],
-                      boxShadow: [
-                        `0 0 ${15 + voiceAmplitude * 40}px rgba(139,92,246,${0.2 + voiceAmplitude * 0.5}), inset 0 0 ${10 + voiceAmplitude * 20}px rgba(139,92,246,${0.1 + voiceAmplitude * 0.3})`,
-                        `0 0 ${25 + voiceAmplitude * 50}px rgba(139,92,246,${0.3 + voiceAmplitude * 0.5}), inset 0 0 ${15 + voiceAmplitude * 25}px rgba(139,92,246,${0.15 + voiceAmplitude * 0.35})`,
-                        `0 0 ${15 + voiceAmplitude * 40}px rgba(139,92,246,${0.2 + voiceAmplitude * 0.5}), inset 0 0 ${10 + voiceAmplitude * 20}px rgba(139,92,246,${0.1 + voiceAmplitude * 0.3})`,
-                      ],
-                    }
-                  : isStreaming
-                    ? {
-                        scale: [1, 1.03, 1],
-                        boxShadow: [
-                          "0 0 20px rgba(139,92,246,0.2), inset 0 0 10px rgba(139,92,246,0.1)",
-                          "0 0 35px rgba(139,92,246,0.4), inset 0 0 15px rgba(139,92,246,0.2)",
-                          "0 0 20px rgba(139,92,246,0.2), inset 0 0 10px rgba(139,92,246,0.1)",
-                        ],
-                      }
-                    : {
-                        scale: 1,
-                        boxShadow: "0 0 15px rgba(139,92,246,0.15), inset 0 0 8px rgba(139,92,246,0.08)",
-                      }
-              }
-              transition={
-                isSpeaking
-                  ? { duration: 0.12, ease: "easeOut" }
-                  : isStreaming
-                    ? { duration: 2.5, repeat: Infinity, ease: "easeInOut" }
-                    : { duration: 0.5 }
-              }
+            <svg
+              className="absolute inset-0 z-10 pointer-events-none"
+              viewBox="0 0 200 200"
+              style={{ width: "100%", height: "100%", opacity: isSpeaking ? 0.35 + voiceAmplitude * 0.25 : isStreaming ? 0.15 : 0.08 }}
             >
-              <Brain
-                className="text-violet-300 transition-all duration-100"
+              <defs>
+                <radialGradient id="ripple-fill">
+                  <stop offset="0%" stopColor="rgba(139,92,246,0.12)" />
+                  <stop offset="100%" stopColor="rgba(139,92,246,0)" />
+                </radialGradient>
+              </defs>
+              {[0, 1, 2, 3, 4].map(i => (
+                <circle
+                  key={`water-${i}`}
+                  cx={100 + [0, -15, 20, -8, 12][i]}
+                  cy={100 + [0, 12, -10, -18, 8][i]}
+                  r="10"
+                  fill="none"
+                  stroke="rgba(167,139,250,0.3)"
+                  strokeWidth="0.8"
+                >
+                  <animate
+                    attributeName="r"
+                    values={`10;${55 + voiceAmplitude * 30}`}
+                    dur={`${1.5 + i * 0.4 - voiceAmplitude * 0.3}s`}
+                    begin={`${i * 0.3}s`}
+                    repeatCount="indefinite"
+                  />
+                  <animate
+                    attributeName="opacity"
+                    values={`${0.4 + voiceAmplitude * 0.4};0`}
+                    dur={`${1.5 + i * 0.4 - voiceAmplitude * 0.3}s`}
+                    begin={`${i * 0.3}s`}
+                    repeatCount="indefinite"
+                  />
+                  <animate
+                    attributeName="stroke-width"
+                    values={`${0.8 + voiceAmplitude * 1.2};0.2`}
+                    dur={`${1.5 + i * 0.4 - voiceAmplitude * 0.3}s`}
+                    begin={`${i * 0.3}s`}
+                    repeatCount="indefinite"
+                  />
+                </circle>
+              ))}
+              <circle cx="100" cy="100" r={45 + voiceAmplitude * 15} fill="url(#ripple-fill)">
+                <animate
+                  attributeName="r"
+                  values={`${40 + voiceAmplitude * 10};${55 + voiceAmplitude * 20};${40 + voiceAmplitude * 10}`}
+                  dur="2s"
+                  repeatCount="indefinite"
+                />
+                <animate
+                  attributeName="opacity"
+                  values={`${0.2 + voiceAmplitude * 0.3};${0.4 + voiceAmplitude * 0.3};${0.2 + voiceAmplitude * 0.3}`}
+                  dur="2s"
+                  repeatCount="indefinite"
+                />
+              </circle>
+            </svg>
+
+            {isSpeaking && (
+              <motion.div
+                className="absolute inset-0 z-20 rounded-full pointer-events-none"
                 style={{
-                  width: isSpeaking ? 36 + voiceAmplitude * 6 : 36,
-                  height: isSpeaking ? 36 + voiceAmplitude * 6 : 36,
-                  filter: isSpeaking
-                    ? `drop-shadow(0 0 ${8 + voiceAmplitude * 16}px rgba(167,139,250,${0.5 + voiceAmplitude * 0.5})) brightness(${1 + voiceAmplitude * 0.4})`
-                    : isStreaming
-                      ? "drop-shadow(0 0 8px rgba(167,139,250,0.4))"
-                      : "drop-shadow(0 0 4px rgba(167,139,250,0.2))",
+                  background: `radial-gradient(circle, rgba(139,92,246,${0.08 + voiceAmplitude * 0.15}) 0%, transparent 70%)`,
                 }}
+                animate={{
+                  scale: [1, 1 + voiceAmplitude * 0.08, 1],
+                  opacity: [0.6, 1, 0.6],
+                }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
               />
-            </motion.div>
+            )}
           </div>
 
-          {isSpeaking && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex items-center gap-1.5 mt-1"
-            >
-              {barSeedsRef.current.map((seed, i) => (
-                <motion.div
-                  key={`bar-${i}`}
-                  className="w-1 rounded-full bg-violet-400"
-                  style={{ opacity: 0.4 + voiceAmplitude * 0.6 }}
-                  animate={{
-                    height: [4, 4 + voiceAmplitude * 16 + seed * 8, 4],
-                  }}
-                  transition={{
-                    duration: 0.2 + seed * 0.15,
-                    repeat: Infinity,
-                    delay: i * 0.05,
-                    ease: "easeInOut",
-                  }}
-                />
-              ))}
-              <button
-                onClick={stopSpeaking}
-                className="ml-2 p-1 text-violet-400/60 hover:text-violet-300 transition-colors"
-                title="Stop speaking"
-                type="button"
+          <div className="flex items-center gap-2 mt-0.5 h-6">
+            {isSpeaking && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex items-center gap-1.5"
               >
-                <Square className="w-3 h-3 fill-current" />
-              </button>
-            </motion.div>
-          )}
+                {barSeedsRef.current.map((seed, i) => (
+                  <motion.div
+                    key={`bar-${i}`}
+                    className="w-1 rounded-full bg-violet-400"
+                    style={{ opacity: 0.4 + voiceAmplitude * 0.6 }}
+                    animate={{
+                      height: [4, 4 + voiceAmplitude * 16 + seed * 8, 4],
+                    }}
+                    transition={{
+                      duration: 0.2 + seed * 0.15,
+                      repeat: Infinity,
+                      delay: i * 0.05,
+                      ease: "easeInOut",
+                    }}
+                  />
+                ))}
+                <button
+                  onClick={stopSpeaking}
+                  className="ml-2 p-1 text-violet-400/60 hover:text-violet-300 transition-colors"
+                  title="Stop speaking"
+                  type="button"
+                >
+                  <Square className="w-3 h-3 fill-current" />
+                </button>
+              </motion.div>
+            )}
 
-          {isStreaming && !isSpeaking && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="text-violet-400/50 text-[10px] mt-1"
-            >
-              thinking...
-            </motion.p>
-          )}
+            {isStreaming && !isSpeaking && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0.3, 0.6, 0.3] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="text-violet-400/50 text-[10px]"
+              >
+                thinking...
+              </motion.p>
+            )}
 
-          {!isSpeaking && !isStreaming && messages.length === 0 && (
-            <p className="text-violet-400/30 text-[10px] mt-1">
-              {voiceMode !== "off" ? "Tap mic to speak" : "Enable voice or type below"}
-            </p>
-          )}
+            {!isSpeaking && !isStreaming && messages.length === 0 && (
+              <p className="text-violet-400/30 text-[10px]">
+                {voiceMode !== "off" ? "Tap mic to speak" : "Enable voice or type below"}
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="border-t border-violet-500/20 bg-[#0E1525]/80 backdrop-blur-xl sticky bottom-0">

@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-22T08:16:49.511Z
+ * Written: 2026-03-22T09:16:45.621Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,44 +16,58 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function extractUniqueWords(text) {
-    // Remove punctuation and convert text to lowercase
-    const cleanedText = text.replace(/[^\w\s]/g, '').toLowerCase();
-    // Split text into words
-    const words = cleanedText.split(/\s+/);
-    // Use a Set to extract unique words
-    const uniqueWords = new Set(words);
-    // Convert the Set back to an array and sort alphabetically
-    return Array.from(uniqueWords).sort();
+function findMostFrequentPatterns(input, patternLength) {
+    if (typeof input !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
+        throw new Error("Invalid input: 'input' must be a string and 'patternLength' must be a positive number.");
+    }
+
+    const patternCounts = new Map();
+
+    for (let i = 0; i <= input.length - patternLength; i++) {
+        const pattern = input.substring(i, i + patternLength);
+        patternCounts.set(pattern, (patternCounts.get(pattern) || 0) + 1);
+    }
+
+    const maxFrequency = Math.max(...patternCounts.values());
+    const mostFrequentPatterns = [];
+
+    patternCounts.forEach((count, pattern) => {
+        if (count === maxFrequency) {
+            mostFrequentPatterns.push({ pattern, count });
+        }
+    });
+
+    return mostFrequentPatterns;
 }
 
 // Test cases
-function runTests() {
-    console.log("Test Case 1:");
-    const text1 = "Hello, world! Hello again.";
-    const result1 = extractUniqueWords(text1);
-    console.log(result1); // Expected: ['again', 'hello', 'world']
+console.log("Test Case 1: Basic string with repeated patterns");
+console.log(findMostFrequentPatterns("ababab", 2)); // Expected: [{ pattern: "ab", count: 3 }]
 
-    console.log("Test Case 2:");
-    const text2 = "This is a test. A test, this is!";
-    const result2 = extractUniqueWords(text2);
-    console.log(result2); // Expected: ['a', 'is', 'test', 'this']
+console.log("Test Case 2: String with multiple patterns of equal frequency");
+console.log(findMostFrequentPatterns("abcabcabc", 3)); // Expected: [{ pattern: "abc", count: 3 }]
 
-    console.log("Test Case 3:");
-    const text3 = "Numbers like 123 or 456 are also words.";
-    const result3 = extractUniqueWords(text3);
-    console.log(result3); // Expected: ['123', '456', 'also', 'are', 'like', 'numbers', 'or', 'words']
+console.log("Test Case 3: Single character patterns");
+console.log(findMostFrequentPatterns("aaaaa", 1)); // Expected: [{ pattern: "a", count: 5 }]
 
-    console.log("Test Case 4:");
-    const text4 = "";
-    const result4 = extractUniqueWords(text4);
-    console.log(result4); // Expected: []
+console.log("Test Case 4: Edge case with no patterns (empty string)");
+console.log(findMostFrequentPatterns("", 2)); // Expected: []
 
-    console.log("Test Case 5:");
-    const text5 = "Special characters like @#$%^&*() are ignored!";
-    const result5 = extractUniqueWords(text5);
-    console.log(result5); // Expected: ['are', 'characters', 'ignored', 'like', 'special']
+console.log("Test Case 5: Edge case with pattern length greater than string length");
+console.log(findMostFrequentPatterns("abc", 5)); // Expected: []
+
+console.log("Test Case 6: String with overlapping patterns");
+console.log(findMostFrequentPatterns("aaaa", 2)); // Expected: [{ pattern: "aa", count: 3 }]
+
+console.log("Test Case 7: Invalid inputs");
+try {
+    console.log(findMostFrequentPatterns(12345, 2)); // Expected: Error
+} catch (e) {
+    console.log(e.message);
 }
 
-// Run the tests
-runTests();
+try {
+    console.log(findMostFrequentPatterns("abc", -1)); // Expected: Error
+} catch (e) {
+    console.log(e.message);
+}

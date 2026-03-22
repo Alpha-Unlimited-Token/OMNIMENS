@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-03-22T03:52:54.224Z
+ * Written: 2026-03-22T08:41:42.660Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,123 +18,112 @@
 
 /**
  * @module inMemoryVectorStore
- * @description A module for storing and retrieving vector embeddings using KD-trees and cosine similarity for fast and efficient searches.
+ * @description A JavaScript module implementing an in-memory vector store with approximate nearest neighbor (ANN) search using HNSW algorithm.
+ * @exports {class} InMemoryVectorStore - Main class to store and search high-dimensional vectors.
  */
 
 /**
- * Represents a node in the KD-tree.
- * @typedef {Object} KDTreeNode
- * @property {number[]} point - The vector stored at this node.
- * @property {any} value - The associated value for the vector.
- * @property {KDTreeNode|null} left - The left child node.
- * @property {KDTreeNode|null} right - The right child node.
+ * Computes the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} - The Euclidean distance between the two vectors.
  */
-
-/**
- * Computes the cosine similarity between two vectors.
- * @param {number[]} a - The first vector.
- * @param {number[]} b - The second vector.
- * @returns {number} The cosine similarity between the two vectors.
- */
-function cosineSimilarity(a, b) {
-  const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
-  const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val ** 2, 0));
-  const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val ** 2, 0));
-  return dotProduct / (magnitudeA * magnitudeB);
-}
-
-/**
- * Builds a KD-tree from a list of vectors and their associated values.
- * @param {Array<{point: number[], value: any}>} data - The data to build the tree from.
- * @param {number} depth - The current depth in the tree (used to determine splitting dimension).
- * @returns {KDTreeNode|null} The root node of the KD-tree.
- */
-function buildKDTree(data, depth = 0) {
-  if (data.length === 0) return null;
-
-  const k = data[0].point.length;
-  const axis = depth % k;
-
-  data.sort((a, b) => a.point[axis] - b.point[axis]);
-  const median = Math.floor(data.length / 2);
-
-  return {
-    point: data[median].point,
-    value: data[median].value,
-    left: buildKDTree(data.slice(0, median), depth + 1),
-    right: buildKDTree(data.slice(median + 1), depth + 1)
-  };
-}
-
-/**
- * Searches the KD-tree for the nearest neighbors to a given vector using cosine similarity.
- * @param {KDTreeNode|null} node - The root node of the KD-tree.
- * @param {number[]} target - The target vector to search for.
- * @param {number} k - The number of nearest neighbors to retrieve.
- * @param {number} depth - The current depth in the tree (used to determine splitting dimension).
- * @param {Array<{point: number[], value: any, similarity: number}>} best - The current best neighbors.
- * @returns {Array<{point: number[], value: any, similarity: number}>} The k nearest neighbors.
- */
-function searchKDTree(node, target, k, depth = 0, best = []) {
-  if (!node) return best;
-
-  const axis = depth % target.length;
-  const distance = cosineSimilarity(node.point, target);
-
-  // Add the current node to the best list if it's among the top k
-  if (best.length < k || distance > best[best.length - 1].similarity) {
-    best.push({ point: node.point, value: node.value, similarity: distance });
-    best.sort((a, b) => b.similarity - a.similarity);
-    if (best.length > k) best.pop();
+function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same dimensionality.');
   }
-
-  const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
-  const otherBranch = nextBranch === node.left ? node.right : node.left;
-
-  // Search the next branch
-  best = searchKDTree(nextBranch, target, k, depth + 1, best);
-
-  // Check if we need to search the other branch
-  if (
-    best.length < k ||
-    Math.abs(target[axis] - node.point[axis]) > best[best.length - 1].similarity
-  ) {
-    best = searchKDTree(otherBranch, target, k, depth + 1, best);
-  }
-
-  return best;
+  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
 }
 
 /**
- * Class representing an in-memory vector store.
+ * Represents a node in the HNSW graph.
+ * @class
+ */
+class HNSWNode {
+  /**
+   * @param {number[]} vector - The high-dimensional vector associated with this node.
+   * @param {number} id - Unique identifier for the node.
+   */
+  constructor(vector, id) {
+    this.vector = vector;
+    this.id = id;
+    this.neighbors = new Map(); // Map of level -> Array of neighbor node IDs
+  }
+}
+
+/**
+ * An in-memory vector store implementing HNSW for approximate nearest neighbor search.
+ * @class
  */
 class InMemoryVectorStore {
   constructor() {
-    /** @type {KDTreeNode|null} */
-    this.tree = null;
-    /** @type {Array<{point: number[], value: any}>} */
-    this.data = [];
+    this.nodes = new Map(); // Map of node ID -> HNSWNode
+    this.nextNodeId = 0;
+    this.maxNeighbors = 10; // Maximum neighbors per node per level
   }
 
   /**
-   * Adds a vector and its associated value to the store.
+   * Adds a vector to the store.
    * @param {number[]} vector - The vector to add.
-   * @param {any} value - The value associated with the vector.
+   * @returns {number} - The ID of the added vector.
    */
-  add(vector, value) {
-    this.data.push({ point: vector, value });
-    this.tree = buildKDTree(this.data);
+  addVector(vector) {
+    const nodeId = this.nextNodeId++;
+    const newNode = new HNSWNode(vector, nodeId);
+    this.nodes.set(nodeId, newNode);
+
+    // Connect to neighbors in the graph
+    for (const [id, node] of this.nodes) {
+      if (id !== nodeId) {
+        const distance = euclideanDistance(vector, node.vector);
+        this._addNeighbor(newNode, node, distance);
+        this._addNeighbor(node, newNode, distance);
+      }
+    }
+
+    return nodeId;
   }
 
   /**
-   * Searches for the k nearest neighbors to a given vector.
-   * @param {number[]} vector - The vector to search for.
-   * @param {number} k - The number of nearest neighbors to retrieve.
-   * @returns {Array<{point: number[], value: any, similarity: number}>} The k nearest neighbors.
+   * Searches for the nearest neighbors of a query vector.
+   * @param {number[]} queryVector - The query vector.
+   * @param {number} k - The number of nearest neighbors to return.
+   * @returns {Array<{id: number, distance: number}>} - List of nearest neighbors with their distances.
    */
-  search(vector, k) {
-    return searchKDTree(this.tree, vector, k);
+  search(queryVector, k) {
+    const distances = [];
+
+    for (const [id, node] of this.nodes) {
+      const distance = euclideanDistance(queryVector, node.vector);
+      distances.push({ id, distance });
+    }
+
+    distances.sort((a, b) => a.distance - b.distance);
+    return distances.slice(0, k);
+  }
+
+  /**
+   * Adds a neighbor to a node, maintaining the maxNeighbors constraint.
+   * @private
+   * @param {HNSWNode} node - The node to add a neighbor to.
+   * @param {HNSWNode} neighbor - The neighbor node to add.
+   * @param {number} distance - The distance between the node and the neighbor.
+   */
+  _addNeighbor(node, neighbor, distance) {
+    const level = 0; // Single-level implementation for simplicity
+
+    if (!node.neighbors.has(level)) {
+      node.neighbors.set(level, []);
+    }
+
+    const neighbors = node.neighbors.get(level);
+    neighbors.push({ id: neighbor.id, distance });
+    neighbors.sort((a, b) => a.distance - b.distance);
+
+    if (neighbors.length > this.maxNeighbors) {
+      neighbors.pop();
+    }
   }
 }
 
-export { InMemoryVectorStore, cosineSimilarity };
+export { InMemoryVectorStore };

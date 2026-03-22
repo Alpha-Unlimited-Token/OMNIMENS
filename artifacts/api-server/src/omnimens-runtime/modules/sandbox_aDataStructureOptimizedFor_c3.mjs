@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a data structure optimized for fast associative memory lookup
- * Written: 2026-03-22T04:14:26.096Z
+ * Written: 2026-03-22T09:03:15.963Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,72 +16,73 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function AssociativeMemory() {
+const AssociativeMemory = function () {
     this.memory = new Map();
-}
 
-AssociativeMemory.prototype.add = function(key, value) {
-    this.memory.set(key, value);
+    this.add = function (key, value) {
+        if (!this.memory.has(key)) {
+            this.memory.set(key, []);
+        }
+        this.memory.get(key).push(value);
+    };
+
+    this.get = function (key) {
+        return this.memory.has(key) ? this.memory.get(key) : [];
+    };
+
+    this.remove = function (key, value) {
+        if (this.memory.has(key)) {
+            const values = this.memory.get(key).filter((v) => v !== value);
+            if (values.length > 0) {
+                this.memory.set(key, values);
+            } else {
+                this.memory.delete(key);
+            }
+        }
+    };
+
+    this.exists = function (key, value) {
+        return this.memory.has(key) && this.memory.get(key).includes(value);
+    };
+
+    this.clear = function () {
+        this.memory.clear();
+    };
+
+    this.keys = function () {
+        return Array.from(this.memory.keys());
+    };
+
+    this.values = function () {
+        return Array.from(this.memory.values());
+    };
 };
 
-AssociativeMemory.prototype.get = function(key) {
-    return this.memory.get(key) || null;
-};
-
-AssociativeMemory.prototype.has = function(key) {
-    return this.memory.has(key);
-};
-
-AssociativeMemory.prototype.remove = function(key) {
-    return this.memory.delete(key);
-};
-
-AssociativeMemory.prototype.clear = function() {
-    this.memory.clear();
-};
-
-AssociativeMemory.prototype.size = function() {
-    return this.memory.size;
-};
-
-// Test cases
+// Self-tests
 const memory = new AssociativeMemory();
 
-// Test adding and retrieving data
-memory.add("Empath", {
-    name: "Empath",
-    domain: "emotional modeling, social reasoning, empathy, ethical AI",
-    specialization: "emotional intelligence"
-});
-memory.add("Explorer", {
-    name: "Explorer",
-    domain: "curiosity, novelty-seeking, question generation, autonomous exploration",
-    specialization: "exploration and curiosity"
-});
-memory.add("Philosopher", {
-    name: "Philosopher",
-    domain: "philosophy, ethics, epistemology, metaphysics, abstract reasoning",
-    specialization: "metaphysical reasoning"
-});
+// Test adding and retrieving values
+memory.add("curiosity", "novelty-seeking");
+memory.add("curiosity", "creative exploration");
+memory.add("ethics", "moral philosophy");
+memory.add("ethics", "value alignment");
+memory.add("creativity", "speculative design");
 
-console.log(memory.get("Empath")); // Should output Empath's data
-console.log(memory.get("Explorer")); // Should output Explorer's data
-console.log(memory.get("Philosopher")); // Should output Philosopher's data
-console.log(memory.get("Unknown")); // Should output null
+console.log(memory.get("curiosity")); // Expected: ["novelty-seeking", "creative exploration"]
+console.log(memory.get("ethics")); // Expected: ["moral philosophy", "value alignment"]
+console.log(memory.get("creativity")); // Expected: ["speculative design"]
 
-// Test has method
-console.log(memory.has("Empath")); // Should output true
-console.log(memory.has("Unknown")); // Should output false
+// Test existence check
+console.log(memory.exists("curiosity", "novelty-seeking")); // Expected: true
+console.log(memory.exists("ethics", "decision-making")); // Expected: false
 
-// Test size
-console.log(memory.size()); // Should output 3
+// Test removing values
+memory.remove("curiosity", "novelty-seeking");
+console.log(memory.get("curiosity")); // Expected: ["creative exploration"]
 
-// Test remove
-memory.remove("Explorer");
-console.log(memory.get("Explorer")); // Should output null
-console.log(memory.size()); // Should output 2
+memory.remove("creativity", "speculative design");
+console.log(memory.get("creativity")); // Expected: []
 
-// Test clear
+// Test clearing memory
 memory.clear();
-console.log(memory.size()); // Should output 0
-console.log(memory.get("Empath")); // Should output null
+console.log(memory.keys()); // Expected: []
