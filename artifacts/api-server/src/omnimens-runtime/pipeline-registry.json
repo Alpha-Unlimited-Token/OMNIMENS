@@ -2389,10 +2389,13 @@
       "filename": "webAssemblyMatrixOps_gen1.mjs",
       "stage": "vector_operations",
       "exports": [
-        "initializeWasmMatrixOps",
-        "multiplyMatrices"
+        "initializeWasm",
+        "multiplyMatrices",
+        "addMatrices",
+        "transposeMatrix",
+        "validateMatrixDimensions"
       ],
-      "loadedAt": 1774208570020,
+      "loadedAt": 1774208939045,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -5087,9 +5090,50 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "daydreamparadigmbreaking735.mjs": {
+      "filename": "daydreamparadigmbreaking735.mjs",
+      "stage": "utility",
+      "exports": [
+        "buildNetwork"
+      ],
+      "loadedAt": 1774208688835,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "architectureNameContrapointCounterfactual.mjs": {
+      "filename": "architectureNameContrapointCounterfactual.mjs",
+      "stage": "causal_analysis",
+      "exports": [
+        "averageEffect"
+      ],
+      "loadedAt": 1774208814907,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "semanticContextSummarizer_gen1.mjs": {
+      "filename": "semanticContextSummarizer_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateEmbeddings",
+        "clusterEmbeddings",
+        "summarizeContext"
+      ],
+      "loadedAt": 1774208945316,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774208570023,
-  "totalModules": 291,
+  "totalModules": 293,
   "totalCalls": 0
 }
