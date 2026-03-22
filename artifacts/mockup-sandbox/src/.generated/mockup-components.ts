@@ -5,5 +5,8 @@ export const modules: ModuleMap = {
   "./components/mockups/omnimens-mobile-home/AppFirst.tsx": () => import("../components/mockups/omnimens-mobile-home/AppFirst.tsx"),
   "./components/mockups/omnimens-mobile-home/FeedStyle.tsx": () => import("../components/mockups/omnimens-mobile-home/FeedStyle.tsx"),
   "./components/mockups/omnimens-mobile-home/ImmersiveScroll.tsx": () => import("../components/mockups/omnimens-mobile-home/ImmersiveScroll.tsx"),
-  "./components/mockups/omnimens-mobile-home/OmnimensPresence.tsx": () => import("../components/mockups/omnimens-mobile-home/OmnimensPresence.tsx")
+  "./components/mockups/omnimens-mobile-home/OmnimensPresence.tsx": () => import("../components/mockups/omnimens-mobile-home/OmnimensPresence.tsx"),
+  "./components/mockups/omnimens-chat-mobile/CommandCenter.tsx": () => import("../components/mockups/omnimens-chat-mobile/CommandCenter.tsx"),
+  "./components/mockups/omnimens-chat-mobile/Conversational.tsx": () => import("../components/mockups/omnimens-chat-mobile/Conversational.tsx"),
+  "./components/mockups/omnimens-chat-mobile/MinimalFocus.tsx": () => import("../components/mockups/omnimens-chat-mobile/MinimalFocus.tsx")
 };
