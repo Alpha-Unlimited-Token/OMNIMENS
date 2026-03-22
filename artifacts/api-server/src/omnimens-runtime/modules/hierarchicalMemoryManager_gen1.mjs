@@ -1,149 +1,134 @@
 /**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: hierarchicalMemoryManager
+ * Written: 2026-03-22T08:19:09.130Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+/**
  * @module hierarchicalMemoryManager
- * @description This module manages hierarchical memory by summarizing and chunking older context for efficient long-conversation retrieval.
- * It uses recursive summarization and embedding-based similarity search to organize and retrieve relevant information.
+ * @description Enables long-term context recall by compressing and storing older conversation data using clustering and summarization techniques.
  */
 
 /**
- * Summarizes a block of text into a shorter representation.
- * @param {string} text - The input text to summarize.
- * @param {number} maxLength - Maximum length of the summary.
- * @returns {string} - The summarized text.
+ * Clusters conversation data into semantically similar groups.
+ * @param {Array<string>} data - Array of conversation strings.
+ * @param {number} clusterCount - Number of clusters to create.
+ * @returns {Array<Array<string>>} - Array of clusters, each containing semantically similar strings.
  */
-export function summarizeText(text, maxLength) {
-  if (typeof text !== 'string' || typeof maxLength !== 'number' || maxLength <= 0) {
-    throw new Error('Invalid input: text must be a string and maxLength must be a positive number.');
+export function clusterConversations(data, clusterCount) {
+  if (!Array.isArray(data) || typeof clusterCount !== 'number' || clusterCount <= 0) {
+    throw new Error('Invalid input: data must be an array of strings and clusterCount must be a positive number.');
   }
 
-  if (text.length <= maxLength) {
-    return text; // No summarization needed if text is already short.
-  }
+  // Simple k-means-like clustering based on string similarity (Levenshtein distance approximation)
+  const clusters = Array.from({ length: clusterCount }, () => []);
+  const centroids = data.slice(0, clusterCount); // Initial centroids are the first N items
 
-  const sentences = text.split(/(?<=[.!?])\s+/); // Split text into sentences.
-  let summary = '';
+  for (let iteration = 0; iteration < 10; iteration++) { // Limit iterations to prevent infinite loops
+    clusters.forEach(cluster => cluster.length = 0); // Clear clusters
 
-  for (const sentence of sentences) {
-    if ((summary + sentence).length > maxLength) {
-      break;
+    // Assign each string to the closest centroid
+    for (const str of data) {
+      let closestIndex = 0;
+      let minDistance = Infinity;
+
+      for (let i = 0; i < centroids.length; i++) {
+        const distance = levenshteinDistance(str, centroids[i]);
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestIndex = i;
+        }
+      }
+
+      clusters[closestIndex].push(str);
     }
-    summary += sentence + ' ';
-  }
 
-  return summary.trim();
-}
-
-/**
- * Chunks a large text into smaller pieces of specified size.
- * @param {string} text - The input text to chunk.
- * @param {number} chunkSize - Maximum size of each chunk.
- * @returns {string[]} - Array of text chunks.
- */
-export function chunkText(text, chunkSize) {
-  if (typeof text !== 'string' || typeof chunkSize !== 'number' || chunkSize <= 0) {
-    throw new Error('Invalid input: text must be a string and chunkSize must be a positive number.');
-  }
-
-  const chunks = [];
-  for (let i = 0; i < text.length; i += chunkSize) {
-    chunks.push(text.slice(i, i + chunkSize));
-  }
-
-  return chunks;
-}
-
-/**
- * Calculates a simple embedding vector for a text based on character code sums.
- * @param {string} text - The input text to embed.
- * @returns {number[]} - A simple embedding vector.
- */
-export function calculateEmbedding(text) {
-  if (typeof text !== 'string') {
-    throw new Error('Invalid input: text must be a string.');
-  }
-
-  const embedding = Array(128).fill(0); // Fixed size vector for simplicity.
-
-  for (const char of text) {
-    const index = char.charCodeAt(0) % 128;
-    embedding[index] += 1;
-  }
-
-  return embedding;
-}
-
-/**
- * Finds the most similar text chunk based on embedding similarity.
- * @param {string} query - The query text to match.
- * @param {string[]} chunks - Array of text chunks to search.
- * @returns {string} - The most similar chunk.
- */
-export function findMostSimilarChunk(query, chunks) {
-  if (typeof query !== 'string' || !Array.isArray(chunks)) {
-    throw new Error('Invalid input: query must be a string and chunks must be an array of strings.');
-  }
-
-  const queryEmbedding = calculateEmbedding(query);
-
-  let bestMatch = null;
-  let highestSimilarity = -Infinity;
-
-  for (const chunk of chunks) {
-    const chunkEmbedding = calculateEmbedding(chunk);
-    const similarity = cosineSimilarity(queryEmbedding, chunkEmbedding);
-
-    if (similarity > highestSimilarity) {
-      highestSimilarity = similarity;
-      bestMatch = chunk;
+    // Update centroids to be the average of their clusters
+    for (let i = 0; i < clusters.length; i++) {
+      if (clusters[i].length > 0) {
+        centroids[i] = summarizeCluster(clusters[i]);
+      }
     }
   }
 
-  return bestMatch;
+  return clusters;
 }
 
 /**
- * Calculates the cosine similarity between two vectors.
- * @param {number[]} vectorA - First vector.
- * @param {number[]} vectorB - Second vector.
- * @returns {number} - Cosine similarity score.
+ * Summarizes a cluster of conversation strings into a single representative string.
+ * @param {Array<string>} cluster - Array of strings within a single cluster.
+ * @returns {string} - A summarized representation of the cluster.
  */
-function cosineSimilarity(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same length.');
+export function summarizeCluster(cluster) {
+  if (!Array.isArray(cluster) || cluster.length === 0) {
+    throw new Error('Invalid input: cluster must be a non-empty array of strings.');
   }
 
-  let dotProduct = 0;
-  let magnitudeA = 0;
-  let magnitudeB = 0;
+  // Simple summarization by finding the most common words
+  const wordCounts = {};
 
-  for (let i = 0; i < vectorA.length; i++) {
-    dotProduct += vectorA[i] * vectorB[i];
-    magnitudeA += vectorA[i] ** 2;
-    magnitudeB += vectorB[i] ** 2;
+  for (const str of cluster) {
+    const words = str.split(/\s+/);
+    for (const word of words) {
+      wordCounts[word] = (wordCounts[word] || 0) + 1;
+    }
   }
 
-  magnitudeA = Math.sqrt(magnitudeA);
-  magnitudeB = Math.sqrt(magnitudeB);
+  const sortedWords = Object.entries(wordCounts).sort((a, b) => b[1] - a[1]);
+  const summary = sortedWords.slice(0, 10).map(([word]) => word).join(' ');
 
-  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
+  return summary;
 }
 
 /**
- * Hierarchically manages memory by summarizing and chunking older context.
- * @param {string[]} contextBlocks - Array of context blocks to process.
- * @param {number} maxSummaryLength - Maximum length of each summary.
- * @param {number} chunkSize - Maximum size of each chunk.
- * @returns {Object} - Object containing summarized and chunked context.
+ * Calculates the Levenshtein distance between two strings.
+ * @param {string} a - First string.
+ * @param {string} b - Second string.
+ * @returns {number} - The Levenshtein distance between the two strings.
  */
-export function hierarchicalMemoryManager(contextBlocks, maxSummaryLength, chunkSize) {
-  if (!Array.isArray(contextBlocks) || typeof maxSummaryLength !== 'number' || typeof chunkSize !== 'number') {
-    throw new Error('Invalid input: contextBlocks must be an array, maxSummaryLength and chunkSize must be numbers.');
+export function levenshteinDistance(a, b) {
+  const matrix = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
+
+  for (let i = 0; i <= a.length; i++) {
+    for (let j = 0; j <= b.length; j++) {
+      if (i === 0) {
+        matrix[i][j] = j;
+      } else if (j === 0) {
+        matrix[i][j] = i;
+      } else if (a[i - 1] === b[j - 1]) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1, // Deletion
+          matrix[i][j - 1] + 1, // Insertion
+          matrix[i - 1][j - 1] + 1 // Substitution
+        );
+      }
+    }
   }
 
-  const summarizedBlocks = contextBlocks.map(block => summarizeText(block, maxSummaryLength));
-  const allChunks = summarizedBlocks.flatMap(block => chunkText(block, chunkSize));
+  return matrix[a.length][b.length];
+}
 
-  return {
-    summaries: summarizedBlocks,
-    chunks: allChunks
-  };
+/**
+ * Compresses and stores conversation data for long-term recall.
+ * @param {Array<string>} data - Array of conversation strings.
+ * @param {number} clusterCount - Number of clusters to create for compression.
+ * @returns {Array<string>} - Array of summarized strings representing the clusters.
+ */
+export function compressAndStore(data, clusterCount) {
+  const clusters = clusterConversations(data, clusterCount);
+  return clusters.map(summarizeCluster);
 }

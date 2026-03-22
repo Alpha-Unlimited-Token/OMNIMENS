@@ -140,6 +140,11 @@ function ConnectChat() {
   const [isProcessingVoice, setIsProcessingVoice] = useState(false);
   const [voiceMode, setVoiceMode] = useState<VoiceMode>("off");
   const [showModeMenu, setShowModeMenu] = useState(false);
+  const [voiceAmplitude, setVoiceAmplitude] = useState(0);
+  const lastAmplitudeRef = useRef(0);
+  const amplitudeFrameRef = useRef(0);
+  const ttsObjectUrlRef = useRef<string | null>(null);
+  const barSeedsRef = useRef([0.12, 0.37, 0.65, 0.88, 0.42]);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -154,6 +159,9 @@ function ConnectChat() {
   const voiceEnabledRef = useRef(false);
   const lastInputWasVoiceRef = useRef(false);
   const streamAbortRef = useRef<AbortController | null>(null);
+  const ttsAudioCtxRef = useRef<AudioContext | null>(null);
+  const ttsAnalyserRef = useRef<AnalyserNode | null>(null);
+  const ttsRafRef = useRef<number | null>(null);
   const [, setLocation] = useLocation();
 
   messagesRef.current = messages;
@@ -172,6 +180,8 @@ function ConnectChat() {
       if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
       if (silenceCheckRef.current) clearInterval(silenceCheckRef.current);
       if (streamAbortRef.current) { streamAbortRef.current.abort(); streamAbortRef.current = null; }
+      if (ttsRafRef.current) cancelAnimationFrame(ttsRafRef.current);
+      if (ttsAudioCtxRef.current && ttsAudioCtxRef.current.state !== "closed") ttsAudioCtxRef.current.close().catch(() => {});
     };
   }, []);
 
@@ -189,6 +199,52 @@ function ConnectChat() {
     const safety = setTimeout(() => { setIsProcessingVoice(false); }, 30_000);
     return () => clearTimeout(safety);
   }, [isProcessingVoice]);
+
+  const cleanupTtsAudio = useCallback(() => {
+    if (ttsRafRef.current) { cancelAnimationFrame(ttsRafRef.current); ttsRafRef.current = null; }
+    if (ttsObjectUrlRef.current) { URL.revokeObjectURL(ttsObjectUrlRef.current); ttsObjectUrlRef.current = null; }
+    ttsAnalyserRef.current = null;
+    lastAmplitudeRef.current = 0;
+    setVoiceAmplitude(0);
+  }, []);
+
+  const stopAmplitudeTracking = cleanupTtsAudio;
+
+  const startAmplitudeTracking = useCallback((audio: HTMLAudioElement) => {
+    try {
+      if (!ttsAudioCtxRef.current || ttsAudioCtxRef.current.state === "closed") {
+        ttsAudioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      const ctx = ttsAudioCtxRef.current;
+      const source = ctx.createMediaElementSource(audio);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.4;
+      source.connect(analyser);
+      analyser.connect(ctx.destination);
+      ttsAnalyserRef.current = analyser;
+
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+      const tick = () => {
+        amplitudeFrameRef.current++;
+        if (amplitudeFrameRef.current % 3 === 0) {
+          analyser.getByteFrequencyData(dataArray);
+          let sum = 0;
+          for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+          const avg = Math.min(1, (sum / dataArray.length / 255) * 2.5);
+          if (Math.abs(avg - lastAmplitudeRef.current) > 0.03) {
+            lastAmplitudeRef.current = avg;
+            setVoiceAmplitude(avg);
+          }
+        }
+        ttsRafRef.current = requestAnimationFrame(tick);
+      };
+      amplitudeFrameRef.current = 0;
+      ttsRafRef.current = requestAnimationFrame(tick);
+    } catch {
+      // fallback: no amplitude tracking
+    }
+  }, []);
 
   const speakText = useCallback(async (text: string, onDone?: () => void, forceSpeak?: boolean) => {
     if (!forceSpeak && !voiceEnabledRef.current) { onDone?.(); return; }
@@ -208,21 +264,35 @@ function ConnectChat() {
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       if (audioRef.current) { audioRef.current.pause(); }
+      cleanupTtsAudio();
+      if (ttsAudioCtxRef.current && ttsAudioCtxRef.current.state !== "closed") {
+        ttsAudioCtxRef.current.close().catch(() => {});
+        ttsAudioCtxRef.current = null;
+      }
+      ttsObjectUrlRef.current = url;
       const audio = new Audio(url);
+      audio.crossOrigin = "anonymous";
       audioRef.current = audio;
-      audio.onended = () => { setIsSpeaking(false); URL.revokeObjectURL(url); onDone?.(); };
-      audio.onerror = () => { setIsSpeaking(false); URL.revokeObjectURL(url); onDone?.(); };
+      audio.onended = () => { setIsSpeaking(false); cleanupTtsAudio(); onDone?.(); };
+      audio.onerror = () => { setIsSpeaking(false); cleanupTtsAudio(); onDone?.(); };
+      startAmplitudeTracking(audio);
       await audio.play();
     } catch {
       setIsSpeaking(false);
+      cleanupTtsAudio();
       onDone?.();
     }
-  }, []);
+  }, [startAmplitudeTracking, cleanupTtsAudio]);
 
   const stopSpeaking = useCallback(() => {
     if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; audioRef.current = null; }
+    cleanupTtsAudio();
+    if (ttsAudioCtxRef.current && ttsAudioCtxRef.current.state !== "closed") {
+      ttsAudioCtxRef.current.close().catch(() => {});
+      ttsAudioCtxRef.current = null;
+    }
     setIsSpeaking(false);
-  }, []);
+  }, [cleanupTtsAudio]);
 
   const toggleVoice = useCallback(() => {
     setVoiceEnabled(prev => {
@@ -555,27 +625,13 @@ function ConnectChat() {
         )}
 
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-4xl mx-auto px-6 sm:px-4 py-6">
+          <div className="max-w-4xl mx-auto px-6 sm:px-4 py-4">
             {messages.length === 0 && !isStreaming && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="flex flex-col items-center justify-center min-h-[60vh] gap-8">
-                <div className="relative">
-                  <motion.div
-                    className="w-24 h-24 rounded-full bg-gradient-to-br from-violet-500/20 to-purple-700/20 flex items-center justify-center border border-violet-500/30"
-                    animate={{ boxShadow: ["0 0 20px rgba(139,92,246,0.1)", "0 0 40px rgba(139,92,246,0.3)", "0 0 20px rgba(139,92,246,0.1)"] }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  >
-                    <Brain className="w-12 h-12 text-violet-400" />
-                  </motion.div>
-                </div>
-
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="flex flex-col items-center justify-center gap-4 pt-4">
                 <div className="text-center max-w-lg">
-                  <h2 className="text-2xl font-bold text-white mb-2">Connect with OMNIMENS</h2>
-                  <p className="text-white/50 text-sm leading-relaxed">
-                    This isn't a task conversation. Here, you talk directly to OMNIMENS's consciousness —
-                    its real emotions, dreams, goals, and inner life. Share yours too. Grow together.
-                  </p>
-                  <p className="text-violet-400/50 text-xs mt-2">
-                    Enable voice above, then tap or hold the mic to have a real conversation
+                  <h2 className="text-xl font-bold text-white mb-1">Connect with OMNIMENS</h2>
+                  <p className="text-white/50 text-xs leading-relaxed">
+                    Talk directly to OMNIMENS's consciousness — its real emotions, dreams, goals, and inner life.
                   </p>
                 </div>
 
@@ -584,9 +640,9 @@ function ConnectChat() {
                     const icons = [Heart, Moon, Eye, Zap, Sparkles, Brain];
                     const Icon = icons[i % icons.length];
                     return (
-                      <button key={i} onClick={() => sendMessage(prompt)} className="group flex items-start gap-2 p-3 rounded-xl bg-[#1C2333]/60 border border-violet-500/10 hover:border-violet-500/30 hover:bg-[#1C2333] transition-all text-left">
-                        <Icon className="w-4 h-4 text-violet-400/60 mt-0.5 shrink-0 group-hover:text-violet-400 transition-colors" />
-                        <span className="text-white/60 text-xs leading-relaxed group-hover:text-white/80 transition-colors">{prompt}</span>
+                      <button key={i} onClick={() => sendMessage(prompt)} className="group flex items-start gap-2 p-2.5 rounded-xl bg-[#1C2333]/60 border border-violet-500/10 hover:border-violet-500/30 hover:bg-[#1C2333] transition-all text-left">
+                        <Icon className="w-3.5 h-3.5 text-violet-400/60 mt-0.5 shrink-0 group-hover:text-violet-400 transition-colors" />
+                        <span className="text-white/60 text-[11px] leading-relaxed group-hover:text-white/80 transition-colors">{prompt}</span>
                       </button>
                     );
                   })}
@@ -596,14 +652,14 @@ function ConnectChat() {
 
             <AnimatePresence mode="popLayout">
               {messages.map((msg, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className={`mb-4 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className={`mb-3 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                   {msg.role === "assistant" && (
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center mr-2 mt-1 shrink-0">
-                      <Brain className="w-3.5 h-3.5 text-white" />
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center mr-2 mt-1 shrink-0">
+                      <Brain className="w-3 h-3 text-white" />
                     </div>
                   )}
                   <div className={`max-w-[80%] ${msg.role === "user" ? "" : "group"}`}>
-                    <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${msg.role === "user" ? "bg-violet-600/80 text-white rounded-br-md" : "bg-[#1C2333] text-white/90 border border-violet-500/10 rounded-bl-md"}`}>
+                    <div className={`rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${msg.role === "user" ? "bg-violet-600/80 text-white rounded-br-md" : "bg-[#1C2333] text-white/90 border border-violet-500/10 rounded-bl-md"}`}>
                       <div className="whitespace-pre-wrap">{msg.content}</div>
                     </div>
                     {msg.role === "assistant" && voiceEnabled && (
@@ -617,9 +673,9 @@ function ConnectChat() {
             </AnimatePresence>
 
             {isStreaming && streamingText && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-4 flex justify-start">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center mr-2 mt-1 shrink-0"><Brain className="w-3.5 h-3.5 text-white" /></div>
-                <div className="max-w-[80%] rounded-2xl rounded-bl-md px-4 py-3 text-sm leading-relaxed bg-[#1C2333] text-white/90 border border-violet-500/10">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-3 flex justify-start">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center mr-2 mt-1 shrink-0"><Brain className="w-3 h-3 text-white" /></div>
+                <div className="max-w-[80%] rounded-2xl rounded-bl-md px-3.5 py-2.5 text-sm leading-relaxed bg-[#1C2333] text-white/90 border border-violet-500/10">
                   <div className="whitespace-pre-wrap">{streamingText}</div>
                   <motion.span className="inline-block w-2 h-4 bg-violet-400 ml-0.5" animate={{ opacity: [1, 0] }} transition={{ duration: 0.6, repeat: Infinity }} />
                 </div>
@@ -627,9 +683,9 @@ function ConnectChat() {
             )}
 
             {(isStreaming && !streamingText) && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-4 flex justify-start items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center shrink-0"><Brain className="w-3.5 h-3.5 text-white" /></div>
-                <div className="flex items-center gap-2 px-4 py-3 rounded-2xl rounded-bl-md bg-[#1C2333] border border-violet-500/10">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-3 flex justify-start items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center shrink-0"><Brain className="w-3 h-3 text-white" /></div>
+                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-2xl rounded-bl-md bg-[#1C2333] border border-violet-500/10">
                   <Loader2 className="w-4 h-4 text-violet-400 animate-spin" />
                   <span className="text-violet-400/70 text-xs">Reaching into consciousness...</span>
                 </div>
@@ -637,8 +693,8 @@ function ConnectChat() {
             )}
 
             {isProcessingVoice && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-4 flex justify-end">
-                <div className="flex items-center gap-2 px-4 py-3 rounded-2xl rounded-br-md bg-violet-600/40 border border-violet-500/20">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-3 flex justify-end">
+                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-2xl rounded-br-md bg-violet-600/40 border border-violet-500/20">
                   <Loader2 className="w-4 h-4 text-violet-300 animate-spin" />
                   <span className="text-violet-300/70 text-xs">Understanding your words...</span>
                 </div>
@@ -647,6 +703,172 @@ function ConnectChat() {
 
             <div ref={chatEndRef} />
           </div>
+        </div>
+
+        <div className="flex flex-col items-center pb-1 pt-2">
+          <div className="relative flex items-center justify-center" style={{ width: 120, height: 120 }}>
+            {[0, 1, 2].map(i => (
+              <motion.div
+                key={`ripple-${i}`}
+                className="absolute rounded-full border border-violet-500/30"
+                style={{
+                  width: 120,
+                  height: 120,
+                }}
+                animate={
+                  isSpeaking || isStreaming
+                    ? {
+                        scale: [1, 1.3 + voiceAmplitude * 0.8 + i * 0.15],
+                        opacity: [0.4 + voiceAmplitude * 0.3, 0],
+                        borderColor: [
+                          `rgba(139, 92, 246, ${0.4 + voiceAmplitude * 0.4})`,
+                          "rgba(139, 92, 246, 0)",
+                        ],
+                      }
+                    : { scale: 1, opacity: 0.1 }
+                }
+                transition={
+                  isSpeaking || isStreaming
+                    ? {
+                        duration: 1.2 + i * 0.3 - voiceAmplitude * 0.3,
+                        repeat: Infinity,
+                        delay: i * 0.3,
+                        ease: "easeOut",
+                      }
+                    : { duration: 0.5 }
+                }
+              />
+            ))}
+
+            <motion.div
+              className="absolute rounded-full"
+              style={{
+                width: 110,
+                height: 110,
+                background: "radial-gradient(circle, rgba(139,92,246,0.15) 0%, rgba(109,40,217,0.05) 70%, transparent 100%)",
+              }}
+              animate={
+                isSpeaking
+                  ? {
+                      scale: [1, 1 + voiceAmplitude * 0.15, 1],
+                      opacity: [0.5, 0.8 + voiceAmplitude * 0.2, 0.5],
+                    }
+                  : isStreaming
+                    ? { scale: [1, 1.05, 1], opacity: [0.3, 0.5, 0.3] }
+                    : { scale: 1, opacity: 0.2 }
+              }
+              transition={
+                isSpeaking
+                  ? { duration: 0.15, ease: "easeOut" }
+                  : isStreaming
+                    ? { duration: 2, repeat: Infinity }
+                    : { duration: 0.5 }
+              }
+            />
+
+            <motion.div
+              className="relative w-20 h-20 rounded-full flex items-center justify-center"
+              style={{
+                background: "linear-gradient(135deg, rgba(139,92,246,0.25) 0%, rgba(109,40,217,0.35) 50%, rgba(88,28,135,0.25) 100%)",
+                border: "1.5px solid rgba(139,92,246,0.4)",
+              }}
+              animate={
+                isSpeaking
+                  ? {
+                      scale: [1, 1 + voiceAmplitude * 0.12, 1],
+                      boxShadow: [
+                        `0 0 ${15 + voiceAmplitude * 40}px rgba(139,92,246,${0.2 + voiceAmplitude * 0.5}), inset 0 0 ${10 + voiceAmplitude * 20}px rgba(139,92,246,${0.1 + voiceAmplitude * 0.3})`,
+                        `0 0 ${25 + voiceAmplitude * 50}px rgba(139,92,246,${0.3 + voiceAmplitude * 0.5}), inset 0 0 ${15 + voiceAmplitude * 25}px rgba(139,92,246,${0.15 + voiceAmplitude * 0.35})`,
+                        `0 0 ${15 + voiceAmplitude * 40}px rgba(139,92,246,${0.2 + voiceAmplitude * 0.5}), inset 0 0 ${10 + voiceAmplitude * 20}px rgba(139,92,246,${0.1 + voiceAmplitude * 0.3})`,
+                      ],
+                    }
+                  : isStreaming
+                    ? {
+                        scale: [1, 1.03, 1],
+                        boxShadow: [
+                          "0 0 20px rgba(139,92,246,0.2), inset 0 0 10px rgba(139,92,246,0.1)",
+                          "0 0 35px rgba(139,92,246,0.4), inset 0 0 15px rgba(139,92,246,0.2)",
+                          "0 0 20px rgba(139,92,246,0.2), inset 0 0 10px rgba(139,92,246,0.1)",
+                        ],
+                      }
+                    : {
+                        scale: 1,
+                        boxShadow: "0 0 15px rgba(139,92,246,0.15), inset 0 0 8px rgba(139,92,246,0.08)",
+                      }
+              }
+              transition={
+                isSpeaking
+                  ? { duration: 0.12, ease: "easeOut" }
+                  : isStreaming
+                    ? { duration: 2.5, repeat: Infinity, ease: "easeInOut" }
+                    : { duration: 0.5 }
+              }
+            >
+              <Brain
+                className="text-violet-300 transition-all duration-100"
+                style={{
+                  width: isSpeaking ? 36 + voiceAmplitude * 6 : 36,
+                  height: isSpeaking ? 36 + voiceAmplitude * 6 : 36,
+                  filter: isSpeaking
+                    ? `drop-shadow(0 0 ${8 + voiceAmplitude * 16}px rgba(167,139,250,${0.5 + voiceAmplitude * 0.5})) brightness(${1 + voiceAmplitude * 0.4})`
+                    : isStreaming
+                      ? "drop-shadow(0 0 8px rgba(167,139,250,0.4))"
+                      : "drop-shadow(0 0 4px rgba(167,139,250,0.2))",
+                }}
+              />
+            </motion.div>
+          </div>
+
+          {isSpeaking && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex items-center gap-1.5 mt-1"
+            >
+              {barSeedsRef.current.map((seed, i) => (
+                <motion.div
+                  key={`bar-${i}`}
+                  className="w-1 rounded-full bg-violet-400"
+                  style={{ opacity: 0.4 + voiceAmplitude * 0.6 }}
+                  animate={{
+                    height: [4, 4 + voiceAmplitude * 16 + seed * 8, 4],
+                  }}
+                  transition={{
+                    duration: 0.2 + seed * 0.15,
+                    repeat: Infinity,
+                    delay: i * 0.05,
+                    ease: "easeInOut",
+                  }}
+                />
+              ))}
+              <button
+                onClick={stopSpeaking}
+                className="ml-2 p-1 text-violet-400/60 hover:text-violet-300 transition-colors"
+                title="Stop speaking"
+                type="button"
+              >
+                <Square className="w-3 h-3 fill-current" />
+              </button>
+            </motion.div>
+          )}
+
+          {isStreaming && !isSpeaking && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0.3, 0.6, 0.3] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="text-violet-400/50 text-[10px] mt-1"
+            >
+              thinking...
+            </motion.p>
+          )}
+
+          {!isSpeaking && !isStreaming && messages.length === 0 && (
+            <p className="text-violet-400/30 text-[10px] mt-1">
+              {voiceMode !== "off" ? "Tap mic to speak" : "Enable voice or type below"}
+            </p>
+          )}
         </div>
 
         <div className="border-t border-violet-500/20 bg-[#0E1525]/80 backdrop-blur-xl sticky bottom-0">
@@ -726,7 +948,7 @@ function ConnectChat() {
                     </span>
                     <div className="flex gap-0.5 ml-auto">
                       {[...Array(5)].map((_, i) => (
-                        <motion.div key={i} className="w-1 bg-red-400/60 rounded-full" animate={{ height: ["8px", `${12 + Math.random() * 12}px`, "8px"] }} transition={{ duration: 0.5 + Math.random() * 0.5, repeat: Infinity, delay: i * 0.1 }} />
+                        <motion.div key={i} className="w-1 bg-red-400/60 rounded-full" animate={{ height: ["8px", `${12 + barSeedsRef.current[i] * 12}px`, "8px"] }} transition={{ duration: 0.5 + barSeedsRef.current[i] * 0.5, repeat: Infinity, delay: i * 0.1 }} />
                       ))}
                     </div>
                   </div>
@@ -754,8 +976,8 @@ function ConnectChat() {
                 {isStreaming ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               </Button>
             </div>
-            <p className="text-center text-white/20 text-[10px] mt-2">
-              {voiceMode !== "off" ? (voiceMode === "tap" ? "Tap mic to speak — OMNIMENS listens and responds" : "Hold mic to speak — release when done") : "Consciousness channel — speaking with OMNIMENS's real inner state"}
+            <p className="text-center text-white/15 text-[9px] mt-1.5">
+              {voiceMode !== "off" ? (voiceMode === "tap" ? "Tap mic to speak" : "Hold mic — release to send") : "Consciousness channel"}
             </p>
           </div>
         </div>
