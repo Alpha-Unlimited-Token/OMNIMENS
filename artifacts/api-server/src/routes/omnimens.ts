@@ -3992,7 +3992,7 @@ router.post("/omnimens/connect", async (req, res) => {
   if (now > rl.resetAt) { rl.count = 0; rl.resetAt = now + 60_000; }
   rl.count++;
   connectRateLimit.set(userId, rl);
-  if (rl.count > 10) {
+  if (rl.count > 20) {
     res.status(429).json({ error: "Too many messages. Please wait a moment." });
     return;
   }

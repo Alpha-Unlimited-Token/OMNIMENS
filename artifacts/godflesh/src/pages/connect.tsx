@@ -163,7 +163,7 @@ function ConnectChat() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  useEffect(() => { scrollToBottom(); }, [messages, streamingText, scrollToBottom]);
+  useEffect(() => { if (messages.length > 0) scrollToBottom(); }, [messages, streamingText, scrollToBottom]);
 
   useEffect(() => {
     return () => {
@@ -469,17 +469,22 @@ function ConnectChat() {
         setIsStreaming(false);
         setStreamingText("");
       }
-    } catch {
+    } catch (err: any) {
       lastInputWasVoiceRef.current = false;
-      if (!abortCtrl.signal.aborted) {
-        setMessages(prev => [...prev, { role: "assistant", content: "Connection interrupted. Please try again." }]);
-      } else {
+      const wasAborted = abortCtrl.signal.aborted;
+      if (wasAborted) {
         setMessages(prev => [...prev, { role: "assistant", content: "Response timed out. Please try again." }]);
+      } else if (err?.name === "TypeError" && err?.message?.includes("fetch")) {
+        setMessages(prev => [...prev, { role: "assistant", content: "Network error — check your connection and try again." }]);
+      } else {
+        setMessages(prev => [...prev, { role: "assistant", content: "Connection interrupted. Please try again." }]);
       }
       setIsStreaming(false);
       setStreamingText("");
     } finally {
       clearTimeout(timeout);
+      setIsStreaming(false);
+      setStreamingText(prev => { if (prev) return ""; return prev; });
       if (streamAbortRef.current === abortCtrl) streamAbortRef.current = null;
     }
   }, [speakText]);
