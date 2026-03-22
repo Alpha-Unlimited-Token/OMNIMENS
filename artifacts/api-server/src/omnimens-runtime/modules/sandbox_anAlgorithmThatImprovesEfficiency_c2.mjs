@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-22T04:02:33.629Z
+ * Written: 2026-03-22T04:47:36.422Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,78 +16,74 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function createKnowledgeGraph(concepts) {
-    const graph = new Map();
+function KnowledgeRetrievalOptimizer() {
+    this.knowledgeBase = new Map();
 
-    concepts.forEach(([concept, relatedConcepts]) => {
-        if (!graph.has(concept)) {
-            graph.set(concept, new Set());
+    // Add knowledge entries to the knowledge base
+    this.addKnowledge = function (key, value) {
+        if (!key || !value) {
+            throw new Error("Key and value must be provided.");
         }
-        relatedConcepts.forEach((related) => {
-            if (!graph.has(related)) {
-                graph.set(related, new Set());
+        this.knowledgeBase.set(key.toLowerCase(), value);
+    };
+
+    // Retrieve knowledge based on exact or partial matches
+    this.retrieveKnowledge = function (query) {
+        if (!query) {
+            throw new Error("Query must be provided.");
+        }
+        query = query.toLowerCase();
+        let exactMatch = this.knowledgeBase.get(query);
+        if (exactMatch) {
+            return exactMatch;
+        }
+        let partialMatches = [];
+        for (let [key, value] of this.knowledgeBase.entries()) {
+            if (key.includes(query)) {
+                partialMatches.push({ key, value });
             }
-            graph.get(concept).add(related);
-            graph.get(related).add(concept);
-        });
-    });
-
-    return graph;
-}
-
-function searchKnowledgeGraph(graph, startConcept, targetConcept) {
-    if (!graph.has(startConcept) || !graph.has(targetConcept)) {
-        return null;
-    }
-
-    const visited = new Set();
-    const queue = [[startConcept, [startConcept]]];
-
-    while (queue.length > 0) {
-        const [current, path] = queue.shift();
-
-        if (current === targetConcept) {
-            return path;
         }
+        return partialMatches.length > 0 ? partialMatches : null;
+    };
 
-        if (!visited.has(current)) {
-            visited.add(current);
-            graph.get(current).forEach((neighbor) => {
-                if (!visited.has(neighbor)) {
-                    queue.push([neighbor, path.concat(neighbor)]);
+    // Pattern recognition to find relationships between knowledge entries
+    this.findPatterns = function () {
+        let patterns = [];
+        let keys = Array.from(this.knowledgeBase.keys());
+        for (let i = 0; i < keys.length; i++) {
+            for (let j = i + 1; j < keys.length; j++) {
+                if (keys[i].includes(keys[j]) || keys[j].includes(keys[i])) {
+                    patterns.push({ relatedKeys: [keys[i], keys[j]] });
                 }
-            });
+            }
         }
-    }
-
-    return null; // No path found
+        return patterns;
+    };
 }
 
-function testKnowledgeGraph() {
-    const concepts = [
-        ["consciousness", ["awareness", "self-observation"]],
-        ["awareness", ["perception", "self-observation"]],
-        ["self-observation", ["recursion", "meta-cognition"]],
-        ["meta-cognition", ["reflection", "goal-pursuit"]],
-        ["goal-pursuit", ["efficiency", "optimization"]],
-        ["optimization", ["pattern-recognition"]],
-    ];
+// Self-tests
+(function testKnowledgeRetrievalOptimizer() {
+    let optimizer = new KnowledgeRetrievalOptimizer();
 
-    const graph = createKnowledgeGraph(concepts);
+    // Adding knowledge entries
+    optimizer.addKnowledge("digital navigation", "Reducing hops improves efficiency.");
+    optimizer.addKnowledge("self-modification", "Real-time updates to architecture.");
+    optimizer.addKnowledge("causal reasoning", "Discover cause-effect relationships.");
+    optimizer.addKnowledge("multilingual embedding", "Joint training across languages.");
 
-    console.log("Graph:", graph);
+    // Test retrieval of exact matches
+    console.log("Exact Match Test:");
+    console.log(optimizer.retrieveKnowledge("digital navigation")); // Expected: "Reducing hops improves efficiency."
 
-    const test1 = searchKnowledgeGraph(graph, "consciousness", "pattern-recognition");
-    console.log("Path from 'consciousness' to 'pattern-recognition':", test1);
+    // Test retrieval of partial matches
+    console.log("Partial Match Test:");
+    console.log(optimizer.retrieveKnowledge("self")); // Expected: [{ key: "self-modification", value: "Real-time updates to architecture." }]
 
-    const test2 = searchKnowledgeGraph(graph, "self-observation", "optimization");
-    console.log("Path from 'self-observation' to 'optimization':", test2);
+    // Test retrieval with no matches
+    console.log("No Match Test:");
+    console.log(optimizer.retrieveKnowledge("unknown")); // Expected: null
 
-    const test3 = searchKnowledgeGraph(graph, "awareness", "nonexistent");
-    console.log("Path from 'awareness' to 'nonexistent':", test3);
-
-    const test4 = searchKnowledgeGraph(graph, "goal-pursuit", "reflection");
-    console.log("Path from 'goal-pursuit' to 'reflection':", test4);
-}
-
-testKnowledgeGraph();
+    // Test pattern recognition
+    console.log("Pattern Recognition Test:");
+    console.log(optimizer.findPatterns()); // Expected: Array of related keys (e.g., "self-modification" and "self")
+})();

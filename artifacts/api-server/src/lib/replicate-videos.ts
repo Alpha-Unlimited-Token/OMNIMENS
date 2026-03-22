@@ -1,33 +1,74 @@
 // Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
-// Replicate — AI video generation via Minimax video-01-live (fast, high quality).
+// Replicate — AI video generation with multiple model options and enhanced control.
 
 const REPLICATE_API = "https://api.replicate.com/v1";
-const VIDEO_MODEL = "minimax/video-01-live";
+
+const VIDEO_MODELS = {
+  minimax: "minimax/video-01-live",
+  wan: "wan-ai/wan-2.1-i2v-480p-bf16",
+} as const;
+
 const POLL_INTERVAL = 3000;
-const MAX_POLLS = 120;
+const MAX_POLLS = 150;
+
+export type VideoAspectRatio = "16:9" | "9:16" | "1:1";
+export type VideoQualityTier = "standard" | "hd";
+export type VideoModel = keyof typeof VIDEO_MODELS;
+
+export interface VideoGenOptions {
+  prompt: string;
+  aspectRatio?: VideoAspectRatio;
+  quality?: VideoQualityTier;
+  model?: VideoModel;
+  imageUrl?: string;
+}
 
 export async function generateVideoWithReplicate(
-  prompt: string
+  promptOrOptions: string | VideoGenOptions
 ): Promise<Buffer> {
   const token = process.env.REPLICATE_API_TOKEN;
   if (!token) throw new Error("REPLICATE_API_TOKEN not configured");
 
-  const startRes = await fetch(`${REPLICATE_API}/models/${VIDEO_MODEL}/predictions`, {
+  const opts: VideoGenOptions = typeof promptOrOptions === "string"
+    ? { prompt: promptOrOptions }
+    : promptOrOptions;
+
+  const selectedModel = opts.model || "minimax";
+  const modelId = VIDEO_MODELS[selectedModel] || VIDEO_MODELS.minimax;
+  const aspectRatio = opts.aspectRatio || "16:9";
+
+  const input: Record<string, any> = {
+    prompt: opts.prompt.slice(0, 2000),
+    prompt_optimizer: true,
+  };
+
+  if (selectedModel === "minimax" && aspectRatio) {
+    const minimaxRatioMap: Record<string, string> = {
+      "16:9": "16:9", "9:16": "9:16", "1:1": "1:1",
+    };
+    if (minimaxRatioMap[aspectRatio]) {
+      input.aspect_ratio = minimaxRatioMap[aspectRatio];
+    }
+  }
+
+  if (opts.imageUrl && selectedModel === "wan") {
+    input.image = opts.imageUrl;
+  }
+
+  const startRes = await fetch(`${REPLICATE_API}/models/${modelId}/predictions`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      input: {
-        prompt: prompt.slice(0, 2000),
-        prompt_optimizer: true,
-      },
-    }),
+    body: JSON.stringify({ input }),
   });
 
   if (!startRes.ok) {
     const err = await startRes.text();
+    if (selectedModel !== "minimax") {
+      return generateVideoWithReplicate({ ...opts, model: "minimax" });
+    }
     throw new Error(`Replicate video prediction failed to start: ${err}`);
   }
 
@@ -55,6 +96,9 @@ export async function generateVideoWithReplicate(
   }
 
   if (prediction.status === "failed") {
+    if (selectedModel !== "minimax") {
+      return generateVideoWithReplicate({ ...opts, model: "minimax" });
+    }
     throw new Error(
       `Replicate video generation failed: ${prediction.error || "unknown error"}`
     );

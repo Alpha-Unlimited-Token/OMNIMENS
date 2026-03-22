@@ -348,7 +348,7 @@ export function useOmnimensChat(
     setMessages(mapped);
   };
 
-  const sendMessage = async (content: string, files: File[] = [], persona = "GENERAL", hubSettings?: any, model = "gpt-4o", responseMode = "AUTO", sessionStart?: number) => {
+  const sendMessage = async (content: string, files: File[] = [], persona = "GENERAL", hubSettings?: any, model = "gpt-4o", responseMode = "AUTO", sessionStart?: number, mediaSettings?: Record<string, string>) => {
     if (!content.trim() && files.length === 0) return;
     if (isTyping) return;
     if (currentConversationId === undefined && content.trim()) {
@@ -423,6 +423,9 @@ export function useOmnimensChat(
       }
       form.append("responseMode", responseMode);
       if (sessionStart) form.append("sessionStart", String(sessionStart));
+      if (mediaSettings && Object.keys(mediaSettings).length > 0) {
+        form.append("mediaSettings", JSON.stringify(mediaSettings));
+      }
       for (const file of files) {
         form.append("files", file);
       }
@@ -564,7 +567,7 @@ export function useOmnimensChat(
                   return newMsgs;
                 });
 
-              } else if (data.type === "image_generating") {
+              } else if (data.type === "image_generating" || data.type === "image_editing") {
                 setMessages((prev) => {
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);

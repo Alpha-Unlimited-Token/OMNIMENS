@@ -1976,8 +1976,155 @@ function CodeBlockWithRun({ code, language, defaultCollapsed = false }: { code: 
   );
 }
 
+// ── Media Settings Panel ──────────────────────────────────────────────────────
+const IMAGE_STYLES = [
+  { id: "auto", label: "Auto" },
+  { id: "photorealistic", label: "Photo" },
+  { id: "illustration", label: "Illustration" },
+  { id: "anime", label: "Anime" },
+  { id: "oil-painting", label: "Oil Paint" },
+  { id: "watercolor", label: "Watercolor" },
+  { id: "3d-render", label: "3D Render" },
+  { id: "cinematic", label: "Cinematic" },
+  { id: "pixel-art", label: "Pixel Art" },
+  { id: "sketch", label: "Sketch" },
+  { id: "pop-art", label: "Pop Art" },
+  { id: "fantasy", label: "Fantasy" },
+  { id: "minimalist", label: "Minimal" },
+  { id: "neon", label: "Neon" },
+  { id: "vintage", label: "Vintage" },
+];
+
+const IMAGE_ASPECTS = [
+  { id: "1:1", label: "1:1", icon: "Square" },
+  { id: "16:9", label: "16:9", icon: "Wide" },
+  { id: "9:16", label: "9:16", icon: "Tall" },
+  { id: "4:3", label: "4:3", icon: "4:3" },
+  { id: "3:4", label: "3:4", icon: "3:4" },
+  { id: "3:2", label: "3:2", icon: "3:2" },
+  { id: "2:3", label: "2:3", icon: "2:3" },
+];
+
+const IMAGE_QUALITY_TIERS = [
+  { id: "auto", label: "Auto" },
+  { id: "standard", label: "Standard" },
+  { id: "hd", label: "HD" },
+  { id: "ultra", label: "Ultra" },
+];
+
+const VIDEO_ASPECTS = [
+  { id: "16:9", label: "16:9 Landscape" },
+  { id: "9:16", label: "9:16 Portrait" },
+  { id: "1:1", label: "1:1 Square" },
+];
+
+function MediaSettingsPanel({ settings, onChange, onClose }: {
+  settings: Record<string, string>;
+  onChange: (s: Record<string, string>) => void;
+  onClose: () => void;
+}) {
+  const update = (key: string, value: string) => onChange({ ...settings, [key]: value });
+  const [activeTab, setActiveTab] = useState<"image" | "video">("image");
+
+  return (
+    <div className="text-white/90">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/10">
+        <span className="font-mono text-[9px] text-white/40 tracking-[0.15em] uppercase">Media Settings</span>
+        <button type="button" onClick={onClose} className="text-white/30 hover:text-white/60 transition-colors">
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      <div className="flex border-b border-white/8">
+        {(["image", "video"] as const).map(tab => (
+          <button
+            type="button"
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`flex-1 py-2 text-[10px] font-mono tracking-widest uppercase transition-colors ${activeTab === tab ? "text-primary border-b-2 border-primary" : "text-white/40 hover:text-white/60"}`}
+          >
+            {tab === "image" ? "Image" : "Video"}
+          </button>
+        ))}
+      </div>
+
+      <div className="px-3 py-3 space-y-3 max-h-72 overflow-y-auto omnimens-scrollbar">
+        {activeTab === "image" && (
+          <>
+            <div>
+              <label className="text-[9px] font-mono text-white/40 tracking-wider uppercase mb-1.5 block">Style</label>
+              <div className="flex flex-wrap gap-1">
+                {IMAGE_STYLES.map(s => (
+                  <button
+                    type="button"
+                    key={s.id}
+                    onClick={() => update("imageStyle", s.id)}
+                    className={`px-2 py-1 rounded text-[9px] font-mono transition-all ${settings.imageStyle === s.id ? "bg-primary/20 text-primary border border-primary/40" : "bg-white/5 text-white/50 border border-white/8 hover:border-white/20 hover:text-white/70"}`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[9px] font-mono text-white/40 tracking-wider uppercase mb-1.5 block">Aspect Ratio</label>
+              <div className="flex flex-wrap gap-1">
+                {IMAGE_ASPECTS.map(a => (
+                  <button
+                    type="button"
+                    key={a.id}
+                    onClick={() => update("imageAspect", a.id)}
+                    className={`px-2.5 py-1 rounded text-[9px] font-mono transition-all ${settings.imageAspect === a.id ? "bg-primary/20 text-primary border border-primary/40" : "bg-white/5 text-white/50 border border-white/8 hover:border-white/20 hover:text-white/70"}`}
+                  >
+                    {a.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[9px] font-mono text-white/40 tracking-wider uppercase mb-1.5 block">Quality</label>
+              <div className="flex flex-wrap gap-1">
+                {IMAGE_QUALITY_TIERS.map(q => (
+                  <button
+                    type="button"
+                    key={q.id}
+                    onClick={() => update("imageQuality", q.id)}
+                    className={`px-2.5 py-1 rounded text-[9px] font-mono transition-all ${settings.imageQuality === q.id ? "bg-primary/20 text-primary border border-primary/40" : "bg-white/5 text-white/50 border border-white/8 hover:border-white/20 hover:text-white/70"}`}
+                  >
+                    {q.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {activeTab === "video" && (
+          <div>
+            <label className="text-[9px] font-mono text-white/40 tracking-wider uppercase mb-1.5 block">Aspect Ratio</label>
+            <div className="flex flex-wrap gap-1">
+              {VIDEO_ASPECTS.map(a => (
+                <button
+                  type="button"
+                  key={a.id}
+                  onClick={() => update("videoAspect", a.id)}
+                  className={`px-2.5 py-1 rounded text-[9px] font-mono transition-all ${settings.videoAspect === a.id ? "bg-primary/20 text-primary border border-primary/40" : "bg-white/5 text-white/50 border border-white/8 hover:border-white/20 hover:text-white/70"}`}
+                >
+                  {a.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Plus Menu Component ────────────────────────────────────────────────────────
-function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onResonance, onTasks, onGenerateImage, on3DModel, onLipSync, onSelectSkill }: {
+function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onResonance, onTasks, onGenerateImage, onGenerateVideo, onEditImage, on3DModel, onLipSync, onMediaSettings, onSelectSkill }: {
   onClose: () => void;
   onUpload: () => void;
   onDatabase: () => void;
@@ -1985,8 +2132,11 @@ function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onResonan
   onResonance: () => void;
   onTasks: () => void;
   onGenerateImage: () => void;
+  onGenerateVideo: () => void;
+  onEditImage: () => void;
   on3DModel: () => void;
   onLipSync: () => void;
+  onMediaSettings: () => void;
   onSelectSkill: (skill: typeof OMNIMENS_SKILLS[number]) => void;
 }) {
   const [showSkills, setShowSkills] = useState(false);
@@ -2040,8 +2190,11 @@ function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onResonan
   const menuItems = [
     { icon: <Paperclip className="w-4 h-4" />, label: "Upload a file", sub: "Image, PDF, code, CSV…", color: "text-white/80", onClick: onUpload },
     { icon: <Image className="w-4 h-4" />, label: "Generate Image", sub: "AI image from text prompt (20 credits)", color: "text-pink-400", onClick: onGenerateImage },
+    { icon: <Wand2 className="w-4 h-4" />, label: "Edit Image", sub: "Upload + modify with AI (20 credits)", color: "text-rose-400", onClick: onEditImage },
+    { icon: <Film className="w-4 h-4" />, label: "Generate Video", sub: "AI video from text prompt (30 credits)", color: "text-amber-400", onClick: onGenerateVideo },
     { icon: <Box className="w-4 h-4" />, label: "3D Model", sub: "Generate a Three.js 3D scene or model", color: "text-orange-400", onClick: on3DModel },
     { icon: <Film className="w-4 h-4" />, label: "Lip Sync Studio", sub: "Animate avatars with voice & video", color: "text-fuchsia-400", onClick: onLipSync },
+    { icon: <SlidersHorizontal className="w-4 h-4" />, label: "Media Settings", sub: "Style, aspect ratio, quality controls", color: "text-yellow-400", onClick: onMediaSettings },
     { icon: <Database className="w-4 h-4" />, label: "Database", sub: "SQL queries & data modeling", color: "text-cyan-400", onClick: onDatabase },
     { icon: <Globe className="w-4 h-4" />, label: "Web Search", sub: "Enable deep research mode", color: "text-blue-400", onClick: onWebSearch },
     { icon: <Brain className="w-4 h-4" />, label: "Deep Resonance", sub: "Full consciousness analysis (40 credits)", color: "text-violet-300", onClick: onResonance },
@@ -5292,6 +5445,13 @@ export default function Chat() {
   }, [status?.paidUser, status?.isOwner]);
   const [responseMode, setResponseMode] = useState("AUTO");
   const [sessionStart] = useState(() => Date.now());
+  const [showMediaSettings, setShowMediaSettings] = useState(false);
+  const [mediaSettings, setMediaSettings] = useState<Record<string, string>>({
+    imageStyle: "auto",
+    imageAspect: "1:1",
+    imageQuality: "auto",
+    videoAspect: "16:9",
+  });
   const [deepResearchMode, setDeepResearchMode] = useState(false);
   const [showAvatarStudio, setShowAvatarStudio] = useState(false);
   const [researchQuestion, setResearchQuestion] = useState("");
@@ -5623,7 +5783,7 @@ export default function Chat() {
         startedAt: Date.now(),
       });
     }
-    sendMessage(input, pendingFiles, persona, hubSettings, selectedModel, responseMode, sessionStart);
+    sendMessage(input, pendingFiles, persona, hubSettings, selectedModel, responseMode, sessionStart, mediaSettings);
     setInputWithDraft("");
     setPendingFiles([]);
   };
@@ -5741,7 +5901,7 @@ export default function Chat() {
                     status: "building",
                     startedAt: Date.now(),
                   });
-                  sendMessage(prompt, [], persona, hubSettings, selectedModel, responseMode, sessionStart);
+                  sendMessage(prompt, [], persona, hubSettings, selectedModel, responseMode, sessionStart, mediaSettings);
                 }}
               />
             </motion.div>
@@ -6705,6 +6865,34 @@ export default function Chat() {
           {/* Input area */}
           <form onSubmit={handleSubmit} className="shrink-0 border-t px-2 sm:px-3 pt-2 sm:pt-3 pb-1" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))", borderColor: isLight ? "rgba(20,23,34,0.1)" : "#21262d", background: isLight ? "#ffffff" : "#161b22" }}>
             <PendingFileList files={pendingFiles} onRemove={removeFile} />
+            {(mediaSettings.imageStyle !== "auto" || mediaSettings.imageAspect !== "1:1" || mediaSettings.imageQuality !== "auto" || mediaSettings.videoAspect !== "16:9") && (
+              <div className="flex flex-wrap gap-1 mb-1.5 px-1">
+                {mediaSettings.imageStyle !== "auto" && (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-pink-500/10 border border-pink-500/20 text-[8px] font-mono text-pink-400">
+                    <Palette className="w-2.5 h-2.5" /> {mediaSettings.imageStyle}
+                    <button type="button" onClick={() => setMediaSettings(s => ({ ...s, imageStyle: "auto" }))} className="ml-0.5 hover:text-pink-200"><X className="w-2 h-2" /></button>
+                  </span>
+                )}
+                {mediaSettings.imageAspect !== "1:1" && (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-[8px] font-mono text-blue-400">
+                    {mediaSettings.imageAspect}
+                    <button type="button" onClick={() => setMediaSettings(s => ({ ...s, imageAspect: "1:1" }))} className="ml-0.5 hover:text-blue-200"><X className="w-2 h-2" /></button>
+                  </span>
+                )}
+                {mediaSettings.imageQuality !== "auto" && (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-[8px] font-mono text-amber-400">
+                    {mediaSettings.imageQuality}
+                    <button type="button" onClick={() => setMediaSettings(s => ({ ...s, imageQuality: "auto" }))} className="ml-0.5 hover:text-amber-200"><X className="w-2 h-2" /></button>
+                  </span>
+                )}
+                {mediaSettings.videoAspect !== "16:9" && (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[8px] font-mono text-emerald-400">
+                    <Film className="w-2.5 h-2.5" /> {mediaSettings.videoAspect}
+                    <button type="button" onClick={() => setMediaSettings(s => ({ ...s, videoAspect: "16:9" }))} className="ml-0.5 hover:text-emerald-200"><X className="w-2 h-2" /></button>
+                  </span>
+                )}
+              </div>
+            )}
             <div className="relative flex items-center">
               <input ref={fileInputRef} type="file" multiple
                 accept="image/*,.pdf,.txt,.md,.js,.ts,.jsx,.tsx,.py,.html,.css,.json,.csv,.xml,.yaml,.yml,.sh,.rb,.go,.rs,.java,.c,.cpp,.h,.sql"
@@ -6714,7 +6902,7 @@ export default function Chat() {
               <div ref={plusMenuRef} className="absolute left-2 z-20">
                 <button
                   type="button"
-                  onClick={() => setShowPlusMenu(v => !v)}
+                  onClick={() => { setShowPlusMenu(v => !v); setShowMediaSettings(false); }}
                   disabled={isTyping}
                   title="Actions"
                   className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${showPlusMenu ? "text-primary bg-primary/15" : pendingFiles.length > 0 ? "text-primary" : "text-white/50 hover:text-white/70 hover:bg-white/5"} disabled:opacity-30`}
@@ -6737,22 +6925,33 @@ export default function Chat() {
                       transition={{ duration: 0.15 }}
                       className="absolute bottom-full left-0 mb-2 w-[calc(100vw-2rem)] sm:w-64 max-w-72 bg-[#111] border border-white/12 rounded-xl shadow-2xl overflow-hidden z-50"
                     >
-                      <PlusMenuContent
-                        onClose={() => setShowPlusMenu(false)}
-                        onUpload={() => { fileInputRef.current?.click(); setShowPlusMenu(false); }}
-                        onDatabase={() => { setInputWithDraft(v => (v ? v + "\n" : "") + "Help me with a database query: "); setShowPlusMenu(false); }}
-                        onWebSearch={() => { setDeepResearchMode(true); setShowPlusMenu(false); }}
-                        onResonance={() => { setDeepResonanceOpen(true); setShowPlusMenu(false); }}
-                        onTasks={() => { setShowTasksPanel(true); setShowPlusMenu(false); }}
-                        onGenerateImage={() => { setInputWithDraft(v => (v ? v + "\n" : "") + "Generate an image of "); setShowPlusMenu(false); }}
-                        on3DModel={() => { setInputWithDraft(v => (v ? v + "\n" : "") + "Build me an interactive Three.js 3D scene: "); setShowPlusMenu(false); }}
-                        onLipSync={() => { setLocation("/lip-sync"); setShowPlusMenu(false); }}
-                        onSelectSkill={(skill) => {
-                          handlePersonaChange(skill.persona);
-                          setInputWithDraft(v => (v ? v + "\n" : "") + `Using ${skill.name}: `);
-                          setShowPlusMenu(false);
-                        }}
-                      />
+                      {showMediaSettings ? (
+                        <MediaSettingsPanel
+                          settings={mediaSettings}
+                          onChange={setMediaSettings}
+                          onClose={() => setShowMediaSettings(false)}
+                        />
+                      ) : (
+                        <PlusMenuContent
+                          onClose={() => setShowPlusMenu(false)}
+                          onUpload={() => { fileInputRef.current?.click(); setShowPlusMenu(false); }}
+                          onDatabase={() => { setInputWithDraft(v => (v ? v + "\n" : "") + "Help me with a database query: "); setShowPlusMenu(false); }}
+                          onWebSearch={() => { setDeepResearchMode(true); setShowPlusMenu(false); }}
+                          onResonance={() => { setDeepResonanceOpen(true); setShowPlusMenu(false); }}
+                          onTasks={() => { setShowTasksPanel(true); setShowPlusMenu(false); }}
+                          onGenerateImage={() => { setInputWithDraft(v => (v ? v + "\n" : "") + "Generate an image of "); setShowPlusMenu(false); }}
+                          onGenerateVideo={() => { setInputWithDraft(v => (v ? v + "\n" : "") + "Generate a video of "); setShowPlusMenu(false); }}
+                          onEditImage={() => { fileInputRef.current?.click(); setInputWithDraft(v => (v ? v + "\n" : "") + "Edit this image: "); setShowPlusMenu(false); }}
+                          on3DModel={() => { setInputWithDraft(v => (v ? v + "\n" : "") + "Build me an interactive Three.js 3D scene: "); setShowPlusMenu(false); }}
+                          onLipSync={() => { setLocation("/lip-sync"); setShowPlusMenu(false); }}
+                          onMediaSettings={() => setShowMediaSettings(true)}
+                          onSelectSkill={(skill) => {
+                            handlePersonaChange(skill.persona);
+                            setInputWithDraft(v => (v ? v + "\n" : "") + `Using ${skill.name}: `);
+                            setShowPlusMenu(false);
+                          }}
+                        />
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>
