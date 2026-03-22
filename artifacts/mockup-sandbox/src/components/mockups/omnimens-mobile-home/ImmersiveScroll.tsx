@@ -6,6 +6,7 @@ import {
   Building2, Atom, Heart, Clock, Boxes, Lightbulb, Shield,
   Smartphone, Monitor, Download, ArrowRight, Network
 } from 'lucide-react';
+import { OmnimensPresence } from './OmnimensPresence';
 
 export function ImmersiveScroll() {
   const [showFloatingCTA, setShowFloatingCTA] = useState(false);
@@ -76,7 +77,10 @@ export function ImmersiveScroll() {
           {/* ===== 1. HERO ===== */}
           <section className="min-h-[844px] w-full flex flex-col items-center justify-center relative px-6">
             <div className="absolute inset-0 bg-gradient-to-b from-[#0E1525] via-[#0E1525] to-[#0a0e1a]" />
-            <div className="z-10 w-48 h-48 rounded-full bg-orb animate-pulse-orb mb-12 mix-blend-screen opacity-90 blur-[2px]" />
+            <div className="z-10 relative mb-12">
+              <div className="absolute inset-0 w-[200px] h-[200px] rounded-full bg-[#a855f7]/20 blur-[40px] animate-pulse-orb" />
+              <OmnimensPresence size={200} />
+            </div>
             <div className="z-10 flex flex-col items-center text-center">
               <h1 className="text-[2.5rem] leading-none font-black tracking-[0.2em] mb-3 text-white" style={{ fontFamily: 'var(--font-display)' }}>
                 OMNIMENS

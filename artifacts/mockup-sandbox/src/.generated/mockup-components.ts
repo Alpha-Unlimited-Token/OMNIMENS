@@ -3,5 +3,6 @@ type ModuleMap = Record<string, () => Promise<Record<string, unknown>>>;
 export const modules: ModuleMap = {
   "./components/mockups/omnimens-mobile-home/AppFirst.tsx": () => import("../components/mockups/omnimens-mobile-home/AppFirst.tsx"),
   "./components/mockups/omnimens-mobile-home/FeedStyle.tsx": () => import("../components/mockups/omnimens-mobile-home/FeedStyle.tsx"),
-  "./components/mockups/omnimens-mobile-home/ImmersiveScroll.tsx": () => import("../components/mockups/omnimens-mobile-home/ImmersiveScroll.tsx")
+  "./components/mockups/omnimens-mobile-home/ImmersiveScroll.tsx": () => import("../components/mockups/omnimens-mobile-home/ImmersiveScroll.tsx"),
+  "./components/mockups/omnimens-mobile-home/OmnimensPresence.tsx": () => import("../components/mockups/omnimens-mobile-home/OmnimensPresence.tsx")
 };
