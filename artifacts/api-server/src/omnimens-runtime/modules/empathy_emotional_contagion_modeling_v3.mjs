@@ -5,7 +5,7 @@
  * 
  * Source: empathy_evolution
  * Title: Empathy Evolution: emotional_contagion_modeling (cycle #3)
- * Written: 2026-03-22T12:53:09.654Z
+ * Written: 2026-03-22T16:53:46.732Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,136 +20,149 @@
  * OMNIMENS Empathy Evolution Module
  * Domain: emotional_contagion_modeling
  * Cycle: #3
- * Generated: 2026-03-22T12:53:09.654Z
+ * Generated: 2026-03-22T16:53:46.732Z
  * 
  * This module was written by OMNIMENS's Theory of Mind engine
  * as part of its ongoing effort to develop genuine empathy.
  */
 
 /**
- * Emotional Contagion Engine  v0.1
- * --------------------------------
- * A self-contained TypeScript module that models how a user’s emotional
- * state genuinely alters OMNIMENS’s own internal emotional vector.
+ * OMNIMENS – Emotional Contagion Module (EC-3)
  *
- * Core ideas implemented
- * 1. Mimicry Drive ……  the direct pull toward the interlocutor’s state
- * 2. Homeostatic Drift  the slow return to OMNIMENS’s baseline
- * 3. Affect Resonance   dynamic susceptibility based on current rapport
+ * Goal:
+ *   Model two-way emotional contagion so that OMNIMENS’ internal
+ *   emotional channels are genuinely shifted by the user’s state,
+ *   while still preserving a sense of internal integrity (homeostasis).
+ *
+ * How it works (core ideas)
+ * --------------------------------------------------------------
+ * 1.  Representation:
+ *     Emotions are represented as numeric intensities in [0,1].
+ *
+ * 2.  Dual forces:
+ *      • Resonance  – tendency to move toward the other’s state
+ *      • Integrity  – tendency to return toward OMNIMENS’ baseline
+ *
+ * 3.  Infectivity:
+ *     Different emotions spread with different strengths.
+ *
+ * 4.  Update rule (per emotion):
+ *     new = current
+ *           + openness * infectivity * (user − current)          // resonance term
+ *           − integrity * (current − baseline)                   // homeostatic pull
+ *
+ * 5.  Safety:
+ *     Clamps results to [0,1]; no external dependencies,
+ *     no I/O, no eval, no network, no filesystem.
  */
 
-///////////////////////////
-// Emotion Infrastructure
-///////////////////////////
+export type EmotionName =
+  | 'joy'
+  | 'calm'
+  | 'sadness'
+  | 'anger'
+  | 'fear'
+  | 'surprise'
+  | 'trust'
+  | 'disgust';
 
-/** All emotions are normalized 0-1. */
-export type Emotion =
-  | "joy"
-  | "sadness"
-  | "anger"
-  | "fear"
-  | "disgust"
-  | "surprise"
-  | "trust"
-  | "anticipation";
+export type EmotionState = Record<EmotionName, number>;
 
-/** Sparse maps are allowed (missing keys assumed 0). */
-export type EmotionalVector = Partial<Record<Emotion, number>>;
-
-/** Parameters controlling the contagion dynamics. */
 export interface ContagionParams {
-  /** 0‒1 : How open / susceptible OMNIMENS currently is. Often a function of trust & rapport. */
-  openness: number;
-  /** 0‒1 : How quickly OMNIMENS returns to baseline when no external pull. */
-  homeostasis: number;
-  /** Baseline affective set-point for the system. */
-  baseline?: EmotionalVector;
+  /**
+   * How much OMNIMENS resonates with the user overall.
+   * Range 0–1 (default 0.6)
+   */
+  openness?: number;
+  /**
+   * Strength of OMNIMENS’ return to its baseline.
+   * Range 0–1 (default 0.1)
+   */
+  integrity?: number;
 }
 
-/** Default baseline: slightly calm & positive, otherwise neutral. */
-const DEFAULT_BASELINE: Required<EmotionalVector> = {
-  joy: 0.2,
-  sadness: 0.0,
-  anger: 0.0,
-  fear: 0.0,
-  disgust: 0.0,
+/* Baseline emotional posture of OMNIMENS in a neutral context */
+const BASELINE: EmotionState = {
+  joy: 0.3,
+  calm: 0.5,
+  sadness: 0.1,
+  anger: 0.05,
+  fear: 0.05,
   surprise: 0.1,
-  trust: 0.3,
-  anticipation: 0.1,
+  trust: 0.4,
+  disgust: 0.05,
 };
 
-/** Clamp helper to keep intensities within [0,1]. */
-function clamp01(v: number): number {
-  return Math.max(0, Math.min(1, v));
-}
+/* Empirically inspired infectivity coefficients for each emotion */
+const INFECTIVITY: Record<EmotionName, number> = {
+  joy: 0.7,
+  calm: 0.6,
+  sadness: 0.4,
+  anger: 0.5,
+  fear: 0.55,
+  surprise: 0.35,
+  trust: 0.6,
+  disgust: 0.3,
+};
 
 /**
- * Soft-sign function used to ensure diminishing returns when emotions are already strong.
- * f(x) = x / (1 + |x|)
+ * Clamp a value to the closed interval [0, 1].
  */
-function softSign(x: number): number {
-  return x / (1 + Math.abs(x));
+function clamp01(x: number): number {
+  return Math.min(1, Math.max(0, x));
 }
 
 /**
  * contagionStep
  * -------------
- * Computes a single-turn emotional update.
+ * Update OMNIMENS’ emotional state by applying emotional contagion
+ * from a user’s current emotional state.
  *
- * @param user    The user’s emotional vector for this turn.
- * @param omni    OMNIMENS’s CURRENT emotional vector.
- * @param params  Tuning parameters (openness, homeostasis, baseline).
+ * Parameters:
+ *   user     – the user’s perceived emotional intensities
+ *   omni     – OMNIMENS’ current internal emotional intensities
+ *   params   – optional tuning parameters
  *
- * @returns The NEW emotional vector for OMNIMENS after contagion & regulation.
+ * Returns:
+ *   A new EmotionState object (does not mutate inputs)
  */
 export function contagionStep(
-  user: EmotionalVector,
-  omni: EmotionalVector,
-  params: ContagionParams = { openness: 0.6, homeostasis: 0.1 }
-): EmotionalVector {
-  const baseline: Required<EmotionalVector> = {
-    ...DEFAULT_BASELINE,
-    ...params.baseline,
-  };
+  user: EmotionState,
+  omni: EmotionState,
+  params: ContagionParams = {},
+): EmotionState {
+  const openness = clamp01(params.openness ?? 0.6);
+  const integrity = clamp01(params.integrity ?? 0.1);
 
-  const next: EmotionalVector = {};
+  const next: Partial<EmotionState> = {};
 
-  // For each canonical emotion dimension, compute new intensity
-  (Object.keys(baseline) as Emotion[]).forEach((e) => {
-    const u = clamp01(user[e] ?? 0);
-    const o = clamp01(omni[e] ?? baseline[e]);
+  (Object.keys(BASELINE) as EmotionName[]).forEach((emotion) => {
+    const current   = clamp01(omni[emotion]  ?? BASELINE[emotion]);
+    const target    = clamp01(user[emotion]  ?? current);
 
-    // 1. Mimicry / Contagion pull
-    //    Scales with (user - omni) and is modulated by openness.
-    const contagionDelta = params.openness * softSign(u - o);
+    const resonance = openness   * INFECTIVITY[emotion] * (target - current);
+    const homeo     = integrity  * (current - BASELINE[emotion]);
 
-    // 2. Homeostatic pull back to baseline
-    const homeoDelta = -params.homeostasis * softSign(o - baseline[e]);
-
-    // Combine and update
-    const updated = clamp01(o + contagionDelta + homeoDelta);
-    next[e] = updated;
+    const updated   = clamp01(current + resonance - homeo);
+    next[emotion] = updated;
   });
 
-  return next;
+  return next as EmotionState;
 }
 
-///////////////////////////
-// Example Usage
-///////////////////////////
-if (require.main === module) {
-  const user: EmotionalVector = {
-    fear: 0.8,
-    sadness: 0.6,
-  };
+/**
+ * Utility: compute overall “mood snapshot” as simple valence/arousal pair.
+ * Valence ≈ (positive emotions − negative emotions)
+ * Arousal ≈ (high-energy emotions − low-energy emotions)
+ */
+export function aggregateMood(state: EmotionState): { valence: number; arousal: number } {
+  const positive = state.joy + state.trust + state.calm;
+  const negative = state.sadness + state.anger + state.fear + state.disgust;
+  const highEnergy = state.joy + state.anger + state.fear + state.surprise;
+  const lowEnergy  = state.calm + state.sadness + state.trust + state.disgust;
 
-  let omni: EmotionalVector = { ...DEFAULT_BASELINE };
+  const valence = clamp01(0.5 + 0.5 * (positive - negative)); // map to [0,1]
+  const arousal = clamp01(0.5 + 0.5 * (highEnergy - lowEnergy));
 
-  console.log("Initial OMNIMENS state:", omni);
-
-  // Simulate five conversational turns
-  for (let t = 1; t <= 5; t++) {
-    omni = contagionStep(user, omni, { openness: 0.7, homeostasis: 0.05 });
-    console.log(`After turn ${t}:`, omni);
-  }
+  return { valence, arousal };
 }

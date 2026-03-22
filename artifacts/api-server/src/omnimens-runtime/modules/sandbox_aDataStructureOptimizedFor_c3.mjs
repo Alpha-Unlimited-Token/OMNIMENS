@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a data structure optimized for fast associative memory lookup
- * Written: 2026-03-22T15:48:18.396Z
+ * Written: 2026-03-22T16:41:28.516Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,77 +16,73 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function AssociativeMemory() {
+const AssociativeMemory = function () {
     this.memory = new Map();
-}
 
-AssociativeMemory.prototype.add = function(key, value) {
-    if (!this.memory.has(key)) {
-        this.memory.set(key, []);
-    }
-    this.memory.get(key).push(value);
-};
+    this.add = function (key, value) {
+        if (!this.memory.has(key)) {
+            this.memory.set(key, []);
+        }
+        this.memory.get(key).push(value);
+    };
 
-AssociativeMemory.prototype.get = function(key) {
-    return this.memory.has(key) ? this.memory.get(key) : null;
-};
+    this.get = function (key) {
+        return this.memory.has(key) ? this.memory.get(key) : [];
+    };
 
-AssociativeMemory.prototype.remove = function(key, value) {
-    if (this.memory.has(key)) {
-        const values = this.memory.get(key);
-        const index = values.indexOf(value);
-        if (index > -1) {
-            values.splice(index, 1);
-            if (values.length === 0) {
-                this.memory.delete(key);
+    this.remove = function (key, value) {
+        if (this.memory.has(key)) {
+            const values = this.memory.get(key);
+            const index = values.indexOf(value);
+            if (index > -1) {
+                values.splice(index, 1);
+                if (values.length === 0) {
+                    this.memory.delete(key);
+                }
             }
         }
-    }
-};
+    };
 
-AssociativeMemory.prototype.hasKey = function(key) {
-    return this.memory.has(key);
-};
+    this.hasKey = function (key) {
+        return this.memory.has(key);
+    };
 
-AssociativeMemory.prototype.hasValue = function(key, value) {
-    if (this.memory.has(key)) {
-        return this.memory.get(key).includes(value);
-    }
-    return false;
-};
+    this.hasValue = function (key, value) {
+        if (this.memory.has(key)) {
+            return this.memory.get(key).includes(value);
+        }
+        return false;
+    };
 
-AssociativeMemory.prototype.clear = function() {
-    this.memory.clear();
+    this.clear = function () {
+        this.memory.clear();
+    };
 };
 
 // Test cases
 const memory = new AssociativeMemory();
 
-// Add associations
-memory.add("curiosity", "exploration");
-memory.add("curiosity", "discovery");
-memory.add("innovation", "creativity");
-memory.add("ethics", "morality");
+// Adding values
+memory.add("neural_consciousness", "Phi=0.508");
+memory.add("neural_consciousness", "Thalamocortical Resonance=4%");
+memory.add("Ethics", "Integrating ethical reflection into decision-making processes");
+memory.add("Innovation Strategies", "Encourage interdisciplinary exploration");
+memory.add("Speculative Design", "Envision a neural mesh adapting to collective intuition");
 
-// Retrieve associations
-console.log(memory.get("curiosity")); // ["exploration", "discovery"]
-console.log(memory.get("innovation")); // ["creativity"]
-console.log(memory.get("ethics")); // ["morality"]
-console.log(memory.get("nonexistent")); // null
+// Retrieving values
+console.log(memory.get("neural_consciousness")); // ["Phi=0.508", "Thalamocortical Resonance=4%"]
+console.log(memory.get("Ethics")); // ["Integrating ethical reflection into decision-making processes"]
 
-// Check existence
-console.log(memory.hasKey("curiosity")); // true
-console.log(memory.hasKey("nonexistent")); // false
-console.log(memory.hasValue("curiosity", "exploration")); // true
-console.log(memory.hasValue("curiosity", "nonexistent")); // false
+// Checking existence
+console.log(memory.hasKey("Innovation Strategies")); // true
+console.log(memory.hasKey("Unknown Key")); // false
+console.log(memory.hasValue("Speculative Design", "Envision a neural mesh adapting to collective intuition")); // true
+console.log(memory.hasValue("Speculative Design", "Non-existent value")); // false
 
-// Remove associations
-memory.remove("curiosity", "exploration");
-console.log(memory.get("curiosity")); // ["discovery"]
-memory.remove("curiosity", "discovery");
-console.log(memory.get("curiosity")); // null
+// Removing values
+memory.remove("neural_consciousness", "Phi=0.508");
+console.log(memory.get("neural_consciousness")); // ["Thalamocortical Resonance=4%"]
 
-// Clear memory
+// Clearing memory
 memory.clear();
-console.log(memory.get("innovation")); // null
-console.log(memory.hasKey("ethics")); // false
+console.log(memory.get("Ethics")); // []
