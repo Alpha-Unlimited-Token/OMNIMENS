@@ -78,3 +78,21 @@ id = "l3Dbv3tLbLsGArriVEIlZ"
 uri = "file://song_VOCALS_ONLY.wav"
 type = "audio"
 title = "ISOLATED VOCALS — Voice Frequencies Only"
+
+[[outputs]]
+id = "kzkCBB51f6dcL5ugpvggQ"
+uri = "file://TrulyYours_ORIGINAL.wav"
+type = "audio"
+title = "ORIGINAL — Truly Yours (Full Mix)"
+
+[[outputs]]
+id = "YFSb-1q8CZj2aGK4cbCtK"
+uri = "file://TrulyYours_VOCALS_REMOVED.wav"
+type = "audio"
+title = "VOCALS REMOVED — Instruments Only (99.6% vocal suppression)"
+
+[[outputs]]
+id = "YmzUEj-PmFQPjrnXp5nnb"
+uri = "file://TrulyYours_VOCALS_ONLY.wav"
+type = "audio"
+title = "ISOLATED VOCALS — Voice Frequencies Only"

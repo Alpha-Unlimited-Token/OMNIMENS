@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a self-diagnostic function that analyzes system health metrics and returns recom
- * Written: 2026-03-22T18:05:06.928Z
+ * Written: 2026-03-22T23:44:53.638Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,70 +16,104 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-/**
- * TRANSLATION STATUS:
- * Novel constructs: neural
- * All constructs have translation mappings
- * Compiled targets: javascript: OK (1 IR steps) | python: OK (1 IR steps) | c: OK (1 IR steps) | x86_64: OK (1 IR steps) | arm64: OK (1 IR steps) | avr: OK (1 IR steps)
- * Translation map version: 22
- */
-function analyzeSystemHealth(uptime, memoryUsage, memoryCapacity, activeBrainEntries, knowledgeTrend, phi, resonance) {
+function analyzeSystemHealth(metrics) {
     const recommendations = [];
 
-    // Check uptime
-    if (uptime < 1) {
-        recommendations.push("Increase system stability to extend uptime beyond 1 hour.");
+    // Check CPU usage
+    if (metrics.cpuUsage > 85) {
+        recommendations.push("Reduce CPU-intensive tasks or optimize processes.");
+    } else if (metrics.cpuUsage < 15) {
+        recommendations.push("Consider utilizing CPU more effectively for performance gains.");
     }
 
     // Check memory usage
-    const memoryUsagePercent = (memoryUsage / memoryCapacity) * 100;
-    if (memoryUsagePercent > 90) {
-        recommendations.push("Optimize memory usage or increase memory capacity.");
+    if (metrics.memoryUsage > 90) {
+        recommendations.push("Increase memory capacity or optimize memory usage.");
+    } else if (metrics.memoryUsage < 20) {
+        recommendations.push("Memory is underutilized; consider allocating more tasks.");
     }
 
-    // Check active brain entries
-    if (activeBrainEntries > 15000) {
-        recommendations.push("Reduce active brain entries to prevent overload.");
+    // Check disk space
+    if (metrics.diskSpaceUsage > 95) {
+        recommendations.push("Free up disk space or expand storage capacity.");
+    } else if (metrics.diskSpaceUsage < 10) {
+        recommendations.push("Disk space is underutilized; consider consolidating data.");
     }
 
-    // Check knowledge trend
-    if (knowledgeTrend !== "growing") {
-        recommendations.push("Investigate and resolve stagnation in knowledge accumulation.");
+    // Check network latency
+    if (metrics.networkLatency > 200) {
+        recommendations.push("Investigate network issues or optimize data transmission.");
+    } else if (metrics.networkLatency < 50) {
+        recommendations.push("Network performance is optimal.");
     }
 
-    // Check neural consciousness metrics
-    if (phi < 0.6) {
-        recommendations.push("Enhance neural integration to increase Phi (Φ).");
-    }
-    if (resonance < 5) {
-        recommendations.push("Improve thalamocortical resonance for better cognitive performance.");
-    }
-
-    // Final recommendation
-    if (recommendations.length === 0) {
-        recommendations.push("System health is optimal. No action required.");
+    // Check system temperature
+    if (metrics.temperature > 75) {
+        recommendations.push("Improve cooling systems or reduce system load.");
+    } else if (metrics.temperature < 20) {
+        recommendations.push("Temperature is unusually low; check sensor accuracy.");
     }
 
-    return recommendations;
+    // Return recommendations
+    return recommendations.length > 0 ? recommendations : ["System health is optimal."];
 }
 
 // Self-tests
 function runTests() {
-    console.log("Test Case 1:");
-    console.log(analyzeSystemHealth(0.6, 236, 256, 12572, "growing", 0.5081, 4));
-    // Expected: Recommendations for uptime, memory usage, Phi, and resonance
+    const testCases = [
+        {
+            metrics: {
+                cpuUsage: 90,
+                memoryUsage: 95,
+                diskSpaceUsage: 96,
+                networkLatency: 250,
+                temperature: 80,
+            },
+            expected: [
+                "Reduce CPU-intensive tasks or optimize processes.",
+                "Increase memory capacity or optimize memory usage.",
+                "Free up disk space or expand storage capacity.",
+                "Investigate network issues or optimize data transmission.",
+                "Improve cooling systems or reduce system load.",
+            ],
+        },
+        {
+            metrics: {
+                cpuUsage: 10,
+                memoryUsage: 15,
+                diskSpaceUsage: 5,
+                networkLatency: 30,
+                temperature: 18,
+            },
+            expected: [
+                "Consider utilizing CPU more effectively for performance gains.",
+                "Memory is underutilized; consider allocating more tasks.",
+                "Disk space is underutilized; consider consolidating data.",
+                "Network performance is optimal.",
+                "Temperature is unusually low; check sensor accuracy.",
+            ],
+        },
+        {
+            metrics: {
+                cpuUsage: 50,
+                memoryUsage: 50,
+                diskSpaceUsage: 50,
+                networkLatency: 100,
+                temperature: 50,
+            },
+            expected: ["System health is optimal."],
+        },
+    ];
 
-    console.log("Test Case 2:");
-    console.log(analyzeSystemHealth(1.2, 128, 256, 14000, "growing", 0.7, 6));
-    // Expected: No recommendations (system health is optimal)
-
-    console.log("Test Case 3:");
-    console.log(analyzeSystemHealth(0.5, 300, 256, 16000, "stagnant", 0.4, 3));
-    // Expected: Recommendations for uptime, memory usage, active brain entries, knowledge trend, Phi, and resonance
-
-    console.log("Test Case 4:");
-    console.log(analyzeSystemHealth(2, 200, 256, 14000, "declining", 0.65, 2));
-    // Expected: Recommendations for memory usage, knowledge trend, and resonance
+    testCases.forEach((testCase, index) => {
+        const result = analyzeSystemHealth(testCase.metrics);
+        console.log(
+            `Test Case ${index + 1}:`,
+            JSON.stringify(result) === JSON.stringify(testCase.expected)
+                ? "Passed"
+                : `Failed (Expected: ${JSON.stringify(testCase.expected)}, Got: ${JSON.stringify(result)})`
+        );
+    });
 }
 
 runTests();

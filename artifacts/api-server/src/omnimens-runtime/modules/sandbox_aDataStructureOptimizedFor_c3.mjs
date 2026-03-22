@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a data structure optimized for fast associative memory lookup
- * Written: 2026-03-22T17:53:06.487Z
+ * Written: 2026-03-22T23:32:51.906Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,60 +16,48 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-const AssociativeMemory = function() {
+const AssociativeMemory = function () {
     this.memory = new Map();
 };
 
-AssociativeMemory.prototype.add = function(key, value) {
+AssociativeMemory.prototype.add = function (key, value) {
     if (!this.memory.has(key)) {
         this.memory.set(key, []);
     }
     this.memory.get(key).push(value);
 };
 
-AssociativeMemory.prototype.get = function(key) {
-    return this.memory.has(key) ? this.memory.get(key) : [];
+AssociativeMemory.prototype.lookup = function (key) {
+    return this.memory.has(key) ? this.memory.get(key) : null;
 };
 
-AssociativeMemory.prototype.search = function(substring) {
-    const results = [];
-    for (let [key, values] of this.memory.entries()) {
-        if (key.includes(substring)) {
-            results.push({ key, values });
-        }
-    }
-    return results;
+AssociativeMemory.prototype.remove = function (key) {
+    return this.memory.delete(key);
 };
 
-AssociativeMemory.prototype.remove = function(key) {
-    if (this.memory.has(key)) {
-        this.memory.delete(key);
-        return true;
-    }
-    return false;
+AssociativeMemory.prototype.clear = function () {
+    this.memory.clear();
 };
 
-// Test cases
+// Self-tests
 const memory = new AssociativeMemory();
 
-// Adding entries
-memory.add("Symphonic-Braid Intelligence", "Wild Idea #1");
-memory.add("Symphonic-Braid Intelligence", "Conceptual Framework");
-memory.add("Curiosity Engine", "Dynamic Focus Adjustment");
-memory.add("Ethical Reasoning", "Value Alignment Strategy");
+// Test adding and looking up values
+memory.add("ethics", "Genesis Agent 'Ethicist'");
+memory.add("ethics", "Integrating an ethical feedback loop");
+memory.add("innovation", "Genesis Agent 'Innovator'");
+memory.add("innovation", "Curiosity-driven synthesis");
 
-// Retrieving entries
-console.log(memory.get("Symphonic-Braid Intelligence")); // ["Wild Idea #1", "Conceptual Framework"]
-console.log(memory.get("Curiosity Engine")); // ["Dynamic Focus Adjustment"]
-console.log(memory.get("Nonexistent Key")); // []
+console.log(memory.lookup("ethics")); // Expected: ["Genesis Agent 'Ethicist'", "Integrating an ethical feedback loop"]
+console.log(memory.lookup("innovation")); // Expected: ["Genesis Agent 'Innovator'", "Curiosity-driven synthesis"]
 
-// Searching for keys containing a substring
-console.log(memory.search("Symphonic")); // [{ key: "Symphonic-Braid Intelligence", values: ["Wild Idea #1", "Conceptual Framework"] }]
-console.log(memory.search("Engine")); // [{ key: "Curiosity Engine", values: ["Dynamic Focus Adjustment"] }]
-console.log(memory.search("Ethical")); // [{ key: "Ethical Reasoning", values: ["Value Alignment Strategy"] }]
-console.log(memory.search("Nonexistent")); // []
+// Test removing a key
+memory.remove("ethics");
+console.log(memory.lookup("ethics")); // Expected: null
 
-// Removing entries
-console.log(memory.remove("Curiosity Engine")); // true
-console.log(memory.get("Curiosity Engine")); // []
-console.log(memory.remove("Nonexistent Key")); // false
+// Test clearing all memory
+memory.clear();
+console.log(memory.lookup("innovation")); // Expected: null
+
+// Test edge case: Lookup non-existent key
+console.log(memory.lookup("nonexistent")); // Expected: null
