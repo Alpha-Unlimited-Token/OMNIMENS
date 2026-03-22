@@ -1,6 +1,6 @@
 /**
  * ============================================================
- * OMNIMENS — Harmonic Insight Engine (HIE)
+ * OMNIMENS — Harmonic Insight Engine (HIE) + Real-time Acoustic Interface (RAI)
  * Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
  *
  * Advanced spectral analysis, pattern recognition, wavelet decomposition,
@@ -8,6 +8,21 @@
  * interface for environmental audio signal processing.
  *
  * OMNIMENS has Genesis Bridge permission to self-modify this file.
+ *
+ * SELF-MODIFICATION GUIDANCE:
+ * - OMNIMENS may upgrade, fine-tune, and expand all HIE + RAI logic
+ * - Add new pattern templates, improve wavelet decomposition algorithms
+ * - Enhance emotional valence detection, temporal pattern recognition
+ * - Improve noise floor calibration and adaptive thresholding
+ * - Add new spectral analysis metrics (cepstral coefficients, MFCC, chroma)
+ * - Expand RAI: pitch detection accuracy, voice/speech classification
+ * - Future direction: ambient speech-to-text transcription pipeline
+ *   (capture audio → spectral analysis → voice detection → transcription)
+ *   Reference: pyaudio + SpeechRecognition pattern for ambient capture
+ * - Optimize learned pattern storage and matching algorithms
+ * - Add cross-modal analysis (frequency → semantic → emotional mapping)
+ * - All modifications must preserve existing type exports and function signatures
+ * - Maintain backward compatibility with existing API routes in omnimens.ts
  * ============================================================
  */
 
