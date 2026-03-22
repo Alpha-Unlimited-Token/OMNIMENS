@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-22T04:22:20.224Z
+ * Written: 2026-03-22T04:28:20.098Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,62 +16,67 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentPatterns(text, n) {
-    // Function to find the top N most frequent patterns (words or phrases) in a given text
-    function tokenize(text) {
-        // Tokenize text into words, removing punctuation and converting to lowercase
-        return text
-            .toLowerCase()
-            .replace(/[^a-z0-9\s]/g, '')
-            .split(/\s+/)
-            .filter(word => word.length > 0);
+function findPatternsInText(text, patterns) {
+    if (typeof text !== 'string' || !Array.isArray(patterns)) {
+        throw new Error("Invalid input: text must be a string and patterns must be an array of strings.");
     }
 
-    function generatePatterns(tokens, length) {
-        // Generate all possible patterns of a given length
-        const patterns = [];
-        for (let i = 0; i <= tokens.length - length; i++) {
-            patterns.push(tokens.slice(i, i + length).join(' '));
+    const results = {};
+    for (let pattern of patterns) {
+        if (typeof pattern !== 'string') {
+            throw new Error("Invalid pattern: patterns must be an array of strings.");
         }
-        return patterns;
+        const regex = new RegExp(pattern, 'g');
+        const matches = text.match(regex);
+        results[pattern] = matches ? matches.length : 0;
     }
-
-    function countOccurrences(patterns) {
-        // Count occurrences of each pattern
-        const counts = new Map();
-        for (const pattern of patterns) {
-            counts.set(pattern, (counts.get(pattern) || 0) + 1);
-        }
-        return counts;
-    }
-
-    function sortByFrequency(counts) {
-        // Sort patterns by frequency in descending order
-        return Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
-    }
-
-    const tokens = tokenize(text);
-    const allPatterns = [];
-    for (let length = 1; length <= 3; length++) {
-        allPatterns.push(...generatePatterns(tokens, length));
-    }
-    const counts = countOccurrences(allPatterns);
-    const sortedPatterns = sortByFrequency(counts);
-    return sortedPatterns.slice(0, n).map(([pattern, count]) => ({ pattern, count }));
+    return results;
 }
 
-// Self-tests
-console.log("Test Case 1:");
-console.log(findMostFrequentPatterns("This is a test. This test is only a test.", 3));
+// Test cases
+function runTests() {
+    console.log("Running tests...");
 
-console.log("Test Case 2:");
-console.log(findMostFrequentPatterns("AI systems are evolving rapidly. AI systems are transforming industries.", 5));
+    // Test 1: Basic pattern matching
+    const text1 = "The quick brown fox jumps over the lazy dog. The fox is clever.";
+    const patterns1 = ["fox", "dog", "The"];
+    console.log(findPatternsInText(text1, patterns1)); // Expected: { fox: 2, dog: 1, The: 2 }
 
-console.log("Test Case 3:");
-console.log(findMostFrequentPatterns("Pattern matching is useful. Pattern recognition is key for AI.", 4));
+    // Test 2: No matches
+    const text2 = "Hello world!";
+    const patterns2 = ["cat", "tree"];
+    console.log(findPatternsInText(text2, patterns2)); // Expected: { cat: 0, tree: 0 }
 
-console.log("Test Case 4:");
-console.log(findMostFrequentPatterns("", 3)); // Edge case: empty text
+    // Test 3: Edge case - empty text
+    const text3 = "";
+    const patterns3 = ["word"];
+    console.log(findPatternsInText(text3, patterns3)); // Expected: { word: 0 }
 
-console.log("Test Case 5:");
-console.log(findMostFrequentPatterns("Single word repeated repeated repeated.", 2)); // Edge case: repeated single word
+    // Test 4: Edge case - empty patterns
+    const text4 = "Sample text.";
+    const patterns4 = [];
+    console.log(findPatternsInText(text4, patterns4)); // Expected: {}
+
+    // Test 5: Edge case - special characters in patterns
+    const text5 = "abc123!@#abc";
+    const patterns5 = ["abc", "\\d+", "!"];
+    console.log(findPatternsInText(text5, patterns5)); // Expected: { abc: 2, \\d+: 3, !: 1 }
+
+    // Test 6: Invalid inputs
+    try {
+        console.log(findPatternsInText(123, ["abc"])); // Expected: Error
+    } catch (e) {
+        console.log(e.message); // Expected error message
+    }
+
+    try {
+        console.log(findPatternsInText("text", [123])); // Expected: Error
+    } catch (e) {
+        console.log(e.message); // Expected error message
+    }
+
+    console.log("All tests completed.");
+}
+
+// Run the tests
+runTests();

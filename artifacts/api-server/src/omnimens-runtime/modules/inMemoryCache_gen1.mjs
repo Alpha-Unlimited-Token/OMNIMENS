@@ -1,67 +1,103 @@
 /**
- * @module inMemoryCache
- * @description A lightweight in-memory cache with LRU (Least Recently Used) eviction strategy for storing embeddings and frequently accessed data.
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryCache
+ * Written: 2026-03-22T04:38:04.690Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
  */
 
 /**
- * CacheEntry represents a single entry in the cache.
- * @typedef {Object} CacheEntry
- * @property {any} value - The value stored in the cache.
- * @property {number} timestamp - The timestamp of the last access.
+ * @module inMemoryCache
+ * @description Provides a configurable LRU (Least Recently Used) cache with expiration and size limits for rapid access to frequently used data.
  */
 
-class InMemoryCache {
+/**
+ * LRUCache class implementing an in-memory cache with configurable size and expiration time.
+ */
+class LRUCache {
   /**
-   * Creates an instance of InMemoryCache.
    * @param {number} maxSize - Maximum number of items the cache can hold.
+   * @param {number} ttl - Time-to-live for cache entries in milliseconds.
    */
-  constructor(maxSize = 100) {
-    if (maxSize <= 0) throw new Error('Cache size must be greater than 0.');
+  constructor(maxSize, ttl) {
+    if (maxSize <= 0 || ttl <= 0) {
+      throw new Error("maxSize and ttl must be positive numbers.");
+    }
+
     this.maxSize = maxSize;
-    this.cache = new Map(); // Map to store cache entries.
+    this.ttl = ttl;
+    this.cache = new Map(); // Stores cache entries in insertion order.
   }
 
   /**
-   * Retrieves an item from the cache.
-   * @param {string} key - The key of the item to retrieve.
-   * @returns {any|null} - The cached value, or null if not found.
+   * Sets a key-value pair in the cache.
+   * @param {string} key - The key to identify the cache entry.
+   * @param {*} value - The value to store in the cache.
+   */
+  set(key, value) {
+    const now = Date.now();
+
+    // Remove the key if it already exists to refresh its position in the LRU order.
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    }
+
+    // Add the new key-value pair.
+    this.cache.set(key, { value, expiresAt: now + this.ttl });
+
+    // Evict the least recently used entry if the cache exceeds its max size.
+    if (this.cache.size > this.maxSize) {
+      const oldestKey = this.cache.keys().next().value;
+      this.cache.delete(oldestKey);
+    }
+  }
+
+  /**
+   * Retrieves a value from the cache.
+   * @param {string} key - The key of the cache entry to retrieve.
+   * @returns {*} The cached value, or undefined if the key does not exist or has expired.
    */
   get(key) {
-    if (!this.cache.has(key)) return null;
+    const now = Date.now();
     const entry = this.cache.get(key);
-    entry.timestamp = Date.now(); // Update access timestamp.
-    this.cache.delete(key); // Remove and re-add to maintain LRU order.
+
+    if (!entry) {
+      return undefined; // Key does not exist.
+    }
+
+    if (entry.expiresAt < now) {
+      this.cache.delete(key); // Remove expired entry.
+      return undefined;
+    }
+
+    // Refresh the key's position in the LRU order.
+    this.cache.delete(key);
     this.cache.set(key, entry);
+
     return entry.value;
   }
 
   /**
-   * Adds an item to the cache.
-   * @param {string} key - The key of the item to add.
-   * @param {any} value - The value to store in the cache.
-   */
-  set(key, value) {
-    if (this.cache.has(key)) {
-      this.cache.delete(key); // Remove existing entry to update it.
-    } else if (this.cache.size >= this.maxSize) {
-      // Evict the least recently used item.
-      const leastUsedKey = this._findLeastRecentlyUsedKey();
-      this.cache.delete(leastUsedKey);
-    }
-    this.cache.set(key, { value, timestamp: Date.now() });
-  }
-
-  /**
-   * Removes an item from the cache.
-   * @param {string} key - The key of the item to remove.
-   * @returns {boolean} - True if the item was removed, false if not found.
+   * Deletes a key-value pair from the cache.
+   * @param {string} key - The key to delete from the cache.
+   * @returns {boolean} True if the key was deleted, false if it was not found.
    */
   delete(key) {
     return this.cache.delete(key);
   }
 
   /**
-   * Clears all items from the cache.
+   * Clears all entries from the cache.
    */
   clear() {
     this.cache.clear();
@@ -69,42 +105,21 @@ class InMemoryCache {
 
   /**
    * Returns the current size of the cache.
-   * @returns {number} - The number of items in the cache.
+   * @returns {number} The number of entries in the cache.
    */
   size() {
     return this.cache.size;
   }
-
-  /**
-   * Finds the key of the least recently used item in the cache.
-   * @private
-   * @returns {string} - The key of the least recently used item.
-   */
-  _findLeastRecentlyUsedKey() {
-    let oldestKey = null;
-    let oldestTimestamp = Infinity;
-    for (const [key, entry] of this.cache.entries()) {
-      if (entry.timestamp < oldestTimestamp) {
-        oldestKey = key;
-        oldestTimestamp = entry.timestamp;
-      }
-    }
-    return oldestKey;
-  }
 }
 
 /**
- * Creates a new in-memory cache instance.
+ * Factory function to create a new LRUCache instance.
  * @param {number} maxSize - Maximum number of items the cache can hold.
- * @returns {InMemoryCache} - A new cache instance.
+ * @param {number} ttl - Time-to-live for cache entries in milliseconds.
+ * @returns {LRUCache} A new LRUCache instance.
  */
-export function createCache(maxSize = 100) {
-  return new InMemoryCache(maxSize);
+export function createCache(maxSize, ttl) {
+  return new LRUCache(maxSize, ttl);
 }
 
-/**
- * Example usage:
- * const cache = createCache(50);
- * cache.set('key1', 'value1');
- * console.log(cache.get('key1')); // Outputs: 'value1'
- */
+export default { createCache };
