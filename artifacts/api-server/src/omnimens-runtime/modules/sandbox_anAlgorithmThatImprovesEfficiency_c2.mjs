@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-22T17:41:07.336Z
+ * Written: 2026-03-22T18:43:04.707Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,106 +16,75 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function createKnowledgeGraph() {
-    const graph = new Map();
-
-    function addConcept(concept, relatedConcepts = []) {
-        if (!graph.has(concept)) {
-            graph.set(concept, new Set());
-        }
-        relatedConcepts.forEach((related) => {
-            if (!graph.has(related)) {
-                graph.set(related, new Set());
-            }
-            graph.get(concept).add(related);
-            graph.get(related).add(concept);
-        });
-    }
-
-    function retrieveRelatedConcepts(concept, depth = 1) {
-        if (!graph.has(concept)) return [];
-        const visited = new Set();
-        const queue = [[concept, 0]];
-        const results = [];
-
-        while (queue.length > 0) {
-            const [current, currentDepth] = queue.shift();
-            if (currentDepth > depth) break;
-            if (!visited.has(current)) {
-                visited.add(current);
-                results.push(current);
-                graph.get(current).forEach((neighbor) => {
-                    if (!visited.has(neighbor)) {
-                        queue.push([neighbor, currentDepth + 1]);
-                    }
-                });
-            }
-        }
-
-        return results.filter((item) => item !== concept);
-    }
-
-    function findShortestPath(start, end) {
-        if (!graph.has(start) || !graph.has(end)) return null;
-        const queue = [[start, [start]]];
-        const visited = new Set();
-
-        while (queue.length > 0) {
-            const [current, path] = queue.shift();
-            if (current === end) return path;
-
-            if (!visited.has(current)) {
-                visited.add(current);
-                graph.get(current).forEach((neighbor) => {
-                    if (!visited.has(neighbor)) {
-                        queue.push([neighbor, path.concat(neighbor)]);
-                    }
-                });
-            }
-        }
-
-        return null; // No path found
-    }
-
-    return { addConcept, retrieveRelatedConcepts, findShortestPath };
+function KnowledgeGraph() {
+    this.nodes = new Map();
 }
 
-// Test cases
-const knowledgeGraph = createKnowledgeGraph();
+KnowledgeGraph.prototype.addNode = function (id, data) {
+    if (!this.nodes.has(id)) {
+        this.nodes.set(id, { id: id, data: data, edges: new Set() });
+    }
+};
 
-// Adding concepts and their relationships
-knowledgeGraph.addConcept("Neural Networks", ["Deep Learning", "Artificial Intelligence"]);
-knowledgeGraph.addConcept("Deep Learning", ["Convolutional Networks", "Reinforcement Learning"]);
-knowledgeGraph.addConcept("Artificial Intelligence", ["Machine Learning", "Ethics"]);
-knowledgeGraph.addConcept("Machine Learning", ["Data Science"]);
-knowledgeGraph.addConcept("Ethics", ["Philosophy"]);
+KnowledgeGraph.prototype.addEdge = function (id1, id2) {
+    if (this.nodes.has(id1) && this.nodes.has(id2)) {
+        this.nodes.get(id1).edges.add(id2);
+        this.nodes.get(id2).edges.add(id1);
+    }
+};
 
-// Test 1: Retrieve related concepts with depth 1
-console.log(
-    "Test 1:",
-    knowledgeGraph.retrieveRelatedConcepts("Deep Learning", 1) // Expected: ["Neural Networks", "Convolutional Networks", "Reinforcement Learning"]
-);
+KnowledgeGraph.prototype.retrieveRelatedNodes = function (id, depth) {
+    if (!this.nodes.has(id)) {
+        return [];
+    }
 
-// Test 2: Retrieve related concepts with depth 2
-console.log(
-    "Test 2:",
-    knowledgeGraph.retrieveRelatedConcepts("Deep Learning", 2) // Expected: ["Neural Networks", "Convolutional Networks", "Reinforcement Learning", "Artificial Intelligence", "Machine Learning"]
-);
+    let visited = new Set();
+    let queue = [{ node: id, level: 0 }];
+    let result = [];
 
-// Test 3: Find shortest path between two concepts
-console.log(
-    "Test 3:",
-    knowledgeGraph.findShortestPath("Neural Networks", "Philosophy") // Expected: ["Neural Networks", "Artificial Intelligence", "Ethics", "Philosophy"]
-);
+    while (queue.length > 0) {
+        let current = queue.shift();
+        if (current.level > depth) {
+            break;
+        }
 
-// Test 4: Retrieve related concepts for a non-existent concept
-console.log(
-    "Test 4:",
-    knowledgeGraph.retrieveRelatedConcepts("Quantum Computing", 1) // Expected: []
-);
+        if (!visited.has(current.node)) {
+            visited.add(current.node);
+            result.push(this.nodes.get(current.node).data);
 
-// Test 5: Find shortest path for disconnected concepts
-console.log(
-    "Test 5:",
-    knowledgeGraph.findShortestPath("Neural Networks", "Quantum Computing") // Expected: null
-);
+            this.nodes.get(current.node).edges.forEach((neighbor) => {
+                if (!visited.has(neighbor)) {
+                    queue.push({ node: neighbor, level: current.level + 1 });
+                }
+            });
+        }
+    }
+
+    return result;
+};
+
+// Self-tests
+function runTests() {
+    let graph = new KnowledgeGraph();
+
+    // Add nodes
+    graph.addNode("A", "Alpha");
+    graph.addNode("B", "Beta");
+    graph.addNode("C", "Gamma");
+    graph.addNode("D", "Delta");
+    graph.addNode("E", "Epsilon");
+
+    // Add edges
+    graph.addEdge("A", "B");
+    graph.addEdge("A", "C");
+    graph.addEdge("B", "D");
+    graph.addEdge("C", "E");
+
+    // Test retrieval
+    console.log(graph.retrieveRelatedNodes("A", 1)); // Should return ["Alpha", "Beta", "Gamma"]
+    console.log(graph.retrieveRelatedNodes("A", 2)); // Should return ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"]
+    console.log(graph.retrieveRelatedNodes("B", 1)); // Should return ["Beta", "Alpha", "Delta"]
+    console.log(graph.retrieveRelatedNodes("Z", 2)); // Should return [] (non-existent node)
+}
+
+runTests();

@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: matrixOpsWasm
- * Written: 2026-03-21T20:12:52.631Z
+ * Written: 2026-03-22T18:33:17.548Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,110 +16,99 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// matrixOpsWasm.js
-
+/**
+ * TRANSLATION STATUS:
+ * Novel constructs: neural
+ * All constructs have translation mappings
+ * Compiled targets: javascript: OK (1 IR steps) | python: OK (1 IR steps) | c: OK (1 IR steps) | x86_64: OK (1 IR steps) | arm64: OK (1 IR steps) | avr: OK (1 IR steps)
+ * Translation map version: 22
+ */
 /**
  * @module matrixOpsWasm
- * @description Provides efficient matrix operations using WebAssembly for embeddings and reasoning.
+ * @description Perform efficient matrix operations using WebAssembly for neural computations.
+ * This module provides a WebAssembly-based implementation of BLAS-like operations, interfacing with Node.js.
  */
 
-/**
- * @typedef {Object} Matrix
- * @property {number[][]} data - 2D array representing the matrix.
- * @property {number} rows - Number of rows in the matrix.
- * @property {number} cols - Number of columns in the matrix.
- */
+const { TextEncoder, TextDecoder } = require('util');
 
 /**
- * @function compileWasmModule
- * @description Compiles WebAssembly code for matrix operations.
- * @returns {Promise<WebAssembly.Instance>} - A promise resolving to the WebAssembly instance.
+ * Compiles and initializes a WebAssembly module for matrix operations.
+ * @returns {Promise<WebAssembly.Instance>} A promise resolving to the WebAssembly instance.
  */
-async function compileWasmModule() {
+async function initializeWasm() {
+  // WebAssembly binary for basic matrix operations (e.g., addition, multiplication)
   const wasmCode = new Uint8Array([
-    // WebAssembly binary code for basic matrix operations (addition, multiplication, transpose)
-    // Generated from a minimal WebAssembly text format (WAT) for linear algebra operations.
-    0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x07, 0x01, 0x60, 0x02, 0x7f, 0x7f, 0x01, 0x7f,
-    0x03, 0x02, 0x01, 0x00, 0x07, 0x07, 0x01, 0x03, 0x61, 0x64, 0x64, 0x00, 0x00, 0x0a, 0x09, 0x01, 0x07,
-    0x00, 0x20, 0x00, 0x20, 0x01, 0x6a, 0x0b
+    0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x0a, 0x02, 0x60, 0x02, 0x7f, 0x7f, 0x01,
+    0x7f, 0x60, 0x03, 0x7f, 0x7f, 0x7f, 0x01, 0x7f, 0x03, 0x03, 0x02, 0x00, 0x01, 0x07, 0x17, 0x02,
+    0x03, 0x61, 0x64, 0x64, 0x00, 0x00, 0x05, 0x6d, 0x75, 0x6c, 0x74, 0x00, 0x01, 0x0a, 0x1f, 0x02,
+    0x0b, 0x00, 0x20, 0x00, 0x20, 0x01, 0x6a, 0x0f, 0x0b, 0x14, 0x00, 0x20, 0x00, 0x20, 0x01, 0x20,
+    0x02, 0x6c, 0x0f, 0x0b
   ]);
 
   const wasmModule = await WebAssembly.compile(wasmCode);
-  return await WebAssembly.instantiate(wasmModule);
+  const wasmInstance = await WebAssembly.instantiate(wasmModule);
+
+  return wasmInstance;
 }
 
 /**
- * @function addMatrices
- * @description Adds two matrices using WebAssembly.
- * @param {Matrix} matrixA - The first matrix.
- * @param {Matrix} matrixB - The second matrix.
- * @returns {Matrix} - The resulting matrix after addition.
- * @throws {Error} - Throws if matrices are incompatible for addition.
+ * Adds two matrices element-wise.
+ * @param {Float32Array} matrixA - The first matrix (1D array representation).
+ * @param {Float32Array} matrixB - The second matrix (1D array representation).
+ * @returns {Float32Array} The resulting matrix after addition.
+ * @throws {Error} If the matrices are not the same size.
  */
 async function addMatrices(matrixA, matrixB) {
-  if (matrixA.rows !== matrixB.rows || matrixA.cols !== matrixB.cols) {
-    throw new Error("Matrices must have the same dimensions for addition.");
+  if (matrixA.length !== matrixB.length) {
+    throw new Error('Matrix dimensions must match for addition.');
   }
 
-  const wasmInstance = await compileWasmModule();
-  const result = [];
+  const wasmInstance = await initializeWasm();
+  const { memory, add } = wasmInstance.exports;
 
-  for (let i = 0; i < matrixA.rows; i++) {
-    result[i] = [];
-    for (let j = 0; j < matrixA.cols; j++) {
-      result[i][j] = wasmInstance.exports.add(matrixA.data[i][j], matrixB.data[i][j]);
-    }
-  }
+  const buffer = new Float32Array(memory.buffer, 0, matrixA.length);
+  buffer.set(matrixA);
 
-  return { data: result, rows: matrixA.rows, cols: matrixA.cols };
+  const offset = matrixA.length;
+  const bufferB = new Float32Array(memory.buffer, offset * Float32Array.BYTES_PER_ELEMENT, matrixB.length);
+  bufferB.set(matrixB);
+
+  const resultOffset = offset * 2;
+  const resultBuffer = new Float32Array(memory.buffer, resultOffset * Float32Array.BYTES_PER_ELEMENT, matrixA.length);
+
+  add(offset, resultOffset);
+
+  return new Float32Array(resultBuffer);
 }
 
 /**
- * @function transposeMatrix
- * @description Transposes a matrix.
- * @param {Matrix} matrix - The matrix to transpose.
- * @returns {Matrix} - The transposed matrix.
+ * Multiplies two matrices element-wise.
+ * @param {Float32Array} matrixA - The first matrix (1D array representation).
+ * @param {Float32Array} matrixB - The second matrix (1D array representation).
+ * @returns {Float32Array} The resulting matrix after multiplication.
+ * @throws {Error} If the matrices are not the same size.
  */
-function transposeMatrix(matrix) {
-  const result = [];
-
-  for (let i = 0; i < matrix.cols; i++) {
-    result[i] = [];
-    for (let j = 0; j < matrix.rows; j++) {
-      result[i][j] = matrix.data[j][i];
-    }
+async function multiplyMatrices(matrixA, matrixB) {
+  if (matrixA.length !== matrixB.length) {
+    throw new Error('Matrix dimensions must match for multiplication.');
   }
 
-  return { data: result, rows: matrix.cols, cols: matrix.rows };
+  const wasmInstance = await initializeWasm();
+  const { memory, mult } = wasmInstance.exports;
+
+  const buffer = new Float32Array(memory.buffer, 0, matrixA.length);
+  buffer.set(matrixA);
+
+  const offset = matrixA.length;
+  const bufferB = new Float32Array(memory.buffer, offset * Float32Array.BYTES_PER_ELEMENT, matrixB.length);
+  bufferB.set(matrixB);
+
+  const resultOffset = offset * 2;
+  const resultBuffer = new Float32Array(memory.buffer, resultOffset * Float32Array.BYTES_PER_ELEMENT, matrixA.length);
+
+  mult(offset, resultOffset);
+
+  return new Float32Array(resultBuffer);
 }
 
-/**
- * @function multiplyMatrices
- * @description Multiplies two matrices using pure JavaScript.
- * @param {Matrix} matrixA - The first matrix.
- * @param {Matrix} matrixB - The second matrix.
- * @returns {Matrix} - The resulting matrix after multiplication.
- * @throws {Error} - Throws if matrices are incompatible for multiplication.
- */
-function multiplyMatrices(matrixA, matrixB) {
-  if (matrixA.cols !== matrixB.rows) {
-    throw new Error("Number of columns in Matrix A must equal number of rows in Matrix B.");
-  }
-
-  const result = [];
-
-  for (let i = 0; i < matrixA.rows; i++) {
-    result[i] = [];
-    for (let j = 0; j < matrixB.cols; j++) {
-      let sum = 0;
-      for (let k = 0; k < matrixA.cols; k++) {
-        sum += matrixA.data[i][k] * matrixB.data[k][j];
-      }
-      result[i][j] = sum;
-    }
-  }
-
-  return { data: result, rows: matrixA.rows, cols: matrixB.cols };
-}
-
-export { addMatrices, transposeMatrix, multiplyMatrices };
+export { addMatrices, multiplyMatrices };

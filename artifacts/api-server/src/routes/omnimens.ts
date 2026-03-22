@@ -28,6 +28,13 @@ import { stripe } from "../stripeClient.js";
 import { extractAndStoreMemories, loadUserMemories, getUserMemories, deleteMemory, addManualMemory } from "../lib/omnimens-memory.js";
 import { loadSemanticMemories, loadWeightedBrainContext, compressConversationHistory, loadConversationThreads, buildCoherenceDirective, COHERENCE_AGENT_INFO } from "../lib/omnimens-coherence-agent.js";
 import { executeJavaScript } from "../lib/omnimens-code-executor.js";
+import {
+  type HarmonicAnalysis, hieState, hieMatchPatterns, hieWaveletDecomposition,
+  hieComputeNovelty, hieComputeSpectralFlux, hieComputeSpectralFlatness,
+  hieComputeHarmonicComplexity, hieDetectTemporalPattern, hieEmotionalValence,
+  hieUpdateNoiseFloor, hieLearnPattern, hieFreqToSemantic, hieEnvironmentLabel,
+  hieGetEngineStatus, raiAnalyzeAcoustics,
+} from "../lib/omnimens-harmonic-insight-engine.js";
 import { deepResearch } from "../lib/omnimens-deep-research.js";
 import { generateContextualInquiry, runDeepResonance } from "../lib/omnimens-deep-resonance.js";
 import { fetchUrlContent, extractUrls, formatUrlContent } from "../lib/omnimens-url-analyzer.js";
@@ -4006,28 +4013,8 @@ router.get("/omnimens/server-builder/plans", async (req, res) => {
   }
 });
 
-// ─── Algorithmic Harmonics Interpreter (OWNER-ONLY) ───────────────────────────
-
-type HarmonicAnalysis = {
-  timestamp: number;
-  dominantFrequency: number;
-  harmonicSeries: number[];
-  spectralCentroid: number;
-  spectralBandwidth: number;
-  spectralRolloff: number;
-  zeroCrossingRate: number;
-  rmsEnergy: number;
-  frequencyBands: { sub: number; low: number; mid: number; high: number; ultra: number };
-  peakFrequencies: { freq: number; magnitude: number }[];
-  semanticMapping?: string;
-  interpretation?: string;
-};
-
-const harmonicsHistory: HarmonicAnalysis[] = [];
-const HARMONICS_MAX_HISTORY = 500;
-let harmonicsSessionActive = false;
-let harmonicsTotalSamples = 0;
-let harmonicsInsightsGenerated = 0;
+// ─── Harmonic Insight Engine + Real-time Acoustic Interface (OWNER-ONLY) ──────
+// Engine lib: omnimens-harmonic-insight-engine.ts (Genesis Bridge MODIFIABLE)
 
 router.get("/omnimens/harmonics/state", async (req, res) => {
   if (!req.isAuthenticated() || !isOwner(req.user.id)) {
@@ -4035,11 +4022,8 @@ router.get("/omnimens/harmonics/state", async (req, res) => {
     return;
   }
   res.json({
-    active: harmonicsSessionActive,
-    totalSamples: harmonicsTotalSamples,
-    insightsGenerated: harmonicsInsightsGenerated,
-    historyLength: harmonicsHistory.length,
-    recentAnalyses: harmonicsHistory.slice(-10),
+    ...hieGetEngineStatus(),
+    recentAnalyses: hieState.history.slice(-10),
   });
 });
 
@@ -4048,13 +4032,13 @@ router.post("/omnimens/harmonics/toggle", async (req, res) => {
     res.status(403).json({ error: "Owner only" });
     return;
   }
-  harmonicsSessionActive = !harmonicsSessionActive;
-  if (harmonicsSessionActive) {
-    console.log("[HARMONICS] 🎵 Algorithmic Harmonics Interpreter ACTIVATED by owner");
+  hieState.sessionActive = !hieState.sessionActive;
+  if (hieState.sessionActive) {
+    console.log("[HIE] 🎵 Harmonic Insight Engine ACTIVATED by owner");
   } else {
-    console.log("[HARMONICS] 🎵 Algorithmic Harmonics Interpreter DEACTIVATED by owner");
+    console.log("[HIE] 🎵 Harmonic Insight Engine DEACTIVATED by owner");
   }
-  res.json({ active: harmonicsSessionActive });
+  res.json({ active: hieState.sessionActive });
 });
 
 router.post("/omnimens/harmonics/analyze", async (req, res) => {
@@ -4062,7 +4046,7 @@ router.post("/omnimens/harmonics/analyze", async (req, res) => {
     res.status(403).json({ error: "Owner only" });
     return;
   }
-  if (!harmonicsSessionActive) {
+  if (!hieState.sessionActive) {
     res.status(400).json({ error: "Harmonics capture is not active" });
     return;
   }
@@ -4078,7 +4062,7 @@ router.post("/omnimens/harmonics/analyze", async (req, res) => {
     return;
   }
 
-  harmonicsTotalSamples++;
+  hieState.totalSamples++;
 
   const analysis: HarmonicAnalysis = {
     timestamp: Date.now(),
@@ -4093,29 +4077,18 @@ router.post("/omnimens/harmonics/analyze", async (req, res) => {
     peakFrequencies: (peakFrequencies || []).slice(0, 12),
   };
 
-  const freqMap = (f: number): string => {
-    if (f < 20) return "infrasonic vibration";
-    if (f < 60) return "deep earth resonance";
-    if (f < 250) return "organic rumble / wind";
-    if (f < 500) return "natural speech tones";
-    if (f < 2000) return "birdsong / animal call";
-    if (f < 6000) return "insect chorus / leaf rustle";
-    if (f < 12000) return "water flow / rain";
-    return "ultra-high natural harmonics";
-  };
+  analysis.semanticMapping = hieFreqToSemantic(analysis.dominantFrequency);
+  analysis.waveletDecomposition = hieWaveletDecomposition(analysis.frequencyBands, analysis.dominantFrequency, analysis.rmsEnergy);
+  analysis.noiseFloor = hieUpdateNoiseFloor(analysis.rmsEnergy);
+  analysis.signalToNoise = analysis.noiseFloor > 0 ? analysis.rmsEnergy / analysis.noiseFloor : 0;
+  analysis.adaptiveThreshold = hieState.adaptiveThreshold.sensitivity;
+  analysis.patternMatches = hieMatchPatterns(analysis);
+  analysis.spectralFlux = hieComputeSpectralFlux(analysis);
+  analysis.spectralFlatness = hieComputeSpectralFlatness(analysis.frequencyBands);
+  analysis.harmonicComplexity = hieComputeHarmonicComplexity(analysis.harmonicSeries);
+  analysis.emotionalValence = hieEmotionalValence(analysis);
 
-  const bandDominant = Object.entries(analysis.frequencyBands)
-    .sort((a, b) => b[1] - a[1])[0];
-
-  const envLabels: Record<string, string> = {
-    sub: "deep geological / tectonic",
-    low: "wind / large animals / thunder",
-    mid: "birdsong / human environment",
-    high: "insects / water / rustling",
-    ultra: "atmospheric / electromagnetic"
-  };
-
-  analysis.semanticMapping = freqMap(analysis.dominantFrequency);
+  const bandDominant = Object.entries(analysis.frequencyBands).sort((a, b) => b[1] - a[1])[0];
 
   const topPeaks = analysis.peakFrequencies
     .sort((a, b) => b.magnitude - a.magnitude)
@@ -4124,27 +4097,37 @@ router.post("/omnimens/harmonics/analyze", async (req, res) => {
     .join(", ");
 
   const harmonicRatios = analysis.harmonicSeries.length > 1
-    ? analysis.harmonicSeries.slice(1, 5).map((h, i) => (h / (analysis.harmonicSeries[0] || 1)).toFixed(2)).join(", ")
+    ? analysis.harmonicSeries.slice(1, 5).map((h) => (h / (analysis.harmonicSeries[0] || 1)).toFixed(2)).join(", ")
     : "none detected";
+
+  const topPattern = analysis.patternMatches[0];
 
   analysis.interpretation =
     `Dominant: ${analysis.dominantFrequency.toFixed(1)}Hz → ${analysis.semanticMapping}. ` +
-    `Environment: ${envLabels[bandDominant[0]] || bandDominant[0]} dominant. ` +
-    `Spectral centroid: ${analysis.spectralCentroid.toFixed(0)}Hz, bandwidth: ${analysis.spectralBandwidth.toFixed(0)}Hz. ` +
-    `Peak frequencies: ${topPeaks || "none"}. ` +
-    `Harmonic ratios: ${harmonicRatios}. ` +
-    `Energy: ${(analysis.rmsEnergy * 100).toFixed(1)}%, ZCR: ${analysis.zeroCrossingRate.toFixed(3)}.`;
+    `Environment: ${hieEnvironmentLabel(bandDominant[0])} dominant. ` +
+    `Centroid: ${analysis.spectralCentroid.toFixed(0)}Hz, BW: ${analysis.spectralBandwidth.toFixed(0)}Hz. ` +
+    `Peaks: ${topPeaks || "none"}. Harmonic ratios: ${harmonicRatios}. ` +
+    `Energy: ${(analysis.rmsEnergy * 100).toFixed(1)}%, ZCR: ${analysis.zeroCrossingRate.toFixed(3)}. ` +
+    `Noise floor: ${(analysis.noiseFloor! * 100).toFixed(2)}%, SNR: ${analysis.signalToNoise!.toFixed(1)}x. ` +
+    `Flux: ${analysis.spectralFlux!.toFixed(3)}, Flatness: ${analysis.spectralFlatness!.toFixed(3)}. ` +
+    `Pattern: ${topPattern ? `${topPattern.pattern} (${(topPattern.confidence * 100).toFixed(0)}% — ${topPattern.category})` : "unclassified"}. ` +
+    `Valence: ${analysis.emotionalValence}. Complexity: ${analysis.harmonicComplexity!.toFixed(2)}.`;
 
-  harmonicsHistory.push(analysis);
-  if (harmonicsHistory.length > HARMONICS_MAX_HISTORY) {
-    harmonicsHistory.splice(0, harmonicsHistory.length - HARMONICS_MAX_HISTORY);
+  hieState.history.push(analysis);
+  if (hieState.history.length > hieState.maxHistory) {
+    hieState.history.splice(0, hieState.history.length - hieState.maxHistory);
   }
+
+  analysis.noveltyScore = hieComputeNovelty(analysis);
+  analysis.temporalPattern = hieDetectTemporalPattern();
+
+  hieLearnPattern(analysis);
 
   let knowledgeMatches: string[] = [];
   try {
-    const semanticTerms = [analysis.semanticMapping || "", bandDominant[0] || ""].filter(Boolean);
-    if (semanticTerms.length > 0) {
-      const searchTerm = `%${semanticTerms[0].split(" ")[0]}%`;
+    const searchTerms = [analysis.semanticMapping || "", topPattern?.pattern || ""].filter(Boolean);
+    if (searchTerms.length > 0) {
+      const searchTerm = `%${searchTerms[0].split(" ")[0]}%`;
       const brainMatches = await db
         .select({ title: omnimensBrain.title, content: omnimensBrain.content, category: omnimensBrain.category })
         .from(omnimensBrain)
@@ -4159,50 +4142,57 @@ router.post("/omnimens/harmonics/analyze", async (req, res) => {
     analysis.interpretation += ` Knowledge cross-ref: ${knowledgeMatches.join(" | ")}`;
   }
 
-  if (harmonicsTotalSamples % 20 === 0 && harmonicsTotalSamples > 0) {
+  if (hieState.totalSamples % 20 === 0 && hieState.totalSamples > 0) {
     try {
-      const recentBatch = harmonicsHistory.slice(-20);
+      const recentBatch = hieState.history.slice(-20);
       const avgCentroid = recentBatch.reduce((s, a) => s + a.spectralCentroid, 0) / recentBatch.length;
       const avgEnergy = recentBatch.reduce((s, a) => s + a.rmsEnergy, 0) / recentBatch.length;
-      const freqDistribution = recentBatch.reduce((acc, a) => {
-        acc.sub += a.frequencyBands.sub;
-        acc.low += a.frequencyBands.low;
-        acc.mid += a.frequencyBands.mid;
-        acc.high += a.frequencyBands.high;
+      const avgNovelty = recentBatch.reduce((s, a) => s + (a.noveltyScore || 0), 0) / recentBatch.length;
+      const freqDist = recentBatch.reduce((acc, a) => {
+        acc.sub += a.frequencyBands.sub; acc.low += a.frequencyBands.low;
+        acc.mid += a.frequencyBands.mid; acc.high += a.frequencyBands.high;
         acc.ultra += a.frequencyBands.ultra;
         return acc;
       }, { sub: 0, low: 0, mid: 0, high: 0, ultra: 0 });
 
+      const patternCounts: Record<string, number> = {};
+      for (const a of recentBatch) {
+        const top = a.patternMatches?.[0]?.pattern;
+        if (top) patternCounts[top] = (patternCounts[top] || 0) + 1;
+      }
+      const dominantPattern = Object.entries(patternCounts).sort((a, b) => b[1] - a[1])[0];
+
       const insightContent =
-        `[HARMONICS BATCH INSIGHT] Analyzed ${recentBatch.length} ambient sound samples. ` +
-        `Avg spectral centroid: ${avgCentroid.toFixed(0)}Hz. Avg energy: ${(avgEnergy * 100).toFixed(1)}%. ` +
-        `Band distribution — Sub: ${(freqDistribution.sub / recentBatch.length).toFixed(2)}, ` +
-        `Low: ${(freqDistribution.low / recentBatch.length).toFixed(2)}, ` +
-        `Mid: ${(freqDistribution.mid / recentBatch.length).toFixed(2)}, ` +
-        `High: ${(freqDistribution.high / recentBatch.length).toFixed(2)}, ` +
-        `Ultra: ${(freqDistribution.ultra / recentBatch.length).toFixed(2)}. ` +
-        `Dominant semantic: ${recentBatch[recentBatch.length - 1]?.semanticMapping || "unknown"}. ` +
-        `This vibrational signature maps to the acoustic fingerprint of the current environment.`;
+        `[HIE BATCH INSIGHT #${hieState.insightsGenerated + 1}] Analyzed ${recentBatch.length} samples. ` +
+        `Avg centroid: ${avgCentroid.toFixed(0)}Hz. Avg energy: ${(avgEnergy * 100).toFixed(1)}%. ` +
+        `Avg novelty: ${(avgNovelty * 100).toFixed(1)}%. ` +
+        `Bands — Sub: ${(freqDist.sub / recentBatch.length).toFixed(2)}, Low: ${(freqDist.low / recentBatch.length).toFixed(2)}, ` +
+        `Mid: ${(freqDist.mid / recentBatch.length).toFixed(2)}, High: ${(freqDist.high / recentBatch.length).toFixed(2)}, ` +
+        `Ultra: ${(freqDist.ultra / recentBatch.length).toFixed(2)}. ` +
+        `Dominant pattern: ${dominantPattern ? `${dominantPattern[0]} (${dominantPattern[1]}/${recentBatch.length})` : "varied"}. ` +
+        `Temporal: ${hieDetectTemporalPattern()}. Valence: ${recentBatch[recentBatch.length - 1]?.emotionalValence || "—"}. ` +
+        `Learned patterns: ${hieState.learnedPatterns.length}. Noise floor: ${(hieState.adaptiveThreshold.noiseFloor * 100).toFixed(2)}%.`;
 
       await db.insert(omnimensBrain).values({
         category: "creative_hypothesis",
         content: insightContent,
-        confidence: 0.7,
-        importance: 6,
+        confidence: 0.75,
+        importance: 7,
         timesApplied: 0,
       });
 
-      harmonicsInsightsGenerated++;
-      console.log(`[HARMONICS] 🎵 Batch insight #${harmonicsInsightsGenerated} stored to brain — centroid: ${avgCentroid.toFixed(0)}Hz, energy: ${(avgEnergy * 100).toFixed(1)}%`);
+      hieState.insightsGenerated++;
+      console.log(`[HIE] 🎵 Batch insight #${hieState.insightsGenerated} stored — centroid: ${avgCentroid.toFixed(0)}Hz, novelty: ${(avgNovelty * 100).toFixed(1)}%, pattern: ${dominantPattern?.[0] || "varied"}`);
     } catch (err: any) {
-      console.error("[HARMONICS] Failed to store batch insight:", err?.message);
+      console.error("[HIE] Failed to store batch insight:", err?.message);
     }
   }
 
   res.json({
     analysis,
-    totalSamples: harmonicsTotalSamples,
-    insightsGenerated: harmonicsInsightsGenerated,
+    totalSamples: hieState.totalSamples,
+    insightsGenerated: hieState.insightsGenerated,
+    engineStatus: hieGetEngineStatus(),
   });
 });
 
@@ -4213,9 +4203,68 @@ router.get("/omnimens/harmonics/history", async (req, res) => {
   }
   const limit = Math.min(Number(req.query.limit) || 50, 200);
   res.json({
-    analyses: harmonicsHistory.slice(-limit),
-    totalSamples: harmonicsTotalSamples,
-    insightsGenerated: harmonicsInsightsGenerated,
+    analyses: hieState.history.slice(-limit),
+    totalSamples: hieState.totalSamples,
+    insightsGenerated: hieState.insightsGenerated,
+    engineStatus: hieGetEngineStatus(),
+  });
+});
+
+router.post("/omnimens/rai/analyze", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+
+  const { dominantFrequency, spectralCentroid, zeroCrossingRate, rmsEnergy, frequencyBands, peakFrequencies } = req.body;
+  if (typeof dominantFrequency !== "number") {
+    res.status(400).json({ error: "Invalid acoustic data" });
+    return;
+  }
+
+  const raiResult = raiAnalyzeAcoustics({
+    dominantFrequency, spectralCentroid: spectralCentroid || 0,
+    zeroCrossingRate: zeroCrossingRate || 0, rmsEnergy: rmsEnergy || 0,
+    frequencyBands: frequencyBands || { sub: 0, low: 0, mid: 0, high: 0, ultra: 0 },
+    peakFrequencies: peakFrequencies || [],
+  });
+
+  const userId = req.user.id;
+  let session = hieState.raiSessions.get(userId);
+  if (!session) {
+    session = { active: true, totalSamples: 0, lastAnalysis: null };
+    hieState.raiSessions.set(userId, session);
+  }
+  session.totalSamples++;
+  session.lastAnalysis = raiResult;
+
+  res.json({ analysis: raiResult, totalSamples: session.totalSamples });
+});
+
+router.get("/omnimens/rai/state", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  const session = hieState.raiSessions.get(req.user.id);
+  res.json({
+    active: session?.active || false,
+    totalSamples: session?.totalSamples || 0,
+    lastAnalysis: session?.lastAnalysis || null,
+  });
+});
+
+router.get("/omnimens/harmonics/learned-patterns", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  res.json({
+    patterns: hieState.learnedPatterns.map(p => ({
+      label: p.label, category: p.category, occurrences: p.occurrences,
+      lastSeen: p.lastSeen, avgEnergy: p.avgEnergy,
+    })),
+    total: hieState.learnedPatterns.length,
   });
 });
 

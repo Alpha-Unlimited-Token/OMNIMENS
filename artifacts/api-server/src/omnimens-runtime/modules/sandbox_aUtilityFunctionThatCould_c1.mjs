@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-22T18:17:22.855Z
+ * Written: 2026-03-22T18:31:08.047Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,48 +16,70 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function extractKeyPhrases(text) {
-    // Utility function to extract key phrases from text based on word frequency and relevance
-    function tokenize(input) {
-        return input.toLowerCase().match(/\b[a-z]{2,}\b/g) || [];
+function findMostFrequentWords(text, topN) {
+    if (typeof text !== 'string' || typeof topN !== 'number' || topN <= 0) {
+        throw new Error("Invalid input: text must be a string and topN must be a positive number.");
     }
 
-    function calculateFrequency(tokens) {
-        const frequencyMap = {};
-        for (const token of tokens) {
-            frequencyMap[token] = (frequencyMap[token] || 0) + 1;
-        }
-        return frequencyMap;
+    // Normalize text: remove punctuation and convert to lowercase
+    const normalizedText = text.replace(/[^\w\s]/g, '').toLowerCase();
+
+    // Split text into words
+    const words = normalizedText.split(/\s+/).filter(Boolean);
+
+    // Count word frequencies
+    const wordCounts = {};
+    for (let word of words) {
+        wordCounts[word] = (wordCounts[word] || 0) + 1;
     }
 
-    function rankPhrases(tokens, frequencyMap) {
-        const uniqueTokens = Array.from(new Set(tokens));
-        uniqueTokens.sort((a, b) => frequencyMap[b] - frequencyMap[a]);
-        return uniqueTokens.slice(0, Math.min(10, uniqueTokens.length)); // Top 10 key phrases
-    }
+    // Convert word counts to an array and sort by frequency (descending)
+    const sortedWords = Object.entries(wordCounts).sort((a, b) => b[1] - a[1]);
 
-    const tokens = tokenize(text);
-    const frequencyMap = calculateFrequency(tokens);
-    return rankPhrases(tokens, frequencyMap);
+    // Return the top N most frequent words
+    return sortedWords.slice(0, topN).map(entry => ({ word: entry[0], count: entry[1] }));
 }
 
 // Self-tests
-console.log("Test Case 1:");
-console.log(extractKeyPhrases("AI systems are becoming increasingly important in data processing, pattern matching, and optimization tasks."));
-// Expected output: ['data', 'processing', 'pattern', 'matching', 'optimization', 'tasks', 'systems', 'important', 'ai', 'becoming']
+function runTests() {
+    console.log("Test 1: Basic functionality");
+    const text1 = "This is a test. This test is only a test.";
+    const result1 = findMostFrequentWords(text1, 2);
+    console.log(result1); // Expected: [{ word: 'test', count: 3 }, { word: 'this', count: 2 }]
 
-console.log("Test Case 2:");
-console.log(extractKeyPhrases("The quick brown fox jumps over the lazy dog. The dog is not amused."));
-// Expected output: ['dog', 'the', 'quick', 'brown', 'fox', 'jumps', 'lazy', 'over', 'amused', 'not']
+    console.log("Test 2: Case insensitivity");
+    const text2 = "Apple apple apple banana BANANA banana.";
+    const result2 = findMostFrequentWords(text2, 1);
+    console.log(result2); // Expected: [{ word: 'apple', count: 3 }]
 
-console.log("Test Case 3:");
-console.log(extractKeyPhrases("")); 
-// Expected output: []
+    console.log("Test 3: Handling punctuation");
+    const text3 = "Hello, world! Hello world?";
+    const result3 = findMostFrequentWords(text3, 2);
+    console.log(result3); // Expected: [{ word: 'hello', count: 2 }, { word: 'world', count: 2 }]
 
-console.log("Test Case 4:");
-console.log(extractKeyPhrases("Data data data data analysis analysis optimization optimization optimization.")); 
-// Expected output: ['optimization', 'data', 'analysis']
+    console.log("Test 4: Edge case - empty string");
+    const text4 = "";
+    const result4 = findMostFrequentWords(text4, 3);
+    console.log(result4); // Expected: []
 
-console.log("Test Case 5:");
-console.log(extractKeyPhrases("A single word repeated word word word.")); 
-// Expected output: ['word', 'single', 'repeated']
+    console.log("Test 5: Edge case - topN greater than unique words");
+    const text5 = "One word one word.";
+    const result5 = findMostFrequentWords(text5, 5);
+    console.log(result5); // Expected: [{ word: 'one', count: 2 }, { word: 'word', count: 2 }]
+
+    console.log("Test 6: Invalid inputs");
+    try {
+        findMostFrequentWords(123, 2);
+    } catch (e) {
+        console.log(e.message); // Expected: Error message
+    }
+
+    try {
+        findMostFrequentWords("Valid text", -1);
+    } catch (e) {
+        console.log(e.message); // Expected: Error message
+    }
+}
+
+// Run tests
+runTests();
