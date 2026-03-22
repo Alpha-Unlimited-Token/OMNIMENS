@@ -54,3 +54,9 @@ id = "x160zD6d4MHZqvQrnCu3I"
 uri = "file://OMNIMENS_IP_Protection_Guide.md"
 type = "text"
 title = "Complete IP Protection Guide — Every Step Before Sharing With Anyone"
+
+[[outputs]]
+id = "1pLvrRD8EA3D27dw8aAwi"
+uri = "file://test_chord_12_frequencies.wav"
+type = "audio"
+title = "Test Sound: C Major Chord with 12 Frequencies"
