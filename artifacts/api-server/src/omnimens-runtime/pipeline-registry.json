@@ -2388,10 +2388,10 @@
       "filename": "webAssemblyMatrixOps_gen1.mjs",
       "stage": "vector_operations",
       "exports": [
-        "initializeWasm",
+        "initializeWasmMatrixOps",
         "multiplyMatrices"
       ],
-      "loadedAt": 1774157688812,
+      "loadedAt": 1774158058167,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2621,7 +2621,7 @@
         "cosineSimilarity",
         "EmbeddingMemoryStore"
       ],
-      "loadedAt": 1774157688767,
+      "loadedAt": 1774158064527,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3592,6 +3592,6 @@
     }
   },
   "lastScan": 1774157688814,
-  "totalModules": 246,
+  "totalModules": 248,
   "totalCalls": 0
 }

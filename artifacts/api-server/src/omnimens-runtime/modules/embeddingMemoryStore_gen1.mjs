@@ -1,103 +1,127 @@
 /**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: embeddingMemoryStore
+ * Written: 2026-03-22T05:41:04.510Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// embeddingMemoryStore.js
+
+/**
  * @module embeddingMemoryStore
- * @description Provides an in-memory store for embeddings, enabling fast similarity searches using cosine similarity.
+ * @description A utility for storing, retrieving, and performing similarity searches on vector embeddings using cosine similarity.
  */
 
 /**
- * Calculates the cosine similarity between two vectors.
+ * Computes the cosine similarity between two vectors.
  * @param {number[]} vectorA - The first vector.
  * @param {number[]} vectorB - The second vector.
- * @returns {number} - The cosine similarity value between -1 and 1.
- * @throws {Error} - Throws if vectors have different lengths or are empty.
+ * @returns {number} The cosine similarity between the two vectors.
+ * @throws {Error} If the vectors are not the same length or are empty.
  */
-function cosineSimilarity(vectorA, vectorB) {
+export function cosineSimilarity(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length || vectorA.length === 0) {
-    throw new Error('Vectors must have the same non-zero length.');
+    throw new Error("Vectors must be non-empty and of the same length.");
   }
 
-  const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
+  const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a * a, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b * b, 0));
 
   if (magnitudeA === 0 || magnitudeB === 0) {
-    throw new Error('Vectors must not be zero vectors.');
+    throw new Error("Vectors must not be zero-length.");
   }
 
   return dotProduct / (magnitudeA * magnitudeB);
 }
 
 /**
- * @class EmbeddingMemoryStore
- * @description In-memory store for embeddings with efficient similarity search.
+ * Class representing the embedding memory store.
  */
-class EmbeddingMemoryStore {
+export class EmbeddingMemoryStore {
   constructor() {
-    /**
-     * @type {Map<string, number[]>}
-     * @description Stores embeddings as key-value pairs (id -> vector).
-     */
+    /** @type {Map<string, number[]>} */
     this.store = new Map();
   }
 
   /**
    * Adds an embedding to the store.
-   * @param {string} id - Unique identifier for the embedding.
-   * @param {number[]} vector - The embedding vector.
-   * @throws {Error} - Throws if the id already exists or vector is invalid.
+   * @param {string} key - The unique identifier for the embedding.
+   * @param {number[]} embedding - The embedding vector.
+   * @throws {Error} If the key already exists or the embedding is invalid.
    */
-  addEmbedding(id, vector) {
-    if (this.store.has(id)) {
-      throw new Error(`Embedding with id '${id}' already exists.`);
+  addEmbedding(key, embedding) {
+    if (this.store.has(key)) {
+      throw new Error(`Key '${key}' already exists in the store.`);
     }
-
-    if (!Array.isArray(vector) || vector.length === 0 || vector.some(isNaN)) {
-      throw new Error('Invalid vector. Must be a non-empty array of numbers.');
+    if (!Array.isArray(embedding) || embedding.length === 0) {
+      throw new Error("Embedding must be a non-empty array of numbers.");
     }
-
-    this.store.set(id, vector);
+    this.store.set(key, embedding);
   }
 
   /**
-   * Finds the most similar embedding in the store to the given vector.
-   * @param {number[]} queryVector - The query vector.
-   * @returns {{id: string, similarity: number} | null} - The most similar embedding's id and similarity score, or null if store is empty.
-   * @throws {Error} - Throws if the query vector is invalid.
+   * Searches for the top N most similar embeddings to the given query vector.
+   * @param {number[]} query - The query embedding vector.
+   * @param {number} topN - The number of top results to return.
+   * @returns {Array<{key: string, similarity: number}>} The top N most similar embeddings.
+   * @throws {Error} If the query is invalid or topN is not a positive integer.
    */
-  findMostSimilar(queryVector) {
-    if (!Array.isArray(queryVector) || queryVector.length === 0 || queryVector.some(isNaN)) {
-      throw new Error('Invalid query vector. Must be a non-empty array of numbers.');
+  search(query, topN) {
+    if (!Array.isArray(query) || query.length === 0) {
+      throw new Error("Query must be a non-empty array of numbers.");
+    }
+    if (!Number.isInteger(topN) || topN <= 0) {
+      throw new Error("topN must be a positive integer.");
     }
 
-    let bestMatch = null;
-    let highestSimilarity = -Infinity;
+    const results = [];
 
-    for (const [id, vector] of this.store.entries()) {
-      const similarity = cosineSimilarity(queryVector, vector);
-
-      if (similarity > highestSimilarity) {
-        highestSimilarity = similarity;
-        bestMatch = { id, similarity };
+    for (const [key, embedding] of this.store.entries()) {
+      if (embedding.length !== query.length) {
+        throw new Error(`Embedding for key '${key}' has a different dimensionality than the query.`);
       }
+      const similarity = cosineSimilarity(query, embedding);
+      results.push({ key, similarity });
     }
 
-    return bestMatch;
-  }
-
-  /**
-   * Removes an embedding from the store.
-   * @param {string} id - The id of the embedding to remove.
-   * @returns {boolean} - True if the embedding was removed, false if not found.
-   */
-  removeEmbedding(id) {
-    return this.store.delete(id);
+    return results
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, topN);
   }
 
   /**
    * Clears all embeddings from the store.
    */
-  clearStore() {
+  clear() {
     this.store.clear();
+  }
+
+  /**
+   * Returns the number of embeddings in the store.
+   * @returns {number} The number of embeddings in the store.
+   */
+  size() {
+    return this.store.size;
   }
 }
 
-export { cosineSimilarity, EmbeddingMemoryStore };
+/**
+ * Example usage:
+ * const store = new EmbeddingMemoryStore();
+ * store.addEmbedding("key1", [1, 2, 3]);
+ * store.addEmbedding("key2", [4, 5, 6]);
+ * const results = store.search([1, 2, 3], 1);
+ * console.log(results);
+ */

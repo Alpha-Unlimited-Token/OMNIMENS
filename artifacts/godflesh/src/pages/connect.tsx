@@ -153,6 +153,7 @@ function ConnectChat() {
   const messagesRef = useRef<Message[]>([]);
   const voiceEnabledRef = useRef(false);
   const lastInputWasVoiceRef = useRef(false);
+  const streamAbortRef = useRef<AbortController | null>(null);
   const [, setLocation] = useLocation();
 
   messagesRef.current = messages;
@@ -170,8 +171,24 @@ function ConnectChat() {
       if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); }
       if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
       if (silenceCheckRef.current) clearInterval(silenceCheckRef.current);
+      if (streamAbortRef.current) { streamAbortRef.current.abort(); streamAbortRef.current = null; }
     };
   }, []);
+
+  useEffect(() => {
+    if (!isStreaming) return;
+    const safety = setTimeout(() => {
+      setIsStreaming(false);
+      setStreamingText("");
+    }, 130_000);
+    return () => clearTimeout(safety);
+  }, [isStreaming]);
+
+  useEffect(() => {
+    if (!isProcessingVoice) return;
+    const safety = setTimeout(() => { setIsProcessingVoice(false); }, 30_000);
+    return () => clearTimeout(safety);
+  }, [isProcessingVoice]);
 
   const speakText = useCallback(async (text: string, onDone?: () => void, forceSpeak?: boolean) => {
     if (!forceSpeak && !voiceEnabledRef.current) { onDone?.(); return; }
@@ -216,9 +233,13 @@ function ConnectChat() {
     });
   }, [stopSpeaking]);
 
+  const sendMessageDirectRef = useRef<(text: string) => Promise<void>>(null!);
+
   const transcribeAndSend = useCallback(async (audioBlob: Blob) => {
     if (audioBlob.size < 500) { setIsProcessingVoice(false); return; }
     setIsProcessingVoice(true);
+    const sttAbort = new AbortController();
+    const sttTimeout = setTimeout(() => sttAbort.abort(), 30_000);
     try {
       const formData = new FormData();
       formData.append("audio", audioBlob, "recording.webm");
@@ -226,6 +247,7 @@ function ConnectChat() {
         method: "POST",
         credentials: "include",
         body: formData,
+        signal: sttAbort.signal,
       });
       if (!res.ok) { setIsProcessingVoice(false); return; }
       const data = await res.json();
@@ -233,9 +255,11 @@ function ConnectChat() {
       if (!text) { setIsProcessingVoice(false); return; }
       setIsProcessingVoice(false);
       lastInputWasVoiceRef.current = true;
-      await sendMessageDirect(text);
+      await sendMessageDirectRef.current(text);
     } catch {
       setIsProcessingVoice(false);
+    } finally {
+      clearTimeout(sttTimeout);
     }
   }, []);
 
@@ -378,6 +402,10 @@ function ConnectChat() {
     const msg = text.trim();
     if (!msg) return;
 
+    if (streamAbortRef.current) { streamAbortRef.current.abort(); }
+    const abortCtrl = new AbortController();
+    streamAbortRef.current = abortCtrl;
+
     const userMsg: Message = { role: "user", content: msg };
     const currentMessages = messagesRef.current;
     const updatedMessages = [...currentMessages, userMsg];
@@ -385,12 +413,15 @@ function ConnectChat() {
     setIsStreaming(true);
     setStreamingText("");
 
+    const timeout = setTimeout(() => { abortCtrl.abort(); }, 120_000);
+
     try {
       const res = await fetch("/api/omnimens/connect", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ message: msg, history: updatedMessages.slice(-20) }),
+        signal: abortCtrl.signal,
       });
 
       if (!res.ok) {
@@ -440,11 +471,20 @@ function ConnectChat() {
       }
     } catch {
       lastInputWasVoiceRef.current = false;
-      setMessages(prev => [...prev, { role: "assistant", content: "Connection interrupted. Please try again." }]);
+      if (!abortCtrl.signal.aborted) {
+        setMessages(prev => [...prev, { role: "assistant", content: "Connection interrupted. Please try again." }]);
+      } else {
+        setMessages(prev => [...prev, { role: "assistant", content: "Response timed out. Please try again." }]);
+      }
       setIsStreaming(false);
       setStreamingText("");
+    } finally {
+      clearTimeout(timeout);
+      if (streamAbortRef.current === abortCtrl) streamAbortRef.current = null;
     }
   }, [speakText]);
+
+  sendMessageDirectRef.current = sendMessageDirect;
 
   const sendMessage = async (text?: string) => {
     const msg = (text || input).trim();
