@@ -1,0 +1,154 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-03-22T09:29:26.499Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+/**
+ * @module inMemoryVectorStore
+ * @description A module for caching and performing similarity searches on embeddings in-memory using a k-d tree algorithm.
+ */
+
+/**
+ * Represents a node in the k-d tree.
+ * @typedef {Object} KDTreeNode
+ * @property {Array<number>} point - The vector stored at this node.
+ * @property {any} value - The associated value for the vector.
+ * @property {KDTreeNode|null} left - The left child node.
+ * @property {KDTreeNode|null} right - The right child node.
+ */
+
+/**
+ * Class representing an in-memory vector store using a k-d tree for efficient similarity search.
+ */
+export class InMemoryVectorStore {
+  /**
+   * Constructs an empty vector store.
+   */
+  constructor() {
+    this.root = null; // Root of the k-d tree
+    this.k = 0; // Dimensionality of the vectors
+  }
+
+  /**
+   * Inserts a vector and its associated value into the k-d tree.
+   * @param {Array<number>} vector - The vector to insert.
+   * @param {any} value - The value associated with the vector.
+   */
+  insert(vector, value) {
+    if (!Array.isArray(vector) || vector.some(isNaN)) {
+      throw new Error("Vector must be an array of numbers.");
+    }
+
+    if (this.k === 0) {
+      this.k = vector.length; // Set dimensionality on first insert
+    } else if (vector.length !== this.k) {
+      throw new Error(`Vector dimensionality must match the k-d tree (${this.k}).`);
+    }
+
+    this.root = this._insertNode(this.root, vector, value, 0);
+  }
+
+  /**
+   * Performs a nearest neighbor search to find the closest vector in the tree.
+   * @param {Array<number>} target - The target vector to search for.
+   * @param {number} [k=1] - The number of nearest neighbors to return.
+   * @returns {Array<{point: Array<number>, value: any, distance: number}>} - The k nearest neighbors.
+   */
+  search(target, k = 1) {
+    if (!Array.isArray(target) || target.length !== this.k || target.some(isNaN)) {
+      throw new Error("Target vector must be an array of numbers matching the dimensionality of the tree.");
+    }
+
+    const results = [];
+    this._nearestNeighborSearch(this.root, target, k, 0, results);
+    results.sort((a, b) => a.distance - b.distance);
+    return results;
+  }
+
+  /**
+   * Recursively inserts a node into the k-d tree.
+   * @param {KDTreeNode|null} node - The current node.
+   * @param {Array<number>} point - The vector to insert.
+   * @param {any} value - The value associated with the vector.
+   * @param {number} depth - The current depth in the tree.
+   * @returns {KDTreeNode} - The updated node.
+   * @private
+   */
+  _insertNode(node, point, value, depth) {
+    if (!node) {
+      return { point, value, left: null, right: null };
+    }
+
+    const axis = depth % this.k;
+    if (point[axis] < node.point[axis]) {
+      node.left = this._insertNode(node.left, point, value, depth + 1);
+    } else {
+      node.right = this._insertNode(node.right, point, value, depth + 1);
+    }
+
+    return node;
+  }
+
+  /**
+   * Recursively performs a nearest neighbor search.
+   * @param {KDTreeNode|null} node - The current node.
+   * @param {Array<number>} target - The target vector.
+   * @param {number} k - The number of neighbors to find.
+   * @param {number} depth - The current depth in the tree.
+   * @param {Array<{point: Array<number>, value: any, distance: number}>} results - The current list of results.
+   * @private
+   */
+  _nearestNeighborSearch(node, target, k, depth, results) {
+    if (!node) return;
+
+    const axis = depth % this.k;
+    const distance = this._euclideanDistance(node.point, target);
+
+    if (results.length < k || distance < results[results.length - 1].distance) {
+      results.push({ point: node.point, value: node.value, distance });
+      results.sort((a, b) => a.distance - b.distance);
+      if (results.length > k) results.pop();
+    }
+
+    const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
+    const oppositeBranch = target[axis] < node.point[axis] ? node.right : node.left;
+
+    this._nearestNeighborSearch(nextBranch, target, k, depth + 1, results);
+
+    if (results.length < k || Math.abs(target[axis] - node.point[axis]) < results[results.length - 1].distance) {
+      this._nearestNeighborSearch(oppositeBranch, target, k, depth + 1, results);
+    }
+  }
+
+  /**
+   * Computes the Euclidean distance between two vectors.
+   * @param {Array<number>} a - The first vector.
+   * @param {Array<number>} b - The second vector.
+   * @returns {number} - The Euclidean distance.
+   * @private
+   */
+  _euclideanDistance(a, b) {
+    return Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0));
+  }
+}
+
+/**
+ * Creates a new instance of the vector store.
+ * @returns {InMemoryVectorStore} - A new vector store instance.
+ */
+export function createVectorStore() {
+  return new InMemoryVectorStore();
+}

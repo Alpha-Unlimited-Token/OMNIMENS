@@ -1,0 +1,73 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-22T09:27:02.460Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Utility Function: Token Frequency Counter
+// This function analyzes a given text and returns the frequency of each token (word).
+// It is useful for text analysis, pattern recognition, and natural language processing tasks.
+
+function tokenFrequencyCounter(text) {
+    if (typeof text !== 'string') {
+        throw new Error("Input must be a string");
+    }
+
+    // Normalize the text: convert to lowercase and remove non-alphanumeric characters (except spaces)
+    const normalizedText = text.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+
+    // Split the text into tokens (words)
+    const tokens = normalizedText.split(/\s+/).filter(token => token.length > 0);
+
+    // Count the frequency of each token
+    const frequencyMap = {};
+    for (let token of tokens) {
+        frequencyMap[token] = (frequencyMap[token] || 0) + 1;
+    }
+
+    return frequencyMap;
+}
+
+// Test Cases
+(function testTokenFrequencyCounter() {
+    console.log("Running tests for tokenFrequencyCounter...");
+
+    // Test 1: Basic input
+    const text1 = "Hello world! Hello AI.";
+    const result1 = tokenFrequencyCounter(text1);
+    console.log(result1); // Expected: { hello: 2, world: 1, ai: 1 }
+
+    // Test 2: Case insensitivity
+    const text2 = "Test test TEST";
+    const result2 = tokenFrequencyCounter(text2);
+    console.log(result2); // Expected: { test: 3 }
+
+    // Test 3: Handling special characters
+    const text3 = "AI, AI, AI!!! Is amazing.";
+    const result3 = tokenFrequencyCounter(text3);
+    console.log(result3); // Expected: { ai: 3, is: 1, amazing: 1 }
+
+    // Test 4: Empty input
+    const text4 = "";
+    const result4 = tokenFrequencyCounter(text4);
+    console.log(result4); // Expected: {}
+
+    // Test 5: Numbers and mixed content
+    const text5 = "123 123 AI 456 AI";
+    const result5 = tokenFrequencyCounter(text5);
+    console.log(result5); // Expected: { '123': 2, ai: 2, '456': 1 }
+
+    console.log("All tests completed.");
+})();

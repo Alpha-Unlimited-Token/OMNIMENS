@@ -1,0 +1,102 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a data structure optimized for fast associative memory lookup
+ * Written: 2026-03-22T09:51:03.099Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+function AssociativeMemory() {
+    const memory = new Map();
+
+    return {
+        add: function (key, value) {
+            if (typeof key !== 'string') {
+                throw new Error('Key must be a string.');
+            }
+            memory.set(key, value);
+        },
+        get: function (key) {
+            if (typeof key !== 'string') {
+                throw new Error('Key must be a string.');
+            }
+            return memory.get(key);
+        },
+        remove: function (key) {
+            if (typeof key !== 'string') {
+                throw new Error('Key must be a string.');
+            }
+            return memory.delete(key);
+        },
+        has: function (key) {
+            if (typeof key !== 'string') {
+                throw new Error('Key must be a string.');
+            }
+            return memory.has(key);
+        },
+        clear: function () {
+            memory.clear();
+        },
+        size: function () {
+            return memory.size;
+        },
+        keys: function () {
+            return Array.from(memory.keys());
+        },
+        values: function () {
+            return Array.from(memory.values());
+        }
+    };
+}
+
+// Self-tests
+const memory = AssociativeMemory();
+
+// Test adding and retrieving values
+memory.add('name', 'Alice');
+console.log(memory.get('name') === 'Alice'); // true
+
+memory.add('age', 30);
+console.log(memory.get('age') === 30); // true
+
+// Test has method
+console.log(memory.has('name') === true); // true
+console.log(memory.has('unknown') === false); // true
+
+// Test removing values
+console.log(memory.remove('age') === true); // true
+console.log(memory.get('age') === undefined); // true
+
+// Test size
+console.log(memory.size() === 1); // true
+
+// Test keys and values
+console.log(JSON.stringify(memory.keys()) === JSON.stringify(['name'])); // true
+console.log(JSON.stringify(memory.values()) === JSON.stringify(['Alice'])); // true
+
+// Test clearing memory
+memory.clear();
+console.log(memory.size() === 0); // true
+
+// Edge case: non-string keys
+try {
+    memory.add(123, 'Invalid');
+} catch (e) {
+    console.log(e.message === 'Key must be a string.'); // true
+}
+
+try {
+    memory.get(123);
+} catch (e) {
+    console.log(e.message === 'Key must be a string.'); // true
+}

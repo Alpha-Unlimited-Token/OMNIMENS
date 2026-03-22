@@ -1,0 +1,97 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-22T10:34:46.233Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+function extractTableFromText(text) {
+    // Extracts tabular data from text where rows are separated by newlines
+    // and columns are separated by a delimiter (default is '|').
+    const delimiter = '|';
+    const rows = text.split('\n').map(row => row.trim()).filter(row => row.length > 0);
+    const table = rows.map(row => row.split(delimiter).map(cell => cell.trim()));
+    return table;
+}
+
+function analyzeTableData(table) {
+    // Analyzes the table data to calculate:
+    // 1. Number of rows and columns
+    // 2. Maximum and minimum values in numeric columns
+    // 3. Column-wise data type inference (numeric or text)
+    const numRows = table.length;
+    const numCols = table[0] ? table[0].length : 0;
+
+    const columnAnalysis = [];
+    for (let col = 0; col < numCols; col++) {
+        const columnData = table.map(row => row[col]);
+        const numericValues = columnData.map(value => parseFloat(value)).filter(value => !isNaN(value));
+        const isNumeric = numericValues.length === columnData.length;
+
+        columnAnalysis.push({
+            isNumeric: isNumeric,
+            max: isNumeric ? Math.max(...numericValues) : null,
+            min: isNumeric ? Math.min(...numericValues) : null,
+            dataType: isNumeric ? 'Numeric' : 'Text'
+        });
+    }
+
+    return {
+        numRows: numRows,
+        numCols: numCols,
+        columnAnalysis: columnAnalysis
+    };
+}
+
+// Test cases
+const testText1 = `
+Name | Age | Score
+Alice | 30 | 85
+Bob | 25 | 90
+Charlie | 35 | 95
+`;
+
+const testText2 = `
+Product | Price | Quantity
+Apple | 1.2 | 10
+Banana | 0.8 | 20
+Cherry | 2.5 | 15
+`;
+
+console.log("Test Case 1:");
+const table1 = extractTableFromText(testText1);
+console.log("Extracted Table:", table1);
+console.log("Analysis:", analyzeTableData(table1));
+
+console.log("\nTest Case 2:");
+const table2 = extractTableFromText(testText2);
+console.log("Extracted Table:", table2);
+console.log("Analysis:", analyzeTableData(table2));
+
+// Edge case: Empty input
+console.log("\nEdge Case: Empty Input");
+const emptyTable = extractTableFromText("");
+console.log("Extracted Table:", emptyTable);
+console.log("Analysis:", analyzeTableData(emptyTable));
+
+// Edge case: Inconsistent rows
+console.log("\nEdge Case: Inconsistent Rows");
+const inconsistentText = `
+A | B | C
+1 | 2
+3 | 4 | 5
+`;
+const inconsistentTable = extractTableFromText(inconsistentText);
+console.log("Extracted Table:", inconsistentTable);
+console.log("Analysis:", analyzeTableData(inconsistentTable));

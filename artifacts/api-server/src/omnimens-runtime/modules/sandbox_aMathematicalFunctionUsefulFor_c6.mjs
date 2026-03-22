@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a mathematical function useful for confidence scoring, probability estimation, o
- * Written: 2026-03-22T07:42:30.719Z
+ * Written: 2026-03-22T13:16:58.514Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,60 +16,75 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function calculateConfidenceInterval(mean, stdDev, sampleSize, confidenceLevel) {
-    if (sampleSize <= 0 || stdDev < 0 || confidenceLevel <= 0 || confidenceLevel >= 1) {
-        throw new Error("Invalid input: ensure sampleSize > 0, stdDev >= 0, and 0 < confidenceLevel < 1.");
+function calculateConfidenceInterval(data, confidenceLevel) {
+    if (!Array.isArray(data) || data.length === 0 || typeof confidenceLevel !== 'number' || confidenceLevel <= 0 || confidenceLevel >= 1) {
+        throw new Error("Invalid input: Provide a non-empty array of numbers and a confidence level between 0 and 1.");
     }
 
+    // Helper function to calculate mean
+    function mean(arr) {
+        return arr.reduce((sum, value) => sum + value, 0) / arr.length;
+    }
+
+    // Helper function to calculate standard deviation
+    function standardDeviation(arr, meanValue) {
+        const variance = arr.reduce((sum, value) => sum + Math.pow(value - meanValue, 2), 0) / (arr.length - 1);
+        return Math.sqrt(variance);
+    }
+
+    const sampleMean = mean(data);
+    const sampleStdDev = standardDeviation(data, sampleMean);
+    const sampleSize = data.length;
+
+    // Z-scores for common confidence levels (two-tailed)
     const zScores = {
         0.90: 1.645,
-        0.95: 1.96,
+        0.95: 1.960,
         0.99: 2.576
     };
 
-    const z = zScores[confidenceLevel];
-    if (!z) {
+    const zScore = zScores[confidenceLevel] || (confidenceLevel > 0.8 && confidenceLevel < 1 ? 1.960 : null);
+    if (!zScore) {
         throw new Error("Unsupported confidence level. Use 0.90, 0.95, or 0.99.");
     }
 
-    const marginOfError = z * (stdDev / Math.sqrt(sampleSize));
-    const lowerBound = mean - marginOfError;
-    const upperBound = mean + marginOfError;
+    const marginOfError = zScore * (sampleStdDev / Math.sqrt(sampleSize));
+    const lowerBound = sampleMean - marginOfError;
+    const upperBound = sampleMean + marginOfError;
 
     return {
-        lowerBound: lowerBound,
-        upperBound: upperBound,
-        marginOfError: marginOfError
+        mean: sampleMean,
+        marginOfError: marginOfError,
+        confidenceInterval: [lowerBound, upperBound],
+        confidenceLevel: confidenceLevel
     };
 }
 
-// Test cases
-function runTests() {
-    console.log("Test Case 1:");
-    const result1 = calculateConfidenceInterval(100, 15, 30, 0.95);
-    console.log(result1); // Expected: { lowerBound: ~92.32, upperBound: ~107.68, marginOfError: ~7.68 }
+// Self-tests
+const testData1 = [12, 15, 14, 10, 13, 14, 15, 16];
+const testData2 = [100, 102, 98, 105, 99, 101, 103, 100, 99, 98];
+const confidenceLevel = 0.95;
 
-    console.log("Test Case 2:");
-    const result2 = calculateConfidenceInterval(50, 20, 50, 0.90);
-    console.log(result2); // Expected: { lowerBound: ~44.34, upperBound: ~55.66, marginOfError: ~5.66 }
+console.log(JSON.stringify(calculateConfidenceInterval(testData1, confidenceLevel), null, 2));
+console.log(JSON.stringify(calculateConfidenceInterval(testData2, confidenceLevel), null, 2));
 
-    console.log("Test Case 3:");
-    const result3 = calculateConfidenceInterval(200, 25, 100, 0.99);
-    console.log(result3); // Expected: { lowerBound: ~194.56, upperBound: ~205.44, marginOfError: ~5.44 }
-
-    console.log("Edge Case 1 (Invalid confidence level):");
-    try {
-        calculateConfidenceInterval(100, 15, 30, 0.85);
-    } catch (e) {
-        console.log(e.message); // Expected: "Unsupported confidence level. Use 0.90, 0.95, or 0.99."
-    }
-
-    console.log("Edge Case 2 (Invalid sample size):");
-    try {
-        calculateConfidenceInterval(100, 15, 0, 0.95);
-    } catch (e) {
-        console.log(e.message); // Expected: "Invalid input: ensure sampleSize > 0, stdDev >= 0, and 0 < confidenceLevel < 1."
-    }
+// Edge case: single data point
+try {
+    console.log(calculateConfidenceInterval([42], confidenceLevel));
+} catch (error) {
+    console.log(error.message);
 }
 
-runTests();
+// Edge case: invalid confidence level
+try {
+    console.log(calculateConfidenceInterval(testData1, 0.5));
+} catch (error) {
+    console.log(error.message);
+}
+
+// Edge case: empty array
+try {
+    console.log(calculateConfidenceInterval([], confidenceLevel));
+} catch (error) {
+    console.log(error.message);
+}

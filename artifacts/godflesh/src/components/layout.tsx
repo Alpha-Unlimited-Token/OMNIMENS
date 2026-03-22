@@ -49,6 +49,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">
+            <Link href="/dreams" className="text-sm font-mono text-violet-300/80 hover:text-violet-300 transition-colors tracking-widest">
+              DREAMS
+            </Link>
+            <Link href="/demo" className="text-sm font-mono text-white/80 hover:text-white transition-colors tracking-widest">
+              TRY FREE
+            </Link>
             <Link href="/pricing" className="text-sm font-mono text-white/80 hover:text-white transition-colors tracking-widest">
               PRICING
             </Link>
@@ -99,6 +105,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   <div className="h-px bg-white/5 my-2" />
                 </>
               )}
+              <MobileNavLink href="/dreams" label="Dreams" />
+              <MobileNavLink href="/demo" label="Try Free" />
               <MobileNavLink href="/pricing" label="Pricing" />
               <MobileNavLink href="/faq" label="FAQ" />
               <MobileNavLink href="/about" label="About" />

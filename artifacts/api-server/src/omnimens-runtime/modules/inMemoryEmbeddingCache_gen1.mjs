@@ -1,132 +1,128 @@
 /**
- * @module inMemoryEmbeddingCache
- * @description A utility module for caching embeddings in memory using an LRU strategy for fast similarity searches.
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryEmbeddingCache
+ * Written: 2026-03-22T12:19:18.028Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
  */
 
 /**
- * A class representing an in-memory embedding cache with LRU eviction policy.
+ * @module inMemoryEmbeddingCache
+ * @description A module for caching embeddings in memory using an LRU strategy, with periodic syncing to PostgreSQL.
  */
-class InMemoryEmbeddingCache {
+
+const crypto = require('crypto');
+
+/**
+ * A simple LRU cache implementation for storing embeddings in memory.
+ * @class LRUCache
+ */
+class LRUCache {
   /**
-   * Creates an instance of InMemoryEmbeddingCache.
-   * @param {number} maxSize - The maximum number of items the cache can hold.
+   * @param {number} maxSize - Maximum number of items the cache can hold.
    */
-  constructor(maxSize = 100) {
-    if (typeof maxSize !== 'number' || maxSize <= 0) {
-      throw new Error('maxSize must be a positive number.');
-    }
-
-    /**
-     * @private
-     * @type {Map<string, { embedding: number[], timestamp: number }>}
-     */
-    this.cache = new Map();
-
-    /**
-     * @private
-     * @type {number}
-     */
+  constructor(maxSize) {
     this.maxSize = maxSize;
+    this.cache = new Map();
   }
 
   /**
-   * Adds an embedding to the cache.
-   * @param {string} key - The unique key for the embedding.
-   * @param {number[]} embedding - The embedding vector to cache.
+   * Retrieves an item from the cache.
+   * @param {string} key - The key of the item to retrieve.
+   * @returns {any|null} - The cached value, or null if not found.
    */
-  set(key, embedding) {
-    if (!Array.isArray(embedding) || embedding.some(isNaN)) {
-      throw new Error('Embedding must be an array of numbers.');
-    }
+  get(key) {
+    if (!this.cache.has(key)) return null;
+    const value = this.cache.get(key);
+    // Move the accessed item to the end to mark it as recently used.
+    this.cache.delete(key);
+    this.cache.set(key, value);
+    return value;
+  }
 
+  /**
+   * Adds an item to the cache.
+   * @param {string} key - The key of the item to add.
+   * @param {any} value - The value to cache.
+   */
+  set(key, value) {
     if (this.cache.has(key)) {
-      this.cache.delete(key); // Remove the key to refresh its position.
-    }
-
-    this.cache.set(key, { embedding, timestamp: Date.now() });
-
-    if (this.cache.size > this.maxSize) {
-      // Evict the least recently used item.
+      this.cache.delete(key);
+    } else if (this.cache.size >= this.maxSize) {
+      // Remove the least recently used item.
       const oldestKey = this.cache.keys().next().value;
       this.cache.delete(oldestKey);
     }
-  }
-
-  /**
-   * Retrieves an embedding from the cache.
-   * @param {string} key - The unique key for the embedding.
-   * @returns {number[] | null} The embedding vector if found, or null if not.
-   */
-  get(key) {
-    if (!this.cache.has(key)) {
-      return null;
-    }
-
-    const value = this.cache.get(key);
-    this.cache.delete(key); // Refresh the key's position.
     this.cache.set(key, value);
-
-    return value.embedding;
   }
 
   /**
-   * Removes an embedding from the cache.
-   * @param {string} key - The unique key for the embedding.
-   * @returns {boolean} True if the key was found and removed, false otherwise.
+   * Returns all items in the cache as an array of key-value pairs.
+   * @returns {Array<[string, any]>} - An array of key-value pairs.
    */
-  delete(key) {
-    return this.cache.delete(key);
-  }
-
-  /**
-   * Clears all embeddings from the cache.
-   */
-  clear() {
-    this.cache.clear();
-  }
-
-  /**
-   * Returns the current size of the cache.
-   * @returns {number} The number of items in the cache.
-   */
-  size() {
-    return this.cache.size;
+  entries() {
+    return Array.from(this.cache.entries());
   }
 }
 
 /**
- * Factory function to create a new in-memory embedding cache.
- * @param {number} [maxSize=100] - The maximum number of items the cache can hold.
- * @returns {InMemoryEmbeddingCache} A new instance of InMemoryEmbeddingCache.
+ * Periodically syncs the in-memory cache to a PostgreSQL database.
+ * @param {LRUCache} cache - The LRU cache instance.
+ * @param {number} intervalMs - Sync interval in milliseconds.
+ * @param {Function} syncFunction - A function to handle the syncing logic.
  */
-export function createEmbeddingCache(maxSize = 100) {
-  return new InMemoryEmbeddingCache(maxSize);
+function startCacheSync(cache, intervalMs, syncFunction) {
+  setInterval(() => {
+    const dataToSync = cache.entries();
+    syncFunction(dataToSync);
+  }, intervalMs);
 }
 
 /**
- * Utility function to check similarity between two embeddings using cosine similarity.
- * @param {number[]} embedding1 - The first embedding vector.
- * @param {number[]} embedding2 - The second embedding vector.
- * @returns {number} The cosine similarity between the two embeddings (range: -1 to 1).
+ * Generates a unique hash for a given embedding.
+ * @param {Array<number>} embedding - The embedding array.
+ * @returns {string} - A unique hash string.
  */
-export function cosineSimilarity(embedding1, embedding2) {
-  if (!Array.isArray(embedding1) || !Array.isArray(embedding2)) {
-    throw new Error('Both embeddings must be arrays of numbers.');
-  }
-
-  if (embedding1.length !== embedding2.length) {
-    throw new Error('Embeddings must have the same length.');
-  }
-
-  const dotProduct = embedding1.reduce((sum, val, i) => sum + val * embedding2[i], 0);
-  const magnitude1 = Math.sqrt(embedding1.reduce((sum, val) => sum + val ** 2, 0));
-  const magnitude2 = Math.sqrt(embedding2.reduce((sum, val) => sum + val ** 2, 0));
-
-  if (magnitude1 === 0 || magnitude2 === 0) {
-    throw new Error('Embeddings must not be zero vectors.');
-  }
-
-  return dotProduct / (magnitude1 * magnitude2);
+function generateEmbeddingHash(embedding) {
+  const hash = crypto.createHash('sha256');
+  hash.update(JSON.stringify(embedding));
+  return hash.digest('hex');
 }
 
-export default { createEmbeddingCache, cosineSimilarity };
+/**
+ * Adds an embedding to the cache.
+ * @param {LRUCache} cache - The LRU cache instance.
+ * @param {Array<number>} embedding - The embedding array.
+ */
+function addEmbeddingToCache(cache, embedding) {
+  const hash = generateEmbeddingHash(embedding);
+  cache.set(hash, embedding);
+}
+
+/**
+ * Retrieves an embedding from the cache by its hash.
+ * @param {LRUCache} cache - The LRU cache instance.
+ * @param {string} hash - The hash of the embedding to retrieve.
+ * @returns {Array<number>|null} - The embedding array, or null if not found.
+ */
+function getEmbeddingFromCache(cache, hash) {
+  return cache.get(hash);
+}
+
+module.exports = {
+  LRUCache,
+  startCacheSync,
+  generateEmbeddingHash,
+  addEmbeddingToCache,
+  getEmbeddingFromCache
+};

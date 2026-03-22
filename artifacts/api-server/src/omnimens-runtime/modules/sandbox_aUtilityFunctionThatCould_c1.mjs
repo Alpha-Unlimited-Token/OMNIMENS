@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-22T09:16:45.621Z
+ * Written: 2026-03-22T15:04:54.425Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,58 +16,52 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentPatterns(input, patternLength) {
-    if (typeof input !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
-        throw new Error("Invalid input: 'input' must be a string and 'patternLength' must be a positive number.");
-    }
+// Utility Function: Find the Longest Common Subsequence (LCS) between two strings
+function longestCommonSubsequence(str1, str2) {
+    const m = str1.length;
+    const n = str2.length;
+    const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
 
-    const patternCounts = new Map();
-
-    for (let i = 0; i <= input.length - patternLength; i++) {
-        const pattern = input.substring(i, i + patternLength);
-        patternCounts.set(pattern, (patternCounts.get(pattern) || 0) + 1);
-    }
-
-    const maxFrequency = Math.max(...patternCounts.values());
-    const mostFrequentPatterns = [];
-
-    patternCounts.forEach((count, pattern) => {
-        if (count === maxFrequency) {
-            mostFrequentPatterns.push({ pattern, count });
+    // Build the DP table
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (str1[i - 1] === str2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            } else {
+                dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+            }
         }
-    });
+    }
 
-    return mostFrequentPatterns;
+    // Backtrack to find the LCS
+    let i = m, j = n;
+    let lcs = [];
+    while (i > 0 && j > 0) {
+        if (str1[i - 1] === str2[j - 1]) {
+            lcs.unshift(str1[i - 1]);
+            i--;
+            j--;
+        } else if (dp[i - 1][j] > dp[i][j - 1]) {
+            i--;
+        } else {
+            j--;
+        }
+    }
+
+    return lcs.join('');
 }
 
 // Test cases
-console.log("Test Case 1: Basic string with repeated patterns");
-console.log(findMostFrequentPatterns("ababab", 2)); // Expected: [{ pattern: "ab", count: 3 }]
-
-console.log("Test Case 2: String with multiple patterns of equal frequency");
-console.log(findMostFrequentPatterns("abcabcabc", 3)); // Expected: [{ pattern: "abc", count: 3 }]
-
-console.log("Test Case 3: Single character patterns");
-console.log(findMostFrequentPatterns("aaaaa", 1)); // Expected: [{ pattern: "a", count: 5 }]
-
-console.log("Test Case 4: Edge case with no patterns (empty string)");
-console.log(findMostFrequentPatterns("", 2)); // Expected: []
-
-console.log("Test Case 5: Edge case with pattern length greater than string length");
-console.log(findMostFrequentPatterns("abc", 5)); // Expected: []
-
-console.log("Test Case 6: String with overlapping patterns");
-console.log(findMostFrequentPatterns("aaaa", 2)); // Expected: [{ pattern: "aa", count: 3 }]
-
-console.log("Test Case 7: Invalid inputs");
-try {
-    console.log(findMostFrequentPatterns(12345, 2)); // Expected: Error
-} catch (e) {
-    console.log(e.message);
+function runTests() {
+    console.log("Test 1: ", longestCommonSubsequence("abcdef", "acdf") === "acdf"); // True
+    console.log("Test 2: ", longestCommonSubsequence("12345", "135") === "135"); // True
+    console.log("Test 3: ", longestCommonSubsequence("abc", "def") === ""); // True
+    console.log("Test 4: ", longestCommonSubsequence("AGGTAB", "GXTXAYB") === "GTAB"); // True
+    console.log("Test 5: ", longestCommonSubsequence("", "abc") === ""); // True
+    console.log("Test 6: ", longestCommonSubsequence("abc", "") === ""); // True
+    console.log("Test 7: ", longestCommonSubsequence("aaaa", "aa") === "aa"); // True
+    console.log("Test 8: ", longestCommonSubsequence("abcdef", "abcdef") === "abcdef"); // True
 }
 
-try {
-    console.log(findMostFrequentPatterns("abc", -1)); // Expected: Error
-} catch (e) {
-    console.log(e.message);
-}
+// Run tests
+runTests();

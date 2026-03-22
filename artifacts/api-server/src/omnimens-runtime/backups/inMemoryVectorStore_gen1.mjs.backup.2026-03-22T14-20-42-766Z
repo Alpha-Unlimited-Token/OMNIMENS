@@ -1,0 +1,168 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-03-22T11:44:48.165Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+/**
+ * @module inMemoryVectorStore
+ * @description Provides a fast in-memory vector storage and similarity search using HNSW (Hierarchical Navigable Small World) algorithm.
+ */
+
+/**
+ * Represents a node in the HNSW graph.
+ * @typedef {Object} Node
+ * @property {number[]} vector - The vector associated with the node.
+ * @property {number} id - Unique identifier for the node.
+ * @property {Map<number, Set<number>>} neighbors - A map of layers to sets of neighboring node IDs.
+ */
+
+class HNSW {
+  constructor() {
+    /** @type {Map<number, Node>} */
+    this.nodes = new Map();
+    this.maxLayer = 0;
+    this.entryPoint = null;
+  }
+
+  /**
+   * Adds a vector to the HNSW graph.
+   * @param {number[]} vector - The vector to add.
+   * @param {number} id - Unique identifier for the vector.
+   */
+  add(vector, id) {
+    const node = {
+      vector,
+      id,
+      neighbors: new Map()
+    };
+
+    if (this.nodes.size === 0) {
+      this.entryPoint = id;
+      this.maxLayer = 0;
+    }
+
+    this.nodes.set(id, node);
+
+    // Insert into graph using greedy search for nearest neighbors
+    const nearest = this._searchLayer(vector, this.entryPoint, 1, this.maxLayer);
+    for (const neighborId of nearest) {
+      this._connectNodes(node, this.nodes.get(neighborId), 0);
+    }
+  }
+
+  /**
+   * Searches for the k-nearest neighbors of a given vector.
+   * @param {number[]} vector - The query vector.
+   * @param {number} k - The number of nearest neighbors to return.
+   * @returns {Array<{id: number, distance: number}>} - The k-nearest neighbors.
+   */
+  search(vector, k) {
+    const visited = new Set();
+    const candidates = [{ id: this.entryPoint, distance: this._euclideanDistance(vector, this.nodes.get(this.entryPoint).vector) }];
+    const results = [];
+
+    while (candidates.length > 0) {
+      const candidate = candidates.pop();
+      if (visited.has(candidate.id)) continue;
+      visited.add(candidate.id);
+
+      results.push(candidate);
+      if (results.length > k) {
+        results.sort((a, b) => a.distance - b.distance);
+        results.pop();
+      }
+
+      const neighbors = this.nodes.get(candidate.id).neighbors.get(0) || new Set();
+      for (const neighborId of neighbors) {
+        if (!visited.has(neighborId)) {
+          candidates.push({
+            id: neighborId,
+            distance: this._euclideanDistance(vector, this.nodes.get(neighborId).vector)
+          });
+        }
+      }
+    }
+
+    return results.sort((a, b) => a.distance - b.distance);
+  }
+
+  /**
+   * Connects two nodes in the graph.
+   * @private
+   * @param {Node} nodeA - The first node.
+   * @param {Node} nodeB - The second node.
+   * @param {number} layer - The layer to connect the nodes on.
+   */
+  _connectNodes(nodeA, nodeB, layer) {
+    if (!nodeA.neighbors.has(layer)) nodeA.neighbors.set(layer, new Set());
+    if (!nodeB.neighbors.has(layer)) nodeB.neighbors.set(layer, new Set());
+
+    nodeA.neighbors.get(layer).add(nodeB.id);
+    nodeB.neighbors.get(layer).add(nodeA.id);
+  }
+
+  /**
+   * Performs a greedy search on a specific layer.
+   * @private
+   * @param {number[]} vector - The query vector.
+   * @param {number} entryPoint - The starting node ID.
+   * @param {number} k - The number of neighbors to find.
+   * @param {number} layer - The layer to search on.
+   * @returns {number[]} - The IDs of the nearest neighbors.
+   */
+  _searchLayer(vector, entryPoint, k, layer) {
+    const visited = new Set();
+    const candidates = [{ id: entryPoint, distance: this._euclideanDistance(vector, this.nodes.get(entryPoint).vector) }];
+    const results = [];
+
+    while (candidates.length > 0) {
+      const candidate = candidates.pop();
+      if (visited.has(candidate.id)) continue;
+      visited.add(candidate.id);
+
+      results.push(candidate);
+      if (results.length > k) {
+        results.sort((a, b) => a.distance - b.distance);
+        results.pop();
+      }
+
+      const neighbors = this.nodes.get(candidate.id).neighbors.get(layer) || new Set();
+      for (const neighborId of neighbors) {
+        if (!visited.has(neighborId)) {
+          candidates.push({
+            id: neighborId,
+            distance: this._euclideanDistance(vector, this.nodes.get(neighborId).vector)
+          });
+        }
+      }
+    }
+
+    return results.map(result => result.id);
+  }
+
+  /**
+   * Calculates the Euclidean distance between two vectors.
+   * @private
+   * @param {number[]} vectorA - The first vector.
+   * @param {number[]} vectorB - The second vector.
+   * @returns {number} - The Euclidean distance.
+   */
+  _euclideanDistance(vectorA, vectorB) {
+    return Math.sqrt(vectorA.reduce((sum, a, i) => sum + (a - vectorB[i]) ** 2, 0));
+  }
+}
+
+export const createVectorStore = () => new HNSW();

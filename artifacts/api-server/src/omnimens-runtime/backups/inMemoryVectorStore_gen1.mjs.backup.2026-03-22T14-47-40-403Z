@@ -1,0 +1,183 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-03-22T14:20:42.762Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+/**
+ * @module inMemoryVectorStore
+ * @description Provides fast semantic search and retrieval for embeddings in memory using a pure JavaScript implementation of HNSW.
+ */
+
+/**
+ * @typedef {Object} Node
+ * @property {number} id - Unique identifier for the node.
+ * @property {number[]} vector - The embedding vector of the node.
+ * @property {Map<number, Set<number>>} neighbors - A map of layers to sets of neighbor node IDs.
+ */
+
+/**
+ * @typedef {Object} SearchResult
+ * @property {number} id - The ID of the matched node.
+ * @property {number} distance - The computed distance to the query vector.
+ */
+
+/**
+ * Calculates the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} The Euclidean distance.
+ */
+function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error("Vectors must have the same dimensions.");
+  }
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + (val - vectorB[i]) ** 2, 0));
+}
+
+/**
+ * Class representing an in-memory HNSW-based vector store.
+ */
+class InMemoryVectorStore {
+  constructor(maxNeighbors = 16, efConstruction = 200) {
+    this.nodes = new Map(); // Stores all nodes by their ID.
+    this.entryPoint = null; // The entry point for the graph.
+    this.maxNeighbors = maxNeighbors; // Max neighbors per layer.
+    this.efConstruction = efConstruction; // Controls search breadth during insertion.
+  }
+
+  /**
+   * Adds a new vector to the store.
+   * @param {number} id - Unique identifier for the vector.
+   * @param {number[]} vector - The embedding vector.
+   */
+  add(id, vector) {
+    if (this.nodes.has(id)) {
+      throw new Error("Node with this ID already exists.");
+    }
+
+    const newNode = {
+      id,
+      vector,
+      neighbors: new Map()
+    };
+
+    if (this.entryPoint === null) {
+      this.entryPoint = id;
+      this.nodes.set(id, newNode);
+      return;
+    }
+
+    let currentNode = this.entryPoint;
+    const visited = new Set();
+    const candidates = [currentNode];
+
+    // Greedy search to find the closest node.
+    while (candidates.length > 0) {
+      let closest = null;
+      let closestDistance = Infinity;
+
+      for (const candidateId of candidates) {
+        if (visited.has(candidateId)) continue;
+        visited.add(candidateId);
+
+        const candidateNode = this.nodes.get(candidateId);
+        const distance = euclideanDistance(vector, candidateNode.vector);
+
+        if (distance < closestDistance) {
+          closest = candidateId;
+          closestDistance = distance;
+        }
+      }
+
+      if (closest !== null) {
+        currentNode = closest;
+        candidates.length = 0;
+        for (const neighborId of this.nodes.get(currentNode).neighbors.get(0) || []) {
+          candidates.push(neighborId);
+        }
+      } else {
+        break;
+      }
+    }
+
+    // Add the new node to the graph.
+    this.nodes.set(id, newNode);
+    this._connectNeighbors(id, currentNode);
+  }
+
+  /**
+   * Searches for the nearest neighbors to a query vector.
+   * @param {number[]} queryVector - The query vector.
+   * @param {number} k - Number of nearest neighbors to return.
+   * @returns {SearchResult[]} The k nearest neighbors.
+   */
+  search(queryVector, k = 1) {
+    if (this.entryPoint === null) {
+      return [];
+    }
+
+    const visited = new Set();
+    const candidates = [this.entryPoint];
+    const results = [];
+
+    while (candidates.length > 0) {
+      const currentId = candidates.pop();
+      if (visited.has(currentId)) continue;
+      visited.add(currentId);
+
+      const currentNode = this.nodes.get(currentId);
+      const distance = euclideanDistance(queryVector, currentNode.vector);
+
+      results.push({ id: currentId, distance });
+      results.sort((a, b) => a.distance - b.distance);
+
+      if (results.length > k) {
+        results.pop();
+      }
+
+      for (const neighborId of currentNode.neighbors.get(0) || []) {
+        if (!visited.has(neighborId)) {
+          candidates.push(neighborId);
+        }
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * Connects a new node to its nearest neighbors in the graph.
+   * @param {number} newNodeId - ID of the new node.
+   * @param {number} closestNodeId - ID of the closest node found.
+   * @private
+   */
+  _connectNeighbors(newNodeId, closestNodeId) {
+    const newNode = this.nodes.get(newNodeId);
+    const closestNode = this.nodes.get(closestNodeId);
+
+    if (!newNode.neighbors.has(0)) {
+      newNode.neighbors.set(0, new Set());
+    }
+    if (!closestNode.neighbors.has(0)) {
+      closestNode.neighbors.set(0, new Set());
+    }
+
+    newNode.neighbors.get(0).add(closestNodeId);
+    closestNode.neighbors.get(0).add(newNodeId);
+  }
+}
+
+export { InMemoryVectorStore, euclideanDistance };

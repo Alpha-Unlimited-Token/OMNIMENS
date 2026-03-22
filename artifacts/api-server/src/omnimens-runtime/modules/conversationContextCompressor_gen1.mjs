@@ -1,113 +1,102 @@
 /**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: conversationContextCompressor
+ * Written: 2026-03-22T13:46:45.953Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// conversationContextCompressor.js
+
+/**
  * @module conversationContextCompressor
- * @description Summarizes and compresses conversation history using hierarchical clustering and semantic similarity scoring.
+ * @description Summarizes and compresses earlier parts of a conversation using sentence embeddings and clustering
+ * to maintain context within a limited token window.
  */
 
 /**
- * Compresses conversation history by extracting key points based on semantic similarity and clustering.
- * @param {Array<string>} conversationHistory - Array of conversation strings in chronological order.
- * @param {number} maxSummaryLength - Maximum number of key points to retain in the summary.
- * @returns {Array<string>} Compressed summary of the conversation.
+ * Computes the cosine similarity between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} Cosine similarity between vectorA and vectorB.
  */
-export function compressConversationHistory(conversationHistory, maxSummaryLength) {
-  if (!Array.isArray(conversationHistory) || conversationHistory.length === 0) {
-    throw new Error("conversationHistory must be a non-empty array of strings.");
-  }
-
-  if (typeof maxSummaryLength !== "number" || maxSummaryLength <= 0) {
-    throw new Error("maxSummaryLength must be a positive number.");
-  }
-
-  // Step 1: Tokenize and vectorize conversation entries using a simple word frequency approach
-  const tokenize = (text) => text.toLowerCase().split(/\W+/).filter(Boolean);
-
-  const vectorize = (tokens) => {
-    const frequencyMap = {};
-    tokens.forEach((token) => {
-      frequencyMap[token] = (frequencyMap[token] || 0) + 1;
-    });
-    return frequencyMap;
-  };
-
-  const vectorizedEntries = conversationHistory.map((entry) => vectorize(tokenize(entry)));
-
-  // Step 2: Compute semantic similarity between entries using cosine similarity
-  const cosineSimilarity = (vecA, vecB) => {
-    const allKeys = new Set([...Object.keys(vecA), ...Object.keys(vecB)]);
-    let dotProduct = 0;
-    let magnitudeA = 0;
-    let magnitudeB = 0;
-
-    allKeys.forEach((key) => {
-      const valA = vecA[key] || 0;
-      const valB = vecB[key] || 0;
-      dotProduct += valA * valB;
-      magnitudeA += valA ** 2;
-      magnitudeB += valB ** 2;
-    });
-
-    magnitudeA = Math.sqrt(magnitudeA);
-    magnitudeB = Math.sqrt(magnitudeB);
-
-    return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
-  };
-
-  // Step 3: Hierarchical clustering based on similarity scores
-  const clusters = conversationHistory.map((entry, index) => ({
-    id: index,
-    text: entry,
-    members: [index],
-  }));
-
-  while (clusters.length > maxSummaryLength) {
-    let maxSimilarity = -1;
-    let mergeIndexA = -1;
-    let mergeIndexB = -1;
-
-    for (let i = 0; i < clusters.length; i++) {
-      for (let j = i + 1; j < clusters.length; j++) {
-        const similarity = cosineSimilarity(
-          vectorizedEntries[clusters[i].members[0]],
-          vectorizedEntries[clusters[j].members[0]]
-        );
-
-        if (similarity > maxSimilarity) {
-          maxSimilarity = similarity;
-          mergeIndexA = i;
-          mergeIndexB = j;
-        }
-      }
-    }
-
-    if (mergeIndexA !== -1 && mergeIndexB !== -1) {
-      const mergedCluster = {
-        id: clusters[mergeIndexA].id,
-        text: clusters[mergeIndexA].text + " " + clusters[mergeIndexB].text,
-        members: [...clusters[mergeIndexA].members, ...clusters[mergeIndexB].members],
-      };
-
-      clusters.splice(mergeIndexB, 1);
-      clusters.splice(mergeIndexA, 1, mergedCluster);
-    }
-  }
-
-  // Step 4: Extract key points from the final clusters
-  const summary = clusters.map((cluster) => {
-    const representativeIndex = cluster.members[0];
-    return conversationHistory[representativeIndex];
-  });
-
-  return summary;
+function cosineSimilarity(vectorA, vectorB) {
+  const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
+  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
 }
 
 /**
- * Example usage of the module.
- * Uncomment the following lines to test the function in Node.js.
+ * Generates a simple sentence embedding by hashing words into a fixed-length vector.
+ * @param {string} sentence - Input sentence.
+ * @returns {number[]} Fixed-length vector representing the sentence.
  */
-// const history = [
-//   "What is the latest in AI research?",
-//   "Tell me about AI safety techniques.",
-//   "What are the advancements in AI reasoning?",
-//   "Explain AI metacognition and self-reflection.",
-// ];
-// console.log(compressConversationHistory(history, 2));
+function generateEmbedding(sentence) {
+  const vectorSize = 128;
+  const vector = new Array(vectorSize).fill(0);
+  const words = sentence.split(/\s+/);
+  const hash = (str) => {
+    let hashValue = 0;
+    for (let i = 0; i < str.length; i++) {
+      hashValue = (hashValue * 31 + str.charCodeAt(i)) % vectorSize;
+    }
+    return hashValue;
+  };
+  words.forEach((word) => {
+    const index = hash(word);
+    vector[index] += 1;
+  });
+  return vector;
+}
+
+/**
+ * Clusters sentences based on similarity to reduce redundancy.
+ * @param {string[]} sentences - Array of sentences to cluster.
+ * @param {number} similarityThreshold - Threshold for cosine similarity to group sentences.
+ * @returns {string[]} Clustered and summarized sentences.
+ */
+function clusterSentences(sentences, similarityThreshold = 0.8) {
+  const embeddings = sentences.map(generateEmbedding);
+  const clusters = [];
+
+  sentences.forEach((sentence, i) => {
+    let addedToCluster = false;
+    for (const cluster of clusters) {
+      const clusterEmbedding = generateEmbedding(cluster[0]);
+      if (cosineSimilarity(embeddings[i], clusterEmbedding) >= similarityThreshold) {
+        cluster.push(sentence);
+        addedToCluster = true;
+        break;
+      }
+    }
+    if (!addedToCluster) {
+      clusters.push([sentence]);
+    }
+  });
+
+  return clusters.map((cluster) => cluster.join(" "));
+}
+
+/**
+ * Summarizes and compresses the conversation context.
+ * @param {string[]} conversation - Array of conversation messages.
+ * @param {number} maxLength - Maximum number of sentences in the compressed context.
+ * @returns {string[]} Compressed conversation context.
+ */
+function compressConversation(conversation, maxLength = 10) {
+  const clustered = clusterSentences(conversation);
+  return clustered.slice(0, maxLength);
+}
+
+export { cosineSimilarity, generateEmbedding, clusterSentences, compressConversation };

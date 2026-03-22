@@ -1,0 +1,73 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-22T13:44:24.672Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+function findMostFrequentWords(text, topN) {
+    if (typeof text !== 'string' || typeof topN !== 'number' || topN <= 0) {
+        throw new Error('Invalid input: text must be a string and topN must be a positive number.');
+    }
+
+    // Clean the text: remove punctuation and convert to lowercase
+    const cleanedText = text.replace(/[^\w\s]/g, '').toLowerCase();
+
+    // Split the text into words
+    const words = cleanedText.split(/\s+/);
+
+    // Count the frequency of each word
+    const wordCounts = {};
+    for (let word of words) {
+        if (word) {
+            wordCounts[word] = (wordCounts[word] || 0) + 1;
+        }
+    }
+
+    // Sort words by frequency in descending order
+    const sortedWords = Object.entries(wordCounts).sort((a, b) => b[1] - a[1]);
+
+    // Extract the top N words
+    return sortedWords.slice(0, topN).map(([word, count]) => ({ word, count }));
+}
+
+// Self-tests
+console.log('Test 1: Basic functionality');
+const text1 = 'This is a test. This test is only a test.';
+console.log(findMostFrequentWords(text1, 3)); // Expected output: [{ word: 'test', count: 3 }, { word: 'this', count: 2 }, { word: 'is', count: 2 }]
+
+console.log('Test 2: Edge case with empty string');
+const text2 = '';
+console.log(findMostFrequentWords(text2, 3)); // Expected output: []
+
+console.log('Test 3: Edge case with topN greater than unique words');
+const text3 = 'Hello world! Hello universe!';
+console.log(findMostFrequentWords(text3, 5)); // Expected output: [{ word: 'hello', count: 2 }, { word: 'world', count: 1 }, { word: 'universe', count: 1 }]
+
+console.log('Test 4: Edge case with special characters');
+const text4 = 'AI, AI, AI! Machine learning? AI.';
+console.log(findMostFrequentWords(text4, 2)); // Expected output: [{ word: 'ai', count: 4 }, { word: 'machine', count: 1 }]
+
+console.log('Test 5: Invalid inputs');
+try {
+    console.log(findMostFrequentWords(12345, 3)); // Should throw an error
+} catch (e) {
+    console.log(e.message); // Expected output: 'Invalid input: text must be a string and topN must be a positive number.'
+}
+
+try {
+    console.log(findMostFrequentWords('Valid text', -1)); // Should throw an error
+} catch (e) {
+    console.log(e.message); // Expected output: 'Invalid input: text must be a string and topN must be a positive number.'
+}

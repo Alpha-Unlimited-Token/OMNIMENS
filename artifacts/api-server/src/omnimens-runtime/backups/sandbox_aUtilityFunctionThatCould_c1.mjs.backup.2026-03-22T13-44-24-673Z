@@ -1,0 +1,74 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-22T12:16:57.792Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+function findPatternsInText(text, patterns) {
+    // Utility function to find occurrences of multiple patterns in a given text
+    const results = {};
+    
+    if (typeof text !== 'string' || !Array.isArray(patterns)) {
+        throw new Error("Invalid input: text must be a string and patterns must be an array of strings.");
+    }
+
+    patterns.forEach(pattern => {
+        if (typeof pattern !== 'string') {
+            throw new Error("Invalid pattern: each pattern must be a string.");
+        }
+        const regex = new RegExp(pattern, 'g');
+        const matches = text.match(regex);
+        results[pattern] = matches ? matches.length : 0;
+    });
+
+    return results;
+}
+
+// Test cases
+const textSample = "The quick brown fox jumps over the lazy dog. The fox is clever and quick.";
+const patternsToMatch = ["quick", "fox", "dog", "cat"];
+
+console.log("Test Case 1:");
+console.log(findPatternsInText(textSample, patternsToMatch));
+// Expected output: { quick: 2, fox: 2, dog: 1, cat: 0 }
+
+console.log("Test Case 2:");
+console.log(findPatternsInText("hello world, hello universe", ["hello", "world", "universe", "earth"]));
+// Expected output: { hello: 2, world: 1, universe: 1, earth: 0 }
+
+console.log("Test Case 3:");
+console.log(findPatternsInText("abc abc abc", ["abc", "xyz"]));
+// Expected output: { abc: 3, xyz: 0 }
+
+console.log("Edge Case 1: Empty text");
+console.log(findPatternsInText("", ["abc", "xyz"]));
+// Expected output: { abc: 0, xyz: 0 }
+
+console.log("Edge Case 2: Empty patterns");
+console.log(findPatternsInText("abc abc abc", []));
+// Expected output: {}
+
+console.log("Edge Case 3: Invalid inputs");
+try {
+    console.log(findPatternsInText(123, ["abc"]));
+} catch (e) {
+    console.log(e.message); // Expected output: "Invalid input: text must be a string and patterns must be an array of strings."
+}
+
+try {
+    console.log(findPatternsInText("abc", [123]));
+} catch (e) {
+    console.log(e.message); // Expected output: "Invalid pattern: each pattern must be a string."
+}

@@ -1,155 +1,118 @@
 /**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: vectorMemoryManager
+ * Written: 2026-03-22T10:37:06.547Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// vectorMemoryManager.js
+
+/**
  * @module vectorMemoryManager
- * @description A utility module for storing and retrieving high-dimensional vector embeddings using a k-d tree structure.
- * @version 1.0.0
+ * @description Provides functionality to store, retrieve, and search embeddings using an approximate nearest neighbor search algorithm.
  */
 
 /**
- * Represents a Node in the k-d tree.
- * @class
+ * @typedef {Object} Vector
+ * @property {string} id - Unique identifier for the vector.
+ * @property {number[]} embedding - Numerical array representing the vector.
  */
-class KDTreeNode {
-  /**
-   * @param {Array<number>} point - The vector embedding.
-   * @param {any} value - The associated value for the embedding.
-   * @param {number} axis - The axis on which the node is split.
-   */
-  constructor(point, value, axis) {
-    this.point = point;
-    this.value = value;
-    this.axis = axis;
-    this.left = null;
-    this.right = null;
+
+/**
+ * @typedef {Object} SearchResult
+ * @property {string} id - Unique identifier of the closest vector.
+ * @property {number} distance - Distance to the queried vector.
+ */
+
+/**
+ * Calculates the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} - Euclidean distance.
+ */
+function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error("Vectors must have the same dimensions.");
   }
+  return Math.sqrt(vectorA.reduce((sum, val, index) => sum + Math.pow(val - vectorB[index], 2), 0));
 }
 
 /**
- * A k-d tree implementation for efficient nearest-neighbor search.
- * @class
- */
-class KDTree {
-  /**
-   * @constructor
-   * @param {Array<{point: Array<number>, value: any}>} points - An array of points with associated values.
-   */
-  constructor(points = []) {
-    this.root = this._buildTree(points, 0);
-  }
-
-  /**
-   * Recursively builds the k-d tree.
-   * @private
-   * @param {Array<{point: Array<number>, value: any}>} points - The points to build the tree from.
-   * @param {number} depth - The current depth in the tree.
-   * @returns {KDTreeNode|null} The root node of the subtree.
-   */
-  _buildTree(points, depth) {
-    if (points.length === 0) return null;
-
-    const axis = depth % points[0].point.length;
-    points.sort((a, b) => a.point[axis] - b.point[axis]);
-    const median = Math.floor(points.length / 2);
-
-    const node = new KDTreeNode(points[median].point, points[median].value, axis);
-    node.left = this._buildTree(points.slice(0, median), depth + 1);
-    node.right = this._buildTree(points.slice(median + 1), depth + 1);
-
-    return node;
-  }
-
-  /**
-   * Inserts a new point into the k-d tree.
-   * @param {Array<number>} point - The vector embedding to insert.
-   * @param {any} value - The value associated with the embedding.
-   */
-  insert(point, value) {
-    const _insert = (node, point, value, depth) => {
-      if (!node) return new KDTreeNode(point, value, depth % point.length);
-
-      const axis = node.axis;
-      if (point[axis] < node.point[axis]) {
-        node.left = _insert(node.left, point, value, depth + 1);
-      } else {
-        node.right = _insert(node.right, point, value, depth + 1);
-      }
-
-      return node;
-    };
-
-    this.root = _insert(this.root, point, value, 0);
-  }
-
-  /**
-   * Finds the nearest neighbor to a given point.
-   * @param {Array<number>} target - The target vector embedding.
-   * @returns {{point: Array<number>, value: any, distance: number}|null} The nearest neighbor.
-   */
-  nearestNeighbor(target) {
-    let best = null;
-
-    const _search = (node, depth) => {
-      if (!node) return;
-
-      const axis = depth % target.length;
-      const distance = this._euclideanDistance(target, node.point);
-
-      if (!best || distance < best.distance) {
-        best = { point: node.point, value: node.value, distance };
-      }
-
-      const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
-      const oppositeBranch = target[axis] < node.point[axis] ? node.right : node.left;
-
-      _search(nextBranch, depth + 1);
-
-      if (Math.abs(target[axis] - node.point[axis]) < best.distance) {
-        _search(oppositeBranch, depth + 1);
-      }
-    };
-
-    _search(this.root, 0);
-    return best;
-  }
-
-  /**
-   * Calculates the Euclidean distance between two points.
-   * @private
-   * @param {Array<number>} a - The first point.
-   * @param {Array<number>} b - The second point.
-   * @returns {number} The Euclidean distance.
-   */
-  _euclideanDistance(a, b) {
-    return Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0));
-  }
-}
-
-/**
- * Stores and retrieves vector embeddings using a k-d tree.
- * @class
+ * Class representing a memory manager for storing and searching vectors.
  */
 class VectorMemoryManager {
   constructor() {
-    this.tree = new KDTree();
+    /** @type {Vector[]} */
+    this.vectors = [];
   }
 
   /**
-   * Adds a vector embedding to the memory.
-   * @param {Array<number>} vector - The vector embedding.
-   * @param {any} value - The associated value.
+   * Adds a vector to the memory.
+   * @param {Vector} vector - The vector to add.
    */
-  add(vector, value) {
-    this.tree.insert(vector, value);
+  addVector(vector) {
+    if (!Array.isArray(vector.embedding) || typeof vector.id !== "string") {
+      throw new Error("Invalid vector format. Must include 'id' (string) and 'embedding' (array).");
+    }
+    this.vectors.push(vector);
   }
 
   /**
-   * Retrieves the closest vector embedding to the target.
-   * @param {Array<number>} target - The target vector embedding.
-   * @returns {{vector: Array<number>, value: any, distance: number}|null} The closest embedding and its value.
+   * Searches for the nearest vector to the given embedding.
+   * @param {number[]} queryEmbedding - The embedding to search for.
+   * @returns {SearchResult} - The nearest vector and its distance.
    */
-  retrieve(target) {
-    const result = this.tree.nearestNeighbor(target);
-    return result ? { vector: result.point, value: result.value, distance: result.distance } : null;
+  searchNearest(queryEmbedding) {
+    if (!Array.isArray(queryEmbedding)) {
+      throw new Error("Query embedding must be an array.");
+    }
+
+    let nearestVector = null;
+    let nearestDistance = Infinity;
+
+    for (const vector of this.vectors) {
+      const distance = euclideanDistance(queryEmbedding, vector.embedding);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestVector = vector;
+      }
+    }
+
+    if (!nearestVector) {
+      throw new Error("No vectors in memory to search.");
+    }
+
+    return {
+      id: nearestVector.id,
+      distance: nearestDistance
+    };
+  }
+
+  /**
+   * Clears all stored vectors.
+   */
+  clearMemory() {
+    this.vectors = [];
   }
 }
 
-export { VectorMemoryManager };
+/**
+ * Factory function to create a new VectorMemoryManager instance.
+ * @returns {VectorMemoryManager} - A new instance of VectorMemoryManager.
+ */
+function createVectorMemoryManager() {
+  return new VectorMemoryManager();
+}
+
+export { createVectorMemoryManager, euclideanDistance };

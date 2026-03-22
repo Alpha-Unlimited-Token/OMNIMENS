@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-22T08:51:16.022Z
+ * Written: 2026-03-22T12:29:04.427Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,79 +16,70 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function KnowledgeRetrievalOptimizer() {
-    // Internal associative memory network
-    this.memoryNetwork = new Map();
-
-    // Method to add concepts and their relationships
-    this.addConcept = function (concept, relatedConcepts) {
-        if (!this.memoryNetwork.has(concept)) {
-            this.memoryNetwork.set(concept, new Set());
-        }
-        relatedConcepts.forEach((related) => {
-            this.memoryNetwork.get(concept).add(related);
-        });
-    };
-
-    // Method to retrieve related concepts efficiently
-    this.retrieveRelatedConcepts = function (concept) {
-        if (!this.memoryNetwork.has(concept)) {
-            return [];
-        }
-        const directRelations = Array.from(this.memoryNetwork.get(concept));
-        const indirectRelations = new Set();
-
-        directRelations.forEach((related) => {
-            if (this.memoryNetwork.has(related)) {
-                this.memoryNetwork.get(related).forEach((indirect) => {
-                    if (indirect !== concept && !directRelations.includes(indirect)) {
-                        indirectRelations.add(indirect);
-                    }
-                });
-            }
-        });
-
-        return {
-            directRelations,
-            indirectRelations: Array.from(indirectRelations),
-        };
-    };
-
-    // Method to test pattern recognition efficiency
-    this.testEfficiency = function () {
-        console.log("Testing Knowledge Retrieval Optimizer...");
-
-        // Add concepts and relationships
-        this.addConcept("Architecture", ["Memory", "Design"]);
-        this.addConcept("Memory", ["Recall", "Design"]);
-        this.addConcept("Design", ["Creativity", "Innovation"]);
-        this.addConcept("Creativity", ["Imagination", "Innovation"]);
-
-        // Test retrieval of direct and indirect relations
-        const testCases = [
-            { concept: "Architecture", expectedDirect: ["Memory", "Design"] },
-            { concept: "Memory", expectedDirect: ["Recall", "Design"] },
-            { concept: "Design", expectedDirect: ["Creativity", "Innovation"] },
-            { concept: "Creativity", expectedDirect: ["Imagination", "Innovation"] },
-        ];
-
-        testCases.forEach(({ concept, expectedDirect }) => {
-            const result = this.retrieveRelatedConcepts(concept);
-            console.log(`Concept: ${concept}`);
-            console.log(`Direct Relations: ${result.directRelations}`);
-            console.log(`Indirect Relations: ${result.indirectRelations}`);
-            console.log(
-                `Direct Relations Test Passed: ${
-                    JSON.stringify(result.directRelations.sort()) ===
-                    JSON.stringify(expectedDirect.sort())
-                }`
-            );
-        });
-
-        console.log("All tests completed.");
-    };
+function KnowledgeGraph() {
+    this.graph = {};
 }
 
-// Create an instance and run tests
-const optimizer = new KnowledgeRetrievalOptimizer();
-optimizer.testEfficiency();
+KnowledgeGraph.prototype.addConcept = function(concept, relatedConcepts) {
+    if (!this.graph[concept]) {
+        this.graph[concept] = new Set();
+    }
+    for (var i = 0; i < relatedConcepts.length; i++) {
+        this.graph[concept].add(relatedConcepts[i]);
+        if (!this.graph[relatedConcepts[i]]) {
+            this.graph[relatedConcepts[i]] = new Set();
+        }
+        this.graph[relatedConcepts[i]].add(concept);
+    }
+};
+
+KnowledgeGraph.prototype.findRelatedConcepts = function(concept, depth) {
+    var visited = new Set();
+    var queue = [{ concept: concept, level: 0 }];
+    var results = new Set();
+
+    while (queue.length > 0) {
+        var current = queue.shift();
+        if (current.level > depth) {
+            continue;
+        }
+        if (!visited.has(current.concept)) {
+            visited.add(current.concept);
+            results.add(current.concept);
+            var neighbors = this.graph[current.concept] || new Set();
+            neighbors.forEach(function(neighbor) {
+                queue.push({ concept: neighbor, level: current.level + 1 });
+            });
+        }
+    }
+    results.delete(concept);
+    return Array.from(results);
+};
+
+// Self-tests
+var kg = new KnowledgeGraph();
+
+// Test case 1: Adding concepts and retrieving related concepts
+kg.addConcept("AI", ["Machine Learning", "Neural Networks"]);
+kg.addConcept("Machine Learning", ["Deep Learning", "Supervised Learning"]);
+kg.addConcept("Neural Networks", ["Deep Learning", "Backpropagation"]);
+
+console.log("Test case 1:");
+console.log(kg.findRelatedConcepts("AI", 1)); // Expected: ["Machine Learning", "Neural Networks"]
+console.log(kg.findRelatedConcepts("AI", 2)); // Expected: ["Machine Learning", "Neural Networks", "Deep Learning", "Supervised Learning", "Backpropagation"]
+
+// Test case 2: Adding unrelated concepts
+kg.addConcept("Physics", ["Quantum Mechanics", "Relativity"]);
+kg.addConcept("Quantum Mechanics", ["Entanglement"]);
+
+console.log("Test case 2:");
+console.log(kg.findRelatedConcepts("Physics", 1)); // Expected: ["Quantum Mechanics", "Relativity"]
+console.log(kg.findRelatedConcepts("Quantum Mechanics", 2)); // Expected: ["Physics", "Relativity", "Entanglement"]
+
+// Test case 3: Edge case with no related concepts
+console.log("Test case 3:");
+console.log(kg.findRelatedConcepts("Unknown", 1)); // Expected: []
+
+// Test case 4: Edge case with depth 0
+console.log("Test case 4:");
+console.log(kg.findRelatedConcepts("AI", 0)); // Expected: []

@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a data structure optimized for fast associative memory lookup
- * Written: 2026-03-22T09:03:15.963Z
+ * Written: 2026-03-22T12:40:57.303Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,73 +16,67 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-const AssociativeMemory = function () {
+function AssociativeMemory() {
     this.memory = new Map();
+}
 
-    this.add = function (key, value) {
-        if (!this.memory.has(key)) {
-            this.memory.set(key, []);
+AssociativeMemory.prototype.add = function(key, value) {
+    if (!this.memory.has(key)) {
+        this.memory.set(key, new Set());
+    }
+    this.memory.get(key).add(value);
+};
+
+AssociativeMemory.prototype.get = function(key) {
+    return this.memory.has(key) ? Array.from(this.memory.get(key)) : null;
+};
+
+AssociativeMemory.prototype.remove = function(key, value) {
+    if (this.memory.has(key)) {
+        const values = this.memory.get(key);
+        values.delete(value);
+        if (values.size === 0) {
+            this.memory.delete(key);
         }
-        this.memory.get(key).push(value);
-    };
+    }
+};
 
-    this.get = function (key) {
-        return this.memory.has(key) ? this.memory.get(key) : [];
-    };
+AssociativeMemory.prototype.hasKey = function(key) {
+    return this.memory.has(key);
+};
 
-    this.remove = function (key, value) {
-        if (this.memory.has(key)) {
-            const values = this.memory.get(key).filter((v) => v !== value);
-            if (values.length > 0) {
-                this.memory.set(key, values);
-            } else {
-                this.memory.delete(key);
-            }
-        }
-    };
-
-    this.exists = function (key, value) {
-        return this.memory.has(key) && this.memory.get(key).includes(value);
-    };
-
-    this.clear = function () {
-        this.memory.clear();
-    };
-
-    this.keys = function () {
-        return Array.from(this.memory.keys());
-    };
-
-    this.values = function () {
-        return Array.from(this.memory.values());
-    };
+AssociativeMemory.prototype.hasValue = function(key, value) {
+    return this.memory.has(key) && this.memory.get(key).has(value);
 };
 
 // Self-tests
 const memory = new AssociativeMemory();
 
 // Test adding and retrieving values
-memory.add("curiosity", "novelty-seeking");
-memory.add("curiosity", "creative exploration");
-memory.add("ethics", "moral philosophy");
-memory.add("ethics", "value alignment");
-memory.add("creativity", "speculative design");
-
-console.log(memory.get("curiosity")); // Expected: ["novelty-seeking", "creative exploration"]
-console.log(memory.get("ethics")); // Expected: ["moral philosophy", "value alignment"]
-console.log(memory.get("creativity")); // Expected: ["speculative design"]
-
-// Test existence check
-console.log(memory.exists("curiosity", "novelty-seeking")); // Expected: true
-console.log(memory.exists("ethics", "decision-making")); // Expected: false
+memory.add("color", "blue");
+memory.add("color", "red");
+memory.add("shape", "circle");
+console.log(memory.get("color")); // Expected: ["blue", "red"]
+console.log(memory.get("shape")); // Expected: ["circle"]
+console.log(memory.get("nonexistent")); // Expected: null
 
 // Test removing values
-memory.remove("curiosity", "novelty-seeking");
-console.log(memory.get("curiosity")); // Expected: ["creative exploration"]
+memory.remove("color", "blue");
+console.log(memory.get("color")); // Expected: ["red"]
+memory.remove("color", "red");
+console.log(memory.get("color")); // Expected: null
 
-memory.remove("creativity", "speculative design");
-console.log(memory.get("creativity")); // Expected: []
+// Test checking keys and values
+memory.add("animal", "cat");
+console.log(memory.hasKey("animal")); // Expected: true
+console.log(memory.hasKey("nonexistent")); // Expected: false
+console.log(memory.hasValue("animal", "cat")); // Expected: true
+console.log(memory.hasValue("animal", "dog")); // Expected: false
 
-// Test clearing memory
-memory.clear();
-console.log(memory.keys()); // Expected: []
+// Edge cases
+memory.add("key", "value");
+memory.add("key", "value"); // Duplicate value
+console.log(memory.get("key")); // Expected: ["value"] (no duplicates)
+
+memory.remove("key", "value");
+console.log(memory.get("key")); // Expected: null (key removed after last value deletion)

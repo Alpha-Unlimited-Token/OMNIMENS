@@ -1,0 +1,134 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-03-22T11:19:25.999Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+/**
+ * @module inMemoryVectorStore
+ * @description Provides an in-memory vector storage and similarity search utility using Approximate Nearest Neighbor (ANN) search.
+ * This module uses hashing and tree-based methods to enable fast retrieval of embeddings during runtime.
+ */
+
+/**
+ * Represents an in-memory vector store for embeddings.
+ * Provides methods to add vectors and perform similarity search.
+ */
+export class InMemoryVectorStore {
+  /**
+   * @constructor
+   * Initializes the vector store with an empty dataset and a default hash size.
+   * @param {number} hashSize - The size of the hash buckets for ANN (default: 32).
+   */
+  constructor(hashSize = 32) {
+    if (hashSize <= 0 || !Number.isInteger(hashSize)) {
+      throw new Error("hashSize must be a positive integer.");
+    }
+    this.hashSize = hashSize;
+    this.vectors = new Map(); // Stores vectors with unique IDs
+    this.hashBuckets = new Map(); // Hash buckets for ANN
+  }
+
+  /**
+   * Adds a vector to the store.
+   * @param {string} id - A unique identifier for the vector.
+   * @param {number[]} vector - The vector to be stored.
+   * @throws {Error} If the id is not unique or the vector is invalid.
+   */
+  addVector(id, vector) {
+    if (this.vectors.has(id)) {
+      throw new Error(`Vector with id '${id}' already exists.`);
+    }
+    if (!Array.isArray(vector) || vector.some((v) => typeof v !== "number")) {
+      throw new Error("Vector must be an array of numbers.");
+    }
+
+    this.vectors.set(id, vector);
+
+    // Compute hash and add to bucket
+    const hash = this._computeHash(vector);
+    if (!this.hashBuckets.has(hash)) {
+      this.hashBuckets.set(hash, new Set());
+    }
+    this.hashBuckets.get(hash).add(id);
+  }
+
+  /**
+   * Searches for the most similar vectors to the query vector.
+   * @param {number[]} queryVector - The vector to search for.
+   * @param {number} k - The number of nearest neighbors to retrieve.
+   * @returns {Array<{id: string, distance: number}>} The k nearest neighbors with their distances.
+   * @throws {Error} If the query vector is invalid or k is not a positive integer.
+   */
+  search(queryVector, k) {
+    if (!Array.isArray(queryVector) || queryVector.some((v) => typeof v !== "number")) {
+      throw new Error("Query vector must be an array of numbers.");
+    }
+    if (k <= 0 || !Number.isInteger(k)) {
+      throw new Error("k must be a positive integer.");
+    }
+
+    const hash = this._computeHash(queryVector);
+    const candidateIds = this.hashBuckets.get(hash) || new Set();
+
+    // Compute distances to candidates
+    const distances = [];
+    for (const id of candidateIds) {
+      const storedVector = this.vectors.get(id);
+      const distance = this._euclideanDistance(queryVector, storedVector);
+      distances.push({ id, distance });
+    }
+
+    // Sort by distance and return top-k
+    distances.sort((a, b) => a.distance - b.distance);
+    return distances.slice(0, k);
+  }
+
+  /**
+   * Computes a hash for a vector using simple binary quantization.
+   * @private
+   * @param {number[]} vector - The vector to hash.
+   * @returns {string} The computed hash as a string.
+   */
+  _computeHash(vector) {
+    return vector
+      .map((v) => (v >= 0 ? 1 : 0))
+      .slice(0, this.hashSize)
+      .join("");
+  }
+
+  /**
+   * Computes the Euclidean distance between two vectors.
+   * @private
+   * @param {number[]} vecA - The first vector.
+   * @param {number[]} vecB - The second vector.
+   * @returns {number} The Euclidean distance between the vectors.
+   */
+  _euclideanDistance(vecA, vecB) {
+    if (vecA.length !== vecB.length) {
+      throw new Error("Vectors must have the same dimensions.");
+    }
+    return Math.sqrt(vecA.reduce((sum, a, i) => sum + (a - vecB[i]) ** 2, 0));
+  }
+}
+
+/**
+ * Example usage:
+ * const store = new InMemoryVectorStore();
+ * store.addVector("1", [0.1, 0.2, 0.3]);
+ * store.addVector("2", [0.4, 0.5, 0.6]);
+ * const results = store.search([0.1, 0.2, 0.3], 1);
+ * console.log(results);
+ */
