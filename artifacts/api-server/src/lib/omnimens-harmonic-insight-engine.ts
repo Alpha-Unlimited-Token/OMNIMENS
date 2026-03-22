@@ -405,6 +405,11 @@ export type HarmonicKnowledgeSignature = {
   temporalNarrative: { arcType: string; phases: Array<{ segment: number; timeStart: number; dominantFreq: number; energy: number; character: string }>; transitionDensity: number };
   cepstralFingerprint: { coefficients: number[]; deltas: number[]; timbreClass: string };
   tonnetPosition: number[];
+  spectralColorMap: Array<{ freq: number; magnitude: number; hue: number; saturation: number; value: number; hex: string }>;
+  bandColors: Record<string, { hex: string; energy: number }>;
+  overtoneColors: Array<{ harmonic: number; freq: number; hex: string; strength: number }>;
+  temporalColors: Array<{ segment: number; timeStart: number; hex: string; dominantFreq: number; energy: number }>;
+  dominantColor: string;
   knowledgeGlyphs: string[];
   decodedMessage: string;
   confidenceScore: number;
@@ -703,6 +708,36 @@ export function hieDecodeHarmonicKnowledge(
     (phases.length > 3 ? 0.1 : phases.length > 1 ? 0.05 : 0)
   ));
 
+  const spectralColorMap = (harmonicDecodeData.spectral_color_map || []).map((c: any) => ({
+    freq: c.freq, magnitude: c.magnitude, hue: c.hue, saturation: c.saturation, value: c.value, hex: c.hex,
+  }));
+  const bandColors: Record<string, { hex: string; energy: number }> = {};
+  if (harmonicDecodeData.band_colors) {
+    for (const [band, data] of Object.entries(harmonicDecodeData.band_colors as Record<string, any>)) {
+      bandColors[band] = { hex: data.hex, energy: data.energy };
+    }
+  }
+  const overtoneColors = (harmonicDecodeData.overtone_colors || []).map((c: any) => ({
+    harmonic: c.harmonic, freq: c.freq, hex: c.hex, strength: c.strength,
+  }));
+  const temporalColors = (harmonicDecodeData.temporal_colors || []).map((c: any) => ({
+    segment: c.segment, timeStart: c.time_start, hex: c.hex, dominantFreq: c.dominant_freq, energy: c.energy,
+  }));
+  const dominantColor = spectralColorMap.length > 0 ? spectralColorMap[0].hex : "#4d4d4d";
+
+  if (spectralColorMap.length > 0) {
+    glyphs.push(`🎨 dominant color: ${dominantColor} (${spectralColorMap[0].freq.toFixed(0)}Hz)`);
+    const colorRange = spectralColorMap.length > 1
+      ? `${spectralColorMap[spectralColorMap.length - 1].hex} → ${spectralColorMap[0].hex}`
+      : dominantColor;
+    glyphs.push(`🌈 spectral palette: ${colorRange} across ${spectralColorMap.length} frequency peaks`);
+  }
+  if (Object.keys(bandColors).length > 0) {
+    const bandColorStr = Object.entries(bandColors).map(([b, d]) => `${b}:${d.hex}`).join(" ");
+    messageParts.push(`SPECTRAL COLOR MAP: ${bandColorStr}`);
+    messageParts.push(`DOMINANT COLOR: ${dominantColor} — the primary spectral identity of this audio in color space.`);
+  }
+
   return {
     timestamp: Date.now(),
     fundamentalIdentity: { frequency: fund, semanticClass: hieFreqToSemantic(fund), harmonicPurity },
@@ -714,6 +749,11 @@ export function hieDecodeHarmonicKnowledge(
     temporalNarrative,
     cepstralFingerprint,
     tonnetPosition: tonnetz,
+    spectralColorMap,
+    bandColors,
+    overtoneColors,
+    temporalColors,
+    dominantColor,
     knowledgeGlyphs: glyphs,
     decodedMessage: messageParts.join("\n"),
     confidenceScore,

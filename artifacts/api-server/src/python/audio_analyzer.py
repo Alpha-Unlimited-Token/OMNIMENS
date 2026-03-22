@@ -167,6 +167,18 @@ def process(spec: dict) -> dict:
             freqs_full = librosa.fft_frequencies(sr=sr, n_fft=n_fft)
             mag_full = np.mean(S_full, axis=1)
 
+            total_energy_hd = float(np.sum(mag_full)) + 1e-10
+            def band_energy_hd(lo, hi):
+                mask = (freqs_full >= lo) & (freqs_full < hi)
+                return float(np.sum(mag_full[mask])) / total_energy_hd
+            frequency_bands = {
+                "sub": round(band_energy_hd(0, 60), 4),
+                "low": round(band_energy_hd(60, 250), 4),
+                "mid": round(band_energy_hd(250, 4000), 4),
+                "high": round(band_energy_hd(4000, 12000), 4),
+                "ultra": round(band_energy_hd(12000, sr / 2), 4),
+            }
+
             resolutions = [512, 1024, 2048, 4096]
             multi_res = []
             for res in resolutions:
@@ -300,6 +312,63 @@ def process(spec: dict) -> dict:
             tonnetz_feat = librosa.feature.tonnetz(y=librosa.effects.harmonic(y), sr=sr)
             tonnetz_means = [round(float(x), 4) for x in np.mean(tonnetz_feat, axis=1)]
 
+            from matplotlib.colors import hsv_to_rgb as _hsv_to_rgb
+            nyquist = sr / 2.0
+            spectral_color_map = []
+            for af in atomic_freqs[:32]:
+                f = af["freq"]
+                m = af["magnitude"]
+                hue = min(f / nyquist, 1.0) * 0.83
+                sat = min(m * 1.2, 1.0)
+                val = max(0.3, min(m * 1.5 + 0.2, 1.0))
+                rgb = _hsv_to_rgb([hue, sat, val])
+                hex_color = "#{:02x}{:02x}{:02x}".format(int(rgb[0]*255), int(rgb[1]*255), int(rgb[2]*255))
+                spectral_color_map.append({
+                    "freq": af["freq"], "magnitude": m,
+                    "hue": round(hue, 4), "saturation": round(sat, 4), "value": round(val, 4),
+                    "rgb": [round(float(rgb[0]), 4), round(float(rgb[1]), 4), round(float(rgb[2]), 4)],
+                    "hex": hex_color,
+                })
+            spectral_color_map.sort(key=lambda x: x["freq"])
+
+            band_colors = {}
+            band_centers = {"sub": 30, "low": 155, "mid": 2125, "high": 8000, "ultra": 16000}
+            for bname, bcenter in band_centers.items():
+                bh = min(bcenter / nyquist, 1.0) * 0.83
+                be = frequency_bands.get(bname, 0)
+                bs = min(be * 2.0, 1.0)
+                bv = max(0.3, min(be * 2.0 + 0.3, 1.0))
+                brgb = _hsv_to_rgb([bh, bs, bv])
+                band_colors[bname] = {
+                    "hex": "#{:02x}{:02x}{:02x}".format(int(brgb[0]*255), int(brgb[1]*255), int(brgb[2]*255)),
+                    "rgb": [round(float(brgb[0]), 4), round(float(brgb[1]), 4), round(float(brgb[2]), 4)],
+                    "energy": round(be, 4),
+                }
+
+            overtone_colors = []
+            for ot in overtone_map[:16]:
+                oh = min(ot["actual_hz"] / nyquist, 1.0) * 0.83
+                os_val = min(ot["strength"] * 1.5, 1.0)
+                ov = max(0.25, min(ot["strength"] * 2.0 + 0.15, 1.0))
+                orgb = _hsv_to_rgb([oh, os_val, ov])
+                overtone_colors.append({
+                    "harmonic": ot["harmonic"], "freq": ot["actual_hz"],
+                    "hex": "#{:02x}{:02x}{:02x}".format(int(orgb[0]*255), int(orgb[1]*255), int(orgb[2]*255)),
+                    "strength": ot["strength"],
+                })
+
+            temporal_colors = []
+            for seg in temporal_evolution:
+                th = min(seg["dominant_freq"] / nyquist, 1.0) * 0.83 if seg["dominant_freq"] > 0 else 0
+                ts = min(seg["rms"] * 8, 1.0)
+                tv = max(0.15, min(seg["rms"] * 5 + 0.1, 1.0))
+                trgb = _hsv_to_rgb([th, ts, tv])
+                temporal_colors.append({
+                    "segment": seg["segment"], "time_start": seg["time_start"],
+                    "hex": "#{:02x}{:02x}{:02x}".format(int(trgb[0]*255), int(trgb[1]*255), int(trgb[2]*255)),
+                    "dominant_freq": seg["dominant_freq"], "energy": seg["rms"],
+                })
+
             result = {
                 "success": True, "action": "harmonic_decode",
                 "duration_seconds": round(duration, 2), "sample_rate": int(sr),
@@ -319,6 +388,10 @@ def process(spec: dict) -> dict:
                 "spectral_flatness_mean": round(float(np.mean(flatness)), 6),
                 "tonnetz": tonnetz_means,
                 "harmonic_percussive_ratio": round(float(np.mean(np.abs(harmonic)) / (np.mean(np.abs(percussive)) + 1e-8)), 4),
+                "spectral_color_map": spectral_color_map,
+                "band_colors": band_colors,
+                "overtone_colors": overtone_colors,
+                "temporal_colors": temporal_colors,
             }
             return result
 

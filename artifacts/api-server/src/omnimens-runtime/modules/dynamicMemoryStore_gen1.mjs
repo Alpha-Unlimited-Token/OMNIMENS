@@ -1,126 +1,123 @@
-// dynamicMemoryStore.js
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: dynamicMemoryStore
+ * Written: 2026-03-22T20:08:57.847Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Complete ES module code here, starting with /** JSDoc */ and exports
 
 /**
  * @module dynamicMemoryStore
- * @description Enables in-memory vector storage and fast retrieval using HNSW (Hierarchical Navigable Small World) graph for approximate nearest neighbor search.
+ * @description An in-memory vector store for fast retrieval using approximate nearest neighbor search.
+ * This module uses Redis-like structures and pure algorithms for managing and querying vector embeddings.
  */
 
 /**
- * Represents a node in the HNSW graph.
- * @class
+ * Generates a unique identifier for stored vectors.
+ * @returns {string} A unique ID string.
  */
-class Node {
-  constructor(id, vector) {
-    /**
-     * @type {string} Unique identifier for the node.
-     */
-    this.id = id;
-
-    /**
-     * @type {number[]} Vector data associated with this node.
-     */
-    this.vector = vector;
-
-    /**
-     * @type {Set<Node>} Connections to other nodes.
-     */
-    this.connections = new Set();
-  }
-
-  /**
-   * Calculates the Euclidean distance between this node's vector and another vector.
-   * @param {number[]} otherVector - The vector to compare against.
-   * @returns {number} The Euclidean distance.
-   */
-  distanceTo(otherVector) {
-    if (this.vector.length !== otherVector.length) {
-      throw new Error("Vector dimensions must match.");
-    }
-    return Math.sqrt(this.vector.reduce((sum, val, i) => sum + Math.pow(val - otherVector[i], 2), 0));
-  }
+function generateUniqueId() {
+  return crypto.randomUUID();
 }
 
 /**
- * Represents the HNSW graph for approximate nearest neighbor search.
- * @class
+ * Calculates the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} The Euclidean distance between the vectors.
  */
-class HNSWGraph {
+function calculateDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error("Vectors must have the same dimensions.");
+  }
+  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
+}
+
+/**
+ * Class representing the dynamic memory store.
+ */
+class DynamicMemoryStore {
   constructor() {
     /**
-     * @type {Map<string, Node>} Stores all nodes in the graph by their unique IDs.
+     * @type {Map<string, { vector: number[], metadata: any }>}
+     * Stores vectors with associated metadata.
      */
-    this.nodes = new Map();
+    this.store = new Map();
   }
 
   /**
-   * Adds a new node to the graph.
-   * @param {string} id - Unique identifier for the node.
-   * @param {number[]} vector - Vector data associated with the node.
+   * Adds a vector to the store.
+   * @param {number[]} vector - The vector to store.
+   * @param {any} metadata - Additional metadata associated with the vector.
+   * @returns {string} The unique ID of the stored vector.
    */
-  addNode(id, vector) {
-    if (this.nodes.has(id)) {
-      throw new Error(`Node with id ${id} already exists.`);
-    }
-    const newNode = new Node(id, vector);
-    this.nodes.set(id, newNode);
-
-    // Connect to existing nodes based on proximity (simplified for demonstration).
-    for (const existingNode of this.nodes.values()) {
-      if (existingNode !== newNode) {
-        const distance = newNode.distanceTo(existingNode.vector);
-        if (distance < 1.0) { // Example threshold for connection.
-          newNode.connections.add(existingNode);
-          existingNode.connections.add(newNode);
-        }
-      }
-    }
+  addVector(vector, metadata = null) {
+    const id = generateUniqueId();
+    this.store.set(id, { vector, metadata });
+    return id;
   }
 
   /**
-   * Searches for the nearest neighbors to a given vector.
-   * @param {number[]} queryVector - The vector to search for.
-   * @param {number} k - Number of nearest neighbors to retrieve.
-   * @returns {Array<{id: string, distance: number}>} The k nearest neighbors.
+   * Performs an approximate nearest neighbor search.
+   * @param {number[]} queryVector - The query vector.
+   * @param {number} k - The number of nearest neighbors to retrieve.
+   * @returns {Array<{ id: string, distance: number, metadata: any }>} The k nearest neighbors.
    */
-  search(queryVector, k) {
+  search(queryVector, k = 1) {
     if (k <= 0) {
-      throw new Error("k must be greater than 0.");
+      throw new Error("k must be a positive integer.");
     }
+
     const distances = [];
 
-    for (const node of this.nodes.values()) {
-      const distance = node.distanceTo(queryVector);
-      distances.push({ id: node.id, distance });
+    for (const [id, { vector, metadata }] of this.store.entries()) {
+      const distance = calculateDistance(queryVector, vector);
+      distances.push({ id, distance, metadata });
     }
 
-    distances.sort((a, b) => a.distance - b.distance);
-    return distances.slice(0, k);
+    return distances
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, k);
+  }
+
+  /**
+   * Removes a vector from the store by its ID.
+   * @param {string} id - The unique ID of the vector to remove.
+   * @returns {boolean} True if the vector was removed, false otherwise.
+   */
+  removeVector(id) {
+    return this.store.delete(id);
+  }
+
+  /**
+   * Clears all vectors from the store.
+   */
+  clearStore() {
+    this.store.clear();
+  }
+
+  /**
+   * Returns the total number of vectors in the store.
+   * @returns {number} The number of vectors in the store.
+   */
+  getSize() {
+    return this.store.size;
   }
 }
 
-/**
- * Creates a new HNSW graph instance.
- * @returns {HNSWGraph} A new instance of the HNSW graph.
- */
-function createGraph() {
-  return new HNSWGraph();
-}
-
-/**
- * Example usage function to demonstrate the module's functionality.
- */
-function exampleUsage() {
-  const graph = createGraph();
-
-  graph.addNode("node1", [1.0, 2.0, 3.0]);
-  graph.addNode("node2", [1.1, 2.1, 3.1]);
-  graph.addNode("node3", [5.0, 5.0, 5.0]);
-
-  const neighbors = graph.search([1.0, 2.0, 3.0], 2);
-  console.log("Nearest neighbors:", neighbors);
-}
-
-// Uncomment the following line to run the example.
-// exampleUsage();
-
-export { createGraph, HNSWGraph, Node };
+// Export the module
+export {
+  DynamicMemoryStore
+};

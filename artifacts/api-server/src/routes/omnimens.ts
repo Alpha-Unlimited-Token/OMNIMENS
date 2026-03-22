@@ -2391,6 +2391,11 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
               },
               knowledgeGlyphs: hieResult.knowledgeSignature.knowledgeGlyphs,
               decodedMessage: hieResult.knowledgeSignature.decodedMessage,
+              spectralColorMap: hieResult.knowledgeSignature.spectralColorMap.slice(0, 20),
+              bandColors: hieResult.knowledgeSignature.bandColors,
+              overtoneColors: hieResult.knowledgeSignature.overtoneColors.slice(0, 12),
+              temporalColors: hieResult.knowledgeSignature.temporalColors.slice(0, 16),
+              dominantColor: hieResult.knowledgeSignature.dominantColor,
             } : null,
           })}\n\n`);
         } else {

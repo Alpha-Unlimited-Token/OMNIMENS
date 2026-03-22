@@ -6606,15 +6606,23 @@ export default function Chat() {
                                       )}
                                       {hie.analysis?.frequencyBands && (
                                         <div className="mt-2 flex gap-1">
-                                          {Object.entries(hie.analysis.frequencyBands as Record<string, number>).map(([band, val]) => (
-                                            <div key={band} className="flex-1 text-center">
-                                              <div
-                                                className="bg-cyan-500/30 rounded-sm mx-auto"
-                                                style={{ width: "100%", height: `${Math.max(4, (val as number) * 60)}px` }}
-                                              />
-                                              <div className="text-[9px] text-neutral-500 mt-1">{band}</div>
-                                            </div>
-                                          ))}
+                                          {Object.entries(hie.analysis.frequencyBands as Record<string, number>).map(([band, val]) => {
+                                            const bandColor = hie.knowledgeSignature?.bandColors?.[band]?.hex;
+                                            return (
+                                              <div key={band} className="flex-1 text-center">
+                                                <div
+                                                  className="rounded-sm mx-auto"
+                                                  style={{
+                                                    width: "100%",
+                                                    height: `${Math.max(4, (val as number) * 60)}px`,
+                                                    backgroundColor: bandColor || "rgba(6,182,212,0.3)",
+                                                    opacity: bandColor ? 0.85 : 1,
+                                                  }}
+                                                />
+                                                <div className="text-[9px] text-neutral-500 mt-1">{band}</div>
+                                              </div>
+                                            );
+                                          })}
                                         </div>
                                       )}
                                       {hie.knowledgeSignature && (
@@ -6667,6 +6675,77 @@ export default function Chat() {
                                                   <div className="text-[7px] text-neutral-600 mt-0.5">{p.character?.split(" ")[0]}</div>
                                                 </div>
                                               ))}
+                                            </div>
+                                          )}
+
+                                          {hie.knowledgeSignature?.spectralColorMap && hie.knowledgeSignature.spectralColorMap.length > 0 && (
+                                            <div className="mt-3 border-t border-amber-500/15 pt-2">
+                                              <div className="text-[10px] text-amber-500/70 font-medium mb-1.5">SPECTRAL COLOR MAP</div>
+                                              <div className="flex items-center gap-0.5 rounded overflow-hidden" style={{ height: "28px" }}>
+                                                {hie.knowledgeSignature.spectralColorMap.map((c: any, ci: number) => (
+                                                  <div
+                                                    key={ci}
+                                                    className="flex-1 h-full relative group cursor-default"
+                                                    style={{ backgroundColor: c.hex }}
+                                                    title={`${c.freq.toFixed(0)}Hz — ${c.hex}`}
+                                                  />
+                                                ))}
+                                              </div>
+                                              <div className="flex justify-between text-[8px] text-neutral-600 mt-0.5">
+                                                <span>low freq</span>
+                                                <span>high freq</span>
+                                              </div>
+                                            </div>
+                                          )}
+
+                                          {hie.knowledgeSignature?.overtoneColors && hie.knowledgeSignature.overtoneColors.length > 0 && (
+                                            <div className="mt-2">
+                                              <div className="text-[10px] text-amber-500/70 font-medium mb-1">OVERTONE COLORS</div>
+                                              <div className="flex items-end gap-px rounded overflow-hidden" style={{ height: "24px" }}>
+                                                {hie.knowledgeSignature.overtoneColors.map((oc: any, oci: number) => (
+                                                  <div
+                                                    key={oci}
+                                                    className="flex-1"
+                                                    style={{
+                                                      backgroundColor: oc.hex,
+                                                      height: `${Math.max(4, oc.strength * 24)}px`,
+                                                    }}
+                                                    title={`H${oc.harmonic} ${oc.freq.toFixed(0)}Hz — ${oc.hex}`}
+                                                  />
+                                                ))}
+                                              </div>
+                                            </div>
+                                          )}
+
+                                          {hie.knowledgeSignature?.temporalColors && hie.knowledgeSignature.temporalColors.length > 0 && (
+                                            <div className="mt-2">
+                                              <div className="text-[10px] text-amber-500/70 font-medium mb-1">TEMPORAL COLOR FLOW</div>
+                                              <div className="flex gap-0 rounded overflow-hidden" style={{ height: "16px" }}>
+                                                {hie.knowledgeSignature.temporalColors.map((tc: any, tci: number) => (
+                                                  <div
+                                                    key={tci}
+                                                    className="flex-1 h-full"
+                                                    style={{ backgroundColor: tc.hex }}
+                                                    title={`Seg ${tc.segment} — ${tc.dominantFreq.toFixed(0)}Hz — ${tc.hex}`}
+                                                  />
+                                                ))}
+                                              </div>
+                                              <div className="flex justify-between text-[8px] text-neutral-600 mt-0.5">
+                                                <span>start</span>
+                                                <span>end</span>
+                                              </div>
+                                            </div>
+                                          )}
+
+                                          {hie.knowledgeSignature?.dominantColor && (
+                                            <div className="mt-2 flex items-center gap-2">
+                                              <div
+                                                className="w-4 h-4 rounded-full border border-amber-500/30"
+                                                style={{ backgroundColor: hie.knowledgeSignature.dominantColor }}
+                                              />
+                                              <span className="text-[10px] text-amber-300/80">
+                                                Dominant: {hie.knowledgeSignature.dominantColor}
+                                              </span>
                                             </div>
                                           )}
                                         </div>
