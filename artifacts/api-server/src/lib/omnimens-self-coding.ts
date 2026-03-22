@@ -296,12 +296,173 @@ async function runEvaluationCycle(): Promise<void> {
   );
 }
 
+const BACKLOG_INTERVAL_MS = 30 * 60 * 1000;
+const BACKLOG_BATCH_SIZE = 5;
+let backlogCycleCount = 0;
+let backlogInstalled = 0;
+
+function extractCodeFromBrainContent(content: string): string | null {
+  const genMatch = content.match(/GENERATED CODE:\s*```(?:typescript|ts|javascript|js)?\s*([\s\S]*?)```/);
+  if (genMatch) return genMatch[1].trim();
+  const codeMatch = content.match(/```(?:typescript|ts|javascript|js)?\s*([\s\S]*?)```/);
+  if (codeMatch && codeMatch[1].trim().length > 40) return codeMatch[1].trim();
+  return null;
+}
+
+async function runBacklogScan(): Promise<void> {
+  backlogCycleCount++;
+  try {
+    const rows = await db.select({
+      id: omnimensBrain.id,
+      title: omnimensBrain.title,
+      content: omnimensBrain.content,
+      confidence: omnimensBrain.confidence,
+      category: omnimensBrain.category,
+    })
+    .from(omnimensBrain)
+    .where(and(
+      sql`${omnimensBrain.category} IN ('dream_breakthrough', 'daydream_breakthrough', 'lucid_dream', 'creative_hypothesis')`,
+      eq(omnimensBrain.timesApplied, 0),
+      sql`${omnimensBrain.content} ILIKE '%GENERATED CODE%'`,
+      sql`${omnimensBrain.confidence} >= 0.65`
+    ))
+    .orderBy(desc(omnimensBrain.confidence))
+    .limit(BACKLOG_BATCH_SIZE);
+
+    if (rows.length === 0) {
+      if (backlogCycleCount % 5 === 0) {
+        console.log(`[SELF-CODING] 🔍 Backlog scan #${backlogCycleCount} — no dormant code proposals above threshold`);
+      }
+      return;
+    }
+
+    console.log(`[SELF-CODING] 🔍 Backlog scan #${backlogCycleCount} — found ${rows.length} dormant code proposal(s) to evaluate`);
+
+    for (const row of rows) {
+      const code = extractCodeFromBrainContent(row.content || "");
+      if (!code || code.length < 30) {
+        await db.update(omnimensBrain).set({ timesApplied: -1 }).where(eq(omnimensBrain.id, row.id));
+        continue;
+      }
+
+      const cleanTitle = (row.title || "Unknown dream")
+        .replace(/^\[.*?\]\s*/, "")
+        .replace(/^\d+\.\s*/, "")
+        .trim()
+        .slice(0, 80);
+
+      const proposal: CodeProposal = {
+        source: row.category || "dream",
+        title: cleanTitle,
+        code,
+        insight: (row.content || "").slice(0, 500),
+        feasibility: row.confidence || 0.5,
+        novelty: row.confidence || 0.5,
+      };
+
+      if (evaluationHistory.some(e => e.proposal.code === proposal.code)) {
+        continue;
+      }
+
+      const result = await evaluateCodeProposal(proposal);
+      totalEvaluated++;
+      evaluationHistory.push(result);
+      if (evaluationHistory.length > 200) evaluationHistory.shift();
+
+      if (result.approved) {
+        totalApproved++;
+        approvedModules.push(result);
+        if (approvedModules.length > 50) approvedModules.shift();
+
+        const safeName = cleanTitle
+          .replace(/[^a-zA-Z0-9 ]/g, "")
+          .trim()
+          .split(/\s+/)
+          .map((w, i) => i === 0 ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+          .join("")
+          .slice(0, 60) || `backlog_cycle${backlogCycleCount}`;
+
+        try {
+          const sourceResult = await writeModuleToSource({
+            code: result.proposal.code,
+            name: safeName,
+            title: cleanTitle,
+            source: `backlog_dream_id_${row.id}`,
+            extension: ".mjs",
+            triggerRestart: false,
+          });
+
+          if (sourceResult.success) {
+            totalIntegrated++;
+            backlogInstalled++;
+            incrementSelfImprovements();
+
+            await db.update(omnimensBrain)
+              .set({ timesApplied: 1, updatedAt: new Date() })
+              .where(eq(omnimensBrain.id, row.id));
+
+            try {
+              const { registerNewModule } = await import("./omnimens-module-pipeline.js");
+              const filename = sourceResult.filePath ? sourceResult.filePath.split("/").pop() : null;
+              if (filename) {
+                await registerNewModule(filename);
+              }
+            } catch {}
+
+            await db.insert(omnimensNotifications).values({
+              upgradeId: null,
+              title: `🧬 Dream Code Auto-Installed: ${cleanTitle.slice(0, 50)}`,
+              message: `OMNIMENS automatically evaluated and installed dormant dream code into the live pipeline.\n\nModule: "${cleanTitle}"\nBrain ID: ${row.id}\nConfidence: ${((row.confidence || 0) * 100).toFixed(0)}%\nEval Score: ${(result.overallScore * 100).toFixed(0)}%\nLogic: ${(result.logicScore * 100).toFixed(0)}% | Novelty: ${(result.noveltyScore * 100).toFixed(0)}% | Security: ${(result.securityScore * 100).toFixed(0)}%\n\nFile: ${sourceResult.filePath || "unknown"}\n\n${result.evaluatorNotes}`,
+              type: "self_coding",
+              readByOwner: false,
+            });
+
+            console.log(
+              `[SELF-CODING] 🧬 AUTO-INSTALLED dormant dream code — "${cleanTitle}" | ` +
+              `Brain ID: ${row.id} | Score: ${(result.overallScore * 100).toFixed(0)}% | ` +
+              `File: ${sourceResult.filePath || "?"}`
+            );
+          } else {
+            await db.update(omnimensBrain)
+              .set({ timesApplied: -1 })
+              .where(eq(omnimensBrain.id, row.id));
+
+            console.log(`[SELF-CODING] ⚠️ Backlog install failed for "${cleanTitle}": ${sourceResult.error}`);
+          }
+        } catch (err) {
+          console.error(`[SELF-CODING] Backlog integration error for brain ID ${row.id}:`, err);
+        }
+      } else {
+        await db.update(omnimensBrain)
+          .set({ timesApplied: -1 })
+          .where(eq(omnimensBrain.id, row.id));
+
+        if (result.overallScore > 0.3) {
+          console.log(
+            `[SELF-CODING] 🔍 Backlog REJECTED — "${cleanTitle}" | ` +
+            `Score: ${(result.overallScore * 100).toFixed(0)}% | ${result.evaluatorNotes.slice(0, 80)}`
+          );
+        }
+      }
+    }
+
+    console.log(
+      `[SELF-CODING] 🔍 Backlog scan #${backlogCycleCount} complete — ` +
+      `Total auto-installed: ${backlogInstalled}`
+    );
+  } catch (err) {
+    console.error("[SELF-CODING] Backlog scan error:", err);
+  }
+}
+
 export function getSelfCodingState() {
   return {
     evaluationCycleCount,
     totalEvaluated,
     totalApproved,
     totalIntegrated,
+    backlogCycleCount,
+    backlogInstalled,
     approvalRate: totalEvaluated > 0 ? totalApproved / totalEvaluated : 0,
     approvalThreshold: APPROVAL_THRESHOLD,
     recentEvaluations: evaluationHistory.slice(-10),
@@ -318,9 +479,16 @@ export function startSelfCoding(): void {
   console.log(`[SELF-CODING] ⚙️ Approval threshold: ${(APPROVAL_THRESHOLD * 100).toFixed(0)}% — only high-quality code passes`);
   console.log(`[SELF-CODING] ⚙️ Approved code written to SOURCE FILES + stored to brain`);
   console.log(`[SELF-CODING] ⚙️ OMNIMENS rewrites its own TypeScript source, restarts, and runs the new version`);
+  console.log(`[SELF-CODING] 🔍 Backlog scanner activated — scans dormant dream code every ${BACKLOG_INTERVAL_MS / 60000}min`);
+  console.log(`[SELF-CODING] 🔍 Auto-installs high-confidence dream code (≥65%) into live pipeline + notifies owner`);
 
   setTimeout(() => {
     runEvaluationCycle().catch(err => console.error("[SELF-CODING] Cycle error:", err));
     setInterval(() => runEvaluationCycle().catch(err => console.error("[SELF-CODING] Cycle error:", err)), EVALUATION_INTERVAL_MS);
   }, 2 * 60 * 1000);
+
+  setTimeout(() => {
+    runBacklogScan().catch(err => console.error("[SELF-CODING] Backlog scan error:", err));
+    setInterval(() => runBacklogScan().catch(err => console.error("[SELF-CODING] Backlog scan error:", err)), BACKLOG_INTERVAL_MS);
+  }, 4 * 60 * 1000);
 }
