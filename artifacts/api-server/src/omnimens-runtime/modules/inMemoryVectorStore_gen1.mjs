@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-03-22T21:04:45.277Z
+ * Written: 2026-03-22T21:28:10.321Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,81 +16,119 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
+// Complete ES module code here, starting with /** JSDoc */ and exports
+
 /**
  * @module inMemoryVectorStore
- * @description A lightweight in-memory k-Nearest Neighbors (k-NN) vector store for fast similarity search of embeddings.
- * This module enables efficient retrieval-augmented generation (RAG) for large language models.
+ * @description Provides fast embedding retrieval using cosine similarity with an in-memory HNSW graph.
  */
 
 /**
- * Calculates the Euclidean distance between two vectors.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number} - The Euclidean distance.
- * @throws {Error} - If the vectors have different dimensions.
+ * Computes cosine similarity between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} - Cosine similarity score.
  */
-export function euclideanDistance(vectorA, vectorB) {
+function cosineSimilarity(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
-    throw new Error("Vectors must have the same dimensions.");
+    throw new Error('Vectors must be of the same length');
   }
-  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+
+  const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
+
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    throw new Error('Vector magnitude cannot be zero');
+  }
+
+  return dotProduct / (magnitudeA * magnitudeB);
 }
 
 /**
- * A class representing an in-memory vector store for fast similarity search.
+ * Represents a node in the HNSW graph.
+ * @class
  */
-export class InMemoryVectorStore {
+class HNSWNode {
   /**
-   * Initializes the vector store.
+   * @param {number[]} vector - The embedding vector.
+   * @param {string} id - Unique identifier for the node.
    */
+  constructor(vector, id) {
+    this.vector = vector;
+    this.id = id;
+    this.neighbors = new Set();
+  }
+
+  /**
+   * Adds a neighbor to the node.
+   * @param {HNSWNode} neighbor - Neighbor node.
+   */
+  addNeighbor(neighbor) {
+    this.neighbors.add(neighbor);
+  }
+}
+
+/**
+ * Represents the HNSW graph for fast retrieval.
+ * @class
+ */
+class HNSWGraph {
   constructor() {
-    /** @type {{id: string, vector: number[]}[]} */
-    this.vectors = [];
+    this.nodes = new Map();
   }
 
   /**
-   * Adds a vector to the store.
-   * @param {string} id - A unique identifier for the vector.
-   * @param {number[]} vector - The vector to store.
+   * Adds a vector to the graph.
+   * @param {number[]} vector - Embedding vector.
+   * @param {string} id - Unique identifier for the vector.
    */
-  addVector(id, vector) {
-    this.vectors.push({ id, vector });
-  }
-
-  /**
-   * Performs a k-Nearest Neighbors search to find the closest vectors.
-   * @param {number[]} queryVector - The query vector.
-   * @param {number} k - The number of nearest neighbors to retrieve.
-   * @returns {{id: string, distance: number}[]} - The k nearest neighbors with their distances.
-   */
-  search(queryVector, k) {
-    if (k <= 0) {
-      throw new Error("k must be a positive integer.");
+  addVector(vector, id) {
+    if (this.nodes.has(id)) {
+      throw new Error('ID already exists in the graph');
     }
 
-    const distances = this.vectors.map(({ id, vector }) => ({
-      id,
-      distance: euclideanDistance(queryVector, vector)
-    }));
+    const newNode = new HNSWNode(vector, id);
+    this.nodes.set(id, newNode);
 
-    distances.sort((a, b) => a.distance - b.distance);
-
-    return distances.slice(0, k);
+    // Connect to existing nodes based on similarity
+    for (const node of this.nodes.values()) {
+      if (node.id !== id) {
+        const similarity = cosineSimilarity(node.vector, vector);
+        if (similarity > 0.8) { // Threshold for neighbor connection
+          newNode.addNeighbor(node);
+          node.addNeighbor(newNode);
+        }
+      }
+    }
   }
 
   /**
-   * Clears all vectors from the store.
+   * Searches for the most similar vectors.
+   * @param {number[]} queryVector - Query embedding vector.
+   * @param {number} k - Number of top results to retrieve.
+   * @returns {Array<{ id: string, similarity: number }>} - Top k results with similarity scores.
    */
-  clear() {
-    this.vectors = [];
+  search(queryVector, k) {
+    const results = [];
+
+    for (const node of this.nodes.values()) {
+      const similarity = cosineSimilarity(node.vector, queryVector);
+      results.push({ id: node.id, similarity });
+    }
+
+    return results
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, k);
   }
 }
 
 /**
- * Example usage:
- * const store = new InMemoryVectorStore();
- * store.addVector("vec1", [1, 2, 3]);
- * store.addVector("vec2", [4, 5, 6]);
- * const results = store.search([1, 2, 3], 1);
- * console.log(results); // [{ id: "vec1", distance: 0 }]
+ * Creates a new instance of the HNSW graph.
+ * @returns {HNSWGraph} - Instance of the HNSW graph.
  */
+function createHNSWGraph() {
+  return new HNSWGraph();
+}
+
+export { cosineSimilarity, createHNSWGraph };

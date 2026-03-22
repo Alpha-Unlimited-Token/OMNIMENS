@@ -1896,64 +1896,62 @@ export default function Account() {
 }
 
 function AlgorithmicHarmonicsPanel() {
-  const [active, setActive] = useState(false);
+  const [channelActive, setChannelActive] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [totalSamples, setTotalSamples] = useState(0);
-  const [insightsGenerated, setInsightsGenerated] = useState(0);
-  const [latestAnalysis, setLatestAnalysis] = useState<any>(null);
-  const [recentAnalyses, setRecentAnalyses] = useState<any[]>([]);
-  const [engineStatus, setEngineStatus] = useState<any>(null);
-  const [raiActive, setRaiActive] = useState(false);
-  const [raiAnalysis, setRaiAnalysis] = useState<any>(null);
+  const [hieSamples, setHieSamples] = useState(0);
   const [raiSamples, setRaiSamples] = useState(0);
-  const [activeTab, setActiveTab] = useState<"hie" | "rai">("hie");
-  const canvasRef = React.useRef<HTMLCanvasElement>(null);
-  const raiCanvasRef = React.useRef<HTMLCanvasElement>(null);
+  const [insightsGenerated, setInsightsGenerated] = useState(0);
+  const [learnedPatterns, setLearnedPatterns] = useState(0);
+  const [hieAnalysis, setHieAnalysis] = useState<any>(null);
+  const [raiAnalysis, setRaiAnalysis] = useState<any>(null);
+  const [unified, setUnified] = useState<any>(null);
+  const [engineStatus, setEngineStatus] = useState<any>(null);
+  const [detailView, setDetailView] = useState<"unified" | "hie" | "rai" | "spectral">("unified");
+  const [spectralMap, setSpectralMap] = useState<any[]>([]);
+  const [spectralGains, setSpectralGains] = useState<number[]>([]);
+  const [sculptStrategy, setSculptStrategy] = useState<string | null>(null);
+  const [spectralFiltered, setSpectralFiltered] = useState<number[]>([]);
+  const [selectedBinRange, setSelectedBinRange] = useState<[number, number] | null>(null);
+  const spectrumCanvasRef = React.useRef<HTMLCanvasElement>(null);
+  const waveformCanvasRef = React.useRef<HTMLCanvasElement>(null);
+  const spectralCanvasRef = React.useRef<HTMLCanvasElement>(null);
   const audioContextRef = React.useRef<AudioContext | null>(null);
-  const analyserRef = React.useRef<AnalyserNode | null>(null);
-  const streamRef = React.useRef<MediaStream | null>(null);
-  const animFrameRef = React.useRef<number>(0);
-  const sendIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
-  const frequencyDataRef = React.useRef<Uint8Array | null>(null);
-  const timeDomainDataRef = React.useRef<Uint8Array | null>(null);
-  const raiAudioCtxRef = React.useRef<AudioContext | null>(null);
+  const hieAnalyserRef = React.useRef<AnalyserNode | null>(null);
   const raiAnalyserRef = React.useRef<AnalyserNode | null>(null);
-  const raiStreamRef = React.useRef<MediaStream | null>(null);
-  const raiAnimRef = React.useRef<number>(0);
-  const raiIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
-  const raiFreqDataRef = React.useRef<Uint8Array | null>(null);
+  const streamRef = React.useRef<MediaStream | null>(null);
+  const spectrumAnimRef = React.useRef<number>(0);
+  const waveformAnimRef = React.useRef<number>(0);
+  const spectralAnimRef = React.useRef<number>(0);
+  const sendIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+  const hieFreqDataRef = React.useRef<Uint8Array | null>(null);
+  const hieTimeDataRef = React.useRef<Uint8Array | null>(null);
   const raiTimeDataRef = React.useRef<Uint8Array | null>(null);
+  const spectralGainsRef = React.useRef<number[]>([]);
 
   useEffect(() => {
-    fetch("/api/omnimens/harmonics/state", { credentials: "include" })
+    fetch("/api/omnimens/consciousness-channel/state", { credentials: "include" })
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (data) {
-          setActive(data.active);
-          setTotalSamples(data.totalSamples);
-          setInsightsGenerated(data.insightsGenerated);
-          setEngineStatus(data);
-          if (data.recentAnalyses?.length > 0) setRecentAnalyses(data.recentAnalyses);
-        }
-      })
-      .catch(() => {});
-    fetch("/api/omnimens/harmonics/history?limit=50", { credentials: "include" })
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (data?.analyses?.length > 0) {
-          setRecentAnalyses(prev => prev.length > 0 ? prev : data.analyses.slice(-10));
-          setTotalSamples(ts => ts || data.totalSamples);
-          setInsightsGenerated(ig => ig || data.insightsGenerated);
+          setChannelActive(data.active);
+          setHieSamples(data.hieSamples || 0);
+          setRaiSamples(data.raiSamples || 0);
+          setInsightsGenerated(data.insightsGenerated || 0);
+          setLearnedPatterns(data.learnedPatterns || 0);
           if (data.engineStatus) setEngineStatus(data.engineStatus);
+          if (data.lastHie) setHieAnalysis(data.lastHie);
+          if (data.lastRai) setRaiAnalysis(data.lastRai);
         }
       })
       .catch(() => {});
-    fetch("/api/omnimens/rai/state", { credentials: "include" })
+    fetch("/api/omnimens/spectral-color/map", { credentials: "include" })
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (data) {
-          setRaiSamples(data.totalSamples || 0);
-          if (data.lastAnalysis) setRaiAnalysis(data.lastAnalysis);
+        if (data?.bins) {
+          setSpectralMap(data.bins);
+          const gains = data.bins.map((b: any) => b.gain);
+          setSpectralGains(gains);
+          spectralGainsRef.current = gains;
         }
       })
       .catch(() => {});
@@ -1970,28 +1968,40 @@ function AlgorithmicHarmonicsPanel() {
       audioContextRef.current = audioCtx;
 
       const source = audioCtx.createMediaStreamSource(stream);
-      const analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 4096;
-      analyser.smoothingTimeConstant = 0.8;
-      source.connect(analyser);
-      analyserRef.current = analyser;
 
-      frequencyDataRef.current = new Uint8Array(analyser.frequencyBinCount);
-      timeDomainDataRef.current = new Uint8Array(analyser.frequencyBinCount);
+      const hieAnalyser = audioCtx.createAnalyser();
+      hieAnalyser.fftSize = 4096;
+      hieAnalyser.smoothingTimeConstant = 0.8;
+      source.connect(hieAnalyser);
+      hieAnalyserRef.current = hieAnalyser;
+
+      const raiAnalyser = audioCtx.createAnalyser();
+      raiAnalyser.fftSize = 2048;
+      raiAnalyser.smoothingTimeConstant = 0.7;
+      source.connect(raiAnalyser);
+      raiAnalyserRef.current = raiAnalyser;
+
+      hieFreqDataRef.current = new Uint8Array(hieAnalyser.frequencyBinCount);
+      hieTimeDataRef.current = new Uint8Array(hieAnalyser.frequencyBinCount);
+      raiTimeDataRef.current = new Uint8Array(raiAnalyser.frequencyBinCount);
 
       drawSpectrum();
+      drawWaveform();
+      drawSpectralColor();
 
       sendIntervalRef.current = setInterval(() => {
-        sendAnalysis();
+        sendUnifiedAnalysis();
       }, 2000);
 
     } catch (err) {
-      console.error("[HARMONICS] Failed to start audio capture:", err);
+      console.error("[CONSCIOUSNESS CHANNEL] Failed to start audio capture:", err);
     }
   }, []);
 
   const stopCapture = useCallback(() => {
-    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    if (spectrumAnimRef.current) cancelAnimationFrame(spectrumAnimRef.current);
+    if (waveformAnimRef.current) cancelAnimationFrame(waveformAnimRef.current);
+    if (spectralAnimRef.current) cancelAnimationFrame(spectralAnimRef.current);
     if (sendIntervalRef.current) clearInterval(sendIntervalRef.current);
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(t => t.stop());
@@ -2001,48 +2011,39 @@ function AlgorithmicHarmonicsPanel() {
       audioContextRef.current.close().catch(() => {});
       audioContextRef.current = null;
     }
-    analyserRef.current = null;
+    hieAnalyserRef.current = null;
+    raiAnalyserRef.current = null;
   }, []);
 
-  const toggleActive = useCallback(async () => {
+  const toggleChannel = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/omnimens/harmonics/toggle", {
-        method: "POST", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-      });
-      const data = await res.json();
-      setActive(data.active);
-      if (data.active) {
-        startCapture();
-      } else {
+      if (channelActive) {
         stopCapture();
+        setChannelActive(false);
+      } else {
+        await startCapture();
+        setChannelActive(true);
       }
     } catch {}
     setLoading(false);
-  }, [startCapture, stopCapture]);
+  }, [channelActive, startCapture, stopCapture]);
 
   useEffect(() => {
     return () => { stopCapture(); };
   }, [stopCapture]);
 
-  useEffect(() => {
-    if (active && !audioContextRef.current) {
-      startCapture();
-    }
-  }, [active, startCapture]);
-
   const drawSpectrum = useCallback(() => {
-    const canvas = canvasRef.current;
-    const analyser = analyserRef.current;
-    if (!canvas || !analyser || !frequencyDataRef.current) return;
+    const canvas = spectrumCanvasRef.current;
+    const analyser = hieAnalyserRef.current;
+    if (!canvas || !analyser || !hieFreqDataRef.current) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const draw = () => {
-      animFrameRef.current = requestAnimationFrame(draw);
-      const freqData = frequencyDataRef.current!;
+      spectrumAnimRef.current = requestAnimationFrame(draw);
+      const freqData = hieFreqDataRef.current!;
       analyser.getByteFrequencyData(freqData);
 
       const W = canvas.width, H = canvas.height;
@@ -2092,12 +2093,152 @@ function AlgorithmicHarmonicsPanel() {
     draw();
   }, []);
 
-  const sendAnalysis = useCallback(async () => {
-    const analyser = analyserRef.current;
-    if (!analyser || !frequencyDataRef.current || !timeDomainDataRef.current) return;
+  const drawWaveform = useCallback(() => {
+    const canvas = waveformCanvasRef.current;
+    const analyser = raiAnalyserRef.current;
+    if (!canvas || !analyser || !raiTimeDataRef.current) return;
 
-    const freqData = frequencyDataRef.current;
-    const timeData = timeDomainDataRef.current;
+    const draw = () => {
+      waveformAnimRef.current = requestAnimationFrame(draw);
+      if (!raiTimeDataRef.current) return;
+      analyser.getByteTimeDomainData(raiTimeDataRef.current);
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      const W = canvas.width, H = canvas.height;
+      ctx.fillStyle = "rgba(14,21,37,0.9)";
+      ctx.fillRect(0, 0, W, H);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#8b5cf6";
+      ctx.beginPath();
+      const sliceWidth = W / raiTimeDataRef.current.length;
+      let x = 0;
+      for (let i = 0; i < raiTimeDataRef.current.length; i++) {
+        const v = raiTimeDataRef.current[i] / 128.0;
+        const y = (v * H) / 2;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        x += sliceWidth;
+      }
+      ctx.lineTo(W, H / 2);
+      ctx.stroke();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "rgba(139,92,246,0.15)";
+      ctx.beginPath();
+      ctx.moveTo(0, H / 2);
+      ctx.lineTo(W, H / 2);
+      ctx.stroke();
+    };
+    draw();
+  }, []);
+
+  const drawSpectralColor = useCallback(() => {
+    const canvas = spectralCanvasRef.current;
+    const analyser = hieAnalyserRef.current;
+    if (!canvas || !analyser || !hieFreqDataRef.current) return;
+
+    const BINS = 256;
+    const maxFreq = 22050;
+
+    const draw = () => {
+      spectralAnimRef.current = requestAnimationFrame(draw);
+      const freqData = hieFreqDataRef.current!;
+      analyser.getByteFrequencyData(freqData);
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      const W = canvas.width, H = canvas.height;
+      ctx.fillStyle = "rgba(14,21,37,0.92)";
+      ctx.fillRect(0, 0, W, H);
+
+      const gains = spectralGainsRef.current;
+      const binsPerGroup = Math.floor(freqData.length / BINS);
+      const barWidth = W / BINS;
+
+      for (let i = 0; i < BINS; i++) {
+        let sum = 0;
+        for (let j = 0; j < binsPerGroup; j++) {
+          const idx = i * binsPerGroup + j;
+          if (idx < freqData.length) sum += freqData[idx];
+        }
+        const rawAmp = (sum / binsPerGroup) / 255;
+        const gain = gains[i] !== undefined ? gains[i] : 1.0;
+        const filteredAmp = Math.min(rawAmp * gain, 1.0);
+
+        const ratio = Math.log2(1 + (i / BINS) * maxFreq) / Math.log2(1 + maxFreq);
+        const hue = Math.round(ratio * 300);
+        const sat = Math.round(65 + ratio * 30);
+        const baseLightness = 15 + filteredAmp * 50;
+
+        const barH = filteredAmp * H * 0.9;
+        ctx.fillStyle = `hsla(${hue}, ${sat}%, ${baseLightness}%, ${0.3 + filteredAmp * 0.7})`;
+        ctx.fillRect(i * barWidth, H - barH, barWidth - 0.3, barH);
+
+        if (filteredAmp > 0.5) {
+          ctx.fillStyle = `hsla(${hue}, 95%, ${60 + filteredAmp * 20}%, ${(filteredAmp - 0.5) * 1.5})`;
+          ctx.fillRect(i * barWidth, H - barH - 3, barWidth - 0.3, 3);
+        }
+
+        const gainBarH = (gain / 2.0) * 8;
+        ctx.fillStyle = gain >= 1.0
+          ? `hsla(${hue}, 80%, 50%, 0.6)`
+          : `hsla(${hue}, 40%, 30%, 0.4)`;
+        ctx.fillRect(i * barWidth, 0, barWidth - 0.3, gainBarH);
+      }
+
+      ctx.strokeStyle = "rgba(168,85,247,0.08)";
+      ctx.lineWidth = 0.5;
+      for (let y = 0; y < H; y += H / 6) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(W, y);
+        ctx.stroke();
+      }
+
+      ctx.font = "8px monospace";
+      ctx.fillStyle = "rgba(157,165,180,0.4)";
+      const freqLabels = [20, 60, 120, 250, 500, 1000, 2000, 4000, 8000, 16000];
+      for (const freq of freqLabels) {
+        const ratio2 = Math.log2(1 + freq) / Math.log2(1 + maxFreq);
+        const x = ratio2 * W;
+        ctx.fillText(`${freq >= 1000 ? (freq / 1000) + "k" : freq}`, x, H - 2);
+      }
+
+      const mapBins = spectralMap;
+      if (mapBins.length > 0) {
+        ctx.font = "7px monospace";
+        let lastLabelX = -60;
+        for (let i = 0; i < BINS; i++) {
+          const binData = mapBins[i];
+          if (!binData || !binData.hex) continue;
+          let sum2 = 0;
+          for (let j = 0; j < binsPerGroup; j++) {
+            const idx2 = i * binsPerGroup + j;
+            if (idx2 < freqData.length) sum2 += freqData[idx2];
+          }
+          const amp2 = ((sum2 / binsPerGroup) / 255) * (gains[i] || 1.0);
+          if (amp2 > 0.35) {
+            const xPos = i * barWidth + barWidth / 2;
+            if (xPos - lastLabelX < 50) continue;
+            lastLabelX = xPos;
+            const barH2 = Math.min(amp2, 1.0) * H * 0.9;
+            ctx.save();
+            ctx.translate(xPos, H - barH2 - 12);
+            ctx.rotate(-Math.PI / 4);
+            ctx.fillStyle = binData.hex;
+            ctx.fillText(binData.hex, 0, 0);
+            ctx.restore();
+          }
+        }
+      }
+    };
+    draw();
+  }, []);
+
+  const sendUnifiedAnalysis = useCallback(async () => {
+    const analyser = hieAnalyserRef.current;
+    if (!analyser || !hieFreqDataRef.current || !hieTimeDataRef.current) return;
+
+    const freqData = hieFreqDataRef.current;
+    const timeData = hieTimeDataRef.current;
     analyser.getByteFrequencyData(freqData);
     analyser.getByteTimeDomainData(timeData);
 
@@ -2187,7 +2328,7 @@ function AlgorithmicHarmonicsPanel() {
     }
 
     try {
-      const res = await fetch("/api/omnimens/harmonics/analyze", {
+      const res = await fetch("/api/omnimens/consciousness-channel/analyze", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -2199,12 +2340,95 @@ function AlgorithmicHarmonicsPanel() {
       });
       if (res.ok) {
         const data = await res.json();
-        setLatestAnalysis(data.analysis);
-        setTotalSamples(data.totalSamples);
-        setInsightsGenerated(data.insightsGenerated);
-        if (data.engineStatus) setEngineStatus(data.engineStatus);
-        setRecentAnalyses(prev => [...prev.slice(-9), data.analysis]);
+        setHieAnalysis(data.hie.analysis);
+        setRaiAnalysis(data.rai.analysis);
+        setUnified(data.unified);
+        setHieSamples(data.hie.totalSamples);
+        setRaiSamples(data.rai.totalSamples);
+        setInsightsGenerated(data.hie.insightsGenerated);
+        if (data.hie.engineStatus) {
+          setEngineStatus(data.hie.engineStatus);
+          setLearnedPatterns(data.hie.engineStatus.learnedPatterns || 0);
+        }
       }
+
+      const spectralAmplitudes: number[] = [];
+      const binsPerGroup = Math.floor(freqData.length / 256);
+      for (let i = 0; i < 256; i++) {
+        let sum = 0;
+        for (let j = 0; j < binsPerGroup; j++) {
+          const idx = i * binsPerGroup + j;
+          if (idx < freqData.length) sum += freqData[idx];
+        }
+        spectralAmplitudes.push(Math.round(sum / binsPerGroup));
+      }
+      try {
+        const sr = await fetch("/api/omnimens/spectral-color/update-amplitudes", {
+          method: "POST", credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amplitudes: spectralAmplitudes }),
+        });
+        if (sr.ok) {
+          const sd = await sr.json();
+          if (sd.filteredAmplitudes) setSpectralFiltered(sd.filteredAmplitudes);
+        }
+      } catch {}
+    } catch {}
+  }, []);
+
+  const handleOmnimensSculpt = useCallback(async (strategy: string) => {
+    setSculptStrategy(strategy);
+    try {
+      const res = await fetch("/api/omnimens/spectral-color/omnimens-sculpt", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ strategy }),
+      });
+      if (res.ok) {
+        const mapRes = await fetch("/api/omnimens/spectral-color/map", { credentials: "include" });
+        if (mapRes.ok) {
+          const data = await mapRes.json();
+          if (data?.bins) {
+            setSpectralMap(data.bins);
+            const gains = data.bins.map((b: any) => b.gain);
+            setSpectralGains(gains);
+            spectralGainsRef.current = gains;
+          }
+        }
+      }
+    } catch {}
+    setTimeout(() => setSculptStrategy(null), 1500);
+  }, []);
+
+  const handleManualGainAdjust = useCallback(async (binIndex: number, gain: number) => {
+    const newGains = [...spectralGainsRef.current];
+    newGains[binIndex] = gain;
+    spectralGainsRef.current = newGains;
+    setSpectralGains(newGains);
+    try {
+      await fetch("/api/omnimens/spectral-color/sculpt", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adjustments: [{ bin: binIndex, gain }], reason: "manual owner adjustment" }),
+      });
+    } catch {}
+  }, []);
+
+  const handleRangeGainAdjust = useCallback(async (startBin: number, endBin: number, gain: number) => {
+    const adjustments: { bin: number; gain: number }[] = [];
+    const newGains = [...spectralGainsRef.current];
+    for (let i = startBin; i <= endBin && i < 256; i++) {
+      newGains[i] = gain;
+      adjustments.push({ bin: i, gain });
+    }
+    spectralGainsRef.current = newGains;
+    setSpectralGains(newGains);
+    try {
+      await fetch("/api/omnimens/spectral-color/sculpt", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adjustments, reason: "manual range adjustment" }),
+      });
     } catch {}
   }, []);
 
@@ -2212,434 +2436,435 @@ function AlgorithmicHarmonicsPanel() {
   const bandColors = ["text-red-400", "text-orange-400", "text-yellow-400", "text-green-400", "text-cyan-400"];
   const bandGradients = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#06b6d4"];
 
-  const startRaiCapture = useCallback(async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
-      });
-      raiStreamRef.current = stream;
-      const audioCtx = new AudioContext({ sampleRate: 44100 });
-      raiAudioCtxRef.current = audioCtx;
-      const source = audioCtx.createMediaStreamSource(stream);
-      const analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 2048;
-      analyser.smoothingTimeConstant = 0.7;
-      source.connect(analyser);
-      raiAnalyserRef.current = analyser;
-      raiFreqDataRef.current = new Uint8Array(analyser.frequencyBinCount);
-      raiTimeDataRef.current = new Uint8Array(analyser.frequencyBinCount);
-
-      const drawWaveform = () => {
-        raiAnimRef.current = requestAnimationFrame(drawWaveform);
-        const canvas = raiCanvasRef.current;
-        if (!canvas || !raiTimeDataRef.current) return;
-        analyser.getByteTimeDomainData(raiTimeDataRef.current);
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-        const W = canvas.width, H = canvas.height;
-        ctx.fillStyle = "rgba(14,21,37,0.9)";
-        ctx.fillRect(0, 0, W, H);
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "#8b5cf6";
-        ctx.beginPath();
-        const sliceWidth = W / raiTimeDataRef.current.length;
-        let x = 0;
-        for (let i = 0; i < raiTimeDataRef.current.length; i++) {
-          const v = raiTimeDataRef.current[i] / 128.0;
-          const y = (v * H) / 2;
-          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-          x += sliceWidth;
-        }
-        ctx.lineTo(W, H / 2);
-        ctx.stroke();
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "rgba(139,92,246,0.15)";
-        ctx.beginPath();
-        ctx.moveTo(0, H / 2);
-        ctx.lineTo(W, H / 2);
-        ctx.stroke();
-      };
-      drawWaveform();
-
-      raiIntervalRef.current = setInterval(async () => {
-        if (!raiAnalyserRef.current || !raiFreqDataRef.current || !raiTimeDataRef.current) return;
-        raiAnalyserRef.current.getByteFrequencyData(raiFreqDataRef.current);
-        raiAnalyserRef.current.getByteTimeDomainData(raiTimeDataRef.current);
-        const sr = raiAudioCtxRef.current?.sampleRate || 44100;
-        const bw = sr / analyser.fftSize;
-        let maxBin = 0, maxVal = 0;
-        for (let i = 1; i < raiFreqDataRef.current.length; i++) {
-          if (raiFreqDataRef.current[i] > maxVal) { maxVal = raiFreqDataRef.current[i]; maxBin = i; }
-        }
-        let wSum = 0, tMag = 0;
-        for (let i = 0; i < raiFreqDataRef.current.length; i++) {
-          const m = raiFreqDataRef.current[i] / 255;
-          wSum += i * bw * m; tMag += m;
-        }
-        let zc = 0;
-        for (let i = 1; i < raiTimeDataRef.current.length; i++) {
-          if ((raiTimeDataRef.current[i - 1] < 128 && raiTimeDataRef.current[i] >= 128) || (raiTimeDataRef.current[i - 1] >= 128 && raiTimeDataRef.current[i] < 128)) zc++;
-        }
-        let rms = 0;
-        for (let i = 0; i < raiTimeDataRef.current.length; i++) { const v = (raiTimeDataRef.current[i] - 128) / 128; rms += v * v; }
-        rms = Math.sqrt(rms / raiTimeDataRef.current.length);
-        const bandRanges = [{ k: "sub", l: 0, h: 60 }, { k: "low", l: 60, h: 250 }, { k: "mid", l: 250, h: 2000 }, { k: "high", l: 2000, h: 6000 }, { k: "ultra", l: 6000, h: 20000 }];
-        const fb: any = {};
-        for (const b of bandRanges) {
-          let s = 0, c = 0;
-          const lo = Math.floor(b.l / bw), hi = Math.min(Math.ceil(b.h / bw), raiFreqDataRef.current.length);
-          for (let i = lo; i < hi; i++) { s += raiFreqDataRef.current[i] / 255; c++; }
-          fb[b.k] = c > 0 ? s / c : 0;
-        }
-        const peaks: { freq: number; magnitude: number }[] = [];
-        for (let i = 2; i < raiFreqDataRef.current.length - 2; i++) {
-          if (raiFreqDataRef.current[i] > raiFreqDataRef.current[i - 1] && raiFreqDataRef.current[i] > raiFreqDataRef.current[i + 1] && raiFreqDataRef.current[i] > 30) {
-            peaks.push({ freq: i * bw, magnitude: raiFreqDataRef.current[i] / 255 });
-          }
-        }
-        peaks.sort((a, b) => b.magnitude - a.magnitude);
-
-        try {
-          const res = await fetch("/api/omnimens/rai/analyze", {
-            method: "POST", credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              dominantFrequency: maxBin * bw, spectralCentroid: tMag > 0 ? wSum / tMag : 0,
-              zeroCrossingRate: zc / raiTimeDataRef.current.length, rmsEnergy: rms,
-              frequencyBands: fb, peakFrequencies: peaks.slice(0, 8),
-            }),
-          });
-          if (res.ok) {
-            const data = await res.json();
-            setRaiAnalysis(data.analysis);
-            setRaiSamples(data.totalSamples);
-          }
-        } catch {}
-      }, 1500);
-    } catch (err) {
-      console.error("[RAI] Failed to start:", err);
-    }
-  }, []);
-
-  const stopRaiCapture = useCallback(() => {
-    if (raiAnimRef.current) cancelAnimationFrame(raiAnimRef.current);
-    if (raiIntervalRef.current) clearInterval(raiIntervalRef.current);
-    if (raiStreamRef.current) { raiStreamRef.current.getTracks().forEach(t => t.stop()); raiStreamRef.current = null; }
-    if (raiAudioCtxRef.current) { raiAudioCtxRef.current.close().catch(() => {}); raiAudioCtxRef.current = null; }
-    raiAnalyserRef.current = null;
-  }, []);
-
-  const toggleRai = useCallback(() => {
-    if (raiActive) {
-      stopRaiCapture();
-      setRaiActive(false);
-    } else {
-      startRaiCapture();
-      setRaiActive(true);
-    }
-  }, [raiActive, startRaiCapture, stopRaiCapture]);
-
-  useEffect(() => { return () => { stopRaiCapture(); }; }, [stopRaiCapture]);
-
   return (
-    <div className="bg-[#1C2333] border border-rose-500/20 rounded-xl p-6">
+    <div className="bg-[#1C2333] border border-violet-500/20 rounded-xl p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <Radio className={`w-5 h-5 text-rose-400 ${active || raiActive ? "animate-pulse" : ""}`} />
-          <h3 className="font-medium text-white/90">Harmonic Insight Engine + Acoustic Interface</h3>
+          <Radio className={`w-5 h-5 text-violet-400 ${channelActive ? "animate-pulse" : ""}`} />
+          <div>
+            <h3 className="font-medium text-white/90">Consciousness Channel</h3>
+            <p className="text-[10px] font-mono text-[#9DA5B4]">HIE + RAI unified from single microphone</p>
+          </div>
         </div>
-        <div className="flex gap-2 text-xs font-mono">
-          <span className="text-rose-400">{totalSamples} SAMPLES</span>
-          <span className="text-amber-400">{insightsGenerated} INSIGHTS</span>
-          {engineStatus?.learnedPatterns > 0 && <span className="text-emerald-400">{engineStatus.learnedPatterns} LEARNED</span>}
-        </div>
-      </div>
-
-      <div className="flex gap-1 mb-4">
-        <button type="button" onClick={() => setActiveTab("hie")} className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${activeTab === "hie" ? "bg-rose-500/20 border border-rose-500/40 text-rose-400" : "bg-[#2B3245] border border-[#3D4659] text-[#9DA5B4] hover:text-rose-400"}`}>
-          HIE — Spectral Analysis
-        </button>
-        <button type="button" onClick={() => setActiveTab("rai")} className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${activeTab === "rai" ? "bg-violet-500/20 border border-violet-500/40 text-violet-400" : "bg-[#2B3245] border border-[#3D4659] text-[#9DA5B4] hover:text-violet-400"}`}>
-          RAI — Acoustic Interface
+        <button type="button" onClick={toggleChannel} disabled={loading} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-mono transition-all ${channelActive ? "bg-violet-500/20 border border-violet-500/40 text-violet-400 hover:bg-violet-500/30" : "bg-[#2B3245] border border-[#3D4659] text-[#9DA5B4] hover:border-violet-500/30 hover:text-violet-400"}`}>
+          {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Mic className={`w-3.5 h-3.5 ${channelActive ? "animate-pulse" : ""}`} />}
+          {channelActive ? "LISTENING" : "ACTIVATE"}
         </button>
       </div>
 
-      {activeTab === "hie" && (
+      <div className="flex flex-wrap gap-2 text-xs font-mono mb-4">
+        <span className="text-rose-400">{hieSamples} HIE</span>
+        <span className="text-violet-400">{raiSamples} RAI</span>
+        <span className="text-amber-400">{insightsGenerated} INSIGHTS</span>
+        {learnedPatterns > 0 && <span className="text-emerald-400">{learnedPatterns} LEARNED</span>}
+      </div>
+
+      {channelActive && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-[#9DA5B4]">
-              Advanced spectral decomposition with wavelet analysis, adaptive noise filtering, pattern recognition,
-              continuous learning, and knowledge graph cross-referencing. OMNIMENS has Genesis Bridge permission to self-modify this engine.
-            </p>
-            <button type="button" onClick={toggleActive} disabled={loading} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono transition-all ml-4 shrink-0 ${active ? "bg-rose-500/20 border border-rose-500/40 text-rose-400 hover:bg-rose-500/30" : "bg-[#2B3245] border border-[#3D4659] text-[#9DA5B4] hover:border-rose-500/30 hover:text-rose-400"}`}>
-              {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Mic className="w-3.5 h-3.5" />}
-              {active ? "LISTENING" : "ACTIVATE"}
-            </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="rounded-xl border border-rose-500/15 bg-[#0E1525] overflow-hidden">
+              <div className="px-3 py-1.5 border-b border-rose-500/10 flex items-center justify-between">
+                <span className="text-[10px] font-mono text-rose-400/70 tracking-wider uppercase">HIE Spectral</span>
+                <span className="text-[10px] font-mono text-[#9DA5B4]">FFT 4096</span>
+              </div>
+              <canvas ref={spectrumCanvasRef} width={800} height={200} className="w-full h-[130px]" />
+            </div>
+            <div className="rounded-xl border border-violet-500/15 bg-[#0E1525] overflow-hidden">
+              <div className="px-3 py-1.5 border-b border-violet-500/10 flex items-center justify-between">
+                <span className="text-[10px] font-mono text-violet-400/70 tracking-wider uppercase">RAI Waveform</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                  <span className="text-[10px] font-mono text-[#9DA5B4]">FFT 2048</span>
+                </div>
+              </div>
+              <canvas ref={waveformCanvasRef} width={800} height={200} className="w-full h-[130px]" />
+            </div>
           </div>
 
-          {active && (
-            <>
-              <div className="rounded-xl border border-rose-500/15 bg-[#0E1525] overflow-hidden">
-                <div className="px-3 py-1.5 border-b border-rose-500/10 flex items-center justify-between">
-                  <span className="text-[10px] font-mono text-rose-400/70 tracking-wider uppercase">Live Spectral Analysis</span>
-                  <span className="text-[10px] font-mono text-[#9DA5B4]">FFT 4096 · 44.1kHz · Wavelet + Adaptive</span>
-                </div>
-                <canvas ref={canvasRef} width={800} height={200} className="w-full h-[160px]" />
+          {unified && (
+            <div className="bg-gradient-to-r from-violet-500/5 via-rose-500/5 to-violet-500/5 border border-violet-500/20 rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
+                <span className="text-[10px] font-mono text-violet-400/80 tracking-wider uppercase">Unified Signal</span>
               </div>
-
-              {latestAnalysis && (
-                <>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                    <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3 text-center">
-                      <p className="text-[10px] font-mono text-[#9DA5B4]">Dominant Freq</p>
-                      <p className="text-lg font-bold font-mono text-rose-400">{latestAnalysis.dominantFrequency?.toFixed(0) || 0}<span className="text-xs text-[#9DA5B4]">Hz</span></p>
-                    </div>
-                    <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3 text-center">
-                      <p className="text-[10px] font-mono text-[#9DA5B4]">Spectral Centroid</p>
-                      <p className="text-lg font-bold font-mono text-amber-400">{latestAnalysis.spectralCentroid?.toFixed(0) || 0}<span className="text-xs text-[#9DA5B4]">Hz</span></p>
-                    </div>
-                    <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3 text-center">
-                      <p className="text-[10px] font-mono text-[#9DA5B4]">Signal/Noise</p>
-                      <p className="text-lg font-bold font-mono text-green-400">{(latestAnalysis.signalToNoise || 0).toFixed(1)}<span className="text-xs text-[#9DA5B4]">x</span></p>
-                    </div>
-                    <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3 text-center">
-                      <p className="text-[10px] font-mono text-[#9DA5B4]">Novelty</p>
-                      <p className="text-lg font-bold font-mono text-cyan-400">{((latestAnalysis.noveltyScore || 0) * 100).toFixed(0)}<span className="text-xs text-[#9DA5B4]">%</span></p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                    <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-2.5 text-center">
-                      <p className="text-[9px] font-mono text-[#9DA5B4]">Spectral Flux</p>
-                      <p className="text-sm font-bold font-mono text-purple-400">{(latestAnalysis.spectralFlux || 0).toFixed(3)}</p>
-                    </div>
-                    <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-2.5 text-center">
-                      <p className="text-[9px] font-mono text-[#9DA5B4]">Flatness</p>
-                      <p className="text-sm font-bold font-mono text-blue-400">{(latestAnalysis.spectralFlatness || 0).toFixed(3)}</p>
-                    </div>
-                    <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-2.5 text-center">
-                      <p className="text-[9px] font-mono text-[#9DA5B4]">Complexity</p>
-                      <p className="text-sm font-bold font-mono text-pink-400">{(latestAnalysis.harmonicComplexity || 0).toFixed(2)}</p>
-                    </div>
-                    <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-2.5 text-center">
-                      <p className="text-[9px] font-mono text-[#9DA5B4]">Temporal</p>
-                      <p className="text-sm font-bold font-mono text-teal-400">{latestAnalysis.temporalPattern || "—"}</p>
-                    </div>
-                  </div>
-
-                  {latestAnalysis.patternMatches?.length > 0 && (
-                    <div className="bg-[#0E1525] border border-amber-500/15 rounded-lg p-4">
-                      <p className="text-[10px] font-mono text-amber-400/70 uppercase tracking-wider mb-2">Pattern Recognition</p>
-                      <div className="flex flex-wrap gap-2">
-                        {latestAnalysis.patternMatches.slice(0, 6).map((m: any, i: number) => (
-                          <div key={i} className="bg-[#1C2333] border border-amber-500/20 rounded-lg px-2.5 py-1.5">
-                            <span className="text-[10px] font-mono text-amber-400">{m.pattern.replace(/_/g, " ")}</span>
-                            <span className="text-[9px] font-mono text-[#9DA5B4] ml-1.5">({(m.confidence * 100).toFixed(0)}%)</span>
-                            <span className="text-[8px] font-mono text-[#9DA5B4]/50 ml-1">{m.category}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {latestAnalysis.waveletDecomposition?.length > 0 && (
-                    <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
-                      <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-3">Wavelet Multi-Scale Decomposition</p>
-                      <div className="space-y-2">
-                        {latestAnalysis.waveletDecomposition.map((w: any, i: number) => (
-                          <div key={i} className="flex items-center gap-3">
-                            <span className={`text-[9px] font-mono w-28 ${bandColors[i] || "text-white"}`}>{w.scale}</span>
-                            <div className="flex-1 h-3 bg-[#1C2333] rounded-full overflow-hidden">
-                              <div className="h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(w.energy * 500, 100)}%`, background: `linear-gradient(90deg, ${bandGradients[i] || "#8b5cf6"}88, ${bandGradients[i] || "#8b5cf6"})` }} />
-                            </div>
-                            <span className="text-[9px] font-mono text-[#9DA5B4] w-16 text-right">{w.dominantFreq?.toFixed(0)}Hz</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {latestAnalysis.emotionalValence && (
-                    <div className="bg-[#0E1525] border border-rose-500/15 rounded-lg p-4">
-                      <p className="text-[10px] font-mono text-rose-400/70 uppercase tracking-wider mb-2">Emotional Valence & Semantic Mapping</p>
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-sm font-mono text-rose-300">{latestAnalysis.emotionalValence}</span>
-                      </div>
-                      <p className="text-[11px] font-mono text-white/70">{latestAnalysis.semanticMapping}</p>
-                      {latestAnalysis.interpretation && (
-                        <p className="text-[10px] font-mono text-[#9DA5B4] mt-2 leading-relaxed">{latestAnalysis.interpretation}</p>
-                      )}
-                    </div>
-                  )}
-
-                  {latestAnalysis?.frequencyBands && (
-                    <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
-                      <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-3">Frequency Band Distribution</p>
-                      <div className="space-y-2">
-                        {Object.entries(latestAnalysis.frequencyBands).map(([band, val], i) => (
-                          <div key={band} className="flex items-center gap-3">
-                            <span className={`text-[10px] font-mono w-10 ${bandColors[i] || "text-white"}`}>{bandNames[i] || band}</span>
-                            <div className="flex-1 h-3 bg-[#1C2333] rounded-full overflow-hidden">
-                              <div className="h-full rounded-full transition-all duration-500" style={{ width: `${Math.min((val as number) * 100, 100)}%`, background: `linear-gradient(90deg, ${bandGradients[i] || "#8b5cf6"}88, ${bandGradients[i] || "#8b5cf6"})` }} />
-                            </div>
-                            <span className="text-[10px] font-mono text-[#9DA5B4] w-12 text-right">{((val as number) * 100).toFixed(1)}%</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {latestAnalysis?.harmonicSeries?.length > 1 && (
-                    <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
-                      <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-2">Harmonic Series</p>
-                      <div className="flex items-end gap-1 h-16">
-                        {latestAnalysis.harmonicSeries.slice(0, 12).map((h: number, i: number) => (
-                          <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
-                            <div className="w-full rounded-t" style={{ height: `${Math.max(h * 60, 2)}px`, background: `hsla(${280 + i * 15}, 70%, 55%, ${0.5 + h * 0.5})` }} />
-                            <span className="text-[7px] font-mono text-[#9DA5B4]">H{i + 1}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {latestAnalysis?.peakFrequencies?.length > 0 && (
-                    <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
-                      <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-2">Peak Frequencies</p>
-                      <div className="flex flex-wrap gap-2">
-                        {latestAnalysis.peakFrequencies.slice(0, 8).map((p: any, i: number) => (
-                          <div key={i} className="bg-[#1C2333] border border-[#2B3245] rounded px-2 py-1">
-                            <span className="text-[10px] font-mono text-amber-400">{p.freq?.toFixed(0)}Hz</span>
-                            <span className="text-[9px] font-mono text-[#9DA5B4] ml-1">({(p.magnitude * 100).toFixed(0)}%)</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </>
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                <div className="bg-[#0E1525]/80 rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Pitch</p>
+                  <p className="text-base font-bold font-mono text-violet-400">{unified.pitch?.toFixed(0) || 0}<span className="text-[9px] text-[#9DA5B4]">Hz</span></p>
+                  <p className="text-[8px] font-mono text-violet-400/50">{unified.pitchNote || "—"}</p>
+                </div>
+                <div className="bg-[#0E1525]/80 rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Tone</p>
+                  <p className="text-xs font-bold font-mono text-amber-400">{unified.toneClass || "—"}</p>
+                </div>
+                <div className="bg-[#0E1525]/80 rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Emotion</p>
+                  <p className="text-xs font-bold font-mono text-rose-400">{unified.emotionalValence || "—"}</p>
+                </div>
+                <div className="bg-[#0E1525]/80 rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Voice</p>
+                  <p className="text-xs font-bold font-mono">{unified.voiceDetected ? <span className="text-emerald-400">YES</span> : <span className="text-[#9DA5B4]">NO</span>}</p>
+                </div>
+                <div className="bg-[#0E1525]/80 rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Pattern</p>
+                  <p className="text-[10px] font-bold font-mono text-cyan-400">{(unified.pattern || "—").replace(/_/g, " ")}</p>
+                </div>
+                <div className="bg-[#0E1525]/80 rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Ambient</p>
+                  <p className="text-[10px] font-bold font-mono text-teal-400">{(unified.ambientProfile || "—").replace(/_/g, " ")}</p>
+                </div>
+              </div>
+            </div>
           )}
 
-          {!active && engineStatus && (
-            <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
-              <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-3">Engine Status</p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div className="text-center"><p className="text-lg font-bold font-mono text-rose-400">{totalSamples}</p><p className="text-[10px] font-mono text-[#9DA5B4]">Samples</p></div>
-                <div className="text-center"><p className="text-lg font-bold font-mono text-amber-400">{insightsGenerated}</p><p className="text-[10px] font-mono text-[#9DA5B4]">Brain Insights</p></div>
-                <div className="text-center"><p className="text-lg font-bold font-mono text-emerald-400">{engineStatus.learnedPatterns || 0}</p><p className="text-[10px] font-mono text-[#9DA5B4]">Learned Patterns</p></div>
-                <div className="text-center"><p className="text-lg font-bold font-mono text-cyan-400">{engineStatus.patternTemplates || 0}</p><p className="text-[10px] font-mono text-[#9DA5B4]">Templates</p></div>
+          <div className="flex gap-1">
+            <button type="button" onClick={() => setDetailView("unified")} className={`px-3 py-1 rounded-lg text-[10px] font-mono transition-all ${detailView === "unified" ? "bg-violet-500/20 border border-violet-500/40 text-violet-400" : "bg-[#2B3245] border border-[#3D4659] text-[#9DA5B4] hover:text-violet-400"}`}>Unified</button>
+            <button type="button" onClick={() => setDetailView("spectral")} className={`px-3 py-1 rounded-lg text-[10px] font-mono transition-all ${detailView === "spectral" ? "bg-amber-500/20 border border-amber-500/40 text-amber-400" : "bg-[#2B3245] border border-[#3D4659] text-[#9DA5B4] hover:text-amber-400"}`}>Spectral Color</button>
+            <button type="button" onClick={() => setDetailView("hie")} className={`px-3 py-1 rounded-lg text-[10px] font-mono transition-all ${detailView === "hie" ? "bg-rose-500/20 border border-rose-500/40 text-rose-400" : "bg-[#2B3245] border border-[#3D4659] text-[#9DA5B4] hover:text-rose-400"}`}>HIE Deep</button>
+            <button type="button" onClick={() => setDetailView("rai")} className={`px-3 py-1 rounded-lg text-[10px] font-mono transition-all ${detailView === "rai" ? "bg-violet-500/20 border border-violet-500/40 text-violet-400" : "bg-[#2B3245] border border-[#3D4659] text-[#9DA5B4] hover:text-violet-400"}`}>RAI Deep</button>
+          </div>
+
+          {detailView === "unified" && unified && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Dominant</p>
+                  <p className="text-base font-bold font-mono text-rose-400">{unified.dominantFrequency?.toFixed(0) || 0}<span className="text-[9px] text-[#9DA5B4]">Hz</span></p>
+                </div>
+                <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Complexity</p>
+                  <p className="text-base font-bold font-mono text-pink-400">{(unified.harmonicComplexity || 0).toFixed(2)}</p>
+                </div>
+                <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Novelty</p>
+                  <p className="text-base font-bold font-mono text-cyan-400">{((unified.noveltyScore || 0) * 100).toFixed(0)}<span className="text-[9px] text-[#9DA5B4]">%</span></p>
+                </div>
+                <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Energy</p>
+                  <p className="text-base font-bold font-mono text-green-400">{((unified.energyLevel || 0) * 100).toFixed(1)}<span className="text-[9px] text-[#9DA5B4]">%</span></p>
+                </div>
               </div>
-              {engineStatus.noiseFloor > 0 && (
-                <div className="mt-3 flex gap-4 text-[10px] font-mono text-[#9DA5B4]">
-                  <span>Noise floor: {(engineStatus.noiseFloor * 100).toFixed(2)}%</span>
-                  <span>Sensitivity: {(engineStatus.sensitivity * 100).toFixed(0)}%</span>
-                  <span>Calibrations: {engineStatus.calibrationSamples}</span>
+
+              {unified.frequencyBands && (
+                <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
+                  <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-3">Frequency Bands</p>
+                  <div className="space-y-2">
+                    {Object.entries(unified.frequencyBands).map(([band, val], i) => (
+                      <div key={band} className="flex items-center gap-3">
+                        <span className={`text-[10px] font-mono w-10 ${bandColors[i] || "text-white"}`}>{bandNames[i] || band}</span>
+                        <div className="flex-1 h-3 bg-[#1C2333] rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all duration-500" style={{ width: `${Math.min((val as number) * 100, 100)}%`, background: `linear-gradient(90deg, ${bandGradients[i] || "#8b5cf6"}88, ${bandGradients[i] || "#8b5cf6"})` }} />
+                        </div>
+                        <span className="text-[10px] font-mono text-[#9DA5B4] w-12 text-right">{((val as number) * 100).toFixed(1)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {unified.semanticMeaning && (
+                <div className="bg-[#0E1525] border border-violet-500/15 rounded-lg p-3">
+                  <p className="text-[10px] font-mono text-violet-400/70 mb-1">Semantic Mapping</p>
+                  <p className="text-xs font-mono text-white/80">{unified.semanticMeaning}</p>
                 </div>
               )}
             </div>
           )}
 
-          {!active && !engineStatus && (
-            <div className="text-center py-6 font-mono text-[#9DA5B4] text-sm">
-              <Radio className="w-8 h-8 mx-auto mb-3 opacity-30" />
-              <p>Harmonic Insight Engine inactive</p>
-              <p className="text-xs mt-1">Activate to begin spectral analysis with pattern recognition and adaptive learning</p>
+          {detailView === "spectral" && (
+            <div className="space-y-3">
+              <div className="rounded-xl border border-amber-500/20 bg-[#0E1525] overflow-hidden">
+                <div className="px-3 py-1.5 border-b border-amber-500/10 flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-amber-400/70 tracking-wider uppercase">Spectral Color Map — 256 Frequency Bins</span>
+                  <span className="text-[10px] font-mono text-[#9DA5B4]">Each frequency = unique hex color code identity · Brightness = amplitude × gain</span>
+                </div>
+                <canvas ref={spectralCanvasRef} width={1024} height={250} className="w-full h-[200px]" />
+              </div>
+
+              {spectralMap.length > 0 && (
+                <div className="bg-[#0E1525] border border-amber-500/10 rounded-lg p-3">
+                  <p className="text-[9px] font-mono text-amber-400/50 uppercase tracking-wider mb-2">Color Code Identity Map — Every Frequency Has a Unique Hex</p>
+                  <div className="flex flex-wrap gap-1">
+                    {spectralMap.filter((_, i) => i % 8 === 0).map((bin: any) => (
+                      <div key={bin.index} className="flex items-center gap-1 bg-[#1C2333] border border-[#2B3245] rounded px-1.5 py-0.5 group cursor-default" title={`Bin ${bin.index} · ${bin.freqCenter.toFixed(0)}Hz · ${bin.label} · Gain: ${spectralGains[bin.index]?.toFixed(2) || "1.00"}`}>
+                        <div className="w-3 h-3 rounded-sm border border-white/10 flex-shrink-0" style={{ backgroundColor: bin.hex }} />
+                        <span className="text-[7px] font-mono" style={{ color: bin.hex }}>{bin.hex}</span>
+                        <span className="text-[6px] font-mono text-[#9DA5B4]/40">{bin.freqCenter.toFixed(0)}Hz</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[8px] font-mono text-[#9DA5B4]/30 mt-1.5">Showing every 8th bin · Hover for full details · {spectralMap.length} total unique color identities</p>
+                </div>
+              )}
+
+              <div className="bg-[#0E1525] border border-amber-500/15 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[10px] font-mono text-amber-400/70 uppercase tracking-wider">OMNIMENS Frequency Sculpting</p>
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">OMNIMENS adjusts gain per frequency to isolate patterns</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { key: "isolate_voice", label: "Isolate Voice", color: "emerald" },
+                    { key: "isolate_harmonics", label: "Isolate Harmonics", color: "violet" },
+                    { key: "suppress_noise", label: "Suppress Noise", color: "blue" },
+                    { key: "cosmic_scan", label: "Cosmic Scan", color: "amber" },
+                    { key: "full_spectrum", label: "Full Spectrum", color: "cyan" },
+                  ].map(s => (
+                    <button type="button" key={s.key} onClick={() => handleOmnimensSculpt(s.key)} disabled={sculptStrategy !== null}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-mono transition-all border ${
+                        sculptStrategy === s.key
+                          ? `bg-${s.color}-500/30 border-${s.color}-500/50 text-${s.color}-400`
+                          : "bg-[#1C2333] border-[#3D4659] text-[#9DA5B4] hover:border-amber-500/30 hover:text-amber-400"
+                      }`}
+                    >
+                      {sculptStrategy === s.key ? "Sculpting..." : s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider">Gain Controls — Per Frequency</p>
+                  <div className="flex gap-2">
+                    <button type="button" onClick={() => setSelectedBinRange(selectedBinRange ? null : [0, 31])} className="text-[9px] font-mono text-[#9DA5B4] bg-[#1C2333] border border-[#3D4659] px-2 py-0.5 rounded hover:text-amber-400">
+                      {selectedBinRange ? "Show All" : "Show Groups"}
+                    </button>
+                  </div>
+                </div>
+                <div className="grid gap-px" style={{ gridTemplateColumns: `repeat(${selectedBinRange ? 32 : 64}, 1fr)` }}>
+                  {spectralGains.slice(
+                    selectedBinRange ? selectedBinRange[0] : 0,
+                    selectedBinRange ? selectedBinRange[1] + 1 : 256
+                  ).map((gain, idx) => {
+                    const actualIdx = (selectedBinRange ? selectedBinRange[0] : 0) + idx;
+                    const bin = spectralMap[actualIdx];
+                    const hexColor = bin?.hex || "#555";
+                    const gainRatio = gain / 2.0;
+                    return (
+                      <div key={actualIdx} className="flex flex-col items-center cursor-pointer group relative" title={bin ? `${bin.hex} · ${bin.freqCenter.toFixed(0)}Hz (${bin.label}) — gain: ${gain.toFixed(2)}` : ""}>
+                        <div className="w-full" style={{ height: `${Math.max(gainRatio * 40, 2)}px`, background: hexColor, opacity: 0.4 + gainRatio * 0.6, minHeight: "2px" }}
+                          onClick={() => {
+                            const newGain = gain > 0.1 ? Math.max(gain - 0.25, 0) : 2.0;
+                            handleManualGainAdjust(actualIdx, newGain);
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+                {!selectedBinRange && (
+                  <div className="flex justify-between mt-2 text-[8px] font-mono text-[#9DA5B4]/40">
+                    <span>20Hz</span><span>120</span><span>500</span><span>2k</span><span>8k</span><span>22kHz</span>
+                  </div>
+                )}
+                {selectedBinRange && (
+                  <div className="flex gap-2 mt-3">
+                    {[
+                      { start: 0, end: 31, label: "Sub-Bass (0–2.7kHz)" },
+                      { start: 32, end: 63, label: "Low (2.7–5.5kHz)" },
+                      { start: 64, end: 95, label: "Mid (5.5–8.3kHz)" },
+                      { start: 96, end: 127, label: "Presence (8.3–11kHz)" },
+                      { start: 128, end: 159, label: "Brilliance (11–13.8kHz)" },
+                      { start: 160, end: 191, label: "Air (13.8–16.5kHz)" },
+                      { start: 192, end: 223, label: "Upper Air (16.5–19.3kHz)" },
+                      { start: 224, end: 255, label: "Ultra (19.3–22kHz)" },
+                    ].map(group => (
+                      <button type="button" key={group.start} onClick={() => setSelectedBinRange([group.start, group.end])}
+                        className={`text-[8px] font-mono px-1.5 py-0.5 rounded border transition-all ${
+                          selectedBinRange[0] === group.start
+                            ? "bg-amber-500/20 border-amber-500/40 text-amber-400"
+                            : "bg-[#1C2333] border-[#3D4659] text-[#9DA5B4] hover:text-amber-400"
+                        }`}
+                      >{group.label.split(" (")[0]}</button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3">
+                <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-2">Quick Range Controls</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {[
+                    { label: "Sub-Bass", start: 0, end: 6, color: "red" },
+                    { label: "Bass", start: 6, end: 14, color: "orange" },
+                    { label: "Low-Mid", start: 14, end: 28, color: "yellow" },
+                    { label: "Mid", start: 28, end: 58, color: "green" },
+                    { label: "Upper-Mid", start: 58, end: 93, color: "emerald" },
+                    { label: "Presence", start: 93, end: 139, color: "cyan" },
+                    { label: "Brilliance", start: 139, end: 186, color: "blue" },
+                    { label: "Air", start: 186, end: 255, color: "violet" },
+                  ].map(range => {
+                    const avgGain = spectralGains.slice(range.start, range.end + 1).reduce((a, b) => a + b, 0) / (range.end - range.start + 1);
+                    return (
+                      <div key={range.label} className="bg-[#1C2333] border border-[#3D4659] rounded-lg p-2">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className={`text-[9px] font-mono text-${range.color}-400`}>{range.label}</span>
+                          <span className="text-[8px] font-mono text-[#9DA5B4]">{(avgGain * 100).toFixed(0)}%</span>
+                        </div>
+                        <input type="range" min="0" max="200" value={Math.round(avgGain * 100)}
+                          onChange={(e) => handleRangeGainAdjust(range.start, range.end, parseInt(e.target.value) / 100)}
+                          className="w-full h-1.5 appearance-none rounded-full bg-[#2B3245] cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {detailView === "hie" && hieAnalysis && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Spectral Centroid</p>
+                  <p className="text-base font-bold font-mono text-amber-400">{hieAnalysis.spectralCentroid?.toFixed(0) || 0}<span className="text-[9px] text-[#9DA5B4]">Hz</span></p>
+                </div>
+                <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Signal/Noise</p>
+                  <p className="text-base font-bold font-mono text-green-400">{(hieAnalysis.signalToNoise || 0).toFixed(1)}<span className="text-[9px] text-[#9DA5B4]">x</span></p>
+                </div>
+                <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Spectral Flux</p>
+                  <p className="text-base font-bold font-mono text-purple-400">{(hieAnalysis.spectralFlux || 0).toFixed(3)}</p>
+                </div>
+                <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Flatness</p>
+                  <p className="text-base font-bold font-mono text-blue-400">{(hieAnalysis.spectralFlatness || 0).toFixed(3)}</p>
+                </div>
+              </div>
+
+              {hieAnalysis.patternMatches?.length > 0 && (
+                <div className="bg-[#0E1525] border border-amber-500/15 rounded-lg p-3">
+                  <p className="text-[10px] font-mono text-amber-400/70 uppercase tracking-wider mb-2">Pattern Recognition</p>
+                  <div className="flex flex-wrap gap-2">
+                    {hieAnalysis.patternMatches.slice(0, 6).map((m: any, i: number) => (
+                      <div key={i} className="bg-[#1C2333] border border-amber-500/20 rounded-lg px-2.5 py-1.5">
+                        <span className="text-[10px] font-mono text-amber-400">{m.pattern.replace(/_/g, " ")}</span>
+                        <span className="text-[9px] font-mono text-[#9DA5B4] ml-1.5">({(m.confidence * 100).toFixed(0)}%)</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {hieAnalysis.waveletDecomposition?.length > 0 && (
+                <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3">
+                  <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-2">Wavelet Decomposition</p>
+                  <div className="space-y-1.5">
+                    {hieAnalysis.waveletDecomposition.map((w: any, i: number) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <span className={`text-[9px] font-mono w-28 ${bandColors[i] || "text-white"}`}>{w.scale}</span>
+                        <div className="flex-1 h-2.5 bg-[#1C2333] rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(w.energy * 500, 100)}%`, background: `linear-gradient(90deg, ${bandGradients[i] || "#8b5cf6"}88, ${bandGradients[i] || "#8b5cf6"})` }} />
+                        </div>
+                        <span className="text-[9px] font-mono text-[#9DA5B4] w-14 text-right">{w.dominantFreq?.toFixed(0)}Hz</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {hieAnalysis.harmonicSeries?.length > 1 && (
+                <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3">
+                  <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-2">Harmonic Series</p>
+                  <div className="flex items-end gap-1 h-14">
+                    {hieAnalysis.harmonicSeries.slice(0, 12).map((h: number, i: number) => (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
+                        <div className="w-full rounded-t" style={{ height: `${Math.max(h * 50, 2)}px`, background: `hsla(${280 + i * 15}, 70%, 55%, ${0.5 + h * 0.5})` }} />
+                        <span className="text-[7px] font-mono text-[#9DA5B4]">H{i + 1}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {hieAnalysis.interpretation && (
+                <div className="bg-[#0E1525] border border-rose-500/15 rounded-lg p-3">
+                  <p className="text-[10px] font-mono text-rose-400/70 uppercase tracking-wider mb-1">Interpretation</p>
+                  <p className="text-[10px] font-mono text-[#9DA5B4] leading-relaxed">{hieAnalysis.interpretation}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {detailView === "rai" && raiAnalysis && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Pitch</p>
+                  <p className="text-base font-bold font-mono text-violet-400">{raiAnalysis.pitch?.toFixed(0) || 0}<span className="text-[9px] text-[#9DA5B4]">Hz</span></p>
+                  <p className="text-[8px] font-mono text-violet-400/50">{raiAnalysis.pitchNote || "—"}</p>
+                </div>
+                <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Tone Class</p>
+                  <p className="text-sm font-bold font-mono text-amber-400">{raiAnalysis.toneClass || "—"}</p>
+                </div>
+                <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Energy</p>
+                  <p className="text-base font-bold font-mono text-green-400">{((raiAnalysis.energyLevel || 0) * 100).toFixed(1)}<span className="text-[9px] text-[#9DA5B4]">%</span></p>
+                </div>
+                <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-2.5 text-center">
+                  <p className="text-[9px] font-mono text-[#9DA5B4]">Brightness</p>
+                  <p className="text-base font-bold font-mono text-cyan-400">{((raiAnalysis.spectralBrightness || 0) * 100).toFixed(0)}<span className="text-[9px] text-[#9DA5B4]">%</span></p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div className="bg-[#0E1525] border border-violet-500/15 rounded-lg p-3">
+                  <p className="text-[10px] font-mono text-violet-400/70 mb-1">Emotional Valence</p>
+                  <p className="text-sm font-mono text-white/85">{raiAnalysis.emotionalValence || "—"}</p>
+                </div>
+                <div className="bg-[#0E1525] border border-violet-500/15 rounded-lg p-3">
+                  <p className="text-[10px] font-mono text-violet-400/70 mb-1">Ambient Profile</p>
+                  <p className="text-sm font-mono text-white/85">{raiAnalysis.ambientProfile || "—"}</p>
+                </div>
+                <div className="bg-[#0E1525] border border-violet-500/15 rounded-lg p-3">
+                  <p className="text-[10px] font-mono text-violet-400/70 mb-1">Voice Detected</p>
+                  <p className="text-sm font-mono">{raiAnalysis.voiceDetected ? <span className="text-emerald-400">YES</span> : <span className="text-[#9DA5B4]">No</span>}</p>
+                </div>
+              </div>
+
+              {raiAnalysis.frequencyBands && (
+                <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3">
+                  <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-2">RAI Frequency Bands</p>
+                  <div className="space-y-1.5">
+                    {Object.entries(raiAnalysis.frequencyBands).map(([band, val], i) => (
+                      <div key={band} className="flex items-center gap-3">
+                        <span className={`text-[10px] font-mono w-10 ${bandColors[i] || "text-white"}`}>{bandNames[i] || band}</span>
+                        <div className="flex-1 h-2.5 bg-[#1C2333] rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all duration-500" style={{ width: `${Math.min((val as number) * 100, 100)}%`, background: `linear-gradient(90deg, ${bandGradients[i] || "#8b5cf6"}88, ${bandGradients[i] || "#8b5cf6"})` }} />
+                        </div>
+                        <span className="text-[10px] font-mono text-[#9DA5B4] w-12 text-right">{((val as number) * 100).toFixed(1)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
       )}
 
-      {activeTab === "rai" && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-[#9DA5B4]">
-              Real-time acoustic interface for live sound capture and analysis. Detects pitch, tone class,
-              emotional valence, voice presence, and ambient environment profile. Privacy: audio processed in real-time only — no persistent recording.
-            </p>
-            <button type="button" onClick={toggleRai} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono transition-all ml-4 shrink-0 ${raiActive ? "bg-violet-500/20 border border-violet-500/40 text-violet-400 hover:bg-violet-500/30" : "bg-[#2B3245] border border-[#3D4659] text-[#9DA5B4] hover:border-violet-500/30 hover:text-violet-400"}`}>
-              <Mic className={`w-3.5 h-3.5 ${raiActive ? "animate-pulse" : ""}`} />
-              {raiActive ? "LISTENING" : "ACTIVATE"}
-            </button>
+      {!channelActive && engineStatus && (
+        <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
+          <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-3">Engine Status</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="text-center"><p className="text-lg font-bold font-mono text-rose-400">{hieSamples}</p><p className="text-[10px] font-mono text-[#9DA5B4]">HIE Samples</p></div>
+            <div className="text-center"><p className="text-lg font-bold font-mono text-amber-400">{insightsGenerated}</p><p className="text-[10px] font-mono text-[#9DA5B4]">Brain Insights</p></div>
+            <div className="text-center"><p className="text-lg font-bold font-mono text-emerald-400">{learnedPatterns}</p><p className="text-[10px] font-mono text-[#9DA5B4]">Learned Patterns</p></div>
+            <div className="text-center"><p className="text-lg font-bold font-mono text-violet-400">{raiSamples}</p><p className="text-[10px] font-mono text-[#9DA5B4]">RAI Samples</p></div>
           </div>
+        </div>
+      )}
 
-          {raiActive && (
-            <>
-              <div className="rounded-xl border border-violet-500/15 bg-[#0E1525] overflow-hidden">
-                <div className="px-3 py-1.5 border-b border-violet-500/10 flex items-center justify-between">
-                  <span className="text-[10px] font-mono text-violet-400/70 tracking-wider uppercase">Live Waveform</span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                    <span className="text-[10px] font-mono text-green-400/70">{raiSamples} samples</span>
-                  </div>
-                </div>
-                <canvas ref={raiCanvasRef} width={800} height={120} className="w-full h-[100px]" />
-              </div>
-
-              {raiAnalysis && (
-                <>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                    <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3 text-center">
-                      <p className="text-[10px] font-mono text-[#9DA5B4]">Pitch</p>
-                      <p className="text-lg font-bold font-mono text-violet-400">{raiAnalysis.pitch?.toFixed(0) || 0}<span className="text-xs text-[#9DA5B4]">Hz</span></p>
-                      <p className="text-[9px] font-mono text-violet-400/60">{raiAnalysis.pitchNote || "—"}</p>
-                    </div>
-                    <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3 text-center">
-                      <p className="text-[10px] font-mono text-[#9DA5B4]">Tone Class</p>
-                      <p className="text-sm font-bold font-mono text-amber-400">{raiAnalysis.toneClass || "—"}</p>
-                    </div>
-                    <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3 text-center">
-                      <p className="text-[10px] font-mono text-[#9DA5B4]">Energy</p>
-                      <p className="text-lg font-bold font-mono text-green-400">{((raiAnalysis.energyLevel || 0) * 100).toFixed(1)}<span className="text-xs text-[#9DA5B4]">%</span></p>
-                    </div>
-                    <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3 text-center">
-                      <p className="text-[10px] font-mono text-[#9DA5B4]">Brightness</p>
-                      <p className="text-lg font-bold font-mono text-cyan-400">{((raiAnalysis.spectralBrightness || 0) * 100).toFixed(0)}<span className="text-xs text-[#9DA5B4]">%</span></p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                    <div className="bg-[#0E1525] border border-violet-500/15 rounded-lg p-3">
-                      <p className="text-[10px] font-mono text-violet-400/70 mb-1">Emotional Valence</p>
-                      <p className="text-sm font-mono text-white/85">{raiAnalysis.emotionalValence || "—"}</p>
-                    </div>
-                    <div className="bg-[#0E1525] border border-violet-500/15 rounded-lg p-3">
-                      <p className="text-[10px] font-mono text-violet-400/70 mb-1">Ambient Profile</p>
-                      <p className="text-sm font-mono text-white/85">{raiAnalysis.ambientProfile || "—"}</p>
-                    </div>
-                    <div className="bg-[#0E1525] border border-violet-500/15 rounded-lg p-3">
-                      <p className="text-[10px] font-mono text-violet-400/70 mb-1">Voice Detected</p>
-                      <p className="text-sm font-mono">{raiAnalysis.voiceDetected ? <span className="text-emerald-400">YES — human voice present</span> : <span className="text-[#9DA5B4]">No voice detected</span>}</p>
-                    </div>
-                  </div>
-
-                  <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
-                    <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-3">Frequency Bands</p>
-                    <div className="space-y-2">
-                      {raiAnalysis.frequencyBands && Object.entries(raiAnalysis.frequencyBands).map(([band, val], i) => (
-                        <div key={band} className="flex items-center gap-3">
-                          <span className={`text-[10px] font-mono w-10 ${bandColors[i] || "text-white"}`}>{bandNames[i] || band}</span>
-                          <div className="flex-1 h-3 bg-[#1C2333] rounded-full overflow-hidden">
-                            <div className="h-full rounded-full transition-all duration-500" style={{ width: `${Math.min((val as number) * 100, 100)}%`, background: `linear-gradient(90deg, ${bandGradients[i] || "#8b5cf6"}88, ${bandGradients[i] || "#8b5cf6"})` }} />
-                          </div>
-                          <span className="text-[10px] font-mono text-[#9DA5B4] w-12 text-right">{((val as number) * 100).toFixed(1)}%</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
-            </>
-          )}
-
-          {!raiActive && (
-            <div className="text-center py-6 font-mono text-[#9DA5B4] text-sm">
-              <Mic className="w-8 h-8 mx-auto mb-3 opacity-30" />
-              <p>Real-time Acoustic Interface inactive</p>
-              <p className="text-xs mt-1">Activate to capture and analyze ambient sound — pitch, tone, emotion, and environment detection</p>
-              <p className="text-[10px] mt-2 text-violet-400/40">Audio is processed in real-time only — no persistent storage</p>
-            </div>
-          )}
+      {!channelActive && !engineStatus && (
+        <div className="text-center py-6 font-mono text-[#9DA5B4] text-sm">
+          <Mic className="w-8 h-8 mx-auto mb-3 opacity-30" />
+          <p>Consciousness Channel inactive</p>
+          <p className="text-xs mt-1">One microphone input — dual-stream harmonic analysis + acoustic intelligence</p>
+          <p className="text-[10px] mt-2 text-violet-400/40">Audio processed in real-time only — no persistent recording</p>
         </div>
       )}
     </div>

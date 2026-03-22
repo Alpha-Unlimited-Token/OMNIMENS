@@ -1,0 +1,104 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
+ * Written: 2026-03-22T21:37:49.461Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+function KnowledgeGraph() {
+    this.nodes = new Map();
+    this.edges = new Map();
+}
+
+KnowledgeGraph.prototype.addNode = function (node) {
+    if (!this.nodes.has(node)) {
+        this.nodes.set(node, []);
+    }
+};
+
+KnowledgeGraph.prototype.addEdge = function (node1, node2) {
+    if (!this.nodes.has(node1)) {
+        this.addNode(node1);
+    }
+    if (!this.nodes.has(node2)) {
+        this.addNode(node2);
+    }
+    this.nodes.get(node1).push(node2);
+    this.nodes.get(node2).push(node1);
+
+    const edgeKey = [node1, node2].sort().join('-');
+    this.edges.set(edgeKey, true);
+};
+
+KnowledgeGraph.prototype.retrievePattern = function (startNode, depth) {
+    if (!this.nodes.has(startNode)) {
+        return [];
+    }
+
+    const visited = new Set();
+    const patterns = [];
+    const queue = [[startNode, 0]];
+
+    while (queue.length > 0) {
+        const [currentNode, currentDepth] = queue.shift();
+
+        if (currentDepth > depth) {
+            continue;
+        }
+
+        if (!visited.has(currentNode)) {
+            visited.add(currentNode);
+            patterns.push(currentNode);
+
+            for (const neighbor of this.nodes.get(currentNode)) {
+                queue.push([neighbor, currentDepth + 1]);
+            }
+        }
+    }
+
+    return patterns;
+};
+
+// Self-tests
+function runTests() {
+    const graph = new KnowledgeGraph();
+
+    // Add nodes and edges
+    graph.addNode("A");
+    graph.addNode("B");
+    graph.addNode("C");
+    graph.addNode("D");
+    graph.addEdge("A", "B");
+    graph.addEdge("A", "C");
+    graph.addEdge("B", "D");
+    graph.addEdge("C", "D");
+
+    // Test pattern retrieval
+    console.log("Test 1: Retrieve patterns from A with depth 1");
+    console.log(graph.retrievePattern("A", 1)); // Expected: ["A", "B", "C"]
+
+    console.log("Test 2: Retrieve patterns from A with depth 2");
+    console.log(graph.retrievePattern("A", 2)); // Expected: ["A", "B", "C", "D"]
+
+    console.log("Test 3: Retrieve patterns from D with depth 1");
+    console.log(graph.retrievePattern("D", 1)); // Expected: ["D", "B", "C"]
+
+    console.log("Test 4: Retrieve patterns from non-existent node");
+    console.log(graph.retrievePattern("Z", 2)); // Expected: []
+
+    console.log("Test 5: Retrieve patterns from A with depth 0");
+    console.log(graph.retrievePattern("A", 0)); // Expected: ["A"]
+}
+
+runTests();

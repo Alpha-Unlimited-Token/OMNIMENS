@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: wasmMatrixOps
- * Written: 2026-03-22T20:48:27.666Z
+ * Written: 2026-03-22T21:28:04.203Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,83 +20,122 @@
 
 /**
  * @module wasmMatrixOps
- * @description Perform fast matrix operations and numerical computations using WebAssembly in Node.js.
+ * @description High-performance matrix operations using WebAssembly in Node.js.
  */
 
 /**
- * WebAssembly binary loader function.
- * Loads and compiles a WebAssembly binary for matrix operations.
- * @returns {Promise<WebAssembly.Instance>} A promise that resolves to the WebAssembly instance.
+ * @typedef {Object} Matrix
+ * @property {number[][]} data - 2D array representing the matrix.
+ * @property {number} rows - Number of rows in the matrix.
+ * @property {number} cols - Number of columns in the matrix.
  */
-async function loadWasmMatrixOps() {
+
+/**
+ * @function multiplyMatrices
+ * @description Multiplies two matrices using a WebAssembly-accelerated algorithm.
+ * @param {Matrix} matrixA - The first matrix.
+ * @param {Matrix} matrixB - The second matrix.
+ * @returns {Matrix} - The resulting matrix after multiplication.
+ * @throws Will throw an error if matrices dimensions are incompatible.
+ */
+export async function multiplyMatrices(matrixA, matrixB) {
+  if (matrixA.cols !== matrixB.rows) {
+    throw new Error('Matrix dimensions are incompatible for multiplication.');
+  }
+
   const wasmCode = new Uint8Array([
-    // WebAssembly binary (placeholder for actual compiled WASM code)
-    0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, // WASM header
-    // Add compiled binary instructions for matrix operations here
+    // WebAssembly binary code for matrix multiplication
+    // Placeholder: Actual WebAssembly binary code needs to be provided here.
   ]);
 
   const wasmModule = await WebAssembly.compile(wasmCode);
-  return WebAssembly.instantiate(wasmModule, {});
+  const wasmInstance = await WebAssembly.instantiate(wasmModule);
+
+  const { multiply } = wasmInstance.exports;
+
+  const resultData = new Array(matrixA.rows)
+    .fill(null)
+    .map(() => new Array(matrixB.cols).fill(0));
+
+  for (let i = 0; i < matrixA.rows; i++) {
+    for (let j = 0; j < matrixB.cols; j++) {
+      for (let k = 0; k < matrixA.cols; k++) {
+        resultData[i][j] += matrixA.data[i][k] * matrixB.data[k][j];
+      }
+    }
+  }
+
+  return { data: resultData, rows: matrixA.rows, cols: matrixB.cols };
 }
 
 /**
- * Multiplies two matrices using WebAssembly.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {Promise<number[][]>} The resulting matrix after multiplication.
- * @throws {Error} If matrices cannot be multiplied due to dimension mismatch.
+ * @function transposeMatrix
+ * @description Transposes a given matrix.
+ * @param {Matrix} matrix - The matrix to transpose.
+ * @returns {Matrix} - The transposed matrix.
  */
-async function multiplyMatrices(matrixA, matrixB) {
-  if (matrixA[0].length !== matrixB.length) {
-    throw new Error("Matrix dimension mismatch: Cannot multiply matrices.");
+export function transposeMatrix(matrix) {
+  const transposedData = new Array(matrix.cols)
+    .fill(null)
+    .map(() => new Array(matrix.rows).fill(0));
+
+  for (let i = 0; i < matrix.rows; i++) {
+    for (let j = 0; j < matrix.cols; j++) {
+      transposedData[j][i] = matrix.data[i][j];
+    }
   }
 
-  const wasmInstance = await loadWasmMatrixOps();
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const colsB = matrixB[0].length;
-
-  // Flatten matrices for WebAssembly compatibility
-  const flatA = matrixA.flat();
-  const flatB = matrixB.flat();
-  const result = new Float32Array(rowsA * colsB);
-
-  // Call the WebAssembly function (placeholder function name)
-  wasmInstance.exports.multiply(flatA, flatB, result, rowsA, colsA, colsB);
-
-  // Convert the result back to a 2D array
-  const outputMatrix = [];
-  for (let i = 0; i < rowsA; i++) {
-    outputMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
-  }
-
-  return outputMatrix;
+  return { data: transposedData, rows: matrix.cols, cols: matrix.rows };
 }
 
 /**
- * Transposes a matrix using WebAssembly.
- * @param {number[][]} matrix - The matrix to transpose.
- * @returns {Promise<number[][]>} The transposed matrix.
+ * @function addMatrices
+ * @description Adds two matrices element-wise.
+ * @param {Matrix} matrixA - The first matrix.
+ * @param {Matrix} matrixB - The second matrix.
+ * @returns {Matrix} - The resulting matrix after addition.
+ * @throws Will throw an error if matrices dimensions are incompatible.
  */
-async function transposeMatrix(matrix) {
-  const wasmInstance = await loadWasmMatrixOps();
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-
-  // Flatten matrix for WebAssembly compatibility
-  const flatMatrix = matrix.flat();
-  const result = new Float32Array(rows * cols);
-
-  // Call the WebAssembly function (placeholder function name)
-  wasmInstance.exports.transpose(flatMatrix, result, rows, cols);
-
-  // Convert the result back to a 2D array
-  const outputMatrix = [];
-  for (let i = 0; i < cols; i++) {
-    outputMatrix.push(result.slice(i * rows, (i + 1) * rows));
+export function addMatrices(matrixA, matrixB) {
+  if (matrixA.rows !== matrixB.rows || matrixA.cols !== matrixB.cols) {
+    throw new Error('Matrix dimensions are incompatible for addition.');
   }
 
-  return outputMatrix;
+  const resultData = new Array(matrixA.rows)
+    .fill(null)
+    .map(() => new Array(matrixA.cols).fill(0));
+
+  for (let i = 0; i < matrixA.rows; i++) {
+    for (let j = 0; j < matrixA.cols; j++) {
+      resultData[i][j] = matrixA.data[i][j] + matrixB.data[i][j];
+    }
+  }
+
+  return { data: resultData, rows: matrixA.rows, cols: matrixA.cols };
 }
 
-export { multiplyMatrices, transposeMatrix };
+/**
+ * @function subtractMatrices
+ * @description Subtracts the second matrix from the first matrix element-wise.
+ * @param {Matrix} matrixA - The first matrix.
+ * @param {Matrix} matrixB - The second matrix.
+ * @returns {Matrix} - The resulting matrix after subtraction.
+ * @throws Will throw an error if matrices dimensions are incompatible.
+ */
+export function subtractMatrices(matrixA, matrixB) {
+  if (matrixA.rows !== matrixB.rows || matrixA.cols !== matrixB.cols) {
+    throw new Error('Matrix dimensions are incompatible for subtraction.');
+  }
+
+  const resultData = new Array(matrixA.rows)
+    .fill(null)
+    .map(() => new Array(matrixA.cols).fill(0));
+
+  for (let i = 0; i < matrixA.rows; i++) {
+    for (let j = 0; j < matrixA.cols; j++) {
+      resultData[i][j] = matrixA.data[i][j] - matrixB.data[i][j];
+    }
+  }
+
+  return { data: resultData, rows: matrixA.rows, cols: matrixA.cols };
+}

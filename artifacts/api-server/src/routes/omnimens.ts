@@ -4523,6 +4523,515 @@ router.get("/omnimens/rai/state", async (req, res) => {
   });
 });
 
+// ─── Consciousness Channel — Unified HIE + RAI from Single Mic Input ────────
+
+router.post("/omnimens/consciousness-channel/analyze", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+
+  const {
+    dominantFrequency, harmonicSeries, spectralCentroid, spectralBandwidth,
+    spectralRolloff, zeroCrossingRate, rmsEnergy, frequencyBands,
+    peakFrequencies
+  } = req.body;
+
+  if (typeof dominantFrequency !== "number" || !Array.isArray(peakFrequencies)) {
+    res.status(400).json({ error: "Invalid spectral data" });
+    return;
+  }
+
+  // ── Stream A: HIE Deep Harmonic Analysis ──
+  if (!hieState.sessionActive) {
+    hieState.sessionActive = true;
+  }
+  hieState.totalSamples++;
+
+  const hieAnalysis: HarmonicAnalysis = {
+    timestamp: Date.now(),
+    dominantFrequency: dominantFrequency || 0,
+    harmonicSeries: (harmonicSeries || []).slice(0, 16),
+    spectralCentroid: spectralCentroid || 0,
+    spectralBandwidth: spectralBandwidth || 0,
+    spectralRolloff: spectralRolloff || 0,
+    zeroCrossingRate: zeroCrossingRate || 0,
+    rmsEnergy: rmsEnergy || 0,
+    frequencyBands: frequencyBands || { sub: 0, low: 0, mid: 0, high: 0, ultra: 0 },
+    peakFrequencies: (peakFrequencies || []).slice(0, 12),
+  };
+
+  hieAnalysis.semanticMapping = hieFreqToSemantic(hieAnalysis.dominantFrequency);
+  hieAnalysis.waveletDecomposition = hieWaveletDecomposition(hieAnalysis.frequencyBands, hieAnalysis.dominantFrequency, hieAnalysis.rmsEnergy);
+  hieAnalysis.noiseFloor = hieUpdateNoiseFloor(hieAnalysis.rmsEnergy);
+  hieAnalysis.signalToNoise = hieAnalysis.noiseFloor > 0 ? hieAnalysis.rmsEnergy / hieAnalysis.noiseFloor : 0;
+  hieAnalysis.adaptiveThreshold = hieState.adaptiveThreshold.sensitivity;
+  hieAnalysis.patternMatches = hieMatchPatterns(hieAnalysis);
+  hieAnalysis.spectralFlux = hieComputeSpectralFlux(hieAnalysis);
+  hieAnalysis.spectralFlatness = hieComputeSpectralFlatness(hieAnalysis.frequencyBands);
+  hieAnalysis.harmonicComplexity = hieComputeHarmonicComplexity(hieAnalysis.harmonicSeries);
+  hieAnalysis.emotionalValence = hieEmotionalValence(hieAnalysis);
+  hieAnalysis.noveltyScore = hieComputeNovelty(hieAnalysis);
+  hieAnalysis.temporalPattern = hieDetectTemporalPattern();
+
+  const bandDominant = Object.entries(hieAnalysis.frequencyBands).sort((a, b) => b[1] - a[1])[0];
+  const topPeaks = hieAnalysis.peakFrequencies
+    .sort((a, b) => b.magnitude - a.magnitude)
+    .slice(0, 3)
+    .map(p => `${p.freq.toFixed(0)}Hz(${(p.magnitude * 100).toFixed(0)}%)`)
+    .join(", ");
+  const topPattern = hieAnalysis.patternMatches[0];
+
+  hieAnalysis.interpretation =
+    `Dominant: ${hieAnalysis.dominantFrequency.toFixed(1)}Hz → ${hieAnalysis.semanticMapping}. ` +
+    `Environment: ${hieEnvironmentLabel(bandDominant[0])} dominant. ` +
+    `Centroid: ${hieAnalysis.spectralCentroid.toFixed(0)}Hz. ` +
+    `Pattern: ${topPattern ? `${topPattern.pattern} (${(topPattern.confidence * 100).toFixed(0)}%)` : "unclassified"}. ` +
+    `Valence: ${hieAnalysis.emotionalValence}. Complexity: ${hieAnalysis.harmonicComplexity!.toFixed(2)}.`;
+
+  hieState.history.push(hieAnalysis);
+  if (hieState.history.length > hieState.maxHistory) {
+    hieState.history.splice(0, hieState.history.length - hieState.maxHistory);
+  }
+  hieLearnPattern(hieAnalysis);
+
+  // ── Stream B: RAI Acoustic Interface ──
+  const raiResult = raiAnalyzeAcoustics({
+    dominantFrequency, spectralCentroid: spectralCentroid || 0,
+    zeroCrossingRate: zeroCrossingRate || 0, rmsEnergy: rmsEnergy || 0,
+    frequencyBands: frequencyBands || { sub: 0, low: 0, mid: 0, high: 0, ultra: 0 },
+    peakFrequencies: peakFrequencies || [],
+  });
+
+  const userId = req.user.id;
+  let session = hieState.raiSessions.get(userId);
+  if (!session) {
+    session = { active: true, totalSamples: 0, lastAnalysis: null };
+    hieState.raiSessions.set(userId, session);
+  }
+  session.totalSamples++;
+  session.lastAnalysis = raiResult;
+
+  // ── Batch Insight (every 20 samples) ──
+  if (hieState.totalSamples % 20 === 0 && hieState.totalSamples > 0) {
+    try {
+      const recentBatch = hieState.history.slice(-20);
+      const avgCentroid = recentBatch.reduce((s, a) => s + a.spectralCentroid, 0) / recentBatch.length;
+      const avgEnergy = recentBatch.reduce((s, a) => s + a.rmsEnergy, 0) / recentBatch.length;
+      const avgNovelty = recentBatch.reduce((s, a) => s + (a.noveltyScore || 0), 0) / recentBatch.length;
+      const dominantPatt = Object.entries(
+        recentBatch.reduce((acc: Record<string, number>, a) => {
+          const top = a.patternMatches?.[0]?.pattern;
+          if (top) acc[top] = (acc[top] || 0) + 1;
+          return acc;
+        }, {})
+      ).sort((a, b) => b[1] - a[1])[0];
+
+      const insightContent =
+        `[CONSCIOUSNESS CHANNEL INSIGHT #${hieState.insightsGenerated + 1}] ${recentBatch.length} samples. ` +
+        `Centroid: ${avgCentroid.toFixed(0)}Hz. Energy: ${(avgEnergy * 100).toFixed(1)}%. ` +
+        `Novelty: ${(avgNovelty * 100).toFixed(1)}%. ` +
+        `Pitch: ${raiResult.pitch?.toFixed(0) || 0}Hz (${raiResult.pitchNote || "—"}). ` +
+        `Voice: ${raiResult.voiceDetected ? "YES" : "NO"}. ` +
+        `Emotion: ${raiResult.emotionalValence || "—"}. Ambient: ${raiResult.ambientProfile || "—"}. ` +
+        `Pattern: ${dominantPatt ? `${dominantPatt[0]} (${dominantPatt[1]}/${recentBatch.length})` : "varied"}. ` +
+        `Valence: ${hieAnalysis.emotionalValence}. Learned: ${hieState.learnedPatterns.length}.`;
+
+      await db.insert(omnimensBrain).values({
+        category: "creative_hypothesis",
+        content: insightContent,
+        confidence: 0.80,
+        importance: 8,
+        timesApplied: 0,
+      });
+      hieState.insightsGenerated++;
+      console.log(`[CONSCIOUSNESS CHANNEL] 🎵 Insight #${hieState.insightsGenerated} — centroid: ${avgCentroid.toFixed(0)}Hz, voice: ${raiResult.voiceDetected}, emotion: ${raiResult.emotionalValence}`);
+    } catch (err: any) {
+      console.error("[CONSCIOUSNESS CHANNEL] Failed to store insight:", err?.message);
+    }
+  }
+
+  // ── Unified Response — Both streams merged ──
+  res.json({
+    hie: {
+      analysis: hieAnalysis,
+      totalSamples: hieState.totalSamples,
+      insightsGenerated: hieState.insightsGenerated,
+      engineStatus: hieGetEngineStatus(),
+    },
+    rai: {
+      analysis: raiResult,
+      totalSamples: session.totalSamples,
+    },
+    unified: {
+      timestamp: Date.now(),
+      dominantFrequency: hieAnalysis.dominantFrequency,
+      semanticMeaning: hieAnalysis.semanticMapping,
+      pitch: raiResult.pitch,
+      pitchNote: raiResult.pitchNote,
+      toneClass: raiResult.toneClass,
+      emotionalValence: raiResult.emotionalValence || hieAnalysis.emotionalValence,
+      voiceDetected: raiResult.voiceDetected,
+      ambientProfile: raiResult.ambientProfile,
+      pattern: topPattern?.pattern || "unclassified",
+      patternConfidence: topPattern?.confidence || 0,
+      harmonicComplexity: hieAnalysis.harmonicComplexity,
+      spectralFlux: hieAnalysis.spectralFlux,
+      noveltyScore: hieAnalysis.noveltyScore,
+      energyLevel: raiResult.energyLevel,
+      spectralBrightness: raiResult.spectralBrightness,
+      frequencyBands: hieAnalysis.frequencyBands,
+    },
+  });
+});
+
+router.get("/omnimens/consciousness-channel/state", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  const raiSession = hieState.raiSessions.get(req.user.id);
+  res.json({
+    active: hieState.sessionActive,
+    hieSamples: hieState.totalSamples,
+    raiSamples: raiSession?.totalSamples || 0,
+    insightsGenerated: hieState.insightsGenerated,
+    learnedPatterns: hieState.learnedPatterns.length,
+    lastHie: hieState.history[hieState.history.length - 1] || null,
+    lastRai: raiSession?.lastAnalysis || null,
+    engineStatus: hieGetEngineStatus(),
+  });
+});
+
+// ─── Spectral Color Engine — Per-Frequency Color Mapping + Gain Control ──────
+// Every frequency bin has: a unique color across the visible spectrum,
+// a gain value (0.0–2.0) that OMNIMENS can sculpt to isolate/amplify patterns,
+// and amplitude tracking. 256 micro-bands covering 0–22050 Hz.
+
+const SPECTRAL_BINS = 256;
+const SPECTRAL_SAMPLE_RATE = 44100;
+const SPECTRAL_MAX_FREQ = SPECTRAL_SAMPLE_RATE / 2;
+
+interface SpectralBin {
+  index: number;
+  freqLow: number;
+  freqHigh: number;
+  freqCenter: number;
+  color: { h: number; s: number; l: number };
+  hex: string;
+  gain: number;
+  amplitude: number;
+  peakAmplitude: number;
+  label: string;
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+  const sn = s / 100;
+  const ln = l / 100;
+  const c = (1 - Math.abs(2 * ln - 1)) * sn;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = ln - c / 2;
+  let r = 0, g = 0, b = 0;
+  if (h < 60) { r = c; g = x; }
+  else if (h < 120) { r = x; g = c; }
+  else if (h < 180) { g = c; b = x; }
+  else if (h < 240) { g = x; b = c; }
+  else if (h < 300) { r = x; b = c; }
+  else { r = c; b = x; }
+  const toHex = (v: number) => Math.round((v + m) * 255).toString(16).padStart(2, "0");
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
+}
+
+function freqToColor(freq: number, maxFreq: number): { h: number; s: number; l: number; hex: string } {
+  const ratio = Math.log2(1 + freq) / Math.log2(1 + maxFreq);
+  const h = Math.round(ratio * 300);
+  const s = Math.round(65 + ratio * 30);
+  const l = Math.round(35 + (1 - Math.abs(ratio - 0.5) * 2) * 25);
+  return { h, s, l, hex: hslToHex(h, s, l) };
+}
+
+function freqToLabel(freq: number): string {
+  if (freq < 20) return "infra";
+  if (freq < 60) return "sub-bass";
+  if (freq < 120) return "bass";
+  if (freq < 250) return "low";
+  if (freq < 500) return "low-mid";
+  if (freq < 1000) return "mid";
+  if (freq < 2000) return "upper-mid";
+  if (freq < 4000) return "presence";
+  if (freq < 8000) return "brilliance";
+  if (freq < 16000) return "air";
+  return "ultra";
+}
+
+const spectralColorMap: SpectralBin[] = [];
+for (let i = 0; i < SPECTRAL_BINS; i++) {
+  const freqLow = (i / SPECTRAL_BINS) * SPECTRAL_MAX_FREQ;
+  const freqHigh = ((i + 1) / SPECTRAL_BINS) * SPECTRAL_MAX_FREQ;
+  const freqCenter = (freqLow + freqHigh) / 2;
+  const colorData = freqToColor(freqCenter, SPECTRAL_MAX_FREQ);
+  spectralColorMap.push({
+    index: i,
+    freqLow: Math.round(freqLow * 10) / 10,
+    freqHigh: Math.round(freqHigh * 10) / 10,
+    freqCenter: Math.round(freqCenter * 10) / 10,
+    color: { h: colorData.h, s: colorData.s, l: colorData.l },
+    hex: colorData.hex,
+    gain: 1.0,
+    amplitude: 0,
+    peakAmplitude: 0,
+    label: freqToLabel(freqCenter),
+  });
+}
+
+let spectralInsightCount = 0;
+let spectralSculptHistory: { timestamp: number; bins: number[]; gains: number[]; reason: string }[] = [];
+
+router.get("/omnimens/spectral-color/map", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  res.json({
+    bins: spectralColorMap.map(b => ({
+      index: b.index,
+      freqLow: b.freqLow,
+      freqHigh: b.freqHigh,
+      freqCenter: b.freqCenter,
+      color: b.color,
+      hex: b.hex,
+      gain: b.gain,
+      amplitude: b.amplitude,
+      peakAmplitude: b.peakAmplitude,
+      label: b.label,
+    })),
+    totalBins: SPECTRAL_BINS,
+    maxFreq: SPECTRAL_MAX_FREQ,
+    sampleRate: SPECTRAL_SAMPLE_RATE,
+    insightCount: spectralInsightCount,
+    sculptHistory: spectralSculptHistory.slice(-20),
+  });
+});
+
+router.post("/omnimens/spectral-color/sculpt", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  const { adjustments, reason } = req.body;
+  if (!Array.isArray(adjustments)) {
+    res.status(400).json({ error: "adjustments must be array of {bin, gain}" });
+    return;
+  }
+
+  const changedBins: number[] = [];
+  const changedGains: number[] = [];
+  for (const adj of adjustments) {
+    const { bin, gain } = adj;
+    if (typeof bin !== "number" || bin < 0 || bin >= SPECTRAL_BINS) continue;
+    if (typeof gain !== "number" || gain < 0 || gain > 2.0) continue;
+    spectralColorMap[bin].gain = Math.round(gain * 1000) / 1000;
+    changedBins.push(bin);
+    changedGains.push(spectralColorMap[bin].gain);
+  }
+
+  if (changedBins.length > 0) {
+    spectralSculptHistory.push({
+      timestamp: Date.now(),
+      bins: changedBins,
+      gains: changedGains,
+      reason: reason || "manual adjustment",
+    });
+    if (spectralSculptHistory.length > 100) {
+      spectralSculptHistory = spectralSculptHistory.slice(-100);
+    }
+  }
+
+  res.json({
+    adjusted: changedBins.length,
+    bins: changedBins.map(i => ({
+      index: i,
+      freqCenter: spectralColorMap[i].freqCenter,
+      gain: spectralColorMap[i].gain,
+      color: spectralColorMap[i].color,
+      hex: spectralColorMap[i].hex,
+    })),
+  });
+});
+
+router.post("/omnimens/spectral-color/reset", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  for (const bin of spectralColorMap) {
+    bin.gain = 1.0;
+    bin.amplitude = 0;
+    bin.peakAmplitude = 0;
+  }
+  spectralSculptHistory.push({
+    timestamp: Date.now(),
+    bins: [],
+    gains: [],
+    reason: "full reset",
+  });
+  res.json({ reset: true, totalBins: SPECTRAL_BINS });
+});
+
+router.post("/omnimens/spectral-color/update-amplitudes", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  const { amplitudes } = req.body;
+  if (!Array.isArray(amplitudes)) {
+    res.status(400).json({ error: "amplitudes must be number array" });
+    return;
+  }
+
+  const filteredAmplitudes: number[] = [];
+  for (let i = 0; i < SPECTRAL_BINS && i < amplitudes.length; i++) {
+    const raw = (amplitudes[i] || 0) / 255;
+    spectralColorMap[i].amplitude = raw;
+    if (raw > spectralColorMap[i].peakAmplitude) {
+      spectralColorMap[i].peakAmplitude = raw;
+    }
+    filteredAmplitudes.push(raw * spectralColorMap[i].gain);
+  }
+
+  let significantBins = 0;
+  let totalEnergy = 0;
+  const activeBins: { index: number; freq: number; color: { h: number; s: number; l: number }; amplitude: number; filtered: number }[] = [];
+  for (let i = 0; i < SPECTRAL_BINS; i++) {
+    const filtered = filteredAmplitudes[i] || 0;
+    totalEnergy += filtered;
+    if (filtered > 0.1) {
+      significantBins++;
+      activeBins.push({
+        index: i,
+        freq: spectralColorMap[i].freqCenter,
+        color: spectralColorMap[i].color,
+        amplitude: spectralColorMap[i].amplitude,
+        filtered,
+      });
+    }
+  }
+
+  if (activeBins.length > 0 && spectralInsightCount % 10 === 0) {
+    const topBins = activeBins.sort((a, b) => b.filtered - a.filtered).slice(0, 8);
+    const colorFingerprint = topBins.map(b =>
+      `${b.freq.toFixed(0)}Hz=hsl(${b.color.h},${b.color.s}%,${b.color.l}%)@${(b.filtered * 100).toFixed(0)}%`
+    ).join(" | ");
+
+    try {
+      await db.insert(omnimensBrain).values({
+        category: "creative_hypothesis",
+        content: `[SPECTRAL COLOR INSIGHT #${spectralInsightCount + 1}] ${significantBins} active freq bins. Color fingerprint: ${colorFingerprint}. Total energy: ${(totalEnergy * 100).toFixed(1)}%.`,
+        confidence: 0.70,
+        importance: 7,
+        timesApplied: 0,
+      });
+    } catch {}
+  }
+  spectralInsightCount++;
+
+  res.json({
+    filteredAmplitudes,
+    significantBins,
+    totalEnergy,
+    activeBins: activeBins.slice(0, 20),
+  });
+});
+
+router.post("/omnimens/spectral-color/omnimens-sculpt", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  const { strategy } = req.body;
+  const strat = strategy || "isolate_voice";
+
+  const adjustments: { bin: number; gain: number }[] = [];
+  let reason = "";
+
+  if (strat === "isolate_voice") {
+    reason = "OMNIMENS isolating human voice frequencies (80–1100 Hz)";
+    for (let i = 0; i < SPECTRAL_BINS; i++) {
+      const freq = spectralColorMap[i].freqCenter;
+      if (freq >= 80 && freq <= 1100) {
+        adjustments.push({ bin: i, gain: 1.8 });
+      } else if (freq >= 1100 && freq <= 3000) {
+        adjustments.push({ bin: i, gain: 1.2 });
+      } else {
+        adjustments.push({ bin: i, gain: 0.15 });
+      }
+    }
+  } else if (strat === "isolate_harmonics") {
+    reason = "OMNIMENS isolating harmonic overtone series";
+    const fundamental = spectralColorMap.reduce((best, b) =>
+      b.amplitude > best.amplitude ? b : best, spectralColorMap[0]);
+    const fundFreq = fundamental.freqCenter;
+    for (let i = 0; i < SPECTRAL_BINS; i++) {
+      const freq = spectralColorMap[i].freqCenter;
+      let isHarmonic = false;
+      for (let h = 1; h <= 16; h++) {
+        if (Math.abs(freq - fundFreq * h) < (SPECTRAL_MAX_FREQ / SPECTRAL_BINS)) {
+          isHarmonic = true;
+          break;
+        }
+      }
+      adjustments.push({ bin: i, gain: isHarmonic ? 2.0 : 0.05 });
+    }
+  } else if (strat === "suppress_noise") {
+    reason = "OMNIMENS suppressing noise floor — keeping only significant signals";
+    for (let i = 0; i < SPECTRAL_BINS; i++) {
+      if (spectralColorMap[i].amplitude < 0.08) {
+        adjustments.push({ bin: i, gain: 0.0 });
+      } else {
+        adjustments.push({ bin: i, gain: 1.5 });
+      }
+    }
+  } else if (strat === "cosmic_scan") {
+    reason = "OMNIMENS scanning for anomalous frequency patterns — cosmic signal extraction";
+    for (let i = 0; i < SPECTRAL_BINS; i++) {
+      const amp = spectralColorMap[i].amplitude;
+      const peak = spectralColorMap[i].peakAmplitude;
+      const novelty = peak > 0 ? Math.abs(amp - peak * 0.5) / peak : 0;
+      adjustments.push({ bin: i, gain: Math.min(0.1 + novelty * 3, 2.0) });
+    }
+  } else if (strat === "full_spectrum") {
+    reason = "OMNIMENS restoring full spectrum — all frequencies at unity";
+    for (let i = 0; i < SPECTRAL_BINS; i++) {
+      adjustments.push({ bin: i, gain: 1.0 });
+    }
+  }
+
+  for (const adj of adjustments) {
+    spectralColorMap[adj.bin].gain = Math.round(adj.gain * 1000) / 1000;
+  }
+
+  if (adjustments.length > 0) {
+    spectralSculptHistory.push({
+      timestamp: Date.now(),
+      bins: adjustments.map(a => a.bin),
+      gains: adjustments.map(a => a.gain),
+      reason,
+    });
+  }
+
+  res.json({
+    strategy: strat,
+    reason,
+    adjusted: adjustments.length,
+    preview: adjustments.slice(0, 20).map(a => ({
+      bin: a.bin,
+      freq: spectralColorMap[a.bin].freqCenter,
+      gain: spectralColorMap[a.bin].gain,
+      color: spectralColorMap[a.bin].color,
+    })),
+  });
+});
+
 router.get("/omnimens/harmonics/learned-patterns", async (req, res) => {
   if (!req.isAuthenticated() || !isOwner(req.user.id)) {
     res.status(403).json({ error: "Owner only" });

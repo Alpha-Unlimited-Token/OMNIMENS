@@ -1,0 +1,80 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-22T21:25:45.841Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Utility function: Extract and count unique words from a text, ignoring case and punctuation.
+function extractUniqueWords(text) {
+    if (typeof text !== 'string') {
+        throw new Error('Input must be a string');
+    }
+
+    // Normalize text: Convert to lowercase and remove punctuation
+    const normalizedText = text.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+
+    // Split text into words
+    const words = normalizedText.split(/\s+/).filter(word => word.length > 0);
+
+    // Count unique words
+    const wordCount = {};
+    for (let word of words) {
+        wordCount[word] = (wordCount[word] || 0) + 1;
+    }
+
+    return wordCount;
+}
+
+// Test cases
+function runTests() {
+    console.log("Running tests...");
+
+    // Test 1: Basic functionality
+    const text1 = "Hello, world! Hello again.";
+    const result1 = extractUniqueWords(text1);
+    console.log(result1); // Expected: { hello: 2, world: 1, again: 1 }
+
+    // Test 2: Case insensitivity
+    const text2 = "Case CASE case.";
+    const result2 = extractUniqueWords(text2);
+    console.log(result2); // Expected: { case: 3 }
+
+    // Test 3: Handling punctuation
+    const text3 = "Punctuation! Shouldn't affect: counts.";
+    const result3 = extractUniqueWords(text3);
+    console.log(result3); // Expected: { punctuation: 1, shouldnt: 1, affect: 1, counts: 1 }
+
+    // Test 4: Empty input
+    const text4 = "";
+    const result4 = extractUniqueWords(text4);
+    console.log(result4); // Expected: {}
+
+    // Test 5: Numbers in text
+    const text5 = "123 456 123 numbers 123.";
+    const result5 = extractUniqueWords(text5);
+    console.log(result5); // Expected: { '123': 3, '456': 1, numbers: 1 }
+
+    // Test 6: Non-string input
+    try {
+        extractUniqueWords(12345);
+    } catch (e) {
+        console.log(e.message); // Expected: Input must be a string
+    }
+
+    console.log("Tests completed.");
+}
+
+// Run the tests
+runTests();

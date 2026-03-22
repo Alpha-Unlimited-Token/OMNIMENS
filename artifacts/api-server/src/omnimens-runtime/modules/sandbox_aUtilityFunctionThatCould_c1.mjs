@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-22T21:02:23.191Z
+ * Written: 2026-03-22T22:35:59.100Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,45 +16,59 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentPatterns(text, patternLength) {
-  if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
-    throw new Error('Invalid input: text must be a string and patternLength must be a positive number.');
-  }
+function findPatternsInText(text, patterns) {
+    if (typeof text !== 'string' || !Array.isArray(patterns)) {
+        throw new Error('Invalid input: text must be a string and patterns must be an array of strings.');
+    }
 
-  const patternFrequency = new Map();
+    const results = patterns.map(pattern => {
+        const regex = new RegExp(pattern, 'g');
+        const matches = [];
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+            matches.push({
+                match: match[0],
+                index: match.index
+            });
+        }
+        return { pattern, matches };
+    });
 
-  for (let i = 0; i <= text.length - patternLength; i++) {
-    const pattern = text.slice(i, i + patternLength);
-    patternFrequency.set(pattern, (patternFrequency.get(pattern) || 0) + 1);
-  }
-
-  const sortedPatterns = Array.from(patternFrequency.entries()).sort((a, b) => b[1] - a[1]);
-
-  return sortedPatterns;
+    return results;
 }
 
 // Test cases
-console.log('Test Case 1:');
-const text1 = 'abcabcabc';
-const patterns1 = findMostFrequentPatterns(text1, 3);
-console.log(patterns1); // Expected: [['abc', 3]]
+function runTests() {
+    console.log("Running tests...");
 
-console.log('Test Case 2:');
-const text2 = 'abababab';
-const patterns2 = findMostFrequentPatterns(text2, 2);
-console.log(patterns2); // Expected: [['ab', 4], ['ba', 3]]
+    const text = "The quick brown fox jumps over the lazy dog. The fox is clever.";
+    const patterns = ["fox", "dog", "The", "clever"];
 
-console.log('Test Case 3:');
-const text3 = 'aaaaaa';
-const patterns3 = findMostFrequentPatterns(text3, 2);
-console.log(patterns3); // Expected: [['aa', 5]]
+    const results = findPatternsInText(text, patterns);
 
-console.log('Test Case 4 (Edge Case):');
-const text4 = 'abcdef';
-const patterns4 = findMostFrequentPatterns(text4, 1);
-console.log(patterns4); // Expected: [['a', 1], ['b', 1], ['c', 1], ['d', 1], ['e', 1], ['f', 1]]
+    console.log("Test 1: Basic pattern matching");
+    console.log(results);
 
-console.log('Test Case 5 (Edge Case):');
-const text5 = 'abc';
-const patterns5 = findMostFrequentPatterns(text5, 4);
-console.log(patterns5); // Expected: [] (patternLength exceeds text length)
+    console.log("Test 2: Edge case - empty text");
+    console.log(findPatternsInText("", patterns));
+
+    console.log("Test 3: Edge case - no patterns");
+    console.log(findPatternsInText(text, []));
+
+    console.log("Test 4: Edge case - invalid inputs");
+    try {
+        console.log(findPatternsInText(null, patterns));
+    } catch (e) {
+        console.log(e.message);
+    }
+
+    try {
+        console.log(findPatternsInText(text, null));
+    } catch (e) {
+        console.log(e.message);
+    }
+
+    console.log("All tests completed.");
+}
+
+runTests();
