@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-22T19:58:48.773Z
+ * Written: 2026-03-22T20:39:55.747Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,86 +16,72 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Algorithm to improve efficiency of knowledge retrieval using a Trie (Prefix Tree) structure
-function TrieNode() {
-  this.children = {};
-  this.isEndOfWord = false;
+function KnowledgeGraph() {
+    this.graph = new Map();
 }
 
-function Trie() {
-  this.root = new TrieNode();
+KnowledgeGraph.prototype.addConcept = function(concept, relatedConcepts) {
+    if (!this.graph.has(concept)) {
+        this.graph.set(concept, new Set());
+    }
+    for (var i = 0; i < relatedConcepts.length; i++) {
+        this.graph.get(concept).add(relatedConcepts[i]);
+        if (!this.graph.has(relatedConcepts[i])) {
+            this.graph.set(relatedConcepts[i], new Set());
+        }
+        this.graph.get(relatedConcepts[i]).add(concept);
+    }
+};
 
-  // Insert a word into the Trie
-  this.insert = function (word) {
-    let node = this.root;
-    for (let char of word) {
-      if (!node.children[char]) {
-        node.children[char] = new TrieNode();
-      }
-      node = node.children[char];
+KnowledgeGraph.prototype.findShortestPath = function(start, end) {
+    if (!this.graph.has(start) || !this.graph.has(end)) {
+        return null;
     }
-    node.isEndOfWord = true;
-  };
 
-  // Search for a word in the Trie
-  this.search = function (word) {
-    let node = this.root;
-    for (let char of word) {
-      if (!node.children[char]) {
-        return false;
-      }
-      node = node.children[char];
-    }
-    return node.isEndOfWord;
-  };
+    var visited = new Set();
+    var queue = [[start, [start]]];
 
-  // Retrieve all words with a given prefix
-  this.startsWith = function (prefix) {
-    let node = this.root;
-    for (let char of prefix) {
-      if (!node.children[char]) {
-        return [];
-      }
-      node = node.children[char];
-    }
-    return this._collectWords(node, prefix);
-  };
+    while (queue.length > 0) {
+        var [current, path] = queue.shift();
 
-  // Helper function to collect words from a given node
-  this._collectWords = function (node, prefix) {
-    let results = [];
-    if (node.isEndOfWord) {
-      results.push(prefix);
+        if (current === end) {
+            return path;
+        }
+
+        visited.add(current);
+
+        var neighbors = this.graph.get(current);
+        neighbors.forEach(function(neighbor) {
+            if (!visited.has(neighbor)) {
+                queue.push([neighbor, path.concat(neighbor)]);
+            }
+        });
     }
-    for (let char in node.children) {
-      results = results.concat(this._collectWords(node.children[char], prefix + char));
-    }
-    return results;
-  };
-}
+
+    return null;
+};
 
 // Self-tests
-const trie = new Trie();
-trie.insert("knowledge");
-trie.insert("know");
-trie.insert("knock");
-trie.insert("knot");
-trie.insert("pattern");
-trie.insert("patience");
-trie.insert("path");
-trie.insert("patter");
+var kg = new KnowledgeGraph();
 
-// Test case 1: Search for existing words
-console.log(trie.search("knowledge")); // true
-console.log(trie.search("know")); // true
-console.log(trie.search("knock")); // true
-console.log(trie.search("unknown")); // false
+// Adding concepts and relationships
+kg.addConcept("Lucid Dream", ["Neural Consciousness", "Insight"]);
+kg.addConcept("Neural Consciousness", ["Goal Pursuit", "Insight"]);
+kg.addConcept("Insight", ["Knowledge Graph", "Digital Navigation"]);
+kg.addConcept("Knowledge Graph", ["Digital Navigation"]);
+kg.addConcept("Digital Navigation", ["Goal Pursuit"]);
 
-// Test case 2: Retrieve words with a given prefix
-console.log(trie.startsWith("kn")); // ["knowledge", "know", "knock", "knot"]
-console.log(trie.startsWith("pat")); // ["pattern", "patience", "path", "patter"]
-console.log(trie.startsWith("z")); // []
+console.log("Test 1: Shortest path between 'Lucid Dream' and 'Goal Pursuit'");
+console.log(kg.findShortestPath("Lucid Dream", "Goal Pursuit")); // Expected: ["Lucid Dream", "Neural Consciousness", "Goal Pursuit"]
 
-// Test case 3: Edge cases
-console.log(trie.search("")); // false
-console.log(trie.startsWith("")); // ["knowledge", "know", "knock", "knot", "pattern", "patience", "path", "patter"]
+console.log("Test 2: Shortest path between 'Insight' and 'Digital Navigation'");
+console.log(kg.findShortestPath("Insight", "Digital Navigation")); // Expected: ["Insight", "Digital Navigation"]
+
+console.log("Test 3: Shortest path between 'Lucid Dream' and 'Knowledge Graph'");
+console.log(kg.findShortestPath("Lucid Dream", "Knowledge Graph")); // Expected: ["Lucid Dream", "Insight", "Knowledge Graph"]
+
+console.log("Test 4: Path between non-existent concepts");
+console.log(kg.findShortestPath("NonExistent", "Goal Pursuit")); // Expected: null
+
+console.log("Test 5: Path to self");
+console.log(kg.findShortestPath("Lucid Dream", "Lucid Dream")); // Expected: ["Lucid Dream"]

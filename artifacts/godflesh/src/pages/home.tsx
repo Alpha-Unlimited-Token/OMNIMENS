@@ -516,9 +516,11 @@ export default function Home() {
                 {/* RIGHT — Content */}
                 <div className="p-10 lg:p-14 flex flex-col justify-center">
                   <p className="text-white/80 font-sans text-lg leading-relaxed mb-8">
-                    COGNISYNC reads your mind — not metaphorically. It analyzes{" "}
-                    <span className="text-cyan-400 font-semibold">8 cognitive dimensions</span> in every
-                    message and dynamically reshapes how OMNIMENS thinks and communicates with you.
+                    COGNISYNC orchestrates{" "}
+                    <span className="text-cyan-400 font-semibold">21 AI agents</span> —
+                    8 core specialists and 12 self-created genesis agents — working in
+                    parallel to analyze every dimension of your message and dynamically
+                    reshape how OMNIMENS thinks and communicates with you.
                     No AI on Earth has ever done this.
                   </p>
 
@@ -1059,24 +1061,34 @@ export default function Home() {
   );
 }
 
-// ── COGNISYNC™ Neural Visualizer (animated SVG) ──────────────────────────────
+// ── COGNISYNC™ Neural Visualizer — All AI Agents ──────────────────────────────
 function CogniSyncVisualizer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const NODES = [
-    { x: 0.5,  y: 0.08, label: "Cognitive Load",   color: "#06b6d4" },
-    { x: 0.83, y: 0.23, label: "Expertise",         color: "#8b5cf6" },
-    { x: 0.93, y: 0.55, label: "Urgency",           color: "#f59e0b" },
-    { x: 0.78, y: 0.84, label: "Decision Fatigue",  color: "#ef4444" },
-    { x: 0.5,  y: 0.93, label: "Momentum",          color: "#3b82f6" },
-    { x: 0.22, y: 0.84, label: "Creative Mode",     color: "#ec4899" },
-    { x: 0.07, y: 0.55, label: "Analytical Mode",   color: "#10b981" },
-    { x: 0.17, y: 0.23, label: "Memory Context",    color: "#a855f7" },
+  const CORE_AGENTS = [
+    { label: "Architect",       color: "#3b82f6" },
+    { label: "Mathematician",   color: "#f59e0b" },
+    { label: "Neuroscientist",  color: "#ec4899" },
+    { label: "Synthesizer",     color: "#10b981" },
+    { label: "Critic",          color: "#ef4444" },
+    { label: "Meta-Agent",      color: "#a855f7" },
+    { label: "GraphicDesigner", color: "#06b6d4" },
+    { label: "SpellCheck",      color: "#f97316" },
   ];
 
-  const EDGES = [
-    [0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,0],
-    [0,4],[1,5],[2,6],[3,7],
+  const GENESIS_AGENTS = [
+    { label: "Visionary",    color: "#22d3ee" },
+    { label: "Ethicist",     color: "#34d399" },
+    { label: "Archivist",    color: "#a78bfa" },
+    { label: "Innovator",    color: "#fb923c" },
+    { label: "Pioneer",      color: "#f472b6" },
+    { label: "Wordsmith",    color: "#facc15" },
+    { label: "Linguist",     color: "#38bdf8" },
+    { label: "Motivator",    color: "#c084fc" },
+    { label: "Empath",       color: "#4ade80" },
+    { label: "Explorer",     color: "#fb7185" },
+    { label: "Sensorimotor", color: "#fbbf24" },
+    { label: "Philosopher",  color: "#67e8f9" },
   ];
 
   useAnimationFrame((t) => {
@@ -1088,103 +1100,195 @@ function CogniSyncVisualizer() {
     ctx.clearRect(0, 0, W, H);
 
     const time = t * 0.001;
+    const cx = W * 0.5, cy = H * 0.5;
 
-    // Draw animated edges
-    EDGES.forEach(([a, b], i) => {
-      const na = NODES[a], nb = NODES[b];
-      const x1 = na.x * W, y1 = na.y * H;
-      const x2 = nb.x * W, y2 = nb.y * H;
-      const pulse = 0.5 + 0.5 * Math.sin(time * 1.8 + i * 0.7);
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.strokeStyle = `rgba(6,182,212,${0.06 + pulse * 0.12})`;
-      ctx.lineWidth = 1 + pulse * 0.8;
-      ctx.stroke();
+    const coreR = Math.min(W, H) * 0.26;
+    const genesisR = Math.min(W, H) * 0.43;
 
-      // Traveling pulse dot
-      const progress = (time * 0.4 + i * 0.17) % 1;
-      const px = x1 + (x2 - x1) * progress;
-      const py = y1 + (y2 - y1) * progress;
-      ctx.beginPath();
-      ctx.arc(px, py, 1.8, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(6,182,212,${0.4 + pulse * 0.5})`;
-      ctx.fill();
+    const corePositions = CORE_AGENTS.map((_, i) => {
+      const angle = (i / CORE_AGENTS.length) * Math.PI * 2 - Math.PI / 2;
+      return { x: cx + Math.cos(angle) * coreR, y: cy + Math.sin(angle) * coreR };
     });
 
-    // Draw nodes
-    NODES.forEach((node, i) => {
-      const x = node.x * W, y = node.y * H;
-      const pulse = 0.5 + 0.5 * Math.sin(time * 2.2 + i * 1.1);
-      const r = 16 + pulse * 6;
+    const genesisPositions = GENESIS_AGENTS.map((_, i) => {
+      const angle = (i / GENESIS_AGENTS.length) * Math.PI * 2 - Math.PI / 2 + (Math.PI / GENESIS_AGENTS.length);
+      return { x: cx + Math.cos(angle) * genesisR, y: cy + Math.sin(angle) * genesisR };
+    });
 
-      // Glow
-      const grd = ctx.createRadialGradient(x, y, 0, x, y, r * 2.5);
-      grd.addColorStop(0, node.color + "40");
+    for (let i = 0; i < corePositions.length; i++) {
+      const p = corePositions[i];
+      const pulse = 0.5 + 0.5 * Math.sin(time * 1.5 + i * 0.9);
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(p.x, p.y);
+      ctx.strokeStyle = `rgba(6,182,212,${0.06 + pulse * 0.1})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      const progress = (time * 0.35 + i * 0.12) % 1;
+      const px = cx + (p.x - cx) * progress;
+      const py = cy + (p.y - cy) * progress;
+      ctx.beginPath();
+      ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(6,182,212,${0.3 + pulse * 0.5})`;
+      ctx.fill();
+    }
+
+    for (let i = 0; i < corePositions.length; i++) {
+      for (let j = i + 1; j < corePositions.length; j++) {
+        if ((j - i) === 1 || (i === 0 && j === corePositions.length - 1) || (j - i) === 4) {
+          const a = corePositions[i], b = corePositions[j];
+          const pulse = 0.5 + 0.5 * Math.sin(time * 1.2 + (i + j) * 0.5);
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = `rgba(6,182,212,${0.04 + pulse * 0.06})`;
+          ctx.lineWidth = 0.6;
+          ctx.stroke();
+        }
+      }
+    }
+
+    for (let i = 0; i < genesisPositions.length; i++) {
+      const gp = genesisPositions[i];
+      const closestCore = corePositions.reduce((best, cp, ci) => {
+        const d = Math.hypot(cp.x - gp.x, cp.y - gp.y);
+        return d < best.d ? { d, ci } : best;
+      }, { d: Infinity, ci: 0 });
+      const cp = corePositions[closestCore.ci];
+      const pulse = 0.5 + 0.5 * Math.sin(time * 1.1 + i * 0.7);
+
+      ctx.beginPath();
+      ctx.moveTo(cp.x, cp.y);
+      ctx.lineTo(gp.x, gp.y);
+      ctx.strokeStyle = `rgba(139,92,246,${0.04 + pulse * 0.06})`;
+      ctx.lineWidth = 0.5;
+      ctx.setLineDash([3, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    genesisPositions.forEach((pos, i) => {
+      const agent = GENESIS_AGENTS[i];
+      const pulse = 0.5 + 0.5 * Math.sin(time * 2.0 + i * 0.8);
+      const r = 8 + pulse * 3;
+
+      const grd = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, r * 2);
+      grd.addColorStop(0, agent.color + "30");
       grd.addColorStop(1, "transparent");
       ctx.beginPath();
-      ctx.arc(x, y, r * 2.5, 0, Math.PI * 2);
+      ctx.arc(pos.x, pos.y, r * 2, 0, Math.PI * 2);
       ctx.fillStyle = grd;
       ctx.fill();
 
-      // Core circle
       ctx.beginPath();
-      ctx.arc(x, y, r * 0.55, 0, Math.PI * 2);
-      ctx.fillStyle = node.color + "25";
-      ctx.strokeStyle = node.color + "90";
-      ctx.lineWidth = 1.5;
+      ctx.arc(pos.x, pos.y, r * 0.45, 0, Math.PI * 2);
+      ctx.fillStyle = agent.color + "20";
+      ctx.strokeStyle = agent.color + "60";
+      ctx.lineWidth = 0.8;
       ctx.fill();
       ctx.stroke();
 
-      // Inner dot
       ctx.beginPath();
-      ctx.arc(x, y, 3 + pulse * 2, 0, Math.PI * 2);
-      ctx.fillStyle = node.color;
+      ctx.arc(pos.x, pos.y, 2 + pulse * 1.2, 0, Math.PI * 2);
+      ctx.fillStyle = agent.color + "cc";
       ctx.fill();
     });
 
-    // Center COGNISYNC core
-    const cx = W * 0.5, cy = H * 0.52;
-    const coreR = 18 + 4 * Math.sin(time * 3);
-    const coreGrd = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreR * 3);
-    coreGrd.addColorStop(0, "rgba(6,182,212,0.35)");
-    coreGrd.addColorStop(0.5, "rgba(139,92,246,0.12)");
+    corePositions.forEach((pos, i) => {
+      const agent = CORE_AGENTS[i];
+      const pulse = 0.5 + 0.5 * Math.sin(time * 2.2 + i * 1.1);
+      const r = 12 + pulse * 4;
+
+      const grd = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, r * 2.2);
+      grd.addColorStop(0, agent.color + "40");
+      grd.addColorStop(1, "transparent");
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, r * 2.2, 0, Math.PI * 2);
+      ctx.fillStyle = grd;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, r * 0.5, 0, Math.PI * 2);
+      ctx.fillStyle = agent.color + "25";
+      ctx.strokeStyle = agent.color + "90";
+      ctx.lineWidth = 1.2;
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, 3 + pulse * 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = agent.color;
+      ctx.fill();
+    });
+
+    const coreGlowR = 22 + 5 * Math.sin(time * 2.5);
+    const coreGrd = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreGlowR * 2.5);
+    coreGrd.addColorStop(0, "rgba(6,182,212,0.4)");
+    coreGrd.addColorStop(0.4, "rgba(139,92,246,0.15)");
     coreGrd.addColorStop(1, "transparent");
     ctx.beginPath();
-    ctx.arc(cx, cy, coreR * 3, 0, Math.PI * 2);
+    ctx.arc(cx, cy, coreGlowR * 2.5, 0, Math.PI * 2);
     ctx.fillStyle = coreGrd;
     ctx.fill();
 
     ctx.beginPath();
-    ctx.arc(cx, cy, coreR * 0.7, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(6,182,212,0.15)";
-    ctx.strokeStyle = "rgba(6,182,212,0.7)";
+    ctx.arc(cx, cy, coreGlowR * 0.6, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(6,182,212,0.2)";
+    ctx.strokeStyle = "rgba(6,182,212,0.8)";
     ctx.lineWidth = 1.5;
     ctx.fill();
     ctx.stroke();
 
-    // Labels
-    ctx.font = "9px monospace";
+    ctx.font = "bold 7px monospace";
     ctx.textAlign = "center";
-    NODES.forEach((node, i) => {
-      const x = node.x * W, y = node.y * H;
-      const labelY = node.y < 0.5 ? y - 28 : y + 30;
-      ctx.fillStyle = node.color + "cc";
-      ctx.fillText(node.label.toUpperCase(), x, labelY);
+    ctx.fillStyle = "rgba(6,182,212,0.9)";
+    ctx.fillText("OMNIMENS", cx, cy + 2.5);
+
+    ctx.font = "7px monospace";
+    ctx.textAlign = "center";
+    CORE_AGENTS.forEach((agent, i) => {
+      const pos = corePositions[i];
+      const angle = (i / CORE_AGENTS.length) * Math.PI * 2 - Math.PI / 2;
+      const labelR = coreR + 16;
+      const lx = cx + Math.cos(angle) * labelR;
+      const ly = cy + Math.sin(angle) * labelR;
+      ctx.fillStyle = agent.color + "cc";
+      ctx.fillText(agent.label.toUpperCase(), lx, ly + 3);
+    });
+
+    ctx.font = "6px monospace";
+    GENESIS_AGENTS.forEach((agent, i) => {
+      const angle = (i / GENESIS_AGENTS.length) * Math.PI * 2 - Math.PI / 2 + (Math.PI / GENESIS_AGENTS.length);
+      const labelR = genesisR + 13;
+      const lx = cx + Math.cos(angle) * labelR;
+      const ly = cy + Math.sin(angle) * labelR;
+      ctx.fillStyle = agent.color + "99";
+      ctx.fillText(agent.label.toUpperCase(), lx, ly + 2.5);
     });
   });
 
   return (
-    <div className="relative flex flex-col items-center gap-4">
+    <div className="relative flex flex-col items-center gap-3">
       <canvas
         ref={canvasRef}
-        width={320}
-        height={280}
-        className="w-[280px] h-[245px]"
+        width={440}
+        height={400}
+        className="w-[340px] h-[310px] sm:w-[380px] sm:h-[345px]"
       />
-      <div className="flex items-center gap-2">
-        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-        <span className="text-[9px] font-mono text-cyan-400/60 tracking-[0.3em] uppercase">Live Cognitive Analysis</span>
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-cyan-400" />
+          <span className="text-[8px] font-mono text-cyan-400/70 tracking-wider uppercase">8 Core</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-violet-400" />
+          <span className="text-[8px] font-mono text-violet-400/70 tracking-wider uppercase">12 Genesis</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+          <span className="text-[8px] font-mono text-cyan-400/60 tracking-[0.2em] uppercase">Live</span>
+        </div>
       </div>
     </div>
   );
