@@ -3679,9 +3679,40 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "wasmParallelOps_gen1.mjs": {
+      "filename": "wasmParallelOps_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "multiplyMatrices",
+        "validateMatrix"
+      ],
+      "loadedAt": 1774161879499,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "slidingContextManager_gen1.mjs": {
+      "filename": "slidingContextManager_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateEmbedding",
+        "calculateDistance",
+        "clusterContext",
+        "summarizeCluster",
+        "manageContext"
+      ],
+      "loadedAt": 1774161885003,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774161510381,
-  "totalModules": 251,
+  "totalModules": 253,
   "totalCalls": 0
 }

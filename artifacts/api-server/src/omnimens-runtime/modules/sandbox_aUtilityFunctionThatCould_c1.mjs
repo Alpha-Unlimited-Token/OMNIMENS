@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-22T06:04:35.546Z
+ * Written: 2026-03-22T06:42:31.212Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,46 +16,104 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function to find the longest common substring between two strings
-function longestCommonSubstring(str1, str2) {
-    if (typeof str1 !== 'string' || typeof str2 !== 'string') {
-        throw new Error('Both inputs must be strings');
+// Utility Function: K-Means Clustering Implementation
+function kMeansClustering(data, k, maxIterations = 100) {
+    if (!Array.isArray(data) || data.length === 0 || k <= 0 || k > data.length) {
+        throw new Error("Invalid input data or number of clusters.");
     }
 
-    const len1 = str1.length;
-    const len2 = str2.length;
-    let maxLength = 0;
-    let endIndex = 0;
-
-    // Create a 2D array to store lengths of common substrings
-    const dp = Array(len1 + 1).fill(null).map(() => Array(len2 + 1).fill(0));
-
-    for (let i = 1; i <= len1; i++) {
-        for (let j = 1; j <= len2; j++) {
-            if (str1[i - 1] === str2[j - 1]) {
-                dp[i][j] = dp[i - 1][j - 1] + 1;
-                if (dp[i][j] > maxLength) {
-                    maxLength = dp[i][j];
-                    endIndex = i;
-                }
-            }
+    // Initialize centroids randomly
+    const centroids = [];
+    const usedIndexes = new Set();
+    while (centroids.length < k) {
+        const randomIndex = Math.floor(Math.random() * data.length);
+        if (!usedIndexes.has(randomIndex)) {
+            centroids.push(data[randomIndex]);
+            usedIndexes.add(randomIndex);
         }
     }
 
-    // Extract the longest common substring
-    return str1.slice(endIndex - maxLength, endIndex);
+    let clusters = [];
+    let iterations = 0;
+    let hasConverged = false;
+
+    while (iterations < maxIterations && !hasConverged) {
+        // Assign points to the nearest centroid
+        clusters = Array.from({ length: k }, () => []);
+        for (const point of data) {
+            let closestCentroidIndex = 0;
+            let minDistance = Infinity;
+
+            centroids.forEach((centroid, index) => {
+                const distance = euclideanDistance(point, centroid);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestCentroidIndex = index;
+                }
+            });
+
+            clusters[closestCentroidIndex].push(point);
+        }
+
+        // Recalculate centroids
+        const newCentroids = clusters.map(cluster => {
+            if (cluster.length === 0) return centroids[clusters.indexOf(cluster)];
+            const dimension = cluster[0].length;
+            const mean = Array(dimension).fill(0);
+
+            cluster.forEach(point => {
+                for (let i = 0; i < dimension; i++) {
+                    mean[i] += point[i];
+                }
+            });
+
+            return mean.map(value => value / cluster.length);
+        });
+
+        // Check for convergence
+        hasConverged = centroids.every((centroid, index) =>
+            euclideanDistance(centroid, newCentroids[index]) === 0
+        );
+
+        centroids.splice(0, centroids.length, ...newCentroids);
+        iterations++;
+    }
+
+    return { centroids, clusters };
+
+    // Helper function to calculate Euclidean distance
+    function euclideanDistance(point1, point2) {
+        return Math.sqrt(
+            point1.reduce((sum, value, index) => sum + Math.pow(value - point2[index], 2), 0)
+        );
+    }
 }
 
-// Test cases
-console.log(longestCommonSubstring("abcdef", "zcdemf")); // Expected output: "cde"
-console.log(longestCommonSubstring("12345", "34567")); // Expected output: "345"
-console.log(longestCommonSubstring("hello", "world")); // Expected output: ""
-console.log(longestCommonSubstring("abcdxyz", "xyzabcd")); // Expected output: "abcd"
-console.log(longestCommonSubstring("same", "same")); // Expected output: "same"
+// Self-tests
+(function testKMeansClustering() {
+    const data = [
+        [1, 2],
+        [1, 4],
+        [1, 0],
+        [10, 2],
+        [10, 4],
+        [10, 0]
+    ];
+    const k = 2;
 
-// Edge cases
-console.log(longestCommonSubstring("", "abc")); // Expected output: ""
-console.log(longestCommonSubstring("abc", "")); // Expected output: ""
-console.log(longestCommonSubstring("", "")); // Expected output: ""
-console.log(longestCommonSubstring("a", "a")); // Expected output: "a"
-console.log(longestCommonSubstring("a", "b")); // Expected output: ""
+    const result = kMeansClustering(data, k);
+
+    console.log("Centroids:", result.centroids);
+    console.log("Clusters:", result.clusters);
+
+    // Validate results
+    console.log("Validation:");
+    console.log(
+        "Number of clusters matches k:",
+        result.clusters.length === k
+    );
+    console.log(
+        "All data points are assigned to a cluster:",
+        result.clusters.flat().length === data.length
+    );
+})();

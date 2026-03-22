@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-22T04:47:36.422Z
+ * Written: 2026-03-22T06:54:29.009Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,74 +16,89 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function KnowledgeRetrievalOptimizer() {
-    this.knowledgeBase = new Map();
-
-    // Add knowledge entries to the knowledge base
-    this.addKnowledge = function (key, value) {
-        if (!key || !value) {
-            throw new Error("Key and value must be provided.");
-        }
-        this.knowledgeBase.set(key.toLowerCase(), value);
-    };
-
-    // Retrieve knowledge based on exact or partial matches
-    this.retrieveKnowledge = function (query) {
-        if (!query) {
-            throw new Error("Query must be provided.");
-        }
-        query = query.toLowerCase();
-        let exactMatch = this.knowledgeBase.get(query);
-        if (exactMatch) {
-            return exactMatch;
-        }
-        let partialMatches = [];
-        for (let [key, value] of this.knowledgeBase.entries()) {
-            if (key.includes(query)) {
-                partialMatches.push({ key, value });
-            }
-        }
-        return partialMatches.length > 0 ? partialMatches : null;
-    };
-
-    // Pattern recognition to find relationships between knowledge entries
-    this.findPatterns = function () {
-        let patterns = [];
-        let keys = Array.from(this.knowledgeBase.keys());
-        for (let i = 0; i < keys.length; i++) {
-            for (let j = i + 1; j < keys.length; j++) {
-                if (keys[i].includes(keys[j]) || keys[j].includes(keys[i])) {
-                    patterns.push({ relatedKeys: [keys[i], keys[j]] });
-                }
-            }
-        }
-        return patterns;
-    };
+function KnowledgeGraph() {
+    this.nodes = new Map();
 }
 
-// Self-tests
-(function testKnowledgeRetrievalOptimizer() {
-    let optimizer = new KnowledgeRetrievalOptimizer();
+KnowledgeGraph.prototype.addConcept = function(concept, relatedConcepts) {
+    if (!this.nodes.has(concept)) {
+        this.nodes.set(concept, new Set());
+    }
+    for (var i = 0; i < relatedConcepts.length; i++) {
+        this.nodes.get(concept).add(relatedConcepts[i]);
+        if (!this.nodes.has(relatedConcepts[i])) {
+            this.nodes.set(relatedConcepts[i], new Set());
+        }
+        this.nodes.get(relatedConcepts[i]).add(concept);
+    }
+};
 
-    // Adding knowledge entries
-    optimizer.addKnowledge("digital navigation", "Reducing hops improves efficiency.");
-    optimizer.addKnowledge("self-modification", "Real-time updates to architecture.");
-    optimizer.addKnowledge("causal reasoning", "Discover cause-effect relationships.");
-    optimizer.addKnowledge("multilingual embedding", "Joint training across languages.");
+KnowledgeGraph.prototype.findShortestPath = function(start, end) {
+    if (!this.nodes.has(start) || !this.nodes.has(end)) {
+        return null;
+    }
 
-    // Test retrieval of exact matches
-    console.log("Exact Match Test:");
-    console.log(optimizer.retrieveKnowledge("digital navigation")); // Expected: "Reducing hops improves efficiency."
+    var visited = new Set();
+    var queue = [[start]];
+    
+    while (queue.length > 0) {
+        var path = queue.shift();
+        var node = path[path.length - 1];
+        
+        if (node === end) {
+            return path;
+        }
+        
+        if (!visited.has(node)) {
+            visited.add(node);
+            var neighbors = this.nodes.get(node);
+            neighbors.forEach(function(neighbor) {
+                var newPath = path.slice();
+                newPath.push(neighbor);
+                queue.push(newPath);
+            });
+        }
+    }
+    return null;
+};
 
-    // Test retrieval of partial matches
-    console.log("Partial Match Test:");
-    console.log(optimizer.retrieveKnowledge("self")); // Expected: [{ key: "self-modification", value: "Real-time updates to architecture." }]
+KnowledgeGraph.prototype.patternMatch = function(concept, pattern) {
+    if (!this.nodes.has(concept)) {
+        return [];
+    }
+    var matches = [];
+    var queue = [concept];
+    var visited = new Set();
+    
+    while (queue.length > 0) {
+        var node = queue.shift();
+        if (visited.has(node)) {
+            continue;
+        }
+        visited.add(node);
+        if (pattern.test(node)) {
+            matches.push(node);
+        }
+        var neighbors = this.nodes.get(node);
+        neighbors.forEach(function(neighbor) {
+            if (!visited.has(neighbor)) {
+                queue.push(neighbor);
+            }
+        });
+    }
+    return matches;
+};
 
-    // Test retrieval with no matches
-    console.log("No Match Test:");
-    console.log(optimizer.retrieveKnowledge("unknown")); // Expected: null
+// Self-contained tests
+var graph = new KnowledgeGraph();
+graph.addConcept("AI", ["Machine Learning", "Neural Networks"]);
+graph.addConcept("Machine Learning", ["Deep Learning", "Supervised Learning"]);
+graph.addConcept("Neural Networks", ["Deep Learning", "Backpropagation"]);
+graph.addConcept("Deep Learning", ["TensorFlow", "PyTorch"]);
+graph.addConcept("Supervised Learning", ["Classification", "Regression"]);
 
-    // Test pattern recognition
-    console.log("Pattern Recognition Test:");
-    console.log(optimizer.findPatterns()); // Expected: Array of related keys (e.g., "self-modification" and "self")
-})();
+console.log("Test 1 - Shortest Path:");
+console.log(graph.findShortestPath("AI", "PyTorch")); // Expected: ["AI", "Machine Learning", "Deep Learning", "PyTorch"]
+
+console.log("Test 2 - Pattern Match:");
+console.log(graph.patternMatch("AI", /Learning/)); // Expected: ["Machine Learning", "Supervised Learning", "Deep Learning"]
