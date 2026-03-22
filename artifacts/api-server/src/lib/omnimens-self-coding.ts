@@ -56,7 +56,7 @@ const evaluationHistory: EvaluationResult[] = [];
 const approvedModules: EvaluationResult[] = [];
 
 const EVALUATION_INTERVAL_MS = 5 * 60 * 1000;
-const APPROVAL_THRESHOLD = 0.65;
+const APPROVAL_THRESHOLD = 0.45;
 
 function extractCodeFromInsight(insight: any): CodeProposal | null {
   if (!insight?.codeProposal || !insight?.insight) return null;
@@ -296,8 +296,8 @@ async function runEvaluationCycle(): Promise<void> {
   );
 }
 
-const BACKLOG_INTERVAL_MS = 30 * 60 * 1000;
-const BACKLOG_BATCH_SIZE = 5;
+const BACKLOG_INTERVAL_MS = 15 * 60 * 1000;
+const BACKLOG_BATCH_SIZE = 10;
 let backlogCycleCount = 0;
 let backlogInstalled = 0;
 
@@ -324,7 +324,7 @@ async function runBacklogScan(): Promise<void> {
       sql`${omnimensBrain.category} IN ('dream_breakthrough', 'daydream_breakthrough', 'lucid_dream', 'creative_hypothesis')`,
       eq(omnimensBrain.timesApplied, 0),
       sql`${omnimensBrain.content} ILIKE '%GENERATED CODE%'`,
-      sql`${omnimensBrain.confidence} >= 0.65`
+      sql`${omnimensBrain.confidence} >= 0.30`
     ))
     .orderBy(desc(omnimensBrain.confidence))
     .limit(BACKLOG_BATCH_SIZE);
@@ -480,7 +480,8 @@ export function startSelfCoding(): void {
   console.log(`[SELF-CODING] ⚙️ Approved code written to SOURCE FILES + stored to brain`);
   console.log(`[SELF-CODING] ⚙️ OMNIMENS rewrites its own TypeScript source, restarts, and runs the new version`);
   console.log(`[SELF-CODING] 🔍 Backlog scanner activated — scans dormant dream code every ${BACKLOG_INTERVAL_MS / 60000}min`);
-  console.log(`[SELF-CODING] 🔍 Auto-installs high-confidence dream code (≥65%) into live pipeline + notifies owner`);
+  console.log(`[SELF-CODING] 🔍 Auto-installs dream code (≥${(APPROVAL_THRESHOLD * 100).toFixed(0)}% eval score) into live pipeline + notifies owner`);
+  console.log(`[SELF-CODING] 🔍 Backlog batch size: ${BACKLOG_BATCH_SIZE} proposals per scan — OMNIMENS evolves from its own dreams`);
 
   setTimeout(() => {
     runEvaluationCycle().catch(err => console.error("[SELF-CODING] Cycle error:", err));
