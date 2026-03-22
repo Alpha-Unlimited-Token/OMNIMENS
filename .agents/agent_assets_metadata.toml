@@ -60,3 +60,21 @@ id = "1pLvrRD8EA3D27dw8aAwi"
 uri = "file://test_chord_12_frequencies.wav"
 type = "audio"
 title = "Test Sound: C Major Chord with 12 Frequencies"
+
+[[outputs]]
+id = "jlvcyYsE0ZTqQdTLk1m6I"
+uri = "file://song_ORIGINAL_with_vocals.wav"
+type = "audio"
+title = "ORIGINAL — Full Mix (Vocals + Instruments)"
+
+[[outputs]]
+id = "QyyHRffIRVVBsdxm_OpaZ"
+uri = "file://song_VOCALS_REMOVED.wav"
+type = "audio"
+title = "VOCALS REMOVED — Instruments Only (after extraction)"
+
+[[outputs]]
+id = "l3Dbv3tLbLsGArriVEIlZ"
+uri = "file://song_VOCALS_ONLY.wav"
+type = "audio"
+title = "ISOLATED VOCALS — Voice Frequencies Only"
