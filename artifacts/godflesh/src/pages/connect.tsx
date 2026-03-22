@@ -633,7 +633,7 @@ function ConnectChat() {
           <motion.div className="h-1 bg-gradient-to-r from-violet-500 via-purple-500 to-violet-500 bg-[length:200%_100%]" animate={{ backgroundPosition: ["0% 0%", "200% 0%"] }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} />
         )}
 
-        <div className="flex-1 overflow-y-auto">
+        <div className={`${messages.length > 0 ? "flex-1" : ""} overflow-y-auto`}>
           <div className="max-w-4xl mx-auto px-6 sm:px-4 py-4">
             {messages.length === 0 && !isStreaming && (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="flex flex-col items-center justify-center gap-4 pt-4">
