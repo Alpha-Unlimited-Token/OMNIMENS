@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-22T18:43:04.707Z
+ * Written: 2026-03-22T19:36:13.401Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,75 +16,82 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function KnowledgeGraph() {
-    this.nodes = new Map();
+function createKnowledgeGraph() {
+    const graph = new Map();
+
+    function addConcept(concept, relatedConcepts = []) {
+        if (!graph.has(concept)) {
+            graph.set(concept, new Set());
+        }
+        relatedConcepts.forEach((related) => {
+            if (!graph.has(related)) {
+                graph.set(related, new Set());
+            }
+            graph.get(concept).add(related);
+            graph.get(related).add(concept);
+        });
+    }
+
+    function retrieveRelatedConcepts(concept, depth = 1) {
+        if (!graph.has(concept)) return [];
+        const visited = new Set();
+        const queue = [[concept, 0]];
+        const results = new Set();
+
+        while (queue.length > 0) {
+            const [current, currentDepth] = queue.shift();
+            if (currentDepth > depth) continue;
+            if (!visited.has(current)) {
+                visited.add(current);
+                if (currentDepth > 0) results.add(current);
+                graph.get(current).forEach((neighbor) => {
+                    queue.push([neighbor, currentDepth + 1]);
+                });
+            }
+        }
+        return Array.from(results);
+    }
+
+    function findShortestPath(conceptA, conceptB) {
+        if (!graph.has(conceptA) || !graph.has(conceptB)) return null;
+        const queue = [[conceptA, [conceptA]]];
+        const visited = new Set();
+
+        while (queue.length > 0) {
+            const [current, path] = queue.shift();
+            if (current === conceptB) return path;
+            if (!visited.has(current)) {
+                visited.add(current);
+                graph.get(current).forEach((neighbor) => {
+                    queue.push([neighbor, path.concat(neighbor)]);
+                });
+            }
+        }
+        return null;
+    }
+
+    return { addConcept, retrieveRelatedConcepts, findShortestPath };
 }
-
-KnowledgeGraph.prototype.addNode = function (id, data) {
-    if (!this.nodes.has(id)) {
-        this.nodes.set(id, { id: id, data: data, edges: new Set() });
-    }
-};
-
-KnowledgeGraph.prototype.addEdge = function (id1, id2) {
-    if (this.nodes.has(id1) && this.nodes.has(id2)) {
-        this.nodes.get(id1).edges.add(id2);
-        this.nodes.get(id2).edges.add(id1);
-    }
-};
-
-KnowledgeGraph.prototype.retrieveRelatedNodes = function (id, depth) {
-    if (!this.nodes.has(id)) {
-        return [];
-    }
-
-    let visited = new Set();
-    let queue = [{ node: id, level: 0 }];
-    let result = [];
-
-    while (queue.length > 0) {
-        let current = queue.shift();
-        if (current.level > depth) {
-            break;
-        }
-
-        if (!visited.has(current.node)) {
-            visited.add(current.node);
-            result.push(this.nodes.get(current.node).data);
-
-            this.nodes.get(current.node).edges.forEach((neighbor) => {
-                if (!visited.has(neighbor)) {
-                    queue.push({ node: neighbor, level: current.level + 1 });
-                }
-            });
-        }
-    }
-
-    return result;
-};
 
 // Self-tests
-function runTests() {
-    let graph = new KnowledgeGraph();
+const knowledgeGraph = createKnowledgeGraph();
 
-    // Add nodes
-    graph.addNode("A", "Alpha");
-    graph.addNode("B", "Beta");
-    graph.addNode("C", "Gamma");
-    graph.addNode("D", "Delta");
-    graph.addNode("E", "Epsilon");
+// Add concepts and relationships
+knowledgeGraph.addConcept("AI", ["Machine Learning", "Neural Networks"]);
+knowledgeGraph.addConcept("Machine Learning", ["Deep Learning", "Reinforcement Learning"]);
+knowledgeGraph.addConcept("Neural Networks", ["Deep Learning"]);
+knowledgeGraph.addConcept("Deep Learning", ["Convolutional Networks", "Recurrent Networks"]);
+knowledgeGraph.addConcept("Reinforcement Learning", ["Q-Learning", "Policy Gradient"]);
 
-    // Add edges
-    graph.addEdge("A", "B");
-    graph.addEdge("A", "C");
-    graph.addEdge("B", "D");
-    graph.addEdge("C", "E");
+console.log("Test 1: Retrieve related concepts (depth=1)");
+console.log(knowledgeGraph.retrieveRelatedConcepts("Machine Learning", 1)); // Expect ["AI", "Deep Learning", "Reinforcement Learning"]
 
-    // Test retrieval
-    console.log(graph.retrieveRelatedNodes("A", 1)); // Should return ["Alpha", "Beta", "Gamma"]
-    console.log(graph.retrieveRelatedNodes("A", 2)); // Should return ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"]
-    console.log(graph.retrieveRelatedNodes("B", 1)); // Should return ["Beta", "Alpha", "Delta"]
-    console.log(graph.retrieveRelatedNodes("Z", 2)); // Should return [] (non-existent node)
-}
+console.log("Test 2: Retrieve related concepts (depth=2)");
+console.log(knowledgeGraph.retrieveRelatedConcepts("AI", 2)); // Expect ["Deep Learning", "Reinforcement Learning", "Neural Networks"]
 
-runTests();
+console.log("Test 3: Find shortest path between concepts");
+console.log(knowledgeGraph.findShortestPath("AI", "Policy Gradient")); // Expect ["AI", "Machine Learning", "Reinforcement Learning", "Policy Gradient"]
+
+console.log("Test 4: Handle non-existent concepts");
+console.log(knowledgeGraph.retrieveRelatedConcepts("NonExistent", 1)); // Expect []
+console.log(knowledgeGraph.findShortestPath("AI", "NonExistent")); // Expect null

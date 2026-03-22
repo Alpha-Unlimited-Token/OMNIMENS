@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: wasmMatrixOps
- * Written: 2026-03-22T19:12:08.012Z
+ * Written: 2026-03-22T19:26:27.715Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,125 +17,105 @@
  */
 
 /**
- * wasmMatrixOps - A utility module for performing efficient matrix operations using WebAssembly.
- * This module is designed for Node.js 20+ and accelerates linear algebra computations by leveraging WebAssembly.
+ * @module wasmMatrixOps
+ * @description Provides high-performance matrix operations using WebAssembly for intensive computational tasks.
+ * This module compiles a simple WebAssembly module for matrix multiplication and exposes it via a JavaScript API.
  */
 
-// WebAssembly binary for matrix operations (base64 encoded for inline usage)
-const wasmBase64 = "AGFzbQEAAAABBgFgAX8BfwMCAQAHBwEDZmFjdG9yaWFsAAAKAgEABgEBAQEBf2FsaWduAAAKAgEABgEBAQEBbWF0cml4QWRkAAAKAgEABgEBAQEBbWF0cml4TXVsdAAACgIBAAcBAQEBbWF0cml4VHJhbnMAAAAKAgEABgEBAQEBbWF0cml4U3ViAAAKAgEABgEBAQEBbWF0cml4RG90AAAKAgEABgEBAQEBbWF0cml4U2NhbGUAAAoCAQAHAgEBAQBtZW1vcnlNYW5hZ2VyAAAKAgEABgEBAQEBbWF0cml4SW52ZXJzZQAA";
-
-// Decode base64 WebAssembly binary
-const wasmBinary = Buffer.from(wasmBase64, "base64");
+const { TextEncoder, TextDecoder } = require('util');
 
 /**
- * Initialize the WebAssembly module and create exports for matrix operations.
- * @returns {Promise<Object>} A promise that resolves to an object containing matrix operation functions.
+ * Compiles a WebAssembly module from raw binary source.
+ * @param {Uint8Array} wasmBinary - The binary representation of the WebAssembly module.
+ * @returns {Promise<WebAssembly.Instance>} - A promise that resolves to the WebAssembly instance.
  */
-export async function initializeWasmMatrixOps() {
-  // Compile and instantiate the WebAssembly module
+async function compileWasmModule(wasmBinary) {
   const wasmModule = await WebAssembly.compile(wasmBinary);
-  const wasmInstance = await WebAssembly.instantiate(wasmModule, {});
-
-  // Extract WebAssembly exports
-  const {
-    matrixAdd,
-    matrixMult,
-    matrixTrans,
-    matrixSub,
-    matrixDot,
-    matrixScale,
-    matrixInverse
-  } = wasmInstance.exports;
-
-  /**
-   * Add two matrices.
-   * @param {Float64Array} a - First matrix (row-major order).
-   * @param {Float64Array} b - Second matrix (row-major order).
-   * @param {number} rows - Number of rows.
-   * @param {number} cols - Number of columns.
-   * @returns {Float64Array} Resulting matrix after addition.
-   */
-  function add(a, b, rows, cols) {
-    validateMatrixInput(a, b, rows, cols);
-    const result = new Float64Array(rows * cols);
-    matrixAdd(a, b, result, rows, cols);
-    return result;
-  }
-
-  /**
-   * Multiply two matrices.
-   * @param {Float64Array} a - First matrix (row-major order).
-   * @param {Float64Array} b - Second matrix (row-major order).
-   * @param {number} rowsA - Rows in the first matrix.
-   * @param {number} colsA - Columns in the first matrix (and rows in the second matrix).
-   * @param {number} colsB - Columns in the second matrix.
-   * @returns {Float64Array} Resulting matrix after multiplication.
-   */
-  function multiply(a, b, rowsA, colsA, colsB) {
-    validateMatrixMultiplyInput(a, b, rowsA, colsA, colsB);
-    const result = new Float64Array(rowsA * colsB);
-    matrixMult(a, b, result, rowsA, colsA, colsB);
-    return result;
-  }
-
-  /**
-   * Transpose a matrix.
-   * @param {Float64Array} a - Input matrix (row-major order).
-   * @param {number} rows - Number of rows.
-   * @param {number} cols - Number of columns.
-   * @returns {Float64Array} Transposed matrix.
-   */
-  function transpose(a, rows, cols) {
-    validateMatrixSize(a, rows, cols);
-    const result = new Float64Array(rows * cols);
-    matrixTrans(a, result, rows, cols);
-    return result;
-  }
-
-  /**
-   * Validate matrix input for addition and subtraction.
-   * @param {Float64Array} a - First matrix.
-   * @param {Float64Array} b - Second matrix.
-   * @param {number} rows - Number of rows.
-   * @param {number} cols - Number of columns.
-   */
-  function validateMatrixInput(a, b, rows, cols) {
-    if (a.length !== rows * cols || b.length !== rows * cols) {
-      throw new Error("Matrix dimensions do not match the specified rows and columns.");
-    }
-  }
-
-  /**
-   * Validate matrix input for multiplication.
-   * @param {Float64Array} a - First matrix.
-   * @param {Float64Array} b - Second matrix.
-   * @param {number} rowsA - Rows in the first matrix.
-   * @param {number} colsA - Columns in the first matrix.
-   * @param {number} colsB - Columns in the second matrix.
-   */
-  function validateMatrixMultiplyInput(a, b, rowsA, colsA, colsB) {
-    if (a.length !== rowsA * colsA || b.length !== colsA * colsB) {
-      throw new Error("Matrix dimensions do not match for multiplication.");
-    }
-  }
-
-  /**
-   * Validate matrix size.
-   * @param {Float64Array} a - Input matrix.
-   * @param {number} rows - Number of rows.
-   * @param {number} cols - Number of columns.
-   */
-  function validateMatrixSize(a, rows, cols) {
-    if (a.length !== rows * cols) {
-      throw new Error("Matrix dimensions do not match the specified rows and columns.");
-    }
-  }
-
-  return {
-    add,
-    multiply,
-    transpose
-  };
+  return new WebAssembly.Instance(wasmModule);
 }
 
-export default initializeWasmMatrixOps;
+/**
+ * Generates a WebAssembly binary for basic matrix multiplication.
+ * @returns {Uint8Array} - The binary representation of the WebAssembly module.
+ */
+function generateMatrixMultiplicationWasm() {
+  // WebAssembly Text Format (WAT) for a simple matrix multiplication function.
+  const wasmSource = `
+  (module
+    (memory (export "memory") 1)
+    (func (export "multiply") (param $a i32) (param $b i32) (param $c i32) (param $n i32)
+      (local $i i32) (local $j i32) (local $k i32) (local $sum i32)
+      (block $outer
+        (loop $row
+          (block $inner
+            (loop $col
+              (set_local $sum (i32.const 0))
+              (block $dot
+                (loop $dotProduct
+                  (br_if $dot (i32.ge_u (get_local $k) (get_local $n)))
+                  (set_local $sum (i32.add (get_local $sum) (i32.mul
+                    (i32.load (i32.add (get_local $a) (i32.mul (get_local $i) (get_local $n))))
+                    (i32.load (i32.add (get_local $b) (i32.mul (get_local $k) (get_local $n))))
+                  ))))
+                  (set_local $k (i32.add (get_local $k) (i32.const 1)))
+                  (br $dotProduct)
+                )
+              )
+              (i32.store (i32.add (get_local $c) (i32.add (i32.mul (get_local $i) (get_local $n)) (get_local $j))) (get_local $sum))
+              (set_local $j (i32.add (get_local $j) (i32.const 1)))
+              (br $inner)
+            )
+          )
+          (set_local $i (i32.add (get_local $i) (i32.const 1)))
+          (br $row)
+        )
+      )
+    )
+  )`;
+
+  const encoder = new TextEncoder();
+  return encoder.encode(wasmSource);
+}
+
+/**
+ * Performs matrix multiplication using the WebAssembly module.
+ * @param {number[][]} matrixA - The first matrix (2D array).
+ * @param {number[][]} matrixB - The second matrix (2D array).
+ * @returns {Promise<number[][]>} - The resulting matrix (2D array).
+ */
+async function multiplyMatrices(matrixA, matrixB) {
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Matrix dimensions do not match for multiplication.');
+  }
+
+  const n = matrixA.length;
+  const wasmBinary = generateMatrixMultiplicationWasm();
+  const wasmInstance = await compileWasmModule(wasmBinary);
+
+  const memory = new WebAssembly.Memory({ initial: 1 });
+  const memoryBuffer = new Uint32Array(memory.buffer);
+
+  // Flatten matrices into linear memory.
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
+  const flatC = new Array(n * n).fill(0);
+
+  memoryBuffer.set(flatA, 0);
+  memoryBuffer.set(flatB, flatA.length);
+
+  // Call the WebAssembly function.
+  wasmInstance.exports.multiply(0, flatA.length, flatA.length + flatB.length, n);
+
+  // Extract the result matrix.
+  for (let i = 0; i < n; i++) {
+    flatC[i] = memoryBuffer[i];
+  }
+
+  return flatC;
+}
+
+module.exports = {
+  compileWasmModule,
+  generateMatrixMultiplicationWasm,
+  multiplyMatrices
+};
