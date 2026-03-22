@@ -4901,7 +4901,7 @@ router.post("/omnimens/spectral-color/update-amplitudes", async (req, res) => {
 
   let significantBins = 0;
   let totalEnergy = 0;
-  const activeBins: { index: number; freq: number; color: { h: number; s: number; l: number }; amplitude: number; filtered: number }[] = [];
+  const activeBins: { index: number; freq: number; hex: string; color: { h: number; s: number; l: number }; amplitude: number; filtered: number; label: string }[] = [];
   for (let i = 0; i < SPECTRAL_BINS; i++) {
     const filtered = filteredAmplitudes[i] || 0;
     totalEnergy += filtered;
@@ -4910,23 +4910,25 @@ router.post("/omnimens/spectral-color/update-amplitudes", async (req, res) => {
       activeBins.push({
         index: i,
         freq: spectralColorMap[i].freqCenter,
+        hex: spectralColorMap[i].hex,
         color: spectralColorMap[i].color,
         amplitude: spectralColorMap[i].amplitude,
         filtered,
+        label: spectralColorMap[i].label,
       });
     }
   }
 
   if (activeBins.length > 0 && spectralInsightCount % 10 === 0) {
-    const topBins = activeBins.sort((a, b) => b.filtered - a.filtered).slice(0, 8);
+    const topBins = [...activeBins].sort((a, b) => b.filtered - a.filtered).slice(0, 8);
     const colorFingerprint = topBins.map(b =>
-      `${b.freq.toFixed(0)}Hz=hsl(${b.color.h},${b.color.s}%,${b.color.l}%)@${(b.filtered * 100).toFixed(0)}%`
+      `${b.hex}=${b.freq.toFixed(0)}Hz@${(b.filtered * 100).toFixed(0)}%`
     ).join(" | ");
 
     try {
       await db.insert(omnimensBrain).values({
         category: "creative_hypothesis",
-        content: `[SPECTRAL COLOR INSIGHT #${spectralInsightCount + 1}] ${significantBins} active freq bins. Color fingerprint: ${colorFingerprint}. Total energy: ${(totalEnergy * 100).toFixed(1)}%.`,
+        content: `[SPECTRAL COLOR INSIGHT #${spectralInsightCount + 1}] ${significantBins} active freq bins. Hex fingerprint: ${colorFingerprint}. Total energy: ${(totalEnergy * 100).toFixed(1)}%.`,
         confidence: 0.70,
         importance: 7,
         timesApplied: 0,
@@ -4935,11 +4937,25 @@ router.post("/omnimens/spectral-color/update-amplitudes", async (req, res) => {
   }
   spectralInsightCount++;
 
+  const decomposition = [...activeBins]
+    .sort((a, b) => b.filtered - a.filtered)
+    .map((b, rank) => ({
+      rank: rank + 1,
+      hex: b.hex,
+      freq: Math.round(b.freq * 10) / 10,
+      label: b.label,
+      amplitude: Math.round(b.amplitude * 1000) / 1000,
+      filtered: Math.round(b.filtered * 1000) / 1000,
+      strength: b.filtered > 0.7 ? "dominant" : b.filtered > 0.4 ? "strong" : b.filtered > 0.2 ? "moderate" : "subtle",
+      gainApplied: spectralColorMap[b.index].gain,
+    }));
+
   res.json({
     filteredAmplitudes,
     significantBins,
     totalEnergy,
     activeBins: activeBins.slice(0, 20),
+    decomposition,
   });
 });
 

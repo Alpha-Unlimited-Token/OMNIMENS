@@ -1912,6 +1912,7 @@ function AlgorithmicHarmonicsPanel() {
   const [sculptStrategy, setSculptStrategy] = useState<string | null>(null);
   const [spectralFiltered, setSpectralFiltered] = useState<number[]>([]);
   const [selectedBinRange, setSelectedBinRange] = useState<[number, number] | null>(null);
+  const [soundDecomposition, setSoundDecomposition] = useState<any[]>([]);
   const spectrumCanvasRef = React.useRef<HTMLCanvasElement>(null);
   const waveformCanvasRef = React.useRef<HTMLCanvasElement>(null);
   const spectralCanvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -2371,6 +2372,7 @@ function AlgorithmicHarmonicsPanel() {
         if (sr.ok) {
           const sd = await sr.json();
           if (sd.filteredAmplitudes) setSpectralFiltered(sd.filteredAmplitudes);
+          if (sd.decomposition) setSoundDecomposition(sd.decomposition);
         }
       } catch {}
     } catch {}
@@ -2594,6 +2596,50 @@ function AlgorithmicHarmonicsPanel() {
                     ))}
                   </div>
                   <p className="text-[8px] font-mono text-[#9DA5B4]/30 mt-1.5">Showing every 8th bin · Hover for full details · {spectralMap.length} total unique color identities</p>
+                </div>
+              )}
+
+              {soundDecomposition.length > 0 && (
+                <div className="bg-[#0E1525] border border-cyan-500/15 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                      <p className="text-[10px] font-mono text-cyan-400/80 uppercase tracking-wider">Sound Decomposition — {soundDecomposition.length} Frequencies Detected</p>
+                    </div>
+                    <p className="text-[9px] font-mono text-[#9DA5B4]">One sound, many frequencies — each identified by hex color</p>
+                  </div>
+                  <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1">
+                    {soundDecomposition.map((comp: any) => {
+                      const strengthColors: Record<string, string> = {
+                        dominant: "text-rose-400 bg-rose-500/10 border-rose-500/20",
+                        strong: "text-amber-400 bg-amber-500/10 border-amber-500/20",
+                        moderate: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
+                        subtle: "text-[#9DA5B4] bg-[#2B3245]/50 border-[#3D4659]",
+                      };
+                      const cls = strengthColors[comp.strength] || strengthColors.subtle;
+                      return (
+                        <div key={comp.rank} className={`flex items-center gap-2 rounded-lg border px-3 py-1.5 ${cls}`}>
+                          <span className="text-[9px] font-mono text-[#9DA5B4]/50 w-5 text-right">#{comp.rank}</span>
+                          <div className="w-4 h-4 rounded border border-white/15 flex-shrink-0" style={{ backgroundColor: comp.hex }} />
+                          <span className="text-[10px] font-mono font-bold w-16" style={{ color: comp.hex }}>{comp.hex}</span>
+                          <span className="text-[10px] font-mono w-20">{comp.freq}Hz</span>
+                          <span className="text-[8px] font-mono text-[#9DA5B4]/60 w-16">{comp.label}</span>
+                          <div className="flex-1 h-2 bg-[#0E1525] rounded-full overflow-hidden">
+                            <div className="h-full rounded-full" style={{ width: `${Math.min(comp.filtered * 100, 100)}%`, backgroundColor: comp.hex }} />
+                          </div>
+                          <span className="text-[9px] font-mono w-10 text-right">{(comp.filtered * 100).toFixed(0)}%</span>
+                          <span className="text-[7px] font-mono uppercase w-14 text-right">{comp.strength}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="mt-3 flex items-center gap-4 text-[8px] font-mono text-[#9DA5B4]/40">
+                    <span>Each row = one frequency component of the current sound</span>
+                    <span>|</span>
+                    <span>Hex code = permanent color identity for that frequency</span>
+                    <span>|</span>
+                    <span>Bar = relative strength after gain</span>
+                  </div>
                 </div>
               )}
 
