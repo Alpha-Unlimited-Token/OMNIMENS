@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-22T05:38:48.933Z
+ * Written: 2026-03-22T06:04:35.546Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,53 +16,46 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentPatterns(text, patternLength) {
-    if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
-        throw new Error('Invalid input: text must be a string and patternLength must be a positive number.');
+// Utility function to find the longest common substring between two strings
+function longestCommonSubstring(str1, str2) {
+    if (typeof str1 !== 'string' || typeof str2 !== 'string') {
+        throw new Error('Both inputs must be strings');
     }
 
-    const patternFrequency = new Map();
+    const len1 = str1.length;
+    const len2 = str2.length;
+    let maxLength = 0;
+    let endIndex = 0;
 
-    // Iterate through the text to extract all patterns of the given length
-    for (let i = 0; i <= text.length - patternLength; i++) {
-        const pattern = text.substring(i, i + patternLength);
-        patternFrequency.set(pattern, (patternFrequency.get(pattern) || 0) + 1);
-    }
+    // Create a 2D array to store lengths of common substrings
+    const dp = Array(len1 + 1).fill(null).map(() => Array(len2 + 1).fill(0));
 
-    // Find the maximum frequency
-    let maxFrequency = 0;
-    for (const frequency of patternFrequency.values()) {
-        if (frequency > maxFrequency) {
-            maxFrequency = frequency;
+    for (let i = 1; i <= len1; i++) {
+        for (let j = 1; j <= len2; j++) {
+            if (str1[i - 1] === str2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+                if (dp[i][j] > maxLength) {
+                    maxLength = dp[i][j];
+                    endIndex = i;
+                }
+            }
         }
     }
 
-    // Collect all patterns with the maximum frequency
-    const mostFrequentPatterns = [];
-    for (const [pattern, frequency] of patternFrequency.entries()) {
-        if (frequency === maxFrequency) {
-            mostFrequentPatterns.push({ pattern, frequency });
-        }
-    }
-
-    return mostFrequentPatterns;
+    // Extract the longest common substring
+    return str1.slice(endIndex - maxLength, endIndex);
 }
 
-// Self-tests
-console.log("Test 1:");
-console.log(findMostFrequentPatterns("abababab", 2)); // Expect patterns "ab" and "ba" with frequency 3
+// Test cases
+console.log(longestCommonSubstring("abcdef", "zcdemf")); // Expected output: "cde"
+console.log(longestCommonSubstring("12345", "34567")); // Expected output: "345"
+console.log(longestCommonSubstring("hello", "world")); // Expected output: ""
+console.log(longestCommonSubstring("abcdxyz", "xyzabcd")); // Expected output: "abcd"
+console.log(longestCommonSubstring("same", "same")); // Expected output: "same"
 
-console.log("Test 2:");
-console.log(findMostFrequentPatterns("abcabcabc", 3)); // Expect pattern "abc" with frequency 3
-
-console.log("Test 3:");
-console.log(findMostFrequentPatterns("aaaaa", 2)); // Expect pattern "aa" with frequency 4
-
-console.log("Test 4:");
-console.log(findMostFrequentPatterns("abcdef", 2)); // Expect all unique patterns with frequency 1
-
-console.log("Test 5 (Edge Case):");
-console.log(findMostFrequentPatterns("a", 1)); // Expect pattern "a" with frequency 1
-
-console.log("Test 6 (Edge Case):");
-console.log(findMostFrequentPatterns("", 1)); // Expect an empty array as there are no patterns
+// Edge cases
+console.log(longestCommonSubstring("", "abc")); // Expected output: ""
+console.log(longestCommonSubstring("abc", "")); // Expected output: ""
+console.log(longestCommonSubstring("", "")); // Expected output: ""
+console.log(longestCommonSubstring("a", "a")); // Expected output: "a"
+console.log(longestCommonSubstring("a", "b")); // Expected output: ""
