@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-22T20:39:55.747Z
+ * Written: 2026-03-22T21:14:25.438Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,71 +17,90 @@
  */
 
 function KnowledgeGraph() {
-    this.graph = new Map();
+    this.nodes = new Map();
+    this.edges = new Map();
 }
 
-KnowledgeGraph.prototype.addConcept = function(concept, relatedConcepts) {
-    if (!this.graph.has(concept)) {
-        this.graph.set(concept, new Set());
-    }
-    for (var i = 0; i < relatedConcepts.length; i++) {
-        this.graph.get(concept).add(relatedConcepts[i]);
-        if (!this.graph.has(relatedConcepts[i])) {
-            this.graph.set(relatedConcepts[i], new Set());
-        }
-        this.graph.get(relatedConcepts[i]).add(concept);
+KnowledgeGraph.prototype.addNode = function (node) {
+    if (!this.nodes.has(node)) {
+        this.nodes.set(node, []);
     }
 };
 
-KnowledgeGraph.prototype.findShortestPath = function(start, end) {
-    if (!this.graph.has(start) || !this.graph.has(end)) {
-        return null;
-    }
+KnowledgeGraph.prototype.addEdge = function (node1, node2, weight) {
+    this.addNode(node1);
+    this.addNode(node2);
 
-    var visited = new Set();
-    var queue = [[start, [start]]];
+    this.edges.set(node1 + "_" + node2, weight);
+    this.nodes.get(node1).push({ node: node2, weight: weight });
+    this.nodes.get(node2).push({ node: node1, weight: weight });
+};
+
+KnowledgeGraph.prototype.retrieveMostRelevant = function (startNode, relevanceThreshold) {
+    let visited = new Set();
+    let results = [];
+    let queue = [{ node: startNode, relevance: 1 }];
 
     while (queue.length > 0) {
-        var [current, path] = queue.shift();
+        let current = queue.shift();
+        let node = current.node;
+        let relevance = current.relevance;
 
-        if (current === end) {
-            return path;
+        if (visited.has(node)) continue;
+        visited.add(node);
+
+        if (relevance >= relevanceThreshold) {
+            results.push(node);
         }
 
-        visited.add(current);
-
-        var neighbors = this.graph.get(current);
-        neighbors.forEach(function(neighbor) {
-            if (!visited.has(neighbor)) {
-                queue.push([neighbor, path.concat(neighbor)]);
+        let neighbors = this.nodes.get(node) || [];
+        for (let neighbor of neighbors) {
+            if (!visited.has(neighbor.node)) {
+                queue.push({
+                    node: neighbor.node,
+                    relevance: relevance * neighbor.weight,
+                });
             }
-        });
+        }
     }
 
-    return null;
+    return results;
 };
 
 // Self-tests
-var kg = new KnowledgeGraph();
+function runTests() {
+    let graph = new KnowledgeGraph();
 
-// Adding concepts and relationships
-kg.addConcept("Lucid Dream", ["Neural Consciousness", "Insight"]);
-kg.addConcept("Neural Consciousness", ["Goal Pursuit", "Insight"]);
-kg.addConcept("Insight", ["Knowledge Graph", "Digital Navigation"]);
-kg.addConcept("Knowledge Graph", ["Digital Navigation"]);
-kg.addConcept("Digital Navigation", ["Goal Pursuit"]);
+    // Adding nodes and edges
+    graph.addEdge("A", "B", 0.8);
+    graph.addEdge("A", "C", 0.6);
+    graph.addEdge("B", "D", 0.9);
+    graph.addEdge("C", "E", 0.7);
+    graph.addEdge("D", "F", 0.5);
+    graph.addEdge("E", "F", 0.4);
 
-console.log("Test 1: Shortest path between 'Lucid Dream' and 'Goal Pursuit'");
-console.log(kg.findShortestPath("Lucid Dream", "Goal Pursuit")); // Expected: ["Lucid Dream", "Neural Consciousness", "Goal Pursuit"]
+    console.log("Graph nodes:", Array.from(graph.nodes.keys()));
+    console.log("Graph edges:", Array.from(graph.edges.entries()));
 
-console.log("Test 2: Shortest path between 'Insight' and 'Digital Navigation'");
-console.log(kg.findShortestPath("Insight", "Digital Navigation")); // Expected: ["Insight", "Digital Navigation"]
+    // Test 1: Retrieve nodes with relevance threshold 0.5 starting from A
+    let result1 = graph.retrieveMostRelevant("A", 0.5);
+    console.log("Test 1 - Relevant nodes from A (threshold 0.5):", result1);
 
-console.log("Test 3: Shortest path between 'Lucid Dream' and 'Knowledge Graph'");
-console.log(kg.findShortestPath("Lucid Dream", "Knowledge Graph")); // Expected: ["Lucid Dream", "Insight", "Knowledge Graph"]
+    // Test 2: Retrieve nodes with relevance threshold 0.7 starting from A
+    let result2 = graph.retrieveMostRelevant("A", 0.7);
+    console.log("Test 2 - Relevant nodes from A (threshold 0.7):", result2);
 
-console.log("Test 4: Path between non-existent concepts");
-console.log(kg.findShortestPath("NonExistent", "Goal Pursuit")); // Expected: null
+    // Test 3: Retrieve nodes with relevance threshold 0.9 starting from B
+    let result3 = graph.retrieveMostRelevant("B", 0.9);
+    console.log("Test 3 - Relevant nodes from B (threshold 0.9):", result3);
 
-console.log("Test 5: Path to self");
-console.log(kg.findShortestPath("Lucid Dream", "Lucid Dream")); // Expected: ["Lucid Dream"]
+    // Edge case: Node not in graph
+    let result4 = graph.retrieveMostRelevant("Z", 0.5);
+    console.log("Test 4 - Relevant nodes from Z (threshold 0.5):", result4);
+
+    // Edge case: Threshold too high
+    let result5 = graph.retrieveMostRelevant("A", 1.5);
+    console.log("Test 5 - Relevant nodes from A (threshold 1.5):", result5);
+}
+
+runTests();

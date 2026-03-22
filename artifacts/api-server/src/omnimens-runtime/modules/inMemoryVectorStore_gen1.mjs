@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-03-22T17:22:26.348Z
+ * Written: 2026-03-22T21:04:45.277Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,109 +18,79 @@
 
 /**
  * @module inMemoryVectorStore
- * @description A module for storing and retrieving vector embeddings for similarity searches using cosine similarity.
- * Implements an efficient in-memory storage and search mechanism.
+ * @description A lightweight in-memory k-Nearest Neighbors (k-NN) vector store for fast similarity search of embeddings.
+ * This module enables efficient retrieval-augmented generation (RAG) for large language models.
  */
 
 /**
- * Computes the cosine similarity between two vectors.
+ * Calculates the Euclidean distance between two vectors.
  * @param {number[]} vectorA - The first vector.
  * @param {number[]} vectorB - The second vector.
- * @returns {number} The cosine similarity between the two vectors.
- * @throws {Error} If vectors are not of the same length or are empty.
+ * @returns {number} - The Euclidean distance.
+ * @throws {Error} - If the vectors have different dimensions.
  */
-export function cosineSimilarity(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length || vectorA.length === 0) {
-    throw new Error("Vectors must be of the same length and non-empty.");
+export function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error("Vectors must have the same dimensions.");
   }
-
-  const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a ** 2, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b ** 2, 0));
-
-  if (magnitudeA === 0 || magnitudeB === 0) {
-    throw new Error("Vectors must not have zero magnitude.");
-  }
-
-  return dotProduct / (magnitudeA * magnitudeB);
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
 }
 
 /**
- * Class representing an in-memory vector store.
+ * A class representing an in-memory vector store for fast similarity search.
  */
 export class InMemoryVectorStore {
   /**
    * Initializes the vector store.
    */
   constructor() {
-    this.store = new Map();
+    /** @type {{id: string, vector: number[]}[]} */
+    this.vectors = [];
   }
 
   /**
    * Adds a vector to the store.
-   * @param {string} key - The unique identifier for the vector.
+   * @param {string} id - A unique identifier for the vector.
    * @param {number[]} vector - The vector to store.
-   * @throws {Error} If the key already exists or the vector is invalid.
    */
-  addVector(key, vector) {
-    if (this.store.has(key)) {
-      throw new Error("Key already exists in the store.");
-    }
-    if (!Array.isArray(vector) || vector.length === 0 || !vector.every(Number.isFinite)) {
-      throw new Error("Invalid vector. Must be a non-empty array of numbers.");
-    }
-    this.store.set(key, vector);
+  addVector(id, vector) {
+    this.vectors.push({ id, vector });
   }
 
   /**
-   * Removes a vector from the store.
-   * @param {string} key - The unique identifier for the vector to remove.
-   * @returns {boolean} True if the vector was removed, false if it did not exist.
-   */
-  removeVector(key) {
-    return this.store.delete(key);
-  }
-
-  /**
-   * Finds the most similar vectors to a given query vector.
+   * Performs a k-Nearest Neighbors search to find the closest vectors.
    * @param {number[]} queryVector - The query vector.
-   * @param {number} topK - The number of top similar vectors to retrieve.
-   * @returns {Array<{key: string, similarity: number}>} An array of objects containing keys and similarity scores.
-   * @throws {Error} If the query vector is invalid or topK is not a positive integer.
+   * @param {number} k - The number of nearest neighbors to retrieve.
+   * @returns {{id: string, distance: number}[]} - The k nearest neighbors with their distances.
    */
-  findMostSimilar(queryVector, topK = 1) {
-    if (!Array.isArray(queryVector) || queryVector.length === 0 || !queryVector.every(Number.isFinite)) {
-      throw new Error("Invalid query vector. Must be a non-empty array of numbers.");
-    }
-    if (!Number.isInteger(topK) || topK <= 0) {
-      throw new Error("topK must be a positive integer.");
+  search(queryVector, k) {
+    if (k <= 0) {
+      throw new Error("k must be a positive integer.");
     }
 
-    const similarities = [];
+    const distances = this.vectors.map(({ id, vector }) => ({
+      id,
+      distance: euclideanDistance(queryVector, vector)
+    }));
 
-    for (const [key, vector] of this.store.entries()) {
-      const similarity = cosineSimilarity(queryVector, vector);
-      similarities.push({ key, similarity });
-    }
+    distances.sort((a, b) => a.distance - b.distance);
 
-    similarities.sort((a, b) => b.similarity - a.similarity);
-    return similarities.slice(0, topK);
+    return distances.slice(0, k);
   }
 
   /**
    * Clears all vectors from the store.
    */
   clear() {
-    this.store.clear();
+    this.vectors = [];
   }
 }
 
 /**
- * Example usage of the InMemoryVectorStore.
- * Uncomment the lines below to test the functionality.
+ * Example usage:
+ * const store = new InMemoryVectorStore();
+ * store.addVector("vec1", [1, 2, 3]);
+ * store.addVector("vec2", [4, 5, 6]);
+ * const results = store.search([1, 2, 3], 1);
+ * console.log(results); // [{ id: "vec1", distance: 0 }]
  */
-// const store = new InMemoryVectorStore();
-// store.addVector("vec1", [1, 2, 3]);
-// store.addVector("vec2", [4, 5, 6]);
-// store.addVector("vec3", [7, 8, 9]);
-// console.log(store.findMostSimilar([1, 2, 3], 2));
