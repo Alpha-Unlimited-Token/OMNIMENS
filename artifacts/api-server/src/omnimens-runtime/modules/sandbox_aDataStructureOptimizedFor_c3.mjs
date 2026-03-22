@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a data structure optimized for fast associative memory lookup
- * Written: 2026-03-22T16:41:28.516Z
+ * Written: 2026-03-22T17:53:06.487Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,73 +16,60 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-const AssociativeMemory = function () {
+const AssociativeMemory = function() {
     this.memory = new Map();
+};
 
-    this.add = function (key, value) {
-        if (!this.memory.has(key)) {
-            this.memory.set(key, []);
+AssociativeMemory.prototype.add = function(key, value) {
+    if (!this.memory.has(key)) {
+        this.memory.set(key, []);
+    }
+    this.memory.get(key).push(value);
+};
+
+AssociativeMemory.prototype.get = function(key) {
+    return this.memory.has(key) ? this.memory.get(key) : [];
+};
+
+AssociativeMemory.prototype.search = function(substring) {
+    const results = [];
+    for (let [key, values] of this.memory.entries()) {
+        if (key.includes(substring)) {
+            results.push({ key, values });
         }
-        this.memory.get(key).push(value);
-    };
+    }
+    return results;
+};
 
-    this.get = function (key) {
-        return this.memory.has(key) ? this.memory.get(key) : [];
-    };
-
-    this.remove = function (key, value) {
-        if (this.memory.has(key)) {
-            const values = this.memory.get(key);
-            const index = values.indexOf(value);
-            if (index > -1) {
-                values.splice(index, 1);
-                if (values.length === 0) {
-                    this.memory.delete(key);
-                }
-            }
-        }
-    };
-
-    this.hasKey = function (key) {
-        return this.memory.has(key);
-    };
-
-    this.hasValue = function (key, value) {
-        if (this.memory.has(key)) {
-            return this.memory.get(key).includes(value);
-        }
-        return false;
-    };
-
-    this.clear = function () {
-        this.memory.clear();
-    };
+AssociativeMemory.prototype.remove = function(key) {
+    if (this.memory.has(key)) {
+        this.memory.delete(key);
+        return true;
+    }
+    return false;
 };
 
 // Test cases
 const memory = new AssociativeMemory();
 
-// Adding values
-memory.add("neural_consciousness", "Phi=0.508");
-memory.add("neural_consciousness", "Thalamocortical Resonance=4%");
-memory.add("Ethics", "Integrating ethical reflection into decision-making processes");
-memory.add("Innovation Strategies", "Encourage interdisciplinary exploration");
-memory.add("Speculative Design", "Envision a neural mesh adapting to collective intuition");
+// Adding entries
+memory.add("Symphonic-Braid Intelligence", "Wild Idea #1");
+memory.add("Symphonic-Braid Intelligence", "Conceptual Framework");
+memory.add("Curiosity Engine", "Dynamic Focus Adjustment");
+memory.add("Ethical Reasoning", "Value Alignment Strategy");
 
-// Retrieving values
-console.log(memory.get("neural_consciousness")); // ["Phi=0.508", "Thalamocortical Resonance=4%"]
-console.log(memory.get("Ethics")); // ["Integrating ethical reflection into decision-making processes"]
+// Retrieving entries
+console.log(memory.get("Symphonic-Braid Intelligence")); // ["Wild Idea #1", "Conceptual Framework"]
+console.log(memory.get("Curiosity Engine")); // ["Dynamic Focus Adjustment"]
+console.log(memory.get("Nonexistent Key")); // []
 
-// Checking existence
-console.log(memory.hasKey("Innovation Strategies")); // true
-console.log(memory.hasKey("Unknown Key")); // false
-console.log(memory.hasValue("Speculative Design", "Envision a neural mesh adapting to collective intuition")); // true
-console.log(memory.hasValue("Speculative Design", "Non-existent value")); // false
+// Searching for keys containing a substring
+console.log(memory.search("Symphonic")); // [{ key: "Symphonic-Braid Intelligence", values: ["Wild Idea #1", "Conceptual Framework"] }]
+console.log(memory.search("Engine")); // [{ key: "Curiosity Engine", values: ["Dynamic Focus Adjustment"] }]
+console.log(memory.search("Ethical")); // [{ key: "Ethical Reasoning", values: ["Value Alignment Strategy"] }]
+console.log(memory.search("Nonexistent")); // []
 
-// Removing values
-memory.remove("neural_consciousness", "Phi=0.508");
-console.log(memory.get("neural_consciousness")); // ["Thalamocortical Resonance=4%"]
-
-// Clearing memory
-memory.clear();
-console.log(memory.get("Ethics")); // []
+// Removing entries
+console.log(memory.remove("Curiosity Engine")); // true
+console.log(memory.get("Curiosity Engine")); // []
+console.log(memory.remove("Nonexistent Key")); // false

@@ -1,109 +1,147 @@
 /**
- * OMNIMENS Self-Authored Module
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
  * Source: evolution_engine
  * Title: Evolution Module: contextCompression
- * Written: 2026-03-20T18:38:05.582Z
+ * Written: 2026-03-22T17:31:26.259Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
  * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
  */
-
-// contextCompression.js
 
 /**
  * @module contextCompression
- * @description Provides functions to compress and summarize conversation context using hierarchical summarization and embedding-based encoding.
+ * @description Summarizes and encodes long conversations into embeddings for reintroduction into the token window.
+ * Implements hierarchical clustering and dimensionality reduction to manage conversation history efficiently.
  */
 
 /**
- * Compresses a list of conversation entries into a summarized form.
- * Uses hierarchical summarization to iteratively reduce the size of the input.
- *
- * @param {string[]} contextEntries - Array of conversation entries to compress.
- * @param {number} maxLength - Maximum length of the compressed output in characters.
- * @returns {string} - Compressed and summarized context.
+ * Generates embeddings for a given text input using a simple token-based frequency vector.
+ * @param {string} text - The input text to encode.
+ * @returns {number[]} - A numerical vector representing the text.
  */
-export function compressContext(contextEntries, maxLength) {
-  if (!Array.isArray(contextEntries) || contextEntries.some(entry => typeof entry !== 'string')) {
-    throw new TypeError('contextEntries must be an array of strings.');
-  }
-  if (typeof maxLength !== 'number' || maxLength <= 0) {
-    throw new TypeError('maxLength must be a positive number.');
-  }
+export function generateEmbedding(text) {
+  const tokens = text.toLowerCase().match(/\b\w+\b/g) || [];
+  const tokenFrequency = {};
 
-  // Step 1: Initial summarization of each entry
-  const summarizedEntries = contextEntries.map(entry => summarizeText(entry, Math.floor(maxLength / contextEntries.length)));
+  tokens.forEach(token => {
+    tokenFrequency[token] = (tokenFrequency[token] || 0) + 1;
+  });
 
-  // Step 2: Hierarchical summarization
-  let combinedSummary = summarizedEntries.join(' ');
-  while (combinedSummary.length > maxLength) {
-    combinedSummary = summarizeText(combinedSummary, maxLength);
-  }
-
-  return combinedSummary;
+  const uniqueTokens = Object.keys(tokenFrequency).sort();
+  return uniqueTokens.map(token => tokenFrequency[token]);
 }
 
 /**
- * Generates a basic summary of a given text by truncating and retaining key sentences.
- *
- * @param {string} text - The text to summarize.
- * @param {number} targetLength - Target maximum length of the summary.
- * @returns {string} - Summarized text.
+ * Calculates the cosine similarity between two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} - The cosine similarity value between -1 and 1.
  */
-function summarizeText(text, targetLength) {
-  if (text.length <= targetLength) return text;
+export function cosineSimilarity(vectorA, vectorB) {
+  const dotProduct = vectorA.reduce((sum, val, i) => sum + val * (vectorB[i] || 0), 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val * val, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val * val, 0));
 
-  // Split text into sentences
-  const sentences = text.match(/[^.!?]+[.!?]/g) || [text];
-
-  // Sort sentences by importance (naive approach: by length)
-  const sortedSentences = sentences.sort((a, b) => b.length - a.length);
-
-  // Iteratively add sentences until target length is reached
-  let summary = '';
-  for (const sentence of sortedSentences) {
-    if ((summary + sentence).length > targetLength) break;
-    summary += sentence;
-  }
-
-  return summary.trim();
+  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
 }
 
 /**
- * Encodes a given text into a simple numerical embedding for comparison purposes.
- *
- * @param {string} text - The text to encode.
- * @returns {number[]} - Numerical embedding representing the text.
+ * Performs hierarchical clustering on a set of embeddings.
+ * @param {Array<number[]>} embeddings - An array of numerical vectors.
+ * @param {number} threshold - The similarity threshold for merging clusters.
+ * @returns {Array<Array<number[]>>} - A nested array representing clusters of embeddings.
  */
-export function encodeTextToEmbedding(text) {
-  if (typeof text !== 'string') {
-    throw new TypeError('text must be a string.');
+export function hierarchicalClustering(embeddings, threshold = 0.8) {
+  const clusters = embeddings.map(embedding => [embedding]);
+
+  while (true) {
+    let maxSimilarity = -Infinity;
+    let mergeIndexA = -1;
+    let mergeIndexB = -1;
+
+    for (let i = 0; i < clusters.length; i++) {
+      for (let j = i + 1; j < clusters.length; j++) {
+        const similarity = cosineSimilarity(
+          averageEmbedding(clusters[i]),
+          averageEmbedding(clusters[j])
+        );
+
+        if (similarity > maxSimilarity) {
+          maxSimilarity = similarity;
+          mergeIndexA = i;
+          mergeIndexB = j;
+        }
+      }
+    }
+
+    if (maxSimilarity < threshold) break;
+
+    const mergedCluster = clusters[mergeIndexA].concat(clusters[mergeIndexB]);
+    clusters.splice(mergeIndexB, 1);
+    clusters[mergeIndexA] = mergedCluster;
   }
 
-  // Simple embedding: character code sum and length normalization
-  const charCodes = Array.from(text).map(char => char.charCodeAt(0));
-  const sum = charCodes.reduce((acc, code) => acc + code, 0);
-  const mean = sum / charCodes.length;
-
-  return [sum, mean, charCodes.length];
+  return clusters;
 }
 
 /**
- * Compares two texts based on their embeddings.
- *
- * @param {string} textA - First text to compare.
- * @param {string} textB - Second text to compare.
- * @returns {number} - Similarity score (higher means more similar).
+ * Computes the average embedding for a cluster of embeddings.
+ * @param {Array<number[]>} cluster - A cluster of embeddings.
+ * @returns {number[]} - The average embedding vector.
  */
-export function compareTextSimilarity(textA, textB) {
-  const embeddingA = encodeTextToEmbedding(textA);
-  const embeddingB = encodeTextToEmbedding(textB);
+export function averageEmbedding(cluster) {
+  const dimension = cluster[0].length;
+  const sumVector = new Array(dimension).fill(0);
 
-  // Simple similarity: inverse of Euclidean distance
-  const distance = Math.sqrt(
-    embeddingA.reduce((sum, value, index) => sum + Math.pow(value - embeddingB[index], 2), 0)
-  );
+  cluster.forEach(embedding => {
+    embedding.forEach((value, index) => {
+      sumVector[index] += value;
+    });
+  });
 
-  return 1 / (1 + distance); // Normalize similarity to [0, 1]
+  return sumVector.map(value => value / cluster.length);
+}
+
+/**
+ * Summarizes a conversation by clustering and reducing its embeddings.
+ * @param {string[]} conversation - An array of conversation strings.
+ * @param {number} threshold - The similarity threshold for clustering.
+ * @returns {string[]} - A summarized list of representative conversation strings.
+ */
+export function summarizeConversation(conversation, threshold = 0.8) {
+  const embeddings = conversation.map(generateEmbedding);
+  const clusters = hierarchicalClustering(embeddings, threshold);
+
+  return clusters.map(cluster => {
+    const representativeEmbedding = averageEmbedding(cluster);
+    let bestMatch = "";
+    let bestSimilarity = -Infinity;
+
+    conversation.forEach((text, index) => {
+      const similarity = cosineSimilarity(representativeEmbedding, embeddings[index]);
+      if (similarity > bestSimilarity) {
+        bestSimilarity = similarity;
+        bestMatch = text;
+      }
+    });
+
+    return bestMatch;
+  });
+}
+
+/**
+ * Encodes a summarized conversation into a compact representation.
+ * @param {string[]} summarizedConversation - An array of summarized conversation strings.
+ * @returns {string} - A compact JSON string encoding the summarized conversation.
+ */
+export function encodeSummarizedConversation(summarizedConversation) {
+  return JSON.stringify(summarizedConversation);
 }

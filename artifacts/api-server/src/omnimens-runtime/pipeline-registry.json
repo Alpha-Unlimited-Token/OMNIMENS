@@ -6,7 +6,7 @@
       "exports": [
         "AdaptiveComputeAllocator"
       ],
-      "loadedAt": 1774200306517,
+      "loadedAt": 1774203203637,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -19,7 +19,7 @@
       "exports": [
         "adaptiveOrchestrationLayer"
       ],
-      "loadedAt": 1774200306518,
+      "loadedAt": 1774203203638,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -32,7 +32,7 @@
       "exports": [
         "AdaptiveResourceManager"
       ],
-      "loadedAt": 1774200306518,
+      "loadedAt": 1774203203639,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -45,7 +45,7 @@
       "exports": [
         "AdversarialCounterfactualGenerator"
       ],
-      "loadedAt": 1774200306519,
+      "loadedAt": 1774203203639,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -58,7 +58,7 @@
       "exports": [
         "simulateAdversarialCases"
       ],
-      "loadedAt": 1774200306520,
+      "loadedAt": 1774203203640,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -71,7 +71,7 @@
       "exports": [
         "AdversarialModuleTester"
       ],
-      "loadedAt": 1774200306520,
+      "loadedAt": 1774203203640,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -84,7 +84,7 @@
       "exports": [
         "AdversarialSelfTest"
       ],
-      "loadedAt": 1774200306521,
+      "loadedAt": 1774203203641,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -97,7 +97,7 @@
       "exports": [
         "adversarialStressTesting"
       ],
-      "loadedAt": 1774200306522,
+      "loadedAt": 1774203203642,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -110,7 +110,7 @@
       "exports": [
         "adversarialTest"
       ],
-      "loadedAt": 1774200306522,
+      "loadedAt": 1774203203642,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -123,7 +123,7 @@
       "exports": [
         "AdversarialTestingModule"
       ],
-      "loadedAt": 1774200306522,
+      "loadedAt": 1774203203643,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -136,7 +136,7 @@
       "exports": [
         "AdversarialTesting"
       ],
-      "loadedAt": 1774200306523,
+      "loadedAt": 1774203203643,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -149,7 +149,7 @@
       "exports": [
         "AdversarialToolTester"
       ],
-      "loadedAt": 1774200306523,
+      "loadedAt": 1774203203643,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -162,7 +162,7 @@
       "exports": [
         "AlphaEvolve"
       ],
-      "loadedAt": 1774200306524,
+      "loadedAt": 1774203203644,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -175,7 +175,7 @@
       "exports": [
         "bayesianCalibrationModule"
       ],
-      "loadedAt": 1774200306524,
+      "loadedAt": 1774203203647,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -188,7 +188,7 @@
       "exports": [
         "BayesianConfidenceCalibrator"
       ],
-      "loadedAt": 1774200306525,
+      "loadedAt": 1774203203648,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -201,7 +201,7 @@
       "exports": [
         "BayesianConfidenceEvaluator"
       ],
-      "loadedAt": 1774200306525,
+      "loadedAt": 1774203203648,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -215,7 +215,7 @@
         "BayesianConfidenceModule",
         "bayesianConfidence"
       ],
-      "loadedAt": 1774200306525,
+      "loadedAt": 1774203203649,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -228,7 +228,7 @@
       "exports": [
         "BayesianEvaluator"
       ],
-      "loadedAt": 1774200306526,
+      "loadedAt": 1774203203649,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -241,7 +241,7 @@
       "exports": [
         "bayesianInferenceModule"
       ],
-      "loadedAt": 1774200306526,
+      "loadedAt": 1774203203649,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -255,7 +255,7 @@
         "CoALAMemory",
         "coalaMemory"
       ],
-      "loadedAt": 1774200306528,
+      "loadedAt": 1774203203651,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -268,7 +268,7 @@
       "exports": [
         "confidenceWeightedSynthesis"
       ],
-      "loadedAt": 1774200306528,
+      "loadedAt": 1774203203652,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -279,11 +279,14 @@
       "filename": "contextCompression_gen1.mjs",
       "stage": "context_compression",
       "exports": [
-        "compressContext",
-        "encodeTextToEmbedding",
-        "compareTextSimilarity"
+        "generateEmbedding",
+        "cosineSimilarity",
+        "hierarchicalClustering",
+        "averageEmbedding",
+        "summarizeConversation",
+        "encodeSummarizedConversation"
       ],
-      "loadedAt": 1774200306528,
+      "loadedAt": 1774203203652,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -296,7 +299,7 @@
       "exports": [
         "generateEmbedding"
       ],
-      "loadedAt": 1774200306529,
+      "loadedAt": 1774203203652,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -312,7 +315,7 @@
         "compressConversationHistory",
         "retrieveRelevantVector"
       ],
-      "loadedAt": 1774200306529,
+      "loadedAt": 1774203203653,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -328,7 +331,7 @@
         "retrieveRelevantChunk",
         "manageContext"
       ],
-      "loadedAt": 1774200306530,
+      "loadedAt": 1774203203653,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -344,7 +347,7 @@
         "clusterSentences",
         "compressConversation"
       ],
-      "loadedAt": 1774200306531,
+      "loadedAt": 1774203203654,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -358,7 +361,7 @@
         "summarizeConversation",
         "summarizeRawInput"
       ],
-      "loadedAt": 1774200306532,
+      "loadedAt": 1774203203655,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -371,7 +374,7 @@
       "exports": [
         "counterfactualAnalysis"
       ],
-      "loadedAt": 1774200306532,
+      "loadedAt": 1774203203655,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -384,7 +387,7 @@
       "exports": [
         "generateCounterfactuals"
       ],
-      "loadedAt": 1774200306532,
+      "loadedAt": 1774203203655,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -397,7 +400,7 @@
       "exports": [
         "CounterfactualSimulation"
       ],
-      "loadedAt": 1774200306533,
+      "loadedAt": 1774203203656,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -411,7 +414,7 @@
         "propagate",
         "counterfactual"
       ],
-      "loadedAt": 1774200306533,
+      "loadedAt": 1774203203656,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -424,7 +427,7 @@
       "exports": [
         "CausalMultiverse"
       ],
-      "loadedAt": 1774200306541,
+      "loadedAt": 1774203203664,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -438,7 +441,7 @@
         "predictIntervention",
         "createSCM"
       ],
-      "loadedAt": 1774200306542,
+      "loadedAt": 1774203203666,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -452,7 +455,7 @@
         "blendMotifs",
         "computeResonance"
       ],
-      "loadedAt": 1774200306543,
+      "loadedAt": 1774203203667,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -467,7 +470,7 @@
         "resonate",
         "cosmicResonance"
       ],
-      "loadedAt": 1774200306544,
+      "loadedAt": 1774203203668,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -483,7 +486,7 @@
         "measureSonicCoherence",
         "runSonicSimulation"
       ],
-      "loadedAt": 1774200306550,
+      "loadedAt": 1774203203674,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -497,7 +500,7 @@
         "propagate",
         "simulateMembrane"
       ],
-      "loadedAt": 1774200306553,
+      "loadedAt": 1774203203677,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -511,7 +514,7 @@
         "resonateField",
         "fieldCoherence"
       ],
-      "loadedAt": 1774200306556,
+      "loadedAt": 1774203203680,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -524,7 +527,7 @@
       "exports": [
         "DualLayerMetacognition"
       ],
-      "loadedAt": 1774200306557,
+      "loadedAt": 1774203203681,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -537,7 +540,7 @@
       "exports": [
         "DynamicAgentOrchestrator"
       ],
-      "loadedAt": 1774200306557,
+      "loadedAt": 1774203203681,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -550,7 +553,7 @@
       "exports": [
         "DynamicAutonomyManager"
       ],
-      "loadedAt": 1774200306558,
+      "loadedAt": 1774203203682,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -563,7 +566,7 @@
       "exports": [
         "dynamicConfidenceCalibration"
       ],
-      "loadedAt": 1774200306559,
+      "loadedAt": 1774203203683,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -579,7 +582,7 @@
         "retrieveRelevantTokens",
         "clearContext"
       ],
-      "loadedAt": 1774200306559,
+      "loadedAt": 1774203203683,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -593,7 +596,7 @@
         "createHNSWGraph",
         "testModule"
       ],
-      "loadedAt": 1774200306559,
+      "loadedAt": 1774203203683,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -606,7 +609,7 @@
       "exports": [
         "EventOrchestrator"
       ],
-      "loadedAt": 1774200306560,
+      "loadedAt": 1774203203683,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -619,7 +622,7 @@
       "exports": [
         "dynamicInsightIntegrator"
       ],
-      "loadedAt": 1774200306560,
+      "loadedAt": 1774203203684,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -632,7 +635,7 @@
       "exports": [
         "KnowledgeGraphUpdater"
       ],
-      "loadedAt": 1774200306561,
+      "loadedAt": 1774203203684,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -645,7 +648,7 @@
       "exports": [
         "DynamicKnowledgeGraph"
       ],
-      "loadedAt": 1774200306561,
+      "loadedAt": 1774203203684,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -660,7 +663,7 @@
         "serializeCache",
         "deserializeCache"
       ],
-      "loadedAt": 1774200306561,
+      "loadedAt": 1774203203685,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -674,7 +677,7 @@
         "dynamicMemoryGraph",
         "queryMemoryGraph"
       ],
-      "loadedAt": 1774200306562,
+      "loadedAt": 1774203203685,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -688,7 +691,7 @@
         "DynamicModuleOrchestration",
         "hierarchicalController"
       ],
-      "loadedAt": 1774200306563,
+      "loadedAt": 1774203203686,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -701,7 +704,7 @@
       "exports": [
         "DynamicOrchestrationLayer"
       ],
-      "loadedAt": 1774200306564,
+      "loadedAt": 1774203203686,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -714,7 +717,7 @@
       "exports": [
         "DynamicReasoningManager"
       ],
-      "loadedAt": 1774200306564,
+      "loadedAt": 1774203203687,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -727,7 +730,7 @@
       "exports": [
         "allocateResources"
       ],
-      "loadedAt": 1774200306565,
+      "loadedAt": 1774203203687,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -740,7 +743,7 @@
       "exports": [
         "dynamicRoleAllocation"
       ],
-      "loadedAt": 1774200306565,
+      "loadedAt": 1774203203687,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -753,7 +756,7 @@
       "exports": [
         "DynamicRoleAllocator"
       ],
-      "loadedAt": 1774200306566,
+      "loadedAt": 1774203203688,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -766,7 +769,7 @@
       "exports": [
         "orchestrateRoles"
       ],
-      "loadedAt": 1774200306566,
+      "loadedAt": 1774203203688,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -779,7 +782,7 @@
       "exports": [
         "DynamicTaskOrchestrator"
       ],
-      "loadedAt": 1774200306566,
+      "loadedAt": 1774203203688,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -792,7 +795,7 @@
       "exports": [
         "createGraph"
       ],
-      "loadedAt": 1774200306567,
+      "loadedAt": 1774203203688,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -806,7 +809,7 @@
         "cosineSimilarity",
         "EmbeddingCache"
       ],
-      "loadedAt": 1774200306568,
+      "loadedAt": 1774203203690,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -820,7 +823,7 @@
         "createEmbeddingMemoryManager",
         "computeCosineSimilarity"
       ],
-      "loadedAt": 1774200306568,
+      "loadedAt": 1774203203690,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -833,7 +836,7 @@
       "exports": [
         "EmbeddingSearchCache"
       ],
-      "loadedAt": 1774200306569,
+      "loadedAt": 1774203203691,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -847,7 +850,7 @@
         "calculateEntropy",
         "dynamicConfidenceAdjustment"
       ],
-      "loadedAt": 1774200306570,
+      "loadedAt": 1774203203692,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -861,7 +864,7 @@
         "calculateEntropy",
         "scoreReasoningChain"
       ],
-      "loadedAt": 1774200306571,
+      "loadedAt": 1774203203692,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -874,7 +877,7 @@
       "exports": [
         "entropyScoringMechanism"
       ],
-      "loadedAt": 1774200306571,
+      "loadedAt": 1774203203693,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -887,7 +890,7 @@
       "exports": [
         "entropyScoringModule"
       ],
-      "loadedAt": 1774200306572,
+      "loadedAt": 1774203203693,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -900,7 +903,7 @@
       "exports": [
         "EntropyScoringSystem"
       ],
-      "loadedAt": 1774200306572,
+      "loadedAt": 1774203203693,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -913,7 +916,7 @@
       "exports": [
         "entropyScoring"
       ],
-      "loadedAt": 1774200306572,
+      "loadedAt": 1774203203693,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -928,7 +931,7 @@
         "selfConsistencyScorer",
         "calibrateConfidence"
       ],
-      "loadedAt": 1774200306573,
+      "loadedAt": 1774203203694,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -941,7 +944,7 @@
       "exports": [
         "EntropyScoring"
       ],
-      "loadedAt": 1774200306573,
+      "loadedAt": 1774203203694,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -954,7 +957,7 @@
       "exports": [
         "entropySelfConsistency"
       ],
-      "loadedAt": 1774200306573,
+      "loadedAt": 1774203203694,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -967,7 +970,7 @@
       "exports": [
         "EventDrivenCoordinator"
       ],
-      "loadedAt": 1774200306574,
+      "loadedAt": 1774203203694,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -980,7 +983,7 @@
       "exports": [
         "EventDrivenOrchestration"
       ],
-      "loadedAt": 1774200306574,
+      "loadedAt": 1774203203695,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -994,7 +997,7 @@
         "PubSubCoordinator",
         "pubSubLayer"
       ],
-      "loadedAt": 1774200306574,
+      "loadedAt": 1774203203695,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1007,7 +1010,7 @@
       "exports": [
         "EventDrivenPubSub"
       ],
-      "loadedAt": 1774200306575,
+      "loadedAt": 1774203203695,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1020,7 +1023,7 @@
       "exports": [
         "EventPubSub"
       ],
-      "loadedAt": 1774200306575,
+      "loadedAt": 1774203203696,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1033,7 +1036,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1774200306575,
+      "loadedAt": 1774203203696,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1046,7 +1049,7 @@
       "exports": [
         "simulateFaultInjection"
       ],
-      "loadedAt": 1774200306575,
+      "loadedAt": 1774203203696,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1059,7 +1062,7 @@
       "exports": [
         "FormalReasoningVerifier"
       ],
-      "loadedAt": 1774200306576,
+      "loadedAt": 1774203203696,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1072,7 +1075,7 @@
       "exports": [
         "verifySelfModification"
       ],
-      "loadedAt": 1774200306576,
+      "loadedAt": 1774203203697,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1085,7 +1088,7 @@
       "exports": [
         "FreeMadAdversarialDebate"
       ],
-      "loadedAt": 1774200306576,
+      "loadedAt": 1774203203697,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1101,7 +1104,7 @@
         "gpuMatrixSubtract",
         "gpuMatrixElementWiseMultiply"
       ],
-      "loadedAt": 1774200306577,
+      "loadedAt": 1774203203698,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1117,7 +1120,7 @@
         "gpuMatrixTranspose",
         "clearGpuMemory"
       ],
-      "loadedAt": 1774200306577,
+      "loadedAt": 1774203203698,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1132,7 +1135,7 @@
         "gpuNeuralInference",
         "isGpuAcceleratedEnvAvailable"
       ],
-      "loadedAt": 1774200306578,
+      "loadedAt": 1774203203698,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1149,7 +1152,7 @@
         "gpuMatrixMultiply",
         "validateMatrixDimensions"
       ],
-      "loadedAt": 1774200306578,
+      "loadedAt": 1774203203699,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1167,7 +1170,7 @@
         "generateRandomMatrix",
         "transposeMatrix"
       ],
-      "loadedAt": 1774200306578,
+      "loadedAt": 1774203203699,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1180,7 +1183,7 @@
       "exports": [
         "gpuMatrixMultiply"
       ],
-      "loadedAt": 1774200306579,
+      "loadedAt": 1774203203700,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1196,7 +1199,7 @@
         "dotProduct",
         "transposeMatrix"
       ],
-      "loadedAt": 1774200306579,
+      "loadedAt": 1774203203700,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1209,7 +1212,7 @@
       "exports": [
         "GraphEntitySynthesizer"
       ],
-      "loadedAt": 1774200306579,
+      "loadedAt": 1774203203700,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1222,7 +1225,7 @@
       "exports": [
         "GraphRAGReasoner"
       ],
-      "loadedAt": 1774200306579,
+      "loadedAt": 1774203203701,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1235,7 +1238,7 @@
       "exports": [
         "integrateMultiAgentOutputs"
       ],
-      "loadedAt": 1774200306580,
+      "loadedAt": 1774203203701,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1248,7 +1251,7 @@
       "exports": [
         "GraphRAG"
       ],
-      "loadedAt": 1774200306580,
+      "loadedAt": 1774203203702,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1261,7 +1264,7 @@
       "exports": [
         "GraphRAG"
       ],
-      "loadedAt": 1774200306580,
+      "loadedAt": 1774203203702,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1274,7 +1277,7 @@
       "exports": [
         "GraphRAGMemory"
       ],
-      "loadedAt": 1774200306581,
+      "loadedAt": 1774203203702,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1287,7 +1290,7 @@
       "exports": [
         "GraphRAGSynthesizer"
       ],
-      "loadedAt": 1774200306581,
+      "loadedAt": 1774203203703,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1300,7 +1303,7 @@
       "exports": [
         "hierarchicalAgentOrchestration"
       ],
-      "loadedAt": 1774200306582,
+      "loadedAt": 1774203203703,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1313,7 +1316,7 @@
       "exports": [
         "HierarchicalCoordinationSystem"
       ],
-      "loadedAt": 1774200306582,
+      "loadedAt": 1774203203704,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1326,7 +1329,7 @@
       "exports": [
         "EventOrchestrator"
       ],
-      "loadedAt": 1774200306582,
+      "loadedAt": 1774203203704,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1342,7 +1345,7 @@
         "levenshteinDistance",
         "compressAndStore"
       ],
-      "loadedAt": 1774200306583,
+      "loadedAt": 1774203203704,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1358,7 +1361,7 @@
         "hierarchicalSummarization",
         "compressContext"
       ],
-      "loadedAt": 1774200306583,
+      "loadedAt": 1774203203705,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1371,7 +1374,7 @@
       "exports": [
         "hierarchicalOrchestration"
       ],
-      "loadedAt": 1774200306583,
+      "loadedAt": 1774203203705,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1384,7 +1387,7 @@
       "exports": [
         "HierarchicalOrchestrator"
       ],
-      "loadedAt": 1774200306584,
+      "loadedAt": 1774203203706,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1397,7 +1400,7 @@
       "exports": [
         "HierarchicalReasoningFramework"
       ],
-      "loadedAt": 1774200306584,
+      "loadedAt": 1774203203706,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1410,7 +1413,7 @@
       "exports": [
         "hierarchicalTaskOrchestration"
       ],
-      "loadedAt": 1774200306584,
+      "loadedAt": 1774203203707,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1423,7 +1426,7 @@
       "exports": [
         "createCache"
       ],
-      "loadedAt": 1774200306585,
+      "loadedAt": 1774203203707,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1436,7 +1439,7 @@
       "exports": [
         "default"
       ],
-      "loadedAt": 1774200306585,
+      "loadedAt": 1774203203708,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1450,7 +1453,7 @@
         "createEmbeddingStore",
         "searchKNearestNeighbors"
       ],
-      "loadedAt": 1774200306586,
+      "loadedAt": 1774203203708,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1463,7 +1466,7 @@
       "exports": [
         "InMemoryVectorStore"
       ],
-      "loadedAt": 1774200306587,
+      "loadedAt": 1774203203709,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1476,7 +1479,7 @@
       "exports": [
         "intrinsicMetacognitionModule"
       ],
-      "loadedAt": 1774200306587,
+      "loadedAt": 1774203203710,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1489,7 +1492,7 @@
       "exports": [
         "intrinsicMetacognition"
       ],
-      "loadedAt": 1774200306588,
+      "loadedAt": 1774203203711,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1502,7 +1505,7 @@
       "exports": [
         "knowledgeDistillationModule"
       ],
-      "loadedAt": 1774200306588,
+      "loadedAt": 1774203203711,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1515,7 +1518,7 @@
       "exports": [
         "manageResourceAllocation"
       ],
-      "loadedAt": 1774200306591,
+      "loadedAt": 1774203203716,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1532,7 +1535,7 @@
         "addVectors",
         "dotProduct"
       ],
-      "loadedAt": 1774200306592,
+      "loadedAt": 1774203203717,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1548,7 +1551,7 @@
         "invertMatrix",
         "isValidMatrix"
       ],
-      "loadedAt": 1774200306592,
+      "loadedAt": 1774203203717,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1567,7 +1570,7 @@
         "normalizeVector",
         "addMatrices"
       ],
-      "loadedAt": 1774200306594,
+      "loadedAt": 1774203203719,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1581,7 +1584,7 @@
         "loadWasmModule",
         "multiplyMatrices"
       ],
-      "loadedAt": 1774200306594,
+      "loadedAt": 1774203203719,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1598,7 +1601,7 @@
         "clearEmbeddings",
         "closeDatabase"
       ],
-      "loadedAt": 1774200306595,
+      "loadedAt": 1774203203720,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1611,7 +1614,7 @@
       "exports": [
         "createCache"
       ],
-      "loadedAt": 1774200306595,
+      "loadedAt": 1774203203720,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1629,7 +1632,7 @@
         "generateKey",
         "getCacheSize"
       ],
-      "loadedAt": 1774200306596,
+      "loadedAt": 1774203203721,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1644,7 +1647,7 @@
         "kMeans",
         "compressContext"
       ],
-      "loadedAt": 1774200306596,
+      "loadedAt": 1774203203721,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1657,7 +1660,7 @@
       "exports": [
         "memoryConsolidationEngine"
       ],
-      "loadedAt": 1774200306596,
+      "loadedAt": 1774203203722,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1670,7 +1673,7 @@
       "exports": [
         "MemoryConsolidation"
       ],
-      "loadedAt": 1774200306597,
+      "loadedAt": 1774203203722,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1683,7 +1686,7 @@
       "exports": [
         "memoryConsolidation"
       ],
-      "loadedAt": 1774200306597,
+      "loadedAt": 1774203203723,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1696,7 +1699,7 @@
       "exports": [
         "MemoryReconsolidationScheduler"
       ],
-      "loadedAt": 1774200306598,
+      "loadedAt": 1774203203723,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1709,7 +1712,7 @@
       "exports": [
         "memoryReconsolidation"
       ],
-      "loadedAt": 1774200306598,
+      "loadedAt": 1774203203724,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1723,7 +1726,7 @@
         "replayMemory",
         "pruneIrrelevantMemories"
       ],
-      "loadedAt": 1774200306598,
+      "loadedAt": 1774203203724,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1737,7 +1740,7 @@
         "MemoryVectorStore",
         "euclideanDistance"
       ],
-      "loadedAt": 1774200306598,
+      "loadedAt": 1774203203724,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1750,7 +1753,7 @@
       "exports": [
         "metaCognitionLayer"
       ],
-      "loadedAt": 1774200306599,
+      "loadedAt": 1774203203725,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1763,7 +1766,7 @@
       "exports": [
         "MultiPathReasoningValidator"
       ],
-      "loadedAt": 1774200306600,
+      "loadedAt": 1774203203727,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1776,7 +1779,7 @@
       "exports": [
         "MultiPathVerification"
       ],
-      "loadedAt": 1774200306600,
+      "loadedAt": 1774203203727,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1789,7 +1792,7 @@
       "exports": [
         "multiPathVerifier"
       ],
-      "loadedAt": 1774200306600,
+      "loadedAt": 1774203203728,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1802,7 +1805,7 @@
       "exports": [
         "multiStepRetrievalRefinement"
       ],
-      "loadedAt": 1774200306601,
+      "loadedAt": 1774203203728,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1816,7 +1819,7 @@
         "ProceduralMemoryModule",
         "proceduralMemory"
       ],
-      "loadedAt": 1774200306602,
+      "loadedAt": 1774203203733,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1829,7 +1832,7 @@
       "exports": [
         "pubSubOrchestrationLayer"
       ],
-      "loadedAt": 1774200306603,
+      "loadedAt": 1774203203733,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1842,7 +1845,7 @@
       "exports": [
         "RecursiveScaffolding"
       ],
-      "loadedAt": 1774200306604,
+      "loadedAt": 1774203203735,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1855,7 +1858,7 @@
       "exports": [
         "RoleOrchestrator"
       ],
-      "loadedAt": 1774200306605,
+      "loadedAt": 1774203203741,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1870,7 +1873,7 @@
         "retainRollingContext",
         "updateRollingContext"
       ],
-      "loadedAt": 1774200306605,
+      "loadedAt": 1774203203742,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1883,7 +1886,7 @@
       "exports": [
         "sandboxSelfModification"
       ],
-      "loadedAt": 1774200306607,
+      "loadedAt": 1774203203743,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1896,7 +1899,7 @@
       "exports": [
         "selectiveMultiBranchEvaluation"
       ],
-      "loadedAt": 1774200306607,
+      "loadedAt": 1774203203743,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1909,7 +1912,7 @@
       "exports": [
         "SelfAdversarialDebugger"
       ],
-      "loadedAt": 1774200306607,
+      "loadedAt": 1774203203743,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1922,7 +1925,7 @@
       "exports": [
         "adversarialTest"
       ],
-      "loadedAt": 1774200306607,
+      "loadedAt": 1774203203744,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1935,7 +1938,7 @@
       "exports": [
         "SelfDebuggingModule"
       ],
-      "loadedAt": 1774200306608,
+      "loadedAt": 1774203203744,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1948,7 +1951,7 @@
       "exports": [
         "selfModifyingCodeSystem"
       ],
-      "loadedAt": 1774200306608,
+      "loadedAt": 1774203203745,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1961,7 +1964,7 @@
       "exports": [
         "compressSemanticContext"
       ],
-      "loadedAt": 1774200306609,
+      "loadedAt": 1774203203745,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1974,7 +1977,7 @@
       "exports": [
         "testSelfRewardMechanism"
       ],
-      "loadedAt": 1774200306611,
+      "loadedAt": 1774203203747,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1987,7 +1990,7 @@
       "exports": [
         "simulateSleepPhase"
       ],
-      "loadedAt": 1774200306611,
+      "loadedAt": 1774203203747,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2002,7 +2005,7 @@
         "generateSummaryEmbeddings",
         "slidingWindowMemory"
       ],
-      "loadedAt": 1774200306612,
+      "loadedAt": 1774203203749,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2015,7 +2018,7 @@
       "exports": [
         "stdpVectorMemory"
       ],
-      "loadedAt": 1774200306613,
+      "loadedAt": 1774203203749,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2028,7 +2031,7 @@
       "exports": [
         "STOPFramework"
       ],
-      "loadedAt": 1774200306613,
+      "loadedAt": 1774203203749,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2041,7 +2044,7 @@
       "exports": [
         "swarmIntelligenceModule"
       ],
-      "loadedAt": 1774200306613,
+      "loadedAt": 1774203203750,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2054,7 +2057,7 @@
       "exports": [
         "createToolManager"
       ],
-      "loadedAt": 1774200306614,
+      "loadedAt": 1774203203750,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2067,7 +2070,7 @@
       "exports": [
         "toolForgeModule"
       ],
-      "loadedAt": 1774200306614,
+      "loadedAt": 1774203203750,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2080,7 +2083,7 @@
       "exports": [
         "ToolForge"
       ],
-      "loadedAt": 1774200306615,
+      "loadedAt": 1774203203751,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2093,7 +2096,7 @@
       "exports": [
         "resolveConflictsUsingTreeOfThoughts"
       ],
-      "loadedAt": 1774200306615,
+      "loadedAt": 1774203203751,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2106,7 +2109,7 @@
       "exports": [
         "treeOfThoughtsGraphRag"
       ],
-      "loadedAt": 1774200306615,
+      "loadedAt": 1774203203751,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2119,7 +2122,7 @@
       "exports": [
         "treeOfThoughtsReasoning"
       ],
-      "loadedAt": 1774200306615,
+      "loadedAt": 1774203203751,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2132,7 +2135,7 @@
       "exports": [
         "UnifiedMemoryGraph"
       ],
-      "loadedAt": 1774200306616,
+      "loadedAt": 1774203203752,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2145,7 +2148,7 @@
       "exports": [
         "createVectorCache"
       ],
-      "loadedAt": 1774200306616,
+      "loadedAt": 1774203203752,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2162,7 +2165,7 @@
         "addNode",
         "search"
       ],
-      "loadedAt": 1774200306617,
+      "loadedAt": 1774203203753,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2181,7 +2184,7 @@
         "getMetadata",
         "getVectorCount"
       ],
-      "loadedAt": 1774200306617,
+      "loadedAt": 1774203203753,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2194,7 +2197,7 @@
       "exports": [
         "VectorStoreLite"
       ],
-      "loadedAt": 1774200306618,
+      "loadedAt": 1774203203754,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2207,7 +2210,7 @@
       "exports": [
         "createVectorStoreManager"
       ],
-      "loadedAt": 1774200306621,
+      "loadedAt": 1774203203754,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2223,7 +2226,7 @@
         "multiplyMatrices",
         "wasmAdd"
       ],
-      "loadedAt": 1774200306625,
+      "loadedAt": 1774203203756,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2236,7 +2239,7 @@
       "exports": [
         "gpuMatrixMultiply"
       ],
-      "loadedAt": 1774200306630,
+      "loadedAt": 1774203203756,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2251,7 +2254,7 @@
         "computeEigenvalues",
         "initializeWasmAccelerator"
       ],
-      "loadedAt": 1774200306630,
+      "loadedAt": 1774203203757,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2267,7 +2270,7 @@
         "validateWasmModule",
         "exampleUsage"
       ],
-      "loadedAt": 1774200306631,
+      "loadedAt": 1774203203757,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2284,7 +2287,7 @@
         "generateIdentityMatrix",
         "computeEmbedding"
       ],
-      "loadedAt": 1774200306631,
+      "loadedAt": 1774203203757,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2300,7 +2303,7 @@
         "generateRandomMatrix",
         "printMatrix"
       ],
-      "loadedAt": 1774200306631,
+      "loadedAt": 1774203203758,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2315,7 +2318,7 @@
         "isValidMatrix",
         "exampleUsage"
       ],
-      "loadedAt": 1774200306632,
+      "loadedAt": 1774203203758,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2331,7 +2334,7 @@
         "isValidMatrix",
         "createRandomMatrix"
       ],
-      "loadedAt": 1774200306633,
+      "loadedAt": 1774203203759,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2347,7 +2350,7 @@
         "isSimdSupported",
         "simdMatrixAdd"
       ],
-      "loadedAt": 1774200306634,
+      "loadedAt": 1774203203760,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2363,7 +2366,7 @@
         "demoMatrixMultiplication",
         "validateMatrixDimensions"
       ],
-      "loadedAt": 1774200306634,
+      "loadedAt": 1774203203760,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2378,7 +2381,7 @@
         "matrixMultiply",
         "example"
       ],
-      "loadedAt": 1774200306635,
+      "loadedAt": 1774203203761,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2392,7 +2395,7 @@
         "initializeWasmMatrixOps",
         "multiplyMatrices"
       ],
-      "loadedAt": 1774200306635,
+      "loadedAt": 1774203203761,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2408,7 +2411,7 @@
         "createBuffer",
         "matrixMultiply"
       ],
-      "loadedAt": 1774200306636,
+      "loadedAt": 1774203203762,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2421,7 +2424,7 @@
       "exports": [
         "WeightedConfidenceVoting"
       ],
-      "loadedAt": 1774200306637,
+      "loadedAt": 1774203203763,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2434,7 +2437,7 @@
       "exports": [
         "BayesianUncertainty"
       ],
-      "loadedAt": 1774200306526,
+      "loadedAt": 1774203203649,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2452,7 +2455,7 @@
         "retrieveContext",
         "closeDatabase"
       ],
-      "loadedAt": 1774200306529,
+      "loadedAt": 1774203203653,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2466,7 +2469,7 @@
         "calculateAttentionScores",
         "summarizeConversation"
       ],
-      "loadedAt": 1774200306530,
+      "loadedAt": 1774203203654,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2481,7 +2484,7 @@
         "summarizeChunks",
         "ConversationMemoryManager"
       ],
-      "loadedAt": 1774200306532,
+      "loadedAt": 1774203203655,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2494,7 +2497,7 @@
       "exports": [
         "DecentralizedPubSub"
       ],
-      "loadedAt": 1774200306556,
+      "loadedAt": 1774203203680,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2507,7 +2510,7 @@
       "exports": [
         "DualProcessReasoning"
       ],
-      "loadedAt": 1774200306557,
+      "loadedAt": 1774203203681,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2524,7 +2527,7 @@
         "maintainRollingBuffer",
         "closeDatabase"
       ],
-      "loadedAt": 1774200306562,
+      "loadedAt": 1774203203685,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2539,7 +2542,7 @@
         "HNSWGraph",
         "Node"
       ],
-      "loadedAt": 1774200306562,
+      "loadedAt": 1774203203685,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2552,7 +2555,7 @@
       "exports": [
         "createVectorStore"
       ],
-      "loadedAt": 1774200306563,
+      "loadedAt": 1774203203686,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2565,7 +2568,7 @@
       "exports": [
         "createVectorStore"
       ],
-      "loadedAt": 1774200306563,
+      "loadedAt": 1774203203686,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2581,7 +2584,7 @@
         "euclideanDistance",
         "DynamicVectorStore"
       ],
-      "loadedAt": 1774200306567,
+      "loadedAt": 1774203203689,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2595,7 +2598,7 @@
         "multiplyMatrices",
         "computeEigenvalues"
       ],
-      "loadedAt": 1774200306567,
+      "loadedAt": 1774203203689,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2608,7 +2611,7 @@
       "exports": [
         "createEmbeddingCache"
       ],
-      "loadedAt": 1774200306568,
+      "loadedAt": 1774203203689,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2622,7 +2625,7 @@
         "cosineSimilarity",
         "EmbeddingMemoryStore"
       ],
-      "loadedAt": 1774200306569,
+      "loadedAt": 1774203203690,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2635,7 +2638,7 @@
       "exports": [
         "EntropyBasedSelfConsistency"
       ],
-      "loadedAt": 1774200306571,
+      "loadedAt": 1774203203692,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2650,7 +2653,7 @@
         "dotProduct",
         "vectorAdd"
       ],
-      "loadedAt": 1774200306577,
+      "loadedAt": 1774203203697,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2665,7 +2668,7 @@
         "addContext",
         "getContextAsJSON"
       ],
-      "loadedAt": 1774200306582,
+      "loadedAt": 1774203203703,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2678,7 +2681,7 @@
       "exports": [
         "InMemoryVectorCache"
       ],
-      "loadedAt": 1774200306586,
+      "loadedAt": 1774203203708,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2693,7 +2696,7 @@
         "nearestNeighborSearch",
         "kNearestNeighborsSearch"
       ],
-      "loadedAt": 1774200306586,
+      "loadedAt": 1774203203709,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2706,7 +2709,7 @@
       "exports": [
         "IntrinsicMetacognitionCounterfactual"
       ],
-      "loadedAt": 1774200306587,
+      "loadedAt": 1774203203710,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2721,7 +2724,7 @@
         "manageContext",
         "combineSummaries"
       ],
-      "loadedAt": 1774200306588,
+      "loadedAt": 1774203203711,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2735,7 +2738,7 @@
         "addMatrices",
         "multiplyMatrices"
       ],
-      "loadedAt": 1774200306591,
+      "loadedAt": 1774203203717,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2750,7 +2753,7 @@
         "wasmMatrixMultiply",
         "wasmMatrixTranspose"
       ],
-      "loadedAt": 1774200306592,
+      "loadedAt": 1774203203717,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2765,7 +2768,7 @@
         "addMatrices",
         "transposeMatrix"
       ],
-      "loadedAt": 1774200306593,
+      "loadedAt": 1774203203718,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2779,7 +2782,7 @@
         "wasmMatrixMultiply",
         "wasmNeuralPrimitive"
       ],
-      "loadedAt": 1774200306593,
+      "loadedAt": 1774203203718,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2794,7 +2797,7 @@
         "multiplyMatrices",
         "formatMatrix"
       ],
-      "loadedAt": 1774200306593,
+      "loadedAt": 1774203203719,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2809,7 +2812,7 @@
         "transposeMatrix",
         "multiplyMatrices"
       ],
-      "loadedAt": 1774200306594,
+      "loadedAt": 1774203203719,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2826,7 +2829,7 @@
         "deleteEmbedding",
         "closeRedisClient"
       ],
-      "loadedAt": 1774200306595,
+      "loadedAt": 1774203203721,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2842,7 +2845,7 @@
         "clearStore",
         "getStoreSize"
       ],
-      "loadedAt": 1774200306597,
+      "loadedAt": 1774203203723,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2855,7 +2858,7 @@
       "exports": [
         "MetaLearningPrioritization"
       ],
-      "loadedAt": 1774200306599,
+      "loadedAt": 1774203203726,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2868,7 +2871,7 @@
       "exports": [
         "MetaPolicyLayer"
       ],
-      "loadedAt": 1774200306600,
+      "loadedAt": 1774203203726,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2881,7 +2884,7 @@
       "exports": [
         "multiplyMatrices"
       ],
-      "loadedAt": 1774200306602,
+      "loadedAt": 1774203203729,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2895,7 +2898,7 @@
         "initializeSchema",
         "PersistentMemoryManager"
       ],
-      "loadedAt": 1774200306602,
+      "loadedAt": 1774203203732,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2913,7 +2916,7 @@
         "removeVector",
         "closeRedisClient"
       ],
-      "loadedAt": 1774200306604,
+      "loadedAt": 1774203203740,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2926,7 +2929,7 @@
       "exports": [
         "createSemanticCacheManager"
       ],
-      "loadedAt": 1774200306609,
+      "loadedAt": 1774203203745,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2939,7 +2942,7 @@
       "exports": [
         "SemanticMemoryCache"
       ],
-      "loadedAt": 1774200306609,
+      "loadedAt": 1774203203746,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2955,7 +2958,7 @@
         "searchEmbedding",
         "clearSessionEmbeddings"
       ],
-      "loadedAt": 1774200306609,
+      "loadedAt": 1774203203746,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2969,7 +2972,7 @@
         "cosineSimilarity",
         "VectorDatabase"
       ],
-      "loadedAt": 1774200306610,
+      "loadedAt": 1774203203746,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2983,7 +2986,7 @@
         "createGraph",
         "exampleUsage"
       ],
-      "loadedAt": 1774200306610,
+      "loadedAt": 1774203203746,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3000,7 +3003,7 @@
         "searchEmbeddings",
         "disconnectFromDatabase"
       ],
-      "loadedAt": 1774200306610,
+      "loadedAt": 1774203203747,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3014,7 +3017,7 @@
         "SlidingWindowContextManager",
         "createSlidingWindowContextManager"
       ],
-      "loadedAt": 1774200306612,
+      "loadedAt": 1774203203748,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3028,7 +3031,7 @@
         "createVectorMemoryManager",
         "euclideanDistance"
       ],
-      "loadedAt": 1774200306616,
+      "loadedAt": 1774203203752,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3043,7 +3046,7 @@
         "searchNearest",
         "clearStore"
       ],
-      "loadedAt": 1774200306616,
+      "loadedAt": 1774203203753,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3057,7 +3060,7 @@
         "HNSW",
         "euclideanDistance"
       ],
-      "loadedAt": 1774200306617,
+      "loadedAt": 1774203203753,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3071,7 +3074,7 @@
         "createVectorStore",
         "VectorStoreMemory"
       ],
-      "loadedAt": 1774200306622,
+      "loadedAt": 1774203203754,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3084,7 +3087,7 @@
       "exports": [
         "VectorStoreRedis"
       ],
-      "loadedAt": 1774200306623,
+      "loadedAt": 1774203203755,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3098,7 +3101,7 @@
         "HNSWGraph",
         "euclideanDistance"
       ],
-      "loadedAt": 1774200306624,
+      "loadedAt": 1774203203755,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3116,7 +3119,7 @@
         "findNearestNeighbor",
         "closeRedisClient"
       ],
-      "loadedAt": 1774200306624,
+      "loadedAt": 1774203203755,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3131,7 +3134,7 @@
         "multiplyMatrices",
         "computeEmbedding"
       ],
-      "loadedAt": 1774200306624,
+      "loadedAt": 1774203203756,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3147,7 +3150,7 @@
         "matrixMultiply",
         "matrixInvert"
       ],
-      "loadedAt": 1774200306632,
+      "loadedAt": 1774203203758,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3161,7 +3164,7 @@
         "matrixMultiply",
         "matrixAdd"
       ],
-      "loadedAt": 1774200306632,
+      "loadedAt": 1774203203758,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3176,7 +3179,7 @@
         "wasmMatrixMultiply",
         "initializeWasmParallelCompute"
       ],
-      "loadedAt": 1774200306633,
+      "loadedAt": 1774203203759,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3193,7 +3196,7 @@
         "convolution",
         "initialize"
       ],
-      "loadedAt": 1774200306635,
+      "loadedAt": 1774203203760,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3207,7 +3210,7 @@
         "loadWasmModule",
         "initializeWasmOps"
       ],
-      "loadedAt": 1774200306635,
+      "loadedAt": 1774203203761,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3222,7 +3225,7 @@
         "multiplyMatrices",
         "isValidMatrix"
       ],
-      "loadedAt": 1774200306636,
+      "loadedAt": 1774203203761,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3237,7 +3240,7 @@
         "multiplyMatrices",
         "isValidMatrix"
       ],
-      "loadedAt": 1774200306636,
+      "loadedAt": 1774203203762,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3250,7 +3253,7 @@
       "exports": [
         "swarmOptimization"
       ],
-      "loadedAt": 1774200306613,
+      "loadedAt": 1774203203750,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3263,7 +3266,7 @@
       "exports": [
         "makeWaveField"
       ],
-      "loadedAt": 1774200306545,
+      "loadedAt": 1774203203668,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3277,7 +3280,7 @@
         "cosineSimilarity",
         "InMemoryVectorStore"
       ],
-      "loadedAt": 1774200306586,
+      "loadedAt": 1774203203709,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3291,7 +3294,7 @@
         "forward",
         "demoSCM"
       ],
-      "loadedAt": 1774200306533,
+      "loadedAt": 1774203203657,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3304,7 +3307,7 @@
       "exports": [
         "tickEcosystem"
       ],
-      "loadedAt": 1774200306544,
+      "loadedAt": 1774203203667,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3317,7 +3320,7 @@
       "exports": [
         "RealTimeKnowledgeGraph"
       ],
-      "loadedAt": 1774200306603,
+      "loadedAt": 1774203203734,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3333,7 +3336,7 @@
         "compressMemory",
         "validateContext"
       ],
-      "loadedAt": 1774200306596,
+      "loadedAt": 1774203203722,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3346,7 +3349,7 @@
       "exports": [
         "capabilityGapAnalyzer"
       ],
-      "loadedAt": 1774200306527,
+      "loadedAt": 1774203203651,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3359,7 +3362,7 @@
       "exports": [
         "dynamicGraphSynthesizer"
       ],
-      "loadedAt": 1774200306560,
+      "loadedAt": 1774203203684,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3372,7 +3375,7 @@
       "exports": [
         "calculateUncertaintyScore"
       ],
-      "loadedAt": 1774200306527,
+      "loadedAt": 1774203203650,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3385,7 +3388,7 @@
       "exports": [
         "resonate"
       ],
-      "loadedAt": 1774200306546,
+      "loadedAt": 1774203203670,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3398,7 +3401,7 @@
       "exports": [
         "resonanceTick"
       ],
-      "loadedAt": 1774200306547,
+      "loadedAt": 1774203203670,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3412,7 +3415,7 @@
         "retrieveEmbedding",
         "setupMemoryHierarchy"
       ],
-      "loadedAt": 1774200306556,
+      "loadedAt": 1774203203681,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3425,7 +3428,7 @@
       "exports": [
         "EventDrivenEmbeddingCache"
       ],
-      "loadedAt": 1774200306574,
+      "loadedAt": 1774203203695,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3438,7 +3441,7 @@
       "exports": [
         "InterAgentKnowledgeGraph"
       ],
-      "loadedAt": 1774200306587,
+      "loadedAt": 1774203203710,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3451,7 +3454,7 @@
       "exports": [
         "evolveCuriousVector"
       ],
-      "loadedAt": 1774200306588,
+      "loadedAt": 1774203203712,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3464,7 +3467,7 @@
       "exports": [
         "harmonicSpinStep"
       ],
-      "loadedAt": 1774200306547,
+      "loadedAt": 1774203203671,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3478,7 +3481,7 @@
         "runModel",
         "intervene"
       ],
-      "loadedAt": 1774200306535,
+      "loadedAt": 1774203203659,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3491,7 +3494,7 @@
       "exports": [
         "resonanceStep"
       ],
-      "loadedAt": 1774200306548,
+      "loadedAt": 1774203203671,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3504,7 +3507,7 @@
       "exports": [
         "orchestraStep"
       ],
-      "loadedAt": 1774200306548,
+      "loadedAt": 1774203203672,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3517,7 +3520,7 @@
       "exports": [
         "SleepPhaseMemoryConsolidation"
       ],
-      "loadedAt": 1774200306611,
+      "loadedAt": 1774203203748,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3530,7 +3533,7 @@
       "exports": [
         "stdpMemoryUpdate"
       ],
-      "loadedAt": 1774200306612,
+      "loadedAt": 1774203203749,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3543,7 +3546,7 @@
       "exports": [
         "MetaLearningOrchestrator"
       ],
-      "loadedAt": 1774200306599,
+      "loadedAt": 1774203203725,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3558,7 +3561,7 @@
         "propagate",
         "divergenceScore"
       ],
-      "loadedAt": 1774200306536,
+      "loadedAt": 1774203203660,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3571,7 +3574,7 @@
       "exports": [
         "runAdversarialDebate"
       ],
-      "loadedAt": 1774200306519,
+      "loadedAt": 1774203203639,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3585,7 +3588,7 @@
         "calculateConfidence",
         "updateAgentConfidence"
       ],
-      "loadedAt": 1774200306524,
+      "loadedAt": 1774203203648,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3598,7 +3601,7 @@
       "exports": [
         "AdversarialStressTester"
       ],
-      "loadedAt": 1774200306522,
+      "loadedAt": 1774203203642,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3611,7 +3614,7 @@
       "exports": [
         "RecursiveScaffolder"
       ],
-      "loadedAt": 1774200306603,
+      "loadedAt": 1774203203734,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3625,7 +3628,7 @@
         "createHNSW",
         "euclideanDistance"
       ],
-      "loadedAt": 1774200306623,
+      "loadedAt": 1774203203755,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3638,7 +3641,7 @@
       "exports": [
         "DynamicOrchestrationSystem"
       ],
-      "loadedAt": 1774200306564,
+      "loadedAt": 1774203203687,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3651,7 +3654,7 @@
       "exports": [
         "GraphRAGConflictResolver"
       ],
-      "loadedAt": 1774200306580,
+      "loadedAt": 1774203203701,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3664,7 +3667,7 @@
       "exports": [
         "resonanceStep"
       ],
-      "loadedAt": 1774200306546,
+      "loadedAt": 1774203203669,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3677,7 +3680,7 @@
       "exports": [
         "entropyBasedConfidenceAdjustment"
       ],
-      "loadedAt": 1774200306570,
+      "loadedAt": 1774203203692,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3691,7 +3694,7 @@
         "multiplyMatrices",
         "validateMatrix"
       ],
-      "loadedAt": 1774200306634,
+      "loadedAt": 1774203203760,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3708,7 +3711,7 @@
         "summarizeCluster",
         "manageContext"
       ],
-      "loadedAt": 1774200306612,
+      "loadedAt": 1774203203748,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3721,7 +3724,7 @@
       "exports": [
         "AdaptiveGovernance"
       ],
-      "loadedAt": 1774200306517,
+      "loadedAt": 1774203203638,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3736,7 +3739,7 @@
         "intervene",
         "updateEdgeWeight"
       ],
-      "loadedAt": 1774200306537,
+      "loadedAt": 1774203203660,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3750,7 +3753,7 @@
         "rollout",
         "evaluate"
       ],
-      "loadedAt": 1774200306537,
+      "loadedAt": 1774203203661,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3763,7 +3766,7 @@
       "exports": [
         "stepSwarm"
       ],
-      "loadedAt": 1774200306549,
+      "loadedAt": 1774203203672,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3776,7 +3779,7 @@
       "exports": [
         "AdversarialToolTesting"
       ],
-      "loadedAt": 1774200306524,
+      "loadedAt": 1774203203644,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3789,7 +3792,7 @@
       "exports": [
         "BayesianUncertaintyTransfer"
       ],
-      "loadedAt": 1774200306527,
+      "loadedAt": 1774203203650,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3802,7 +3805,7 @@
       "exports": [
         "d5p4Sample"
       ],
-      "loadedAt": 1774200306590,
+      "loadedAt": 1774203203713,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3815,7 +3818,7 @@
       "exports": [
         "AdversarialSimulationLayer"
       ],
-      "loadedAt": 1774200306521,
+      "loadedAt": 1774203203642,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3828,7 +3831,7 @@
       "exports": [
         "SelfModificationSandbox"
       ],
-      "loadedAt": 1774200306608,
+      "loadedAt": 1774203203744,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3842,7 +3845,7 @@
         "simulate",
         "counterfactual"
       ],
-      "loadedAt": 1774200306535,
+      "loadedAt": 1774203203658,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3855,7 +3858,7 @@
       "exports": [
         "AdversarialReasoningModule"
       ],
-      "loadedAt": 1774200306520,
+      "loadedAt": 1774203203641,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3868,7 +3871,7 @@
       "exports": [
         "stepSwarm"
       ],
-      "loadedAt": 1774200306549,
+      "loadedAt": 1774203203673,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3882,7 +3885,7 @@
         "retroCausalResonance",
         "decayProjector"
       ],
-      "loadedAt": 1774200306550,
+      "loadedAt": 1774203203673,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3895,7 +3898,7 @@
       "exports": [
         "HierarchicalPubSub"
       ],
-      "loadedAt": 1774200306584,
+      "loadedAt": 1774203203706,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3908,7 +3911,7 @@
       "exports": [
         "WeightedKnowledgeGraph"
       ],
-      "loadedAt": 1774200306637,
+      "loadedAt": 1774203203763,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3921,7 +3924,7 @@
       "exports": [
         "runAdversarialTests"
       ],
-      "loadedAt": 1774200306521,
+      "loadedAt": 1774203203641,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3935,7 +3938,7 @@
         "forward",
         "intervene"
       ],
-      "loadedAt": 1774200306538,
+      "loadedAt": 1774203203662,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3948,7 +3951,7 @@
       "exports": [
         "Sandbox"
       ],
-      "loadedAt": 1774200306538,
+      "loadedAt": 1774203203662,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3961,7 +3964,7 @@
       "exports": [
         "createMRAM"
       ],
-      "loadedAt": 1774200306543,
+      "loadedAt": 1774203203667,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3974,7 +3977,7 @@
       "exports": [
         "multiplyMatrices"
       ],
-      "loadedAt": 1774200306637,
+      "loadedAt": 1774203203762,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3987,7 +3990,7 @@
       "exports": [
         "MetaCognitiveReasoningMonitor"
       ],
-      "loadedAt": 1774200306599,
+      "loadedAt": 1774203203725,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4000,7 +4003,7 @@
       "exports": [
         "relaxConceptField"
       ],
-      "loadedAt": 1774200306539,
+      "loadedAt": 1774203203663,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4013,7 +4016,7 @@
       "exports": [
         "evolve"
       ],
-      "loadedAt": 1774200306551,
+      "loadedAt": 1774203203674,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4028,7 +4031,7 @@
         "interference",
         "retrieve"
       ],
-      "loadedAt": 1774200306551,
+      "loadedAt": 1774203203675,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4041,7 +4044,7 @@
       "exports": [
         "harmonicStep"
       ],
-      "loadedAt": 1774200306552,
+      "loadedAt": 1774203203675,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4054,7 +4057,7 @@
       "exports": [
         "createField"
       ],
-      "loadedAt": 1774200306554,
+      "loadedAt": 1774203203678,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4067,7 +4070,7 @@
       "exports": [
         "resonanceField"
       ],
-      "loadedAt": 1774200306554,
+      "loadedAt": 1774203203678,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4080,7 +4083,7 @@
       "exports": [
         "resonate"
       ],
-      "loadedAt": 1774200306555,
+      "loadedAt": 1774203203679,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4094,7 +4097,7 @@
         "contagionStep",
         "aggregateMood"
       ],
-      "loadedAt": 1774200306569,
+      "loadedAt": 1774203203691,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4107,7 +4110,7 @@
       "exports": [
         "ToolBuilder"
       ],
-      "loadedAt": 1774200306614,
+      "loadedAt": 1774203203750,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4121,7 +4124,7 @@
         "causalScore",
         "updatePosterior"
       ],
-      "loadedAt": 1774200306534,
+      "loadedAt": 1774203203657,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4136,7 +4139,7 @@
         "tick",
         "readChord"
       ],
-      "loadedAt": 1774200306545,
+      "loadedAt": 1774203203669,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4149,7 +4152,7 @@
       "exports": [
         "BayesianUncertaintyModule"
       ],
-      "loadedAt": 1774200306527,
+      "loadedAt": 1774203203650,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4163,7 +4166,7 @@
         "DynamicResourceAllocator",
         "sharedComputePool"
       ],
-      "loadedAt": 1774200306565,
+      "loadedAt": 1774203203687,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4176,7 +4179,7 @@
       "exports": [
         "DynamicCISCThresholding"
       ],
-      "loadedAt": 1774200306558,
+      "loadedAt": 1774203203682,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4189,7 +4192,7 @@
       "exports": [
         "HierarchicalTaskOrchestrator"
       ],
-      "loadedAt": 1774200306585,
+      "loadedAt": 1774203203707,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4203,7 +4206,7 @@
         "runSimulation",
         "entropy"
       ],
-      "loadedAt": 1774200306540,
+      "loadedAt": 1774203203663,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4220,7 +4223,7 @@
         "isValidMatrix",
         "isValidVector"
       ],
-      "loadedAt": 1774200306633,
+      "loadedAt": 1774203203759,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4233,7 +4236,7 @@
       "exports": [
         "adaptiveRoleAllocator"
       ],
-      "loadedAt": 1774200306518,
+      "loadedAt": 1774203203639,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4246,7 +4249,7 @@
       "exports": [
         "hierarchicalOrchestrationModule"
       ],
-      "loadedAt": 1774200306583,
+      "loadedAt": 1774203203705,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4260,7 +4263,7 @@
         "evaluateConfidence",
         "multiPathEvaluation"
       ],
-      "loadedAt": 1774200306528,
+      "loadedAt": 1774203203651,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4274,7 +4277,7 @@
         "evaluateModel",
         "counterfactual"
       ],
-      "loadedAt": 1774200306540,
+      "loadedAt": 1774203203664,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4288,7 +4291,7 @@
         "stepField",
         "demo"
       ],
-      "loadedAt": 1774200306555,
+      "loadedAt": 1774203203679,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4301,7 +4304,7 @@
       "exports": [
         "rtamStep"
       ],
-      "loadedAt": 1774200306591,
+      "loadedAt": 1774203203715,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4314,7 +4317,7 @@
       "exports": [
         "createRedisMemoryCache"
       ],
-      "loadedAt": 1774200306604,
+      "loadedAt": 1774203203735,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4327,7 +4330,7 @@
       "exports": [
         "CausalGraph"
       ],
-      "loadedAt": 1774200306541,
+      "loadedAt": 1774203203665,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4340,7 +4343,7 @@
       "exports": [
         "DynamicClustering"
       ],
-      "loadedAt": 1774200306558,
+      "loadedAt": 1774203203682,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4353,7 +4356,7 @@
       "exports": [
         "GraphSynthesis"
       ],
-      "loadedAt": 1774200306581,
+      "loadedAt": 1774203203703,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4366,7 +4369,7 @@
       "exports": [
         "stepOscillators"
       ],
-      "loadedAt": 1774200306552,
+      "loadedAt": 1774203203676,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4379,7 +4382,7 @@
       "exports": [
         "DCPISubsystem"
       ],
-      "loadedAt": 1774200306558,
+      "loadedAt": 1774203203682,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4393,7 +4396,7 @@
         "NanoOrganism",
         "WasmZoo"
       ],
-      "loadedAt": 1774200306600,
+      "loadedAt": 1774203203726,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4406,7 +4409,7 @@
       "exports": [
         "MycelialMesh"
       ],
-      "loadedAt": 1774200306601,
+      "loadedAt": 1774203203728,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4420,7 +4423,7 @@
         "weave",
         "HyperLattice"
       ],
-      "loadedAt": 1774200306601,
+      "loadedAt": 1774203203729,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4434,7 +4437,7 @@
         "eegToVoiceFrame",
         "mazeMix"
       ],
-      "loadedAt": 1774200306602,
+      "loadedAt": 1774203203732,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4447,7 +4450,7 @@
       "exports": [
         "QuantumWeave"
       ],
-      "loadedAt": 1774200306603,
+      "loadedAt": 1774203203734,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4460,7 +4463,7 @@
       "exports": [
         "RAMAL"
       ],
-      "loadedAt": 1774200306605,
+      "loadedAt": 1774203203741,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4473,7 +4476,7 @@
       "exports": [
         "RARM"
       ],
-      "loadedAt": 1774200306605,
+      "loadedAt": 1774203203741,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4486,7 +4489,7 @@
       "exports": [
         "nextSymphonicState"
       ],
-      "loadedAt": 1774200306553,
+      "loadedAt": 1774203203676,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4499,7 +4502,7 @@
       "exports": [
         "CIECore"
       ],
-      "loadedAt": 1774200306542,
+      "loadedAt": 1774203203665,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4512,15 +4515,178 @@
       "exports": [
         "VectorSearchMemory"
       ],
-      "loadedAt": 1774200306589,
+      "loadedAt": 1774203203713,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
       "errors": 0,
       "active": false
+    },
+    "daydreamparadigmbreaking647.mjs": {
+      "filename": "daydreamparadigmbreaking647.mjs",
+      "stage": "utility",
+      "exports": [
+        "createMesh",
+        "tick",
+        "stimulate",
+        "fingerprint"
+      ],
+      "loadedAt": 1774203203680,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "architectureNameOmnicausalSandboxOcs2.mjs": {
+      "filename": "architectureNameOmnicausalSandboxOcs2.mjs",
+      "stage": "causal_analysis",
+      "exports": [
+        "propagate",
+        "counterfactual"
+      ],
+      "loadedAt": 1774203203647,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "simdMatrixOps_gen1.mjs": {
+      "filename": "simdMatrixOps_gen1.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "addMatrices",
+        "multiplyMatrices"
+      ],
+      "loadedAt": 1774203203747,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adaptiveCoordinationModule_gen1.mjs": {
+      "filename": "adaptiveCoordinationModule_gen1.mjs",
+      "stage": "orchestration",
+      "exports": [
+        "AdaptiveCoordinationModule"
+      ],
+      "loadedAt": 1774203203638,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "architectureNameCausalAutopoieticReasoningE.mjs": {
+      "filename": "architectureNameCausalAutopoieticReasoningE.mjs",
+      "stage": "causal_analysis",
+      "exports": [
+        "predictIntervention"
+      ],
+      "loadedAt": 1774203203645,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "architectureNameCsimCausalsimulationInfe.mjs": {
+      "filename": "architectureNameCsimCausalsimulationInfe.mjs",
+      "stage": "causal_analysis",
+      "exports": [
+        "simulate",
+        "counterfactual"
+      ],
+      "loadedAt": 1774203203646,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "daydreamarchitecturedesign661.mjs": {
+      "filename": "daydreamarchitecturedesign661.mjs",
+      "stage": "causal_analysis",
+      "exports": [
+        "stepGraph",
+        "simulate"
+      ],
+      "loadedAt": 1774203203666,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "daydreamdivergentthinking656.mjs": {
+      "filename": "daydreamdivergentthinking656.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "HarmonicField"
+      ],
+      "loadedAt": 1774203203677,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "lucidDream81RealtimeAdaptationMechanismsQuantumc.mjs": {
+      "filename": "lucidDream81RealtimeAdaptationMechanismsQuantumc.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "rtamStep"
+      ],
+      "loadedAt": 1774203203714,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "lucidDream8NovelDefenseMethodCapability.mjs": {
+      "filename": "lucidDream8NovelDefenseMethodCapability.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "HoloContext"
+      ],
+      "loadedAt": 1774203203716,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": false
+    },
+    "metacognitiveRegulation_gen1.mjs": {
+      "filename": "metacognitiveRegulation_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "MetacognitiveRegulation"
+      ],
+      "loadedAt": 1774203203727,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "treeOfThoughtVoting_gen1.mjs": {
+      "filename": "treeOfThoughtVoting_gen1.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "TreeOfThoughtVoting"
+      ],
+      "loadedAt": 1774203203751,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
-  "lastScan": 1774200306637,
-  "totalModules": 283,
+  "lastScan": 1774203203763,
+  "totalModules": 287,
   "totalCalls": 0
 }
