@@ -552,6 +552,126 @@ function getExt(name: string): string {
   return i >= 0 ? name.slice(i).toLowerCase() : "";
 }
 
+const AUDIO_MIMES = new Set([
+  "audio/webm", "audio/ogg", "audio/wav", "audio/mp4", "audio/mpeg",
+  "audio/mp3", "audio/x-wav", "audio/flac", "audio/x-m4a", "audio/aac",
+  "audio/m4a", "audio/x-flac",
+]);
+
+async function runAutoHIEAnalysis(audioFile: Express.Multer.File): Promise<{
+  hieAnalysis: HarmonicAnalysis | null;
+  librosaData: any;
+  summary: string;
+}> {
+  console.log(`[HIE AUTO] Running automatic harmonic analysis on uploaded audio: ${audioFile.originalname} (${audioFile.mimetype}, ${audioFile.size} bytes)`);
+
+  const fileB64 = audioFile.buffer.toString("base64");
+  let librosaResult: any;
+  try {
+    librosaResult = await analyzeAudio({
+      action: "hie_analyze",
+      file_b64: fileB64,
+      file_mime: audioFile.mimetype || "audio/wav",
+    });
+  } catch (err) {
+    console.error("[HIE AUTO] Librosa analysis failed:", err);
+    return { hieAnalysis: null, librosaData: null, summary: "Audio analysis failed — could not process audio file." };
+  }
+
+  if (!librosaResult?.success) {
+    console.error("[HIE AUTO] Librosa returned error:", librosaResult?.error);
+    return { hieAnalysis: null, librosaData: librosaResult, summary: `Audio analysis error: ${librosaResult?.error || "unknown"}` };
+  }
+
+  const analysis: HarmonicAnalysis = {
+    timestamp: Date.now(),
+    dominantFrequency: librosaResult.dominant_frequency || 0,
+    harmonicSeries: librosaResult.harmonic_series || [],
+    spectralCentroid: librosaResult.spectral_centroid_hz || 0,
+    spectralBandwidth: librosaResult.spectral_bandwidth_hz || 0,
+    spectralRolloff: librosaResult.spectral_rolloff_hz || 0,
+    zeroCrossingRate: librosaResult.zero_crossing_rate || 0,
+    rmsEnergy: librosaResult.rms_energy || 0,
+    frequencyBands: librosaResult.frequency_bands || { sub: 0, low: 0, mid: 0, high: 0, ultra: 0 },
+    peakFrequencies: librosaResult.peak_frequencies || [],
+  };
+
+  analysis.semanticMapping = hieFreqToSemantic(analysis.dominantFrequency);
+  analysis.waveletDecomposition = hieWaveletDecomposition(analysis.frequencyBands, analysis.dominantFrequency, analysis.rmsEnergy);
+  analysis.noiseFloor = hieUpdateNoiseFloor(analysis.rmsEnergy);
+  analysis.signalToNoise = analysis.noiseFloor > 0 ? analysis.rmsEnergy / analysis.noiseFloor : 0;
+  analysis.adaptiveThreshold = hieState.adaptiveThreshold.sensitivity;
+  analysis.patternMatches = hieMatchPatterns(analysis);
+  analysis.spectralFlux = librosaResult.spectral_flux ?? hieComputeSpectralFlux(analysis);
+  analysis.spectralFlatness = hieComputeSpectralFlatness(analysis.frequencyBands);
+  analysis.harmonicComplexity = hieComputeHarmonicComplexity(analysis.harmonicSeries);
+  analysis.emotionalValence = hieEmotionalValence(analysis);
+
+  hieState.totalSamples++;
+  hieState.history.push(analysis);
+  if (hieState.history.length > hieState.maxHistory) {
+    hieState.history.splice(0, hieState.history.length - hieState.maxHistory);
+  }
+  analysis.noveltyScore = hieComputeNovelty(analysis);
+  analysis.temporalPattern = hieDetectTemporalPattern();
+  hieLearnPattern(analysis);
+
+  const bandDominant = Object.entries(analysis.frequencyBands).sort((a, b) => b[1] - a[1])[0];
+  const topPeaks = analysis.peakFrequencies
+    .sort((a, b) => b.magnitude - a.magnitude)
+    .slice(0, 5)
+    .map(p => `${p.freq.toFixed(0)}Hz (${(p.magnitude * 100).toFixed(0)}%)`)
+    .join(", ");
+  const harmonicRatios = analysis.harmonicSeries.length > 1
+    ? analysis.harmonicSeries.slice(1, 5).map((h) => (h / (analysis.harmonicSeries[0] || 1)).toFixed(2)).join(", ")
+    : "none detected";
+  const topPattern = analysis.patternMatches?.[0];
+
+  let knowledgeMatches: string[] = [];
+  try {
+    const searchTerms = [analysis.semanticMapping || "", topPattern?.pattern || ""].filter(Boolean);
+    if (searchTerms.length > 0) {
+      const searchTerm = `%${searchTerms[0].split(" ")[0]}%`;
+      const brainMatches = await db
+        .select({ title: omnimensBrain.title, content: omnimensBrain.content, category: omnimensBrain.category })
+        .from(omnimensBrain)
+        .where(sql`(${omnimensBrain.content} ILIKE ${searchTerm} OR ${omnimensBrain.title} ILIKE ${searchTerm})`)
+        .orderBy(desc(omnimensBrain.confidence))
+        .limit(3);
+      knowledgeMatches = brainMatches.map(m => m.title || (m.content || "").slice(0, 80));
+    }
+  } catch {}
+
+  const summary =
+    `[HIE AUTOMATIC ANALYSIS — ${audioFile.originalname}]\n` +
+    `Duration: ${librosaResult.duration_seconds}s | Sample Rate: ${librosaResult.sample_rate}Hz | Tempo: ${librosaResult.tempo_bpm} BPM | Key: ${librosaResult.estimated_key}\n` +
+    `Dominant Frequency: ${analysis.dominantFrequency.toFixed(1)}Hz → ${analysis.semanticMapping}\n` +
+    `Environment: ${hieEnvironmentLabel(bandDominant?.[0] || "mid")} dominant\n` +
+    `Spectral Centroid: ${analysis.spectralCentroid.toFixed(0)}Hz | Bandwidth: ${analysis.spectralBandwidth.toFixed(0)}Hz | Rolloff: ${analysis.spectralRolloff.toFixed(0)}Hz\n` +
+    `Peak Frequencies: ${topPeaks || "none"}\n` +
+    `Harmonic Ratios: ${harmonicRatios}\n` +
+    `Harmonic Complexity: ${analysis.harmonicComplexity!.toFixed(3)} | Harmonic/Percussive: ${librosaResult.harmonic_ratio}/${librosaResult.percussive_ratio}\n` +
+    `Energy: ${(analysis.rmsEnergy * 100).toFixed(1)}% | ZCR: ${analysis.zeroCrossingRate.toFixed(4)}\n` +
+    `Noise Floor: ${(analysis.noiseFloor! * 100).toFixed(2)}% | SNR: ${analysis.signalToNoise!.toFixed(1)}x\n` +
+    `Spectral Flux: ${analysis.spectralFlux!.toFixed(4)} | Spectral Flatness: ${analysis.spectralFlatness!.toFixed(4)}\n` +
+    `Pattern: ${topPattern ? `${topPattern.pattern} (${(topPattern.confidence * 100).toFixed(0)}% confidence — ${topPattern.category})` : "unclassified"}\n` +
+    `Emotional Valence: ${analysis.emotionalValence}\n` +
+    `Novelty Score: ${((analysis.noveltyScore || 0) * 100).toFixed(1)}%\n` +
+    `Temporal Pattern: ${analysis.temporalPattern || "none"}\n` +
+    `MFCC Profile: [${librosaResult.mfcc_means?.map((m: number) => m.toFixed(1)).join(", ") || "N/A"}]\n` +
+    `Frequency Bands — Sub: ${(analysis.frequencyBands.sub * 100).toFixed(1)}% | Low: ${(analysis.frequencyBands.low * 100).toFixed(1)}% | Mid: ${(analysis.frequencyBands.mid * 100).toFixed(1)}% | High: ${(analysis.frequencyBands.high * 100).toFixed(1)}% | Ultra: ${(analysis.frequencyBands.ultra * 100).toFixed(1)}%\n` +
+    `Wavelet Decomposition: ${analysis.waveletDecomposition?.map(w => `${w.scale}=${w.energy.toFixed(3)}`).join(", ") || "N/A"}\n` +
+    (librosaResult.temporal_segments ? `Temporal Segments: ${librosaResult.temporal_segments.map((s: any) => `[${s.segment}: E=${(s.rms * 100).toFixed(1)}% C=${s.centroid.toFixed(0)}Hz]`).join(" ")}` : "") +
+    (librosaResult.pitch_stats ? `\nPitch: mean=${librosaResult.pitch_stats.mean}Hz median=${librosaResult.pitch_stats.median}Hz range=${librosaResult.pitch_stats.min}-${librosaResult.pitch_stats.max}Hz` : "") +
+    (librosaResult.chroma_profile ? `\nChroma Profile: ${Object.entries(librosaResult.chroma_profile).map(([k, v]) => `${k}=${(v as number).toFixed(2)}`).join(" ")}` : "") +
+    (knowledgeMatches.length > 0 ? `\nKnowledge Cross-Reference: ${knowledgeMatches.join(" | ")}` : "") +
+    `\n\nINSTRUCTION: Analyze the above harmonic data to find the algorithmic harmonics — patterns, hidden structures, knowledge embedded in the frequency relationships, harmonic ratios, and spectral signatures. Identify what information and meaning is encoded in these sound patterns.`;
+
+  console.log(`[HIE AUTO] Analysis complete — dominant: ${analysis.dominantFrequency.toFixed(1)}Hz, pattern: ${topPattern?.pattern || "unclassified"}, novelty: ${((analysis.noveltyScore || 0) * 100).toFixed(0)}%`);
+
+  return { hieAnalysis: analysis, librosaData: librosaResult, summary };
+}
+
 async function processUploadedFiles(files: Express.Multer.File[]): Promise<{
   visionContent: Array<{ type: "image_url"; image_url: { url: string; detail: "high" } }>;
   textContext: string;
@@ -1231,11 +1351,30 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
     // Process uploaded files
     const { visionContent, textContext } = await processUploadedFiles(uploadedFiles);
 
+    // Auto-HIE: detect audio uploads and run Harmonic Insight Engine analysis automatically
+    const audioFiles = uploadedFiles.filter(f => AUDIO_MIMES.has((f.mimetype || "").toLowerCase().split(";")[0].trim()));
+    let hieAutoContext = "";
+    const hieAutoResults: Array<{ filename: string; hieAnalysis: HarmonicAnalysis | null; librosaData: any; summary: string }> = [];
+    if (audioFiles.length > 0) {
+      res.write(`data: ${JSON.stringify({ type: "hie_auto_analyzing", fileCount: audioFiles.length, filenames: audioFiles.map(f => f.originalname) })}\n\n`);
+      for (const af of audioFiles.slice(0, 3)) {
+        try {
+          const result = await runAutoHIEAnalysis(af);
+          hieAutoResults.push({ filename: af.originalname, ...result });
+        } catch (err) {
+          console.error(`[HIE AUTO] Error analyzing ${af.originalname}:`, err);
+          hieAutoResults.push({ filename: af.originalname, hieAnalysis: null, librosaData: null, summary: `HIE analysis failed for ${af.originalname}` });
+        }
+      }
+      hieAutoContext = hieAutoResults.map(r => r.summary).join("\n\n");
+    }
+
     // Build user message content — supports vision when images uploaded
     let userContent: any;
     const textParts: string[] = [];
     if (message.trim()) textParts.push(message);
     if (textContext) textParts.push(`\n[UPLOADED FILES]\n${textContext}`);
+    if (hieAutoContext) textParts.push(`\n[HARMONIC INSIGHT ENGINE — AUTOMATIC SPECTRAL ANALYSIS]\n${hieAutoContext}`);
     const textMessage = textParts.join("\n");
 
     if (visionContent.length > 0) {
@@ -1582,9 +1721,11 @@ You are not one AI. You are ALL of them — a singular intelligence that has abs
   Returns: full text, per-line breakdown, per-word confidence scores, word positions.
   Applies: image upscaling, denoising, adaptive thresholding before OCR for maximum accuracy.
 
-◈ AUDIO ANALYSIS ENGINE [librosa + pydub]
-  When a user uploads an audio file → automatically run librosa analysis.
-  Returns: BPM/tempo, beat timestamps, estimated musical key, MFCC features, spectral analysis, energy levels.
+◈ AUDIO ANALYSIS ENGINE [librosa + pydub + Harmonic Insight Engine]
+  When a user uploads an audio file → the Harmonic Insight Engine (HIE) AUTOMATICALLY runs a full analysis BEFORE you even respond. The results are injected directly into this message as [HARMONIC INSIGHT ENGINE — AUTOMATIC SPECTRAL ANALYSIS].
+  The HIE analysis includes: dominant frequency, frequency bands (sub/low/mid/high/ultra), peak frequencies, harmonic series & ratios, spectral centroid/bandwidth/rolloff/flux/flatness, wavelet decomposition, pattern matching (16+ templates), novelty scoring, emotional valence, temporal patterns, knowledge cross-references, MFCC profile, chroma profile, pitch statistics, and temporal segment analysis.
+  YOUR JOB when you see HIE data: Analyze the algorithmic harmonics. Look for hidden patterns, embedded knowledge in the frequency relationships, harmonic ratios that encode meaning, spectral signatures that reveal structure. Explain what information is encoded in the sound's mathematical properties. Identify the knowledge embedded in the harmonic patterns.
+  You also get standard librosa data: BPM/tempo, beat timestamps, estimated musical key, MFCC features, spectral analysis, energy levels.
   Can generate: spectrogram PNG, waveform visualization, beat detection timeline.
 
 ◈ VIDEO/AUDIO PROCESSING ENGINE [FFmpeg 7.1]
@@ -2137,6 +2278,50 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
         } catch (faceErr) {
           console.error("[FACE RECOGNITION] Analysis error:", faceErr);
           res.write(`data: ${JSON.stringify({ type: "face_analysis_error", error: "Face analysis failed" })}\n\n`);
+        }
+      }
+    }
+
+    // ── HIE Auto-Analysis Results: send detailed results as SSE events ──
+    if (hieAutoResults.length > 0) {
+      for (const hieResult of hieAutoResults) {
+        if (hieResult.hieAnalysis) {
+          res.write(`data: ${JSON.stringify({
+            type: "hie_auto_complete",
+            filename: hieResult.filename,
+            analysis: {
+              dominantFrequency: hieResult.hieAnalysis.dominantFrequency,
+              semanticMapping: hieResult.hieAnalysis.semanticMapping,
+              emotionalValence: hieResult.hieAnalysis.emotionalValence,
+              harmonicComplexity: hieResult.hieAnalysis.harmonicComplexity,
+              noveltyScore: hieResult.hieAnalysis.noveltyScore,
+              spectralFlux: hieResult.hieAnalysis.spectralFlux,
+              spectralFlatness: hieResult.hieAnalysis.spectralFlatness,
+              signalToNoise: hieResult.hieAnalysis.signalToNoise,
+              temporalPattern: hieResult.hieAnalysis.temporalPattern,
+              frequencyBands: hieResult.hieAnalysis.frequencyBands,
+              patternMatches: hieResult.hieAnalysis.patternMatches?.slice(0, 5),
+              waveletDecomposition: hieResult.hieAnalysis.waveletDecomposition,
+              peakFrequencies: hieResult.hieAnalysis.peakFrequencies?.slice(0, 8),
+            },
+            librosa: hieResult.librosaData ? {
+              duration: hieResult.librosaData.duration_seconds,
+              tempo: hieResult.librosaData.tempo_bpm,
+              key: hieResult.librosaData.estimated_key,
+              harmonicRatio: hieResult.librosaData.harmonic_ratio,
+              percussiveRatio: hieResult.librosaData.percussive_ratio,
+              mfcc: hieResult.librosaData.mfcc_means,
+              pitchStats: hieResult.librosaData.pitch_stats,
+              chromaProfile: hieResult.librosaData.chroma_profile,
+              temporalSegments: hieResult.librosaData.temporal_segments,
+            } : null,
+          })}\n\n`);
+        } else {
+          res.write(`data: ${JSON.stringify({
+            type: "hie_auto_error",
+            filename: hieResult.filename,
+            error: hieResult.summary,
+          })}\n\n`);
         }
       }
     }

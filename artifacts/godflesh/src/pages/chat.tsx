@@ -6563,6 +6563,65 @@ export default function Chat() {
                                 </div>
                               )}
 
+                              {msg.analyzingHIE && (
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 mt-2">
+                                  <span className="animate-pulse">🔊</span> Running Harmonic Insight Engine analysis...
+                                </div>
+                              )}
+
+                              {msg.hieAnalysis && msg.hieAnalysis.length > 0 && (
+                                <div className="mt-4 rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-4 space-y-3">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-cyan-400 text-lg">🔊</span>
+                                    <span className="font-semibold text-cyan-300 text-sm">Harmonic Insight Engine — Auto Analysis</span>
+                                    <span className="ml-auto px-2 py-0.5 rounded-full text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                                      {msg.hieAnalysis.length} file{msg.hieAnalysis.length !== 1 ? "s" : ""} analyzed
+                                    </span>
+                                  </div>
+                                  {msg.hieAnalysis.map((hie, hieIdx) => (
+                                    <div key={hieIdx} className="bg-[#0E1525]/80 rounded-lg p-3 border border-cyan-500/10">
+                                      <div className="text-xs font-medium text-cyan-200 mb-2">{hie.filename}</div>
+                                      {!hie.analysis && (
+                                        <div className="text-xs text-red-400/70">Analysis could not be completed for this file.</div>
+                                      )}
+                                      {hie.analysis && (
+                                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-neutral-400">
+                                          <div>Dominant: <span className="text-cyan-300">{hie.analysis.dominantFrequency?.toFixed(1)}Hz</span></div>
+                                          <div>Mapping: <span className="text-cyan-300">{hie.analysis.semanticMapping}</span></div>
+                                          <div>Valence: <span className="text-cyan-300">{hie.analysis.emotionalValence}</span></div>
+                                          <div>Complexity: <span className="text-cyan-300">{hie.analysis.harmonicComplexity?.toFixed(3)}</span></div>
+                                          <div>Novelty: <span className="text-cyan-300">{((hie.analysis.noveltyScore || 0) * 100).toFixed(1)}%</span></div>
+                                          <div>SNR: <span className="text-cyan-300">{hie.analysis.signalToNoise?.toFixed(1)}x</span></div>
+                                          <div>Pattern: <span className="text-cyan-300">{hie.analysis.patternMatches?.[0]?.pattern || "unclassified"}</span></div>
+                                          <div>Temporal: <span className="text-cyan-300">{hie.analysis.temporalPattern || "none"}</span></div>
+                                          {hie.librosa && (
+                                            <>
+                                              <div>Tempo: <span className="text-cyan-300">{hie.librosa.tempo} BPM</span></div>
+                                              <div>Key: <span className="text-cyan-300">{hie.librosa.key}</span></div>
+                                              <div>Duration: <span className="text-cyan-300">{hie.librosa.duration}s</span></div>
+                                              <div>Harmonic: <span className="text-cyan-300">{hie.librosa.harmonicRatio}</span></div>
+                                            </>
+                                          )}
+                                        </div>
+                                      )}
+                                      {hie.analysis?.frequencyBands && (
+                                        <div className="mt-2 flex gap-1">
+                                          {Object.entries(hie.analysis.frequencyBands as Record<string, number>).map(([band, val]) => (
+                                            <div key={band} className="flex-1 text-center">
+                                              <div
+                                                className="bg-cyan-500/30 rounded-sm mx-auto"
+                                                style={{ width: "100%", height: `${Math.max(4, (val as number) * 60)}px` }}
+                                              />
+                                              <div className="text-[9px] text-neutral-500 mt-1">{band}</div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
                               {/* Developer Tools: Chart results */}
                               {msg.chartResults && msg.chartResults.length > 0 && (
                                 <div className="mt-4 space-y-3">

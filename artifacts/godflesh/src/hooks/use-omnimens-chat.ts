@@ -291,6 +291,13 @@ export type Message = {
     markdown: string;
     boundingBoxes: { face_index: number; x: number; y: number; width: number; height: number; confidence: number }[];
   };
+  // HIE Auto-Analysis
+  analyzingHIE?: boolean;
+  hieAnalysis?: Array<{
+    filename: string;
+    analysis: any;
+    librosa: any;
+  }>;
   // Developer Power Tools
   chartResults?: ChartResult[];
   diagramResults?: DiagramResult[];
@@ -809,6 +816,46 @@ export function useOmnimensChat(
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
                   if (msg) msg.analyzingFaces = false;
+                  return newMsgs;
+                });
+
+              } else if (data.type === "hie_auto_analyzing") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) msg.analyzingHIE = true;
+                  return newMsgs;
+                });
+
+              } else if (data.type === "hie_auto_complete") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    msg.analyzingHIE = false;
+                    if (!msg.hieAnalysis) msg.hieAnalysis = [];
+                    msg.hieAnalysis.push({
+                      filename: data.filename,
+                      analysis: data.analysis,
+                      librosa: data.librosa,
+                    });
+                  }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "hie_auto_error") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    msg.analyzingHIE = false;
+                    if (!msg.hieAnalysis) msg.hieAnalysis = [];
+                    msg.hieAnalysis.push({
+                      filename: data.filename,
+                      analysis: null,
+                      librosa: null,
+                    });
+                  }
                   return newMsgs;
                 });
 

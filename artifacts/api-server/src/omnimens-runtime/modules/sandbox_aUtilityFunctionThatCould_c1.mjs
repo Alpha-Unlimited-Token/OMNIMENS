@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-22T18:56:20.719Z
+ * Written: 2026-03-22T19:09:49.355Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,41 +16,54 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function extractUniqueWords(text) {
-    // Function to extract unique words from a given text
-    const wordPattern = /\b[a-zA-Z]+\b/g;
-    const words = text.match(wordPattern) || [];
-    const uniqueWords = Array.from(new Set(words.map(word => word.toLowerCase())));
-    return uniqueWords.sort();
+function findPatternsInText(text, patterns) {
+    if (typeof text !== 'string' || !Array.isArray(patterns)) {
+        throw new Error('Invalid input: text must be a string and patterns must be an array of strings.');
+    }
+
+    const results = patterns.map(pattern => {
+        const regex = new RegExp(pattern, 'g');
+        const matches = text.match(regex) || [];
+        return { pattern, count: matches.length, matches };
+    });
+
+    return results;
 }
 
 // Test cases
 function runTests() {
-    console.log("Test 1: Basic extraction");
-    const text1 = "Hello world! Hello AI.";
-    const result1 = extractUniqueWords(text1);
-    console.log(result1); // Expected: ["ai", "hello", "world"]
+    console.log('Test 1: Basic pattern matching');
+    const text1 = "The quick brown fox jumps over the lazy dog. The dog barked.";
+    const patterns1 = ["dog", "fox", "cat"];
+    console.log(findPatternsInText(text1, patterns1));
 
-    console.log("Test 2: Case insensitivity");
-    const text2 = "Test case CASE test.";
-    const result2 = extractUniqueWords(text2);
-    console.log(result2); // Expected: ["case", "test"]
+    console.log('Test 2: Case sensitivity');
+    const text2 = "Hello hello HELLO world.";
+    const patterns2 = ["hello", "HELLO"];
+    console.log(findPatternsInText(text2, patterns2));
 
-    console.log("Test 3: Empty input");
+    console.log('Test 3: Empty text');
     const text3 = "";
-    const result3 = extractUniqueWords(text3);
-    console.log(result3); // Expected: []
+    const patterns3 = ["test"];
+    console.log(findPatternsInText(text3, patterns3));
 
-    console.log("Test 4: Special characters");
-    const text4 = "Numbers 123 and symbols #!@.";
-    const result4 = extractUniqueWords(text4);
-    console.log(result4); // Expected: ["and", "numbers", "symbols"]
+    console.log('Test 4: No matches');
+    const text4 = "This is a test string.";
+    const patterns4 = ["xyz", "123"];
+    console.log(findPatternsInText(text4, patterns4));
 
-    console.log("Test 5: Large input");
-    const text5 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum.";
-    const result5 = extractUniqueWords(text5);
-    console.log(result5); // Expected: ["adipiscing", "amet", "consectetur", "dolor", "elit", "ipsum", "lorem", "sit"]
+    console.log('Test 5: Invalid inputs');
+    try {
+        console.log(findPatternsInText(123, ["test"]));
+    } catch (error) {
+        console.log(error.message);
+    }
+
+    try {
+        console.log(findPatternsInText("Valid text", "invalid patterns"));
+    } catch (error) {
+        console.log(error.message);
+    }
 }
 
-// Run tests
 runTests();
