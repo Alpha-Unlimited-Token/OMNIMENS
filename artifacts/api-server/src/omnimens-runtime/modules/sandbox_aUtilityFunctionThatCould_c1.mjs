@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-22T17:19:55.184Z
+ * Written: 2026-03-22T17:29:05.521Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,62 +16,72 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentWords(text, topN) {
-    if (typeof text !== 'string' || typeof topN !== 'number' || topN <= 0) {
-        throw new Error("Invalid input: text must be a string and topN must be a positive number.");
+function extractPatternsFromText(text, patterns) {
+    if (typeof text !== 'string' || !Array.isArray(patterns)) {
+        throw new Error('Invalid input: text must be a string and patterns must be an array of strings.');
     }
 
-    // Normalize text: remove punctuation, convert to lowercase
-    const normalizedText = text.replace(/[^\w\s]/g, '').toLowerCase();
+    const results = {};
+    patterns.forEach(pattern => {
+        try {
+            const regex = new RegExp(pattern, 'g');
+            const matches = text.match(regex);
+            results[pattern] = matches || [];
+        } catch (e) {
+            results[pattern] = `Invalid regex: ${pattern}`;
+        }
+    });
 
-    // Split text into words
-    const words = normalizedText.split(/\s+/).filter(word => word.length > 0);
-
-    // Count word frequencies
-    const wordCounts = {};
-    for (let word of words) {
-        wordCounts[word] = (wordCounts[word] || 0) + 1;
-    }
-
-    // Convert wordCounts to an array of [word, count] pairs
-    const wordArray = Object.entries(wordCounts);
-
-    // Sort by frequency in descending order
-    wordArray.sort((a, b) => b[1] - a[1]);
-
-    // Extract topN words
-    const topWords = wordArray.slice(0, topN);
-
-    return topWords;
+    return results;
 }
 
 // Self-tests
-console.log("Test 1: Basic functionality");
-const text1 = "The quick brown fox jumps over the lazy dog. The dog was not amused.";
-console.log(findMostFrequentWords(text1, 3)); // Expected output: [['the', 3], ['dog', 2], ['quick', 1]]
+function runTests() {
+    console.log("Running Tests...");
 
-console.log("Test 2: Single word input");
-const text2 = "hello";
-console.log(findMostFrequentWords(text2, 1)); // Expected output: [['hello', 1]]
+    // Test 1: Basic pattern matching
+    const text1 = "The quick brown fox jumps over the lazy dog.";
+    const patterns1 = ["quick", "fox", "dog"];
+    const result1 = extractPatternsFromText(text1, patterns1);
+    console.log("Test 1 Result:", result1);
 
-console.log("Test 3: Case insensitivity");
-const text3 = "Apple apple APPLE";
-console.log(findMostFrequentWords(text3, 1)); // Expected output: [['apple', 3]]
+    // Test 2: Regex pattern matching
+    const text2 = "abc123 def456 ghi789";
+    const patterns2 = ["\\d+", "[a-z]+", "xyz"];
+    const result2 = extractPatternsFromText(text2, patterns2);
+    console.log("Test 2 Result:", result2);
 
-console.log("Test 4: Edge case - empty string");
-try {
-    console.log(findMostFrequentWords("", 3)); // Expected output: []
-} catch (e) {
-    console.log(e.message); // Expected error message
+    // Test 3: Invalid regex
+    const text3 = "Sample text.";
+    const patterns3 = ["[", "text"];
+    const result3 = extractPatternsFromText(text3, patterns3);
+    console.log("Test 3 Result:", result3);
+
+    // Test 4: Edge case - empty text
+    const text4 = "";
+    const patterns4 = ["empty", "\\s"];
+    const result4 = extractPatternsFromText(text4, patterns4);
+    console.log("Test 4 Result:", result4);
+
+    // Test 5: Edge case - empty patterns
+    const text5 = "Non-empty text.";
+    const patterns5 = [];
+    const result5 = extractPatternsFromText(text5, patterns5);
+    console.log("Test 5 Result:", result5);
+
+    // Test 6: Invalid input types
+    try {
+        extractPatternsFromText(123, ["pattern"]);
+    } catch (e) {
+        console.log("Test 6 Result:", e.message);
+    }
+
+    try {
+        extractPatternsFromText("Valid text", "not an array");
+    } catch (e) {
+        console.log("Test 6 Result:", e.message);
+    }
 }
 
-console.log("Test 5: Edge case - invalid topN");
-try {
-    console.log(findMostFrequentWords("hello world", -1)); // Expected error
-} catch (e) {
-    console.log(e.message); // Expected error message
-}
-
-console.log("Test 6: Edge case - punctuation handling");
-const text4 = "Hello, world! Hello: world?";
-console.log(findMostFrequentWords(text4, 2)); // Expected output: [['hello', 2], ['world', 2]]
+// Run self-tests
+runTests();
