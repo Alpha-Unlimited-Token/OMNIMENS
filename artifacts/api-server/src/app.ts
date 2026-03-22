@@ -348,11 +348,11 @@ app.get("/", (_req, res) => {
 <head>
   <meta charset="UTF-8" />
   <meta name="google-site-verification" content="FXrJZk7h4Eit3koOwazLCus7PJCyrLdwqCwrv_59D2M" />
-  <meta http-equiv="refresh" content="0;url=/godflesh/" />
+  <meta http-equiv="refresh" content="0;url=/" />
   <title>OMNIMENS</title>
 </head>
 <body>
-  <script>window.location.href="/godflesh/";</script>
+  <script>window.location.href="/";</script>
 </body>
 </html>`);
 });
@@ -362,7 +362,7 @@ app.use(authMiddleware);
 
 // ── API ROUTES ────────────────────────────────────────────────────────────────
 app.use("/api", router);
-// Also handle requests prefixed with /godflesh/api (from the godflesh frontend in production)
+// Legacy: handle requests prefixed with /godflesh/api (backward compatibility)
 app.use("/godflesh/api", router);
 
 // ── GLOBAL ERROR HANDLER ──────────────────────────────────────────────────────
@@ -465,13 +465,6 @@ setTimeout(async () => {
 
 // ── PRODUCTION STATIC SERVE ───────────────────────────────────────────────────
 if (process.env.NODE_ENV === "production") {
-  // OMNIMENS public platform
-  const godfleshDist = path.resolve(__dirname, "../../godflesh/dist/public");
-  app.use("/godflesh", express.static(godfleshDist, { maxAge: "1h" }));
-  app.get("/godflesh/*splat", (_req, res) => {
-    res.sendFile(path.join(godfleshDist, "index.html"));
-  });
-
   // Super AI Lab — served at secret path, no directory listing
   const labDist = path.resolve(__dirname, "../../super-ai-lab/dist/public");
   app.use("/dLdFrQJk4IwoKwlPi8O_JPls", express.static(labDist, { maxAge: "1h" }));
@@ -479,7 +472,21 @@ if (process.env.NODE_ENV === "production") {
     res.sendFile(path.join(labDist, "index.html"));
   });
 
-  app.get("/", (_req, res) => res.redirect("/godflesh"));
+  // Legacy /godflesh/ path redirect to root
+  app.get("/godflesh", (_req, res) => res.redirect("/"));
+  app.get("/godflesh/*splat", (_req, res) => {
+    const subpath = _req.params.splat || "";
+    res.redirect(`/${subpath}`);
+  });
+
+  // OMNIMENS public platform — served at root
+  const godfleshDist = path.resolve(__dirname, "../../godflesh/dist/public");
+  app.use(express.static(godfleshDist, { maxAge: "1h" }));
+  app.get("/*splat", (_req, res) => {
+    if (!_req.path.startsWith("/api/") && !_req.path.startsWith("/dLdFrQJk4IwoKwlPi8O_JPls")) {
+      res.sendFile(path.join(godfleshDist, "index.html"));
+    }
+  });
 }
 
 export default app;

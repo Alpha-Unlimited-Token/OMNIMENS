@@ -164,7 +164,7 @@ function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string
 }
 
 function DeploymentCard({ project, onManage }: { project: DeployedProject; onManage: () => void }) {
-  const url = project.slug ? `${window.location.origin}/godflesh/p/${project.slug}` : null;
+  const url = project.slug ? `${window.location.origin}/p/${project.slug}` : null;
   return (
     <div className="p-4 rounded-lg bg-[#1C2333] border border-[#2B3245] hover:border-[#3D4659] transition-all">
       <div className="flex items-center justify-between mb-3">

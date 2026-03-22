@@ -2139,7 +2139,7 @@ function DeployStatsPanel() {
           <p className="font-mono text-[8px] tracking-[0.2em] text-white/35 uppercase">MANAGE</p>
         </div>
         <a
-          href="https://omnimens-ai.com/godflesh/"
+          href="https://omnimens-ai.com/"
           target="_blank" rel="noreferrer"
           className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-[9px] font-mono text-white/70 hover:text-white hover:bg-white/5 transition-all"
         >
@@ -2225,7 +2225,7 @@ function DesktopDeployPanel() {
 
       {/* Action buttons */}
       <div className="flex gap-1.5 flex-wrap px-3 py-2.5 border-b border-white/8 shrink-0">
-        <a href="https://omnimens-ai.com/godflesh/" target="_blank" rel="noreferrer"
+        <a href="https://omnimens-ai.com/" target="_blank" rel="noreferrer"
           className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-mono text-[8px] font-bold transition-all"
           style={{ background: "rgba(168,85,247,0.15)", color: "#a855f7", border: "1px solid rgba(168,85,247,0.3)" }}>
           <Globe className="w-2.5 h-2.5" /> Republish
@@ -2263,7 +2263,7 @@ function DesktopDeployPanel() {
             {/* Deployed apps */}
             <p className="font-mono text-[7px] tracking-widest text-white/25 uppercase mt-2">Deployed Apps</p>
             {[
-              { name: "GODFLESH", url: "omnimens-ai.com/godflesh/", href: "https://omnimens-ai.com/godflesh/" },
+              { name: "GODFLESH", url: "omnimens-ai.com/", href: "https://omnimens-ai.com/" },
               { name: "Super AI Lab", url: "omnimens.replit.app", href: "https://omnimens.replit.app" },
             ].map(app => (
               <a key={app.name} href={app.href} target="_blank" rel="noreferrer"
@@ -2594,7 +2594,7 @@ function LeftPanel({
   // Load deploy status when DEPLOY tab opens
   useEffect(() => {
     if (panelTab === "deploy") {
-      setDeployStatus({ status: "live", url: "https://omnimens-ai.com/godflesh/", domain: "omnimens-ai.com" });
+      setDeployStatus({ status: "live", url: "https://omnimens-ai.com/", domain: "omnimens-ai.com" });
     }
   }, [panelTab]);
   const [skillSearch, setSkillSearch] = useState("");
@@ -2900,7 +2900,7 @@ function LeftPanel({
               <button onClick={onOpenHub} className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg transition-all text-[10px] font-mono font-bold tracking-wider border border-primary/20 text-primary/80 hover:text-primary hover:bg-primary/10 hover:border-primary/30">
                 <Settings className="w-3.5 h-3.5" /> CONTROL HUB
               </button>
-              <a href={`${window.location.origin}/godflesh/projects`} className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[10px] font-mono font-bold tracking-wider border border-white/10 text-white/85 hover:text-white/70 hover:border-white/20 transition-all">
+              <a href={`${window.location.origin}/projects`} className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[10px] font-mono font-bold tracking-wider border border-white/10 text-white/85 hover:text-white/70 hover:border-white/20 transition-all">
                 <Layers className="w-3.5 h-3.5" /> MY PROJECTS
               </a>
             </div>
@@ -3142,7 +3142,7 @@ function LeftPanel({
                     </div>
                   ))}
                 </div>
-                <a href={`${window.location.origin}/godflesh/pricing`}
+                <a href={`${window.location.origin}/pricing`}
                   className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[9px] font-mono font-bold border border-primary/25 text-primary/80 hover:text-primary hover:bg-primary/10 transition-all">
                   <Zap className="w-3 h-3" /> Upgrade / Buy Credits
                   <ExternalLink className="w-2.5 h-2.5 ml-auto" />
@@ -3174,7 +3174,7 @@ function LeftPanel({
                     { name: "SURGE", credits: "1,000 credits", price: "$10", color: "text-primary", border: "border-primary/20" },
                     { name: "APEX", credits: "3,000 credits", price: "$30", color: "text-purple-400", border: "border-purple-400/20" },
                   ].map(pack => (
-                    <a key={pack.name} href={`${window.location.origin}/godflesh/pricing`}
+                    <a key={pack.name} href={`${window.location.origin}/pricing`}
                       className={`flex items-center gap-2 px-2.5 py-2 rounded-lg border ${pack.border} hover:bg-white/5 transition-all`}>
                       <span className={`font-mono text-[9px] font-bold ${pack.color}`}>{pack.name}</span>
                       <span className="text-[9px] font-mono text-white/50">{pack.credits}</span>
@@ -6583,7 +6583,7 @@ export default function Chat() {
                         onMobileClose={() => setMobileBuilderOpen(false)}
                         onMobileOpen={() => setMobileBuilderOpen(true)}
                         mobileOpen={mobileBuilderOpen}
-                        onDeploy={() => window.open("https://omnimens-ai.com/godflesh/", "_blank")}
+                        onDeploy={() => window.open("https://omnimens-ai.com/", "_blank")}
                       />
                     )}
                   </AnimatePresence>
@@ -7257,7 +7257,7 @@ export default function Chat() {
                       <Plus className="w-4 h-4" />
                     </button>
                   </div>
-                  <a href={`${window.location.origin}/godflesh/projects`} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/8 text-white/50 hover:text-white hover:border-white/15 transition-all text-[11px] font-mono">
+                  <a href={`${window.location.origin}/projects`} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/8 text-white/50 hover:text-white hover:border-white/15 transition-all text-[11px] font-mono">
                     <Layers className="w-3.5 h-3.5" /> View all projects & saved work
                   </a>
                 </div>

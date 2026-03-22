@@ -2249,7 +2249,7 @@ function ReferralSection() {
   }, []);
 
   const shareUrl = referralCode
-    ? `${window.location.origin}/godflesh/?ref=${referralCode}`
+    ? `${window.location.origin}/?ref=${referralCode}`
     : "";
 
   const copyLink = () => {

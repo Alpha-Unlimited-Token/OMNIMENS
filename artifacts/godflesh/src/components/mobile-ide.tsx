@@ -112,7 +112,7 @@ function DeployView() {
           <div className="p-4 space-y-4">
             {/* Action buttons */}
             <div className="flex gap-2 flex-wrap">
-              <a href="https://omnimens-ai.com/godflesh/" target="_blank" rel="noreferrer"
+              <a href="https://omnimens-ai.com/" target="_blank" rel="noreferrer"
                 className="flex items-center gap-2 px-4 py-2 rounded-xl font-mono text-xs font-bold transition-all"
                 style={{ background: VD, color: V, border: `1px solid ${BORDER}` }}>
                 <Play className="w-3.5 h-3.5" /> View Live
@@ -147,7 +147,7 @@ function DeployView() {
             <div>
               <p className="font-mono text-[10px] tracking-widest mb-2 px-1" style={{ color: TXT_FAINT }}>DEPLOYED APPS</p>
               {[
-                { name: "GODFLESH", url: "omnimens-ai.com/godflesh/", type: "Website" },
+                { name: "GODFLESH", url: "omnimens-ai.com/", type: "Website" },
                 { name: "Super AI Lab", url: "omnimens.replit.app", type: "Website" },
               ].map(app => (
                 <a key={app.name} href={`https://${app.url}`} target="_blank" rel="noreferrer"
@@ -298,7 +298,7 @@ function DeployView() {
 function FilesView({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
   const [search, setSearch] = useState("");
   const apps = [
-    { name: "GODFLESH", type: "Website", url: "omnimens-ai.com/godflesh/" },
+    { name: "GODFLESH", type: "Website", url: "omnimens-ai.com/" },
     { name: "Super AI Lab", type: "Website", url: "omnimens.replit.app" },
   ].filter(a => a.name.toLowerCase().includes(search.toLowerCase()));
 
@@ -318,7 +318,7 @@ function FilesView({ onNavigate }: { onNavigate: (tab: Tab) => void }) {
             style={{ color: TXT }}
           />
         </div>
-        <a href="/godflesh/chat" className="flex items-center gap-1 px-3 py-2 rounded-xl font-mono text-xs font-bold transition-all"
+        <a href="/chat" className="flex items-center gap-1 px-3 py-2 rounded-xl font-mono text-xs font-bold transition-all"
           style={{ background: VD, color: V, border: `1px solid ${BORDER}` }}>
           <Plus className="w-3.5 h-3.5" /> New
         </a>
@@ -759,7 +759,7 @@ export function MobileIDE({ onClose }: { onClose?: () => void }) {
             </div>
             <p className="font-mono text-sm font-bold text-center" style={{ color: TXT }}>Open Full Chat</p>
             <p className="font-mono text-xs text-center" style={{ color: TXT_FAINT }}>Use the full OMNIMENS interface for the complete AI experience</p>
-            <a href="/godflesh/chat"
+            <a href="/chat"
               className="px-6 py-3 rounded-xl font-mono text-sm font-bold transition-all"
               style={{ background: VD, color: V, border: `1px solid ${BORDER}` }}>
               Open OMNIMENS Chat →

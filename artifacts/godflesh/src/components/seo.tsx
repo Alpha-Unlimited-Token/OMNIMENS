@@ -7,8 +7,8 @@
 import { useEffect } from "react";
 
 const SITE_NAME = "OMNIMENS";
-const SITE_URL = "https://omnimens-ai.com/godflesh";
-const DEFAULT_IMAGE = "https://omnimens-ai.com/godflesh/opengraph.jpg";
+const SITE_URL = "https://omnimens-ai.com";
+const DEFAULT_IMAGE = "https://omnimens-ai.com/opengraph.jpg";
 const DEFAULT_DESCRIPTION = "OMNIMENS is a free AI platform with GPT-4o, Llama 3, Mistral, image generation, code execution, deep research, and persistent memory. Start chatting with AI for free — no credit card required.";
 
 interface SEOProps {
@@ -116,8 +116,8 @@ export const seoData = {
       },
       "description": "Free AI chat platform with GPT-4o, Llama 3, Mistral, image generation, code execution, deep research, persistent memory, and voice chat.",
       "featureList": "AI Chat, Image Generation, Code Execution, Deep Research, Persistent Memory, Voice Chat, Multiple AI Models, Free Tier",
-      "screenshot": "https://omnimens-ai.com/godflesh/opengraph.jpg",
-      "url": "https://omnimens-ai.com/godflesh/",
+      "screenshot": "https://omnimens-ai.com/opengraph.jpg",
+      "url": "https://omnimens-ai.com/",
       "author": {
         "@type": "Organization",
         "name": "Alpha Unlimited Technologies, LLC"
@@ -276,7 +276,7 @@ export const seoData = {
         "contactPoint": {
           "@type": "ContactPoint",
           "contactType": "customer support",
-          "url": "https://omnimens-ai.com/godflesh/contact"
+          "url": "https://omnimens-ai.com/contact"
         }
       }
     }

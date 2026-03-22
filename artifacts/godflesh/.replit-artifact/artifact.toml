@@ -1,5 +1,5 @@
 kind = "web"
-previewPath = "/godflesh/"
+previewPath = "/"
 title = "GODFLESH"
 version = "1.0.0"
 id = "artifacts/godflesh"
@@ -12,14 +12,14 @@ version = "1.0.0"
 [[services]]
 localPort = 25047
 name = "web"
-paths = ["/godflesh/"]
+paths = ["/"]
 
 [services.development]
 run = "pnpm --filter @workspace/godflesh run dev"
 
 [services.env]
 PORT = "25047"
-BASE_PATH = "/godflesh/"
+BASE_PATH = "/"
 
 [services.production]
 build = ["pnpm", "--filter", "@workspace/godflesh", "run", "build"]

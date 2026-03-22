@@ -3109,8 +3109,8 @@ router.post("/omnimens/resonance/checkout", async (req, res) => {
     const proto = req.headers["x-forwarded-proto"] || "https";
     const host = req.headers["x-forwarded-host"] || req.headers.host || "";
     const baseUrl = `${proto}://${host}`;
-    const successUrl = `${baseUrl}/godflesh/pricing?resonance_success=true&session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${baseUrl}/godflesh/pricing?resonance_cancelled=true`;
+    const successUrl = `${baseUrl}/pricing?resonance_success=true&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${baseUrl}/pricing?resonance_cancelled=true`;
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -3297,8 +3297,8 @@ router.post("/omnimens/subscribe-plan", async (req, res) => {
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
       ...(user.stripeCustomerId ? { customer: user.stripeCustomerId } : { customer_creation: "always" }),
-      success_url: `${baseUrl}/godflesh/pricing?plan_success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/godflesh/pricing?plan_cancelled=true`,
+      success_url: `${baseUrl}/pricing?plan_success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/pricing?plan_cancelled=true`,
       metadata: { userId: req.user.id, planId, purpose: "monthly_plan" },
     });
     res.json({ url: session.url });
@@ -5644,8 +5644,8 @@ router.post("/omnimens/checkout", async (req, res) => {
     const proto = req.headers["x-forwarded-proto"] || "https";
     const host = req.headers["x-forwarded-host"] || req.headers.host || "";
     const baseUrl = `${proto}://${host}`;
-    const successUrl = `${baseUrl}/godflesh/pricing?pack_success=true&session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${baseUrl}/godflesh/pricing?pack_cancelled=true`;
+    const successUrl = `${baseUrl}/pricing?pack_success=true&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${baseUrl}/pricing?pack_cancelled=true`;
 
     const pack = packFromPriceId(priceId);
     const packInfo = CREDIT_PACKS[pack];
@@ -5775,7 +5775,7 @@ router.post("/omnimens/portal", async (req, res) => {
     }
     const proto = req.headers["x-forwarded-proto"] || "https";
     const host = req.headers["x-forwarded-host"] || req.headers.host || "";
-    const returnUrl = `${proto}://${host}/godflesh/pricing`;
+    const returnUrl = `${proto}://${host}/pricing`;
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: user.stripeCustomerId,
       return_url: returnUrl,
@@ -6084,7 +6084,7 @@ router.post("/omnimens/projects/:id/publish", async (req, res) => {
       updatedAt: new Date(),
     }).where(eq(omnimensProjects.id, projectId)).returning();
 
-    res.json({ ...updated, publishedUrl: slug ? `/godflesh/p/${slug}` : null });
+    res.json({ ...updated, publishedUrl: slug ? `/p/${slug}` : null });
   } catch (err) {
     res.status(500).json({ error: "Failed to publish project" });
   }

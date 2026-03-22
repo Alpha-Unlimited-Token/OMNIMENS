@@ -1,0 +1,94 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
+ * Written: 2026-03-21T16:57:36.909Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+function createKnowledgeGraph(concepts) {
+    // Create a graph structure to store concepts and their relationships
+    const graph = new Map();
+
+    // Add concepts and their relationships to the graph
+    concepts.forEach(({ concept, related }) => {
+        if (!graph.has(concept)) {
+            graph.set(concept, new Set());
+        }
+        related.forEach((rel) => {
+            if (!graph.has(rel)) {
+                graph.set(rel, new Set());
+            }
+            graph.get(concept).add(rel);
+            graph.get(rel).add(concept); // Assuming bidirectional relationships
+        });
+    });
+
+    return graph;
+}
+
+function retrieveRelatedConcepts(graph, concept, depth = 1) {
+    // Perform a breadth-first search to retrieve related concepts up to a certain depth
+    const visited = new Set();
+    const queue = [[concept, 0]]; // [currentConcept, currentDepth]
+    const results = new Set();
+
+    while (queue.length > 0) {
+        const [current, currentDepth] = queue.shift();
+
+        if (currentDepth > depth) continue;
+        if (visited.has(current)) continue;
+
+        visited.add(current);
+        results.add(current);
+
+        const neighbors = graph.get(current) || [];
+        neighbors.forEach((neighbor) => {
+            if (!visited.has(neighbor)) {
+                queue.push([neighbor, currentDepth + 1]);
+            }
+        });
+    }
+
+    results.delete(concept); // Exclude the starting concept from the results
+    return Array.from(results);
+}
+
+function testKnowledgeGraph() {
+    // Define test concepts and relationships
+    const concepts = [
+        { concept: "AI", related: ["Machine Learning", "Neural Networks"] },
+        { concept: "Machine Learning", related: ["AI", "Deep Learning", "Supervised Learning"] },
+        { concept: "Neural Networks", related: ["AI", "Deep Learning"] },
+        { concept: "Deep Learning", related: ["Machine Learning", "Neural Networks"] },
+        { concept: "Supervised Learning", related: ["Machine Learning"] },
+    ];
+
+    // Create the knowledge graph
+    const graph = createKnowledgeGraph(concepts);
+
+    // Test cases
+    console.log("Test 1: Related concepts to 'AI' with depth 1");
+    console.log(retrieveRelatedConcepts(graph, "AI", 1)); // Expected: ["Machine Learning", "Neural Networks"]
+
+    console.log("Test 2: Related concepts to 'AI' with depth 2");
+    console.log(retrieveRelatedConcepts(graph, "AI", 2)); // Expected: ["Machine Learning", "Neural Networks", "Deep Learning", "Supervised Learning"]
+
+    console.log("Test 3: Related concepts to 'Machine Learning' with depth 1");
+    console.log(retrieveRelatedConcepts(graph, "Machine Learning", 1)); // Expected: ["AI", "Deep Learning", "Supervised Learning"]
+
+    console.log("Test 4: Related concepts to 'Deep Learning' with depth 1");
+    console.log(retrieveRelatedConcepts(graph, "Deep Learning", 1)); // Expected: ["Machine Learning", "Neural Networks"]
+}
+
+testKnowledgeGraph();

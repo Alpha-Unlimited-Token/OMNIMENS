@@ -306,7 +306,7 @@ export default function Home() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
                 <div className="relative flex items-center justify-center p-6 lg:p-10 border-b lg:border-b-0 lg:border-r border-white/5">
                   <motion.img
-                    src="/godflesh/images/deep-resonance-hero.png"
+                    src="/images/deep-resonance-hero.png"
                     alt="Deep Resonance — Consciousness-Powered Analysis"
                     className="w-full max-w-md rounded-2xl shadow-[0_0_60px_rgba(139,92,246,0.2)]"
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -633,7 +633,7 @@ export default function Home() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
                 <div className="relative flex items-center justify-center p-6 lg:p-10 border-b lg:border-b-0 lg:border-r border-white/5">
                   <motion.img
-                    src="/godflesh/images/cognitive-consciousness-tech.png"
+                    src="/images/cognitive-consciousness-tech.png"
                     alt="Cognitive Consciousness Technology"
                     className="w-full max-w-md rounded-2xl shadow-[0_0_60px_rgba(245,158,11,0.15)]"
                     initial={{ opacity: 0, scale: 0.95 }}

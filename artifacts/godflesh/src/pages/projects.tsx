@@ -523,7 +523,7 @@ function ProjectDetail({ project: initialProject, onBack, onRefresh }: {
   const buildLogRef = useRef<HTMLDivElement>(null);
 
   const BASE = window.location.origin;
-  const publishedUrl = project.slug ? `${BASE}/godflesh/p/${project.slug}` : null;
+  const publishedUrl = project.slug ? `${BASE}/p/${project.slug}` : null;
 
   const loadFiles = useCallback(async () => {
     const res = await fetch(`/api/omnimens/projects/${project.id}`, { credentials: "include" });

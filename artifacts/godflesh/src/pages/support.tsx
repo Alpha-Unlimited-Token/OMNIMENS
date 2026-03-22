@@ -223,7 +223,7 @@ export default function SupportPage() {
       <div className="border-b border-white/8 sticky top-0 z-30 bg-black/95 backdrop-blur-xl">
         <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <a href={`${window.location.origin}/godflesh/chat`}
+            <a href={`${window.location.origin}/chat`}
               className="flex items-center gap-1.5 text-white/30 hover:text-white/70 text-sm transition-colors">
               <ArrowLeft className="w-4 h-4" /> Back
             </a>
@@ -444,7 +444,7 @@ export default function SupportPage() {
                   className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/10 text-white/50 text-sm hover:text-white/80 hover:border-white/20 transition-all">
                   <RefreshCw className="w-3.5 h-3.5" /> Submit another
                 </button>
-                <a href={`${window.location.origin}/godflesh/chat`}
+                <a href={`${window.location.origin}/chat`}
                   className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-black text-sm font-semibold hover:bg-primary/90 transition-all">
                   Return to OMNIMENS
                 </a>
@@ -461,10 +461,10 @@ export default function SupportPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-white/20 text-xs font-mono">© 2026 Alpha Unlimited Technologies LLC</p>
             <div className="flex items-center gap-5 text-xs text-white/25">
-              <a href={`${window.location.origin}/godflesh/`} className="hover:text-white/50 transition-colors">Home</a>
-              <a href={`${window.location.origin}/godflesh/faq`} className="hover:text-white/50 transition-colors">FAQ</a>
-              <a href={`${window.location.origin}/godflesh/pricing`} className="hover:text-white/50 transition-colors">Pricing</a>
-              <a href={`${window.location.origin}/godflesh/dev`} className="hover:text-white/50 transition-colors">Developer</a>
+              <a href={`${window.location.origin}/`} className="hover:text-white/50 transition-colors">Home</a>
+              <a href={`${window.location.origin}/faq`} className="hover:text-white/50 transition-colors">FAQ</a>
+              <a href={`${window.location.origin}/pricing`} className="hover:text-white/50 transition-colors">Pricing</a>
+              <a href={`${window.location.origin}/dev`} className="hover:text-white/50 transition-colors">Developer</a>
             </div>
           </div>
         </div>

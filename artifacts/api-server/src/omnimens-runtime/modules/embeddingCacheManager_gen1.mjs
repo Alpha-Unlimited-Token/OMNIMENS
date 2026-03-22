@@ -1,181 +1,194 @@
 /**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: embeddingCacheManager
+ * Written: 2026-03-22T03:15:31.851Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// embeddingCacheManager.js
+
+/**
  * @module embeddingCacheManager
- * @description This module implements an embedding cache manager using the HNSW (Hierarchical Navigable Small World) algorithm
- *              for efficient approximate nearest neighbor search. It is designed to store and retrieve high-dimensional
- *              embeddings for semantic similarity tasks in a performant manner.
- * @author OMNIMENS
+ * @description A utility module for storing and retrieving embeddings in memory, 
+ *              with an approximate nearest neighbor (ANN) search using the HNSW algorithm.
  */
 
 /**
- * Node.js built-in module imports (none required for this implementation).
+ * Represents a node in the HNSW graph.
+ * @typedef {Object} HNSWNode
+ * @property {number[]} vector - The embedding vector.
+ * @property {number} id - Unique identifier for the node.
+ * @property {Map<number, Set<number>>} neighbors - A map of layers to sets of neighboring node IDs.
  */
 
-/**
- * Class representing a node in the HNSW graph.
- */
-class HNSWNode {
-  /**
-   * @param {Array<number>} vector - The high-dimensional embedding vector.
-   * @param {string} id - Unique identifier for the node.
-   */
-  constructor(vector, id) {
-    this.vector = vector;
-    this.id = id;
-    this.connections = new Map(); // Maps layer index to connected nodes
-  }
-}
-
-/**
- * Class implementing the HNSW algorithm for approximate nearest neighbor search.
- */
 class HNSW {
-  /**
-   * @param {number} maxConnections - Maximum number of connections per layer.
-   * @param {number} efConstruction - Controls the trade-off between accuracy and speed during construction.
-   */
-  constructor(maxConnections = 16, efConstruction = 200) {
-    this.maxConnections = maxConnections;
-    this.efConstruction = efConstruction;
-    this.nodes = []; // All nodes in the graph
-    this.entryPoint = null; // Entry point for the graph traversal
+  constructor(maxNeighbors = 16, maxLayers = 5) {
+    this.nodes = new Map(); // Stores all nodes by their ID.
+    this.maxNeighbors = maxNeighbors; // Maximum neighbors per node per layer.
+    this.maxLayers = maxLayers; // Maximum number of layers in the graph.
+    this.entryPoint = null; // Entry point for the graph.
   }
 
   /**
-   * Computes the Euclidean distance between two vectors.
-   * @param {Array<number>} vec1 - First vector.
-   * @param {Array<number>} vec2 - Second vector.
-   * @returns {number} - The Euclidean distance.
+   * Adds a new vector to the HNSW graph.
+   * @param {number[]} vector - The embedding vector to add.
+   * @param {number} id - Unique identifier for the vector.
    */
-  static euclideanDistance(vec1, vec2) {
-    if (vec1.length !== vec2.length) {
-      throw new Error('Vectors must have the same dimensions');
+  add(vector, id) {
+    const newNode = {
+      vector,
+      id,
+      neighbors: new Map()
+    };
+    for (let i = 0; i < this.maxLayers; i++) {
+      newNode.neighbors.set(i, new Set());
     }
-    return Math.sqrt(vec1.reduce((sum, val, i) => sum + (val - vec2[i]) ** 2, 0));
-  }
+    this.nodes.set(id, newNode);
 
-  /**
-   * Adds a new node to the HNSW graph.
-   * @param {Array<number>} vector - The high-dimensional embedding vector.
-   * @param {string} id - Unique identifier for the node.
-   */
-  addNode(vector, id) {
-    const newNode = new HNSWNode(vector, id);
-
-    if (this.nodes.length === 0) {
-      this.entryPoint = newNode;
-    } else {
-      this._connectNode(newNode);
+    if (!this.entryPoint) {
+      this.entryPoint = id;
+      return;
     }
 
-    this.nodes.push(newNode);
-  }
-
-  /**
-   * Connects a new node to the graph using the HNSW algorithm.
-   * @param {HNSWNode} newNode - The new node to connect.
-   * @private
-   */
-  _connectNode(newNode) {
-    const neighbors = this._searchLayer(newNode.vector, this.entryPoint, this.efConstruction);
-
-    neighbors.forEach((neighbor) => {
-      this._linkNodes(newNode, neighbor);
-    });
-  }
-
-  /**
-   * Links two nodes together.
-   * @param {HNSWNode} node1 - First node.
-   * @param {HNSWNode} node2 - Second node.
-   * @private
-   */
-  _linkNodes(node1, node2) {
-    const layer = 0; // Single-layer implementation for simplicity
-
-    if (!node1.connections.has(layer)) {
-      node1.connections.set(layer, []);
-    }
-    if (!node2.connections.has(layer)) {
-      node2.connections.set(layer, []);
+    let currentNodeId = this.entryPoint;
+    for (let layer = this.maxLayers - 1; layer >= 0; layer--) {
+      currentNodeId = this._searchLayer(vector, currentNodeId, layer);
     }
 
-    node1.connections.get(layer).push(node2);
-    node2.connections.get(layer).push(node1);
-
-    // Ensure max connections per node
-    this._pruneConnections(node1, layer);
-    this._pruneConnections(node2, layer);
+    this._connect(newNode, this.nodes.get(currentNodeId), 0);
   }
 
   /**
-   * Prunes connections to maintain the maximum number of connections.
-   * @param {HNSWNode} node - The node whose connections are pruned.
-   * @param {number} layer - The layer index.
-   * @private
+   * Searches for the nearest neighbors of a given vector.
+   * @param {number[]} vector - The query vector.
+   * @param {number} k - The number of nearest neighbors to retrieve.
+   * @returns {Array<{id: number, distance: number}>} The k nearest neighbors.
    */
-  _pruneConnections(node, layer) {
-    const connections = node.connections.get(layer);
-    if (connections.length > this.maxConnections) {
-      connections.sort((a, b) => HNSW.euclideanDistance(node.vector, a.vector) - HNSW.euclideanDistance(node.vector, b.vector));
-      node.connections.set(layer, connections.slice(0, this.maxConnections));
+  search(vector, k) {
+    if (!this.entryPoint) return [];
+
+    let currentNodeId = this.entryPoint;
+    for (let layer = this.maxLayers - 1; layer >= 0; layer--) {
+      currentNodeId = this._searchLayer(vector, currentNodeId, layer);
     }
-  }
 
-  /**
-   * Searches the graph layer for nearest neighbors.
-   * @param {Array<number>} queryVector - The query vector.
-   * @param {HNSWNode} entryPoint - The starting point for the search.
-   * @param {number} ef - The size of the candidate list.
-   * @returns {Array<HNSWNode>} - The nearest neighbors.
-   * @private
-   */
-  _searchLayer(queryVector, entryPoint, ef) {
     const visited = new Set();
-    const candidates = [entryPoint];
+    const candidates = [{ id: currentNodeId, distance: this._distance(vector, this.nodes.get(currentNodeId).vector) }];
     const results = [];
 
     while (candidates.length > 0) {
-      const current = candidates.pop();
-      if (visited.has(current)) continue;
-      visited.add(current);
+      candidates.sort((a, b) => a.distance - b.distance);
+      const current = candidates.shift();
 
-      results.push(current);
-      results.sort((a, b) => HNSW.euclideanDistance(queryVector, a.vector) - HNSW.euclideanDistance(queryVector, b.vector));
+      if (!visited.has(current.id)) {
+        visited.add(current.id);
+        results.push(current);
 
-      if (results.length > ef) {
-        results.pop();
-      }
-
-      const neighbors = current.connections.get(0) || [];
-      neighbors.forEach((neighbor) => {
-        if (!visited.has(neighbor)) {
-          candidates.push(neighbor);
+        if (results.length > k) {
+          results.sort((a, b) => a.distance - b.distance);
+          results.pop();
         }
-      });
+
+        const neighbors = this.nodes.get(current.id).neighbors.get(0) || [];
+        for (const neighborId of neighbors) {
+          if (!visited.has(neighborId)) {
+            const neighborNode = this.nodes.get(neighborId);
+            candidates.push({ id: neighborId, distance: this._distance(vector, neighborNode.vector) });
+          }
+        }
+      }
     }
 
     return results;
   }
 
   /**
-   * Searches for the nearest neighbors of a query vector.
-   * @param {Array<number>} queryVector - The query vector.
-   * @param {number} k - The number of nearest neighbors to return.
-   * @returns {Array<{id: string, distance: number}>} - The nearest neighbors with their distances.
+   * Searches for the closest node in a specific layer.
+   * @param {number[]} vector - The query vector.
+   * @param {number} entryId - The ID of the entry point node.
+   * @param {number} layer - The layer to search in.
+   * @returns {number} The ID of the closest node found.
+   * @private
    */
-  search(queryVector, k) {
-    if (!this.entryPoint) {
-      throw new Error('Graph is empty');
+  _searchLayer(vector, entryId, layer) {
+    let currentNodeId = entryId;
+    let currentDistance = this._distance(vector, this.nodes.get(currentNodeId).vector);
+
+    while (true) {
+      let foundCloser = false;
+      for (const neighborId of this.nodes.get(currentNodeId).neighbors.get(layer) || []) {
+        const neighborNode = this.nodes.get(neighborId);
+        const distance = this._distance(vector, neighborNode.vector);
+        if (distance < currentDistance) {
+          currentNodeId = neighborId;
+          currentDistance = distance;
+          foundCloser = true;
+        }
+      }
+      if (!foundCloser) break;
     }
 
-    const neighbors = this._searchLayer(queryVector, this.entryPoint, this.efConstruction);
-    return neighbors
-      .slice(0, k)
-      .map((neighbor) => ({ id: neighbor.id, distance: HNSW.euclideanDistance(queryVector, neighbor.vector) }));
+    return currentNodeId;
+  }
+
+  /**
+   * Connects two nodes in the graph.
+   * @param {HNSWNode} nodeA - The first node.
+   * @param {HNSWNode} nodeB - The second node.
+   * @param {number} layer - The layer to connect the nodes in.
+   * @private
+   */
+  _connect(nodeA, nodeB, layer) {
+    const neighborsA = nodeA.neighbors.get(layer);
+    const neighborsB = nodeB.neighbors.get(layer);
+
+    if (neighborsA.size < this.maxNeighbors) {
+      neighborsA.add(nodeB.id);
+    }
+
+    if (neighborsB.size < this.maxNeighbors) {
+      neighborsB.add(nodeA.id);
+    }
+  }
+
+  /**
+   * Calculates the squared Euclidean distance between two vectors.
+   * @param {number[]} vectorA - The first vector.
+   * @param {number[]} vectorB - The second vector.
+   * @returns {number} The squared Euclidean distance.
+   * @private
+   */
+  _distance(vectorA, vectorB) {
+    return vectorA.reduce((sum, val, i) => sum + (val - vectorB[i]) ** 2, 0);
   }
 }
 
 /**
- * Exports the HNSW class for external use.
+ * Creates a new HNSW instance for managing embeddings.
+ * @param {number} [maxNeighbors=16] - Maximum neighbors per node per layer.
+ * @param {number} [maxLayers=5] - Maximum number of layers in the graph.
+ * @returns {HNSW} A new HNSW instance.
  */
-export { HNSW };
+export function createEmbeddingCache(maxNeighbors = 16, maxLayers = 5) {
+  return new HNSW(maxNeighbors, maxLayers);
+}
+
+/**
+ * Example usage:
+ * const cache = createEmbeddingCache();
+ * cache.add([1, 2, 3], 1);
+ * cache.add([4, 5, 6], 2);
+ * const neighbors = cache.search([1, 2, 3], 1);
+ * console.log(neighbors);
+ */

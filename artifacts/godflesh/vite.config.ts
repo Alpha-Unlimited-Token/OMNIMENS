@@ -15,7 +15,7 @@ if (!isBuild && (Number.isNaN(port) || port <= 0)) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-const basePath = process.env.BASE_PATH || (isBuild ? "/godflesh/" : undefined);
+const basePath = process.env.BASE_PATH || (isBuild ? "/" : undefined);
 if (!basePath) {
   throw new Error("BASE_PATH environment variable is required but was not provided.");
 }

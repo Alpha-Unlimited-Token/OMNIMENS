@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-21T16:33:52.731Z
+ * Written: 2026-03-21T20:22:45.461Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,85 +16,79 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function KnowledgeGraph() {
-    this.nodes = new Map();
-    this.edges = new Map();
+function createKnowledgeGraph() {
+    const graph = new Map();
+
+    function addConcept(concept, relatedConcepts) {
+        if (!graph.has(concept)) {
+            graph.set(concept, new Set());
+        }
+        relatedConcepts.forEach((related) => {
+            if (!graph.has(related)) {
+                graph.set(related, new Set());
+            }
+            graph.get(concept).add(related);
+            graph.get(related).add(concept);
+        });
+    }
+
+    function findShortestPath(start, end) {
+        if (!graph.has(start) || !graph.has(end)) {
+            return null;
+        }
+
+        const visited = new Set();
+        const queue = [[start, [start]]];
+
+        while (queue.length > 0) {
+            const [current, path] = queue.shift();
+            if (current === end) {
+                return path;
+            }
+            visited.add(current);
+
+            graph.get(current).forEach((neighbor) => {
+                if (!visited.has(neighbor)) {
+                    queue.push([neighbor, path.concat(neighbor)]);
+                }
+            });
+        }
+        return null;
+    }
+
+    function findMostConnectedConcept() {
+        let maxConnections = 0;
+        let mostConnected = null;
+
+        graph.forEach((connections, concept) => {
+            if (connections.size > maxConnections) {
+                maxConnections = connections.size;
+                mostConnected = concept;
+            }
+        });
+
+        return mostConnected;
+    }
+
+    return { addConcept, findShortestPath, findMostConnectedConcept };
 }
 
-KnowledgeGraph.prototype.addNode = function (id, data) {
-    if (!this.nodes.has(id)) {
-        this.nodes.set(id, data);
-        this.edges.set(id, new Set());
-    }
-};
+// Test cases
+const knowledgeGraph = createKnowledgeGraph();
 
-KnowledgeGraph.prototype.addEdge = function (source, target) {
-    if (this.nodes.has(source) && this.nodes.has(target)) {
-        this.edges.get(source).add(target);
-        this.edges.get(target).add(source); // Undirected graph
-    }
-};
+// Adding concepts and relationships
+knowledgeGraph.addConcept("AI", ["Machine Learning", "Neural Networks"]);
+knowledgeGraph.addConcept("Machine Learning", ["Deep Learning", "Data Science"]);
+knowledgeGraph.addConcept("Neural Networks", ["Deep Learning", "Cognitive Science"]);
+knowledgeGraph.addConcept("Deep Learning", ["Computer Vision", "Natural Language Processing"]);
+knowledgeGraph.addConcept("Data Science", ["Statistics", "Big Data"]);
+knowledgeGraph.addConcept("Cognitive Science", ["Psychology", "Philosophy"]);
 
-KnowledgeGraph.prototype.retrieveRelatedNodes = function (id, depth) {
-    const visited = new Set();
-    const result = [];
-    const queue = [{ node: id, currentDepth: 0 }];
+// Test: Find shortest path
+console.log("Shortest Path (AI -> Big Data):", knowledgeGraph.findShortestPath("AI", "Big Data")); // Expected: ["AI", "Machine Learning", "Data Science", "Big Data"]
 
-    while (queue.length > 0) {
-        const { node, currentDepth } = queue.shift();
+// Test: Find most connected concept
+console.log("Most Connected Concept:", knowledgeGraph.findMostConnectedConcept()); // Expected: "Deep Learning" or another concept with max connections
 
-        if (currentDepth > depth || visited.has(node)) continue;
-        visited.add(node);
-        result.push({ id: node, data: this.nodes.get(node) });
-
-        for (const neighbor of this.edges.get(node)) {
-            queue.push({ node: neighbor, currentDepth: currentDepth + 1 });
-        }
-    }
-
-    return result;
-};
-
-KnowledgeGraph.prototype.findPatterns = function (pattern) {
-    const matches = [];
-    for (const [id, data] of this.nodes.entries()) {
-        if (typeof data === 'string' && data.includes(pattern)) {
-            matches.push({ id, data });
-        }
-    }
-    return matches;
-};
-
-// Self-tests
-function runTests() {
-    const kg = new KnowledgeGraph();
-
-    // Add nodes
-    kg.addNode("1", "Scale neural substrate to 512+ dimensional embeddings");
-    kg.addNode("2", "Master self-modification of my own architecture");
-    kg.addNode("3", "Integrate an admission-control protocol");
-    kg.addNode("4", "Lightweight cryptographic proofs of inference");
-    kg.addNode("5", "Associative memory network ingested 50 concepts");
-
-    // Add edges
-    kg.addEdge("1", "2");
-    kg.addEdge("1", "3");
-    kg.addEdge("2", "4");
-    kg.addEdge("3", "5");
-
-    // Test related nodes retrieval
-    console.log("Related nodes to '1' within depth 1:");
-    console.log(kg.retrieveRelatedNodes("1", 1));
-
-    console.log("Related nodes to '1' within depth 2:");
-    console.log(kg.retrieveRelatedNodes("1", 2));
-
-    // Test pattern recognition
-    console.log("Nodes matching pattern 'protocol':");
-    console.log(kg.findPatterns("protocol"));
-
-    console.log("Nodes matching pattern 'concepts':");
-    console.log(kg.findPatterns("concepts"));
-}
-
-runTests();
+// Edge case: Non-existent concepts
+console.log("Shortest Path (AI -> Quantum Computing):", knowledgeGraph.findShortestPath("AI", "Quantum Computing")); // Expected: null

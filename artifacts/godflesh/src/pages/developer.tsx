@@ -1267,11 +1267,11 @@ export default function DeveloperPage() {
               <p className="text-white/30 text-xs font-mono uppercase tracking-wider mb-3">Platform</p>
               <div className="space-y-2">
                 {[
-                  { label: "Home", href: `${window.location.origin}/godflesh/` },
-                  { label: "Chat", href: `${window.location.origin}/godflesh/chat` },
-                  { label: "Pricing", href: `${window.location.origin}/godflesh/pricing` },
-                  { label: "FAQ", href: `${window.location.origin}/godflesh/faq` },
-                  { label: "Account", href: `${window.location.origin}/godflesh/account` },
+                  { label: "Home", href: `${window.location.origin}/` },
+                  { label: "Chat", href: `${window.location.origin}/chat` },
+                  { label: "Pricing", href: `${window.location.origin}/pricing` },
+                  { label: "FAQ", href: `${window.location.origin}/faq` },
+                  { label: "Account", href: `${window.location.origin}/account` },
                 ].map(l => (
                   <a key={l.label} href={l.href} className="block text-white/35 text-xs hover:text-white/65 transition-colors">{l.label}</a>
                 ))}
@@ -1281,12 +1281,12 @@ export default function DeveloperPage() {
             <div>
               <p className="text-white/30 text-xs font-mono uppercase tracking-wider mb-3">Support</p>
               <div className="space-y-2">
-                <a href={`${window.location.origin}/godflesh/support`}
+                <a href={`${window.location.origin}/support`}
                   className="flex items-center gap-1.5 text-xs text-red-400/70 hover:text-red-400 transition-colors font-medium">
                   <AlertTriangle className="w-3 h-3" /> Report a Problem
                 </a>
-                <a href={`${window.location.origin}/godflesh/faq`} className="block text-white/35 text-xs hover:text-white/65 transition-colors">FAQ</a>
-                <a href={`${window.location.origin}/godflesh/support`} className="block text-white/35 text-xs hover:text-white/65 transition-colors">Contact Us</a>
+                <a href={`${window.location.origin}/faq`} className="block text-white/35 text-xs hover:text-white/65 transition-colors">FAQ</a>
+                <a href={`${window.location.origin}/support`} className="block text-white/35 text-xs hover:text-white/65 transition-colors">Contact Us</a>
               </div>
             </div>
           </div>
