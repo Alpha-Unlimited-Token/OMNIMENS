@@ -35,7 +35,7 @@ import {
   File, Eye, Lock, Unlock, Upload, Server, MemoryStick, Wrench, CircleDot,
   Sun, Moon, GitBranch,
   AlertCircle, ArrowLeft, ArrowRight, CheckCircle2,
-  User, Wallet, CreditCard, LogOut, Bell, HelpCircle, Info, MoreVertical, SquarePlus, Shield
+  User, Wallet, CreditCard, LogOut, Bell, HelpCircle, Info, MoreVertical, SquarePlus, Shield, Menu
 } from "lucide-react";
 import { OmnimensIcon } from "@/components/omnimens-icon";
 import { WebsitePreview, parseMessageSegments } from "@/components/website-preview";
@@ -5937,25 +5937,40 @@ export default function Chat() {
                 <OmnimensIcon size={18} />
               </Link>
             </div>
-            {/* Mobile top bar — workspace style */}
-            <div className="flex sm:hidden items-center justify-between w-full px-3 h-full">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
-                  <span className="text-[10px] font-bold text-primary">
-                    {(user as any)?.username?.slice(0, 2)?.toUpperCase() || "OM"}
-                  </span>
-                </div>
-                <span className="font-semibold text-sm tracking-wide" style={{ color: isLight ? "#141722" : "#fff" }}>
-                  {mobileNav === "apps" ? "Apps" : mobileNav === "account" ? (accountSubPage === "billing" ? "Billing" : accountSubPage === "usage" ? "Usage" : accountSubPage === "profile" ? "Profile" : "Account") : (activeProject?.name || "OMNIMENS")}
-                </span>
-              </div>
+            {/* Mobile top bar — Command Center style */}
+            <div className="flex sm:hidden items-center justify-between w-full px-2 h-full gap-1">
               <button
-                onClick={() => setShowControlHub(true)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors"
-                style={{ color: isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.5)" }}
+                type="button"
+                onClick={() => setMobileNav(mobileNav === "apps" ? "create" : "apps")}
+                className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors shrink-0"
+                style={{ color: mobileNav === "apps" ? "#a855f7" : (isLight ? "rgba(20,23,34,0.5)" : "rgba(255,255,255,0.5)") }}
               >
-                <MoreVertical className="w-4.5 h-4.5" />
+                <Menu className="w-[18px] h-[18px]" />
               </button>
+              <button
+                type="button"
+                onClick={() => setShowControlHub(true)}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors border"
+                style={{
+                  background: isLight ? "rgba(168,85,247,0.08)" : "rgba(43,50,69,0.8)",
+                  borderColor: isLight ? "rgba(168,85,247,0.2)" : "rgba(61,70,89,0.8)",
+                  color: isLight ? "#141722" : "#fff",
+                }}
+              >
+                <span className="text-primary font-semibold text-[10px]">{MODEL_OPTIONS.find(m => m.id === selectedModel)?.label || selectedModel}</span>
+                <ChevronDown className="w-3 h-3" style={{ color: isLight ? "rgba(20,23,34,0.4)" : "rgba(255,255,255,0.4)" }} />
+              </button>
+              <div
+                className="flex items-center gap-1 px-1.5 py-1 rounded text-[10px] font-mono shrink-0 border"
+                style={{
+                  background: isLight ? "rgba(0,0,0,0.03)" : "rgba(14,21,37,0.8)",
+                  borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(43,50,69,0.6)",
+                  color: isLight ? "rgba(20,23,34,0.5)" : "rgba(157,165,180,0.8)",
+                }}
+              >
+                <Zap className="w-2.5 h-2.5 text-amber-400" />
+                <span>{status?.paidUser ? "∞" : "FREE"}</span>
+              </div>
             </div>
 
             <div className="hidden sm:flex items-center overflow-x-auto flex-1 min-w-0" style={{ scrollbarWidth: "none" }}>
@@ -6385,24 +6400,29 @@ export default function Chat() {
               </div>
             ) : (
               <>
-                <div className="space-y-4 sm:space-y-6 max-w-3xl mx-auto">
+                <div className="space-y-3 sm:space-y-6 max-w-3xl mx-auto">
                   {messages.map((msg) => {
                     return (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         key={msg.id}
-                        className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                        className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} ${msg.role !== "user" ? "gap-2 sm:gap-0" : ""}`}
                       >
+                        {msg.role !== "user" && (
+                          <div className="sm:hidden w-7 h-7 rounded-full bg-gradient-to-b from-primary to-purple-800 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_10px_rgba(168,85,247,0.2)] border border-purple-400/30">
+                            <Brain className="w-3.5 h-3.5 text-white" />
+                          </div>
+                        )}
                         <div className={`max-w-[95%] sm:max-w-[92%] w-full ${
                           msg.role === "user"
-                            ? "bg-white/10 border border-white/20 text-white rounded-2xl rounded-tr-sm px-3 sm:px-5 py-2.5 sm:py-3 font-sans"
-                            : `bg-primary/5 border border-primary/15 rounded-2xl rounded-tl-sm px-3 sm:px-5 py-3 sm:py-4 font-mono shadow-[0_0_15px_rgba(130,80,220,0.06)] text-white/90`
+                            ? "bg-white/10 border border-white/20 sm:border-white/20 border-l-[3px] sm:border-l border-l-primary text-white rounded-2xl rounded-tr-sm px-3 sm:px-5 py-2 sm:py-3 font-sans"
+                            : `bg-primary/5 border border-primary/15 rounded-2xl rounded-tl-sm px-3 sm:px-5 py-2.5 sm:py-4 font-mono shadow-[0_0_15px_rgba(130,80,220,0.06)] text-white/90`
                         }`}>
                           {msg.role === "omnimens" && (
                             <div className="flex items-center justify-between gap-1 mb-2">
                               <div className="flex items-center gap-1 text-primary font-bold text-[10px] tracking-widest uppercase flex-wrap">
-                                <OmnimensIcon size={14} className="shrink-0" />
+                                <OmnimensIcon size={14} className="shrink-0 hidden sm:block" />
                                 <span>OMNIMENS</span>
                                 {msg.model && msg.model !== "gpt-4o" && (
                                   <span className="text-[8px] text-white/30 font-mono normal-case tracking-normal ml-1 border border-white/10 px-1 rounded">{msg.model}</span>
@@ -7059,6 +7079,26 @@ export default function Chat() {
 
           {/* Input area */}
           <form onSubmit={handleSubmit} className="shrink-0 border-t px-2 sm:px-3 pt-2 sm:pt-3 pb-1" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))", borderColor: isLight ? "rgba(20,23,34,0.1)" : "#21262d", background: isLight ? "#ffffff" : "#161b22" }}>
+            {/* Mobile quick-action toolbar */}
+            <div className="sm:hidden flex items-center gap-2 px-1 pb-2 mb-1 border-b" style={{ borderColor: isLight ? "rgba(20,23,34,0.06)" : "rgba(255,255,255,0.04)" }}>
+              <button type="button" onClick={() => fileInputRef.current?.click()} className="p-1.5 rounded-md transition-colors border" style={{ color: isLight ? "rgba(20,23,34,0.5)" : "#9DA5B4", background: isLight ? "rgba(0,0,0,0.03)" : "rgba(28,35,51,0.8)", borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(43,50,69,0.6)" }}>
+                <Paperclip className="w-4 h-4" />
+              </button>
+              <button type="button" onClick={toggleVoiceInput} className={`p-1.5 rounded-md transition-colors border ${isListening ? "text-rose-400 animate-pulse" : ""}`} style={{ color: isListening ? undefined : (isLight ? "rgba(20,23,34,0.5)" : "#9DA5B4"), background: isLight ? "rgba(0,0,0,0.03)" : "rgba(28,35,51,0.8)", borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(43,50,69,0.6)" }}>
+                {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+              </button>
+              <button type="button" onClick={() => setShowCamera(true)} className="p-1.5 rounded-md transition-colors border" style={{ color: isLight ? "rgba(20,23,34,0.5)" : "#9DA5B4", background: isLight ? "rgba(0,0,0,0.03)" : "rgba(28,35,51,0.8)", borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(43,50,69,0.6)" }}>
+                <Camera className="w-4 h-4" />
+              </button>
+              <div className="w-px h-4" style={{ background: isLight ? "rgba(20,23,34,0.08)" : "rgba(43,50,69,0.6)" }} />
+              <button type="button" onClick={() => setShowControlHub(true)} className="flex items-center gap-1 px-2 p-1.5 rounded-md transition-colors border" style={{ color: isLight ? "rgba(20,23,34,0.5)" : "#9DA5B4", background: isLight ? "rgba(0,0,0,0.03)" : "rgba(28,35,51,0.8)", borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(43,50,69,0.6)" }}>
+                <Brain className="w-3.5 h-3.5" />
+                <span className="text-[9px] font-medium uppercase tracking-wide">Persona</span>
+              </button>
+              <button type="button" onClick={() => { setShowPlusMenu(v => !v); setShowMediaSettings(false); }} className="p-1.5 rounded-md transition-colors border" style={{ color: isLight ? "rgba(20,23,34,0.5)" : "#eab308", background: isLight ? "rgba(0,0,0,0.03)" : "rgba(28,35,51,0.8)", borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(43,50,69,0.6)" }}>
+                <Zap className="w-4 h-4" />
+              </button>
+            </div>
             <PendingFileList files={pendingFiles} onRemove={removeFile} />
             {(mediaSettings.imageStyle !== "auto" || mediaSettings.imageAspect !== "1:1" || mediaSettings.imageQuality !== "auto" || mediaSettings.videoAspect !== "16:9") && (
               <div className="flex flex-wrap gap-1 mb-1.5 px-1">
@@ -7184,7 +7224,7 @@ export default function Chat() {
                       type="button"
                       onClick={() => setShowCamera(true)}
                       title="Camera — capture a photo to attach"
-                      className="text-white/40 hover:text-primary transition-colors w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded"
+                      className="hidden sm:flex text-white/40 hover:text-primary transition-colors w-7 h-7 items-center justify-center rounded"
                     >
                       <Camera className="w-3.5 h-3.5" />
                     </button>
@@ -7192,7 +7232,7 @@ export default function Chat() {
                       type="button"
                       onClick={toggleVoiceInput}
                       title={isListening ? "Stop listening" : "Speak your message"}
-                      className={`transition-colors w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded ${
+                      className={`hidden sm:flex transition-colors w-7 h-7 items-center justify-center rounded ${
                         isListening
                           ? "text-rose-400 animate-pulse bg-rose-400/10"
                           : "text-white/40 hover:text-primary"
@@ -7210,6 +7250,7 @@ export default function Chat() {
                   <Button type="submit" size="icon" variant="default"
                     disabled={(!input.trim() && pendingFiles.length === 0) || accountLocked}
                     className="rounded-lg w-10 h-10 min-w-[44px] min-h-[44px] shadow-none border-none"
+                    style={(input.trim() || pendingFiles.length > 0) ? { boxShadow: "0 0 10px rgba(168,85,247,0.4)" } : undefined}
                   >
                     <Send className="w-4 h-4 ml-1" />
                   </Button>
@@ -7218,9 +7259,10 @@ export default function Chat() {
             </div>
             <div className="flex items-center justify-between mt-1.5 px-1">
               <div className="flex items-center gap-2 min-w-0">
-                <span className="text-[9px] font-mono text-white/70 truncate">
+                <span className="hidden sm:inline text-[9px] font-mono text-white/70 truncate">
                   {PERSONA_NAMES[persona]} · MEMORY ACTIVE
                 </span>
+                <span className="sm:hidden text-[8px] font-mono" style={{ color: input.length > 1800 ? "#f87171" : "rgba(255,255,255,0.25)" }}>{input.length}/2000</span>
                 <ModelSelector value={selectedModel} onChange={setSelectedModel} paidUser={!!status?.paidUser} />
               </div>
               <div className="flex items-center gap-2 shrink-0">
@@ -7381,36 +7423,49 @@ export default function Chat() {
               </div>
             </div>
 
-          {/* ── Mobile Bottom Nav (Replit-style 3 tabs) ── */}
+          {/* ── Mobile Bottom Nav (Command Center 4-tab) ── */}
           {!mobileBuilderOpen && <div
             className="sm:hidden shrink-0 flex items-center justify-around border-t"
             style={{
-              background: isLight ? "#ffffff" : "#0f0f14",
+              background: isLight ? "#ffffff" : "#0a0f1a",
               borderColor: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)",
-              height: 56,
+              height: 64,
               paddingBottom: "env(safe-area-inset-bottom)",
             }}
           >
             {[
-              { id: "apps" as const, icon: <FolderOpen className="w-5 h-5" />, label: "Apps" },
-              { id: "create" as const, icon: <SquarePlus className="w-5 h-5" />, label: "Create" },
-              { id: "account" as const, icon: <User className="w-5 h-5" />, label: "Account" },
-            ].map(item => (
+              { id: "create" as const, icon: <MessageSquare className="w-5 h-5" />, label: "Chat", hasNotif: true },
+              { id: "apps" as const, icon: <FolderOpen className="w-5 h-5" />, label: "Projects" },
+              { id: "account" as const, icon: <Bell className="w-5 h-5" />, label: "Alerts", hasBadge: true },
+              { id: "account" as const, icon: <User className="w-5 h-5" />, label: "Account", subPage: "account" as any },
+            ].map((item, idx) => (
               <button
-                key={item.id}
-                onClick={() => { setMobileNav(item.id); setAccountSubPage(null); }}
-                className="flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all relative"
+                key={idx}
+                onClick={() => { setMobileNav(item.id); if ((item as any).subPage) setAccountSubPage((item as any).subPage); else setAccountSubPage(null); }}
+                className="flex flex-col items-center justify-center gap-1.5 flex-1 h-full transition-all relative"
                 style={{
-                  color: mobileNav === item.id
+                  color: (item.label === "Chat" && mobileNav === "create")
                     ? "#a855f7"
-                    : (isLight ? "rgba(20,23,34,0.45)" : "rgba(255,255,255,0.4)"),
+                    : (item.label === "Projects" && mobileNav === "apps")
+                    ? "#a855f7"
+                    : (item.label === "Account" && mobileNav === "account" && !accountSubPage)
+                    ? "#a855f7"
+                    : (isLight ? "rgba(20,23,34,0.4)" : "rgba(90,99,118,1)"),
                 }}
               >
-                {mobileNav === item.id && (
+                {((item.label === "Chat" && mobileNav === "create") || (item.label === "Projects" && mobileNav === "apps")) && (
                   <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[3px] rounded-full bg-primary" />
                 )}
-                {item.icon}
-                <span className="text-[10px] font-semibold tracking-wide">{item.label}</span>
+                <div className="relative">
+                  {item.icon}
+                  {item.hasNotif && mobileNav === "create" && (
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-primary rounded-full" style={{ boxShadow: "0 0 5px rgba(168,85,247,0.8)" }} />
+                  )}
+                  {item.hasBadge && (
+                    <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-rose-500 rounded-full" style={{ border: "1px solid #0a0f1a" }} />
+                  )}
+                </div>
+                <span className="text-[10px] font-medium tracking-wide">{item.label}</span>
               </button>
             ))}
           </div>}
