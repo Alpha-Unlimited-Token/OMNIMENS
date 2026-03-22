@@ -14,6 +14,15 @@ import { useAuth } from "@workspace/replit-auth-web";
 import { WorkspaceLayout } from "@/components/workspace-layout";
 import NotFound from "@/pages/not-found";
 
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations().then((regs) => {
+    for (const r of regs) r.unregister();
+  });
+  caches.keys().then((keys) => {
+    for (const k of keys) caches.delete(k);
+  });
+}
+
 function retryLazy(factory: () => Promise<any>, retries = 2): ReturnType<typeof lazy> {
   return lazy(() =>
     factory().catch((err: any) => {

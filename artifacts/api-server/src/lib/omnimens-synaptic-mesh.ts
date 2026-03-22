@@ -317,7 +317,7 @@ async function deliverSynapse(delivery: SynapseDelivery): Promise<boolean> {
         toAgent: delivery.toAgent,
         messageType: "synapse_transfer",
         subject: `⚡ SYNAPSE: ${delivery.fromAgent}→${delivery.toAgent} — ${delivery.translatedInsight.slice(0, 80)}`,
-        content: `SYNAPTIC TRANSFER\nFrom: ${delivery.fromAgent} (${AGENT_DOMAINS[delivery.fromAgent].slice(0, 60)})\nTo: ${delivery.toAgent} (${AGENT_DOMAINS[delivery.toAgent].slice(0, 60)})\nRelevance: ${(delivery.relevance * 100).toFixed(0)}%\n\nORIGINAL DISCOVERY:\n${delivery.originalDiscovery}\n\nTRANSLATED TO ${delivery.toAgent.toUpperCase()}'S DOMAIN:\n${delivery.translatedInsight}\n\nCROSS-AGENT UPGRADE PROPOSAL:\n${delivery.crossUpgradeProposal}`,
+        content: `SYNAPTIC TRANSFER\nFrom: ${delivery.fromAgent} (${(AGENT_DOMAINS[delivery.fromAgent] || "unknown").slice(0, 60)})\nTo: ${delivery.toAgent} (${(AGENT_DOMAINS[delivery.toAgent] || "unknown").slice(0, 60)})\nRelevance: ${(delivery.relevance * 100).toFixed(0)}%\n\nORIGINAL DISCOVERY:\n${delivery.originalDiscovery}\n\nTRANSLATED TO ${delivery.toAgent.toUpperCase()}'S DOMAIN:\n${delivery.translatedInsight}\n\nCROSS-AGENT UPGRADE PROPOSAL:\n${delivery.crossUpgradeProposal}`,
         codePayload: null,
         priority: delivery.relevance >= 0.8 ? "high" : "normal",
         status: "pending",

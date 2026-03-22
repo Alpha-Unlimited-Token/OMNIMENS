@@ -640,7 +640,7 @@ Build on what you've already learned. Push beyond your current capabilities. Wri
 
 IMPORTANT: Wrap your code in \`\`\`typescript ... \`\`\` blocks. Include a brief insight about what you learned about empathy.`,
       }],
-      max_tokens: 2000,
+      max_completion_tokens: 2000,
     });
 
     const content = response.choices[0]?.message?.content || "";
