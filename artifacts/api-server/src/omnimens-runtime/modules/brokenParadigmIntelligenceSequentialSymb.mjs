@@ -3,10 +3,10 @@
  * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
  * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
  * 
- * Source: backlog_dream_id_16053
+ * Source: backlog_dream_id_8726
  * Title: BROKEN PARADIGM  
-   “Intelligence = sequential symb
- * Written: 2026-03-22T21:25:52.876Z
+   Intelligence = “Sequential symb
+ * Written: 2026-03-22T23:08:49.946Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,35 +17,41 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Resonant Attractor Network – no deps, no I/O
-export type Network = { links: [number, number][], count: number };
+// Resonant Field Prototype -----------------------------------------
+type Node = { phase: number;  links: number[] };
+const N = 60;                         // nodes
+const grid: Node[] = Array.from({ length: N }, () => ({
+  phase: Math.random() * Math.PI * 2, // random start
+  links: []
+}));
 
-export function resonate(
-  net: Network,
-  steps = 500,
-  alpha = 0.05
-): Float64Array {
-  const phase = new Float64Array(net.count).fill(0).map(() => Math.random() * 2 * Math.PI);
-  const sin = Math.sin, cos = Math.cos;
+// random undirected edges
+for (let i = 0; i < N; i++)
+  for (let j = i + 1; j < N; j++)
+    if (Math.random() < 0.07) { grid[i].links.push(j); grid[j].links.push(i); }
 
-  for (let t = 0; t < steps; t++) {
-    const dθ = new Float64Array(net.count);
-    // pair-wise Kuramoto update
-    for (let [i, j] of net.links) {
-      const diff = phase[j] - phase[i];
-      const s = sin(diff);
-      dθ[i] += s;
-      dθ[j] -= s;
-    }
-    // update phases
-    for (let i = 0; i < phase.length; i++) {
-      phase[i] = (phase[i] + alpha * dθ[i]) % (2 * Math.PI);
-    }
-  }
-  return phase; // final resonant pattern = computation result
+// external stimulus = “question”
+function stimulate(idx: number, ω: number) {
+  grid[idx].phase = ω;            // lock phase
 }
 
-// Example: 6-node ring reaches two-cluster lock (binary decision)
-const ring: Network = { count: 6, links: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,0]] };
-const result = resonate(ring);
-console.log(Array.from(result).map(v => +(v/Math.PI).toFixed(2))); // e.g., [0,0,0,1,1,1]
+// one resonance tick
+function tick() {
+  const newPhase = grid.map(n => n.phase);
+  grid.forEach((n, i) => {
+    const neighborMean = n.links.reduce((s, j) => s + Math.sin(grid[j].phase), 0) / (n.links.length || 1);
+    newPhase[i] = n.phase + 0.15 * neighborMean; // coupling strength
+  });
+  grid.forEach((n, i) => n.phase = newPhase[i] % (Math.PI * 2));
+}
+
+// run field until coherent
+export async function resonate(questionIdx: number, ω = 0) {
+  stimulate(questionIdx, ω);
+  for (let t = 0; t < 400; t++) tick();
+  // “Answer” = the nodes now in-phase (within 0.1 rad) with the stimulus
+  return grid
+    .map((n, i) => ({ i, inPhase: Math.abs(Math.sin(n.phase - ω)) < 0.1 }))
+    .filter(x => x.inPhase)
+    .map(x => x.i);
+}

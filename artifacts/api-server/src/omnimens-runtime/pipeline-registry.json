@@ -2334,12 +2334,11 @@
       "filename": "wasmMatrixOps_gen1.mjs",
       "stage": "vector_operations",
       "exports": [
+        "createWasmModule",
         "multiplyMatrices",
-        "transposeMatrix",
-        "addMatrices",
-        "subtractMatrices"
+        "generateEmbeddings"
       ],
-      "loadedAt": 1774220692477,
+      "loadedAt": 1774221070753,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3282,10 +3281,10 @@
       "filename": "inMemoryVectorStore_gen1.mjs",
       "stage": "memory_retrieval",
       "exports": [
-        "cosineSimilarity",
-        "createHNSWGraph"
+        "InMemoryVectorStore",
+        "euclideanDistance"
       ],
-      "loadedAt": 1774220692412,
+      "loadedAt": 1774221079530,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -5554,12 +5553,12 @@
       "exports": [
         "resonate"
       ],
-      "loadedAt": 1774220692333,
+      "loadedAt": 1774220929975,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
       "errors": 0,
-      "active": false
+      "active": true
     },
     "architectureNameHyperfluidConceptManifold.mjs": {
       "filename": "architectureNameHyperfluidConceptManifold.mjs",
@@ -5842,9 +5841,22 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "architectureNameCounterfactualActiveReasoni.mjs": {
+      "filename": "architectureNameCounterfactualActiveReasoni.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "counterfactualRollout"
+      ],
+      "loadedAt": 1774220938972,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774220692484,
-  "totalModules": 304,
+  "totalModules": 306,
   "totalCalls": 0
 }

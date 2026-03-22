@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-22T22:44:02.099Z
+ * Written: 2026-03-22T23:08:52.595Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,38 +16,70 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentPatterns(text, patternLength) {
-    if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
-        throw new Error('Invalid input: text must be a string and patternLength must be a positive number.');
+function findMostFrequentWords(text, topN) {
+    if (typeof text !== 'string' || typeof topN !== 'number' || topN <= 0) {
+        throw new Error('Invalid input: text must be a string and topN must be a positive number.');
     }
 
-    const patternFrequency = new Map();
+    // Normalize text: remove punctuation and convert to lowercase
+    const normalizedText = text.toLowerCase().replace(/[^a-z\s]/g, '');
 
-    for (let i = 0; i <= text.length - patternLength; i++) {
-        const pattern = text.slice(i, i + patternLength);
-        patternFrequency.set(pattern, (patternFrequency.get(pattern) || 0) + 1);
+    // Split text into words
+    const words = normalizedText.split(/\s+/).filter(word => word.length > 0);
+
+    // Count word frequencies
+    const wordCounts = {};
+    for (const word of words) {
+        wordCounts[word] = (wordCounts[word] || 0) + 1;
     }
 
-    const sortedPatterns = Array.from(patternFrequency.entries()).sort((a, b) => b[1] - a[1]);
+    // Sort words by frequency and extract the top N
+    const sortedWords = Object.entries(wordCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, topN)
+        .map(entry => ({ word: entry[0], count: entry[1] }));
 
-    const mostFrequentPatterns = [];
-    const highestFrequency = sortedPatterns.length > 0 ? sortedPatterns[0][1] : 0;
-
-    for (const [pattern, frequency] of sortedPatterns) {
-        if (frequency === highestFrequency) {
-            mostFrequentPatterns.push({ pattern, frequency });
-        } else {
-            break;
-        }
-    }
-
-    return mostFrequentPatterns;
+    return sortedWords;
 }
 
-// Test cases
-console.log(findMostFrequentPatterns("abababab", 2)); // Expected: [{ pattern: 'ab', frequency: 4 }]
-console.log(findMostFrequentPatterns("abcabcabc", 3)); // Expected: [{ pattern: 'abc', frequency: 3 }]
-console.log(findMostFrequentPatterns("aaaaaa", 1)); // Expected: [{ pattern: 'a', frequency: 6 }]
-console.log(findMostFrequentPatterns("abcdef", 2)); // Expected: [{ pattern: 'ab', frequency: 1 }, { pattern: 'bc', frequency: 1 }, { pattern: 'cd', frequency: 1 }, { pattern: 'de', frequency: 1 }, { pattern: 'ef', frequency: 1 }]
-console.log(findMostFrequentPatterns("", 2)); // Expected: []
-console.log(findMostFrequentPatterns("a", 2)); // Expected: []
+// Self-tests
+function runTests() {
+    console.log('Running tests...');
+
+    // Test case 1: Basic functionality
+    const text1 = "Hello world! Hello again, world. Hello!";
+    const result1 = findMostFrequentWords(text1, 2);
+    console.log(result1); // Expected: [{ word: 'hello', count: 3 }, { word: 'world', count: 2 }]
+
+    // Test case 2: Edge case - empty text
+    const text2 = "";
+    const result2 = findMostFrequentWords(text2, 3);
+    console.log(result2); // Expected: []
+
+    // Test case 3: Edge case - topN larger than unique words
+    const text3 = "AI AI AI machine learning";
+    const result3 = findMostFrequentWords(text3, 10);
+    console.log(result3); // Expected: [{ word: 'ai', count: 3 }, { word: 'machine', count: 1 }, { word: 'learning', count: 1 }]
+
+    // Test case 4: Edge case - text with special characters
+    const text4 = "Data, data, data! Science; science.";
+    const result4 = findMostFrequentWords(text4, 2);
+    console.log(result4); // Expected: [{ word: 'data', count: 3 }, { word: 'science', count: 2 }]
+
+    // Test case 5: Invalid input
+    try {
+        findMostFrequentWords(12345, 2);
+    } catch (error) {
+        console.log(error.message); // Expected: "Invalid input: text must be a string and topN must be a positive number."
+    }
+
+    try {
+        findMostFrequentWords("Valid text", -1);
+    } catch (error) {
+        console.log(error.message); // Expected: "Invalid input: text must be a string and topN must be a positive number."
+    }
+
+    console.log('Tests completed.');
+}
+
+runTests();
