@@ -7,6 +7,7 @@ import {
   Smartphone, Monitor, Download, ArrowRight, Network
 } from 'lucide-react';
 import { OmnimensPresence } from './OmnimensPresence';
+import { AgentMeshVisualizer } from './AgentMeshVisualizer';
 
 export function ImmersiveScroll() {
   const [showFloatingCTA, setShowFloatingCTA] = useState(false);
@@ -234,27 +235,17 @@ export function ImmersiveScroll() {
               A living network of specialist AI agents — Architect, Critic, Neuroscientist, Mathematician — that cross-pollinate discoveries in real-time.
             </p>
 
-            <div className="bg-[#1C2333]/60 backdrop-blur-sm rounded-2xl p-5 border border-[#2B3245]/60 mb-5 relative overflow-hidden h-[180px]">
-              <div className="absolute inset-0 flex items-center justify-center">
-                {[
-                  { name: 'Architect', x: 50, y: 30 },
-                  { name: 'Critic', x: 80, y: 60 },
-                  { name: 'Neuro', x: 20, y: 65 },
-                  { name: 'Math', x: 50, y: 85 },
-                  { name: 'Synth', x: 75, y: 25 },
-                  { name: 'Meta', x: 25, y: 30 },
-                  { name: 'Design', x: 85, y: 80 },
-                  { name: 'OMNI', x: 50, y: 55 },
-                ].map((agent, i) => (
-                  <div
-                    key={i}
-                    className="absolute flex flex-col items-center mesh-dot"
-                    style={{ left: `${agent.x}%`, top: `${agent.y}%`, animationDelay: `${i * 0.4}s` }}
-                  >
-                    <div className={`w-2.5 h-2.5 rounded-full ${agent.name === 'OMNI' ? 'bg-[#a855f7] shadow-[0_0_8px_rgba(168,85,247,0.6)]' : 'bg-[#06b6d4]/60'}`} />
-                    <span className="text-[8px] text-[#9DA5B4] mt-1" style={{ fontFamily: 'var(--font-mono)' }}>{agent.name}</span>
-                  </div>
-                ))}
+            <div className="bg-[#1C2333]/60 backdrop-blur-sm rounded-2xl border border-[#2B3245]/60 mb-5 overflow-hidden flex flex-col items-center py-3">
+              <AgentMeshVisualizer width={340} height={260} />
+              <div className="flex items-center gap-5 text-[9px] mt-1" style={{ fontFamily: 'var(--font-mono)' }}>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+                  <span className="text-violet-400/80 tracking-wider">11 AGENTS</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-emerald-400/80 tracking-wider">2 SELF-CREATED</span>
+                </div>
               </div>
             </div>
 
