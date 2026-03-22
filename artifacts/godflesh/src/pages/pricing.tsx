@@ -273,22 +273,22 @@ function DevToolCosts({ costs }: { costs: any[] }) {
       </div>
       <p className="text-xs font-mono text-white/82 mb-4 pl-7">Charged per invocation from your credit balance. No external APIs — pure compute.</p>
       <div className="bg-black/30 border border-white/8 rounded-2xl overflow-hidden">
-        <div className="grid grid-cols-4 px-6 py-3 border-b border-white/5 text-xs font-mono text-white/82 tracking-widest">
+        <div className="hidden sm:grid grid-cols-4 px-6 py-3 border-b border-white/5 text-xs font-mono text-white/82 tracking-widest">
           <div className="col-span-2">TOOL</div>
           <div className="text-center">CREDITS</div>
           <div className="text-right">USD VALUE</div>
         </div>
         {costs.map((c: any, i: number) => (
-          <div key={c.label} className={`grid grid-cols-4 px-6 py-3.5 items-center ${i < costs.length - 1 ? "border-b border-white/5" : ""}`}>
-            <div className="col-span-2 flex items-center gap-3">
+          <div key={c.label} className={`flex flex-col sm:grid sm:grid-cols-4 px-4 sm:px-6 py-3.5 gap-2 sm:gap-0 sm:items-center ${i < costs.length - 1 ? "border-b border-white/5" : ""}`}>
+            <div className="sm:col-span-2 flex items-center gap-3">
               {icons[c.label] ?? <Terminal className="w-4 h-4 text-white/80" />}
               <div>
                 <div className="font-mono text-white text-xs font-bold">{c.label}</div>
                 <div className="font-mono text-white/80 text-xs">{c.desc}</div>
               </div>
             </div>
-            <div className="text-center font-mono font-bold text-white">{c.credits} cr</div>
-            <div className="text-right font-mono text-white/82 text-xs">${c.dollarValue}</div>
+            <div className="text-left sm:text-center font-mono font-bold text-white text-xs sm:text-base pl-7 sm:pl-0">{c.credits} cr · ${c.dollarValue}</div>
+            <div className="hidden sm:block text-right font-mono text-white/82 text-xs">${c.dollarValue}</div>
           </div>
         ))}
       </div>
@@ -360,25 +360,26 @@ function LoyaltyTable({ tiers }: { tiers: any[] }) {
         <span className="text-xs font-mono text-white/75">(based on prior month's paid spend)</span>
       </div>
       <div className="bg-black/30 border border-white/8 rounded-2xl overflow-hidden">
-        <div className="grid grid-cols-3 px-6 py-3 border-b border-white/5 text-xs font-mono text-white/75 tracking-widest">
+        <div className="hidden sm:grid grid-cols-3 px-6 py-3 border-b border-white/5 text-xs font-mono text-white/75 tracking-widest">
           <div>TIER</div>
           <div className="text-center">MIN SPEND</div>
           <div className="text-right">FREE CREDITS NEXT MONTH</div>
         </div>
         {tiers.map((t, i) => (
-          <div key={t.label} className={`grid grid-cols-3 px-6 py-4 ${i < tiers.length - 1 ? "border-b border-white/5" : ""}`}>
-            <div className="font-mono font-bold tracking-widest text-sm">
+          <div key={t.label} className={`flex flex-col sm:grid sm:grid-cols-3 px-4 sm:px-6 py-3 sm:py-4 gap-1 sm:gap-0 ${i < tiers.length - 1 ? "border-b border-white/5" : ""}`}>
+            <div className="font-mono font-bold tracking-widest text-sm flex items-center gap-2">
               <span className={
                 t.label === "LEGEND" ? "text-accent glow-text-gold" :
                 t.label === "PRIME" || t.label === "APEX+" ? "text-primary" :
                 t.label === "ELITE" ? "text-blue-400" :
                 "text-white/85"
               }>{t.label}</span>
+              <span className="sm:hidden text-white/50 font-normal text-xs">${t.minSpendDollars}{t.maxSpendDollars ? `–$${t.maxSpendDollars}` : "+"}/mo</span>
             </div>
-            <div className="text-center font-mono text-sm">
+            <div className="hidden sm:block text-center font-mono text-sm">
               ${t.minSpendDollars}{t.maxSpendDollars ? `–$${t.maxSpendDollars}` : "+"}
             </div>
-            <div className="text-right font-mono text-sm">
+            <div className="sm:text-right font-mono text-xs sm:text-sm">
               <span className="text-green-400 font-bold">${t.bonusDollars} free</span>
               <span className="text-white/75 ml-1">({t.bonusCredits.toLocaleString()} cr)</span>
             </div>
@@ -486,7 +487,7 @@ function WalletPanel({
         {hasWallet && (
           <div>
             <div className="text-xs font-mono text-white/75 tracking-widest mb-3">ADD CREDITS NOW</div>
-            <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2">
               {topupOptions.map(opt => (
                 <button key={opt.cents} onClick={() => onTopup(opt.cents)} disabled={isTopupping}
                   className="bg-black/40 border border-white/10 hover:border-primary/50 hover:bg-primary/5 rounded-xl p-3 text-center transition-all font-mono disabled:opacity-50">
@@ -693,7 +694,7 @@ export default function Pricing() {
   return (
     <>
       <SEO {...seoData.pricing} />
-      <div className="container mx-auto px-4 py-16 flex-1 flex flex-col items-center">
+      <div className="container mx-auto px-6 sm:px-4 py-12 sm:py-16 flex-1 flex flex-col items-center">
 
         {/* Header */}
         <div className="text-center mb-14">

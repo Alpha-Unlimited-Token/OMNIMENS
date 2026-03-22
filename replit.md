@@ -23,6 +23,7 @@ The project employs a pnpm monorepo structure.
 
 **UI/UX Decisions:**
 Both OMNIMENS and Super AI Lab frontends are built with React, Vite, Tailwind CSS, shadcn/ui, and framer-motion, emphasizing a modern and responsive user experience. OMNIMENS features a dual-layout for public and workspace pages, with a Replit-style sidebar for workspace.
+- **ImmersiveScroll Mobile Design**: All 22+ pages use the ImmersiveScroll responsive pattern: `px-6 sm:px-4` container padding, `py-16 sm:py-24` section spacing, dark theme (`#0E1525` bg, `#1C2333` cards, `#2B3245` borders), touch-friendly 44px min tap targets. Chat page uses `100dvh` for mobile viewport, responsive message bubbles (`px-3 sm:px-5`), and safe-area-inset-bottom for input.
 
 **Technical Implementations & Feature Specifications:**
 

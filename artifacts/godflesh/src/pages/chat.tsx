@@ -5673,7 +5673,7 @@ export default function Chat() {
       <div
         className="flex flex-1 overflow-hidden"
         style={{
-          height: "100vh",
+          height: "100dvh",
           background: isLight ? "#f4f5f8" : "#0D1117",
         }}
       >
@@ -5934,7 +5934,7 @@ export default function Chat() {
 
           {/* Messages / Mobile Tab Content area */}
           <div
-            className="flex-1 overflow-y-auto omnimens-scrollbar p-4 relative"
+            className="flex-1 overflow-y-auto omnimens-scrollbar px-2 sm:px-4 py-4 relative"
             style={{ background: isLight ? "#f4f5f8" : "#0D1117" }}
           >
             {/* ── MOBILE: Apps Tab ── */}
@@ -6222,7 +6222,7 @@ export default function Chat() {
               </div>
             ) : (
               <>
-                <div className="space-y-6 max-w-3xl mx-auto">
+                <div className="space-y-4 sm:space-y-6 max-w-3xl mx-auto">
                   {messages.map((msg) => {
                     return (
                       <motion.div
@@ -6231,10 +6231,10 @@ export default function Chat() {
                         key={msg.id}
                         className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                       >
-                        <div className={`max-w-[92%] w-full ${
+                        <div className={`max-w-[95%] sm:max-w-[92%] w-full ${
                           msg.role === "user"
-                            ? "bg-white/10 border border-white/20 text-white rounded-2xl rounded-tr-sm px-5 py-3 font-sans"
-                            : `bg-primary/5 border border-primary/15 rounded-2xl rounded-tl-sm px-5 py-4 font-mono shadow-[0_0_15px_rgba(130,80,220,0.06)] text-white/90`
+                            ? "bg-white/10 border border-white/20 text-white rounded-2xl rounded-tr-sm px-3 sm:px-5 py-2.5 sm:py-3 font-sans"
+                            : `bg-primary/5 border border-primary/15 rounded-2xl rounded-tl-sm px-3 sm:px-5 py-3 sm:py-4 font-mono shadow-[0_0_15px_rgba(130,80,220,0.06)] text-white/90`
                         }`}>
                           {msg.role === "omnimens" && (
                             <div className="flex items-center justify-between gap-1 mb-2">
@@ -6657,7 +6657,7 @@ export default function Chat() {
           {/* Credit alert banner — hide on mobile when not on Create tab */}
           <div className={mobileNav !== "create" ? "hidden sm:block" : ""}>
           {creditsAlert && (
-            <div className={`shrink-0 flex items-center justify-between gap-3 px-4 py-2.5 text-[12px] font-mono border-t ${
+            <div className={`shrink-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-[12px] font-mono border-t ${
               creditsAlert.kind === "need_resonance"
                 ? "bg-violet-500/10 border-violet-500/25 text-violet-300"
                 : creditsAlert.kind === "no_wallet"
@@ -6703,7 +6703,7 @@ export default function Chat() {
           )}
 
           {/* Input area */}
-          <form onSubmit={handleSubmit} className="shrink-0 border-t p-3" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))", borderColor: isLight ? "rgba(20,23,34,0.1)" : "#21262d", background: isLight ? "#ffffff" : "#161b22" }}>
+          <form onSubmit={handleSubmit} className="shrink-0 border-t px-2 sm:px-3 pt-2 sm:pt-3 pb-1" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))", borderColor: isLight ? "rgba(20,23,34,0.1)" : "#21262d", background: isLight ? "#ffffff" : "#161b22" }}>
             <PendingFileList files={pendingFiles} onRemove={removeFile} />
             <div className="relative flex items-center">
               <input ref={fileInputRef} type="file" multiple
@@ -6735,7 +6735,7 @@ export default function Chat() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 8, scale: 0.96 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute bottom-full left-0 mb-2 w-64 bg-[#111] border border-white/12 rounded-xl shadow-2xl overflow-hidden z-50"
+                      className="absolute bottom-full left-0 mb-2 w-[calc(100vw-2rem)] sm:w-64 max-w-72 bg-[#111] border border-white/12 rounded-xl shadow-2xl overflow-hidden z-50"
                     >
                       <PlusMenuContent
                         onClose={() => setShowPlusMenu(false)}
@@ -6764,7 +6764,7 @@ export default function Chat() {
                   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(e); }
                 }}
                 placeholder={accountLocked ? "ACCOUNT LOCKED — Pay outstanding balance to continue" : pendingFiles.length > 0 ? "Describe what to create with these files..." : "Query the intelligence... or attach files to build something"}
-                className="w-full rounded-xl pl-10 pr-[6.5rem] sm:pr-[11rem] py-3.5 font-mono text-sm resize-none h-[56px] omnimens-scrollbar outline-none transition-all border focus:border-primary focus:ring-1 focus:ring-primary/50"
+                className="w-full rounded-xl pl-10 pr-[6.5rem] sm:pr-[11rem] py-3 sm:py-3.5 font-mono text-sm resize-none h-[48px] sm:h-[56px] omnimens-scrollbar outline-none transition-all border focus:border-primary focus:ring-1 focus:ring-primary/50"
                 style={{
                   background: isLight ? "#f4f5f8" : "#0d1117",
                   borderColor: accountLocked ? "rgba(239,68,68,0.5)" : isLight ? "rgba(168,85,247,0.25)" : "rgba(255,255,255,0.15)",
@@ -6790,7 +6790,7 @@ export default function Chat() {
                       type="button"
                       onClick={() => setShowCamera(true)}
                       title="Camera — capture a photo to attach"
-                      className="text-white/40 hover:text-primary transition-colors w-7 h-7 flex items-center justify-center rounded"
+                      className="text-white/40 hover:text-primary transition-colors w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded"
                     >
                       <Camera className="w-3.5 h-3.5" />
                     </button>
@@ -6798,7 +6798,7 @@ export default function Chat() {
                       type="button"
                       onClick={toggleVoiceInput}
                       title={isListening ? "Stop listening" : "Speak your message"}
-                      className={`transition-colors w-7 h-7 flex items-center justify-center rounded ${
+                      className={`transition-colors w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded ${
                         isListening
                           ? "text-rose-400 animate-pulse bg-rose-400/10"
                           : "text-white/40 hover:text-primary"
@@ -6815,7 +6815,7 @@ export default function Chat() {
                 ) : (
                   <Button type="submit" size="icon" variant="default"
                     disabled={(!input.trim() && pendingFiles.length === 0) || accountLocked}
-                    className="rounded-lg w-10 h-10 shadow-none border-none"
+                    className="rounded-lg w-10 h-10 min-w-[44px] min-h-[44px] shadow-none border-none"
                   >
                     <Send className="w-4 h-4 ml-1" />
                   </Button>

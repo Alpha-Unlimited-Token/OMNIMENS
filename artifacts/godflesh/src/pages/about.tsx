@@ -15,7 +15,7 @@ export default function About() {
     <Layout>
       <SEO {...seoData.about} />
       <div className="flex-1 py-20 relative z-10">
-        <div className="container mx-auto px-4 max-w-5xl">
+        <div className="container mx-auto px-6 sm:px-4 max-w-5xl">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}

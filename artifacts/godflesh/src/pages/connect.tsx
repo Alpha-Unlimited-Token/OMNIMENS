@@ -467,7 +467,7 @@ function ConnectChat() {
     <Layout>
       <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
         <div className="border-b border-violet-500/20 bg-[#0E1525]/80 backdrop-blur-xl sticky top-0 z-20">
-          <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="max-w-4xl mx-auto px-6 sm:px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button onClick={() => setLocation("/")} className="text-white/40 hover:text-white transition-colors p-1">
                 <ArrowLeft className="w-5 h-5" />
@@ -510,7 +510,7 @@ function ConnectChat() {
         )}
 
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-4xl mx-auto px-4 py-6">
+          <div className="max-w-4xl mx-auto px-6 sm:px-4 py-6">
             {messages.length === 0 && !isStreaming && (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="flex flex-col items-center justify-center min-h-[60vh] gap-8">
                 <div className="relative">

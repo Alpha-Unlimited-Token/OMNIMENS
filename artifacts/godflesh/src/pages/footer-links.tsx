@@ -48,7 +48,7 @@ export default function FooterLinks() {
     <Layout>
       <SEO title="Site Map" description="Navigate the OMNIMENS AI platform. Find links to all pages including AI chat, pricing, FAQ, support, developer tools, and more." keywords="OMNIMENS site map, AI platform navigation" path="/footer-links" />
       <div className="flex-1 py-20 relative z-10">
-        <div className="container mx-auto px-4 max-w-3xl">
+        <div className="container mx-auto px-6 sm:px-4 max-w-3xl">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}

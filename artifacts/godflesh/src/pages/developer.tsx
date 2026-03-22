@@ -162,8 +162,8 @@ function OverviewTab() {
         <h3 className="text-white font-semibold text-lg mb-4 flex items-center gap-2">
           <Cpu className="w-4 h-4 text-primary" /> Available Models
         </h3>
-        <div className="rounded-xl border border-white/8 overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="rounded-xl border border-white/8 overflow-x-auto">
+          <table className="w-full text-sm min-w-[500px]">
             <thead>
               <tr className="border-b border-white/8 bg-white/3">
                 <th className="text-left px-4 py-2.5 text-white/40 text-xs font-mono">MODEL</th>

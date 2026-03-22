@@ -128,7 +128,7 @@ export default function MemoryPage() {
     <>
       <SEO {...seoData.memory} />
       <div className="flex-1 overflow-auto">
-        <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+        <div className="max-w-3xl mx-auto px-6 sm:px-4 py-8 space-y-6">
 
           {/* Header */}
           <div className="flex items-start justify-between gap-4">

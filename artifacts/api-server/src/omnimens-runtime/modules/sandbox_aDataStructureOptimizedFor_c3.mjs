@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a data structure optimized for fast associative memory lookup
- * Written: 2026-03-22T03:37:06.723Z
+ * Written: 2026-03-22T04:14:26.096Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,66 +16,72 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-const AssociativeMemory = function () {
-    const memory = new Map();
+function AssociativeMemory() {
+    this.memory = new Map();
+}
 
-    return {
-        add: function (key, value) {
-            if (!memory.has(key)) {
-                memory.set(key, []);
-            }
-            memory.get(key).push(value);
-        },
-        get: function (key) {
-            return memory.get(key) || [];
-        },
-        has: function (key) {
-            return memory.has(key);
-        },
-        remove: function (key) {
-            return memory.delete(key);
-        },
-        keys: function () {
-            return Array.from(memory.keys());
-        },
-        values: function () {
-            return Array.from(memory.values());
-        },
-        clear: function () {
-            memory.clear();
-        },
-        size: function () {
-            return memory.size;
-        }
-    };
+AssociativeMemory.prototype.add = function(key, value) {
+    this.memory.set(key, value);
+};
+
+AssociativeMemory.prototype.get = function(key) {
+    return this.memory.get(key) || null;
+};
+
+AssociativeMemory.prototype.has = function(key) {
+    return this.memory.has(key);
+};
+
+AssociativeMemory.prototype.remove = function(key) {
+    return this.memory.delete(key);
+};
+
+AssociativeMemory.prototype.clear = function() {
+    this.memory.clear();
+};
+
+AssociativeMemory.prototype.size = function() {
+    return this.memory.size;
 };
 
 // Test cases
-const memory = AssociativeMemory();
+const memory = new AssociativeMemory();
 
-// Add entries
-memory.add("philosophy", "ethics");
-memory.add("philosophy", "epistemology");
-memory.add("sensorimotor", "perception-action coupling");
-memory.add("sensorimotor", "embodied cognition");
+// Test adding and retrieving data
+memory.add("Empath", {
+    name: "Empath",
+    domain: "emotional modeling, social reasoning, empathy, ethical AI",
+    specialization: "emotional intelligence"
+});
+memory.add("Explorer", {
+    name: "Explorer",
+    domain: "curiosity, novelty-seeking, question generation, autonomous exploration",
+    specialization: "exploration and curiosity"
+});
+memory.add("Philosopher", {
+    name: "Philosopher",
+    domain: "philosophy, ethics, epistemology, metaphysics, abstract reasoning",
+    specialization: "metaphysical reasoning"
+});
 
-// Retrieve entries
-console.log(memory.get("philosophy")); // ["ethics", "epistemology"]
-console.log(memory.get("sensorimotor")); // ["perception-action coupling", "embodied cognition"]
-console.log(memory.get("nonexistent")); // []
+console.log(memory.get("Empath")); // Should output Empath's data
+console.log(memory.get("Explorer")); // Should output Explorer's data
+console.log(memory.get("Philosopher")); // Should output Philosopher's data
+console.log(memory.get("Unknown")); // Should output null
 
-// Check existence
-console.log(memory.has("philosophy")); // true
-console.log(memory.has("nonexistent")); // false
+// Test has method
+console.log(memory.has("Empath")); // Should output true
+console.log(memory.has("Unknown")); // Should output false
 
-// Remove a key
-memory.remove("philosophy");
-console.log(memory.get("philosophy")); // []
+// Test size
+console.log(memory.size()); // Should output 3
 
-// List keys and values
-console.log(memory.keys()); // ["sensorimotor"]
-console.log(memory.values()); // [["perception-action coupling", "embodied cognition"]]
+// Test remove
+memory.remove("Explorer");
+console.log(memory.get("Explorer")); // Should output null
+console.log(memory.size()); // Should output 2
 
-// Clear memory
+// Test clear
 memory.clear();
-console.log(memory.size()); // 0
+console.log(memory.size()); // Should output 0
+console.log(memory.get("Empath")); // Should output null

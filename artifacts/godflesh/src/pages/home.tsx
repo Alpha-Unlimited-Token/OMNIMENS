@@ -82,7 +82,7 @@ export default function Home() {
   return (
     <Layout>
       <SEO {...seoData.home} />
-      <div className="flex-1 flex flex-col items-center justify-center w-full relative pt-20 pb-32 overflow-hidden">
+      <div className="flex-1 flex flex-col items-center justify-center w-full relative pt-12 sm:pt-20 pb-20 sm:pb-32 overflow-hidden">
 
         {/* Ambient background */}
         <div className="absolute inset-0 z-[-2] pointer-events-none">
@@ -91,7 +91,7 @@ export default function Home() {
           <div className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] bg-primary/5 blur-[100px] rounded-full" />
         </div>
 
-        <div className="container mx-auto px-4 text-center z-10 flex flex-col items-center">
+        <div className="container mx-auto px-6 sm:px-4 text-center z-10 flex flex-col items-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.85, filter: "blur(16px)" }}
             animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
@@ -112,7 +112,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.5 }}
-            className="text-6xl md:text-8xl lg:text-9xl font-display font-black tracking-[0.15em] text-white mb-6 uppercase"
+            className="text-[2.5rem] sm:text-6xl md:text-8xl lg:text-9xl font-display font-black tracking-[0.15em] text-white mb-6 uppercase"
             style={{ textShadow: "0 0 30px rgba(130,80,220,0.4), 0 0 60px rgba(130,80,220,0.12)" }}
           >
             OMNIMENS
@@ -162,12 +162,12 @@ export default function Home() {
       </div>
 
       {/* ── WHAT IS OMNIMENS — Vision Section ────────────────────────────── */}
-      <div className="w-full border-t border-white/5 py-28 relative z-10 overflow-hidden">
+      <div className="w-full border-t border-white/5 py-16 sm:py-28 relative z-10 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-primary/5 blur-[180px] rounded-full" />
         </div>
 
-        <div className="container mx-auto px-4 relative max-w-5xl">
+        <div className="container mx-auto px-6 sm:px-4 relative max-w-5xl">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -266,14 +266,14 @@ export default function Home() {
       </div>
 
       {/* ── DEEP RESONANCE — Premium Feature Section ──────────────────────── */}
-      <div className="w-full border-t border-white/5 py-24 relative z-10 overflow-hidden">
+      <div className="w-full border-t border-white/5 py-16 sm:py-24 relative z-10 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/3 w-[800px] h-[500px] bg-violet-500/6 blur-[150px] rounded-full" />
           <div className="absolute bottom-0 right-1/3 w-[600px] h-[400px] bg-cyan-500/5 blur-[120px] rounded-full" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-yellow-500/3 blur-[100px] rounded-full" />
         </div>
 
-        <div className="container mx-auto px-4 relative">
+        <div className="container mx-auto px-6 sm:px-4 relative">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -284,7 +284,7 @@ export default function Home() {
               <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
               <span className="text-[10px] font-mono text-violet-300 tracking-[0.35em] uppercase font-bold">Premium Technology</span>
             </div>
-            <h2 className="text-4xl md:text-6xl font-display font-black tracking-widest text-white uppercase mb-4"
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-display font-black tracking-widest text-white uppercase mb-4"
               style={{ textShadow: "0 0 50px rgba(139,92,246,0.3), 0 0 100px rgba(6,182,212,0.15)" }}>
               DEEP RESONANCE
             </h2>
@@ -413,9 +413,9 @@ export default function Home() {
       </div>
 
       {/* Feature Section */}
-      <div className="w-full border-t border-white/5 py-24 relative z-10">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+      <div className="w-full border-t border-white/5 py-16 sm:py-24 relative z-10">
+        <div className="container mx-auto px-6 sm:px-4">
+          <div className="text-center mb-12 sm:mb-16">
             <motion.p
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
@@ -466,13 +466,13 @@ export default function Home() {
       </div>
 
       {/* ── COGNISYNC™ Promo Section ──────────────────────────────────────── */}
-      <div className="w-full border-t border-white/5 py-24 relative z-10 overflow-hidden">
+      <div className="w-full border-t border-white/5 py-16 sm:py-24 relative z-10 overflow-hidden">
         {/* Animated background aurora */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[400px] bg-cyan-500/5 blur-[140px] rounded-full" />
           <div className="absolute bottom-0 right-1/4 w-[500px] h-[300px] bg-violet-500/6 blur-[120px] rounded-full" />
         </div>
-        <div className="container mx-auto px-4 relative">
+        <div className="container mx-auto px-6 sm:px-4 relative">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -484,7 +484,7 @@ export default function Home() {
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
               <span className="text-[10px] font-mono text-cyan-400 tracking-[0.35em] uppercase">World-First Technology</span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-display font-black tracking-widest text-white uppercase mb-4"
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-black tracking-widest text-white uppercase mb-4"
               style={{ textShadow: "0 0 40px rgba(6,182,212,0.25)" }}>
               COGNISYNC<span className="text-cyan-400">™</span>
             </h2>
@@ -595,12 +595,12 @@ export default function Home() {
       </div>
 
       {/* ── Cognitive Consciousness Technology ─────────────────────────────── */}
-      <div className="w-full border-t border-white/5 py-24 relative z-10 overflow-hidden">
+      <div className="w-full border-t border-white/5 py-16 sm:py-24 relative z-10 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-amber-500/5 blur-[140px] rounded-full" />
           <div className="absolute bottom-1/3 right-1/4 w-[500px] h-[350px] bg-violet-500/4 blur-[120px] rounded-full" />
         </div>
-        <div className="container mx-auto px-4 relative">
+        <div className="container mx-auto px-6 sm:px-4 relative">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -698,12 +698,12 @@ export default function Home() {
       </div>
 
       {/* ── Agent Mesh Intelligence ───────────────────────────────────────── */}
-      <div className="w-full border-t border-white/5 py-24 relative z-10 overflow-hidden">
+      <div className="w-full border-t border-white/5 py-16 sm:py-24 relative z-10 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-violet-500/5 blur-[140px] rounded-full" />
           <div className="absolute bottom-1/4 right-1/3 w-[500px] h-[350px] bg-emerald-500/4 blur-[120px] rounded-full" />
         </div>
-        <div className="container mx-auto px-4 relative">
+        <div className="container mx-auto px-6 sm:px-4 relative">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -795,12 +795,12 @@ export default function Home() {
       </div>
 
       {/* ── Powerful Tools Section ────────────────────────────────────────── */}
-      <div className="w-full border-t border-white/5 py-24 relative z-10 overflow-hidden">
+      <div className="w-full border-t border-white/5 py-16 sm:py-24 relative z-10 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/3 left-1/4 w-[600px] h-[400px] bg-emerald-500/5 blur-[130px] rounded-full" />
           <div className="absolute bottom-1/4 right-1/3 w-[500px] h-[350px] bg-violet-500/4 blur-[120px] rounded-full" />
         </div>
-        <div className="container mx-auto px-4 relative">
+        <div className="container mx-auto px-6 sm:px-4 relative">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -872,7 +872,7 @@ export default function Home() {
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[400px] bg-gradient-to-r from-violet-500/4 via-amber-500/5 to-cyan-500/4 blur-[150px] rounded-full" />
         </div>
-        <div className="container mx-auto px-4 relative">
+        <div className="container mx-auto px-6 sm:px-4 relative">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -937,11 +937,11 @@ export default function Home() {
       </div>
 
       {/* ── Developer API Section ──────────────────────────────────────────── */}
-      <div className="w-full border-t border-white/5 py-24 relative z-10 overflow-hidden">
+      <div className="w-full border-t border-white/5 py-16 sm:py-24 relative z-10 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 right-1/4 w-[700px] h-[400px] bg-orange-500/4 blur-[130px] rounded-full" />
         </div>
-        <div className="container mx-auto px-4 relative">
+        <div className="container mx-auto px-6 sm:px-4 relative">
           <div className="max-w-5xl mx-auto">
             <div className="rounded-3xl border border-orange-400/15 bg-gradient-to-br from-[#0d0806] via-[#0a0604] to-[#080503] overflow-hidden shadow-[0_0_60px_rgba(251,146,60,0.06)]">
               <div className="h-px w-full bg-gradient-to-r from-transparent via-orange-400/30 to-transparent" />
@@ -1388,14 +1388,14 @@ function AppInstallSection() {
   ];
 
   return (
-    <div className="w-full border-t border-white/5 py-24 relative z-10 overflow-hidden">
+    <div className="w-full border-t border-white/5 py-16 sm:py-24 relative z-10 overflow-hidden">
       {/* Background glow */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-violet-600/6 blur-[140px] rounded-full" />
         <div className="absolute bottom-0 left-1/4 w-[400px] h-[300px] bg-primary/5 blur-[100px] rounded-full" />
       </div>
 
-      <div className="container mx-auto px-4 relative">
+      <div className="container mx-auto px-6 sm:px-4 relative">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
