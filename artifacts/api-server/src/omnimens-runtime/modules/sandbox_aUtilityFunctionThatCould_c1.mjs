@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-22T17:08:50.191Z
+ * Written: 2026-03-22T17:19:55.184Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,41 +16,62 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function: Find the longest common substring between two strings
-function longestCommonSubstring(str1, str2) {
-    if (!str1 || !str2) return "";
-
-    let maxLength = 0;
-    let endIdx = 0;
-    const dp = Array(str1.length + 1).fill(0).map(() => Array(str2.length + 1).fill(0));
-
-    for (let i = 1; i <= str1.length; i++) {
-        for (let j = 1; j <= str2.length; j++) {
-            if (str1[i - 1] === str2[j - 1]) {
-                dp[i][j] = dp[i - 1][j - 1] + 1;
-                if (dp[i][j] > maxLength) {
-                    maxLength = dp[i][j];
-                    endIdx = i;
-                }
-            }
-        }
+function findMostFrequentWords(text, topN) {
+    if (typeof text !== 'string' || typeof topN !== 'number' || topN <= 0) {
+        throw new Error("Invalid input: text must be a string and topN must be a positive number.");
     }
 
-    return str1.slice(endIdx - maxLength, endIdx);
+    // Normalize text: remove punctuation, convert to lowercase
+    const normalizedText = text.replace(/[^\w\s]/g, '').toLowerCase();
+
+    // Split text into words
+    const words = normalizedText.split(/\s+/).filter(word => word.length > 0);
+
+    // Count word frequencies
+    const wordCounts = {};
+    for (let word of words) {
+        wordCounts[word] = (wordCounts[word] || 0) + 1;
+    }
+
+    // Convert wordCounts to an array of [word, count] pairs
+    const wordArray = Object.entries(wordCounts);
+
+    // Sort by frequency in descending order
+    wordArray.sort((a, b) => b[1] - a[1]);
+
+    // Extract topN words
+    const topWords = wordArray.slice(0, topN);
+
+    return topWords;
 }
 
-// Self-contained tests
-function runTests() {
-    console.log("Test 1: ", longestCommonSubstring("abcdef", "zabcf") === "abc"); // Common substring: "abc"
-    console.log("Test 2: ", longestCommonSubstring("12345", "34567") === "345"); // Common substring: "345"
-    console.log("Test 3: ", longestCommonSubstring("hello", "world") === ""); // No common substring
-    console.log("Test 4: ", longestCommonSubstring("abcdxyz", "xyzabcd") === "abcd"); // Common substring: "abcd"
-    console.log("Test 5: ", longestCommonSubstring("", "anything") === ""); // Empty string input
-    console.log("Test 6: ", longestCommonSubstring("anything", "") === ""); // Empty string input
-    console.log("Test 7: ", longestCommonSubstring("same", "same") === "same"); // Strings are identical
-    console.log("Test 8: ", longestCommonSubstring("a", "a") === "a"); // Single character match
-    console.log("Test 9: ", longestCommonSubstring("abc", "def") === ""); // Completely different strings
+// Self-tests
+console.log("Test 1: Basic functionality");
+const text1 = "The quick brown fox jumps over the lazy dog. The dog was not amused.";
+console.log(findMostFrequentWords(text1, 3)); // Expected output: [['the', 3], ['dog', 2], ['quick', 1]]
+
+console.log("Test 2: Single word input");
+const text2 = "hello";
+console.log(findMostFrequentWords(text2, 1)); // Expected output: [['hello', 1]]
+
+console.log("Test 3: Case insensitivity");
+const text3 = "Apple apple APPLE";
+console.log(findMostFrequentWords(text3, 1)); // Expected output: [['apple', 3]]
+
+console.log("Test 4: Edge case - empty string");
+try {
+    console.log(findMostFrequentWords("", 3)); // Expected output: []
+} catch (e) {
+    console.log(e.message); // Expected error message
 }
 
-// Run tests
-runTests();
+console.log("Test 5: Edge case - invalid topN");
+try {
+    console.log(findMostFrequentWords("hello world", -1)); // Expected error
+} catch (e) {
+    console.log(e.message); // Expected error message
+}
+
+console.log("Test 6: Edge case - punctuation handling");
+const text4 = "Hello, world! Hello: world?";
+console.log(findMostFrequentWords(text4, 2)); // Expected output: [['hello', 2], ['world', 2]]

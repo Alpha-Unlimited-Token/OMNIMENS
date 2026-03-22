@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-03-22T15:07:16.703Z
+ * Written: 2026-03-22T17:22:26.348Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,116 +18,109 @@
 
 /**
  * @module inMemoryVectorStore
- * @description Provides fast semantic search and similarity lookups using approximate nearest neighbor (ANN) search with cosine similarity.
+ * @description A module for storing and retrieving vector embeddings for similarity searches using cosine similarity.
+ * Implements an efficient in-memory storage and search mechanism.
  */
 
 /**
- * Represents an in-memory vector store for efficient similarity search.
+ * Computes the cosine similarity between two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} The cosine similarity between the two vectors.
+ * @throws {Error} If vectors are not of the same length or are empty.
+ */
+export function cosineSimilarity(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length || vectorA.length === 0) {
+    throw new Error("Vectors must be of the same length and non-empty.");
+  }
+
+  const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b ** 2, 0));
+
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    throw new Error("Vectors must not have zero magnitude.");
+  }
+
+  return dotProduct / (magnitudeA * magnitudeB);
+}
+
+/**
+ * Class representing an in-memory vector store.
  */
 export class InMemoryVectorStore {
+  /**
+   * Initializes the vector store.
+   */
   constructor() {
-    /**
-     * @private
-     * @type {Map<string, number[]>}
-     * Stores vectors with unique keys.
-     */
-    this.vectorMap = new Map();
+    this.store = new Map();
   }
 
   /**
    * Adds a vector to the store.
-   * @param {string} key - Unique identifier for the vector.
+   * @param {string} key - The unique identifier for the vector.
    * @param {number[]} vector - The vector to store.
-   * @throws {Error} If the vector is not an array of numbers.
+   * @throws {Error} If the key already exists or the vector is invalid.
    */
   addVector(key, vector) {
-    if (!Array.isArray(vector) || !vector.every((val) => typeof val === "number")) {
-      throw new Error("Vector must be an array of numbers.");
+    if (this.store.has(key)) {
+      throw new Error("Key already exists in the store.");
     }
-    this.vectorMap.set(key, vector);
-  }
-
-  /**
-   * Computes the cosine similarity between two vectors.
-   * @private
-   * @param {number[]} vecA - First vector.
-   * @param {number[]} vecB - Second vector.
-   * @returns {number} Cosine similarity value between -1 and 1.
-   */
-  _cosineSimilarity(vecA, vecB) {
-    const dotProduct = vecA.reduce((sum, val, i) => sum + val * vecB[i], 0);
-    const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val ** 2, 0));
-    const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val ** 2, 0));
-    return dotProduct / (magnitudeA * magnitudeB || 1); // Avoid division by zero
-  }
-
-  /**
-   * Finds the top N most similar vectors to the query vector.
-   * @param {number[]} queryVector - The vector to compare against.
-   * @param {number} topN - Number of top results to return.
-   * @returns {Array<{key: string, similarity: number}>} Sorted array of top N results.
-   * @throws {Error} If the query vector is not an array of numbers.
-   */
-  search(queryVector, topN) {
-    if (!Array.isArray(queryVector) || !queryVector.every((val) => typeof val === "number")) {
-      throw new Error("Query vector must be an array of numbers.");
+    if (!Array.isArray(vector) || vector.length === 0 || !vector.every(Number.isFinite)) {
+      throw new Error("Invalid vector. Must be a non-empty array of numbers.");
     }
-
-    const results = [];
-
-    for (const [key, vector] of this.vectorMap.entries()) {
-      const similarity = this._cosineSimilarity(queryVector, vector);
-      results.push({ key, similarity });
-    }
-
-    // Sort by similarity in descending order and return top N results
-    return results
-      .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, topN);
+    this.store.set(key, vector);
   }
 
   /**
    * Removes a vector from the store.
-   * @param {string} key - Unique identifier for the vector to remove.
-   * @returns {boolean} True if the vector was removed, false otherwise.
+   * @param {string} key - The unique identifier for the vector to remove.
+   * @returns {boolean} True if the vector was removed, false if it did not exist.
    */
   removeVector(key) {
-    return this.vectorMap.delete(key);
+    return this.store.delete(key);
+  }
+
+  /**
+   * Finds the most similar vectors to a given query vector.
+   * @param {number[]} queryVector - The query vector.
+   * @param {number} topK - The number of top similar vectors to retrieve.
+   * @returns {Array<{key: string, similarity: number}>} An array of objects containing keys and similarity scores.
+   * @throws {Error} If the query vector is invalid or topK is not a positive integer.
+   */
+  findMostSimilar(queryVector, topK = 1) {
+    if (!Array.isArray(queryVector) || queryVector.length === 0 || !queryVector.every(Number.isFinite)) {
+      throw new Error("Invalid query vector. Must be a non-empty array of numbers.");
+    }
+    if (!Number.isInteger(topK) || topK <= 0) {
+      throw new Error("topK must be a positive integer.");
+    }
+
+    const similarities = [];
+
+    for (const [key, vector] of this.store.entries()) {
+      const similarity = cosineSimilarity(queryVector, vector);
+      similarities.push({ key, similarity });
+    }
+
+    similarities.sort((a, b) => b.similarity - a.similarity);
+    return similarities.slice(0, topK);
   }
 
   /**
    * Clears all vectors from the store.
    */
-  clearStore() {
-    this.vectorMap.clear();
+  clear() {
+    this.store.clear();
   }
 }
 
 /**
- * Utility function to normalize a vector.
- * @param {number[]} vector - The vector to normalize.
- * @returns {number[]} Normalized vector.
- * @throws {Error} If the vector is not an array of numbers.
+ * Example usage of the InMemoryVectorStore.
+ * Uncomment the lines below to test the functionality.
  */
-export function normalizeVector(vector) {
-  if (!Array.isArray(vector) || !vector.every((val) => typeof val === "number")) {
-    throw new Error("Vector must be an array of numbers.");
-  }
-
-  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
-  return vector.map((val) => val / (magnitude || 1)); // Avoid division by zero
-}
-
-/**
- * Utility function to generate a random vector of a given dimension.
- * @param {number} dimension - The dimension of the vector.
- * @returns {number[]} Randomly generated vector.
- * @throws {Error} If the dimension is not a positive integer.
- */
-export function generateRandomVector(dimension) {
-  if (!Number.isInteger(dimension) || dimension <= 0) {
-    throw new Error("Dimension must be a positive integer.");
-  }
-
-  return Array.from({ length: dimension }, () => Math.random() * 2 - 1); // Random values between -1 and 1
-}
+// const store = new InMemoryVectorStore();
+// store.addVector("vec1", [1, 2, 3]);
+// store.addVector("vec2", [4, 5, 6]);
+// store.addVector("vec3", [7, 8, 9]);
+// console.log(store.findMostSimilar([1, 2, 3], 2));
