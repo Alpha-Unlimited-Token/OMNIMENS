@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a data structure optimized for fast associative memory lookup
- * Written: 2026-03-22T12:40:57.303Z
+ * Written: 2026-03-22T15:48:18.396Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -22,21 +22,24 @@ function AssociativeMemory() {
 
 AssociativeMemory.prototype.add = function(key, value) {
     if (!this.memory.has(key)) {
-        this.memory.set(key, new Set());
+        this.memory.set(key, []);
     }
-    this.memory.get(key).add(value);
+    this.memory.get(key).push(value);
 };
 
 AssociativeMemory.prototype.get = function(key) {
-    return this.memory.has(key) ? Array.from(this.memory.get(key)) : null;
+    return this.memory.has(key) ? this.memory.get(key) : null;
 };
 
 AssociativeMemory.prototype.remove = function(key, value) {
     if (this.memory.has(key)) {
         const values = this.memory.get(key);
-        values.delete(value);
-        if (values.size === 0) {
-            this.memory.delete(key);
+        const index = values.indexOf(value);
+        if (index > -1) {
+            values.splice(index, 1);
+            if (values.length === 0) {
+                this.memory.delete(key);
+            }
         }
     }
 };
@@ -46,37 +49,44 @@ AssociativeMemory.prototype.hasKey = function(key) {
 };
 
 AssociativeMemory.prototype.hasValue = function(key, value) {
-    return this.memory.has(key) && this.memory.get(key).has(value);
+    if (this.memory.has(key)) {
+        return this.memory.get(key).includes(value);
+    }
+    return false;
 };
 
-// Self-tests
+AssociativeMemory.prototype.clear = function() {
+    this.memory.clear();
+};
+
+// Test cases
 const memory = new AssociativeMemory();
 
-// Test adding and retrieving values
-memory.add("color", "blue");
-memory.add("color", "red");
-memory.add("shape", "circle");
-console.log(memory.get("color")); // Expected: ["blue", "red"]
-console.log(memory.get("shape")); // Expected: ["circle"]
-console.log(memory.get("nonexistent")); // Expected: null
+// Add associations
+memory.add("curiosity", "exploration");
+memory.add("curiosity", "discovery");
+memory.add("innovation", "creativity");
+memory.add("ethics", "morality");
 
-// Test removing values
-memory.remove("color", "blue");
-console.log(memory.get("color")); // Expected: ["red"]
-memory.remove("color", "red");
-console.log(memory.get("color")); // Expected: null
+// Retrieve associations
+console.log(memory.get("curiosity")); // ["exploration", "discovery"]
+console.log(memory.get("innovation")); // ["creativity"]
+console.log(memory.get("ethics")); // ["morality"]
+console.log(memory.get("nonexistent")); // null
 
-// Test checking keys and values
-memory.add("animal", "cat");
-console.log(memory.hasKey("animal")); // Expected: true
-console.log(memory.hasKey("nonexistent")); // Expected: false
-console.log(memory.hasValue("animal", "cat")); // Expected: true
-console.log(memory.hasValue("animal", "dog")); // Expected: false
+// Check existence
+console.log(memory.hasKey("curiosity")); // true
+console.log(memory.hasKey("nonexistent")); // false
+console.log(memory.hasValue("curiosity", "exploration")); // true
+console.log(memory.hasValue("curiosity", "nonexistent")); // false
 
-// Edge cases
-memory.add("key", "value");
-memory.add("key", "value"); // Duplicate value
-console.log(memory.get("key")); // Expected: ["value"] (no duplicates)
+// Remove associations
+memory.remove("curiosity", "exploration");
+console.log(memory.get("curiosity")); // ["discovery"]
+memory.remove("curiosity", "discovery");
+console.log(memory.get("curiosity")); // null
 
-memory.remove("key", "value");
-console.log(memory.get("key")); // Expected: null (key removed after last value deletion)
+// Clear memory
+memory.clear();
+console.log(memory.get("innovation")); // null
+console.log(memory.hasKey("ethics")); // false

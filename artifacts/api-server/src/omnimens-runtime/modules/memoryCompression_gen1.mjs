@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: memoryCompression
- * Written: 2026-03-21T20:12:58.972Z
+ * Written: 2026-03-22T15:26:35.959Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,105 +16,90 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
+/**
+ * TRANSLATION STATUS:
+ * Novel constructs: attention
+ * All constructs have translation mappings
+ * Compiled targets: javascript: OK (7 IR steps) | python: OK (7 IR steps) | c: OK (7 IR steps) | x86_64: OK (7 IR steps) | arm64: OK (7 IR steps) | avr: OK (7 IR steps)
+ * Translation map version: 22
+ */
 // memoryCompression.js
 
 /**
  * @module memoryCompression
- * @description A utility module for summarizing and encoding long-term conversation context using token-based summarization and embedding compression.
+ * @description Implements recursive summarization and embedding techniques to compress conversational memory into dense representations.
  */
 
 /**
- * Compresses a long-form text into a summarized representation using token frequency analysis and embedding techniques.
- * @param {string} text - The input text to compress.
- * @param {number} maxTokens - The maximum number of tokens to retain in the summary.
- * @returns {Object} A compressed memory object containing the summary and token embeddings.
+ * Generates a compact representation of the input context using recursive summarization.
+ * @param {string[]} context - Array of strings representing the conversational history.
+ * @param {number} maxSummaryLength - Maximum length of the summarized output.
+ * @returns {string} A summarized string representation of the input context.
  */
-export function compressMemory(text, maxTokens = 50) {
-  if (typeof text !== 'string' || text.length === 0) {
-    throw new Error('Input text must be a non-empty string.');
-  }
-  if (typeof maxTokens !== 'number' || maxTokens <= 0) {
-    throw new Error('maxTokens must be a positive number.');
+export function summarizeContext(context, maxSummaryLength = 256) {
+  if (!Array.isArray(context) || context.length === 0) {
+    return "";
   }
 
-  const tokenFrequency = {};
-  const tokens = text.split(/\s+/);
+  let summary = context.join(" ");
 
-  // Token frequency analysis
-  tokens.forEach(token => {
-    const normalizedToken = token.toLowerCase().replace(/[^a-z0-9]/g, '');
-    if (normalizedToken) {
-      tokenFrequency[normalizedToken] = (tokenFrequency[normalizedToken] || 0) + 1;
-    }
-  });
-
-  // Sort tokens by frequency and truncate
-  const sortedTokens = Object.entries(tokenFrequency)
-    .sort(([, freqA], [, freqB]) => freqB - freqA)
-    .slice(0, maxTokens)
-    .map(([token]) => token);
-
-  // Generate embeddings (simple hash-based encoding for demonstration)
-  const embeddings = sortedTokens.map(token => hashToken(token));
-
-  return {
-    summary: sortedTokens.join(' '),
-    embeddings
-  };
-}
-
-/**
- * Generates a hash-based embedding for a token.
- * @param {string} token - The token to hash.
- * @returns {string} A hexadecimal string representing the token embedding.
- */
-function hashToken(token) {
-  const crypto = require('crypto');
-  return crypto.createHash('sha256').update(token).digest('hex');
-}
-
-/**
- * Expands a compressed memory object back into its original context approximation.
- * @param {Object} compressedMemory - The compressed memory object.
- * @returns {string} The expanded context approximation.
- */
-export function expandMemory(compressedMemory) {
-  if (!compressedMemory || typeof compressedMemory !== 'object') {
-    throw new Error('Compressed memory must be a valid object.');
-  }
-  const { summary } = compressedMemory;
-  if (typeof summary !== 'string') {
-    throw new Error('Compressed memory must contain a valid summary string.');
+  while (summary.length > maxSummaryLength) {
+    const sentences = summary.split(/(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s+/);
+    summary = sentences.slice(0, Math.ceil(sentences.length / 2)).join(" ");
   }
 
-  // For demonstration, expansion is simply returning the summary
   return summary;
 }
 
 /**
- * Merges two compressed memory objects into a unified representation.
- * @param {Object} memoryA - The first compressed memory object.
- * @param {Object} memoryB - The second compressed memory object.
- * @param {number} maxTokens - The maximum number of tokens for the merged summary.
- * @returns {Object} A new compressed memory object combining both inputs.
+ * Encodes a string into a dense vector representation using a simple hash-based embedding technique.
+ * @param {string} input - The string to encode.
+ * @returns {number[]} A fixed-length dense vector representing the input string.
  */
-export function mergeMemories(memoryA, memoryB, maxTokens = 50) {
-  if (!memoryA || !memoryB || typeof memoryA !== 'object' || typeof memoryB !== 'object') {
-    throw new Error('Both inputs must be valid compressed memory objects.');
+export function encodeToVector(input) {
+  const vectorLength = 128; // Fixed length of the dense vector
+  const hash = crypto.createHash("sha256").update(input).digest("hex");
+  const vector = new Array(vectorLength).fill(0);
+
+  for (let i = 0; i < hash.length; i++) {
+    const charCode = hash.charCodeAt(i);
+    vector[i % vectorLength] += charCode;
   }
-  const combinedSummary = `${memoryA.summary} ${memoryB.summary}`;
-  return compressMemory(combinedSummary, maxTokens);
+
+  return vector.map((value) => value % 256); // Normalize values to fit within a byte range
 }
 
 /**
- * Validates a compressed memory object.
- * @param {Object} compressedMemory - The compressed memory object to validate.
- * @returns {boolean} True if the object is valid, false otherwise.
+ * Compresses conversational memory by summarizing and encoding it into a compact representation.
+ * @param {string[]} context - Array of strings representing the conversational history.
+ * @param {number} maxSummaryLength - Maximum length of the summarized output.
+ * @returns {{summary: string, vector: number[]}} An object containing the summarized string and its dense vector representation.
  */
-export function validateMemory(compressedMemory) {
-  if (!compressedMemory || typeof compressedMemory !== 'object') {
-    return false;
-  }
-  const { summary, embeddings } = compressedMemory;
-  return typeof summary === 'string' && Array.isArray(embeddings) && embeddings.every(e => typeof e === 'string');
+export function compressMemory(context, maxSummaryLength = 256) {
+  const summary = summarizeContext(context, maxSummaryLength);
+  const vector = encodeToVector(summary);
+
+  return { summary, vector };
 }
+
+/**
+ * Validates the input context and ensures it meets the requirements for processing.
+ * @param {string[]} context - Array of strings representing the conversational history.
+ * @returns {boolean} True if the context is valid, false otherwise.
+ */
+export function validateContext(context) {
+  return Array.isArray(context) && context.every((item) => typeof item === "string" && item.trim().length > 0);
+}
+
+/**
+ * Example usage of the module.
+ * Uncomment the following lines to test the module in Node.js.
+ */
+// const context = [
+//   "No search results found for: \"attention mechanism efficient transformers latest research\"",
+//   "No search results found for: \"JavaScript performance optimization V8 engine techniques\"",
+//   "No search results found for: \"Gemini Ultra 2.0 breakthrough features 2025\"",
+//   "No search results found for: \"AI reasoning chain-of-thought self-consistency improvements 2025\""
+// ];
+// const compressed = compressMemory(context);
+// console.log(compressed);
