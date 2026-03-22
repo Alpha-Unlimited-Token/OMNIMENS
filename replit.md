@@ -51,6 +51,8 @@ Both OMNIMENS and Super AI Lab frontends are built with React, Vite, Tailwind CS
 - **Independent Reasoning Engine:** A zero-API-call algorithmic reasoning engine with multiple modes.
 - **Autonomous Reasoning Orchestrator:** Orchestrates internal reasoning before external LLM calls.
 - **Digital Environment Navigator:** OMNIMENS maps and navigates the digital world.
+- **Conversation Recall System:** Cross-conversation memory — loads actual message content from past conversations (30-day window), keyword-scored and recall-intent-aware, injected into system prompt so OMNIMENS remembers what was discussed across sessions. Uses batched DB queries via `inArray`. Located in `omnimens-coherence-agent.ts`.
+- **Harmonic Insight Engine (HIE) + Real-time Acoustic Interface (RAI):** Advanced spectral analysis with wavelet decomposition, pattern recognition (16 templates + adaptive learning), novelty scoring, emotional valence detection, and real-time acoustic capture. Admin-only panels in account.tsx. Engine lib has Genesis Bridge self-modification permission.
 - **Security:** Implements comprehensive protections across network, authentication, data encryption, API security, and AI-specific security.
 
 **Super AI Lab Architecture:**

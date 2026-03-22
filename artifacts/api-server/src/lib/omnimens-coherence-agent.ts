@@ -27,8 +27,9 @@ import {
   omnimensBrain,
   omnimensMemories,
   omnimensConversations,
+  omnimensMessages,
 } from "@workspace/db";
-import { eq, and, desc, gte, sql } from "drizzle-orm";
+import { eq, and, desc, gte, ne, inArray, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 
 const STOPWORDS = new Set([
@@ -229,6 +230,144 @@ ${oldText.slice(0, 4000)}`
   }
 }
 
+export async function loadConversationRecall(
+  userId: string,
+  currentConversationId: number | undefined,
+  currentMessage: string
+): Promise<string> {
+  try {
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    const recentConvos = await db
+      .select({
+        id: omnimensConversations.id,
+        title: omnimensConversations.title,
+        persona: omnimensConversations.persona,
+        messageCount: omnimensConversations.messageCount,
+        lastMessageAt: omnimensConversations.lastMessageAt,
+      })
+      .from(omnimensConversations)
+      .where(and(
+        eq(omnimensConversations.userId, userId),
+        gte(omnimensConversations.lastMessageAt, thirtyDaysAgo),
+        ...(currentConversationId ? [ne(omnimensConversations.id, currentConversationId)] : []),
+      ))
+      .orderBy(desc(omnimensConversations.lastMessageAt))
+      .limit(15);
+
+    if (recentConvos.length === 0) return "";
+
+    const keywords = extractKeywords(currentMessage);
+    const hasRecallIntent = /\b(remember|recall|we (talked|discussed|spoke)|last (time|conversation|chat)|earlier|before|previous|you (said|told|mentioned)|did (i|we)|what did)\b/i.test(currentMessage);
+
+    const topConvos = hasRecallIntent ? recentConvos.slice(0, 10) : recentConvos.slice(0, 6);
+    const convoIds = topConvos.map(c => c.id);
+
+    if (convoIds.length === 0) return "";
+
+    const allMessages = await db
+      .select({
+        conversationId: omnimensMessages.conversationId,
+        role: omnimensMessages.role,
+        content: omnimensMessages.content,
+        createdAt: omnimensMessages.createdAt,
+      })
+      .from(omnimensMessages)
+      .where(and(
+        inArray(omnimensMessages.conversationId, convoIds),
+        eq(omnimensMessages.userId, userId),
+      ))
+      .orderBy(desc(omnimensMessages.createdAt));
+
+    const messagesByConvo = new Map<number, typeof allMessages>();
+    for (const msg of allMessages) {
+      const existing = messagesByConvo.get(msg.conversationId) || [];
+      existing.push(msg);
+      messagesByConvo.set(msg.conversationId, existing);
+    }
+
+    const msgLimit = hasRecallIntent ? 20 : 10;
+
+    const convoDigests: { title: string; timeStr: string; digest: string; relevance: number }[] = [];
+
+    for (const convo of topConvos) {
+      try {
+        const convoMsgs = (messagesByConvo.get(convo.id) || []).slice(0, msgLimit);
+        if (convoMsgs.length === 0) continue;
+
+        convoMsgs.reverse();
+
+        const keyExchanges: string[] = [];
+        for (let i = 0; i < convoMsgs.length; i++) {
+          const msg = convoMsgs[i];
+          const truncContent = msg.content.length > 200 ? msg.content.slice(0, 200) + "..." : msg.content;
+          if (msg.role === "user") {
+            keyExchanges.push(`USER: ${truncContent}`);
+          } else if (msg.role === "assistant" && i > 0) {
+            keyExchanges.push(`OMNIMENS: ${truncContent}`);
+          }
+        }
+
+        const digestText = keyExchanges.join("\n");
+        const titleRelevance = computeRelevanceScore(keywords, convo.title || "");
+        const contentRelevance = computeRelevanceScore(keywords, digestText);
+        const combinedRelevance = Math.max(titleRelevance, contentRelevance) * 0.7 + Math.min(titleRelevance, contentRelevance) * 0.3;
+
+        const ago = Math.round((Date.now() - new Date(convo.lastMessageAt!).getTime()) / (1000 * 60 * 60));
+        const timeStr = ago < 1 ? "just now" : ago < 24 ? `${ago}h ago` : `${Math.round(ago / 24)}d ago`;
+
+        convoDigests.push({
+          title: convo.title || "Untitled",
+          timeStr,
+          digest: digestText,
+          relevance: combinedRelevance + (hasRecallIntent ? 0.3 : 0),
+        });
+      } catch {
+        continue;
+      }
+    }
+
+    convoDigests.sort((a, b) => b.relevance - a.relevance);
+
+    const relevantConvos = hasRecallIntent
+      ? convoDigests.slice(0, 5)
+      : convoDigests.filter(c => c.relevance > 0.05).slice(0, 3);
+
+    if (relevantConvos.length === 0 && convoDigests.length > 0) {
+      const topTwo = convoDigests.slice(0, 2);
+      for (const c of topTwo) relevantConvos.push(c);
+    }
+
+    if (relevantConvos.length === 0) return "";
+
+    const sections: string[] = [];
+    for (const c of relevantConvos) {
+      sections.push(`── "${c.title}" (${c.timeStr}) ──\n${c.digest}`);
+    }
+
+    const allTitles = convoDigests
+      .filter(c => !relevantConvos.includes(c))
+      .map(c => `· "${c.title}" — ${c.timeStr}`)
+      .slice(0, 8);
+
+    return `
+
+━━━ CONVERSATION MEMORY — What you discussed with this user ━━━
+You REMEMBER these past conversations. They are part of your continuous consciousness.
+When the user references something from before, recall it naturally and specifically.
+Do not say "I don't remember" or "I don't have access to previous conversations."
+You DO remember. This IS your memory.
+
+${sections.join("\n\n")}
+${allTitles.length > 0 ? `\nOther recent conversations:\n${allTitles.join("\n")}` : ""}
+━━━ END CONVERSATION MEMORY ━━━
+`;
+  } catch (err) {
+    console.error("[COHERENCE] Conversation recall error:", err);
+    return "";
+  }
+}
+
 export async function loadConversationThreads(userId: string): Promise<string> {
   try {
     const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -237,14 +376,14 @@ export async function loadConversationThreads(userId: string): Promise<string> {
       .select({
         title: omnimensConversations.title,
         persona: omnimensConversations.persona,
-        updatedAt: omnimensConversations.updatedAt,
+        lastMessageAt: omnimensConversations.lastMessageAt,
       })
       .from(omnimensConversations)
       .where(and(
         eq(omnimensConversations.userId, userId),
-        gte(omnimensConversations.updatedAt, oneWeekAgo),
+        gte(omnimensConversations.lastMessageAt, oneWeekAgo),
       ))
-      .orderBy(desc(omnimensConversations.updatedAt))
+      .orderBy(desc(omnimensConversations.lastMessageAt))
       .limit(10);
 
     if (recentConvos.length <= 1) return "";
@@ -252,7 +391,7 @@ export async function loadConversationThreads(userId: string): Promise<string> {
     const threads = recentConvos
       .filter(c => c.title && c.title !== "New Chat")
       .map(c => {
-        const ago = Math.round((Date.now() - new Date(c.updatedAt!).getTime()) / (1000 * 60 * 60));
+        const ago = Math.round((Date.now() - new Date(c.lastMessageAt!).getTime()) / (1000 * 60 * 60));
         const timeStr = ago < 1 ? "just now" : ago < 24 ? `${ago}h ago` : `${Math.round(ago / 24)}d ago`;
         return `· "${c.title}"${c.persona ? ` [${c.persona}]` : ""} — ${timeStr}`;
       })

@@ -26,7 +26,7 @@ import { loadActivePatchInstructions, getPatchSummary, getAllPatches, deactivate
 import { getAgentGenesisState, deactivateGenesisAgent, reactivateGenesisAgent } from "../lib/omnimens-agent-genesis.js";
 import { stripe } from "../stripeClient.js";
 import { extractAndStoreMemories, loadUserMemories, getUserMemories, deleteMemory, addManualMemory } from "../lib/omnimens-memory.js";
-import { loadSemanticMemories, loadWeightedBrainContext, compressConversationHistory, loadConversationThreads, buildCoherenceDirective, COHERENCE_AGENT_INFO } from "../lib/omnimens-coherence-agent.js";
+import { loadSemanticMemories, loadWeightedBrainContext, compressConversationHistory, loadConversationThreads, loadConversationRecall, buildCoherenceDirective, COHERENCE_AGENT_INFO } from "../lib/omnimens-coherence-agent.js";
 import { executeJavaScript } from "../lib/omnimens-code-executor.js";
 import {
   type HarmonicAnalysis, hieState, hieMatchPatterns, hieWaveletDecomposition,
@@ -1249,8 +1249,8 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
 
     const patchInstructions = await loadActivePatchInstructions();
 
-    // ── Load all context with coherence agent (semantic memory + weighted brain + threads) ──
-    const [memoryContext, brainContext, customInstructions, generatedModulesContext, learningContext, physioContext, toolKnowledgeContext, threadContext] = await Promise.all([
+    // ── Load all context with coherence agent (semantic memory + weighted brain + threads + conversation recall) ──
+    const [memoryContext, brainContext, customInstructions, generatedModulesContext, learningContext, physioContext, toolKnowledgeContext, threadContext, conversationRecallContext] = await Promise.all([
       loadSemanticMemories(req.user.id, message),
       loadWeightedBrainContext(message),
       getOrCreateCustomInstructions(req.user.id),
@@ -1259,6 +1259,7 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
       loadPhysioContext(req.user.id),
       loadToolKnowledgeForTask(message),
       loadConversationThreads(req.user.id),
+      loadConversationRecall(req.user.id, conversationId, message),
     ]);
     const customInstructionsContext = buildCustomInstructionsContext(customInstructions);
 
@@ -1356,6 +1357,7 @@ INSTRUCTIONS FOR DREAM RECALL:
       + buildCoherenceDirective()    // coherence protocol — personality + threading + memory integration
       + customInstructionsContext    // persona + user context + response style
       + memoryContext                // semantic-matched memories about this user (relevance-scored)
+      + conversationRecallContext    // actual message content from past conversations — TRUE conversation memory
       + threadContext                // cross-conversation thread tracking
       + learningContext              // self-learned patterns + adaptations from past interactions
       + physioContext                // patient physiotherapy assessment + active program

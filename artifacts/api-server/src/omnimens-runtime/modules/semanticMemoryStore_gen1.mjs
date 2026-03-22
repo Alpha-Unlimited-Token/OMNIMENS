@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: semanticMemoryStore
- * Written: 2026-03-22T18:19:44.984Z
+ * Written: 2026-03-22T18:58:40.734Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,161 +16,125 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
+// semanticMemoryStore.js
+
 /**
  * @module semanticMemoryStore
- * @description A semantic memory store for storing and retrieving semantically similar data points using KD-tree and cosine similarity.
+ * @description Retains conversational memory by storing semantic embeddings of context in memory,
+ * periodically summarizing older context to compress and retain relevance.
  */
 
 /**
- * Generates a normalized vector (embedding) for a given input array.
- * @param {number[]} vector - An array of numbers representing the input vector.
- * @returns {number[]} A normalized vector.
+ * Generates a semantic embedding for a given text input using a simplified vectorization algorithm.
+ * @param {string} text - The input text to be embedded.
+ * @returns {number[]} - A fixed-length vector representing the semantic embedding of the text.
  */
-export function normalizeVector(vector) {
-  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
-  if (magnitude === 0) throw new Error("Cannot normalize a zero vector.");
-  return vector.map((val) => val / magnitude);
+export function generateEmbedding(text) {
+  const normalizedText = text.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim();
+  const words = normalizedText.split(" ");
+  const vectorLength = 128;
+  const embedding = new Array(vectorLength).fill(0);
+
+  for (const word of words) {
+    const hash = crypto.createHash("md5").update(word).digest("hex");
+    for (let i = 0; i < vectorLength; i++) {
+      embedding[i] += parseInt(hash[i % hash.length], 16);
+    }
+  }
+
+  const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
+  return embedding.map((val) => val / magnitude);
 }
 
 /**
- * Computes the cosine similarity between two vectors.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number} The cosine similarity between the two vectors.
+ * Calculates the cosine similarity between two semantic embeddings.
+ * @param {number[]} embeddingA - The first embedding vector.
+ * @param {number[]} embeddingB - The second embedding vector.
+ * @returns {number} - The cosine similarity score between the two embeddings.
  */
-export function cosineSimilarity(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error("Vectors must have the same dimensions.");
+export function calculateSimilarity(embeddingA, embeddingB) {
+  if (embeddingA.length !== embeddingB.length) {
+    throw new Error("Embedding vectors must have the same length.");
   }
-  const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
-  if (magnitudeA === 0 || magnitudeB === 0) {
-    throw new Error("Cannot compute similarity with a zero vector.");
-  }
+
+  const dotProduct = embeddingA.reduce((sum, val, idx) => sum + val * embeddingB[idx], 0);
+  const magnitudeA = Math.sqrt(embeddingA.reduce((sum, val) => sum + val * val, 0));
+  const magnitudeB = Math.sqrt(embeddingB.reduce((sum, val) => sum + val * val, 0));
+
   return dotProduct / (magnitudeA * magnitudeB);
 }
 
 /**
- * A KD-tree node class for storing data points and their embeddings.
+ * Summarizes a list of text entries by selecting the most relevant based on semantic similarity.
+ * @param {string[]} texts - An array of text entries to summarize.
+ * @returns {string} - A summarized text combining the most relevant entries.
  */
-class KDTreeNode {
-  constructor(point, embedding, axis) {
-    this.point = point;
-    this.embedding = embedding;
-    this.axis = axis;
-    this.left = null;
-    this.right = null;
-  }
+export function summarizeContext(texts) {
+  if (texts.length === 0) return "";
+
+  const embeddings = texts.map(generateEmbedding);
+  const similarityMatrix = embeddings.map((embeddingA) =>
+    embeddings.map((embeddingB) => calculateSimilarity(embeddingA, embeddingB))
+  );
+
+  const relevanceScores = similarityMatrix.map((row) => row.reduce((sum, val) => sum + val, 0));
+  const mostRelevantIndex = relevanceScores.indexOf(Math.max(...relevanceScores));
+
+  return texts[mostRelevantIndex];
 }
 
 /**
- * KD-tree class for efficient nearest neighbor search.
- */
-export class KDTree {
-  /**
-   * Creates a KDTree instance.
-   * @param {{point: any, embedding: number[]}[]} data - Array of objects with `point` and `embedding` properties.
-   */
-  constructor(data) {
-    if (!Array.isArray(data) || data.length === 0) {
-      throw new Error("Data must be a non-empty array.");
-    }
-    this.root = this.buildTree(data, 0);
-  }
-
-  /**
-   * Builds the KD-tree recursively.
-   * @param {{point: any, embedding: number[]}[]} data - Data to build the tree.
-   * @param {number} depth - Current depth in the tree.
-   * @returns {KDTreeNode} Root node of the KD-tree.
-   */
-  buildTree(data, depth) {
-    if (data.length === 0) return null;
-
-    const axis = depth % data[0].embedding.length;
-    data.sort((a, b) => a.embedding[axis] - b.embedding[axis]);
-    const medianIndex = Math.floor(data.length / 2);
-
-    const node = new KDTreeNode(
-      data[medianIndex].point,
-      data[medianIndex].embedding,
-      axis
-    );
-
-    node.left = this.buildTree(data.slice(0, medianIndex), depth + 1);
-    node.right = this.buildTree(data.slice(medianIndex + 1), depth + 1);
-
-    return node;
-  }
-
-  /**
-   * Searches for the nearest neighbor to a given embedding.
-   * @param {number[]} targetEmbedding - The embedding to search for.
-   * @returns {any} The point with the nearest embedding.
-   */
-  nearestNeighbor(targetEmbedding) {
-    if (!Array.isArray(targetEmbedding)) {
-      throw new Error("Target embedding must be an array.");
-    }
-
-    let best = { node: null, distance: Infinity };
-
-    const search = (node, depth) => {
-      if (!node) return;
-
-      const axis = depth % targetEmbedding.length;
-      const distance = 1 - cosineSimilarity(targetEmbedding, node.embedding);
-
-      if (distance < best.distance) {
-        best = { node, distance };
-      }
-
-      const diff = targetEmbedding[axis] - node.embedding[axis];
-      const [near, far] = diff <= 0 ? [node.left, node.right] : [node.right, node.left];
-
-      search(near, depth + 1);
-      if (Math.abs(diff) < best.distance) {
-        search(far, depth + 1);
-      }
-    };
-
-    search(this.root, 0);
-    return best.node ? best.node.point : null;
-  }
-}
-
-/**
- * Stores and retrieves semantically similar data points.
+ * Stores and manages semantic memory in a simple in-memory database.
  */
 export class SemanticMemoryStore {
   constructor() {
-    this.data = [];
-    this.tree = null;
+    this.memory = [];
   }
 
   /**
-   * Adds a data point and its embedding to the memory store.
-   * @param {any} point - The data point to store.
-   * @param {number[]} embedding - The embedding representing the data point.
+   * Adds a new text entry to the memory store.
+   * @param {string} text - The text to add to the memory.
    */
-  add(point, embedding) {
-    if (!Array.isArray(embedding)) {
-      throw new Error("Embedding must be an array.");
-    }
-    this.data.push({ point, embedding: normalizeVector(embedding) });
-    this.tree = new KDTree(this.data);
+  addMemory(text) {
+    this.memory.push({ text, embedding: generateEmbedding(text) });
   }
 
   /**
-   * Retrieves the most semantically similar data point to the given embedding.
-   * @param {number[]} embedding - The embedding to search for.
-   * @returns {any} The most similar data point.
+   * Retrieves the most relevant memory entry based on a given query.
+   * @param {string} query - The query text to search for relevant memory.
+   * @returns {string} - The most relevant memory entry.
    */
-  retrieve(embedding) {
-    if (!this.tree) {
-      throw new Error("Memory store is empty.");
+  retrieveMemory(query) {
+    const queryEmbedding = generateEmbedding(query);
+    let bestMatch = null;
+    let bestScore = -Infinity;
+
+    for (const { text, embedding } of this.memory) {
+      const score = calculateSimilarity(queryEmbedding, embedding);
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = text;
+      }
     }
-    return this.tree.nearestNeighbor(normalizeVector(embedding));
+
+    return bestMatch || "No relevant memory found.";
+  }
+
+  /**
+   * Periodically summarizes older memory to compress and retain relevance.
+   */
+  summarizeMemory() {
+    const texts = this.memory.map((entry) => entry.text);
+    const summarizedText = summarizeContext(texts);
+    this.memory = [{ text: summarizedText, embedding: generateEmbedding(summarizedText) }];
   }
 }
+
+/**
+ * Example usage:
+ * const memoryStore = new SemanticMemoryStore();
+ * memoryStore.addMemory("Hello world!");
+ * memoryStore.addMemory("How are you?");
+ * console.log(memoryStore.retrieveMemory("Greetings"));
+ * memoryStore.summarizeMemory();
+ */
