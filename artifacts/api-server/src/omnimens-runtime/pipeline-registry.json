@@ -2326,14 +2326,12 @@
       "filename": "wasmMatrixOps_gen1.mjs",
       "stage": "vector_operations",
       "exports": [
-        "multiplyMatrices",
-        "transposeMatrix",
-        "determinant",
-        "identityMatrix",
+        "initializeWasmMatrixOps",
         "addMatrices",
-        "subtractMatrices"
+        "multiplyMatrices",
+        "validateMatrixDimensions"
       ],
-      "loadedAt": 1774196007301,
+      "loadedAt": 1774196377928,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -4309,9 +4307,22 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": false
+    },
+    "redisMemoryCache_gen1.mjs": {
+      "filename": "redisMemoryCache_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "createRedisMemoryCache"
+      ],
+      "loadedAt": 1774196382108,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774196007306,
-  "totalModules": 272,
+  "totalModules": 274,
   "totalCalls": 0
 }
