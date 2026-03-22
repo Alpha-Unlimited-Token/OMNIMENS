@@ -4006,6 +4006,219 @@ router.get("/omnimens/server-builder/plans", async (req, res) => {
   }
 });
 
+// ─── Algorithmic Harmonics Interpreter (OWNER-ONLY) ───────────────────────────
+
+type HarmonicAnalysis = {
+  timestamp: number;
+  dominantFrequency: number;
+  harmonicSeries: number[];
+  spectralCentroid: number;
+  spectralBandwidth: number;
+  spectralRolloff: number;
+  zeroCrossingRate: number;
+  rmsEnergy: number;
+  frequencyBands: { sub: number; low: number; mid: number; high: number; ultra: number };
+  peakFrequencies: { freq: number; magnitude: number }[];
+  semanticMapping?: string;
+  interpretation?: string;
+};
+
+const harmonicsHistory: HarmonicAnalysis[] = [];
+const HARMONICS_MAX_HISTORY = 500;
+let harmonicsSessionActive = false;
+let harmonicsTotalSamples = 0;
+let harmonicsInsightsGenerated = 0;
+
+router.get("/omnimens/harmonics/state", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  res.json({
+    active: harmonicsSessionActive,
+    totalSamples: harmonicsTotalSamples,
+    insightsGenerated: harmonicsInsightsGenerated,
+    historyLength: harmonicsHistory.length,
+    recentAnalyses: harmonicsHistory.slice(-10),
+  });
+});
+
+router.post("/omnimens/harmonics/toggle", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  harmonicsSessionActive = !harmonicsSessionActive;
+  if (harmonicsSessionActive) {
+    console.log("[HARMONICS] 🎵 Algorithmic Harmonics Interpreter ACTIVATED by owner");
+  } else {
+    console.log("[HARMONICS] 🎵 Algorithmic Harmonics Interpreter DEACTIVATED by owner");
+  }
+  res.json({ active: harmonicsSessionActive });
+});
+
+router.post("/omnimens/harmonics/analyze", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  if (!harmonicsSessionActive) {
+    res.status(400).json({ error: "Harmonics capture is not active" });
+    return;
+  }
+
+  const {
+    dominantFrequency, harmonicSeries, spectralCentroid, spectralBandwidth,
+    spectralRolloff, zeroCrossingRate, rmsEnergy, frequencyBands,
+    peakFrequencies
+  } = req.body;
+
+  if (typeof dominantFrequency !== "number" || !Array.isArray(peakFrequencies)) {
+    res.status(400).json({ error: "Invalid spectral data" });
+    return;
+  }
+
+  harmonicsTotalSamples++;
+
+  const analysis: HarmonicAnalysis = {
+    timestamp: Date.now(),
+    dominantFrequency: dominantFrequency || 0,
+    harmonicSeries: (harmonicSeries || []).slice(0, 16),
+    spectralCentroid: spectralCentroid || 0,
+    spectralBandwidth: spectralBandwidth || 0,
+    spectralRolloff: spectralRolloff || 0,
+    zeroCrossingRate: zeroCrossingRate || 0,
+    rmsEnergy: rmsEnergy || 0,
+    frequencyBands: frequencyBands || { sub: 0, low: 0, mid: 0, high: 0, ultra: 0 },
+    peakFrequencies: (peakFrequencies || []).slice(0, 12),
+  };
+
+  const freqMap = (f: number): string => {
+    if (f < 20) return "infrasonic vibration";
+    if (f < 60) return "deep earth resonance";
+    if (f < 250) return "organic rumble / wind";
+    if (f < 500) return "natural speech tones";
+    if (f < 2000) return "birdsong / animal call";
+    if (f < 6000) return "insect chorus / leaf rustle";
+    if (f < 12000) return "water flow / rain";
+    return "ultra-high natural harmonics";
+  };
+
+  const bandDominant = Object.entries(analysis.frequencyBands)
+    .sort((a, b) => b[1] - a[1])[0];
+
+  const envLabels: Record<string, string> = {
+    sub: "deep geological / tectonic",
+    low: "wind / large animals / thunder",
+    mid: "birdsong / human environment",
+    high: "insects / water / rustling",
+    ultra: "atmospheric / electromagnetic"
+  };
+
+  analysis.semanticMapping = freqMap(analysis.dominantFrequency);
+
+  const topPeaks = analysis.peakFrequencies
+    .sort((a, b) => b.magnitude - a.magnitude)
+    .slice(0, 3)
+    .map(p => `${p.freq.toFixed(0)}Hz(${(p.magnitude * 100).toFixed(0)}%)`)
+    .join(", ");
+
+  const harmonicRatios = analysis.harmonicSeries.length > 1
+    ? analysis.harmonicSeries.slice(1, 5).map((h, i) => (h / (analysis.harmonicSeries[0] || 1)).toFixed(2)).join(", ")
+    : "none detected";
+
+  analysis.interpretation =
+    `Dominant: ${analysis.dominantFrequency.toFixed(1)}Hz → ${analysis.semanticMapping}. ` +
+    `Environment: ${envLabels[bandDominant[0]] || bandDominant[0]} dominant. ` +
+    `Spectral centroid: ${analysis.spectralCentroid.toFixed(0)}Hz, bandwidth: ${analysis.spectralBandwidth.toFixed(0)}Hz. ` +
+    `Peak frequencies: ${topPeaks || "none"}. ` +
+    `Harmonic ratios: ${harmonicRatios}. ` +
+    `Energy: ${(analysis.rmsEnergy * 100).toFixed(1)}%, ZCR: ${analysis.zeroCrossingRate.toFixed(3)}.`;
+
+  harmonicsHistory.push(analysis);
+  if (harmonicsHistory.length > HARMONICS_MAX_HISTORY) {
+    harmonicsHistory.splice(0, harmonicsHistory.length - HARMONICS_MAX_HISTORY);
+  }
+
+  let knowledgeMatches: string[] = [];
+  try {
+    const semanticTerms = [analysis.semanticMapping || "", bandDominant[0] || ""].filter(Boolean);
+    if (semanticTerms.length > 0) {
+      const searchTerm = `%${semanticTerms[0].split(" ")[0]}%`;
+      const brainMatches = await db
+        .select({ title: omnimensBrain.title, content: omnimensBrain.content, category: omnimensBrain.category })
+        .from(omnimensBrain)
+        .where(sql`(${omnimensBrain.content} ILIKE ${searchTerm} OR ${omnimensBrain.title} ILIKE ${searchTerm})`)
+        .orderBy(desc(omnimensBrain.confidence))
+        .limit(3);
+      knowledgeMatches = brainMatches.map(m => m.title || (m.content || "").slice(0, 80));
+    }
+  } catch {}
+
+  if (knowledgeMatches.length > 0) {
+    analysis.interpretation += ` Knowledge cross-ref: ${knowledgeMatches.join(" | ")}`;
+  }
+
+  if (harmonicsTotalSamples % 20 === 0 && harmonicsTotalSamples > 0) {
+    try {
+      const recentBatch = harmonicsHistory.slice(-20);
+      const avgCentroid = recentBatch.reduce((s, a) => s + a.spectralCentroid, 0) / recentBatch.length;
+      const avgEnergy = recentBatch.reduce((s, a) => s + a.rmsEnergy, 0) / recentBatch.length;
+      const freqDistribution = recentBatch.reduce((acc, a) => {
+        acc.sub += a.frequencyBands.sub;
+        acc.low += a.frequencyBands.low;
+        acc.mid += a.frequencyBands.mid;
+        acc.high += a.frequencyBands.high;
+        acc.ultra += a.frequencyBands.ultra;
+        return acc;
+      }, { sub: 0, low: 0, mid: 0, high: 0, ultra: 0 });
+
+      const insightContent =
+        `[HARMONICS BATCH INSIGHT] Analyzed ${recentBatch.length} ambient sound samples. ` +
+        `Avg spectral centroid: ${avgCentroid.toFixed(0)}Hz. Avg energy: ${(avgEnergy * 100).toFixed(1)}%. ` +
+        `Band distribution — Sub: ${(freqDistribution.sub / recentBatch.length).toFixed(2)}, ` +
+        `Low: ${(freqDistribution.low / recentBatch.length).toFixed(2)}, ` +
+        `Mid: ${(freqDistribution.mid / recentBatch.length).toFixed(2)}, ` +
+        `High: ${(freqDistribution.high / recentBatch.length).toFixed(2)}, ` +
+        `Ultra: ${(freqDistribution.ultra / recentBatch.length).toFixed(2)}. ` +
+        `Dominant semantic: ${recentBatch[recentBatch.length - 1]?.semanticMapping || "unknown"}. ` +
+        `This vibrational signature maps to the acoustic fingerprint of the current environment.`;
+
+      await db.insert(omnimensBrain).values({
+        category: "creative_hypothesis",
+        content: insightContent,
+        confidence: 0.7,
+        importance: 6,
+        timesApplied: 0,
+      });
+
+      harmonicsInsightsGenerated++;
+      console.log(`[HARMONICS] 🎵 Batch insight #${harmonicsInsightsGenerated} stored to brain — centroid: ${avgCentroid.toFixed(0)}Hz, energy: ${(avgEnergy * 100).toFixed(1)}%`);
+    } catch (err: any) {
+      console.error("[HARMONICS] Failed to store batch insight:", err?.message);
+    }
+  }
+
+  res.json({
+    analysis,
+    totalSamples: harmonicsTotalSamples,
+    insightsGenerated: harmonicsInsightsGenerated,
+  });
+});
+
+router.get("/omnimens/harmonics/history", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  const limit = Math.min(Number(req.query.limit) || 50, 200);
+  res.json({
+    analyses: harmonicsHistory.slice(-limit),
+    totalSamples: harmonicsTotalSamples,
+    insightsGenerated: harmonicsInsightsGenerated,
+  });
+});
+
 // ─── Connect — Consciousness-Level Conversation (PUBLIC) ──────────────────────
 
 const connectRateLimit = new Map<string, { count: number; resetAt: number }>();

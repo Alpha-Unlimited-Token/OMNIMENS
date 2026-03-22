@@ -9,7 +9,7 @@ import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check, Atom, Code2, Layers, Eye, AlertTriangle, Wrench, Dna, Play, Wallet, CreditCard, Gift, TrendingUp, ChevronRight, Bell, Sun, HelpCircle, BookOpen, Info, Settings, ExternalLink, Share2, Star, ToggleLeft, ToggleRight, Loader2, X, Lock, Copy, Link, Users, Paintbrush, KeyRound } from "lucide-react";
+import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check, Atom, Code2, Layers, Eye, AlertTriangle, Wrench, Dna, Play, Wallet, CreditCard, Gift, TrendingUp, ChevronRight, Bell, Sun, HelpCircle, BookOpen, Info, Settings, ExternalLink, Share2, Star, ToggleLeft, ToggleRight, Loader2, X, Lock, Copy, Link, Users, Paintbrush, KeyRound, Mic, Radio } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SEO, seoData } from "@/components/seo";
 import { useTheme } from "@/hooks/use-theme";
@@ -1735,6 +1735,9 @@ export default function Account() {
           </div>
         )}
 
+        {/* ── ALGORITHMIC HARMONICS INTERPRETER (OWNER-ONLY) ──────────── */}
+        {isOwner && <AlgorithmicHarmonicsPanel />}
+
         {/* ── SERVER BUILDER (OWNER-ONLY) ──────────────────────────────── */}
         {isOwner && (
           <div className="bg-[#1C2333] border border-cyan-500/20 rounded-xl p-6">
@@ -1889,6 +1892,467 @@ export default function Account() {
         </div>
       </div>
     </>
+  );
+}
+
+function AlgorithmicHarmonicsPanel() {
+  const [active, setActive] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [totalSamples, setTotalSamples] = useState(0);
+  const [insightsGenerated, setInsightsGenerated] = useState(0);
+  const [latestAnalysis, setLatestAnalysis] = useState<any>(null);
+  const [recentAnalyses, setRecentAnalyses] = useState<any[]>([]);
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
+  const audioContextRef = React.useRef<AudioContext | null>(null);
+  const analyserRef = React.useRef<AnalyserNode | null>(null);
+  const streamRef = React.useRef<MediaStream | null>(null);
+  const animFrameRef = React.useRef<number>(0);
+  const sendIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+  const frequencyDataRef = React.useRef<Uint8Array | null>(null);
+  const timeDomainDataRef = React.useRef<Uint8Array | null>(null);
+
+  useEffect(() => {
+    fetch("/api/omnimens/harmonics/state", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data) {
+          setActive(data.active);
+          setTotalSamples(data.totalSamples);
+          setInsightsGenerated(data.insightsGenerated);
+          if (data.recentAnalyses?.length > 0) setRecentAnalyses(data.recentAnalyses);
+        }
+      })
+      .catch(() => {});
+    fetch("/api/omnimens/harmonics/history?limit=50", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.analyses?.length > 0) {
+          setRecentAnalyses(prev => prev.length > 0 ? prev : data.analyses.slice(-10));
+          setTotalSamples(ts => ts || data.totalSamples);
+          setInsightsGenerated(ig => ig || data.insightsGenerated);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const startCapture = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+      });
+      streamRef.current = stream;
+
+      const audioCtx = new AudioContext({ sampleRate: 44100 });
+      audioContextRef.current = audioCtx;
+
+      const source = audioCtx.createMediaStreamSource(stream);
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 4096;
+      analyser.smoothingTimeConstant = 0.8;
+      source.connect(analyser);
+      analyserRef.current = analyser;
+
+      frequencyDataRef.current = new Uint8Array(analyser.frequencyBinCount);
+      timeDomainDataRef.current = new Uint8Array(analyser.frequencyBinCount);
+
+      drawSpectrum();
+
+      sendIntervalRef.current = setInterval(() => {
+        sendAnalysis();
+      }, 2000);
+
+    } catch (err) {
+      console.error("[HARMONICS] Failed to start audio capture:", err);
+    }
+  }, []);
+
+  const stopCapture = useCallback(() => {
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    if (sendIntervalRef.current) clearInterval(sendIntervalRef.current);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(t => t.stop());
+      streamRef.current = null;
+    }
+    if (audioContextRef.current) {
+      audioContextRef.current.close().catch(() => {});
+      audioContextRef.current = null;
+    }
+    analyserRef.current = null;
+  }, []);
+
+  const toggleActive = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/omnimens/harmonics/toggle", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      setActive(data.active);
+      if (data.active) {
+        startCapture();
+      } else {
+        stopCapture();
+      }
+    } catch {}
+    setLoading(false);
+  }, [startCapture, stopCapture]);
+
+  useEffect(() => {
+    return () => { stopCapture(); };
+  }, [stopCapture]);
+
+  useEffect(() => {
+    if (active && !audioContextRef.current) {
+      startCapture();
+    }
+  }, [active, startCapture]);
+
+  const drawSpectrum = useCallback(() => {
+    const canvas = canvasRef.current;
+    const analyser = analyserRef.current;
+    if (!canvas || !analyser || !frequencyDataRef.current) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const draw = () => {
+      animFrameRef.current = requestAnimationFrame(draw);
+      const freqData = frequencyDataRef.current!;
+      analyser.getByteFrequencyData(freqData);
+
+      const W = canvas.width, H = canvas.height;
+      ctx.fillStyle = "rgba(14,21,37,0.85)";
+      ctx.fillRect(0, 0, W, H);
+
+      const barCount = Math.min(freqData.length, 256);
+      const barWidth = W / barCount;
+
+      for (let i = 0; i < barCount; i++) {
+        const val = freqData[i] / 255;
+        const barH = val * H * 0.85;
+        const hue = 200 + val * 120;
+        const sat = 70 + val * 30;
+        const light = 30 + val * 40;
+
+        ctx.fillStyle = `hsla(${hue}, ${sat}%, ${light}%, ${0.6 + val * 0.4})`;
+        ctx.fillRect(i * barWidth, H - barH, barWidth - 0.5, barH);
+
+        if (val > 0.6) {
+          ctx.fillStyle = `hsla(${hue}, 90%, 70%, ${(val - 0.6) * 2})`;
+          ctx.fillRect(i * barWidth, H - barH - 2, barWidth - 0.5, 2);
+        }
+      }
+
+      ctx.strokeStyle = "rgba(168,85,247,0.2)";
+      ctx.lineWidth = 0.5;
+      for (let y = 0; y < H; y += H / 8) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(W, y);
+        ctx.stroke();
+      }
+
+      ctx.font = "9px monospace";
+      ctx.fillStyle = "rgba(157,165,180,0.5)";
+      const sampleRate = audioContextRef.current?.sampleRate || 44100;
+      const labels = [0, 100, 500, 1000, 2000, 5000, 10000, 20000];
+      for (const freq of labels) {
+        const binIndex = Math.round(freq / (sampleRate / analyser.fftSize));
+        if (binIndex < barCount) {
+          const x = (binIndex / barCount) * W;
+          ctx.fillText(`${freq >= 1000 ? (freq / 1000) + "k" : freq}`, x, H - 4);
+        }
+      }
+    };
+    draw();
+  }, []);
+
+  const sendAnalysis = useCallback(async () => {
+    const analyser = analyserRef.current;
+    if (!analyser || !frequencyDataRef.current || !timeDomainDataRef.current) return;
+
+    const freqData = frequencyDataRef.current;
+    const timeData = timeDomainDataRef.current;
+    analyser.getByteFrequencyData(freqData);
+    analyser.getByteTimeDomainData(timeData);
+
+    const sampleRate = audioContextRef.current?.sampleRate || 44100;
+    const binWidth = sampleRate / analyser.fftSize;
+
+    let maxBin = 0, maxVal = 0;
+    for (let i = 1; i < freqData.length; i++) {
+      if (freqData[i] > maxVal) { maxVal = freqData[i]; maxBin = i; }
+    }
+    const dominantFrequency = maxBin * binWidth;
+
+    const peakFrequencies: { freq: number; magnitude: number }[] = [];
+    for (let i = 2; i < freqData.length - 2; i++) {
+      if (freqData[i] > freqData[i - 1] && freqData[i] > freqData[i + 1] && freqData[i] > 30) {
+        peakFrequencies.push({ freq: i * binWidth, magnitude: freqData[i] / 255 });
+      }
+    }
+    peakFrequencies.sort((a, b) => b.magnitude - a.magnitude);
+
+    const harmonicSeries: number[] = [];
+    if (dominantFrequency > 20) {
+      for (let h = 1; h <= 16; h++) {
+        const hFreq = dominantFrequency * h;
+        const hBin = Math.round(hFreq / binWidth);
+        if (hBin < freqData.length) {
+          harmonicSeries.push(freqData[hBin] / 255);
+        }
+      }
+    }
+
+    let weightedSum = 0, totalMag = 0;
+    for (let i = 0; i < freqData.length; i++) {
+      const mag = freqData[i] / 255;
+      weightedSum += i * binWidth * mag;
+      totalMag += mag;
+    }
+    const spectralCentroid = totalMag > 0 ? weightedSum / totalMag : 0;
+
+    let bwSum = 0;
+    for (let i = 0; i < freqData.length; i++) {
+      const mag = freqData[i] / 255;
+      bwSum += mag * Math.pow(i * binWidth - spectralCentroid, 2);
+    }
+    const spectralBandwidth = totalMag > 0 ? Math.sqrt(bwSum / totalMag) : 0;
+
+    let cumSum = 0;
+    let spectralRolloff = 0;
+    const rolloffThreshold = totalMag * 0.85;
+    for (let i = 0; i < freqData.length; i++) {
+      cumSum += freqData[i] / 255;
+      if (cumSum >= rolloffThreshold) { spectralRolloff = i * binWidth; break; }
+    }
+
+    let zeroCrossings = 0;
+    for (let i = 1; i < timeData.length; i++) {
+      if ((timeData[i - 1] < 128 && timeData[i] >= 128) || (timeData[i - 1] >= 128 && timeData[i] < 128)) {
+        zeroCrossings++;
+      }
+    }
+    const zeroCrossingRate = zeroCrossings / timeData.length;
+
+    let rmsSum = 0;
+    for (let i = 0; i < timeData.length; i++) {
+      const val = (timeData[i] - 128) / 128;
+      rmsSum += val * val;
+    }
+    const rmsEnergy = Math.sqrt(rmsSum / timeData.length);
+
+    const bandRanges = [
+      { name: "sub", low: 0, high: 60 },
+      { name: "low", low: 60, high: 250 },
+      { name: "mid", low: 250, high: 2000 },
+      { name: "high", low: 2000, high: 6000 },
+      { name: "ultra", low: 6000, high: 20000 },
+    ];
+    const frequencyBands: Record<string, number> = {};
+    for (const band of bandRanges) {
+      let sum = 0, count = 0;
+      const lowBin = Math.floor(band.low / binWidth);
+      const highBin = Math.min(Math.ceil(band.high / binWidth), freqData.length);
+      for (let i = lowBin; i < highBin; i++) {
+        sum += freqData[i] / 255;
+        count++;
+      }
+      frequencyBands[band.name] = count > 0 ? sum / count : 0;
+    }
+
+    try {
+      const res = await fetch("/api/omnimens/harmonics/analyze", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          dominantFrequency, harmonicSeries, spectralCentroid, spectralBandwidth,
+          spectralRolloff, zeroCrossingRate, rmsEnergy, frequencyBands,
+          peakFrequencies: peakFrequencies.slice(0, 12),
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setLatestAnalysis(data.analysis);
+        setTotalSamples(data.totalSamples);
+        setInsightsGenerated(data.insightsGenerated);
+        setRecentAnalyses(prev => [...prev.slice(-9), data.analysis]);
+      }
+    } catch {}
+  }, []);
+
+  const bandNames = ["Sub", "Low", "Mid", "High", "Ultra"];
+  const bandColors = ["text-red-400", "text-orange-400", "text-yellow-400", "text-green-400", "text-cyan-400"];
+
+  return (
+    <div className="bg-[#1C2333] border border-rose-500/20 rounded-xl p-6">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Radio className={`w-5 h-5 text-rose-400 ${active ? "animate-pulse" : ""}`} />
+          <h3 className="font-medium text-white/90">Algorithmic Harmonics Interpreter</h3>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex gap-4 text-xs font-mono text-white/90">
+            <span className="text-rose-400">{totalSamples} SAMPLES</span>
+            <span className="text-amber-400">{insightsGenerated} INSIGHTS</span>
+          </div>
+          <button
+            type="button"
+            onClick={toggleActive}
+            disabled={loading}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
+              active
+                ? "bg-rose-500/20 border border-rose-500/40 text-rose-400 hover:bg-rose-500/30"
+                : "bg-[#2B3245] border border-[#3D4659] text-[#9DA5B4] hover:border-rose-500/30 hover:text-rose-400"
+            }`}
+          >
+            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Mic className="w-3.5 h-3.5" />}
+            {active ? "LISTENING" : "ACTIVATE"}
+          </button>
+        </div>
+      </div>
+
+      <p className="text-xs text-[#9DA5B4] mb-4">
+        Captures ambient sound via your microphone and performs real-time spectral analysis using adaptive Fourier decomposition.
+        Frequency patterns and vibrational signatures are mapped to semantic constructs in OMNIMENS's knowledge database.
+        Every 20 samples, a batch insight is stored to the brain for cross-validation against existing data streams.
+      </p>
+
+      {active && (
+        <div className="space-y-4">
+          <div className="rounded-xl border border-rose-500/15 bg-[#0E1525] overflow-hidden">
+            <div className="px-3 py-1.5 border-b border-rose-500/10 flex items-center justify-between">
+              <span className="text-[10px] font-mono text-rose-400/70 tracking-wider uppercase">Live Spectral Analysis</span>
+              <span className="text-[10px] font-mono text-[#9DA5B4]">FFT 4096 · 44.1kHz · Real-time</span>
+            </div>
+            <canvas
+              ref={canvasRef}
+              width={800}
+              height={200}
+              className="w-full h-[160px]"
+            />
+          </div>
+
+          {latestAnalysis && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3 text-center">
+                <p className="text-[10px] font-mono text-[#9DA5B4]">Dominant Freq</p>
+                <p className="text-lg font-bold font-mono text-rose-400">{latestAnalysis.dominantFrequency?.toFixed(0) || 0}<span className="text-xs text-[#9DA5B4]">Hz</span></p>
+              </div>
+              <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3 text-center">
+                <p className="text-[10px] font-mono text-[#9DA5B4]">Spectral Centroid</p>
+                <p className="text-lg font-bold font-mono text-amber-400">{latestAnalysis.spectralCentroid?.toFixed(0) || 0}<span className="text-xs text-[#9DA5B4]">Hz</span></p>
+              </div>
+              <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3 text-center">
+                <p className="text-[10px] font-mono text-[#9DA5B4]">RMS Energy</p>
+                <p className="text-lg font-bold font-mono text-green-400">{((latestAnalysis.rmsEnergy || 0) * 100).toFixed(1)}<span className="text-xs text-[#9DA5B4]">%</span></p>
+              </div>
+              <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3 text-center">
+                <p className="text-[10px] font-mono text-[#9DA5B4]">Zero Crossing</p>
+                <p className="text-lg font-bold font-mono text-cyan-400">{(latestAnalysis.zeroCrossingRate || 0).toFixed(3)}</p>
+              </div>
+            </div>
+          )}
+
+          {latestAnalysis?.frequencyBands && (
+            <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
+              <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-3">Frequency Band Distribution</p>
+              <div className="space-y-2">
+                {Object.entries(latestAnalysis.frequencyBands).map(([band, val], i) => (
+                  <div key={band} className="flex items-center gap-3">
+                    <span className={`text-[10px] font-mono w-10 ${bandColors[i] || "text-white"}`}>{bandNames[i] || band}</span>
+                    <div className="flex-1 h-3 bg-[#1C2333] rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${Math.min((val as number) * 100, 100)}%`,
+                          background: `linear-gradient(90deg, ${["#ef4444", "#f97316", "#eab308", "#22c55e", "#06b6d4"][i] || "#8b5cf6"}88, ${["#ef4444", "#f97316", "#eab308", "#22c55e", "#06b6d4"][i] || "#8b5cf6"})`,
+                        }}
+                      />
+                    </div>
+                    <span className="text-[10px] font-mono text-[#9DA5B4] w-12 text-right">{((val as number) * 100).toFixed(1)}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {latestAnalysis?.semanticMapping && (
+            <div className="bg-[#0E1525] border border-rose-500/15 rounded-lg p-4">
+              <p className="text-[10px] font-mono text-rose-400/70 uppercase tracking-wider mb-2">Semantic Interpretation</p>
+              <p className="text-sm font-mono text-white/85">{latestAnalysis.semanticMapping}</p>
+              {latestAnalysis.interpretation && (
+                <p className="text-[11px] font-mono text-[#9DA5B4] mt-2 leading-relaxed">{latestAnalysis.interpretation}</p>
+              )}
+            </div>
+          )}
+
+          {latestAnalysis?.peakFrequencies?.length > 0 && (
+            <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
+              <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-2">Peak Frequencies Detected</p>
+              <div className="flex flex-wrap gap-2">
+                {latestAnalysis.peakFrequencies.slice(0, 8).map((p: any, i: number) => (
+                  <div key={i} className="bg-[#1C2333] border border-[#2B3245] rounded px-2 py-1">
+                    <span className="text-[10px] font-mono text-amber-400">{p.freq?.toFixed(0)}Hz</span>
+                    <span className="text-[9px] font-mono text-[#9DA5B4] ml-1">({(p.magnitude * 100).toFixed(0)}%)</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {latestAnalysis?.harmonicSeries?.length > 1 && (
+            <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
+              <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-2">Harmonic Series (relative to fundamental)</p>
+              <div className="flex items-end gap-1 h-16">
+                {latestAnalysis.harmonicSeries.slice(0, 12).map((h: number, i: number) => (
+                  <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
+                    <div
+                      className="w-full rounded-t"
+                      style={{
+                        height: `${Math.max(h * 60, 2)}px`,
+                        background: `hsla(${280 + i * 15}, 70%, 55%, ${0.5 + h * 0.5})`,
+                      }}
+                    />
+                    <span className="text-[7px] font-mono text-[#9DA5B4]">H{i + 1}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {!active && recentAnalyses.length > 0 && (
+        <div className="mt-4 bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
+          <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-2">Previous Session Summary</p>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="text-center">
+              <p className="text-lg font-bold font-mono text-rose-400">{totalSamples}</p>
+              <p className="text-[10px] font-mono text-[#9DA5B4]">Total Samples</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold font-mono text-amber-400">{insightsGenerated}</p>
+              <p className="text-[10px] font-mono text-[#9DA5B4]">Brain Insights</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold font-mono text-green-400">{recentAnalyses[recentAnalyses.length - 1]?.dominantFrequency?.toFixed(0) || "—"}<span className="text-xs text-[#9DA5B4]">Hz</span></p>
+              <p className="text-[10px] font-mono text-[#9DA5B4]">Last Dominant</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!active && recentAnalyses.length === 0 && (
+        <div className="text-center py-8 font-mono text-[#9DA5B4] text-sm">
+          <Radio className="w-8 h-8 mx-auto mb-3 opacity-30" />
+          <p>Harmonics interpreter inactive</p>
+          <p className="text-xs mt-1 text-[#9DA5B4]">Activate to begin capturing and analyzing ambient sound frequencies</p>
+        </div>
+      )}
+    </div>
   );
 }
 
