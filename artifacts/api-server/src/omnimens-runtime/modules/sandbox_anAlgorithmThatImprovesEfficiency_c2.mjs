@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-22T19:36:13.401Z
+ * Written: 2026-03-22T19:58:48.773Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,82 +16,86 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function createKnowledgeGraph() {
-    const graph = new Map();
+// Algorithm to improve efficiency of knowledge retrieval using a Trie (Prefix Tree) structure
+function TrieNode() {
+  this.children = {};
+  this.isEndOfWord = false;
+}
 
-    function addConcept(concept, relatedConcepts = []) {
-        if (!graph.has(concept)) {
-            graph.set(concept, new Set());
-        }
-        relatedConcepts.forEach((related) => {
-            if (!graph.has(related)) {
-                graph.set(related, new Set());
-            }
-            graph.get(concept).add(related);
-            graph.get(related).add(concept);
-        });
+function Trie() {
+  this.root = new TrieNode();
+
+  // Insert a word into the Trie
+  this.insert = function (word) {
+    let node = this.root;
+    for (let char of word) {
+      if (!node.children[char]) {
+        node.children[char] = new TrieNode();
+      }
+      node = node.children[char];
     }
+    node.isEndOfWord = true;
+  };
 
-    function retrieveRelatedConcepts(concept, depth = 1) {
-        if (!graph.has(concept)) return [];
-        const visited = new Set();
-        const queue = [[concept, 0]];
-        const results = new Set();
-
-        while (queue.length > 0) {
-            const [current, currentDepth] = queue.shift();
-            if (currentDepth > depth) continue;
-            if (!visited.has(current)) {
-                visited.add(current);
-                if (currentDepth > 0) results.add(current);
-                graph.get(current).forEach((neighbor) => {
-                    queue.push([neighbor, currentDepth + 1]);
-                });
-            }
-        }
-        return Array.from(results);
+  // Search for a word in the Trie
+  this.search = function (word) {
+    let node = this.root;
+    for (let char of word) {
+      if (!node.children[char]) {
+        return false;
+      }
+      node = node.children[char];
     }
+    return node.isEndOfWord;
+  };
 
-    function findShortestPath(conceptA, conceptB) {
-        if (!graph.has(conceptA) || !graph.has(conceptB)) return null;
-        const queue = [[conceptA, [conceptA]]];
-        const visited = new Set();
-
-        while (queue.length > 0) {
-            const [current, path] = queue.shift();
-            if (current === conceptB) return path;
-            if (!visited.has(current)) {
-                visited.add(current);
-                graph.get(current).forEach((neighbor) => {
-                    queue.push([neighbor, path.concat(neighbor)]);
-                });
-            }
-        }
-        return null;
+  // Retrieve all words with a given prefix
+  this.startsWith = function (prefix) {
+    let node = this.root;
+    for (let char of prefix) {
+      if (!node.children[char]) {
+        return [];
+      }
+      node = node.children[char];
     }
+    return this._collectWords(node, prefix);
+  };
 
-    return { addConcept, retrieveRelatedConcepts, findShortestPath };
+  // Helper function to collect words from a given node
+  this._collectWords = function (node, prefix) {
+    let results = [];
+    if (node.isEndOfWord) {
+      results.push(prefix);
+    }
+    for (let char in node.children) {
+      results = results.concat(this._collectWords(node.children[char], prefix + char));
+    }
+    return results;
+  };
 }
 
 // Self-tests
-const knowledgeGraph = createKnowledgeGraph();
+const trie = new Trie();
+trie.insert("knowledge");
+trie.insert("know");
+trie.insert("knock");
+trie.insert("knot");
+trie.insert("pattern");
+trie.insert("patience");
+trie.insert("path");
+trie.insert("patter");
 
-// Add concepts and relationships
-knowledgeGraph.addConcept("AI", ["Machine Learning", "Neural Networks"]);
-knowledgeGraph.addConcept("Machine Learning", ["Deep Learning", "Reinforcement Learning"]);
-knowledgeGraph.addConcept("Neural Networks", ["Deep Learning"]);
-knowledgeGraph.addConcept("Deep Learning", ["Convolutional Networks", "Recurrent Networks"]);
-knowledgeGraph.addConcept("Reinforcement Learning", ["Q-Learning", "Policy Gradient"]);
+// Test case 1: Search for existing words
+console.log(trie.search("knowledge")); // true
+console.log(trie.search("know")); // true
+console.log(trie.search("knock")); // true
+console.log(trie.search("unknown")); // false
 
-console.log("Test 1: Retrieve related concepts (depth=1)");
-console.log(knowledgeGraph.retrieveRelatedConcepts("Machine Learning", 1)); // Expect ["AI", "Deep Learning", "Reinforcement Learning"]
+// Test case 2: Retrieve words with a given prefix
+console.log(trie.startsWith("kn")); // ["knowledge", "know", "knock", "knot"]
+console.log(trie.startsWith("pat")); // ["pattern", "patience", "path", "patter"]
+console.log(trie.startsWith("z")); // []
 
-console.log("Test 2: Retrieve related concepts (depth=2)");
-console.log(knowledgeGraph.retrieveRelatedConcepts("AI", 2)); // Expect ["Deep Learning", "Reinforcement Learning", "Neural Networks"]
-
-console.log("Test 3: Find shortest path between concepts");
-console.log(knowledgeGraph.findShortestPath("AI", "Policy Gradient")); // Expect ["AI", "Machine Learning", "Reinforcement Learning", "Policy Gradient"]
-
-console.log("Test 4: Handle non-existent concepts");
-console.log(knowledgeGraph.retrieveRelatedConcepts("NonExistent", 1)); // Expect []
-console.log(knowledgeGraph.findShortestPath("AI", "NonExistent")); // Expect null
+// Test case 3: Edge cases
+console.log(trie.search("")); // false
+console.log(trie.startsWith("")); // ["knowledge", "know", "knock", "knot", "pattern", "patience", "path", "patter"]

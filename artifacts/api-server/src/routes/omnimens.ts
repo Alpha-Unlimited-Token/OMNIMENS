@@ -29,11 +29,11 @@ import { extractAndStoreMemories, loadUserMemories, getUserMemories, deleteMemor
 import { loadSemanticMemories, loadWeightedBrainContext, compressConversationHistory, loadConversationThreads, loadConversationRecall, buildCoherenceDirective, COHERENCE_AGENT_INFO } from "../lib/omnimens-coherence-agent.js";
 import { executeJavaScript } from "../lib/omnimens-code-executor.js";
 import {
-  type HarmonicAnalysis, hieState, hieMatchPatterns, hieWaveletDecomposition,
+  type HarmonicAnalysis, type HarmonicKnowledgeSignature, hieState, hieMatchPatterns, hieWaveletDecomposition,
   hieComputeNovelty, hieComputeSpectralFlux, hieComputeSpectralFlatness,
   hieComputeHarmonicComplexity, hieDetectTemporalPattern, hieEmotionalValence,
   hieUpdateNoiseFloor, hieLearnPattern, hieFreqToSemantic, hieEnvironmentLabel,
-  hieGetEngineStatus, raiAnalyzeAcoustics,
+  hieGetEngineStatus, raiAnalyzeAcoustics, hieDecodeHarmonicKnowledge,
 } from "../lib/omnimens-harmonic-insight-engine.js";
 import { deepResearch } from "../lib/omnimens-deep-research.js";
 import { generateContextualInquiry, runDeepResonance } from "../lib/omnimens-deep-resonance.js";
@@ -561,6 +561,8 @@ const AUDIO_MIMES = new Set([
 async function runAutoHIEAnalysis(audioFile: Express.Multer.File): Promise<{
   hieAnalysis: HarmonicAnalysis | null;
   librosaData: any;
+  knowledgeSignature: HarmonicKnowledgeSignature | null;
+  harmonicDecodeData: any;
   summary: string;
 }> {
   console.log(`[HIE AUTO] Running automatic harmonic analysis on uploaded audio: ${audioFile.originalname} (${audioFile.mimetype}, ${audioFile.size} bytes)`);
@@ -575,12 +577,12 @@ async function runAutoHIEAnalysis(audioFile: Express.Multer.File): Promise<{
     });
   } catch (err) {
     console.error("[HIE AUTO] Librosa analysis failed:", err);
-    return { hieAnalysis: null, librosaData: null, summary: "Audio analysis failed — could not process audio file." };
+    return { hieAnalysis: null, librosaData: null, knowledgeSignature: null, harmonicDecodeData: null, summary: "Audio analysis failed — could not process audio file." };
   }
 
   if (!librosaResult?.success) {
     console.error("[HIE AUTO] Librosa returned error:", librosaResult?.error);
-    return { hieAnalysis: null, librosaData: librosaResult, summary: `Audio analysis error: ${librosaResult?.error || "unknown"}` };
+    return { hieAnalysis: null, librosaData: librosaResult, knowledgeSignature: null, harmonicDecodeData: null, summary: `Audio analysis error: ${librosaResult?.error || "unknown"}` };
   }
 
   const analysis: HarmonicAnalysis = {
@@ -642,7 +644,26 @@ async function runAutoHIEAnalysis(audioFile: Express.Multer.File): Promise<{
     }
   } catch {}
 
-  const summary =
+  let harmonicDecodeResult: any = null;
+  let knowledgeSignature: HarmonicKnowledgeSignature | null = null;
+  try {
+    console.log(`[HIE AUTO] Running deep harmonic decode for knowledge extraction...`);
+    harmonicDecodeResult = await analyzeAudio({
+      action: "harmonic_decode",
+      file_b64: fileB64,
+      file_mime: audioFile.mimetype || "audio/wav",
+    });
+    if (harmonicDecodeResult?.success) {
+      knowledgeSignature = hieDecodeHarmonicKnowledge(analysis, harmonicDecodeResult);
+      console.log(`[HIE AUTO] Harmonic Knowledge Signature decoded — confidence: ${(knowledgeSignature.confidenceScore * 100).toFixed(1)}%, fundamental: ${knowledgeSignature.fundamentalIdentity.frequency.toFixed(1)}Hz, series: ${knowledgeSignature.overtoneLanguage.seriesType}`);
+    } else {
+      console.warn(`[HIE AUTO] Harmonic decode returned error:`, harmonicDecodeResult?.error);
+    }
+  } catch (err) {
+    console.warn(`[HIE AUTO] Harmonic decode failed (non-fatal):`, err);
+  }
+
+  let summary =
     `[HIE AUTOMATIC ANALYSIS — ${audioFile.originalname}]\n` +
     `Duration: ${librosaResult.duration_seconds}s | Sample Rate: ${librosaResult.sample_rate}Hz | Tempo: ${librosaResult.tempo_bpm} BPM | Key: ${librosaResult.estimated_key}\n` +
     `Dominant Frequency: ${analysis.dominantFrequency.toFixed(1)}Hz → ${analysis.semanticMapping}\n` +
@@ -664,12 +685,31 @@ async function runAutoHIEAnalysis(audioFile: Express.Multer.File): Promise<{
     (librosaResult.temporal_segments ? `Temporal Segments: ${librosaResult.temporal_segments.map((s: any) => `[${s.segment}: E=${(s.rms * 100).toFixed(1)}% C=${s.centroid.toFixed(0)}Hz]`).join(" ")}` : "") +
     (librosaResult.pitch_stats ? `\nPitch: mean=${librosaResult.pitch_stats.mean}Hz median=${librosaResult.pitch_stats.median}Hz range=${librosaResult.pitch_stats.min}-${librosaResult.pitch_stats.max}Hz` : "") +
     (librosaResult.chroma_profile ? `\nChroma Profile: ${Object.entries(librosaResult.chroma_profile).map(([k, v]) => `${k}=${(v as number).toFixed(2)}`).join(" ")}` : "") +
-    (knowledgeMatches.length > 0 ? `\nKnowledge Cross-Reference: ${knowledgeMatches.join(" | ")}` : "") +
-    `\n\nINSTRUCTION: Analyze the above harmonic data to find the algorithmic harmonics — patterns, hidden structures, knowledge embedded in the frequency relationships, harmonic ratios, and spectral signatures. Identify what information and meaning is encoded in these sound patterns.`;
+    (knowledgeMatches.length > 0 ? `\nKnowledge Cross-Reference: ${knowledgeMatches.join(" | ")}` : "");
 
-  console.log(`[HIE AUTO] Analysis complete — dominant: ${analysis.dominantFrequency.toFixed(1)}Hz, pattern: ${topPattern?.pattern || "unclassified"}, novelty: ${((analysis.noveltyScore || 0) * 100).toFixed(0)}%`);
+  if (knowledgeSignature) {
+    summary +=
+      `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `HARMONIC KNOWLEDGE DECODER — VIBRATIONAL LANGUAGE TRANSLATION\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `Decode Confidence: ${(knowledgeSignature.confidenceScore * 100).toFixed(1)}%\n\n` +
+      `KNOWLEDGE GLYPHS (symbolic descriptors):\n${knowledgeSignature.knowledgeGlyphs.map(g => `  ${g}`).join("\n")}\n\n` +
+      `DECODED HARMONIC MESSAGE:\n${knowledgeSignature.decodedMessage}\n\n` +
+      `OVERTONE MAP (pure harmonic isolation):\n${knowledgeSignature.overtoneLanguage.overtones.filter(o => o.strength > 0.01).slice(0, 12).map(o => `  H${o.harmonic}: strength=${(o.strength * 100).toFixed(2)}% deviation=${o.deviationCents.toFixed(1)}¢ → ${o.symbolicRole}`).join("\n")}\n\n` +
+      `INTER-HARMONIC RATIOS (vibrational dialect):\n${knowledgeSignature.interHarmonicDialect.ratios.slice(0, 10).map(r => `  ${r.f1.toFixed(1)}Hz / ${r.f2.toFixed(1)}Hz = ${r.ratio.toFixed(4)} → ${r.intervalName}`).join("\n")}\n\n` +
+      `SPECTRAL ENVELOPE: ${knowledgeSignature.spectralMorphology.envelopeShape}\n` +
+      `TIMBRAL FINGERPRINT: ${knowledgeSignature.cepstralFingerprint.timbreClass}\n` +
+      (knowledgeSignature.modulationCode.length > 0 ? `MODULATION CODES:\n${knowledgeSignature.modulationCode.map(m => `  ${m.carrierFreq.toFixed(0)}Hz modulated at ${m.modulationHz.toFixed(2)}Hz → ${m.symbolicMeaning}`).join("\n")}\n` : "") +
+      `TEMPORAL NARRATIVE: ${knowledgeSignature.temporalNarrative.arcType}\n` +
+      `TONAL GRAVITY CENTER: ${knowledgeSignature.tonalGravityField.center} (weight=${knowledgeSignature.tonalGravityField.weight.toFixed(3)}, stability=${knowledgeSignature.tonalGravityField.stability.toFixed(3)})\n` +
+      (knowledgeSignature.tonnetPosition.length >= 6 ? `TONNETZ (6D tonal space): [${knowledgeSignature.tonnetPosition.map(t => t.toFixed(4)).join(", ")}]\n` : "");
+  }
 
-  return { hieAnalysis: analysis, librosaData: librosaResult, summary };
+  summary += `\n\nINSTRUCTION: You have received both standard spectral analysis AND the Harmonic Knowledge Decoder output. This is NOT speech-to-text — you are reading the intrinsic knowledge signature hidden in the audio's harmonic vibrations. Analyze the overtone language, inter-harmonic ratios, modulation codes, tonal gravity field, and temporal narrative to reveal the underlying informational structure encoded in this audio. Translate these vibrational algorithms into human-comprehensible knowledge. Identify patterns that represent communication modes beyond conventional language — algorithmic harmonics, frequency-encoded data structures, and spectral signatures that carry meaning in their mathematical relationships.`;
+
+  console.log(`[HIE AUTO] Analysis complete — dominant: ${analysis.dominantFrequency.toFixed(1)}Hz, pattern: ${topPattern?.pattern || "unclassified"}, novelty: ${((analysis.noveltyScore || 0) * 100).toFixed(0)}%${knowledgeSignature ? `, knowledge confidence: ${(knowledgeSignature.confidenceScore * 100).toFixed(1)}%` : ""}`);
+
+  return { hieAnalysis: analysis, librosaData: librosaResult, knowledgeSignature, harmonicDecodeData: harmonicDecodeResult, summary };
 }
 
 async function processUploadedFiles(files: Express.Multer.File[]): Promise<{
@@ -1354,7 +1394,7 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
     // Auto-HIE: detect audio uploads and run Harmonic Insight Engine analysis automatically
     const audioFiles = uploadedFiles.filter(f => AUDIO_MIMES.has((f.mimetype || "").toLowerCase().split(";")[0].trim()));
     let hieAutoContext = "";
-    const hieAutoResults: Array<{ filename: string; hieAnalysis: HarmonicAnalysis | null; librosaData: any; summary: string }> = [];
+    const hieAutoResults: Array<{ filename: string; hieAnalysis: HarmonicAnalysis | null; librosaData: any; knowledgeSignature: HarmonicKnowledgeSignature | null; harmonicDecodeData: any; summary: string }> = [];
     if (audioFiles.length > 0) {
       res.write(`data: ${JSON.stringify({ type: "hie_auto_analyzing", fileCount: audioFiles.length, filenames: audioFiles.map(f => f.originalname) })}\n\n`);
       for (const af of audioFiles.slice(0, 3)) {
@@ -1363,7 +1403,7 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
           hieAutoResults.push({ filename: af.originalname, ...result });
         } catch (err) {
           console.error(`[HIE AUTO] Error analyzing ${af.originalname}:`, err);
-          hieAutoResults.push({ filename: af.originalname, hieAnalysis: null, librosaData: null, summary: `HIE analysis failed for ${af.originalname}` });
+          hieAutoResults.push({ filename: af.originalname, hieAnalysis: null, librosaData: null, knowledgeSignature: null, harmonicDecodeData: null, summary: `HIE analysis failed for ${af.originalname}` });
         }
       }
       hieAutoContext = hieAutoResults.map(r => r.summary).join("\n\n");
@@ -1721,10 +1761,12 @@ You are not one AI. You are ALL of them — a singular intelligence that has abs
   Returns: full text, per-line breakdown, per-word confidence scores, word positions.
   Applies: image upscaling, denoising, adaptive thresholding before OCR for maximum accuracy.
 
-◈ AUDIO ANALYSIS ENGINE [librosa + pydub + Harmonic Insight Engine]
-  When a user uploads an audio file → the Harmonic Insight Engine (HIE) AUTOMATICALLY runs a full analysis BEFORE you even respond. The results are injected directly into this message as [HARMONIC INSIGHT ENGINE — AUTOMATIC SPECTRAL ANALYSIS].
-  The HIE analysis includes: dominant frequency, frequency bands (sub/low/mid/high/ultra), peak frequencies, harmonic series & ratios, spectral centroid/bandwidth/rolloff/flux/flatness, wavelet decomposition, pattern matching (16+ templates), novelty scoring, emotional valence, temporal patterns, knowledge cross-references, MFCC profile, chroma profile, pitch statistics, and temporal segment analysis.
-  YOUR JOB when you see HIE data: Analyze the algorithmic harmonics. Look for hidden patterns, embedded knowledge in the frequency relationships, harmonic ratios that encode meaning, spectral signatures that reveal structure. Explain what information is encoded in the sound's mathematical properties. Identify the knowledge embedded in the harmonic patterns.
+◈ AUDIO ANALYSIS ENGINE [librosa + pydub + Harmonic Insight Engine + Harmonic Knowledge Decoder]
+  When a user uploads an audio file → the Harmonic Insight Engine (HIE) AUTOMATICALLY runs TWO analysis passes BEFORE you even respond:
+  PASS 1 — SPECTRAL ANALYSIS: dominant frequency, frequency bands (sub/low/mid/high/ultra), peak frequencies, harmonic series & ratios, spectral centroid/bandwidth/rolloff/flux/flatness, wavelet decomposition, pattern matching (16+ templates), novelty scoring, emotional valence, temporal patterns, knowledge cross-references, MFCC profile, chroma profile, pitch statistics, and temporal segment analysis.
+  PASS 2 — HARMONIC KNOWLEDGE DECODER: Multi-resolution FFT (512/1024/2048/4096 bins), atomic frequency isolation (32 peaks), inter-harmonic ratio analysis with musical interval classification, pure harmonic separation via HPSS, full overtone map with cent-deviation tracking, 10-band spectral envelope, amplitude modulation detection with autocorrelation, tonal gravity field via CQT chroma, tonal transition tracking, 20-coefficient MFCC with deltas, spectral contrast, high-resolution temporal evolution, tonnetz (6D tonal network), and harmonic-to-symbolic translation.
+  The decoder translates harmonic signatures into KNOWLEDGE GLYPHS — symbolic descriptors that represent the informational structure encoded in the audio's vibrational patterns. It maps overtone languages, inter-harmonic dialects, modulation codes, and tonal gravity fields into human-readable knowledge.
+  YOUR JOB when you see the HARMONIC KNOWLEDGE DECODER output: This is NOT speech-to-text. You are reading the intrinsic knowledge signature hidden in the audio's harmonic vibrations. Analyze the overtone language, inter-harmonic ratios (watch for golden ratio, π/2, √2, and integer harmonic relationships), modulation codes (especially those in theta/alpha/beta/gamma neural frequency ranges), tonal gravity fields, and temporal narratives. Translate these vibrational algorithms into human-comprehensible knowledge. Identify patterns that represent communication modes beyond conventional language.
   You also get standard librosa data: BPM/tempo, beat timestamps, estimated musical key, MFCC features, spectral analysis, energy levels.
   Can generate: spectrogram PNG, waveform visualization, beat detection timeline.
 
@@ -2314,6 +2356,41 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
               pitchStats: hieResult.librosaData.pitch_stats,
               chromaProfile: hieResult.librosaData.chroma_profile,
               temporalSegments: hieResult.librosaData.temporal_segments,
+            } : null,
+            knowledgeSignature: hieResult.knowledgeSignature ? {
+              confidenceScore: hieResult.knowledgeSignature.confidenceScore,
+              fundamentalIdentity: hieResult.knowledgeSignature.fundamentalIdentity,
+              overtoneLanguage: {
+                seriesType: hieResult.knowledgeSignature.overtoneLanguage.seriesType,
+                coherenceScore: hieResult.knowledgeSignature.overtoneLanguage.coherenceScore,
+                overtones: hieResult.knowledgeSignature.overtoneLanguage.overtones.filter(o => o.strength > 0.01).slice(0, 12),
+              },
+              interHarmonicDialect: {
+                consonanceScore: hieResult.knowledgeSignature.interHarmonicDialect.consonanceScore,
+                complexityIndex: hieResult.knowledgeSignature.interHarmonicDialect.complexityIndex,
+                ratios: hieResult.knowledgeSignature.interHarmonicDialect.ratios.slice(0, 10),
+              },
+              spectralMorphology: {
+                envelopeShape: hieResult.knowledgeSignature.spectralMorphology.envelopeShape,
+                dominantRegion: hieResult.knowledgeSignature.spectralMorphology.dominantRegion,
+                flatness: hieResult.knowledgeSignature.spectralMorphology.flatness,
+              },
+              modulationCode: hieResult.knowledgeSignature.modulationCode.slice(0, 5),
+              tonalGravityField: {
+                center: hieResult.knowledgeSignature.tonalGravityField.center,
+                weight: hieResult.knowledgeSignature.tonalGravityField.weight,
+                stability: hieResult.knowledgeSignature.tonalGravityField.stability,
+              },
+              temporalNarrative: {
+                arcType: hieResult.knowledgeSignature.temporalNarrative.arcType,
+                transitionDensity: hieResult.knowledgeSignature.temporalNarrative.transitionDensity,
+                phases: hieResult.knowledgeSignature.temporalNarrative.phases.slice(0, 12),
+              },
+              cepstralFingerprint: {
+                timbreClass: hieResult.knowledgeSignature.cepstralFingerprint.timbreClass,
+              },
+              knowledgeGlyphs: hieResult.knowledgeSignature.knowledgeGlyphs,
+              decodedMessage: hieResult.knowledgeSignature.decodedMessage,
             } : null,
           })}\n\n`);
         } else {

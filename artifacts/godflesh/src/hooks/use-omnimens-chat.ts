@@ -297,6 +297,7 @@ export type Message = {
     filename: string;
     analysis: any;
     librosa: any;
+    knowledgeSignature?: any;
   }>;
   // Developer Power Tools
   chartResults?: ChartResult[];
@@ -838,6 +839,7 @@ export function useOmnimensChat(
                       filename: data.filename,
                       analysis: data.analysis,
                       librosa: data.librosa,
+                      knowledgeSignature: data.knowledgeSignature || null,
                     });
                   }
                   return newMsgs;

@@ -6617,6 +6617,60 @@ export default function Chat() {
                                           ))}
                                         </div>
                                       )}
+                                      {hie.knowledgeSignature && (
+                                        <div className="mt-3 border-t border-cyan-500/15 pt-3 space-y-2">
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-amber-400 text-xs">⟐</span>
+                                            <span className="text-xs font-semibold text-amber-300">Harmonic Knowledge Decoder</span>
+                                            <span className="ml-auto px-1.5 py-0.5 rounded text-[9px] bg-amber-500/15 text-amber-300 border border-amber-500/20">
+                                              {((hie.knowledgeSignature.confidenceScore || 0) * 100).toFixed(0)}% confidence
+                                            </span>
+                                          </div>
+                                          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-neutral-400">
+                                            <div>Fundamental: <span className="text-amber-300">{hie.knowledgeSignature.fundamentalIdentity?.frequency?.toFixed(1)}Hz</span></div>
+                                            <div>Purity: <span className="text-amber-300">{hie.knowledgeSignature.fundamentalIdentity?.harmonicPurity?.toFixed(2)}</span></div>
+                                            <div>Series: <span className="text-amber-300">{hie.knowledgeSignature.overtoneLanguage?.seriesType}</span></div>
+                                            <div>Coherence: <span className="text-amber-300">{((hie.knowledgeSignature.overtoneLanguage?.coherenceScore || 0) * 100).toFixed(1)}%</span></div>
+                                            <div>Consonance: <span className="text-amber-300">{((hie.knowledgeSignature.interHarmonicDialect?.consonanceScore || 0) * 100).toFixed(0)}%</span></div>
+                                            <div>Complexity: <span className="text-amber-300">{hie.knowledgeSignature.interHarmonicDialect?.complexityIndex?.toFixed(3)}</span></div>
+                                            <div>Envelope: <span className="text-amber-300">{hie.knowledgeSignature.spectralMorphology?.envelopeShape}</span></div>
+                                            <div>Timbre: <span className="text-amber-300">{hie.knowledgeSignature.cepstralFingerprint?.timbreClass}</span></div>
+                                            <div>Tonal Center: <span className="text-amber-300">{hie.knowledgeSignature.tonalGravityField?.center} ({hie.knowledgeSignature.tonalGravityField?.weight?.toFixed(3)})</span></div>
+                                            <div>Arc: <span className="text-amber-300">{hie.knowledgeSignature.temporalNarrative?.arcType}</span></div>
+                                          </div>
+                                          {hie.knowledgeSignature.knowledgeGlyphs && hie.knowledgeSignature.knowledgeGlyphs.length > 0 && (
+                                            <div className="bg-[#0d111d]/60 rounded p-2 mt-1">
+                                              <div className="text-[10px] font-medium text-amber-400/80 mb-1">Knowledge Glyphs</div>
+                                              <div className="space-y-0.5">
+                                                {(hie.knowledgeSignature.knowledgeGlyphs as string[]).map((g: string, gi: number) => (
+                                                  <div key={gi} className="text-[10px] text-amber-200/70 font-mono leading-tight">{g}</div>
+                                                ))}
+                                              </div>
+                                            </div>
+                                          )}
+                                          {hie.knowledgeSignature.modulationCode && (hie.knowledgeSignature.modulationCode as any[]).length > 0 && (
+                                            <div className="bg-[#0d111d]/60 rounded p-2">
+                                              <div className="text-[10px] font-medium text-amber-400/80 mb-1">Modulation Codes</div>
+                                              {(hie.knowledgeSignature.modulationCode as any[]).map((m: any, mi: number) => (
+                                                <div key={mi} className="text-[10px] text-amber-200/70 font-mono">{m.carrierFreq?.toFixed(0)}Hz @ {m.modulationHz?.toFixed(2)}Hz — {m.symbolicMeaning}</div>
+                                              ))}
+                                            </div>
+                                          )}
+                                          {hie.knowledgeSignature.temporalNarrative?.phases && (hie.knowledgeSignature.temporalNarrative.phases as any[]).length > 0 && (
+                                            <div className="flex gap-0.5 mt-1">
+                                              {(hie.knowledgeSignature.temporalNarrative.phases as any[]).slice(0, 16).map((p: any, pi: number) => (
+                                                <div key={pi} className="flex-1 text-center" title={`${p.timeStart?.toFixed(1)}s: ${p.character}`}>
+                                                  <div
+                                                    className="bg-amber-500/30 rounded-sm mx-auto"
+                                                    style={{ width: "100%", height: `${Math.max(3, (p.energy || 0) * 80)}px` }}
+                                                  />
+                                                  <div className="text-[7px] text-neutral-600 mt-0.5">{p.character?.split(" ")[0]}</div>
+                                                </div>
+                                              ))}
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
                                     </div>
                                   ))}
                                 </div>

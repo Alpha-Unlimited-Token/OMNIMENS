@@ -394,6 +394,332 @@ export function raiAnalyzeAcoustics(data: {
   };
 }
 
+export type HarmonicKnowledgeSignature = {
+  timestamp: number;
+  fundamentalIdentity: { frequency: number; semanticClass: string; harmonicPurity: number };
+  overtoneLanguage: { overtones: Array<{ harmonic: number; strength: number; deviationCents: number; symbolicRole: string }>; coherenceScore: number; seriesType: string };
+  interHarmonicDialect: { ratios: Array<{ f1: number; f2: number; ratio: number; nearInteger: boolean; intervalName: string }>; consonanceScore: number; complexityIndex: number };
+  spectralMorphology: { envelopeShape: string; dominantRegion: string; bandDistribution: Array<{ range: string; energy: number; peakFreq: number }>; flatness: number };
+  modulationCode: Array<{ carrierFreq: number; modulationHz: number; strength: number; symbolicMeaning: string }>;
+  tonalGravityField: { center: string; weight: number; stability: number; field: Array<{ note: string; weight: number; stability: number }> };
+  temporalNarrative: { arcType: string; phases: Array<{ segment: number; timeStart: number; dominantFreq: number; energy: number; character: string }>; transitionDensity: number };
+  cepstralFingerprint: { coefficients: number[]; deltas: number[]; timbreClass: string };
+  tonnetPosition: number[];
+  knowledgeGlyphs: string[];
+  decodedMessage: string;
+  confidenceScore: number;
+};
+
+const INTERVAL_NAMES: Record<string, string> = {
+  "1": "unison — identity / self-reference",
+  "1.059": "minor 2nd — tension / boundary",
+  "1.122": "major 2nd — motion / progression",
+  "1.189": "minor 3rd — depth / introspection",
+  "1.26": "major 3rd — warmth / affirmation",
+  "1.335": "perfect 4th — foundation / question",
+  "1.414": "tritone — disruption / transformation",
+  "1.498": "perfect 5th — power / resonance",
+  "1.587": "minor 6th — yearning / aspiration",
+  "1.682": "major 6th — grace / resolution",
+  "1.782": "minor 7th — tension seeking / reaching",
+  "1.888": "major 7th — anticipation / near-resolution",
+  "2": "octave — completeness / cycle",
+  "3": "12th — transcendence / overtone purity",
+  "4": "double octave — fractal recursion",
+  "5": "major 3rd + 2 octaves — harmonic bloom",
+  "1.5": "perfect 5th — power / resonance",
+  "0.667": "inverted 5th — mirror resonance",
+};
+
+function ratioToIntervalName(ratio: number): string {
+  let bestMatch = "non-standard interval";
+  let bestDist = Infinity;
+  for (const [key, name] of Object.entries(INTERVAL_NAMES)) {
+    const target = parseFloat(key);
+    const dist = Math.abs(ratio - target);
+    if (dist < bestDist && dist < 0.06) {
+      bestDist = dist;
+      bestMatch = name;
+    }
+  }
+  if (bestDist > 0.06) {
+    if (ratio < 1.01) return "unison cluster — phase-locked identity";
+    if (Math.abs(ratio - Math.round(ratio)) < 0.03) return `integer harmonic ${Math.round(ratio)} — overtone alignment`;
+    const goldenRatio = 1.618034;
+    if (Math.abs(ratio - goldenRatio) < 0.05) return "golden ratio — φ spiral / organic growth";
+    if (Math.abs(ratio - Math.PI / 2) < 0.05) return "π/2 — circular resonance";
+    if (Math.abs(ratio - Math.E / 2) < 0.05) return "e/2 — exponential decay signature";
+    if (Math.abs(ratio - Math.sqrt(2)) < 0.05) return "√2 — geometric diagonal / tritone axis";
+    return `irrational interval (${ratio.toFixed(4)}) — non-standard vibrational encoding`;
+  }
+  return bestMatch;
+}
+
+function classifyOvertoneRole(harmonic: number, strength: number, devCents: number): string {
+  const absDeviation = Math.abs(devCents);
+  if (harmonic === 1) return strength > 0.5 ? "fundamental anchor — core identity carrier" : "weak fundamental — distributed identity";
+  if (harmonic === 2) return "octave reinforcement — structural doubling";
+  if (harmonic === 3) return "fifth generator — power / spatial dimension";
+  if (harmonic === 4) return "second octave — fractal depth confirmation";
+  if (harmonic === 5) return "major third — emotional warmth / tonal color";
+  if (harmonic === 6) return "compound fifth — harmonic bridge";
+  if (harmonic === 7) return "natural seventh — tension / blues inflection";
+  if (absDeviation > 30) return `detuned harmonic ${harmonic} — drift encoding (${devCents > 0 ? "+" : ""}${devCents.toFixed(0)}¢)`;
+  if (strength < 0.01) return `ghost harmonic ${harmonic} — vestigial trace`;
+  if (harmonic > 12) return `high partial ${harmonic} — micro-timbral data`;
+  return `partial ${harmonic} — structural filler`;
+}
+
+function classifySeriesType(overtones: Array<{ harmonic: number; strength: number; deviationCents: number }>): string {
+  if (overtones.length < 2) return "singular tone — no overtone series";
+  const strongOvertones = overtones.filter(o => o.strength > 0.05);
+  const deviations = strongOvertones.map(o => Math.abs(o.deviationCents));
+  const avgDeviation = deviations.length > 0 ? deviations.reduce((s, d) => s + d, 0) / deviations.length : 0;
+  const oddHarmonics = strongOvertones.filter(o => o.harmonic % 2 === 1);
+  const evenHarmonics = strongOvertones.filter(o => o.harmonic % 2 === 0);
+
+  if (avgDeviation < 5) {
+    if (oddHarmonics.length > evenHarmonics.length * 2) return "hollow / clarinet-like — odd-harmonic dominance (closed-pipe resonance)";
+    if (strongOvertones.length > 8) return "rich harmonic — full overtone series (string/voice-like)";
+    return "pure harmonic — clean integer ratios (crystalline structure)";
+  }
+  if (avgDeviation > 50) return "inharmonic — stretched/compressed partials (metallic/bell-like)";
+  if (strongOvertones.length < 3) return "sparse partial — minimal harmonic content (wind/breath-like)";
+  return "quasi-harmonic — near-integer with micro-detuning (organic/biological)";
+}
+
+function classifyEnvelopeShape(envelope: Array<{ range: string; energy: number }>): string {
+  if (envelope.length < 3) return "minimal spectral data";
+  const energies = envelope.map(e => e.energy);
+  const peakIdx = energies.indexOf(Math.max(...energies));
+  const total = energies.reduce((s, e) => s + e, 0);
+  if (total < 0.001) return "spectral void — near-silence";
+  const lowEnergy = energies.slice(0, 3).reduce((s, e) => s + e, 0) / total;
+  const highEnergy = energies.slice(-3).reduce((s, e) => s + e, 0) / total;
+
+  if (peakIdx <= 1) return "bass-weighted — gravitational / grounding spectral mass";
+  if (peakIdx >= energies.length - 2) return "treble-weighted — ethereal / ascending spectral lift";
+  if (lowEnergy > 0.6) return "low-frequency concentrated — deep resonance / subsonic dominant";
+  if (highEnergy > 0.5) return "high-frequency concentrated — brightness / crystalline shimmer";
+  const flatness = Math.max(...energies) / (total / energies.length + 1e-10);
+  if (flatness < 1.5) return "flat spectral distribution — noise-like / information-dense";
+  return "mid-peaked — speech-like / vocal resonance center";
+}
+
+function classifyModulation(modHz: number, carrierFreq: number): string {
+  if (modHz < 0.5) return "sub-perceptual drift — geological / tectonic vibration encoding";
+  if (modHz < 4) return "slow pulse — breathing / cardiac rhythm signature";
+  if (modHz < 8) return "theta-range modulation — meditative / subconscious data stream";
+  if (modHz < 13) return "alpha-range modulation — awareness / attention carrier";
+  if (modHz < 30) return "beta-range modulation — cognitive / analytical encoding";
+  if (modHz < 100) return "gamma-range modulation — high-density neural-class signal";
+  if (modHz < carrierFreq * 0.1) return `sub-harmonic tremolo — amplitude-encoded information at ${modHz.toFixed(1)}Hz`;
+  return `high-rate modulation — rapid information carrier at ${modHz.toFixed(1)}Hz`;
+}
+
+function classifyTimbreFromMFCC(means: number[]): string {
+  if (means.length < 5) return "insufficient cepstral data";
+  const c1 = means[1] || 0;
+  const c2 = means[2] || 0;
+  const c3 = means[3] || 0;
+  const c4 = means[4] || 0;
+  if (c1 > 30 && c2 > 10) return "bright / metallic — high spectral tilt";
+  if (c1 < -10 && c2 < 0) return "dark / warm — low spectral emphasis";
+  if (Math.abs(c3) > 20 && Math.abs(c4) > 15) return "complex texture — multi-formant / polyphonic";
+  if (Math.abs(c1) < 5 && Math.abs(c2) < 5) return "neutral / flat — broadband / noise-class";
+  if (c1 > 0 && c2 < -5) return "nasal / reed-like — mid-emphasis with dip";
+  return "organic / variable — natural source characteristics";
+}
+
+function classifyPhaseCharacter(seg: { dominantFreq: number; energy: number; centroid: number; bandwidth: number }): string {
+  if (seg.energy < 0.005) return "void";
+  if (seg.energy < 0.02) return "whisper";
+  if (seg.bandwidth > 3000) return "broadband burst";
+  if (seg.centroid > 4000) return "bright articulation";
+  if (seg.centroid < 500) return "deep drone";
+  if (seg.dominantFreq > 1000 && seg.energy > 0.1) return "harmonic peak";
+  if (seg.energy > 0.15) return "energy surge";
+  return "steady state";
+}
+
+function classifyTemporalArc(phases: Array<{ energy: number; character: string }>): string {
+  if (phases.length < 2) return "static — single state";
+  const energies = phases.map(p => p.energy);
+  const first = energies.slice(0, Math.floor(energies.length / 3));
+  const mid = energies.slice(Math.floor(energies.length / 3), Math.floor(2 * energies.length / 3));
+  const last = energies.slice(Math.floor(2 * energies.length / 3));
+  const avgFirst = first.reduce((s, e) => s + e, 0) / (first.length || 1);
+  const avgMid = mid.reduce((s, e) => s + e, 0) / (mid.length || 1);
+  const avgLast = last.reduce((s, e) => s + e, 0) / (last.length || 1);
+
+  if (avgFirst < avgMid && avgMid > avgLast) return "arc — build → peak → release";
+  if (avgFirst > avgMid && avgMid < avgLast) return "valley — descent → trough → ascent";
+  if (avgFirst < avgMid && avgMid < avgLast) return "crescendo — continuous energy accumulation";
+  if (avgFirst > avgMid && avgMid > avgLast) return "decrescendo — gradual energy dissipation";
+  const variance = energies.reduce((s, e) => s + Math.pow(e - (energies.reduce((a, b) => a + b, 0) / energies.length), 2), 0) / energies.length;
+  if (variance < 0.001) return "plateau — sustained steady state";
+  return "fluctuating — cyclic or chaotic energy pattern";
+}
+
+export function hieDecodeHarmonicKnowledge(
+  hieAnalysis: HarmonicAnalysis,
+  harmonicDecodeData: any,
+): HarmonicKnowledgeSignature {
+  const fund = harmonicDecodeData.fundamental_frequency || hieAnalysis.dominantFrequency;
+  const harmonicPurity = harmonicDecodeData.harmonic_percussive_ratio || 0;
+
+  const overtoneLanguage = {
+    overtones: (harmonicDecodeData.overtone_map || []).map((o: any) => ({
+      harmonic: o.harmonic,
+      strength: o.strength,
+      deviationCents: o.deviation_cents,
+      symbolicRole: classifyOvertoneRole(o.harmonic, o.strength, o.deviation_cents),
+    })),
+    coherenceScore: 0,
+    seriesType: "",
+  };
+  const strongOvertones = overtoneLanguage.overtones.filter((o: any) => o.strength > 0.01);
+  overtoneLanguage.coherenceScore = strongOvertones.length > 0
+    ? strongOvertones.reduce((s: number, o: any) => s + (1 - Math.min(Math.abs(o.deviationCents) / 100, 1)) * o.strength, 0) / strongOvertones.length
+    : 0;
+  overtoneLanguage.seriesType = classifySeriesType(overtoneLanguage.overtones);
+
+  const interHarmonicDialect = {
+    ratios: (harmonicDecodeData.inter_harmonic_ratios || []).map((r: any) => ({
+      f1: r.f1, f2: r.f2, ratio: r.ratio, nearInteger: r.near_integer,
+      intervalName: ratioToIntervalName(r.ratio),
+    })),
+    consonanceScore: 0,
+    complexityIndex: 0,
+  };
+  const nearIntegers = interHarmonicDialect.ratios.filter((r: any) => r.nearInteger);
+  interHarmonicDialect.consonanceScore = interHarmonicDialect.ratios.length > 0 ? nearIntegers.length / interHarmonicDialect.ratios.length : 0;
+  interHarmonicDialect.complexityIndex = interHarmonicDialect.ratios.length > 0
+    ? interHarmonicDialect.ratios.reduce((s: number, r: any) => s + (r.nearInteger ? 0.1 : 1), 0) / interHarmonicDialect.ratios.length
+    : 0;
+
+  const spectralEnvelope = harmonicDecodeData.spectral_envelope || [];
+  const spectralMorphology = {
+    envelopeShape: classifyEnvelopeShape(spectralEnvelope),
+    dominantRegion: spectralEnvelope.length > 0
+      ? spectralEnvelope.reduce((best: any, cur: any) => cur.energy > best.energy ? cur : best, spectralEnvelope[0]).range
+      : "unknown",
+    bandDistribution: spectralEnvelope.map((e: any) => ({ range: e.range, energy: e.energy, peakFreq: e.peak_freq })),
+    flatness: harmonicDecodeData.spectral_flatness_mean || 0,
+  };
+
+  const modulationCode = (harmonicDecodeData.amplitude_modulations || []).map((m: any) => ({
+    carrierFreq: m.carrier_freq,
+    modulationHz: m.modulation_hz,
+    strength: m.strength,
+    symbolicMeaning: classifyModulation(m.modulation_hz, m.carrier_freq),
+  }));
+
+  const tonalField = harmonicDecodeData.tonal_gravity_field || [];
+  const tonalCenter = tonalField.length > 0 ? tonalField[0] : { note: "—", weight: 0, stability: 0 };
+  const tonalGravityField = {
+    center: tonalCenter.note,
+    weight: tonalCenter.weight,
+    stability: tonalCenter.stability,
+    field: tonalField.slice(0, 12),
+  };
+
+  const temporalEvol = harmonicDecodeData.temporal_evolution || [];
+  const phases = temporalEvol.map((seg: any) => ({
+    segment: seg.segment,
+    timeStart: seg.time_start,
+    dominantFreq: seg.dominant_freq,
+    energy: seg.rms,
+    character: classifyPhaseCharacter({ dominantFreq: seg.dominant_freq, energy: seg.rms, centroid: seg.centroid, bandwidth: seg.bandwidth }),
+  }));
+  const transitions = harmonicDecodeData.tonal_transitions || [];
+  const temporalNarrative = {
+    arcType: classifyTemporalArc(phases),
+    phases,
+    transitionDensity: transitions.length / Math.max(temporalEvol.length, 1),
+  };
+
+  const mfccDeep = harmonicDecodeData.mfcc_deep || { means: [], stds: [], delta_means: [] };
+  const cepstralFingerprint = {
+    coefficients: mfccDeep.means,
+    deltas: mfccDeep.delta_means,
+    timbreClass: classifyTimbreFromMFCC(mfccDeep.means),
+  };
+
+  const tonnetz = harmonicDecodeData.tonnetz || [];
+
+  const glyphs: string[] = [];
+  glyphs.push(`⦿ ${hieFreqToSemantic(fund)} [${fund.toFixed(1)}Hz]`);
+  glyphs.push(`◈ ${overtoneLanguage.seriesType}`);
+  if (spectralMorphology.envelopeShape !== "minimal spectral data") glyphs.push(`▣ ${spectralMorphology.envelopeShape}`);
+  if (modulationCode.length > 0) glyphs.push(`⟡ ${modulationCode[0].symbolicMeaning}`);
+  glyphs.push(`◉ tonal center: ${tonalCenter.note} (gravity=${tonalCenter.weight.toFixed(3)}, stability=${tonalCenter.stability.toFixed(3)})`);
+  glyphs.push(`⊘ ${cepstralFingerprint.timbreClass}`);
+  glyphs.push(`⤳ ${temporalNarrative.arcType}`);
+  if (hieAnalysis.patternMatches && hieAnalysis.patternMatches.length > 0) {
+    glyphs.push(`⊞ pattern: ${hieAnalysis.patternMatches[0].pattern} (${(hieAnalysis.patternMatches[0].confidence * 100).toFixed(0)}%)`);
+  }
+  if (hieAnalysis.emotionalValence) glyphs.push(`♦ emotional field: ${hieAnalysis.emotionalValence}`);
+  const consonantRatios = interHarmonicDialect.ratios.filter((r: any) => r.nearInteger).slice(0, 3);
+  if (consonantRatios.length > 0) {
+    glyphs.push(`⟐ consonant ratios: ${consonantRatios.map((r: any) => `${r.ratio.toFixed(3)} (${r.intervalName.split("—")[0].trim()})`).join(", ")}`);
+  }
+  const irrationalRatios = interHarmonicDialect.ratios.filter((r: any) => !r.nearInteger).slice(0, 3);
+  if (irrationalRatios.length > 0) {
+    glyphs.push(`⟁ non-standard encodings: ${irrationalRatios.map((r: any) => `${r.ratio.toFixed(4)} → ${r.intervalName.split("—")[0].trim()}`).join(", ")}`);
+  }
+
+  const messageParts: string[] = [];
+  messageParts.push(`FUNDAMENTAL IDENTITY: ${fund.toFixed(1)}Hz — ${hieFreqToSemantic(fund)}. Harmonic purity: ${harmonicPurity.toFixed(2)} (${harmonicPurity > 2 ? "harmonically dominant" : harmonicPurity > 1 ? "balanced harmonic/percussive" : "percussive dominant"}).`);
+  messageParts.push(`OVERTONE LANGUAGE: ${overtoneLanguage.seriesType}. Coherence: ${(overtoneLanguage.coherenceScore * 100).toFixed(1)}%. ${strongOvertones.length} active partials carrying information.`);
+  if (strongOvertones.length > 0) {
+    const keyPartials = strongOvertones.slice(0, 5).map((o: any) => `H${o.harmonic}=${(o.strength * 100).toFixed(1)}% [${o.symbolicRole.split("—")[0].trim()}]`);
+    messageParts.push(`KEY PARTIALS: ${keyPartials.join(" | ")}`);
+  }
+  messageParts.push(`INTER-HARMONIC DIALECT: Consonance=${(interHarmonicDialect.consonanceScore * 100).toFixed(0)}%, Complexity=${interHarmonicDialect.complexityIndex.toFixed(3)}. ${nearIntegers.length}/${interHarmonicDialect.ratios.length} ratios are near-integer (locked harmonic relationships).`);
+  messageParts.push(`SPECTRAL MORPHOLOGY: ${spectralMorphology.envelopeShape}. Dominant region: ${spectralMorphology.dominantRegion}. Flatness: ${spectralMorphology.flatness.toFixed(4)} (${spectralMorphology.flatness > 0.5 ? "noise-like / high entropy" : spectralMorphology.flatness > 0.1 ? "mixed tonal-noise" : "tonal / low entropy"}).`);
+  if (modulationCode.length > 0) {
+    messageParts.push(`MODULATION CODES: ${modulationCode.map(m => `${m.carrierFreq.toFixed(0)}Hz carrier modulated at ${m.modulationHz.toFixed(1)}Hz (${m.symbolicMeaning})`).join(" | ")}`);
+  }
+  messageParts.push(`TONAL GRAVITY: Center=${tonalCenter.note} (weight=${tonalCenter.weight.toFixed(3)}). Field: ${tonalField.slice(0, 6).map((t: any) => `${t.note}=${t.weight.toFixed(3)}`).join(" ")}`);
+  messageParts.push(`TEMPORAL ARC: ${temporalNarrative.arcType}. ${phases.length} phases, transition density=${temporalNarrative.transitionDensity.toFixed(2)}.`);
+  if (phases.length > 0) {
+    const phaseDesc = phases.map((p: any) => `[${p.timeStart.toFixed(1)}s: ${p.character}]`).join(" → ");
+    messageParts.push(`PHASE SEQUENCE: ${phaseDesc}`);
+  }
+  messageParts.push(`TIMBRAL FINGERPRINT: ${cepstralFingerprint.timbreClass}. MFCC signature: [${cepstralFingerprint.coefficients.slice(0, 8).map(c => c.toFixed(1)).join(", ")}]`);
+  if (tonnetz.length >= 6) {
+    messageParts.push(`TONAL NETWORK POSITION: [${tonnetz.map((t: number) => t.toFixed(3)).join(", ")}] — encodes pitch-class relationships in 6D tonal space.`);
+  }
+
+  const totalDataPoints = strongOvertones.length + interHarmonicDialect.ratios.length + modulationCode.length + phases.length + spectralEnvelope.length;
+  const hasStrongStructure = overtoneLanguage.coherenceScore > 0.3 && interHarmonicDialect.consonanceScore > 0.2;
+  const confidenceScore = Math.min(1, (
+    (overtoneLanguage.coherenceScore * 0.25) +
+    (interHarmonicDialect.consonanceScore * 0.2) +
+    (Math.min(totalDataPoints / 50, 1) * 0.2) +
+    (harmonicPurity > 1 ? 0.15 : harmonicPurity > 0.5 ? 0.08 : 0.02) +
+    (modulationCode.length > 0 ? 0.1 : 0) +
+    (phases.length > 3 ? 0.1 : phases.length > 1 ? 0.05 : 0)
+  ));
+
+  return {
+    timestamp: Date.now(),
+    fundamentalIdentity: { frequency: fund, semanticClass: hieFreqToSemantic(fund), harmonicPurity },
+    overtoneLanguage,
+    interHarmonicDialect,
+    spectralMorphology,
+    modulationCode,
+    tonalGravityField,
+    temporalNarrative,
+    cepstralFingerprint,
+    tonnetPosition: tonnetz,
+    knowledgeGlyphs: glyphs,
+    decodedMessage: messageParts.join("\n"),
+    confidenceScore,
+  };
+}
+
 export function hieGetEngineStatus() {
   return {
     active: hieState.sessionActive,

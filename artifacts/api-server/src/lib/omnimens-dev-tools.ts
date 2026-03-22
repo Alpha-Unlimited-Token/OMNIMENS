@@ -187,7 +187,7 @@ export async function solveMath(spec: {
 // ── Audio Analysis ────────────────────────────────────────────────────────────
 
 export async function analyzeAudio(spec: {
-  action: "analyze" | "hie_analyze" | "spectrogram" | "beat_detect";
+  action: "analyze" | "hie_analyze" | "harmonic_decode" | "spectrogram" | "beat_detect";
   file_b64: string;
   file_mime?: string;
   options?: object;
