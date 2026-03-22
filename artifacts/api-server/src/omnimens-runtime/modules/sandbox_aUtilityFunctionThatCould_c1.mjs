@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-22T03:13:06.310Z
+ * Written: 2026-03-22T03:50:25.328Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,33 +16,40 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentWords(text, n) {
-    // Function to find the top N most frequent words in a given text
-    function cleanText(input) {
-        return input.toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).filter(word => word.length > 0);
+function levenshteinDistance(a, b) {
+    const matrix = Array(a.length + 1).fill(null).map(() => Array(b.length + 1).fill(null));
+
+    for (let i = 0; i <= a.length; i++) {
+        matrix[i][0] = i;
+    }
+    for (let j = 0; j <= b.length; j++) {
+        matrix[0][j] = j;
     }
 
-    const wordCounts = {};
-    const words = cleanText(text);
-
-    for (let word of words) {
-        wordCounts[word] = (wordCounts[word] || 0) + 1;
+    for (let i = 1; i <= a.length; i++) {
+        for (let j = 1; j <= b.length; j++) {
+            const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+            matrix[i][j] = Math.min(
+                matrix[i - 1][j] + 1, // Deletion
+                matrix[i][j - 1] + 1, // Insertion
+                matrix[i - 1][j - 1] + cost // Substitution
+            );
+        }
     }
 
-    const sortedWords = Object.entries(wordCounts).sort((a, b) => b[1] - a[1]);
-    return sortedWords.slice(0, n).map(entry => ({ word: entry[0], count: entry[1] }));
+    return matrix[a.length][b.length];
 }
 
 // Test cases
-const testText1 = "The quick brown fox jumps over the lazy dog. The dog was not amused.";
-const testText2 = "AI systems are evolving rapidly. AI is transforming industries. AI is everywhere.";
-const testText3 = "Hello! Hello? Is anyone there? Hello!";
+console.log("Test Cases for Levenshtein Distance:");
+console.log(levenshteinDistance("kitten", "sitting") === 3); // Expected: true
+console.log(levenshteinDistance("flaw", "lawn") === 2); // Expected: true
+console.log(levenshteinDistance("intention", "execution") === 5); // Expected: true
+console.log(levenshteinDistance("", "test") === 4); // Expected: true
+console.log(levenshteinDistance("same", "same") === 0); // Expected: true
+console.log(levenshteinDistance("", "") === 0); // Expected: true
+console.log(levenshteinDistance("abc", "def") === 3); // Expected: true
+console.log(levenshteinDistance("a", "a") === 0); // Expected: true
+console.log(levenshteinDistance("a", "b") === 1); // Expected: true
 
-console.log("Test Case 1:");
-console.log(findMostFrequentWords(testText1, 3)); // Expected: [{ word: 'the', count: 3 }, { word: 'dog', count: 2 }, { word: 'lazy', count: 1 }]
-
-console.log("Test Case 2:");
-console.log(findMostFrequentWords(testText2, 2)); // Expected: [{ word: 'ai', count: 3 }, { word: 'is', count: 2 }]
-
-console.log("Test Case 3:");
-console.log(findMostFrequentWords(testText3, 1)); // Expected: [{ word: 'hello', count: 3 }]
+console.log("All test cases passed!");

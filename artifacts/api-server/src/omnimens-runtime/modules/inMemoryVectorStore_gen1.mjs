@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-03-21T16:47:55.836Z
+ * Written: 2026-03-22T03:52:54.224Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,119 +18,123 @@
 
 /**
  * @module inMemoryVectorStore
- * @description A lightweight in-memory vector store for storing and retrieving embedding vectors using k-d tree for efficient nearest neighbor search.
+ * @description A module for storing and retrieving vector embeddings using KD-trees and cosine similarity for fast and efficient searches.
  */
 
 /**
- * Represents a node in the k-d tree.
+ * Represents a node in the KD-tree.
  * @typedef {Object} KDTreeNode
  * @property {number[]} point - The vector stored at this node.
+ * @property {any} value - The associated value for the vector.
  * @property {KDTreeNode|null} left - The left child node.
  * @property {KDTreeNode|null} right - The right child node.
  */
 
 /**
- * Builds a k-d tree from a list of points.
- * @param {number[][]} points - Array of vectors to store in the k-d tree.
- * @param {number} depth - Current depth in the tree (used for determining the splitting dimension).
- * @returns {KDTreeNode|null} The root node of the k-d tree.
+ * Computes the cosine similarity between two vectors.
+ * @param {number[]} a - The first vector.
+ * @param {number[]} b - The second vector.
+ * @returns {number} The cosine similarity between the two vectors.
  */
-function buildKDTree(points, depth = 0) {
-  if (points.length === 0) return null;
+function cosineSimilarity(a, b) {
+  const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
+  const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val ** 2, 0));
+  return dotProduct / (magnitudeA * magnitudeB);
+}
 
-  const k = points[0].length; // Dimensionality of the vectors
-  const axis = depth % k; // Splitting dimension
+/**
+ * Builds a KD-tree from a list of vectors and their associated values.
+ * @param {Array<{point: number[], value: any}>} data - The data to build the tree from.
+ * @param {number} depth - The current depth in the tree (used to determine splitting dimension).
+ * @returns {KDTreeNode|null} The root node of the KD-tree.
+ */
+function buildKDTree(data, depth = 0) {
+  if (data.length === 0) return null;
 
-  // Sort points by the current axis and choose the median as the root
-  points.sort((a, b) => a[axis] - b[axis]);
-  const medianIndex = Math.floor(points.length / 2);
+  const k = data[0].point.length;
+  const axis = depth % k;
+
+  data.sort((a, b) => a.point[axis] - b.point[axis]);
+  const median = Math.floor(data.length / 2);
 
   return {
-    point: points[medianIndex],
-    left: buildKDTree(points.slice(0, medianIndex), depth + 1),
-    right: buildKDTree(points.slice(medianIndex + 1), depth + 1)
+    point: data[median].point,
+    value: data[median].value,
+    left: buildKDTree(data.slice(0, median), depth + 1),
+    right: buildKDTree(data.slice(median + 1), depth + 1)
   };
 }
 
 /**
- * Calculates the Euclidean distance between two vectors.
- * @param {number[]} a - First vector.
- * @param {number[]} b - Second vector.
- * @returns {number} The Euclidean distance.
+ * Searches the KD-tree for the nearest neighbors to a given vector using cosine similarity.
+ * @param {KDTreeNode|null} node - The root node of the KD-tree.
+ * @param {number[]} target - The target vector to search for.
+ * @param {number} k - The number of nearest neighbors to retrieve.
+ * @param {number} depth - The current depth in the tree (used to determine splitting dimension).
+ * @param {Array<{point: number[], value: any, similarity: number}>} best - The current best neighbors.
+ * @returns {Array<{point: number[], value: any, similarity: number}>} The k nearest neighbors.
  */
-function euclideanDistance(a, b) {
-  return Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0));
-}
+function searchKDTree(node, target, k, depth = 0, best = []) {
+  if (!node) return best;
 
-/**
- * Searches the k-d tree for the nearest neighbor to a given vector.
- * @param {KDTreeNode|null} node - The root of the k-d tree.
- * @param {number[]} target - The vector to find the nearest neighbor for.
- * @param {number} depth - Current depth in the tree.
- * @param {Object} best - The current best match ({ point: number[], distance: number }).
- * @returns {Object} The nearest neighbor ({ point: number[], distance: number }).
- */
-function nearestNeighborSearch(node, target, depth = 0, best = { point: null, distance: Infinity }) {
-  if (node === null) return best;
+  const axis = depth % target.length;
+  const distance = cosineSimilarity(node.point, target);
 
-  const k = target.length;
-  const axis = depth % k;
-
-  // Compute distance to the current node
-  const distance = euclideanDistance(target, node.point);
-  if (distance < best.distance) {
-    best = { point: node.point, distance };
+  // Add the current node to the best list if it's among the top k
+  if (best.length < k || distance > best[best.length - 1].similarity) {
+    best.push({ point: node.point, value: node.value, similarity: distance });
+    best.sort((a, b) => b.similarity - a.similarity);
+    if (best.length > k) best.pop();
   }
 
-  // Determine which subtree to search first
-  const direction = target[axis] < node.point[axis] ? 'left' : 'right';
-  best = nearestNeighborSearch(node[direction], target, depth + 1, best);
+  const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
+  const otherBranch = nextBranch === node.left ? node.right : node.left;
 
-  // Check the other subtree if necessary
-  if (Math.abs(target[axis] - node.point[axis]) < best.distance) {
-    const otherDirection = direction === 'left' ? 'right' : 'left';
-    best = nearestNeighborSearch(node[otherDirection], target, depth + 1, best);
+  // Search the next branch
+  best = searchKDTree(nextBranch, target, k, depth + 1, best);
+
+  // Check if we need to search the other branch
+  if (
+    best.length < k ||
+    Math.abs(target[axis] - node.point[axis]) > best[best.length - 1].similarity
+  ) {
+    best = searchKDTree(otherBranch, target, k, depth + 1, best);
   }
 
   return best;
 }
 
 /**
- * Class representing an in-memory vector store using a k-d tree.
+ * Class representing an in-memory vector store.
  */
-export class InMemoryVectorStore {
+class InMemoryVectorStore {
   constructor() {
     /** @type {KDTreeNode|null} */
-    this.root = null;
-    /** @type {number[][]} */
-    this.points = [];
+    this.tree = null;
+    /** @type {Array<{point: number[], value: any}>} */
+    this.data = [];
   }
 
   /**
-   * Adds a vector to the store.
+   * Adds a vector and its associated value to the store.
    * @param {number[]} vector - The vector to add.
+   * @param {any} value - The value associated with the vector.
    */
-  add(vector) {
-    this.points.push(vector);
-    this.root = buildKDTree(this.points);
+  add(vector, value) {
+    this.data.push({ point: vector, value });
+    this.tree = buildKDTree(this.data);
   }
 
   /**
-   * Finds the nearest neighbor to a given vector.
-   * @param {number[]} vector - The query vector.
-   * @returns {Object} The nearest neighbor ({ point: number[], distance: number }).
+   * Searches for the k nearest neighbors to a given vector.
+   * @param {number[]} vector - The vector to search for.
+   * @param {number} k - The number of nearest neighbors to retrieve.
+   * @returns {Array<{point: number[], value: any, similarity: number}>} The k nearest neighbors.
    */
-  nearest(vector) {
-    if (!this.root) throw new Error('Vector store is empty.');
-    return nearestNeighborSearch(this.root, vector);
+  search(vector, k) {
+    return searchKDTree(this.tree, vector, k);
   }
 }
 
-/**
- * Example usage:
- * const store = new InMemoryVectorStore();
- * store.add([1, 2, 3]);
- * store.add([4, 5, 6]);
- * const nearest = store.nearest([3, 3, 3]);
- * console.log(nearest);
- */
+export { InMemoryVectorStore, cosineSimilarity };

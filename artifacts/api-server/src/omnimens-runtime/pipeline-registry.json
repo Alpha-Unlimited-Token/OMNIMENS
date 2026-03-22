@@ -2321,11 +2321,10 @@
       "filename": "wasmMatrixOps_gen1.mjs",
       "stage": "vector_operations",
       "exports": [
-        "multiplyMatrices",
-        "invertMatrix",
-        "computeEigenvalues"
+        "initializeWasmModule",
+        "multiplyMatrices"
       ],
-      "loadedAt": 1774151186151,
+      "loadedAt": 1774151564989,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3270,9 +3269,10 @@
       "filename": "inMemoryVectorStore_gen1.mjs",
       "stage": "memory_retrieval",
       "exports": [
-        "InMemoryVectorStore"
+        "InMemoryVectorStore",
+        "cosineSimilarity"
       ],
-      "loadedAt": 1774151186122,
+      "loadedAt": 1774151574237,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -3416,6 +3416,6 @@
     }
   },
   "lastScan": 1774151186154,
-  "totalModules": 240,
+  "totalModules": 242,
   "totalCalls": 0
 }
