@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, X, MessageSquare, FolderOpen, FileCode, Settings,
   CreditCard, BookOpen, HelpCircle, Globe, Zap, ArrowRight,
-  CornerDownLeft, ChevronRight, Rocket, Wrench, Brain, Key
+  CornerDownLeft, ChevronRight, Rocket, Wrench, Brain, Key, FileArchive
 } from "lucide-react";
 
 type SearchResult = {
@@ -29,6 +29,7 @@ const PAGES: SearchResult[] = [
   { id: "tools", type: "page", title: "Tools", subtitle: "Built-in tools", icon: <Wrench className="w-4 h-4" />, href: "/tools" },
   { id: "faq", type: "page", title: "FAQ", subtitle: "Help & guides", icon: <HelpCircle className="w-4 h-4" />, href: "/faq" },
   { id: "deploy", type: "page", title: "Deployments", subtitle: "Deploy projects", icon: <Rocket className="w-4 h-4" />, href: "/deploy" },
+  { id: "files", type: "page", title: "My Files", subtitle: "Saved images, videos & assets", icon: <FileArchive className="w-4 h-4" />, href: "/files", shortcut: "F" },
 ];
 
 const ACTIONS: SearchResult[] = [

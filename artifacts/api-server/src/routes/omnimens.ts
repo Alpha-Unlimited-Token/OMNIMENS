@@ -42,7 +42,8 @@ import { getOrCreateCustomInstructions, saveCustomInstructions, buildCustomInstr
 import { analyzeUserEmotionalState, buildEmotionalContext, loadLearningContext, runLearningCycle } from "../lib/omnimens-learning.js";
 import { loadGeneratedModulesContext, getConsciousnessState, getEvolutionHistory, getGeneratedModules, deactivateModule, runEvolutionCycle } from "../lib/omnimens-evolution.js";
 import { runCouncilAnalysis } from "./council.js";
-import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness, omnimensProjects, omnimensProjectFiles, omnimensApiKeys, omnimensProblemReports, omnimensReferrals } from "@workspace/db";
+import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness, omnimensProjects, omnimensProjectFiles, omnimensApiKeys, omnimensProblemReports, omnimensReferrals, omnimensUserFiles } from "@workspace/db";
+import { autoSaveImage, autoSaveVideo, autoSave3DModel, autoSaveGameZip, getUserFiles, getUserFileById, deleteUserFile, streamFileToResponse, getUserFileStats, getConversationFiles } from "../lib/omnimens-file-storage.js";
 import * as OTPAuth from "otpauth";
 import crypto from "crypto";
 import {
@@ -2285,6 +2286,12 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
         const dataUrl = `data:image/png;base64,${imageBuffer!.toString("base64")}`;
         generatedImages.push({ url: dataUrl, prompt });
         res.write(`data: ${JSON.stringify({ type: "image_generated", url: dataUrl, prompt, index: i, provider: imageProvider, spellCorrected, spellCorrections })}\n\n`);
+
+        autoSaveImage(req.user.id, conversationId, imageBuffer!, prompt, imageProvider, i)
+          .then((fileId) => {
+            try { res.write(`data: ${JSON.stringify({ type: "file_saved", fileId, fileType: "image", filename: `omnimens_image_${Date.now()}_${i}.png` })}\n\n`); } catch {}
+          })
+          .catch((e) => console.error("[AUTO-SAVE IMAGE]", e));
       } catch (imgErr) {
         console.error(`[OMNIMENS IMAGE] Error generating image ${i}:`, imgErr);
         res.write(`data: ${JSON.stringify({ type: "image_error", index: i, error: "Image generation failed" })}\n\n`);
@@ -2428,6 +2435,12 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
           const editDataUrl = `data:image/png;base64,${editedBuffer.toString("base64")}`;
           generatedImages.push({ url: editDataUrl, prompt: editPrompt });
           res.write(`data: ${JSON.stringify({ type: "image_generated", url: editDataUrl, prompt: editPrompt, index: generatedImages.length - 1, provider: "openai-edit" })}\n\n`);
+
+          autoSaveImage(req.user.id, conversationId, editedBuffer, editPrompt, "openai-edit", generatedImages.length - 1)
+            .then((fileId) => {
+              try { res.write(`data: ${JSON.stringify({ type: "file_saved", fileId, fileType: "image", filename: `omnimens_edit_${Date.now()}.png` })}\n\n`); } catch {}
+            })
+            .catch((e) => console.error("[AUTO-SAVE EDIT IMAGE]", e));
         } catch (editErr) {
           console.error("[OMNIMENS IMAGE EDIT] Error:", editErr);
           res.write(`data: ${JSON.stringify({ type: "image_error", index: 0, error: "Image editing failed" })}\n\n`);
@@ -2472,6 +2485,12 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
           sizeBytes: videoBuffer.length,
         })}\n\n`);
         videosGeneratedSuccessfully++;
+
+        autoSaveVideo(req.user.id, conversationId, videoBuffer, videoPrompt, videoProvider)
+          .then((fileId) => {
+            try { res.write(`data: ${JSON.stringify({ type: "file_saved", fileId, fileType: "video", filename: `omnimens_video_${Date.now()}.mp4` })}\n\n`); } catch {}
+          })
+          .catch((e) => console.error("[AUTO-SAVE VIDEO]", e));
       } catch (vidErr) {
         console.error(`[OMNIMENS VIDEO] Error generating video ${vi}:`, vidErr);
         res.write(`data: ${JSON.stringify({ type: "video_error", index: vi, error: "AI video generation failed" })}\n\n`);
@@ -2528,6 +2547,12 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
           zipSizeBytes: model3d.zipSizeBytes || 0,
           formats: model3d.formats || ["GLB"],
         })}\n\n`);
+
+        autoSave3DModel(req.user.id, conversationId, model3d.glbBase64, prompt3d, model3d.toolUsed || "blender")
+          .then((fileId) => {
+            try { res.write(`data: ${JSON.stringify({ type: "file_saved", fileId, fileType: "3d_model", filename: `omnimens_3d_${Date.now()}.glb` })}\n\n`); } catch {}
+          })
+          .catch((e) => console.error("[AUTO-SAVE 3D]", e));
       } catch (err3d) {
         console.error(`[OMNIMENS 3D] Error generating model ${i}:`, err3d);
         res.write(`data: ${JSON.stringify({ type: "3d_error", index: i, error: "3D generation failed — try a simpler description" })}\n\n`);
@@ -2580,6 +2605,15 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
           assetCount: gameResult.assetCount,
           formats: gameResult.formats,
         })}\n\n`);
+
+        const gameZip = gameResult.masterZipBase64 || gameResult.html5GameBase64;
+        if (gameZip) {
+          autoSaveGameZip(req.user.id, conversationId, gameZip, gameResult.title || "game", gamePrompt)
+            .then((fileId) => {
+              try { res.write(`data: ${JSON.stringify({ type: "file_saved", fileId, fileType: "game", filename: `omnimens_game_${Date.now()}.zip` })}\n\n`); } catch {}
+            })
+            .catch((e) => console.error("[AUTO-SAVE GAME]", e));
+        }
       } catch (gameErr) {
         console.error(`[OMNIMENS GAME] Error generating game:`, gameErr);
         res.write(`data: ${JSON.stringify({ type: "game_error", index: gi, error: "Game generation failed — try a simpler description" })}\n\n`);
@@ -3068,6 +3102,60 @@ router.delete("/omnimens/conversations/:id", async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: "Failed to delete conversation" });
+  }
+});
+
+// ─── User Files (Auto-saved assets) ──────────────────────────────────────────
+
+router.get("/omnimens/files", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const fileType = req.query.type as string | undefined;
+    const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
+    const offset = parseInt(req.query.offset as string) || 0;
+    const files = await getUserFiles(req.user.id, limit, offset, fileType);
+    const stats = await getUserFileStats(req.user.id);
+    res.json({ files, stats });
+  } catch (err) {
+    console.error("[FILES] Error listing:", err);
+    res.status(500).json({ error: "Failed to load files" });
+  }
+});
+
+router.get("/omnimens/files/conversation/:convId", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const convId = parseInt(req.params.convId);
+    const files = await getConversationFiles(req.user.id, convId);
+    res.json({ files });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load conversation files" });
+  }
+});
+
+router.get("/omnimens/files/:id/download", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const fileId = parseInt(req.params.id);
+    const file = await getUserFileById(req.user.id, fileId);
+    if (!file) { res.status(404).json({ error: "File not found" }); return; }
+    const inline = req.query.inline === "true";
+    await streamFileToResponse(file.storageKey, res, file.filename, file.mimeType, inline);
+  } catch (err) {
+    console.error("[FILES] Download error:", err);
+    res.status(500).json({ error: "Failed to download file" });
+  }
+});
+
+router.delete("/omnimens/files/:id", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const fileId = parseInt(req.params.id);
+    const ok = await deleteUserFile(req.user.id, fileId);
+    if (!ok) { res.status(404).json({ error: "File not found" }); return; }
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete file" });
   }
 });
 

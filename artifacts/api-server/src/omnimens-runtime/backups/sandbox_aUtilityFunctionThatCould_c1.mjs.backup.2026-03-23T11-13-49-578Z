@@ -1,0 +1,65 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-23T10:39:07.329Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+function findPatternsInText(text, patterns) {
+    // Utility function to find all occurrences of given patterns in a text
+    const results = {};
+    patterns.forEach((pattern) => {
+        const regex = new RegExp(pattern, 'g');
+        const matches = [];
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+            matches.push({ match: match[0], index: match.index });
+        }
+        results[pattern] = matches;
+    });
+    return results;
+}
+
+// Self-tests
+function runTests() {
+    console.log("Running tests...");
+
+    const text = "The quick brown fox jumps over the lazy dog. The fox is clever.";
+    const patterns = ["fox", "dog", "The"];
+
+    const result = findPatternsInText(text, patterns);
+
+    console.log("Test 1: Basic pattern matching");
+    console.log(result);
+    console.log(result["fox"].length === 2); // Expect 2 occurrences of "fox"
+    console.log(result["dog"].length === 1); // Expect 1 occurrence of "dog"
+    console.log(result["The"].length === 2); // Expect 2 occurrences of "The"
+
+    console.log("Test 2: No matches");
+    const noMatchResult = findPatternsInText(text, ["cat"]);
+    console.log(noMatchResult["cat"].length === 0); // Expect 0 occurrences of "cat"
+
+    console.log("Test 3: Edge case - empty text");
+    const emptyTextResult = findPatternsInText("", patterns);
+    console.log(Object.values(emptyTextResult).every((matches) => matches.length === 0)); // Expect no matches for any pattern
+
+    console.log("Test 4: Edge case - empty patterns");
+    const emptyPatternsResult = findPatternsInText(text, []);
+    console.log(Object.keys(emptyPatternsResult).length === 0); // Expect no results
+
+    console.log("All tests completed.");
+}
+
+// Execute tests
+runTests();

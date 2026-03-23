@@ -1,0 +1,57 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-23T08:37:11.502Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+function findMostFrequentPatterns(text, patternLength) {
+    if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
+        throw new Error('Invalid input: text must be a string and patternLength must be a positive number.');
+    }
+
+    const patternFrequency = new Map();
+
+    for (let i = 0; i <= text.length - patternLength; i++) {
+        const pattern = text.substring(i, i + patternLength);
+        patternFrequency.set(pattern, (patternFrequency.get(pattern) || 0) + 1);
+    }
+
+    let maxFrequency = 0;
+    const mostFrequentPatterns = [];
+
+    patternFrequency.forEach((frequency, pattern) => {
+        if (frequency > maxFrequency) {
+            maxFrequency = frequency;
+            mostFrequentPatterns.length = 0; // Clear the array
+            mostFrequentPatterns.push(pattern);
+        } else if (frequency === maxFrequency) {
+            mostFrequentPatterns.push(pattern);
+        }
+    });
+
+    return { mostFrequentPatterns, maxFrequency };
+}
+
+// Test cases
+console.log(findMostFrequentPatterns("abababab", 2)); // { mostFrequentPatterns: ['ab', 'ba'], maxFrequency: 3 }
+console.log(findMostFrequentPatterns("abcdefg", 3));  // { mostFrequentPatterns: ['abc', 'bcd', 'cde', 'def', 'efg'], maxFrequency: 1 }
+console.log(findMostFrequentPatterns("aaaaaa", 1));   // { mostFrequentPatterns: ['a'], maxFrequency: 6 }
+console.log(findMostFrequentPatterns("abcabcabc", 3)); // { mostFrequentPatterns: ['abc'], maxFrequency: 3 }
+console.log(findMostFrequentPatterns("xyzxyzxyzxyz", 4)); // { mostFrequentPatterns: ['xyzx', 'yzxy', 'zxyz'], maxFrequency: 3 }
+
+// Edge cases
+console.log(findMostFrequentPatterns("", 1)); // { mostFrequentPatterns: [], maxFrequency: 0 }
+console.log(findMostFrequentPatterns("a", 2)); // { mostFrequentPatterns: [], maxFrequency: 0 }
+console.log(findMostFrequentPatterns("a", 1)); // { mostFrequentPatterns: ['a'], maxFrequency: 1 }

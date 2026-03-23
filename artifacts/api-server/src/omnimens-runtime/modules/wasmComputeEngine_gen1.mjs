@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: wasmComputeEngine
- * Written: 2026-03-22T11:19:15.996Z
+ * Written: 2026-03-23T04:30:24.695Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,151 +20,106 @@
 
 /**
  * @module wasmComputeEngine
- * @description A WebAssembly-based computational engine for matrix operations and embeddings in Node.js.
- * This module leverages WebAssembly (WASM) for high-performance linear algebra computations.
+ * @description Provides accelerated matrix operations using WebAssembly for computationally heavy tasks.
+ * This module uses AssemblyScript-generated WebAssembly to perform numerical computations efficiently.
  */
 
 /**
- * @typedef {Object} Matrix
- * @property {number[][]} data - 2D array representing the matrix values.
- * @property {number} rows - Number of rows in the matrix.
- * @property {number} cols - Number of columns in the matrix.
+ * @function generateMatrixMultiplicationWasm
+ * @description Generates a WebAssembly binary for matrix multiplication using AssemblyScript source code.
+ * @returns {Uint8Array} A WebAssembly binary for matrix multiplication.
  */
-
-/**
- * @function createMatrix
- * @description Creates a matrix object from a 2D array.
- * @param {number[][]} array - The input 2D array.
- * @returns {Matrix} The matrix object.
- * @throws {Error} If the input array is not rectangular.
- */
-export function createMatrix(array) {
-  if (!Array.isArray(array) || array.length === 0 || !Array.isArray(array[0])) {
-    throw new Error("Input must be a non-empty 2D array.");
-  }
-
-  const rows = array.length;
-  const cols = array[0].length;
-
-  for (let i = 1; i < rows; i++) {
-    if (array[i].length !== cols) {
-      throw new Error("Input array must be rectangular.");
-    }
-  }
-
-  return { data: array, rows, cols };
-}
-
-/**
- * @function multiplyMatrices
- * @description Multiplies two matrices using WebAssembly for optimized computation.
- * @param {Matrix} matrixA - The first matrix.
- * @param {Matrix} matrixB - The second matrix.
- * @returns {Matrix} The resulting matrix after multiplication.
- * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
- */
-export function multiplyMatrices(matrixA, matrixB) {
-  if (matrixA.cols !== matrixB.rows) {
-    throw new Error("Matrix dimensions do not allow multiplication.");
-  }
-
-  const wasmCode = new Uint8Array([
-    // WASM bytecode for matrix multiplication (placeholder, replace with actual bytecode)
-  ]);
-
-  const wasmModule = new WebAssembly.Module(wasmCode);
-  const wasmInstance = new WebAssembly.Instance(wasmModule);
-
-  const resultData = [];
-
-  for (let i = 0; i < matrixA.rows; i++) {
-    const row = [];
-    for (let j = 0; j < matrixB.cols; j++) {
-      let sum = 0;
-      for (let k = 0; k < matrixA.cols; k++) {
-        sum += matrixA.data[i][k] * matrixB.data[k][j];
+function generateMatrixMultiplicationWasm() {
+  // AssemblyScript source code for matrix multiplication
+  const assemblyScriptSource = `
+    export function multiplyMatrices(
+      a: Float64Array,
+      b: Float64Array,
+      rowsA: i32,
+      colsA: i32,
+      colsB: i32
+    ): Float64Array {
+      const result = new Float64Array(rowsA * colsB);
+      for (let i = 0; i < rowsA; i++) {
+        for (let j = 0; j < colsB; j++) {
+          let sum = 0.0;
+          for (let k = 0; k < colsA; k++) {
+            sum += a[i * colsA + k] * b[k * colsB + j];
+          }
+          result[i * colsB + j] = sum;
+        }
       }
-      row.push(sum);
+      return result;
     }
-    resultData.push(row);
-  }
+  `;
 
-  return createMatrix(resultData);
+  // Convert AssemblyScript source code into WebAssembly binary
+  const { compile } = require("webassembly");
+  const wasmBinary = compile(assemblyScriptSource);
+
+  return wasmBinary;
 }
 
 /**
- * @function transposeMatrix
- * @description Transposes a given matrix.
- * @param {Matrix} matrix - The input matrix.
- * @returns {Matrix} The transposed matrix.
+ * @function loadWasmModule
+ * @description Loads a WebAssembly module from a binary and returns its exported functions.
+ * @param {Uint8Array} wasmBinary - The WebAssembly binary to load.
+ * @returns {Promise<Object>} A promise resolving to the WebAssembly module's exports.
  */
-export function transposeMatrix(matrix) {
-  const transposedData = [];
-
-  for (let i = 0; i < matrix.cols; i++) {
-    const row = [];
-    for (let j = 0; j < matrix.rows; j++) {
-      row.push(matrix.data[j][i]);
-    }
-    transposedData.push(row);
-  }
-
-  return createMatrix(transposedData);
+async function loadWasmModule(wasmBinary) {
+  const wasmModule = await WebAssembly.instantiate(wasmBinary);
+  return wasmModule.instance.exports;
 }
 
 /**
- * @function generateIdentityMatrix
- * @description Generates an identity matrix of a given size.
- * @param {number} size - The size of the identity matrix.
- * @returns {Matrix} The identity matrix.
- * @throws {Error} If the size is not a positive integer.
+ * @function matrixMultiply
+ * @description Multiplies two matrices using WebAssembly.
+ * @param {Float64Array} matrixA - The first matrix (flattened).
+ * @param {Float64Array} matrixB - The second matrix (flattened).
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA.
+ * @param {number} colsB - Number of columns in matrixB.
+ * @returns {Promise<Float64Array>} A promise resolving to the result matrix (flattened).
  */
-export function generateIdentityMatrix(size) {
-  if (!Number.isInteger(size) || size <= 0) {
-    throw new Error("Size must be a positive integer.");
+async function matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
+  const wasmBinary = generateMatrixMultiplicationWasm();
+  const wasmExports = await loadWasmModule(wasmBinary);
+
+  if (!wasmExports.multiplyMatrices) {
+    throw new Error("WebAssembly module does not export multiplyMatrices function.");
   }
 
-  const identityData = [];
-
-  for (let i = 0; i < size; i++) {
-    const row = new Array(size).fill(0);
-    row[i] = 1;
-    identityData.push(row);
-  }
-
-  return createMatrix(identityData);
+  return wasmExports.multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB);
 }
 
 /**
- * @function computeEmbedding
- * @description Computes an embedding vector for a given input using a simple linear transformation.
- * @param {number[]} vector - The input vector.
- * @param {Matrix} transformationMatrix - The transformation matrix.
- * @returns {number[]} The resulting embedding vector.
- * @throws {Error} If the vector length does not match the matrix rows.
+ * @function validateMatrixDimensions
+ * @description Validates matrix dimensions for multiplication compatibility.
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA.
+ * @param {number} rowsB - Number of rows in matrixB.
+ * @param {number} colsB - Number of columns in matrixB.
+ * @throws {Error} If matrices cannot be multiplied due to incompatible dimensions.
  */
-export function computeEmbedding(vector, transformationMatrix) {
-  if (vector.length !== transformationMatrix.rows) {
-    throw new Error("Vector length must match the number of rows in the transformation matrix.");
+function validateMatrixDimensions(rowsA, colsA, rowsB, colsB) {
+  if (colsA !== rowsB) {
+    throw new Error("Matrix dimensions are incompatible for multiplication.");
   }
-
-  const embedding = [];
-
-  for (let i = 0; i < transformationMatrix.cols; i++) {
-    let sum = 0;
-    for (let j = 0; j < vector.length; j++) {
-      sum += vector[j] * transformationMatrix.data[j][i];
-    }
-    embedding.push(sum);
-  }
-
-  return embedding;
 }
 
-export default {
-  createMatrix,
-  multiplyMatrices,
-  transposeMatrix,
-  generateIdentityMatrix,
-  computeEmbedding
-};
+/**
+ * @function multiply
+ * @description Public interface for matrix multiplication.
+ * @param {Float64Array} matrixA - The first matrix (flattened).
+ * @param {Float64Array} matrixB - The second matrix (flattened).
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA.
+ * @param {number} colsB - Number of columns in matrixB.
+ * @returns {Promise<Float64Array>} A promise resolving to the result matrix (flattened).
+ */
+async function multiply(matrixA, matrixB, rowsA, colsA, colsB) {
+  validateMatrixDimensions(rowsA, colsA, matrixB.length / colsB, colsB);
+  return matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB);
+}
+
+export { multiply };

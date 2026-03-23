@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-23T01:58:21.817Z
+ * Written: 2026-03-23T15:14:25.395Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,60 +16,47 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function for text analysis: Extract and count unique words from a given text
-function extractUniqueWords(text) {
-    if (typeof text !== 'string') {
-        throw new Error("Input must be a string");
+function findMostFrequentPatterns(text, patternLength) {
+    if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
+        throw new Error("Invalid input: text must be a string and patternLength must be a positive number.");
     }
 
-    // Normalize text: Remove punctuation, convert to lowercase, and split into words
-    const words = text
-        .replace(/[^a-zA-Z0-9\s]/g, '') // Remove non-alphanumeric characters
-        .toLowerCase()
-        .split(/\s+/); // Split by whitespace
+    const patternCounts = new Map();
 
-    // Use a Map to count occurrences of each unique word
-    const wordCounts = new Map();
-    for (const word of words) {
-        if (word) { // Ignore empty strings
-            wordCounts.set(word, (wordCounts.get(word) || 0) + 1);
-        }
+    for (let i = 0; i <= text.length - patternLength; i++) {
+        const pattern = text.substring(i, i + patternLength);
+        patternCounts.set(pattern, (patternCounts.get(pattern) || 0) + 1);
     }
 
-    // Convert Map to an array of objects for better readability
-    const result = [];
-    wordCounts.forEach((count, word) => {
-        result.push({ word, count });
-    });
-
-    // Sort results by word alphabetically
-    result.sort((a, b) => a.word.localeCompare(b.word));
-
-    return result;
+    const sortedPatterns = Array.from(patternCounts.entries()).sort((a, b) => b[1] - a[1]);
+    return sortedPatterns;
 }
 
-// Test cases
+// Self-tests
 function runTests() {
-    console.log("Test Case 1: Simple sentence");
-    console.log(extractUniqueWords("Hello world! Hello again, world."));
-    // Expected output: [ { word: 'again', count: 1 }, { word: 'hello', count: 2 }, { word: 'world', count: 2 } ]
+    console.log("Running tests...");
 
-    console.log("Test Case 2: Empty string");
-    console.log(extractUniqueWords(""));
-    // Expected output: []
+    const text1 = "abcabcabc";
+    const patterns1 = findMostFrequentPatterns(text1, 3);
+    console.log("Test 1:", patterns1); // Expect: [["abc", 3]]
 
-    console.log("Test Case 3: Numbers and mixed characters");
-    console.log(extractUniqueWords("123 123 test TEST test123!"));
-    // Expected output: [ { word: '123', count: 2 }, { word: 'test', count: 1 }, { word: 'test123', count: 1 } ]
+    const text2 = "aaaaa";
+    const patterns2 = findMostFrequentPatterns(text2, 2);
+    console.log("Test 2:", patterns2); // Expect: [["aa", 4]]
 
-    console.log("Test Case 4: Special characters only");
-    console.log(extractUniqueWords("!@#$%^&*()"));
-    // Expected output: []
+    const text3 = "abcdef";
+    const patterns3 = findMostFrequentPatterns(text3, 2);
+    console.log("Test 3:", patterns3); // Expect: [["ab", 1], ["bc", 1], ["cd", 1], ["de", 1], ["ef", 1]]
 
-    console.log("Test Case 5: Case insensitivity");
-    console.log(extractUniqueWords("Apple apple APPLE"));
-    // Expected output: [ { word: 'apple', count: 3 } ]
+    const text4 = "";
+    const patterns4 = findMostFrequentPatterns(text4, 2);
+    console.log("Test 4:", patterns4); // Expect: []
+
+    const text5 = "a";
+    const patterns5 = findMostFrequentPatterns(text5, 1);
+    console.log("Test 5:", patterns5); // Expect: [["a", 1]]
+
+    console.log("All tests completed.");
 }
 
-// Run tests
 runTests();

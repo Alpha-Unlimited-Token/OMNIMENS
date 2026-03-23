@@ -1,0 +1,119 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: vectorMemoryManager
+ * Written: 2026-03-23T08:11:31.669Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+/**
+ * @module vectorMemoryManager
+ * @description A utility module for storing and retrieving vector embeddings using a hybrid in-memory store with approximate nearest neighbor (ANN) search.
+ */
+
+/**
+ * @typedef {Object} VectorStore
+ * @property {Array<number>} vector - The embedding vector.
+ * @property {string} id - A unique identifier for the vector.
+ */
+
+/**
+ * @typedef {Object} SearchResult
+ * @property {string} id - The identifier of the closest vector.
+ * @property {number} distance - The computed distance to the query vector.
+ */
+
+/**
+ * Euclidean distance function to measure similarity between two vectors.
+ * @param {Array<number>} vectorA - The first vector.
+ * @param {Array<number>} vectorB - The second vector.
+ * @returns {number} The Euclidean distance between the two vectors.
+ */
+function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error("Vectors must have the same dimensions.");
+  }
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+}
+
+/**
+ * Class representing the VectorMemoryManager.
+ * Implements an in-memory vector store with approximate nearest neighbor search.
+ */
+class VectorMemoryManager {
+  constructor() {
+    /**
+     * @private
+     * @type {Array<VectorStore>}
+     */
+    this.store = [];
+  }
+
+  /**
+   * Adds a vector to the memory store.
+   * @param {string} id - The unique identifier for the vector.
+   * @param {Array<number>} vector - The embedding vector to store.
+   * @throws {Error} If a vector with the same ID already exists.
+   */
+  addVector(id, vector) {
+    if (this.store.some((entry) => entry.id === id)) {
+      throw new Error(`A vector with ID '${id}' already exists.`);
+    }
+    this.store.push({ id, vector });
+  }
+
+  /**
+   * Searches for the nearest vector to the query vector using approximate nearest neighbor search.
+   * @param {Array<number>} queryVector - The query embedding vector.
+   * @param {number} k - The number of nearest neighbors to retrieve.
+   * @returns {Array<SearchResult>} An array of the closest vectors and their distances.
+   */
+  search(queryVector, k = 1) {
+    if (k <= 0) {
+      throw new Error("Parameter 'k' must be greater than 0.");
+    }
+
+    // Compute distances to all vectors in the store
+    const distances = this.store.map((entry) => ({
+      id: entry.id,
+      distance: euclideanDistance(queryVector, entry.vector)
+    }));
+
+    // Sort by distance and return the top-k results
+    return distances
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, k);
+  }
+
+  /**
+   * Removes a vector from the memory store by its ID.
+   * @param {string} id - The unique identifier of the vector to remove.
+   * @returns {boolean} True if the vector was removed, false otherwise.
+   */
+  removeVector(id) {
+    const initialLength = this.store.length;
+    this.store = this.store.filter((entry) => entry.id !== id);
+    return this.store.length < initialLength;
+  }
+
+  /**
+   * Retrieves all stored vectors.
+   * @returns {Array<VectorStore>} An array of all stored vectors.
+   */
+  getAllVectors() {
+    return [...this.store];
+  }
+}
+
+// Export the VectorMemoryManager class
+export default VectorMemoryManager;

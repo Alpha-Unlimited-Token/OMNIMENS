@@ -1,0 +1,153 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-03-23T06:37:37.500Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+/**
+ * @module inMemoryVectorStore
+ * @description Provides in-memory semantic search capabilities using HNSW (Hierarchical Navigable Small World) for approximate nearest neighbor search.
+ */
+
+/**
+ * Represents a node in the HNSW graph.
+ * @class
+ */
+class HNSWNode {
+  constructor(id, vector) {
+    this.id = id;
+    this.vector = vector;
+    this.neighbors = []; // Array of neighbor nodes
+  }
+}
+
+/**
+ * Computes the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} The Euclidean distance.
+ */
+function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error("Vectors must have the same dimension.");
+  }
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+}
+
+/**
+ * HNSW-based in-memory vector store for approximate nearest neighbor search.
+ * @class
+ */
+class InMemoryVectorStore {
+  constructor() {
+    this.nodes = []; // Array of all nodes in the graph
+    this.maxNeighbors = 10; // Maximum number of neighbors per node
+  }
+
+  /**
+   * Adds a vector to the store.
+   * @param {number[]} vector - The vector to add.
+   * @returns {number} The ID of the added vector.
+   */
+  addVector(vector) {
+    const id = this.nodes.length;
+    const newNode = new HNSWNode(id, vector);
+
+    if (this.nodes.length > 0) {
+      // Connect the new node to existing nodes
+      this._connectNode(newNode);
+    }
+
+    this.nodes.push(newNode);
+    return id;
+  }
+
+  /**
+   * Searches for the nearest neighbors of a given vector.
+   * @param {number[]} queryVector - The query vector.
+   * @param {number} k - The number of nearest neighbors to return.
+   * @returns {Array<{id: number, distance: number}>} The nearest neighbors.
+   */
+  search(queryVector, k) {
+    if (this.nodes.length === 0) {
+      return [];
+    }
+
+    const visited = new Set();
+    const candidates = [this.nodes[0]]; // Start with the first node
+    const results = [];
+
+    while (candidates.length > 0) {
+      const currentNode = candidates.pop();
+
+      if (visited.has(currentNode.id)) {
+        continue;
+      }
+
+      visited.add(currentNode.id);
+      const distance = euclideanDistance(queryVector, currentNode.vector);
+
+      results.push({ id: currentNode.id, distance });
+      results.sort((a, b) => a.distance - b.distance);
+
+      if (results.length > k) {
+        results.pop();
+      }
+
+      // Add neighbors to the candidate list
+      candidates.push(...currentNode.neighbors);
+    }
+
+    return results;
+  }
+
+  /**
+   * Connects a new node to the graph.
+   * @private
+   * @param {HNSWNode} newNode - The new node to connect.
+   */
+  _connectNode(newNode) {
+    const distances = this.nodes.map((node) => ({
+      node,
+      distance: euclideanDistance(newNode.vector, node.vector),
+    }));
+
+    distances.sort((a, b) => a.distance - b.distance);
+
+    for (let i = 0; i < Math.min(this.maxNeighbors, distances.length); i++) {
+      const neighbor = distances[i].node;
+      newNode.neighbors.push(neighbor);
+      neighbor.neighbors.push(newNode);
+    }
+  }
+}
+
+/**
+ * Creates a new in-memory vector store.
+ * @returns {InMemoryVectorStore} The vector store instance.
+ */
+export function createVectorStore() {
+  return new InMemoryVectorStore();
+}
+
+/**
+ * Computes the similarity between two vectors using Euclidean distance.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} The similarity score (lower is more similar).
+ */
+export function computeSimilarity(vectorA, vectorB) {
+  return euclideanDistance(vectorA, vectorB);
+}

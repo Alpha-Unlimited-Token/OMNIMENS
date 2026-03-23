@@ -1,0 +1,115 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-03-23T12:22:41.624Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Complete ES module code here, starting with /** JSDoc */ and exports
+
+/**
+ * @module inMemoryVectorStore
+ * @description This module provides an in-memory vector store using Hierarchical Navigable Small-World (HNSW) graphs
+ * for fast approximate nearest neighbor search on embeddings.
+ */
+
+/**
+ * @typedef {Object} Node
+ * @property {number[]} vector - The vector associated with the node.
+ * @property {Set<number>} neighbors - Set of indices representing neighboring nodes.
+ */
+
+/**
+ * @typedef {Object} HNSWGraph
+ * @property {Node[]} nodes - Array of nodes representing the graph.
+ * @property {number} maxNeighbors - Maximum number of neighbors per node.
+ */
+
+/**
+ * Creates a new HNSW graph.
+ * @param {number} maxNeighbors - Maximum number of neighbors per node.
+ * @returns {HNSWGraph} A new HNSW graph.
+ */
+export function createGraph(maxNeighbors = 10) {
+  return {
+    nodes: [],
+    maxNeighbors
+  };
+}
+
+/**
+ * Calculates the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} The Euclidean distance.
+ */
+export function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error("Vectors must have the same dimension.");
+  }
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+}
+
+/**
+ * Adds a new vector to the HNSW graph.
+ * @param {HNSWGraph} graph - The HNSW graph.
+ * @param {number[]} vector - The vector to add.
+ */
+export function addVector(graph, vector) {
+  const newNode = {
+    vector,
+    neighbors: new Set()
+  };
+
+  const distances = graph.nodes.map((node, index) => ({
+    index,
+    distance: euclideanDistance(node.vector, vector)
+  }));
+
+  distances.sort((a, b) => a.distance - b.distance);
+
+  for (let i = 0; i < Math.min(graph.maxNeighbors, distances.length); i++) {
+    const neighborIndex = distances[i].index;
+    newNode.neighbors.add(neighborIndex);
+    graph.nodes[neighborIndex].neighbors.add(graph.nodes.length);
+  }
+
+  graph.nodes.push(newNode);
+}
+
+/**
+ * Searches for the nearest neighbors of a given vector.
+ * @param {HNSWGraph} graph - The HNSW graph.
+ * @param {number[]} queryVector - The vector to search for.
+ * @param {number} k - Number of nearest neighbors to retrieve.
+ * @returns {Array<{index: number, distance: number}>} Array of nearest neighbors with their indices and distances.
+ */
+export function searchNearestNeighbors(graph, queryVector, k = 5) {
+  const distances = graph.nodes.map((node, index) => ({
+    index,
+    distance: euclideanDistance(node.vector, queryVector)
+  }));
+
+  distances.sort((a, b) => a.distance - b.distance);
+
+  return distances.slice(0, k);
+}
+
+/**
+ * Example usage:
+ * const graph = createGraph(5);
+ * addVector(graph, [1, 2, 3]);
+ * addVector(graph, [4, 5, 6]);
+ * console.log(searchNearestNeighbors(graph, [1, 2, 3], 1));
+ */

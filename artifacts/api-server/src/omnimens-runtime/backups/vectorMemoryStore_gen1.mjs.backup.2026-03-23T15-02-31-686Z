@@ -1,0 +1,206 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: vectorMemoryStore
+ * Written: 2026-03-23T14:46:31.142Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+/**
+ * @module vectorMemoryStore
+ * @description Provides an in-memory vector store with HNSW (Hierarchical Navigable Small World) graph-based nearest neighbor search.
+ * This module is optimized for fast similarity search and embedding-based reasoning.
+ */
+
+/**
+ * @typedef {Object} Node
+ * @property {number} id - Unique identifier for the node.
+ * @property {Float32Array} vector - The vector stored in this node.
+ * @property {Map<number, Set<number>>} neighbors - Hierarchical neighbors organized by layer.
+ */
+
+/**
+ * Calculates the Euclidean distance between two vectors.
+ * @param {Float32Array} vec1 - First vector.
+ * @param {Float32Array} vec2 - Second vector.
+ * @returns {number} - Euclidean distance between the two vectors.
+ */
+function euclideanDistance(vec1, vec2) {
+  if (vec1.length !== vec2.length) {
+    throw new Error("Vectors must have the same dimensionality.");
+  }
+  let sum = 0;
+  for (let i = 0; i < vec1.length; i++) {
+    const diff = vec1[i] - vec2[i];
+    sum += diff * diff;
+  }
+  return Math.sqrt(sum);
+}
+
+/**
+ * Class representing the HNSW graph for vector similarity search.
+ */
+class HNSW {
+  /**
+   * @param {number} maxNeighbors - Maximum number of neighbors per layer.
+   * @param {number} ef - Size of the dynamic candidate list during search.
+   */
+  constructor(maxNeighbors = 16, ef = 10) {
+    this.maxNeighbors = maxNeighbors;
+    this.ef = ef;
+    this.nodes = new Map();
+    this.entryPoint = null;
+    this.layerCount = 0;
+  }
+
+  /**
+   * Adds a new vector to the HNSW graph.
+   * @param {number} id - Unique identifier for the vector.
+   * @param {Float32Array} vector - The vector to add.
+   */
+  addNode(id, vector) {
+    if (this.nodes.has(id)) {
+      throw new Error(`Node with id ${id} already exists.`);
+    }
+
+    const node = {
+      id,
+      vector,
+      neighbors: new Map()
+    };
+
+    const layer = this._randomLayer();
+    this.layerCount = Math.max(this.layerCount, layer + 1);
+
+    for (let l = 0; l <= layer; l++) {
+      node.neighbors.set(l, new Set());
+    }
+
+    if (this.entryPoint === null) {
+      this.entryPoint = node;
+    } else {
+      let current = this.entryPoint;
+      for (let l = this.layerCount - 1; l >= 0; l--) {
+        current = this._searchLayer(vector, current, l);
+        if (l <= layer) {
+          this._connectNeighbors(node, current, l);
+        }
+      }
+    }
+
+    this.nodes.set(id, node);
+  }
+
+  /**
+   * Searches for the nearest neighbors of a given query vector.
+   * @param {Float32Array} query - Query vector.
+   * @param {number} k - Number of nearest neighbors to retrieve.
+   * @returns {Array<{id: number, distance: number}>} - List of nearest neighbors.
+   */
+  search(query, k) {
+    if (!this.entryPoint) {
+      return [];
+    }
+
+    let candidates = [this.entryPoint];
+    let visited = new Set();
+    let results = [];
+
+    for (let l = this.layerCount - 1; l >= 0; l--) {
+      candidates = this._searchLayer(query, candidates[0], l, visited);
+    }
+
+    for (const candidate of candidates) {
+      const distance = euclideanDistance(query, candidate.vector);
+      results.push({ id: candidate.id, distance });
+    }
+
+    results.sort((a, b) => a.distance - b.distance);
+    return results.slice(0, k);
+  }
+
+  /**
+   * Searches within a specific layer of the HNSW graph.
+   * @private
+   * @param {Float32Array} query - Query vector.
+   * @param {Node} entry - Entry point node.
+   * @param {number} layer - Layer to search within.
+   * @param {Set<number>} [visited] - Set of visited node IDs.
+   * @returns {Node} - Closest node found in the layer.
+   */
+  _searchLayer(query, entry, layer, visited = new Set()) {
+    let closest = entry;
+    let closestDistance = euclideanDistance(query, entry.vector);
+
+    const candidates = [entry];
+    visited.add(entry.id);
+
+    while (candidates.length > 0) {
+      const current = candidates.pop();
+      for (const neighborId of current.neighbors.get(layer)) {
+        if (visited.has(neighborId)) {
+          continue;
+        }
+        visited.add(neighborId);
+        const neighbor = this.nodes.get(neighborId);
+        const distance = euclideanDistance(query, neighbor.vector);
+        if (distance < closestDistance) {
+          closest = neighbor;
+          closestDistance = distance;
+          candidates.push(neighbor);
+        }
+      }
+    }
+
+    return closest;
+  }
+
+  /**
+   * Connects a node to its neighbors in a specific layer.
+   * @private
+   * @param {Node} node - Node to connect.
+   * @param {Node} entry - Entry point node.
+   * @param {number} layer - Layer to connect within.
+   */
+  _connectNeighbors(node, entry, layer) {
+    const neighbors = Array.from(entry.neighbors.get(layer)).map(id => this.nodes.get(id));
+    neighbors.push(entry);
+
+    neighbors.sort((a, b) => {
+      const distA = euclideanDistance(node.vector, a.vector);
+      const distB = euclideanDistance(node.vector, b.vector);
+      return distA - distB;
+    });
+
+    const selectedNeighbors = neighbors.slice(0, this.maxNeighbors);
+    for (const neighbor of selectedNeighbors) {
+      node.neighbors.get(layer).add(neighbor.id);
+      neighbor.neighbors.get(layer).add(node.id);
+    }
+  }
+
+  /**
+   * Generates a random layer for a new node.
+   * @private
+   * @returns {number} - Random layer index.
+   */
+  _randomLayer() {
+    let layer = 0;
+    while (Math.random() < 0.5) {
+      layer++;
+    }
+    return layer;
+  }
+}
+
+export { HNSW, euclideanDistance };

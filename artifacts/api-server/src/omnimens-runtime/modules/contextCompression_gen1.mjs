@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: contextCompression
- * Written: 2026-03-22T17:31:26.259Z
+ * Written: 2026-03-23T11:17:17.862Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,132 +16,156 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
+// contextCompression.js
+
 /**
  * @module contextCompression
- * @description Summarizes and encodes long conversations into embeddings for reintroduction into the token window.
- * Implements hierarchical clustering and dimensionality reduction to manage conversation history efficiently.
+ * @description Compresses long conversations into essential summaries using clustering and summarization techniques.
  */
 
 /**
- * Generates embeddings for a given text input using a simple token-based frequency vector.
- * @param {string} text - The input text to encode.
- * @returns {number[]} - A numerical vector representing the text.
+ * Summarizes a conversation by clustering related ideas and distilling them into a compact representation.
+ * @param {string[]} conversation - Array of strings representing the conversation.
+ * @param {number} clusterCount - Number of clusters to form for summarization.
+ * @returns {string[]} - Array of key summary strings representing the compressed context.
  */
-export function generateEmbedding(text) {
-  const tokens = text.toLowerCase().match(/\b\w+\b/g) || [];
-  const tokenFrequency = {};
+export function compressContext(conversation, clusterCount = 3) {
+  if (!Array.isArray(conversation) || conversation.length === 0) {
+    throw new Error("Invalid conversation input. Must be a non-empty array of strings.");
+  }
 
-  tokens.forEach(token => {
-    tokenFrequency[token] = (tokenFrequency[token] || 0) + 1;
-  });
+  if (typeof clusterCount !== "number" || clusterCount <= 0) {
+    throw new Error("Invalid clusterCount input. Must be a positive integer.");
+  }
 
-  const uniqueTokens = Object.keys(tokenFrequency).sort();
-  return uniqueTokens.map(token => tokenFrequency[token]);
+  // Step 1: Tokenize and preprocess conversation
+  const tokenizedSentences = conversation.map((sentence) => tokenize(sentence));
+
+  // Step 2: Calculate sentence similarity matrix
+  const similarityMatrix = calculateSimilarityMatrix(tokenizedSentences);
+
+  // Step 3: Perform clustering
+  const clusters = kMeansClustering(similarityMatrix, clusterCount);
+
+  // Step 4: Summarize each cluster
+  const summaries = clusters.map((cluster) => summarizeCluster(cluster, conversation));
+
+  return summaries;
 }
 
 /**
- * Calculates the cosine similarity between two vectors.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number} - The cosine similarity value between -1 and 1.
+ * Tokenizes a sentence into an array of words.
+ * @param {string} sentence - The sentence to tokenize.
+ * @returns {string[]} - Array of words.
  */
-export function cosineSimilarity(vectorA, vectorB) {
-  const dotProduct = vectorA.reduce((sum, val, i) => sum + val * (vectorB[i] || 0), 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val * val, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val * val, 0));
-
-  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
+function tokenize(sentence) {
+  return sentence
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, "")
+    .split(/\s+/)
+    .filter((word) => word.length > 0);
 }
 
 /**
- * Performs hierarchical clustering on a set of embeddings.
- * @param {Array<number[]>} embeddings - An array of numerical vectors.
- * @param {number} threshold - The similarity threshold for merging clusters.
- * @returns {Array<Array<number[]>>} - A nested array representing clusters of embeddings.
+ * Calculates a similarity matrix for an array of tokenized sentences.
+ * @param {string[][]} tokenizedSentences - Array of tokenized sentences.
+ * @returns {number[][]} - 2D array representing sentence similarity scores.
  */
-export function hierarchicalClustering(embeddings, threshold = 0.8) {
-  const clusters = embeddings.map(embedding => [embedding]);
+function calculateSimilarityMatrix(tokenizedSentences) {
+  const matrix = [];
 
-  while (true) {
-    let maxSimilarity = -Infinity;
-    let mergeIndexA = -1;
-    let mergeIndexB = -1;
+  for (let i = 0; i < tokenizedSentences.length; i++) {
+    matrix[i] = [];
+    for (let j = 0; j < tokenizedSentences.length; j++) {
+      matrix[i][j] = calculateSimilarity(tokenizedSentences[i], tokenizedSentences[j]);
+    }
+  }
 
-    for (let i = 0; i < clusters.length; i++) {
-      for (let j = i + 1; j < clusters.length; j++) {
-        const similarity = cosineSimilarity(
-          averageEmbedding(clusters[i]),
-          averageEmbedding(clusters[j])
-        );
+  return matrix;
+}
 
-        if (similarity > maxSimilarity) {
-          maxSimilarity = similarity;
-          mergeIndexA = i;
-          mergeIndexB = j;
+/**
+ * Calculates similarity between two tokenized sentences using Jaccard similarity.
+ * @param {string[]} tokensA - Tokenized sentence A.
+ * @param {string[]} tokensB - Tokenized sentence B.
+ * @returns {number} - Similarity score between 0 and 1.
+ */
+function calculateSimilarity(tokensA, tokensB) {
+  const setA = new Set(tokensA);
+  const setB = new Set(tokensB);
+
+  const intersection = new Set([...setA].filter((x) => setB.has(x))).size;
+  const union = new Set([...setA, ...setB]).size;
+
+  return intersection / union;
+}
+
+/**
+ * Performs k-means clustering on a similarity matrix.
+ * @param {number[][]} similarityMatrix - 2D array representing sentence similarity scores.
+ * @param {number} k - Number of clusters.
+ * @returns {number[][]} - Array of clusters, each containing indices of sentences.
+ */
+function kMeansClustering(similarityMatrix, k) {
+  const n = similarityMatrix.length;
+  const centroids = Array.from({ length: k }, () => Math.floor(Math.random() * n));
+  let clusters = Array.from({ length: k }, () => []);
+  let previousCentroids;
+
+  do {
+    previousCentroids = [...centroids];
+    clusters = Array.from({ length: k }, () => []);
+
+    for (let i = 0; i < n; i++) {
+      let closestCentroid = 0;
+      let maxSimilarity = -Infinity;
+
+      for (let j = 0; j < k; j++) {
+        if (similarityMatrix[i][centroids[j]] > maxSimilarity) {
+          maxSimilarity = similarityMatrix[i][centroids[j]];
+          closestCentroid = j;
         }
       }
+
+      clusters[closestCentroid].push(i);
     }
 
-    if (maxSimilarity < threshold) break;
+    centroids = clusters.map((cluster) => {
+      const clusterSimilarity = cluster.map((index) => similarityMatrix[index]);
+      const averageSimilarity = clusterSimilarity.reduce((acc, row) => {
+        return acc.map((sum, i) => sum + row[i]);
+      }, Array(n).fill(0)).map((sum) => sum / cluster.length);
 
-    const mergedCluster = clusters[mergeIndexA].concat(clusters[mergeIndexB]);
-    clusters.splice(mergeIndexB, 1);
-    clusters[mergeIndexA] = mergedCluster;
-  }
+      return averageSimilarity.indexOf(Math.max(...averageSimilarity));
+    });
+  } while (!centroids.every((c, i) => c === previousCentroids[i]));
 
   return clusters;
 }
 
 /**
- * Computes the average embedding for a cluster of embeddings.
- * @param {Array<number[]>} cluster - A cluster of embeddings.
- * @returns {number[]} - The average embedding vector.
+ * Summarizes a cluster by selecting the most representative sentence.
+ * @param {number[]} cluster - Array of indices representing sentences in the cluster.
+ * @param {string[]} conversation - Original conversation array.
+ * @returns {string} - Summary of the cluster.
  */
-export function averageEmbedding(cluster) {
-  const dimension = cluster[0].length;
-  const sumVector = new Array(dimension).fill(0);
+function summarizeCluster(cluster, conversation) {
+  let representativeSentence = "";
+  let maxScore = -Infinity;
 
-  cluster.forEach(embedding => {
-    embedding.forEach((value, index) => {
-      sumVector[index] += value;
-    });
-  });
+  for (const index of cluster) {
+    const score = cluster.reduce((sum, otherIndex) => sum + calculateSimilarity(
+      tokenize(conversation[index]),
+      tokenize(conversation[otherIndex])
+    ), 0);
 
-  return sumVector.map(value => value / cluster.length);
+    if (score > maxScore) {
+      maxScore = score;
+      representativeSentence = conversation[index];
+    }
+  }
+
+  return representativeSentence;
 }
 
-/**
- * Summarizes a conversation by clustering and reducing its embeddings.
- * @param {string[]} conversation - An array of conversation strings.
- * @param {number} threshold - The similarity threshold for clustering.
- * @returns {string[]} - A summarized list of representative conversation strings.
- */
-export function summarizeConversation(conversation, threshold = 0.8) {
-  const embeddings = conversation.map(generateEmbedding);
-  const clusters = hierarchicalClustering(embeddings, threshold);
-
-  return clusters.map(cluster => {
-    const representativeEmbedding = averageEmbedding(cluster);
-    let bestMatch = "";
-    let bestSimilarity = -Infinity;
-
-    conversation.forEach((text, index) => {
-      const similarity = cosineSimilarity(representativeEmbedding, embeddings[index]);
-      if (similarity > bestSimilarity) {
-        bestSimilarity = similarity;
-        bestMatch = text;
-      }
-    });
-
-    return bestMatch;
-  });
-}
-
-/**
- * Encodes a summarized conversation into a compact representation.
- * @param {string[]} summarizedConversation - An array of summarized conversation strings.
- * @returns {string} - A compact JSON string encoding the summarized conversation.
- */
-export function encodeSummarizedConversation(summarizedConversation) {
-  return JSON.stringify(summarizedConversation);
-}
+export default { compressContext };

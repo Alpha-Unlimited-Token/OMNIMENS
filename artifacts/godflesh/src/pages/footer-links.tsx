@@ -21,6 +21,7 @@ const LINK_SECTIONS = [
       { icon: <CreditCard className="w-4 h-4" />, label: "Pricing", href: "/pricing", desc: "View plans and credit packs" },
       { icon: <Code2 className="w-4 h-4" />, label: "Developer", href: "/developer", desc: "API access and documentation" },
       { icon: <Layers className="w-4 h-4" />, label: "Projects", href: "/projects", desc: "Your saved projects and files" },
+      { icon: <Layers className="w-4 h-4" />, label: "My Files", href: "/files", desc: "Auto-saved images, videos, and assets" },
       { icon: <Brain className="w-4 h-4" />, label: "Memory", href: "/memory", desc: "Manage OMNIMENS memory" },
       { icon: <Zap className="w-4 h-4" />, label: "Tools", href: "/tools", desc: "Configure AI tools and features" },
     ],

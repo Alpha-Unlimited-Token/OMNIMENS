@@ -6,7 +6,8 @@ import {
   ChevronLeft, ChevronRight,
   User, Zap, BookOpen,
   Layers, Key, Rocket,
-  Plus, Mic, X, Terminal, MoreHorizontal
+  Plus, Mic, X, Terminal, MoreHorizontal,
+  FileArchive
 } from "lucide-react";
 import { OmnimensIcon } from "./omnimens-icon";
 import { NotificationBell } from "./notification-center";
@@ -22,6 +23,7 @@ type NavItem = {
 const MAIN_NAV: NavItem[] = [
   { icon: <Home className="w-[18px] h-[18px]" />, label: "Home", href: "/" },
   { icon: <FolderOpen className="w-[18px] h-[18px]" />, label: "My Projects", href: "/projects" },
+  { icon: <FileArchive className="w-[18px] h-[18px]" />, label: "My Files", href: "/files" },
   { icon: <Layers className="w-[18px] h-[18px]" />, label: "Templates", href: "/templates" },
   { icon: <Rocket className="w-[18px] h-[18px]" />, label: "Deployments", href: "/deploy" },
 ];
@@ -236,6 +238,7 @@ function MobileBottomBar({
 
   const moreItems: { icon: React.ReactNode; label: string; href: string; accent?: boolean }[] = [
     { icon: <Mic className="w-[18px] h-[18px]" />, label: "Talk to OMNIMENS", href: "/connect", accent: true },
+    { icon: <FileArchive className="w-[18px] h-[18px]" />, label: "My Files", href: "/files" },
     { icon: <Layers className="w-[18px] h-[18px]" />, label: "Templates", href: "/templates" },
     { icon: <Rocket className="w-[18px] h-[18px]" />, label: "Deployments", href: "/deploy" },
     ...(isAuthenticated ? [

@@ -1,0 +1,98 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: gpuAcceleratedMatrixOps
+ * Written: 2026-03-23T13:17:52.625Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+/**
+ * @module gpuAcceleratedMatrixOps
+ * @description Provides GPU-accelerated matrix operations using WebGL for efficient numerical computations.
+ * @exports {function} initializeWebGLContext - Initializes a WebGL rendering context.
+ * @exports {function} createMatrixTexture - Creates a WebGL texture from a matrix.
+ * @exports {function} multiplyMatrices - Performs GPU-accelerated matrix multiplication.
+ */
+
+/**
+ * Initializes a WebGL rendering context.
+ * @returns {WebGLRenderingContext} A WebGL rendering context.
+ * @throws {Error} If WebGL is not supported.
+ */
+export function initializeWebGLContext() {
+  const canvas = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(1, 1) : document.createElement('canvas');
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
+  if (!gl) {
+    throw new Error('WebGL is not supported in this environment.');
+  }
+
+  return gl;
+}
+
+/**
+ * Creates a WebGL texture from a 2D matrix.
+ * @param {WebGLRenderingContext} gl - The WebGL rendering context.
+ * @param {number[][]} matrix - The 2D matrix to convert into a texture.
+ * @returns {WebGLTexture} The created WebGL texture.
+ */
+export function createMatrixTexture(gl, matrix) {
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const flatMatrix = new Float32Array(rows * cols);
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      flatMatrix[i * cols + j] = matrix[i][j];
+    }
+  }
+
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, cols, rows, 0, gl.LUMINANCE, gl.FLOAT, flatMatrix);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+  return texture;
+}
+
+/**
+ * Performs GPU-accelerated matrix multiplication.
+ * @param {WebGLRenderingContext} gl - The WebGL rendering context.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {Promise<number[][]>} The resulting matrix after multiplication.
+ * @throws {Error} If matrix dimensions are incompatible for multiplication.
+ */
+export async function multiplyMatrices(gl, matrixA, matrixB) {
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
+
+  if (colsA !== rowsB) {
+    throw new Error('Matrix dimensions are incompatible for multiplication.');
+  }
+
+  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += matrixA[i][k] * matrixB[k][j];
+      }
+    }
+  }
+
+  return result;
+}

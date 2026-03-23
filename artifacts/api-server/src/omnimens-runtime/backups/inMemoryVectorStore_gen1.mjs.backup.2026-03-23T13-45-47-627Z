@@ -1,0 +1,143 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-03-23T13:18:10.050Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// In-memory vector store ES module
+
+/**
+ * @module inMemoryVectorStore
+ * @description Provides an in-memory vector storage and retrieval system optimized for fast similarity searches using cosine similarity and k-d tree partitioning.
+ */
+
+/**
+ * Represents a single node in the k-d tree.
+ * @class KDTreeNode
+ */
+class KDTreeNode {
+  /**
+   * @param {number[]} vector - The vector stored at this node.
+   * @param {number} index - The index of the vector in the original dataset.
+   * @param {KDTreeNode|null} left - Left child node.
+   * @param {KDTreeNode|null} right - Right child node.
+   */
+  constructor(vector, index, left = null, right = null) {
+    this.vector = vector;
+    this.index = index;
+    this.left = left;
+    this.right = right;
+  }
+}
+
+/**
+ * Calculates cosine similarity between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} - Cosine similarity score.
+ */
+function cosineSimilarity(vectorA, vectorB) {
+  const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a * a, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b * b, 0));
+  return dotProduct / (magnitudeA * magnitudeB);
+}
+
+/**
+ * Builds a k-d tree from a set of vectors.
+ * @param {Array<{vector: number[], index: number}>} data - Array of objects containing vectors and their indices.
+ * @param {number} depth - Current depth of the tree.
+ * @returns {KDTreeNode|null} - Root node of the k-d tree.
+ */
+function buildKDTree(data, depth = 0) {
+  if (data.length === 0) return null;
+
+  const axis = depth % data[0].vector.length;
+  data.sort((a, b) => a.vector[axis] - b.vector[axis]);
+
+  const median = Math.floor(data.length / 2);
+
+  return new KDTreeNode(
+    data[median].vector,
+    data[median].index,
+    buildKDTree(data.slice(0, median), depth + 1),
+    buildKDTree(data.slice(median + 1), depth + 1)
+  );
+}
+
+/**
+ * Searches the k-d tree for the most similar vector using cosine similarity.
+ * @param {KDTreeNode|null} node - Root node of the k-d tree.
+ * @param {number[]} targetVector - Vector to search for.
+ * @param {number} depth - Current depth in the tree.
+ * @param {{bestNode: KDTreeNode|null, bestSimilarity: number}} best - Best match found so far.
+ * @returns {{bestNode: KDTreeNode|null, bestSimilarity: number}} - Best match found.
+ */
+function searchKDTree(node, targetVector, depth = 0, best = { bestNode: null, bestSimilarity: -Infinity }) {
+  if (!node) return best;
+
+  const axis = depth % targetVector.length;
+
+  const similarity = cosineSimilarity(targetVector, node.vector);
+  if (similarity > best.bestSimilarity) {
+    best = { bestNode: node, bestSimilarity: similarity };
+  }
+
+  const nextBranch = targetVector[axis] < node.vector[axis] ? node.left : node.right;
+  const otherBranch = targetVector[axis] < node.vector[axis] ? node.right : node.left;
+
+  best = searchKDTree(nextBranch, targetVector, depth + 1, best);
+
+  if (Math.abs(targetVector[axis] - node.vector[axis]) < best.bestSimilarity) {
+    best = searchKDTree(otherBranch, targetVector, depth + 1, best);
+  }
+
+  return best;
+}
+
+/**
+ * InMemoryVectorStore class for storing and retrieving vectors.
+ */
+class InMemoryVectorStore {
+  constructor() {
+    this.vectors = [];
+    this.kdTreeRoot = null;
+  }
+
+  /**
+   * Adds a vector to the store.
+   * @param {number[]} vector - Vector to add.
+   */
+  addVector(vector) {
+    this.vectors.push({ vector, index: this.vectors.length });
+    this.kdTreeRoot = buildKDTree(this.vectors);
+  }
+
+  /**
+   * Searches for the most similar vector in the store.
+   * @param {number[]} targetVector - Vector to search for.
+   * @returns {{vector: number[], index: number, similarity: number}} - Most similar vector and its similarity score.
+   */
+  search(targetVector) {
+    const result = searchKDTree(this.kdTreeRoot, targetVector);
+    return {
+      vector: result.bestNode.vector,
+      index: result.bestNode.index,
+      similarity: result.bestSimilarity
+    };
+  }
+}
+
+export { InMemoryVectorStore, cosineSimilarity };

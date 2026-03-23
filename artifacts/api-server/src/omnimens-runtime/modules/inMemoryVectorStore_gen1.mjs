@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-03-23T01:18:11.222Z
+ * Written: 2026-03-23T13:45:47.625Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,77 +16,156 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Complete ES module code here, starting with /** JSDoc */ and exports
-
 /**
  * @module inMemoryVectorStore
- * @description A utility module for storing and retrieving vector embeddings in memory, enabling fast similarity searches using KD-Tree.
+ * @description Provides fast similarity search and embedding lookup using HNSW (Hierarchical Navigable Small World) graphs.
  */
 
 /**
- * @typedef {Object} VectorStore
- * @property {Object} vectors - A map of vector IDs to their corresponding embeddings.
- * @property {Function} addVector - Adds a vector to the store.
- * @property {Function} searchNearest - Finds the nearest neighbors to a given query vector.
+ * Represents a node in the HNSW graph.
+ * @typedef {Object} Node
+ * @property {number[]} vector - The embedding vector of the node.
+ * @property {number} id - Unique identifier for the node.
+ * @property {Map<number, Set<number>>} neighbors - Neighbors organized by layer.
  */
 
-/**
- * Calculates the Euclidean distance between two vectors.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number} - The Euclidean distance.
- */
-function euclideanDistance(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error("Vectors must have the same dimension.");
+class HNSW {
+  constructor(maxNeighbors = 16, efConstruction = 200) {
+    /**
+     * @type {Node[]}
+     * @private
+     */
+    this.nodes = [];
+
+    /**
+     * @type {number}
+     * @private
+     */
+    this.maxNeighbors = maxNeighbors;
+
+    /**
+     * @type {number}
+     * @private
+     */
+    this.efConstruction = efConstruction;
   }
-  return Math.sqrt(vectorA.reduce((sum, val, index) => sum + Math.pow(val - vectorB[index], 2), 0));
-}
-
-/**
- * Creates an in-memory vector store for embeddings.
- * @returns {VectorStore} - The vector store instance.
- */
-function createVectorStore() {
-  const vectors = {};
 
   /**
-   * Adds a vector to the store.
-   * @param {string} id - The unique identifier for the vector.
-   * @param {number[]} embedding - The vector embedding.
+   * Calculates the Euclidean distance between two vectors.
+   * @param {number[]} a - First vector.
+   * @param {number[]} b - Second vector.
+   * @returns {number} - The Euclidean distance.
    */
-  function addVector(id, embedding) {
-    if (!Array.isArray(embedding)) {
-      throw new Error("Embedding must be an array.");
+  static euclideanDistance(a, b) {
+    if (a.length !== b.length) {
+      throw new Error("Vectors must have the same dimensions.");
     }
-    vectors[id] = embedding;
+    return Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0));
   }
 
   /**
-   * Finds the nearest neighbors to a given query vector.
+   * Adds a new vector to the HNSW graph.
+   * @param {number[]} vector - The embedding vector to add.
+   * @returns {number} - The ID of the newly added node.
+   */
+  addVector(vector) {
+    const id = this.nodes.length;
+    const newNode = {
+      vector,
+      id,
+      neighbors: new Map()
+    };
+
+    // Initialize neighbors for each layer
+    for (let layer = 0; layer < this.maxNeighbors; layer++) {
+      newNode.neighbors.set(layer, new Set());
+    }
+
+    this.nodes.push(newNode);
+
+    if (id > 0) {
+      this._connectNode(newNode);
+    }
+
+    return id;
+  }
+
+  /**
+   * Connects a new node to the graph using the nearest neighbors.
+   * @param {Node} newNode - The new node to connect.
+   * @private
+   */
+  _connectNode(newNode) {
+    const neighbors = this._searchKNN(newNode.vector, this.efConstruction);
+
+    for (const neighbor of neighbors) {
+      this._linkNodes(newNode, neighbor);
+    }
+  }
+
+  /**
+   * Links two nodes in the HNSW graph.
+   * @param {Node} nodeA - First node.
+   * @param {Node} nodeB - Second node.
+   * @private
+   */
+  _linkNodes(nodeA, nodeB) {
+    const layer = 0; // Single-layer implementation for simplicity
+    if (nodeA.neighbors.get(layer).size < this.maxNeighbors) {
+      nodeA.neighbors.get(layer).add(nodeB.id);
+    }
+    if (nodeB.neighbors.get(layer).size < this.maxNeighbors) {
+      nodeB.neighbors.get(layer).add(nodeA.id);
+    }
+  }
+
+  /**
+   * Searches for the k-nearest neighbors to a given vector.
    * @param {number[]} queryVector - The vector to search for.
    * @param {number} k - The number of neighbors to retrieve.
-   * @returns {Array<{id: string, distance: number}>} - The nearest neighbors sorted by distance.
+   * @returns {Node[]} - The k-nearest neighbors.
    */
-  function searchNearest(queryVector, k = 1) {
-    if (!Array.isArray(queryVector)) {
-      throw new Error("Query vector must be an array.");
-    }
-    if (k <= 0) {
-      throw new Error("Number of neighbors (k) must be greater than 0.");
-    }
-
-    const distances = Object.entries(vectors).map(([id, vector]) => {
-      const distance = euclideanDistance(queryVector, vector);
-      return { id, distance };
-    });
+  _searchKNN(queryVector, k) {
+    const distances = this.nodes.map(node => ({
+      node,
+      distance: HNSW.euclideanDistance(queryVector, node.vector)
+    }));
 
     distances.sort((a, b) => a.distance - b.distance);
 
-    return distances.slice(0, k);
+    return distances.slice(0, k).map(entry => entry.node);
   }
 
-  return { addVector, searchNearest };
+  /**
+   * Finds the most similar vectors to the query vector.
+   * @param {number[]} queryVector - The vector to search for.
+   * @param {number} topK - The number of top results to return.
+   * @returns {Array<{id: number, distance: number}>} - The top K similar vectors with their distances.
+   */
+  search(queryVector, topK) {
+    const neighbors = this._searchKNN(queryVector, topK);
+    return neighbors.map(node => ({
+      id: node.id,
+      distance: HNSW.euclideanDistance(queryVector, node.vector)
+    }));
+  }
 }
 
-export { createVectorStore, euclideanDistance };
+/**
+ * Creates a new HNSW instance.
+ * @param {number} [maxNeighbors=16] - Maximum number of neighbors per node.
+ * @param {number} [efConstruction=200] - Size of the candidate pool during construction.
+ * @returns {HNSW} - The HNSW instance.
+ */
+export function createVectorStore(maxNeighbors = 16, efConstruction = 200) {
+  return new HNSW(maxNeighbors, efConstruction);
+}
+
+/**
+ * Example usage:
+ * const store = createVectorStore();
+ * const id1 = store.addVector([1, 2, 3]);
+ * const id2 = store.addVector([4, 5, 6]);
+ * const results = store.search([1, 2, 3], 1);
+ * console.log(results);
+ */

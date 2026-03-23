@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-23T02:10:26.935Z
+ * Written: 2026-03-23T14:23:15.181Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,64 +17,74 @@
  */
 
 function KnowledgeGraph() {
-    this.nodes = new Map();
+  this.nodes = new Map();
 }
 
 KnowledgeGraph.prototype.addConcept = function(concept, relatedConcepts) {
-    if (!this.nodes.has(concept)) {
-        this.nodes.set(concept, new Set());
+  if (!this.nodes.has(concept)) {
+    this.nodes.set(concept, new Set());
+  }
+  for (let related of relatedConcepts) {
+    if (!this.nodes.has(related)) {
+      this.nodes.set(related, new Set());
     }
-    for (var i = 0; i < relatedConcepts.length; i++) {
-        this.nodes.get(concept).add(relatedConcepts[i]);
-        if (!this.nodes.has(relatedConcepts[i])) {
-            this.nodes.set(relatedConcepts[i], new Set());
-        }
-        this.nodes.get(relatedConcepts[i]).add(concept);
-    }
+    this.nodes.get(concept).add(related);
+    this.nodes.get(related).add(concept);
+  }
 };
 
-KnowledgeGraph.prototype.retrieveRelatedConcepts = function(concept) {
-    if (this.nodes.has(concept)) {
-        return Array.from(this.nodes.get(concept));
+KnowledgeGraph.prototype.findShortestPath = function(start, end) {
+  if (!this.nodes.has(start) || !this.nodes.has(end)) {
+    return null;
+  }
+
+  let visited = new Set();
+  let queue = [[start, [start]]];
+
+  while (queue.length > 0) {
+    let [current, path] = queue.shift();
+
+    if (current === end) {
+      return path;
     }
-    return [];
+
+    visited.add(current);
+
+    for (let neighbor of this.nodes.get(current)) {
+      if (!visited.has(neighbor)) {
+        queue.push([neighbor, path.concat(neighbor)]);
+      }
+    }
+  }
+
+  return null;
 };
 
-KnowledgeGraph.prototype.findPattern = function(pattern) {
-    var matches = [];
-    var regex = new RegExp(pattern);
-    this.nodes.forEach(function(relatedConcepts, concept) {
-        if (regex.test(concept)) {
-            matches.push(concept);
-        }
-    });
-    return matches;
+KnowledgeGraph.prototype.findPatterns = function(pattern) {
+  let matches = [];
+  for (let concept of this.nodes.keys()) {
+    if (concept.includes(pattern)) {
+      matches.push(concept);
+    }
+  }
+  return matches;
 };
 
 // Self-tests
-var graph = new KnowledgeGraph();
+const graph = new KnowledgeGraph();
 
-// Adding concepts and relationships
+// Adding concepts and their relationships
 graph.addConcept("AI", ["Machine Learning", "Neural Networks"]);
-graph.addConcept("Machine Learning", ["Supervised Learning", "Unsupervised Learning"]);
+graph.addConcept("Machine Learning", ["Data Science", "Statistics"]);
 graph.addConcept("Neural Networks", ["Deep Learning", "Backpropagation"]);
-graph.addConcept("Optimization", ["Gradient Descent", "Variable Entropy Policy Optimization"]);
+graph.addConcept("Data Science", ["Big Data", "Visualization"]);
+graph.addConcept("Statistics", ["Probability", "Analysis"]);
+graph.addConcept("Deep Learning", ["TensorFlow", "PyTorch"]);
+graph.addConcept("Backpropagation", ["Optimization"]);
+graph.addConcept("Big Data", ["Hadoop", "Spark"]);
 
-// Test 1: Retrieve related concepts
-console.log("Test 1: Related concepts of 'AI':", graph.retrieveRelatedConcepts("AI")); // Expected: ["Machine Learning", "Neural Networks"]
-
-// Test 2: Retrieve related concepts of a concept with no relationships
-console.log("Test 2: Related concepts of 'Quantum Computing':", graph.retrieveRelatedConcepts("Quantum Computing")); // Expected: []
-
-// Test 3: Find concepts matching a pattern
-console.log("Test 3: Concepts matching 'Learning':", graph.findPattern("Learning")); // Expected: ["Machine Learning", "Supervised Learning", "Unsupervised Learning"]
-
-// Test 4: Find concepts matching a pattern with no matches
-console.log("Test 4: Concepts matching 'Physics':", graph.findPattern("Physics")); // Expected: []
-
-// Test 5: Ensure bidirectional relationships
-console.log("Test 5: Related concepts of 'Neural Networks':", graph.retrieveRelatedConcepts("Neural Networks")); // Expected: ["AI", "Deep Learning", "Backpropagation"]
-
-// Test 6: Adding new relationships dynamically
-graph.addConcept("Evolutionary Algorithms", ["Optimization", "Multi-Objective Search"]);
-console.log("Test 6: Related concepts of 'Optimization':", graph.retrieveRelatedConcepts("Optimization")); // Expected: ["Gradient Descent", "Variable Entropy Policy Optimization", "Evolutionary Algorithms"]
+console.log("Shortest Path (AI to Spark):", graph.findShortestPath("AI", "Spark"));
+console.log("Shortest Path (Deep Learning to Probability):", graph.findShortestPath("Deep Learning", "Probability"));
+console.log("Pattern Match ('Data'):", graph.findPatterns("Data"));
+console.log("Pattern Match ('Learning'):", graph.findPatterns("Learning"));
+console.log("Edge Case (Non-existent concept):", graph.findShortestPath("AI", "Quantum Computing"));

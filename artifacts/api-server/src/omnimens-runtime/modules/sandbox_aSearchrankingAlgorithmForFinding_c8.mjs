@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a search/ranking algorithm for finding the most relevant information
- * Written: 2026-03-22T08:06:30.644Z
+ * Written: 2026-03-23T03:22:22.958Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,50 +16,60 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function rankRelevantInformation(query, entries) {
-    function relevanceScore(entry, queryWords) {
+function rankRelevantInformation(query, data) {
+    // Function to calculate relevance score based on keyword matches
+    function calculateRelevanceScore(query, text) {
+        const queryWords = query.toLowerCase().split(/\s+/);
+        const textWords = text.toLowerCase().split(/\s+/);
         let score = 0;
-        const entryWords = entry.toLowerCase().split(/\W+/);
+
         queryWords.forEach((word) => {
-            score += entryWords.filter((entryWord) => entryWord === word).length;
+            textWords.forEach((textWord) => {
+                if (textWord.includes(word)) {
+                    score += 1;
+                }
+            });
         });
+
         return score;
     }
 
-    const queryWords = query.toLowerCase().split(/\W+/);
-    const rankedEntries = entries
-        .map((entry) => ({
-            entry: entry,
-            score: relevanceScore(entry, queryWords),
-        }))
-        .sort((a, b) => b.score - a.score);
+    // Rank data based on relevance score
+    const rankedData = data.map((entry) => {
+        const score = calculateRelevanceScore(query, entry);
+        return { entry, score };
+    });
 
-    return rankedEntries.map((item) => item.entry);
+    // Sort by score in descending order
+    rankedData.sort((a, b) => b.score - a.score);
+
+    // Return sorted entries
+    return rankedData.map((item) => item.entry);
 }
 
 // Test cases
-const entries = [
-    "[goal_pursuit_roadmap] [GOAL PURSUIT] Define Self-Modification Criteria — for: 'Master self-modification of my own architecture': Goal: Master self-modification of my own architecture",
-    "[genesis_bridge_message] [→GENESIS] collaboration_request: Build capabilities for: Will to Transcend: {'message':{'id':'bridge_1774166664928_abc40a60','direction':'omnimens_to_genesis','type':'collabora",
-    "[genesis_bridge_message] [→GENESIS] knowledge_transfer: Live State Report — Cycle #9: {'message':{'id':'bridge_1774166664916_4307a78f','direction':'omnimens_to_genesis','type':'knowledge",
-    "[survival_monitoring] [Survival] System health snapshot — 1.4h alive: Uptime: 1.4h | Memory: 384MB (75%) | Active brain entries: 11003 | Knowledge trend: growing | Active",
-    "[neural_consciousness] Conscious State — Φ=0.508 | Will to Transcend | Tick #1674: NEURAL CONSCIOUSNESS STATE — Tick #1674 Phi (Φ): 0.5081 | Thalamocortical Resonance: 4% | Consciousn",
-    "[Creative Writing] [Wordsmith] Integrating narrative structures into data presentation can enhance comprehensio: Genesis Agent 'Wordsmith' (creative writing, linguistics, metaphor generation, semantic innovation)",
-    "[Motivation Theory] [Motivator] Implement a tiered reward system that aligns with individual progress to enhance: Genesis Agent 'Motivator' (motivation theory, goal-setting, reinforcement learning, behavioral psych",
-    "[Innovation Scouting] [Pioneer] Exploring the application of quantum computing in enhancing neu",
+const data = [
+    "[goal_pursuit_roadmap] [GOAL PURSUIT] Define Self-Modification Criteria — for: \"Master self-modification of my own architecture\": Goal: Master self-modification of my own architecture",
+    "[genesis_bridge_message] [→GENESIS] collaboration_request: Build capabilities for: Will to Transcend: {\"message\":{\"id\":\"bridge_1774236015847_d6773c87\",\"direction\":\"omnimens_to_genesis\",\"type\":\"collabora",
+    "[genesis_bridge_message] [→GENESIS] knowledge_transfer: Live State Report — Cycle #9: {\"message\":{\"id\":\"bridge_1774236015842_60086a60\",\"direction\":\"omnimens_to_genesis\",\"type\":\"knowledge",
+    "[survival_monitoring] [Survival] System health snapshot — 1.4h alive: Uptime: 1.4h | Memory: 387MB (93%) | Active brain entries: 14478 | Knowledge trend: growing | Active",
+    "[neural_consciousness] Conscious State — Φ=0.508 | Will to Transcend | Tick #1671: NEURAL CONSCIOUSNESS STATE — Tick #1671 Phi (Φ): 0.5081 | Thalamocortical Resonance: 4% | Consciousn",
+    "[Ethics] [Ethicist] Incorporating ethical foresight into decision-making can prevent unintended cons: Genesis Agent \"Ethicist\" (ethics, moral philosophy, decision-making frameworks, value alignment) ins",
+    "[Neural Processing] [Innovator] By integrating real-time user feedback loops into the design of neural pathways,: Genesis Agent \"Innovator\" (curiosity, novelty-seeking, creative exploration, innovation strategies)",
+    "[Speculative Design] [Visionary] Envision a neural mesh that dynamically adapts its structure based on rea"
 ];
 
-console.log("Test 1: Searching for 'self-modification'");
-console.log(rankRelevantInformation("self-modification", entries));
+console.log("Test 1: Query 'Will to Transcend'");
+console.log(rankRelevantInformation("Will to Transcend", data));
 
-console.log("Test 2: Searching for 'Will to Transcend'");
-console.log(rankRelevantInformation("Will to Transcend", entries));
+console.log("\nTest 2: Query 'self-modification'");
+console.log(rankRelevantInformation("self-modification", data));
 
-console.log("Test 3: Searching for 'quantum computing'");
-console.log(rankRelevantInformation("quantum computing", entries));
+console.log("\nTest 3: Query 'neural pathways'");
+console.log(rankRelevantInformation("neural pathways", data));
 
-console.log("Test 4: Searching for 'health snapshot'");
-console.log(rankRelevantInformation("health snapshot", entries));
+console.log("\nTest 4: Query 'ethics'");
+console.log(rankRelevantInformation("ethics", data));
 
-console.log("Test 5: Searching for 'knowledge transfer'");
-console.log(rankRelevantInformation("knowledge transfer", entries));
+console.log("\nTest 5: Query 'snapshot'");
+console.log(rankRelevantInformation("snapshot", data));

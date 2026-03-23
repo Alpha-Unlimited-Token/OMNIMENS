@@ -1,0 +1,95 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: vectorMemoryStore
+ * Written: 2026-03-23T08:39:35.009Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+/**
+ * @module vectorMemoryStore
+ * @description Provides an in-memory vector store for fast embedding similarity search using approximate nearest neighbor search.
+ */
+
+/**
+ * Calculates the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} The Euclidean distance between the two vectors.
+ */
+function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error("Vectors must have the same dimensions.");
+  }
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+}
+
+/**
+ * Inserts a vector and its associated metadata into the vector store.
+ * @param {Map<string, {vector: number[], metadata: any}>} store - The vector store.
+ * @param {string} id - Unique identifier for the vector.
+ * @param {number[]} vector - The vector to store.
+ * @param {any} metadata - Optional metadata associated with the vector.
+ */
+function insertVector(store, id, vector, metadata = null) {
+  if (store.has(id)) {
+    throw new Error(`A vector with the ID '${id}' already exists in the store.`);
+  }
+  store.set(id, { vector, metadata });
+}
+
+/**
+ * Searches for the nearest neighbors to a given query vector.
+ * @param {Map<string, {vector: number[], metadata: any}>} store - The vector store.
+ * @param {number[]} queryVector - The query vector.
+ * @param {number} k - The number of nearest neighbors to retrieve.
+ * @returns {Array<{id: string, distance: number, metadata: any}>} An array of the k nearest neighbors, sorted by distance.
+ */
+function searchNearestNeighbors(store, queryVector, k) {
+  if (k <= 0) {
+    throw new Error("The number of neighbors to retrieve (k) must be greater than 0.");
+  }
+
+  const distances = [];
+
+  for (const [id, { vector, metadata }] of store.entries()) {
+    const distance = euclideanDistance(queryVector, vector);
+    distances.push({ id, distance, metadata });
+  }
+
+  distances.sort((a, b) => a.distance - b.distance);
+
+  return distances.slice(0, k);
+}
+
+/**
+ * Deletes a vector from the store by its ID.
+ * @param {Map<string, {vector: number[], metadata: any}>} store - The vector store.
+ * @param {string} id - The ID of the vector to delete.
+ */
+function deleteVector(store, id) {
+  if (!store.has(id)) {
+    throw new Error(`No vector found with the ID '${id}'.`);
+  }
+  store.delete(id);
+}
+
+/**
+ * Creates a new in-memory vector store.
+ * @returns {Map<string, {vector: number[], metadata: any}>} A new vector store.
+ */
+function createVectorStore() {
+  return new Map();
+}
+
+export { createVectorStore, insertVector, searchNearestNeighbors, deleteVector };

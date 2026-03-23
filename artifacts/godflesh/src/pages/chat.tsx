@@ -6512,6 +6512,13 @@ export default function Chat() {
                                 </div>
                               )}
 
+                              {msg.savedFiles && msg.savedFiles.length > 0 && (
+                                <div className="mt-2 flex items-center gap-1.5 text-[10px] text-green-400/60">
+                                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                  <span>{msg.savedFiles.length} file{msg.savedFiles.length > 1 ? "s" : ""} auto-saved to <a href={`${window.location.origin}/files`} className="underline hover:text-green-400">My Files</a></span>
+                                </div>
+                              )}
+
                               {/* Physical Therapy Red Flag Alert — shown first for patient safety */}
                               {msg.redFlagAlert && msg.redFlagAlert.urgency !== "none" && (
                                 <RedFlagAlertCard alert={msg.redFlagAlert} />

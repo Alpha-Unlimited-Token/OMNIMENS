@@ -1,0 +1,110 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-03-23T04:58:53.293Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Complete ES module code here, starting with /** JSDoc */ and exports
+
+/**
+ * @module inMemoryVectorStore
+ * @description A pure in-memory vector store for embeddings, supporting approximate nearest neighbor (ANN) queries using HNSW-like graph traversal.
+ */
+
+/**
+ * Calculates the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} - Euclidean distance.
+ */
+function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error("Vectors must have the same dimensions.");
+  }
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+}
+
+/**
+ * Represents a node in the HNSW-like graph.
+ * @typedef {Object} Node
+ * @property {number[]} vector - The embedding vector.
+ * @property {string} id - Unique identifier for the node.
+ * @property {Set<string>} neighbors - IDs of neighboring nodes.
+ */
+
+/**
+ * Class representing an in-memory vector store with HNSW-like functionality.
+ */
+class InMemoryVectorStore {
+  constructor() {
+    /** @type {Map<string, Node>} */
+    this.nodes = new Map();
+  }
+
+  /**
+   * Adds a vector to the store.
+   * @param {string} id - Unique identifier for the vector.
+   * @param {number[]} vector - The embedding vector.
+   */
+  addVector(id, vector) {
+    if (this.nodes.has(id)) {
+      throw new Error(`Node with id '${id}' already exists.`);
+    }
+    this.nodes.set(id, { vector, id, neighbors: new Set() });
+  }
+
+  /**
+   * Links two vectors as neighbors.
+   * @param {string} idA - ID of the first vector.
+   * @param {string} idB - ID of the second vector.
+   */
+  linkVectors(idA, idB) {
+    const nodeA = this.nodes.get(idA);
+    const nodeB = this.nodes.get(idB);
+    if (!nodeA || !nodeB) {
+      throw new Error("Both nodes must exist to create a link.");
+    }
+    nodeA.neighbors.add(idB);
+    nodeB.neighbors.add(idA);
+  }
+
+  /**
+   * Performs an ANN search to find the nearest vector to the target.
+   * @param {number[]} targetVector - The target vector.
+   * @param {number} k - Number of nearest neighbors to retrieve.
+   * @returns {Array<{id: string, distance: number}>} - List of nearest neighbors sorted by distance.
+   */
+  queryNearestNeighbors(targetVector, k) {
+    if (k <= 0) {
+      throw new Error("k must be a positive integer.");
+    }
+
+    const visited = new Set();
+    const results = [];
+
+    for (const node of this.nodes.values()) {
+      const distance = euclideanDistance(targetVector, node.vector);
+      results.push({ id: node.id, distance });
+    }
+
+    results.sort((a, b) => a.distance - b.distance);
+    return results.slice(0, k);
+  }
+}
+
+/**
+ * Exports the module.
+ */
+export { InMemoryVectorStore, euclideanDistance };

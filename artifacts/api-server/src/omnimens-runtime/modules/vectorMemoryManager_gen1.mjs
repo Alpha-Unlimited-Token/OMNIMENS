@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: vectorMemoryManager
- * Written: 2026-03-22T19:26:33.525Z
+ * Written: 2026-03-23T12:44:15.442Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,96 +16,105 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
+// Complete ES module code here, starting with /** JSDoc */ and exports
+
 /**
  * @module vectorMemoryManager
- * @description Provides fast similarity search and context retrieval using an in-memory vector database.
- * Implements approximate nearest neighbor search with pure JavaScript.
+ * @description Provides fast in-memory storage and retrieval of embeddings for dynamic memory recall.
+ * Implements efficient indexing and retrieval using pure JavaScript data structures.
  */
 
 /**
- * Calculates the Euclidean distance between two vectors.
- * @param {number[]} vectorA - First vector.
- * @param {number[]} vectorB - Second vector.
- * @returns {number} The Euclidean distance between the two vectors.
+ * @typedef {number[]} Vector
+ * A numerical array representing an embedding.
  */
-function euclideanDistance(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error("Vectors must be of the same dimension.");
-  }
 
-  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+/**
+ * @typedef {Object} IndexedVector
+ * @property {string} id - Unique identifier for the vector.
+ * @property {Vector} vector - The embedding vector.
+ */
+
+/**
+ * @typedef {Object} SearchResult
+ * @property {string} id - Unique identifier of the closest vector.
+ * @property {number} similarity - Cosine similarity score.
+ */
+
+/**
+ * Computes the cosine similarity between two vectors.
+ * @param {Vector} vectorA - First vector.
+ * @param {Vector} vectorB - Second vector.
+ * @returns {number} Cosine similarity score.
+ */
+function cosineSimilarity(vectorA, vectorB) {
+  const dotProduct = vectorA.reduce((sum, value, index) => sum + value * vectorB[index], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, value) => sum + value ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, value) => sum + value ** 2, 0));
+  return magnitudeA > 0 && magnitudeB > 0 ? dotProduct / (magnitudeA * magnitudeB) : 0;
 }
 
 /**
- * Builds an in-memory vector index for approximate nearest neighbor search.
- * @class
+ * Class for managing vector embeddings in memory.
  */
 class VectorMemoryManager {
   constructor() {
-    /** @type {Map<string, number[]>} */
+    /** @type {Map<string, IndexedVector>} */
     this.vectorStore = new Map();
   }
 
   /**
-   * Adds a vector to the in-memory database.
+   * Adds a vector to the store.
    * @param {string} id - Unique identifier for the vector.
-   * @param {number[]} vector - The vector to be stored.
+   * @param {Vector} vector - The embedding vector.
+   * @throws {Error} If the vector is not valid.
    */
   addVector(id, vector) {
-    if (this.vectorStore.has(id)) {
-      throw new Error(`Vector with id '${id}' already exists.`);
+    if (!Array.isArray(vector) || vector.some(value => typeof value !== 'number')) {
+      throw new Error('Invalid vector: must be an array of numbers.');
     }
-
-    this.vectorStore.set(id, vector);
-  }
-
-  /**
-   * Searches for the closest vectors to a given query vector.
-   * @param {number[]} queryVector - The vector to search for.
-   * @param {number} k - The number of nearest neighbors to retrieve.
-   * @returns {Array<{ id: string, distance: number }>} An array of nearest neighbors with their distances.
-   */
-  search(queryVector, k) {
-    if (k <= 0) {
-      throw new Error("Parameter 'k' must be greater than 0.");
-    }
-
-    const results = Array.from(this.vectorStore.entries())
-      .map(([id, vector]) => ({ id, distance: euclideanDistance(queryVector, vector) }))
-      .sort((a, b) => a.distance - b.distance)
-      .slice(0, k);
-
-    return results;
+    this.vectorStore.set(id, { id, vector });
   }
 
   /**
    * Retrieves a vector by its ID.
-   * @param {string} id - The unique identifier of the vector.
-   * @returns {number[] | null} The vector if found, or null if not found.
+   * @param {string} id - Unique identifier of the vector.
+   * @returns {Vector|null} The vector, or null if not found.
    */
-  getVector(id) {
-    return this.vectorStore.get(id) || null;
+  getVectorById(id) {
+    const entry = this.vectorStore.get(id);
+    return entry ? entry.vector : null;
   }
 
   /**
-   * Removes a vector by its ID.
-   * @param {string} id - The unique identifier of the vector to remove.
+   * Finds the most similar vector in the store to the given query vector.
+   * @param {Vector} queryVector - The query embedding vector.
+   * @returns {SearchResult|null} The closest vector and similarity score, or null if store is empty.
    */
-  removeVector(id) {
-    if (!this.vectorStore.has(id)) {
-      throw new Error(`Vector with id '${id}' does not exist.`);
+  findMostSimilarVector(queryVector) {
+    if (this.vectorStore.size === 0) return null;
+
+    let bestMatch = null;
+    let highestSimilarity = -Infinity;
+
+    for (const { id, vector } of this.vectorStore.values()) {
+      const similarity = cosineSimilarity(queryVector, vector);
+      if (similarity > highestSimilarity) {
+        highestSimilarity = similarity;
+        bestMatch = { id, similarity };
+      }
     }
 
-    this.vectorStore.delete(id);
+    return bestMatch;
   }
 
   /**
-   * Clears all vectors from the in-memory database.
+   * Clears all vectors from the store.
    */
-  clear() {
+  clearStore() {
     this.vectorStore.clear();
   }
 }
 
-// Export the VectorMemoryManager class
-export { VectorMemoryManager };
+// Export the module
+export { VectorMemoryManager, cosineSimilarity };

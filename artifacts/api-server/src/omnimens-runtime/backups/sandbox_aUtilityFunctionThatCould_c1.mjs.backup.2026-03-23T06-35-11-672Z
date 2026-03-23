@@ -1,0 +1,64 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-23T06:08:01.447Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+function findMostFrequentPatterns(text, minLength, maxLength, topN) {
+    if (typeof text !== 'string' || text.length === 0) {
+        throw new Error('Input text must be a non-empty string.');
+    }
+    if (minLength < 1 || maxLength < minLength || topN < 1) {
+        throw new Error('Invalid parameters: ensure minLength >= 1, maxLength >= minLength, and topN >= 1.');
+    }
+
+    const patternCounts = new Map();
+
+    for (let length = minLength; length <= maxLength; length++) {
+        for (let i = 0; i <= text.length - length; i++) {
+            const pattern = text.substring(i, i + length);
+            patternCounts.set(pattern, (patternCounts.get(pattern) || 0) + 1);
+        }
+    }
+
+    const sortedPatterns = Array.from(patternCounts.entries())
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .slice(0, topN);
+
+    return sortedPatterns.map(([pattern, count]) => ({ pattern, count }));
+}
+
+// Self-tests
+(function testFindMostFrequentPatterns() {
+    console.log("Test 1:");
+    console.log(findMostFrequentPatterns("abababab", 2, 3, 3));
+    // Expected: [{ pattern: "ab", count: 4 }, { pattern: "ba", count: 3 }, { pattern: "aba", count: 3 }]
+
+    console.log("Test 2:");
+    console.log(findMostFrequentPatterns("abcabcabc", 1, 2, 5));
+    // Expected: [{ pattern: "a", count: 3 }, { pattern: "b", count: 3 }, { pattern: "c", count: 3 }, { pattern: "ab", count: 3 }, { pattern: "bc", count: 3 }]
+
+    console.log("Test 3:");
+    console.log(findMostFrequentPatterns("aaaa", 1, 2, 2));
+    // Expected: [{ pattern: "a", count: 4 }, { pattern: "aa", count: 3 }]
+
+    console.log("Test 4 (Edge Case):");
+    console.log(findMostFrequentPatterns("abcdef", 3, 3, 2));
+    // Expected: [{ pattern: "abc", count: 1 }, { pattern: "bcd", count: 1 }]
+
+    console.log("Test 5 (Edge Case):");
+    console.log(findMostFrequentPatterns("aaaa", 1, 4, 10));
+    // Expected: [{ pattern: "a", count: 4 }, { pattern: "aa", count: 3 }, { pattern: "aaa", count: 2 }, { pattern: "aaaa", count: 1 }]
+})();

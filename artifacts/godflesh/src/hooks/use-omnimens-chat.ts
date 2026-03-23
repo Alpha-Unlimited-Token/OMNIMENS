@@ -285,6 +285,7 @@ export type Message = {
   neuroIntensity?: string;
   suggestions?: string[];
   // Face recognition
+  savedFiles?: { fileId: number; fileType: string; filename: string }[];
   analyzingFaces?: boolean;
   faceAnalysis?: {
     faceCount: number;
@@ -786,6 +787,20 @@ export function useOmnimensChat(
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
                   if (msg) { msg.generatingGame = false; msg.gamePhase = undefined; }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "file_saved") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    msg.savedFiles = [...(msg.savedFiles || []), {
+                      fileId: data.fileId,
+                      fileType: data.fileType,
+                      filename: data.filename,
+                    }];
+                  }
                   return newMsgs;
                 });
 

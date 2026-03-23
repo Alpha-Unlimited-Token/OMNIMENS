@@ -1,0 +1,62 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-23T09:09:50.070Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+function extractEntitiesFromText(text, patterns) {
+    const results = [];
+    patterns.forEach(pattern => {
+        const regex = new RegExp(pattern, 'g');
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+            results.push({
+                match: match[0],
+                index: match.index,
+                pattern: pattern
+            });
+        }
+    });
+    return results;
+}
+
+// Test cases
+function runTests() {
+    console.log("Running tests...");
+
+    const text1 = "John bought 3 apples and 5 oranges on 2023-10-01.";
+    const patterns1 = ["\\b\\d+\\b", "\\b\\w+\\b", "\\d{4}-\\d{2}-\\d{2}"];
+    const result1 = extractEntitiesFromText(text1, patterns1);
+    console.log("Test 1:", result1);
+
+    const text2 = "The price of the stock rose from $123.45 to $150.67.";
+    const patterns2 = ["\\$\\d+\\.\\d{2}", "\\bfrom\\b", "\\bto\\b"];
+    const result2 = extractEntitiesFromText(text2, patterns2);
+    console.log("Test 2:", result2);
+
+    const text3 = "Emails: alice@example.com, bob@work.net; Phone: +1-800-555-0199.";
+    const patterns3 = ["[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}", "\\+\\d{1,3}-\\d{3}-\\d{3}-\\d{4}"];
+    const result3 = extractEntitiesFromText(text3, patterns3);
+    console.log("Test 3:", result3);
+
+    const text4 = "No matches here!";
+    const patterns4 = ["\\d+", "\\$\\d+"];
+    const result4 = extractEntitiesFromText(text4, patterns4);
+    console.log("Test 4:", result4);
+
+    console.log("Tests completed.");
+}
+
+runTests();

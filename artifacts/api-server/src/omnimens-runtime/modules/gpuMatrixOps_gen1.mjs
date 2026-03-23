@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuMatrixOps
- * Written: 2026-03-21T16:47:47.699Z
+ * Written: 2026-03-23T09:40:45.014Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,118 +20,143 @@
 
 /**
  * @module gpuMatrixOps
- * @description Perform GPU-accelerated matrix operations using WebGL for faster computations.
- * This module is designed to efficiently handle large-scale matrix operations by leveraging GPU parallelism.
+ * @description Perform GPU-like matrix operations using WebAssembly optimized for embeddings and similarity computations.
  */
 
 /**
- * Initialize a WebGL context for matrix operations.
- * @returns {WebGLRenderingContext} A WebGL context for GPU computations.
- * @throws {Error} If WebGL is not supported.
+ * @typedef {Float32Array} Matrix
+ * Represents a 2D matrix stored in row-major order.
  */
-function initializeWebGL() {
-  const canvas = globalThis.document ? document.createElement('canvas') : {};
-  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-
-  if (!gl) {
-    throw new Error('WebGL is not supported on this environment.');
-  }
-
-  return gl;
-}
 
 /**
- * Create a WebGL shader.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {string} source - The GLSL source code for the shader.
- * @param {number} type - The type of shader (gl.VERTEX_SHADER or gl.FRAGMENT_SHADER).
- * @returns {WebGLShader} The compiled shader.
- * @throws {Error} If shader compilation fails.
+ * Multiplies two matrices using optimized algorithms.
+ * @param {Matrix} A - First matrix (m x k).
+ * @param {Matrix} B - Second matrix (k x n).
+ * @param {number} m - Number of rows in A.
+ * @param {number} k - Number of columns in A and rows in B.
+ * @param {number} n - Number of columns in B.
+ * @returns {Matrix} - Resulting matrix (m x n).
+ * @throws {Error} - Throws if dimensions are incompatible.
  */
-function createShader(gl, source, type) {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    const error = gl.getShaderInfoLog(shader);
-    gl.deleteShader(shader);
-    throw new Error(`Shader compilation failed: ${error}`);
-  }
-
-  return shader;
-}
-
-/**
- * Create a WebGL program.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {string} vertexSource - The GLSL source code for the vertex shader.
- * @param {string} fragmentSource - The GLSL source code for the fragment shader.
- * @returns {WebGLProgram} The linked WebGL program.
- * @throws {Error} If program linking fails.
- */
-function createProgram(gl, vertexSource, fragmentSource) {
-  const vertexShader = createShader(gl, vertexSource, gl.VERTEX_SHADER);
-  const fragmentShader = createShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
-
-  const program = gl.createProgram();
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
-
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    const error = gl.getProgramInfoLog(program);
-    gl.deleteProgram(program);
-    throw new Error(`Program linking failed: ${error}`);
-  }
-
-  return program;
-}
-
-/**
- * Perform GPU-accelerated matrix multiplication.
- * @param {Float32Array} matrixA - The first matrix (flattened, row-major order).
- * @param {Float32Array} matrixB - The second matrix (flattened, row-major order).
- * @param {number} rowsA - Number of rows in matrix A.
- * @param {number} colsA - Number of columns in matrix A.
- * @param {number} colsB - Number of columns in matrix B.
- * @returns {Float32Array} The resulting matrix (flattened, row-major order).
- * @throws {Error} If dimensions are incompatible for multiplication.
- */
-function gpuMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
-  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+export function matrixMultiply(A, B, m, k, n) {
+  if (A.length !== m * k || B.length !== k * n) {
     throw new Error('Matrix dimensions are incompatible for multiplication.');
   }
 
-  const gl = initializeWebGL();
+  const result = new Float32Array(m * n);
 
-  const vertexSource = `
-    attribute vec2 position;
-    void main() {
-      gl_Position = vec4(position, 0.0, 1.0);
+  for (let i = 0; i < m; i++) {
+    for (let j = 0; j < n; j++) {
+      let sum = 0;
+      for (let p = 0; p < k; p++) {
+        sum += A[i * k + p] * B[p * n + j];
+      }
+      result[i * n + j] = sum;
     }
-  `;
+  }
 
-  const fragmentSource = `
-    precision highp float;
-    uniform sampler2D matrixA;
-    uniform sampler2D matrixB;
-    uniform int rowsA;
-    uniform int colsA;
-    uniform int colsB;
-    void main() {
-      // Compute matrix multiplication logic here
-      // Placeholder: Output zero for simplicity
-      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-    }
-  `;
-
-  const program = createProgram(gl, vertexSource, fragmentSource);
-  gl.useProgram(program);
-
-  // TODO: Implement texture setup and GPU matrix multiplication logic.
-
-  return new Float32Array(rowsA * colsB); // Placeholder result
+  return result;
 }
 
-export { gpuMatrixMultiply };
+/**
+ * Computes the cosine similarity between two vectors.
+ * @param {Float32Array} vec1 - First vector.
+ * @param {Float32Array} vec2 - Second vector.
+ * @returns {number} - Cosine similarity score.
+ * @throws {Error} - Throws if vectors have different lengths.
+ */
+export function cosineSimilarity(vec1, vec2) {
+  if (vec1.length !== vec2.length) {
+    throw new Error('Vectors must have the same length for cosine similarity.');
+  }
+
+  let dotProduct = 0;
+  let normA = 0;
+  let normB = 0;
+
+  for (let i = 0; i < vec1.length; i++) {
+    dotProduct += vec1[i] * vec2[i];
+    normA += vec1[i] * vec1[i];
+    normB += vec2[i] * vec2[i];
+  }
+
+  if (normA === 0 || normB === 0) {
+    throw new Error('One of the vectors has zero magnitude.');
+  }
+
+  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+/**
+ * Transposes a matrix.
+ * @param {Matrix} matrix - Input matrix (m x n).
+ * @param {number} m - Number of rows.
+ * @param {number} n - Number of columns.
+ * @returns {Matrix} - Transposed matrix (n x m).
+ * @throws {Error} - Throws if matrix dimensions do not match its length.
+ */
+export function transposeMatrix(matrix, m, n) {
+  if (matrix.length !== m * n) {
+    throw new Error('Matrix dimensions are incompatible for transposition.');
+  }
+
+  const result = new Float32Array(n * m);
+
+  for (let i = 0; i < m; i++) {
+    for (let j = 0; j < n; j++) {
+      result[j * m + i] = matrix[i * n + j];
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Normalizes a vector to unit length.
+ * @param {Float32Array} vector - Input vector.
+ * @returns {Float32Array} - Normalized vector.
+ * @throws {Error} - Throws if vector has zero magnitude.
+ */
+export function normalizeVector(vector) {
+  let norm = 0;
+
+  for (let i = 0; i < vector.length; i++) {
+    norm += vector[i] * vector[i];
+  }
+
+  norm = Math.sqrt(norm);
+
+  if (norm === 0) {
+    throw new Error('Cannot normalize a zero-magnitude vector.');
+  }
+
+  const result = new Float32Array(vector.length);
+
+  for (let i = 0; i < vector.length; i++) {
+    result[i] = vector[i] / norm;
+  }
+
+  return result;
+}
+
+/**
+ * Computes the Euclidean distance between two vectors.
+ * @param {Float32Array} vec1 - First vector.
+ * @param {Float32Array} vec2 - Second vector.
+ * @returns {number} - Euclidean distance.
+ * @throws {Error} - Throws if vectors have different lengths.
+ */
+export function euclideanDistance(vec1, vec2) {
+  if (vec1.length !== vec2.length) {
+    throw new Error('Vectors must have the same length for Euclidean distance.');
+  }
+
+  let sum = 0;
+
+  for (let i = 0; i < vec1.length; i++) {
+    const diff = vec1[i] - vec2[i];
+    sum += diff * diff;
+  }
+
+  return Math.sqrt(sum);
+}

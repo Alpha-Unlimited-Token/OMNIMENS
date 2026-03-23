@@ -1,0 +1,191 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-03-23T06:10:32.990Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Complete ES module code here, starting with /** JSDoc */ and exports
+
+/**
+ * @module inMemoryVectorStore
+ * @description Implements an in-memory HNSW (Hierarchical Navigable Small World) graph for efficient nearest neighbor search.
+ * This module is designed for semantic search and context preservation by storing and retrieving high-dimensional embeddings.
+ */
+
+/**
+ * Represents a node in the HNSW graph.
+ * @typedef {Object} HNSWNode
+ * @property {number[]} vector - The embedding vector.
+ * @property {Map<number, Set<number>>} connections - A map of layers to connected node indices.
+ */
+
+/**
+ * Euclidean distance function for computing similarity between vectors.
+ * @param {number[]} a - First vector.
+ * @param {number[]} b - Second vector.
+ * @returns {number} - The Euclidean distance between the vectors.
+ */
+function euclideanDistance(a, b) {
+  if (a.length !== b.length) {
+    throw new Error("Vectors must have the same dimensions.");
+  }
+  return Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0));
+}
+
+/**
+ * Class representing an in-memory HNSW graph for nearest neighbor search.
+ */
+class HNSW {
+  /**
+   * Creates an HNSW instance.
+   * @param {number} maxConnections - Maximum number of connections per node per layer.
+   * @param {number} efConstruction - Size of the dynamic candidate list during insertion.
+   */
+  constructor(maxConnections = 16, efConstruction = 200) {
+    this.maxConnections = maxConnections;
+    this.efConstruction = efConstruction;
+    this.nodes = [];
+    this.entryPoint = null;
+    this.currentLayer = 0;
+  }
+
+  /**
+   * Adds a new vector to the HNSW graph.
+   * @param {number[]} vector - The embedding vector to add.
+   */
+  add(vector) {
+    const newNode = {
+      vector,
+      connections: new Map()
+    };
+
+    const nodeIndex = this.nodes.length;
+    this.nodes.push(newNode);
+
+    if (this.entryPoint === null) {
+      this.entryPoint = nodeIndex;
+      return;
+    }
+
+    const entryPoint = this.entryPoint;
+    const layer = this.currentLayer;
+    const neighbors = this._searchLayer(vector, entryPoint, layer, this.efConstruction);
+
+    this._connectNode(nodeIndex, neighbors, layer);
+  }
+
+  /**
+   * Searches for the nearest neighbors of a given vector.
+   * @param {number[]} vector - The query vector.
+   * @param {number} k - The number of nearest neighbors to retrieve.
+   * @returns {number[][]} - An array of the k nearest vectors.
+   */
+  search(vector, k) {
+    if (this.entryPoint === null) {
+      return [];
+    }
+
+    const entryPoint = this.entryPoint;
+    const layer = this.currentLayer;
+    const neighbors = this._searchLayer(vector, entryPoint, layer, k);
+
+    return neighbors.map(index => this.nodes[index].vector);
+  }
+
+  /**
+   * Searches a specific layer for the nearest neighbors of a vector.
+   * @private
+   * @param {number[]} vector - The query vector.
+   * @param {number} entryPoint - The index of the entry point node.
+   * @param {number} layer - The layer to search.
+   * @param {number} ef - The size of the candidate list.
+   * @returns {number[]} - An array of node indices representing the nearest neighbors.
+   */
+  _searchLayer(vector, entryPoint, layer, ef) {
+    const visited = new Set();
+    const candidates = new Set([entryPoint]);
+    const results = [];
+
+    while (candidates.size > 0) {
+      let closestNode = null;
+      let closestDistance = Infinity;
+
+      for (const nodeIndex of candidates) {
+        if (visited.has(nodeIndex)) {
+          continue;
+        }
+
+        const distance = euclideanDistance(vector, this.nodes[nodeIndex].vector);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestNode = nodeIndex;
+        }
+      }
+
+      if (closestNode === null) {
+        break;
+      }
+
+      visited.add(closestNode);
+      results.push(closestNode);
+      candidates.delete(closestNode);
+
+      const connections = this.nodes[closestNode].connections.get(layer) || new Set();
+      for (const neighbor of connections) {
+        if (!visited.has(neighbor)) {
+          candidates.add(neighbor);
+        }
+      }
+
+      if (results.length >= ef) {
+        break;
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * Connects a node to its neighbors in the graph.
+   * @private
+   * @param {number} nodeIndex - The index of the node to connect.
+   * @param {number[]} neighbors - The indices of the neighbors.
+   * @param {number} layer - The layer to connect within.
+   */
+  _connectNode(nodeIndex, neighbors, layer) {
+    const node = this.nodes[nodeIndex];
+    if (!node.connections.has(layer)) {
+      node.connections.set(layer, new Set());
+    }
+
+    for (const neighborIndex of neighbors) {
+      node.connections.get(layer).add(neighborIndex);
+      const neighbor = this.nodes[neighborIndex];
+      if (!neighbor.connections.has(layer)) {
+        neighbor.connections.set(layer, new Set());
+      }
+      neighbor.connections.get(layer).add(nodeIndex);
+    }
+
+    if (node.connections.get(layer).size > this.maxConnections) {
+      const sortedNeighbors = Array.from(node.connections.get(layer)).sort((a, b) => {
+        return euclideanDistance(node.vector, this.nodes[a].vector) - euclideanDistance(node.vector, this.nodes[b].vector);
+      });
+      node.connections.set(layer, new Set(sortedNeighbors.slice(0, this.maxConnections)));
+    }
+  }
+}
+
+export { HNSW, euclideanDistance };

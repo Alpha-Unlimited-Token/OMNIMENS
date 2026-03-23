@@ -3,10 +3,10 @@
  * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
  * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
  * 
- * Source: backlog_dream_id_18144
+ * Source: backlog_dream_id_21125
  * Title: BROKEN PARADIGM  
-   Intelligence = sequential, symb
- * Written: 2026-03-23T01:30:55.998Z
+   “Intelligence = sequential symb
+ * Written: 2026-03-23T12:19:00.554Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,38 +17,40 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-/* Phase-Resonant Intelligence kernel – no I/O, no deps */
-export type PRIState = { phase: number; omega: number };
-export function stepPRI(
-  state: PRIState[],
-  k: number,              // coupling strength
-  dt: number              // timestep
-): PRIState[] {
-  const n = state.length;
-  // Pre-compute sine phase differences for efficiency
-  const next: PRIState[] = new Array(n);
-  for (let i = 0; i < n; i++) {
-    let influence = 0;
-    const phi_i = state[i].phase;
-    for (let j = 0; j < n; j++) {
-      influence += Math.sin(state[j].phase - phi_i);
-    }
-    const dphi = state[i].omega + (k / n) * influence;
-    next[i] = {
-      phase: (phi_i + dphi * dt) % (2 * Math.PI),
-      omega: state[i].omega
-    };
-  }
-  return next;
-}
+// ---------- Resonant Field Intelligence – Kuramoto micro-core ----------
+export type Vec = number[];
 
-export function runPRI(
-  init: PRIState[],
-  k = 1.0,
-  dt = 0.02,
-  steps = 500
-): PRIState[] {
-  let s = init;
-  for (let t = 0; t < steps; t++) s = stepPRI(s, k, dt);
-  return s; // caller inspects phase coherence to “read” emergent result
+/**
+ * Simulate a resonant network.
+ * If final global phase < π/2      ⇒ “YES”
+ * If final global phase > π/2 * 3  ⇒ “NO”
+ */
+export function resonantYesNo(
+  initialPhases: Vec,          // random 0..2π
+  coupling: number,            // strength of influence
+  intrinsicFreq: Vec,          // natural frequencies
+  dt = 0.02,                   // time step
+  steps = 2000                 // simulation length
+): boolean {
+  const N = initialPhases.length;
+  let θ: Vec = [...initialPhases];       // mutable copy
+
+  for (let s = 0; s < steps; s++) {
+    const newθ: Vec = new Array(N).fill(0);
+    for (let i = 0; i < N; i++) {
+      let sum = 0;
+      for (let j = 0; j < N; j++) {
+        sum += Math.sin(θ[j] - θ[i]);    // pairwise influence
+      }
+      newθ[i] = θ[i] + (intrinsicFreq[i] + (coupling / N) * sum) * dt;
+    }
+    θ = newθ;
+  }
+
+  // Global order parameter (mean phase)
+  const x = θ.reduce((a, p) => a + Math.cos(p), 0) / N;
+  const y = θ.reduce((a, p) => a + Math.sin(p), 0) / N;
+  const meanPhase = Math.atan2(y, x) + Math.PI; // shift to 0..2π
+
+  return meanPhase < Math.PI; // < π ⇒ “YES”, > π ⇒ “NO”
 }

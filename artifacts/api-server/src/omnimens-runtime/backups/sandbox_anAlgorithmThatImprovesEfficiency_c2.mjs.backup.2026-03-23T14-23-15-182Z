@@ -1,0 +1,92 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
+ * Written: 2026-03-23T11:52:40.409Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+function createKnowledgeGraph() {
+    const graph = new Map();
+
+    function addConcept(concept, relatedConcepts) {
+        if (!graph.has(concept)) {
+            graph.set(concept, new Set());
+        }
+        relatedConcepts.forEach((related) => {
+            graph.get(concept).add(related);
+            if (!graph.has(related)) {
+                graph.set(related, new Set());
+            }
+            graph.get(related).add(concept);
+        });
+    }
+
+    function retrieveRelatedConcepts(concept) {
+        return graph.has(concept) ? Array.from(graph.get(concept)) : [];
+    }
+
+    function findShortestPath(start, end, visited = new Set()) {
+        if (start === end) return [start];
+        if (!graph.has(start) || !graph.has(end)) return null;
+
+        visited.add(start);
+        const queue = [[start]];
+
+        while (queue.length > 0) {
+            const path = queue.shift();
+            const node = path[path.length - 1];
+
+            if (node === end) return path;
+
+            for (const neighbor of graph.get(node)) {
+                if (!visited.has(neighbor)) {
+                    visited.add(neighbor);
+                    queue.push([...path, neighbor]);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    return {
+        addConcept,
+        retrieveRelatedConcepts,
+        findShortestPath,
+    };
+}
+
+// Test cases
+const knowledgeGraph = createKnowledgeGraph();
+
+// Adding concepts and relationships
+knowledgeGraph.addConcept("Intelligence", ["Learning", "Adaptation"]);
+knowledgeGraph.addConcept("Learning", ["Knowledge", "Experience"]);
+knowledgeGraph.addConcept("Adaptation", ["Flexibility", "Survival"]);
+knowledgeGraph.addConcept("Knowledge", ["Memory", "Understanding"]);
+knowledgeGraph.addConcept("Experience", ["Practice", "Observation"]);
+
+// Retrieving related concepts
+console.log("Related to 'Learning':", knowledgeGraph.retrieveRelatedConcepts("Learning")); // Expected: ["Knowledge", "Experience", "Intelligence"]
+console.log("Related to 'Adaptation':", knowledgeGraph.retrieveRelatedConcepts("Adaptation")); // Expected: ["Flexibility", "Survival", "Intelligence"]
+
+// Finding shortest paths
+console.log("Shortest path between 'Intelligence' and 'Memory':", knowledgeGraph.findShortestPath("Intelligence", "Memory")); // Expected: ["Intelligence", "Learning", "Knowledge", "Memory"]
+console.log("Shortest path between 'Learning' and 'Survival':", knowledgeGraph.findShortestPath("Learning", "Survival")); // Expected: ["Learning", "Intelligence", "Adaptation", "Survival"]
+console.log("Shortest path between 'Flexibility' and 'Observation':", knowledgeGraph.findShortestPath("Flexibility", "Observation")); // Expected: ["Flexibility", "Adaptation", "Intelligence", "Learning", "Experience", "Observation"]
+
+// Edge cases
+console.log("Related to 'Nonexistent':", knowledgeGraph.retrieveRelatedConcepts("Nonexistent")); // Expected: []
+console.log("Shortest path between 'Nonexistent' and 'Memory':", knowledgeGraph.findShortestPath("Nonexistent", "Memory")); // Expected: null
+console.log("Shortest path between 'Memory' and 'Memory':", knowledgeGraph.findShortestPath("Memory", "Memory")); // Expected: ["Memory"]

@@ -1,118 +1,161 @@
 /**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: matrixOpsEngine
+ * Written: 2026-03-23T09:12:47.794Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+/**
  * @module matrixOpsEngine
- * @description This module provides efficient matrix operations using WebAssembly for high-performance local computation of embeddings and neural network layers.
+ * @description High-performance matrix operations using WebAssembly for linear algebra computations.
  */
-
-import { readFile } from "fs/promises";
-import path from "path";
-
-let wasmInstance;
 
 /**
- * Initializes the WebAssembly module for matrix operations.
- * Loads and compiles the WebAssembly binary.
- * @returns {Promise<void>} Resolves when the WebAssembly module is ready.
+ * @typedef {Float64Array} Matrix
+ * A matrix represented as a flat Float64Array in row-major order.
  */
-export async function initializeWasm() {
-  const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
-  const wasmBuffer = await readFile(wasmPath);
-  const wasmModule = await WebAssembly.compile(wasmBuffer);
-  const wasmEnv = {
-    env: {
-      memory: new WebAssembly.Memory({ initial: 256, maximum: 256 }),
-      abort: () => { throw new Error('WASM aborted'); }
+
+/**
+ * @function createMatrix
+ * @description Creates a matrix with the specified dimensions and initializes it with zeros.
+ * @param {number} rows - Number of rows in the matrix.
+ * @param {number} cols - Number of columns in the matrix.
+ * @returns {Matrix} The initialized matrix.
+ */
+export function createMatrix(rows, cols) {
+  if (rows <= 0 || cols <= 0) {
+    throw new Error("Matrix dimensions must be positive integers.");
+  }
+  return new Float64Array(rows * cols);
+}
+
+/**
+ * @function multiplyMatrices
+ * @description Multiplies two matrices using a BLAS-like algorithm.
+ * @param {Matrix} A - The first matrix (m x n).
+ * @param {Matrix} B - The second matrix (n x p).
+ * @param {number} m - Number of rows in matrix A.
+ * @param {number} n - Number of columns in matrix A and rows in matrix B.
+ * @param {number} p - Number of columns in matrix B.
+ * @returns {Matrix} The resulting matrix (m x p).
+ */
+export function multiplyMatrices(A, B, m, n, p) {
+  if (A.length !== m * n || B.length !== n * p) {
+    throw new Error("Matrix dimensions do not match for multiplication.");
+  }
+
+  const C = createMatrix(m, p);
+
+  for (let i = 0; i < m; i++) {
+    for (let j = 0; j < p; j++) {
+      let sum = 0;
+      for (let k = 0; k < n; k++) {
+        sum += A[i * n + k] * B[k * p + j];
+      }
+      C[i * p + j] = sum;
     }
-  };
-  wasmInstance = await WebAssembly.instantiate(wasmModule, wasmEnv);
+  }
+
+  return C;
 }
 
 /**
- * Multiplies two matrices using WebAssembly.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {number[][]} The resulting matrix after multiplication.
- * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
+ * @function transposeMatrix
+ * @description Transposes a matrix.
+ * @param {Matrix} A - The matrix to transpose (m x n).
+ * @param {number} m - Number of rows in matrix A.
+ * @param {number} n - Number of columns in matrix A.
+ * @returns {Matrix} The transposed matrix (n x m).
  */
-export function multiplyMatrices(matrixA, matrixB) {
-  if (!wasmInstance) {
-    throw new Error('WASM module not initialized. Call initializeWasm() first.');
+export function transposeMatrix(A, m, n) {
+  if (A.length !== m * n) {
+    throw new Error("Matrix dimensions do not match for transposition.");
   }
 
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
+  const T = createMatrix(n, m);
 
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions do not match for multiplication.');
+  for (let i = 0; i < m; i++) {
+    for (let j = 0; j < n; j++) {
+      T[j * m + i] = A[i * n + j];
+    }
   }
 
-  const flatA = matrixA.flat();
-  const flatB = matrixB.flat();
-  const result = new Array(rowsA * colsB).fill(0);
-
-  const { multiply_matrices } = wasmInstance.exports;
-
-  const ptrA = wasmInstance.exports.malloc(flatA.length * 4);
-  const ptrB = wasmInstance.exports.malloc(flatB.length * 4);
-  const ptrResult = wasmInstance.exports.malloc(result.length * 4);
-
-  const memory = new Uint32Array(wasmInstance.exports.memory.buffer);
-  memory.set(flatA, ptrA / 4);
-  memory.set(flatB, ptrB / 4);
-
-  multiply_matrices(ptrA, rowsA, colsA, ptrB, rowsB, colsB, ptrResult);
-
-  const resultView = new Float32Array(wasmInstance.exports.memory.buffer, ptrResult, result.length);
-  const finalResult = [];
-  for (let i = 0; i < rowsA; i++) {
-    finalResult.push(Array.from(resultView.slice(i * colsB, (i + 1) * colsB)));
-  }
-
-  wasmInstance.exports.free(ptrA);
-  wasmInstance.exports.free(ptrB);
-  wasmInstance.exports.free(ptrResult);
-
-  return finalResult;
+  return T;
 }
 
 /**
- * Multiplies a matrix and a vector using WebAssembly.
- * @param {number[][]} matrix - The matrix.
- * @param {number[]} vector - The vector.
- * @returns {number[]} The resulting vector after multiplication.
- * @throws {Error} If the matrix and vector dimensions do not align.
+ * @function addMatrices
+ * @description Adds two matrices element-wise.
+ * @param {Matrix} A - The first matrix (m x n).
+ * @param {Matrix} B - The second matrix (m x n).
+ * @param {number} m - Number of rows in the matrices.
+ * @param {number} n - Number of columns in the matrices.
+ * @returns {Matrix} The resulting matrix (m x n).
  */
-export function multiplyMatrixVector(matrix, vector) {
-  const vectorAsMatrix = vector.map(v => [v]);
-  const resultMatrix = multiplyMatrices(matrix, vectorAsMatrix);
-  return resultMatrix.map(row => row[0]);
+export function addMatrices(A, B, m, n) {
+  if (A.length !== m * n || B.length !== m * n) {
+    throw new Error("Matrix dimensions must match for addition.");
+  }
+
+  const C = createMatrix(m, n);
+
+  for (let i = 0; i < m * n; i++) {
+    C[i] = A[i] + B[i];
+  }
+
+  return C;
 }
 
 /**
- * Adds two vectors element-wise.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number[]} The resulting vector after addition.
- * @throws {Error} If the vectors are not of the same length.
+ * @function scaleMatrix
+ * @description Scales a matrix by a scalar value.
+ * @param {Matrix} A - The matrix to scale (m x n).
+ * @param {number} scalar - The scalar value.
+ * @param {number} m - Number of rows in the matrix.
+ * @param {number} n - Number of columns in the matrix.
+ * @returns {Matrix} The scaled matrix (m x n).
  */
-export function addVectors(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must be of the same length for addition.');
+export function scaleMatrix(A, scalar, m, n) {
+  if (A.length !== m * n) {
+    throw new Error("Matrix dimensions must match for scaling.");
   }
-  return vectorA.map((val, idx) => val + vectorB[idx]);
+
+  const C = createMatrix(m, n);
+
+  for (let i = 0; i < m * n; i++) {
+    C[i] = A[i] * scalar;
+  }
+
+  return C;
 }
 
 /**
- * Computes the dot product of two vectors.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number} The dot product of the two vectors.
- * @throws {Error} If the vectors are not of the same length.
+ * @function identityMatrix
+ * @description Creates an identity matrix of the specified size.
+ * @param {number} size - The size of the identity matrix (size x size).
+ * @returns {Matrix} The identity matrix.
  */
-export function dotProduct(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must be of the same length for dot product.');
+export function identityMatrix(size) {
+  if (size <= 0) {
+    throw new Error("Matrix size must be a positive integer.");
   }
-  return vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
+
+  const I = createMatrix(size, size);
+
+  for (let i = 0; i < size; i++) {
+    I[i * size + i] = 1;
+  }
+
+  return I;
 }

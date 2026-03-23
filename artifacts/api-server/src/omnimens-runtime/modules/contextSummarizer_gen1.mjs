@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: contextSummarizer
- * Written: 2026-03-23T02:00:42.530Z
+ * Written: 2026-03-23T07:11:12.158Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,80 +18,93 @@
 
 /**
  * @module contextSummarizer
- * @description Condenses long conversations into compact summaries using a sliding window summarization technique with semantic embedding clustering.
+ * @description Summarizes and compresses long conversations into a compact representation using a hybrid extractive-abstractive approach.
  */
 
 /**
- * Generates semantic embeddings for text by hashing words into numerical vectors.
- * This is a simple stand-in for more complex embedding techniques.
- * @param {string} text - The input text to embed.
- * @returns {number[]} A fixed-size numerical embedding vector.
+ * Summarizes a long conversation into key points.
+ * @param {string[]} conversation - Array of conversation strings.
+ * @param {number} maxSummaryLength - Maximum number of key points to extract.
+ * @returns {string[]} Array of summarized key points.
  */
-function generateEmbedding(text) {
-  const words = text.split(/\s+/);
-  const vector = new Array(128).fill(0);
-  for (const word of words) {
-    const hash = [...Buffer.from(word)].reduce((acc, byte) => acc + byte, 0);
-    vector[hash % 128] += 1;
-  }
-  return vector;
-}
-
-/**
- * Calculates the cosine similarity between two numerical vectors.
- * @param {number[]} vecA - The first vector.
- * @param {number[]} vecB - The second vector.
- * @returns {number} The cosine similarity between vecA and vecB.
- */
-function cosineSimilarity(vecA, vecB) {
-  const dotProduct = vecA.reduce((sum, val, i) => sum + val * vecB[i], 0);
-  const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val * val, 0));
-  const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val * val, 0));
-  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
-}
-
-/**
- * Summarizes a long conversation into a compact summary using a sliding window approach.
- * @param {string[]} conversation - An array of conversation segments (e.g., sentences or paragraphs).
- * @param {number} windowSize - The number of segments to include in each sliding window.
- * @param {number} similarityThreshold - The similarity threshold for clustering segments.
- * @returns {string} A compact summary of the conversation.
- */
-function summarizeConversation(conversation, windowSize, similarityThreshold) {
-  const embeddings = conversation.map(generateEmbedding);
-  const clusters = [];
-
-  for (let i = 0; i < conversation.length; i += windowSize) {
-    const window = conversation.slice(i, i + windowSize);
-    const windowEmbedding = embeddings.slice(i, i + windowSize).reduce((acc, vec) => {
-      for (let j = 0; j < vec.length; j++) {
-        acc[j] += vec[j];
-      }
-      return acc;
-    }, new Array(128).fill(0));
-
-    let addedToCluster = false;
-    for (const cluster of clusters) {
-      const similarity = cosineSimilarity(cluster.embedding, windowEmbedding);
-      if (similarity >= similarityThreshold) {
-        cluster.segments.push(...window);
-        for (let j = 0; j < cluster.embedding.length; j++) {
-          cluster.embedding[j] += windowEmbedding[j];
-        }
-        addedToCluster = true;
-        break;
-      }
-    }
-
-    if (!addedToCluster) {
-      clusters.push({ segments: [...window], embedding: windowEmbedding });
-    }
+export function summarizeConversation(conversation, maxSummaryLength) {
+  if (!Array.isArray(conversation) || typeof maxSummaryLength !== 'number' || maxSummaryLength <= 0) {
+    throw new Error("Invalid input: conversation must be an array of strings and maxSummaryLength must be a positive number.");
   }
 
-  return clusters.map(cluster => cluster.segments.join(' ')).join(' ');
+  // Step 1: Tokenize conversation into sentences.
+  const sentences = conversation.flatMap(text => text.split(/(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s+/));
+
+  // Step 2: Extractive summarization using frequency analysis.
+  const wordFrequency = {};
+  sentences.forEach(sentence => {
+    sentence.split(/\W+/).forEach(word => {
+      const normalizedWord = word.toLowerCase();
+      if (normalizedWord) {
+        wordFrequency[normalizedWord] = (wordFrequency[normalizedWord] || 0) + 1;
+      }
+    });
+  });
+
+  const sentenceScores = sentences.map(sentence => {
+    const words = sentence.split(/\W+/);
+    const score = words.reduce((sum, word) => sum + (wordFrequency[word.toLowerCase()] || 0), 0);
+    return { sentence, score };
+  });
+
+  // Sort sentences by score in descending order.
+  sentenceScores.sort((a, b) => b.score - a.score);
+
+  // Select top sentences up to maxSummaryLength.
+  const extractiveSummary = sentenceScores.slice(0, maxSummaryLength).map(item => item.sentence);
+
+  // Step 3: Abstractive compression (simple embedding-like abstraction).
+  const abstractedSummary = extractiveSummary.map(sentence => compressSentence(sentence));
+
+  return abstractedSummary;
 }
 
 /**
- * Exports the module functions.
+ * Compresses a sentence by reducing redundancy and normalizing structure.
+ * @param {string} sentence - A sentence to compress.
+ * @returns {string} Compressed sentence.
  */
-export { generateEmbedding, cosineSimilarity, summarizeConversation };
+function compressSentence(sentence) {
+  // Normalize whitespace and remove redundant words (basic example).
+  return sentence
+    .replace(/\s+/g, ' ')
+    .replace(/\b(very|really|actually|basically|just)\b/gi, '')
+    .trim();
+}
+
+/**
+ * Encodes summarized key points into a numeric embedding representation.
+ * This is a simplified embedding generator using character codes.
+ * @param {string[]} summary - Array of summarized key points.
+ * @returns {number[][]} Array of numeric embeddings for each key point.
+ */
+export function encodeSummary(summary) {
+  if (!Array.isArray(summary)) {
+    throw new Error("Invalid input: summary must be an array of strings.");
+  }
+
+  return summary.map(point => {
+    const embedding = new Array(128).fill(0);
+    for (let i = 0; i < point.length; i++) {
+      const charCode = point.charCodeAt(i);
+      embedding[charCode % 128] += 1; // Simple hash into 128 dimensions.
+    }
+    return embedding;
+  });
+}
+
+/**
+ * Summarizes and encodes a conversation into compact embeddings.
+ * @param {string[]} conversation - Array of conversation strings.
+ * @param {number} maxSummaryLength - Maximum number of key points to extract.
+ * @returns {number[][]} Array of numeric embeddings representing the summarized conversation.
+ */
+export function summarizeAndEncode(conversation, maxSummaryLength) {
+  const summary = summarizeConversation(conversation, maxSummaryLength);
+  return encodeSummary(summary);
+}

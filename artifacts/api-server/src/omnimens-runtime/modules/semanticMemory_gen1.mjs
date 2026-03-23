@@ -1,123 +1,109 @@
 /**
- * OMNIMENS Self-Authored Module
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
  * Source: evolution_engine
  * Title: Evolution Module: semanticMemory
- * Written: 2026-03-20T18:15:28.231Z
+ * Written: 2026-03-23T10:42:36.900Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
  * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
  */
 
 /**
  * @module semanticMemory
- * @description Provides an in-memory vector store for semantic search and retrieval using HNSW (Hierarchical Navigable Small World) graphs.
+ * @description This module provides an in-memory vector storage and retrieval system
+ * for contextual memory using cosine similarity on precomputed embeddings.
  */
 
 /**
- * Represents a node in the HNSW graph.
- * @class
+ * Computes the cosine similarity between two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} Cosine similarity value between -1 and 1.
  */
-class Node {
-  /**
-   * @param {number[]} vector - The vector representing the node's semantic data.
-   * @param {string} id - A unique identifier for the node.
-   */
-  constructor(vector, id) {
-    this.vector = vector;
-    this.id = id;
-    this.neighbors = []; // List of neighboring nodes
-  }
-}
-
-/**
- * Computes the Euclidean distance between two vectors.
- * @param {number[]} vectorA - First vector.
- * @param {number[]} vectorB - Second vector.
- * @returns {number} - Euclidean distance.
- */
-function euclideanDistance(vectorA, vectorB) {
+function cosineSimilarity(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
-    throw new Error("Vectors must have the same dimensions.");
+    throw new Error("Vectors must be of the same length.");
   }
-  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+
+  const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a * a, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b * b, 0));
+
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    return 0; // Avoid division by zero; return zero similarity for zero vectors.
+  }
+
+  return dotProduct / (magnitudeA * magnitudeB);
 }
 
 /**
- * Represents the HNSW graph.
- * @class
+ * Class representing a semantic memory store.
  */
-class HNSWGraph {
+class SemanticMemory {
   constructor() {
-    this.nodes = new Map(); // Map of nodes by their ID
+    /**
+     * @private
+     * @type {Map<string, number[]>}
+     * A Map to store embeddings with their associated keys.
+     */
+    this.memory = new Map();
   }
 
   /**
-   * Adds a node to the graph.
-   * @param {string} id - Unique identifier for the node.
-   * @param {number[]} vector - Semantic vector for the node.
+   * Adds a new key-vector pair to the memory.
+   * @param {string} key - The unique identifier for the embedding.
+   * @param {number[]} vector - The embedding vector to store.
    */
-  addNode(id, vector) {
-    if (this.nodes.has(id)) {
-      throw new Error(`Node with id ${id} already exists.`);
+  add(key, vector) {
+    if (this.memory.has(key)) {
+      throw new Error(`Key '${key}' already exists in memory.`);
     }
-    const newNode = new Node(vector, id);
-    this.nodes.set(id, newNode);
-    this._connectNode(newNode);
+    this.memory.set(key, vector);
   }
 
   /**
-   * Connects a node to its nearest neighbors.
-   * @private
-   * @param {Node} newNode - Node to connect.
+   * Retrieves the vector associated with a given key.
+   * @param {string} key - The unique identifier for the embedding.
+   * @returns {number[] | undefined} The associated vector, or undefined if not found.
    */
-  _connectNode(newNode) {
-    const neighbors = Array.from(this.nodes.values())
-      .filter(node => node.id !== newNode.id)
-      .map(node => ({ node, distance: euclideanDistance(newNode.vector, node.vector) }))
-      .sort((a, b) => a.distance - b.distance)
-      .slice(0, 5); // Keep top 5 nearest neighbors
-
-    newNode.neighbors = neighbors.map(n => n.node);
-    neighbors.forEach(n => n.node.neighbors.push(newNode));
+  get(key) {
+    return this.memory.get(key);
   }
 
   /**
-   * Searches for the nearest neighbors of a given vector.
-   * @param {number[]} queryVector - Vector to search for.
-   * @param {number} k - Number of nearest neighbors to retrieve.
-   * @returns {Array<{id: string, distance: number}>} - List of nearest neighbors.
+   * Finds the most similar vector in memory to a given query vector.
+   * @param {number[]} queryVector - The query vector.
+   * @returns {{ key: string, similarity: number } | null} The key and similarity of the closest match, or null if memory is empty.
    */
-  search(queryVector, k) {
-    const distances = Array.from(this.nodes.values())
-      .map(node => ({ id: node.id, distance: euclideanDistance(queryVector, node.vector) }))
-      .sort((a, b) => a.distance - b.distance)
-      .slice(0, k);
+  findMostSimilar(queryVector) {
+    let bestMatch = null;
+    let highestSimilarity = -Infinity;
 
-    return distances;
+    for (const [key, vector] of this.memory.entries()) {
+      const similarity = cosineSimilarity(queryVector, vector);
+      if (similarity > highestSimilarity) {
+        highestSimilarity = similarity;
+        bestMatch = { key, similarity };
+      }
+    }
+
+    return bestMatch;
+  }
+
+  /**
+   * Clears all stored embeddings from memory.
+   */
+  clear() {
+    this.memory.clear();
   }
 }
 
-/**
- * Creates a new HNSWGraph instance.
- * @returns {HNSWGraph} - A new instance of the graph.
- */
-function createGraph() {
-  return new HNSWGraph();
-}
-
-/**
- * Example usage of the semanticMemory module.
- * @returns {void}
- */
-function exampleUsage() {
-  const graph = createGraph();
-  graph.addNode("node1", [1, 2, 3]);
-  graph.addNode("node2", [4, 5, 6]);
-  graph.addNode("node3", [7, 8, 9]);
-
-  const results = graph.search([5, 5, 5], 2);
-  console.log("Search results:", results);
-}
-
-export { createGraph, exampleUsage };
+export { SemanticMemory, cosineSimilarity };

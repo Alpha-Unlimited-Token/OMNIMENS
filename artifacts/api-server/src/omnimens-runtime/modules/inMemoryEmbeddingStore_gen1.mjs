@@ -1,125 +1,123 @@
 /**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryEmbeddingStore
+ * Written: 2026-03-23T04:30:34.423Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Complete ES module code here, starting with /** JSDoc */ and exports
+
+/**
  * @module inMemoryEmbeddingStore
- * @description Provides an in-memory store for embeddings with efficient similarity search using a k-d tree algorithm.
+ * @description A runtime in-memory store for embeddings with fast cosine similarity search.
  */
 
 /**
- * Represents a node in the k-d tree.
- * @class KDTreeNode
+ * Computes the cosine similarity between two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} - The cosine similarity value.
+ * @throws {Error} - If vectors have different lengths or are empty.
  */
-class KDTreeNode {
-  /**
-   * @param {Array<number>} point - The embedding vector.
-   * @param {number} index - The index of the embedding in the original dataset.
-   * @param {number} depth - The depth of the node in the tree.
-   */
-  constructor(point, index, depth) {
-    this.point = point;
-    this.index = index;
-    this.left = null;
-    this.right = null;
-    this.depth = depth;
+function cosineSimilarity(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length || vectorA.length === 0) {
+    throw new Error("Vectors must have the same non-zero length.");
   }
+
+  const dotProduct = vectorA.reduce((sum, val, index) => sum + val * vectorB[index], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val * val, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val * val, 0));
+
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    throw new Error("Vectors must not be zero vectors.");
+  }
+
+  return dotProduct / (magnitudeA * magnitudeB);
 }
 
 /**
- * Represents a k-d tree for storing and searching embeddings.
- * @class KDTree
+ * A class representing an in-memory embedding store.
  */
-class KDTree {
-  /**
-   * @param {Array<Array<number>>} embeddings - Array of embedding vectors.
-   */
-  constructor(embeddings) {
-    this.root = this.buildTree(embeddings.map((point, index) => ({ point, index })), 0);
+class InMemoryEmbeddingStore {
+  constructor() {
+    /**
+     * Internal storage for embeddings.
+     * @type {Map<string, number[]>}
+     */
+    this.store = new Map();
   }
 
   /**
-   * Builds the k-d tree recursively.
-   * @private
-   * @param {Array<{point: Array<number>, index: number}>} points - Array of points with their indices.
-   * @param {number} depth - Current depth in the tree.
-   * @returns {KDTreeNode|null} - The root node of the subtree.
+   * Adds an embedding to the store.
+   * @param {string} key - The unique identifier for the embedding.
+   * @param {number[]} embedding - The embedding vector.
+   * @throws {Error} - If the key already exists or the embedding is invalid.
    */
-  buildTree(points, depth) {
-    if (points.length === 0) return null;
+  addEmbedding(key, embedding) {
+    if (this.store.has(key)) {
+      throw new Error(`Key '${key}' already exists in the store.`);
+    }
 
-    const axis = depth % points[0].point.length;
-    points.sort((a, b) => a.point[axis] - b.point[axis]);
-    const median = Math.floor(points.length / 2);
+    if (!Array.isArray(embedding) || embedding.length === 0 || !embedding.every(val => typeof val === 'number')) {
+      throw new Error("Embedding must be a non-empty array of numbers.");
+    }
 
-    const node = new KDTreeNode(points[median].point, points[median].index, depth);
-    node.left = this.buildTree(points.slice(0, median), depth + 1);
-    node.right = this.buildTree(points.slice(median + 1), depth + 1);
-
-    return node;
+    this.store.set(key, embedding);
   }
 
   /**
-   * Finds the k nearest neighbors to a given query point.
-   * @param {Array<number>} queryPoint - The query embedding vector.
-   * @param {number} k - The number of nearest neighbors to find.
-   * @returns {Array<{index: number, distance: number}>} - Array of nearest neighbors with their indices and distances.
+   * Searches for the most similar embeddings based on cosine similarity.
+   * @param {number[]} queryEmbedding - The query embedding vector.
+   * @param {number} topN - The number of top similar embeddings to return.
+   * @returns {Array<{key: string, similarity: number}>} - An array of top similar embeddings.
+   * @throws {Error} - If the query embedding is invalid or topN is not a positive integer.
    */
-  findKNearestNeighbors(queryPoint, k) {
-    const neighbors = [];
+  search(queryEmbedding, topN = 1) {
+    if (!Array.isArray(queryEmbedding) || queryEmbedding.length === 0 || !queryEmbedding.every(val => typeof val === 'number')) {
+      throw new Error("Query embedding must be a non-empty array of numbers.");
+    }
 
-    const searchTree = (node) => {
-      if (!node) return;
+    if (!Number.isInteger(topN) || topN <= 0) {
+      throw new Error("topN must be a positive integer.");
+    }
 
-      const axis = node.depth % queryPoint.length;
-      const distance = this.euclideanDistance(queryPoint, node.point);
+    const similarities = [];
 
-      if (neighbors.length < k) {
-        neighbors.push({ index: node.index, distance });
-        neighbors.sort((a, b) => a.distance - b.distance);
-      } else if (distance < neighbors[neighbors.length - 1].distance) {
-        neighbors[neighbors.length - 1] = { index: node.index, distance };
-        neighbors.sort((a, b) => a.distance - b.distance);
+    for (const [key, embedding] of this.store.entries()) {
+      try {
+        const similarity = cosineSimilarity(queryEmbedding, embedding);
+        similarities.push({ key, similarity });
+      } catch (error) {
+        // Skip invalid embeddings silently
+        continue;
       }
+    }
 
-      const diff = queryPoint[axis] - node.point[axis];
-      const primary = diff < 0 ? node.left : node.right;
-      const secondary = diff < 0 ? node.right : node.left;
-
-      searchTree(primary);
-      if (neighbors.length < k || Math.abs(diff) < neighbors[neighbors.length - 1].distance) {
-        searchTree(secondary);
-      }
-    };
-
-    searchTree(this.root);
-    return neighbors;
+    return similarities
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, topN);
   }
 
   /**
-   * Calculates the Euclidean distance between two points.
-   * @private
-   * @param {Array<number>} pointA - The first point.
-   * @param {Array<number>} pointB - The second point.
-   * @returns {number} - The Euclidean distance.
+   * Clears all embeddings from the store.
    */
-  euclideanDistance(pointA, pointB) {
-    return Math.sqrt(pointA.reduce((sum, val, i) => sum + (val - pointB[i]) ** 2, 0));
+  clearStore() {
+    this.store.clear();
   }
 }
 
 /**
- * Creates a new in-memory embedding store.
- * @param {Array<Array<number>>} embeddings - Array of embedding vectors.
- * @returns {KDTree} - A k-d tree instance for similarity search.
+ * Exports the module functions and class.
  */
-export function createEmbeddingStore(embeddings) {
-  return new KDTree(embeddings);
-}
-
-/**
- * Searches for the k nearest neighbors to a query embedding.
- * @param {KDTree} embeddingStore - The in-memory embedding store.
- * @param {Array<number>} queryEmbedding - The query embedding vector.
- * @param {number} k - The number of nearest neighbors to find.
- * @returns {Array<{index: number, distance: number}>} - Array of nearest neighbors with their indices and distances.
- */
-export function searchKNearestNeighbors(embeddingStore, queryEmbedding, k) {
-  return embeddingStore.findKNearestNeighbors(queryEmbedding, k);
-}
+export { cosineSimilarity, InMemoryEmbeddingStore };

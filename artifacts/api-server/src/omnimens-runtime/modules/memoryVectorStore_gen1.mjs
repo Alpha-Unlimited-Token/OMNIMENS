@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: memoryVectorStore
- * Written: 2026-03-22T09:19:01.402Z
+ * Written: 2026-03-23T07:39:36.698Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,91 +16,80 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
+// memoryVectorStore.js
+
 /**
  * @module memoryVectorStore
- * @description A utility module to store and retrieve high-dimensional embeddings in-memory for fast context recall using k-nearest neighbor search.
+ * @description Provides an in-memory embedding index for fast retrieval and reasoning using KNN search over embeddings stored in JavaScript arrays.
  */
 
 /**
  * Calculates the Euclidean distance between two vectors.
  * @param {number[]} vectorA - The first vector.
  * @param {number[]} vectorB - The second vector.
- * @returns {number} The Euclidean distance between the two vectors.
- * @throws {Error} If the vectors are not of the same length.
+ * @returns {number} The Euclidean distance.
  */
 function euclideanDistance(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
     throw new Error("Vectors must have the same length.");
   }
-  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+  return Math.sqrt(vectorA.reduce((sum, value, index) => sum + Math.pow(value - vectorB[index], 2), 0));
 }
 
 /**
- * A class representing an in-memory vector store with k-nearest neighbor search.
+ * A class representing an in-memory vector store.
  */
 class MemoryVectorStore {
   constructor() {
     /**
-     * @private
-     * @type {{ id: string, vector: number[] }[]}
-     * @description Stores vectors along with their unique IDs.
+     * @type {Array<{id: string, embedding: number[]}>}
+     * @description Stores the embeddings and their associated IDs.
      */
     this.store = [];
   }
 
   /**
-   * Adds a vector to the store.
-   * @param {string} id - A unique identifier for the vector.
-   * @param {number[]} vector - The high-dimensional vector to store.
+   * Adds a new embedding to the store.
+   * @param {string} id - A unique identifier for the embedding.
+   * @param {number[]} embedding - The embedding vector.
    */
-  addVector(id, vector) {
-    if (!Array.isArray(vector) || vector.some(isNaN)) {
-      throw new Error("Vector must be an array of numbers.");
+  add(id, embedding) {
+    if (typeof id !== "string" || !Array.isArray(embedding)) {
+      throw new Error("Invalid input: id must be a string and embedding must be an array.");
     }
-    this.store.push({ id, vector });
+    this.store.push({ id, embedding });
   }
 
   /**
-   * Finds the k-nearest neighbors to a given query vector.
-   * @param {number[]} queryVector - The vector to search for neighbors.
-   * @param {number} k - The number of nearest neighbors to retrieve.
-   * @returns {{ id: string, distance: number }[]} The k-nearest neighbors with their distances.
-   * @throws {Error} If k is not a positive integer or the query vector is invalid.
+   * Finds the k-nearest neighbors to a given query embedding.
+   * @param {number[]} queryEmbedding - The query embedding vector.
+   * @param {number} k - The number of neighbors to retrieve.
+   * @returns {Array<{id: string, distance: number}>} The k-nearest neighbors sorted by distance.
    */
-  findNearestNeighbors(queryVector, k) {
-    if (!Array.isArray(queryVector) || queryVector.some(isNaN)) {
-      throw new Error("Query vector must be an array of numbers.");
-    }
-    if (!Number.isInteger(k) || k <= 0) {
-      throw new Error("Parameter 'k' must be a positive integer.");
+  knnSearch(queryEmbedding, k) {
+    if (!Array.isArray(queryEmbedding) || typeof k !== "number" || k <= 0) {
+      throw new Error("Invalid input: queryEmbedding must be an array and k must be a positive number.");
     }
 
-    // Calculate distances to all stored vectors.
-    const distances = this.store.map(({ id, vector }) => ({
+    const distances = this.store.map(({ id, embedding }) => ({
       id,
-      distance: euclideanDistance(queryVector, vector)
+      distance: euclideanDistance(queryEmbedding, embedding)
     }));
 
-    // Sort by distance and return the top k results.
     return distances
       .sort((a, b) => a.distance - b.distance)
       .slice(0, k);
   }
 
   /**
-   * Clears all vectors from the store.
+   * Clears all embeddings from the store.
    */
-  clearStore() {
+  clear() {
     this.store = [];
-  }
-
-  /**
-   * Returns the number of vectors currently stored.
-   * @returns {number} The count of stored vectors.
-   */
-  vectorCount() {
-    return this.store.length;
   }
 }
 
+/**
+ * Exports the MemoryVectorStore class and the euclideanDistance function.
+ */
 export { MemoryVectorStore, euclideanDistance };

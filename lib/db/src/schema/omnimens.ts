@@ -682,6 +682,22 @@ export const omnimensUserMentalModels = pgTable("godflesh_user_mental_models", {
 
 export type OmnimensUserMentalModel = typeof omnimensUserMentalModels.$inferSelect;
 
+// ─── User Files (Auto-saved assets from all interactions) ─────────────────────
+export const omnimensUserFiles = pgTable("godflesh_user_files", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => omnimensUsers.id),
+  conversationId: integer("conversation_id"),
+  projectId: integer("project_id"),
+  filename: text("filename").notNull(),
+  fileType: text("file_type").notNull(),
+  mimeType: text("mime_type").notNull(),
+  fileSize: integer("file_size").notNull(),
+  storageKey: text("storage_key").notNull(),
+  prompt: text("prompt"),
+  metadata: text("metadata"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // ─── Causal Graph (Cause-Effect Reasoning) ────────────────────────────────────
 export const omnimensCausalGraph = pgTable("godflesh_causal_graph", {
   id: serial("id").primaryKey(),

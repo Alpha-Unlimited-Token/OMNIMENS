@@ -69,6 +69,7 @@ const Deploy = retryLazy(() => import("@/pages/deploy"));
 const Connect = retryLazy(() => import("@/pages/connect"));
 const Dreams = retryLazy(() => import("@/pages/dreams"));
 const Demo = retryLazy(() => import("@/pages/demo"));
+const MyFiles = retryLazy(() => import("@/pages/my-files"));
 
 initTheme();
 try { sessionStorage.removeItem("chunk_reload"); } catch {}
@@ -178,6 +179,7 @@ function Router() {
         <Route path="/tools">{() => <ProtectedRoute><Tools /></ProtectedRoute>}</Route>
         <Route path="/templates">{() => <WS><Templates /></WS>}</Route>
         <Route path="/deploy">{() => <ProtectedRoute><Deploy /></ProtectedRoute>}</Route>
+        <Route path="/files">{() => <ProtectedRoute><MyFiles /></ProtectedRoute>}</Route>
 
         <Route path="/faq" component={FAQ} />
         <Route path="/support" component={Support} />
