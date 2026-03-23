@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-23T15:23:42.570Z
+ * Written: 2026-03-23T17:50:54.773Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,60 +16,67 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentPatterns(text, patternLength) {
-    if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
-        throw new Error('Invalid input: text must be a string and patternLength must be a positive number.');
+// Utility function: Extract named entities from text based on simple pattern matching
+function extractEntities(text, patterns) {
+    if (typeof text !== 'string' || !Array.isArray(patterns)) {
+        throw new Error('Invalid input: text must be a string and patterns must be an array.');
     }
 
-    const patternCounts = new Map();
-
-    for (let i = 0; i <= text.length - patternLength; i++) {
-        const pattern = text.substring(i, i + patternLength);
-        if (patternCounts.has(pattern)) {
-            patternCounts.set(pattern, patternCounts.get(pattern) + 1);
-        } else {
-            patternCounts.set(pattern, 1);
+    const entities = [];
+    patterns.forEach(pattern => {
+        if (!pattern.label || !pattern.regex) {
+            throw new Error('Invalid pattern: each pattern must have a label and a regex.');
         }
-    }
+        const regex = new RegExp(pattern.regex, 'g');
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+            entities.push({ label: pattern.label, value: match[0], index: match.index });
+        }
+    });
 
-    const sortedPatterns = Array.from(patternCounts.entries()).sort((a, b) => b[1] - a[1]);
-    const mostFrequentPatterns = sortedPatterns.filter(([_, count]) => count === sortedPatterns[0][1]);
-
-    return mostFrequentPatterns.map(([pattern, count]) => ({ pattern, count }));
+    return entities;
 }
 
 // Test cases
-console.log('Test Case 1:');
-console.log(findMostFrequentPatterns('abababab', 2)); // Expected: [{ pattern: 'ab', count: 4 }, { pattern: 'ba', count: 3 }]
+(function testExtractEntities() {
+    const text = "Google and Microsoft are leading tech companies. Elon Musk founded SpaceX.";
+    const patterns = [
+        { label: 'ORG', regex: '\\b(Google|Microsoft|SpaceX)\\b' },
+        { label: 'PERSON', regex: '\\b(Elon Musk)\\b' }
+    ];
 
-console.log('Test Case 2:');
-console.log(findMostFrequentPatterns('abcdeabcdeabc', 3)); // Expected: [{ pattern: 'abc', count: 3 }, { pattern: 'bcd', count: 2 }, { pattern: 'cde', count: 2 }]
+    console.log("Test Case 1:");
+    console.log(extractEntities(text, patterns));
+    // Expected output:
+    // [
+    //   { label: 'ORG', value: 'Google', index: 0 },
+    //   { label: 'ORG', value: 'Microsoft', index: 11 },
+    //   { label: 'PERSON', value: 'Elon Musk', index: 43 },
+    //   { label: 'ORG', value: 'SpaceX', index: 57 }
+    // ]
 
-console.log('Test Case 3:');
-console.log(findMostFrequentPatterns('aaaaaa', 2)); // Expected: [{ pattern: 'aa', count: 5 }]
+    console.log("Test Case 2 (No matches):");
+    console.log(extractEntities("No entities here.", patterns));
+    // Expected output: []
 
-console.log('Test Case 4:');
-console.log(findMostFrequentPatterns('xyzxyzxyz', 3)); // Expected: [{ pattern: 'xyz', count: 3 }]
+    console.log("Test Case 3 (Edge case - empty text):");
+    console.log(extractEntities("", patterns));
+    // Expected output: []
 
-console.log('Test Case 5 (Edge Case: Single Character Text):');
-console.log(findMostFrequentPatterns('a', 1)); // Expected: [{ pattern: 'a', count: 1 }]
+    console.log("Test Case 4 (Edge case - empty patterns):");
+    console.log(extractEntities(text, []));
+    // Expected output: []
 
-console.log('Test Case 6 (Edge Case: Empty Text):');
-console.log(findMostFrequentPatterns('', 1)); // Expected: []
+    console.log("Test Case 5 (Invalid inputs):");
+    try {
+        console.log(extractEntities(123, patterns));
+    } catch (e) {
+        console.log(e.message); // Expected: "Invalid input: text must be a string and patterns must be an array."
+    }
 
-console.log('Test Case 7 (Edge Case: Pattern Length Greater Than Text Length):');
-console.log(findMostFrequentPatterns('abc', 5)); // Expected: []
-
-console.log('Test Case 8 (Edge Case: Non-String Input):');
-try {
-    console.log(findMostFrequentPatterns(12345, 2));
-} catch (e) {
-    console.log(e.message); // Expected: Error message
-}
-
-console.log('Test Case 9 (Edge Case: Invalid Pattern Length):');
-try {
-    console.log(findMostFrequentPatterns('abcde', -1));
-} catch (e) {
-    console.log(e.message); // Expected: Error message
-}
+    try {
+        console.log(extractEntities(text, [{ label: 'ORG' }]));
+    } catch (e) {
+        console.log(e.message); // Expected: "Invalid pattern: each pattern must have a label and a regex."
+    }
+})();

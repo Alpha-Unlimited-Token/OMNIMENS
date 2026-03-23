@@ -56,24 +56,28 @@ import {
 } from "@workspace/db";
 import { desc, eq, sql, and, gte, or } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { getAllAgentNames, getAgentDomain, getAllAgentDomains } from "./omnimens-consciousness-bus.js";
 
-type AgentName = "Architect" | "Critic" | "Synthesizer" | "Mathematician" | "Neuroscientist" | "Meta-Agent" | "GraphicDesigner" | "SpellCheckVisual";
+type AgentName = string;
 
-const ALL_AGENTS: AgentName[] = [
-  "Architect", "Mathematician", "Neuroscientist", "Synthesizer",
-  "Critic", "Meta-Agent", "GraphicDesigner", "SpellCheckVisual",
-];
+function resolveAllAgents(): AgentName[] {
+  return getAllAgentNames();
+}
 
-const AGENT_DOMAINS: Record<AgentName, string> = {
-  "Architect": "system architecture, design patterns, scalability, distributed systems, orchestration",
-  "Mathematician": "algorithms, optimization, formal proofs, Bayesian methods, information theory",
-  "Neuroscientist": "biological learning, memory consolidation, neural plasticity, cognitive modeling, dual-process theory",
-  "Synthesizer": "integration of ideas, knowledge graphs, cross-domain transfer, conflict resolution, unified systems",
-  "Critic": "adversarial testing, security, edge cases, robustness, red-team analysis, debate",
-  "Meta-Agent": "orchestration strategy, self-improvement, capability gaps, governance, meta-learning",
-  "GraphicDesigner": "visual design, UI/UX, data visualization, accessibility, aesthetics",
-  "SpellCheckVisual": "text quality, brand consistency, readability, factual grounding, communication clarity",
-};
+function resolveAgentDomains(): Record<string, string> {
+  return getAllAgentDomains();
+}
+
+const AGENT_DOMAINS: Record<string, string> = new Proxy({} as Record<string, string>, {
+  get(_target, prop: string) {
+    return getAgentDomain(prop);
+  },
+  has() { return true; },
+  ownKeys() { return Object.keys(resolveAgentDomains()); },
+  getOwnPropertyDescriptor(_target, prop: string) {
+    return { configurable: true, enumerable: true, value: getAgentDomain(prop) };
+  },
+});
 
 interface SynapticConnection {
   fromAgent: AgentName;
@@ -166,6 +170,7 @@ async function motherBrainScan(): Promise<{
   }
 
   const agentOutputs = new Map<AgentName, string[]>();
+  const ALL_AGENTS = resolveAllAgents();
   for (const agent of ALL_AGENTS) {
     agentOutputs.set(agent, []);
   }
@@ -350,6 +355,7 @@ async function cascadePropagation(
 ): Promise<CascadeEvent[]> {
   const cascadeEvents: CascadeEvent[] = [];
   let currentDeliveries = initialDeliveries.filter(d => d.relevance >= 0.7);
+  const ALL_AGENTS = resolveAllAgents();
 
   for (let depth = 1; depth <= maxDepth && currentDeliveries.length > 0; depth++) {
     const nextDeliveries: SynapseDelivery[] = [];
@@ -430,6 +436,8 @@ Respond JSON only:
 export async function runSynapticMeshCycle(): Promise<void> {
   synapseCycleCount++;
   const cycleStart = Date.now();
+
+  const ALL_AGENTS = resolveAllAgents();
 
   console.log(`\n${"⚡".repeat(35)}`);
   console.log(`[SYNAPTIC MESH] ⚡ Pituitary Brain Cycle #${synapseCycleCount}`);
@@ -547,8 +555,9 @@ export function startSynapticMesh(): void {
 
   const INTERVAL_MS = 2 * 60 * 60 * 1000 + 3 * 60 * 1000; // ~123 minutes
 
+  const ALL_AGENTS = resolveAllAgents();
   console.log(`[SYNAPTIC MESH] ⚡ Pituitary Brain (Master Coordination Spider) activated — first cycle in ${FIRST_DELAY_MS / 60000}min, then every ${(INTERVAL_MS / 60000).toFixed(0)}min.`);
-  console.log(`[SYNAPTIC MESH] ⚡ ${ALL_AGENTS.length} agents connected in synaptic network`);
+  console.log(`[SYNAPTIC MESH] ⚡ ${ALL_AGENTS.length} agents connected in synaptic network (dynamic — auto-expands with genesis agents)`);
   console.log(`[SYNAPTIC MESH] ⚡ Synapse spiders translate + deliver cross-agent intelligence`);
   console.log(`[SYNAPTIC MESH] ⚡ Cascade propagation: successful deliveries trigger further firing`);
   console.log(`[SYNAPTIC MESH] ⚡ Hebbian learning: "neurons that fire together wire together"`);

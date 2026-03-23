@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-03-23T13:45:47.625Z
+ * Written: 2026-03-23T15:58:27.984Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,156 +16,140 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
+// Complete ES module code here, starting with /** JSDoc */ and exports
+
 /**
  * @module inMemoryVectorStore
- * @description Provides fast similarity search and embedding lookup using HNSW (Hierarchical Navigable Small World) graphs.
+ * @description Efficient in-memory storage and retrieval of semantically similar embeddings using k-d tree algorithm.
  */
 
 /**
- * Represents a node in the HNSW graph.
- * @typedef {Object} Node
- * @property {number[]} vector - The embedding vector of the node.
- * @property {number} id - Unique identifier for the node.
- * @property {Map<number, Set<number>>} neighbors - Neighbors organized by layer.
+ * Represents a node in the k-d tree.
+ * @class KDTreeNode
  */
+class KDTreeNode {
+  /**
+   * @param {number[]} point - The vector point stored in this node.
+   * @param {*} value - The associated value for the vector.
+   * @param {number} depth - The depth of the node in the tree.
+   */
+  constructor(point, value, depth = 0) {
+    this.point = point;
+    this.value = value;
+    this.depth = depth;
+    this.left = null;
+    this.right = null;
+  }
+}
 
-class HNSW {
-  constructor(maxNeighbors = 16, efConstruction = 200) {
-    /**
-     * @type {Node[]}
-     * @private
-     */
-    this.nodes = [];
-
-    /**
-     * @type {number}
-     * @private
-     */
-    this.maxNeighbors = maxNeighbors;
-
-    /**
-     * @type {number}
-     * @private
-     */
-    this.efConstruction = efConstruction;
+/**
+ * Represents a k-d tree for efficient nearest neighbor search.
+ * @class KDTree
+ */
+class KDTree {
+  constructor() {
+    this.root = null;
   }
 
   /**
-   * Calculates the Euclidean distance between two vectors.
-   * @param {number[]} a - First vector.
-   * @param {number[]} b - Second vector.
-   * @returns {number} - The Euclidean distance.
+   * Inserts a point and its associated value into the k-d tree.
+   * @param {number[]} point - The vector point to insert.
+   * @param {*} value - The associated value for the vector.
    */
-  static euclideanDistance(a, b) {
-    if (a.length !== b.length) {
-      throw new Error("Vectors must have the same dimensions.");
-    }
-    return Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0));
-  }
+  insert(point, value) {
+    const insertRec = (node, point, value, depth) => {
+      if (!node) return new KDTreeNode(point, value, depth);
 
-  /**
-   * Adds a new vector to the HNSW graph.
-   * @param {number[]} vector - The embedding vector to add.
-   * @returns {number} - The ID of the newly added node.
-   */
-  addVector(vector) {
-    const id = this.nodes.length;
-    const newNode = {
-      vector,
-      id,
-      neighbors: new Map()
+      const axis = depth % point.length;
+
+      if (point[axis] < node.point[axis]) {
+        node.left = insertRec(node.left, point, value, depth + 1);
+      } else {
+        node.right = insertRec(node.right, point, value, depth + 1);
+      }
+
+      return node;
     };
 
-    // Initialize neighbors for each layer
-    for (let layer = 0; layer < this.maxNeighbors; layer++) {
-      newNode.neighbors.set(layer, new Set());
-    }
-
-    this.nodes.push(newNode);
-
-    if (id > 0) {
-      this._connectNode(newNode);
-    }
-
-    return id;
+    this.root = insertRec(this.root, point, value, 0);
   }
 
   /**
-   * Connects a new node to the graph using the nearest neighbors.
-   * @param {Node} newNode - The new node to connect.
-   * @private
+   * Finds the nearest neighbor to the given point.
+   * @param {number[]} target - The target vector point.
+   * @returns {{point: number[], value: *, distance: number}} The nearest neighbor.
    */
-  _connectNode(newNode) {
-    const neighbors = this._searchKNN(newNode.vector, this.efConstruction);
+  findNearest(target) {
+    let best = { node: null, distance: Infinity };
 
-    for (const neighbor of neighbors) {
-      this._linkNodes(newNode, neighbor);
-    }
-  }
+    const distanceFunction = (a, b) => {
+      return Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0));
+    };
 
-  /**
-   * Links two nodes in the HNSW graph.
-   * @param {Node} nodeA - First node.
-   * @param {Node} nodeB - Second node.
-   * @private
-   */
-  _linkNodes(nodeA, nodeB) {
-    const layer = 0; // Single-layer implementation for simplicity
-    if (nodeA.neighbors.get(layer).size < this.maxNeighbors) {
-      nodeA.neighbors.get(layer).add(nodeB.id);
-    }
-    if (nodeB.neighbors.get(layer).size < this.maxNeighbors) {
-      nodeB.neighbors.get(layer).add(nodeA.id);
-    }
-  }
+    const searchRec = (node, target, depth) => {
+      if (!node) return;
 
-  /**
-   * Searches for the k-nearest neighbors to a given vector.
-   * @param {number[]} queryVector - The vector to search for.
-   * @param {number} k - The number of neighbors to retrieve.
-   * @returns {Node[]} - The k-nearest neighbors.
-   */
-  _searchKNN(queryVector, k) {
-    const distances = this.nodes.map(node => ({
-      node,
-      distance: HNSW.euclideanDistance(queryVector, node.vector)
-    }));
+      const axis = depth % target.length;
+      const distance = distanceFunction(node.point, target);
 
-    distances.sort((a, b) => a.distance - b.distance);
+      if (distance < best.distance) {
+        best = { node, distance };
+      }
 
-    return distances.slice(0, k).map(entry => entry.node);
-  }
+      const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
+      const oppositeBranch = target[axis] < node.point[axis] ? node.right : node.left;
 
-  /**
-   * Finds the most similar vectors to the query vector.
-   * @param {number[]} queryVector - The vector to search for.
-   * @param {number} topK - The number of top results to return.
-   * @returns {Array<{id: number, distance: number}>} - The top K similar vectors with their distances.
-   */
-  search(queryVector, topK) {
-    const neighbors = this._searchKNN(queryVector, topK);
-    return neighbors.map(node => ({
-      id: node.id,
-      distance: HNSW.euclideanDistance(queryVector, node.vector)
-    }));
+      searchRec(nextBranch, target, depth + 1);
+
+      if (Math.abs(target[axis] - node.point[axis]) < best.distance) {
+        searchRec(oppositeBranch, target, depth + 1);
+      }
+    };
+
+    searchRec(this.root, target, 0);
+
+    return {
+      point: best.node.point,
+      value: best.node.value,
+      distance: best.distance
+    };
   }
 }
 
 /**
- * Creates a new HNSW instance.
- * @param {number} [maxNeighbors=16] - Maximum number of neighbors per node.
- * @param {number} [efConstruction=200] - Size of the candidate pool during construction.
- * @returns {HNSW} - The HNSW instance.
+ * In-memory vector store using k-d tree for efficient semantic similarity search.
  */
-export function createVectorStore(maxNeighbors = 16, efConstruction = 200) {
-  return new HNSW(maxNeighbors, efConstruction);
+class InMemoryVectorStore {
+  constructor() {
+    this.tree = new KDTree();
+  }
+
+  /**
+   * Adds a vector and its associated value to the store.
+   * @param {number[]} vector - The vector to store.
+   * @param {*} value - The associated value.
+   */
+  add(vector, value) {
+    this.tree.insert(vector, value);
+  }
+
+  /**
+   * Retrieves the most semantically similar vector and its value.
+   * @param {number[]} queryVector - The query vector.
+   * @returns {{vector: number[], value: *, distance: number}} The nearest neighbor.
+   */
+  search(queryVector) {
+    const result = this.tree.findNearest(queryVector);
+    return {
+      vector: result.point,
+      value: result.value,
+      distance: result.distance
+    };
+  }
 }
 
 /**
- * Example usage:
- * const store = createVectorStore();
- * const id1 = store.addVector([1, 2, 3]);
- * const id2 = store.addVector([4, 5, 6]);
- * const results = store.search([1, 2, 3], 1);
- * console.log(results);
+ * Exports the InMemoryVectorStore class.
+ * @type {InMemoryVectorStore}
  */
+export default InMemoryVectorStore;

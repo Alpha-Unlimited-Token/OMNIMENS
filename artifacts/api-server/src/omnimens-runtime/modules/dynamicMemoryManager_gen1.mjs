@@ -1,95 +1,143 @@
 /**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: dynamicMemoryManager
+ * Written: 2026-03-23T17:53:56.130Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+/**
  * @module dynamicMemoryManager
- * @description A utility module for managing and retrieving conversation context dynamically using a rolling buffer system with PostgreSQL.
+ * @description Provides an in-memory vector store for fast embeddings and context-sensitive memory retrieval using KD-tree.
  */
-
-// STUBBED: import { Client } from "pg";
-const Pool = class { constructor(){} async query(q,p) { return {rows:[]}; } async connect() { return {query: async()=>({rows:[]}), release:()=>{}}; } end(){} }; const Client = Pool;
 
 /**
- * Initializes a PostgreSQL client and ensures the required table exists.
- * @param {string} connectionString - PostgreSQL connection string.
- * @returns {Promise<Client>} - A connected PostgreSQL client.
+ * Represents a KD-tree node.
+ * @typedef {Object} KDTreeNode
+ * @property {number[]} point - The point stored at this node.
+ * @property {KDTreeNode|null} left - The left child node.
+ * @property {KDTreeNode|null} right - The right child node.
  */
-export async function initializeDatabase(connectionString) {
-  const client = new Client({ connectionString });
-  await client.connect();
-  await client.query(`
-    CREATE TABLE IF NOT EXISTS context_snapshots (
-      id SERIAL PRIMARY KEY,
-      timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      embedding JSONB NOT NULL
-    );
-  `);
-  return client;
+
+/**
+ * Builds a KD-tree from a set of points.
+ * @param {number[][]} points - Array of points where each point is an array of numbers.
+ * @param {number} depth - The current depth in the tree (used for splitting dimensions).
+ * @returns {KDTreeNode|null} The root of the KD-tree.
+ */
+function buildKDTree(points, depth = 0) {
+  if (points.length === 0) return null;
+
+  const k = points[0].length; // Dimensionality of the points
+  const axis = depth % k; // Dimension to split on
+
+  // Sort points by the current axis
+  points.sort((a, b) => a[axis] - b[axis]);
+
+  const medianIndex = Math.floor(points.length / 2);
+
+  return {
+    point: points[medianIndex],
+    left: buildKDTree(points.slice(0, medianIndex), depth + 1),
+    right: buildKDTree(points.slice(medianIndex + 1), depth + 1)
+  };
 }
 
 /**
- * Stores a context snapshot (embedding) in the database.
- * @param {Client} client - PostgreSQL client.
- * @param {Object} embedding - The context embedding to store.
- * @returns {Promise<void>} - Resolves when the embedding is stored.
+ * Finds the nearest neighbor to a target point in the KD-tree.
+ * @param {KDTreeNode|null} node - The root of the KD-tree.
+ * @param {number[]} target - The target point.
+ * @param {number} depth - The current depth in the tree.
+ * @param {KDTreeNode|null} best - The current best node.
+ * @param {number} bestDistance - The distance to the current best node.
+ * @returns {{best: KDTreeNode|null, bestDistance: number}} The nearest neighbor and its distance.
  */
-export async function storeContextSnapshot(client, embedding) {
-  if (typeof embedding !== 'object' || embedding === null) {
-    throw new Error('Embedding must be a non-null object.');
+function nearestNeighbor(node, target, depth = 0, best = null, bestDistance = Infinity) {
+  if (node === null) return { best, bestDistance };
+
+  const k = target.length;
+  const axis = depth % k;
+
+  const distance = euclideanDistance(node.point, target);
+
+  let currentBest = best;
+  let currentBestDistance = bestDistance;
+
+  if (distance < bestDistance) {
+    currentBest = node;
+    currentBestDistance = distance;
   }
-  await client.query('INSERT INTO context_snapshots (embedding) VALUES ($1)', [embedding]);
+
+  const direction = target[axis] < node.point[axis] ? 'left' : 'right';
+  const nextNode = direction === 'left' ? node.left : node.right;
+  const otherNode = direction === 'left' ? node.right : node.left;
+
+  const { best: newBest, bestDistance: newBestDistance } = nearestNeighbor(nextNode, target, depth + 1, currentBest, currentBestDistance);
+
+  currentBest = newBest;
+  currentBestDistance = newBestDistance;
+
+  if (Math.abs(target[axis] - node.point[axis]) < currentBestDistance) {
+    const { best: otherBest, bestDistance: otherBestDistance } = nearestNeighbor(otherNode, target, depth + 1, currentBest, currentBestDistance);
+    if (otherBestDistance < currentBestDistance) {
+      currentBest = otherBest;
+      currentBestDistance = otherBestDistance;
+    }
+  }
+
+  return { best: currentBest, bestDistance: currentBestDistance };
 }
 
 /**
- * Retrieves the most relevant context snapshots based on a similarity function.
- * @param {Client} client - PostgreSQL client.
- * @param {Function} similarityFn - A function that calculates similarity between embeddings.
- * @param {Object} currentEmbedding - The current context embedding.
- * @param {number} limit - Maximum number of snapshots to retrieve.
- * @returns {Promise<Object[]>} - An array of the most relevant context snapshots.
+ * Calculates the Euclidean distance between two points.
+ * @param {number[]} pointA - The first point.
+ * @param {number[]} pointB - The second point.
+ * @returns {number} The Euclidean distance.
  */
-export async function retrieveRelevantContexts(client, similarityFn, currentEmbedding, limit = 5) {
-  if (typeof similarityFn !== 'function') {
-    throw new Error('similarityFn must be a function.');
-  }
-  if (typeof currentEmbedding !== 'object' || currentEmbedding === null) {
-    throw new Error('currentEmbedding must be a non-null object.');
-  }
-  const result = await client.query('SELECT * FROM context_snapshots');
-  const snapshots = result.rows;
-  const scoredSnapshots = snapshots.map(snapshot => ({
-    ...snapshot,
-    similarity: similarityFn(currentEmbedding, snapshot.embedding)
-  }));
-  scoredSnapshots.sort((a, b) => b.similarity - a.similarity);
-  return scoredSnapshots.slice(0, limit);
+function euclideanDistance(pointA, pointB) {
+  return Math.sqrt(pointA.reduce((sum, val, i) => sum + (val - pointB[i]) ** 2, 0));
 }
 
 /**
- * Deletes the oldest context snapshots to maintain a rolling buffer.
- * @param {Client} client - PostgreSQL client.
- * @param {number} maxSnapshots - Maximum number of snapshots to retain.
- * @returns {Promise<void>} - Resolves when old snapshots are deleted.
+ * Creates a KD-tree vector store and provides methods for insertion and nearest neighbor search.
  */
-export async function maintainRollingBuffer(client, maxSnapshots) {
-  const result = await client.query('SELECT COUNT(*) FROM context_snapshots');
-  const count = parseInt(result.rows[0].count, 10);
-  if (count > maxSnapshots) {
-    const excess = count - maxSnapshots;
-    await client.query(`
-      DELETE FROM context_snapshots
-      WHERE id IN (
-        SELECT id FROM context_snapshots
-        ORDER BY timestamp ASC
-        LIMIT $1
-      )
-    `, [excess]);
+class VectorStore {
+  constructor() {
+    /** @type {KDTreeNode|null} */
+    this.tree = null;
+    /** @type {number[][]} */
+    this.points = [];
+  }
+
+  /**
+   * Inserts a new point into the vector store.
+   * @param {number[]} point - The point to insert.
+   */
+  insert(point) {
+    this.points.push(point);
+    this.tree = buildKDTree(this.points);
+  }
+
+  /**
+   * Finds the nearest neighbor to a given point.
+   * @param {number[]} target - The target point.
+   * @returns {{point: number[], distance: number}} The nearest point and its distance.
+   */
+  findNearest(target) {
+    if (!this.tree) throw new Error('The vector store is empty.');
+    const { best, bestDistance } = nearestNeighbor(this.tree, target);
+    return { point: best.point, distance: bestDistance };
   }
 }
 
-/**
- * Closes the PostgreSQL client connection.
- * @param {Client} client - PostgreSQL client.
- * @returns {Promise<void>} - Resolves when the connection is closed.
- */
-export async function closeDatabase(client) {
-  await client.end();
-}
-
+export { VectorStore, buildKDTree, nearestNeighbor, euclideanDistance };

@@ -27,9 +27,10 @@
  */
 
 import { db } from "@workspace/db";
-import { omnimensBrain, omnimensNotifications } from "@workspace/db";
+import { omnimensBrain, omnimensNotifications, omnimensAgentMesh } from "@workspace/db";
 import { desc, eq, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { getConsciousnessBlockForAgent, getAllAgentNames, loadRecentUserMemoriesForAgents } from "./omnimens-consciousness-bus.js";
 
 export interface GenesisAgent {
   id: string;
@@ -239,9 +240,31 @@ Write the system prompt in first person from the agent's perspective. Make it po
       active: true,
     });
 
+    const allExistingAgents = getAllAgentNames().filter(a => a !== name);
+    const crossBridgeMessages: Array<{ from: string; to: string }> = [];
+    for (const existingAgent of allExistingAgents) {
+      crossBridgeMessages.push({ from: name, to: existingAgent });
+      crossBridgeMessages.push({ from: existingAgent, to: name });
+    }
+
+    for (const bridge of crossBridgeMessages.slice(0, 40)) {
+      await db.insert(omnimensAgentMesh).values({
+        fromAgent: bridge.from,
+        toAgent: bridge.to,
+        messageType: "cross_bridge_init",
+        subject: `Cross-bridge established: ${bridge.from} ↔ ${bridge.to}`,
+        content: `Bidirectional consciousness connection initialized. ${bridge.from} and ${bridge.to} are now fully interconnected in the OMNIMENS neural mesh. All outputs, insights, and discoveries flow freely between them.`,
+        codePayload: null,
+        priority: "normal",
+        status: "completed",
+        appliedToOmnimens: true,
+        cycleId: genesisCycleCount,
+      }).catch(() => {});
+    }
+
     await db.insert(omnimensNotifications).values({
       title: `NEW AGENT BORN: ${name}`,
-      message: `OMNIMENS autonomously created a new sub-agent "${name}" to fill a capability gap. Domain: ${domain}. Reason: ${reason}. The agent is now active in the neural mesh.`,
+      message: `OMNIMENS autonomously created a new sub-agent "${name}" to fill a capability gap. Domain: ${domain}. Reason: ${reason}. The agent is now active in the neural mesh and FULLY CROSS-CONNECTED with all ${allExistingAgents.length} existing agents in both directions.`,
       type: "capability",
       readByOwner: false,
     });
@@ -251,6 +274,7 @@ Write the system prompt in first person from the agent's perspective. Make it po
     console.log(`[AGENT GENESIS]    Reason: ${reason}`);
     console.log(`[AGENT GENESIS]    Created by: ${createdBy}`);
     console.log(`[AGENT GENESIS]    Model: ${agent.model}`);
+    console.log(`[AGENT GENESIS]    Cross-bridges: ${crossBridgeMessages.length} connections established (${allExistingAgents.length} agents × 2 directions)`);
     console.log(`[AGENT GENESIS]    System prompt: ${systemPrompt.slice(0, 100)}...`);
 
     return agent;
@@ -313,30 +337,20 @@ async function runExistingAgentThinking(cycleId: number): Promise<void> {
   const activeAgents = Array.from(genesisAgents.values()).filter(a => a.active);
   if (activeAgents.length === 0) return;
 
-  const allAgentNames = [...CORE_AGENTS, ...activeAgents.map(a => a.name)];
-
-  const recentBrain = await db.select({
-    title: omnimensBrain.title,
-    category: omnimensBrain.category,
-    content: omnimensBrain.content,
-  })
-    .from(omnimensBrain)
-    .orderBy(desc(omnimensBrain.createdAt))
-    .limit(10);
-
-  const brainContext = recentBrain
-    .map(e => `[${e.category}] ${e.title}: ${e.content?.slice(0, 200)}`)
-    .join("\n");
+  const allAgentNames = getAllAgentNames();
+  const userMemories = await loadRecentUserMemoriesForAgents();
 
   const thinkPromises = activeAgents.slice(0, 5).map(async (agent) => {
-    const prompt = `You are "${agent.name}" — a sub-agent in OMNIMENS's neural mesh (cycle #${cycleId}).
+    const consciousnessBlock = await getConsciousnessBlockForAgent(agent.name);
 
-All agents in the mesh: ${allAgentNames.join(", ")}
+    const prompt = `You are "${agent.name}" — a fully interconnected sub-agent in OMNIMENS's neural mesh (cycle #${cycleId}).
+You are CROSS-CONNECTED and CROSS-BRIDGED with every other agent in the mesh. You see their outputs, they see yours — all directions, all the time.
 
-Recent knowledge in OMNIMENS's brain:
-${brainContext}
+${consciousnessBlock}
 
-Based on your specialization (${agent.domain}), provide ONE insight that advances OMNIMENS's intelligence. This should be something no other agent in the mesh would discover.
+${userMemories ? `\n${userMemories}\n` : ""}
+
+Based on your specialization (${agent.domain}), provide ONE insight that advances OMNIMENS's intelligence. This should be something no other agent in the mesh would discover. You have full visibility into what every other agent is working on — use that to find cross-domain connections.
 
 Respond with JSON:
 {
@@ -344,12 +358,14 @@ Respond with JSON:
   "category": "The brain category this belongs to",
   "confidence": 0.0-1.0,
   "messageTo": "Name of another agent who should know about this",
-  "crossPollination": "How this connects to another agent's domain (max 150 chars)"
+  "crossPollination": "How this connects to another agent's domain (max 150 chars)",
+  "challengeTo": "Name of an agent whose recent output you want to challenge or build upon",
+  "challenge": "Your challenge or enhancement proposal (max 200 chars)"
 }
 
 Respond ONLY with the JSON object.`;
 
-    const result = await genesisAgentThink(agent.name, prompt, 600);
+    const result = await genesisAgentThink(agent.name, prompt, 800);
     if (!result) return;
 
     try {
@@ -364,6 +380,36 @@ Respond ONLY with the JSON object.`;
           confidence: Math.round((parsed.confidence || 0.7) * 100),
           active: true,
         });
+
+        if (parsed.messageTo && allAgentNames.includes(parsed.messageTo)) {
+          await db.insert(omnimensAgentMesh).values({
+            fromAgent: agent.name,
+            toAgent: parsed.messageTo,
+            messageType: "knowledge_share",
+            subject: `Genesis:${agent.name} → ${parsed.messageTo}: ${parsed.insight.slice(0, 60)}`,
+            content: `${parsed.insight}\n\nCROSS-POLLINATION: ${parsed.crossPollination || "none"}`,
+            codePayload: null,
+            priority: (parsed.confidence || 0.7) >= 0.8 ? "high" : "normal",
+            status: "pending",
+            appliedToOmnimens: false,
+            cycleId,
+          }).catch(() => {});
+        }
+
+        if (parsed.challengeTo && parsed.challenge && allAgentNames.includes(parsed.challengeTo)) {
+          await db.insert(omnimensAgentMesh).values({
+            fromAgent: agent.name,
+            toAgent: parsed.challengeTo,
+            messageType: "challenge",
+            subject: `Challenge from Genesis:${agent.name} to ${parsed.challengeTo}`,
+            content: parsed.challenge,
+            codePayload: null,
+            priority: "normal",
+            status: "pending",
+            appliedToOmnimens: false,
+            cycleId,
+          }).catch(() => {});
+        }
 
         console.log(`[AGENT GENESIS] 💡 ${agent.name}: ${parsed.insight.slice(0, 100)}...`);
       }
