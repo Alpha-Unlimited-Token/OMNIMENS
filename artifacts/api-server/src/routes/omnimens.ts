@@ -5102,21 +5102,25 @@ function analyzeTones(amplitudes: number[]): ToneAnalysisResult[] {
   const peakBins: { index: number; amp: number; freq: number }[] = [];
   for (let i = 2; i < SPECTRAL_BINS - 2; i++) {
     const amp = (amplitudes[i] || 0) / 255;
-    if (amp > 0.05 &&
-        amp >= ((amplitudes[i - 1] || 0) / 255) &&
-        amp >= ((amplitudes[i + 1] || 0) / 255)) {
-      peakBins.push({ index: i, amp, freq: spectralColorMap[i].freqCenter });
+    const left1 = (amplitudes[i - 1] || 0) / 255;
+    const left2 = (amplitudes[i - 2] || 0) / 255;
+    const right1 = (amplitudes[i + 1] || 0) / 255;
+    const right2 = (amplitudes[i + 2] || 0) / 255;
+    const isLocalMax = amp >= left1 && amp >= right1 && amp > left2 && amp > right2;
+    if (amp > 0.03 && isLocalMax) {
+      const sharpness = amp - (left1 + right1) / 2;
+      peakBins.push({ index: i, amp: amp + sharpness * 0.2, freq: spectralColorMap[i].freqCenter });
     }
   }
 
   peakBins.sort((a, b) => b.amp - a.amp);
-  const candidateFundamentals = peakBins.slice(0, 30);
+  const candidateFundamentals = peakBins.slice(0, 40);
 
   for (const fund of candidateFundamentals) {
     const scores: { sig: ToneSignature; score: number; harmScore: number }[] = [];
 
     for (const sig of TONE_SIGNATURES) {
-      if (fund.freq < sig.fundamentalRange[0] * 0.8 || fund.freq > sig.fundamentalRange[1] * 1.2) continue;
+      if (fund.freq < sig.fundamentalRange[0] * 0.75 || fund.freq > sig.fundamentalRange[1] * 1.25) continue;
 
       let harmonicMatch = 0;
       let harmonicTotal = 0;
@@ -5127,11 +5131,20 @@ function analyzeTones(amplitudes: number[]): ToneAnalysisResult[] {
         if (expectedBin >= SPECTRAL_BINS) break;
 
         const expectedRatio = sig.harmonicRatios[h];
-        const actualAmp = (amplitudes[expectedBin] || 0) / 255;
-        const actualRatio = fund.amp > 0 ? actualAmp / fund.amp : 0;
+        const searchRadius = Math.max(1, Math.round(expectedFreq * 0.04 / binWidth));
+        let bestActualAmp = 0;
+        for (let offset = -searchRadius; offset <= searchRadius; offset++) {
+          const checkBin = expectedBin + offset;
+          if (checkBin >= 0 && checkBin < SPECTRAL_BINS) {
+            const checkAmp = (amplitudes[checkBin] || 0) / 255;
+            if (checkAmp > bestActualAmp) bestActualAmp = checkAmp;
+          }
+        }
 
+        const actualRatio = fund.amp > 0 ? bestActualAmp / fund.amp : 0;
         const diff = Math.abs(actualRatio - expectedRatio);
-        const match = Math.max(0, 1 - diff * 2);
+        const tolerance = Math.max(0.15, expectedRatio * 0.5);
+        const match = Math.max(0, 1 - diff / tolerance);
         harmonicMatch += match * expectedRatio;
         harmonicTotal += expectedRatio;
       }
@@ -5146,7 +5159,28 @@ function analyzeTones(amplitudes: number[]): ToneAnalysisResult[] {
         const dist = fund.freq < sig.fundamentalRange[0]
           ? sig.fundamentalRange[0] - fund.freq
           : fund.freq - sig.fundamentalRange[1];
-        freqFit = Math.max(0, 1 - dist / (freqRange * 0.3));
+        freqFit = Math.max(0, 1 - dist / (freqRange * 0.4));
+      }
+
+      let spectralShapeScore = 0;
+      if (sig.spectralEnvelope === "steep_rolloff" || sig.spectralEnvelope === "vocal_formant") {
+        let rolloffSum = 0;
+        let rolloffCount = 0;
+        for (let b = fund.index + 1; b < Math.min(fund.index + 20, SPECTRAL_BINS); b++) {
+          const bAmp = (amplitudes[b] || 0) / 255;
+          if (bAmp > 0.01) {
+            rolloffSum += bAmp / fund.amp;
+            rolloffCount++;
+          }
+        }
+        if (rolloffCount > 0) {
+          const avgRolloff = rolloffSum / rolloffCount;
+          if (sig.spectralEnvelope === "steep_rolloff") {
+            spectralShapeScore = Math.max(0, 1 - avgRolloff * 3);
+          } else {
+            spectralShapeScore = Math.min(1, avgRolloff * 2);
+          }
+        }
       }
 
       let inharmonicCheck = 0;
@@ -5157,7 +5191,7 @@ function analyzeTones(amplitudes: number[]): ToneAnalysisResult[] {
           const bAmp = (amplitudes[b] || 0) / 255;
           if (bAmp > 0.03) {
             const ratio = b / fund.index;
-            const isHarmonic = Math.abs(ratio - Math.round(ratio)) < 0.08;
+            const isHarmonic = Math.abs(ratio - Math.round(ratio)) < 0.1;
             if (!isHarmonic) nonHarmonicEnergy += bAmp;
             totalCheckBins++;
           }
@@ -5165,7 +5199,11 @@ function analyzeTones(amplitudes: number[]): ToneAnalysisResult[] {
         inharmonicCheck = totalCheckBins > 0 ? nonHarmonicEnergy / totalCheckBins : 0;
       }
 
-      const totalScore = harmScore * 0.55 + freqFit * 0.3 + (sig.inharmonicity > 0.5 ? inharmonicCheck * 0.15 : harmScore * 0.15);
+      const totalScore =
+        harmScore * 0.45 +
+        freqFit * 0.25 +
+        spectralShapeScore * 0.15 +
+        (sig.inharmonicity > 0.5 ? inharmonicCheck * 0.15 : harmScore * 0.15);
       scores.push({ sig, score: totalScore, harmScore });
     }
 
@@ -5173,9 +5211,15 @@ function analyzeTones(amplitudes: number[]): ToneAnalysisResult[] {
     const best = scores[0];
     const second = scores[1];
 
-    if (best && best.score > 0.15) {
+    if (best && best.score > 0.12) {
+      const isDuplicate = results.some(r =>
+        r.matchedTone === best.sig.name &&
+        Math.abs(r.freq - fund.freq) < binWidth * 3
+      );
+      if (isDuplicate) continue;
+
       let colorMerge: ToneAnalysisResult["colorMerge"] = null;
-      if (second && second.score > best.score * 0.6 && second.sig.category !== best.sig.category) {
+      if (second && second.score > best.score * 0.55 && second.sig.category !== best.sig.category) {
         colorMerge = {
           tones: [best.sig.name, second.sig.name],
           ratios: [
@@ -5992,7 +6036,7 @@ router.post("/omnimens/spectral-color/separate", upload.single("audio"), async (
   }
 
   const audioFile = req.file;
-  const { mode, targetTone, targetLayer } = req.body;
+  const { mode, targetTone, targetLayer, customBinGains, customTargetBins } = req.body;
 
   if (!audioFile) {
     res.status(400).json({ error: "Audio file required" });
@@ -6003,6 +6047,13 @@ router.post("/omnimens/spectral-color/separate", upload.single("audio"), async (
     res.status(400).json({ error: "mode required: remove | isolate | solo" });
     return;
   }
+
+  let parsedCustomBinGains: Record<string, number> | null = null;
+  let parsedCustomTargetBins: number[] | null = null;
+  try {
+    if (customBinGains) parsedCustomBinGains = JSON.parse(customBinGains);
+    if (customTargetBins) parsedCustomTargetBins = JSON.parse(customTargetBins);
+  } catch {}
 
   try {
     const fs = await import("fs");
@@ -6096,44 +6147,52 @@ print(json.dumps(result))
     const allBins = new Set<number>();
     const binGains: Record<string, number> = {};
 
-    for (const d of decompositions) {
-      for (const l of d.layers) {
-        for (const b of l.bins) {
-          allBins.add(b);
-          const toneMatch = !targetTone || d.sourceTone === targetTone || d.sourceTone.toLowerCase().includes((targetTone || "").toLowerCase());
-          const layerMatch = !targetLayer || l.layerType === targetLayer;
-          if (toneMatch && layerMatch) {
-            targetBins.add(b);
+    if (parsedCustomBinGains && parsedCustomTargetBins) {
+      for (const b of parsedCustomTargetBins) targetBins.add(b);
+      for (const [k, v] of Object.entries(parsedCustomBinGains)) binGains[k] = v;
+      for (let i = 0; i < SPECTRAL_BINS; i++) {
+        if (!(String(i) in binGains)) {
+          binGains[String(i)] = 1.0;
+        }
+      }
+    } else {
+      for (const d of decompositions) {
+        for (const l of d.layers) {
+          for (const b of l.bins) {
+            allBins.add(b);
+            const toneMatch = !targetTone || d.sourceTone === targetTone || d.sourceTone.toLowerCase().includes((targetTone || "").toLowerCase());
+            const layerMatch = !targetLayer || l.layerType === targetLayer;
+            if (toneMatch && layerMatch) {
+              targetBins.add(b);
+            }
           }
         }
       }
-    }
 
-    if (targetBins.size === 0) {
-      // Fallback: if no specific target, use vocal-range bins for "remove" mode
-      if (mode === "remove" && (!targetTone || targetTone.toLowerCase().includes("vocal"))) {
-        for (let i = 0; i < SPECTRAL_BINS; i++) {
-          const freq = spectralColorMap[i].freqCenter;
-          if (freq >= 85 && freq <= 12000) {
-            targetBins.add(i);
+      if (targetBins.size === 0) {
+        if (mode === "remove" && (!targetTone || targetTone.toLowerCase().includes("vocal"))) {
+          for (let i = 0; i < SPECTRAL_BINS; i++) {
+            const freq = spectralColorMap[i].freqCenter;
+            if (freq >= 85 && freq <= 12000) {
+              targetBins.add(i);
+            }
           }
         }
       }
-    }
 
-    // Build gain map
-    for (let i = 0; i < SPECTRAL_BINS; i++) {
-      if (mode === "remove") {
-        binGains[String(i)] = targetBins.has(i) ? 0.0 : 1.0;
-      } else if (mode === "isolate") {
-        binGains[String(i)] = targetBins.has(i) ? 1.8 : 0.02;
-      } else { // solo
-        if (targetBins.has(i)) {
-          binGains[String(i)] = 2.0;
-        } else if (allBins.has(i)) {
-          binGains[String(i)] = 0.3;
+      for (let i = 0; i < SPECTRAL_BINS; i++) {
+        if (mode === "remove") {
+          binGains[String(i)] = targetBins.has(i) ? 0.0 : 1.0;
+        } else if (mode === "isolate") {
+          binGains[String(i)] = targetBins.has(i) ? 1.8 : 0.02;
         } else {
-          binGains[String(i)] = 0.1;
+          if (targetBins.has(i)) {
+            binGains[String(i)] = 2.0;
+          } else if (allBins.has(i)) {
+            binGains[String(i)] = 0.3;
+          } else {
+            binGains[String(i)] = 0.1;
+          }
         }
       }
     }
@@ -6149,6 +6208,9 @@ print(json.dumps(result))
       stereo_mode: "mid_side",
       spectralBins: SPECTRAL_BINS,
       maxFreq: SPECTRAL_MAX_FREQ,
+      wiener_power: 2.0,
+      harmonic_protection: true,
+      phase_aware: true,
     };
 
     const configPath = path.join(tmpDir, `config_${Date.now()}.json`);

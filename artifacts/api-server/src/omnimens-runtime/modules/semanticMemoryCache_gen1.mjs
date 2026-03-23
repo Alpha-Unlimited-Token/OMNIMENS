@@ -1,104 +1,101 @@
 /**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: semanticMemoryCache
+ * Written: 2026-03-23T00:59:07.359Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+/**
  * @module semanticMemoryCache
- * @description Provides in-memory storage and retrieval of embeddings for semantic similarity searches using a Redis-backed or JavaScript-based ANN search.
- */
-
-import { createServer } from "http";
-
-/**
- * @typedef {Object} Vector
- * @property {number[]} values - The numerical values of the vector.
+ * @description Provides an in-memory cache for storing and retrieving semantic embeddings with cosine similarity search.
  */
 
 /**
- * @typedef {Object} CacheItem
- * @property {string} id - Unique identifier for the item.
- * @property {Vector} vector - The vector representation of the item.
+ * @typedef {Object} Embedding
+ * @property {string} id - Unique identifier for the embedding.
+ * @property {number[]} vector - The embedding vector.
  */
 
 /**
- * @class SemanticMemoryCache
- * @description A fast in-memory cache for storing and retrieving semantic embeddings with approximate nearest neighbor search.
+ * @typedef {Object} SearchResult
+ * @property {string} id - Identifier of the closest embedding.
+ * @property {number} similarity - Cosine similarity score.
  */
-export class SemanticMemoryCache {
-  constructor() {
-    /** @type {Map<string, CacheItem>} */
-    this.cache = new Map();
-  }
 
-  /**
-   * Adds a vector to the cache.
-   * @param {string} id - Unique identifier for the vector.
-   * @param {number[]} vector - The numerical vector to store.
-   * @throws {Error} If the vector is not valid.
-   */
-  addVector(id, vector) {
-    if (!Array.isArray(vector) || vector.some(v => typeof v !== 'number')) {
-      throw new Error('Vector must be an array of numbers.');
-    }
-    this.cache.set(id, { id, vector: { values: vector } });
-  }
+const cache = new Map();
 
-  /**
-   * Finds the nearest vector to the given query vector.
-   * @param {number[]} queryVector - The query vector.
-   * @param {number} k - Number of nearest neighbors to retrieve.
-   * @returns {CacheItem[]} The nearest neighbors.
-   */
-  findNearest(queryVector, k = 1) {
-    if (!Array.isArray(queryVector) || queryVector.some(v => typeof v !== 'number')) {
-      throw new Error('Query vector must be an array of numbers.');
-    }
-
-    const distances = [];
-
-    for (const [id, item] of this.cache.entries()) {
-      const distance = this._calculateDistance(queryVector, item.vector.values);
-      distances.push({ id, distance });
-    }
-
-    distances.sort((a, b) => a.distance - b.distance);
-
-    return distances.slice(0, k).map(({ id }) => this.cache.get(id));
-  }
-
-  /**
-   * Calculates the Euclidean distance between two vectors.
-   * @param {number[]} vectorA - The first vector.
-   * @param {number[]} vectorB - The second vector.
-   * @returns {number} The Euclidean distance.
-   */
-  _calculateDistance(vectorA, vectorB) {
-    if (vectorA.length !== vectorB.length) {
-      throw new Error('Vectors must be of the same length.');
-    }
-
-    return Math.sqrt(
-      vectorA.reduce((sum, a, i) => sum + Math.pow(a - vectorB[i], 2), 0)
-    );
-  }
-
-  /**
-   * Clears the cache.
-   */
-  clear() {
-    this.cache.clear();
-  }
+/**
+ * Computes the cosine similarity between two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} Cosine similarity between the two vectors.
+ */
+function cosineSimilarity(vectorA, vectorB) {
+  const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a * a, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b * b, 0));
+  if (magnitudeA === 0 || magnitudeB === 0) return 0;
+  return dotProduct / (magnitudeA * magnitudeB);
 }
 
 /**
- * Example usage of the SemanticMemoryCache module.
+ * Adds an embedding to the in-memory cache.
+ * @param {string} id - Unique identifier for the embedding.
+ * @param {number[]} vector - The embedding vector.
  */
-if (false) {
-  const cache = new SemanticMemoryCache();
-
-  // Add some vectors to the cache
-  cache.addVector('item1', [1, 2, 3]);
-  cache.addVector('item2', [4, 5, 6]);
-  cache.addVector('item3', [7, 8, 9]);
-
-  // Find the nearest vector to the query
-  const nearest = cache.findNearest([5, 5, 5], 2);
-  console.log('Nearest neighbors:', nearest);
+export function addEmbedding(id, vector) {
+  if (!id || !Array.isArray(vector) || vector.length === 0) {
+    throw new Error("Invalid embedding: id must be a string and vector must be a non-empty array.");
+  }
+  cache.set(id, vector);
 }
 
+/**
+ * Retrieves the most similar embedding from the cache based on cosine similarity.
+ * @param {number[]} queryVector - The query vector to compare against.
+ * @returns {SearchResult|null} The closest embedding and its similarity score, or null if the cache is empty.
+ */
+export function getMostSimilar(queryVector) {
+  if (!Array.isArray(queryVector) || queryVector.length === 0) {
+    throw new Error("Invalid query vector: must be a non-empty array.");
+  }
+
+  let bestMatch = null;
+  let highestSimilarity = -Infinity;
+
+  for (const [id, vector] of cache.entries()) {
+    const similarity = cosineSimilarity(queryVector, vector);
+    if (similarity > highestSimilarity) {
+      highestSimilarity = similarity;
+      bestMatch = { id, similarity };
+    }
+  }
+
+  return bestMatch;
+}
+
+/**
+ * Clears all embeddings from the cache.
+ */
+export function clearCache() {
+  cache.clear();
+}
+
+/**
+ * Returns the total number of embeddings in the cache.
+ * @returns {number} The number of embeddings stored in the cache.
+ */
+export function getCacheSize() {
+  return cache.size;
+}

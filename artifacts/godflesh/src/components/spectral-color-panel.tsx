@@ -132,8 +132,203 @@ export default function SpectralColorPanel({
   const [separating, setSeparating] = useState(false);
   const [separationStatus, setSeparationStatus] = useState("");
   const [fileAmplitudes, setFileAmplitudes] = useState<number[]>([]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [playbackTime, setPlaybackTime] = useState(0);
+  const [audioDuration, setAudioDuration] = useState(0);
+  const [layerGainValues, setLayerGainValues] = useState<Record<string, number>>({});
+  const [liveSpectrumData, setLiveSpectrumData] = useState<number[]>([]);
+  const [fineTuneMode, setFineTuneMode] = useState(false);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const audioBufferRef = useRef<AudioBuffer | null>(null);
+  const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const gainNodesRef = useRef<GainNode[]>([]);
+  const filtersRef = useRef<BiquadFilterNode[]>([]);
+  const playStartTimeRef = useRef(0);
+  const playOffsetRef = useRef(0);
+  const spectrumAnimRef = useRef(0);
   const wheelSizeRef = useRef(0);
   const animFrameRef = useRef(0);
+
+  const initAudioPlayback = useCallback(async (file: File) => {
+    try {
+      if (audioCtxRef.current) {
+        audioCtxRef.current.close();
+      }
+      const ctx = new AudioContext({ sampleRate: 44100 });
+      audioCtxRef.current = ctx;
+
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = await ctx.decodeAudioData(arrayBuffer);
+      audioBufferRef.current = buffer;
+      setAudioDuration(buffer.duration);
+
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 4096;
+      analyser.smoothingTimeConstant = 0.8;
+      analyserRef.current = analyser;
+
+      const bandFreqs = [60, 170, 350, 700, 1400, 2800, 5600, 11200, 16000];
+      const filters: BiquadFilterNode[] = [];
+      const gains: GainNode[] = [];
+
+      bandFreqs.forEach((freq, i) => {
+        const filter = ctx.createBiquadFilter();
+        if (i === 0) {
+          filter.type = "lowshelf";
+        } else if (i === bandFreqs.length - 1) {
+          filter.type = "highshelf";
+        } else {
+          filter.type = "peaking";
+        }
+        filter.frequency.value = freq;
+        filter.Q.value = 1.4;
+        filter.gain.value = 0;
+        filters.push(filter);
+
+        const gainNode = ctx.createGain();
+        gainNode.gain.value = 1.0;
+        gains.push(gainNode);
+      });
+
+      for (let i = 0; i < filters.length; i++) {
+        if (i === 0) continue;
+        filters[i - 1].connect(filters[i]);
+      }
+
+      filters[filters.length - 1].connect(analyser);
+      analyser.connect(ctx.destination);
+
+      filtersRef.current = filters;
+      gainNodesRef.current = gains;
+
+      setSeparationStatus("Audio loaded — ready for live fine-tuning");
+    } catch (e: any) {
+      setSeparationStatus(`Audio load error: ${e.message}`);
+    }
+  }, []);
+
+  const startPlayback = useCallback((offset = 0) => {
+    const ctx = audioCtxRef.current;
+    const buffer = audioBufferRef.current;
+    if (!ctx || !buffer || !filtersRef.current.length) return;
+
+    if (sourceNodeRef.current) {
+      try { sourceNodeRef.current.stop(); } catch {}
+    }
+
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(filtersRef.current[0]);
+    sourceNodeRef.current = source;
+
+    source.onended = () => {
+      setIsPlaying(false);
+      cancelAnimationFrame(spectrumAnimRef.current);
+    };
+
+    playStartTimeRef.current = ctx.currentTime;
+    playOffsetRef.current = offset;
+    source.start(0, offset);
+    setIsPlaying(true);
+
+    const updateSpectrum = () => {
+      if (!analyserRef.current || !audioCtxRef.current) return;
+      const analyser = analyserRef.current;
+      const freqData = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(freqData);
+
+      const bins256: number[] = new Array(256).fill(0);
+      const binCount = freqData.length;
+      const maxFreq = 22050;
+
+      for (let i = 0; i < 256; i++) {
+        const lo = maxFreq * (i / 256);
+        const hi = maxFreq * ((i + 1) / 256);
+        const loIdx = Math.floor((lo / maxFreq) * binCount);
+        const hiIdx = Math.min(Math.ceil((hi / maxFreq) * binCount), binCount - 1);
+        let sum = 0, count = 0;
+        for (let j = loIdx; j <= hiIdx; j++) {
+          sum += freqData[j];
+          count++;
+        }
+        bins256[i] = count > 0 ? sum / count : 0;
+      }
+      setLiveSpectrumData(bins256);
+
+      const elapsed = audioCtxRef.current.currentTime - playStartTimeRef.current + playOffsetRef.current;
+      setPlaybackTime(Math.min(elapsed, audioBufferRef.current?.duration || 0));
+
+      spectrumAnimRef.current = requestAnimationFrame(updateSpectrum);
+    };
+    spectrumAnimRef.current = requestAnimationFrame(updateSpectrum);
+  }, []);
+
+  const stopPlayback = useCallback(() => {
+    if (sourceNodeRef.current) {
+      try { sourceNodeRef.current.stop(); } catch {}
+    }
+    cancelAnimationFrame(spectrumAnimRef.current);
+    setIsPlaying(false);
+  }, []);
+
+  const togglePlayback = useCallback(() => {
+    if (isPlaying) {
+      const ctx = audioCtxRef.current;
+      const elapsed = ctx ? ctx.currentTime - playStartTimeRef.current + playOffsetRef.current : 0;
+      stopPlayback();
+      playOffsetRef.current = elapsed;
+    } else {
+      startPlayback(playOffsetRef.current);
+    }
+  }, [isPlaying, startPlayback, stopPlayback]);
+
+  const seekTo = useCallback((time: number) => {
+    playOffsetRef.current = time;
+    setPlaybackTime(time);
+    if (isPlaying) {
+      stopPlayback();
+      startPlayback(time);
+    }
+  }, [isPlaying, startPlayback, stopPlayback]);
+
+  const applyLayerGain = useCallback((sourceIdx: number, layerIdx: number, gain: number) => {
+    const key = `${sourceIdx}-${layerIdx}`;
+    setLayerGainValues(prev => ({ ...prev, [key]: gain }));
+
+    if (!atomicLayers[sourceIdx]) return;
+    const layer = atomicLayers[sourceIdx].layers[layerIdx];
+    if (!layer) return;
+
+    layer.frequencies.forEach(freq => {
+      filtersRef.current.forEach(filter => {
+        const filterFreq = filter.frequency.value;
+        if (Math.abs(freq - filterFreq) / filterFreq < 1.5) {
+          const dbGain = (gain - 1.0) * 12;
+          filter.gain.setValueAtTime(dbGain, audioCtxRef.current?.currentTime || 0);
+        }
+      });
+
+      const binIdx = spectralMap.findIndex(b => Math.abs(b.freqCenter - freq) < (freq * 0.15));
+      if (binIdx >= 0) {
+        onGainAdjust(binIdx, gain);
+      }
+    });
+  }, [atomicLayers, spectralMap, onGainAdjust]);
+
+  const formatTime = (s: number) => {
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return `${m}:${sec.toString().padStart(2, "0")}`;
+  };
+
+  useEffect(() => {
+    return () => {
+      cancelAnimationFrame(spectrumAnimRef.current);
+      if (sourceNodeRef.current) try { sourceNodeRef.current.stop(); } catch {}
+      if (audioCtxRef.current) audioCtxRef.current.close();
+    };
+  }, []);
 
   const WHEEL_SIZE = 420;
   const WHEEL_RADIUS = WHEEL_SIZE / 2 - 10;
@@ -852,6 +1047,188 @@ export default function SpectralColorPanel({
                 </div>
               )}
             </div>
+
+            {audioFileRef && (
+              <div className="bg-[#1C2333] border border-cyan-500/20 rounded-lg p-3 mb-3">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[9px] font-mono text-cyan-400/70 uppercase tracking-wider">Live Fine-Tuning Engine</p>
+                  <button type="button"
+                    onClick={() => {
+                      if (!fineTuneMode && audioFileRef) {
+                        initAudioPlayback(audioFileRef);
+                        setFineTuneMode(true);
+                      } else {
+                        stopPlayback();
+                        setFineTuneMode(false);
+                        setLiveSpectrumData([]);
+                      }
+                    }}
+                    className={`px-3 py-1 rounded text-[8px] font-mono border transition-all ${
+                      fineTuneMode
+                        ? "bg-cyan-500/20 border-cyan-500/40 text-cyan-400"
+                        : "bg-[#0E1525] border-cyan-500/20 text-cyan-400/60 hover:border-cyan-500/40"
+                    }`}>
+                    {fineTuneMode ? "Exit Fine-Tune" : "Enter Fine-Tune Mode"}
+                  </button>
+                </div>
+
+                {fineTuneMode && (
+                  <div className="space-y-2">
+                    <div className="bg-[#0E1525] rounded-lg p-2 border border-[#2B3245]">
+                      <div className="flex items-center h-16 gap-px overflow-hidden rounded">
+                        {(liveSpectrumData.length > 0 ? liveSpectrumData : new Array(256).fill(0)).map((val, i) => {
+                          const bin = spectralMap[i];
+                          const hex = bin?.hex || "#444";
+                          const height = Math.max(1, (val / 255) * 100);
+                          return (
+                            <div key={i} className="flex-1 flex items-end h-full" style={{ minWidth: "0.5px" }}>
+                              <div style={{
+                                width: "100%",
+                                height: `${height}%`,
+                                backgroundColor: hex,
+                                opacity: val > 5 ? 0.4 + (val / 255) * 0.6 : 0.15,
+                                transition: "height 0.05s linear",
+                              }} />
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="flex justify-between mt-1 text-[6px] font-mono text-[#9DA5B4]/30">
+                        <span>20Hz</span><span>200</span><span>1k</span><span>5k</span><span>22kHz</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button type="button"
+                        onClick={togglePlayback}
+                        className="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center hover:bg-cyan-500/30 transition-all">
+                        <span className="text-cyan-400 text-xs">{isPlaying ? "\u23F8" : "\u25B6"}</span>
+                      </button>
+                      <span className="text-[9px] font-mono text-[#9DA5B4]/60 w-20 text-center">
+                        {formatTime(playbackTime)} / {formatTime(audioDuration)}
+                      </span>
+                      <div className="flex-1 relative">
+                        <input type="range" min="0" max={Math.floor(audioDuration * 100)} value={Math.floor(playbackTime * 100)}
+                          onChange={(e) => seekTo(parseInt(e.target.value) / 100)}
+                          className="w-full h-1.5 appearance-none rounded-full bg-[#2B3245] cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-cyan-400"
+                        />
+                      </div>
+                      <button type="button"
+                        onClick={() => {
+                          stopPlayback();
+                          playOffsetRef.current = 0;
+                          setPlaybackTime(0);
+                        }}
+                        className="px-2 py-1 rounded text-[7px] font-mono text-[#9DA5B4]/50 hover:text-cyan-400 border border-[#2B3245] hover:border-cyan-500/30 transition-all">
+                        Reset
+                      </button>
+                    </div>
+
+                    {atomicLayers.length > 0 && (
+                      <div className="bg-[#0E1525] rounded-lg p-2.5 border border-[#2B3245]">
+                        <p className="text-[8px] font-mono text-cyan-400/50 uppercase tracking-wider mb-2">Per-Layer Gain Control</p>
+                        <div className="space-y-1.5">
+                          {atomicLayers.map((source, si) => (
+                            <div key={si}>
+                              <p className="text-[7px] font-mono text-[#9DA5B4]/40 mb-1">{source.sourceTone}</p>
+                              {source.layers.map((layer, li) => {
+                                const key = `${si}-${li}`;
+                                const gain = layerGainValues[key] ?? 1.0;
+                                const pct = Math.round(gain * 100);
+                                return (
+                                  <div key={li} className="flex items-center gap-2 mb-0.5">
+                                    <div className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ backgroundColor: layer.hexColors[0] || "#666" }} />
+                                    <span className="text-[7px] font-mono text-[#9DA5B4]/60 w-24 truncate">{layer.layerName}</span>
+                                    <input type="range" min="0" max="200" value={Math.round(gain * 100)}
+                                      onChange={(e) => applyLayerGain(si, li, parseInt(e.target.value) / 100)}
+                                      className="flex-1 h-1 appearance-none rounded-full bg-[#2B3245] cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-cyan-400"
+                                    />
+                                    <span className={`text-[7px] font-mono w-8 text-right ${
+                                      pct === 100 ? "text-[#9DA5B4]/40" : pct > 100 ? "text-emerald-400/70" : "text-red-400/70"
+                                    }`}>{pct}%</span>
+                                    <button type="button"
+                                      onClick={() => applyLayerGain(si, li, 1.0)}
+                                      className="text-[6px] font-mono text-[#9DA5B4]/30 hover:text-cyan-400 transition-colors">
+                                      RST
+                                    </button>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex gap-1 mt-2 pt-2 border-t border-[#2B3245]">
+                          <button type="button"
+                            onClick={() => {
+                              atomicLayers.forEach((source, si) => {
+                                source.layers.forEach((_, li) => applyLayerGain(si, li, 1.0));
+                              });
+                            }}
+                            className="px-2 py-0.5 rounded text-[7px] font-mono bg-[#1C2333] border border-[#2B3245] text-[#9DA5B4]/50 hover:text-cyan-400 hover:border-cyan-500/30 transition-all">
+                            Reset All Gains
+                          </button>
+                          {audioFileRef && (
+                            <button type="button"
+                              onClick={async () => {
+                                if (!audioFileRef || separating) return;
+                                setSeparating(true);
+                                setSeparationStatus("Exporting with current gain settings...");
+                                try {
+                                  const gainAdjustments: { bin: number; gain: number }[] = [];
+                                  atomicLayers.forEach((source, si) => {
+                                    source.layers.forEach((layer, li) => {
+                                      const key = `${si}-${li}`;
+                                      const gain = layerGainValues[key] ?? 1.0;
+                                      if (Math.abs(gain - 1.0) > 0.01) {
+                                        layer.bins.forEach(b => gainAdjustments.push({ bin: b, gain }));
+                                      }
+                                    });
+                                  });
+                                  if (gainAdjustments.length === 0) {
+                                    setSeparationStatus("No gain changes to export");
+                                    setSeparating(false);
+                                    return;
+                                  }
+                                  const binGains: Record<string, number> = {};
+                                  gainAdjustments.forEach(({ bin, gain }) => { binGains[String(bin)] = gain; });
+                                  const targetBins = gainAdjustments.map(a => a.bin);
+                                  const formData = new FormData();
+                                  formData.append("audio", audioFileRef);
+                                  formData.append("mode", "isolate");
+                                  formData.append("customBinGains", JSON.stringify(binGains));
+                                  formData.append("customTargetBins", JSON.stringify(targetBins));
+                                  const resp = await fetch("/api/omnimens/spectral-color/separate", {
+                                    method: "POST", credentials: "include", body: formData,
+                                  });
+                                  if (resp.ok) {
+                                    const blob = await resp.blob();
+                                    const url = URL.createObjectURL(blob);
+                                    const a = document.createElement("a");
+                                    a.href = url;
+                                    a.download = `${audioFileRef.name.replace(/\.[^.]+$/, "")}_fine_tuned.wav`;
+                                    a.click();
+                                    URL.revokeObjectURL(url);
+                                    setSeparationStatus("Fine-tuned export downloaded!");
+                                  } else {
+                                    const err = await resp.json().catch(() => ({ error: resp.statusText }));
+                                    setSeparationStatus(`Export failed: ${err.error || resp.statusText}`);
+                                  }
+                                } catch (e: any) {
+                                  setSeparationStatus(`Export error: ${e.message || "Unknown"}`);
+                                } finally { setSeparating(false); }
+                              }}
+                              disabled={separating}
+                              className="px-2 py-0.5 rounded text-[7px] font-mono bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-40 transition-all">
+                              Export with Current Gains
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             {atomicLayers.length === 0 && (
               <div className="text-center py-6 border border-dashed border-rose-500/15 rounded-lg">
