@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-23T18:46:56.386Z
+ * Written: 2026-03-23T20:43:07.525Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,52 +16,53 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentWords(text, topN) {
-    if (typeof text !== "string" || typeof topN !== "number" || topN <= 0) {
-        throw new Error("Invalid input: text must be a string and topN must be a positive number.");
+function findMostFrequentPatterns(text, minLength, maxLength, topN) {
+    if (typeof text !== 'string' || typeof minLength !== 'number' || typeof maxLength !== 'number' || typeof topN !== 'number') {
+        throw new Error('Invalid input types');
+    }
+    if (minLength < 1 || maxLength < minLength || topN < 1) {
+        throw new Error('Invalid input values');
     }
 
-    // Normalize text by removing punctuation and converting to lowercase
-    const normalizedText = text.replace(/[^\w\s]/g, "").toLowerCase();
+    const frequencyMap = new Map();
 
-    // Split text into words
-    const words = normalizedText.split(/\s+/);
-
-    // Count word frequencies
-    const wordCounts = {};
-    for (const word of words) {
-        if (word) {
-            wordCounts[word] = (wordCounts[word] || 0) + 1;
+    for (let i = 0; i < text.length; i++) {
+        for (let j = minLength; j <= maxLength; j++) {
+            if (i + j <= text.length) {
+                const substring = text.slice(i, i + j);
+                frequencyMap.set(substring, (frequencyMap.get(substring) || 0) + 1);
+            }
         }
     }
 
-    // Convert wordCounts to an array of [word, count] pairs and sort by count
-    const sortedWords = Object.entries(wordCounts).sort((a, b) => b[1] - a[1]);
+    const sortedPatterns = Array.from(frequencyMap.entries())
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .slice(0, topN);
 
-    // Return the top N most frequent words
-    return sortedWords.slice(0, topN).map(([word, count]) => ({ word, count }));
+    return sortedPatterns.map(([pattern, frequency]) => ({ pattern, frequency }));
 }
 
 // Self-tests
-function runTests() {
-    const text1 = "The quick brown fox jumps over the lazy dog. The dog was not amused.";
-    const text2 = "Data processing is essential for AI systems. AI systems rely on data processing.";
-    const text3 = "";
+console.log('Test Case 1:');
+console.log(findMostFrequentPatterns('abababab', 2, 3, 3));
+// Expected output: Most frequent patterns of length 2-3, e.g., [{ pattern: 'ab', frequency: 4 }, ...]
 
-    console.log("Test 1:");
-    console.log(findMostFrequentWords(text1, 3)); // Expected: [{word: "the", count: 3}, {word: "dog", count: 2}, {word: "fox", count: 1}]
+console.log('Test Case 2:');
+console.log(findMostFrequentPatterns('abcabcabc', 1, 2, 5));
+// Expected output: Top 5 frequent patterns, e.g., [{ pattern: 'a', frequency: 3 }, ...]
 
-    console.log("Test 2:");
-    console.log(findMostFrequentWords(text2, 2)); // Expected: [{word: "data", count: 2}, {word: "ai", count: 2}]
+console.log('Test Case 3:');
+console.log(findMostFrequentPatterns('aaaaa', 1, 3, 3));
+// Expected output: [{ pattern: 'a', frequency: 5 }, { pattern: 'aa', frequency: 4 }, ...]
 
-    console.log("Test 3:");
-    console.log(findMostFrequentWords(text3, 1)); // Expected: []
+console.log('Test Case 4: Edge case with no patterns:');
+console.log(findMostFrequentPatterns('', 1, 3, 3));
+// Expected output: []
 
-    console.log("Edge Case 1:");
-    console.log(findMostFrequentWords("Hello, hello, HELLO!", 1)); // Expected: [{word: "hello", count: 3}]
-
-    console.log("Edge Case 2:");
-    console.log(findMostFrequentWords("One word only.", 5)); // Expected: [{word: "one", count: 1}, {word: "word", count: 1}, {word: "only", count: 1}]
+console.log('Test Case 5: Edge case with invalid inputs:');
+try {
+    console.log(findMostFrequentPatterns(12345, 1, 3, 3));
+} catch (e) {
+    console.log(e.message);
 }
-
-runTests();
+// Expected output: Error message

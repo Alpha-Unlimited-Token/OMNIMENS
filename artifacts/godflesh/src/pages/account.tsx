@@ -798,8 +798,8 @@ export default function Account() {
                           <div className="flex items-center gap-2">
                             <Gift className="w-4 h-4 text-accent" />
                             <span className="font-mono text-xs text-white">
-                              Next month bonus:&nbsp;
-                              <span className="text-green-400 font-bold">{(billing as any)?.nextBonusCredits?.toLocaleString() ?? 2000} credits free</span>
+                              Signup bonus:&nbsp;
+                              <span className="text-green-400 font-bold">$20 one-time (2,000 credits)</span>
                             </span>
                           </div>
                           <span className="font-mono text-[10px] text-[#9DA5B4]">{(billing as any)?.nextBonusTier ?? "BASE"} tier</span>
@@ -940,8 +940,8 @@ export default function Account() {
                         <span className="text-white font-bold">{isOwner ? '—' : `$${(billing as any)?.currentMonthSpendDollars ?? "0.00"}`}</span>
                       </div>
                       <div className="flex justify-between border-b border-[#2B3245] pb-2">
-                        <span className="text-white/90">Next Month Bonus</span>
-                        <span className="text-green-400 font-bold">{isOwner ? '—' : `${((billing as any)?.nextBonusCredits ?? 2000).toLocaleString()} credits free`}</span>
+                        <span className="text-white/90">Signup Bonus</span>
+                        <span className="text-green-400 font-bold">{isOwner ? '—' : '$20 one-time (2,000 credits)'}</span>
                       </div>
                       <div className="flex justify-between border-b border-[#2B3245] pb-2">
                         <span className="text-white/90">Wallet</span>

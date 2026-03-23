@@ -250,7 +250,7 @@ function MonthlyPlans({
         })}
       </div>
       <p className="text-xs font-mono text-white/80 text-center mt-4">
-        Monthly subscription · Cancel anytime · Billed via Stripe · Credits don't carry over between cycles (base $20 free grant does)
+        Monthly subscription · Cancel anytime · Billed via Stripe · Credits don't carry over between cycles
       </p>
     </div>
   );
@@ -301,20 +301,20 @@ function HowItWorks() {
     {
       num: "01",
       icon: <Gift className="w-6 h-6" />,
-      title: "$20 FREE EVERY MONTH",
-      body: "Every account receives 2,000 free credits at the start of each month. No card required. Earn more through loyalty bonuses.",
+      title: "$20 FREE ON SIGNUP",
+      body: "Create an account and receive 2,000 free credits ($20 value) instantly. No card required. This is a one-time welcome bonus.",
     },
     {
       num: "02",
       icon: <Rocket className="w-6 h-6" />,
-      title: "SUBSCRIBE OR BUY CREDITS",
-      body: "Subscribe for guaranteed monthly credits + premium features. Or buy one-time credit packs that never expire — your choice.",
+      title: "USE YOUR CREDITS",
+      body: "Use your free credits on any AI model, image generation, code execution, or deep research. Open-source models cost zero credits.",
     },
     {
       num: "03",
       icon: <TrendingUp className="w-6 h-6" />,
-      title: "EARN LOYALTY BONUSES",
-      body: "The more you spend, the more free credits you earn next month. Power users can earn up to $500 free monthly.",
+      title: "PAY AS YOU GO OR SUBSCRIBE",
+      body: "When credits run out, buy credit packs (never expire) or subscribe for monthly credits. Set up auto-topup for uninterrupted service.",
     },
   ];
 
@@ -387,8 +387,7 @@ function LoyaltyTable({ tiers }: { tiers: any[] }) {
         ))}
       </div>
       <p className="text-xs font-mono text-white/85 mt-3 px-1">
-        Free credits granted on the 1st of each month based on the prior month's paid usage.
-        Base $20 is given to every user regardless of spend.
+        Loyalty bonuses are granted based on your prior month's paid usage.
       </p>
     </div>
   );
@@ -435,7 +434,7 @@ function WalletPanel({
             <div className="text-xs font-mono text-white/75 tracking-widest mb-1">THIS MONTH SPEND</div>
             <div className="text-xl font-bold text-white">${billing?.currentMonthSpendDollars ?? "0.00"}</div>
             <div className="text-xs font-mono text-white/85 mt-1">
-              next bonus: <span className="text-green-400">${billing?.nextBonusCredits ? (billing.nextBonusCredits / 100).toFixed(0) : "20"} free</span>
+              signup bonus: <span className="text-green-400">$20 one-time</span>
             </div>
           </div>
         </div>
@@ -700,13 +699,13 @@ export default function Pricing() {
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-full px-4 py-1.5 font-mono text-xs text-green-400 mb-5">
             <Gift className="w-3 h-3" />
-            $20 FREE EVERY MONTH — NO CARD NEEDED TO START
+            $20 FREE ON SIGNUP — NO CARD NEEDED
           </div>
           <h1 className="text-4xl md:text-6xl font-display font-black tracking-widest text-white mb-4 uppercase">
             OMNIMENS <span className="text-primary glow-text-red">Pricing</span>
           </h1>
           <p className="text-white font-mono max-w-xl mx-auto text-sm leading-relaxed">
-            Start free. Subscribe for monthly credits. Or buy credits once — they never expire.
+            Create an account and get $20 in free credits. Subscribe for monthly credits. Or buy credit packs — they never expire.
             Every feature, every model, every dev tool.
           </p>
         </div>
@@ -853,10 +852,7 @@ export default function Pricing() {
           <DevToolCosts costs={pricingData.devToolCosts} />
         )}
 
-        {/* Loyalty tiers */}
-        {pricingData?.loyaltyTiers && !pricingLoading && (
-          <LoyaltyTable tiers={pricingData.loyaltyTiers} />
-        )}
+        
 
         {/* ── DEEP RESONANCE SECTION ──────────────────────────────────────── */}
         <div id="resonance-section" className="w-full max-w-5xl mb-14 scroll-mt-8">
@@ -960,11 +956,11 @@ export default function Pricing() {
             },
             {
               q: "WHEN AM I CHARGED?",
-              a: "Subscriptions charge monthly on your billing date. Auto-topup charges when your free credits run out (minimum $10 by default). Credit packs are one-time charges.",
+              a: "Subscriptions charge monthly on your billing date. Auto-topup charges when your credits run out (minimum $10 by default). Credit packs are one-time charges.",
             },
             {
               q: "DO CREDITS ROLL OVER?",
-              a: "Purchased credits (from packs) never expire. Monthly plan credits do not carry over — they reset with each new billing cycle. Your free $20/month grant adds on top of any balance.",
+              a: "Purchased credits (from packs) never expire. Monthly plan credits do not carry over — they reset with each new billing cycle. The $20 welcome bonus is one-time only.",
             },
           ].map(({ q, a }) => (
             <div key={q}>

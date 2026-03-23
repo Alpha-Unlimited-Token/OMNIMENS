@@ -7,10 +7,10 @@
 /**
  * OMNIMENS Billing Engine
  *
- * - $20 free credits every month for every user
- * - After free credits run out, auto-charge saved debit card
- * - Monthly loyalty bonus: 10% of prior month's paid spend, given as free credits
- * - Bonus is always profitable: our cost = 33% of credits, bonus = 10% = 3.3% of revenue
+ * - $20 ONE-TIME free credits on account creation (IP-protected, no exploitation)
+ * - After free credits run out, user MUST pay (credit packs, auto-topup, or subscription)
+ * - No monthly free grants — the $20 is a one-time welcome gift
+ * - Auto-charge saved debit card when balance runs out
  */
 
 import { db } from "@workspace/db";
@@ -20,99 +20,51 @@ import { stripe } from "../stripeClient.js";
 import type Stripe from "stripe";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-export const FREE_MONTHLY_CREDITS = 2000;          // $20 free every month
-export const AUTO_TOPUP_DEFAULT_CENTS = 1000;      // $10 auto-topup default
-export const CREDITS_PER_DOLLAR = 100;             // 100 credits = $1
+export const FREE_SIGNUP_CREDITS = 2000;            // $20 ONE-TIME free on signup
+export const AUTO_TOPUP_DEFAULT_CENTS = 1000;       // $10 auto-topup default
+export const CREDITS_PER_DOLLAR = 100;              // 100 credits = $1
 
-// ── Loyalty Bonus Tiers ───────────────────────────────────────────────────────
-// Based on prior month's PAID spend in cents
-// Our margin: we charge 3× OpenAI cost, so 10% bonus = 3.3% of revenue hit
-// At $1,000 paid: $333 cost + $33 bonus cost = $634 profit (63.4%) ✓
-export const LOYALTY_TIERS = [
-  { minSpendCents: 0,      maxSpendCents: 999,    bonusCredits: 2000,  label: "BASE",    desc: "$20 monthly base" },
-  { minSpendCents: 1000,   maxSpendCents: 4999,   bonusCredits: 2000,  label: "SPARK",   desc: "$20 free next month" },
-  { minSpendCents: 5000,   maxSpendCents: 9999,   bonusCredits: 2200,  label: "RISE",    desc: "$22 free next month" },
-  { minSpendCents: 10000,  maxSpendCents: 24999,  bonusCredits: 2500,  label: "SURGE",   desc: "$25 free next month" },
-  { minSpendCents: 25000,  maxSpendCents: 49999,  bonusCredits: 3500,  label: "APEX",    desc: "$35 free next month" },
-  { minSpendCents: 50000,  maxSpendCents: 99999,  bonusCredits: 5000,  label: "ELITE",   desc: "$50 free next month" },
-  { minSpendCents: 100000, maxSpendCents: 199999, bonusCredits: 10000, label: "PRIME",   desc: "$100 free next month" },
-  { minSpendCents: 200000, maxSpendCents: 499999, bonusCredits: 20000, label: "APEX+",   desc: "$200 free next month" },
-  { minSpendCents: 500000, maxSpendCents: Infinity,bonusCredits: 50000, label: "LEGEND",  desc: "$500 free next month" },
-] as const;
-
-export function calculateLoyaltyBonus(paidSpendCents: number): {
-  bonusCredits: number;
-  tier: string;
-  desc: string;
-  nextTierSpendCents: number | null;
-} {
-  const tier = [...LOYALTY_TIERS].reverse().find(t => paidSpendCents >= t.minSpendCents) || LOYALTY_TIERS[0];
-  const tierIdx = LOYALTY_TIERS.findIndex(t => t.label === tier.label);
-  const nextTier = tierIdx < LOYALTY_TIERS.length - 1 ? LOYALTY_TIERS[tierIdx + 1] : null;
-  return {
-    bonusCredits: tier.bonusCredits,
-    tier: tier.label,
-    desc: tier.desc,
-    nextTierSpendCents: nextTier ? nextTier.minSpendCents : null,
-  };
-}
-
-// ── Current month key (YYYY-MM) ────────────────────────────────────────────────
-export function currentMonthKey(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-}
-
-// ── Check and grant monthly free credits ──────────────────────────────────────
-// Called on every request — grants bonus if a new month has started
-export async function checkAndGrantMonthlyCredits(userId: string): Promise<void> {
+// ── Grant one-time free credits (IP-protected) ───────────────────────────────
+// Called ONCE when user is created. After this $20 is used, they must pay.
+// IP fraud check must be done BEFORE calling this function.
+export async function grantOneTimeFreeCredits(userId: string): Promise<{
+  granted: boolean;
+  credits: number;
+  reason?: string;
+}> {
   try {
-    const monthKey = currentMonthKey();
     const [user] = await db
       .select()
       .from(omnimensUsers)
       .where(eq(omnimensUsers.id, userId))
       .limit(1);
 
-    if (!user) return;
+    if (!user) return { granted: false, credits: 0, reason: "User not found" };
 
-    const prevMonthKey = user.currentMonthKey;
-    const isNewMonth = prevMonthKey !== monthKey;
-    if (!isNewMonth) return;
+    if (user.freeCreditsGranted) {
+      return { granted: false, credits: 0, reason: "Free credits already claimed" };
+    }
 
-    // New month — calculate bonus based on last month's paid spend
-    const prevSpendCents = user.monthlyPaidSpendCents || 0;
-    const { bonusCredits, tier, desc } = calculateLoyaltyBonus(prevSpendCents);
-
-    // Grant the bonus (or base $20 for new users) + reset monthly counters
     await db.update(omnimensUsers)
       .set({
-        credits: sql`${omnimensUsers.credits} + ${bonusCredits}`,
-        totalCreditsEarned: sql`${omnimensUsers.totalCreditsEarned} + ${bonusCredits}`,
-        currentMonthKey: monthKey,
-        monthlyPaidSpendCents: 0,  // reset for new month
-        lastBonusMonth: prevMonthKey || monthKey,
+        credits: sql`${omnimensUsers.credits} + ${FREE_SIGNUP_CREDITS}`,
+        totalCreditsEarned: sql`${omnimensUsers.totalCreditsEarned} + ${FREE_SIGNUP_CREDITS}`,
+        freeCreditsGranted: true,
       })
       .where(eq(omnimensUsers.id, userId));
 
     await db.insert(omnimensCreditTransactions).values({
       userId,
       type: "bonus",
-      credits: bonusCredits,
-      description: `Monthly ${tier} loyalty bonus — ${desc} (prev spend: $${(prevSpendCents / 100).toFixed(2)})`,
+      credits: FREE_SIGNUP_CREDITS,
+      description: `Welcome bonus — $20 one-time free credits`,
     });
 
-    await db.insert(omnimensNotifications).values({
-      upgradeId: null,
-      title: `YOUR MONTHLY ${tier} BONUS HAS ARRIVED`,
-      message: `${bonusCredits} free credits added to your account for this month. ${desc}. Based on your $${(prevSpendCents / 100).toFixed(2)} spend last month.`,
-      type: "system",
-      readByOwner: false,
-    });
-
-    console.log(`[OMNIMENS BILLING] Monthly ${tier} bonus granted to ${userId}: ${bonusCredits} credits`);
+    console.log(`[OMNIMENS BILLING] One-time welcome bonus granted to ${userId}: ${FREE_SIGNUP_CREDITS} credits ($20)`);
+    return { granted: true, credits: FREE_SIGNUP_CREDITS };
   } catch (err) {
-    console.error("[OMNIMENS BILLING] Monthly credit grant error:", err);
+    console.error("[OMNIMENS BILLING] One-time credit grant error:", err);
+    return { granted: false, credits: 0, reason: "Grant failed" };
   }
 }
 
@@ -443,11 +395,6 @@ export async function getBillingSummary(userId: string) {
 
   if (!user) return null;
 
-  const monthKey = currentMonthKey();
-  const isNewMonth = user.currentMonthKey !== monthKey;
-  const spendCents = isNewMonth ? 0 : (user.monthlyPaidSpendCents || 0);
-  const { bonusCredits, tier, desc, nextTierSpendCents } = calculateLoyaltyBonus(spendCents);
-
   let cardInfo: { last4?: string; brand?: string } | null = null;
   if (user.paymentMethodId && user.stripeCustomerId) {
     try {
@@ -462,25 +409,13 @@ export async function getBillingSummary(userId: string) {
     autoTopupEnabled: user.autoTopupEnabled,
     autoTopupAmountCents: user.autoTopupAmountCents,
     card: cardInfo,
-    currentMonthSpendCents: spendCents,
-    currentMonthSpendDollars: (spendCents / 100).toFixed(2),
-    nextBonusCredits: bonusCredits,
-    nextBonusTier: tier,
-    nextBonusDesc: desc,
-    nextTierSpendCents,
-    nextTierSpendDollars: nextTierSpendCents ? (nextTierSpendCents / 100).toFixed(2) : null,
     totalPaidSpendDollars: ((user.totalPaidSpendCents || 0) / 100).toFixed(2),
     resonanceCredits: user.resonanceCredits ?? 0,
     resonanceTotalEarned: user.resonanceTotalEarned ?? 0,
     resonanceSessionsRemaining: Math.floor((user.resonanceCredits ?? 0) / 40),
-    freeMonthlyCredits: FREE_MONTHLY_CREDITS,
-    loyaltyTiers: LOYALTY_TIERS.map(t => ({
-      label: t.label,
-      minSpendDollars: (t.minSpendCents / 100).toFixed(0),
-      bonusCredits: t.bonusCredits,
-      bonusDollars: (t.bonusCredits / CREDITS_PER_DOLLAR).toFixed(0),
-      desc: t.desc,
-    })),
+    freeCreditsGranted: user.freeCreditsGranted,
+    freeSignupCredits: FREE_SIGNUP_CREDITS,
+    freeSignupDollars: (FREE_SIGNUP_CREDITS / 100).toFixed(0),
   };
 }
 

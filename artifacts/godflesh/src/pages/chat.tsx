@@ -5146,8 +5146,8 @@ function MobileUsagePage({ isLight, status, onBack, onNavigate }: { isLight: boo
               </div>
               <div className="h-px" style={{ background: isLight ? "rgba(20,23,34,0.08)" : "rgba(255,255,255,0.06)" }} />
               <div className="flex items-center justify-between">
-                <span className="text-sm" style={{ color: isLight ? "rgba(20,23,34,0.7)" : "rgba(255,255,255,0.6)" }}>Free monthly allowance</span>
-                <span className="text-sm font-medium" style={{ color: isLight ? "#141722" : "#fff" }}>{usageData?.freeMonthlyCredits ?? 25}</span>
+                <span className="text-sm" style={{ color: isLight ? "rgba(20,23,34,0.7)" : "rgba(255,255,255,0.6)" }}>Free signup credits</span>
+                <span className="text-sm font-medium" style={{ color: isLight ? "#141722" : "#fff" }}>{usageData?.freeSignupCredits ?? 2000}</span>
               </div>
             </div>
           </div>

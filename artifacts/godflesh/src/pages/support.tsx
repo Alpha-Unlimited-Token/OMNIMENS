@@ -72,7 +72,7 @@ const CATEGORIES: Category[] = [
       "I need a refund for a purchase",
       "My card was declined but I was still charged",
       "I want to cancel auto top-up",
-      "My free monthly credits weren't added",
+      "I didn't receive my free signup credits",
     ],
   },
   {

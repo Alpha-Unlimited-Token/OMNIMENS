@@ -31,6 +31,7 @@ export const omnimensUsers = pgTable("godflesh_users", {
   referralCreditsEarned: integer("referral_credits_earned").default(0).notNull(),
   failedLoginAttempts: integer("failed_login_attempts").default(0).notNull(),
   lockedUntil: timestamp("locked_until"),
+  freeCreditsGranted: boolean("free_credits_granted").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -710,4 +711,22 @@ export const omnimensCausalGraph = pgTable("godflesh_causal_graph", {
   learnedFrom: text("learned_from"),
   strengthenedCount: integer("strengthened_count").default(1).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const omnimensIpLog = pgTable("godflesh_ip_log", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => omnimensUsers.id),
+  ipAddress: text("ip_address").notNull(),
+  action: text("action").notNull(),
+  userAgent: text("user_agent"),
+  firstSeenAt: timestamp("first_seen_at").defaultNow().notNull(),
+  lastSeenAt: timestamp("last_seen_at").defaultNow().notNull(),
+  hitCount: integer("hit_count").default(1).notNull(),
+});
+
+export const omnimensIpBans = pgTable("godflesh_ip_bans", {
+  id: serial("id").primaryKey(),
+  ipAddress: text("ip_address").notNull(),
+  reason: text("reason").notNull(),
+  bannedAt: timestamp("banned_at").defaultNow().notNull(),
 });

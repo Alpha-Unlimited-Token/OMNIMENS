@@ -13,6 +13,8 @@ import { db, usersTable, omnimensUsers } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { createSession, clearSession, SESSION_COOKIE, SESSION_TTL } from "../lib/auth.js";
 import * as OTPAuth from "otpauth";
+import { extractIp, recordIp, checkIpFraudForFreeCredits } from "../lib/omnimens-ip-guard.js";
+import { grantOneTimeFreeCredits } from "../lib/omnimens-billing.js";
 
 const router = Router();
 
@@ -99,6 +101,20 @@ router.post("/auth/email/register", async (req: Request, res: Response) => {
     });
 
     setSessionCookie(res, sid);
+
+    const regIp = extractIp(req);
+    await recordIp(newUser.id, regIp, "email_register", req.headers["user-agent"] as string);
+
+    const fraudCheck = await checkIpFraudForFreeCredits(newUser.id, regIp);
+    if (!fraudCheck.blocked) {
+      const omnimensUser = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, newUser.id)).limit(1);
+      if (!omnimensUser.length || !omnimensUser[0].freeCreditsGranted) {
+        await grantOneTimeFreeCredits(newUser.id);
+      }
+    } else {
+      console.log(`[IP GUARD] Blocked free credits for new email user ${newUser.id} from IP ${regIp}: ${fraudCheck.reason}`);
+    }
+
     res.status(201).json({
       ok: true,
       user: {
@@ -200,6 +216,10 @@ router.post("/auth/email/login", async (req: Request, res: Response) => {
     });
 
     setSessionCookie(res, sid);
+
+    const loginIp = extractIp(req);
+    recordIp(user.id, loginIp, "email_login", req.headers["user-agent"] as string).catch(() => {});
+
     res.json({
       ok: true,
       user: {

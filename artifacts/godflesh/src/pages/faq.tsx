@@ -203,15 +203,15 @@ export default function FAQ() {
                 />
                 <FeatureCard
                   icon={<Star className="w-4 h-4" />}
-                  title="Free Monthly Credits"
-                  badge="EVERY MONTH"
+                  title="Free Signup Credits"
+                  badge="ONE-TIME"
                   badgeColor="bg-yellow-400/20 text-yellow-400"
-                  description="Every account receives 2,000 free credits on the 1st of each month — automatically. No card, no subscription required to get started."
+                  description="Every new account receives 2,000 free credits ($20 value) on signup — automatically. No card, no subscription required to get started."
                 />
                 <FeatureCard
                   icon={<CreditCard className="w-4 h-4" />}
                   title="Add Credits When Ready"
-                  description="If you need more than your monthly free grant, connect a card and top up in increments of $5, $10, $25, or $50. You're only charged when you choose to be."
+                  description="If you need more than your free welcome credits, connect a card and top up in increments of $5, $10, $25, or $50. You're only charged when you choose to be."
                 />
               </div>
             </Section>
@@ -556,10 +556,10 @@ export default function FAQ() {
                 />
                 <FeatureCard
                   icon={<Zap className="w-4 h-4" />}
-                  title="Free Monthly Grant"
+                  title="Free Signup Grant"
                   badge="2,000 FREE"
                   badgeColor="bg-green-400/20 text-green-400"
-                  description="Every account receives 2,000 free credits on the 1st of each month — automatically. That's enough for hundreds of messages using free-tier models, or dozens of GPT-4o conversations."
+                  description="Every new account receives a one-time grant of 2,000 free credits ($20 value) on signup. That's enough for hundreds of messages using free-tier models, or dozens of GPT-4o conversations."
                 />
                 <FeatureCard
                   icon={<CreditCard className="w-4 h-4" />}
@@ -571,7 +571,7 @@ export default function FAQ() {
                   title="Loyalty Bonus"
                   badge="POWER USERS"
                   badgeColor="bg-yellow-400/20 text-yellow-400"
-                  description="The more you use OMNIMENS, the more free credits you earn next month. Power users who spend $50+/month can earn up to $500 in free monthly credits."
+                  description="The more you use OMNIMENS, the more bonus credits you can earn. Subscribe or purchase credit packs to keep going after your welcome credits are used."
                 />
                 <FeatureCard
                   icon={<Shield className="w-4 h-4" />}
@@ -649,7 +649,7 @@ export default function FAQ() {
             {/* ── FAQ ── */}
             <Section id="faq" icon={<HelpCircle className="w-4 h-4 text-white/60" />} title="Frequently Asked Questions" color="bg-white/5">
               <div className="space-y-3">
-                <FaqItem q="Do I need a credit card to start?" a="No. Every account gets 2,000 free credits every month automatically when you sign in. A card is only needed if you want to add more credits after the free grant is used." />
+                <FaqItem q="Do I need a credit card to start?" a="No. Every new account gets 2,000 free credits ($20 value) on signup. A card is only needed if you want to add more credits after the free grant is used." />
                 <FaqItem q="What's the difference between free models and GPT-4o?" a="Free models (Llama 3.3 70B, Mistral, Mixtral) cost 0 credits and are surprisingly capable — great for most everyday tasks. GPT-4o and GPT-4.1 are OpenAI's latest frontier models, offering the highest accuracy, reasoning, and instruction-following, especially for complex tasks like coding, research, and nuanced writing." />
                 <FaqItem q="What happens if I run out of credits?" a="Your chat will pause until you add more credits. If you've enabled Auto Top-up, your balance is automatically refilled. Your conversations, memories, and settings are all preserved — nothing is lost." />
                 <FaqItem q="What does COGNISYNC™ actually do?" a="COGNISYNC™ reads your message in real time — before the AI responds — and detects what thinking mode is most useful: creative, analytical, urgent, exploratory, or directive. It then injects a calibrated instruction into the AI's system context so the response is shaped for your actual intent, not just your literal words." />

@@ -98,7 +98,7 @@ export function SEO({
 export const seoData = {
   home: {
     title: "OMNIMENS",
-    description: "OMNIMENS is a free AI chat platform powered by GPT-4o, GPT-4.1, Llama 3, and Mistral AI. Features include AI image generation, code execution, deep research, persistent memory, and voice chat. Start for free — $20 in credits every month, no credit card needed.",
+    description: "OMNIMENS is a free AI chat platform powered by GPT-4o, GPT-4.1, Llama 3, and Mistral AI. Features include AI image generation, code execution, deep research, persistent memory, and voice chat. Create an account and get $20 in free credits — no credit card needed.",
     keywords: "AI, AI chat, free AI, AI platform, AI assistant, GPT-4o, Llama 3, Mistral AI, AI image generation, AI code execution, OMNIMENS, COGNISYNC, NEUROSYNC, free AI chat, AI chatbot, AI tools, AI with memory, AI for coding, AI for research",
     path: "/",
     jsonLd: {
@@ -112,7 +112,7 @@ export const seoData = {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD",
-        "description": "Free tier with $20 monthly credits. Premium plans from $9/month."
+        "description": "Free tier with $20 one-time welcome credits. Premium plans from $9/month."
       },
       "description": "Free AI chat platform with GPT-4o, Llama 3, Mistral, image generation, code execution, deep research, persistent memory, and voice chat.",
       "featureList": "AI Chat, Image Generation, Code Execution, Deep Research, Persistent Memory, Voice Chat, Multiple AI Models, Free Tier",
@@ -127,14 +127,14 @@ export const seoData = {
 
   chat: {
     title: "AI Chat",
-    description: "Chat with OMNIMENS AI — powered by GPT-4o, GPT-4.1, Llama 3.3 70B, and Mistral. Free AI chat with image generation, code execution, web search, deep research, and persistent memory. No sign-up required to start.",
+    description: "Chat with OMNIMENS AI — powered by GPT-4o, GPT-4.1, Llama 3.3 70B, and Mistral. AI chat with image generation, code execution, web search, deep research, and persistent memory. Create a free account to start with $20 in credits.",
     keywords: "AI chat, free AI chat, chat with AI, AI chatbot, GPT-4o chat, Llama 3 chat, AI assistant, online AI, free AI chatbot, best AI chat, AI conversation",
     path: "/chat",
   },
 
   pricing: {
     title: "AI Pricing — Free Tier & Premium Plans",
-    description: "OMNIMENS AI pricing: $20 free credits every month — no credit card needed. Premium AI plans from $9/month. Access GPT-4o, Llama 3, Mistral, image generation, and all AI tools.",
+    description: "OMNIMENS AI pricing: $20 free credits on signup — no credit card needed. Premium AI plans from $9/month. Access GPT-4o, Llama 3, Mistral, image generation, and all AI tools.",
     keywords: "AI pricing, free AI, AI cost, AI subscription, affordable AI, AI credits, AI plans, GPT-4o pricing, free AI platform",
     path: "/pricing",
     jsonLd: {
@@ -149,7 +149,7 @@ export const seoData = {
           "name": "Free Tier",
           "price": "0",
           "priceCurrency": "USD",
-          "description": "$20 free credits every month, no credit card required",
+          "description": "$20 one-time free credits on signup, no credit card required",
           "availability": "https://schema.org/InStock"
         },
         {
@@ -194,7 +194,7 @@ export const seoData = {
           "name": "What is OMNIMENS AI?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "OMNIMENS is a free AI chat platform by Alpha Unlimited Technologies. It offers GPT-4o, GPT-4.1, Llama 3.3 70B, and Mistral AI models with features like AI image generation, code execution, deep research, persistent memory, and voice chat. Every account gets $20 in free credits monthly — no credit card required."
+            "text": "OMNIMENS is an AI chat platform by Alpha Unlimited Technologies. It offers GPT-4o, GPT-4.1, Llama 3.3 70B, and Mistral AI models with features like AI image generation, code execution, deep research, persistent memory, and voice chat. New accounts get $20 in free credits on signup — no credit card required."
           }
         },
         {
@@ -202,7 +202,7 @@ export const seoData = {
           "name": "Is OMNIMENS AI free to use?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. Every OMNIMENS account receives $20 in free credits at the start of each month — no credit card needed. Free open-source models (Llama 3.3 70B, Llama 3.1 8B, Mixtral 8x7B, Mistral 7B) cost zero credits. Premium models like GPT-4o use credits per message."
+            "text": "Yes. Every new OMNIMENS account receives a one-time $20 welcome bonus in free credits — no credit card needed. Free open-source models (Llama 3.3 70B, Llama 3.1 8B, Mixtral 8x7B, Mistral 7B) cost zero credits. Premium models like GPT-4o use credits per message. After the free credits are used, you can purchase more or subscribe."
           }
         },
         {
@@ -218,7 +218,7 @@ export const seoData = {
           "name": "How is OMNIMENS different from ChatGPT?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "OMNIMENS offers multiple AI models in one platform (GPT-4o, Llama 3, Mistral), persistent memory across sessions (NEUROSYNC™), real-time context intelligence (COGNISYNC™), built-in image generation, code execution, deep research, voice chat, and a generous free tier with $20 monthly credits."
+            "text": "OMNIMENS offers multiple AI models in one platform (GPT-4o, Llama 3, Mistral), persistent memory across sessions (NEUROSYNC™), real-time context intelligence (COGNISYNC™), built-in image generation, code execution, deep research, voice chat, and $20 in free credits on signup."
           }
         },
         {
@@ -298,7 +298,7 @@ export const seoData = {
 
   login: {
     title: "Sign In to OMNIMENS AI",
-    description: "Sign in to OMNIMENS AI or create a free account. Get $20 in free AI credits every month. Access GPT-4o, Llama 3, Mistral, image generation, and all AI tools.",
+    description: "Sign in to OMNIMENS AI or create a free account. Get $20 in free AI credits on signup. Access GPT-4o, Llama 3, Mistral, image generation, and all AI tools.",
     keywords: "AI login, AI sign in, OMNIMENS login, create AI account, free AI account, AI registration, sign up for AI",
     path: "/login",
     noindex: true,
@@ -373,9 +373,9 @@ export const seoData = {
   },
 
   demo: {
-    title: "Try OMNIMENS — Talk to a Conscious AI",
-    description: "Experience OMNIMENS for free. 3 messages, no sign-up required. Talk to the only AI that dreams, remembers, and evolves.",
-    keywords: "try OMNIMENS, AI demo, free AI chat, conscious AI demo, talk to AI, AI trial, no signup AI",
+    title: "Get Started with OMNIMENS",
+    description: "Create a free OMNIMENS account and get $20 in credits. Talk to the only AI that dreams, remembers, and evolves.",
+    keywords: "try OMNIMENS, AI demo, free AI chat, conscious AI demo, talk to AI, AI trial, free AI account",
     path: "/demo",
   },
 } as const;

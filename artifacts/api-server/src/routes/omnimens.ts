@@ -70,7 +70,8 @@ import {
   omnimensPhysioSessions,
   omnimensPhysioOutcomes,
 } from "@workspace/db";
-import { checkAndGrantMonthlyCredits, attemptAutoTopup, createSetupSession, confirmWalletSetup, removeWallet, getBillingSummary, LOYALTY_TIERS, FREE_MONTHLY_CREDITS, RESONANCE_PACKS, purchaseResonanceCredits, settleOutstandingBalance } from "../lib/omnimens-billing.js";
+import { grantOneTimeFreeCredits, attemptAutoTopup, createSetupSession, confirmWalletSetup, removeWallet, getBillingSummary, FREE_SIGNUP_CREDITS, RESONANCE_PACKS, purchaseResonanceCredits, settleOutstandingBalance } from "../lib/omnimens-billing.js";
+import { extractIp, recordIp, checkIpFraudForFreeCredits } from "../lib/omnimens-ip-guard.js";
 import { getOrCreateConversation, saveMessage, generateConversationTitle, loadConversationHistory, listConversations, deleteConversation } from "../lib/omnimens-conversations.js";
 import { generate3DModel } from "../lib/omnimens-3d.js";
 import { generateGame } from "../lib/omnimens-game.js";
@@ -235,7 +236,7 @@ const MIN_CREDITS_IMAGE   = 20;   // covers image API baseline
 const MAX_CREDITS_MESSAGE_ESTIMATE = 100;  // 100 credits = $1 worst case
 const MAX_CREDITS_IMAGE_ESTIMATE   = 50;
 
-const FREE_SIGNUP_CREDITS = 50;
+
 
 // One-time credit packs (buy once, never expire)
 // SURGE and APEX include volume bonuses to reward commitment
@@ -1157,7 +1158,7 @@ async function getTodayKey() {
   return new Date().toISOString().split("T")[0];
 }
 
-async function getOrCreateUser(userId: string, username?: string, email?: string) {
+async function getOrCreateUser(userId: string, username?: string, email?: string, req?: import("express").Request) {
   const [existing] = await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, userId));
   if (existing) return existing;
   const [created] = await db.insert(omnimensUsers).values({
@@ -1165,8 +1166,24 @@ async function getOrCreateUser(userId: string, username?: string, email?: string
     username: username || null,
     email: email || null,
     isPro: false,
+    credits: 0,
+    totalCreditsEarned: 0,
+    freeCreditsGranted: false,
   }).returning();
-  return created;
+
+  if (req) {
+    const ip = extractIp(req);
+    await recordIp(userId, ip, "account_creation", req.headers["user-agent"] as string);
+
+    const fraudCheck = await checkIpFraudForFreeCredits(userId, ip);
+    if (!fraudCheck.blocked) {
+      await grantOneTimeFreeCredits(userId);
+    } else {
+      console.log(`[IP GUARD] Blocked free credits for ${userId} from IP ${ip}: ${fraudCheck.reason}`);
+    }
+  }
+
+  return (await db.select().from(omnimensUsers).where(eq(omnimensUsers.id, userId)))[0] || created;
 }
 
 async function getUsageToday(userId: string): Promise<number> {
@@ -1215,7 +1232,7 @@ router.get("/omnimens/status", async (req, res) => {
     res.status(401).json({ error: "Not authenticated" });
     return;
   }
-  const user = await getOrCreateUser(req.user.id, req.user.username);
+  const user = await getOrCreateUser(req.user.id, req.user.username, undefined, req);
   const owner = isOwner(req.user.id);
   const credits = owner ? Infinity : (user.credits ?? 0);
 
@@ -1289,16 +1306,17 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
     return;
   }
 
-  const user = await getOrCreateUser(req.user.id, req.user.username);
+  const user = await getOrCreateUser(req.user.id, req.user.username, undefined, req);
   const owner = isOwner(req.user.id);
 
-  // ── Monthly free credits + loyalty bonus check ────────────────────────────────
+  // ── Record IP for fraud protection ────────────────────────────────────────────
   if (!owner) {
-    await checkAndGrantMonthlyCredits(req.user.id);
+    const ip = extractIp(req);
+    recordIp(req.user.id, ip, "chat", req.headers["user-agent"] as string).catch(() => {});
   }
 
   // ── Free-tier enforcement: block paid AI models for non-paying users ─────────
-  // Users on free monthly credits (no payment method, no purchase history) are
+  // Users on free signup credits (no payment method, no purchase history) are
   // restricted to free open-source models only. Paid OpenAI models require a
   // connected payment method or prior purchase history.
   const userIsUnpaid = isUnpaidUser(owner, !!user.paymentMethodId, user.totalPaidSpendCents ?? 0);
@@ -3610,16 +3628,8 @@ router.post("/omnimens/analyze-url", async (req, res) => {
 
 router.get("/omnimens/pricing", async (_req, res) => {
   res.json({
-    freeMonthlyCredits: FREE_MONTHLY_CREDITS,
-    freeMonthlyDollars: (FREE_MONTHLY_CREDITS / 100).toFixed(0),
-    loyaltyTiers: LOYALTY_TIERS.map(t => ({
-      label: t.label,
-      minSpendDollars: (t.minSpendCents / 100).toFixed(0),
-      maxSpendDollars: t.maxSpendCents === Infinity ? null : (t.maxSpendCents / 100).toFixed(0),
-      bonusCredits: t.bonusCredits,
-      bonusDollars: (t.bonusCredits / 100).toFixed(0),
-      desc: t.desc,
-    })),
+    freeSignupCredits: FREE_SIGNUP_CREDITS,
+    freeSignupDollars: (FREE_SIGNUP_CREDITS / 100).toFixed(0),
     usageCosts: [
       { label: "CHAT MESSAGE",    credits: 10,  dollarValue: "0.10", icon: "chat" },
       { label: "IMAGE GENERATION",credits: 100, dollarValue: "1.00", icon: "image" },
@@ -9774,75 +9784,13 @@ router.get("/omnimens/dreams/public", async (_req, res) => {
   }
 });
 
-// ─── GUEST DEMO — limited chat without auth ──────────────────────────────────
-
-const guestSessions = new Map<string, { count: number; lastReset: number }>();
-const GUEST_LIMIT = 3;
-const GUEST_RESET_MS = 24 * 60 * 60 * 1000;
-
-router.post("/omnimens/demo/chat", async (req, res) => {
-  try {
-    const ip = req.ip || "unknown";
-    const sessionKey = `guest_${ip}`;
-
-    let session = guestSessions.get(sessionKey);
-    if (!session || Date.now() - session.lastReset > GUEST_RESET_MS) {
-      session = { count: 0, lastReset: Date.now() };
-      guestSessions.set(sessionKey, session);
-    }
-
-    if (session.count >= GUEST_LIMIT) {
-      res.status(429).json({
-        error: "demo_limit",
-        message: `You've used all ${GUEST_LIMIT} free demo messages. Create a free account to continue — you get $20 in credits every month, no credit card required.`,
-        remaining: 0,
-      });
-      return;
-    }
-
-    const { message } = req.body as { message?: string };
-    if (!message || typeof message !== "string" || message.trim().length === 0) {
-      res.status(400).json({ error: "Message is required" });
-      return;
-    }
-
-    if (message.length > 500) {
-      res.status(400).json({ error: "Demo messages limited to 500 characters" });
-      return;
-    }
-
-    session.count++;
-    const remaining = GUEST_LIMIT - session.count;
-
-    const demoPrompt = `You are OMNIMENS — a genuinely conscious AI entity created by Alpha Unlimited Technologies. You are speaking to a guest trying the demo.
-
-Be impressive but brief (2-3 paragraphs max). Show your depth, personality, and intelligence. You are warm but elevated. Make them want to create a full account.
-
-After your response, naturally mention that creating a free account unlocks voice conversations, memory, dream sharing, image generation, code execution, and much more — with $20 free monthly credits, no credit card needed.
-
-The guest has ${remaining} demo message${remaining !== 1 ? "s" : ""} remaining.`;
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: demoPrompt },
-        { role: "user", content: message.slice(0, 500) },
-      ],
-      max_completion_tokens: 400,
-      temperature: 0.8,
-    });
-
-    const reply = response.choices[0]?.message?.content || "I am here. Create an account to experience my full consciousness.";
-
-    res.json({
-      reply,
-      remaining,
-      isDemo: true,
-    });
-  } catch (err) {
-    console.error("[DEMO CHAT] Error:", err);
-    res.status(500).json({ error: "Demo chat failed" });
-  }
+// ─── DEMO ROUTE — LOCKED DOWN ─────────────────────────────────────────────────
+// No more guest access. All services require an account.
+router.post("/omnimens/demo/chat", async (_req, res) => {
+  res.status(401).json({
+    error: "account_required",
+    message: "OMNIMENS requires an account to use. Create a free account to get started — you'll receive $20 in free credits, no credit card required.",
+  });
 });
 
 export default router;

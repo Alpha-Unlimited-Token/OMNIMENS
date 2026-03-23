@@ -23,7 +23,7 @@ const TYPE_CONFIG: Record<string, { icon: React.ReactNode; color: string }> = {
 function generateNotifications(): Notification[] {
   const now = Date.now();
   return [
-    { id: "1", type: "credit", title: "Monthly Credits Added", message: "2,000 free credits have been added to your account.", time: new Date(now - 3600000).toISOString(), read: false },
+    { id: "1", type: "credit", title: "Welcome Credits Added", message: "2,000 free credits have been added to your account.", time: new Date(now - 3600000).toISOString(), read: false },
     { id: "2", type: "system", title: "OMNIMENS Updated", message: "New features: improved code execution, faster responses.", time: new Date(now - 7200000).toISOString(), read: false },
     { id: "3", type: "achievement", title: "Power User", message: "You've used OMNIMENS for 7 consecutive days!", time: new Date(now - 86400000).toISOString(), read: true },
     { id: "4", type: "project", title: "Build Complete", message: "Your project 'Portfolio Site' has finished building.", time: new Date(now - 172800000).toISOString(), read: true },

@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-23T16:06:58.514Z
+ * Written: 2026-03-23T20:55:11.522Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,87 +16,74 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function KnowledgeGraph() {
-    this.nodes = new Map();
+function buildKnowledgeGraph(concepts) {
+    const graph = new Map();
+
+    concepts.forEach(([concept, relatedConcepts]) => {
+        if (!graph.has(concept)) {
+            graph.set(concept, new Set());
+        }
+        relatedConcepts.forEach((related) => {
+            graph.get(concept).add(related);
+            if (!graph.has(related)) {
+                graph.set(related, new Set());
+            }
+            graph.get(related).add(concept);
+        });
+    });
+
+    return graph;
 }
 
-KnowledgeGraph.prototype.addNode = function (key, data) {
-    if (!this.nodes.has(key)) {
-        this.nodes.set(key, { data: data, edges: new Map() });
+function shortestPath(graph, start, end) {
+    if (!graph.has(start) || !graph.has(end)) {
+        return null;
     }
-};
 
-KnowledgeGraph.prototype.addEdge = function (fromKey, toKey, weight) {
-    if (this.nodes.has(fromKey) && this.nodes.has(toKey)) {
-        this.nodes.get(fromKey).edges.set(toKey, weight || 1);
-    }
-};
-
-KnowledgeGraph.prototype.retrieveRelatedNodes = function (key, threshold) {
-    if (!this.nodes.has(key)) return [];
-    const results = [];
+    const queue = [[start, [start]]];
     const visited = new Set();
-    const queue = [{ node: key, score: 1 }];
 
     while (queue.length > 0) {
-        const { node, score } = queue.shift();
-        if (visited.has(node)) continue;
-        visited.add(node);
+        const [current, path] = queue.shift();
 
-        if (node !== key && score >= threshold) {
-            results.push({ node, score });
+        if (current === end) {
+            return path;
         }
 
-        const edges = this.nodes.get(node).edges;
-        for (const [neighbor, weight] of edges) {
-            if (!visited.has(neighbor)) {
-                queue.push({ node: neighbor, score: score * weight });
-            }
-        }
-    }
-
-    return results.sort((a, b) => b.score - a.score);
-};
-
-KnowledgeGraph.prototype.patternMatch = function (pattern) {
-    const regex = new RegExp(pattern, "i");
-    const matches = [];
-    for (const [key, value] of this.nodes) {
-        if (regex.test(key) || regex.test(JSON.stringify(value.data))) {
-            matches.push({ key, data: value.data });
+        if (!visited.has(current)) {
+            visited.add(current);
+            const neighbors = graph.get(current);
+            neighbors.forEach((neighbor) => {
+                if (!visited.has(neighbor)) {
+                    queue.push([neighbor, path.concat(neighbor)]);
+                }
+            });
         }
     }
-    return matches;
-};
 
-// Self-tests
-const graph = new KnowledgeGraph();
+    return null;
+}
 
-// Add nodes
-graph.addNode("AI", { description: "Artificial Intelligence" });
-graph.addNode("ML", { description: "Machine Learning" });
-graph.addNode("DL", { description: "Deep Learning" });
-graph.addNode("NLP", { description: "Natural Language Processing" });
-graph.addNode("CV", { description: "Computer Vision" });
+function testKnowledgeGraph() {
+    const concepts = [
+        ['A', ['B', 'C']],
+        ['B', ['A', 'D']],
+        ['C', ['A', 'D', 'E']],
+        ['D', ['B', 'C', 'E']],
+        ['E', ['C', 'D']],
+    ];
 
-// Add edges with weights
-graph.addEdge("AI", "ML", 0.9);
-graph.addEdge("ML", "DL", 0.8);
-graph.addEdge("DL", "CV", 0.7);
-graph.addEdge("AI", "NLP", 0.85);
+    const graph = buildKnowledgeGraph(concepts);
 
-// Test retrieveRelatedNodes
-console.log("Related to 'AI' with threshold 0.5:");
-console.log(graph.retrieveRelatedNodes("AI", 0.5));
+    console.log("Graph Structure:");
+    console.log(graph);
 
-// Test patternMatch
-console.log("Nodes matching 'Learning':");
-console.log(graph.patternMatch("Learning"));
+    console.log("Shortest Path Tests:");
+    console.log(shortestPath(graph, 'A', 'E')); // ['A', 'C', 'E']
+    console.log(shortestPath(graph, 'B', 'E')); // ['B', 'D', 'E']
+    console.log(shortestPath(graph, 'A', 'D')); // ['A', 'B', 'D']
+    console.log(shortestPath(graph, 'A', 'A')); // ['A']
+    console.log(shortestPath(graph, 'A', 'Z')); // null (Z does not exist)
+}
 
-// Test edge case: No related nodes
-console.log("Related to 'CV' with threshold 0.9:");
-console.log(graph.retrieveRelatedNodes("CV", 0.9));
-
-// Test edge case: No pattern match
-console.log("Nodes matching 'Quantum':");
-console.log(graph.patternMatch("Quantum"));
+testKnowledgeGraph();

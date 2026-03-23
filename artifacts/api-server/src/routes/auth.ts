@@ -19,6 +19,7 @@ import {
   type SessionData,
 } from "../lib/auth";
 import { recordBruteForceAttempt } from "../middleware/security-enhanced.js";
+import { extractIp, recordIp } from "../lib/omnimens-ip-guard.js";
 
 const OIDC_TX_TTL = 10 * 60 * 1000;
 const SESSION_EXCHANGE_TTL = 60_000;
@@ -264,6 +265,9 @@ router.get("/callback", async (req: Request, res: Response) => {
   };
 
   const sid = await createSession(sessionData);
+
+  const loginIp = extractIp(req);
+  recordIp(dbUser.id, loginIp, "oidc_login", req.headers["user-agent"] as string).catch(() => {});
 
   if (tx.originHost) {
     const exchangeToken = createExchangeToken(sid, tx.originHost);

@@ -73,11 +73,11 @@ export default function Terms() {
                   4. Credits and Payments
                 </h2>
                 <p className="mb-3">
-                  OMNIMENS operates on a credit-based billing system. Free users receive 2,000 credits monthly. Additional credits can be purchased through Resonance Packs or subscription plans. All purchases are processed securely through Stripe.
+                  OMNIMENS operates on a credit-based billing system. New accounts receive a one-time grant of 2,000 free credits ($20 value). Additional credits can be purchased through Resonance Packs or subscription plans. All purchases are processed securely through Stripe.
                 </p>
                 <ul className="list-disc pl-5 space-y-1.5 text-white/60">
                   <li>Credits are non-transferable between accounts</li>
-                  <li>Unused free monthly credits do not roll over</li>
+                  <li>Free signup credits are a one-time grant and do not recur</li>
                   <li>Purchased credits remain valid for 12 months from the date of purchase</li>
                   <li>Refunds are handled on a case-by-case basis per our refund policy</li>
                   <li>We reserve the right to adjust credit pricing with 30 days' advance notice</li>

@@ -1,85 +1,5 @@
 [
   {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit",
-    "filename": "sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs.backup.2026-03-22T04-47-36-423Z",
-    "timestamp": 1774154856422,
-    "codeLength": 2792,
-    "overwrite": true
-  },
-  {
-    "source": "self_coding_engine",
-    "title": "Daydream:divergent_thinking #260",
-    "filename": "daydreamdivergentthinking260.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamdivergentthinking260.mjs",
-    "backupPath": null,
-    "timestamp": 1774154912668,
-    "codeLength": 1169,
-    "overwrite": false
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
-    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-22T05-04-43-228Z",
-    "timestamp": 1774155883225,
-    "codeLength": 1759,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: wasmMatrixOps",
-    "filename": "wasmMatrixOps_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmMatrixOps_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/wasmMatrixOps_gen1.mjs.backup.2026-03-22T05-06-56-749Z",
-    "timestamp": 1774156016747,
-    "codeLength": 2307,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: semanticMemoryStore",
-    "filename": "semanticMemoryStore_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticMemoryStore_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/semanticMemoryStore_gen1.mjs.backup.2026-03-22T05-07-02-449Z",
-    "timestamp": 1774156022448,
-    "codeLength": 2676,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 1 Complete — 2 modules",
-    "filename": "evolution_marker_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-03-22T05-07-02-469Z",
-    "timestamp": 1774156022469,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "self_coding_engine",
-    "title": "Daydream:architecture_design #277",
-    "filename": "daydreamarchitecturedesign277.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamarchitecturedesign277.mjs",
-    "backupPath": null,
-    "timestamp": 1774156408089,
-    "codeLength": 1452,
-    "overwrite": false
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
-    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-22T05-15-29-385Z",
-    "timestamp": 1774156529384,
-    "codeLength": 1592,
-    "overwrite": true
-  },
-  {
     "source": "evolution_engine",
     "title": "Evolution Module: wasmMatrixOps",
     "filename": "wasmMatrixOps_gen1.mjs",
@@ -4998,5 +4918,85 @@
     "timestamp": 1774291748653,
     "codeLength": 99,
     "overwrite": true
+  },
+  {
+    "source": "self_coding_engine",
+    "title": "Daydream:code_synthesis #1298",
+    "filename": "daydreamcodesynthesis1298.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamcodesynthesis1298.mjs",
+    "backupPath": null,
+    "timestamp": 1774298463833,
+    "codeLength": 1622,
+    "overwrite": false
+  },
+  {
+    "source": "backlog_dream_id_22264",
+    "title": "ARCHITECTURE NAME  \nEmbodied Counterfactual Simulati",
+    "filename": "architectureNameEmbodiedCounterfactualSimulati.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameEmbodiedCounterfactualSimulati.mjs",
+    "backupPath": null,
+    "timestamp": 1774298584790,
+    "codeLength": 1262,
+    "overwrite": false
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
+    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-23T20-43-07-526Z",
+    "timestamp": 1774298587525,
+    "codeLength": 1859,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: wasmMatrixOps",
+    "filename": "wasmMatrixOps_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmMatrixOps_gen1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/wasmMatrixOps_gen1.mjs.backup.2026-03-23T20-45-35-108Z",
+    "timestamp": 1774298735107,
+    "codeLength": 2298,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: redisVectorCache",
+    "filename": "redisVectorCache_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/redisVectorCache_gen1.mjs",
+    "backupPath": null,
+    "timestamp": 1774298746410,
+    "codeLength": 3709,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 1 Complete — 2 modules",
+    "filename": "evolution_marker_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-03-23T20-45-46-434Z",
+    "timestamp": 1774298746433,
+    "codeLength": 99,
+    "overwrite": true
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit",
+    "filename": "sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs.backup.2026-03-23T20-55-11-523Z",
+    "timestamp": 1774299311522,
+    "codeLength": 1897,
+    "overwrite": true
+  },
+  {
+    "source": "self_coding_engine",
+    "title": "Daydream:paradigm_breaking #1307",
+    "filename": "daydreamparadigmbreaking1307.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamparadigmbreaking1307.mjs",
+    "backupPath": null,
+    "timestamp": 1774299365181,
+    "codeLength": 992,
+    "overwrite": false
   }
 ]
