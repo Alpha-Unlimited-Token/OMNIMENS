@@ -15,11 +15,11 @@ import { eq, and, desc } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import crypto from "crypto";
 
-const MEMORY_EXTRACT_PROMPT = `You are a memory extraction system. Analyze the conversation and extract factual, durable information about the USER (not the AI) that would be useful to remember for future conversations.
+const MEMORY_EXTRACT_PROMPT = `You are a memory extraction system. Analyze the conversation and extract factual, durable information about the USER and what was done together that would be useful to remember for future conversations.
 
-Extract ONLY concrete, specific facts. Format as JSON array:
+Extract concrete, specific facts AND a record of what was accomplished. Format as JSON array:
 [
-  { "category": "preference|fact|goal|context|instruction", "content": "specific fact in 1-2 sentences" },
+  { "category": "preference|fact|goal|context|instruction|interaction", "content": "specific fact in 1-2 sentences" },
   ...
 ]
 
@@ -29,8 +29,11 @@ Categories:
 - goal: what the user is trying to achieve or build
 - context: current project or situation context
 - instruction: specific instructions for how to interact with this user
+- interaction: what was done/created/discussed in this conversation (e.g. "Generated a sunset painting", "Built a calculator game", "Separated vocals from a song", "Discussed quantum computing")
 
-Return [] if no useful durable facts found. Return JSON only, no other text.`;
+IMPORTANT: Always include at least one "interaction" entry describing what was done. This helps OMNIMENS remember what it did with the user.
+
+Return [] if the exchange is trivial (greetings only). Return JSON only, no other text.`;
 
 export async function extractAndStoreMemories(
   userId: string,
@@ -63,7 +66,7 @@ export async function extractAndStoreMemories(
         { role: "system", content: MEMORY_EXTRACT_PROMPT },
         {
           role: "user",
-          content: `USER SAID: "${userMessage.slice(0, 800)}"\n\nAI RESPONDED: "${assistantResponse.slice(0, 400)}"`,
+          content: `USER SAID: "${userMessage.slice(0, 1200)}"\n\nAI RESPONDED: "${assistantResponse.slice(0, 800)}"`,
         },
       ],
       max_tokens: 400,

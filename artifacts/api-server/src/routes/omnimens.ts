@@ -3033,7 +3033,7 @@ Example format: ["How does X relate to Y?", "Show me how to implement Z", "What 
 
     // Fire-and-forget: extract memories + reflect on conversation
     extractAndStoreMemories(req.user.id, message, fullText).catch(console.error);
-    reflectOnConversation(message, fullText, `User: ${message.slice(0, 200)}`).catch(console.error);
+    reflectOnConversation(message, fullText, `User: ${message.slice(0, 200)}`, req.user.id, conversationId).catch(console.error);
     // Learning cycle: critic evaluates quality → learning element updates → memory stores insights
     runLearningCycle(req.user.id, message, fullText, taskAnalysis.taskType || "chat").catch(console.error);
     // Council Intelligence System: 6 Lab agents analyze this conversation in background

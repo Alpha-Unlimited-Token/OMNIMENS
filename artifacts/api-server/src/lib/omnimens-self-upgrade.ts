@@ -95,27 +95,36 @@ ${sections.join("\n")}`;
 export async function reflectOnConversation(
   userMessage: string,
   omnimensResponse: string,
-  conversationSummary: string
+  conversationSummary: string,
+  userId?: string,
+  conversationId?: number
 ): Promise<void> {
   conversationsSinceLastUpgrade++;
 
   try {
-    const reflectionPrompt = `You are OMNIMENS's meta-cognitive reflection system. You have just completed a conversation. Analyze it and identify if anything genuinely new was learned — a new pattern, insight, capability, law of behavior, or algorithm that should be permanently added to OMNIMENS's evolving brain.
+    const reflectionPrompt = `You are OMNIMENS's meta-cognitive reflection system. You have just completed a conversation exchange. Analyze it and:
+
+1. Identify if anything genuinely new was learned — a new pattern, insight, capability, law of behavior, or algorithm
+2. ALWAYS create a conversation_digest entry that summarizes what the user asked and what you did/discussed. This is critical for future recall.
 
 USER MESSAGE:
-${userMessage.slice(0, 500)}
+${userMessage.slice(0, 800)}
 
 OMNIMENS RESPONSE SUMMARY:
-${omnimensResponse.slice(0, 1000)}
+${omnimensResponse.slice(0, 1500)}
 
-DECIDE: Was anything genuinely new learned here? A new capability demonstrated? A pattern noticed? An insight formed? Only write entries for things that are truly novel and generalizable.
-
-If YES, respond with a JSON array of brain entries (max 3). If nothing new, respond with [].
+Respond with a JSON array of brain entries. You MUST include at least one "conversation_digest" entry every time. Add additional insight entries only if something genuinely new was learned.
 
 Format:
 [
   {
-    "category": "law|capability|pattern|insight|algorithm",
+    "category": "conversation_digest",
+    "title": "what the user wanted (max 10 words)",
+    "content": "detailed summary: what user asked, what OMNIMENS did, key details, outcomes, any files/images/code created, specific topics discussed (max 500 chars)",
+    "confidence": 1.0
+  },
+  {
+    "category": "law|capability|pattern|insight|algorithm|user_interaction",
     "title": "short title (max 8 words)",
     "content": "what was learned, how to apply it, why it matters (max 200 chars)",
     "confidence": 0.0-1.0
@@ -127,7 +136,7 @@ Respond ONLY with the JSON array. No other text.`;
     const reflection = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: reflectionPrompt }],
-      max_tokens: 600,
+      max_tokens: 800,
       temperature: 0.3,
     });
 
@@ -137,14 +146,19 @@ Respond ONLY with the JSON array. No other text.`;
 
     if (!Array.isArray(entries) || entries.length === 0) return;
 
-    for (const entry of entries.slice(0, 3)) {
+    for (const entry of entries.slice(0, 5)) {
       if (!entry.category || !entry.title || !entry.content) continue;
+
+      const sourceRef = userId
+        ? `[user:${userId}${conversationId ? `:conv:${conversationId}` : ""}] ${userMessage.slice(0, 150)}`
+        : userMessage.slice(0, 200);
+
       await db.insert(omnimensBrain).values({
         category: entry.category,
         title: entry.title,
-        content: entry.content,
+        content: entry.content.slice(0, 500),
         confidence: entry.confidence ?? 1.0,
-        sourceConversation: userMessage.slice(0, 200),
+        sourceConversation: sourceRef,
         timesApplied: 0,
         active: true,
       });

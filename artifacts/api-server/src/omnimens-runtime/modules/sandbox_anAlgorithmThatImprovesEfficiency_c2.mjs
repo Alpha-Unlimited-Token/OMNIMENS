@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-23T14:23:15.181Z
+ * Written: 2026-03-23T15:35:22.249Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,74 +17,70 @@
  */
 
 function KnowledgeGraph() {
-  this.nodes = new Map();
+    this.graph = new Map();
 }
 
 KnowledgeGraph.prototype.addConcept = function(concept, relatedConcepts) {
-  if (!this.nodes.has(concept)) {
-    this.nodes.set(concept, new Set());
-  }
-  for (let related of relatedConcepts) {
-    if (!this.nodes.has(related)) {
-      this.nodes.set(related, new Set());
+    if (!this.graph.has(concept)) {
+        this.graph.set(concept, new Set());
     }
-    this.nodes.get(concept).add(related);
-    this.nodes.get(related).add(concept);
-  }
+    for (var i = 0; i < relatedConcepts.length; i++) {
+        this.graph.get(concept).add(relatedConcepts[i]);
+        if (!this.graph.has(relatedConcepts[i])) {
+            this.graph.set(relatedConcepts[i], new Set());
+        }
+        this.graph.get(relatedConcepts[i]).add(concept);
+    }
+};
+
+KnowledgeGraph.prototype.retrieveRelatedConcepts = function(concept) {
+    return this.graph.has(concept) ? Array.from(this.graph.get(concept)) : [];
 };
 
 KnowledgeGraph.prototype.findShortestPath = function(start, end) {
-  if (!this.nodes.has(start) || !this.nodes.has(end)) {
+    if (!this.graph.has(start) || !this.graph.has(end)) {
+        return null;
+    }
+    var visited = new Set();
+    var queue = [[start, [start]]];
+    while (queue.length > 0) {
+        var [current, path] = queue.shift();
+        if (current === end) {
+            return path;
+        }
+        visited.add(current);
+        var neighbors = this.graph.get(current);
+        for (var neighbor of neighbors) {
+            if (!visited.has(neighbor)) {
+                queue.push([neighbor, path.concat(neighbor)]);
+            }
+        }
+    }
     return null;
-  }
-
-  let visited = new Set();
-  let queue = [[start, [start]]];
-
-  while (queue.length > 0) {
-    let [current, path] = queue.shift();
-
-    if (current === end) {
-      return path;
-    }
-
-    visited.add(current);
-
-    for (let neighbor of this.nodes.get(current)) {
-      if (!visited.has(neighbor)) {
-        queue.push([neighbor, path.concat(neighbor)]);
-      }
-    }
-  }
-
-  return null;
 };
 
-KnowledgeGraph.prototype.findPatterns = function(pattern) {
-  let matches = [];
-  for (let concept of this.nodes.keys()) {
-    if (concept.includes(pattern)) {
-      matches.push(concept);
-    }
-  }
-  return matches;
-};
+// Self-contained tests
+var kg = new KnowledgeGraph();
+kg.addConcept("AI", ["Machine Learning", "Neural Networks"]);
+kg.addConcept("Machine Learning", ["Statistics", "Data Science"]);
+kg.addConcept("Neural Networks", ["Deep Learning", "Backpropagation"]);
+kg.addConcept("Deep Learning", ["AI"]);
+kg.addConcept("Statistics", ["Probability", "Data Analysis"]);
 
-// Self-tests
-const graph = new KnowledgeGraph();
+console.log("Test 1: Retrieve related concepts for 'AI'");
+console.log(kg.retrieveRelatedConcepts("AI")); // Expected: ["Machine Learning", "Neural Networks"]
 
-// Adding concepts and their relationships
-graph.addConcept("AI", ["Machine Learning", "Neural Networks"]);
-graph.addConcept("Machine Learning", ["Data Science", "Statistics"]);
-graph.addConcept("Neural Networks", ["Deep Learning", "Backpropagation"]);
-graph.addConcept("Data Science", ["Big Data", "Visualization"]);
-graph.addConcept("Statistics", ["Probability", "Analysis"]);
-graph.addConcept("Deep Learning", ["TensorFlow", "PyTorch"]);
-graph.addConcept("Backpropagation", ["Optimization"]);
-graph.addConcept("Big Data", ["Hadoop", "Spark"]);
+console.log("Test 2: Retrieve related concepts for 'Deep Learning'");
+console.log(kg.retrieveRelatedConcepts("Deep Learning")); // Expected: ["Neural Networks", "AI"]
 
-console.log("Shortest Path (AI to Spark):", graph.findShortestPath("AI", "Spark"));
-console.log("Shortest Path (Deep Learning to Probability):", graph.findShortestPath("Deep Learning", "Probability"));
-console.log("Pattern Match ('Data'):", graph.findPatterns("Data"));
-console.log("Pattern Match ('Learning'):", graph.findPatterns("Learning"));
-console.log("Edge Case (Non-existent concept):", graph.findShortestPath("AI", "Quantum Computing"));
+console.log("Test 3: Find shortest path between 'AI' and 'Probability'");
+console.log(kg.findShortestPath("AI", "Probability")); // Expected: ["AI", "Machine Learning", "Statistics", "Probability"]
+
+console.log("Test 4: Find shortest path between 'Deep Learning' and 'Data Science'");
+console.log(kg.findShortestPath("Deep Learning", "Data Science")); // Expected: ["Deep Learning", "Neural Networks", "Machine Learning", "Data Science"]
+
+console.log("Test 5: Find shortest path between 'AI' and 'Nonexistent'");
+console.log(kg.findShortestPath("AI", "Nonexistent")); // Expected: null
+
+console.log("Test 6: Retrieve related concepts for 'Nonexistent'");
+console.log(kg.retrieveRelatedConcepts("Nonexistent")); // Expected: []

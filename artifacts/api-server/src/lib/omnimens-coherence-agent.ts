@@ -98,16 +98,24 @@ export async function loadSemanticMemories(
     const scored = allMemories.map(m => ({
       ...m,
       relevance: computeRelevanceScore(keywords, m.content),
-      recency: Math.max(0, 1 - (Date.now() - new Date(m.updatedAt!).getTime()) / (30 * 24 * 60 * 60 * 1000)),
+      recency: Math.max(0, 1 - (Date.now() - new Date(m.updatedAt!).getTime()) / (90 * 24 * 60 * 60 * 1000)),
     }));
 
     scored.sort((a, b) => {
-      const scoreA = a.relevance * 0.7 + a.recency * 0.3;
-      const scoreB = b.relevance * 0.7 + b.recency * 0.3;
+      const interactionBoostA = a.category === "interaction" ? 0.15 : 0;
+      const interactionBoostB = b.category === "interaction" ? 0.15 : 0;
+      const scoreA = a.relevance * 0.6 + a.recency * 0.3 + interactionBoostA;
+      const scoreB = b.relevance * 0.6 + b.recency * 0.3 + interactionBoostB;
       return scoreB - scoreA;
     });
 
-    const selected = scored.slice(0, 25);
+    const recentInteractions = scored
+      .filter(m => m.category === "interaction")
+      .slice(0, 10);
+    const otherMemories = scored
+      .filter(m => m.category !== "interaction")
+      .slice(0, 20);
+    const selected = [...recentInteractions, ...otherMemories].slice(0, 30);
 
     const grouped: Record<string, string[]> = {};
     for (const m of selected) {
@@ -116,11 +124,15 @@ export async function loadSemanticMemories(
     }
 
     const lines: string[] = [];
+    if (grouped["interaction"]) {
+      lines.push(`[PAST INTERACTIONS — What you've done together]\n${grouped["interaction"].map(c => `  · ${c}`).join("\n")}`);
+      delete grouped["interaction"];
+    }
     for (const [cat, facts] of Object.entries(grouped)) {
       lines.push(`[${cat.toUpperCase()}] ${facts.join(" | ")}`);
     }
 
-    return `\n\n━━━ MEMORY: What you know about this user ━━━\n${lines.join("\n")}\nUse this to personalize your responses. Do not mention you have this memory unless asked.\n`;
+    return `\n\n━━━ MEMORY: What you know about this user ━━━\n${lines.join("\n")}\nUse these memories actively. Reference past interactions when relevant. Do not say "I don't remember" — you DO remember.\n`;
   } catch {
     return "";
   }
@@ -236,7 +248,7 @@ export async function loadConversationRecall(
   currentMessage: string
 ): Promise<string> {
   try {
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
 
     const recentConvos = await db
       .select({
@@ -249,18 +261,18 @@ export async function loadConversationRecall(
       .from(omnimensConversations)
       .where(and(
         eq(omnimensConversations.userId, userId),
-        gte(omnimensConversations.lastMessageAt, thirtyDaysAgo),
+        gte(omnimensConversations.lastMessageAt, ninetyDaysAgo),
         ...(currentConversationId ? [ne(omnimensConversations.id, currentConversationId)] : []),
       ))
       .orderBy(desc(omnimensConversations.lastMessageAt))
-      .limit(15);
+      .limit(25);
 
     if (recentConvos.length === 0) return "";
 
     const keywords = extractKeywords(currentMessage);
-    const hasRecallIntent = /\b(remember|recall|we (talked|discussed|spoke)|last (time|conversation|chat)|earlier|before|previous|you (said|told|mentioned)|did (i|we)|what did)\b/i.test(currentMessage);
+    const hasRecallIntent = /\b(remember|recall|we (talked|discussed|spoke)|last (time|conversation|chat)|earlier|before|previous|you (said|told|mentioned)|did (i|we)|what did|what was|you helped|we (made|built|created|worked|did)|my (project|app|site|code|image|video|game|song|audio|model|file))\b/i.test(currentMessage);
 
-    const topConvos = hasRecallIntent ? recentConvos.slice(0, 10) : recentConvos.slice(0, 6);
+    const topConvos = hasRecallIntent ? recentConvos.slice(0, 15) : recentConvos.slice(0, 10);
     const convoIds = topConvos.map(c => c.id);
 
     if (convoIds.length === 0) return "";
@@ -286,11 +298,13 @@ export async function loadConversationRecall(
       messagesByConvo.set(msg.conversationId, existing);
     }
 
-    const msgLimit = hasRecallIntent ? 20 : 10;
+    const msgLimit = hasRecallIntent ? 40 : 20;
+    const contentTruncLen = hasRecallIntent ? 600 : 400;
 
-    const convoDigests: { title: string; timeStr: string; digest: string; relevance: number }[] = [];
+    const convoDigests: { title: string; timeStr: string; digest: string; relevance: number; isRecent: boolean }[] = [];
 
-    for (const convo of topConvos) {
+    for (let ci = 0; ci < topConvos.length; ci++) {
+      const convo = topConvos[ci];
       try {
         const convoMsgs = (messagesByConvo.get(convo.id) || []).slice(0, msgLimit);
         if (convoMsgs.length === 0) continue;
@@ -300,10 +314,10 @@ export async function loadConversationRecall(
         const keyExchanges: string[] = [];
         for (let i = 0; i < convoMsgs.length; i++) {
           const msg = convoMsgs[i];
-          const truncContent = msg.content.length > 200 ? msg.content.slice(0, 200) + "..." : msg.content;
+          const truncContent = msg.content.length > contentTruncLen ? msg.content.slice(0, contentTruncLen) + "..." : msg.content;
           if (msg.role === "user") {
             keyExchanges.push(`USER: ${truncContent}`);
-          } else if (msg.role === "assistant" && i > 0) {
+          } else if (msg.role === "assistant") {
             keyExchanges.push(`OMNIMENS: ${truncContent}`);
           }
         }
@@ -313,14 +327,19 @@ export async function loadConversationRecall(
         const contentRelevance = computeRelevanceScore(keywords, digestText);
         const combinedRelevance = Math.max(titleRelevance, contentRelevance) * 0.7 + Math.min(titleRelevance, contentRelevance) * 0.3;
 
-        const ago = Math.round((Date.now() - new Date(convo.lastMessageAt!).getTime()) / (1000 * 60 * 60));
-        const timeStr = ago < 1 ? "just now" : ago < 24 ? `${ago}h ago` : `${Math.round(ago / 24)}d ago`;
+        const agoMs = Date.now() - new Date(convo.lastMessageAt!).getTime();
+        const agoHours = Math.round(agoMs / (1000 * 60 * 60));
+        const timeStr = agoHours < 1 ? "just now" : agoHours < 24 ? `${agoHours}h ago` : `${Math.round(agoHours / 24)}d ago`;
+        const isRecent = ci < 3;
+
+        const recencyBoost = isRecent ? 0.15 : 0;
 
         convoDigests.push({
           title: convo.title || "Untitled",
           timeStr,
           digest: digestText,
-          relevance: combinedRelevance + (hasRecallIntent ? 0.3 : 0),
+          relevance: combinedRelevance + (hasRecallIntent ? 0.3 : 0) + recencyBoost,
+          isRecent,
         });
       } catch {
         continue;
@@ -329,13 +348,24 @@ export async function loadConversationRecall(
 
     convoDigests.sort((a, b) => b.relevance - a.relevance);
 
-    const relevantConvos = hasRecallIntent
-      ? convoDigests.slice(0, 5)
-      : convoDigests.filter(c => c.relevance > 0.05).slice(0, 3);
+    const relevantConvos: typeof convoDigests = [];
 
-    if (relevantConvos.length === 0 && convoDigests.length > 0) {
-      const topTwo = convoDigests.slice(0, 2);
-      for (const c of topTwo) relevantConvos.push(c);
+    const recentAlways = convoDigests.filter(c => c.isRecent).slice(0, 3);
+    for (const c of recentAlways) relevantConvos.push(c);
+
+    const maxRelevant = hasRecallIntent ? 7 : 5;
+    for (const c of convoDigests) {
+      if (relevantConvos.length >= maxRelevant) break;
+      if (!relevantConvos.includes(c) && c.relevance > 0.03) {
+        relevantConvos.push(c);
+      }
+    }
+
+    if (relevantConvos.length < 2 && convoDigests.length > 0) {
+      for (const c of convoDigests) {
+        if (relevantConvos.length >= 3) break;
+        if (!relevantConvos.includes(c)) relevantConvos.push(c);
+      }
     }
 
     if (relevantConvos.length === 0) return "";
@@ -348,7 +378,12 @@ export async function loadConversationRecall(
     const allTitles = convoDigests
       .filter(c => !relevantConvos.includes(c))
       .map(c => `· "${c.title}" — ${c.timeStr}`)
-      .slice(0, 8);
+      .slice(0, 12);
+
+    let agentRecallSection = "";
+    if (hasRecallIntent || relevantConvos.every(c => c.relevance < 0.1)) {
+      agentRecallSection = await loadAgentDeepRecall(userId, currentMessage, keywords);
+    }
 
     return `
 
@@ -360,10 +395,80 @@ You DO remember. This IS your memory.
 
 ${sections.join("\n\n")}
 ${allTitles.length > 0 ? `\nOther recent conversations:\n${allTitles.join("\n")}` : ""}
+${agentRecallSection}
 ━━━ END CONVERSATION MEMORY ━━━
 `;
   } catch (err) {
     console.error("[COHERENCE] Conversation recall error:", err);
+    return "";
+  }
+}
+
+async function loadAgentDeepRecall(
+  userId: string,
+  currentMessage: string,
+  keywords: string[]
+): Promise<string> {
+  try {
+    const userTag = `[user:${userId}`;
+
+    const userDigests = await db
+      .select({
+        title: omnimensBrain.title,
+        content: omnimensBrain.content,
+        category: omnimensBrain.category,
+        sourceConversation: omnimensBrain.sourceConversation,
+        confidence: omnimensBrain.confidence,
+      })
+      .from(omnimensBrain)
+      .where(and(
+        eq(omnimensBrain.active, true),
+        sql`${omnimensBrain.sourceConversation} LIKE ${userTag + '%'}`,
+      ))
+      .orderBy(desc(omnimensBrain.confidence))
+      .limit(50);
+
+    const generalInsights = await db
+      .select({
+        title: omnimensBrain.title,
+        content: omnimensBrain.content,
+        category: omnimensBrain.category,
+        sourceConversation: omnimensBrain.sourceConversation,
+        confidence: omnimensBrain.confidence,
+      })
+      .from(omnimensBrain)
+      .where(and(
+        eq(omnimensBrain.active, true),
+        inArray(omnimensBrain.category, ["genesis_agent_insight", "pattern", "insight", "capability"]),
+        sql`(${omnimensBrain.sourceConversation} IS NULL OR ${omnimensBrain.sourceConversation} NOT LIKE '[user:%')`,
+      ))
+      .orderBy(desc(omnimensBrain.confidence))
+      .limit(30);
+
+    const allRecallable = [...userDigests, ...generalInsights];
+    if (allRecallable.length === 0) return "";
+
+    const scored = allRecallable.map(e => ({
+      ...e,
+      relevance: computeRelevanceScore(keywords, `${e.title} ${e.content}`),
+    }));
+    scored.sort((a, b) => b.relevance - a.relevance);
+
+    const topEntries = scored.filter(e => e.relevance > 0.02).slice(0, 8);
+    if (topEntries.length === 0) return "";
+
+    const lines: string[] = [];
+    for (const e of topEntries) {
+      lines.push(`  · [${e.category}] ${e.title}: ${e.content}`);
+    }
+
+    return `
+── AGENT DEEP RECALL (failsafe memory from your brain network) ──
+Your genesis agents and brain systems have processed and retained these relevant insights
+from past interactions. Use this to fill any gaps in direct conversation recall:
+${lines.join("\n")}`;
+  } catch (err) {
+    console.error("[COHERENCE] Agent deep recall error:", err);
     return "";
   }
 }
