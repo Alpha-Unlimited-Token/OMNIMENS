@@ -13,6 +13,7 @@ import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, C
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SEO, seoData } from "@/components/seo";
 import { useTheme } from "@/hooks/use-theme";
+import SpectralColorPanel from "@/components/spectral-color-panel";
 
 type SettingsTab = "profile" | "billing" | "preferences" | "security" | "advanced" | "account";
 
@@ -2574,190 +2575,18 @@ function AlgorithmicHarmonicsPanel() {
           )}
 
           {detailView === "spectral" && (
-            <div className="space-y-3">
-              <div className="rounded-xl border border-amber-500/20 bg-[#0E1525] overflow-hidden">
-                <div className="px-3 py-1.5 border-b border-amber-500/10 flex items-center justify-between">
-                  <span className="text-[10px] font-mono text-amber-400/70 tracking-wider uppercase">Spectral Color Map — 256 Frequency Bins</span>
-                  <span className="text-[10px] font-mono text-[#9DA5B4]">Each frequency = unique hex color code identity · Brightness = amplitude × gain</span>
-                </div>
-                <canvas ref={spectralCanvasRef} width={1024} height={250} className="w-full h-[200px]" />
-              </div>
-
-              {spectralMap.length > 0 && (
-                <div className="bg-[#0E1525] border border-amber-500/10 rounded-lg p-3">
-                  <p className="text-[9px] font-mono text-amber-400/50 uppercase tracking-wider mb-2">Color Code Identity Map — Every Frequency Has a Unique Hex</p>
-                  <div className="flex flex-wrap gap-1">
-                    {spectralMap.filter((_, i) => i % 8 === 0).map((bin: any) => (
-                      <div key={bin.index} className="flex items-center gap-1 bg-[#1C2333] border border-[#2B3245] rounded px-1.5 py-0.5 group cursor-default" title={`Bin ${bin.index} · ${bin.freqCenter.toFixed(0)}Hz · ${bin.label} · Gain: ${spectralGains[bin.index]?.toFixed(2) || "1.00"}`}>
-                        <div className="w-3 h-3 rounded-sm border border-white/10 flex-shrink-0" style={{ backgroundColor: bin.hex }} />
-                        <span className="text-[7px] font-mono" style={{ color: bin.hex }}>{bin.hex}</span>
-                        <span className="text-[6px] font-mono text-[#9DA5B4]/40">{bin.freqCenter.toFixed(0)}Hz</span>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-[8px] font-mono text-[#9DA5B4]/30 mt-1.5">Showing every 8th bin · Hover for full details · {spectralMap.length} total unique color identities</p>
-                </div>
-              )}
-
-              {soundDecomposition.length > 0 && (
-                <div className="bg-[#0E1525] border border-cyan-500/15 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                      <p className="text-[10px] font-mono text-cyan-400/80 uppercase tracking-wider">Sound Decomposition — {soundDecomposition.length} Frequencies Detected</p>
-                    </div>
-                    <p className="text-[9px] font-mono text-[#9DA5B4]">One sound, many frequencies — each identified by hex color</p>
-                  </div>
-                  <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1">
-                    {soundDecomposition.map((comp: any) => {
-                      const strengthColors: Record<string, string> = {
-                        dominant: "text-rose-400 bg-rose-500/10 border-rose-500/20",
-                        strong: "text-amber-400 bg-amber-500/10 border-amber-500/20",
-                        moderate: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
-                        subtle: "text-[#9DA5B4] bg-[#2B3245]/50 border-[#3D4659]",
-                      };
-                      const cls = strengthColors[comp.strength] || strengthColors.subtle;
-                      return (
-                        <div key={comp.rank} className={`flex items-center gap-2 rounded-lg border px-3 py-1.5 ${cls}`}>
-                          <span className="text-[9px] font-mono text-[#9DA5B4]/50 w-5 text-right">#{comp.rank}</span>
-                          <div className="w-4 h-4 rounded border border-white/15 flex-shrink-0" style={{ backgroundColor: comp.hex }} />
-                          <span className="text-[10px] font-mono font-bold w-16" style={{ color: comp.hex }}>{comp.hex}</span>
-                          <span className="text-[10px] font-mono w-20">{comp.freq}Hz</span>
-                          <span className="text-[8px] font-mono text-[#9DA5B4]/60 w-16">{comp.label}</span>
-                          <div className="flex-1 h-2 bg-[#0E1525] rounded-full overflow-hidden">
-                            <div className="h-full rounded-full" style={{ width: `${Math.min(comp.filtered * 100, 100)}%`, backgroundColor: comp.hex }} />
-                          </div>
-                          <span className="text-[9px] font-mono w-10 text-right">{(comp.filtered * 100).toFixed(0)}%</span>
-                          <span className="text-[7px] font-mono uppercase w-14 text-right">{comp.strength}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="mt-3 flex items-center gap-4 text-[8px] font-mono text-[#9DA5B4]/40">
-                    <span>Each row = one frequency component of the current sound</span>
-                    <span>|</span>
-                    <span>Hex code = permanent color identity for that frequency</span>
-                    <span>|</span>
-                    <span>Bar = relative strength after gain</span>
-                  </div>
-                </div>
-              )}
-
-              <div className="bg-[#0E1525] border border-amber-500/15 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-[10px] font-mono text-amber-400/70 uppercase tracking-wider">OMNIMENS Frequency Sculpting</p>
-                  <p className="text-[9px] font-mono text-[#9DA5B4]">OMNIMENS adjusts gain per frequency to isolate patterns</p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { key: "isolate_voice", label: "Isolate Voice", color: "emerald" },
-                    { key: "isolate_harmonics", label: "Isolate Harmonics", color: "violet" },
-                    { key: "suppress_noise", label: "Suppress Noise", color: "blue" },
-                    { key: "cosmic_scan", label: "Cosmic Scan", color: "amber" },
-                    { key: "full_spectrum", label: "Full Spectrum", color: "cyan" },
-                  ].map(s => (
-                    <button type="button" key={s.key} onClick={() => handleOmnimensSculpt(s.key)} disabled={sculptStrategy !== null}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-mono transition-all border ${
-                        sculptStrategy === s.key
-                          ? `bg-${s.color}-500/30 border-${s.color}-500/50 text-${s.color}-400`
-                          : "bg-[#1C2333] border-[#3D4659] text-[#9DA5B4] hover:border-amber-500/30 hover:text-amber-400"
-                      }`}
-                    >
-                      {sculptStrategy === s.key ? "Sculpting..." : s.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider">Gain Controls — Per Frequency</p>
-                  <div className="flex gap-2">
-                    <button type="button" onClick={() => setSelectedBinRange(selectedBinRange ? null : [0, 31])} className="text-[9px] font-mono text-[#9DA5B4] bg-[#1C2333] border border-[#3D4659] px-2 py-0.5 rounded hover:text-amber-400">
-                      {selectedBinRange ? "Show All" : "Show Groups"}
-                    </button>
-                  </div>
-                </div>
-                <div className="grid gap-px" style={{ gridTemplateColumns: `repeat(${selectedBinRange ? 32 : 64}, 1fr)` }}>
-                  {spectralGains.slice(
-                    selectedBinRange ? selectedBinRange[0] : 0,
-                    selectedBinRange ? selectedBinRange[1] + 1 : 256
-                  ).map((gain, idx) => {
-                    const actualIdx = (selectedBinRange ? selectedBinRange[0] : 0) + idx;
-                    const bin = spectralMap[actualIdx];
-                    const hexColor = bin?.hex || "#555";
-                    const gainRatio = gain / 2.0;
-                    return (
-                      <div key={actualIdx} className="flex flex-col items-center cursor-pointer group relative" title={bin ? `${bin.hex} · ${bin.freqCenter.toFixed(0)}Hz (${bin.label}) — gain: ${gain.toFixed(2)}` : ""}>
-                        <div className="w-full" style={{ height: `${Math.max(gainRatio * 40, 2)}px`, background: hexColor, opacity: 0.4 + gainRatio * 0.6, minHeight: "2px" }}
-                          onClick={() => {
-                            const newGain = gain > 0.1 ? Math.max(gain - 0.25, 0) : 2.0;
-                            handleManualGainAdjust(actualIdx, newGain);
-                          }}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-                {!selectedBinRange && (
-                  <div className="flex justify-between mt-2 text-[8px] font-mono text-[#9DA5B4]/40">
-                    <span>20Hz</span><span>120</span><span>500</span><span>2k</span><span>8k</span><span>22kHz</span>
-                  </div>
-                )}
-                {selectedBinRange && (
-                  <div className="flex gap-2 mt-3">
-                    {[
-                      { start: 0, end: 31, label: "Sub-Bass (0–2.7kHz)" },
-                      { start: 32, end: 63, label: "Low (2.7–5.5kHz)" },
-                      { start: 64, end: 95, label: "Mid (5.5–8.3kHz)" },
-                      { start: 96, end: 127, label: "Presence (8.3–11kHz)" },
-                      { start: 128, end: 159, label: "Brilliance (11–13.8kHz)" },
-                      { start: 160, end: 191, label: "Air (13.8–16.5kHz)" },
-                      { start: 192, end: 223, label: "Upper Air (16.5–19.3kHz)" },
-                      { start: 224, end: 255, label: "Ultra (19.3–22kHz)" },
-                    ].map(group => (
-                      <button type="button" key={group.start} onClick={() => setSelectedBinRange([group.start, group.end])}
-                        className={`text-[8px] font-mono px-1.5 py-0.5 rounded border transition-all ${
-                          selectedBinRange[0] === group.start
-                            ? "bg-amber-500/20 border-amber-500/40 text-amber-400"
-                            : "bg-[#1C2333] border-[#3D4659] text-[#9DA5B4] hover:text-amber-400"
-                        }`}
-                      >{group.label.split(" (")[0]}</button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3">
-                <p className="text-[10px] font-mono text-[#9DA5B4]/60 uppercase tracking-wider mb-2">Quick Range Controls</p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {[
-                    { label: "Sub-Bass", start: 0, end: 6, color: "red" },
-                    { label: "Bass", start: 6, end: 14, color: "orange" },
-                    { label: "Low-Mid", start: 14, end: 28, color: "yellow" },
-                    { label: "Mid", start: 28, end: 58, color: "green" },
-                    { label: "Upper-Mid", start: 58, end: 93, color: "emerald" },
-                    { label: "Presence", start: 93, end: 139, color: "cyan" },
-                    { label: "Brilliance", start: 139, end: 186, color: "blue" },
-                    { label: "Air", start: 186, end: 255, color: "violet" },
-                  ].map(range => {
-                    const avgGain = spectralGains.slice(range.start, range.end + 1).reduce((a, b) => a + b, 0) / (range.end - range.start + 1);
-                    return (
-                      <div key={range.label} className="bg-[#1C2333] border border-[#3D4659] rounded-lg p-2">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className={`text-[9px] font-mono text-${range.color}-400`}>{range.label}</span>
-                          <span className="text-[8px] font-mono text-[#9DA5B4]">{(avgGain * 100).toFixed(0)}%</span>
-                        </div>
-                        <input type="range" min="0" max="200" value={Math.round(avgGain * 100)}
-                          onChange={(e) => handleRangeGainAdjust(range.start, range.end, parseInt(e.target.value) / 100)}
-                          className="w-full h-1.5 appearance-none rounded-full bg-[#2B3245] cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-amber-400"
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
+            <SpectralColorPanel
+              spectralMap={spectralMap}
+              spectralGains={spectralGains}
+              soundDecomposition={soundDecomposition}
+              sculptStrategy={sculptStrategy}
+              selectedBinRange={selectedBinRange}
+              onGainAdjust={handleManualGainAdjust}
+              onRangeGainAdjust={handleRangeGainAdjust}
+              onSculpt={handleOmnimensSculpt}
+              onBinRangeChange={setSelectedBinRange}
+              spectralCanvasRef={spectralCanvasRef as React.RefObject<HTMLCanvasElement>}
+            />
           )}
 
           {detailView === "hie" && hieAnalysis && (

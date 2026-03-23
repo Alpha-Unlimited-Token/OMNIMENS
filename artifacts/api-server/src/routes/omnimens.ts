@@ -4787,6 +4787,455 @@ for (let i = 0; i < SPECTRAL_BINS; i++) {
 let spectralInsightCount = 0;
 let spectralSculptHistory: { timestamp: number; bins: number[]; gains: number[]; reason: string }[] = [];
 
+// ─── TONE ANALYSIS ENGINE ──────────────────────────────────────────────────────
+// Each instrument/voice has a unique timbre signature defined by its harmonic
+// overtone pattern, attack shape, and spectral envelope. This engine classifies
+// sound sources at the atomic level so they can be separated without disruption.
+
+interface ToneSignature {
+  name: string;
+  category: "vocal" | "string" | "percussion" | "wind" | "keys" | "electronic" | "noise";
+  harmonicRatios: number[];      // relative strength of harmonics (1st=fundamental)
+  attackMs: [number, number];    // typical attack time range in ms
+  decayShape: "sustained" | "plucked" | "struck" | "blown";
+  formantPeaks?: number[];       // Hz — vocal formant regions
+  spectralEnvelope: "warm" | "bright" | "hollow" | "sharp" | "nasal" | "breathy";
+  fundamentalRange: [number, number]; // Hz range for fundamental frequency
+  inharmonicity: number;         // 0 = perfectly harmonic, 1 = fully inharmonic (bells)
+}
+
+const TONE_SIGNATURES: ToneSignature[] = [
+  {
+    name: "Male Voice",
+    category: "vocal",
+    harmonicRatios: [1.0, 0.7, 0.5, 0.4, 0.3, 0.2, 0.15, 0.1],
+    attackMs: [20, 80],
+    decayShape: "sustained",
+    formantPeaks: [500, 1500, 2500, 3500],
+    spectralEnvelope: "warm",
+    fundamentalRange: [80, 400],
+    inharmonicity: 0.02,
+  },
+  {
+    name: "Female Voice",
+    category: "vocal",
+    harmonicRatios: [1.0, 0.6, 0.45, 0.35, 0.25, 0.18, 0.12, 0.08],
+    attackMs: [15, 70],
+    decayShape: "sustained",
+    formantPeaks: [600, 1700, 2800, 4000],
+    spectralEnvelope: "bright",
+    fundamentalRange: [150, 800],
+    inharmonicity: 0.02,
+  },
+  {
+    name: "Acoustic Guitar",
+    category: "string",
+    harmonicRatios: [1.0, 0.8, 0.6, 0.45, 0.3, 0.2, 0.12, 0.06],
+    attackMs: [5, 30],
+    decayShape: "plucked",
+    spectralEnvelope: "warm",
+    fundamentalRange: [80, 1200],
+    inharmonicity: 0.01,
+  },
+  {
+    name: "Electric Guitar",
+    category: "string",
+    harmonicRatios: [1.0, 0.9, 0.75, 0.6, 0.5, 0.4, 0.3, 0.2],
+    attackMs: [3, 25],
+    decayShape: "sustained",
+    spectralEnvelope: "bright",
+    fundamentalRange: [80, 1200],
+    inharmonicity: 0.015,
+  },
+  {
+    name: "Bass Guitar",
+    category: "string",
+    harmonicRatios: [1.0, 0.85, 0.5, 0.3, 0.15, 0.08, 0.04],
+    attackMs: [5, 40],
+    decayShape: "plucked",
+    spectralEnvelope: "warm",
+    fundamentalRange: [30, 400],
+    inharmonicity: 0.03,
+  },
+  {
+    name: "Piano",
+    category: "keys",
+    harmonicRatios: [1.0, 0.65, 0.45, 0.3, 0.2, 0.15, 0.1, 0.07, 0.05],
+    attackMs: [1, 15],
+    decayShape: "struck",
+    spectralEnvelope: "bright",
+    fundamentalRange: [27, 4200],
+    inharmonicity: 0.04,
+  },
+  {
+    name: "Xylophone",
+    category: "percussion",
+    harmonicRatios: [1.0, 0.1, 0.05, 0.9, 0.02, 0.01],
+    attackMs: [1, 8],
+    decayShape: "struck",
+    spectralEnvelope: "sharp",
+    fundamentalRange: [260, 4200],
+    inharmonicity: 0.6,
+  },
+  {
+    name: "Bell",
+    category: "percussion",
+    harmonicRatios: [1.0, 0.3, 0.8, 0.2, 0.7, 0.15, 0.5],
+    attackMs: [1, 5],
+    decayShape: "struck",
+    spectralEnvelope: "sharp",
+    fundamentalRange: [200, 8000],
+    inharmonicity: 0.8,
+  },
+  {
+    name: "Kick Drum",
+    category: "percussion",
+    harmonicRatios: [1.0, 0.4, 0.1],
+    attackMs: [1, 10],
+    decayShape: "struck",
+    spectralEnvelope: "warm",
+    fundamentalRange: [30, 100],
+    inharmonicity: 0.9,
+  },
+  {
+    name: "Snare Drum",
+    category: "percussion",
+    harmonicRatios: [1.0, 0.7, 0.5, 0.4, 0.35, 0.3],
+    attackMs: [1, 8],
+    decayShape: "struck",
+    spectralEnvelope: "sharp",
+    fundamentalRange: [100, 400],
+    inharmonicity: 0.85,
+  },
+  {
+    name: "Hi-Hat / Cymbal",
+    category: "percussion",
+    harmonicRatios: [0.3, 0.5, 0.7, 1.0, 0.9, 0.8, 0.7],
+    attackMs: [1, 5],
+    decayShape: "struck",
+    spectralEnvelope: "sharp",
+    fundamentalRange: [3000, 16000],
+    inharmonicity: 0.95,
+  },
+  {
+    name: "Flute",
+    category: "wind",
+    harmonicRatios: [1.0, 0.1, 0.05, 0.02],
+    attackMs: [30, 100],
+    decayShape: "blown",
+    spectralEnvelope: "breathy",
+    fundamentalRange: [250, 2400],
+    inharmonicity: 0.005,
+  },
+  {
+    name: "Trumpet",
+    category: "wind",
+    harmonicRatios: [1.0, 0.9, 0.8, 0.65, 0.5, 0.35, 0.2],
+    attackMs: [15, 60],
+    decayShape: "blown",
+    spectralEnvelope: "bright",
+    fundamentalRange: [160, 1200],
+    inharmonicity: 0.01,
+  },
+  {
+    name: "Saxophone",
+    category: "wind",
+    harmonicRatios: [1.0, 0.75, 0.55, 0.4, 0.3, 0.22, 0.15],
+    attackMs: [20, 70],
+    decayShape: "blown",
+    spectralEnvelope: "nasal",
+    fundamentalRange: [100, 800],
+    inharmonicity: 0.015,
+  },
+  {
+    name: "Synthesizer",
+    category: "electronic",
+    harmonicRatios: [1.0, 0.5, 0.5, 0.5, 0.5, 0.5],
+    attackMs: [1, 200],
+    decayShape: "sustained",
+    spectralEnvelope: "bright",
+    fundamentalRange: [20, 10000],
+    inharmonicity: 0.1,
+  },
+  {
+    name: "Sub Bass (808)",
+    category: "electronic",
+    harmonicRatios: [1.0, 0.6, 0.2, 0.05],
+    attackMs: [5, 30],
+    decayShape: "sustained",
+    spectralEnvelope: "warm",
+    fundamentalRange: [20, 120],
+    inharmonicity: 0.05,
+  },
+  {
+    name: "Violin / Strings",
+    category: "string",
+    harmonicRatios: [1.0, 0.85, 0.65, 0.5, 0.35, 0.25, 0.18, 0.12],
+    attackMs: [30, 150],
+    decayShape: "sustained",
+    spectralEnvelope: "nasal",
+    fundamentalRange: [196, 3500],
+    inharmonicity: 0.01,
+  },
+  {
+    name: "White Noise",
+    category: "noise",
+    harmonicRatios: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+    attackMs: [0, 5],
+    decayShape: "sustained",
+    spectralEnvelope: "bright",
+    fundamentalRange: [20, 20000],
+    inharmonicity: 1.0,
+  },
+  {
+    name: "Wind / Ambient",
+    category: "noise",
+    harmonicRatios: [0.8, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1],
+    attackMs: [100, 500],
+    decayShape: "sustained",
+    spectralEnvelope: "warm",
+    fundamentalRange: [20, 5000],
+    inharmonicity: 0.95,
+  },
+  {
+    name: "Rain / Water",
+    category: "noise",
+    harmonicRatios: [0.3, 0.4, 0.6, 0.8, 1.0, 0.7, 0.4],
+    attackMs: [1, 10],
+    decayShape: "struck",
+    spectralEnvelope: "bright",
+    fundamentalRange: [500, 15000],
+    inharmonicity: 1.0,
+  },
+  {
+    name: "Room Tone / Hum",
+    category: "noise",
+    harmonicRatios: [1.0, 0.8, 0.3, 0.1],
+    attackMs: [200, 1000],
+    decayShape: "sustained",
+    spectralEnvelope: "hollow",
+    fundamentalRange: [50, 300],
+    inharmonicity: 0.7,
+  },
+  {
+    name: "Electrical Hum (60Hz)",
+    category: "noise",
+    harmonicRatios: [1.0, 0.5, 0.3, 0.2, 0.15, 0.1],
+    attackMs: [0, 0],
+    decayShape: "sustained",
+    spectralEnvelope: "hollow",
+    fundamentalRange: [55, 65],
+    inharmonicity: 0.05,
+  },
+  {
+    name: "Clap / Body Percussion",
+    category: "percussion",
+    harmonicRatios: [0.5, 0.7, 1.0, 0.8, 0.5, 0.3],
+    attackMs: [1, 5],
+    decayShape: "struck",
+    spectralEnvelope: "sharp",
+    fundamentalRange: [500, 5000],
+    inharmonicity: 0.9,
+  },
+  {
+    name: "Organ",
+    category: "keys",
+    harmonicRatios: [1.0, 1.0, 0.7, 0.7, 0.5, 0.5, 0.3, 0.3],
+    attackMs: [10, 50],
+    decayShape: "sustained",
+    spectralEnvelope: "hollow",
+    fundamentalRange: [50, 4000],
+    inharmonicity: 0.005,
+  },
+  {
+    name: "Cello",
+    category: "string",
+    harmonicRatios: [1.0, 0.9, 0.7, 0.55, 0.4, 0.3, 0.2, 0.15],
+    attackMs: [40, 200],
+    decayShape: "sustained",
+    spectralEnvelope: "warm",
+    fundamentalRange: [65, 1000],
+    inharmonicity: 0.01,
+  },
+  {
+    name: "Harp",
+    category: "string",
+    harmonicRatios: [1.0, 0.5, 0.3, 0.15, 0.08, 0.04],
+    attackMs: [3, 15],
+    decayShape: "plucked",
+    spectralEnvelope: "bright",
+    fundamentalRange: [30, 3400],
+    inharmonicity: 0.02,
+  },
+  {
+    name: "Whistle",
+    category: "wind",
+    harmonicRatios: [1.0, 0.05, 0.02],
+    attackMs: [20, 80],
+    decayShape: "blown",
+    spectralEnvelope: "breathy",
+    fundamentalRange: [500, 4000],
+    inharmonicity: 0.005,
+  },
+];
+
+interface ToneAnalysisResult {
+  binIndex: number;
+  freq: number;
+  hex: string;
+  matchedTone: string;
+  category: string;
+  confidence: number;
+  harmonicScore: number;
+  inharmonicityScore: number;
+  spectralShape: string;
+  colorMerge: { tones: string[]; ratios: number[] } | null;
+}
+
+let toneAnalysisHistory: ToneAnalysisResult[][] = [];
+const TONE_HISTORY_SIZE = 30;
+
+function analyzeTones(amplitudes: number[]): ToneAnalysisResult[] {
+  const results: ToneAnalysisResult[] = [];
+  const binWidth = SPECTRAL_MAX_FREQ / SPECTRAL_BINS;
+
+  const peakBins: { index: number; amp: number; freq: number }[] = [];
+  for (let i = 2; i < SPECTRAL_BINS - 2; i++) {
+    const amp = (amplitudes[i] || 0) / 255;
+    if (amp > 0.05 &&
+        amp >= ((amplitudes[i - 1] || 0) / 255) &&
+        amp >= ((amplitudes[i + 1] || 0) / 255)) {
+      peakBins.push({ index: i, amp, freq: spectralColorMap[i].freqCenter });
+    }
+  }
+
+  peakBins.sort((a, b) => b.amp - a.amp);
+  const candidateFundamentals = peakBins.slice(0, 30);
+
+  for (const fund of candidateFundamentals) {
+    const scores: { sig: ToneSignature; score: number; harmScore: number }[] = [];
+
+    for (const sig of TONE_SIGNATURES) {
+      if (fund.freq < sig.fundamentalRange[0] * 0.8 || fund.freq > sig.fundamentalRange[1] * 1.2) continue;
+
+      let harmonicMatch = 0;
+      let harmonicTotal = 0;
+
+      for (let h = 1; h < sig.harmonicRatios.length; h++) {
+        const expectedFreq = fund.freq * (h + 1);
+        const expectedBin = Math.round(expectedFreq / binWidth);
+        if (expectedBin >= SPECTRAL_BINS) break;
+
+        const expectedRatio = sig.harmonicRatios[h];
+        const actualAmp = (amplitudes[expectedBin] || 0) / 255;
+        const actualRatio = fund.amp > 0 ? actualAmp / fund.amp : 0;
+
+        const diff = Math.abs(actualRatio - expectedRatio);
+        const match = Math.max(0, 1 - diff * 2);
+        harmonicMatch += match * expectedRatio;
+        harmonicTotal += expectedRatio;
+      }
+
+      const harmScore = harmonicTotal > 0 ? harmonicMatch / harmonicTotal : 0;
+
+      let freqFit = 1.0;
+      const freqRange = sig.fundamentalRange[1] - sig.fundamentalRange[0];
+      if (fund.freq >= sig.fundamentalRange[0] && fund.freq <= sig.fundamentalRange[1]) {
+        freqFit = 1.0;
+      } else {
+        const dist = fund.freq < sig.fundamentalRange[0]
+          ? sig.fundamentalRange[0] - fund.freq
+          : fund.freq - sig.fundamentalRange[1];
+        freqFit = Math.max(0, 1 - dist / (freqRange * 0.3));
+      }
+
+      let inharmonicCheck = 0;
+      if (sig.inharmonicity > 0.5) {
+        let nonHarmonicEnergy = 0;
+        let totalCheckBins = 0;
+        for (let b = fund.index + 1; b < Math.min(fund.index + 40, SPECTRAL_BINS); b++) {
+          const bAmp = (amplitudes[b] || 0) / 255;
+          if (bAmp > 0.03) {
+            const ratio = b / fund.index;
+            const isHarmonic = Math.abs(ratio - Math.round(ratio)) < 0.08;
+            if (!isHarmonic) nonHarmonicEnergy += bAmp;
+            totalCheckBins++;
+          }
+        }
+        inharmonicCheck = totalCheckBins > 0 ? nonHarmonicEnergy / totalCheckBins : 0;
+      }
+
+      const totalScore = harmScore * 0.55 + freqFit * 0.3 + (sig.inharmonicity > 0.5 ? inharmonicCheck * 0.15 : harmScore * 0.15);
+      scores.push({ sig, score: totalScore, harmScore });
+    }
+
+    scores.sort((a, b) => b.score - a.score);
+    const best = scores[0];
+    const second = scores[1];
+
+    if (best && best.score > 0.15) {
+      let colorMerge: ToneAnalysisResult["colorMerge"] = null;
+      if (second && second.score > best.score * 0.6 && second.sig.category !== best.sig.category) {
+        colorMerge = {
+          tones: [best.sig.name, second.sig.name],
+          ratios: [
+            Math.round((best.score / (best.score + second.score)) * 100) / 100,
+            Math.round((second.score / (best.score + second.score)) * 100) / 100,
+          ],
+        };
+      }
+
+      results.push({
+        binIndex: fund.index,
+        freq: fund.freq,
+        hex: spectralColorMap[fund.index].hex,
+        matchedTone: best.sig.name,
+        category: best.sig.category,
+        confidence: Math.round(best.score * 100) / 100,
+        harmonicScore: Math.round(best.harmScore * 100) / 100,
+        inharmonicityScore: Math.round(best.sig.inharmonicity * 100) / 100,
+        spectralShape: best.sig.spectralEnvelope,
+        colorMerge,
+      });
+    }
+  }
+
+  results.sort((a, b) => b.confidence - a.confidence);
+
+  toneAnalysisHistory.push(results);
+  if (toneAnalysisHistory.length > TONE_HISTORY_SIZE) {
+    toneAnalysisHistory = toneAnalysisHistory.slice(-TONE_HISTORY_SIZE);
+  }
+
+  return results;
+}
+
+function getTemporalToneProfile(): Record<string, { count: number; avgConf: number; freqRange: [number, number] }> {
+  const profile: Record<string, { count: number; totalConf: number; minFreq: number; maxFreq: number }> = {};
+
+  for (const frame of toneAnalysisHistory) {
+    for (const t of frame) {
+      if (!profile[t.matchedTone]) {
+        profile[t.matchedTone] = { count: 0, totalConf: 0, minFreq: t.freq, maxFreq: t.freq };
+      }
+      profile[t.matchedTone].count++;
+      profile[t.matchedTone].totalConf += t.confidence;
+      if (t.freq < profile[t.matchedTone].minFreq) profile[t.matchedTone].minFreq = t.freq;
+      if (t.freq > profile[t.matchedTone].maxFreq) profile[t.matchedTone].maxFreq = t.freq;
+    }
+  }
+
+  const result: Record<string, { count: number; avgConf: number; freqRange: [number, number] }> = {};
+  for (const [name, data] of Object.entries(profile)) {
+    result[name] = {
+      count: data.count,
+      avgConf: Math.round((data.totalConf / data.count) * 100) / 100,
+      freqRange: [Math.round(data.minFreq), Math.round(data.maxFreq)],
+    };
+  }
+  return result;
+}
+
 router.get("/omnimens/spectral-color/map", async (req, res) => {
   if (!req.isAuthenticated() || !isOwner(req.user.id)) {
     res.status(403).json({ error: "Owner only" });
@@ -4950,12 +5399,33 @@ router.post("/omnimens/spectral-color/update-amplitudes", async (req, res) => {
       gainApplied: spectralColorMap[b.index].gain,
     }));
 
+  const toneResults = analyzeTones(amplitudes);
+
+  const decompositionWithTones = decomposition.map(d => {
+    const tone = toneResults.find(t => Math.abs(t.freq - d.freq) < (SPECTRAL_MAX_FREQ / SPECTRAL_BINS) * 1.5);
+    return {
+      ...d,
+      tone: tone ? {
+        name: tone.matchedTone,
+        category: tone.category,
+        confidence: tone.confidence,
+        spectralShape: tone.spectralShape,
+        colorMerge: tone.colorMerge,
+      } : null,
+    };
+  });
+
   res.json({
     filteredAmplitudes,
     significantBins,
     totalEnergy,
     activeBins: activeBins.slice(0, 20),
-    decomposition,
+    decomposition: decompositionWithTones,
+    toneAnalysis: {
+      detected: toneResults.length,
+      tones: toneResults.slice(0, 20),
+      temporalProfile: getTemporalToneProfile(),
+    },
   });
 });
 
@@ -5045,6 +5515,473 @@ router.post("/omnimens/spectral-color/omnimens-sculpt", async (req, res) => {
       gain: spectralColorMap[a.bin].gain,
       color: spectralColorMap[a.bin].color,
     })),
+  });
+});
+
+// ─── ATOMIC LAYER DECOMPOSITION ENGINE ─────────────────────────────────────────
+// Every sound is an onion — multiple layers stacked together:
+//   Layer 1: Fundamental (base pitch, the note itself)
+//   Layer 2: Harmonic Overtones (2x, 3x, 4x — timbre/tone character)
+//   Layer 3: Formant Resonances (vocal tract shape, vowel identity)
+//   Layer 4: Vibrato (rhythmic pitch modulation)
+//   Layer 5: Noise/Breath (air, consonant texture, bow noise)
+//   Layer 6: Attack Transient (initial strike, pluck, consonant onset)
+// Each layer has its own unique color identity and can be peeled off independently.
+
+interface AtomicLayer {
+  layerType: "fundamental" | "harmonic" | "formant" | "vibrato" | "noise" | "transient";
+  layerName: string;
+  bins: number[];
+  hexColors: string[];
+  frequencies: number[];
+  energyRatio: number;
+  description: string;
+}
+
+interface AtomicDecomposition {
+  sourceTone: string;
+  sourceCategory: string;
+  fundamentalFreq: number;
+  fundamentalHex: string;
+  totalLayers: number;
+  layers: AtomicLayer[];
+}
+
+function atomicDecompose(amplitudes: number[]): AtomicDecomposition[] {
+  const results: AtomicDecomposition[] = [];
+  const binWidth = SPECTRAL_MAX_FREQ / SPECTRAL_BINS;
+  const tones = analyzeTones(amplitudes);
+
+  const usedBins = new Set<number>();
+
+  for (const tone of tones.slice(0, 10)) {
+    if (usedBins.has(tone.binIndex)) continue;
+
+    const layers: AtomicLayer[] = [];
+    const fundAmp = (amplitudes[tone.binIndex] || 0) / 255;
+    let totalEnergy = fundAmp;
+
+    // LAYER 1: FUNDAMENTAL
+    const fundBins = [tone.binIndex];
+    for (const offset of [-1, 1]) {
+      const b = tone.binIndex + offset;
+      if (b >= 0 && b < SPECTRAL_BINS && (amplitudes[b] || 0) / 255 > fundAmp * 0.3) {
+        fundBins.push(b);
+      }
+    }
+    fundBins.forEach(b => usedBins.add(b));
+
+    layers.push({
+      layerType: "fundamental",
+      layerName: "Fundamental Pitch",
+      bins: fundBins,
+      hexColors: fundBins.map(b => spectralColorMap[b].hex),
+      frequencies: fundBins.map(b => spectralColorMap[b].freqCenter),
+      energyRatio: fundAmp,
+      description: `Base note at ${tone.freq.toFixed(0)}Hz — the pitch you hear`,
+    });
+
+    // LAYER 2: HARMONIC OVERTONES
+    const harmonicBins: number[] = [];
+    const harmonicFreqs: number[] = [];
+    let harmonicEnergy = 0;
+    for (let h = 2; h <= 16; h++) {
+      const expectedFreq = tone.freq * h;
+      const expectedBin = Math.round(expectedFreq / binWidth);
+      if (expectedBin >= SPECTRAL_BINS) break;
+
+      for (const offset of [-1, 0, 1]) {
+        const b = expectedBin + offset;
+        if (b >= 0 && b < SPECTRAL_BINS && !usedBins.has(b)) {
+          const bAmp = (amplitudes[b] || 0) / 255;
+          if (bAmp > 0.02) {
+            harmonicBins.push(b);
+            harmonicFreqs.push(spectralColorMap[b].freqCenter);
+            harmonicEnergy += bAmp;
+            usedBins.add(b);
+            break;
+          }
+        }
+      }
+    }
+
+    if (harmonicBins.length > 0) {
+      totalEnergy += harmonicEnergy;
+      layers.push({
+        layerType: "harmonic",
+        layerName: "Harmonic Overtones",
+        bins: harmonicBins,
+        hexColors: harmonicBins.map(b => spectralColorMap[b].hex),
+        frequencies: harmonicFreqs,
+        energyRatio: harmonicEnergy,
+        description: `${harmonicBins.length} overtone${harmonicBins.length > 1 ? "s" : ""} — defines the tone/timbre (what makes ${tone.matchedTone} sound like ${tone.matchedTone})`,
+      });
+    }
+
+    // LAYER 3: FORMANT RESONANCES (vocals and some instruments)
+    const sig = TONE_SIGNATURES.find(s => s.name === tone.matchedTone);
+    if (sig?.formantPeaks) {
+      const formantBins: number[] = [];
+      const formantFreqs: number[] = [];
+      let formantEnergy = 0;
+
+      for (const fFreq of sig.formantPeaks) {
+        const fBin = Math.round(fFreq / binWidth);
+        for (const offset of [-2, -1, 0, 1, 2]) {
+          const b = fBin + offset;
+          if (b >= 0 && b < SPECTRAL_BINS && !usedBins.has(b)) {
+            const bAmp = (amplitudes[b] || 0) / 255;
+            if (bAmp > 0.01) {
+              formantBins.push(b);
+              formantFreqs.push(spectralColorMap[b].freqCenter);
+              formantEnergy += bAmp;
+              usedBins.add(b);
+              break;
+            }
+          }
+        }
+      }
+
+      if (formantBins.length > 0) {
+        totalEnergy += formantEnergy;
+        layers.push({
+          layerType: "formant",
+          layerName: "Formant Resonances",
+          bins: formantBins,
+          hexColors: formantBins.map(b => spectralColorMap[b].hex),
+          frequencies: formantFreqs,
+          energyRatio: formantEnergy,
+          description: `${formantBins.length} resonance peak${formantBins.length > 1 ? "s" : ""} — vocal tract shape / body resonance`,
+        });
+      }
+    }
+
+    // LAYER 4: VIBRATO DETECTION
+    // With 256 bins at 22050Hz (binWidth ~86Hz), vibrato rate (4-8Hz) is sub-bin resolution.
+    // Detect vibrato by spectral spreading: bins immediately adjacent to fundamental with
+    // moderate energy (10-60% of fundamental) suggest frequency modulation / wobble.
+    const vibratoBins: number[] = [];
+    let vibratoEnergy = 0;
+
+    for (const offset of [-2, -1, 1, 2]) {
+      const vBin = tone.binIndex + offset;
+      if (vBin >= 0 && vBin < SPECTRAL_BINS && !usedBins.has(vBin)) {
+        const vAmp = (amplitudes[vBin] || 0) / 255;
+        if (vAmp > fundAmp * 0.1 && vAmp < fundAmp * 0.6) {
+          vibratoBins.push(vBin);
+          vibratoEnergy += vAmp;
+          usedBins.add(vBin);
+        }
+      }
+    }
+
+    if (vibratoBins.length >= 2) {
+      totalEnergy += vibratoEnergy;
+      layers.push({
+        layerType: "vibrato",
+        layerName: "Vibrato Modulation",
+        bins: vibratoBins,
+        hexColors: vibratoBins.map(b => spectralColorMap[b].hex),
+        frequencies: vibratoBins.map(b => spectralColorMap[b].freqCenter),
+        energyRatio: vibratoEnergy,
+        description: `Pitch wobble sidebands — the expressive vibrato movement`,
+      });
+    }
+
+    // LAYER 5: NOISE/BREATH
+    // Broadband noise in the higher frequencies (breath, bow noise, pick scrape)
+    const noiseBins: number[] = [];
+    let noiseEnergy = 0;
+    const noiseFloor = 0.015;
+
+    for (let b = Math.round(4000 / binWidth); b < SPECTRAL_BINS; b++) {
+      if (usedBins.has(b)) continue;
+      const bAmp = (amplitudes[b] || 0) / 255;
+      if (bAmp > noiseFloor && bAmp < fundAmp * 0.3) {
+        const ratio = b / tone.binIndex;
+        const isHarmonic = Math.abs(ratio - Math.round(ratio)) < 0.05;
+        if (!isHarmonic) {
+          noiseBins.push(b);
+          noiseEnergy += bAmp;
+          usedBins.add(b);
+        }
+      }
+    }
+
+    if (noiseBins.length > 2) {
+      totalEnergy += noiseEnergy;
+      layers.push({
+        layerType: "noise",
+        layerName: "Breath / Noise Texture",
+        bins: noiseBins.slice(0, 20),
+        hexColors: noiseBins.slice(0, 20).map(b => spectralColorMap[b].hex),
+        frequencies: noiseBins.slice(0, 20).map(b => spectralColorMap[b].freqCenter),
+        energyRatio: noiseEnergy,
+        description: `${noiseBins.length} noise component${noiseBins.length > 1 ? "s" : ""} — air, breath, pick/bow texture`,
+      });
+    }
+
+    // LAYER 6: ATTACK TRANSIENTS
+    // Transients show as brief broadband energy spikes in lower-mid frequencies
+    // We detect by checking for energy in non-harmonic bins near the fundamental
+    const transientBins: number[] = [];
+    let transientEnergy = 0;
+
+    for (let b = Math.max(1, tone.binIndex - 15); b < Math.min(SPECTRAL_BINS, tone.binIndex + 15); b++) {
+      if (usedBins.has(b)) continue;
+      const bAmp = (amplitudes[b] || 0) / 255;
+      if (bAmp > noiseFloor) {
+        const ratio = (b * binWidth) / tone.freq;
+        const isHarmonic = Math.abs(ratio - Math.round(ratio)) < 0.08;
+        if (!isHarmonic) {
+          transientBins.push(b);
+          transientEnergy += bAmp;
+          usedBins.add(b);
+        }
+      }
+    }
+
+    if (transientBins.length > 0) {
+      totalEnergy += transientEnergy;
+      layers.push({
+        layerType: "transient",
+        layerName: "Attack Transient",
+        bins: transientBins,
+        hexColors: transientBins.map(b => spectralColorMap[b].hex),
+        frequencies: transientBins.map(b => spectralColorMap[b].freqCenter),
+        energyRatio: transientEnergy,
+        description: `${transientBins.length} transient component${transientBins.length > 1 ? "s" : ""} — initial onset/attack character`,
+      });
+    }
+
+    // Normalize energy ratios
+    if (totalEnergy > 0) {
+      for (const layer of layers) {
+        layer.energyRatio = Math.round((layer.energyRatio / totalEnergy) * 1000) / 1000;
+      }
+    }
+
+    results.push({
+      sourceTone: tone.matchedTone,
+      sourceCategory: tone.category,
+      fundamentalFreq: tone.freq,
+      fundamentalHex: tone.hex,
+      totalLayers: layers.length,
+      layers,
+    });
+  }
+
+  // NOISE DECOMPOSITION — bins not claimed by any tonal source
+  // Even "white noise" has layers: low rumble, mid wash, high hiss, transient crackle
+  const unclaimedBins: { bin: number; amp: number }[] = [];
+  for (let i = 0; i < SPECTRAL_BINS; i++) {
+    if (usedBins.has(i)) continue;
+    const amp = (amplitudes[i] || 0) / 255;
+    if (amp > 0.01) {
+      unclaimedBins.push({ bin: i, amp });
+    }
+  }
+
+  if (unclaimedBins.length > 3) {
+    const noiseLayers: AtomicLayer[] = [];
+    let noiseTotalEnergy = 0;
+
+    const bands = [
+      { name: "Sub Rumble", type: "noise" as const, min: 0, max: 60, desc: "Deep vibration — felt more than heard" },
+      { name: "Low Resonance", type: "noise" as const, min: 60, max: 250, desc: "Body resonance, room tone, mechanical hum" },
+      { name: "Mid Wash", type: "noise" as const, min: 250, max: 2000, desc: "Broad mid-range ambient texture" },
+      { name: "Presence Texture", type: "noise" as const, min: 2000, max: 5000, desc: "Detail texture, surface character" },
+      { name: "High Hiss", type: "noise" as const, min: 5000, max: 12000, desc: "Air, hiss, sibilance, high-frequency friction" },
+      { name: "Ultra Shimmer", type: "noise" as const, min: 12000, max: 22050, desc: "Ultra-high sparkle, electronic artifacts" },
+    ];
+
+    for (const band of bands) {
+      const bandBins = unclaimedBins.filter(u => {
+        const freq = spectralColorMap[u.bin].freqCenter;
+        return freq >= band.min && freq < band.max;
+      });
+      if (bandBins.length > 0) {
+        const energy = bandBins.reduce((s, b) => s + b.amp, 0);
+        noiseTotalEnergy += energy;
+        noiseLayers.push({
+          layerType: "noise",
+          layerName: band.name,
+          bins: bandBins.map(b => b.bin),
+          hexColors: bandBins.map(b => spectralColorMap[b.bin].hex),
+          frequencies: bandBins.map(b => spectralColorMap[b.bin].freqCenter),
+          energyRatio: energy,
+          description: `${bandBins.length} bin${bandBins.length > 1 ? "s" : ""} (${band.min}–${band.max}Hz) — ${band.desc}`,
+        });
+      }
+    }
+
+    // Check for transient noise spikes (sudden energy in random bins)
+    const avgNoiseAmp = unclaimedBins.reduce((s, b) => s + b.amp, 0) / unclaimedBins.length;
+    const spikeBins = unclaimedBins.filter(b => b.amp > avgNoiseAmp * 3);
+    if (spikeBins.length > 0) {
+      const spikeEnergy = spikeBins.reduce((s, b) => s + b.amp, 0);
+      noiseTotalEnergy += spikeEnergy;
+      noiseLayers.push({
+        layerType: "transient",
+        layerName: "Noise Transients",
+        bins: spikeBins.map(b => b.bin),
+        hexColors: spikeBins.map(b => spectralColorMap[b.bin].hex),
+        frequencies: spikeBins.map(b => spectralColorMap[b.bin].freqCenter),
+        energyRatio: spikeEnergy,
+        description: `${spikeBins.length} transient spike${spikeBins.length > 1 ? "s" : ""} — crackle, pop, impact micro-events`,
+      });
+    }
+
+    if (noiseTotalEnergy > 0) {
+      for (const nl of noiseLayers) {
+        nl.energyRatio = Math.round((nl.energyRatio / noiseTotalEnergy) * 1000) / 1000;
+      }
+    }
+
+    if (noiseLayers.length > 0) {
+      results.push({
+        sourceTone: "Ambient / Noise Floor",
+        sourceCategory: "noise",
+        fundamentalFreq: 0,
+        fundamentalHex: "#555555",
+        totalLayers: noiseLayers.length,
+        layers: noiseLayers,
+      });
+    }
+  }
+
+  return results;
+}
+
+router.post("/omnimens/spectral-color/atomic-decompose", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  const { amplitudes } = req.body;
+  if (!Array.isArray(amplitudes)) {
+    res.status(400).json({ error: "amplitudes must be number array" });
+    return;
+  }
+
+  const decompositions = atomicDecompose(amplitudes);
+
+  const allLayers: { type: string; count: number; totalBins: number }[] = [];
+  const layerTypes = new Set<string>();
+  for (const d of decompositions) {
+    for (const l of d.layers) {
+      layerTypes.add(l.layerType);
+    }
+  }
+  for (const lt of layerTypes) {
+    const matching = decompositions.flatMap(d => d.layers.filter(l => l.layerType === lt));
+    allLayers.push({
+      type: lt,
+      count: matching.length,
+      totalBins: matching.reduce((s, l) => s + l.bins.length, 0),
+    });
+  }
+
+  res.json({
+    decompositions,
+    summary: {
+      totalSources: decompositions.length,
+      totalLayers: decompositions.reduce((s, d) => s + d.totalLayers, 0),
+      layerBreakdown: allLayers,
+    },
+    toneProfile: getTemporalToneProfile(),
+  });
+});
+
+router.post("/omnimens/spectral-color/isolate-layer", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  const { amplitudes, targetTone, targetLayer, mode } = req.body;
+  if (!Array.isArray(amplitudes)) {
+    res.status(400).json({ error: "amplitudes required" });
+    return;
+  }
+
+  const decompositions = atomicDecompose(amplitudes);
+  const adjustments: { bin: number; gain: number }[] = [];
+  let reason = "";
+
+  const allLayerBins = new Set<number>();
+  const targetBins = new Set<number>();
+
+  for (const d of decompositions) {
+    for (const l of d.layers) {
+      for (const b of l.bins) {
+        allLayerBins.add(b);
+        const toneMatch = !targetTone || d.sourceTone === targetTone;
+        const layerMatch = !targetLayer || l.layerType === targetLayer;
+        if (toneMatch && layerMatch) {
+          targetBins.add(b);
+        }
+      }
+    }
+  }
+
+  if (mode === "isolate") {
+    reason = `Isolating ${targetLayer || "all layers"} from ${targetTone || "all tones"} — boosting target, muting everything else`;
+    for (let i = 0; i < SPECTRAL_BINS; i++) {
+      if (targetBins.has(i)) {
+        adjustments.push({ bin: i, gain: 1.8 });
+      } else {
+        adjustments.push({ bin: i, gain: 0.02 });
+      }
+    }
+  } else if (mode === "remove") {
+    reason = `Removing ${targetLayer || "all layers"} from ${targetTone || "all tones"} — muting target, preserving everything else`;
+    for (let i = 0; i < SPECTRAL_BINS; i++) {
+      if (targetBins.has(i)) {
+        adjustments.push({ bin: i, gain: 0.0 });
+      } else {
+        adjustments.push({ bin: i, gain: 1.0 });
+      }
+    }
+  } else {
+    reason = `Solo: ${targetLayer || "all"} of ${targetTone || "all"} — all other layers reduced`;
+    for (let i = 0; i < SPECTRAL_BINS; i++) {
+      if (targetBins.has(i)) {
+        adjustments.push({ bin: i, gain: 2.0 });
+      } else if (allLayerBins.has(i)) {
+        adjustments.push({ bin: i, gain: 0.3 });
+      } else {
+        adjustments.push({ bin: i, gain: 0.1 });
+      }
+    }
+  }
+
+  for (const adj of adjustments) {
+    spectralColorMap[adj.bin].gain = Math.round(adj.gain * 1000) / 1000;
+  }
+
+  if (adjustments.length > 0) {
+    spectralSculptHistory.push({
+      timestamp: Date.now(),
+      bins: adjustments.map(a => a.bin),
+      gains: adjustments.map(a => a.gain),
+      reason,
+    });
+  }
+
+  const adjustedGains = new Array(SPECTRAL_BINS).fill(1.0);
+  for (const adj of adjustments) {
+    adjustedGains[adj.bin] = adj.gain;
+  }
+
+  res.json({
+    mode,
+    targetTone: targetTone || "all",
+    targetLayer: targetLayer || "all",
+    reason,
+    adjusted: adjustments.length,
+    targetBinCount: targetBins.size,
+    adjustedGains,
+    decompositions,
   });
 });
 

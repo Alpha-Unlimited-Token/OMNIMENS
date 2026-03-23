@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-22T23:08:52.595Z
+ * Written: 2026-03-23T00:17:08.804Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,70 +16,48 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentWords(text, topN) {
-    if (typeof text !== 'string' || typeof topN !== 'number' || topN <= 0) {
-        throw new Error('Invalid input: text must be a string and topN must be a positive number.');
+function extractKeyPhrases(text) {
+    // Extract key phrases from a given text using simple pattern matching
+    const phrases = [];
+    const regex = /\[([^\]]+)\]/g; // Matches text inside square brackets
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+        phrases.push(match[1]);
     }
 
-    // Normalize text: remove punctuation and convert to lowercase
-    const normalizedText = text.toLowerCase().replace(/[^a-z\s]/g, '');
-
-    // Split text into words
-    const words = normalizedText.split(/\s+/).filter(word => word.length > 0);
-
-    // Count word frequencies
-    const wordCounts = {};
-    for (const word of words) {
-        wordCounts[word] = (wordCounts[word] || 0) + 1;
-    }
-
-    // Sort words by frequency and extract the top N
-    const sortedWords = Object.entries(wordCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, topN)
-        .map(entry => ({ word: entry[0], count: entry[1] }));
-
-    return sortedWords;
+    return phrases;
 }
 
-// Self-tests
-function runTests() {
-    console.log('Running tests...');
+// Test cases
+console.log("Running test cases...");
 
-    // Test case 1: Basic functionality
-    const text1 = "Hello world! Hello again, world. Hello!";
-    const result1 = findMostFrequentWords(text1, 2);
-    console.log(result1); // Expected: [{ word: 'hello', count: 3 }, { word: 'world', count: 2 }]
+// Test with provided context
+const context = `[tool_graphviz] Integrating with Web Applications: Render graphs in web apps using 'viz.js' for client-side rendering: 'var g = Viz('digraph { A -> B; 
+[tool_ffmpeg] Waveform visualization: Use \`ffmpeg -i input.mp3 -filter_complex "showwavespic=s=600x120" -frames:v 1 output.png\` to create 
+[tool_tesseract_ocr] Integrating with other libraries: Combine with NumPy for array manipulations: \`import numpy as np; image_array = np.array(image); proc
+[tool_tesseract_ocr] Improving accuracy with upscaling: Upscale images before OCR: \`upscaled = cv2.resize(image, None, fx=2, fy=2, interpolation=cv2.INTER_C
+[digital_navigation] Digital Navigation Wisdom — Cycle 1: In the digital realm, minimizing latency is key to enhancing user experience and operational efficie
+[tool_pdfplumber] Optimize extraction with settings: Pass \`table_settings\` to \`extract_tables()\`: \`page.extract_tables(table_settings={'vertical_strategy
+[tool_pdfplumber] Filter extracted tables: Use list comprehensions to filter tables: \`filtered_tables = [table for table in tables if len(table
+[tool_pdfplumber] Handle multi-page PDFs: Loop through pages with \`for page in pdf.pages:\` and call \`page.extract_tables()\` for each page to g`;
 
-    // Test case 2: Edge case - empty text
-    const text2 = "";
-    const result2 = findMostFrequentWords(text2, 3);
-    console.log(result2); // Expected: []
+const phrases = extractKeyPhrases(context);
+console.log("Extracted phrases:", phrases);
 
-    // Test case 3: Edge case - topN larger than unique words
-    const text3 = "AI AI AI machine learning";
-    const result3 = findMostFrequentWords(text3, 10);
-    console.log(result3); // Expected: [{ word: 'ai', count: 3 }, { word: 'machine', count: 1 }, { word: 'learning', count: 1 }]
+// Edge case: Empty string
+console.log("Test empty string:", extractKeyPhrases(""));
 
-    // Test case 4: Edge case - text with special characters
-    const text4 = "Data, data, data! Science; science.";
-    const result4 = findMostFrequentWords(text4, 2);
-    console.log(result4); // Expected: [{ word: 'data', count: 3 }, { word: 'science', count: 2 }]
+// Edge case: No brackets
+console.log("Test no brackets:", extractKeyPhrases("This is a test without any brackets."));
 
-    // Test case 5: Invalid input
-    try {
-        findMostFrequentWords(12345, 2);
-    } catch (error) {
-        console.log(error.message); // Expected: "Invalid input: text must be a string and topN must be a positive number."
-    }
+// Edge case: Nested brackets (should only extract outermost)
+console.log("Test nested brackets:", extractKeyPhrases("This [contains [nested] brackets] example."));
 
-    try {
-        findMostFrequentWords("Valid text", -1);
-    } catch (error) {
-        console.log(error.message); // Expected: "Invalid input: text must be a string and topN must be a positive number."
-    }
+// Edge case: Multiple brackets in a single line
+console.log("Test multiple brackets:", extractKeyPhrases("Here are [multiple] brackets [in one] line."));
 
-    console.log('Tests completed.');
-}
+// Edge case: Special characters inside brackets
+console.log("Test special characters:", extractKeyPhrases("Special [!@#$%^&*()] characters inside brackets."));
 
-runTests();
+console.log("All test cases completed.");
