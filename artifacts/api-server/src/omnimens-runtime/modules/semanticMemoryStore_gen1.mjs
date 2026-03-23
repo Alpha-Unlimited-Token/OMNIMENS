@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: semanticMemoryStore
- * Written: 2026-03-22T18:58:40.734Z
+ * Written: 2026-03-23T21:56:43.885Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,121 +20,82 @@
 
 /**
  * @module semanticMemoryStore
- * @description Retains conversational memory by storing semantic embeddings of context in memory,
- * periodically summarizing older context to compress and retain relevance.
+ * @description Implements an in-memory vector store for fast semantic search and retrieval using cosine similarity.
  */
 
 /**
- * Generates a semantic embedding for a given text input using a simplified vectorization algorithm.
- * @param {string} text - The input text to be embedded.
- * @returns {number[]} - A fixed-length vector representing the semantic embedding of the text.
+ * Calculates the cosine similarity between two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} - The cosine similarity score between vectorA and vectorB.
  */
-export function generateEmbedding(text) {
-  const normalizedText = text.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim();
-  const words = normalizedText.split(" ");
-  const vectorLength = 128;
-  const embedding = new Array(vectorLength).fill(0);
-
-  for (const word of words) {
-    const hash = crypto.createHash("md5").update(word).digest("hex");
-    for (let i = 0; i < vectorLength; i++) {
-      embedding[i] += parseInt(hash[i % hash.length], 16);
-    }
+function cosineSimilarity(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error("Vectors must have the same length.");
   }
 
-  const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
-  return embedding.map((val) => val / magnitude);
-}
+  const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
 
-/**
- * Calculates the cosine similarity between two semantic embeddings.
- * @param {number[]} embeddingA - The first embedding vector.
- * @param {number[]} embeddingB - The second embedding vector.
- * @returns {number} - The cosine similarity score between the two embeddings.
- */
-export function calculateSimilarity(embeddingA, embeddingB) {
-  if (embeddingA.length !== embeddingB.length) {
-    throw new Error("Embedding vectors must have the same length.");
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    return 0; // Avoid division by zero; treat as no similarity.
   }
-
-  const dotProduct = embeddingA.reduce((sum, val, idx) => sum + val * embeddingB[idx], 0);
-  const magnitudeA = Math.sqrt(embeddingA.reduce((sum, val) => sum + val * val, 0));
-  const magnitudeB = Math.sqrt(embeddingB.reduce((sum, val) => sum + val * val, 0));
 
   return dotProduct / (magnitudeA * magnitudeB);
 }
 
 /**
- * Summarizes a list of text entries by selecting the most relevant based on semantic similarity.
- * @param {string[]} texts - An array of text entries to summarize.
- * @returns {string} - A summarized text combining the most relevant entries.
+ * Creates a semantic memory store for fast vector-based search.
+ * @returns {object} - An object with methods to add, search, and retrieve vectors.
  */
-export function summarizeContext(texts) {
-  if (texts.length === 0) return "";
+function createSemanticMemoryStore() {
+  const store = new Map();
 
-  const embeddings = texts.map(generateEmbedding);
-  const similarityMatrix = embeddings.map((embeddingA) =>
-    embeddings.map((embeddingB) => calculateSimilarity(embeddingA, embeddingB))
-  );
-
-  const relevanceScores = similarityMatrix.map((row) => row.reduce((sum, val) => sum + val, 0));
-  const mostRelevantIndex = relevanceScores.indexOf(Math.max(...relevanceScores));
-
-  return texts[mostRelevantIndex];
-}
-
-/**
- * Stores and manages semantic memory in a simple in-memory database.
- */
-export class SemanticMemoryStore {
-  constructor() {
-    this.memory = [];
+  /**
+   * Adds a vector with an associated key to the store.
+   * @param {string} key - The unique identifier for the vector.
+   * @param {number[]} vector - The vector to store.
+   */
+  function addVector(key, vector) {
+    if (!Array.isArray(vector) || vector.some(isNaN)) {
+      throw new Error("Vector must be an array of numbers.");
+    }
+    store.set(key, vector);
   }
 
   /**
-   * Adds a new text entry to the memory store.
-   * @param {string} text - The text to add to the memory.
+   * Searches the store for the most similar vectors to the query vector.
+   * @param {number[]} queryVector - The vector to search for.
+   * @param {number} topK - The number of top results to return.
+   * @returns {Array<{key: string, similarity: number}>} - An array of objects containing keys and similarity scores.
    */
-  addMemory(text) {
-    this.memory.push({ text, embedding: generateEmbedding(text) });
-  }
-
-  /**
-   * Retrieves the most relevant memory entry based on a given query.
-   * @param {string} query - The query text to search for relevant memory.
-   * @returns {string} - The most relevant memory entry.
-   */
-  retrieveMemory(query) {
-    const queryEmbedding = generateEmbedding(query);
-    let bestMatch = null;
-    let bestScore = -Infinity;
-
-    for (const { text, embedding } of this.memory) {
-      const score = calculateSimilarity(queryEmbedding, embedding);
-      if (score > bestScore) {
-        bestScore = score;
-        bestMatch = text;
-      }
+  function search(queryVector, topK = 5) {
+    if (!Array.isArray(queryVector) || queryVector.some(isNaN)) {
+      throw new Error("Query vector must be an array of numbers.");
     }
 
-    return bestMatch || "No relevant memory found.";
+    const results = [];
+
+    for (const [key, vector] of store.entries()) {
+      const similarity = cosineSimilarity(queryVector, vector);
+      results.push({ key, similarity });
+    }
+
+    results.sort((a, b) => b.similarity - a.similarity);
+    return results.slice(0, topK);
   }
 
   /**
-   * Periodically summarizes older memory to compress and retain relevance.
+   * Retrieves a vector by its key.
+   * @param {string} key - The key of the vector to retrieve.
+   * @returns {number[] | undefined} - The vector associated with the key, or undefined if not found.
    */
-  summarizeMemory() {
-    const texts = this.memory.map((entry) => entry.text);
-    const summarizedText = summarizeContext(texts);
-    this.memory = [{ text: summarizedText, embedding: generateEmbedding(summarizedText) }];
+  function getVector(key) {
+    return store.get(key);
   }
+
+  return { addVector, search, getVector };
 }
 
-/**
- * Example usage:
- * const memoryStore = new SemanticMemoryStore();
- * memoryStore.addMemory("Hello world!");
- * memoryStore.addMemory("How are you?");
- * console.log(memoryStore.retrieveMemory("Greetings"));
- * memoryStore.summarizeMemory();
- */
+export { cosineSimilarity, createSemanticMemoryStore };

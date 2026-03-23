@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-03-23T15:58:27.984Z
+ * Written: 2026-03-23T21:06:22.737Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,140 +16,99 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Complete ES module code here, starting with /** JSDoc */ and exports
-
 /**
  * @module inMemoryVectorStore
- * @description Efficient in-memory storage and retrieval of semantically similar embeddings using k-d tree algorithm.
+ * @description Provides fast semantic search and context retention using in-memory embeddings.
  */
 
 /**
- * Represents a node in the k-d tree.
- * @class KDTreeNode
+ * @typedef {Object} VectorStore
+ * @property {Array<number[]>} vectors - Array of stored vectors.
+ * @property {Array<string>} metadata - Metadata associated with each vector.
  */
-class KDTreeNode {
-  /**
-   * @param {number[]} point - The vector point stored in this node.
-   * @param {*} value - The associated value for the vector.
-   * @param {number} depth - The depth of the node in the tree.
-   */
-  constructor(point, value, depth = 0) {
-    this.point = point;
-    this.value = value;
-    this.depth = depth;
-    this.left = null;
-    this.right = null;
-  }
+
+/**
+ * @typedef {Object} SearchResult
+ * @property {string} metadata - Metadata of the closest vector.
+ * @property {number} similarity - Cosine similarity score.
+ */
+
+/**
+ * Computes the cosine similarity between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} Cosine similarity score.
+ */
+function cosineSimilarity(vectorA, vectorB) {
+  const dotProduct = vectorA.reduce((sum, value, index) => sum + value * vectorB[index], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, value) => sum + value ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, value) => sum + value ** 2, 0));
+  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
 }
 
 /**
- * Represents a k-d tree for efficient nearest neighbor search.
- * @class KDTree
+ * Creates a new in-memory vector store.
+ * @returns {VectorStore} A new vector store object.
  */
-class KDTree {
-  constructor() {
-    this.root = null;
-  }
-
-  /**
-   * Inserts a point and its associated value into the k-d tree.
-   * @param {number[]} point - The vector point to insert.
-   * @param {*} value - The associated value for the vector.
-   */
-  insert(point, value) {
-    const insertRec = (node, point, value, depth) => {
-      if (!node) return new KDTreeNode(point, value, depth);
-
-      const axis = depth % point.length;
-
-      if (point[axis] < node.point[axis]) {
-        node.left = insertRec(node.left, point, value, depth + 1);
-      } else {
-        node.right = insertRec(node.right, point, value, depth + 1);
-      }
-
-      return node;
-    };
-
-    this.root = insertRec(this.root, point, value, 0);
-  }
-
-  /**
-   * Finds the nearest neighbor to the given point.
-   * @param {number[]} target - The target vector point.
-   * @returns {{point: number[], value: *, distance: number}} The nearest neighbor.
-   */
-  findNearest(target) {
-    let best = { node: null, distance: Infinity };
-
-    const distanceFunction = (a, b) => {
-      return Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0));
-    };
-
-    const searchRec = (node, target, depth) => {
-      if (!node) return;
-
-      const axis = depth % target.length;
-      const distance = distanceFunction(node.point, target);
-
-      if (distance < best.distance) {
-        best = { node, distance };
-      }
-
-      const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
-      const oppositeBranch = target[axis] < node.point[axis] ? node.right : node.left;
-
-      searchRec(nextBranch, target, depth + 1);
-
-      if (Math.abs(target[axis] - node.point[axis]) < best.distance) {
-        searchRec(oppositeBranch, target, depth + 1);
-      }
-    };
-
-    searchRec(this.root, target, 0);
-
-    return {
-      point: best.node.point,
-      value: best.node.value,
-      distance: best.distance
-    };
-  }
+function createVectorStore() {
+  return {
+    vectors: [],
+    metadata: []
+  };
 }
 
 /**
- * In-memory vector store using k-d tree for efficient semantic similarity search.
+ * Adds a vector and its associated metadata to the store.
+ * @param {VectorStore} store - The vector store.
+ * @param {number[]} vector - The vector to add.
+ * @param {string} metadata - Metadata associated with the vector.
  */
-class InMemoryVectorStore {
-  constructor() {
-    this.tree = new KDTree();
+function addVector(store, vector, metadata) {
+  if (!Array.isArray(vector) || typeof metadata !== 'string') {
+    throw new Error('Invalid input: vector must be an array and metadata must be a string.');
   }
-
-  /**
-   * Adds a vector and its associated value to the store.
-   * @param {number[]} vector - The vector to store.
-   * @param {*} value - The associated value.
-   */
-  add(vector, value) {
-    this.tree.insert(vector, value);
-  }
-
-  /**
-   * Retrieves the most semantically similar vector and its value.
-   * @param {number[]} queryVector - The query vector.
-   * @returns {{vector: number[], value: *, distance: number}} The nearest neighbor.
-   */
-  search(queryVector) {
-    const result = this.tree.findNearest(queryVector);
-    return {
-      vector: result.point,
-      value: result.value,
-      distance: result.distance
-    };
-  }
+  store.vectors.push(vector);
+  store.metadata.push(metadata);
 }
 
 /**
- * Exports the InMemoryVectorStore class.
- * @type {InMemoryVectorStore}
+ * Searches for the closest vector in the store using cosine similarity.
+ * @param {VectorStore} store - The vector store.
+ * @param {number[]} queryVector - The query vector.
+ * @returns {SearchResult|null} The closest vector's metadata and similarity score, or null if the store is empty.
  */
-export default InMemoryVectorStore;
+function searchVector(store, queryVector) {
+  if (!Array.isArray(queryVector)) {
+    throw new Error('Invalid input: queryVector must be an array.');
+  }
+  if (store.vectors.length === 0) {
+    return null;
+  }
+
+  let bestMatch = null;
+  let highestSimilarity = -Infinity;
+
+  for (let i = 0; i < store.vectors.length; i++) {
+    const similarity = cosineSimilarity(queryVector, store.vectors[i]);
+    if (similarity > highestSimilarity) {
+      highestSimilarity = similarity;
+      bestMatch = store.metadata[i];
+    }
+  }
+
+  return {
+    metadata: bestMatch,
+    similarity: highestSimilarity
+  };
+}
+
+/**
+ * Clears all vectors and metadata from the store.
+ * @param {VectorStore} store - The vector store.
+ */
+function clearStore(store) {
+  store.vectors.length = 0;
+  store.metadata.length = 0;
+}
+
+export { createVectorStore, addVector, searchVector, clearStore };
