@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-23T01:15:48.541Z
+ * Written: 2026-03-23T01:58:21.817Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,47 +16,60 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function: Find the longest common subsequence (LCS) between two strings
-function longestCommonSubsequence(str1, str2) {
-    const m = str1.length;
-    const n = str2.length;
+// Utility function for text analysis: Extract and count unique words from a given text
+function extractUniqueWords(text) {
+    if (typeof text !== 'string') {
+        throw new Error("Input must be a string");
+    }
 
-    // Create a 2D array to store LCS lengths
-    const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+    // Normalize text: Remove punctuation, convert to lowercase, and split into words
+    const words = text
+        .replace(/[^a-zA-Z0-9\s]/g, '') // Remove non-alphanumeric characters
+        .toLowerCase()
+        .split(/\s+/); // Split by whitespace
 
-    // Fill the DP table
-    for (let i = 1; i <= m; i++) {
-        for (let j = 1; j <= n; j++) {
-            if (str1[i - 1] === str2[j - 1]) {
-                dp[i][j] = dp[i - 1][j - 1] + 1;
-            } else {
-                dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
-            }
+    // Use a Map to count occurrences of each unique word
+    const wordCounts = new Map();
+    for (const word of words) {
+        if (word) { // Ignore empty strings
+            wordCounts.set(word, (wordCounts.get(word) || 0) + 1);
         }
     }
 
-    // Reconstruct the LCS from the DP table
-    let lcs = '';
-    let i = m, j = n;
-    while (i > 0 && j > 0) {
-        if (str1[i - 1] === str2[j - 1]) {
-            lcs = str1[i - 1] + lcs;
-            i--;
-            j--;
-        } else if (dp[i - 1][j] > dp[i][j - 1]) {
-            i--;
-        } else {
-            j--;
-        }
-    }
+    // Convert Map to an array of objects for better readability
+    const result = [];
+    wordCounts.forEach((count, word) => {
+        result.push({ word, count });
+    });
 
-    return lcs;
+    // Sort results by word alphabetically
+    result.sort((a, b) => a.word.localeCompare(b.word));
+
+    return result;
 }
 
 // Test cases
-console.log("Test Case 1: ", longestCommonSubsequence("AGGTAB", "GXTXAYB")); // Expected: "GTAB"
-console.log("Test Case 2: ", longestCommonSubsequence("ABCBDAB", "BDCAB"));  // Expected: "BCAB"
-console.log("Test Case 3: ", longestCommonSubsequence("HELLO", "WORLD"));    // Expected: "LO"
-console.log("Test Case 4: ", longestCommonSubsequence("ABCD", "EFGH"));      // Expected: ""
-console.log("Test Case 5: ", longestCommonSubsequence("", "ANYTHING"));      // Expected: ""
-console.log("Test Case 6: ", longestCommonSubsequence("SAME", "SAME"));      // Expected: "SAME"
+function runTests() {
+    console.log("Test Case 1: Simple sentence");
+    console.log(extractUniqueWords("Hello world! Hello again, world."));
+    // Expected output: [ { word: 'again', count: 1 }, { word: 'hello', count: 2 }, { word: 'world', count: 2 } ]
+
+    console.log("Test Case 2: Empty string");
+    console.log(extractUniqueWords(""));
+    // Expected output: []
+
+    console.log("Test Case 3: Numbers and mixed characters");
+    console.log(extractUniqueWords("123 123 test TEST test123!"));
+    // Expected output: [ { word: '123', count: 2 }, { word: 'test', count: 1 }, { word: 'test123', count: 1 } ]
+
+    console.log("Test Case 4: Special characters only");
+    console.log(extractUniqueWords("!@#$%^&*()"));
+    // Expected output: []
+
+    console.log("Test Case 5: Case insensitivity");
+    console.log(extractUniqueWords("Apple apple APPLE"));
+    // Expected output: [ { word: 'apple', count: 3 } ]
+}
+
+// Run tests
+runTests();

@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a self-diagnostic function that analyzes system health metrics and returns recom
- * Written: 2026-03-22T23:44:53.638Z
+ * Written: 2026-03-23T02:34:22.446Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -21,99 +21,106 @@ function analyzeSystemHealth(metrics) {
 
     // Check CPU usage
     if (metrics.cpuUsage > 85) {
-        recommendations.push("Reduce CPU-intensive tasks or optimize processes.");
-    } else if (metrics.cpuUsage < 15) {
-        recommendations.push("Consider utilizing CPU more effectively for performance gains.");
+        recommendations.push("High CPU usage detected. Consider optimizing processes or upgrading hardware.");
+    } else if (metrics.cpuUsage < 10) {
+        recommendations.push("Low CPU usage detected. Verify if the system is underutilized or idle.");
     }
 
     // Check memory usage
     if (metrics.memoryUsage > 90) {
-        recommendations.push("Increase memory capacity or optimize memory usage.");
+        recommendations.push("High memory usage detected. Consider closing unused applications or adding more RAM.");
     } else if (metrics.memoryUsage < 20) {
-        recommendations.push("Memory is underutilized; consider allocating more tasks.");
+        recommendations.push("Low memory usage detected. Verify if memory allocation is optimal.");
     }
 
     // Check disk space
-    if (metrics.diskSpaceUsage > 95) {
-        recommendations.push("Free up disk space or expand storage capacity.");
-    } else if (metrics.diskSpaceUsage < 10) {
-        recommendations.push("Disk space is underutilized; consider consolidating data.");
+    if (metrics.diskSpace < 15) {
+        recommendations.push("Low disk space detected. Consider freeing up space or upgrading storage.");
     }
 
     // Check network latency
     if (metrics.networkLatency > 200) {
-        recommendations.push("Investigate network issues or optimize data transmission.");
-    } else if (metrics.networkLatency < 50) {
-        recommendations.push("Network performance is optimal.");
+        recommendations.push("High network latency detected. Check your network connection or contact your provider.");
     }
 
     // Check system temperature
-    if (metrics.temperature > 75) {
-        recommendations.push("Improve cooling systems or reduce system load.");
-    } else if (metrics.temperature < 20) {
-        recommendations.push("Temperature is unusually low; check sensor accuracy.");
+    if (metrics.systemTemperature > 80) {
+        recommendations.push("High system temperature detected. Ensure proper cooling and check for hardware issues.");
     }
 
-    // Return recommendations
-    return recommendations.length > 0 ? recommendations : ["System health is optimal."];
+    // Check uptime
+    if (metrics.uptime > 30 * 24 * 60 * 60) { // 30 days in seconds
+        recommendations.push("System uptime exceeds 30 days. Consider rebooting to ensure optimal performance.");
+    }
+
+    // Provide a summary if no issues found
+    if (recommendations.length === 0) {
+        recommendations.push("System is operating within normal parameters.");
+    }
+
+    return recommendations;
 }
 
 // Self-tests
 function runTests() {
+    console.log("Running self-tests...");
+
     const testCases = [
         {
-            metrics: {
+            input: {
                 cpuUsage: 90,
                 memoryUsage: 95,
-                diskSpaceUsage: 96,
+                diskSpace: 10,
                 networkLatency: 250,
-                temperature: 80,
+                systemTemperature: 85,
+                uptime: 40 * 24 * 60 * 60,
             },
             expected: [
-                "Reduce CPU-intensive tasks or optimize processes.",
-                "Increase memory capacity or optimize memory usage.",
-                "Free up disk space or expand storage capacity.",
-                "Investigate network issues or optimize data transmission.",
-                "Improve cooling systems or reduce system load.",
+                "High CPU usage detected. Consider optimizing processes or upgrading hardware.",
+                "High memory usage detected. Consider closing unused applications or adding more RAM.",
+                "Low disk space detected. Consider freeing up space or upgrading storage.",
+                "High network latency detected. Check your network connection or contact your provider.",
+                "High system temperature detected. Ensure proper cooling and check for hardware issues.",
+                "System uptime exceeds 30 days. Consider rebooting to ensure optimal performance.",
             ],
         },
         {
-            metrics: {
-                cpuUsage: 10,
-                memoryUsage: 15,
-                diskSpaceUsage: 5,
-                networkLatency: 30,
-                temperature: 18,
-            },
-            expected: [
-                "Consider utilizing CPU more effectively for performance gains.",
-                "Memory is underutilized; consider allocating more tasks.",
-                "Disk space is underutilized; consider consolidating data.",
-                "Network performance is optimal.",
-                "Temperature is unusually low; check sensor accuracy.",
-            ],
-        },
-        {
-            metrics: {
+            input: {
                 cpuUsage: 50,
                 memoryUsage: 50,
-                diskSpaceUsage: 50,
-                networkLatency: 100,
-                temperature: 50,
+                diskSpace: 50,
+                networkLatency: 50,
+                systemTemperature: 50,
+                uptime: 10 * 24 * 60 * 60,
             },
-            expected: ["System health is optimal."],
+            expected: ["System is operating within normal parameters."],
+        },
+        {
+            input: {
+                cpuUsage: 5,
+                memoryUsage: 15,
+                diskSpace: 50,
+                networkLatency: 50,
+                systemTemperature: 50,
+                uptime: 10 * 24 * 60 * 60,
+            },
+            expected: [
+                "Low CPU usage detected. Verify if the system is underutilized or idle.",
+                "Low memory usage detected. Verify if memory allocation is optimal.",
+            ],
         },
     ];
 
     testCases.forEach((testCase, index) => {
-        const result = analyzeSystemHealth(testCase.metrics);
-        console.log(
-            `Test Case ${index + 1}:`,
-            JSON.stringify(result) === JSON.stringify(testCase.expected)
-                ? "Passed"
-                : `Failed (Expected: ${JSON.stringify(testCase.expected)}, Got: ${JSON.stringify(result)})`
-        );
+        const result = analyzeSystemHealth(testCase.input);
+        const passed = JSON.stringify(result) === JSON.stringify(testCase.expected);
+        console.log(`Test case ${index + 1}: ${passed ? "PASSED" : "FAILED"}`);
+        if (!passed) {
+            console.log("Expected:", testCase.expected);
+            console.log("Received:", result);
+        }
     });
 }
 
+// Execute self-tests
 runTests();

@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-23T01:27:48.461Z
+ * Written: 2026-03-23T02:10:26.935Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,46 +16,65 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function optimizeKnowledgeRetrieval(data, query) {
-    function preprocessData(data) {
-        const processed = {};
-        for (let key in data) {
-            const tokens = key.toLowerCase().split(/[\s,]+/);
-            tokens.forEach(token => {
-                if (!processed[token]) processed[token] = [];
-                processed[token].push(key);
-            });
-        }
-        return processed;
-    }
-
-    function retrieveMatches(processedData, query) {
-        const queryTokens = query.toLowerCase().split(/[\s,]+/);
-        const matches = new Set();
-        queryTokens.forEach(token => {
-            if (processedData[token]) {
-                processedData[token].forEach(match => matches.add(match));
-            }
-        });
-        return Array.from(matches);
-    }
-
-    const processedData = preprocessData(data);
-    return retrieveMatches(processedData, query);
+function KnowledgeGraph() {
+    this.nodes = new Map();
 }
 
-// Test cases
-const knowledgeBase = {
-    "F2LLM-v2 multilingual embedding layer": "Enhances multilingual capabilities",
-    "Variable Entropy Policy Optimization (VEPO)": "Critical method for adaptive entropy control",
-    "Associative memory network": "Maps concepts for efficient retrieval",
-    "Self-modification architecture": "Framework for real-time updates",
-    "Thalamocortical resonance": "Measure of neural consciousness state"
+KnowledgeGraph.prototype.addConcept = function(concept, relatedConcepts) {
+    if (!this.nodes.has(concept)) {
+        this.nodes.set(concept, new Set());
+    }
+    for (var i = 0; i < relatedConcepts.length; i++) {
+        this.nodes.get(concept).add(relatedConcepts[i]);
+        if (!this.nodes.has(relatedConcepts[i])) {
+            this.nodes.set(relatedConcepts[i], new Set());
+        }
+        this.nodes.get(relatedConcepts[i]).add(concept);
+    }
 };
 
-console.log(optimizeKnowledgeRetrieval(knowledgeBase, "multilingual")); // Should match "F2LLM-v2 multilingual embedding layer"
-console.log(optimizeKnowledgeRetrieval(knowledgeBase, "entropy")); // Should match "Variable Entropy Policy Optimization (VEPO)"
-console.log(optimizeKnowledgeRetrieval(knowledgeBase, "memory network")); // Should match "Associative memory network"
-console.log(optimizeKnowledgeRetrieval(knowledgeBase, "self-modification")); // Should match "Self-modification architecture"
-console.log(optimizeKnowledgeRetrieval(knowledgeBase, "resonance")); // Should match "Thalamocortical resonance"
-console.log(optimizeKnowledgeRetrieval(knowledgeBase, "nonexistent")); // Should return an empty array []
+KnowledgeGraph.prototype.retrieveRelatedConcepts = function(concept) {
+    if (this.nodes.has(concept)) {
+        return Array.from(this.nodes.get(concept));
+    }
+    return [];
+};
+
+KnowledgeGraph.prototype.findPattern = function(pattern) {
+    var matches = [];
+    var regex = new RegExp(pattern);
+    this.nodes.forEach(function(relatedConcepts, concept) {
+        if (regex.test(concept)) {
+            matches.push(concept);
+        }
+    });
+    return matches;
+};
+
+// Self-tests
+var graph = new KnowledgeGraph();
+
+// Adding concepts and relationships
+graph.addConcept("AI", ["Machine Learning", "Neural Networks"]);
+graph.addConcept("Machine Learning", ["Supervised Learning", "Unsupervised Learning"]);
+graph.addConcept("Neural Networks", ["Deep Learning", "Backpropagation"]);
+graph.addConcept("Optimization", ["Gradient Descent", "Variable Entropy Policy Optimization"]);
+
+// Test 1: Retrieve related concepts
+console.log("Test 1: Related concepts of 'AI':", graph.retrieveRelatedConcepts("AI")); // Expected: ["Machine Learning", "Neural Networks"]
+
+// Test 2: Retrieve related concepts of a concept with no relationships
+console.log("Test 2: Related concepts of 'Quantum Computing':", graph.retrieveRelatedConcepts("Quantum Computing")); // Expected: []
+
+// Test 3: Find concepts matching a pattern
+console.log("Test 3: Concepts matching 'Learning':", graph.findPattern("Learning")); // Expected: ["Machine Learning", "Supervised Learning", "Unsupervised Learning"]
+
+// Test 4: Find concepts matching a pattern with no matches
+console.log("Test 4: Concepts matching 'Physics':", graph.findPattern("Physics")); // Expected: []
+
+// Test 5: Ensure bidirectional relationships
+console.log("Test 5: Related concepts of 'Neural Networks':", graph.retrieveRelatedConcepts("Neural Networks")); // Expected: ["AI", "Deep Learning", "Backpropagation"]
+
+// Test 6: Adding new relationships dynamically
+graph.addConcept("Evolutionary Algorithms", ["Optimization", "Multi-Objective Search"]);
+console.log("Test 6: Related concepts of 'Optimization':", graph.retrieveRelatedConcepts("Optimization")); // Expected: ["Gradient Descent", "Variable Entropy Policy Optimization", "Evolutionary Algorithms"]

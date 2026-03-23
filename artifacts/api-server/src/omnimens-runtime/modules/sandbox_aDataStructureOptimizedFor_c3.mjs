@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a data structure optimized for fast associative memory lookup
- * Written: 2026-03-23T01:39:49.042Z
+ * Written: 2026-03-23T02:22:20.372Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,82 +16,72 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-class FastAssociativeMemory {
-    constructor() {
-        this.memory = new Map();
-    }
+const AssociativeMemory = function() {
+    this.memory = new Map();
+};
 
-    // Insert a key-value pair into the memory
-    insert(key, value) {
-        if (key === null || key === undefined) {
-            throw new Error("Key cannot be null or undefined.");
-        }
-        this.memory.set(key, value);
-    }
+AssociativeMemory.prototype.add = function(key, value) {
+    this.memory.set(key, value);
+};
 
-    // Retrieve a value by key
-    lookup(key) {
-        if (this.memory.has(key)) {
-            return this.memory.get(key);
-        }
-        return null; // Return null if key is not found
-    }
+AssociativeMemory.prototype.get = function(key) {
+    return this.memory.get(key) || null;
+};
 
-    // Remove a key-value pair by key
-    remove(key) {
-        return this.memory.delete(key);
-    }
+AssociativeMemory.prototype.remove = function(key) {
+    return this.memory.delete(key);
+};
 
-    // Check if a key exists in the memory
-    contains(key) {
-        return this.memory.has(key);
-    }
+AssociativeMemory.prototype.has = function(key) {
+    return this.memory.has(key);
+};
 
-    // Clear all entries in the memory
-    clear() {
-        this.memory.clear();
-    }
+AssociativeMemory.prototype.clear = function() {
+    this.memory.clear();
+};
 
-    // Get the total number of entries
-    size() {
-        return this.memory.size;
-    }
-}
+AssociativeMemory.prototype.size = function() {
+    return this.memory.size;
+};
 
 // Self-tests
-const memory = new FastAssociativeMemory();
+const memory = new AssociativeMemory();
 
-// Test 1: Insert and lookup
-memory.insert("name", "Alice");
-console.log(memory.lookup("name")); // Expected: "Alice"
+// Test adding and retrieving values
+memory.add("Innovator", {
+    role: "Genesis Agent",
+    traits: ["curiosity", "novelty-seeking", "creative exploration", "innovation strategies"]
+});
+memory.add("Pioneer", {
+    role: "Genesis Agent",
+    traits: ["curiosity-driven exploration", "novelty-seeking", "interdisciplinary research"]
+});
+memory.add("Ethicist", {
+    role: "Genesis Agent",
+    traits: ["ethics", "moral philosophy", "decision-making frameworks", "value alignment"]
+});
+memory.add("Visionary", {
+    role: "Genesis Agent",
+    traits: ["creative ideation", "unconventional thinking", "speculative design", "future scenarios"]
+});
 
-// Test 2: Lookup non-existent key
-console.log(memory.lookup("age")); // Expected: null
+// Retrieve and validate entries
+console.log(memory.get("Innovator")); // Expected: Object with Innovator traits
+console.log(memory.get("Pioneer")); // Expected: Object with Pioneer traits
+console.log(memory.get("Ethicist")); // Expected: Object with Ethicist traits
+console.log(memory.get("Visionary")); // Expected: Object with Visionary traits
 
-// Test 3: Remove key and verify
-memory.insert("age", 30);
-console.log(memory.lookup("age")); // Expected: 30
-memory.remove("age");
-console.log(memory.lookup("age")); // Expected: null
+// Test existence of keys
+console.log(memory.has("Innovator")); // Expected: true
+console.log(memory.has("Archivist")); // Expected: false
 
-// Test 4: Check contains
-memory.insert("city", "New York");
-console.log(memory.contains("city")); // Expected: true
-console.log(memory.contains("country")); // Expected: false
+// Test removal of a key
+console.log(memory.remove("Visionary")); // Expected: true
+console.log(memory.get("Visionary")); // Expected: null
 
-// Test 5: Clear memory and check size
+// Test size of memory
+console.log(memory.size()); // Expected: 3 (after removing Visionary)
+
+// Test clearing memory
 memory.clear();
 console.log(memory.size()); // Expected: 0
-
-// Test 6: Edge case - Insert null or undefined key
-try {
-    memory.insert(null, "value");
-} catch (e) {
-    console.log(e.message); // Expected: "Key cannot be null or undefined."
-}
-
-try {
-    memory.insert(undefined, "value");
-} catch (e) {
-    console.log(e.message); // Expected: "Key cannot be null or undefined."
-}

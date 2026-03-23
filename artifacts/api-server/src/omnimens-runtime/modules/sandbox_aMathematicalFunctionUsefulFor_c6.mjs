@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a mathematical function useful for confidence scoring, probability estimation, o
- * Written: 2026-03-23T00:08:54.234Z
+ * Written: 2026-03-23T02:58:21.878Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,12 +16,20 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function calculateConfidenceInterval(mean, stdDev, sampleSize, zScore) {
-    if (sampleSize <= 0 || stdDev < 0 || zScore < 0) {
-        throw new Error("Invalid input values. Ensure sample size > 0, standard deviation >= 0, and z-score >= 0.");
+function calculateConfidenceInterval(mean, standardDeviation, sampleSize, confidenceLevel) {
+    // Z-scores for common confidence levels
+    const zScores = {
+        0.90: 1.645,
+        0.95: 1.96,
+        0.99: 2.576
+    };
+
+    if (!zScores[confidenceLevel]) {
+        throw new Error("Unsupported confidence level. Use 0.90, 0.95, or 0.99.");
     }
 
-    const marginOfError = zScore * (stdDev / Math.sqrt(sampleSize));
+    const zScore = zScores[confidenceLevel];
+    const marginOfError = zScore * (standardDeviation / Math.sqrt(sampleSize));
     const lowerBound = mean - marginOfError;
     const upperBound = mean + marginOfError;
 
@@ -32,38 +40,30 @@ function calculateConfidenceInterval(mean, stdDev, sampleSize, zScore) {
     };
 }
 
-// Test cases
+// Self-tests
 function runTests() {
-    // Test 1: Basic test
-    let result = calculateConfidenceInterval(50, 10, 100, 1.96);
-    console.log("Test 1:", result); // Expected: lowerBound and upperBound around 48.04 and 51.96
+    console.log("Running tests...");
 
-    // Test 2: Small sample size
-    result = calculateConfidenceInterval(100, 15, 10, 1.96);
-    console.log("Test 2:", result); // Expected: wider interval due to small sample size
+    // Test 1: Sample data
+    const result1 = calculateConfidenceInterval(100, 15, 30, 0.95);
+    console.log("Test 1:", result1);
 
-    // Test 3: Zero standard deviation
-    result = calculateConfidenceInterval(75, 0, 50, 1.96);
-    console.log("Test 3:", result); // Expected: lowerBound and upperBound both equal 75
+    // Test 2: Edge case with small sample size
+    const result2 = calculateConfidenceInterval(50, 10, 5, 0.90);
+    console.log("Test 2:", result2);
 
-    // Test 4: Large sample size
-    result = calculateConfidenceInterval(200, 20, 1000, 1.96);
-    console.log("Test 4:", result); // Expected: very narrow interval due to large sample size
+    // Test 3: High confidence level
+    const result3 = calculateConfidenceInterval(200, 25, 50, 0.99);
+    console.log("Test 3:", result3);
 
-    // Test 5: Invalid inputs
+    // Test 4: Unsupported confidence level
     try {
-        result = calculateConfidenceInterval(50, -10, 100, 1.96);
-        console.log("Test 5: Failed (should throw error)");
+        calculateConfidenceInterval(100, 20, 40, 0.85);
     } catch (e) {
-        console.log("Test 5: Passed (error thrown as expected)");
+        console.log("Test 4 (expected error):", e.message);
     }
 
-    try {
-        result = calculateConfidenceInterval(50, 10, -100, 1.96);
-        console.log("Test 6: Failed (should throw error)");
-    } catch (e) {
-        console.log("Test 6: Passed (error thrown as expected)");
-    }
+    console.log("Tests completed.");
 }
 
 runTests();

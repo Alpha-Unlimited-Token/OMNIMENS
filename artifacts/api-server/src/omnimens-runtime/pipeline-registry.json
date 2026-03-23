@@ -2335,11 +2335,10 @@
       "stage": "vector_operations",
       "exports": [
         "multiplyMatrices",
-        "dotProduct",
-        "scalarMultiply",
-        "transposeMatrix"
+        "addVectors",
+        "dotProduct"
       ],
-      "loadedAt": 1774230861756,
+      "loadedAt": 1774231235156,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -2472,10 +2471,11 @@
       "filename": "contextSummarizer_gen1.mjs",
       "stage": "context_compression",
       "exports": [
-        "calculateAttentionScores",
+        "generateEmbedding",
+        "cosineSimilarity",
         "summarizeConversation"
       ],
-      "loadedAt": 1774230861628,
+      "loadedAt": 1774231242549,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -6274,9 +6274,37 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "theWildIdeaSymphonicSwarmMemoryBuildAn.mjs": {
+      "filename": "theWildIdeaSymphonicSwarmMemoryBuildAn.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "vectorToChord",
+        "dissonance",
+        "harmonise"
+      ],
+      "loadedAt": 1774231098893,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "inventionNameAdaptiveMicropolicyMorphograph.mjs": {
+      "filename": "inventionNameAdaptiveMicropolicyMorphograph.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "AMPM"
+      ],
+      "loadedAt": 1774231105095,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774230861767,
-  "totalModules": 309,
+  "totalModules": 311,
   "totalCalls": 0
 }
