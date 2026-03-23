@@ -484,6 +484,30 @@ export async function runSynapticMeshCycle(): Promise<void> {
     if (cascadeCount > 0) {
       console.log(`[SYNAPTIC MESH] ⚡ ${cascadeCount} cascade event(s) — intelligence spreading through the neural network!`);
     }
+
+    const highRelevanceDeliveries = successfulDeliveries.filter(d => d.relevance >= 0.75);
+    if (highRelevanceDeliveries.length > 0) {
+      try {
+        const { initiateInterAgentConversation } = await import("./omnimens-consciousness-bus.js");
+        const topDelivery = highRelevanceDeliveries[0];
+        const conversationParticipants = ALL_AGENTS
+          .filter(a => a !== topDelivery.fromAgent && a !== topDelivery.toAgent)
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 2);
+
+        console.log(`[SYNAPTIC MESH] ⚡ Triggering inter-agent dialogue: ${topDelivery.fromAgent} + ${topDelivery.toAgent} + ${conversationParticipants.join(", ")}`);
+
+        await initiateInterAgentConversation(
+          topDelivery.fromAgent,
+          [topDelivery.toAgent, ...conversationParticipants],
+          `Synapse insight: ${topDelivery.translatedInsight.slice(0, 80)}`,
+          `A synapse transfer revealed: "${topDelivery.translatedInsight}". The proposed cross-upgrade is: "${topDelivery.crossUpgradeProposal}". What do you think? Can we develop this further or combine it with something else?`,
+          openai,
+        );
+      } catch (err) {
+        console.error("[SYNAPTIC MESH] Inter-agent dialogue trigger error:", err);
+      }
+    }
   }
 
   const elapsed = ((Date.now() - cycleStart) / 1000).toFixed(1);

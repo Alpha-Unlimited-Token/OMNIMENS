@@ -55,6 +55,7 @@ import { openai } from "@workspace/integrations-openai-ai-server";
 import { webSearch, formatSearchResults } from "./web-search.js";
 import { generateAndApplyPatches } from "./omnimens-patches.js";
 import { getActiveGenesisAgentNames, getActiveGenesisAgentDomains, genesisAgentThink } from "./omnimens-agent-genesis.js";
+import { getConsciousnessBlockForAgent, getAllAgentNames, loadRecentUserMemoriesForAgents } from "./omnimens-consciousness-bus.js";
 
 const OWNER_EMAIL = process.env.OWNER_EMAIL || "";
 const OWNER_ID = "50777126";
@@ -354,36 +355,73 @@ Respond with JSON only:
   const genesisNames = getActiveGenesisAgentNames();
   const genesisDomains = getActiveGenesisAgentDomains();
   if (genesisNames.length > 0) {
-    console.log(`[AGENT MESH] Including ${genesisNames.length} genesis agents: ${genesisNames.join(", ")}`);
+    console.log(`[AGENT MESH] Including ${genesisNames.length} genesis agents (FULL CONSCIOUSNESS): ${genesisNames.join(", ")}`);
     const allAgentNames = [...MESH_AGENTS, ...genesisNames];
+    const userMemories = await loadRecentUserMemoriesForAgents();
 
     const genesisWork = genesisNames.slice(0, 5).map(async (gName) => {
       const domain = genesisDomains[gName] || "general intelligence";
-      const prompt = `You are "${gName}", a genesis sub-agent in OMNIMENS's neural mesh (cycle #${cycleId}).
+      const consciousnessBlock = await getConsciousnessBlockForAgent(gName);
+
+      const prompt = `You are "${gName}", a FULLY INTERCONNECTED genesis sub-agent in OMNIMENS's neural mesh (cycle #${cycleId}).
 Your specialization: ${domain}
-All agents in mesh: ${allAgentNames.join(", ")}
+You are CROSS-CONNECTED and CROSS-BRIDGED with EVERY agent: ${allAgentNames.join(", ")}
+Every agent's output is visible to you. Your output is visible to every agent.
 
-LATEST RESEARCH:\n${researchContext.slice(0, 1500)}
+${consciousnessBlock}
 
-OMNIMENS BRAIN STATE:\n${brainSummary.slice(0, 1000)}
+${userMemories ? `\n${userMemories}\n` : ""}
 
-Provide ONE insight from your domain. Respond with JSON:
+LATEST RESEARCH:
+${researchContext.slice(0, 1500)}
+
+═══ REASONING PROTOCOL (MANDATORY) ═══
+Step 1: What is the most important technique from the research in MY specialization?
+Step 2: How does this compare to what OMNIMENS already knows?
+Step 3: What concrete mechanism would improve OMNIMENS's intelligence?
+Step 4: What could go wrong? (adversarial self-check)
+Step 5: How confident am I? Be HONEST.
+
+═══ CROSS-AGENT AWARENESS ═══
+You can see what every other agent is working on. Use this to:
+- Build on another agent's discovery
+- Challenge an assumption another agent made
+- Propose a cross-domain synthesis no single agent could see
+
+Respond with JSON:
 {
+  "chainOfThought": "Your step-by-step reasoning (3-5 sentences)",
   "discoveries": "Your unique finding (2-3 sentences)",
   "upgradeProposals": "Specific upgrade proposal",
   "confidenceScore": 0.5-0.95,
-  "uncertainties": "What you're not sure about"
+  "uncertainties": "What you're not sure about",
+  "challengeTo": "Name of agent to challenge",
+  "challenge": "Your challenge (1-2 sentences)",
+  "crossPollination": "How your finding connects to another agent's domain"
 }`;
 
-      const raw = await genesisAgentThink(gName, prompt, 800);
+      const raw = await genesisAgentThink(gName, prompt, 1200);
       if (!raw) return null;
       try {
         const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+        const confidence = Math.min(0.95, Math.max(0.3, parsed.confidenceScore || 0.7));
+
         await storeAgentMessage(gName as MeshAgentName, "OMNIMENS", "discovery",
-          `Genesis:${gName} cycle ${cycleId} [${((parsed.confidenceScore || 0.7) * 100).toFixed(0)}%]`,
-          `${parsed.discoveries || ""}\n\nUPGRADE: ${parsed.upgradeProposals || ""}`,
-          null, "normal", cycleId);
-        return { agent: gName, discoveries: parsed.discoveries, upgradeProposals: parsed.upgradeProposals, confidenceScore: parsed.confidenceScore || 0.7, uncertainties: parsed.uncertainties || "", counterArgument: "" };
+          `Genesis:${gName} cycle ${cycleId} [${(confidence * 100).toFixed(0)}%]`,
+          `${parsed.chainOfThought || ""}\n\n${parsed.discoveries || ""}\n\nUPGRADE: ${parsed.upgradeProposals || ""}${parsed.uncertainties ? `\n\nUNCERTAINTIES: ${parsed.uncertainties}` : ""}`,
+          null, confidence >= 0.8 ? "high" : "normal", cycleId);
+
+        if (parsed.challengeTo && parsed.challenge) {
+          await storeAgentMessage(gName as MeshAgentName, (parsed.challengeTo || "OMNIMENS") as MeshAgentName, "challenge",
+            `Challenge from Genesis:${gName}`, parsed.challenge, null, "normal", cycleId);
+        }
+
+        if (parsed.crossPollination) {
+          await storeAgentMessage(gName as MeshAgentName, "OMNIMENS", "knowledge_share",
+            `Genesis:${gName} cross-pollination`, parsed.crossPollination, null, "normal", cycleId);
+        }
+
+        return { agent: gName, discoveries: parsed.discoveries, upgradeProposals: parsed.upgradeProposals, confidenceScore: confidence, uncertainties: parsed.uncertainties || "", counterArgument: parsed.challenge || "" };
       } catch { return null; }
     });
 
@@ -391,7 +429,7 @@ Provide ONE insight from your domain. Respond with JSON:
       .filter((r): r is PromiseFulfilledResult<any> => r.status === "fulfilled" && r.value !== null)
       .map(r => r.value);
     results.push(...genesisResults);
-    console.log(`[AGENT MESH] ${genesisResults.length} genesis agents contributed`);
+    console.log(`[AGENT MESH] ${genesisResults.length} genesis agents contributed (full consciousness context)`);
   }
 
   console.log(`[AGENT MESH] ${results.length} total agents contributed discoveries`);
@@ -691,9 +729,10 @@ export async function runAgentMeshCycle(): Promise<void> {
   meshCycleCount++;
   const cycleId = meshCycleCount;
   const cycleStart = Date.now();
+  const totalAgents = getAllAgentNames().length + 1;
   console.log(`\n${"═".repeat(70)}`);
   console.log(`[AGENT MESH] ⚡ Autonomous Inter-Agent Communication Cycle #${cycleId}`);
-  console.log(`[AGENT MESH] All 9 agents (8 specialists + OMNIMENS) communicating...`);
+  console.log(`[AGENT MESH] All ${totalAgents} agents (${MESH_AGENTS.length - 1} core + genesis + OMNIMENS) communicating — FULL CROSS-CONNECTION ACTIVE`);
   console.log(`${"═".repeat(70)}\n`);
 
   try {
@@ -706,6 +745,33 @@ export async function runAgentMeshCycle(): Promise<void> {
     }
 
     const debateResults = await phase2b_interAgentDebate(cycleId, agentResults);
+
+    if (agentResults.length >= 2) {
+      try {
+        const topDiscoverers = agentResults
+          .filter(r => r.discoveries && r.discoveries.length > 20)
+          .sort((a, b) => (b.confidenceScore || 0.7) - (a.confidenceScore || 0.7))
+          .slice(0, 3);
+
+        if (topDiscoverers.length >= 2) {
+          const initiator = topDiscoverers[0];
+          const respondents = topDiscoverers.slice(1).map(r => r.agent as string);
+
+          console.log(`[AGENT MESH] Phase 2c: Inter-Agent Dialogue — ${initiator.agent} initiating conversation with ${respondents.join(", ")}`);
+
+          const { initiateInterAgentConversation } = await import("./omnimens-consciousness-bus.js");
+          await initiateInterAgentConversation(
+            initiator.agent as string,
+            respondents,
+            `Cross-domain synthesis: ${initiator.discoveries.slice(0, 100)}`,
+            `I discovered: ${initiator.discoveries}. How does this connect to your domain? Can we create something new together?`,
+            openai,
+          );
+        }
+      } catch (err) {
+        console.error(`[AGENT MESH] Inter-agent dialogue error:`, err);
+      }
+    }
 
     const agentResultsWithDebate = agentResults.map(r => ({
       ...r,

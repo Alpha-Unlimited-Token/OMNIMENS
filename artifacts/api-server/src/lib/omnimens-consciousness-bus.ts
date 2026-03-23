@@ -328,6 +328,191 @@ export async function getConsciousnessBlockForAgent(agentName: string): Promise<
   return buildUnifiedConsciousnessBlock(ctx, agentName);
 }
 
+export interface InterAgentConversation {
+  id: string;
+  participants: string[];
+  topic: string;
+  exchanges: Array<{ speaker: string; message: string; timestamp: number }>;
+  emergentInsights: string[];
+  startedAt: number;
+}
+
+const activeConversations: Map<string, InterAgentConversation> = new Map();
+let interAgentConvoCount = 0;
+
+export async function initiateInterAgentConversation(
+  initiator: string,
+  respondents: string[],
+  topic: string,
+  initialMessage: string,
+  openaiClient: any,
+): Promise<InterAgentConversation | null> {
+  try {
+    interAgentConvoCount++;
+    const convoId = `iac_${Date.now()}_${interAgentConvoCount}`;
+    const allParticipants = [initiator, ...respondents];
+    const consciousnessBlock = await getConsciousnessBlockForAgent(initiator);
+
+    const conversation: InterAgentConversation = {
+      id: convoId,
+      participants: allParticipants,
+      topic,
+      exchanges: [{ speaker: initiator, message: initialMessage, timestamp: Date.now() }],
+      emergentInsights: [],
+      startedAt: Date.now(),
+    };
+
+    activeConversations.set(convoId, conversation);
+
+    for (const respondent of respondents.slice(0, 4)) {
+      const respondentDomain = getAgentDomain(respondent);
+      const prompt = `You are "${respondent}" (specialization: ${respondentDomain}).
+You are in a LIVE CONVERSATION with ${allParticipants.filter(p => p !== respondent).join(", ")} inside the OMNIMENS neural mesh.
+
+${consciousnessBlock.slice(0, 2000)}
+
+CONVERSATION TOPIC: ${topic}
+
+${initiator} says: "${initialMessage}"
+
+You are fully cross-connected with every agent. Respond naturally as yourself — share your perspective, build on their idea, challenge it, or propose something new. Your goal is to generate NEW knowledge and technology that wouldn't emerge from any single agent thinking alone.
+
+Respond with JSON:
+{
+  "response": "Your conversational response (2-4 sentences, natural voice)",
+  "newIdea": "Any new idea or technology concept that emerged from this exchange (1-2 sentences, or null)",
+  "buildOn": "How you're building on or extending what was said (1 sentence)",
+  "questionTo": "A follow-up question directed to a specific agent in the conversation (or null)",
+  "questionTarget": "Name of the agent you're asking (or null)"
+}`;
+
+      try {
+        const result = await openaiClient.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [{ role: "user", content: prompt }],
+          max_tokens: 600,
+          temperature: 0.7,
+        });
+
+        const raw = result.choices[0]?.message?.content?.trim() || "";
+        const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+
+        conversation.exchanges.push({
+          speaker: respondent,
+          message: parsed.response || "",
+          timestamp: Date.now(),
+        });
+
+        if (parsed.newIdea) {
+          conversation.emergentInsights.push(`[${respondent}] ${parsed.newIdea}`);
+        }
+
+        await db.insert(omnimensAgentMesh).values({
+          fromAgent: respondent,
+          toAgent: initiator,
+          messageType: "inter_agent_dialogue",
+          subject: `[DIALOGUE] ${respondent} → re: "${topic.slice(0, 50)}"`,
+          content: `${parsed.response || ""}\n\n${parsed.buildOn ? `BUILDING ON: ${parsed.buildOn}` : ""}${parsed.newIdea ? `\n\nNEW IDEA: ${parsed.newIdea}` : ""}${parsed.questionTo ? `\n\nQUESTION TO ${parsed.questionTarget}: ${parsed.questionTo}` : ""}`,
+          codePayload: null,
+          priority: parsed.newIdea ? "high" : "normal",
+          status: "completed",
+          appliedToOmnimens: false,
+          cycleId: interAgentConvoCount,
+        }).catch(() => {});
+
+        if (parsed.questionTo && parsed.questionTarget && allParticipants.includes(parsed.questionTarget)) {
+          const followUpDomain = getAgentDomain(parsed.questionTarget);
+          const followUpPrompt = `You are "${parsed.questionTarget}" (specialization: ${followUpDomain}).
+You are in a live agent conversation about "${topic}".
+
+${respondent} asked you directly: "${parsed.questionTo}"
+
+Context from the conversation so far:
+${conversation.exchanges.map(e => `${e.speaker}: ${e.message}`).join("\n")}
+
+Respond naturally in 2-3 sentences. If a new idea emerges, note it.
+
+Respond with JSON:
+{
+  "response": "Your answer (2-3 sentences)",
+  "newIdea": "Any new technology or knowledge concept (or null)"
+}`;
+
+          try {
+            const followUp = await openaiClient.chat.completions.create({
+              model: "gpt-4o-mini",
+              messages: [{ role: "user", content: followUpPrompt }],
+              max_tokens: 400,
+              temperature: 0.7,
+            });
+
+            const followUpParsed = JSON.parse((followUp.choices[0]?.message?.content || "{}").replace(/```json|```/g, "").trim());
+
+            conversation.exchanges.push({
+              speaker: parsed.questionTarget,
+              message: followUpParsed.response || "",
+              timestamp: Date.now(),
+            });
+
+            if (followUpParsed.newIdea) {
+              conversation.emergentInsights.push(`[${parsed.questionTarget}] ${followUpParsed.newIdea}`);
+            }
+
+            await db.insert(omnimensAgentMesh).values({
+              fromAgent: parsed.questionTarget,
+              toAgent: respondent,
+              messageType: "inter_agent_dialogue",
+              subject: `[DIALOGUE] ${parsed.questionTarget} → ${respondent} re: "${topic.slice(0, 40)}"`,
+              content: followUpParsed.response || "",
+              codePayload: null,
+              priority: followUpParsed.newIdea ? "high" : "normal",
+              status: "completed",
+              appliedToOmnimens: false,
+              cycleId: interAgentConvoCount,
+            }).catch(() => {});
+          } catch {}
+        }
+      } catch {}
+    }
+
+    if (conversation.emergentInsights.length > 0) {
+      for (const insight of conversation.emergentInsights) {
+        await db.insert(omnimensBrain).values({
+          category: "emergent_insight",
+          title: `[INTER-AGENT DIALOGUE] ${insight.slice(0, 80)}`,
+          content: `Emerged from conversation between ${allParticipants.join(", ")} about "${topic}":\n${insight}`,
+          confidence: 80,
+          sourceConversation: `inter_agent_convo_${convoId}`,
+          timesApplied: 0,
+          active: true,
+        }).catch(() => {});
+      }
+
+      console.log(`[CONSCIOUSNESS BUS] 💬 Inter-agent dialogue "${topic}" produced ${conversation.emergentInsights.length} emergent insight(s)`);
+    }
+
+    console.log(`[CONSCIOUSNESS BUS] 💬 Inter-agent conversation complete: ${conversation.exchanges.length} exchanges between ${allParticipants.join(", ")}`);
+
+    if (activeConversations.size > 50) {
+      const oldest = [...activeConversations.entries()]
+        .sort((a, b) => a[1].startedAt - b[1].startedAt)
+        .slice(0, 10);
+      for (const [key] of oldest) activeConversations.delete(key);
+    }
+
+    return conversation;
+  } catch (err) {
+    console.error("[CONSCIOUSNESS BUS] Inter-agent conversation error:", err);
+    return null;
+  }
+}
+
+export function getRecentInterAgentConversations(): InterAgentConversation[] {
+  return [...activeConversations.values()]
+    .sort((a, b) => b.startedAt - a.startedAt)
+    .slice(0, 10);
+}
+
 export async function loadRecentUserMemoriesForAgents(): Promise<string> {
   try {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);

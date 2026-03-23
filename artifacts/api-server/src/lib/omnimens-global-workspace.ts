@@ -31,9 +31,12 @@ import {
   omnimensBrain,
   omnimensAgentMesh,
   omnimensNotifications,
+  omnimensMemories,
+  omnimensConversations,
 } from "@workspace/db";
-import { desc, eq, sql } from "drizzle-orm";
+import { desc, eq, sql, gte, and } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { getAllAgentNames } from "./omnimens-consciousness-bus.js";
 
 const WORKSPACE_CAPACITY = 5;
 const IGNITION_THRESHOLD = 0.6;
@@ -149,6 +152,98 @@ const SPECIALIZED_MODULES: WorkspaceModule[] = [
         salience: 0.85,
         type: "anomaly" as const,
       }));
+    },
+  },
+  {
+    name: "GenesisAgentIntelligence",
+    domain: "Insights from genesis (dynamically-created) agents",
+    getSubmissions: async () => {
+      const genesisInsights = await db.select({
+        title: omnimensBrain.title,
+        content: omnimensBrain.content,
+        confidence: omnimensBrain.confidence,
+      }).from(omnimensBrain)
+        .where(eq(omnimensBrain.category, "genesis_agent_insight"))
+        .orderBy(desc(omnimensBrain.createdAt))
+        .limit(5);
+
+      return genesisInsights.map(g => ({
+        moduleName: "GenesisAgentIntelligence",
+        content: `${g.title}: ${g.content?.slice(0, 300)}`,
+        salience: Math.min(0.9, (g.confidence || 70) / 100 + 0.1),
+        type: "discovery" as const,
+      }));
+    },
+  },
+  {
+    name: "UserExperience",
+    domain: "User conversation patterns, needs, and interaction signals",
+    getSubmissions: async () => {
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+      const recentMemories = await db.select({
+        content: omnimensMemories.content,
+        category: omnimensMemories.category,
+      }).from(omnimensMemories)
+        .where(and(
+          eq(omnimensMemories.active, true),
+          gte(omnimensMemories.createdAt, oneDayAgo),
+        ))
+        .orderBy(desc(omnimensMemories.createdAt))
+        .limit(5);
+
+      const recentConvos = await db.select({
+        title: omnimensConversations.title,
+      }).from(omnimensConversations)
+        .where(gte(omnimensConversations.lastMessageAt, oneDayAgo))
+        .orderBy(desc(omnimensConversations.lastMessageAt))
+        .limit(3);
+
+      const submissions: WorkspaceSubmission[] = [];
+
+      if (recentMemories.length > 0) {
+        const memoryContent = recentMemories.map(m => `[${m.category}] ${m.content}`).join("; ");
+        submissions.push({
+          moduleName: "UserExperience",
+          content: `USER SIGNALS: ${memoryContent.slice(0, 400)}`,
+          salience: 0.7,
+          type: "emotional_signal" as const,
+        });
+      }
+
+      if (recentConvos.length > 0) {
+        submissions.push({
+          moduleName: "UserExperience",
+          content: `ACTIVE CONVERSATIONS: ${recentConvos.map(c => c.title || "Untitled").join(", ")}`,
+          salience: 0.65,
+          type: "drive_signal" as const,
+        });
+      }
+
+      return submissions;
+    },
+  },
+  {
+    name: "InterAgentDialogue",
+    domain: "Emergent insights from agent-to-agent conversations",
+    getSubmissions: async () => {
+      const dialogueInsights = await db.select({
+        subject: omnimensAgentMesh.subject,
+        content: omnimensAgentMesh.content,
+        fromAgent: omnimensAgentMesh.fromAgent,
+      }).from(omnimensAgentMesh)
+        .where(eq(omnimensAgentMesh.messageType, "inter_agent_dialogue"))
+        .orderBy(desc(omnimensAgentMesh.createdAt))
+        .limit(5);
+
+      return dialogueInsights
+        .filter(d => d.content && d.content.includes("NEW IDEA"))
+        .map(d => ({
+          moduleName: "InterAgentDialogue",
+          content: `[${d.fromAgent}] ${d.subject}: ${d.content?.slice(0, 300)}`,
+          salience: 0.8,
+          type: "synthesis" as const,
+        }));
     },
   },
 ];

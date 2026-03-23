@@ -30,7 +30,30 @@ import { db } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications, omnimensAgentMesh } from "@workspace/db";
 import { desc, eq, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
-import { getConsciousnessBlockForAgent, getAllAgentNames, loadRecentUserMemoriesForAgents } from "./omnimens-consciousness-bus.js";
+let _consciousnessBusMod: any = null;
+async function _loadConsciousnessBus() {
+  if (!_consciousnessBusMod) {
+    _consciousnessBusMod = await import("./omnimens-consciousness-bus.js");
+  }
+  return _consciousnessBusMod;
+}
+
+async function getConsciousnessBlockForAgent(agentName: string): Promise<string> {
+  const mod = await _loadConsciousnessBus();
+  return mod.getConsciousnessBlockForAgent(agentName);
+}
+
+function getAllAgentNames(): string[] {
+  if (_consciousnessBusMod) {
+    return _consciousnessBusMod.getAllAgentNames();
+  }
+  return [...CORE_AGENTS, ...Array.from(genesisAgents.values()).filter(a => a.active).map(a => a.name)];
+}
+
+async function loadRecentUserMemoriesForAgents(): Promise<string> {
+  const mod = await _loadConsciousnessBus();
+  return mod.loadRecentUserMemoriesForAgents();
+}
 
 export interface GenesisAgent {
   id: string;
