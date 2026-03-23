@@ -96,3 +96,9 @@ id = "YmzUEj-PmFQPjrnXp5nnb"
 uri = "file://TrulyYours_VOCALS_ONLY.wav"
 type = "audio"
 title = "ISOLATED VOCALS — Voice Frequencies Only"
+
+[[outputs]]
+id = "6LD-HcVBGlyCm22CB2PIP"
+uri = "file://TrulyYours_VOCALS_REMOVED_v2.mp3"
+type = "audio"
+title = "Truly Yours - Vocals Removed (v2.0 Separator)"

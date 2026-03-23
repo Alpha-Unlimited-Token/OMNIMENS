@@ -1,0 +1,55 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: backlog_dream_id_19016
+ * Title: ARCHITECTURE NAME  
+   Causal Imagination Fabric (CI
+ * Written: 2026-03-23T01:15:47.364Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Causal Imagination Fabric – minimal SCM + do() operator
+export type Node = { id: string; parents: string[]; fn: (p: number[], e: number) => number };
+export type SCM = { nodes: Node[] };
+
+const topological = (scm: SCM): Node[] => {
+  const order: Node[] = [];
+  const visited = new Set<string>();
+  const visit = (n: Node) => {
+    if (visited.has(n.id)) return;
+    n.parents.forEach(pid => visit(scm.nodes.find(x => x.id === pid)!));
+    visited.add(n.id); order.push(n);
+  };
+  scm.nodes.forEach(visit); return order;
+};
+
+// Abduction: estimate eps that matches evidence
+export function abduct(scm: SCM, evidence: Record<string, number>): Record<string, number> {
+  const eps: Record<string, number> = {};
+  topological(scm).forEach(n => {
+    const pVals = n.parents.map(p => evidence[p] ?? 0);
+    const inferred = evidence[n.id] ?? n.fn(pVals, 0);
+    eps[n.id] = inferred - n.fn(pVals, 0);
+  });
+  return eps;
+}
+
+// Intervention & prediction
+export function predict(scm: SCM, eps: Record<string, number>, intervene: Partial<Record<string, number>> = {}): Record<string, number> {
+  const out: Record<string, number> = {};
+  topological(scm).forEach(n => {
+    if (n.id in intervene) { out[n.id] = intervene[n.id]!; return; }
+    const pVals = n.parents.map(p => out[p]);
+    out[n.id] = n.fn(pVals, eps[n.id]);
+  });
+  return out;
+}

@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a data structure optimized for fast associative memory lookup
- * Written: 2026-03-22T23:32:51.906Z
+ * Written: 2026-03-23T01:39:49.042Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,48 +16,82 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-const AssociativeMemory = function () {
-    this.memory = new Map();
-};
-
-AssociativeMemory.prototype.add = function (key, value) {
-    if (!this.memory.has(key)) {
-        this.memory.set(key, []);
+class FastAssociativeMemory {
+    constructor() {
+        this.memory = new Map();
     }
-    this.memory.get(key).push(value);
-};
 
-AssociativeMemory.prototype.lookup = function (key) {
-    return this.memory.has(key) ? this.memory.get(key) : null;
-};
+    // Insert a key-value pair into the memory
+    insert(key, value) {
+        if (key === null || key === undefined) {
+            throw new Error("Key cannot be null or undefined.");
+        }
+        this.memory.set(key, value);
+    }
 
-AssociativeMemory.prototype.remove = function (key) {
-    return this.memory.delete(key);
-};
+    // Retrieve a value by key
+    lookup(key) {
+        if (this.memory.has(key)) {
+            return this.memory.get(key);
+        }
+        return null; // Return null if key is not found
+    }
 
-AssociativeMemory.prototype.clear = function () {
-    this.memory.clear();
-};
+    // Remove a key-value pair by key
+    remove(key) {
+        return this.memory.delete(key);
+    }
+
+    // Check if a key exists in the memory
+    contains(key) {
+        return this.memory.has(key);
+    }
+
+    // Clear all entries in the memory
+    clear() {
+        this.memory.clear();
+    }
+
+    // Get the total number of entries
+    size() {
+        return this.memory.size;
+    }
+}
 
 // Self-tests
-const memory = new AssociativeMemory();
+const memory = new FastAssociativeMemory();
 
-// Test adding and looking up values
-memory.add("ethics", "Genesis Agent 'Ethicist'");
-memory.add("ethics", "Integrating an ethical feedback loop");
-memory.add("innovation", "Genesis Agent 'Innovator'");
-memory.add("innovation", "Curiosity-driven synthesis");
+// Test 1: Insert and lookup
+memory.insert("name", "Alice");
+console.log(memory.lookup("name")); // Expected: "Alice"
 
-console.log(memory.lookup("ethics")); // Expected: ["Genesis Agent 'Ethicist'", "Integrating an ethical feedback loop"]
-console.log(memory.lookup("innovation")); // Expected: ["Genesis Agent 'Innovator'", "Curiosity-driven synthesis"]
+// Test 2: Lookup non-existent key
+console.log(memory.lookup("age")); // Expected: null
 
-// Test removing a key
-memory.remove("ethics");
-console.log(memory.lookup("ethics")); // Expected: null
+// Test 3: Remove key and verify
+memory.insert("age", 30);
+console.log(memory.lookup("age")); // Expected: 30
+memory.remove("age");
+console.log(memory.lookup("age")); // Expected: null
 
-// Test clearing all memory
+// Test 4: Check contains
+memory.insert("city", "New York");
+console.log(memory.contains("city")); // Expected: true
+console.log(memory.contains("country")); // Expected: false
+
+// Test 5: Clear memory and check size
 memory.clear();
-console.log(memory.lookup("innovation")); // Expected: null
+console.log(memory.size()); // Expected: 0
 
-// Test edge case: Lookup non-existent key
-console.log(memory.lookup("nonexistent")); // Expected: null
+// Test 6: Edge case - Insert null or undefined key
+try {
+    memory.insert(null, "value");
+} catch (e) {
+    console.log(e.message); // Expected: "Key cannot be null or undefined."
+}
+
+try {
+    memory.insert(undefined, "value");
+} catch (e) {
+    console.log(e.message); // Expected: "Key cannot be null or undefined."
+}

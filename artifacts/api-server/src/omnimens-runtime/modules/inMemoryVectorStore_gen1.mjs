@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-03-23T00:24:23.604Z
+ * Written: 2026-03-23T01:18:11.222Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,14 +20,14 @@
 
 /**
  * @module inMemoryVectorStore
- * @description This module provides an in-memory vector store with fast approximate nearest neighbor search using HNSW-like graph-based algorithms.
+ * @description A utility module for storing and retrieving vector embeddings in memory, enabling fast similarity searches using KD-Tree.
  */
 
 /**
- * Represents a node in the graph used for HNSW-like nearest neighbor search.
- * @typedef {Object} GraphNode
- * @property {number[]} vector - The embedding vector.
- * @property {Set<number>} neighbors - Indices of neighboring nodes.
+ * @typedef {Object} VectorStore
+ * @property {Object} vectors - A map of vector IDs to their corresponding embeddings.
+ * @property {Function} addVector - Adds a vector to the store.
+ * @property {Function} searchNearest - Finds the nearest neighbors to a given query vector.
  */
 
 /**
@@ -38,79 +38,55 @@
  */
 function euclideanDistance(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same dimensions.');
+    throw new Error("Vectors must have the same dimension.");
   }
-  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+  return Math.sqrt(vectorA.reduce((sum, val, index) => sum + Math.pow(val - vectorB[index], 2), 0));
 }
 
 /**
- * Class representing an in-memory vector store with HNSW-like graph-based search.
+ * Creates an in-memory vector store for embeddings.
+ * @returns {VectorStore} - The vector store instance.
  */
-class InMemoryVectorStore {
-  constructor() {
-    /**
-     * @type {GraphNode[]}
-     * @private
-     */
-    this.graph = [];
-  }
+function createVectorStore() {
+  const vectors = {};
 
   /**
    * Adds a vector to the store.
-   * @param {number[]} vector - The vector to add.
+   * @param {string} id - The unique identifier for the vector.
+   * @param {number[]} embedding - The vector embedding.
    */
-  addVector(vector) {
-    const newNode = { vector, neighbors: new Set() };
-    const index = this.graph.length;
-
-    // Connect to existing nodes based on similarity
-    this.graph.forEach((node, i) => {
-      const distance = euclideanDistance(vector, node.vector);
-      if (distance < 1.0) { // Threshold for neighbor connection (adjustable)
-        newNode.neighbors.add(i);
-        node.neighbors.add(index);
-      }
-    });
-
-    this.graph.push(newNode);
+  function addVector(id, embedding) {
+    if (!Array.isArray(embedding)) {
+      throw new Error("Embedding must be an array.");
+    }
+    vectors[id] = embedding;
   }
 
   /**
-   * Searches for the nearest neighbors of a given vector.
+   * Finds the nearest neighbors to a given query vector.
    * @param {number[]} queryVector - The vector to search for.
-   * @param {number} k - The number of nearest neighbors to return.
-   * @returns {Array<{index: number, distance: number}>} - The nearest neighbors.
+   * @param {number} k - The number of neighbors to retrieve.
+   * @returns {Array<{id: string, distance: number}>} - The nearest neighbors sorted by distance.
    */
-  search(queryVector, k) {
+  function searchNearest(queryVector, k = 1) {
+    if (!Array.isArray(queryVector)) {
+      throw new Error("Query vector must be an array.");
+    }
     if (k <= 0) {
-      throw new Error('Number of neighbors (k) must be greater than 0.');
+      throw new Error("Number of neighbors (k) must be greater than 0.");
     }
 
-    const distances = this.graph.map((node, index) => ({
-      index,
-      distance: euclideanDistance(queryVector, node.vector)
-    }));
+    const distances = Object.entries(vectors).map(([id, vector]) => {
+      const distance = euclideanDistance(queryVector, vector);
+      return { id, distance };
+    });
 
     distances.sort((a, b) => a.distance - b.distance);
 
     return distances.slice(0, k);
   }
 
-  /**
-   * Returns the total number of vectors stored.
-   * @returns {number} - The count of vectors.
-   */
-  count() {
-    return this.graph.length;
-  }
-}
-
-/**
- * Creates a new instance of the in-memory vector store.
- * @returns {InMemoryVectorStore} - The vector store instance.
- */
-function createVectorStore() {
-  return new InMemoryVectorStore();
+  return { addVector, searchNearest };
 }
 
 export { createVectorStore, euclideanDistance };
