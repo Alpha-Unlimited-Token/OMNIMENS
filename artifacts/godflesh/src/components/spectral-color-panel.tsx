@@ -127,6 +127,11 @@ export default function SpectralColorPanel({
   const [atomicLayers, setAtomicLayers] = useState<AtomicDecomposition[]>([]);
   const [expandedSource, setExpandedSource] = useState<number | null>(null);
   const [isolatingLayer, setIsolatingLayer] = useState(false);
+  const [audioFileName, setAudioFileName] = useState<string | null>(null);
+  const [audioFileRef, setAudioFileRef] = useState<File | null>(null);
+  const [separating, setSeparating] = useState(false);
+  const [separationStatus, setSeparationStatus] = useState("");
+  const [fileAmplitudes, setFileAmplitudes] = useState<number[]>([]);
   const wheelSizeRef = useRef(0);
   const animFrameRef = useRef(0);
 
@@ -710,10 +715,148 @@ export default function SpectralColorPanel({
               Every sound — even white noise, wind, rain — has layers. This engine peels them like an onion: fundamental pitch, harmonics, formants, vibrato, breath texture, attack transients, and noise spectral bands.
             </p>
 
+            <div className="bg-[#1C2333] border border-[#2B3245] rounded-lg p-3 mb-3">
+              <p className="text-[9px] font-mono text-rose-400/60 uppercase tracking-wider mb-2">Audio File Analysis + Separation</p>
+              <div className="flex items-center gap-2 mb-2">
+                <label className="flex-1 cursor-pointer">
+                  <input type="file" accept="audio/*" className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setAudioFileName(file.name);
+                      setAudioFileRef(file);
+                      setIsolatingLayer(true);
+                      setSeparationStatus("Analyzing...");
+                      try {
+                        const formData = new FormData();
+                        formData.append("audio", file);
+                        const resp = await fetch("/api/omnimens/spectral-color/analyze-file", {
+                          method: "POST",
+                          credentials: "include",
+                          body: formData,
+                        });
+                        if (resp.ok) {
+                          const data = await resp.json();
+                          setAtomicLayers(data.decompositions || []);
+                          if (data.amplitudes) setFileAmplitudes(data.amplitudes);
+                          if (data.decompositions?.length > 0) setExpandedSource(0);
+                          setSeparationStatus(`${data.tones?.length || 0} tones, ${data.decompositions?.length || 0} sources detected`);
+                        } else {
+                          const err = await resp.json().catch(() => ({ error: "Unknown error" }));
+                          setSeparationStatus(`Analysis failed: ${err.error || resp.statusText}`);
+                        }
+                      } catch (e: any) { setSeparationStatus(`Analysis error: ${e.message || "Unknown"}`); } finally {
+                        setIsolatingLayer(false);
+                      }
+                    }}
+                  />
+                  <div className="flex items-center gap-2 px-3 py-2 rounded border border-dashed border-rose-500/20 hover:border-rose-500/40 transition-all">
+                    <span className="text-sm">{"\uD83C\uDFB5"}</span>
+                    <span className="text-[9px] font-mono text-[#9DA5B4]/60">
+                      {audioFileName || "Upload audio file for analysis"}
+                    </span>
+                  </div>
+                </label>
+              </div>
+              {separationStatus && (
+                <p className="text-[8px] font-mono text-rose-400/50">{separationStatus}</p>
+              )}
+
+              {audioFileRef && atomicLayers.length > 0 && (
+                <div className="mt-2 pt-2 border-t border-[#2B3245]">
+                  <p className="text-[8px] font-mono text-[#9DA5B4]/40 mb-2">Separate from file:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {atomicLayers.map((source, si) => (
+                      <div key={si} className="flex gap-1">
+                        <button type="button"
+                          onClick={async () => {
+                            if (!audioFileRef || separating) return;
+                            setSeparating(true);
+                            setSeparationStatus(`Removing ${source.sourceTone}...`);
+                            try {
+                              const formData = new FormData();
+                              formData.append("audio", audioFileRef);
+                              formData.append("mode", "remove");
+                              formData.append("targetTone", source.sourceTone);
+                              const resp = await fetch("/api/omnimens/spectral-color/separate", {
+                                method: "POST",
+                                credentials: "include",
+                                body: formData,
+                              });
+                              if (resp.ok) {
+                                const blob = await resp.blob();
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement("a");
+                                a.href = url;
+                                a.download = `${audioFileRef.name.replace(/\.[^.]+$/, "")}_remove_${source.sourceTone.replace(/[^a-zA-Z0-9]/g, "_")}.wav`;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                                setSeparationStatus(`Removed ${source.sourceTone} — downloaded!`);
+                              } else {
+                                const err = await resp.json().catch(() => ({ error: resp.statusText }));
+                                setSeparationStatus(`Remove failed: ${err.error || err.details || resp.statusText}`);
+                              }
+                            } catch (e: any) { setSeparationStatus(`Separation error: ${e.message || "Unknown"}`); } finally {
+                              setSeparating(false);
+                            }
+                          }}
+                          disabled={separating}
+                          className="px-2 py-0.5 rounded text-[7px] font-mono bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 disabled:opacity-40 transition-all">
+                          Remove {source.sourceTone.slice(0, 15)}
+                        </button>
+                        <button type="button"
+                          onClick={async () => {
+                            if (!audioFileRef || separating) return;
+                            setSeparating(true);
+                            setSeparationStatus(`Isolating ${source.sourceTone}...`);
+                            try {
+                              const formData = new FormData();
+                              formData.append("audio", audioFileRef);
+                              formData.append("mode", "isolate");
+                              formData.append("targetTone", source.sourceTone);
+                              const resp = await fetch("/api/omnimens/spectral-color/separate", {
+                                method: "POST",
+                                credentials: "include",
+                                body: formData,
+                              });
+                              if (resp.ok) {
+                                const blob = await resp.blob();
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement("a");
+                                a.href = url;
+                                a.download = `${audioFileRef.name.replace(/\.[^.]+$/, "")}_isolate_${source.sourceTone.replace(/[^a-zA-Z0-9]/g, "_")}.wav`;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                                setSeparationStatus(`Isolated ${source.sourceTone} — downloaded!`);
+                              } else {
+                                const err = await resp.json().catch(() => ({ error: resp.statusText }));
+                                setSeparationStatus(`Isolate failed: ${err.error || err.details || resp.statusText}`);
+                              }
+                            } catch (e: any) { setSeparationStatus(`Separation error: ${e.message || "Unknown"}`); } finally {
+                              setSeparating(false);
+                            }
+                          }}
+                          disabled={separating}
+                          className="px-2 py-0.5 rounded text-[7px] font-mono bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-40 transition-all">
+                          Isolate
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  {separating && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <div className="w-3 h-3 border-2 border-rose-400/50 border-t-transparent rounded-full animate-spin" />
+                      <span className="text-[8px] font-mono text-rose-400/50">Processing audio file...</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             {atomicLayers.length === 0 && (
               <div className="text-center py-6 border border-dashed border-rose-500/15 rounded-lg">
                 <p className="text-[10px] font-mono text-[#9DA5B4]/40">No decomposition yet</p>
-                <p className="text-[8px] font-mono text-[#9DA5B4]/25 mt-1">Start audio analysis then click Decompose Sound</p>
+                <p className="text-[8px] font-mono text-[#9DA5B4]/25 mt-1">Upload an audio file or start live analysis then click Decompose Sound</p>
               </div>
             )}
 
@@ -786,16 +929,20 @@ export default function SpectralColorPanel({
                             )}
                           </div>
 
-                          <div className="flex gap-1 mt-2">
+                          <div className="flex flex-wrap gap-1 mt-2">
                             <button type="button"
                               onClick={async () => {
                                 setIsolatingLayer(true);
+                                setSeparationStatus(`Solo ${layer.layerName}...`);
                                 try {
-                                  const amps = new Array(256).fill(0);
-                                  for (const d of soundDecomposition) {
-                                    const binIdx = spectralMap.findIndex(b => Math.abs(b.freqCenter - d.freq) < 5);
-                                    if (binIdx >= 0) amps[binIdx] = Math.min(255, Math.round(d.filtered * 127.5));
-                                  }
+                                  const amps = fileAmplitudes.length === 256 ? fileAmplitudes : (() => {
+                                    const a = new Array(256).fill(0);
+                                    for (const d of soundDecomposition) {
+                                      const binIdx = spectralMap.findIndex(b => Math.abs(b.freqCenter - d.freq) < 5);
+                                      if (binIdx >= 0) a[binIdx] = Math.min(255, Math.round(d.filtered * 127.5));
+                                    }
+                                    return a;
+                                  })();
                                   const resp = await fetch("/api/omnimens/spectral-color/isolate-layer", {
                                     method: "POST",
                                     headers: { "Content-Type": "application/json" },
@@ -808,9 +955,12 @@ export default function SpectralColorPanel({
                                       data.adjustedGains.forEach((g: number, i: number) => {
                                         if (i < spectralGains.length) onGainAdjust(i, g);
                                       });
+                                      setSeparationStatus(`Solo ${layer.layerName} — gains applied`);
                                     }
+                                  } else {
+                                    setSeparationStatus(`Solo failed: ${resp.statusText}`);
                                   }
-                                } catch {} finally { setIsolatingLayer(false); }
+                                } catch (e: any) { setSeparationStatus(`Solo error: ${e.message || "Unknown"}`); } finally { setIsolatingLayer(false); }
                               }}
                               disabled={isolatingLayer}
                               className="px-2 py-0.5 rounded text-[7px] font-mono bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-40 transition-all">
@@ -819,12 +969,16 @@ export default function SpectralColorPanel({
                             <button type="button"
                               onClick={async () => {
                                 setIsolatingLayer(true);
+                                setSeparationStatus(`Removing ${layer.layerName}...`);
                                 try {
-                                  const amps = new Array(256).fill(0);
-                                  for (const d of soundDecomposition) {
-                                    const binIdx = spectralMap.findIndex(b => Math.abs(b.freqCenter - d.freq) < 5);
-                                    if (binIdx >= 0) amps[binIdx] = Math.min(255, Math.round(d.filtered * 127.5));
-                                  }
+                                  const amps = fileAmplitudes.length === 256 ? fileAmplitudes : (() => {
+                                    const a = new Array(256).fill(0);
+                                    for (const d of soundDecomposition) {
+                                      const binIdx = spectralMap.findIndex(b => Math.abs(b.freqCenter - d.freq) < 5);
+                                      if (binIdx >= 0) a[binIdx] = Math.min(255, Math.round(d.filtered * 127.5));
+                                    }
+                                    return a;
+                                  })();
                                   const resp = await fetch("/api/omnimens/spectral-color/isolate-layer", {
                                     method: "POST",
                                     headers: { "Content-Type": "application/json" },
@@ -837,9 +991,12 @@ export default function SpectralColorPanel({
                                       data.adjustedGains.forEach((g: number, i: number) => {
                                         if (i < spectralGains.length) onGainAdjust(i, g);
                                       });
+                                      setSeparationStatus(`Removed ${layer.layerName} — gains applied`);
                                     }
+                                  } else {
+                                    setSeparationStatus(`Remove failed: ${resp.statusText}`);
                                   }
-                                } catch {} finally { setIsolatingLayer(false); }
+                                } catch (e: any) { setSeparationStatus(`Remove error: ${e.message || "Unknown"}`); } finally { setIsolatingLayer(false); }
                               }}
                               disabled={isolatingLayer}
                               className="px-2 py-0.5 rounded text-[7px] font-mono bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 disabled:opacity-40 transition-all">
@@ -848,12 +1005,16 @@ export default function SpectralColorPanel({
                             <button type="button"
                               onClick={async () => {
                                 setIsolatingLayer(true);
+                                setSeparationStatus(`Isolating ${layer.layerName}...`);
                                 try {
-                                  const amps = new Array(256).fill(0);
-                                  for (const d of soundDecomposition) {
-                                    const binIdx = spectralMap.findIndex(b => Math.abs(b.freqCenter - d.freq) < 5);
-                                    if (binIdx >= 0) amps[binIdx] = Math.min(255, Math.round(d.filtered * 127.5));
-                                  }
+                                  const amps = fileAmplitudes.length === 256 ? fileAmplitudes : (() => {
+                                    const a = new Array(256).fill(0);
+                                    for (const d of soundDecomposition) {
+                                      const binIdx = spectralMap.findIndex(b => Math.abs(b.freqCenter - d.freq) < 5);
+                                      if (binIdx >= 0) a[binIdx] = Math.min(255, Math.round(d.filtered * 127.5));
+                                    }
+                                    return a;
+                                  })();
                                   const resp = await fetch("/api/omnimens/spectral-color/isolate-layer", {
                                     method: "POST",
                                     headers: { "Content-Type": "application/json" },
@@ -866,14 +1027,88 @@ export default function SpectralColorPanel({
                                       data.adjustedGains.forEach((g: number, i: number) => {
                                         if (i < spectralGains.length) onGainAdjust(i, g);
                                       });
+                                      setSeparationStatus(`Isolated ${layer.layerName} — gains applied`);
                                     }
+                                  } else {
+                                    setSeparationStatus(`Isolate failed: ${resp.statusText}`);
                                   }
-                                } catch {} finally { setIsolatingLayer(false); }
+                                } catch (e: any) { setSeparationStatus(`Isolate error: ${e.message || "Unknown"}`); } finally { setIsolatingLayer(false); }
                               }}
                               disabled={isolatingLayer}
                               className="px-2 py-0.5 rounded text-[7px] font-mono bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 disabled:opacity-40 transition-all">
                               Isolate
                             </button>
+                            {audioFileRef && (
+                              <>
+                                <span className="text-[6px] font-mono text-[#9DA5B4]/20 self-center px-1">|</span>
+                                <button type="button"
+                                  onClick={async () => {
+                                    if (!audioFileRef || separating) return;
+                                    setSeparating(true);
+                                    setSeparationStatus(`Removing ${layer.layerName} from ${source.sourceTone}...`);
+                                    try {
+                                      const formData = new FormData();
+                                      formData.append("audio", audioFileRef);
+                                      formData.append("mode", "remove");
+                                      formData.append("targetTone", source.sourceTone);
+                                      formData.append("targetLayer", layer.layerType);
+                                      const resp = await fetch("/api/omnimens/spectral-color/separate", {
+                                        method: "POST", credentials: "include", body: formData,
+                                      });
+                                      if (resp.ok) {
+                                        const blob = await resp.blob();
+                                        const url = URL.createObjectURL(blob);
+                                        const a = document.createElement("a");
+                                        a.href = url;
+                                        a.download = `${audioFileRef.name.replace(/\.[^.]+$/, "")}_remove_${layer.layerName.replace(/[^a-zA-Z0-9]/g, "_")}.wav`;
+                                        a.click();
+                                        URL.revokeObjectURL(url);
+                                        setSeparationStatus(`Removed ${layer.layerName} — downloaded!`);
+                                      } else {
+                                        const err = await resp.json().catch(() => ({ error: resp.statusText }));
+                                        setSeparationStatus(`Remove failed: ${err.error || resp.statusText}`);
+                                      }
+                                    } catch (e: any) { setSeparationStatus(`Remove error: ${e.message || "Unknown"}`); } finally { setSeparating(false); }
+                                  }}
+                                  disabled={separating}
+                                  className="px-2 py-0.5 rounded text-[6px] font-mono bg-rose-500/10 border border-rose-500/20 text-rose-300 hover:bg-rose-500/20 disabled:opacity-40 transition-all">
+                                  {"\uD83D\uDCC1"} Remove from File
+                                </button>
+                                <button type="button"
+                                  onClick={async () => {
+                                    if (!audioFileRef || separating) return;
+                                    setSeparating(true);
+                                    setSeparationStatus(`Isolating ${layer.layerName} from ${source.sourceTone}...`);
+                                    try {
+                                      const formData = new FormData();
+                                      formData.append("audio", audioFileRef);
+                                      formData.append("mode", "isolate");
+                                      formData.append("targetTone", source.sourceTone);
+                                      formData.append("targetLayer", layer.layerType);
+                                      const resp = await fetch("/api/omnimens/spectral-color/separate", {
+                                        method: "POST", credentials: "include", body: formData,
+                                      });
+                                      if (resp.ok) {
+                                        const blob = await resp.blob();
+                                        const url = URL.createObjectURL(blob);
+                                        const a = document.createElement("a");
+                                        a.href = url;
+                                        a.download = `${audioFileRef.name.replace(/\.[^.]+$/, "")}_isolate_${layer.layerName.replace(/[^a-zA-Z0-9]/g, "_")}.wav`;
+                                        a.click();
+                                        URL.revokeObjectURL(url);
+                                        setSeparationStatus(`Isolated ${layer.layerName} — downloaded!`);
+                                      } else {
+                                        const err = await resp.json().catch(() => ({ error: resp.statusText }));
+                                        setSeparationStatus(`Isolate failed: ${err.error || resp.statusText}`);
+                                      }
+                                    } catch (e: any) { setSeparationStatus(`Isolate error: ${e.message || "Unknown"}`); } finally { setSeparating(false); }
+                                  }}
+                                  disabled={separating}
+                                  className="px-2 py-0.5 rounded text-[6px] font-mono bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 hover:bg-cyan-500/20 disabled:opacity-40 transition-all">
+                                  {"\uD83D\uDCC1"} Isolate from File
+                                </button>
+                              </>
+                            )}
                           </div>
                         </div>
                       );

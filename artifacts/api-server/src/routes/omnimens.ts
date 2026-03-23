@@ -5985,6 +5985,300 @@ router.post("/omnimens/spectral-color/isolate-layer", async (req, res) => {
   });
 });
 
+router.post("/omnimens/spectral-color/separate", upload.single("audio"), async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+
+  const audioFile = req.file;
+  const { mode, targetTone, targetLayer } = req.body;
+
+  if (!audioFile) {
+    res.status(400).json({ error: "Audio file required" });
+    return;
+  }
+
+  if (!mode || !["remove", "isolate", "solo"].includes(mode)) {
+    res.status(400).json({ error: "mode required: remove | isolate | solo" });
+    return;
+  }
+
+  try {
+    const fs = await import("fs");
+    const path = await import("path");
+    const { execSync } = await import("child_process");
+
+    const tmpDir = "/tmp/spectral_sep";
+    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+
+    const inputPath = path.join(tmpDir, `input_${Date.now()}${path.extname(audioFile.originalname || ".mp3")}`);
+    fs.writeFileSync(inputPath, audioFile.buffer);
+
+    // Step 1: Decode to WAV and analyze with ffmpeg
+    const wavPath = path.join(tmpDir, `decoded_${Date.now()}.wav`);
+    execSync(`ffmpeg -y -i "${inputPath}" -ar 44100 -ac 2 -sample_fmt s16 "${wavPath}"`, { timeout: 30000 });
+
+    // Step 2: Read WAV and compute FFT amplitudes for tone analysis
+    // Use Python to get amplitudes since we need proper audio processing
+    const ampScript = `
+import numpy as np
+import soundfile as sf
+import json
+import sys
+
+data, sr = sf.read("${wavPath}")
+if data.ndim > 1:
+    mono = np.mean(data, axis=1)
+else:
+    mono = data
+
+# Compute 256-bin spectral amplitudes (matching our Spectral Color Engine bins)
+n_fft = 4096
+hop = n_fft // 2
+n_frames = max(1, (len(mono) - n_fft) // hop)
+from scipy.signal.windows import hann
+window = hann(n_fft, sym=False)
+
+# Average spectrum across all frames
+avg_spectrum = np.zeros(n_fft // 2 + 1)
+count = 0
+for i in range(n_frames):
+    start = i * hop
+    frame = mono[start:start + n_fft]
+    if len(frame) < n_fft:
+        break
+    spectrum = np.abs(np.fft.rfft(frame * window))
+    avg_spectrum += spectrum
+    count += 1
+
+if count > 0:
+    avg_spectrum /= count
+
+# Map to 256 spectral bins (log-scale matching our color engine)
+max_freq = sr / 2
+bins_256 = np.zeros(256)
+freqs = np.fft.rfftfreq(n_fft, 1.0 / sr)
+
+for i in range(256):
+    bin_low = max_freq * (i / 256)
+    bin_high = max_freq * ((i + 1) / 256)
+    mask = (freqs >= bin_low) & (freqs < bin_high)
+    if np.any(mask):
+        bins_256[i] = np.mean(avg_spectrum[mask])
+
+# Normalize to 0-255
+peak = np.max(bins_256)
+if peak > 0:
+    bins_256 = (bins_256 / peak) * 255
+
+result = [int(round(v)) for v in bins_256]
+print(json.dumps(result))
+`;
+    const ampResult = execSync(`python3 -c '${ampScript.replace(/'/g, "'\\''")}'`, {
+      timeout: 60000,
+      maxBuffer: 1024 * 1024,
+    }).toString().trim();
+
+    const amplitudes: number[] = JSON.parse(ampResult);
+
+    // Step 3: Run tone analysis + atomic decomposition using our engine
+    const tones = analyzeTones(amplitudes);
+    const decompositions = atomicDecompose(amplitudes);
+
+    console.log(`[SPECTRAL SEPARATOR] Detected ${tones.length} tones, ${decompositions.length} sources`);
+    for (const d of decompositions) {
+      console.log(`  Source: ${d.sourceTone} (${d.sourceCategory}) — ${d.totalLayers} layers`);
+    }
+
+    // Step 4: Build bin gains map based on target tone/layer selection
+    const targetBins = new Set<number>();
+    const allBins = new Set<number>();
+    const binGains: Record<string, number> = {};
+
+    for (const d of decompositions) {
+      for (const l of d.layers) {
+        for (const b of l.bins) {
+          allBins.add(b);
+          const toneMatch = !targetTone || d.sourceTone === targetTone || d.sourceTone.toLowerCase().includes((targetTone || "").toLowerCase());
+          const layerMatch = !targetLayer || l.layerType === targetLayer;
+          if (toneMatch && layerMatch) {
+            targetBins.add(b);
+          }
+        }
+      }
+    }
+
+    if (targetBins.size === 0) {
+      // Fallback: if no specific target, use vocal-range bins for "remove" mode
+      if (mode === "remove" && (!targetTone || targetTone.toLowerCase().includes("vocal"))) {
+        for (let i = 0; i < SPECTRAL_BINS; i++) {
+          const freq = spectralColorMap[i].freqCenter;
+          if (freq >= 85 && freq <= 12000) {
+            targetBins.add(i);
+          }
+        }
+      }
+    }
+
+    // Build gain map
+    for (let i = 0; i < SPECTRAL_BINS; i++) {
+      if (mode === "remove") {
+        binGains[String(i)] = targetBins.has(i) ? 0.0 : 1.0;
+      } else if (mode === "isolate") {
+        binGains[String(i)] = targetBins.has(i) ? 1.8 : 0.02;
+      } else { // solo
+        if (targetBins.has(i)) {
+          binGains[String(i)] = 2.0;
+        } else if (allBins.has(i)) {
+          binGains[String(i)] = 0.3;
+        } else {
+          binGains[String(i)] = 0.1;
+        }
+      }
+    }
+
+    // Step 5: Write config and run Python separator
+    const config = {
+      mode,
+      targetBins: Array.from(targetBins),
+      binGains,
+      n_fft: 4096,
+      hop_length: 1024,
+      smoothing: 7,
+      stereo_mode: "mid_side",
+      spectralBins: SPECTRAL_BINS,
+      maxFreq: SPECTRAL_MAX_FREQ,
+    };
+
+    const configPath = path.join(tmpDir, `config_${Date.now()}.json`);
+    fs.writeFileSync(configPath, JSON.stringify(config));
+
+    const outputPath = path.join(tmpDir, `output_${Date.now()}.wav`);
+    const scriptPath = path.resolve("../../scripts/spectral_separator.py");
+
+    console.log(`[SPECTRAL SEPARATOR] Running: mode=${mode}, targetBins=${targetBins.size}, targetTone=${targetTone || "all"}, targetLayer=${targetLayer || "all"}`);
+
+    execSync(`python3 "${scriptPath}" "${wavPath}" "${outputPath}" "${configPath}"`, {
+      timeout: 120000,
+      maxBuffer: 10 * 1024 * 1024,
+    });
+
+    // Step 6: Read output and send as response
+    const outputBuffer = fs.readFileSync(outputPath);
+
+    // Clean up temp files
+    try {
+      fs.unlinkSync(inputPath);
+      fs.unlinkSync(wavPath);
+      fs.unlinkSync(configPath);
+      fs.unlinkSync(outputPath);
+    } catch {}
+
+    const filename = `${path.parse(audioFile.originalname || "audio").name}_${mode}_${targetTone || "all"}_${targetLayer || "all"}.wav`;
+
+    res.set({
+      "Content-Type": "audio/wav",
+      "Content-Disposition": `attachment; filename="${filename}"`,
+      "X-Spectral-Mode": mode,
+      "X-Spectral-Target-Tone": targetTone || "all",
+      "X-Spectral-Target-Layer": targetLayer || "all",
+      "X-Spectral-Tones-Detected": String(tones.length),
+      "X-Spectral-Sources": String(decompositions.length),
+      "X-Spectral-Target-Bins": String(targetBins.size),
+    });
+
+    res.send(outputBuffer);
+
+  } catch (err: any) {
+    console.error("[SPECTRAL SEPARATOR] Error:", err.message || err);
+    res.status(500).json({ error: "Separation failed", details: err.message || String(err) });
+  }
+});
+
+router.post("/omnimens/spectral-color/analyze-file", upload.single("audio"), async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+
+  const audioFile = req.file;
+  if (!audioFile) {
+    res.status(400).json({ error: "Audio file required" });
+    return;
+  }
+
+  try {
+    const fs = await import("fs");
+    const path = await import("path");
+    const { execSync } = await import("child_process");
+
+    const tmpDir = "/tmp/spectral_sep";
+    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+
+    const inputPath = path.join(tmpDir, `analyze_${Date.now()}${path.extname(audioFile.originalname || ".mp3")}`);
+    fs.writeFileSync(inputPath, audioFile.buffer);
+
+    const wavPath = path.join(tmpDir, `analyze_wav_${Date.now()}.wav`);
+    execSync(`ffmpeg -y -i "${inputPath}" -ar 44100 -ac 2 -sample_fmt s16 "${wavPath}"`, { timeout: 30000 });
+
+    const ampScript = `
+import numpy as np, soundfile as sf, json
+from scipy.signal.windows import hann
+data, sr = sf.read("${wavPath}")
+mono = np.mean(data, axis=1) if data.ndim > 1 else data
+n_fft = 4096
+hop = n_fft // 2
+n_frames = max(1, (len(mono) - n_fft) // hop)
+window = hann(n_fft, sym=False)
+avg = np.zeros(n_fft // 2 + 1)
+cnt = 0
+for i in range(n_frames):
+    s = i * hop
+    f = mono[s:s+n_fft]
+    if len(f) < n_fft: break
+    avg += np.abs(np.fft.rfft(f * window))
+    cnt += 1
+if cnt > 0: avg /= cnt
+max_freq = sr / 2
+bins = np.zeros(256)
+freqs = np.fft.rfftfreq(n_fft, 1.0/sr)
+for i in range(256):
+    lo = max_freq * (i/256)
+    hi = max_freq * ((i+1)/256)
+    m = (freqs >= lo) & (freqs < hi)
+    if np.any(m): bins[i] = np.mean(avg[m])
+pk = np.max(bins)
+if pk > 0: bins = (bins / pk) * 255
+print(json.dumps([int(round(v)) for v in bins]))
+`;
+    const ampResult = execSync(`python3 -c '${ampScript.replace(/'/g, "'\\''")}'`, {
+      timeout: 60000, maxBuffer: 1024 * 1024,
+    }).toString().trim();
+
+    const amplitudes: number[] = JSON.parse(ampResult);
+    const tones = analyzeTones(amplitudes);
+    const decompositions = atomicDecompose(amplitudes);
+
+    try { fs.unlinkSync(inputPath); fs.unlinkSync(wavPath); } catch {}
+
+    res.json({
+      filename: audioFile.originalname,
+      tones: tones.slice(0, 20),
+      decompositions,
+      amplitudes,
+      spectralMap: spectralColorMap.map(b => ({
+        index: b.index, hex: b.hex, freqCenter: b.freqCenter, label: b.label,
+        amplitude: amplitudes[b.index] || 0,
+      })),
+    });
+
+  } catch (err: any) {
+    console.error("[SPECTRAL ANALYZER] Error:", err.message || err);
+    res.status(500).json({ error: "Analysis failed", details: err.message || String(err) });
+  }
+});
+
 router.get("/omnimens/harmonics/learned-patterns", async (req, res) => {
   if (!req.isAuthenticated() || !isOwner(req.user.id)) {
     res.status(403).json({ error: "Owner only" });

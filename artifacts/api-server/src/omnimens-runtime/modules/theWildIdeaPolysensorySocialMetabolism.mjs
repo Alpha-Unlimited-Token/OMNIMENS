@@ -1,0 +1,44 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: backlog_dream_id_18585
+ * Title: THE WILD IDEA – “Poly-Sensory Social Metabolism”
+ * Written: 2026-03-23T00:50:46.221Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Kuramoto-style metabolic swarm core
+export type System = { theta: number[]; omega: number[]; K: number[][] }; // phases, natural freq, couplings
+
+// One integration step – returns new phases & “homeostasis error”
+export function metabolise(sys: System, dt = 0.01): { next: System; error: number } {
+  const { theta, omega, K } = sys;
+  const n = theta.length;
+  const dTheta = new Array<number>(n).fill(0);
+  // Kuramoto update
+  for (let i = 0; i < n; i++) {
+    let sum = 0;
+    for (let j = 0; j < n; j++) sum += K[i][j] * Math.sin(theta[j] - theta[i]);
+    dTheta[i] = omega[i] + sum;
+  }
+  // Advance phases & compute sync level (order parameter R)
+  let Re = 0, Im = 0;
+  const nextTheta = theta.map((th, i) => {
+    const nt = th + dt * dTheta[i];
+    Re += Math.cos(nt); Im += Math.sin(nt);
+    return nt;
+  });
+  const R = Math.sqrt(Re * Re + Im * Im) / n;
+  // Homeostasis error: want R ≈ 1 (perfect sync)
+  const error = 1 - R;
+  return { next: { theta: nextTheta, omega, K }, error };
+}

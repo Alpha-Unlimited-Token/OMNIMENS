@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-23T00:17:08.804Z
+ * Written: 2026-03-23T00:50:47.683Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,48 +16,64 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function extractKeyPhrases(text) {
-    // Extract key phrases from a given text using simple pattern matching
-    const phrases = [];
-    const regex = /\[([^\]]+)\]/g; // Matches text inside square brackets
-    let match;
-
-    while ((match = regex.exec(text)) !== null) {
-        phrases.push(match[1]);
+function cosineSimilarity(vecA, vecB) {
+    if (vecA.length !== vecB.length) {
+        throw new Error("Vectors must be of the same length.");
     }
 
-    return phrases;
+    let dotProduct = 0;
+    let magnitudeA = 0;
+    let magnitudeB = 0;
+
+    for (let i = 0; i < vecA.length; i++) {
+        dotProduct += vecA[i] * vecB[i];
+        magnitudeA += vecA[i] ** 2;
+        magnitudeB += vecB[i] ** 2;
+    }
+
+    const magnitudeProduct = Math.sqrt(magnitudeA) * Math.sqrt(magnitudeB);
+    if (magnitudeProduct === 0) {
+        return 0; // Avoid division by zero
+    }
+
+    return dotProduct / magnitudeProduct;
 }
 
-// Test cases
-console.log("Running test cases...");
+// Self-tests
+function runTests() {
+    console.log("Running tests...");
 
-// Test with provided context
-const context = `[tool_graphviz] Integrating with Web Applications: Render graphs in web apps using 'viz.js' for client-side rendering: 'var g = Viz('digraph { A -> B; 
-[tool_ffmpeg] Waveform visualization: Use \`ffmpeg -i input.mp3 -filter_complex "showwavespic=s=600x120" -frames:v 1 output.png\` to create 
-[tool_tesseract_ocr] Integrating with other libraries: Combine with NumPy for array manipulations: \`import numpy as np; image_array = np.array(image); proc
-[tool_tesseract_ocr] Improving accuracy with upscaling: Upscale images before OCR: \`upscaled = cv2.resize(image, None, fx=2, fy=2, interpolation=cv2.INTER_C
-[digital_navigation] Digital Navigation Wisdom — Cycle 1: In the digital realm, minimizing latency is key to enhancing user experience and operational efficie
-[tool_pdfplumber] Optimize extraction with settings: Pass \`table_settings\` to \`extract_tables()\`: \`page.extract_tables(table_settings={'vertical_strategy
-[tool_pdfplumber] Filter extracted tables: Use list comprehensions to filter tables: \`filtered_tables = [table for table in tables if len(table
-[tool_pdfplumber] Handle multi-page PDFs: Loop through pages with \`for page in pdf.pages:\` and call \`page.extract_tables()\` for each page to g`;
+    // Test 1: Identical vectors
+    const vec1 = [1, 2, 3];
+    const vec2 = [1, 2, 3];
+    console.log("Test 1:", cosineSimilarity(vec1, vec2)); // Expected: 1
 
-const phrases = extractKeyPhrases(context);
-console.log("Extracted phrases:", phrases);
+    // Test 2: Completely opposite vectors
+    const vec3 = [1, 0, -1];
+    const vec4 = [-1, 0, 1];
+    console.log("Test 2:", cosineSimilarity(vec3, vec4)); // Expected: -1
 
-// Edge case: Empty string
-console.log("Test empty string:", extractKeyPhrases(""));
+    // Test 3: Orthogonal vectors
+    const vec5 = [1, 0];
+    const vec6 = [0, 1];
+    console.log("Test 3:", cosineSimilarity(vec5, vec6)); // Expected: 0
 
-// Edge case: No brackets
-console.log("Test no brackets:", extractKeyPhrases("This is a test without any brackets."));
+    // Test 4: Zero vector
+    const vec7 = [0, 0, 0];
+    const vec8 = [1, 2, 3];
+    console.log("Test 4:", cosineSimilarity(vec7, vec8)); // Expected: 0
 
-// Edge case: Nested brackets (should only extract outermost)
-console.log("Test nested brackets:", extractKeyPhrases("This [contains [nested] brackets] example."));
+    // Test 5: Different lengths (should throw error)
+    try {
+        const vec9 = [1, 2];
+        const vec10 = [1, 2, 3];
+        console.log("Test 5:", cosineSimilarity(vec9, vec10));
+    } catch (e) {
+        console.log("Test 5:", e.message); // Expected: Error message
+    }
 
-// Edge case: Multiple brackets in a single line
-console.log("Test multiple brackets:", extractKeyPhrases("Here are [multiple] brackets [in one] line."));
+    console.log("Tests completed.");
+}
 
-// Edge case: Special characters inside brackets
-console.log("Test special characters:", extractKeyPhrases("Special [!@#$%^&*()] characters inside brackets."));
-
-console.log("All test cases completed.");
+// Execute tests
+runTests();
