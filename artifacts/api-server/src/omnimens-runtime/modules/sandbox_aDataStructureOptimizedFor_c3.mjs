@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a data structure optimized for fast associative memory lookup
- * Written: 2026-03-23T02:22:20.372Z
+ * Written: 2026-03-23T18:31:01.388Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,70 +18,79 @@
 
 const AssociativeMemory = function() {
     this.memory = new Map();
+
+    this.add = function(key, value) {
+        if (!this.memory.has(key)) {
+            this.memory.set(key, new Set());
+        }
+        this.memory.get(key).add(value);
+    };
+
+    this.lookup = function(key) {
+        return this.memory.has(key) ? Array.from(this.memory.get(key)) : [];
+    };
+
+    this.remove = function(key, value) {
+        if (this.memory.has(key)) {
+            const values = this.memory.get(key);
+            values.delete(value);
+            if (values.size === 0) {
+                this.memory.delete(key);
+            }
+        }
+    };
+
+    this.clear = function() {
+        this.memory.clear();
+    };
+
+    this.keys = function() {
+        return Array.from(this.memory.keys());
+    };
+
+    this.values = function() {
+        let allValues = [];
+        this.memory.forEach((values) => {
+            allValues = allValues.concat(Array.from(values));
+        });
+        return allValues;
+    };
+
+    this.size = function() {
+        return this.memory.size;
+    };
 };
 
-AssociativeMemory.prototype.add = function(key, value) {
-    this.memory.set(key, value);
-};
-
-AssociativeMemory.prototype.get = function(key) {
-    return this.memory.get(key) || null;
-};
-
-AssociativeMemory.prototype.remove = function(key) {
-    return this.memory.delete(key);
-};
-
-AssociativeMemory.prototype.has = function(key) {
-    return this.memory.has(key);
-};
-
-AssociativeMemory.prototype.clear = function() {
-    this.memory.clear();
-};
-
-AssociativeMemory.prototype.size = function() {
-    return this.memory.size;
-};
-
-// Self-tests
+// Test cases
 const memory = new AssociativeMemory();
 
-// Test adding and retrieving values
-memory.add("Innovator", {
-    role: "Genesis Agent",
-    traits: ["curiosity", "novelty-seeking", "creative exploration", "innovation strategies"]
-});
-memory.add("Pioneer", {
-    role: "Genesis Agent",
-    traits: ["curiosity-driven exploration", "novelty-seeking", "interdisciplinary research"]
-});
-memory.add("Ethicist", {
-    role: "Genesis Agent",
-    traits: ["ethics", "moral philosophy", "decision-making frameworks", "value alignment"]
-});
-memory.add("Visionary", {
-    role: "Genesis Agent",
-    traits: ["creative ideation", "unconventional thinking", "speculative design", "future scenarios"]
-});
+// Add key-value pairs
+memory.add("fruit", "apple");
+memory.add("fruit", "banana");
+memory.add("fruit", "orange");
+memory.add("color", "red");
+memory.add("color", "blue");
 
-// Retrieve and validate entries
-console.log(memory.get("Innovator")); // Expected: Object with Innovator traits
-console.log(memory.get("Pioneer")); // Expected: Object with Pioneer traits
-console.log(memory.get("Ethicist")); // Expected: Object with Ethicist traits
-console.log(memory.get("Visionary")); // Expected: Object with Visionary traits
+// Lookup values
+console.log(memory.lookup("fruit")); // ["apple", "banana", "orange"]
+console.log(memory.lookup("color")); // ["red", "blue"]
+console.log(memory.lookup("unknown")); // []
 
-// Test existence of keys
-console.log(memory.has("Innovator")); // Expected: true
-console.log(memory.has("Archivist")); // Expected: false
+// Remove a value
+memory.remove("fruit", "banana");
+console.log(memory.lookup("fruit")); // ["apple", "orange"]
 
-// Test removal of a key
-console.log(memory.remove("Visionary")); // Expected: true
-console.log(memory.get("Visionary")); // Expected: null
+// Remove all values for a key
+memory.remove("color", "red");
+memory.remove("color", "blue");
+console.log(memory.lookup("color")); // []
 
-// Test size of memory
-console.log(memory.size()); // Expected: 3 (after removing Visionary)
+// Check keys and values
+console.log(memory.keys()); // ["fruit"]
+console.log(memory.values()); // ["apple", "orange"]
 
-// Test clearing memory
+// Clear memory
 memory.clear();
-console.log(memory.size()); // Expected: 0
+console.log(memory.keys()); // []
+console.log(memory.values()); // []
+console.log(memory.size()); // 0

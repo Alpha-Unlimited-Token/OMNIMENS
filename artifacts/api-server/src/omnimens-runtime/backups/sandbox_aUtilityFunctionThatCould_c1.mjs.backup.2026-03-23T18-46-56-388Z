@@ -1,0 +1,59 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-23T18:07:13.710Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+function extractKeywords(text, minLength = 3) {
+    const stopWords = new Set([
+        "the", "is", "in", "at", "of", "on", "and", "a", "to", "it", "this", "that", "with", "for", "as", "was", "by", "an", "be", "or", "from", "are", "but", "not", "have", "has", "had", "which", "were", "can", "will", "would", "could", "should", "may", "might", "must", "do", "does", "did", "so", "if", "then", "than", "such", "like", "about", "into", "out", "up", "down", "over", "under", "these", "those", "their", "there", "here", "how", "what", "why", "when", "where", "who", "whom", "whose", "some", "any", "each", "every", "either", "neither", "both", "few", "many", "more", "most", "other", "another", "same", "different", "again", "always", "never", "sometimes", "often", "once", "all", "no", "yes", "yet", "still", "just"
+    ]);
+
+    function cleanWord(word) {
+        return word.toLowerCase().replace(/[^a-z0-9]/g, "");
+    }
+
+    const words = text.split(/\s+/);
+    const keywordCount = {};
+
+    for (let word of words) {
+        const cleanedWord = cleanWord(word);
+        if (cleanedWord.length >= minLength && !stopWords.has(cleanedWord)) {
+            keywordCount[cleanedWord] = (keywordCount[cleanedWord] || 0) + 1;
+        }
+    }
+
+    const sortedKeywords = Object.entries(keywordCount)
+        .sort((a, b) => b[1] - a[1])
+        .map(entry => ({ keyword: entry[0], count: entry[1] }));
+
+    return sortedKeywords;
+}
+
+// Self-tests
+console.log("Test Case 1:");
+console.log(extractKeywords("The quick brown fox jumps over the lazy dog. The fox is quick and clever."));
+
+console.log("Test Case 2:");
+console.log(extractKeywords("Artificial intelligence is a fascinating field of study. Intelligence and learning are key components of AI."));
+
+console.log("Test Case 3:");
+console.log(extractKeywords("Data processing and pattern matching are essential for text analysis and optimization.", 4));
+
+console.log("Test Case 4:");
+console.log(extractKeywords("A short sentence with few keywords.", 5));
+
+console.log("Test Case 5:");
+console.log(extractKeywords(""));
