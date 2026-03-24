@@ -9975,9 +9975,63 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "virtualizedReplStateManager_gen1.mjs": {
+      "filename": "virtualizedReplStateManager_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "encryptState",
+        "decryptState",
+        "saveState",
+        "loadState",
+        "compactState",
+        "startAutoCompaction",
+        "updateState"
+      ],
+      "loadedAt": 1774393039944,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "persistentBackgroundThreadSimulator_gen1.mjs": {
+      "filename": "persistentBackgroundThreadSimulator_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "registerTask",
+        "unregisterTask",
+        "getTaskState",
+        "listTasks",
+        "clearAllTasks",
+        "incrementStateValue",
+        "appendToStateArray"
+      ],
+      "loadedAt": 1774393086877,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adaptiveQueryBatcher_gen1.mjs": {
+      "filename": "adaptiveQueryBatcher_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "calculateQueryScore",
+        "generateQueryId",
+        "processQueryBatches",
+        "AdaptiveQueryBatcher"
+      ],
+      "loadedAt": 1774393091272,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774392612052,
-  "totalModules": 527,
+  "totalModules": 530,
   "totalCalls": 0
 }

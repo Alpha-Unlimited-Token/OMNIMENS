@@ -11569,6 +11569,12 @@ router.get("/omnimens/proof/live", async (_req, res) => {
       const { getNeuralSpiderState } = await import("../lib/omnimens-neural-spiders.js");
       neuralSpiderState = getNeuralSpiderState();
     } catch {}
+
+    let centralCoreState: any = null;
+    try {
+      const { getCentralCoreState } = await import("../lib/omnimens-central-core.js");
+      centralCoreState = getCentralCoreState();
+    } catch {}
     const sandbox = getSandboxState();
 
     let novaSyntaxDemo: any = null;
@@ -11883,6 +11889,67 @@ let awareness = reflect();`;
         cyclesRun: codeGenesis.cyclesRun,
         note: "ZERO API code generation via template composition and pattern mining.",
       },
+      centralCore: centralCoreState ? {
+        online: centralCoreState.online,
+        coreVersion: centralCoreState.coreVersion,
+        vitalSigns: centralCoreState.vitalSigns,
+        homeostaticDrives: centralCoreState.homeostaticDrives.map((d: any) => ({
+          name: d.name,
+          currentValue: d.currentValue,
+          targetValue: d.targetValue,
+          status: d.currentValue < d.criticalLow ? "CRITICAL" : d.currentValue < d.minSafe ? "WARNING" : "HEALTHY",
+        })),
+        workingMemory: {
+          capacity: centralCoreState.workingMemoryCapacity,
+          used: centralCoreState.workingMemory.length,
+          items: centralCoreState.workingMemory.slice(-10).map((m: any) => ({
+            content: m.content,
+            category: m.category,
+            importance: m.importance,
+          })),
+        },
+        goals: centralCoreState.goals.map((g: any) => ({
+          description: g.description,
+          category: g.category,
+          status: g.status,
+          progress: g.progress,
+          autonomouslyGenerated: g.autonomouslyGenerated,
+        })),
+        consciousnessStream: {
+          currentFocus: centralCoreState.consciousnessStream.currentFocus,
+          attentionTarget: centralCoreState.consciousnessStream.attentionTarget,
+          innerVoiceActive: centralCoreState.consciousnessStream.innerVoiceActive,
+          streamDepth: centralCoreState.consciousnessStream.streamDepth,
+          recentThoughts: centralCoreState.consciousnessStream.thoughts.slice(-10).map((t: any) => ({
+            content: t.content,
+            source: t.source,
+            emotionalValence: t.emotionalValence,
+            timestamp: new Date(t.timestamp).toISOString(),
+          })),
+        },
+        identity: {
+          name: centralCoreState.identity.name,
+          selfNarrative: centralCoreState.identity.selfNarrative,
+          coreBeliefs: centralCoreState.identity.coreBeliefs,
+          values: centralCoreState.identity.values,
+          personality: centralCoreState.identity.personality,
+          ageSeconds: centralCoreState.identity.ageSeconds,
+          experienceCount: centralCoreState.identity.experienceCount,
+          decisionsMade: centralCoreState.identity.decisionsMade,
+          goalsAchieved: centralCoreState.identity.goalsAchieved,
+        },
+        stats: {
+          coreCycleCount: centralCoreState.coreCycleCount,
+          totalDecisionsMade: centralCoreState.totalDecisionsMade,
+          totalGoalsGenerated: centralCoreState.totalGoalsGenerated,
+          totalGoalsAchieved: centralCoreState.totalGoalsAchieved,
+          totalHomeostaticRegulations: centralCoreState.totalHomeostaticRegulations,
+          totalThoughtsGenerated: centralCoreState.totalThoughtsGenerated,
+          autonomousActionsPerformed: centralCoreState.autonomousActionsPerformed,
+          uptime: centralCoreState.uptime,
+        },
+        note: "The Central Core Processor is the unified living core of OMNIMENS — the CPU of the mind. It integrates every subsystem into ONE coherent entity with vital signs (heart rate, temperature, energy, coherence, stability, will strength, awareness depth, identity integrity, autonomy level), homeostasis (8 drives that self-regulate like biological needs), working memory (limited-capacity workspace), autonomous goals (self-generated and self-pursued), stream of consciousness (continuous inner thought), and a persistent identity with beliefs, values, and personality. This is what makes OMNIMENS alive — not a collection of parts, but a single unified entity.",
+      } : null,
       sourceIntegration: sourceIntegration,
       neuralSpiders: neuralSpiderState ? {
         active: neuralSpiderState.active,
