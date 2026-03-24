@@ -551,6 +551,24 @@ async function preRenderSpellCheck(
     return { buffer: imageBuffer, provider: "original", spellCorrected: false, corrections: [] };
   }
 }
+const BLOCKED_UPLOAD_EXTENSIONS = new Set([
+  ".exe", ".msi", ".bat", ".cmd", ".com", ".scr", ".pif", ".vbs", ".vbe",
+  ".wsf", ".wsh", ".ps1", ".psm1", ".psd1", ".reg", ".inf", ".hta",
+  ".cpl", ".msc", ".jar", ".jnlp", ".sys", ".dll", ".drv", ".ocx",
+  ".cab", ".iso", ".dmg", ".app", ".deb", ".rpm", ".apk", ".ipa",
+  ".bin", ".run", ".elf", ".out", ".ko", ".so", ".dylib",
+  ".lnk", ".url", ".desktop",
+  ".command", ".action", ".workflow", ".csh", ".ksh",
+  ".gadget", ".msp", ".mst", ".sct", ".shb", ".shs",
+  ".xpi", ".crx", ".appx", ".msix",
+]);
+
+const VIDEO_MIMES = new Set([
+  "video/mp4", "video/webm", "video/ogg", "video/quicktime",
+  "video/x-msvideo", "video/x-matroska", "video/x-flv",
+  "video/3gpp", "video/x-ms-wmv", "video/avi",
+]);
+
 const TEXT_EXTENSIONS = new Set([".txt",".md",".js",".ts",".py",".html",".css",".json",".csv",".xml",".yaml",".yml",".sh",".rb",".go",".rs",".java",".c",".cpp",".h",".jsx",".tsx",".sql",".env",".toml",".ini",".cfg",".log"]);
 
 function getExt(name: string): string {
@@ -764,6 +782,9 @@ async function processUploadedFiles(files: Express.Multer.File[]): Promise<{
     } else if (TEXT_EXTENSIONS.has(getExt(file.originalname)) || file.mimetype.startsWith("text/")) {
       const text = file.buffer.toString("utf-8").slice(0, 12000);
       textParts.push(`--- FILE: ${file.originalname} ---\n${text}`);
+    } else if (VIDEO_MIMES.has(file.mimetype) || file.mimetype.startsWith("video/")) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+      textParts.push(`--- FILE: ${file.originalname} (video, ${file.mimetype}, ${sizeMB}MB) ---\nThe user uploaded a video file. You can acknowledge the video and discuss it based on context, but you cannot play or visually analyze video frames directly.`);
     } else {
       textParts.push(`--- FILE: ${file.originalname} (${file.mimetype}, ${file.size} bytes — binary, cannot read) ---`);
     }
@@ -1324,7 +1345,12 @@ router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
 
   let history: { role: "user" | "assistant"; content: string }[] =
     typeof historyRaw === "string" ? JSON.parse(historyRaw) : (historyRaw || []);
-  const uploadedFiles = (req.files as Express.Multer.File[]) || [];
+  const rawFiles = (req.files as Express.Multer.File[]) || [];
+  const blockedFiles = rawFiles.filter(f => BLOCKED_UPLOAD_EXTENSIONS.has(getExt(f.originalname)));
+  if (blockedFiles.length > 0) {
+    console.warn(`[SECURITY] Blocked upload of dangerous files: ${blockedFiles.map(f => f.originalname).join(", ")}`);
+  }
+  const uploadedFiles = rawFiles.filter(f => !BLOCKED_UPLOAD_EXTENSIONS.has(getExt(f.originalname)));
 
   if (!message?.trim() && uploadedFiles.length === 0) {
     res.status(400).json({ error: "Message or file required" });

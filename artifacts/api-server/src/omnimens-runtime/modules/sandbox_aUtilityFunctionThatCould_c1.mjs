@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-24T04:35:43.127Z
+ * Written: 2026-03-24T05:03:23.905Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,57 +16,34 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentPatterns(text, patternLength) {
-    if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
-        throw new Error("Invalid input: text must be a string and patternLength must be a positive number.");
+function levenshteinDistance(str1, str2) {
+    const len1 = str1.length;
+    const len2 = str2.length;
+    const dp = Array(len1 + 1).fill(null).map(() => Array(len2 + 1).fill(0));
+
+    for (let i = 0; i <= len1; i++) dp[i][0] = i;
+    for (let j = 0; j <= len2; j++) dp[0][j] = j;
+
+    for (let i = 1; i <= len1; i++) {
+        for (let j = 1; j <= len2; j++) {
+            const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+            dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+        }
     }
 
-    const patternCounts = {};
-    const textLength = text.length;
-
-    for (let i = 0; i <= textLength - patternLength; i++) {
-        const pattern = text.slice(i, i + patternLength);
-        patternCounts[pattern] = (patternCounts[pattern] || 0) + 1;
-    }
-
-    const sortedPatterns = Object.entries(patternCounts)
-        .sort((a, b) => b[1] - a[1])
-        .map(([pattern, count]) => ({ pattern, count }));
-
-    return sortedPatterns;
+    return dp[len1][len2];
 }
 
-// Test cases
-function runTests() {
-    console.log("Test Case 1: Basic functionality");
-    const text1 = "abababab";
-    const patterns1 = findMostFrequentPatterns(text1, 2);
-    console.log(patterns1); // Expected: [{ pattern: 'ab', count: 4 }, { pattern: 'ba', count: 3 }]
-
-    console.log("Test Case 2: Single character patterns");
-    const text2 = "aaaaa";
-    const patterns2 = findMostFrequentPatterns(text2, 1);
-    console.log(patterns2); // Expected: [{ pattern: 'a', count: 5 }]
-
-    console.log("Test Case 3: Edge case with empty text");
-    const text3 = "";
-    const patterns3 = findMostFrequentPatterns(text3, 2);
-    console.log(patterns3); // Expected: []
-
-    console.log("Test Case 4: Edge case with patternLength larger than text length");
-    const text4 = "abc";
-    const patterns4 = findMostFrequentPatterns(text4, 5);
-    console.log(patterns4); // Expected: []
-
-    console.log("Test Case 5: Pattern length equals text length");
-    const text5 = "hello";
-    const patterns5 = findMostFrequentPatterns(text5, 5);
-    console.log(patterns5); // Expected: [{ pattern: 'hello', count: 1 }]
-
-    console.log("Test Case 6: Complex text with overlapping patterns");
-    const text6 = "abcabcabc";
-    const patterns6 = findMostFrequentPatterns(text6, 3);
-    console.log(patterns6); // Expected: [{ pattern: 'abc', count: 3 }, { pattern: 'bca', count: 2 }, { pattern: 'cab', count: 2 }]
+function testLevenshteinDistance() {
+    console.log(levenshteinDistance("kitten", "sitting")); // Expected: 3
+    console.log(levenshteinDistance("flaw", "lawn")); // Expected: 2
+    console.log(levenshteinDistance("intention", "execution")); // Expected: 5
+    console.log(levenshteinDistance("", "")); // Expected: 0
+    console.log(levenshteinDistance("abc", "")); // Expected: 3
+    console.log(levenshteinDistance("", "def")); // Expected: 3
+    console.log(levenshteinDistance("same", "same")); // Expected: 0
+    console.log(levenshteinDistance("a", "b")); // Expected: 1
+    console.log(levenshteinDistance("abcdef", "azced")); // Expected: 3
 }
 
-runTests();
+testLevenshteinDistance();

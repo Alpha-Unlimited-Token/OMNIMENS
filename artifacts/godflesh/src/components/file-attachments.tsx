@@ -4,7 +4,7 @@
  * Unauthorized reproduction, distribution, or use is strictly prohibited.
  */
 
-import { X, FileText, FileCode, FileImage, File } from "lucide-react";
+import { X, FileText, FileCode, FileImage, File, FileAudio, Film } from "lucide-react";
 import type { AttachedFile } from "@/hooks/use-omnimens-chat";
 
 function formatBytes(bytes: number): string {
@@ -15,10 +15,27 @@ function formatBytes(bytes: number): string {
 
 function FileIcon({ type, name }: { type: string; name: string }) {
   if (type.startsWith("image/")) return <FileImage className="w-4 h-4 text-blue-400" />;
+  if (type.startsWith("video/")) return <Film className="w-4 h-4 text-emerald-400" />;
+  if (type.startsWith("audio/")) return <FileAudio className="w-4 h-4 text-purple-400" />;
   if (type === "application/pdf") return <FileText className="w-4 h-4 text-red-400" />;
   const ext = name.split(".").pop()?.toLowerCase();
+  if (["mp4","mov","avi","mkv","webm","m4v","wmv","flv","3gp","ogv"].includes(ext || "")) {
+    return <Film className="w-4 h-4 text-emerald-400" />;
+  }
+  if (["wav","mp3","m4a","ogg","aac","flac","opus","wma"].includes(ext || "")) {
+    return <FileAudio className="w-4 h-4 text-purple-400" />;
+  }
+  if (ext === "pdf") {
+    return <FileText className="w-4 h-4 text-red-400" />;
+  }
   if (["js","ts","py","html","css","json","jsx","tsx","go","rs","java"].includes(ext || "")) {
     return <FileCode className="w-4 h-4 text-green-400" />;
+  }
+  if (["doc","docx","xls","xlsx","ppt","pptx","rtf","odt","ods"].includes(ext || "")) {
+    return <FileText className="w-4 h-4 text-blue-300" />;
+  }
+  if (["zip","rar","7z","tar","gz","bz2"].includes(ext || "")) {
+    return <File className="w-4 h-4 text-yellow-400" />;
   }
   return <File className="w-4 h-4 text-white" />;
 }

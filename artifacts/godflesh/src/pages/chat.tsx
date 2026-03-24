@@ -2189,7 +2189,7 @@ function PlusMenuContent({ onClose, onUpload, onDatabase, onWebSearch, onResonan
   }
 
   const menuItems = [
-    { icon: <Paperclip className="w-4 h-4" />, label: "Upload a file", sub: "Image, PDF, code, CSV…", color: "text-white/80", onClick: onUpload },
+    { icon: <Paperclip className="w-4 h-4" />, label: "Upload a file", sub: "Image, video, audio, PDF, docs & more", color: "text-white/80", onClick: onUpload },
     { icon: <Image className="w-4 h-4" />, label: "Generate Image", sub: "AI image from text prompt (20 credits)", color: "text-pink-400", onClick: onGenerateImage },
     { icon: <Wand2 className="w-4 h-4" />, label: "Edit Image", sub: "Upload + modify with AI (20 credits)", color: "text-rose-400", onClick: onEditImage },
     { icon: <Film className="w-4 h-4" />, label: "Generate Video", sub: "AI video from text prompt (30 credits)", color: "text-amber-400", onClick: onGenerateVideo },
@@ -5752,9 +5752,29 @@ export default function Chat() {
     });
   }, [messages, isTyping, activeProject]);
 
+  const BLOCKED_EXTENSIONS = new Set([
+    ".exe", ".msi", ".bat", ".cmd", ".com", ".scr", ".pif", ".vbs", ".vbe",
+    ".wsf", ".wsh", ".ps1", ".psm1", ".psd1", ".reg", ".inf", ".hta",
+    ".cpl", ".msc", ".jar", ".jnlp", ".sys", ".dll", ".drv", ".ocx",
+    ".cab", ".iso", ".dmg", ".app", ".deb", ".rpm", ".apk", ".ipa",
+    ".bin", ".run", ".elf", ".out", ".ko", ".so", ".dylib",
+    ".lnk", ".url", ".desktop",
+    ".command", ".action", ".workflow", ".csh", ".ksh",
+    ".gadget", ".msp", ".mst", ".sct", ".shb", ".shs",
+    ".xpi", ".crx", ".appx", ".msix",
+  ]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files || []);
-    setPendingFiles((prev) => [...prev, ...selected].slice(0, 10));
+    const safe = selected.filter(f => {
+      const ext = f.name.includes(".") ? ("." + f.name.split(".").pop()!.toLowerCase()) : "";
+      if (BLOCKED_EXTENSIONS.has(ext)) {
+        alert(`"${f.name}" was blocked — executable and system files are not allowed for security.`);
+        return false;
+      }
+      return true;
+    });
+    setPendingFiles((prev) => [...prev, ...safe].slice(0, 10));
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -7137,7 +7157,7 @@ export default function Chat() {
             )}
             <div className="relative flex items-center">
               <input ref={fileInputRef} type="file" multiple
-                accept="image/*,.pdf,.txt,.md,.js,.ts,.jsx,.tsx,.py,.html,.css,.json,.csv,.xml,.yaml,.yml,.sh,.rb,.go,.rs,.java,.c,.cpp,.h,.sql"
+                accept="*/*"
                 onChange={handleFileChange} className="hidden"
               />
               {/* + menu button */}
