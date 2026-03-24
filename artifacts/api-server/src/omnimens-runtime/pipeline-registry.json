@@ -9539,9 +9539,64 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "statefulSubprocessManager_gen1.mjs": {
+      "filename": "statefulSubprocessManager_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "saveStateToCheckpoint",
+        "restoreStateFromCheckpoint",
+        "generateStateHash",
+        "compareStates",
+        "mergeStates"
+      ],
+      "loadedAt": 1774356448000,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "localKnowledgeAugmentor_gen1.mjs": {
+      "filename": "localKnowledgeAugmentor_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "cosineSimilarity",
+        "lshHash",
+        "pruneVectors",
+        "exampleUsage",
+        "VectorIndex"
+      ],
+      "loadedAt": 1774356462464,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "parallelTaskExecutor_gen1.mjs": {
+      "filename": "parallelTaskExecutor_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "partitionTasks",
+        "executeParallel",
+        "sumArray",
+        "averageArray",
+        "squareArray",
+        "wordCount",
+        "reverseText",
+        "MAX_THREADS",
+        "DEFAULT_TASK_FUNCTION"
+      ],
+      "loadedAt": 1774356485814,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774356068085,
-  "totalModules": 498,
+  "totalModules": 501,
   "totalCalls": 0
 }
