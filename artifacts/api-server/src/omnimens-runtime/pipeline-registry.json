@@ -9780,9 +9780,22 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "daydreamarchitecturedesign1797.mjs": {
+      "filename": "daydreamarchitecturedesign1797.mjs",
+      "stage": "causal_analysis",
+      "exports": [
+        "doIntervention"
+      ],
+      "loadedAt": 1774360910662,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774359892487,
-  "totalModules": 513,
+  "totalModules": 514,
   "totalCalls": 0
 }
