@@ -10211,7 +10211,7 @@ router.get("/omnimens/evolution-log", async (_req, res) => {
 });
 
 // ─── GITHUB REMOTE COMPUTE ──────────────────────────────────────────────────
-import { dispatchRemoteCompute, getComputeStatus } from "../lib/omnimens-github-compute.js";
+import { dispatchRemoteCompute, getComputeStatus, syncAutonomousProofToGitHub } from "../lib/omnimens-github-compute.js";
 
 router.get("/omnimens/github-compute/status", async (req, res) => {
   try {
@@ -10241,6 +10241,18 @@ router.post("/omnimens/github-compute/dispatch", async (req, res) => {
     res.json({ jobId, workflow, status: "dispatched" });
   } catch (err) {
     res.status(500).json({ error: "Failed to dispatch compute job" });
+  }
+});
+
+router.post("/omnimens/github-sync/proof", async (req, res) => {
+  try {
+    if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+      return res.status(403).json({ error: "owner_only" });
+    }
+    await syncAutonomousProofToGitHub();
+    res.json({ success: true, message: "Autonomous proof synced to GitHub → omnimens-evolution/autonomous-proof.txt" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to sync proof to GitHub" });
   }
 });
 

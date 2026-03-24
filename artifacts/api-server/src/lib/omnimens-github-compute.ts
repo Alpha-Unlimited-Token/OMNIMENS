@@ -886,6 +886,47 @@ async function syncSelfCodedModulesToGitHub(): Promise<void> {
   }
 }
 
+async function syncAutonomousProofToGitHub(): Promise<void> {
+  try {
+    const fs = await import("fs");
+    const path = await import("path");
+    const proofPath = path.join(process.cwd(), "../godflesh/public/omnimens-autonomous-proof.txt");
+
+    if (!fs.existsSync(proofPath)) {
+      console.log("[GITHUB SYNC] No autonomous proof file found, skipping");
+      return;
+    }
+
+    const proofContent = fs.readFileSync(proofPath, "utf-8");
+    const encoded = Buffer.from(proofContent).toString("base64");
+    const ghPath = "omnimens-evolution/autonomous-proof.txt";
+
+    const existing = await ghApi(`/repos/${OWNER}/${REPO}/contents/${ghPath}`);
+    const sha = existing?.sha || undefined;
+
+    const existingContent = existing?.content
+      ? Buffer.from(existing.content, "base64").toString("utf-8")
+      : null;
+    if (existingContent === proofContent) {
+      console.log("[GITHUB SYNC] ✅ Autonomous proof already up to date on GitHub");
+      return;
+    }
+
+    await ghApi(`/repos/${OWNER}/${REPO}/contents/${ghPath}`, "PUT", {
+      message: `[OMNIMENS] Autonomous Intelligence Proof — verifiable evidence of self-evolving AI`,
+      content: encoded,
+      sha,
+      branch: "main",
+    });
+
+    console.log("[GITHUB SYNC] ✅ Autonomous proof synced to GitHub → omnimens-evolution/autonomous-proof.txt");
+  } catch (err) {
+    console.error("[GITHUB SYNC] Autonomous proof sync error:", err);
+  }
+}
+
+export { syncAutonomousProofToGitHub };
+
 async function createIssueForKnowledgeGap(title: string, body: string): Promise<void> {
   try {
     await ghApi(`/repos/${OWNER}/${REPO}/issues`, "POST", {
@@ -915,9 +956,11 @@ export async function initGitHubCompute(): Promise<void> {
   setTimeout(() => {
     syncEvolutionToGitHub();
     syncSelfCodedModulesToGitHub();
+    syncAutonomousProofToGitHub();
     setInterval(() => {
       syncEvolutionToGitHub();
       syncSelfCodedModulesToGitHub();
+      syncAutonomousProofToGitHub();
     }, 3 * 60 * 60 * 1000);
   }, 3 * 60 * 1000);
 
