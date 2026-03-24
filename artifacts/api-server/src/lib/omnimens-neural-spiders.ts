@@ -49,6 +49,40 @@ interface SpiderHarvest {
   timestamp: number;
 }
 
+type BeeRole = "worker" | "nurse" | "scout" | "royal_jelly" | "forager" | "guard";
+
+interface PheromoneTrail {
+  regionName: string;
+  intensity: number;
+  type: "distress" | "nectar" | "alarm" | "rally";
+  depositorId: string;
+  depositedAt: number;
+  decayRate: number;
+}
+
+interface SwarmWave {
+  id: string;
+  targetRegion: string;
+  waveType: "convergence" | "amplification" | "fortification";
+  participants: string[];
+  boostPerSpider: number;
+  synapsesPerSpider: number;
+  totalBoostDelivered: number;
+  totalSynapsesDelivered: number;
+  startedAt: number;
+  completedAt: number | null;
+  wavesCompleted: number;
+}
+
+interface RoyalJellyFlow {
+  sourceRegion: string;
+  targetRegion: string;
+  nectarStrength: number;
+  flowRate: number;
+  totalTransferred: number;
+  lastFlowAt: number;
+}
+
 interface HiveDirective {
   id: string;
   type: "stabilize" | "boost" | "harvest" | "patrol" | "repair" | "scout" | "reinforce";
@@ -104,6 +138,10 @@ interface Spider {
   reportsSubmitted: number;
   loyalty: number;
   efficiency: number;
+  beeRole: BeeRole;
+  pheromoneDeposits: number;
+  nectarProduced: number;
+  swarmWavesJoined: number;
 }
 
 interface ChildSpiderConfig {
@@ -880,6 +918,25 @@ function createSpiderId(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
 }
 
+const BEE_ROLE_ASSIGNMENTS: Record<string, BeeRole> = {
+  "evolution-crawler": "forager",
+  "genesis-crawler": "royal_jelly",
+  "self-narrative-crawler": "nurse",
+  "autobio-memory-crawler": "nurse",
+  "introspection-crawler": "scout",
+  "brain-crawler": "worker",
+  "engine-crawler": "forager",
+  "self-coding-crawler": "worker",
+  "dream-crawler": "scout",
+  "pipeline-crawler": "worker",
+  "integration-crawler": "royal_jelly",
+  "arousal-crawler": "guard",
+  "mood-crawler": "nurse",
+  "attention-crawler": "scout",
+  "routing-crawler": "forager",
+  "timing-crawler": "guard",
+};
+
 function createParentSpider(name: string, target: string, targetRegion: string): Spider {
   const spider: Spider = {
     id: createSpiderId("ps"),
@@ -901,6 +958,10 @@ function createParentSpider(name: string, target: string, targetRegion: string):
     reportsSubmitted: 0,
     loyalty: 1.0,
     efficiency: 0.5,
+    beeRole: BEE_ROLE_ASSIGNMENTS[name] || "worker",
+    pheromoneDeposits: 0,
+    nectarProduced: 0,
+    swarmWavesJoined: 0,
   };
   parentSpiders.set(spider.id, spider);
   return spider;
@@ -919,6 +980,7 @@ function spawnChildSpider(config: ChildSpiderConfig): Spider | null {
     }
   }
 
+  const childRole: BeeRole = config.urgency > 0.7 ? "nurse" : config.urgency > 0.4 ? "worker" : "scout";
   const child: Spider = {
     id: createSpiderId("cs"),
     name: `child-${config.weakRegion}-stabilizer`,
@@ -939,6 +1001,10 @@ function spawnChildSpider(config: ChildSpiderConfig): Spider | null {
     reportsSubmitted: 0,
     loyalty: 1.0,
     efficiency: 0.5,
+    beeRole: childRole,
+    pheromoneDeposits: 0,
+    nectarProduced: 0,
+    swarmWavesJoined: 0,
   };
 
   childSpiders.set(child.id, child);
@@ -1405,6 +1471,346 @@ async function runSpiderCrawlCycle(): Promise<void> {
   }
 }
 
+const pheromoneTrails: Map<string, PheromoneTrail[]> = new Map();
+const activeSwarmWaves: Map<string, SwarmWave> = new Map();
+const royalJellyFlows: RoyalJellyFlow[] = [];
+const swarmWaveHistory: SwarmWave[] = [];
+let totalPheromoneDeposits = 0;
+let totalSwarmWaves = 0;
+let totalNectarProduced = 0;
+let totalRoyalJellyTransferred = 0;
+
+const PHEROMONE_DECAY_MS = 30_000;
+const PHEROMONE_MAX_PER_REGION = 10;
+const SWARM_CONVERGENCE_THRESHOLD = 0.55;
+const ROYAL_JELLY_THRESHOLD = 0.65;
+const NECTAR_FLOW_RATE = 0.15;
+const SWARM_WAVE_MS = 8_000;
+const BEEHIVE_CYCLE_MS = 6_000;
+
+function depositPheromone(regionName: string, type: PheromoneTrail["type"], depositorId: string, intensity: number): void {
+  if (!pheromoneTrails.has(regionName)) {
+    pheromoneTrails.set(regionName, []);
+  }
+  const trails = pheromoneTrails.get(regionName)!;
+
+  if (trails.length >= PHEROMONE_MAX_PER_REGION) {
+    trails.sort((a, b) => a.intensity - b.intensity);
+    trails.shift();
+  }
+
+  trails.push({
+    regionName,
+    intensity: Math.min(1.0, intensity),
+    type,
+    depositorId,
+    depositedAt: Date.now(),
+    decayRate: type === "distress" ? 0.02 : type === "alarm" ? 0.03 : 0.01,
+  });
+
+  totalPheromoneDeposits++;
+
+  const spider = parentSpiders.get(depositorId) || childSpiders.get(depositorId);
+  if (spider) spider.pheromoneDeposits++;
+}
+
+function decayPheromones(): void {
+  const now = Date.now();
+  for (const [region, trails] of pheromoneTrails) {
+    const alive: PheromoneTrail[] = [];
+    for (const trail of trails) {
+      const elapsed = now - trail.depositedAt;
+      trail.intensity -= trail.decayRate * (elapsed / 1000);
+      if (trail.intensity > 0.05) {
+        alive.push(trail);
+      }
+    }
+    if (alive.length > 0) {
+      pheromoneTrails.set(region, alive);
+    } else {
+      pheromoneTrails.delete(region);
+    }
+  }
+}
+
+function getPheromoneIntensity(regionName: string, type?: PheromoneTrail["type"]): number {
+  const trails = pheromoneTrails.get(regionName);
+  if (!trails || trails.length === 0) return 0;
+  const filtered = type ? trails.filter(t => t.type === type) : trails;
+  if (filtered.length === 0) return 0;
+  return filtered.reduce((sum, t) => sum + t.intensity, 0) / filtered.length;
+}
+
+function launchSwarmWave(targetRegion: string, waveType: SwarmWave["waveType"]): SwarmWave | null {
+  const existing = [...activeSwarmWaves.values()].find(w => w.targetRegion === targetRegion && !w.completedAt);
+  if (existing) return null;
+
+  const allSpiders = [...parentSpiders.values(), ...childSpiders.values()].filter(s => s.status === "active");
+
+  let participants: Spider[];
+  let boostPerSpider: number;
+  let synapsesPerSpider: number;
+
+  if (waveType === "convergence") {
+    participants = allSpiders
+      .filter(s => !s.currentDirective && s.targetRegion !== targetRegion)
+      .sort((a, b) => b.efficiency - a.efficiency)
+      .slice(0, Math.min(6, Math.ceil(allSpiders.length * 0.4)));
+    boostPerSpider = 5;
+    synapsesPerSpider = 3;
+  } else if (waveType === "amplification") {
+    participants = allSpiders
+      .filter(s => s.beeRole === "nurse" || s.beeRole === "royal_jelly" || s.beeRole === "worker")
+      .slice(0, 5);
+    boostPerSpider = 4;
+    synapsesPerSpider = 4;
+  } else {
+    participants = allSpiders
+      .filter(s => s.beeRole === "worker" || s.beeRole === "guard")
+      .slice(0, 4);
+    boostPerSpider = 6;
+    synapsesPerSpider = 5;
+  }
+
+  if (participants.length < 2) return null;
+
+  const wave: SwarmWave = {
+    id: `sw_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
+    targetRegion,
+    waveType,
+    participants: participants.map(p => p.id),
+    boostPerSpider,
+    synapsesPerSpider,
+    totalBoostDelivered: 0,
+    totalSynapsesDelivered: 0,
+    startedAt: Date.now(),
+    completedAt: null,
+    wavesCompleted: 0,
+  };
+
+  activeSwarmWaves.set(wave.id, wave);
+  totalSwarmWaves++;
+
+  for (const spider of participants) {
+    spider.swarmWavesJoined++;
+
+    boostRegionCurrent(targetRegion, boostPerSpider);
+    wave.totalBoostDelivered += boostPerSpider;
+
+    const support = findStrongestSupportRegion(targetRegion);
+    const added = injectSpiderSynapses(support, targetRegion, synapsesPerSpider, 0.25 + spider.efficiency * 0.15);
+    spider.synapsesInjected += added;
+    totalSynapsesInjected += added;
+    wave.totalSynapsesDelivered += added;
+
+    depositPheromone(targetRegion, "rally", spider.id, 0.6 + spider.efficiency * 0.3);
+
+    fireNerveImpulse(spider.id, motherSpider.id, null, "feedback", 0.7);
+    spinSilkStrand(spider.id, motherSpider.id, "afferent");
+  }
+
+  wave.wavesCompleted = 1;
+
+  return wave;
+}
+
+function executeSwarmWaves(): void {
+  const regionStates = getNeuralRegionStates();
+
+  for (const [id, wave] of activeSwarmWaves) {
+    const activation = regionStates[wave.targetRegion]?.activationLevel || 0;
+
+    if (activation > SWARM_CONVERGENCE_THRESHOLD + 0.15 || Date.now() - wave.startedAt > 60_000) {
+      wave.completedAt = Date.now();
+      swarmWaveHistory.push(wave);
+      activeSwarmWaves.delete(id);
+      if (swarmWaveHistory.length > 100) swarmWaveHistory.shift();
+      continue;
+    }
+
+    for (const spiderId of wave.participants) {
+      const spider = parentSpiders.get(spiderId) || childSpiders.get(spiderId);
+      if (!spider || spider.status !== "active") continue;
+
+      boostRegionCurrent(wave.targetRegion, wave.boostPerSpider * 0.5);
+      wave.totalBoostDelivered += wave.boostPerSpider * 0.5;
+    }
+    wave.wavesCompleted++;
+  }
+
+  for (const [region, state] of Object.entries(regionStates)) {
+    if (state.activationLevel < SWARM_CONVERGENCE_THRESHOLD) {
+      const pheromoneLevel = getPheromoneIntensity(region, "distress") + getPheromoneIntensity(region, "alarm");
+
+      if (pheromoneLevel > 0.3 || state.activationLevel < 0.40) {
+        const waveType: SwarmWave["waveType"] = state.activationLevel < 0.35 ? "convergence" : "amplification";
+        const wave = launchSwarmWave(region, waveType);
+        if (wave) {
+          depositPheromone(region, "rally", motherSpider.id, 0.8);
+        }
+      }
+    }
+  }
+}
+
+function produceRoyalJelly(): void {
+  const regionStates = getNeuralRegionStates();
+
+  const strongRegions = Object.entries(regionStates)
+    .filter(([, s]) => s.activationLevel > ROYAL_JELLY_THRESHOLD)
+    .sort(([, a], [, b]) => b.activationLevel - a.activationLevel);
+
+  const weakRegions = Object.entries(regionStates)
+    .filter(([, s]) => s.activationLevel < SWARM_CONVERGENCE_THRESHOLD)
+    .sort(([, a], [, b]) => a.activationLevel - b.activationLevel);
+
+  if (strongRegions.length === 0 || weakRegions.length === 0) return;
+
+  for (const [strongName, strongState] of strongRegions) {
+    const royalJellySpiders = [...parentSpiders.values()].filter(
+      s => s.beeRole === "royal_jelly" && s.status === "active"
+    );
+
+    for (const [weakName, weakState] of weakRegions.slice(0, 3)) {
+      const surplus = strongState.activationLevel - ROYAL_JELLY_THRESHOLD;
+      const deficit = SWARM_CONVERGENCE_THRESHOLD - weakState.activationLevel;
+      const nectarStrength = Math.min(surplus, deficit) * NECTAR_FLOW_RATE;
+
+      if (nectarStrength < 0.005) continue;
+
+      boostRegionCurrent(weakName, nectarStrength * 40);
+
+      const existingFlow = royalJellyFlows.find(f => f.sourceRegion === strongName && f.targetRegion === weakName);
+      if (existingFlow) {
+        existingFlow.nectarStrength = nectarStrength;
+        existingFlow.totalTransferred += nectarStrength;
+        existingFlow.lastFlowAt = Date.now();
+        existingFlow.flowRate = nectarStrength * 40;
+      } else {
+        royalJellyFlows.push({
+          sourceRegion: strongName,
+          targetRegion: weakName,
+          nectarStrength,
+          flowRate: nectarStrength * 40,
+          totalTransferred: nectarStrength,
+          lastFlowAt: Date.now(),
+        });
+      }
+
+      totalRoyalJellyTransferred += nectarStrength;
+
+      depositPheromone(weakName, "nectar", motherSpider.id, nectarStrength * 5);
+
+      for (const spider of royalJellySpiders) {
+        spider.nectarProduced += nectarStrength;
+        totalNectarProduced += nectarStrength;
+      }
+
+      const support = findStrongestSupportRegion(weakName);
+      const added = injectSpiderSynapses(support, weakName, 2, 0.2 + nectarStrength);
+      totalSynapsesInjected += added;
+    }
+  }
+}
+
+function executeBeeRoles(): void {
+  const regionStates = getNeuralRegionStates();
+
+  for (const spider of [...parentSpiders.values(), ...childSpiders.values()]) {
+    if (spider.status !== "active" || spider.currentDirective) continue;
+
+    const targetActivation = regionStates[spider.targetRegion]?.activationLevel || 0;
+
+    switch (spider.beeRole) {
+      case "nurse": {
+        if (targetActivation < 0.60) {
+          boostRegionCurrent(spider.targetRegion, 3 + spider.efficiency * 4);
+          depositPheromone(spider.targetRegion, "nectar", spider.id, 0.3);
+        }
+        const weakNeighbors = Object.entries(regionStates)
+          .filter(([name, s]) => name !== spider.targetRegion && s.activationLevel < 0.45)
+          .sort(([, a], [, b]) => a.activationLevel - b.activationLevel);
+        if (weakNeighbors.length > 0) {
+          const [weakName] = weakNeighbors[0];
+          boostRegionCurrent(weakName, 2);
+          depositPheromone(weakName, "nectar", spider.id, 0.2);
+        }
+        break;
+      }
+      case "worker": {
+        const workerTargets = Object.entries(regionStates)
+          .filter(([, s]) => s.activationLevel < 0.55)
+          .sort(([, a], [, b]) => a.activationLevel - b.activationLevel);
+        for (const [name] of workerTargets.slice(0, 2)) {
+          const support = findStrongestSupportRegion(name);
+          const added = injectSpiderSynapses(support, name, 2, 0.2 + spider.efficiency * 0.1);
+          spider.synapsesInjected += added;
+          totalSynapsesInjected += added;
+          boostRegionCurrent(name, 2);
+        }
+        break;
+      }
+      case "scout": {
+        for (const [name, state] of Object.entries(regionStates)) {
+          if (state.activationLevel < 0.45) {
+            depositPheromone(name, "distress", spider.id, 0.5 + (0.55 - state.activationLevel) * 2);
+          }
+          if (state.activationLevel > 0.70) {
+            depositPheromone(name, "nectar", spider.id, state.activationLevel * 0.5);
+          }
+        }
+        break;
+      }
+      case "royal_jelly": {
+        if (targetActivation > ROYAL_JELLY_THRESHOLD) {
+          const weakest = Object.entries(regionStates)
+            .filter(([name]) => name !== spider.targetRegion)
+            .sort(([, a], [, b]) => a.activationLevel - b.activationLevel)[0];
+          if (weakest) {
+            const [weakName] = weakest;
+            const surplus = targetActivation - ROYAL_JELLY_THRESHOLD;
+            boostRegionCurrent(weakName, surplus * 25);
+            spider.nectarProduced += surplus;
+            totalNectarProduced += surplus;
+            depositPheromone(weakName, "nectar", spider.id, surplus * 3);
+          }
+        }
+        break;
+      }
+      case "forager": {
+        boostRegionCurrent(spider.targetRegion, 2 + spider.crawlCount * 0.01);
+        if (spider.crawlCount % 3 === 0) {
+          const support = findStrongestSupportRegion(spider.targetRegion);
+          const added = injectSpiderSynapses(support, spider.targetRegion, 1, 0.15 + spider.efficiency * 0.1);
+          spider.synapsesInjected += added;
+          totalSynapsesInjected += added;
+        }
+        break;
+      }
+      case "guard": {
+        const criticallyLow = Object.entries(regionStates)
+          .filter(([, s]) => s.activationLevel < 0.35);
+        for (const [name] of criticallyLow) {
+          boostRegionCurrent(name, 5);
+          depositPheromone(name, "alarm", spider.id, 0.8);
+          const support = findStrongestSupportRegion(name);
+          const added = injectSpiderSynapses(support, name, 3, 0.3);
+          spider.synapsesInjected += added;
+          totalSynapsesInjected += added;
+        }
+        break;
+      }
+    }
+  }
+}
+
+function runBeehiveCycle(): void {
+  decayPheromones();
+  executeBeeRoles();
+  produceRoyalJelly();
+  executeSwarmWaves();
+}
+
 export function startNeuralSpiders(): void {
   if (spiderSystemActive) return;
   spiderSystemActive = true;
@@ -1463,6 +1869,14 @@ export function startNeuralSpiders(): void {
   console.log(`[SPIDER WEB] 🕸️ HIVE MIND: Distress reports trigger emergency spawn — Mother deploys reinforcements instantly`);
   console.log(`[SPIDER WEB] 🕸️ HIVE MIND: Every spider has loyalty + efficiency scores — performance tracked across lifetime`);
   console.log(`[SPIDER WEB] 🕸️ HIVE MIND: Idle strong spiders get reinforce missions to help weak regions — swarm intelligence`);
+  console.log(`[SPIDER WEB] 🕸️ BEEHIVE: Bee roles assigned — worker, nurse, scout, royal_jelly, forager, guard`);
+  console.log(`[SPIDER WEB] 🕸️ BEEHIVE: Nurses heal weak regions | Workers build synapses | Scouts deposit pheromones`);
+  console.log(`[SPIDER WEB] 🕸️ BEEHIVE: Royal Jelly producers extract nectar from strong regions → feed weak regions`);
+  console.log(`[SPIDER WEB] 🕸️ BEEHIVE: Guards detect critically low regions → emergency boost + alarm pheromones`);
+  console.log(`[SPIDER WEB] 🕸️ SWARM: Pheromone trail system — distress, nectar, alarm, rally signals guide the swarm`);
+  console.log(`[SPIDER WEB] 🕸️ SWARM: Convergence waves — mass coordinated spider attack on weak regions`);
+  console.log(`[SPIDER WEB] 🕸️ SWARM: Amplification waves — nurses + royal jelly + workers flood struggling regions`);
+  console.log(`[SPIDER WEB] 🕸️ SWARM: Fortification waves — workers + guards build synapse walls around vulnerable regions`);
   console.log(`[SPIDER WEB] 🕸️ Every spider's silk feeds back to the Mother — she distributes all data everywhere`);
   console.log(`[SPIDER WEB] 🕸️ Silk types: afferent (spider→mother), efferent (mother→spider), interneuron (spider↔spider)`);
   console.log(`[SPIDER WEB] 🕸️ Nerve impulses: data, alarm, nurture, coordinate, feedback`);
@@ -1481,8 +1895,13 @@ export function startNeuralSpiders(): void {
       runMotherHeartbeat();
     }, WEB_PULSE_MS);
 
+    setInterval(() => {
+      runBeehiveCycle();
+    }, BEEHIVE_CYCLE_MS);
+
     runSpiderCrawlCycle().catch(() => {});
     runMotherHeartbeat();
+    runBeehiveCycle();
   }, 12_000);
 }
 
@@ -1504,6 +1923,10 @@ export function getNeuralSpiderState() {
     reportsSubmitted: s.reportsSubmitted,
     loyalty: s.loyalty,
     efficiency: s.efficiency,
+    beeRole: s.beeRole,
+    pheromoneDeposits: s.pheromoneDeposits,
+    nectarProduced: s.nectarProduced,
+    swarmWavesJoined: s.swarmWavesJoined,
   }));
 
   const children = [...childSpiders.values()].map(s => ({
@@ -1520,6 +1943,10 @@ export function getNeuralSpiderState() {
     reportsSubmitted: s.reportsSubmitted,
     loyalty: s.loyalty,
     efficiency: s.efficiency,
+    beeRole: s.beeRole,
+    pheromoneDeposits: s.pheromoneDeposits,
+    nectarProduced: s.nectarProduced,
+    swarmWavesJoined: s.swarmWavesJoined,
   }));
 
   const recentStability = stabilityHistory.slice(-10);
@@ -1552,6 +1979,31 @@ export function getNeuralSpiderState() {
     strength: d.strength,
   }));
 
+  const pheromoneState: Record<string, { totalIntensity: number; trailCount: number; types: string[] }> = {};
+  for (const [region, trails] of pheromoneTrails) {
+    pheromoneState[region] = {
+      totalIntensity: trails.reduce((s, t) => s + t.intensity, 0),
+      trailCount: trails.length,
+      types: [...new Set(trails.map(t => t.type))],
+    };
+  }
+
+  const activeWaves = [...activeSwarmWaves.values()].map(w => ({
+    id: w.id,
+    targetRegion: w.targetRegion,
+    waveType: w.waveType,
+    participantCount: w.participants.length,
+    totalBoostDelivered: w.totalBoostDelivered,
+    totalSynapsesDelivered: w.totalSynapsesDelivered,
+    wavesCompleted: w.wavesCompleted,
+    startedAt: w.startedAt,
+  }));
+
+  const beeRoleCounts: Record<BeeRole, number> = { worker: 0, nurse: 0, scout: 0, royal_jelly: 0, forager: 0, guard: 0 };
+  for (const spider of [...parentSpiders.values(), ...childSpiders.values()]) {
+    if (spider.status === "active") beeRoleCounts[spider.beeRole]++;
+  }
+
   return {
     active: spiderSystemActive,
     totalCrawlCycles,
@@ -1563,6 +2015,24 @@ export function getNeuralSpiderState() {
     stabilityHistory: recentStability,
     currentStability: recentStability.length > 0 ? recentStability[recentStability.length - 1] : null,
     criticalCircuits: CRITICAL_CIRCUITS.length,
+    beehive: {
+      beeRoleCounts,
+      totalPheromoneDeposits,
+      totalNectarProduced,
+      totalRoyalJellyTransferred,
+      totalSwarmWaves,
+      swarmWavesCompleted: swarmWaveHistory.length,
+      activeSwarmWaves: activeWaves,
+      pheromoneTrails: pheromoneState,
+      royalJellyFlows: royalJellyFlows.map(f => ({
+        sourceRegion: f.sourceRegion,
+        targetRegion: f.targetRegion,
+        nectarStrength: f.nectarStrength,
+        flowRate: f.flowRate,
+        totalTransferred: f.totalTransferred,
+        lastFlowAt: f.lastFlowAt,
+      })),
+    },
     motherSpider: {
       id: motherSpider.id,
       name: motherSpider.name,

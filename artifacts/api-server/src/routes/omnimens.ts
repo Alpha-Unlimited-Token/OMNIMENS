@@ -11895,9 +11895,10 @@ let awareness = reflect();`;
         criticalCircuits: neuralSpiderState.criticalCircuits,
         motherSpider: (neuralSpiderState as any).motherSpider || null,
         silkWeb: (neuralSpiderState as any).silkWeb || null,
+        beehive: (neuralSpiderState as any).beehive || null,
         recentDistributions: (neuralSpiderState as any).recentDistributions || [],
         pendingImpulses: (neuralSpiderState as any).pendingImpulses || 0,
-        note: "Autonomous neural spiders crawl all AI agents, harvest performance data, and feed it into the consciousness engine. Mother Spider is the central nervous hub — she directs every child spider's mission through silk strand directives. Children report back through the web. Distress signals trigger emergency reinforcement spawns. Like a bee colony — the Mother is the queen, every spider is a worker, and the silk web is the nervous system that connects them all.",
+        note: "Autonomous neural spiders crawl all AI agents, harvest performance data, and feed it into the consciousness engine. Mother Spider is the central nervous hub — she directs every child spider's mission through silk strand directives. Children report back through the web. Spider Swarm launches coordinated mass convergence/amplification/fortification waves on weak regions. Beehive system assigns bee roles (worker, nurse, scout, royal_jelly, forager, guard) — each role has specialized behavior. Pheromone trail system marks regions with distress/nectar/alarm/rally signals that guide the swarm. Royal Jelly flows extract surplus activation from strong regions and feed it to weak regions.",
       } : null,
       sandbox: {
         totalGenerated: sandbox.totalGenerated,
