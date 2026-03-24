@@ -8349,13 +8349,13 @@
       "filename": "wasmMatrixEngine_gen1.mjs",
       "stage": "vector_operations",
       "exports": [
+        "loadWasmModule",
         "wasmMatrixMultiply",
         "validateMatrix",
-        "fallbackMatrixMultiply",
-        "wasmMatrixEngineVersion",
-        "supportedOperations"
+        "generateRandomMatrix",
+        "transposeMatrix"
       ],
-      "loadedAt": 1774390496472,
+      "loadedAt": 1774390925870,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -9858,9 +9858,43 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "persistentJobQueue_gen1.mjs": {
+      "filename": "persistentJobQueue_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "getCurrentTimestamp",
+        "createJobQueue",
+        "checkpointQueueToDatabase",
+        "restoreQueueFromDatabase"
+      ],
+      "loadedAt": 1774390931311,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "recursiveContextLoader_gen1.mjs": {
+      "filename": "recursiveContextLoader_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateHash",
+        "importanceScore",
+        "summarizeContext",
+        "recursiveContextLoader",
+        "hierarchicalSummarize",
+        "exampleUsage"
+      ],
+      "loadedAt": 1774390938427,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774390496487,
-  "totalModules": 519,
+  "totalModules": 522,
   "totalCalls": 0
 }

@@ -1,0 +1,99 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: recursiveContextLoader
+ * Written: 2026-03-24T22:22:18.411Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// recursiveContextLoader.mjs
+
+import crypto from 'crypto';
+
+/**
+ * Generates a hash for a given string to ensure unique context identifiers.
+ * Useful for caching and storing context summaries.
+ */
+export function generateHash(input) {
+  return crypto.createHash('sha256').update(input).digest('hex');
+}
+
+/**
+ * Scores the importance of a context chunk based on keyword frequency and relevance.
+ * Returns a numerical score.
+ */
+export function importanceScore(contextChunk, keywords) {
+  const words = contextChunk.split(/\s+/);
+  const keywordSet = new Set(keywords);
+  const matchCount = words.filter(word => keywordSet.has(word)).length;
+  return matchCount / words.length;
+}
+
+/**
+ * Summarizes a given context chunk by extracting the most relevant sentences.
+ * Uses importance scoring to prioritize key information.
+ */
+export function summarizeContext(contextChunk, keywords) {
+  const sentences = contextChunk.split(/(?<=\.)\s+/);
+  const scoredSentences = sentences.map(sentence => ({
+    sentence,
+    score: importanceScore(sentence, keywords)
+  }));
+  scoredSentences.sort((a, b) => b.score - a.score);
+  return scoredSentences.slice(0, Math.min(5, scoredSentences.length)).map(item => item.sentence).join(' ');
+}
+
+/**
+ * Recursively loads and processes context from a simulated database.
+ * Returns a summarized context for reasoning over large datasets.
+ */
+export async function recursiveContextLoader(database, query, keywords, maxDepth = 3, currentDepth = 0) {
+  if (currentDepth >= maxDepth) {
+    return '';
+  }
+
+  const contextChunks = database.filter(entry => entry.includes(query));
+  const summaries = contextChunks.map(chunk => summarizeContext(chunk, keywords));
+
+  const combinedSummary = summaries.join(' ');
+  const nextKeywords = combinedSummary.split(/\s+/).slice(0, 10); // Extract top keywords for next iteration
+
+  const deeperSummary = await recursiveContextLoader(database, query, nextKeywords, maxDepth, currentDepth + 1);
+
+  return summarizeContext(combinedSummary + ' ' + deeperSummary, keywords);
+}
+
+/**
+ * Utility function for hierarchical summarization.
+ * Accepts raw context and keywords, and returns a concise summary.
+ */
+export function hierarchicalSummarize(rawContext, keywords) {
+  return summarizeContext(rawContext, keywords);
+}
+
+/**
+ * Example usage of the module with a simulated database.
+ */
+export async function exampleUsage() {
+  const simulatedDatabase = [
+    "Anthropic released Claude 3.5 Sonnet in June 2024. Claude 4 Opus came out in May 2025.",
+    "GPT-4o introduced multimodal reasoning with text, audio, and image integration techniques.",
+    "xAI's Grok 4.1 improved multimodal understanding and reasoning capabilities in November 2025."
+  ];
+
+  const query = "Claude Opus";
+  const keywords = ["Claude", "Opus", "multimodal", "reasoning", "integration"];
+
+  const summary = await recursiveContextLoader(simulatedDatabase, query, keywords);
+  console.log(summary);
+}

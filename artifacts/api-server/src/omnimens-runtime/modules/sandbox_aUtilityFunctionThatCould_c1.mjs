@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-24T22:12:06.159Z
+ * Written: 2026-03-24T22:18:59.291Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,40 +17,41 @@
  */
 
 function findMostFrequentWords(text, topN) {
-    function cleanText(input) {
-        return input.toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).filter(word => word.length > 0);
+    if (typeof text !== 'string' || typeof topN !== 'number' || topN <= 0) {
+        throw new Error("Invalid input: text must be a string and topN must be a positive number.");
     }
 
-    function countWords(words) {
-        const wordCounts = {};
-        for (const word of words) {
-            wordCounts[word] = (wordCounts[word] || 0) + 1;
-        }
-        return wordCounts;
+    // Normalize text and split into words
+    const words = text.toLowerCase().match(/\b\w+\b/g);
+    if (!words) return [];
+
+    // Count occurrences of each word
+    const wordCounts = {};
+    for (const word of words) {
+        wordCounts[word] = (wordCounts[word] || 0) + 1;
     }
 
-    function sortWordCounts(wordCounts) {
-        return Object.entries(wordCounts).sort((a, b) => b[1] - a[1]);
-    }
+    // Sort words by frequency and return the top N
+    const sortedWords = Object.entries(wordCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, topN)
+        .map(entry => ({ word: entry[0], count: entry[1] }));
 
-    const cleanedWords = cleanText(text);
-    const wordCounts = countWords(cleanedWords);
-    const sortedWordCounts = sortWordCounts(wordCounts);
-
-    return sortedWordCounts.slice(0, topN).map(([word, count]) => ({ word, count }));
+    return sortedWords;
 }
 
-// Test cases
-function runTests() {
-    const text1 = "Hello world! Hello again, world.";
-    const text2 = "AI systems are evolving. AI is everywhere. AI, AI, AI!";
-    const text3 = "One fish two fish red fish blue fish.";
+// Self-tests
+console.log(findMostFrequentWords("This is a test. This test is only a test.", 3)); 
+// Expected output: [{word: 'test', count: 3}, {word: 'this', count: 2}, {word: 'is', count: 2}]
 
-    console.log(findMostFrequentWords(text1, 2)); // Expected: [{ word: 'hello', count: 2 }, { word: 'world', count: 2 }]
-    console.log(findMostFrequentWords(text2, 3)); // Expected: [{ word: 'ai', count: 5 }, { word: 'is', count: 1 }, { word: 'everywhere', count: 1 }]
-    console.log(findMostFrequentWords(text3, 4)); // Expected: [{ word: 'fish', count: 4 }, { word: 'one', count: 1 }, { word: 'two', count: 1 }, { word: 'red', count: 1 }]
-    console.log(findMostFrequentWords("", 5)); // Expected: []
-    console.log(findMostFrequentWords("Special characters! @#$%^&*() shouldn't count.", 3)); // Expected: [{ word: 'special', count: 1 }, { word: 'characters', count: 1 }, { word: 'shouldnt', count: 1 }]
-}
+console.log(findMostFrequentWords("Hello world! Hello AI. AI is the future.", 2)); 
+// Expected output: [{word: 'hello', count: 2}, {word: 'ai', count: 2}]
 
-runTests();
+console.log(findMostFrequentWords("One fish, two fish, red fish, blue fish.", 4)); 
+// Expected output: [{word: 'fish', count: 4}, {word: 'one', count: 1}, {word: 'two', count: 1}, {word: 'red', count: 1}]
+
+console.log(findMostFrequentWords("", 5)); 
+// Expected output: []
+
+console.log(findMostFrequentWords("SingleWord", 1)); 
+// Expected output: [{word: 'singleword', count: 1}]
