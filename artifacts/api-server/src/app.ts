@@ -224,13 +224,15 @@ app.use((_req: Request, res: Response, next: NextFunction) => {
 
 // ── RATE LIMITING ─────────────────────────────────────────────────────────────
 
-// General API limiter — 300 req / 15 min per IP
+const PROOF_PATHS = ["/api/omnimens/proof", "/api/omnimens/autonomous-proof", "/api/omnimens/evolution-log", "/api/omnimens/dreams/public"];
+
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 300,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many requests. Please slow down." },
+  skip: (req: Request) => PROOF_PATHS.some(p => req.path.startsWith(p)),
 });
 
 // Auth endpoints — 200 req / 15 min (SPA checks auth on every page load)
