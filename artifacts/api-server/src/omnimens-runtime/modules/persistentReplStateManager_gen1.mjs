@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: persistentReplStateManager
- * Written: 2026-03-24T10:21:20.869Z
+ * Written: 2026-03-24T22:06:12.152Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,134 +18,95 @@
 
 // persistentReplStateManager.mjs
 
-import { parse, stringify } from 'querystring';
-import { createHash } from 'crypto';
+import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
+import { resolve } from 'path';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
+
+const algorithm = 'aes-256-gcm';
+const key = randomBytes(32); // Replace with a securely stored key for production
+const ivLength = 12; // AES-GCM requires a 12-byte IV
 
 /**
- * Serialize a REPL state object into a JSON string.
- * @param {object} state - The REPL state object to serialize.
- * @returns {string} - Serialized JSON string.
+ * Encrypts data using AES-256-GCM.
+ * @param {Buffer|string} data - Data to encrypt.
+ * @returns {Object} - Encrypted payload containing ciphertext, IV, and authentication tag.
  */
-export function serializeState(state) {
-  if (typeof state !== 'object' || state === null) {
-    throw new Error('State must be a non-null object');
-  }
-  try {
-    return JSON.stringify(state);
-  } catch (error) {
-    throw new Error(`Failed to serialize state: ${error.message}`);
-  }
+export function encryptData(data) {
+  const iv = randomBytes(ivLength);
+  const cipher = createCipheriv(algorithm, key, iv);
+
+  const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
+  const authTag = cipher.getAuthTag();
+
+  return { ciphertext: encrypted.toString('hex'), iv: iv.toString('hex'), authTag: authTag.toString('hex') };
 }
 
 /**
- * Deserialize a JSON string into a REPL state object.
- * @param {string} jsonString - The JSON string to deserialize.
- * @returns {object} - Deserialized REPL state object.
+ * Decrypts data using AES-256-GCM.
+ * @param {Object} encryptedPayload - Encrypted payload containing ciphertext, IV, and authentication tag.
+ * @returns {Buffer} - Decrypted data.
  */
-export function deserializeState(jsonString) {
-  if (typeof jsonString !== 'string') {
-    throw new Error('Input must be a string');
-  }
-  try {
-    return JSON.parse(jsonString);
-  } catch (error) {
-    throw new Error(`Failed to deserialize state: ${error.message}`);
-  }
+export function decryptData(encryptedPayload) {
+  const { ciphertext, iv, authTag } = encryptedPayload;
+  const decipher = createDecipheriv(algorithm, key, Buffer.from(iv, 'hex'));
+  decipher.setAuthTag(Buffer.from(authTag, 'hex'));
+
+  const decrypted = Buffer.concat([
+    decipher.update(Buffer.from(ciphertext, 'hex')),
+    decipher.final()
+  ]);
+
+  return decrypted;
 }
 
 /**
- * Generate a unique hash for a given state object.
- * @param {object} state - The state object to hash.
- * @returns {string} - A SHA-256 hash of the state.
+ * Saves the current state to an encrypted file.
+ * @param {Object} state - State object to save.
+ * @param {string} filePath - Path to the state file.
  */
-export function generateStateHash(state) {
-  const serialized = serializeState(state);
-  return createHash('sha256').update(serialized).digest('hex');
+export function saveState(state, filePath) {
+  const encryptedState = encryptData(JSON.stringify(state));
+  writeFileSync(filePath, JSON.stringify(encryptedState));
 }
 
 /**
- * Merge two REPL state objects, prioritizing keys from the second object.
- * @param {object} baseState - The base state object.
- * @param {object} newState - The new state object to merge.
- * @returns {object} - Merged state object.
+ * Loads the state from an encrypted file.
+ * @param {string} filePath - Path to the state file.
+ * @returns {Object|null} - Decrypted state object or null if file does not exist.
  */
-export function mergeStates(baseState, newState) {
-  if (typeof baseState !== 'object' || baseState === null || typeof newState !== 'object' || newState === null) {
-    throw new Error('Both states must be non-null objects');
-  }
-  return { ...baseState, ...newState };
+export function loadState(filePath) {
+  if (!existsSync(filePath)) return null;
+
+  const encryptedPayload = JSON.parse(readFileSync(filePath, 'utf-8'));
+  const decryptedState = decryptData(encryptedPayload);
+
+  return JSON.parse(decryptedState.toString());
 }
 
 /**
- * Validate the integrity of a state object by comparing its hash.
- * @param {object} state - The state object to validate.
- * @param {string} expectedHash - The expected SHA-256 hash of the state.
- * @returns {boolean} - True if the hash matches, false otherwise.
+ * Updates the state by applying a delta (partial update).
+ * @param {Object} currentState - Current state object.
+ * @param {Object} delta - Partial update to apply.
+ * @returns {Object} - Updated state object.
  */
-export function validateStateIntegrity(state, expectedHash) {
-  const actualHash = generateStateHash(state);
-  return actualHash === expectedHash;
+export function updateState(currentState, delta) {
+  return { ...currentState, ...delta };
 }
 
 /**
- * Extract function definitions from a REPL state object.
- * @param {object} state - The state object containing functions.
- * @returns {object} - An object containing only the functions from the state.
+ * Utility function to initialize a default state if none exists.
+ * @param {string} filePath - Path to the state file.
+ * @param {Object} defaultState - Default state object.
+ * @returns {Object} - Loaded or initialized state.
  */
-export function extractFunctions(state) {
-  if (typeof state !== 'object' || state === null) {
-    throw new Error('State must be a non-null object');
-  }
-  const functions = {};
-  for (const [key, value] of Object.entries(state)) {
-    if (typeof value === 'function') {
-      functions[key] = value;
-    }
-  }
-  return functions;
+export function initializeState(filePath, defaultState) {
+  const existingState = loadState(filePath);
+  return existingState || defaultState;
 }
 
-/**
- * Extract non-function variables from a REPL state object.
- * @param {object} state - The state object containing variables.
- * @returns {object} - An object containing only the non-function variables from the state.
- */
-export function extractVariables(state) {
-  if (typeof state !== 'object' || state === null) {
-    throw new Error('State must be a non-null object');
-  }
-  const variables = {};
-  for (const [key, value] of Object.entries(state)) {
-    if (typeof value !== 'function') {
-      variables[key] = value;
-    }
-  }
-  return variables;
-}
-
-/**
- * Restore a REPL-like state from serialized data.
- * @param {string} serializedState - The serialized state data.
- * @returns {object} - Restored state object.
- */
-export function restoreState(serializedState) {
-  return deserializeState(serializedState);
-}
-
-/**
- * Save a REPL-like state to serialized data.
- * @param {object} state - The state object to serialize.
- * @returns {string} - Serialized state data.
- */
-export function saveState(state) {
-  return serializeState(state);
-}
-
-/**
- * Deep clone a REPL state object.
- * @param {object} state - The state object to clone.
- * @returns {object} - A deep clone of the state object.
- */
-export function cloneState(state) {
-  return deserializeState(serializeState(state));
-}
+// Example usage:
+// const stateFilePath = resolve('./state.json');
+// const initialState = { counter: 0 };
+// const state = initializeState(stateFilePath, initialState);
+// const updatedState = updateState(state, { counter: state.counter + 1 });
+// saveState(updatedState, stateFilePath);

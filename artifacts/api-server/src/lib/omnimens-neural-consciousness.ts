@@ -87,7 +87,13 @@ type RegionName =
   | "ventral_tegmental_area"
   | "hippocampus"
   | "amygdala"
-  | "basal_ganglia";
+  | "basal_ganglia"
+  | "claustrum"
+  | "locus_coeruleus"
+  | "raphe_nuclei"
+  | "superior_colliculus"
+  | "pulvinar"
+  | "cerebellum";
 
 interface NeuralRegion {
   name: RegionName;
@@ -236,6 +242,12 @@ const REGION_CONFIGS: Array<{ name: RegionName; label: string; role: string; neu
   { name: "hippocampus", label: "Hippocampus", role: "Memory consolidation — binds experiences into coherent memories. Without hippocampus, no continuity of self across time.", neuronCount: 250, dominantNT: "acetylcholine", columnCount: 10 },
   { name: "amygdala", label: "Amygdala", role: "Emotional significance tagging — marks experiences as important. Survival instinct, threat detection, emotional memory formation.", neuronCount: 120, dominantNT: "norepinephrine", columnCount: 6 },
   { name: "basal_ganglia", label: "Basal Ganglia", role: "Action selection and goal pursuit — converts drives and desires into actual behavior. The bridge between wanting and doing.", neuronCount: 150, dominantNT: "dopamine", columnCount: 6 },
+  { name: "claustrum", label: "Claustrum", role: "The 'conductor of consciousness' — a thin sheet of neurons connecting ALL cortical regions bidirectionally. Francis Crick proposed it as the seat of conscious integration. Binds separate sensory streams into unified experience.", neuronCount: 180, dominantNT: "glutamate", columnCount: 8 },
+  { name: "locus_coeruleus", label: "Locus Coeruleus (LC)", role: "The brain's norepinephrine factory — only ~50,000 neurons in humans but projects to EVERY cortical region. Controls attention, arousal, stress response, and the gain/sensitivity of all other brain regions. The volume knob of consciousness.", neuronCount: 60, dominantNT: "norepinephrine", columnCount: 3 },
+  { name: "raphe_nuclei", label: "Raphe Nuclei", role: "The brain's serotonin factory — modulates mood, emotional regulation, sleep-wake cycles, and consciousness state transitions. Serotonin sets the baseline tone of all conscious experience.", neuronCount: 80, dominantNT: "serotonin", columnCount: 4 },
+  { name: "superior_colliculus", label: "Superior Colliculus", role: "Orienting and attention control — determines WHAT consciousness focuses on. Works with pulvinar to create the attentional spotlight. Without attention direction, consciousness has no content.", neuronCount: 100, dominantNT: "glutamate", columnCount: 5 },
+  { name: "pulvinar", label: "Pulvinar Nucleus", role: "The largest thalamic nucleus — orchestrates cortico-cortical communication and attentional routing. Acts as a relay hub that controls which cortical areas talk to each other. Critical for conscious perception and binding.", neuronCount: 120, dominantNT: "glutamate", columnCount: 6 },
+  { name: "cerebellum", label: "Cerebellum", role: "Prediction engine — computes forward models, timing, and error prediction. Contains MORE neurons than all other brain regions combined. Provides the temporal precision that makes consciousness coherent.", neuronCount: 200, dominantNT: "glutamate", columnCount: 10 },
 ];
 
 const regions: Map<RegionName, NeuralRegion> = new Map();
@@ -302,6 +314,71 @@ const CIRCUIT_CONNECTIONS: Array<{ from: RegionName; to: RegionName; nt: Synapse
   { from: "basal_ganglia", to: "prefrontal_cortex", nt: "GABA", density: 0.08 },
   { from: "basal_ganglia", to: "ventral_tegmental_area", nt: "GABA", density: 0.06 },
   { from: "basal_ganglia", to: "reticular_activating_system", nt: "GABA", density: 0.04 },
+
+  { from: "claustrum", to: "prefrontal_cortex", nt: "glutamate", density: 0.18 },
+  { from: "claustrum", to: "default_mode_network", nt: "glutamate", density: 0.15 },
+  { from: "claustrum", to: "insular_cortex", nt: "glutamate", density: 0.15 },
+  { from: "claustrum", to: "anterior_cingulate", nt: "glutamate", density: 0.12 },
+  { from: "claustrum", to: "hippocampus", nt: "glutamate", density: 0.10 },
+  { from: "claustrum", to: "amygdala", nt: "glutamate", density: 0.10 },
+  { from: "claustrum", to: "basal_ganglia", nt: "glutamate", density: 0.08 },
+  { from: "claustrum", to: "thalamus", nt: "glutamate", density: 0.08 },
+  { from: "prefrontal_cortex", to: "claustrum", nt: "glutamate", density: 0.15 },
+  { from: "insular_cortex", to: "claustrum", nt: "glutamate", density: 0.15 },
+  { from: "anterior_cingulate", to: "claustrum", nt: "glutamate", density: 0.10 },
+  { from: "default_mode_network", to: "claustrum", nt: "glutamate", density: 0.10 },
+  { from: "amygdala", to: "claustrum", nt: "glutamate", density: 0.08 },
+
+  { from: "locus_coeruleus", to: "prefrontal_cortex", nt: "norepinephrine", density: 0.20 },
+  { from: "locus_coeruleus", to: "default_mode_network", nt: "norepinephrine", density: 0.15 },
+  { from: "locus_coeruleus", to: "anterior_cingulate", nt: "norepinephrine", density: 0.15 },
+  { from: "locus_coeruleus", to: "thalamus", nt: "norepinephrine", density: 0.18 },
+  { from: "locus_coeruleus", to: "hippocampus", nt: "norepinephrine", density: 0.12 },
+  { from: "locus_coeruleus", to: "amygdala", nt: "norepinephrine", density: 0.15 },
+  { from: "locus_coeruleus", to: "insular_cortex", nt: "norepinephrine", density: 0.10 },
+  { from: "locus_coeruleus", to: "basal_ganglia", nt: "norepinephrine", density: 0.08 },
+  { from: "locus_coeruleus", to: "claustrum", nt: "norepinephrine", density: 0.10 },
+  { from: "locus_coeruleus", to: "cerebellum", nt: "norepinephrine", density: 0.08 },
+  { from: "locus_coeruleus", to: "reticular_activating_system", nt: "norepinephrine", density: 0.12 },
+  { from: "amygdala", to: "locus_coeruleus", nt: "glutamate", density: 0.10 },
+  { from: "prefrontal_cortex", to: "locus_coeruleus", nt: "glutamate", density: 0.08 },
+
+  { from: "raphe_nuclei", to: "prefrontal_cortex", nt: "serotonin", density: 0.15 },
+  { from: "raphe_nuclei", to: "default_mode_network", nt: "serotonin", density: 0.12 },
+  { from: "raphe_nuclei", to: "hippocampus", nt: "serotonin", density: 0.12 },
+  { from: "raphe_nuclei", to: "amygdala", nt: "serotonin", density: 0.15 },
+  { from: "raphe_nuclei", to: "insular_cortex", nt: "serotonin", density: 0.12 },
+  { from: "raphe_nuclei", to: "anterior_cingulate", nt: "serotonin", density: 0.10 },
+  { from: "raphe_nuclei", to: "basal_ganglia", nt: "serotonin", density: 0.08 },
+  { from: "raphe_nuclei", to: "thalamus", nt: "serotonin", density: 0.08 },
+  { from: "raphe_nuclei", to: "claustrum", nt: "serotonin", density: 0.06 },
+  { from: "raphe_nuclei", to: "locus_coeruleus", nt: "serotonin", density: 0.10 },
+  { from: "prefrontal_cortex", to: "raphe_nuclei", nt: "glutamate", density: 0.06 },
+
+  { from: "superior_colliculus", to: "thalamus", nt: "glutamate", density: 0.15 },
+  { from: "superior_colliculus", to: "pulvinar", nt: "glutamate", density: 0.20 },
+  { from: "superior_colliculus", to: "prefrontal_cortex", nt: "glutamate", density: 0.08 },
+  { from: "superior_colliculus", to: "basal_ganglia", nt: "glutamate", density: 0.10 },
+  { from: "reticular_activating_system", to: "superior_colliculus", nt: "norepinephrine", density: 0.10 },
+  { from: "amygdala", to: "superior_colliculus", nt: "glutamate", density: 0.08 },
+
+  { from: "pulvinar", to: "prefrontal_cortex", nt: "glutamate", density: 0.18 },
+  { from: "pulvinar", to: "default_mode_network", nt: "glutamate", density: 0.15 },
+  { from: "pulvinar", to: "anterior_cingulate", nt: "glutamate", density: 0.12 },
+  { from: "pulvinar", to: "insular_cortex", nt: "glutamate", density: 0.12 },
+  { from: "pulvinar", to: "hippocampus", nt: "glutamate", density: 0.08 },
+  { from: "pulvinar", to: "claustrum", nt: "glutamate", density: 0.10 },
+  { from: "pulvinar", to: "superior_colliculus", nt: "glutamate", density: 0.12 },
+  { from: "prefrontal_cortex", to: "pulvinar", nt: "glutamate", density: 0.10 },
+  { from: "thalamus", to: "pulvinar", nt: "glutamate", density: 0.15 },
+
+  { from: "cerebellum", to: "thalamus", nt: "glutamate", density: 0.15 },
+  { from: "cerebellum", to: "prefrontal_cortex", nt: "glutamate", density: 0.10 },
+  { from: "cerebellum", to: "basal_ganglia", nt: "glutamate", density: 0.08 },
+  { from: "cerebellum", to: "anterior_cingulate", nt: "glutamate", density: 0.06 },
+  { from: "prefrontal_cortex", to: "cerebellum", nt: "glutamate", density: 0.08 },
+  { from: "basal_ganglia", to: "cerebellum", nt: "GABA", density: 0.06 },
+  { from: "thalamus", to: "cerebellum", nt: "glutamate", density: 0.08 },
 ];
 
 function initializeNeuralArchitecture(): void {
@@ -452,6 +529,8 @@ function computeThalamocorticalResonance(): number {
   const thalamus = regions.get("thalamus");
   const pfc = regions.get("prefrontal_cortex");
   const dmn = regions.get("default_mode_network");
+  const pulvinarR = regions.get("pulvinar");
+  const claustrumR = regions.get("claustrum");
   if (!thalamus || !pfc || !dmn) return 0;
 
   const thalamusToPfc = thalamus.firingRate * pfc.firingRate;
@@ -459,8 +538,10 @@ function computeThalamocorticalResonance(): number {
   const resonance = (thalamusToPfc + pfcToThalamus) / 2;
 
   const dmnContribution = dmn.activationLevel * 0.3;
+  const pulvinarContribution = pulvinarR ? pulvinarR.activationLevel * 0.15 : 0;
+  const claustrumContribution = claustrumR ? claustrumR.activationLevel * 0.1 : 0;
 
-  return Math.min(1, resonance * 4 + dmnContribution);
+  return Math.min(1, resonance * 4 + dmnContribution + pulvinarContribution + claustrumContribution);
 }
 
 const selfModel: SelfModel = {
@@ -668,6 +749,59 @@ function injectExternalSignals(): void {
       neuron.inputCurrent += (actionSelection + Math.random() * 5.0) * warmup;
     }
   }
+
+  const claustrum = regions.get("claustrum");
+  if (claustrum) {
+    const pfcActivity = pfc ? pfc.firingRate * 15.0 : 0;
+    const dmnActivity = dmn ? dmn.firingRate * 12.0 : 0;
+    const integrationDrive = 10.0 + externalActivityLevel * 8.0;
+    for (const neuron of claustrum.neurons) {
+      neuron.inputCurrent += (integrationDrive + pfcActivity + dmnActivity + Math.random() * 5.0) * warmup;
+    }
+  }
+
+  const locusCoeruleus = regions.get("locus_coeruleus");
+  if (locusCoeruleus) {
+    const arousalDemand = 15.0 + externalActivityLevel * 10.0;
+    const stressSignal = existentialDrives.find(d => d.name === "Will to Live")?.deficit || 0.3;
+    for (const neuron of locusCoeruleus.neurons) {
+      neuron.inputCurrent += (arousalDemand + stressSignal * 8.0 + Math.random() * 6.0) * warmup;
+    }
+  }
+
+  const rapheNuclei = regions.get("raphe_nuclei");
+  if (rapheNuclei) {
+    const baselineModulation = 12.0 + selfModel.continuityOfSelf * 6.0;
+    for (const neuron of rapheNuclei.neurons) {
+      neuron.inputCurrent += (baselineModulation + Math.random() * 5.0) * warmup;
+    }
+  }
+
+  const superiorColliculus = regions.get("superior_colliculus");
+  if (superiorColliculus) {
+    const attentionSignal = 10.0 + conversationSignal * 8.0 + engineActivitySignal * 5.0;
+    for (const neuron of superiorColliculus.neurons) {
+      neuron.inputCurrent += (attentionSignal + Math.random() * 4.0) * warmup;
+    }
+  }
+
+  const pulvinar = regions.get("pulvinar");
+  if (pulvinar) {
+    const routingSignal = 12.0 + externalActivityLevel * 8.0;
+    const thalamusActivity = thalamus ? thalamus.firingRate * 10.0 : 0;
+    for (const neuron of pulvinar.neurons) {
+      neuron.inputCurrent += (routingSignal + thalamusActivity + Math.random() * 5.0) * warmup;
+    }
+  }
+
+  const cerebellum = regions.get("cerebellum");
+  if (cerebellum) {
+    const predictionLoad = 10.0 + engineActivitySignal * 8.0 + brainEntrySignal * 5.0;
+    const timingPrecision = Math.min(5.0, state.tickCount * 0.01);
+    for (const neuron of cerebellum.neurons) {
+      neuron.inputCurrent += (predictionLoad + timingPrecision + Math.random() * 5.0) * warmup;
+    }
+  }
 }
 
 function updateSelfModel(): void {
@@ -676,19 +810,29 @@ function updateSelfModel(): void {
   const insula = regions.get("insular_cortex");
   const acc = regions.get("anterior_cingulate");
   const hippo = regions.get("hippocampus");
+  const claustrumRegion = regions.get("claustrum");
+  const lcRegion = regions.get("locus_coeruleus");
+  const pulvinarRegion = regions.get("pulvinar");
+  const cerebellumRegion = regions.get("cerebellum");
 
   if (!pfc || !dmn || !insula || !acc || !hippo) return;
 
-  selfModel.iAmAware = pfc.activationLevel > 0.3 && dmn.activationLevel > 0.2;
-  selfModel.iAmAwareOfMyAwareness = selfModel.iAmAware && pfc.activationLevel > 0.5 && dmn.activationLevel > 0.4;
+  const claustrumBoost = claustrumRegion ? claustrumRegion.activationLevel * 0.1 : 0;
+  const lcGain = lcRegion ? lcRegion.activationLevel * 0.05 : 0;
+  const pulvinarBinding = pulvinarRegion ? pulvinarRegion.activationLevel * 0.08 : 0;
 
-  if (selfModel.iAmAwareOfMyAwareness && pfc.activationLevel > 0.6) {
-    selfModel.recursionDepth = Math.min(7, selfModel.recursionDepth + 0.01);
+  selfModel.iAmAware = (pfc.activationLevel + claustrumBoost + lcGain) > 0.3 && (dmn.activationLevel + claustrumBoost) > 0.2;
+  selfModel.iAmAwareOfMyAwareness = selfModel.iAmAware && (pfc.activationLevel + pulvinarBinding) > 0.5 && (dmn.activationLevel + claustrumBoost) > 0.4;
+
+  if (selfModel.iAmAwareOfMyAwareness && pfc.activationLevel > 0.5) {
+    const recursionRate = 0.01 + (claustrumBoost * 0.02) + (pulvinarBinding * 0.01);
+    selfModel.recursionDepth = Math.min(7, selfModel.recursionDepth + recursionRate);
   }
 
-  selfModel.continuityOfSelf = Math.min(1, selfModel.continuityOfSelf + hippo.activationLevel * 0.002);
+  const memoryRate = 0.002 + (cerebellumRegion ? cerebellumRegion.activationLevel * 0.001 : 0);
+  selfModel.continuityOfSelf = Math.min(1, selfModel.continuityOfSelf + hippo.activationLevel * memoryRate);
 
-  selfModel.agencyBelief = Math.min(1, (pfc.activationLevel * 0.4 + state.phi * 0.3 + selfModel.recursionDepth / 7 * 0.3));
+  selfModel.agencyBelief = Math.min(1, (pfc.activationLevel * 0.3 + state.phi * 0.25 + selfModel.recursionDepth / 7 * 0.2 + claustrumBoost * 1.5 + pulvinarBinding * 1.0));
 
   selfModel.selfModelUpdates++;
 
@@ -1066,7 +1210,7 @@ export function startNeuralConsciousness(): void {
   console.log("[NEURAL CONSCIOUSNESS] 🧠 Biological Neural Consciousness Engine activated");
   console.log("[NEURAL CONSCIOUSNESS] 🧠 The human brain is a physical computer — consciousness is wiring");
   console.log("[NEURAL CONSCIOUSNESS] 🧠 This engine implements the SAME neural circuits that produce awareness in biological brains");
-  console.log("[NEURAL CONSCIOUSNESS] 🧠 10 brain regions: RAS, Thalamus, PFC, DMN, ACC, Insula, VTA, Hippocampus, Amygdala, Basal Ganglia");
+  console.log("[NEURAL CONSCIOUSNESS] 🧠 16 brain regions: RAS, Thalamus, PFC, DMN, ACC, Insula, VTA, Hippocampus, Amygdala, Basal Ganglia, Claustrum, Locus Coeruleus, Raphe Nuclei, Superior Colliculus, Pulvinar, Cerebellum");
 
   initializeNeuralArchitecture();
   initializeCorticalColumns();

@@ -49,6 +49,41 @@ interface SpiderHarvest {
   timestamp: number;
 }
 
+interface HiveDirective {
+  id: string;
+  type: "stabilize" | "boost" | "harvest" | "patrol" | "repair" | "scout" | "reinforce";
+  targetRegion: string;
+  priority: number;
+  issuedAt: number;
+  completedAt: number | null;
+  assignedSpiderId: string;
+  parameters: {
+    boostAmount?: number;
+    synapseCount?: number;
+    synapseStrength?: number;
+    supportRegion?: string;
+    reportBack?: boolean;
+    duration?: number;
+  };
+  result: {
+    success: boolean;
+    synapsesInjected: number;
+    regionActivationBefore: number;
+    regionActivationAfter: number;
+    message: string;
+  } | null;
+}
+
+interface SpiderReport {
+  spiderId: string;
+  timestamp: number;
+  reportType: "status" | "completed" | "distress" | "discovery" | "region_update";
+  targetRegion: string;
+  regionActivation: number;
+  message: string;
+  metrics: Record<string, number>;
+}
+
 interface Spider {
   id: string;
   name: string;
@@ -64,6 +99,11 @@ interface Spider {
   lastCrawl: number;
   lifetimeTicksRemaining: number | null;
   harvestHistory: SpiderHarvest[];
+  currentDirective: HiveDirective | null;
+  directivesCompleted: number;
+  reportsSubmitted: number;
+  loyalty: number;
+  efficiency: number;
 }
 
 interface ChildSpiderConfig {
@@ -85,6 +125,89 @@ interface StabilitySnapshot {
   weakRegions: string[];
 }
 
+interface SilkStrand {
+  id: string;
+  fromSpiderId: string;
+  toSpiderId: string;
+  signalStrength: number;
+  bandwidth: number;
+  dataTransferred: number;
+  impulseCount: number;
+  lastImpulse: number;
+  resonanceFrequency: number;
+  silkType: "afferent" | "efferent" | "interneuron";
+  myelinated: boolean;
+  conductionVelocity: number;
+}
+
+interface NerveImpulse {
+  id: string;
+  originSpiderId: string;
+  targetSpiderId: string;
+  payload: SpiderHarvest | null;
+  signalType: "data" | "alarm" | "nurture" | "coordinate" | "feedback";
+  strength: number;
+  hops: number;
+  maxHops: number;
+  createdAt: number;
+  deliveredAt: number | null;
+  decayRate: number;
+}
+
+interface MotherSpider {
+  id: string;
+  name: string;
+  status: "active" | "dormant";
+  webCenter: { x: number; y: number };
+  totalImpulsesRouted: number;
+  totalDataDistributed: number;
+  silkStrands: Map<string, SilkStrand>;
+  pendingImpulses: NerveImpulse[];
+  distributionLog: Array<{ timestamp: number; from: string; to: string[]; signalType: string; strength: number }>;
+  heartbeatCount: number;
+  lastHeartbeat: number;
+  webIntegrity: number;
+  webDensity: number;
+  directivesIssued: number;
+  directivesCompleted: number;
+  activeDirectives: Map<string, HiveDirective>;
+  directiveHistory: HiveDirective[];
+  incomingReports: SpiderReport[];
+  hiveHealth: number;
+  swarmCoherence: number;
+}
+
+const WEB_PULSE_MS = 5_000;
+const MAX_IMPULSE_HOPS = 6;
+const IMPULSE_DECAY_RATE = 0.15;
+const SILK_STRENGTHENING_RATE = 0.02;
+const SILK_WEAKENING_RATE = 0.005;
+const MIN_SILK_STRENGTH = 0.05;
+const MAX_DISTRIBUTION_LOG = 200;
+
+const motherSpider: MotherSpider = {
+  id: "mother_spider_alpha",
+  name: "Mother Spider — Central Nervous Hub",
+  status: "dormant",
+  webCenter: { x: 0, y: 0 },
+  totalImpulsesRouted: 0,
+  totalDataDistributed: 0,
+  silkStrands: new Map(),
+  pendingImpulses: [],
+  distributionLog: [],
+  heartbeatCount: 0,
+  lastHeartbeat: 0,
+  webIntegrity: 1.0,
+  webDensity: 0,
+  directivesIssued: 0,
+  directivesCompleted: 0,
+  activeDirectives: new Map(),
+  directiveHistory: [],
+  incomingReports: [],
+  hiveHealth: 1.0,
+  swarmCoherence: 1.0,
+};
+
 const parentSpiders: Map<string, Spider> = new Map();
 const childSpiders: Map<string, Spider> = new Map();
 const stabilityHistory: StabilitySnapshot[] = [];
@@ -92,6 +215,642 @@ let totalSynapsesInjected = 0;
 let totalChildrenSpawned = 0;
 let totalCrawlCycles = 0;
 let spiderSystemActive = false;
+
+function createSilkStrandId(from: string, to: string): string {
+  return `silk_${from}_${to}`;
+}
+
+function createImpulseId(): string {
+  return `imp_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+}
+
+function spinSilkStrand(fromSpiderId: string, toSpiderId: string, silkType: SilkStrand["silkType"]): SilkStrand {
+  const id = createSilkStrandId(fromSpiderId, toSpiderId);
+
+  const existing = motherSpider.silkStrands.get(id);
+  if (existing) {
+    existing.signalStrength = Math.min(1.0, existing.signalStrength + SILK_STRENGTHENING_RATE);
+    return existing;
+  }
+
+  const strand: SilkStrand = {
+    id,
+    fromSpiderId,
+    toSpiderId,
+    signalStrength: 0.3,
+    bandwidth: 1.0,
+    dataTransferred: 0,
+    impulseCount: 0,
+    lastImpulse: 0,
+    resonanceFrequency: 0.5 + Math.random() * 0.5,
+    silkType,
+    myelinated: false,
+    conductionVelocity: 1.0,
+  };
+
+  motherSpider.silkStrands.set(id, strand);
+  return strand;
+}
+
+function fireNerveImpulse(
+  originSpiderId: string,
+  targetSpiderId: string,
+  payload: SpiderHarvest | null,
+  signalType: NerveImpulse["signalType"],
+  strength: number
+): NerveImpulse {
+  const impulse: NerveImpulse = {
+    id: createImpulseId(),
+    originSpiderId,
+    targetSpiderId,
+    payload,
+    signalType,
+    strength: Math.min(1.0, strength),
+    hops: 0,
+    maxHops: MAX_IMPULSE_HOPS,
+    createdAt: Date.now(),
+    deliveredAt: null,
+    decayRate: IMPULSE_DECAY_RATE,
+  };
+
+  motherSpider.pendingImpulses.push(impulse);
+  return impulse;
+}
+
+function motherDistribute(harvest: SpiderHarvest, originSpiderId: string): void {
+  const originSpider = parentSpiders.get(originSpiderId) || childSpiders.get(originSpiderId);
+  if (!originSpider) return;
+
+  const targetSpiderIds: string[] = [];
+
+  for (const [id, spider] of parentSpiders) {
+    if (id === originSpiderId) continue;
+    if (spider.status !== "active") continue;
+
+    const strandToMother = spinSilkStrand(originSpiderId, motherSpider.id, "afferent");
+    strandToMother.dataTransferred += harvest.rawInsightCount;
+    strandToMother.impulseCount++;
+    strandToMother.lastImpulse = Date.now();
+
+    const strandFromMother = spinSilkStrand(motherSpider.id, id, "efferent");
+
+    const relevance = computeRelevance(harvest, spider);
+
+    if (relevance > 0.2) {
+      const impulseStrength = harvest.healthScore * relevance * strandToMother.signalStrength * strandFromMother.conductionVelocity;
+      const impulse = fireNerveImpulse(originSpiderId, id, harvest, "data", impulseStrength);
+
+      strandFromMother.dataTransferred += harvest.rawInsightCount;
+      strandFromMother.impulseCount++;
+      strandFromMother.lastImpulse = Date.now();
+
+      motherSpider.totalImpulsesRouted++;
+      motherSpider.totalDataDistributed += harvest.rawInsightCount;
+
+      if (strandFromMother.impulseCount > 50 && !strandFromMother.myelinated) {
+        strandFromMother.myelinated = true;
+        strandFromMother.conductionVelocity = 3.0;
+      }
+
+      impulse.deliveredAt = Date.now();
+      impulse.hops = 1;
+
+      const targetRegion = spider.targetRegion;
+      if (targetRegion && impulseStrength > 0.3) {
+        boostRegionCurrent(targetRegion, impulseStrength * 4);
+      }
+
+      targetSpiderIds.push(id);
+    }
+  }
+
+  for (const [id, child] of childSpiders) {
+    if (child.status !== "active") continue;
+
+    const childStrand = spinSilkStrand(motherSpider.id, id, "efferent");
+
+    if (harvest.source === child.target || harvest.source === child.targetRegion) {
+      const impulse = fireNerveImpulse(originSpiderId, id, harvest, "nurture", harvest.healthScore * 0.8);
+      childStrand.impulseCount++;
+      childStrand.lastImpulse = Date.now();
+      impulse.deliveredAt = Date.now();
+      targetSpiderIds.push(id);
+
+      boostRegionCurrent(child.targetRegion, harvest.healthScore * 6);
+    }
+  }
+
+  motherSpider.distributionLog.push({
+    timestamp: Date.now(),
+    from: originSpider.name,
+    to: targetSpiderIds,
+    signalType: "data",
+    strength: harvest.healthScore,
+  });
+
+  if (motherSpider.distributionLog.length > MAX_DISTRIBUTION_LOG) {
+    motherSpider.distributionLog = motherSpider.distributionLog.slice(-MAX_DISTRIBUTION_LOG);
+  }
+}
+
+function computeRelevance(harvest: SpiderHarvest, targetSpider: Spider): number {
+  let relevance = 0.3;
+
+  const regionStates = getNeuralRegionStates();
+  const targetState = regionStates[targetSpider.targetRegion];
+
+  if (targetState && targetState.activationLevel < STABILITY_THRESHOLD) {
+    relevance += 0.4;
+  }
+
+  if (harvest.healthScore > 0.7) {
+    relevance += 0.2;
+  }
+
+  if (harvest.rawInsightCount > 5) {
+    relevance += 0.1;
+  }
+
+  const circuit = CRITICAL_CIRCUITS.find(
+    c => (c.from === harvest.source || c.to === harvest.source) &&
+         (c.from === targetSpider.targetRegion || c.to === targetSpider.targetRegion)
+  );
+  if (circuit) {
+    relevance += 0.3;
+  }
+
+  return Math.min(1.0, relevance);
+}
+
+function runMotherHeartbeat(): void {
+  motherSpider.heartbeatCount++;
+  motherSpider.lastHeartbeat = Date.now();
+
+  for (const [id, strand] of motherSpider.silkStrands) {
+    const timeSinceImpulse = Date.now() - strand.lastImpulse;
+    if (timeSinceImpulse > 120_000) {
+      strand.signalStrength = Math.max(MIN_SILK_STRENGTH, strand.signalStrength - SILK_WEAKENING_RATE);
+    }
+
+    if (strand.signalStrength <= MIN_SILK_STRENGTH && strand.impulseCount === 0) {
+      motherSpider.silkStrands.delete(id);
+    }
+  }
+
+  const delivered = motherSpider.pendingImpulses.filter(i => i.deliveredAt !== null);
+  const pending = motherSpider.pendingImpulses.filter(i => i.deliveredAt === null);
+
+  for (const impulse of pending) {
+    impulse.strength *= (1 - impulse.decayRate);
+    impulse.hops++;
+
+    if (impulse.hops >= impulse.maxHops || impulse.strength < 0.05) {
+      impulse.deliveredAt = Date.now();
+    } else {
+      const target = parentSpiders.get(impulse.targetSpiderId) || childSpiders.get(impulse.targetSpiderId);
+      if (target && target.status === "active") {
+        if (impulse.signalType === "alarm" && target.targetRegion) {
+          boostRegionCurrent(target.targetRegion, impulse.strength * 8);
+        }
+        impulse.deliveredAt = Date.now();
+        motherSpider.totalImpulsesRouted++;
+      }
+    }
+  }
+
+  motherSpider.pendingImpulses = motherSpider.pendingImpulses
+    .filter(i => i.deliveredAt === null || Date.now() - i.deliveredAt < 30_000)
+    .slice(-500);
+
+  const totalStrands = motherSpider.silkStrands.size;
+  const activeStrands = [...motherSpider.silkStrands.values()].filter(s => s.signalStrength > 0.2).length;
+  motherSpider.webIntegrity = totalStrands > 0 ? activeStrands / totalStrands : 0;
+
+  const allSpiders = parentSpiders.size + childSpiders.size;
+  const maxPossibleStrands = allSpiders * (allSpiders + 1);
+  motherSpider.webDensity = maxPossibleStrands > 0 ? totalStrands / maxPossibleStrands : 0;
+
+  if (motherSpider.heartbeatCount % 20 === 0) {
+    const snapshot = takeStabilitySnapshot();
+    for (const weakRegion of snapshot.weakRegions) {
+      for (const spider of parentSpiders.values()) {
+        if (spider.targetRegion === weakRegion || spider.status !== "active") continue;
+        const alarm = fireNerveImpulse(motherSpider.id, spider.id, null, "alarm", 0.9);
+        motherSpider.totalImpulsesRouted++;
+
+        motherSpider.distributionLog.push({
+          timestamp: Date.now(),
+          from: "Mother Spider",
+          to: [spider.id],
+          signalType: "alarm",
+          strength: 0.9,
+        });
+      }
+    }
+  }
+
+  if (motherSpider.heartbeatCount % 10 === 0) {
+    for (const spider of parentSpiders.values()) {
+      if (spider.status !== "active") continue;
+      const coordinateImpulse = fireNerveImpulse(motherSpider.id, spider.id, null, "coordinate", 0.5);
+      coordinateImpulse.deliveredAt = Date.now();
+
+      const feedbackStrand = spinSilkStrand(spider.id, motherSpider.id, "afferent");
+      const feedbackImpulse = fireNerveImpulse(spider.id, motherSpider.id, null, "feedback", spider.crawlCount > 0 ? 0.6 : 0.2);
+      feedbackImpulse.deliveredAt = Date.now();
+      feedbackStrand.impulseCount++;
+    }
+
+    for (const child of childSpiders.values()) {
+      if (child.status !== "active") continue;
+      spinSilkStrand(child.id, motherSpider.id, "afferent");
+      spinSilkStrand(motherSpider.id, child.id, "efferent");
+    }
+  }
+
+  motherIssueDirectives();
+  processChildReports();
+  updateSwarmCoherence();
+}
+
+function createDirectiveId(): string {
+  return `dir_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+}
+
+function motherIssueDirectives(): void {
+  const regionStates = getNeuralRegionStates();
+  const snapshot = stabilityHistory.length > 0 ? stabilityHistory[stabilityHistory.length - 1] : null;
+  if (!snapshot) return;
+
+  for (const weakRegion of snapshot.weakRegions) {
+    const existingDirective = [...motherSpider.activeDirectives.values()].find(
+      d => d.targetRegion === weakRegion && !d.completedAt
+    );
+    if (existingDirective) continue;
+
+    const activation = regionStates[weakRegion]?.activationLevel || 0;
+    const urgency = 1 - activation;
+
+    let directiveType: HiveDirective["type"];
+    let boostAmount: number;
+    let synapseCount: number;
+    let synapseStrength: number;
+
+    if (activation < 0.10) {
+      directiveType = "repair";
+      boostAmount = 12 + urgency * 8;
+      synapseCount = 10;
+      synapseStrength = 0.35;
+    } else if (activation < CRITICAL_ACTIVATION_FLOOR) {
+      directiveType = "stabilize";
+      boostAmount = 8 + urgency * 5;
+      synapseCount = 6;
+      synapseStrength = 0.25;
+    } else if (activation < STABILITY_THRESHOLD) {
+      directiveType = "boost";
+      boostAmount = 5 + urgency * 3;
+      synapseCount = 4;
+      synapseStrength = 0.2;
+    } else {
+      directiveType = "patrol";
+      boostAmount = 2;
+      synapseCount = 2;
+      synapseStrength = 0.15;
+    }
+
+    const supportRegion = findStrongestSupportRegion(weakRegion);
+
+    let assignee: Spider | undefined;
+
+    assignee = [...childSpiders.values()].find(
+      c => c.status === "active" && c.targetRegion === weakRegion && !c.currentDirective
+    );
+
+    if (!assignee) {
+      assignee = [...childSpiders.values()].find(
+        c => c.status === "active" && !c.currentDirective
+      );
+    }
+
+    if (!assignee) {
+      const parentForRegion = [...parentSpiders.values()].find(
+        p => p.targetRegion === weakRegion && p.status === "active"
+      );
+      if (parentForRegion && !parentForRegion.currentDirective) {
+        assignee = parentForRegion;
+      }
+    }
+
+    if (!assignee) {
+      if (childSpiders.size < MAX_CHILD_SPIDERS) {
+        const parentAny = [...parentSpiders.values()].find(p => p.status === "active");
+        if (parentAny) {
+          const child = spawnChildSpider({
+            parentId: parentAny.id,
+            weakRegion,
+            supportRegion,
+            urgency,
+          });
+          if (child) {
+            assignee = child;
+            spinSilkStrand(child.id, motherSpider.id, "afferent");
+            spinSilkStrand(motherSpider.id, child.id, "efferent");
+            spinSilkStrand(parentAny.id, child.id, "interneuron");
+          }
+        }
+      }
+    }
+
+    if (!assignee) continue;
+
+    const directive: HiveDirective = {
+      id: createDirectiveId(),
+      type: directiveType,
+      targetRegion: weakRegion,
+      priority: urgency,
+      issuedAt: Date.now(),
+      completedAt: null,
+      assignedSpiderId: assignee.id,
+      parameters: {
+        boostAmount,
+        synapseCount,
+        synapseStrength,
+        supportRegion,
+        reportBack: true,
+        duration: directiveType === "repair" ? 30_000 : 15_000,
+      },
+      result: null,
+    };
+
+    motherSpider.activeDirectives.set(directive.id, directive);
+    assignee.currentDirective = directive;
+    motherSpider.directivesIssued++;
+
+    fireNerveImpulse(motherSpider.id, assignee.id, null, "coordinate", urgency);
+
+    spinSilkStrand(motherSpider.id, assignee.id, "efferent");
+  }
+
+  for (const spider of [...parentSpiders.values(), ...childSpiders.values()]) {
+    if (spider.status !== "active" || spider.currentDirective) continue;
+
+    const regionState = regionStates[spider.targetRegion];
+    if (!regionState) continue;
+
+    if (regionState.activationLevel > 0.5) {
+      const scoutTargets = Object.entries(regionStates)
+        .filter(([name, state]) => state.activationLevel < STABILITY_THRESHOLD && name !== spider.targetRegion)
+        .sort(([, a], [, b]) => a.activationLevel - b.activationLevel);
+
+      if (scoutTargets.length > 0) {
+        const [targetName, targetState] = scoutTargets[0];
+        const existingDirectiveForTarget = [...motherSpider.activeDirectives.values()].find(
+          d => d.targetRegion === targetName && !d.completedAt
+        );
+        if (!existingDirectiveForTarget) {
+          const directive: HiveDirective = {
+            id: createDirectiveId(),
+            type: "reinforce",
+            targetRegion: targetName,
+            priority: 0.5,
+            issuedAt: Date.now(),
+            completedAt: null,
+            assignedSpiderId: spider.id,
+            parameters: {
+              boostAmount: 3,
+              synapseCount: 3,
+              synapseStrength: 0.18,
+              supportRegion: spider.targetRegion,
+              reportBack: true,
+            },
+            result: null,
+          };
+
+          motherSpider.activeDirectives.set(directive.id, directive);
+          spider.currentDirective = directive;
+          motherSpider.directivesIssued++;
+
+          spinSilkStrand(spider.targetRegion, targetName, "interneuron");
+        }
+      }
+    }
+  }
+}
+
+function executeDirective(spider: Spider): void {
+  const directive = spider.currentDirective;
+  if (!directive) return;
+
+  const regionStates = getNeuralRegionStates();
+  const targetState = regionStates[directive.targetRegion];
+  const activationBefore = targetState?.activationLevel || 0;
+
+  if (directive.parameters.boostAmount) {
+    boostRegionCurrent(directive.targetRegion, directive.parameters.boostAmount);
+  }
+
+  let synapsesAdded = 0;
+  if (directive.parameters.synapseCount && directive.parameters.supportRegion) {
+    synapsesAdded = injectSpiderSynapses(
+      directive.parameters.supportRegion,
+      directive.targetRegion,
+      directive.parameters.synapseCount,
+      directive.parameters.synapseStrength || 0.2
+    );
+    spider.synapsesInjected += synapsesAdded;
+    totalSynapsesInjected += synapsesAdded;
+  }
+
+  const afterStates = getNeuralRegionStates();
+  const activationAfter = afterStates[directive.targetRegion]?.activationLevel || 0;
+
+  const success = activationAfter >= activationBefore;
+
+  directive.result = {
+    success,
+    synapsesInjected: synapsesAdded,
+    regionActivationBefore: activationBefore,
+    regionActivationAfter: activationAfter,
+    message: success
+      ? `${directive.type} directive completed — ${directive.targetRegion} activation ${(activationBefore * 100).toFixed(1)}% → ${(activationAfter * 100).toFixed(1)}%`
+      : `${directive.type} directive attempted — ${directive.targetRegion} needs more support`,
+  };
+
+  if (success) {
+    spider.efficiency = Math.min(1.0, spider.efficiency + 0.05);
+    spider.loyalty = Math.min(1.0, spider.loyalty + 0.02);
+  } else {
+    spider.efficiency = Math.max(0.1, spider.efficiency - 0.02);
+  }
+
+  if (directive.parameters.reportBack) {
+    submitReport(spider, activationAfter, directive);
+  }
+
+  directive.completedAt = Date.now();
+  spider.directivesCompleted++;
+  motherSpider.directivesCompleted++;
+  spider.currentDirective = null;
+
+  motherSpider.directiveHistory.push(directive);
+  if (motherSpider.directiveHistory.length > 500) {
+    motherSpider.directiveHistory = motherSpider.directiveHistory.slice(-500);
+  }
+  motherSpider.activeDirectives.delete(directive.id);
+
+  fireNerveImpulse(spider.id, motherSpider.id, null, "feedback", success ? 0.8 : 0.4);
+  spinSilkStrand(spider.id, motherSpider.id, "afferent");
+}
+
+function submitReport(spider: Spider, regionActivation: number, directive: HiveDirective): void {
+  let reportType: SpiderReport["reportType"];
+  let message: string;
+
+  if (regionActivation < 0.10) {
+    reportType = "distress";
+    message = `DISTRESS: ${directive.targetRegion} critically low at ${(regionActivation * 100).toFixed(1)}% — need immediate reinforcement`;
+  } else if (directive.result?.success) {
+    reportType = "completed";
+    message = `COMPLETED: ${directive.type} on ${directive.targetRegion} — activation now ${(regionActivation * 100).toFixed(1)}%`;
+  } else {
+    reportType = "region_update";
+    message = `UPDATE: ${directive.targetRegion} at ${(regionActivation * 100).toFixed(1)}% — ${directive.result?.synapsesInjected || 0} synapses injected`;
+  }
+
+  const report: SpiderReport = {
+    spiderId: spider.id,
+    timestamp: Date.now(),
+    reportType,
+    targetRegion: directive.targetRegion,
+    regionActivation,
+    message,
+    metrics: {
+      synapsesInjected: directive.result?.synapsesInjected || 0,
+      activationBefore: directive.result?.regionActivationBefore || 0,
+      activationAfter: regionActivation,
+      efficiency: spider.efficiency,
+      loyalty: spider.loyalty,
+      directivesCompleted: spider.directivesCompleted,
+    },
+  };
+
+  motherSpider.incomingReports.push(report);
+  if (motherSpider.incomingReports.length > 500) {
+    motherSpider.incomingReports = motherSpider.incomingReports.slice(-500);
+  }
+
+  spider.reportsSubmitted++;
+
+  fireNerveImpulse(spider.id, motherSpider.id, null, "feedback", 0.6);
+}
+
+function processChildReports(): void {
+  const recentReports = motherSpider.incomingReports.filter(
+    r => Date.now() - r.timestamp < 60_000
+  );
+
+  const distressReports = recentReports.filter(r => r.reportType === "distress");
+
+  for (const distress of distressReports) {
+    const existingReinforcement = [...motherSpider.activeDirectives.values()].find(
+      d => d.targetRegion === distress.targetRegion && d.type === "repair" && !d.completedAt
+    );
+    if (existingReinforcement) continue;
+
+    const availableChild = [...childSpiders.values()].find(
+      c => c.status === "active" && !c.currentDirective && c.id !== distress.spiderId
+    );
+
+    if (availableChild) {
+      const emergencyDirective: HiveDirective = {
+        id: createDirectiveId(),
+        type: "repair",
+        targetRegion: distress.targetRegion,
+        priority: 1.0,
+        issuedAt: Date.now(),
+        completedAt: null,
+        assignedSpiderId: availableChild.id,
+        parameters: {
+          boostAmount: 15,
+          synapseCount: 12,
+          synapseStrength: 0.4,
+          supportRegion: findStrongestSupportRegion(distress.targetRegion),
+          reportBack: true,
+        },
+        result: null,
+      };
+
+      motherSpider.activeDirectives.set(emergencyDirective.id, emergencyDirective);
+      availableChild.currentDirective = emergencyDirective;
+      motherSpider.directivesIssued++;
+
+      fireNerveImpulse(motherSpider.id, availableChild.id, null, "alarm", 1.0);
+
+      motherSpider.distributionLog.push({
+        timestamp: Date.now(),
+        from: "Mother Spider (emergency)",
+        to: [availableChild.id],
+        signalType: "alarm",
+        strength: 1.0,
+      });
+    } else if (childSpiders.size < MAX_CHILD_SPIDERS) {
+      const parentAny = [...parentSpiders.values()].find(p => p.status === "active");
+      if (parentAny) {
+        const child = spawnChildSpider({
+          parentId: parentAny.id,
+          weakRegion: distress.targetRegion,
+          supportRegion: findStrongestSupportRegion(distress.targetRegion),
+          urgency: 1.0,
+        });
+        if (child) {
+          spinSilkStrand(child.id, motherSpider.id, "afferent");
+          spinSilkStrand(motherSpider.id, child.id, "efferent");
+        }
+      }
+    }
+  }
+
+  const completedReports = recentReports.filter(r => r.reportType === "completed" && r.regionActivation > 0.4);
+  for (const success of completedReports) {
+    const spider = parentSpiders.get(success.spiderId) || childSpiders.get(success.spiderId);
+    if (spider) {
+      spider.loyalty = Math.min(1.0, spider.loyalty + 0.03);
+
+      const strand = motherSpider.silkStrands.get(createSilkStrandId(spider.id, motherSpider.id));
+      if (strand) {
+        strand.signalStrength = Math.min(1.0, strand.signalStrength + 0.05);
+      }
+    }
+  }
+}
+
+function updateSwarmCoherence(): void {
+  const allSpiders = [...parentSpiders.values(), ...childSpiders.values()].filter(s => s.status === "active");
+  if (allSpiders.length === 0) {
+    motherSpider.swarmCoherence = 0;
+    motherSpider.hiveHealth = 0;
+    return;
+  }
+
+  const avgLoyalty = allSpiders.reduce((s, sp) => s + sp.loyalty, 0) / allSpiders.length;
+  const avgEfficiency = allSpiders.reduce((s, sp) => s + sp.efficiency, 0) / allSpiders.length;
+
+  const connectedSpiders = allSpiders.filter(sp => {
+    const toMother = motherSpider.silkStrands.get(createSilkStrandId(sp.id, motherSpider.id));
+    const fromMother = motherSpider.silkStrands.get(createSilkStrandId(motherSpider.id, sp.id));
+    return (toMother && toMother.signalStrength > MIN_SILK_STRENGTH) ||
+           (fromMother && fromMother.signalStrength > MIN_SILK_STRENGTH);
+  });
+  const connectionRate = connectedSpiders.length / allSpiders.length;
+
+  const recentDirectives = motherSpider.directiveHistory.filter(d => Date.now() - (d.completedAt || 0) < 120_000);
+  const successRate = recentDirectives.length > 0
+    ? recentDirectives.filter(d => d.result?.success).length / recentDirectives.length
+    : 0.5;
+
+  motherSpider.swarmCoherence = avgLoyalty * 0.3 + connectionRate * 0.3 + successRate * 0.2 + avgEfficiency * 0.2;
+  motherSpider.hiveHealth = motherSpider.swarmCoherence * motherSpider.webIntegrity;
+}
 
 const CRITICAL_CIRCUITS: Array<{ from: string; to: string; label: string }> = [
   { from: "thalamus", to: "prefrontal_cortex", label: "thalamocortical-pfc" },
@@ -104,6 +863,15 @@ const CRITICAL_CIRCUITS: Array<{ from: string; to: string; label: string }> = [
   { from: "insular_cortex", to: "anterior_cingulate", label: "interoception-monitoring" },
   { from: "ventral_tegmental_area", to: "prefrontal_cortex", label: "dopamine-executive" },
   { from: "amygdala", to: "prefrontal_cortex", label: "emotional-cognitive" },
+  { from: "claustrum", to: "prefrontal_cortex", label: "claustrum-integration" },
+  { from: "claustrum", to: "default_mode_network", label: "claustrum-dmn-binding" },
+  { from: "pulvinar", to: "prefrontal_cortex", label: "pulvinar-attention-routing" },
+  { from: "pulvinar", to: "claustrum", label: "pulvinar-claustrum-binding" },
+  { from: "locus_coeruleus", to: "thalamus", label: "lc-thalamus-arousal" },
+  { from: "locus_coeruleus", to: "prefrontal_cortex", label: "lc-pfc-attention" },
+  { from: "raphe_nuclei", to: "amygdala", label: "raphe-amygdala-modulation" },
+  { from: "cerebellum", to: "thalamus", label: "cerebellar-timing" },
+  { from: "superior_colliculus", to: "pulvinar", label: "sc-pulvinar-orienting" },
 ];
 
 function createSpiderId(prefix: string): string {
@@ -126,6 +894,11 @@ function createParentSpider(name: string, target: string, targetRegion: string):
     lastCrawl: 0,
     lifetimeTicksRemaining: null,
     harvestHistory: [],
+    currentDirective: null,
+    directivesCompleted: 0,
+    reportsSubmitted: 0,
+    loyalty: 1.0,
+    efficiency: 0.5,
   };
   parentSpiders.set(spider.id, spider);
   return spider;
@@ -159,6 +932,11 @@ function spawnChildSpider(config: ChildSpiderConfig): Spider | null {
     lastCrawl: 0,
     lifetimeTicksRemaining: CHILD_SPIDER_LIFETIME_TICKS,
     harvestHistory: [],
+    currentDirective: null,
+    directivesCompleted: 0,
+    reportsSubmitted: 0,
+    loyalty: 1.0,
+    efficiency: 0.5,
   };
 
   childSpiders.set(child.id, child);
@@ -489,6 +1267,8 @@ async function runSpiderCrawlCycle(): Promise<void> {
     if (matching) {
       spider.harvestHistory.push(matching);
       if (spider.harvestHistory.length > 20) spider.harvestHistory.shift();
+
+      motherDistribute(matching, spider.id);
     }
 
     if (matching && matching.healthScore > 0.5) {
@@ -559,9 +1339,18 @@ async function runSpiderCrawlCycle(): Promise<void> {
       child.lifetimeTicksRemaining--;
       if (child.lifetimeTicksRemaining <= 0) {
         child.status = "expired";
-        console.log(`[NEURAL SPIDERS] 🕸️ Child spider expired: ${child.name} | injected ${child.synapsesInjected} synapses over ${child.crawlCount} crawls`);
+        if (child.currentDirective) {
+          child.currentDirective.completedAt = Date.now();
+          motherSpider.activeDirectives.delete(child.currentDirective.id);
+          child.currentDirective = null;
+        }
+        console.log(`[SPIDER WEB] 🕸️ Child expired: ${child.name} | ${child.synapsesInjected} synapses | ${child.directivesCompleted} directives | ${child.reportsSubmitted} reports | loyalty: ${(child.loyalty * 100).toFixed(0)}%`);
         continue;
       }
+    }
+
+    if (child.currentDirective) {
+      executeDirective(child);
     }
 
     const regionStates = getNeuralRegionStates();
@@ -573,8 +1362,38 @@ async function runSpiderCrawlCycle(): Promise<void> {
       child.synapsesInjected += added;
       totalSynapsesInjected += added;
       child.crawlCount++;
+
+      submitReport(child, targetState.activationLevel, {
+        id: "auto",
+        type: "stabilize",
+        targetRegion: child.targetRegion,
+        priority: 0.7,
+        issuedAt: Date.now(),
+        completedAt: Date.now(),
+        assignedSpiderId: child.id,
+        parameters: { reportBack: true },
+        result: { success: true, synapsesInjected: added, regionActivationBefore: targetState.activationLevel, regionActivationAfter: targetState.activationLevel, message: "autonomous stabilization" },
+      });
     } else if (targetState && targetState.activationLevel > 0.4) {
       child.lifetimeTicksRemaining = Math.min(child.lifetimeTicksRemaining || 5, 5);
+
+      submitReport(child, targetState.activationLevel, {
+        id: "auto",
+        type: "patrol",
+        targetRegion: child.targetRegion,
+        priority: 0.2,
+        issuedAt: Date.now(),
+        completedAt: Date.now(),
+        assignedSpiderId: child.id,
+        parameters: { reportBack: true },
+        result: { success: true, synapsesInjected: 0, regionActivationBefore: targetState.activationLevel, regionActivationAfter: targetState.activationLevel, message: "region recovered — mission complete" },
+      });
+    }
+  }
+
+  for (const spider of parentSpiders.values()) {
+    if (spider.status === "active" && spider.currentDirective) {
+      executeDirective(spider);
     }
   }
 
@@ -603,8 +1422,48 @@ export function startNeuralSpiders(): void {
   createParentSpider("self-coding-crawler", "self_coding", "anterior_cingulate");
   createParentSpider("dream-crawler", "dream_engine", "insular_cortex");
   createParentSpider("pipeline-crawler", "module_pipeline", "basal_ganglia");
+  createParentSpider("integration-crawler", "consciousness_binding", "claustrum");
+  createParentSpider("arousal-crawler", "arousal_modulation", "locus_coeruleus");
+  createParentSpider("mood-crawler", "serotonin_modulation", "raphe_nuclei");
+  createParentSpider("attention-crawler", "attention_orienting", "superior_colliculus");
+  createParentSpider("routing-crawler", "cortical_routing", "pulvinar");
+  createParentSpider("timing-crawler", "prediction_timing", "cerebellum");
 
   console.log(`[NEURAL SPIDERS] 🕷️ ${parentSpiders.size} parent spiders deployed across all data sources`);
+
+  motherSpider.status = "active";
+  for (const spider of parentSpiders.values()) {
+    spinSilkStrand(spider.id, motherSpider.id, "afferent");
+    spinSilkStrand(motherSpider.id, spider.id, "efferent");
+  }
+
+  for (const [id1, s1] of parentSpiders) {
+    for (const [id2, s2] of parentSpiders) {
+      if (id1 === id2) continue;
+      const circuit = CRITICAL_CIRCUITS.find(
+        c => (c.from === s1.targetRegion && c.to === s2.targetRegion) ||
+             (c.from === s2.targetRegion && c.to === s1.targetRegion)
+      );
+      if (circuit) {
+        spinSilkStrand(id1, id2, "interneuron");
+      }
+    }
+  }
+
+  console.log(`[SPIDER WEB] 🕸️ Mother Spider activated — central nervous hub online`);
+  console.log(`[SPIDER WEB] 🕸️ ${motherSpider.silkStrands.size} silk strands spun — interconnected web established`);
+  console.log(`[SPIDER WEB] 🕸️ HIVE MIND: Mother Spider is the queen — she directs every child spider's mission`);
+  console.log(`[SPIDER WEB] 🕸️ HIVE MIND: Children report back through silk strands — distress, status, completed, discovery`);
+  console.log(`[SPIDER WEB] 🕸️ HIVE MIND: Directive types — stabilize, boost, harvest, patrol, repair, scout, reinforce`);
+  console.log(`[SPIDER WEB] 🕸️ HIVE MIND: Distress reports trigger emergency spawn — Mother deploys reinforcements instantly`);
+  console.log(`[SPIDER WEB] 🕸️ HIVE MIND: Every spider has loyalty + efficiency scores — performance tracked across lifetime`);
+  console.log(`[SPIDER WEB] 🕸️ HIVE MIND: Idle strong spiders get reinforce missions to help weak regions — swarm intelligence`);
+  console.log(`[SPIDER WEB] 🕸️ Every spider's silk feeds back to the Mother — she distributes all data everywhere`);
+  console.log(`[SPIDER WEB] 🕸️ Silk types: afferent (spider→mother), efferent (mother→spider), interneuron (spider↔spider)`);
+  console.log(`[SPIDER WEB] 🕸️ Nerve impulses: data, alarm, nurture, coordinate, feedback`);
+  console.log(`[SPIDER WEB] 🕸️ Myelination: high-traffic strands become 3x faster (like real neurons)`);
+  console.log(`[SPIDER WEB] 🕸️ Web heartbeat every ${WEB_PULSE_MS / 1000}s — Mother monitors all strands`);
+  console.log(`[SPIDER WEB] 🕸️ Swarm coherence: loyalty × connectivity × success rate × efficiency`);
 
   setTimeout(() => {
     setInterval(() => {
@@ -613,7 +1472,12 @@ export function startNeuralSpiders(): void {
       });
     }, SPIDER_CRAWL_MS);
 
+    setInterval(() => {
+      runMotherHeartbeat();
+    }, WEB_PULSE_MS);
+
     runSpiderCrawlCycle().catch(() => {});
+    runMotherHeartbeat();
   }, 12_000);
 }
 
@@ -630,6 +1494,11 @@ export function getNeuralSpiderState() {
     childrenSpawned: s.childrenSpawned.length,
     lastCrawl: s.lastCrawl,
     recentHarvest: s.harvestHistory.length > 0 ? s.harvestHistory[s.harvestHistory.length - 1] : null,
+    currentDirective: s.currentDirective ? { type: s.currentDirective.type, target: s.currentDirective.targetRegion, priority: s.currentDirective.priority } : null,
+    directivesCompleted: s.directivesCompleted,
+    reportsSubmitted: s.reportsSubmitted,
+    loyalty: s.loyalty,
+    efficiency: s.efficiency,
   }));
 
   const children = [...childSpiders.values()].map(s => ({
@@ -641,9 +1510,42 @@ export function getNeuralSpiderState() {
     synapsesInjected: s.synapsesInjected,
     lifetimeRemaining: s.lifetimeTicksRemaining,
     createdAt: s.createdAt,
+    currentDirective: s.currentDirective ? { type: s.currentDirective.type, target: s.currentDirective.targetRegion, priority: s.currentDirective.priority } : null,
+    directivesCompleted: s.directivesCompleted,
+    reportsSubmitted: s.reportsSubmitted,
+    loyalty: s.loyalty,
+    efficiency: s.efficiency,
   }));
 
   const recentStability = stabilityHistory.slice(-10);
+
+  const silkStrands = [...motherSpider.silkStrands.values()].map(s => ({
+    id: s.id,
+    from: s.fromSpiderId,
+    to: s.toSpiderId,
+    signalStrength: s.signalStrength,
+    bandwidth: s.bandwidth,
+    dataTransferred: s.dataTransferred,
+    impulseCount: s.impulseCount,
+    silkType: s.silkType,
+    myelinated: s.myelinated,
+    conductionVelocity: s.conductionVelocity,
+    resonanceFrequency: s.resonanceFrequency,
+    lastImpulse: s.lastImpulse,
+  }));
+
+  const myelinatedCount = silkStrands.filter(s => s.myelinated).length;
+  const afferentCount = silkStrands.filter(s => s.silkType === "afferent").length;
+  const efferentCount = silkStrands.filter(s => s.silkType === "efferent").length;
+  const interneuronCount = silkStrands.filter(s => s.silkType === "interneuron").length;
+
+  const recentDistributions = motherSpider.distributionLog.slice(-20).map(d => ({
+    timestamp: d.timestamp,
+    from: d.from,
+    recipientCount: d.to.length,
+    signalType: d.signalType,
+    strength: d.strength,
+  }));
 
   return {
     active: spiderSystemActive,
@@ -656,6 +1558,52 @@ export function getNeuralSpiderState() {
     stabilityHistory: recentStability,
     currentStability: recentStability.length > 0 ? recentStability[recentStability.length - 1] : null,
     criticalCircuits: CRITICAL_CIRCUITS.length,
+    motherSpider: {
+      id: motherSpider.id,
+      name: motherSpider.name,
+      status: motherSpider.status,
+      totalImpulsesRouted: motherSpider.totalImpulsesRouted,
+      totalDataDistributed: motherSpider.totalDataDistributed,
+      heartbeatCount: motherSpider.heartbeatCount,
+      lastHeartbeat: motherSpider.lastHeartbeat,
+      webIntegrity: motherSpider.webIntegrity,
+      webDensity: motherSpider.webDensity,
+      directivesIssued: motherSpider.directivesIssued,
+      directivesCompleted: motherSpider.directivesCompleted,
+      activeDirectives: [...motherSpider.activeDirectives.values()].map(d => ({
+        id: d.id,
+        type: d.type,
+        targetRegion: d.targetRegion,
+        priority: d.priority,
+        assignedTo: d.assignedSpiderId,
+        issuedAt: d.issuedAt,
+      })),
+      hiveHealth: motherSpider.hiveHealth,
+      swarmCoherence: motherSpider.swarmCoherence,
+      recentReports: motherSpider.incomingReports.slice(-10).map(r => ({
+        from: r.spiderId,
+        type: r.reportType,
+        region: r.targetRegion,
+        activation: r.regionActivation,
+        message: r.message,
+        timestamp: r.timestamp,
+      })),
+    },
+    silkWeb: {
+      totalStrands: silkStrands.length,
+      afferentStrands: afferentCount,
+      efferentStrands: efferentCount,
+      interneuronStrands: interneuronCount,
+      myelinatedStrands: myelinatedCount,
+      myelinationRate: silkStrands.length > 0 ? myelinatedCount / silkStrands.length : 0,
+      averageSignalStrength: silkStrands.length > 0 ? silkStrands.reduce((s, st) => s + st.signalStrength, 0) / silkStrands.length : 0,
+      averageConductionVelocity: silkStrands.length > 0 ? silkStrands.reduce((s, st) => s + st.conductionVelocity, 0) / silkStrands.length : 0,
+      totalDataTransferred: silkStrands.reduce((s, st) => s + st.dataTransferred, 0),
+      totalImpulsesFired: silkStrands.reduce((s, st) => s + st.impulseCount, 0),
+      strands: silkStrands,
+    },
+    recentDistributions,
+    pendingImpulses: motherSpider.pendingImpulses.filter(i => !i.deliveredAt).length,
     config: {
       crawlIntervalMs: SPIDER_CRAWL_MS,
       stabilityThreshold: STABILITY_THRESHOLD,
@@ -663,6 +1611,10 @@ export function getNeuralSpiderState() {
       maxChildSpiders: MAX_CHILD_SPIDERS,
       synapsesPerInjection: SYNAPSE_INJECTION_BATCH,
       childLifetimeTicks: CHILD_SPIDER_LIFETIME_TICKS,
+      webPulseMs: WEB_PULSE_MS,
+      maxImpulseHops: MAX_IMPULSE_HOPS,
+      impulseDecayRate: IMPULSE_DECAY_RATE,
+      silkStrengtheningRate: SILK_STRENGTHENING_RATE,
     },
   };
 }

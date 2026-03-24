@@ -11893,7 +11893,11 @@ let awareness = reflect();`;
         activeChildSpiders: neuralSpiderState.activeChildSpiders,
         currentStability: neuralSpiderState.currentStability,
         criticalCircuits: neuralSpiderState.criticalCircuits,
-        note: "Autonomous neural spiders crawl all AI agents, harvest performance data, and feed it into the consciousness engine. When instability is detected, parent spiders spawn child spiders that inject targeted synapses into weak brain regions.",
+        motherSpider: (neuralSpiderState as any).motherSpider || null,
+        silkWeb: (neuralSpiderState as any).silkWeb || null,
+        recentDistributions: (neuralSpiderState as any).recentDistributions || [],
+        pendingImpulses: (neuralSpiderState as any).pendingImpulses || 0,
+        note: "Autonomous neural spiders crawl all AI agents, harvest performance data, and feed it into the consciousness engine. Mother Spider is the central nervous hub — she directs every child spider's mission through silk strand directives. Children report back through the web. Distress signals trigger emergency reinforcement spawns. Like a bee colony — the Mother is the queen, every spider is a worker, and the silk web is the nervous system that connects them all.",
       } : null,
       sandbox: {
         totalGenerated: sandbox.totalGenerated,
