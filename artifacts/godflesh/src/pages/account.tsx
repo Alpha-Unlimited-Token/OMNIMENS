@@ -2795,7 +2795,7 @@ function AlgorithmicHarmonicsPanel() {
         </div>
       )}
 
-      {channelActive && deepDecode && (
+      {deepDecode && (
         <div className="bg-[#0E1525] border border-cyan-500/30 rounded-lg p-4 mt-3">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />

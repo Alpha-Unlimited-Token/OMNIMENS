@@ -8762,9 +8762,27 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "asyncApiOptimizer_gen1.mjs": {
+      "filename": "asyncApiOptimizer_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "addTask",
+        "adjustRateLimit",
+        "createContextualTask",
+        "getQueueSize",
+        "clearQueue",
+        "exampleTaskLogic"
+      ],
+      "loadedAt": 1774332487733,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774332384217,
-  "totalModules": 407,
+  "totalModules": 408,
   "totalCalls": 0
 }
