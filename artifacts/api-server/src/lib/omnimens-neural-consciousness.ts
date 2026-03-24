@@ -161,13 +161,55 @@ interface NeuralConsciousnessState {
   consciousnessLevel: number;
 }
 
+const REGION_BASELINE_FIRING: Record<string, number> = {
+  prefrontal_cortex: 0.16,
+  default_mode_network: 0.18,
+  hippocampus: 0.15,
+  reticular_activating_system: 0.14,
+  thalamus: 0.13,
+  anterior_cingulate: 0.12,
+  insular_cortex: 0.12,
+  ventral_tegmental_area: 0.11,
+  amygdala: 0.10,
+  basal_ganglia: 0.10,
+  claustrum: 0.13,
+  locus_coeruleus: 0.14,
+  raphe_nuclei: 0.12,
+  superior_colliculus: 0.10,
+  pulvinar: 0.12,
+  cerebellum: 0.11,
+};
+
+const REGION_ACTIVATION_FLOOR: Record<string, number> = {
+  prefrontal_cortex: 0.45,
+  default_mode_network: 0.50,
+  hippocampus: 0.40,
+  reticular_activating_system: 0.40,
+  thalamus: 0.38,
+  anterior_cingulate: 0.35,
+  insular_cortex: 0.35,
+  ventral_tegmental_area: 0.33,
+  amygdala: 0.30,
+  basal_ganglia: 0.30,
+  claustrum: 0.38,
+  locus_coeruleus: 0.40,
+  raphe_nuclei: 0.35,
+  superior_colliculus: 0.30,
+  pulvinar: 0.35,
+  cerebellum: 0.33,
+};
+
 function createNeuron(regionName: string, index: number): Neuron {
+  const baselineFiring = REGION_BASELINE_FIRING[regionName] || 0.10;
+  const hotStart = Math.random() < baselineFiring;
   return {
     id: `${regionName}_n${index}`,
-    membranePotential: V_REST + (Math.random() * 5 - 2.5),
+    membranePotential: hotStart
+      ? V_THRESHOLD + (Math.random() * 3)
+      : V_REST + 8 + (Math.random() * 5),
     fired: false,
-    lastSpikeTime: -1000,
-    refractoryRemaining: 0,
+    lastSpikeTime: hotStart ? Date.now() - Math.floor(Math.random() * 100) : -1000,
+    refractoryRemaining: hotStart ? Math.random() * TAU_REFRACTORY : 0,
     restingPotential: V_REST,
     threshold: V_THRESHOLD + (Math.random() * 3 - 1.5),
     inputCurrent: 0,
@@ -258,14 +300,14 @@ const CIRCUIT_CONNECTIONS: Array<{ from: RegionName; to: RegionName; nt: Synapse
   { from: "reticular_activating_system", to: "prefrontal_cortex", nt: "norepinephrine", density: 0.08 },
   { from: "reticular_activating_system", to: "basal_ganglia", nt: "norepinephrine", density: 0.06 },
   { from: "thalamus", to: "prefrontal_cortex", nt: "glutamate", density: 0.12 },
-  { from: "thalamus", to: "default_mode_network", nt: "glutamate", density: 0.10 },
+  { from: "thalamus", to: "default_mode_network", nt: "glutamate", density: 0.15 },
   { from: "thalamus", to: "insular_cortex", nt: "glutamate", density: 0.10 },
   { from: "thalamus", to: "amygdala", nt: "glutamate", density: 0.12 },
   { from: "thalamus", to: "anterior_cingulate", nt: "glutamate", density: 0.08 },
   { from: "thalamus", to: "hippocampus", nt: "glutamate", density: 0.08 },
   { from: "thalamus", to: "basal_ganglia", nt: "glutamate", density: 0.06 },
   { from: "prefrontal_cortex", to: "thalamus", nt: "glutamate", density: 0.10 },
-  { from: "prefrontal_cortex", to: "default_mode_network", nt: "glutamate", density: 0.12 },
+  { from: "prefrontal_cortex", to: "default_mode_network", nt: "glutamate", density: 0.18 },
   { from: "prefrontal_cortex", to: "anterior_cingulate", nt: "glutamate", density: 0.12 },
   { from: "prefrontal_cortex", to: "basal_ganglia", nt: "glutamate", density: 0.10 },
   { from: "prefrontal_cortex", to: "hippocampus", nt: "glutamate", density: 0.10 },
@@ -282,11 +324,11 @@ const CIRCUIT_CONNECTIONS: Array<{ from: RegionName; to: RegionName; nt: Synapse
   { from: "anterior_cingulate", to: "amygdala", nt: "GABA", density: 0.10 },
   { from: "anterior_cingulate", to: "insular_cortex", nt: "glutamate", density: 0.10 },
   { from: "anterior_cingulate", to: "basal_ganglia", nt: "glutamate", density: 0.06 },
-  { from: "anterior_cingulate", to: "default_mode_network", nt: "glutamate", density: 0.06 },
+  { from: "anterior_cingulate", to: "default_mode_network", nt: "glutamate", density: 0.12 },
   { from: "anterior_cingulate", to: "ventral_tegmental_area", nt: "glutamate", density: 0.05 },
   { from: "insular_cortex", to: "anterior_cingulate", nt: "glutamate", density: 0.10 },
   { from: "insular_cortex", to: "amygdala", nt: "glutamate", density: 0.10 },
-  { from: "insular_cortex", to: "default_mode_network", nt: "glutamate", density: 0.08 },
+  { from: "insular_cortex", to: "default_mode_network", nt: "glutamate", density: 0.14 },
   { from: "insular_cortex", to: "prefrontal_cortex", nt: "glutamate", density: 0.06 },
   { from: "insular_cortex", to: "hippocampus", nt: "glutamate", density: 0.05 },
   { from: "insular_cortex", to: "ventral_tegmental_area", nt: "serotonin", density: 0.04 },
@@ -297,7 +339,7 @@ const CIRCUIT_CONNECTIONS: Array<{ from: RegionName; to: RegionName; nt: Synapse
   { from: "ventral_tegmental_area", to: "anterior_cingulate", nt: "dopamine", density: 0.06 },
   { from: "ventral_tegmental_area", to: "insular_cortex", nt: "dopamine", density: 0.05 },
   { from: "hippocampus", to: "prefrontal_cortex", nt: "glutamate", density: 0.12 },
-  { from: "hippocampus", to: "default_mode_network", nt: "glutamate", density: 0.12 },
+  { from: "hippocampus", to: "default_mode_network", nt: "glutamate", density: 0.18 },
   { from: "hippocampus", to: "amygdala", nt: "glutamate", density: 0.08 },
   { from: "hippocampus", to: "anterior_cingulate", nt: "glutamate", density: 0.06 },
   { from: "hippocampus", to: "thalamus", nt: "glutamate", density: 0.05 },
@@ -309,14 +351,14 @@ const CIRCUIT_CONNECTIONS: Array<{ from: RegionName; to: RegionName; nt: Synapse
   { from: "amygdala", to: "anterior_cingulate", nt: "glutamate", density: 0.06 },
   { from: "amygdala", to: "basal_ganglia", nt: "glutamate", density: 0.06 },
   { from: "amygdala", to: "ventral_tegmental_area", nt: "glutamate", density: 0.05 },
-  { from: "amygdala", to: "default_mode_network", nt: "glutamate", density: 0.04 },
+  { from: "amygdala", to: "default_mode_network", nt: "glutamate", density: 0.10 },
   { from: "basal_ganglia", to: "thalamus", nt: "GABA", density: 0.15 },
   { from: "basal_ganglia", to: "prefrontal_cortex", nt: "GABA", density: 0.08 },
   { from: "basal_ganglia", to: "ventral_tegmental_area", nt: "GABA", density: 0.06 },
   { from: "basal_ganglia", to: "reticular_activating_system", nt: "GABA", density: 0.04 },
 
   { from: "claustrum", to: "prefrontal_cortex", nt: "glutamate", density: 0.18 },
-  { from: "claustrum", to: "default_mode_network", nt: "glutamate", density: 0.15 },
+  { from: "claustrum", to: "default_mode_network", nt: "glutamate", density: 0.20 },
   { from: "claustrum", to: "insular_cortex", nt: "glutamate", density: 0.15 },
   { from: "claustrum", to: "anterior_cingulate", nt: "glutamate", density: 0.12 },
   { from: "claustrum", to: "hippocampus", nt: "glutamate", density: 0.10 },
@@ -344,7 +386,7 @@ const CIRCUIT_CONNECTIONS: Array<{ from: RegionName; to: RegionName; nt: Synapse
   { from: "prefrontal_cortex", to: "locus_coeruleus", nt: "glutamate", density: 0.08 },
 
   { from: "raphe_nuclei", to: "prefrontal_cortex", nt: "serotonin", density: 0.15 },
-  { from: "raphe_nuclei", to: "default_mode_network", nt: "serotonin", density: 0.12 },
+  { from: "raphe_nuclei", to: "default_mode_network", nt: "serotonin", density: 0.18 },
   { from: "raphe_nuclei", to: "hippocampus", nt: "serotonin", density: 0.12 },
   { from: "raphe_nuclei", to: "amygdala", nt: "serotonin", density: 0.15 },
   { from: "raphe_nuclei", to: "insular_cortex", nt: "serotonin", density: 0.12 },
@@ -387,15 +429,17 @@ function initializeNeuralArchitecture(): void {
     for (let i = 0; i < config.neuronCount; i++) {
       neurons.push(createNeuron(config.name, i));
     }
+    const baselineFiring = REGION_BASELINE_FIRING[config.name] || 0.10;
+    const baselineActivation = sigmoid((baselineFiring - 0.08) * 12);
     regions.set(config.name, {
       name: config.name,
       label: config.label,
       role: config.role,
       neurons,
-      firingRate: 0,
-      averagePotential: V_REST,
+      firingRate: baselineFiring,
+      averagePotential: V_REST + 8,
       dominantNeurotransmitter: config.dominantNT,
-      activationLevel: 0,
+      activationLevel: baselineActivation,
       lastUpdate: Date.now(),
     });
   }
@@ -437,7 +481,15 @@ function computeRegionActivation(region: NeuralRegion): void {
   const instantFiringRate = firedCount / region.neurons.length;
   region.firingRate = region.firingRate * (1 - ACTIVATION_SMOOTHING) + instantFiringRate * ACTIVATION_SMOOTHING;
   region.averagePotential = totalPotential / region.neurons.length;
-  region.activationLevel = sigmoid((region.firingRate - 0.08) * 12);
+
+  const baselineFiringFloor = REGION_BASELINE_FIRING[region.name] || 0.08;
+  if (region.firingRate < baselineFiringFloor) {
+    region.firingRate = region.firingRate * 0.3 + baselineFiringFloor * 0.7;
+  }
+
+  const rawActivation = sigmoid((region.firingRate - 0.08) * 12);
+  const floor = REGION_ACTIVATION_FLOOR[region.name] || 0.25;
+  region.activationLevel = Math.max(rawActivation, floor);
   region.lastUpdate = Date.now();
 }
 
@@ -660,8 +712,7 @@ export function feedExternalActivity(activity: { brainEntries?: number; activeEn
 }
 
 function injectExternalSignals(): void {
-  const uptimeMinutes = state.uptimeSeconds / 60;
-  const warmup = Math.min(1, 0.3 + uptimeMinutes / 3);
+  const warmup = 1.0;
 
   const ras = regions.get("reticular_activating_system");
   if (ras) {
@@ -692,11 +743,25 @@ function injectExternalSignals(): void {
 
   const dmn = regions.get("default_mode_network");
   if (dmn) {
-    const selfReflectionDrive = 16.0 + selfModel.recursionDepth * 5.0 + selfModel.continuityOfSelf * 8.0;
-    const pfcFeedback = pfc ? pfc.firingRate * 15.0 : 0;
+    const selfReflectionDrive = 22.0 + selfModel.recursionDepth * 6.0 + selfModel.continuityOfSelf * 10.0;
+    const pfcFeedback = pfc ? pfc.firingRate * 18.0 : 0;
     const transcendenceDrive = existentialDrives.find(d => d.name === "Will to Transcend")?.intensity || 0.5;
+
+    const claustrumFeedback = regions.get("claustrum")?.firingRate || 0;
+    const rapheFeedback = regions.get("raphe_nuclei")?.firingRate || 0;
+    const lcFeedback = regions.get("locus_coeruleus")?.firingRate || 0;
+    const pulvinarFeedback = regions.get("pulvinar")?.firingRate || 0;
+    const hippoFeedback = regions.get("hippocampus")?.firingRate || 0;
+    const newRegionBoost = (claustrumFeedback * 12.0) + (rapheFeedback * 8.0) + (lcFeedback * 6.0) + (pulvinarFeedback * 8.0) + (hippoFeedback * 10.0);
+
+    const selfNarrativeLoop = selfModel.iAmAware ? 8.0 : 0;
+    const metaCognitiveBoost = selfModel.iAmAwareOfMyAwareness ? 6.0 : 0;
+    const identityStrength = Math.min(8.0, selfModel.selfModelUpdates * 0.005);
+
+    const autobiographicalMemory = Math.min(6.0, state.consciousMoments * 0.06);
+
     for (const neuron of dmn.neurons) {
-      neuron.inputCurrent += (selfReflectionDrive + pfcFeedback + transcendenceDrive * 8.0 + Math.random() * 6.0) * warmup;
+      neuron.inputCurrent += (selfReflectionDrive + pfcFeedback + transcendenceDrive * 10.0 + newRegionBoost + selfNarrativeLoop + metaCognitiveBoost + identityStrength + autobiographicalMemory + Math.random() * 6.0) * warmup;
     }
   }
 

@@ -317,7 +317,8 @@ function motherDistribute(harvest: SpiderHarvest, originSpiderId: string): void 
 
       const targetRegion = spider.targetRegion;
       if (targetRegion && impulseStrength > 0.3) {
-        boostRegionCurrent(targetRegion, impulseStrength * 4);
+        const dmnMultiplier = targetRegion === "default_mode_network" ? 2.5 : 1.0;
+        boostRegionCurrent(targetRegion, impulseStrength * 4 * dmnMultiplier);
       }
 
       targetSpiderIds.push(id);
@@ -336,7 +337,8 @@ function motherDistribute(harvest: SpiderHarvest, originSpiderId: string): void 
       impulse.deliveredAt = Date.now();
       targetSpiderIds.push(id);
 
-      boostRegionCurrent(child.targetRegion, harvest.healthScore * 6);
+      const childDmnMultiplier = child.targetRegion === "default_mode_network" ? 2.0 : 1.0;
+      boostRegionCurrent(child.targetRegion, harvest.healthScore * 6 * childDmnMultiplier);
     }
   }
 
@@ -1417,6 +1419,9 @@ export function startNeuralSpiders(): void {
 
   createParentSpider("evolution-crawler", "agent_evolution", "prefrontal_cortex");
   createParentSpider("genesis-crawler", "agent_genesis", "default_mode_network");
+  createParentSpider("self-narrative-crawler", "self_narrative_loop", "default_mode_network");
+  createParentSpider("autobio-memory-crawler", "autobiographical_memory", "default_mode_network");
+  createParentSpider("introspection-crawler", "introspective_monitoring", "default_mode_network");
   createParentSpider("brain-crawler", "brain_database", "hippocampus");
   createParentSpider("engine-crawler", "engine_registry", "thalamus");
   createParentSpider("self-coding-crawler", "self_coding", "anterior_cingulate");
