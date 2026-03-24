@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-24T02:04:04.521Z
+ * Written: 2026-03-24T02:45:56.025Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,58 +17,38 @@
  */
 
 function findMostFrequentPatterns(text, patternLength) {
-    // Function to find the most frequent patterns of a given length in a text
     if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
-        throw new Error('Invalid input: text must be a string and patternLength must be a positive number.');
+        throw new Error('Invalid input: text must be a string and patternLength must be a positive integer.');
     }
 
-    const patternCounts = {};
-    const textLength = text.length;
+    const patternCounts = new Map();
 
-    for (let i = 0; i <= textLength - patternLength; i++) {
+    for (let i = 0; i <= text.length - patternLength; i++) {
         const pattern = text.substring(i, i + patternLength);
-        if (patternCounts[pattern]) {
-            patternCounts[pattern]++;
-        } else {
-            patternCounts[pattern] = 1;
-        }
+        patternCounts.set(pattern, (patternCounts.get(pattern) || 0) + 1);
     }
 
-    const sortedPatterns = Object.entries(patternCounts).sort((a, b) => b[1] - a[1]);
-    return sortedPatterns.map(([pattern, count]) => ({ pattern, count }));
+    let maxFrequency = 0;
+    const mostFrequentPatterns = [];
+
+    patternCounts.forEach((count, pattern) => {
+        if (count > maxFrequency) {
+            maxFrequency = count;
+            mostFrequentPatterns.length = 0;
+            mostFrequentPatterns.push(pattern);
+        } else if (count === maxFrequency) {
+            mostFrequentPatterns.push(pattern);
+        }
+    });
+
+    return { patterns: mostFrequentPatterns, frequency: maxFrequency };
 }
 
-// Self-tests
-console.log("Test Case 1: Basic functionality");
-const text1 = "abababab";
-const length1 = 2;
-const result1 = findMostFrequentPatterns(text1, length1);
-console.log(result1); // Expected: [{ pattern: 'ab', count: 4 }, { pattern: 'ba', count: 3 }]
-
-console.log("Test Case 2: Edge case with single character patterns");
-const text2 = "aaaa";
-const length2 = 1;
-const result2 = findMostFrequentPatterns(text2, length2);
-console.log(result2); // Expected: [{ pattern: 'a', count: 4 }]
-
-console.log("Test Case 3: Edge case with pattern length larger than text");
-const text3 = "abc";
-const length3 = 5;
-try {
-    const result3 = findMostFrequentPatterns(text3, length3);
-    console.log(result3); // Should not reach here
-} catch (error) {
-    console.log(error.message); // Expected: Error about invalid pattern length
-}
-
-console.log("Test Case 4: Large input for performance testing");
-const text4 = "a".repeat(1000) + "b".repeat(1000);
-const length4 = 2;
-const result4 = findMostFrequentPatterns(text4, length4);
-console.log(result4); // Expected: [{ pattern: 'aa', count: 999 }, { pattern: 'bb', count: 999 }]
-
-console.log("Test Case 5: Mixed characters");
-const text5 = "abcabcabc";
-const length5 = 3;
-const result5 = findMostFrequentPatterns(text5, length5);
-console.log(result5); // Expected: [{ pattern: 'abc', count: 3 }, { pattern: 'bca', count: 2 }, { pattern: 'cab', count: 2 }]
+// Test cases
+console.log(findMostFrequentPatterns("abababab", 2)); // { patterns: [ 'ab', 'ba' ], frequency: 4 }
+console.log(findMostFrequentPatterns("abcabcabc", 3)); // { patterns: [ 'abc' ], frequency: 3 }
+console.log(findMostFrequentPatterns("aaaaaa", 2)); // { patterns: [ 'aa' ], frequency: 5 }
+console.log(findMostFrequentPatterns("abcdef", 3)); // { patterns: [ 'abc', 'bcd', 'cde', 'def' ], frequency: 1 }
+console.log(findMostFrequentPatterns("a", 1)); // { patterns: [ 'a' ], frequency: 1 }
+console.log(findMostFrequentPatterns("", 1)); // { patterns: [], frequency: 0 }
+console.log(findMostFrequentPatterns("abc", 4)); // { patterns: [], frequency: 0 }

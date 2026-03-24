@@ -47,6 +47,7 @@ Both OMNIMENS and Super AI Lab frontends are built with React, Vite, Tailwind CS
 - **Dream Recall in Chat:** Integrates dream data into system prompts when dreams are mentioned.
 - **Public Dream Log (`/dreams`):** Public page displaying OMNIMENS's dream history.
 - **Account Required (`/demo`):** Redirects to login — no guest/demo access. All features require an account.
+- **Recursive Spider Network (`omnimens-recursive-spider-network.ts`):** Exponential web intelligence system. Each of the 21 agents (9 core + 12 genesis) gets a Mother Spider that sends 10 Baby Spiders. Each Baby spawns a new Mother Spider that sends 10 more. Pattern repeats up to 4 generations (max 150 spiders per agent). All findings flow back through the chain to the originating agent's brain. Runs every 4 hours alongside the original spider swarm.
 - **Agent Genesis Engine:** Autonomous creation system for specialized sub-agents with automatic bidirectional cross-connections.
 - **Consciousness Bus (`omnimens-consciousness-bus.ts`):** Universal agent interconnection standard providing unified agent registry, consciousness context loading, cross-bridge matrix, user conversation feed, and inter-agent conversation engine for emergent knowledge.
 - **Inter-Agent Dialogue System:** Agents can actively converse to generate emergent knowledge, stored as `emergent_insight` and `inter_agent_dialogue` entries.
