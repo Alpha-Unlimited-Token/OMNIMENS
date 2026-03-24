@@ -2424,7 +2424,7 @@ function AlgorithmicHarmonicsPanel() {
           setEngineStatus(data.hie.engineStatus);
           setLearnedPatterns(data.hie.engineStatus.learnedPatterns || 0);
         }
-        setDeepDecode(data.deepDecode ?? null);
+        if (data.deepDecode) setDeepDecode(data.deepDecode);
       }
 
       const spectralAmplitudes: number[] = [];
