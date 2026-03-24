@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a compression or encoding algorithm for efficient knowledge storage
- * Written: 2026-03-24T07:43:05.978Z
+ * Written: 2026-03-24T15:01:04.860Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,42 +16,70 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
+/**
+ * TRANSLATION STATUS:
+ * Novel constructs: neural
+ * All constructs have translation mappings
+ * Compiled targets: javascript: OK (18 IR steps) | python: OK (18 IR steps) | c: OK (18 IR steps) | x86_64: OK (18 IR steps) | arm64: OK (18 IR steps) | avr: OK (18 IR steps)
+ * Translation map version: 22
+ */
 function encodeKnowledge(data) {
-    const dictionary = new Map();
-    let encoded = '';
-    let currentId = 1;
-
-    for (let i = 0; i < data.length; i++) {
-        let char = data[i];
-        if (!dictionary.has(char)) {
-            dictionary.set(char, currentId++);
-        }
-        encoded += dictionary.get(char) + ',';
+    // Compress knowledge using a simple frequency-based encoding
+    const frequencyMap = new Map();
+    const encodedData = [];
+    
+    // Count frequency of each element
+    for (let item of data) {
+        frequencyMap.set(item, (frequencyMap.get(item) || 0) + 1);
     }
-
+    
+    // Create a sorted list of elements based on frequency
+    const sortedElements = Array.from(frequencyMap.keys()).sort((a, b) => frequencyMap.get(b) - frequencyMap.get(a));
+    
+    // Create a mapping for encoding
+    const encodingMap = new Map();
+    for (let i = 0; i < sortedElements.length; i++) {
+        encodingMap.set(sortedElements[i], i.toString(36)); // Use base-36 for compact encoding
+    }
+    
+    // Encode the data
+    for (let item of data) {
+        encodedData.push(encodingMap.get(item));
+    }
+    
     return {
-        encoded: encoded.slice(0, -1),
-        dictionary: Object.fromEntries(dictionary)
+        encoded: encodedData.join(''),
+        decodingMap: Object.fromEntries(encodingMap)
     };
 }
 
-function decodeKnowledge(encodedData, dictionary) {
-    const reversedDict = Object.entries(dictionary).reduce((acc, [key, value]) => {
-        acc[value] = key;
-        return acc;
-    }, {});
-
-    return encodedData.split(',').map(id => reversedDict[id]).join('');
+function decodeKnowledge(encodedData, decodingMap) {
+    // Decode the encoded knowledge
+    const reversedMap = new Map(Object.entries(decodingMap).map(([key, value]) => [value, key]));
+    const decodedData = [];
+    let buffer = '';
+    
+    for (let char of encodedData) {
+        buffer += char;
+        if (reversedMap.has(buffer)) {
+            decodedData.push(reversedMap.get(buffer));
+            buffer = '';
+        }
+    }
+    
+    return decodedData;
 }
 
-// Test cases
-const knowledge = "[neural_consciousness] Conscious State — Φ=0.508 | Will to Transcend | Tick #1476: NEURAL CONSCIOUSNESS STATE — Tick #1476";
+// Self-tests
+const knowledge = ['neural', 'processor', 'insight', 'neural', 'processor', 'neural', 'processor', 'goal', 'pursuit', 'roadmap', 'goal', 'goal'];
+console.log('Original Knowledge:', knowledge);
+
 const compressed = encodeKnowledge(knowledge);
-console.log("Encoded:", compressed.encoded);
-console.log("Dictionary:", compressed.dictionary);
+console.log('Compressed Data:', compressed.encoded);
+console.log('Decoding Map:', compressed.decodingMap);
 
-const decompressed = decodeKnowledge(compressed.encoded, compressed.dictionary);
-console.log("Decoded:", decompressed);
+const decompressed = decodeKnowledge(compressed.encoded, compressed.decodingMap);
+console.log('Decompressed Knowledge:', decompressed);
 
-// Validation
-console.log("Test Passed:", decompressed === knowledge);
+// Validate correctness
+console.log('Compression and Decompression successful:', JSON.stringify(knowledge) === JSON.stringify(decompressed));

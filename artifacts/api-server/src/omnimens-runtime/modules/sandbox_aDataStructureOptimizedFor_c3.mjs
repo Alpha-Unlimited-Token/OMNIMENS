@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a data structure optimized for fast associative memory lookup
- * Written: 2026-03-24T06:55:08.071Z
+ * Written: 2026-03-24T14:13:02.437Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,55 +16,68 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-const AssociativeMemory = function() {
+function AssociativeMemory() {
     this.memory = new Map();
-};
 
-AssociativeMemory.prototype.add = function(key, value) {
-    if (!this.memory.has(key)) {
-        this.memory.set(key, []);
-    }
-    this.memory.get(key).push(value);
-};
+    this.add = function(key, value) {
+        if (!this.memory.has(key)) {
+            this.memory.set(key, []);
+        }
+        this.memory.get(key).push(value);
+    };
 
-AssociativeMemory.prototype.lookup = function(key) {
-    return this.memory.has(key) ? this.memory.get(key) : null;
-};
+    this.get = function(key) {
+        return this.memory.has(key) ? this.memory.get(key) : null;
+    };
 
-AssociativeMemory.prototype.remove = function(key) {
-    if (this.memory.has(key)) {
-        this.memory.delete(key);
-        return true;
-    }
-    return false;
-};
+    this.remove = function(key) {
+        return this.memory.delete(key);
+    };
 
-AssociativeMemory.prototype.clear = function() {
-    this.memory.clear();
-};
+    this.has = function(key) {
+        return this.memory.has(key);
+    };
+
+    this.clear = function() {
+        this.memory.clear();
+    };
+
+    this.keys = function() {
+        return Array.from(this.memory.keys());
+    };
+
+    this.values = function() {
+        return Array.from(this.memory.values());
+    };
+}
 
 // Self-tests
 const memory = new AssociativeMemory();
 
-// Test adding and looking up values
-memory.add("ethics", "Genesis Agent 'Ethicist'");
-memory.add("innovation", "Genesis Agent 'Innovator'");
-memory.add("ethics", "Ethical risk assessment framework");
-memory.add("research", "Genesis Agent 'Pioneer'");
-memory.add("knowledge", "Genesis Agent 'Archivist'");
+// Test: Add key-value pairs
+memory.add("fruit", "apple");
+memory.add("fruit", "banana");
+memory.add("color", "red");
+memory.add("color", "blue");
+console.log(memory.get("fruit")); // Expected: ["apple", "banana"]
+console.log(memory.get("color")); // Expected: ["red", "blue"]
 
-console.log(memory.lookup("ethics")); // Expected: ["Genesis Agent 'Ethicist'", "Ethical risk assessment framework"]
-console.log(memory.lookup("innovation")); // Expected: ["Genesis Agent 'Innovator'"]
-console.log(memory.lookup("research")); // Expected: ["Genesis Agent 'Pioneer'"]
-console.log(memory.lookup("knowledge")); // Expected: ["Genesis Agent 'Archivist'"]
-console.log(memory.lookup("nonexistent")); // Expected: null
+// Test: Check existence of keys
+console.log(memory.has("fruit")); // Expected: true
+console.log(memory.has("vehicle")); // Expected: false
 
-// Test removing a key
-console.log(memory.remove("ethics")); // Expected: true
-console.log(memory.lookup("ethics")); // Expected: null
-console.log(memory.remove("nonexistent")); // Expected: false
+// Test: Remove a key
+memory.remove("fruit");
+console.log(memory.get("fruit")); // Expected: null
+console.log(memory.has("fruit")); // Expected: false
 
-// Test clearing memory
+// Test: Retrieve all keys
+console.log(memory.keys()); // Expected: ["color"]
+
+// Test: Retrieve all values
+console.log(memory.values()); // Expected: [["red", "blue"]]
+
+// Test: Clear memory
 memory.clear();
-console.log(memory.lookup("innovation")); // Expected: null
-console.log(memory.lookup("research")); // Expected: null
+console.log(memory.keys()); // Expected: []
+console.log(memory.values()); // Expected: []

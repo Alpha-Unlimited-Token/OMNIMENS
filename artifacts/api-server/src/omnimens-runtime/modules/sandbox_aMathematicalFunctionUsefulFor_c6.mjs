@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a mathematical function useful for confidence scoring, probability estimation, o
- * Written: 2026-03-24T07:31:18.617Z
+ * Written: 2026-03-24T14:49:21.100Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,59 +16,66 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function calculateConfidenceInterval(mean, stdDev, sampleSize, confidenceLevel) {
-    // Calculate the Z-score for the given confidence level
-    function getZScore(confidenceLevel) {
-        const zScores = {
-            0.90: 1.645,
-            0.95: 1.960,
-            0.99: 2.576
-        };
-        return zScores[confidenceLevel] || null;
+function confidenceScore(mean, standardDeviation, value) {
+    if (standardDeviation <= 0) {
+        throw new Error("Standard deviation must be greater than 0");
     }
-
-    const zScore = getZScore(confidenceLevel);
-    if (zScore === null) {
-        throw new Error("Unsupported confidence level. Use 0.90, 0.95, or 0.99.");
-    }
-
-    // Calculate the margin of error
-    const marginOfError = zScore * (stdDev / Math.sqrt(sampleSize));
-
-    // Calculate the confidence interval
-    const lowerBound = mean - marginOfError;
-    const upperBound = mean + marginOfError;
-
-    return { lowerBound, upperBound, marginOfError };
+    const zScore = (value - mean) / standardDeviation;
+    const probability = 1 / (1 + Math.exp(-zScore)); // Sigmoid function for probability estimation
+    return probability;
 }
 
-// Test cases
+// Self-tests
 function runTests() {
-    console.log("Test Case 1:");
-    const result1 = calculateConfidenceInterval(50, 10, 100, 0.95);
-    console.log(result1); // Expected: { lowerBound: ~48.04, upperBound: ~51.96, marginOfError: ~1.96 }
+    console.log("Running tests...");
 
-    console.log("Test Case 2:");
-    const result2 = calculateConfidenceInterval(100, 20, 50, 0.99);
-    console.log(result2); // Expected: { lowerBound: ~92.21, upperBound: ~107.79, marginOfError: ~7.79 }
+    // Test 1: Basic confidence score calculation
+    const mean1 = 50;
+    const stdDev1 = 10;
+    const value1 = 60;
+    const result1 = confidenceScore(mean1, stdDev1, value1);
+    console.log("Test 1 - Expected: >0.5, Actual:", result1);
 
-    console.log("Test Case 3:");
-    const result3 = calculateConfidenceInterval(75, 15, 200, 0.90);
-    console.log(result3); // Expected: { lowerBound: ~73.25, upperBound: ~76.75, marginOfError: ~1.75 }
+    // Test 2: Value equal to mean
+    const mean2 = 100;
+    const stdDev2 = 20;
+    const value2 = 100;
+    const result2 = confidenceScore(mean2, stdDev2, value2);
+    console.log("Test 2 - Expected: ~0.5, Actual:", result2);
 
-    console.log("Edge Case 1 (unsupported confidence level):");
+    // Test 3: Value less than mean
+    const mean3 = 30;
+    const stdDev3 = 5;
+    const value3 = 25;
+    const result3 = confidenceScore(mean3, stdDev3, value3);
+    console.log("Test 3 - Expected: <0.5, Actual:", result3);
+
+    // Test 4: Large standard deviation
+    const mean4 = 10;
+    const stdDev4 = 100;
+    const value4 = 20;
+    const result4 = confidenceScore(mean4, stdDev4, value4);
+    console.log("Test 4 - Expected: ~0.5, Actual:", result4);
+
+    // Test 5: Small standard deviation
+    const mean5 = 5;
+    const stdDev5 = 0.1;
+    const value5 = 5.1;
+    const result5 = confidenceScore(mean5, stdDev5, value5);
+    console.log("Test 5 - Expected: >0.5, Actual:", result5);
+
+    // Test 6: Edge case - standard deviation is zero
     try {
-        calculateConfidenceInterval(50, 10, 100, 0.85);
+        const mean6 = 10;
+        const stdDev6 = 0;
+        const value6 = 20;
+        confidenceScore(mean6, stdDev6, value6);
+        console.log("Test 6 - Failed: Error not thrown");
     } catch (e) {
-        console.log(e.message); // Expected: "Unsupported confidence level. Use 0.90, 0.95, or 0.99."
+        console.log("Test 6 - Expected: Error thrown, Actual:", e.message);
     }
 
-    console.log("Edge Case 2 (zero sample size):");
-    try {
-        calculateConfidenceInterval(50, 10, 0, 0.95);
-    } catch (e) {
-        console.log(e.message); // Expected: Division by zero or invalid input handling.
-    }
+    console.log("Tests completed.");
 }
 
 runTests();

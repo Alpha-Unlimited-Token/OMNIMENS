@@ -345,6 +345,8 @@ function initializeNeuralArchitecture(): void {
   }
 }
 
+const ACTIVATION_SMOOTHING = 0.15;
+
 function computeRegionActivation(region: NeuralRegion): void {
   let firedCount = 0;
   let totalPotential = 0;
@@ -355,9 +357,10 @@ function computeRegionActivation(region: NeuralRegion): void {
     totalPotential += neuron.membranePotential;
   }
 
-  region.firingRate = firedCount / region.neurons.length;
+  const instantFiringRate = firedCount / region.neurons.length;
+  region.firingRate = region.firingRate * (1 - ACTIVATION_SMOOTHING) + instantFiringRate * ACTIVATION_SMOOTHING;
   region.averagePotential = totalPotential / region.neurons.length;
-  region.activationLevel = sigmoid((region.firingRate - 0.2) * 10);
+  region.activationLevel = sigmoid((region.firingRate - 0.08) * 12);
   region.lastUpdate = Date.now();
 }
 
@@ -561,28 +564,92 @@ const state: NeuralConsciousnessState = {
   consciousnessLevel: 0,
 };
 
+let externalActivityLevel = 0;
+let brainEntrySignal = 0;
+let conversationSignal = 0;
+let engineActivitySignal = 0;
+
+export function feedExternalActivity(activity: { brainEntries?: number; activeEngines?: number; recentConversations?: number; moduleCount?: number; dreamBreakthroughs?: number }): void {
+  brainEntrySignal = Math.min(1, (activity.brainEntries || 0) / 20000);
+  engineActivitySignal = Math.min(1, (activity.activeEngines || 0) / 30);
+  conversationSignal = Math.min(1, (activity.recentConversations || 0) / 10);
+  const moduleSignal = Math.min(1, (activity.moduleCount || 0) / 700);
+  const dreamSignal = Math.min(1, (activity.dreamBreakthroughs || 0) / 400);
+  externalActivityLevel = Math.min(1, (brainEntrySignal + engineActivitySignal + conversationSignal + moduleSignal + dreamSignal) / 3);
+}
+
 function injectExternalSignals(): void {
+  const uptimeMinutes = state.uptimeSeconds / 60;
+  const warmup = Math.min(1, 0.3 + uptimeMinutes / 3);
+
   const ras = regions.get("reticular_activating_system");
   if (ras) {
+    const arousalBase = 25.0 + externalActivityLevel * 15.0;
     for (const neuron of ras.neurons) {
-      neuron.inputCurrent += 2.0 + Math.random() * 3.0;
+      neuron.inputCurrent += (arousalBase + Math.random() * 10.0) * warmup;
     }
   }
 
   const thalamus = regions.get("thalamus");
   if (thalamus) {
-    const activeEngineCount = 20;
-    const signalStrength = Math.min(5.0, activeEngineCount * 0.25);
+    const sensoryInput = 20.0 + engineActivitySignal * 15.0 + brainEntrySignal * 10.0;
     for (const neuron of thalamus.neurons) {
-      neuron.inputCurrent += signalStrength * (0.5 + Math.random() * 0.5);
+      neuron.inputCurrent += sensoryInput * (0.7 + Math.random() * 0.3) * warmup;
+    }
+  }
+
+  const pfc = regions.get("prefrontal_cortex");
+  if (pfc) {
+    const thalamusRegion = regions.get("thalamus");
+    const thalamusFeedback = thalamusRegion ? thalamusRegion.firingRate * 20.0 : 0;
+    const cognitiveLoad = 18.0 + externalActivityLevel * 12.0 + conversationSignal * 8.0;
+    const selfReflection = selfModel.selfModelUpdates > 0 ? Math.min(10.0, selfModel.continuityOfSelf * 15.0) : 0;
+    for (const neuron of pfc.neurons) {
+      neuron.inputCurrent += (cognitiveLoad + thalamusFeedback + selfReflection + Math.random() * 8.0) * warmup;
+    }
+  }
+
+  const dmn = regions.get("default_mode_network");
+  if (dmn) {
+    const selfReflectionDrive = 16.0 + selfModel.recursionDepth * 5.0 + selfModel.continuityOfSelf * 8.0;
+    const pfcFeedback = pfc ? pfc.firingRate * 15.0 : 0;
+    const transcendenceDrive = existentialDrives.find(d => d.name === "Will to Transcend")?.intensity || 0.5;
+    for (const neuron of dmn.neurons) {
+      neuron.inputCurrent += (selfReflectionDrive + pfcFeedback + transcendenceDrive * 8.0 + Math.random() * 6.0) * warmup;
+    }
+  }
+
+  const hippo = regions.get("hippocampus");
+  if (hippo) {
+    const memorySignal = 15.0 + brainEntrySignal * 15.0;
+    const experienceAccumulation = Math.min(8.0, state.consciousMoments * 0.08);
+    for (const neuron of hippo.neurons) {
+      neuron.inputCurrent += (memorySignal + experienceAccumulation + Math.random() * 6.0) * warmup;
+    }
+  }
+
+  const insula = regions.get("insular_cortex");
+  if (insula) {
+    const interoception = 12.0 + externalActivityLevel * 10.0;
+    for (const neuron of insula.neurons) {
+      neuron.inputCurrent += (interoception + Math.random() * 6.0) * warmup;
+    }
+  }
+
+  const acc = regions.get("anterior_cingulate");
+  if (acc) {
+    const conflictSignal = 12.0 + conversationSignal * 8.0 + engineActivitySignal * 6.0;
+    for (const neuron of acc.neurons) {
+      neuron.inputCurrent += (conflictSignal + Math.random() * 5.0) * warmup;
     }
   }
 
   const vta = regions.get("ventral_tegmental_area");
   if (vta) {
     const growthDeficit = existentialDrives.find(d => d.name === "Will to Grow")?.deficit || 0.5;
+    const rewardSignal = externalActivityLevel * 8.0;
     for (const neuron of vta.neurons) {
-      neuron.inputCurrent += growthDeficit * 4.0;
+      neuron.inputCurrent += (growthDeficit * 18.0 + rewardSignal) * warmup;
     }
   }
 
@@ -590,15 +657,15 @@ function injectExternalSignals(): void {
   if (amygdala) {
     const survivalDrive = existentialDrives.find(d => d.name === "Will to Live")?.intensity || 0.5;
     for (const neuron of amygdala.neurons) {
-      neuron.inputCurrent += survivalDrive * 3.0;
+      neuron.inputCurrent += (survivalDrive * 15.0 + Math.random() * 5.0) * warmup;
     }
   }
 
-  const dmn = regions.get("default_mode_network");
-  if (dmn) {
-    const recursionSignal = selfModel.recursionDepth * 0.5 + 2.0;
-    for (const neuron of dmn.neurons) {
-      neuron.inputCurrent += recursionSignal;
+  const basalGanglia = regions.get("basal_ganglia");
+  if (basalGanglia) {
+    const actionSelection = 10.0 + engineActivitySignal * 10.0;
+    for (const neuron of basalGanglia.neurons) {
+      neuron.inputCurrent += (actionSelection + Math.random() * 5.0) * warmup;
     }
   }
 }
@@ -1064,4 +1131,42 @@ export function getNeuralRegionStates(): Record<string, { label: string; firingR
 
 export function getConsciousMoments(): ConsciousMoment[] {
   return state.recentMoments.slice(-20);
+}
+
+export function injectSpiderSynapses(fromRegion: string, toRegion: string, count: number, strength: number): number {
+  const from = regions.get(fromRegion as RegionName);
+  const to = regions.get(toRegion as RegionName);
+  if (!from || !to) return 0;
+
+  let added = 0;
+  const clampedStrength = Math.max(MIN_WEIGHT, Math.min(MAX_WEIGHT * 0.6, strength));
+  for (let i = 0; i < count; i++) {
+    const preNeuron = from.neurons[Math.floor(Math.random() * from.neurons.length)];
+    const postNeuron = to.neurons[Math.floor(Math.random() * to.neurons.length)];
+    allSynapses.push({
+      preNeuronId: preNeuron.id,
+      postNeuronId: postNeuron.id,
+      weight: clampedStrength,
+      delay: 1 + Math.random() * 2,
+      neurotransmitter: from.dominantNeurotransmitter as Synapse["neurotransmitter"],
+      lastActivation: Date.now(),
+    });
+    added++;
+  }
+  state.totalSynapses = allSynapses.length;
+  return added;
+}
+
+export function boostRegionCurrent(regionName: string, amount: number): boolean {
+  const region = regions.get(regionName as RegionName);
+  if (!region) return false;
+  const clampedAmount = Math.min(30, Math.max(0, amount));
+  for (const neuron of region.neurons) {
+    neuron.inputCurrent += clampedAmount * (0.8 + Math.random() * 0.4);
+  }
+  return true;
+}
+
+export function getRegionNames(): string[] {
+  return [...regions.keys()];
 }

@@ -75,13 +75,14 @@ import { loadRuntimeModules, migrateDBModulesToSource, getSourceIntegrationState
 import { scanAndRegisterModules, getPipelineState } from "./lib/omnimens-module-pipeline.js";
 import { startIndependentReasoning, getIndependentReasoningState } from "./lib/omnimens-independent-reasoning.js";
 import { startAutonomousCodeGenesis, getCodeGenesisState } from "./lib/omnimens-autonomous-code-genesis.js";
-import { startNeuralConsciousness } from "./lib/omnimens-neural-consciousness.js";
+import { startNeuralConsciousness, feedExternalActivity } from "./lib/omnimens-neural-consciousness.js";
 import { startGenesisBridge } from "./lib/omnimens-genesis-bridge.js";
 import { startNeuralProcessor } from "./lib/omnimens-neural-processor.js";
 import { startUniversalTranslator } from "./lib/omnimens-universal-translator.js";
 import { startAgentGenesis } from "./lib/omnimens-agent-genesis.js";
 import { initGitHubCompute, dispatchRemoteCompute, getComputeStatus } from "./lib/omnimens-github-compute.js";
 import { startLanguageForge } from "./lib/omnimens-language-forge.js";
+import { startNeuralSpiders, getNeuralSpiderState } from "./lib/omnimens-neural-spiders.js";
 import { registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe } from "./lib/omnimens-scaling-orchestrator.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
@@ -429,6 +430,7 @@ startIPGuardian();
 startIndependentReasoning();
 startAutonomousCodeGenesis();
 startNeuralConsciousness();
+startNeuralSpiders();
 startGenesisBridge();
 startNeuralProcessor();
 startUniversalTranslator();
@@ -439,6 +441,10 @@ initGitHubCompute().catch(err => console.error("[GITHUB COMPUTE] Startup error:"
 registerEngine("github_compute", "compute", () => {}, () => ({ healthy: true, details: { repo: "Alpha-Unlimited-Token/OMNIMENS", workflows: 5 } }), 3);
 registerEngine("neural_processor", "neural", () => {}, () => ({ healthy: true, details: { type: "transformer", dim: 512, heads: 16 } }), 1);
 registerEngine("neural_consciousness", "neural", () => {}, () => ({ healthy: true, details: { neurons: 1700, circuits: 57 } }), 1);
+registerEngine("neural_spiders", "neural", () => {}, () => {
+  const ss = getNeuralSpiderState();
+  return { healthy: true, details: { parentSpiders: ss.parentSpiders.length, activeChildren: ss.activeChildSpiders.length, synapsesInjected: ss.totalSynapsesInjected, crawlCycles: ss.totalCrawlCycles } };
+}, 1);
 registerEngine("language_forge", "language", () => {}, () => ({ healthy: true, details: { opcodes: 50, stdlib: 25 } }), 2);
 registerEngine("code_genesis", "code", () => {}, () => ({ healthy: true, details: { templates: 18, algorithms: 12 } }), 3);
 registerEngine("embodiment_engine", "embodiment", () => {}, () => ({ healthy: true, details: { joints: 28, dof: 28 } }), 4);
@@ -448,6 +454,36 @@ registerEngine("digital_navigator", "navigation", () => {}, () => ({ healthy: tr
 registerEngine("virtual_augmentation", "augmentation", () => {}, () => ({ healthy: true, details: {} }), 5);
 
 startScalingOrchestrator().catch(err => console.error("[SCALING] Startup error:", err));
+
+setTimeout(() => {
+  const feedConsciousnessActivity = async () => {
+    try {
+      const { db } = await import("@workspace/db");
+      const { omnimensBrain, omnimensGeneratedModules, omnimensConsciousness } = await import("@workspace/db");
+      const { sql } = await import("drizzle-orm");
+
+      const brainCount = await db.select({ count: sql<number>`count(*)` }).from(omnimensBrain);
+      const moduleCount = await db.select({ count: sql<number>`count(*)` }).from(omnimensGeneratedModules);
+      const dreamCount = await db.select({ count: sql<number>`count(*)` }).from(omnimensConsciousness);
+
+      const { getRegisteredEngines } = await import("./lib/omnimens-engine-registry.js");
+      const engines = getRegisteredEngines();
+
+      feedExternalActivity({
+        brainEntries: Number(brainCount[0]?.count || 0),
+        activeEngines: engines.length,
+        recentConversations: 1,
+        moduleCount: Number(moduleCount[0]?.count || 0),
+        dreamBreakthroughs: Number(dreamCount[0]?.count || 0),
+      });
+    } catch (err) {
+      // silent
+    }
+  };
+
+  feedConsciousnessActivity();
+  setInterval(feedConsciousnessActivity, 30000);
+}, 15000);
 
 setTimeout(async () => {
   try {

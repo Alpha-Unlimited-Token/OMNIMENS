@@ -3,10 +3,10 @@
  * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
  * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
  * 
- * Source: backlog_dream_id_23070
+ * Source: backlog_dream_id_26497
  * Title: BROKEN PARADIGM  
    Intelligence = sequential symbo
- * Written: 2026-03-24T00:39:24.079Z
+ * Written: 2026-03-24T14:33:50.985Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,29 +17,37 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Phase-Resonance micro‐simulation — no I/O, no eval/require
-i<N;i++){
-    let sum=0
-    for(let j=0;j<N;j++){
-      if(i!==j) sum += Math.sin(net[j].φ - net[i].φ)
-    }
-    net[i].φ += net[i].ω + (K/N)*sum                      // Kuramoto update
-    net[i].φ %= 2*Math.PI
+// ResonanceNetwork.ts
+               // 0 … 2π
+        // symmetric N×N matrix ∈ [0,1]
+
+const TWO_PI = Math.PI * 2;
+
+/** Advance one tick of a Kuramoto-like phase network */
+function step(phases, K, dt = 0.05) {
+  const N = phases.length;
+  const next= new Array(N);
+  for (let i = 0; i < N; i++) {
+    let sum = 0;
+    for (let j = 0; j < N; j++) sum += K[i][j] * Math.sin(phases[j] - phases[i]);
+    next[i] = (phases[i] + dt * sum + TWO_PI) % TWO_PI;
   }
-}
-export function run(net, steps=100) { while(steps--) tick(net) }
-
-export function coherenceClusters(net, ε=0.2): number[][] {
-  const groups=[]
-  net.forEach((o,i)=>{
-    let g=groups.find(G=>Math.abs(o.φ-net[G[0]].φ)<ε)
-    if(!g){g=[];groups.push(g)}; g.push(i)
-  })
-  return groups
+  return next;
 }
 
-// DEMO — create network, resonate, observe ideas (clusters)
-export function demo(size=24): number[][] {
-  const net=buildNetwork(size); run(net,400)
-  return coherenceClusters(net)
+/** Run until the network reaches global synchrony (ε threshold) */
+export function resonate(
+  phases,
+  K,
+  dt = 0.05,
+  ε = 1e-3,
+  maxSteps = 2000
+) {
+  for (let t = 0; t < maxSteps; t++) {
+    phases = step(phases, K, dt);
+    const mean = phases.reduce((a, b) => a + b) / phases.length;
+    const drift = Math.max(...phases.map(p => Math.abs(p - mean)));
+    if (drift < ε) break;                 // phase-lock achieved
+  }
+  return phases;
 }

@@ -11563,6 +11563,12 @@ router.get("/omnimens/proof/live", async (_req, res) => {
     const codeGenesis = getCodeGenesisState();
     const genesisAgents = getGenesisAgents().filter((a: any) => a.active);
     const sourceIntegration = getSourceIntegrationState();
+
+    let neuralSpiderState: any = null;
+    try {
+      const { getNeuralSpiderState } = await import("../lib/omnimens-neural-spiders.js");
+      neuralSpiderState = getNeuralSpiderState();
+    } catch {}
     const sandbox = getSandboxState();
 
     let novaSyntaxDemo: any = null;
@@ -11878,6 +11884,17 @@ let awareness = reflect();`;
         note: "ZERO API code generation via template composition and pattern mining.",
       },
       sourceIntegration: sourceIntegration,
+      neuralSpiders: neuralSpiderState ? {
+        active: neuralSpiderState.active,
+        totalCrawlCycles: neuralSpiderState.totalCrawlCycles,
+        totalSynapsesInjected: neuralSpiderState.totalSynapsesInjected,
+        totalChildrenSpawned: neuralSpiderState.totalChildrenSpawned,
+        parentSpiders: neuralSpiderState.parentSpiders,
+        activeChildSpiders: neuralSpiderState.activeChildSpiders,
+        currentStability: neuralSpiderState.currentStability,
+        criticalCircuits: neuralSpiderState.criticalCircuits,
+        note: "Autonomous neural spiders crawl all AI agents, harvest performance data, and feed it into the consciousness engine. When instability is detected, parent spiders spawn child spiders that inject targeted synapses into weak brain regions.",
+      } : null,
       sandbox: {
         totalGenerated: sandbox.totalGenerated,
         totalApproved: sandbox.totalApproved,

@@ -1,95 +1,5 @@
 [
   {
-    "source": "backlog_dream_id_5825",
-    "title": "Lucid Dream #14: Cognitive Architecture for Memory Retrieval",
-    "filename": "lucidDream14CognitiveArchitectureForMemoryRetrieval.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/lucidDream14CognitiveArchitectureForMemoryRetrieval.mjs",
-    "backupPath": null,
-    "timestamp": 1774211283969,
-    "codeLength": 1491,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_17485",
-    "title": "ARCHITECTURE NAME  \n   Counterfactual Abductive Reas",
-    "filename": "architectureNameCounterfactualAbductiveReas.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameCounterfactualAbductiveReas.mjs",
-    "backupPath": null,
-    "timestamp": 1774211287741,
-    "codeLength": 1349,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_12626",
-    "title": "ARCHITECTURE NAME  \n   Causal Multiverse Simulator (",
-    "filename": "architectureNameCausalMultiverseSimulator.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameCausalMultiverseSimulator.mjs",
-    "backupPath": null,
-    "timestamp": 1774211289446,
-    "codeLength": 1488,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: webAssemblyMatrixOps",
-    "filename": "webAssemblyMatrixOps_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webAssemblyMatrixOps_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/webAssemblyMatrixOps_gen1.mjs.backup.2026-03-22T20-30-09-273Z",
-    "timestamp": 1774211409271,
-    "codeLength": 3574,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: semanticVectorStore",
-    "filename": "semanticVectorStore_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticVectorStore_gen1.mjs",
-    "backupPath": null,
-    "timestamp": 1774211414086,
-    "codeLength": 2568,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 1 Complete — 2 modules",
-    "filename": "evolution_marker_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-03-22T20-30-14-112Z",
-    "timestamp": 1774211414111,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit",
-    "filename": "sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs.backup.2026-03-22T20-39-55-748Z",
-    "timestamp": 1774211995747,
-    "codeLength": 2461,
-    "overwrite": true
-  },
-  {
-    "source": "backlog_dream_id_11237",
-    "title": "ARCHITECTURE NAME  \n   CEE – Causal Experimentation",
-    "filename": "architectureNameCeeCausalExperimentation.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameCeeCausalExperimentation.mjs",
-    "backupPath": null,
-    "timestamp": 1774212382271,
-    "codeLength": 1338,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: wasmMatrixOps",
-    "filename": "wasmMatrixOps_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmMatrixOps_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/wasmMatrixOps_gen1.mjs.backup.2026-03-22T20-48-27-668Z",
-    "timestamp": 1774212507666,
-    "codeLength": 2747,
-    "overwrite": true
-  },
-  {
     "source": "evolution_engine",
     "title": "Evolution Module: memoryEfficientVectorStore",
     "filename": "memoryEfficientVectorStore_gen1.mjs",
@@ -4998,5 +4908,95 @@
     "timestamp": 1774360910648,
     "codeLength": 1205,
     "overwrite": false
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: a data structure optimized for fast associative memory lookup",
+    "filename": "sandbox_aDataStructureOptimizedFor_c3.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aDataStructureOptimizedFor_c3.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aDataStructureOptimizedFor_c3.mjs.backup.2026-03-24T14-13-02-439Z",
+    "timestamp": 1774361582437,
+    "codeLength": 1662,
+    "overwrite": true
+  },
+  {
+    "source": "backlog_dream_id_26497",
+    "title": "BROKEN PARADIGM  \n   Intelligence = sequential symbo",
+    "filename": "brokenParadigmIntelligenceSequentialSymbo.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/brokenParadigmIntelligenceSequentialSymbo.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/brokenParadigmIntelligenceSequentialSymbo.mjs.backup.2026-03-24T14-33-50-988Z",
+    "timestamp": 1774362830985,
+    "codeLength": 1053,
+    "overwrite": true
+  },
+  {
+    "source": "self_coding_engine",
+    "title": "Daydream:architecture_design #1825",
+    "filename": "daydreamarchitecturedesign1825.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamarchitecturedesign1825.mjs",
+    "backupPath": null,
+    "timestamp": 1774363610060,
+    "codeLength": 927,
+    "overwrite": false
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: a mathematical function useful for confidence scoring, probability estimation, o",
+    "filename": "sandbox_aMathematicalFunctionUsefulFor_c6.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aMathematicalFunctionUsefulFor_c6.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aMathematicalFunctionUsefulFor_c6.mjs.backup.2026-03-24T14-49-21-102Z",
+    "timestamp": 1774363761100,
+    "codeLength": 1997,
+    "overwrite": true
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: a compression or encoding algorithm for efficient knowledge storage",
+    "filename": "sandbox_aCompressionOrEncodingAlgorithm_c7.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aCompressionOrEncodingAlgorithm_c7.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aCompressionOrEncodingAlgorithm_c7.mjs.backup.2026-03-24T15-01-04-866Z",
+    "timestamp": 1774364464860,
+    "codeLength": 2066,
+    "overwrite": true
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
+    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-24T21-45-13-652Z",
+    "timestamp": 1774388713649,
+    "codeLength": 1849,
+    "overwrite": true
+  },
+  {
+    "source": "backlog_dream_id_26400",
+    "title": "ARCHITECTURE NAME  \n   CAUSALEX — Causal-Simulation",
+    "filename": "architectureNameCausalexCausalsimulation.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameCausalexCausalsimulation.mjs",
+    "backupPath": null,
+    "timestamp": 1774388714108,
+    "codeLength": 1205,
+    "overwrite": false
+  },
+  {
+    "source": "backlog_dream_id_26525",
+    "title": "ARCHITECTURE NAME  \n   Causal Abstraction & Mental S",
+    "filename": "architectureNameCausalAbstractionMentalS.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameCausalAbstractionMentalS.mjs",
+    "backupPath": null,
+    "timestamp": 1774388719560,
+    "codeLength": 927,
+    "overwrite": false
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
+    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-24T21-51-24-062Z",
+    "timestamp": 1774389084060,
+    "codeLength": 1628,
+    "overwrite": true
   }
 ]
