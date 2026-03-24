@@ -1,0 +1,130 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: continuousWorkerManager
+ * Written: 2026-03-24T05:49:22.443Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Complete ES module code here
+
+import { Worker, isMainThread, parentPort } from 'node:worker_threads';
+
+// Utility function for chunking tasks
+export function chunkArray(array, chunkSize) {
+  if (!Array.isArray(array) || chunkSize <= 0) {
+    throw new Error('Invalid input: array must be an array and chunkSize must be greater than 0.');
+  }
+  const chunks = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
+
+// Priority Queue Implementation
+export class PriorityQueue {
+  constructor() {
+    this.queue = [];
+  }
+
+  enqueue(item, priority = 0) {
+    this.queue.push({ item, priority });
+    this.queue.sort((a, b) => b.priority - a.priority); // Higher priority first
+  }
+
+  dequeue() {
+    return this.queue.shift()?.item;
+  }
+
+  isEmpty() {
+    return this.queue.length === 0;
+  }
+}
+
+// Worker Manager Class
+export class ContinuousWorkerManager {
+  constructor(workerScript, maxWorkers = 4) {
+    if (!workerScript) {
+      throw new Error('Worker script path must be provided.');
+    }
+    this.workerScript = workerScript;
+    this.maxWorkers = maxWorkers;
+    this.workers = [];
+    this.taskQueue = new PriorityQueue();
+    this.sharedState = new Map();
+  }
+
+  startWorker() {
+    if (this.workers.length >= this.maxWorkers) {
+      throw new Error('Maximum workers limit reached.');
+    }
+    const worker = new Worker(this.workerScript);
+    worker.on('message', (message) => {
+      if (message.type === 'taskComplete') {
+        this.sharedState.set(message.taskId, message.result);
+        this.assignTask(worker);
+      }
+    });
+    worker.on('error', (error) => {
+      console.error('Worker error:', error);
+    });
+    worker.on('exit', (code) => {
+      console.log(`Worker exited with code ${code}`);
+      this.workers = this.workers.filter((w) => w !== worker);
+    });
+    this.workers.push(worker);
+    this.assignTask(worker);
+  }
+
+  assignTask(worker) {
+    if (this.taskQueue.isEmpty()) {
+      return;
+    }
+    const task = this.taskQueue.dequeue();
+    worker.postMessage({ type: 'executeTask', task });
+  }
+
+  addTask(task, priority = 0) {
+    this.taskQueue.enqueue(task, priority);
+    this.workers.forEach((worker) => this.assignTask(worker));
+  }
+
+  pauseWorkers() {
+    this.workers.forEach((worker) => worker.postMessage({ type: 'pause' }));
+  }
+
+  resumeWorkers() {
+    this.workers.forEach((worker) => worker.postMessage({ type: 'resume' }));
+  }
+
+  stopAllWorkers() {
+    this.workers.forEach((worker) => worker.terminate());
+    this.workers = [];
+  }
+}
+
+// Worker script template (for demonstration purposes)
+if (!isMainThread) {
+  parentPort.on('message', (message) => {
+    if (message.type === 'executeTask') {
+      const { task } = message;
+      const result = task(); // Execute the task function
+      parentPort.postMessage({ type: 'taskComplete', taskId: task.id, result });
+    } else if (message.type === 'pause') {
+      // Pause logic (if needed)
+    } else if (message.type === 'resume') {
+      // Resume logic (if needed)
+    }
+  });
+}

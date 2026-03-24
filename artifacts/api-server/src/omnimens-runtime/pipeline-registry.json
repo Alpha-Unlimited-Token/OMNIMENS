@@ -8697,9 +8697,24 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "continuousWorkerManager_gen1.mjs": {
+      "filename": "continuousWorkerManager_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "chunkArray",
+        "PriorityQueue",
+        "ContinuousWorkerManager"
+      ],
+      "loadedAt": 1774331362552,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774330992777,
-  "totalModules": 402,
+  "totalModules": 403,
   "totalCalls": 0
 }

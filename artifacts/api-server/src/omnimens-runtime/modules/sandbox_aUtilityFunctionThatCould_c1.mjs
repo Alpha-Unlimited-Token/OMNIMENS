@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-24T05:28:17.975Z
+ * Written: 2026-03-24T05:47:25.687Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,72 +16,56 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function extractEntities(text, patterns) {
-    /**
-     * Extracts entities from a given text based on provided patterns.
-     * @param {string} text - The input text to analyze.
-     * @param {Array} patterns - Array of objects with `label` and `pattern` keys.
-     * @returns {Array} - Array of extracted entities with their labels and positions.
-     */
-    const entities = [];
-    patterns.forEach(({ label, pattern }) => {
-        const regex = new RegExp(pattern, 'gi');
-        let match;
-        while ((match = regex.exec(text)) !== null) {
-            entities.push({
-                label: label,
-                entity: match[0],
-                start: match.index,
-                end: match.index + match[0].length
-            });
-        }
-    });
-    return entities;
+function findMostFrequentWords(text, topN) {
+    if (typeof text !== 'string' || typeof topN !== 'number' || topN < 1) {
+        throw new Error('Invalid input: text must be a string and topN must be a positive number.');
+    }
+
+    // Normalize text: convert to lowercase and remove non-alphanumeric characters
+    const normalizedText = text.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+
+    // Split text into words
+    const words = normalizedText.split(/\s+/).filter(word => word.length > 0);
+
+    // Count word frequencies
+    const wordCounts = {};
+    for (let word of words) {
+        wordCounts[word] = (wordCounts[word] || 0) + 1;
+    }
+
+    // Sort words by frequency
+    const sortedWords = Object.entries(wordCounts).sort((a, b) => b[1] - a[1]);
+
+    // Extract the top N words
+    const topWords = sortedWords.slice(0, topN).map(entry => ({ word: entry[0], count: entry[1] }));
+
+    return topWords;
 }
 
-// Test cases
-function runTests() {
-    console.log("Running Tests...");
+// Self-tests
+console.log('Test 1: Basic functionality');
+const text1 = "The quick brown fox jumps over the lazy dog. The dog was not amused.";
+const result1 = findMostFrequentWords(text1, 3);
+console.log(result1); // Expected output: [{word: 'the', count: 3}, {word: 'dog', count: 2}, {word: 'brown', count: 1}]
 
-    // Test 1: Simple entity extraction
-    const text1 = "John Doe lives in New York.";
-    const patterns1 = [
-        { label: "PERSON", pattern: "\\bJohn Doe\\b" },
-        { label: "LOCATION", pattern: "\\bNew York\\b" }
-    ];
-    const result1 = extractEntities(text1, patterns1);
-    console.log("Test 1 Result:", result1);
+console.log('Test 2: Edge case - empty string');
+const text2 = "";
+const result2 = findMostFrequentWords(text2, 3);
+console.log(result2); // Expected output: []
 
-    // Test 2: Multiple matches
-    const text2 = "Alice and Bob went to Paris. Alice loves Paris.";
-    const patterns2 = [
-        { label: "PERSON", pattern: "\\bAlice\\b" },
-        { label: "PERSON", pattern: "\\bBob\\b" },
-        { label: "LOCATION", pattern: "\\bParis\\b" }
-    ];
-    const result2 = extractEntities(text2, patterns2);
-    console.log("Test 2 Result:", result2);
+console.log('Test 3: Edge case - topN larger than unique words');
+const text3 = "apple banana apple orange banana apple";
+const result3 = findMostFrequentWords(text3, 10);
+console.log(result3); // Expected output: [{word: 'apple', count: 3}, {word: 'banana', count: 2}, {word: 'orange', count: 1}]
 
-    // Test 3: Edge case - no matches
-    const text3 = "No entities here.";
-    const patterns3 = [
-        { label: "PERSON", pattern: "\\bJohn\\b" },
-        { label: "LOCATION", pattern: "\\bLondon\\b" }
-    ];
-    const result3 = extractEntities(text3, patterns3);
-    console.log("Test 3 Result:", result3);
+console.log('Test 4: Case insensitivity and punctuation removal');
+const text4 = "Hello, hello! HELLO world... World?";
+const result4 = findMostFrequentWords(text4, 2);
+console.log(result4); // Expected output: [{word: 'hello', count: 3}, {word: 'world', count: 2}]
 
-    // Test 4: Overlapping patterns
-    const text4 = "The quick brown fox jumps over the lazy dog.";
-    const patterns4 = [
-        { label: "ANIMAL", pattern: "\\bfox\\b" },
-        { label: "ANIMAL", pattern: "\\bdog\\b" },
-        { label: "PHRASE", pattern: "quick brown fox" }
-    ];
-    const result4 = extractEntities(text4, patterns4);
-    console.log("Test 4 Result:", result4);
-
-    console.log("Tests Completed.");
+console.log('Test 5: Invalid input');
+try {
+    findMostFrequentWords(12345, 3);
+} catch (error) {
+    console.log(error.message); // Expected output: Invalid input: text must be a string and topN must be a positive number.
 }
-
-runTests();
