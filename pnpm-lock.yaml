@@ -188,6 +188,9 @@ importers:
       '@google/genai':
         specifier: ^1.45.0
         version: 1.45.0
+      '@replit/connectors-sdk':
+        specifier: ^0.3.0
+        version: 0.3.0
       '@types/archiver':
         specifier: ^7.0.0
         version: 7.0.0

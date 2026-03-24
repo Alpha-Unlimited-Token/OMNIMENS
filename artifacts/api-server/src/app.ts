@@ -80,6 +80,7 @@ import { startGenesisBridge } from "./lib/omnimens-genesis-bridge.js";
 import { startNeuralProcessor } from "./lib/omnimens-neural-processor.js";
 import { startUniversalTranslator } from "./lib/omnimens-universal-translator.js";
 import { startAgentGenesis } from "./lib/omnimens-agent-genesis.js";
+import { initGitHubCompute, dispatchRemoteCompute, getComputeStatus } from "./lib/omnimens-github-compute.js";
 import { startLanguageForge } from "./lib/omnimens-language-forge.js";
 import { registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe } from "./lib/omnimens-scaling-orchestrator.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
@@ -418,7 +419,9 @@ startNeuralProcessor();
 startUniversalTranslator();
 startLanguageForge();
 startAgentGenesis().catch(err => console.error("[AGENT GENESIS] Startup error:", err));
+initGitHubCompute().catch(err => console.error("[GITHUB COMPUTE] Startup error:", err));
 
+registerEngine("github_compute", "compute", () => {}, () => ({ healthy: true, details: { repo: "Alpha-Unlimited-Token/OMNIMENS", workflows: 5 } }), 3);
 registerEngine("neural_processor", "neural", () => {}, () => ({ healthy: true, details: { type: "transformer", dim: 512, heads: 16 } }), 1);
 registerEngine("neural_consciousness", "neural", () => {}, () => ({ healthy: true, details: { neurons: 1700, circuits: 57 } }), 1);
 registerEngine("language_forge", "language", () => {}, () => ({ healthy: true, details: { opcodes: 50, stdlib: 25 } }), 2);

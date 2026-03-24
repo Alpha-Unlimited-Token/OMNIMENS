@@ -9784,6 +9784,40 @@ router.get("/omnimens/dreams/public", async (_req, res) => {
   }
 });
 
+// ─── GITHUB REMOTE COMPUTE ──────────────────────────────────────────────────
+import { dispatchRemoteCompute, getComputeStatus } from "../lib/omnimens-github-compute.js";
+
+router.get("/omnimens/github-compute/status", async (req, res) => {
+  try {
+    if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+      return res.status(403).json({ error: "owner_only" });
+    }
+    const status = getComputeStatus();
+    res.json(status);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get compute status" });
+  }
+});
+
+router.post("/omnimens/github-compute/dispatch", async (req, res) => {
+  try {
+    if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+      return res.status(403).json({ error: "owner_only" });
+    }
+    const { workflow, inputs, agent } = req.body;
+    if (!workflow) {
+      return res.status(400).json({ error: "workflow is required (deep-research, code-synthesis, knowledge-harvest, stress-test, model-eval)" });
+    }
+    const jobId = await dispatchRemoteCompute(workflow, inputs || {}, agent || "OMNIMENS");
+    if (!jobId) {
+      return res.status(500).json({ error: "Dispatch failed" });
+    }
+    res.json({ jobId, workflow, status: "dispatched" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to dispatch compute job" });
+  }
+});
+
 // ─── DEMO ROUTE — LOCKED DOWN ─────────────────────────────────────────────────
 // No more guest access. All services require an account.
 router.post("/omnimens/demo/chat", async (_req, res) => {
