@@ -10077,9 +10077,45 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "distributedWorkerSystem_gen1.mjs": {
+      "filename": "distributedWorkerSystem_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "createWorkerPool",
+        "saveCheckpoint",
+        "loadCheckpoint",
+        "priorityFunction",
+        "simulateDistributedComputation"
+      ],
+      "loadedAt": 1774394635794,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "neuroEvolutionEngine_gen1.mjs": {
+      "filename": "neuroEvolutionEngine_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "randomInRange",
+        "shuffleArray",
+        "sigmoid",
+        "mutate",
+        "crossover",
+        "evaluateFitness",
+        "initializePopulation"
+      ],
+      "loadedAt": 1774394646684,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774394227765,
-  "totalModules": 533,
+  "totalModules": 535,
   "totalCalls": 0
 }

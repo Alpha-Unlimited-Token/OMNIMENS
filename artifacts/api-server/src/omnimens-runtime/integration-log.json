@@ -1,55 +1,5 @@
 [
   {
-    "source": "self_coding_engine",
-    "title": "Daydream:paradigm_breaking #815",
-    "filename": "daydreamparadigmbreaking815.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamparadigmbreaking815.mjs",
-    "backupPath": null,
-    "timestamp": 1774217621070,
-    "codeLength": 1181,
-    "overwrite": false
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
-    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-22T22-15-43-903Z",
-    "timestamp": 1774217743902,
-    "codeLength": 1323,
-    "overwrite": true
-  },
-  {
-    "source": "backlog_dream_id_18360",
-    "title": "ARCHITECTURE NAME  \n   Causal Dream Weaver (CDW)\n\n2.",
-    "filename": "architectureNameCausalDreamWeaverCdw2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameCausalDreamWeaverCdw2.mjs",
-    "backupPath": null,
-    "timestamp": 1774217748012,
-    "codeLength": 1170,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_14158",
-    "title": "ARCHITECTURE NAME  \n   C.S.W. – Causal-Simulation Wo",
-    "filename": "architectureNameCswCausalsimulationWo.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameCswCausalsimulationWo.mjs",
-    "backupPath": null,
-    "timestamp": 1774217750882,
-    "codeLength": 1073,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: matrixOps_wasm",
-    "filename": "matrixOps_wasm_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/matrixOps_wasm_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/matrixOps_wasm_gen1.mjs.backup.2026-03-22T22-17-56-794Z",
-    "timestamp": 1774217876787,
-    "codeLength": 3392,
-    "overwrite": true
-  },
-  {
     "source": "evolution_engine",
     "title": "Evolution Module: inMemoryCache",
     "filename": "inMemoryCache_gen1.mjs",
@@ -4996,6 +4946,56 @@
     "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
     "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-03-24T23-12-06-148Z",
     "timestamp": 1774393926148,
+    "codeLength": 99,
+    "overwrite": true
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
+    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-24T23-21-07-839Z",
+    "timestamp": 1774394467836,
+    "codeLength": 2463,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: distributedWorkerSystem",
+    "filename": "distributedWorkerSystem_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/distributedWorkerSystem_gen1.mjs",
+    "backupPath": null,
+    "timestamp": 1774394635779,
+    "codeLength": 2792,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: neuroEvolutionEngine",
+    "filename": "neuroEvolutionEngine_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/neuroEvolutionEngine_gen1.mjs",
+    "backupPath": null,
+    "timestamp": 1774394646670,
+    "codeLength": 4166,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: realTimeDataIngestor",
+    "filename": "realTimeDataIngestor_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/realTimeDataIngestor_gen1.mjs",
+    "backupPath": null,
+    "timestamp": 1774394668473,
+    "codeLength": 3787,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 1 Complete — 3 modules",
+    "filename": "evolution_marker_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-03-24T23-24-28-496Z",
+    "timestamp": 1774394668496,
     "codeLength": 99,
     "overwrite": true
   }
