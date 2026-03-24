@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: memoryVectorStore
- * Written: 2026-03-23T07:39:36.698Z
+ * Written: 2026-03-23T23:13:32.150Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,76 +20,109 @@
 
 /**
  * @module memoryVectorStore
- * @description Provides an in-memory embedding index for fast retrieval and reasoning using KNN search over embeddings stored in JavaScript arrays.
+ * @description Provides a fast, in-memory vector store for temporary state handling and reasoning.
+ * Implements efficient indexing and retrieval mechanisms for embedding storage.
  */
 
 /**
- * Calculates the Euclidean distance between two vectors.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number} The Euclidean distance.
+ * @typedef {Object} VectorEntry
+ * @property {string} id - Unique identifier for the vector.
+ * @property {number[]} vector - The numerical vector representation.
  */
-function euclideanDistance(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error("Vectors must have the same length.");
-  }
-  return Math.sqrt(vectorA.reduce((sum, value, index) => sum + Math.pow(value - vectorB[index], 2), 0));
-}
 
 /**
- * A class representing an in-memory vector store.
+ * @class MemoryVectorStore
+ * @description A class to manage in-memory vector storage and retrieval.
  */
 class MemoryVectorStore {
   constructor() {
     /**
-     * @type {Array<{id: string, embedding: number[]}>}
-     * @description Stores the embeddings and their associated IDs.
+     * @private
+     * @type {Map<string, VectorEntry>}
+     * @description Internal store for vectors, using a Map for efficient indexing.
      */
-    this.store = [];
+    this.store = new Map();
   }
 
   /**
-   * Adds a new embedding to the store.
-   * @param {string} id - A unique identifier for the embedding.
-   * @param {number[]} embedding - The embedding vector.
+   * Adds a vector to the store.
+   * @param {string} id - Unique identifier for the vector.
+   * @param {number[]} vector - Numerical vector to store.
+   * @throws {Error} If the vector is not an array of numbers.
    */
-  add(id, embedding) {
-    if (typeof id !== "string" || !Array.isArray(embedding)) {
-      throw new Error("Invalid input: id must be a string and embedding must be an array.");
+  addVector(id, vector) {
+    if (!Array.isArray(vector) || !vector.every((v) => typeof v === 'number')) {
+      throw new Error('Vector must be an array of numbers.');
     }
-    this.store.push({ id, embedding });
+    this.store.set(id, { id, vector });
   }
 
   /**
-   * Finds the k-nearest neighbors to a given query embedding.
-   * @param {number[]} queryEmbedding - The query embedding vector.
-   * @param {number} k - The number of neighbors to retrieve.
-   * @returns {Array<{id: string, distance: number}>} The k-nearest neighbors sorted by distance.
+   * Retrieves a vector by its ID.
+   * @param {string} id - Unique identifier for the vector.
+   * @returns {VectorEntry | null} The vector entry if found, or null if not.
    */
-  knnSearch(queryEmbedding, k) {
-    if (!Array.isArray(queryEmbedding) || typeof k !== "number" || k <= 0) {
-      throw new Error("Invalid input: queryEmbedding must be an array and k must be a positive number.");
+  getVector(id) {
+    return this.store.get(id) || null;
+  }
+
+  /**
+   * Finds the closest vector to a given query vector using cosine similarity.
+   * @param {number[]} queryVector - The query vector.
+   * @returns {VectorEntry | null} The closest vector entry, or null if the store is empty.
+   */
+  findClosestVector(queryVector) {
+    if (!Array.isArray(queryVector) || !queryVector.every((v) => typeof v === 'number')) {
+      throw new Error('Query vector must be an array of numbers.');
     }
 
-    const distances = this.store.map(({ id, embedding }) => ({
-      id,
-      distance: euclideanDistance(queryEmbedding, embedding)
-    }));
+    let closestEntry = null;
+    let highestSimilarity = -Infinity;
 
-    return distances
-      .sort((a, b) => a.distance - b.distance)
-      .slice(0, k);
+    for (const entry of this.store.values()) {
+      const similarity = this._cosineSimilarity(queryVector, entry.vector);
+      if (similarity > highestSimilarity) {
+        highestSimilarity = similarity;
+        closestEntry = entry;
+      }
+    }
+
+    return closestEntry;
   }
 
   /**
-   * Clears all embeddings from the store.
+   * Clears all vectors from the store.
    */
-  clear() {
-    this.store = [];
+  clearStore() {
+    this.store.clear();
+  }
+
+  /**
+   * Computes the cosine similarity between two vectors.
+   * @private
+   * @param {number[]} vectorA - First vector.
+   * @param {number[]} vectorB - Second vector.
+   * @returns {number} The cosine similarity value.
+   */
+  _cosineSimilarity(vectorA, vectorB) {
+    const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * (vectorB[idx] || 0), 0);
+    const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val * val, 0));
+    const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val * val, 0));
+
+    if (magnitudeA === 0 || magnitudeB === 0) {
+      return 0; // Avoid division by zero
+    }
+
+    return dotProduct / (magnitudeA * magnitudeB);
   }
 }
 
 /**
- * Exports the MemoryVectorStore class and the euclideanDistance function.
+ * Creates a new instance of MemoryVectorStore.
+ * @returns {MemoryVectorStore} A new MemoryVectorStore instance.
  */
-export { MemoryVectorStore, euclideanDistance };
+function createMemoryVectorStore() {
+  return new MemoryVectorStore();
+}
+
+export { createMemoryVectorStore };

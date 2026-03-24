@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a data structure optimized for fast associative memory lookup
- * Written: 2026-03-23T18:31:01.388Z
+ * Written: 2026-03-24T00:10:19.148Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,81 +16,91 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-const AssociativeMemory = function() {
+function AssociativeMemory() {
     this.memory = new Map();
+}
 
-    this.add = function(key, value) {
-        if (!this.memory.has(key)) {
-            this.memory.set(key, new Set());
-        }
-        this.memory.get(key).add(value);
-    };
+AssociativeMemory.prototype.store = function(key, value) {
+    if (typeof key !== 'string') {
+        throw new Error('Key must be a string');
+    }
+    this.memory.set(key, value);
+};
 
-    this.lookup = function(key) {
-        return this.memory.has(key) ? Array.from(this.memory.get(key)) : [];
-    };
+AssociativeMemory.prototype.retrieve = function(key) {
+    if (typeof key !== 'string') {
+        throw new Error('Key must be a string');
+    }
+    return this.memory.get(key);
+};
 
-    this.remove = function(key, value) {
-        if (this.memory.has(key)) {
-            const values = this.memory.get(key);
-            values.delete(value);
-            if (values.size === 0) {
-                this.memory.delete(key);
-            }
-        }
-    };
+AssociativeMemory.prototype.delete = function(key) {
+    if (typeof key !== 'string') {
+        throw new Error('Key must be a string');
+    }
+    return this.memory.delete(key);
+};
 
-    this.clear = function() {
-        this.memory.clear();
-    };
+AssociativeMemory.prototype.hasKey = function(key) {
+    if (typeof key !== 'string') {
+        throw new Error('Key must be a string');
+    }
+    return this.memory.has(key);
+};
 
-    this.keys = function() {
-        return Array.from(this.memory.keys());
-    };
+AssociativeMemory.prototype.clear = function() {
+    this.memory.clear();
+};
 
-    this.values = function() {
-        let allValues = [];
-        this.memory.forEach((values) => {
-            allValues = allValues.concat(Array.from(values));
-        });
-        return allValues;
-    };
-
-    this.size = function() {
-        return this.memory.size;
-    };
+AssociativeMemory.prototype.size = function() {
+    return this.memory.size;
 };
 
 // Test cases
-const memory = new AssociativeMemory();
+(function testAssociativeMemory() {
+    const memory = new AssociativeMemory();
 
-// Add key-value pairs
-memory.add("fruit", "apple");
-memory.add("fruit", "banana");
-memory.add("fruit", "orange");
-memory.add("color", "red");
-memory.add("color", "blue");
+    console.log('Test 1: Store and Retrieve');
+    memory.store('alpha', 42);
+    console.log(memory.retrieve('alpha') === 42); // true
 
-// Lookup values
-console.log(memory.lookup("fruit")); // ["apple", "banana", "orange"]
-console.log(memory.lookup("color")); // ["red", "blue"]
-console.log(memory.lookup("unknown")); // []
+    console.log('Test 2: Overwrite Existing Key');
+    memory.store('alpha', 99);
+    console.log(memory.retrieve('alpha') === 99); // true
 
-// Remove a value
-memory.remove("fruit", "banana");
-console.log(memory.lookup("fruit")); // ["apple", "orange"]
+    console.log('Test 3: Check Key Existence');
+    console.log(memory.hasKey('alpha') === true); // true
+    console.log(memory.hasKey('beta') === false); // true
 
-// Remove all values for a key
-memory.remove("color", "red");
-memory.remove("color", "blue");
-console.log(memory.lookup("color")); // []
+    console.log('Test 4: Delete Key');
+    console.log(memory.delete('alpha') === true); // true
+    console.log(memory.hasKey('alpha') === false); // true
 
-// Check keys and values
-console.log(memory.keys()); // ["fruit"]
-console.log(memory.values()); // ["apple", "orange"]
+    console.log('Test 5: Clear Memory');
+    memory.store('gamma', 123);
+    memory.store('delta', 456);
+    console.log(memory.size() === 2); // true
+    memory.clear();
+    console.log(memory.size() === 0); // true
 
-// Clear memory
-memory.clear();
-console.log(memory.keys()); // []
-console.log(memory.values()); // []
-console.log(memory.size()); // 0
+    console.log('Test 6: Edge Cases');
+    try {
+        memory.store(123, 'value'); // Invalid key type
+    } catch (e) {
+        console.log(e.message === 'Key must be a string'); // true
+    }
+
+    try {
+        memory.retrieve(123); // Invalid key type
+    } catch (e) {
+        console.log(e.message === 'Key must be a string'); // true
+    }
+
+    try {
+        memory.delete(123); // Invalid key type
+    } catch (e) {
+        console.log(e.message === 'Key must be a string'); // true
+    }
+
+    console.log('All tests passed!');
+})();

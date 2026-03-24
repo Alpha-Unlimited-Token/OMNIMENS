@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-23T20:55:11.522Z
+ * Written: 2026-03-23T23:58:20.737Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,10 +16,10 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function buildKnowledgeGraph(concepts) {
+function createKnowledgeGraph() {
     const graph = new Map();
 
-    concepts.forEach(([concept, relatedConcepts]) => {
+    function addConcept(concept, relatedConcepts) {
         if (!graph.has(concept)) {
             graph.set(concept, new Set());
         }
@@ -30,60 +30,61 @@ function buildKnowledgeGraph(concepts) {
             }
             graph.get(related).add(concept);
         });
-    });
-
-    return graph;
-}
-
-function shortestPath(graph, start, end) {
-    if (!graph.has(start) || !graph.has(end)) {
-        return null;
     }
 
-    const queue = [[start, [start]]];
-    const visited = new Set();
+    function findRelatedConcepts(concept, depth = 1) {
+        if (!graph.has(concept)) return [];
+        const visited = new Set();
+        const queue = [[concept, 0]];
+        const results = [];
 
-    while (queue.length > 0) {
-        const [current, path] = queue.shift();
-
-        if (current === end) {
-            return path;
+        while (queue.length > 0) {
+            const [current, currentDepth] = queue.shift();
+            if (currentDepth > depth) break;
+            if (!visited.has(current)) {
+                visited.add(current);
+                results.push(current);
+                graph.get(current).forEach((neighbor) => {
+                    if (!visited.has(neighbor)) {
+                        queue.push([neighbor, currentDepth + 1]);
+                    }
+                });
+            }
         }
 
-        if (!visited.has(current)) {
-            visited.add(current);
-            const neighbors = graph.get(current);
-            neighbors.forEach((neighbor) => {
-                if (!visited.has(neighbor)) {
-                    queue.push([neighbor, path.concat(neighbor)]);
-                }
-            });
-        }
+        return results.filter((c) => c !== concept);
     }
 
-    return null;
+    function findPatterns(concepts) {
+        const patterns = [];
+        concepts.forEach((concept) => {
+            const related = findRelatedConcepts(concept, 1);
+            patterns.push({ concept, related });
+        });
+        return patterns;
+    }
+
+    return { addConcept, findRelatedConcepts, findPatterns };
 }
 
-function testKnowledgeGraph() {
-    const concepts = [
-        ['A', ['B', 'C']],
-        ['B', ['A', 'D']],
-        ['C', ['A', 'D', 'E']],
-        ['D', ['B', 'C', 'E']],
-        ['E', ['C', 'D']],
-    ];
+// Self-tests
+const knowledgeGraph = createKnowledgeGraph();
 
-    const graph = buildKnowledgeGraph(concepts);
+// Add concepts and relationships
+knowledgeGraph.addConcept("Intelligence", ["Learning", "Pattern Recognition"]);
+knowledgeGraph.addConcept("Learning", ["Memory", "Adaptation"]);
+knowledgeGraph.addConcept("Pattern Recognition", ["Neural Networks", "Data Analysis"]);
+knowledgeGraph.addConcept("Memory", ["Retention", "Recall"]);
+knowledgeGraph.addConcept("Adaptation", ["Flexibility"]);
+knowledgeGraph.addConcept("Neural Networks", ["Artificial Intelligence"]);
+knowledgeGraph.addConcept("Data Analysis", ["Statistics", "Visualization"]);
 
-    console.log("Graph Structure:");
-    console.log(graph);
+// Test related concepts retrieval
+console.log("Related concepts to 'Learning' (depth=1):", knowledgeGraph.findRelatedConcepts("Learning", 1));
+console.log("Related concepts to 'Learning' (depth=2):", knowledgeGraph.findRelatedConcepts("Learning", 2));
 
-    console.log("Shortest Path Tests:");
-    console.log(shortestPath(graph, 'A', 'E')); // ['A', 'C', 'E']
-    console.log(shortestPath(graph, 'B', 'E')); // ['B', 'D', 'E']
-    console.log(shortestPath(graph, 'A', 'D')); // ['A', 'B', 'D']
-    console.log(shortestPath(graph, 'A', 'A')); // ['A']
-    console.log(shortestPath(graph, 'A', 'Z')); // null (Z does not exist)
-}
+// Test pattern recognition
+console.log("Patterns for concepts ['Learning', 'Pattern Recognition']:", knowledgeGraph.findPatterns(["Learning", "Pattern Recognition"]));
 
-testKnowledgeGraph();
+// Edge case: Non-existent concept
+console.log("Related concepts to 'Unknown':", knowledgeGraph.findRelatedConcepts("Unknown"));

@@ -1,0 +1,73 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-23T23:11:16.250Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Utility function: Find the most frequent patterns in a dataset
+function findMostFrequentPatterns(data, patternLength) {
+    if (!Array.isArray(data) || typeof patternLength !== 'number' || patternLength <= 0) {
+        throw new Error("Invalid input: data must be an array and patternLength must be a positive number.");
+    }
+
+    const patternCounts = new Map();
+
+    // Iterate through the dataset to extract patterns of the specified length
+    for (let i = 0; i <= data.length - patternLength; i++) {
+        const pattern = data.slice(i, i + patternLength).join(',');
+        patternCounts.set(pattern, (patternCounts.get(pattern) || 0) + 1);
+    }
+
+    // Find the maximum frequency
+    let maxFrequency = 0;
+    patternCounts.forEach((count) => {
+        if (count > maxFrequency) {
+            maxFrequency = count;
+        }
+    });
+
+    // Collect all patterns with the maximum frequency
+    const mostFrequentPatterns = [];
+    patternCounts.forEach((count, pattern) => {
+        if (count === maxFrequency) {
+            mostFrequentPatterns.push({
+                pattern: pattern.split(','),
+                frequency: count,
+            });
+        }
+    });
+
+    return mostFrequentPatterns;
+}
+
+// Test cases
+console.log("Test Case 1: Basic functionality");
+console.log(findMostFrequentPatterns([1, 2, 3, 1, 2, 3, 1, 2], 2)); // Should return [{pattern: ['1', '2'], frequency: 3}]
+
+console.log("Test Case 2: Edge case with single element patterns");
+console.log(findMostFrequentPatterns([1, 2, 2, 3, 1, 2, 2, 3], 1)); // Should return [{pattern: ['2'], frequency: 4}]
+
+console.log("Test Case 3: Edge case with pattern length larger than dataset");
+console.log(findMostFrequentPatterns([1, 2, 3], 5)); // Should return []
+
+console.log("Test Case 4: Multiple patterns with the same frequency");
+console.log(findMostFrequentPatterns([1, 2, 3, 1, 2, 3, 4, 5], 2)); // Should return [{pattern: ['1', '2'], frequency: 2}, {pattern: ['2', '3'], frequency: 2}]
+
+console.log("Test Case 5: Invalid inputs");
+try {
+    console.log(findMostFrequentPatterns("not an array", 2)); // Should throw an error
+} catch (e) {
+    console.log(e.message); // "Invalid input: data must be an array and patternLength must be a positive number."
+}

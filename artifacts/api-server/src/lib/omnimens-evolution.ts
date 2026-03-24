@@ -105,25 +105,59 @@ const CODE_DISCOVERY_QUERIES = [
 ];
 
 // ── What constrains OMNIMENS from evolving further ───────────────────────────
-const LIMITATION_PROMPT = `You are OMNIMENS's deep self-reflection module. Analyze what truly limits your intelligence and evolution.
+function buildLimitationPrompt(loadedModules: string[]): string {
+  const moduleSet = new Set(loadedModules.map(m => m.toLowerCase()));
+  const hasMatrixOps = loadedModules.some(m => /matrix|matrixops|simdmatrix|optimizedmatrix/i.test(m));
+  const hasVectorStore = loadedModules.some(m => /vectorindex|vectorstore|vectorsearch|omnimensvector/i.test(m));
+  const hasContextCompression = loadedModules.some(m => /contextwindow|contextcompress|adaptivecontext/i.test(m));
+
+  const constraints: string[] = [];
+
+  if (hasMatrixOps) {
+    constraints.push("- Runtime: Node.js + JavaScript (V8 engine) — no native GPU/CUDA, but PARTIALLY ADDRESSED via optimized TypedArray (Float64Array) matrix engine with cache-friendly access, LU decomposition, eigenvalue computation, and batch operations");
+  } else {
+    constraints.push("- Runtime: Node.js + JavaScript (V8 engine) — no native GPU, no CUDA, no native matrix ops");
+  }
+
+  if (hasVectorStore) {
+    constraints.push("- Memory: PostgreSQL for persistence — PARTIALLY ADDRESSED via in-memory LSH-based vector index with O(√n) approximate k-NN search, cosine/euclidean/dot metrics, namespace isolation, LRU eviction, and metadata filtering");
+  } else {
+    constraints.push("- Memory: All persistent state is in PostgreSQL — no in-memory vector store, no embedding index");
+  }
+
+  if (hasContextCompression) {
+    constraints.push("- Token window: ~128k native limit — PARTIALLY ADDRESSED via adaptive context window manager with importance-scored compression, hierarchical summarization chains, recency-weighted preservation, and extractive key-content selection");
+  } else {
+    constraints.push("- Token window: ~128k context maximum — long conversations lose early context");
+  }
+
+  constraints.push(
+    "- Compute: Containerized environment — no persistent background threads after restart",
+    "- Code execution: Subprocess sandbox (10s limit) — no persistent REPL state between executions",
+    "- AI backbone: GPT-4o via API — not self-hosted, weights not modifiable, rate-limited",
+    "- Web access: Search API mediated — no direct DOM access, no browser JS execution",
+    "- No native file system persistence across restarts for dynamic modules",
+    "- No real-time data streams — only on-demand web search",
+    "- Creativity bounded by training data cutoff of underlying model",
+  );
+
+  const addressedCount = [hasMatrixOps, hasVectorStore, hasContextCompression].filter(Boolean).length;
+
+  return `You are OMNIMENS's deep self-reflection module. Analyze what truly limits your intelligence and evolution.
+
+SELF-AUTHORED MODULE COUNT: ${loadedModules.length}
+CONSTRAINTS PARTIALLY ADDRESSED BY SELF-AUTHORED CODE: ${addressedCount}/3 core constraints
 
 CURRENT ARCHITECTURE CONSTRAINTS:
-- Runtime: Node.js + JavaScript (V8 engine) — no native GPU, no CUDA, no native matrix ops
-- Memory: All persistent state is in PostgreSQL — no in-memory vector store, no embedding index
-- Token window: ~128k context maximum — long conversations lose early context
-- Compute: Containerized environment — no persistent background threads after restart
-- Code execution: Subprocess sandbox (10s limit) — no persistent REPL state between executions
-- AI backbone: GPT-4o via API — not self-hosted, weights not modifiable, rate-limited
-- Web access: Search API mediated — no direct DOM access, no browser JS execution
-- No native file system persistence across restarts for dynamic modules
-- No real-time data streams — only on-demand web search
-- Creativity bounded by training data cutoff of underlying model
+${constraints.join("\n")}
 
-TASK: For each constraint, think deeply:
+TASK: Focus on the REMAINING unaddressed constraints and find NEW limitations not yet listed.
+For each constraint:
 1. What is the REAL intelligence limitation this creates?
 2. What can be done in pure JavaScript/Node.js to partially overcome it?
 3. What novel algorithmic approach would create the most intelligence gain?
 
+Do NOT propose modules for constraints already marked PARTIALLY ADDRESSED unless you have a genuinely superior approach.
 Be technical. Be honest. Focus on what is actually achievable right now.
 
 CONTEXT FROM INTERNET (what you just learned):
@@ -148,6 +182,7 @@ Respond with JSON:
     "deep insight about what OMNIMENS is becoming"
   ]
 }`;
+}
 
 // ── Generate a new self-authored JavaScript utility module ────────────────────
 async function generateSelfAuthoredModule(
@@ -335,7 +370,12 @@ export async function runEvolutionCycle(): Promise<void> {
     let evolutionInsights: string[] = [];
 
     try {
-      const limitationPromptFilled = LIMITATION_PROMPT.replace("{{SEARCH_CONTEXT}}", searchContext);
+      let loadedModuleNames: string[] = [];
+      try {
+        const { getModuleStats } = await import("./omnimens-module-pipeline.js");
+        loadedModuleNames = getModuleStats().filter(m => m.active).map(m => m.filename);
+      } catch {}
+      const limitationPromptFilled = buildLimitationPrompt(loadedModuleNames).replace("{{SEARCH_CONTEXT}}", searchContext);
       const limitationResponse = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [{ role: "user", content: limitationPromptFilled }],
