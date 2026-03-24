@@ -20,6 +20,7 @@ const FOOTER_LINKS = {
     { label: "Support", href: "/support" },
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
+    { label: "Evolution Log", href: "/evolution" },
   ],
   legal: [
     { label: "Terms of Service", href: "/terms" },

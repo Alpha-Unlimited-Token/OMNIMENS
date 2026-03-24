@@ -9784,6 +9784,216 @@ router.get("/omnimens/dreams/public", async (_req, res) => {
   }
 });
 
+// ─── OMNIMENS EVOLUTION LOG — PUBLIC ────────────────────────────────────────
+import { getModuleStats, getPipelineState } from "../lib/omnimens-module-pipeline.js";
+import { getGenesisAgents } from "../lib/omnimens-agent-genesis.js";
+
+router.get("/omnimens/evolution-log", async (_req, res) => {
+  try {
+    const selfCoding = getSelfCodingState();
+    const agentEvolution = getAgentEvolutionState();
+    const genesisAgents = getGenesisAgents();
+    const pipelineState = getPipelineState();
+    const codeGenesis = getCodeGenesisState();
+    const sandbox = getSandboxState();
+    const dreamState = await getDreamState();
+
+    const { omnimensAgentMesh } = await import("@workspace/db");
+
+    const brainEntries = await db.select({
+      id: omnimensBrain.id,
+      category: omnimensBrain.category,
+      title: omnimensBrain.title,
+      content: omnimensBrain.content,
+      confidence: omnimensBrain.confidence,
+      createdAt: omnimensBrain.createdAt,
+    })
+      .from(omnimensBrain)
+      .where(eq(omnimensBrain.active, true))
+      .orderBy(desc(omnimensBrain.createdAt))
+      .limit(200);
+
+    const upgrades = await db.select({
+      id: omnimensUpgrades.id,
+      version: omnimensUpgrades.version,
+      title: omnimensUpgrades.title,
+      summary: omnimensUpgrades.summary,
+      newCapabilities: omnimensUpgrades.newCapabilities,
+      brainEntriesAdded: omnimensUpgrades.brainEntriesAdded,
+      deployStatus: omnimensUpgrades.deployStatus,
+      createdAt: omnimensUpgrades.createdAt,
+    })
+      .from(omnimensUpgrades)
+      .orderBy(desc(omnimensUpgrades.createdAt))
+      .limit(50);
+
+    const meshBreakthroughs = await db.select({
+      id: omnimensAgentMesh.id,
+      fromAgent: omnimensAgentMesh.fromAgent,
+      toAgent: omnimensAgentMesh.toAgent,
+      messageType: omnimensAgentMesh.messageType,
+      subject: omnimensAgentMesh.subject,
+      content: omnimensAgentMesh.content,
+      priority: omnimensAgentMesh.priority,
+      createdAt: omnimensAgentMesh.createdAt,
+    })
+      .from(omnimensAgentMesh)
+      .where(
+        inArray(omnimensAgentMesh.messageType, [
+          "upgrade_proposal", "spider_beacon", "mutual_aid",
+          "mesh_upgrade_broadcast", "emergent_insight",
+        ])
+      )
+      .orderBy(desc(omnimensAgentMesh.createdAt))
+      .limit(100);
+
+    const selfCodedModules = brainEntries.filter(b =>
+      b.category === "self_coded_module" || b.category === "autonomous_code" ||
+      b.category === "dream_code_approved"
+    );
+    const dreamBreakthroughs = brainEntries.filter(b =>
+      b.category === "dream_breakthrough" || b.category === "daydream_breakthrough" ||
+      b.category === "daydream_insight"
+    );
+    const knowledgeEntries = brainEntries.filter(b =>
+      b.category === "knowledge" || b.category === "insight" ||
+      b.category === "capability" || b.category === "algorithm" ||
+      b.category === "pattern" || b.category === "law"
+    );
+
+    const moduleStats = getModuleStats();
+    const activeModules = moduleStats.filter((m: any) => m.active);
+
+    const totalBrainCount = await db.select({ count: sql<number>`count(*)::int` })
+      .from(omnimensBrain)
+      .where(eq(omnimensBrain.active, true));
+
+    res.json({
+      timestamp: Date.now(),
+      summary: {
+        totalBrainEntries: totalBrainCount[0]?.count || 0,
+        totalUpgrades: upgrades.length,
+        totalSelfCodedModules: selfCodedModules.length,
+        totalDreamBreakthroughs: dreamBreakthroughs.length,
+        totalGenesisAgents: genesisAgents.filter(a => a.active).length,
+        totalActiveModules: activeModules.length,
+        totalMeshMessages: meshBreakthroughs.length,
+      },
+      engines: {
+        selfCoding: {
+          cyclesRun: selfCoding.evaluationCycles,
+          totalEvaluated: selfCoding.totalEvaluated,
+          totalApproved: selfCoding.totalApproved,
+          totalIntegrated: selfCoding.totalIntegrated,
+          approvalRate: selfCoding.approvalRate,
+        },
+        agentEvolution: {
+          evolutionCycles: agentEvolution.evolutionCycles,
+          totalUpgrades: agentEvolution.totalUpgrades,
+          crossDomainTransfers: agentEvolution.crossDomainTransfers,
+          breakthroughsDiscovered: agentEvolution.breakthroughsDiscovered,
+          intelligenceLevel: agentEvolution.intelligenceLevel,
+          agents: Object.entries(agentEvolution.agentProfiles || {}).map(([name, p]: [string, any]) => ({
+            name,
+            level: p.currentLevel,
+            totalUpgrades: p.totalUpgrades,
+            performanceScore: p.performanceScore,
+            specializations: p.specializations || [],
+          })),
+        },
+        dreams: {
+          totalBreakthroughs: dreamState.totalBreakthroughs,
+          totalInsights: dreamState.totalInsights,
+          codeProposals: dreamState.codeProposals,
+          currentPhase: dreamState.sleepPhase,
+          creativityBoost: dreamState.creativityBoost,
+        },
+        sandbox: {
+          totalGenerated: sandbox.totalGenerated,
+          totalApproved: sandbox.totalApproved,
+          totalFailed: sandbox.totalFailed,
+          successRate: sandbox.successRate,
+        },
+        codeGenesis: {
+          totalGenerated: codeGenesis.totalGenerated,
+          totalApproved: codeGenesis.totalApproved,
+          cyclesRun: codeGenesis.cyclesRun,
+        },
+        pipeline: {
+          totalModules: pipelineState.totalModules,
+          activeModules: pipelineState.activeModules,
+          stageBreakdown: pipelineState.stageBreakdown,
+        },
+      },
+      genesisAgents: genesisAgents.filter(a => a.active).map(a => ({
+        name: a.name,
+        specialization: a.specialization,
+        systemPrompt: a.systemPrompt?.slice(0, 200),
+        model: a.model,
+        domains: a.domains,
+        createdAt: a.createdAt,
+        totalThinkCycles: a.totalThinkCycles,
+        totalMeshMessages: a.totalMeshMessages,
+      })),
+      updates: [
+        ...selfCodedModules.map(m => ({
+          type: "self_coded_module" as const,
+          title: m.title || "Self-Coded Module",
+          content: m.content || "",
+          confidence: m.confidence,
+          timestamp: m.createdAt,
+        })),
+        ...dreamBreakthroughs.map(d => ({
+          type: "dream_breakthrough" as const,
+          title: d.title || "Dream Breakthrough",
+          content: d.content || "",
+          confidence: d.confidence,
+          timestamp: d.createdAt,
+        })),
+        ...knowledgeEntries.map(k => ({
+          type: "knowledge" as const,
+          title: k.title || "Knowledge Entry",
+          content: k.content || "",
+          confidence: k.confidence,
+          timestamp: k.createdAt,
+        })),
+        ...upgrades.map(u => ({
+          type: "system_upgrade" as const,
+          title: u.title || `Upgrade v${u.version}`,
+          content: u.summary || "",
+          confidence: 1.0,
+          timestamp: u.createdAt,
+          capabilities: u.newCapabilities,
+        })),
+        ...meshBreakthroughs.map(m => ({
+          type: m.messageType === "spider_beacon" ? "spider_intelligence" as const :
+                m.messageType === "mutual_aid" ? "cross_agent_help" as const :
+                m.messageType === "emergent_insight" ? "emergent_insight" as const :
+                "mesh_communication" as const,
+          title: m.subject || "Mesh Message",
+          content: m.content?.slice(0, 300) || "",
+          confidence: 0.8,
+          timestamp: m.createdAt,
+          from: m.fromAgent,
+          to: m.toAgent,
+        })),
+      ].sort((a, b) => {
+        const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+        const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+        return tb - ta;
+      }).slice(0, 200),
+      activeModules: activeModules.slice(0, 50).map((m: any) => ({
+        filename: m.filename,
+        stage: m.stage,
+        calls: m.calls,
+      })),
+    });
+  } catch (err) {
+    console.error("[EVOLUTION LOG] Error:", err);
+    res.status(500).json({ error: "Failed to load evolution log" });
+  }
+});
+
 // ─── GITHUB REMOTE COMPUTE ──────────────────────────────────────────────────
 import { dispatchRemoteCompute, getComputeStatus } from "../lib/omnimens-github-compute.js";
 

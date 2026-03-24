@@ -736,6 +736,167 @@ export function getComputeStatus() {
   };
 }
 
+let syncCycleCount = 0;
+
+async function syncEvolutionToGitHub(): Promise<void> {
+  syncCycleCount++;
+  console.log(`[GITHUB SYNC] 🔄 Auto-sync cycle #${syncCycleCount}`);
+
+  try {
+    const brainEntries = await db.select({
+      id: omnimensBrain.id,
+      category: omnimensBrain.category,
+      title: omnimensBrain.title,
+      content: omnimensBrain.content,
+      confidence: omnimensBrain.confidence,
+      createdAt: omnimensBrain.createdAt,
+    })
+      .from(omnimensBrain)
+      .where(eq(omnimensBrain.active, true))
+      .orderBy(desc(omnimensBrain.createdAt))
+      .limit(100);
+
+    const selfCoded = brainEntries.filter(b =>
+      b.category === "self_coded_module" || b.category === "autonomous_code" ||
+      b.category === "dream_code_approved"
+    );
+    const breakthroughs = brainEntries.filter(b =>
+      b.category === "dream_breakthrough" || b.category === "daydream_breakthrough"
+    );
+    const knowledge = brainEntries.filter(b =>
+      b.category === "knowledge" || b.category === "insight" ||
+      b.category === "capability" || b.category === "algorithm"
+    );
+
+    const evolutionLog = {
+      lastSync: new Date().toISOString(),
+      syncCycle: syncCycleCount,
+      stats: {
+        totalBrainEntries: brainEntries.length,
+        selfCodedModules: selfCoded.length,
+        dreamBreakthroughs: breakthroughs.length,
+        knowledgeEntries: knowledge.length,
+      },
+      recentSelfCodedModules: selfCoded.slice(0, 20).map(m => ({
+        title: m.title,
+        content: (m.content || "").slice(0, 500),
+        confidence: m.confidence,
+        createdAt: m.createdAt,
+      })),
+      recentBreakthroughs: breakthroughs.slice(0, 20).map(b => ({
+        title: b.title,
+        content: (b.content || "").slice(0, 500),
+        confidence: b.confidence,
+        createdAt: b.createdAt,
+      })),
+      recentKnowledge: knowledge.slice(0, 20).map(k => ({
+        title: k.title,
+        content: (k.content || "").slice(0, 300),
+        confidence: k.confidence,
+        createdAt: k.createdAt,
+      })),
+    };
+
+    const content = Buffer.from(JSON.stringify(evolutionLog, null, 2)).toString("base64");
+    const filePath = "omnimens-evolution/evolution-log.json";
+
+    const existing = await ghApi(`/repos/${OWNER}/${REPO}/contents/${filePath}`);
+    const sha = existing?.sha || undefined;
+
+    await ghApi(`/repos/${OWNER}/${REPO}/contents/${filePath}`, "PUT", {
+      message: `[OMNIMENS AUTO-SYNC] Evolution log — cycle #${syncCycleCount} — ${selfCoded.length} modules, ${breakthroughs.length} breakthroughs`,
+      content,
+      sha,
+      branch: "main",
+    });
+
+    const { getGenesisAgents: getGA } = await import("./omnimens-agent-genesis.js");
+    const agents = getGA().filter((a: any) => a.active);
+    const agentManifest = {
+      lastSync: new Date().toISOString(),
+      totalAgents: agents.length + 9,
+      coreAgents: ["Architect", "Mathematician", "Neuroscientist", "Synthesizer", "Critic", "Meta-Agent", "GraphicDesigner", "SpellCheckVisual", "OMNIMENS"],
+      genesisAgents: agents.map((a: any) => ({
+        name: a.name,
+        specialization: a.specialization,
+        domains: a.domains,
+        model: a.model,
+        totalThinkCycles: a.totalThinkCycles,
+        totalMeshMessages: a.totalMeshMessages,
+        createdAt: a.createdAt,
+      })),
+    };
+
+    const agentContent = Buffer.from(JSON.stringify(agentManifest, null, 2)).toString("base64");
+    const agentPath = "omnimens-evolution/agent-manifest.json";
+    const existingAgent = await ghApi(`/repos/${OWNER}/${REPO}/contents/${agentPath}`);
+    await ghApi(`/repos/${OWNER}/${REPO}/contents/${agentPath}`, "PUT", {
+      message: `[OMNIMENS AUTO-SYNC] Agent manifest — ${agentManifest.totalAgents} agents active`,
+      content: agentContent,
+      sha: existingAgent?.sha || undefined,
+      branch: "main",
+    });
+
+    console.log(`[GITHUB SYNC] ✅ Evolution log synced — ${selfCoded.length} modules, ${breakthroughs.length} breakthroughs, ${agents.length} genesis agents`);
+  } catch (err) {
+    console.error("[GITHUB SYNC] Sync error:", err);
+  }
+}
+
+async function syncSelfCodedModulesToGitHub(): Promise<void> {
+  try {
+    const fs = await import("fs");
+    const path = await import("path");
+    const modulesDir = path.join(process.cwd(), "src/omnimens-runtime/modules");
+
+    if (!fs.existsSync(modulesDir)) return;
+
+    const files = fs.readdirSync(modulesDir).filter((f: string) => f.endsWith(".mjs")).slice(0, 30);
+    let synced = 0;
+
+    for (const file of files) {
+      try {
+        const code = fs.readFileSync(path.join(modulesDir, file), "utf-8");
+        const encoded = Buffer.from(code).toString("base64");
+        const ghPath = `omnimens-evolution/self-coded-modules/${file}`;
+
+        const existing = await ghApi(`/repos/${OWNER}/${REPO}/contents/${ghPath}`);
+        const sha = existing?.sha || undefined;
+
+        const existingContent = existing?.content
+          ? Buffer.from(existing.content, "base64").toString("utf-8")
+          : null;
+        if (existingContent === code) continue;
+
+        await ghApi(`/repos/${OWNER}/${REPO}/contents/${ghPath}`, "PUT", {
+          message: `[OMNIMENS SELF-CODE] Module synced: ${file}`,
+          content: encoded,
+          sha,
+          branch: "main",
+        });
+        synced++;
+      } catch {}
+    }
+
+    if (synced > 0) {
+      console.log(`[GITHUB SYNC] ✅ ${synced} self-coded modules synced to GitHub`);
+    }
+  } catch (err) {
+    console.error("[GITHUB SYNC] Module sync error:", err);
+  }
+}
+
+async function createIssueForKnowledgeGap(title: string, body: string): Promise<void> {
+  try {
+    await ghApi(`/repos/${OWNER}/${REPO}/issues`, "POST", {
+      title: `[OMNIMENS GAP] ${title.slice(0, 80)}`,
+      body: `## Knowledge Gap Detected by OMNIMENS\n\n${body}\n\n---\n*Auto-created by OMNIMENS autonomous intelligence*`,
+      labels: ["omnimens-auto", "knowledge-gap"],
+    });
+    console.log(`[GITHUB SYNC] 📝 Created issue for knowledge gap: "${title.slice(0, 50)}"`);
+  } catch {}
+}
+
 export async function initGitHubCompute(): Promise<void> {
   console.log(`[GITHUB COMPUTE] 🖥️ Remote Compute Bridge initializing...`);
   console.log(`[GITHUB COMPUTE] 🖥️ Repository: ${OWNER}/${REPO}`);
@@ -751,8 +912,20 @@ export async function initGitHubCompute(): Promise<void> {
     setInterval(() => autonomousComputeCycle(), 2 * 60 * 60 * 1000);
   }, 5 * 60 * 1000);
 
+  setTimeout(() => {
+    syncEvolutionToGitHub();
+    syncSelfCodedModulesToGitHub();
+    setInterval(() => {
+      syncEvolutionToGitHub();
+      syncSelfCodedModulesToGitHub();
+    }, 3 * 60 * 60 * 1000);
+  }, 3 * 60 * 1000);
+
   console.log(`[GITHUB COMPUTE] 🖥️ Bridge active — workflows deploy in 1min, first compute cycle in 5min, then every 2h`);
   console.log(`[GITHUB COMPUTE] 🖥️ Available workflows: deep-research, code-synthesis, knowledge-harvest, stress-test, model-eval`);
   console.log(`[GITHUB COMPUTE] 🖥️ Any agent can request: GITHUB_COMPUTE_REQUEST workflow:<name> inputs:{...}`);
   console.log(`[GITHUB COMPUTE] 🖥️ Auto-dispatch: low-confidence knowledge gaps trigger remote deep research`);
+  console.log(`[GITHUB SYNC] 📦 Auto-sync to GitHub active — first sync in 3min, then every 3h`);
+  console.log(`[GITHUB SYNC] 📦 Syncs: evolution log, agent manifest, self-coded modules`);
+  console.log(`[GITHUB SYNC] 📦 Version-controlled self-evolution history on GitHub`);
 }

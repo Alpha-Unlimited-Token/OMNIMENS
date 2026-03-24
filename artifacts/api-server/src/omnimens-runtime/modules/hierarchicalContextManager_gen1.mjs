@@ -1,97 +1,117 @@
-// hierarchicalContextManager.js
-
 /**
- * @module hierarchicalContextManager
- * @description Maintains a compressed, hierarchical representation of long-term conversations by summarizing and storing older context in a tree structure.
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: hierarchicalContextManager
+ * Written: 2026-03-24T03:42:02.138Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-/**
- * Represents a node in the hierarchical context tree.
- * @typedef {Object} ContextNode
- * @property {string} summary - The summarized content of this node.
- * @property {Array<ContextNode>} children - The child nodes representing subcontexts.
- */
+// hierarchicalContextManager.mjs
+
+import { createHash } from 'crypto';
 
 /**
- * Creates a new context node.
- * @param {string} summary - The summarized content for this node.
- * @returns {ContextNode} A new context node.
+ * Generates a hash for semantic chunk identification.
+ * @param {string} input - The input string to hash.
+ * @returns {string} - A unique hash identifier.
  */
-function createContextNode(summary) {
-  return {
-    summary,
-    children: []
-  };
+export function generateChunkHash(input) {
+  const hash = createHash('sha256');
+  hash.update(input);
+  return hash.digest('hex').slice(0, 16); // Shortened hash for efficiency
 }
 
 /**
- * Summarizes a list of text entries into a single summary.
- * This function simulates summarization using a naive approach.
- * @param {Array<string>} texts - The list of text entries to summarize.
- * @returns {string} A single summary combining the input texts.
+ * Splits a large context into semantic chunks.
+ * @param {string} context - The large input text.
+ * @param {number} chunkSize - Maximum size of each chunk.
+ * @returns {Array<string>} - Array of semantic chunks.
  */
-function summarizeTexts(texts) {
-  if (!texts || texts.length === 0) return "";
+export function semanticChunking(context, chunkSize = 1024) {
+  const chunks = [];
+  let currentChunk = '';
 
-  // Naive summarization: concatenate and truncate to 200 characters
-  const combined = texts.join(" ");
-  return combined.length > 200 ? combined.slice(0, 197) + "..." : combined;
-}
-
-/**
- * Adds a new context to the hierarchical tree, summarizing older contexts if needed.
- * @param {ContextNode} root - The root of the hierarchical context tree.
- * @param {string} newContext - The new context to add.
- * @returns {void}
- */
-function addContext(root, newContext) {
-  if (!root || typeof newContext !== "string") {
-    throw new Error("Invalid input: root must be a ContextNode and newContext must be a string.");
+  for (const sentence of context.split('. ')) {
+    if ((currentChunk.length + sentence.length) <= chunkSize) {
+      currentChunk += sentence + '. ';
+    } else {
+      chunks.push(currentChunk.trim());
+      currentChunk = sentence + '. ';
+    }
   }
 
-  // If the root has too many children, summarize them into a single node
-  if (root.children.length >= 5) {
-    const summaries = root.children.map(child => child.summary);
-    const summarizedContent = summarizeTexts(summaries);
-    const summarizedNode = createContextNode(summarizedContent);
-
-    // Replace children with the summarized node
-    root.children = [summarizedNode];
+  if (currentChunk) {
+    chunks.push(currentChunk.trim());
   }
 
-  // Add the new context as a child node
-  const newNode = createContextNode(newContext);
-  root.children.push(newNode);
+  return chunks;
 }
 
 /**
- * Recursively retrieves the hierarchical context as a JSON object.
- * @param {ContextNode} node - The root node of the tree.
- * @returns {Object} A JSON representation of the hierarchical context.
+ * Recursively summarizes semantic chunks.
+ * @param {Array<string>} chunks - Array of semantic chunks.
+ * @param {number} depth - Maximum depth of summarization.
+ * @returns {string} - Final hierarchical summary.
  */
-function getContextAsJSON(node) {
-  if (!node) {
-    throw new Error("Invalid input: node must be a ContextNode.");
+export function recursiveSummarization(chunks, depth = 3) {
+  if (depth === 0 || chunks.length === 1) {
+    return chunks.join(' ');
   }
 
-  return {
-    summary: node.summary,
-    children: node.children.map(getContextAsJSON)
-  };
+  const summaries = chunks.map(chunk => {
+    return summarizeChunk(chunk); // Summarize each chunk
+  });
+
+  return recursiveSummarization(summaries, depth - 1);
 }
 
 /**
- * Initializes a new hierarchical context tree.
- * @param {string} rootSummary - The summary for the root node.
- * @returns {ContextNode} The root of the new hierarchical context tree.
+ * Summarizes a single semantic chunk.
+ * @param {string} chunk - The input chunk.
+ * @returns {string} - A summarized version of the chunk.
  */
-function initializeContextTree(rootSummary) {
-  return createContextNode(rootSummary);
+export function summarizeChunk(chunk) {
+  const sentences = chunk.split('. ');
+  const keySentences = sentences.slice(0, Math.max(1, Math.floor(sentences.length / 3))); // Extract key sentences
+  return keySentences.join('. ');
 }
 
-// Export the module's functions
-export {
-  initializeContextTree,
-  addContext,
-  getContextAsJSON
-};
+/**
+ * Compresses and reconstructs hierarchical summaries dynamically.
+ * @param {string} context - The large input text.
+ * @param {number} chunkSize - Maximum size of each chunk.
+ * @param {number} depth - Maximum depth of summarization.
+ * @returns {string} - Final reconstructed summary.
+ */
+export function hierarchicalContextManager(context, chunkSize = 1024, depth = 3) {
+  const chunks = semanticChunking(context, chunkSize);
+  return recursiveSummarization(chunks, depth);
+}
+
+/**
+ * Utility function for cross-agent usage: compress large text data.
+ * @param {string} text - Input text.
+ * @returns {string} - Compressed summary.
+ */
+export function compressText(text) {
+  return hierarchicalContextManager(text);
+}
+
+/**
+ * Utility function for cross-agent usage: reconstruct compressed text.
+ * @param {string} compressedText - Input compressed text.
+ * @returns {string} - Reconstructed text (approximation).
+ */
+export function reconstructText(compressedText) {
+  return compressedText; // Placeholder for future reconstruction logic
+}

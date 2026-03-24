@@ -68,6 +68,7 @@ const Templates = retryLazy(() => import("@/pages/templates"));
 const Deploy = retryLazy(() => import("@/pages/deploy"));
 const Connect = retryLazy(() => import("@/pages/connect"));
 const Dreams = retryLazy(() => import("@/pages/dreams"));
+const Evolution = retryLazy(() => import("@/pages/evolution"));
 const Demo = retryLazy(() => import("@/pages/demo"));
 const MyFiles = retryLazy(() => import("@/pages/my-files"));
 
@@ -190,6 +191,7 @@ function Router() {
         <Route path="/footer-links" component={FooterLinks} />
         <Route path="/lip-sync" component={LipSync} />
         <Route path="/dreams" component={Dreams} />
+        <Route path="/evolution" component={Evolution} />
         <Route path="/demo" component={Demo} />
         <Route path="/connect">{() => <ProtectedRoute layout="none"><Connect /></ProtectedRoute>}</Route>
         <Route component={NotFound} />
