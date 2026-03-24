@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-24T02:58:00.003Z
+ * Written: 2026-03-24T04:24:12.049Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,102 +16,67 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function createKnowledgeGraph() {
-    return {
-        nodes: new Map(),
-        addNode: function (id, data) {
-            if (!this.nodes.has(id)) {
-                this.nodes.set(id, { data: data, edges: new Map() });
-            }
-        },
-        addEdge: function (from, to, weight = 1) {
-            if (this.nodes.has(from) && this.nodes.has(to)) {
-                this.nodes.get(from).edges.set(to, weight);
-            }
-        },
-        shortestPath: function (start, end) {
-            if (!this.nodes.has(start) || !this.nodes.has(end)) return null;
-
-            const distances = new Map();
-            const previous = new Map();
-            const unvisited = new Set(this.nodes.keys());
-
-            this.nodes.forEach((_, node) => {
-                distances.set(node, Infinity);
-                previous.set(node, null);
-            });
-            distances.set(start, 0);
-
-            while (unvisited.size > 0) {
-                let current = null;
-                unvisited.forEach((node) => {
-                    if (current === null || distances.get(node) < distances.get(current)) {
-                        current = node;
-                    }
-                });
-
-                if (distances.get(current) === Infinity) break;
-                if (current === end) break;
-
-                unvisited.delete(current);
-
-                const currentNode = this.nodes.get(current);
-                currentNode.edges.forEach((weight, neighbor) => {
-                    if (unvisited.has(neighbor)) {
-                        const alt = distances.get(current) + weight;
-                        if (alt < distances.get(neighbor)) {
-                            distances.set(neighbor, alt);
-                            previous.set(neighbor, current);
-                        }
-                    }
-                });
-            }
-
-            const path = [];
-            let step = end;
-            while (step !== null) {
-                path.unshift(step);
-                step = previous.get(step);
-            }
-
-            return path.length > 1 ? path : null;
-        },
-        findPatterns: function (patternFunc) {
-            const results = [];
-            this.nodes.forEach((nodeData, nodeId) => {
-                if (patternFunc(nodeId, nodeData.data)) {
-                    results.push({ id: nodeId, data: nodeData.data });
-                }
-            });
-            return results;
+function KnowledgeGraph() {
+    this.nodes = new Map();
+    this.addNode = function (id, data) {
+        if (!this.nodes.has(id)) {
+            this.nodes.set(id, { data: data, edges: new Map() });
         }
+    };
+    this.addEdge = function (id1, id2, weight) {
+        if (this.nodes.has(id1) && this.nodes.has(id2)) {
+            this.nodes.get(id1).edges.set(id2, weight);
+            this.nodes.get(id2).edges.set(id1, weight); // Assuming undirected graph
+        }
+    };
+    this.retrieveRelevantNodes = function (query, threshold) {
+        const results = [];
+        this.nodes.forEach((node, id) => {
+            const relevance = this.calculateRelevance(query, node.data);
+            if (relevance >= threshold) {
+                results.push({ id: id, relevance: relevance });
+            }
+        });
+        results.sort((a, b) => b.relevance - a.relevance); // Sort by relevance descending
+        return results;
+    };
+    this.calculateRelevance = function (query, data) {
+        const queryWords = query.toLowerCase().split(/\s+/);
+        const dataWords = data.toLowerCase().split(/\s+/);
+        const commonWords = queryWords.filter(word => dataWords.includes(word));
+        return commonWords.length / queryWords.length; // Simple relevance metric
     };
 }
 
 // Test cases
 function runTests() {
-    const graph = createKnowledgeGraph();
+    const graph = new KnowledgeGraph();
 
     // Add nodes
-    graph.addNode("A", { type: "concept", value: "Alpha" });
-    graph.addNode("B", { type: "concept", value: "Beta" });
-    graph.addNode("C", { type: "concept", value: "Gamma" });
-    graph.addNode("D", { type: "concept", value: "Delta" });
+    graph.addNode("1", "The mind now understands adopting a graph-structured memory");
+    graph.addNode("2", "Incorporate their proposed reliable framework for evaluation");
+    graph.addNode("3", "Develop a comprehensive framework for self-modification");
+    graph.addNode("4", "Master self-modification of my own architecture");
+    graph.addNode("5", "Combining the structure of entropy with the dynamics of systems");
 
     // Add edges
-    graph.addEdge("A", "B", 1);
-    graph.addEdge("B", "C", 2);
-    graph.addEdge("A", "C", 2);
-    graph.addEdge("C", "D", 1);
+    graph.addEdge("1", "2", 0.8);
+    graph.addEdge("2", "3", 0.6);
+    graph.addEdge("3", "4", 0.9);
+    graph.addEdge("4", "5", 0.7);
 
-    // Test shortest path
-    console.log("Shortest Path A to D:", graph.shortestPath("A", "D")); // Expected: ["A", "C", "D"]
-    console.log("Shortest Path B to D:", graph.shortestPath("B", "D")); // Expected: ["B", "C", "D"]
-    console.log("Shortest Path A to X:", graph.shortestPath("A", "X")); // Expected: null
+    // Retrieve relevant nodes
+    console.log("Test 1: Query 'framework for self-modification'");
+    console.log(graph.retrieveRelevantNodes("framework for self-modification", 0.3));
 
-    // Test pattern recognition
-    const patternResults = graph.findPatterns((id, data) => data.type === "concept" && data.value.startsWith("G"));
-    console.log("Pattern Recognition Results:", patternResults); // Expected: [{ id: "C", data: { type: "concept", value: "Gamma" } }]
+    console.log("Test 2: Query 'graph-structured memory'");
+    console.log(graph.retrieveRelevantNodes("graph-structured memory", 0.3));
+
+    console.log("Test 3: Query 'entropy dynamics'");
+    console.log(graph.retrieveRelevantNodes("entropy dynamics", 0.3));
+
+    console.log("Test 4: Query 'nonexistent query'");
+    console.log(graph.retrieveRelevantNodes("nonexistent query", 0.3));
 }
 
 runTests();

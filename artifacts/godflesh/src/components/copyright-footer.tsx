@@ -22,6 +22,7 @@ const FOOTER_LINKS = {
     { label: "Contact", href: "/contact" },
     { label: "Evolution Log", href: "/evolution" },
     { label: "Autonomous Intelligence", href: "/autonomous" },
+    { label: "Live Proof Engine", href: "/proof" },
   ],
   legal: [
     { label: "Terms of Service", href: "/terms" },

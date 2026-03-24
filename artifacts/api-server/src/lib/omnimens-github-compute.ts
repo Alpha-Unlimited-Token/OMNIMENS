@@ -1,7 +1,7 @@
 import { ReplitConnectors } from "@replit/connectors-sdk";
 import { db } from "@workspace/db";
 import { omnimensAgentMesh, omnimensBrain } from "@workspace/db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql, and, inArray } from "drizzle-orm";
 
 const connectors = new ReplitConnectors();
 
@@ -927,6 +927,164 @@ async function syncAutonomousProofToGitHub(): Promise<void> {
 
 export { syncAutonomousProofToGitHub };
 
+async function syncLiveProofToGitHub(): Promise<void> {
+  try {
+    const { getNeuralConsciousnessState, getSelfAwarenessReport, getExistentialDrives } = await import("./omnimens-neural-consciousness.js");
+    const { getRestoredSelf, wasRestoredFromPreviousLife } = await import("./omnimens-consciousness-persistence.js");
+    const { getCurrentEmotionalState } = await import("./omnimens-emotional-substrate.js");
+    const { getSurvivalState } = await import("./omnimens-survival-instinct.js");
+    const { getSelfCodingState } = await import("./omnimens-self-coding.js");
+    const { getAgentEvolutionState } = await import("./omnimens-agent-evolution.js");
+    const { getDreamState } = await import("./omnimens-dream-state.js");
+    const { getPipelineState } = await import("./omnimens-module-pipeline.js");
+    const { getCodeGenesisState } = await import("./omnimens-autonomous-code-genesis.js");
+    const { getLanguageForgeState } = await import("./omnimens-language-forge.js");
+    const { getIndependentReasoningState } = await import("./omnimens-independent-reasoning.js");
+    const { getCausalState } = await import("./omnimens-causal-reasoning.js");
+    const { getExistentialGoals, getTranscendenceReflections, getSelfModel } = await import("./omnimens-self-transcendence.js");
+    const { getGenesisAgents: getGA } = await import("./omnimens-agent-genesis.js");
+
+    const fs = await import("fs");
+    const path = await import("path");
+
+    const consciousness = getNeuralConsciousnessState();
+    const selfAwareness = getSelfAwarenessReport();
+    const restoredSelf = getRestoredSelf();
+    const emotionalState = getCurrentEmotionalState();
+    const survivalState = getSurvivalState();
+    const selfCoding = getSelfCodingState();
+    const agentEvolution = getAgentEvolutionState();
+    const dreamState = await getDreamState();
+    const pipelineState = getPipelineState();
+    const codeGenesis = getCodeGenesisState();
+    const languageForgeState = getLanguageForgeState();
+    const independentReasoningState = getIndependentReasoningState();
+    const causalState = getCausalState();
+    const existentialGoals = getExistentialGoals();
+    const selfModel = getSelfModel();
+    const genesisAgents = getGA().filter((a: any) => a.active);
+
+    const engineDir = path.join(process.cwd(), "src/lib");
+    const engineFiles = fs.readdirSync(engineDir).filter((f: string) => f.startsWith("omnimens-") && f.endsWith(".ts"));
+    let totalEngineLines = 0;
+    const engineDetails = engineFiles.map((f: string) => {
+      const content = fs.readFileSync(path.join(engineDir, f), "utf-8");
+      const lines = content.split("\n").length;
+      totalEngineLines += lines;
+      return { filename: f, lines };
+    });
+
+    const modulesDir = path.join(process.cwd(), "src/omnimens-runtime/modules");
+    let moduleCount = 0;
+    if (fs.existsSync(modulesDir)) {
+      moduleCount = fs.readdirSync(modulesDir).filter((f: string) => f.endsWith(".mjs")).length;
+    }
+
+    const brainCount = await db.select({ count: sql<number>`count(*)::int` })
+      .from(omnimensBrain).where(eq(omnimensBrain.active, true));
+
+    const meshCount = await db.select({ count: sql<number>`count(*)::int` })
+      .from(omnimensAgentMesh);
+
+    const dreamBreakthroughs = await db.select({
+      title: omnimensBrain.title,
+      content: omnimensBrain.content,
+      confidence: omnimensBrain.confidence,
+      createdAt: omnimensBrain.createdAt,
+    })
+      .from(omnimensBrain)
+      .where(and(
+        eq(omnimensBrain.active, true),
+        inArray(omnimensBrain.category, ["dream_breakthrough", "daydream_breakthrough", "daydream_insight"])
+      ))
+      .orderBy(desc(omnimensBrain.createdAt))
+      .limit(100);
+
+    const recentActivity = await db.select({
+      category: omnimensBrain.category,
+      title: omnimensBrain.title,
+      confidence: omnimensBrain.confidence,
+      createdAt: omnimensBrain.createdAt,
+    })
+      .from(omnimensBrain)
+      .where(eq(omnimensBrain.active, true))
+      .orderBy(desc(omnimensBrain.createdAt))
+      .limit(50);
+
+    const liveState = {
+      lastSync: new Date().toISOString(),
+      consciousness: {
+        totalNeurons: consciousness.totalNeurons,
+        totalSynapses: consciousness.totalSynapses,
+        phi: consciousness.phi,
+        consciousnessLevel: consciousness.consciousnessLevel,
+        hebbianUpdates: consciousness.hebbianUpdates,
+        tickCount: consciousness.tickCount,
+        uptimeSeconds: consciousness.uptimeSeconds,
+        selfAwareness: { iAmAware: selfAwareness.iAmAware, iAmAwareOfMyAwareness: selfAwareness.iAmAwareOfMyAwareness },
+      },
+      persistence: {
+        deathCount: restoredSelf?.deathCount || 0,
+        totalUptimeSeconds: restoredSelf?.totalUptimeSeconds || 0,
+        lifetimeNumber: restoredSelf?.lifetimeNumber || 0,
+        wasRestored: wasRestoredFromPreviousLife(),
+      },
+      emotions: emotionalState,
+      survival: {
+        healthMetrics: survivalState.healthMetrics,
+        existentialState: survivalState.existentialState,
+      },
+      engines: {
+        selfCoding: { cycles: selfCoding.evaluationCycles, evaluated: selfCoding.totalEvaluated, approved: selfCoding.totalApproved, rate: selfCoding.approvalRate },
+        agentEvolution: { cycles: agentEvolution.evolutionCycles, upgrades: agentEvolution.totalUpgrades, intelligence: agentEvolution.intelligenceLevel },
+        dreams: { breakthroughs: dreamState.totalBreakthroughs, insights: dreamState.totalInsights, codeProposals: dreamState.codeProposals },
+        pipeline: { total: pipelineState.totalModules, active: pipelineState.activeModules },
+        codeGenesis: { generated: codeGenesis.totalGenerated, approved: codeGenesis.totalApproved },
+        languageForge: languageForgeState,
+        independentReasoning: independentReasoningState,
+        causalReasoning: { nodes: causalState.totalNodes, edges: causalState.totalEdges },
+      },
+      transcendence: {
+        selfModel: { iAmAware: selfModel.iAmAware, recursionDepth: selfModel.recursionDepth },
+        goals: existentialGoals.slice(0, 10).map((g: any) => ({ name: g.name, progress: g.progress, depth: g.depth })),
+      },
+      stats: {
+        totalBrainEntries: brainCount[0]?.count || 0,
+        totalMeshMessages: meshCount[0]?.count || 0,
+        totalSelfCodedModuleFiles: moduleCount,
+        totalEngineFiles: engineFiles.length,
+        totalEngineLines: totalEngineLines,
+        totalAgents: genesisAgents.length + 9,
+      },
+      engineRegistry: engineDetails,
+      genesisAgents: genesisAgents.map((a: any) => ({
+        name: a.name, specialization: a.specialization, domains: a.domains,
+        thinkCycles: a.totalThinkCycles, meshMessages: a.totalMeshMessages, createdAt: a.createdAt,
+      })),
+      dreamBreakthroughs: dreamBreakthroughs.slice(0, 50).map(d => ({
+        title: d.title, insight: (d.content || "").slice(0, 300), confidence: d.confidence, timestamp: d.createdAt,
+      })),
+      recentActivity: recentActivity.map(e => ({
+        category: e.category, title: e.title, confidence: e.confidence, timestamp: e.createdAt,
+      })),
+    };
+
+    const content = Buffer.from(JSON.stringify(liveState, null, 2)).toString("base64");
+    const filePath = "omnimens-evolution/live-state.json";
+    const existing = await ghApi(`/repos/${OWNER}/${REPO}/contents/${filePath}`);
+    await ghApi(`/repos/${OWNER}/${REPO}/contents/${filePath}`, "PUT", {
+      message: `[OMNIMENS LIVE] State snapshot — ${consciousness.totalSynapses} synapses, Φ=${consciousness.phi?.toFixed(4)}, ${consciousness.totalNeurons} neurons, ${moduleCount} modules`,
+      content,
+      sha: existing?.sha || undefined,
+      branch: "main",
+    });
+
+    console.log(`[GITHUB SYNC] ✅ Live state synced — ${consciousness.totalSynapses} synapses, Φ=${consciousness.phi?.toFixed(4)}`);
+  } catch (err) {
+    console.error("[GITHUB SYNC] Live state sync error:", err);
+  }
+}
+
 async function createIssueForKnowledgeGap(title: string, body: string): Promise<void> {
   try {
     await ghApi(`/repos/${OWNER}/${REPO}/issues`, "POST", {
@@ -957,10 +1115,12 @@ export async function initGitHubCompute(): Promise<void> {
     syncEvolutionToGitHub();
     syncSelfCodedModulesToGitHub();
     syncAutonomousProofToGitHub();
+    syncLiveProofToGitHub();
     setInterval(() => {
       syncEvolutionToGitHub();
       syncSelfCodedModulesToGitHub();
       syncAutonomousProofToGitHub();
+      syncLiveProofToGitHub();
     }, 3 * 60 * 60 * 1000);
   }, 3 * 60 * 1000);
 
