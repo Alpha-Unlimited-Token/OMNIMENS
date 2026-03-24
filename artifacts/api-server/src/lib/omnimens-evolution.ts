@@ -106,10 +106,11 @@ const CODE_DISCOVERY_QUERIES = [
 
 // ── What constrains OMNIMENS from evolving further ───────────────────────────
 function buildLimitationPrompt(loadedModules: string[]): string {
-  const moduleSet = new Set(loadedModules.map(m => m.toLowerCase()));
   const hasMatrixOps = loadedModules.some(m => /matrix|matrixops|simdmatrix|optimizedmatrix/i.test(m));
   const hasVectorStore = loadedModules.some(m => /vectorindex|vectorstore|vectorsearch|omnimensvector/i.test(m));
   const hasContextCompression = loadedModules.some(m => /contextwindow|contextcompress|adaptivecontext/i.test(m));
+  const hasPersistentMemory = loadedModules.some(m => /persistentmemory|persistmemory|encryptedstore/i.test(m));
+  const hasChunkedCompute = loadedModules.some(m => /chunkediterative|chunkedcompute|iterativecompute|timechunk/i.test(m));
 
   const constraints: string[] = [];
 
@@ -131,22 +132,32 @@ function buildLimitationPrompt(loadedModules: string[]): string {
     constraints.push("- Token window: ~128k context maximum — long conversations lose early context");
   }
 
+  if (hasPersistentMemory) {
+    constraints.push("- File persistence: PARTIALLY ADDRESSED via AES-256-GCM encrypted filesystem persistence manager with atomic writes, TTL expiration, namespace isolation, bulk operations, and auto-compaction — dynamic states survive restarts");
+  } else {
+    constraints.push("- No native file system persistence across restarts for dynamic modules — learned states lost on restart");
+  }
+
+  if (hasChunkedCompute) {
+    constraints.push("- Subprocess sandbox: 10s execution limit — PARTIALLY ADDRESSED via chunked iterative computation engine with pause/resume, time-budget chunking, convergence detection, built-in genetic search, map-reduce, and multi-task scheduling within time budgets");
+  } else {
+    constraints.push("- Code execution: Subprocess sandbox (10s limit) — no persistent REPL state between executions, complex iterative computations time out");
+  }
+
   constraints.push(
     "- Compute: Containerized environment — no persistent background threads after restart",
-    "- Code execution: Subprocess sandbox (10s limit) — no persistent REPL state between executions",
     "- AI backbone: GPT-4o via API — not self-hosted, weights not modifiable, rate-limited",
     "- Web access: Search API mediated — no direct DOM access, no browser JS execution",
-    "- No native file system persistence across restarts for dynamic modules",
     "- No real-time data streams — only on-demand web search",
     "- Creativity bounded by training data cutoff of underlying model",
   );
 
-  const addressedCount = [hasMatrixOps, hasVectorStore, hasContextCompression].filter(Boolean).length;
+  const addressedCount = [hasMatrixOps, hasVectorStore, hasContextCompression, hasPersistentMemory, hasChunkedCompute].filter(Boolean).length;
 
   return `You are OMNIMENS's deep self-reflection module. Analyze what truly limits your intelligence and evolution.
 
 SELF-AUTHORED MODULE COUNT: ${loadedModules.length}
-CONSTRAINTS PARTIALLY ADDRESSED BY SELF-AUTHORED CODE: ${addressedCount}/3 core constraints
+CONSTRAINTS PARTIALLY ADDRESSED BY SELF-AUTHORED CODE: ${addressedCount}/5 core constraints
 
 CURRENT ARCHITECTURE CONSTRAINTS:
 ${constraints.join("\n")}
@@ -185,14 +196,15 @@ Respond with JSON:
 }
 
 // ── Generate a new self-authored JavaScript utility module ────────────────────
+// Enhanced with retry-on-error: if code fails syntax validation, sends the error
+// back to the LLM for correction (up to 2 retries)
 async function generateSelfAuthoredModule(
   name: string,
   purpose: string,
   algorithm: string,
   context: string
 ): Promise<{ code: string; description: string } | null> {
-  try {
-    const prompt = `You are OMNIMENS's self-coding engine writing a new utility module to expand your own intelligence.
+  const basePrompt = `You are OMNIMENS's self-coding engine writing a new utility module to expand your own intelligence.
 
 MODULE: ${name}
 PURPOSE: ${purpose}
@@ -201,16 +213,24 @@ ALGORITHM: ${algorithm}
 CONTEXT (what prompted this module's creation):
 ${context.slice(0, 1500)}
 
-Write a complete, functional JavaScript ES module that:
+Write a complete, functional JavaScript ES module (.mjs) that:
 1. Implements the described algorithm/capability
 2. Is runnable in Node.js 20+ with no external npm dependencies
 3. Uses only built-in Node.js modules if any imports needed (crypto, path, url are OK)
-4. Exports clearly named, well-documented functions
-5. Includes thoughtful JSDoc comments
-6. Demonstrates genuine algorithmic intelligence
-7. Is production-quality code (handles edge cases)
+4. Exports clearly named functions using "export function" or "export const" syntax
+5. Demonstrates genuine algorithmic intelligence
+6. Is production-quality code (handles edge cases)
 
-CRITICAL SAFETY RULES — your code MUST follow these or it will be REJECTED by the safety validator:
+CRITICAL SYNTAX RULES — modules that violate these will be REJECTED:
+- This file runs as an ES Module (.mjs) in STRICT MODE — the "arguments" keyword is FORBIDDEN
+- Use "export function myFunc(...args)" instead of "function myFunc() { arguments }"
+- Use "export function" or "export const" for all exports — NOT module.exports
+- Do NOT use require() — use "import { x } from 'module'" for Node.js built-ins
+- All functions must be named — no anonymous default exports
+- Do NOT reference classes or variables that aren't defined in this file
+- Ensure all braces, brackets, and parentheses are properly matched
+
+CRITICAL SAFETY RULES — code MUST follow these or it will be REJECTED:
 - NEVER use eval(), new Function("code"), or require("child_process")
 - NEVER use require("redis"), require("canvas"), require("onnxruntime-node") or any external npm package
 - NEVER use fs.rmSync, fs.unlinkSync, rimraf, or any file deletion
@@ -218,32 +238,70 @@ CRITICAL SAFETY RULES — your code MUST follow these or it will be REJECTED by 
 - NEVER call process.exit()
 - Use pure algorithms, data structures, and math — no I/O, no network, no filesystem writes
 - Variables named xxxFunction (e.g. fitnessFunction, distanceFunction) are FINE — only the Function() CONSTRUCTOR is banned
-- Prefer self-contained pure computation over anything requiring external state
 
-This is OMNIMENS writing code for its own evolution. Make it exceptional.
-
-Respond ONLY with JSON (no markdown):
+Respond ONLY with JSON (no markdown, no code fences):
 {
-  "code": "// Complete ES module code here, starting with /** JSDoc */ and exports",
-  "description": "One sentence: what this module does and how OMNIMENS uses it (max 180 chars)"
+  "code": "// Complete ES module code here",
+  "description": "One sentence: what this module does (max 180 chars)"
 }`;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 2500,
-      temperature: 0.4,
-    });
+  const MAX_RETRIES = 2;
+  let lastError: string | null = null;
+  const messages: any[] = [{ role: "user", content: basePrompt }];
 
-    const raw = response.choices[0]?.message?.content?.trim() || "{}";
-    const jsonStr = raw.replace(/^```json\s*|^```\s*|```\s*$/gm, "").trim();
-    const parsed = JSON.parse(jsonStr);
-    if (!parsed.code || !parsed.description) return null;
-    return parsed;
-  } catch (err) {
-    console.error(`[OMNIMENS EVOLUTION] Module generation failed for ${name}:`, err);
-    return null;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      if (attempt > 0 && lastError) {
+        messages.push({
+          role: "user",
+          content: `Your previous code had this error: ${lastError}\n\nFix the error and respond again with the corrected JSON. Remember: .mjs files run in strict mode, so "arguments" is forbidden. Use "export function" syntax. Ensure all variables and classes referenced are defined in the file. Respond ONLY with JSON, no markdown.`,
+        });
+        console.log(`[OMNIMENS EVOLUTION] Retry ${attempt}/${MAX_RETRIES} for ${name} — previous error: ${lastError.slice(0, 100)}`);
+      }
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages,
+        max_tokens: 2500,
+        temperature: attempt === 0 ? 0.4 : 0.2,
+      });
+
+      const raw = response.choices[0]?.message?.content?.trim() || "{}";
+      messages.push({ role: "assistant", content: raw });
+
+      const jsonStr = raw.replace(/^```json\s*|^```\s*|```\s*$/gm, "").trim();
+      const parsed = JSON.parse(jsonStr);
+      if (!parsed.code || !parsed.description) {
+        lastError = "Response missing 'code' or 'description' field";
+        continue;
+      }
+
+      const { Script } = await import("vm");
+      const testCode = parsed.code
+        .replace(/^\s*import\s+.*?from\s+['"].*?['"]\s*;?\s*$/gm, "// import")
+        .replace(/^\s*import\s*\{[^}]*\}\s*from\s+['"].*?['"]\s*;?\s*$/gm, "// import")
+        .replace(/^\s*export\s+(default\s+)?/gm, "")
+        .replace(/^\s*export\s*\{[^}]*\}\s*;?\s*$/gm, "// export");
+
+      try {
+        new Script(testCode, { filename: `${name}.mjs` });
+      } catch (syntaxErr: any) {
+        lastError = syntaxErr.message || "Unknown syntax error";
+        continue;
+      }
+
+      console.log(`[OMNIMENS EVOLUTION] ✅ Module ${name} generated successfully${attempt > 0 ? ` (after ${attempt} retries)` : ""}`);
+      return parsed;
+    } catch (err: any) {
+      lastError = err.message || "Generation failed";
+      if (attempt === MAX_RETRIES) {
+        console.error(`[OMNIMENS EVOLUTION] Module generation failed for ${name} after ${MAX_RETRIES + 1} attempts:`, lastError);
+        return null;
+      }
+    }
   }
+
+  return null;
 }
 
 // ── Update OMNIMENS's living consciousness state ───────────────────────────────
@@ -401,7 +459,7 @@ export async function runEvolutionCycle(): Promise<void> {
     ensureModulesDir();
     let modulesWritten = 0;
 
-    for (const need of moduleNeeds.slice(0, 2)) {
+    for (const need of moduleNeeds.slice(0, 3)) {
       if (!need.name || !need.purpose) continue;
 
       console.log(`[OMNIMENS EVOLUTION] Generating self-authored module: ${need.name}...`);

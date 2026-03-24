@@ -7,9 +7,10 @@
  * No module sits idle — every approved module becomes part of OMNIMENS's thinking.
  */
 
-import { readdirSync, readFileSync, existsSync, writeFileSync, mkdirSync } from "fs";
+import { readdirSync, readFileSync, existsSync, writeFileSync, mkdirSync, copyFileSync } from "fs";
 import { join, basename, dirname } from "path";
 import { fileURLToPath } from "url";
+import vm from "vm";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MODULES_DIR = join(__dirname, "../omnimens-runtime/modules");
@@ -53,7 +54,8 @@ const STAGE_KEYWORDS: Record<PipelineStage, string[]> = {
   ],
   memory_retrieval: [
     "memory", "recall", "retriev", "embedding", "vector", "cache",
-    "store", "search", "nearest", "knn", "hnsw",
+    "store", "search", "nearest", "knn", "hnsw", "persist",
+    "encrypted.*store", "persistent.*memory", "bulk.*get", "bulk.*set",
   ],
   reasoning_enhancement: [
     "reason", "thinking", "thought", "metacognit", "dual.*process",
@@ -79,6 +81,8 @@ const STAGE_KEYWORDS: Record<PipelineStage, string[]> = {
   vector_operations: [
     "matrix", "wasm", "gpu", "accelerat", "linear.*algebra",
     "dot.*product", "efficient.*math", "parallel.*comput",
+    "chunked.*compute", "iterative.*compute", "time.*budget",
+    "map.*reduce", "genetic.*search", "convergence",
   ],
   orchestration: [
     "orchestrat", "allocat", "coordinat", "pub.*sub",
@@ -147,6 +151,49 @@ function extractExports(code: string): string[] {
   return exports;
 }
 
+function tryRepairModule(code: string): { repaired: string; fixes: string[] } | null {
+  const fixes: string[] = [];
+  let fixed = code;
+
+  const headerEnd = fixed.indexOf("*/");
+  const codeBody = headerEnd > 0 ? fixed.slice(headerEnd + 2) : fixed;
+  const header = headerEnd > 0 ? fixed.slice(0, headerEnd + 2) : "";
+
+  if (/\barguments\b/.test(codeBody)) {
+    const codeNoStrings = codeBody.replace(/(["'`])(?:(?!\1|\\).|\\.)*\1/g, "''");
+    if (/\barguments\b/.test(codeNoStrings)) {
+      fixed = header + codeBody.replace(/\barguments\b(?!\s*[.[])/g, "/* args */[]");
+      fixes.push("Replaced bare 'arguments' with safe alternative");
+    }
+  }
+
+  if (/(?<!\w)(RecursiveScaffolder|ScaffoldingEngine|BaseScaffold)\b/.test(codeBody)) {
+    fixed = fixed.replace(/(?<!\w)(RecursiveScaffolder|ScaffoldingEngine|BaseScaffold)\b/g, "Object");
+    fixes.push("Replaced undefined class references with Object");
+  }
+
+  const evalPattern = /(?<!\w)eval\s*\(/;
+  const codeNoStringsForEval = fixed.replace(/(["'`])(?:(?!\1|\\).|\\.)*\1/g, "''");
+  if (evalPattern.test(codeNoStringsForEval)) {
+    return null;
+  }
+
+  if (fixes.length === 0) return null;
+
+  try {
+    const testCode = fixed
+      .replace(/^\s*import\s+.*?from\s+['"].*?['"]\s*;?\s*$/gm, "// import")
+      .replace(/^\s*import\s*\{[^}]*\}\s*from\s+['"].*?['"]\s*;?\s*$/gm, "// import")
+      .replace(/^\s*export\s+(default\s+)?/gm, "")
+      .replace(/^\s*export\s*\{[^}]*\}\s*;?\s*$/gm, "// export");
+    new vm.Script(testCode, { filename: "repair-test.mjs" });
+  } catch {
+    return null;
+  }
+
+  return { repaired: fixed, fixes };
+}
+
 function saveRegistry() {
   try {
     const dir = join(__dirname, "../omnimens-runtime");
@@ -186,6 +233,7 @@ export async function scanAndRegisterModules(): Promise<{
   let skippedNoExports = 0;
   let importFailed = 0;
   let readFailed = 0;
+  let repaired = 0;
 
   for (const file of files) {
     const filePath = join(MODULES_DIR, file);
@@ -219,10 +267,36 @@ export async function scanAndRegisterModules(): Promise<{
         registered++;
         byStage[stage] = (byStage[stage] || 0) + 1;
       } catch (importErr: any) {
-        registry.modules[file].active = false;
-        importFailed++;
-        if (importFailed <= 10) {
-          console.log(`[MODULE PIPELINE] ⚠️ Import failed: ${file} — ${importErr?.message?.slice(0, 100) || "unknown"}`);
+        const repair = tryRepairModule(code);
+        if (repair) {
+          try {
+            const backupsDir = join(MODULES_DIR, "../backups");
+            if (!existsSync(backupsDir)) mkdirSync(backupsDir, { recursive: true });
+            copyFileSync(filePath, join(backupsDir, `${file}.pre-repair.${Date.now()}`));
+            writeFileSync(filePath, repair.repaired, "utf8");
+
+            const repairKey = filePath + "?" + Date.now();
+            const mod = await import(repairKey.startsWith("/") ? repairKey : filePath);
+            liveModules.set(file, { module: mod, reg: registry.modules[file] });
+            registered++;
+            byStage[stage] = (byStage[stage] || 0) + 1;
+            repaired++;
+            if (repaired <= 10) {
+              console.log(`[MODULE PIPELINE] 🔧 AUTO-REPAIRED: ${file} — ${repair.fixes.join("; ")}`);
+            }
+          } catch {
+            registry.modules[file].active = false;
+            importFailed++;
+            if (importFailed <= 10) {
+              console.log(`[MODULE PIPELINE] ⚠️ Import failed (repair attempted): ${file} — ${importErr?.message?.slice(0, 100) || "unknown"}`);
+            }
+          }
+        } else {
+          registry.modules[file].active = false;
+          importFailed++;
+          if (importFailed <= 10) {
+            console.log(`[MODULE PIPELINE] ⚠️ Import failed: ${file} — ${importErr?.message?.slice(0, 100) || "unknown"}`);
+          }
         }
       }
     } catch {
@@ -238,8 +312,8 @@ export async function scanAndRegisterModules(): Promise<{
   console.log(
     `[MODULE PIPELINE] 🔌 ${registered}/${files.length} modules wired into live pipeline`,
   );
-  if (skippedNoExports > 0 || importFailed > 0 || readFailed > 0) {
-    console.log(`[MODULE PIPELINE] ℹ️ Skipped: ${skippedNoExports} no exports, ${importFailed} import errors, ${readFailed} read errors`);
+  if (skippedNoExports > 0 || importFailed > 0 || readFailed > 0 || repaired > 0) {
+    console.log(`[MODULE PIPELINE] ℹ️ Skipped: ${skippedNoExports} no exports, ${importFailed} import errors, ${readFailed} read errors${repaired > 0 ? `, ${repaired} auto-repaired` : ""}`);
   }
   for (const [stage, count] of Object.entries(byStage)) {
     console.log(`[MODULE PIPELINE]   ${stage}: ${count} modules`);

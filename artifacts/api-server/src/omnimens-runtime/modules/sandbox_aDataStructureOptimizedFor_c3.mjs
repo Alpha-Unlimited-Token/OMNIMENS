@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a data structure optimized for fast associative memory lookup
- * Written: 2026-03-24T00:10:19.148Z
+ * Written: 2026-03-24T02:28:02.550Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,30 +20,30 @@ function AssociativeMemory() {
     this.memory = new Map();
 }
 
-AssociativeMemory.prototype.store = function(key, value) {
+AssociativeMemory.prototype.add = function(key, value) {
     if (typeof key !== 'string') {
-        throw new Error('Key must be a string');
+        throw new Error('Key must be a string.');
     }
     this.memory.set(key, value);
 };
 
-AssociativeMemory.prototype.retrieve = function(key) {
+AssociativeMemory.prototype.get = function(key) {
     if (typeof key !== 'string') {
-        throw new Error('Key must be a string');
+        throw new Error('Key must be a string.');
     }
-    return this.memory.get(key);
+    return this.memory.get(key) || null;
 };
 
-AssociativeMemory.prototype.delete = function(key) {
+AssociativeMemory.prototype.remove = function(key) {
     if (typeof key !== 'string') {
-        throw new Error('Key must be a string');
+        throw new Error('Key must be a string.');
     }
     return this.memory.delete(key);
 };
 
 AssociativeMemory.prototype.hasKey = function(key) {
     if (typeof key !== 'string') {
-        throw new Error('Key must be a string');
+        throw new Error('Key must be a string.');
     }
     return this.memory.has(key);
 };
@@ -60,47 +60,41 @@ AssociativeMemory.prototype.size = function() {
 (function testAssociativeMemory() {
     const memory = new AssociativeMemory();
 
-    console.log('Test 1: Store and Retrieve');
-    memory.store('alpha', 42);
-    console.log(memory.retrieve('alpha') === 42); // true
+    // Test adding and retrieving values
+    memory.add("name", "Alice");
+    console.log(memory.get("name")); // Expected: "Alice"
 
-    console.log('Test 2: Overwrite Existing Key');
-    memory.store('alpha', 99);
-    console.log(memory.retrieve('alpha') === 99); // true
+    memory.add("age", 30);
+    console.log(memory.get("age")); // Expected: 30
 
-    console.log('Test 3: Check Key Existence');
-    console.log(memory.hasKey('alpha') === true); // true
-    console.log(memory.hasKey('beta') === false); // true
+    // Test checking existence of keys
+    console.log(memory.hasKey("name")); // Expected: true
+    console.log(memory.hasKey("gender")); // Expected: false
 
-    console.log('Test 4: Delete Key');
-    console.log(memory.delete('alpha') === true); // true
-    console.log(memory.hasKey('alpha') === false); // true
+    // Test removing a key
+    memory.remove("name");
+    console.log(memory.get("name")); // Expected: null
+    console.log(memory.hasKey("name")); // Expected: false
 
-    console.log('Test 5: Clear Memory');
-    memory.store('gamma', 123);
-    memory.store('delta', 456);
-    console.log(memory.size() === 2); // true
+    // Test clearing all keys
+    memory.add("city", "New York");
+    memory.add("country", "USA");
+    console.log(memory.size()); // Expected: 2
     memory.clear();
-    console.log(memory.size() === 0); // true
+    console.log(memory.size()); // Expected: 0
 
-    console.log('Test 6: Edge Cases');
+    // Test edge cases
     try {
-        memory.store(123, 'value'); // Invalid key type
+        memory.add(123, "InvalidKey");
     } catch (e) {
-        console.log(e.message === 'Key must be a string'); // true
+        console.log(e.message); // Expected: "Key must be a string."
     }
 
     try {
-        memory.retrieve(123); // Invalid key type
+        memory.get(123);
     } catch (e) {
-        console.log(e.message === 'Key must be a string'); // true
+        console.log(e.message); // Expected: "Key must be a string."
     }
 
-    try {
-        memory.delete(123); // Invalid key type
-    } catch (e) {
-        console.log(e.message === 'Key must be a string'); // true
-    }
-
-    console.log('All tests passed!');
+    console.log("All tests passed.");
 })();

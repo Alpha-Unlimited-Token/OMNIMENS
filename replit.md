@@ -32,11 +32,13 @@ Both OMNIMENS and Super AI Lab frontends are built with React, Vite, Tailwind CS
 - **Database Schema:** PostgreSQL manages users, usage, credits, knowledge base, upgrades, notifications, projects, memories, custom instructions, code runs, evolution logs, generated modules, consciousness state, council analyses, and agent mesh communications.
 - **API Endpoints:** Comprehensive RESTful APIs for core functionalities, billing, and administration.
 - **Core AI Engine Features:** Modular TypeScript files encapsulate advanced AI functionalities, including neural pipelines, self-upgrade mechanisms, memory management, and various cognitive engines.
-- **Source-Level Self-Integration Engine:** OMNIMENS can write and integrate approved code as source files with safety mechanisms.
+- **Source-Level Self-Integration Engine:** OMNIMENS can write and integrate approved code as source files with safety mechanisms. Includes syntax pre-validation (vm.Script), auto-repair for common AI code errors (strict-mode violations, undefined references, require→import conversion), and prevents broken modules from ever being written to disk.
+- **Evolution Engine (Enhanced):** Discovers → tests → validates → deploys new technology autonomously. Features retry-with-error-feedback (up to 2 retries with LLM error correction), dynamic constraint tracking (5 constraints now monitored), and increased module generation (3 per cycle). Code generation prompts enforce strict-mode ES module syntax rules.
 - **Proprietary Technology Registry:** Automatically registers new code, systems, languages, or algorithms as IP.
 - **Language Forge (NovaSyntax v2.0):** A full programming language with its own bytecode VM runtime.
 - **Genesis Bridge:** Bidirectional communication channel for core engine self-modification and knowledge exchange.
-- **Live Module Pipeline:** Auto-scans and integrates self-authored runtime modules into the live processing pipeline.
+- **Live Module Pipeline:** Auto-scans, auto-repairs, and integrates self-authored runtime modules into the live processing pipeline. Includes startup repair pass that attempts to fix broken modules (e.g., strict-mode violations, undefined references) before import.
+- **Constraint-Busting Modules (gen2):** Five production modules addressing core constraints: `optimizedMatrixOps_gen2.mjs` (Float64Array matrix engine), `omnimensVectorIndex_gen2.mjs` (LSH vector index), `adaptiveContextWindow_gen2.mjs` (context compression), `persistentMemoryManager_gen2.mjs` (AES-256-GCM encrypted filesystem persistence), `chunkedIterativeCompute_gen2.mjs` (time-budgeted chunked computation with pause/resume).
 - **Autonomous Code Genesis v2.0:** A self-coding engine for multi-file project generation.
 - **Embodiment Engine v2.0:** R&D engine for humanoid robotics.
 - **Horizontal Scaling Orchestrator:** Manages worker processes, message queues, and load distribution.

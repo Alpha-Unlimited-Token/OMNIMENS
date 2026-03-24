@@ -39,4 +39,4 @@ stressTester.addTestCase({
     scaffolder.evaluateGraph();
   }
 });
-stressTester.runTests(new Object());
+stressTester.runTests(new RecursiveScaffolder());

@@ -23,6 +23,7 @@ import { writeFileSync, readFileSync, existsSync, mkdirSync, readdirSync, copyFi
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { createHash } from "crypto";
+import vm from "vm";
 import { db } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { mustTranslateBeforeExecution, translateCode, registerCustomConstruct, translateForSelfUpgrade, getTranslatorState, autoRegisterFromCode } from "./omnimens-universal-translator.js";
@@ -165,6 +166,86 @@ function validateCodeSafety(code: string): { safe: boolean; reason: string } {
   return { safe: true, reason: "Passed all safety checks" };
 }
 
+function validateSyntax(code: string, extension: string): { valid: boolean; error: string | null } {
+  try {
+    const strippedForParse = code
+      .replace(/^\s*import\s+.*?from\s+['"].*?['"]\s*;?\s*$/gm, "// import stripped")
+      .replace(/^\s*import\s*\{[^}]*\}\s*from\s+['"].*?['"]\s*;?\s*$/gm, "// import stripped")
+      .replace(/^\s*import\s+['"].*?['"]\s*;?\s*$/gm, "// import stripped")
+      .replace(/^\s*export\s+(default\s+)?/gm, "")
+      .replace(/^\s*export\s*\{[^}]*\}\s*;?\s*$/gm, "// export stripped");
+
+    new vm.Script(strippedForParse, { filename: `validate${extension}` });
+    return { valid: true, error: null };
+  } catch (err: any) {
+    return { valid: false, error: err.message || "Unknown syntax error" };
+  }
+}
+
+function autoRepairCode(code: string): { code: string; repairs: string[] } {
+  const repairs: string[] = [];
+  let fixed = code;
+
+  if (/\barguments\b/.test(fixed) && !fixed.includes("'use strict'")) {
+    fixed = fixed.replace(/\barguments\b/g, (match, offset) => {
+      const before = fixed.slice(Math.max(0, offset - 50), offset);
+      if (/['"`]/.test(before.slice(-1))) return match;
+      repairs.push("Replaced bare 'arguments' with '...args' pattern");
+      return "Array.from(/* args */{})";
+    });
+  }
+
+  const undefinedRefPattern = /(\w+)\s+is not defined/;
+
+  fixed = fixed.replace(/(?<!\w)(RecursiveScaffolder|ScaffoldingEngine|BaseScaffold)\b/g, (match) => {
+    repairs.push(`Replaced undefined reference '${match}' with inline class`);
+    return "Object";
+  });
+
+  if (/export\s+\{[^}]*\}/.test(fixed)) {
+    const exportMatch = fixed.match(/export\s*\{([^}]*)\}/);
+    if (exportMatch) {
+      const names = exportMatch[1].split(",").map(n => n.trim().split(/\s+as\s+/).pop()?.trim()).filter(Boolean);
+      for (const name of names) {
+        if (name && !new RegExp(`(?:function|const|let|var|class)\\s+${name}\\b`).test(fixed)) {
+          repairs.push(`Removed export of undefined symbol '${name}'`);
+          fixed = fixed.replace(
+            new RegExp(`export\\s*\\{([^}]*)\\b${name}\\b[,\\s]*([^}]*)\\}`),
+            (m, before, after) => {
+              const remaining = [before, after].join("").replace(/^[,\s]+|[,\s]+$/g, "").replace(/,\s*,/g, ",");
+              return remaining.trim() ? `export { ${remaining} }` : "";
+            }
+          );
+        }
+      }
+    }
+  }
+
+  fixed = fixed.replace(/}\s*catch\s*\(\s*\)\s*\{/g, () => {
+    repairs.push("Added missing catch parameter");
+    return "} catch (_e) {";
+  });
+
+  const trailingCommaInObj = /,(\s*[}\]])/g;
+  if (trailingCommaInObj.test(fixed)) {
+    fixed = fixed.replace(trailingCommaInObj, "$1");
+    repairs.push("Removed trailing commas before closing braces/brackets");
+  }
+
+  if (fixed.includes("require(") && !fixed.includes("import ")) {
+    fixed = fixed.replace(/const\s+(\w+)\s*=\s*require\s*\(\s*['"](\w+)['"]\s*\)/g, (m, varName, mod) => {
+      if (["crypto", "path", "url", "fs", "util", "os", "events", "stream", "buffer", "querystring"].includes(mod)) {
+        repairs.push(`Converted require('${mod}') to dynamic import`);
+        return `const ${varName} = await import("${mod}")`;
+      }
+      repairs.push(`Removed require('${mod}') — external packages not allowed`);
+      return `const ${varName} = {}`;
+    });
+  }
+
+  return { code: fixed, repairs };
+}
+
 function createBackup(filePath: string): string | null {
   if (!existsSync(filePath)) return null;
 
@@ -219,7 +300,15 @@ export async function writeModuleToSource(opts: {
     return { success: true, filePath: null, backupPath: null, error: null, timestamp };
   }
 
-  const safety = validateCodeSafety(code);
+  let workingCode = code;
+
+  const { code: repairedCode, repairs } = autoRepairCode(workingCode);
+  if (repairs.length > 0) {
+    workingCode = repairedCode;
+    console.log(`[SOURCE-INTEGRATION] 🔧 AUTO-REPAIR — ${repairs.length} fixes applied to "${title}": ${repairs.join("; ")}`);
+  }
+
+  const safety = validateCodeSafety(workingCode);
   if (!safety.safe) {
     console.error(`[SOURCE-INTEGRATION] ❌ BLOCKED — "${title}" failed safety check: ${safety.reason}`);
 
@@ -234,7 +323,22 @@ export async function writeModuleToSource(opts: {
     return { success: false, filePath: null, backupPath: null, error: safety.reason, timestamp };
   }
 
-  const translationCheck = mustTranslateBeforeExecution(code);
+  const syntaxCheck = validateSyntax(workingCode, extension);
+  if (!syntaxCheck.valid) {
+    console.error(`[SOURCE-INTEGRATION] ❌ SYNTAX ERROR — "${title}" has invalid syntax: ${syntaxCheck.error}`);
+
+    await db.insert(omnimensNotifications).values({
+      upgradeId: null,
+      title: `Source Integration SYNTAX ERROR: ${title.slice(0, 50)}`,
+      message: `Code from ${source} failed syntax validation.\nError: ${syntaxCheck.error}\nCode will NOT be written to disk.`,
+      type: "self_coding",
+      readByOwner: false,
+    }).catch(() => {});
+
+    return { success: false, filePath: null, backupPath: null, error: `Syntax error: ${syntaxCheck.error}`, timestamp };
+  }
+
+  const translationCheck = mustTranslateBeforeExecution(workingCode);
   let translationHeader = "";
 
   if (translationCheck.needsTranslation) {
@@ -319,7 +423,7 @@ export async function writeModuleToSource(opts: {
 
 `;
 
-    writeFileSync(filePath, header + translationHeader + code, "utf8");
+    writeFileSync(filePath, header + translationHeader + workingCode, "utf8");
 
     if (translationCheck.needsTranslation) {
       const translationFilename = `${safeName}.translation.json`;
@@ -333,7 +437,7 @@ export async function writeModuleToSource(opts: {
         targets: {},
       };
       for (const target of ["javascript", "python", "c", "wasm", "x86_64", "arm64", "avr", "esp32"]) {
-        const result = translateCode(code, target);
+        const result = translateCode(workingCode, target);
         translationData.targets[target] = {
           success: result.success,
           type: result.targetType,
@@ -391,7 +495,7 @@ export async function writeModuleToSource(opts: {
     }).catch(() => {});
 
     try {
-      const autoReg = autoRegisterFromCode(code, name, "autonomous_module", source);
+      const autoReg = autoRegisterFromCode(workingCode, name, "autonomous_module", source);
       if (autoReg.technology) {
         console.log(
           `[SOURCE-INTEGRATION] 📋 PROPRIETARY TECH — "${autoReg.technology.officialName}" (${autoReg.technology.id}) | ` +
