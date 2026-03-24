@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: wasmComputeEngine
- * Written: 2026-03-23T04:30:24.695Z
+ * Written: 2026-03-24T23:12:06.033Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,110 +16,130 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// wasmComputeEngine.js
+// wasmComputeEngine.mjs
+
+import { createHash } from 'crypto';
 
 /**
- * @module wasmComputeEngine
- * @description Provides accelerated matrix operations using WebAssembly for computationally heavy tasks.
- * This module uses AssemblyScript-generated WebAssembly to perform numerical computations efficiently.
+ * Generates a unique hash for caching purposes.
+ * Useful for identifying WebAssembly modules or results.
+ * @param {string} input - Input string to hash.
+ * @returns {string} - SHA256 hash.
  */
+export function generateHash(input) {
+  const hash = createHash('sha256');
+  hash.update(input);
+  return hash.digest('hex');
+}
 
 /**
- * @function generateMatrixMultiplicationWasm
- * @description Generates a WebAssembly binary for matrix multiplication using AssemblyScript source code.
- * @returns {Uint8Array} A WebAssembly binary for matrix multiplication.
+ * Validates matrix dimensions for operations like multiplication.
+ * Ensures compatibility between matrices.
+ * @param {Array<Array<number>>} matrixA - First matrix.
+ * @param {Array<Array<number>>} matrixB - Second matrix.
+ * @returns {boolean} - True if matrices can be multiplied, false otherwise.
  */
-function generateMatrixMultiplicationWasm() {
-  // AssemblyScript source code for matrix multiplication
-  const assemblyScriptSource = `
-    export function multiplyMatrices(
-      a,
-      b,
-      rowsA: i32,
-      colsA: i32,
-      colsB: i32
-    ) {
-      const result = new Float64Array(rowsA * colsB);
-      for (let i = 0; i < rowsA; i++) {
-        for (let j = 0; j < colsB; j++) {
-          let sum = 0.0;
-          for (let k = 0; k < colsA; k++) {
-            sum += a[i * colsA + k] * b[k * colsB + j];
-          }
-          result[i * colsB + j] = sum;
-        }
+export function validateMatrixDimensions(matrixA, matrixB) {
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) return false;
+  if (matrixA.length === 0 || matrixB.length === 0) return false;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  return colsA === rowsB;
+}
+
+/**
+ * Multiplies two matrices using pure JavaScript.
+ * Optimized for small to medium-sized matrices.
+ * @param {Array<Array<number>>} matrixA - First matrix.
+ * @param {Array<Array<number>>} matrixB - Second matrix.
+ * @returns {Array<Array<number>>} - Resultant matrix.
+ */
+export function multiplyMatrices(matrixA, matrixB) {
+  if (!validateMatrixDimensions(matrixA, matrixB)) {
+    throw new Error('Matrix dimensions are incompatible for multiplication.');
+  }
+
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const colsB = matrixB[0].length;
+  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += matrixA[i][k] * matrixB[k][j];
       }
-      return result;
     }
-  `;
-
-  // Convert AssemblyScript source code into WebAssembly binary
-  const { compile } = require("webassembly");
-  const wasmBinary = compile(assemblyScriptSource);
-
-  return wasmBinary;
-}
-
-/**
- * @function loadWasmModule
- * @description Loads a WebAssembly module from a binary and returns its exported functions.
- * @param {Uint8Array} wasmBinary - The WebAssembly binary to load.
- * @returns {Promise} A promise resolving to the WebAssembly module's exports.
- */
-async function loadWasmModule(wasmBinary) {
-  const wasmModule = await WebAssembly.instantiate(wasmBinary);
-  return wasmModule.instance.exports;
-}
-
-/**
- * @function matrixMultiply
- * @description Multiplies two matrices using WebAssembly.
- * @param {Float64Array} matrixA - The first matrix (flattened).
- * @param {Float64Array} matrixB - The second matrix (flattened).
- * @param {number} rowsA - Number of rows in matrixA.
- * @param {number} colsA - Number of columns in matrixA.
- * @param {number} colsB - Number of columns in matrixB.
- * @returns {Promise} A promise resolving to the result matrix (flattened).
- */
-async function matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
-  const wasmBinary = generateMatrixMultiplicationWasm();
-  const wasmExports = await loadWasmModule(wasmBinary);
-
-  if (!wasmExports.multiplyMatrices) {
-    throw new Error("WebAssembly module does not export multiplyMatrices function.");
   }
 
-  return wasmExports.multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB);
+  return result;
 }
 
 /**
- * @function validateMatrixDimensions
- * @description Validates matrix dimensions for multiplication compatibility.
- * @param {number} rowsA - Number of rows in matrixA.
- * @param {number} colsA - Number of columns in matrixA.
- * @param {number} rowsB - Number of rows in matrixB.
- * @param {number} colsB - Number of columns in matrixB.
- * @throws {Error} If matrices cannot be multiplied due to incompatible dimensions.
+ * Generates a WebAssembly-compatible memory buffer for input data.
+ * Converts a flat array of numbers into a Float64Array for WASM.
+ * @param {Array<number>} data - Flat array of numbers.
+ * @returns {Float64Array} - Typed array for WASM.
  */
-function validateMatrixDimensions(rowsA, colsA, rowsB, colsB) {
-  if (colsA !== rowsB) {
-    throw new Error("Matrix dimensions are incompatible for multiplication.");
+export function createWasmBuffer(data) {
+  if (!Array.isArray(data)) {
+    throw new Error('Input data must be an array of numbers.');
   }
+
+  return new Float64Array(data);
 }
 
 /**
- * @function multiply
- * @description Public interface for matrix multiplication.
- * @param {Float64Array} matrixA - The first matrix (flattened).
- * @param {Float64Array} matrixB - The second matrix (flattened).
- * @param {number} rowsA - Number of rows in matrixA.
- * @param {number} colsA - Number of columns in matrixA.
- * @param {number} colsB - Number of columns in matrixB.
- * @returns {Promise} A promise resolving to the result matrix (flattened).
+ * Placeholder function for WebAssembly integration.
+ * Simulates offloading computation to WASM (to be implemented).
+ * @param {Array<Array<number>>} matrixA - First matrix.
+ * @param {Array<Array<number>>} matrixB - Second matrix.
+ * @returns {Array<Array<number>>} - Resultant matrix (mocked).
  */
-async function multiply(matrixA, matrixB, rowsA, colsA, colsB) {
-  validateMatrixDimensions(rowsA, colsA, matrixB.length / colsB, colsB);
-  return matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB);
+export function wasmMatrixMultiply(matrixA, matrixB) {
+  // Future implementation will involve compiling optimized libraries to WASM.
+  // For now, fallback to pure JavaScript multiplication.
+  return multiplyMatrices(matrixA, matrixB);
 }
 
-export { multiply };
+/**
+ * Utility function for transposing a matrix.
+ * Useful for various linear algebra operations.
+ * @param {Array<Array<number>>} matrix - Matrix to transpose.
+ * @returns {Array<Array<number>>} - Transposed matrix.
+ */
+export function transposeMatrix(matrix) {
+  if (!Array.isArray(matrix) || matrix.length === 0) {
+    throw new Error('Input must be a non-empty matrix.');
+  }
+
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const transposed = Array.from({ length: cols }, () => Array(rows).fill(0));
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      transposed[j][i] = matrix[i][j];
+    }
+  }
+
+  return transposed;
+}
+
+/**
+ * Utility function for generating an identity matrix.
+ * Useful for testing and linear algebra operations.
+ * @param {number} size - Size of the identity matrix.
+ * @returns {Array<Array<number>>} - Identity matrix.
+ */
+export function generateIdentityMatrix(size) {
+  if (size <= 0 || !Number.isInteger(size)) {
+    throw new Error('Size must be a positive integer.');
+  }
+
+  const identity = Array.from({ length: size }, (_, i) => {
+    return Array.from({ length: size }, (_, j) => (i === j ? 1 : 0));
+  });
+
+  return identity;
+}

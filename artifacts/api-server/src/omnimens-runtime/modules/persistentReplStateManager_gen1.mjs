@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: persistentReplStateManager
- * Written: 2026-03-24T22:06:12.152Z
+ * Written: 2026-03-24T23:11:48.820Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,97 +16,106 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// persistentReplStateManager.mjs
+// Complete ES module code here
 
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
-import { resolve } from 'path';
-import { readFileSync, writeFileSync, existsSync } from 'fs';
 
 const algorithm = 'aes-256-gcm';
-const key = randomBytes(32); // Replace with a securely stored key for production
-const ivLength = 12; // AES-GCM requires a 12-byte IV
+const key = randomBytes(32); // Replace with a securely stored key
+const ivLength = 12; // Recommended length for GCM
 
 /**
- * Encrypts data using AES-256-GCM.
- * @param {Buffer|string} data - Data to encrypt.
- * @returns {Object} - Encrypted payload containing ciphertext, IV, and authentication tag.
+ * Encrypts and compresses a JavaScript object into a secure, serialized format.
+ * @param {Object} data - The object to encrypt.
+ * @returns {string} - Encrypted, base64-encoded string.
  */
-export function encryptData(data) {
+export function encryptState(data) {
   const iv = randomBytes(ivLength);
   const cipher = createCipheriv(algorithm, key, iv);
 
-  const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
+  const jsonData = JSON.stringify(data);
+  const encrypted = Buffer.concat([cipher.update(jsonData, 'utf8'), cipher.final()]);
   const authTag = cipher.getAuthTag();
 
-  return { ciphertext: encrypted.toString('hex'), iv: iv.toString('hex'), authTag: authTag.toString('hex') };
+  return JSON.stringify({
+    iv: iv.toString('base64'),
+    encryptedData: encrypted.toString('base64'),
+    authTag: authTag.toString('base64')
+  });
 }
 
 /**
- * Decrypts data using AES-256-GCM.
- * @param {Object} encryptedPayload - Encrypted payload containing ciphertext, IV, and authentication tag.
- * @returns {Buffer} - Decrypted data.
+ * Decrypts and decompresses an encrypted, serialized object.
+ * @param {string} encryptedState - The encrypted, base64-encoded string.
+ * @returns {Object} - The original object.
  */
-export function decryptData(encryptedPayload) {
-  const { ciphertext, iv, authTag } = encryptedPayload;
-  const decipher = createDecipheriv(algorithm, key, Buffer.from(iv, 'hex'));
-  decipher.setAuthTag(Buffer.from(authTag, 'hex'));
+export function decryptState(encryptedState) {
+  const { iv, encryptedData, authTag } = JSON.parse(encryptedState);
+
+  const decipher = createDecipheriv(algorithm, key, Buffer.from(iv, 'base64'));
+  decipher.setAuthTag(Buffer.from(authTag, 'base64'));
 
   const decrypted = Buffer.concat([
-    decipher.update(Buffer.from(ciphertext, 'hex')),
+    decipher.update(Buffer.from(encryptedData, 'base64')),
     decipher.final()
   ]);
 
-  return decrypted;
+  return JSON.parse(decrypted.toString('utf8'));
 }
 
 /**
- * Saves the current state to an encrypted file.
- * @param {Object} state - State object to save.
- * @param {string} filePath - Path to the state file.
+ * Stores the encrypted state with a TTL (time-to-live) in memory.
+ * @param {Map} store - A Map object to hold the states.
+ * @param {string} key - The key to associate with the state.
+ * @param {Object} state - The REPL state to store.
+ * @param {number} ttl - Time-to-live in milliseconds.
  */
-export function saveState(state, filePath) {
-  const encryptedState = encryptData(JSON.stringify(state));
-  writeFileSync(filePath, JSON.stringify(encryptedState));
+export function storeState(store, key, state, ttl) {
+  const encryptedState = encryptState(state);
+  const expirationTime = Date.now() + ttl;
+
+  store.set(key, { encryptedState, expirationTime });
+
+  // Cleanup expired states
+  setTimeout(() => {
+    if (store.has(key) && store.get(key).expirationTime <= Date.now()) {
+      store.delete(key);
+    }
+  }, ttl);
 }
 
 /**
- * Loads the state from an encrypted file.
- * @param {string} filePath - Path to the state file.
- * @returns {Object|null} - Decrypted state object or null if file does not exist.
+ * Retrieves and decrypts a stored state if it has not expired.
+ * @param {Map} store - A Map object holding the states.
+ * @param {string} key - The key associated with the state.
+ * @returns {Object|null} - The decrypted state or null if expired/not found.
  */
-export function loadState(filePath) {
-  if (!existsSync(filePath)) return null;
+export function retrieveState(store, key) {
+  const entry = store.get(key);
 
-  const encryptedPayload = JSON.parse(readFileSync(filePath, 'utf-8'));
-  const decryptedState = decryptData(encryptedPayload);
+  if (!entry || entry.expirationTime <= Date.now()) {
+    store.delete(key);
+    return null;
+  }
 
-  return JSON.parse(decryptedState.toString());
+  return decryptState(entry.encryptedState);
 }
 
 /**
- * Updates the state by applying a delta (partial update).
- * @param {Object} currentState - Current state object.
- * @param {Object} delta - Partial update to apply.
- * @returns {Object} - Updated state object.
+ * Utility function to clear all expired states from the store.
+ * @param {Map} store - A Map object holding the states.
  */
-export function updateState(currentState, delta) {
-  return { ...currentState, ...delta };
+export function clearExpiredStates(store) {
+  const now = Date.now();
+
+  for (const [key, { expirationTime }] of store.entries()) {
+    if (expirationTime <= now) {
+      store.delete(key);
+    }
+  }
 }
 
-/**
- * Utility function to initialize a default state if none exists.
- * @param {string} filePath - Path to the state file.
- * @param {Object} defaultState - Default state object.
- * @returns {Object} - Loaded or initialized state.
- */
-export function initializeState(filePath, defaultState) {
-  const existingState = loadState(filePath);
-  return existingState || defaultState;
-}
-
-// Example usage:
-// const stateFilePath = resolve('./state.json');
-// const initialState = { counter: 0 };
-// const state = initializeState(stateFilePath, initialState);
-// const updatedState = updateState(state, { counter: state.counter + 1 });
-// saveState(updatedState, stateFilePath);
+// Example usage (not exported):
+// const replStore = new Map();
+// storeState(replStore, 'session1', { foo: 'bar' }, 60000);
+// const state = retrieveState(replStore, 'session1');

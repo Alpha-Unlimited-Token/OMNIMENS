@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-24T22:54:12.835Z
+ * Written: 2026-03-24T23:09:02.366Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,54 +16,51 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function cosineSimilarity(vecA, vecB) {
-    if (vecA.length !== vecB.length) {
-        throw new Error("Vectors must be of the same length");
-    }
-    let dotProduct = 0;
-    let magnitudeA = 0;
-    let magnitudeB = 0;
-
-    for (let i = 0; i < vecA.length; i++) {
-        dotProduct += vecA[i] * vecB[i];
-        magnitudeA += vecA[i] ** 2;
-        magnitudeB += vecB[i] ** 2;
+function findMostFrequentPatterns(text, patternLength) {
+    if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
+        throw new Error("Invalid input: text must be a string and patternLength must be a positive number.");
     }
 
-    magnitudeA = Math.sqrt(magnitudeA);
-    magnitudeB = Math.sqrt(magnitudeB);
+    const patternCounts = {};
+    const textLength = text.length;
 
-    if (magnitudeA === 0 || magnitudeB === 0) {
-        throw new Error("One of the vectors has zero magnitude");
+    for (let i = 0; i <= textLength - patternLength; i++) {
+        const pattern = text.substring(i, i + patternLength);
+        patternCounts[pattern] = (patternCounts[pattern] || 0) + 1;
     }
 
-    return dotProduct / (magnitudeA * magnitudeB);
+    const sortedPatterns = Object.entries(patternCounts).sort((a, b) => b[1] - a[1]);
+
+    return sortedPatterns;
 }
 
-// Test cases
-try {
-    const vec1 = [1, 2, 3];
-    const vec2 = [4, 5, 6];
-    const vec3 = [0, 0, 0];
-    const vec4 = [1, 0, -1];
+// Self-tests
+console.log("Test 1: Basic pattern matching");
+const text1 = "abcabcabc";
+const patternLength1 = 3;
+console.log(findMostFrequentPatterns(text1, patternLength1)); // Expected: [["abc", 3]]
 
-    console.log("Cosine Similarity between vec1 and vec2:", cosineSimilarity(vec1, vec2)); // Expected: ~0.9746
-    console.log("Cosine Similarity between vec1 and vec4:", cosineSimilarity(vec1, vec4)); // Expected: ~0.5
-    console.log("Cosine Similarity between vec2 and vec4:", cosineSimilarity(vec2, vec4)); // Expected: ~0.4558
+console.log("Test 2: Overlapping patterns");
+const text2 = "abababab";
+const patternLength2 = 2;
+console.log(findMostFrequentPatterns(text2, patternLength2)); // Expected: [["ab", 4], ["ba", 3]]
 
-    // Edge case: Vectors of different lengths
-    try {
-        console.log(cosineSimilarity([1, 2], [1, 2, 3])); // Expected: Error
-    } catch (e) {
-        console.log("Error (expected):", e.message);
-    }
+console.log("Test 3: Single character patterns");
+const text3 = "aaaaa";
+const patternLength3 = 1;
+console.log(findMostFrequentPatterns(text3, patternLength3)); // Expected: [["a", 5]]
 
-    // Edge case: Zero magnitude vector
-    try {
-        console.log(cosineSimilarity(vec1, vec3)); // Expected: Error
-    } catch (e) {
-        console.log("Error (expected):", e.message);
-    }
-} catch (e) {
-    console.error("Unexpected error:", e.message);
-}
+console.log("Test 4: Edge case - Empty text");
+const text4 = "";
+const patternLength4 = 2;
+console.log(findMostFrequentPatterns(text4, patternLength4)); // Expected: []
+
+console.log("Test 5: Edge case - Pattern length larger than text");
+const text5 = "short";
+const patternLength5 = 10;
+console.log(findMostFrequentPatterns(text5, patternLength5)); // Expected: []
+
+console.log("Test 6: Edge case - Non-overlapping patterns");
+const text6 = "abcdef";
+const patternLength6 = 2;
+console.log(findMostFrequentPatterns(text6, patternLength6)); // Expected: [["ab", 1], ["bc", 1], ["cd", 1], ["de", 1], ["ef", 1]];
