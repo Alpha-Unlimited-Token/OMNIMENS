@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-24T04:12:13.191Z
+ * Written: 2026-03-24T04:35:43.127Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,66 +16,57 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function cosineSimilarity(vec1, vec2) {
-    if (vec1.length !== vec2.length) {
-        throw new Error("Vectors must have the same length");
+function findMostFrequentPatterns(text, patternLength) {
+    if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
+        throw new Error("Invalid input: text must be a string and patternLength must be a positive number.");
     }
 
-    let dotProduct = 0;
-    let magnitudeVec1 = 0;
-    let magnitudeVec2 = 0;
+    const patternCounts = {};
+    const textLength = text.length;
 
-    for (let i = 0; i < vec1.length; i++) {
-        dotProduct += vec1[i] * vec2[i];
-        magnitudeVec1 += vec1[i] ** 2;
-        magnitudeVec2 += vec2[i] ** 2;
+    for (let i = 0; i <= textLength - patternLength; i++) {
+        const pattern = text.slice(i, i + patternLength);
+        patternCounts[pattern] = (patternCounts[pattern] || 0) + 1;
     }
 
-    magnitudeVec1 = Math.sqrt(magnitudeVec1);
-    magnitudeVec2 = Math.sqrt(magnitudeVec2);
+    const sortedPatterns = Object.entries(patternCounts)
+        .sort((a, b) => b[1] - a[1])
+        .map(([pattern, count]) => ({ pattern, count }));
 
-    if (magnitudeVec1 === 0 || magnitudeVec2 === 0) {
-        return 0; // Handle edge case where one or both vectors are zero vectors
-    }
-
-    return dotProduct / (magnitudeVec1 * magnitudeVec2);
+    return sortedPatterns;
 }
 
-// Self-tests
+// Test cases
 function runTests() {
-    console.log("Running tests...");
+    console.log("Test Case 1: Basic functionality");
+    const text1 = "abababab";
+    const patterns1 = findMostFrequentPatterns(text1, 2);
+    console.log(patterns1); // Expected: [{ pattern: 'ab', count: 4 }, { pattern: 'ba', count: 3 }]
 
-    // Test 1: Similar vectors
-    const vecA1 = [1, 2, 3];
-    const vecB1 = [1, 2, 3];
-    console.log("Test 1:", cosineSimilarity(vecA1, vecB1) === 1);
+    console.log("Test Case 2: Single character patterns");
+    const text2 = "aaaaa";
+    const patterns2 = findMostFrequentPatterns(text2, 1);
+    console.log(patterns2); // Expected: [{ pattern: 'a', count: 5 }]
 
-    // Test 2: Orthogonal vectors
-    const vecA2 = [1, 0, 0];
-    const vecB2 = [0, 1, 0];
-    console.log("Test 2:", cosineSimilarity(vecA2, vecB2) === 0);
+    console.log("Test Case 3: Edge case with empty text");
+    const text3 = "";
+    const patterns3 = findMostFrequentPatterns(text3, 2);
+    console.log(patterns3); // Expected: []
 
-    // Test 3: Opposite vectors
-    const vecA3 = [1, 2, 3];
-    const vecB3 = [-1, -2, -3];
-    console.log("Test 3:", cosineSimilarity(vecA3, vecB3) === -1);
+    console.log("Test Case 4: Edge case with patternLength larger than text length");
+    const text4 = "abc";
+    const patterns4 = findMostFrequentPatterns(text4, 5);
+    console.log(patterns4); // Expected: []
 
-    // Test 4: Zero vector
-    const vecA4 = [0, 0, 0];
-    const vecB4 = [1, 2, 3];
-    console.log("Test 4:", cosineSimilarity(vecA4, vecB4) === 0);
+    console.log("Test Case 5: Pattern length equals text length");
+    const text5 = "hello";
+    const patterns5 = findMostFrequentPatterns(text5, 5);
+    console.log(patterns5); // Expected: [{ pattern: 'hello', count: 1 }]
 
-    // Test 5: Different lengths (should throw error)
-    try {
-        const vecA5 = [1, 2];
-        const vecB5 = [1, 2, 3];
-        cosineSimilarity(vecA5, vecB5);
-        console.log("Test 5: Failed (no error thrown)");
-    } catch (e) {
-        console.log("Test 5: Passed (error thrown)");
-    }
-
-    console.log("Tests completed.");
+    console.log("Test Case 6: Complex text with overlapping patterns");
+    const text6 = "abcabcabc";
+    const patterns6 = findMostFrequentPatterns(text6, 3);
+    console.log(patterns6); // Expected: [{ pattern: 'abc', count: 3 }, { pattern: 'bca', count: 2 }, { pattern: 'cab', count: 2 }]
 }
 
 runTests();

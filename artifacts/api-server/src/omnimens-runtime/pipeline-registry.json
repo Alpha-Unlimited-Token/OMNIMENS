@@ -8518,9 +8518,46 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": false
+    },
+    "dynamicPromptOptimization_gen1.mjs": {
+      "filename": "dynamicPromptOptimization_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateInitialPopulation",
+        "evaluateFitness",
+        "crossoverPrompts",
+        "mutatePrompt",
+        "selectPromptsByFitness",
+        "optimizePrompts",
+        "generateOptimizedPrompt"
+      ],
+      "loadedAt": 1774327107483,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adaptiveDataStreamSimulator_gen1.mjs": {
+      "filename": "adaptiveDataStreamSimulator_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateHash",
+        "calculateRelevanceScore",
+        "adaptivePoll",
+        "getSortedCachedData",
+        "initializeSimulator",
+        "clearCache"
+      ],
+      "loadedAt": 1774327116080,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774326702424,
-  "totalModules": 393,
+  "totalModules": 395,
   "totalCalls": 0
 }
