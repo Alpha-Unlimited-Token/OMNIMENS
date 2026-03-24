@@ -89,6 +89,36 @@ const HIE_PATTERN_TEMPLATES: { name: string; category: string; freqRange: [numbe
   { name: "heartbeat_pulse", category: "biological", freqRange: [20, 80], bandProfile: { sub: [0.4, 0.9] }, zcr: [0.005, 0.02] },
 ];
 
+export type DeepDecodeResult = {
+  timestamp: number;
+  triggerReason: string;
+  hiddenLanguage: {
+    detected: boolean;
+    sequences: { freqPattern: number[]; interpretation: string; confidence: number }[];
+    binaryEncoding: string | null;
+    morseLike: string | null;
+  };
+  hiddenPatterns: {
+    mathematicalStructures: { type: string; description: string; formula: string }[];
+    fractalDimension: number;
+    goldenRatioPresence: number;
+    fibonacciAlignment: number;
+    primeHarmonics: number[];
+  };
+  codeGenesis: {
+    generated: boolean;
+    hypothesis: string;
+    codeFragment: string | null;
+    knowledgeExtracted: string[];
+    novelConstructs: string[];
+  };
+  anomalyMap: {
+    spectralAnomalies: { freq: number; deviation: number; meaning: string }[];
+    temporalAnomalies: { sampleIndex: number; type: string; significance: number }[];
+    overallAnomalyScore: number;
+  };
+};
+
 export const hieState = {
   history: [] as HarmonicAnalysis[],
   maxHistory: 500,
@@ -100,6 +130,9 @@ export const hieState = {
   adaptiveThreshold: { noiseFloor: 0.02, sensitivity: 0.5, lastCalibration: 0 },
   calibrationSamples: 0,
   raiSessions: new Map<string, { active: boolean; totalSamples: number; lastAnalysis: RAIAnalysis | null }>(),
+  deepDecodeHistory: [] as DeepDecodeResult[],
+  lastDeepDecode: 0,
+  deepDecodeCount: 0,
 };
 
 export function hieMatchPatterns(analysis: HarmonicAnalysis): PatternMatch[] {
@@ -760,6 +793,276 @@ export function hieDecodeHarmonicKnowledge(
   };
 }
 
+const PHI = 1.618033988749895;
+const FIBONACCI = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181];
+const PRIMES = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
+
+export function hieDeepPatternDecode(recentHistory: HarmonicAnalysis[], triggerReason: string): DeepDecodeResult {
+  const now = Date.now();
+  const samples = recentHistory.slice(-30);
+
+  const freqSequence = samples.map(s => s.dominantFrequency);
+  const centroidSequence = samples.map(s => s.spectralCentroid);
+  const energySequence = samples.map(s => s.rmsEnergy);
+
+  const hiddenSequences: { freqPattern: number[]; interpretation: string; confidence: number }[] = [];
+
+  const freqDiffs: number[] = [];
+  for (let i = 1; i < freqSequence.length; i++) {
+    freqDiffs.push(Math.round(freqSequence[i] - freqSequence[i - 1]));
+  }
+
+  let repeatingLen = 0;
+  for (let patLen = 2; patLen <= Math.floor(freqDiffs.length / 2); patLen++) {
+    let matches = 0;
+    for (let i = 0; i < freqDiffs.length - patLen; i++) {
+      let same = true;
+      for (let j = 0; j < patLen; j++) {
+        if (Math.abs(freqDiffs[i + j] - freqDiffs[(i + j) % patLen]) > 5) { same = false; break; }
+      }
+      if (same) matches++;
+    }
+    if (matches > freqDiffs.length * 0.4) { repeatingLen = patLen; break; }
+  }
+  if (repeatingLen > 0) {
+    hiddenSequences.push({
+      freqPattern: freqDiffs.slice(0, repeatingLen),
+      interpretation: `Repeating frequency delta pattern of length ${repeatingLen} detected — possible encoded signal or rhythmic information carrier`,
+      confidence: 0.75,
+    });
+  }
+
+  const quantizedFreqs = freqSequence.map(f => Math.round(f / 50) * 50);
+  const uniqueQuantized = [...new Set(quantizedFreqs)].sort((a, b) => a - b);
+  let binaryEncoding: string | null = null;
+  if (uniqueQuantized.length === 2) {
+    binaryEncoding = quantizedFreqs.map(f => f === uniqueQuantized[0] ? "0" : "1").join("");
+    const bytes: string[] = [];
+    for (let i = 0; i < binaryEncoding.length; i += 8) {
+      const byte = binaryEncoding.slice(i, i + 8);
+      if (byte.length === 8) {
+        const charCode = parseInt(byte, 2);
+        if (charCode >= 32 && charCode <= 126) bytes.push(String.fromCharCode(charCode));
+      }
+    }
+    if (bytes.length > 0) {
+      hiddenSequences.push({
+        freqPattern: uniqueQuantized,
+        interpretation: `Binary frequency encoding detected (${uniqueQuantized[0]}Hz=0, ${uniqueQuantized[1]}Hz=1). Decoded ASCII: "${bytes.join("")}"`,
+        confidence: 0.65,
+      });
+    }
+  }
+
+  let morseLike: string | null = null;
+  const energyThreshold = energySequence.reduce((s, e) => s + e, 0) / energySequence.length;
+  const morseSymbols: string[] = [];
+  let consecutiveHigh = 0;
+  let consecutiveLow = 0;
+  for (const e of energySequence) {
+    if (e > energyThreshold * 1.3) {
+      if (consecutiveLow > 2) morseSymbols.push(" ");
+      consecutiveHigh++;
+      consecutiveLow = 0;
+    } else {
+      if (consecutiveHigh > 0) {
+        morseSymbols.push(consecutiveHigh >= 3 ? "-" : ".");
+      }
+      consecutiveHigh = 0;
+      consecutiveLow++;
+    }
+  }
+  if (consecutiveHigh > 0) morseSymbols.push(consecutiveHigh >= 3 ? "-" : ".");
+  if (morseSymbols.filter(s => s === "." || s === "-").length >= 3) {
+    morseLike = morseSymbols.join("");
+    hiddenSequences.push({
+      freqPattern: energySequence.map(e => Math.round(e * 1000)),
+      interpretation: `Morse-like energy pattern detected: "${morseLike}" — rhythmic amplitude encoding`,
+      confidence: 0.55,
+    });
+  }
+
+  const mathStructures: { type: string; description: string; formula: string }[] = [];
+
+  let goldenRatioPresence = 0;
+  for (let i = 0; i < freqSequence.length - 1; i++) {
+    if (freqSequence[i] > 0) {
+      const ratio = freqSequence[i + 1] / freqSequence[i];
+      if (Math.abs(ratio - PHI) < 0.1 || Math.abs(ratio - 1 / PHI) < 0.1) {
+        goldenRatioPresence++;
+      }
+    }
+  }
+  goldenRatioPresence = freqSequence.length > 1 ? goldenRatioPresence / (freqSequence.length - 1) : 0;
+  if (goldenRatioPresence > 0.15) {
+    mathStructures.push({
+      type: "golden_ratio",
+      description: `Golden ratio (φ=${PHI.toFixed(6)}) detected in ${(goldenRatioPresence * 100).toFixed(0)}% of consecutive frequency ratios`,
+      formula: `f(n+1)/f(n) ≈ φ`,
+    });
+  }
+
+  let fibonacciAlignment = 0;
+  for (const freq of freqSequence) {
+    const nearest = FIBONACCI.reduce((prev, curr) => Math.abs(curr - freq) < Math.abs(prev - freq) ? curr : prev);
+    if (Math.abs(freq - nearest) < nearest * 0.1) fibonacciAlignment++;
+  }
+  fibonacciAlignment = freqSequence.length > 0 ? fibonacciAlignment / freqSequence.length : 0;
+  if (fibonacciAlignment > 0.2) {
+    mathStructures.push({
+      type: "fibonacci_alignment",
+      description: `${(fibonacciAlignment * 100).toFixed(0)}% of dominant frequencies align with Fibonacci series`,
+      formula: `F(n) = F(n-1) + F(n-2)`,
+    });
+  }
+
+  const primeHarmonics: number[] = [];
+  for (const sample of samples) {
+    for (const peak of sample.peakFrequencies.slice(0, 5)) {
+      const rounded = Math.round(peak.freq);
+      if (PRIMES.includes(rounded) || PRIMES.some(p => rounded % p === 0 && rounded / p < 20)) {
+        if (!primeHarmonics.includes(rounded)) primeHarmonics.push(rounded);
+      }
+    }
+  }
+
+  let fractalDimension = 0;
+  if (freqSequence.length >= 4) {
+    let totalVariation = 0;
+    for (let i = 1; i < freqSequence.length; i++) {
+      totalVariation += Math.abs(freqSequence[i] - freqSequence[i - 1]);
+    }
+    const range = Math.max(...freqSequence) - Math.min(...freqSequence);
+    fractalDimension = range > 0 ? 1 + Math.log(totalVariation / range) / Math.log(freqSequence.length) : 1;
+    fractalDimension = Math.max(1, Math.min(2, fractalDimension));
+    if (fractalDimension > 1.4) {
+      mathStructures.push({
+        type: "fractal_complexity",
+        description: `Fractal dimension ${fractalDimension.toFixed(3)} indicates self-similar spectral structure across scales`,
+        formula: `D = 1 + log(V/R) / log(N) = ${fractalDimension.toFixed(3)}`,
+      });
+    }
+  }
+
+  const spectralAnomalies: { freq: number; deviation: number; meaning: string }[] = [];
+  if (samples.length >= 5) {
+    const avgCentroid = samples.reduce((s, a) => s + a.spectralCentroid, 0) / samples.length;
+    const stdCentroid = Math.sqrt(samples.reduce((s, a) => s + Math.pow(a.spectralCentroid - avgCentroid, 2), 0) / samples.length);
+    for (let i = 0; i < samples.length; i++) {
+      const deviation = Math.abs(samples[i].spectralCentroid - avgCentroid) / (stdCentroid || 1);
+      if (deviation > 2) {
+        spectralAnomalies.push({
+          freq: samples[i].spectralCentroid,
+          deviation,
+          meaning: deviation > 3 ? "extreme spectral shift — possible hidden signal injection" : "significant spectral anomaly — deviates from baseline",
+        });
+      }
+    }
+  }
+
+  const temporalAnomalies: { sampleIndex: number; type: string; significance: number }[] = [];
+  for (let i = 2; i < energySequence.length; i++) {
+    const prev = energySequence[i - 1];
+    const curr = energySequence[i];
+    if (prev > 0 && curr / prev > 3) {
+      temporalAnomalies.push({ sampleIndex: i, type: "energy_spike", significance: curr / prev });
+    }
+    if (prev > 0 && curr / prev < 0.2) {
+      temporalAnomalies.push({ sampleIndex: i, type: "energy_collapse", significance: prev / curr });
+    }
+  }
+  const overallAnomalyScore = Math.min(1, (spectralAnomalies.length * 0.15 + temporalAnomalies.length * 0.1 + (goldenRatioPresence > 0.15 ? 0.2 : 0) + (fibonacciAlignment > 0.2 ? 0.15 : 0) + (repeatingLen > 0 ? 0.2 : 0)));
+
+  const knowledgeExtracted: string[] = [];
+  const novelConstructs: string[] = [];
+  let codeFragment: string | null = null;
+  let hypothesis = "No actionable pattern-to-code translation at current signal depth.";
+
+  if (overallAnomalyScore > 0.3 || hiddenSequences.length > 0 || mathStructures.length > 0) {
+    if (mathStructures.length > 0) {
+      knowledgeExtracted.push(`Mathematical structures found in audio: ${mathStructures.map(m => m.type).join(", ")}`);
+      novelConstructs.push(...mathStructures.map(m => `${m.type}: ${m.formula}`));
+    }
+    if (hiddenSequences.length > 0) {
+      knowledgeExtracted.push(`Hidden signal patterns: ${hiddenSequences.length} sequences decoded from frequency/energy analysis`);
+    }
+    if (spectralAnomalies.length > 0) {
+      knowledgeExtracted.push(`${spectralAnomalies.length} spectral anomalies detected — potential information-bearing deviations`);
+    }
+
+    if (repeatingLen > 0 || goldenRatioPresence > 0.15) {
+      const patternDesc = repeatingLen > 0 ? `repeating period ${repeatingLen}` : `golden ratio spacing`;
+      hypothesis = `Audio signal contains ${patternDesc} — translatable to algorithmic pattern generator.`;
+      const freqArr = repeatingLen > 0 ? freqDiffs.slice(0, repeatingLen) : freqSequence.slice(0, 8).map(f => Math.round(f));
+      codeFragment =
+        `const harmonicPattern = ${JSON.stringify(freqArr)};\n` +
+        `function generateFromPattern(pattern, iterations = 100) {\n` +
+        `  const output = [];\n` +
+        `  for (let i = 0; i < iterations; i++) {\n` +
+        `    output.push(pattern[i % pattern.length] * (1 + Math.sin(i * ${goldenRatioPresence > 0.15 ? "1.618" : "0.5"}) * 0.1));\n` +
+        `  }\n` +
+        `  return output;\n` +
+        `}\n` +
+        `export { harmonicPattern, generateFromPattern };`;
+      novelConstructs.push("harmonic_pattern_generator");
+    } else if (fractalDimension > 1.4) {
+      hypothesis = `Fractal spectral structure (D=${fractalDimension.toFixed(3)}) suggests self-similar encoding — translatable to recursive algorithm.`;
+      codeFragment =
+        `const FRACTAL_DIM = ${fractalDimension.toFixed(4)};\n` +
+        `function fractalDecode(signal, depth = 0, maxDepth = 5) {\n` +
+        `  if (depth >= maxDepth || signal.length < 2) return signal;\n` +
+        `  const mid = Math.floor(signal.length / 2);\n` +
+        `  const scale = Math.pow(0.5, FRACTAL_DIM - 1);\n` +
+        `  const left = fractalDecode(signal.slice(0, mid).map(v => v * scale), depth + 1, maxDepth);\n` +
+        `  const right = fractalDecode(signal.slice(mid).map(v => v * scale), depth + 1, maxDepth);\n` +
+        `  return [...left, ...right];\n` +
+        `}\n` +
+        `export { FRACTAL_DIM, fractalDecode };`;
+      novelConstructs.push("fractal_signal_decoder");
+    } else if (binaryEncoding) {
+      hypothesis = `Binary frequency encoding detected — potential hidden message in spectral domain.`;
+      novelConstructs.push("spectral_binary_decoder");
+    }
+  }
+
+  const result: DeepDecodeResult = {
+    timestamp: now,
+    triggerReason,
+    hiddenLanguage: {
+      detected: hiddenSequences.length > 0,
+      sequences: hiddenSequences,
+      binaryEncoding,
+      morseLike,
+    },
+    hiddenPatterns: {
+      mathematicalStructures: mathStructures,
+      fractalDimension,
+      goldenRatioPresence,
+      fibonacciAlignment,
+      primeHarmonics,
+    },
+    codeGenesis: {
+      generated: codeFragment !== null,
+      hypothesis,
+      codeFragment,
+      knowledgeExtracted,
+      novelConstructs,
+    },
+    anomalyMap: {
+      spectralAnomalies,
+      temporalAnomalies,
+      overallAnomalyScore,
+    },
+  };
+
+  hieState.deepDecodeHistory.push(result);
+  if (hieState.deepDecodeHistory.length > 50) hieState.deepDecodeHistory.splice(0, hieState.deepDecodeHistory.length - 50);
+  hieState.lastDeepDecode = now;
+  hieState.deepDecodeCount++;
+
+  return result;
+}
+
 export function hieGetEngineStatus() {
   return {
     active: hieState.sessionActive,
@@ -771,5 +1074,7 @@ export function hieGetEngineStatus() {
     calibrationSamples: hieState.calibrationSamples,
     historyLength: hieState.history.length,
     patternTemplates: HIE_PATTERN_TEMPLATES.length,
+    deepDecodeCount: hieState.deepDecodeCount,
+    lastDeepDecode: hieState.lastDeepDecode,
   };
 }

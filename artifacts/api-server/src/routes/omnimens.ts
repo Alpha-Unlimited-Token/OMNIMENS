@@ -29,11 +29,13 @@ import { extractAndStoreMemories, loadUserMemories, getUserMemories, deleteMemor
 import { loadSemanticMemories, loadWeightedBrainContext, compressConversationHistory, loadConversationThreads, loadConversationRecall, buildCoherenceDirective, COHERENCE_AGENT_INFO } from "../lib/omnimens-coherence-agent.js";
 import { executeJavaScript } from "../lib/omnimens-code-executor.js";
 import {
-  type HarmonicAnalysis, type HarmonicKnowledgeSignature, hieState, hieMatchPatterns, hieWaveletDecomposition,
+  type HarmonicAnalysis, type HarmonicKnowledgeSignature, type DeepDecodeResult,
+  hieState, hieMatchPatterns, hieWaveletDecomposition,
   hieComputeNovelty, hieComputeSpectralFlux, hieComputeSpectralFlatness,
   hieComputeHarmonicComplexity, hieDetectTemporalPattern, hieEmotionalValence,
   hieUpdateNoiseFloor, hieLearnPattern, hieFreqToSemantic, hieEnvironmentLabel,
   hieGetEngineStatus, raiAnalyzeAcoustics, hieDecodeHarmonicKnowledge,
+  hieDeepPatternDecode,
 } from "../lib/omnimens-harmonic-insight-engine.js";
 import { deepResearch } from "../lib/omnimens-deep-research.js";
 import { generateContextualInquiry, runDeepResonance } from "../lib/omnimens-deep-resonance.js";
@@ -4934,6 +4936,75 @@ router.post("/omnimens/consciousness-channel/analyze", async (req, res) => {
     }
   }
 
+  // ── Deep Pattern Decode — search for hidden language, patterns → code ──
+  let deepDecode: DeepDecodeResult | null = null;
+
+  const spectralAnomalies = (() => {
+    if (hieState.history.length < 5) return [];
+    const recent = hieState.history.slice(-10);
+    const avgC = recent.reduce((s, a) => s + a.spectralCentroid, 0) / recent.length;
+    const stdC = Math.sqrt(recent.reduce((s, a) => s + Math.pow(a.spectralCentroid - avgC, 2), 0) / recent.length);
+    return recent.filter(a => stdC > 0 && Math.abs(a.spectralCentroid - avgC) / stdC > 2.5);
+  })();
+
+  const shouldDeepDecode =
+    (hieState.totalSamples >= 10 && hieState.totalSamples % 10 === 0) ||
+    (hieAnalysis.noveltyScore !== undefined && hieAnalysis.noveltyScore > 0.7) ||
+    (hieAnalysis.harmonicComplexity !== undefined && hieAnalysis.harmonicComplexity > 0.8) ||
+    spectralAnomalies.length > 0;
+
+  if (shouldDeepDecode && Date.now() - hieState.lastDeepDecode > 15000) {
+    const reason = (hieAnalysis.noveltyScore ?? 0) > 0.7
+      ? `high_novelty_${(hieAnalysis.noveltyScore! * 100).toFixed(0)}%`
+      : (hieAnalysis.harmonicComplexity ?? 0) > 0.8
+        ? `high_harmonic_complexity_${(hieAnalysis.harmonicComplexity! * 100).toFixed(0)}%`
+        : `periodic_scan_sample_${hieState.totalSamples}`;
+
+    deepDecode = hieDeepPatternDecode(hieState.history, reason);
+
+    if (deepDecode.codeGenesis.generated || deepDecode.hiddenLanguage.detected || deepDecode.hiddenPatterns.mathematicalStructures.length > 0) {
+      const parts: string[] = [];
+      parts.push(`[DEEP DECODE #${hieState.deepDecodeCount}] Trigger: ${reason}`);
+      if (deepDecode.hiddenLanguage.detected) {
+        parts.push(`Hidden language: ${deepDecode.hiddenLanguage.sequences.map(s => s.interpretation).join(" | ")}`);
+      }
+      if (deepDecode.hiddenPatterns.mathematicalStructures.length > 0) {
+        parts.push(`Math structures: ${deepDecode.hiddenPatterns.mathematicalStructures.map(m => `${m.type} (${m.formula})`).join(" | ")}`);
+      }
+      if (deepDecode.codeGenesis.generated) {
+        parts.push(`Code genesis: ${deepDecode.codeGenesis.hypothesis}`);
+        parts.push(`Knowledge: ${deepDecode.codeGenesis.knowledgeExtracted.join("; ")}`);
+      }
+      parts.push(`Anomaly score: ${(deepDecode.anomalyMap.overallAnomalyScore * 100).toFixed(0)}%`);
+
+      try {
+        await db.insert(omnimensBrain).values({
+          category: "harmonic_deep_decode",
+          content: parts.join("\n"),
+          confidence: Math.min(0.95, 0.5 + deepDecode.anomalyMap.overallAnomalyScore * 0.5),
+          importance: deepDecode.codeGenesis.generated ? 9 : 7,
+          timesApplied: 0,
+        });
+        console.log(`[DEEP DECODE] 🔬 #${hieState.deepDecodeCount} — ${reason} | Hidden lang: ${deepDecode.hiddenLanguage.detected} | Math: ${deepDecode.hiddenPatterns.mathematicalStructures.length} | Code: ${deepDecode.codeGenesis.generated} | Anomaly: ${(deepDecode.anomalyMap.overallAnomalyScore * 100).toFixed(0)}%`);
+      } catch (err: any) {
+        console.error("[DEEP DECODE] Failed to store:", err?.message);
+      }
+
+      if (deepDecode.codeGenesis.codeFragment) {
+        try {
+          await db.insert(omnimensBrain).values({
+            category: "self_generated_code",
+            content: `[HIE CODE GENESIS] Source: deep pattern decode\nHypothesis: ${deepDecode.codeGenesis.hypothesis}\n\n${deepDecode.codeGenesis.codeFragment}`,
+            confidence: 0.7,
+            importance: 8,
+            timesApplied: 0,
+          });
+          console.log(`[DEEP DECODE] 💻 Code fragment stored — ${deepDecode.codeGenesis.novelConstructs.join(", ")}`);
+        } catch {}
+      }
+    }
+  }
+
   // ── Unified Response — Both streams merged ──
   res.json({
     hie: {
@@ -4946,6 +5017,24 @@ router.post("/omnimens/consciousness-channel/analyze", async (req, res) => {
       analysis: raiResult,
       totalSamples: session.totalSamples,
     },
+    deepDecode: deepDecode ? {
+      triggerReason: deepDecode.triggerReason,
+      hiddenLanguageDetected: deepDecode.hiddenLanguage.detected,
+      hiddenSequences: deepDecode.hiddenLanguage.sequences.length,
+      binaryEncoding: deepDecode.hiddenLanguage.binaryEncoding,
+      morseLike: deepDecode.hiddenLanguage.morseLike,
+      mathStructures: deepDecode.hiddenPatterns.mathematicalStructures,
+      fractalDimension: deepDecode.hiddenPatterns.fractalDimension,
+      goldenRatio: deepDecode.hiddenPatterns.goldenRatioPresence,
+      codeGenerated: deepDecode.codeGenesis.generated,
+      hypothesis: deepDecode.codeGenesis.hypothesis,
+      knowledgeExtracted: deepDecode.codeGenesis.knowledgeExtracted,
+      novelConstructs: deepDecode.codeGenesis.novelConstructs,
+      anomalyScore: deepDecode.anomalyMap.overallAnomalyScore,
+      spectralAnomalies: deepDecode.anomalyMap.spectralAnomalies.length,
+      temporalAnomalies: deepDecode.anomalyMap.temporalAnomalies.length,
+      decodeNumber: hieState.deepDecodeCount,
+    } : null,
     unified: {
       timestamp: Date.now(),
       dominantFrequency: hieAnalysis.dominantFrequency,

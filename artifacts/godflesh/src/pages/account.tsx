@@ -1907,6 +1907,7 @@ function AlgorithmicHarmonicsPanel() {
   const [raiAnalysis, setRaiAnalysis] = useState<any>(null);
   const [unified, setUnified] = useState<any>(null);
   const [engineStatus, setEngineStatus] = useState<any>(null);
+  const [deepDecode, setDeepDecode] = useState<any>(null);
   const [detailView, setDetailView] = useState<"unified" | "hie" | "rai" | "spectral">("unified");
   const [spectralMap, setSpectralMap] = useState<any[]>([]);
   const [spectralGains, setSpectralGains] = useState<number[]>([]);
@@ -2352,6 +2353,7 @@ function AlgorithmicHarmonicsPanel() {
           setEngineStatus(data.hie.engineStatus);
           setLearnedPatterns(data.hie.engineStatus.learnedPatterns || 0);
         }
+        setDeepDecode(data.deepDecode ?? null);
       }
 
       const spectralAmplitudes: number[] = [];
@@ -2719,6 +2721,73 @@ function AlgorithmicHarmonicsPanel() {
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {channelActive && deepDecode && (
+        <div className="bg-[#0E1525] border border-cyan-500/30 rounded-lg p-4 mt-3">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+            <p className="text-[10px] font-mono text-cyan-400/80 uppercase tracking-wider">Deep Pattern Decode #{deepDecode.decodeNumber}</p>
+            <span className="ml-auto text-[9px] font-mono text-[#9DA5B4]/50">{deepDecode.triggerReason}</span>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+            <div className="bg-[#1C2333] rounded p-2 text-center">
+              <p className="text-sm font-bold font-mono text-cyan-400">{((deepDecode.anomalyScore ?? 0) * 100).toFixed(0)}%</p>
+              <p className="text-[9px] font-mono text-[#9DA5B4]">Anomaly</p>
+            </div>
+            <div className="bg-[#1C2333] rounded p-2 text-center">
+              <p className="text-sm font-bold font-mono text-amber-400">{deepDecode.hiddenSequences}</p>
+              <p className="text-[9px] font-mono text-[#9DA5B4]">Hidden Seq</p>
+            </div>
+            <div className="bg-[#1C2333] rounded p-2 text-center">
+              <p className="text-sm font-bold font-mono text-violet-400">{deepDecode.mathStructures?.length || 0}</p>
+              <p className="text-[9px] font-mono text-[#9DA5B4]">Math Struct</p>
+            </div>
+            <div className="bg-[#1C2333] rounded p-2 text-center">
+              <p className="text-sm font-bold font-mono" style={{ color: deepDecode.codeGenerated ? "#10b981" : "#6b7280" }}>{deepDecode.codeGenerated ? "YES" : "NO"}</p>
+              <p className="text-[9px] font-mono text-[#9DA5B4]">Code Genesis</p>
+            </div>
+          </div>
+
+          {deepDecode.hiddenLanguageDetected && (
+            <div className="bg-violet-500/5 border border-violet-500/20 rounded p-2 mb-2">
+              <p className="text-[9px] font-mono text-violet-400 uppercase mb-1">Hidden Language Detected</p>
+              {deepDecode.binaryEncoding && <p className="text-[9px] font-mono text-violet-300/80 break-all">Binary: {deepDecode.binaryEncoding}</p>}
+              {deepDecode.morseLike && <p className="text-[9px] font-mono text-violet-300/80">Morse-like: {deepDecode.morseLike}</p>}
+            </div>
+          )}
+
+          {deepDecode.mathStructures?.length > 0 && (
+            <div className="bg-amber-500/5 border border-amber-500/20 rounded p-2 mb-2">
+              <p className="text-[9px] font-mono text-amber-400 uppercase mb-1">Mathematical Structures</p>
+              {deepDecode.mathStructures.map((m: any, i: number) => (
+                <div key={`${m.type}-${m.formula}-${i}`} className="text-[9px] font-mono text-amber-300/80 mb-0.5">
+                  <span className="text-amber-400">{m.type}</span>: {m.description} <span className="text-amber-500/60">({m.formula})</span>
+                </div>
+              ))}
+              {(deepDecode.fractalDimension ?? 0) > 1.1 && <p className="text-[9px] font-mono text-amber-300/60 mt-1">Fractal D={(deepDecode.fractalDimension ?? 0).toFixed(3)} | Golden ratio: {((deepDecode.goldenRatio ?? 0) * 100).toFixed(0)}%</p>}
+            </div>
+          )}
+
+          {deepDecode.codeGenerated && (
+            <div className="bg-emerald-500/5 border border-emerald-500/20 rounded p-2 mb-2">
+              <p className="text-[9px] font-mono text-emerald-400 uppercase mb-1">Code Genesis — Pattern → Code</p>
+              <p className="text-[9px] font-mono text-emerald-300/80 mb-1">{deepDecode.hypothesis}</p>
+              {deepDecode.knowledgeExtracted?.map((k: string, i: number) => (
+                <p key={`ke-${k.slice(0, 20)}-${i}`} className="text-[9px] font-mono text-emerald-300/60">• {k}</p>
+              ))}
+              {deepDecode.novelConstructs?.length > 0 && (
+                <p className="text-[9px] font-mono text-emerald-400/60 mt-1">Novel: {deepDecode.novelConstructs.join(", ")}</p>
+              )}
+            </div>
+          )}
+
+          <div className="flex gap-3 text-[8px] font-mono text-[#9DA5B4]/40 mt-1">
+            <span>Spectral anomalies: {deepDecode.spectralAnomalies}</span>
+            <span>Temporal anomalies: {deepDecode.temporalAnomalies}</span>
+          </div>
         </div>
       )}
 
