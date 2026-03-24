@@ -1,0 +1,77 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-24T09:52:01.560Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+function findPatternsInText(text, patterns) {
+    // Utility function to find all occurrences of given patterns in a text
+    // Returns an object with pattern as key and array of indices as values
+    const results = {};
+    patterns.forEach(pattern => {
+        const regex = new RegExp(pattern, 'g');
+        results[pattern] = [];
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+            results[pattern].push(match.index);
+        }
+    });
+    return results;
+}
+
+// Test cases
+function runTests() {
+    console.log("Running tests...");
+
+    // Test 1: Single pattern
+    const text1 = "The quick brown fox jumps over the lazy dog.";
+    const patterns1 = ["fox"];
+    const result1 = findPatternsInText(text1, patterns1);
+    console.log(result1); // Expected: { fox: [16] }
+
+    // Test 2: Multiple patterns
+    const text2 = "The quick brown fox jumps over the lazy dog.";
+    const patterns2 = ["quick", "lazy", "dog"];
+    const result2 = findPatternsInText(text2, patterns2);
+    console.log(result2); // Expected: { quick: [4], lazy: [35], dog: [40] }
+
+    // Test 3: Overlapping patterns
+    const text3 = "abababab";
+    const patterns3 = ["aba", "bab"];
+    const result3 = findPatternsInText(text3, patterns3);
+    console.log(result3); // Expected: { aba: [0, 2, 4], bab: [1, 3] }
+
+    // Test 4: No matches
+    const text4 = "Hello world!";
+    const patterns4 = ["xyz"];
+    const result4 = findPatternsInText(text4, patterns4);
+    console.log(result4); // Expected: { xyz: [] }
+
+    // Test 5: Empty text
+    const text5 = "";
+    const patterns5 = ["test"];
+    const result5 = findPatternsInText(text5, patterns5);
+    console.log(result5); // Expected: { test: [] }
+
+    // Test 6: Empty patterns
+    const text6 = "Some text here.";
+    const patterns6 = [];
+    const result6 = findPatternsInText(text6, patterns6);
+    console.log(result6); // Expected: {}
+
+    console.log("Tests completed.");
+}
+
+runTests();

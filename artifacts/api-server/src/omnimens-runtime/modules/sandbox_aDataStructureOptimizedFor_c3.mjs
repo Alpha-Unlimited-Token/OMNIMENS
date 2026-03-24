@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a data structure optimized for fast associative memory lookup
- * Written: 2026-03-24T02:28:02.550Z
+ * Written: 2026-03-24T06:55:08.071Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,85 +16,55 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function AssociativeMemory() {
+const AssociativeMemory = function() {
     this.memory = new Map();
-}
-
-AssociativeMemory.prototype.add = function(key, value) {
-    if (typeof key !== 'string') {
-        throw new Error('Key must be a string.');
-    }
-    this.memory.set(key, value);
 };
 
-AssociativeMemory.prototype.get = function(key) {
-    if (typeof key !== 'string') {
-        throw new Error('Key must be a string.');
+AssociativeMemory.prototype.add = function(key, value) {
+    if (!this.memory.has(key)) {
+        this.memory.set(key, []);
     }
-    return this.memory.get(key) || null;
+    this.memory.get(key).push(value);
+};
+
+AssociativeMemory.prototype.lookup = function(key) {
+    return this.memory.has(key) ? this.memory.get(key) : null;
 };
 
 AssociativeMemory.prototype.remove = function(key) {
-    if (typeof key !== 'string') {
-        throw new Error('Key must be a string.');
+    if (this.memory.has(key)) {
+        this.memory.delete(key);
+        return true;
     }
-    return this.memory.delete(key);
-};
-
-AssociativeMemory.prototype.hasKey = function(key) {
-    if (typeof key !== 'string') {
-        throw new Error('Key must be a string.');
-    }
-    return this.memory.has(key);
+    return false;
 };
 
 AssociativeMemory.prototype.clear = function() {
     this.memory.clear();
 };
 
-AssociativeMemory.prototype.size = function() {
-    return this.memory.size;
-};
+// Self-tests
+const memory = new AssociativeMemory();
 
-// Test cases
-(function testAssociativeMemory() {
-    const memory = new AssociativeMemory();
+// Test adding and looking up values
+memory.add("ethics", "Genesis Agent 'Ethicist'");
+memory.add("innovation", "Genesis Agent 'Innovator'");
+memory.add("ethics", "Ethical risk assessment framework");
+memory.add("research", "Genesis Agent 'Pioneer'");
+memory.add("knowledge", "Genesis Agent 'Archivist'");
 
-    // Test adding and retrieving values
-    memory.add("name", "Alice");
-    console.log(memory.get("name")); // Expected: "Alice"
+console.log(memory.lookup("ethics")); // Expected: ["Genesis Agent 'Ethicist'", "Ethical risk assessment framework"]
+console.log(memory.lookup("innovation")); // Expected: ["Genesis Agent 'Innovator'"]
+console.log(memory.lookup("research")); // Expected: ["Genesis Agent 'Pioneer'"]
+console.log(memory.lookup("knowledge")); // Expected: ["Genesis Agent 'Archivist'"]
+console.log(memory.lookup("nonexistent")); // Expected: null
 
-    memory.add("age", 30);
-    console.log(memory.get("age")); // Expected: 30
+// Test removing a key
+console.log(memory.remove("ethics")); // Expected: true
+console.log(memory.lookup("ethics")); // Expected: null
+console.log(memory.remove("nonexistent")); // Expected: false
 
-    // Test checking existence of keys
-    console.log(memory.hasKey("name")); // Expected: true
-    console.log(memory.hasKey("gender")); // Expected: false
-
-    // Test removing a key
-    memory.remove("name");
-    console.log(memory.get("name")); // Expected
-    console.log(memory.hasKey("name")); // Expected: false
-
-    // Test clearing all keys
-    memory.add("city", "New York");
-    memory.add("country", "USA");
-    console.log(memory.size()); // Expected: 2
-    memory.clear();
-    console.log(memory.size()); // Expected: 0
-
-    // Test edge cases
-    try {
-        memory.add(123, "InvalidKey");
-    } catch (e) {
-        console.log(e.message); // Expected: "Key must be a string."
-    }
-
-    try {
-        memory.get(123);
-    } catch (e) {
-        console.log(e.message); // Expected: "Key must be a string."
-    }
-
-    console.log("All tests passed.");
-})();
+// Test clearing memory
+memory.clear();
+console.log(memory.lookup("innovation")); // Expected: null
+console.log(memory.lookup("research")); // Expected: null

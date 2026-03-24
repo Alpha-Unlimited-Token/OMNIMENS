@@ -1,0 +1,59 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-24T11:20:46.688Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+function levenshteinDistance(str1, str2) {
+    const len1 = str1.length;
+    const len2 = str2.length;
+    const dp = Array(len1 + 1).fill(null).map(() => Array(len2 + 1).fill(0));
+
+    for (let i = 0; i <= len1; i++) {
+        dp[i][0] = i;
+    }
+    for (let j = 0; j <= len2; j++) {
+        dp[0][j] = j;
+    }
+
+    for (let i = 1; i <= len1; i++) {
+        for (let j = 1; j <= len2; j++) {
+            const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+            dp[i][j] = Math.min(
+                dp[i - 1][j] + 1, // deletion
+                dp[i][j - 1] + 1, // insertion
+                dp[i - 1][j - 1] + cost // substitution
+            );
+        }
+    }
+
+    return dp[len1][len2];
+}
+
+// Self-tests
+console.log("Test Cases for Levenshtein Distance:");
+console.log(levenshteinDistance("kitten", "sitting") === 3); // Expected: 3
+console.log(levenshteinDistance("flaw", "lawn") === 2); // Expected: 2
+console.log(levenshteinDistance("", "abc") === 3); // Expected: 3
+console.log(levenshteinDistance("abc", "") === 3); // Expected: 3
+console.log(levenshteinDistance("same", "same") === 0); // Expected: 0
+console.log(levenshteinDistance("distance", "instance") === 2); // Expected: 2
+console.log(levenshteinDistance("abcdef", "azced") === 3); // Expected: 3
+
+console.log("Edge Cases:");
+console.log(levenshteinDistance("", "") === 0); // Expected: 0
+console.log(levenshteinDistance("a", "a") === 0); // Expected: 0
+console.log(levenshteinDistance("a", "b") === 1); // Expected: 1
+console.log(levenshteinDistance("abc", "def") === 3); // Expected: 3

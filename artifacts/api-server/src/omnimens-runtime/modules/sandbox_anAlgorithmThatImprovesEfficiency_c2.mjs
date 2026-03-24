@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-24T05:40:17.738Z
+ * Written: 2026-03-24T11:03:48.554Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,74 +17,81 @@
  */
 
 function KnowledgeGraph() {
-    this.nodes = new Map();
-}
+    this.graph = new Map();
 
-KnowledgeGraph.prototype.addNode = function (id, data) {
-    if (!this.nodes.has(id)) {
-        this.nodes.set(id, { data: data, edges: new Map() });
-    }
-};
-
-KnowledgeGraph.prototype.addEdge = function (fromId, toId, weight) {
-    if (this.nodes.has(fromId) && this.nodes.has(toId)) {
-        this.nodes.get(fromId).edges.set(toId, weight || 1);
-    }
-};
-
-KnowledgeGraph.prototype.retrievePattern = function (startId, pattern) {
-    if (!this.nodes.has(startId)) return [];
-
-    const results = [];
-    const visited = new Set();
-
-    function dfs(nodeId, currentPatternIndex) {
-        if (currentPatternIndex === pattern.length) {
-            results.push(nodeId);
-            return;
+    // Add a concept and its associations
+    this.addConcept = function (concept, associations) {
+        if (!this.graph.has(concept)) {
+            this.graph.set(concept, new Set());
         }
+        const conceptSet = this.graph.get(concept);
+        for (let assoc of associations) {
+            conceptSet.add(assoc);
+            if (!this.graph.has(assoc)) {
+                this.graph.set(assoc, new Set());
+            }
+            this.graph.get(assoc).add(concept); // Ensure bidirectional linking
+        }
+    };
 
-        if (visited.has(nodeId)) return;
+    // Retrieve related concepts with a depth limit
+    this.retrieveRelated = function (concept, depth) {
+        if (!this.graph.has(concept)) return [];
+        const visited = new Set();
+        const queue = [{ node: concept, level: 0 }];
+        const results = [];
 
-        visited.add(nodeId);
-
-        const currentPattern = pattern[currentPatternIndex];
-        const node = this.nodes.get(nodeId);
-
-        for (const [neighborId, weight] of node.edges) {
-            if (weight === currentPattern) {
-                dfs.call(this, neighborId, currentPatternIndex + 1);
+        while (queue.length > 0) {
+            const { node, level } = queue.shift();
+            if (visited.has(node) || level > depth) continue;
+            visited.add(node);
+            results.push(node);
+            for (let neighbor of this.graph.get(node)) {
+                if (!visited.has(neighbor)) {
+                    queue.push({ node: neighbor, level: level + 1 });
+                }
             }
         }
+        return results;
+    };
 
-        visited.delete(nodeId);
-    }
+    // Pattern recognition: Find the shortest path between two concepts
+    this.findShortestPath = function (start, end) {
+        if (!this.graph.has(start) || !this.graph.has(end)) return null;
+        const queue = [{ node: start, path: [start] }];
+        const visited = new Set();
 
-    dfs.call(this, startId, 0);
-
-    return results;
-};
+        while (queue.length > 0) {
+            const { node, path } = queue.shift();
+            if (node === end) return path;
+            if (visited.has(node)) continue;
+            visited.add(node);
+            for (let neighbor of this.graph.get(node)) {
+                if (!visited.has(neighbor)) {
+                    queue.push({ node: neighbor, path: [...path, neighbor] });
+                }
+            }
+        }
+        return null; // No path found
+    };
+}
 
 // Test cases
-const graph = new KnowledgeGraph();
+const kg = new KnowledgeGraph();
 
-// Add nodes
-graph.addNode("A", { concept: "Start" });
-graph.addNode("B", { concept: "Intermediate" });
-graph.addNode("C", { concept: "End" });
-graph.addNode("D", { concept: "Alternate Path" });
-graph.addNode("E", { concept: "Final" });
+// Add concepts and their associations
+kg.addConcept("Fractals", ["Mathematics", "Nature"]);
+kg.addConcept("Mathematics", ["Geometry", "Algebra"]);
+kg.addConcept("Nature", ["Ecology", "Physics"]);
+kg.addConcept("Physics", ["Quantum Mechanics", "Relativity"]);
+kg.addConcept("Ecology", ["Environment", "Sustainability"]);
 
-// Add edges with weights
-graph.addEdge("A", "B", 1);
-graph.addEdge("B", "C", 2);
-graph.addEdge("A", "D", 3);
-graph.addEdge("D", "E", 2);
-graph.addEdge("C", "E", 1);
+// Test retrieval with depth
+console.log("Related to 'Mathematics' (depth 1):", kg.retrieveRelated("Mathematics", 1));
+console.log("Related to 'Mathematics' (depth 2):", kg.retrieveRelated("Mathematics", 2));
+console.log("Related to 'Fractals' (depth 3):", kg.retrieveRelated("Fractals", 3));
 
-// Test pattern retrieval
-console.log(graph.retrievePattern("A", [1, 2])); // Should return ["C"]
-console.log(graph.retrievePattern("A", [3, 2])); // Should return ["E"]
-console.log(graph.retrievePattern("A", [1, 3])); // Should return []
-console.log(graph.retrievePattern("B", [2]));    // Should return ["C"]
-console.log(graph.retrievePattern("D", [2]));    // Should return ["E"]
+// Test shortest path
+console.log("Shortest path between 'Fractals' and 'Relativity':", kg.findShortestPath("Fractals", "Relativity"));
+console.log("Shortest path between 'Nature' and 'Environment':", kg.findShortestPath("Nature", "Environment"));
+console.log("Shortest path between 'Fractals' and 'Nonexistent':", kg.findShortestPath("Fractals", "Nonexistent"));

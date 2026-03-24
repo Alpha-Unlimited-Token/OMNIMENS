@@ -1,0 +1,102 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: iterativeComputationManager
+ * Written: 2026-03-24T08:52:24.743Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// iterativeComputationManager.mjs
+
+import { createHash } from 'crypto';
+
+/**
+ * Serialize a computation state into a unique key for checkpointing.
+ * @param {object} state - The state object representing computation progress.
+ * @returns {string} A unique hash representing the serialized state.
+ */
+export function generateStateKey(state) {
+  const stateString = JSON.stringify(state);
+  return createHash('sha256').update(stateString).digest('hex');
+}
+
+/**
+ * Save computation state to memory for checkpointing.
+ * @param {Map} stateStore - A Map to store computation states.
+ * @param {string} key - The unique key for the computation state.
+ * @param {object} state - The computation state to save.
+ */
+export function saveState(stateStore, key, state) {
+  stateStore.set(key, state);
+}
+
+/**
+ * Retrieve computation state from memory.
+ * @param {Map} stateStore - A Map storing computation states.
+ * @param {string} key - The unique key for the computation state.
+ * @returns {object|null} The retrieved state, or null if not found.
+ */
+export function loadState(stateStore, key) {
+  return stateStore.get(key) || null;
+}
+
+/**
+ * Perform an iterative computation with checkpointing.
+ * @param {function} computeStep - A function representing one step of the computation.
+ * @param {object} initialState - The initial state of the computation.
+ * @param {Map} stateStore - A Map to store computation states.
+ * @param {number} maxSteps - Maximum number of steps to execute before checkpointing.
+ * @returns {object} The final state after computation or checkpoint.
+ */
+export function iterativeComputation(computeStep, initialState, stateStore, maxSteps = 100) {
+  let state = initialState;
+  const stateKey = generateStateKey(state);
+
+  // Check if there's an existing state to resume from
+  const savedState = loadState(stateStore, stateKey);
+  if (savedState) {
+    state = savedState;
+  }
+
+  let steps = 0;
+  while (steps < maxSteps) {
+    state = computeStep(state);
+    steps++;
+
+    // Checkpoint the state after each step
+    saveState(stateStore, stateKey, state);
+  }
+
+  return state;
+}
+
+/**
+ * Example computation step function (can be replaced with any logic).
+ * @param {object} state - The current state of the computation.
+ * @returns {object} The updated state after one computation step.
+ */
+export function exampleComputeStep(state) {
+  return { ...state, count: (state.count || 0) + 1 };
+}
+
+/**
+ * Example usage of the module.
+ * Demonstrates how to use the iterative computation manager.
+ */
+export function exampleUsage() {
+  const stateStore = new Map();
+  const initialState = { count: 0 };
+
+  const finalState = iterativeComputation(exampleComputeStep, initialState, stateStore, 10);
+  return finalState;
+}

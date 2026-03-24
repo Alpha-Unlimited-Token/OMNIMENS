@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: hierarchicalMemoryManager
- * Written: 2026-03-22T08:19:09.130Z
+ * Written: 2026-03-24T11:24:29.293Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,119 +16,133 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-/**
- * @module hierarchicalMemoryManager
- * @description Enables long-term context recall by compressing and storing older conversation data using clustering and summarization techniques.
- */
+// hierarchicalMemoryManager.mjs
+
+import { createHash } from 'crypto';
 
 /**
- * Clusters conversation data into semantically similar groups.
- * @param {Array<string>} data - Array of conversation strings.
- * @param {number} clusterCount - Number of clusters to create.
- * @returns {Array<Array<string>>} - Array of clusters, each containing semantically similar strings.
+ * Generate a hash for embedding keys using SHA-256.
+ * @param {string} key - The key to hash.
+ * @returns {string} - The hashed key.
  */
-export function clusterConversations(data, clusterCount) {
-  if (!Array.isArray(data) || typeof clusterCount !== 'number' || clusterCount <= 0) {
-    throw new Error('Invalid input: data must be an array of strings and clusterCount must be a positive number.');
+export function hashKey(key) {
+  return createHash('sha256').update(key).digest('hex');
+}
+
+/**
+ * Partition embeddings into shards based on hash values.
+ * @param {Array<Object>} embeddings - Array of embedding objects with { key, vector }.
+ * @param {number} numShards - Number of shards to partition into.
+ * @returns {Object} - Shard map with shard IDs as keys and embedding arrays as values.
+ */
+export function createShards(embeddings, numShards) {
+  const shards = {};
+  for (let i = 0; i < numShards; i++) {
+    shards[i] = [];
   }
 
-  // Simple k-means-like clustering based on string similarity (Levenshtein distance approximation)
-  const clusters = Array.from({ length: clusterCount }, () => []);
-  const centroids = data.slice(0, clusterCount); // Initial centroids are the first N items
+  embeddings.forEach(({ key, vector }) => {
+    const hash = hashKey(key);
+    const shardId = parseInt(hash.slice(-4), 16) % numShards;
+    shards[shardId].push({ key, vector });
+  });
 
-  for (let iteration = 0; iteration < 10; iteration++) { // Limit iterations to prevent infinite loops
-    clusters.forEach(cluster => cluster.length = 0); // Clear clusters
+  return shards;
+}
 
-    // Assign each string to the closest centroid
-    for (const str of data) {
-      let closestIndex = 0;
-      let minDistance = Infinity;
+/**
+ * Perform hierarchical clustering on embedding vectors.
+ * @param {Array<Object>} embeddings - Array of embedding objects with { key, vector }.
+ * @param {number} clusterSize - Maximum number of embeddings per cluster.
+ * @returns {Array<Array<Object>>} - Hierarchical clusters of embeddings.
+ */
+export function hierarchicalCluster(embeddings, clusterSize) {
+  if (embeddings.length <= clusterSize) {
+    return [embeddings];
+  }
 
-      for (let i = 0; i < centroids.length; i++) {
-        const distance = levenshteinDistance(str, centroids[i]);
-        if (distance < minDistance) {
-          minDistance = distance;
-          closestIndex = i;
-        }
-      }
+  const clusters = [];
+  let currentCluster = [];
 
-      clusters[closestIndex].push(str);
+  embeddings.forEach((embedding) => {
+    currentCluster.push(embedding);
+    if (currentCluster.length === clusterSize) {
+      clusters.push(currentCluster);
+      currentCluster = [];
     }
+  });
 
-    // Update centroids to be the average of their clusters
-    for (let i = 0; i < clusters.length; i++) {
-      if (clusters[i].length > 0) {
-        centroids[i] = summarizeCluster(clusters[i]);
-      }
-    }
+  if (currentCluster.length > 0) {
+    clusters.push(currentCluster);
   }
 
   return clusters;
 }
 
 /**
- * Summarizes a cluster of conversation strings into a single representative string.
- * @param {Array<string>} cluster - Array of strings within a single cluster.
- * @returns {string} - A summarized representation of the cluster.
+ * Retrieve embeddings from shards using a hashed key lookup.
+ * @param {Object} shards - Shard map with shard IDs as keys and embedding arrays as values.
+ * @param {string} key - The key to retrieve.
+ * @returns {Object|null} - The embedding object if found, otherwise null.
  */
-export function summarizeCluster(cluster) {
-  if (!Array.isArray(cluster) || cluster.length === 0) {
-    throw new Error('Invalid input: cluster must be a non-empty array of strings.');
-  }
+export function retrieveFromShards(shards, key) {
+  const hash = hashKey(key);
+  const shardId = parseInt(hash.slice(-4), 16) % Object.keys(shards).length;
 
-  // Simple summarization by finding the most common words
-  const wordCounts = {};
+  const shard = shards[shardId];
+  if (!shard) return null;
 
-  for (const str of cluster) {
-    const words = str.split(/\s+/);
-    for (const word of words) {
-      wordCounts[word] = (wordCounts[word] || 0) + 1;
-    }
-  }
-
-  const sortedWords = Object.entries(wordCounts).sort((a, b) => b[1] - a[1]);
-  const summary = sortedWords.slice(0, 10).map(([word]) => word).join(' ');
-
-  return summary;
+  return shard.find((embedding) => embedding.key === key) || null;
 }
 
 /**
- * Calculates the Levenshtein distance between two strings.
- * @param {string} a - First string.
- * @param {string} b - Second string.
- * @returns {number} - The Levenshtein distance between the two strings.
+ * Scale embedding retrieval using hierarchical clustering and shard storage.
+ * @param {Array<Object>} embeddings - Array of embedding objects with { key, vector }.
+ * @param {number} numShards - Number of shards to partition into.
+ * @param {number} clusterSize - Maximum number of embeddings per cluster.
+ * @returns {Object} - Object containing shards and hierarchical clusters.
  */
-export function levenshteinDistance(a, b) {
-  const matrix = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
-
-  for (let i = 0; i <= a.length; i++) {
-    for (let j = 0; j <= b.length; j++) {
-      if (i === 0) {
-        matrix[i][j] = j;
-      } else if (j === 0) {
-        matrix[i][j] = i;
-      } else if (a[i - 1] === b[j - 1]) {
-        matrix[i][j] = matrix[i - 1][j - 1];
-      } else {
-        matrix[i][j] = Math.min(
-          matrix[i - 1][j] + 1, // Deletion
-          matrix[i][j - 1] + 1, // Insertion
-          matrix[i - 1][j - 1] + 1 // Substitution
-        );
-      }
-    }
-  }
-
-  return matrix[a.length][b.length];
+export function scaleEmbeddingRetrieval(embeddings, numShards, clusterSize) {
+  const shards = createShards(embeddings, numShards);
+  const hierarchicalClusters = hierarchicalCluster(embeddings, clusterSize);
+  return { shards, hierarchicalClusters };
 }
 
 /**
- * Compresses and stores conversation data for long-term recall.
- * @param {Array<string>} data - Array of conversation strings.
- * @param {number} clusterCount - Number of clusters to create for compression.
- * @returns {Array<string>} - Array of summarized strings representing the clusters.
+ * Compute Euclidean distance between two vectors.
+ * @param {Array<number>} vectorA - First vector.
+ * @param {Array<number>} vectorB - Second vector.
+ * @returns {number} - Euclidean distance.
  */
-export function compressAndStore(data, clusterCount) {
-  const clusters = clusterConversations(data, clusterCount);
-  return clusters.map(summarizeCluster);
+export function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same length');
+  }
+
+  return Math.sqrt(
+    vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0)
+  );
+}
+
+/**
+ * Find the nearest neighbor embedding based on Euclidean distance.
+ * @param {Array<Object>} embeddings - Array of embedding objects with { key, vector }.
+ * @param {Array<number>} queryVector - Query vector to compare.
+ * @returns {Object|null} - Nearest neighbor embedding object or null if no embeddings exist.
+ */
+export function findNearestNeighbor(embeddings, queryVector) {
+  if (embeddings.length === 0) return null;
+
+  let nearest = null;
+  let minDistance = Infinity;
+
+  embeddings.forEach(({ key, vector }) => {
+    const distance = euclideanDistance(vector, queryVector);
+    if (distance < minDistance) {
+      minDistance = distance;
+      nearest = { key, vector, distance };
+    }
+  });
+
+  return nearest;
 }

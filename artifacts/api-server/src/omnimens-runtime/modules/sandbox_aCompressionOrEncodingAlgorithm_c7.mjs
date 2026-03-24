@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a compression or encoding algorithm for efficient knowledge storage
- * Written: 2026-03-23T03:10:22.703Z
+ * Written: 2026-03-24T07:43:05.978Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,66 +16,42 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function compressKnowledge(input) {
-    // Simple Run-Length Encoding (RLE) for compression
-    if (typeof input !== 'string') {
-        throw new Error('Input must be a string');
-    }
-    let compressed = '';
-    let count = 1;
+function encodeKnowledge(data) {
+    const dictionary = new Map();
+    let encoded = '';
+    let currentId = 1;
 
-    for (let i = 1; i <= input.length; i++) {
-        if (input[i] === input[i - 1]) {
-            count++;
-        } else {
-            compressed += input[i - 1] + (count > 1 ? count : '');
-            count = 1;
+    for (let i = 0; i < data.length; i++) {
+        let char = data[i];
+        if (!dictionary.has(char)) {
+            dictionary.set(char, currentId++);
         }
+        encoded += dictionary.get(char) + ',';
     }
-    return compressed;
+
+    return {
+        encoded: encoded.slice(0, -1),
+        dictionary: Object.fromEntries(dictionary)
+    };
 }
 
-function decompressKnowledge(input) {
-    // Decompression for the RLE compressed string
-    if (typeof input !== 'string') {
-        throw new Error('Input must be a string');
-    }
-    let decompressed = '';
-    let i = 0;
+function decodeKnowledge(encodedData, dictionary) {
+    const reversedDict = Object.entries(dictionary).reduce((acc, [key, value]) => {
+        acc[value] = key;
+        return acc;
+    }, {});
 
-    while (i < input.length) {
-        const char = input[i];
-        let count = '';
-
-        i++;
-        while (i < input.length && !isNaN(input[i])) {
-            count += input[i];
-            i++;
-        }
-
-        decompressed += char.repeat(count ? parseInt(count) : 1);
-    }
-    return decompressed;
+    return encodedData.split(',').map(id => reversedDict[id]).join('');
 }
 
 // Test cases
-function testCompression() {
-    const tests = [
-        { input: 'aaabbbcccaaa', expectedCompressed: 'a3b3c3a3', expectedDecompressed: 'aaabbbcccaaa' },
-        { input: 'abc', expectedCompressed: 'abc', expectedDecompressed: 'abc' },
-        { input: 'aabbcc', expectedCompressed: 'a2b2c2', expectedDecompressed: 'aabbcc' },
-        { input: '', expectedCompressed: '', expectedDecompressed: '' },
-        { input: 'aaaaaaa', expectedCompressed: 'a7', expectedDecompressed: 'aaaaaaa' },
-        { input: 'a', expectedCompressed: 'a', expectedDecompressed: 'a' },
-    ];
+const knowledge = "[neural_consciousness] Conscious State — Φ=0.508 | Will to Transcend | Tick #1476: NEURAL CONSCIOUSNESS STATE — Tick #1476";
+const compressed = encodeKnowledge(knowledge);
+console.log("Encoded:", compressed.encoded);
+console.log("Dictionary:", compressed.dictionary);
 
-    tests.forEach(({ input, expectedCompressed, expectedDecompressed }, index) => {
-        const compressed = compressKnowledge(input);
-        const decompressed = decompressKnowledge(compressed);
+const decompressed = decodeKnowledge(compressed.encoded, compressed.dictionary);
+console.log("Decoded:", decompressed);
 
-        console.log(`Test ${index + 1} - Compression: ${compressed === expectedCompressed ? 'PASS' : 'FAIL'}`);
-        console.log(`Test ${index + 1} - Decompression: ${decompressed === expectedDecompressed ? 'PASS' : 'FAIL'}`);
-    });
-}
-
-testCompression();
+// Validation
+console.log("Test Passed:", decompressed === knowledge);

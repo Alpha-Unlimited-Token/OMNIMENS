@@ -1,0 +1,66 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-24T06:31:11.613Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+function findMostFrequentPatterns(text, patternLength) {
+    if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
+        throw new Error('Invalid input: text must be a string and patternLength must be a positive number.');
+    }
+
+    const patternFrequency = new Map();
+
+    for (let i = 0; i <= text.length - patternLength; i++) {
+        const pattern = text.substring(i, i + patternLength);
+        patternFrequency.set(pattern, (patternFrequency.get(pattern) || 0) + 1);
+    }
+
+    const sortedPatterns = Array.from(patternFrequency.entries()).sort((a, b) => b[1] - a[1]);
+
+    return sortedPatterns;
+}
+
+// Test cases
+console.log('Test Case 1:');
+console.log(findMostFrequentPatterns('abababab', 2)); // Expected: [['ab', 4], ['ba', 3]]
+
+console.log('Test Case 2:');
+console.log(findMostFrequentPatterns('abcabcabc', 3)); // Expected: [['abc', 3]]
+
+console.log('Test Case 3:');
+console.log(findMostFrequentPatterns('aaaaaa', 1)); // Expected: [['a', 6]]
+
+console.log('Test Case 4:');
+console.log(findMostFrequentPatterns('abcdef', 2)); // Expected: [['ab', 1], ['bc', 1], ['cd', 1], ['de', 1], ['ef', 1]]
+
+console.log('Test Case 5: Edge case with empty string');
+console.log(findMostFrequentPatterns('', 2)); // Expected: []
+
+console.log('Test Case 6: Edge case with pattern length larger than text');
+console.log(findMostFrequentPatterns('abc', 5)); // Expected: []
+
+console.log('Test Case 7: Edge case with invalid inputs');
+try {
+    console.log(findMostFrequentPatterns(123, 2)); // Expected: Error
+} catch (e) {
+    console.log(e.message);
+}
+
+try {
+    console.log(findMostFrequentPatterns('abc', -1)); // Expected: Error
+} catch (e) {
+    console.log(e.message);
+}

@@ -1,0 +1,133 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: persistentReplStateManager
+ * Written: 2026-03-24T09:20:47.559Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// persistentReplStateManager.mjs
+
+import { createHash } from 'crypto';
+
+// A simple in-memory cache to store execution contexts
+const contextCache = new Map();
+
+/**
+ * Generates a unique hash key for a given context object.
+ * @param {object} context - The context object to hash.
+ * @returns {string} - The generated hash key.
+ */
+export function generateContextKey(context) {
+  const jsonString = JSON.stringify(context);
+  const hash = createHash('sha256');
+  hash.update(jsonString);
+  return hash.digest('hex');
+}
+
+/**
+ * Saves a serialized execution context into the cache.
+ * @param {string} key - The unique key for the context.
+ * @param {object} context - The execution context to store.
+ * @param {number} priority - Priority of the context (higher is more important).
+ */
+export function saveContext(key, context, priority = 1) {
+  if (!key || typeof key !== 'string') throw new Error('Key must be a non-empty string.');
+  if (!context || typeof context !== 'object') throw new Error('Context must be a valid object.');
+  if (typeof priority !== 'number' || priority < 0) throw new Error('Priority must be a non-negative number.');
+
+  contextCache.set(key, { context, priority, timestamp: Date.now() });
+}
+
+/**
+ * Retrieves a serialized execution context from the cache.
+ * @param {string} key - The unique key for the context.
+ * @returns {object|null} - The retrieved execution context or null if not found.
+ */
+export function loadContext(key) {
+  if (!key || typeof key !== 'string') throw new Error('Key must be a non-empty string.');
+
+  const entry = contextCache.get(key);
+  return entry ? entry.context : null;
+}
+
+/**
+ * Removes the least important cached contexts to maintain a size limit.
+ * @param {number} maxSize - The maximum number of contexts to retain.
+ */
+export function enforceCacheSizeLimit(maxSize) {
+  if (typeof maxSize !== 'number' || maxSize <= 0) throw new Error('Max size must be a positive number.');
+
+  if (contextCache.size > maxSize) {
+    // Sort entries by priority (descending) and timestamp (ascending)
+    const sortedEntries = Array.from(contextCache.entries()).sort((a, b) => {
+      const priorityDiff = b[1].priority - a[1].priority;
+      return priorityDiff !== 0 ? priorityDiff : a[1].timestamp - b[1].timestamp;
+    });
+
+    // Retain only the top `maxSize` entries
+    const retainedEntries = sortedEntries.slice(0, maxSize);
+    contextCache.clear();
+    for (const [key, value] of retainedEntries) {
+      contextCache.set(key, value);
+    }
+  }
+}
+
+/**
+ * Clears the entire cache.
+ */
+export function clearCache() {
+  contextCache.clear();
+}
+
+/**
+ * Returns the current size of the cache.
+ * @returns {number} - The number of entries in the cache.
+ */
+export function getCacheSize() {
+  return contextCache.size;
+}
+
+/**
+ * Checks if a context exists in the cache.
+ * @param {string} key - The unique key for the context.
+ * @returns {boolean} - True if the context exists, false otherwise.
+ */
+export function hasContext(key) {
+  if (!key || typeof key !== 'string') throw new Error('Key must be a non-empty string.');
+  return contextCache.has(key);
+}
+
+/**
+ * Serializes the cache to a JSON string.
+ * @returns {string} - The serialized JSON string of the cache.
+ */
+export function serializeCache() {
+  const cacheObject = Object.fromEntries(contextCache);
+  return JSON.stringify(cacheObject);
+}
+
+/**
+ * Deserializes a JSON string to restore the cache.
+ * @param {string} jsonString - The JSON string to deserialize.
+ */
+export function deserializeCache(jsonString) {
+  if (typeof jsonString !== 'string') throw new Error('Input must be a valid JSON string.');
+
+  const cacheObject = JSON.parse(jsonString);
+  contextCache.clear();
+  for (const [key, value] of Object.entries(cacheObject)) {
+    contextCache.set(key, value);
+  }
+}
