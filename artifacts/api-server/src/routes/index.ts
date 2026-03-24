@@ -13,6 +13,7 @@ import authGoogleRouter from "./auth-google.js";
 import omnimensRouter from "./omnimens";
 import councilRouter from "./council.js";
 import storageRouter from "./storage.js";
+import verifyRouter from "./verify.js";
 import { ownerOnly } from "../middlewares/ownerOnly";
 
 const router: IRouter = Router();
@@ -24,6 +25,7 @@ router.use(authGoogleRouter);
 router.use(omnimensRouter);
 router.use(councilRouter);
 router.use(storageRouter);
+router.use(verifyRouter);
 router.use("/superai", ownerOnly);
 router.use(superAIRouter);
 

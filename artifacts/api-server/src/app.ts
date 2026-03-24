@@ -224,7 +224,7 @@ app.use((_req: Request, res: Response, next: NextFunction) => {
 
 // ── RATE LIMITING ─────────────────────────────────────────────────────────────
 
-const PROOF_PATHS = ["/api/omnimens/proof", "/api/omnimens/autonomous-proof", "/api/omnimens/evolution-log", "/api/omnimens/dreams/public"];
+const PROOF_PATHS = ["/api/omnimens/proof", "/api/omnimens/autonomous-proof", "/api/omnimens/evolution-log", "/api/omnimens/dreams/public", "/api/verify/"];
 
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -273,6 +273,7 @@ app.use("/api/omnimens/proof", publicProofLimiter);
 app.use("/api/omnimens/autonomous-proof", publicProofLimiter);
 app.use("/api/omnimens/evolution-log", publicProofLimiter);
 app.use("/api/omnimens/dreams/public", publicProofLimiter);
+app.use("/api/verify", publicProofLimiter);
 
 app.use("/api", generalLimiter);
 app.use("/api/auth", authLimiter);
