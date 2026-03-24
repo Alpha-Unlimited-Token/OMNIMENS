@@ -9374,14 +9374,15 @@
       "filename": "virtualReplStateManager_gen1.mjs",
       "stage": "context_compression",
       "exports": [
-        "serializeContext",
-        "deserializeContext",
-        "generateContextHash",
-        "restoreContext",
-        "validateContextIntegrity",
-        "exampleUsage"
+        "generateTaskId",
+        "saveState",
+        "restoreState",
+        "clearState",
+        "clearAllStates",
+        "listTaskIds",
+        "hasState"
       ],
-      "loadedAt": 1774359892475,
+      "loadedAt": 1774360354378,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -9751,9 +9752,37 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "apiQueryOptimizer_gen1.mjs": {
+      "filename": "apiQueryOptimizer_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateQueryHash",
+        "batchQueries",
+        "APIQueryOptimizer"
+      ],
+      "loadedAt": 1774360361523,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "daydreamdivergentthinking1792.mjs": {
+      "filename": "daydreamdivergentthinking1792.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "step"
+      ],
+      "loadedAt": 1774360613916,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774359892487,
-  "totalModules": 510,
+  "totalModules": 513,
   "totalCalls": 0
 }

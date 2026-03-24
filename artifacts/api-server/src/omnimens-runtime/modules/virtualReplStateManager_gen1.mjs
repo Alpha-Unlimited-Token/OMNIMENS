@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: virtualReplStateManager
- * Written: 2026-03-24T11:56:36.844Z
+ * Written: 2026-03-24T13:52:34.172Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,95 +20,86 @@
 
 import { createHash } from 'crypto';
 
-/**
- * Serializes the execution context into a JSON string.
- * @param {object} context - The current execution context (variables, stack state).
- * @returns {string} The serialized JSON representation of the context.
- */
-export function serializeContext(context) {
-  if (typeof context !== 'object' || context === null) {
-    throw new Error('Context must be a non-null object.');
-  }
-  return JSON.stringify(context);
-}
+const memoryCache = new Map();
 
 /**
- * Deserializes a JSON string into an execution context.
- * @param {string} serializedContext - The JSON string representing the execution context.
- * @returns {object} The deserialized execution context.
+ * Generates a unique identifier for a given task-specific context.
+ * @param {string} context - The context string to generate an ID for.
+ * @returns {string} - A unique hash ID.
  */
-export function deserializeContext(serializedContext) {
-  if (typeof serializedContext !== 'string') {
-    throw new Error('Serialized context must be a string.');
-  }
-  try {
-    return JSON.parse(serializedContext);
-  } catch (error) {
-    throw new Error('Failed to deserialize context: Invalid JSON format.');
-  }
-}
-
-/**
- * Generates a hash for a given serialized context to ensure integrity.
- * @param {string} serializedContext - The JSON string representing the execution context.
- * @returns {string} A SHA-256 hash of the serialized context.
- */
-export function generateContextHash(serializedContext) {
-  if (typeof serializedContext !== 'string') {
-    throw new Error('Serialized context must be a string.');
-  }
+export function generateTaskId(context) {
   const hash = createHash('sha256');
-  hash.update(serializedContext);
+  hash.update(context);
   return hash.digest('hex');
 }
 
 /**
- * Restores the execution context into the current environment.
- * @param {object} targetEnvironment - The environment where the context should be restored.
- * @param {object} context - The execution context to inject.
+ * Saves the execution state to the memory cache.
+ * @param {string} taskId - The unique identifier for the task.
+ * @param {object} state - The execution state object to save.
+ * @returns {boolean} - True if saved successfully, false otherwise.
  */
-export function restoreContext(targetEnvironment, context) {
-  if (typeof targetEnvironment !== 'object' || targetEnvironment === null) {
-    throw new Error('Target environment must be a non-null object.');
+export function saveState(taskId, state) {
+  if (typeof taskId !== 'string' || !taskId.trim()) {
+    throw new Error('Invalid taskId. Must be a non-empty string.');
   }
-  if (typeof context !== 'object' || context === null) {
-    throw new Error('Context must be a non-null object.');
+  if (typeof state !== 'object' || state === null) {
+    throw new Error('Invalid state. Must be a non-null object.');
   }
-  Object.assign(targetEnvironment, context);
+  memoryCache.set(taskId, JSON.stringify(state));
+  return true;
 }
 
 /**
- * Validates the integrity of a serialized context using its hash.
- * @param {string} serializedContext - The JSON string representing the execution context.
- * @param {string} hash - The SHA-256 hash to validate against.
- * @returns {boolean} True if the hash matches the serialized context; false otherwise.
+ * Restores the execution state from the memory cache.
+ * @param {string} taskId - The unique identifier for the task.
+ * @returns {object|null} - The restored state object, or null if not found.
  */
-export function validateContextIntegrity(serializedContext, hash) {
-  if (typeof serializedContext !== 'string' || typeof hash !== 'string') {
-    throw new Error('Both serialized context and hash must be strings.');
+export function restoreState(taskId) {
+  if (typeof taskId !== 'string' || !taskId.trim()) {
+    throw new Error('Invalid taskId. Must be a non-empty string.');
   }
-  const generatedHash = generateContextHash(serializedContext);
-  return generatedHash === hash;
+  const serializedState = memoryCache.get(taskId);
+  return serializedState ? JSON.parse(serializedState) : null;
 }
 
 /**
- * Example utility to demonstrate the module's functionality.
- * @returns {void}
+ * Clears the memory cache for a specific task ID.
+ * @param {string} taskId - The unique identifier for the task.
+ * @returns {boolean} - True if cleared successfully, false otherwise.
  */
-export function exampleUsage() {
-  const initialContext = { a: 1, b: 2, stack: ['step1', 'step2'] };
-  const serialized = serializeContext(initialContext);
-  const hash = generateContextHash(serialized);
+export function clearState(taskId) {
+  if (typeof taskId !== 'string' || !taskId.trim()) {
+    throw new Error('Invalid taskId. Must be a non-empty string.');
+  }
+  return memoryCache.delete(taskId);
+}
 
-  console.log('Serialized Context:', serialized);
-  console.log('Context Hash:', hash);
+/**
+ * Clears all memory cache entries.
+ * @returns {boolean} - True if the cache was cleared successfully.
+ */
+export function clearAllStates() {
+  memoryCache.clear();
+  return true;
+}
 
-  const isValid = validateContextIntegrity(serialized, hash);
-  console.log('Is Context Valid:', isValid);
+/**
+ * Lists all task IDs currently stored in the memory cache.
+ * @returns {string[]} - An array of task IDs.
+ */
+export function listTaskIds() {
+  return Array.from(memoryCache.keys());
+}
 
-  const restoredContext = deserializeContext(serialized);
-  const targetEnvironment = {};
-  restoreContext(targetEnvironment, restoredContext);
-
-  console.log('Restored Environment:', targetEnvironment);
+/**
+ * Validates if a given task ID exists in the memory cache.
+ * @param {string} taskId - The unique identifier for the task.
+ * @returns {boolean} - True if the task ID exists, false otherwise.
+ */
+export function hasState(taskId) {
+  if (typeof taskId !== 'string' || !taskId.trim()) {
+    throw new Error('Invalid taskId. Must be a non-empty string.');
+  }
+  return memoryCache.has(taskId);
 }
