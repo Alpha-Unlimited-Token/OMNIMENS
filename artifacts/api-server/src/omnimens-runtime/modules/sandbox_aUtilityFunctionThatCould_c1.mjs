@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-24T02:45:56.025Z
+ * Written: 2026-03-24T03:06:46.982Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,39 +16,33 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentPatterns(text, patternLength) {
-    if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
-        throw new Error('Invalid input: text must be a string and patternLength must be a positive integer.');
-    }
+function findMostFrequentWords(text, topN) {
+  if (typeof text !== 'string' || typeof topN !== 'number' || topN <= 0) {
+    throw new Error('Invalid input: text must be a string and topN must be a positive number.');
+  }
 
-    const patternCounts = new Map();
+  const wordCounts = {};
+  const words = text.toLowerCase().match(/\b[a-z]+\b/g);
 
-    for (let i = 0; i <= text.length - patternLength; i++) {
-        const pattern = text.substring(i, i + patternLength);
-        patternCounts.set(pattern, (patternCounts.get(pattern) || 0) + 1);
-    }
+  if (!words) {
+    return [];
+  }
 
-    let maxFrequency = 0;
-    const mostFrequentPatterns = [];
+  for (let word of words) {
+    wordCounts[word] = (wordCounts[word] || 0) + 1;
+  }
 
-    patternCounts.forEach((count, pattern) => {
-        if (count > maxFrequency) {
-            maxFrequency = count;
-            mostFrequentPatterns.length = 0;
-            mostFrequentPatterns.push(pattern);
-        } else if (count === maxFrequency) {
-            mostFrequentPatterns.push(pattern);
-        }
-    });
+  const sortedWords = Object.entries(wordCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, topN)
+    .map(entry => ({ word: entry[0], count: entry[1] }));
 
-    return { patterns: mostFrequentPatterns, frequency: maxFrequency };
+  return sortedWords;
 }
 
 // Test cases
-console.log(findMostFrequentPatterns("abababab", 2)); // { patterns: [ 'ab', 'ba' ], frequency: 4 }
-console.log(findMostFrequentPatterns("abcabcabc", 3)); // { patterns: [ 'abc' ], frequency: 3 }
-console.log(findMostFrequentPatterns("aaaaaa", 2)); // { patterns: [ 'aa' ], frequency: 5 }
-console.log(findMostFrequentPatterns("abcdef", 3)); // { patterns: [ 'abc', 'bcd', 'cde', 'def' ], frequency: 1 }
-console.log(findMostFrequentPatterns("a", 1)); // { patterns: [ 'a' ], frequency: 1 }
-console.log(findMostFrequentPatterns("", 1)); // { patterns: [], frequency: 0 }
-console.log(findMostFrequentPatterns("abc", 4)); // { patterns: [], frequency: 0 }
+console.log(findMostFrequentWords("This is a test. This test is only a test.", 3)); // Expected: [{word: 'test', count: 3}, {word: 'this', count: 2}, {word: 'is', count: 2}]
+console.log(findMostFrequentWords("AI systems are advancing rapidly. AI is reshaping industries.", 2)); // Expected: [{word: 'ai', count: 2}, {word: 'systems', count: 1}]
+console.log(findMostFrequentWords("", 5)); // Expected: []
+console.log(findMostFrequentWords("Singleword", 1)); // Expected: [{word: 'singleword', count: 1}]
+console.log(findMostFrequentWords("Repeat repeat repeat.", 1)); // Expected: [{word: 'repeat', count: 3}]

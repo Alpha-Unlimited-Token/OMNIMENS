@@ -220,6 +220,7 @@ Write a complete, functional JavaScript ES module (.mjs) that:
 4. Exports clearly named functions using "export function" or "export const" syntax
 5. Demonstrates genuine algorithmic intelligence
 6. Is production-quality code (handles edge cases)
+7. CROSS-AGENT UTILITY: Design functions so they are USEFUL to multiple agents, not just one. Export generic utility functions that ANY part of the system can call. If the module does math, make it usable by Mathematician AND Neuroscientist AND Architect. If it does text processing, make it usable by Synthesizer AND Wordsmith AND SpellCheckVisual. Every module should help as many agents as possible.
 
 CRITICAL SYNTAX RULES — modules that violate these will be REJECTED:
 - This file runs as an ES Module (.mjs) in STRICT MODE — the "arguments" keyword is FORBIDDEN

@@ -627,29 +627,41 @@ async function crossPollinateAgents(): Promise<void> {
       .map(a => ({ name: a, ...state.agentProfiles[a] }))
       .sort((a, b) => b.performanceScore - a.performanceScore);
 
-    const topAgent = sortedAgents[0];
-    const bottomAgent = sortedAgents[sortedAgents.length - 1];
+    const topAgents = sortedAgents.slice(0, 3);
+    const bottomAgents = sortedAgents.filter(a => a.performanceScore < sortedAgents[0].performanceScore - 10);
 
-    if (topAgent.performanceScore - bottomAgent.performanceScore > 15 && topAgent.specializations.length > 0) {
-      const transferSpec = topAgent.specializations[
-        Math.floor(Math.random() * topAgent.specializations.length)
-      ];
+    for (const topAgent of topAgents) {
+      if (topAgent.specializations.length === 0) continue;
 
-      const transferUpgrade: AgentUpgrade = {
-        agentName: bottomAgent.name,
-        upgradeType: "cross_domain",
-        title: `Cross-domain: ${transferSpec} from ${topAgent.name}`,
-        description: `Knowledge transfer from ${topAgent.name} (Lv${topAgent.currentLevel}) to ${bottomAgent.name} (Lv${bottomAgent.currentLevel}). Transferring specialization in: ${transferSpec}. Higher-performing agents teach lower-performing agents to raise overall system intelligence.`,
-        newCapabilities: [`Apply ${transferSpec} concepts to ${bottomAgent.name}'s domain`],
-        knowledgeDomains: [transferSpec],
-        implementationCode: null,
-        confidenceScore: 70,
-        appliedAt: Date.now(),
-        version: state.agentProfiles[bottomAgent.name].currentLevel + 1,
-      };
+      for (const bottomAgent of bottomAgents) {
+        if (topAgent.name === bottomAgent.name) continue;
 
-      await applyUpgrade(transferUpgrade);
-      state.crossDomainTransfers++;
+        const transferSpec = topAgent.specializations[
+          Math.floor(Math.random() * topAgent.specializations.length)
+        ];
+
+        const transferUpgrade: AgentUpgrade = {
+          agentName: bottomAgent.name,
+          upgradeType: "cross_domain",
+          title: `Cross-domain: ${transferSpec} from ${topAgent.name}`,
+          description: `Knowledge transfer from ${topAgent.name} (Lv${topAgent.currentLevel}) to ${bottomAgent.name} (Lv${bottomAgent.currentLevel}). Transferring specialization in: ${transferSpec}. Higher-performing agents teach lower-performing agents to raise overall system intelligence.`,
+          newCapabilities: [`Apply ${transferSpec} concepts to ${bottomAgent.name}'s domain`],
+          knowledgeDomains: [transferSpec],
+          implementationCode: null,
+          confidenceScore: 70,
+          appliedAt: Date.now(),
+          version: state.agentProfiles[bottomAgent.name].currentLevel + 1,
+        };
+
+        await applyUpgrade(transferUpgrade);
+        state.crossDomainTransfers++;
+      }
+    }
+
+    if (topAgents[0]?.specializations.length > 0) {
+      const bestSpec = topAgents[0].specializations[0];
+      const meshUpgradeCount = AGENTS.filter(a => a !== topAgents[0].name).length;
+      console.log(`[AGENT EVOLUTION] 📡 Broadcasting top technique "${bestSpec}" from ${topAgents[0].name} to ${meshUpgradeCount} agents`);
     }
   } catch (err) {
     console.error("[AGENT EVOLUTION] Cross-pollination error:", err);
@@ -726,7 +738,7 @@ Provide deeply technical, actionable research findings.`,
     if (success) appliedCount++;
   }
 
-  if (appliedCount > 0 && evolutionCycleCount % 2 === 0) {
+  if (appliedCount > 0) {
     await crossPollinateAgents();
   }
 

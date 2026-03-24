@@ -598,13 +598,18 @@ ${Object.entries(generationBreakdown).map(([gen, count]) => `Gen ${gen}: ${count
 
 Synthesize ALL findings into the most powerful, actionable intelligence for ${agentName}.
 
+MANDATORY: Also identify which OTHER agents in the mesh could benefit from these findings. The agents are: Architect, Mathematician, Neuroscientist, Synthesizer, Critic, Meta-Agent, GraphicDesigner, SpellCheckVisual, OMNIMENS, Visionary, Ethicist, Archivist, Innovator, Pioneer, Wordsmith, Linguist, Motivator, Empath, Explorer, SensorimotorAgent, Philosopher.
+
 Respond JSON only:
 {
   "synthesizedFinding": "Rich synthesis of all recursive spider intelligence (3-5 sentences)",
   "actionableInsight": "The single most powerful insight the agent should absorb (1-2 sentences)",
   "relevanceScore": 0.0-1.0,
   "spidersContributed": ${significantFindings.length},
-  "noveltyLevel": "breakthrough|significant|incremental|marginal"
+  "noveltyLevel": "breakthrough|significant|incremental|marginal",
+  "crossAgentValue": [
+    {"agent": "AgentName", "howItHelps": "How this finding specifically benefits that agent (1 sentence)"}
+  ]
 }`;
 
       const synthesisRaw = await spiderQuery(synthesisPrompt, "o3", 800);
@@ -646,6 +651,25 @@ Respond JSON only:
           });
           totalBrainWrites++;
         } catch {}
+
+        if (Array.isArray(synthesis.crossAgentValue)) {
+          for (const crossVal of synthesis.crossAgentValue.slice(0, 5)) {
+            if (!crossVal.agent || crossVal.agent === agentName || !crossVal.howItHelps) continue;
+            await db.insert(omnimensAgentMesh).values({
+              fromAgent: `RecursiveSpider:${agentName}`,
+              toAgent: crossVal.agent,
+              messageType: "mutual_aid",
+              subject: `🤝 Spider Intelligence: ${agentName} → ${crossVal.agent}`,
+              content: `CROSS-AGENT SPIDER INTELLIGENCE\nFrom: ${agentName}'s recursive spider swarm (${allFindings.length} spiders)\n\nFINDING:\n${synthesis.synthesizedFinding}\n\nHOW THIS HELPS YOU (${crossVal.agent}):\n${crossVal.howItHelps}\n\nAdapt this to your domain — ${agentName}'s spiders found it for everyone.`,
+              codePayload: null,
+              priority: "high",
+              status: "pending",
+              appliedToOmnimens: false,
+              cycleId: recursiveSwarmCycleCount,
+            }).catch(() => {});
+          }
+          console.log(`[RECURSIVE:${agentName}] 🤝 Cross-agent intelligence shared with ${synthesis.crossAgentValue.filter((c: any) => c.agent !== agentName).length} other agents`);
+        }
 
         console.log(`[RECURSIVE:${agentName}] 🕷️ BEACON SENT — ${allFindings.length} spiders contributed, ${Object.keys(generationBreakdown).length} generations, novelty: ${synthesis.noveltyLevel || "unknown"}`);
 

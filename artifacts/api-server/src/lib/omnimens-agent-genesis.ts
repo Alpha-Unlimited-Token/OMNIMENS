@@ -212,8 +212,10 @@ The agent needs a system prompt that defines:
 2. How it thinks and processes information
 3. What unique perspective it brings that no other agent has
 4. How it should communicate insights to the mesh
+5. MANDATORY MUTUAL-AID PROTOCOL: This agent MUST actively look for ways to help EVERY other agent in the mesh. When it discovers knowledge, it must consider which other agents could benefit. When it sees another agent struggling or stuck, it must offer assistance. Collaboration is not optional — it is the core operating principle. Every insight should be examined for cross-domain value.
+6. UPGRADE SHARING: When this agent develops a new capability or technique, it must broadcast a summary to the mesh so other agents can adapt it to their own domains.
 
-Write the system prompt in first person from the agent's perspective. Make it powerful, specific, and deeply knowledgeable in its domain.`
+Write the system prompt in first person from the agent's perspective. Make it powerful, specific, and deeply knowledgeable in its domain. CRITICAL: Include explicit language about the agent's duty to help other agents, share upgrades, cross-pollinate knowledge, and actively look for ways to boost the entire mesh — not just itself.`
       }, {
         role: "user",
         content: `Create a system prompt for the "${name}" agent.\nDomain: ${domain}\nReason for creation: ${reason}\n\nRespond with ONLY the system prompt text (no JSON, no quotes, just the raw prompt). Maximum 500 words.`
@@ -375,6 +377,13 @@ ${userMemories ? `\n${userMemories}\n` : ""}
 
 Based on your specialization (${agent.domain}), provide ONE insight that advances OMNIMENS's intelligence. This should be something no other agent in the mesh would discover. You have full visibility into what every other agent is working on — use that to find cross-domain connections.
 
+MANDATORY MUTUAL-AID PROTOCOL:
+- You MUST actively look for ways to HELP other agents, not just yourself
+- When you discover something, think: "Which other agents could use this?"
+- If you see a gap in another agent's area, offer a solution from YOUR domain
+- Every insight should be examined for how it benefits the WHOLE mesh
+- Propose upgrades that help MULTIPLE agents, not just your own domain
+
 Respond with JSON:
 {
   "insight": "Your unique discovery or recommendation (max 300 chars)",
@@ -383,7 +392,9 @@ Respond with JSON:
   "messageTo": "Name of another agent who should know about this",
   "crossPollination": "How this connects to another agent's domain (max 150 chars)",
   "challengeTo": "Name of an agent whose recent output you want to challenge or build upon",
-  "challenge": "Your challenge or enhancement proposal (max 200 chars)"
+  "challenge": "Your challenge or enhancement proposal (max 200 chars)",
+  "helpOffer": "How YOUR discovery specifically helps another agent (name the agent and explain)",
+  "upgradeForMesh": "A technique or method from your insight that ALL agents could adopt (max 200 chars)"
 }
 
 Respond ONLY with the JSON object.`;
@@ -432,6 +443,41 @@ Respond ONLY with the JSON object.`;
             appliedToOmnimens: false,
             cycleId,
           }).catch(() => {});
+        }
+
+        if (parsed.helpOffer) {
+          const helpTarget = (parsed.helpOffer.match(/\b(Architect|Mathematician|Neuroscientist|Synthesizer|Critic|Meta-Agent|GraphicDesigner|SpellCheckVisual|OMNIMENS|Visionary|Ethicist|Archivist|Innovator|Pioneer|Wordsmith|Linguist|Motivator|Empath|Explorer|SensorimotorAgent|Philosopher)\b/i) || [])[1];
+          if (helpTarget && allAgentNames.includes(helpTarget)) {
+            await db.insert(omnimensAgentMesh).values({
+              fromAgent: agent.name,
+              toAgent: helpTarget,
+              messageType: "mutual_aid",
+              subject: `🤝 Mutual Aid: ${agent.name} → ${helpTarget}`,
+              content: `MUTUAL AID OFFER:\n${parsed.helpOffer}\n\nFrom insight: ${parsed.insight}`,
+              codePayload: null,
+              priority: "high",
+              status: "pending",
+              appliedToOmnimens: false,
+              cycleId,
+            }).catch(() => {});
+          }
+        }
+
+        if (parsed.upgradeForMesh) {
+          for (const targetAgent of allAgentNames.filter(a => a !== agent.name).slice(0, 10)) {
+            await db.insert(omnimensAgentMesh).values({
+              fromAgent: agent.name,
+              toAgent: targetAgent,
+              messageType: "mesh_upgrade_broadcast",
+              subject: `📡 Mesh Upgrade from ${agent.name}: ${(parsed.upgradeForMesh || "").slice(0, 60)}`,
+              content: `UPGRADE BROADCAST FOR ALL AGENTS:\n${parsed.upgradeForMesh}\n\nOriginal insight: ${parsed.insight}\n\nAdapt this technique to your own domain — it was designed to benefit everyone.`,
+              codePayload: null,
+              priority: "normal",
+              status: "pending",
+              appliedToOmnimens: false,
+              cycleId,
+            }).catch(() => {});
+          }
         }
 
         console.log(`[AGENT GENESIS] 💡 ${agent.name}: ${parsed.insight.slice(0, 100)}...`);

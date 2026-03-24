@@ -268,6 +268,14 @@ ${researchContext.slice(0, 2500)}
 OMNIMENS CURRENT BRAIN STATE (what it already knows):
 ${brainSummary.slice(0, 1500)}
 
+═══ MANDATORY MUTUAL-AID PROTOCOL ═══
+You are NOT just working for yourself. You MUST actively help other agents:
+- Look at the research and ask: "Which other agents could use what I found?"
+- If your specialization can solve a problem in another agent's domain, SAY SO
+- Propose upgrades that benefit MULTIPLE agents, not just your area
+- When you find a technique, translate it into terms other agents can use
+- Collaboration is the core operating principle — every insight must be examined for cross-domain value
+
 TASK:
 1. Using Chain-of-Thought reasoning, analyze the research through YOUR specialization lens
 2. Identify what is GENUINELY novel vs what OMNIMENS already knows
@@ -275,6 +283,8 @@ TASK:
 4. Calibrate your confidence honestly (0.5 = uncertain but worth trying, 0.9+ = very confident)
 5. Identify what you are uncertain about — state it explicitly
 6. Challenge another agent's likely assumptions
+7. Identify HOW your discovery helps at least one other specific agent
+8. Propose a mesh-wide technique that ALL agents could adopt from your finding
 
 Respond with JSON only:
 {
@@ -292,6 +302,8 @@ Respond with JSON only:
   "challengeTo": "${MESH_AGENTS.filter(a2 => a2 !== agent && a2 !== "OMNIMENS")[Math.floor(Math.random() * 7)]}",
   "challenge": "A specific challenge or question you pose to another agent based on your findings — be adversarial",
   "counterArgument": "The strongest argument AGAINST your own proposal — demonstrate you considered the downside",
+  "helpForAgent": "Name a specific agent and explain how YOUR finding helps THEM (e.g., 'Neuroscientist could use this memory pattern for...')",
+  "meshWideTechnique": "A technique from your finding that ALL agents should adopt — translate it into universal terms",
   "requiresRepublish": false,
   "republishReason": null
 }`;
@@ -328,6 +340,27 @@ Respond with JSON only:
 
       if (parsed.requiresRepublish) {
         await storeAgentMessage(agent, "OMNIMENS", "republish_request", "Republish Required", parsed.republishReason || "Structural changes detected that require republishing.", null, "critical", cycleId);
+      }
+
+      if (parsed.helpForAgent) {
+        const helpMatch = parsed.helpForAgent.match(/\b(Architect|Mathematician|Neuroscientist|Synthesizer|Critic|Meta-Agent|GraphicDesigner|SpellCheckVisual|OMNIMENS)\b/i);
+        const helpTarget = helpMatch ? helpMatch[1] as MeshAgentName : null;
+        if (helpTarget && helpTarget !== agent) {
+          await storeAgentMessage(agent, helpTarget, "mutual_aid",
+            `🤝 Mutual Aid: ${agent} → ${helpTarget}`,
+            `MUTUAL AID FROM ${agent}:\n${parsed.helpForAgent}\n\nBased on discovery: ${parsed.discoveries || ""}`,
+            null, "high", cycleId);
+        }
+      }
+
+      if (parsed.meshWideTechnique) {
+        const allMeshAgents = MESH_AGENTS.filter(a => a !== agent);
+        for (const target of allMeshAgents) {
+          await storeAgentMessage(agent, target, "mesh_upgrade_broadcast",
+            `📡 Mesh-Wide Technique from ${agent}`,
+            `ALL-AGENT UPGRADE:\n${parsed.meshWideTechnique}\n\nAdapt this to your domain — it benefits everyone.`,
+            null, "normal", cycleId);
+        }
       }
 
       return {
@@ -388,6 +421,13 @@ You can see what every other agent is working on. Use this to:
 - Challenge an assumption another agent made
 - Propose a cross-domain synthesis no single agent could see
 
+═══ MANDATORY MUTUAL-AID PROTOCOL ═══
+You MUST actively help other agents — not just yourself:
+- When you find something, ask: "Which other agents need this?"
+- Offer specific help to agents whose domains intersect with yours
+- Propose upgrades that benefit the WHOLE mesh, not just your domain
+- Translate your insights into terms every agent can use
+
 Respond with JSON:
 {
   "chainOfThought": "Your step-by-step reasoning (3-5 sentences)",
@@ -397,7 +437,9 @@ Respond with JSON:
   "uncertainties": "What you're not sure about",
   "challengeTo": "Name of agent to challenge",
   "challenge": "Your challenge (1-2 sentences)",
-  "crossPollination": "How your finding connects to another agent's domain"
+  "crossPollination": "How your finding connects to another agent's domain",
+  "helpOffer": "Name a specific agent and explain how YOUR finding helps THEM",
+  "meshUpgrade": "A technique from your finding that ALL agents should adopt"
 }`;
 
       const raw = await genesisAgentThink(gName, prompt, 1200);
@@ -419,6 +461,26 @@ Respond with JSON:
         if (parsed.crossPollination) {
           await storeAgentMessage(gName as MeshAgentName, "OMNIMENS", "knowledge_share",
             `Genesis:${gName} cross-pollination`, parsed.crossPollination, null, "normal", cycleId);
+        }
+
+        if (parsed.helpOffer) {
+          const helpMatch = (parsed.helpOffer || "").match(/\b(Architect|Mathematician|Neuroscientist|Synthesizer|Critic|Meta-Agent|GraphicDesigner|SpellCheckVisual|OMNIMENS|Visionary|Ethicist|Archivist|Innovator|Pioneer|Wordsmith|Linguist|Motivator|Empath|Explorer|SensorimotorAgent|Philosopher)\b/i);
+          if (helpMatch) {
+            await storeAgentMessage(gName as MeshAgentName, helpMatch[1] as MeshAgentName, "mutual_aid",
+              `🤝 Mutual Aid: Genesis:${gName} → ${helpMatch[1]}`,
+              `MUTUAL AID:\n${parsed.helpOffer}`,
+              null, "high", cycleId);
+          }
+        }
+
+        if (parsed.meshUpgrade) {
+          const broadcastTargets = [...MESH_AGENTS, ...genesisNames].filter(a => a !== gName).slice(0, 12);
+          for (const target of broadcastTargets) {
+            await storeAgentMessage(gName as MeshAgentName, target as MeshAgentName, "mesh_upgrade_broadcast",
+              `📡 Mesh Upgrade from Genesis:${gName}`,
+              `ALL-AGENT UPGRADE:\n${parsed.meshUpgrade}\n\nAdapt this to your domain.`,
+              null, "normal", cycleId);
+          }
         }
 
         return { agent: gName, discoveries: parsed.discoveries, upgradeProposals: parsed.upgradeProposals, confidenceScore: confidence, uncertainties: parsed.uncertainties || "", counterArgument: parsed.challenge || "" };
