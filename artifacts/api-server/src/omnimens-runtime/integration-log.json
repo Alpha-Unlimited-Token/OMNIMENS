@@ -1,55 +1,5 @@
 [
   {
-    "source": "backlog_dream_id_15694",
-    "title": "ARCHITECTURE NAME  \n   CAUSEWAY – Counterfactual Abd",
-    "filename": "architectureNameCausewayCounterfactualAbd.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameCausewayCounterfactualAbd.mjs",
-    "backupPath": null,
-    "timestamp": 1774209718320,
-    "codeLength": 1455,
-    "overwrite": false
-  },
-  {
-    "source": "self_coding_engine",
-    "title": "Daydream:architecture_design #749",
-    "filename": "daydreamarchitecturedesign749.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamarchitecturedesign749.mjs",
-    "backupPath": null,
-    "timestamp": 1774209877518,
-    "codeLength": 1074,
-    "overwrite": false
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
-    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-22T20-06-40-250Z",
-    "timestamp": 1774210000249,
-    "codeLength": 2402,
-    "overwrite": true
-  },
-  {
-    "source": "backlog_dream_id_17847",
-    "title": "BROKEN PARADIGM  \nSequential Symbol-Processing.  Fro",
-    "filename": "brokenParadigmSequentialSymbolprocessingFro.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/brokenParadigmSequentialSymbolprocessingFro.mjs",
-    "backupPath": null,
-    "timestamp": 1774210000617,
-    "codeLength": 1215,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_15198",
-    "title": "Lucid Dream #47: D5P4 diversity sampler + OS-Themis-style ce",
-    "filename": "lucidDream47D5p4DiversitySamplerOsthemisstyleCe.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/lucidDream47D5p4DiversitySamplerOsthemisstyleCe.mjs",
-    "backupPath": null,
-    "timestamp": 1774210002416,
-    "codeLength": 1152,
-    "overwrite": false
-  },
-  {
     "source": "backlog_dream_id_15859",
     "title": "INVENTION NAME  \nMeta-Resonant Adaptive Mixer (MRAM)",
     "filename": "inventionNameMetaresonantAdaptiveMixerMram.mjs",
@@ -4998,5 +4948,55 @@
     "timestamp": 1774358537511,
     "codeLength": 1375,
     "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: realTimeDataStream",
+    "filename": "realTimeDataStream_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/realTimeDataStream_gen1.mjs",
+    "backupPath": null,
+    "timestamp": 1774358785298,
+    "codeLength": 2479,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: iterativeComputationManager",
+    "filename": "iterativeComputationManager_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeComputationManager_gen1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/iterativeComputationManager_gen1.mjs.backup.2026-03-24T13-26-48-364Z",
+    "timestamp": 1774358808363,
+    "codeLength": 2764,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: semanticContextCompressor",
+    "filename": "semanticContextCompressor_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticContextCompressor_gen1.mjs",
+    "backupPath": null,
+    "timestamp": 1774358833984,
+    "codeLength": 3006,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 1 Complete — 3 modules",
+    "filename": "evolution_marker_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-03-24T13-27-14-010Z",
+    "timestamp": 1774358834010,
+    "codeLength": 99,
+    "overwrite": true
+  },
+  {
+    "source": "self_coding_engine",
+    "title": "Daydream:divergent_thinking #1776",
+    "filename": "daydreamdivergentthinking1776.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamdivergentthinking1776.mjs",
+    "backupPath": null,
+    "timestamp": 1774359021115,
+    "codeLength": 998,
+    "overwrite": false
   }
 ]

@@ -9031,15 +9031,17 @@
     },
     "iterativeComputationManager_gen1.mjs": {
       "filename": "iterativeComputationManager_gen1.mjs",
-      "stage": "memory_retrieval",
+      "stage": "knowledge_synthesis",
       "exports": [
-        "generateTaskKey",
-        "computeWithDecomposition",
-        "clearCache",
-        "getCachedResult",
-        "isResultCached"
+        "generateCheckpointId",
+        "divideIntoChunks",
+        "serializeState",
+        "deserializeState",
+        "processChunksWithState",
+        "exampleComputationFunction",
+        "iterativeComputationManager"
       ],
-      "loadedAt": 1774358295901,
+      "loadedAt": 1774358808377,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -9677,9 +9679,55 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "realTimeDataStream_gen1.mjs": {
+      "filename": "realTimeDataStream_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "createWebSocketServer",
+        "createStateManager",
+        "startRealTimeDataStream",
+        "realTimeUtilityFunctions"
+      ],
+      "loadedAt": 1774358785326,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "semanticContextCompressor_gen1.mjs": {
+      "filename": "semanticContextCompressor_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "semanticHash",
+        "clusterTokens",
+        "extractDependencies",
+        "compressContext",
+        "exampleUsage"
+      ],
+      "loadedAt": 1774358833997,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "daydreamdivergentthinking1776.mjs": {
+      "filename": "daydreamdivergentthinking1776.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "braidHash"
+      ],
+      "loadedAt": 1774359021142,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774358296000,
-  "totalModules": 506,
+  "totalModules": 509,
   "totalCalls": 0
 }

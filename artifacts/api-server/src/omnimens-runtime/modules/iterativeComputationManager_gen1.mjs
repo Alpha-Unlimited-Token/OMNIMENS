@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: iterativeComputationManager
- * Written: 2026-03-24T10:56:02.727Z
+ * Written: 2026-03-24T13:26:48.363Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,86 +17,88 @@
  */
 
 // iterativeComputationManager.mjs
-import { createHash } from 'crypto';
 
-// Cache for storing intermediate results
-const cache = new Map();
+import crypto from 'crypto';
 
 /**
- * Generates a unique hash key for a task based on its input.
- * @param {any} input - The input data for the task.
- * @returns {string} - A unique hash key.
+ * Generates a unique checkpoint identifier using SHA-256.
+ * @param {string} input - Input string to hash.
+ * @returns {string} - Unique checkpoint identifier.
  */
-export function generateTaskKey(input) {
-  const hash = createHash('sha256');
-  hash.update(JSON.stringify(input));
-  return hash.digest('hex');
+export function generateCheckpointId(input) {
+  return crypto.createHash('sha256').update(input).digest('hex');
 }
 
 /**
- * Recursively decomposes a task into smaller subtasks and computes the result.
- * @param {Function} taskFunction - The main function to execute the task.
- * @param {any} input - The input data for the task.
- * @param {number} timeout - Maximum allowed time for execution in milliseconds.
- * @returns {Promise<any>} - The computed result of the task.
+ * Divides a large task into smaller chunks for iterative processing.
+ * @param {Array} data - Array of data to process.
+ * @param {number} chunkSize - Size of each chunk.
+ * @returns {Array} - Array of chunks.
  */
-export async function computeWithDecomposition(taskFunction, input, timeout = 5000) {
-  const taskKey = generateTaskKey(input);
-
-  // Check if result is already cached
-  if (cache.has(taskKey)) {
-    return cache.get(taskKey);
+export function divideIntoChunks(data, chunkSize) {
+  const chunks = [];
+  for (let i = 0; i < data.length; i += chunkSize) {
+    chunks.push(data.slice(i, i + chunkSize));
   }
+  return chunks;
+}
 
-  // Timeout mechanism
-  const startTime = Date.now();
+/**
+ * Serializes state into a JSON string for checkpointing.
+ * @param {Object} state - State object to serialize.
+ * @returns {string} - Serialized state.
+ */
+export function serializeState(state) {
+  return JSON.stringify(state);
+}
 
-  const computeRecursive = async (data) => {
-    if (Date.now() - startTime > timeout) {
-      throw new Error('Task timed out');
-    }
+/**
+ * Deserializes a JSON string back into a state object.
+ * @param {string} serializedState - Serialized state string.
+ * @returns {Object} - Deserialized state object.
+ */
+export function deserializeState(serializedState) {
+  return JSON.parse(serializedState);
+}
 
-    // Decompose task if possible
-    if (taskFunction.canDecompose && typeof taskFunction.canDecompose === 'function' && taskFunction.canDecompose(data)) {
-      const subtasks = taskFunction.decompose(data);
-      const subresults = await Promise.all(subtasks.map(subtask => computeRecursive(subtask)));
-      const result = taskFunction.combine(subresults);
-      cache.set(taskKey, result);
-      return result;
-    } else {
-      // Base case: directly compute the result
-      const result = await taskFunction(data);
-      cache.set(taskKey, result);
-      return result;
-    }
+/**
+ * Reinitializes a subprocess with preserved state.
+ * @param {Function} computationFunction - Function to execute on each chunk.
+ * @param {Array} chunks - Array of data chunks.
+ * @param {Object} preservedState - State object to reinitialize.
+ * @returns {Array} - Array of results from processing each chunk.
+ */
+export function processChunksWithState(computationFunction, chunks, preservedState) {
+  const results = [];
+  for (const chunk of chunks) {
+    const result = computationFunction(chunk, preservedState);
+    results.push(result);
+  }
+  return results;
+}
+
+/**
+ * Example computation function for demonstration.
+ * @param {Array} chunk - Data chunk to process.
+ * @param {Object} state - Preserved state.
+ * @returns {Object} - Processed result.
+ */
+export function exampleComputationFunction(chunk, state) {
+  return {
+    processedChunk: chunk.map(item => item * state.multiplier),
+    checkpointId: generateCheckpointId(JSON.stringify(chunk))
   };
-
-  return computeRecursive(input);
 }
 
 /**
- * Clears the in-memory cache.
+ * Main function to demonstrate iterative computation management.
+ * @param {Array} data - Array of data to process.
+ * @param {number} chunkSize - Size of each chunk.
+ * @param {Object} initialState - Initial state object.
+ * @returns {Array} - Array of processed results.
  */
-export function clearCache() {
-  cache.clear();
-}
-
-/**
- * Retrieves a cached result by its input.
- * @param {any} input - The input data for the task.
- * @returns {any | undefined} - The cached result or undefined if not found.
- */
-export function getCachedResult(input) {
-  const taskKey = generateTaskKey(input);
-  return cache.get(taskKey);
-}
-
-/**
- * Checks if a result for a given input is cached.
- * @param {any} input - The input data for the task.
- * @returns {boolean} - True if the result is cached, false otherwise.
- */
-export function isResultCached(input) {
-  const taskKey = generateTaskKey(input);
-  return cache.has(taskKey);
+export function iterativeComputationManager(data, chunkSize, initialState) {
+  const chunks = divideIntoChunks(data, chunkSize);
+  const results = processChunksWithState(exampleComputationFunction, chunks, initialState);
+  return results;
 }
