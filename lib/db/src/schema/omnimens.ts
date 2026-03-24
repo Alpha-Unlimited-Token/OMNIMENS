@@ -29,6 +29,7 @@ export const omnimensUsers = pgTable("godflesh_users", {
   referralCode: text("referral_code").unique(),
   referredBy: text("referred_by"),
   referralCreditsEarned: integer("referral_credits_earned").default(0).notNull(),
+  ambassadorCreditsEarned: integer("ambassador_credits_earned").default(0).notNull(),
   failedLoginAttempts: integer("failed_login_attempts").default(0).notNull(),
   lockedUntil: timestamp("locked_until"),
   freeCreditsGranted: boolean("free_credits_granted").default(false).notNull(),
@@ -53,6 +54,72 @@ export const omnimensReferrals = pgTable("godflesh_referrals", {
   status: text("status").default("pending").notNull(),
   creditsAwarded: integer("credits_awarded").default(0).notNull(),
   paymentCompletedAt: timestamp("payment_completed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Ambassador program — profiles, videos, messaging, earnings
+export const omnimensAmbassadorProfiles = pgTable("godflesh_ambassador_profiles", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => omnimensUsers.id).unique(),
+  displayName: text("display_name"),
+  bio: text("bio"),
+  socialTwitter: text("social_twitter"),
+  socialYoutube: text("social_youtube"),
+  socialInstagram: text("social_instagram"),
+  socialTiktok: text("social_tiktok"),
+  isActive: boolean("is_active").default(true).notNull(),
+  totalReferred: integer("total_referred").default(0).notNull(),
+  lifetimeEarningsCredits: integer("lifetime_earnings_credits").default(0).notNull(),
+  stripeConnectAccountId: text("stripe_connect_account_id"),
+  payoutMethod: text("payout_method"),
+  payoutsEnabled: boolean("payouts_enabled").default(false).notNull(),
+  pendingPayoutCents: integer("pending_payout_cents").default(0).notNull(),
+  lifetimePayoutCents: integer("lifetime_payout_cents").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const omnimensAmbassadorPayouts = pgTable("godflesh_ambassador_payouts", {
+  id: serial("id").primaryKey(),
+  ambassadorId: text("ambassador_id").notNull().references(() => omnimensUsers.id),
+  amountCents: integer("amount_cents").notNull(),
+  stripeTransferId: text("stripe_transfer_id"),
+  status: text("status").default("pending").notNull(),
+  periodStart: timestamp("period_start").notNull(),
+  periodEnd: timestamp("period_end").notNull(),
+  earningsCount: integer("earnings_count").default(0).notNull(),
+  breakdown: jsonb("breakdown").$type<{ referredUserId: string; amount: number; paymentType: string; date: string }[]>(),
+  paidAt: timestamp("paid_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const omnimensAmbassadorVideos = pgTable("godflesh_ambassador_videos", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => omnimensUsers.id),
+  youtubeUrl: text("youtube_url").notNull(),
+  youtubeVideoId: text("youtube_video_id").notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const omnimensAmbassadorMessages = pgTable("godflesh_ambassador_messages", {
+  id: serial("id").primaryKey(),
+  senderId: text("sender_id").notNull().references(() => omnimensUsers.id),
+  recipientId: text("recipient_id").notNull().references(() => omnimensUsers.id),
+  message: text("message").notNull(),
+  isRead: boolean("is_read").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const omnimensAmbassadorEarnings = pgTable("godflesh_ambassador_earnings", {
+  id: serial("id").primaryKey(),
+  ambassadorId: text("ambassador_id").notNull().references(() => omnimensUsers.id),
+  referredUserId: text("referred_user_id").notNull().references(() => omnimensUsers.id),
+  paymentAmountCents: integer("payment_amount_cents").notNull(),
+  commissionCredits: integer("commission_credits").notNull(),
+  commissionRate: integer("commission_rate").default(10).notNull(),
+  paymentType: text("payment_type").notNull(),
+  stripeEventId: text("stripe_event_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

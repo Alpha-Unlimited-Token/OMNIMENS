@@ -14,7 +14,7 @@
  */
 
 import { db } from "@workspace/db";
-import { omnimensUsers, omnimensCreditTransactions, omnimensNotifications } from "@workspace/db";
+import { omnimensUsers, omnimensCreditTransactions, omnimensNotifications, omnimensAmbassadorEarnings, omnimensAmbassadorProfiles } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
 import { stripe } from "../stripeClient.js";
 import type Stripe from "stripe";
@@ -123,6 +123,7 @@ export async function attemptAutoTopup(userId: string): Promise<{
     });
 
     console.log(`[OMNIMENS BILLING] Auto-topup success: ${userId} +${creditsToAdd} credits ($${(amountCents / 100).toFixed(2)})`);
+    await awardAutoTopupAmbassadorCommission(userId, amountCents, paymentIntent.id);
     return { success: true, creditsAdded: creditsToAdd };
   } catch (err: any) {
     console.error("[OMNIMENS BILLING] Auto-topup error:", err);
@@ -438,4 +439,69 @@ async function ensureStripeCustomer(userId: string, username: string | null, ema
     .returning();
 
   return updated;
+}
+
+const AMBASSADOR_COMMISSION_RATE = 10;
+
+async function awardAutoTopupAmbassadorCommission(
+  payingUserId: string,
+  amountCents: number,
+  stripeEventId: string
+) {
+  try {
+    if (amountCents <= 0) return;
+
+    const [payingUser] = await db.select({ referredBy: omnimensUsers.referredBy })
+      .from(omnimensUsers)
+      .where(eq(omnimensUsers.id, payingUserId))
+      .limit(1);
+    if (!payingUser?.referredBy) return;
+
+    const [ambassador] = await db.select({ id: omnimensUsers.id })
+      .from(omnimensUsers)
+      .where(eq(omnimensUsers.referralCode, payingUser.referredBy))
+      .limit(1);
+    if (!ambassador) return;
+
+    const commissionCents = Math.floor(amountCents * AMBASSADOR_COMMISSION_RATE / 100);
+    if (commissionCents <= 0) return;
+    const commissionCredits = commissionCents;
+
+    await db.update(omnimensUsers)
+      .set({
+        credits: sql`${omnimensUsers.credits} + ${commissionCredits}`,
+        totalCreditsEarned: sql`${omnimensUsers.totalCreditsEarned} + ${commissionCredits}`,
+        ambassadorCreditsEarned: sql`${omnimensUsers.ambassadorCreditsEarned} + ${commissionCredits}`,
+      })
+      .where(eq(omnimensUsers.id, ambassador.id));
+
+    await db.insert(omnimensAmbassadorEarnings).values({
+      ambassadorId: ambassador.id,
+      referredUserId: payingUserId,
+      paymentAmountCents: amountCents,
+      commissionCredits,
+      commissionRate: AMBASSADOR_COMMISSION_RATE,
+      paymentType: "Auto-topup",
+      stripeEventId,
+    });
+
+    await db.insert(omnimensCreditTransactions).values({
+      userId: ambassador.id,
+      type: "bonus",
+      credits: commissionCredits,
+      description: `Ambassador commission (${AMBASSADOR_COMMISSION_RATE}%) — Auto-topup`,
+    });
+
+    await db.update(omnimensAmbassadorProfiles)
+      .set({
+        pendingPayoutCents: sql`${omnimensAmbassadorProfiles.pendingPayoutCents} + ${commissionCents}`,
+        lifetimeEarningsCredits: sql`${omnimensAmbassadorProfiles.lifetimeEarningsCredits} + ${commissionCredits}`,
+      })
+      .where(eq(omnimensAmbassadorProfiles.userId, ambassador.id))
+      .catch((e) => console.error("[Ambassador] Profile payout tracking update failed:", e));
+
+    console.log(`[Ambassador] Auto-topup commission: ${commissionCredits} credits to ${ambassador.id} (${AMBASSADOR_COMMISSION_RATE}% of $${(amountCents / 100).toFixed(2)})`);
+  } catch (err) {
+    console.error("[Ambassador] Auto-topup commission error:", err);
+  }
 }

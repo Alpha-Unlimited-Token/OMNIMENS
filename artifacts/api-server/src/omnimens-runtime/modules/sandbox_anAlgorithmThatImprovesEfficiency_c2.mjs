@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-24T04:47:50.240Z
+ * Written: 2026-03-24T05:40:17.738Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,71 +17,74 @@
  */
 
 function KnowledgeGraph() {
-    this.graph = new Map();
+    this.nodes = new Map();
 }
 
-// Adds a concept and its related concepts to the graph
-KnowledgeGraph.prototype.addConcept = function (concept, relatedConcepts) {
-    if (!this.graph.has(concept)) {
-        this.graph.set(concept, new Set());
-    }
-    for (let related of relatedConcepts) {
-        this.graph.get(concept).add(related);
-        if (!this.graph.has(related)) {
-            this.graph.set(related, new Set());
-        }
-        this.graph.get(related).add(concept);
+KnowledgeGraph.prototype.addNode = function (id, data) {
+    if (!this.nodes.has(id)) {
+        this.nodes.set(id, { data: data, edges: new Map() });
     }
 };
 
-// Retrieves related concepts with a depth-first search
-KnowledgeGraph.prototype.retrieveRelatedConcepts = function (concept, depth) {
-    if (!this.graph.has(concept)) {
-        return [];
+KnowledgeGraph.prototype.addEdge = function (fromId, toId, weight) {
+    if (this.nodes.has(fromId) && this.nodes.has(toId)) {
+        this.nodes.get(fromId).edges.set(toId, weight || 1);
     }
+};
 
-    let visited = new Set();
-    let results = new Set();
+KnowledgeGraph.prototype.retrievePattern = function (startId, pattern) {
+    if (!this.nodes.has(startId)) return [];
 
-    function dfs(current, currentDepth) {
-        if (currentDepth > depth || visited.has(current)) {
+    const results = [];
+    const visited = new Set();
+
+    function dfs(nodeId, currentPatternIndex) {
+        if (currentPatternIndex === pattern.length) {
+            results.push(nodeId);
             return;
         }
-        visited.add(current);
-        results.add(current);
-        for (let neighbor of this.graph.get(current)) {
-            dfs.call(this, neighbor, currentDepth + 1);
+
+        if (visited.has(nodeId)) return;
+
+        visited.add(nodeId);
+
+        const currentPattern = pattern[currentPatternIndex];
+        const node = this.nodes.get(nodeId);
+
+        for (const [neighborId, weight] of node.edges) {
+            if (weight === currentPattern) {
+                dfs.call(this, neighborId, currentPatternIndex + 1);
+            }
         }
+
+        visited.delete(nodeId);
     }
 
-    dfs.call(this, concept, 0);
-    results.delete(concept); // Exclude the original concept
-    return Array.from(results);
+    dfs.call(this, startId, 0);
+
+    return results;
 };
 
 // Test cases
-function runTests() {
-    let kg = new KnowledgeGraph();
+const graph = new KnowledgeGraph();
 
-    // Adding concepts and relationships
-    kg.addConcept("AI", ["Machine Learning", "Neural Networks", "Deep Learning"]);
-    kg.addConcept("Machine Learning", ["Supervised Learning", "Unsupervised Learning"]);
-    kg.addConcept("Neural Networks", ["Backpropagation", "Activation Functions"]);
-    kg.addConcept("Deep Learning", ["Convolutional Networks", "Recurrent Networks"]);
-    kg.addConcept("Supervised Learning", ["Classification", "Regression"]);
-    kg.addConcept("Unsupervised Learning", ["Clustering", "Dimensionality Reduction"]);
+// Add nodes
+graph.addNode("A", { concept: "Start" });
+graph.addNode("B", { concept: "Intermediate" });
+graph.addNode("C", { concept: "End" });
+graph.addNode("D", { concept: "Alternate Path" });
+graph.addNode("E", { concept: "Final" });
 
-    console.log("Test 1: Retrieve related concepts for 'AI' with depth 1");
-    console.log(kg.retrieveRelatedConcepts("AI", 1)); // Expected: ["Machine Learning", "Neural Networks", "Deep Learning"]
+// Add edges with weights
+graph.addEdge("A", "B", 1);
+graph.addEdge("B", "C", 2);
+graph.addEdge("A", "D", 3);
+graph.addEdge("D", "E", 2);
+graph.addEdge("C", "E", 1);
 
-    console.log("Test 2: Retrieve related concepts for 'AI' with depth 2");
-    console.log(kg.retrieveRelatedConcepts("AI", 2)); // Expected: ["Machine Learning", "Neural Networks", "Deep Learning", "Supervised Learning", "Unsupervised Learning", "Backpropagation", "Activation Functions", "Convolutional Networks", "Recurrent Networks"]
-
-    console.log("Test 3: Retrieve related concepts for 'Machine Learning' with depth 1");
-    console.log(kg.retrieveRelatedConcepts("Machine Learning", 1)); // Expected: ["AI", "Supervised Learning", "Unsupervised Learning"]
-
-    console.log("Test 4: Retrieve related concepts for 'Supervised Learning' with depth 2");
-    console.log(kg.retrieveRelatedConcepts("Supervised Learning", 2)); // Expected: ["Machine Learning", "AI", "Classification", "Regression", "Unsupervised Learning"]
-}
-
-runTests();
+// Test pattern retrieval
+console.log(graph.retrievePattern("A", [1, 2])); // Should return ["C"]
+console.log(graph.retrievePattern("A", [3, 2])); // Should return ["E"]
+console.log(graph.retrievePattern("A", [1, 3])); // Should return []
+console.log(graph.retrievePattern("B", [2]));    // Should return ["C"]
+console.log(graph.retrievePattern("D", [2]));    // Should return ["E"]

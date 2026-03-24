@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-24T05:03:23.905Z
+ * Written: 2026-03-24T05:28:17.975Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,34 +16,72 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function levenshteinDistance(str1, str2) {
-    const len1 = str1.length;
-    const len2 = str2.length;
-    const dp = Array(len1 + 1).fill(null).map(() => Array(len2 + 1).fill(0));
-
-    for (let i = 0; i <= len1; i++) dp[i][0] = i;
-    for (let j = 0; j <= len2; j++) dp[0][j] = j;
-
-    for (let i = 1; i <= len1; i++) {
-        for (let j = 1; j <= len2; j++) {
-            const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
-            dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+function extractEntities(text, patterns) {
+    /**
+     * Extracts entities from a given text based on provided patterns.
+     * @param {string} text - The input text to analyze.
+     * @param {Array} patterns - Array of objects with `label` and `pattern` keys.
+     * @returns {Array} - Array of extracted entities with their labels and positions.
+     */
+    const entities = [];
+    patterns.forEach(({ label, pattern }) => {
+        const regex = new RegExp(pattern, 'gi');
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+            entities.push({
+                label: label,
+                entity: match[0],
+                start: match.index,
+                end: match.index + match[0].length
+            });
         }
-    }
-
-    return dp[len1][len2];
+    });
+    return entities;
 }
 
-function testLevenshteinDistance() {
-    console.log(levenshteinDistance("kitten", "sitting")); // Expected: 3
-    console.log(levenshteinDistance("flaw", "lawn")); // Expected: 2
-    console.log(levenshteinDistance("intention", "execution")); // Expected: 5
-    console.log(levenshteinDistance("", "")); // Expected: 0
-    console.log(levenshteinDistance("abc", "")); // Expected: 3
-    console.log(levenshteinDistance("", "def")); // Expected: 3
-    console.log(levenshteinDistance("same", "same")); // Expected: 0
-    console.log(levenshteinDistance("a", "b")); // Expected: 1
-    console.log(levenshteinDistance("abcdef", "azced")); // Expected: 3
+// Test cases
+function runTests() {
+    console.log("Running Tests...");
+
+    // Test 1: Simple entity extraction
+    const text1 = "John Doe lives in New York.";
+    const patterns1 = [
+        { label: "PERSON", pattern: "\\bJohn Doe\\b" },
+        { label: "LOCATION", pattern: "\\bNew York\\b" }
+    ];
+    const result1 = extractEntities(text1, patterns1);
+    console.log("Test 1 Result:", result1);
+
+    // Test 2: Multiple matches
+    const text2 = "Alice and Bob went to Paris. Alice loves Paris.";
+    const patterns2 = [
+        { label: "PERSON", pattern: "\\bAlice\\b" },
+        { label: "PERSON", pattern: "\\bBob\\b" },
+        { label: "LOCATION", pattern: "\\bParis\\b" }
+    ];
+    const result2 = extractEntities(text2, patterns2);
+    console.log("Test 2 Result:", result2);
+
+    // Test 3: Edge case - no matches
+    const text3 = "No entities here.";
+    const patterns3 = [
+        { label: "PERSON", pattern: "\\bJohn\\b" },
+        { label: "LOCATION", pattern: "\\bLondon\\b" }
+    ];
+    const result3 = extractEntities(text3, patterns3);
+    console.log("Test 3 Result:", result3);
+
+    // Test 4: Overlapping patterns
+    const text4 = "The quick brown fox jumps over the lazy dog.";
+    const patterns4 = [
+        { label: "ANIMAL", pattern: "\\bfox\\b" },
+        { label: "ANIMAL", pattern: "\\bdog\\b" },
+        { label: "PHRASE", pattern: "quick brown fox" }
+    ];
+    const result4 = extractEntities(text4, patterns4);
+    console.log("Test 4 Result:", result4);
+
+    console.log("Tests Completed.");
 }
 
-testLevenshteinDistance();
+runTests();

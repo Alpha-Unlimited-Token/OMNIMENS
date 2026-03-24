@@ -44,7 +44,7 @@ import { getOrCreateCustomInstructions, saveCustomInstructions, buildCustomInstr
 import { analyzeUserEmotionalState, buildEmotionalContext, loadLearningContext, runLearningCycle } from "../lib/omnimens-learning.js";
 import { loadGeneratedModulesContext, getConsciousnessState, getEvolutionHistory, getGeneratedModules, deactivateModule, runEvolutionCycle } from "../lib/omnimens-evolution.js";
 import { runCouncilAnalysis } from "./council.js";
-import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness, omnimensProjects, omnimensProjectFiles, omnimensApiKeys, omnimensProblemReports, omnimensReferrals, omnimensUserFiles } from "@workspace/db";
+import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness, omnimensProjects, omnimensProjectFiles, omnimensApiKeys, omnimensProblemReports, omnimensReferrals, omnimensUserFiles, omnimensAmbassadorProfiles, omnimensAmbassadorVideos, omnimensAmbassadorMessages, omnimensAmbassadorEarnings, omnimensAmbassadorPayouts } from "@workspace/db";
 import { autoSaveImage, autoSaveVideo, autoSave3DModel, autoSaveGameZip, getUserFiles, getUserFileById, deleteUserFile, streamFileToResponse, getUserFileStats, getConversationFiles } from "../lib/omnimens-file-storage.js";
 import * as OTPAuth from "otpauth";
 import crypto from "crypto";
@@ -4196,9 +4196,599 @@ router.post("/omnimens/referral/apply", async (req, res) => {
       status: "pending",
     });
 
-    res.json({ applied: true, message: "Referral code applied! Your referrer will earn credits when you make your first payment." });
+    res.json({ applied: true, message: "Referral code applied! You get 10% off as a referred customer, and your ambassador earns 10% commission on every purchase you make." });
   } catch (err: any) {
     res.status(500).json({ error: "Failed to apply referral code" });
+  }
+});
+
+// ─── Ambassador Program ──────────────────────────────────────────────────────
+
+const AMBASSADOR_COMMISSION_RATE = 10;
+
+router.get("/omnimens/ambassador/profile", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const [profile] = await db.select().from(omnimensAmbassadorProfiles)
+      .where(eq(omnimensAmbassadorProfiles.userId, req.user.id)).limit(1);
+    const [user] = await db.select().from(omnimensUsers)
+      .where(eq(omnimensUsers.id, req.user.id)).limit(1);
+    if (!user) { res.status(404).json({ error: "User not found" }); return; }
+
+    const referrals = await db.select().from(omnimensReferrals)
+      .where(eq(omnimensReferrals.referrerId, req.user.id));
+
+    const earnings = await db.select().from(omnimensAmbassadorEarnings)
+      .where(eq(omnimensAmbassadorEarnings.ambassadorId, req.user.id))
+      .orderBy(desc(omnimensAmbassadorEarnings.createdAt));
+
+    const videos = await db.select().from(omnimensAmbassadorVideos)
+      .where(eq(omnimensAmbassadorVideos.userId, req.user.id))
+      .orderBy(desc(omnimensAmbassadorVideos.createdAt));
+
+    const payouts = await db.select().from(omnimensAmbassadorPayouts)
+      .where(eq(omnimensAmbassadorPayouts.ambassadorId, req.user.id))
+      .orderBy(desc(omnimensAmbassadorPayouts.createdAt));
+
+    const unreadMsgCount = await db.select({ id: omnimensAmbassadorMessages.id })
+      .from(omnimensAmbassadorMessages)
+      .where(and(
+        eq(omnimensAmbassadorMessages.recipientId, req.user.id),
+        eq(omnimensAmbassadorMessages.isRead, false)
+      ));
+
+    const totalEarningsCents = earnings.reduce((s, e) => s + e.commissionCredits, 0);
+    const pendingPayoutCents = profile?.pendingPayoutCents || 0;
+    const lifetimePayoutCents = profile?.lifetimePayoutCents || 0;
+
+    res.json({
+      isAmbassador: !!profile,
+      profile: profile ? {
+        displayName: profile.displayName,
+        bio: profile.bio,
+        socialTwitter: profile.socialTwitter,
+        socialYoutube: profile.socialYoutube,
+        socialInstagram: profile.socialInstagram,
+        socialTiktok: profile.socialTiktok,
+        isActive: profile.isActive,
+        payoutsEnabled: profile.payoutsEnabled,
+        payoutMethod: profile.payoutMethod,
+        stripeConnectLinked: !!profile.stripeConnectAccountId,
+        createdAt: profile.createdAt,
+      } : null,
+      referralCode: user.referralCode,
+      stats: {
+        totalReferred: referrals.length,
+        activeReferred: referrals.filter(r => r.status === "completed").length,
+        pendingReferred: referrals.filter(r => r.status === "pending").length,
+        commissionRate: AMBASSADOR_COMMISSION_RATE,
+        totalEarningsCents,
+        totalEarningsDollars: (totalEarningsCents / 100).toFixed(2),
+        pendingPayoutCents,
+        pendingPayoutDollars: (pendingPayoutCents / 100).toFixed(2),
+        lifetimePayoutCents,
+        lifetimePayoutDollars: (lifetimePayoutCents / 100).toFixed(2),
+        ambassadorCreditsEarned: user.ambassadorCreditsEarned || 0,
+        unreadMessages: unreadMsgCount.length,
+      },
+      earnings: earnings.slice(0, 50).map(e => ({
+        id: e.id,
+        paymentAmountCents: e.paymentAmountCents,
+        commissionCredits: e.commissionCredits,
+        commissionRate: e.commissionRate,
+        paymentType: e.paymentType,
+        createdAt: e.createdAt,
+      })),
+      videos,
+      payouts: payouts.map(p => ({
+        id: p.id,
+        amountCents: p.amountCents,
+        amountDollars: (p.amountCents / 100).toFixed(2),
+        status: p.status,
+        periodStart: p.periodStart,
+        periodEnd: p.periodEnd,
+        earningsCount: p.earningsCount,
+        breakdown: p.breakdown,
+        paidAt: p.paidAt,
+        createdAt: p.createdAt,
+      })),
+      referrals: referrals.map(r => ({
+        status: r.status,
+        createdAt: r.createdAt,
+        completedAt: r.paymentCompletedAt,
+      })),
+    });
+  } catch (err: any) {
+    console.error("[Ambassador] Profile error:", err);
+    res.status(500).json({ error: "Failed to load ambassador profile" });
+  }
+});
+
+router.post("/omnimens/ambassador/enroll", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const [existing] = await db.select().from(omnimensAmbassadorProfiles)
+      .where(eq(omnimensAmbassadorProfiles.userId, req.user.id)).limit(1);
+    if (existing) { res.json({ enrolled: true, message: "You are already an ambassador!" }); return; }
+
+    const [user] = await db.select().from(omnimensUsers)
+      .where(eq(omnimensUsers.id, req.user.id)).limit(1);
+    if (!user) { res.status(404).json({ error: "User not found" }); return; }
+
+    let code = user.referralCode;
+    if (!code) {
+      code = generateReferralCode();
+      await db.update(omnimensUsers)
+        .set({ referralCode: code })
+        .where(eq(omnimensUsers.id, req.user.id));
+    }
+
+    const { displayName, bio } = req.body || {};
+    await db.insert(omnimensAmbassadorProfiles).values({
+      userId: req.user.id,
+      displayName: displayName || user.username || "Ambassador",
+      bio: bio || null,
+    });
+
+    res.json({
+      enrolled: true,
+      referralCode: code,
+      shareUrl: `${req.headers.origin || "https://omnimens-ai.com"}/?ref=${code}`,
+      message: "Welcome to the OMNIMENS Ambassador Program! Share your link to earn 10% commission on every purchase.",
+    });
+  } catch (err: any) {
+    console.error("[Ambassador] Enroll error:", err);
+    res.status(500).json({ error: "Failed to enroll as ambassador" });
+  }
+});
+
+router.put("/omnimens/ambassador/profile", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const { displayName, bio, socialTwitter, socialYoutube, socialInstagram, socialTiktok } = req.body;
+    const updates: Record<string, any> = {};
+    if (displayName !== undefined) updates.displayName = displayName;
+    if (bio !== undefined) updates.bio = bio;
+    if (socialTwitter !== undefined) updates.socialTwitter = socialTwitter;
+    if (socialYoutube !== undefined) updates.socialYoutube = socialYoutube;
+    if (socialInstagram !== undefined) updates.socialInstagram = socialInstagram;
+    if (socialTiktok !== undefined) updates.socialTiktok = socialTiktok;
+
+    if (Object.keys(updates).length === 0) { res.status(400).json({ error: "No fields to update" }); return; }
+
+    await db.update(omnimensAmbassadorProfiles)
+      .set(updates)
+      .where(eq(omnimensAmbassadorProfiles.userId, req.user.id));
+
+    res.json({ updated: true });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to update profile" });
+  }
+});
+
+router.post("/omnimens/ambassador/videos", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const { youtubeUrl, title, description } = req.body;
+    if (!youtubeUrl || !title) { res.status(400).json({ error: "YouTube URL and title required" }); return; }
+
+    const ytMatch = youtubeUrl.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (!ytMatch) { res.status(400).json({ error: "Invalid YouTube URL" }); return; }
+    const youtubeVideoId = ytMatch[1];
+
+    const [existing] = await db.select().from(omnimensAmbassadorProfiles)
+      .where(eq(omnimensAmbassadorProfiles.userId, req.user.id)).limit(1);
+    if (!existing) { res.status(403).json({ error: "Must be an ambassador to add videos" }); return; }
+
+    const vids = await db.select({ id: omnimensAmbassadorVideos.id })
+      .from(omnimensAmbassadorVideos)
+      .where(eq(omnimensAmbassadorVideos.userId, req.user.id));
+    if (vids.length >= 20) { res.status(400).json({ error: "Maximum 20 videos allowed" }); return; }
+
+    const [video] = await db.insert(omnimensAmbassadorVideos).values({
+      userId: req.user.id,
+      youtubeUrl,
+      youtubeVideoId,
+      title: title.slice(0, 200),
+      description: description?.slice(0, 1000) || null,
+    }).returning();
+
+    res.json({ video });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to add video" });
+  }
+});
+
+router.delete("/omnimens/ambassador/videos/:id", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const videoId = parseInt(req.params.id);
+    const [video] = await db.select().from(omnimensAmbassadorVideos)
+      .where(and(eq(omnimensAmbassadorVideos.id, videoId), eq(omnimensAmbassadorVideos.userId, req.user.id)))
+      .limit(1);
+    if (!video) { res.status(404).json({ error: "Video not found" }); return; }
+
+    await db.delete(omnimensAmbassadorVideos).where(eq(omnimensAmbassadorVideos.id, videoId));
+    res.json({ deleted: true });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to delete video" });
+  }
+});
+
+router.get("/omnimens/ambassador/referred-users", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const referrals = await db.select().from(omnimensReferrals)
+      .where(eq(omnimensReferrals.referrerId, req.user.id))
+      .orderBy(desc(omnimensReferrals.createdAt));
+
+    const userIds = referrals.map(r => r.referredUserId);
+    if (userIds.length === 0) { res.json({ users: [] }); return; }
+
+    const users = await Promise.all(userIds.map(async (uid) => {
+      const [u] = await db.select({
+        id: omnimensUsers.id,
+        username: omnimensUsers.username,
+        createdAt: omnimensUsers.createdAt,
+      }).from(omnimensUsers).where(eq(omnimensUsers.id, uid)).limit(1);
+
+      const userEarnings = await db.select().from(omnimensAmbassadorEarnings)
+        .where(and(
+          eq(omnimensAmbassadorEarnings.ambassadorId, req.user.id),
+          eq(omnimensAmbassadorEarnings.referredUserId, uid)
+        ));
+
+      const ref = referrals.find(r => r.referredUserId === uid);
+      return {
+        id: u?.id,
+        username: u?.username || "User",
+        joinedAt: u?.createdAt,
+        referralStatus: ref?.status || "unknown",
+        totalCommissionEarned: userEarnings.reduce((s, e) => s + e.commissionCredits, 0),
+        purchaseCount: userEarnings.length,
+        lastPurchaseAt: userEarnings.length > 0 ? userEarnings[0].createdAt : null,
+      };
+    }));
+
+    res.json({ users: users.filter(Boolean) });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to load referred users" });
+  }
+});
+
+router.get("/omnimens/ambassador/messages", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const { userId } = req.query;
+
+    const received = await db.select().from(omnimensAmbassadorMessages)
+      .where(eq(omnimensAmbassadorMessages.recipientId, req.user.id))
+      .orderBy(desc(omnimensAmbassadorMessages.createdAt));
+
+    const sent = await db.select().from(omnimensAmbassadorMessages)
+      .where(eq(omnimensAmbassadorMessages.senderId, req.user.id))
+      .orderBy(desc(omnimensAmbassadorMessages.createdAt));
+
+    let messages = [...received.map(m => ({ ...m, direction: "received" as const })),
+                    ...sent.map(m => ({ ...m, direction: "sent" as const }))]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    if (userId && typeof userId === "string") {
+      messages = messages.filter(m => m.senderId === userId || m.recipientId === userId);
+    }
+
+    const senderIds = [...new Set(received.map(m => m.senderId))];
+    const senders: Record<string, string> = {};
+    for (const sid of senderIds) {
+      const [u] = await db.select({ username: omnimensUsers.username })
+        .from(omnimensUsers).where(eq(omnimensUsers.id, sid)).limit(1);
+      senders[sid] = u?.username || "User";
+    }
+    const recipientIds = [...new Set(sent.map(m => m.recipientId))];
+    for (const rid of recipientIds) {
+      if (!senders[rid]) {
+        const [u] = await db.select({ username: omnimensUsers.username })
+          .from(omnimensUsers).where(eq(omnimensUsers.id, rid)).limit(1);
+        senders[rid] = u?.username || "User";
+      }
+    }
+
+    res.json({
+      messages: messages.slice(0, 100).map(m => ({
+        id: m.id,
+        senderId: m.senderId,
+        senderName: senders[m.senderId] || senders[m.recipientId] || "User",
+        recipientId: m.recipientId,
+        message: m.message,
+        direction: m.direction,
+        isRead: m.isRead,
+        createdAt: m.createdAt,
+      })),
+      usernames: senders,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to load messages" });
+  }
+});
+
+router.post("/omnimens/ambassador/messages", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const { recipientId, message } = req.body;
+    if (!recipientId || !message || typeof message !== "string") {
+      res.status(400).json({ error: "Recipient and message required" }); return;
+    }
+    if (message.length > 2000) { res.status(400).json({ error: "Message too long (max 2000 chars)" }); return; }
+
+    const referrals = await db.select().from(omnimensReferrals)
+      .where(eq(omnimensReferrals.referrerId, req.user.id));
+    const referredIds = referrals.map(r => r.referredUserId);
+
+    const [amIReferred] = await db.select().from(omnimensReferrals)
+      .where(and(
+        eq(omnimensReferrals.referredUserId, req.user.id),
+        eq(omnimensReferrals.referrerId, recipientId)
+      )).limit(1);
+
+    if (!referredIds.includes(recipientId) && !amIReferred) {
+      res.status(403).json({ error: "You can only message users in your ambassador network" }); return;
+    }
+
+    const [msg] = await db.insert(omnimensAmbassadorMessages).values({
+      senderId: req.user.id,
+      recipientId,
+      message: message.trim(),
+    }).returning();
+
+    res.json({ sent: true, message: msg });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to send message" });
+  }
+});
+
+router.post("/omnimens/ambassador/messages/read", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const { messageIds } = req.body;
+    if (!Array.isArray(messageIds)) { res.status(400).json({ error: "messageIds array required" }); return; }
+
+    for (const mid of messageIds) {
+      await db.update(omnimensAmbassadorMessages)
+        .set({ isRead: true })
+        .where(and(
+          eq(omnimensAmbassadorMessages.id, mid),
+          eq(omnimensAmbassadorMessages.recipientId, req.user.id)
+        ));
+    }
+    res.json({ marked: true });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to mark messages read" });
+  }
+});
+
+router.post("/omnimens/ambassador/connect-payout", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const [profile] = await db.select().from(omnimensAmbassadorProfiles)
+      .where(eq(omnimensAmbassadorProfiles.userId, req.user.id)).limit(1);
+    if (!profile) { res.status(403).json({ error: "Must be an ambassador first" }); return; }
+
+    const [user] = await db.select().from(omnimensUsers)
+      .where(eq(omnimensUsers.id, req.user.id)).limit(1);
+
+    let connectAccountId = profile.stripeConnectAccountId;
+    if (!connectAccountId) {
+      const account = await stripe.accounts.create({
+        type: "express",
+        email: user?.email || undefined,
+        metadata: { userId: req.user.id, type: "ambassador" },
+        capabilities: {
+          transfers: { requested: true },
+        },
+      });
+      connectAccountId = account.id;
+      await db.update(omnimensAmbassadorProfiles)
+        .set({ stripeConnectAccountId: connectAccountId, payoutMethod: "stripe_connect" })
+        .where(eq(omnimensAmbassadorProfiles.userId, req.user.id));
+    }
+
+    const returnUrl = `${req.headers.origin || "https://omnimens-ai.com"}/omnimens/pricing?tab=account&ambassador=payout-connected`;
+    const refreshUrl = `${req.headers.origin || "https://omnimens-ai.com"}/omnimens/pricing?tab=account&ambassador=payout-refresh`;
+
+    const accountLink = await stripe.accountLinks.create({
+      account: connectAccountId,
+      refresh_url: refreshUrl,
+      return_url: returnUrl,
+      type: "account_onboarding",
+    });
+
+    res.json({ url: accountLink.url });
+  } catch (err: any) {
+    console.error("[Ambassador] Connect payout error:", err);
+    res.status(500).json({ error: "Failed to set up payout method" });
+  }
+});
+
+router.get("/omnimens/ambassador/payout-status", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const [profile] = await db.select().from(omnimensAmbassadorProfiles)
+      .where(eq(omnimensAmbassadorProfiles.userId, req.user.id)).limit(1);
+    if (!profile?.stripeConnectAccountId) {
+      res.json({ connected: false, payoutsEnabled: false }); return;
+    }
+
+    const account = await stripe.accounts.retrieve(profile.stripeConnectAccountId);
+    const payoutsReady = !!(account.charges_enabled && account.payouts_enabled);
+
+    if (payoutsReady && !profile.payoutsEnabled) {
+      await db.update(omnimensAmbassadorProfiles)
+        .set({ payoutsEnabled: true })
+        .where(eq(omnimensAmbassadorProfiles.userId, req.user.id));
+    }
+
+    res.json({
+      connected: true,
+      payoutsEnabled: payoutsReady,
+      payoutMethod: profile.payoutMethod || "stripe_connect",
+      email: account.email,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to check payout status" });
+  }
+});
+
+router.get("/omnimens/ambassador/payouts", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const payouts = await db.select().from(omnimensAmbassadorPayouts)
+      .where(eq(omnimensAmbassadorPayouts.ambassadorId, req.user.id))
+      .orderBy(desc(omnimensAmbassadorPayouts.createdAt));
+
+    res.json({
+      payouts: payouts.map(p => ({
+        id: p.id,
+        amountCents: p.amountCents,
+        amountDollars: (p.amountCents / 100).toFixed(2),
+        status: p.status,
+        periodStart: p.periodStart,
+        periodEnd: p.periodEnd,
+        earningsCount: p.earningsCount,
+        breakdown: p.breakdown,
+        paidAt: p.paidAt,
+        createdAt: p.createdAt,
+      })),
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to load payouts" });
+  }
+});
+
+router.get("/omnimens/ambassador/leaderboard", async (_req, res) => {
+  try {
+    const profiles = await db.select().from(omnimensAmbassadorProfiles)
+      .where(eq(omnimensAmbassadorProfiles.isActive, true))
+      .orderBy(desc(omnimensAmbassadorProfiles.lifetimeEarningsCredits));
+
+    const top = await Promise.all(profiles.slice(0, 20).map(async (p) => {
+      const [user] = await db.select({ username: omnimensUsers.username })
+        .from(omnimensUsers).where(eq(omnimensUsers.id, p.userId)).limit(1);
+      return {
+        displayName: p.displayName || user?.username || "Ambassador",
+        totalReferred: p.totalReferred,
+        lifetimeEarnings: p.lifetimeEarningsCredits,
+        joinedAt: p.createdAt,
+      };
+    }));
+
+    res.json({ leaderboard: top });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to load leaderboard" });
+  }
+});
+
+// ─── Owner: Process Ambassador Payouts (runs biweekly or manually) ───────────
+
+router.post("/omnimens/ambassador/process-payouts", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const ownerId = process.env.REPL_OWNER_ID;
+  if (!ownerId || req.user.id !== ownerId) { res.status(403).json({ error: "Owner only" }); return; }
+
+  try {
+    const profiles = await db.select().from(omnimensAmbassadorProfiles)
+      .where(and(
+        eq(omnimensAmbassadorProfiles.payoutsEnabled, true),
+        eq(omnimensAmbassadorProfiles.isActive, true)
+      ));
+
+    const now = new Date();
+    const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    const results: any[] = [];
+
+    for (const profile of profiles) {
+      if (!profile.stripeConnectAccountId) continue;
+
+      const earnings = await db.select().from(omnimensAmbassadorEarnings)
+        .where(and(
+          eq(omnimensAmbassadorEarnings.ambassadorId, profile.userId),
+        ));
+
+      const unpaidEarnings = earnings.filter(e => {
+        const existingPayouts = results; // will check via DB below
+        return new Date(e.createdAt) >= twoWeeksAgo;
+      });
+
+      const periodEarnings = await db.select().from(omnimensAmbassadorEarnings)
+        .where(eq(omnimensAmbassadorEarnings.ambassadorId, profile.userId))
+        .orderBy(desc(omnimensAmbassadorEarnings.createdAt));
+
+      const alreadyPaid = await db.select().from(omnimensAmbassadorPayouts)
+        .where(eq(omnimensAmbassadorPayouts.ambassadorId, profile.userId))
+        .orderBy(desc(omnimensAmbassadorPayouts.createdAt));
+
+      const lastPaidAt = alreadyPaid.length > 0 ? new Date(alreadyPaid[0].periodEnd) : new Date(0);
+      const newEarnings = periodEarnings.filter(e => new Date(e.createdAt) > lastPaidAt);
+
+      if (newEarnings.length === 0) continue;
+
+      const totalPayoutCents = newEarnings.reduce((s, e) => s + e.commissionCredits, 0);
+      if (totalPayoutCents < 100) continue;
+
+      const breakdown = newEarnings.map(e => ({
+        referredUserId: e.referredUserId,
+        amount: e.commissionCredits,
+        paymentType: e.paymentType,
+        date: new Date(e.createdAt).toISOString(),
+      }));
+
+      try {
+        const transfer = await stripe.transfers.create({
+          amount: totalPayoutCents,
+          currency: "usd",
+          destination: profile.stripeConnectAccountId,
+          description: `OMNIMENS Ambassador payout — ${newEarnings.length} commissions`,
+          metadata: { ambassadorId: profile.userId },
+        });
+
+        await db.insert(omnimensAmbassadorPayouts).values({
+          ambassadorId: profile.userId,
+          amountCents: totalPayoutCents,
+          stripeTransferId: transfer.id,
+          status: "paid",
+          periodStart: lastPaidAt,
+          periodEnd: now,
+          earningsCount: newEarnings.length,
+          breakdown,
+          paidAt: now,
+        });
+
+        await db.update(omnimensAmbassadorProfiles)
+          .set({
+            pendingPayoutCents: 0,
+            lifetimePayoutCents: sql`${omnimensAmbassadorProfiles.lifetimePayoutCents} + ${totalPayoutCents}`,
+          })
+          .where(eq(omnimensAmbassadorProfiles.userId, profile.userId));
+
+        await db.insert(omnimensNotifications).values({
+          upgradeId: null,
+          userId: profile.userId,
+          title: "Ambassador Payout Sent",
+          body: `$${(totalPayoutCents / 100).toFixed(2)} has been sent to your connected account for ${newEarnings.length} commission${newEarnings.length > 1 ? "s" : ""}.`,
+          type: "billing",
+        } as any).catch(() => {});
+
+        results.push({ userId: profile.userId, amount: totalPayoutCents, status: "paid", transferId: transfer.id });
+        console.log(`[Ambassador Payout] Paid $${(totalPayoutCents / 100).toFixed(2)} to ${profile.userId}`);
+      } catch (payErr: any) {
+        results.push({ userId: profile.userId, amount: totalPayoutCents, status: "failed", error: payErr.message });
+        console.error(`[Ambassador Payout] Failed for ${profile.userId}:`, payErr.message);
+      }
+    }
+
+    res.json({ processed: results.length, results });
+  } catch (err: any) {
+    console.error("[Ambassador Payout] Process error:", err);
+    res.status(500).json({ error: "Failed to process payouts" });
   }
 });
 
@@ -9882,6 +10472,7 @@ const ALLOWED_ADMIN_TABLES = new Set([
   "godflesh_patch_registry", "godflesh_mesh_comms", "godflesh_generated_modules",
   "godflesh_theory_of_mind", "godflesh_causal_graph", "godflesh_consciousness_state",
   "godflesh_saved_prompts", "godflesh_api_keys", "godflesh_referrals",
+  "godflesh_ambassador_earnings",
 ]);
 
 router.get("/omnimens/admin/table/:name", async (req, res) => {

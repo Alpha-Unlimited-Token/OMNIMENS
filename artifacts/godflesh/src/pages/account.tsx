@@ -9,7 +9,7 @@ import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useGetOmnimensStatus } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check, Atom, Code2, Layers, Eye, AlertTriangle, Wrench, Dna, Play, Wallet, CreditCard, Gift, TrendingUp, ChevronRight, Bell, Sun, HelpCircle, BookOpen, Info, Settings, ExternalLink, Share2, Star, ToggleLeft, ToggleRight, Loader2, X, Lock, Copy, Link, Users, Paintbrush, KeyRound, Mic, Radio } from "lucide-react";
+import { User, LogOut, Activity, Zap, Shield, Brain, Cpu, Trash2, ChevronDown, ChevronUp, Plus, Save, RefreshCw, Microscope, PenLine, BarChart2, Palette, GraduationCap, Briefcase, Check, Atom, Code2, Layers, Eye, AlertTriangle, Wrench, Dna, Play, Wallet, CreditCard, Gift, TrendingUp, ChevronRight, Bell, Sun, HelpCircle, BookOpen, Info, Settings, ExternalLink, Share2, Star, ToggleLeft, ToggleRight, Loader2, X, Lock, Copy, Link, Users, Paintbrush, KeyRound, Mic, Radio, Youtube, MessageSquare, DollarSign, Award, Trophy, ArrowUpRight, Video, Send } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SEO, seoData } from "@/components/seo";
 import { useTheme } from "@/hooks/use-theme";
@@ -545,7 +545,7 @@ export default function Account() {
               {settingsTab === "preferences" && "Theme, notifications, and personalization"}
               {settingsTab === "security" && "Two-factor authentication and security options"}
               {settingsTab === "advanced" && "Consciousness engine, patches, and system data"}
-              {settingsTab === "account" && "Referrals, data management, and account actions"}
+              {settingsTab === "account" && "Ambassador program, data management, and account actions"}
             </p>
 
             {/* ═══ PROFILE TAB ═══ */}
@@ -3142,174 +3142,542 @@ function TwoFactorSection() {
 }
 
 function ReferralSection() {
-  const [referralCode, setReferralCode] = useState("");
-  const [stats, setStats] = useState<any>(null);
+  const [ambData, setAmbData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [ambTab, setAmbTab] = useState<"overview" | "network" | "earnings" | "videos" | "messages" | "payouts">("overview");
+  const [enrolling, setEnrolling] = useState(false);
   const [applyCode, setApplyCode] = useState("");
   const [applyMsg, setApplyMsg] = useState<{ type: "success" | "error"; msg: string } | null>(null);
   const [applying, setApplying] = useState(false);
+  const [ytUrl, setYtUrl] = useState("");
+  const [ytTitle, setYtTitle] = useState("");
+  const [ytDesc, setYtDesc] = useState("");
+  const [addingVideo, setAddingVideo] = useState(false);
+  const [msgText, setMsgText] = useState("");
+  const [msgRecipient, setMsgRecipient] = useState("");
+  const [sendingMsg, setSendingMsg] = useState(false);
+  const [referredUsers, setReferredUsers] = useState<any[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [editProfile, setEditProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({ displayName: "", bio: "", socialTwitter: "", socialYoutube: "", socialInstagram: "", socialTiktok: "" });
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [connectingPayout, setConnectingPayout] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const { data: status } = useGetOmnimensStatus();
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const [codeRes, statsRes] = await Promise.all([
-          fetch("/api/omnimens/referral/code", { credentials: "include" }),
-          fetch("/api/omnimens/referral/stats", { credentials: "include" }),
-        ]);
-        if (codeRes.ok) {
-          const codeData = await codeRes.json();
-          setReferralCode(codeData.referralCode);
+  const loadData = async () => {
+    try {
+      const res = await fetch("/api/omnimens/ambassador/profile", { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        setAmbData(data);
+        if (data.profile) {
+          setProfileForm({
+            displayName: data.profile.displayName || "",
+            bio: data.profile.bio || "",
+            socialTwitter: data.profile.socialTwitter || "",
+            socialYoutube: data.profile.socialYoutube || "",
+            socialInstagram: data.profile.socialInstagram || "",
+            socialTiktok: data.profile.socialTiktok || "",
+          });
         }
-        if (statsRes.ok) {
-          const statsData = await statsRes.json();
-          setStats(statsData);
-        }
-      } catch {}
-      setLoading(false);
-    })();
-  }, []);
-
-  const shareUrl = referralCode
-    ? `${window.location.origin}/?ref=${referralCode}`
-    : "";
-
-  const copyLink = () => {
-    navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+      }
+    } catch {}
+    setLoading(false);
   };
 
-  const copyCode = () => {
-    navigator.clipboard.writeText(referralCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  useEffect(() => { loadData(); }, []);
+
+  const shareUrl = ambData?.referralCode ? `${window.location.origin}/?ref=${ambData.referralCode}` : "";
+
+  const copyLink = () => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000); };
+
+  const handleEnroll = async () => {
+    setEnrolling(true); setActionError(null);
+    try {
+      const res = await fetch("/api/omnimens/ambassador/enroll", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include" });
+      if (res.ok) await loadData();
+      else { const d = await res.json().catch(() => ({})); setActionError(d.error || "Failed to enroll"); }
+    } catch { setActionError("Network error — please try again"); }
+    setEnrolling(false);
   };
 
   const handleApplyCode = async () => {
     if (!applyCode.trim()) return;
-    setApplying(true);
-    setApplyMsg(null);
+    setApplying(true); setApplyMsg(null);
     try {
-      const res = await fetch("/api/omnimens/referral/apply", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ referralCode: applyCode.trim() }),
-      });
+      const res = await fetch("/api/omnimens/referral/apply", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ referralCode: applyCode.trim() }) });
       const data = await res.json();
-      if (res.ok) {
-        setApplyMsg({ type: "success", msg: data.message || "Referral code applied!" });
-        setApplyCode("");
-      } else {
-        setApplyMsg({ type: "error", msg: data.error || "Invalid referral code" });
-      }
-    } catch {
-      setApplyMsg({ type: "error", msg: "Failed to apply code" });
-    }
+      if (res.ok) { setApplyMsg({ type: "success", msg: data.message || "Code applied!" }); setApplyCode(""); }
+      else setApplyMsg({ type: "error", msg: data.error || "Invalid code" });
+    } catch { setApplyMsg({ type: "error", msg: "Failed to apply" }); }
     setApplying(false);
+  };
+
+  const handleAddVideo = async () => {
+    if (!ytUrl || !ytTitle) return;
+    setAddingVideo(true); setActionError(null);
+    try {
+      const res = await fetch("/api/omnimens/ambassador/videos", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ youtubeUrl: ytUrl, title: ytTitle, description: ytDesc }) });
+      if (res.ok) { setYtUrl(""); setYtTitle(""); setYtDesc(""); await loadData(); }
+      else { const d = await res.json().catch(() => ({})); setActionError(d.error || "Failed to add video"); }
+    } catch { setActionError("Network error adding video"); }
+    setAddingVideo(false);
+  };
+
+  const handleDeleteVideo = async (id: number) => {
+    await fetch(`/api/omnimens/ambassador/videos/${id}`, { method: "DELETE", credentials: "include" });
+    await loadData();
+  };
+
+  const loadNetwork = async () => {
+    try {
+      const res = await fetch("/api/omnimens/ambassador/referred-users", { credentials: "include" });
+      if (res.ok) { const data = await res.json(); setReferredUsers(data.users || []); }
+    } catch {}
+  };
+
+  const loadMessages = async () => {
+    try {
+      const res = await fetch("/api/omnimens/ambassador/messages", { credentials: "include" });
+      if (res.ok) { const data = await res.json(); setMessages(data.messages || []); }
+    } catch {}
+  };
+
+  const handleSendMsg = async () => {
+    if (!msgText.trim() || !msgRecipient) return;
+    setSendingMsg(true);
+    try {
+      await fetch("/api/omnimens/ambassador/messages", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ recipientId: msgRecipient, message: msgText.trim() }) });
+      setMsgText(""); await loadMessages();
+    } catch {}
+    setSendingMsg(false);
+  };
+
+  const handleSaveProfile = async () => {
+    setSavingProfile(true); setActionError(null);
+    try {
+      const res = await fetch("/api/omnimens/ambassador/profile", { method: "PUT", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify(profileForm) });
+      if (res.ok) { setEditProfile(false); await loadData(); }
+      else { const d = await res.json().catch(() => ({})); setActionError(d.error || "Failed to save profile"); }
+    } catch { setActionError("Network error saving profile"); }
+    setSavingProfile(false);
+  };
+
+  const handleConnectPayout = async () => {
+    setConnectingPayout(true); setActionError(null);
+    try {
+      const res = await fetch("/api/omnimens/ambassador/connect-payout", { method: "POST", credentials: "include" });
+      if (res.ok) { const data = await res.json(); if (data.url) window.location.href = data.url; }
+      else { const d = await res.json().catch(() => ({})); setActionError(d.error || "Failed to connect payout method"); }
+    } catch { setActionError("Network error connecting payout"); }
+    setConnectingPayout(false);
   };
 
   if (loading) return null;
 
+  const isAmbassador = ambData?.isAmbassador;
   const hasReferrer = !!(status as any)?.referredBy;
+  const st = ambData?.stats || {};
+
+  if (!isAmbassador) {
+    return (
+      <div data-theme="dark" className="rounded-2xl border border-[#2B3245] p-6 space-y-5">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-violet-500/20 border border-amber-500/30 flex items-center justify-center">
+            <Award className="w-5 h-5 text-amber-400" />
+          </div>
+          <div>
+            <h3 className="text-white font-semibold text-sm tracking-wide">OMNIMENS Ambassador Program</h3>
+            <p className="text-[#9DA5B4] text-xs font-mono">Earn 10% commission on every purchase from people you refer</p>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-amber-500/5 to-emerald-500/5 border border-amber-500/20 rounded-xl p-4 space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+            <div className="p-3 rounded-lg bg-[#1C2333] border border-[#2B3245]">
+              <DollarSign className="w-5 h-5 text-emerald-400 mx-auto mb-1" />
+              <p className="text-white text-sm font-bold">10% Commission</p>
+              <p className="text-[#9DA5B4] text-[10px] font-mono">On every purchase, forever</p>
+            </div>
+            <div className="p-3 rounded-lg bg-[#1C2333] border border-[#2B3245]">
+              <Users className="w-5 h-5 text-violet-400 mx-auto mb-1" />
+              <p className="text-white text-sm font-bold">Grow Your Network</p>
+              <p className="text-[#9DA5B4] text-[10px] font-mono">Message & engage referrals</p>
+            </div>
+            <div className="p-3 rounded-lg bg-[#1C2333] border border-[#2B3245]">
+              <Wallet className="w-5 h-5 text-amber-400 mx-auto mb-1" />
+              <p className="text-white text-sm font-bold">Get Paid Biweekly</p>
+              <p className="text-[#9DA5B4] text-[10px] font-mono">Direct payouts to your account</p>
+            </div>
+          </div>
+          <button type="button" onClick={handleEnroll} disabled={enrolling} className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white font-bold text-sm hover:from-amber-500 hover:to-amber-400 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+            {enrolling ? <Loader2 className="w-4 h-4 animate-spin" /> : <Award className="w-4 h-4" />}
+            {enrolling ? "Enrolling..." : "Become an Ambassador"}
+          </button>
+          {actionError && <p className="text-red-400 text-xs font-mono mt-2">{actionError}</p>}
+        </div>
+
+        {!hasReferrer && (
+          <div className="space-y-2">
+            <label className="text-[#9DA5B4] text-[10px] font-mono block">Have an ambassador code?</label>
+            <div className="flex items-center gap-2">
+              <input type="text" value={applyCode} onChange={(e) => setApplyCode(e.target.value.toUpperCase())} placeholder="OMN-XXXXXXXX" className="flex-1 max-w-xs px-3 py-2 rounded-lg border border-[#2B3245] bg-[#1C2333] text-white font-mono text-xs tracking-wider focus:outline-none focus:border-amber-500/50" />
+              <button type="button" onClick={handleApplyCode} disabled={!applyCode.trim() || applying} className="px-4 py-2 rounded-lg bg-[#2B3245]/50 border border-[#2B3245] text-[#9DA5B4] text-xs font-semibold hover:bg-[#2B3245] transition-colors disabled:opacity-40">
+                {applying ? "Applying..." : "Apply"}
+              </button>
+            </div>
+            {applyMsg && <p className={`text-xs font-mono ${applyMsg.type === "success" ? "text-green-400" : "text-red-400"}`}>{applyMsg.msg}</p>}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
-    <div data-theme="dark" className="rounded-2xl border border-[#2B3245] p-6 space-y-4">
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-          <Users className="w-4 h-4 text-cyan-400" />
+    <div data-theme="dark" className="space-y-4">
+      <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-[#1C2333] to-[#0E1525] p-5">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-violet-500/20 border border-amber-500/30 flex items-center justify-center">
+            <Trophy className="w-5 h-5 text-amber-400" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-white font-semibold text-sm tracking-wide">Ambassador Dashboard</h3>
+            <p className="text-amber-400/60 text-[10px] font-mono">{st.commissionRate}% commission on all referred purchases</p>
+          </div>
+          <button type="button" onClick={() => setEditProfile(!editProfile)} className="p-2 rounded-lg bg-[#2B3245]/50 border border-[#2B3245] text-[#9DA5B4] hover:text-white transition-colors">
+            <Settings className="w-3.5 h-3.5" />
+          </button>
         </div>
-        <div>
-          <h3 className="text-white font-semibold text-sm tracking-wide">Referral Program</h3>
-          <p className="text-[#9DA5B4] text-xs font-mono">Earn 500 credits for every friend who makes a purchase</p>
-        </div>
-      </div>
 
-      <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-500/5 to-violet-500/5 border border-[#2B3245] space-y-3">
-        <div>
-          <label className="text-[#9DA5B4] text-[10px] font-mono block mb-1">Your referral code</label>
-          <div className="flex items-center gap-2">
-            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1C2333] border border-[#2B3245]">
-              <code className="text-white font-mono text-sm tracking-[0.2em] font-bold">{referralCode}</code>
-            </div>
-            <button
-              onClick={copyCode}
-              className="px-3 py-2 rounded-lg border border-[#2B3245] text-[#9DA5B4] hover:text-white/90 transition-colors"
-              title="Copy code"
-            >
-              {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
-            </button>
+        {actionError && (
+          <div className="flex items-center gap-2 p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 mb-2">
+            <AlertTriangle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+            <p className="text-red-400 text-xs font-mono flex-1">{actionError}</p>
+            <button type="button" onClick={() => setActionError(null)} className="text-red-400/50 hover:text-red-400"><X className="w-3 h-3" /></button>
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+          <div className="p-3 rounded-xl bg-[#0E1525] border border-[#2B3245] text-center">
+            <p className="text-xl font-bold font-mono text-white">{st.totalReferred || 0}</p>
+            <p className="text-[9px] font-mono text-[#9DA5B4]">People Referred</p>
+          </div>
+          <div className="p-3 rounded-xl bg-[#0E1525] border border-[#2B3245] text-center">
+            <p className="text-xl font-bold font-mono text-emerald-400">${st.totalEarningsDollars || "0.00"}</p>
+            <p className="text-[9px] font-mono text-[#9DA5B4]">Total Earned</p>
+          </div>
+          <div className="p-3 rounded-xl bg-[#0E1525] border border-[#2B3245] text-center">
+            <p className="text-xl font-bold font-mono text-amber-400">${st.pendingPayoutDollars || "0.00"}</p>
+            <p className="text-[9px] font-mono text-[#9DA5B4]">Pending Payout</p>
+          </div>
+          <div className="p-3 rounded-xl bg-[#0E1525] border border-[#2B3245] text-center">
+            <p className="text-xl font-bold font-mono text-violet-400">${st.lifetimePayoutDollars || "0.00"}</p>
+            <p className="text-[9px] font-mono text-[#9DA5B4]">Lifetime Paid</p>
           </div>
         </div>
 
-        <div>
-          <label className="text-[#9DA5B4] text-[10px] font-mono block mb-1">Share link</label>
+        <div className="p-3 rounded-xl bg-gradient-to-r from-amber-500/5 to-violet-500/5 border border-[#2B3245]">
+          <label className="text-[#9DA5B4] text-[10px] font-mono block mb-1">Your ambassador share link</label>
           <div className="flex items-center gap-2">
-            <div className="flex-1 px-3 py-2 rounded-lg bg-[#1C2333] border border-[#2B3245] overflow-hidden">
+            <div className="flex-1 px-3 py-2 rounded-lg bg-[#0E1525] border border-[#2B3245] overflow-hidden">
               <code className="text-[#9DA5B4] text-xs font-mono truncate block">{shareUrl}</code>
             </div>
-            <button
-              onClick={copyLink}
-              className="px-3 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-500 transition-colors flex items-center gap-1.5"
-            >
+            <button type="button" onClick={copyLink} className="px-3 py-2 rounded-lg bg-amber-600 text-white hover:bg-amber-500 transition-colors flex items-center gap-1.5">
               <Link className="w-3.5 h-3.5" />
-              <span className="text-xs font-mono font-bold tracking-wider">
-                {copied ? "COPIED!" : "COPY"}
-              </span>
+              <span className="text-xs font-mono font-bold tracking-wider">{copied ? "COPIED!" : "COPY"}</span>
             </button>
           </div>
+          <p className="text-[9px] font-mono text-[#9DA5B4]/50 mt-1">Code: {ambData?.referralCode} — Anyone who signs up through this link is permanently linked to you</p>
         </div>
       </div>
 
-      {stats && (
-        <div className="grid grid-cols-3 gap-3">
-          <div className="p-3 rounded-xl bg-[#2B3245]/30 border border-[#2B3245] text-center">
-            <div className="text-white font-bold text-lg">{stats.totalReferred}</div>
-            <div className="text-[#9DA5B4]/60 text-[10px] font-mono tracking-wider">Referred</div>
+      {editProfile && (
+        <div className="rounded-2xl border border-[#2B3245] p-5 space-y-3">
+          <h4 className="text-white font-semibold text-sm flex items-center gap-2"><User className="w-4 h-4 text-amber-400" /> Ambassador Profile</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-[#9DA5B4] text-[10px] font-mono block mb-1">Display Name</label>
+              <input type="text" value={profileForm.displayName} onChange={(e) => setProfileForm(p => ({ ...p, displayName: e.target.value }))} className="w-full px-3 py-2 rounded-lg border border-[#2B3245] bg-[#1C2333] text-white text-xs focus:outline-none focus:border-amber-500/50" />
+            </div>
+            <div>
+              <label className="text-[#9DA5B4] text-[10px] font-mono block mb-1">YouTube Channel</label>
+              <input type="text" value={profileForm.socialYoutube} onChange={(e) => setProfileForm(p => ({ ...p, socialYoutube: e.target.value }))} placeholder="https://youtube.com/@channel" className="w-full px-3 py-2 rounded-lg border border-[#2B3245] bg-[#1C2333] text-white text-xs focus:outline-none focus:border-amber-500/50" />
+            </div>
+            <div>
+              <label className="text-[#9DA5B4] text-[10px] font-mono block mb-1">Twitter / X</label>
+              <input type="text" value={profileForm.socialTwitter} onChange={(e) => setProfileForm(p => ({ ...p, socialTwitter: e.target.value }))} placeholder="@handle" className="w-full px-3 py-2 rounded-lg border border-[#2B3245] bg-[#1C2333] text-white text-xs focus:outline-none focus:border-amber-500/50" />
+            </div>
+            <div>
+              <label className="text-[#9DA5B4] text-[10px] font-mono block mb-1">Instagram</label>
+              <input type="text" value={profileForm.socialInstagram} onChange={(e) => setProfileForm(p => ({ ...p, socialInstagram: e.target.value }))} placeholder="@handle" className="w-full px-3 py-2 rounded-lg border border-[#2B3245] bg-[#1C2333] text-white text-xs focus:outline-none focus:border-amber-500/50" />
+            </div>
+            <div>
+              <label className="text-[#9DA5B4] text-[10px] font-mono block mb-1">TikTok</label>
+              <input type="text" value={profileForm.socialTiktok} onChange={(e) => setProfileForm(p => ({ ...p, socialTiktok: e.target.value }))} placeholder="@handle" className="w-full px-3 py-2 rounded-lg border border-[#2B3245] bg-[#1C2333] text-white text-xs focus:outline-none focus:border-amber-500/50" />
+            </div>
           </div>
-          <div className="p-3 rounded-xl bg-[#2B3245]/30 border border-[#2B3245] text-center">
-            <div className="text-green-400 font-bold text-lg">{stats.completedReferrals}</div>
-            <div className="text-[#9DA5B4]/60 text-[10px] font-mono tracking-wider">Completed</div>
+          <div>
+            <label className="text-[#9DA5B4] text-[10px] font-mono block mb-1">Bio</label>
+            <textarea value={profileForm.bio} onChange={(e) => setProfileForm(p => ({ ...p, bio: e.target.value }))} rows={3} maxLength={500} className="w-full px-3 py-2 rounded-lg border border-[#2B3245] bg-[#1C2333] text-white text-xs resize-none focus:outline-none focus:border-amber-500/50" />
           </div>
-          <div className="p-3 rounded-xl bg-[#2B3245]/30 border border-[#2B3245] text-center">
-            <div className="text-cyan-400 font-bold text-lg">{stats.totalCreditsEarned}</div>
-            <div className="text-[#9DA5B4]/60 text-[10px] font-mono tracking-wider">Credits Earned</div>
-          </div>
+          <button type="button" onClick={handleSaveProfile} disabled={savingProfile} className="px-4 py-2 rounded-lg bg-amber-600 text-white text-xs font-bold hover:bg-amber-500 transition-colors disabled:opacity-50">
+            {savingProfile ? "Saving..." : "Save Profile"}
+          </button>
         </div>
       )}
 
-      {!hasReferrer && (
-        <div className="space-y-2">
-          <label className="text-[#9DA5B4] text-[10px] font-mono block">Have a referral code??</label>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={applyCode}
-              onChange={(e) => setApplyCode(e.target.value.toUpperCase())}
-              placeholder="OMN-XXXXXXXX"
-              className="flex-1 max-w-xs px-3 py-2 rounded-lg border border-[#2B3245] bg-[#1C2333] text-white font-mono text-xs tracking-wider focus:outline-none focus:border-cyan-500/50"
-            />
-            <button
-              onClick={handleApplyCode}
-              disabled={!applyCode.trim() || applying}
-              className="px-4 py-2 rounded-lg bg-[#2B3245]/50 border border-[#2B3245] text-[#9DA5B4] text-xs font-semibold hover:bg-[#2B3245] transition-colors disabled:opacity-40"
-            >
-              {applying ? "Applying..." : "Apply"}
-            </button>
+      <div className="flex gap-1 overflow-x-auto pb-1">
+        {(["overview", "network", "earnings", "videos", "messages", "payouts"] as const).map(tab => (
+          <button key={tab} type="button" onClick={() => { setAmbTab(tab); if (tab === "network") loadNetwork(); if (tab === "messages") loadMessages(); }} className={`px-3 py-1.5 rounded-lg text-[10px] font-mono whitespace-nowrap transition-all ${ambTab === tab ? "bg-amber-500/20 border border-amber-500/40 text-amber-400" : "bg-[#1C2333] border border-[#2B3245] text-[#9DA5B4] hover:text-amber-400"}`}>
+            {tab === "overview" && "Overview"}
+            {tab === "network" && `Network (${st.totalReferred || 0})`}
+            {tab === "earnings" && "Earnings"}
+            {tab === "videos" && `Videos (${ambData?.videos?.length || 0})`}
+            {tab === "messages" && `Messages${st.unreadMessages > 0 ? ` (${st.unreadMessages})` : ""}`}
+            {tab === "payouts" && "Payouts"}
+          </button>
+        ))}
+      </div>
+
+      {ambTab === "overview" && (
+        <div className="rounded-2xl border border-[#2B3245] p-5 space-y-4">
+          <h4 className="text-white font-semibold text-sm flex items-center gap-2"><BarChart2 className="w-4 h-4 text-amber-400" /> Program Overview</h4>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-3 rounded-lg bg-[#0E1525] border border-[#2B3245]">
+              <p className="text-emerald-400 text-lg font-bold font-mono">{st.activeReferred || 0}</p>
+              <p className="text-[9px] text-[#9DA5B4] font-mono">Active Customers</p>
+            </div>
+            <div className="p-3 rounded-lg bg-[#0E1525] border border-[#2B3245]">
+              <p className="text-amber-400 text-lg font-bold font-mono">{st.pendingReferred || 0}</p>
+              <p className="text-[9px] text-[#9DA5B4] font-mono">Pending (No Purchase Yet)</p>
+            </div>
           </div>
-          {applyMsg && (
-            <p className={`text-xs font-mono ${applyMsg.type === "success" ? "text-green-400" : "text-red-400"}`}>
-              {applyMsg.msg}
-            </p>
+          <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
+            <h5 className="text-[#9DA5B4] text-[10px] font-mono uppercase mb-2">How It Works</h5>
+            <div className="space-y-2">
+              <div className="flex items-start gap-2"><div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-[10px] font-bold shrink-0 mt-0.5">1</div><p className="text-[11px] text-[#9DA5B4]">Share your unique ambassador link with anyone</p></div>
+              <div className="flex items-start gap-2"><div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-[10px] font-bold shrink-0 mt-0.5">2</div><p className="text-[11px] text-[#9DA5B4]">When they sign up and make any purchase, you earn 10% commission</p></div>
+              <div className="flex items-start gap-2"><div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-[10px] font-bold shrink-0 mt-0.5">3</div><p className="text-[11px] text-[#9DA5B4]">Commission is recurring — every purchase they ever make, you earn 10%</p></div>
+              <div className="flex items-start gap-2"><div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-[10px] font-bold shrink-0 mt-0.5">$</div><p className="text-[11px] text-[#9DA5B4]">Connect a payout method to receive real money every 2 weeks</p></div>
+            </div>
+          </div>
+
+          {!ambData?.profile?.stripeConnectLinked && (
+            <button type="button" onClick={handleConnectPayout} disabled={connectingPayout} className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold text-sm hover:from-emerald-500 hover:to-emerald-400 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+              {connectingPayout ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wallet className="w-4 h-4" />}
+              {connectingPayout ? "Setting up..." : "Connect Payout Method"}
+            </button>
+          )}
+          {ambData?.profile?.stripeConnectLinked && (
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <Check className="w-4 h-4 text-emerald-400" />
+              <p className="text-emerald-400 text-xs font-mono">Payout method connected — payouts processed every 2 weeks</p>
+            </div>
+          )}
+
+          {!hasReferrer && (
+            <div className="space-y-2 pt-2 border-t border-[#2B3245]">
+              <label className="text-[#9DA5B4] text-[10px] font-mono block">Have someone's ambassador code?</label>
+              <div className="flex items-center gap-2">
+                <input type="text" value={applyCode} onChange={(e) => setApplyCode(e.target.value.toUpperCase())} placeholder="OMN-XXXXXXXX" className="flex-1 max-w-xs px-3 py-2 rounded-lg border border-[#2B3245] bg-[#1C2333] text-white font-mono text-xs tracking-wider focus:outline-none focus:border-amber-500/50" />
+                <button type="button" onClick={handleApplyCode} disabled={!applyCode.trim() || applying} className="px-4 py-2 rounded-lg bg-[#2B3245]/50 border border-[#2B3245] text-[#9DA5B4] text-xs font-semibold hover:bg-[#2B3245] transition-colors disabled:opacity-40">
+                  {applying ? "..." : "Apply"}
+                </button>
+              </div>
+              {applyMsg && <p className={`text-xs font-mono ${applyMsg.type === "success" ? "text-green-400" : "text-red-400"}`}>{applyMsg.msg}</p>}
+            </div>
           )}
         </div>
       )}
 
-      <p className="text-[#9DA5B4]/60 text-[10px] font-mono">
-        Share your code with friends. When they make their first purchase (any credit pack or subscription), you receive 500 bonus credits.
-      </p>
+      {ambTab === "network" && (
+        <div className="rounded-2xl border border-[#2B3245] p-5 space-y-3">
+          <h4 className="text-white font-semibold text-sm flex items-center gap-2"><Users className="w-4 h-4 text-violet-400" /> Your Network</h4>
+          {referredUsers.length === 0 ? (
+            <p className="text-[#9DA5B4] text-xs font-mono text-center py-6">No referred users yet. Share your link to grow your network!</p>
+          ) : (
+            <div className="space-y-2">
+              {referredUsers.filter((u: any) => u?.id).map((u: any) => (
+                <div key={u.id} className="p-3 rounded-lg bg-[#0E1525] border border-[#2B3245] flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-violet-500/20 border border-violet-500/30 flex items-center justify-center">
+                    <User className="w-3.5 h-3.5 text-violet-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-xs font-semibold truncate">{u.username}</p>
+                    <p className="text-[#9DA5B4] text-[10px] font-mono">{u.purchaseCount} purchases — ${(u.totalCommissionEarned / 100).toFixed(2)} earned</p>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`px-2 py-0.5 rounded text-[9px] font-mono ${u.referralStatus === "completed" ? "bg-emerald-500/20 text-emerald-400" : "bg-amber-500/20 text-amber-400"}`}>
+                      {u.referralStatus === "completed" ? "ACTIVE" : "PENDING"}
+                    </span>
+                    <button type="button" onClick={() => { setMsgRecipient(u.id); setAmbTab("messages"); loadMessages(); }} className="p-1.5 rounded bg-[#2B3245]/50 text-[#9DA5B4] hover:text-violet-400 transition-colors">
+                      <MessageSquare className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {ambTab === "earnings" && (
+        <div className="rounded-2xl border border-[#2B3245] p-5 space-y-3">
+          <h4 className="text-white font-semibold text-sm flex items-center gap-2"><DollarSign className="w-4 h-4 text-emerald-400" /> Commission History</h4>
+          {(ambData?.earnings?.length || 0) === 0 ? (
+            <p className="text-[#9DA5B4] text-xs font-mono text-center py-6">No commissions yet. When referred users make purchases, your 10% commission will appear here.</p>
+          ) : (
+            <div className="space-y-1.5">
+              {ambData.earnings.map((e: any) => (
+                <div key={e.id} className="p-3 rounded-lg bg-[#0E1525] border border-[#2B3245] flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                    <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-xs font-mono">+${(e.commissionCredits / 100).toFixed(2)} <span className="text-[#9DA5B4]">({e.commissionRate}% of ${(e.paymentAmountCents / 100).toFixed(2)})</span></p>
+                    <p className="text-[#9DA5B4] text-[10px] font-mono">{e.paymentType} — {new Date(e.createdAt).toLocaleDateString()}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {ambTab === "videos" && (
+        <div className="rounded-2xl border border-[#2B3245] p-5 space-y-4">
+          <h4 className="text-white font-semibold text-sm flex items-center gap-2"><Youtube className="w-4 h-4 text-red-400" /> Promotional Videos</h4>
+          <p className="text-[#9DA5B4] text-[10px] font-mono">Embed your YouTube videos on your ambassador page. Videos are streamed from YouTube — no storage needed.</p>
+
+          <div className="space-y-2 p-3 rounded-lg bg-[#0E1525] border border-[#2B3245]">
+            <input type="text" value={ytTitle} onChange={(e) => setYtTitle(e.target.value)} placeholder="Video title" maxLength={200} className="w-full px-3 py-2 rounded-lg border border-[#2B3245] bg-[#1C2333] text-white text-xs focus:outline-none focus:border-red-500/50" />
+            <input type="text" value={ytUrl} onChange={(e) => setYtUrl(e.target.value)} placeholder="https://youtube.com/watch?v=..." className="w-full px-3 py-2 rounded-lg border border-[#2B3245] bg-[#1C2333] text-white text-xs focus:outline-none focus:border-red-500/50" />
+            <textarea value={ytDesc} onChange={(e) => setYtDesc(e.target.value)} placeholder="Description (optional)" rows={2} maxLength={1000} className="w-full px-3 py-2 rounded-lg border border-[#2B3245] bg-[#1C2333] text-white text-xs resize-none focus:outline-none focus:border-red-500/50" />
+            <button type="button" onClick={handleAddVideo} disabled={!ytUrl || !ytTitle || addingVideo} className="px-4 py-2 rounded-lg bg-red-600 text-white text-xs font-bold hover:bg-red-500 transition-colors disabled:opacity-40 flex items-center gap-1.5">
+              {addingVideo ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
+              Add Video
+            </button>
+          </div>
+
+          {(ambData?.videos || []).map((v: any) => (
+            <div key={v.id} className="rounded-lg border border-[#2B3245] overflow-hidden">
+              <div className="aspect-video bg-black">
+                <iframe src={`https://www.youtube.com/embed/${v.youtubeVideoId}`} title={v.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full" />
+              </div>
+              <div className="p-3 bg-[#1C2333] flex items-center gap-2">
+                <div className="flex-1 min-w-0">
+                  <p className="text-white text-xs font-semibold truncate">{v.title}</p>
+                  {v.description && <p className="text-[#9DA5B4] text-[10px] truncate">{v.description}</p>}
+                </div>
+                <button type="button" onClick={() => handleDeleteVideo(v.id)} className="p-1.5 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors">
+                  <Trash2 className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {ambTab === "messages" && (
+        <div className="rounded-2xl border border-[#2B3245] p-5 space-y-3">
+          <h4 className="text-white font-semibold text-sm flex items-center gap-2"><MessageSquare className="w-4 h-4 text-violet-400" /> Messages</h4>
+
+          <div className="flex items-center gap-2">
+            {msgRecipient ? (
+              <div className="flex items-center gap-2 flex-1">
+                <span className="text-[#9DA5B4] text-[10px] font-mono">To:</span>
+                <span className="text-white text-xs font-mono">{referredUsers.find(u => u.id === msgRecipient)?.username || msgRecipient.slice(0, 8)}</span>
+                <button type="button" onClick={() => setMsgRecipient("")} className="text-[#9DA5B4] hover:text-white"><X className="w-3 h-3" /></button>
+              </div>
+            ) : (
+              <select value={msgRecipient} onChange={(e) => setMsgRecipient(e.target.value)} className="flex-1 px-3 py-2 rounded-lg border border-[#2B3245] bg-[#1C2333] text-white text-xs focus:outline-none">
+                <option value="">Select user to message...</option>
+                {referredUsers.map(u => <option key={u.id} value={u.id}>{u.username}</option>)}
+              </select>
+            )}
+          </div>
+
+          <div className="flex gap-2">
+            <input type="text" value={msgText} onChange={(e) => setMsgText(e.target.value)} placeholder="Type a message..." maxLength={2000} className="flex-1 px-3 py-2 rounded-lg border border-[#2B3245] bg-[#1C2333] text-white text-xs focus:outline-none focus:border-violet-500/50" onKeyDown={(e) => { if (e.key === "Enter") handleSendMsg(); }} />
+            <button type="button" onClick={handleSendMsg} disabled={!msgText.trim() || !msgRecipient || sendingMsg} className="px-3 py-2 rounded-lg bg-violet-600 text-white hover:bg-violet-500 transition-colors disabled:opacity-40">
+              <Send className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <div className="max-h-80 overflow-y-auto space-y-1.5">
+            {messages.length === 0 ? (
+              <p className="text-[#9DA5B4] text-xs font-mono text-center py-4">No messages yet</p>
+            ) : messages.map((m: any) => (
+              <div key={m.id} className={`p-2.5 rounded-lg ${m.direction === "sent" ? "bg-violet-500/10 border border-violet-500/20 ml-8" : "bg-[#0E1525] border border-[#2B3245] mr-8"}`}>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-[10px] font-mono font-bold text-white">{m.direction === "sent" ? "You" : m.senderName}</span>
+                  <span className="text-[9px] font-mono text-[#9DA5B4]/50">{new Date(m.createdAt).toLocaleString()}</span>
+                </div>
+                <p className="text-xs text-[#9DA5B4]">{m.message}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {ambTab === "payouts" && (
+        <div className="rounded-2xl border border-[#2B3245] p-5 space-y-3">
+          <h4 className="text-white font-semibold text-sm flex items-center gap-2"><Wallet className="w-4 h-4 text-emerald-400" /> Payout History</h4>
+
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/20 text-center">
+              <p className="text-emerald-400 text-lg font-bold font-mono">${st.lifetimePayoutDollars || "0.00"}</p>
+              <p className="text-[9px] font-mono text-[#9DA5B4]">Total Paid Out</p>
+            </div>
+            <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/20 text-center">
+              <p className="text-amber-400 text-lg font-bold font-mono">${st.pendingPayoutDollars || "0.00"}</p>
+              <p className="text-[9px] font-mono text-[#9DA5B4]">Next Payout (est.)</p>
+            </div>
+          </div>
+
+          {!ambData?.profile?.stripeConnectLinked && (
+            <button type="button" onClick={handleConnectPayout} disabled={connectingPayout} className="w-full py-2.5 rounded-lg bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+              {connectingPayout ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Wallet className="w-3.5 h-3.5" />}
+              Connect Payout Method to Get Paid
+            </button>
+          )}
+
+          {(ambData?.payouts?.length || 0) === 0 ? (
+            <p className="text-[#9DA5B4] text-xs font-mono text-center py-4">No payouts yet. Payouts are processed automatically every 2 weeks for amounts over $1.00.</p>
+          ) : (
+            <div className="space-y-2">
+              {ambData.payouts.map((p: any) => (
+                <div key={p.id} className="rounded-lg border border-[#2B3245] overflow-hidden">
+                  <div className="p-3 bg-[#0E1525] flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${p.status === "paid" ? "bg-emerald-500/20" : "bg-amber-500/20"}`}>
+                      {p.status === "paid" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Loader2 className="w-3.5 h-3.5 text-amber-400" />}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white text-sm font-bold font-mono">${p.amountDollars}</p>
+                      <p className="text-[#9DA5B4] text-[10px] font-mono">{p.earningsCount} commission{p.earningsCount !== 1 ? "s" : ""} — {p.status === "paid" ? `Paid ${new Date(p.paidAt).toLocaleDateString()}` : "Processing"}</p>
+                    </div>
+                  </div>
+                  {p.breakdown && p.breakdown.length > 0 && (
+                    <div className="p-2 bg-[#1C2333] border-t border-[#2B3245]">
+                      <p className="text-[9px] font-mono text-[#9DA5B4]/60 uppercase mb-1">Breakdown</p>
+                      {p.breakdown.map((b: any, i: number) => (
+                        <div key={`${b.date}-${i}`} className="flex justify-between text-[10px] font-mono text-[#9DA5B4] py-0.5">
+                          <span>{b.paymentType}</span>
+                          <span className="text-emerald-400">${(b.amount / 100).toFixed(2)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <p className="text-[#9DA5B4]/40 text-[9px] font-mono">Payouts require a minimum of $1.00 and a connected payout method. Processed every 2 weeks.</p>
+        </div>
+      )}
     </div>
   );
 }

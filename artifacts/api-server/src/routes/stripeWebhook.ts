@@ -7,7 +7,7 @@
 import { Router } from "express";
 import { stripe } from "../stripeClient.js";
 import { db } from "@workspace/db";
-import { omnimensUsers, omnimensCreditTransactions, omnimensNotifications, omnimensReferrals } from "@workspace/db";
+import { omnimensUsers, omnimensCreditTransactions, omnimensNotifications, omnimensReferrals, omnimensAmbassadorEarnings, omnimensAmbassadorProfiles } from "@workspace/db";
 import { eq, and, sql } from "drizzle-orm";
 
 const REFERRAL_REWARD_CREDITS = 500;
@@ -50,6 +50,80 @@ async function awardReferralCredits(payingUserId: string) {
     console.log(`[Referral] Awarded ${REFERRAL_REWARD_CREDITS} credits to ${pendingRef.referrerId} for referring ${payingUserId}`);
   } catch (err) {
     console.error("[Referral] Failed to award referral credits:", err);
+  }
+}
+
+const AMBASSADOR_COMMISSION_RATE = 10;
+
+async function awardAmbassadorCommission(
+  payingUserId: string,
+  paymentAmountCents: number,
+  paymentType: string,
+  stripeEventId?: string
+) {
+  try {
+    if (paymentAmountCents <= 0) return;
+
+    const [payingUser] = await db.select({ referredBy: omnimensUsers.referredBy })
+      .from(omnimensUsers)
+      .where(eq(omnimensUsers.id, payingUserId))
+      .limit(1);
+    if (!payingUser?.referredBy) return;
+
+    const [ambassador] = await db.select({ id: omnimensUsers.id })
+      .from(omnimensUsers)
+      .where(eq(omnimensUsers.referralCode, payingUser.referredBy))
+      .limit(1);
+    if (!ambassador) return;
+
+    const commissionCents = Math.floor(paymentAmountCents * AMBASSADOR_COMMISSION_RATE / 100);
+    if (commissionCents <= 0) return;
+    const commissionCredits = commissionCents;
+
+    await db.update(omnimensUsers)
+      .set({
+        credits: sql`${omnimensUsers.credits} + ${commissionCredits}`,
+        totalCreditsEarned: sql`${omnimensUsers.totalCreditsEarned} + ${commissionCredits}`,
+        ambassadorCreditsEarned: sql`${omnimensUsers.ambassadorCreditsEarned} + ${commissionCredits}`,
+      })
+      .where(eq(omnimensUsers.id, ambassador.id));
+
+    await db.insert(omnimensAmbassadorEarnings).values({
+      ambassadorId: ambassador.id,
+      referredUserId: payingUserId,
+      paymentAmountCents,
+      commissionCredits,
+      commissionRate: AMBASSADOR_COMMISSION_RATE,
+      paymentType,
+      stripeEventId: stripeEventId || null,
+    });
+
+    await db.insert(omnimensCreditTransactions).values({
+      userId: ambassador.id,
+      type: "bonus",
+      credits: commissionCredits,
+      description: `Ambassador commission (${AMBASSADOR_COMMISSION_RATE}%) — ${paymentType}`,
+    });
+
+    await db.insert(omnimensNotifications).values({
+      upgradeId: null,
+      userId: ambassador.id,
+      title: "Ambassador Commission Earned",
+      body: `You earned ${commissionCredits} credits (${AMBASSADOR_COMMISSION_RATE}% commission) from a referred user's purchase.`,
+      type: "billing",
+    } as any).catch(() => {});
+
+    await db.update(omnimensAmbassadorProfiles)
+      .set({
+        pendingPayoutCents: sql`${omnimensAmbassadorProfiles.pendingPayoutCents} + ${commissionCents}`,
+        lifetimeEarningsCredits: sql`${omnimensAmbassadorProfiles.lifetimeEarningsCredits} + ${commissionCredits}`,
+      })
+      .where(eq(omnimensAmbassadorProfiles.userId, ambassador.id))
+      .catch((e) => console.error("[Ambassador] Profile payout tracking update failed:", e));
+
+    console.log(`[Ambassador] Awarded ${commissionCredits} credits to ${ambassador.id} (${AMBASSADOR_COMMISSION_RATE}% of $${(paymentAmountCents / 100).toFixed(2)} from ${payingUserId})`);
+  } catch (err) {
+    console.error("[Ambassador] Failed to award commission:", err);
   }
 }
 
@@ -168,6 +242,7 @@ router.post(
             } as any).catch(() => {});
 
             console.log(`[Stripe Webhook] Credited ${resPack.totalCredits} resonance credits to ${userId} (pack: ${packId})`);
+            await awardAmbassadorCommission(userId, resPack.amountCents, `Resonance ${resPack.label}`, session.id);
 
           // ── One-time credit pack purchase ──────────────────────────────────
           } else if (packId && CREDIT_PACKS[packId] && session.payment_status === "paid") {
@@ -213,6 +288,7 @@ router.post(
 
             console.log(`[Stripe Webhook] Credited ${creditsToAdd} credits to ${userId} (pack: ${packId})`);
             await awardReferralCredits(userId);
+            await awardAmbassadorCommission(userId, packInfo.amountCents, `${packInfo.label} pack`, session.id);
 
           // ── Monthly plan subscription started ──────────────────────────────
           } else if (purpose === "monthly_plan" && session.mode === "subscription") {
@@ -255,6 +331,8 @@ router.post(
 
             console.log(`[Stripe Webhook] ${plan.label} plan activated for ${userId} — ${plan.credits} credits`);
             await awardReferralCredits(userId);
+            const planAmountCents = session.amount_total || 0;
+            if (planAmountCents > 0) await awardAmbassadorCommission(userId, planAmountCents, `${plan.label} plan`, session.id);
 
           // ── Wallet setup ───────────────────────────────────────────────────
           } else if (purpose === "wallet_setup" && session.setup_intent) {
@@ -329,6 +407,8 @@ router.post(
           } as any).catch(() => {});
 
           console.log(`[Stripe Webhook] ${plan.label} renewal for user ${user.id} — ${plan.credits} credits`);
+          const renewalAmountCents = invoice.amount_paid || 0;
+          if (renewalAmountCents > 0) await awardAmbassadorCommission(user.id, renewalAmountCents, `${plan.label} renewal`, invoice.id);
           break;
         }
 
