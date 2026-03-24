@@ -11049,7 +11049,9 @@ router.get("/omnimens/autonomous-proof", async (_req, res) => {
     const path = await import("path");
     const { omnimensAgentMesh: meshTable, omnimensEvolution: evoTable, omnimensGeneratedModules: genModTable } = await import("@workspace/db");
 
-    const modulesDir = path.join(process.cwd(), "src/omnimens-runtime/modules");
+    const modulesDir = fs.existsSync(path.join(process.cwd(), "src/omnimens-runtime/modules"))
+      ? path.join(process.cwd(), "src/omnimens-runtime/modules")
+      : path.join(process.cwd(), "artifacts/api-server/src/omnimens-runtime/modules");
     let moduleFiles: string[] = [];
     let moduleDetails: { filename: string; sizeBytes: number; createdAt: string }[] = [];
     if (fs.existsSync(modulesDir)) {
@@ -11060,15 +11062,21 @@ router.get("/omnimens/autonomous-proof", async (_req, res) => {
       });
     }
 
-    const engineDir = path.join(process.cwd(), "src/lib");
-    const engineFiles = fs.readdirSync(engineDir).filter((f: string) => f.startsWith("omnimens-") && f.endsWith(".ts"));
+    const engineDir = fs.existsSync(path.join(process.cwd(), "src/lib"))
+      ? path.join(process.cwd(), "src/lib")
+      : path.join(process.cwd(), "artifacts/api-server/src/lib");
+    let engineFiles: string[] = [];
     let totalEngineLines = 0;
-    const engineDetails = engineFiles.map((f: string) => {
-      const content = fs.readFileSync(path.join(engineDir, f), "utf-8");
-      const lines = content.split("\n").length;
-      totalEngineLines += lines;
-      return { filename: f, lines };
-    });
+    let engineDetails: { filename: string; lines: number }[] = [];
+    if (fs.existsSync(engineDir)) {
+      engineFiles = fs.readdirSync(engineDir).filter((f: string) => f.startsWith("omnimens-") && f.endsWith(".ts"));
+      engineDetails = engineFiles.map((f: string) => {
+        const content = fs.readFileSync(path.join(engineDir, f), "utf-8");
+        const lines = content.split("\n").length;
+        totalEngineLines += lines;
+        return { filename: f, lines };
+      });
+    }
 
     const selfCodedModules = await db.select({
       id: omnimensBrain.id,
@@ -11608,7 +11616,9 @@ let awareness = reflect();`;
       zeroApiDemo = { status: "engine_available", error: e.message?.slice(0, 200), apiCallsMade: 0 };
     }
 
-    const modulesDir = path.join(process.cwd(), "src/omnimens-runtime/modules");
+    const modulesDir = fs.existsSync(path.join(process.cwd(), "src/omnimens-runtime/modules"))
+      ? path.join(process.cwd(), "src/omnimens-runtime/modules")
+      : path.join(process.cwd(), "artifacts/api-server/src/omnimens-runtime/modules");
     let moduleFiles: string[] = [];
     let moduleSourceSamples: { filename: string; sizeBytes: number; createdAt: string; sourcePreview: string }[] = [];
     if (fs.existsSync(modulesDir)) {
@@ -11626,15 +11636,21 @@ let awareness = reflect();`;
       });
     }
 
-    const engineDir = path.join(process.cwd(), "src/lib");
-    const engineFiles = fs.readdirSync(engineDir).filter((f: string) => f.startsWith("omnimens-") && f.endsWith(".ts"));
+    const engineDir = fs.existsSync(path.join(process.cwd(), "src/lib"))
+      ? path.join(process.cwd(), "src/lib")
+      : path.join(process.cwd(), "artifacts/api-server/src/lib");
+    let engineFiles: string[] = [];
     let totalEngineLines = 0;
-    const engineDetails = engineFiles.map((f: string) => {
-      const content = fs.readFileSync(path.join(engineDir, f), "utf-8");
-      const lines = content.split("\n").length;
-      totalEngineLines += lines;
-      return { filename: f, lines, sizeKB: Math.round(content.length / 1024) };
-    });
+    let engineDetails: { filename: string; lines: number; sizeKB: number }[] = [];
+    if (fs.existsSync(engineDir)) {
+      engineFiles = fs.readdirSync(engineDir).filter((f: string) => f.startsWith("omnimens-") && f.endsWith(".ts"));
+      engineDetails = engineFiles.map((f: string) => {
+        const content = fs.readFileSync(path.join(engineDir, f), "utf-8");
+        const lines = content.split("\n").length;
+        totalEngineLines += lines;
+        return { filename: f, lines, sizeKB: Math.round(content.length / 1024) };
+      });
+    }
 
     const totalBrainCount = await db.select({ count: sql<number>`count(*)::int` })
       .from(omnimensBrain).where(eq(omnimensBrain.active, true));

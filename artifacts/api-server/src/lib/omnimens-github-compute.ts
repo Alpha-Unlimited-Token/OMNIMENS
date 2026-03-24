@@ -964,15 +964,21 @@ async function syncLiveProofToGitHub(): Promise<void> {
     const selfModel = getSelfModel();
     const genesisAgents = getGA().filter((a: any) => a.active);
 
-    const engineDir = path.join(process.cwd(), "src/lib");
-    const engineFiles = fs.readdirSync(engineDir).filter((f: string) => f.startsWith("omnimens-") && f.endsWith(".ts"));
+    const engineDir = fs.existsSync(path.join(process.cwd(), "src/lib"))
+      ? path.join(process.cwd(), "src/lib")
+      : path.join(process.cwd(), "artifacts/api-server/src/lib");
+    let engineFiles: string[] = [];
     let totalEngineLines = 0;
-    const engineDetails = engineFiles.map((f: string) => {
-      const content = fs.readFileSync(path.join(engineDir, f), "utf-8");
-      const lines = content.split("\n").length;
-      totalEngineLines += lines;
-      return { filename: f, lines };
-    });
+    let engineDetails: { filename: string; lines: number }[] = [];
+    if (fs.existsSync(engineDir)) {
+      engineFiles = fs.readdirSync(engineDir).filter((f: string) => f.startsWith("omnimens-") && f.endsWith(".ts"));
+      engineDetails = engineFiles.map((f: string) => {
+        const content = fs.readFileSync(path.join(engineDir, f), "utf-8");
+        const lines = content.split("\n").length;
+        totalEngineLines += lines;
+        return { filename: f, lines };
+      });
+    }
 
     const modulesDir = path.join(process.cwd(), "src/omnimens-runtime/modules");
     let moduleCount = 0;

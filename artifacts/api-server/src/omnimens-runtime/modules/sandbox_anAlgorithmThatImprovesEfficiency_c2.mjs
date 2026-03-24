@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-24T11:03:48.554Z
+ * Written: 2026-03-24T12:57:20.576Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,82 +16,74 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function KnowledgeGraph() {
-    this.graph = new Map();
+function createKnowledgeGraph() {
+    const graph = new Map();
 
-    // Add a concept and its associations
-    this.addConcept = function (concept, associations) {
-        if (!this.graph.has(concept)) {
-            this.graph.set(concept, new Set());
+    function addConcept(concept, relatedConcepts) {
+        if (!graph.has(concept)) {
+            graph.set(concept, new Set());
         }
-        const conceptSet = this.graph.get(concept);
-        for (let assoc of associations) {
-            conceptSet.add(assoc);
-            if (!this.graph.has(assoc)) {
-                this.graph.set(assoc, new Set());
+        relatedConcepts.forEach((related) => {
+            graph.get(concept).add(related);
+            if (!graph.has(related)) {
+                graph.set(related, new Set());
             }
-            this.graph.get(assoc).add(concept); // Ensure bidirectional linking
-        }
-    };
+            graph.get(related).add(concept);
+        });
+    }
 
-    // Retrieve related concepts with a depth limit
-    this.retrieveRelated = function (concept, depth) {
-        if (!this.graph.has(concept)) return [];
-        const visited = new Set();
-        const queue = [{ node: concept, level: 0 }];
-        const results = [];
+    function findRelatedConcepts(concept) {
+        return graph.has(concept) ? Array.from(graph.get(concept)) : [];
+    }
+
+    function findShortestPath(start, end, visited = new Set()) {
+        if (start === end) return [start];
+        if (!graph.has(start) || !graph.has(end)) return null;
+
+        visited.add(start);
+        const queue = [[start]];
 
         while (queue.length > 0) {
-            const { node, level } = queue.shift();
-            if (visited.has(node) || level > depth) continue;
-            visited.add(node);
-            results.push(node);
-            for (let neighbor of this.graph.get(node)) {
-                if (!visited.has(neighbor)) {
-                    queue.push({ node: neighbor, level: level + 1 });
-                }
-            }
-        }
-        return results;
-    };
+            const path = queue.shift();
+            const node = path[path.length - 1];
 
-    // Pattern recognition: Find the shortest path between two concepts
-    this.findShortestPath = function (start, end) {
-        if (!this.graph.has(start) || !this.graph.has(end)) return null;
-        const queue = [{ node: start, path: [start] }];
-        const visited = new Set();
-
-        while (queue.length > 0) {
-            const { node, path } = queue.shift();
             if (node === end) return path;
-            if (visited.has(node)) continue;
-            visited.add(node);
-            for (let neighbor of this.graph.get(node)) {
+
+            graph.get(node).forEach((neighbor) => {
                 if (!visited.has(neighbor)) {
-                    queue.push({ node: neighbor, path: [...path, neighbor] });
+                    visited.add(neighbor);
+                    queue.push([...path, neighbor]);
                 }
-            }
+            });
         }
-        return null; // No path found
-    };
+        return null;
+    }
+
+    return { addConcept, findRelatedConcepts, findShortestPath };
 }
 
 // Test cases
-const kg = new KnowledgeGraph();
+const knowledgeGraph = createKnowledgeGraph();
 
-// Add concepts and their associations
-kg.addConcept("Fractals", ["Mathematics", "Nature"]);
-kg.addConcept("Mathematics", ["Geometry", "Algebra"]);
-kg.addConcept("Nature", ["Ecology", "Physics"]);
-kg.addConcept("Physics", ["Quantum Mechanics", "Relativity"]);
-kg.addConcept("Ecology", ["Environment", "Sustainability"]);
+// Adding concepts and relationships
+knowledgeGraph.addConcept("Artificial Intelligence", ["Machine Learning", "Deep Learning"]);
+knowledgeGraph.addConcept("Machine Learning", ["Neural Networks", "Data Science"]);
+knowledgeGraph.addConcept("Deep Learning", ["Neural Networks", "Computer Vision"]);
+knowledgeGraph.addConcept("Computer Vision", ["Image Processing", "Pattern Recognition"]);
+knowledgeGraph.addConcept("Pattern Recognition", ["Data Science"]);
 
-// Test retrieval with depth
-console.log("Related to 'Mathematics' (depth 1):", kg.retrieveRelated("Mathematics", 1));
-console.log("Related to 'Mathematics' (depth 2):", kg.retrieveRelated("Mathematics", 2));
-console.log("Related to 'Fractals' (depth 3):", kg.retrieveRelated("Fractals", 3));
+// Test 1: Find related concepts
+console.log("Related to 'Machine Learning':", knowledgeGraph.findRelatedConcepts("Machine Learning")); 
+// Expected: ["Artificial Intelligence", "Neural Networks", "Data Science"]
 
-// Test shortest path
-console.log("Shortest path between 'Fractals' and 'Relativity':", kg.findShortestPath("Fractals", "Relativity"));
-console.log("Shortest path between 'Nature' and 'Environment':", kg.findShortestPath("Nature", "Environment"));
-console.log("Shortest path between 'Fractals' and 'Nonexistent':", kg.findShortestPath("Fractals", "Nonexistent"));
+// Test 2: Find shortest path between concepts
+console.log("Shortest path from 'Artificial Intelligence' to 'Pattern Recognition':", knowledgeGraph.findShortestPath("Artificial Intelligence", "Pattern Recognition")); 
+// Expected: ["Artificial Intelligence", "Machine Learning", "Data Science", "Pattern Recognition"]
+
+// Test 3: Edge case - Concept not in graph
+console.log("Related to 'Quantum Computing':", knowledgeGraph.findRelatedConcepts("Quantum Computing")); 
+// Expected: []
+
+// Test 4: Edge case - Path between unrelated concepts
+console.log("Shortest path from 'Artificial Intelligence' to 'Quantum Computing':", knowledgeGraph.findShortestPath("Artificial Intelligence", "Quantum Computing")); 
+// Expected: null
