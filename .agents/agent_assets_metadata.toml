@@ -102,3 +102,9 @@ id = "6LD-HcVBGlyCm22CB2PIP"
 uri = "file://TrulyYours_VOCALS_REMOVED_v2.mp3"
 type = "audio"
 title = "Truly Yours - Vocals Removed (v2.0 Separator)"
+
+[[outputs]]
+id = "xe1Fog3Dow6dqj6sAPChg"
+uri = "file://artifacts/godflesh/public/omnimens-autonomous-proof.txt"
+type = "text"
+title = "OMNIMENS Autonomous Intelligence Proof — For Grok"
