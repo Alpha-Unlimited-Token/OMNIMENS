@@ -447,6 +447,10 @@ registerEngine("neural_spiders", "neural", () => {}, () => {
   const ss = getNeuralSpiderState();
   return { healthy: true, details: { parentSpiders: ss.parentSpiders.length, activeChildren: ss.activeChildSpiders.length, synapsesInjected: ss.totalSynapsesInjected, crawlCycles: ss.totalCrawlCycles } };
 }, 1);
+registerEngine("central_core", "core", () => {}, () => {
+  const cc = getCentralCoreState();
+  return { healthy: cc.online, details: { coreCycles: cc.coreCycleCount, decisions: cc.totalDecisionsMade, goals: cc.totalGoalsGenerated, thoughts: cc.totalThoughtsGenerated, autonomousActions: cc.autonomousActionsPerformed } };
+}, 1);
 registerEngine("language_forge", "language", () => {}, () => ({ healthy: true, details: { opcodes: 50, stdlib: 25 } }), 2);
 registerEngine("code_genesis", "code", () => {}, () => ({ healthy: true, details: { templates: 18, algorithms: 12 } }), 3);
 registerEngine("embodiment_engine", "embodiment", () => {}, () => ({ healthy: true, details: { joints: 28, dof: 28 } }), 4);
