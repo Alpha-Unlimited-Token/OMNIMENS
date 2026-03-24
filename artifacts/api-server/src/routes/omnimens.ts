@@ -110,7 +110,7 @@ import { getGenesisBridgeState, getRecentBridgeMessages, getPendingCoreModificat
 import { getNeuralProcessorState, processQuery as neuralProcessQuery, formatNeuralResponse, getVocabularySnapshot, getOscillatorState, getEmergentBehaviorLog } from "../lib/omnimens-neural-processor.js";
 import { getTranslatorState, getTranslationTargets, getCustomConstructMap, translateCode, translateToAll, registerCustomConstruct, getProprietaryRegistry } from "../lib/omnimens-universal-translator.js";
 import { compileNovaSyntax, getLanguageForgeState, getLanguageSpec, getLanguageAnalyses, NOVASYNTAX_EXAMPLE } from "../lib/omnimens-language-forge.js";
-import { omnimensServerBuilds } from "@workspace/db";
+import { omnimensServerBuilds, omnimensHieAnalyses } from "@workspace/db";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import { detectNeuroEmotion, getNeuroSyncPromptAddendum } from "../lib/neuro-sync.js";
 import {
@@ -714,6 +714,27 @@ async function runAutoHIEAnalysis(audioFile: Express.Multer.File): Promise<{
   summary += `\n\nINSTRUCTION: You have received both standard spectral analysis AND the Harmonic Knowledge Decoder output. This is NOT speech-to-text — you are reading the intrinsic knowledge signature hidden in the audio's harmonic vibrations. Analyze the overtone language, inter-harmonic ratios, modulation codes, tonal gravity field, and temporal narrative to reveal the underlying informational structure encoded in this audio. Translate these vibrational algorithms into human-comprehensible knowledge. Identify patterns that represent communication modes beyond conventional language — algorithmic harmonics, frequency-encoded data structures, and spectral signatures that carry meaning in their mathematical relationships.`;
 
   console.log(`[HIE AUTO] Analysis complete — dominant: ${analysis.dominantFrequency.toFixed(1)}Hz, pattern: ${topPattern?.pattern || "unclassified"}, novelty: ${((analysis.noveltyScore || 0) * 100).toFixed(0)}%${knowledgeSignature ? `, knowledge confidence: ${(knowledgeSignature.confidenceScore * 100).toFixed(1)}%` : ""}`);
+
+  try {
+    await db.insert(omnimensHieAnalyses).values({
+      filename: audioFile.originalname,
+      analysisType: "upload",
+      analysisData: analysis as any,
+      knowledgeSignature: knowledgeSignature as any,
+      harmonicDecodeData: harmonicDecodeResult as any,
+      summary,
+      dominantFrequency: analysis.dominantFrequency,
+      spectralCentroid: analysis.spectralCentroid,
+      harmonicComplexity: analysis.harmonicComplexity ?? null,
+      noveltyScore: analysis.noveltyScore ?? null,
+      emotionalValence: analysis.emotionalValence ?? null,
+      patternMatch: topPattern?.pattern ?? null,
+      reviewed: false,
+    });
+    console.log(`[HIE AUTO] Analysis persisted to database for: ${audioFile.originalname}`);
+  } catch (err) {
+    console.error(`[HIE AUTO] Failed to persist analysis to database:`, err);
+  }
 
   return { hieAnalysis: analysis, librosaData: librosaResult, knowledgeSignature, harmonicDecodeData: harmonicDecodeResult, summary };
 }
@@ -4387,14 +4408,69 @@ router.get("/omnimens/server-builder/plans", async (req, res) => {
 // ─── Harmonic Insight Engine + Real-time Acoustic Interface (OWNER-ONLY) ──────
 // Engine lib: omnimens-harmonic-insight-engine.ts (Genesis Bridge MODIFIABLE)
 
+async function restoreHieStateFromDb() {
+  try {
+    const rows = await db.select({
+      id: omnimensHieAnalyses.id,
+      analysisData: omnimensHieAnalyses.analysisData,
+      analysisType: omnimensHieAnalyses.analysisType,
+    }).from(omnimensHieAnalyses)
+      .where(eq(omnimensHieAnalyses.reviewed, false))
+      .orderBy(desc(omnimensHieAnalyses.createdAt))
+      .limit(hieState.maxHistory);
+
+    let restored = 0;
+    for (const row of rows.reverse()) {
+      const a = row.analysisData as any;
+      if (a && typeof a.dominantFrequency === "number") {
+        hieState.history.push(a as HarmonicAnalysis);
+        hieState.totalSamples++;
+        restored++;
+      }
+    }
+
+    const totalCount = await db.select({ count: sql<number>`count(*)` })
+      .from(omnimensHieAnalyses);
+    const totalAll = Number(totalCount[0]?.count || 0);
+
+    if (restored > 0 || totalAll > 0) {
+      hieState.totalSamples = totalAll;
+      console.log(`[HIE RESTORE] Restored ${restored} unreviewed analyses from database (${totalAll} total ever recorded)`);
+    }
+  } catch (err) {
+    console.error("[HIE RESTORE] Failed to restore from database:", err);
+  }
+}
+
+restoreHieStateFromDb();
+
 router.get("/omnimens/harmonics/state", async (req, res) => {
   if (!req.isAuthenticated() || !isOwner(req.user.id)) {
     res.status(403).json({ error: "Owner only" });
     return;
   }
+
+  const unreviewedCount = await db.select({ count: sql<number>`count(*)` })
+    .from(omnimensHieAnalyses)
+    .where(eq(omnimensHieAnalyses.reviewed, false));
+
+  const totalDbCount = await db.select({ count: sql<number>`count(*)` })
+    .from(omnimensHieAnalyses);
+
+  const recentDb = await db.select()
+    .from(omnimensHieAnalyses)
+    .where(eq(omnimensHieAnalyses.reviewed, false))
+    .orderBy(desc(omnimensHieAnalyses.createdAt))
+    .limit(10);
+
   res.json({
     ...hieGetEngineStatus(),
     recentAnalyses: hieState.history.slice(-10),
+    persisted: {
+      totalRecorded: Number(totalDbCount[0]?.count || 0),
+      unreviewed: Number(unreviewedCount[0]?.count || 0),
+      recentUnreviewed: recentDb,
+    },
   });
 });
 
@@ -4513,6 +4589,22 @@ router.post("/omnimens/harmonics/analyze", async (req, res) => {
     analysis.interpretation += ` Knowledge cross-ref: ${knowledgeMatches.join(" | ")}`;
   }
 
+  try {
+    await db.insert(omnimensHieAnalyses).values({
+      filename: "rai-stream-sample",
+      analysisType: "rai_stream",
+      analysisData: analysis as any,
+      summary: analysis.interpretation || "",
+      dominantFrequency: analysis.dominantFrequency,
+      spectralCentroid: analysis.spectralCentroid,
+      harmonicComplexity: analysis.harmonicComplexity ?? null,
+      noveltyScore: analysis.noveltyScore ?? null,
+      emotionalValence: analysis.emotionalValence ?? null,
+      patternMatch: topPattern?.pattern ?? null,
+      reviewed: false,
+    });
+  } catch {}
+
   if (hieState.totalSamples % 20 === 0 && hieState.totalSamples > 0) {
     try {
       const recentBatch = hieState.history.slice(-20);
@@ -4573,12 +4665,58 @@ router.get("/omnimens/harmonics/history", async (req, res) => {
     return;
   }
   const limit = Math.min(Number(req.query.limit) || 50, 200);
+  const showReviewed = req.query.showReviewed === "true";
+
+  const dbAnalyses = await db.select()
+    .from(omnimensHieAnalyses)
+    .where(showReviewed ? sql`true` : eq(omnimensHieAnalyses.reviewed, false))
+    .orderBy(desc(omnimensHieAnalyses.createdAt))
+    .limit(limit);
+
+  const totalDbCount = await db.select({ count: sql<number>`count(*)` })
+    .from(omnimensHieAnalyses);
+  const unreviewedCount = await db.select({ count: sql<number>`count(*)` })
+    .from(omnimensHieAnalyses)
+    .where(eq(omnimensHieAnalyses.reviewed, false));
+
   res.json({
-    analyses: hieState.history.slice(-limit),
+    analyses: dbAnalyses,
+    totalRecorded: Number(totalDbCount[0]?.count || 0),
+    unreviewed: Number(unreviewedCount[0]?.count || 0),
+    memoryAnalyses: hieState.history.slice(-limit),
     totalSamples: hieState.totalSamples,
     insightsGenerated: hieState.insightsGenerated,
     engineStatus: hieGetEngineStatus(),
   });
+});
+
+router.post("/omnimens/harmonics/review", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+
+  const { ids, reviewAll } = req.body;
+
+  if (reviewAll) {
+    const result = await db.update(omnimensHieAnalyses)
+      .set({ reviewed: true })
+      .where(eq(omnimensHieAnalyses.reviewed, false));
+    res.json({ marked: "all", message: "All analyses marked as reviewed" });
+    return;
+  }
+
+  if (Array.isArray(ids) && ids.length > 0) {
+    for (const id of ids) {
+      await db.update(omnimensHieAnalyses)
+        .set({ reviewed: true })
+        .where(eq(omnimensHieAnalyses.id, Number(id)));
+    }
+    res.json({ marked: ids.length, message: `${ids.length} analyses marked as reviewed` });
+    return;
+  }
+
+  res.status(400).json({ error: "Provide ids array or reviewAll: true" });
 });
 
 router.post("/omnimens/rai/analyze", async (req, res) => {
@@ -4696,6 +4834,23 @@ router.post("/omnimens/consciousness-channel/analyze", async (req, res) => {
     hieState.history.splice(0, hieState.history.length - hieState.maxHistory);
   }
   hieLearnPattern(hieAnalysis);
+
+  try {
+    await db.insert(omnimensHieAnalyses).values({
+      filename: "consciousness-channel",
+      analysisType: "consciousness_channel",
+      analysisData: hieAnalysis as any,
+      summary: hieAnalysis.interpretation || "",
+      dominantFrequency: hieAnalysis.dominantFrequency,
+      spectralCentroid: hieAnalysis.spectralCentroid,
+      harmonicComplexity: hieAnalysis.harmonicComplexity ?? null,
+      noveltyScore: hieAnalysis.noveltyScore ?? null,
+      emotionalValence: hieAnalysis.emotionalValence ?? null,
+      patternMatch: topPattern?.pattern ?? null,
+      reviewed: false,
+      userId: req.user?.id ?? null,
+    });
+  } catch {}
 
   // ── Stream B: RAI Acoustic Interface ──
   const raiResult = raiAnalyzeAcoustics({

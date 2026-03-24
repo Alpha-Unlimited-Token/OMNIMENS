@@ -730,3 +730,22 @@ export const omnimensIpBans = pgTable("godflesh_ip_bans", {
   reason: text("reason").notNull(),
   bannedAt: timestamp("banned_at").defaultNow().notNull(),
 });
+
+export const omnimensHieAnalyses = pgTable("godflesh_hie_analyses", {
+  id: serial("id").primaryKey(),
+  filename: text("filename").notNull(),
+  analysisType: text("analysis_type").default("upload").notNull(),
+  analysisData: jsonb("analysis_data").$type<Record<string, any>>().notNull(),
+  knowledgeSignature: jsonb("knowledge_signature").$type<Record<string, any>>(),
+  harmonicDecodeData: jsonb("harmonic_decode_data").$type<Record<string, any>>(),
+  summary: text("summary").notNull(),
+  dominantFrequency: real("dominant_frequency"),
+  spectralCentroid: real("spectral_centroid"),
+  harmonicComplexity: real("harmonic_complexity"),
+  noveltyScore: real("novelty_score"),
+  emotionalValence: text("emotional_valence"),
+  patternMatch: text("pattern_match"),
+  reviewed: boolean("reviewed").default(false).notNull(),
+  userId: text("user_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
