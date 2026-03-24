@@ -260,6 +260,18 @@ const imageLimiter = rateLimit({
   message: { error: "Image generation limit reached. Please wait." },
 });
 
+const publicProofLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests. Please slow down." },
+});
+app.use("/api/omnimens/proof", publicProofLimiter);
+app.use("/api/omnimens/autonomous-proof", publicProofLimiter);
+app.use("/api/omnimens/evolution-log", publicProofLimiter);
+app.use("/api/omnimens/dreams/public", publicProofLimiter);
+
 app.use("/api", generalLimiter);
 app.use("/api/auth", authLimiter);
 app.use("/api/omnimens/chat", aiLimiter);
