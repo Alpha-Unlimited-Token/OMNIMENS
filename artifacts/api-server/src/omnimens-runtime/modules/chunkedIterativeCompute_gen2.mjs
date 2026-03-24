@@ -35,7 +35,7 @@ export function createChunkedTask(config) {
     name,
     totalIterations,
     timeBudgetMs,
-    state: null,
+    state,
     currentIteration: 0,
     completed: false,
     chunks: 0,
@@ -89,7 +89,7 @@ export function runChunk(task) {
 
   const iterPerMs = task.totalTimeMs > 0 ? task.currentIteration / task.totalTimeMs : 0;
   const remaining = task.totalIterations - task.currentIteration;
-  const etaMs = iterPerMs > 0 ? remaining / iterPerMs : Infinity;
+  const etaMs = iterPerMs > 0 ? remaining / iterPerMs;
 
   return {
     done: task.completed,
@@ -112,7 +112,7 @@ export function runToCompletion(task, maxChunks = 100) {
     result = runChunk(task);
     chunkCount++;
   }
-  return result || { done: false, iterations: 0, chunks: 0, state: null };
+  return result || { done: false, iterations: 0, chunks: 0, state};
 }
 
 export function serializeTask(task) {
@@ -157,7 +157,7 @@ export function chunkedMapReduce(items, mapFn, reduceFn, initialAcc, timeBudgetM
       state.index = i + 1;
       return state;
     },
-    onComplete: (state) => state,
+    onComplete => state,
   });
   return runToCompletion(task);
 }
@@ -203,7 +203,7 @@ export function chunkedIterativeRefinement(config) {
       }
       return state;
     },
-    shouldStop: (state) => {
+    shouldStop => {
       const scoreDelta = Math.abs(state.score - prevScore);
       prevScore = state.score;
       return scoreDelta < convergenceThreshold && state.stagnant > 50;
@@ -265,7 +265,7 @@ export function chunkedGeneticSearch(config) {
         bestEver: { genes: scored[0].genes.slice(), fitness: scored[0].fitness },
       };
     },
-    iterate: (state) => {
+    iterate => {
       const pop = state.population;
       const newPop = [pop[0]];
 
@@ -359,12 +359,12 @@ export function chunkedConvergenceLoop(config) {
     }),
     iterate: (state, i) => {
       const newValue = stepFn(state.value, i);
-      state.history.push(typeof newValue === "number" ? newValue : null);
+      state.history.push(typeof newValue === "number" ? newValue);
       if (state.history.length > 100) state.history.shift();
       state.value = newValue;
       return state;
     },
-    shouldStop: (state) => {
+    shouldStop => {
       if (convergenceCheck(state.value, state.history)) {
         state.converged = true;
         return true;

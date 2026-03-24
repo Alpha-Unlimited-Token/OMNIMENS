@@ -18,21 +18,21 @@
  */
 
 // Phase-Resonant Associative Cache — pure computation, no IO
-export type Wave = { f: number; phi: number; a: number }; // frequency, phase, amplitude
-export type MemoryItem<T> = { key: Wave; value: T };
+ phi; a}; // frequency, phase, amplitude
+ value};
 
-export function phaseDistance(w1: Wave, w2: Wave): number {
+export function phaseDistance(w1, w2) {
   const Δf = Math.abs(w1.f - w2.f);
   const Δφ = Math.abs(Math.atan2(Math.sin(w1.phi - w2.phi), Math.cos(w1.phi - w2.phi)));
   return Δf + Δφ;               // simple metric; extendable
 }
 
-export function store<T>(mem: MemoryItem<T>[], key: Wave, value: T): MemoryItem<T>[] {
+export function store(mem, key, value) {
   return [...mem, { key, value }]; // append immutably
 }
 
-export function retrieve<T>(mem: MemoryItem<T>[], probe: Wave, threshold = 0.05): T | undefined {
-  let best: { d: number; v: T } | null = null;
+export function retrieve(mem, probe, threshold = 0.05): T | undefined {
+  let best: { d; v} | null = null;
   for (const { key, value } of mem) {
     const d = phaseDistance(key, probe);
     if (d < threshold && (!best || d < best.d)) best = { d, v: value };

@@ -40,9 +40,9 @@ export function calculatePriority(taskWeight, expectedGain) {
 
 /**
  * Reinforcement learning model to dynamically allocate query budgets.
- * @param {Array<Object>} tasks - Array of task objects with { id, taskWeight, expectedGain }.
+ * @param {Array} tasks - Array of task objects with { id, taskWeight, expectedGain }.
  * @param {number} totalBudget - Total query budget available.
- * @returns {Array<Object>} Allocated budgets for each task.
+ * @returns {Array} Allocated budgets for each task.
  */
 export function allocateQueryBudget(tasks, totalBudget) {
   if (totalBudget <= 0) {
@@ -89,9 +89,9 @@ export function getCachedResult(query) {
 
 /**
  * Batch queries intelligently based on priority.
- * @param {Array<Object>} queries - Array of query objects with { query, taskWeight, expectedGain }.
+ * @param {Array} queries - Array of query objects with { query, taskWeight, expectedGain }.
  * @param {number} batchSize - Maximum number of queries per batch.
- * @returns {Array<Array<Object>>} Batches of queries.
+ * @returns {Array} Batches of queries.
  */
 export function batchQueries(queries, batchSize) {
   if (batchSize <= 0) {

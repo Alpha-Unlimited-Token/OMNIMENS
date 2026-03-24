@@ -27,11 +27,11 @@
 // n oscillators, θ[i] phase ∈ [0,2π).  Coupling drives synchrony.
 // Return next phases and global coherence R ∈ [0,1].
 export function resonanceTick(
-  phases: number[],        // current phases
-  naturalFreq: number[],   // each oscillator’s intrinsic ω
+  phases,        // current phases
+  naturalFreq,   // each oscillator’s intrinsic ω
   coupling = 1,            // global coupling strength K
   dt = 0.05                // timestep
-): { next: number[]; coherence: number } {
+): { next; coherence} {
   const n = phases.length;
   let sumSin = 0, sumCos = 0;
   for (let θ of phases) { sumSin += Math.sin(θ); sumCos += Math.cos(θ); }
@@ -46,5 +46,5 @@ export function resonanceTick(
     if (newθ >= 2 * Math.PI) newθ -= 2 * Math.PI;
     return newθ;
   });
-  return { next, coherence: R };
+  return { next, coherence};
 }

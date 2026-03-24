@@ -17,19 +17,19 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-export type Event = {t:number, id:string, prop:string, val:number};
-export type Edge = {from:string, to:string, weight:number};
-export type Graph = Map<string, Edge[]>;
+
+
+
 
 const eps = 1e-9;
 
-function cmid(pxyz:number, pxz:number, pyz:number, pz:number){
+function cmid(pxyz, pxz, pyz, pz){
   return Math.log((pxyz*pz + eps)/(pxz*pyz + eps));
 }
 
-export function induceCausalGraph(events:Event[], theta=0.05):Graph{
+export function induceCausalGraph(events, theta=0.05) {
   const nodes = new Set(events.map(e=>e.id+e.prop));
-  const edges:Graph = new Map();
+  const edges= new Map();
   const pairs = Array.from(nodes);
   for(let i=0;i<pairs.length;i++){
     for(let j=0;j<pairs.length;j++){
@@ -47,12 +47,12 @@ export function induceCausalGraph(events:Event[], theta=0.05):Graph{
   return edges;
 }
 
-function prob(es:Event[], a:string,b:string){
+function prob(es, a,b){
   let both=0, tot=0;
   for(const e of es){ if(e.id+e.prop===a||e.id+e.prop===b){tot++; if(e.val>0) both++;}}
   return both/(tot||1);
 }
-function probSingle(es:Event[], a:string){
+function probSingle(es, a){
   let pos=0, tot=0;
   for(const e of es){ if(e.id+e.prop===a){tot++; if(e.val>0) pos++;}}
   return pos/(tot||1);

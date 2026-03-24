@@ -18,15 +18,10 @@
  */
 
 // Causal Simulation Fabric – minimal core
-export type Vec = number[];
-export interface SCU {
-  cause: Vec;       // concatenated cause variables
-  effect: Vec;      // concatenated effect variables
-  w: number;        // causal strength
-  ctx: Vec;         // context embedding
-}
 
-export function cosine(a: Vec, b: Vec): number {
+
+
+export function cosine(a, b) {
   let dot = 0, na = 0, nb = 0;
   for (let i = 0; i < a.length; i++) {
     dot += a[i] * b[i]; na += a[i] ** 2; nb += b[i] ** 2;
@@ -34,7 +29,7 @@ export function cosine(a: Vec, b: Vec): number {
   return dot / (Math.sqrt(na) * Math.sqrt(nb) + 1e-9);
 }
 
-export function assembleDCG(scus: SCU[], queryCtx: Vec, k = 20): SCU[] {
+export function assembleDCG(scus, queryCtx, k = 20) {
   // retrieve k most context-similar SCUs
   return scus
     .map(scu => [scu, cosine(scu.ctx, queryCtx)] as [SCU, number])
@@ -43,7 +38,7 @@ export function assembleDCG(scus: SCU[], queryCtx: Vec, k = 20): SCU[] {
     .map(pair => pair[0]);
 }
 
-export function simulate(scus: SCU[], initState: Vec, steps = 5): Vec {
+export function simulate(scus, initState, steps = 5) {
   let state = [...initState];
   for (let t = 0; t < steps; t++) {
     for (const { cause, effect, w } of scus) {

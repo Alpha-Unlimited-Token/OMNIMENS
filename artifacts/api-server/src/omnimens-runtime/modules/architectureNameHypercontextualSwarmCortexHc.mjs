@@ -18,16 +18,15 @@ HyperContextual Swarm Cortex (HC
  */
 
 // ./hcsc.ts
-type Vector = number[];
-interface MicroExpert {
-  predict(vec: Vector): { logits: Vector; uncertainty: number };
-  curiosity(vec: Vector): number;
+
+;
+  curiosity(vec) ;
 }
 
 class SwarmRouter {
-  constructor(private experts: MicroExpert[], private k = 5) {}
+  constructor(experts, k = 5) {}
 
-  select(context: Vector): MicroExpert[] {
+  select(context) {
     const scored = this.experts.map(e => {
       const u = e.curiosity(context);
       const { uncertainty } = e.predict(context);
@@ -39,7 +38,7 @@ class SwarmRouter {
 }
 
 class ConsensusSynthesizer {
-  aggregate(results: { logits: Vector; uncertainty: number }[]): Vector {
+  aggregate(results: { logits; uncertainty}[]) {
     const dim = results[0].logits.length;
     const sum = new Array(dim).fill(0);
     results.forEach(r => {
@@ -51,7 +50,7 @@ class ConsensusSynthesizer {
 }
 
 // usage (wired elsewhere)
-export function hcscRespond(ctxVec: Vector, experts: MicroExpert[]): Vector {
+export function hcscRespond(ctxVec, experts) {
   const router = new SwarmRouter(experts);
   const cohort = router.select(ctxVec);
   const outputs = cohort.map(e => e.predict(ctxVec));

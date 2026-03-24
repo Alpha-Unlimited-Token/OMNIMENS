@@ -17,26 +17,23 @@
  */
 
 // CISE-mini: core causal propagation (no external deps, 32 lines)
-export type Vec = number[];
-export interface Node { id: string; state: Vec; }
-export interface Edge {
-  from: string; to: string;
-  J: number[][];                // influence matrix
-}
-export class CISE {
-  nodes: Map<string, Node> = new Map();
-  edges: Edge[] = [];
 
-  addNode(id: string, state: Vec) { this.nodes.set(id, { id, state }); }
-  addEdge(e: Edge) { this.edges.push(e); }
+
+
+export class CISE {
+  nodes = new Map();
+  edges= [];
+
+  addNode(id, state) { this.nodes.set(id, { id, state }); }
+  addEdge(e) { this.edges.push(e); }
 
   // single forward step
-  propagate(deltaSource: Map<string, Vec>): Map<string, Vec> {
-    const deltaTarget = new Map<string, Vec>();
+  propagate(deltaSource) {
+    const deltaTarget = new Map();
     for (const e of this.edges) {
       const dS = deltaSource.get(e.from);
       if (!dS) continue;
-      const matMul = (M: number[][], v: Vec): Vec =>
+      const matMul = (M, v) =>
         M.map(row => row.reduce((s, x, i) => s + x * v[i], 0));
       const dT = matMul(e.J, dS);
       const prev = deltaTarget.get(e.to) || Array(dT.length).fill(0);
@@ -50,8 +47,8 @@ export class CISE {
     return deltaTarget;
   }
 
-  simulate(actionNode: string, actionDelta: Vec, steps = 3): void {
-    let frontier = new Map<string, Vec>([[actionNode, actionDelta]]);
+  simulate(actionNode, actionDelta, steps = 3) {
+    let frontier = new Map([[actionNode, actionDelta]]);
     for (let i = 0; i < steps; i++) frontier = this.propagate(frontier);
   }
 }

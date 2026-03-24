@@ -35,8 +35,7 @@ class VectorStoreManager {
 
   /**
    * Computes the Euclidean distance between two vectors.
-   * @private
-   * @param {number[]} vectorA - The first vector.
+   * @* @param {number[]} vectorA - The first vector.
    * @param {number[]} vectorB - The second vector.
    * @returns {number} The Euclidean distance between the two vectors.
    */
@@ -51,7 +50,7 @@ class VectorStoreManager {
    * Finds the nearest neighbors to a given vector using a simplified HNSW approach.
    * @param {number[]} queryVector - The vector to search for neighbors.
    * @param {number} k - The number of nearest neighbors to retrieve.
-   * @returns {Array<{key: string, distance: number}>} An array of nearest neighbors with their keys and distances.
+   * @returns {Array<{key, distance}>} An array of nearest neighbors with their keys and distances.
    */
   findNearestNeighbors(queryVector, k) {
     if (!Array.isArray(queryVector) || !queryVector.every((val) => typeof val === 'number')) {

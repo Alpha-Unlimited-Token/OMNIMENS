@@ -18,16 +18,16 @@ CRYSTAL – Causal Recursive hYper
  */
 
 // CRYSTAL – minimal SCM engine (pure computation, 25 LOC)
-export type Node = {
-  name: string
-  parents: string[]
-  func: (parents: number[]) => number
+
+  name
+  parents
+  func => number
 }
 
-function topological(nodes: Node[]): Node[] {
-  const order: Node[] = []
-  const visited = new Set<string>()
-  function visit(n: Node) {
+function topological(nodes) {
+  const order= []
+  const visited = new Set()
+  function visit(n) {
     if (visited.has(n.name)) return
     n.parents.forEach(p => visit(nodeMap.get(p)!))
     visited.add(n.name)
@@ -39,11 +39,11 @@ function topological(nodes: Node[]): Node[] {
 }
 
 export function simulate(
-  nodes: Node[],
-  evidence: Record<string, number> = {},
-  intervention: Record<string, number> = {}
-): Record<string, number> {
-  const state: Record<string, number> = { ...evidence, ...intervention }
+  nodes,
+  evidence = {},
+  intervention = {}
+) {
+  const state = { ...evidence, ...intervention }
   for (const n of topological(nodes)) {
     if (n.name in intervention) continue // do-operator: override causal mechanism
     if (!(n.name in state)) {

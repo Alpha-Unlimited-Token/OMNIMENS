@@ -9,7 +9,7 @@
 
 /**
  * @module semanticCacheManager
- * @description Provides in-memory caching for semantic embeddings and implements approximate nearest neighbor search.
+ * @description Provides in-memory caching for semantic embeddings and nearest neighbor search.
  */
 
 // worker_threads removed — using pure JS implementation
@@ -55,7 +55,7 @@ class SemanticCacheManager {
    */
   getEmbedding(id) {
     const entry = this.cache.get(id);
-    return entry ? entry.embedding : null;
+    return entry ? entry.embedding;
   }
 
   /**
@@ -77,8 +77,7 @@ class SemanticCacheManager {
   }
 
   /**
-   * @private
-   * @description Removes the oldest entry from the cache.
+   * @* @description Removes the oldest entry from the cache.
    */
   evictOldest() {
     let oldestKey = null;

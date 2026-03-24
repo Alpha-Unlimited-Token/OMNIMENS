@@ -20,15 +20,15 @@ Causal Generative Thought Mesh (
 import { gpuMatMul } from "gpuAcceleratedMatrixOps";
 import { wasmBayesUpdate } from "wasmMatrixOps";
 
-type Node = { id: string; state: Float32Array };
-type Edge = { from: string; to: string; weight: number };
+ state};
+ to; weight};
 
 class MicroModel {
-  nodes: Node[];
-  edges: Edge[];
-  constructor(nodes: Node[], edges: Edge[]) { this.nodes = nodes; this.edges = edges; }
+  nodes;
+  edges;
+  constructor(nodes, edges) { this.nodes = nodes; this.edges = edges; }
 
-  rollout(intervention: Partial<Record<string, number>>, steps = 8) {
+  rollout(intervention>, steps = 8) {
     // Apply intervention
     for (const [id, val] of Object.entries(intervention)) {
       const n = this.nodes.find(n => n.id === id); if (n) n.state.fill(val);
@@ -42,14 +42,14 @@ class MicroModel {
     }
   }
 
-  bayesUpdate(observed: Record<string, number>) {
+  bayesUpdate(observed) {
     const likelihoods = Float32Array.from(this.edges.map(e => 0.5)); // placeholder
     const post = wasmBayesUpdate(likelihoods, Object.values(observed));
     this.edges.forEach((e, i) => e.weight = post[i]);
   }
 }
 
-export async function inferCounterfactual(model: MicroModel, query: any) {
+export async function inferCounterfactual(model, query) {
   model.rollout(query.intervention);
   model.bayesUpdate(query.observed);
   return model.nodes.map(n => ({ id: n.id, val: n.state[0] }));

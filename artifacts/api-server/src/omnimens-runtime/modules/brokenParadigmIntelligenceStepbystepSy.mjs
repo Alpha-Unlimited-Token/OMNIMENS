@@ -18,13 +18,13 @@
  */
 
 // Field-Resonance Cognition: minimal resonator
-export type Vec = number[];
-const dot = (a: Vec, b: Vec) => a.reduce((s, v, i) => s + v * b[i], 0);
 
-export function trainResonator(patterns: Vec[]): number[][] {
+const dot = (a, b) => a.reduce((s, v, i) => s + v * b[i], 0);
+
+export function trainResonator(patterns): number[][] {
   const n = patterns[0].length;
   // Hebbian-like symmetric coupling matrix
-  const W: number[][] = Array.from({ length: n }, () => Array(n).fill(0));
+  const W= Array.from({ length: n }, () => Array(n).fill(0));
   for (const p of patterns) {
     for (let i = 0; i < n; i++)
       for (let j = 0; j < n; j++)
@@ -36,11 +36,11 @@ export function trainResonator(patterns: Vec[]): number[][] {
 }
 
 export function resonate(
-  query: Vec,
-  W: number[][],
+  query,
+  W,
   steps = 10,
   beta = 1
-): Vec {
+) {
   let state = [...query]; // initial field
   const n = state.length;
   for (let t = 0; t < steps; t++) {

@@ -18,11 +18,11 @@
 
 // CARMEN Core – pure, side-effect-free
 
-export type Node = { id: string; state: Record<string, number> };
-export type Edge = { from: string; to: string; weight: number };
-export type WorldGraph = { nodes: Node[]; edges: Edge[] };
+ state };
+ to; weight};
+ edges};
 
-function step(world: WorldGraph): WorldGraph {
+function step(world) {
   const nextNodes = world.nodes.map(n => {
     const incoming = world.edges.filter(e => e.to === n.id);
     const delta = incoming.reduce((acc, e) => {
@@ -38,15 +38,15 @@ function step(world: WorldGraph): WorldGraph {
 }
 
 export function rollout(
-  base: WorldGraph,
-  interventions: (wg: WorldGraph) => WorldGraph,
+  base,
+  interventions => WorldGraph,
   ticks = 5
-): WorldGraph {
+) {
   let w = interventions(JSON.parse(JSON.stringify(base)));
   for (let i = 0; i < ticks; i++) w = step(w);
   return w;
 }
 
-export function evaluate(goal: (wg: WorldGraph) => number, candidates: WorldGraph[]): WorldGraph {
+export function evaluate(goal => number, candidates) {
   return candidates.reduce((best, w) => (goal(w) > goal(best) ? w : best), candidates[0]);
 }

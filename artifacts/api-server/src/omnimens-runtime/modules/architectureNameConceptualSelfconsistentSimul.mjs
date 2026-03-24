@@ -18,20 +18,20 @@ Conceptual Self-Consistent Simul
  */
 
 /* CS2 core – pure, side-effect-free */
-export type Relation = 'causes' | 'is_a' | 'part_of' | 'before';
-export interface Edge { from: string; to: string; rel: Relation; weight: number; }
-export interface Graph { nodes: Set<string>; edges: Edge[]; }
 
-export function addEdge(g: Graph, e: Edge): Graph {
+
+
+
+export function addEdge(g, e) {
   if (!g.nodes.has(e.from)) g.nodes.add(e.from);
   if (!g.nodes.has(e.to)) g.nodes.add(e.to);
   return { nodes: g.nodes, edges: [...g.edges, e] };
 }
 
-export function propagate(g: Graph, seed: string, steps = 2): Map<string, number> {
-  const scores = new Map<string, number>([[seed, 1]]);
+export function propagate(g, seed, steps = 2) {
+  const scores = new Map([[seed, 1]]);
   for (let s = 0; s < steps; s++) {
-    const next = new Map<string, number>();
+    const next = new Map();
     for (const { from, to, weight } of g.edges) {
       const val = scores.get(from);
       if (val) next.set(to, (next.get(to) || 0) + val * weight);
@@ -42,9 +42,8 @@ export function propagate(g: Graph, seed: string, steps = 2): Map<string, number
 }
 
 export function divergenceScore(
-  predicted: Map<string, number>,
-  observedTokens: string[]
-): number {
+  predicted,
+  observedTokens) {
   let div = 0;
   for (const [concept, pScore] of predicted) {
     const o = observedTokens.includes(concept) ? 1 : 0;
@@ -54,7 +53,7 @@ export function divergenceScore(
 }
 
 /* Example usage */
-const g: Graph = { nodes: new Set(), edges: [] };
+const g= { nodes: new Set(), edges: [] };
 addEdge(g, { from: 'ice', to: 'water', rel: 'before', weight: 0.9 });
 const pred = propagate(g, 'ice');
 const div = divergenceScore(pred, ['water']);

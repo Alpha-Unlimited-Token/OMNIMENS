@@ -39,7 +39,7 @@ export function calculateDistance(vectorA, vectorB) {
  * @param {number[][]} data - The dataset of vectors.
  * @param {number[]} query - The query vector.
  * @param {number} k - The number of neighbors to find.
- * @returns {Array<{ index: number, distance: number }>} - The k nearest neighbors with their indices and distances.
+ * @returns {Array<{ index, distance}>} - The k nearest neighbors with their indices and distances.
  */
 export function findKNearestNeighbors(data, query, k) {
   if (!Array.isArray(data) || !Array.isArray(query) || typeof k !== "number" || k <= 0) {
@@ -112,7 +112,7 @@ export class RedisVectorStore {
    * Searches for the nearest neighbors to a query vector.
    * @param {number[]} query - The query vector.
    * @param {number} k - The number of neighbors to find.
-   * @returns {Array<{ key: string, distance: number }>} - The k nearest neighbors with their keys and distances.
+   * @returns {Array<{ key, distance}>} - The k nearest neighbors with their keys and distances.
    */
   search(query, k) {
     const data = Array.from(this.store.entries()).map(([key, vector]) => ({ key, vector }));

@@ -11,8 +11,7 @@
 class EmbeddingMemoryManager {
   constructor() {
     /**
-     * @private
-     * @type {Map<string, number[]>}
+     * @* @type {Map<string, number[]>}
      * Stores embeddings with unique string keys.
      */
     this.embeddingStore = new Map();
@@ -39,7 +38,7 @@ class EmbeddingMemoryManager {
    * Uses Euclidean distance for similarity measurement.
    * @param {number[]} queryVector - The query vector to search for.
    * @param {number} k - The number of nearest neighbors to retrieve.
-   * @returns {Array<{ key: string, distance: number }>} An array of nearest neighbors with their keys and distances.
+   * @returns {Array<{ key, distance}>} An array of nearest neighbors with their keys and distances.
    * @throws {Error} If the query vector is invalid or k is not a positive integer.
    */
   searchNearestNeighbors(queryVector, k) {

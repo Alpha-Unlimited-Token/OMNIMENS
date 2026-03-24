@@ -30,8 +30,7 @@ export class InMemoryVectorCache {
 
   /**
    * Generates a unique hash for a given key.
-   * @private
-   * @param {string} key - The key to hash.
+   * @* @param {string} key - The key to hash.
    * @returns {string} - A hashed representation of the key.
    */
   _hashKey(key) {
@@ -88,8 +87,7 @@ export class InMemoryVectorCache {
 
   /**
    * Evicts the least recently used (LRU) entry from the cache.
-   * @private
-   */
+   * @*/
   _evictLRU() {
     let oldestKey = null;
     let oldestTimestamp = Infinity;

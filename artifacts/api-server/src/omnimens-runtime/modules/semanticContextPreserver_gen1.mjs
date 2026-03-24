@@ -70,7 +70,7 @@ export function cosineSimilarity(embeddingA, embeddingB) {
  * Rank compressed summaries based on semantic similarity to the original context.
  * @param {string} originalText - Original text context.
  * @param {string[]} summaries - Array of compressed summaries.
- * @returns {Array<{summary: string, score: number}>} - Ranked summaries with similarity scores.
+ * @returns {Array<{summary, score}>} - Ranked summaries with similarity scores.
  */
 export function rankSummariesBySemanticSimilarity(originalText, summaries) {
   const originalEmbedding = generateTextEmbedding(originalText);
@@ -86,8 +86,8 @@ export function rankSummariesBySemanticSimilarity(originalText, summaries) {
 
 /**
  * Utility function to normalize similarity scores to a 0-1 range.
- * @param {Array<{summary: string, score: number}>} rankedSummaries - Ranked summaries with raw scores.
- * @returns {Array<{summary: string, normalizedScore: number}>} - Summaries with normalized scores.
+ * @param {Array<{summary, score}>} rankedSummaries - Ranked summaries with raw scores.
+ * @returns {Array<{summary, normalizedScore}>} - Summaries with normalized scores.
  */
 export function normalizeScores(rankedSummaries) {
   const scores = rankedSummaries.map((item) => item.score);
@@ -104,7 +104,7 @@ export function normalizeScores(rankedSummaries) {
  * Main function to process and rank summaries.
  * @param {string} originalText - Original text context.
  * @param {string[]} summaries - Array of compressed summaries.
- * @returns {Array<{summary: string, normalizedScore: number}>} - Ranked and normalized summaries.
+ * @returns {Array<{summary, normalizedScore}>} - Ranked and normalized summaries.
  */
 export function processSummaries(originalText, summaries) {
   const rankedSummaries = rankSummariesBySemanticSimilarity(originalText, summaries);

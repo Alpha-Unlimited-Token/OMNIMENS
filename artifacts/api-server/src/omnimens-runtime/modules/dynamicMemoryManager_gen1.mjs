@@ -60,7 +60,7 @@ function buildKDTree(points, depth = 0) {
  * @param {number} depth - The current depth in the tree.
  * @param {KDTreeNode|null} best - The current best node.
  * @param {number} bestDistance - The distance to the current best node.
- * @returns {{best: KDTreeNode|null, bestDistance: number}} The nearest neighbor and its distance.
+ * @returns {{best: KDTreeNode|null, bestDistance}} The nearest neighbor and its distance.
  */
 function nearestNeighbor(node, target, depth = 0, best = null, bestDistance = Infinity) {
   if (node === null) return { best, bestDistance };
@@ -131,7 +131,7 @@ class VectorStore {
   /**
    * Finds the nearest neighbor to a given point.
    * @param {number[]} target - The target point.
-   * @returns {{point: number[], distance: number}} The nearest point and its distance.
+   * @returns {{point, distance}} The nearest point and its distance.
    */
   findNearest(target) {
     if (!this.tree) throw new Error('The vector store is empty.');

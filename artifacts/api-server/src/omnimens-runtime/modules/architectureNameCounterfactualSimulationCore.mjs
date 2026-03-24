@@ -18,29 +18,24 @@ Counterfactual Simulation Core (
  */
 
 // Counterfactual Simulation Core – minimal skeleton
-export type NodeID = string;
 
-export interface Node {
-  id: NodeID;
-  parents: NodeID[];
-  func: (inputs: number[]) => number; // structural equation
-  value?: number;
-}
+
+
 
 export class CausalGraph {
-  private nodes: Map<NodeID, Node> = new Map();
+  nodes= new Map();
 
-  addNode(node: Node) {
+  addNode(node) {
     this.nodes.set(node.id, node);
   }
 
-  setEvidence(id: NodeID, val: number) {
+  setEvidence(id, val) {
     const n = this.nodes.get(id);
     if (n) n.value = val;
   }
 
   // Pearl's do-operator: override structural function of target
-  intervene(id: NodeID, forcedValue: number) {
+  intervene(id, forcedValue) {
     const n = this.nodes.get(id);
     if (n) {
       n.func = () => forcedValue;
@@ -50,8 +45,8 @@ export class CausalGraph {
 
   // Topologically propagate values
   propagate() {
-    const visited = new Set<NodeID>();
-    const visit = (id: NodeID) => {
+    const visited = new Set();
+    const visit = (id) => {
       if (visited.has(id)) return;
       const n = this.nodes.get(id);
       if (!n) return;
@@ -63,7 +58,7 @@ export class CausalGraph {
     this.nodes.forEach((_v, id) => visit(id));
   }
 
-  query(id: NodeID): number | undefined {
+  query(id): number | undefined {
     return this.nodes.get(id)?.value;
   }
 }

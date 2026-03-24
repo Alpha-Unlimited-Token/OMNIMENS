@@ -8,7 +8,7 @@ const createClient = () => ({ connect: async()=>{}, get: async()=>null, set: asy
 
 /**
  * Initializes a Redis client for vector storage.
- * @returns {Promise<RedisClient>} A connected Redis client instance.
+ * @returns {Promise} A connected Redis client instance.
  */
 export async function initializeRedisClient() {
   const client = createClient();
@@ -79,7 +79,7 @@ export function cosineSimilarity(vectorA, vectorB) {
  * @param {RedisClient} client - The Redis client instance.
  * @param {number[]} queryVector - The query vector.
  * @param {string[]} keys - The keys of the stored vectors to search.
- * @returns {Promise<{ key: string, similarity: number }>} The nearest neighbor and its similarity score.
+ * @returns {Promise<{ key, similarity}>} The nearest neighbor and its similarity score.
  */
 export async function findNearestNeighbor(client, queryVector, keys) {
   let nearestNeighbor = null;

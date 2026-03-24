@@ -17,14 +17,14 @@
  */
 
 // ResonantField.ts
-export type Vec = number[];
-export interface FieldCfg { nodes: number; coupling: number[][]; dt?: number; k?: number; }
+
+
 
 export function createField({ nodes, coupling, dt = 0.05, k = 1 }: FieldCfg) {
-  let phase: Vec = Array.from({ length: nodes }, () => Math.random() * Math.PI * 2);
+  let phase= Array.from({ length: nodes }, () => Math.random() * Math.PI * 2);
   const ω: Vec = Array.from({ length: nodes }, () => Math.random() * 0.2 - 0.1); // intrinsic drift
 
-  function step(): Vec {
+  function step() {
     const newPhase = phase.map((θi, i) => {
       let sum = 0;
       for (let j = 0; j < nodes; j++) sum += coupling[i][j] * Math.sin(phase[j] - θi);
@@ -34,11 +34,11 @@ export function createField({ nodes, coupling, dt = 0.05, k = 1 }: FieldCfg) {
     return phase;
   }
 
-  function nudge(targets: number[], amt: number) {
+  function nudge(targets, amt) {
     targets.forEach(i => (phase[i] += amt));
   }
 
-  function coherence(): number {
+  function coherence() {
     const x = phase.reduce((s, θ) => s + Math.cos(θ), 0) / nodes;
     const y = phase.reduce((s, θ) => s + Math.sin(θ), 0) / nodes;
     return Math.sqrt(x * x + y * y); // 0-1 synchrony

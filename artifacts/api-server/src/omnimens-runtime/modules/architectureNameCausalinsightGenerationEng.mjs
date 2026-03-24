@@ -18,40 +18,39 @@
  */
 
 // CIGE core – hypothesis evolution loop (pure, no IO, no deps)
-export type State = number[];
-export type Action = number[];
-export type Trace = { s: State; a: Action; sn: State; r: number };
 
-type Hypothesis = {
-  wasm: Uint8Array;          // compiled causal program
-  score: number;             // lower = better
+
+ a; sn; r};
+
+          // compiled causal program
+  score;             // lower = better
 };
 
-function mutate(bytes: Uint8Array): Uint8Array {
+function mutate(bytes) {
   const out = bytes.slice();
   for (let i = 0; i < out.length; i++) if (Math.random() < 0.02)
       out[i] ^= 1 << (Math.random() * 8);
   return out;
 }
 
-function evalHypothesis(h: Hypothesis, traces: Trace[]): number {
+function evalHypothesis(h, traces) {
   // Stubbed pure error: random placeholder until WASM exec integrated
   let err = 0;
   for (const t of traces) err += Math.random(); // replace w/ wasm run
   return err / traces.length + 0.001 * h.wasm.length;
 }
 
-export function evolveHypotheses(pop: Hypothesis[], traces: Trace[], keep = 32): Hypothesis[] {
+export function evolveHypotheses(pop, traces, keep = 32) {
   // 1. Evaluate
   pop.forEach(h => { h.score = evalHypothesis(h, traces); });
   // 2. Select top-K
   pop.sort((a, b) => a.score - b.score);
   const survivors = pop.slice(0, keep);
   // 3. Reproduce
-  const next: Hypothesis[] = [...survivors];
+  const next= [...survivors];
   while (next.length < pop.length) {
     const parent = survivors[Math.floor(Math.random() * keep)];
-    next.push({ wasm: mutate(parent.wasm), score: Infinity });
+    next.push({ wasm: mutate(parent.wasm), score});
   }
   return next;
 }

@@ -18,27 +18,26 @@
  */
 
 // Causal Counterfactual Simulator — skeleton
-export type Var = string;
-export type State = Record<Var, number>;
 
-type Edge = {
-  from: Var;
-  to: Var;
-  weight: number; // confidence 0–1
-  mechanism: (v: number, s: State) => number; // pure fn
+
+
+
+  to;
+  weight; // confidence 0–1
+  mechanism: (v, s) => number; // pure fn
 };
 
 export class CCS {
-  private edges: Edge[] = [];
-  constructor(public vars: Var[] = []) {}
+  edges= [];
+  constructor(vars= []) {}
 
-  addEdge(e: Edge) {
+  addEdge(e) {
     this.edges.push(e);
   }
 
   // single-step forward simulation under optional interventions
-  simulate(init: State, interventions: Partial<State> = {}): State {
-    const s: State = { ...init, ...interventions };
+  simulate(init, interventions= {}) {
+    const s= { ...init, ...interventions };
     // topological-ish pass (assumes no cycles for prototype)
     for (const { from, to, weight, mechanism } of this.edges) {
       if (weight < 0.05) continue; // ignore weak hypotheses
@@ -50,16 +49,16 @@ export class CCS {
   }
 
   // naive Bayesian update of edge confidence given observation
-  update(observed: State, predicted: State) {
+  update(observed, predicted) {
     for (const e of this.edges) {
       const err = Math.abs((observed[e.to] ?? 0) - (predicted[e.to] ?? 0));
       e.weight = 1 / (1 + err); // shrink with error
     }
   }
 
-  predict(query: Var[], init: State, interventions?: Partial<State>): Partial<State> {
+  predict(query, init, interventions?: Partial) {
     const next = this.simulate(init, interventions);
-    const out: Partial<State> = {};
+    const out= {};
     for (const v of query) out[v] = next[v];
     return out;
   }

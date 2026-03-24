@@ -17,22 +17,17 @@
  */
 
 // deno run --allow-read broker.ts
-type Context = number[]; // simplified embedding
+ // simplified embedding
 
-interface MicroModule {
-  wasmPath: string;
-  patternSignature: (c: Context) => number;          // relevance score 0..1
-  bid: (c: Context) => number;                       // value offer
-  run: (c: Context) => Promise<number[]>;            // returns new context
-}
+
 
 class AttentionBroker {
-  private modules: MicroModule[] = [];
-  private credit: Map<MicroModule, number> = new Map();
+  modules= [];
+  credit = new Map();
 
-  register(m: MicroModule) { this.modules.push(m); this.credit.set(m, 1); }
+  register(m) { this.modules.push(m); this.credit.set(m, 1); }
 
-  async cycle(context: Context): Promise<Context> {
+  async cycle(context) {
     // 1. ask every module for its bid weighted by relevance & credit
     const bids = this.modules.map(m => ({
       module: m,

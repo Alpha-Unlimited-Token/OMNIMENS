@@ -19,14 +19,14 @@
 
 // counterfactual.ts
 // Pure TS implementation – no IO, no eval, no external deps.
-export type Equation = (parents: Record<string, number>) => number;
-export interface NodeSpec { parents: string[]; eq: Equation; }
 
-export interface ModelSpec { [node: string]: NodeSpec; }
 
-function topoOrder(model: ModelSpec): string[] {
-  const visited = new Set<string>(), order: string[] = [];
-  function visit(n: string) {
+
+
+
+function topoOrder(model) {
+  const visited = new Set(), order= [];
+  function visit(n) {
     if (!visited.has(n)) {
       visited.add(n);
       model[n]?.parents.forEach(visit);
@@ -37,13 +37,13 @@ function topoOrder(model: ModelSpec): string[] {
   return order;
 }
 
-export function evaluateModel(model: ModelSpec,
-                              intervention: Partial<Record<string, number>> = {}) {
-  const values: Record<string, number> = {};
+export function evaluateModel(model,
+                              intervention> = {}) {
+  const values = {};
   const order = topoOrder(model);
   for (const n of order) {
     if (n in intervention) { values[n] = intervention[n]!; continue; }
-    const parents: Record<string, number> = {};
+    const parents = {};
     model[n].parents.forEach(p => parents[p] = values[p]);
     values[n] = model[n].eq(parents);
   }
@@ -51,9 +51,9 @@ export function evaluateModel(model: ModelSpec,
 }
 
 // Convenience helper for counterfactual queries
-export function counterfactual(model: ModelSpec,
-                               intervention: Partial<Record<string, number>>,
-                               queryVar: string) {
+export function counterfactual(model,
+                               intervention>,
+                               queryVar) {
   const factual = evaluateModel(model);
   const cf = evaluateModel(model, intervention);
   return { factual: factual[queryVar], counterfactual: cf[queryVar] };

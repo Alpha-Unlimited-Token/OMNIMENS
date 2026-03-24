@@ -120,7 +120,7 @@ export function hashDataset(data) {
 /**
  * Dynamically selects a model or logic function based on input characteristics.
  * @param {Array} data - Input data to analyze.
- * @param {Array<Function>} models - Array of candidate functions to choose from.
+ * @param {Array} models - Array of candidate functions to choose from.
  * @returns {Function} - Selected function.
  */
 export function dynamicModelSelector(data, models) {

@@ -18,26 +18,22 @@
  */
 
 // CASE core – self-contained prototype (no I/O, pure computation)
-export type Predicate = string; // e.g. "water:liquid"
-export interface CausalTriple {
-  cause: Predicate[];     // pre-conditions
-  effect: Predicate;      // post-condition
-  weight: number;         // confidence 0-1
-}
+ // e.g. "water:liquid"
 
-export interface WorldState { facts: Set<Predicate>; score: number; path: number[]; }
+
+
 
 export function simulate(
-  triples: CausalTriple[],
-  start: Predicate[],
-  goal: Predicate,
+  triples,
+  start,
+  goal,
   maxSteps = 6
 ): WorldState | undefined {
-  const startState: WorldState = { facts: new Set(start), score: 1, path: [] };
-  let frontier: WorldState[] = [startState];
+  const startState= { facts: new Set(start), score: 1, path: [] };
+  let frontier= [startState];
 
   for (let step = 0; step < maxSteps; step++) {
-    const next: WorldState[] = [];
+    const next= [];
     for (const state of frontier) {
       if (state.facts.has(goal)) return state; // goal reached
       triples.forEach((t, idx) => {

@@ -88,7 +88,7 @@ export function summarizeConversation(conversation, windowSize, overlap) {
 /**
  * Validates and prepares input for the summarizer function.
  *
- * @param {string} input - The raw conversation input as a single string.
+ * @param {string} input - The raw conversation input single string.
  * @param {number} windowSize - The size of the sliding window.
  * @param {number} overlap - The number of overlapping messages between windows.
  * @returns {string} A summarized version of the conversation.

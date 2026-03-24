@@ -50,8 +50,7 @@ function cosineSimilarity(vectorA, vectorB) {
 class SemanticMemory {
   constructor() {
     /**
-     * @private
-     * @type {Map<string, number[]>}
+     * @* @type {Map<string, number[]>}
      * A Map to store embeddings with their associated keys.
      */
     this.memory = new Map();
@@ -81,7 +80,7 @@ class SemanticMemory {
   /**
    * Finds the most similar vector in memory to a given query vector.
    * @param {number[]} queryVector - The query vector.
-   * @returns {{ key: string, similarity: number } | null} The key and similarity of the closest match, or null if memory is empty.
+   * @returns {{ key, similarity} | null} The key and similarity of the closest match, or null if memory is empty.
    */
   findMostSimilar(queryVector) {
     let bestMatch = null;

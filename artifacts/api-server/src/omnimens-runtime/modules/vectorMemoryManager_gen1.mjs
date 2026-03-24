@@ -83,7 +83,7 @@ class VectorMemoryManager {
    */
   getVectorById(id) {
     const entry = this.vectorStore.get(id);
-    return entry ? entry.vector : null;
+    return entry ? entry.vector;
   }
 
   /**

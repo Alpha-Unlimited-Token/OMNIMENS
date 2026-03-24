@@ -17,14 +17,14 @@
  */
 
 // Causal Imagination Core – 24 lines, no I/O, pure computation
-export type NodeID = string;
-export type State = Record<NodeID, number>;
-export type Edge = { from: NodeID; to: NodeID; weight: number };
-export type CausalGraph = { edges: Edge[]; updater: (n: NodeID, s: State) => number };
+
+
+ to; weight};
+ updater: (n, s) => number };
 
 // Apply one propagation step
-function propagate(graph: CausalGraph, state: State): State {
-  const next: State = { ...state };
+function propagate(graph, state) {
+  const next= { ...state };
   for (const { from, to, weight } of graph.edges) {
     next[to] += weight * state[from];
   }
@@ -34,17 +34,17 @@ function propagate(graph: CausalGraph, state: State): State {
 
 // Run k steps, starting from an initial state and optional intervention
 export function imagine(
-  graph: CausalGraph,
-  initial: State,
-  intervention: Partial<State>,
+  graph,
+  initial,
+  intervention,
   steps = 3
-): State {
-  let s: State = { ...initial, ...intervention }; // apply counterfactual
+) {
+  let s= { ...initial, ...intervention }; // apply counterfactual
   for (let i = 0; i < steps; i++) s = propagate(graph, s);
   return s;
 }
 
 // Score a trajectory by simple utility: sum of target node values
-export function score(state: State, targets: NodeID[]): number {
+export function score(state, targets) {
   return targets.reduce((acc, id) => acc + (state[id] || 0), 0);
 }

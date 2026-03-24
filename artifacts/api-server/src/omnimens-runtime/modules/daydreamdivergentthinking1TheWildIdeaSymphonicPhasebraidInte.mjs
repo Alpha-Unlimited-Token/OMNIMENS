@@ -24,13 +24,13 @@
  * Translation map version: 22
  */
 // Symphonic Phase-Braid core — pure functions, no I/O
-export type Osc = { phase: number, freq: number };
-export type BraidState = Osc[];
+
+
 
 // initialise N oscillators with random phases around a base frequency
-export function initBraid(N: number, baseFreq = 0.05): BraidState {
+export function initBraid(N, baseFreq = 0.05) {
   const rand = (m = 1) => (Math.random() * 2 - 1) * m;
-  return Array.from({ length: N }, (_, i) => ({
+  return Array.from({ length}, (_, i) => ({
     phase: rand(Math.PI),
     freq: baseFreq * (1 + rand(0.01)) + i * 1e-4
   }));
@@ -38,12 +38,12 @@ export function initBraid(N: number, baseFreq = 0.05): BraidState {
 
 // one tick of “dreaming”: advance phases & apply phase-error feedback
 export function tick(
-  braid: BraidState,
-  targetVector: number[],      // sparse 0/1 desired chord bits
+  braid,
+  targetVector,      // sparse 0/1 desired chord bits
   lr = 0.02                    // learning rate on phase
-): BraidState {
+) {
   const N = braid.length;
-  const out: BraidState = [];
+  const out= [];
   let resonance = 0;
   for (let i = 0; i < N; i++) {
     const p = braid[i].phase + braid[i].freq;
@@ -56,7 +56,7 @@ export function tick(
 }
 
 // reading: positions with constructive interference > threshold
-export function readChord(braid: BraidState, thresh = 0.8): number[] {
+export function readChord(braid, thresh = 0.8) {
   return braid
     .map((o, i) => ({ idx: i, val: Math.cos(o.phase) }))
     .filter(x => x.val > thresh)

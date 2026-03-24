@@ -26,9 +26,9 @@ import { createHash } from 'crypto';
  */
 
 const ACTIVATION_FUNCTIONS = {
-  relu: (x) => Math.max(0, x),
-  sigmoid: (x) => 1 / (1 + Math.exp(-x)),
-  tanh: (x) => Math.tanh(x)
+  relu => Math.max(0, x),
+  sigmoid => 1 / (1 + Math.exp(-x)),
+  tanh => Math.tanh(x)
 };
 
 /**

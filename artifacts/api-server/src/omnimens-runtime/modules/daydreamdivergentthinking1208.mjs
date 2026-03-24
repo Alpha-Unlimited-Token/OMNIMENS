@@ -16,11 +16,11 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-export type Osc = { phase:number; omega:number; links:number[] };   // natural freq & couplings
+ omega; links };   // natural freq & couplings
 const TAU = 2*Math.PI;
 
-export function stepNet(net:Osc[], K:number, dt:number):Osc[]{
-  const n = net.length, next:Osc[] = new Array(n);
+export function stepNet(net, K, dt) {
+  const n = net.length, next= new Array(n);
   for(let i=0;i<n;i++){
     const o = net[i];
     let sum=0;
@@ -34,13 +34,13 @@ export function stepNet(net:Osc[], K:number, dt:number):Osc[]{
   return next;
 }
 
-export function braidSignal(net:Osc[], anchor:number):number[]{
+export function braidSignal(net, anchor) {
   // returns “chord” of phase offsets to HOME_BASE anchor
   const base = net[anchor].phase;
   return net.map(o => ((o.phase - base + TAU) % TAU)/TAU);
 }
 
-export function convergence(net:Osc[], eps=1e-3):boolean{
+export function convergence(net, eps=1e-3) {
   const first = net[0].phase;
   return net.every(o => Math.abs(Math.sin(o.phase-first))<eps);
 }

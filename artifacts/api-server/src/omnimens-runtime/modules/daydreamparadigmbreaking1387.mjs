@@ -17,20 +17,20 @@
  */
 
 // Resonant Field Simulator — pure computation, policy-compliant
-export type FieldState = Float32Array;
+
 
 /**
  * Simulates a 1-D resonant field for `steps` iterations.
  * Each cell holds a phase angle in radians [0, 2π).
  */
 export function resonate(
-  size: number,
-  steps: number,
-  coupling: number,          // 0‒1, how strongly neighbors influence phase
-  seed: (i: number) => number // initial phase generator
-): FieldState[] {
-  const history: FieldState[] = [];
-  let field: FieldState = new Float32Array(size).map((_, i) => seed(i));
+  size,
+  steps,
+  coupling,          // 0‒1, how strongly neighbors influence phase
+  seed => number // initial phase generator
+) {
+  const history= [];
+  let field= new Float32Array(size).map((_, i) => seed(i));
 
   const TWO_PI = Math.PI * 2;
 
@@ -52,7 +52,7 @@ export function resonate(
   }
   return history;
 
-  function normalizePhase(p: number): number {
+  function normalizePhase(p) {
     p %= TWO_PI;
     return p < 0 ? p + TWO_PI : p;
   }

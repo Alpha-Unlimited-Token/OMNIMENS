@@ -18,10 +18,10 @@
  */
 
 // phaseBraid.ts – minimal core of Phase-Braided Consciousness
-export type Genome = { coupling: number[][] };           // adjacency matrix
-export interface State { φ: number[] }                   // phases on [0, 2π)
+           // adjacency matrix
+                   // phases on [0, 2π)
 
-export const step = (g: Genome, s: State, dt = 0.01): State => {
+export const step = (g, s, dt = 0.01) => {
   const N = s.φ.length, next = new Array(N).fill(0);
   for (let i = 0; i < N; i++) {
     let Σ = 0;
@@ -32,17 +32,17 @@ export const step = (g: Genome, s: State, dt = 0.01): State => {
 };
 
 // map external stimulus to phase perturbation
-export const senseBlock = (stim: number[], s: State, gain = 0.5): State => {
+export const senseBlock = (stim, s, gain = 0.5) => {
   const φ = s.φ.map((p, i) => (p + gain * stim[i]) % (2 * Math.PI));
   return { φ };
 };
 
-// extract topological “concept braid” as winding numbers
-export const braidSignature = (s: State): number[] =>
+// extract topological “concept braid” numbers
+export const braidSignature = (s) =>
   s.φ.map(p => Math.round(p / (2 * Math.PI)));          // integer winds
 
 // simple evolutionary mutation of genome
-export const mutate = (g: Genome, rate = 0.1): Genome => ({
+export const mutate = (g, rate = 0.1) => ({
   coupling: g.coupling.map(row =>
     row.map(w => w + (Math.random() < rate ? (Math.random() - 0.5) : 0))
   )

@@ -17,23 +17,23 @@
  */
 
 /* Resonant coherence demo — no loss/gradients, pure coupling */
-export type Phase = number;            // in radians
-interface Node { phase: Phase; speed: number; }
+            // in radians
+
 
 export function runResonanceNetwork(
   size = 12,
   coupling = 0.25,
   steps = 100
-): Phase[] {
+) {
   // random initial mini-oscillators
-  const nodes: Node[] = Array.from({ length: size }, () => ({
+  const nodes= Array.from({ length: size }, () => ({
     phase: Math.random() * 2 * Math.PI,
     speed: 0
   }));
 
   for (let t = 0; t < steps; t++) {
     // local interaction: pull toward mean neighbour phase
-    const newPhases: Phase[] = [];
+    const newPhases= [];
     for (let i = 0; i < size; i++) {
       const left = nodes[(i - 1 + size) % size].phase;
       const right = nodes[(i + 1) % size].phase;

@@ -84,9 +84,9 @@ export function compressContext(embeddings) {
 function exampleUsage() {
   const conversation = [
     'Hello, how are you?',
-    'I am fine, thank you! How about you?',
+    'I am fine, thank you How about you?',
     'I am doing well, just working on some projects.',
-    'That sounds interesting! What kind of projects?'
+    'That sounds interesting What kind of projects?'
   ];
 
   // Generate embeddings for each message

@@ -16,25 +16,16 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-export type Var = string;
 
-export interface Edge {
-  from: Var;
-  to: Var;
-  weight: number;          // causal strength in [-1,1]
-}
 
-export interface Graph {
-  nodes: Set<Var>;
-  edges: Edge[];
-}
 
-export interface WorldState {
-  [k: string]: number;     // variable assignments (0-1 scaled)
-}
 
-export function propagate(graph: Graph, state: WorldState): WorldState {
-  const next: WorldState = { ...state };
+
+
+
+
+export function propagate(graph, state) {
+  const next= { ...state };
   for (const { from, to, weight } of graph.edges) {
     if (from in state) {
       const influence = state[from] * weight;
@@ -46,22 +37,22 @@ export function propagate(graph: Graph, state: WorldState): WorldState {
 }
 
 export function intervene(
-  graph: Graph,
-  base: WorldState,
-  intervention: Partial<WorldState>,
+  graph,
+  base,
+  intervention,
   steps = 3,
   samples = 100
-): number {
+) {
   let diffSum = 0;
   for (let i = 0; i < samples; i++) {
-    let s: WorldState = { ...base, ...intervention };
+    let s= { ...base, ...intervention };
     for (let t = 0; t < steps; t++) s = propagate(graph, s);
     diffSum += Object.keys(base).reduce((acc, k) => acc + Math.abs(s[k] - base[k]), 0);
   }
   return diffSum / samples; // expected causal effect magnitude
 }
 
-export function updateEdgeWeight(edge: Edge, evidence: number, lr = 0.1): Edge {
+export function updateEdgeWeight(edge, evidence, lr = 0.1) {
   const grad = evidence - edge.weight;
   const newWeight = Math.max(-1, Math.min(1, edge.weight + lr * grad));
   return { ...edge, weight: newWeight };

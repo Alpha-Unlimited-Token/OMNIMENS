@@ -17,11 +17,11 @@
  */
 
 // Pure TypeScript emulator of one optical-resonant “thought step”
-export type Wave = {freq:number, amp:number, phase:number};          // one harmonic
-export type ThoughtState = Wave[];                                   // polyphonic chord
+          // one harmonic
+                                   // polyphonic chord
 
 // Interference of two waves -> new uncertainty-weighted wave
-function interfere(a:Wave, b:Wave):Wave{
+function interfere(a, b) {
   const beat = Math.abs(a.freq - b.freq);
   const newAmp = (a.amp + b.amp)/2 * Math.exp(-beat);               // dissonance damping
   const newPhase = (a.phase + b.phase)/2;
@@ -30,8 +30,8 @@ function interfere(a:Wave, b:Wave):Wave{
 }
 
 // One reasoning tick: all-pair interference then collapse to top-K strongest harmonics
-export function propagateThought(state:ThoughtState, topK=32):ThoughtState{
-  const next:Wave[] = [];
+export function propagateThought(state, topK=32) {
+  const next= [];
   for(let i=0;i<state.length;i++){
     for(let j=i+1;j<state.length;j++){
       next.push(interfere(state[i], state[j]));

@@ -17,23 +17,23 @@
  */
 
 // Each concept is a small set of ints (Hz). Memory is an array of such chords.
-type Chord = number[];
-type Memory = Chord[];
+
+
 
 // Cosine-based resonance score between two chords.
-function resonance(a: Chord, b: Chord): number {
+function resonance(a, b) {
   const shared = a.filter(f => b.includes(f)).length;
   const phaseBonus = Math.cos((a.reduce((s,x)=>s+x,0)-b.reduce((s,x)=>s+x,0))*Math.PI/180);
   return shared + phaseBonus;
 }
 
 // Store by simply pushing into memory.
-export function store(memory: Memory, chord: Chord): Memory {
+export function store(memory, chord) {
   return [...memory, chord];
 }
 
 // Given a query chord, return the most resonant stored chord.
-export function recall(memory: Memory, query: Chord): Chord | null {
+export function recall(memory, query): Chord | null {
   if (memory.length === 0) return null;
   let best = memory[0], bestScore = -Infinity;
   for (const m of memory) {

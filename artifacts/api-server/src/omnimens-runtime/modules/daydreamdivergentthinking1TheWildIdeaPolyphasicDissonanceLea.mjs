@@ -18,15 +18,15 @@
  */
 
 // Polyphasic Dissonance Learning – minimal skeleton
-export type Vector = number[];
+
 
 // Simple phase-shifted “micro-models”; here just linear transforms with phase tags
 class PhaseModel {
   constructor(
-    public phase: number,                // 0–1 normalized phase offset
-    private weights: Vector              // internal parameters
+    phase,                // 0–1 normalized phase offset
+    weights: Vector              // internal parameters
   ) {}
-  predict(x: Vector, t: number): Vector {
+  predict(x, t) {
     // phase-shifted activation
     const alpha = Math.sin(2 * Math.PI * (t + this.phase));
     return x.map((xi, i) => xi * this.weights[i] * alpha);
@@ -35,10 +35,9 @@ class PhaseModel {
 
 // Meta-learner trying to minimize *pairwise dissonance*
 export function harmonize(
-  models: PhaseModel[],
-  x: Vector,
-  t: number
-): {consensus: Vector; tension: number} {
+  models,
+  x,
+  t): {consensus; tension} {
   const outputs = models.map(m => m.predict(x, t));
   const dim = outputs[0].length;
   const consensus = Array(dim).fill(0);

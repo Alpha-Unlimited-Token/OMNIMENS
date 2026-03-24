@@ -24,16 +24,16 @@
  * Translation map version: 22
  */
 // Dynamic Exploration Beyond Training Distribution — core loop
-export type Vec = number[];
-export type Scorer = (v: Vec) => number;       // external utility signal
+
+       // external utility signal
 
 // Euclidean distance between two vectors
-function dist(a: Vec, b: Vec): number {
+function dist(a, b) {
   return Math.sqrt(a.reduce((s, x, i) => s + (x - b[i]) ** 2, 0));
 }
 
 // Produce k novel candidates around a seed vector
-function perturb(seed: Vec, k = 4, step = 0.3): Vec[] {
+function perturb(seed, k = 4, step = 0.3) {
   return Array.from({ length: k }, () =>
     seed.map(x => x + (Math.random() * 2 - 1) * step)
   );
@@ -46,11 +46,11 @@ function perturb(seed: Vec, k = 4, step = 0.3): Vec[] {
  * keep:    max memory size
  */
 export function recurseImprove(
-  memory: Vec[],
-  score: Scorer,
+  memory,
+  score,
   keep = 64
-): Vec[] {
-  const candidates: Vec[] = [];
+) {
+  const candidates= [];
   for (const v of memory) candidates.push(...perturb(v));
   // Combine utility with novelty (1e-9 avoids div-by-zero)
   const rated = candidates.map(c => {

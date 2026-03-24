@@ -74,7 +74,7 @@ export function createHNSWGraph() {
   return {
     nodes: new Map(),
     maxLayer: 0,
-    entryPoint: null
+    entryPoint
   };
 }
 
@@ -169,7 +169,7 @@ function trimNeighbors(node, layer, maxNeighbors) {
  * @param {HNSWGraph} graph - The HNSW graph.
  * @param {Array<number>} queryVector - The vector to search for.
  * @param {number} k - The number of nearest neighbors to retrieve.
- * @returns {Array<{id: number, distance: number}>} The k nearest neighbors and their distances.
+ * @returns {Array<{id, distance}>} The k nearest neighbors and their distances.
  */
 export function search(graph, queryVector, k) {
   if (!graph.entryPoint) {
@@ -177,7 +177,7 @@ export function search(graph, queryVector, k) {
   }
 
   const visited = new Set();
-  const candidates = [{ id: graph.entryPoint, distance: Infinity }];
+  const candidates = [{ id: graph.entryPoint, distance}];
   const results = [];
 
   while (candidates.length > 0) {

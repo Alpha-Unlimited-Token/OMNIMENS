@@ -17,15 +17,15 @@
  */
 
 // Monophase: one scalar phase per unit, in radians
-export type PhaseVec = Float64Array;
+
 
 // Kuramoto-style update for one timestep
 export function stepOscillators(
-  phases: PhaseVec,              // current phases θ_i
-  naturalFreq: Float64Array,     // ω_i
-  coupling: Float64Array[],      // K_ij symmetric matrix (row-major)
+  phases,              // current phases θ_i
+  naturalFreq,     // ω_i
+  coupling,      // K_ij symmetric matrix (row-major)
   dt = 0.01                      // timestep
-): PhaseVec {
+) {
   const n = phases.length;
   const next = new Float64Array(n);
 

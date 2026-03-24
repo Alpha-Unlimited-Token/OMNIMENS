@@ -25,11 +25,11 @@
  * Translation map version: 22
  */
 // holoflux.ts — pure, side-effect-free resonance demo
-export type Field = Float64Array;            // phases of N oscillators 0…2π
+            // phases of N oscillators 0…2π
 const TAU = Math.PI * 2;
 
 /** advance the field one timestep using holistic coupling (no pairwise loops) */
-export function tick(field: Field, k = 0.05): Field {
+export function tick(field, k = 0.05) {
   const N = field.length;
   // Compute global sine & cosine sums once (O(N)), creating a field-level force
   let sx = 0, sy = 0;
@@ -46,8 +46,8 @@ export function tick(field: Field, k = 0.05): Field {
 }
 
 /** run until coherence > thresh and return ticks used */
-export function converge(N = 128, thresh = 0.99, max = 10_000): number {
-  let field = Float64Array.from({ length: N }, () => Math.random() * TAU);
+export function converge(N = 128, thresh = 0.99, max = 10_000) {
+  let field = Float64Array.from({ length}, () => Math.random() * TAU);
   for (let t = 0; t < max; t++) {
     field = tick(field);
     // order parameter r = magnitude of average vector (0…1)

@@ -20,21 +20,21 @@
 // hd-cs.ts
 import { VectorStore } from './vectorSearchMemory';
 
-type NodeID = string;
-interface Node { id: NodeID; data: any; version: number; }
-interface HyperEdge { src: NodeID[]; dst: NodeID; weight: number; tag: string; }
+
+
+
 
 export class Hypergraph {
-  private nodes = new Map<NodeID, Node>();
-  private edges: HyperEdge[] = [];
-  constructor(private vectors: VectorStore) {}
+  nodes = new Map();
+  edges= [];
+  constructor(vectors) {}
 
-  addNode(n: Node) { this.nodes.set(n.id, n); this.vectors.upsert(n.id, n.data); }
-  addEdge(e: HyperEdge) { this.edges.push(e); }
+  addNode(n) { this.nodes.set(n.id, n); this.vectors.upsert(n.id, n.data); }
+  addEdge(e) { this.edges.push(e); }
 
   // cheap photonic-like parallel scan (CPU mock)
-  enumeratePaths(seed: NodeID, depth = 3): NodeID[][] {
-    let frontier: NodeID[][] = [[seed]];
+  enumeratePaths(seed, depth = 3) {
+    let frontier= [[seed]];
     for (let d = 0; d < depth; d++) {
       frontier = frontier.flatMap(path => {
         const last = path[path.length - 1];
@@ -46,7 +46,7 @@ export class Hypergraph {
     return frontier;
   }
 
-  scorePath(path: NodeID[]): number {
+  scorePath(path) {
     // heuristic gradient (simplified): novelty * plausibility
     const novelty = 1 - this.vectors.cosineSimilarity(path[0], path[path.length - 1]);
     const plausibility = path.reduce((acc, id) => acc * (this.nodes.get(id)?.version ?? 1) / 10, 1);

@@ -51,7 +51,7 @@ function calculateDistance(vectorA, vectorB) {
 class DynamicMemoryStore {
   constructor() {
     /**
-     * @type {Map<string, { vector: number[], metadata: any }>}
+     * @type {Map<string, { vector, metadata}>}
      * Stores vectors with associated metadata.
      */
     this.store = new Map();
@@ -73,7 +73,7 @@ class DynamicMemoryStore {
    * Performs an approximate nearest neighbor search.
    * @param {number[]} queryVector - The query vector.
    * @param {number} k - The number of nearest neighbors to retrieve.
-   * @returns {Array<{ id: string, distance: number, metadata: any }>} The k nearest neighbors.
+   * @returns {Array<{ id, distance, metadata}>} The k nearest neighbors.
    */
   search(queryVector, k = 1) {
     if (k <= 0) {

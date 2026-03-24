@@ -20,6 +20,6 @@ export class BayesianUncertaintyTransfer {
 
 // Example usage
 const sourceAgent = { getKnowledge: () => [{ content: 'data1', confidence: 0.9 }, { content: 'data2', confidence: 0.7 }] };
-const targetAgent = { integrateKnowledge: (data) => console.log('Integrated:', data) };
+const targetAgent = { integrateKnowledge => console.log('Integrated:', data) };
 const bayesianTransfer = new BayesianUncertaintyTransfer();
 bayesianTransfer.transferKnowledge(sourceAgent, targetAgent);

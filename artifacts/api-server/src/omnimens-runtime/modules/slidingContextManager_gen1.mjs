@@ -56,7 +56,7 @@ function calculateDistance(emb1, emb2) {
 
 /**
  * Clusters embeddings into groups based on similarity.
- * @param {Array<{text: string, embedding: number[]}>} context - Array of text and embeddings.
+ * @param {Array<{text, embedding}>} context - Array of text and embeddings.
  * @param {number} threshold - Distance threshold for clustering.
  * @returns {Array<Array<string>>} - Clustered groups of text.
  */

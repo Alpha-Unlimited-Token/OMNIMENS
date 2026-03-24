@@ -13,8 +13,7 @@ export class InMemoryVectorStore {
    */
   constructor() {
     /**
-     * @private
-     * @type {Map<string, number[]>}
+     * @* @type {Map<string, number[]>}
      * A Map to store embeddings with unique keys.
      */
     this.store = new Map();
@@ -35,8 +34,7 @@ export class InMemoryVectorStore {
 
   /**
    * Computes the cosine similarity between two vectors.
-   * @private
-   * @param {number[]} vectorA - The first vector.
+   * @* @param {number[]} vectorA - The first vector.
    * @param {number[]} vectorB - The second vector.
    * @returns {number} The cosine similarity between the two vectors.
    */
@@ -51,7 +49,7 @@ export class InMemoryVectorStore {
    * Searches for the most similar embeddings to a given query vector.
    * @param {number[]} queryVector - The query vector.
    * @param {number} topK - The number of top results to return.
-   * @returns {Array<{key: string, similarity: number}>} An array of topK results sorted by similarity.
+   * @returns {Array<{key, similarity}>} An array of topK results sorted by similarity.
    * @throws {Error} If the query vector is not an array of numbers.
    */
   search(queryVector, topK = 5) {

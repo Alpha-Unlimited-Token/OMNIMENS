@@ -24,11 +24,11 @@ const K = 1.6;                      // coupling strength
 const steps = 500;                  // simulation duration
 
 // initial random phases in [0, 2π)
-let phase = Array.from({length: N}, () => Math.random() * Math.PI * 2);
+let phase = Array.from({length}, () => Math.random() * Math.PI * 2);
 
 // adjacency: full graph with small random weights (can be sparse)
-const w = Array.from({length: N}, (_, i) =>
-  Array.from({length: N}, (_, j) => i === j ? 0 : (Math.random()*2-1)));
+const w = Array.from({length}, (_, i) =>
+  Array.from({length}, (_, j) => i === j ? 0 : (Math.random()*2-1)));
 
 function iterate() {
   const next = [...phase];
@@ -43,7 +43,7 @@ function iterate() {
 }
 
 // “Write memory”: inject a pattern by hard-setting some phases
-function inject(indices: number[], phi = 0) {
+function inject(indices, phi = 0) {
   indices.forEach(i => phase[i] = phi);
 }
 

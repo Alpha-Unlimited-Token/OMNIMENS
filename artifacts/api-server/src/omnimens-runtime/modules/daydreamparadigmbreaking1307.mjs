@@ -16,16 +16,16 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-export type ResonantReport = { history: number[]; finalR: number };
+ finalR};
 
 export function resonate(
-  cells: number,      // number of oscillators
-  steps: number,      // time steps to iterate
+  cells,      // number of oscillators
+  steps,      // time steps to iterate
   coupling = 0.08     // interaction strength
-): ResonantReport {
+) {
   // random initial phases 0..2π
-  let phase: number[] = Array.from({ length: cells }, () => Math.random() * 2 * Math.PI);
-  const history: number[] = [];
+  let phase= Array.from({ length: cells }, () => Math.random() * 2 * Math.PI);
+  const history= [];
 
   const sin = Math.sin, cos = Math.cos, PI2 = 2 * Math.PI;
 

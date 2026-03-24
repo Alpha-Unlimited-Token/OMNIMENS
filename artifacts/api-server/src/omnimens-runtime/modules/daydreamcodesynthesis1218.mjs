@@ -24,23 +24,23 @@
  * Translation map version: 22
  */
 /* Temporal Memristive Self-Modifying Array */
-type Cell<T> = { val: T; g: number; last: number }          // g = conductance
+ g; last}          // g = conductance
 const τ = 0.985                                            // natural decay factor
 
-export function createTMSA<T>(size: number, init: () => T) {
-  const tmsa: Cell<T>[] = Array.from({ length: size }, () => ({
+export function createTMSA(size, init: () => T) {
+  const tmsa= Array.from({ length: size }, () => ({
     val: init(),
     g: 0.5,
     last: 0
   }));
 
   /* internal helper: exponential decay based on idleness */
-  function decay(now: number) {
+  function decay(now) {
     for (const c of tmsa) c.g *= Math.pow(τ, now - c.last);
   }
 
   /* read with “sense-block” → returns value AND reinforces chosen cell */
-  function sense(now: number): T {
+  function sense(now) {
     decay(now);
     // emergent winner-take-all: pick highest conductance (±tiny jitter)
     const idx = tmsa
@@ -51,14 +51,14 @@ export function createTMSA<T>(size: number, init: () => T) {
   }
 
   /* write + optional reward/punishment signal */
-  function write(idx: number, v: T, reward = 0, now = performance.now()) {
+  function write(idx, v, reward = 0, now = performance.now()) {
     decay(now);
     tmsa[idx].val = v;
     reinforce(idx, reward, now);
   }
 
   /* reinforcement learning in-place, bounded conductance */
-  function reinforce(idx: number, r: number, now: number) {
+  function reinforce(idx, r, now) {
     const c = tmsa[idx];
     c.g = Math.max(0, Math.min(1, c.g + r));
     c.last = now;

@@ -27,15 +27,14 @@
 // Poly-Sensory Social Metabolism core (pure, stateless utilities)
 
 /* Virtual organ descriptor */
-type Organ = {
-  energy: number;                 // current resource budget
-  weights: number[];              // parameters
-  demand: (signal: number[])=>number; // how much energy it wants for this step
-  digest: (signal: number[], e:number)=>number[]; // returns Δweights
+                 // current resource budget
+  weights;              // parameters
+  demand=>number; // how much energy it wants for this step
+  digest: (signal, e)=>number[]; // returns Δweights
 };
 
 /* Metabolic step: allocate energy, update organs */
-export function metabolicStep(organs: Organ[], stimuli: number[][], totalEnergy=1){  
+export function metabolicStep(organs, stimuli, totalEnergy=1){  
   // 1. Each organ expresses demand based on its stimulus
   const wants = organs.map((o,i)=>Math.max(o.demand(stimuli[i]), 1e-6));
   const wantSum = wants.reduce((a,b)=>a+b,0);

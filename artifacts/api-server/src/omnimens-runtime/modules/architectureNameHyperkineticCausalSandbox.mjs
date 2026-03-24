@@ -18,21 +18,16 @@
  */
 
 // HyCaS – minimal Causal Micro-Model & Sandbox
-export type State = Record<string, number>;
 
-export interface CMM {
-  id: string;
-  state: State;
-  confidence: number;
-  tick(state: State): State;          // transition operator
-}
+
+
 
 export class Sandbox {
-  private models: CMM[] = [];
-  constructor(models: CMM[]) { this.models = models; }
+  models= [];
+  constructor(models) { this.models = models; }
 
   // one simulation step across all models
-  step(): void {
+  step() {
     this.models = this.models.map(m => ({
       ...m,
       state: m.tick(m.state)
@@ -40,8 +35,8 @@ export class Sandbox {
   }
 
   // fuse models that are predicting the same trajectory
-  fuse(threshold = 0.05): void {
-    const fused: CMM[] = [];
+  fuse(threshold = 0.05) {
+    const fused= [];
     for (const m of this.models) {
       const peer = fused.find(f =>
         distance(f.state, m.state) < threshold);
@@ -60,10 +55,10 @@ export class Sandbox {
 }
 
 // helpers
-function distance(a: State, b: State): number {
+function distance(a, b) {
   return Math.sqrt(Object.keys(a).reduce((sum, k) =>
     sum + Math.pow((a[k] || 0) - (b[k] || 0), 2), 0));
 }
-function weighted(a: CMM, b: CMM): number {
+function weighted(a, b) {
   return (a.confidence + b.confidence) / 2;
 }

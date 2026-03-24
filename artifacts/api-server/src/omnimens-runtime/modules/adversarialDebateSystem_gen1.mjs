@@ -8,9 +8,9 @@
  */
 
 export function runAdversarialDebate(agents, topic) {
-  const arguments = agents.map(agent => agent.generateArgument(topic));
-  const counterArguments = agents.map((agent, i) => agent.generateCounterArgument(arguments[i], arguments));
-  const scores = arguments.map((arg, i) => evaluateArgument(arg, counterArguments[i]));
+  const args = agents.map(agent => agent.generateArgument(topic));
+  const counterArguments = agents.map((agent, i) => agent.generateCounterArgument(args[i], arguments));
+  const scores = args.map((arg, i) => evaluateArgument(arg, counterArguments[i]));
   const consensus = scores.reduce((sum, score) => sum + score, 0) / scores.length;
   return { arguments, counterArguments, scores, consensus };
 }

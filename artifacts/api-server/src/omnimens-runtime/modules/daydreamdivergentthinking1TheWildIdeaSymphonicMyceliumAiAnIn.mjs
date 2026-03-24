@@ -19,16 +19,16 @@
 
 // Each weight is (freq, phase). Learning adjusts phase toward reward resonance.
 export function harmonicResonanceStep(
-  weights: Array<[number, number]>,   // [frequency, phase]
-  rewardSignal: number,               // +1 good, -1 bad
+  weights,   // [frequency, phase]
+  rewardSignal,               // +1 good, -1 bad
   dt = 0.01                           // time-step size
-): Array<[number, number]> {
+) {
 
   // Helper: simple resonance gradient = sin(phase) * reward
-  const phaseGradient = (phase: number) => Math.sin(phase) * rewardSignal;
+  const phaseGradient = (phase) => Math.sin(phase) * rewardSignal;
 
   // Update phases; keep frequency fixed for stability
-  const newWeights: Array<[number, number]> = [];
+  const newWeights = [];
 
   for (let i = 0; i < weights.length; i++) {
     const [f, p] = weights[i];

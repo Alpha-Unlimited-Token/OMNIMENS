@@ -33,12 +33,12 @@ function generateMatrixMultiplicationWasm() {
   // AssemblyScript source code for matrix multiplication
   const assemblyScriptSource = `
     export function multiplyMatrices(
-      a: Float64Array,
-      b: Float64Array,
+      a,
+      b,
       rowsA: i32,
       colsA: i32,
       colsB: i32
-    ): Float64Array {
+    ) {
       const result = new Float64Array(rowsA * colsB);
       for (let i = 0; i < rowsA; i++) {
         for (let j = 0; j < colsB; j++) {
@@ -64,7 +64,7 @@ function generateMatrixMultiplicationWasm() {
  * @function loadWasmModule
  * @description Loads a WebAssembly module from a binary and returns its exported functions.
  * @param {Uint8Array} wasmBinary - The WebAssembly binary to load.
- * @returns {Promise<Object>} A promise resolving to the WebAssembly module's exports.
+ * @returns {Promise} A promise resolving to the WebAssembly module's exports.
  */
 async function loadWasmModule(wasmBinary) {
   const wasmModule = await WebAssembly.instantiate(wasmBinary);
@@ -79,7 +79,7 @@ async function loadWasmModule(wasmBinary) {
  * @param {number} rowsA - Number of rows in matrixA.
  * @param {number} colsA - Number of columns in matrixA.
  * @param {number} colsB - Number of columns in matrixB.
- * @returns {Promise<Float64Array>} A promise resolving to the result matrix (flattened).
+ * @returns {Promise} A promise resolving to the result matrix (flattened).
  */
 async function matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
   const wasmBinary = generateMatrixMultiplicationWasm();
@@ -115,7 +115,7 @@ function validateMatrixDimensions(rowsA, colsA, rowsB, colsB) {
  * @param {number} rowsA - Number of rows in matrixA.
  * @param {number} colsA - Number of columns in matrixA.
  * @param {number} colsB - Number of columns in matrixB.
- * @returns {Promise<Float64Array>} A promise resolving to the result matrix (flattened).
+ * @returns {Promise} A promise resolving to the result matrix (flattened).
  */
 async function multiply(matrixA, matrixB, rowsA, colsA, colsB) {
   validateMatrixDimensions(rowsA, colsA, matrixB.length / colsB, colsB);

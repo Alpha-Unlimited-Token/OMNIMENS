@@ -193,7 +193,7 @@ class VectorIndex {
       vectors: this.vectors.size,
       capacity: this.capacity,
       dimensions: this.dimensions,
-      lshTables: LSH_NUM_TABLES,
+      lshTables,
       totalBuckets,
       memoryEstimateMB: ((this.vectors.size * this.dimensions * 8) / (1024 * 1024)).toFixed(2),
     };

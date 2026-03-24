@@ -96,7 +96,7 @@ class HNSW {
    * Searches for the nearest neighbors of a given vector.
    * @param {number[]} queryVector - The query embedding vector.
    * @param {number} k - Number of nearest neighbors to retrieve.
-   * @returns {Array<{id: number, distance: number}>} List of nearest neighbors with distances.
+   * @returns {Array<{id, distance}>} List of nearest neighbors with distances.
    */
   search(queryVector, k = 1) {
     if (this.entryPoint === null) {
@@ -133,8 +133,7 @@ class HNSW {
 
   /**
    * Searches for the closest node at a specific level.
-   * @private
-   * @param {number[]} vector - The query vector.
+   * @* @param {number[]} vector - The query vector.
    * @param {number} entryId - Starting node ID.
    * @param {number} level - Level to search on.
    * @returns {number} The closest node ID at the level.
@@ -161,8 +160,7 @@ class HNSW {
 
   /**
    * Connects the new node to its nearest neighbors at a given level.
-   * @private
-   * @param {Node} newNode - The new node to connect.
+   * @* @param {Node} newNode - The new node to connect.
    * @param {number} closestId - The closest node ID.
    * @param {number} level - The level to connect at.
    */

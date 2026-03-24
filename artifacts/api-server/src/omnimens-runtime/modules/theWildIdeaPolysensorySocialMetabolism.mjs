@@ -17,13 +17,13 @@
  */
 
 // Kuramoto-style metabolic swarm core
-export type System = { theta: number[]; omega: number[]; K: number[][] }; // phases, natural freq, couplings
+ omega; K }; // phases, natural freq, couplings
 
 // One integration step – returns new phases & “homeostasis error”
-export function metabolise(sys: System, dt = 0.01): { next: System; error: number } {
+export function metabolise(sys, dt = 0.01): { next; error} {
   const { theta, omega, K } = sys;
   const n = theta.length;
-  const dTheta = new Array<number>(n).fill(0);
+  const dTheta = new Array(n).fill(0);
   // Kuramoto update
   for (let i = 0; i < n; i++) {
     let sum = 0;

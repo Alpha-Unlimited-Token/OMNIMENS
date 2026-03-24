@@ -23,7 +23,7 @@
 
 /**
  * In-memory store for vectors and their associated metadata.
- * @type {Map<string, {vector: number[], metadata: any}>}
+ * @type {Map<string, {vector, metadata}>}
  */
 const vectorStore = new Map();
 
@@ -62,7 +62,7 @@ export function cosineSimilarity(vecA, vecB) {
  * Finds the k-nearest vectors to a given query vector based on cosine similarity.
  * @param {number[]} queryVector - The query vector.
  * @param {number} k - Number of nearest neighbors to retrieve.
- * @returns {Array<{id: string, similarity: number, metadata: any}>} Array of nearest neighbors with their similarity scores and metadata.
+ * @returns {Array<{id, similarity, metadata}>} Array of nearest neighbors with their similarity scores and metadata.
  * @throws {Error} If the query vector is not a valid array of numbers.
  */
 export function findNearestNeighbors(queryVector, k) {
@@ -104,7 +104,7 @@ export function clearStore() {
  */
 export function getMetadata(id) {
   const entry = vectorStore.get(id);
-  return entry ? entry.metadata : null;
+  return entry ? entry.metadata;
 }
 
 /**

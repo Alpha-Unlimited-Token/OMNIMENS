@@ -30,8 +30,7 @@ export function summarizeText(text, windowSize = 500, stepSize = 250) {
 
 /**
  * Summarizes a single chunk of text.
- * @private
- * @param {string} chunk - The chunk of text to summarize.
+ * @* @param {string} chunk - The chunk of text to summarize.
  * @returns {string} - A summarized version of the chunk.
  */
 function summarizeChunk(chunk) {

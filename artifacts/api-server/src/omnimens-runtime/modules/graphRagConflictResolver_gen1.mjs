@@ -13,7 +13,7 @@ export class GraphRAGConflictResolver {
   }
 
   addAgentOutput(agentId, output, confidence) {
-    // Add outputs as nodes in the knowledge graph
+    // Add outputs in the knowledge graph
     this.knowledgeGraph.set(agentId, { output, confidence });
   }
 

@@ -17,26 +17,23 @@
  */
 
 // Causal Grounding Engine – minimal core prototype
-export type Variable = string;
-export type Value = number;
-export type WorldState = Record<Variable, Value>;
 
-interface Equation {
-  inputs: Variable[];
-  func: (...args: Value[]) => Value;
-}
+
+
+
+
 
 export class CausalModel {
-  private equations: Map<Variable, Equation> = new Map();
+  equations= new Map();
 
-  addEquation(target: Variable, inputs: Variable[], func: (...args: Value[]) => Value): void {
+  addEquation(target, inputs, func: (...args) => Value) {
     this.equations.set(target, { inputs, func });
   }
 
   // do-intervention: fixes variable to given value, propagates causal effects
-  intervene(init: WorldState, intervention: WorldState): WorldState {
-    const state: WorldState = { ...init, ...intervention };
-    const pending = new Set<Variable>(this.equations.keys());
+  intervene(init, intervention) {
+    const state= { ...init, ...intervention };
+    const pending = new Set(this.equations.keys());
     let updated = true;
 
     while (updated) {

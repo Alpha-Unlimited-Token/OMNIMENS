@@ -2,13 +2,13 @@
 
 /**
  * @module memoryEmbeddingStore
- * @description Module for storing and retrieving conversation history as vector embeddings
+ * @description Module for storing and retrieving conversation history embeddings
  *              to enable long-term context reconstruction using cosine similarity.
  */
 
 /**
  * Stores embeddings and their associated metadata.
- * @type {Map<string, {embedding: number[], metadata: object}>}
+ * @type {Map<string, {embedding, metadata}>}
  */
 const embeddingStore = new Map();
 
@@ -52,7 +52,7 @@ function addEmbedding(id, embedding, metadata = {}) {
  * Retrieves the most relevant embeddings based on cosine similarity.
  * @param {number[]} queryEmbedding - The query embedding vector.
  * @param {number} topK - The number of top results to retrieve.
- * @returns {Array<{id: string, similarity: number, metadata: object}>} - The top K most relevant embeddings.
+ * @returns {Array<{id, similarity, metadata}>} - The top K most relevant embeddings.
  */
 function retrieveRelevantEmbeddings(queryEmbedding, topK = 5) {
   if (!Array.isArray(queryEmbedding) || queryEmbedding.some(isNaN)) {

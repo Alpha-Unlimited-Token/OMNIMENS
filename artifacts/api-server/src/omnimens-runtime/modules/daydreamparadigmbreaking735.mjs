@@ -17,17 +17,17 @@
  */
 
 // ResonanceNetwork.ts – self-contained, pure computation
-export type State = number; // [-1,1] preferred phase
-export interface Node { id: number; state: State; next: State }
-export type Edge = [number, number, number]; // (from,to,weight)
+ // [-1,1] preferred phase
 
-export function buildNetwork(size: number, edges: Edge[]): Node[] {
-  const nodes: Node[] = Array.from({ length: size }, (_, i) => ({
+ // (from,to,weight)
+
+export function buildNetwork(size, edges) {
+  const nodes= Array.from({ length: size }, (_, i) => ({
     id: i,
     state: Math.random() * 2 - 1,
     next: 0
   }));
-  const adjacency: { [k: number]: Edge[] } = {};
+  const adjacency: { [k]: Edge[] } = {};
   edges.forEach(e => (adjacency[e[0]] = (adjacency[e[0]] || []).concat([e])));
   // synchronous relaxation until coherence
   for (let step = 0; step < 1000; step++) {

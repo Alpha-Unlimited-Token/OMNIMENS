@@ -70,7 +70,7 @@ export function wasmMatrixMultiply(matrixA, matrixB, wasmInstance) {
 /**
  * Initialize the module and provide a utility function for matrix multiplication.
  * @param {string} wasmFilePath - The path to the WebAssembly binary file.
- * @returns {Promise<Function>} - A promise that resolves to a matrix multiplication function.
+ * @returns {Promise} - A promise that resolves to a matrix multiplication function.
  */
 export async function initializeWasmParallelCompute(wasmFilePath) {
   const wasmInstance = await loadWasmModule(wasmFilePath);

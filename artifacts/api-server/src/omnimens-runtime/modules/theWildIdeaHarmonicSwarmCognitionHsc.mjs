@@ -18,22 +18,22 @@
  */
 
 // Harmonic Swarm step – NO external deps, NO eval/new Function/child_process
-export type Osc = { f: number; phase: number; strength: number };
-export type Swarm = Osc[];
+ phase; strength};
+
 
 // Helper to wrap phase into [0,2π)
 const tau = 2 * Math.PI;
-const wrap = (x: number) => (x % tau + tau) % tau;
+const wrap = (x) => (x % tau + tau) % tau;
 
 // One simulation tick: inject goal chord ≈ target[], relax swarm
 export function stepSwarm(
-  swarm: Swarm,
-  target: number[],        // frequencies to resonate with
+  swarm,
+  target,        // frequencies to resonate with
   dt = 0.02,               // time increment
   kAttract = 0.1,          // attraction gain
   kRepel = 0.05            // repulsion (avoid exact sync -> diversity)
-): Swarm {
-  const avgPhase = (f: number) => {
+) {
+  const avgPhase = (f) => {
     const s = swarm
       .filter(o => Math.abs(o.f - f) < 1e-6)
       .reduce((a, o) => a + Math.sin(o.phase), 0);

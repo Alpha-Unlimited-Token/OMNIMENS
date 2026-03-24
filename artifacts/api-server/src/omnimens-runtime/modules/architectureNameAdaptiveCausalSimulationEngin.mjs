@@ -17,28 +17,28 @@ Adaptive Causal Simulation Engin
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-export type Var = string;
-export type Equation = (parents: Record<Var, number>) => number;
+
+
 
 export class CausalNode {
-  constructor(public name: Var, public parents: Var[], public eq: Equation) {}
-  sample(state: Record<Var, number>) {
-    const inp: Record<Var, number> = {};
+  constructor(name, parents, eq) {}
+  sample(state) {
+    const inp = {};
     this.parents.forEach(p => (inp[p] = state[p]));
     state[this.name] = this.eq(inp);
   }
 }
 
 export class CausalGraph {
-  nodes: CausalNode[] = [];
-  add(node: CausalNode) { this.nodes.push(node); }
-  roll(state: Record<Var, number>) {
+  nodes= [];
+  add(node) { this.nodes.push(node); }
+  roll(state) {
     this.nodes.forEach(n => n.sample(state));
     return { ...state };
   }
 }
 
-export function blendGraphs(gs: CausalGraph[], w: number[]): CausalGraph {
+export function blendGraphs(gs, w) {
   const g = new CausalGraph();
   gs[0].nodes.forEach((n, i) => {
     const eqs = gs.map(gx => gx.nodes[i].eq);
@@ -54,13 +54,13 @@ export function blendGraphs(gs: CausalGraph[], w: number[]): CausalGraph {
 }
 
 export function simulate(
-  graphs: CausalGraph[],
-  weights: number[][],
+  graphs,
+  weights,
   steps = 5
 ) {
   return weights.map(w => {
-    const traj: Record<Var, number>[] = [];
-    let state: Record<Var, number> = {};
+    const traj = [];
+    let state = {};
     const g = blendGraphs(graphs, w);
     for (let t = 0; t < steps; t++) {
       state = g.roll(state);

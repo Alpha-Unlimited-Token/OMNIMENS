@@ -18,14 +18,14 @@ Poly-Temporal Resonance Swarm (PTRS)
  */
 
 // 19 lines. Pure computation: phase update + interference readout
-export type Agent = { phase: number; freq: number };          // rad, Hz
+ freq};          // rad, Hz
 const TAU = Math.PI * 2;
 
 export function stepSwarm(
-  agents: Agent[],
-  dt: number,                               // seconds
-  critic: (field: number) => number         // returns scalar reward
-): Agent[] {
+  agents,
+  dt,                               // seconds
+  critic => number         // returns scalar reward
+) {
   // 1. Phase advance
   for (const a of agents) a.phase = (a.phase + TAU * a.freq * dt) % TAU;
 
@@ -46,4 +46,4 @@ export function stepSwarm(
 }
 
 // Example critic: encourage zero field (destructive interference)
-export const zeroFieldCritic = (f: number) => -Math.abs(f);
+export const zeroFieldCritic = (f) => -Math.abs(f);

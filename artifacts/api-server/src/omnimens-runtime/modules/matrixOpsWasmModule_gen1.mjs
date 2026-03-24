@@ -30,7 +30,7 @@ export async function loadWasmModule() {
  * @param {number} colsA - Number of columns in matrixA.
  * @param {number} rowsB - Number of rows in matrixB.
  * @param {number} colsB - Number of columns in matrixB.
- * @returns {Promise<Float64Array>} Resulting matrix (row-major order).
+ * @returns {Promise} Resulting matrix (row-major order).
  * @throws {Error} If matrix dimensions are incompatible for multiplication.
  */
 export async function multiplyMatrices(matrixA, matrixB, rowsA, colsA, rowsB, colsB) {

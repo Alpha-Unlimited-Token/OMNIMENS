@@ -17,16 +17,11 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-export type State = Record<string, number>;
 
-export interface Edge {
-  from: string;
-  to:   string;
-  kind: 'enables' | 'prevents' | 'amplifies' | 'diminishes';
-  weight: number;          // causal strength ∈ [0,1]
-}
 
-function applyEdge(edge: Edge, s: State): State {
+
+
+function applyEdge(edge, s) {
   const out = { ...s };
   const x = s[edge.from] ?? 0;
   const y = s[edge.to]   ?? 0;
@@ -41,10 +36,10 @@ function applyEdge(edge: Edge, s: State): State {
 }
 
 export function simulateScenario(
-  initial: State,
-  edges: Edge[],
+  initial,
+  edges,
   steps = 3
-): State {
+) {
   let current = { ...initial };
   for (let t = 0; t < steps; t++) {
     for (const e of edges) current = applyEdge(e, current);

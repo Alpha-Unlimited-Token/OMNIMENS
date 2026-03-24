@@ -25,12 +25,12 @@
  */
 // Resonance-Maze core — pure computation, no I/O or imports
 export function resonanceStep(
-  memRe: Float64Array,  // real part of memristor lattice (N complex cells)
-  memIm: Float64Array,  // imag part
-  input: Float64Array,  // current sensory frame, length N
-  mazeDelay: number[],  // per-cell phase delays (radians)
+  memRe,  // real part of memristor lattice (N complex cells)
+  memIm,  // imag part
+  input,  // current sensory frame, length N
+  mazeDelay,  // per-cell phase delays (radians)
   lr = 0.02             // complex learning rate
-): void {
+) {
   const N = memRe.length;
   for (let i = 0; i < N; i++) {
     // 1. Emit “song” phase = mem phase + sensed input

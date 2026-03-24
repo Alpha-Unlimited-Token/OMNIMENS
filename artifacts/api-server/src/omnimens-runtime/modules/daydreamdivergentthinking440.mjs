@@ -24,14 +24,14 @@
  * Translation map version: 22
  */
 // Pure functional oscillator swarm step — NO external deps
-export type Osc = { f: number; phi: number; w: number };   // frequency, phase, coupling weight
-export type Swarm = Osc[];
+ phi; w};   // frequency, phase, coupling weight
+
 
 /**
  * Advance the swarm by dt, synchronising phases via simple Kuramoto update.
  * Returns new swarm and global coherence metric (0-1).
  */
-export function stepSwarm(s: Swarm, dt = 0.05): { next: Swarm; coherence: number } {
+export function stepSwarm(s, dt = 0.05): { next; coherence} {
   const n = s.length;
   const sin = Math.sin, cos = Math.cos;
   let R_x = 0, R_y = 0;
@@ -47,5 +47,5 @@ export function stepSwarm(s: Swarm, dt = 0.05): { next: Swarm; coherence: number
     return { ...o, phi: (o.phi + dphi * dt) % (2 * Math.PI) };
   });
 
-  return { next, coherence: R };
+  return { next, coherence};
 }

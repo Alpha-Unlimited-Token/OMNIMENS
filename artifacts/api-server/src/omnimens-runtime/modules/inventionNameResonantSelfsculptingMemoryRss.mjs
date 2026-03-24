@@ -18,17 +18,16 @@ Resonant Self-Sculpting Memory (RSS
  */
 
 // Resonant Self-Sculpting Memory — pure functional core
-export type Node = {
-  v: number[];        // stored vector (idea/embedding)
-  phi: number;        // phase 0-2π
-  w: number;          // adaptive coupling strength
+        // stored vector (idea/embedding)
+  phi;        // phase 0-2π
+  w;          // adaptive coupling strength
 };
 
 const TAU = Math.PI * 2;
 const rand = (m = 1) => Math.random() * m;
 
 // cosine distance helper
-const cosSim = (a: number[], b: number[]) =>
+const cosSim = (a, b) =>
   a.reduce((s, x, i) => s + x * b[i], 0) /
   (Math.hypot(...a) * Math.hypot(...b) + 1e-9);
 
@@ -41,12 +40,12 @@ const cosSim = (a: number[], b: number[]) =>
  * @param α consonance rate, β plasticity rate
  */
 export function rssStep(
-  nodes: Node[],
-  stimulus: number[],
-  reward: number,
+  nodes,
+  stimulus,
+  reward,
   α = 0.05,
   β = 0.02
-): Node[] {
+) {
   const stimMag = Math.hypot(...stimulus) + 1e-9;
   return nodes.map((n, idx) => {
     // phase pull: Kuramoto + stimulus alignment

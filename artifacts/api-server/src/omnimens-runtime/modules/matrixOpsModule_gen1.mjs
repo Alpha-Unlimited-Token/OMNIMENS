@@ -41,12 +41,12 @@ async function compileWasmMatrixMultiplication() {
 
 /**
  * Multiplies two matrices using WebAssembly for optimal performance.
- * @param {Float32Array} matrixA - The first matrix as a 1D array.
- * @param {Float32Array} matrixB - The second matrix as a 1D array.
+ * @param {Float32Array} matrixA - The first matrix 1D array.
+ * @param {Float32Array} matrixB - The second matrix 1D array.
  * @param {number} rowsA - Number of rows in matrix A.
  * @param {number} colsA - Number of columns in matrix A (must match rowsB).
  * @param {number} colsB - Number of columns in matrix B.
- * @returns {Promise<Float32Array>} The resulting matrix as a 1D array.
+ * @returns {Promise} The resulting matrix 1D array.
  * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
  */
 export async function multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB) {
@@ -95,10 +95,10 @@ export function dotProduct(vectorA, vectorB) {
 
 /**
  * Transposes a matrix.
- * @param {Float32Array} matrix - The matrix as a 1D array.
+ * @param {Float32Array} matrix - The matrix 1D array.
  * @param {number} rows - Number of rows in the matrix.
  * @param {number} cols - Number of columns in the matrix.
- * @returns {Float32Array} The transposed matrix as a 1D array.
+ * @returns {Float32Array} The transposed matrix 1D array.
  */
 export function transposeMatrix(matrix, rows, cols) {
   const result = new Float32Array(rows * cols);

@@ -16,10 +16,10 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-export type Wave = { f: number; p: number; a: number }; // frequency, phase, amplitude
+ p; a}; // frequency, phase, amplitude
 
 // Simple cosine similarity for waves in complex plane
-function waveDot(w1: Wave, w2: Wave): number {
+function waveDot(w1, w2) {
   const re1 = w1.a * Math.cos(w1.p);
   const im1 = w1.a * Math.sin(w1.p);
   const re2 = w2.a * Math.cos(w2.p);
@@ -27,7 +27,7 @@ function waveDot(w1: Wave, w2: Wave): number {
   return re1 * re2 + im1 * im2; // inner product of phasors
 }
 
-export function resonate(query: Wave, memory: Wave[]): number {
+export function resonate(query, memory) {
   // Compute interference score: sum of dot products weighted by frequency proximity
   let bestIdx = -1;
   let bestScore = -Infinity;

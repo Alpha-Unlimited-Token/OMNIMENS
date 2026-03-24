@@ -18,17 +18,17 @@
  */
 
 // Pure TS – no I/O, no external libs
-export type Vector = number[];
+
 const TAU = Math.PI * 2;
 
 // Convert a high-dimensional vector into a harmonic “chord” (Fourier coefficients)
-export function vectorToChord(v: Vector): Vector {
+export function vectorToChord(v) {
   const norm = Math.hypot(...v) || 1;
   return v.map(x => x / norm);
 }
 
 // Measure dissonance between two chords via roughness (simplified Plomp–Levelt curve)
-export function dissonance(a: Vector, b: Vector): number {
+export function dissonance(a, b) {
   let d = 0;
   for (let i = 0; i < a.length; i++) {
     const diff = Math.abs(a[i] - b[i]);
@@ -39,7 +39,7 @@ export function dissonance(a: Vector, b: Vector): number {
 }
 
 // One learning step: each agent moves its chord a tiny step toward consonance with neighbours
-export function harmonise(self: Vector, neighbours: Vector[], lr = 0.05): Vector {
+export function harmonise(self, neighbours, lr = 0.05) {
   if (neighbours.length === 0) return self;
   const avg = new Array(self.length).fill(0);
   neighbours.forEach(n => n.forEach((v, i) => (avg[i] += v)));

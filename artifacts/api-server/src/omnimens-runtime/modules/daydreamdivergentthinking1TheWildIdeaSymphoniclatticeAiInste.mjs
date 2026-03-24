@@ -19,12 +19,12 @@ Instead of
  */
 
 // Symphonic-Lattice core — no IO, no external deps
-export type Gene     = Uint8Array;          // ≤32 bytes, encodes tiny WASM
-export type NoteMeta = { pitch: number; key: number };
-export interface Note { gene: Gene; meta: NoteMeta }
+          // ≤32 bytes, encodes tiny WASM
+ key};
 
-export function resonanceStep(notes: Note[]): Note[] {
-  const next: Note[] = [];
+
+export function resonanceStep(notes) {
+  const next= [];
   for (let i = 0; i < notes.length; i++) {
     for (let j = i + 1; j < notes.length; j++) {
       const a = notes[i], b = notes[j];

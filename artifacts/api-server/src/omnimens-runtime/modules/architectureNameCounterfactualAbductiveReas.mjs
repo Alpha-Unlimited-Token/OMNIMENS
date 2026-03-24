@@ -18,22 +18,18 @@
  */
 
 // CARE — minimal structural–causal core
-export type Var = string;
-type Func = (parents: number[]) => number;
 
-interface Node {
-  name: Var;
-  parents: Var[];
-  fn: Func;           // structural equation
-}
+
+
+
 
 export class SCM {
-  private nodes: Record<Var, Node> = {};
-  addNode(node: Node) { this.nodes[node.name] = node; }
+  nodes= {};
+  addNode(node) { this.nodes[node.name] = node; }
 
   // Evaluate graph with optional interventions {X: value}
-  evaluate(givens: Record<Var, number> = {}): Record<Var, number> {
-    const values: Record<Var, number> = { ...givens };
+  evaluate(givens = {}) {
+    const values = { ...givens };
     const unresolved = new Set(Object.keys(this.nodes));
 
     // Simple forward–chaining until all nodes are resolved
@@ -51,7 +47,7 @@ export class SCM {
   }
 
   // Return a new SCM with an intervention do(X = val)
-  intervene(target: Var, val: number): SCM {
+  intervene(target, val) {
     const clone = new SCM();
     Object.values(this.nodes).forEach(n => {
       clone.addNode({

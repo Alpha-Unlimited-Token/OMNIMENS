@@ -14,7 +14,7 @@ import crypto from "crypto";
 /**
  * Connects to a PostgreSQL database.
  * @param {string} connectionString - PostgreSQL connection string.
- * @returns {Promise<Client>} A connected PostgreSQL client instance.
+ * @returns {Promise} A connected PostgreSQL client instance.
  */
 export async function connectToDatabase(connectionString) {
   const client = new Client({ connectionString });

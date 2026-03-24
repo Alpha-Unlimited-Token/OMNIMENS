@@ -20,26 +20,22 @@
  */
 
 // Causal Dream Weaver – minimal Structural Causal Model core
-export type NodeId = string;
 
-export interface NodeSpec {
-  id: NodeId;
-  parents: NodeId[];
-  func: (p: Record<NodeId, number>) => number; // structural equation
-}
+
+
 
 export class SCM {
-  private nodes: Record<NodeId, NodeSpec> = {};
+  nodes= {};
 
-  addNode(n: NodeSpec) { this.nodes[n.id] = n; }
+  addNode(n) { this.nodes[n.id] = n; }
 
   // Evaluate all nodes given optional forced interventions (do-operator)
-  evaluate(intervene: Partial<Record<NodeId, number>> = {}): Record<NodeId, number> {
-    const memo: Record<NodeId, number> = { ...intervene };
-    const visit = (id: NodeId): number => {
+  evaluate(intervene> = {}) {
+    const memo = { ...intervene };
+    const visit = (id) => {
       if (memo[id] !== undefined) return memo[id];
       const n = this.nodes[id];
-      const parentVals: Record<NodeId, number> = {};
+      const parentVals = {};
       for (const p of n.parents) parentVals[p] = visit(p);
       memo[id] = n.func(parentVals);
       return memo[id];
@@ -49,7 +45,7 @@ export class SCM {
   }
 
   // Counterfactual query: change X, observe ΔY
-  counterfactual(x: NodeId, xVal: number, y: NodeId): number {
+  counterfactual(x, xVal, y) {
     const base = this.evaluate()[y];
     const changed = this.evaluate({ [x]: xVal })[y];
     return changed - base;

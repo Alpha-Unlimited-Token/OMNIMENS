@@ -17,15 +17,15 @@
  */
 
 // Temporal Synaptic Weave — self-rewiring predictive memory
-export function createTSW<T>() {
-  type Edge = { to: string; w: number };
-  const data = new Map<string, T>();
-  const graph = new Map<string, Edge[]>();     // dynamic synapses
-  let lastKey: string | null = null;           // previous access
+export function createTSW() {
+  type Edge = { to; w};
+  const data = new Map();
+  const graph = new Map();     // dynamic synapses
+  let lastKey| null = null;           // previous access
   const α = 0.3;                               // reinforcement rate
   const β = 0.97;                              // decay per tick
 
-  function strengthen(from: string, to: string) {
+  function strengthen(from, to) {
     const edges = graph.get(from) || [];
     let edge = edges.find(e => e.to === to);
     if (!edge) { edge = { to, w: 0 }; edges.push(edge); graph.set(from, edges); }
@@ -41,18 +41,18 @@ export function createTSW<T>() {
   }
 
   return {
-    put(key: string, value: T) {
+    put(key, value) {
       data.set(key, value);
       if (lastKey) strengthen(lastKey, key);
       lastKey = key;
     },
-    get(key: string): T | undefined {
+    get(key): T | undefined {
       const val = data.get(key);
       if (lastKey) strengthen(lastKey, key);
       lastKey = key;
       return val;
     },
-    predictNext(from: string, k = 3): string[] {
+    predictNext(from, k = 3) {
       const edges = graph.get(from) || [];
       return edges
         .sort((a, b) => b.w - a.w)

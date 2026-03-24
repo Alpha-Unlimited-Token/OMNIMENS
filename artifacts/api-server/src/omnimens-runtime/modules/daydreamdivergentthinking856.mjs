@@ -25,17 +25,17 @@
  */
 // Pure, dependency-free resonant update step
 export function sonicValenceStep(
-  state: number[],            // phases of N oscillators  [0, 2π)
-  inputSpectrum: number[]     // same length, magnitude of input frequencies
-): number[] {
+  state,            // phases of N oscillators  [0, 2π)
+  inputSpectrum     // same length, magnitude of input frequencies
+) {
   const N = state.length;
-  const next: number[] = new Array(N);
+  const next= new Array(N);
   const kCouple = 0.02;       // coupling strength
   const kInput  = 0.05;       // attraction to input phase (=0)
   const twoPi   = 2 * Math.PI;
 
   // helper: wrap angle into [0,2π)
-  const norm = (x:number) => (x % twoPi + twoPi) % twoPi;
+  const norm = (x) => (x % twoPi + twoPi) % twoPi;
 
   // 1. compute global field (mean phase) weighted by magnitude
   let s = 0, c = 0, magSum = 0;

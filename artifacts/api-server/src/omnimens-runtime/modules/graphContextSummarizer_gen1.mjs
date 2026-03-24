@@ -36,7 +36,7 @@ export function computeSemanticSimilarity(tokensA, tokensB) {
 
 /**
  * Constructs a semantic graph from token sequences.
- * @param {Array<{ id: string, tokens: string[] }>} contexts - Array of contexts with unique IDs and token sequences.
+ * @param {Array<{ id, tokens }>} contexts - Array of contexts with unique IDs and token sequences.
  * @returns {Object} - Graph representation (nodes and edges).
  */
 export function constructSemanticGraph(contexts) {
@@ -95,7 +95,7 @@ export function clusterGraph(graph) {
  * Compresses clusters into summary nodes.
  * @param {Array<Array<string>>} clusters - Clusters of node IDs.
  * @param {Object} graph - Original graph representation.
- * @returns {Array<{ id: string, summary: string }>} - Summary nodes.
+ * @returns {Array<{ id, summary}>} - Summary nodes.
  */
 export function compressClusters(clusters, graph) {
   const summaries = [];
@@ -117,8 +117,8 @@ export function compressClusters(clusters, graph) {
 
 /**
  * Main function to summarize large contexts using graph-based hierarchical summarization.
- * @param {Array<{ id: string, tokens: string[] }>} contexts - Array of contexts with unique IDs and token sequences.
- * @returns {Array<{ id: string, summary: string }>} - Summarized nodes.
+ * @param {Array<{ id, tokens }>} contexts - Array of contexts with unique IDs and token sequences.
+ * @returns {Array<{ id, summary}>} - Summarized nodes.
  */
 export function summarizeContexts(contexts) {
   const graph = constructSemanticGraph(contexts);

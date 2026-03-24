@@ -17,12 +17,12 @@
  */
 
 // CARE core – pure computation, no side-effects
-export type Graph = { [v: string]: string[] };          // adjacency list: parents of v
-export type SEM   = { [v: string]: (pa: number[]) => number };
+          // adjacency list: parents of v
 
-export function topologicalSort(g: Graph): string[] {
-  const visited = new Set<string>(), order: string[] = [];
-  function dfs(v: string) {
+
+export function topologicalSort(g) {
+  const visited = new Set(), order= [];
+  function dfs(v) {
     if (visited.has(v)) return;
     visited.add(v);
     (g[v] || []).forEach(dfs);
@@ -33,12 +33,12 @@ export function topologicalSort(g: Graph): string[] {
 }
 
 export function simulate(
-  g: Graph,
-  sem: SEM,
-  exogenous: { [v: string]: number },
-  intervention: Partial<{ [v: string]: number }> = {}
-): { [v: string]: number } {
-  const value: { [v: string]: number } = { ...exogenous, ...intervention };
+  g,
+  sem,
+  exogenous: { [v]: number },
+  intervention = {}
+): { [v]: number } {
+  const value: { [v]: number } = { ...exogenous, ...intervention };
   for (const v of topologicalSort(g)) {
     if (v in intervention) continue;                    // do( ) cuts incoming edges
     const parents = (g[v] || []).map(p => value[p]);
@@ -49,7 +49,7 @@ export function simulate(
 
 // tiny demo graph: X→Y→Z
 const g = { Y: ["X"], Z: ["Y"] };
-const sem: SEM = {
+const sem= {
   Y: ([x]) => 2 * x + 1,
   Z: ([y]) => y * y
 };

@@ -11,7 +11,7 @@ const sqlite3 = { verbose: () => ({ Database: class { constructor(){} run(){} ge
 
 /**
  * Initialize an in-memory SQLite database for storing embeddings.
- * @returns {Promise<Object>} A database instance with the embeddings table set up.
+ * @returns {Promise} A database instance with the embeddings table set up.
  */
 export async function initializeDatabase() {
   const db = await open({

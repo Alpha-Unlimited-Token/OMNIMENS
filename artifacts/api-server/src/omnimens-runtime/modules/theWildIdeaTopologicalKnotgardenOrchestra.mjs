@@ -16,17 +16,17 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Knot type: braid word encoded as int array; lower numbers = simpler crossings
-type Knot = number[];
+// Knot type: braid word encoded array; lower numbers = simpler crossings
+
 
 // Agent state: its braid, curiosity level & role
-interface Agent { braid: Knot; curiosity: number; conductor: boolean; }
 
-function braidEnergy(braid: Knot): number {
+
+function braidEnergy(braid) {
   return braid.reduce((e, c, i) => e + Math.abs(c) / (i + 1), 0);
 }
 
-function mutate(braid: Knot): Knot {
+function mutate(braid) {
   const idx = Math.floor(Math.random() * braid.length);
   const delta = Math.random() < 0.5 ? -1 : 1;
   const nb = [...braid];
@@ -34,7 +34,7 @@ function mutate(braid: Knot): Knot {
   return nb;
 }
 
-export function orchestraStep(pop: Agent[]): Agent[] {
+export function orchestraStep(pop) {
   const globalEnergy = pop.reduce((s, a) => s + braidEnergy(a.braid), 0);
   return pop.map(a => {
     const newBraid = mutate(a.braid);

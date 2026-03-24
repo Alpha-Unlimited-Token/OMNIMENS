@@ -19,14 +19,14 @@
 // Polyphonic Swarm – D5P4 core
 // Pure, side-effect-free, no I/O, no dynamic code generation.
 
-export function d5p4Sample<T>(
-  items: T[],                       // candidate thoughts/world-states
-  distance: (a: T, b: T) => number, // domain-specific dissimilarity
-  k: number                         // how many diverse items to keep
-): T[] {
+export function d5p4Sample(
+  items,                       // candidate thoughts/world-states
+  distance: (a, b) => number, // domain-specific dissimilarity
+  k// how many diverse items to keep
+) {
   if (k <= 0 || items.length === 0) return [];
   // 1. Start with a random item to seed diversity.
-  const selected: T[] = [items[Math.floor(Math.random() * items.length)]];
+  const selected= [items[Math.floor(Math.random() * items.length)]];
   // 2. Greedily add the item that maximizes min-distance to current set.
   while (selected.length < Math.min(k, items.length)) {
     let bestItem: T | null = null;

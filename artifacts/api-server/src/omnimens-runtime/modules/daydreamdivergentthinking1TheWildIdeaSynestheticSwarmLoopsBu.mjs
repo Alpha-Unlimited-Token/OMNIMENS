@@ -18,19 +18,19 @@
  */
 
 // Pure, self-contained demo of one loop-step cross-modal update
-export type Vec = number[];
-export type Modality = (v: Vec) => Vec;          // encoder-decoder pair
-export type Agent = { encode: Modality, decode: Modality, state: Vec };
+
+          // encoder-decoder pair
+
 
 export function loopStep(
-  agents: Agent[],                             // swarm ring
-  translation: (a: Vec, b: Vec) => number      // surprisal metric
-): number {
+  agents,                             // swarm ring
+  translation: (a, b) => number      // surprisal metric
+) {
   const n = agents.length;
   let totalLoss = 0;
 
   // Each agent predicts the PRIOR agent's *future* state = decode(next.state)
-  const futureStates: Vec[] = agents.map((ag, i) =>
+  const futureStates= agents.map((ag, i) =>
     ag.decode(agents[(i + 1) % n].state)
   );
 

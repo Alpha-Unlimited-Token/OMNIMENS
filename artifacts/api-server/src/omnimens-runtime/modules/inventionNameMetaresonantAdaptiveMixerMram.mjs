@@ -18,18 +18,12 @@ Meta-Resonant Adaptive Mixer (MRAM)
  */
 
 /* Meta-Resonant Adaptive Mixer — pure TypeScript, no IO, no eval */
-export type Strategy<I, O> = (input: I) => O
-export type Distance<O> = (a: O, b: O) => number
-
-export function createMRAM<I, O>(
-  strategies: Strategy<I, O>[],
-  combine: (weighted: {out: O; w: number}[]) => O,
-  dist: Distance<O>
-) {
+ w}[]) => O,
+  dist) {
   // start with equal resonance (1)
   const w = Array(strategies.length).fill(1)
 
-  function mix(input: I): O {
+  function mix(input) {
     const outs = strategies.map(s => s(input))
     const weighted = outs.map((out, i) => ({ out, w: w[i] }))
     const final = combine(weighted)

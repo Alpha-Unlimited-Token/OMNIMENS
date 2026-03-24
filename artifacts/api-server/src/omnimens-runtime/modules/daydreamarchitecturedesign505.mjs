@@ -17,10 +17,9 @@
  */
 
 // Pure functional core for one relaxation tick of the QMCF
-export type ConceptGraph = {
-  nodes: Float32Array;         // concepton amplitudes
-  edges: Uint32Array;          // flattened adjacency list: [from, to, weightIndex]
-  weights: Float32Array;       // memristor conductances
+         // concepton amplitudes
+  edges;          // flattened adjacency list: [from, to, weightIndex]
+  weights;       // memristor conductances
 };
 
 /**
@@ -28,9 +27,9 @@ export type ConceptGraph = {
  * gpuAcceleratedMatrixOps.simulate(mat, vec) is assumed to exist in OMNIMENS.
  */
 export function relaxConceptField(
-  g: ConceptGraph,
+  g,
   damping = 0.15
-): Float32Array {
+) {
   const next = new Float32Array(g.nodes.length);
   // naive O(E) pass; in hardware this is massively parallel
   for (let i = 0; i < g.edges.length; i += 3) {

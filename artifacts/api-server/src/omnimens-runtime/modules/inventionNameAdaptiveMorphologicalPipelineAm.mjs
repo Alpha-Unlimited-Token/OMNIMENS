@@ -18,17 +18,17 @@ Adaptive Morphological Pipeline (AM
  */
 
 // Adaptive Morphological Pipeline — self-rewiring pure function
-type T = (x: number) => number;
 
-export function spawnAMP(seed: T = x => x): (x: number, target?: number) => number {
+
+export function spawnAMP(seed= x => x): (x, target?: number) => number {
   // internal immutable list of transforms; captured by closure
-  let pipeline: T[] = [seed];
+  let pipeline= [seed];
 
   // error-driven micro-transform constructor (simple causal reasoning)
-  const corrector = (err: number): T => (v: number) => v + 0.2 * err;
+  const corrector = (err) => (v) => v + 0.2 * err;
 
   // the adaptive callable itself
-  const amp = (input: number, target?: number): number => {
+  const amp = (input, target?: number) => {
     // forward pass through current pipeline
     const out = pipeline.reduce((v, f) => f(v), input);
 
@@ -41,6 +41,6 @@ export function spawnAMP(seed: T = x => x): (x: number, target?: number) => numb
   };
 
   // expose lightweight introspection without mutation routes
-  (amp as any).meta = () => ({ depth: pipeline.length });
+  (amp).meta = () => ({ depth: pipeline.length });
   return amp;
 }

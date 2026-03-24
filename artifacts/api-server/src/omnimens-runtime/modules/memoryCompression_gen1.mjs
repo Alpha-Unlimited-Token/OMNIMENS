@@ -73,7 +73,7 @@ export function encodeToVector(input) {
  * Compresses conversational memory by summarizing and encoding it into a compact representation.
  * @param {string[]} context - Array of strings representing the conversational history.
  * @param {number} maxSummaryLength - Maximum length of the summarized output.
- * @returns {{summary: string, vector: number[]}} An object containing the summarized string and its dense vector representation.
+ * @returns {{summary, vector}} An object containing the summarized string and its dense vector representation.
  */
 export function compressMemory(context, maxSummaryLength = 256) {
   const summary = summarizeContext(context, maxSummaryLength);

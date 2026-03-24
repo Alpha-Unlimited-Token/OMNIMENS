@@ -18,9 +18,9 @@
 
 // Symphonic Attractor Core — pure in-memory, no I/O side-effects
 export function nextSymphonicState(
-  score: number[][],          // tracks × notes (amplitudes)
-  inputPhrase: number[],      // encoded new token/feature (note vector)
-  feedbackEQ: number[],       // human spectral reinforcement (|notes|)
+  score,          // tracks × notes (amplitudes)
+  inputPhrase,      // encoded new token/feature (note vector)
+  feedbackEQ,       // human spectral reinforcement (|notes|)
   learningRate = 0.01
 ): number[][] {
   const tracks = score.length;
@@ -38,7 +38,7 @@ export function nextSymphonicState(
       // energy update: move amplitude toward majority phase agreement
       const influence = topIdx.reduce((sum,j)=>sum+Math.sign(score[j][n]),0);
       newScore[i][n] = Math.tanh(score[i][n] + influence + inputPhrase[n]);
-      // 3) Apply human feedback as spectral EQ
+      // 3) Apply human feedback EQ
       newScore[i][n] += learningRate * feedbackEQ[n];
     }
   }

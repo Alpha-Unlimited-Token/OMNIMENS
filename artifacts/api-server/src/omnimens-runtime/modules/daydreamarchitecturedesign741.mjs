@@ -16,29 +16,25 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-type Func = (parents: number[]) => number;
 
-interface Node {
-  name: string;
-  parents: string[];
-  func: Func;          // causal mechanism g_i
-}
+
+
 
 export class SCM {
-  private nodes: Record<string, Node> = {};
-  private values: Record<string, number> = {};
+  nodes = {};
+  values = {};
 
-  addNode(node: Node) {
+  addNode(node) {
     this.nodes[node.name] = node;
   }
 
-  observe(varName: string, value: number) {
+  observe(varName, value) {
     this.values[varName] = value;
   }
 
-  private topological(): string[] {
-    const visited = new Set<string>(), order: string[] = [];
-    const visit = (n: string) => {
+  topological() {
+    const visited = new Set(), order= [];
+    const visit = (n) => {
       if (!visited.has(n)) {
         visited.add(n);
         for (const p of this.nodes[n].parents) visit(p);
@@ -49,13 +45,13 @@ export class SCM {
     return order;
   }
 
-  private forward() {
+  forward() {
     for (const n of this.topological())
       if (!(n in this.values))
         this.values[n] = this.nodes[n].func(this.nodes[n].parents.map(p => this.values[p]));
   }
 
-  query(target: string, intervention?: { varName: string; value: number }): number {
+  query(target, intervention?: { varName; value}) {
     const backup = { ...this.values };
     if (intervention) this.values[intervention.varName] = intervention.value;
     this.forward();

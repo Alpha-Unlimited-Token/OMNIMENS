@@ -20,21 +20,21 @@
       No I/O, no dynamic code generation, pure computation.           */
 
    export function simulateResonanceNet(
-       n: number = 12,           // number of oscillators
-       K: number = 1.2,          // global coupling strength
-       steps: number = 200,      // simulation steps
-       dt: number = 0.05         // timestep
+       n= 12,           // number of oscillators
+       K= 1.2,          // global coupling strength
+       steps= 200,      // simulation steps
+       dt= 0.05         // timestep
    ): number[][] {
        // Initial random phases 0..2π
-       let phases: number[] = Array.from({ length: n }, () => Math.random() * 2 * Math.PI);
-       const history: number[][] = [];
+       let phases= Array.from({ length: n }, () => Math.random() * 2 * Math.PI);
+       const history= [];
 
        // Natural frequencies (could encode “genetic” priors)
-       const omega: number[] = Array.from({ length: n }, () => 0.5 + Math.random() * 0.5);
+       const omega= Array.from({ length: n }, () => 0.5 + Math.random() * 0.5);
 
        for (let t = 0; t < steps; t++) {
            history.push([...phases]);                        // store current snapshot
-           const next: number[] = [];
+           const next= [];
 
            for (let i = 0; i < n; i++) {
                // Kuramoto coupling: sum of sine of phase differences

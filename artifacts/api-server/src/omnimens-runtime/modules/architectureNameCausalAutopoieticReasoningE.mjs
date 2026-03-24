@@ -18,19 +18,19 @@ Causal Autopoietic Reasoning & E
  */
 
 // CAREN core – tiny pure-JS SCM with do-intervention
-export type Edge = [string, string];          // [parent, child]
-export type CPT  = Record<string, number>;    // "parentValues->child=1": P
-export interface SCM { nodes: Set<string>; edges: Edge[]; cpt: CPT; }
+          // [parent, child]
+    // "parentValues->child=1": P
 
-function parents(node: string, edges: Edge[]): string[] {
+
+function parents(node, edges) {
   return edges.filter(e => e[1] === node).map(e => e[0]);
 }
 
 // Enumerate all parent value assignments (binary vars assumed)
-function* combos(vars: string[]): Generator<Record<string, number>> {
+function* combos(vars) {
   const n = vars.length;
   for (let mask = 0; mask < 1 << n; mask++) {
-    const assign: Record<string, number> = {};
+    const assign = {};
     vars.forEach((v, i) => assign[v] = (mask >> i) & 1);
     yield assign;
   }
@@ -38,8 +38,8 @@ function* combos(vars: string[]): Generator<Record<string, number>> {
 
 // P(target=1 | do(interveneVar=ival))
 export function predictIntervention(
-  m: SCM, target: string, interveneVar: string, ival: 0 | 1
-): number {
+  m, target, interveneVar, ival: 0 | 1
+) {
   const pa = parents(target, m.edges);
   let sum = 0, norm = 0;
   for (const assign of combos(Array.from(m.nodes))) {

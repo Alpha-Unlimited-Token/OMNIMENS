@@ -20,29 +20,18 @@ Causo-Semantic Fabric (CSF)
  */
 
 // ---------- Causo-Semantic Fabric core skeleton ----------
-export type NodeId = string;
-export type Relation = string;
 
-export interface Triple {
-  cause: NodeId;
-  relation: Relation;
-  effect: NodeId;
-  confidence: number;
-  time: number; // epoch ms
-}
 
-export interface Edge {
-  to: NodeId;
-  relation: Relation;
-  confidence: number;
-  time: number;
-}
+
+
+
+
 
 export class CausalGraph {
-  private edges: Map<NodeId, Edge[]> = new Map();
+  edges = new Map();
 
   // ingest one semantic triple
-  add(t: Triple) {
+  add(t) {
     const list = this.edges.get(t.cause) ?? [];
     list.push({
       to: t.effect,
@@ -54,10 +43,10 @@ export class CausalGraph {
   }
 
   // simple counterfactual: remove node n and propagate
-  counterfactual(n: NodeId, depth = 2, visited: Set<NodeId> = new Set()): NodeId[] {
+  counterfactual(n, depth = 2, visited= new Set()) {
     if (depth === 0 || visited.has(n)) return [];
     visited.add(n);
-    const affected: NodeId[] = [];
+    const affected= [];
     for (const [src, outs] of this.edges) {
       outs.forEach(e => {
         if (e.to === n && e.confidence > 0.5) {

@@ -45,7 +45,7 @@ export class InMemoryCache {
     if (!this.cache.has(key)) {
       return undefined;
     }
-    // Move the accessed key to the end to mark it as recently used
+    // Move the accessed key to the end to mark it used
     const value = this.cache.get(key);
     this.cache.delete(key);
     this.cache.set(key, value);

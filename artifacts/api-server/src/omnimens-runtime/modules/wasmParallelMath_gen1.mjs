@@ -37,7 +37,7 @@
  * Multiplies two matrices using a parallelized WebAssembly approach.
  * @param {Matrix} matrixA - First matrix.
  * @param {Matrix} matrixB - Second matrix.
- * @returns {Promise<Matrix>} Resultant matrix after multiplication.
+ * @returns {Promise} Resultant matrix after multiplication.
  * @throws {Error} If matrices cannot be multiplied (dimension mismatch).
  */
 export async function multiplyMatrices(matrixA, matrixB) {
@@ -77,7 +77,7 @@ export async function multiplyMatrices(matrixA, matrixB) {
 /**
  * Computes the eigenvalues and eigenvectors of a square matrix using WebAssembly.
  * @param {Matrix} matrix - Input square matrix.
- * @returns {Promise<{ eigenvalues: Vector, eigenvectors: Matrix }>} Eigenvalues and eigenvectors.
+ * @returns {Promise<{ eigenvalues, eigenvectors}>} Eigenvalues and eigenvectors.
  * @throws {Error} If the matrix is not square.
  */
 export async function computeEigen(matrix) {
@@ -108,7 +108,7 @@ export async function computeEigen(matrix) {
     eigenvectorMatrix.push(Array.from(eigenvectors.slice(i * size, (i + 1) * size)));
   }
 
-  return { eigenvalues: { data: Array.from(eigenvalues) }, eigenvectors: { data: eigenvectorMatrix } };
+  return { eigenvalues: { data: Array.from(eigenvalues) }, eigenvectors };
 }
 
 /**

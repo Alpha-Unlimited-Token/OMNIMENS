@@ -64,16 +64,16 @@ function getStorePath(namespace) {
 
 function loadStore(namespace) {
   const path = getStorePath(namespace);
-  if (!existsSync(path)) return { version: SCHEMA_VERSION, entries: {} };
+  if (!existsSync(path)) return { version, entries: {} };
   try {
     const raw = readFileSync(path, "utf8");
     const store = JSON.parse(raw);
     if (store.version !== SCHEMA_VERSION) {
-      return { version: SCHEMA_VERSION, entries: {} };
+      return { version, entries: {} };
     }
     return store;
   } catch {
-    return { version: SCHEMA_VERSION, entries: {} };
+    return { version, entries: {} };
   }
 }
 

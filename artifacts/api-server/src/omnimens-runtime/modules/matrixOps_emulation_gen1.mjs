@@ -18,7 +18,7 @@
 
 /**
  * @module matrixOps_emulation
- * @description Provides basic matrix operations such as multiplication, addition, transpose, and identity matrix generation.
+ * @description Provides basic matrix operations such, addition, transpose, and identity matrix generation.
  * @author OMNIMENS
  */
 

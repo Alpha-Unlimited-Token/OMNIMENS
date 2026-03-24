@@ -17,26 +17,26 @@
  */
 
 // --- VectorSearchMemory.ts -----------------------------------------------
-import * as tf from '@tensorflow/tfjs';
+import * from '@tensorflow/tfjs';
 
-type Vec = number[];
-type MemItem = { id: string; vec: Vec; payload: any };
+
+ vec; payload};
 
 export class VectorSearchMemory {
-  private store: MemItem[] = [];
-  constructor(private similarityThreshold = 0.85, private topK = 5) {}
+  store= [];
+  constructor(similarityThreshold = 0.85, topK = 5) {}
 
-  add(item: MemItem) { this.store.push(item); }
+  add(item) { this.store.push(item); }
 
   /** cosine similarity */
-  private sim(a: Vec, b: Vec): number {
+  sim(a, b) {
     const ta = tf.tensor1d(a), tb = tf.tensor1d(b);
     const score = tf.losses.cosineDistance(ta, tb, 0).dataSync()[0];
     return 1 - score;                    // distance → similarity
   }
 
   /** retrieve nearest neighbours above threshold */
-  query(vec: Vec): MemItem[] {
+  query(vec) {
     const scored = this.store
       .map(m => ({ m, s: this.sim(vec, m.vec) }))
       .filter(r => r.s >= this.similarityThreshold)
@@ -46,7 +46,7 @@ export class VectorSearchMemory {
   }
 
   /** simple self-write hook: returns code string proposing a patch */
-  proposePatch(context: string): string {
+  proposePatch(context) {
     return `// AUTOGEN PATCH\n` +
            `// Context: ${context}\n` +
            `// TODO: improve similarityThreshold via reinforcement stats`;

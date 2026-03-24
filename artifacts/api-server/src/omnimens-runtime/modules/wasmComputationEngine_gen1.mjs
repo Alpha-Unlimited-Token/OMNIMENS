@@ -24,7 +24,7 @@ import { join } from 'path';
 /**
  * Loads a WebAssembly module from a specified file path.
  * @param {string} filePath - Path to the WebAssembly binary file (.wasm).
- * @returns {Promise<WasmModule>} - The loaded WebAssembly module and instance.
+ * @returns {Promise} - The loaded WebAssembly module and instance.
  * @throws {Error} - Throws if the file cannot be read or the WebAssembly module cannot be instantiated.
  */
 export async function loadWasmModule(filePath) {

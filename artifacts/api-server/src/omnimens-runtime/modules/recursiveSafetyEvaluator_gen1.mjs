@@ -8,21 +8,21 @@
  */
 
 export const recursiveSafetyEvaluator = {
-  runAdversarialSimulations: (modification) => {
+  runAdversarialSimulations => {
     const simulatedFailures = [
       { type: 'security', likelihood: 0.4 },
       { type: 'performance', likelihood: 0.2 }
     ];
     return simulatedFailures.filter(failure => failure.likelihood > 0.3);
   },
-  counterfactualAnalysis: (modification) => {
+  counterfactualAnalysis => {
     const counterfactualScenarios = [
       { scenario: 'unexpected input', risk: 0.5 },
       { scenario: 'resource exhaustion', risk: 0.7 }
     ];
     return counterfactualScenarios;
   },
-  evaluate: (modification) => {
+  evaluate => {
     const adversarialResults = recursiveSafetyEvaluator.runAdversarialSimulations(modification);
     const counterfactualResults = recursiveSafetyEvaluator.counterfactualAnalysis(modification);
     return { adversarialResults, counterfactualResults };

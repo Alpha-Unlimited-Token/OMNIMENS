@@ -18,11 +18,11 @@
 
 // Pure Kuramoto micro-kernel for  N  conceptual oscillators
 export function phaseLatticeStep(
-  phases: Float64Array,          // θ_i
-  naturalFreq: Float64Array,     // ω_i
-  K: number,                     // global coupling strength
-  dt: number                     // timestep
-): Float64Array {
+  phases,          // θ_i
+  naturalFreq,     // ω_i
+  K,                     // global coupling strength
+  dt// timestep
+) {
   const N = phases.length;
   const newPhases = new Float64Array(N);
   for (let i = 0; i < N; i++) {
@@ -36,12 +36,11 @@ export function phaseLatticeStep(
   return newPhases;
 }
 
-// Example usage: inject data as tiny phase nudges
+// Example usage: inject data phase nudges
 export function injectStimulus(
-  phases: Float64Array,
-  indices: number[],
-  nudges: number[]
-): Float64Array {
+  phases,
+  indices,
+  nudges) {
   const out = phases.slice();
   for (let k = 0; k < indices.length; k++) {
     out[indices[k]] = (out[indices[k]] + nudges[k]) % (2 * Math.PI);

@@ -14,7 +14,7 @@ export class ResourceManager {
   }
 
   monitorMetrics() {
-    // Example: CPU, memory, task priority
+    // Example, memory, task priority
     this.metrics = {
       cpuUsage: process.cpuUsage(),
       memoryUsage: process.memoryUsage(),

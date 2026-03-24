@@ -27,7 +27,7 @@ export async function loadWasmModule(wasmFilePath) {
  * @param {number} m - Number of rows in matrixA.
  * @param {number} n - Number of columns in matrixA and rows in matrixB.
  * @param {number} p - Number of columns in matrixB.
- * @returns {Promise<Float64Array>} - The resulting matrix (m x p).
+ * @returns {Promise} - The resulting matrix (m x p).
  * @throws {Error} If matrix dimensions are incompatible.
  */
 export async function wasmMatrixMultiply(matrixA, matrixB, m, n, p) {
@@ -62,7 +62,7 @@ export async function wasmMatrixMultiply(matrixA, matrixB, m, n, p) {
  * @param {Float64Array} matrix - The matrix to transpose (m x n).
  * @param {number} m - Number of rows in the matrix.
  * @param {number} n - Number of columns in the matrix.
- * @returns {Promise<Float64Array>} - The transposed matrix (n x m).
+ * @returns {Promise} - The transposed matrix (n x m).
  */
 export async function wasmMatrixTranspose(matrix, m, n) {
   if (matrix.length !== m * n) {

@@ -30,8 +30,7 @@ export class WeightedConfidenceVoting {
     }, { sumWeightedValues: 0, totalWeight: 0 });
 
     return refinedDecision.totalWeight > 0
-      ? refinedDecision.sumWeightedValues / refinedDecision.totalWeight
-      : null;
+      ? refinedDecision.sumWeightedValues / refinedDecision.totalWeight;
   }
 }
 

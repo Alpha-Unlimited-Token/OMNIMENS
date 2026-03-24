@@ -17,23 +17,16 @@
  */
 
 // CXS core – minimal deterministic graph simulator
-export type Node = string;
-export type State = Record<Node, number>;
 
-export interface Rule {
-  /** pattern to match; undefined = wildcard */
-  pre: Partial<State>;
-  /** additive delta applied when rule fires */
-  post: Partial<State>;
-  /** causal weight (confidence) */
-  weight: number;
-}
 
-const match = (s: State, pre: Partial<State>): boolean =>
+
+
+
+const match = (s, pre) =>
   Object.keys(pre).every(k => s[k] === pre[k]);
 
-const apply = (s: State, post: Partial<State>): State => {
-  const next: State = { ...s };
+const apply = (s, post) => {
+  const next= { ...s };
   for (const k in post) next[k] = (next[k] ?? 0) + post[k]!;
   return next;
 };
@@ -42,12 +35,12 @@ const apply = (s: State, post: Partial<State>): State => {
  * Executes rules for a fixed horizon, returning trajectory.
  */
 export function simulate(
-  init: State,
-  rules: Rule[],
+  init,
+  rules,
   steps = 5,
-  intervention: Partial<State> = {}
-): State[] {
-  const trace: State[] = [{ ...init, ...intervention }];
+  intervention= {}
+) {
+  const trace= [{ ...init, ...intervention }];
   for (let t = 0; t < steps; t++) {
     let current = trace[t];
     for (const r of rules) {

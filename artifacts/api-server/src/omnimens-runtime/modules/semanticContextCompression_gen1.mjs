@@ -119,7 +119,7 @@ function summarizeClusters(clusters) {
   return clusters.map(cluster => {
     const allTokens = cluster.flat();
     const uniqueTokens = Array.from(new Set(allTokens));
-    return uniqueTokens.slice(0, 10).join(" "); // Take top 10 unique tokens as summary
+    return uniqueTokens.slice(0, 10).join(" "); // Take top 10 unique tokens
   });
 }
 

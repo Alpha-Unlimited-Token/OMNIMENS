@@ -13,7 +13,7 @@ const wasmCode = new Uint8Array([
 
 /**
  * Initialize the WebAssembly instance and export its functions.
- * @returns {Promise<Object>} A promise that resolves to the WebAssembly exports.
+ * @returns {Promise} A promise that resolves to the WebAssembly exports.
  */
 async function initializeWasm() {
   const wasmModule = await WebAssembly.compile(wasmCode);

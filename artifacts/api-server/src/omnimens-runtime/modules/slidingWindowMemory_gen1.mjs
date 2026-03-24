@@ -50,9 +50,9 @@ function calculateDistance(vec1, vec2) {
 
 /**
  * Clusters embeddings into groups based on a distance threshold.
- * @param {Array<{text: string, embedding: number[]}>} data - Array of objects containing text and embeddings.
+ * @param {Array<{text, embedding}>} data - Array of objects containing text and embeddings.
  * @param {number} threshold - Maximum distance between points in a cluster.
- * @returns {Array<{cluster: number, texts: string[]}>} - Clustered data with associated texts.
+ * @returns {Array<{cluster, texts}>} - Clustered data with associated texts.
  */
 function clusterEmbeddings(data, threshold) {
   const clusters = [];
@@ -87,7 +87,7 @@ function summarizeCluster(texts) {
  * Maintains a sliding window memory by summarizing and retaining key points.
  * @param {string[]} conversationHistory - Array of conversation strings.
  * @param {number} embeddingThreshold - Distance threshold for clustering.
- * @returns {Array<{summary: string}>} - Array of summaries representing the long-term memory.
+ * @returns {Array<{summary}>} - Array of summaries representing the long-term memory.
  */
 function slidingWindowMemory(conversationHistory, embeddingThreshold = 0.5) {
   const data = conversationHistory.map(text => ({ text, embedding: generateEmbedding(text) }));

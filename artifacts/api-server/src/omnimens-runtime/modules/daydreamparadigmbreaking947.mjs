@@ -18,20 +18,20 @@
 
 // ResonantAssociativeField.ts – 32 lines, no I/O, pure math
 export function resonate(
-  memories: number[][],       // each memory is ±1 pattern
-  cue: number[],              // noisy / partial pattern
+  memories,       // each memory is ±1 pattern
+  cue,              // noisy / partial pattern
   steps = 40,                 // oscillation iterations
   k = 0.6                     // coupling strength (0‒1)
-): number[] {
+) {
   const n = cue.length;
   // Build symmetric coupling matrix J_ij = Σ_m mem_i * mem_j
-  const J: number[][] = Array.from({ length: n }, (_, i) =>
+  const J= Array.from({ length: n }, (_, i) =>
     Array.from({ length: n }, (_, j) =>
       i === j ? 0 : memories.reduce((sum, m) => sum + m[i] * m[j], 0)
     )
   );
   // Phases: +1 or -1 initialised by cue (missing = 0 -> random)
-  const phase: number[] = cue.map(v => (v === 0 ? (Math.random() < 0.5 ? 1 : -1) : v));
+  const phase= cue.map(v => (v === 0 ? (Math.random() < 0.5 ? 1 : -1) : v));
 
   // Oscillatory convergence
   for (let t = 0; t < steps; t++) {

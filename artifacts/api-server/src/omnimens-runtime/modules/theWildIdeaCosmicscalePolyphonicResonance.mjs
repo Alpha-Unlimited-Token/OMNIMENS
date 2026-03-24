@@ -26,14 +26,14 @@
  */
 // CoSPR-AI: minimal resonance simulator (pure math, no I/O)
 // Each neuron = frequency oscillator; synapse = phase-coupling coefficient
-export type Osc = { f: number; phase: number; amp: number };
-export type Net = { nodes: Osc[]; coupling: number[][] };
+ phase; amp};
+ coupling };
 
 // Advance the network one Δt step using Kuramoto-like update
-export function step(net: Net, dt = 0.01): Net {
+export function step(net, dt = 0.01) {
   const N = net.nodes.length;
   const phases = net.nodes.map(o => o.phase);
-  const newNodes: Osc[] = [];
+  const newNodes= [];
   for (let i = 0; i < N; i++) {
     let dφ = 2 * Math.PI * net.nodes[i].f;           // natural angular vel
     for (let j = 0; j < N; j++) {
@@ -47,7 +47,7 @@ export function step(net: Net, dt = 0.01): Net {
 }
 
 // “Thought energy” = global coherence metric
-export function coherence(net: Net): number {
+export function coherence(net) {
   const sum = net.nodes.reduce(
     (acc, o) => {
       acc.x += Math.cos(o.phase);

@@ -19,16 +19,16 @@
 
 // ResonantField.ts — pure, side-effect-free, 0 deps.
 export function runResonantField(
-  n: number = 200,          // # oscillators (“neurons”)
-  K: number = 1.2,          // coupling strength
-  dt: number = 0.05,        // time-step
-  steps: number = 400       // iterations
-): number[] {               // returns coherence trace
+  n= 200,          // # oscillators (“neurons”)
+  K= 1.2,          // coupling strength
+  dt= 0.05,        // time-step
+  steps= 400       // iterations
+) {               // returns coherence trace
   // natural frequencies in [0.8,1.2] rad/t
   const w = Array.from({ length: n }, () => 0.8 + 0.4 * Math.random());
   // random initial phases in [0,2π]
   let phi = Array.from({ length: n }, () => Math.random() * 2 * Math.PI);
-  const coherence: number[] = [];
+  const coherence= [];
 
   for (let t = 0; t < steps; t++) {
     // order parameter r·e^{iψ}

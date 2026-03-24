@@ -18,17 +18,17 @@
  */
 
 // No external deps, pure computation, 24 LOC
-type Vec = number[];
-type Edge = [number, number];          // indices of connected notes
-type Lattice = { pos: Vec[]; edges: Edge[] };
+
+          // indices of connected notes
+ edges};
 
 export function harmonicSpinStep(
-  lat: Lattice,
-  freqs: number[],                   // current frequencies (Hz) per node
+  lat,
+  freqs,                   // current frequencies (Hz) per node
   lr = 0.05
-): number[] {
-  const ratio = (a: number, b: number) => a / b;
-  const consonanceError = (r: number) => {
+) {
+  const ratio = (a, b) => a / b;
+  const consonanceError = (r) => {
     const ratios = [1, 5 / 4, 4 / 3, 3 / 2, 2]; // unison, M3, P4, P5, octave
     let min = Infinity;
     for (const ideal of ratios) min = Math.min(min, Math.abs(Math.log(r / ideal)));

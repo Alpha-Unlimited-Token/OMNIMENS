@@ -34,7 +34,7 @@
 
 /**
  * @typedef {Object} SlidingWindowContext
- * @property {Array<ContextItem>} retained - The retained high-priority context items.
+ * @property {Array} retained - The retained high-priority context items.
  * @property {string} summary - The summarized history of lower-priority context items.
  */
 

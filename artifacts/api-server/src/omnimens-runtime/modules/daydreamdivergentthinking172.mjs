@@ -17,14 +17,13 @@
  */
 
 // ecosystem.ts  –  pure simulation, no I/O, no eval / require
-export type Species = {
-  dna: Uint8Array;              // e.g., wasmMatrixOps byte-code
-  energy: number;               // CPU cycle budget
-  fitness: number;              // updated each tick
+              // e.g., wasmMatrixOps byte-code
+  energy;               // CPU cycle budget
+  fitness;              // updated each tick
 };
 
-export function tickEcosystem(pop: Species[], goalSignal: number[]): Species[] {
-  const next: Species[] = [];
+export function tickEcosystem(pop, goalSignal) {
+  const next= [];
   for (const sp of pop) {
     // 1. “Metabolism” — spend energy to act
     const effort = Math.min(sp.energy, 10);

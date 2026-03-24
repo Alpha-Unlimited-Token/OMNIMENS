@@ -35,8 +35,7 @@
 class EmbeddingCacheManager {
   constructor() {
     /**
-     * @private
-     * @type {Map<string, number[]>}
+     * @* @type {Map<string, number[]>}
      * @description Internal storage for embeddings, keyed by their unique ID.
      */
     this.cache = new Map();
@@ -87,7 +86,7 @@ class EmbeddingCacheManager {
    * Finds the nearest embedding to a given vector based on cosine similarity.
    * @param {number[]} queryVector - The query vector.
    * @param {number} [topK=1] - Number of nearest neighbors to return.
-   * @returns {Array<{id: string, similarity: number}>} An array of nearest neighbors with their IDs and similarities.
+   * @returns {Array<{id, similarity}>} An array of nearest neighbors with their IDs and similarities.
    * @throws {Error} If the query vector is not valid.
    */
   findNearestNeighbors(queryVector, topK = 1) {

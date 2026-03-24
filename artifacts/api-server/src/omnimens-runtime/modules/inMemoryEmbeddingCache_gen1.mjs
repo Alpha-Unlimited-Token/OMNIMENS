@@ -44,7 +44,7 @@ class LRUCache {
   get(key) {
     if (!this.cache.has(key)) return null;
     const value = this.cache.get(key);
-    // Move the accessed item to the end to mark it as recently used.
+    // Move the accessed item to the end to mark it used.
     this.cache.delete(key);
     this.cache.set(key, value);
     return value;
@@ -67,7 +67,7 @@ class LRUCache {
   }
 
   /**
-   * Returns all items in the cache as an array of key-value pairs.
+   * Returns all items in the cache array of key-value pairs.
    * @returns {Array<[string, any]>} - An array of key-value pairs.
    */
   entries() {

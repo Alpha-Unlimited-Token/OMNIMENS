@@ -73,7 +73,7 @@ AssociativeMemory.prototype.size = function() {
 
     // Test removing a key
     memory.remove("name");
-    console.log(memory.get("name")); // Expected: null
+    console.log(memory.get("name")); // Expected
     console.log(memory.hasKey("name")); // Expected: false
 
     // Test clearing all keys

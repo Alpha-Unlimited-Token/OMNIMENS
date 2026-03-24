@@ -18,20 +18,19 @@
  */
 
 // ResonantField.ts
-export type FieldState = { phases: number[]; t: number };
+ t};
 
 const TAU = 2 * Math.PI;
 
-function wrap(x: number): number {
+function wrap(x) {
   // keep phase in [0, 2π)
   return (x % TAU + TAU) % TAU;
 }
 
 export function stepField(
-  state: FieldState,
-  naturalFreq: (i: number) => number,
-  coupling: number
-): FieldState {
+  state,
+  naturalFreq => number,
+  coupling) {
   const { phases, t } = state;
   const n = phases.length;
   const next = phases.map((phi_i, i) => {
@@ -46,12 +45,12 @@ export function stepField(
 }
 
 // Demo: 50 oscillators, random frequencies, observe convergence
-export function demo(steps = 100): number {
-  let field: FieldState = {
+export function demo(steps = 100) {
+  let field= {
     phases: Array.from({ length: 50 }, () => Math.random() * TAU),
     t: 0
   };
-  const w = (i: number) => 0.05 * Math.sin(i); // intrinsic freq distribution
+  const w = (i) => 0.05 * Math.sin(i); // intrinsic freq distribution
   for (let k = 0; k < steps; k++) field = stepField(field, w, 1.2);
   // Return synchrony metric: 1 = perfect lock, 0 = chaos
   const R =

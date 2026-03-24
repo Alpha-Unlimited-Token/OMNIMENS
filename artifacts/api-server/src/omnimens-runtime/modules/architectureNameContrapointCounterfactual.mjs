@@ -18,26 +18,20 @@
  */
 
 // CONTRAPOINT – minimal causal simulator
-export type VarFunc = (parents: number[]) => number;
 
-export interface CausalVar {
-  name: string;
-  parents: number[];          // indices into vars[]
-  func: VarFunc;              // structural equation
-}
 
-export interface SCM {
-  vars: CausalVar[];
-}
+
+
+
 
 /** Run the SCM once and produce a numeric assignment for every variable */
-function forward(model: SCM, override: Partial<Record<string, number>> = {}): number[] {
+function forward(model, override> = {}) {
   const { vars } = model;
-  const values: number[] = Array(vars.length).fill(0);
+  const values= Array(vars.length).fill(0);
   for (let i = 0; i < vars.length; i++) {
     const v = vars[i];
     if (override.hasOwnProperty(v.name)) {
-      values[i] = override[v.name] as number;      // do(X = x’)
+      values[i] = override[v.name];      // do(X = x’)
       continue;
     }
     const parentVals = v.parents.map(p => values[p]);
@@ -48,14 +42,14 @@ function forward(model: SCM, override: Partial<Record<string, number>> = {}): nu
 
 /** Estimate average outcome of Y under intervention do(X = x’) via Monte-Carlo */
 export function averageEffect(
-  model: SCM,
-  xName: string,
-  xVal: number,
-  yName: string,
+  model,
+  xName,
+  xVal,
+  yName,
   runs = 1000
-): number {
+) {
   const yIdx = model.vars.findIndex(v => v.name === yName);
-  const override: Partial<Record<string, number>> = { [xName]: xVal };
+  const override> = { [xName]: xVal };
   let sum = 0;
   for (let i = 0; i < runs; i++) sum += forward(model, override)[yIdx];
   return sum / runs;

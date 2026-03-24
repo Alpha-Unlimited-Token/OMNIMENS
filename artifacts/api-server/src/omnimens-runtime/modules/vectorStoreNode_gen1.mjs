@@ -87,7 +87,7 @@ class HNSW {
    * Searches for the nearest neighbors to a query vector.
    * @param {number[]} queryVector - The query vector.
    * @param {number} k - The number of nearest neighbors to retrieve.
-   * @returns {Array<{id: number, distance: number}>} The k nearest neighbors.
+   * @returns {Array<{id, distance}>} The k nearest neighbors.
    */
   search(queryVector, k) {
     if (k <= 0) {

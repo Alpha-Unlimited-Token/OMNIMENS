@@ -18,12 +18,12 @@
  */
 
 // Resonant Field Micro-Simulator (RFC-Mini) – 34 lines
-type Node = {ω:number, φ:number, κ:number[]};     // freq, phase, coupling
+     // freq, phase, coupling
 const N = 16, dt = 0.02, steps = 500;
-const nodes: Node[] = Array.from({length:N},(_,i)=>({
+const nodes= Array.from({length},(_,i)=>({
   ω:Math.random()*0.2 + 0.9,                    // natural freq
   φ:Math.random()*Math.PI*2,                    // initial phase
-  κ:Array.from({length:N},()=>Math.random()*0.3) // random coupling strengths
+  κ:Array.from({length},()=>Math.random()*0.3) // random coupling strengths
 }));
 
 // external stimulus: lock node[0] & node[1] 180° apart (represents “bit = 1”)

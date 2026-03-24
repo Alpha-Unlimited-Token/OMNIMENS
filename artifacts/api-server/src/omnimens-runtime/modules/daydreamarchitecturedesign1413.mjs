@@ -16,29 +16,28 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-export type CausalNode = {
-  id: string;                    // unique identifier
-  state: number;                 // abstract numeric state
-  inputs: string[];              // upstream node ids
-  update: (ins: number[]) => number; // deterministic transition
+                    // unique identifier
+  state;                 // abstract numeric state
+  inputs;              // upstream node ids
+  update => number; // deterministic transition
 };
 
-export type Trajectory = Record<string, number[]>;
+
 
 export function simulateGraph(
-  nodes: CausalNode[],
-  steps: number,
+  nodes,
+  steps,
   seed?: Record<string, number>
-): Trajectory {
+) {
   // index nodes for O(1) lookup
-  const map: Record<string, CausalNode> = {};
+  const map = {};
   nodes.forEach(n => { map[n.id] = n; if (seed && seed[n.id] !== undefined) n.state = seed[n.id]; });
 
-  const history: Trajectory = {};
+  const history= {};
   nodes.forEach(n => { history[n.id] = [n.state]; });
 
   for (let t = 0; t < steps; t++) {
-    const nextStates: Record<string, number> = {};
+    const nextStates = {};
     nodes.forEach(n => {
       const inVals = n.inputs.map(i => map[i].state);
       nextStates[n.id] = n.update(inVals);

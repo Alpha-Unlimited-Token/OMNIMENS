@@ -17,21 +17,17 @@
  */
 
 /* Counterfactual Causal Cognition – minimal core */
-export type Func = (parents: number[]) => number;
 
-export interface SCM {
-  nodes: string[];
-  parents: Record<string, string[]>;              // adjacency list
-  mechanisms: Record<string, Func>;               // g_i(parents) -> value
-}
+
+
 
 export function forward(
-  scm: SCM,
-  exogenous: Record<string, number>,
-  doIntervene: Record<string, number> = {}
-): Record<string, number> {
-  const value: Record<string, number> = { ...doIntervene };
-  const evalNode = (n: string): number => {
+  scm,
+  exogenous,
+  doIntervene = {}
+) {
+  const value = { ...doIntervene };
+  const evalNode = (n) => {
     if (value[n] !== undefined) return value[n];
     const pVals = scm.parents[n]?.map(evalNode) || [];
     return (value[n] = scm.mechanisms[n]
@@ -43,7 +39,7 @@ export function forward(
 }
 
 /* Example tiny SCM: Smoking → Tar → Cancer */
-export const demoSCM: SCM = {
+export const demoSCM= {
   nodes: ["Smoke", "Tar", "Cancer"],
   parents: { Smoke: [], Tar: ["Smoke"], Cancer: ["Tar"] },
   mechanisms: {

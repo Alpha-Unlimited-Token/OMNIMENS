@@ -20,22 +20,22 @@
 // celeste-core.ts
 import { Matrix, randn } from "ml-matrix";
 
-type Node = string;
-type Edge = { from: Node; to: Node; func: (x: number) => number; weight: number };
+
+ to; func => number; weight};
 
 export class SymbolicCausalGraph {
-  nodes: Set<Node> = new Set();
-  edges: Edge[] = [];
+  nodes= new Set();
+  edges= [];
 
-  addNode(n: Node) { this.nodes.add(n); }
+  addNode(n) { this.nodes.add(n); }
 
-  addEdge(from: Node, to: Node, func: (x: number) => number, weight = 0.5) {
+  addEdge(from, to, func => number, weight = 0.5) {
     this.edges.push({ from, to, func, weight });
   }
 
   // Perform one intervention do(node = value) and propagate effects
-  intervene(target: Node, value: number): Map<Node, number> {
-    const state = new Map<Node, number>([[target, value]]);
+  intervene(target, value) {
+    const state = new Map([[target, value]]);
     let updated = true;
     while (updated) {
       updated = false;
@@ -50,7 +50,7 @@ export class SymbolicCausalGraph {
   }
 
   // Bayesian weight update from observation (simple Gaussian likelihood)
-  updateWeight(edgeIdx: number, observedTo: number, fromVal: number, lr = 0.05) {
+  updateWeight(edgeIdx, observedTo, fromVal, lr = 0.05) {
     const e = this.edges[edgeIdx];
     const pred = e.func(fromVal);
     const grad = observedTo - pred;
@@ -59,6 +59,6 @@ export class SymbolicCausalGraph {
 }
 
 // --- minimal latent-semantic simulator stub ---
-export function simulateLatent(sampleSize: number, dim = 32): Matrix {
+export function simulateLatent(sampleSize, dim = 32) {
   return randn(sampleSize, dim); // placeholder for VAE/transformer synthesis
 }

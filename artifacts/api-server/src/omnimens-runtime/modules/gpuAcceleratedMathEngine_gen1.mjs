@@ -1,7 +1,7 @@
 /**
  * gpuAcceleratedMathEngine - A WebAssembly-powered module for efficient matrix operations and numerical computations.
  *
- * This module leverages WebAssembly (WASM) to perform BLAS-like operations such as matrix multiplication, vector addition,
+ * This module leverages WebAssembly (WASM) to perform BLAS-like operations such multiplication, vector addition,
  * and dot products. It is designed to run efficiently in Node.js environments, utilizing the power of WASM for near-native performance.
  *
  * @module gpuAcceleratedMathEngine

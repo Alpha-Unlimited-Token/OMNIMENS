@@ -21,27 +21,27 @@ In
 // Resonant-Field Cognition – minimal core (pure TS, no I/O)
 
 /** Complex number */
-interface C { re: number; im: number; }
-const add = (a: C, b: C): C => ({ re: a.re + b.re, im: a.im + b.im });
-const mul = (a: C, b: C): C => ({ re: a.re * b.re - a.im * b.im,
+
+const add = (a, b) => ({ re: a.re + b.re, im: a.im + b.im });
+const mul = (a, b) => ({ re: a.re * b.re - a.im * b.im,
                                    im: a.re * b.im + a.im * b.re });
-const conj = (a: C): C => ({ re: a.re, im: -a.im });
+const conj = (a) => ({ re: a.re, im: -a.im });
 
 /** Hyper-wavefield living in N complex dimensions */
-export function makeWaveField(N: number) {
-  let field: C[] = Array.from({ length: N }, () => ({ re: 0, im: 0 }));
+export function makeWaveField(N) {
+  let field= Array.from({ length}, () => ({ re: 0, im: 0 }));
 
   // Project a real vector into complex phase points
-  const encode = (v: number[]): C[] =>
+  const encode = (v): C[] =>
     v.map((x, i) => ({ re: Math.cos(x), im: Math.sin(x + i) }));
 
   // Inject new knowledge (phase-additive learning)
-  const learn = (v: number[]) => {
+  const learn = (v) => {
     encode(v).forEach((c, i) => field[i] = add(field[i], c));
   };
 
   // Query: return resonance scores (dot w/ conjugates)
-  const query = (v: number[]): number => {
+  const query = (v) => {
     const probe = encode(v);
     return probe.reduce((sum, c, i) => {
       const prod = mul(c, conj(field[i]));

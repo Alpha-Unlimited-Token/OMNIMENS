@@ -34,7 +34,7 @@ export class ConversationMemoryManager {
   constructor() {
     /**
      * Persistent memory store for conversation summaries.
-     * @type {Object<string, {summary: string, embedding: string}>}
+     * @type {Object<string, {summary, embedding}>}
      */
     this.memoryStore = {};
 
@@ -84,7 +84,7 @@ export class ConversationMemoryManager {
 
   /**
    * Retrieves the entire memory store.
-   * @returns {Object<string, {summary: string, embedding: string}>} The memory store.
+   * @returns {Object<string, {summary, embedding}>} The memory store.
    */
   getMemoryStore() {
     return this.memoryStore;
@@ -92,7 +92,7 @@ export class ConversationMemoryManager {
 
   /**
    * Retrieves the most recent summary from the memory store.
-   * @returns {{summary: string, embedding: string}|null} The most recent summary or null if memory is empty.
+   * @returns {{summary, embedding}|null} The most recent summary or null if memory is empty.
    */
   getLatestSummary() {
     const keys = Object.keys(this.memoryStore);

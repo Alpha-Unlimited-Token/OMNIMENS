@@ -17,14 +17,14 @@
  */
 
 // counterfactual-causal-reasoner.ts
-export type Node = string;
-export type Edge = { from: Node; to: Node; weight: number }; // + causes, – inhibits
-export type SCM = { nodes: Node[]; edges: Edge[] };
 
-const topologicalSort = (g: SCM): Node[] => {
-  const visited: Record<Node, boolean> = {};
-  const order: Node[] = [];
-  const dfs = (n: Node) => {
+ to; weight}; // + causes, – inhibits
+ edges};
+
+const topologicalSort = (g): Node[] => {
+  const visited = {};
+  const order= [];
+  const dfs = (n) => {
     if (visited[n]) return;
     visited[n] = true;
     g.edges.filter(e => e.from === n).forEach(e => dfs(e.to));
@@ -34,7 +34,7 @@ const topologicalSort = (g: SCM): Node[] => {
   return order.reverse();
 };
 
-const propagate = (g: SCM, state: Record<Node, number>): Record<Node, number> => {
+const propagate = (g, state) => {
   const out = { ...state };
   topologicalSort(g).forEach(n => {
     g.edges.filter(e => e.from === n).forEach(e => {
@@ -45,14 +45,14 @@ const propagate = (g: SCM, state: Record<Node, number>): Record<Node, number> =>
 };
 
 export const counterfactualEffect = (
-  g: SCM,
-  factual: Record<Node, number>,
-  intervention: Record<Node, number>
+  g,
+  factual,
+  intervention
 ) => {
   const factualResult = propagate(g, factual);
   const cfState = { ...factual, ...intervention }; // do(X=x)
   const counterResult = propagate(g, cfState);
-  const delta: Record<Node, number> = {};
+  const delta = {};
   Object.keys(factualResult).forEach(n => {
     delta[n] = (counterResult[n] ?? 0) - (factualResult[n] ?? 0);
   });

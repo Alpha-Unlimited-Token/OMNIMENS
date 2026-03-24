@@ -18,25 +18,25 @@ THE WILD IDEA — “Harmo
  */
 
 // Harmonic Resonance Memory – minimal toy core (no external deps)
-export type Harmonic = { freq: number; phase: number; amp: number };
+ phase; amp};
 
 export class HarmonicField {
-  private modes: Harmonic[] = [];
+  modes= [];
 
-  // Add a new concept as a harmonic signature
-  add(freq: number, phase: number, amp = 1): void {
+  // Add a new concept harmonic signature
+  add(freq, phase, amp = 1) {
     this.modes.push({ freq, phase, amp });
   }
 
   // Interference energy between two harmonics
-  private static interference(a: Harmonic, b: Harmonic): number {
+  static interference(a, b) {
     // Cosine of phase difference weighted by amplitudes
     return a.amp * b.amp * Math.cos(a.phase - b.phase);
   }
 
   // Query: given (freq,phase) return concepts with strongest resonance
-  query(freq: number, phase: number, topK = 3): Harmonic[] {
-    const probe: Harmonic = { freq, phase, amp: 1 };
+  query(freq, phase, topK = 3) {
+    const probe= { freq, phase, amp: 1 };
     return this.modes
       .map(h => ({ h, score: HarmonicField.interference(h, probe) }))
       .sort((x, y) => y.score - x.score)
@@ -45,7 +45,7 @@ export class HarmonicField {
   }
 
   // Time evolution – drift phases to simulate memory aging
-  tick(dt: number): void {
+  tick(dt) {
     this.modes = this.modes.map(({ freq, phase, amp }) => ({
       freq,
       phase: phase + freq * dt,

@@ -54,14 +54,14 @@ console.log(detectNovelty([-10, -12, -11, -10, -100], 2)); // Expect: Novel poin
 
 console.log("Edge Case 1:");
 try {
-    console.log(detectNovelty([], 2)); // Expect: Error
+    console.log(detectNovelty([], 2)); // Expect
 } catch (e) {
     console.log(e.message);
 }
 
 console.log("Edge Case 2:");
 try {
-    console.log(detectNovelty([1, 2, 3], -1)); // Expect: Error
+    console.log(detectNovelty([1, 2, 3], -1)); // Expect
 } catch (e) {
     console.log(e.message);
 }

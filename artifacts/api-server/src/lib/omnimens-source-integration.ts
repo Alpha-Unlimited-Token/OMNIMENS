@@ -182,9 +182,97 @@ function validateSyntax(code: string, extension: string): { valid: boolean; erro
   }
 }
 
+function hasTypeScriptSyntax(code: string): boolean {
+  return /\b(interface|enum|declare|implements|abstract\s+class|readonly)\s+\w/.test(code) ||
+    /\b(public|private|protected)\s+\w/.test(code) ||
+    /:\s*(string|number|boolean|any|void|never|unknown|object)\s*[,);=\n\{\}\[]/.test(code) ||
+    /\bas\s+(string|number|boolean|any|const|unknown|never|void)\b/.test(code) ||
+    /\bnew\s+(Map|Set|Array)\s*<\w/.test(code) ||
+    /\btype\s+\w+\s*(?:<[^>]*>)?\s*=/.test(code) ||
+    /\bimport\s+type\b/.test(code) ||
+    /\)\s*:\s*(?:string|number|boolean|void|any|null|undefined|Promise)\s*(?:<|[\{\n=>])/.test(code);
+}
+
+function stripTypeScriptSyntax(code: string): { code: string; stripped: boolean } {
+  if (!hasTypeScriptSyntax(code)) {
+    return { code, stripped: false };
+  }
+
+  let c = code;
+  const orig = code;
+
+  c = c.replace(/^import\s+type\b.*$/gm, "");
+  c = c.replace(/^export\s+type\s+\w+(?:<[^>]*>)?\s*=[^;]*;/gm, "");
+  c = c.replace(/^export\s+interface\s+\w+(?:<[^>]*>)?\s*\{[^}]*\}/gm, "");
+  c = c.replace(/^type\s+\w+(?:<[^>]*>)?\s*=[^;]*;/gm, "");
+  c = c.replace(/^interface\s+\w+(?:<[^>]*>)?\s*\{[^}]*\}/gm, "");
+  c = c.replace(/^export\s+enum\s+\w+\s*\{[^}]*\}/gm, "");
+  c = c.replace(/^enum\s+\w+\s*\{[^}]*\}/gm, "");
+  c = c.replace(/^declare\s+.*$/gm, "");
+
+  c = c.replace(/new\s+(Map|Set|Array|WeakMap|WeakSet|Promise)\s*<[^>]*>\s*\(/g, "new $1(");
+  c = c.replace(/(function\s+\w+)\s*<[^>]*>/g, "$1");
+  c = c.replace(/(=\s*)<[A-Z]\w*(?:\s+extends\s+[^>]+)?(?:,\s*[A-Z]\w*)*>\s*\(/g, "$1(");
+
+  c = c.replace(/(\w+)\s*:\s*(?:string|number|boolean|any|void|null|undefined|object|never|unknown|symbol|bigint)(?:\[\])*\s*(?=[,);=\n\{\}])/g, "$1");
+  c = c.replace(/(\w+)\s*:\s*(?:Record|Map|Set|Array|Promise|Partial|Required|Readonly|Pick|Omit|Exclude|Extract|Generator|Iterator|Iterable)\s*<[^>]*(?:<[^>]*>)*>/g, "$1");
+  c = c.replace(/(\w+)\s*:\s*[A-Z]\w*(?:\[\])*\s*(?=[,);=\n\{\}])/g, "$1");
+
+  c = c.replace(/(const|let|var)\s+(\w+)\s*:\s*\w+(?:<[^>]*>)?\s*=/g, "$1 $2 =");
+
+  c = c.replace(/\)\s*:\s*(?:string|number|boolean|void|any|null|undefined|object|never|unknown|symbol|bigint)(?:\[\])?\s*=>/g, ") =>");
+  c = c.replace(/\)\s*:\s*\w+(?:<[^>]*(?:<[^>]*>)*>)?\s*=>/g, ") =>");
+  c = c.replace(/\)\s*:\s*(?:string|number|boolean|void|any|null|undefined|object|never|unknown|Promise)\s*(?:<[^>]*(?:<[^>]*>)*>)?\s*(?=[\{\n])/g, ") ");
+  c = c.replace(/\)\s*:\s*\w+(?:<[^>]*(?:<[^>]*>)*>)?\s*(?=[\{\n])/g, ") ");
+  c = c.replace(/\)\s*:\s*[A-Z]\w*(?:\[\])*\s*(?=[\{\n])/g, ") ");
+
+  c = c.replace(/(\w+\([^)]*\))\s*:\s*(?:string|number|boolean|any|void|null|undefined|object|never|unknown)\s*;/g, "$1 { return null; }");
+
+  c = c.replace(/\b(public|private|protected)\s+/g, "");
+  c = c.replace(/\breadonly\s+/g, "");
+  c = c.replace(/\babstract\s+class\b/g, "class");
+  c = c.replace(/\s+implements\s+\w+(?:<[^>]*>)?/g, "");
+
+  c = c.replace(/\s+as\s+(?:const|any|unknown|string|number|boolean|void|null|undefined|object|never)\b/g, "");
+  c = c.replace(/\s+as\s+[A-Z]\w*(?:<[^>]*>)?/g, "");
+
+  c = c.replace(/(\w)!\./g, "$1.");
+  c = c.replace(/(\w)!\[/g, "$1[");
+  c = c.replace(/(\w)!\s/g, "$1 ");
+
+  c = c.replace(/(\w+)\?\s*(?=[,)])/g, "$1");
+
+  c = c.replace(/\b(const|let|var)\s+(\w+)\[\]\s*=/g, "$1 $2 =");
+
+  return { code: c, stripped: c !== orig };
+}
+
 function autoRepairCode(code: string): { code: string; repairs: string[] } {
   const repairs: string[] = [];
   let fixed = code;
+
+  const ts = stripTypeScriptSyntax(fixed);
+  if (ts.stripped) {
+    fixed = ts.code;
+    repairs.push("Stripped TypeScript syntax (types, interfaces, generics, access modifiers) for .mjs compatibility");
+  }
+
+  if (/\bconst\s+arguments\b|\blet\s+arguments\b|\bvar\s+arguments\b/.test(fixed)) {
+    fixed = fixed.replace(/\b(const|let|var)\s+arguments\b/g, "$1 args");
+    fixed = fixed.replace(/(?<!\.)arguments\.map/g, "args.map");
+    fixed = fixed.replace(/(?<!\.)arguments\.filter/g, "args.filter");
+    fixed = fixed.replace(/(?<!\.)arguments\.forEach/g, "args.forEach");
+    fixed = fixed.replace(/(?<!\.)arguments\.reduce/g, "args.reduce");
+    fixed = fixed.replace(/(?<!\.)arguments\.length/g, "args.length");
+    fixed = fixed.replace(/(?<!\.)arguments\[/g, "args[");
+    fixed = fixed.replace(/\breturn\s+arguments\b/g, "return args");
+    repairs.push("Renamed reserved word 'arguments' to 'args'");
+  }
+
+  if (/\bconst\s+eval\b|\blet\s+eval\b/.test(fixed)) {
+    fixed = fixed.replace(/\b(const|let|var)\s+eval\b/g, "$1 evalFn");
+    repairs.push("Renamed reserved word 'eval' to 'evalFn'");
+  }
 
   if (/\barguments\b/.test(fixed) && !fixed.includes("'use strict'")) {
     fixed = fixed.replace(/\barguments\b/g, (match, offset) => {

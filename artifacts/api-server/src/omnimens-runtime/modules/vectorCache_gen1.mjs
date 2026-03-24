@@ -77,7 +77,7 @@ class HNSW {
    * Searches for the closest vectors to a given query vector.
    * @param {number[]} queryVector - The vector to search for.
    * @param {number} k - Number of nearest neighbors to retrieve.
-   * @returns {Array<{id: number, distance: number}>} - Array of nearest neighbors sorted by distance.
+   * @returns {Array<{id, distance}>} - Array of nearest neighbors sorted by distance.
    */
   search(queryVector, k = 1) {
     if (k < 1) {

@@ -8,7 +8,7 @@
  */
 
 export const resourceManagementFramework = {
-  regulateResources: (moduleUsages) => {
+  regulateResources => {
     const limits = {
       cpu: 80, // Max CPU usage percentage
       memory: 70 // Max memory usage percentage

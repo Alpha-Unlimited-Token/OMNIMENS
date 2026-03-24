@@ -68,7 +68,7 @@ function cosineSimilarity(vectorA, vectorB) {
  * Retrieves memory from cache or persistent storage based on embedding similarity.
  * @param {Array<number>} queryEmbedding - The embedding to search for.
  * @param {number} similarityThreshold - Minimum similarity score to consider a match.
- * @returns {Array<{key: string, data: string, similarity: number}>} Matching memories.
+ * @returns {Array<{key, data, similarity}>} Matching memories.
  */
 function retrieveMemory(queryEmbedding, similarityThreshold = 0.8) {
   const results = [];

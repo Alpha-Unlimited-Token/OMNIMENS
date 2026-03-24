@@ -20,22 +20,19 @@
  */
 
 // OmniCausal Sandbox – minimal pure-TS prototype (no I/O, no deps)
-export type Vector = number[];
-export type Node = { id: string; state: Vector };
-export type Edge = { from: string; to: string;
-                     fn: (x: Vector) => Vector }; // structural eq.
 
-export interface CausalGraph {
-  nodes: Record<string, Node>;
-  edges: Edge[];
-}
+ state};
+ to;
+                     fn => Vector }; // structural eq.
+
+
 
 /**
  * Propagate causes through the graph once.
  * No side-effects; returns a new graph instance.
  */
-export function propagate(graph: CausalGraph): CausalGraph {
-  const nextNodes: Record<string, Node> = {};
+export function propagate(graph) {
+  const nextNodes = {};
   // deep copy current states
   Object.values(graph.nodes).forEach(n => nextNodes[n.id] = { ...n, state: [...n.state] });
 
@@ -52,12 +49,12 @@ export function propagate(graph: CausalGraph): CausalGraph {
  * Apply an intervention do(nodeId = value) and propagate N steps.
  */
 export function counterfactual(
-  graph: CausalGraph,
-  nodeId: string,
-  value: Vector,
+  graph,
+  nodeId,
+  value,
   steps = 3
-): CausalGraph {
-  let g: CausalGraph = {
+) {
+  let g= {
     nodes: { ...graph.nodes, [nodeId]: { id: nodeId, state: [...value] } },
     edges: graph.edges
   };

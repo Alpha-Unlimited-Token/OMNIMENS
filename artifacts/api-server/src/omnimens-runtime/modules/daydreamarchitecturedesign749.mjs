@@ -17,19 +17,19 @@
  */
 
 // metacausal-hypothesis-engine.ts
-export type NodeId = number;
-export interface Edge { from: NodeId; to: NodeId; weight: number; }
-export interface Graph { nodes: NodeId[]; edges: Edge[]; }
+
+
+
 
 export function intervene(
-  g: Graph,
-  target: NodeId,
-  newValue: number,
-  state: Map<NodeId, number>
-): Map<NodeId, number> {
+  g,
+  target,
+  newValue,
+  state
+) {
   const next = new Map(state);
   next.set(target, newValue);                       // do(X = x)
-  const parentsOf = (v: NodeId) =>
+  const parentsOf = (v) =>
     g.edges.filter(e => e.to === v).map(e => e.from);
   const topo = [...g.nodes].sort(
     (a, b) => parentsOf(a).length - parentsOf(b).length
@@ -48,6 +48,6 @@ export function intervene(
   return next;
 }
 
-function sigmoid(x: number): number {
+function sigmoid(x) {
   return 1 / (1 + Math.exp(-x));
 }

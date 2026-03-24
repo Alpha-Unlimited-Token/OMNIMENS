@@ -57,8 +57,7 @@ class HNSWGraph {
   /**
    * @method _connectNode
    * @description Connects a new node to existing nodes based on similarity.
-   * @private
-   * @param {number} nodeIndex - Index of the new node.
+   * @* @param {number} nodeIndex - Index of the new node.
    */
   _connectNode(nodeIndex) {
     const distances = this.nodes.map((node, index) => {
@@ -84,7 +83,7 @@ class HNSWGraph {
    * @description Searches for the nearest neighbors to a given embedding.
    * @param {Vector} query - The query embedding.
    * @param {number} k - Number of nearest neighbors to return.
-   * @returns {Array<{index: number, distance: number}>} - List of nearest neighbors.
+   * @returns {Array<{index, distance}>} - List of nearest neighbors.
    */
   search(query, k = 1) {
     const distances = this.nodes.map((node, index) => {

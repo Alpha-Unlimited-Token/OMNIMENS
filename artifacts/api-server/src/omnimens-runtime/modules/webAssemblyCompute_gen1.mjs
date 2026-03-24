@@ -69,7 +69,7 @@ export function wasmMatrixMultiply(wasmInstance, matrixA, matrixB, rowsA, colsA,
  * @param {number} rowsA - Number of rows in matrixA.
  * @param {number} colsA - Number of columns in matrixA.
  * @param {number} colsB - Number of columns in matrixB.
- * @returns {Promise<Float64Array>} - The resulting matrix (in row-major order).
+ * @returns {Promise} - The resulting matrix (in row-major order).
  */
 export async function demoMatrixMultiplication(wasmFilePath, matrixA, matrixB, rowsA, colsA, colsB) {
   const wasmInstance = await loadWasmModule(wasmFilePath);

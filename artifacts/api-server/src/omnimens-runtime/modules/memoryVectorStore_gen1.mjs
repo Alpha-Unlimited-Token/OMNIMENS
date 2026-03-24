@@ -37,8 +37,7 @@
 class MemoryVectorStore {
   constructor() {
     /**
-     * @private
-     * @type {Map<string, VectorEntry>}
+     * @* @type {Map<string, VectorEntry>}
      * @description Internal store for vectors, using a Map for efficient indexing.
      */
     this.store = new Map();
@@ -99,8 +98,7 @@ class MemoryVectorStore {
 
   /**
    * Computes the cosine similarity between two vectors.
-   * @private
-   * @param {number[]} vectorA - First vector.
+   * @* @param {number[]} vectorA - First vector.
    * @param {number[]} vectorB - Second vector.
    * @returns {number} The cosine similarity value.
    */

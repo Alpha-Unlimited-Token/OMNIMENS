@@ -24,18 +24,18 @@
  * Translation map version: 22
  */
 // ResonantField.ts
-export type Phase = number; // radians 0-2π
-export interface FieldState { phases: Phase[]; }
+ // radians 0-2π
+
 const TAU = Math.PI * 2;
 
 /**
  * Single synchronous update: each oscillator pulls toward the mean phase
  * weighted by a simple coupling matrix derived from the "question" pattern.
  */
-export function step(state: FieldState, coupling: number[][]): FieldState {
+export function step(state, coupling) {
   const { phases } = state;
   const n = phases.length;
-  const newPhases: Phase[] = new Array(n);
+  const newPhases= new Array(n);
   for (let i = 0; i < n; i++) {
     let sum = 0;
     for (let j = 0; j < n; j++) {
@@ -52,11 +52,11 @@ export function step(state: FieldState, coupling: number[][]): FieldState {
  * Returns final phase ordering, our “answer”.
  */
 export function resonate(
-  questionPattern: number[][],
+  questionPattern,
   iterations = 200
-): Phase[] {
+) {
   const n = questionPattern.length;
-  let state: FieldState = {
+  let state= {
     phases: Array.from({ length: n }, () => Math.random() * TAU),
   };
   for (let t = 0; t < iterations; t++) {

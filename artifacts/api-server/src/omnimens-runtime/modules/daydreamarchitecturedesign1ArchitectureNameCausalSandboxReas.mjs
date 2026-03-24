@@ -18,13 +18,10 @@
  */
 
 /* CSRE core — pure TS, no I/O, no external deps */
-export type Vec = number[];
-export interface Snippet {
-  code: (inputs: Vec) => Vec; // causal program
-  prior: number;              // prior probability
-}
 
-function perturb(v: Vec, idx: number, eps = 0.1): Vec {
+
+
+function perturb(v, idx, eps = 0.1) {
   const copy = v.slice();
   copy[idx] += eps;
   return copy;
@@ -32,7 +29,7 @@ function perturb(v: Vec, idx: number, eps = 0.1): Vec {
 
 /* One simulation step: evaluate a snippet on original + perturbed inputs,
    return empirical causal score (lower is better) */
-export function causalScore(snippet: Snippet, x: Vec): number {
+export function causalScore(snippet, x) {
   const y0 = snippet.code(x);
   let energy = 0;
   for (let i = 0; i < x.length; i++) {
@@ -47,9 +44,9 @@ export function causalScore(snippet: Snippet, x: Vec): number {
 
 /* Bayesian update: newPosterior ∝ prior * exp(-λ * energy) */
 export function updatePosterior(
-  snippet: Snippet,
-  energy: number,
+  snippet,
+  energy,
   lambda = 3
-): number {
+) {
   return snippet.prior * Math.exp(-lambda * energy);
 }

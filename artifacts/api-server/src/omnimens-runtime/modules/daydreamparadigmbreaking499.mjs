@@ -17,13 +17,13 @@
  */
 
 // Resonant Attractor Network – no deps, no I/O
-export type Network = { links: [number, number][], count: number };
+
 
 export function resonate(
-  net: Network,
+  net,
   steps = 500,
   alpha = 0.05
-): Float64Array {
+) {
   const phase = new Float64Array(net.count).fill(0).map(() => Math.random() * 2 * Math.PI);
   const sin = Math.sin, cos = Math.cos;
 
@@ -45,6 +45,6 @@ export function resonate(
 }
 
 // Example: 6-node ring reaches two-cluster lock (binary decision)
-const ring: Network = { count: 6, links: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,0]] };
+const ring= { count: 6, links: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,0]] };
 const result = resonate(ring);
 console.log(Array.from(result).map(v => +(v/Math.PI).toFixed(2))); // e.g., [0,0,0,1,1,1]

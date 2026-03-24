@@ -1,7 +1,7 @@
 /**
  * @module wasmAccelerator
  * @description Provides GPU-like acceleration for computationally intensive tasks using WebAssembly.
- * This module implements matrix operations (e.g., multiplication, eigenvalue decomposition) in WebAssembly
+ * This module operations (e.g., multiplication, eigenvalue decomposition) in WebAssembly
  * and exposes them to Node.js for high-performance computations.
  */
 
@@ -26,7 +26,7 @@ async function loadWasmModule(filePath) {
  * @param {number} rowsA - Number of rows in matrixA.
  * @param {number} colsA - Number of columns in matrixA.
  * @param {number} colsB - Number of columns in matrixB.
- * @returns {Promise<Float64Array>} The resulting matrix (flattened row-major order).
+ * @returns {Promise} The resulting matrix (flattened row-major order).
  * @throws {Error} If dimensions are incompatible for matrix multiplication.
  */
 export async function multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB) {
@@ -54,7 +54,7 @@ export async function multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB) {
  * Computes the eigenvalues of a square matrix using WebAssembly.
  * @param {Float64Array} matrix - The square matrix (flattened row-major order).
  * @param {number} size - The number of rows/columns in the square matrix.
- * @returns {Promise<Float64Array>} The eigenvalues of the matrix.
+ * @returns {Promise} The eigenvalues of the matrix.
  * @throws {Error} If the matrix is not square.
  */
 export async function computeEigenvalues(matrix, size) {

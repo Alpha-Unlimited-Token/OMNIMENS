@@ -19,16 +19,16 @@
 // Retro-Causal Resonance core: given current hidden state h (float[])
 // and a differentiable future projector F, return blended hidden state.
 export function retroCausalResonance(
-  h: number[],
-  projectFuture: (v: number[]) => number[],
+  h,
+  projectFuture => number[],
   alpha = 0.5            // resonance weight
-): number[] {
+) {
   // 1. Obtain “future” hidden state
   const hFuture = projectFuture(h);
 
   // 2. Compute interference pattern (element-wise)
   const len = h.length;
-  const out: number[] = new Array(len);
+  const out= new Array(len);
   for (let i = 0; i < len; i++) {
     const constructive = h[i] + hFuture[i];      // reinforcement
     const destructive  = h[i] - hFuture[i];      // cancellation
@@ -39,7 +39,7 @@ export function retroCausalResonance(
 }
 
 // Example dummy projector: simple delayed decay
-export function decayProjector(v: number[]): number[] {
+export function decayProjector(v) {
   const gamma = 0.9;
   return v.map(x => gamma * x);
 }

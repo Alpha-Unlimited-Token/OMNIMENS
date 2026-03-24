@@ -18,24 +18,24 @@
  */
 
 // Each expert owns a frequency in Hz and a trainable weight vector
-export type Expert = { f: number; w: number[] };
+ w };
 
 // Compute harmonic distance between two frequencies
-const harmonicDistance = (f1: number, f2: number) =>
+const harmonicDistance = (f1, f2) =>
   Math.abs(Math.log2(f1 / f2)); // in octaves
 
 // Convert an input vector into a chord (list of partial frequencies)
-const chordify = (x: number[]): number[] => {
+const chordify = (x) => {
   const base = 220 + (x[0] % 440);              // 220–660 Hz base tone
   return x.slice(1, 6).map((v, i) => base * (i + 2) * (1 + (v % 0.03)));
 };
 
 // Route input to top-k resonant experts
 export function polyphonicRoute(
-  x: number[],
-  experts: Expert[],
+  x,
+  experts,
   k = 4
-): Expert[] {
+) {
   const chord = chordify(x);
   const scored = experts.map(e => {
     const minDist = Math.min(...chord.map(c => harmonicDistance(c, e.f)));

@@ -18,25 +18,16 @@
  */
 
 // HACG – minimalist core
-type Vec = Float32Array;
-type NodeID = string;
 
-interface Node {
-  id: NodeID;
-  phi_state: Vec;
-  phi_rule: (g: Graph, self: Node) => void; // executable rule
-  phi_curio: number;
-}
 
-interface Edge {
-  from: NodeID; to: NodeID;
-  program: (a: Node, b: Node, g: Graph) => void;
-  evidence: number;
-}
+
+
+
+
 
 class Graph {
-  nodes = new Map<NodeID, Node>();
-  edges: Edge[] = [];
+  nodes = new Map();
+  edges= [];
 
   step() {
     // 1. execute node-level rules
@@ -53,5 +44,5 @@ class Graph {
 }
 
 // ----- helpers (stubs) -----
-function monteCarloAbductiveSearch(g: Graph): Edge[] { return []; }
-function noveltyTDerror(n: Node, g: Graph): number { return Math.random(); }
+function monteCarloAbductiveSearch(g) { return []; }
+function noveltyTDerror(n, g) { return Math.random(); }

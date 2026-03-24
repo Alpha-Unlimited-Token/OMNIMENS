@@ -17,23 +17,20 @@
  */
 
 // Core counterfactual rollout (simplified, no I/O, no imports)
-export type State = Record<string, number>;
-export type Action = (s: State) => State;
 
-export interface Scorer {
-  value(state: State, depth: number): number;      // utility / plausibility
-}
+
+
+
 
 export function bestCounterfactual(
-  init: State,
-  actions: Action[],
-  depth: number,
-  scorer: Scorer
-): { bestAction: Action | null; bestScore: number } {
+  init,
+  actions,
+  depth,
+  scorer): { bestAction: Action | null; bestScore} {
   let bestScore = -Infinity;
   let bestAction: Action | null = null;
 
-  function dfs(state: State, d: number): number {
+  function dfs(state, d) {
     if (d === 0) return scorer.value(state, depth - d);
     let max = -Infinity;
     for (const a of actions) {

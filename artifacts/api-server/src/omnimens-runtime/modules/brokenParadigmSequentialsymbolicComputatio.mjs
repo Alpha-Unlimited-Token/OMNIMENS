@@ -18,26 +18,20 @@
  */
 
 // ResonantField.ts
-export type Vec = number[];
-export interface FieldConfig {
-    naturalFreq: Vec;      // intrinsic frequencies ω_i
-    coupling: number[][];  // symmetric K_ij
-    dt?: number;           // time step
-    steps?: number;        // iterations
-}
+
+
 
 /**
  * Drive the field; returns final phases.
- * A queried pattern is supplied as a phase offset to some nodes.
+ * A queried pattern is supplied phase offset to some nodes.
  */
 export function resonate(
-    initPhase: Vec,
-    drive: Partial<Vec>,
-    cfg: FieldConfig
-): Vec {
+    initPhase,
+    drive,
+    cfg) {
     const n = initPhase.length;
     const phase = initPhase.slice();
-    const { naturalFreq: w, coupling: K, dt = 0.05, steps = 500 } = cfg;
+    const { naturalFreq: w, coupling, dt = 0.05, steps = 500 } = cfg;
 
     for (let t = 0; t < steps; t++) {
         for (let i = 0; i < n; i++) {

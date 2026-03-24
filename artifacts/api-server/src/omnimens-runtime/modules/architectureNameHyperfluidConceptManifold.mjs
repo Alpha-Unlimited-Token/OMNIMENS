@@ -19,16 +19,16 @@
 
 // Hyperfluid Concept Manifold – core curvature update (CPU demo)
 // SAFE: no eval/new Function/require/fs/network
-export type Vec = number[];
-export type Mat = number[][];
+
+
 const LR = 0.05;                  // learning rate for manifold update
 const EPS = 1e-9;                 // numerical stability
 
 // Fast outer product of two vectors
-function outer(a: Vec, b: Vec): Mat {
-  const m: Mat = [];
+function outer(a, b) {
+  const m= [];
   for (let i = 0; i < a.length; i++) {
-    const row: number[] = [];
+    const row= [];
     for (let j = 0; j < b.length; j++) row.push(a[i] * b[j]);
     m.push(row);
   }
@@ -37,10 +37,10 @@ function outer(a: Vec, b: Vec): Mat {
 
 // Incremental UPVD step: ΔM = LR * (ΔP ⊗ ΔV)  (⊗ = outer product)
 export function upvdUpdate(
-  manifold: Mat,           // current concept manifold
-  deltaPred: Vec,          // ΔP: prediction-error vector
+  manifold,           // current concept manifold
+  deltaPred,          // ΔP: prediction-error vector
   deltaVal: Vec            // ΔV: subjective-value vector
-): Mat {
+) {
   const upd = outer(deltaPred, deltaVal);
   const rows = manifold.length;
   const cols = manifold[0].length;

@@ -19,19 +19,16 @@
 // CIEM: ultra-light causal graph runner (pure computation)
 
 // Basic types
-type State = Record<string, number>;
-type CausalFn = (s: State) => number;
-type Node = { key: string; fn: CausalFn };
+
+
+ fn};
 
 // One causal micro-world = list of nodes + initial state
-export interface CMW {
-  nodes: Node[];
-  state: State;
-}
+
 
 // Run one simulation tick
-function step(cmw: CMW): State {
-  const next: State = { ...cmw.state };
+function step(cmw) {
+  const next= { ...cmw.state };
   for (const n of cmw.nodes) {
     next[n.key] = n.fn(cmw.state);
   }
@@ -40,11 +37,11 @@ function step(cmw: CMW): State {
 
 // Run imagination loop
 export function simulate(
-  cmw: CMW,
-  ticks: number,
-  stopCond: (s: State) => boolean = () => false
-): State[] {
-  const history: State[] = [cmw.state];
+  cmw,
+  ticks,
+  stopCond => boolean = () => false
+) {
+  const history= [cmw.state];
   let current = cmw.state;
   for (let t = 0; t < ticks; t++) {
     current = step({ ...cmw, state: current });
@@ -56,13 +53,13 @@ export function simulate(
 
 // Simple counter-factual: swap a variable, re-simulate, diff trajectories
 export function counterFactual(
-  cmw: CMW,
-  varKey: string,
-  newVal: number,
+  cmw,
+  varKey,
+  newVal,
   ticks = 10
 ) {
   const original = simulate(cmw, ticks);
-  const mutated: CMW = { ...cmw, state: { ...cmw.state, [varKey]: newVal } };
+  const mutated= { ...cmw, state: { ...cmw.state, [varKey]: newVal } };
   const alt = simulate(mutated, ticks);
   return { original, alt };
 }

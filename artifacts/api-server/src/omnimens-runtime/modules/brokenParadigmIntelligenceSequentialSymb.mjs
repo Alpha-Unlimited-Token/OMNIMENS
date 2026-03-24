@@ -18,7 +18,7 @@
  */
 
 // ---------- Resonant Field Intelligence – Kuramoto micro-core ----------
-export type Vec = number[];
+
 
 /**
  * Simulate a resonant network.
@@ -26,12 +26,12 @@ export type Vec = number[];
  * If final global phase > π/2 * 3  ⇒ “NO”
  */
 export function resonantYesNo(
-  initialPhases: Vec,          // random 0..2π
-  coupling: number,            // strength of influence
-  intrinsicFreq: Vec,          // natural frequencies
+  initialPhases,          // random 0..2π
+  coupling,            // strength of influence
+  intrinsicFreq,          // natural frequencies
   dt = 0.02,                   // time step
   steps = 2000                 // simulation length
-): boolean {
+) {
   const N = initialPhases.length;
   let θ: Vec = [...initialPhases];       // mutable copy
 

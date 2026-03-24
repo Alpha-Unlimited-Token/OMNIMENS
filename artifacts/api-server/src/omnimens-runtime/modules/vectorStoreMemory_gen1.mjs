@@ -14,7 +14,7 @@ class VectorStoreMemory {
   constructor() {
     /**
      * @type {Array<number[]>}
-     * @description Stores vectors as an array of arrays.
+     * @description Stores vectors array of arrays.
      */
     this.vectors = [];
 
@@ -56,7 +56,7 @@ class VectorStoreMemory {
    * Searches for the most similar vector in the store.
    * @param {number[]} queryVector - The query vector.
    * @param {number} topK - Number of top results to return.
-   * @returns {Array<{meta: string, similarity: number}>} Top K similar vectors with metadata.
+   * @returns {Array<{meta, similarity}>} Top K similar vectors with metadata.
    * @throws {Error} Throws error if queryVector is not an array of numbers.
    */
   search(queryVector, topK = 1) {

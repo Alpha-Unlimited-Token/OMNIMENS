@@ -50,7 +50,7 @@ function cosineSimilarity(vectorA, vectorB) {
  * @param {number[][]} vectors - Array of vectors to search.
  * @param {number[]} targetVector - The vector to find neighbors for.
  * @param {number} k - Number of neighbors to retrieve.
- * @returns {{index: number, similarity: number}[]} Array of k-nearest neighbors with their indices and similarity scores.
+ * @returns {{index, similarity}[]} Array of k-nearest neighbors with their indices and similarity scores.
  */
 function findKNearestNeighbors(vectors, targetVector, k) {
   if (!Array.isArray(vectors) || vectors.length === 0) {

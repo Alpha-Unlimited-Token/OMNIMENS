@@ -19,22 +19,18 @@
 // HoloContext.ts
 import wasmSim from "./wasm/sim.wasm"; //  ⬅ compiled SIMD cosine-similarity
 
-type Vec = Float32Array;
-interface Capsule {
-  id: string;
-  vec: Vec;                 //  embedding in shared latent space
-  meta: Record<string, any>; //  optional metadata
-}
+
+
 
 export class HoloContext {
-  private capsules: Capsule[] = [];
-  private readonly α = 0.02; // learning rate for latent plasticity
+  capsules= [];
+  α = 0.02; // learning rate for latent plasticity
 
-  add(id: string, vec: Vec, meta: any = {}) {
+  add(id, vec, meta= {}) {
     this.capsules.push({ id, vec, meta });
   }
 
-  query(q: Vec, topK = 5): Capsule[] {
+  query(q, topK = 5) {
     // 1. compute similarities in WASM
     const sims = wasmSim.similarities(q, this.capsules.map(c => c.vec));
     // 2. pick top-K

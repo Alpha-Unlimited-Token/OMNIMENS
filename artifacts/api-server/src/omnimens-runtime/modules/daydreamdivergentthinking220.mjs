@@ -17,8 +17,8 @@
  */
 
 // Pure, side-effect-free causal-resonance step
-export type Node = { id: string; freq: number; amp: number };
-export type Edge = { from: string; to: string; weight: number }; // causal strength
+ freq; amp};
+ to; weight}; // causal strength
 
 const TAU = Math.PI * 2;
 const REF = 440; // reference Hz (A4)
@@ -31,10 +31,10 @@ const REF = 440; // reference Hz (A4)
  * @returns new node set after one tick
  */
 export function resonanceTick(
-  nodes: Node[],
-  edges: Edge[],
+  nodes,
+  edges,
   damp = 0.05
-): Node[] {
+) {
   const id2idx = new Map(nodes.map((n, i) => [n.id, i]));
   const ampsNext = nodes.map(n => n.amp * (1 - damp));
 

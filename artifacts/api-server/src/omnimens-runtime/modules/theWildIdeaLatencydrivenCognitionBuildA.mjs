@@ -18,20 +18,19 @@
  */
 
 // latencyKuramoto.ts
-export type OscNet = {
-  ω: number[];          // intrinsic frequencies
+          // intrinsic frequencies
   θ: number[];          // current phases
-  K: number[][];        // coupling strengths
+  K;        // coupling strengths
 };
 
 /**
  * One Kuramoto update using measured round-trip latencies L_ij (ms).
- *  n = θ.length   |   dt in seconds   |   L in same shape as K
+ *  n = θ.length   |   dt in seconds   |   L in same shape
  */
-export function stepKuramoto(net: OscNet, L: number[][], dt = 0.05): void {
+export function stepKuramoto(net, L, dt = 0.05) {
   const { ω, θ, K } = net;
   const n = θ.length;
-  const newθ = new Array<number>(n);
+  const newθ = new Array(n);
 
   for (let i = 0; i < n; i++) {
     let couplingSum = 0;

@@ -20,22 +20,17 @@
 // Self-Optimizing Thought Pipeline (SOTP)
 // Pure, dependency-free, no eval / FS / network.
 
-type State = Record<string, any>;
-type Thought = (s: State) => State;
 
-interface Node {
-  id: string;
-  score: number;                 // Higher = earlier execution
-  think: Thought;
-  adapt: (delta: number) => void;
-}
+
+
+
 
 export class SOTP {
-  private nodes: Node[] = [];
+  nodes= [];
 
   // Register a new reasoning step
-  add(id: string, think: Thought) {
-    const node: Node = {
+  add(id, think) {
+    const node= {
       id,
       score: 0,
       think,
@@ -48,10 +43,10 @@ export class SOTP {
   }
 
   // Execute pipeline, auto-reordering by score
-  run(input: State, fitnessFunction: (before: State, after: State) => number): State {
+  run(input, fitnessFunction: (before, after) => number) {
     // Local copy of nodes sorted by current scores (desc)
     const ordered = [...this.nodes].sort((a, b) => b.score - a.score);
-    let state: State = { ...input };
+    let state= { ...input };
 
     for (const n of ordered) {
       const before = { ...state };

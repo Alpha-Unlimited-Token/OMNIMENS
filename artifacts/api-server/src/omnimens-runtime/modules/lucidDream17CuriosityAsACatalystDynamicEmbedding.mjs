@@ -4,7 +4,7 @@
  * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
  * 
  * Source: backlog_dream_id_13987
- * Title: Lucid Dream #17: Curiosity as a Catalyst + Dynamic Embedding
+ * Title: Lucid Dream #17: Curiosity Catalyst + Dynamic Embedding
  * Written: 2026-03-22T18:17:36.705Z
  * 
  * This file was autonomously written by OMNIMENS.
@@ -17,29 +17,29 @@
  */
 
 // Curiosity-Evolved Embedding Engine — core prototype (pure computation)
-export type Vector = number[];
+
 
 // cosine similarity helper
-const cosSim = (a: Vector, b: Vector): number =>
+const cosSim = (a, b) =>
   a.reduce((s, v, i) => s + v * b[i], 0) /
   (Math.hypot(...a) * Math.hypot(...b) + 1e-9);
 
 // novelty score: 1 − max cosine similarity to any memory vector
-const novelty = (v: Vector, memory: Vector[]): number =>
+const novelty = (v, memory) =>
   1 - Math.max(...memory.map(m => cosSim(v, m)));
 
 // mutate a vector by gaussian noise scaled with tau
-const mutate = (v: Vector, tau = 0.1): Vector =>
+const mutate = (v, tau = 0.1) =>
   v.map(x => x + (Math.random() * 2 - 1) * tau);
 
 // evolve a population toward maximal novelty
 export function evolveCuriousVector(
-  seed: Vector,
-  memory: Vector[],
+  seed,
+  memory,
   population = 32,
   generations = 8,
-): Vector {
-  let pop: Vector[] = Array.from({ length: population }, () => mutate(seed));
+) {
+  let pop= Array.from({ length: population }, () => mutate(seed));
   for (let g = 0; g < generations; g++) {
     const scored = pop.map(v => ({ v, score: novelty(v, memory) }));
     scored.sort((a, b) => b.score - a.score);               // high novelty first

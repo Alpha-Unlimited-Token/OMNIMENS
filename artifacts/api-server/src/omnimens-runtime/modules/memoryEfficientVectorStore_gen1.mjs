@@ -102,8 +102,7 @@ class HNSWVectorStore {
    * Connects a node to its neighbors in a given layer.
    * @param {Node} node - The node to connect.
    * @param {number} layer - The layer number.
-   * @private
-   */
+   * @*/
   _connectNode(node, layer) {
     const candidates = Array.from(this.nodes.values());
     candidates.sort((a, b) => euclideanDistance(node.vector, a.vector) - euclideanDistance(node.vector, b.vector));

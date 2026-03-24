@@ -19,7 +19,7 @@
 /**
  * @module semanticSearchIndex
  * @description Implements a simulated vector store using PostgreSQL for fast semantic searches.
- * Embeddings are stored as JSONB objects, and cosine similarity is used for retrieval.
+ * Embeddings are stored objects, and cosine similarity is used for retrieval.
  */
 
 import crypto from 'crypto';

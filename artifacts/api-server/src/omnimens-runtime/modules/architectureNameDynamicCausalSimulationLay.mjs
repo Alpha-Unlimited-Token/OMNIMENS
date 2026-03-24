@@ -18,12 +18,12 @@
  */
 
 /* Dynamic Causal Simulation Layer – minimal core */
-export type Node = { id: string; fn: (parents: number[]) => number; parents: string[] };
-export type Model = { [key: string]: Node };
+ fn => number; parents };
 
-function topologicalSort(model: Model): string[] {
-  const visited = new Set<string>(), order: string[] = [];
-  function dfs(id: string) {
+
+function topologicalSort(model) {
+  const visited = new Set(), order= [];
+  function dfs(id) {
     if (visited.has(id)) return;
     visited.add(id);
     model[id].parents.forEach(dfs);
@@ -33,8 +33,8 @@ function topologicalSort(model: Model): string[] {
   return order;
 }
 
-export function forwardSimulate(model: Model, inputs: Record<string, number>): Record<string, number> {
-  const values: Record<string, number> = { ...inputs };
+export function forwardSimulate(model, inputs) {
+  const values = { ...inputs };
   for (const id of topologicalSort(model)) {
     if (id in inputs) continue; // intervention
     const node = model[id];
@@ -45,10 +45,9 @@ export function forwardSimulate(model: Model, inputs: Record<string, number>): R
 }
 
 export function counterfactualPlan(
-  model: Model,
-  goal: (vals: Record<string, number>) => boolean,
-  candidates: string[]
-): Record<string, number> | null {
+  model,
+  goal => boolean,
+  candidates): Record<string, number> | null {
   for (const c of candidates) {
     for (const delta of [-1, 1]) {
       const trial = forwardSimulate(model, { [c]: delta });

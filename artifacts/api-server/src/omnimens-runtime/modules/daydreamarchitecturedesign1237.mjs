@@ -17,21 +17,16 @@
  */
 
 // CAISS mini-kernel — 1 step Kuramoto update + causal score extraction
-export type Vec = number[];
+
 const TWO_PI = 2 * Math.PI;
 
-export interface CAISSState {
-  theta: Vec;       // phases
-  omega: Vec;       // natural freqs
-  K: number[][];    // coupling matrix (derived from memristors)
-  dt: number;       // time step
-}
+
 
 /** single integration + causal lead matrix */
-export function stepCaiss(s: CAISSState): { next: CAISSState; lead: number[][] } {
+export function stepCaiss(s): { next; lead } {
   const n = s.theta.length;
-  const dTheta: Vec = new Array(n).fill(0);
-  const lead: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
+  const dTheta= new Array(n).fill(0);
+  const lead= Array.from({ length: n }, () => new Array(n).fill(0));
 
   // Kuramoto differential + phase-lead stats
   for (let i = 0; i < n; i++) {
@@ -47,7 +42,7 @@ export function stepCaiss(s: CAISSState): { next: CAISSState; lead: number[][] }
 
   // Euler integration
   const nextTheta = s.theta.map((th, i) => (th + s.dt * dTheta[i]) % TWO_PI);
-  const next: CAISSState = { ...s, theta: nextTheta };
+  const next= { ...s, theta: nextTheta };
 
   return { next, lead };
 }

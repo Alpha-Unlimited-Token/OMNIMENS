@@ -17,11 +17,11 @@
  */
 
 // Causal graph primitives
-export type Edge = { from: string; to: string; weight: number; };
-export type CausalGraph = { nodes: Set<string>; edges: Edge[]; };
+ to; weight; };
+ edges; };
 
 // Very small demo: update graph with new observation and simulate an intervention
-export function updateGraph(graph: CausalGraph, cause: string, effect: string, dt: number): CausalGraph {
+export function updateGraph(graph, cause, effect, dt) {
   const w = 1 / (1 + dt);                        // simple temporal decay
   graph.nodes.add(cause);
   graph.nodes.add(effect);
@@ -31,8 +31,8 @@ export function updateGraph(graph: CausalGraph, cause: string, effect: string, d
   return graph;
 }
 
-export function simulate(graph: CausalGraph, intervention: { var: string; delta: number }): Record<string, number> {
-  const influence: Record<string, number> = {};
+export function simulate(graph, intervention: { var; delta}) {
+  const influence = {};
   influence[intervention.var] = intervention.delta;
   // one-pass propagation
   for (const e of graph.edges) {
@@ -45,6 +45,6 @@ export function simulate(graph: CausalGraph, intervention: { var: string; delta:
 }
 
 // Example usage (not executed in production):
-// let G: CausalGraph = { nodes: new Set(), edges: [] };
+// let G= { nodes: new Set(), edges: [] };
 // G = updateGraph(G, "exercise", "mood", 3);
 // const result = simulate(G, { var: "exercise", delta: +1 });

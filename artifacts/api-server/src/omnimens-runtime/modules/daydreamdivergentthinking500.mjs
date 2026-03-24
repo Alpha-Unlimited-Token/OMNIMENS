@@ -17,13 +17,13 @@
  */
 
 // Prime‐frequency rhythm encoder / matcher (pure functions, no I/O)
-export type Rhythm = boolean[];          // length = NUM_PRIMES
+          // length = NUM_PRIMES
 const PRIMES = [11, 13, 17, 19, 23, 29]; // channels
 
 // Encode a numeric vector into a rhythm by thresholding its FFT energy
-export function encodeVector(vec: number[]): Rhythm {
+export function encodeVector(vec) {
   const n = PRIMES.length;
-  const rhythm: boolean[] = Array(n).fill(false);
+  const rhythm= Array(n).fill(false);
   for (let i = 0; i < n && i < vec.length; i++) {
     // simple threshold: beat present if component energy above median
     const median = 0.5 * (Math.max(...vec) + Math.min(...vec));
@@ -32,15 +32,15 @@ export function encodeVector(vec: number[]): Rhythm {
   return rhythm;
 }
 
-// Interference score: number of simultaneous “on” beats (logical AND popcount)
-export function interference(a: Rhythm, b: Rhythm): number {
+// Interference scoreof simultaneous “on” beats (logical AND popcount)
+export function interference(a, b) {
   let score = 0;
   for (let i = 0; i < PRIMES.length; i++) if (a[i] && b[i]) score++;
   return score;
 }
 
 // Retrieve top-k memories matching a probe rhythm
-export function retrieve(probe: Rhythm, memory: Rhythm[], k = 3): Rhythm[] {
+export function retrieve(probe, memory, k = 3) {
   return memory
     .map(r => ({ r, s: interference(probe, r) }))
     .sort((x, y) => y.s - x.s)

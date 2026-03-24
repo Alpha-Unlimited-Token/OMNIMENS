@@ -25,7 +25,7 @@ export class UnifiedMemoryGraph {
   }
 
   getNodeData(nodeId) {
-    return this.graph.has(nodeId) ? this.graph.get(nodeId).data : null;
+    return this.graph.has(nodeId) ? this.graph.get(nodeId).data;
   }
 
   resolveConflicts() {

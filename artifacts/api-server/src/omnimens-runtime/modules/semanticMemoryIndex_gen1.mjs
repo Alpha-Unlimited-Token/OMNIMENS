@@ -25,7 +25,7 @@
 
 /**
  * Memory index to store embeddings and associated metadata.
- * @type {Array<{embedding: number[], metadata: object}>}
+ * @type {Array<{embedding, metadata}>}
  */
 const memoryIndex = [];
 
@@ -58,7 +58,7 @@ export function addEmbedding(embedding, metadata) {
  * Queries the memory index for the closest embeddings to a given vector.
  * @param {number[]} queryVector - The vector to search for.
  * @param {number} k - The number of nearest neighbors to retrieve.
- * @returns {Array<{embedding: number[], metadata: object, distance: number}>} - The k nearest neighbors, sorted by distance.
+ * @returns {Array<{embedding, metadata, distance}>} - The k nearest neighbors, sorted by distance.
  */
 export function queryEmbedding(queryVector, k) {
   if (!Array.isArray(queryVector) || queryVector.some(isNaN)) {

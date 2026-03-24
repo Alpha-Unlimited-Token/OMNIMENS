@@ -73,10 +73,10 @@ export function validateStateUpdate(stateUpdate, schema) {
 
 // Example schema validator functions
 export const schemaValidators = {
-  isString: (value) => typeof value === 'string',
-  isNumber: (value) => typeof value === 'number',
-  isBoolean: (value) => typeof value === 'boolean',
-  isArray: (value) => Array.isArray(value)
+  isString => typeof value === 'string',
+  isNumber => typeof value === 'number',
+  isBoolean => typeof value === 'boolean',
+  isArray => Array.isArray(value)
 };
 
 // Utility to merge state updates atomically

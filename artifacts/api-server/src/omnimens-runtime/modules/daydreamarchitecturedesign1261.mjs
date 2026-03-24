@@ -18,14 +18,14 @@
 
 // Pure, side-effect-free TypeScript: 0 external deps
 export function causalResonatorStep(
-    phases: number[],                 // current phase of each node
-    omega: number[],                  // natural frequency per node
-    coupling: number[][],             // symmetric K_ij
+    phases,                 // current phase of each node
+    omega,                  // natural frequency per node
+    coupling,             // symmetric K_ij
     dt = 0.01                         // timestep (s)
-): { newPhases: number[]; adjMatrix: number[][] } {
+): { newPhases; adjMatrix } {
     const n = phases.length;
     const newPhases = phases.slice();
-    const adjMatrix: number[][] = Array.from({ length: n }, () => Array(n).fill(0));
+    const adjMatrix= Array.from({ length: n }, () => Array(n).fill(0));
 
     // 1. Kuramoto phase update
     for (let i = 0; i < n; i++) {

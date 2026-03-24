@@ -20,11 +20,11 @@
 // No external deps, pure computation, <40 lines.
 
 export function resonantField(
-  initial: number[],        // starting phases 0…2π
-  affinity: (i: number, j: number) => number, // coupling strength
+  initial,        // starting phases 0…2π
+  affinity: (i, j) => number, // coupling strength
   dt = 0.03,                // time step
   steps = 400               // iterations
-): number[] {
+) {
   const n = initial.length;
   const phase = initial.slice();
 

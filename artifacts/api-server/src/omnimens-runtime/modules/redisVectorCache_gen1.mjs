@@ -87,7 +87,7 @@ function cosineSimilarity(vectorA, vectorB) {
  * Finds the nearest neighbors to a given query vector.
  * @param {number[]} queryVector - The vector to compare against.
  * @param {number} topK - The number of nearest neighbors to retrieve.
- * @returns {Array<{ key: string, similarity: number }>} An array of nearest neighbors sorted by similarity (descending).
+ * @returns {Array<{ key, similarity}>} An array of nearest neighbors sorted by similarity (descending).
  * @throws {Error} If the query vector is invalid or topK is not a positive integer.
  */
 export function findNearestNeighbors(queryVector, topK) {

@@ -25,8 +25,7 @@ export class EmbeddingSearchCache {
 
   /**
    * Hashes a vector using a simple random projection method.
-   * @private
-   * @param {number[]} vector - The input vector.
+   * @* @param {number[]} vector - The input vector.
    * @returns {number[]} - Array of hash values.
    */
   _hashVector(vector) {
@@ -71,7 +70,7 @@ export class EmbeddingSearchCache {
    * Searches for similar embeddings in the cache.
    * @param {number[]} queryVector - The query embedding vector.
    * @param {number} [maxResults=10] - Maximum number of results to return.
-   * @returns {Array<{id: string, similarity: number}>} - Array of matching embeddings with similarity scores.
+   * @returns {Array<{id, similarity}>} - Array of matching embeddings with similarity scores.
    */
   search(queryVector, maxResults = 10) {
     const hashValues = this._hashVector(queryVector);
@@ -103,8 +102,7 @@ export class EmbeddingSearchCache {
 
   /**
    * Computes the cosine similarity between two vectors.
-   * @private
-   * @param {number[]} vec1 - First vector.
+   * @* @param {number[]} vec1 - First vector.
    * @param {number[]} vec2 - Second vector.
    * @returns {number} - Cosine similarity score.
    */

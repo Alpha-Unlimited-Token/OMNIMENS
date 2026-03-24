@@ -85,7 +85,7 @@ class EmbeddingVectorStore {
    * Searches for the nearest neighbors of a given vector.
    * @param {number[]} queryVector - The vector to search for.
    * @param {number} k - The number of nearest neighbors to return.
-   * @returns {Array<{id: number, distance: number}>} - The nearest neighbors.
+   * @returns {Array<{id, distance}>} - The nearest neighbors.
    */
   search(queryVector, k = 1) {
     const candidates = this._search(queryVector, k);

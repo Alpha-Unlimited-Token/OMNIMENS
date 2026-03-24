@@ -8,17 +8,17 @@
  */
 
 export const boundedAutonomyModule = {
-  checkResourceLimits: (resources) => {
+  checkResourceLimits => {
     const maxResources = 100; // Example threshold
     return resources <= maxResources;
   },
-  escalateIfNeeded: (modification) => {
+  escalateIfNeeded => {
     if (modification.riskLevel > 0.7) {
       return 'Escalate to human oversight';
     }
     return 'Proceed with modification';
   },
-  applyModification: (modification) => {
+  applyModification => {
     const isSafe = boundedAutonomyModule.checkResourceLimits(modification.resourceUsage);
     const escalation = boundedAutonomyModule.escalateIfNeeded(modification);
     if (isSafe && escalation === 'Proceed with modification') {

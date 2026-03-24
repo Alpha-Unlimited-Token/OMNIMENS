@@ -75,7 +75,7 @@ export class EmbeddingMemoryStore {
    * Searches for the top N most similar embeddings to the given query vector.
    * @param {number[]} query - The query embedding vector.
    * @param {number} topN - The number of top results to return.
-   * @returns {Array<{key: string, similarity: number}>} The top N most similar embeddings.
+   * @returns {Array<{key, similarity}>} The top N most similar embeddings.
    * @throws {Error} If the query is invalid or topN is not a positive integer.
    */
   search(query, topN) {

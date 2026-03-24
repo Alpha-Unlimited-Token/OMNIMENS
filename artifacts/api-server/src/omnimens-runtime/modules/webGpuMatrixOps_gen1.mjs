@@ -14,7 +14,7 @@ export function isWebGpuSupported() {
 
 /**
  * Initializes a WebGPU device and context.
- * @returns {Promise<{device: GPUDevice, adapter: GPUAdapter}>} - A promise resolving to the WebGPU device and adapter.
+ * @returns {Promise<{device, adapter}>} - A promise resolving to the WebGPU device and adapter.
  * @throws {Error} - If WebGPU is not supported or initialization fails.
  */
 export async function initializeWebGpu() {
@@ -60,7 +60,7 @@ export function createBuffer(device, data, usage) {
  * @param {number} rowsA - Number of rows in matrix A.
  * @param {number} colsA - Number of columns in matrix A (and rows in matrix B).
  * @param {number} colsB - Number of columns in matrix B.
- * @returns {Promise<Float32Array>} - A promise resolving to the resulting matrix (in row-major order).
+ * @returns {Promise} - A promise resolving to the resulting matrix (in row-major order).
  */
 export async function matrixMultiply(device, matrixA, matrixB, rowsA, colsA, colsB) {
   const shaderCode = `
@@ -77,7 +77,7 @@ export async function matrixMultiply(device, matrixA, matrixB, rowsA, colsA, col
         return;
       }
 
-      var sum : f32 = 0.0;
+      var sum = 0.0;
       for (var i = 0u; i < ${colsA}u; i = i + 1u) {
         sum = sum + matrixA[row * ${colsA}u + i] * matrixB[i * ${colsB}u + col];
       }
@@ -105,9 +105,9 @@ export async function matrixMultiply(device, matrixA, matrixB, rowsA, colsA, col
   const bindGroup = device.createBindGroup({
     layout: pipeline.getBindGroupLayout(0),
     entries: [
-      { binding: 0, resource: { buffer: bufferA } },
-      { binding: 1, resource: { buffer: bufferB } },
-      { binding: 2, resource: { buffer: resultBuffer } }
+      { binding: 0, resource },
+      { binding: 1, resource },
+      { binding: 2, resource }
     ]
   });
 

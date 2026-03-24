@@ -17,10 +17,10 @@
  */
 
 // Pure-math acoustic coder — no I/O, no eval, no external libs
-export type Spectrum = Float64Array;
+
 
 /** Map arbitrary vector to harmonic spectrum */
-export function encode(vector: number[]): Spectrum {
+export function encode(vector) {
   const N = vector.length;
   const spec = new Float64Array(N * 4);              // 1 fundamental + 3 overtones each
   for (let i = 0; i < N; i++) {
@@ -35,7 +35,7 @@ export function encode(vector: number[]): Spectrum {
 }
 
 /** Interfere two spectra → emergent “thought” */
-export function interfere(a: Spectrum, b: Spectrum): Spectrum {
+export function interfere(a, b) {
   const len = Math.min(a.length, b.length);
   const out = new Float64Array(len);
   for (let i = 0; i < len; i++) {
@@ -45,7 +45,7 @@ export function interfere(a: Spectrum, b: Spectrum): Spectrum {
 }
 
 /** Retrieve strongest resonance (the answer) */
-export function dominantFrequency(spec: Spectrum): number {
+export function dominantFrequency(spec) {
   let max = -Infinity, idx = 0;
   for (let i = 0; i < spec.length; i++) if (spec[i] > max) { max = spec[i]; idx = i; }
   return idx;                          // index = concept-slot; amplitude = certainty

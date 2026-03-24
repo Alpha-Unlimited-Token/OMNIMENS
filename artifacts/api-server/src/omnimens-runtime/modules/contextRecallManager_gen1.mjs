@@ -65,7 +65,7 @@ export async function saveContext(client, context) {
  * @param {Client} client - The PostgreSQL client instance.
  * @param {string} searchTerm - The term to search for within the context data.
  * @param {number} limit - The maximum number of entries to retrieve.
- * @returns {Promise<Array<{context_data: string, created_at: string}>>} - An array of matching context entries.
+ * @returns {Promise<Array<{context_data, created_at}>>} - An array of matching context entries.
  */
 export async function retrieveContext(client, searchTerm, limit = 5) {
   const query = `

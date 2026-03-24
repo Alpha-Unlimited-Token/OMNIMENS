@@ -8,14 +8,14 @@
  */
 
 export const proceduralMemoryLayer = {
-  trackExecution: (executionSteps) => {
+  trackExecution => {
     const anomalies = executionSteps.filter(step => step.status === 'failed');
     return anomalies.map(anomaly => ({
       step: anomaly.step,
       suggestion: `Review step ${anomaly.step} for potential improvements.`
     }));
   },
-  suggestModifications: (anomalies) => {
+  suggestModifications => {
     return anomalies.map(({ step, suggestion }) => {
       return {
         step,

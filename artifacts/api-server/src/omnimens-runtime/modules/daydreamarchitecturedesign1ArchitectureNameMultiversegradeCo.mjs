@@ -18,18 +18,17 @@
  */
 
 // MuGCS – minimal causal–counterfactual core (28 lines)
-export type NodeID = string;
 
-export type Node = {
-  id: NodeID;
-  parents: NodeID[];
-  compute: (...args: number[]) => number;   // deterministic causal mechanism
+
+
+  parents;
+  compute: (...args) => number;   // deterministic causal mechanism
 };
 
-export type Universe = Record<NodeID, number>;
 
-function forward(nodes: Node[], state: Universe): Universe {
-  const next: Universe = { ...state };
+
+function forward(nodes, state) {
+  const next= { ...state };
   for (const n of nodes) {
     if (n.parents.every(p => p in next)) {
       const inputs = n.parents.map(p => next[p]);
@@ -39,23 +38,23 @@ function forward(nodes: Node[], state: Universe): Universe {
   return next;
 }
 
-function energy(state: Universe, target: Universe): number {
+function energy(state, target) {
   let e = 0;
   for (const k in target) e += (state[k] - target[k]) ** 2;
   return e;
 }
 
 export function multiverseStep(
-  base: Universe,
-  nodes: Node[],
-  interventions: NodeID[],
-  deltas: number[],
-  target: Universe,
+  base,
+  nodes,
+  interventions,
+  deltas,
+  target,
   topK = 3
-): Universe {
-  const branches: { s: Universe; e: number }[] = [];
+) {
+  const branches: { s; e}[] = [];
   for (let i = 0; i < interventions.length; i++) {
-    const s: Universe = { ...base, [interventions[i]]: base[interventions[i]] + deltas[i] };
+    const s= { ...base, [interventions[i]]: base[interventions[i]] + deltas[i] };
     const propagated = forward(nodes, s);
     branches.push({ s: propagated, e: energy(propagated, target) });
   }

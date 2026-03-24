@@ -16,24 +16,24 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-export type Vec = number[];
-export type Node = { id: string; state: number; prior: number; posterior: number };
-export type Edge = { inputs: string[]; output: string; weight: number; func: (xs: Vec) => number };
+
+ state; prior; posterior};
+ output; weight; func => number };
 
 export class CausalGraph {
-  private V: Record<string, Node> = {};
-  private E: Edge[] = [];
+  V = {};
+  E= [];
 
-  addNode(id: string, prior = 0) {
+  addNode(id, prior = 0) {
     this.V[id] = { id, state: prior, prior, posterior: prior };
   }
 
-  addEdge(inputs: string[], output: string, weight: number,
-           func: (xs: Vec) => number) {
+  addEdge(inputs, output, weight,
+           func => number) {
     this.E.push({ inputs, output, weight, func });
   }
 
-  intervene(id: string, value: number) {
+  intervene(id, value) {
     if (this.V[id]) this.V[id].state = value;
   }
 
@@ -48,9 +48,9 @@ export class CausalGraph {
     }
   }
 
-  trace(output: string): string[] {
-    const deps = new Set<string>();
-    const visit = (id: string) => {
+  trace(output) {
+    const deps = new Set();
+    const visit = (id) => {
       for (const e of this.E) {
         if (e.output === id) {
           e.inputs.forEach(i => { if (!deps.has(i)) { deps.add(i); visit(i); } });

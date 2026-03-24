@@ -94,8 +94,7 @@ class HNSW {
   /**
    * Connect a new node to the graph.
    * @param {Node} newNode - The node to connect.
-   * @private
-   */
+   * @*/
   _connectNode(newNode) {
     let currentNode = this.entryPoint;
 

@@ -24,7 +24,7 @@ import { randomUUID } from 'crypto';
  * Generates an initial population of prompts for optimization.
  * @param {number} populationSize - Number of prompts to generate.
  * @param {Array<string>} baseTemplates - Base templates to start with.
- * @returns {Array<Object>} Array of prompt objects with unique IDs.
+ * @returns {Array} Array of prompt objects with unique IDs.
  */
 export function generateInitialPopulation(populationSize, baseTemplates) {
   const population = [];
@@ -86,9 +86,9 @@ export function mutatePrompt(prompt, mutationRate) {
 
 /**
  * Selects prompts for the next generation based on fitness scores.
- * @param {Array<Object>} population - Current population of prompts.
+ * @param {Array} population - Current population of prompts.
  * @param {number} selectionSize - Number of prompts to select.
- * @returns {Array<Object>} Selected prompts.
+ * @returns {Array} Selected prompts.
  */
 export function selectPromptsByFitness(population, selectionSize) {
   return population
@@ -160,7 +160,7 @@ export function generateOptimizedPrompt(taskDescription) {
   ];
 
   const fitnessFunction = (prompt) => {
-    // Example fitness evaluation: length of prompt (customize as needed)
+    // Example fitness evaluation: length of prompt (customize)
     return prompt.length;
   };
 

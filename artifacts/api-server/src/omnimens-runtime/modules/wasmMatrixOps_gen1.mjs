@@ -125,7 +125,7 @@ async function invertMatrix(matrix) {
 /**
  * Computes the eigenvalues and eigenvectors of a matrix.
  * @param {number[][]} matrix - The matrix to decompose.
- * @returns {Promise<{ eigenvalues: number[], eigenvectors: number[][] }>} - The eigenvalues and eigenvectors.
+ * @returns {Promise<{ eigenvalues, eigenvectors }>} - The eigenvalues and eigenvectors.
  */
 async function eigenDecomposition(matrix) {
   const wasmInstance = await loadWasm();

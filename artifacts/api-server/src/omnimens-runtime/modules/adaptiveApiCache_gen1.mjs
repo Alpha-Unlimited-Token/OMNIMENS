@@ -89,7 +89,7 @@ export function findSimilarCachedResponse(query) {
     }
   }
 
-  return highestSimilarity > 0.8 ? bestMatch : null; // Threshold for similarity
+  return highestSimilarity > 0.8 ? bestMatch; // Threshold for similarity
 }
 
 /**

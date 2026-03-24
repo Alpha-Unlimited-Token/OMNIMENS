@@ -18,13 +18,13 @@
  */
 
 // Counterpoint-Evolution core (pure TS, no io, no eval, no require)
-export type Voice = number[];               // each number = token id
-export type Score = { voices: Voice[], fit: number };
+               // each number = token id
 
-const consonant = (a: number, b: number) => (Math.abs(a - b) % 12) === 0;
-const dissonance = (a: number, b: number) => !consonant(a, b);
 
-function fitness(voices: Voice[]): number {
+const consonant = (a, b) => (Math.abs(a - b) % 12) === 0;
+const dissonance = (a, b) => !consonant(a, b);
+
+function fitness(voices) {
   // reward alternating consonance/dissonance across time
   let fit = 0;
   for (let t = 0; t < voices[0].length; t++) {
@@ -37,8 +37,8 @@ function fitness(voices: Voice[]): number {
   return -fit;                               // lower imbalance = better
 }
 
-export function evolve(pop: Voice[][], steps = 100): Score {
-  let best: Score = { voices: pop[0], fit: fitness(pop[0]) };
+export function evolve(pop, steps = 100) {
+  let best= { voices: pop[0], fit: fitness(pop[0]) };
   for (let s = 0; s < steps; s++) {
     const idx = Math.floor(Math.random() * pop.length);
     const mutant = pop[idx].map(v =>

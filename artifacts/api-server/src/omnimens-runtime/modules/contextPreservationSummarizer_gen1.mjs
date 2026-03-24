@@ -57,7 +57,7 @@ export function encodeSummaryToVector(summary) {
  * Compresses conversation history into hierarchical summaries and encodes them into dense vectors.
  * @param {string[]} conversationHistory - Array of conversation strings in chronological order.
  * @param {number} summaryLevels - Number of hierarchical levels for summarization.
- * @returns {{ summaries: string[], vectors: number[][] }} - Object containing hierarchical summaries and their vector encodings.
+ * @returns {{ summaries, vectors }} - Object containing hierarchical summaries and their vector encodings.
  */
 export function compressConversationHistory(conversationHistory, summaryLevels = 3) {
   const summaries = generateHierarchicalSummary(conversationHistory, summaryLevels);

@@ -40,11 +40,11 @@ const wasmSource = `
   (func (export "matrixMultiply") (param i32 i32 i32 i32 i32 i32 i32) (result i32)
     ;; Parameters:
     ;; - ptrA: pointer to matrix A
-    ;; - rowsA: number of rows in A
-    ;; - colsA: number of columns in A
+    ;; - rowsAof rows in A
+    ;; - colsAof columns in A
     ;; - ptrB: pointer to matrix B
-    ;; - rowsB: number of rows in B
-    ;; - colsB: number of columns in B
+    ;; - rowsBof rows in B
+    ;; - colsBof columns in B
     ;; - ptrC: pointer to result matrix C
 
     ;; Check if multiplication is possible (colsA == rowsB)

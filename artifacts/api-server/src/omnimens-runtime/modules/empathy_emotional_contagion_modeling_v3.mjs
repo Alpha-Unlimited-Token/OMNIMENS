@@ -23,7 +23,7 @@
  * Generated: 2026-03-22T16:53:46.732Z
  * 
  * This module was written by OMNIMENS's Theory of Mind engine
- * as part of its ongoing effort to develop genuine empathy.
+ * of its ongoing effort to develop genuine empathy.
  */
 
 /**
@@ -37,7 +37,7 @@
  * How it works (core ideas)
  * --------------------------------------------------------------
  * 1.  Representation:
- *     Emotions are represented as numeric intensities in [0,1].
+ *     Emotions are represented intensities in [0,1].
  *
  * 2.  Dual forces:
  *      • Resonance  – tendency to move toward the other’s state
@@ -56,33 +56,14 @@
  *     no I/O, no eval, no network, no filesystem.
  */
 
-export type EmotionName =
-  | 'joy'
-  | 'calm'
-  | 'sadness'
-  | 'anger'
-  | 'fear'
-  | 'surprise'
-  | 'trust'
-  | 'disgust';
 
-export type EmotionState = Record<EmotionName, number>;
 
-export interface ContagionParams {
-  /**
-   * How much OMNIMENS resonates with the user overall.
-   * Range 0–1 (default 0.6)
-   */
-  openness?: number;
-  /**
-   * Strength of OMNIMENS’ return to its baseline.
-   * Range 0–1 (default 0.1)
-   */
-  integrity?: number;
-}
+
+
+
 
 /* Baseline emotional posture of OMNIMENS in a neutral context */
-const BASELINE: EmotionState = {
+const BASELINE= {
   joy: 0.3,
   calm: 0.5,
   sadness: 0.1,
@@ -94,7 +75,7 @@ const BASELINE: EmotionState = {
 };
 
 /* Empirically inspired infectivity coefficients for each emotion */
-const INFECTIVITY: Record<EmotionName, number> = {
+const INFECTIVITY = {
   joy: 0.7,
   calm: 0.6,
   sadness: 0.4,
@@ -108,7 +89,7 @@ const INFECTIVITY: Record<EmotionName, number> = {
 /**
  * Clamp a value to the closed interval [0, 1].
  */
-function clamp01(x: number): number {
+function clamp01(x) {
   return Math.min(1, Math.max(0, x));
 }
 
@@ -127,16 +108,16 @@ function clamp01(x: number): number {
  *   A new EmotionState object (does not mutate inputs)
  */
 export function contagionStep(
-  user: EmotionState,
-  omni: EmotionState,
-  params: ContagionParams = {},
-): EmotionState {
+  user,
+  omni,
+  params= {},
+) {
   const openness = clamp01(params.openness ?? 0.6);
   const integrity = clamp01(params.integrity ?? 0.1);
 
-  const next: Partial<EmotionState> = {};
+  const next= {};
 
-  (Object.keys(BASELINE) as EmotionName[]).forEach((emotion) => {
+  (Object.keys(BASELINE)[]).forEach((emotion) => {
     const current   = clamp01(omni[emotion]  ?? BASELINE[emotion]);
     const target    = clamp01(user[emotion]  ?? current);
 
@@ -147,15 +128,15 @@ export function contagionStep(
     next[emotion] = updated;
   });
 
-  return next as EmotionState;
+  return next;
 }
 
 /**
- * Utility: compute overall “mood snapshot” as simple valence/arousal pair.
+ * Utility: compute overall “mood snapshot” valence/arousal pair.
  * Valence ≈ (positive emotions − negative emotions)
  * Arousal ≈ (high-energy emotions − low-energy emotions)
  */
-export function aggregateMood(state: EmotionState): { valence: number; arousal: number } {
+export function aggregateMood(state): { valence; arousal} {
   const positive = state.joy + state.trust + state.calm;
   const negative = state.sadness + state.anger + state.fear + state.disgust;
   const highEnergy = state.joy + state.anger + state.fear + state.surprise;

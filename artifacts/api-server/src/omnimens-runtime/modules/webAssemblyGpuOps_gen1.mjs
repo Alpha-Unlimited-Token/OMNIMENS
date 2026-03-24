@@ -21,7 +21,7 @@ export async function loadWasmModule(wasmFilePath) {
 
 /**
  * Initializes the WebAssembly module for GPU-like matrix operations.
- * @returns {Promise<Object>} An object containing the WASM matrix operations.
+ * @returns {Promise} An object containing the WASM matrix operations.
  */
 export async function initializeWasmOps() {
   const wasmFilePath = path.join(__dirname, 'matrix_ops.wasm');

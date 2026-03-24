@@ -17,19 +17,19 @@
  */
 
 // Resonant Field Intelligence – micro‐demo (pure, side-effect free)
-export type Vector = number[];          // phases in radians, range [-π, π]
+          // phases in radians, range [-π, π]
 
 const TAU = Math.PI * 2;
-function wrap(x: number): number {      // keep phase inside [-π, π]
+function wrap(x) {      // keep phase inside [-π, π]
   return ((x + Math.PI) % TAU + TAU) % TAU - Math.PI;
 }
 
 export function resonate(
-  couplings: number[][],                // symmetric weights, |w|≤1
-  seed: Vector,                         // initial phases (NaN = unknown)
+  couplings,                // symmetric weights, |w|≤1
+  seed,                         // initial phases (NaN = unknown)
   steps = 30,                           // iterations until lock
   alpha = 0.15                          // blending rate
-): Vector {
+) {
   const n = couplings.length;
   let state = seed.map(p => isNaN(p) ? Math.random() * TAU - Math.PI : p);
 

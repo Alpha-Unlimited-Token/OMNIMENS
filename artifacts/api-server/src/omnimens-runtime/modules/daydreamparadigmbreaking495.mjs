@@ -18,17 +18,17 @@
 
 // ResonanceField.ts — 100 % sandbox-safe
 export function resonanceField(
-  couplings: number[][],      // symmetric NxN influence matrix
-  stimuli:  number[],         // external push to each node (-π … π)
+  couplings,      // symmetric NxN influence matrix
+  stimuli,         // external push to each node (-π … π)
   steps = 40,                 // iterations to settle
   dt    = 0.05                // time-step
-): number[] {                 // returns settled phases in radians
+) {                 // returns settled phases in radians
   const N = couplings.length;
-  let phase = Array.from({ length: N }, (_, i) => stimuli[i]); // init
+  let phase = Array.from({ length}, (_, i) => stimuli[i]); // init
 
   const sin = Math.sin;
   for (let t = 0; t < steps; t++) {
-    const next: number[] = new Array(N);
+    const next= new Array(N);
     for (let i = 0; i < N; i++) {
       let dφ = 0;
       for (let j = 0; j < N; j++) {

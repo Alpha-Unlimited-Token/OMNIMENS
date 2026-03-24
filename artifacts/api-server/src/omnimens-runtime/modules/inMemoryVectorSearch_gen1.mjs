@@ -94,7 +94,7 @@ class HNSWGraph {
    * Searches for the nearest neighbors to a given vector.
    * @param {number[]} queryVector - The query vector.
    * @param {number} k - Number of nearest neighbors to return.
-   * @returns {Array<{id: number, distance: number}>} - List of nearest neighbors with their IDs and distances.
+   * @returns {Array<{id, distance}>} - List of nearest neighbors with their IDs and distances.
    */
   search(queryVector, k = 1) {
     if (this.nodes.length === 0) {
@@ -128,8 +128,7 @@ class HNSWGraph {
 
   /**
    * Finds the nearest neighbors for a given vector.
-   * @private
-   * @param {number[]} vector - The query vector.
+   * @* @param {number[]} vector - The query vector.
    * @param {number} k - Number of neighbors to find.
    * @returns {HNSWNode[]} - List of nearest neighbor nodes.
    */

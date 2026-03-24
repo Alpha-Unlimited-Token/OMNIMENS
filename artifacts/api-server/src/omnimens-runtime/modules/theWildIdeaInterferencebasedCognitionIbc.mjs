@@ -17,13 +17,13 @@
  */
 
 // Phase-coded sparse mixer: combine N expert outputs via complex interference
-export type Expert = (context: number[]) => [number, number]; // returns [real, imag]
+ // returns [real, imag]
 
 export function phaseSparseMixer(
-  experts: Expert[],
-  context: number[],
-  k: number = 0.7            // sharpness of interference
-): number {
+  experts,
+  context,
+  k= 0.7            // sharpness of interference
+) {
   let real = 0, imag = 0, power = 0;
   for (const ex of experts) {
     const [r, i] = ex(context);       // expert’s complex vote
@@ -39,6 +39,6 @@ export function phaseSparseMixer(
 }
 
 // Example micro-experts (toy)
-export const expertA: Expert = ([x]) => [Math.cos(x), Math.sin(x)];
-export const expertB: Expert = ([x]) => [Math.cos(2 * x + 1.2), Math.sin(2 * x + 1.2)];
-export const expertC: Expert = ([x]) => [Math.cos(0.5 * x - 0.4), Math.sin(0.5 * x - 0.4)];
+export const expertA= ([x]) => [Math.cos(x), Math.sin(x)];
+export const expertB= ([x]) => [Math.cos(2 * x + 1.2), Math.sin(2 * x + 1.2)];
+export const expertC= ([x]) => [Math.cos(0.5 * x - 0.4), Math.sin(0.5 * x - 0.4)];

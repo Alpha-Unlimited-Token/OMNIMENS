@@ -17,22 +17,18 @@
  */
 
 // Causal mini-kernel (pure, no I/O)
-export type NodeId = string;
-export type Equation = (parents: Record<NodeId, number>) => number;
 
-export interface SCM {
-  nodes: NodeId[];
-  parents: Record<NodeId, NodeId[]>;
-  eqs: Record<NodeId, Equation>;
-}
+
+
+
 
 // Forward propagate values through the causal graph
-export function forward(model: SCM, evidence: Record<NodeId, number>): Record<NodeId, number> {
-  const value: Record<NodeId, number> = { ...evidence };
+export function forward(model, evidence) {
+  const value = { ...evidence };
   const topo = topologicalSort(model);
   for (const node of topo) {
     if (value[node] !== undefined) continue; // evidence overrides
-    const p: Record<NodeId, number> = {};
+    const p = {};
     for (const par of model.parents[node]) p[par] = value[par];
     value[node] = model.eqs[node](p);
   }
@@ -40,8 +36,8 @@ export function forward(model: SCM, evidence: Record<NodeId, number>): Record<No
 }
 
 // Perform an intervention do(X = v)
-export function intervene(model: SCM, X: NodeId, v: number, evidence: Record<NodeId, number> = {}) {
-  const newModel: SCM = {
+export function intervene(model, X, v, evidence = {}) {
+  const newModel= {
     nodes: model.nodes,
     parents: { ...model.parents, [X]: [] }, // cut incoming edges
     eqs: { ...model.eqs, [X]: () => v }
@@ -50,10 +46,10 @@ export function intervene(model: SCM, X: NodeId, v: number, evidence: Record<Nod
 }
 
 // Simple DAG topological sort
-function topologicalSort(model: SCM): NodeId[] {
-  const visited = new Set<NodeId>();
-  const order: NodeId[] = [];
-  const visit = (n: NodeId) => {
+function topologicalSort(model) {
+  const visited = new Set();
+  const order= [];
+  const visit = (n) => {
     if (visited.has(n)) return;
     visited.add(n);
     for (const p of model.parents[n] || []) visit(p);

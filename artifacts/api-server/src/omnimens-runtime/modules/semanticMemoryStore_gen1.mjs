@@ -39,7 +39,7 @@ function cosineSimilarity(vectorA, vectorB) {
   const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
 
   if (magnitudeA === 0 || magnitudeB === 0) {
-    return 0; // Avoid division by zero; treat as no similarity.
+    return 0; // Avoid division by zero; treat similarity.
   }
 
   return dotProduct / (magnitudeA * magnitudeB);
@@ -68,7 +68,7 @@ function createSemanticMemoryStore() {
    * Searches the store for the most similar vectors to the query vector.
    * @param {number[]} queryVector - The vector to search for.
    * @param {number} topK - The number of top results to return.
-   * @returns {Array<{key: string, similarity: number}>} - An array of objects containing keys and similarity scores.
+   * @returns {Array<{key, similarity}>} - An array of objects containing keys and similarity scores.
    */
   function search(queryVector, topK = 5) {
     if (!Array.isArray(queryVector) || queryVector.some(isNaN)) {

@@ -36,14 +36,12 @@
 class RedisMemoryCache {
   constructor() {
     /**
-     * @private
-     * @type {Map<string, CacheEntry>}
+     * @* @type {Map<string, CacheEntry>}
      */
     this.cache = new Map();
 
     /**
-     * @private
-     * @type {NodeJS.Timeout}
+     * @* @type {NodeJS.Timeout}
      */
     this.cleanupInterval = setInterval(() => this.cleanupExpiredEntries(), 1000);
   }
@@ -90,8 +88,7 @@ class RedisMemoryCache {
 
   /**
    * Cleans up expired entries from the cache.
-   * @private
-   */
+   * @*/
   cleanupExpiredEntries() {
     const now = Date.now();
     for (const [key, entry] of this.cache.entries()) {

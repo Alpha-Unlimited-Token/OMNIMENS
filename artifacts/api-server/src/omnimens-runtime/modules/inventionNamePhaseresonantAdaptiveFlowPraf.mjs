@@ -18,24 +18,20 @@ Phase-Resonant Adaptive Flow (PRAF)
  */
 
 // Phase-Resonant Adaptive Flow — pure, self-contained
-export type Fiber = (input: number, phase: number) => number;
 
-interface State {
-  phases: Float64Array;          // individual fiber phases
-  strengths: Float64Array;       // connection “intensity”
-  order: Uint16Array;            // dynamic execution order
-}
 
-export function createPRAF(fibers: Fiber[]): (x: number, fb: number) => number {
+
+
+export function createPRAF(fibers): (x, fb) => number {
   const n = fibers.length;
-  const st: State = {
+  const st= {
     phases: new Float64Array(n).fill(0),
     strengths: new Float64Array(n).fill(1 / n),
     order: new Uint16Array(n).map((_, i) => i),
   };
 
   // single step processor (self-mutable via st closures)
-  return function process(input: number, feedback: number): number {
+  return function process(input, feedback) {
     // 1. Phase update (resonance with feedback)
     for (let i = 0; i < n; i++) {
       st.phases[i] = (st.phases[i] + st.strengths[i] * feedback) % (2 * Math.PI);

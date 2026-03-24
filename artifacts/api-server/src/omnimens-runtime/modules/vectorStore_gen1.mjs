@@ -35,7 +35,7 @@ function euclideanDistance(vectorA, vectorB) {
  */
 class HNSWGraph {
   constructor(maxNeighbors = 10) {
-    this.nodes = new Map(); // Map of all nodes (key: node ID, value: HNSWNode)
+    this.nodes = new Map(); // Map of all nodes (key: node ID, value)
     this.maxNeighbors = maxNeighbors; // Maximum number of neighbors per node
   }
 
@@ -64,7 +64,7 @@ class HNSWGraph {
    * Performs a similarity search to find the nearest neighbors.
    * @param {number[]} queryVector - The query vector.
    * @param {number} k - Number of nearest neighbors to return.
-   * @returns {Array<{id: string, distance: number}>} List of nearest neighbors.
+   * @returns {Array<{id, distance}>} List of nearest neighbors.
    */
   search(queryVector, k = 5) {
     if (k <= 0) {
@@ -83,8 +83,7 @@ class HNSWGraph {
 
   /**
    * Adds a neighbor to a node, maintaining the maxNeighbors constraint.
-   * @private
-   * @param {HNSWNode} node - The node to add a neighbor to.
+   * @* @param {HNSWNode} node - The node to add a neighbor to.
    * @param {HNSWNode} neighbor - The neighbor node.
    * @param {number} distance - The distance between the nodes.
    */

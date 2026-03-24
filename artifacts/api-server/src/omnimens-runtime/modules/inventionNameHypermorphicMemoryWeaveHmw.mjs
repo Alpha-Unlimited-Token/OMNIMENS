@@ -18,24 +18,20 @@
  */
 
 // Hyper-Morphic Memory Weave — self-rewiring memory lattice
-export type MicroFn = (v: number) => number;
 
-interface Chunk {
-  data: number;
-  weight: number;
-  warp: MicroFn;               // transformation stored *with* the datum
-}
+
+
 
 export class HMW {
-  private lattice: Chunk[] = [];
+  lattice= [];
 
   // write a datum with an optional transformer
-  write(value: number, warp: MicroFn = (x) => x): void {
+  write(value, warp= (x) => x) {
     this.lattice.push({ data: value, weight: 1, warp });
   }
 
   // read synthesises a collective answer, THEN updates internal code
-  read(query: (v: number) => number): number {
+  read(query => number) {
     let acc = 0, wSum = 0;
 
     for (const c of this.lattice) {
@@ -57,7 +53,7 @@ export class HMW {
 
       // graft: create a new function that nudges output next time
       const prevWarp = c.warp;
-      c.warp = (v: number) => prevWarp(v) + delta;
+      c.warp = (v) => prevWarp(v) + delta;
     }
     // ---------------------------------------------------------------------
 

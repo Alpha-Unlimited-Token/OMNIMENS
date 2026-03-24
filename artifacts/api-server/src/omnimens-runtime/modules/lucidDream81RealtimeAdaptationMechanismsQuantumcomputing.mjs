@@ -17,30 +17,22 @@
  */
 
 // Topological Memory Graph — minimal prototype, no external deps
-export type FluxonID = number;
 
-export interface Edge {
-  to: FluxonID;
-  weight: number;          // classical magnitude
-  phase: number;           // quantum-inspired angle (0..2π)
-}
 
-export interface Fluxon {
-  id: FluxonID;
-  state: number;           // current activation
-  edges: Edge[];
-}
+
+
+
 
 const TAU = Math.PI * 2;
 
 /** One Real-Time Adaptation step */
 export function rtamStep(
-  graph: Fluxon[],
-  input: number[],
-  errorSignal: number[],
+  graph,
+  input,
+  errorSignal,
   lr = 0.1,              // learning-rate on magnitude
   phaseRate = 0.2        // learning-rate on phase
-): number[] {
+) {
   // 1. Inject input
   for (let i = 0; i < input.length; i++) graph[i].state = input[i];
 

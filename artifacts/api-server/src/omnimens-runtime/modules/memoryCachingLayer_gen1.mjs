@@ -68,7 +68,7 @@ function cosineSimilarity(vectorA, vectorB) {
  * Finds the most similar items in the cache based on vector similarity.
  * @param {Array<number>} queryVector - The query embedding vector.
  * @param {number} [topK=5] - The number of top similar items to return.
- * @returns {Array<{key: string, similarity: number}>} Array of top similar items with their keys and similarity scores.
+ * @returns {Array<{key, similarity}>} Array of top similar items with their keys and similarity scores.
  */
 export function findSimilarItems(queryVector, topK = 5) {
   if (!Array.isArray(queryVector) || queryVector.some(isNaN)) {

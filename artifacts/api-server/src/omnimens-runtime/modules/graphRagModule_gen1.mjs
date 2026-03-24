@@ -8,7 +8,7 @@
  */
 
 export const graphRagModule = {
-  synthesizeRelationships: (entities) => {
+  synthesizeRelationships => {
     return entities.map(entity => {
       return {
         entityId: entity.id,
@@ -19,13 +19,13 @@ export const graphRagModule = {
       };
     });
   },
-  calculateConfidenceScores: (relationships) => {
+  calculateConfidenceScores => {
     return relationships.map(rel => {
       const totalConfidence = rel.connections.reduce((sum, conn) => sum + conn.confidence, 0);
       return { ...rel, totalConfidence };
     });
   },
-  dynamicSynthesis: (entities) => {
+  dynamicSynthesis => {
     const relationships = graphRagModule.synthesizeRelationships(entities);
     return graphRagModule.calculateConfidenceScores(relationships);
   }

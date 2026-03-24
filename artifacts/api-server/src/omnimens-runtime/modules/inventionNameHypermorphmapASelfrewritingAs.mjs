@@ -18,22 +18,21 @@ HyperMorphMap – a Self-Rewriting As
  */
 
 // HyperMorphMap.ts
-type Patch<K, V> = { key: K; morph: Morph<K, V> };
-type Morph<K, V> = (prev: V | undefined, api: HyperMorphMap<K, V>) =>
-                   { next: V; patches?: Patch<K, V>[] };
+ morph};
+ patches?: Patch[] };
 
-export class HyperMorphMap<K, V> {
-  private store = new Map<K, Morph<K, V>>();
+export class HyperMorphMap {
+  store = new Map();
 
-  constructor(seed: Iterable<[K, Morph<K, V>]>) {
+  constructor(seed) {
     for (const [k, m] of seed) this.store.set(k, m);
   }
 
   // Core accessor – every get() may rewrite the map
-  get(key: K, fallback?: V): V {
+  get(key, fallback?: V) {
     const morph = this.store.get(key);
     const prev  = morph ? morph(undefined, this).next : fallback;
-    if (!morph) return fallback as V;
+    if (!morph) return fallback;
 
     const { next, patches } = morph(prev, this);
     // Apply emitted patches (self-modification)
@@ -42,13 +41,13 @@ export class HyperMorphMap<K, V> {
   }
 
   // Allow external injection of new morphisms
-  set(key: K, morph: Morph<K, V>) { this.store.set(key, morph); }
+  set(key, morph) { this.store.set(key, morph); }
 
   keys() { return this.store.keys(); }
 }
 
 /* ===== Example usage ===== */
-const incrMorph: Morph<string, number> = (prev = 0) => {
+const incrMorph = (prev = 0) => {
   const next = prev + 1;
   // After being hit 3 times, redirect itself to a constant morph
   if (next === 3) {

@@ -29,7 +29,7 @@ import crypto from 'crypto';
  * Encrypts data using AES-256-GCM.
  * @param {string} plaintext - The data to encrypt.
  * @param {string} key - A 32-byte encryption key.
- * @returns {{ciphertext: string, iv: string, authTag: string}} - Encrypted data with IV and authentication tag.
+ * @returns {{ciphertext, iv, authTag}} - Encrypted data with IV and authentication tag.
  */
 export function encryptData(plaintext, key) {
   const iv = crypto.randomBytes(12); // 12-byte IV for AES-GCM

@@ -46,7 +46,7 @@ export class VectorStoreLite {
    * Retrieves the closest vectors to a given query vector using cosine similarity.
    * @param {number[]} queryVector - The query vector.
    * @param {number} k - The number of closest vectors to retrieve.
-   * @returns {Array<{id: string, similarity: number}>} An array of objects containing the IDs and similarities of the closest vectors.
+   * @returns {Array<{id, similarity}>} An array of objects containing the IDs and similarities of the closest vectors.
    */
   retrieve(queryVector, k = 1) {
     if (queryVector.length !== this.dimension) {
@@ -76,8 +76,7 @@ export class VectorStoreLite {
 
   /**
    * Computes the cosine similarity between two vectors.
-   * @private
-   * @param {number[]} vectorA - The first vector.
+   * @* @param {number[]} vectorA - The first vector.
    * @param {Float32Array} vectorB - The second vector.
    * @returns {number} The cosine similarity between the two vectors.
    */

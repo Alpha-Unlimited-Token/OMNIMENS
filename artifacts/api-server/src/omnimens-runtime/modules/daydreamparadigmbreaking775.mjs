@@ -17,15 +17,15 @@
  */
 
 /* Phase-Resonant Intelligence kernel – no I/O, no deps */
-export type PRIState = { phase: number; omega: number };
+ omega};
 export function stepPRI(
-  state: PRIState[],
-  k: number,              // coupling strength
-  dt: number              // timestep
-): PRIState[] {
+  state,
+  k,              // coupling strength
+  dt// timestep
+) {
   const n = state.length;
   // Pre-compute sine phase differences for efficiency
-  const next: PRIState[] = new Array(n);
+  const next= new Array(n);
   for (let i = 0; i < n; i++) {
     let influence = 0;
     const phi_i = state[i].phase;
@@ -42,11 +42,11 @@ export function stepPRI(
 }
 
 export function runPRI(
-  init: PRIState[],
+  init,
   k = 1.0,
   dt = 0.02,
   steps = 500
-): PRIState[] {
+) {
   let s = init;
   for (let t = 0; t < steps; t++) s = stepPRI(s, k, dt);
   return s; // caller inspects phase coherence to “read” emergent result

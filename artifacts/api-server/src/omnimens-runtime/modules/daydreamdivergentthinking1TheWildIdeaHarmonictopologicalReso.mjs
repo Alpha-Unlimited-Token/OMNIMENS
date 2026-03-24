@@ -18,20 +18,20 @@
  */
 
 // Harmonic-Topological Resonance core — pure math, no I/O
-export type Field = number[];              // 1-D cavity for simplicity
-export interface HTRState { field: Field; phase: Field; }
+              // 1-D cavity for simplicity
+
 
 const TAU = Math.PI * 2;
 
 export function stepHTR(
-  state: HTRState,
-  input: Field,            // same length as field
+  state,
+  input,            // same length
   ω: number,               // global angular frequency
   κ: number                // coupling constant
-): HTRState {
+) {
   const n = state.field.length;
-  const newField = new Array<number>(n);
-  const newPhase = new Array<number>(n);
+  const newField = new Array(n);
+  const newPhase = new Array(n);
 
   for (let i = 0; i < n; i++) {
     // Local standing-wave update with neighbor interference

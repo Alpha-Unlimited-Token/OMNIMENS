@@ -17,11 +17,11 @@
  */
 
 // Each gene = [pitch(0-11), duration(ms), velocity(0-1), operator(0-29)]
-type Gene = [number, number, number, number];
-type Genome = Gene[];                   // 16 genes ≈ 1 bar
+
+                   // 16 genes ≈ 1 bar
 const OPS = 30;                         // “Translation Map v22”
 
-function phaseError(g: Genome, bpm = 120): number {
+function phaseError(g, bpm = 120) {
   const beat = 60000 / bpm;
   let t = 0, err = 0;
   for (const [, dur] of g) {            // ignore pitch for error calc
@@ -33,8 +33,8 @@ function phaseError(g: Genome, bpm = 120): number {
 }
 
 export function evolveRhythmicGenome(
-  pop: Genome[], iters = 1000, temp = 1
-): Genome {
+  pop, iters = 1000, temp = 1
+) {
   for (let k = 0; k < iters; k++) {
     const [a, b] = pop.sort(() => 0.5 - Math.random()).slice(0, 2);
     const cross = a.map((g, i) => (Math.random() < 0.5 ? g : b[i])); // crossover

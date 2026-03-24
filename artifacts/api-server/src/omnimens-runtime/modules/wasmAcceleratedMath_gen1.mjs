@@ -21,7 +21,7 @@
 /**
  * @module wasmAcceleratedMath
  * @description Perform GPU-accelerated matrix operations and numerical computations using WebAssembly.
- * This module is designed to handle large-scale numerical tasks efficiently, such as embedding generation and clustering.
+ * This module is designed to handle large-scale numerical tasks efficiently, such generation and clustering.
  */
 
 /**

@@ -23,7 +23,7 @@
 
 /**
  * @typedef {Float64Array} Matrix
- * A matrix represented as a flat Float64Array in row-major order.
+ * A matrix represented flat Float64Array in row-major order.
  */
 
 /**

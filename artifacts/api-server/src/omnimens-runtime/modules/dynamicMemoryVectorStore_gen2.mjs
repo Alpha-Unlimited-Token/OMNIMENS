@@ -12,8 +12,7 @@
 class VectorStore {
   constructor() {
     /**
-     * @private
-     * @type {Map<string, { vector: number[], metadata: object }>}
+     * @* @type {Map<string, { vector, metadata}>}
      * @description Internal storage for vector embeddings indexed by unique keys.
      */
     this.store = new Map();
@@ -39,7 +38,7 @@ class VectorStore {
   /**
    * Retrieves a vector embedding and its metadata by key.
    * @param {string} key - Unique identifier for the vector.
-   * @returns {{ vector: number[], metadata: object }} The vector embedding and associated metadata.
+   * @returns {{ vector, metadata}} The vector embedding and associated metadata.
    * @throws {Error} Throws an error if the key does not exist.
    */
   getVector(key) {
@@ -53,7 +52,7 @@ class VectorStore {
    * Finds the closest vector(s) to a given query vector using cosine similarity.
    * @param {number[]} queryVector - The query vector to compare against.
    * @param {number} topN - Number of closest vectors to retrieve (default is 1).
-   * @returns {Array<{ key: string, similarity: number, vector: number[], metadata: object }>} Closest vectors sorted by similarity.
+   * @returns {Array<{ key, similarity, vector, metadata}>} Closest vectors sorted by similarity.
    * @throws {Error} Throws an error if the query vector is invalid.
    */
   findClosest(queryVector, topN = 1) {

@@ -12,7 +12,7 @@
  * @param {number} rowsA - Number of rows in matrixA.
  * @param {number} colsA - Number of columns in matrixA (must match rowsB).
  * @param {number} colsB - Number of columns in matrixB.
- * @returns {Float32Array} The resulting matrix as a flat array.
+ * @returns {Float32Array} The resulting matrix flat array.
  * @throws {Error} If dimensions are incompatible for multiplication.
  */
 export async function gpuMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {

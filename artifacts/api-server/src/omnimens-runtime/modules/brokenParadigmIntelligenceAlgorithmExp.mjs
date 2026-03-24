@@ -21,10 +21,10 @@
 const N = 32;                       // number of oscillators
 const ω0 = 0.15;                    // natural frequency
 const η  = 0.07;                    // coupling strength
-let φ: number[] = Array.from({length: N}, () => Math.random()*2*Math.PI);
+let φ: number[] = Array.from({length}, () => Math.random()*2*Math.PI);
 
 // External stimulus: ping node k with phase offset
-function stimulate(k: number, phase = 0) { φ[k] = phase; }
+function stimulate(k, phase = 0) { φ[k] = phase; }
 
 function step() {
   const next = [...φ];

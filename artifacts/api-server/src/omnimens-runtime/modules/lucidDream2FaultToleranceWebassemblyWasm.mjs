@@ -17,20 +17,20 @@
  */
 
 // Cerebral Mesh – Minimal BrainSeed prototype (TypeScript)
-type Snippet = { id: string; version: number; data: string };
+ version; data};
 
 export class BrainSeed {
-  private memory: Map<string, Snippet> = new Map();
-  constructor(public id: string) {}
+  memory = new Map();
+  constructor(id) {}
 
   // Receive and validate a knowledge snippet
-  ingest(snippet: Snippet) {
+  ingest(snippet) {
     const old = this.memory.get(snippet.id);
     if (!old || snippet.version > old.version) this.memory.set(snippet.id, snippet);
   }
 
   // Simple reasoning: keyword count with fault tolerance (returns majority vote hash)
-  reason(query: string): string {
+  reason(query) {
     const score = [...this.memory.values()]
       .filter(s => s.data.includes(query))
       .map(s => this.hash(s.data))
@@ -46,7 +46,7 @@ export class BrainSeed {
   }
 
   // Tiny hash helper
-  private hash(str: string) {
+  hash(str) {
     let h = 0;
     for (let i = 0; i < str.length; i++) h = (h << 5) - h + str.charCodeAt(i);
     return h >>> 0;

@@ -18,25 +18,22 @@
  */
 
 // C-SIM: minimal causal simulator core (no I/O, pure functions)
-export type Var   = string;
-export type Vec   = number[];
-export type Func  = (parents: Vec) => number;
 
-export interface SCG {
-  parents: Record<Var, Var[]>;          // adjacency list
-  f:       Record<Var, Func>;           // structural equations
-}
 
-export type Assignment = Record<Var, number>;
+
+
+
+
+
 
 /* Forward simulation under optional interventions (do-operator) */
 export function simulate(
-  g: SCG,
-  exogenous: Assignment,               // independent noise terms
-  intervene: Assignment = {}           // forced values
-): Assignment {
-  const memo: Assignment = { ...intervene };
-  const evalNode = (v: Var): number => {
+  g,
+  exogenous,               // independent noise terms
+  intervene= {}           // forced values
+) {
+  const memo= { ...intervene };
+  const evalNode = (v) => {
     if (memo[v] !== undefined) return memo[v];
     const ps = g.parents[v] || [];
     const inputs = ps.map(evalNode);
@@ -49,11 +46,10 @@ export function simulate(
 
 /* Counterfactual query: compare factual vs intervened outcomes */
 export function counterfactual(
-  g: SCG,
-  exogenous: Assignment,
-  intervene: Assignment,
-  target: Var
-): { factual: number; counter: number; delta: number } {
+  g,
+  exogenous,
+  intervene,
+  target): { factual; counter; delta} {
   const factual   = simulate(g, exogenous)[target];
   const counter   = simulate(g, exogenous, intervene)[target];
   return { factual, counter, delta: counter - factual };

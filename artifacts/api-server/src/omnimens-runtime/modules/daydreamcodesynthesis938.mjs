@@ -17,9 +17,9 @@
  */
 
 // Adaptive Micro-Policy Morphograph — self-modifying without eval/Function
-export type MicroPolicy = (x: number) => number;
 
-const primitives: MicroPolicy[] = [
+
+const primitives= [
   x => x + 1,         // increment
   x => x - 1,         // decrement
   x => x * 2,         // double
@@ -27,13 +27,13 @@ const primitives: MicroPolicy[] = [
   x => Math.sin(x),   // non-linear
 ];
 
-interface Edge { op: MicroPolicy; weight: number; }
+
 
 export class AMPM {
-  private graph: Edge[] = [{ op: primitives[0], weight: 1 }];
+  graph= [{ op: primitives[0], weight: 1 }];
 
   // execute then adapt
-  run(input: number, criticScore: (y: number) => number): number {
+  run(input, criticScore => number) {
     // 1. forward pass
     let y = input;
     for (const { op, weight } of this.graph) y = op(y * weight);
@@ -45,7 +45,7 @@ export class AMPM {
     return y;
   }
 
-  private mutate(score: number) {
+  mutate(score) {
     // simple Hebbian-like rule: keep good edges, drop bad, add new
     const avg = this.graph.reduce((s, e) => s + e.weight, 0) / this.graph.length;
 

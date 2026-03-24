@@ -20,7 +20,7 @@
 function generateSummary(tokens) {
   // Simple summarization by extracting key tokens (e.g., nouns/keywords).
   const keyTokens = tokens.filter(token => token.length > 3); // Example: filter tokens longer than 3 characters.
-  return keyTokens.slice(0, 10).join(" "); // Return first 10 key tokens as summary.
+  return keyTokens.slice(0, 10).join(" "); // Return first 10 key tokens.
 }
 
 /**

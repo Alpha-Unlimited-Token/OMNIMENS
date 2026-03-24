@@ -18,22 +18,18 @@
  */
 
 // CAGS core micro-simulator (pure, no IO)
-export type Node = { id: string; state: Record<string, number> }; // numerical attributes
-export type Edge = {
-  from: string;
-  to: string;
+ state }; // numerical attributes
+
+  to;
   // deterministic causal rule: mutate target based on source
-  update: (src: Node, dst: Node) => void;
+  update: (src, dst) => void;
 };
 
-export interface CausalGraph {
-  nodes: Map<string, Node>;
-  edges: Edge[];
-}
 
-export function stepGraph(g: CausalGraph): CausalGraph {
+
+export function stepGraph(g) {
   // deep-clone nodes to avoid side-effects
-  const nextNodes = new Map<string, Node>();
+  const nextNodes = new Map();
   g.nodes.forEach((n, id) =>
     nextNodes.set(id, { id, state: { ...n.state } })
   );
@@ -48,10 +44,9 @@ export function stepGraph(g: CausalGraph): CausalGraph {
 
 // run k steps and return trajectory
 export function simulate(
-  g0: CausalGraph,
-  steps: number
-): CausalGraph[] {
-  const history: CausalGraph[] = [g0];
+  g0,
+  steps) {
+  const history= [g0];
   let current = g0;
   for (let i = 0; i < steps; i++) {
     current = stepGraph(current);

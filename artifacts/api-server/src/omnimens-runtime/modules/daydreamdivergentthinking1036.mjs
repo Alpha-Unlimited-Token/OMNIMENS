@@ -16,18 +16,18 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-type Genome = number[];              // frequencies (Hz) of fundamentals
-type ScoreFn = (g: Genome) => number;// external fitness (task + consonance)
+              // frequencies (Hz) of fundamentals
+// external fitness (task + consonance)
 
 // simple harmonic-mutation evolutionary step
 export function evolveHarmonicAI(
-    population: Genome[],
-    score: ScoreFn,
+    population,
+    score,
     rng = Math.random
-): Genome[] {
-    const next: Genome[] = [];
+) {
+    const next= [];
     const pickParent = () => population[Math.floor(rng() * population.length)];
-    const mutate = (g: Genome): Genome =>
+    const mutate = (g) =>
         g.map(f => f * (1 + (rng() - 0.5) * 0.02));         // ±1% retune
     // roulette-wheel selection based on inverse dissonance (=fitness)
     const fitness = population.map(score);

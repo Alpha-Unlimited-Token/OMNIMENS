@@ -18,21 +18,21 @@
  */
 
 // ------------- GSIE minimal core (28 LOC) ------------------
-type Node = { id: string; typ: string; vec: number[] };
-type Edge = { from: string; to: string; rel: string };
-type ConceptGraph = { nodes: Map<string, Node>; edges: Edge[] };
+ typ; vec };
+ to; rel};
+ edges};
 
-function dot(a: number[], b: number[]) { return a.reduce((s, v, i) => s + v * b[i], 0); }
+function dot(a, b) { return a.reduce((s, v, i) => s + v * b[i], 0); }
 
-function simulateEdge(n1: Node, n2: Node, rel: string): number {
+function simulateEdge(n1, n2, rel) {
   // toy physics/social simulation score in [0,1]
   const similarity = Math.max(0, dot(n1.vec, n2.vec) / (n1.vec.length));
   const relWeight = rel === "CAUSE" ? 0.9 : rel === "ENABLE" ? 0.7 : 0.5;
   return similarity * relWeight;
 }
 
-export function runSimulation(cg: ConceptGraph, steps = 3) {
-  const scores: Record<string, number> = {};
+export function runSimulation(cg, steps = 3) {
+  const scores = {};
   for (let k of cg.nodes.keys()) scores[k] = 0.5;              // init state entropy
   for (let s = 0; s < steps; s++) {
     for (let e of cg.edges) {
@@ -45,7 +45,7 @@ export function runSimulation(cg: ConceptGraph, steps = 3) {
   return scores; // higher = more plausible outcomes
 }
 
-export function entropy(scores: Record<string, number>) {
+export function entropy(scores) {
   let h = 0;
   for (let k in scores) {
     const p = scores[k];

@@ -17,10 +17,10 @@
  */
 
 // Harmonic Resonant Mesh — no sequential “program”; only coupled resonance
-export type Mesh = { phase: number; freq: number }[];
+ freq}[];
 
 /** create an N-node resonant mesh with random phases  */
-export function createMesh(n: number, baseFreq = 0.02): Mesh {
+export function createMesh(n, baseFreq = 0.02) {
   const rand = () => Math.random();
   return Array.from({ length: n }, () => ({
     phase: rand(),               // 0 … 1
@@ -29,7 +29,7 @@ export function createMesh(n: number, baseFreq = 0.02): Mesh {
 }
 
 /** advance the mesh one Δt step using Kuramoto-style coupling */
-export function tick(mesh: Mesh, K = 0.3, dt = 1): void {
+export function tick(mesh, K = 0.3, dt = 1) {
   const N = mesh.length;
   const phases = mesh.map(n => n.phase);
   for (let i = 0; i < N; i++) {
@@ -41,11 +41,11 @@ export function tick(mesh: Mesh, K = 0.3, dt = 1): void {
 }
 
 /** inject “stimulus” by nudging a subset of nodes’ phases */
-export function stimulate(mesh: Mesh, idx: number[], energy = 0.25): void {
+export function stimulate(mesh, idx, energy = 0.25) {
   idx.forEach(i => mesh[i].phase = (mesh[i].phase + energy) % 1);
 }
 
 /** readout: the emergent standing wave pattern */
-export function fingerprint(mesh: Mesh): number[] {
+export function fingerprint(mesh) {
   return mesh.map(n => Math.round(n.phase * 10) / 10); // coarse quantisation
 }

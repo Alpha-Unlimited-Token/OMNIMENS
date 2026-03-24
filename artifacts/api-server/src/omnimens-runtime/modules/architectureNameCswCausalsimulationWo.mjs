@@ -18,17 +18,17 @@
  */
 
 // Causal-Simulation Workspace – Minimal Core
-export type Node = {
-  name: string
-  parents: string[]
-  fn: (parents: number[]) => number
+
+  name
+  parents
+  fn => number
 }
 
-export type SCM = { [k: string]: Node }
 
-export function runModel(model: SCM, exogenous: { [k: string]: number }): { [k: string]: number } {
-  const memo: { [k: string]: number } = { ...exogenous }
-  const evalNode = (n: string): number => {
+
+export function runModel(model, exogenous: { [k]: number }): { [k]: number } {
+  const memo: { [k]: number } = { ...exogenous }
+  const evalNode = (n) => {
     if (memo[n] !== undefined) return memo[n]
     const node = model[n]
     const inputs = node.parents.map(p => evalNode(p))
@@ -39,9 +39,9 @@ export function runModel(model: SCM, exogenous: { [k: string]: number }): { [k: 
   return memo
 }
 
-export function intervene(model: SCM, intervention: { [k: string]: number }, exogenous: { [k: string]: number }) {
+export function intervene(model, intervention: { [k]: number }, exogenous: { [k]: number }) {
   // Clone model shallowly and replace functions for intervened nodes with constants
-  const newModel: SCM = {}
+  const newModel= {}
   for (const k in model) {
     newModel[k] = { ...model[k] }
     if (intervention[k] !== undefined) {

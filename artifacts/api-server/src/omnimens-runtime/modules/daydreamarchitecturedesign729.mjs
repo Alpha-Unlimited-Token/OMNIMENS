@@ -17,30 +17,30 @@
  */
 
 // Counterfactual World Sandbox – minimal core (pure logic, no I/O)
-export type Node = { id: string; features: number[] };
-export type Edge = { from: string; to: string; label: string; weight: number };
-export type Graph = { nodes: Node[]; edges: Edge[] };
+ features };
+ to; label; weight};
+ edges};
 
-export type Transition = (g: Graph) => Graph;
-export type Critic     = (g: Graph) => number;
+
+
 
 /** clone helper */
-const cloneGraph = (g: Graph): Graph => ({
+const cloneGraph = (g) => ({
   nodes: g.nodes.map(n => ({ ...n, features: [...n.features] })),
   edges: g.edges.map(e => ({ ...e }))
 });
 
 /** single rollout */
 const rollout = (
-  start: Graph,
-  transitions: Transition[],
-  critic: Critic,
+  start,
+  transitions,
+  critic,
   depth = 3
 ) => {
   let bestGraph = start;
   let bestScore = critic(start);
 
-  const recurse = (g: Graph, d: number) => {
+  const recurse = (g, d) => {
     if (d === 0) return;
     for (const Δ of transitions) {
       const gNext = Δ(cloneGraph(g));

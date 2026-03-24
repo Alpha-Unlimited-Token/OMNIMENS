@@ -24,7 +24,7 @@
 
 /**
  * Stores vectors and their associated metadata.
- * @type {Map<string, {vector: number[], metadata: any}>}
+ * @type {Map<string, {vector, metadata}>}
  */
 const vectorStore = new Map();
 
@@ -63,7 +63,7 @@ function cosineSimilarity(vectorA, vectorB) {
  * Finds the k most similar vectors to a given query vector.
  * @param {number[]} queryVector - The vector to search for.
  * @param {number} k - The number of nearest neighbors to retrieve.
- * @returns {Array<{id: string, similarity: number, metadata: any}>} The top k most similar vectors with their metadata.
+ * @returns {Array<{id, similarity, metadata}>} The top k most similar vectors with their metadata.
  * @throws {Error} If k is not a positive integer or the query vector is invalid.
  */
 export function findNearestNeighbors(queryVector, k) {

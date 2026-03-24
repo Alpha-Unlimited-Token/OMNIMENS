@@ -18,21 +18,21 @@ Assumption: “Intelligence = sequen
  */
 
 // ts-node resonance.ts
-type NodeId = number;
-type Complex = { re: number; im: number };
+
+ im};
 
 const N = 32;                        // # of oscillators
 const steps = 200;                   // simulation ticks
 const coupling = 0.15;               // interaction strength
 
 // Random complex unit vectors (on the unit circle)
-let phases: Complex[] = Array.from({ length: N }, () => {
+let phases= Array.from({ length}, () => {
   const θ = Math.random() * Math.PI * 2;
   return { re: Math.cos(θ), im: Math.sin(θ) };
 });
 
 // Fully-connected weights can be replaced with any graph
-const weight = (i: NodeId, j: NodeId) => (i === j ? 0 : 1 / (N - 1));
+const weight = (i, j) => (i === j ? 0 : 1 / (N - 1));
 
 for (let t = 0; t < steps; t++) {
   phases = phases.map((p, i) => {
@@ -50,7 +50,7 @@ for (let t = 0; t < steps; t++) {
 }
 
 // Simple readout: detect clusters (≈ “concepts”)
-const clusters = new Map<string, NodeId[]>();
+const clusters = new Map();
 phases.forEach((p, i) => {
   const key = Math.round((Math.atan2(p.im, p.re) / Math.PI) * 4).toString();
   clusters.set(key, [...(clusters.get(key) || []), i]);

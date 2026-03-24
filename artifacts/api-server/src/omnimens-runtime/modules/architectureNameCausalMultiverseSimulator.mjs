@@ -17,21 +17,18 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-export type NodeFn = (parents: Record<string, number>, noise: number) => number;
 
-export interface SCGSpec {
-  parents: Record<string, string[]>; // child -> [parents]
-  fns: Record<string, NodeFn>;       // child -> generator
-}
+
+
 
 export class CausalMultiverse {
-  private spec: SCGSpec;
-  constructor(spec: SCGSpec) { this.spec = spec; }
+  spec;
+  constructor(spec) { this.spec = spec; }
 
-  private topological(): string[] {
-    const order: string[] = [];
-    const visited = new Set<string>();
-    const visit = (n: string) => {
+  topological() {
+    const order= [];
+    const visited = new Set();
+    const visit = (n) => {
       if (visited.has(n)) return;
       (this.spec.parents[n] || []).forEach(visit);
       visited.add(n); order.push(n);
@@ -40,19 +37,19 @@ export class CausalMultiverse {
     return order;
   }
 
-  sample(ctx: Partial<Record<string, number>> = {}): Record<string, number> {
-    const world: Record<string, number> = { ...ctx };
+  sample(ctx> = {}) {
+    const world = { ...ctx };
     const topo = this.topological();
     for (const v of topo) {
       if (world[v] !== undefined) continue; // intervened
-      const p: Record<string, number> = {};
+      const p = {};
       (this.spec.parents[v] || []).forEach(k => p[k] = world[k]);
       world[v] = this.spec.fns[v](p, Math.random());
     }
     return world;
   }
 
-  counterfactual(queryVar: string, baseCtx: {}, xStar: number, N = 1000) {
+  counterfactual(queryVar, baseCtx: {}, xStar, N = 1000) {
     let baseSum = 0, altSum = 0;
     for (let i = 0; i < N; i++) {
       const w0 = this.sample(baseCtx);

@@ -18,13 +18,13 @@
  */
 
 // Causal Imagination Fabric – minimal SCM + do() operator
-export type Node = { id: string; parents: string[]; fn: (p: number[], e: number) => number };
-export type SCM = { nodes: Node[] };
+ parents; fn: (p, e) => number };
 
-const topological = (scm: SCM): Node[] => {
-  const order: Node[] = [];
-  const visited = new Set<string>();
-  const visit = (n: Node) => {
+
+const topological = (scm): Node[] => {
+  const order= [];
+  const visited = new Set();
+  const visit = (n) => {
     if (visited.has(n.id)) return;
     n.parents.forEach(pid => visit(scm.nodes.find(x => x.id === pid)!));
     visited.add(n.id); order.push(n);
@@ -33,8 +33,8 @@ const topological = (scm: SCM): Node[] => {
 };
 
 // Abduction: estimate eps that matches evidence
-export function abduct(scm: SCM, evidence: Record<string, number>): Record<string, number> {
-  const eps: Record<string, number> = {};
+export function abduct(scm, evidence) {
+  const eps = {};
   topological(scm).forEach(n => {
     const pVals = n.parents.map(p => evidence[p] ?? 0);
     const inferred = evidence[n.id] ?? n.fn(pVals, 0);
@@ -44,8 +44,8 @@ export function abduct(scm: SCM, evidence: Record<string, number>): Record<strin
 }
 
 // Intervention & prediction
-export function predict(scm: SCM, eps: Record<string, number>, intervene: Partial<Record<string, number>> = {}): Record<string, number> {
-  const out: Record<string, number> = {};
+export function predict(scm, eps, intervene> = {}) {
+  const out = {};
   topological(scm).forEach(n => {
     if (n.id in intervene) { out[n.id] = intervene[n.id]!; return; }
     const pVals = n.parents.map(p => out[p]);

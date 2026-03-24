@@ -8,14 +8,14 @@
  */
 
 export const dynamicToolCreation = {
-  proposeTool: (toolDetails) => {
+  proposeTool => {
     return {
       toolName: toolDetails.name,
       status: 'Proposed',
       feedback: 'Pending evaluation by agents.'
     };
   },
-  evaluateTool: (toolProposals) => {
+  evaluateTool => {
     return toolProposals.map(proposal => {
       const evaluationScore = Math.random() * 100; // Simulated evaluation score
       return {

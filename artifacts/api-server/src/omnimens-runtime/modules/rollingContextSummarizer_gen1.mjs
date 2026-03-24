@@ -18,7 +18,7 @@ export function summarizeContext(chunks, maxChunkSize = 500) {
     return '';
   }
 
-  // Base case: if there is only one chunk, return it as the summary.
+  // Base case: if there is only one chunk, return it summary.
   if (chunks.length === 1) {
     return chunks[0].slice(0, maxChunkSize);
   }

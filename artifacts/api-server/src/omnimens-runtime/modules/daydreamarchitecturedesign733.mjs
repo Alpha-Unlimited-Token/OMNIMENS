@@ -16,21 +16,13 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-export type NodeId = string;
 
-export interface Edge {
-  from: NodeId;
-  to: NodeId;
-  weight: number;        // belief strength
-  plasticity: number;    // inverse of memristance
-}
 
-export interface CausalProgram {
-  pre: NodeId[];
-  post: NodeId[];
-}
 
-export function simulate(state: Set<NodeId>, prog: CausalProgram): Set<NodeId> {
+
+
+
+export function simulate(state, prog) {
   // simple forward-chaining
   const next = new Set(state);
   const satisfied = prog.pre.every(e => state.has(e));
@@ -38,7 +30,7 @@ export function simulate(state: Set<NodeId>, prog: CausalProgram): Set<NodeId> {
   return next;
 }
 
-export function critic(pred: Set<NodeId>, obs: Set<NodeId>): number {
+export function critic(pred, obs) {
   // domain-agnostic surprise metric
   const union = new Set([...pred, ...obs]);
   let diff = 0;
@@ -50,7 +42,7 @@ export function critic(pred: Set<NodeId>, obs: Set<NodeId>): number {
   return diff / union.size; // 0 = perfect, 1 = total miss
 }
 
-export function updateEdge(edge: Edge, surprise: number, lr = 0.1): Edge {
+export function updateEdge(edge, surprise, lr = 0.1) {
   // memristor-like: high surprise ⇒ increase plasticity, lower weight
   const delta = lr * (surprise - (1 - edge.plasticity));
   const newPlasticity = Math.min(1, Math.max(0, edge.plasticity + delta));

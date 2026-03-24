@@ -17,26 +17,25 @@
  */
 
 // Embodied Counterfactual Simulation Engine – minimal core
-export type WorldState = Record<string, number>;           // key-value facts
-export type Operator = {                                   // causal rule
-  name: string;
-  pre: (s: WorldState) => boolean;                         // guard
-  act: (s: WorldState) => WorldState;                      // transition
-  cost: number;
+           // key-value facts
+
+  pre => boolean;                         // guard
+  act => WorldState;                      // transition
+  cost;
 };
 
 export function simulate(
-  init: WorldState,
-  operators: Operator[],
-  horizon: number,
-  score: (s: WorldState) => number
+  init,
+  operators,
+  horizon,
+  score => number
 ) {
-  type Node = { state: WorldState; value: number; depth: number; trace: string[] };
-  let frontier: Node[] = [{ state: { ...init }, value: 0, depth: 0, trace: [] }];
-  let best: Node = frontier[0];
+  type Node = { state; value; depth; trace };
+  let frontier= [{ state: { ...init }, value: 0, depth: 0, trace: [] }];
+  let best= frontier[0];
 
   while (frontier.length) {
-    const node = frontier.pop() as Node;
+    const node = frontier.pop();
     if (node.value > best.value) best = node;
     if (node.depth >= horizon) continue;
 

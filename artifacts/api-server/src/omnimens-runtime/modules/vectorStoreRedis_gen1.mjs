@@ -70,7 +70,7 @@ export class VectorStoreRedis {
       throw new Error('Key must be a string.');
     }
     const vectorString = await this.client.get(key);
-    return vectorString ? JSON.parse(vectorString) : null;
+    return vectorString ? JSON.parse(vectorString) ;
   }
 
   /**

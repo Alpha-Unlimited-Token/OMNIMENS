@@ -17,18 +17,18 @@
  */
 
 // ICMC minimal core — pure functional, no side effects
-export type Node = string;
-export type Edge = { from: Node; to: Node; weight: number };
+
+ to; weight};
 
 export class CausalGraph {
-  private edges: Edge[] = [];
-  addEdge(from: Node, to: Node, weight = 1): void {
+  edges= [];
+  addEdge(from, to, weight = 1) {
     this.edges.push({ from, to, weight });
   }
 
-  descendants(node: Node): Set<Node> {
-    const out = new Set<Node>();
-    const dfs = (n: Node) => {
+  descendants(node) {
+    const out = new Set();
+    const dfs = (n) => {
       this.edges.filter(e => e.from === n).forEach(e => {
         if (!out.has(e.to)) { out.add(e.to); dfs(e.to); }
       });
@@ -38,14 +38,14 @@ export class CausalGraph {
   }
 
   // Simple “do” intervention: remove incoming edges to ‘node’
-  intervene(node: Node): CausalGraph {
+  intervene(node) {
     const g = new CausalGraph();
     g.edges = this.edges.filter(e => e.to !== node);
     return g;
   }
 
   // Checks if X can still reach Y after intervening on X (idealized counterfactual)
-  counterfactualInfluence(x: Node, y: Node): boolean {
+  counterfactualInfluence(x, y) {
     const g = this.intervene(x);
     return g.descendants(x).has(y);
   }

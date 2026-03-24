@@ -25,15 +25,15 @@
  * Translation map version: 22
  */
 // Each oscillator is a belief with magnitude & phase. Consonance = low pairwise phase-error.
-export type Osc = { mag: number; phase: number }; // phase ∈ [0, 2π)
+ phase}; // phase ∈ [0, 2π)
 
 const TAU = Math.PI * 2;
 
 // small helper: wrap angle into [0,2π)
-const wrap = (x: number) => (x % TAU + TAU) % TAU;
+const wrap = (x) => (x % TAU + TAU) % TAU;
 
 // compute “harmonic energy” (dissonance) for a swarm
-export function harmonicEnergy(swarm: Osc[]): number {
+export function harmonicEnergy(swarm) {
   let E = 0;
   for (let i = 0; i < swarm.length; i++)
     for (let j = i + 1; j < swarm.length; j++) {
@@ -45,7 +45,7 @@ export function harmonicEnergy(swarm: Osc[]): number {
 }
 
 // gradient-descent step: tune phases toward harmony (lower energy)
-export function tuneSwarm(swarm: Osc[], η = 0.05): Osc[] {
+export function tuneSwarm(swarm, η = 0.05) {
   return swarm.map((o, k) => {
     let grad = 0;
     swarm.forEach((p, j) => {

@@ -18,22 +18,22 @@
  */
 
 // CARE.ts
-import * as math from "mathjs";
+import * from "mathjs";
 
-type Node = string;
-type Parents = Node[];
-type Cpt = (parentsState: number[]) => number; // returns P(node=1 | parents)
+
+
+ // returns P(node=1 | parents)
 
 class CausalGraph {
-  edges: Map<Node, Parents> = new Map();
-  cpts: Map<Node, Cpt> = new Map();
+  edges= new Map();
+  cpts= new Map();
 
-  addNode(node: Node, parents: Parents, cpt: Cpt) {
+  addNode(node, parents, cpt) {
     this.edges.set(node, parents);
     this.cpts.set(node, cpt);
   }
 
-  sample(state: Record<Node, number>): Record<Node, number> {
+  sample(state) {
     for (const [node, parents] of this.edges) {
       const p = this.cpts.get(node)!(parents.map(p => state[p]));
       state[node] = Math.random() < p ? 1 : 0;
@@ -41,16 +41,16 @@ class CausalGraph {
     return state;
   }
 
-  intervene(intervention: Partial<Record<Node, number>>) {
-    return (base: Record<Node, number>) => ({ ...base, ...intervention });
+  intervene(intervention>) {
+    return (base) => ({ ...base, ...intervention });
   }
 }
 
 export function counterfactualRollout(
-  g: CausalGraph,
-  base: Record<Node, number>,
-  interventions: Partial<Record<Node, number>>[],
-  utility: (s: Record<Node, number>) => number
+  g,
+  base,
+  interventions>[],
+  utility => number
 ) {
   return interventions.map(intv => {
     const init = g.intervene(intv)(base);

@@ -29,7 +29,7 @@ import { createHash } from 'crypto';
 
 /**
  * Splits a large dataset into hierarchical chunks for iterative processing.
- * @param {string} data - The input dataset as a string.
+ * @param {string} data - The input dataset string.
  * @param {number} chunkSize - Maximum size of each chunk.
  * @returns {Array} - Array of chunks.
  */
@@ -103,7 +103,7 @@ export function reconstructContext(chunks, depth = 0) {
 
 /**
  * Main function to process a dataset and reconstruct its context.
- * @param {string} data - The input dataset as a string.
+ * @param {string} data - The input dataset string.
  * @param {number} chunkSize - Maximum size of each chunk.
  * @returns {string} - Reconstructed context.
  */

@@ -80,7 +80,7 @@ class InMemoryEmbeddingStore {
    * Searches for the most similar embeddings based on cosine similarity.
    * @param {number[]} queryEmbedding - The query embedding vector.
    * @param {number} topN - The number of top similar embeddings to return.
-   * @returns {Array<{key: string, similarity: number}>} - An array of top similar embeddings.
+   * @returns {Array<{key, similarity}>} - An array of top similar embeddings.
    * @throws {Error} - If the query embedding is invalid or topN is not a positive integer.
    */
   search(queryEmbedding, topN = 1) {

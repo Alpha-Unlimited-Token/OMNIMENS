@@ -19,12 +19,12 @@ Turn every
  */
 
 // Sonic-Graph Cognition – minimal core (pure computation, no I/O)
-export type Node = { ω: number; φ: number; neighbors: number[] }; // freq, phase
-export type Graph = Node[];
+ φ: number; neighbors }; // freq, phase
+
 
 // Kuramoto-like synchrony update
-export function step(graph: Graph, K = 0.05, dt = 0.1): Graph {
-  const next: Graph = graph.map(n => ({ ...n, φ: n.φ })); // clone
+export function step(graph, K = 0.05, dt = 0.1) {
+  const next= graph.map(n => ({ ...n, φ: n.φ })); // clone
   graph.forEach((n, i) => {
     let sum = 0;
     n.neighbors.forEach(j => {
@@ -37,13 +37,13 @@ export function step(graph: Graph, K = 0.05, dt = 0.1): Graph {
   return next;
 }
 
-// Inject stimulus as detuning; returns new graph
-export function injectStimulus(graph: Graph, target: number, deltaΩ: number): Graph {
+// Inject stimulus; returns new graph
+export function injectStimulus(graph, target, deltaΩ: number) {
   return graph.map((n, i) => i === target ? { ...n, ω: n.ω + deltaΩ } : n);
 }
 
 // Measure global “dissonance” (to be minimised)
-export function dissonance(graph: Graph): number {
+export function dissonance(graph) {
   let acc = 0;
   graph.forEach(n =>
     n.neighbors.forEach(j => {
