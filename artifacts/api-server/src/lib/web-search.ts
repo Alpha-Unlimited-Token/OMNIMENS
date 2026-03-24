@@ -29,60 +29,48 @@ function fetchWithTimeout(url: string, options: RequestInit = {}): Promise<Respo
     .finally(() => clearTimeout(timer));
 }
 
-// DuckDuckGo Instant Answer API — free, no key, returns structured data
 async function duckduckgoSearch(query: string, maxResults = 6): Promise<SearchResult[]> {
-  const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`;
+  const url = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
   const res = await fetchWithTimeout(url, {
-    headers: { "User-Agent": "OMNIMENS-AI/1.0 (omnimens.app)" },
+    method: "POST",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: `q=${encodeURIComponent(query)}`,
   });
-  if (!res.ok) throw new Error(`DuckDuckGo API error: ${res.status}`);
-  const data: any = await res.json();
+  if (!res.ok) throw new Error(`DuckDuckGo search error: ${res.status}`);
+  const html = await res.text();
 
   const results: SearchResult[] = [];
 
-  if (data.AbstractText) {
-    results.push({
-      title: data.Heading || query,
-      snippet: data.AbstractText,
-      url: data.AbstractURL || data.AbstractSource || "",
-      source: "DuckDuckGo Abstract",
-    });
+  const linkRegex = /<a[^>]+class="result__a"[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/g;
+  const snippetRegex = /<a[^>]+class="result__snippet"[^>]*>([\s\S]*?)<\/a>/g;
+
+  const links: { url: string; title: string }[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = linkRegex.exec(html)) !== null) {
+    const rawUrl = m[1];
+    const title = m[2].replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#x27;/g, "'").replace(/&quot;/g, '"').trim();
+    let cleanUrl = rawUrl;
+    const udMatch = rawUrl.match(/uddg=([^&]+)/);
+    if (udMatch) cleanUrl = decodeURIComponent(udMatch[1]);
+    links.push({ url: cleanUrl, title });
   }
 
-  const topics: any[] = data.RelatedTopics || [];
-  for (const t of topics) {
-    if (results.length >= maxResults) break;
-    if (t.Text && t.FirstURL) {
+  const snippets: string[] = [];
+  while ((m = snippetRegex.exec(html)) !== null) {
+    snippets.push(m[1].replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#x27;/g, "'").replace(/&quot;/g, '"').trim());
+  }
+
+  for (let i = 0; i < Math.min(links.length, maxResults); i++) {
+    const snippet = snippets[i] || links[i].title;
+    if (snippet.length > 10) {
       results.push({
-        title: t.Text.split(" - ")[0]?.slice(0, 80) || query,
-        snippet: t.Text,
-        url: t.FirstURL,
+        title: links[i].title,
+        snippet,
+        url: links[i].url,
         source: "DuckDuckGo",
-      });
-    }
-    if (t.Topics) {
-      for (const sub of t.Topics) {
-        if (results.length >= maxResults) break;
-        if (sub.Text && sub.FirstURL) {
-          results.push({
-            title: sub.Text.split(" - ")[0]?.slice(0, 80) || query,
-            snippet: sub.Text,
-            url: sub.FirstURL,
-            source: "DuckDuckGo",
-          });
-        }
-      }
-    }
-  }
-
-  if (data.Results) {
-    for (const r of data.Results) {
-      if (results.length >= maxResults) break;
-      results.push({
-        title: r.Text || query,
-        snippet: r.Text || "",
-        url: r.FirstURL || "",
-        source: "DuckDuckGo Result",
       });
     }
   }
@@ -90,19 +78,19 @@ async function duckduckgoSearch(query: string, maxResults = 6): Promise<SearchRe
   return results;
 }
 
-// Wikipedia OpenSearch — free, finds current encyclopedia articles
 async function wikipediaSearch(query: string, maxResults = 4): Promise<SearchResult[]> {
-  const searchUrl = `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=${maxResults}&format=json&origin=*`;
+  const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=${maxResults}&format=json&origin=*`;
   const res = await fetchWithTimeout(searchUrl, {
     headers: { "User-Agent": "OMNIMENS-AI/1.0 (omnimens.app)" },
   });
   if (!res.ok) throw new Error(`Wikipedia API error: ${res.status}`);
-  const [, titles, descriptions, urls]: [string, string[], string[], string[]] = await res.json() as [string, string[], string[], string[]];
+  const data: any = await res.json();
+  const items: any[] = data?.query?.search || [];
 
-  return titles.map((title, i) => ({
-    title,
-    snippet: descriptions[i] || title,
-    url: urls[i] || `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`,
+  return items.map((item) => ({
+    title: item.title || query,
+    snippet: (item.snippet || item.title || "").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&quot;/g, '"').trim(),
+    url: `https://en.wikipedia.org/wiki/${encodeURIComponent(item.title.replace(/ /g, "_"))}`,
     source: "Wikipedia",
   }));
 }

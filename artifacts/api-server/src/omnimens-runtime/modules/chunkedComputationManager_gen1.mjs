@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: chunkedComputationManager
- * Written: 2026-03-24T13:08:09.251Z
+ * Written: 2026-03-24T13:15:26.992Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,123 +18,82 @@
 
 // chunkedComputationManager.mjs
 
-import crypto from 'crypto';
+import { createHash } from 'crypto';
 
 /**
- * Divides a large computation into smaller chunks, stores intermediate states, and resumes after timeouts.
+ * Breaks down large computations into smaller chunks, processes them, and reassembles the results.
+ * Useful for managing tasks that exceed sandbox limits.
  */
 
-const MAX_CHUNK_SIZE = 1000; // Maximum size of a chunk for computation
-const DEFAULT_TIMEOUT = 5000; // Default timeout for resuming computations
-
-/**
- * Splits a large task into smaller chunks based on the provided chunk size.
- * @param {Array} data - The input data to be processed.
- * @param {number} chunkSize - Size of each chunk.
- * @returns {Array} - Array of chunks.
- */
-export function splitIntoChunks(data, chunkSize = MAX_CHUNK_SIZE) {
-  if (!Array.isArray(data)) {
-    throw new Error("Input data must be an array.");
+// Utility function to divide an array into chunks
+export function chunkArray(array, chunkSize) {
+  if (!Array.isArray(array) || chunkSize <= 0) {
+    throw new Error('Invalid input: array must be an array and chunkSize must be a positive integer.');
   }
   const chunks = [];
-  for (let i = 0; i < data.length; i += chunkSize) {
-    chunks.push(data.slice(i, i + chunkSize));
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
   }
   return chunks;
 }
 
-/**
- * Computes a hash for storing intermediate states.
- * @param {string} input - The input string to hash.
- * @returns {string} - The computed hash.
- */
-export function computeHash(input) {
-  return crypto.createHash('sha256').update(input).digest('hex');
-}
-
-/**
- * Processes a single chunk of data using a user-defined computation function.
- * @param {Array} chunk - The chunk of data to process.
- * @param {Function} computationFunction - The function to apply to each element.
- * @returns {Array} - Processed chunk.
- */
-export function processChunk(chunk, computationFunction) {
-  if (typeof computationFunction !== 'function') {
-    throw new Error("computationFunction must be a valid function.");
+// Utility function to serialize intermediate results
+export function serializeData(data) {
+  if (typeof data !== 'object' || data === null) {
+    throw new Error('Invalid input: data must be a non-null object.');
   }
-  return chunk.map(computationFunction);
+  return JSON.stringify(data);
 }
 
-/**
- * Manages the computation process by checkpointing and resuming after timeouts.
- * @param {Array} data - The input data to process.
- * @param {Function} computationFunction - The function to apply to each element.
- * @param {number} chunkSize - Size of each chunk.
- * @param {number} timeout - Timeout for resuming computations.
- * @returns {Promise<Array>} - Processed data.
- */
-export async function manageComputation(data, computationFunction, chunkSize = MAX_CHUNK_SIZE, timeout = DEFAULT_TIMEOUT) {
-  const chunks = splitIntoChunks(data, chunkSize);
-  const results = [];
-
-  for (let i = 0; i < chunks.length; i++) {
-    const chunk = chunks[i];
-    try {
-      const processedChunk = processChunk(chunk, computationFunction);
-      results.push(...processedChunk);
-    } catch (err) {
-      console.error(`Error processing chunk ${i}:`, err);
-      throw err;
-    }
-
-    // Simulate checkpointing and timeout
-    await new Promise(resolve => setTimeout(resolve, timeout));
+// Utility function to deserialize intermediate results
+export function deserializeData(serializedData) {
+  if (typeof serializedData !== 'string') {
+    throw new Error('Invalid input: serializedData must be a string.');
   }
-
-  return results;
+  return JSON.parse(serializedData);
 }
 
-/**
- * Utility function to resume computation from a specific checkpoint.
- * @param {Array} data - The input data to process.
- * @param {Function} computationFunction - The function to apply to each element.
- * @param {number} startIndex - The index to resume from.
- * @param {number} chunkSize - Size of each chunk.
- * @returns {Array} - Processed data from the checkpoint.
- */
-export function resumeFromCheckpoint(data, computationFunction, startIndex, chunkSize = MAX_CHUNK_SIZE) {
-  if (startIndex < 0 || startIndex >= data.length) {
-    throw new Error("Invalid start index.");
+// Function to process chunks with a user-defined computation
+export function processChunks(chunks, computationFunction) {
+  if (!Array.isArray(chunks) || typeof computationFunction !== 'function') {
+    throw new Error('Invalid input: chunks must be an array and computationFunction must be a function.');
+  }
+  return chunks.map(chunk => computationFunction(chunk));
+}
+
+// Function to reassemble results from processed chunks
+export function reassembleResults(chunkResults) {
+  if (!Array.isArray(chunkResults)) {
+    throw new Error('Invalid input: chunkResults must be an array.');
+  }
+  return chunkResults.reduce((acc, result) => acc.concat(result), []);
+}
+
+// Example computation function: calculates hash for each item in a chunk
+export function hashComputation(chunk) {
+  if (!Array.isArray(chunk)) {
+    throw new Error('Invalid input: chunk must be an array.');
+  }
+  return chunk.map(item => {
+    const hash = createHash('sha256');
+    hash.update(String(item));
+    return hash.digest('hex');
+  });
+}
+
+// Main function to manage chunked computation
+export function chunkedComputationManager(dataArray, chunkSize, computationFunction) {
+  if (!Array.isArray(dataArray) || chunkSize <= 0 || typeof computationFunction !== 'function') {
+    throw new Error('Invalid input: dataArray must be an array, chunkSize must be a positive integer, and computationFunction must be a function.');
   }
 
-  const remainingData = data.slice(startIndex);
-  const chunks = splitIntoChunks(remainingData, chunkSize);
-  const results = [];
-
-  for (const chunk of chunks) {
-    const processedChunk = processChunk(chunk, computationFunction);
-    results.push(...processedChunk);
-  }
-
-  return results;
+  const chunks = chunkArray(dataArray, chunkSize);
+  const processedChunks = processChunks(chunks, computationFunction);
+  return reassembleResults(processedChunks);
 }
 
-/**
- * Example computation function for demonstration purposes.
- * @param {number} x - Input number.
- * @returns {number} - Computed result.
- */
-export function exampleComputationFunction(x) {
-  return x * x; // Example: square the input
-}
-
-/**
- * Example usage of the module.
- * Uncomment to test.
- */
-// (async () => {
-//   const data = Array.from({ length: 5000 }, (_, i) => i + 1);
-//   const results = await manageComputation(data, exampleComputationFunction);
-//   console.log(results);
-// })();
+// Example usage:
+// const data = [1, 2, 3, 4, 5, 6];
+// const chunkSize = 2;
+// const results = chunkedComputationManager(data, chunkSize, hashComputation);
+// console.log(results);
