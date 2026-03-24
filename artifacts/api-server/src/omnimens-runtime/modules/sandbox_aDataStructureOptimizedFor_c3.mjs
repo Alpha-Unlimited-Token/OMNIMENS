@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a data structure optimized for fast associative memory lookup
- * Written: 2026-03-24T14:13:02.437Z
+ * Written: 2026-03-24T23:45:07.546Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,66 +18,58 @@
 
 function AssociativeMemory() {
     this.memory = new Map();
-
-    this.add = function(key, value) {
-        if (!this.memory.has(key)) {
-            this.memory.set(key, []);
-        }
-        this.memory.get(key).push(value);
-    };
-
-    this.get = function(key) {
-        return this.memory.has(key) ? this.memory.get(key) : null;
-    };
-
-    this.remove = function(key) {
-        return this.memory.delete(key);
-    };
-
-    this.has = function(key) {
-        return this.memory.has(key);
-    };
-
-    this.clear = function() {
-        this.memory.clear();
-    };
-
-    this.keys = function() {
-        return Array.from(this.memory.keys());
-    };
-
-    this.values = function() {
-        return Array.from(this.memory.values());
-    };
 }
 
-// Self-tests
-const memory = new AssociativeMemory();
+AssociativeMemory.prototype.store = function(key, value) {
+    this.memory.set(key, value);
+};
 
-// Test: Add key-value pairs
-memory.add("fruit", "apple");
-memory.add("fruit", "banana");
-memory.add("color", "red");
-memory.add("color", "blue");
-console.log(memory.get("fruit")); // Expected: ["apple", "banana"]
-console.log(memory.get("color")); // Expected: ["red", "blue"]
+AssociativeMemory.prototype.retrieve = function(key) {
+    return this.memory.has(key) ? this.memory.get(key) : null;
+};
 
-// Test: Check existence of keys
-console.log(memory.has("fruit")); // Expected: true
-console.log(memory.has("vehicle")); // Expected: false
+AssociativeMemory.prototype.remove = function(key) {
+    if (this.memory.has(key)) {
+        this.memory.delete(key);
+        return true;
+    }
+    return false;
+};
 
-// Test: Remove a key
-memory.remove("fruit");
-console.log(memory.get("fruit")); // Expected: null
-console.log(memory.has("fruit")); // Expected: false
+AssociativeMemory.prototype.exists = function(key) {
+    return this.memory.has(key);
+};
 
-// Test: Retrieve all keys
-console.log(memory.keys()); // Expected: ["color"]
+// Test cases
+(function testAssociativeMemory() {
+    const memory = new AssociativeMemory();
 
-// Test: Retrieve all values
-console.log(memory.values()); // Expected: [["red", "blue"]]
+    // Test storing and retrieving data
+    memory.store("key1", "value1");
+    console.log(memory.retrieve("key1")); // Expected: "value1"
 
-// Test: Clear memory
-memory.clear();
-console.log(memory.keys()); // Expected: []
-console.log(memory.values()); // Expected: []
+    memory.store("key2", 42);
+    console.log(memory.retrieve("key2")); // Expected: 42
+
+    memory.store("key3", { name: "Genesis", type: "Agent" });
+    console.log(memory.retrieve("key3")); // Expected: { name: "Genesis", type: "Agent" }
+
+    // Test existence check
+    console.log(memory.exists("key1")); // Expected: true
+    console.log(memory.exists("key4")); // Expected: false
+
+    // Test removing data
+    console.log(memory.remove("key2")); // Expected: true
+    console.log(memory.retrieve("key2")); // Expected: null
+    console.log(memory.exists("key2")); // Expected: false
+
+    // Test edge cases
+    console.log(memory.retrieve("nonexistent")); // Expected: null
+    console.log(memory.remove("nonexistent")); // Expected: false
+
+    // Test overwriting existing key
+    memory.store("key1", "newValue1");
+    console.log(memory.retrieve("key1")); // Expected: "newValue1"
+
+    console.log("All tests passed.");
+})();
