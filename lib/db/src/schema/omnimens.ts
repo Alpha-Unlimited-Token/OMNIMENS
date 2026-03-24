@@ -118,6 +118,7 @@ export const omnimensAmbassadorEarnings = pgTable("godflesh_ambassador_earnings"
   paymentAmountCents: integer("payment_amount_cents").notNull(),
   commissionCredits: integer("commission_credits").notNull(),
   commissionRate: integer("commission_rate").default(10).notNull(),
+  commissionLevel: integer("commission_level").default(1).notNull(),
   paymentType: text("payment_type").notNull(),
   stripeEventId: text("stripe_event_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -796,6 +797,29 @@ export const omnimensIpBans = pgTable("godflesh_ip_bans", {
   ipAddress: text("ip_address").notNull(),
   reason: text("reason").notNull(),
   bannedAt: timestamp("banned_at").defaultNow().notNull(),
+});
+
+export const omnimensAmbassadorObjectives = pgTable("godflesh_ambassador_objectives", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  category: text("category").default("onboarding").notNull(),
+  sortOrder: integer("sort_order").default(0).notNull(),
+  isRequired: boolean("is_required").default(false).notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const omnimensAmbassadorObjectiveProgress = pgTable("godflesh_ambassador_objective_progress", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => omnimensUsers.id),
+  objectiveId: integer("objective_id").notNull().references(() => omnimensAmbassadorObjectives.id),
+  completed: boolean("completed").default(false).notNull(),
+  completedAt: timestamp("completed_at"),
+  verifiedByOwner: boolean("verified_by_owner").default(false).notNull(),
+  verifiedAt: timestamp("verified_at"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const omnimensHieAnalyses = pgTable("godflesh_hie_analyses", {

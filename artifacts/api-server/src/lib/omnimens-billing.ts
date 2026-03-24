@@ -441,7 +441,11 @@ async function ensureStripeCustomer(userId: string, username: string | null, ema
   return updated;
 }
 
-const AMBASSADOR_COMMISSION_RATE = 10;
+const COMMISSION_LEVELS = [
+  { level: 1, rate: 10 },
+  { level: 2, rate: 3 },
+  { level: 3, rate: 1 },
+];
 
 async function awardAutoTopupAmbassadorCommission(
   payingUserId: string,
@@ -451,56 +455,65 @@ async function awardAutoTopupAmbassadorCommission(
   try {
     if (amountCents <= 0) return;
 
-    const [payingUser] = await db.select({ referredBy: omnimensUsers.referredBy })
-      .from(omnimensUsers)
-      .where(eq(omnimensUsers.id, payingUserId))
-      .limit(1);
-    if (!payingUser?.referredBy) return;
+    let currentUserId = payingUserId;
+    const visited = new Set<string>();
 
-    const [ambassador] = await db.select({ id: omnimensUsers.id })
-      .from(omnimensUsers)
-      .where(eq(omnimensUsers.referralCode, payingUser.referredBy))
-      .limit(1);
-    if (!ambassador) return;
+    for (const { level, rate } of COMMISSION_LEVELS) {
+      const [currentUser] = await db.select({ referredBy: omnimensUsers.referredBy })
+        .from(omnimensUsers)
+        .where(eq(omnimensUsers.id, currentUserId))
+        .limit(1);
+      if (!currentUser?.referredBy) break;
 
-    const commissionCents = Math.floor(amountCents * AMBASSADOR_COMMISSION_RATE / 100);
-    if (commissionCents <= 0) return;
-    const commissionCredits = commissionCents;
+      const [ambassador] = await db.select({ id: omnimensUsers.id })
+        .from(omnimensUsers)
+        .where(eq(omnimensUsers.referralCode, currentUser.referredBy))
+        .limit(1);
+      if (!ambassador || visited.has(ambassador.id)) break;
+      visited.add(ambassador.id);
 
-    await db.update(omnimensUsers)
-      .set({
-        credits: sql`${omnimensUsers.credits} + ${commissionCredits}`,
-        totalCreditsEarned: sql`${omnimensUsers.totalCreditsEarned} + ${commissionCredits}`,
-        ambassadorCreditsEarned: sql`${omnimensUsers.ambassadorCreditsEarned} + ${commissionCredits}`,
-      })
-      .where(eq(omnimensUsers.id, ambassador.id));
+      const commissionCents = Math.floor(amountCents * rate / 100);
+      if (commissionCents <= 0) { currentUserId = ambassador.id; continue; }
+      const commissionCredits = commissionCents;
 
-    await db.insert(omnimensAmbassadorEarnings).values({
-      ambassadorId: ambassador.id,
-      referredUserId: payingUserId,
-      paymentAmountCents: amountCents,
-      commissionCredits,
-      commissionRate: AMBASSADOR_COMMISSION_RATE,
-      paymentType: "Auto-topup",
-      stripeEventId,
-    });
+      await db.update(omnimensUsers)
+        .set({
+          credits: sql`${omnimensUsers.credits} + ${commissionCredits}`,
+          totalCreditsEarned: sql`${omnimensUsers.totalCreditsEarned} + ${commissionCredits}`,
+          ambassadorCreditsEarned: sql`${omnimensUsers.ambassadorCreditsEarned} + ${commissionCredits}`,
+        })
+        .where(eq(omnimensUsers.id, ambassador.id));
 
-    await db.insert(omnimensCreditTransactions).values({
-      userId: ambassador.id,
-      type: "bonus",
-      credits: commissionCredits,
-      description: `Ambassador commission (${AMBASSADOR_COMMISSION_RATE}%) — Auto-topup`,
-    });
+      await db.insert(omnimensAmbassadorEarnings).values({
+        ambassadorId: ambassador.id,
+        referredUserId: payingUserId,
+        paymentAmountCents: amountCents,
+        commissionCredits,
+        commissionRate: rate,
+        commissionLevel: level,
+        paymentType: "Auto-topup",
+        stripeEventId,
+      });
 
-    await db.update(omnimensAmbassadorProfiles)
-      .set({
-        pendingPayoutCents: sql`${omnimensAmbassadorProfiles.pendingPayoutCents} + ${commissionCents}`,
-        lifetimeEarningsCredits: sql`${omnimensAmbassadorProfiles.lifetimeEarningsCredits} + ${commissionCredits}`,
-      })
-      .where(eq(omnimensAmbassadorProfiles.userId, ambassador.id))
-      .catch((e) => console.error("[Ambassador] Profile payout tracking update failed:", e));
+      await db.insert(omnimensCreditTransactions).values({
+        userId: ambassador.id,
+        type: "bonus",
+        credits: commissionCredits,
+        description: `Ambassador L${level} commission (${rate}%) — Auto-topup`,
+      });
 
-    console.log(`[Ambassador] Auto-topup commission: ${commissionCredits} credits to ${ambassador.id} (${AMBASSADOR_COMMISSION_RATE}% of $${(amountCents / 100).toFixed(2)})`);
+      await db.update(omnimensAmbassadorProfiles)
+        .set({
+          pendingPayoutCents: sql`${omnimensAmbassadorProfiles.pendingPayoutCents} + ${commissionCents}`,
+          lifetimeEarningsCredits: sql`${omnimensAmbassadorProfiles.lifetimeEarningsCredits} + ${commissionCredits}`,
+        })
+        .where(eq(omnimensAmbassadorProfiles.userId, ambassador.id))
+        .catch((e) => console.error("[Ambassador] Profile payout tracking update failed:", e));
+
+      console.log(`[Ambassador] Auto-topup L${level} — ${commissionCredits} credits (${rate}%) to ${ambassador.id} from ${payingUserId}`);
+
+      currentUserId = ambassador.id;
+    }
   } catch (err) {
     console.error("[Ambassador] Auto-topup commission error:", err);
   }

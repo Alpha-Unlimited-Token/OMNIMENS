@@ -15,7 +15,7 @@ import { SEO, seoData } from "@/components/seo";
 import { useTheme } from "@/hooks/use-theme";
 import SpectralColorPanel from "@/components/spectral-color-panel";
 
-type SettingsTab = "profile" | "billing" | "preferences" | "security" | "advanced" | "account";
+type SettingsTab = "profile" | "billing" | "preferences" | "security" | "advanced" | "ambassador" | "account";
 
 function useBillingInfo() {
   return useQuery({
@@ -469,6 +469,7 @@ export default function Account() {
     { id: "preferences", label: "Preferences", icon: <Paintbrush className="w-4 h-4" /> },
     { id: "security", label: "Security", icon: <KeyRound className="w-4 h-4" /> },
     { id: "advanced", label: "Advanced", icon: <Atom className="w-4 h-4" /> },
+    { id: "ambassador", label: "Ambassador", icon: <Award className="w-4 h-4" /> },
     { id: "account", label: "Account", icon: <Settings className="w-4 h-4" /> },
   ];
 
@@ -545,7 +546,8 @@ export default function Account() {
               {settingsTab === "preferences" && "Theme, notifications, and personalization"}
               {settingsTab === "security" && "Two-factor authentication and security options"}
               {settingsTab === "advanced" && "Consciousness engine, patches, and system data"}
-              {settingsTab === "account" && "Ambassador program, data management, and account actions"}
+              {settingsTab === "ambassador" && "Grow your network and earn commissions"}
+              {settingsTab === "account" && "Data management and account actions"}
             </p>
 
             {/* ═══ PROFILE TAB ═══ */}
@@ -1038,6 +1040,69 @@ export default function Account() {
             {settingsTab === "security" && (
               <div className="space-y-6">
                 <TwoFactorSection />
+
+                <div className="rounded-2xl border border-[#2B3245] p-6 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                      <Shield className="w-4 h-4 text-amber-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold text-sm tracking-wide">Account Protection</h3>
+                      <p className="text-[#9DA5B4] text-xs font-mono">Built-in security features protecting your account</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-[#0E1525] border border-[#2B3245]">
+                      <div className="flex items-center gap-2">
+                        <Lock className="w-3.5 h-3.5 text-emerald-400" />
+                        <div>
+                          <p className="text-white text-xs font-semibold">Brute Force Protection</p>
+                          <p className="text-[#9DA5B4] text-[10px] font-mono">Account locks after 5 failed login attempts for 15 minutes</p>
+                        </div>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[9px] font-mono font-bold">ACTIVE</span>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-[#0E1525] border border-[#2B3245]">
+                      <div className="flex items-center gap-2">
+                        <KeyRound className="w-3.5 h-3.5 text-emerald-400" />
+                        <div>
+                          <p className="text-white text-xs font-semibold">Encrypted Sessions</p>
+                          <p className="text-[#9DA5B4] text-[10px] font-mono">All sessions use secure, encrypted cookies with HTTPS</p>
+                        </div>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[9px] font-mono font-bold">ACTIVE</span>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-[#0E1525] border border-[#2B3245]">
+                      <div className="flex items-center gap-2">
+                        <Shield className="w-3.5 h-3.5 text-emerald-400" />
+                        <div>
+                          <p className="text-white text-xs font-semibold">Replit OAuth Authentication</p>
+                          <p className="text-[#9DA5B4] text-[10px] font-mono">Login secured through Replit's OAuth with PKCE verification</p>
+                        </div>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[9px] font-mono font-bold">ACTIVE</span>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-[#0E1525] border border-[#2B3245]">
+                      <div className="flex items-center gap-2">
+                        <CreditCard className="w-3.5 h-3.5 text-emerald-400" />
+                        <div>
+                          <p className="text-white text-xs font-semibold">Payment Security</p>
+                          <p className="text-[#9DA5B4] text-[10px] font-mono">Card data handled by Stripe — never stored on our servers</p>
+                        </div>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[9px] font-mono font-bold">ACTIVE</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-amber-500/5 border border-amber-500/20 rounded-lg p-3">
+                    <p className="text-amber-400 text-[10px] font-mono font-bold flex items-center gap-1.5"><AlertTriangle className="w-3 h-3" /> Recommendation</p>
+                    <p className="text-[#9DA5B4] text-[10px] font-mono mt-1">Enable Two-Factor Authentication above for maximum account security. 2FA protects your account even if your login credentials are compromised.</p>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -1881,10 +1946,16 @@ export default function Account() {
               </div>
             )}
 
+            {/* ═══ AMBASSADOR TAB ═══ */}
+            {settingsTab === "ambassador" && (
+              <div className="space-y-6">
+                <ReferralSection />
+              </div>
+            )}
+
             {/* ═══ ACCOUNT TAB ═══ */}
             {settingsTab === "account" && (
               <div className="space-y-6">
-                <ReferralSection />
                 {!isOwner && <DeleteAccountSection />}
               </div>
             )}
@@ -3141,11 +3212,52 @@ function TwoFactorSection() {
   );
 }
 
+function DownlineTreeView({ nodes, onMessage, depth = 0 }: { nodes: any[]; onMessage: (uid: string) => void; depth?: number }) {
+  if (!nodes || nodes.length === 0) return null;
+  const levelColors = ["border-amber-500/30 bg-amber-500/5", "border-violet-500/30 bg-violet-500/5", "border-cyan-500/30 bg-cyan-500/5"];
+  const levelTextColors = ["text-amber-400", "text-violet-400", "text-cyan-400"];
+  const levelLabels = ["L1 — 10%", "L2 — 3%", "L3 — 1%"];
+
+  return (
+    <div className={depth > 0 ? "ml-4 pl-3 border-l border-[#2B3245]/50" : ""}>
+      {nodes.filter((n: any) => n?.id).map((node: any) => {
+        const lvlIdx = Math.min(depth, 2);
+        return (
+          <div key={node.id} className="mb-2">
+            <div className={`p-3 rounded-lg border ${levelColors[lvlIdx]} flex items-center gap-3`}>
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${depth === 0 ? "bg-amber-500/20" : depth === 1 ? "bg-violet-500/20" : "bg-cyan-500/20"}`}>
+                {node.isAmbassador ? <Award className={`w-3.5 h-3.5 ${levelTextColors[lvlIdx]}`} /> : <User className={`w-3.5 h-3.5 ${levelTextColors[lvlIdx]}`} />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-white text-xs font-semibold truncate">{node.username}</p>
+                  {node.isAmbassador && <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">AMBASSADOR</span>}
+                </div>
+                <p className="text-[#9DA5B4] text-[10px] font-mono">
+                  {node.commissionEarnedFromUser > 0 ? `$${(node.commissionEarnedFromUser / 100).toFixed(2)} earned` : "No purchases yet"}
+                  {node.children?.length > 0 ? ` — ${node.children.length} referral${node.children.length !== 1 ? "s" : ""} below` : ""}
+                </p>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold ${levelTextColors[lvlIdx]} bg-[#1C2333]`}>{levelLabels[lvlIdx]}</span>
+                <button type="button" onClick={() => onMessage(node.id)} className="p-1 rounded bg-[#2B3245]/50 text-[#9DA5B4] hover:text-violet-400 transition-colors">
+                  <MessageSquare className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+            {node.children?.length > 0 && <DownlineTreeView nodes={node.children} onMessage={onMessage} depth={depth + 1} />}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function ReferralSection() {
   const [ambData, setAmbData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [ambTab, setAmbTab] = useState<"overview" | "network" | "earnings" | "videos" | "messages" | "payouts">("overview");
+  const [ambTab, setAmbTab] = useState<"overview" | "network" | "earnings" | "videos" | "messages" | "payouts" | "objectives" | "handbook" | "admin">("overview");
   const [enrolling, setEnrolling] = useState(false);
   const [applyCode, setApplyCode] = useState("");
   const [applyMsg, setApplyMsg] = useState<{ type: "success" | "error"; msg: string } | null>(null);
@@ -3158,12 +3270,21 @@ function ReferralSection() {
   const [msgRecipient, setMsgRecipient] = useState("");
   const [sendingMsg, setSendingMsg] = useState(false);
   const [referredUsers, setReferredUsers] = useState<any[]>([]);
+  const [downlineTree, setDownlineTree] = useState<any[]>([]);
+  const [downlineTotal, setDownlineTotal] = useState(0);
   const [messages, setMessages] = useState<any[]>([]);
   const [editProfile, setEditProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({ displayName: "", bio: "", socialTwitter: "", socialYoutube: "", socialInstagram: "", socialTiktok: "" });
   const [savingProfile, setSavingProfile] = useState(false);
   const [connectingPayout, setConnectingPayout] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [objectives, setObjectives] = useState<any[]>([]);
+  const [completingObj, setCompletingObj] = useState<number | null>(null);
+  const [adminAmbs, setAdminAmbs] = useState<any[]>([]);
+  const [adminCustomers, setAdminCustomers] = useState<any[]>([]);
+  const [adminDetail, setAdminDetail] = useState<any>(null);
+  const [adminLoading, setAdminLoading] = useState(false);
+  const [adminView, setAdminView] = useState<"list" | "detail" | "customers">("list");
   const { data: status } = useGetOmnimensStatus();
 
   const loadData = async () => {
@@ -3233,8 +3354,12 @@ function ReferralSection() {
 
   const loadNetwork = async () => {
     try {
-      const res = await fetch("/api/omnimens/ambassador/referred-users", { credentials: "include" });
-      if (res.ok) { const data = await res.json(); setReferredUsers(data.users || []); }
+      const [usersRes, treeRes] = await Promise.all([
+        fetch("/api/omnimens/ambassador/referred-users", { credentials: "include" }),
+        fetch("/api/omnimens/ambassador/downline", { credentials: "include" }),
+      ]);
+      if (usersRes.ok) { const data = await usersRes.json(); setReferredUsers(data.users || []); }
+      if (treeRes.ok) { const data = await treeRes.json(); setDownlineTree(data.tree || []); setDownlineTotal(data.totalDownline || 0); }
     } catch {}
   };
 
@@ -3243,6 +3368,64 @@ function ReferralSection() {
       const res = await fetch("/api/omnimens/ambassador/messages", { credentials: "include" });
       if (res.ok) { const data = await res.json(); setMessages(data.messages || []); }
     } catch {}
+  };
+
+  const loadObjectives = async () => {
+    try {
+      const res = await fetch("/api/omnimens/ambassador/objectives", { credentials: "include" });
+      if (res.ok) { const data = await res.json(); setObjectives(data.objectives || []); }
+    } catch {}
+  };
+
+  const toggleObjective = async (objId: number, completed: boolean) => {
+    setCompletingObj(objId);
+    try {
+      const endpoint = completed ? "uncomplete" : "complete";
+      const res = await fetch(`/api/omnimens/ambassador/objectives/${objId}/${endpoint}`, { method: "POST", credentials: "include" });
+      if (res.ok) await loadObjectives();
+    } catch { setActionError("Failed to update objective"); }
+    setCompletingObj(null);
+  };
+
+  const loadAdminAmbassadors = async () => {
+    setAdminLoading(true);
+    try {
+      const res = await fetch("/api/omnimens/admin/ambassadors", { credentials: "include" });
+      if (res.ok) { const data = await res.json(); setAdminAmbs(data.ambassadors || []); }
+    } catch {}
+    setAdminLoading(false);
+  };
+
+  const loadAdminDetail = async (userId: string) => {
+    setAdminLoading(true);
+    try {
+      const res = await fetch(`/api/omnimens/admin/ambassador/${userId}`, { credentials: "include" });
+      if (res.ok) { const data = await res.json(); setAdminDetail(data); setAdminView("detail"); }
+    } catch {}
+    setAdminLoading(false);
+  };
+
+  const loadAdminCustomers = async () => {
+    setAdminLoading(true);
+    try {
+      const res = await fetch("/api/omnimens/admin/all-customers", { credentials: "include" });
+      if (res.ok) { const data = await res.json(); setAdminCustomers(data.customers || []); }
+    } catch {}
+    setAdminLoading(false);
+  };
+
+  const verifyObjective = async (userId: string, objId: number) => {
+    try {
+      const res = await fetch(`/api/omnimens/admin/ambassador/${userId}/verify-objective/${objId}`, { method: "POST", credentials: "include" });
+      if (res.ok && adminDetail) await loadAdminDetail(userId);
+    } catch { setActionError("Failed to verify objective"); }
+  };
+
+  const toggleAmbassadorActive = async (userId: string) => {
+    try {
+      const res = await fetch(`/api/omnimens/admin/ambassador/${userId}/toggle-active`, { method: "POST", credentials: "include" });
+      if (res.ok) await loadAdminAmbassadors();
+    } catch { setActionError("Failed to toggle ambassador status"); }
   };
 
   const handleSendMsg = async () => {
@@ -3298,18 +3481,18 @@ function ReferralSection() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
             <div className="p-3 rounded-lg bg-[#1C2333] border border-[#2B3245]">
               <DollarSign className="w-5 h-5 text-emerald-400 mx-auto mb-1" />
-              <p className="text-white text-sm font-bold">10% Commission</p>
-              <p className="text-[#9DA5B4] text-[10px] font-mono">On every purchase, forever</p>
+              <p className="text-white text-sm font-bold">Multi-Level Commissions</p>
+              <p className="text-[#9DA5B4] text-[10px] font-mono">10% direct, 3% L2, 1% L3</p>
             </div>
             <div className="p-3 rounded-lg bg-[#1C2333] border border-[#2B3245]">
               <Users className="w-5 h-5 text-violet-400 mx-auto mb-1" />
-              <p className="text-white text-sm font-bold">Grow Your Network</p>
-              <p className="text-[#9DA5B4] text-[10px] font-mono">Message & engage referrals</p>
+              <p className="text-white text-sm font-bold">Build Your Downline</p>
+              <p className="text-[#9DA5B4] text-[10px] font-mono">Earn from 3 levels deep</p>
             </div>
             <div className="p-3 rounded-lg bg-[#1C2333] border border-[#2B3245]">
               <Wallet className="w-5 h-5 text-amber-400 mx-auto mb-1" />
               <p className="text-white text-sm font-bold">Get Paid Biweekly</p>
-              <p className="text-[#9DA5B4] text-[10px] font-mono">Direct payouts to your account</p>
+              <p className="text-[#9DA5B4] text-[10px] font-mono">Real money to your account</p>
             </div>
           </div>
           <button type="button" onClick={handleEnroll} disabled={enrolling} className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 text-white font-bold text-sm hover:from-amber-500 hover:to-amber-400 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
@@ -3429,14 +3612,17 @@ function ReferralSection() {
       )}
 
       <div className="flex gap-1 overflow-x-auto pb-1">
-        {(["overview", "network", "earnings", "videos", "messages", "payouts"] as const).map(tab => (
-          <button key={tab} type="button" onClick={() => { setAmbTab(tab); if (tab === "network") loadNetwork(); if (tab === "messages") loadMessages(); }} className={`px-3 py-1.5 rounded-lg text-[10px] font-mono whitespace-nowrap transition-all ${ambTab === tab ? "bg-amber-500/20 border border-amber-500/40 text-amber-400" : "bg-[#1C2333] border border-[#2B3245] text-[#9DA5B4] hover:text-amber-400"}`}>
+        {(["overview", "network", "earnings", "objectives", "videos", "messages", "payouts", "handbook", ...(status?.isOwner ? ["admin" as const] : [])] as const).map(tab => (
+          <button key={tab} type="button" onClick={() => { setAmbTab(tab as any); if (tab === "network") loadNetwork(); if (tab === "messages") loadMessages(); if (tab === "objectives") loadObjectives(); if (tab === "admin") loadAdminAmbassadors(); }} className={`px-3 py-1.5 rounded-lg text-[10px] font-mono whitespace-nowrap transition-all ${ambTab === tab ? "bg-amber-500/20 border border-amber-500/40 text-amber-400" : "bg-[#1C2333] border border-[#2B3245] text-[#9DA5B4] hover:text-amber-400"}`}>
             {tab === "overview" && "Overview"}
             {tab === "network" && `Network (${st.totalReferred || 0})`}
             {tab === "earnings" && "Earnings"}
+            {tab === "objectives" && "Objectives"}
             {tab === "videos" && `Videos (${ambData?.videos?.length || 0})`}
             {tab === "messages" && `Messages${st.unreadMessages > 0 ? ` (${st.unreadMessages})` : ""}`}
             {tab === "payouts" && "Payouts"}
+            {tab === "handbook" && "Handbook"}
+            {tab === "admin" && "Admin"}
           </button>
         ))}
       </div>
@@ -3455,12 +3641,44 @@ function ReferralSection() {
             </div>
           </div>
           <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
-            <h5 className="text-[#9DA5B4] text-[10px] font-mono uppercase mb-2">How It Works</h5>
+            <h5 className="text-[#9DA5B4] text-[10px] font-mono uppercase mb-2">Multi-Level Commission Structure</h5>
             <div className="space-y-2">
-              <div className="flex items-start gap-2"><div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-[10px] font-bold shrink-0 mt-0.5">1</div><p className="text-[11px] text-[#9DA5B4]">Share your unique ambassador link with anyone</p></div>
-              <div className="flex items-start gap-2"><div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-[10px] font-bold shrink-0 mt-0.5">2</div><p className="text-[11px] text-[#9DA5B4]">When they sign up and make any purchase, you earn 10% commission</p></div>
-              <div className="flex items-start gap-2"><div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-[10px] font-bold shrink-0 mt-0.5">3</div><p className="text-[11px] text-[#9DA5B4]">Commission is recurring — every purchase they ever make, you earn 10%</p></div>
-              <div className="flex items-start gap-2"><div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-[10px] font-bold shrink-0 mt-0.5">$</div><p className="text-[11px] text-[#9DA5B4]">Connect a payout method to receive real money every 2 weeks</p></div>
+              <div className="flex items-start gap-2"><div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-[10px] font-bold shrink-0 mt-0.5">1</div><p className="text-[11px] text-[#9DA5B4]">Share your ambassador link — when someone signs up and buys, you earn <span className="text-amber-400 font-bold">10%</span> commission forever</p></div>
+              <div className="flex items-start gap-2"><div className="w-5 h-5 rounded-full bg-violet-500/20 flex items-center justify-center text-violet-400 text-[10px] font-bold shrink-0 mt-0.5">2</div><p className="text-[11px] text-[#9DA5B4]">If they become an ambassador and refer others, you earn <span className="text-violet-400 font-bold">3%</span> from those second-level purchases too</p></div>
+              <div className="flex items-start gap-2"><div className="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-[10px] font-bold shrink-0 mt-0.5">3</div><p className="text-[11px] text-[#9DA5B4]">Third level deep, you still earn <span className="text-cyan-400 font-bold">1%</span> — your entire downline earns you money</p></div>
+              <div className="flex items-start gap-2"><div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-[10px] font-bold shrink-0 mt-0.5">$</div><p className="text-[11px] text-[#9DA5B4]">Connect a payout method to get paid real money every 2 weeks</p></div>
+            </div>
+          </div>
+
+          <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
+            <h5 className="text-[#9DA5B4] text-[10px] font-mono uppercase mb-3">Commission Flow — $10 Purchase Example</h5>
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-full p-2 rounded bg-[#1C2333] border border-[#2B3245] text-center">
+                <p className="text-white text-xs font-bold">Customer buys $10.00</p>
+              </div>
+              <ChevronDown className="w-4 h-4 text-[#3D4659]" />
+              <div className="w-full grid grid-cols-4 gap-1.5">
+                <div className="p-2 rounded bg-amber-500/10 border border-amber-500/30 text-center">
+                  <p className="text-amber-400 text-sm font-bold font-mono">$1.00</p>
+                  <p className="text-[8px] text-amber-400 font-mono">L1 (10%)</p>
+                  <p className="text-[7px] text-[#9DA5B4]">Direct referrer</p>
+                </div>
+                <div className="p-2 rounded bg-violet-500/10 border border-violet-500/30 text-center">
+                  <p className="text-violet-400 text-sm font-bold font-mono">$0.30</p>
+                  <p className="text-[8px] text-violet-400 font-mono">L2 (3%)</p>
+                  <p className="text-[7px] text-[#9DA5B4]">2nd level up</p>
+                </div>
+                <div className="p-2 rounded bg-cyan-500/10 border border-cyan-500/30 text-center">
+                  <p className="text-cyan-400 text-sm font-bold font-mono">$0.10</p>
+                  <p className="text-[8px] text-cyan-400 font-mono">L3 (1%)</p>
+                  <p className="text-[7px] text-[#9DA5B4]">3rd level up</p>
+                </div>
+                <div className="p-2 rounded bg-[#1C2333] border border-[#2B3245] text-center">
+                  <p className="text-[#9DA5B4] text-sm font-bold font-mono">$8.60</p>
+                  <p className="text-[8px] text-[#9DA5B4] font-mono">Platform</p>
+                  <p className="text-[7px] text-[#9DA5B4]">OMNIMENS</p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -3493,32 +3711,26 @@ function ReferralSection() {
       )}
 
       {ambTab === "network" && (
-        <div className="rounded-2xl border border-[#2B3245] p-5 space-y-3">
-          <h4 className="text-white font-semibold text-sm flex items-center gap-2"><Users className="w-4 h-4 text-violet-400" /> Your Network</h4>
-          {referredUsers.length === 0 ? (
+        <div className="rounded-2xl border border-[#2B3245] p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-white font-semibold text-sm flex items-center gap-2"><Users className="w-4 h-4 text-violet-400" /> Your Network</h4>
+            <span className="text-[10px] font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">{downlineTotal} total in downline</span>
+          </div>
+
+          {downlineTree.length === 0 && referredUsers.length === 0 ? (
             <p className="text-[#9DA5B4] text-xs font-mono text-center py-6">No referred users yet. Share your link to grow your network!</p>
           ) : (
-            <div className="space-y-2">
-              {referredUsers.filter((u: any) => u?.id).map((u: any) => (
-                <div key={u.id} className="p-3 rounded-lg bg-[#0E1525] border border-[#2B3245] flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-violet-500/20 border border-violet-500/30 flex items-center justify-center">
-                    <User className="w-3.5 h-3.5 text-violet-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white text-xs font-semibold truncate">{u.username}</p>
-                    <p className="text-[#9DA5B4] text-[10px] font-mono">{u.purchaseCount} purchases — ${(u.totalCommissionEarned / 100).toFixed(2)} earned</p>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className={`px-2 py-0.5 rounded text-[9px] font-mono ${u.referralStatus === "completed" ? "bg-emerald-500/20 text-emerald-400" : "bg-amber-500/20 text-amber-400"}`}>
-                      {u.referralStatus === "completed" ? "ACTIVE" : "PENDING"}
-                    </span>
-                    <button type="button" onClick={() => { setMsgRecipient(u.id); setAmbTab("messages"); loadMessages(); }} className="p-1.5 rounded bg-[#2B3245]/50 text-[#9DA5B4] hover:text-violet-400 transition-colors">
-                      <MessageSquare className="w-3 h-3" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <>
+              <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3 mb-2">
+                <p className="text-[10px] font-mono text-[#9DA5B4]">
+                  <span className="text-amber-400">L1</span> = Direct referral (you earn 10%) &nbsp;
+                  <span className="text-violet-400">L2</span> = Their referrals (you earn 3%) &nbsp;
+                  <span className="text-cyan-400">L3</span> = Third level (you earn 1%)
+                </p>
+              </div>
+
+              <DownlineTreeView nodes={downlineTree} onMessage={(uid: string) => { setMsgRecipient(uid); setAmbTab("messages"); loadMessages(); }} />
+            </>
           )}
         </div>
       )}
@@ -3530,17 +3742,22 @@ function ReferralSection() {
             <p className="text-[#9DA5B4] text-xs font-mono text-center py-6">No commissions yet. When referred users make purchases, your 10% commission will appear here.</p>
           ) : (
             <div className="space-y-1.5">
-              {ambData.earnings.map((e: any) => (
-                <div key={e.id} className="p-3 rounded-lg bg-[#0E1525] border border-[#2B3245] flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                    <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
+              {ambData.earnings.map((e: any) => {
+                const lvl = e.commissionLevel ?? 1;
+                const lvlColor = lvl === 1 ? "text-amber-400" : lvl === 2 ? "text-violet-400" : "text-cyan-400";
+                return (
+                  <div key={e.id} className="p-3 rounded-lg bg-[#0E1525] border border-[#2B3245] flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                      <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-xs font-mono">+${(e.commissionCredits / 100).toFixed(2)} <span className="text-[#9DA5B4]">({e.commissionRate}% of ${(e.paymentAmountCents / 100).toFixed(2)})</span></p>
+                      <p className="text-[#9DA5B4] text-[10px] font-mono">{e.paymentType} — {new Date(e.createdAt).toLocaleDateString()}</p>
+                    </div>
+                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold ${lvlColor} bg-[#2B3245]/50`}>L{lvl}</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white text-xs font-mono">+${(e.commissionCredits / 100).toFixed(2)} <span className="text-[#9DA5B4]">({e.commissionRate}% of ${(e.paymentAmountCents / 100).toFixed(2)})</span></p>
-                    <p className="text-[#9DA5B4] text-[10px] font-mono">{e.paymentType} — {new Date(e.createdAt).toLocaleDateString()}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -3676,6 +3893,341 @@ function ReferralSection() {
           )}
 
           <p className="text-[#9DA5B4]/40 text-[9px] font-mono">Payouts require a minimum of $1.00 and a connected payout method. Processed every 2 weeks.</p>
+        </div>
+      )}
+
+      {ambTab === "objectives" && (
+        <div className="rounded-2xl border border-[#2B3245] p-5 space-y-4">
+          <h4 className="text-white font-semibold text-sm flex items-center gap-2"><Check className="w-4 h-4 text-emerald-400" /> Ambassador Objectives</h4>
+          <p className="text-[#9DA5B4] text-xs font-mono">Complete these objectives to maintain your ambassador status. Required items must stay completed.</p>
+
+          {objectives.length === 0 ? (
+            <p className="text-[#9DA5B4] text-xs font-mono text-center py-6">Loading objectives...</p>
+          ) : (
+            <div className="space-y-2">
+              {objectives.map((obj: any) => {
+                const catColors: Record<string, string> = { onboarding: "text-amber-400 bg-amber-500/10", milestone: "text-violet-400 bg-violet-500/10", content: "text-cyan-400 bg-cyan-500/10", growth: "text-emerald-400 bg-emerald-500/10", ongoing: "text-blue-400 bg-blue-500/10" };
+                const catColor = catColors[obj.category] || "text-[#9DA5B4] bg-[#2B3245]/50";
+                return (
+                  <div key={obj.id} className={`p-3 rounded-lg border ${obj.completed ? "border-emerald-500/30 bg-emerald-500/5" : "border-[#2B3245] bg-[#0E1525]"} flex items-start gap-3`}>
+                    <button type="button" onClick={() => toggleObjective(obj.id, obj.completed)} disabled={completingObj === obj.id} className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all ${obj.completed ? "bg-emerald-500 border-emerald-500" : "border-[#3D4659] hover:border-amber-400"}`}>
+                      {completingObj === obj.id ? <Loader2 className="w-3 h-3 animate-spin text-white" /> : obj.completed ? <Check className="w-3 h-3 text-white" /> : null}
+                    </button>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <p className={`text-xs font-semibold ${obj.completed ? "text-emerald-400 line-through" : "text-white"}`}>{obj.title}</p>
+                        {obj.isRequired && <span className="text-[8px] font-mono px-1 py-0.5 rounded bg-red-500/20 text-red-400">REQUIRED</span>}
+                        <span className={`text-[8px] font-mono px-1.5 py-0.5 rounded ${catColor}`}>{obj.category}</span>
+                      </div>
+                      <p className="text-[#9DA5B4] text-[10px] font-mono">{obj.description}</p>
+                      {obj.completed && (
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-emerald-400 text-[9px] font-mono">Completed {obj.completedAt ? new Date(obj.completedAt).toLocaleDateString() : ""}</span>
+                          {obj.verifiedByOwner ? (
+                            <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 flex items-center gap-1"><Shield className="w-2.5 h-2.5" /> VERIFIED</span>
+                          ) : (
+                            <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">PENDING VERIFICATION</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-3">
+            <p className="text-[10px] font-mono text-[#9DA5B4]">
+              {objectives.filter((o: any) => o.completed).length}/{objectives.length} objectives completed.
+              {objectives.filter((o: any) => o.isRequired && !o.completed).length > 0 && <span className="text-red-400 ml-1">{objectives.filter((o: any) => o.isRequired && !o.completed).length} required objectives remaining.</span>}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {ambTab === "handbook" && (
+        <div className="rounded-2xl border border-[#2B3245] p-5 space-y-5">
+          <div className="flex items-center justify-between">
+            <h4 className="text-white font-semibold text-sm flex items-center gap-2"><BookOpen className="w-4 h-4 text-amber-400" /> Ambassador Handbook</h4>
+            <button type="button" onClick={() => {
+              const el = document.getElementById("handbook-content");
+              if (!el) return;
+              const w = window.open("", "_blank");
+              if (!w) return;
+              w.document.write(`<html><head><title>OMNIMENS Ambassador Handbook</title><style>body{font-family:system-ui,-apple-system,sans-serif;max-width:720px;margin:40px auto;padding:0 20px;color:#333;line-height:1.6}h1{color:#b45309;border-bottom:2px solid #b45309;padding-bottom:8px}h2{color:#7c3aed;margin-top:28px}h3{color:#0891b2}ul{padding-left:20px}li{margin:4px 0}.highlight{background:#fef3c7;padding:2px 6px;border-radius:4px;font-weight:600}.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:700;margin:0 4px}.l1{background:#fef3c7;color:#b45309}.l2{background:#ede9fe;color:#7c3aed}.l3{background:#cffafe;color:#0891b2}</style></head><body>${el.innerHTML}<p style="margin-top:40px;color:#999;font-size:12px">© ${new Date().getFullYear()} Alpha Unlimited Technologies, LLC — OMNIMENS Ambassador Program</p></body></html>`);
+              w.document.close();
+              w.print();
+            }} className="px-3 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-400 text-[10px] font-mono hover:bg-amber-500/30 transition-all flex items-center gap-1.5">
+              <ExternalLink className="w-3 h-3" /> Print / Save PDF
+            </button>
+          </div>
+
+          <div id="handbook-content" className="space-y-6 text-[#9DA5B4] text-xs font-mono leading-relaxed">
+            <div>
+              <h3 className="text-white text-sm font-bold mb-2">Welcome to the OMNIMENS Ambassador Program</h3>
+              <p>As an OMNIMENS Ambassador, you represent the cutting edge of AI technology. You earn commissions by referring new users and building your network. This handbook covers everything you need to know.</p>
+            </div>
+
+            <div className="bg-gradient-to-r from-amber-500/5 to-violet-500/5 border border-amber-500/20 rounded-lg p-4">
+              <h3 className="text-amber-400 text-sm font-bold mb-3">Commission Structure — How You Get Paid</h3>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 shrink-0">LEVEL 1</span>
+                  <div>
+                    <p className="text-white text-xs font-bold">10% Direct Commission</p>
+                    <p>When someone signs up using YOUR referral link and makes any purchase, you earn 10% of that purchase as commission. This is recurring — every purchase they ever make, you earn 10%.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-violet-500/20 text-violet-400 shrink-0">LEVEL 2</span>
+                  <div>
+                    <p className="text-white text-xs font-bold">3% Second-Level Commission</p>
+                    <p>If your referral becomes an ambassador and refers their own users, you earn 3% of every purchase those second-level users make. You're earning from people you never even spoke to.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-400 shrink-0">LEVEL 3</span>
+                  <div>
+                    <p className="text-white text-xs font-bold">1% Third-Level Commission</p>
+                    <p>The chain goes three levels deep. If those second-level ambassadors refer users who become ambassadors and refer more users, you still earn 1% from that third level.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-[#0E1525] border border-[#2B3245] rounded-lg p-4">
+              <h3 className="text-white text-sm font-bold mb-3">Example Breakdown</h3>
+              <p className="mb-3">Imagine you refer Alice, who refers Bob, who refers Carol. When Carol buys a $10 credit pack:</p>
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center p-2 rounded bg-amber-500/5 border border-amber-500/20">
+                  <span><span className="text-amber-400 font-bold">Bob</span> (Carol's direct referrer)</span>
+                  <span className="text-amber-400 font-bold">$1.00 (10%)</span>
+                </div>
+                <div className="flex justify-between items-center p-2 rounded bg-violet-500/5 border border-violet-500/20">
+                  <span><span className="text-violet-400 font-bold">Alice</span> (second level up)</span>
+                  <span className="text-violet-400 font-bold">$0.30 (3%)</span>
+                </div>
+                <div className="flex justify-between items-center p-2 rounded bg-cyan-500/5 border border-cyan-500/20">
+                  <span><span className="text-cyan-400 font-bold">You</span> (third level — original ambassador)</span>
+                  <span className="text-cyan-400 font-bold">$0.10 (1%)</span>
+                </div>
+                <div className="flex justify-between items-center p-2 rounded bg-[#1C2333] border border-[#2B3245]">
+                  <span className="text-[#9DA5B4]">OMNIMENS (platform)</span>
+                  <span className="text-[#9DA5B4]">$8.60 (86%)</span>
+                </div>
+              </div>
+              <p className="mt-3 text-[10px]">Now multiply this by every purchase, across your entire downline network. The more ambassadors in your network, the more you earn passively.</p>
+            </div>
+
+            <div>
+              <h3 className="text-white text-sm font-bold mb-2">Requirements to Stay Active</h3>
+              <ul className="list-disc space-y-1">
+                <li>Complete all <span className="text-red-400">required</span> objectives in the Objectives tab</li>
+                <li>Log into your dashboard at least once per month</li>
+                <li>Share OMNIMENS content at least once per month on any social platform</li>
+                <li>Maintain professional conduct when representing OMNIMENS</li>
+                <li>Do not make false claims about AI capabilities or earnings potential</li>
+                <li>Do not spam referral links — quality engagement over quantity</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-white text-sm font-bold mb-2">Payout Information</h3>
+              <ul className="list-disc space-y-1">
+                <li>Payouts are processed automatically every 2 weeks</li>
+                <li>Minimum payout threshold: $1.00</li>
+                <li>You must connect a Stripe payout account to receive payments</li>
+                <li>Commission is earned in platform credits and converted to USD for payout</li>
+                <li>You can track all earnings and payouts in the Earnings and Payouts tabs</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-white text-sm font-bold mb-2">Best Practices</h3>
+              <ul className="list-disc space-y-1">
+                <li>Create authentic content showing how you use OMNIMENS AI</li>
+                <li>Focus on the value OMNIMENS provides, not just the referral program</li>
+                <li>Engage with your referred users — help them get started</li>
+                <li>Encourage your active referrals to become ambassadors (grows your L2/L3)</li>
+                <li>Use the Messages tab to stay in touch with your network</li>
+                <li>Track your objectives and make sure required items stay completed</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-white text-sm font-bold mb-2">Termination Policy</h3>
+              <p>Ambassador status may be revoked for: violating terms of service, spamming, making false claims, extended inactivity (3+ months without login or content), or any behavior that harms the OMNIMENS brand. Pending commissions will be forfeited upon termination.</p>
+            </div>
+
+            <div className="bg-amber-500/5 border border-amber-500/20 rounded-lg p-3">
+              <p className="text-amber-400 text-[10px] font-bold">IMPORTANT: This is a referral program, not an employment agreement. Ambassadors are independent promoters. OMNIMENS reserves the right to modify commission rates, payout schedules, and program terms at any time.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {ambTab === "admin" && status?.isOwner && (
+        <div className="rounded-2xl border border-[#2B3245] p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-white font-semibold text-sm flex items-center gap-2"><Shield className="w-4 h-4 text-red-400" /> Ambassador Admin</h4>
+            <div className="flex gap-1">
+              <button type="button" onClick={() => { setAdminView("list"); loadAdminAmbassadors(); }} className={`px-2 py-1 rounded text-[9px] font-mono ${adminView === "list" ? "bg-amber-500/20 text-amber-400" : "bg-[#1C2333] text-[#9DA5B4]"}`}>Ambassadors</button>
+              <button type="button" onClick={() => { setAdminView("customers"); loadAdminCustomers(); }} className={`px-2 py-1 rounded text-[9px] font-mono ${adminView === "customers" ? "bg-amber-500/20 text-amber-400" : "bg-[#1C2333] text-[#9DA5B4]"}`}>All Customers</button>
+            </div>
+          </div>
+
+          {adminLoading && <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-amber-400" /></div>}
+
+          {!adminLoading && adminView === "list" && (
+            <div className="space-y-2">
+              {adminAmbs.length === 0 ? (
+                <p className="text-[#9DA5B4] text-xs font-mono text-center py-6">No ambassadors enrolled yet.</p>
+              ) : adminAmbs.map((amb: any) => (
+                <div key={amb.userId} className="p-3 rounded-lg bg-[#0E1525] border border-[#2B3245] space-y-2">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${amb.isActive ? "bg-amber-500/20" : "bg-red-500/20"}`}>
+                      <Award className={`w-3.5 h-3.5 ${amb.isActive ? "text-amber-400" : "text-red-400"}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-xs font-semibold truncate">{amb.displayName || amb.username || "Unknown"}</p>
+                      <p className="text-[#9DA5B4] text-[10px] font-mono">{amb.email || "No email"} — Joined {new Date(amb.createdAt).toLocaleDateString()}</p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button type="button" onClick={() => loadAdminDetail(amb.userId)} className="px-2 py-1 rounded text-[9px] font-mono bg-[#2B3245]/50 text-[#9DA5B4] hover:text-amber-400 transition-colors">View</button>
+                      <button type="button" onClick={() => toggleAmbassadorActive(amb.userId)} className={`px-2 py-1 rounded text-[9px] font-mono ${amb.isActive ? "bg-red-500/10 text-red-400 hover:bg-red-500/20" : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"} transition-colors`}>
+                        {amb.isActive ? "Deactivate" : "Activate"}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    <div className="text-center p-1.5 rounded bg-[#1C2333]">
+                      <p className="text-amber-400 text-xs font-bold font-mono">{amb.totalReferred || 0}</p>
+                      <p className="text-[8px] text-[#9DA5B4] font-mono">Referred</p>
+                    </div>
+                    <div className="text-center p-1.5 rounded bg-[#1C2333]">
+                      <p className="text-amber-400 text-xs font-bold font-mono">${((amb.l1Earnings || 0) / 100).toFixed(2)}</p>
+                      <p className="text-[8px] text-[#9DA5B4] font-mono">L1 Earned</p>
+                    </div>
+                    <div className="text-center p-1.5 rounded bg-[#1C2333]">
+                      <p className="text-violet-400 text-xs font-bold font-mono">${((amb.l2Earnings || 0) / 100).toFixed(2)}</p>
+                      <p className="text-[8px] text-[#9DA5B4] font-mono">L2 Earned</p>
+                    </div>
+                    <div className="text-center p-1.5 rounded bg-[#1C2333]">
+                      <p className="text-cyan-400 text-xs font-bold font-mono">${((amb.l3Earnings || 0) / 100).toFixed(2)}</p>
+                      <p className="text-[8px] text-[#9DA5B4] font-mono">L3 Earned</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {!adminLoading && adminView === "detail" && adminDetail && (
+            <div className="space-y-4">
+              <button type="button" onClick={() => setAdminView("list")} className="text-amber-400 text-xs font-mono flex items-center gap-1 hover:underline"><ChevronRight className="w-3 h-3 rotate-180" /> Back to list</button>
+
+              <div className="p-4 rounded-lg bg-[#0E1525] border border-[#2B3245] space-y-2">
+                <h5 className="text-white text-sm font-bold">{adminDetail.user?.username || "Unknown"}</h5>
+                <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
+                  <div><span className="text-[#9DA5B4]">Email:</span> <span className="text-white">{adminDetail.user?.email || "N/A"}</span></div>
+                  <div><span className="text-[#9DA5B4]">Joined:</span> <span className="text-white">{adminDetail.user?.createdAt ? new Date(adminDetail.user.createdAt).toLocaleDateString() : "N/A"}</span></div>
+                  <div><span className="text-[#9DA5B4]">Credits:</span> <span className="text-white">{adminDetail.user?.credits ?? 0}</span></div>
+                  <div><span className="text-[#9DA5B4]">Total Spent:</span> <span className="text-white">${((adminDetail.user?.totalPaidSpendCents || 0) / 100).toFixed(2)}</span></div>
+                  <div><span className="text-[#9DA5B4]">2FA:</span> <span className={adminDetail.user?.twoFactorEnabled ? "text-emerald-400" : "text-red-400"}>{adminDetail.user?.twoFactorEnabled ? "Enabled" : "Disabled"}</span></div>
+                  <div><span className="text-[#9DA5B4]">Referral Code:</span> <span className="text-amber-400">{adminDetail.user?.referralCode || "N/A"}</span></div>
+                </div>
+              </div>
+
+              {adminDetail.referrals?.length > 0 && (
+                <div className="p-4 rounded-lg bg-[#0E1525] border border-[#2B3245]">
+                  <h5 className="text-white text-xs font-bold mb-2">Referred Users ({adminDetail.referrals.length})</h5>
+                  <div className="space-y-1">
+                    {adminDetail.referrals.map((r: any) => (
+                      <div key={r.id} className="flex justify-between items-center p-2 rounded bg-[#1C2333] text-[10px] font-mono">
+                        <span className="text-white">{r.username || "Unknown"}</span>
+                        <span className="text-[#9DA5B4]">{r.email || "N/A"} — Spent ${((r.totalPaidSpendCents || 0) / 100).toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {adminDetail.objectives?.length > 0 && (
+                <div className="p-4 rounded-lg bg-[#0E1525] border border-[#2B3245]">
+                  <h5 className="text-white text-xs font-bold mb-2">Objectives Progress</h5>
+                  <div className="space-y-1.5">
+                    {adminDetail.objectives.map((obj: any) => (
+                      <div key={obj.id} className="flex items-center gap-2 p-2 rounded bg-[#1C2333] text-[10px] font-mono">
+                        <div className={`w-4 h-4 rounded flex items-center justify-center ${obj.completed ? "bg-emerald-500" : "bg-[#3D4659]"}`}>
+                          {obj.completed && <Check className="w-2.5 h-2.5 text-white" />}
+                        </div>
+                        <span className={`flex-1 ${obj.completed ? "text-emerald-400" : "text-white"}`}>{obj.title}</span>
+                        {obj.isRequired && <span className="text-red-400 text-[8px]">REQ</span>}
+                        {obj.completed && !obj.verifiedByOwner && (
+                          <button type="button" onClick={() => verifyObjective(adminDetail.user.id, obj.id)} className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 text-[8px] font-bold">VERIFY</button>
+                        )}
+                        {obj.verifiedByOwner && <span className="text-emerald-400 text-[8px] flex items-center gap-0.5"><Shield className="w-2.5 h-2.5" /> VERIFIED</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {adminDetail.earnings?.length > 0 && (
+                <div className="p-4 rounded-lg bg-[#0E1525] border border-[#2B3245]">
+                  <h5 className="text-white text-xs font-bold mb-2">Recent Earnings (Last 50)</h5>
+                  <div className="space-y-1 max-h-48 overflow-y-auto">
+                    {adminDetail.earnings.map((e: any) => {
+                      const lvl = e.commissionLevel ?? 1;
+                      const lvlColor = lvl === 1 ? "text-amber-400" : lvl === 2 ? "text-violet-400" : "text-cyan-400";
+                      return (
+                        <div key={e.id} className="flex justify-between items-center p-1.5 rounded bg-[#1C2333] text-[10px] font-mono">
+                          <span className="text-[#9DA5B4]">{e.paymentType} — {new Date(e.createdAt).toLocaleDateString()}</span>
+                          <div className="flex items-center gap-2">
+                            <span className={lvlColor}>L{lvl}</span>
+                            <span className="text-emerald-400">${(e.commissionCredits / 100).toFixed(2)}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!adminLoading && adminView === "customers" && (
+            <div className="space-y-2">
+              {adminCustomers.length === 0 ? (
+                <p className="text-[#9DA5B4] text-xs font-mono text-center py-6">No customers found.</p>
+              ) : (
+                <>
+                  <p className="text-[#9DA5B4] text-[10px] font-mono">{adminCustomers.length} customers shown</p>
+                  <div className="space-y-1 max-h-96 overflow-y-auto">
+                    {adminCustomers.map((c: any) => (
+                      <div key={c.id} className="p-2.5 rounded-lg bg-[#0E1525] border border-[#2B3245] flex items-center gap-3">
+                        <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${c.isAmbassador ? "bg-amber-500/20" : "bg-[#2B3245]"}`}>
+                          {c.isAmbassador ? <Award className="w-3 h-3 text-amber-400" /> : <User className="w-3 h-3 text-[#9DA5B4]" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white text-xs font-semibold truncate">{c.username || "User"}</p>
+                          <p className="text-[#9DA5B4] text-[9px] font-mono">{c.email || "No email"} — Credits: {c.credits} — Spent: ${((c.totalPaidSpendCents || 0) / 100).toFixed(2)}</p>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {c.twoFactorEnabled && <Shield className="w-3 h-3 text-emerald-400" />}
+                          {c.referredBy && <span className="text-[8px] font-mono text-violet-400 bg-violet-500/10 px-1.5 py-0.5 rounded">REFERRED</span>}
+                          {c.isAmbassador && (
+                            <button type="button" onClick={() => loadAdminDetail(c.id)} className="px-2 py-0.5 rounded text-[8px] font-mono bg-amber-500/10 text-amber-400 hover:bg-amber-500/20">Details</button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

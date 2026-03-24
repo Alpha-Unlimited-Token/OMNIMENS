@@ -44,7 +44,7 @@ import { getOrCreateCustomInstructions, saveCustomInstructions, buildCustomInstr
 import { analyzeUserEmotionalState, buildEmotionalContext, loadLearningContext, runLearningCycle } from "../lib/omnimens-learning.js";
 import { loadGeneratedModulesContext, getConsciousnessState, getEvolutionHistory, getGeneratedModules, deactivateModule, runEvolutionCycle } from "../lib/omnimens-evolution.js";
 import { runCouncilAnalysis } from "./council.js";
-import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness, omnimensProjects, omnimensProjectFiles, omnimensApiKeys, omnimensProblemReports, omnimensReferrals, omnimensUserFiles, omnimensAmbassadorProfiles, omnimensAmbassadorVideos, omnimensAmbassadorMessages, omnimensAmbassadorEarnings, omnimensAmbassadorPayouts } from "@workspace/db";
+import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness, omnimensProjects, omnimensProjectFiles, omnimensApiKeys, omnimensProblemReports, omnimensReferrals, omnimensUserFiles, omnimensAmbassadorProfiles, omnimensAmbassadorVideos, omnimensAmbassadorMessages, omnimensAmbassadorEarnings, omnimensAmbassadorPayouts, omnimensAmbassadorObjectives, omnimensAmbassadorObjectiveProgress } from "@workspace/db";
 import { autoSaveImage, autoSaveVideo, autoSave3DModel, autoSaveGameZip, getUserFiles, getUserFileById, deleteUserFile, streamFileToResponse, getUserFileStats, getConversationFiles } from "../lib/omnimens-file-storage.js";
 import * as OTPAuth from "otpauth";
 import crypto from "crypto";
@@ -4204,7 +4204,11 @@ router.post("/omnimens/referral/apply", async (req, res) => {
 
 // ─── Ambassador Program ──────────────────────────────────────────────────────
 
-const AMBASSADOR_COMMISSION_RATE = 10;
+const COMMISSION_LEVELS = [
+  { level: 1, rate: 10 },
+  { level: 2, rate: 3 },
+  { level: 3, rate: 1 },
+];
 
 router.get("/omnimens/ambassador/profile", async (req, res) => {
   if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
@@ -4261,7 +4265,7 @@ router.get("/omnimens/ambassador/profile", async (req, res) => {
         totalReferred: referrals.length,
         activeReferred: referrals.filter(r => r.status === "completed").length,
         pendingReferred: referrals.filter(r => r.status === "pending").length,
-        commissionRate: AMBASSADOR_COMMISSION_RATE,
+        commissionLevels: COMMISSION_LEVELS,
         totalEarningsCents,
         totalEarningsDollars: (totalEarningsCents / 100).toFixed(2),
         pendingPayoutCents,
@@ -4276,6 +4280,7 @@ router.get("/omnimens/ambassador/profile", async (req, res) => {
         paymentAmountCents: e.paymentAmountCents,
         commissionCredits: e.commissionCredits,
         commissionRate: e.commissionRate,
+        commissionLevel: e.commissionLevel ?? 1,
         paymentType: e.paymentType,
         createdAt: e.createdAt,
       })),
@@ -4412,6 +4417,90 @@ router.delete("/omnimens/ambassador/videos/:id", async (req, res) => {
     res.json({ deleted: true });
   } catch (err: any) {
     res.status(500).json({ error: "Failed to delete video" });
+  }
+});
+
+router.get("/omnimens/ambassador/downline", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const maxDepth = 3;
+
+    const [user] = await db.select({ referralCode: omnimensUsers.referralCode })
+      .from(omnimensUsers).where(eq(omnimensUsers.id, req.user.id)).limit(1);
+    if (!user?.referralCode) { res.json({ tree: [], totalDownline: 0 }); return; }
+
+    const visited = new Set<string>();
+
+    async function getChildrenBatched(parentCodes: string[], depth: number): Promise<Map<string, any[]>> {
+      const result = new Map<string, any[]>();
+      if (depth > maxDepth || parentCodes.length === 0) return result;
+
+      const freshCodes = parentCodes.filter(c => c && !visited.has(c));
+      if (freshCodes.length === 0) return result;
+      freshCodes.forEach(c => visited.add(c));
+
+      const referred = await db.select({
+        id: omnimensUsers.id,
+        username: omnimensUsers.username,
+        referralCode: omnimensUsers.referralCode,
+        referredBy: omnimensUsers.referredBy,
+        createdAt: omnimensUsers.createdAt,
+      }).from(omnimensUsers).where(inArray(omnimensUsers.referredBy, freshCodes));
+
+      if (referred.length === 0) return result;
+
+      const userIds = referred.map(u => u.id);
+
+      const [ambProfiles, earningsAgg] = await Promise.all([
+        db.select({ userId: omnimensAmbassadorProfiles.userId })
+          .from(omnimensAmbassadorProfiles)
+          .where(inArray(omnimensAmbassadorProfiles.userId, userIds)),
+        db.select({
+          referredUserId: omnimensAmbassadorEarnings.referredUserId,
+          total: sql<number>`COALESCE(SUM(${omnimensAmbassadorEarnings.commissionCredits}), 0)`,
+        })
+          .from(omnimensAmbassadorEarnings)
+          .where(and(
+            eq(omnimensAmbassadorEarnings.ambassadorId, req.user.id),
+            inArray(omnimensAmbassadorEarnings.referredUserId, userIds)
+          ))
+          .groupBy(omnimensAmbassadorEarnings.referredUserId),
+      ]);
+
+      const ambSet = new Set(ambProfiles.map(a => a.userId));
+      const earningsMap = new Map(earningsAgg.map(e => [e.referredUserId, e.total]));
+
+      const nextCodes = referred.filter(u => u.referralCode).map(u => u.referralCode!);
+      const childrenByCode = await getChildrenBatched(nextCodes, depth + 1);
+
+      for (const u of referred) {
+        const parentCode = u.referredBy!;
+        if (!result.has(parentCode)) result.set(parentCode, []);
+        result.get(parentCode)!.push({
+          id: u.id,
+          username: u.username || "User",
+          level: depth,
+          isAmbassador: ambSet.has(u.id),
+          joinedAt: u.createdAt,
+          commissionEarnedFromUser: earningsMap.get(u.id) ?? 0,
+          children: u.referralCode ? (childrenByCode.get(u.referralCode) || []) : [],
+        });
+      }
+
+      return result;
+    }
+
+    const treeMap = await getChildrenBatched([user.referralCode], 1);
+    const tree = treeMap.get(user.referralCode) || [];
+
+    function countAll(nodes: any[]): number {
+      return nodes.reduce((s, n) => s + 1 + countAll(n.children || []), 0);
+    }
+
+    res.json({ tree, totalDownline: countAll(tree) });
+  } catch (err: any) {
+    console.error("[Ambassador] Downline error:", err);
+    res.status(500).json({ error: "Failed to load downline" });
   }
 });
 
@@ -4789,6 +4878,310 @@ router.post("/omnimens/ambassador/process-payouts", async (req, res) => {
   } catch (err: any) {
     console.error("[Ambassador Payout] Process error:", err);
     res.status(500).json({ error: "Failed to process payouts" });
+  }
+});
+
+// ─── Ambassador Objectives ───────────────────────────────────────────────────
+
+router.get("/omnimens/ambassador/objectives", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const objectives = await db.select().from(omnimensAmbassadorObjectives)
+      .where(eq(omnimensAmbassadorObjectives.isActive, true))
+      .orderBy(omnimensAmbassadorObjectives.sortOrder);
+
+    const progress = await db.select().from(omnimensAmbassadorObjectiveProgress)
+      .where(eq(omnimensAmbassadorObjectiveProgress.userId, req.user.id));
+
+    const progressMap = new Map(progress.map(p => [p.objectiveId, p]));
+
+    const result = objectives.map(o => ({
+      ...o,
+      completed: progressMap.get(o.id)?.completed || false,
+      completedAt: progressMap.get(o.id)?.completedAt || null,
+      verifiedByOwner: progressMap.get(o.id)?.verifiedByOwner || false,
+      verifiedAt: progressMap.get(o.id)?.verifiedAt || null,
+      notes: progressMap.get(o.id)?.notes || null,
+    }));
+
+    res.json({ objectives: result });
+  } catch (err: any) {
+    console.error("[Ambassador] Objectives error:", err);
+    res.status(500).json({ error: "Failed to load objectives" });
+  }
+});
+
+router.post("/omnimens/ambassador/objectives/:id/complete", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const objectiveId = parseInt(req.params.id);
+    if (isNaN(objectiveId)) { res.status(400).json({ error: "Invalid objective ID" }); return; }
+
+    const [existing] = await db.select().from(omnimensAmbassadorObjectiveProgress)
+      .where(and(
+        eq(omnimensAmbassadorObjectiveProgress.userId, req.user.id),
+        eq(omnimensAmbassadorObjectiveProgress.objectiveId, objectiveId)
+      )).limit(1);
+
+    if (existing) {
+      await db.update(omnimensAmbassadorObjectiveProgress)
+        .set({ completed: true, completedAt: new Date() })
+        .where(eq(omnimensAmbassadorObjectiveProgress.id, existing.id));
+    } else {
+      await db.insert(omnimensAmbassadorObjectiveProgress).values({
+        userId: req.user.id,
+        objectiveId,
+        completed: true,
+        completedAt: new Date(),
+      });
+    }
+
+    res.json({ success: true });
+  } catch (err: any) {
+    console.error("[Ambassador] Complete objective error:", err);
+    res.status(500).json({ error: "Failed to complete objective" });
+  }
+});
+
+router.post("/omnimens/ambassador/objectives/:id/uncomplete", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    const objectiveId = parseInt(req.params.id);
+    if (isNaN(objectiveId)) { res.status(400).json({ error: "Invalid objective ID" }); return; }
+
+    await db.update(omnimensAmbassadorObjectiveProgress)
+      .set({ completed: false, completedAt: null })
+      .where(and(
+        eq(omnimensAmbassadorObjectiveProgress.userId, req.user.id),
+        eq(omnimensAmbassadorObjectiveProgress.objectiveId, objectiveId)
+      ));
+
+    res.json({ success: true });
+  } catch (err: any) {
+    console.error("[Ambassador] Uncomplete objective error:", err);
+    res.status(500).json({ error: "Failed to uncomplete objective" });
+  }
+});
+
+// ─── Owner Admin: Ambassador Management ──────────────────────────────────────
+
+router.get("/omnimens/admin/ambassadors", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  if (!isOwner(req.user.id)) { res.status(403).json({ error: "Owner only" }); return; }
+
+  try {
+    const profiles = await db.select({
+      id: omnimensAmbassadorProfiles.id,
+      userId: omnimensAmbassadorProfiles.userId,
+      displayName: omnimensAmbassadorProfiles.displayName,
+      bio: omnimensAmbassadorProfiles.bio,
+      isActive: omnimensAmbassadorProfiles.isActive,
+      totalReferred: omnimensAmbassadorProfiles.totalReferred,
+      lifetimeEarningsCredits: omnimensAmbassadorProfiles.lifetimeEarningsCredits,
+      payoutsEnabled: omnimensAmbassadorProfiles.payoutsEnabled,
+      pendingPayoutCents: omnimensAmbassadorProfiles.pendingPayoutCents,
+      lifetimePayoutCents: omnimensAmbassadorProfiles.lifetimePayoutCents,
+      createdAt: omnimensAmbassadorProfiles.createdAt,
+      username: omnimensUsers.username,
+      email: omnimensUsers.email,
+      credits: omnimensUsers.credits,
+      totalCreditsEarned: omnimensUsers.totalCreditsEarned,
+      totalPaidSpendCents: omnimensUsers.totalPaidSpendCents,
+      twoFactorEnabled: omnimensUsers.twoFactorEnabled,
+      userCreatedAt: omnimensUsers.createdAt,
+    })
+      .from(omnimensAmbassadorProfiles)
+      .innerJoin(omnimensUsers, eq(omnimensAmbassadorProfiles.userId, omnimensUsers.id))
+      .orderBy(desc(omnimensAmbassadorProfiles.createdAt));
+
+    const allEarnings = await db.select({
+      ambassadorId: omnimensAmbassadorEarnings.ambassadorId,
+      total: sql<number>`COALESCE(SUM(${omnimensAmbassadorEarnings.commissionCredits}), 0)`,
+      count: sql<number>`COUNT(*)`,
+      l1Total: sql<number>`COALESCE(SUM(CASE WHEN ${omnimensAmbassadorEarnings.commissionLevel} = 1 THEN ${omnimensAmbassadorEarnings.commissionCredits} ELSE 0 END), 0)`,
+      l2Total: sql<number>`COALESCE(SUM(CASE WHEN ${omnimensAmbassadorEarnings.commissionLevel} = 2 THEN ${omnimensAmbassadorEarnings.commissionCredits} ELSE 0 END), 0)`,
+      l3Total: sql<number>`COALESCE(SUM(CASE WHEN ${omnimensAmbassadorEarnings.commissionLevel} = 3 THEN ${omnimensAmbassadorEarnings.commissionCredits} ELSE 0 END), 0)`,
+    })
+      .from(omnimensAmbassadorEarnings)
+      .groupBy(omnimensAmbassadorEarnings.ambassadorId);
+
+    const earningsMap = new Map(allEarnings.map(e => [e.ambassadorId, e]));
+
+    const result = profiles.map(p => ({
+      ...p,
+      earningsTotal: earningsMap.get(p.userId)?.total ?? 0,
+      earningsCount: earningsMap.get(p.userId)?.count ?? 0,
+      l1Earnings: earningsMap.get(p.userId)?.l1Total ?? 0,
+      l2Earnings: earningsMap.get(p.userId)?.l2Total ?? 0,
+      l3Earnings: earningsMap.get(p.userId)?.l3Total ?? 0,
+    }));
+
+    res.json({ ambassadors: result });
+  } catch (err: any) {
+    console.error("[Admin] Ambassador list error:", err);
+    res.status(500).json({ error: "Failed to load ambassadors" });
+  }
+});
+
+router.get("/omnimens/admin/ambassador/:userId", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  if (!isOwner(req.user.id)) { res.status(403).json({ error: "Owner only" }); return; }
+
+  try {
+    const userId = req.params.userId;
+
+    const [user] = await db.select({
+      id: omnimensUsers.id,
+      username: omnimensUsers.username,
+      email: omnimensUsers.email,
+      credits: omnimensUsers.credits,
+      totalCreditsEarned: omnimensUsers.totalCreditsEarned,
+      totalPaidSpendCents: omnimensUsers.totalPaidSpendCents,
+      referralCode: omnimensUsers.referralCode,
+      referredBy: omnimensUsers.referredBy,
+      twoFactorEnabled: omnimensUsers.twoFactorEnabled,
+      createdAt: omnimensUsers.createdAt,
+    }).from(omnimensUsers).where(eq(omnimensUsers.id, userId)).limit(1);
+
+    if (!user) { res.status(404).json({ error: "User not found" }); return; }
+
+    const [profile] = await db.select().from(omnimensAmbassadorProfiles)
+      .where(eq(omnimensAmbassadorProfiles.userId, userId)).limit(1);
+
+    const referrals = await db.select({
+      id: omnimensUsers.id,
+      username: omnimensUsers.username,
+      email: omnimensUsers.email,
+      credits: omnimensUsers.credits,
+      totalPaidSpendCents: omnimensUsers.totalPaidSpendCents,
+      createdAt: omnimensUsers.createdAt,
+    }).from(omnimensUsers).where(eq(omnimensUsers.referredBy, user.referralCode || ""));
+
+    const earnings = await db.select().from(omnimensAmbassadorEarnings)
+      .where(eq(omnimensAmbassadorEarnings.ambassadorId, userId))
+      .orderBy(desc(omnimensAmbassadorEarnings.createdAt))
+      .limit(50);
+
+    const objectives = await db.select().from(omnimensAmbassadorObjectives)
+      .where(eq(omnimensAmbassadorObjectives.isActive, true))
+      .orderBy(omnimensAmbassadorObjectives.sortOrder);
+
+    const progress = await db.select().from(omnimensAmbassadorObjectiveProgress)
+      .where(eq(omnimensAmbassadorObjectiveProgress.userId, userId));
+
+    const progressMap = new Map(progress.map(p => [p.objectiveId, p]));
+    const objectivesWithProgress = objectives.map(o => ({
+      ...o,
+      completed: progressMap.get(o.id)?.completed || false,
+      completedAt: progressMap.get(o.id)?.completedAt || null,
+      verifiedByOwner: progressMap.get(o.id)?.verifiedByOwner || false,
+      notes: progressMap.get(o.id)?.notes || null,
+    }));
+
+    res.json({ user, profile, referrals, earnings, objectives: objectivesWithProgress });
+  } catch (err: any) {
+    console.error("[Admin] Ambassador detail error:", err);
+    res.status(500).json({ error: "Failed to load ambassador details" });
+  }
+});
+
+router.post("/omnimens/admin/ambassador/:userId/verify-objective/:objectiveId", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  if (!isOwner(req.user.id)) { res.status(403).json({ error: "Owner only" }); return; }
+
+  try {
+    const userId = req.params.userId;
+    const objectiveId = parseInt(req.params.objectiveId);
+    if (isNaN(objectiveId)) { res.status(400).json({ error: "Invalid objective ID" }); return; }
+
+    const [existing] = await db.select().from(omnimensAmbassadorObjectiveProgress)
+      .where(and(
+        eq(omnimensAmbassadorObjectiveProgress.userId, userId),
+        eq(omnimensAmbassadorObjectiveProgress.objectiveId, objectiveId)
+      )).limit(1);
+
+    if (existing) {
+      await db.update(omnimensAmbassadorObjectiveProgress)
+        .set({ verifiedByOwner: true, verifiedAt: new Date(), completed: true, completedAt: existing.completedAt || new Date() })
+        .where(eq(omnimensAmbassadorObjectiveProgress.id, existing.id));
+    } else {
+      await db.insert(omnimensAmbassadorObjectiveProgress).values({
+        userId,
+        objectiveId,
+        completed: true,
+        completedAt: new Date(),
+        verifiedByOwner: true,
+        verifiedAt: new Date(),
+      });
+    }
+
+    res.json({ success: true });
+  } catch (err: any) {
+    console.error("[Admin] Verify objective error:", err);
+    res.status(500).json({ error: "Failed to verify objective" });
+  }
+});
+
+router.post("/omnimens/admin/ambassador/:userId/toggle-active", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  if (!isOwner(req.user.id)) { res.status(403).json({ error: "Owner only" }); return; }
+
+  try {
+    const [profile] = await db.select().from(omnimensAmbassadorProfiles)
+      .where(eq(omnimensAmbassadorProfiles.userId, req.params.userId)).limit(1);
+    if (!profile) { res.status(404).json({ error: "Ambassador not found" }); return; }
+
+    await db.update(omnimensAmbassadorProfiles)
+      .set({ isActive: !profile.isActive })
+      .where(eq(omnimensAmbassadorProfiles.userId, req.params.userId));
+
+    res.json({ success: true, isActive: !profile.isActive });
+  } catch (err: any) {
+    console.error("[Admin] Toggle ambassador error:", err);
+    res.status(500).json({ error: "Failed to toggle ambassador" });
+  }
+});
+
+router.get("/omnimens/admin/all-customers", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  if (!isOwner(req.user.id)) { res.status(403).json({ error: "Owner only" }); return; }
+
+  try {
+    const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
+    const offset = parseInt(req.query.offset as string) || 0;
+    const search = (req.query.search as string || "").trim();
+
+    let query = db.select({
+      id: omnimensUsers.id,
+      username: omnimensUsers.username,
+      email: omnimensUsers.email,
+      credits: omnimensUsers.credits,
+      totalCreditsEarned: omnimensUsers.totalCreditsEarned,
+      totalPaidSpendCents: omnimensUsers.totalPaidSpendCents,
+      referralCode: omnimensUsers.referralCode,
+      referredBy: omnimensUsers.referredBy,
+      twoFactorEnabled: omnimensUsers.twoFactorEnabled,
+      autoTopupEnabled: omnimensUsers.autoTopupEnabled,
+      createdAt: omnimensUsers.createdAt,
+    }).from(omnimensUsers).orderBy(desc(omnimensUsers.createdAt)).limit(limit).offset(offset);
+
+    const users = await query;
+
+    const ambProfiles = await db.select({ userId: omnimensAmbassadorProfiles.userId })
+      .from(omnimensAmbassadorProfiles);
+    const ambSet = new Set(ambProfiles.map(p => p.userId));
+
+    const result = users.map(u => ({
+      ...u,
+      isAmbassador: ambSet.has(u.id),
+    }));
+
+    const [countResult] = await db.select({ count: sql<number>`COUNT(*)` }).from(omnimensUsers);
+
+    res.json({ customers: result, total: countResult?.count ?? 0 });
+  } catch (err: any) {
+    console.error("[Admin] All customers error:", err);
+    res.status(500).json({ error: "Failed to load customers" });
   }
 });
 
