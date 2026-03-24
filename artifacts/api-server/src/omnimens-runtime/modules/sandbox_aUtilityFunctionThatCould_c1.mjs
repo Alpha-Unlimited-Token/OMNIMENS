@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-24T12:21:07.480Z
+ * Written: 2026-03-24T13:05:05.007Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,52 +16,63 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentWords(text, topN) {
-    if (typeof text !== 'string' || typeof topN !== 'number' || topN <= 0) {
-        throw new Error('Invalid input: text must be a string and topN must be a positive number.');
+function findPatternsInText(text, patterns) {
+  if (typeof text !== 'string' || !Array.isArray(patterns)) {
+    throw new Error('Invalid input: text must be a string and patterns must be an array of strings.');
+  }
+
+  const results = patterns.map(pattern => {
+    const regex = new RegExp(pattern, 'g');
+    const matches = [];
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+      matches.push({ match: match[0], index: match.index });
     }
 
-    const wordCounts = {};
-    const words = text.toLowerCase().match(/\b[a-z]+\b/g);
+    return { pattern, matches };
+  });
 
-    if (!words) {
-        return [];
-    }
-
-    for (let word of words) {
-        wordCounts[word] = (wordCounts[word] || 0) + 1;
-    }
-
-    const sortedWords = Object.entries(wordCounts).sort((a, b) => b[1] - a[1]);
-    return sortedWords.slice(0, topN).map(([word, count]) => ({ word, count }));
+  return results;
 }
 
 // Self-tests
-console.log('Test 1: Basic functionality');
-const text1 = "This is a test. This test is only a test.";
-console.log(findMostFrequentWords(text1, 2)); // Expected: [{ word: 'test', count: 3 }, { word: 'this', count: 2 }]
+function runTests() {
+  console.log('Running tests for findPatternsInText...');
 
-console.log('Test 2: Edge case - empty string');
-const text2 = "";
-console.log(findMostFrequentWords(text2, 5)); // Expected: []
+  const text = 'The quick brown fox jumps over the lazy dog. The fox is clever.';
+  const patterns = ['fox', 'dog', 'quick', 'clever'];
 
-console.log('Test 3: Edge case - no valid words');
-const text3 = "12345 !!! ###";
-console.log(findMostFrequentWords(text3, 3)); // Expected: []
+  const result = findPatternsInText(text, patterns);
+  console.log('Test 1 - Basic functionality:');
+  console.log(result);
 
-console.log('Test 4: Large input');
-const text4 = "apple banana apple orange banana apple orange orange orange";
-console.log(findMostFrequentWords(text4, 3)); // Expected: [{ word: 'orange', count: 4 }, { word: 'apple', count: 3 }, { word: 'banana', count: 2 }]
+  console.log('Test 2 - Edge case: Empty text');
+  const emptyTextResult = findPatternsInText('', patterns);
+  console.log(emptyTextResult);
 
-console.log('Test 5: Invalid input');
-try {
-    console.log(findMostFrequentWords(12345, 3)); // Expected: Error
-} catch (e) {
-    console.log(e.message); // Expected error message
+  console.log('Test 3 - Edge case: No patterns');
+  const noPatternsResult = findPatternsInText(text, []);
+  console.log(noPatternsResult);
+
+  console.log('Test 4 - Edge case: No matches');
+  const noMatchesResult = findPatternsInText(text, ['cat', 'mouse']);
+  console.log(noMatchesResult);
+
+  console.log('Test 5 - Invalid input handling');
+  try {
+    findPatternsInText(null, patterns);
+  } catch (error) {
+    console.log(error.message);
+  }
+
+  try {
+    findPatternsInText(text, null);
+  } catch (error) {
+    console.log(error.message);
+  }
+
+  console.log('All tests completed.');
 }
 
-try {
-    console.log(findMostFrequentWords("Valid text", -1)); // Expected: Error
-} catch (e) {
-    console.log(e.message); // Expected error message
-}
+runTests();

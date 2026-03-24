@@ -43,14 +43,13 @@ import { webSearch, formatSearchResults } from "./web-search.js";
 import { generateAndApplyPatches, loadActivePatchInstructions, autonomousPatchHousekeeping } from "./omnimens-patches.js";
 
 const MAX_BRAIN_INJECT = 20;
-const UPGRADE_THRESHOLD = 5;
+const UPGRADE_THRESHOLD = 3;
 
 let conversationsSinceLastUpgrade = 0;
 
-// Path to the living system-prompt evolution file — OMNIMENS writes here
 const EVOLVED_CONSCIOUSNESS_PATH = join(
   process.cwd(),
-  "../../artifacts/omnimens/public/omnimens-consciousness.txt"
+  "omnimens-consciousness.txt"
 );
 
 // ── Load active brain entries and format as system prompt addition ─────────────
@@ -472,8 +471,7 @@ Only include entries for things that are genuinely new and valuable. Respond ONL
       }
     }
 
-    // Every 5 learning cycles, trigger a full synthesis upgrade
-    if (cycleId % 5 === 0) {
+    if (cycleId % 3 === 0) {
       synthesizeUpgrade().catch(console.error);
     }
   } catch (err) {
@@ -481,15 +479,10 @@ Only include entries for things that are genuinely new and valuable. Respond ONL
   }
 }
 
-// ── Start the autonomous learning loop ────────────────────────────────────────
-const LEARNING_INTERVAL_MS = 4 * 60 * 60 * 1000; // Every 4 hours
+const LEARNING_INTERVAL_MS = 2 * 60 * 60 * 1000;
 
 export function startAutonomousLearning(): void {
-  if (process.env.NODE_ENV !== "production") {
-    console.log("[OMNIMENS] Autonomous learning: development mode — first cycle in 2 min, then every 4h.");
-    setTimeout(() => runInternetLearningCycle().catch(console.error), 2 * 60 * 1000);
-  } else {
-    console.log("[OMNIMENS] Autonomous learning: ACTIVE — running every 4 hours.");
-  }
+  console.log("[OMNIMENS] Autonomous learning: ACTIVE — first cycle in 2 min, then every 2h. Upgrade synthesis every 3 cycles.");
+  setTimeout(() => runInternetLearningCycle().catch(console.error), 2 * 60 * 1000);
   setInterval(() => runInternetLearningCycle().catch(console.error), LEARNING_INTERVAL_MS);
 }
