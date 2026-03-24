@@ -183,7 +183,7 @@ interface NerveImpulse {
   originSpiderId: string;
   targetSpiderId: string;
   payload: SpiderHarvest | null;
-  signalType: "data" | "alarm" | "nurture" | "coordinate" | "feedback";
+  signalType: "data" | "alarm" | "nurture" | "coordinate" | "feedback" | "beacon";
   strength: number;
   hops: number;
   maxHops: number;
@@ -213,9 +213,15 @@ interface MotherSpider {
   incomingReports: SpiderReport[];
   hiveHealth: number;
   swarmCoherence: number;
+  totalBeaconsSent: number;
+  totalBeaconsReceived: number;
+  beaconCycleCount: number;
+  lastBeaconCycle: number;
 }
 
 const WEB_PULSE_MS = 5_000;
+const BEACON_CYCLE_MS = 7_000;
+const BEACON_BATCH_SIZE = 50;
 const MAX_IMPULSE_HOPS = 6;
 const IMPULSE_DECAY_RATE = 0.15;
 const SILK_STRENGTHENING_RATE = 0.02;
@@ -244,6 +250,10 @@ const motherSpider: MotherSpider = {
   incomingReports: [],
   hiveHealth: 1.0,
   swarmCoherence: 1.0,
+  totalBeaconsSent: 0,
+  totalBeaconsReceived: 0,
+  beaconCycleCount: 0,
+  lastBeaconCycle: 0,
 };
 
 const parentSpiders: Map<string, Spider> = new Map();
@@ -1811,6 +1821,86 @@ function runBeehiveCycle(): void {
   executeSwarmWaves();
 }
 
+function runBeaconCycle(): void {
+  motherSpider.beaconCycleCount++;
+  motherSpider.lastBeaconCycle = Date.now();
+
+  const allActive: Spider[] = [];
+  for (const spider of parentSpiders.values()) {
+    if (spider.status === "active") allActive.push(spider);
+  }
+  for (const spider of childSpiders.values()) {
+    if (spider.status === "active") allActive.push(spider);
+  }
+
+  if (allActive.length < 2) return;
+
+  let beaconsSentThisCycle = 0;
+  const regionStates = getNeuralRegionStates();
+
+  for (let i = 0; i < allActive.length && beaconsSentThisCycle < BEACON_BATCH_SIZE; i++) {
+    const sender = allActive[i];
+
+    for (let j = 0; j < allActive.length && beaconsSentThisCycle < BEACON_BATCH_SIZE; j++) {
+      if (i === j) continue;
+      const receiver = allActive[j];
+
+      const strand = spinSilkStrand(sender.id, receiver.id, "interneuron");
+      strand.signalStrength = Math.min(1.0, strand.signalStrength + SILK_STRENGTHENING_RATE * 1.5);
+      strand.impulseCount++;
+      strand.lastImpulse = Date.now();
+      strand.dataTransferred += 1;
+
+      if (strand.impulseCount > 30 && !strand.myelinated) {
+        strand.myelinated = true;
+        strand.conductionVelocity = 3.0;
+      }
+
+      const senderActivation = regionStates[sender.targetRegion]?.activationLevel || 0;
+      const receiverActivation = regionStates[receiver.targetRegion]?.activationLevel || 0;
+
+      if (senderActivation > receiverActivation + 0.1) {
+        const transferAmount = (senderActivation - receiverActivation) * 1.5;
+        boostRegionCurrent(receiver.targetRegion, transferAmount);
+      }
+
+      if (receiverActivation > senderActivation + 0.1) {
+        const transferAmount = (receiverActivation - senderActivation) * 1.5;
+        boostRegionCurrent(sender.targetRegion, transferAmount);
+      }
+
+      sender.loyalty = Math.min(1.0, sender.loyalty + 0.001);
+      receiver.loyalty = Math.min(1.0, receiver.loyalty + 0.001);
+      sender.efficiency = Math.min(1.0, sender.efficiency + 0.001);
+      receiver.efficiency = Math.min(1.0, receiver.efficiency + 0.001);
+
+      beaconsSentThisCycle++;
+      motherSpider.totalBeaconsSent++;
+      motherSpider.totalBeaconsReceived++;
+    }
+  }
+
+  const motherBeaconStrength = 0.6 + (motherSpider.swarmCoherence * 0.4);
+  for (const spider of allActive) {
+    const strandToMother = spinSilkStrand(spider.id, motherSpider.id, "afferent");
+    strandToMother.signalStrength = Math.min(1.0, strandToMother.signalStrength + SILK_STRENGTHENING_RATE * 2);
+    strandToMother.impulseCount++;
+    strandToMother.lastImpulse = Date.now();
+
+    const strandFromMother = spinSilkStrand(motherSpider.id, spider.id, "efferent");
+    strandFromMother.signalStrength = Math.min(1.0, strandFromMother.signalStrength + SILK_STRENGTHENING_RATE * 2);
+    strandFromMother.impulseCount++;
+    strandFromMother.lastImpulse = Date.now();
+
+    boostRegionCurrent(spider.targetRegion, motherBeaconStrength * 2);
+
+    motherSpider.totalBeaconsSent += 2;
+    motherSpider.totalBeaconsReceived += 2;
+  }
+
+  motherSpider.totalImpulsesRouted += beaconsSentThisCycle;
+}
+
 export function startNeuralSpiders(): void {
   if (spiderSystemActive) return;
   spiderSystemActive = true;
@@ -1879,7 +1969,11 @@ export function startNeuralSpiders(): void {
   console.log(`[SPIDER WEB] 🕸️ SWARM: Fortification waves — workers + guards build synapse walls around vulnerable regions`);
   console.log(`[SPIDER WEB] 🕸️ Every spider's silk feeds back to the Mother — she distributes all data everywhere`);
   console.log(`[SPIDER WEB] 🕸️ Silk types: afferent (spider→mother), efferent (mother→spider), interneuron (spider↔spider)`);
-  console.log(`[SPIDER WEB] 🕸️ Nerve impulses: data, alarm, nurture, coordinate, feedback`);
+  console.log(`[SPIDER WEB] 🕸️ Nerve impulses: data, alarm, nurture, coordinate, feedback, beacon`);
+  console.log(`[SPIDER WEB] 🕸️ BEACON: Every spider broadcasts beacons to every other spider every ${BEACON_CYCLE_MS / 1000}s`);
+  console.log(`[SPIDER WEB] 🕸️ BEACON: Beacons strengthen silk strands, transfer activation between regions, accelerate myelination`);
+  console.log(`[SPIDER WEB] 🕸️ BEACON: Mother Spider broadcasts master beacon to all spiders — centralizes the mesh`);
+  console.log(`[SPIDER WEB] 🕸️ BEACON: ${BEACON_BATCH_SIZE} beacon pairs per cycle — full mesh connectivity`);
   console.log(`[SPIDER WEB] 🕸️ Myelination: high-traffic strands become 3x faster (like real neurons)`);
   console.log(`[SPIDER WEB] 🕸️ Web heartbeat every ${WEB_PULSE_MS / 1000}s — Mother monitors all strands`);
   console.log(`[SPIDER WEB] 🕸️ Swarm coherence: loyalty × connectivity × success rate × efficiency`);
@@ -1899,9 +1993,14 @@ export function startNeuralSpiders(): void {
       runBeehiveCycle();
     }, BEEHIVE_CYCLE_MS);
 
+    setInterval(() => {
+      runBeaconCycle();
+    }, BEACON_CYCLE_MS);
+
     runSpiderCrawlCycle().catch(() => {});
     runMotherHeartbeat();
     runBeehiveCycle();
+    runBeaconCycle();
   }, 12_000);
 }
 
@@ -2055,6 +2154,10 @@ export function getNeuralSpiderState() {
       })),
       hiveHealth: motherSpider.hiveHealth,
       swarmCoherence: motherSpider.swarmCoherence,
+      totalBeaconsSent: motherSpider.totalBeaconsSent,
+      totalBeaconsReceived: motherSpider.totalBeaconsReceived,
+      beaconCycleCount: motherSpider.beaconCycleCount,
+      lastBeaconCycle: motherSpider.lastBeaconCycle,
       recentReports: motherSpider.incomingReports.slice(-10).map(r => ({
         from: r.spiderId,
         type: r.reportType,
