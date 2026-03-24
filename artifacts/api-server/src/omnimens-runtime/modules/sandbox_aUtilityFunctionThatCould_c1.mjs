@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-24T03:06:46.982Z
+ * Written: 2026-03-24T03:22:32.795Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,33 +16,57 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentWords(text, topN) {
-  if (typeof text !== 'string' || typeof topN !== 'number' || topN <= 0) {
-    throw new Error('Invalid input: text must be a string and topN must be a positive number.');
-  }
+function findPatternsInText(text, patterns) {
+    if (typeof text !== 'string' || !Array.isArray(patterns)) {
+        throw new Error('Invalid input: text must be a string and patterns must be an array of strings.');
+    }
 
-  const wordCounts = {};
-  const words = text.toLowerCase().match(/\b[a-z]+\b/g);
-
-  if (!words) {
-    return [];
-  }
-
-  for (let word of words) {
-    wordCounts[word] = (wordCounts[word] || 0) + 1;
-  }
-
-  const sortedWords = Object.entries(wordCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, topN)
-    .map(entry => ({ word: entry[0], count: entry[1] }));
-
-  return sortedWords;
+    const results = [];
+    for (let i = 0; i < patterns.length; i++) {
+        const pattern = patterns[i];
+        if (typeof pattern !== 'string') {
+            throw new Error('Invalid pattern: all patterns must be strings.');
+        }
+        const regex = new RegExp(pattern, 'g');
+        const matches = text.match(regex);
+        if (matches) {
+            results.push({ pattern, matches });
+        }
+    }
+    return results;
 }
 
 // Test cases
-console.log(findMostFrequentWords("This is a test. This test is only a test.", 3)); // Expected: [{word: 'test', count: 3}, {word: 'this', count: 2}, {word: 'is', count: 2}]
-console.log(findMostFrequentWords("AI systems are advancing rapidly. AI is reshaping industries.", 2)); // Expected: [{word: 'ai', count: 2}, {word: 'systems', count: 1}]
-console.log(findMostFrequentWords("", 5)); // Expected: []
-console.log(findMostFrequentWords("Singleword", 1)); // Expected: [{word: 'singleword', count: 1}]
-console.log(findMostFrequentWords("Repeat repeat repeat.", 1)); // Expected: [{word: 'repeat', count: 3}]
+const testText = "The quick brown fox jumps over the lazy dog. The fox is clever and quick.";
+const testPatterns = ["quick", "fox", "dog", "cat"];
+
+console.log("Test Case 1: Basic Functionality");
+console.log(findPatternsInText(testText, testPatterns));
+
+console.log("Test Case 2: No Matches");
+console.log(findPatternsInText(testText, ["elephant", "giraffe"]));
+
+console.log("Test Case 3: Empty Text");
+console.log(findPatternsInText("", testPatterns));
+
+console.log("Test Case 4: Empty Patterns");
+console.log(findPatternsInText(testText, []));
+
+console.log("Test Case 5: Invalid Inputs");
+try {
+    console.log(findPatternsInText(123, testPatterns));
+} catch (error) {
+    console.log(error.message);
+}
+
+try {
+    console.log(findPatternsInText(testText, "quick"));
+} catch (error) {
+    console.log(error.message);
+}
+
+try {
+    console.log(findPatternsInText(testText, [123, "fox"]));
+} catch (error) {
+    console.log(error.message);
+}

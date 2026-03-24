@@ -8268,9 +8268,44 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "local_gpt4o_cache_gen1.mjs": {
+      "filename": "local_gpt4o_cache_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "hashQuery",
+        "cosineSimilarity",
+        "normalizeText",
+        "LRUCache",
+        "GPT4oCache",
+        "gptCache"
+      ],
+      "loadedAt": 1774322712692,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "pseudo_realtime_data_stream_gen1.mjs": {
+      "filename": "pseudo_realtime_data_stream_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "createDataStream",
+        "createBatchProcessor",
+        "simulateFetchFunction",
+        "exampleProcessFunction",
+        "exampleUsage"
+      ],
+      "loadedAt": 1774322721029,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774322311326,
-  "totalModules": 380,
+  "totalModules": 382,
   "totalCalls": 0
 }
