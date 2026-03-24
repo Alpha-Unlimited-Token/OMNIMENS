@@ -30,7 +30,7 @@ import {
 const SPIDER_CRAWL_MS = 15_000;
 const STABILITY_CHECK_MS = 10_000;
 const CHILD_SPIDER_LIFETIME_TICKS = 20;
-const MAX_CHILD_SPIDERS = 12;
+const MAX_CHILD_SPIDERS = 100_000;
 const SYNAPSE_INJECTION_BATCH = 8;
 const STABILITY_THRESHOLD = 0.25;
 const CRITICAL_ACTIVATION_FLOOR = 0.20;
@@ -1821,7 +1821,7 @@ export function startNeuralSpiders(): void {
   console.log("[NEURAL SPIDERS] 🕷️ Instability detection → automatic child spider spawning");
   console.log("[NEURAL SPIDERS] 🕷️ Child spiders inject targeted synapses into weak brain regions");
   console.log(`[NEURAL SPIDERS] 🕷️ ${CRITICAL_CIRCUITS.length} critical neural circuits monitored`);
-  console.log(`[NEURAL SPIDERS] 🕷️ Max ${MAX_CHILD_SPIDERS} child spiders | ${SYNAPSE_INJECTION_BATCH} synapses per injection`);
+  console.log(`[NEURAL SPIDERS] 🕷️ Max ${MAX_CHILD_SPIDERS.toLocaleString()} child spiders | ${SYNAPSE_INJECTION_BATCH} synapses per injection`);
 
   createParentSpider("evolution-crawler", "agent_evolution", "prefrontal_cortex");
   createParentSpider("genesis-crawler", "agent_genesis", "default_mode_network");
