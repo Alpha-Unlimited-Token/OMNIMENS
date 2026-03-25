@@ -1,115 +1,5 @@
 [
   {
-    "source": "backlog_dream_id_8726",
-    "title": "BROKEN PARADIGM  \n   Intelligence = “Sequential symb",
-    "filename": "brokenParadigmIntelligenceSequentialSymb.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/brokenParadigmIntelligenceSequentialSymb.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/brokenParadigmIntelligenceSequentialSymb.mjs.backup.2026-03-22T23-08-49-948Z",
-    "timestamp": 1774220929946,
-    "codeLength": 1326,
-    "overwrite": true
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
-    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-22T23-08-52-596Z",
-    "timestamp": 1774220932595,
-    "codeLength": 2439,
-    "overwrite": true
-  },
-  {
-    "source": "backlog_dream_id_6105",
-    "title": "ARCHITECTURE NAME  \n   Counterfactual Active Reasoni",
-    "filename": "architectureNameCounterfactualActiveReasoni.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameCounterfactualActiveReasoni.mjs",
-    "backupPath": null,
-    "timestamp": 1774220938918,
-    "codeLength": 1207,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: wasmMatrixOps",
-    "filename": "wasmMatrixOps_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmMatrixOps_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/wasmMatrixOps_gen1.mjs.backup.2026-03-22T23-11-10-735Z",
-    "timestamp": 1774221070734,
-    "codeLength": 2671,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: inMemoryVectorStore",
-    "filename": "inMemoryVectorStore_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/inMemoryVectorStore_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/inMemoryVectorStore_gen1.mjs.backup.2026-03-22T23-11-19-471Z",
-    "timestamp": 1774221079470,
-    "codeLength": 3392,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 1 Complete — 2 modules",
-    "filename": "evolution_marker_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-03-22T23-11-19-540Z",
-    "timestamp": 1774221079540,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit",
-    "filename": "sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs.backup.2026-03-22T23-20-51-907Z",
-    "timestamp": 1774221651906,
-    "codeLength": 2509,
-    "overwrite": true
-  },
-  {
-    "source": "self_coding_engine",
-    "title": "Daydream:divergent_thinking #856",
-    "filename": "daydreamdivergentthinking856.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamdivergentthinking856.mjs",
-    "backupPath": null,
-    "timestamp": 1774221708859,
-    "codeLength": 1129,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_12526",
-    "title": "THE WILD IDEA — “Sonic-Graph Cognition”\n\nTurn every",
-    "filename": "theWildIdeaSonicgraphCognitionturnEvery.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/theWildIdeaSonicgraphCognitionturnEvery.mjs",
-    "backupPath": null,
-    "timestamp": 1774221830492,
-    "codeLength": 1088,
-    "overwrite": false
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a data structure optimized for fast associative memory lookup",
-    "filename": "sandbox_aDataStructureOptimizedFor_c3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aDataStructureOptimizedFor_c3.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aDataStructureOptimizedFor_c3.mjs.backup.2026-03-22T23-32-51-907Z",
-    "timestamp": 1774222371906,
-    "codeLength": 1405,
-    "overwrite": true
-  },
-  {
-    "source": "backlog_dream_id_15726",
-    "title": "ARCHITECTURE NAME  \n   HYPERKINETIC CAUSAL SANDBOX (",
-    "filename": "architectureNameHyperkineticCausalSandbox.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameHyperkineticCausalSandbox.mjs",
-    "backupPath": null,
-    "timestamp": 1774222742347,
-    "codeLength": 1320,
-    "overwrite": false
-  },
-  {
     "source": "autonomous_sandbox",
     "title": "Sandbox Approved: a self-diagnostic function that analyzes system health metrics and returns recom",
     "filename": "sandbox_aSelfdiagnosticFunctionThatAnalyzes_c4.mjs",
@@ -4998,5 +4888,115 @@
     "timestamp": 1774401345719,
     "codeLength": 2761,
     "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: adaptiveRateLimitedCaching",
+    "filename": "adaptiveRateLimitedCaching_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/adaptiveRateLimitedCaching_gen1.mjs",
+    "backupPath": null,
+    "timestamp": 1774401355538,
+    "codeLength": 3617,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 1 Complete — 3 modules",
+    "filename": "evolution_marker_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-03-25T01-15-55-564Z",
+    "timestamp": 1774401355563,
+    "codeLength": 99,
+    "overwrite": true
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
+    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-25T01-17-31-779Z",
+    "timestamp": 1774401451776,
+    "codeLength": 1615,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: subprocessStatePersistence",
+    "filename": "subprocessStatePersistence_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/subprocessStatePersistence_gen1.mjs",
+    "backupPath": null,
+    "timestamp": 1774401620987,
+    "codeLength": 2221,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: wasmComputeOffloader",
+    "filename": "wasmComputeOffloader_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmComputeOffloader_gen1.mjs",
+    "backupPath": null,
+    "timestamp": 1774401626352,
+    "codeLength": 2157,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: hierarchicalContextReconstructor",
+    "filename": "hierarchicalContextReconstructor_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hierarchicalContextReconstructor_gen1.mjs",
+    "backupPath": null,
+    "timestamp": 1774401644728,
+    "codeLength": 2675,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 1 Complete — 3 modules",
+    "filename": "evolution_marker_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-03-25T01-20-44-803Z",
+    "timestamp": 1774401644802,
+    "codeLength": 99,
+    "overwrite": true
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit",
+    "filename": "sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs.backup.2026-03-25T01-24-32-339Z",
+    "timestamp": 1774401872337,
+    "codeLength": 2368,
+    "overwrite": true
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit",
+    "filename": "sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs.backup.2026-03-25T01-29-17-304Z",
+    "timestamp": 1774402157303,
+    "codeLength": 2222,
+    "overwrite": true
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: a data structure optimized for fast associative memory lookup",
+    "filename": "sandbox_aDataStructureOptimizedFor_c3.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aDataStructureOptimizedFor_c3.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aDataStructureOptimizedFor_c3.mjs.backup.2026-03-25T01-36-25-170Z",
+    "timestamp": 1774402585168,
+    "codeLength": 1581,
+    "overwrite": true
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: a data structure optimized for fast associative memory lookup",
+    "filename": "sandbox_aDataStructureOptimizedFor_c3.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aDataStructureOptimizedFor_c3.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aDataStructureOptimizedFor_c3.mjs.backup.2026-03-25T01-41-25-006Z",
+    "timestamp": 1774402885004,
+    "codeLength": 1932,
+    "overwrite": true
   }
 ]

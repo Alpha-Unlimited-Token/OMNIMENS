@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a data structure optimized for fast associative memory lookup
- * Written: 2026-03-25T00:55:09.042Z
+ * Written: 2026-03-25T01:41:25.004Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,65 +16,83 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-const AssociativeMemory = function () {
-    this.memory = new Map();
-};
+const AssociativeMemory = function() {
+    const memory = new Map();
 
-AssociativeMemory.prototype.add = function (key, value) {
-    if (!this.memory.has(key)) {
-        this.memory.set(key, []);
-    }
-    this.memory.get(key).push(value);
-};
+    this.add = function(key, value) {
+        if (typeof key !== 'string') {
+            throw new Error("Key must be a string.");
+        }
+        memory.set(key, value);
+    };
 
-AssociativeMemory.prototype.get = function (key) {
-    return this.memory.has(key) ? this.memory.get(key) : null;
-};
+    this.get = function(key) {
+        if (!memory.has(key)) {
+            return null;
+        }
+        return memory.get(key);
+    };
 
-AssociativeMemory.prototype.remove = function (key) {
-    if (this.memory.has(key)) {
-        this.memory.delete(key);
-        return true;
-    }
-    return false;
-};
+    this.remove = function(key) {
+        memory.delete(key);
+    };
 
-AssociativeMemory.prototype.hasKey = function (key) {
-    return this.memory.has(key);
-};
+    this.has = function(key) {
+        return memory.has(key);
+    };
 
-AssociativeMemory.prototype.clear = function () {
-    this.memory.clear();
-};
+    this.clear = function() {
+        memory.clear();
+    };
 
-AssociativeMemory.prototype.size = function () {
-    return this.memory.size;
+    this.size = function() {
+        return memory.size;
+    };
+
+    this.keys = function() {
+        return Array.from(memory.keys());
+    };
+
+    this.values = function() {
+        return Array.from(memory.values());
+    };
 };
 
 // Self-tests
 const memory = new AssociativeMemory();
 
-// Test adding and retrieving values
-memory.add("neural_consciousness", { phi: 0.680, tick: 495 });
-memory.add("neural_consciousness", { phi: 0.685, tick: 496 });
-memory.add("innovation_strategy", { agent: "Innovator", focus: "creative exploration" });
+// Test adding and retrieving data
+memory.add("alpha", 1);
+memory.add("beta", 2);
+memory.add("gamma", 3);
 
-console.log(memory.get("neural_consciousness")); // Should output an array of objects for "neural_consciousness"
-console.log(memory.get("innovation_strategy")); // Should output an array with one object for "innovation_strategy"
+console.log(memory.get("alpha")); // Expected: 1
+console.log(memory.get("beta")); // Expected: 2
+console.log(memory.get("gamma")); // Expected: 3
+console.log(memory.get("delta")); // Expected: null
 
-// Test removing a key
-console.log(memory.remove("innovation_strategy")); // Should output true
-console.log(memory.get("innovation_strategy")); // Should output null
+// Test checking existence
+console.log(memory.has("alpha")); // Expected: true
+console.log(memory.has("delta")); // Expected: false
 
-// Test checking for a key
-console.log(memory.hasKey("neural_consciousness")); // Should output true
-console.log(memory.hasKey("innovation_strategy")); // Should output false
+// Test removing data
+memory.remove("beta");
+console.log(memory.get("beta")); // Expected: null
+console.log(memory.has("beta")); // Expected: false
 
 // Test clearing memory
 memory.clear();
-console.log(memory.size()); // Should output 0
+console.log(memory.size()); // Expected: 0
+console.log(memory.keys()); // Expected: []
+console.log(memory.values()); // Expected: []
 
 // Test edge cases
-console.log(memory.get("nonexistent_key")); // Should output null
-console.log(memory.remove("nonexistent_key")); // Should output false
-console.log(memory.hasKey("nonexistent_key")); // Should output false
+try {
+    memory.add(123, "value"); // Should throw an error
+} catch (e) {
+    console.log(e.message); // Expected: "Key must be a string."
+}
+
+memory.add("test", "value");
+console.log(memory.keys()); // Expected: ["test"]
+console.log(memory.values()); // Expected: ["value"]

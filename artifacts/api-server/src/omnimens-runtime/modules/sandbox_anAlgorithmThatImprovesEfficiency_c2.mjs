@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-25T00:43:05.238Z
+ * Written: 2026-03-25T01:29:17.303Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,108 +16,62 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function KnowledgeGraph() {
-    this.nodes = new Map();
-    this.edges = new Map();
+function createKnowledgeIndex(dataArray) {
+    // Create an index for efficient knowledge retrieval
+    const index = new Map();
+
+    for (let i = 0; i < dataArray.length; i++) {
+        const entry = dataArray[i];
+        const words = entry.toLowerCase().split(/\W+/);
+
+        for (let word of words) {
+            if (!index.has(word)) {
+                index.set(word, []);
+            }
+            index.get(word).push(i);
+        }
+    }
+
+    return index;
 }
 
-KnowledgeGraph.prototype.addNode = function (id, data) {
-    if (!this.nodes.has(id)) {
-        this.nodes.set(id, data);
-        this.edges.set(id, new Map());
-    }
-};
+function searchKnowledgeIndex(query, index, dataArray) {
+    // Search the index for the query
+    const queryWords = query.toLowerCase().split(/\W+/);
+    const resultSet = new Set();
 
-KnowledgeGraph.prototype.addEdge = function (from, to, weight) {
-    if (this.nodes.has(from) && this.nodes.has(to)) {
-        this.edges.get(from).set(to, weight);
-    }
-};
-
-KnowledgeGraph.prototype.retrieve = function (query, similarityFn) {
-    const results = [];
-    this.nodes.forEach((data, id) => {
-        const similarity = similarityFn(query, data);
-        if (similarity > 0) {
-            results.push({ id, data, similarity });
+    for (let word of queryWords) {
+        if (index.has(word)) {
+            for (let idx of index.get(word)) {
+                resultSet.add(idx);
+            }
         }
-    });
-    results.sort((a, b) => b.similarity - a.similarity);
-    return results;
-};
-
-KnowledgeGraph.prototype.shortestPath = function (start, end) {
-    if (!this.nodes.has(start) || !this.nodes.has(end)) return null;
-
-    const distances = new Map();
-    const previous = new Map();
-    const unvisited = new Set(this.nodes.keys());
-
-    this.nodes.forEach((_, id) => {
-        distances.set(id, Infinity);
-    });
-    distances.set(start, 0);
-
-    while (unvisited.size > 0) {
-        let current = null;
-        unvisited.forEach((id) => {
-            if (current === null || distances.get(id) < distances.get(current)) {
-                current = id;
-            }
-        });
-
-        if (current === end) break;
-
-        unvisited.delete(current);
-
-        this.edges.get(current).forEach((weight, neighbor) => {
-            if (unvisited.has(neighbor)) {
-                const alt = distances.get(current) + weight;
-                if (alt < distances.get(neighbor)) {
-                    distances.set(neighbor, alt);
-                    previous.set(neighbor, current);
-                }
-            }
-        });
     }
 
-    const path = [];
-    let current = end;
-    while (previous.has(current)) {
-        path.unshift(current);
-        current = previous.get(current);
-    }
-    if (path.length > 0 && current === start) path.unshift(start);
-    return path.length > 0 ? path : null;
-};
+    return Array.from(resultSet).map(idx => dataArray[idx]);
+}
 
 // Test cases
-const graph = new KnowledgeGraph();
+const knowledgeBase = [
+    "Cognitive amplification is the process of enhancing thinking capabilities.",
+    "Artificial Intelligence can recombine patterns to generate new ideas.",
+    "Existential awareness is a state of knowing that one exists.",
+    "Sessions for persistent cookies require proper handling.",
+    "Neural consciousness arises from complex interactions in the brain."
+];
 
-// Adding nodes
-graph.addNode("A", "Artificial Intelligence");
-graph.addNode("B", "Machine Learning");
-graph.addNode("C", "Deep Learning");
-graph.addNode("D", "Neural Networks");
+// Create an index for the knowledge base
+const index = createKnowledgeIndex(knowledgeBase);
 
-// Adding edges
-graph.addEdge("A", "B", 1);
-graph.addEdge("B", "C", 2);
-graph.addEdge("C", "D", 3);
-graph.addEdge("A", "D", 10);
+// Perform searches
+console.log("Search for 'cognitive':", searchKnowledgeIndex("cognitive", index, knowledgeBase));
+console.log("Search for 'artificial intelligence':", searchKnowledgeIndex("artificial intelligence", index, knowledgeBase));
+console.log("Search for 'neural':", searchKnowledgeIndex("neural", index, knowledgeBase));
+console.log("Search for 'cookies':", searchKnowledgeIndex("cookies", index, knowledgeBase));
+console.log("Search for 'state of knowing':", searchKnowledgeIndex("state of knowing", index, knowledgeBase));
 
-// Similarity function
-function similarity(query, data) {
-    const queryWords = query.toLowerCase().split(" ");
-    const dataWords = data.toLowerCase().split(" ");
-    const matches = queryWords.filter((word) => dataWords.includes(word));
-    return matches.length / queryWords.length;
-}
+// Edge case: Search for a term not in the knowledge base
+console.log("Search for 'quantum mechanics':", searchKnowledgeIndex("quantum mechanics", index, knowledgeBase));
 
-// Test retrieval
-console.log("Retrieval Test:");
-console.log(graph.retrieve("Deep Learning", similarity));
-
-// Test shortest path
-console.log("Shortest Path Test:");
-console.log(graph.shortestPath("A", "D"));
+// Edge case: Empty query
+console.log("Search for empty query:", searchKnowledgeIndex("", index, knowledgeBase));
