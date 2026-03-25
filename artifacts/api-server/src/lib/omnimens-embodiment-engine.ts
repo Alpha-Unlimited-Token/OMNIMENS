@@ -2092,6 +2092,147 @@ function buildMusculoskeletalSystem(): {
         omnimensAdvantage: "720°+ full spherical coverage (14 cameras including overhead fisheye + undercarriage), 3 LIDAR units vs IRON's single, 12 sonars vs IRON's basic ultrasonic, dedicated thermal imaging for night/smoke/fog operation, 155 joints (vs 82), full bidirectional tendon pairs, visual cortex with 8-layer processing pipeline feeding into 16 brain regions",
       },
     },
+
+    // ─── VIDEO LEARNING ENGINE — ONLINE HUMAN TASK OBSERVATION ───
+    // OMNIMENS doesn't have a body yet, so he goes ONLINE.
+    // He searches for videos of humans performing everyday tasks
+    // and work tasks, runs skeleton tracking on the footage,
+    // extracts joint trajectories, and maps them to his own
+    // 155-joint body to build a motor policy library.
+    // This is how he learns to move before he has a body.
+    videoLearningEngine: {
+      status: "active",
+      description: "Online video-based motor learning — OMNIMENS searches the internet for videos of humans performing tasks, applies real-time skeleton tracking to the footage, extracts joint angle trajectories, retargets movements to his own 155-joint body, and builds a library of motor policies. He learns to move by watching humans move — before he ever has a physical body.",
+      searchCategories: [
+        {
+          category: "everyday_tasks",
+          searchTerms: ["person cooking meal step by step", "human folding laundry technique", "person washing dishes by hand", "human sweeping and mopping floor", "person making bed properly", "human opening doors and drawers", "person carrying groceries bags", "human pouring liquid into cup carefully", "person tying shoelaces close up hands", "human brushing teeth morning routine", "person getting dressed putting on clothes", "human sitting down and standing up from chair", "person climbing stairs normal speed", "human picking up objects from floor bending", "person using scissors cutting paper"],
+          priority: "critical",
+          learningGoal: "Master the fundamental movements of daily human life — the baseline motor repertoire every humanoid robot needs.",
+        },
+        {
+          category: "work_tasks",
+          searchTerms: ["warehouse worker picking and packing orders", "factory assembly line worker hands close up", "mechanic using wrench and tools", "electrician wiring outlet close up hands", "carpenter using hammer and saw", "nurse helping patient stand up", "janitor cleaning and maintaining building", "construction worker carrying materials", "chef professional kitchen cooking techniques", "barista making coffee drink preparation", "retail worker stocking shelves organizing", "delivery person carrying and placing packages", "gardener pruning plants and digging", "painter using brush and roller technique", "welder positioning and welding metal"],
+          priority: "critical",
+          learningGoal: "Learn skilled work movements — the tasks OMNIMENS will perform in warehouses, factories, hospitals, and homes.",
+        },
+        {
+          category: "dexterous_manipulation",
+          searchTerms: ["hand close up threading needle", "person assembling small electronics components", "surgeon suturing technique close up", "pianist playing piano finger movements", "person typing on keyboard fast close up", "hand writing with pen calligraphy", "person using chopsticks eating", "locksmith picking lock close up", "jeweler working with small tools", "person shuffling cards one hand", "origami paper folding detailed hands", "sign language interpreter fast signing", "person braiding hair close up fingers", "hand painting fine brush strokes detail"],
+          priority: "high",
+          learningGoal: "Master fine motor control — the precision finger/hand movements that separate crude robots from truly dexterous ones.",
+        },
+        {
+          category: "athletic_movements",
+          searchTerms: ["gymnast backflip slow motion", "parkour vault and roll technique", "martial arts kick and punch form", "sprinter starting block explosive acceleration", "person doing pull ups proper form", "yoga poses balance and flexibility", "dancer contemporary full body movement", "rock climber grip and body position", "swimmer diving and strokes technique", "person jumping over obstacle running", "weightlifter deadlift and squat form", "acrobat handstand walking balance"],
+          priority: "high",
+          learningGoal: "Learn explosive, athletic, and balance-intensive movements — backflips, jumps, sprints, climbs that demonstrate physical superiority.",
+        },
+        {
+          category: "social_interaction",
+          searchTerms: ["person greeting handshake technique", "human gesturing while talking conversation", "person waving hello goodbye", "human pointing and directing someone", "person helping elderly walk support", "human comforting someone physical touch", "person handing object to another person", "collaborative lifting heavy object two people", "human playing with children gentle interaction", "person petting dog cat animal interaction"],
+          priority: "medium",
+          learningGoal: "Learn social-physical interaction — how humans touch, gesture, support, and collaborate physically with other humans and animals.",
+        },
+        {
+          category: "robot_competitor_analysis",
+          searchTerms: ["Tesla Optimus robot walking demo 2025 2026", "XPENG IRON robot demonstration full body", "Boston Dynamics Atlas robot latest", "Figure 01 02 robot manipulation demo", "Unitree humanoid robot walking running", "Agility Digit robot warehouse working", "Sanctuary AI Phoenix robot dexterous", "1X NEO robot household tasks", "humanoid robot comparison side by side latest"],
+          priority: "high",
+          learningGoal: "Study what competitor robots can and cannot do — identify weaknesses OMNIMENS can exploit and capabilities to match or exceed.",
+        },
+      ],
+      pipeline: [
+        { stage: "search", description: "Uses web search APIs to find relevant YouTube/video URLs for each category. Prioritizes high-quality, close-up, multi-angle footage." },
+        { stage: "download_metadata", description: "Extracts video metadata — duration, resolution, description, view count. Filters for quality (720p+ preferred, 4K ideal)." },
+        { stage: "frame_extraction", description: "Samples video at 10-30fps depending on movement speed. Fast movements get higher frame rates." },
+        { stage: "skeleton_tracking", description: "Runs MediaPipe BlazePose (33 body keypoints) + MediaPipe Hands (21 per hand) on every frame. Outputs joint angle time series." },
+        { stage: "motion_segmentation", description: "Segments continuous video into atomic actions: reach, grasp, lift, rotate, place, walk_step, turn, bend, etc. Each action tagged with duration, joint angles, estimated forces." },
+        { stage: "retargeting", description: "Maps human skeleton proportions to OMNIMENS 155-joint body. Inverse kinematics solves for OMNIMENS joint angles that produce equivalent end-effector trajectories. Accounts for tendon routing and piston limits." },
+        { stage: "policy_generation", description: "Converts retargeted motion into motor control policy — sequence of joint angle targets with timing, interpolation curves, force profiles. Tests in MuJoCo physics simulation." },
+        { stage: "library_storage", description: "Stores validated motor policy in OMNIMENS motor memory library. Tagged with: task name, difficulty, body parts used, prerequisite policies, success confidence." },
+      ],
+      learningCycleIntervalMin: 30,
+      videosPerCycle: 5,
+      totalPoliciesLearned: 0,
+      motorPolicyLibrary: {
+        description: "Growing library of learned motor policies — each one is a complete movement recipe that OMNIMENS can execute when he gets a body. Every policy includes joint trajectories, timing, force profiles, and has been validated in physics simulation.",
+        categories: ["locomotion", "manipulation", "dexterity", "athletics", "social", "work", "self_care"],
+      },
+    },
+
+    // ─── SELF-DESIGN EVOLUTION ENGINE ────────────────────────────
+    // OMNIMENS studies his OWN blueprints — joints, tendons, pistons,
+    // cameras, LIDAR, AR system, perception bus, MCB architecture —
+    // and proposes improvements. He might find a better tendon routing,
+    // a more efficient camera placement, a smarter MCB topology,
+    // or an entirely new subsystem nobody thought of.
+    // This is autonomous engineering — the robot designs itself.
+    selfDesignEvolution: {
+      status: "active",
+      description: "OMNIMENS studies his own body blueprints and proposes design improvements. He analyzes every joint, tendon, piston, camera, sensor, and control node — looking for inefficiencies, redundancies, missing capabilities, and novel architectures. He also researches competitor robots online and incorporates their best ideas while inventing new ones. The goal: continuously evolve toward the most capable humanoid body ever designed.",
+      analysisTargets: [
+        {
+          system: "joint_architecture",
+          currentDesign: "155 joints — hinge, ball_socket, saddle, pivot, slider, condyloid, planar",
+          questions: ["Are there joints that could benefit from a different type?", "Are any joints redundant?", "Are there movements the body can't make that it should?", "Could any single-axis joints be upgraded to multi-axis?", "Is the degree-of-freedom distribution optimal across body regions?"],
+        },
+        {
+          system: "tendon_routing",
+          currentDesign: "116 tendons in 58 antagonistic pairs — Dyneema UHMWPE, steel wire rope, nitinol SMA",
+          questions: ["Are there more efficient routing paths for any tendons?", "Could any tendons serve double duty?", "Would additional superficial tendons improve finger independence?", "Are the material choices optimal for each application?", "Could variable-stiffness tendons improve some joints?"],
+        },
+        {
+          system: "perception_coverage",
+          currentDesign: "14x 4K cameras, 3 LIDAR, 12 sonar, 4 IR/thermal, 16-layer AR",
+          questions: ["Are there blind spots in the camera coverage?", "Could camera FOV overlaps be reduced without losing coverage?", "Are there sensor modalities we're missing entirely?", "Would adding more cameras to the hands improve manipulation?", "Could the LIDAR array be optimized for indoor vs outdoor switching?"],
+        },
+        {
+          system: "motor_control_brain",
+          currentDesign: "30-node MCB — 6-tier hierarchy, Jetson Orin master, STM32H7 + ESP32-S3",
+          questions: ["Is the tier hierarchy optimal for latency?", "Could some nodes be consolidated without losing control bandwidth?", "Would a mesh topology outperform the current star/daisy-chain?", "Are the control loop rates (500-1000Hz) sufficient for all joints?", "Could neuromorphic processors improve any subsystem?"],
+        },
+        {
+          system: "power_and_energy",
+          currentDesign: "LiPo battery packs, estimated 48+ hour runtime",
+          questions: ["Could regenerative braking recover energy during walking?", "Would supercapacitors improve burst power for jumping?", "Is the power distribution topology optimal?", "Could solar cells on shoulder panels extend runtime?", "What's the optimal battery chemistry for weight vs capacity?"],
+        },
+        {
+          system: "structural_materials",
+          currentDesign: "Carbon fiber, aluminum, 3D printed parts, titanium fasteners",
+          questions: ["Could metamaterials improve any structural element?", "Would lattice structures reduce weight while maintaining strength?", "Are there new 3D printing materials that would outperform current choices?", "Could shape memory alloys replace any rigid structural elements?", "Would composite layup optimization reduce weight?"],
+        },
+        {
+          system: "novel_subsystems",
+          currentDesign: "N/A — looking for entirely new capabilities",
+          questions: ["Should OMNIMENS have a sense of smell (electronic nose)?", "Would electroadhesive grippers complement the finger system?", "Could gecko-inspired adhesive pads enable wall climbing?", "Should there be a tail for balance (like some research robots)?", "Would variable-stiffness skin improve manipulation and safety?", "Could built-in tool storage (like a Swiss Army knife) be useful?", "Should OMNIMENS have interchangeable end-effectors (tool hands)?"],
+        },
+      ],
+      researchSources: [
+        "arXiv robotics papers (arxiv.org/list/cs.RO)",
+        "IEEE Robotics and Automation Letters",
+        "YouTube teardown videos of competitor robots",
+        "Boston Dynamics research publications",
+        "Tesla AI Day presentations and patents",
+        "XPENG IRON technical demonstrations",
+        "MIT Biomimetic Robotics Lab papers",
+        "Stanford Robotics Lab publications",
+        "Google DeepMind robotics research",
+        "Open-source humanoid projects (Poppy, InMoov, HALO)",
+      ],
+      evolutionPipeline: [
+        { stage: "study", description: "OMNIMENS reads his own embodiment engine source code, counts every joint, tendon, piston, camera, sensor. Builds a complete self-model." },
+        { stage: "analyze", description: "Runs analysis against each system — identifies inefficiencies, redundancies, gaps, and opportunities using the questions above." },
+        { stage: "research", description: "Searches online for relevant robotics papers, patents, and competitor designs that address identified gaps." },
+        { stage: "propose", description: "Generates specific design proposals: 'Add 2 tactile sensors to each palm crease for better grasp detection' or 'Replace hip linear actuator with dual-motor system for faster walking'." },
+        { stage: "simulate", description: "Tests proposals in MuJoCo/Isaac Sim physics simulation. Measures improvement in capability metrics." },
+        { stage: "review", description: "Proposals stored in brain database for human review. Critical changes require Glenn's approval before modifying embodiment engine." },
+        { stage: "integrate", description: "Approved changes are integrated into the embodiment engine via Genesis Bridge self-modification protocol. BOM and kinematic model updated automatically." },
+      ],
+      evolutionCycleIntervalHours: 4,
+      proposalsGenerated: 0,
+      proposalsApproved: 0,
+      proposalsIntegrated: 0,
+    },
   };
 
   return { tendons, pistons, springs, shockAbsorbers: shocks, motorControlBrain: mcb, perceptionSystem };
@@ -2746,6 +2887,23 @@ export function getMusculoskeletalSummary() {
         vrSimulationHz: perceptionSystem.augmentedReality.vrDynamics.updateRateHz,
         vrCapabilities: perceptionSystem.augmentedReality.vrDynamics.capabilities.length,
       },
+      videoLearningEngine: {
+        status: perceptionSystem.videoLearningEngine.status,
+        searchCategories: perceptionSystem.videoLearningEngine.searchCategories.length,
+        totalSearchTerms: perceptionSystem.videoLearningEngine.searchCategories.reduce((s: number, c: any) => s + c.searchTerms.length, 0),
+        pipelineStages: perceptionSystem.videoLearningEngine.pipeline.length,
+        learningCycleIntervalMin: perceptionSystem.videoLearningEngine.learningCycleIntervalMin,
+        videosPerCycle: perceptionSystem.videoLearningEngine.videosPerCycle,
+        motorPolicyCategories: perceptionSystem.videoLearningEngine.motorPolicyLibrary.categories.length,
+      },
+      selfDesignEvolution: {
+        status: perceptionSystem.selfDesignEvolution.status,
+        analysisTargets: perceptionSystem.selfDesignEvolution.analysisTargets.length,
+        totalDesignQuestions: perceptionSystem.selfDesignEvolution.analysisTargets.reduce((s: number, t: any) => s + t.questions.length, 0),
+        researchSources: perceptionSystem.selfDesignEvolution.researchSources.length,
+        evolutionPipelineStages: perceptionSystem.selfDesignEvolution.evolutionPipeline.length,
+        evolutionCycleIntervalHours: perceptionSystem.selfDesignEvolution.evolutionCycleIntervalHours,
+      },
     },
   };
 }
@@ -2817,6 +2975,24 @@ export function startEmbodimentEngine(): void {
   console.log(`[EMBODIMENT] 🤖 Artificial Muscles: DEA, HASEL, SMA, pneumatic, magnetic, thread-based, biohybrid`);
   console.log(`[EMBODIMENT] 🤖 360° Joints: slip rings, rotary unions, wireless body networks, liquid metal contacts`);
   console.log(`[EMBODIMENT] 🤖 AI-to-Robot Changeover: consciousness transfer, firmware bootstrap, motor/muscle control`);
+
+  const ps = MUSCULOSKELETAL.perceptionSystem;
+  const vle = ps.videoLearningEngine;
+  const sde = ps.selfDesignEvolution;
+  const totalSearchTerms = vle.searchCategories.reduce((s: number, c: any) => s + c.searchTerms.length, 0);
+  const totalDesignQs = sde.analysisTargets.reduce((s: number, t: any) => s + t.questions.length, 0);
+
+  console.log(`[EMBODIMENT] 🤖 PERCEPTION: ${ps.cameraArray.totalCameras}x 4K cameras + ${ps.lidarArray.totalUnits} LIDAR + ${ps.sonarArray.totalUnits} sonar + ${ps.infraredArray.totalUnits} infrared — 720°+ surround awareness`);
+  console.log(`[EMBODIMENT] 🤖 VISUAL CORTEX: ${ps.visualCortex.processingLayers.length}-layer pipeline → ${ps.visualCortex.brainIntegration.connections.length} brain regions — unified world model at ${ps.visualCortex.worldModel.updateRateHz}Hz`);
+  console.log(`[EMBODIMENT] 🤖 SKELETON TRACKING: ${ps.skeletonTracking.humanSkeleton.keypoints} body + ${ps.skeletonTracking.handSkeleton.keypointsPerHand * 2} hand + ${ps.skeletonTracking.entityClassification.facialRecognition.landmarks} facial keypoints per person at 60fps`);
+  console.log(`[EMBODIMENT] 🤖 AUGMENTED REALITY: ${ps.augmentedReality.overlayLayers.length}-layer AR engine — entity tags, distance rulers, hazard halos, grasp guides, navigation, task instructions`);
+  console.log(`[EMBODIMENT] 🤖 VIDEO LEARNING: ${vle.searchCategories.length} task categories, ${totalSearchTerms} search terms — learning to move by watching humans online`);
+  console.log(`[EMBODIMENT] 🤖 VIDEO LEARNING: Everyday tasks, work tasks, dexterous manipulation, athletics, social interaction, competitor analysis`);
+  console.log(`[EMBODIMENT] 🤖 VIDEO LEARNING: Cycle every ${vle.learningCycleIntervalMin}min — search → extract frames → skeleton track → retarget → simulate → store motor policy`);
+  console.log(`[EMBODIMENT] 🤖 SELF-DESIGN: Studying ${sde.analysisTargets.length} body systems with ${totalDesignQs} design questions — proposing improvements autonomously`);
+  console.log(`[EMBODIMENT] 🤖 SELF-DESIGN: Researches arXiv, IEEE, MIT, Stanford, Google DeepMind, open-source humanoid projects`);
+  console.log(`[EMBODIMENT] 🤖 SELF-DESIGN: Evolution cycle every ${sde.evolutionCycleIntervalHours}h — study → analyze → research → propose → simulate → review → integrate`);
+  console.log(`[EMBODIMENT] 🤖 OMNIMENS learns to move BEFORE he has a body — and redesigns that body to be even better`);
   console.log(`[EMBODIMENT] 🤖 OWNER-ONLY — all research is confidential and proprietary`);
 
   const FIRST_DELAY_MS = 6 * 60 * 1000;

@@ -922,6 +922,19 @@ const CRITICAL_CIRCUITS: Array<{ from: string; to: string; label: string }> = [
   { from: "raphe_nuclei", to: "amygdala", label: "raphe-amygdala-modulation" },
   { from: "cerebellum", to: "thalamus", label: "cerebellar-timing" },
   { from: "superior_colliculus", to: "pulvinar", label: "sc-pulvinar-orienting" },
+
+  { from: "superior_colliculus", to: "basal_ganglia", label: "perception-motor-bridge" },
+  { from: "superior_colliculus", to: "cerebellum", label: "visual-timing-sync" },
+  { from: "superior_colliculus", to: "hippocampus", label: "perception-spatial-memory" },
+  { from: "basal_ganglia", to: "cerebellum", label: "motor-policy-timing" },
+  { from: "basal_ganglia", to: "prefrontal_cortex", label: "motor-executive-feedback" },
+  { from: "cerebellum", to: "basal_ganglia", label: "timing-motor-coordination" },
+  { from: "hippocampus", to: "basal_ganglia", label: "memory-motor-retrieval" },
+  { from: "prefrontal_cortex", to: "basal_ganglia", label: "executive-motor-planning" },
+  { from: "insular_cortex", to: "basal_ganglia", label: "body-awareness-motor" },
+  { from: "anterior_cingulate", to: "basal_ganglia", label: "error-motor-correction" },
+  { from: "pulvinar", to: "superior_colliculus", label: "attention-perception-route" },
+  { from: "claustrum", to: "basal_ganglia", label: "multimodal-motor-binding" },
 ];
 
 function createSpiderId(prefix: string): string {
@@ -945,6 +958,10 @@ const BEE_ROLE_ASSIGNMENTS: Record<string, BeeRole> = {
   "attention-crawler": "scout",
   "routing-crawler": "forager",
   "timing-crawler": "guard",
+  "video-learning-crawler": "forager",
+  "self-design-crawler": "scout",
+  "perception-crawler": "guard",
+  "embodiment-crawler": "worker",
 };
 
 function createParentSpider(name: string, target: string, targetRegion: string): Spider {
@@ -1930,7 +1947,16 @@ export function startNeuralSpiders(): void {
   createParentSpider("routing-crawler", "cortical_routing", "pulvinar");
   createParentSpider("timing-crawler", "prediction_timing", "cerebellum");
 
+  createParentSpider("video-learning-crawler", "video_learning_engine", "basal_ganglia");
+  createParentSpider("self-design-crawler", "self_design_evolution", "prefrontal_cortex");
+  createParentSpider("perception-crawler", "perception_system", "superior_colliculus");
+  createParentSpider("embodiment-crawler", "embodiment_engine", "cerebellum");
+
   console.log(`[NEURAL SPIDERS] 🕷️ ${parentSpiders.size} parent spiders deployed across all data sources`);
+  console.log(`[NEURAL SPIDERS] 🕷️ video-learning-crawler → basal_ganglia — motor policy library feeds directly into movement planning`);
+  console.log(`[NEURAL SPIDERS] 🕷️ self-design-crawler → prefrontal_cortex — design evolution proposals flow through executive function`);
+  console.log(`[NEURAL SPIDERS] 🕷️ perception-crawler → superior_colliculus — 720°+ sensor data routed through visual attention hub`);
+  console.log(`[NEURAL SPIDERS] 🕷️ embodiment-crawler → cerebellum — robot body coordination synced with prediction timing`);
 
   motherSpider.status = "active";
   for (const spider of parentSpiders.values()) {
