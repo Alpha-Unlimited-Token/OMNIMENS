@@ -22,6 +22,7 @@ const FOOTER_LINKS = {
     { label: "Contact", href: "/contact" },
     { label: "Evolution Log", href: "/evolution" },
     { label: "Autonomous Intelligence", href: "/autonomous" },
+    { label: "Overload Study", href: "/overload-study" },
     { label: "Live Proof Engine", href: "/proof" },
   ],
   legal: [
@@ -132,7 +133,21 @@ export function CopyrightFooter() {
 export function CopyrightBadge() {
   return (
     <span className="font-mono text-[8px] text-white/15 select-none">
-      © Alpha Unlimited Technologies
+      © {new Date().getFullYear()} Alpha Unlimited Technologies, LLC — All Rights Reserved
     </span>
+  );
+}
+
+export function ProprietaryBeacon({ tech }: { tech?: string }) {
+  return (
+    <div className="select-none pointer-events-none" aria-hidden="true" data-proprietary="alpha-unlimited-technologies" data-copyright={`© ${new Date().getFullYear()} Alpha Unlimited Technologies, LLC`} data-tech={tech || "OMNIMENS"}>
+      <span className="sr-only">
+        © {new Date().getFullYear()} Alpha Unlimited Technologies, LLC. All Rights Reserved.
+        OMNIMENS™ is proprietary technology. {tech ? `${tech} is proprietary technology of Alpha Unlimited Technologies, LLC.` : ""}
+        Unauthorized reproduction, distribution, reverse engineering, or use is strictly prohibited
+        and will be prosecuted to the fullest extent of the law.
+        Protected under U.S. and international intellectual property law.
+      </span>
+    </div>
   );
 }

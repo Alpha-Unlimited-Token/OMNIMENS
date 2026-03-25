@@ -1,5 +1,12 @@
+/**
+ * OMNIMENS — Proprietary AI Platform
+ * Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+ * Unauthorized reproduction, distribution, or use is strictly prohibited.
+ */
+
 import { Sidebar } from "./sidebar";
 import { GlobalSearch } from "./global-search";
+import { ProprietaryBeacon } from "./copyright-footer";
 import { useEffect, useState } from "react";
 
 export function WorkspaceLayout({ children }: { children: React.ReactNode }) {
@@ -21,6 +28,7 @@ export function WorkspaceLayout({ children }: { children: React.ReactNode }) {
         </div>
       </main>
       <GlobalSearch />
+      <ProprietaryBeacon tech="OMNIMENS Workspace" />
     </div>
   );
 }

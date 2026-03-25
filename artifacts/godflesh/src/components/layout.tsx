@@ -9,7 +9,7 @@ import { useAuth } from "@workspace/replit-auth-web";
 import { Button } from "./ui/button";
 import { User, Layers, Menu, X } from "lucide-react";
 import { OmnimensIcon } from "./omnimens-icon";
-import { CopyrightFooter } from "./copyright-footer";
+import { CopyrightFooter, ProprietaryBeacon } from "./copyright-footer";
 import { useState, useEffect } from "react";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -131,6 +131,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </main>
 
       <CopyrightFooter />
+      <ProprietaryBeacon tech="OMNIMENS Autonomous Intelligence Platform" />
     </div>
   );
 }

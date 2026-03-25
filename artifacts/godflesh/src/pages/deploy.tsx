@@ -1,4 +1,10 @@
-import { useState } from "react";
+/**
+   * OMNIMENS — Proprietary AI Platform
+   * Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+   * Unauthorized reproduction, distribution, or use is strictly prohibited.
+   */
+
+  import { useState } from "react";
 import { useAuth } from "@workspace/replit-auth-web";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";

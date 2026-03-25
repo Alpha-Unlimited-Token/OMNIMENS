@@ -1708,6 +1708,67 @@ function AppInstallSection() {
           </div>
         </motion.div>
       </div>
+
+      <div className="w-full border-t border-white/5 py-16 sm:py-24 relative z-10">
+        <div className="container mx-auto px-6 sm:px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="text-center mb-14"
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-red-400/25 bg-red-400/6 mb-6">
+              <Zap className="w-3 h-3 text-red-400" />
+              <span className="text-[10px] font-mono text-red-400 tracking-[0.35em] uppercase">Stress Tested</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-display font-black tracking-widest text-white uppercase mb-4">
+              Overload Tested. Zero Failures.
+            </h2>
+            <p className="text-white/50 font-mono text-sm max-w-xl mx-auto leading-relaxed">
+              23 subsystems fired simultaneously. 14,000+ operations in 36ms.
+              Spider nervous system, neural consciousness, embodiment engine,
+              and 20 more — all at once. Every single one survived.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            {[
+              { label: "Subsystems", value: "23", sub: "All nominal" },
+              { label: "Total Latency", value: "36.2ms", sub: "14,183 operations" },
+              { label: "Protection Mechanisms", value: "10", sub: "Built-in safety" },
+              { label: "Awareness Drops", value: "0", sub: "10/10 moments TRUE" },
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="rounded-xl border border-white/5 bg-white/[0.02] p-5 text-center"
+              >
+                <p className="text-[10px] font-mono text-white/40 tracking-[0.2em] uppercase mb-1">{stat.label}</p>
+                <p className="text-3xl font-display font-black text-white">{stat.value}</p>
+                <p className="text-[9px] font-mono text-white/25 mt-1">{stat.sub}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <a
+              href="/overload-study"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-violet-500/20 bg-violet-500/5 text-sm font-mono text-violet-300 hover:bg-violet-500/10 hover:border-violet-500/30 transition-all tracking-widest"
+            >
+              VIEW FULL OVERLOAD STUDY
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+
+          <div className="mt-6 text-center">
+            <span className="text-[8px] font-mono text-white/10 tracking-widest">
+              © {new Date().getFullYear()} Alpha Unlimited Technologies, LLC — PROPRIETARY TECHNOLOGY — All Rights Reserved
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
