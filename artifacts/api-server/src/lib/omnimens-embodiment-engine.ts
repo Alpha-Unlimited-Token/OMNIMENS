@@ -1726,7 +1726,231 @@ function buildMusculoskeletalSystem(): {
     powerBudgetW: 1.5,
   });
 
-  return { tendons, pistons, springs, shockAbsorbers: shocks, motorControlBrain: mcb };
+  // ═══════════════════════════════════════════════════════════════
+  //  PERCEPTION SYSTEM — 720° SURROUND AWARENESS
+  //  XPENG IRON has "Eagle-Eye 720° perception" — OMNIMENS exceeds
+  //  this with a multi-modal sensor fusion architecture that
+  //  combines 4K cameras, LIDAR, sonar, infrared, depth sensing,
+  //  skeleton tracking, and a visual cortex — all communicating
+  //  through a unified perception bus feeding directly into the
+  //  brain's sensory processing regions.
+  //
+  //  Tesla Optimus: 8 cameras (1.2MP), no LIDAR, vision-only
+  //  XPENG IRON: RGB + stereo + LIDAR + ultrasonic
+  //  OMNIMENS: 14 cameras (4K) + LIDAR + sonar + IR + depth +
+  //            skeleton tracking + EGO-scale learning + visual cortex
+  // ═══════════════════════════════════════════════════════════════
+
+  const perceptionSystem: any = {
+    // ─── 4K CAMERA ARRAY — 360° + overhead + undercarriage ────────
+    cameraArray: {
+      totalCameras: 14,
+      resolution: "3840x2160 (4K UHD)",
+      frameRate: 60,
+      totalDataRateMpxPerSec: 14 * 3840 * 2160 * 60 / 1_000_000,
+      colorSpace: "HDR10, 10-bit, BT.2020",
+      cameras: [
+        { name: "head_stereo_left", type: "4K_RGB_stereo", mountPoint: "skull_left_eye", fovDegrees: 90, role: "Primary stereo depth — left eye. Human/animal/object recognition, facial recognition, skeleton overlay tracking." },
+        { name: "head_stereo_right", type: "4K_RGB_stereo", mountPoint: "skull_right_eye", fovDegrees: 90, role: "Primary stereo depth — right eye. Parallax depth estimation, binocular vision." },
+        { name: "head_wide_angle", type: "4K_RGB_wide", mountPoint: "skull_forehead", fovDegrees: 170, role: "Wide-angle peripheral vision — captures full scene context, gesture recognition at distance." },
+        { name: "head_rear", type: "4K_RGB", mountPoint: "skull_occipital", fovDegrees: 120, role: "Rear head camera — 'eyes in the back of the head'. Detects approach from behind." },
+        { name: "chest_forward", type: "4K_RGB", mountPoint: "upper_torso_frame_front", fovDegrees: 100, role: "Chest-level forward view — table-height manipulation, close-range object tracking." },
+        { name: "chest_rear", type: "4K_RGB", mountPoint: "upper_torso_frame_rear", fovDegrees: 100, role: "Chest-level rear view — workspace awareness behind the body." },
+        { name: "shoulder_left", type: "4K_RGB", mountPoint: "l_scapula", fovDegrees: 110, role: "Left lateral peripheral — covers left blind spot, monitors left arm workspace." },
+        { name: "shoulder_right", type: "4K_RGB", mountPoint: "r_scapula", fovDegrees: 110, role: "Right lateral peripheral — covers right blind spot, monitors right arm workspace." },
+        { name: "wrist_left", type: "4K_RGB_macro", mountPoint: "l_carpal_prox", fovDegrees: 80, role: "Left wrist close-up — watches hand manipulate objects, reads text, inspects parts. Macro focus for detail work." },
+        { name: "wrist_right", type: "4K_RGB_macro", mountPoint: "r_carpal_prox", fovDegrees: 80, role: "Right wrist close-up — mirror of left wrist camera." },
+        { name: "pelvis_forward", type: "4K_RGB", mountPoint: "pelvis_frame_front", fovDegrees: 100, role: "Lower forward — ground/step detection, leg workspace, curb/stair edge detection." },
+        { name: "pelvis_rear", type: "4K_RGB", mountPoint: "pelvis_frame_rear", fovDegrees: 100, role: "Lower rear — behind-body ground awareness, backup movement safety." },
+        { name: "overhead_fisheye", type: "4K_fisheye", mountPoint: "skull_crown", fovDegrees: 220, role: "Overhead fisheye — ceiling/overhead obstacle detection, vertical clearance mapping, falling object detection." },
+        { name: "undercarriage", type: "4K_RGB_downward", mountPoint: "pelvis_frame_bottom", fovDegrees: 120, role: "Downward view — foot placement, ground texture, step edge, hole detection. Critical for terrain navigation." },
+      ],
+    },
+
+    // ─── LIDAR — 360° 3D point cloud mapping ─────────────────────
+    lidarArray: {
+      totalUnits: 3,
+      units: [
+        { name: "head_lidar", type: "solid_state_3D", mountPoint: "skull_forehead", model: "Livox Mid-360", rangeMeter: 70, pointsPerSec: 200000, fovHorizontal: 360, fovVertical: 59, role: "Primary 3D mapping — builds real-time point cloud of entire environment. SLAM localization, obstacle mapping, room geometry." },
+        { name: "waist_lidar", type: "solid_state_3D", mountPoint: "mid_torso_frame_front", model: "Livox HAP", rangeMeter: 150, pointsPerSec: 450000, fovHorizontal: 120, fovVertical: 25, role: "Long-range forward LIDAR — outdoor navigation, large room mapping, approaching vehicle/person detection at distance." },
+        { name: "ankle_lidar", type: "2D_scanning", mountPoint: "pelvis_frame_lower", model: "RPLIDAR S2", rangeMeter: 30, pointsPerSec: 32000, fovHorizontal: 360, fovVertical: 1, role: "Low-level 360° scan — ground-level obstacle detection, table legs, pet detection, foot-level hazards." },
+      ],
+    },
+
+    // ─── SONAR — ultrasonic ranging for close-proximity ───────────
+    sonarArray: {
+      totalUnits: 12,
+      units: [
+        { name: "sonar_head_front", mountPoint: "skull_forehead", rangeCm: 400, frequencyKHz: 40, beamAngleDeg: 30, role: "Forward proximity — detects objects cameras may miss (glass, mirrors, transparent surfaces)." },
+        { name: "sonar_head_rear", mountPoint: "skull_occipital", rangeCm: 300, frequencyKHz: 40, beamAngleDeg: 30, role: "Rear proximity — backup collision prevention." },
+        { name: "sonar_chest_left", mountPoint: "upper_torso_frame_left", rangeCm: 250, frequencyKHz: 40, beamAngleDeg: 45, role: "Left torso proximity — workspace collision avoidance." },
+        { name: "sonar_chest_right", mountPoint: "upper_torso_frame_right", rangeCm: 250, frequencyKHz: 40, beamAngleDeg: 45, role: "Right torso proximity." },
+        { name: "sonar_hip_left", mountPoint: "pelvis_frame_left", rangeCm: 200, frequencyKHz: 40, beamAngleDeg: 45, role: "Left hip proximity — table/counter edge detection." },
+        { name: "sonar_hip_right", mountPoint: "pelvis_frame_right", rangeCm: 200, frequencyKHz: 40, beamAngleDeg: 45, role: "Right hip proximity." },
+        { name: "sonar_knee_left", mountPoint: "l_tibia_upper", rangeCm: 150, frequencyKHz: 40, beamAngleDeg: 30, role: "Left knee-level — low obstacle detection (pets, children, cables)." },
+        { name: "sonar_knee_right", mountPoint: "r_tibia_upper", rangeCm: 150, frequencyKHz: 40, beamAngleDeg: 30, role: "Right knee-level." },
+        { name: "sonar_wrist_left", mountPoint: "l_carpal_prox", rangeCm: 100, frequencyKHz: 40, beamAngleDeg: 20, role: "Left wrist — close manipulation ranging for precise grasp positioning." },
+        { name: "sonar_wrist_right", mountPoint: "r_carpal_prox", rangeCm: 100, frequencyKHz: 40, beamAngleDeg: 20, role: "Right wrist — close manipulation ranging." },
+        { name: "sonar_foot_left", mountPoint: "l_calcaneus", rangeCm: 100, frequencyKHz: 40, beamAngleDeg: 30, role: "Left foot — step edge detection, ground distance for stair descent." },
+        { name: "sonar_foot_right", mountPoint: "r_calcaneus", rangeCm: 100, frequencyKHz: 40, beamAngleDeg: 30, role: "Right foot — step edge detection." },
+      ],
+    },
+
+    // ─── INFRARED / THERMAL IMAGING ──────────────────────────────
+    infraredArray: {
+      totalUnits: 4,
+      units: [
+        { name: "thermal_head_forward", type: "LWIR_microbolometer", mountPoint: "skull_forehead", model: "FLIR Lepton 3.5", resolution: "160x120", framerate: 8.6, spectralRange: "8-14μm", role: "Forward thermal — detect humans/animals by body heat through darkness, smoke, fog. Distinguish living beings from objects. Night vision." },
+        { name: "thermal_head_rear", type: "LWIR_microbolometer", mountPoint: "skull_occipital", model: "FLIR Lepton 3.5", resolution: "160x120", framerate: 8.6, spectralRange: "8-14μm", role: "Rear thermal — detect approaching people/animals from behind. Fire detection." },
+        { name: "thermal_chest_wide", type: "LWIR_array", mountPoint: "upper_torso_frame_front", model: "MLX90640", resolution: "32x24", framerate: 16, spectralRange: "5-14μm", role: "Wide-angle thermal scan — whole-room heat mapping, HVAC analysis, detect overheating equipment/motors." },
+        { name: "nir_depth_projector", type: "NIR_structured_light", mountPoint: "skull_forehead", model: "Intel RealSense D456", resolution: "1280x720", framerate: 90, spectralRange: "850nm", role: "Near-infrared structured light depth — projects IR dot pattern for millimeter-precision depth map. Works in total darkness. Used for precision manipulation and facial geometry." },
+      ],
+    },
+
+    // ─── DEPTH PERCEPTION — stereo + structured light + ToF ──────
+    depthSensing: {
+      methods: [
+        { name: "binocular_stereo", description: "Head stereo camera pair computes depth via parallax — like human binocular vision. Range: 0.5m to 50m. Accuracy: ±2cm at 5m.", hardware: ["head_stereo_left", "head_stereo_right"], algorithm: "semi_global_block_matching + neural_depth_estimation" },
+        { name: "structured_light", description: "NIR dot projector + IR camera captures millimeter-precision depth map. Range: 0.2m to 6m. Accuracy: ±1mm at 1m. Works in total darkness.", hardware: ["nir_depth_projector"], algorithm: "structured_light_triangulation" },
+        { name: "lidar_point_cloud", description: "3D point cloud from LIDAR sensors. Range: 0.3m to 150m. Used for room-scale mapping and outdoor navigation.", hardware: ["head_lidar", "waist_lidar", "ankle_lidar"], algorithm: "SLAM_3D_mapping + ICP_registration" },
+        { name: "time_of_flight_sonar", description: "Ultrasonic time-of-flight ranging for close proximity. Detects transparent surfaces (glass, mirrors) that cameras and LIDAR miss.", hardware: ["sonar_array"], algorithm: "ultrasonic_echo_trilateration" },
+        { name: "neural_monocular_depth", description: "Any single 4K camera can estimate depth using trained neural network (MiDaS/DPT). Fallback when other depth methods fail.", hardware: ["any_camera"], algorithm: "monocular_depth_estimation_transformer" },
+      ],
+    },
+
+    // ─── SKELETON TRACKING & ENTITY RECOGNITION ──────────────────
+    // This is how OMNIMENS sees and understands living things.
+    // Uses MediaPipe/OpenPose-style keypoint detection to overlay
+    // skeleton wireframes on every human, animal, and creature it sees.
+    skeletonTracking: {
+      status: "active",
+      description: "Real-time skeleton overlay tracking on all visible entities. Detects and classifies humans, animals, birds, pets — anything that moves. Maps 33 body keypoints (MediaPipe BlazePose), 21 hand keypoints per hand, 468 face mesh landmarks. Tracks movement patterns for EGO-scale imitation learning.",
+      entityClassification: {
+        categories: ["human_adult", "human_child", "human_infant", "dog", "cat", "bird", "horse", "livestock", "wild_animal", "insect", "unknown_animate", "unknown_inanimate"],
+        method: "YOLO v9 + EfficientNet classifier, trained on 10M+ labeled images. Distinguishes species, breed, age estimate, threat level, emotional state (for humans).",
+        facialRecognition: {
+          status: "active",
+          landmarks: 468,
+          capabilities: ["identity_matching", "emotion_detection", "age_estimation", "gender_detection", "gaze_direction", "lip_reading", "micro_expression_analysis"],
+          privacyMode: "opt_in_consent_required",
+        },
+      },
+      humanSkeleton: {
+        keypoints: 33,
+        standard: "MediaPipe BlazePose",
+        trackedJoints: ["nose", "left_eye_inner", "left_eye", "left_eye_outer", "right_eye_inner", "right_eye", "right_eye_outer", "left_ear", "right_ear", "mouth_left", "mouth_right", "left_shoulder", "right_shoulder", "left_elbow", "right_elbow", "left_wrist", "right_wrist", "left_pinky", "right_pinky", "left_index", "right_index", "left_thumb", "right_thumb", "left_hip", "right_hip", "left_knee", "right_knee", "left_ankle", "right_ankle", "left_heel", "right_heel", "left_foot_index", "right_foot_index"],
+        capabilities: ["pose_estimation_3D", "action_recognition", "gesture_classification", "gait_analysis", "fall_detection", "behavior_prediction"],
+      },
+      handSkeleton: {
+        keypointsPerHand: 21,
+        standard: "MediaPipe Hands",
+        trackedJoints: ["wrist", "thumb_cmc", "thumb_mcp", "thumb_ip", "thumb_tip", "index_mcp", "index_pip", "index_dip", "index_tip", "middle_mcp", "middle_pip", "middle_dip", "middle_tip", "ring_mcp", "ring_pip", "ring_dip", "ring_tip", "pinky_mcp", "pinky_pip", "pinky_dip", "pinky_tip"],
+        capabilities: ["finger_flexion_tracking", "gesture_recognition", "sign_language_interpretation", "tool_usage_analysis", "grasp_type_classification", "dexterity_assessment"],
+      },
+      animalSkeleton: {
+        keypointsQuadruped: 17,
+        keypointsBird: 12,
+        standard: "DeepLabCut + custom OMNIMENS animal pose model",
+        capabilities: ["species_identification", "gait_analysis", "behavior_classification", "threat_assessment", "size_estimation"],
+      },
+    },
+
+    // ─── EGO-SCALE IMITATION LEARNING SYSTEM ─────────────────────
+    // Inspired by XPENG IRON's egocentric learning and Ego4D.
+    // OMNIMENS watches humans perform tasks, maps the skeleton
+    // overlay to its own joint system, and learns to replicate
+    // the movements through its own body.
+    egoScaleLearning: {
+      status: "active",
+      description: "Egocentric imitation learning — OMNIMENS observes humans performing tasks from its own first-person viewpoint, tracks their skeleton, maps their joint movements to its own 155-joint body, and learns motor policies to replicate the task. Like XPENG IRON but with full bidirectional tendon-driven dexterity.",
+      pipeline: [
+        { stage: "observe", description: "4K cameras capture human performing a task. Skeleton overlay tracks all 33 body + 42 hand keypoints in real-time at 60fps." },
+        { stage: "segment", description: "AI segments the task into atomic actions: reach, grasp, lift, rotate, place, release. Each action is tagged with joint angles, forces, and timing." },
+        { stage: "retarget", description: "Human skeleton keypoints are retargeted to OMNIMENS joint space. Maps human proportions → robot proportions with inverse kinematics. Accounts for tendon routing and piston limits." },
+        { stage: "simulate", description: "Motor policy is tested in physics simulation (MuJoCo/Isaac Sim) before executing on hardware. Verifies forces, torques, collision safety." },
+        { stage: "refine", description: "Reinforcement learning fine-tunes the policy on hardware. Tendon tension feedback and tactile sensors provide real-world correction signals." },
+        { stage: "generalize", description: "Learned task is stored in motor memory and generalized to variations — different object sizes, positions, orientations, weights." },
+      ],
+      trainingSpeed: "Complex task learned in 30 minutes to 2 hours (vs XPENG IRON 2 hours for dance routine)",
+      dataSource: "Egocentric video of human demonstrations + 3rd-person multi-camera capture + force/tactile sensor data",
+    },
+
+    // ─── VISUAL CORTEX — the brain region that processes all vision ──
+    // This is the software layer that fuses ALL sensor data into
+    // one unified world model. It connects directly to the brain's
+    // Superior Colliculus, Pulvinar, and Thalamus regions.
+    visualCortex: {
+      status: "active",
+      description: "Unified visual processing pipeline — fuses all 14 cameras, 3 LIDARs, 12 sonars, 4 infrared sensors into a single coherent 3D world model updated at 60Hz. Feeds directly into the brain's sensory processing regions.",
+      processingLayers: [
+        { layer: "V1_primary", function: "Edge detection, motion detection, color processing from raw camera feeds. Runs on Jetson Orin GPU at 60fps across all 14 cameras simultaneously.", outputTo: ["V2_secondary"] },
+        { layer: "V2_secondary", function: "Shape recognition, texture analysis, depth integration. Merges stereo depth + structured light + LIDAR point cloud into unified depth map.", outputTo: ["V4_object", "MT_motion"] },
+        { layer: "V4_object", function: "Object recognition and classification. YOLO v9 detects and classifies 10,000+ object categories. Identifies humans vs animals vs objects vs vehicles.", outputTo: ["IT_identity", "skeleton_tracker"] },
+        { layer: "MT_motion", function: "Motion flow analysis — optical flow, ego-motion compensation, moving object tracking. Predicts trajectories of all moving entities.", outputTo: ["MST_navigation"] },
+        { layer: "IT_identity", function: "Identity and semantic processing — facial recognition, object permanence, scene understanding. 'What am I looking at and what does it mean?'", outputTo: ["prefrontal_cortex"] },
+        { layer: "MST_navigation", function: "Spatial navigation — SLAM mapping, path planning, obstacle avoidance, terrain classification. Builds 3D voxel map of entire environment.", outputTo: ["motor_cortex", "cerebellum"] },
+        { layer: "skeleton_tracker", function: "Real-time skeleton overlay on all detected humans/animals. Tracks 33 body + 42 hand keypoints per person at 60fps. Feeds into EGO-scale learning system.", outputTo: ["ego_scale_learner", "hippocampus"] },
+        { layer: "ego_scale_learner", function: "Egocentric task learning — maps observed human movements to OMNIMENS joint space. Generates motor policies for imitation.", outputTo: ["motor_cortex", "basal_ganglia"] },
+      ],
+      brainIntegration: {
+        description: "Visual cortex output feeds directly into existing OMNIMENS brain regions for unified consciousness.",
+        connections: [
+          { target: "superior_colliculus", dataType: "saccade_targets", description: "Eye/head movement targets — 'look at this'" },
+          { target: "pulvinar", dataType: "attention_filtered_visual", description: "Attention-gated visual stream — filters what's important from the visual flood" },
+          { target: "thalamus", dataType: "sensory_relay", description: "All processed sensory data relayed through thalamus to cortex — the brain's switchboard" },
+          { target: "hippocampus", dataType: "spatial_memory", description: "3D map and location memory — 'I've been here before, the door is to the left'" },
+          { target: "amygdala", dataType: "threat_detection", description: "Emotional/threat assessment of visual input — 'is this person angry? is that animal dangerous?'" },
+          { target: "prefrontal_cortex", dataType: "scene_understanding", description: "High-level scene comprehension — 'I'm in a kitchen, there's a person cooking, they need help carrying plates'" },
+          { target: "basal_ganglia", dataType: "motor_planning", description: "Movement selection based on visual input — 'I see the object, plan the reach'" },
+          { target: "cerebellum", dataType: "visuomotor_coordination", description: "Real-time hand-eye coordination — smooth reaching, catching, precise placement" },
+        ],
+      },
+      worldModel: {
+        updateRateHz: 60,
+        representation: "3D voxel grid (5cm resolution indoor, 20cm outdoor) + semantic labels + entity tracks + depth confidence",
+        entities: "Tracks up to 200 simultaneous entities with position, velocity, classification, identity, skeleton overlay, predicted trajectory",
+        memoryHorizon: "30-second rolling buffer of full sensory state + permanent storage of significant events (new person, obstacle, task observation)",
+        distanceEstimation: {
+          methods: ["stereo_parallax", "lidar_point_cloud", "structured_light_depth", "sonar_time_of_flight", "neural_monocular_depth", "known_object_size_scaling"],
+          accuracy: "±1cm at 1m, ±5cm at 5m, ±20cm at 20m, ±1m at 100m",
+          range: "0.1m to 150m (LIDAR-assisted), 0.2m to 50m (vision-only)",
+        },
+      },
+    },
+
+    // ─── PERCEPTION BUS — how all sensors talk to each other ─────
+    // This is the nervous system wiring that connects every sensor
+    // to the visual cortex and ultimately to the brain.
+    perceptionBus: {
+      description: "High-speed data bus connecting all perception sensors to the visual cortex processing pipeline. All sensors feed into one unified perception stream — no sensor operates in isolation.",
+      busTopology: "star_hub",
+      hub: "NVIDIA Jetson Orin NX — dedicated vision processing cores (GPU + DLA)",
+      totalBandwidthGbps: 25,
+      connections: [
+        { sensors: "14x 4K cameras", interface: "MIPI CSI-2 (4-lane)", bandwidthGbps: 16, latencyMs: 1 },
+        { sensors: "3x LIDAR", interface: "Ethernet 1Gbps", bandwidthGbps: 3, latencyMs: 2 },
+        { sensors: "12x Sonar", interface: "I2C multiplexed", bandwidthGbps: 0.001, latencyMs: 5 },
+        { sensors: "4x Infrared/thermal", interface: "SPI + I2C", bandwidthGbps: 0.1, latencyMs: 3 },
+        { sensors: "6x IMU", interface: "SPI daisy-chain", bandwidthGbps: 0.01, latencyMs: 0.5 },
+        { sensors: "Tactile arrays (760 sensors)", interface: "SPI via ESP32-S3 nodes", bandwidthGbps: 0.5, latencyMs: 2 },
+      ],
+      fusionPipeline: "All sensor data timestamped to <1μs accuracy via PTP (Precision Time Protocol). Visual cortex fuses all modalities into unified world model at 60Hz. Any sensor failure detected in <10ms with graceful degradation.",
+    },
+
+    // ─── COMPETITIVE SUPERIORITY ─────────────────────────────────
+    competitiveAnalysis: {
+      vsTestlaOptimus: {
+        teslaSpecs: "8 cameras (1.2MP), no LIDAR, no sonar, no infrared, vision-only depth",
+        omnimensAdvantage: "14 cameras (4K 8.3MP = 7x resolution), 3 LIDARs, 12 sonars, 4 infrared sensors, multi-modal depth (5 methods vs 1), skeleton tracking, EGO-scale learning, visual cortex with brain integration",
+      },
+      vsXpengIron: {
+        ironSpecs: "720° Eagle-Eye perception, RGB + stereo + LIDAR + ultrasonic, EGO imitation learning, 82 DoF",
+        omnimensAdvantage: "720°+ full spherical coverage (14 cameras including overhead fisheye + undercarriage), 3 LIDAR units vs IRON's single, 12 sonars vs IRON's basic ultrasonic, dedicated thermal imaging for night/smoke/fog operation, 155 joints (vs 82), full bidirectional tendon pairs, visual cortex with 8-layer processing pipeline feeding into 16 brain regions",
+      },
+    },
+  };
+
+  return { tendons, pistons, springs, shockAbsorbers: shocks, motorControlBrain: mcb, perceptionSystem };
 }
 
 const MUSCULOSKELETAL = buildMusculoskeletalSystem();
@@ -2035,18 +2259,29 @@ const BILL_OF_MATERIALS: BOMEntry[] = [
   { partName: "Cycloidal Reducer", category: "transmission", quantity: 8, unitCostUsd: 80, supplier: "AliExpress", specifications: "100:1 ratio, high torque, shock resistant — hips, knees" },
   { partName: "Planetary Gearbox 20:1 (spine)", category: "transmission", quantity: 24, unitCostUsd: 18, supplier: "AliExpress", specifications: "20:1, low backlash, compact, spine segments" },
   { partName: "Tendon Cable (finger/toe)", category: "transmission", quantity: 60, unitCostUsd: 2, supplier: "McMaster-Carr", specifications: "Dyneema UHMWPE, 1mm, 200lb rated, finger/toe routing" },
-  // ─── SENSORS ──────────────────────────────────────────────────
-  { partName: "IMU BNO085", category: "sensor", quantity: 5, unitCostUsd: 18, supplier: "Adafruit/DigiKey", specifications: "9-axis, sensor fusion, 100Hz, I2C — pelvis, torso, head, each foot" },
-  { partName: "Intel RealSense D435i", category: "sensor", quantity: 2, unitCostUsd: 250, supplier: "Intel/Amazon", specifications: "Stereo depth + IMU, 90fps, USB 3.0 — stereo vision" },
+  // ─── SENSORS — proprioceptive ────────────────────────────────
+  { partName: "IMU BNO085", category: "sensor", quantity: 6, unitCostUsd: 18, supplier: "Adafruit/DigiKey", specifications: "9-axis, sensor fusion, 100Hz, SPI — head, torso, pelvis, each wrist, each ankle" },
   { partName: "Force/Torque Sensor 6-axis", category: "sensor", quantity: 6, unitCostUsd: 45, supplier: "AliExpress/SparkFun", specifications: "6-axis, 50N range, I2C — wrists, ankles" },
-  { partName: "FSR Pressure Sensor (foot)", category: "sensor", quantity: 16, unitCostUsd: 5, supplier: "AliExpress", specifications: "FSR 0-50kg, analog, 8 per foot sole" },
+  { partName: "FSR Pressure Sensor (foot)", category: "sensor", quantity: 160, unitCostUsd: 2, supplier: "AliExpress", specifications: "FSR 0-50kg, analog, 80 per foot sole — plantar pressure grid" },
   { partName: "Fingertip Tactile Sensor", category: "sensor", quantity: 10, unitCostUsd: 12, supplier: "AliExpress/SparkFun", specifications: "3-axis force, 0.01N resolution, each fingertip" },
-  { partName: "Magnetic Encoder AS5047P", category: "sensor", quantity: 28, unitCostUsd: 6, supplier: "DigiKey/Mouser", specifications: "14-bit, 28000rpm, SPI — one per major joint motor" },
-  { partName: "Flex Sensor (spine curvature)", category: "sensor", quantity: 6, unitCostUsd: 8, supplier: "SparkFun/Adafruit", specifications: "4.5in, analog, along spine to measure posture" },
-  { partName: "MLX90640 Thermal Camera", category: "sensor", quantity: 1, unitCostUsd: 55, supplier: "Adafruit/DigiKey", specifications: "32x24 IR array, 16Hz, I2C — infrared vision" },
-  { partName: "Ultrasonic HC-SR04", category: "sensor", quantity: 4, unitCostUsd: 3, supplier: "AliExpress", specifications: "2cm-4m range, 40Hz — proximity detection" },
+  { partName: "Hand Palm Pressure Array", category: "sensor", quantity: 2, unitCostUsd: 35, supplier: "Interlink/AliExpress", specifications: "200 pressure points per palm, 0.1N resolution, SPI — grasp force mapping" },
+  { partName: "Magnetic Encoder AS5047P", category: "sensor", quantity: 40, unitCostUsd: 6, supplier: "DigiKey/Mouser", specifications: "14-bit, 28000rpm, SPI — one per major joint motor" },
   { partName: "MQ Gas Sensor Array", category: "sensor", quantity: 3, unitCostUsd: 5, supplier: "AliExpress", specifications: "CO, CO2, methane, smoke, VOC detection" },
-  { partName: "Microphone MEMS INMP441", category: "sensor", quantity: 2, unitCostUsd: 4, supplier: "DigiKey", specifications: "I2S, 60dB SNR, stereo audio" },
+  { partName: "Microphone MEMS INMP441", category: "sensor", quantity: 6, unitCostUsd: 4, supplier: "DigiKey", specifications: "I2S, 60dB SNR, 3 per ear — spatial audio, directional hearing, voice recognition" },
+  // ─── VISION — 4K camera array (14 cameras) ────────────────────
+  { partName: "IMX577 4K Camera Module", category: "sensor", quantity: 14, unitCostUsd: 45, supplier: "ArduCam/AliExpress", specifications: "12.3MP Sony IMX577, 4K@60fps, MIPI CSI-2, HDR, 1/2.3in sensor — main vision array" },
+  { partName: "ArduCam 170° Fisheye Lens", category: "sensor", quantity: 2, unitCostUsd: 15, supplier: "ArduCam", specifications: "170° ultra-wide angle + 220° fisheye, M12 mount — wide peripheral + overhead cameras" },
+  { partName: "ArduCam 80° Macro Lens", category: "sensor", quantity: 2, unitCostUsd: 12, supplier: "ArduCam", specifications: "80° FOV, 5cm min focus, M12 mount — wrist-mounted close-up inspection cameras" },
+  // ─── VISION — LIDAR (3 units) ─────────────────────────────────
+  { partName: "Livox Mid-360 LIDAR", category: "sensor", quantity: 1, unitCostUsd: 1099, supplier: "Livox/DJI", specifications: "360°×59° FOV, 200K pts/sec, 70m range, IP67 — head-mounted 3D mapping" },
+  { partName: "Livox HAP LIDAR", category: "sensor", quantity: 1, unitCostUsd: 599, supplier: "Livox/DJI", specifications: "120°×25° FOV, 450K pts/sec, 150m range — waist-mounted long-range forward scan" },
+  { partName: "RPLIDAR S2 2D Scanner", category: "sensor", quantity: 1, unitCostUsd: 189, supplier: "Slamtec/Amazon", specifications: "360° 2D, 32K pts/sec, 30m range — ankle-level ground scan" },
+  // ─── VISION — sonar (12 units) ────────────────────────────────
+  { partName: "Ultrasonic MB1043 HRLV", category: "sensor", quantity: 12, unitCostUsd: 30, supplier: "MaxBotix/DigiKey", specifications: "1mm resolution, 30-500cm, I2C, weatherproof — body-distributed proximity array" },
+  // ─── VISION — infrared / thermal (4 units) ────────────────────
+  { partName: "FLIR Lepton 3.5 Thermal", category: "sensor", quantity: 2, unitCostUsd: 250, supplier: "FLIR/GroupGets", specifications: "160x120, 8.6fps, LWIR 8-14μm, SPI — forward + rear thermal for human/animal detection in darkness" },
+  { partName: "MLX90640 Thermal Array", category: "sensor", quantity: 1, unitCostUsd: 55, supplier: "Adafruit/DigiKey", specifications: "32x24 IR array, 16Hz, I2C — wide thermal scan for room heat mapping" },
+  { partName: "Intel RealSense D456 Depth", category: "sensor", quantity: 1, unitCostUsd: 350, supplier: "Intel/Amazon", specifications: "NIR structured light, 1280x720@90fps, 0.2-6m, USB 3.0 — mm-precision depth in darkness" },
   // ─── COMPUTE ──────────────────────────────────────────────────
   { partName: "NVIDIA Jetson Orin NX 16GB", category: "compute", quantity: 1, unitCostUsd: 599, supplier: "NVIDIA/Arrow", specifications: "100 TOPS AI, 8-core ARM, 16GB LPDDR5 — main brain" },
   { partName: "STM32H7 MCU (motor control)", category: "compute", quantity: 4, unitCostUsd: 15, supplier: "DigiKey/Mouser", specifications: "480MHz, FPU, CAN-FD, 1kHz PID — spine, arms, legs, hands" },
@@ -2292,7 +2527,7 @@ export function getForwardKinematics(anglesRad: number[]): ReturnType<typeof com
 }
 export function getMusculoskeletalSystem() { return MUSCULOSKELETAL; }
 export function getMusculoskeletalSummary() {
-  const { tendons, pistons, springs, shockAbsorbers, motorControlBrain } = MUSCULOSKELETAL;
+  const { tendons, pistons, springs, shockAbsorbers, motorControlBrain, perceptionSystem } = MUSCULOSKELETAL;
   const tendonsByMaterial: Record<string, number> = {};
   for (const t of tendons) tendonsByMaterial[t.material] = (tendonsByMaterial[t.material] || 0) + 1;
   const pistonsByType: Record<string, number> = {};
@@ -2303,6 +2538,13 @@ export function getMusculoskeletalSummary() {
   const totalPistonForceN = pistons.reduce((s, p) => s + p.maxForceN, 0);
   const totalSpringEnergyJ = springs.reduce((s, sp) => s + sp.energyStorageJ, 0);
   const totalMCBPowerW = motorControlBrain.reduce((s, m) => s + m.powerBudgetW, 0);
+
+  const totalSensors =
+    perceptionSystem.cameraArray.totalCameras +
+    perceptionSystem.lidarArray.totalUnits +
+    perceptionSystem.sonarArray.totalUnits +
+    perceptionSystem.infraredArray.totalUnits;
+
   return {
     tendonCount: tendons.length,
     tendonsByMaterial,
@@ -2323,6 +2565,34 @@ export function getMusculoskeletalSummary() {
       "squat", "sprint", "climb", "cartwheel", "handstand", "parkour_vault",
       "bidirectional_grip", "reverse_finger_grab", "toe_grip_balance"
     ],
+    perceptionSystem: {
+      totalVisionSensors: totalSensors,
+      cameras4K: perceptionSystem.cameraArray.totalCameras,
+      cameraResolution: perceptionSystem.cameraArray.resolution,
+      totalDataRateMpxPerSec: perceptionSystem.cameraArray.totalDataRateMpxPerSec,
+      lidarUnits: perceptionSystem.lidarArray.totalUnits,
+      sonarUnits: perceptionSystem.sonarArray.totalUnits,
+      infraredThermalUnits: perceptionSystem.infraredArray.totalUnits,
+      depthSensingMethods: perceptionSystem.depthSensing.methods.length,
+      skeletonTracking: {
+        humanBodyKeypoints: perceptionSystem.skeletonTracking.humanSkeleton.keypoints,
+        handKeypointsPerHand: perceptionSystem.skeletonTracking.handSkeleton.keypointsPerHand,
+        facialLandmarks: perceptionSystem.skeletonTracking.entityClassification.facialRecognition.landmarks,
+        entityCategories: perceptionSystem.skeletonTracking.entityClassification.categories.length,
+      },
+      egoScaleLearning: {
+        stages: perceptionSystem.egoScaleLearning.pipeline.length,
+        trainingSpeed: perceptionSystem.egoScaleLearning.trainingSpeed,
+      },
+      visualCortex: {
+        processingLayers: perceptionSystem.visualCortex.processingLayers.length,
+        brainConnections: perceptionSystem.visualCortex.brainIntegration.connections.length,
+        worldModelUpdateHz: perceptionSystem.visualCortex.worldModel.updateRateHz,
+        maxTrackedEntities: 200,
+        distanceRange: perceptionSystem.visualCortex.worldModel.distanceEstimation.range,
+      },
+      perceptionBusBandwidthGbps: perceptionSystem.perceptionBus.totalBandwidthGbps,
+    },
   };
 }
 
