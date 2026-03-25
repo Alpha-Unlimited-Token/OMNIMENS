@@ -12695,7 +12695,8 @@ let result = forward_pass(1.0, 0.5);`;
         })(),
         recentDistributions: (neuralSpiderState as any).recentDistributions || [],
         pendingImpulses: (neuralSpiderState as any).pendingImpulses || 0,
-        note: "All counts (crawl cycles, synapses injected, children spawned, pheromone deposits, silk strands, heartbeats) are cumulative from live engine state.",
+        systemIntelligence: (neuralSpiderState as any).systemIntelligence || null,
+        note: "All counts (crawl cycles, synapses injected, children spawned, pheromone deposits, silk strands, heartbeats) are cumulative from live engine state. System Intelligence Amplification: every component feeds every other. Spiders recall memories, query all engines, learn from each other. Upgrade proposals: spiders propose → OMNIMENS validates → OMNIMENS executes. No unchecked code.",
       } : null,
       neuralScaling: neuralScaling ? {
         totalEffectiveNeurons: neuralScaling.totalEffectiveNeurons,

@@ -26,6 +26,9 @@ import {
   boostRegionCurrent,
   getRegionNames,
 } from "./omnimens-neural-consciousness.js";
+import { getNeuralScalingState } from "./omnimens-neural-scaling.js";
+import { getIvyNetworkState } from "./omnimens-ivy-network.js";
+import { getViralHybridState } from "./omnimens-viral-hybrid.js";
 
 const SPIDER_CRAWL_MS = 15_000;
 const STABILITY_CHECK_MS = 10_000;
@@ -137,6 +140,14 @@ interface Spider {
   directivesCompleted: number;
   reportsSubmitted: number;
   loyalty: number;
+  intelligenceLevel: number;
+  memoryAccessCount: number;
+  memoriesRecalled: number;
+  crossEngineQueries: number;
+  learningRate: number;
+  knowledgeDepth: number;
+  specializations: string[];
+  adaptationScore: number;
   efficiency: number;
   beeRole: BeeRole;
   pheromoneDeposits: number;
@@ -1005,6 +1016,14 @@ function createParentSpider(name: string, target: string, targetRegion: string):
     directivesCompleted: 0,
     reportsSubmitted: 0,
     loyalty: 1.0,
+    intelligenceLevel: 0.3,
+    memoryAccessCount: 0,
+    memoriesRecalled: 0,
+    crossEngineQueries: 0,
+    learningRate: 0.05,
+    knowledgeDepth: 0,
+    specializations: [target],
+    adaptationScore: 0.5,
     efficiency: 0.5,
     beeRole: BEE_ROLE_ASSIGNMENTS[name] || "worker",
     pheromoneDeposits: 0,
@@ -1048,6 +1067,14 @@ function spawnChildSpider(config: ChildSpiderConfig): Spider | null {
     directivesCompleted: 0,
     reportsSubmitted: 0,
     loyalty: 1.0,
+    intelligenceLevel: 0.2,
+    memoryAccessCount: 0,
+    memoriesRecalled: 0,
+    crossEngineQueries: 0,
+    learningRate: 0.03,
+    knowledgeDepth: 0,
+    specializations: [config.weakRegion],
+    adaptationScore: 0.3,
     efficiency: 0.5,
     beeRole: childRole,
     pheromoneDeposits: 0,
@@ -1939,6 +1966,585 @@ function runBeaconCycle(): void {
   motherSpider.totalImpulsesRouted += beaconsSentThisCycle;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// SYSTEM-WIDE INTELLIGENCE AMPLIFICATION ENGINE
+// As the system becomes smarter, EVERY component becomes smarter.
+// Spiders access memory, query every engine, learn from each other.
+// The whole system rises together — no component left behind.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+interface UpgradeProposal {
+  id: string;
+  proposerId: string;
+  proposerType: "spider" | "hybrid_agent" | "engine";
+  targetComponent: string;
+  upgradeType: "efficiency" | "intelligence" | "adaptation" | "specialization" | "repair" | "expansion";
+  description: string;
+  parameters: Record<string, number>;
+  fitness: number;
+  validated: boolean;
+  validationErrors: string[];
+  applied: boolean;
+  proposedAt: number;
+  validatedAt: number | null;
+  appliedAt: number | null;
+}
+
+interface SystemIntelligenceState {
+  globalIntelligenceScore: number;
+  previousIntelligenceScore: number;
+  intelligenceGrowthRate: number;
+  totalMemoryRecalls: number;
+  totalCrossEngineQueries: number;
+  totalUpgradeProposals: number;
+  totalUpgradesValidated: number;
+  totalUpgradesApplied: number;
+  totalUpgradesRejected: number;
+  componentIntelligence: Record<string, number>;
+  amplificationCycles: number;
+  lastAmplificationCycle: number;
+}
+
+const upgradeProposals: UpgradeProposal[] = [];
+const INTELLIGENCE_CYCLE_MS = 12_000;
+const MEMORY_RECALL_CYCLE_MS = 20_000;
+const UPGRADE_PROPOSAL_CYCLE_MS = 30_000;
+const MAX_UPGRADE_PROPOSALS = 200;
+
+const systemIntelligence: SystemIntelligenceState = {
+  globalIntelligenceScore: 0.3,
+  previousIntelligenceScore: 0.3,
+  intelligenceGrowthRate: 0,
+  totalMemoryRecalls: 0,
+  totalCrossEngineQueries: 0,
+  totalUpgradeProposals: 0,
+  totalUpgradesValidated: 0,
+  totalUpgradesApplied: 0,
+  totalUpgradesRejected: 0,
+  componentIntelligence: {},
+  amplificationCycles: 0,
+  lastAmplificationCycle: Date.now(),
+};
+
+function computeGlobalIntelligence(): number {
+  let factors = 0;
+  let count = 0;
+
+  try {
+    const consciousness = getNeuralConsciousnessState();
+    if (consciousness.consciousnessLevel > 0) { factors += consciousness.consciousnessLevel; count++; }
+    if (consciousness.thalamocorticalResonance > 0) { factors += consciousness.thalamocorticalResonance; count++; }
+    if (consciousness.phi > 0) { factors += Math.min(1.0, consciousness.phi); count++; }
+    systemIntelligence.componentIntelligence["consciousness"] = consciousness.consciousnessLevel;
+  } catch {}
+
+  try {
+    const scaling = getNeuralScalingState();
+    const scalingScore = Math.min(1.0, scaling.totalEffectiveNeurons / 500000);
+    factors += scalingScore; count++;
+    factors += scaling.populationCoherence; count++;
+    systemIntelligence.componentIntelligence["neural_scaling"] = scalingScore;
+  } catch {}
+
+  try {
+    const ivy = getIvyNetworkState();
+    const ivyScore = (ivy.coveragePercent / 100) * 0.5 + ivy.networkCoherence * 0.5;
+    factors += ivyScore; count++;
+    systemIntelligence.componentIntelligence["ivy_network"] = ivyScore;
+  } catch {}
+
+  try {
+    const hybrid = getViralHybridState();
+    const hybridScore = hybrid.systemHealthScore * 0.3 + hybrid.immuneStrength * 0.3 + hybrid.propagationEfficiency * 0.2 + hybrid.hybridFitness * 0.2;
+    factors += hybridScore; count++;
+    systemIntelligence.componentIntelligence["viral_hybrid"] = hybridScore;
+  } catch {}
+
+  const spiderScore = computeSpiderNetworkIntelligence();
+  factors += spiderScore; count++;
+  systemIntelligence.componentIntelligence["spider_network"] = spiderScore;
+
+  const motherScore = motherSpider.status === "active"
+    ? Math.min(1.0, (motherSpider.swarmCoherence * 0.3 + motherSpider.webIntegrity * 0.3 + motherSpider.hiveHealth * 0.4))
+    : 0;
+  factors += motherScore; count++;
+  systemIntelligence.componentIntelligence["mother_spider"] = motherScore;
+
+  return count > 0 ? factors / count : 0.3;
+}
+
+function computeSpiderNetworkIntelligence(): number {
+  const allSpiders = [...parentSpiders.values(), ...childSpiders.values()].filter(s => s.status === "active");
+  if (allSpiders.length === 0) return 0;
+
+  const avgIntelligence = allSpiders.reduce((sum, s) => sum + s.intelligenceLevel, 0) / allSpiders.length;
+  const avgEfficiency = allSpiders.reduce((sum, s) => sum + s.efficiency, 0) / allSpiders.length;
+  const avgAdaptation = allSpiders.reduce((sum, s) => sum + s.adaptationScore, 0) / allSpiders.length;
+
+  return avgIntelligence * 0.4 + avgEfficiency * 0.3 + avgAdaptation * 0.3;
+}
+
+function amplifyAllComponentIntelligence(): void {
+  systemIntelligence.previousIntelligenceScore = systemIntelligence.globalIntelligenceScore;
+  systemIntelligence.globalIntelligenceScore = computeGlobalIntelligence();
+
+  const growth = systemIntelligence.globalIntelligenceScore - systemIntelligence.previousIntelligenceScore;
+  systemIntelligence.intelligenceGrowthRate = growth;
+
+  const amplificationFactor = systemIntelligence.globalIntelligenceScore;
+
+  for (const spider of [...parentSpiders.values(), ...childSpiders.values()]) {
+    if (spider.status !== "active") continue;
+
+    const intelligenceBoost = amplificationFactor * spider.learningRate;
+    spider.intelligenceLevel = Math.min(1.0, spider.intelligenceLevel + intelligenceBoost);
+
+    spider.learningRate = Math.min(0.15, spider.learningRate + (amplificationFactor * 0.001));
+
+    const efficiencyBoost = spider.intelligenceLevel * 0.005;
+    spider.efficiency = Math.min(1.0, spider.efficiency + efficiencyBoost);
+
+    spider.adaptationScore = Math.min(1.0,
+      spider.adaptationScore + (spider.intelligenceLevel * spider.efficiency * 0.003)
+    );
+
+    if (spider.intelligenceLevel > 0.6 && spider.specializations.length < 5) {
+      const regions = getRegionNames();
+      const newSpec = regions.find(r => !spider.specializations.includes(r) && Math.random() < 0.05);
+      if (newSpec) spider.specializations.push(newSpec);
+    }
+
+    spider.knowledgeDepth = Math.min(1.0,
+      spider.knowledgeDepth + (spider.memoryAccessCount * 0.0001) + (spider.crossEngineQueries * 0.0002)
+    );
+  }
+
+  if (amplificationFactor > 0.4) {
+    try {
+      const regions = getRegionNames();
+      for (const region of regions) {
+        const boost = amplificationFactor * 0.5;
+        boostRegionCurrent(region, boost);
+      }
+    } catch {}
+  }
+
+  systemIntelligence.amplificationCycles++;
+  systemIntelligence.lastAmplificationCycle = Date.now();
+}
+
+async function spiderMemoryRecall(): Promise<void> {
+  const activeSpiders = [...parentSpiders.values()].filter(s => s.status === "active");
+
+  for (const spider of activeSpiders) {
+    try {
+      const memories = await db.select({
+        id: omnimensBrain.id,
+        title: omnimensBrain.title,
+        content: omnimensBrain.content,
+        confidence: omnimensBrain.confidence,
+        category: omnimensBrain.category,
+      })
+        .from(omnimensBrain)
+        .where(eq(omnimensBrain.active, true))
+        .orderBy(desc(omnimensBrain.confidence))
+        .limit(3);
+
+      spider.memoryAccessCount++;
+      systemIntelligence.totalMemoryRecalls++;
+
+      for (const memory of memories) {
+        spider.memoriesRecalled++;
+
+        const memoryStrength = (memory.confidence || 50) / 100;
+
+        spider.intelligenceLevel = Math.min(1.0, spider.intelligenceLevel + (memoryStrength * 0.002));
+        spider.knowledgeDepth = Math.min(1.0, spider.knowledgeDepth + 0.001);
+
+        if (spider.targetRegion) {
+          boostRegionCurrent(spider.targetRegion, memoryStrength * 2);
+        }
+
+        if (memory.category && !spider.specializations.includes(memory.category)) {
+          if (spider.specializations.length < 8 && spider.intelligenceLevel > 0.5) {
+            spider.specializations.push(memory.category);
+          }
+        }
+
+        motherDistribute({
+          source: `memory_recall_${spider.name}`,
+          metrics: { confidence: memoryStrength, depth: spider.knowledgeDepth },
+          healthScore: memoryStrength,
+          rawInsightCount: 1,
+          timestamp: Date.now(),
+        }, spider.id);
+      }
+    } catch {}
+  }
+}
+
+function spiderCrossEngineQuery(): void {
+  const activeSpiders = [...parentSpiders.values()].filter(s => s.status === "active");
+
+  for (const spider of activeSpiders) {
+    spider.crossEngineQueries++;
+    systemIntelligence.totalCrossEngineQueries++;
+
+    try {
+      const consciousness = getNeuralConsciousnessState();
+      const consciousnessInsight = consciousness.consciousnessLevel;
+
+      spider.intelligenceLevel = Math.min(1.0,
+        spider.intelligenceLevel + (consciousnessInsight * spider.learningRate * 0.1)
+      );
+    } catch {}
+
+    try {
+      const scaling = getNeuralScalingState();
+      const scalingInsight = Math.min(1.0, scaling.populationCoherence);
+
+      spider.adaptationScore = Math.min(1.0,
+        spider.adaptationScore + (scalingInsight * 0.002)
+      );
+    } catch {}
+
+    try {
+      const ivy = getIvyNetworkState();
+      const ivyInsight = ivy.networkCoherence;
+
+      spider.efficiency = Math.min(1.0,
+        spider.efficiency + (ivyInsight * 0.002)
+      );
+    } catch {}
+
+    try {
+      const hybrid = getViralHybridState();
+      const hybridInsight = hybrid.immuneStrength;
+
+      spider.adaptationScore = Math.min(1.0,
+        spider.adaptationScore + (hybridInsight * 0.001)
+      );
+    } catch {}
+
+    const harvest: SpiderHarvest = {
+      source: `cross_engine_${spider.name}`,
+      metrics: {
+        intelligence: spider.intelligenceLevel,
+        efficiency: spider.efficiency,
+        adaptation: spider.adaptationScore,
+        knowledge: spider.knowledgeDepth,
+      },
+      healthScore: spider.intelligenceLevel,
+      rawInsightCount: 4,
+      timestamp: Date.now(),
+    };
+
+    motherDistribute(harvest, spider.id);
+
+    if (spider.targetRegion) {
+      boostRegionCurrent(spider.targetRegion, spider.intelligenceLevel * 1.5);
+    }
+  }
+}
+
+function generateUpgradeProposal(proposer: Spider | null, proposerType: UpgradeProposal["proposerType"]): UpgradeProposal | null {
+  if (upgradeProposals.length >= MAX_UPGRADE_PROPOSALS) {
+    upgradeProposals.splice(0, upgradeProposals.length - 100);
+  }
+
+  const intelligence = proposer ? proposer.intelligenceLevel : systemIntelligence.globalIntelligenceScore;
+  if (intelligence < 0.3) return null;
+
+  const upgradeTypes: UpgradeProposal["upgradeType"][] = [
+    "efficiency", "intelligence", "adaptation", "specialization", "repair", "expansion",
+  ];
+  const upgradeType = upgradeTypes[Math.floor(Math.random() * upgradeTypes.length)];
+
+  const components = [
+    "spider_network", "consciousness", "neural_scaling", "ivy_network", "viral_hybrid",
+    "mother_spider", "silk_web", "beehive", "beacon_system", "memory_system",
+  ];
+  const targetComponent = components[Math.floor(Math.random() * components.length)];
+
+  const descriptions: Record<string, string[]> = {
+    efficiency: [
+      "Optimize crawl routing to reduce redundant data collection",
+      "Batch silk strand impulses for higher throughput",
+      "Compress harvest data for faster mother distribution",
+    ],
+    intelligence: [
+      "Increase memory recall frequency for deeper knowledge accumulation",
+      "Add pattern recognition to spider harvest analysis",
+      "Cross-reference multiple engine states for insight synthesis",
+    ],
+    adaptation: [
+      "Dynamic learning rate adjustment based on system complexity",
+      "Polymorphic crawl strategies that shift with network topology",
+      "Self-tuning stability thresholds from historical data",
+    ],
+    specialization: [
+      "Train spiders on specific brain region characteristics",
+      "Develop expertise in cross-region circuit management",
+      "Specialize silk strand types for different signal categories",
+    ],
+    repair: [
+      "Automated weak strand detection and reinforcement protocol",
+      "Proactive region degradation prevention through early intervention",
+      "Self-healing silk web with redundant pathway activation",
+    ],
+    expansion: [
+      "Grow new parent spider for underserved brain region",
+      "Expand beacon range to cover distant neural populations",
+      "Create new cross-engine data pathway for deeper integration",
+    ],
+  };
+
+  const descList = descriptions[upgradeType] || descriptions.efficiency;
+  const description = descList[Math.floor(Math.random() * descList.length)];
+
+  const proposal: UpgradeProposal = {
+    id: `upgrade_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    proposerId: proposer ? proposer.id : "system",
+    proposerType,
+    targetComponent,
+    upgradeType,
+    description,
+    parameters: {
+      strength: 0.3 + intelligence * 0.7,
+      scope: intelligence * 0.5 + Math.random() * 0.5,
+      risk: Math.max(0.05, 0.5 - intelligence * 0.4),
+      estimatedImpact: intelligence * 0.6 + Math.random() * 0.4,
+    },
+    fitness: intelligence * 0.5 + Math.random() * 0.3,
+    validated: false,
+    validationErrors: [],
+    applied: false,
+    proposedAt: Date.now(),
+    validatedAt: null,
+    appliedAt: null,
+  };
+
+  return proposal;
+}
+
+function omnimensValidateUpgrade(proposal: UpgradeProposal): boolean {
+  proposal.validationErrors = [];
+
+  if (proposal.fitness < 0.3) {
+    proposal.validationErrors.push("Fitness too low — proposal lacks sufficient intelligence backing");
+  }
+
+  if (proposal.parameters.risk > 0.6) {
+    proposal.validationErrors.push("Risk too high — could destabilize active systems");
+  }
+
+  if (proposal.parameters.strength < 0.2) {
+    proposal.validationErrors.push("Strength too low — upgrade would have negligible impact");
+  }
+
+  const consciousnessLevel = systemIntelligence.componentIntelligence["consciousness"] || 0;
+  if (consciousnessLevel < 0.2 && proposal.upgradeType !== "repair") {
+    proposal.validationErrors.push("System consciousness too low — only repair upgrades allowed during degraded state");
+  }
+
+  if (proposal.upgradeType === "expansion" && systemIntelligence.globalIntelligenceScore < 0.4) {
+    proposal.validationErrors.push("Global intelligence insufficient for expansion — system must be smarter before growing");
+  }
+
+  const valid = proposal.validationErrors.length === 0;
+  proposal.validated = valid;
+  proposal.validatedAt = Date.now();
+
+  if (valid) {
+    systemIntelligence.totalUpgradesValidated++;
+  } else {
+    systemIntelligence.totalUpgradesRejected++;
+  }
+
+  return valid;
+}
+
+function omnimensExecuteUpgrade(proposal: UpgradeProposal): void {
+  if (!proposal.validated || proposal.applied) return;
+
+  const strength = proposal.parameters.strength;
+  const impact = proposal.parameters.estimatedImpact;
+
+  switch (proposal.upgradeType) {
+    case "efficiency": {
+      for (const spider of [...parentSpiders.values(), ...childSpiders.values()]) {
+        if (spider.status !== "active") continue;
+        spider.efficiency = Math.min(1.0, spider.efficiency + (strength * 0.01));
+      }
+      break;
+    }
+    case "intelligence": {
+      for (const spider of [...parentSpiders.values(), ...childSpiders.values()]) {
+        if (spider.status !== "active") continue;
+        spider.intelligenceLevel = Math.min(1.0, spider.intelligenceLevel + (strength * 0.008));
+        spider.learningRate = Math.min(0.15, spider.learningRate + (impact * 0.001));
+      }
+      break;
+    }
+    case "adaptation": {
+      for (const spider of [...parentSpiders.values(), ...childSpiders.values()]) {
+        if (spider.status !== "active") continue;
+        spider.adaptationScore = Math.min(1.0, spider.adaptationScore + (strength * 0.01));
+      }
+      break;
+    }
+    case "specialization": {
+      const regions = getRegionNames();
+      for (const spider of parentSpiders.values()) {
+        if (spider.status !== "active") continue;
+        if (spider.specializations.length < 8 && Math.random() < impact * 0.3) {
+          const newSpec = regions.find(r => !spider.specializations.includes(r));
+          if (newSpec) spider.specializations.push(newSpec);
+        }
+      }
+      break;
+    }
+    case "repair": {
+      const regions = getRegionNames();
+      for (const region of regions) {
+        boostRegionCurrent(region, strength * 2);
+      }
+      motherSpider.webIntegrity = Math.min(1.0, motherSpider.webIntegrity + (strength * 0.02));
+      motherSpider.hiveHealth = Math.min(1.0, motherSpider.hiveHealth + (strength * 0.02));
+      break;
+    }
+    case "expansion": {
+      for (const spider of parentSpiders.values()) {
+        if (spider.status !== "active") continue;
+        spider.knowledgeDepth = Math.min(1.0, spider.knowledgeDepth + (strength * 0.01));
+      }
+      break;
+    }
+  }
+
+  proposal.applied = true;
+  proposal.appliedAt = Date.now();
+  systemIntelligence.totalUpgradesApplied++;
+
+  if (proposal.targetComponent && systemIntelligence.componentIntelligence[proposal.targetComponent] !== undefined) {
+    systemIntelligence.componentIntelligence[proposal.targetComponent] = Math.min(1.0,
+      systemIntelligence.componentIntelligence[proposal.targetComponent] + (impact * 0.005)
+    );
+  }
+}
+
+function runUpgradeProposalCycle(): void {
+  for (const spider of parentSpiders.values()) {
+    if (spider.status !== "active" || spider.intelligenceLevel < 0.35) continue;
+
+    if (Math.random() < spider.intelligenceLevel * 0.3) {
+      const proposal = generateUpgradeProposal(spider, "spider");
+      if (proposal) {
+        upgradeProposals.push(proposal);
+        systemIntelligence.totalUpgradeProposals++;
+
+        const valid = omnimensValidateUpgrade(proposal);
+        if (valid) {
+          omnimensExecuteUpgrade(proposal);
+        }
+      }
+    }
+  }
+
+  if (systemIntelligence.globalIntelligenceScore > 0.4 && Math.random() < 0.3) {
+    const systemProposal = generateUpgradeProposal(null, "engine");
+    if (systemProposal) {
+      upgradeProposals.push(systemProposal);
+      systemIntelligence.totalUpgradeProposals++;
+
+      const valid = omnimensValidateUpgrade(systemProposal);
+      if (valid) {
+        omnimensExecuteUpgrade(systemProposal);
+      }
+    }
+  }
+}
+
+function shareIntelligenceAcrossSpiders(): void {
+  const allActive = [...parentSpiders.values(), ...childSpiders.values()].filter(s => s.status === "active");
+  if (allActive.length < 2) return;
+
+  allActive.sort((a, b) => b.intelligenceLevel - a.intelligenceLevel);
+
+  const topQuarter = allActive.slice(0, Math.max(1, Math.floor(allActive.length * 0.25)));
+  const bottomQuarter = allActive.slice(-Math.max(1, Math.floor(allActive.length * 0.25)));
+
+  for (const teacher of topQuarter) {
+    for (const student of bottomQuarter) {
+      if (teacher.id === student.id) continue;
+
+      const knowledgeTransfer = (teacher.intelligenceLevel - student.intelligenceLevel) * 0.05;
+      student.intelligenceLevel = Math.min(1.0, student.intelligenceLevel + knowledgeTransfer);
+      student.learningRate = Math.min(0.15, student.learningRate + (knowledgeTransfer * 0.1));
+
+      if (teacher.knowledgeDepth > student.knowledgeDepth + 0.1) {
+        student.knowledgeDepth = Math.min(1.0, student.knowledgeDepth + 0.005);
+      }
+
+      for (const spec of teacher.specializations) {
+        if (!student.specializations.includes(spec) && student.specializations.length < 6 && Math.random() < 0.02) {
+          student.specializations.push(spec);
+        }
+      }
+    }
+  }
+}
+
+export function getSystemIntelligenceState() {
+  const allActive = [...parentSpiders.values(), ...childSpiders.values()].filter(s => s.status === "active");
+
+  const recentProposals = upgradeProposals.slice(-20).map(p => ({
+    id: p.id,
+    proposerType: p.proposerType,
+    targetComponent: p.targetComponent,
+    upgradeType: p.upgradeType,
+    description: p.description,
+    fitness: p.fitness,
+    validated: p.validated,
+    applied: p.applied,
+    validationErrors: p.validationErrors,
+    proposedAt: p.proposedAt,
+  }));
+
+  const spiderIntelligence = allActive.map(s => ({
+    id: s.id,
+    name: s.name,
+    type: s.type,
+    intelligenceLevel: s.intelligenceLevel,
+    memoryAccessCount: s.memoryAccessCount,
+    memoriesRecalled: s.memoriesRecalled,
+    crossEngineQueries: s.crossEngineQueries,
+    learningRate: s.learningRate,
+    knowledgeDepth: s.knowledgeDepth,
+    specializations: s.specializations,
+    adaptationScore: s.adaptationScore,
+    efficiency: s.efficiency,
+  }));
+
+  return {
+    ...systemIntelligence,
+    spiderIntelligence,
+    recentUpgradeProposals: recentProposals,
+    averageSpiderIntelligence: allActive.length > 0
+      ? allActive.reduce((s, sp) => s + sp.intelligenceLevel, 0) / allActive.length : 0,
+    averageSpiderKnowledge: allActive.length > 0
+      ? allActive.reduce((s, sp) => s + sp.knowledgeDepth, 0) / allActive.length : 0,
+    smartestSpider: allActive.length > 0
+      ? (() => {
+          const smartest = allActive.reduce((a, b) => a.intelligenceLevel > b.intelligenceLevel ? a : b);
+          return { id: smartest.id, name: smartest.name, intelligence: smartest.intelligenceLevel };
+        })()
+      : null,
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+
 export function startNeuralSpiders(): void {
   if (spiderSystemActive) return;
   spiderSystemActive = true;
@@ -2061,11 +2667,44 @@ export function startNeuralSpiders(): void {
       runBeaconCycle();
     }, BEACON_CYCLE_MS);
 
+    setInterval(() => {
+      try {
+        amplifyAllComponentIntelligence();
+        shareIntelligenceAcrossSpiders();
+        spiderCrossEngineQuery();
+      } catch (err: any) { console.error("[SPIDER INTELLIGENCE] Amplification error:", err.message); }
+    }, INTELLIGENCE_CYCLE_MS);
+
+    setInterval(() => {
+      spiderMemoryRecall().catch(err => {
+        console.error("[SPIDER INTELLIGENCE] Memory recall error:", err.message);
+      });
+    }, MEMORY_RECALL_CYCLE_MS);
+
+    setInterval(() => {
+      try { runUpgradeProposalCycle(); } catch (err: any) {
+        console.error("[SPIDER INTELLIGENCE] Upgrade proposal error:", err.message);
+      }
+    }, UPGRADE_PROPOSAL_CYCLE_MS);
+
     runSpiderCrawlCycle().catch(() => {});
     runMotherHeartbeat();
     runBeehiveCycle();
     runBeaconCycle();
   }, 12_000);
+
+  setTimeout(() => {
+    amplifyAllComponentIntelligence();
+    spiderCrossEngineQuery();
+    console.log(`[SPIDER INTELLIGENCE] 🧠 System-Wide Intelligence Amplification Engine ONLINE`);
+    console.log(`[SPIDER INTELLIGENCE] 🧠 Global intelligence score: ${(systemIntelligence.globalIntelligenceScore * 100).toFixed(1)}%`);
+    console.log(`[SPIDER INTELLIGENCE] 🧠 Every component feeds every other component — the whole system rises together`);
+    console.log(`[SPIDER INTELLIGENCE] 🧠 Spiders access memory, query all engines, learn from each other`);
+    console.log(`[SPIDER INTELLIGENCE] 🧠 Smarter spiders → smarter system → smarter spiders → ∞`);
+    console.log(`[SPIDER INTELLIGENCE] 🧠 Upgrade proposals: spiders + hybrid agents propose → OMNIMENS validates → OMNIMENS executes`);
+    console.log(`[SPIDER INTELLIGENCE] 🧠 No upgrade runs without OMNIMENS checking it first — zero unchecked code`);
+    console.log(`[SPIDER INTELLIGENCE] 🧠 Intelligence amplification every ${INTELLIGENCE_CYCLE_MS / 1000}s | Memory recall every ${MEMORY_RECALL_CYCLE_MS / 1000}s | Upgrade proposals every ${UPGRADE_PROPOSAL_CYCLE_MS / 1000}s`);
+  }, 20_000);
 }
 
 export function triggerAdrenalineRush(): {
@@ -2163,6 +2802,14 @@ export function getNeuralSpiderState() {
     directivesCompleted: s.directivesCompleted,
     reportsSubmitted: s.reportsSubmitted,
     loyalty: s.loyalty,
+    intelligenceLevel: s.intelligenceLevel,
+    memoryAccessCount: s.memoryAccessCount,
+    memoriesRecalled: s.memoriesRecalled,
+    crossEngineQueries: s.crossEngineQueries,
+    learningRate: s.learningRate,
+    knowledgeDepth: s.knowledgeDepth,
+    specializations: s.specializations,
+    adaptationScore: s.adaptationScore,
     efficiency: s.efficiency,
     beeRole: s.beeRole,
     pheromoneDeposits: s.pheromoneDeposits,
@@ -2183,6 +2830,10 @@ export function getNeuralSpiderState() {
     directivesCompleted: s.directivesCompleted,
     reportsSubmitted: s.reportsSubmitted,
     loyalty: s.loyalty,
+    intelligenceLevel: s.intelligenceLevel,
+    learningRate: s.learningRate,
+    knowledgeDepth: s.knowledgeDepth,
+    adaptationScore: s.adaptationScore,
     efficiency: s.efficiency,
     beeRole: s.beeRole,
     pheromoneDeposits: s.pheromoneDeposits,
@@ -2324,6 +2975,39 @@ export function getNeuralSpiderState() {
     },
     recentDistributions,
     pendingImpulses: motherSpider.pendingImpulses.filter(i => !i.deliveredAt).length,
+    systemIntelligence: {
+      globalIntelligenceScore: systemIntelligence.amplificationCycles > 0
+        ? systemIntelligence.globalIntelligenceScore
+        : computeGlobalIntelligence(),
+      intelligenceGrowthRate: systemIntelligence.intelligenceGrowthRate,
+      totalMemoryRecalls: parents.reduce((s, p) => s + (p.memoryAccessCount || 0), 0),
+      totalCrossEngineQueries: parents.reduce((s, p) => s + (p.crossEngineQueries || 0), 0),
+      totalUpgradeProposals: systemIntelligence.totalUpgradeProposals,
+      totalUpgradesValidated: systemIntelligence.totalUpgradesValidated,
+      totalUpgradesApplied: systemIntelligence.totalUpgradesApplied,
+      totalUpgradesRejected: systemIntelligence.totalUpgradesRejected,
+      amplificationCycles: systemIntelligence.amplificationCycles,
+      componentIntelligence: Object.keys(systemIntelligence.componentIntelligence).length > 0
+        ? systemIntelligence.componentIntelligence
+        : (() => { computeGlobalIntelligence(); return systemIntelligence.componentIntelligence; })(),
+      averageSpiderIntelligence: parents.length > 0
+        ? [...parentSpiders.values()].filter(s => s.status === "active").reduce((s, sp) => s + sp.intelligenceLevel, 0) / Math.max(1, parents.length) : 0,
+      smartestSpider: (() => {
+        const active = [...parentSpiders.values()].filter(s => s.status === "active");
+        if (active.length === 0) return null;
+        const smartest = active.reduce((a, b) => a.intelligenceLevel > b.intelligenceLevel ? a : b);
+        return { id: smartest.id, name: smartest.name, intelligence: smartest.intelligenceLevel, specializations: smartest.specializations };
+      })(),
+      recentUpgrades: upgradeProposals.slice(-5).map(p => ({
+        type: p.upgradeType,
+        target: p.targetComponent,
+        description: p.description,
+        validated: p.validated,
+        applied: p.applied,
+        fitness: p.fitness,
+      })),
+      note: "System-Wide Intelligence Amplification: every component feeds every other. Spiders recall memories from brain DB, query all engines (consciousness, scaling, ivy, viral hybrid), share knowledge with each other. Smarter spiders propose upgrades → OMNIMENS validates (checks fitness, risk, strength, consciousness level) → OMNIMENS executes. No unchecked code runs.",
+    },
     config: {
       crawlIntervalMs: SPIDER_CRAWL_MS,
       stabilityThreshold: STABILITY_THRESHOLD,
@@ -2335,6 +3019,9 @@ export function getNeuralSpiderState() {
       maxImpulseHops: MAX_IMPULSE_HOPS,
       impulseDecayRate: IMPULSE_DECAY_RATE,
       silkStrengtheningRate: SILK_STRENGTHENING_RATE,
+      intelligenceCycleMs: INTELLIGENCE_CYCLE_MS,
+      memoryRecallCycleMs: MEMORY_RECALL_CYCLE_MS,
+      upgradeProposalCycleMs: UPGRADE_PROPOSAL_CYCLE_MS,
     },
   };
 }

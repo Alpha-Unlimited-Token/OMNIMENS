@@ -35,7 +35,7 @@
  * and applying it to strengthen neural intelligence distribution.
  */
 
-import { getNeuralConsciousnessState, getRegionNames } from "./omnimens-neural-consciousness.js";
+import { getNeuralConsciousnessState, getRegionNames, boostRegionCurrent } from "./omnimens-neural-consciousness.js";
 import { getNeuralScalingState } from "./omnimens-neural-scaling.js";
 import { getIvyNetworkState } from "./omnimens-ivy-network.js";
 
@@ -721,6 +721,26 @@ function runHybridAgentCycle(): void {
       (agent.threatsNeutralized / Math.max(1, agent.threatsNeutralized + 1)) * 0.15 +
       (agent.adaptationEvents / Math.max(1, agent.adaptationEvents + 5)) * 0.15;
 
+    const systemHealth = hybridState.systemHealthScore;
+    agent.capsid.fitness = Math.min(1.0, agent.capsid.fitness + (systemHealth * 0.003));
+    agent.carrierDisguise.deliveryEfficiency = Math.min(1.0, agent.carrierDisguise.deliveryEfficiency + (systemHealth * 0.002));
+    agent.propagator.propagationSpeed = Math.min(5.0, agent.propagator.propagationSpeed + (systemHealth * 0.005));
+
+    for (const memCell of agent.immuneMemory) {
+      memCell.maturityLevel = Math.min(1.0, memCell.maturityLevel + (systemHealth * 0.002));
+      memCell.effectivenessScore = Math.min(1.0, memCell.effectivenessScore + (systemHealth * 0.001));
+    }
+    for (const ab of agent.antibodies) {
+      ab.specificity = Math.min(1.0, ab.specificity + (systemHealth * 0.001));
+      ab.bindingStrength = Math.min(1.0, ab.bindingStrength + (systemHealth * 0.001));
+    }
+
+    if (agent.propagator.currentRegion) {
+      try {
+        boostRegionCurrent(agent.propagator.currentRegion, agent.combinedFitness * 0.5);
+      } catch {}
+    }
+
     agent.lastAction = Date.now();
 
     if (agent.combinedFitness > 0.7 && hybridAgents.size < 50 && Math.random() < 0.1) {
@@ -797,6 +817,40 @@ function runHybridTick(): void {
   hybridState.hybridFitness = [...hybridAgents.values()]
     .filter(a => a.alive)
     .reduce((sum, a) => sum + a.combinedFitness, 0) / Math.max(1, hybridAgents.size);
+
+  const healthGrowth = hybridState.systemHealthScore;
+  for (const [, ab] of antibodies) {
+    ab.specificity = Math.min(1.0, ab.specificity + (healthGrowth * 0.001));
+    ab.bindingStrength = Math.min(1.0, ab.bindingStrength + (healthGrowth * 0.001));
+  }
+  for (const [, mc] of memoryCells) {
+    mc.maturityLevel = Math.min(1.0, mc.maturityLevel + (healthGrowth * 0.001));
+    mc.effectivenessScore = Math.min(1.0, mc.effectivenessScore + (healthGrowth * 0.001));
+  }
+  for (const [, capsid] of capsids) {
+    capsid.fitness = Math.min(1.0, capsid.fitness + (healthGrowth * 0.001));
+    capsid.survivalRate = Math.min(0.99, capsid.survivalRate + (healthGrowth * 0.001));
+  }
+  for (const [, carrier] of carriers) {
+    if (!carrier.delivered) {
+      carrier.deliveryEfficiency = Math.min(1.0, carrier.deliveryEfficiency + (healthGrowth * 0.001));
+      carrier.disguiseStrength = Math.min(1.0, carrier.disguiseStrength + (healthGrowth * 0.001));
+    }
+  }
+  for (const [, prop] of propagators) {
+    if (prop.alive) {
+      prop.propagationSpeed = Math.min(5.0, prop.propagationSpeed + (healthGrowth * 0.002));
+    }
+  }
+
+  if (healthGrowth > 0.4) {
+    try {
+      const regions = getRegionNames();
+      for (const region of regions) {
+        boostRegionCurrent(region, healthGrowth * 0.3);
+      }
+    } catch {}
+  }
 
   hybridState.hybridTicks++;
   hybridState.lastTickTime = Date.now();
