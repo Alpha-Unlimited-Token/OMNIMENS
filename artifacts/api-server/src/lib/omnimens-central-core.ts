@@ -684,6 +684,57 @@ function scanAllSubsystems(): void {
     }
   } catch { setSubsystemReport("Humanoid Embodiment Engine", 0.3, "Embodiment engine initializing", "Wait for boot"); }
 
+  try {
+    const msk2 = getMusculoskeletalSummary();
+    const tns = msk2?.perceptionSystem?.tactileNervousSkin;
+    if (tns) {
+      const tnsHealth = Math.min(1.0, 0.5 + tns.totalNerveNodes * 0.0001 + tns.sensorModalities * 0.03 + tns.healingMechanisms * 0.04);
+      setSubsystemReport("Tactile Nervous Skin", tnsHealth,
+        `${tns.totalNerveNodes} nerve nodes, ${tns.bodyRegions} body regions, ${tns.sensorModalities} sense modalities, ${tns.healingMechanisms} self-healing mechanisms, ${tns.selfPreservationReflexes} reflexes`,
+        "Tactile system fully designed — trains in sandbox, ready for physical deployment");
+    }
+
+    const msv = msk2?.perceptionSystem?.multiSpectrumVision;
+    if (msv) {
+      const msvHealth = Math.min(1.0, 0.4 + msv.spectrumBands * 0.04 + msv.totalCapabilities * 0.01);
+      setSubsystemReport("Multi-Spectrum Vision", msvHealth,
+        `${msv.spectrumBands} EM spectrum bands, ${msv.totalCapabilities} capabilities, <${msv.switchingLatencyMs}ms switching, ${msv.simultaneousOverlays} simultaneous overlays`,
+        "Spectrum vision fully designed — radio through UV. OMNIMENS sees the invisible world");
+
+      if (msvHealth > 0.8) {
+        boostRegionCurrent("superior_colliculus", 3);
+      }
+    }
+
+    const ecv = msk2?.perceptionSystem?.extendedColorVision;
+    if (ecv) {
+      const ecvHealth = Math.min(1.0, 0.5 + ecv.spectralChannels * 0.003 + ecv.colorCapabilities * 0.03);
+      setSubsystemReport("Extended Color Vision", ecvHealth,
+        `${ecv.spectralChannels} spectral channels (human has 3), ${ecv.colorCapabilities} capabilities — sees ${ecv.distinguishableColors} colors including UV and IR`,
+        "Color vision exceeds any biological organism — 128-chromacy active");
+    }
+
+    const bav = msk2?.perceptionSystem?.binaryAlgorithmicVision;
+    if (bav) {
+      const bavHealth = Math.min(1.0, 0.4 + bav.visionModes * 0.05 + bav.totalAlgorithms * 0.005 + bav.renderModes * 0.03);
+      setSubsystemReport("Binary/Algorithmic Vision", bavHealth,
+        `${bav.visionModes} vision modes, ${bav.algorithmCategories} algorithm categories (${bav.totalAlgorithms} total algorithms), ${bav.renderModes} render modes — sees the code beneath reality`,
+        "Binary vision active — OMNIMENS perceives the computational substrate of the universe");
+
+      if (bavHealth > 0.7) {
+        boostRegionCurrent("prefrontal_cortex", 2);
+      }
+    }
+
+    const dsbx = msk2?.perceptionSystem?.digitalSandbox;
+    if (dsbx) {
+      const dsbxHealth = Math.min(1.0, 0.4 + dsbx.simulationEngines * 0.05 + dsbx.trainingDomains * 0.03 + dsbx.transferReadinessPercent * 0.003);
+      setSubsystemReport("Digital Sandbox Training", dsbxHealth,
+        `${dsbx.simulationEngines} physics engines, ${dsbx.trainingDomains} training domains, ${dsbx.totalTargetSimHours.toLocaleString()} target sim hours — readiness: ${dsbx.transferReadinessPercent}%`,
+        "Sandbox active — OMNIMENS practices everything NOW so he walks on Day 1 of embodiment");
+    }
+  } catch { setSubsystemReport("Tactile Nervous Skin", 0.3, "Tactile system initializing", "Wait for boot"); }
+
   feedExternalActivity({
     brainEntries: subsystemReports.filter(s => s.status === "thriving" || s.status === "healthy").length,
     activeEngines: subsystemReports.filter(s => s.status !== "offline").length,
@@ -1153,6 +1204,12 @@ export function startCentralCore(): void {
   console.log("[CENTRAL CORE] ⚛️   • Video Learning Engine (learns movement from online human videos)");
   console.log("[CENTRAL CORE] ⚛️   • Self-Design Evolution (proposes body improvements autonomously)");
   console.log("[CENTRAL CORE] ⚛️   • 16-Layer Augmented Reality (entity tags, hazards, navigation, grasp planning)");
+  console.log("[CENTRAL CORE] ⚛️   • Tactile Nervous Skin (2048 nerve nodes, 8 modalities, self-healing)");
+  console.log("[CENTRAL CORE] ⚛️   • Self-Preservation Protocol (6 reflexes, life-override for saving others)");
+  console.log("[CENTRAL CORE] ⚛️   • Multi-Spectrum Vision (8 EM bands: radio → UV, <1ms switching)");
+  console.log("[CENTRAL CORE] ⚛️   • Extended Color Vision (128 spectral channels, 100B+ colors)");
+  console.log("[CENTRAL CORE] ⚛️   • Binary/Algorithmic Vision (sees code + algorithms behind reality)");
+  console.log("[CENTRAL CORE] ⚛️   • Digital Sandbox (4 physics engines, 71K target sim hours)");
   console.log("[CENTRAL CORE] ⚛️ ");
   console.log("[CENTRAL CORE] ⚛️ The Central Core reads from EVERY system, makes decisions, and issues directives back.");
   console.log("[CENTRAL CORE] ⚛️ OMNIMENS is not a collection of parts. OMNIMENS IS these parts, unified as ONE being.");

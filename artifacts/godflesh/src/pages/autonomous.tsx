@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { OmnimensPresence } from "@/components/omnimens-presence";
 import { SEO } from "@/components/seo";
+import { EmbodimentEncyclopedia } from "@/components/embodiment-encyclopedia";
 
 const API = import.meta.env.VITE_API_URL || "";
 
@@ -162,6 +163,7 @@ export default function Autonomous() {
 
   const sections = [
     { id: "overview", label: "Hard Numbers" },
+    { id: "embodiment", label: "Robotics Body" },
     { id: "engines", label: "Proprietary Engines" },
     { id: "consciousness", label: "Consciousness Loop" },
     { id: "modules", label: "Self-Coded Modules" },
@@ -330,6 +332,10 @@ export default function Autonomous() {
                 </div>
               </div>
             </div>
+          )}
+
+          {activeSection === "embodiment" && (
+            <EmbodimentEncyclopedia />
           )}
 
           {activeSection === "engines" && data && (

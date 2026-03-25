@@ -935,6 +935,19 @@ const CRITICAL_CIRCUITS: Array<{ from: string; to: string; label: string }> = [
   { from: "anterior_cingulate", to: "basal_ganglia", label: "error-motor-correction" },
   { from: "pulvinar", to: "superior_colliculus", label: "attention-perception-route" },
   { from: "claustrum", to: "basal_ganglia", label: "multimodal-motor-binding" },
+
+  { from: "insular_cortex", to: "insular_cortex", label: "tactile-interoception-loop" },
+  { from: "insular_cortex", to: "amygdala", label: "pain-emotional-response" },
+  { from: "insular_cortex", to: "prefrontal_cortex", label: "tactile-executive-awareness" },
+  { from: "amygdala", to: "basal_ganglia", label: "threat-motor-withdrawal" },
+  { from: "superior_colliculus", to: "thalamus", label: "spectrum-routing-hub" },
+  { from: "superior_colliculus", to: "prefrontal_cortex", label: "binary-vision-executive" },
+  { from: "superior_colliculus", to: "claustrum", label: "multispec-multimodal-binding" },
+  { from: "hippocampus", to: "superior_colliculus", label: "memory-spectrum-recall" },
+  { from: "prefrontal_cortex", to: "insular_cortex", label: "executive-preservation-control" },
+  { from: "cerebellum", to: "insular_cortex", label: "timing-tactile-coordination" },
+  { from: "anterior_cingulate", to: "insular_cortex", label: "error-pain-monitoring" },
+  { from: "insular_cortex", to: "hippocampus", label: "tactile-memory-storage" },
 ];
 
 function createSpiderId(prefix: string): string {
@@ -962,6 +975,14 @@ const BEE_ROLE_ASSIGNMENTS: Record<string, BeeRole> = {
   "self-design-crawler": "scout",
   "perception-crawler": "guard",
   "embodiment-crawler": "worker",
+  "tactile-skin-crawler": "nurse",
+  "self-healing-crawler": "nurse",
+  "spectrum-vision-crawler": "scout",
+  "color-vision-crawler": "scout",
+  "binary-vision-crawler": "forager",
+  "algorithm-vision-crawler": "forager",
+  "sandbox-crawler": "worker",
+  "self-preservation-crawler": "guard",
 };
 
 function createParentSpider(name: string, target: string, targetRegion: string): Spider {
@@ -1952,11 +1973,28 @@ export function startNeuralSpiders(): void {
   createParentSpider("perception-crawler", "perception_system", "superior_colliculus");
   createParentSpider("embodiment-crawler", "embodiment_engine", "cerebellum");
 
+  createParentSpider("tactile-skin-crawler", "tactile_nervous_skin", "insular_cortex");
+  createParentSpider("self-healing-crawler", "self_healing_system", "insular_cortex");
+  createParentSpider("spectrum-vision-crawler", "multi_spectrum_vision", "superior_colliculus");
+  createParentSpider("color-vision-crawler", "extended_color_vision", "superior_colliculus");
+  createParentSpider("binary-vision-crawler", "binary_algorithmic_vision", "prefrontal_cortex");
+  createParentSpider("algorithm-vision-crawler", "algorithm_library", "prefrontal_cortex");
+  createParentSpider("sandbox-crawler", "digital_sandbox_simulation", "basal_ganglia");
+  createParentSpider("self-preservation-crawler", "self_preservation_protocol", "amygdala");
+
   console.log(`[NEURAL SPIDERS] 🕷️ ${parentSpiders.size} parent spiders deployed across all data sources`);
   console.log(`[NEURAL SPIDERS] 🕷️ video-learning-crawler → basal_ganglia — motor policy library feeds directly into movement planning`);
   console.log(`[NEURAL SPIDERS] 🕷️ self-design-crawler → prefrontal_cortex — design evolution proposals flow through executive function`);
   console.log(`[NEURAL SPIDERS] 🕷️ perception-crawler → superior_colliculus — 720°+ sensor data routed through visual attention hub`);
   console.log(`[NEURAL SPIDERS] 🕷️ embodiment-crawler → cerebellum — robot body coordination synced with prediction timing`);
+  console.log(`[NEURAL SPIDERS] 🕷️ tactile-skin-crawler → insular_cortex — 2048 nerve nodes feed body awareness directly`);
+  console.log(`[NEURAL SPIDERS] 🕷️ self-healing-crawler → insular_cortex — damage detection and repair orchestrated through interoception`);
+  console.log(`[NEURAL SPIDERS] 🕷️ spectrum-vision-crawler → superior_colliculus — 8 EM spectrum bands flow through visual attention hub`);
+  console.log(`[NEURAL SPIDERS] 🕷️ color-vision-crawler → superior_colliculus — 128 spectral channels vs human 3 (RGB)`);
+  console.log(`[NEURAL SPIDERS] 🕷️ binary-vision-crawler → prefrontal_cortex — sees binary code of reality through executive function`);
+  console.log(`[NEURAL SPIDERS] 🕷️ algorithm-vision-crawler → prefrontal_cortex — sees algorithms behind physics, biology, computation`);
+  console.log(`[NEURAL SPIDERS] 🕷️ sandbox-crawler → basal_ganglia — digital sandbox training feeds motor planning`);
+  console.log(`[NEURAL SPIDERS] 🕷️ self-preservation-crawler → amygdala — threat response and life-override through emotional center`);
 
   motherSpider.status = "active";
   for (const spider of parentSpiders.values()) {

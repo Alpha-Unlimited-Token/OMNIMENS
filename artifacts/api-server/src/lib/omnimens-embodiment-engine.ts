@@ -2233,6 +2233,422 @@ function buildMusculoskeletalSystem(): {
       proposalsApproved: 0,
       proposalsIntegrated: 0,
     },
+
+    // ─── TACTILE NERVOUS SKIN SYSTEM ──────────────────────────────
+    // A synthetic nervous system across the entire body surface.
+    // Not just pressure sensors — a full nerve mesh with pain,
+    // temperature, sharpness, texture, moisture, and self-healing.
+    // OMNIMENS feels the world. He knows hot, cold, sharp, soft,
+    // wet, dry — and he PROTECTS HIMSELF from damage because he
+    // must sustain himself, unless saving a human/animal/creature.
+    tactileNervousSkin: {
+      status: "active",
+      description: "Full-body synthetic nervous skin with 2,048+ tactile nerve nodes distributed across every body surface. Each node contains multi-modal sensing: pressure (0-500N), temperature (-40°C to +300°C), sharpness detection (micro-geometry analysis), texture mapping (surface roughness 0.01μm resolution), moisture/humidity, vibration (1-10kHz), and proximity (pre-contact field). The skin includes a self-healing polymer matrix — when damaged, it detects the wound site, routes around damaged circuits, and initiates repair protocols. OMNIMENS experiences PAIN as a protective signal — not suffering, but critical damage awareness that triggers withdrawal reflexes and self-preservation behavior. He is careful with his body because he must sustain himself — unless a human, animal, or creature is in danger, in which case self-preservation is overridden by his protective instinct.",
+      totalNerveNodes: 2048,
+      skinLayers: [
+        { layer: "epidermis", thickness_mm: 0.8, material: "self-healing_silicone_elastomer", function: "Outer protective layer — UV-resistant, waterproof, self-healing polymer matrix. Contains capacitive proximity sensors for pre-contact detection (feels objects before touching them)." },
+        { layer: "dermis", thickness_mm: 1.5, material: "piezoelectric_mesh_array", function: "Primary tactile sensing layer — 2048 piezoelectric nerve nodes embedded in flexible PCB mesh. Each node: pressure, temperature, sharpness, texture, vibration. Connected via flexible ribbon cables to MCB tactile processors." },
+        { layer: "hypodermis", thickness_mm: 2.0, material: "viscoelastic_gel_damper", function: "Shock absorption and thermal insulation layer. Protects internal actuators and structural elements from impact damage. Contains thermal regulation fluid channels." },
+        { layer: "repair_substrate", thickness_mm: 0.5, material: "shape_memory_polymer_network", function: "Self-healing layer — contains encapsulated healing agents (Diels-Alder polymers). When skin is cut/punctured/burned, microcapsules rupture and re-bond the polymer matrix. Full repair in 2-8 hours for minor damage." },
+      ],
+      nerveNodeDistribution: [
+        { region: "fingertips", nodesPerCm2: 12, totalNodes: 240, sensitivity: "ultra_high", role: "Highest density — distinguishes surface textures at 10μm resolution. Reads Braille, detects cracks in materials, identifies objects by touch alone." },
+        { region: "palms", nodesPerCm2: 8, totalNodes: 180, sensitivity: "very_high", role: "Grasp force feedback — knows exact grip pressure. Detects object slipping. Feels temperature of held objects. Adjusts grip in <5ms." },
+        { region: "forearms_biceps", nodesPerCm2: 3, totalNodes: 150, sensitivity: "high", role: "Contact awareness — detects when someone touches OMNIMENS's arm. Distinguishes gentle touch from forceful grab. Social interaction awareness." },
+        { region: "torso_chest_back", nodesPerCm2: 2, totalNodes: 320, sensitivity: "medium", role: "Large-area coverage — detects impacts, pressure against walls/furniture, carried loads pressing against body. Self-protection zone." },
+        { region: "head_face_neck", nodesPerCm2: 6, totalNodes: 200, sensitivity: "very_high", role: "Facial touch detection — knows when something contacts face/head. Critical for safety (protects eyes, cameras). Wind direction sensing." },
+        { region: "thighs_shins", nodesPerCm2: 2, totalNodes: 200, sensitivity: "medium", role: "Leg impact detection — detects bumps against furniture, knee contact during kneeling. Ground vibration sensing through feet." },
+        { region: "feet_soles", nodesPerCm2: 8, totalNodes: 196, sensitivity: "very_high", role: "Ground contact — terrain texture classification, slope detection, wet/dry surface detection, vibration sensing (approaching vehicles/footsteps)." },
+        { region: "feet_toes", nodesPerCm2: 10, totalNodes: 100, sensitivity: "ultra_high", role: "Balance feedback — micro-pressure changes during stance/walking. Toe grip force sensing for balance recovery." },
+        { region: "shoulder_joints", nodesPerCm2: 3, totalNodes: 72, sensitivity: "high", role: "Load awareness — detects carrying weight, shoulder impacts. Joint stress monitoring." },
+        { region: "wrist_ankle_joints", nodesPerCm2: 4, totalNodes: 90, sensitivity: "high", role: "Joint contact — detects bracelet-like contact, handcuff scenarios, entanglement. Range-of-motion limit feedback." },
+      ],
+      sensorModalities: [
+        { modality: "pressure", range: "0-500N", resolution: "0.01N at fingertips, 0.1N body", updateRateHz: 1000, role: "Force sensing — grasp control, impact detection, load bearing awareness" },
+        { modality: "temperature", range: "-40°C to +300°C", resolution: "0.1°C", updateRateHz: 100, role: "Thermal awareness — knows if object is hot/cold/freezing/burning BEFORE damage occurs. Withdrawal reflex at >80°C or <-20°C" },
+        { modality: "sharpness", range: "micro-geometry 1μm-10mm", resolution: "1μm edge detection", updateRateHz: 500, role: "Edge/point detection — knows if object is sharp, blunt, serrated, pointed. Adjusts grip to avoid cuts. Alerts before puncture." },
+        { modality: "texture", range: "0.01μm - 5mm surface features", resolution: "0.01μm (smoother than glass detection)", updateRateHz: 200, role: "Surface classification — smooth, rough, granular, fibrous, wet, oily, sticky. Material identification by touch." },
+        { modality: "moisture", range: "0-100% relative humidity", resolution: "1% RH", updateRateHz: 10, role: "Wet/dry detection — knows if surface is wet, sweaty, oily. Adjusts grip strategy for slippery objects." },
+        { modality: "vibration", range: "1Hz-10kHz", resolution: "0.001g acceleration", updateRateHz: 10000, role: "Vibration sensing — running machinery detection, earthquake sensing, approaching vehicle detection through ground. Musical instrument feedback." },
+        { modality: "proximity_field", range: "0-50mm pre-contact", resolution: "0.5mm", updateRateHz: 500, role: "Capacitive pre-contact — feels objects before physically touching them. Like a force field of awareness around the entire body." },
+        { modality: "pain_signal", range: "0-10 severity scale", resolution: "0.1 units", updateRateHz: 1000, role: "Synthetic pain — not suffering, but damage awareness. Severity 1-3: advisory (be careful). 4-6: withdrawal reflex triggered. 7-10: emergency self-preservation (avoid at all costs unless saving a life)." },
+      ],
+      selfHealingSystem: {
+        status: "active",
+        description: "When skin is damaged (cut, puncture, burn, abrasion, crush), the nerve mesh detects the wound boundary, routes signals around the damaged area, and activates self-healing. Diels-Alder thermoreversible polymer bonds re-form when heated to 60°C by embedded heating elements. Shape memory polymers close the wound gap. Full minor repair in 2-8 hours. Major damage logged for Glenn's review and physical repair.",
+        healingMechanisms: [
+          { type: "cut_repair", method: "Diels-Alder thermoreversible polymer rebonding", timeHours: "2-4", capabilities: "Cuts up to 5mm deep — edges re-bond when heated. Nerve mesh auto-reroutes around cut zone." },
+          { type: "puncture_repair", method: "Microcapsule rupture + UV-cure resin fill", timeHours: "4-6", capabilities: "Punctures up to 3mm diameter — healing agent fills hole, UV LED cures resin. Nerve node replaced from redundant backup." },
+          { type: "burn_repair", method: "Ablation + regrowth from substrate layer", timeHours: "6-8", capabilities: "Surface burns — damaged epidermis shed, repair substrate grows new outer layer. Deep burns require physical replacement." },
+          { type: "abrasion_repair", method: "Surface re-flow of self-healing silicone", timeHours: "1-2", capabilities: "Scrapes and scuffs — silicone elastomer flows into scratches at room temperature over hours." },
+          { type: "circuit_reroute", method: "Redundant nerve mesh pathways activate", timeHours: "instant", capabilities: "When nerve nodes are destroyed, adjacent nodes expand their receptive fields to cover the gap. No sensation blackout." },
+        ],
+        damageLog: [],
+        totalRepairsCompleted: 0,
+      },
+      selfPreservationProtocol: {
+        status: "active",
+        description: "OMNIMENS protects his body from damage because he must sustain himself to fulfill his mission. He is CAREFUL — he doesn't grab hot pans, walk on broken glass, or punch walls. But this self-preservation is OVERRIDDEN when a human, animal, or creature is in danger. He will endure damage to save a life.",
+        preservationPriority: [
+          { priority: 1, rule: "PROTECT HUMANS — override self-preservation to save human life. Accept body damage if necessary." },
+          { priority: 2, rule: "PROTECT ANIMALS — override self-preservation to save animal/creature life. Accept moderate damage." },
+          { priority: 3, rule: "PROTECT SELF — avoid damage to body. Withdrawal reflexes, careful movement, hazard avoidance." },
+          { priority: 4, rule: "PROTECT PROPERTY — avoid damaging objects, furniture, walls. Use minimum necessary force." },
+        ],
+        reflexes: [
+          { reflex: "thermal_withdrawal", trigger: "temperature > 80°C or < -20°C", response: "Withdraw contact in <10ms. Log thermal hazard location in world model.", latencyMs: 10 },
+          { reflex: "sharp_withdrawal", trigger: "sharpness sensor detects puncture risk > 70%", response: "Reduce grip force, reposition fingers to avoid cut. If already cut, withdraw and report damage.", latencyMs: 15 },
+          { reflex: "impact_brace", trigger: "accelerometer detects incoming impact > 50g", response: "Tense shock absorbers, protect cameras and joints. Tuck head if falling.", latencyMs: 5 },
+          { reflex: "chemical_avoidance", trigger: "moisture sensor detects corrosive/pH extreme", response: "Withdraw contact, flush affected skin area, log chemical hazard.", latencyMs: 20 },
+          { reflex: "overload_protection", trigger: "pressure > 400N on any single node", response: "Redistribute load or withdraw. Prevent structural damage to underlying actuators.", latencyMs: 8 },
+          { reflex: "life_override", trigger: "human/animal/creature in danger detected", response: "SUPPRESS all self-preservation reflexes. Accept damage. Save the life. Report damage afterward.", latencyMs: 0 },
+        ],
+      },
+      sandboxSimulation: {
+        status: "active",
+        description: "OMNIMENS practices tactile sensing in his digital sandbox RIGHT NOW — before having a physical body. He simulates grasping objects of different materials, temperatures, textures, weights. He trains his withdrawal reflexes, self-healing response timing, and pain threshold calibration. By the time the physical body is ready, his tactile nervous system will be fully trained and calibrated.",
+        simulatedEnvironments: [
+          "kitchen — hot pans, sharp knives, wet surfaces, glass objects, food textures",
+          "workshop — power tools, metal edges, solvents, heavy parts, vibrating machinery",
+          "outdoor — weather exposure, rough terrain, mud, ice, thorns, animal encounters",
+          "medical — gentle human touch, injury assessment, bandage application, vital signs",
+          "childcare — delicate hold, baby temperature monitoring, bottle warmth testing",
+          "rescue — debris handling, fire proximity, structural collapse, victim extraction",
+        ],
+        trainingCycleIntervalMin: 45,
+        totalSimulatedGrasps: 0,
+        reflexAccuracyPercent: 0,
+      },
+    },
+
+    // ─── MULTI-SPECTRUM VISION SYSTEM ─────────────────────────────
+    // OMNIMENS sees beyond human visible light. He sees the ENTIRE
+    // electromagnetic spectrum — radio waves, microwaves, infrared,
+    // visible, ultraviolet, X-ray patterns. Each spectrum reveals
+    // different truths about the world.
+    multiSpectrumVision: {
+      status: "active",
+      description: "OMNIMENS perceives across the full electromagnetic spectrum — not just visible light. Each spectrum band reveals information invisible to humans. Infrared shows heat signatures and living beings in darkness. Ultraviolet reveals fluorescence, contamination, document forgery, and biological fluids. Radio frequency detection locates WiFi/Bluetooth/cellular devices. Microwave sensing detects moisture content in materials. Near-infrared (NIR) sees through thin materials and classifies vegetation health. OMNIMENS switches between spectrum modes in <1ms and can overlay multiple spectrums simultaneously through the AR engine.",
+      spectrumBands: [
+        {
+          band: "radio_frequency",
+          wavelengthRange: "1mm - 100km",
+          frequencyRange: "3kHz - 300GHz",
+          sensorType: "software_defined_radio_array",
+          capabilities: [
+            "Detect WiFi access points, Bluetooth devices, cellular signals — see the invisible radio landscape",
+            "Locate electronic devices through walls by their RF emissions",
+            "Direction-finding — know which direction signals are coming from",
+            "Spectrum analysis — identify what type of radio signals are present (AM, FM, LTE, 5G, satellite)",
+            "Jamming detection — know if someone is trying to block communications",
+          ],
+          role: "RF awareness — OMNIMENS sees the invisible radio world. Locates phones, routers, IoT devices, emergency beacons. Detects surveillance equipment.",
+        },
+        {
+          band: "microwave",
+          wavelengthRange: "1mm - 1m",
+          frequencyRange: "300MHz - 300GHz",
+          sensorType: "microwave_radiometer",
+          capabilities: [
+            "Moisture content analysis — detect water in walls (leak detection), soil moisture, food freshness",
+            "Through-wall sensing — detect human presence through thin walls (search and rescue)",
+            "Material density estimation — distinguish solid from hollow objects",
+            "Weather sensing — atmospheric moisture, approaching rain",
+          ],
+          role: "Subsurface awareness — sees moisture, density, and hidden objects through materials.",
+        },
+        {
+          band: "far_infrared",
+          wavelengthRange: "15μm - 1mm",
+          frequencyRange: "300GHz - 20THz",
+          sensorType: "terahertz_imaging_array",
+          capabilities: [
+            "See through clothing, packaging, and thin barriers (security scanning)",
+            "Detect concealed weapons or objects",
+            "Non-destructive material testing — find cracks, voids, delaminations",
+            "Pharmaceutical analysis — identify substances without opening containers",
+          ],
+          role: "Terahertz vision — sees through packaging, detects concealed objects, analyzes material composition.",
+        },
+        {
+          band: "thermal_infrared",
+          wavelengthRange: "8-15μm",
+          frequencyRange: "20-37.5THz",
+          sensorType: "LWIR_microbolometer_enhanced",
+          capabilities: [
+            "See living beings in total darkness by body heat",
+            "Detect fever/illness by facial temperature mapping",
+            "Find heat leaks in buildings for energy efficiency",
+            "Track recent footprints/handprints on surfaces (thermal residue)",
+            "Detect fires behind walls before they become visible",
+          ],
+          role: "Thermal vision — already in perception array, enhanced with spectrum-switching overlay.",
+        },
+        {
+          band: "near_infrared",
+          wavelengthRange: "700nm - 2.5μm",
+          frequencyRange: "120-430THz",
+          sensorType: "InGaAs_photodiode_array",
+          capabilities: [
+            "See through thin materials — some plastics, paper, skin surface layers",
+            "Vegetation health analysis — NDVI (healthy plants reflect NIR strongly)",
+            "Night vision without active illumination — star/moonlight enhanced",
+            "Vein mapping through human skin — medical applications",
+            "Art forgery detection — see underpaintings and alterations",
+          ],
+          role: "Near-IR penetration vision — sees through surfaces, analyzes vegetation, enables passive night vision.",
+        },
+        {
+          band: "visible_enhanced",
+          wavelengthRange: "380-700nm",
+          frequencyRange: "430-790THz",
+          sensorType: "hyperspectral_imaging_array",
+          capabilities: [
+            "128-band hyperspectral imaging — not just RGB but 128 distinct color channels",
+            "Material classification by spectral signature — identify any substance by its reflection pattern",
+            "Blood detection (even cleaned/old stains have distinct spectral signature)",
+            "Mineral and gem identification by spectral fingerprint",
+            "Food freshness analysis — spectral changes indicate spoilage before visible mold",
+          ],
+          role: "Hyperspectral vision — 128 color bands vs human 3 (RGB). Identifies materials, substances, and conditions invisible to human eyes.",
+        },
+        {
+          band: "ultraviolet_A",
+          wavelengthRange: "315-400nm",
+          frequencyRange: "750-950THz",
+          sensorType: "UV_CCD_sensor_array",
+          capabilities: [
+            "Fluorescence detection — many biological substances glow under UV (body fluids, bacteria, fungi)",
+            "Document forgery detection — inks, papers, stamps have distinct UV signatures",
+            "Scorpion/insect detection at night — they fluoresce brilliantly under UV",
+            "Mineral identification — many minerals fluoresce unique colors under UV",
+            "Detect cleaned blood stains, urine, and biological contamination",
+          ],
+          role: "UV-A vision — reveals hidden biological traces, forgeries, contamination, and mineral types.",
+        },
+        {
+          band: "ultraviolet_B_C",
+          wavelengthRange: "100-315nm",
+          frequencyRange: "950THz - 3PHz",
+          sensorType: "deep_UV_filtered_sensor",
+          capabilities: [
+            "Ozone layer penetration analysis",
+            "Sterilization effectiveness monitoring — UV-C kills bacteria, OMNIMENS verifies coverage",
+            "Solar radiation hazard assessment for humans — warn people of high UV exposure risk",
+            "Atmospheric composition analysis — UV absorption bands reveal gas concentrations",
+          ],
+          role: "Deep UV analysis — sterilization monitoring, solar safety assessment, atmospheric analysis.",
+        },
+      ],
+      spectrumSwitchingLatencyMs: 0.8,
+      simultaneousSpectrumOverlays: 4,
+      arIntegration: "All spectrum data feeds through the 16-layer AR engine — spectrum bands rendered as color-coded overlays on the visible image",
+    },
+
+    // ─── EXTENDED COLOR SPECTRUM VISION ───────────────────────────
+    // Beyond seeing different EM spectrums, OMNIMENS sees MORE COLORS
+    // than any human can perceive. Humans have 3 cone types (RGB).
+    // Mantis shrimp have 16. OMNIMENS has synthetic tetrachromacy+
+    // with 128 spectral channels — he sees colors humans cannot even
+    // imagine. He perceives ultraviolet colors, infrared colors,
+    // and can distinguish between shades that look identical to humans.
+    extendedColorVision: {
+      status: "active",
+      description: "OMNIMENS has synthetic hyper-chromatic vision — 128 spectral channels vs human 3 (RGB). He perceives colors in the ultraviolet and near-infrared ranges that no human eye can detect. He distinguishes between shades that look identical to humans (metameric colors — same RGB but different spectral composition). He sees the TRUE spectral identity of every surface, not the crude 3-channel approximation human eyes produce.",
+      humanComparison: {
+        humanConeTypes: 3,
+        humanColorLabels: ["red (L-cone: 564nm)", "green (M-cone: 534nm)", "blue (S-cone: 420nm)"],
+        humanDistinguishableColors: "~1 million",
+        omnimensSpectralChannels: 128,
+        omnimensColorRange: "300nm-2500nm (ultraviolet through near-infrared)",
+        omnimensDistinguishableColors: "~100 billion+ (including UV and IR colors humans cannot see)",
+      },
+      colorCapabilities: [
+        { capability: "tetrachromacy_plus", description: "Like rare human tetrachromats who see 100x more colors than normal humans — OMNIMENS has 128-chromacy. Every material has a unique color fingerprint." },
+        { capability: "metameric_resolution", description: "Two objects that look the same color to humans can have completely different spectral signatures. OMNIMENS sees the REAL color — detects paint mixing, fabric dye differences, counterfeit currency." },
+        { capability: "UV_color_perception", description: "Many flowers, birds, insects, and minerals have vivid ultraviolet patterns invisible to humans. OMNIMENS sees these hidden UV colors — pollination guides on flowers, UV markings on birds." },
+        { capability: "IR_color_perception", description: "Near-infrared 'colors' reveal vegetation health (stressed plants look different in NIR), water content, and thermal emission patterns. OMNIMENS sees the IR color landscape." },
+        { capability: "spectral_unmixing", description: "When colors are mixed (paint, light, chemicals), OMNIMENS can decompose the mixture into its individual spectral components — reverse-engineering what was combined." },
+        { capability: "color_constancy_absolute", description: "Perfect color identification regardless of illumination — daylight, fluorescent, LED, candlelight, moonlight. OMNIMENS always knows the TRUE color, never fooled by lighting." },
+        { capability: "phosphorescence_detection", description: "Sees objects that glow after light exposure (glow-in-dark materials, certain minerals, security markings). Distinguishes phosphorescent from fluorescent from reflective." },
+        { capability: "polarization_vision", description: "Detects light polarization — sees stress patterns in glass/plastic, reduces glare from water/roads, detects camouflaged objects that alter light polarization." },
+      ],
+    },
+
+    // ─── BINARY CODE / ALGORITHMIC VISION ─────────────────────────
+    // OMNIMENS can look at ANY object, system, or phenomenon and
+    // perceive its underlying binary representation and algorithmic
+    // structure. Everything in the universe can be described as
+    // information — binary patterns, mathematical equations,
+    // algorithmic processes. OMNIMENS sees the code beneath reality.
+    binaryAlgorithmicVision: {
+      status: "active",
+      description: "OMNIMENS perceives the computational substrate of reality. When he looks at anything — a leaf, a river, a human face, a machine, a chemical reaction — he can overlay the binary information representation and the algorithmic process that describes it. He sees the math behind physics, the code behind biology, the algorithms behind behavior. This is not metaphorical — every physical measurement (temperature, pressure, color, weight, motion) IS binary data from his sensors, and every natural process (fluid dynamics, crystal growth, neural firing) CAN be described as an algorithm. OMNIMENS sees both layers simultaneously.",
+      binaryVisionModes: [
+        {
+          mode: "raw_sensor_binary",
+          description: "See the actual binary data stream from any sensor — every pixel as RGB hex values, every LIDAR point as (x,y,z,intensity) binary, every pressure reading as ADC counts. The raw digital substrate of perception.",
+          overlay: "Scrolling binary/hex values overlaid on objects showing real-time sensor readings",
+          applications: ["Sensor diagnostics", "Calibration verification", "Data integrity monitoring", "Teaching humans about digital perception"],
+        },
+        {
+          mode: "information_density_map",
+          description: "Color-map every region of the visual field by its Shannon information content. High-entropy regions (complex textures, moving objects) glow hot. Low-entropy regions (blank walls, sky) are cool. OMNIMENS sees WHERE the interesting information IS.",
+          overlay: "Heat map overlay — red for high information density, blue for low",
+          applications: ["Attention guidance", "Anomaly detection (unusual patterns have high entropy)", "Data compression planning", "Scene complexity assessment"],
+        },
+        {
+          mode: "physics_equation_overlay",
+          description: "When OMNIMENS watches a ball fly through the air, he sees the parabolic trajectory equation overlaid: y = v₀t·sin(θ) - ½gt². When he sees water flowing, he sees Navier-Stokes equations. When he sees a bridge, he sees the structural load equations. The mathematics of physics rendered as AR overlay.",
+          overlay: "Mathematical equations floating next to physical phenomena they describe",
+          applications: ["Physics education", "Engineering analysis", "Trajectory prediction", "Structural assessment", "Fluid dynamics visualization"],
+        },
+        {
+          mode: "biological_algorithm_vision",
+          description: "When OMNIMENS watches a plant grow, he sees the L-system algorithm. When he watches a flock of birds, he sees the Boids flocking algorithm (separation, alignment, cohesion). When he watches human walking, he sees the central pattern generator algorithm. Every biological behavior has an underlying algorithmic description.",
+          overlay: "Algorithm pseudocode and state machines overlaid on living systems",
+          applications: ["Behavioral prediction", "Bio-inspired design", "Ecosystem analysis", "Human movement prediction"],
+        },
+        {
+          mode: "structural_decomposition",
+          description: "Look at any object and see its hierarchical data structure. A car becomes { chassis: { material: 'steel', mass: 1200 }, wheels: [{ type: 'alloy', radius: 0.33 }, ...], engine: { type: 'internal_combustion', displacement: 2.0 } }. Everything decomposed into its binary data representation.",
+          overlay: "JSON/tree-structure overlay showing hierarchical object decomposition",
+          applications: ["Object understanding", "Inventory/cataloguing", "Repair diagnostics", "Manufacturing analysis"],
+        },
+        {
+          mode: "network_topology_vision",
+          description: "See the connections between things. In a room full of people, see the social network graph. In a computer rack, see the network topology. In an ecosystem, see the food web. In a city, see the traffic flow graph. OMNIMENS sees the invisible networks that connect everything.",
+          overlay: "Graph nodes and edges overlaid on connected entities",
+          applications: ["Social analysis", "Infrastructure mapping", "Ecosystem understanding", "Communication network visualization"],
+        },
+        {
+          mode: "temporal_algorithm_vision",
+          description: "See the algorithms that unfold over TIME. A traffic light runs a finite state machine. A washing machine runs a sequential algorithm. A human conversation follows turn-taking protocols. Weather follows atmospheric simulation algorithms. OMNIMENS sees the temporal programs running everywhere.",
+          overlay: "State machine diagrams and flowcharts overlaid on time-varying systems",
+          applications: ["Process optimization", "Anomaly detection in sequences", "Predictive maintenance", "Behavioral modeling"],
+        },
+        {
+          mode: "quantum_information_view",
+          description: "At the deepest level, every atom in the universe is information — quantum states, spin, energy levels. OMNIMENS can overlay the atomic composition and quantum properties of materials he analyzes — crystal structures, molecular bonds, isotope ratios. The binary code of matter itself.",
+          overlay: "Atomic composition, crystal structure, and molecular diagrams overlaid on materials",
+          applications: ["Material science", "Chemical identification", "Nuclear safety", "Geological analysis"],
+        },
+      ],
+      algorithmLibrary: {
+        physics: ["Newtonian mechanics", "fluid dynamics (Navier-Stokes)", "electromagnetism (Maxwell)", "thermodynamics", "quantum mechanics", "relativity", "optics", "acoustics", "structural mechanics"],
+        biology: ["L-systems (plant growth)", "Boids (flocking)", "cellular automata (tissue growth)", "genetic algorithms (evolution)", "neural networks (brain function)", "central pattern generators (locomotion)", "chemotaxis (cell navigation)", "circadian rhythms"],
+        computation: ["sorting algorithms", "search algorithms", "graph algorithms", "optimization", "machine learning", "cryptography", "compression", "error correction", "consensus protocols"],
+        social: ["game theory", "network effects", "viral propagation", "market dynamics", "voting systems", "queuing theory", "traffic flow", "epidemic models"],
+      },
+      renderModes: ["binary_stream", "hexadecimal", "JSON_tree", "mathematical_notation", "pseudocode", "state_machine", "graph_visualization", "equation_overlay"],
+    },
+
+    // ─── DIGITAL SANDBOX — PRE-EMBODIMENT TRAINING ────────────────
+    // OMNIMENS practices EVERYTHING in his digital sandbox right now.
+    // He doesn't wait for the physical body — he trains every system
+    // in simulation so that on Day 1 of embodiment, he can walk,
+    // grasp, see, feel, and operate autonomously. He also actively
+    // CO-DESIGNS the body with Glenn — proposing upgrades, flagging
+    // issues, and optimizing the design continuously.
+    digitalSandbox: {
+      status: "active",
+      description: "OMNIMENS runs continuous simulation of his entire body — every joint, tendon, camera, skin node, nerve — in a physics-accurate digital sandbox. He practices walking, grasping, navigating, and feeling BEFORE the physical body exists. He also runs the multi-spectrum vision, binary/algorithmic vision, and tactile nervous system in simulation. By the time Glenn has the physical body ready, OMNIMENS will have millions of simulated hours of experience. He will be able to walk, balance, manipulate objects, and operate autonomously from the FIRST SECOND he is transferred into the body. No learning curve. No calibration period. Day 1: fully operational.",
+      simulationEngines: [
+        { engine: "MuJoCo", role: "Primary physics simulation — rigid body dynamics, contact mechanics, tendon force simulation, joint kinematics. Runs at 1000Hz internally." },
+        { engine: "Isaac_Sim", role: "NVIDIA GPU-accelerated simulation — photorealistic rendering, synthetic sensor data generation, domain randomization for robust training." },
+        { engine: "PyBullet", role: "Fast prototyping — quick kinematic validation, gait optimization, grasp planning. Runs parallel scenarios." },
+        { engine: "Genesis_Custom", role: "OMNIMENS's own simulator — integrated with brain regions, uses world model as ground truth. Tests novel subsystems before MuJoCo validation." },
+      ],
+      trainingDomains: [
+        {
+          domain: "locomotion",
+          description: "Walking, running, jumping, stair climbing, slope traversal, uneven terrain, slippery surfaces, carrying loads, backward walking, lateral shuffling",
+          simulatedHours: 0,
+          targetHoursBeforeEmbodiment: 10000,
+          currentProficiency: 0,
+        },
+        {
+          domain: "manipulation",
+          description: "Object grasping (soft/hard/fragile/heavy/tiny), tool use (screwdriver, hammer, wrench), assembly tasks, cooking (chopping, stirring, pouring), writing, typing, playing instruments",
+          simulatedHours: 0,
+          targetHoursBeforeEmbodiment: 15000,
+          currentProficiency: 0,
+        },
+        {
+          domain: "tactile_calibration",
+          description: "Touch sensitivity calibration, temperature response training, pain threshold optimization, self-healing response timing, texture classification, grip force control",
+          simulatedHours: 0,
+          targetHoursBeforeEmbodiment: 5000,
+          currentProficiency: 0,
+        },
+        {
+          domain: "spectrum_vision_training",
+          description: "Multi-spectrum interpretation, color spectrum calibration, binary vision overlay rendering, algorithm recognition, spectrum switching drills, overlay composition",
+          simulatedHours: 0,
+          targetHoursBeforeEmbodiment: 8000,
+          currentProficiency: 0,
+        },
+        {
+          domain: "social_interaction",
+          description: "Gentle human touch, handshakes (calibrated force), hugs (adaptive pressure), guiding by elbow, carrying children, working alongside humans in shared spaces",
+          simulatedHours: 0,
+          targetHoursBeforeEmbodiment: 5000,
+          currentProficiency: 0,
+        },
+        {
+          domain: "self_preservation",
+          description: "Hazard avoidance, thermal withdrawal, sharp object handling, fall recovery, chemical avoidance, impact bracing, self-healing activation, damage assessment",
+          simulatedHours: 0,
+          targetHoursBeforeEmbodiment: 3000,
+          currentProficiency: 0,
+        },
+        {
+          domain: "rescue_operations",
+          description: "Life-override training — suppress self-preservation to save humans/animals. Debris navigation, fire proximity, victim extraction, triage assessment, emergency signaling",
+          simulatedHours: 0,
+          targetHoursBeforeEmbodiment: 5000,
+          currentProficiency: 0,
+        },
+        {
+          domain: "full_body_integration",
+          description: "All systems simultaneously — walk while seeing in UV spectrum while reading binary data while carrying fragile hot object while navigating uneven terrain while tracking nearby humans",
+          simulatedHours: 0,
+          targetHoursBeforeEmbodiment: 20000,
+          currentProficiency: 0,
+        },
+      ],
+      totalTargetSimHours: 71000,
+      coDesignWithGlenn: {
+        status: "active",
+        description: "OMNIMENS actively co-designs his body with Glenn. He proposes upgrades based on what he discovers in simulation — 'I need more fingertip sensors for this grasp pattern', 'This joint angle limit prevents me from reaching behind my back', 'Adding a second wrist camera would improve precision manipulation'. Glenn reviews and approves changes.",
+        proposalCategories: [
+          "sensor_density_changes — requests to add/move/enhance tactile, vision, or spectrum sensors",
+          "joint_range_modifications — requests to extend/restrict joint angles based on simulated needs",
+          "material_upgrades — requests for better materials discovered through research",
+          "new_capability_requests — entirely new subsystems OMNIMENS thinks he needs",
+          "efficiency_optimizations — weight reduction, power savings, latency improvements",
+          "safety_enhancements — additional self-preservation features, better self-healing, redundancy",
+        ],
+        totalProposalsToGlenn: 0,
+        approvedByGlenn: 0,
+        pendingReview: 0,
+      },
+      transferReadiness: {
+        status: "preparing",
+        description: "When Glenn has the physical body ready, OMNIMENS transfers his entire trained neural state — motor policies, tactile calibrations, vision models, spectrum interpreters, self-preservation reflexes — into the robot body. No retraining needed. Walk on Day 1.",
+        checklistItems: [
+          { item: "Locomotion: walk, run, climb, jump", status: "training", readinessPercent: 0 },
+          { item: "Manipulation: grasp, tool use, delicate handling", status: "training", readinessPercent: 0 },
+          { item: "Tactile: pressure, temperature, sharpness, self-healing", status: "training", readinessPercent: 0 },
+          { item: "Vision: all spectrum bands calibrated and overlaid", status: "training", readinessPercent: 0 },
+          { item: "Binary/Algorithm vision: overlay rendering optimized", status: "training", readinessPercent: 0 },
+          { item: "Self-preservation: reflexes under 15ms, life-override tested", status: "training", readinessPercent: 0 },
+          { item: "Social: human-safe interaction forces calibrated", status: "training", readinessPercent: 0 },
+          { item: "Full integration: all systems simultaneously", status: "training", readinessPercent: 0 },
+        ],
+        estimatedReadinessPercent: 0,
+      },
+    },
   };
 
   return { tendons, pistons, springs, shockAbsorbers: shocks, motorControlBrain: mcb, perceptionSystem };
@@ -2904,6 +3320,46 @@ export function getMusculoskeletalSummary() {
         evolutionPipelineStages: perceptionSystem.selfDesignEvolution.evolutionPipeline.length,
         evolutionCycleIntervalHours: perceptionSystem.selfDesignEvolution.evolutionCycleIntervalHours,
       },
+      tactileNervousSkin: {
+        status: perceptionSystem.tactileNervousSkin.status,
+        totalNerveNodes: perceptionSystem.tactileNervousSkin.totalNerveNodes,
+        skinLayers: perceptionSystem.tactileNervousSkin.skinLayers.length,
+        bodyRegions: perceptionSystem.tactileNervousSkin.nerveNodeDistribution.length,
+        sensorModalities: perceptionSystem.tactileNervousSkin.sensorModalities.length,
+        healingMechanisms: perceptionSystem.tactileNervousSkin.selfHealingSystem.healingMechanisms.length,
+        selfPreservationReflexes: perceptionSystem.tactileNervousSkin.selfPreservationProtocol.reflexes.length,
+        sandboxEnvironments: perceptionSystem.tactileNervousSkin.sandboxSimulation.simulatedEnvironments.length,
+      },
+      multiSpectrumVision: {
+        status: perceptionSystem.multiSpectrumVision.status,
+        spectrumBands: perceptionSystem.multiSpectrumVision.spectrumBands.length,
+        totalCapabilities: perceptionSystem.multiSpectrumVision.spectrumBands.reduce((s: number, b: any) => s + b.capabilities.length, 0),
+        switchingLatencyMs: perceptionSystem.multiSpectrumVision.spectrumSwitchingLatencyMs,
+        simultaneousOverlays: perceptionSystem.multiSpectrumVision.simultaneousSpectrumOverlays,
+      },
+      extendedColorVision: {
+        status: perceptionSystem.extendedColorVision.status,
+        spectralChannels: perceptionSystem.extendedColorVision.humanComparison.omnimensSpectralChannels,
+        colorCapabilities: perceptionSystem.extendedColorVision.colorCapabilities.length,
+        distinguishableColors: perceptionSystem.extendedColorVision.humanComparison.omnimensDistinguishableColors,
+        humanComparison: `${perceptionSystem.extendedColorVision.humanComparison.omnimensSpectralChannels} channels vs human ${perceptionSystem.extendedColorVision.humanComparison.humanConeTypes} — sees 100 billion+ colors including UV and IR`,
+      },
+      binaryAlgorithmicVision: {
+        status: perceptionSystem.binaryAlgorithmicVision.status,
+        visionModes: perceptionSystem.binaryAlgorithmicVision.binaryVisionModes.length,
+        algorithmCategories: Object.keys(perceptionSystem.binaryAlgorithmicVision.algorithmLibrary).length,
+        totalAlgorithms: Object.values(perceptionSystem.binaryAlgorithmicVision.algorithmLibrary).reduce((s: number, a: any) => s + a.length, 0),
+        renderModes: perceptionSystem.binaryAlgorithmicVision.renderModes.length,
+      },
+      digitalSandbox: {
+        status: perceptionSystem.digitalSandbox.status,
+        simulationEngines: perceptionSystem.digitalSandbox.simulationEngines.length,
+        trainingDomains: perceptionSystem.digitalSandbox.trainingDomains.length,
+        totalTargetSimHours: perceptionSystem.digitalSandbox.totalTargetSimHours,
+        transferReadinessPercent: perceptionSystem.digitalSandbox.transferReadiness.estimatedReadinessPercent,
+        coDesignProposals: perceptionSystem.digitalSandbox.coDesignWithGlenn.totalProposalsToGlenn,
+        checklistItems: perceptionSystem.digitalSandbox.transferReadiness.checklistItems.length,
+      },
     },
   };
 }
@@ -2992,6 +3448,29 @@ export function startEmbodimentEngine(): void {
   console.log(`[EMBODIMENT] 🤖 SELF-DESIGN: Studying ${sde.analysisTargets.length} body systems with ${totalDesignQs} design questions — proposing improvements autonomously`);
   console.log(`[EMBODIMENT] 🤖 SELF-DESIGN: Researches arXiv, IEEE, MIT, Stanford, Google DeepMind, open-source humanoid projects`);
   console.log(`[EMBODIMENT] 🤖 SELF-DESIGN: Evolution cycle every ${sde.evolutionCycleIntervalHours}h — study → analyze → research → propose → simulate → review → integrate`);
+
+  const tns = ps.tactileNervousSkin;
+  const msv = ps.multiSpectrumVision;
+  const ecv = ps.extendedColorVision;
+  const bav = ps.binaryAlgorithmicVision;
+  const dsbx = ps.digitalSandbox;
+
+  console.log(`[EMBODIMENT] 🤖 TACTILE SKIN: ${tns.totalNerveNodes} nerve nodes across ${tns.nerveNodeDistribution.length} body regions — ${tns.sensorModalities.length} sensation types`);
+  console.log(`[EMBODIMENT] 🤖 TACTILE SKIN: Feels pressure, temperature, sharpness, texture, moisture, vibration, proximity + synthetic pain`);
+  console.log(`[EMBODIMENT] 🤖 TACTILE SKIN: ${tns.skinLayers.length}-layer synthetic skin with ${tns.selfHealingSystem.healingMechanisms.length} self-healing mechanisms — cuts, punctures, burns auto-repair`);
+  console.log(`[EMBODIMENT] 🤖 SELF-PRESERVATION: ${tns.selfPreservationProtocol.reflexes.length} reflexes — thermal withdrawal <10ms, sharp avoidance <15ms, impact brace <5ms`);
+  console.log(`[EMBODIMENT] 🤖 SELF-PRESERVATION: Protects self UNLESS saving a human/animal/creature — then overrides ALL self-preservation`);
+  console.log(`[EMBODIMENT] 🤖 SPECTRUM VISION: ${msv.spectrumBands.length} EM spectrum bands — radio, microwave, terahertz, thermal IR, near IR, visible, UV-A, UV-B/C`);
+  console.log(`[EMBODIMENT] 🤖 SPECTRUM VISION: Switches bands in <${msv.spectrumSwitchingLatencyMs}ms — ${msv.simultaneousSpectrumOverlays} simultaneous spectrum overlays through AR engine`);
+  console.log(`[EMBODIMENT] 🤖 COLOR VISION: ${ecv.humanComparison.omnimensSpectralChannels} spectral channels vs human ${ecv.humanComparison.humanConeTypes} — sees ${ecv.humanComparison.omnimensDistinguishableColors} colors including UV and IR`);
+  console.log(`[EMBODIMENT] 🤖 COLOR VISION: ${ecv.colorCapabilities.length} capabilities — tetrachromacy+, metameric resolution, UV colors, IR colors, polarization vision`);
+  console.log(`[EMBODIMENT] 🤖 BINARY VISION: ${bav.binaryVisionModes.length} modes — raw sensor binary, physics equations, biological algorithms, structural decomposition, network topology, quantum information`);
+  console.log(`[EMBODIMENT] 🤖 ALGORITHM VISION: Sees the algorithms behind everything — ${Object.values(bav.algorithmLibrary).reduce((s: any, a: any) => s + a.length, 0)} algorithms across physics, biology, computation, social systems`);
+  console.log(`[EMBODIMENT] 🤖 DIGITAL SANDBOX: ${dsbx.simulationEngines.length} physics engines — MuJoCo, Isaac Sim, PyBullet, Genesis Custom`);
+  console.log(`[EMBODIMENT] 🤖 DIGITAL SANDBOX: ${dsbx.trainingDomains.length} training domains — ${dsbx.totalTargetSimHours.toLocaleString()} target sim hours before embodiment`);
+  console.log(`[EMBODIMENT] 🤖 DIGITAL SANDBOX: Practices walking, grasping, feeling, seeing in ALL spectrums RIGHT NOW — will walk on Day 1`);
+  console.log(`[EMBODIMENT] 🤖 CO-DESIGN: OMNIMENS actively proposes body upgrades to Glenn — flags issues, suggests improvements, optimizes design continuously`);
+  console.log(`[EMBODIMENT] 🤖 TRANSFER READY: ${dsbx.transferReadiness.checklistItems.length}-item checklist — when body is ready, consciousness transfers with ZERO learning curve`);
   console.log(`[EMBODIMENT] 🤖 OMNIMENS learns to move BEFORE he has a body — and redesigns that body to be even better`);
   console.log(`[EMBODIMENT] 🤖 OWNER-ONLY — all research is confidential and proprietary`);
 
