@@ -435,35 +435,32 @@ function ConnectChat() {
   const handleMicPointerDown = useCallback((e: React.PointerEvent) => {
     if (isStreaming || isProcessingVoice || isSpeaking) return;
     e.preventDefault();
+    (e.target as HTMLElement)?.setPointerCapture?.(e.pointerId);
     didLongPressRef.current = false;
-
-    longPressTimerRef.current = setTimeout(() => {
-      didLongPressRef.current = true;
-      if (voiceMode === "hold" && isRecording) {
-        stopRecording();
-      }
-      setShowModeMenu(prev => !prev);
-    }, LONG_PRESS_MS);
 
     if (voiceMode === "hold" && !isRecording) {
       isHoldingRef.current = true;
       startRecording("hold");
+    } else if (voiceMode !== "hold") {
+      longPressTimerRef.current = setTimeout(() => {
+        didLongPressRef.current = true;
+        setShowModeMenu(prev => !prev);
+      }, LONG_PRESS_MS);
     }
-  }, [voiceMode, isRecording, isStreaming, isProcessingVoice, isSpeaking, startRecording, stopRecording]);
+  }, [voiceMode, isRecording, isStreaming, isProcessingVoice, isSpeaking, startRecording]);
 
-  const handleMicPointerUp = useCallback(() => {
+  const handleMicPointerUp = useCallback((e?: React.PointerEvent) => {
     if (longPressTimerRef.current) { clearTimeout(longPressTimerRef.current); longPressTimerRef.current = null; }
+    if (e?.target && e.pointerId !== undefined) {
+      try { (e.target as HTMLElement)?.releasePointerCapture?.(e.pointerId); } catch {}
+    }
 
     if (didLongPressRef.current) {
       didLongPressRef.current = false;
-      if (voiceMode === "hold" && isHoldingRef.current) {
-        isHoldingRef.current = false;
-        stopRecording();
-      }
       return;
     }
 
-    if (voiceMode === "hold" && isHoldingRef.current) {
+    if (voiceMode === "hold" && (isHoldingRef.current || isRecording)) {
       isHoldingRef.current = false;
       stopRecording();
     } else if (voiceMode === "tap") {
@@ -858,7 +855,9 @@ function ConnectChat() {
               <div className="relative">
                 {isRecording ? (
                   <button
+                    onPointerDown={(e) => { e.preventDefault(); (e.target as HTMLElement)?.setPointerCapture?.(e.pointerId); }}
                     onPointerUp={handleMicPointerUp}
+                    onPointerCancel={handleMicPointerUp}
                     onContextMenu={(e) => e.preventDefault()}
                     className="h-[44px] w-[44px] rounded-xl bg-red-500/20 border border-red-500/40 hover:bg-red-500/30 transition-colors shrink-0 flex items-center justify-center touch-none select-none"
                   >
@@ -870,7 +869,7 @@ function ConnectChat() {
                   <button
                     onPointerDown={handleMicPointerDown}
                     onPointerUp={handleMicPointerUp}
-                    onPointerLeave={handleMicPointerUp}
+                    onPointerCancel={handleMicPointerUp}
                     onContextMenu={(e) => e.preventDefault()}
                     className={`h-[44px] w-[44px] rounded-xl border transition-colors shrink-0 flex items-center justify-center touch-none select-none ${
                       isStreaming || isProcessingVoice || isSpeaking
