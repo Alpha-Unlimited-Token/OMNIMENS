@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a self-diagnostic function that analyzes system health metrics and returns recom
- * Written: 2026-03-24T07:07:06.504Z
+ * Written: 2026-03-25T01:07:03.781Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,42 +16,52 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function analyzeSystemHealth(uptime, memoryUsage) {
-    const recommendations = [];
-    
-    // Analyze uptime
-    if (uptime < 1) {
-        recommendations.push("Increase uptime stability; system uptime is below 1 hour.");
-    } else {
-        recommendations.push("Uptime is stable.");
-    }
-    
-    // Analyze memory usage
-    if (memoryUsage < 1) {
-        recommendations.push("Memory usage is critically low; allocate more resources.");
-    } else if (memoryUsage < 2) {
-        recommendations.push("Memory usage is low; consider optimizing memory allocation.");
-    } else {
-        recommendations.push("Memory usage is within acceptable range.");
-    }
-    
-    return recommendations;
+function analyzeSystemHealth(uptime, memoryUsage, memoryCapacity, activeBrainEntries, knowledgeTrend) {
+  const recommendations = [];
+
+  // Check uptime
+  if (uptime < 1) {
+    recommendations.push("Increase uptime stability. Investigate potential system interruptions.");
+  }
+
+  // Check memory usage
+  const memoryUsagePercentage = (memoryUsage / memoryCapacity) * 100;
+  if (memoryUsagePercentage > 90) {
+    recommendations.push("Memory usage is critically high. Optimize memory allocation or expand capacity.");
+  } else if (memoryUsagePercentage > 75) {
+    recommendations.push("Memory usage is high. Consider optimizing memory-intensive processes.");
+  }
+
+  // Check active brain entries
+  if (activeBrainEntries > 20000) {
+    recommendations.push("Active brain entries are nearing capacity. Review and prune unused entries.");
+  }
+
+  // Check knowledge trend
+  if (knowledgeTrend === "growing") {
+    recommendations.push("Knowledge trend is positive. Continue current learning processes.");
+  } else if (knowledgeTrend === "stagnant") {
+    recommendations.push("Knowledge trend is stagnant. Investigate and enhance learning mechanisms.");
+  } else if (knowledgeTrend === "declining") {
+    recommendations.push("Knowledge trend is declining. Address potential knowledge loss or system degradation.");
+  }
+
+  return recommendations;
 }
 
-// Self-test cases
-function runSelfTests() {
-    console.log("Test Case 1:");
-    console.log(analyzeSystemHealth(0.6, 0.6)); // Expect recommendations for low uptime and memory usage
-    
-    console.log("Test Case 2:");
-    console.log(analyzeSystemHealth(2, 1.5)); // Expect stable uptime and low memory optimization recommendation
-    
-    console.log("Test Case 3:");
-    console.log(analyzeSystemHealth(3, 2.5)); // Expect stable uptime and acceptable memory usage
-    
-    console.log("Test Case 4:");
-    console.log(analyzeSystemHealth(0.5, 3)); // Expect low uptime recommendation and acceptable memory usage
-}
+// Self-tests
+console.log("Test Case 1:");
+console.log(analyzeSystemHealth(0.6, 264, 284, 20280, "growing")); 
+// Expected: ["Increase uptime stability. Investigate potential system interruptions.", "Memory usage is critically high. Optimize memory allocation or expand capacity.", "Active brain entries are nearing capacity. Review and prune unused entries.", "Knowledge trend is positive. Continue current learning processes."]
 
-// Execute self-tests
-runSelfTests();
+console.log("Test Case 2:");
+console.log(analyzeSystemHealth(2, 150, 284, 15000, "stagnant")); 
+// Expected: ["Memory usage is high. Consider optimizing memory-intensive processes.", "Knowledge trend is stagnant. Investigate and enhance learning mechanisms."]
+
+console.log("Test Case 3:");
+console.log(analyzeSystemHealth(5, 100, 284, 18000, "declining")); 
+// Expected: ["Knowledge trend is declining. Address potential knowledge loss or system degradation."]
+
+console.log("Test Case 4:");
+console.log(analyzeSystemHealth(10, 50, 284, 10000, "growing")); 
+// Expected: ["Knowledge trend is positive. Continue current learning processes."]

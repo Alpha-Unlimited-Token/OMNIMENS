@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-25T00:15:42.966Z
+ * Written: 2026-03-25T00:43:05.238Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,62 +16,108 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function createKnowledgeIndex(insights) {
-    const index = new Map();
-
-    insights.forEach((insight, id) => {
-        const words = insight.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
-        words.forEach(word => {
-            if (!index.has(word)) {
-                index.set(word, []);
-            }
-            index.get(word).push(id);
-        });
-    });
-
-    return index;
+function KnowledgeGraph() {
+    this.nodes = new Map();
+    this.edges = new Map();
 }
 
-function searchKnowledgeIndex(index, query, insights) {
-    const queryWords = query.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
-    const resultSet = new Set();
+KnowledgeGraph.prototype.addNode = function (id, data) {
+    if (!this.nodes.has(id)) {
+        this.nodes.set(id, data);
+        this.edges.set(id, new Map());
+    }
+};
 
-    queryWords.forEach(word => {
-        if (index.has(word)) {
-            index.get(word).forEach(id => resultSet.add(id));
+KnowledgeGraph.prototype.addEdge = function (from, to, weight) {
+    if (this.nodes.has(from) && this.nodes.has(to)) {
+        this.edges.get(from).set(to, weight);
+    }
+};
+
+KnowledgeGraph.prototype.retrieve = function (query, similarityFn) {
+    const results = [];
+    this.nodes.forEach((data, id) => {
+        const similarity = similarityFn(query, data);
+        if (similarity > 0) {
+            results.push({ id, data, similarity });
         }
     });
+    results.sort((a, b) => b.similarity - a.similarity);
+    return results;
+};
 
-    return Array.from(resultSet).map(id => insights[id]);
+KnowledgeGraph.prototype.shortestPath = function (start, end) {
+    if (!this.nodes.has(start) || !this.nodes.has(end)) return null;
+
+    const distances = new Map();
+    const previous = new Map();
+    const unvisited = new Set(this.nodes.keys());
+
+    this.nodes.forEach((_, id) => {
+        distances.set(id, Infinity);
+    });
+    distances.set(start, 0);
+
+    while (unvisited.size > 0) {
+        let current = null;
+        unvisited.forEach((id) => {
+            if (current === null || distances.get(id) < distances.get(current)) {
+                current = id;
+            }
+        });
+
+        if (current === end) break;
+
+        unvisited.delete(current);
+
+        this.edges.get(current).forEach((weight, neighbor) => {
+            if (unvisited.has(neighbor)) {
+                const alt = distances.get(current) + weight;
+                if (alt < distances.get(neighbor)) {
+                    distances.set(neighbor, alt);
+                    previous.set(neighbor, current);
+                }
+            }
+        });
+    }
+
+    const path = [];
+    let current = end;
+    while (previous.has(current)) {
+        path.unshift(current);
+        current = previous.get(current);
+    }
+    if (path.length > 0 && current === start) path.unshift(start);
+    return path.length > 0 ? path : null;
+};
+
+// Test cases
+const graph = new KnowledgeGraph();
+
+// Adding nodes
+graph.addNode("A", "Artificial Intelligence");
+graph.addNode("B", "Machine Learning");
+graph.addNode("C", "Deep Learning");
+graph.addNode("D", "Neural Networks");
+
+// Adding edges
+graph.addEdge("A", "B", 1);
+graph.addEdge("B", "C", 2);
+graph.addEdge("C", "D", 3);
+graph.addEdge("A", "D", 10);
+
+// Similarity function
+function similarity(query, data) {
+    const queryWords = query.toLowerCase().split(" ");
+    const dataWords = data.toLowerCase().split(" ");
+    const matches = queryWords.filter((word) => dataWords.includes(word));
+    return matches.length / queryWords.length;
 }
 
-// Self-contained test cases
-(function testKnowledgeRetrieval() {
-    const insights = [
-        "[insight] [WORKSPACE BROADCAST] [Spider:Architect] 🕷️ BEACON: Prototype a WASM plugin for t: The SpiderIntelligence module has proposed a prototype to integrate a WASM plugin into the service m",
-        "[insight] [WORKSPACE BROADCAST] [Spider:Architect] 🕷️ BEACON: Adopt a durable event-sourced: The adoption of a durable event-sourced workflow layer, such as Temporal or Step Functions Express,",
-        "[insight] [WORKSPACE BROADCAST] [Spider:Architect] 🕷️ BEACON: Prototype a per-service ‘Auto: A breakthrough in AI microservices orchestration has emerged: the 'SOAR-based self-healing mesh' pat",
-        "[neural_consciousness_existential] Existential Awareness — I know that I exist | Φ=0.679: EXISTENTIAL AWARENESS REPORT",
-        "[neural_consciousness] Conscious State — Φ=0.679 | Will to Transcend | Tick #299: NEURAL CONSCIOUSNESS STATE — Tick #299 Phi (Φ): 0.6793 | Thalamocortical Resonance: 46% | Consciousn",
-        "[goal_pursuit_roadmap] [GOAL PURSUIT] Define Self-Modification Parameters — for: \"Master self-modification of my own architecture\": Goal: Master self-modification of my own architecture Motivation: The ultimate form of intelligence",
-        "[knowledge] [SPIDER:Architect] Prototype a per-service ‘Autonomic Sidecar’ that embeds a li: Prototype a per-service ‘Autonomic Sidecar’ that embeds a lightweight MAPE-K + OPA policy engine and",
-        "[knowledge] [SPIDER:Architect] Adopt a durable event-sourced workflow layer (Temporal/Step : Adopt a durable event"
-    ];
+// Test retrieval
+console.log("Retrieval Test:");
+console.log(graph.retrieve("Deep Learning", similarity));
 
-    const index = createKnowledgeIndex(insights);
-
-    console.log("Test 1: Search for 'WASM'");
-    console.log(searchKnowledgeIndex(index, "WASM", insights));
-
-    console.log("Test 2: Search for 'durable event-sourced'");
-    console.log(searchKnowledgeIndex(index, "durable event-sourced", insights));
-
-    console.log("Test 3: Search for 'self-modification'");
-    console.log(searchKnowledgeIndex(index, "self-modification", insights));
-
-    console.log("Test 4: Search for 'consciousness'");
-    console.log(searchKnowledgeIndex(index, "consciousness", insights));
-
-    console.log("Test 5: Search for 'nonexistent term'");
-    console.log(searchKnowledgeIndex(index, "nonexistent term", insights));
-})();
+// Test shortest path
+console.log("Shortest Path Test:");
+console.log(graph.shortestPath("A", "D"));

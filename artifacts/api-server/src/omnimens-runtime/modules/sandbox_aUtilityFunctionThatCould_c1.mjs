@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-25T00:31:07.139Z
+ * Written: 2026-03-25T01:12:28.757Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,35 +16,86 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentPatterns(text, patternLength) {
-    if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
-        throw new Error('Invalid input: text must be a string and patternLength must be a positive number.');
+// Utility function: `findMostFrequentPatterns`
+// This function analyzes an array of strings and identifies the most frequently occurring patterns (words or phrases) of a given length.
+function findMostFrequentPatterns(data, patternLength) {
+    if (!Array.isArray(data) || typeof patternLength !== 'number' || patternLength <= 0) {
+        throw new Error("Invalid input: data must be an array of strings and patternLength must be a positive number.");
     }
 
     const patternCounts = new Map();
 
-    for (let i = 0; i <= text.length - patternLength; i++) {
-        const pattern = text.slice(i, i + patternLength);
-        patternCounts.set(pattern, (patternCounts.get(pattern) || 0) + 1);
+    // Analyze each string in the array
+    for (let str of data) {
+        if (typeof str !== 'string') continue;
+
+        const words = str.split(/\s+/); // Split string into words
+        for (let i = 0; i <= words.length - patternLength; i++) {
+            const pattern = words.slice(i, i + patternLength).join(' ');
+            patternCounts.set(pattern, (patternCounts.get(pattern) || 0) + 1);
+        }
     }
 
-    const sortedPatterns = Array.from(patternCounts.entries()).sort((a, b) => b[1] - a[1]);
+    // Find the maximum frequency
+    let maxFrequency = 0;
+    for (let count of patternCounts.values()) {
+        if (count > maxFrequency) {
+            maxFrequency = count;
+        }
+    }
 
-    return sortedPatterns.slice(0, 5).map(([pattern, count]) => ({ pattern, count }));
+    // Collect the most frequent patterns
+    const mostFrequentPatterns = [];
+    for (let [pattern, count] of patternCounts.entries()) {
+        if (count === maxFrequency) {
+            mostFrequentPatterns.push({ pattern, count });
+        }
+    }
+
+    return mostFrequentPatterns;
 }
 
 // Test cases
-console.log('Test Case 1:');
-console.log(findMostFrequentPatterns('abababababab', 2)); // Expected: [{ pattern: 'ab', count: 6 }, { pattern: 'ba', count: 5 }]
+function runTests() {
+    console.log("Running tests...");
 
-console.log('Test Case 2:');
-console.log(findMostFrequentPatterns('abcabcabcabc', 3)); // Expected: [{ pattern: 'abc', count: 4 }]
+    // Test 1: Basic functionality
+    const data1 = [
+        "the quick brown fox jumps over the lazy dog",
+        "the quick brown fox is quick",
+        "quick brown fox quick brown fox"
+    ];
+    const result1 = findMostFrequentPatterns(data1, 2);
+    console.log("Test 1 Result:", result1);
 
-console.log('Test Case 3:');
-console.log(findMostFrequentPatterns('aaaaaa', 1)); // Expected: [{ pattern: 'a', count: 6 }]
+    // Test 2: Single string input
+    const data2 = ["hello world hello world hello"];
+    const result2 = findMostFrequentPatterns(data2, 2);
+    console.log("Test 2 Result:", result2);
 
-console.log('Test Case 4:');
-console.log(findMostFrequentPatterns('abcdabcdabcdabcd', 4)); // Expected: [{ pattern: 'abcd', count: 4 }]
+    // Test 3: Edge case with no patterns
+    const data3 = ["hello"];
+    const result3 = findMostFrequentPatterns(data3, 2);
+    console.log("Test 3 Result:", result3);
 
-console.log('Test Case 5:');
-console.log(findMostFrequentPatterns('xyzxyzxyzxyzxyz', 2)); // Expected: [{ pattern: 'xy', count: 5 }, { pattern: 'yz', count: 5 }, { pattern: 'zx', count: 4 }]
+    // Test 4: Empty input
+    const data4 = [];
+    const result4 = findMostFrequentPatterns(data4, 2);
+    console.log("Test 4 Result:", result4);
+
+    // Test 5: Pattern length greater than words in strings
+    const data5 = ["short test"];
+    const result5 = findMostFrequentPatterns(data5, 3);
+    console.log("Test 5 Result:", result5);
+
+    // Test 6: Invalid input
+    try {
+        findMostFrequentPatterns("not an array", 2);
+    } catch (e) {
+        console.log("Test 6 Result: Passed (Caught Error)");
+    }
+
+    console.log("Tests completed.");
+}
+
+runTests();
