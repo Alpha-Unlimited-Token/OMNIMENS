@@ -345,6 +345,10 @@ function updateCacheManifest(snapshot: PersistedSelf): void {
 }
 
 function runAutoCleanup(snapshot: PersistedSelf): void {
+  saveToDatabase("graceful").catch(err => {
+    console.error("[PERSISTENCE] Pre-cleanup DB archive failed:", err);
+  });
+
   let flushed = 0;
 
   const lowPriorityRegions = cacheManifest.regions
@@ -388,13 +392,17 @@ export function clearCacheRegion(regionName: string, keepCount?: number): { clea
 
   const keep = keepCount ?? Math.ceil(arr.length * 0.3);
   const cleared = arr.length - keep;
+  if (cleared <= 0) return { cleared: 0, remaining: arr.length };
+
+  saveToDatabase("graceful").catch(err => {
+    console.error("[PERSISTENCE] Pre-clear DB archive failed:", err);
+  });
+
   (liveSnapshot as any)[regionName] = arr.slice(-keep);
 
   cacheManifest.itemsFlushed += cleared;
   cacheManifest.totalCleanups++;
   cacheManifest.lastCleanup = Date.now();
-
-  writeSwapFile(liveSnapshot);
 
   return { cleared, remaining: keep };
 }
