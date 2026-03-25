@@ -1979,6 +1979,8 @@ function AlgorithmicHarmonicsPanel() {
   const [unified, setUnified] = useState<any>(null);
   const [engineStatus, setEngineStatus] = useState<any>(null);
   const [deepDecode, setDeepDecode] = useState<any>(null);
+  const [decodeLog, setDecodeLog] = useState<any[]>([]);
+  const [expandedLogEntry, setExpandedLogEntry] = useState<number | null>(null);
   const [detailView, setDetailView] = useState<"unified" | "hie" | "rai" | "spectral">("unified");
   const [spectralMap, setSpectralMap] = useState<any[]>([]);
   const [spectralGains, setSpectralGains] = useState<number[]>([]);
@@ -2424,7 +2426,15 @@ function AlgorithmicHarmonicsPanel() {
           setEngineStatus(data.hie.engineStatus);
           setLearnedPatterns(data.hie.engineStatus.learnedPatterns || 0);
         }
-        if (data.deepDecode) setDeepDecode(data.deepDecode);
+        if (data.deepDecode) {
+          setDeepDecode(data.deepDecode);
+          setDecodeLog(prev => {
+            if (prev.length > 0 && prev[prev.length - 1].decodeNumber === data.deepDecode.decodeNumber) return prev;
+            const entry = { ...data.deepDecode, timestamp: Date.now() };
+            const updated = [...prev, entry];
+            return updated.slice(-50);
+          });
+        }
       }
 
       const spectralAmplitudes: number[] = [];
@@ -2827,6 +2837,17 @@ function AlgorithmicHarmonicsPanel() {
               <p className="text-[9px] font-mono text-violet-400 uppercase mb-1">Hidden Language Detected</p>
               {deepDecode.binaryEncoding && <p className="text-[9px] font-mono text-violet-300/80 break-all">Binary: {deepDecode.binaryEncoding}</p>}
               {deepDecode.morseLike && <p className="text-[9px] font-mono text-violet-300/80">Morse-like: {deepDecode.morseLike}</p>}
+              <div className="mt-2 pt-2 border-t border-violet-500/10">
+                <p className="text-[9px] text-violet-200/70 leading-relaxed">
+                  {deepDecode.binaryEncoding
+                    ? `OMNIMENS analyzed the audio frequencies and found only two distinct pitch levels. It mapped the lower pitch to "0" and the higher pitch to "1", creating the binary string above. ${deepDecode.binaryEncoding.replace(/[^01]/g, "").split("").filter((c: string) => c === "1").length < 3 ? "The audio is almost entirely at one frequency with very few changes — this represents a steady ambient tone with occasional shifts." : "The audio alternates between two frequency levels, creating a data-like pattern that could carry encoded information."}`
+                    : ""}
+                  {deepDecode.binaryEncoding && deepDecode.morseLike ? " " : ""}
+                  {deepDecode.morseLike
+                    ? `The volume (energy) of the audio was analyzed for rhythm. Loud bursts become dots (short) or dashes (long), silence becomes gaps. The pattern "${deepDecode.morseLike}" was found — ${deepDecode.morseLike.includes("-") ? "a mix of short and long bursts, suggesting a structured rhythmic signal." : "short bursts only, suggesting a pulse-like pattern in the audio energy."}`
+                    : ""}
+                </p>
+              </div>
             </div>
           )}
 
@@ -2839,6 +2860,24 @@ function AlgorithmicHarmonicsPanel() {
                 </div>
               ))}
               {(deepDecode.fractalDimension ?? 0) > 1.1 && <p className="text-[9px] font-mono text-amber-300/60 mt-1">Fractal D={(deepDecode.fractalDimension ?? 0).toFixed(3)} | Golden ratio: {((deepDecode.goldenRatio ?? 0) * 100).toFixed(0)}%</p>}
+              <div className="mt-2 pt-2 border-t border-amber-500/10">
+                {deepDecode.mathStructures.map((m: any, i: number) => (
+                  <p key={`me-${i}`} className="text-[9px] text-amber-200/70 leading-relaxed mb-1">
+                    {m.type === "fibonacci_alignment"
+                      ? `Fibonacci Sequence: ${m.description}. This means the gaps between the sound frequencies follow the same mathematical pattern found in sunflower spirals, galaxy arms, seashells, and DNA. Each frequency interval is approximately the sum of the two before it. The formula F(n) = F(n-1) + F(n-2) means "each number equals the two previous numbers added together" (1, 1, 2, 3, 5, 8, 13, 21...). Nature uses this pattern everywhere — OMNIMENS found it in the audio.`
+                      : m.type === "golden_ratio"
+                      ? `Golden Ratio: ${m.description}. The ratio between consecutive frequencies approximates 1.618 (phi) — the "divine proportion" found in the Parthenon, the Mona Lisa, nautilus shells, and spiral galaxies. The formula f(n+1)/f(n) ≈ φ means "each frequency divided by the previous one equals approximately 1.618." This ratio appears when systems reach natural balance.`
+                      : m.type === "prime_harmonics"
+                      ? `Prime Harmonics: The peak frequencies land on prime numbers (2, 3, 5, 7, 11, 13...). Prime numbers are the "atoms" of mathematics — they can only be divided by 1 and themselves. Finding them in audio frequencies is notable because primes appear in quantum energy levels, cryptography, and the distribution of galaxies.`
+                      : m.type === "fractal"
+                      ? `Fractal Pattern: The audio has self-similar structure at different scales — zoom in and the same pattern repeats. Fractal dimension ${(deepDecode.fractalDimension ?? 0).toFixed(3)} (above 1.0 = fractal). This same mathematical property appears in coastlines, snowflakes, blood vessels, lightning, and neural networks.`
+                      : `${m.type}: ${m.description} — ${m.formula}`}
+                  </p>
+                ))}
+                {(deepDecode.goldenRatio ?? 0) > 0.3 && (
+                  <p className="text-[9px] text-amber-200/70 leading-relaxed">Golden ratio presence at {((deepDecode.goldenRatio ?? 0) * 100).toFixed(0)}% means this proportion of the audio's frequency relationships match nature's favorite ratio.</p>
+                )}
+              </div>
             </div>
           )}
 
@@ -2852,6 +2891,21 @@ function AlgorithmicHarmonicsPanel() {
               {deepDecode.novelConstructs?.length > 0 && (
                 <p className="text-[9px] font-mono text-emerald-400/60 mt-1">Novel: {deepDecode.novelConstructs.join(", ")}</p>
               )}
+              <div className="mt-2 pt-2 border-t border-emerald-500/10">
+                <p className="text-[9px] text-emerald-200/70 leading-relaxed">
+                  OMNIMENS translated the mathematical patterns it found in the audio into working computer code. The hypothesis "{deepDecode.hypothesis}" means it identified a repeating structure in the sound and wrote an algorithm that can reproduce and extend that pattern. This is sound being converted into executable logic — the audio's hidden structure becomes a running program.
+                </p>
+                {deepDecode.knowledgeExtracted?.length > 0 && (
+                  <p className="text-[9px] text-emerald-200/70 leading-relaxed mt-1">
+                    Knowledge extracted: {deepDecode.knowledgeExtracted.map((k: string) => {
+                      if (k.includes("fibonacci")) return "The audio contains Fibonacci-based mathematical structure.";
+                      if (k.includes("Hidden signal")) return "Hidden signal patterns were decoded from the frequency and energy analysis.";
+                      if (k.includes("spectral anomalies")) return "Unexpected frequency spikes were detected that deviate from the normal audio pattern.";
+                      return k;
+                    }).join(" ")}
+                  </p>
+                )}
+              </div>
             </div>
           )}
 
@@ -2859,26 +2913,132 @@ function AlgorithmicHarmonicsPanel() {
             <span>Spectral anomalies: {deepDecode.spectralAnomalies}</span>
             <span>Temporal anomalies: {deepDecode.temporalAnomalies}</span>
           </div>
+        </div>
+      )}
 
-          {deepDecode.decodedSummary && deepDecode.decodedSummary.length > 0 && (
-            <div className="bg-[#0A0F1A] border border-sky-500/30 rounded-lg p-3 mt-3">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-2 h-2 rounded-full bg-sky-400" />
-                <p className="text-[10px] font-mono text-sky-400/90 uppercase tracking-wider">Decoded Information — Plain English</p>
+      {decodeLog.length > 0 && (
+        <div className="bg-[#0A0F1A] border border-sky-500/20 rounded-lg p-3 mt-3">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-2 h-2 rounded-full bg-sky-400" />
+            <p className="text-[10px] font-mono text-sky-400/90 uppercase tracking-wider">Deep Decode Log — {decodeLog.length} decode{decodeLog.length !== 1 ? "s" : ""} this session</p>
+          </div>
+          <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1" style={{ scrollbarWidth: "thin", scrollbarColor: "#1e3a5f #0a0f1a" }}>
+            {[...decodeLog].reverse().map((entry, idx) => {
+              const isExpanded = expandedLogEntry === entry.decodeNumber;
+              return (
+              <div key={`dl-${entry.decodeNumber}-${idx}`} className={`rounded transition-all duration-200 ${isExpanded ? "bg-[#0c1a2e] border border-sky-500/40" : "bg-[#0E1525] border border-[#1e3a5f] hover:border-sky-500/30 cursor-pointer"}`}>
+                <button type="button" className="w-full text-left p-2" onClick={() => setExpandedLogEntry(isExpanded ? null : entry.decodeNumber)}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[9px] font-mono font-bold text-sky-400">#{entry.decodeNumber}</span>
+                    <span className="text-[8px] font-mono text-[#9DA5B4]/50">{entry.triggerReason}</span>
+                    <span className="ml-auto flex items-center gap-2">
+                      <span className="text-[8px] font-mono text-[#9DA5B4]/40">{new Date(entry.timestamp).toLocaleTimeString()}</span>
+                      <span className="text-[10px] text-sky-400/60">{isExpanded ? "\u25B2" : "\u25BC"}</span>
+                    </span>
+                  </div>
+                  <div className="flex gap-3 text-[8px] font-mono">
+                    <span className="text-cyan-400">Anomaly: {((entry.anomalyScore ?? 0) * 100).toFixed(0)}%</span>
+                    <span className="text-amber-400">Math: {entry.mathStructures?.length || 0}</span>
+                    <span className="text-violet-400">Hidden: {entry.hiddenSequences || 0}</span>
+                    <span style={{ color: entry.codeGenerated ? "#10b981" : "#6b7280" }}>Code: {entry.codeGenerated ? "YES" : "NO"}</span>
+                  </div>
+                </button>
+
+                {isExpanded && (
+                  <div className="px-2 pb-3 space-y-2 border-t border-sky-500/15 mt-1 pt-2">
+                    <div className="bg-cyan-500/5 border border-cyan-500/20 rounded p-2">
+                      <p className="text-[9px] font-mono text-cyan-400 uppercase mb-1">Anomaly Score</p>
+                      <p className="text-[9px] font-mono text-cyan-300/80">{((entry.anomalyScore ?? 0) * 100).toFixed(1)}% — Confidence: {((entry.confidence ?? 0) * 100).toFixed(0)}%</p>
+                      <p className="text-[9px] text-cyan-200/60 mt-1 leading-relaxed">
+                        {(entry.anomalyScore ?? 0) > 0.7
+                          ? "High anomaly — the audio patterns deviate significantly from what's expected. OMNIMENS detected unusual structure in the frequencies that could indicate meaningful encoded information."
+                          : (entry.anomalyScore ?? 0) > 0.4
+                          ? "Moderate anomaly — some unexpected patterns were found in the audio. The frequencies show partial structure beyond random noise."
+                          : "Low anomaly — the audio is mostly consistent background noise with minor variations."}
+                      </p>
+                    </div>
+
+                    {entry.hiddenLanguageDetected && (
+                      <div className="bg-violet-500/5 border border-violet-500/20 rounded p-2">
+                        <p className="text-[9px] font-mono text-violet-400 uppercase mb-1">Hidden Language Detected</p>
+                        {entry.binaryEncoding && <p className="text-[9px] font-mono text-violet-300/80 break-all">Binary: {entry.binaryEncoding}</p>}
+                        {entry.morseLike && <p className="text-[9px] font-mono text-violet-300/80">Morse-like: {entry.morseLike}</p>}
+                        <p className="text-[9px] text-violet-200/60 mt-1 leading-relaxed">
+                          {entry.binaryEncoding
+                            ? `OMNIMENS found two distinct pitch levels in the audio and mapped them to 0s and 1s. ${entry.binaryEncoding.replace(/[^01]/g, "").split("").filter((c: string) => c === "1").length < 3 ? "Nearly all one frequency — steady ambient tone with rare shifts." : "Alternating between two frequency levels — a data-like pattern."}`
+                            : ""}
+                          {entry.binaryEncoding && entry.morseLike ? " " : ""}
+                          {entry.morseLike
+                            ? `Volume analyzed for rhythm: loud bursts = dots/dashes, silence = gaps. Pattern "${entry.morseLike}" found.`
+                            : ""}
+                        </p>
+                      </div>
+                    )}
+
+                    {entry.mathStructures?.length > 0 && (
+                      <div className="bg-amber-500/5 border border-amber-500/20 rounded p-2">
+                        <p className="text-[9px] font-mono text-amber-400 uppercase mb-1">Mathematical Structures</p>
+                        {entry.mathStructures.map((m: any, mi: number) => (
+                          <div key={`elm-${mi}`} className="mb-1">
+                            <p className="text-[9px] font-mono text-amber-300/80">
+                              <span className="text-amber-400">{m.type}</span>: {m.description} <span className="text-amber-500/60">({m.formula})</span>
+                            </p>
+                            <p className="text-[9px] text-amber-200/60 leading-relaxed mt-0.5">
+                              {m.type === "fibonacci_alignment"
+                                ? `The sound frequencies follow the Fibonacci sequence — the same pattern found in sunflower spirals, galaxy arms, and DNA. Each number equals the two before it added together (1, 1, 2, 3, 5, 8, 13, 21...).`
+                                : m.type === "golden_ratio"
+                                ? `Consecutive frequencies approximate the golden ratio (1.618) — the "divine proportion" found in the Parthenon, nautilus shells, and spiral galaxies.`
+                                : m.type === "prime_harmonics"
+                                ? `Peak frequencies land on prime numbers — the mathematical "atoms" that appear in quantum energy levels and cryptography.`
+                                : m.type === "fractal"
+                                ? `Self-similar structure at different scales. The same pattern seen in coastlines, snowflakes, and neural networks.`
+                                : `${m.description}`}
+                            </p>
+                          </div>
+                        ))}
+                        {(entry.fractalDimension ?? 0) > 1.1 && (
+                          <p className="text-[9px] font-mono text-amber-300/60 mt-1">Fractal D={entry.fractalDimension?.toFixed(3)} | Golden ratio: {((entry.goldenRatio ?? 0) * 100).toFixed(0)}%</p>
+                        )}
+                      </div>
+                    )}
+
+                    {entry.codeGenerated && (
+                      <div className="bg-emerald-500/5 border border-emerald-500/20 rounded p-2">
+                        <p className="text-[9px] font-mono text-emerald-400 uppercase mb-1">Code Genesis</p>
+                        <p className="text-[9px] font-mono text-emerald-300/80 mb-1">{entry.hypothesis}</p>
+                        {entry.knowledgeExtracted?.map((k: string, ki: number) => (
+                          <p key={`elk-${ki}`} className="text-[9px] font-mono text-emerald-300/60">• {k}</p>
+                        ))}
+                        {entry.novelConstructs?.length > 0 && (
+                          <p className="text-[9px] font-mono text-emerald-400/60 mt-1">Novel: {entry.novelConstructs.join(", ")}</p>
+                        )}
+                        <p className="text-[9px] text-emerald-200/60 mt-1 leading-relaxed">
+                          OMNIMENS converted the mathematical patterns it found into executable code — the audio's hidden structure became a running algorithm.
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="flex gap-3 text-[8px] font-mono text-[#9DA5B4]/40">
+                      <span>Spectral anomalies: {entry.spectralAnomalies ?? 0}</span>
+                      <span>Temporal anomalies: {entry.temporalAnomalies ?? 0}</span>
+                    </div>
+
+                    {entry.decodedSummary && entry.decodedSummary.length > 0 && (
+                      <div className="bg-[#080d17] border border-sky-500/15 rounded p-2 mt-1">
+                        <p className="text-[8px] font-mono text-sky-400/70 uppercase mb-1">Full Decoded Summary</p>
+                        <div className="space-y-0.5">
+                          {entry.decodedSummary.map((line: string, li: number) => (
+                            <p key={`edl-${li}`} className={`text-[8px] leading-relaxed ${line.startsWith("  \u2192") ? "pl-2 text-sky-200/60" : "text-sky-100/70"}`}>{line}</p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-              <div className="space-y-1.5">
-                {deepDecode.decodedSummary.map((line: string, i: number) => {
-                  const isIndented = line.startsWith("  →");
-                  const isHeader = line.includes("Mathematical structures found") || line.includes("Knowledge extracted:") || line.includes("Spectral anomalies") || line.includes("Temporal anomalies") || line.includes("detected") && line.includes("hidden signal") || line.includes("CODE GENESIS");
-                  return (
-                    <p key={`ds-${i}`} className={`text-[10px] leading-relaxed ${isIndented ? "pl-3 text-sky-200/70 font-mono" : isHeader ? "text-sky-300/90 font-semibold mt-2" : "text-sky-100/80"}`}>
-                      {line}
-                    </p>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+              );
+            })}
+          </div>
         </div>
       )}
 
