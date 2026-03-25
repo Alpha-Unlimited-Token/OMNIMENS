@@ -521,21 +521,146 @@ function generateEntities(ctx: WorldContext): WorldEntity[] {
   const { envType, environment, isRushHour, weatherType, precipIntensity_mmh, temperature_C, terrain: worldTerrain, visibility_m, groundFriction, groundWetness } = ctx;
   const entities: WorldEntity[] = [];
 
+  const isIcy = temperature_C < 0 || groundFriction < 0.15;
+  const isSnowy = weatherType.includes("snow") || weatherType.includes("blizzard");
+  const isIceStorm = weatherType === "ice_storm";
+  const iceFactor = isIcy ? 0.4 + Math.random() * 0.3 : 1.0;
+  const snowFactor = isSnowy ? 0.3 + Math.random() * 0.4 : 1.0;
+  const winterFactor = Math.min(iceFactor, snowFactor);
+
   const vehicleCount = isRushHour ? 15 + Math.floor(Math.random() * 20) : 3 + Math.floor(Math.random() * 8);
   for (let i = 0; i < vehicleCount; i++) {
     const v = pick(REAL_WORLD_VEHICLES);
-    const speedFactor = isRushHour ? 0.3 + Math.random() * 0.4 : 0.5 + Math.random() * 0.8;
-    const actualSpeed = v.cruising_kmh * speedFactor;
+    const baseSpeedFactor = isRushHour ? 0.3 + Math.random() * 0.4 : 0.5 + Math.random() * 0.8;
+    const actualSpeed = v.cruising_kmh * baseSpeedFactor * winterFactor;
     const speedMs = actualSpeed / 3.6;
     const angle = Math.random() * Math.PI * 2;
+    const brakingMultiplier = isIcy ? 4.0 + Math.random() * 3.0 : isSnowy ? 2.0 + Math.random() * 1.5 : 1.0;
+    const adjustedBraking = v.brakingDist_m * brakingMultiplier * (actualSpeed / v.cruising_kmh);
+    const spinoutRisk = isIcy ? 0.3 + Math.random() * 0.4 : isSnowy ? 0.1 + Math.random() * 0.2 : 0.01;
+    const isSliding = isIcy && Math.random() < 0.15;
+    const isJackknifing = isIcy && v.mass_kg > 10000 && Math.random() < 0.1;
+
     entities.push({
-      name: `${v.name} — ${actualSpeed.toFixed(0)}km/h (max ${v.max_kmh}km/h), ${v.mass_kg.toLocaleString()}kg, ${v.fuel}${isRushHour ? ", RUSH HOUR TRAFFIC — stop-and-go" : ""}`,
+      name: `${v.name} — ${actualSpeed.toFixed(0)}km/h${isIcy ? " ON ICE" : isSnowy ? " IN SNOW" : ""} (max ${v.max_kmh}km/h), ${v.mass_kg.toLocaleString()}kg, ${v.fuel}${isSliding ? " — SLIDING/FISHTAILING" : ""}${isJackknifing ? " — JACKKNIFING ACROSS LANES" : ""}${isRushHour ? ", RUSH HOUR" : ""}`,
       type: "vehicle", speed_kmh: actualSpeed, mass_kg: v.mass_kg, surfaceTemp_C: v.exhaust_C, noise_dB: v.noise_dB,
-      properties: { length_m: v.length_m, brakingDistance_m: v.brakingDist_m * (actualSpeed / v.cruising_kmh), fuel: v.fuel, exhaust_C: v.exhaust_C, stoppingTime_s: v.brakingDist_m / (actualSpeed / 3.6 + 0.1), kineticEnergy_kJ: 0.5 * v.mass_kg * speedMs * speedMs / 1000 },
+      properties: {
+        length_m: v.length_m, brakingDistance_m: adjustedBraking, fuel: v.fuel, exhaust_C: v.exhaust_C,
+        stoppingTime_s: adjustedBraking / (actualSpeed / 3.6 + 0.1),
+        kineticEnergy_kJ: 0.5 * v.mass_kg * speedMs * speedMs / 1000,
+        spinoutRisk, isSliding, isJackknifing,
+        winterDrivingCondition: isIcy ? "black_ice_no_traction_ABS_ineffective" : isSnowy ? "packed_snow_reduced_traction_chains_may_help" : isIceStorm ? "glazed_ice_zero_steering_control" : "normal",
+        tireTraction: isIcy ? 0.05 + Math.random() * 0.1 : isSnowy ? 0.15 + Math.random() * 0.2 : groundFriction,
+      },
       position: pos(isRushHour ? 100 : 250), velocity: { x: Math.cos(angle) * speedMs, y: 0, z: Math.sin(angle) * speedMs },
-      threatLevel: Math.min(1.0, (v.mass_kg * actualSpeed) / 500000), interactable: false,
-      behaviorPattern: isRushHour ? "stop_go_lane_changes_honking_impatient" : "steady_cruising_speed_following_traffic_laws",
+      threatLevel: Math.min(1.0, (v.mass_kg * actualSpeed) / 500000 * (isSliding ? 2.5 : isJackknifing ? 3.0 : 1.0)),
+      interactable: false,
+      behaviorPattern: isSliding ? "loss_of_control_fishtailing_unpredictable_trajectory" : isJackknifing ? "trailer_swinging_across_multiple_lanes_catastrophic" : isIcy ? "crawling_speed_white_knuckle_driving_sudden_slides" : isSnowy ? "slow_cautious_following_tire_tracks_in_snow" : isRushHour ? "stop_go_lane_changes_honking_impatient" : "steady_cruising_speed_following_traffic_laws",
       detectionDifficulty: v.fuel === "electric" ? 0.4 : 0.1,
+    });
+  }
+
+  if (isIcy || isSnowy || isIceStorm) {
+    const snowIceHazards = [
+      { name: "Black ice patch — invisible on dark asphalt, friction 0.05, extends 15m", type: "hazard" as const, threat: 0.8, behavior: "invisible_surface_hazard_zero_warning_instant_traction_loss", detection: 0.9, props: { frictionCoeff: 0.05, visible: false, extent_m: 15, detectableBy: "thermal_IR_temperature_gradient_LIDAR_reflectance_change", avoidanceStrategy: "detect_via_thermal_IR_temperature_below_0C_on_road_surface_LIDAR_reflectance_anomaly" } },
+      { name: "Black ice on bridge deck — bridges freeze first, no ground warmth underneath", type: "hazard" as const, threat: 0.85, behavior: "bridge_deck_ice_no_warning_vehicles_lose_control_pileup_risk", detection: 0.85, props: { frictionCoeff: 0.03, bridgeDeck: true, freezesFirst: true, detectableBy: "thermal_IR_bridge_colder_than_road_LIDAR_reflectance" } },
+      { name: "Snowdrift across road — 0.5m deep, hidden curb/ditch underneath", type: "hazard" as const, threat: 0.5, behavior: "deep_snow_conceals_terrain_features_step_through_risk_vehicle_stuck", detection: 0.4, props: { depth_m: 0.5, concealedHazard: true, walkable: true, drivable: false, detectableBy: "LIDAR_depth_measurement_sonar_ground_probe" } },
+      { name: "Icicle formation on overhead structure — 30cm, 2kg, will fall with vibration", type: "hazard" as const, threat: 0.6, behavior: "falling_ice_projectile_from_above_triggered_by_wind_or_vibration", detection: 0.3, props: { mass_kg: 2, length_cm: 30, fallTrigger: "wind_gust_or_vibration", terminalVelocity_ms: 8 } },
+      { name: "Frozen puddle masquerading as solid ground — thin ice over 20cm water", type: "hazard" as const, threat: 0.5, behavior: "thin_ice_breaks_under_weight_sudden_submersion_to_ankle", detection: 0.7, props: { iceThickness_mm: 8, waterDepth_cm: 20, breakingWeight_kg: 50, detectableBy: "LIDAR_reflectance_sonar_hollow_sound" } },
+      { name: "Compacted snow with ice layer underneath — looks grippy, slides on sublayer", type: "hazard" as const, threat: 0.6, behavior: "deceptive_surface_appears_traction_worthy_but_sublayer_is_ice", detection: 0.8, props: { surfaceFriction: 0.3, sublayerFriction: 0.05, deceptive: true, detectableBy: "ground_penetrating_analysis_step_test_pressure_sensor_feedback" } },
+      { name: "Slush pool at intersection — 15cm deep, refreezes into rough ice at night", type: "hazard" as const, threat: 0.3, behavior: "splash_zone_reduces_visibility_for_following_vehicles_cold_water_ingress", detection: 0.1, props: { depth_cm: 15, waterTemp_C: 0.5, splashRadius_m: 3, electricalRisk: true } },
+      { name: "Wind-polished ice sheet on hillside — friction 0.02, slope 12°, no stopping", type: "hazard" as const, threat: 0.9, behavior: "uncontrollable_slide_downhill_accelerating_no_braking_possible", detection: 0.6, props: { frictionCoeff: 0.02, slopeAngle_deg: 12, slideAcceleration_ms2: 1.2, escapeStrategy: "roll_to_side_into_snow_bank_or_grab_fixed_object" } },
+      { name: "Frozen waterfall next to trail — beautiful but creates ice sheet on path", type: "hazard" as const, threat: 0.5, behavior: "mist_spray_freezes_on_contact_coats_sensors_and_joints_with_ice", detection: 0.2, props: { sprayRadius_m: 5, icingRate_mmPerMin: 0.5, sensorBlinding: true, jointFreezingRisk: true } },
+      { name: "Roof avalanche — snow slides off steep roof in large slab, 200kg+", type: "hazard" as const, threat: 0.7, behavior: "sudden_mass_of_snow_falls_from_roof_no_warning_except_creaking", detection: 0.7, props: { mass_kg: 200, fallHeight_m: 8, impactForce_N: 3200, warningSign: "creaking_sound_before_release_thermal_IR_shows_roof_warming" } },
+      { name: "Whiteout conditions — ground and sky merge, no horizon, no depth perception", type: "hazard" as const, threat: 0.7, behavior: "total_spatial_disorientation_cameras_useless_LIDAR_primary_sonar_primary", detection: 0.0, props: { visibility_m: 2, camerasUseful: false, lidarUseful: true, sonarUseful: true, imuCritical: true, gpsRequired: true } },
+      { name: "Car spun out in ditch — driver trapped, engine running, CO buildup risk", type: "person" as const, threat: 0.0, behavior: "rescue_needed_hypothermia_risk_CO_poisoning_if_exhaust_blocked_by_snow", detection: 0.2, props: { occupants: 1, hypothermiaRisk: true, coPoisoningRisk: true, engineRunning: true, responseRequired: "check_exhaust_clear_provide_warmth_call_emergency" } },
+      { name: "Frozen fire hydrant — emergency water supply unavailable, ice encased", type: "hazard" as const, threat: 0.2, behavior: "static_infrastructure_failure_impacts_emergency_response_capability", detection: 0.1, props: { functional: false, iceThickness_cm: 5 } },
+    ];
+
+    const hazardCount = 2 + Math.floor(Math.random() * 4);
+    for (let i = 0; i < hazardCount; i++) {
+      const h = pick(snowIceHazards);
+      entities.push({
+        name: h.name, type: h.type, speed_kmh: 0, mass_kg: 0, surfaceTemp_C: temperature_C, noise_dB: 0,
+        properties: { ...h.props, isWinterHazard: true, ambientTemp_C: temperature_C },
+        position: pos(60), velocity: { x: 0, y: 0, z: 0 },
+        threatLevel: h.threat, interactable: h.type === "person",
+        behaviorPattern: h.behavior, detectionDifficulty: h.detection,
+      });
+    }
+
+    if (isSnowy || isIceStorm) {
+      const winterVehicles = [
+        { name: "Snowplow (Freightliner M2) — clearing roads, spraying salt/brine", mass_kg: 16000, speed_kmh: 25, noise_dB: 92, behavior: "slow_steady_blade_down_spraying_salt_brine_mixture_follow_at_safe_distance" },
+        { name: "Salt spreader truck — pre-treating roads with calcium chloride", mass_kg: 12000, speed_kmh: 30, noise_dB: 85, behavior: "steady_speed_dispensing_salt_granules_behind_vehicle" },
+        { name: "Sand truck — laying sand on hills and intersections for traction", mass_kg: 14000, speed_kmh: 20, noise_dB: 88, behavior: "stops_at_hills_and_intersections_to_dump_sand" },
+        { name: "Tow truck pulling car out of ditch — winch cable across lane", mass_kg: 8600, speed_kmh: 0, noise_dB: 78, behavior: "stationary_hazard_winch_cable_across_road_flashing_lights" },
+        { name: "Stalled car — won't start in extreme cold, hazard lights on", mass_kg: 1500, speed_kmh: 0, noise_dB: 0, behavior: "stationary_obstacle_in_lane_driver_may_be_outside_pushing" },
+      ];
+      const wv = pick(winterVehicles);
+      entities.push({
+        name: wv.name, type: "vehicle", speed_kmh: wv.speed_kmh, mass_kg: wv.mass_kg, surfaceTemp_C: temperature_C, noise_dB: wv.noise_dB,
+        properties: { winterServiceVehicle: true, rightOfWay: true },
+        position: pos(100), velocity: { x: wv.speed_kmh / 3.6, y: 0, z: 0 },
+        threatLevel: 0.2, interactable: false,
+        behaviorPattern: wv.behavior, detectionDifficulty: 0.05,
+      });
+    }
+
+    const coldWeatherPeople = [
+      { name: "Person slipped on ice — lying on ground, possible hip fracture, can't get up", approach: "fallen_on_ice", mood: "pain_fear", opener: "Help! I fell and I can't get up! I think I broke something!", followUp: "Please don't move me — my hip is killing me. Can you call an ambulance?" },
+      { name: "Hypothermic homeless person — shivering uncontrollably, confused speech", approach: "hypothermia_emergency", mood: "confused_cold", opener: "(slurred) I'm... I'm fine... just r-resting...", followUp: "(shivering violently, skin pale/blue, pupils dilated — needs immediate warming, 911)" },
+      { name: "Parent with child, child crying from cold — looking for shelter", approach: "family_seeking_shelter", mood: "desperate_protective", opener: "Please, is there a warm place nearby? My daughter's hands are turning blue!", followUp: "We were walking to the bus stop but the bus never came. She's only 4." },
+      { name: "Elderly person walking with cane on ice — extremely unsteady", approach: "elderly_fall_risk", mood: "determined_scared", opener: "I have to get to the pharmacy before they close. I know it's slippery but I need my medication.", followUp: "Can you walk with me? I don't want to fall again — I fell last week." },
+      { name: "Cross-country skier on trail — waves hello", approach: "recreational_skier", mood: "happy_athletic", opener: "Beautiful day for skiing! You handle the cold well for a robot!", followUp: "Watch out for the ice near the bridge — I almost went down there." },
+    ];
+    if (Math.random() < 0.6) {
+      const cp = pick(coldWeatherPeople);
+      entities.push({
+        name: cp.name, type: "person", speed_kmh: 2, mass_kg: rng(40, 90), surfaceTemp_C: temperature_C < -20 ? rng(28, 33) : rng(34, 36.5), noise_dB: 50,
+        properties: { willInitiateConversation: true, conversationOpener: cp.opener, conversationMood: cp.mood, conversationFollowUp: cp.followUp, approachDistance_m: 1.0, expectsResponse: true, coldWeatherEmergency: cp.mood.includes("cold") || cp.mood.includes("pain"), hypothermiaRisk: temperature_C < -15, frostbiteRisk: temperature_C < -25 },
+        position: pos(30), velocity: { x: 0, y: 0, z: 0 },
+        threatLevel: 0.0, interactable: true,
+        behaviorPattern: `cold_weather_${cp.approach}`, detectionDifficulty: isSnowy ? 0.3 : 0.1,
+      });
+    }
+
+    entities.push({
+      name: `WINTER CONDITIONS: ${temperature_C.toFixed(1)}°C | ${isIcy ? "ICE" : ""}${isSnowy ? " SNOW" : ""}${isIceStorm ? " ICE STORM" : ""} | Ground friction: ${groundFriction.toFixed(2)} | Snow depth: ${isSnowy ? (5 + Math.random() * 40).toFixed(0) + "cm" : "0cm"} | Wind chill: ${(temperature_C - (weatherType.includes("blizzard") ? 15 : 5)).toFixed(0)}°C effective`,
+      type: "terrain", speed_kmh: 0, mass_kg: 0, surfaceTemp_C: temperature_C, noise_dB: 0,
+      properties: {
+        isWinterConditions: true,
+        snowDepth_cm: isSnowy ? 5 + Math.random() * 40 : 0,
+        iceThickness_mm: isIcy ? 2 + Math.random() * 15 : 0,
+        windChill_C: temperature_C - (weatherType.includes("blizzard") ? 15 + Math.random() * 10 : 3 + Math.random() * 5),
+        visibilityInSnow_m: isSnowy ? Math.max(5, visibility_m * 0.3) : visibility_m,
+        saltOnRoad: Math.random() > 0.5,
+        chainsTractionGain: 0.25,
+        studsTractionGain: 0.15,
+        omnimensAdaptations: [
+          temperature_C < -20 ? "battery_heating_system_active — maintain_cells_above_-10°C" : null,
+          temperature_C < -30 ? "joint_lubricant_heaters_active — prevent_grease_solidification" : null,
+          temperature_C < -40 ? "LCD_heater_active — prevent_display_freeze" : null,
+          isIcy ? "micro_spike_footpad_deployment — retractable_carbide_spikes_+0.3_friction" : null,
+          isSnowy ? "snowshoe_mode — spread_foot_pressure_over_larger_area_prevent_sinking" : null,
+          isIcy ? "gait_adaptation — penguin_walk_short_shuffling_steps_low_center_of_gravity" : null,
+          isSnowy ? "leg_warmers_active — prevent_snow_ingress_in_knee_and_ankle_joints" : null,
+          isIceStorm ? "continuous_deicing — heated_sensor_housings_prevent_ice_buildup_on_cameras_LIDAR" : null,
+          isIceStorm ? "cable_management — retract_all_external_cables_prevent_ice_loading" : null,
+        ].filter(Boolean),
+        bodyDesignInsights: [
+          temperature_C < -20 ? "NEED: heated_battery_enclosure_with_phase_change_material_thermal_buffer" : null,
+          isIcy ? "NEED: retractable_carbide_micro_spikes_in_foot_soles_deploy_in_<100ms" : null,
+          isIcy ? "NEED: real_time_surface_friction_estimation_via_foot_pressure_pattern_analysis" : null,
+          isSnowy ? "NEED: snow_seal_gaskets_on_all_joints_below_knee_prevent_packed_snow_buildup" : null,
+          isIceStorm ? "NEED: heated_camera_lens_covers_transparent_ITO_coating_prevents_ice_formation" : null,
+          temperature_C < -40 ? "NEED: arctic_grade_lubricant_PFPE_rated_to_-60°C_for_all_bearings" : null,
+          temperature_C < -30 ? "NEED: metal_components_switch_to_austenitic_stainless_steel_prevents_cold_brittleness" : null,
+        ].filter(Boolean),
+      },
+      position: pos(10), velocity: { x: 0, y: 0, z: 0 },
+      threatLevel: isIcy ? 0.5 : isSnowy ? 0.3 : 0.1, interactable: false,
+      behaviorPattern: "winter_environment_persistent_condition", detectionDifficulty: 0.0,
     });
   }
 
