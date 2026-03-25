@@ -1956,6 +1956,37 @@ export default function Account() {
             {/* ═══ ACCOUNT TAB ═══ */}
             {settingsTab === "account" && (
               <div className="space-y-6">
+                <div className="bg-[#1C2333] border border-[#2B3245] rounded-xl p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <User className="w-5 h-5 text-primary" />
+                    <h3 className="font-semibold text-white text-sm">Account Overview</h3>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-3 rounded-lg bg-[#2B3245]/30 border border-[#2B3245]">
+                      <p className="text-[10px] font-mono text-[#9DA5B4] mb-0.5">Username</p>
+                      <p className="text-sm font-mono text-white/90">@{(user as any)?.username || "—"}</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-[#2B3245]/30 border border-[#2B3245]">
+                      <p className="text-[10px] font-mono text-[#9DA5B4] mb-0.5">Email</p>
+                      <p className="text-sm font-mono text-white/90 break-all">{(user as any)?.email || "—"}</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-[#2B3245]/30 border border-[#2B3245]">
+                      <p className="text-[10px] font-mono text-[#9DA5B4] mb-0.5">User ID</p>
+                      <p className="text-[11px] font-mono text-[#9DA5B4] break-all">{user?.id || "—"}</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-[#2B3245]/30 border border-[#2B3245]">
+                      <p className="text-[10px] font-mono text-[#9DA5B4] mb-0.5">Plan</p>
+                      <p className="text-sm font-mono font-bold text-primary">
+                        {isOwner ? "CREATOR" : (status as any)?.isPro ? "UNLIMITED" : "FREE"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <AccountSessionsSection />
+
+                <AccountDataExportSection />
+
                 {!isOwner && <DeleteAccountSection />}
               </div>
             )}
@@ -3137,6 +3168,128 @@ function AlgorithmicHarmonicsPanel() {
           <p className="text-[10px] mt-2 text-violet-400/40">Audio processed in real-time only — no persistent recording</p>
         </div>
       )}
+    </div>
+  );
+}
+
+function AccountSessionsSection() {
+  const { logout } = useAuth();
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/omnimens/active-sessions", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.sessions) setSessions(data.sessions);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleLogoutAll = async () => {
+    setLoggingOut(true);
+    try {
+      const res = await fetch("/api/omnimens/logout-all-sessions", { method: "POST", credentials: "include" });
+      if (res.ok) {
+        logout();
+      }
+    } catch {} finally {
+      setLoggingOut(false);
+    }
+  };
+
+  return (
+    <div className="bg-[#1C2333] border border-[#2B3245] rounded-xl p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Shield className="w-5 h-5 text-primary" />
+          <h3 className="font-semibold text-white text-sm">Active Sessions</h3>
+        </div>
+        <button
+          type="button"
+          onClick={handleLogoutAll}
+          disabled={loggingOut}
+          className="text-xs font-mono text-red-400 hover:text-red-300 transition-colors disabled:opacity-40"
+        >
+          {loggingOut ? "Signing out..." : "Sign out all devices"}
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="space-y-2">
+          {[1, 2].map(i => <div key={i} className="h-10 animate-pulse bg-[#2B3245]/50 rounded-lg" />)}
+        </div>
+      ) : sessions.length === 0 ? (
+        <div className="text-center py-6">
+          <Shield className="w-6 h-6 mx-auto mb-2 text-[#9DA5B4]/40" />
+          <p className="text-xs text-[#9DA5B4]">Current session active</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {sessions.map((s: any, idx: number) => (
+            <div key={idx} className="flex items-center justify-between p-3 rounded-lg bg-[#2B3245]/30 border border-[#2B3245]">
+              <div className="flex items-center gap-3">
+                <div className={`w-2 h-2 rounded-full ${s.current ? "bg-green-500" : "bg-[#9DA5B4]/40"}`} />
+                <div>
+                  <p className="text-xs font-mono text-white/90">{s.device || "Unknown device"}</p>
+                  <p className="text-[10px] font-mono text-[#9DA5B4]">{s.lastActive || "—"}</p>
+                </div>
+              </div>
+              {s.current && <span className="text-[10px] font-mono text-green-400 border border-green-500/30 bg-green-500/10 px-2 py-0.5 rounded">THIS DEVICE</span>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AccountDataExportSection() {
+  const [exporting, setExporting] = useState(false);
+  const [exported, setExported] = useState(false);
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const res = await fetch("/api/omnimens/export-data", { credentials: "include" });
+      if (!res.ok) throw new Error("Export failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `omnimens-data-${new Date().toISOString().split("T")[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setExported(true);
+      setTimeout(() => setExported(false), 4000);
+    } catch {
+      alert("Failed to export data. Please try again.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  return (
+    <div className="bg-[#1C2333] border border-[#2B3245] rounded-xl p-6">
+      <div className="flex items-center gap-2 mb-3">
+        <Copy className="w-5 h-5 text-primary" />
+        <h3 className="font-semibold text-white text-sm">Export Your Data</h3>
+      </div>
+      <p className="text-xs text-[#9DA5B4] mb-4">
+        Download all your OMNIMENS data — conversations, memories, custom instructions, and account settings — as a JSON file.
+      </p>
+      <button
+        type="button"
+        onClick={handleExport}
+        disabled={exporting}
+        className="px-4 py-2 rounded-lg border border-primary/30 bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition-colors disabled:opacity-40"
+      >
+        {exporting ? "Exporting..." : exported ? "Downloaded!" : "Export all data"}
+      </button>
     </div>
   );
 }

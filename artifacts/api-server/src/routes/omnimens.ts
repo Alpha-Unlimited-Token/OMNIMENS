@@ -13,7 +13,7 @@ import multer from "multer";
 import JSZip from "jszip";
 import { db } from "@workspace/db";
 import { recordBruteForceAttempt } from "../middleware/security-enhanced.js";
-import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions, omnimensCodeRuns, omnimensConversations, omnimensMessages, omnimensMemories, omnimensCustomInstructions, omnimensHubSettings, omnimensSavedPrompts } from "@workspace/db";
+import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions, omnimensCodeRuns, omnimensConversations, omnimensMessages, omnimensMemories, omnimensCustomInstructions, omnimensHubSettings, omnimensSavedPrompts, sessionsTable, usersTable } from "@workspace/db";
 import { eq, and, desc, sql, asc, inArray, gte, lte } from "drizzle-orm";
 import { openai, generateImageBuffer, editImageFromBuffer } from "@workspace/integrations-openai-ai-server";
 import { getTogetherClient, isTogetherModel, TOGETHER_MODEL_IDS, TOGETHER_PRICING, syncTogetherPricing, type TogetherModel } from "../lib/together-ai.js";
@@ -5201,6 +5201,101 @@ router.get("/omnimens/admin/all-customers", async (req, res) => {
   } catch (err: any) {
     console.error("[Admin] All customers error:", err);
     res.status(500).json({ error: "Failed to load customers" });
+  }
+});
+
+// ─── Active Sessions ─────────────────────────────────────────────────────────
+
+router.get("/omnimens/active-sessions", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const userId = req.user.id;
+  const currentSid = req.cookies?.sid;
+  try {
+    const rows = await db.select().from(sessionsTable).where(gte(sessionsTable.expire, new Date()));
+    const userSessions = rows.filter((r: any) => {
+      const sess = r.sess as any;
+      return sess?.user?.id === userId;
+    });
+    const sessions = userSessions.map((r: any) => ({
+      device: "Browser session",
+      lastActive: r.expire ? new Date(new Date(r.expire).getTime() - 7 * 24 * 60 * 60 * 1000).toLocaleString() : "—",
+      current: r.sid === currentSid,
+    }));
+    res.json({ sessions });
+  } catch (err) {
+    console.error("[Account] Active sessions error:", err);
+    res.json({ sessions: [] });
+  }
+});
+
+// ─── Logout all sessions ────────────────────────────────────────────────────
+
+router.post("/omnimens/logout-all-sessions", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const userId = req.user.id;
+  try {
+    const rows = await db.select().from(sessionsTable).where(gte(sessionsTable.expire, new Date()));
+    const userSids = rows.filter((r: any) => (r.sess as any)?.user?.id === userId).map((r: any) => r.sid);
+    if (userSids.length > 0) {
+      await db.delete(sessionsTable).where(inArray(sessionsTable.sid, userSids));
+    }
+    res.clearCookie("sid", { path: "/" });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error("[Account] Logout all error:", err);
+    res.status(500).json({ error: "Failed to logout sessions" });
+  }
+});
+
+// ─── Export user data ───────────────────────────────────────────────────────
+
+router.get("/omnimens/export-data", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const userId = req.user.id;
+  try {
+    const [userRow] = await db.select({
+      id: usersTable.id,
+      email: usersTable.email,
+      firstName: usersTable.firstName,
+      lastName: usersTable.lastName,
+      createdAt: usersTable.createdAt,
+    }).from(usersTable).where(eq(usersTable.id, userId));
+
+    const conversations = await db.select().from(omnimensConversations).where(eq(omnimensConversations.userId, userId)).orderBy(desc(omnimensConversations.createdAt));
+    const convoIds = conversations.map(c => c.id);
+    let messages: any[] = [];
+    if (convoIds.length > 0) {
+      messages = await db.select().from(omnimensMessages).where(inArray(omnimensMessages.conversationId, convoIds)).orderBy(asc(omnimensMessages.createdAt));
+    }
+
+    const memories = await db.select().from(omnimensMemories).where(eq(omnimensMemories.userId, userId));
+    const [customInstructions] = await db.select().from(omnimensCustomInstructions).where(eq(omnimensCustomInstructions.userId, userId));
+
+    const exportData = {
+      exportedAt: new Date().toISOString(),
+      account: userRow || {},
+      customInstructions: customInstructions || null,
+      memories: memories.map(m => ({ content: m.content, category: m.category, confidence: m.confidence, active: m.active, createdAt: m.createdAt })),
+      conversations: conversations.map(c => ({
+        id: c.id,
+        title: c.title,
+        persona: c.persona,
+        messageCount: c.messageCount,
+        createdAt: c.createdAt,
+        messages: messages.filter(m => m.conversationId === c.id).map(m => ({
+          role: m.role,
+          content: m.content,
+          createdAt: m.createdAt,
+        })),
+      })),
+    };
+
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Content-Disposition", `attachment; filename="omnimens-data-${new Date().toISOString().split("T")[0]}.json"`);
+    res.send(JSON.stringify(exportData, null, 2));
+  } catch (err) {
+    console.error("[Account] Export data error:", err);
+    res.status(500).json({ error: "Failed to export data" });
   }
 });
 
