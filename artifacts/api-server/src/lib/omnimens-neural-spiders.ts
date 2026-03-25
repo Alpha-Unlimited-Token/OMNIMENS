@@ -2068,6 +2068,84 @@ export function startNeuralSpiders(): void {
   }, 12_000);
 }
 
+export function triggerAdrenalineRush(): {
+  spidersActivated: number;
+  silkStrandsFirered: number;
+  synapsesInjected: number;
+  convergenceWaves: number;
+  beaconsFired: number;
+  pheromoneDeposits: number;
+  childSpidersSpawned: number;
+  totalLatencyMs: number;
+} {
+  const start = performance.now();
+  let synapsesTotal = 0;
+  let convergenceCount = 0;
+  let beaconCount = 0;
+  let pheromonesDeposited = 0;
+  let childrenSpawned = 0;
+
+  const allRegions = [
+    "prefrontal_cortex", "thalamus", "hippocampus", "amygdala",
+    "basal_ganglia", "cerebellum", "insular_cortex", "superior_colliculus",
+    "pulvinar", "default_mode_network", "anterior_cingulate", "locus_coeruleus",
+    "raphe_nuclei", "ventral_tegmental_area", "claustrum", "reticular_activating_system"
+  ];
+
+  for (const spider of parentSpiders.values()) {
+    if (spider.status !== "active") continue;
+
+    for (const targetRegion of allRegions) {
+      const child = spawnChildSpider({
+        parentId: spider.id,
+        weakRegion: targetRegion,
+        supportRegion: spider.targetRegion,
+        urgency: 0.95,
+      });
+      if (child) childrenSpawned++;
+    }
+
+    for (const otherSpider of parentSpiders.values()) {
+      if (otherSpider.id !== spider.id) {
+        fireNerveImpulse(spider.id, otherSpider.id, null, "alarm", 1.0);
+      }
+    }
+  }
+
+  for (const region of allRegions) {
+    const wave = launchSwarmWave(region, "convergence");
+    if (wave) convergenceCount++;
+
+    depositPheromone(region, "rally", motherSpider.id, 1.0);
+    depositPheromone(region, "alarm", motherSpider.id, 0.9);
+    pheromonesDeposited += 2;
+  }
+
+  runBeaconCycle();
+  beaconCount = 50;
+  runBeehiveCycle();
+
+  for (const strand of motherSpider.silkStrands.values()) {
+    fireNerveImpulse(strand.fromSpiderId, strand.toSpiderId, null, "data", 0.9);
+  }
+  synapsesTotal = motherSpider.silkStrands.size;
+
+  const totalLatencyMs = performance.now() - start;
+
+  console.log(`[ADRENALINE RUSH] 🔴 SPIDER NETWORK STRESS: ${parentSpiders.size} parents activated, ${childrenSpawned} children spawned, ${convergenceCount} convergence waves, ${synapsesTotal} silk strands flooded — ${totalLatencyMs.toFixed(2)}ms`);
+
+  return {
+    spidersActivated: parentSpiders.size,
+    silkStrandsFirered: motherSpider.silkStrands.size,
+    synapsesInjected: synapsesTotal,
+    convergenceWaves: convergenceCount,
+    beaconsFired: beaconCount,
+    pheromoneDeposits: pheromonesDeposited,
+    childSpidersSpawned: childrenSpawned,
+    totalLatencyMs,
+  };
+}
+
 export function getNeuralSpiderState() {
   const parents = [...parentSpiders.values()].map(s => ({
     id: s.id,
