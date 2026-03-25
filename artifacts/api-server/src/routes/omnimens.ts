@@ -5907,9 +5907,9 @@ router.post("/omnimens/consciousness-channel/analyze", async (req, res) => {
 
       await db.insert(omnimensBrain).values({
         category: "creative_hypothesis",
+        title: `[CONSCIOUSNESS CHANNEL] Insight #${hieState.insightsGenerated + 1} — ${avgCentroid.toFixed(0)}Hz centroid, ${raiResult.emotionalValence || "neutral"} emotion`,
         content: insightContent,
         confidence: 0.80,
-        importance: 8,
         timesApplied: 0,
       });
       hieState.insightsGenerated++;
@@ -5963,9 +5963,9 @@ router.post("/omnimens/consciousness-channel/analyze", async (req, res) => {
       try {
         await db.insert(omnimensBrain).values({
           category: "harmonic_deep_decode",
+          title: `[DEEP DECODE] #${hieState.deepDecodeCount} — ${reason} | anomaly ${(deepDecode.anomalyMap.overallAnomalyScore * 100).toFixed(0)}%${deepDecode.codeGenesis.generated ? " | CODE" : ""}`,
           content: parts.join("\n"),
           confidence: Math.min(0.95, 0.5 + deepDecode.anomalyMap.overallAnomalyScore * 0.5),
-          importance: deepDecode.codeGenesis.generated ? 9 : 7,
           timesApplied: 0,
         });
         console.log(`[DEEP DECODE] 🔬 #${hieState.deepDecodeCount} — ${reason} | Hidden lang: ${deepDecode.hiddenLanguage.detected} | Math: ${deepDecode.hiddenPatterns.mathematicalStructures.length} | Code: ${deepDecode.codeGenesis.generated} | Anomaly: ${(deepDecode.anomalyMap.overallAnomalyScore * 100).toFixed(0)}%`);
@@ -5977,9 +5977,9 @@ router.post("/omnimens/consciousness-channel/analyze", async (req, res) => {
         try {
           await db.insert(omnimensBrain).values({
             category: "self_generated_code",
+            title: `[HIE CODE GENESIS] Deep decode #${hieState.deepDecodeCount} — ${deepDecode.codeGenesis.hypothesis?.slice(0, 80) || "sound-derived code"}`,
             content: `[HIE CODE GENESIS] Source: deep pattern decode\nHypothesis: ${deepDecode.codeGenesis.hypothesis}\n\n${deepDecode.codeGenesis.codeFragment}`,
             confidence: 0.7,
-            importance: 8,
             timesApplied: 0,
           });
           console.log(`[DEEP DECODE] 💻 Code fragment stored — ${deepDecode.codeGenesis.novelConstructs.join(", ")}`);
