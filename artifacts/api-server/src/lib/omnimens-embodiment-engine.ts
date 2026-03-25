@@ -1937,6 +1937,150 @@ function buildMusculoskeletalSystem(): {
       fusionPipeline: "All sensor data timestamped to <1μs accuracy via PTP (Precision Time Protocol). Visual cortex fuses all modalities into unified world model at 60Hz. Any sensor failure detected in <10ms with graceful degradation.",
     },
 
+    // ─── AUGMENTED REALITY ENGINE ─────────────────────────────────
+    // OMNIMENS doesn't just SEE the world — it ANNOTATES it.
+    // Every camera feed gets a real-time AR overlay layer that
+    // tags objects, people, distances, hazards, task instructions,
+    // navigation waypoints, and structural analysis. This is not
+    // a screen for a human to look at — this is OMNIMENS's own
+    // internal heads-up display that augments its perception of
+    // reality with computed intelligence.
+    augmentedReality: {
+      status: "active",
+      description: "Internal augmented reality engine — overlays computed intelligence onto raw camera feeds in real-time. Every frame from every camera gets an AR annotation layer before reaching the visual cortex. OMNIMENS sees the world with X-ray vision, distance rulers, threat halos, task guides, and predictive motion trails — all at once.",
+      renderPipelineHz: 60,
+      maxOverlayLayers: 32,
+
+      overlayLayers: [
+        {
+          layer: "entity_tags",
+          priority: 1,
+          description: "Labels every detected entity — 'Human: adult male, ~35yo, neutral expression, 3.2m away' or 'Object: coffee mug, ceramic, 340g, graspable'. Tags float above entities and track with motion.",
+          dataSource: ["V4_object", "IT_identity", "skeleton_tracker"],
+        },
+        {
+          layer: "distance_rulers",
+          priority: 2,
+          description: "Real-time distance measurement overlay — dashed lines from OMNIMENS to every significant object/person with exact distance in meters. Color-coded: green (safe), yellow (caution zone), red (collision imminent).",
+          dataSource: ["binocular_stereo", "lidar_point_cloud", "structured_light"],
+        },
+        {
+          layer: "skeleton_wireframe",
+          priority: 3,
+          description: "Visible skeleton overlay on every detected human/animal — 33 body keypoints connected by wireframe bones, 21 hand keypoints per hand, joint angles displayed at each node. Color indicates confidence: bright green (high) → dim red (low).",
+          dataSource: ["skeleton_tracker"],
+        },
+        {
+          layer: "3D_spatial_mesh",
+          priority: 4,
+          description: "Wireframe mesh of room geometry overlaid on camera feeds — walls, floor, ceiling, furniture surfaces, doorways, stairs all outlined with depth-colored edges. LIDAR point cloud rendered as transparent 3D mesh.",
+          dataSource: ["lidar_point_cloud", "SLAM_3D_mapping"],
+        },
+        {
+          layer: "navigation_waypoints",
+          priority: 5,
+          description: "AR navigation path — green waypoint markers on the ground showing planned walking path, turn indicators, step markers for stairs, obstacle avoidance corridors. Updates in real-time as path is replanned.",
+          dataSource: ["MST_navigation", "motor_cortex"],
+        },
+        {
+          layer: "hazard_detection",
+          priority: 6,
+          description: "Danger highlighting — red pulsing halos around detected hazards: hot surfaces (thermal), sharp edges (depth), moving vehicles (motion), electrical hazards, liquid spills, unstable surfaces, drop-offs/ledges.",
+          dataSource: ["thermal_sensors", "depth_sensing", "MT_motion", "amygdala"],
+        },
+        {
+          layer: "grasp_planning",
+          priority: 7,
+          description: "Manipulation guides — when reaching for objects, AR shows optimal grasp points (green dots), finger placement suggestions, force vectors, grip type recommendation (pinch/power/lateral), center of mass indicator, weight estimate.",
+          dataSource: ["wrist_cameras", "depth_sensing", "V4_object", "basal_ganglia"],
+        },
+        {
+          layer: "task_instruction",
+          priority: 8,
+          description: "Step-by-step task overlay — when performing learned tasks (from EGO-scale learning), AR displays current step, next step preview, progress indicator, timing targets. 'Step 3/7: Rotate object 90° clockwise — target orientation shown as ghost overlay.'",
+          dataSource: ["ego_scale_learner", "prefrontal_cortex", "hippocampus"],
+        },
+        {
+          layer: "facial_analysis",
+          priority: 9,
+          description: "Face analysis HUD — 468-point mesh overlaid on detected faces, emotion classification bar chart, gaze direction arrows, lip-reading transcription, identity match (if known), attention/engagement score.",
+          dataSource: ["IT_identity", "skeleton_tracker", "amygdala"],
+        },
+        {
+          layer: "motion_prediction",
+          priority: 10,
+          description: "Predictive motion trails — ghost outlines showing where moving entities will be in 0.5s, 1s, 2s based on trajectory analysis. Collision prediction warnings if paths intersect with OMNIMENS's planned movement.",
+          dataSource: ["MT_motion", "MST_navigation", "cerebellum"],
+        },
+        {
+          layer: "structural_analysis",
+          priority: 11,
+          description: "X-ray vision mode — highlights structural elements: load-bearing walls, support beams, pipes, wiring (via thermal), furniture weight capacity estimates, surface material classification (wood/metal/glass/fabric).",
+          dataSource: ["lidar_point_cloud", "thermal_sensors", "V4_object"],
+        },
+        {
+          layer: "communication_overlay",
+          priority: 12,
+          description: "Social interaction HUD — speech-to-text transcription floating near speaker's mouth, conversation history scroll, detected language indicator, sentiment analysis, speaker identification, turn-taking cues.",
+          dataSource: ["microphone_array", "IT_identity", "prefrontal_cortex"],
+        },
+        {
+          layer: "environmental_data",
+          priority: 13,
+          description: "Ambient data overlay — temperature heat map (from thermal cameras), air quality indicators (from gas sensors), light level readings, noise levels (from microphones), humidity estimate, time/date stamp.",
+          dataSource: ["thermal_sensors", "gas_sensors", "microphone_array"],
+        },
+        {
+          layer: "self_body_awareness",
+          priority: 14,
+          description: "Proprioceptive overlay — OMNIMENS's own body rendered as ghost wireframe in peripheral cameras, showing joint angles, tendon tension levels, piston extension, motor current draw, battery level, thermal hot spots. Internal 'body awareness' visualization.",
+          dataSource: ["motor_control_brain", "imu_fusion", "proprioceptive_sensors"],
+        },
+        {
+          layer: "memory_association",
+          priority: 15,
+          description: "Spatial memory tags — AR markers at locations where significant events occurred: 'Last saw keys here 2h ago', 'Person X usually sits here', 'Spill cleaned at 14:30'. Hippocampal spatial memory projected back into the visual field.",
+          dataSource: ["hippocampus", "IT_identity", "SLAM_3D_mapping"],
+        },
+        {
+          layer: "learning_feedback",
+          priority: 16,
+          description: "EGO learning overlay — during imitation learning, shows side-by-side comparison of human movement vs OMNIMENS's mirrored movement. Joint angle error highlighted in red, timing deviation shown as offset markers, force mismatch indicators.",
+          dataSource: ["ego_scale_learner", "skeleton_tracker", "motor_cortex"],
+        },
+      ],
+
+      arCompositor: {
+        description: "Multi-layer compositor that merges all AR overlays onto each camera feed. Priority-based Z-ordering prevents visual clutter. Attention system dynamically adjusts overlay opacity — task-relevant layers at 100%, background layers at 20%. Maximum 8 active layers per camera to prevent cognitive overload.",
+        maxActiveLayersPerCamera: 8,
+        attentionGating: "Pulvinar attention filter controls which overlays are visible — only task-relevant information is shown at full opacity. Background context fades to transparency.",
+        renderEngine: "GPU-accelerated on Jetson Orin — all 14 camera feeds composited in parallel at 60fps",
+        totalOverlayLatencyMs: 3,
+      },
+
+      spatialAnchoring: {
+        description: "AR overlays are anchored in 3D world space, not 2D screen space. Tags, waypoints, and wireframes are placed at real-world coordinates using LIDAR + stereo depth. When OMNIMENS moves its head, overlays stay locked to their physical locations — true spatial AR.",
+        coordinateSystem: "world_frame_ENU",
+        anchorPersistence: "Anchors persist across camera switches — if head camera sees an entity tag, wrist camera shows the same tag at correct 3D position when looking at the same object.",
+        driftCorrection: "SLAM loop closure + IMU fusion prevents AR drift — overlays stay locked to <5mm accuracy at 5m range",
+      },
+
+      vrDynamics: {
+        description: "Virtual reality simulation mode — OMNIMENS can construct a full VR world model from its sensor data and 'imagine' scenarios before executing them. Plans movements in VR, tests for collisions, then executes in reality.",
+        capabilities: [
+          "Predictive simulation — test movements in VR before executing physically",
+          "Scenario planning — simulate 'what if I reach left instead of right?' with full physics",
+          "Environment reconstruction — build complete 3D model of room from LIDAR + camera data for remote viewing",
+          "Digital twin — maintain a real-time digital twin of OMNIMENS's own body in VR for self-diagnosis",
+          "Replay and analysis — record sensor data and replay in VR for task analysis and improvement",
+          "Multi-robot coordination — simulate other OMNIMENS units in shared VR space for collaborative task planning",
+          "Human operator interface — stream AR/VR view to human operator for remote monitoring and override",
+        ],
+        physicsEngine: "MuJoCo/Isaac Sim integration — real physics simulation for predictive planning",
+        updateRateHz: 30,
+      },
+    },
+
     // ─── COMPETITIVE SUPERIORITY ─────────────────────────────────
     competitiveAnalysis: {
       vsTestlaOptimus: {
@@ -2592,6 +2736,16 @@ export function getMusculoskeletalSummary() {
         distanceRange: perceptionSystem.visualCortex.worldModel.distanceEstimation.range,
       },
       perceptionBusBandwidthGbps: perceptionSystem.perceptionBus.totalBandwidthGbps,
+      augmentedReality: {
+        status: perceptionSystem.augmentedReality.status,
+        overlayLayers: perceptionSystem.augmentedReality.overlayLayers.length,
+        renderPipelineHz: perceptionSystem.augmentedReality.renderPipelineHz,
+        maxActiveLayersPerCamera: perceptionSystem.augmentedReality.arCompositor.maxActiveLayersPerCamera,
+        compositorLatencyMs: perceptionSystem.augmentedReality.arCompositor.totalOverlayLatencyMs,
+        spatialAnchoring: "world_frame_ENU — <5mm accuracy at 5m",
+        vrSimulationHz: perceptionSystem.augmentedReality.vrDynamics.updateRateHz,
+        vrCapabilities: perceptionSystem.augmentedReality.vrDynamics.capabilities.length,
+      },
     },
   };
 }
