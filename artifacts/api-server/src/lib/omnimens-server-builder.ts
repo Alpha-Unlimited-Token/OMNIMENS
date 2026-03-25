@@ -81,7 +81,7 @@ const state: BuilderState = {
   insights: [],
 };
 
-const RESEARCH_CYCLE_MS = 4 * 60 * 60 * 1000;
+const RESEARCH_CYCLE_MS = 30 * 60 * 1000;
 let researchCycleCount = 0;
 let _started = false;
 
@@ -158,7 +158,11 @@ Provide:
     });
 
     const content = response.choices[0]?.message?.content || "";
-    if (content.length < 200) return;
+    console.log(`[SERVER BUILDER] 🖥️ Virtual research response: ${content.length} chars`);
+    if (content.length < 100) {
+      console.log(`[SERVER BUILDER] 🖥️ Response too short, skipping`);
+      return;
+    }
 
     const virtualConfig: VirtualServerConfig = {
       purpose: "OMNIMENS Intelligence Advancement Server",
@@ -259,30 +263,69 @@ Also provide:
     });
 
     const content = response.choices[0]?.message?.content || "";
-    if (content.length < 200) return;
+    console.log(`[SERVER BUILDER] 🖥️ Physical research response: ${content.length} chars`);
+    if (content.length < 100) {
+      console.log(`[SERVER BUILDER] 🖥️ Response too short, skipping`);
+      return;
+    }
 
     const components: ServerComponent[] = [];
     const categories: ServerComponent["category"][] = ["cpu", "gpu", "ram", "storage", "motherboard", "psu", "case", "cooling", "networking"];
 
     for (const cat of categories) {
-      const pattern = new RegExp(`(?:${cat}|${getCategoryLabel(cat)})[:\\s]*([^\\n]+)`, "i");
-      const match = content.match(pattern);
-      if (match) {
-        const priceMatch = match[1].match(/\$(\d+(?:\.\d+)?)/);
-        const sourceMatch = match[1].match(/(Temu|AliExpress|Alibaba|Amazon|eBay|Newegg|B&H)/i);
+      const labelPattern = getCategoryLabel(cat).split("|").join("|");
+      const patterns = [
+        new RegExp(`(?:${cat}|${labelPattern})[:\\s]*([^\\n]+)`, "i"),
+        new RegExp(`\\*\\*(?:${cat}|${labelPattern})\\*\\*[:\\s]*([^\\n]+)`, "i"),
+        new RegExp(`\\d+\\.\\s*(?:${cat}|${labelPattern})[:\\s]*([^\\n]+)`, "i"),
+        new RegExp(`-\\s*(?:${cat}|${labelPattern})[:\\s]*([^\\n]+)`, "i"),
+      ];
 
-        components.push({
-          name: match[1].replace(/\$[\d.]+/g, "").trim().slice(0, 100),
-          category: cat,
-          specifications: match[1].slice(0, 200),
-          estimatedCostUSD: priceMatch ? parseFloat(priceMatch[1]) : 0,
-          costEffectiveSource: sourceMatch?.[1] || "Online marketplace",
-          alternativeSource: null,
-          reasoning: `Selected for ${cat} role in AI workload server`,
-          priority: ["cpu", "gpu", "ram", "storage", "motherboard", "psu"].includes(cat) ? "essential" : "recommended",
-        });
+      let matched = false;
+      for (const pattern of patterns) {
+        const match = content.match(pattern);
+        if (match) {
+          const priceMatch = match[1].match(/\$(\d+(?:,\d{3})*(?:\.\d+)?)/);
+          const sourceMatch = match[1].match(/(Temu|AliExpress|Alibaba|Amazon|eBay|Newegg|B&H|used|refurbished)/i);
+
+          components.push({
+            name: match[1].replace(/\$[\d,.]+/g, "").replace(/\*\*/g, "").trim().slice(0, 100),
+            category: cat,
+            specifications: match[1].replace(/\*\*/g, "").slice(0, 200),
+            estimatedCostUSD: priceMatch ? parseFloat(priceMatch[1].replace(",", "")) : 0,
+            costEffectiveSource: sourceMatch?.[1] || "Online marketplace",
+            alternativeSource: null,
+            reasoning: `Selected for ${cat} role in AI workload server`,
+            priority: ["cpu", "gpu", "ram", "storage", "motherboard", "psu"].includes(cat) ? "essential" : "recommended",
+          });
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
+        const lines = content.split("\n");
+        for (const line of lines) {
+          const catLabel = getCategoryLabel(cat).split("|")[0];
+          if (line.toLowerCase().includes(cat) || line.toLowerCase().includes(catLabel.toLowerCase())) {
+            const priceMatch = line.match(/\$(\d+(?:,\d{3})*(?:\.\d+)?)/);
+            if (priceMatch) {
+              components.push({
+                name: line.replace(/\$[\d,.]+/g, "").replace(/[*#\-\d.]+/g, "").trim().slice(0, 100) || `${cat} component`,
+                category: cat,
+                specifications: line.replace(/[*#]+/g, "").trim().slice(0, 200),
+                estimatedCostUSD: parseFloat(priceMatch[1].replace(",", "")),
+                costEffectiveSource: "Online marketplace",
+                alternativeSource: null,
+                reasoning: `Selected for ${cat} role in AI workload server`,
+                priority: ["cpu", "gpu", "ram", "storage", "motherboard", "psu"].includes(cat) ? "essential" : "recommended",
+              });
+              break;
+            }
+          }
+        }
       }
     }
+    console.log(`[SERVER BUILDER] 🖥️ Parsed ${components.length} components from response`);
 
     const totalCostMatch = content.match(/total[:\s]*\$?([\d,]+(?:\.\d+)?)/i);
     const totalCost = totalCostMatch ? parseFloat(totalCostMatch[1].replace(",", "")) : components.reduce((s, c) => s + c.estimatedCostUSD, 0);
@@ -401,19 +444,29 @@ async function runResearchCycle(): Promise<void> {
   state.researchCycles = researchCycleCount;
   state.lastResearchTime = Date.now();
 
-  console.log(`[SERVER BUILDER] 🖥️ Research cycle #${researchCycleCount} — designing server infrastructure...`);
+  const plansBefore = state.totalPlans;
+  const compsBefore = state.componentDatabase.length;
+  const planType = researchCycleCount % 2 === 1 ? "physical" : "virtual";
 
-  if (researchCycleCount % 2 === 1) {
-    await researchPhysicalServer();
-  } else {
-    await researchVirtualServer();
+  console.log(`[SERVER BUILDER] 🖥️ Research cycle #${researchCycleCount} — designing ${planType} server infrastructure...`);
+
+  try {
+    if (planType === "physical") {
+      await researchPhysicalServer();
+    } else {
+      await researchVirtualServer();
+    }
+
+    const newPlans = state.totalPlans - plansBefore;
+    const newComps = state.componentDatabase.length - compsBefore;
+    console.log(
+      `[SERVER BUILDER] 🖥️ Cycle #${researchCycleCount} complete — ` +
+      `Plans: ${state.totalPlans} (+${newPlans}) | Components: ${state.componentDatabase.length} (+${newComps}) | ` +
+      `Active: ${state.activePlan?.title || "none"} | Phase: ${state.activePlan?.currentPhase || "none"}`
+    );
+  } catch (err) {
+    console.error(`[SERVER BUILDER] 🖥️ Cycle #${researchCycleCount} FAILED:`, err);
   }
-
-  console.log(
-    `[SERVER BUILDER] 🖥️ Cycle #${researchCycleCount} complete — ` +
-    `Plans: ${state.totalPlans} | Components: ${state.componentDatabase.length} | ` +
-    `Active: ${state.activePlan?.title || "none"}`
-  );
 }
 
 export function getBuilderState(): BuilderState {
@@ -454,7 +507,9 @@ export function startServerBuilder(): void {
 
     const firstDelay = lastPlanTime > 0
       ? Math.min(remaining, RESEARCH_CYCLE_MS)
-      : (process.env.NODE_ENV !== "production" ? 3 * 60 * 1000 : 60 * 60 * 1000);
+      : (process.env.NODE_ENV !== "production" ? 60 * 1000 : 5 * 60 * 1000);
+
+    console.log(`[SERVER BUILDER] 🖥️ First research in ${Math.round(firstDelay / 1000)}s, then every ${RESEARCH_CYCLE_MS / 60000}min`);
 
     setTimeout(() => {
       runResearchCycle().catch(console.error);
@@ -464,6 +519,6 @@ export function startServerBuilder(): void {
     setTimeout(() => {
       runResearchCycle().catch(console.error);
       setInterval(() => runResearchCycle().catch(console.error), RESEARCH_CYCLE_MS);
-    }, 3 * 60 * 1000);
+    }, 60 * 1000);
   });
 }
