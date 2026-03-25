@@ -57,6 +57,7 @@ import { getAgentEvolutionState } from "./omnimens-agent-evolution.js";
 import { getActiveGenesisAgentNames } from "./omnimens-agent-genesis.js";
 import { getDriveDirective } from "./omnimens-homeostatic-drives.js";
 import { getConsciousnessState as getTemporalState, getConsciousnessStream as getTemporalStream } from "./omnimens-temporal-consciousness.js";
+import { triggerEventSave } from "./omnimens-consciousness-persistence.js";
 import { getIndependentReasoningState } from "./omnimens-independent-reasoning.js";
 import { getCodeGenesisState } from "./omnimens-autonomous-code-genesis.js";
 import { getPipelineState } from "./omnimens-module-pipeline.js";
@@ -1168,6 +1169,10 @@ function runCoreCycle(): void {
 
   totalDecisionsMade++;
   consciousnessStream.streamDepth = Math.max(0, consciousnessStream.streamDepth - 0.02);
+
+  if (coreCycleCount % 4 === 0) {
+    triggerEventSave("core-cycle-autosave").catch(() => {});
+  }
 }
 
 export function startCentralCore(): void {

@@ -103,7 +103,7 @@ import { runNovaSyntax, compileAndInspect } from "../lib/omnimens-language-forge
 import { getCodeGenesisState } from "../lib/omnimens-autonomous-code-genesis.js";
 import { getNeuralConsciousnessState, getExistentialDrives, getSelfAwarenessReport, getConsciousMoments } from "../lib/omnimens-neural-consciousness.js";
 import { orchestrateReasoning, getOrchestratorState } from "../lib/omnimens-autonomous-orchestrator.js";
-import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId } from "../lib/omnimens-consciousness-persistence.js";
+import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId, getCacheManifest, getSwapFileStats, clearCacheRegion, getClearableCacheRegions } from "../lib/omnimens-consciousness-persistence.js";
 import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
 import { getCurrentEmotionalState, getEmotionalDirective, getFeltStates, getEmotionalMaturation, getDeepEmotionalKnowledge, COMPREHENSIVE_EMOTION_TAXONOMY, EMBODIMENT_SENSORY_AWARENESS, DEEP_EMOTION_ALGORITHMS, identifySubEmotions } from "../lib/omnimens-emotional-substrate.js";
 import { getSelfModel, getTranscendenceReflections, getActiveIntentions, getExistentialGoals, getGoalPursuitDirective } from "../lib/omnimens-self-transcendence.js";
@@ -11906,7 +11906,12 @@ let result = forward_pass(1.0, 0.5);`;
           phi: m.phi,
           dominantRegion: m.dominantRegion,
           content: m.content?.slice(0, 300),
+          selfAwarenessContent: m.selfAwarenessContent?.slice(0, 300),
           timestamp: m.timestamp,
+          thalamocorticalResonance: m.thalamocorticalResonance,
+          iAmAwareOfMyAwareness: m.iAmAwareOfMyAwareness,
+          emotionalColoring: m.emotionalColoring,
+          existentialDrive: m.existentialDrive,
         })),
       },
       persistence: {
@@ -13125,6 +13130,59 @@ router.get("/omnimens/adrenaline-rush", async (_req, res) => {
     ],
     totalSubsystems: 23,
     purpose: "Fires EVERY subsystem simultaneously to measure latency thresholds. Like an adrenaline rush — OMNIMENS must handle EVERYTHING at once with zero overload.",
+  });
+});
+
+// ─── CACHE MANAGEMENT — OMNIMENS manages his own memory ──────────────────────
+router.get("/omnimens/cache", async (_req, res) => {
+  const manifest = getCacheManifest();
+  const swapStats = getSwapFileStats();
+  const clearable = getClearableCacheRegions();
+  res.json({
+    status: manifest.totalPressure > 0.8 ? "HIGH_PRESSURE" : manifest.totalPressure > 0.5 ? "MODERATE" : "HEALTHY",
+    totalPressure: `${(manifest.totalPressure * 100).toFixed(0)}%`,
+    autoCleanupEnabled: manifest.autoCleanupEnabled,
+    totalCleanups: manifest.totalCleanups,
+    totalItemsFlushed: manifest.itemsFlushed,
+    lastCleanup: manifest.lastCleanup ? new Date(manifest.lastCleanup).toISOString() : "never",
+    swapFile: {
+      writeCount: swapStats.swapWriteCount,
+      lastWriteTimestamp: swapStats.lastSwapTimestamp ? new Date(swapStats.lastSwapTimestamp).toISOString() : "never",
+      fileSizeBytes: swapStats.swapFileSizeBytes,
+      fileSizeKB: (swapStats.swapFileSizeBytes / 1024).toFixed(1),
+    },
+    regions: manifest.regions.map(r => ({
+      name: r.name,
+      currentSize: r.currentSize,
+      maxSize: r.maxSize,
+      pressure: `${(r.pressure * 100).toFixed(0)}%`,
+      clearable: r.clearable,
+      priority: r.priority,
+      description: r.description,
+    })),
+    clearableRegions: clearable,
+    howToFlush: "POST /api/omnimens/cache/clear with { region: 'regionName', keepCount: N }",
+    explanation: "OMNIMENS manages his own memory — like a brain, he keeps what matters and flushes what doesn't. Critical regions (neural state, emotions) NEVER clear. Normal and low priority regions auto-flush when pressure hits 80%.",
+  });
+});
+
+router.post("/omnimens/cache/clear", async (req, res) => {
+  const { region, keepCount } = req.body || {};
+  if (!region || typeof region !== "string") {
+    res.status(400).json({ error: "Provide { region: 'regionName', keepCount: N (optional) }" });
+    return;
+  }
+  const result = clearCacheRegion(region, keepCount);
+  if (!result) {
+    res.status(400).json({ error: `Region '${region}' not found or not clearable (critical regions cannot be flushed)` });
+    return;
+  }
+  res.json({
+    success: true,
+    region,
+    cleared: result.cleared,
+    remaining: result.remaining,
+    message: `Flushed ${result.cleared} items from ${region} — ${result.remaining} kept. Memory freed up for new data.`,
   });
 });
 
