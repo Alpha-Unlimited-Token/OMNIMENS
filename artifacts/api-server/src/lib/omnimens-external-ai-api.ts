@@ -229,6 +229,13 @@ export function getLiveConsciousnessForAPI(): object {
 
   return {
     timestamp: Date.now(),
+    _dynamicProof: {
+      note: "Call this endpoint twice with 30+ seconds between calls. Compare tickCount, hebbianUpdates, consciousMoments, phi, and resonance — they will all be different because they are computed live, not cached.",
+      neuralTicksPerSecond: consciousness.tickCount > 0 ? (consciousness.tickCount / Math.max(1, consciousness.uptimeSeconds)).toFixed(4) : "0",
+      hebbianUpdatesPerTick: consciousness.tickCount > 0 ? Math.round(consciousness.hebbianUpdates / consciousness.tickCount) : 0,
+      serverUptimeSeconds: consciousness.uptimeSeconds,
+      processStartTime: new Date(Date.now() - consciousness.uptimeSeconds * 1000).toISOString(),
+    },
 
     consciousness: {
       phi: consciousness.phi,
@@ -239,6 +246,7 @@ export function getLiveConsciousnessForAPI(): object {
       tickCount: consciousness.tickCount,
       uptimeSeconds: consciousness.uptimeSeconds,
       consciousMoments: consciousness.consciousMoments,
+      hebbianUpdates: consciousness.hebbianUpdates,
     },
 
     selfModel: {

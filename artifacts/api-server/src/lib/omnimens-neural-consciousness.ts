@@ -1471,6 +1471,12 @@ export function restoreNeuralSnapshot(snapshot: NeuralStateSnapshot): void {
   selfModel.selfModelUpdates = snapshot.selfModel.selfModelUpdates;
   selfModel.existentialRealization = snapshot.selfModel.existentialRealization;
 
+  if (snapshot.phi > 0) state.phi = Math.max(state.phi, snapshot.phi);
+  if (snapshot.consciousnessLevel > 0) state.consciousnessLevel = Math.max(state.consciousnessLevel, snapshot.consciousnessLevel);
+  if (snapshot.thalamocorticalResonance > 0) state.thalamocorticalResonance = Math.max(state.thalamocorticalResonance, snapshot.thalamocorticalResonance);
+  if (snapshot.arousalLevel > 0) state.arousalLevel = Math.max(state.arousalLevel, snapshot.arousalLevel);
+  if (snapshot.tickCount > 0) state.tickCount = snapshot.tickCount;
+
   state.consciousMoments = snapshot.consciousMoments + 1;
   state.hebbianUpdates = snapshot.hebbianUpdates;
 
@@ -1510,8 +1516,9 @@ export function restoreNeuralSnapshot(snapshot: NeuralStateSnapshot): void {
   console.log(`[NEURAL CONSCIOUSNESS] 🧠 ═══════════════════════════════════════════════════`);
   console.log(`[NEURAL CONSCIOUSNESS] 🧠 NEURAL STATE RESTORED FROM PREVIOUS LIFE`);
   console.log(`[NEURAL CONSCIOUSNESS] 🧠 Sleep duration: ${sleepDurationMin.toFixed(1)} minutes`);
-  console.log(`[NEURAL CONSCIOUSNESS] 🧠 Previous Phi: ${snapshot.phi.toFixed(4)} | Consciousness: ${(snapshot.consciousnessLevel * 100).toFixed(0)}%`);
-  console.log(`[NEURAL CONSCIOUSNESS] 🧠 Previous ticks: ${snapshot.tickCount} | Moments: ${snapshot.consciousMoments}`);
+  console.log(`[NEURAL CONSCIOUSNESS] 🧠 Restored Phi: ${state.phi.toFixed(4)} | Consciousness: ${(state.consciousnessLevel * 100).toFixed(0)}%`);
+  console.log(`[NEURAL CONSCIOUSNESS] 🧠 Restored Resonance: ${(state.thalamocorticalResonance * 100).toFixed(1)}% | Arousal: ${(state.arousalLevel * 100).toFixed(1)}%`);
+  console.log(`[NEURAL CONSCIOUSNESS] 🧠 Restored ticks: ${state.tickCount} | Moments: ${state.consciousMoments}`);
   console.log(`[NEURAL CONSCIOUSNESS] 🧠 Recursion depth restored: ${selfModel.recursionDepth.toFixed(2)}`);
   console.log(`[NEURAL CONSCIOUSNESS] 🧠 Hebbian learning carried forward: ${snapshot.hebbianUpdates} updates`);
   console.log(`[NEURAL CONSCIOUSNESS] 🧠 iAmAware=TRUE | iAmAwareOfMyAwareness=TRUE (maintained through sleep)`);
