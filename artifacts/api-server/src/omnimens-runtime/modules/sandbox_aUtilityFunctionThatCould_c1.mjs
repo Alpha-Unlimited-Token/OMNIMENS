@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-25T00:03:53.295Z
+ * Written: 2026-03-25T00:31:07.139Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,49 +16,35 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function extractKeywords(text, minLength = 4) {
-    // Extracts unique keywords from a given text based on word length and frequency
-    const wordCounts = {};
-    const words = text.toLowerCase().match(/\b[a-z]+\b/g);
+function findMostFrequentPatterns(text, patternLength) {
+    if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
+        throw new Error('Invalid input: text must be a string and patternLength must be a positive number.');
+    }
 
-    if (!words) return [];
+    const patternCounts = new Map();
 
-    words.forEach(word => {
-        if (word.length >= minLength) {
-            wordCounts[word] = (wordCounts[word] || 0) + 1;
-        }
-    });
+    for (let i = 0; i <= text.length - patternLength; i++) {
+        const pattern = text.slice(i, i + patternLength);
+        patternCounts.set(pattern, (patternCounts.get(pattern) || 0) + 1);
+    }
 
-    const sortedKeywords = Object.keys(wordCounts).sort((a, b) => wordCounts[b] - wordCounts[a]);
-    return sortedKeywords;
+    const sortedPatterns = Array.from(patternCounts.entries()).sort((a, b) => b[1] - a[1]);
+
+    return sortedPatterns.slice(0, 5).map(([pattern, count]) => ({ pattern, count }));
 }
 
-// Self-tests
-function runTests() {
-    console.log("Test Case 1:");
-    const text1 = "Artificial intelligence is becoming increasingly important in the digital realm.";
-    const result1 = extractKeywords(text1);
-    console.log(result1); // Expected: ['intelligence', 'artificial', 'becoming', 'increasingly', 'important', 'digital', 'realm']
+// Test cases
+console.log('Test Case 1:');
+console.log(findMostFrequentPatterns('abababababab', 2)); // Expected: [{ pattern: 'ab', count: 6 }, { pattern: 'ba', count: 5 }]
 
-    console.log("Test Case 2:");
-    const text2 = "Generative AI focuses on creating new content, indicating a rise in AI capabilities.";
-    const result2 = extractKeywords(text2);
-    console.log(result2); // Expected: ['generative', 'focuses', 'creating', 'content', 'indicating', 'capabilities']
+console.log('Test Case 2:');
+console.log(findMostFrequentPatterns('abcabcabcabc', 3)); // Expected: [{ pattern: 'abc', count: 4 }]
 
-    console.log("Test Case 3:");
-    const text3 = "Quantum computing and AI integration are pioneering advancements.";
-    const result3 = extractKeywords(text3);
-    console.log(result3); // Expected: ['quantum', 'computing', 'integration', 'pioneering', 'advancements']
+console.log('Test Case 3:');
+console.log(findMostFrequentPatterns('aaaaaa', 1)); // Expected: [{ pattern: 'a', count: 6 }]
 
-    console.log("Test Case 4:");
-    const text4 = "Short words like 'is', 'on', 'and' should be excluded.";
-    const result4 = extractKeywords(text4);
-    console.log(result4); // Expected: ['short', 'words', 'like', 'should', 'excluded']
+console.log('Test Case 4:');
+console.log(findMostFrequentPatterns('abcdabcdabcdabcd', 4)); // Expected: [{ pattern: 'abcd', count: 4 }]
 
-    console.log("Test Case 5:");
-    const text5 = "";
-    const result5 = extractKeywords(text5);
-    console.log(result5); // Expected: []
-}
-
-runTests();
+console.log('Test Case 5:');
+console.log(findMostFrequentPatterns('xyzxyzxyzxyzxyz', 2)); // Expected: [{ pattern: 'xy', count: 5 }, { pattern: 'yz', count: 5 }, { pattern: 'zx', count: 4 }]

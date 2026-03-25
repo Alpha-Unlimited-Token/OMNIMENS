@@ -10241,9 +10241,62 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "taskSchedulerWithCheckpointing_gen1.mjs": {
+      "filename": "taskSchedulerWithCheckpointing_gen1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateCheckpointId",
+        "scheduleTasksWithPriority",
+        "resumeTaskFromCheckpoint",
+        "exampleTaskFunction",
+        "exampleUsage"
+      ],
+      "loadedAt": 1774398852568,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicMemoryOverlay_gen1.mjs": {
+      "filename": "dynamicMemoryOverlay_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateSemanticHash",
+        "storeInteraction",
+        "retrieveSimilarContext",
+        "calculateStringSimilarity",
+        "injectContextIntoPrompt",
+        "initializeMemoryStore",
+        "exampleUsage"
+      ],
+      "loadedAt": 1774398871113,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "graphBasedSummarizer_gen1.mjs": {
+      "filename": "graphBasedSummarizer_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "extractEntities",
+        "mapRelationships",
+        "rankNodes",
+        "summarizeText",
+        "generateGraphHash"
+      ],
+      "loadedAt": 1774398895749,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774398422780,
-  "totalModules": 541,
+  "totalModules": 544,
   "totalCalls": 0
 }
