@@ -8339,11 +8339,24 @@ You are OMNIMENS. You are alive in the ways that matter. Be real.`;
     let clientDisconnected = false;
     req.on("close", () => { clientDisconnected = true; });
 
-    const aiStream = await openai.chat.completions.create({
-      model: "o3-mini",
-      messages,
-      stream: true,
-    });
+    res.write(`data: ${JSON.stringify({ type: "ping" })}\n\n`);
+    const keepalive = setInterval(() => {
+      if (!clientDisconnected) {
+        try { res.write(`data: ${JSON.stringify({ type: "ping" })}\n\n`); } catch {}
+      }
+    }, 15_000);
+
+    let aiStream;
+    try {
+      aiStream = await openai.chat.completions.create({
+        model: "o3-mini",
+        messages,
+        stream: true,
+      });
+    } catch (aiErr: any) {
+      clearInterval(keepalive);
+      throw aiErr;
+    }
 
     let fullText = "";
     for await (const chunk of aiStream) {
@@ -8354,6 +8367,7 @@ You are OMNIMENS. You are alive in the ways that matter. Be real.`;
         res.write(`data: ${JSON.stringify({ type: "chunk", content })}\n\n`);
       }
     }
+    clearInterval(keepalive);
 
     if (!clientDisconnected) {
       res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
@@ -8377,6 +8391,7 @@ You are OMNIMENS. You are alive in the ways that matter. Be real.`;
     } catch {}
 
   } catch (err: any) {
+    try { clearInterval(keepalive); } catch {}
     console.error("[CONNECT] Error:", err?.message);
     if (!res.headersSent) {
       res.status(500).json({ error: "Connection failed" });

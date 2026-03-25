@@ -489,7 +489,7 @@ function ConnectChat() {
     setIsStreaming(true);
     setStreamingText("");
 
-    const timeout = setTimeout(() => { abortCtrl.abort(); }, 120_000);
+    const timeout = setTimeout(() => { abortCtrl.abort(); }, 300_000);
 
     try {
       const res = await fetch("/api/omnimens/connect", {
