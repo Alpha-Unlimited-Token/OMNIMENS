@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-24T23:21:07.836Z
+ * Written: 2026-03-25T00:03:53.295Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,64 +16,49 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility Function: Text Pattern Frequency Analyzer
-// This function analyzes a given text and identifies the frequency of patterns (words or phrases) of a specified length.
+function extractKeywords(text, minLength = 4) {
+    // Extracts unique keywords from a given text based on word length and frequency
+    const wordCounts = {};
+    const words = text.toLowerCase().match(/\b[a-z]+\b/g);
 
-function analyzePatternFrequency(text, patternLength) {
-    if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
-        throw new Error('Invalid input. Text must be a string and patternLength must be a positive number.');
-    }
+    if (!words) return [];
 
-    const words = text.split(/\s+/).filter(word => word.trim().length > 0);
-    const patternMap = new Map();
+    words.forEach(word => {
+        if (word.length >= minLength) {
+            wordCounts[word] = (wordCounts[word] || 0) + 1;
+        }
+    });
 
-    for (let i = 0; i <= words.length - patternLength; i++) {
-        const pattern = words.slice(i, i + patternLength).join(' ');
-        patternMap.set(pattern, (patternMap.get(pattern) || 0) + 1);
-    }
-
-    const result = Array.from(patternMap.entries())
-        .sort((a, b) => b[1] - a[1])
-        .map(([pattern, count]) => ({ pattern, count }));
-
-    return result;
+    const sortedKeywords = Object.keys(wordCounts).sort((a, b) => wordCounts[b] - wordCounts[a]);
+    return sortedKeywords;
 }
 
 // Self-tests
 function runTests() {
-    console.log("Test 1: Single-word patterns");
-    console.log(analyzePatternFrequency("hello world hello universe", 1));
-    // Expected output: [{ pattern: 'hello', count: 2 }, { pattern: 'world', count: 1 }, { pattern: 'universe', count: 1 }]
+    console.log("Test Case 1:");
+    const text1 = "Artificial intelligence is becoming increasingly important in the digital realm.";
+    const result1 = extractKeywords(text1);
+    console.log(result1); // Expected: ['intelligence', 'artificial', 'becoming', 'increasingly', 'important', 'digital', 'realm']
 
-    console.log("Test 2: Two-word patterns");
-    console.log(analyzePatternFrequency("hello world hello universe world hello", 2));
-    // Expected output: [{ pattern: 'hello world', count: 2 }, { pattern: 'world hello', count: 2 }, { pattern: 'hello universe', count: 1 }, { pattern: 'universe world', count: 1 }]
+    console.log("Test Case 2:");
+    const text2 = "Generative AI focuses on creating new content, indicating a rise in AI capabilities.";
+    const result2 = extractKeywords(text2);
+    console.log(result2); // Expected: ['generative', 'focuses', 'creating', 'content', 'indicating', 'capabilities']
 
-    console.log("Test 3: Three-word patterns");
-    console.log(analyzePatternFrequency("a quick brown fox jumps over the lazy dog", 3));
-    // Expected output: [{ pattern: 'a quick brown', count: 1 }, { pattern: 'quick brown fox', count: 1 }, ...]
+    console.log("Test Case 3:");
+    const text3 = "Quantum computing and AI integration are pioneering advancements.";
+    const result3 = extractKeywords(text3);
+    console.log(result3); // Expected: ['quantum', 'computing', 'integration', 'pioneering', 'advancements']
 
-    console.log("Test 4: Edge case - Empty text");
-    console.log(analyzePatternFrequency("", 2));
-    // Expected output: []
+    console.log("Test Case 4:");
+    const text4 = "Short words like 'is', 'on', 'and' should be excluded.";
+    const result4 = extractKeywords(text4);
+    console.log(result4); // Expected: ['short', 'words', 'like', 'should', 'excluded']
 
-    console.log("Test 5: Edge case - Pattern length larger than text");
-    console.log(analyzePatternFrequency("short text", 5));
-    // Expected output: []
-
-    console.log("Test 6: Edge case - Invalid inputs");
-    try {
-        console.log(analyzePatternFrequency(12345, 2));
-    } catch (e) {
-        console.log(e.message); // Expected error message
-    }
-
-    try {
-        console.log(analyzePatternFrequency("valid text", -1));
-    } catch (e) {
-        console.log(e.message); // Expected error message
-    }
+    console.log("Test Case 5:");
+    const text5 = "";
+    const result5 = extractKeywords(text5);
+    console.log(result5); // Expected: []
 }
 
-// Run the tests
 runTests();

@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: webAssemblyMatrixEngine
- * Written: 2026-03-24T11:23:40.239Z
+ * Written: 2026-03-25T00:07:00.909Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,21 +18,26 @@
 
 // webAssemblyMatrixEngine.mjs
 
+import { WASI } from 'wasi';
 import { readFile } from 'fs/promises';
-import { join } from 'path';
+import path from 'path';
 
-// Load WebAssembly binary
-async function loadWebAssembly(filePath) {
-  const wasmBuffer = await readFile(filePath);
-  const wasmModule = await WebAssembly.instantiate(wasmBuffer);
-  return wasmModule.instance.exports;
+const wasi = new WASI();
+let wasmInstance;
+
+async function initializeWasm() {
+  const wasmPath = path.resolve('./matrix_engine.wasm');
+  const wasmBuffer = await readFile(wasmPath);
+  const wasmModule = await WebAssembly.compile(wasmBuffer);
+  const instance = await WebAssembly.instantiate(wasmModule, {
+    wasi_snapshot_preview1: wasi.wasiImport
+  });
+  wasi.initialize(instance);
+  wasmInstance = instance.exports;
 }
 
-// Matrix multiplication using WebAssembly
-export async function matrixMultiply(wasmFilePath, matrixA, matrixB) {
-  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-    throw new Error("Both inputs must be 2D arrays.");
-  }
+export async function multiplyMatrices(matrixA, matrixB) {
+  if (!wasmInstance) await initializeWasm();
 
   const rowsA = matrixA.length;
   const colsA = matrixA[0].length;
@@ -40,58 +45,68 @@ export async function matrixMultiply(wasmFilePath, matrixA, matrixB) {
   const colsB = matrixB[0].length;
 
   if (colsA !== rowsB) {
-    throw new Error("Matrix dimensions do not match for multiplication.");
+    throw new Error('Matrix dimensions do not match for multiplication');
   }
 
-  const wasmExports = await loadWebAssembly(wasmFilePath);
-
-  // Prepare flat arrays for WebAssembly
   const flatA = matrixA.flat();
   const flatB = matrixB.flat();
   const result = new Float64Array(rowsA * colsB);
 
-  wasmExports.matrixMultiply(flatA, rowsA, colsA, flatB, rowsB, colsB, result);
+  wasmInstance.multiply(flatA, flatB, result, rowsA, colsA, colsB);
 
-  // Convert flat result back to 2D array
-  const resultMatrix = [];
+  const output = [];
   for (let i = 0; i < rowsA; i++) {
-    resultMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
+    output.push(Array.from(result.slice(i * colsB, (i + 1) * colsB)));
   }
 
-  return resultMatrix;
+  return output;
 }
 
-// Generic utility for creating identity matrices
-export function createIdentityMatrix(size) {
-  if (size <= 0 || !Number.isInteger(size)) {
-    throw new Error("Size must be a positive integer.");
-  }
-
-  const matrix = Array.from({ length: size }, (_, i) => {
-    return Array.from({ length: size }, (_, j) => (i === j ? 1 : 0));
-  });
-
-  return matrix;
-}
-
-// Generic utility for transposing matrices
-export function transposeMatrix(matrix) {
-  if (!Array.isArray(matrix) || !Array.isArray(matrix[0])) {
-    throw new Error("Input must be a 2D array.");
-  }
+export async function computeEigenvalues(matrix) {
+  if (!wasmInstance) await initializeWasm();
 
   const rows = matrix.length;
   const cols = matrix[0].length;
 
-  const transposed = Array.from({ length: cols }, (_, i) => {
-    return Array.from({ length: rows }, (_, j) => matrix[j][i]);
-  });
+  if (rows !== cols) {
+    throw new Error('Matrix must be square to compute eigenvalues');
+  }
 
-  return transposed;
+  const flatMatrix = matrix.flat();
+  const eigenvalues = new Float64Array(rows);
+
+  wasmInstance.eigenvalues(flatMatrix, eigenvalues, rows);
+
+  return Array.from(eigenvalues);
 }
 
-// Example usage (uncomment to test):
-// const wasmFilePath = join(__dirname, 'matrixEngine.wasm');
-// const matrixA = [[1, 2], [3, 4]];
-// const matrixB = [[5, 6], [7, 8]];
-// matrixMultiply(wasmFilePath, matrixA, matrixB).then(console.log);
+export async function performLUDecomposition(matrix) {
+  if (!wasmInstance) await initializeWasm();
+
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+
+  if (rows !== cols) {
+    throw new Error('Matrix must be square for LU decomposition');
+  }
+
+  const flatMatrix = matrix.flat();
+  const lower = new Float64Array(rows * cols);
+  const upper = new Float64Array(rows * cols);
+
+  wasmInstance.luDecomposition(flatMatrix, lower, upper, rows);
+
+  const lowerMatrix = [];
+  const upperMatrix = [];
+
+  for (let i = 0; i < rows; i++) {
+    lowerMatrix.push(Array.from(lower.slice(i * cols, (i + 1) * cols)));
+    upperMatrix.push(Array.from(upper.slice(i * cols, (i + 1) * cols)));
+  }
+
+  return { lower: lowerMatrix, upper: upperMatrix };
+}
+
+export async function initialize() {
+  await initializeWasm();
+}

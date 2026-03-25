@@ -1,55 +1,5 @@
 [
   {
-    "source": "self_coding_engine",
-    "title": "Daydream:architecture_design #825",
-    "filename": "daydreamarchitecturedesign825.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamarchitecturedesign825.mjs",
-    "backupPath": null,
-    "timestamp": 1774218522935,
-    "codeLength": 1312,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_15056",
-    "title": "THE WILD IDEA  \n   Harmonic Swarm Cognition (HSC) –",
-    "filename": "theWildIdeaHarmonicSwarmCognitionHsc.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/theWildIdeaHarmonicSwarmCognitionHsc.mjs",
-    "backupPath": null,
-    "timestamp": 1774218642748,
-    "codeLength": 1205,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_8911",
-    "title": "Lucid Dream #2: attention_mechanisms + Modular Evolution for",
-    "filename": "lucidDream2AttentionmechanismsModularEvolutionFor.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/lucidDream2AttentionmechanismsModularEvolutionFor.mjs",
-    "backupPath": null,
-    "timestamp": 1774218646787,
-    "codeLength": 1319,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_11635",
-    "title": "ARCHITECTURE NAME  \n   CASE – Causal Abstraction & S",
-    "filename": "architectureNameCaseCausalAbstractionS.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameCaseCausalAbstractionS.mjs",
-    "backupPath": null,
-    "timestamp": 1774218650364,
-    "codeLength": 1310,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_16024",
-    "title": "BROKEN PARADIGM  \nSequential, symbol-manipulating “t",
-    "filename": "brokenParadigmSequentialSymbolmanipulatingT.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/brokenParadigmSequentialSymbolmanipulatingT.mjs",
-    "backupPath": null,
-    "timestamp": 1774218652832,
-    "codeLength": 1141,
-    "overwrite": false
-  },
-  {
     "source": "backlog_dream_id_16878",
     "title": "ARCHITECTURE NAME\nCauso-Semantic Fabric (CSF)\n\n2. CO",
     "filename": "architectureNamecausosemanticFabricCsf2Co.mjs",
@@ -4998,5 +4948,55 @@
     "timestamp": 1774396445164,
     "codeLength": 1112,
     "overwrite": false
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
+    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-25T00-03-53-297Z",
+    "timestamp": 1774397033295,
+    "codeLength": 1843,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: webAssemblyMatrixEngine",
+    "filename": "webAssemblyMatrixEngine_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webAssemblyMatrixEngine_gen1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/webAssemblyMatrixEngine_gen1.mjs.backup.2026-03-25T00-07-00-912Z",
+    "timestamp": 1774397220909,
+    "codeLength": 2483,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: subprocessCheckpointManager",
+    "filename": "subprocessCheckpointManager_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/subprocessCheckpointManager_gen1.mjs",
+    "backupPath": null,
+    "timestamp": 1774397229929,
+    "codeLength": 3142,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: distributedApiCacheLayer",
+    "filename": "distributedApiCacheLayer_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/distributedApiCacheLayer_gen1.mjs",
+    "backupPath": null,
+    "timestamp": 1774397248992,
+    "codeLength": 2892,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 1 Complete — 3 modules",
+    "filename": "evolution_marker_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-03-25T00-07-29-018Z",
+    "timestamp": 1774397249018,
+    "codeLength": 99,
+    "overwrite": true
   }
 ]
