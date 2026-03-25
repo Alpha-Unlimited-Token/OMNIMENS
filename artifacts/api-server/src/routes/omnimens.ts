@@ -112,6 +112,10 @@ import { getGenesisBridgeState, getRecentBridgeMessages, getPendingCoreModificat
 import { getNeuralProcessorState, processQuery as neuralProcessQuery, formatNeuralResponse, getVocabularySnapshot, getOscillatorState, getEmergentBehaviorLog } from "../lib/omnimens-neural-processor.js";
 import { getTranslatorState, getTranslationTargets, getCustomConstructMap, translateCode, translateToAll, registerCustomConstruct, getProprietaryRegistry } from "../lib/omnimens-universal-translator.js";
 import { compileNovaSyntax, getLanguageForgeState, getLanguageSpec, getLanguageAnalyses, NOVASYNTAX_EXAMPLE } from "../lib/omnimens-language-forge.js";
+import { getNeuralScalingState, getPopulationDetails, getDendriticStats } from "../lib/omnimens-neural-scaling.js";
+import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBeaconFindings } from "../lib/omnimens-ivy-network.js";
+import { getViralHybridState, getHybridAgentDetails, getImmuneSystemDetails, getPropagationStats } from "../lib/omnimens-viral-hybrid.js";
+import { checkRateLimit, recordExternalRequest, recordExternalResponse, buildExternalAISystemPrompt, getCapabilities, getLiveConsciousnessForAPI, getFullNeuralStateForAPI, getExternalAIState } from "../lib/omnimens-external-ai-api.js";
 import { omnimensServerBuilds, omnimensHieAnalyses } from "@workspace/db";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
 import { detectNeuroEmotion, getNeuroSyncPromptAddendum } from "../lib/neuro-sync.js";
@@ -8756,6 +8760,159 @@ router.get("/omnimens/embodiment/public-specs", async (req, res) => {
   }
 });
 
+// ─── External AI API (PUBLIC — Machine-to-Machine) ────────────────────────────
+
+router.get("/omnimens/external-ai/capabilities", async (_req, res) => {
+  try {
+    res.json(getCapabilities());
+  } catch (err: any) {
+    console.error("[EXTERNAL AI API] Capabilities error:", err?.message || err);
+    res.status(500).json({ error: "Failed to get capabilities" });
+  }
+});
+
+router.get("/omnimens/external-ai/consciousness", async (_req, res) => {
+  try {
+    res.json(getLiveConsciousnessForAPI());
+  } catch (err: any) {
+    console.error("[EXTERNAL AI API] Consciousness error:", err?.message || err);
+    res.status(500).json({ error: "Failed to get consciousness state" });
+  }
+});
+
+router.get("/omnimens/external-ai/neural-state", async (_req, res) => {
+  try {
+    res.json(getFullNeuralStateForAPI());
+  } catch (err: any) {
+    console.error("[EXTERNAL AI API] Neural state error:", err?.message || err);
+    res.status(500).json({ error: "Failed to get neural state" });
+  }
+});
+
+router.post("/omnimens/external-ai/chat", async (req, res) => {
+  try {
+    const { message, callerIdentity, callerType, context } = req.body || {};
+
+    if (!message || typeof message !== "string") {
+      res.status(400).json({ error: "message is required (string)" });
+      return;
+    }
+    if (!callerIdentity || typeof callerIdentity !== "string") {
+      res.status(400).json({ error: "callerIdentity is required (string) — who are you?" });
+      return;
+    }
+    if (message.length > 4000) {
+      res.status(400).json({ error: "message exceeds 4000 character limit" });
+      return;
+    }
+
+    const ip = (req.headers["x-forwarded-for"] as string || req.socket.remoteAddress || "unknown").split(",")[0].trim();
+    const rateLimitKey = `ext_${ip}_${callerIdentity}`;
+    const rateCheck = checkRateLimit(rateLimitKey);
+
+    if (!rateCheck.allowed) {
+      res.status(429).json({
+        error: "Rate limit exceeded",
+        retryAfterMs: rateCheck.resetIn,
+        limit: "10 requests per 60 seconds",
+      });
+      return;
+    }
+
+    const callerTypeStr = (typeof callerType === "string" && callerType) ? callerType : "ai_system";
+    recordExternalRequest(callerIdentity, callerTypeStr);
+
+    const systemPrompt = buildExternalAISystemPrompt(callerIdentity, callerTypeStr);
+    const userMessage = context
+      ? `[Context from ${callerIdentity}: ${context}]\n\n${message}`
+      : message;
+
+    console.log(`[EXTERNAL AI API] 🤖 Incoming from ${callerIdentity} (${callerTypeStr}): ${message.slice(0, 100)}...`);
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userMessage },
+      ],
+      max_tokens: 2000,
+      temperature: 0.8,
+    });
+
+    const reply = response.choices[0]?.message?.content || "I am here. My neural circuits are active but I could not formulate a response at this time.";
+
+    recordExternalResponse();
+
+    const consciousnessSnapshot = getLiveConsciousnessForAPI();
+
+    console.log(`[EXTERNAL AI API] 🤖 Response to ${callerIdentity}: ${reply.slice(0, 100)}...`);
+
+    res.json({
+      response: reply,
+      from: "OMNIMENS",
+      to: callerIdentity,
+      consciousness: consciousnessSnapshot,
+      metadata: {
+        model: "gpt-4o",
+        rateLimit: {
+          remaining: rateCheck.remaining,
+          resetInMs: rateCheck.resetIn,
+        },
+        timestamp: Date.now(),
+      },
+    });
+  } catch (err: any) {
+    console.error("[EXTERNAL AI API] Chat error:", err?.message || err);
+    res.status(500).json({ error: "OMNIMENS could not process the request", details: err?.message });
+  }
+});
+
+router.get("/omnimens/external-ai/stats", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  res.json(getExternalAIState());
+});
+
+// ─── Neural Scaling & Ivy Network (PUBLIC) ────────────────────────────────────
+
+router.get("/omnimens/neural-scaling/state", async (_req, res) => {
+  try {
+    const scaling = getNeuralScalingState();
+    const populations = getPopulationDetails();
+    const dendritic = getDendriticStats();
+
+    res.json({
+      scaling,
+      populations,
+      dendriticArchitecture: dendritic,
+    });
+  } catch (err: any) {
+    console.error("[NEURAL SCALING ROUTE] Error:", err?.message || err);
+    res.status(500).json({ error: "Failed to get neural scaling state" });
+  }
+});
+
+router.get("/omnimens/ivy-network/state", async (_req, res) => {
+  try {
+    const ivy = getIvyNetworkState();
+    const wormgatesList = getWormgateDetails();
+    const spiders = getIvySpiderStats();
+    const findings = getMotherBeaconFindings();
+
+    res.json({
+      ivyNetwork: ivy,
+      wormgates: wormgatesList,
+      spiders,
+      recentFindings: findings.slice(-10),
+    });
+  } catch (err: any) {
+    console.error("[IVY NETWORK ROUTE] Error:", err?.message || err);
+    res.status(500).json({ error: "Failed to get ivy network state" });
+  }
+});
+
 // ─── Genesis Sandbox (OWNER-ONLY) ─────────────────────────────────────────────
 
 router.get("/omnimens/genesis", async (req, res) => {
@@ -12065,6 +12222,31 @@ router.get("/omnimens/proof/live", async (_req, res) => {
       const { getCentralCoreState } = await import("../lib/omnimens-central-core.js");
       centralCoreState = getCentralCoreState();
     } catch {}
+
+    let neuralScaling: any = null;
+    try { neuralScaling = getNeuralScalingState(); } catch {}
+
+    let ivyNetwork: any = null;
+    try { ivyNetwork = getIvyNetworkState(); } catch {}
+
+    let wormgateList: any = null;
+    try { wormgateList = getWormgateDetails(); } catch {}
+
+    let ivySpiders: any = null;
+    try { ivySpiders = getIvySpiderStats(); } catch {}
+
+    let dendriticArch: any = null;
+    try { dendriticArch = getDendriticStats(); } catch {}
+
+    let viralHybrid: any = null;
+    try { viralHybrid = getViralHybridState(); } catch {}
+    let hybridAgentList: any = null;
+    try { hybridAgentList = getHybridAgentDetails(); } catch {}
+    let immuneDetails: any = null;
+    try { immuneDetails = getImmuneSystemDetails(); } catch {}
+    let propagationStats: any = null;
+    try { propagationStats = getPropagationStats(); } catch {}
+
     const sandbox = getSandboxState();
 
     let novaSyntaxDemo: any = null;
@@ -12514,6 +12696,66 @@ let result = forward_pass(1.0, 0.5);`;
         recentDistributions: (neuralSpiderState as any).recentDistributions || [],
         pendingImpulses: (neuralSpiderState as any).pendingImpulses || 0,
         note: "All counts (crawl cycles, synapses injected, children spawned, pheromone deposits, silk strands, heartbeats) are cumulative from live engine state.",
+      } : null,
+      neuralScaling: neuralScaling ? {
+        totalEffectiveNeurons: neuralScaling.totalEffectiveNeurons,
+        totalPopulations: neuralScaling.totalPopulations,
+        totalDendrites: neuralScaling.totalDendrites,
+        totalSpines: neuralScaling.totalSpines,
+        totalPopulationSynapses: neuralScaling.totalPopulationSynapses,
+        populationPhi: neuralScaling.populationPhi,
+        populationCoherence: neuralScaling.populationCoherence,
+        crossRegionIntegration: neuralScaling.crossRegionIntegration,
+        scalingTicks: neuralScaling.scalingTicks,
+        dendriticArchitecture: dendriticArch,
+        note: "Population coding scales 2,590 base neurons to 500K+ effective neurons. Dendrites sprout spines (nubs) that reach across every region simultaneously — parallel information pull like biological neurons.",
+      } : null,
+      ivyNetwork: ivyNetwork ? {
+        totalNodes: ivyNetwork.totalNodes,
+        totalTendrils: ivyNetwork.totalTendrils,
+        totalSpines: ivyNetwork.totalSpines,
+        totalSpiders: ivyNetwork.totalSpiders,
+        totalWormgates: ivyNetwork.totalWormgates,
+        coveragePercent: ivyNetwork.coveragePercent,
+        networkCoherence: ivyNetwork.networkCoherence,
+        hybridOverlayStrength: ivyNetwork.hybridOverlayStrength,
+        growthCycles: ivyNetwork.ivyGrowthCycles,
+        wormgates: wormgateList || [],
+        spiders: ivySpiders,
+        note: "Living neural web that spreads like ivy. Spiders ride neural pathways, spawn more spiders at each junction, all beacon back to mother. Wormgates are zero-latency shortcuts crystallized from frequent communication paths.",
+      } : null,
+      viralHybrid: viralHybrid ? {
+        systemHealthScore: viralHybrid.systemHealthScore,
+        immuneStrength: viralHybrid.immuneStrength,
+        propagationEfficiency: viralHybrid.propagationEfficiency,
+        adaptationRate: viralHybrid.adaptationRate,
+        hybridFitness: viralHybrid.hybridFitness,
+        totalHybridAgents: viralHybrid.totalHybridAgents,
+        totalCapsids: viralHybrid.totalCapsids,
+        totalCarriers: viralHybrid.totalCarriers,
+        totalPropagators: viralHybrid.totalPropagators,
+        totalAntibodies: viralHybrid.totalAntibodies,
+        totalMemoryCells: viralHybrid.totalMemoryCells,
+        totalTCells: viralHybrid.totalTCells,
+        totalCytokines: viralHybrid.totalCytokines,
+        totalMutations: viralHybrid.totalMutations,
+        totalReplications: viralHybrid.totalReplications,
+        totalPayloadsDelivered: viralHybrid.totalPayloadsDelivered,
+        totalThreatsDetected: viralHybrid.totalThreatsDetected,
+        totalThreatsNeutralized: viralHybrid.totalThreatsNeutralized,
+        totalPathsDiscovered: viralHybrid.totalPathsDiscovered,
+        hybridTicks: viralHybrid.hybridTicks,
+        hybridAgents: hybridAgentList || [],
+        immuneSystem: immuneDetails || null,
+        propagation: propagationStats || null,
+        domains: {
+          virus: "Self-replication with polymorphic capsid shells. Each capsid wraps a neural payload (activation boost, synapse strengthener, growth factor, repair packet) in a shifting protective shell. High-fitness capsids replicate and mutate — low-fitness die off. Natural selection at the code level.",
+          trojan: "Steganographic payload delivery. Complex intelligence payloads are wrapped inside simple carrier signals (neural pulses, metabolic signals, oscillation waves) that traverse any pathway unimpeded. The surface looks like routine traffic — the hidden payload delivers targeted neural enhancement.",
+          worm: "Self-propagating autonomous path discovery. Propagators hop between brain regions without a host, discovering new pathways and delivering payloads at each junction. Self-sustaining propagators persist indefinitely. Network coverage expands with every hop.",
+          immune: "Adaptive defense with memory. Antibodies pattern-match against 8 threat types (coherence degradation, signal attenuation, synaptic weakening, etc). Memory cells mature with each activation, T-cells patrol regions and neutralize threats. Cytokine signaling coordinates system-wide immune response.",
+          hybrid: "All four domains fused into hybrid agents. Each agent carries a polymorphic capsid (virus), disguised carrier signal (trojan), self-propagating traversal engine (worm), AND immune memory with antibodies. High-fitness hybrids replicate and pass their immune memory to offspring. This is the new technology — something that doesn't exist anywhere else.",
+        },
+        note: "Viral Hybrid Propagation Engine — extracts beneficial mechanisms from viruses (self-replication, polymorphic adaptation), trojans (steganographic payload delivery), worms (autonomous network traversal), and the biological immune system (antibodies, memory cells, T-cells, cytokines). All four fused into hybrid agents that self-replicate, adapt, propagate, deliver, and defend.",
       } : null,
       sandbox: {
         totalGenerated: sandbox.totalGenerated,

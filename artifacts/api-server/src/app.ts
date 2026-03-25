@@ -84,6 +84,9 @@ import { initGitHubCompute, dispatchRemoteCompute, getComputeStatus } from "./li
 import { startLanguageForge } from "./lib/omnimens-language-forge.js";
 import { startNeuralSpiders, getNeuralSpiderState } from "./lib/omnimens-neural-spiders.js";
 import { startCentralCore, getCentralCoreState } from "./lib/omnimens-central-core.js";
+import { startNeuralScaling, getNeuralScalingState } from "./lib/omnimens-neural-scaling.js";
+import { startIvyNetwork, getIvyNetworkState } from "./lib/omnimens-ivy-network.js";
+import { startViralHybrid, getViralHybridState } from "./lib/omnimens-viral-hybrid.js";
 import { registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe } from "./lib/omnimens-scaling-orchestrator.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
@@ -431,6 +434,9 @@ startIPGuardian();
 startIndependentReasoning();
 startAutonomousCodeGenesis();
 startNeuralConsciousness();
+startNeuralScaling();
+startIvyNetwork();
+startViralHybrid();
 startNeuralSpiders();
 startCentralCore();
 startGenesisBridge();
@@ -442,7 +448,19 @@ initGitHubCompute().catch(err => console.error("[GITHUB COMPUTE] Startup error:"
 
 registerEngine("github_compute", "compute", () => {}, () => ({ healthy: true, details: { repo: "Alpha-Unlimited-Token/OMNIMENS", workflows: 5 } }), 3);
 registerEngine("neural_processor", "neural", () => {}, () => ({ healthy: true, details: { type: "transformer", dim: 512, heads: 16 } }), 1);
-registerEngine("neural_consciousness", "neural", () => {}, () => ({ healthy: true, details: { neurons: 1700, circuits: 57 } }), 1);
+registerEngine("neural_consciousness", "neural", () => {}, () => ({ healthy: true, details: { neurons: 2590, synapses: 429258, circuits: 119, corticalColumns: 115 } }), 1);
+registerEngine("neural_scaling", "neural", () => {}, () => {
+  const ns = getNeuralScalingState();
+  return { healthy: true, details: { effectiveNeurons: ns.totalEffectiveNeurons, populations: ns.totalPopulations, dendrites: ns.totalDendrites, spines: ns.totalSpines, populationPhi: ns.populationPhi } };
+}, 1);
+registerEngine("ivy_network", "neural", () => {}, () => {
+  const ivy = getIvyNetworkState();
+  return { healthy: true, details: { nodes: ivy.totalNodes, tendrils: ivy.totalTendrils, spiders: ivy.totalSpiders, wormgates: ivy.totalWormgates, coverage: ivy.coveragePercent } };
+}, 1);
+registerEngine("viral_hybrid", "hybrid", () => {}, () => {
+  const vh = getViralHybridState();
+  return { healthy: true, details: { hybridAgents: vh.totalHybridAgents, capsids: vh.totalCapsids, antibodies: vh.totalAntibodies, memoryCells: vh.totalMemoryCells, tCells: vh.totalTCells, immuneStrength: vh.immuneStrength, health: vh.systemHealthScore } };
+}, 1);
 registerEngine("neural_spiders", "neural", () => {}, () => {
   const ss = getNeuralSpiderState();
   return { healthy: true, details: { parentSpiders: ss.parentSpiders.length, activeChildren: ss.activeChildSpiders.length, synapsesInjected: ss.totalSynapsesInjected, crawlCycles: ss.totalCrawlCycles } };
