@@ -78,11 +78,25 @@ function executeInSandbox(code: string, timeout = SANDBOX_TIMEOUT_MS): SandboxRe
   const outputLines: string[] = [];
 
   try {
+    const timers = new Map<string, number>();
+    const fmt = (...args: any[]) => args.map(a => typeof a === "object" ? JSON.stringify(a) : String(a)).join(" ");
     const sandbox = {
       console: {
-        log: (...args: any[]) => outputLines.push(args.map(a => typeof a === "object" ? JSON.stringify(a) : String(a)).join(" ")),
-        error: (...args: any[]) => outputLines.push(`[ERROR] ${args.map(a => String(a)).join(" ")}`),
-        warn: (...args: any[]) => outputLines.push(`[WARN] ${args.map(a => String(a)).join(" ")}`),
+        log: (...args: any[]) => outputLines.push(fmt(...args)),
+        error: (...args: any[]) => outputLines.push(`[ERROR] ${fmt(...args)}`),
+        warn: (...args: any[]) => outputLines.push(`[WARN] ${fmt(...args)}`),
+        info: (...args: any[]) => outputLines.push(fmt(...args)),
+        debug: (...args: any[]) => outputLines.push(`[DEBUG] ${fmt(...args)}`),
+        assert: (condition: any, ...args: any[]) => { if (!condition) outputLines.push(`[ASSERT FAILED] ${fmt(...args)}`); },
+        table: (data: any) => outputLines.push(JSON.stringify(data, null, 2)),
+        time: (label = "default") => { timers.set(label, Date.now()); },
+        timeEnd: (label = "default") => { const s = timers.get(label); outputLines.push(`${label}: ${s ? Date.now() - s : 0}ms`); timers.delete(label); },
+        timeLog: (label = "default") => { const s = timers.get(label); outputLines.push(`${label}: ${s ? Date.now() - s : 0}ms`); },
+        group: () => {},
+        groupEnd: () => {},
+        dir: (obj: any) => outputLines.push(JSON.stringify(obj, null, 2)),
+        count: (() => { const c: Record<string, number> = {}; return (label = "default") => { c[label] = (c[label] || 0) + 1; outputLines.push(`${label}: ${c[label]}`); }; })(),
+        clear: () => {},
       },
       Math,
       JSON,
@@ -98,11 +112,26 @@ function executeInSandbox(code: string, timeout = SANDBOX_TIMEOUT_MS): SandboxRe
       Boolean,
       Map,
       Set,
+      WeakMap,
+      WeakSet,
       Promise,
       RegExp,
+      Symbol,
       Error,
       TypeError,
       RangeError,
+      SyntaxError,
+      URIError,
+      Infinity,
+      NaN,
+      undefined,
+      encodeURIComponent,
+      decodeURIComponent,
+      encodeURI,
+      decodeURI,
+      atob: (s: string) => Buffer.from(s, "base64").toString("binary"),
+      btoa: (s: string) => Buffer.from(s, "binary").toString("base64"),
+      structuredClone: (obj: any) => JSON.parse(JSON.stringify(obj)),
       setTimeout: undefined,
       setInterval: undefined,
       process: undefined,
@@ -197,16 +226,17 @@ async function generateAndTestCode(): Promise<void> {
         role: "system",
         content: `You are the AUTONOMOUS CODE GENERATOR of OMNIMENS. You write pure JavaScript code that can run in an isolated sandbox (no require/import, no filesystem, no network, no async/await, no setTimeout).
 
-Available globals: console.log, Math, JSON, Date, parseInt, parseFloat, Array, Object, String, Number, Boolean, Map, Set, RegExp, Error.
+Available globals: console (log, error, warn, info, debug, assert, table, time, timeEnd, dir, count), Math, JSON, Date, parseInt, parseFloat, isNaN, isFinite, Array, Object, String, Number, Boolean, Map, Set, RegExp, Error, TypeError, RangeError.
 
 Your code MUST:
 1. Be self-contained (no external dependencies)
-2. Include test cases that validate the code works
+2. Include test cases that validate the code works — use console.assert(condition, message) or console.log
 3. Use console.log to output results
 4. Be genuinely useful — not toy examples
 5. Handle edge cases properly
+6. Use only plain JavaScript — no TypeScript, no JSX, no import/export/require
 
-Output ONLY the JavaScript code, no markdown fences, no explanations.`,
+CRITICAL: Output ONLY raw JavaScript code. No markdown fences. No explanations. No text before or after the code. Start directly with a comment or function declaration.`,
       }, {
         role: "user",
         content: `Based on this knowledge context:\n${knowledgeContext.slice(0, 1500)}\n\nWrite ${codeType}.\n\nThe code should be immediately executable and include self-tests that prove it works. Output the code and nothing else.`,
@@ -216,7 +246,9 @@ Output ONLY the JavaScript code, no markdown fences, no explanations.`,
     });
 
     let code = response.choices[0]?.message?.content || "";
-    code = code.replace(/^```(?:javascript|js)?\n?/i, "").replace(/\n?```$/i, "").trim();
+    code = code.replace(/^[\s\S]*?```(?:javascript|js)?\s*\n/i, "").replace(/\n\s*```[\s\S]*$/i, "").trim();
+    if (code.startsWith("```")) code = code.replace(/^```\w*\s*\n?/, "").replace(/\n?```\s*$/, "").trim();
+    code = code.replace(/^(?:Here(?:'s| is)[^\n]*\n|\/\/\s*(?:Here|Below|This)[^\n]*\n)/i, "").trim();
 
     if (code.length < 30) return;
 
