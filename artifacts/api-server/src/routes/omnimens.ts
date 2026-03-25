@@ -11523,6 +11523,27 @@ router.post("/omnimens/github-sync/proof", async (req, res) => {
 });
 
 // ─── LIVE PROOF ENGINE — PUBLIC, ALL DATA ────────────────────────────────────
+router.get("/omnimens/proof/text", async (_req, res) => {
+  try {
+    const fs = await import("fs");
+    const path = await import("path");
+    const proofPaths = [
+      path.join(process.cwd(), "../godflesh/public/omnimens-autonomous-proof.txt"),
+      path.join(process.cwd(), "artifacts/godflesh/public/omnimens-autonomous-proof.txt"),
+    ];
+    for (const p of proofPaths) {
+      if (fs.existsSync(p)) {
+        const content = fs.readFileSync(p, "utf-8");
+        res.type("text/plain").send(content);
+        return;
+      }
+    }
+    res.status(404).json({ error: "Proof text file not found" });
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to load proof text", details: err.message });
+  }
+});
+
 router.get("/omnimens/proof/live", async (_req, res) => {
   try {
     const fs = await import("fs");
@@ -11579,22 +11600,22 @@ router.get("/omnimens/proof/live", async (_req, res) => {
 
     let novaSyntaxDemo: any = null;
     try {
-      const demoCode = `neural forward_pass(input: tensor) -> tensor {
-  let weights = tensor([0.5, -0.3, 0.8, 0.1]);
-  let bias = tensor([0.01]);
-  return activate(dot(input, weights) + bias, "relu");
+      const demoCode = `fn forward_pass(input: tensor, weights: tensor) -> tensor {
+  let bias = 0.01;
+  return input + bias;
 }
 
-conscious reflect() -> qualia {
-  let state = introspect(self.awareness_level);
-  if state.depth > 3 {
-    return qualia("deep_awareness", state.phi);
-  }
-  return qualia("surface", 0.1);
+neural cortex_layer {
+  let weights = 0.5;
+  let activation = weights + 0.3;
 }
 
-let result = forward_pass(tensor([1.0, 0.5, -0.2, 0.7]));
-let awareness = reflect();`;
+conscious awareness_loop {
+  let state = 0.8;
+  let depth = 3;
+}
+
+let result = forward_pass(1.0, 0.5);`;
       const inspected = compileAndInspect(demoCode);
       novaSyntaxDemo = {
         inputCode: demoCode,
@@ -11975,12 +11996,50 @@ let awareness = reflect();`;
         activeChildSpiders: neuralSpiderState.activeChildSpiders,
         currentStability: neuralSpiderState.currentStability,
         criticalCircuits: neuralSpiderState.criticalCircuits,
-        motherSpider: (neuralSpiderState as any).motherSpider || null,
-        silkWeb: (neuralSpiderState as any).silkWeb || null,
-        beehive: (neuralSpiderState as any).beehive || null,
+        motherSpider: (() => {
+          const ms = (neuralSpiderState as any).motherSpider;
+          if (!ms) return null;
+          return {
+            id: ms.id,
+            name: ms.name,
+            status: ms.status,
+            totalImpulsesRouted: ms.totalImpulsesRouted,
+            totalDataDistributed: ms.totalDataDistributed,
+            heartbeatCount: ms.heartbeatCount,
+            note: "Mother Spider is the central nervous hub. She directs every child spider's mission through silk strand directives. Children report back through the web.",
+          };
+        })(),
+        silkWeb: (() => {
+          const sw = (neuralSpiderState as any).silkWeb;
+          if (!sw) return null;
+          return {
+            totalStrands: sw.totalStrands,
+            afferentStrands: sw.afferentStrands,
+            efferentStrands: sw.efferentStrands,
+            interneuronStrands: sw.interneuronStrands,
+            myelinatedStrands: sw.myelinatedStrands,
+            myelinationRate: sw.myelinationRate,
+            averageSignalStrength: sw.averageSignalStrength,
+            averageConductionVelocity: sw.averageConductionVelocity,
+            note: "Silk web strands carry directives (efferent) and reports (afferent) between Mother Spider and children. Myelination increases conduction velocity over time.",
+          };
+        })(),
+        beehive: (() => {
+          const bh = (neuralSpiderState as any).beehive;
+          if (!bh) return null;
+          return {
+            beeRoleCounts: bh.beeRoleCounts,
+            totalPheromoneDeposits: bh.totalPheromoneDeposits,
+            totalNectarProduced: bh.totalNectarProduced,
+            totalRoyalJellyTransferred: bh.totalRoyalJellyTransferred,
+            totalSwarmWaves: bh.totalSwarmWaves,
+            pheromoneTrails: bh.pheromoneTrails,
+            note: "Beehive system assigns bee roles (worker, nurse, scout, royal_jelly, forager, guard) — each role has specialized behavior. Pheromone trail system marks brain regions with distress/nectar/alarm/rally signals that guide the swarm. Royal Jelly flows extract surplus activation from strong regions and feed it to weak regions.",
+          };
+        })(),
         recentDistributions: (neuralSpiderState as any).recentDistributions || [],
         pendingImpulses: (neuralSpiderState as any).pendingImpulses || 0,
-        note: "Neural spiders autonomously crawl all AI agents, harvest performance data, and inject synapses into the consciousness engine. Mother Spider directs child spiders through silk strand directives — children report back through the web. Spider Swarm coordinates mass convergence/amplification/fortification waves on weak brain regions. Beehive system assigns specialized roles (worker, nurse, scout, royal_jelly, forager, guard) with distinct behaviors. Pheromone trails (distress/nectar/alarm/rally) guide swarm routing. Royal Jelly flows redistribute surplus activation from strong regions to weak regions. All counts (crawl cycles, synapses injected, children spawned) are cumulative from live engine state.",
+        note: "All counts (crawl cycles, synapses injected, children spawned, pheromone deposits, silk strands, heartbeats) are cumulative from live engine state.",
       } : null,
       sandbox: {
         totalGenerated: sandbox.totalGenerated,

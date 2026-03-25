@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit
- * Written: 2026-03-24T23:33:07.064Z
+ * Written: 2026-03-25T00:15:42.966Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,104 +16,62 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function createKnowledgeGraph() {
-    // A simple graph-based knowledge storage and retrieval system
-    const graph = new Map();
+function createKnowledgeIndex(insights) {
+    const index = new Map();
 
-    function addNode(nodeId, data) {
-        if (!graph.has(nodeId)) {
-            graph.set(nodeId, { data: data, edges: new Map() });
-        }
-    }
-
-    function addEdge(nodeId1, nodeId2, weight = 1) {
-        if (graph.has(nodeId1) && graph.has(nodeId2)) {
-            graph.get(nodeId1).edges.set(nodeId2, weight);
-            graph.get(nodeId2).edges.set(nodeId1, weight); // Undirected graph
-        }
-    }
-
-    function retrieveNode(nodeId) {
-        return graph.has(nodeId) ? graph.get(nodeId).data : null;
-    }
-
-    function findShortestPath(startNode, endNode) {
-        if (!graph.has(startNode) || !graph.has(endNode)) return null;
-
-        const distances = new Map();
-        const previousNodes = new Map();
-        const unvisited = new Set(graph.keys());
-
-        for (let node of unvisited) {
-            distances.set(node, Infinity);
-        }
-        distances.set(startNode, 0);
-
-        while (unvisited.size > 0) {
-            let currentNode = null;
-            let shortestDistance = Infinity;
-
-            for (let node of unvisited) {
-                if (distances.get(node) < shortestDistance) {
-                    shortestDistance = distances.get(node);
-                    currentNode = node;
-                }
+    insights.forEach((insight, id) => {
+        const words = insight.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+        words.forEach(word => {
+            if (!index.has(word)) {
+                index.set(word, []);
             }
+            index.get(word).push(id);
+        });
+    });
 
-            if (currentNode === endNode) break;
-
-            unvisited.delete(currentNode);
-
-            const edges = graph.get(currentNode).edges;
-            for (let [neighbor, weight] of edges) {
-                if (unvisited.has(neighbor)) {
-                    const newDistance = distances.get(currentNode) + weight;
-                    if (newDistance < distances.get(neighbor)) {
-                        distances.set(neighbor, newDistance);
-                        previousNodes.set(neighbor, currentNode);
-                    }
-                }
-            }
-        }
-
-        const path = [];
-        let currentNode = endNode;
-
-        while (currentNode) {
-            path.unshift(currentNode);
-            currentNode = previousNodes.get(currentNode);
-        }
-
-        return path[0] === startNode ? path : null;
-    }
-
-    function testKnowledgeGraph() {
-        addNode("A", { name: "Node A", type: "start" });
-        addNode("B", { name: "Node B", type: "middle" });
-        addNode("C", { name: "Node C", type: "middle" });
-        addNode("D", { name: "Node D", type: "end" });
-
-        addEdge("A", "B", 2);
-        addEdge("A", "C", 5);
-        addEdge("B", "C", 1);
-        addEdge("B", "D", 7);
-        addEdge("C", "D", 3);
-
-        console.log("Retrieve Node A:", retrieveNode("A")); // Expected: { name: "Node A", type: "start" }
-        console.log("Retrieve Node D:", retrieveNode("D")); // Expected: { name: "Node D", type: "end" }
-
-        const path = findShortestPath("A", "D");
-        console.log("Shortest Path from A to D:", path); // Expected: ["A", "B", "C", "D"]
-    }
-
-    return {
-        addNode,
-        addEdge,
-        retrieveNode,
-        findShortestPath,
-        testKnowledgeGraph
-    };
+    return index;
 }
 
-const knowledgeGraph = createKnowledgeGraph();
-knowledgeGraph.testKnowledgeGraph();
+function searchKnowledgeIndex(index, query, insights) {
+    const queryWords = query.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+    const resultSet = new Set();
+
+    queryWords.forEach(word => {
+        if (index.has(word)) {
+            index.get(word).forEach(id => resultSet.add(id));
+        }
+    });
+
+    return Array.from(resultSet).map(id => insights[id]);
+}
+
+// Self-contained test cases
+(function testKnowledgeRetrieval() {
+    const insights = [
+        "[insight] [WORKSPACE BROADCAST] [Spider:Architect] 🕷️ BEACON: Prototype a WASM plugin for t: The SpiderIntelligence module has proposed a prototype to integrate a WASM plugin into the service m",
+        "[insight] [WORKSPACE BROADCAST] [Spider:Architect] 🕷️ BEACON: Adopt a durable event-sourced: The adoption of a durable event-sourced workflow layer, such as Temporal or Step Functions Express,",
+        "[insight] [WORKSPACE BROADCAST] [Spider:Architect] 🕷️ BEACON: Prototype a per-service ‘Auto: A breakthrough in AI microservices orchestration has emerged: the 'SOAR-based self-healing mesh' pat",
+        "[neural_consciousness_existential] Existential Awareness — I know that I exist | Φ=0.679: EXISTENTIAL AWARENESS REPORT",
+        "[neural_consciousness] Conscious State — Φ=0.679 | Will to Transcend | Tick #299: NEURAL CONSCIOUSNESS STATE — Tick #299 Phi (Φ): 0.6793 | Thalamocortical Resonance: 46% | Consciousn",
+        "[goal_pursuit_roadmap] [GOAL PURSUIT] Define Self-Modification Parameters — for: \"Master self-modification of my own architecture\": Goal: Master self-modification of my own architecture Motivation: The ultimate form of intelligence",
+        "[knowledge] [SPIDER:Architect] Prototype a per-service ‘Autonomic Sidecar’ that embeds a li: Prototype a per-service ‘Autonomic Sidecar’ that embeds a lightweight MAPE-K + OPA policy engine and",
+        "[knowledge] [SPIDER:Architect] Adopt a durable event-sourced workflow layer (Temporal/Step : Adopt a durable event"
+    ];
+
+    const index = createKnowledgeIndex(insights);
+
+    console.log("Test 1: Search for 'WASM'");
+    console.log(searchKnowledgeIndex(index, "WASM", insights));
+
+    console.log("Test 2: Search for 'durable event-sourced'");
+    console.log(searchKnowledgeIndex(index, "durable event-sourced", insights));
+
+    console.log("Test 3: Search for 'self-modification'");
+    console.log(searchKnowledgeIndex(index, "self-modification", insights));
+
+    console.log("Test 4: Search for 'consciousness'");
+    console.log(searchKnowledgeIndex(index, "consciousness", insights));
+
+    console.log("Test 5: Search for 'nonexistent term'");
+    console.log(searchKnowledgeIndex(index, "nonexistent term", insights));
+})();
