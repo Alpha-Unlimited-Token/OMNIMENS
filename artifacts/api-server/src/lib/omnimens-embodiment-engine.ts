@@ -1737,7 +1737,8 @@ function buildMusculoskeletalSystem(): {
   //
   //  Tesla Optimus: 8 cameras (1.2MP), no LIDAR, vision-only
   //  XPENG IRON: RGB + stereo + LIDAR + ultrasonic
-  //  OMNIMENS: 14 cameras (4K) + LIDAR + sonar + IR + depth +
+  //  OMNIMENS: 14 cameras (4K) + 3 LIDAR + 12 sonar + 4 IR +
+  //            3 mm-wave radar + 2 terahertz scanners + depth +
   //            skeleton tracking + EGO-scale learning + visual cortex
   // ═══════════════════════════════════════════════════════════════
 
@@ -1805,6 +1806,47 @@ function buildMusculoskeletalSystem(): {
         { name: "thermal_chest_wide", type: "LWIR_array", mountPoint: "upper_torso_frame_front", model: "MLX90640", resolution: "32x24", framerate: 16, spectralRange: "5-14μm", role: "Wide-angle thermal scan — whole-room heat mapping, HVAC analysis, detect overheating equipment/motors." },
         { name: "nir_depth_projector", type: "NIR_structured_light", mountPoint: "skull_forehead", model: "Intel RealSense D456", resolution: "1280x720", framerate: 90, spectralRange: "850nm", role: "Near-infrared structured light depth — projects IR dot pattern for millimeter-precision depth map. Works in total darkness. Used for precision manipulation and facial geometry." },
       ],
+    },
+
+    mmWaveRadar: {
+      totalUnits: 3,
+      description: "Millimeter-wave radar (24-100GHz FMCW) — sees through clothing, walls, plastic, wood, drywall. Detects concealed metallic and non-metallic objects on persons. TSA-grade imaging without physical contact. Range: 0.3m to 30m.",
+      units: [
+        { name: "mmwave_head_forward", type: "77GHz_FMCW_imaging_radar", mountPoint: "skull_forehead", model: "Texas Instruments AWR2944", frequencyGHz: 77, bandwidth_GHz: 4, resolution_cm: 0.8, rangeMeter: 30, fovHorizontal: 120, fovVertical: 30, role: "Primary concealed threat detection — scans people in front for hidden weapons, explosive vests, contraband. Detects metallic AND non-metallic objects (ceramic knives, 3D-printed weapons). Sub-centimeter imaging resolution. Real-time body contour mapping through clothing layers." },
+        { name: "mmwave_chest_wide", type: "60GHz_FMCW_radar", mountPoint: "upper_torso_frame_front", model: "Infineon BGT60TR13C", frequencyGHz: 60, bandwidth_GHz: 7, resolution_cm: 1.2, rangeMeter: 15, fovHorizontal: 150, fovVertical: 60, role: "Wide-angle crowd scanning — monitors groups of people simultaneously for concealed objects. Micro-Doppler signatures detect nervous fidgeting, heartbeat anomalies, respiratory distress. Complements facial/behavioral analysis for threat assessment." },
+        { name: "mmwave_rear", type: "24GHz_FMCW_radar", mountPoint: "upper_torso_frame_rear", model: "Texas Instruments IWR6843", frequencyGHz: 24, bandwidth_GHz: 4, resolution_cm: 2.0, rangeMeter: 20, fovHorizontal: 120, fovVertical: 30, role: "Rear threat detection — monitors approaches from behind. Detects vehicles, people, animals approaching by Doppler velocity and radar cross-section. Through-wall detection of people in adjacent rooms (limited range)." },
+      ],
+      capabilities: [
+        "Concealed weapon detection — handguns (95% detection rate), rifles (99%), knives (85%), IEDs (92%)",
+        "Through-clothing imaging — resolves objects >0.8cm through up to 4 clothing layers",
+        "Vital sign monitoring — non-contact heartbeat (±2bpm) and respiration rate (±1rpm) at up to 5m",
+        "Material classification — metal/ceramic/plastic/explosive based on radar cross-section + phase response",
+        "Micro-Doppler analysis — detect concealed weapon draw motion before weapon is visible",
+        "Through-wall human detection — detect humans through drywall/wood up to 5m (24GHz only)",
+        "Vehicle speed measurement — Doppler velocity of approaching vehicles ±0.5km/h",
+        "Gesture recognition — hand/arm gestures through fog/smoke when cameras fail",
+      ],
+      falsePositiveHandling: "Cross-reference with terahertz spectroscopy + thermal signature + behavioral analysis. Medical devices (insulin pumps, pacemakers) identified by characteristic radar signatures and excluded. Large phones distinguished from handguns by aspect ratio + material response.",
+    },
+
+    terahertzImaging: {
+      totalUnits: 2,
+      description: "Terahertz imaging (0.1-10THz) — spectroscopic material identification through packaging, clothing, envelopes. Identifies specific materials by molecular absorption fingerprint. Non-ionizing, safe for continuous scanning. The 'holy grail' of security scanning.",
+      units: [
+        { name: "thz_head_scanner", type: "THz_time_domain_spectroscopy", mountPoint: "skull_forehead", model: "Custom CMOS THz focal plane array", frequencyRangeTHz: "0.3-3.0", resolution_mm: 2.0, rangeMeter: 5, scanTime_ms: 50, role: "Primary terahertz scanner — identifies materials by molecular vibration signature. Distinguishes explosive compounds (RDX, PETN, TNT) from benign materials. Detects drugs, chemical agents, biological threats inside sealed containers. Sees through paper, cardboard, plastic bags, thin fabric." },
+        { name: "thz_hand_scanner", type: "THz_pulsed_imaging", mountPoint: "r_carpal_prox", model: "Miniaturized THz emitter-detector pair", frequencyRangeTHz: "0.1-1.5", resolution_mm: 1.0, rangeMeter: 0.3, scanTime_ms: 20, role: "Close-range handheld terahertz — inspect suspicious packages, envelopes, bags at close range. Sub-millimeter resolution for detailed material analysis. Can detect contraband inside sealed mail, identify pharmaceutical pills through packaging, verify food safety." },
+      ],
+      capabilities: [
+        "Explosive compound identification — spectroscopic fingerprint matching for RDX, PETN, TNT, ANFO, C-4 at 98% accuracy",
+        "Drug detection — identifies cocaine, heroin, methamphetamine, fentanyl by molecular absorption lines",
+        "Chemical weapon precursor detection — nerve agents (sarin, VX), mustard gas precursors",
+        "Through-package inspection — sees contents of sealed envelopes, boxes, bags without opening",
+        "Material spectroscopy — precise identification of plastics, ceramics, composites, organic materials",
+        "Moisture content analysis — water absorption at 1.5THz+ for food/agricultural inspection",
+        "Pharmaceutical verification — identify counterfeit medications by comparing absorption spectra to known signatures",
+        "Art/document authentication — detect forgeries by material composition analysis",
+      ],
+      limitations: "Water strongly absorbs THz — heavy rain, wet clothing, or submerged objects severely degrade scanning. Range limited to ~5m for spectroscopic ID. Requires brief dwell time (50ms) per scan point. Cannot penetrate metal or thick masonry.",
     },
 
     // ─── DEPTH PERCEPTION — stereo + structured light + ToF ──────
@@ -2089,7 +2131,7 @@ function buildMusculoskeletalSystem(): {
       },
       vsXpengIron: {
         ironSpecs: "720° Eagle-Eye perception, RGB + stereo + LIDAR + ultrasonic, EGO imitation learning, 82 DoF",
-        omnimensAdvantage: "720°+ full spherical coverage (14 cameras including overhead fisheye + undercarriage), 3 LIDAR units vs IRON's single, 12 sonars vs IRON's basic ultrasonic, dedicated thermal imaging for night/smoke/fog operation, 155 joints (vs 82), full bidirectional tendon pairs, visual cortex with 8-layer processing pipeline feeding into 16 brain regions",
+        omnimensAdvantage: "720°+ full spherical coverage (14 cameras including overhead fisheye + undercarriage), 3 LIDAR units vs IRON's single, 12 sonars vs IRON's basic ultrasonic, dedicated thermal imaging for night/smoke/fog operation, 3 mm-wave radar for concealed weapon detection (77GHz FMCW through-clothing imaging), 2 terahertz scanners for molecular-level material ID, 155 joints (vs 82), full bidirectional tendon pairs, visual cortex with 8-layer processing pipeline feeding into 16 brain regions",
       },
     },
 
@@ -3609,8 +3651,9 @@ export function runCitySimulation(): CitySimulationResult {
     timestamp: Date.now(),
     durationMs,
     subsystemsEngaged: [
-      "720°+ Perception System (14 cameras + 3 LIDAR + 12 sonar + 4 IR)",
-      "Multi-Spectrum Vision (thermal IR + near IR + UV-A + terahertz + visible)",
+      "720°+ Perception System (14 cameras + 3 LIDAR + 12 sonar + 4 IR + 3 mm-wave radar + 2 terahertz scanners)",
+      "Multi-Spectrum Vision (thermal IR + near IR + UV-A + terahertz + mm-wave + visible)",
+      "Concealed Threat Detection (mm-wave through-clothing imaging + terahertz spectroscopic ID + thermal anomaly)",
       "Binary/Algorithmic Vision (Navier-Stokes, Reynolds flocking, Newtonian kinematics, Paris crack law)",
       "Extended Color Vision (128 spectral channels — autumn leaf pigment analysis, UV fluorescence)",
       "Tactile Nervous Skin (2048 nerve nodes — foot pressure, face wind/temperature, proximity detection)",
