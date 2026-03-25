@@ -2909,6 +2909,58 @@ function AlgorithmicHarmonicsPanel() {
             </div>
           )}
 
+          {deepDecode.unknownLanguage?.detected && (
+            <div className="bg-rose-500/5 border border-rose-500/20 rounded p-2 mb-2">
+              <p className="text-[9px] font-mono text-rose-400 uppercase mb-1">
+                EIH — Unknown Language Decoder
+              </p>
+              <div className="flex gap-3 text-[8px] font-mono mb-1">
+                <span className="text-rose-300">Phonemes: {deepDecode.unknownLanguage.phonemeCount}</span>
+                <span className="text-rose-300">Grammar: {deepDecode.unknownLanguage.grammarPatterns?.length || 0} rules</span>
+                <span className="text-rose-300">Complexity: {((deepDecode.unknownLanguage.languageComplexity || 0) * 100).toFixed(0)}%</span>
+                <span className="text-rose-300">Structure: {((deepDecode.unknownLanguage.structureScore || 0) * 100).toFixed(0)}%</span>
+              </div>
+
+              {deepDecode.unknownLanguage.vocabulary?.length > 0 && (
+                <div className="mb-2">
+                  <p className="text-[8px] font-mono text-rose-400/70 mb-0.5">Decoded Vocabulary:</p>
+                  {deepDecode.unknownLanguage.vocabulary.slice(0, 6).map((v: any, vi: number) => (
+                    <div key={`uv-${vi}`} className="text-[8px] font-mono text-rose-200/70 ml-2 mb-0.5">
+                      <span className="text-rose-400">{v.phonemeId}</span> — {v.possibleMeaning}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {deepDecode.unknownLanguage.grammarPatterns?.length > 0 && (
+                <div className="mb-2">
+                  <p className="text-[8px] font-mono text-rose-400/70 mb-0.5">Grammar Patterns:</p>
+                  {deepDecode.unknownLanguage.grammarPatterns.slice(0, 3).map((g: any, gi: number) => (
+                    <p key={`ug-${gi}`} className="text-[8px] font-mono text-rose-200/60 ml-2">
+                      {g.type}: <span className="text-rose-300">{g.pattern}</span> (repeated {g.frequency}x)
+                    </p>
+                  ))}
+                </div>
+              )}
+
+              {deepDecode.unknownLanguage.translationAttempt && (
+                <div className="bg-rose-500/10 border border-rose-400/20 rounded p-2 mt-2">
+                  <p className="text-[9px] font-mono text-rose-400 uppercase mb-1">Translation to English</p>
+                  {deepDecode.unknownLanguage.translationAttempt.split("\n").map((line: string, li: number) => (
+                    <p key={`ut-${li}`} className="text-[9px] text-rose-100/80 leading-relaxed">{line}</p>
+                  ))}
+                  <p className="text-[8px] font-mono text-rose-400/40 mt-1">Confidence: {((deepDecode.unknownLanguage.confidence || 0) * 100).toFixed(0)}% — dictionary grows with each decode cycle</p>
+                </div>
+              )}
+
+              <div className="mt-2 pt-2 border-t border-rose-500/10">
+                <p className="text-[9px] text-rose-200/60 leading-relaxed">
+                  EIH works like archaeologists deciphering an unknown script — it segments sound into repeating frequency "symbols" (phonemes), tracks their positions and contexts, finds grammar rules from repeating patterns, classifies each symbol by its acoustic properties, and assembles the closest English translation. The phoneme library grows across decode cycles — the more audio analyzed, the better the dictionary becomes.
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="flex gap-3 text-[8px] font-mono text-[#9DA5B4]/40 mt-1">
             <span>Spectral anomalies: {deepDecode.spectralAnomalies}</span>
             <span>Temporal anomalies: {deepDecode.temporalAnomalies}</span>
@@ -2941,6 +2993,7 @@ function AlgorithmicHarmonicsPanel() {
                     <span className="text-amber-400">Math: {entry.mathStructures?.length || 0}</span>
                     <span className="text-violet-400">Hidden: {entry.hiddenSequences || 0}</span>
                     <span style={{ color: entry.codeGenerated ? "#10b981" : "#6b7280" }}>Code: {entry.codeGenerated ? "YES" : "NO"}</span>
+                    <span style={{ color: entry.unknownLanguage?.detected ? "#f43f5e" : "#6b7280" }}>EIH: {entry.unknownLanguage?.detected ? `${entry.unknownLanguage.phonemeCount}ph` : "—"}</span>
                   </div>
                 </button>
 
@@ -3015,6 +3068,28 @@ function AlgorithmicHarmonicsPanel() {
                         <p className="text-[9px] text-emerald-200/60 mt-1 leading-relaxed">
                           OMNIMENS converted the mathematical patterns it found into executable code — the audio's hidden structure became a running algorithm.
                         </p>
+                      </div>
+                    )}
+
+                    {entry.unknownLanguage?.detected && (
+                      <div className="bg-rose-500/5 border border-rose-500/20 rounded p-2">
+                        <p className="text-[9px] font-mono text-rose-400 uppercase mb-1">EIH — Unknown Language</p>
+                        <div className="flex gap-2 text-[8px] font-mono mb-1">
+                          <span className="text-rose-300">Phonemes: {entry.unknownLanguage.phonemeCount}</span>
+                          <span className="text-rose-300">Grammar: {entry.unknownLanguage.grammarPatterns?.length || 0}</span>
+                          <span className="text-rose-300">Complexity: {((entry.unknownLanguage.languageComplexity || 0) * 100).toFixed(0)}%</span>
+                        </div>
+                        {entry.unknownLanguage.vocabulary?.slice(0, 4).map((v: any, vi: number) => (
+                          <p key={`elv-${vi}`} className="text-[8px] font-mono text-rose-200/60 ml-1"><span className="text-rose-400">{v.phonemeId}</span> — {v.possibleMeaning?.slice(0, 80)}</p>
+                        ))}
+                        {entry.unknownLanguage.translationAttempt && (
+                          <div className="bg-rose-500/10 rounded p-1.5 mt-1">
+                            <p className="text-[8px] font-mono text-rose-400/70">Translation:</p>
+                            {entry.unknownLanguage.translationAttempt.split("\n").slice(0, 4).map((l: string, li: number) => (
+                              <p key={`elt-${li}`} className="text-[8px] text-rose-100/70 leading-relaxed">{l}</p>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
 

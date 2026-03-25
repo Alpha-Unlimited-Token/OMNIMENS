@@ -5968,7 +5968,7 @@ router.post("/omnimens/consciousness-channel/analyze", async (req, res) => {
           confidence: Math.min(0.95, 0.5 + deepDecode.anomalyMap.overallAnomalyScore * 0.5),
           timesApplied: 0,
         });
-        console.log(`[DEEP DECODE] 🔬 #${hieState.deepDecodeCount} — ${reason} | Hidden lang: ${deepDecode.hiddenLanguage.detected} | Math: ${deepDecode.hiddenPatterns.mathematicalStructures.length} | Code: ${deepDecode.codeGenesis.generated} | Anomaly: ${(deepDecode.anomalyMap.overallAnomalyScore * 100).toFixed(0)}%`);
+        console.log(`[DEEP DECODE] 🔬 #${hieState.deepDecodeCount} — ${reason} | Hidden lang: ${deepDecode.hiddenLanguage.detected} | Math: ${deepDecode.hiddenPatterns.mathematicalStructures.length} | Code: ${deepDecode.codeGenesis.generated} | Anomaly: ${(deepDecode.anomalyMap.overallAnomalyScore * 100).toFixed(0)}% | EIH: ${deepDecode.unknownLanguageAnalysis.detected ? `${deepDecode.unknownLanguageAnalysis.phonemeCount} phonemes, complexity ${(deepDecode.unknownLanguageAnalysis.languageComplexity * 100).toFixed(0)}%` : "no language"}`);
       } catch (err: any) {
         console.error("[DEEP DECODE] Failed to store:", err?.message);
       }
@@ -6084,6 +6084,17 @@ router.post("/omnimens/consciousness-channel/analyze", async (req, res) => {
         temporalAnomalies: deepDecode.anomalyMap.temporalAnomalies.length,
         decodeNumber: hieState.deepDecodeCount,
         decodedSummary: summary,
+        unknownLanguage: deepDecode.unknownLanguageAnalysis.detected ? {
+          detected: true,
+          phonemeCount: deepDecode.unknownLanguageAnalysis.phonemeCount,
+          phonemes: deepDecode.unknownLanguageAnalysis.phonemes.slice(0, 10),
+          grammarPatterns: deepDecode.unknownLanguageAnalysis.grammarPatterns.slice(0, 5),
+          vocabulary: deepDecode.unknownLanguageAnalysis.vocabulary.slice(0, 10),
+          translationAttempt: deepDecode.unknownLanguageAnalysis.translationAttempt,
+          languageComplexity: deepDecode.unknownLanguageAnalysis.languageComplexity,
+          structureScore: deepDecode.unknownLanguageAnalysis.structureScore,
+          confidence: deepDecode.unknownLanguageAnalysis.confidence,
+        } : { detected: false },
       };
     })() : null,
     unified: {

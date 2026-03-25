@@ -117,6 +117,17 @@ export type DeepDecodeResult = {
     temporalAnomalies: { sampleIndex: number; type: string; significance: number }[];
     overallAnomalyScore: number;
   };
+  unknownLanguageAnalysis: {
+    detected: boolean;
+    phonemeCount: number;
+    phonemes: { id: string; freqSignature: number[]; occurrences: number; avgDuration: number }[];
+    grammarPatterns: { pattern: string; frequency: number; type: string }[];
+    vocabulary: { phonemeId: string; contextCluster: string; possibleMeaning: string }[];
+    translationAttempt: string | null;
+    languageComplexity: number;
+    structureScore: number;
+    confidence: number;
+  };
 };
 
 export const hieState = {
@@ -797,6 +808,272 @@ const PHI = 1.618033988749895;
 const FIBONACCI = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181];
 const PRIMES = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
 
+const eihPhonemeLibrary: Map<string, { signature: number[]; occurrences: number; contexts: string[][]; firstSeen: number }> = new Map();
+let eihTranslationMemory: { phonemeSequence: string; translation: string; confidence: number; timestamp: number }[] = [];
+
+function analyzeUnknownLanguage(samples: HarmonicAnalysis[]): {
+  detected: boolean;
+  phonemeCount: number;
+  phonemes: { id: string; freqSignature: number[]; occurrences: number; avgDuration: number }[];
+  grammarPatterns: { pattern: string; frequency: number; type: string }[];
+  vocabulary: { phonemeId: string; contextCluster: string; possibleMeaning: string }[];
+  translationAttempt: string | null;
+  languageComplexity: number;
+  structureScore: number;
+  confidence: number;
+} {
+  if (samples.length < 5) {
+    return { detected: false, phonemeCount: 0, phonemes: [], grammarPatterns: [], vocabulary: [], translationAttempt: null, languageComplexity: 0, structureScore: 0, confidence: 0 };
+  }
+
+  const quantizationStep = 25;
+  const sampleSignatures: { sig: number[]; raw: HarmonicAnalysis }[] = samples.map(s => ({
+    sig: [
+      Math.round(s.dominantFrequency / quantizationStep) * quantizationStep,
+      Math.round(s.spectralCentroid / quantizationStep) * quantizationStep,
+      Math.round(s.rmsEnergy * 100),
+      Math.round((s.zeroCrossingRate || 0) * 1000),
+      Math.round(s.frequencyBands.sub * 10),
+      Math.round(s.frequencyBands.low * 10),
+      Math.round(s.frequencyBands.mid * 10),
+      Math.round(s.frequencyBands.high * 10),
+    ],
+    raw: s,
+  }));
+
+  const sigToId = (sig: number[]): string => {
+    const hash = sig.reduce((h, v, i) => h + v * (i + 1) * 31, 0);
+    const prefix = sig[0] < 200 ? "L" : sig[0] < 800 ? "M" : sig[0] < 2000 ? "H" : "U";
+    return `${prefix}${Math.abs(hash % 10000).toString().padStart(4, "0")}`;
+  };
+
+  const phonemeSequence: string[] = [];
+  let prevId = "";
+  let segmentStart = 0;
+  const segmentDurations: Map<string, number[]> = new Map();
+
+  for (let i = 0; i < sampleSignatures.length; i++) {
+    const id = sigToId(sampleSignatures[i].sig);
+    if (id !== prevId) {
+      if (prevId && i - segmentStart > 0) {
+        const dur = i - segmentStart;
+        if (!segmentDurations.has(prevId)) segmentDurations.set(prevId, []);
+        segmentDurations.get(prevId)!.push(dur);
+      }
+      phonemeSequence.push(id);
+      prevId = id;
+      segmentStart = i;
+    }
+  }
+  if (prevId) {
+    const dur = sampleSignatures.length - segmentStart;
+    if (!segmentDurations.has(prevId)) segmentDurations.set(prevId, []);
+    segmentDurations.get(prevId)!.push(dur);
+  }
+
+  const localPhonemes: Map<string, { sig: number[]; count: number }> = new Map();
+  for (const ss of sampleSignatures) {
+    const id = sigToId(ss.sig);
+    if (!localPhonemes.has(id)) {
+      localPhonemes.set(id, { sig: ss.sig, count: 0 });
+    }
+    localPhonemes.get(id)!.count++;
+  }
+
+  for (const [id, data] of localPhonemes) {
+    const existing = eihPhonemeLibrary.get(id);
+    if (existing) {
+      existing.occurrences += data.count;
+    } else {
+      eihPhonemeLibrary.set(id, { signature: data.sig, occurrences: data.count, contexts: [], firstSeen: Date.now() });
+    }
+  }
+
+  for (let i = 1; i < phonemeSequence.length - 1; i++) {
+    const id = phonemeSequence[i];
+    const lib = eihPhonemeLibrary.get(id);
+    if (lib) {
+      const ctx = [phonemeSequence[i - 1], phonemeSequence[i + 1]];
+      lib.contexts.push(ctx);
+      if (lib.contexts.length > 30) lib.contexts.splice(0, lib.contexts.length - 30);
+    }
+  }
+
+  const grammarPatterns: { pattern: string; frequency: number; type: string }[] = [];
+
+  for (let pLen = 2; pLen <= Math.min(5, Math.floor(phonemeSequence.length / 2)); pLen++) {
+    const patternCounts: Map<string, number> = new Map();
+    for (let i = 0; i <= phonemeSequence.length - pLen; i++) {
+      const pat = phonemeSequence.slice(i, i + pLen).join("-");
+      patternCounts.set(pat, (patternCounts.get(pat) || 0) + 1);
+    }
+    for (const [pat, count] of patternCounts) {
+      if (count >= 2) {
+        const patType = pLen === 2 ? "bigram" : pLen === 3 ? "trigram" : `${pLen}-gram`;
+        grammarPatterns.push({ pattern: pat, frequency: count, type: patType });
+      }
+    }
+  }
+  grammarPatterns.sort((a, b) => b.frequency - a.frequency);
+  const topGrammar = grammarPatterns.slice(0, 10);
+
+  const vocabulary: { phonemeId: string; contextCluster: string; possibleMeaning: string }[] = [];
+  for (const [id, lib] of eihPhonemeLibrary) {
+    if (lib.occurrences < 2) continue;
+
+    const sig = lib.signature;
+    const freq = sig[0];
+    const energy = sig[2];
+    const zcr = sig[3];
+    const contextLabels = lib.contexts.slice(-5).map(c => c.join("+")).join(", ");
+
+    let meaning = "";
+    if (freq < 100 && energy > 50) meaning = "emphasis/stress marker — low powerful tone (comparable to a downbeat or exclamation)";
+    else if (freq < 100) meaning = "background carrier — low-frequency foundation signal (structural element, like a sentence boundary)";
+    else if (freq >= 100 && freq < 300 && zcr < 50) meaning = "primary vocalization unit — steady mid-low tone (possible content word, carries core meaning)";
+    else if (freq >= 100 && freq < 300 && zcr >= 50) meaning = "modulated signal — mid-low with rapid changes (possible verb/action indicator or tense marker)";
+    else if (freq >= 300 && freq < 800 && energy > 30) meaning = "articulated unit — mid-range active signal (possible descriptor or modifier, like adjective/adverb)";
+    else if (freq >= 300 && freq < 800) meaning = "connector element — mid-range passive signal (possible conjunction, preposition, or relational word)";
+    else if (freq >= 800 && freq < 2000) meaning = "high articulation — upper range signal (possible question marker, emotional inflection, or precision term)";
+    else if (freq >= 2000 && freq < 5000) meaning = "fine detail signal — very high frequency component (ultrasonic modifier, inaudible to humans, carries metadata about the message)";
+    else if (freq >= 5000) meaning = "ultrasonic data channel — beyond human hearing (pure information carrier, possibly encoding numerical or spatial data)";
+    else meaning = "unclassified frequency unit — requires more context for interpretation";
+
+    if (lib.contexts.length > 10) {
+      const uniqueContexts = new Set(lib.contexts.map(c => c.join("-")));
+      if (uniqueContexts.size < 3) meaning += " [FIXED CONTEXT: appears in same position — likely grammatical/structural word]";
+      else if (uniqueContexts.size > 8) meaning += " [VARIABLE CONTEXT: appears in many positions — likely content/meaning word]";
+    }
+
+    vocabulary.push({ phonemeId: id, contextCluster: contextLabels || "isolated", possibleMeaning: meaning });
+  }
+  vocabulary.sort((a, b) => {
+    const aOcc = eihPhonemeLibrary.get(a.phonemeId)?.occurrences || 0;
+    const bOcc = eihPhonemeLibrary.get(b.phonemeId)?.occurrences || 0;
+    return bOcc - aOcc;
+  });
+
+  const uniquePhonemes = new Set(phonemeSequence).size;
+  const totalPhonemes = phonemeSequence.length;
+  const typeTokenRatio = totalPhonemes > 0 ? uniquePhonemes / totalPhonemes : 0;
+  const hasRepeatingStructure = topGrammar.length > 0;
+  const hasVariety = typeTokenRatio > 0.2 && typeTokenRatio < 0.9;
+  const hasSufficientLength = totalPhonemes >= 4;
+
+  const structureScore = Math.min(1,
+    (hasRepeatingStructure ? 0.3 : 0) +
+    (hasVariety ? 0.25 : 0) +
+    (hasSufficientLength ? 0.15 : 0) +
+    (uniquePhonemes >= 3 ? 0.15 : 0) +
+    (topGrammar.filter(g => g.frequency >= 3).length > 0 ? 0.15 : 0)
+  );
+
+  const languageComplexity = Math.min(1,
+    (uniquePhonemes / 20) * 0.3 +
+    (topGrammar.length / 10) * 0.3 +
+    typeTokenRatio * 0.2 +
+    (vocabulary.filter(v => v.possibleMeaning.includes("content word") || v.possibleMeaning.includes("vocalization")).length / Math.max(1, vocabulary.length)) * 0.2
+  );
+
+  const detected = structureScore > 0.3 && uniquePhonemes >= 2 && totalPhonemes >= 3;
+  const confidence = Math.min(0.95, structureScore * 0.6 + languageComplexity * 0.4);
+
+  let translationAttempt: string | null = null;
+  if (detected && phonemeSequence.length >= 3) {
+    const words: string[] = [];
+    for (const pid of phonemeSequence) {
+      const vocab = vocabulary.find(v => v.phonemeId === pid);
+      if (vocab) {
+        const sig = eihPhonemeLibrary.get(pid)?.signature || [];
+        const freq = sig[0] || 0;
+        const energy = sig[2] || 0;
+
+        if (freq < 100 && energy > 50) words.push("[EMPHASIS]");
+        else if (freq < 100) words.push("[PAUSE/BOUNDARY]");
+        else if (freq >= 100 && freq < 300 && (sig[3] || 0) < 50) {
+          const occ = eihPhonemeLibrary.get(pid)?.occurrences || 0;
+          if (occ > 5) words.push("(core-concept)");
+          else words.push("(statement)");
+        }
+        else if (freq >= 100 && freq < 300) words.push("(action/change)");
+        else if (freq >= 300 && freq < 800 && energy > 30) words.push("(quality/descriptor)");
+        else if (freq >= 300 && freq < 800) words.push("(relation/link)");
+        else if (freq >= 800 && freq < 2000) words.push("(question/inflection)");
+        else if (freq >= 2000 && freq < 5000) words.push("[ultrasonic-modifier]");
+        else if (freq >= 5000) words.push("[data-channel]");
+        else words.push("(unknown)");
+      }
+    }
+
+    const hasEmphasis = words.includes("[EMPHASIS]");
+    const hasBoundary = words.includes("[PAUSE/BOUNDARY]");
+    const contentWords = words.filter(w => w.startsWith("(")).length;
+    const ultrasonicParts = words.filter(w => w.includes("ultrasonic") || w.includes("data-channel")).length;
+
+    const parts: string[] = [];
+    if (contentWords === 0 && ultrasonicParts > 0) {
+      parts.push(`Signal contains ${ultrasonicParts} ultrasonic data element${ultrasonicParts > 1 ? "s" : ""} operating above human hearing range — this is a pure information channel, not vocal speech. The data is structured and repeating, suggesting numerical, spatial, or state-encoding information.`);
+    } else if (contentWords > 0) {
+      parts.push(`Detected ${contentWords} semantic unit${contentWords > 1 ? "s" : ""} in the signal.`);
+
+      const sentences: string[] = [];
+      let currentSentence: string[] = [];
+      for (const w of words) {
+        if (w === "[PAUSE/BOUNDARY]") {
+          if (currentSentence.length > 0) sentences.push(currentSentence.join(" "));
+          currentSentence = [];
+        } else if (w === "[EMPHASIS]") {
+          currentSentence.push("(!)");
+        } else {
+          currentSentence.push(w);
+        }
+      }
+      if (currentSentence.length > 0) sentences.push(currentSentence.join(" "));
+
+      for (let si = 0; si < sentences.length; si++) {
+        parts.push(`Phrase ${si + 1}: ${sentences[si]}`);
+      }
+
+      if (hasEmphasis) parts.push(`Emphasis markers present — this signal carries emotional weight or urgency.`);
+      if (hasBoundary) parts.push(`Boundary markers found — the signal is segmented into distinct phrases, a hallmark of structured communication.`);
+      if (topGrammar.length > 0) {
+        parts.push(`Grammar: ${topGrammar.length} repeating pattern${topGrammar.length > 1 ? "s" : ""} detected — the most frequent being "${topGrammar[0].pattern}" (${topGrammar[0].frequency}x). Repeating structure indicates syntax rules.`);
+      }
+    } else {
+      parts.push(`Signal contains ${phonemeSequence.length} frequency units but no clear semantic content was identified in this sample. More data may reveal structure.`);
+    }
+
+    translationAttempt = parts.join("\n");
+
+    eihTranslationMemory.push({
+      phonemeSequence: phonemeSequence.join("-"),
+      translation: translationAttempt,
+      confidence,
+      timestamp: Date.now(),
+    });
+    if (eihTranslationMemory.length > 100) eihTranslationMemory = eihTranslationMemory.slice(-100);
+  }
+
+  const phonemeList = Array.from(localPhonemes.entries()).map(([id, data]) => ({
+    id,
+    freqSignature: data.sig,
+    occurrences: eihPhonemeLibrary.get(id)?.occurrences || data.count,
+    avgDuration: (segmentDurations.get(id) || [1]).reduce((a, b) => a + b, 0) / (segmentDurations.get(id)?.length || 1),
+  }));
+
+  return {
+    detected,
+    phonemeCount: uniquePhonemes,
+    phonemes: phonemeList.slice(0, 20),
+    grammarPatterns: topGrammar,
+    vocabulary: vocabulary.slice(0, 15),
+    translationAttempt,
+    languageComplexity,
+    structureScore,
+    confidence,
+  };
+}
+
 export function hieDeepPatternDecode(recentHistory: HarmonicAnalysis[], triggerReason: string): DeepDecodeResult {
   const now = Date.now();
   const samples = recentHistory.slice(-30);
@@ -1025,6 +1302,8 @@ export function hieDeepPatternDecode(recentHistory: HarmonicAnalysis[], triggerR
     }
   }
 
+  const unknownLanguageAnalysis = analyzeUnknownLanguage(samples);
+
   const result: DeepDecodeResult = {
     timestamp: now,
     triggerReason,
@@ -1053,6 +1332,7 @@ export function hieDeepPatternDecode(recentHistory: HarmonicAnalysis[], triggerR
       temporalAnomalies,
       overallAnomalyScore,
     },
+    unknownLanguageAnalysis,
   };
 
   hieState.deepDecodeHistory.push(result);

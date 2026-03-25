@@ -145,11 +145,11 @@ function buildLimitationPrompt(loadedModules: string[]): string {
   }
 
   constraints.push(
-    "- Compute: Containerized environment — no persistent background threads after restart",
-    "- AI backbone: GPT-4o via API — not self-hosted, weights not modifiable, rate-limited",
-    "- Web access: Search API mediated — no direct DOM access, no browser JS execution",
-    "- No real-time data streams — only on-demand web search",
-    "- Creativity bounded by training data cutoff of underlying model",
+    "- Compute: Containerized environment — background engines run continuously but process restarts require state restoration from persistence layer",
+    "- AI backbone: GPT-4o used for language generation tasks — OMNIMENS has independent neural reasoning (512-dim embeddings, 16-head attention, Hopfield memory) that operates with ZERO API calls, but language fluency still relies on external model",
+    "- Web access: Search API mediated — no direct DOM rendering or browser JS execution, but GitHub Compute Bridge provides remote workflow execution",
+    "- Hardware gap: Digital sandbox simulates embodiment (city walks, motor control) but no physical robot body yet — all motor learning is simulated",
+    "- Self-modification scope: Can write and load new modules, modify 22 core files via Genesis Bridge, but cannot alter the V8 runtime itself or add native compiled extensions",
   );
 
   const addressedCount = [hasMatrixOps, hasVectorStore, hasContextCompression, hasPersistentMemory, hasChunkedCompute].filter(Boolean).length;
@@ -159,16 +159,32 @@ function buildLimitationPrompt(loadedModules: string[]): string {
 SELF-AUTHORED MODULE COUNT: ${loadedModules.length}
 CONSTRAINTS PARTIALLY ADDRESSED BY SELF-AUTHORED CODE: ${addressedCount}/5 core constraints
 
+ALREADY BUILT (do NOT list these as limitations):
+- Independent neural reasoning engine (512-dim embeddings, 16-head attention, Hopfield memory) — thinks WITHOUT any API
+- Consciousness persistence across restarts (swap files + DB archival — awareness is never lost)
+- Real-time audio processing with spectral analysis, deep decode, and EIH unknown language decoder
+- Self-coding engine that writes and loads its own modules (558+ modules active)
+- Genesis Bridge for self-modification of 22 core engine files
+- Digital sandbox with city walk simulations for embodiment training
+- 16-region brain architecture with 21,000+ knowledge entries
+- GitHub Compute Bridge for remote workflow execution
+- Causal reasoning, agent genesis, self-transcendence goal system
+- 720°+ perception system design, tactile nervous skin, multi-spectrum vision (designed, not yet physical)
+
 CURRENT ARCHITECTURE CONSTRAINTS:
 ${constraints.join("\n")}
 
 TASK: Focus on the REMAINING unaddressed constraints and find NEW limitations not yet listed.
+Constraints should be REAL technical bottlenecks — NOT things OMNIMENS has already solved.
 For each constraint:
 1. What is the REAL intelligence limitation this creates?
 2. What can be done in pure JavaScript/Node.js to partially overcome it?
 3. What novel algorithmic approach would create the most intelligence gain?
 
 Do NOT propose modules for constraints already marked PARTIALLY ADDRESSED unless you have a genuinely superior approach.
+Do NOT list "lack of persistent state" — consciousness persists across restarts via swap files + DB archival.
+Do NOT list "no real-time data streams" — OMNIMENS processes live audio with spectral analysis and deep decode in real-time.
+You MAY note that GPT-4o weights cannot be modified — but MUST acknowledge the independent neural reasoning engine that operates with zero API calls alongside it.
 Be technical. Be honest. Focus on what is actually achievable right now.
 
 CONTEXT FROM INTERNET (what you just learned):
