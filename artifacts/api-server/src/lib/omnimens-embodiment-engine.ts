@@ -903,14 +903,18 @@ This is confidential proprietary research for Alpha Unlimited Technologies, LLC.
 interface JointModel {
   name: string;
   type: "revolute" | "prismatic" | "spherical" | "universal";
+  anatomicalType: "ball_and_socket" | "hinge" | "pivot" | "condyloid" | "saddle" | "gliding" | "intervertebral" | "composite";
+  anatomicalName: string;
   parentLink: string;
   childLink: string;
   axis: [number, number, number];
   limits: { min: number; max: number };
+  is360: boolean;
   maxTorqueNm: number;
   maxSpeedRps: number;
   massKg: number;
   inertia: [number, number, number];
+  controlBus: "can_spine" | "can_limb" | "can_hand" | "can_foot" | "i2c_face";
 }
 
 interface ActuatorModel {
@@ -925,6 +929,587 @@ interface ActuatorModel {
   costUsd: number;
   controlInterface: "pwm" | "can" | "i2c" | "spi" | "uart";
 }
+
+interface TendonModel {
+  name: string;
+  material: "dyneema_uhmwpe" | "steel_wire_rope" | "nitinol_sma" | "carbon_fiber_cable" | "kevlar_aramid";
+  diameterMm: number;
+  breakingStrengthN: number;
+  elongationPct: number;
+  sheathType: "ptfe_lined" | "bowden" | "teflon_tube" | "bare" | "silicone_sleeve";
+  routingPath: string[];
+  lengthMm: number;
+  pretensionN: number;
+  antagonistTendon: string | null;
+  attachedJoints: string[];
+  function: "flexion" | "extension" | "abduction" | "adduction" | "rotation" | "stabilization";
+}
+
+interface HydraulicPistonModel {
+  name: string;
+  type: "hydraulic" | "pneumatic" | "electro_hydraulic";
+  boreDiameterMm: number;
+  strokeMm: number;
+  maxForceN: number;
+  maxPressureBar: number;
+  speedMmPerSec: number;
+  fluidType: "mineral_oil" | "synthetic" | "air" | "nitrogen";
+  mountPoints: [string, string];
+  attachedJoints: string[];
+  controlValve: "proportional" | "servo" | "solenoid" | "on_off";
+  function: "power_amplification" | "explosive_movement" | "load_bearing" | "stabilization";
+}
+
+interface SpringModel {
+  name: string;
+  type: "compression" | "extension" | "torsion" | "constant_force" | "gas_spring" | "leaf_spring";
+  material: "spring_steel" | "titanium" | "carbon_fiber" | "elastomer";
+  springConstantNPerMm: number;
+  freeLength: number;
+  maxDeflectionMm: number;
+  energyStorageJ: number;
+  mountPoints: [string, string];
+  attachedJoints: string[];
+  function: "energy_return" | "shock_absorption" | "gravity_compensation" | "antagonist_return" | "landing_dampening";
+}
+
+interface ShockAbsorberModel {
+  name: string;
+  type: "viscous_damper" | "magnetorheological" | "air_spring" | "elastomer_pad";
+  dampingCoeffNsPerM: number;
+  strokeMm: number;
+  maxForceN: number;
+  adjustable: boolean;
+  mountPoints: [string, string];
+  attachedJoints: string[];
+  function: "landing_impact" | "joint_deceleration" | "vibration_isolation" | "collision_protection";
+}
+
+interface MotorControlBrainNode {
+  name: string;
+  processor: string;
+  firmwareRole: string;
+  controlledJoints: string[];
+  controlledTendons: string[];
+  controlledPistons: string[];
+  busInterface: "can_fd" | "ethercat" | "spi_chain" | "i2c_mux";
+  loopRateHz: number;
+  algorithms: string[];
+  powerBudgetW: number;
+}
+
+function buildMusculoskeletalSystem(): {
+  tendons: TendonModel[];
+  pistons: HydraulicPistonModel[];
+  springs: SpringModel[];
+  shockAbsorbers: ShockAbsorberModel[];
+  motorControlBrain: MotorControlBrainNode[];
+} {
+  const tendons: TendonModel[] = [];
+  const pistons: HydraulicPistonModel[] = [];
+  const springs: SpringModel[] = [];
+  const shocks: ShockAbsorberModel[] = [];
+  const mcb: MotorControlBrainNode[] = [];
+
+  // ═══════════════════════════════════════════════════════════════
+  //  TENDONS — the "muscles" that pull joints in each direction
+  //  Antagonistic pairs: one flexor + one extensor per axis
+  // ═══════════════════════════════════════════════════════════════
+
+  // ─── LEG TENDONS — power for jumping, backflips, squats ───────
+  for (const side of ["l", "r"]) {
+    const S = side === "l" ? "Left" : "Right";
+
+    tendons.push({
+      name: `${side}_quadriceps_tendon`, material: "steel_wire_rope", diameterMm: 3.0, breakingStrengthN: 8000, elongationPct: 0.3,
+      sheathType: "ptfe_lined", routingPath: [`${side}_femur`, `${side}_patella`, `${side}_tibia`], lengthMm: 450,
+      pretensionN: 50, antagonistTendon: `${side}_hamstring_tendon`, attachedJoints: [`${side}_tibiofemoral`],
+      function: "extension",
+    });
+    tendons.push({
+      name: `${side}_hamstring_tendon`, material: "steel_wire_rope", diameterMm: 3.0, breakingStrengthN: 8000, elongationPct: 0.3,
+      sheathType: "ptfe_lined", routingPath: [`${side}_ilium`, `${side}_femur_rot`, `${side}_tibia`], lengthMm: 500,
+      pretensionN: 50, antagonistTendon: `${side}_quadriceps_tendon`, attachedJoints: [`${side}_tibiofemoral`, `${side}_acetabulofemoral_flex`],
+      function: "flexion",
+    });
+    tendons.push({
+      name: `${side}_achilles_tendon`, material: "steel_wire_rope", diameterMm: 4.0, breakingStrengthN: 12000, elongationPct: 0.2,
+      sheathType: "ptfe_lined", routingPath: [`${side}_tibia`, `${side}_calcaneus`], lengthMm: 250,
+      pretensionN: 80, antagonistTendon: `${side}_tibialis_tendon`, attachedJoints: [`${side}_talocrural`],
+      function: "flexion",
+    });
+    tendons.push({
+      name: `${side}_tibialis_tendon`, material: "steel_wire_rope", diameterMm: 2.5, breakingStrengthN: 5000, elongationPct: 0.3,
+      sheathType: "ptfe_lined", routingPath: [`${side}_tibia`, `${side}_talus`, `${side}_mt1`], lengthMm: 300,
+      pretensionN: 40, antagonistTendon: `${side}_achilles_tendon`, attachedJoints: [`${side}_talocrural`],
+      function: "extension",
+    });
+    tendons.push({
+      name: `${side}_hip_flexor_tendon`, material: "steel_wire_rope", diameterMm: 3.5, breakingStrengthN: 10000, elongationPct: 0.2,
+      sheathType: "ptfe_lined", routingPath: ["sacrum", `${side}_ilium`, `${side}_femur`], lengthMm: 350,
+      pretensionN: 60, antagonistTendon: `${side}_gluteal_tendon`, attachedJoints: [`${side}_acetabulofemoral_flex`],
+      function: "flexion",
+    });
+    tendons.push({
+      name: `${side}_gluteal_tendon`, material: "steel_wire_rope", diameterMm: 4.0, breakingStrengthN: 12000, elongationPct: 0.2,
+      sheathType: "ptfe_lined", routingPath: [`${side}_ilium`, `${side}_femur`], lengthMm: 300,
+      pretensionN: 70, antagonistTendon: `${side}_hip_flexor_tendon`, attachedJoints: [`${side}_acetabulofemoral_flex`],
+      function: "extension",
+    });
+    tendons.push({
+      name: `${side}_hip_abductor_tendon`, material: "steel_wire_rope", diameterMm: 2.5, breakingStrengthN: 5000, elongationPct: 0.3,
+      sheathType: "ptfe_lined", routingPath: [`${side}_ilium`, `${side}_femur_abd`], lengthMm: 200,
+      pretensionN: 30, antagonistTendon: `${side}_hip_adductor_tendon`, attachedJoints: [`${side}_acetabulofemoral_abd`],
+      function: "abduction",
+    });
+    tendons.push({
+      name: `${side}_hip_adductor_tendon`, material: "steel_wire_rope", diameterMm: 2.5, breakingStrengthN: 5000, elongationPct: 0.3,
+      sheathType: "ptfe_lined", routingPath: [`${side}_ilium`, `${side}_femur_abd`], lengthMm: 200,
+      pretensionN: 30, antagonistTendon: `${side}_hip_abductor_tendon`, attachedJoints: [`${side}_acetabulofemoral_abd`],
+      function: "adduction",
+    });
+
+    // ─── ARM TENDONS — pull-ups, pushing, lifting ─────────────
+    tendons.push({
+      name: `${side}_biceps_tendon`, material: "steel_wire_rope", diameterMm: 2.5, breakingStrengthN: 6000, elongationPct: 0.3,
+      sheathType: "ptfe_lined", routingPath: [`${side}_scapula`, `${side}_humerus`, `${side}_radius`], lengthMm: 350,
+      pretensionN: 40, antagonistTendon: `${side}_triceps_tendon`, attachedJoints: [`${side}_ulnohumeral`],
+      function: "flexion",
+    });
+    tendons.push({
+      name: `${side}_triceps_tendon`, material: "steel_wire_rope", diameterMm: 2.5, breakingStrengthN: 6000, elongationPct: 0.3,
+      sheathType: "ptfe_lined", routingPath: [`${side}_scapula`, `${side}_humerus`, `${side}_ulna`], lengthMm: 380,
+      pretensionN: 40, antagonistTendon: `${side}_biceps_tendon`, attachedJoints: [`${side}_ulnohumeral`],
+      function: "extension",
+    });
+    tendons.push({
+      name: `${side}_deltoid_tendon`, material: "steel_wire_rope", diameterMm: 3.0, breakingStrengthN: 8000, elongationPct: 0.3,
+      sheathType: "ptfe_lined", routingPath: [`${side}_scapula`, `${side}_clavicle`, `${side}_humerus`], lengthMm: 200,
+      pretensionN: 50, antagonistTendon: `${side}_lat_tendon`, attachedJoints: [`${side}_glenohumeral_abd`],
+      function: "abduction",
+    });
+    tendons.push({
+      name: `${side}_lat_tendon`, material: "steel_wire_rope", diameterMm: 3.0, breakingStrengthN: 8000, elongationPct: 0.3,
+      sheathType: "ptfe_lined", routingPath: [`${side}_scapula`, `${side}_humerus`], lengthMm: 250,
+      pretensionN: 50, antagonistTendon: `${side}_deltoid_tendon`, attachedJoints: [`${side}_glenohumeral_abd`, `${side}_glenohumeral_flex`],
+      function: "adduction",
+    });
+    tendons.push({
+      name: `${side}_pec_tendon`, material: "steel_wire_rope", diameterMm: 2.5, breakingStrengthN: 7000, elongationPct: 0.3,
+      sheathType: "ptfe_lined", routingPath: ["sternum", `${side}_clavicle`, `${side}_humerus`], lengthMm: 250,
+      pretensionN: 40, antagonistTendon: `${side}_rear_delt_tendon`, attachedJoints: [`${side}_glenohumeral_flex`],
+      function: "flexion",
+    });
+    tendons.push({
+      name: `${side}_rear_delt_tendon`, material: "steel_wire_rope", diameterMm: 2.0, breakingStrengthN: 4000, elongationPct: 0.3,
+      sheathType: "ptfe_lined", routingPath: [`${side}_scapula`, `${side}_humerus`], lengthMm: 180,
+      pretensionN: 30, antagonistTendon: `${side}_pec_tendon`, attachedJoints: [`${side}_glenohumeral_flex`],
+      function: "extension",
+    });
+    tendons.push({
+      name: `${side}_rotator_cuff_int`, material: "dyneema_uhmwpe", diameterMm: 2.0, breakingStrengthN: 3500, elongationPct: 0.5,
+      sheathType: "ptfe_lined", routingPath: [`${side}_scapula`, `${side}_humerus_rot`], lengthMm: 120,
+      pretensionN: 25, antagonistTendon: `${side}_rotator_cuff_ext`, attachedJoints: [`${side}_glenohumeral_rot`],
+      function: "rotation",
+    });
+    tendons.push({
+      name: `${side}_rotator_cuff_ext`, material: "dyneema_uhmwpe", diameterMm: 2.0, breakingStrengthN: 3500, elongationPct: 0.5,
+      sheathType: "ptfe_lined", routingPath: [`${side}_scapula`, `${side}_humerus_rot`], lengthMm: 120,
+      pretensionN: 25, antagonistTendon: `${side}_rotator_cuff_int`, attachedJoints: [`${side}_glenohumeral_rot`],
+      function: "rotation",
+    });
+    tendons.push({
+      name: `${side}_pronator_tendon`, material: "dyneema_uhmwpe", diameterMm: 1.5, breakingStrengthN: 2500, elongationPct: 0.5,
+      sheathType: "bowden", routingPath: [`${side}_ulna`, `${side}_radius`], lengthMm: 200,
+      pretensionN: 15, antagonistTendon: `${side}_supinator_tendon`, attachedJoints: [`${side}_proximal_radioulnar`],
+      function: "rotation",
+    });
+    tendons.push({
+      name: `${side}_supinator_tendon`, material: "dyneema_uhmwpe", diameterMm: 1.5, breakingStrengthN: 2500, elongationPct: 0.5,
+      sheathType: "bowden", routingPath: [`${side}_ulna`, `${side}_radius`], lengthMm: 200,
+      pretensionN: 15, antagonistTendon: `${side}_pronator_tendon`, attachedJoints: [`${side}_proximal_radioulnar`],
+      function: "rotation",
+    });
+
+    // ─── FINGER TENDONS — bidirectional: flexor + extensor per joint ───
+    for (const finger of ["index", "middle", "ring", "pinky"]) {
+      tendons.push({
+        name: `${side}_${finger}_flexor_deep`, material: "dyneema_uhmwpe", diameterMm: 1.0, breakingStrengthN: 1800, elongationPct: 0.5,
+        sheathType: "bowden", routingPath: [`${side}_ulna`, `${side}_carpal_dist`, `${side}_${finger}_mc`, `${side}_${finger}_prox`, `${side}_${finger}_mid`, `${side}_${finger}_dist`], lengthMm: 320,
+        pretensionN: 5, antagonistTendon: `${side}_${finger}_extensor`, attachedJoints: [`${side}_${finger}_mcp_flex`, `${side}_${finger}_pip`, `${side}_${finger}_dip`],
+        function: "flexion",
+      });
+      tendons.push({
+        name: `${side}_${finger}_extensor`, material: "dyneema_uhmwpe", diameterMm: 1.0, breakingStrengthN: 1800, elongationPct: 0.5,
+        sheathType: "bowden", routingPath: [`${side}_ulna`, `${side}_carpal_dist`, `${side}_${finger}_mc`, `${side}_${finger}_prox`, `${side}_${finger}_mid`, `${side}_${finger}_dist`], lengthMm: 310,
+        pretensionN: 5, antagonistTendon: `${side}_${finger}_flexor_deep`, attachedJoints: [`${side}_${finger}_mcp_flex`, `${side}_${finger}_pip`, `${side}_${finger}_dip`],
+        function: "extension",
+      });
+      tendons.push({
+        name: `${side}_${finger}_abductor`, material: "dyneema_uhmwpe", diameterMm: 0.8, breakingStrengthN: 800, elongationPct: 0.6,
+        sheathType: "bowden", routingPath: [`${side}_hand_base`, `${side}_${finger}_mc`, `${side}_${finger}_prox_abd`], lengthMm: 100,
+        pretensionN: 3, antagonistTendon: `${side}_${finger}_adductor`, attachedJoints: [`${side}_${finger}_mcp_abd`],
+        function: "abduction",
+      });
+      tendons.push({
+        name: `${side}_${finger}_adductor`, material: "dyneema_uhmwpe", diameterMm: 0.8, breakingStrengthN: 800, elongationPct: 0.6,
+        sheathType: "bowden", routingPath: [`${side}_hand_base`, `${side}_${finger}_mc`, `${side}_${finger}_prox_abd`], lengthMm: 100,
+        pretensionN: 3, antagonistTendon: `${side}_${finger}_abductor`, attachedJoints: [`${side}_${finger}_mcp_abd`],
+        function: "adduction",
+      });
+    }
+
+    // ─── THUMB TENDONS — bidirectional ─────────────────────────
+    tendons.push({
+      name: `${side}_thumb_flexor`, material: "dyneema_uhmwpe", diameterMm: 1.2, breakingStrengthN: 2200, elongationPct: 0.5,
+      sheathType: "bowden", routingPath: [`${side}_radius`, `${side}_carpal_dist`, `${side}_thumb_mc`, `${side}_thumb_prox`, `${side}_thumb_dist`], lengthMm: 250,
+      pretensionN: 8, antagonistTendon: `${side}_thumb_extensor`, attachedJoints: [`${side}_thumb_cmc_flex`, `${side}_thumb_mcp_flex`, `${side}_thumb_ip`],
+      function: "flexion",
+    });
+    tendons.push({
+      name: `${side}_thumb_extensor`, material: "dyneema_uhmwpe", diameterMm: 1.2, breakingStrengthN: 2200, elongationPct: 0.5,
+      sheathType: "bowden", routingPath: [`${side}_radius`, `${side}_carpal_dist`, `${side}_thumb_mc`, `${side}_thumb_prox`, `${side}_thumb_dist`], lengthMm: 240,
+      pretensionN: 8, antagonistTendon: `${side}_thumb_flexor`, attachedJoints: [`${side}_thumb_cmc_flex`, `${side}_thumb_mcp_flex`, `${side}_thumb_ip`],
+      function: "extension",
+    });
+    tendons.push({
+      name: `${side}_thumb_abductor`, material: "dyneema_uhmwpe", diameterMm: 1.0, breakingStrengthN: 1200, elongationPct: 0.5,
+      sheathType: "bowden", routingPath: [`${side}_hand_base`, `${side}_thumb_mc_abd`], lengthMm: 80,
+      pretensionN: 5, antagonistTendon: `${side}_thumb_adductor`, attachedJoints: [`${side}_thumb_cmc_abd`],
+      function: "abduction",
+    });
+    tendons.push({
+      name: `${side}_thumb_adductor`, material: "dyneema_uhmwpe", diameterMm: 1.0, breakingStrengthN: 1200, elongationPct: 0.5,
+      sheathType: "bowden", routingPath: [`${side}_hand_base`, `${side}_thumb_mc_abd`], lengthMm: 80,
+      pretensionN: 5, antagonistTendon: `${side}_thumb_abductor`, attachedJoints: [`${side}_thumb_cmc_abd`],
+      function: "adduction",
+    });
+
+    // ─── TOE TENDONS — bidirectional flexor+extensor ──────────
+    for (const [toe, n] of [["hallux",1],["toe2",2],["toe3",3],["toe4",4],["toe5",5]] as const) {
+      const joints = n === 1
+        ? [`${side}_hallux_mtp_flex`, `${side}_hallux_ip`]
+        : [`${side}_toe${n}_mtp_flex`, `${side}_toe${n}_pip`, `${side}_toe${n}_dip`];
+      tendons.push({
+        name: `${side}_${toe}_flexor`, material: "dyneema_uhmwpe", diameterMm: n === 1 ? 1.2 : 0.8, breakingStrengthN: n === 1 ? 2000 : 800, elongationPct: 0.5,
+        sheathType: "bowden", routingPath: [`${side}_tibia`, `${side}_talus`, `${side}_mt${n}`, `${side}_${n===1?"hallux":"toe"+n}_prox`], lengthMm: 350,
+        pretensionN: n === 1 ? 10 : 5, antagonistTendon: `${side}_${toe}_extensor`, attachedJoints: joints,
+        function: "flexion",
+      });
+      tendons.push({
+        name: `${side}_${toe}_extensor`, material: "dyneema_uhmwpe", diameterMm: n === 1 ? 1.2 : 0.8, breakingStrengthN: n === 1 ? 2000 : 800, elongationPct: 0.5,
+        sheathType: "bowden", routingPath: [`${side}_tibia`, `${side}_talus`, `${side}_mt${n}`, `${side}_${n===1?"hallux":"toe"+n}_prox`], lengthMm: 340,
+        pretensionN: n === 1 ? 10 : 5, antagonistTendon: `${side}_${toe}_flexor`, attachedJoints: joints,
+        function: "extension",
+      });
+    }
+  }
+
+  // ─── SPINE TENDONS — core stability, bending, twisting ──────
+  tendons.push({
+    name: "erector_spinae_l", material: "steel_wire_rope", diameterMm: 3.0, breakingStrengthN: 8000, elongationPct: 0.3,
+    sheathType: "ptfe_lined", routingPath: ["sacrum", "l5_vertebra", "l3_vertebra", "l1_vertebra", "t12_vertebra", "t6_vertebra", "t1_vertebra"], lengthMm: 600,
+    pretensionN: 80, antagonistTendon: "rectus_abdominis_l", attachedJoints: ["lumbosacral_l5_s1", "lumbar_l1_l2_flex", "thoracolumbar_t12_l1_flex"],
+    function: "extension",
+  });
+  tendons.push({
+    name: "erector_spinae_r", material: "steel_wire_rope", diameterMm: 3.0, breakingStrengthN: 8000, elongationPct: 0.3,
+    sheathType: "ptfe_lined", routingPath: ["sacrum", "l5_vertebra", "l3_vertebra", "l1_vertebra", "t12_vertebra", "t6_vertebra", "t1_vertebra"], lengthMm: 600,
+    pretensionN: 80, antagonistTendon: "rectus_abdominis_r", attachedJoints: ["lumbosacral_l5_s1", "lumbar_l1_l2_flex", "thoracolumbar_t12_l1_flex"],
+    function: "extension",
+  });
+  tendons.push({
+    name: "rectus_abdominis_l", material: "steel_wire_rope", diameterMm: 2.5, breakingStrengthN: 6000, elongationPct: 0.3,
+    sheathType: "ptfe_lined", routingPath: ["sternum", "t12_vertebra", "l3_vertebra", "sacrum"], lengthMm: 500,
+    pretensionN: 50, antagonistTendon: "erector_spinae_l", attachedJoints: ["thoracolumbar_t12_l1_flex", "lumbar_l3_l4_flex", "lumbosacral_l5_s1"],
+    function: "flexion",
+  });
+  tendons.push({
+    name: "rectus_abdominis_r", material: "steel_wire_rope", diameterMm: 2.5, breakingStrengthN: 6000, elongationPct: 0.3,
+    sheathType: "ptfe_lined", routingPath: ["sternum", "t12_vertebra", "l3_vertebra", "sacrum"], lengthMm: 500,
+    pretensionN: 50, antagonistTendon: "erector_spinae_r", attachedJoints: ["thoracolumbar_t12_l1_flex", "lumbar_l3_l4_flex", "lumbosacral_l5_s1"],
+    function: "flexion",
+  });
+  tendons.push({
+    name: "neck_flexor", material: "nitinol_sma", diameterMm: 1.5, breakingStrengthN: 2000, elongationPct: 4.0,
+    sheathType: "silicone_sleeve", routingPath: ["skull", "c1_atlas", "c2_axis", "c7_vertebra"], lengthMm: 150,
+    pretensionN: 15, antagonistTendon: "neck_extensor", attachedJoints: ["atlanto_occipital_flex", "cervical_c2_c1_flex"],
+    function: "flexion",
+  });
+  tendons.push({
+    name: "neck_extensor", material: "nitinol_sma", diameterMm: 1.5, breakingStrengthN: 2000, elongationPct: 4.0,
+    sheathType: "silicone_sleeve", routingPath: ["skull", "c1_atlas", "c2_axis", "c7_vertebra"], lengthMm: 150,
+    pretensionN: 15, antagonistTendon: "neck_flexor", attachedJoints: ["atlanto_occipital_flex", "cervical_c2_c1_flex"],
+    function: "extension",
+  });
+  tendons.push({
+    name: "oblique_l", material: "steel_wire_rope", diameterMm: 2.0, breakingStrengthN: 4000, elongationPct: 0.3,
+    sheathType: "ptfe_lined", routingPath: ["l_ilium", "l3_vertebra", "t10_vertebra"], lengthMm: 350,
+    pretensionN: 40, antagonistTendon: "oblique_r", attachedJoints: ["lumbar_l3_l4_rot", "thoracic_t10_t11_rot"],
+    function: "rotation",
+  });
+  tendons.push({
+    name: "oblique_r", material: "steel_wire_rope", diameterMm: 2.0, breakingStrengthN: 4000, elongationPct: 0.3,
+    sheathType: "ptfe_lined", routingPath: ["r_ilium", "l3_vertebra", "t10_vertebra"], lengthMm: 350,
+    pretensionN: 40, antagonistTendon: "oblique_l", attachedJoints: ["lumbar_l3_l4_rot", "thoracic_t10_t11_rot"],
+    function: "rotation",
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  //  HYDRAULIC/PNEUMATIC PISTONS — explosive power for athletics
+  //  These are what let him jump, flip, and do heavy lifts
+  // ═══════════════════════════════════════════════════════════════
+  for (const side of ["l", "r"]) {
+    const S = side === "l" ? "Left" : "Right";
+    pistons.push({
+      name: `${side}_knee_power_piston`, type: "electro_hydraulic", boreDiameterMm: 32, strokeMm: 120,
+      maxForceN: 4000, maxPressureBar: 200, speedMmPerSec: 800, fluidType: "synthetic",
+      mountPoints: [`${side}_femur_rot`, `${side}_tibia`], attachedJoints: [`${side}_tibiofemoral`],
+      controlValve: "servo", function: "explosive_movement",
+    });
+    pistons.push({
+      name: `${side}_hip_power_piston`, type: "electro_hydraulic", boreDiameterMm: 40, strokeMm: 150,
+      maxForceN: 6000, maxPressureBar: 250, speedMmPerSec: 600, fluidType: "synthetic",
+      mountPoints: [`${side}_ilium`, `${side}_femur`], attachedJoints: [`${side}_acetabulofemoral_flex`],
+      controlValve: "servo", function: "explosive_movement",
+    });
+    pistons.push({
+      name: `${side}_ankle_power_piston`, type: "electro_hydraulic", boreDiameterMm: 25, strokeMm: 80,
+      maxForceN: 2500, maxPressureBar: 200, speedMmPerSec: 1000, fluidType: "synthetic",
+      mountPoints: [`${side}_tibia`, `${side}_calcaneus`], attachedJoints: [`${side}_talocrural`],
+      controlValve: "servo", function: "explosive_movement",
+    });
+    pistons.push({
+      name: `${side}_shoulder_assist_piston`, type: "pneumatic", boreDiameterMm: 20, strokeMm: 100,
+      maxForceN: 1500, maxPressureBar: 8, speedMmPerSec: 500, fluidType: "air",
+      mountPoints: [`${side}_scapula`, `${side}_humerus`], attachedJoints: [`${side}_glenohumeral_flex`],
+      controlValve: "proportional", function: "power_amplification",
+    });
+    pistons.push({
+      name: `${side}_elbow_assist_piston`, type: "pneumatic", boreDiameterMm: 16, strokeMm: 80,
+      maxForceN: 800, maxPressureBar: 8, speedMmPerSec: 600, fluidType: "air",
+      mountPoints: [`${side}_humerus_rot`, `${side}_ulna`], attachedJoints: [`${side}_ulnohumeral`],
+      controlValve: "proportional", function: "power_amplification",
+    });
+  }
+  pistons.push({
+    name: "torso_core_piston_front", type: "electro_hydraulic", boreDiameterMm: 25, strokeMm: 100,
+    maxForceN: 3000, maxPressureBar: 200, speedMmPerSec: 500, fluidType: "synthetic",
+    mountPoints: ["sternum", "sacrum"], attachedJoints: ["thoracolumbar_t12_l1_flex", "lumbosacral_l5_s1"],
+    controlValve: "servo", function: "explosive_movement",
+  });
+  pistons.push({
+    name: "torso_core_piston_rear", type: "electro_hydraulic", boreDiameterMm: 25, strokeMm: 100,
+    maxForceN: 3000, maxPressureBar: 200, speedMmPerSec: 500, fluidType: "synthetic",
+    mountPoints: ["t1_vertebra", "sacrum"], attachedJoints: ["thoracolumbar_t12_l1_flex", "lumbosacral_l5_s1"],
+    controlValve: "servo", function: "explosive_movement",
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  //  SPRINGS — energy storage for jumping, return force for tendons
+  //  Like the human Achilles + arch — stores energy on landing,
+  //  releases it for push-off
+  // ═══════════════════════════════════════════════════════════════
+  for (const side of ["l", "r"]) {
+    springs.push({
+      name: `${side}_ankle_energy_spring`, type: "compression", material: "spring_steel",
+      springConstantNPerMm: 80, freeLength: 100, maxDeflectionMm: 50, energyStorageJ: 100,
+      mountPoints: [`${side}_tibia`, `${side}_calcaneus`], attachedJoints: [`${side}_talocrural`],
+      function: "energy_return",
+    });
+    springs.push({
+      name: `${side}_knee_return_spring`, type: "extension", material: "spring_steel",
+      springConstantNPerMm: 40, freeLength: 80, maxDeflectionMm: 60, energyStorageJ: 72,
+      mountPoints: [`${side}_femur_rot`, `${side}_tibia`], attachedJoints: [`${side}_tibiofemoral`],
+      function: "energy_return",
+    });
+    springs.push({
+      name: `${side}_hip_torsion_spring`, type: "torsion", material: "titanium",
+      springConstantNPerMm: 60, freeLength: 40, maxDeflectionMm: 90, energyStorageJ: 120,
+      mountPoints: [`${side}_ilium`, `${side}_femur`], attachedJoints: [`${side}_acetabulofemoral_flex`],
+      function: "energy_return",
+    });
+    springs.push({
+      name: `${side}_foot_arch_spring`, type: "leaf_spring", material: "carbon_fiber",
+      springConstantNPerMm: 100, freeLength: 120, maxDeflectionMm: 20, energyStorageJ: 20,
+      mountPoints: [`${side}_calcaneus`, `${side}_mt1`], attachedJoints: [`${side}_tarsometatarsal_1`],
+      function: "energy_return",
+    });
+    springs.push({
+      name: `${side}_shoulder_gravity_comp`, type: "constant_force", material: "spring_steel",
+      springConstantNPerMm: 15, freeLength: 60, maxDeflectionMm: 40, energyStorageJ: 12,
+      mountPoints: [`${side}_scapula`, `${side}_humerus`], attachedJoints: [`${side}_glenohumeral_abd`],
+      function: "gravity_compensation",
+    });
+  }
+  springs.push({
+    name: "spine_central_torsion", type: "torsion", material: "titanium",
+    springConstantNPerMm: 50, freeLength: 30, maxDeflectionMm: 45, energyStorageJ: 50,
+    mountPoints: ["sacrum", "t1_vertebra"], attachedJoints: ["thoracolumbar_t12_l1_flex", "lumbosacral_l5_s1"],
+    function: "energy_return",
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  //  SHOCK ABSORBERS — landing from jumps/flips without damage
+  // ═══════════════════════════════════════════════════════════════
+  for (const side of ["l", "r"]) {
+    shocks.push({
+      name: `${side}_knee_damper`, type: "magnetorheological", dampingCoeffNsPerM: 2000, strokeMm: 40,
+      maxForceN: 5000, adjustable: true, mountPoints: [`${side}_femur_rot`, `${side}_tibia`],
+      attachedJoints: [`${side}_tibiofemoral`], function: "landing_impact",
+    });
+    shocks.push({
+      name: `${side}_ankle_damper`, type: "magnetorheological", dampingCoeffNsPerM: 1500, strokeMm: 30,
+      maxForceN: 3000, adjustable: true, mountPoints: [`${side}_tibia`, `${side}_calcaneus`],
+      attachedJoints: [`${side}_talocrural`], function: "landing_impact",
+    });
+    shocks.push({
+      name: `${side}_hip_damper`, type: "viscous_damper", dampingCoeffNsPerM: 3000, strokeMm: 50,
+      maxForceN: 6000, adjustable: false, mountPoints: [`${side}_ilium`, `${side}_femur`],
+      attachedJoints: [`${side}_acetabulofemoral_flex`], function: "landing_impact",
+    });
+    shocks.push({
+      name: `${side}_foot_pad`, type: "elastomer_pad", dampingCoeffNsPerM: 500, strokeMm: 10,
+      maxForceN: 2000, adjustable: false, mountPoints: [`${side}_calcaneus`, `${side}_mt1`],
+      attachedJoints: [`${side}_talocrural`, `${side}_subtalar`], function: "landing_impact",
+    });
+    shocks.push({
+      name: `${side}_wrist_damper`, type: "elastomer_pad", dampingCoeffNsPerM: 300, strokeMm: 8,
+      maxForceN: 1000, adjustable: false, mountPoints: [`${side}_ulna_distal`, `${side}_carpal_prox`],
+      attachedJoints: [`${side}_radiocarpal_flex`], function: "collision_protection",
+    });
+  }
+  shocks.push({
+    name: "spine_vibration_isolator", type: "air_spring", dampingCoeffNsPerM: 1000, strokeMm: 20,
+    maxForceN: 3000, adjustable: true, mountPoints: ["sacrum", "l1_vertebra"],
+    attachedJoints: ["lumbosacral_l5_s1"], function: "vibration_isolation",
+  });
+
+  // ═══════════════════════════════════════════════════════════════
+  //  MOTOR CONTROL BRAIN — distributed compute for real-time control
+  //  Dedicated processors for each body region, all coordinated
+  //  by the Jetson Orin main brain
+  // ═══════════════════════════════════════════════════════════════
+  mcb.push({
+    name: "mcb_central_coordinator", processor: "NVIDIA Jetson Orin NX 16GB",
+    firmwareRole: "Master trajectory planner — whole-body inverse kinematics, gait generation, flip/jump planning, balance control",
+    controlledJoints: ["ALL"], controlledTendons: ["ALL"], controlledPistons: ["ALL"],
+    busInterface: "ethercat", loopRateHz: 200,
+    algorithms: ["whole_body_IK", "ZMP_balance", "centroidal_momentum", "trajectory_optimization", "model_predictive_control", "reinforcement_learning_policy", "jump_trajectory_planner", "flip_rotation_planner", "landing_predictor"],
+    powerBudgetW: 25,
+  });
+  mcb.push({
+    name: "mcb_leg_left", processor: "STM32H7 480MHz",
+    firmwareRole: "Left leg real-time motor control — hip, knee, ankle PID loops + tendon tension + piston pressure",
+    controlledJoints: ["l_acetabulofemoral_flex", "l_acetabulofemoral_abd", "l_acetabulofemoral_rot", "l_tibiofemoral", "l_talocrural", "l_subtalar"],
+    controlledTendons: ["l_quadriceps_tendon", "l_hamstring_tendon", "l_achilles_tendon", "l_tibialis_tendon", "l_hip_flexor_tendon", "l_gluteal_tendon", "l_hip_abductor_tendon", "l_hip_adductor_tendon"],
+    controlledPistons: ["l_knee_power_piston", "l_hip_power_piston", "l_ankle_power_piston"],
+    busInterface: "can_fd", loopRateHz: 1000,
+    algorithms: ["cascaded_PID", "tendon_tension_control", "hydraulic_pressure_regulation", "spring_preload_optimization", "impact_detection", "ground_reaction_force_estimation"],
+    powerBudgetW: 3,
+  });
+  mcb.push({
+    name: "mcb_leg_right", processor: "STM32H7 480MHz",
+    firmwareRole: "Right leg real-time motor control — mirror of left leg controller",
+    controlledJoints: ["r_acetabulofemoral_flex", "r_acetabulofemoral_abd", "r_acetabulofemoral_rot", "r_tibiofemoral", "r_talocrural", "r_subtalar"],
+    controlledTendons: ["r_quadriceps_tendon", "r_hamstring_tendon", "r_achilles_tendon", "r_tibialis_tendon", "r_hip_flexor_tendon", "r_gluteal_tendon", "r_hip_abductor_tendon", "r_hip_adductor_tendon"],
+    controlledPistons: ["r_knee_power_piston", "r_hip_power_piston", "r_ankle_power_piston"],
+    busInterface: "can_fd", loopRateHz: 1000,
+    algorithms: ["cascaded_PID", "tendon_tension_control", "hydraulic_pressure_regulation", "spring_preload_optimization", "impact_detection", "ground_reaction_force_estimation"],
+    powerBudgetW: 3,
+  });
+  mcb.push({
+    name: "mcb_arm_left", processor: "STM32H7 480MHz",
+    firmwareRole: "Left arm motor control — shoulder, elbow, forearm rotation + tendons + pneumatic assist",
+    controlledJoints: ["l_glenohumeral_flex", "l_glenohumeral_abd", "l_glenohumeral_rot", "l_ulnohumeral", "l_proximal_radioulnar", "l_distal_radioulnar"],
+    controlledTendons: ["l_biceps_tendon", "l_triceps_tendon", "l_deltoid_tendon", "l_lat_tendon", "l_pec_tendon", "l_rear_delt_tendon", "l_rotator_cuff_int", "l_rotator_cuff_ext", "l_pronator_tendon", "l_supinator_tendon"],
+    controlledPistons: ["l_shoulder_assist_piston", "l_elbow_assist_piston"],
+    busInterface: "can_fd", loopRateHz: 1000,
+    algorithms: ["cascaded_PID", "tendon_tension_control", "pneumatic_pressure_control", "impedance_control", "gravity_compensation"],
+    powerBudgetW: 3,
+  });
+  mcb.push({
+    name: "mcb_arm_right", processor: "STM32H7 480MHz",
+    firmwareRole: "Right arm motor control — mirror of left arm controller",
+    controlledJoints: ["r_glenohumeral_flex", "r_glenohumeral_abd", "r_glenohumeral_rot", "r_ulnohumeral", "r_proximal_radioulnar", "r_distal_radioulnar"],
+    controlledTendons: ["r_biceps_tendon", "r_triceps_tendon", "r_deltoid_tendon", "r_lat_tendon", "r_pec_tendon", "r_rear_delt_tendon", "r_rotator_cuff_int", "r_rotator_cuff_ext", "r_pronator_tendon", "r_supinator_tendon"],
+    controlledPistons: ["r_shoulder_assist_piston", "r_elbow_assist_piston"],
+    busInterface: "can_fd", loopRateHz: 1000,
+    algorithms: ["cascaded_PID", "tendon_tension_control", "pneumatic_pressure_control", "impedance_control", "gravity_compensation"],
+    powerBudgetW: 3,
+  });
+  mcb.push({
+    name: "mcb_hand_left", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Left hand — all finger/thumb tendons, bidirectional grip, tactile feedback",
+    controlledJoints: ["l_index_mcp_flex", "l_index_pip", "l_index_dip", "l_middle_mcp_flex", "l_middle_pip", "l_middle_dip", "l_ring_mcp_flex", "l_ring_pip", "l_ring_dip", "l_pinky_mcp_flex", "l_pinky_pip", "l_pinky_dip", "l_thumb_cmc_flex", "l_thumb_mcp_flex", "l_thumb_ip"],
+    controlledTendons: ["l_index_flexor_deep", "l_index_extensor", "l_middle_flexor_deep", "l_middle_extensor", "l_ring_flexor_deep", "l_ring_extensor", "l_pinky_flexor_deep", "l_pinky_extensor", "l_thumb_flexor", "l_thumb_extensor"],
+    controlledPistons: [],
+    busInterface: "i2c_mux", loopRateHz: 500,
+    algorithms: ["tendon_tension_PID", "tactile_force_feedback", "bidirectional_grip_control", "object_slip_detection", "adaptive_grasp"],
+    powerBudgetW: 2,
+  });
+  mcb.push({
+    name: "mcb_hand_right", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Right hand — mirror of left hand controller",
+    controlledJoints: ["r_index_mcp_flex", "r_index_pip", "r_index_dip", "r_middle_mcp_flex", "r_middle_pip", "r_middle_dip", "r_ring_mcp_flex", "r_ring_pip", "r_ring_dip", "r_pinky_mcp_flex", "r_pinky_pip", "r_pinky_dip", "r_thumb_cmc_flex", "r_thumb_mcp_flex", "r_thumb_ip"],
+    controlledTendons: ["r_index_flexor_deep", "r_index_extensor", "r_middle_flexor_deep", "r_middle_extensor", "r_ring_flexor_deep", "r_ring_extensor", "r_pinky_flexor_deep", "r_pinky_extensor", "r_thumb_flexor", "r_thumb_extensor"],
+    controlledPistons: [],
+    busInterface: "i2c_mux", loopRateHz: 500,
+    algorithms: ["tendon_tension_PID", "tactile_force_feedback", "bidirectional_grip_control", "object_slip_detection", "adaptive_grasp"],
+    powerBudgetW: 2,
+  });
+  mcb.push({
+    name: "mcb_spine", processor: "STM32H7 480MHz",
+    firmwareRole: "Spine + torso — all intervertebral joints, costovertebral ribs, core tendon tension, torso pistons",
+    controlledJoints: ["atlanto_occipital_flex", "atlanto_axial_rotation", "cervical_c7_t1_flex", "thoracolumbar_t12_l1_flex", "lumbosacral_l5_s1"],
+    controlledTendons: ["erector_spinae_l", "erector_spinae_r", "rectus_abdominis_l", "rectus_abdominis_r", "neck_flexor", "neck_extensor", "oblique_l", "oblique_r"],
+    controlledPistons: ["torso_core_piston_front", "torso_core_piston_rear"],
+    busInterface: "can_fd", loopRateHz: 500,
+    algorithms: ["multi_segment_PID", "spinal_curvature_control", "breathing_rhythm", "core_stability_tensor", "posture_optimization"],
+    powerBudgetW: 3,
+  });
+  mcb.push({
+    name: "mcb_foot_left", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Left foot — toe tendons, foot arch, pressure sensing, ground contact",
+    controlledJoints: ["l_hallux_mtp_flex", "l_hallux_ip", "l_toe2_mtp_flex", "l_toe3_mtp_flex", "l_toe4_mtp_flex", "l_toe5_mtp_flex"],
+    controlledTendons: ["l_hallux_flexor", "l_hallux_extensor", "l_toe2_flexor", "l_toe2_extensor", "l_toe3_flexor", "l_toe3_extensor", "l_toe4_flexor", "l_toe4_extensor", "l_toe5_flexor", "l_toe5_extensor"],
+    controlledPistons: [],
+    busInterface: "i2c_mux", loopRateHz: 500,
+    algorithms: ["tendon_tension_PID", "ground_contact_detection", "arch_spring_control", "toe_grip_balance"],
+    powerBudgetW: 1.5,
+  });
+  mcb.push({
+    name: "mcb_foot_right", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Right foot — mirror of left foot controller",
+    controlledJoints: ["r_hallux_mtp_flex", "r_hallux_ip", "r_toe2_mtp_flex", "r_toe3_mtp_flex", "r_toe4_mtp_flex", "r_toe5_mtp_flex"],
+    controlledTendons: ["r_hallux_flexor", "r_hallux_extensor", "r_toe2_flexor", "r_toe2_extensor", "r_toe3_flexor", "r_toe3_extensor", "r_toe4_flexor", "r_toe4_extensor", "r_toe5_flexor", "r_toe5_extensor"],
+    controlledPistons: [],
+    busInterface: "i2c_mux", loopRateHz: 500,
+    algorithms: ["tendon_tension_PID", "ground_contact_detection", "arch_spring_control", "toe_grip_balance"],
+    powerBudgetW: 1.5,
+  });
+  mcb.push({
+    name: "mcb_hydraulic_pump", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Central hydraulic pump controller — manages fluid pressure, reservoir, accumulator for all pistons",
+    controlledJoints: [], controlledTendons: [],
+    controlledPistons: ["l_knee_power_piston", "r_knee_power_piston", "l_hip_power_piston", "r_hip_power_piston", "l_ankle_power_piston", "r_ankle_power_piston", "torso_core_piston_front", "torso_core_piston_rear"],
+    busInterface: "can_fd", loopRateHz: 200,
+    algorithms: ["pressure_regulation", "accumulator_charge_management", "burst_mode_for_jumps", "fluid_temperature_monitoring", "leak_detection"],
+    powerBudgetW: 5,
+  });
+  mcb.push({
+    name: "mcb_shock_management", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Shock absorber tuning — adjusts MR damper stiffness in real-time for landing, walking, running",
+    controlledJoints: [], controlledTendons: [], controlledPistons: [],
+    busInterface: "can_fd", loopRateHz: 1000,
+    algorithms: ["MR_current_control", "impact_prediction", "terrain_adaptation", "gait_phase_detection", "vibration_frequency_analysis"],
+    powerBudgetW: 1.5,
+  });
+
+  return { tendons, pistons, springs, shockAbsorbers: shocks, motorControlBrain: mcb };
+}
+
+const MUSCULOSKELETAL = buildMusculoskeletalSystem();
 
 interface KinematicLink {
   name: string;
@@ -943,81 +1528,404 @@ interface BOMEntry {
   specifications: string;
 }
 
-const HUMANOID_JOINTS: JointModel[] = [
-  { name: "neck_yaw", type: "revolute", parentLink: "torso_upper", childLink: "head", axis: [0, 0, 1], limits: { min: -80, max: 80 }, maxTorqueNm: 3, maxSpeedRps: 2, massKg: 0.15, inertia: [0.001, 0.001, 0.001] },
-  { name: "neck_pitch", type: "revolute", parentLink: "head", childLink: "head_frame", axis: [0, 1, 0], limits: { min: -40, max: 60 }, maxTorqueNm: 3, maxSpeedRps: 2, massKg: 0.1, inertia: [0.001, 0.001, 0.001] },
-  { name: "l_shoulder_pitch", type: "revolute", parentLink: "torso_upper", childLink: "l_upper_arm", axis: [0, 1, 0], limits: { min: -180, max: 60 }, maxTorqueNm: 40, maxSpeedRps: 3, massKg: 0.8, inertia: [0.02, 0.02, 0.005] },
-  { name: "l_shoulder_roll", type: "revolute", parentLink: "l_upper_arm", childLink: "l_upper_arm_roll", axis: [1, 0, 0], limits: { min: -10, max: 180 }, maxTorqueNm: 30, maxSpeedRps: 3, massKg: 0.5, inertia: [0.01, 0.01, 0.003] },
-  { name: "l_shoulder_yaw", type: "revolute", parentLink: "l_upper_arm_roll", childLink: "l_upper_arm_yaw", axis: [0, 0, 1], limits: { min: -90, max: 90 }, maxTorqueNm: 15, maxSpeedRps: 3, massKg: 0.3, inertia: [0.005, 0.005, 0.002] },
-  { name: "l_elbow", type: "revolute", parentLink: "l_upper_arm_yaw", childLink: "l_forearm", axis: [0, 1, 0], limits: { min: -130, max: 0 }, maxTorqueNm: 20, maxSpeedRps: 4, massKg: 0.5, inertia: [0.008, 0.008, 0.003] },
-  { name: "l_wrist_roll", type: "revolute", parentLink: "l_forearm", childLink: "l_wrist", axis: [1, 0, 0], limits: { min: -180, max: 180 }, maxTorqueNm: 5, maxSpeedRps: 5, massKg: 0.2, inertia: [0.002, 0.002, 0.001] },
-  { name: "l_wrist_pitch", type: "revolute", parentLink: "l_wrist", childLink: "l_hand", axis: [0, 1, 0], limits: { min: -60, max: 60 }, maxTorqueNm: 5, maxSpeedRps: 5, massKg: 0.15, inertia: [0.001, 0.001, 0.0005] },
-  { name: "r_shoulder_pitch", type: "revolute", parentLink: "torso_upper", childLink: "r_upper_arm", axis: [0, 1, 0], limits: { min: -180, max: 60 }, maxTorqueNm: 40, maxSpeedRps: 3, massKg: 0.8, inertia: [0.02, 0.02, 0.005] },
-  { name: "r_shoulder_roll", type: "revolute", parentLink: "r_upper_arm", childLink: "r_upper_arm_roll", axis: [1, 0, 0], limits: { min: -180, max: 10 }, maxTorqueNm: 30, maxSpeedRps: 3, massKg: 0.5, inertia: [0.01, 0.01, 0.003] },
-  { name: "r_shoulder_yaw", type: "revolute", parentLink: "r_upper_arm_roll", childLink: "r_upper_arm_yaw", axis: [0, 0, 1], limits: { min: -90, max: 90 }, maxTorqueNm: 15, maxSpeedRps: 3, massKg: 0.3, inertia: [0.005, 0.005, 0.002] },
-  { name: "r_elbow", type: "revolute", parentLink: "r_upper_arm_yaw", childLink: "r_forearm", axis: [0, 1, 0], limits: { min: 0, max: 130 }, maxTorqueNm: 20, maxSpeedRps: 4, massKg: 0.5, inertia: [0.008, 0.008, 0.003] },
-  { name: "r_wrist_roll", type: "revolute", parentLink: "r_forearm", childLink: "r_wrist", axis: [1, 0, 0], limits: { min: -180, max: 180 }, maxTorqueNm: 5, maxSpeedRps: 5, massKg: 0.2, inertia: [0.002, 0.002, 0.001] },
-  { name: "r_wrist_pitch", type: "revolute", parentLink: "r_wrist", childLink: "r_hand", axis: [0, 1, 0], limits: { min: -60, max: 60 }, maxTorqueNm: 5, maxSpeedRps: 5, massKg: 0.15, inertia: [0.001, 0.001, 0.0005] },
-  { name: "torso_yaw", type: "revolute", parentLink: "pelvis", childLink: "torso_lower", axis: [0, 0, 1], limits: { min: -45, max: 45 }, maxTorqueNm: 60, maxSpeedRps: 1.5, massKg: 1.0, inertia: [0.05, 0.05, 0.02] },
-  { name: "torso_pitch", type: "revolute", parentLink: "torso_lower", childLink: "torso_upper", axis: [0, 1, 0], limits: { min: -30, max: 45 }, maxTorqueNm: 80, maxSpeedRps: 1.5, massKg: 1.0, inertia: [0.05, 0.05, 0.02] },
-  { name: "l_hip_yaw", type: "revolute", parentLink: "pelvis", childLink: "l_hip_yaw_link", axis: [0, 0, 1], limits: { min: -45, max: 45 }, maxTorqueNm: 50, maxSpeedRps: 2, massKg: 0.8, inertia: [0.03, 0.03, 0.01] },
-  { name: "l_hip_roll", type: "revolute", parentLink: "l_hip_yaw_link", childLink: "l_hip_roll_link", axis: [1, 0, 0], limits: { min: -25, max: 45 }, maxTorqueNm: 50, maxSpeedRps: 2, massKg: 0.6, inertia: [0.02, 0.02, 0.008] },
-  { name: "l_hip_pitch", type: "revolute", parentLink: "l_hip_roll_link", childLink: "l_thigh", axis: [0, 1, 0], limits: { min: -120, max: 30 }, maxTorqueNm: 100, maxSpeedRps: 2, massKg: 1.2, inertia: [0.05, 0.05, 0.02] },
-  { name: "l_knee", type: "revolute", parentLink: "l_thigh", childLink: "l_shin", axis: [0, 1, 0], limits: { min: 0, max: 130 }, maxTorqueNm: 80, maxSpeedRps: 3, massKg: 0.8, inertia: [0.03, 0.03, 0.01] },
-  { name: "l_ankle_pitch", type: "revolute", parentLink: "l_shin", childLink: "l_ankle_link", axis: [0, 1, 0], limits: { min: -45, max: 45 }, maxTorqueNm: 40, maxSpeedRps: 3, massKg: 0.4, inertia: [0.01, 0.01, 0.005] },
-  { name: "l_ankle_roll", type: "revolute", parentLink: "l_ankle_link", childLink: "l_foot", axis: [1, 0, 0], limits: { min: -30, max: 30 }, maxTorqueNm: 30, maxSpeedRps: 3, massKg: 0.3, inertia: [0.008, 0.008, 0.003] },
-  { name: "r_hip_yaw", type: "revolute", parentLink: "pelvis", childLink: "r_hip_yaw_link", axis: [0, 0, 1], limits: { min: -45, max: 45 }, maxTorqueNm: 50, maxSpeedRps: 2, massKg: 0.8, inertia: [0.03, 0.03, 0.01] },
-  { name: "r_hip_roll", type: "revolute", parentLink: "r_hip_yaw_link", childLink: "r_hip_roll_link", axis: [1, 0, 0], limits: { min: -45, max: 25 }, maxTorqueNm: 50, maxSpeedRps: 2, massKg: 0.6, inertia: [0.02, 0.02, 0.008] },
-  { name: "r_hip_pitch", type: "revolute", parentLink: "r_hip_roll_link", childLink: "r_thigh", axis: [0, 1, 0], limits: { min: -120, max: 30 }, maxTorqueNm: 100, maxSpeedRps: 2, massKg: 1.2, inertia: [0.05, 0.05, 0.02] },
-  { name: "r_knee", type: "revolute", parentLink: "r_thigh", childLink: "r_shin", axis: [0, 1, 0], limits: { min: 0, max: 130 }, maxTorqueNm: 80, maxSpeedRps: 3, massKg: 0.8, inertia: [0.03, 0.03, 0.01] },
-  { name: "r_ankle_pitch", type: "revolute", parentLink: "r_shin", childLink: "r_ankle_link", axis: [0, 1, 0], limits: { min: -45, max: 45 }, maxTorqueNm: 40, maxSpeedRps: 3, massKg: 0.4, inertia: [0.01, 0.01, 0.005] },
-  { name: "r_ankle_roll", type: "revolute", parentLink: "r_ankle_link", childLink: "r_foot", axis: [1, 0, 0], limits: { min: -30, max: 30 }, maxTorqueNm: 30, maxSpeedRps: 3, massKg: 0.3, inertia: [0.008, 0.008, 0.003] },
-];
+function buildHumanoidJoints(): JointModel[] {
+  const j: JointModel[] = [];
+  const add = (
+    name: string, type: JointModel["type"], aType: JointModel["anatomicalType"], aName: string,
+    parent: string, child: string, axis: [number,number,number],
+    min: number, max: number, full360: boolean,
+    torque: number, speed: number, mass: number, inertia: [number,number,number],
+    bus: JointModel["controlBus"]
+  ) => {
+    j.push({
+      name, type, anatomicalType: aType, anatomicalName: aName,
+      parentLink: parent, childLink: child, axis,
+      limits: { min: full360 ? -180 : min, max: full360 ? 180 : max },
+      is360: full360,
+      maxTorqueNm: torque, maxSpeedRps: speed, massKg: mass, inertia, controlBus: bus,
+    });
+  };
 
-const KINEMATIC_LINKS: KinematicLink[] = [
-  { name: "pelvis", lengthM: 0.15, massKg: 3.0, comOffset: [0, 0, 0], inertiaKgM2: [0.05, 0.05, 0.03] },
-  { name: "torso_lower", lengthM: 0.20, massKg: 4.0, comOffset: [0, 0, 0.10], inertiaKgM2: [0.08, 0.08, 0.04] },
-  { name: "torso_upper", lengthM: 0.30, massKg: 5.0, comOffset: [0, 0, 0.15], inertiaKgM2: [0.12, 0.12, 0.06] },
-  { name: "head", lengthM: 0.20, massKg: 2.0, comOffset: [0, 0, 0.10], inertiaKgM2: [0.02, 0.02, 0.01] },
-  { name: "l_upper_arm", lengthM: 0.28, massKg: 1.5, comOffset: [0, 0, -0.14], inertiaKgM2: [0.01, 0.01, 0.003] },
-  { name: "l_forearm", lengthM: 0.25, massKg: 1.0, comOffset: [0, 0, -0.125], inertiaKgM2: [0.008, 0.008, 0.002] },
-  { name: "l_hand", lengthM: 0.18, massKg: 0.4, comOffset: [0, 0, -0.09], inertiaKgM2: [0.002, 0.002, 0.001] },
-  { name: "r_upper_arm", lengthM: 0.28, massKg: 1.5, comOffset: [0, 0, -0.14], inertiaKgM2: [0.01, 0.01, 0.003] },
-  { name: "r_forearm", lengthM: 0.25, massKg: 1.0, comOffset: [0, 0, -0.125], inertiaKgM2: [0.008, 0.008, 0.002] },
-  { name: "r_hand", lengthM: 0.18, massKg: 0.4, comOffset: [0, 0, -0.09], inertiaKgM2: [0.002, 0.002, 0.001] },
-  { name: "l_thigh", lengthM: 0.40, massKg: 4.0, comOffset: [0, 0, -0.20], inertiaKgM2: [0.06, 0.06, 0.02] },
-  { name: "l_shin", lengthM: 0.38, massKg: 2.5, comOffset: [0, 0, -0.19], inertiaKgM2: [0.03, 0.03, 0.01] },
-  { name: "l_foot", lengthM: 0.25, massKg: 1.0, comOffset: [0.08, 0, 0], inertiaKgM2: [0.005, 0.008, 0.005] },
-  { name: "r_thigh", lengthM: 0.40, massKg: 4.0, comOffset: [0, 0, -0.20], inertiaKgM2: [0.06, 0.06, 0.02] },
-  { name: "r_shin", lengthM: 0.38, massKg: 2.5, comOffset: [0, 0, -0.19], inertiaKgM2: [0.03, 0.03, 0.01] },
-  { name: "r_foot", lengthM: 0.25, massKg: 1.0, comOffset: [0.08, 0, 0], inertiaKgM2: [0.005, 0.008, 0.005] },
-];
+  // ═══════════════════════════════════════════════════════════════
+  //  HEAD & NECK — 3 joints
+  // ═══════════════════════════════════════════════════════════════
+  add("atlanto_occipital_flex", "universal", "condyloid", "Atlanto-Occipital (skull-C1)", "c1_atlas", "skull", [0,1,0], -25, 25, false, 4, 2, 0.12, [0.001,0.001,0.001], "can_spine");
+  add("atlanto_axial_rotation", "revolute", "pivot", "Atlanto-Axial (C1-C2)", "c2_axis", "c1_atlas", [0,0,1], -180, 180, true, 5, 2.5, 0.1, [0.001,0.001,0.001], "can_spine");
+  add("temporomandibular", "universal", "condyloid", "Temporomandibular (Jaw)", "skull", "mandible", [0,1,0], -45, 5, false, 1.5, 3, 0.05, [0.0002,0.0002,0.0001], "i2c_face");
+
+  // ═══════════════════════════════════════════════════════════════
+  //  CERVICAL SPINE C1-C7 — intervertebral facet joints (14 joints)
+  //  Each vertebra: flexion/extension + lateral rotation
+  // ═══════════════════════════════════════════════════════════════
+  for (let i = 2; i <= 7; i++) {
+    const parent = `c${i}_vertebra`;
+    const child = i === 2 ? "c2_axis" : `c${i-1}_vertebra`;
+    add(`cervical_c${i}_c${i-1}_flex`, "revolute", "intervertebral", `Cervical C${i}-C${i-1} Facet (flex/ext)`, parent, child, [0,1,0], -8, 8, false, 4, 1.5, 0.04, [0.0003,0.0003,0.0001], "can_spine");
+    add(`cervical_c${i}_c${i-1}_rot`, "revolute", "intervertebral", `Cervical C${i}-C${i-1} Facet (rotation)`, parent, child, [0,0,1], -6, 6, false, 3, 1.5, 0.02, [0.0002,0.0002,0.0001], "can_spine");
+  }
+  add("cervical_c7_t1_flex", "revolute", "intervertebral", "Cervicothoracic C7-T1 Facet (flex)", "c7_vertebra", "t1_vertebra", [0,1,0], -5, 5, false, 5, 1, 0.04, [0.0003,0.0003,0.0001], "can_spine");
+  add("cervical_c7_t1_rot", "revolute", "intervertebral", "Cervicothoracic C7-T1 Facet (rot)", "c7_vertebra", "t1_vertebra", [0,0,1], -4, 4, false, 4, 1, 0.02, [0.0002,0.0002,0.0001], "can_spine");
+
+  // ═══════════════════════════════════════════════════════════════
+  //  THORACIC SPINE T1-T12 — intervertebral facet joints (22 joints)
+  // ═══════════════════════════════════════════════════════════════
+  for (let i = 1; i <= 11; i++) {
+    add(`thoracic_t${i}_t${i+1}_flex`, "revolute", "intervertebral", `Thoracic T${i}-T${i+1} Facet (flex/ext)`, `t${i}_vertebra`, `t${i+1}_vertebra`, [0,1,0], -5, 5, false, 8, 1, 0.06, [0.0005,0.0005,0.0002], "can_spine");
+    add(`thoracic_t${i}_t${i+1}_rot`, "revolute", "intervertebral", `Thoracic T${i}-T${i+1} Facet (rotation)`, `t${i}_vertebra`, `t${i+1}_vertebra`, [0,0,1], -4, 4, false, 6, 1, 0.03, [0.0003,0.0003,0.0001], "can_spine");
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  LUMBAR SPINE L1-L5 — intervertebral facet joints (10 joints)
+  // ═══════════════════════════════════════════════════════════════
+  add("thoracolumbar_t12_l1_flex", "revolute", "intervertebral", "Thoracolumbar T12-L1 Facet (flex)", "t12_vertebra", "l1_vertebra", [0,1,0], -8, 8, false, 12, 1, 0.07, [0.0008,0.0008,0.0003], "can_spine");
+  add("thoracolumbar_t12_l1_rot", "revolute", "intervertebral", "Thoracolumbar T12-L1 Facet (rot)", "t12_vertebra", "l1_vertebra", [0,0,1], -5, 5, false, 10, 1, 0.04, [0.0005,0.0005,0.0002], "can_spine");
+  for (let i = 1; i <= 4; i++) {
+    add(`lumbar_l${i}_l${i+1}_flex`, "revolute", "intervertebral", `Lumbar L${i}-L${i+1} Facet (flex/ext)`, `l${i}_vertebra`, `l${i+1}_vertebra`, [0,1,0], -12, 12, false, 15, 1, 0.08, [0.001,0.001,0.0004], "can_spine");
+    add(`lumbar_l${i}_l${i+1}_rot`, "revolute", "intervertebral", `Lumbar L${i}-L${i+1} Facet (rotation)`, `l${i}_vertebra`, `l${i+1}_vertebra`, [0,0,1], -5, 5, false, 12, 1, 0.04, [0.0005,0.0005,0.0002], "can_spine");
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  LUMBOSACRAL + SACROILIAC (3 joints)
+  // ═══════════════════════════════════════════════════════════════
+  add("lumbosacral_l5_s1", "revolute", "intervertebral", "Lumbosacral L5-S1 Facet", "l5_vertebra", "sacrum", [0,1,0], -10, 10, false, 20, 0.8, 0.1, [0.002,0.002,0.001], "can_spine");
+  add("l_sacroiliac", "prismatic", "gliding", "Left Sacroiliac", "sacrum", "l_ilium", [0,1,0], -4, 4, false, 20, 0.5, 0.1, [0.002,0.002,0.001], "can_spine");
+  add("r_sacroiliac", "prismatic", "gliding", "Right Sacroiliac", "sacrum", "r_ilium", [0,1,0], -4, 4, false, 20, 0.5, 0.1, [0.002,0.002,0.001], "can_spine");
+
+  // ═══════════════════════════════════════════════════════════════
+  //  RIBS — costovertebral (24 joints, gliding)
+  // ═══════════════════════════════════════════════════════════════
+  for (let i = 1; i <= 12; i++) {
+    add(`l_costovertebral_rib${i}`, "prismatic", "gliding", `Left Costovertebral Rib ${i}`, `t${i}_vertebra`, `l_rib${i}`, [1,0,0], -3, 3, false, 2, 0.5, 0.02, [0.0001,0.0001,0.0001], "can_spine");
+    add(`r_costovertebral_rib${i}`, "prismatic", "gliding", `Right Costovertebral Rib ${i}`, `t${i}_vertebra`, `r_rib${i}`, [1,0,0], -3, 3, false, 2, 0.5, 0.02, [0.0001,0.0001,0.0001], "can_spine");
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  SHOULDER GIRDLE — sternoclavicular + acromioclavicular + glenohumeral
+  //  Per side: SC (saddle, 2 DOF) + AC (gliding, 1 DOF) + GH (ball-and-socket, 3 DOF, 360°) = 12 total
+  // ═══════════════════════════════════════════════════════════════
+  for (const side of ["l", "r"]) {
+    const S = side === "l" ? "Left" : "Right";
+    add(`${side}_sternoclavicular_elev`, "revolute", "saddle", `${S} Sternoclavicular (elevation)`, "sternum", `${side}_clavicle`, [0,1,0], -5, 45, false, 15, 2, 0.15, [0.002,0.002,0.001], "can_limb");
+    add(`${side}_sternoclavicular_prot`, "revolute", "saddle", `${S} Sternoclavicular (protraction)`, "sternum", `${side}_clavicle`, [0,0,1], -15, 15, false, 12, 2, 0.1, [0.001,0.001,0.0005], "can_limb");
+    add(`${side}_acromioclavicular`, "prismatic", "gliding", `${S} Acromioclavicular`, `${side}_clavicle`, `${side}_scapula`, [0,1,0], -20, 20, false, 10, 2, 0.1, [0.001,0.001,0.0005], "can_limb");
+    add(`${side}_glenohumeral_flex`, "spherical", "ball_and_socket", `${S} Glenohumeral (flex/ext) — 360°`, `${side}_scapula`, `${side}_humerus`, [0,1,0], -180, 180, true, 45, 3, 0.8, [0.02,0.02,0.005], "can_limb");
+    add(`${side}_glenohumeral_abd`, "spherical", "ball_and_socket", `${S} Glenohumeral (abd/add) — 360°`, `${side}_humerus`, `${side}_humerus_abd`, [1,0,0], -180, 180, true, 35, 3, 0.5, [0.01,0.01,0.003], "can_limb");
+    add(`${side}_glenohumeral_rot`, "spherical", "ball_and_socket", `${S} Glenohumeral (int/ext rotation) — 360°`, `${side}_humerus_abd`, `${side}_humerus_rot`, [0,0,1], -180, 180, true, 20, 3, 0.3, [0.005,0.005,0.002], "can_limb");
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  ELBOW & FOREARM — ulnohumeral (hinge) + radiohumeral (pivot) + radioulnar (pivot, 360°)
+  //  Per side: 3 joints = 6 total
+  // ═══════════════════════════════════════════════════════════════
+  for (const side of ["l", "r"]) {
+    const S = side === "l" ? "Left" : "Right";
+    add(`${side}_ulnohumeral`, "revolute", "hinge", `${S} Ulnohumeral (elbow flex/ext)`, `${side}_humerus_rot`, `${side}_ulna`, [0,1,0], 0, 150, false, 25, 4, 0.5, [0.008,0.008,0.003], "can_limb");
+    add(`${side}_radiohumeral`, "revolute", "pivot", `${S} Radiohumeral`, `${side}_humerus_rot`, `${side}_radius_prox`, [0,1,0], 0, 150, false, 15, 4, 0.2, [0.003,0.003,0.001], "can_limb");
+    add(`${side}_proximal_radioulnar`, "revolute", "pivot", `${S} Proximal Radioulnar (pronation/supination) — 360°`, `${side}_ulna`, `${side}_radius`, [1,0,0], -180, 180, true, 10, 5, 0.2, [0.003,0.003,0.001], "can_limb");
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  WRIST — distal radioulnar (pivot, 360°) + radiocarpal (condyloid, 2 DOF)
+  //         + midcarpal (gliding) + pisotriquetral (gliding)
+  //  Per side: 5 joints = 10 total
+  // ═══════════════════════════════════════════════════════════════
+  for (const side of ["l", "r"]) {
+    const S = side === "l" ? "Left" : "Right";
+    add(`${side}_distal_radioulnar`, "revolute", "pivot", `${S} Distal Radioulnar (wrist rotation) — 360°`, `${side}_radius`, `${side}_ulna_distal`, [1,0,0], -180, 180, true, 6, 5, 0.12, [0.001,0.001,0.0005], "can_limb");
+    add(`${side}_radiocarpal_flex`, "universal", "condyloid", `${S} Radiocarpal (flex/ext)`, `${side}_ulna_distal`, `${side}_carpal_prox`, [0,1,0], -80, 80, false, 5, 5, 0.1, [0.001,0.001,0.0005], "can_hand");
+    add(`${side}_radiocarpal_dev`, "universal", "condyloid", `${S} Radiocarpal (radial/ulnar deviation)`, `${side}_carpal_prox`, `${side}_carpal_mid`, [0,0,1], -25, 35, false, 4, 5, 0.06, [0.0005,0.0005,0.0002], "can_hand");
+    add(`${side}_midcarpal`, "prismatic", "gliding", `${S} Midcarpal`, `${side}_carpal_mid`, `${side}_carpal_dist`, [0,1,0], -10, 10, false, 3, 4, 0.04, [0.0003,0.0003,0.0001], "can_hand");
+    add(`${side}_pisotriquetral`, "prismatic", "gliding", `${S} Pisotriquetral`, `${side}_carpal_dist`, `${side}_hand_base`, [0,0,1], -5, 5, false, 1, 4, 0.02, [0.0001,0.0001,0.00005], "can_hand");
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  THUMB — CMC (saddle, 2 DOF) + MCP (condyloid, 2 DOF) + IP (hinge, 1 DOF)
+  //  Per side: 5 joints = 10 total
+  // ═══════════════════════════════════════════════════════════════
+  for (const side of ["l", "r"]) {
+    const S = side === "l" ? "Left" : "Right";
+    add(`${side}_thumb_cmc_flex`, "universal", "saddle", `${S} Thumb CMC (flex/ext) — BIDIRECTIONAL`, `${side}_hand_base`, `${side}_thumb_mc`, [0,1,0], -60, 60, false, 2.5, 5, 0.02, [0.0001,0.0001,0.00004], "can_hand");
+    add(`${side}_thumb_cmc_abd`, "universal", "saddle", `${S} Thumb CMC (abd/add)`, `${side}_hand_base`, `${side}_thumb_mc_abd`, [0,0,1], -30, 70, false, 2, 5, 0.015, [0.00008,0.00008,0.00003], "can_hand");
+    add(`${side}_thumb_mcp_flex`, "universal", "condyloid", `${S} Thumb MCP (flex/ext) — BIDIRECTIONAL`, `${side}_thumb_mc`, `${side}_thumb_prox`, [0,1,0], -70, 70, false, 1.5, 6, 0.012, [0.00005,0.00005,0.00002], "can_hand");
+    add(`${side}_thumb_mcp_abd`, "universal", "condyloid", `${S} Thumb MCP (abd)`, `${side}_thumb_prox`, `${side}_thumb_prox_abd`, [0,0,1], -25, 25, false, 0.8, 6, 0.006, [0.00002,0.00002,0.00001], "can_hand");
+    add(`${side}_thumb_ip`, "revolute", "hinge", `${S} Thumb IP — BIDIRECTIONAL`, `${side}_thumb_prox`, `${side}_thumb_dist`, [0,1,0], -50, 80, false, 1, 6, 0.005, [0.00002,0.00002,0.00001], "can_hand");
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  FINGERS (index, middle, ring, pinky)
+  //  CMC (gliding) + MCP (condyloid, 2 DOF) + PIP (hinge) + DIP (hinge)
+  //  Per finger: 4 joints × 4 fingers × 2 hands = 32 joints + 8 CMC = 40
+  // ═══════════════════════════════════════════════════════════════
+  for (const side of ["l", "r"]) {
+    const S = side === "l" ? "Left" : "Right";
+    for (const [finger, idx] of [["index",2],["middle",3],["ring",4],["pinky",5]] as const) {
+      const F = finger.charAt(0).toUpperCase() + finger.slice(1);
+      add(`${side}_${finger}_cmc`, "prismatic", "gliding", `${S} ${F} CMC`, `${side}_hand_base`, `${side}_${finger}_mc`, [0,1,0], -5, 5, false, 1, 4, 0.01, [0.00003,0.00003,0.00001], "can_hand");
+      add(`${side}_${finger}_mcp_flex`, "universal", "condyloid", `${S} ${F} MCP (flex/ext) — BIDIRECTIONAL`, `${side}_${finger}_mc`, `${side}_${finger}_prox`, [0,1,0], -90, 90, false, 1.8, 6, 0.015, [0.00005,0.00005,0.00002], "can_hand");
+      add(`${side}_${finger}_mcp_abd`, "universal", "condyloid", `${S} ${F} MCP (abd/add)`, `${side}_${finger}_prox`, `${side}_${finger}_prox_abd`, [0,0,1], -30, 30, false, 0.8, 6, 0.008, [0.00003,0.00003,0.00001], "can_hand");
+      add(`${side}_${finger}_pip`, "revolute", "hinge", `${S} ${F} PIP — BIDIRECTIONAL`, `${side}_${finger}_prox`, `${side}_${finger}_mid`, [0,1,0], -60, 110, false, 1.2, 6, 0.01, [0.00004,0.00004,0.00001], "can_hand");
+      add(`${side}_${finger}_dip`, "revolute", "hinge", `${S} ${F} DIP — BIDIRECTIONAL`, `${side}_${finger}_mid`, `${side}_${finger}_dist`, [0,1,0], -45, 80, false, 0.8, 6, 0.006, [0.00002,0.00002,0.00001], "can_hand");
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  HIP — acetabulofemoral (ball-and-socket, 3 DOF, 360°)
+  //  Per side: 3 joints = 6 total
+  // ═══════════════════════════════════════════════════════════════
+  for (const side of ["l", "r"]) {
+    const S = side === "l" ? "Left" : "Right";
+    add(`${side}_acetabulofemoral_flex`, "spherical", "ball_and_socket", `${S} Hip Acetabulofemoral (flex/ext) — 360°`, `${side}_ilium`, `${side}_femur`, [0,1,0], -180, 180, true, 110, 2.5, 1.2, [0.05,0.05,0.02], "can_limb");
+    add(`${side}_acetabulofemoral_abd`, "spherical", "ball_and_socket", `${S} Hip Acetabulofemoral (abd/add) — 360°`, `${side}_femur`, `${side}_femur_abd`, [1,0,0], -180, 180, true, 55, 2, 0.6, [0.02,0.02,0.008], "can_limb");
+    add(`${side}_acetabulofemoral_rot`, "spherical", "ball_and_socket", `${S} Hip Acetabulofemoral (rotation) — 360°`, `${side}_femur_abd`, `${side}_femur_rot`, [0,0,1], -180, 180, true, 45, 2, 0.4, [0.015,0.015,0.006], "can_limb");
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  KNEE — tibiofemoral (hinge) + patellofemoral (gliding)
+  //  Per side: 2 joints = 4 total
+  // ═══════════════════════════════════════════════════════════════
+  for (const side of ["l", "r"]) {
+    const S = side === "l" ? "Left" : "Right";
+    add(`${side}_tibiofemoral`, "revolute", "hinge", `${S} Tibiofemoral (knee flex/ext)`, `${side}_femur_rot`, `${side}_tibia`, [0,1,0], 0, 150, false, 90, 3, 0.8, [0.03,0.03,0.01], "can_limb");
+    add(`${side}_patellofemoral`, "prismatic", "gliding", `${S} Patellofemoral`, `${side}_femur_rot`, `${side}_patella`, [0,1,0], -5, 5, false, 10, 2, 0.1, [0.002,0.002,0.001], "can_limb");
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  PROXIMAL TIBIOFIBULAR (gliding, per side = 2)
+  // ═══════════════════════════════════════════════════════════════
+  for (const side of ["l", "r"]) {
+    const S = side === "l" ? "Left" : "Right";
+    add(`${side}_proximal_tibiofibular`, "prismatic", "gliding", `${S} Proximal Tibiofibular`, `${side}_tibia`, `${side}_fibula`, [1,0,0], -3, 3, false, 8, 1.5, 0.08, [0.001,0.001,0.0005], "can_limb");
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  ANKLE — talocrural (hinge) + subtalar (gliding)
+  //  Per side: 2 joints = 4 total
+  // ═══════════════════════════════════════════════════════════════
+  for (const side of ["l", "r"]) {
+    const S = side === "l" ? "Left" : "Right";
+    add(`${side}_talocrural`, "revolute", "hinge", `${S} Talocrural (ankle dorsi/plantarflex)`, `${side}_tibia`, `${side}_talus`, [0,1,0], -50, 30, false, 45, 3, 0.4, [0.01,0.01,0.005], "can_limb");
+    add(`${side}_subtalar`, "prismatic", "gliding", `${S} Subtalar (inversion/eversion)`, `${side}_talus`, `${side}_calcaneus`, [1,0,0], -35, 25, false, 30, 2.5, 0.3, [0.008,0.008,0.003], "can_foot");
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  MIDFOOT — tarsometatarsal (gliding, 5 per foot) + tarsal interbone (gliding)
+  //  Per side: 6 joints = 12 total
+  // ═══════════════════════════════════════════════════════════════
+  for (const side of ["l", "r"]) {
+    const S = side === "l" ? "Left" : "Right";
+    add(`${side}_calcaneocuboid`, "prismatic", "gliding", `${S} Calcaneocuboid (tarsal)`, `${side}_calcaneus`, `${side}_cuboid`, [0,1,0], -8, 8, false, 12, 2, 0.08, [0.001,0.001,0.0005], "can_foot");
+    for (let i = 1; i <= 5; i++) {
+      add(`${side}_tarsometatarsal_${i}`, "prismatic", "gliding", `${S} Tarsometatarsal ${i}`, `${side}_cuboid`, `${side}_mt${i}`, [0,1,0], -10, 10, false, 8, 2, 0.04, [0.0003,0.0003,0.0001], "can_foot");
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  //  TOES — MTP (condyloid, 2 DOF) + PIP (hinge) + DIP (hinge)
+  //  Big toe: MTP(2) + IP(1) = 3. Others: MTP(2) + PIP(1) + DIP(1) = 4 each
+  //  Per foot: 3 + 4×4 = 19 joints. Both feet = 38 total
+  // ═══════════════════════════════════════════════════════════════
+  for (const side of ["l", "r"]) {
+    const S = side === "l" ? "Left" : "Right";
+    add(`${side}_hallux_mtp_flex`, "universal", "condyloid", `${S} Hallux MTP (flex/ext) — BIDIRECTIONAL`, `${side}_mt1`, `${side}_hallux_prox`, [0,1,0], -70, 70, false, 3.5, 4, 0.02, [0.00008,0.00008,0.00003], "can_foot");
+    add(`${side}_hallux_mtp_abd`, "universal", "condyloid", `${S} Hallux MTP (abd)`, `${side}_mt1`, `${side}_hallux_prox_abd`, [0,0,1], -15, 15, false, 1, 4, 0.008, [0.00003,0.00003,0.00001], "can_foot");
+    add(`${side}_hallux_ip`, "revolute", "hinge", `${S} Hallux IP — BIDIRECTIONAL`, `${side}_hallux_prox`, `${side}_hallux_dist`, [0,1,0], -40, 60, false, 1.5, 4, 0.008, [0.00003,0.00003,0.00001], "can_foot");
+    for (const [toe, n] of [["2nd",2],["3rd",3],["4th",4],["5th",5]] as const) {
+      add(`${side}_toe${n}_mtp_flex`, "universal", "condyloid", `${S} ${toe} Toe MTP (flex) — BIDIRECTIONAL`, `${side}_mt${n}`, `${side}_toe${n}_prox`, [0,1,0], -40, 40, false, 1, 4, 0.008, [0.00003,0.00003,0.00001], "can_foot");
+      add(`${side}_toe${n}_mtp_abd`, "universal", "condyloid", `${S} ${toe} Toe MTP (abd)`, `${side}_mt${n}`, `${side}_toe${n}_prox_abd`, [0,0,1], -12, 12, false, 0.5, 4, 0.004, [0.00001,0.00001,0.000005], "can_foot");
+      add(`${side}_toe${n}_pip`, "revolute", "hinge", `${S} ${toe} Toe PIP — BIDIRECTIONAL`, `${side}_toe${n}_prox`, `${side}_toe${n}_mid`, [0,1,0], -25, 35, false, 0.5, 4, 0.004, [0.00001,0.00001,0.00001], "can_foot");
+      add(`${side}_toe${n}_dip`, "revolute", "hinge", `${S} ${toe} Toe DIP — BIDIRECTIONAL`, `${side}_toe${n}_mid`, `${side}_toe${n}_dist`, [0,1,0], -25, 60, false, 0.3, 4, 0.003, [0.00001,0.00001,0.00001], "can_foot");
+    }
+  }
+
+  return j;
+}
+
+function buildKinematicLinks(): KinematicLink[] {
+  const L: KinematicLink[] = [];
+  const add = (name: string, len: number, mass: number, com: [number,number,number], inertia: [number,number,number]) => {
+    L.push({ name, lengthM: len, massKg: mass, comOffset: com, inertiaKgM2: inertia });
+  };
+
+  add("skull", 0.20, 2.0, [0,0,0.10], [0.02,0.02,0.01]);
+  add("mandible", 0.08, 0.15, [0,0,-0.04], [0.0003,0.0003,0.0001]);
+  add("c1_atlas", 0.015, 0.03, [0,0,0.008], [0.00004,0.00004,0.00002]);
+  add("c2_axis", 0.018, 0.04, [0,0,0.009], [0.00005,0.00005,0.00002]);
+  for (let i = 3; i <= 7; i++) add(`c${i}_vertebra`, 0.018, 0.04, [0,0,0.009], [0.00005,0.00005,0.00002]);
+  for (let i = 1; i <= 12; i++) {
+    add(`t${i}_vertebra`, 0.023, 0.07, [0,0,0.012], [0.0001,0.0001,0.00004]);
+    add(`l_rib${i}`, 0.15, 0.04, [0.07,0,0], [0.0001,0.0001,0.00004]);
+    add(`r_rib${i}`, 0.15, 0.04, [-0.07,0,0], [0.0001,0.0001,0.00004]);
+  }
+  for (let i = 1; i <= 5; i++) add(`l${i}_vertebra`, 0.028, 0.1, [0,0,0.014], [0.0002,0.0002,0.00008]);
+  add("sacrum", 0.12, 0.5, [0,0,-0.06], [0.003,0.003,0.001]);
+  add("sternum", 0.17, 0.5, [0,0,0.08], [0.003,0.003,0.001]);
+
+  for (const side of ["l", "r"]) {
+    const sx = side === "l" ? 1 : -1;
+    add(`${side}_ilium`, 0.12, 1.5, [sx*0.06,0,0], [0.01,0.01,0.005]);
+    add(`${side}_clavicle`, 0.15, 0.2, [sx*0.07,0,0], [0.0005,0.0005,0.0002]);
+    add(`${side}_scapula`, 0.12, 0.3, [sx*0.06,0,-0.06], [0.001,0.001,0.0005]);
+    add(`${side}_humerus`, 0.30, 1.5, [0,0,-0.15], [0.01,0.01,0.003]);
+    add(`${side}_humerus_abd`, 0.04, 0.2, [0,0,-0.02], [0.0005,0.0005,0.0002]);
+    add(`${side}_humerus_rot`, 0.04, 0.2, [0,0,-0.02], [0.0005,0.0005,0.0002]);
+    add(`${side}_ulna`, 0.26, 0.6, [0,0,-0.13], [0.005,0.005,0.002]);
+    add(`${side}_radius_prox`, 0.05, 0.15, [0,0,-0.025], [0.0005,0.0005,0.0002]);
+    add(`${side}_radius`, 0.24, 0.5, [0,0,-0.12], [0.004,0.004,0.001]);
+    add(`${side}_ulna_distal`, 0.03, 0.08, [0,0,-0.015], [0.0002,0.0002,0.0001]);
+    add(`${side}_carpal_prox`, 0.02, 0.05, [0,0,-0.01], [0.0001,0.0001,0.00005]);
+    add(`${side}_carpal_mid`, 0.015, 0.04, [0,0,-0.008], [0.00008,0.00008,0.00003]);
+    add(`${side}_carpal_dist`, 0.015, 0.03, [0,0,-0.008], [0.00006,0.00006,0.00002]);
+    add(`${side}_hand_base`, 0.08, 0.2, [0,0,-0.04], [0.0005,0.0005,0.0002]);
+
+    add(`${side}_thumb_mc`, 0.04, 0.02, [0,0,-0.02], [0.0001,0.0001,0.00004]);
+    add(`${side}_thumb_mc_abd`, 0.005, 0.005, [0,0,0], [0.00001,0.00001,0.000005]);
+    add(`${side}_thumb_prox`, 0.03, 0.012, [0,0,-0.015], [0.00002,0.00002,0.00001]);
+    add(`${side}_thumb_prox_abd`, 0.005, 0.003, [0,0,0], [0.000005,0.000005,0.000002]);
+    add(`${side}_thumb_dist`, 0.02, 0.006, [0,0,-0.01], [0.00001,0.00001,0.000005]);
+    for (const finger of ["index", "middle", "ring", "pinky"]) {
+      add(`${side}_${finger}_mc`, 0.06, 0.015, [0,0,-0.03], [0.00003,0.00003,0.00001]);
+      add(`${side}_${finger}_prox`, 0.04, 0.012, [0,0,-0.02], [0.00002,0.00002,0.00001]);
+      add(`${side}_${finger}_prox_abd`, 0.005, 0.003, [0,0,0], [0.000005,0.000005,0.000002]);
+      add(`${side}_${finger}_mid`, 0.025, 0.008, [0,0,-0.012], [0.00001,0.00001,0.000005]);
+      add(`${side}_${finger}_dist`, 0.018, 0.005, [0,0,-0.009], [0.000005,0.000005,0.000002]);
+    }
+
+    add(`${side}_femur`, 0.42, 4.5, [0,0,-0.21], [0.07,0.07,0.025]);
+    add(`${side}_femur_abd`, 0.04, 0.3, [0,0,-0.02], [0.002,0.002,0.001]);
+    add(`${side}_femur_rot`, 0.04, 0.25, [0,0,-0.02], [0.002,0.002,0.001]);
+    add(`${side}_patella`, 0.04, 0.1, [0,0.02,0], [0.0005,0.0005,0.0002]);
+    add(`${side}_tibia`, 0.38, 2.5, [0,0,-0.19], [0.03,0.03,0.01]);
+    add(`${side}_fibula`, 0.36, 0.4, [sx*0.02,0,-0.18], [0.005,0.005,0.002]);
+    add(`${side}_talus`, 0.04, 0.15, [0,0,-0.02], [0.0005,0.0005,0.0002]);
+    add(`${side}_calcaneus`, 0.08, 0.3, [0.04,0,0], [0.001,0.001,0.0005]);
+    add(`${side}_cuboid`, 0.03, 0.06, [0.015,0,0], [0.0002,0.0002,0.0001]);
+    for (let i = 1; i <= 5; i++) add(`${side}_mt${i}`, 0.065, 0.025, [0,0,-0.03], [0.00005,0.00005,0.00002]);
+    add(`${side}_hallux_prox`, 0.035, 0.015, [0,0,-0.017], [0.00003,0.00003,0.00001]);
+    add(`${side}_hallux_prox_abd`, 0.005, 0.003, [0,0,0], [0.000005,0.000005,0.000002]);
+    add(`${side}_hallux_dist`, 0.025, 0.008, [0,0,-0.012], [0.00001,0.00001,0.000005]);
+    for (const n of [2,3,4,5]) {
+      add(`${side}_toe${n}_prox`, 0.03, 0.006, [0,0,-0.015], [0.00001,0.00001,0.000005]);
+      add(`${side}_toe${n}_prox_abd`, 0.005, 0.002, [0,0,0], [0.000003,0.000003,0.000001]);
+      add(`${side}_toe${n}_mid`, 0.018, 0.004, [0,0,-0.009], [0.000005,0.000005,0.000002]);
+      add(`${side}_toe${n}_dist`, 0.012, 0.003, [0,0,-0.006], [0.000003,0.000003,0.000001]);
+    }
+  }
+
+  return L;
+}
+
+const HUMANOID_JOINTS: JointModel[] = buildHumanoidJoints();
+
+const KINEMATIC_LINKS: KinematicLink[] = buildKinematicLinks();
 
 const BILL_OF_MATERIALS: BOMEntry[] = [
-  { partName: "BLDC Motor 100W", category: "actuator", quantity: 6, unitCostUsd: 45, supplier: "AliExpress/Odrive", specifications: "100W, 24V, 3000rpm, 0.32Nm continuous, harmonic drive 50:1" },
-  { partName: "BLDC Motor 200W", category: "actuator", quantity: 6, unitCostUsd: 85, supplier: "AliExpress/Odrive", specifications: "200W, 48V, 3000rpm, 0.64Nm, harmonic drive 80:1" },
-  { partName: "BLDC Motor 400W", category: "actuator", quantity: 4, unitCostUsd: 150, supplier: "AliExpress/Stepperonline", specifications: "400W, 48V, 2500rpm, 1.5Nm, cycloidal reducer 100:1" },
-  { partName: "Servo Motor (wrist/finger)", category: "actuator", quantity: 20, unitCostUsd: 15, supplier: "AliExpress", specifications: "25kg-cm, 7.4V, digital, metal gear" },
-  { partName: "Harmonic Drive CSF-14", category: "transmission", quantity: 6, unitCostUsd: 120, supplier: "Harmonic Drive/AliExpress", specifications: "50:1 ratio, zero backlash, 14mm bore" },
-  { partName: "Cycloidal Reducer", category: "transmission", quantity: 4, unitCostUsd: 80, supplier: "AliExpress", specifications: "100:1 ratio, high torque, shock resistant" },
-  { partName: "IMU BNO085", category: "sensor", quantity: 3, unitCostUsd: 18, supplier: "Adafruit/DigiKey", specifications: "9-axis, sensor fusion, 100Hz, I2C" },
-  { partName: "Intel RealSense D435i", category: "sensor", quantity: 2, unitCostUsd: 250, supplier: "Intel/Amazon", specifications: "Stereo depth + IMU, 90fps, USB 3.0" },
-  { partName: "Force/Torque Sensor", category: "sensor", quantity: 4, unitCostUsd: 45, supplier: "AliExpress/SparkFun", specifications: "6-axis, 50N range, I2C" },
-  { partName: "Pressure Sensor (foot)", category: "sensor", quantity: 8, unitCostUsd: 5, supplier: "AliExpress", specifications: "FSR 0-10kg, analog" },
-  { partName: "NVIDIA Jetson Orin NX 16GB", category: "compute", quantity: 1, unitCostUsd: 599, supplier: "NVIDIA/Arrow", specifications: "100 TOPS AI, 8-core ARM, 16GB LPDDR5" },
-  { partName: "ESP32-S3 MCU", category: "compute", quantity: 6, unitCostUsd: 8, supplier: "AliExpress/DigiKey", specifications: "240MHz dual-core, WiFi+BT, 8MB PSRAM, motor control PWM" },
-  { partName: "STM32H7 MCU", category: "compute", quantity: 2, unitCostUsd: 15, supplier: "DigiKey/Mouser", specifications: "480MHz, FPU, CAN-FD, real-time motor control" },
-  { partName: "LiPo Battery 48V 20Ah", category: "power", quantity: 1, unitCostUsd: 350, supplier: "AliExpress/Alibaba", specifications: "48V, 20Ah, 960Wh, BMS, 60A continuous" },
-  { partName: "DC-DC Converter 48V→12V", category: "power", quantity: 2, unitCostUsd: 25, supplier: "AliExpress", specifications: "300W, 25A, high efficiency" },
-  { partName: "DC-DC Converter 48V→5V", category: "power", quantity: 3, unitCostUsd: 12, supplier: "AliExpress", specifications: "60W, 12A, USB output" },
-  { partName: "CAN Bus Transceiver", category: "communication", quantity: 12, unitCostUsd: 3, supplier: "DigiKey/AliExpress", specifications: "MCP2551, 1Mbps, bus fault protection" },
-  { partName: "Slip Ring (shoulder)", category: "joint", quantity: 2, unitCostUsd: 35, supplier: "AliExpress", specifications: "12 channel, 2A per ring, 360° continuous" },
-  { partName: "Carbon Fiber Tube 20mm", category: "structural", quantity: 8, unitCostUsd: 15, supplier: "AliExpress/Alibaba", specifications: "20mm OD, 18mm ID, 500mm length, 3K weave" },
-  { partName: "Aluminum 7075 Plate", category: "structural", quantity: 4, unitCostUsd: 30, supplier: "AliExpress/MetalsDepot", specifications: "300x200x6mm, aircraft grade" },
-  { partName: "3D Printed Parts (PETG)", category: "structural", quantity: 50, unitCostUsd: 2, supplier: "Self-printed", specifications: "PETG, 0.2mm layer, 100% infill for structural" },
-  { partName: "Microphone MEMS", category: "sensor", quantity: 2, unitCostUsd: 4, supplier: "DigiKey", specifications: "INMP441, I2S, 60dB SNR" },
+  // ─── ACTUATORS — major joints ──────────────────────────────────
+  { partName: "BLDC Motor 400W (hip/knee)", category: "actuator", quantity: 8, unitCostUsd: 150, supplier: "AliExpress/Stepperonline", specifications: "400W, 48V, 2500rpm, 1.5Nm, cycloidal reducer 100:1 — hip flexion/abd/rot, knee flexion" },
+  { partName: "BLDC Motor 200W (shoulder/ankle)", category: "actuator", quantity: 10, unitCostUsd: 85, supplier: "AliExpress/Odrive", specifications: "200W, 48V, 3000rpm, 0.64Nm, harmonic drive 80:1 — shoulder, ankle, torso" },
+  { partName: "BLDC Motor 100W (elbow/wrist/neck)", category: "actuator", quantity: 10, unitCostUsd: 45, supplier: "AliExpress/Odrive", specifications: "100W, 24V, 3000rpm, 0.32Nm, harmonic drive 50:1 — elbow, wrist, neck, jaw" },
+  // ─── ACTUATORS — spine ─────────────────────────────────────────
+  { partName: "Linear Actuator 20W (spine segment)", category: "actuator", quantity: 48, unitCostUsd: 22, supplier: "AliExpress/Actuonix", specifications: "20W, 12V, 10mm stroke, 50N, CAN bus — cervical/thoracic/lumbar flexion+rotation" },
+  { partName: "Micro Servo SG90 (rib breathing)", category: "actuator", quantity: 24, unitCostUsd: 3, supplier: "AliExpress", specifications: "1.8kg-cm, 4.8V, micro, costovertebral expansion" },
+  // ─── ACTUATORS — hands/fingers ─────────────────────────────────
+  { partName: "Micro Servo 10kg-cm (finger MCP)", category: "actuator", quantity: 20, unitCostUsd: 8, supplier: "AliExpress/TowerPro", specifications: "10kg-cm, 6V, digital, metal gear, MCP flex+abd" },
+  { partName: "Micro Servo 5kg-cm (finger PIP/DIP)", category: "actuator", quantity: 16, unitCostUsd: 5, supplier: "AliExpress", specifications: "5kg-cm, 6V, digital, PIP and DIP flexion" },
+  { partName: "Micro Servo 12kg-cm (thumb)", category: "actuator", quantity: 10, unitCostUsd: 10, supplier: "AliExpress/TowerPro", specifications: "12kg-cm, 7.4V, metal gear, thumb CMC/MCP/IP" },
+  // ─── ACTUATORS — feet/toes ─────────────────────────────────────
+  { partName: "Servo Motor 15kg-cm (foot/ankle)", category: "actuator", quantity: 8, unitCostUsd: 12, supplier: "AliExpress", specifications: "15kg-cm, 7.4V, subtalar + midtarsal" },
+  { partName: "Micro Servo 3kg-cm (toe)", category: "actuator", quantity: 28, unitCostUsd: 3, supplier: "AliExpress", specifications: "3kg-cm, 4.8V, MTP/PIP/DIP toe joints" },
+  // ─── TRANSMISSIONS ────────────────────────────────────────────
+  { partName: "Harmonic Drive CSF-14", category: "transmission", quantity: 10, unitCostUsd: 120, supplier: "Harmonic Drive/AliExpress", specifications: "50:1 ratio, zero backlash, 14mm bore — shoulders, elbows" },
+  { partName: "Cycloidal Reducer", category: "transmission", quantity: 8, unitCostUsd: 80, supplier: "AliExpress", specifications: "100:1 ratio, high torque, shock resistant — hips, knees" },
+  { partName: "Planetary Gearbox 20:1 (spine)", category: "transmission", quantity: 24, unitCostUsd: 18, supplier: "AliExpress", specifications: "20:1, low backlash, compact, spine segments" },
+  { partName: "Tendon Cable (finger/toe)", category: "transmission", quantity: 60, unitCostUsd: 2, supplier: "McMaster-Carr", specifications: "Dyneema UHMWPE, 1mm, 200lb rated, finger/toe routing" },
+  // ─── SENSORS ──────────────────────────────────────────────────
+  { partName: "IMU BNO085", category: "sensor", quantity: 5, unitCostUsd: 18, supplier: "Adafruit/DigiKey", specifications: "9-axis, sensor fusion, 100Hz, I2C — pelvis, torso, head, each foot" },
+  { partName: "Intel RealSense D435i", category: "sensor", quantity: 2, unitCostUsd: 250, supplier: "Intel/Amazon", specifications: "Stereo depth + IMU, 90fps, USB 3.0 — stereo vision" },
+  { partName: "Force/Torque Sensor 6-axis", category: "sensor", quantity: 6, unitCostUsd: 45, supplier: "AliExpress/SparkFun", specifications: "6-axis, 50N range, I2C — wrists, ankles" },
+  { partName: "FSR Pressure Sensor (foot)", category: "sensor", quantity: 16, unitCostUsd: 5, supplier: "AliExpress", specifications: "FSR 0-50kg, analog, 8 per foot sole" },
+  { partName: "Fingertip Tactile Sensor", category: "sensor", quantity: 10, unitCostUsd: 12, supplier: "AliExpress/SparkFun", specifications: "3-axis force, 0.01N resolution, each fingertip" },
+  { partName: "Magnetic Encoder AS5047P", category: "sensor", quantity: 28, unitCostUsd: 6, supplier: "DigiKey/Mouser", specifications: "14-bit, 28000rpm, SPI — one per major joint motor" },
+  { partName: "Flex Sensor (spine curvature)", category: "sensor", quantity: 6, unitCostUsd: 8, supplier: "SparkFun/Adafruit", specifications: "4.5in, analog, along spine to measure posture" },
+  { partName: "MLX90640 Thermal Camera", category: "sensor", quantity: 1, unitCostUsd: 55, supplier: "Adafruit/DigiKey", specifications: "32x24 IR array, 16Hz, I2C — infrared vision" },
+  { partName: "Ultrasonic HC-SR04", category: "sensor", quantity: 4, unitCostUsd: 3, supplier: "AliExpress", specifications: "2cm-4m range, 40Hz — proximity detection" },
+  { partName: "MQ Gas Sensor Array", category: "sensor", quantity: 3, unitCostUsd: 5, supplier: "AliExpress", specifications: "CO, CO2, methane, smoke, VOC detection" },
+  { partName: "Microphone MEMS INMP441", category: "sensor", quantity: 2, unitCostUsd: 4, supplier: "DigiKey", specifications: "I2S, 60dB SNR, stereo audio" },
+  // ─── COMPUTE ──────────────────────────────────────────────────
+  { partName: "NVIDIA Jetson Orin NX 16GB", category: "compute", quantity: 1, unitCostUsd: 599, supplier: "NVIDIA/Arrow", specifications: "100 TOPS AI, 8-core ARM, 16GB LPDDR5 — main brain" },
+  { partName: "STM32H7 MCU (motor control)", category: "compute", quantity: 4, unitCostUsd: 15, supplier: "DigiKey/Mouser", specifications: "480MHz, FPU, CAN-FD, 1kHz PID — spine, arms, legs, hands" },
+  { partName: "ESP32-S3 MCU (sensor hub)", category: "compute", quantity: 8, unitCostUsd: 8, supplier: "AliExpress/DigiKey", specifications: "240MHz dual-core, WiFi+BT, 8MB PSRAM — sensor fusion nodes" },
+  { partName: "PCA9685 Servo Driver", category: "compute", quantity: 12, unitCostUsd: 4, supplier: "Adafruit/AliExpress", specifications: "16-ch PWM, I2C, 12-bit — finger/toe servo banks" },
+  // ─── POWER ────────────────────────────────────────────────────
+  { partName: "LiPo Battery 48V 20Ah", category: "power", quantity: 2, unitCostUsd: 350, supplier: "AliExpress/Alibaba", specifications: "48V, 20Ah, 960Wh, BMS, 60A continuous — hot-swappable pair" },
+  { partName: "DC-DC Converter 48V→12V 300W", category: "power", quantity: 3, unitCostUsd: 25, supplier: "AliExpress", specifications: "300W, 25A — spine actuators, servos" },
+  { partName: "DC-DC Converter 48V→5V 60W", category: "power", quantity: 4, unitCostUsd: 12, supplier: "AliExpress", specifications: "60W, 12A — sensors, MCUs, servo logic" },
+  { partName: "DC-DC Converter 48V→6V 120W", category: "power", quantity: 2, unitCostUsd: 18, supplier: "AliExpress", specifications: "120W, 20A — finger/toe servo power" },
+  // ─── COMMUNICATION ────────────────────────────────────────────
+  { partName: "CAN Bus Transceiver MCP2551", category: "communication", quantity: 20, unitCostUsd: 3, supplier: "DigiKey/AliExpress", specifications: "1Mbps, bus fault protection — all MCU nodes" },
+  { partName: "I2C Multiplexer TCA9548A", category: "communication", quantity: 6, unitCostUsd: 4, supplier: "Adafruit/DigiKey", specifications: "8-channel I2C mux — sensor buses" },
+  // ─── STRUCTURAL ───────────────────────────────────────────────
+  { partName: "Carbon Fiber Tube 20mm", category: "structural", quantity: 12, unitCostUsd: 15, supplier: "AliExpress/Alibaba", specifications: "20mm OD, 18mm ID, 500mm, 3K weave — limb shafts" },
+  { partName: "Carbon Fiber Tube 10mm", category: "structural", quantity: 8, unitCostUsd: 8, supplier: "AliExpress", specifications: "10mm OD, 8mm ID, 300mm — finger/toe frame" },
+  { partName: "Aluminum 7075 Plate", category: "structural", quantity: 6, unitCostUsd: 30, supplier: "AliExpress/MetalsDepot", specifications: "300x200x6mm, aircraft grade — hip, torso" },
+  { partName: "Titanium Fasteners M3-M8", category: "structural", quantity: 200, unitCostUsd: 0.5, supplier: "AliExpress/McMaster", specifications: "Grade 5, various lengths — joint assembly" },
+  { partName: "3D Printed Parts (PETG)", category: "structural", quantity: 120, unitCostUsd: 2, supplier: "Self-printed", specifications: "PETG, 0.2mm layer, 100% infill — finger phalanges, housings, spine segments" },
+  { partName: "Silicone Skin Panels", category: "structural", quantity: 20, unitCostUsd: 15, supplier: "AliExpress/SmoothOn", specifications: "Shore 10A, tactile sensor embedded, covers major body segments" },
+  // ─── JOINT HARDWARE ───────────────────────────────────────────
+  { partName: "Slip Ring 12ch (shoulder/hip)", category: "joint", quantity: 4, unitCostUsd: 35, supplier: "AliExpress", specifications: "12 channel, 2A per ring, 360° continuous rotation — shoulders + hips" },
+  { partName: "Miniature Ball Bearing 6mm", category: "joint", quantity: 80, unitCostUsd: 1.5, supplier: "AliExpress/SKF", specifications: "686ZZ, 6x13x5mm — finger/toe/spine pivots" },
+  { partName: "Precision Ball Bearing 20mm", category: "joint", quantity: 40, unitCostUsd: 5, supplier: "AliExpress/NSK", specifications: "6204ZZ, 20x47x14mm — elbow, wrist, ankle, knee" },
+  { partName: "Thrust Bearing 25mm", category: "joint", quantity: 8, unitCostUsd: 8, supplier: "AliExpress/NSK", specifications: "51105, 25x42x11mm — shoulder/hip 360° rotation support" },
+  // ─── TENDON SYSTEM (musculoskeletal) ──────────────────────────
+  { partName: "Steel Wire Rope 7x7 3mm", category: "tendon", quantity: 20, unitCostUsd: 8, supplier: "McMaster-Carr/AliExpress", specifications: "316 SS, 3mm, 7x7 strand, 8kN breaking, PTFE coated — legs, arms, spine" },
+  { partName: "Steel Wire Rope 7x7 4mm", category: "tendon", quantity: 6, unitCostUsd: 12, supplier: "McMaster-Carr", specifications: "316 SS, 4mm, 7x7 strand, 12kN breaking — Achilles, gluteal (power tendons)" },
+  { partName: "Steel Wire Rope 7x7 2.5mm", category: "tendon", quantity: 12, unitCostUsd: 6, supplier: "McMaster-Carr/AliExpress", specifications: "316 SS, 2.5mm, 6kN breaking — biceps, triceps, deltoid, hip abd/add" },
+  { partName: "Dyneema UHMWPE Cable 1mm", category: "tendon", quantity: 60, unitCostUsd: 2, supplier: "McMaster-Carr/Samson Rope", specifications: "1mm braided, 1800N breaking, 0.5% elongation — finger flexor/extensor" },
+  { partName: "Dyneema UHMWPE Cable 1.2mm", category: "tendon", quantity: 20, unitCostUsd: 3, supplier: "McMaster-Carr", specifications: "1.2mm braided, 2200N breaking — thumb, hallux tendons" },
+  { partName: "Dyneema UHMWPE Cable 0.8mm", category: "tendon", quantity: 30, unitCostUsd: 1.5, supplier: "AliExpress/Samson", specifications: "0.8mm braided, 800N breaking — finger abd/add, small toe tendons" },
+  { partName: "Nitinol SMA Wire 1.5mm", category: "tendon", quantity: 4, unitCostUsd: 25, supplier: "Dynalloy/DigiKey", specifications: "1.5mm, 70°C activation, 4% contraction, 2kN — neck flexor/extensor" },
+  { partName: "PTFE-Lined Sheath 5mm OD", category: "tendon", quantity: 30, unitCostUsd: 3, supplier: "McMaster-Carr/AliExpress", specifications: "5mm OD, 3mm ID, PTFE inner lining, SS braid outer — major tendon routing" },
+  { partName: "Bowden Cable Sheath 3mm OD", category: "tendon", quantity: 80, unitCostUsd: 1.5, supplier: "AliExpress/Jagwire", specifications: "3mm OD, 1.5mm ID, coiled SS, PTFE liner — finger/toe tendon routing" },
+  { partName: "Tendon Crimp Ferrule SS", category: "tendon", quantity: 300, unitCostUsd: 0.3, supplier: "McMaster-Carr", specifications: "Copper/SS, crimp-on, various sizes — tendon termination" },
+  { partName: "Tendon Tensioner (adjustable)", category: "tendon", quantity: 40, unitCostUsd: 5, supplier: "AliExpress/McMaster", specifications: "Inline cable tensioner, M3, 0-200N adjustable — pretension calibration" },
+  { partName: "Tendon Pulley (PEEK)", category: "tendon", quantity: 60, unitCostUsd: 3, supplier: "McMaster-Carr/3D-printed", specifications: "PEEK or 3D-printed, 8mm, ball bearing center — routing around joints" },
+  // ─── HYDRAULIC SYSTEM (explosive power) ───────────────────────
+  { partName: "Micro Hydraulic Cylinder 32mm", category: "hydraulic", quantity: 4, unitCostUsd: 85, supplier: "AliExpress/Parker", specifications: "32mm bore, 120mm stroke, 200bar, servo valve — knee/hip power pistons" },
+  { partName: "Micro Hydraulic Cylinder 40mm", category: "hydraulic", quantity: 2, unitCostUsd: 120, supplier: "Parker/AliExpress", specifications: "40mm bore, 150mm stroke, 250bar, servo valve — hip explosive power" },
+  { partName: "Micro Hydraulic Cylinder 25mm", category: "hydraulic", quantity: 2, unitCostUsd: 65, supplier: "AliExpress", specifications: "25mm bore, 80mm stroke, 200bar — ankle push-off pistons" },
+  { partName: "Electro-Hydraulic Pump 48V", category: "hydraulic", quantity: 1, unitCostUsd: 280, supplier: "AliExpress/Bucher Hydraulics", specifications: "48V BLDC, 2.5cc/rev, 250bar max, 1.5L/min, 200W — central hydraulic pump" },
+  { partName: "Hydraulic Accumulator 100cc", category: "hydraulic", quantity: 2, unitCostUsd: 45, supplier: "AliExpress/Parker", specifications: "100cc bladder, 250bar, nitrogen pre-charge — burst power for jumps/flips" },
+  { partName: "Hydraulic Reservoir 500ml", category: "hydraulic", quantity: 1, unitCostUsd: 30, supplier: "AliExpress", specifications: "500ml, aluminum, with filter/breather — fluid storage" },
+  { partName: "Hydraulic Servo Valve", category: "hydraulic", quantity: 8, unitCostUsd: 55, supplier: "AliExpress/Moog", specifications: "Proportional, 10L/min, 250bar, CAN controlled — each piston" },
+  { partName: "Hydraulic Hose 4mm", category: "hydraulic", quantity: 15, unitCostUsd: 8, supplier: "AliExpress/Parker", specifications: "4mm ID, 250bar rated, Teflon core, SS braid — piston lines" },
+  { partName: "Synthetic Hydraulic Fluid 1L", category: "hydraulic", quantity: 2, unitCostUsd: 25, supplier: "AliExpress/Mobil", specifications: "Synthetic, -40°C to 200°C, fire-resistant, biodegradable" },
+  // ─── PNEUMATIC SYSTEM (arm assist) ────────────────────────────
+  { partName: "Pneumatic Cylinder 20mm", category: "pneumatic", quantity: 2, unitCostUsd: 25, supplier: "AliExpress/Festo", specifications: "20mm bore, 100mm stroke, 8bar — shoulder assist" },
+  { partName: "Pneumatic Cylinder 16mm", category: "pneumatic", quantity: 2, unitCostUsd: 18, supplier: "AliExpress/Festo", specifications: "16mm bore, 80mm stroke, 8bar — elbow assist" },
+  { partName: "Mini Air Compressor 12V", category: "pneumatic", quantity: 1, unitCostUsd: 45, supplier: "AliExpress", specifications: "12V, 100PSI, 0.5L/min, ultra-quiet — pneumatic supply" },
+  { partName: "Air Reservoir 200ml", category: "pneumatic", quantity: 1, unitCostUsd: 15, supplier: "AliExpress", specifications: "200ml aluminum, 10bar rated — pressure buffer" },
+  { partName: "Proportional Solenoid Valve", category: "pneumatic", quantity: 4, unitCostUsd: 22, supplier: "AliExpress/Festo", specifications: "5/3 way, proportional, 12V, CAN — arm pneumatic control" },
+  // ─── SPRINGS & ENERGY STORAGE ─────────────────────────────────
+  { partName: "Compression Spring (ankle)", category: "spring", quantity: 4, unitCostUsd: 8, supplier: "McMaster-Carr/Lee Spring", specifications: "Spring steel, 80N/mm, 100mm free, 50mm deflection — ankle energy return" },
+  { partName: "Extension Spring (knee)", category: "spring", quantity: 4, unitCostUsd: 6, supplier: "McMaster-Carr/Lee Spring", specifications: "Spring steel, 40N/mm, 80mm free, 60mm deflection — knee energy return" },
+  { partName: "Torsion Spring (hip)", category: "spring", quantity: 4, unitCostUsd: 12, supplier: "McMaster-Carr", specifications: "Titanium, 60N/mm, 90° deflection, 120J storage — hip explosive power" },
+  { partName: "Carbon Fiber Leaf Spring (foot)", category: "spring", quantity: 4, unitCostUsd: 25, supplier: "AliExpress/Össur", specifications: "CF layup, 100N/mm, 20mm deflection — foot arch energy return (like running blades)" },
+  { partName: "Constant Force Spring (shoulder)", category: "spring", quantity: 4, unitCostUsd: 10, supplier: "McMaster-Carr/Vulcan", specifications: "Spring steel, 15N/mm constant — shoulder gravity compensation" },
+  { partName: "Torsion Spring (spine)", category: "spring", quantity: 2, unitCostUsd: 15, supplier: "McMaster-Carr", specifications: "Titanium, 50N/mm, 45° deflection — core energy return for flips" },
+  // ─── SHOCK ABSORBERS & DAMPERS ────────────────────────────────
+  { partName: "Magnetorheological Damper (knee)", category: "damper", quantity: 2, unitCostUsd: 120, supplier: "Lord Corp/AliExpress", specifications: "MR fluid, 5kN max, 40mm stroke, adjustable via current — knee landing" },
+  { partName: "Magnetorheological Damper (ankle)", category: "damper", quantity: 2, unitCostUsd: 95, supplier: "Lord Corp/AliExpress", specifications: "MR fluid, 3kN max, 30mm stroke — ankle landing impact" },
+  { partName: "Viscous Damper (hip)", category: "damper", quantity: 2, unitCostUsd: 40, supplier: "AliExpress/ACE", specifications: "6kN max, 50mm stroke, non-adjustable — hip impact absorption" },
+  { partName: "Elastomer Pad (foot sole)", category: "damper", quantity: 4, unitCostUsd: 8, supplier: "AliExpress/Sorbothane", specifications: "Sorbothane, 2kN, 10mm, Shore 30A — foot impact padding" },
+  { partName: "Elastomer Pad (wrist)", category: "damper", quantity: 4, unitCostUsd: 5, supplier: "AliExpress/Sorbothane", specifications: "Sorbothane, 1kN, 8mm — wrist/palm collision protection" },
+  { partName: "Air Spring (spine)", category: "damper", quantity: 1, unitCostUsd: 35, supplier: "AliExpress/Firestone", specifications: "3kN, 20mm stroke, adjustable pressure — spine vibration isolation" },
+  { partName: "MR Fluid 100ml", category: "damper", quantity: 2, unitCostUsd: 30, supplier: "Lord Corp", specifications: "MRF-140CG, 100ml — magnetorheological damper fluid" },
+  // ─── OUTPUT ───────────────────────────────────────────────────
   { partName: "Speaker 3W", category: "output", quantity: 1, unitCostUsd: 5, supplier: "AliExpress", specifications: "3W, 8ohm, 40mm, I2S DAC" },
-  { partName: "Cooling Fan 40mm", category: "thermal", quantity: 4, unitCostUsd: 3, supplier: "AliExpress", specifications: "40x40x10mm, 5V, 6000rpm, ball bearing" },
+  { partName: "OLED Display 1.3in", category: "output", quantity: 1, unitCostUsd: 8, supplier: "AliExpress", specifications: "128x64, I2C, status display on chest" },
+  // ─── THERMAL ──────────────────────────────────────────────────
+  { partName: "Cooling Fan 40mm", category: "thermal", quantity: 6, unitCostUsd: 3, supplier: "AliExpress", specifications: "40x40x10mm, 5V, 6000rpm, ball bearing — compute + hydraulic cooling" },
+  { partName: "Heat Pipe (Jetson cooling)", category: "thermal", quantity: 2, unitCostUsd: 12, supplier: "AliExpress", specifications: "6mm dia, 150mm, copper — Jetson heatsink" },
+  { partName: "Hydraulic Oil Cooler", category: "thermal", quantity: 1, unitCostUsd: 25, supplier: "AliExpress", specifications: "12V fan, aluminum, 200W dissipation — hydraulic fluid cooling" },
 ];
 
 function computeForwardKinematics(jointAnglesRad: number[]): Array<{ joint: string; position: [number, number, number]; rotation: number[] }> {
@@ -1025,8 +1933,13 @@ function computeForwardKinematics(jointAnglesRad: number[]): Array<{ joint: stri
   let x = 0, y = 0, z = 0;
   let totalAngle = 0;
 
-  const armChain = HUMANOID_JOINTS.filter(j => j.name.startsWith("l_shoulder") || j.name === "l_elbow" || j.name.startsWith("l_wrist"));
-  const armLinks = KINEMATIC_LINKS.filter(l => l.name.startsWith("l_"));
+  const armChain = HUMANOID_JOINTS.filter(j =>
+    j.name.startsWith("l_glenohumeral") || j.name === "l_ulnohumeral" ||
+    j.name.startsWith("l_radiocarpal") || j.name === "l_proximal_radioulnar"
+  );
+  const armLinks = KINEMATIC_LINKS.filter(l =>
+    l.name === "l_humerus" || l.name === "l_ulna" || l.name === "l_radius" || l.name === "l_hand_base"
+  );
 
   for (let i = 0; i < Math.min(armChain.length, jointAnglesRad.length); i++) {
     const joint = armChain[i];
@@ -1180,6 +2093,41 @@ export function getServoFirmware(jointName: string): string { return generateSer
 export function getForwardKinematics(anglesRad: number[]): ReturnType<typeof computeForwardKinematics> {
   return computeForwardKinematics(anglesRad);
 }
+export function getMusculoskeletalSystem() { return MUSCULOSKELETAL; }
+export function getMusculoskeletalSummary() {
+  const { tendons, pistons, springs, shockAbsorbers, motorControlBrain } = MUSCULOSKELETAL;
+  const tendonsByMaterial: Record<string, number> = {};
+  for (const t of tendons) tendonsByMaterial[t.material] = (tendonsByMaterial[t.material] || 0) + 1;
+  const pistonsByType: Record<string, number> = {};
+  for (const p of pistons) pistonsByType[p.type] = (pistonsByType[p.type] || 0) + 1;
+  const bidirectionalJoints = HUMANOID_JOINTS.filter(j => j.anatomicalName.includes("BIDIRECTIONAL"));
+  const fullRotationJoints = HUMANOID_JOINTS.filter(j => j.is360);
+  const totalTendonForceN = tendons.reduce((s, t) => s + t.breakingStrengthN, 0);
+  const totalPistonForceN = pistons.reduce((s, p) => s + p.maxForceN, 0);
+  const totalSpringEnergyJ = springs.reduce((s, sp) => s + sp.energyStorageJ, 0);
+  const totalMCBPowerW = motorControlBrain.reduce((s, m) => s + m.powerBudgetW, 0);
+  return {
+    tendonCount: tendons.length,
+    tendonsByMaterial,
+    totalTendonForceN,
+    antagonisticPairs: tendons.filter(t => t.antagonistTendon).length / 2,
+    pistonCount: pistons.length,
+    pistonsByType,
+    totalPistonForceN,
+    springCount: springs.length,
+    totalSpringEnergyJ,
+    shockAbsorberCount: shockAbsorbers.length,
+    motorControlNodes: motorControlBrain.length,
+    totalMCBPowerW,
+    bidirectionalJointCount: bidirectionalJoints.length,
+    fullRotationJointCount: fullRotationJoints.length,
+    athleticCapabilities: [
+      "vertical_jump", "broad_jump", "backflip", "front_flip", "pull_up", "push_up",
+      "squat", "sprint", "climb", "cartwheel", "handstand", "parkour_vault",
+      "bidirectional_grip", "reverse_finger_grab", "toe_grip_balance"
+    ],
+  };
+}
 
 export function getEmbodimentState(): EmbodimentState & {
   jointCount: number;
@@ -1187,8 +2135,16 @@ export function getEmbodimentState(): EmbodimentState & {
   bomEntries: number;
   totalBomCost: number;
   totalDOF: number;
+  tendonCount: number;
+  pistonCount: number;
+  springCount: number;
+  shockAbsorberCount: number;
+  motorControlNodes: number;
+  bidirectionalJoints: number;
+  full360Joints: number;
 } {
   const bomSummary = computeTotalBOMCost();
+  const msk = MUSCULOSKELETAL;
   return {
     ...JSON.parse(JSON.stringify(state)),
     jointCount: HUMANOID_JOINTS.length,
@@ -1196,6 +2152,13 @@ export function getEmbodimentState(): EmbodimentState & {
     bomEntries: BILL_OF_MATERIALS.length,
     totalBomCost: bomSummary.totalCost,
     totalDOF: HUMANOID_JOINTS.length,
+    tendonCount: msk.tendons.length,
+    pistonCount: msk.pistons.length,
+    springCount: msk.springs.length,
+    shockAbsorberCount: msk.shockAbsorbers.length,
+    motorControlNodes: msk.motorControlBrain.length,
+    bidirectionalJoints: HUMANOID_JOINTS.filter(j => j.anatomicalName.includes("BIDIRECTIONAL")).length,
+    full360Joints: HUMANOID_JOINTS.filter(j => j.is360).length,
   };
 }
 

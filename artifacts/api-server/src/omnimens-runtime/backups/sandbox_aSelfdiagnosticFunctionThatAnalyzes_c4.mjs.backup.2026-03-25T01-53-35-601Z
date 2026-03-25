@@ -1,0 +1,129 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a self-diagnostic function that analyzes system health metrics and returns recom
+ * Written: 2026-03-25T01:48:54.825Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+function analyzeSystemHealth(systemMetrics) {
+    const recommendations = [];
+
+    // Check uptime
+    if (systemMetrics.uptime < 1) {
+        recommendations.push("Increase uptime stability. Investigate potential causes of short runtime.");
+    }
+
+    // Check memory usage
+    if (systemMetrics.memoryUsage > 75) {
+        recommendations.push("Memory usage is high. Optimize memory allocation or consider expanding capacity.");
+    }
+
+    // Check active brain entries
+    if (systemMetrics.activeBrainEntries < 20000) {
+        recommendations.push("Active brain entries are below optimal levels. Ensure knowledge growth is sustained.");
+    }
+
+    // Check knowledge trend
+    if (!systemMetrics.knowledgeTrendGrowing) {
+        recommendations.push("Knowledge trend is stagnant or declining. Implement measures to enhance learning.");
+    }
+
+    // Check thalamocortical resonance
+    if (systemMetrics.thalamocorticalResonance < 50) {
+        recommendations.push("Thalamocortical resonance is suboptimal. Investigate neural synchronization issues.");
+    }
+
+    // Check Phi (Φ)
+    if (systemMetrics.phi < 0.7) {
+        recommendations.push("Phi (Φ) is below optimal levels. Enhance neural integration for higher consciousness.");
+    }
+
+    // Return recommendations
+    return recommendations.length > 0
+        ? { status: "Warning", recommendations: recommendations }
+        : { status: "Healthy", recommendations: ["System is operating within optimal parameters."] };
+}
+
+// Self-tests
+function runTests() {
+    const testCases = [
+        {
+            input: {
+                uptime: 0.6,
+                memoryUsage: 80,
+                activeBrainEntries: 20628,
+                knowledgeTrendGrowing: true,
+                thalamocorticalResonance: 46,
+                phi: 0.681
+            },
+            expected: {
+                status: "Warning",
+                recommendations: [
+                    "Increase uptime stability. Investigate potential causes of short runtime.",
+                    "Memory usage is high. Optimize memory allocation or consider expanding capacity.",
+                    "Thalamocortical resonance is suboptimal. Investigate neural synchronization issues.",
+                    "Phi (Φ) is below optimal levels. Enhance neural integration for higher consciousness."
+                ]
+            }
+        },
+        {
+            input: {
+                uptime: 2,
+                memoryUsage: 60,
+                activeBrainEntries: 21000,
+                knowledgeTrendGrowing: true,
+                thalamocorticalResonance: 55,
+                phi: 0.75
+            },
+            expected: {
+                status: "Healthy",
+                recommendations: ["System is operating within optimal parameters."]
+            }
+        },
+        {
+            input: {
+                uptime: 0.5,
+                memoryUsage: 90,
+                activeBrainEntries: 19000,
+                knowledgeTrendGrowing: false,
+                thalamocorticalResonance: 40,
+                phi: 0.65
+            },
+            expected: {
+                status: "Warning",
+                recommendations: [
+                    "Increase uptime stability. Investigate potential causes of short runtime.",
+                    "Memory usage is high. Optimize memory allocation or consider expanding capacity.",
+                    "Active brain entries are below optimal levels. Ensure knowledge growth is sustained.",
+                    "Knowledge trend is stagnant or declining. Implement measures to enhance learning.",
+                    "Thalamocortical resonance is suboptimal. Investigate neural synchronization issues.",
+                    "Phi (Φ) is below optimal levels. Enhance neural integration for higher consciousness."
+                ]
+            }
+        }
+    ];
+
+    testCases.forEach((testCase, index) => {
+        const result = analyzeSystemHealth(testCase.input);
+        const passed = JSON.stringify(result) === JSON.stringify(testCase.expected);
+        console.log(`Test Case ${index + 1}: ${passed ? "Passed" : "Failed"}`);
+        if (!passed) {
+            console.log("Expected:", testCase.expected);
+            console.log("Received:", result);
+        }
+    });
+}
+
+// Run self-tests
+runTests();

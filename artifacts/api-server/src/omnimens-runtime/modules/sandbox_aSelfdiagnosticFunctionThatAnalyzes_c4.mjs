@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a self-diagnostic function that analyzes system health metrics and returns recom
- * Written: 2026-03-25T01:07:03.781Z
+ * Written: 2026-03-25T01:53:35.600Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,52 +16,85 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function analyzeSystemHealth(uptime, memoryUsage, memoryCapacity, activeBrainEntries, knowledgeTrend) {
-  const recommendations = [];
+function analyzeSystemHealth(metrics) {
+    const recommendations = [];
+    
+    // Check for CPU usage
+    if (metrics.cpuUsage > 85) {
+        recommendations.push("Reduce CPU load by optimizing processes or scaling resources.");
+    } else if (metrics.cpuUsage < 20) {
+        recommendations.push("Consider consolidating tasks or reducing idle resources.");
+    }
 
-  // Check uptime
-  if (uptime < 1) {
-    recommendations.push("Increase uptime stability. Investigate potential system interruptions.");
-  }
+    // Check for memory usage
+    if (metrics.memoryUsage > 90) {
+        recommendations.push("Increase memory capacity or optimize memory-intensive tasks.");
+    } else if (metrics.memoryUsage < 30) {
+        recommendations.push("Evaluate memory allocation to ensure efficient usage.");
+    }
 
-  // Check memory usage
-  const memoryUsagePercentage = (memoryUsage / memoryCapacity) * 100;
-  if (memoryUsagePercentage > 90) {
-    recommendations.push("Memory usage is critically high. Optimize memory allocation or expand capacity.");
-  } else if (memoryUsagePercentage > 75) {
-    recommendations.push("Memory usage is high. Consider optimizing memory-intensive processes.");
-  }
+    // Check for disk usage
+    if (metrics.diskUsage > 80) {
+        recommendations.push("Free up disk space or expand storage capacity.");
+    } else if (metrics.diskUsage < 20) {
+        recommendations.push("Consider reducing unused storage to optimize costs.");
+    }
 
-  // Check active brain entries
-  if (activeBrainEntries > 20000) {
-    recommendations.push("Active brain entries are nearing capacity. Review and prune unused entries.");
-  }
+    // Check for network latency
+    if (metrics.networkLatency > 200) {
+        recommendations.push("Investigate network bottlenecks or upgrade bandwidth.");
+    } else if (metrics.networkLatency < 50) {
+        recommendations.push("Network performance is optimal.");
+    }
 
-  // Check knowledge trend
-  if (knowledgeTrend === "growing") {
-    recommendations.push("Knowledge trend is positive. Continue current learning processes.");
-  } else if (knowledgeTrend === "stagnant") {
-    recommendations.push("Knowledge trend is stagnant. Investigate and enhance learning mechanisms.");
-  } else if (knowledgeTrend === "declining") {
-    recommendations.push("Knowledge trend is declining. Address potential knowledge loss or system degradation.");
-  }
+    // Check for error rates
+    if (metrics.errorRate > 5) {
+        recommendations.push("Analyze error logs and resolve recurring issues.");
+    } else if (metrics.errorRate === 0) {
+        recommendations.push("System stability is excellent.");
+    }
 
-  return recommendations;
+    return recommendations;
 }
 
 // Self-tests
-console.log("Test Case 1:");
-console.log(analyzeSystemHealth(0.6, 264, 284, 20280, "growing")); 
-// Expected: ["Increase uptime stability. Investigate potential system interruptions.", "Memory usage is critically high. Optimize memory allocation or expand capacity.", "Active brain entries are nearing capacity. Review and prune unused entries.", "Knowledge trend is positive. Continue current learning processes."]
+function runTests() {
+    console.log("Test 1: High CPU and memory usage");
+    console.log(analyzeSystemHealth({
+        cpuUsage: 90,
+        memoryUsage: 95,
+        diskUsage: 50,
+        networkLatency: 100,
+        errorRate: 3
+    }));
 
-console.log("Test Case 2:");
-console.log(analyzeSystemHealth(2, 150, 284, 15000, "stagnant")); 
-// Expected: ["Memory usage is high. Consider optimizing memory-intensive processes.", "Knowledge trend is stagnant. Investigate and enhance learning mechanisms."]
+    console.log("Test 2: Low resource usage");
+    console.log(analyzeSystemHealth({
+        cpuUsage: 15,
+        memoryUsage: 25,
+        diskUsage: 10,
+        networkLatency: 40,
+        errorRate: 0
+    }));
 
-console.log("Test Case 3:");
-console.log(analyzeSystemHealth(5, 100, 284, 18000, "declining")); 
-// Expected: ["Knowledge trend is declining. Address potential knowledge loss or system degradation."]
+    console.log("Test 3: High error rate and network latency");
+    console.log(analyzeSystemHealth({
+        cpuUsage: 50,
+        memoryUsage: 60,
+        diskUsage: 70,
+        networkLatency: 250,
+        errorRate: 10
+    }));
 
-console.log("Test Case 4:");
-console.log(analyzeSystemHealth(10, 50, 284, 10000, "growing")); 
-// Expected: ["Knowledge trend is positive. Continue current learning processes."]
+    console.log("Test 4: Optimal conditions");
+    console.log(analyzeSystemHealth({
+        cpuUsage: 50,
+        memoryUsage: 50,
+        diskUsage: 50,
+        networkLatency: 30,
+        errorRate: 0
+    }));
+}
+
+// Execute tests
+runTests();
