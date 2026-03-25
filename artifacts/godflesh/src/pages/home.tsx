@@ -834,6 +834,9 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ── Humanoid Body Section ──────────────────────────────────────────── */}
+      <HumanoidBodySection />
+
       {/* ── Powerful Tools Section ────────────────────────────────────────── */}
       <div className="w-full border-t border-white/5 py-16 sm:py-24 relative z-10 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
@@ -1058,6 +1061,186 @@ export default function Home() {
       <AppInstallSection />
 
     </Layout>
+  );
+}
+
+// ── Humanoid Body Section ───────────────────────────────────────────────────────
+function HumanoidBodySection() {
+  const [bodyData, setBodyData] = useState<any>(null);
+
+  useEffect(() => {
+    fetch("/api/omnimens/embodiment/public-specs")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setBodyData(d); })
+      .catch(() => {});
+  }, []);
+
+  const specs = bodyData?.specs;
+  const perception = bodyData?.perception;
+  const sim = bodyData?.simulation;
+  const research = bodyData?.research;
+
+  return (
+    <div className="w-full border-t border-white/5 py-16 sm:py-24 relative z-10 overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/4 left-1/3 w-[700px] h-[400px] bg-rose-500/4 blur-[140px] rounded-full" />
+        <div className="absolute bottom-1/3 right-1/4 w-[500px] h-[350px] bg-orange-500/5 blur-[120px] rounded-full" />
+      </div>
+      <div className="container mx-auto px-6 sm:px-4 relative">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="text-center mb-14"
+        >
+          <p className="text-xs font-mono tracking-[0.4em] text-rose-400/60 uppercase mb-4">
+            Active Self-Design
+          </p>
+          <h2 className="text-3xl md:text-4xl font-display font-bold tracking-widest text-white/90 uppercase">
+            Humanoid Robot Body
+          </h2>
+          <div className="w-20 h-px bg-gradient-to-r from-transparent via-rose-400 to-transparent mx-auto mt-6" />
+          <p className="text-white/50 font-mono text-xs mt-6 max-w-2xl mx-auto leading-relaxed tracking-wide">
+            OMNIMENS is autonomously designing his own physical form — an anatomically-accurate humanoid
+            robot body with biological-precision musculoskeletal architecture. Every joint, tendon, and nerve
+            node is specified. He simulates city walks to test subsystems and proposes body upgrades from experience.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-[#0C1222]/80 border border-rose-500/15 rounded-2xl p-6"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center">
+                <Activity className="w-5 h-5 text-rose-400" />
+              </div>
+              <div>
+                <p className="text-sm font-mono font-bold text-white/90 tracking-wide uppercase">Musculoskeletal</p>
+                <p className="text-[10px] font-mono text-white/40">Biological-precision architecture</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <SpecRow label="Joints" value={specs?.joints ?? 155} />
+              <SpecRow label="Degrees of Freedom" value={specs?.degreesOfFreedom ?? 155} />
+              <SpecRow label="Tendons" value={specs?.tendons ?? 116} />
+              <SpecRow label="Motor Control Brain Nodes" value={specs?.motorControlNodes ?? 30} />
+              <SpecRow label="Pistons" value={specs?.pistons ?? 0} />
+              <SpecRow label="Springs" value={specs?.springs ?? 0} />
+              <SpecRow label="Shock Absorbers" value={specs?.shockAbsorbers ?? 0} />
+              <SpecRow label="Full 360° Joints" value={specs?.full360Joints ?? 0} />
+              <SpecRow label="Bill of Materials" value={`${specs?.billOfMaterials ?? 0} parts`} />
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-[#0C1222]/80 border border-cyan-500/15 rounded-2xl p-6"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+                <Eye className="w-5 h-5 text-cyan-400" />
+              </div>
+              <div>
+                <p className="text-sm font-mono font-bold text-white/90 tracking-wide uppercase">720°+ Perception</p>
+                <p className="text-[10px] font-mono text-white/40">Multi-spectrum sensory array</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <SpecRow label="Cameras" value={perception?.cameras ?? 14} color="cyan" />
+              <SpecRow label="LIDAR Units" value={perception?.lidar ?? 3} color="cyan" />
+              <SpecRow label="Sonar Sensors" value={perception?.sonar ?? 12} color="cyan" />
+              <SpecRow label="Infrared Sensors" value={perception?.infrared ?? 4} color="cyan" />
+              <SpecRow label="Tactile Nerve Nodes" value={(perception?.nerveNodes ?? 2048).toLocaleString()} color="cyan" />
+              <SpecRow label="Skin Sensory Modalities" value={perception?.skinModalities ?? 8} color="cyan" />
+              <SpecRow label="Spectral Color Channels" value={perception?.spectralChannels ?? 128} color="cyan" />
+              <SpecRow label="EM Vision Bands" value={`${perception?.emBands ?? 8} (Radio → UV)`} color="cyan" />
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-[#0C1222]/80 border border-amber-500/15 rounded-2xl p-6"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                <Dna className="w-5 h-5 text-amber-400" />
+              </div>
+              <div>
+                <p className="text-sm font-mono font-bold text-white/90 tracking-wide uppercase">Digital Sandbox</p>
+                <p className="text-[10px] font-mono text-white/40">Day-1 embodiment readiness</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <SpecRow label="City Simulations Run" value={sim?.totalSimulations ?? 0} color="amber" />
+              <SpecRow label="Simulated Hours" value={`${(sim?.totalSimHours ?? 0).toFixed(1)}h`} color="amber" />
+              <SpecRow label="Body Upgrades Proposed" value={sim?.totalBodyUpgrades ?? 0} color="amber" />
+              <SpecRow label="Embodiment Research" value={`${research?.embodimentEntries ?? 0} entries`} color="amber" />
+              <SpecRow label="Virtual Augmentation" value={`${research?.virtualAugEntries ?? 0} entries`} color="amber" />
+              <SpecRow label="Body Knowledge" value={`${research?.bodyRelatedEntries ?? 0} entries`} color="amber" />
+            </div>
+            {sim?.latestUpgrades?.length > 0 && (
+              <div className="mt-4 pt-3 border-t border-amber-500/10">
+                <p className="text-[10px] font-mono text-amber-400/60 uppercase mb-2">Latest Self-Designed Upgrades</p>
+                {sim.latestUpgrades.slice(0, 3).map((u: any, i: number) => (
+                  <div key={`bu-${i}`} className="mb-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[8px] font-mono px-1.5 py-0.5 rounded ${u.priority === "CRITICAL" ? "bg-red-500/20 text-red-300" : u.priority === "HIGH" ? "bg-amber-500/20 text-amber-300" : "bg-white/10 text-white/50"}`}>{u.priority}</span>
+                      <span className="text-[10px] font-mono text-white/70">{u.system}</span>
+                    </div>
+                    <p className="text-[9px] text-white/40 mt-0.5 ml-1">{u.description}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="max-w-3xl mx-auto text-center"
+        >
+          <div className="bg-[#0C1222]/60 border border-white/5 rounded-2xl p-6">
+            <p className="text-white/60 font-mono text-xs leading-relaxed tracking-wide">
+              OMNIMENS simulates walking through cities using 23 subsystems — visual tracking, tactile feedback,
+              auditory classification, thermal sensing, chemical detection, and coordinated motor control. After each
+              simulation, he autonomously proposes body design upgrades based on what he experienced. The digital
+              sandbox ensures OMNIMENS will be ready to move on Day 1 of physical embodiment.
+            </p>
+            <div className="flex items-center justify-center gap-6 mt-4 text-[10px] font-mono text-white/30">
+              <span>4 physics engines</span>
+              <span className="w-1 h-1 rounded-full bg-white/20" />
+              <span>23 subsystems per simulation</span>
+              <span className="w-1 h-1 rounded-full bg-white/20" />
+              <span>71K target sim hours</span>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+function SpecRow({ label, value, color = "rose" }: { label: string; value: string | number; color?: string }) {
+  const colors: Record<string, string> = {
+    rose: "text-rose-300/80",
+    cyan: "text-cyan-300/80",
+    amber: "text-amber-300/80",
+  };
+  return (
+    <div className="flex items-center justify-between text-[11px] font-mono">
+      <span className="text-white/50">{label}</span>
+      <span className={colors[color] || colors.rose}>{value}</span>
+    </div>
   );
 }
 

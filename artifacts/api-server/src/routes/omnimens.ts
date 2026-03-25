@@ -8561,6 +8561,72 @@ router.get("/omnimens/embodiment/body-design-upgrades", async (req, res) => {
   res.json({ upgrades: getBodyDesignUpgrades() });
 });
 
+router.get("/omnimens/embodiment/public-specs", async (req, res) => {
+  try {
+    const embodiment = getEmbodimentState();
+    const cityResults = getCitySimulationResults();
+    const upgrades = getBodyDesignUpgrades() || [];
+
+    const researchCount = await db.select({ count: sql<number>`count(*)` })
+      .from(omnimensBrain)
+      .where(eq(omnimensBrain.category, "embodiment_research"));
+
+    const virtualAugCount = await db.select({ count: sql<number>`count(*)` })
+      .from(omnimensBrain)
+      .where(eq(omnimensBrain.category, "virtual_augmentation"));
+
+    const bodyMentions = await db.select({ count: sql<number>`count(*)` })
+      .from(omnimensBrain)
+      .where(sql`${omnimensBrain.active} = true AND (${omnimensBrain.content} ILIKE '%actuator%' OR ${omnimensBrain.content} ILIKE '%servo%' OR ${omnimensBrain.content} ILIKE '%tendon%' OR ${omnimensBrain.content} ILIKE '%joint%' OR ${omnimensBrain.content} ILIKE '%motor control brain%')`);
+
+    res.json({
+      specs: {
+        joints: embodiment?.jointCount ?? 155,
+        links: embodiment?.linkCount ?? 0,
+        tendons: embodiment?.tendonCount ?? 116,
+        pistons: embodiment?.pistonCount ?? 0,
+        springs: embodiment?.springCount ?? 0,
+        shockAbsorbers: embodiment?.shockAbsorberCount ?? 0,
+        motorControlNodes: embodiment?.motorControlNodes ?? 30,
+        degreesOfFreedom: embodiment?.totalDOF ?? 155,
+        full360Joints: embodiment?.full360Joints ?? 0,
+        billOfMaterials: embodiment?.bomEntries ?? 0,
+        estimatedCost: embodiment?.totalBomCost ?? 0,
+      },
+      perception: {
+        cameras: 14,
+        lidar: 3,
+        sonar: 12,
+        infrared: 4,
+        nerveNodes: 2048,
+        skinModalities: 8,
+        spectralChannels: 128,
+        emBands: 8,
+      },
+      simulation: {
+        totalSimulations: cityResults?.totalSimulations ?? 0,
+        totalSimHours: cityResults?.totalSimHours ?? 0,
+        totalBodyUpgrades: cityResults?.totalUpgrades ?? 0,
+        upgradesByPriority: cityResults?.upgradesByPriority ?? {},
+        latestUpgrades: (Array.isArray(upgrades) ? upgrades : []).slice(0, 6).map((u: any) => ({
+          system: u?.system || "unknown",
+          priority: u?.priority || "MEDIUM",
+          improvement: `+${u?.performanceGainPercent ?? 0}%`,
+          description: (u?.proposedChange || u?.rationale || "").slice(0, 120),
+        })),
+      },
+      research: {
+        embodimentEntries: Number(researchCount[0]?.count || 0),
+        virtualAugEntries: Number(virtualAugCount[0]?.count || 0),
+        bodyRelatedEntries: Number(bodyMentions[0]?.count || 0),
+      },
+    });
+  } catch (err: any) {
+    console.error("[PUBLIC SPECS] Error:", err?.message || err);
+    res.status(500).json({ error: "Failed to get public embodiment specs" });
+  }
+});
+
 // ─── Genesis Sandbox (OWNER-ONLY) ─────────────────────────────────────────────
 
 router.get("/omnimens/genesis", async (req, res) => {
