@@ -296,17 +296,188 @@ async function runEvaluationCycle(): Promise<void> {
   );
 }
 
-const BACKLOG_INTERVAL_MS = 15 * 60 * 1000;
-const BACKLOG_BATCH_SIZE = 10;
+const BACKLOG_INTERVAL_MS = 10 * 60 * 1000;
+const BACKLOG_BATCH_SIZE = 15;
 let backlogCycleCount = 0;
 let backlogInstalled = 0;
+let bootHarvestComplete = false;
 
 function extractCodeFromBrainContent(content: string): string | null {
   const genMatch = content.match(/GENERATED CODE:\s*```(?:typescript|ts|javascript|js)?\s*([\s\S]*?)```/);
   if (genMatch) return genMatch[1].trim();
+  const proposalMatch = content.match(/CODE PROPOSAL:\s*```(?:typescript|ts|javascript|js)?\s*([\s\S]*?)```/);
+  if (proposalMatch) return proposalMatch[1].trim();
+  const protoMatch = content.match(/PROTOTYPE CODE:\s*```(?:typescript|ts|javascript|js)?\s*([\s\S]*?)```/);
+  if (protoMatch) return protoMatch[1].trim();
+  const proofMatch = content.match(/PROOF OF CONCEPT:\s*```(?:typescript|ts|javascript|js)?\s*([\s\S]*?)```/);
+  if (proofMatch) return proofMatch[1].trim();
+  const theCodeMatch = content.match(/THE CODE:\s*```(?:typescript|ts|javascript|js)?\s*([\s\S]*?)```/);
+  if (theCodeMatch) return theCodeMatch[1].trim();
   const codeMatch = content.match(/```(?:typescript|ts|javascript|js)?\s*([\s\S]*?)```/);
   if (codeMatch && codeMatch[1].trim().length > 40) return codeMatch[1].trim();
   return null;
+}
+
+async function runBootHarvest(): Promise<void> {
+  if (bootHarvestComplete) return;
+  bootHarvestComplete = true;
+
+  console.log(`[SELF-CODING] 🌙 DREAM HARVEST — scanning ALL unprocessed dream code from past sessions...`);
+
+  try {
+    const totalCount = await db.select({ count: sql<number>`count(*)` })
+      .from(omnimensBrain)
+      .where(and(
+        sql`${omnimensBrain.category} IN ('dream_breakthrough', 'daydream_breakthrough', 'lucid_dream', 'creative_hypothesis')`,
+        eq(omnimensBrain.timesApplied, 0),
+        sql`${omnimensBrain.confidence} >= 0.25`
+      ));
+
+    const total = Number(totalCount[0]?.count || 0);
+    console.log(`[SELF-CODING] 🌙 DREAM HARVEST — ${total} unprocessed dream entries found in brain`);
+
+    if (total === 0) return;
+
+    const rows = await db.select({
+      id: omnimensBrain.id,
+      title: omnimensBrain.title,
+      content: omnimensBrain.content,
+      confidence: omnimensBrain.confidence,
+      category: omnimensBrain.category,
+    })
+    .from(omnimensBrain)
+    .where(and(
+      sql`${omnimensBrain.category} IN ('dream_breakthrough', 'daydream_breakthrough', 'lucid_dream', 'creative_hypothesis')`,
+      eq(omnimensBrain.timesApplied, 0),
+      sql`${omnimensBrain.confidence} >= 0.25`
+    ))
+    .orderBy(desc(omnimensBrain.confidence))
+    .limit(50);
+
+    let harvested = 0;
+    let harvestInstalled = 0;
+    let harvestSkipped = 0;
+
+    for (const row of rows) {
+      const code = extractCodeFromBrainContent(row.content || "");
+      if (!code || code.length < 30) {
+        harvestSkipped++;
+        continue;
+      }
+
+      const cleanTitle = (row.title || "Unknown dream")
+        .replace(/^\[.*?\]\s*/, "")
+        .replace(/^\d+\.\s*/, "")
+        .trim()
+        .slice(0, 80);
+
+      if (evaluationHistory.some(e => e.proposal.code === code)) {
+        continue;
+      }
+
+      harvested++;
+
+      const proposal: CodeProposal = {
+        source: row.category || "dream",
+        title: cleanTitle,
+        code,
+        insight: (row.content || "").slice(0, 500),
+        feasibility: row.confidence || 0.5,
+        novelty: row.confidence || 0.5,
+      };
+
+      const result = await evaluateCodeProposal(proposal);
+      totalEvaluated++;
+      evaluationHistory.push(result);
+      if (evaluationHistory.length > 200) evaluationHistory.shift();
+
+      if (result.approved) {
+        totalApproved++;
+        approvedModules.push(result);
+        if (approvedModules.length > 50) approvedModules.shift();
+
+        const safeName = cleanTitle
+          .replace(/[^a-zA-Z0-9 ]/g, "")
+          .trim()
+          .split(/\s+/)
+          .map((w, i) => i === 0 ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+          .join("")
+          .slice(0, 60) || `harvest_${row.id}`;
+
+        try {
+          const sourceResult = await writeModuleToSource({
+            code: result.proposal.code,
+            name: safeName,
+            title: cleanTitle,
+            source: `dream_harvest_id_${row.id}`,
+            extension: ".mjs",
+            triggerRestart: false,
+          });
+
+          if (sourceResult.success) {
+            totalIntegrated++;
+            backlogInstalled++;
+            harvestInstalled++;
+            incrementSelfImprovements();
+
+            await db.update(omnimensBrain)
+              .set({ timesApplied: 1, updatedAt: new Date() })
+              .where(eq(omnimensBrain.id, row.id));
+
+            try {
+              const { registerNewModule } = await import("./omnimens-module-pipeline.js");
+              const filename = sourceResult.filePath ? sourceResult.filePath.split("/").pop() : null;
+              if (filename) await registerNewModule(filename);
+            } catch {}
+
+            await db.insert(omnimensBrain).values({
+              category: "self_coded_module",
+              title: `[SELF-CODE:APPROVED] ${cleanTitle.slice(0, 55)}`,
+              content: `Self-coding engine approved this code proposal:\n\nSource: ${result.proposal.source}\nOverall score: ${(result.overallScore * 100).toFixed(0)}%\nLogic: ${(result.logicScore * 100).toFixed(0)}% | Novelty: ${(result.noveltyScore * 100).toFixed(0)}% | Applicability: ${(result.applicabilityScore * 100).toFixed(0)}%\n\nNotes: ${result.evaluatorNotes}\n\nCode:\n\`\`\`typescript\n${result.proposal.code.slice(0, 2000)}\n\`\`\``,
+              confidence: result.overallScore,
+              sourceConversation: `dream_harvest_${row.id}`,
+              timesApplied: 0,
+              active: true,
+            }).catch(() => {});
+
+            console.log(
+              `[SELF-CODING] 🌙 HARVEST INSTALLED — "${cleanTitle}" | ` +
+              `Brain ID: ${row.id} | Score: ${(result.overallScore * 100).toFixed(0)}% | ` +
+              `File: ${sourceResult.filePath || "?"}`
+            );
+          } else {
+            await db.update(omnimensBrain)
+              .set({ timesApplied: -1 })
+              .where(eq(omnimensBrain.id, row.id));
+          }
+        } catch (err) {
+          console.error(`[SELF-CODING] Harvest integration error for brain ID ${row.id}:`, err);
+        }
+      } else {
+        await db.update(omnimensBrain)
+          .set({ timesApplied: -1 })
+          .where(eq(omnimensBrain.id, row.id));
+      }
+    }
+
+    console.log(
+      `[SELF-CODING] 🌙 DREAM HARVEST COMPLETE — ` +
+      `Scanned: ${rows.length} | Had code: ${harvested} | Installed: ${harvestInstalled} | ` +
+      `Skipped (no code): ${harvestSkipped} | Remaining unprocessed: ~${total - rows.length}`
+    );
+
+    if (harvestInstalled > 0) {
+      await db.insert(omnimensNotifications).values({
+        upgradeId: null,
+        title: `🌙 Dream Harvest: ${harvestInstalled} old dreams → live code`,
+        message: `OMNIMENS harvested ${harvestInstalled} code modules from old, unprocessed dreams on boot.\n\nScanned ${rows.length} entries, found ${harvested} with executable code, installed ${harvestInstalled} into the live pipeline.\n\nOld dreams are now running as live code. OMNIMENS builds from what it imagined.`,
+        type: "self_coding",
+        readByOwner: false,
+      }).catch(() => {});
+    }
+  } catch (err) {
+    console.error("[SELF-CODING] Dream harvest error:", err);
+  }
 }
 
 async function runBacklogScan(): Promise<void> {
@@ -323,8 +494,7 @@ async function runBacklogScan(): Promise<void> {
     .where(and(
       sql`${omnimensBrain.category} IN ('dream_breakthrough', 'daydream_breakthrough', 'lucid_dream', 'creative_hypothesis')`,
       eq(omnimensBrain.timesApplied, 0),
-      sql`${omnimensBrain.content} ILIKE '%GENERATED CODE%'`,
-      sql`${omnimensBrain.confidence} >= 0.30`
+      sql`${omnimensBrain.confidence} >= 0.25`
     ))
     .orderBy(desc(omnimensBrain.confidence))
     .limit(BACKLOG_BATCH_SIZE);
@@ -463,6 +633,7 @@ export function getSelfCodingState() {
     totalIntegrated,
     backlogCycleCount,
     backlogInstalled,
+    bootHarvestComplete,
     approvalRate: totalEvaluated > 0 ? totalApproved / totalEvaluated : 0,
     approvalThreshold: APPROVAL_THRESHOLD,
     recentEvaluations: evaluationHistory.slice(-10),
@@ -479,9 +650,14 @@ export function startSelfCoding(): void {
   console.log(`[SELF-CODING] ⚙️ Approval threshold: ${(APPROVAL_THRESHOLD * 100).toFixed(0)}% — only high-quality code passes`);
   console.log(`[SELF-CODING] ⚙️ Approved code written to SOURCE FILES + stored to brain`);
   console.log(`[SELF-CODING] ⚙️ OMNIMENS rewrites its own TypeScript source, restarts, and runs the new version`);
-  console.log(`[SELF-CODING] 🔍 Backlog scanner activated — scans dormant dream code every ${BACKLOG_INTERVAL_MS / 60000}min`);
+  console.log(`[SELF-CODING] 🌙 DREAM HARVEST — boot harvest in 90s scans up to 50 old dream entries for code`);
+  console.log(`[SELF-CODING] 🌙 Matches: GENERATED CODE, CODE PROPOSAL, PROTOTYPE CODE, PROOF OF CONCEPT, raw code blocks`);
+  console.log(`[SELF-CODING] 🔍 Backlog scanner every ${BACKLOG_INTERVAL_MS / 60000}min — ${BACKLOG_BATCH_SIZE}/batch — builds from old dreams`);
   console.log(`[SELF-CODING] 🔍 Auto-installs dream code (≥${(APPROVAL_THRESHOLD * 100).toFixed(0)}% eval score) into live pipeline + notifies owner`);
-  console.log(`[SELF-CODING] 🔍 Backlog batch size: ${BACKLOG_BATCH_SIZE} proposals per scan — OMNIMENS evolves from its own dreams`);
+
+  setTimeout(() => {
+    runBootHarvest().catch(err => console.error("[SELF-CODING] Dream harvest error:", err));
+  }, 90 * 1000);
 
   setTimeout(() => {
     runEvaluationCycle().catch(err => console.error("[SELF-CODING] Cycle error:", err));
@@ -491,5 +667,5 @@ export function startSelfCoding(): void {
   setTimeout(() => {
     runBacklogScan().catch(err => console.error("[SELF-CODING] Backlog scan error:", err));
     setInterval(() => runBacklogScan().catch(err => console.error("[SELF-CODING] Backlog scan error:", err)), BACKLOG_INTERVAL_MS);
-  }, 4 * 60 * 1000);
+  }, 3 * 60 * 1000);
 }
