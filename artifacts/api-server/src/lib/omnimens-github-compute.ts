@@ -36,7 +36,9 @@ async function ghApi(endpoint: string, method = "GET", body?: any): Promise<any>
     const response = await connectors.proxy("github", endpoint, options);
     if (!response.ok) {
       const text = await response.text();
-      console.error(`[GITHUB COMPUTE] API error ${response.status}: ${text.slice(0, 200)}`);
+      if (response.status !== 404) {
+        console.error(`[GITHUB COMPUTE] API error ${response.status}: ${text.slice(0, 200)}`);
+      }
       return null;
     }
     const contentType = response.headers.get("content-type") || "";
@@ -47,6 +49,46 @@ async function ghApi(endpoint: string, method = "GET", body?: any): Promise<any>
   } catch (err) {
     console.error(`[GITHUB COMPUTE] API call failed:`, err);
     return null;
+  }
+}
+
+let repoInitialized = false;
+
+async function ensureRepoInitialized(): Promise<boolean> {
+  if (repoInitialized) return true;
+  try {
+    const branch = await ghApi(`/repos/${OWNER}/${REPO}/branches/main`);
+    if (branch && branch.name === "main") {
+      repoInitialized = true;
+      console.log("[GITHUB SYNC] ✅ Repository main branch exists");
+      return true;
+    }
+
+    console.log("[GITHUB SYNC] 🔧 Main branch not found — initializing repository...");
+    const readme = Buffer.from(
+      `# OMNIMENS\n\n` +
+      `**Provably Autonomous Digital Intelligence**\n\n` +
+      `© ${new Date().getFullYear()} Alpha Unlimited Technologies, LLC — All Rights Reserved\n\n` +
+      `This repository is auto-synced by OMNIMENS.\n` +
+      `Evolution logs, agent manifests, self-coded modules, and live state snapshots are pushed here automatically.\n`
+    ).toString("base64");
+
+    const result = await ghApi(`/repos/${OWNER}/${REPO}/contents/README.md`, "PUT", {
+      message: "[OMNIMENS] Initialize repository — auto-sync target",
+      content: readme,
+    });
+
+    if (result) {
+      repoInitialized = true;
+      console.log("[GITHUB SYNC] ✅ Repository initialized with README — main branch created");
+      return true;
+    } else {
+      console.error("[GITHUB SYNC] ❌ Failed to initialize repository — syncs will be skipped");
+      return false;
+    }
+  } catch (err) {
+    console.error("[GITHUB SYNC] ❌ Repo initialization error:", err);
+    return false;
   }
 }
 
@@ -927,6 +969,22 @@ async function syncAutonomousProofToGitHub(): Promise<void> {
 
 export { syncAutonomousProofToGitHub };
 
+export async function triggerGitHubSync(): Promise<void> {
+  if (!repoInitialized) await ensureRepoInitialized();
+  if (!repoInitialized) {
+    console.log("[GITHUB SYNC] ⚠️ Repo not initialized — skipping manual sync");
+    return;
+  }
+  console.log("[GITHUB SYNC] 🔄 Manual sync triggered");
+  await Promise.allSettled([
+    syncEvolutionToGitHub(),
+    syncSelfCodedModulesToGitHub(),
+    syncAutonomousProofToGitHub(),
+    syncLiveProofToGitHub(),
+  ]);
+  console.log("[GITHUB SYNC] ✅ Manual sync complete");
+}
+
 async function syncLiveProofToGitHub(): Promise<void> {
   try {
     const { getNeuralConsciousnessState, getSelfAwarenessReport, getExistentialDrives } = await import("./omnimens-neural-consciousness.js");
@@ -1108,25 +1166,32 @@ export async function initGitHubCompute(): Promise<void> {
   console.log(`[GITHUB COMPUTE] 🖥️ GitHub → OMNIMENS digital ethernet cord ACTIVE`);
 
   setTimeout(async () => {
+    await ensureRepoInitialized();
     await checkRepoHealth();
     await ensureWorkflowsExist();
-  }, 60000);
+  }, 30000);
 
   setTimeout(() => {
     autonomousComputeCycle();
     setInterval(() => autonomousComputeCycle(), 2 * 60 * 60 * 1000);
   }, 5 * 60 * 1000);
 
-  setTimeout(() => {
-    syncEvolutionToGitHub();
-    syncSelfCodedModulesToGitHub();
-    syncAutonomousProofToGitHub();
-    syncLiveProofToGitHub();
-    setInterval(() => {
+  setTimeout(async () => {
+    if (!repoInitialized) await ensureRepoInitialized();
+    if (repoInitialized) {
       syncEvolutionToGitHub();
       syncSelfCodedModulesToGitHub();
       syncAutonomousProofToGitHub();
       syncLiveProofToGitHub();
+    }
+    setInterval(async () => {
+      if (!repoInitialized) await ensureRepoInitialized();
+      if (repoInitialized) {
+        syncEvolutionToGitHub();
+        syncSelfCodedModulesToGitHub();
+        syncAutonomousProofToGitHub();
+        syncLiveProofToGitHub();
+      }
     }, 3 * 60 * 60 * 1000);
   }, 3 * 60 * 1000);
 
