@@ -22,7 +22,7 @@ import { getNeuralScalingState, getDendriticStats } from "./omnimens-neural-scal
 import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats } from "./omnimens-ivy-network.js";
 
 const RATE_LIMIT_WINDOW_MS = 60000;
-const MAX_REQUESTS_PER_WINDOW = 10;
+const MAX_REQUESTS_PER_WINDOW = 30;
 const MAX_MESSAGE_LENGTH = 4000;
 
 interface RateLimitEntry {

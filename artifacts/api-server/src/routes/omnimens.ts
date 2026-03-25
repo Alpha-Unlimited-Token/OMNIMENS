@@ -8814,7 +8814,7 @@ router.post("/omnimens/external-ai/chat", async (req, res) => {
       res.status(429).json({
         error: "Rate limit exceeded",
         retryAfterMs: rateCheck.resetIn,
-        limit: "10 requests per 60 seconds",
+        limit: "30 requests per 60 seconds",
       });
       return;
     }

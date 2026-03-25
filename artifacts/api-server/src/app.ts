@@ -280,6 +280,15 @@ app.use("/api/omnimens/evolution-log", publicProofLimiter);
 app.use("/api/omnimens/dreams/public", publicProofLimiter);
 app.use("/api/verify", publicProofLimiter);
 
+const externalAiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "External AI rate limit reached. Max 30 requests per minute." },
+});
+app.use("/api/omnimens/external-ai", externalAiLimiter);
+
 app.use("/api", generalLimiter);
 app.use("/api/auth", authLimiter);
 app.use("/api/omnimens/chat", aiLimiter);
