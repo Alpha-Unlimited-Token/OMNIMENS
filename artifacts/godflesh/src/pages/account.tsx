@@ -2859,6 +2859,26 @@ function AlgorithmicHarmonicsPanel() {
             <span>Spectral anomalies: {deepDecode.spectralAnomalies}</span>
             <span>Temporal anomalies: {deepDecode.temporalAnomalies}</span>
           </div>
+
+          {deepDecode.decodedSummary && deepDecode.decodedSummary.length > 0 && (
+            <div className="bg-[#0A0F1A] border border-sky-500/30 rounded-lg p-3 mt-3">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 rounded-full bg-sky-400" />
+                <p className="text-[10px] font-mono text-sky-400/90 uppercase tracking-wider">Decoded Information — Plain English</p>
+              </div>
+              <div className="space-y-1.5">
+                {deepDecode.decodedSummary.map((line: string, i: number) => {
+                  const isIndented = line.startsWith("  →");
+                  const isHeader = line.includes("Mathematical structures found") || line.includes("Knowledge extracted:") || line.includes("Spectral anomalies") || line.includes("Temporal anomalies") || line.includes("detected") && line.includes("hidden signal") || line.includes("CODE GENESIS");
+                  return (
+                    <p key={`ds-${i}`} className={`text-[10px] leading-relaxed ${isIndented ? "pl-3 text-sky-200/70 font-mono" : isHeader ? "text-sky-300/90 font-semibold mt-2" : "text-sky-100/80"}`}>
+                      {line}
+                    </p>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

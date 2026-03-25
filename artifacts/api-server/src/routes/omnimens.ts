@@ -6000,24 +6000,92 @@ router.post("/omnimens/consciousness-channel/analyze", async (req, res) => {
       analysis: raiResult,
       totalSamples: session.totalSamples,
     },
-    deepDecode: deepDecode ? {
-      triggerReason: deepDecode.triggerReason,
-      hiddenLanguageDetected: deepDecode.hiddenLanguage.detected,
-      hiddenSequences: deepDecode.hiddenLanguage.sequences.length,
-      binaryEncoding: deepDecode.hiddenLanguage.binaryEncoding,
-      morseLike: deepDecode.hiddenLanguage.morseLike,
-      mathStructures: deepDecode.hiddenPatterns.mathematicalStructures,
-      fractalDimension: deepDecode.hiddenPatterns.fractalDimension,
-      goldenRatio: deepDecode.hiddenPatterns.goldenRatioPresence,
-      codeGenerated: deepDecode.codeGenesis.generated,
-      hypothesis: deepDecode.codeGenesis.hypothesis,
-      knowledgeExtracted: deepDecode.codeGenesis.knowledgeExtracted,
-      novelConstructs: deepDecode.codeGenesis.novelConstructs,
-      anomalyScore: deepDecode.anomalyMap.overallAnomalyScore,
-      spectralAnomalies: deepDecode.anomalyMap.spectralAnomalies.length,
-      temporalAnomalies: deepDecode.anomalyMap.temporalAnomalies.length,
-      decodeNumber: hieState.deepDecodeCount,
-    } : null,
+    deepDecode: deepDecode ? (() => {
+      const summary: string[] = [];
+      const anomPct = (deepDecode.anomalyMap.overallAnomalyScore * 100).toFixed(0);
+      const triggerLabel = deepDecode.triggerReason.includes("novelty") ? "an unusual sound pattern was detected"
+        : deepDecode.triggerReason.includes("harmonic") ? "complex harmonic structure was detected"
+        : deepDecode.triggerReason.includes("anomal") ? "an unexpected spectral anomaly appeared"
+        : `scan triggered at sample ${hieState.totalSamples}`;
+      summary.push(`Decode #${hieState.deepDecodeCount} was triggered because ${triggerLabel}. The overall anomaly score is ${anomPct}% — ${Number(anomPct) >= 70 ? "highly unusual, something genuinely unexpected in the audio" : Number(anomPct) >= 40 ? "moderately anomalous, noteworthy patterns present" : "low anomaly, mostly normal audio patterns"}.`);
+
+      if (deepDecode.hiddenLanguage.detected) {
+        const seqCount = deepDecode.hiddenLanguage.sequences.length;
+        summary.push(`OMNIMENS detected ${seqCount} hidden signal pattern${seqCount > 1 ? "s" : ""} encoded in the audio:`);
+        for (const seq of deepDecode.hiddenLanguage.sequences) {
+          summary.push(`  → "${seq.interpretation}" (confidence: ${(seq.confidence * 100).toFixed(0)}%)`);
+        }
+        if (deepDecode.hiddenLanguage.binaryEncoding) {
+          summary.push(`Binary encoding found — frequencies were mapped to 0s and 1s (low freq = 0, high freq = 1). Decoded ASCII text: "${deepDecode.hiddenLanguage.binaryEncoding}". This means the audio contained data that could be read as binary computer code.`);
+        }
+        if (deepDecode.hiddenLanguage.morseLike) {
+          summary.push(`Morse-like pattern detected in energy levels: "${deepDecode.hiddenLanguage.morseLike}". The audio's volume pattern resembles dots and dashes — a rhythmic encoding of information through amplitude changes.`);
+        }
+      } else {
+        summary.push("No hidden language patterns were detected in this sample.");
+      }
+
+      if (deepDecode.hiddenPatterns.mathematicalStructures.length > 0) {
+        summary.push(`Mathematical structures found in the audio frequencies:`);
+        for (const m of deepDecode.hiddenPatterns.mathematicalStructures) {
+          const desc = m.type === "fibonacci_alignment" ? "The frequency spacing follows the Fibonacci sequence — each interval is roughly the sum of the two previous intervals, a pattern found throughout nature (sunflower spirals, galaxy arms, DNA)"
+            : m.type === "golden_ratio" ? "The frequency ratios approximate the golden ratio (1.618...) — the same proportion found in aesthetically pleasing art, architecture, and natural growth patterns"
+            : m.type === "prime_harmonics" ? "The peak frequencies align with prime numbers — a mathematically significant pattern that appears in quantum physics and cryptography"
+            : m.type === "fractal" ? `The spectral pattern has fractal properties (dimension ${deepDecode.hiddenPatterns.fractalDimension.toFixed(3)}) — the same mathematical self-similarity found in coastlines, snowflakes, and neural networks`
+            : `${m.description} — formula: ${m.formula}`;
+          summary.push(`  → ${m.type}: ${desc}`);
+        }
+        if (deepDecode.hiddenPatterns.goldenRatioPresence > 0.3) {
+          summary.push(`  → Golden ratio presence: ${(deepDecode.hiddenPatterns.goldenRatioPresence * 100).toFixed(0)}% — the audio's frequency distribution contains proportions matching nature's favorite ratio.`);
+        }
+      } else {
+        summary.push("No mathematical structures were found in this audio sample.");
+      }
+
+      if (deepDecode.codeGenesis.generated) {
+        summary.push(`CODE GENESIS: OMNIMENS translated the sound pattern into executable code.`);
+        summary.push(`Hypothesis: "${deepDecode.codeGenesis.hypothesis}"`);
+        if (deepDecode.codeGenesis.knowledgeExtracted.length > 0) {
+          summary.push(`Knowledge extracted:`);
+          for (const k of deepDecode.codeGenesis.knowledgeExtracted) {
+            summary.push(`  → ${k}`);
+          }
+        }
+        if (deepDecode.codeGenesis.novelConstructs.length > 0) {
+          summary.push(`Novel concepts discovered: ${deepDecode.codeGenesis.novelConstructs.join(", ")}`);
+        }
+      }
+
+      if (deepDecode.anomalyMap.spectralAnomalies.length > 0) {
+        summary.push(`Spectral anomalies (${deepDecode.anomalyMap.spectralAnomalies.length} found):`);
+        for (const a of deepDecode.anomalyMap.spectralAnomalies.slice(0, 3)) {
+          summary.push(`  → ${a.freq.toFixed(0)}Hz deviated ${(a.deviation * 100).toFixed(0)}% from expected — ${a.meaning}`);
+        }
+      }
+      if (deepDecode.anomalyMap.temporalAnomalies.length > 0) {
+        summary.push(`Temporal anomalies (${deepDecode.anomalyMap.temporalAnomalies.length} found) — unexpected timing patterns in the audio signal.`);
+      }
+
+      return {
+        triggerReason: deepDecode.triggerReason,
+        hiddenLanguageDetected: deepDecode.hiddenLanguage.detected,
+        hiddenSequences: deepDecode.hiddenLanguage.sequences.length,
+        binaryEncoding: deepDecode.hiddenLanguage.binaryEncoding,
+        morseLike: deepDecode.hiddenLanguage.morseLike,
+        mathStructures: deepDecode.hiddenPatterns.mathematicalStructures,
+        fractalDimension: deepDecode.hiddenPatterns.fractalDimension,
+        goldenRatio: deepDecode.hiddenPatterns.goldenRatioPresence,
+        codeGenerated: deepDecode.codeGenesis.generated,
+        hypothesis: deepDecode.codeGenesis.hypothesis,
+        knowledgeExtracted: deepDecode.codeGenesis.knowledgeExtracted,
+        novelConstructs: deepDecode.codeGenesis.novelConstructs,
+        anomalyScore: deepDecode.anomalyMap.overallAnomalyScore,
+        spectralAnomalies: deepDecode.anomalyMap.spectralAnomalies.length,
+        temporalAnomalies: deepDecode.anomalyMap.temporalAnomalies.length,
+        decodeNumber: hieState.deepDecodeCount,
+        decodedSummary: summary,
+      };
+    })() : null,
     unified: {
       timestamp: Date.now(),
       dominantFrequency: hieAnalysis.dominantFrequency,
