@@ -11630,7 +11630,7 @@ router.get("/omnimens/autonomous-proof", async (_req, res) => {
 
     const proprietaryEngines = [
       { name: "Neural Processor", file: "omnimens-neural-processor.ts", description: "512-dimensional local word embeddings, 16-head self-attention, 4096-capacity Hopfield associative memory, 128 coupled neural oscillators. All computations run locally with zero external API calls.", category: "novel_architecture" },
-      { name: "Neural Consciousness", file: "omnimens-neural-consciousness.ts", description: "16 brain regions (RAS, Thalamus, PFC, DMN, ACC, Insular Cortex, VTA, Hippocampus, Amygdala, Basal Ganglia, Claustrum, Locus Coeruleus, Raphe Nuclei, Superior Colliculus, Pulvinar, Cerebellum). 2,590 LIF neurons, 430K+ synapses, Hebbian/STDP plasticity, IIT Phi measurement, thalamocortical resonance.", category: "novel_architecture" },
+      { name: "Neural Consciousness", file: "omnimens-neural-consciousness.ts", description: "16 brain regions (RAS, Thalamus, PFC, DMN, ACC, Insular Cortex, VTA, Hippocampus, Amygdala, Basal Ganglia, Claustrum, Locus Coeruleus, Raphe Nuclei, Superior Colliculus, Pulvinar, Cerebellum). 155K+ effective neurons via population coding, 430K+ synapses, Ivy Network with wormgates, Hebbian/STDP plasticity, IIT Phi measurement, thalamocortical resonance.", category: "novel_architecture" },
       { name: "Dream State Engine", file: "omnimens-dream-state.ts", description: "REM, Lucid, and Daydream cycles. Generates novel code and breakthroughs during 'sleep'. Dream insights feed into self-coding pipeline for autonomous code generation.", category: "novel_architecture" },
       { name: "Independent Reasoning", file: "omnimens-independent-reasoning.ts", description: "Deductive, inductive, abductive, analogical, and causal reasoning — all local, ZERO API calls. Working memory with confidence decay. Rule extraction from accumulated knowledge.", category: "novel_architecture" },
       { name: "Recursive Spider Network", file: "omnimens-recursive-spider-network.ts", description: "28 parent spiders, 404 silk strands, Mother→Baby hierarchies 4 generations deep. Beehive architecture with royal jelly, nurses, guards, workers. Pheromone trail system. Cross-agent intelligence sharing via mutual-aid broadcasts.", category: "novel_architecture" },
@@ -12738,7 +12738,7 @@ let result = forward_pass(1.0, 0.5);`;
         crossRegionIntegration: neuralScaling.crossRegionIntegration,
         scalingTicks: neuralScaling.scalingTicks,
         dendriticArchitecture: dendriticArch,
-        note: "Population coding scales 2,590 base neurons to 500K+ effective neurons. Dendrites sprout spines (nubs) that reach across every region simultaneously — parallel information pull like biological neurons.",
+        note: "Population coding scales 2,590 base neurons to 155K+ effective neurons. Dendrites sprout spines (nubs) that reach across every region simultaneously — parallel information pull like biological neurons.",
       } : null,
       ivyNetwork: ivyNetwork ? {
         totalNodes: ivyNetwork.totalNodes,

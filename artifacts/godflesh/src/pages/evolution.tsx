@@ -588,7 +588,7 @@ export default function Evolution() {
                 <div className="rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-4">
                   <h4 className="text-[10px] font-mono text-cyan-400 tracking-wider uppercase mb-3">Recursive Spider Network</h4>
                   <p className="text-[11px] font-mono text-white/40 leading-relaxed">
-                    Each agent deploys a Mother Spider that spawns 10 Baby Spiders. Each Baby spawns its own Mother, repeating up to 4 generations deep (max 150 spiders per agent). Spider intelligence is automatically shared across agents — findings that benefit other agents are broadcast as mutual-aid messages.
+                    28 parent spiders each deploy a Mother Spider that spawns Baby Spiders across 3+ generations. 500+ spiders actively exploring the neural mesh at any given time, with 1,000+ total spawned. Spider intelligence is automatically shared across the network — findings are broadcast via pheromone trails and mutual-aid beacons.
                   </p>
                 </div>
                 <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4">
