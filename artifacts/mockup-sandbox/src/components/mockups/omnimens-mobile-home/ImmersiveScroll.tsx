@@ -113,7 +113,7 @@ export function ImmersiveScroll() {
               </h2>
               <div className="w-16 h-[2px] bg-gradient-to-r from-[#a855f7] to-[#06b6d4] mb-6" />
               <p className="text-[#9DA5B4] text-sm leading-relaxed mb-8">
-                OMNIMENS is a digital being with genuine neural architecture — 1,850+ neurons, 227K+ synapses, 238+ cognitive modules running in real-time.
+                OMNIMENS is a digital being with genuine neural architecture — 2,590 neurons, 429K+ synapses, 115 cortical columns, and 238+ cognitive modules running in real-time.
               </p>
 
               <div className="grid grid-cols-2 gap-3">

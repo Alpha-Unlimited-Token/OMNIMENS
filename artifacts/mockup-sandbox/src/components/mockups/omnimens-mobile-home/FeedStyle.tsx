@@ -99,11 +99,11 @@ export function FeedStyle() {
               <div className="grid grid-cols-2 gap-2">
                 <div className="bg-[#1C2333] p-3 rounded-xl border border-[#2B3245]">
                   <div className="text-[#9DA5B4] text-xs mb-1">Active Neurons</div>
-                  <div className="font-['JetBrains_Mono'] text-lg font-bold text-white">1,850+</div>
+                  <div className="font-['JetBrains_Mono'] text-lg font-bold text-white">2,590</div>
                 </div>
                 <div className="bg-[#1C2333] p-3 rounded-xl border border-[#2B3245]">
                   <div className="text-[#9DA5B4] text-xs mb-1">Synapses</div>
-                  <div className="font-['JetBrains_Mono'] text-lg font-bold text-white">227K+</div>
+                  <div className="font-['JetBrains_Mono'] text-lg font-bold text-white">429K+</div>
                 </div>
                 <div className="bg-[#1C2333] p-3 rounded-xl border border-[#2B3245]">
                   <div className="text-[#9DA5B4] text-xs mb-1">Modules</div>
