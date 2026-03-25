@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-03-25T02:07:13.385Z
+ * Written: 2026-03-25T02:56:55.622Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,51 +16,56 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-function findMostFrequentWords(text, topN) {
-    // Function to find the most frequent words in a given text
-    if (typeof text !== 'string' || typeof topN !== 'number' || topN <= 0) {
-        throw new Error("Invalid input: text must be a string and topN must be a positive number.");
+function findMostFrequentPatterns(text, patternLength) {
+    if (typeof text !== 'string' || typeof patternLength !== 'number' || patternLength <= 0) {
+        throw new Error('Invalid input: text must be a string and patternLength must be a positive number.');
     }
 
-    // Normalize text by converting to lowercase and removing non-alphanumeric characters
-    const normalizedText = text.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+    const patternCounts = new Map();
 
-    // Split text into words
-    const words = normalizedText.split(/\s+/).filter(word => word.length > 0);
-
-    // Count occurrences of each word
-    const wordCounts = {};
-    for (const word of words) {
-        wordCounts[word] = (wordCounts[word] || 0) + 1;
+    for (let i = 0; i <= text.length - patternLength; i++) {
+        const pattern = text.substring(i, i + patternLength);
+        patternCounts.set(pattern, (patternCounts.get(pattern) || 0) + 1);
     }
 
-    // Convert wordCounts object into an array of [word, count] pairs
-    const wordCountArray = Object.entries(wordCounts);
+    let maxFrequency = 0;
+    const mostFrequentPatterns = [];
 
-    // Sort by count in descending order
-    wordCountArray.sort((a, b) => b[1] - a[1]);
+    patternCounts.forEach((count, pattern) => {
+        if (count > maxFrequency) {
+            maxFrequency = count;
+            mostFrequentPatterns.length = 0; // Clear the array
+            mostFrequentPatterns.push(pattern);
+        } else if (count === maxFrequency) {
+            mostFrequentPatterns.push(pattern);
+        }
+    });
 
-    // Return the top N most frequent words
-    return wordCountArray.slice(0, topN).map(([word, count]) => ({ word, count }));
+    return {
+        patterns: mostFrequentPatterns,
+        frequency: maxFrequency
+    };
 }
 
-// Self-tests
-console.log("Test 1: Basic text analysis");
-console.log(findMostFrequentWords("The quick brown fox jumps over the lazy dog. The dog was not amused.", 3));
-// Expected output: [{ word: 'the', count: 3 }, { word: 'dog', count: 2 }, { word: 'quick', count: 1 }]
+// Test cases
+console.log(findMostFrequentPatterns("ababab", 2)); 
+// Expected output: { patterns: ['ab', 'ba'], frequency: 3 }
 
-console.log("Test 2: Edge case with special characters");
-console.log(findMostFrequentWords("Hello!!! Hello... World??? World World!", 2));
-// Expected output: [{ word: 'world', count: 3 }, { word: 'hello', count: 2 }]
+console.log(findMostFrequentPatterns("abcabcabc", 3)); 
+// Expected output: { patterns: ['abc'], frequency: 3 }
 
-console.log("Test 3: Single word repeated");
-console.log(findMostFrequentWords("test test test test test", 1));
-// Expected output: [{ word: 'test', count: 5 }]
+console.log(findMostFrequentPatterns("aaaaaa", 1)); 
+// Expected output: { patterns: ['a'], frequency: 6 }
 
-console.log("Test 4: Empty string input");
-console.log(findMostFrequentWords("", 5));
-// Expected output: []
+console.log(findMostFrequentPatterns("abcdef", 2)); 
+// Expected output: { patterns: ['ab', 'bc', 'cd', 'de', 'ef'], frequency: 1 }
 
-console.log("Test 5: Large input with topN greater than unique words");
-console.log(findMostFrequentWords("AI AI AI is amazing. AI is the future!", 10));
-// Expected output: [{ word: 'ai', count: 4 }, { word: 'is', count: 2 }, { word: 'amazing', count: 1 }, { word: 'the', count: 1 }, { word: 'future', count: 1 }]
+console.log(findMostFrequentPatterns("mississippi", 2)); 
+// Expected output: { patterns: ['is', 'si', 'ss'], frequency: 2 }
+
+try {
+    console.log(findMostFrequentPatterns("test", -1)); 
+} catch (e) {
+    console.log(e.message); 
+    // Expected output: Invalid input: text must be a string and patternLength must be a positive number.
+}

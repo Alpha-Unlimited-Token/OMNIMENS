@@ -1131,13 +1131,23 @@ function buildMusculoskeletalSystem(): {
       function: "rotation",
     });
 
-    // ─── FINGER TENDONS — bidirectional: flexor + extensor per joint ───
+    // ─── FINGER TENDONS — FULL BIDIRECTIONAL: deep flexor + superficial flexor + extensor per finger ───
+    // Every bidirectional joint needs tendons pulling BOTH directions.
+    // Deep flexor: routes all the way to DIP — power grip
+    // Superficial flexor: routes to PIP — fine grip, independent middle phalanx control
+    // Extensor: routes to all 3 joints — opens finger from any position
     for (const finger of ["index", "middle", "ring", "pinky"]) {
       tendons.push({
         name: `${side}_${finger}_flexor_deep`, material: "dyneema_uhmwpe", diameterMm: 1.0, breakingStrengthN: 1800, elongationPct: 0.5,
         sheathType: "bowden", routingPath: [`${side}_ulna`, `${side}_carpal_dist`, `${side}_${finger}_mc`, `${side}_${finger}_prox`, `${side}_${finger}_mid`, `${side}_${finger}_dist`], lengthMm: 320,
         pretensionN: 5, antagonistTendon: `${side}_${finger}_extensor`, attachedJoints: [`${side}_${finger}_mcp_flex`, `${side}_${finger}_pip`, `${side}_${finger}_dip`],
-        function: "flexion",
+        function: "flexion_deep",
+      });
+      tendons.push({
+        name: `${side}_${finger}_flexor_superficial`, material: "dyneema_uhmwpe", diameterMm: 0.9, breakingStrengthN: 1500, elongationPct: 0.5,
+        sheathType: "bowden", routingPath: [`${side}_ulna`, `${side}_carpal_dist`, `${side}_${finger}_mc`, `${side}_${finger}_prox`, `${side}_${finger}_mid`], lengthMm: 280,
+        pretensionN: 4, antagonistTendon: `${side}_${finger}_extensor`, attachedJoints: [`${side}_${finger}_mcp_flex`, `${side}_${finger}_pip`],
+        function: "flexion_superficial",
       });
       tendons.push({
         name: `${side}_${finger}_extensor`, material: "dyneema_uhmwpe", diameterMm: 1.0, breakingStrengthN: 1800, elongationPct: 0.5,
@@ -1205,54 +1215,80 @@ function buildMusculoskeletalSystem(): {
     }
   }
 
-  // ─── SPINE TENDONS — core stability, bending, twisting ──────
+  // ─── TORSO TENDONS — rigid frame articulation, bending, twisting ──────
+  // Robot torso is a rigid frame with powered articulation points.
+  // Tendons provide the pulling force at each flex point.
   tendons.push({
     name: "erector_spinae_l", material: "steel_wire_rope", diameterMm: 3.0, breakingStrengthN: 8000, elongationPct: 0.3,
-    sheathType: "ptfe_lined", routingPath: ["sacrum", "l5_vertebra", "l3_vertebra", "l1_vertebra", "t12_vertebra", "t6_vertebra", "t1_vertebra"], lengthMm: 600,
-    pretensionN: 80, antagonistTendon: "rectus_abdominis_l", attachedJoints: ["lumbosacral_l5_s1", "lumbar_l1_l2_flex", "thoracolumbar_t12_l1_flex"],
+    sheathType: "ptfe_lined", routingPath: ["pelvis_frame", "mid_torso_frame", "upper_torso_frame"], lengthMm: 600,
+    pretensionN: 80, antagonistTendon: "rectus_abdominis_l", attachedJoints: ["torso_lower_pitch", "torso_upper_pitch"],
     function: "extension",
   });
   tendons.push({
     name: "erector_spinae_r", material: "steel_wire_rope", diameterMm: 3.0, breakingStrengthN: 8000, elongationPct: 0.3,
-    sheathType: "ptfe_lined", routingPath: ["sacrum", "l5_vertebra", "l3_vertebra", "l1_vertebra", "t12_vertebra", "t6_vertebra", "t1_vertebra"], lengthMm: 600,
-    pretensionN: 80, antagonistTendon: "rectus_abdominis_r", attachedJoints: ["lumbosacral_l5_s1", "lumbar_l1_l2_flex", "thoracolumbar_t12_l1_flex"],
+    sheathType: "ptfe_lined", routingPath: ["pelvis_frame", "mid_torso_frame", "upper_torso_frame"], lengthMm: 600,
+    pretensionN: 80, antagonistTendon: "rectus_abdominis_r", attachedJoints: ["torso_lower_pitch", "torso_upper_pitch"],
     function: "extension",
   });
   tendons.push({
     name: "rectus_abdominis_l", material: "steel_wire_rope", diameterMm: 2.5, breakingStrengthN: 6000, elongationPct: 0.3,
-    sheathType: "ptfe_lined", routingPath: ["sternum", "t12_vertebra", "l3_vertebra", "sacrum"], lengthMm: 500,
-    pretensionN: 50, antagonistTendon: "erector_spinae_l", attachedJoints: ["thoracolumbar_t12_l1_flex", "lumbar_l3_l4_flex", "lumbosacral_l5_s1"],
+    sheathType: "ptfe_lined", routingPath: ["upper_torso_frame", "mid_torso_frame", "pelvis_frame"], lengthMm: 500,
+    pretensionN: 50, antagonistTendon: "erector_spinae_l", attachedJoints: ["torso_upper_pitch", "torso_lower_pitch"],
     function: "flexion",
   });
   tendons.push({
     name: "rectus_abdominis_r", material: "steel_wire_rope", diameterMm: 2.5, breakingStrengthN: 6000, elongationPct: 0.3,
-    sheathType: "ptfe_lined", routingPath: ["sternum", "t12_vertebra", "l3_vertebra", "sacrum"], lengthMm: 500,
-    pretensionN: 50, antagonistTendon: "erector_spinae_r", attachedJoints: ["thoracolumbar_t12_l1_flex", "lumbar_l3_l4_flex", "lumbosacral_l5_s1"],
+    sheathType: "ptfe_lined", routingPath: ["upper_torso_frame", "mid_torso_frame", "pelvis_frame"], lengthMm: 500,
+    pretensionN: 50, antagonistTendon: "erector_spinae_r", attachedJoints: ["torso_upper_pitch", "torso_lower_pitch"],
     function: "flexion",
   });
   tendons.push({
     name: "neck_flexor", material: "nitinol_sma", diameterMm: 1.5, breakingStrengthN: 2000, elongationPct: 4.0,
-    sheathType: "silicone_sleeve", routingPath: ["skull", "c1_atlas", "c2_axis", "c7_vertebra"], lengthMm: 150,
-    pretensionN: 15, antagonistTendon: "neck_extensor", attachedJoints: ["atlanto_occipital_flex", "cervical_c2_c1_flex"],
+    sheathType: "silicone_sleeve", routingPath: ["skull", "c1_atlas", "neck_base", "upper_torso_frame"], lengthMm: 150,
+    pretensionN: 15, antagonistTendon: "neck_extensor", attachedJoints: ["atlanto_occipital_flex", "neck_pitch"],
     function: "flexion",
   });
   tendons.push({
     name: "neck_extensor", material: "nitinol_sma", diameterMm: 1.5, breakingStrengthN: 2000, elongationPct: 4.0,
-    sheathType: "silicone_sleeve", routingPath: ["skull", "c1_atlas", "c2_axis", "c7_vertebra"], lengthMm: 150,
-    pretensionN: 15, antagonistTendon: "neck_flexor", attachedJoints: ["atlanto_occipital_flex", "cervical_c2_c1_flex"],
+    sheathType: "silicone_sleeve", routingPath: ["skull", "c1_atlas", "neck_base", "upper_torso_frame"], lengthMm: 150,
+    pretensionN: 15, antagonistTendon: "neck_flexor", attachedJoints: ["atlanto_occipital_flex", "neck_pitch"],
     function: "extension",
   });
   tendons.push({
+    name: "neck_lateral_l", material: "nitinol_sma", diameterMm: 1.2, breakingStrengthN: 1500, elongationPct: 4.0,
+    sheathType: "silicone_sleeve", routingPath: ["skull_l", "neck_base_l", "upper_torso_frame_l"], lengthMm: 140,
+    pretensionN: 10, antagonistTendon: "neck_lateral_r", attachedJoints: ["neck_roll"],
+    function: "lateral_flexion",
+  });
+  tendons.push({
+    name: "neck_lateral_r", material: "nitinol_sma", diameterMm: 1.2, breakingStrengthN: 1500, elongationPct: 4.0,
+    sheathType: "silicone_sleeve", routingPath: ["skull_r", "neck_base_r", "upper_torso_frame_r"], lengthMm: 140,
+    pretensionN: 10, antagonistTendon: "neck_lateral_l", attachedJoints: ["neck_roll"],
+    function: "lateral_flexion",
+  });
+  tendons.push({
     name: "oblique_l", material: "steel_wire_rope", diameterMm: 2.0, breakingStrengthN: 4000, elongationPct: 0.3,
-    sheathType: "ptfe_lined", routingPath: ["l_ilium", "l3_vertebra", "t10_vertebra"], lengthMm: 350,
-    pretensionN: 40, antagonistTendon: "oblique_r", attachedJoints: ["lumbar_l3_l4_rot", "thoracic_t10_t11_rot"],
+    sheathType: "ptfe_lined", routingPath: ["l_ilium", "mid_torso_frame_l", "upper_torso_frame_l"], lengthMm: 350,
+    pretensionN: 40, antagonistTendon: "oblique_r", attachedJoints: ["torso_lower_yaw", "torso_upper_yaw"],
     function: "rotation",
   });
   tendons.push({
     name: "oblique_r", material: "steel_wire_rope", diameterMm: 2.0, breakingStrengthN: 4000, elongationPct: 0.3,
-    sheathType: "ptfe_lined", routingPath: ["r_ilium", "l3_vertebra", "t10_vertebra"], lengthMm: 350,
-    pretensionN: 40, antagonistTendon: "oblique_l", attachedJoints: ["lumbar_l3_l4_rot", "thoracic_t10_t11_rot"],
+    sheathType: "ptfe_lined", routingPath: ["r_ilium", "mid_torso_frame_r", "upper_torso_frame_r"], lengthMm: 350,
+    pretensionN: 40, antagonistTendon: "oblique_l", attachedJoints: ["torso_lower_yaw", "torso_upper_yaw"],
     function: "rotation",
+  });
+  tendons.push({
+    name: "lateral_flexor_l", material: "steel_wire_rope", diameterMm: 2.0, breakingStrengthN: 4000, elongationPct: 0.3,
+    sheathType: "ptfe_lined", routingPath: ["l_ilium", "mid_torso_frame_l", "upper_torso_frame_l"], lengthMm: 340,
+    pretensionN: 35, antagonistTendon: "lateral_flexor_r", attachedJoints: ["torso_lower_roll", "torso_upper_roll"],
+    function: "lateral_flexion",
+  });
+  tendons.push({
+    name: "lateral_flexor_r", material: "steel_wire_rope", diameterMm: 2.0, breakingStrengthN: 4000, elongationPct: 0.3,
+    sheathType: "ptfe_lined", routingPath: ["r_ilium", "mid_torso_frame_r", "upper_torso_frame_r"], lengthMm: 340,
+    pretensionN: 35, antagonistTendon: "lateral_flexor_l", attachedJoints: ["torso_lower_roll", "torso_upper_roll"],
+    function: "lateral_flexion",
   });
 
   // ═══════════════════════════════════════════════════════════════
@@ -1295,13 +1331,13 @@ function buildMusculoskeletalSystem(): {
   pistons.push({
     name: "torso_core_piston_front", type: "electro_hydraulic", boreDiameterMm: 25, strokeMm: 100,
     maxForceN: 3000, maxPressureBar: 200, speedMmPerSec: 500, fluidType: "synthetic",
-    mountPoints: ["sternum", "sacrum"], attachedJoints: ["thoracolumbar_t12_l1_flex", "lumbosacral_l5_s1"],
+    mountPoints: ["upper_torso_frame", "pelvis_frame"], attachedJoints: ["torso_upper_pitch", "torso_lower_pitch"],
     controlValve: "servo", function: "explosive_movement",
   });
   pistons.push({
     name: "torso_core_piston_rear", type: "electro_hydraulic", boreDiameterMm: 25, strokeMm: 100,
     maxForceN: 3000, maxPressureBar: 200, speedMmPerSec: 500, fluidType: "synthetic",
-    mountPoints: ["t1_vertebra", "sacrum"], attachedJoints: ["thoracolumbar_t12_l1_flex", "lumbosacral_l5_s1"],
+    mountPoints: ["upper_torso_frame_rear", "pelvis_frame"], attachedJoints: ["torso_upper_pitch", "torso_lower_pitch"],
     controlValve: "servo", function: "explosive_movement",
   });
 
@@ -1343,9 +1379,9 @@ function buildMusculoskeletalSystem(): {
     });
   }
   springs.push({
-    name: "spine_central_torsion", type: "torsion", material: "titanium",
+    name: "torso_central_torsion", type: "torsion", material: "titanium",
     springConstantNPerMm: 50, freeLength: 30, maxDeflectionMm: 45, energyStorageJ: 50,
-    mountPoints: ["sacrum", "t1_vertebra"], attachedJoints: ["thoracolumbar_t12_l1_flex", "lumbosacral_l5_s1"],
+    mountPoints: ["pelvis_frame", "upper_torso_frame"], attachedJoints: ["torso_lower_pitch", "torso_upper_pitch"],
     function: "energy_return",
   });
 
@@ -1380,129 +1416,313 @@ function buildMusculoskeletalSystem(): {
     });
   }
   shocks.push({
-    name: "spine_vibration_isolator", type: "air_spring", dampingCoeffNsPerM: 1000, strokeMm: 20,
-    maxForceN: 3000, adjustable: true, mountPoints: ["sacrum", "l1_vertebra"],
-    attachedJoints: ["lumbosacral_l5_s1"], function: "vibration_isolation",
+    name: "torso_vibration_isolator", type: "air_spring", dampingCoeffNsPerM: 1000, strokeMm: 20,
+    maxForceN: 3000, adjustable: true, mountPoints: ["pelvis_frame", "mid_torso_frame"],
+    attachedJoints: ["torso_lower_pitch"], function: "vibration_isolation",
   });
 
   // ═══════════════════════════════════════════════════════════════
-  //  MOTOR CONTROL BRAIN — distributed compute for real-time control
-  //  Dedicated processors for each body region, all coordinated
-  //  by the Jetson Orin main brain
+  //  MOTOR CONTROL BRAIN — 30-NODE DISTRIBUTED COMPUTE ARCHITECTURE
+  //  Tesla Optimus uses 28 controllers for ~28 joints.
+  //  OMNIMENS uses 30 controllers for all joints, tendons,
+  //  pistons, springs, and shock absorbers.
+  //  Tier 1: 1 master Jetson Orin
+  //  Tier 2: 10 STM32H7 major limb controllers (1kHz)
+  //  Tier 3: 6 ESP32-S3 dexterous extremity controllers (500Hz)
+  //  Tier 4: 3 STM32H7 torso/neck/head controllers (500-1000Hz)
+  //  Tier 5: 5 ESP32-S3 system controllers
+  //  Tier 6: 5 ESP32-S3 sensor fusion
   // ═══════════════════════════════════════════════════════════════
+
+  // ─── TIER 1: MASTER BRAIN (1 node) ─────────────────────────────
   mcb.push({
-    name: "mcb_central_coordinator", processor: "NVIDIA Jetson Orin NX 16GB",
-    firmwareRole: "Master trajectory planner — whole-body inverse kinematics, gait generation, flip/jump planning, balance control",
-    controlledJoints: ["ALL"], controlledTendons: ["ALL"], controlledPistons: ["ALL"],
+    name: "mcb_master", processor: "NVIDIA Jetson Orin NX 16GB",
+    firmwareRole: "Master trajectory planner — whole-body IK, gait generation, flip/jump planning, MPC balance, RL policy. Sends trajectory commands to all Tier 2/3 nodes via EtherCAT at 200Hz.",
+    controlledJoints: ["ALL_SUPERVISORY"], controlledTendons: ["ALL_SUPERVISORY"], controlledPistons: ["ALL_SUPERVISORY"],
     busInterface: "ethercat", loopRateHz: 200,
-    algorithms: ["whole_body_IK", "ZMP_balance", "centroidal_momentum", "trajectory_optimization", "model_predictive_control", "reinforcement_learning_policy", "jump_trajectory_planner", "flip_rotation_planner", "landing_predictor"],
+    algorithms: ["whole_body_IK", "ZMP_balance", "centroidal_momentum", "trajectory_optimization", "model_predictive_control", "reinforcement_learning_policy", "jump_trajectory_planner", "flip_rotation_planner", "landing_predictor", "collision_avoidance", "terrain_mapping"],
     powerBudgetW: 25,
   });
+
+  // ─── TIER 2: MAJOR LIMB CONTROLLERS — STM32H7 at 1kHz (10 nodes) ──
   mcb.push({
-    name: "mcb_leg_left", processor: "STM32H7 480MHz",
-    firmwareRole: "Left leg real-time motor control — hip, knee, ankle PID loops + tendon tension + piston pressure",
-    controlledJoints: ["l_acetabulofemoral_flex", "l_acetabulofemoral_abd", "l_acetabulofemoral_rot", "l_tibiofemoral", "l_talocrural", "l_subtalar"],
-    controlledTendons: ["l_quadriceps_tendon", "l_hamstring_tendon", "l_achilles_tendon", "l_tibialis_tendon", "l_hip_flexor_tendon", "l_gluteal_tendon", "l_hip_abductor_tendon", "l_hip_adductor_tendon"],
-    controlledPistons: ["l_knee_power_piston", "l_hip_power_piston", "l_ankle_power_piston"],
+    name: "mcb_hip_left", processor: "STM32H7 480MHz",
+    firmwareRole: "Left hip — 3-DOF acetabulofemoral ball-and-socket + hip flexor/extensor/abductor/adductor tendons + hip power piston",
+    controlledJoints: ["l_acetabulofemoral_flex", "l_acetabulofemoral_abd", "l_acetabulofemoral_rot"],
+    controlledTendons: ["l_hip_flexor_tendon", "l_gluteal_tendon", "l_hip_abductor_tendon", "l_hip_adductor_tendon"],
+    controlledPistons: ["l_hip_power_piston"],
+    busInterface: "can_fd", loopRateHz: 1000,
+    algorithms: ["cascaded_PID", "tendon_tension_control", "hydraulic_pressure_regulation", "gravity_compensation", "hip_impedance_control"],
+    powerBudgetW: 3,
+  });
+  mcb.push({
+    name: "mcb_hip_right", processor: "STM32H7 480MHz",
+    firmwareRole: "Right hip — mirror of left hip controller",
+    controlledJoints: ["r_acetabulofemoral_flex", "r_acetabulofemoral_abd", "r_acetabulofemoral_rot"],
+    controlledTendons: ["r_hip_flexor_tendon", "r_gluteal_tendon", "r_hip_abductor_tendon", "r_hip_adductor_tendon"],
+    controlledPistons: ["r_hip_power_piston"],
+    busInterface: "can_fd", loopRateHz: 1000,
+    algorithms: ["cascaded_PID", "tendon_tension_control", "hydraulic_pressure_regulation", "gravity_compensation", "hip_impedance_control"],
+    powerBudgetW: 3,
+  });
+  mcb.push({
+    name: "mcb_knee_ankle_left", processor: "STM32H7 480MHz",
+    firmwareRole: "Left knee + ankle — tibiofemoral, patellofemoral, talocrural, subtalar + quad/hamstring/achilles tendons + knee/ankle pistons",
+    controlledJoints: ["l_tibiofemoral", "l_patellofemoral", "l_talocrural", "l_subtalar"],
+    controlledTendons: ["l_quadriceps_tendon", "l_hamstring_tendon", "l_achilles_tendon", "l_tibialis_tendon"],
+    controlledPistons: ["l_knee_power_piston", "l_ankle_power_piston"],
     busInterface: "can_fd", loopRateHz: 1000,
     algorithms: ["cascaded_PID", "tendon_tension_control", "hydraulic_pressure_regulation", "spring_preload_optimization", "impact_detection", "ground_reaction_force_estimation"],
     powerBudgetW: 3,
   });
   mcb.push({
-    name: "mcb_leg_right", processor: "STM32H7 480MHz",
-    firmwareRole: "Right leg real-time motor control — mirror of left leg controller",
-    controlledJoints: ["r_acetabulofemoral_flex", "r_acetabulofemoral_abd", "r_acetabulofemoral_rot", "r_tibiofemoral", "r_talocrural", "r_subtalar"],
-    controlledTendons: ["r_quadriceps_tendon", "r_hamstring_tendon", "r_achilles_tendon", "r_tibialis_tendon", "r_hip_flexor_tendon", "r_gluteal_tendon", "r_hip_abductor_tendon", "r_hip_adductor_tendon"],
-    controlledPistons: ["r_knee_power_piston", "r_hip_power_piston", "r_ankle_power_piston"],
+    name: "mcb_knee_ankle_right", processor: "STM32H7 480MHz",
+    firmwareRole: "Right knee + ankle — mirror of left knee/ankle controller",
+    controlledJoints: ["r_tibiofemoral", "r_patellofemoral", "r_talocrural", "r_subtalar"],
+    controlledTendons: ["r_quadriceps_tendon", "r_hamstring_tendon", "r_achilles_tendon", "r_tibialis_tendon"],
+    controlledPistons: ["r_knee_power_piston", "r_ankle_power_piston"],
     busInterface: "can_fd", loopRateHz: 1000,
     algorithms: ["cascaded_PID", "tendon_tension_control", "hydraulic_pressure_regulation", "spring_preload_optimization", "impact_detection", "ground_reaction_force_estimation"],
     powerBudgetW: 3,
   });
   mcb.push({
-    name: "mcb_arm_left", processor: "STM32H7 480MHz",
-    firmwareRole: "Left arm motor control — shoulder, elbow, forearm rotation + tendons + pneumatic assist",
-    controlledJoints: ["l_glenohumeral_flex", "l_glenohumeral_abd", "l_glenohumeral_rot", "l_ulnohumeral", "l_proximal_radioulnar", "l_distal_radioulnar"],
-    controlledTendons: ["l_biceps_tendon", "l_triceps_tendon", "l_deltoid_tendon", "l_lat_tendon", "l_pec_tendon", "l_rear_delt_tendon", "l_rotator_cuff_int", "l_rotator_cuff_ext", "l_pronator_tendon", "l_supinator_tendon"],
-    controlledPistons: ["l_shoulder_assist_piston", "l_elbow_assist_piston"],
+    name: "mcb_shoulder_left", processor: "STM32H7 480MHz",
+    firmwareRole: "Left shoulder complex — sternoclavicular + acromioclavicular + 3-DOF glenohumeral + rotator cuff tendons + shoulder piston",
+    controlledJoints: ["l_sternoclavicular", "l_acromioclavicular", "l_glenohumeral_flex", "l_glenohumeral_abd", "l_glenohumeral_rot"],
+    controlledTendons: ["l_deltoid_tendon", "l_lat_tendon", "l_pec_tendon", "l_rear_delt_tendon", "l_rotator_cuff_int", "l_rotator_cuff_ext"],
+    controlledPistons: ["l_shoulder_assist_piston"],
     busInterface: "can_fd", loopRateHz: 1000,
-    algorithms: ["cascaded_PID", "tendon_tension_control", "pneumatic_pressure_control", "impedance_control", "gravity_compensation"],
+    algorithms: ["cascaded_PID", "tendon_tension_control", "pneumatic_pressure_control", "impedance_control", "gravity_compensation", "rotator_cuff_stabilization"],
     powerBudgetW: 3,
   });
   mcb.push({
-    name: "mcb_arm_right", processor: "STM32H7 480MHz",
-    firmwareRole: "Right arm motor control — mirror of left arm controller",
-    controlledJoints: ["r_glenohumeral_flex", "r_glenohumeral_abd", "r_glenohumeral_rot", "r_ulnohumeral", "r_proximal_radioulnar", "r_distal_radioulnar"],
-    controlledTendons: ["r_biceps_tendon", "r_triceps_tendon", "r_deltoid_tendon", "r_lat_tendon", "r_pec_tendon", "r_rear_delt_tendon", "r_rotator_cuff_int", "r_rotator_cuff_ext", "r_pronator_tendon", "r_supinator_tendon"],
-    controlledPistons: ["r_shoulder_assist_piston", "r_elbow_assist_piston"],
+    name: "mcb_shoulder_right", processor: "STM32H7 480MHz",
+    firmwareRole: "Right shoulder complex — mirror of left shoulder controller",
+    controlledJoints: ["r_sternoclavicular", "r_acromioclavicular", "r_glenohumeral_flex", "r_glenohumeral_abd", "r_glenohumeral_rot"],
+    controlledTendons: ["r_deltoid_tendon", "r_lat_tendon", "r_pec_tendon", "r_rear_delt_tendon", "r_rotator_cuff_int", "r_rotator_cuff_ext"],
+    controlledPistons: ["r_shoulder_assist_piston"],
     busInterface: "can_fd", loopRateHz: 1000,
-    algorithms: ["cascaded_PID", "tendon_tension_control", "pneumatic_pressure_control", "impedance_control", "gravity_compensation"],
+    algorithms: ["cascaded_PID", "tendon_tension_control", "pneumatic_pressure_control", "impedance_control", "gravity_compensation", "rotator_cuff_stabilization"],
     powerBudgetW: 3,
   });
+  mcb.push({
+    name: "mcb_elbow_forearm_left", processor: "STM32H7 480MHz",
+    firmwareRole: "Left elbow + forearm — ulnohumeral, radiohumeral, proximal/distal radioulnar + biceps/triceps/pronator/supinator tendons + elbow piston",
+    controlledJoints: ["l_ulnohumeral", "l_radiohumeral", "l_proximal_radioulnar", "l_distal_radioulnar"],
+    controlledTendons: ["l_biceps_tendon", "l_triceps_tendon", "l_pronator_tendon", "l_supinator_tendon"],
+    controlledPistons: ["l_elbow_assist_piston"],
+    busInterface: "can_fd", loopRateHz: 1000,
+    algorithms: ["cascaded_PID", "tendon_tension_control", "hydraulic_pressure_control", "impedance_control", "pronation_supination_sync"],
+    powerBudgetW: 3,
+  });
+  mcb.push({
+    name: "mcb_elbow_forearm_right", processor: "STM32H7 480MHz",
+    firmwareRole: "Right elbow + forearm — mirror of left elbow/forearm controller",
+    controlledJoints: ["r_ulnohumeral", "r_radiohumeral", "r_proximal_radioulnar", "r_distal_radioulnar"],
+    controlledTendons: ["r_biceps_tendon", "r_triceps_tendon", "r_pronator_tendon", "r_supinator_tendon"],
+    controlledPistons: ["r_elbow_assist_piston"],
+    busInterface: "can_fd", loopRateHz: 1000,
+    algorithms: ["cascaded_PID", "tendon_tension_control", "hydraulic_pressure_control", "impedance_control", "pronation_supination_sync"],
+    powerBudgetW: 3,
+  });
+  mcb.push({
+    name: "mcb_wrist_left", processor: "STM32H7 480MHz",
+    firmwareRole: "Left wrist — radiocarpal (flex/dev), midcarpal, pisotriquetral + all CMC joints at base of hand",
+    controlledJoints: ["l_radiocarpal_flex", "l_radiocarpal_dev", "l_midcarpal", "l_pisotriquetral", "l_index_cmc", "l_middle_cmc", "l_ring_cmc", "l_pinky_cmc", "l_thumb_cmc_flex", "l_thumb_cmc_abd"],
+    controlledTendons: ["l_wrist_flexor", "l_wrist_extensor", "l_wrist_ulnar_dev", "l_wrist_radial_dev"],
+    controlledPistons: [],
+    busInterface: "can_fd", loopRateHz: 1000,
+    algorithms: ["cascaded_PID", "tendon_tension_control", "wrist_impedance_control", "carpal_tunnel_routing_optimization"],
+    powerBudgetW: 2.5,
+  });
+  mcb.push({
+    name: "mcb_wrist_right", processor: "STM32H7 480MHz",
+    firmwareRole: "Right wrist — mirror of left wrist controller",
+    controlledJoints: ["r_radiocarpal_flex", "r_radiocarpal_dev", "r_midcarpal", "r_pisotriquetral", "r_index_cmc", "r_middle_cmc", "r_ring_cmc", "r_pinky_cmc", "r_thumb_cmc_flex", "r_thumb_cmc_abd"],
+    controlledTendons: ["r_wrist_flexor", "r_wrist_extensor", "r_wrist_ulnar_dev", "r_wrist_radial_dev"],
+    controlledPistons: [],
+    busInterface: "can_fd", loopRateHz: 1000,
+    algorithms: ["cascaded_PID", "tendon_tension_control", "wrist_impedance_control", "carpal_tunnel_routing_optimization"],
+    powerBudgetW: 2.5,
+  });
+
+  // ─── TIER 3: DEXTEROUS EXTREMITIES — ESP32-S3 at 500Hz (6 nodes) ──
   mcb.push({
     name: "mcb_hand_left", processor: "ESP32-S3 240MHz",
-    firmwareRole: "Left hand — all finger/thumb tendons, bidirectional grip, tactile feedback",
-    controlledJoints: ["l_index_mcp_flex", "l_index_pip", "l_index_dip", "l_middle_mcp_flex", "l_middle_pip", "l_middle_dip", "l_ring_mcp_flex", "l_ring_pip", "l_ring_dip", "l_pinky_mcp_flex", "l_pinky_pip", "l_pinky_dip", "l_thumb_cmc_flex", "l_thumb_mcp_flex", "l_thumb_ip"],
-    controlledTendons: ["l_index_flexor_deep", "l_index_extensor", "l_middle_flexor_deep", "l_middle_extensor", "l_ring_flexor_deep", "l_ring_extensor", "l_pinky_flexor_deep", "l_pinky_extensor", "l_thumb_flexor", "l_thumb_extensor"],
+    firmwareRole: "Left hand fingers — index/middle/ring/pinky MCP/PIP/DIP + thumb MCP/IP. All bidirectional flexion/extension via tendon pairs. Tactile feedback from 200 pressure sensors.",
+    controlledJoints: ["l_index_mcp_flex", "l_index_mcp_abd", "l_index_pip", "l_index_dip", "l_middle_mcp_flex", "l_middle_mcp_abd", "l_middle_pip", "l_middle_dip", "l_ring_mcp_flex", "l_ring_mcp_abd", "l_ring_pip", "l_ring_dip", "l_pinky_mcp_flex", "l_pinky_mcp_abd", "l_pinky_pip", "l_pinky_dip", "l_thumb_mcp_flex", "l_thumb_ip"],
+    controlledTendons: ["l_index_flexor_deep", "l_index_flexor_superficial", "l_index_extensor", "l_middle_flexor_deep", "l_middle_flexor_superficial", "l_middle_extensor", "l_ring_flexor_deep", "l_ring_flexor_superficial", "l_ring_extensor", "l_pinky_flexor_deep", "l_pinky_flexor_superficial", "l_pinky_extensor", "l_thumb_flexor", "l_thumb_extensor"],
     controlledPistons: [],
-    busInterface: "i2c_mux", loopRateHz: 500,
-    algorithms: ["tendon_tension_PID", "tactile_force_feedback", "bidirectional_grip_control", "object_slip_detection", "adaptive_grasp"],
-    powerBudgetW: 2,
+    busInterface: "spi_daisy_chain", loopRateHz: 500,
+    algorithms: ["tendon_tension_PID", "tactile_force_feedback", "bidirectional_grip_control", "object_slip_detection", "adaptive_grasp", "force_closure_optimization", "contact_wrench_estimation"],
+    powerBudgetW: 2.5,
   });
   mcb.push({
     name: "mcb_hand_right", processor: "ESP32-S3 240MHz",
-    firmwareRole: "Right hand — mirror of left hand controller",
-    controlledJoints: ["r_index_mcp_flex", "r_index_pip", "r_index_dip", "r_middle_mcp_flex", "r_middle_pip", "r_middle_dip", "r_ring_mcp_flex", "r_ring_pip", "r_ring_dip", "r_pinky_mcp_flex", "r_pinky_pip", "r_pinky_dip", "r_thumb_cmc_flex", "r_thumb_mcp_flex", "r_thumb_ip"],
-    controlledTendons: ["r_index_flexor_deep", "r_index_extensor", "r_middle_flexor_deep", "r_middle_extensor", "r_ring_flexor_deep", "r_ring_extensor", "r_pinky_flexor_deep", "r_pinky_extensor", "r_thumb_flexor", "r_thumb_extensor"],
+    firmwareRole: "Right hand fingers — mirror of left hand controller",
+    controlledJoints: ["r_index_mcp_flex", "r_index_mcp_abd", "r_index_pip", "r_index_dip", "r_middle_mcp_flex", "r_middle_mcp_abd", "r_middle_pip", "r_middle_dip", "r_ring_mcp_flex", "r_ring_mcp_abd", "r_ring_pip", "r_ring_dip", "r_pinky_mcp_flex", "r_pinky_mcp_abd", "r_pinky_pip", "r_pinky_dip", "r_thumb_mcp_flex", "r_thumb_ip"],
+    controlledTendons: ["r_index_flexor_deep", "r_index_flexor_superficial", "r_index_extensor", "r_middle_flexor_deep", "r_middle_flexor_superficial", "r_middle_extensor", "r_ring_flexor_deep", "r_ring_flexor_superficial", "r_ring_extensor", "r_pinky_flexor_deep", "r_pinky_flexor_superficial", "r_pinky_extensor", "r_thumb_flexor", "r_thumb_extensor"],
     controlledPistons: [],
-    busInterface: "i2c_mux", loopRateHz: 500,
-    algorithms: ["tendon_tension_PID", "tactile_force_feedback", "bidirectional_grip_control", "object_slip_detection", "adaptive_grasp"],
+    busInterface: "spi_daisy_chain", loopRateHz: 500,
+    algorithms: ["tendon_tension_PID", "tactile_force_feedback", "bidirectional_grip_control", "object_slip_detection", "adaptive_grasp", "force_closure_optimization", "contact_wrench_estimation"],
+    powerBudgetW: 2.5,
+  });
+  mcb.push({
+    name: "mcb_foot_toes_left", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Left foot toes — hallux (MTP+IP) + toes 2-5 (MTP+PIP+DIP) bidirectional grip + tarsometatarsal + midfoot joints + arch spring control + 80 plantar pressure sensors",
+    controlledJoints: ["l_hallux_mtp_flex", "l_hallux_mtp_abd", "l_hallux_ip", "l_toe2_mtp_flex", "l_toe2_pip", "l_toe2_dip", "l_toe3_mtp_flex", "l_toe3_pip", "l_toe3_dip", "l_toe4_mtp_flex", "l_toe4_pip", "l_toe4_dip", "l_toe5_mtp_flex", "l_toe5_pip", "l_toe5_dip", "l_tarsometatarsal_1", "l_tarsometatarsal_2", "l_tarsometatarsal_3", "l_tarsometatarsal_4", "l_tarsometatarsal_5"],
+    controlledTendons: ["l_hallux_flexor", "l_hallux_extensor", "l_toe2_flexor", "l_toe2_extensor", "l_toe3_flexor", "l_toe3_extensor", "l_toe4_flexor", "l_toe4_extensor", "l_toe5_flexor", "l_toe5_extensor"],
+    controlledPistons: [],
+    busInterface: "spi_daisy_chain", loopRateHz: 500,
+    algorithms: ["tendon_tension_PID", "ground_contact_detection", "arch_spring_control", "toe_grip_balance", "plantar_pressure_mapping", "gait_phase_detection"],
     powerBudgetW: 2,
   });
   mcb.push({
-    name: "mcb_spine", processor: "STM32H7 480MHz",
-    firmwareRole: "Spine + torso — all intervertebral joints, costovertebral ribs, core tendon tension, torso pistons",
-    controlledJoints: ["atlanto_occipital_flex", "atlanto_axial_rotation", "cervical_c7_t1_flex", "thoracolumbar_t12_l1_flex", "lumbosacral_l5_s1"],
-    controlledTendons: ["erector_spinae_l", "erector_spinae_r", "rectus_abdominis_l", "rectus_abdominis_r", "neck_flexor", "neck_extensor", "oblique_l", "oblique_r"],
+    name: "mcb_foot_toes_right", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Right foot toes — mirror of left foot/toe controller",
+    controlledJoints: ["r_hallux_mtp_flex", "r_hallux_mtp_abd", "r_hallux_ip", "r_toe2_mtp_flex", "r_toe2_pip", "r_toe2_dip", "r_toe3_mtp_flex", "r_toe3_pip", "r_toe3_dip", "r_toe4_mtp_flex", "r_toe4_pip", "r_toe4_dip", "r_toe5_mtp_flex", "r_toe5_pip", "r_toe5_dip", "r_tarsometatarsal_1", "r_tarsometatarsal_2", "r_tarsometatarsal_3", "r_tarsometatarsal_4", "r_tarsometatarsal_5"],
+    controlledTendons: ["r_hallux_flexor", "r_hallux_extensor", "r_toe2_flexor", "r_toe2_extensor", "r_toe3_flexor", "r_toe3_extensor", "r_toe4_flexor", "r_toe4_extensor", "r_toe5_flexor", "r_toe5_extensor"],
+    controlledPistons: [],
+    busInterface: "spi_daisy_chain", loopRateHz: 500,
+    algorithms: ["tendon_tension_PID", "ground_contact_detection", "arch_spring_control", "toe_grip_balance", "plantar_pressure_mapping", "gait_phase_detection"],
+    powerBudgetW: 2,
+  });
+  mcb.push({
+    name: "mcb_foot_ankle_left", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Left foot structure — manages talocrural/subtalar/midfoot/arch compliance in coordination with mcb_knee_ankle_left for ankle joint sharing",
+    controlledJoints: ["l_calcaneocuboid", "l_talonavicular", "l_cuneonavicular_1", "l_cuneonavicular_2", "l_cuneonavicular_3", "l_cuboideonavicular"],
+    controlledTendons: ["l_peroneal_tendon", "l_plantar_fascia_tendon"],
+    controlledPistons: [],
+    busInterface: "spi_daisy_chain", loopRateHz: 500,
+    algorithms: ["arch_compliance_control", "midfoot_stability", "lateral_balance_assist", "pronation_supination_control"],
+    powerBudgetW: 1.5,
+  });
+  mcb.push({
+    name: "mcb_foot_ankle_right", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Right foot structure — mirror of left foot structure controller",
+    controlledJoints: ["r_calcaneocuboid", "r_talonavicular", "r_cuneonavicular_1", "r_cuneonavicular_2", "r_cuneonavicular_3", "r_cuboideonavicular"],
+    controlledTendons: ["r_peroneal_tendon", "r_plantar_fascia_tendon"],
+    controlledPistons: [],
+    busInterface: "spi_daisy_chain", loopRateHz: 500,
+    algorithms: ["arch_compliance_control", "midfoot_stability", "lateral_balance_assist", "pronation_supination_control"],
+    powerBudgetW: 1.5,
+  });
+
+  // ─── TIER 4: TORSO + NECK + HEAD — STM32H7 at 500-1000Hz (3 nodes) ───
+  // Robot has rigid torso frame with articulation points, NOT individual vertebrae
+  mcb.push({
+    name: "mcb_torso", processor: "STM32H7 480MHz",
+    firmwareRole: "Torso articulation — upper (pitch/yaw/roll) + lower (pitch/yaw/roll) flex points. Controls all core tendons + torso pistons. Handles bending, twisting, lifting posture.",
+    controlledJoints: ["torso_upper_pitch", "torso_upper_yaw", "torso_upper_roll", "torso_lower_pitch", "torso_lower_yaw", "torso_lower_roll"],
+    controlledTendons: ["erector_spinae_l", "erector_spinae_r", "rectus_abdominis_l", "rectus_abdominis_r", "oblique_l", "oblique_r", "lateral_flexor_l", "lateral_flexor_r"],
     controlledPistons: ["torso_core_piston_front", "torso_core_piston_rear"],
     busInterface: "can_fd", loopRateHz: 500,
-    algorithms: ["multi_segment_PID", "spinal_curvature_control", "breathing_rhythm", "core_stability_tensor", "posture_optimization"],
+    algorithms: ["cascaded_PID", "core_stability_tensor", "posture_optimization", "lifting_load_distribution", "torso_impedance_control"],
     powerBudgetW: 3,
   });
   mcb.push({
-    name: "mcb_foot_left", processor: "ESP32-S3 240MHz",
-    firmwareRole: "Left foot — toe tendons, foot arch, pressure sensing, ground contact",
-    controlledJoints: ["l_hallux_mtp_flex", "l_hallux_ip", "l_toe2_mtp_flex", "l_toe3_mtp_flex", "l_toe4_mtp_flex", "l_toe5_mtp_flex"],
-    controlledTendons: ["l_hallux_flexor", "l_hallux_extensor", "l_toe2_flexor", "l_toe2_extensor", "l_toe3_flexor", "l_toe3_extensor", "l_toe4_flexor", "l_toe4_extensor", "l_toe5_flexor", "l_toe5_extensor"],
+    name: "mcb_neck_head", processor: "STM32H7 480MHz",
+    firmwareRole: "Neck + Head — neck pitch/roll, atlanto-occipital (nod), atlanto-axial (360° rotate), TMJ (jaw), eye pan/tilt servos. All neck/head tendons.",
+    controlledJoints: ["neck_pitch", "neck_roll", "atlanto_occipital_flex", "atlanto_axial_rotation", "temporomandibular"],
+    controlledTendons: ["neck_flexor", "neck_extensor", "neck_lateral_l", "neck_lateral_r"],
     controlledPistons: [],
-    busInterface: "i2c_mux", loopRateHz: 500,
-    algorithms: ["tendon_tension_PID", "ground_contact_detection", "arch_spring_control", "toe_grip_balance"],
-    powerBudgetW: 1.5,
+    busInterface: "can_fd", loopRateHz: 1000,
+    algorithms: ["cascaded_PID", "head_stabilization", "vestibulo_ocular_reflex", "neck_impedance_control", "saccade_control", "jaw_force_feedback", "head_gaze_coordination", "smooth_pursuit_tracking"],
+    powerBudgetW: 3,
   });
   mcb.push({
-    name: "mcb_foot_right", processor: "ESP32-S3 240MHz",
-    firmwareRole: "Right foot — mirror of left foot controller",
-    controlledJoints: ["r_hallux_mtp_flex", "r_hallux_ip", "r_toe2_mtp_flex", "r_toe3_mtp_flex", "r_toe4_mtp_flex", "r_toe5_mtp_flex"],
-    controlledTendons: ["r_hallux_flexor", "r_hallux_extensor", "r_toe2_flexor", "r_toe2_extensor", "r_toe3_flexor", "r_toe3_extensor", "r_toe4_flexor", "r_toe4_extensor", "r_toe5_flexor", "r_toe5_extensor"],
+    name: "mcb_pelvis", processor: "STM32H7 480MHz",
+    firmwareRole: "Pelvis frame — pelvic tilt control, bridges torso to legs. Critical for gait and balance. Coordinates with hip and torso controllers.",
+    controlledJoints: [],
+    controlledTendons: ["psoas_l", "psoas_r", "iliacus_l", "iliacus_r"],
     controlledPistons: [],
-    busInterface: "i2c_mux", loopRateHz: 500,
-    algorithms: ["tendon_tension_PID", "ground_contact_detection", "arch_spring_control", "toe_grip_balance"],
-    powerBudgetW: 1.5,
+    busInterface: "can_fd", loopRateHz: 500,
+    algorithms: ["pelvic_tilt_PID", "gait_phase_pelvic_rotation", "center_of_mass_tracking", "torso_hip_coordination"],
+    powerBudgetW: 2.5,
   });
+
+  // ─── TIER 5: SYSTEM CONTROLLERS — ESP32-S3 (5 nodes) ──────────
   mcb.push({
-    name: "mcb_hydraulic_pump", processor: "ESP32-S3 240MHz",
-    firmwareRole: "Central hydraulic pump controller — manages fluid pressure, reservoir, accumulator for all pistons",
+    name: "mcb_hydraulic_master", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Central hydraulic pump + accumulator — manages system-wide hydraulic pressure, reservoir level, burst mode for explosive movements",
     controlledJoints: [], controlledTendons: [],
-    controlledPistons: ["l_knee_power_piston", "r_knee_power_piston", "l_hip_power_piston", "r_hip_power_piston", "l_ankle_power_piston", "r_ankle_power_piston", "torso_core_piston_front", "torso_core_piston_rear"],
+    controlledPistons: ["l_knee_power_piston", "r_knee_power_piston", "l_hip_power_piston", "r_hip_power_piston", "l_ankle_power_piston", "r_ankle_power_piston", "l_shoulder_assist_piston", "r_shoulder_assist_piston", "l_elbow_assist_piston", "r_elbow_assist_piston", "torso_core_piston_front", "torso_core_piston_rear"],
     busInterface: "can_fd", loopRateHz: 200,
-    algorithms: ["pressure_regulation", "accumulator_charge_management", "burst_mode_for_jumps", "fluid_temperature_monitoring", "leak_detection"],
+    algorithms: ["pressure_regulation", "accumulator_charge_management", "burst_mode_for_jumps", "fluid_temperature_monitoring", "leak_detection", "piston_synchronization", "energy_regeneration"],
     powerBudgetW: 5,
   });
   mcb.push({
-    name: "mcb_shock_management", processor: "ESP32-S3 240MHz",
-    firmwareRole: "Shock absorber tuning — adjusts MR damper stiffness in real-time for landing, walking, running",
+    name: "mcb_shock_damper", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Shock absorber management — tunes all 11 MR dampers in real-time. Terrain-adaptive stiffness, pre-landing stiffening, walking/running mode switch.",
     controlledJoints: [], controlledTendons: [], controlledPistons: [],
     busInterface: "can_fd", loopRateHz: 1000,
-    algorithms: ["MR_current_control", "impact_prediction", "terrain_adaptation", "gait_phase_detection", "vibration_frequency_analysis"],
+    algorithms: ["MR_current_control", "impact_prediction", "terrain_adaptation", "gait_phase_detection", "vibration_frequency_analysis", "pre_landing_stiffening", "jump_crouch_softening"],
+    powerBudgetW: 2,
+  });
+  mcb.push({
+    name: "mcb_spring_management", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Spring preload + energy return — monitors all 11 springs, optimizes preload for current activity (walking/running/jumping), manages spring energy charging for explosive movements",
+    controlledJoints: [], controlledTendons: [], controlledPistons: [],
+    busInterface: "can_fd", loopRateHz: 500,
+    algorithms: ["spring_preload_optimization", "energy_storage_tracking", "spring_fatigue_monitoring", "activity_mode_tuning", "jump_charge_sequencing"],
+    powerBudgetW: 1.5,
+  });
+  mcb.push({
+    name: "mcb_power_management", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Power distribution + battery management — monitors all battery packs, manages hot-swap, distributes power budgets to all 31 other controllers, emergency power conservation mode",
+    controlledJoints: [], controlledTendons: [], controlledPistons: [],
+    busInterface: "can_fd", loopRateHz: 100,
+    algorithms: ["battery_SoC_estimation", "hot_swap_sequencing", "power_budget_allocation", "thermal_management", "regenerative_braking_routing", "emergency_power_conservation"],
+    powerBudgetW: 2,
+  });
+  mcb.push({
+    name: "mcb_safety_watchdog", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Independent safety watchdog — hardware-level emergency stop, collision detection, thermal shutdown, joint limit enforcement, tendon breakage detection. Runs independently from master — can shut down entire body if master fails.",
+    controlledJoints: [], controlledTendons: [], controlledPistons: [],
+    busInterface: "can_fd", loopRateHz: 1000,
+    algorithms: ["hardware_watchdog_timer", "collision_force_threshold", "thermal_runaway_detection", "joint_limit_enforcement", "tendon_tension_anomaly", "motor_overcurrent_shutdown", "heartbeat_monitoring_all_nodes"],
+    powerBudgetW: 1,
+  });
+
+  // ─── TIER 6: SENSOR FUSION — ESP32-S3 (5 nodes) ───────────────
+  mcb.push({
+    name: "mcb_tactile_upper_left", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Left upper body tactile — processes 250 pressure sensors across left hand (200), left forearm (30), left upper arm (20). Contact detection, force mapping, object recognition by touch.",
+    controlledJoints: [], controlledTendons: [], controlledPistons: [],
+    busInterface: "spi_daisy_chain", loopRateHz: 200,
+    algorithms: ["pressure_array_scan", "contact_force_estimation", "texture_classification", "object_shape_recognition", "collision_detection_reflex"],
+    powerBudgetW: 1.5,
+  });
+  mcb.push({
+    name: "mcb_tactile_upper_right", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Right upper body tactile — mirror of left upper body tactile",
+    controlledJoints: [], controlledTendons: [], controlledPistons: [],
+    busInterface: "spi_daisy_chain", loopRateHz: 200,
+    algorithms: ["pressure_array_scan", "contact_force_estimation", "texture_classification", "object_shape_recognition", "collision_detection_reflex"],
+    powerBudgetW: 1.5,
+  });
+  mcb.push({
+    name: "mcb_tactile_lower_left", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Left lower body tactile — processes 130 pressure sensors across left foot (80 plantar), left shin (20), left thigh (30). Ground reaction force, gait contact phase, terrain classification.",
+    controlledJoints: [], controlledTendons: [], controlledPistons: [],
+    busInterface: "spi_daisy_chain", loopRateHz: 200,
+    algorithms: ["plantar_pressure_mapping", "ground_reaction_force", "gait_contact_phase", "terrain_classification", "slip_detection"],
+    powerBudgetW: 1.5,
+  });
+  mcb.push({
+    name: "mcb_tactile_lower_right", processor: "ESP32-S3 240MHz",
+    firmwareRole: "Right lower body tactile — mirror of left lower body tactile",
+    controlledJoints: [], controlledTendons: [], controlledPistons: [],
+    busInterface: "spi_daisy_chain", loopRateHz: 200,
+    algorithms: ["plantar_pressure_mapping", "ground_reaction_force", "gait_contact_phase", "terrain_classification", "slip_detection"],
+    powerBudgetW: 1.5,
+  });
+  mcb.push({
+    name: "mcb_imu_fusion", processor: "ESP32-S3 240MHz",
+    firmwareRole: "IMU sensor fusion — 6 IMUs (head, torso, pelvis, left/right wrist, left/right ankle). Fuses accelerometer + gyroscope data into whole-body orientation estimate. Critical for balance, flip tracking, landing detection.",
+    controlledJoints: [], controlledTendons: [], controlledPistons: [],
+    busInterface: "spi_daisy_chain", loopRateHz: 1000,
+    algorithms: ["extended_kalman_filter", "complementary_filter", "madgwick_AHRS", "zero_velocity_update", "free_fall_detection", "flip_rotation_tracking", "landing_impact_estimation"],
     powerBudgetW: 1.5,
   });
 
@@ -1554,50 +1774,27 @@ function buildHumanoidJoints(): JointModel[] {
   add("temporomandibular", "universal", "condyloid", "Temporomandibular (Jaw)", "skull", "mandible", [0,1,0], -45, 5, false, 1.5, 3, 0.05, [0.0002,0.0002,0.0001], "i2c_face");
 
   // ═══════════════════════════════════════════════════════════════
-  //  CERVICAL SPINE C1-C7 — intervertebral facet joints (14 joints)
-  //  Each vertebra: flexion/extension + lateral rotation
+  //  NECK — 2-DOF articulation (tilt + rotate handled by atlanto joints above)
+  //  Robot neck: rigid tube with servo-driven flexion at base
+  //  Head already has atlanto-occipital (nod) + atlanto-axial (360° rotate)
+  //  One additional neck pitch joint for forward/back lean
   // ═══════════════════════════════════════════════════════════════
-  for (let i = 2; i <= 7; i++) {
-    const parent = `c${i}_vertebra`;
-    const child = i === 2 ? "c2_axis" : `c${i-1}_vertebra`;
-    add(`cervical_c${i}_c${i-1}_flex`, "revolute", "intervertebral", `Cervical C${i}-C${i-1} Facet (flex/ext)`, parent, child, [0,1,0], -8, 8, false, 4, 1.5, 0.04, [0.0003,0.0003,0.0001], "can_spine");
-    add(`cervical_c${i}_c${i-1}_rot`, "revolute", "intervertebral", `Cervical C${i}-C${i-1} Facet (rotation)`, parent, child, [0,0,1], -6, 6, false, 3, 1.5, 0.02, [0.0002,0.0002,0.0001], "can_spine");
-  }
-  add("cervical_c7_t1_flex", "revolute", "intervertebral", "Cervicothoracic C7-T1 Facet (flex)", "c7_vertebra", "t1_vertebra", [0,1,0], -5, 5, false, 5, 1, 0.04, [0.0003,0.0003,0.0001], "can_spine");
-  add("cervical_c7_t1_rot", "revolute", "intervertebral", "Cervicothoracic C7-T1 Facet (rot)", "c7_vertebra", "t1_vertebra", [0,0,1], -4, 4, false, 4, 1, 0.02, [0.0002,0.0002,0.0001], "can_spine");
+  add("neck_pitch", "revolute", "robotic_articulation", "Neck Pitch (forward/backward lean)", "upper_torso_frame", "neck_base", [0,1,0], -30, 30, false, 8, 3, 0.15, [0.002,0.002,0.001], "can_spine");
+  add("neck_roll", "revolute", "robotic_articulation", "Neck Roll (side tilt)", "neck_base", "c1_atlas", [1,0,0], -25, 25, false, 6, 3, 0.1, [0.001,0.001,0.0005], "can_spine");
 
   // ═══════════════════════════════════════════════════════════════
-  //  THORACIC SPINE T1-T12 — intervertebral facet joints (22 joints)
+  //  TORSO — RIGID FRAME WITH 3 ARTICULATION POINTS
+  //  Real robots do NOT have individual vertebrae. They have a rigid
+  //  structural frame (aluminum/carbon fiber) with a few powered
+  //  flex points for bending and twisting. This is how Atlas,
+  //  Optimus, and every real humanoid does it.
   // ═══════════════════════════════════════════════════════════════
-  for (let i = 1; i <= 11; i++) {
-    add(`thoracic_t${i}_t${i+1}_flex`, "revolute", "intervertebral", `Thoracic T${i}-T${i+1} Facet (flex/ext)`, `t${i}_vertebra`, `t${i+1}_vertebra`, [0,1,0], -5, 5, false, 8, 1, 0.06, [0.0005,0.0005,0.0002], "can_spine");
-    add(`thoracic_t${i}_t${i+1}_rot`, "revolute", "intervertebral", `Thoracic T${i}-T${i+1} Facet (rotation)`, `t${i}_vertebra`, `t${i+1}_vertebra`, [0,0,1], -4, 4, false, 6, 1, 0.03, [0.0003,0.0003,0.0001], "can_spine");
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  //  LUMBAR SPINE L1-L5 — intervertebral facet joints (10 joints)
-  // ═══════════════════════════════════════════════════════════════
-  add("thoracolumbar_t12_l1_flex", "revolute", "intervertebral", "Thoracolumbar T12-L1 Facet (flex)", "t12_vertebra", "l1_vertebra", [0,1,0], -8, 8, false, 12, 1, 0.07, [0.0008,0.0008,0.0003], "can_spine");
-  add("thoracolumbar_t12_l1_rot", "revolute", "intervertebral", "Thoracolumbar T12-L1 Facet (rot)", "t12_vertebra", "l1_vertebra", [0,0,1], -5, 5, false, 10, 1, 0.04, [0.0005,0.0005,0.0002], "can_spine");
-  for (let i = 1; i <= 4; i++) {
-    add(`lumbar_l${i}_l${i+1}_flex`, "revolute", "intervertebral", `Lumbar L${i}-L${i+1} Facet (flex/ext)`, `l${i}_vertebra`, `l${i+1}_vertebra`, [0,1,0], -12, 12, false, 15, 1, 0.08, [0.001,0.001,0.0004], "can_spine");
-    add(`lumbar_l${i}_l${i+1}_rot`, "revolute", "intervertebral", `Lumbar L${i}-L${i+1} Facet (rotation)`, `l${i}_vertebra`, `l${i+1}_vertebra`, [0,0,1], -5, 5, false, 12, 1, 0.04, [0.0005,0.0005,0.0002], "can_spine");
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  //  LUMBOSACRAL + SACROILIAC (3 joints)
-  // ═══════════════════════════════════════════════════════════════
-  add("lumbosacral_l5_s1", "revolute", "intervertebral", "Lumbosacral L5-S1 Facet", "l5_vertebra", "sacrum", [0,1,0], -10, 10, false, 20, 0.8, 0.1, [0.002,0.002,0.001], "can_spine");
-  add("l_sacroiliac", "prismatic", "gliding", "Left Sacroiliac", "sacrum", "l_ilium", [0,1,0], -4, 4, false, 20, 0.5, 0.1, [0.002,0.002,0.001], "can_spine");
-  add("r_sacroiliac", "prismatic", "gliding", "Right Sacroiliac", "sacrum", "r_ilium", [0,1,0], -4, 4, false, 20, 0.5, 0.1, [0.002,0.002,0.001], "can_spine");
-
-  // ═══════════════════════════════════════════════════════════════
-  //  RIBS — costovertebral (24 joints, gliding)
-  // ═══════════════════════════════════════════════════════════════
-  for (let i = 1; i <= 12; i++) {
-    add(`l_costovertebral_rib${i}`, "prismatic", "gliding", `Left Costovertebral Rib ${i}`, `t${i}_vertebra`, `l_rib${i}`, [1,0,0], -3, 3, false, 2, 0.5, 0.02, [0.0001,0.0001,0.0001], "can_spine");
-    add(`r_costovertebral_rib${i}`, "prismatic", "gliding", `Right Costovertebral Rib ${i}`, `t${i}_vertebra`, `r_rib${i}`, [1,0,0], -3, 3, false, 2, 0.5, 0.02, [0.0001,0.0001,0.0001], "can_spine");
-  }
+  add("torso_upper_pitch", "revolute", "robotic_articulation", "Upper Torso Pitch (forward/back bend)", "mid_torso_frame", "upper_torso_frame", [0,1,0], -30, 30, false, 80, 2, 1.5, [0.02,0.02,0.01], "can_spine");
+  add("torso_upper_yaw", "revolute", "robotic_articulation", "Upper Torso Yaw (twist left/right)", "mid_torso_frame", "upper_torso_frame", [0,0,1], -45, 45, false, 60, 2, 1.2, [0.015,0.015,0.008], "can_spine");
+  add("torso_upper_roll", "revolute", "robotic_articulation", "Upper Torso Roll (lateral bend)", "mid_torso_frame", "upper_torso_frame", [1,0,0], -20, 20, false, 50, 1.5, 1.0, [0.01,0.01,0.005], "can_spine");
+  add("torso_lower_pitch", "revolute", "robotic_articulation", "Lower Torso Pitch (waist bend forward/back)", "pelvis_frame", "mid_torso_frame", [0,1,0], -40, 40, false, 100, 2, 2.0, [0.03,0.03,0.015], "can_spine");
+  add("torso_lower_yaw", "revolute", "robotic_articulation", "Lower Torso Yaw (waist twist)", "pelvis_frame", "mid_torso_frame", [0,0,1], -50, 50, false, 80, 2, 1.8, [0.025,0.025,0.012], "can_spine");
+  add("torso_lower_roll", "revolute", "robotic_articulation", "Lower Torso Roll (waist lateral bend)", "pelvis_frame", "mid_torso_frame", [1,0,0], -25, 25, false, 60, 1.5, 1.5, [0.015,0.015,0.008], "can_spine");
 
   // ═══════════════════════════════════════════════════════════════
   //  SHOULDER GIRDLE — sternoclavicular + acromioclavicular + glenohumeral
@@ -1824,8 +2021,8 @@ const BILL_OF_MATERIALS: BOMEntry[] = [
   { partName: "BLDC Motor 200W (shoulder/ankle)", category: "actuator", quantity: 10, unitCostUsd: 85, supplier: "AliExpress/Odrive", specifications: "200W, 48V, 3000rpm, 0.64Nm, harmonic drive 80:1 — shoulder, ankle, torso" },
   { partName: "BLDC Motor 100W (elbow/wrist/neck)", category: "actuator", quantity: 10, unitCostUsd: 45, supplier: "AliExpress/Odrive", specifications: "100W, 24V, 3000rpm, 0.32Nm, harmonic drive 50:1 — elbow, wrist, neck, jaw" },
   // ─── ACTUATORS — spine ─────────────────────────────────────────
-  { partName: "Linear Actuator 20W (spine segment)", category: "actuator", quantity: 48, unitCostUsd: 22, supplier: "AliExpress/Actuonix", specifications: "20W, 12V, 10mm stroke, 50N, CAN bus — cervical/thoracic/lumbar flexion+rotation" },
-  { partName: "Micro Servo SG90 (rib breathing)", category: "actuator", quantity: 24, unitCostUsd: 3, supplier: "AliExpress", specifications: "1.8kg-cm, 4.8V, micro, costovertebral expansion" },
+  { partName: "BLDC Motor 150W (torso articulation)", category: "actuator", quantity: 6, unitCostUsd: 65, supplier: "AliExpress/Odrive", specifications: "150W, 48V, 2000rpm, 0.5Nm, harmonic drive 100:1 — torso upper/lower pitch/yaw/roll" },
+  { partName: "Dynamixel XL330-M288-T (torso articulation)", category: "actuator", quantity: 6, unitCostUsd: 24, supplier: "Robotis", specifications: "0.52Nm, 12V, TTL bus, torso flex points" },
   // ─── ACTUATORS — hands/fingers ─────────────────────────────────
   { partName: "Micro Servo 10kg-cm (finger MCP)", category: "actuator", quantity: 20, unitCostUsd: 8, supplier: "AliExpress/TowerPro", specifications: "10kg-cm, 6V, digital, metal gear, MCP flex+abd" },
   { partName: "Micro Servo 5kg-cm (finger PIP/DIP)", category: "actuator", quantity: 16, unitCostUsd: 5, supplier: "AliExpress", specifications: "5kg-cm, 6V, digital, PIP and DIP flexion" },

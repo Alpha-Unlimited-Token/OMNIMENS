@@ -1,0 +1,73 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-03-25T02:52:02.788Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Utility function for text analysis: Word Frequency Counter
+// This function calculates the frequency of each word in a given string,
+// ignoring case and punctuation, and returns the result as an object.
+
+function wordFrequencyCounter(text) {
+    if (typeof text !== 'string') {
+        throw new Error('Input must be a string');
+    }
+
+    // Remove punctuation and convert to lowercase
+    const sanitizedText = text.replace(/[^\w\s]/g, '').toLowerCase();
+
+    // Split the text into words and filter out empty strings
+    const words = sanitizedText.split(/\s+/).filter(word => word.length > 0);
+
+    // Count the frequency of each word
+    const frequency = {};
+    for (let word of words) {
+        frequency[word] = (frequency[word] || 0) + 1;
+    }
+
+    return frequency;
+}
+
+// Self-tests
+(function testWordFrequencyCounter() {
+    console.log("Running tests for wordFrequencyCounter...");
+
+    // Test 1: Basic functionality
+    const text1 = "Hello world! Hello again, world.";
+    const result1 = wordFrequencyCounter(text1);
+    console.log(result1); // Expected: { hello: 2, world: 2, again: 1 }
+
+    // Test 2: Case insensitivity
+    const text2 = "Case CASE case.";
+    const result2 = wordFrequencyCounter(text2);
+    console.log(result2); // Expected: { case: 3 }
+
+    // Test 3: Handling punctuation
+    const text3 = "Punctuation! Shouldn't, affect: the result.";
+    const result3 = wordFrequencyCounter(text3);
+    console.log(result3); // Expected: { punctuation: 1, shouldnt: 1, affect: 1, the: 1, result: 1 }
+
+    // Test 4: Empty string
+    const text4 = "";
+    const result4 = wordFrequencyCounter(text4);
+    console.log(result4); // Expected: {}
+
+    // Test 5: String with only punctuation
+    const text5 = "!!! ??? ...";
+    const result5 = wordFrequencyCounter(text5);
+    console.log(result5); // Expected: {}
+
+    console.log("All tests completed.");
+})();

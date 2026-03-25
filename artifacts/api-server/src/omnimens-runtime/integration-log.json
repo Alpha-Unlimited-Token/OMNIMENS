@@ -1,25 +1,5 @@
 [
   {
-    "source": "backlog_dream_id_15557",
-    "title": "THE WILD IDEA —  “Polyphonic Intelligence Swarms”",
-    "filename": "theWildIdeaPolyphonicIntelligenceSwarms.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/theWildIdeaPolyphonicIntelligenceSwarms.mjs",
-    "backupPath": null,
-    "timestamp": 1774224541726,
-    "codeLength": 928,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_11427",
-    "title": "ARCHITECTURE NAME  \n   Dynamic Causal Simulation Lay",
-    "filename": "architectureNameDynamicCausalSimulationLay.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameDynamicCausalSimulationLay.mjs",
-    "backupPath": null,
-    "timestamp": 1774224544869,
-    "codeLength": 1243,
-    "overwrite": false
-  },
-  {
     "source": "backlog_dream_id_8967",
     "title": "ARCHITECTURE NAME  \n   HyperAbductive Curiosity Grap",
     "filename": "architectureNameHyperabductiveCuriosityGrap.mjs",
@@ -4997,6 +4977,26 @@
     "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-25T02-07-13-388Z",
     "timestamp": 1774404433385,
     "codeLength": 2156,
+    "overwrite": true
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
+    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-25T02-52-02-790Z",
+    "timestamp": 1774407122788,
+    "codeLength": 1893,
+    "overwrite": true
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
+    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-25T02-56-55-625Z",
+    "timestamp": 1774407415622,
+    "codeLength": 1834,
     "overwrite": true
   }
 ]
