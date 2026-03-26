@@ -89,8 +89,9 @@ export function createInitialBuildSteps(): BuildStep[] {
 }
 
 export function isBuildIntent(text: string): boolean {
+  if (/\b(video|movie|clip|film|animation|image|picture|photo|song|music|audio|sound|voice\s*over)\b/i.test(text)) return false;
   return /\b(build|create|make|develop|write|generate|code|scaffold)\b.{0,60}\b(app|application|website|web app|page|component|dashboard|api|server|game|bot|tool|ui|interface|extension|mobile|site|landing|portfolio|chat|store|shop|blog|voice|slides|presentation|quiz|form|admin|panel|e-?commerce|cart|checkout|diagram|chart|agent|automation|workflow|saas|platform|directory|gallery|timer|calculator|converter|tracker|planner|editor|studio)\b/i.test(text)
-    || /\b(build|create|make)\b.{0,10}\b(me|us|a|an|the)\b/i.test(text);
+    || /\b(build|create|make)\b.{0,10}\b(me|us|a|an|the)\b.{0,30}\b(app|application|website|web app|page|component|dashboard|api|server|game|bot|tool|ui|interface|extension|mobile|site|landing|portfolio|chat|store|shop|blog|slides|presentation|quiz|form|admin|panel|e-?commerce|cart|checkout|diagram|chart|agent|automation|workflow|saas|platform|directory|gallery|timer|calculator|converter|tracker|planner|editor|studio)\b/i.test(text);
 }
 
 export function extractFilesFromMarkdown(content: string): ExtractedFile[] {
