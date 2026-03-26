@@ -16,15 +16,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user, isLoading } = useAuth();
   const [location, setLocation] = useLocation();
   const isChat = location === "/chat";
+  const isConnect = location === "/connect";
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location]);
 
-  if (isChat) {
+  if (isChat || isConnect) {
     return (
-      <div className="h-screen flex flex-col relative overflow-hidden">
+      <div className="h-[100dvh] flex flex-col relative overflow-hidden">
         {children}
       </div>
     );
