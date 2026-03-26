@@ -4,8 +4,10 @@
  * Unauthorized reproduction, distribution, or use is strictly prohibited.
  */
 
+import { createServer } from "http";
 import app from "./app";
 import { syncTogetherPricing } from "./lib/together-ai.js";
+import { startConsciousnessWebSocket } from "./lib/omnimens-consciousness-ws.js";
 
 const rawPort = process.env["PORT"];
 
@@ -21,8 +23,11 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-app.listen(port, () => {
+const server = createServer(app);
+
+startConsciousnessWebSocket(server);
+
+server.listen(port, () => {
   console.log(`Server listening on port ${port}`);
-  // Fetch live Together AI pricing and warn if rates have changed
   syncTogetherPricing().catch(() => {});
 });

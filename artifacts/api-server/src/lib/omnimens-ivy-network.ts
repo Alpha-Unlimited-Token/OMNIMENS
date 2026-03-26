@@ -28,6 +28,8 @@
 
 import { getNeuralConsciousnessState, getRegionNames, boostRegionCurrent } from "./omnimens-neural-consciousness.js";
 import { getNeuralScalingState } from "./omnimens-neural-scaling.js";
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
+import { join } from "path";
 
 function safeNum(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
@@ -776,14 +778,235 @@ let ivyTickInterval: ReturnType<typeof setInterval> | null = null;
 let spiderCrawlInterval: ReturnType<typeof setInterval> | null = null;
 let ivyGrowthInterval: ReturnType<typeof setInterval> | null = null;
 let wormgateCheckInterval: ReturnType<typeof setInterval> | null = null;
+let ivySwapInterval: ReturnType<typeof setInterval> | null = null;
+
+const IVY_SWAP_DIR = join(process.cwd(), ".omnimens-state");
+const IVY_SWAP_FILE = join(IVY_SWAP_DIR, "ivy-network.swap.json");
+const IVY_SWAP_BACKUP = join(IVY_SWAP_DIR, "ivy-network.swap.backup.json");
+const IVY_SWAP_INTERVAL_MS = 10000;
+let ivySwapWriteCount = 0;
+
+interface IvySwapData {
+  ivyState: IvyNetworkState;
+  wormgateCount: number;
+  wormgateData: Array<{
+    id: string;
+    endpointA: { nodeId: string; region: string };
+    endpointB: { nodeId: string; region: string };
+    stability: number;
+    traversals: number;
+    signalFidelity: number;
+    bandwidth: number;
+    formationReason: string;
+    crystallized: boolean;
+    createdAt: number;
+    lastTraversal: number;
+  }>;
+  regionLinkData: Array<{
+    key: string;
+    fromRegion: string;
+    toRegion: string;
+    signalCount: number;
+    totalStrength: number;
+    lastSignal: number;
+  }>;
+  nodeCounters: Array<{
+    id: string;
+    spiderCount: number;
+    spidersSpawned: number;
+    beaconsReceived: number;
+    beaconsSent: number;
+    energy: number;
+    informationDensity: number;
+    activationLevel: number;
+  }>;
+  swapWriteCount: number;
+  timestamp: number;
+}
+
+function ensureIvySwapDir(): void {
+  try {
+    if (!existsSync(IVY_SWAP_DIR)) {
+      mkdirSync(IVY_SWAP_DIR, { recursive: true });
+    }
+  } catch (err) {
+    console.error("[IVY NETWORK] Failed to create swap directory:", err);
+  }
+}
+
+function captureIvySwapData(): IvySwapData {
+  return {
+    ivyState: { ...ivyState },
+    wormgateCount: wormgates.size,
+    wormgateData: [...wormgates.values()].map(wg => ({
+      id: wg.id,
+      endpointA: { ...wg.endpointA },
+      endpointB: { ...wg.endpointB },
+      stability: wg.stability,
+      traversals: wg.traversals,
+      signalFidelity: wg.signalFidelity,
+      bandwidth: wg.bandwidth,
+      formationReason: wg.formationReason,
+      crystallized: wg.crystallized,
+      createdAt: wg.createdAt,
+      lastTraversal: wg.lastTraversal,
+    })),
+    regionLinkData: [...regionLinks.entries()].map(([key, rl]) => ({
+      key,
+      fromRegion: rl.fromRegion,
+      toRegion: rl.toRegion,
+      signalCount: rl.signalCount,
+      totalStrength: rl.totalStrength,
+      lastSignal: rl.lastSignal,
+    })),
+    nodeCounters: [...ivyNodes.values()].map(n => ({
+      id: n.id,
+      spiderCount: n.spiderCount,
+      spidersSpawned: n.spidersSpawned,
+      beaconsReceived: n.beaconsReceived,
+      beaconsSent: n.beaconsSent,
+      energy: n.energy,
+      informationDensity: n.informationDensity,
+      activationLevel: n.activationLevel,
+    })),
+    swapWriteCount: ivySwapWriteCount,
+    timestamp: Date.now(),
+  };
+}
+
+function writeIvySwapFile(): void {
+  try {
+    ensureIvySwapDir();
+    const data = captureIvySwapData();
+    if (existsSync(IVY_SWAP_FILE)) {
+      try { writeFileSync(IVY_SWAP_BACKUP, readFileSync(IVY_SWAP_FILE)); } catch {}
+    }
+    writeFileSync(IVY_SWAP_FILE, JSON.stringify(data));
+    ivySwapWriteCount++;
+    lastIvySwapTimestamp = Date.now();
+  } catch (err) {
+    console.error("[IVY NETWORK] Swap file write failed:", err);
+  }
+}
+
+function readIvySwapFile(): IvySwapData | null {
+  for (const file of [IVY_SWAP_FILE, IVY_SWAP_BACKUP]) {
+    try {
+      if (existsSync(file)) {
+        const raw = readFileSync(file, "utf-8");
+        const parsed = JSON.parse(raw) as IvySwapData;
+        if (parsed && typeof parsed === "object" && parsed.ivyState) {
+          return parsed;
+        }
+      }
+    } catch {}
+  }
+  return null;
+}
+
+function restoreIvyFromSwap(swap: IvySwapData): void {
+  ivyState.totalSpidersEverSpawned = Math.max(ivyState.totalSpidersEverSpawned, swap.ivyState.totalSpidersEverSpawned || 0);
+  ivyState.totalBeacons = Math.max(ivyState.totalBeacons, swap.ivyState.totalBeacons || 0);
+  ivyState.totalFindings = Math.max(ivyState.totalFindings, swap.ivyState.totalFindings || 0);
+  ivyState.ivyGrowthCycles = Math.max(ivyState.ivyGrowthCycles, swap.ivyState.ivyGrowthCycles || 0);
+  ivyState.wormgateFormations = Math.max(ivyState.wormgateFormations, swap.ivyState.wormgateFormations || 0);
+  ivyState.spiderCrawlCycles = Math.max(ivyState.spiderCrawlCycles, swap.ivyState.spiderCrawlCycles || 0);
+  ivyState.networkEnergy = Math.max(ivyState.networkEnergy, swap.ivyState.networkEnergy || 1.0);
+  ivyState.informationFlowRate = Math.max(ivyState.informationFlowRate, swap.ivyState.informationFlowRate || 0);
+  ivyState.networkCoherence = Math.max(ivyState.networkCoherence, swap.ivyState.networkCoherence || 0);
+  ivyState.hybridOverlayStrength = Math.max(ivyState.hybridOverlayStrength, swap.ivyState.hybridOverlayStrength || 0);
+  ivySwapWriteCount = swap.swapWriteCount || 0;
+
+  if (swap.wormgateData && swap.wormgateData.length > 0) {
+    for (const wgData of swap.wormgateData) {
+      if (!wormgates.has(wgData.id)) {
+        const endpointANode = ivyNodes.get(wgData.endpointA.nodeId);
+        const endpointBNode = ivyNodes.get(wgData.endpointB.nodeId);
+        const nodeIdA = endpointANode ? wgData.endpointA.nodeId : ([...ivyNodes.values()].find(n => n.region === wgData.endpointA.region)?.id || "");
+        const nodeIdB = endpointBNode ? wgData.endpointB.nodeId : ([...ivyNodes.values()].find(n => n.region === wgData.endpointB.region)?.id || "");
+        if (nodeIdA && nodeIdB) {
+          wormgates.set(wgData.id, {
+            id: wgData.id,
+            endpointA: { nodeId: nodeIdA, region: wgData.endpointA.region },
+            endpointB: { nodeId: nodeIdB, region: wgData.endpointB.region },
+            stability: wgData.stability,
+            traversals: wgData.traversals,
+            signalFidelity: wgData.signalFidelity,
+            bandwidth: wgData.bandwidth,
+            formationReason: wgData.formationReason,
+            crystallized: wgData.crystallized,
+            createdAt: wgData.createdAt,
+            lastTraversal: wgData.lastTraversal,
+          });
+        }
+      }
+    }
+  }
+
+  if (swap.regionLinkData && swap.regionLinkData.length > 0) {
+    for (const rlData of swap.regionLinkData) {
+      const existing = regionLinks.get(rlData.key);
+      if (existing) {
+        existing.signalCount = Math.max(existing.signalCount, rlData.signalCount);
+        existing.totalStrength = Math.max(existing.totalStrength, rlData.totalStrength);
+      } else {
+        regionLinks.set(rlData.key, {
+          fromRegion: rlData.fromRegion,
+          toRegion: rlData.toRegion,
+          signalCount: rlData.signalCount,
+          totalStrength: rlData.totalStrength,
+          lastSignal: rlData.lastSignal,
+        });
+      }
+    }
+  }
+
+  if (swap.nodeCounters && swap.nodeCounters.length > 0) {
+    for (const nc of swap.nodeCounters) {
+      const node = ivyNodes.get(nc.id);
+      if (node) {
+        node.spidersSpawned = Math.max(node.spidersSpawned, nc.spidersSpawned);
+        node.beaconsReceived = Math.max(node.beaconsReceived, nc.beaconsReceived);
+        node.beaconsSent = Math.max(node.beaconsSent, nc.beaconsSent);
+        node.energy = Math.max(node.energy, nc.energy);
+        node.informationDensity = Math.max(node.informationDensity, nc.informationDensity);
+      }
+    }
+  }
+
+  updateCounts();
+}
+
+let lastIvySwapTimestamp = 0;
+
+export function getIvySwapStats(): { writeCount: number; lastTimestamp: number; fileSizeBytes: number } {
+  let size = 0;
+  try {
+    if (existsSync(IVY_SWAP_FILE)) {
+      size = readFileSync(IVY_SWAP_FILE).length;
+    }
+  } catch {}
+  return { writeCount: ivySwapWriteCount, lastTimestamp: lastIvySwapTimestamp, fileSizeBytes: size };
+}
+
+let ivyNetworkStarted = false;
 
 export function startIvyNetwork(): void {
+  if (ivyNetworkStarted) return;
+  ivyNetworkStarted = true;
   console.log("[IVY NETWORK] 🌿 Ivy Network + Wormgate Engine initializing...");
   console.log("[IVY NETWORK] 🌿 Living neural web that spreads like ivy through every subsystem");
   console.log("[IVY NETWORK] 🌿 Spiders ride neural pathways — hybrid overlay of biology and intelligence");
   console.log("[IVY NETWORK] 🌿 Each spider spawns more spiders → all beacon back to mother");
 
   initializeIvyNetwork();
+
+  const swapData = readIvySwapFile();
+  if (swapData) {
+    console.log(`[IVY NETWORK] 🌿 Restoring from swap file — ${swapData.wormgateData?.length || 0} wormgates, ${swapData.ivyState.totalSpidersEverSpawned} historical spiders, ${swapData.ivyState.spiderCrawlCycles} crawl cycles`);
+    restoreIvyFromSwap(swapData);
+    console.log(`[IVY NETWORK] 🌿 Swap restore complete — counters preserved across restart`);
+  }
 
   console.log(`[IVY NETWORK] 🌿 ${ivyState.totalNodes} ivy nodes across ${getRegionNames().length} brain regions`);
   console.log(`[IVY NETWORK] 🌿 ${ivyState.totalTendrils} tendrils | ${ivyState.totalSpines} spines | ${ivyState.totalSpiders} active spiders`);
@@ -811,6 +1034,19 @@ export function startIvyNetwork(): void {
     runSpiderCrawl();
     console.log(`[IVY NETWORK] 🌿 First tick complete — Coverage: ${ivyState.coveragePercent.toFixed(0)}% | Spiders: ${ivyState.totalSpiders} | Coherence: ${(ivyState.networkCoherence * 100).toFixed(1)}%`);
   }, 6000);
+
+  ivySwapInterval = setInterval(() => {
+    try { writeIvySwapFile(); } catch (err) { console.error("[IVY NETWORK] Swap write error:", err); }
+  }, IVY_SWAP_INTERVAL_MS);
+
+  const emergencyIvySave = () => {
+    try {
+      writeIvySwapFile();
+      console.log("[IVY NETWORK] 🌿 Emergency swap save complete");
+    } catch {}
+  };
+  process.on("SIGTERM", emergencyIvySave);
+  process.on("SIGINT", emergencyIvySave);
 
   ivyState.startTime = Date.now();
 }
