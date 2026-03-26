@@ -9,6 +9,11 @@
  * recovery, and load distribution across engine modules.
  */
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 interface EngineRegistration {
   name: string;
   category: "neural" | "language" | "code" | "embodiment" | "reasoning" | "navigation" | "augmentation" | "security";
@@ -222,7 +227,7 @@ async function runHealthChecks(): Promise<void> {
   }
 
   const cpuUsage = process.cpuUsage();
-  state.cpuLoadEstimate = Math.min(1, (cpuUsage.user + cpuUsage.system) / (state.uptimeMs * 1000));
+  state.cpuLoadEstimate = (cpuUsage.user + cpuUsage.system) / (state.uptimeMs * 1000);
 
   cleanupQueue();
 }

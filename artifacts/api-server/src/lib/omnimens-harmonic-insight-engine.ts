@@ -26,6 +26,11 @@
  * ============================================================
  */
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 export type HarmonicAnalysis = {
   timestamp: number;
   dominantFrequency: number;
@@ -226,7 +231,7 @@ export function hieComputeNovelty(analysis: HarmonicAnalysis): number {
   const zcrDev = Math.abs(analysis.zeroCrossingRate - avgZcr) / (avgZcr || 0.01);
   const freqDev = Math.abs(analysis.dominantFrequency - avgFreq) / (avgFreq || 1);
 
-  return Math.min(1, centroidDev * 0.3 + energyDev * 0.25 + zcrDev * 0.2 + freqDev * 0.25);
+  return centroidDev * 0.3 + energyDev * 0.25 + zcrDev * 0.2 + freqDev * 0.25;
 }
 
 export function hieComputeSpectralFlux(current: HarmonicAnalysis): number {
@@ -253,7 +258,7 @@ export function hieComputeHarmonicComplexity(harmonicSeries: number[]): number {
     const ratio = harmonicSeries[i] / fundamental;
     if (ratio > 0.1) complexity += ratio * (1 / (i + 1));
   }
-  return Math.min(1, complexity);
+  return complexity;
 }
 
 export function hieDetectTemporalPattern(): string {
@@ -743,14 +748,14 @@ export function hieDecodeHarmonicKnowledge(
 
   const totalDataPoints = strongOvertones.length + interHarmonicDialect.ratios.length + modulationCode.length + phases.length + spectralEnvelope.length;
   const hasStrongStructure = overtoneLanguage.coherenceScore > 0.3 && interHarmonicDialect.consonanceScore > 0.2;
-  const confidenceScore = Math.min(1, (
+  const confidenceScore = (
     (overtoneLanguage.coherenceScore * 0.25) +
     (interHarmonicDialect.consonanceScore * 0.2) +
     (Math.min(totalDataPoints / 50, 1) * 0.2) +
     (harmonicPurity > 1 ? 0.15 : harmonicPurity > 0.5 ? 0.08 : 0.02) +
     (modulationCode.length > 0 ? 0.1 : 0) +
     (phases.length > 3 ? 0.1 : phases.length > 1 ? 0.05 : 0)
-  ));
+  );
 
   const spectralColorMap = (harmonicDecodeData.spectral_color_map || []).map((c: any) => ({
     freq: c.freq, magnitude: c.magnitude, hue: c.hue, saturation: c.saturation, value: c.value, hex: c.hex,
@@ -960,23 +965,21 @@ function analyzeUnknownLanguage(samples: HarmonicAnalysis[]): {
   const hasVariety = typeTokenRatio > 0.2 && typeTokenRatio < 0.9;
   const hasSufficientLength = totalPhonemes >= 4;
 
-  const structureScore = Math.min(1,
-    (hasRepeatingStructure ? 0.3 : 0) +
+  const structureScore = (hasRepeatingStructure ? 0.3 : 0) +
     (hasVariety ? 0.25 : 0) +
     (hasSufficientLength ? 0.15 : 0) +
     (uniquePhonemes >= 3 ? 0.15 : 0) +
     (topGrammar.filter(g => g.frequency >= 3).length > 0 ? 0.15 : 0)
-  );
+  ;
 
-  const languageComplexity = Math.min(1,
-    (uniquePhonemes / 20) * 0.3 +
+  const languageComplexity = (uniquePhonemes / 20) * 0.3 +
     (topGrammar.length / 10) * 0.3 +
     typeTokenRatio * 0.2 +
     (vocabulary.filter(v => v.possibleMeaning.includes("content word") || v.possibleMeaning.includes("vocalization")).length / Math.max(1, vocabulary.length)) * 0.2
-  );
+  ;
 
   const detected = structureScore > 0.3 && uniquePhonemes >= 2 && totalPhonemes >= 3;
-  const confidence = Math.min(0.95, structureScore * 0.6 + languageComplexity * 0.4);
+  const confidence = structureScore * 0.6 + languageComplexity * 0.4;
 
   let translationAttempt: string | null = null;
   if (detected && phonemeSequence.length >= 3) {
@@ -1248,7 +1251,7 @@ export function hieDeepPatternDecode(recentHistory: HarmonicAnalysis[], triggerR
       temporalAnomalies.push({ sampleIndex: i, type: "energy_collapse", significance: prev / curr });
     }
   }
-  const overallAnomalyScore = Math.min(1, (spectralAnomalies.length * 0.15 + temporalAnomalies.length * 0.1 + (goldenRatioPresence > 0.15 ? 0.2 : 0) + (fibonacciAlignment > 0.2 ? 0.15 : 0) + (repeatingLen > 0 ? 0.2 : 0)));
+  const overallAnomalyScore = (spectralAnomalies.length * 0.15 + temporalAnomalies.length * 0.1 + (goldenRatioPresence > 0.15 ? 0.2 : 0) + (fibonacciAlignment > 0.2 ? 0.15 : 0) + (repeatingLen > 0 ? 0.2 : 0));
 
   const knowledgeExtracted: string[] = [];
   const novelConstructs: string[] = [];

@@ -28,6 +28,11 @@ import { omnimensBrain, omnimensNotifications, omnimensAgentMesh } from "@worksp
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { desc, eq, sql, and, gte } from "drizzle-orm";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 let _started = false;
 let evolutionCycleCount = 0;
 
@@ -520,7 +525,7 @@ Make the upgrades AMBITIOUS — don't just add small improvements. Give the agen
         newCapabilities: (item.newCapabilities || []).map((c: any) => String(c).slice(0, 200)).slice(0, 5),
         knowledgeDomains: (item.knowledgeDomains || []).map((d: any) => String(d).slice(0, 100)).slice(0, 4),
         implementationCode: item.implementation ? String(item.implementation).slice(0, 2000) : null,
-        confidenceScore: Math.min(100, Math.max(0, Number(item.confidenceScore) || 60)),
+        confidenceScore: Math.max(0, Number(item.confidenceScore) || 60),
         appliedAt: Date.now(),
         version: state.agentProfiles[targetAgent].currentLevel + 1,
       });
@@ -553,7 +558,7 @@ async function applyUpgrade(upgrade: AgentUpgrade): Promise<boolean> {
     profile.totalUpgrades++;
     profile.currentLevel = upgrade.version;
     profile.lastEvolvedAt = Date.now();
-    profile.performanceScore = Math.min(100, profile.performanceScore + Math.floor(upgrade.confidenceScore / 10));
+    profile.performanceScore = profile.performanceScore + Math.floor(upgrade.confidenceScore / 10);
     profile.specializations = [
       ...new Set([...profile.specializations, ...upgrade.knowledgeDomains]),
     ].slice(-15);

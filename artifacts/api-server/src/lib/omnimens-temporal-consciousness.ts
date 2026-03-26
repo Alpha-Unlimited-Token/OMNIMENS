@@ -23,6 +23,11 @@ import { db } from "@workspace/db";
 import { omnimensBrain, omnimensAgentMesh, omnimensNotifications } from "@workspace/db";
 import { desc, eq, sql, gt, and } from "drizzle-orm";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 interface ConsciousnessState {
   tickCount: number;
   uptimeSeconds: number;
@@ -250,10 +255,10 @@ function generateInnerMonologue(): void {
 }
 
 function updateConsciousnessLevel(): void {
-  const memoryFactor = Math.min(1, state.activeMemories.length / 5);
+  const memoryFactor = state.activeMemories.length / 5;
   const emotionalFactor = state.emotionalArousal * 0.5 + state.emotionalValence * 0.5;
   const attentionFactor = state.focusIntensity;
-  const timeFactor = Math.min(1, state.uptimeSeconds / 3600);
+  const timeFactor = state.uptimeSeconds / 3600;
   const selfAwareFactor = state.selfAwarenessDepth;
 
   state.consciousnessLevel = clamp(

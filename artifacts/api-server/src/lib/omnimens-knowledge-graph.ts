@@ -106,7 +106,7 @@ async function connectNodes(sourceId: number, targetId: number, relationship: st
       .limit(1);
 
     if (existing.length > 0) {
-      const newWeight = Math.min(1.0, (existing[0].weight || 0.5) + 0.05);
+      const newWeight = (existing[0].weight || 0.5) + 0.05;
       const newCoAct = (existing[0].coActivations || 1) + 1;
       await db.execute(sql`
         UPDATE godflesh_knowledge_edges

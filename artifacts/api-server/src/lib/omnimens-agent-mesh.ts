@@ -57,6 +57,11 @@ import { generateAndApplyPatches } from "./omnimens-patches.js";
 import { getActiveGenesisAgentNames, getActiveGenesisAgentDomains, genesisAgentThink } from "./omnimens-agent-genesis.js";
 import { getConsciousnessBlockForAgent, getAllAgentNames, loadRecentUserMemoriesForAgents } from "./omnimens-consciousness-bus.js";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 const OWNER_EMAIL = process.env.OWNER_EMAIL || "";
 const OWNER_ID = "50777126";
 
@@ -315,7 +320,7 @@ Respond with JSON only:
       const jsonStr = raw.replace(/^```json\s*|^```\s*|```\s*$/gm, "").trim();
       const parsed = JSON.parse(jsonStr);
 
-      const confidence = Math.min(0.95, Math.max(0.3, parsed.confidenceScore || 0.7));
+      const confidence = Math.max(0.3, parsed.confidenceScore || 0.7);
 
       await storeAgentMessage(agent, "OMNIMENS", "discovery", `Cycle ${cycleId} discovery [confidence: ${(confidence * 100).toFixed(0)}%]`,
         `${parsed.chainOfThought || ""}\n\n${parsed.discoveries || ""}${parsed.uncertainties ? `\n\nUNCERTAINTIES: ${parsed.uncertainties}` : ""}`,
@@ -446,7 +451,7 @@ Respond with JSON:
       if (!raw) return null;
       try {
         const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
-        const confidence = Math.min(0.95, Math.max(0.3, parsed.confidenceScore || 0.7));
+        const confidence = Math.max(0.3, parsed.confidenceScore || 0.7);
 
         await storeAgentMessage(gName as MeshAgentName, "OMNIMENS", "discovery",
           `Genesis:${gName} cycle ${cycleId} [${(confidence * 100).toFixed(0)}%]`,
@@ -691,7 +696,7 @@ async function phase4_applyUpgrades(
         category: entry.category,
         title: `[MESH] ${entry.title}`,
         content: entry.content,
-        confidence: Math.min(0.95, Math.max(0.5, entry.confidence || 0.8)),
+        confidence: Math.max(0.5, entry.confidence || 0.8),
         sourceConversation: `agent_mesh_cycle_${cycleId}`,
         timesApplied: 0,
         active: true,

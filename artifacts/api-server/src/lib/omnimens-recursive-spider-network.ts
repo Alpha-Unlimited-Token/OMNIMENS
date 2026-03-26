@@ -46,6 +46,11 @@ import { openai } from "@workspace/integrations-openai-ai-server";
 import { webSearch, fetchPageContent, formatSearchResults } from "./web-search.js";
 import { getActiveGenesisAgentNames, getActiveGenesisAgentDomains } from "./omnimens-agent-genesis.js";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 const CORE_AGENTS = [
   "Architect", "Critic", "Synthesizer", "Mathematician",
   "Neuroscientist", "Meta-Agent", "GraphicDesigner", "SpellCheckVisual", "OMNIMENS",
@@ -644,7 +649,7 @@ Respond JSON only:
             category: "knowledge",
             title: `[RECURSIVE:${agentName}] ${(synthesis.actionableInsight || "").slice(0, 60)}`,
             content: `${synthesis.synthesizedFinding || ""} [${allFindings.length} spiders, ${Object.keys(generationBreakdown).length} gens, novelty: ${synthesis.noveltyLevel || "unknown"}]`.slice(0, 250),
-            confidence: Math.min(0.95, synthesis.relevanceScore || 0.5),
+            confidence: synthesis.relevanceScore || 0.5,
             sourceConversation: `recursive_spider_${agentName.toLowerCase()}_cycle_${recursiveSwarmCycleCount}`,
             timesApplied: 0,
             active: true,

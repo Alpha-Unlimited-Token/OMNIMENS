@@ -23,6 +23,11 @@ import { openai } from "@workspace/integrations-openai-ai-server";
 import { getRecentDreamInsights, getDreamState, incrementSelfImprovements } from "./omnimens-dream-state.js";
 import { writeModuleToSource } from "./omnimens-source-integration.js";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 let _started = false;
 let evaluationCycleCount = 0;
 let totalEvaluated = 0;
@@ -168,7 +173,7 @@ function parseScore(text: string, field: string): number {
   const match = text.match(new RegExp(`${field}:\\s*(0?\\.\\d+|1\\.0|\\d)`, "i"));
   if (!match) return 0;
   const val = parseFloat(match[1]);
-  return isNaN(val) ? 0 : Math.min(1, Math.max(0, val));
+  return isNaN(val) ? 0 : Math.max(0, val);
 }
 
 async function runEvaluationCycle(): Promise<void> {

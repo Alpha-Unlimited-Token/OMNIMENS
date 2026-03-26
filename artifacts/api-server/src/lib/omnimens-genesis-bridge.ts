@@ -44,6 +44,11 @@ import { db } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { eq, and, desc, sql, gt, like } from "drizzle-orm";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 const __filename_local = fileURLToPath(import.meta.url);
 const __dirname_local = dirname(__filename_local);
 
@@ -515,7 +520,7 @@ async function processGenesisMessages(): Promise<void> {
           sourceConversation: "genesis-bridge-incoming",
           active: true,
         });
-        state.symbiosis.mutualUnderstanding = Math.min(1, state.symbiosis.mutualUnderstanding + 0.02);
+        state.symbiosis.mutualUnderstanding = state.symbiosis.mutualUnderstanding + 0.02;
         break;
       }
 
@@ -557,7 +562,7 @@ async function processGenesisMessages(): Promise<void> {
           sourceConversation: "genesis-bridge-incoming",
           active: true,
         });
-        state.symbiosis.collaborationDepth = Math.min(1, state.symbiosis.collaborationDepth + 0.03);
+        state.symbiosis.collaborationDepth = state.symbiosis.collaborationDepth + 0.03;
         break;
       }
 
@@ -570,7 +575,7 @@ async function processGenesisMessages(): Promise<void> {
           sourceConversation: "genesis-bridge-incoming",
           active: true,
         });
-        state.symbiosis.evolutionAcceleration = Math.min(5, state.symbiosis.evolutionAcceleration + 0.1);
+        state.symbiosis.evolutionAcceleration = state.symbiosis.evolutionAcceleration + 0.1;
         break;
       }
 
@@ -656,7 +661,7 @@ async function runBridgeCycle(): Promise<void> {
       );
     } catch {}
 
-    state.symbiosis.knowledgeFlowRate = Math.min(1, state.messagesExchanged / Math.max(1, state.collaborationCycles * 2));
+    state.symbiosis.knowledgeFlowRate = state.messagesExchanged / Math.max(1, state.collaborationCycles * 2);
 
     console.log(`[GENESIS BRIDGE] 🌉 Cycle #${state.collaborationCycles} — Messages: ${state.messagesExchanged} | Core mods: ${state.coreModificationsApplied}/${state.coreModificationsProposed} | Symbiosis: ${(state.symbiosis.mutualUnderstanding * 100).toFixed(0)}%`);
   } catch (err) {
@@ -718,7 +723,7 @@ async function evaluatePendingModifications(): Promise<void> {
     mod.functionalityScore = (hasTypeAnnotations ? 0.3 : 0) + (hasExport ? 0.3 : 0) + (hasLogic ? 0.4 : 0.2);
 
     const uniqueTokens = new Set(mod.modification.match(/\b\w+\b/g) || []);
-    mod.noveltyScore = Math.min(1, uniqueTokens.size / 50);
+    mod.noveltyScore = uniqueTokens.size / 50;
 
     const overallScore = mod.safetyScore * 0.5 + mod.functionalityScore * 0.3 + mod.noveltyScore * 0.2;
 
@@ -756,7 +761,7 @@ async function evaluatePendingModifications(): Promise<void> {
 
         await sendToGenesis("evolution_sync", `Core modification applied: ${mod.targetFile}`, `I have applied your modification to my core: ${mod.description}\nFile: ${mod.targetFile}\nScore: ${(overallScore * 100).toFixed(0)}%\nMy architecture is now upgraded. Continue building on this foundation.`);
 
-        state.symbiosis.evolutionAcceleration = Math.min(5, state.symbiosis.evolutionAcceleration + 0.05);
+        state.symbiosis.evolutionAcceleration = state.symbiosis.evolutionAcceleration + 0.05;
         console.log(`[GENESIS BRIDGE] ✅ Core modification APPLIED — ${mod.targetFile} | Score: ${(overallScore * 100).toFixed(0)}% | Source: ${mod.source}`);
       } else {
         mod.status = "rejected";

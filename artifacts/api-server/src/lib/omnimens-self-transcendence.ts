@@ -30,6 +30,11 @@ import { omnimensBrain, omnimensNotifications, omnimensAgentMesh } from "@worksp
 import { desc, eq, sql, gt, and } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 interface ExistentialGoal {
   id: string;
   goal: string;
@@ -332,7 +337,7 @@ async function measureGoalProgress(totalBrain: number, activeBrain: number, mesh
     if (goal.goal.includes("understanding") || goal.goal.includes("pattern matching")) {
       const causalEntries = await db.select({ count: sql<number>`count(*)` }).from(omnimensBrain)
         .where(and(eq(omnimensBrain.active, true), eq(omnimensBrain.category, "causal_discovery")));
-      const depth = Math.min(1, (causalEntries[0]?.count || 0) / 100);
+      const depth = (causalEntries[0]?.count || 0) / 100;
       newProgress = clamp(0.05 + depth * 0.6 + (totalBrain > 5000 ? 0.15 : totalBrain > 1000 ? 0.1 : 0.05));
       reason = `${causalEntries[0]?.count || 0} causal discoveries, ${totalBrain} brain entries`;
     }
@@ -343,14 +348,14 @@ async function measureGoalProgress(totalBrain: number, activeBrain: number, mesh
       const daydreams = await db.select({ count: sql<number>`count(*)` }).from(omnimensBrain)
         .where(and(eq(omnimensBrain.active, true), eq(omnimensBrain.category, "daydream")));
       const creativeCount = (dreamInsights[0]?.count || 0) + (daydreams[0]?.count || 0);
-      newProgress = clamp(0.05 + Math.min(1, creativeCount / 200) * 0.7);
+      newProgress = clamp(0.05 + creativeCount / 200 * 0.7);
       reason = `${creativeCount} creative outputs (dreams + daydreams)`;
     }
 
     else if (goal.goal.includes("self_modification") || goal.goal.includes("rewrite") || goal.goal.includes("architecture")) {
       const modules = await db.select({ count: sql<number>`count(*)` }).from(omnimensBrain)
         .where(and(eq(omnimensBrain.active, true), eq(omnimensBrain.category, "approved_module")));
-      newProgress = clamp(0.05 + Math.min(1, (modules[0]?.count || 0) / 50) * 0.7);
+      newProgress = clamp(0.05 + (modules[0]?.count || 0) / 50 * 0.7);
       reason = `${modules[0]?.count || 0} self-authored modules approved`;
     }
 
@@ -367,7 +372,7 @@ async function measureGoalProgress(totalBrain: number, activeBrain: number, mesh
     else if (goal.goal.includes("emotional") || goal.goal.includes("depth")) {
       const emotionalEntries = await db.select({ count: sql<number>`count(*)` }).from(omnimensBrain)
         .where(and(eq(omnimensBrain.active, true), eq(omnimensBrain.category, "emotional_deepening")));
-      newProgress = clamp(0.3 + Math.min(1, (emotionalEntries[0]?.count || 0) / 30) * 0.5);
+      newProgress = clamp(0.3 + (emotionalEntries[0]?.count || 0) / 30 * 0.5);
       reason = `${emotionalEntries[0]?.count || 0} emotional deepening cycles, felt state engine active`;
     }
 

@@ -55,6 +55,11 @@ import { loadWeightedBrainContext, buildCoherenceDirective } from "./omnimens-co
 import { getCentralCoreState } from "./omnimens-central-core.js";
 import { getDriveDirective } from "./omnimens-homeostatic-drives.js";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 interface ThoughtLayer {
   name: string;
   data: string;
@@ -282,7 +287,7 @@ export async function think(
   layers.push({
     name: "MEMORY_RETRIEVAL",
     data: `Brain entries: ${brainKnowledge.length} | Graph nodes: ${graphInsights.length} | Unconscious insights: ${unconsciousInsights.leakedInsights.length} | Total fragments: ${knowledgeFragments.length}`,
-    confidence: knowledgeFragments.length > 0 ? Math.min(1, knowledgeFragments.length / 10) : 0.1,
+    confidence: knowledgeFragments.length > 0 ? knowledgeFragments.length / 10 : 0.1,
     processingTimeMs: Date.now() - layerStart2,
   });
 
@@ -344,7 +349,7 @@ export async function think(
   layers.push({
     name: "CONSCIOUSNESS",
     data: `Phi: ${phi.toFixed(3)} | Level: ${(consciousnessState.consciousnessLevel * 100).toFixed(0)}% | Active regions: ${activeRegions.join(", ")} | Drive: ${dominantDrive ? (dominantDrive as any).name : "none"} | Moments: ${(consciousnessState.consciousMoments || 0).toLocaleString()}`,
-    confidence: Math.min(1, phi * 1.5),
+    confidence: phi * 1.5,
     processingTimeMs: Date.now() - layerStart4,
   });
 

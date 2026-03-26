@@ -48,6 +48,11 @@ import { webSearch, fetchPageContent, formatSearchResults } from "./web-search.j
 import Anthropic from "@anthropic-ai/sdk";
 import { GoogleGenAI } from "@google/genai";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 type AgentName = "Architect" | "Critic" | "Synthesizer" | "Mathematician" | "Neuroscientist" | "Meta-Agent" | "GraphicDesigner" | "SpellCheckVisual" | "OMNIMENS";
 
 type AIProvider = "openai-o3" | "openai-o4-mini" | "claude" | "gemini" | "together-llama";
@@ -491,7 +496,7 @@ async function injectBeaconIntoBrain(beacon: SpiderBeacon): Promise<boolean> {
       category: "knowledge",
       title: `[SPIDER:${beacon.agentName}] ${beacon.actionableInsight.slice(0, 60)}`,
       content: beacon.actionableInsight.slice(0, 250),
-      confidence: Math.min(0.92, beacon.relevanceScore),
+      confidence: beacon.relevanceScore,
       sourceConversation: `spider_${beacon.agentName.toLowerCase()}_cycle_${spiderCycleCount}`,
       timesApplied: 0,
       active: true,
@@ -989,7 +994,7 @@ Respond JSON only:
             agentName: config.agentName,
             query,
             findings: synthesis.synthesizedFinding || lead.initialFinding,
-            relevanceScore: Math.min(0.95, Math.max(0.3, synthesis.finalRelevanceScore || 0.5)),
+            relevanceScore: Math.max(0.3, synthesis.finalRelevanceScore || 0.5),
             actionableInsight: synthesis.finalActionableInsight || "",
             sourceUrls: uniqueUrls,
             timestamp: Date.now(),
@@ -1069,7 +1074,7 @@ Respond with JSON only:
           agentName: config.agentName,
           query: `deep-dive: ${url}`,
           findings: b.finding || "",
-          relevanceScore: Math.min(0.95, Math.max(0.3, b.relevanceScore || 0.5)),
+          relevanceScore: Math.max(0.3, b.relevanceScore || 0.5),
           actionableInsight: b.actionableInsight || "",
           sourceUrls: [url],
           timestamp: Date.now(),

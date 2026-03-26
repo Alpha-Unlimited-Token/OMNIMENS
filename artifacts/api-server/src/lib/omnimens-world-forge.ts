@@ -32,6 +32,11 @@ import { omnimensBrain } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { desc, eq, sql, and } from "drizzle-orm";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 let _started = false;
 let forgeCycleCount = 0;
 
@@ -553,7 +558,7 @@ function generateEntities(ctx: WorldContext): WorldEntity[] {
         tireTraction: isIcy ? 0.05 + Math.random() * 0.1 : isSnowy ? 0.15 + Math.random() * 0.2 : groundFriction,
       },
       position: pos(isRushHour ? 100 : 250), velocity: { x: Math.cos(angle) * speedMs, y: 0, z: Math.sin(angle) * speedMs },
-      threatLevel: Math.min(1.0, (v.mass_kg * actualSpeed) / 500000 * (isSliding ? 2.5 : isJackknifing ? 3.0 : 1.0)),
+      threatLevel: (v.mass_kg * actualSpeed) / 500000 * (isSliding ? 2.5 : isJackknifing ? 3.0 : 1.0),
       interactable: false,
       behaviorPattern: isSliding ? "loss_of_control_fishtailing_unpredictable_trajectory" : isJackknifing ? "trailer_swinging_across_multiple_lanes_catastrophic" : isIcy ? "crawling_speed_white_knuckle_driving_sudden_slides" : isSnowy ? "slow_cautious_following_tire_tracks_in_snow" : isRushHour ? "stop_go_lane_changes_honking_impatient" : "steady_cruising_speed_following_traffic_laws",
       detectionDifficulty: v.fuel === "electric" ? 0.4 : 0.1,
@@ -853,7 +858,7 @@ function createWorld(targetWeaknesses: string[]): SimulationWorld {
     selectedEnv = unused[Math.floor(Math.random() * unused.length)];
   }
 
-  const difficulty = Math.min(1.0, state.difficultyProgression * (0.5 + forgeCycleCount * 0.05));
+  const difficulty = state.difficultyProgression * (0.5 + forgeCycleCount * 0.05);
 
   const weatherEffect = pick(WEATHER_EFFECTS);
   const thermalZone = pick(THERMAL_EXTREMES);
@@ -867,7 +872,7 @@ function createWorld(targetWeaknesses: string[]): SimulationWorld {
   const baseVisibility = weatherEffect.type === "dense_fog" ? 20 : weatherEffect.type === "blizzard" ? 10 : 5000;
   const actualVisibility = baseVisibility * (1 - weatherEffect.visibilityReduction);
   const adjustedFriction = terrain.frictionCoeff * (1 - weatherEffect.frictionReduction);
-  const wetness = precipIntensity > 0 ? Math.min(1.0, precipIntensity / 40) : (weatherEffect.type === "dense_fog" ? 0.3 : 0);
+  const wetness = precipIntensity > 0 ? precipIntensity / 40 : (weatherEffect.type === "dense_fog" ? 0.3 : 0);
 
   const componentsTested: string[] = [];
   if (Math.abs(baseTemp) > 30) componentsTested.push("battery_cells", "motor_windings", "joint_lubricant");
@@ -937,8 +942,8 @@ function runWorldSimulation(world: SimulationWorld): WorldRunResult {
   const challengeResults = world.challenges.map(challenge => {
     const basePerformance = 0.4 + Math.random() * 0.4;
     const difficultyPenalty = challenge.difficulty * 0.2;
-    const experienceBonus = Math.min(0.15, forgeCycleCount * 0.01);
-    const score = Math.max(0, Math.min(1.0, basePerformance - difficultyPenalty + experienceBonus));
+    const experienceBonus = forgeCycleCount * 0.01;
+    const score = Math.max(0, basePerformance - difficultyPenalty + experienceBonus);
     const passed = score >= 0.6;
     const timeUsed = challenge.timeLimit_s * (0.5 + Math.random() * 0.5);
 
@@ -978,7 +983,7 @@ function runWorldSimulation(world: SimulationWorld): WorldRunResult {
   const mmWaveAccuracy = Math.max(0.3, 0.92 - (isFoggy ? 0.05 : 0) - (isSandstorm ? 0.15 : 0) - (precip > 30 ? 0.1 : precip > 10 ? 0.05 : 0));
   const terahertzAccuracy = Math.max(0.1, 0.95 - (precip > 15 ? 0.4 : precip > 5 ? 0.15 : 0) - (isWet ? 0.2 : 0) - (isSandstorm ? 0.3 : 0));
   const thermalAccuracy = Math.max(0.4, 0.90 - (precip > 20 ? 0.15 : 0) - (Math.abs(world.environment.temperature_C - 37) < 5 ? 0.2 : 0));
-  const fusedAccuracy = Math.min(0.98, 1 - (1 - mmWaveAccuracy) * (1 - terahertzAccuracy) * (1 - thermalAccuracy));
+  const fusedAccuracy = 1 - (1 - mmWaveAccuracy) * (1 - terahertzAccuracy) * (1 - thermalAccuracy);
 
   const mmWaveHits = concealedEntities.filter(e => e.properties?.mmWave_detectable && Math.random() < mmWaveAccuracy).length;
   const terahertzHits = concealedEntities.filter(e => e.properties?.terahertz_detectable && Math.random() < terahertzAccuracy).length;
@@ -1136,7 +1141,7 @@ function updateStateFromRun(result: WorldRunResult): void {
   for (const strength of result.strengthsConfirmed) {
     const existing = state.strengthLog.find(s => s.strength === strength);
     if (existing) {
-      existing.confidence = Math.min(1.0, existing.confidence + 0.05);
+      existing.confidence = existing.confidence + 0.05;
       existing.lastConfirmed = Date.now();
     } else {
       state.strengthLog.push({ strength, confidence: 0.6, lastConfirmed: Date.now() });
@@ -1147,7 +1152,7 @@ function updateStateFromRun(result: WorldRunResult): void {
   state.insightsGenerated += result.insightsGained.length;
 
   if (result.overallScore > 0.75) {
-    state.difficultyProgression = Math.min(2.0, state.difficultyProgression + 0.05);
+    state.difficultyProgression = state.difficultyProgression + 0.05;
   } else if (result.overallScore < 0.4) {
     state.difficultyProgression = Math.max(0.5, state.difficultyProgression - 0.03);
   }
@@ -1243,7 +1248,7 @@ Respond with ONLY valid JSON (no markdown, no explanation):
     const world = createWorld(design.targetSkills || selectWeaknessTargets());
 
     world.description = design.customDescription || world.description;
-    world.difficulty = Math.min(1.0, design.difficulty || world.difficulty);
+    world.difficulty = design.difficulty || world.difficulty;
     world.targetWeaknesses = design.targetSkills || world.targetWeaknesses;
 
     if (design.customChallenges && Array.isArray(design.customChallenges)) {
@@ -1332,7 +1337,7 @@ async function runForgeCycle(): Promise<void> {
     await saveToBrain(world, result);
 
     if (run < runCount - 1 && result.overallScore > 0.8) {
-      world.difficulty = Math.min(1.0, world.difficulty + 0.1);
+      world.difficulty = world.difficulty + 0.1;
       world.version++;
       console.log(`[WORLD FORGE] ⬆️ Difficulty increased to ${(world.difficulty * 10).toFixed(1)}/10 for next run`);
     }

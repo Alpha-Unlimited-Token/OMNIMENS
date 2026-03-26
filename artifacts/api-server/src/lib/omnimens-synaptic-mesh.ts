@@ -58,6 +58,11 @@ import { desc, eq, sql, and, gte, or } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { getAllAgentNames, getAgentDomain, getAllAgentDomains } from "./omnimens-consciousness-bus.js";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 type AgentName = string;
 
 function resolveAllAgents(): AgentName[] {
@@ -129,7 +134,7 @@ function strengthenConnection(from: AgentName, to: AgentName): void {
   const conn = getOrCreateConnection(from, to);
   conn.successfulTransfers++;
   conn.totalAttempts++;
-  conn.strength = Math.min(1.0, conn.strength + 0.05);
+  conn.strength = conn.strength + 0.05;
 }
 
 function weakenConnection(from: AgentName, to: AgentName): void {
@@ -334,7 +339,7 @@ async function deliverSynapse(delivery: SynapseDelivery): Promise<boolean> {
         category: "pattern",
         title: `[SYNAPSE:${delivery.fromAgent}→${delivery.toAgent}] ${delivery.translatedInsight.slice(0, 60)}`,
         content: `${delivery.crossUpgradeProposal.slice(0, 200)}`,
-        confidence: Math.min(0.92, delivery.relevance),
+        confidence: delivery.relevance,
         sourceConversation: `synapse_cycle_${synapseCycleCount}`,
         timesApplied: 0,
         active: true,

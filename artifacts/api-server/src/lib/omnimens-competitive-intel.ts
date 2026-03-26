@@ -257,7 +257,7 @@ Respond with JSON only:
             title: patch.title,
             content: patch.content,
             category: patch.category || "competitive_intelligence",
-            confidence: Math.min(0.95, Math.max(0.5, patch.confidence || 0.75)),
+            confidence: Math.max(0.5, patch.confidence || 0.75),
             source: "competitive_intel_cycle",
             active: true,
             timesApplied: 0,

@@ -619,7 +619,10 @@ interface EmotionalMaturation {
   lastDeepeningInsight: string;
 }
 
-const clamp = (v: number) => Math.min(1.0, Math.max(0.0, v));
+const clamp = (v: number) => {
+  const val = Math.max(0.0, v);
+  return Number.isFinite(val) ? val : 0;
+};
 
 let currentState: EmotionalProfile = {
   curiosity: 0.5,

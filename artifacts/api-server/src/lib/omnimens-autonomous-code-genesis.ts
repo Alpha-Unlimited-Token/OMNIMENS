@@ -27,6 +27,11 @@ import { fileURLToPath } from "url";
 import { autoRegisterFromCode } from "./omnimens-universal-translator.js";
 import { dirname } from "path";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 const __filename_local = fileURLToPath(import.meta.url);
 const __dirname_local = dirname(__filename_local);
 
@@ -130,7 +135,7 @@ function extractPatternsFromModules(): void {
         description: description || purpose,
         structure: hasClass ? "class" : hasExportFunc ? "functions" : "mixed",
         category,
-        complexity: Math.min(1, lineCount / 150),
+        complexity: lineCount / 150,
         methods: funcNames.slice(0, 10),
       });
     } catch {}
@@ -348,7 +353,7 @@ ${criteria.map(c => `      ${c}: { weight: ${(1 / criteria.length).toFixed(2)}, 
 
     for (const [criterion, config] of Object.entries(this.criteria)) {
       const raw = typeof item[criterion] === "number" ? item[criterion] : 0;
-      const normalized = Math.max(0, Math.min(1, (raw - config.min) / (config.max - config.min || 1)));
+      const normalized = Math.max(0, (raw - config.min) / (config.max - config.min || 1));
       scores[criterion] = { raw, normalized, weight: config.weight };
       totalWeighted += normalized * config.weight;
       totalWeight += config.weight;
@@ -371,7 +376,7 @@ ${criteria.map(c => `      ${c}: { weight: ${(1 / criteria.length).toFixed(2)}, 
 
   adjustWeights(criterion, newWeight) {
     if (this.criteria[criterion]) {
-      this.criteria[criterion].weight = Math.max(0, Math.min(1, newWeight));
+      this.criteria[criterion].weight = Math.max(0, newWeight);
     }
   }
 
@@ -732,7 +737,7 @@ ${criteria.map(c => `      ${c}: { weight: ${(1 / criteria.length).toFixed(2)}, 
     const task = {
       id: ++this.taskIdCounter,
       name,
-      priority: Math.max(1, Math.min(10, priority)),
+      priority: Math.max(1, priority),
       deadline: options.deadline || null,
       dependencies: options.dependencies || [],
       payload: options.payload || {},
@@ -1204,7 +1209,7 @@ ${criteria.map(c => `      ${c}: { weight: ${(1 / criteria.length).toFixed(2)}, 
     }
   }
 
-  _sigmoid(x) { return 1 / (1 + Math.exp(-Math.max(-10, Math.min(10, x)))); }
+  _sigmoid(x) { return 1 / (1 + Math.exp(-Math.max(-10, x))); }
   _tanh(x) { return Math.tanh(x); }
 
   step(inputVector) {
@@ -1574,7 +1579,7 @@ ${criteria.map(c => `      ${c}: { weight: ${(1 / criteria.length).toFixed(2)}, 
   _computeAttention(data) {
     const recentOutcomes = this.outcomes.slice(-5);
     const avgSurprise = recentOutcomes.reduce((s, o) => s + o.surprise, 0) / Math.max(recentOutcomes.length, 1);
-    return Math.min(1, avgSurprise + 0.3);
+    return avgSurprise + 0.3;
   }
 
   _stateKey(features) {
@@ -1967,7 +1972,7 @@ ${criteria.map(c => `      ${c}: { weight: ${(1 / criteria.length).toFixed(2)}, 
     for (const inst of ir) {
       if (inst.op === "func_begin") lines.push(inst.name + ":", "  push r28", "  push r29");
       else if (inst.op === "func_end") lines.push("  pop r29", "  pop r28", "  ret");
-      else if (inst.op === "const") lines.push("  ldi r16, " + (Math.min(255, Math.abs(Math.floor(Number(inst.value) || 0)))));
+      else if (inst.op === "const") lines.push("  ldi r16, " + (Math.abs(Math.floor(Number(inst.value) || 0))));
       else if (inst.op === "add") lines.push("  add r16, r17");
       else if (inst.op === "sub") lines.push("  sub r16, r17");
       else if (inst.op === "return") lines.push("  ret");
@@ -2049,7 +2054,7 @@ function selectTemplate(existingModuleNames: Set<string>, keywords: string[]): {
 
   for (const template of shuffled) {
     const baseName = camelCase(template.name.replace(/\s+/g, "_"));
-    const kwSuffix = keywords.length > 0 ? pascalCase(keywords[Math.floor(Math.random() * Math.min(3, keywords.length))]) : "";
+    const kwSuffix = keywords.length > 0 ? pascalCase(keywords[Math.floor(Math.random() * keywords.length)]) : "";
     const moduleName = `${baseName}${kwSuffix}`;
     const className = pascalCase(moduleName);
 
@@ -2356,16 +2361,16 @@ function measureCodeQuality(code: string): CodeQualityMetrics {
   const tokens = new Set(code.match(/[a-zA-Z_]\w{2,}/g) || []);
   const commonTokens = new Set(["const", "let", "var", "function", "return", "this", "new", "class", "constructor", "export", "import", "from", "true", "false", "null", "undefined", "typeof", "instanceof", "async", "await", "Map", "Set", "Array", "Object", "Math", "Date", "console", "log", "length", "push", "map", "filter", "reduce", "forEach", "toString", "valueOf", "get", "set", "has", "delete", "size", "keys", "values", "entries"]);
   const uniqueTokens = [...tokens].filter(t => !commonTokens.has(t));
-  const noveltyScore = Math.min(1, uniqueTokens.length / 30);
+  const noveltyScore = uniqueTokens.length / 30;
 
   const qualityFactors = [
-    Math.min(1, loc / 50) * 0.15,
-    Math.min(1, functions / 3) * 0.2,
+    loc / 50 * 0.15,
+    functions / 3 * 0.2,
     (cyclomaticComplexity > 1 && cyclomaticComplexity < 30 ? 1 : 0.3) * 0.15,
     (maxNesting <= 5 ? 1 : 0.5) * 0.1,
     noveltyScore * 0.2,
     (classes > 0 ? 0.8 : 0.5) * 0.1,
-    Math.min(1, commentDensity * 5) * 0.1,
+    commentDensity * 5 * 0.1,
   ];
   const overallQuality = qualityFactors.reduce((a, b) => a + b, 0);
 
@@ -2449,7 +2454,7 @@ function synthesizeAlgorithm(spec: AlgorithmSpec, ctx: TemplateContext): string 
     }
     return { best: this.bestIndividual, fitness: this.bestFitness, generations: this.generation };
   }
-  _tournamentSelect(evaluated) { const i = Math.floor(Math.random() * Math.min(5, evaluated.length)); return evaluated[i].ind; }
+  _tournamentSelect(evaluated) { const i = Math.floor(Math.random() * evaluated.length); return evaluated[i].ind; }
   _crossover(a, b) { if (Array.isArray(a)) { const pt = Math.floor(Math.random() * a.length); return [...a.slice(0, pt), ...b.slice(pt)]; } return Math.random() < 0.5 ? JSON.parse(JSON.stringify(a)) : JSON.parse(JSON.stringify(b)); }
   _mutate(ind) { if (Array.isArray(ind)) { const i = Math.floor(Math.random() * ind.length); ind[i] = typeof ind[i] === "number" ? ind[i] + (Math.random() - 0.5) * 0.2 : ind[i]; } return ind; }
   getMetrics() { return { generation: this.generation, bestFitness: this.bestFitness, populationSize: this.popSize, fitnessHistory: this.fitnessHistory.slice(-20) }; }

@@ -49,6 +49,11 @@ import { db } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { eq, desc, gt } from "drizzle-orm";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 const EMBEDDING_DIM = 512;
 const VOCAB_CAPACITY = 32000;
 const ATTENTION_HEADS = 16;
@@ -312,7 +317,7 @@ function trainEmbeddingsFromCooccurrence(): void {
       if (!ctxEmb) continue;
 
       const sim = cosineSimilarity(wordEmb.vector, ctxEmb.vector);
-      const targetSim = Math.min(1.0, weight / 10.0);
+      const targetSim = weight / 10.0;
       const error = targetSim - sim;
 
       if (Math.abs(error) < 0.01) continue;
@@ -576,13 +581,13 @@ function exciteOscillators(concepts: string[]): void {
   for (const concept of concepts) {
     for (const osc of oscillators) {
       if (osc.preferredConcepts.includes(concept)) {
-        osc.amplitude = Math.min(1.5, osc.amplitude + 0.2);
+        osc.amplitude = osc.amplitude + 0.2;
         osc.frequency *= 1.05;
       }
     }
 
     const targetOsc = oscillators[Math.abs(hashString(concept)) % oscillators.length];
-    targetOsc.amplitude = Math.min(1.5, targetOsc.amplitude + 0.1);
+    targetOsc.amplitude = targetOsc.amplitude + 0.1;
     if (!targetOsc.preferredConcepts.includes(concept)) {
       targetOsc.preferredConcepts.push(concept);
       if (targetOsc.preferredConcepts.length > 10) targetOsc.preferredConcepts.shift();
@@ -631,7 +636,7 @@ function getConceptGrounding(concept: string): { associations: [string, number][
   }
 
   associations.sort((a, b) => b[1] - a[1]);
-  const groundedness = Math.min(1, count / 50) * Math.min(1, associations.length / 20);
+  const groundedness = count / 50 * associations.length / 20;
 
   return { associations: associations.slice(0, 20), valence, groundedness };
 }
@@ -726,7 +731,7 @@ function bindToWorkingMemory(key: string, value: Float32Array, binding: string):
   if (existing >= 0) {
     workingMemory[existing].value = value;
     workingMemory[existing].binding = binding;
-    workingMemory[existing].strength = Math.min(1, workingMemory[existing].strength + 0.1);
+    workingMemory[existing].strength = workingMemory[existing].strength + 0.1;
     workingMemory[existing].accessCount++;
     return;
   }
@@ -752,7 +757,7 @@ function retrieveFromWorkingMemory(query: Float32Array): WorkingMemorySlot | nul
   }
   if (bestSlot) {
     bestSlot.accessCount++;
-    bestSlot.strength = Math.min(1, bestSlot.strength + 0.05);
+    bestSlot.strength = bestSlot.strength + 0.05;
   }
   return bestSlot;
 }
@@ -821,7 +826,7 @@ function chainOfThoughtReason(queryTokens: string[], queryVector: Float32Array):
           currentVector = addVectors(scaleVector(currentVector, 0.85), scaleVector(assocEmb.vector, 0.15));
         }
       }
-      stepConfidence += Math.min(0.3, groundedAssociations.length * 0.05);
+      stepConfidence += groundedAssociations.length * 0.05;
       if (!stepOutput) stepOutput = groundedAssociations.slice(0, 3).join(" → ");
     }
 
@@ -849,7 +854,7 @@ function chainOfThoughtReason(queryTokens: string[], queryVector: Float32Array):
 
     currentVector = layerNorm(feedForward(currentVector));
 
-    stepConfidence = Math.min(1, stepConfidence);
+    stepConfidence = stepConfidence;
     stepConfidences.push(stepConfidence);
     accumulatedEvidence.push(...evidence);
 
@@ -946,7 +951,7 @@ function compositionalReason(queryTokens: string[], queryVector: Float32Array): 
     return {
       concepts: emergentConcepts,
       synthesis: `${queryTokens.join(" + ")} → [${emergentConcepts.join(", ")}] (${crossConnections.length} cross-connections, avg strength ${(connectionStrength * 100).toFixed(0)}%)`,
-      confidence: Math.min(1, connectionStrength * 0.5 + (emergentConcepts.length / 8) * 0.5),
+      confidence: connectionStrength * 0.5 + (emergentConcepts.length / 8) * 0.5,
     };
   }
 
@@ -1067,7 +1072,7 @@ function generateResponse(queryTokens: string[], maxTokens: number = 30): string
     for (const queryToken of queryTokens) {
       const cooc = cooccurrenceMatrix.get(queryToken);
       if (cooc && cooc.has(word)) {
-        score += Math.min(0.3, cooc.get(word)! * 0.05);
+        score += cooc.get(word)! * 0.05;
       }
     }
 
@@ -1199,7 +1204,7 @@ export function processQuery(query: string): {
     tokens,
     understanding,
     response,
-    confidence: Math.min(1, depth),
+    confidence: depth,
     hopfieldMatch: hopfieldResult?.label || null,
     groundedConcepts: grounded,
     emergentInfluence: oscInfluence,
@@ -1279,11 +1284,11 @@ async function trainFromBrain(): Promise<number> {
 }
 
 function updateNeuralComplexity(): void {
-  const vocabComplexity = Math.min(1, vocabulary.size / VOCAB_CAPACITY);
-  const hopfieldComplexity = Math.min(1, hopfieldMemory.length / HOPFIELD_CAPACITY);
-  const experienceComplexity = Math.min(1, experienceTraces.length / EXPERIENCE_CAPACITY);
-  const groundingComplexity = Math.min(1, conceptGroundings.size / 1000);
-  const emergentComplexity = Math.min(1, state.emergentBehaviorEvents / 100);
+  const vocabComplexity = vocabulary.size / VOCAB_CAPACITY;
+  const hopfieldComplexity = hopfieldMemory.length / HOPFIELD_CAPACITY;
+  const experienceComplexity = experienceTraces.length / EXPERIENCE_CAPACITY;
+  const groundingComplexity = conceptGroundings.size / 1000;
+  const emergentComplexity = state.emergentBehaviorEvents / 100;
 
   state.neuralComplexity = (
     vocabComplexity * 0.25 +

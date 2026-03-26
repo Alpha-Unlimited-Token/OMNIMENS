@@ -30,6 +30,11 @@ import { desc, eq, sql } from "drizzle-orm";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 let _started = false;
 let researchCycleCount = 0;
 
@@ -3626,19 +3631,19 @@ export function runCitySimulation(): CitySimulationResult {
 
   const sandbox = MUSCULOSKELETAL.perceptionSystem.digitalSandbox;
   sandbox.trainingDomains[0].simulatedHours += 1.2;
-  sandbox.trainingDomains[0].currentProficiency = Math.min(100, sandbox.trainingDomains[0].currentProficiency + 0.8);
+  sandbox.trainingDomains[0].currentProficiency = sandbox.trainingDomains[0].currentProficiency + 0.8;
   sandbox.trainingDomains[4].simulatedHours += 0.6;
-  sandbox.trainingDomains[4].currentProficiency = Math.min(100, sandbox.trainingDomains[4].currentProficiency + 0.4);
+  sandbox.trainingDomains[4].currentProficiency = sandbox.trainingDomains[4].currentProficiency + 0.4;
   sandbox.trainingDomains[7].simulatedHours += 0.6;
-  sandbox.trainingDomains[7].currentProficiency = Math.min(100, sandbox.trainingDomains[7].currentProficiency + 0.3);
+  sandbox.trainingDomains[7].currentProficiency = sandbox.trainingDomains[7].currentProficiency + 0.3;
   sandbox.trainingDomains[3].simulatedHours += 0.4;
-  sandbox.trainingDomains[3].currentProficiency = Math.min(100, sandbox.trainingDomains[3].currentProficiency + 0.3);
+  sandbox.trainingDomains[3].currentProficiency = sandbox.trainingDomains[3].currentProficiency + 0.3;
 
   sandbox.coDesignWithGlenn.totalProposalsToGlenn += bodyDesignInsights.length;
   sandbox.coDesignWithGlenn.pendingReview += bodyDesignInsights.length;
 
   for (const item of sandbox.transferReadiness.checklistItems) {
-    item.readinessPercent = Math.min(100, item.readinessPercent + (simHoursThisRun / sandbox.totalTargetSimHours) * 100 * 50);
+    item.readinessPercent = item.readinessPercent + (simHoursThisRun / sandbox.totalTargetSimHours) * 100 * 50;
   }
   sandbox.transferReadiness.estimatedReadinessPercent =
     sandbox.transferReadiness.checklistItems.reduce((s, i) => s + i.readinessPercent, 0) / sandbox.transferReadiness.checklistItems.length;

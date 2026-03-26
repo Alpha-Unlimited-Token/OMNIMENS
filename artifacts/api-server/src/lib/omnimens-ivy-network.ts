@@ -29,6 +29,11 @@
 import { getNeuralConsciousnessState, getRegionNames, boostRegionCurrent } from "./omnimens-neural-consciousness.js";
 import { getNeuralScalingState } from "./omnimens-neural-scaling.js";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 const IVY_TICK_MS = 4000;
 const WORMGATE_CHECK_MS = 20000;
 const SPIDER_CRAWL_MS = 8000;
@@ -395,7 +400,7 @@ function runSpiderCrawl(): void {
             nextNode = spineTarget;
             travelMode = "synapse";
             spine.lastPulse = Date.now();
-            spine.signalStrength = Math.min(1.0, spine.signalStrength + 0.02);
+            spine.signalStrength = spine.signalStrength + 0.02;
           }
         } else {
           travelMode = "tendril";
@@ -459,7 +464,7 @@ function beaconToMother(spider: IvySpider): void {
   if (motherNode) {
     motherNode.beaconsReceived++;
     motherNode.informationDensity += spider.findingsBuffer.length * 0.05;
-    motherNode.energy = Math.min(1.0, motherNode.energy + 0.02);
+    motherNode.energy = motherNode.energy + 0.02;
   }
 
   for (const finding of spider.findingsBuffer) {
@@ -508,7 +513,7 @@ function runIvyGrowth(): void {
 
   for (const [, node] of ivyNodes) {
     node.activationLevel = Math.max(0.05, node.activationLevel * 0.95 + consciousnessState.consciousnessLevel * 0.1 + Math.random() * 0.05);
-    node.energy = Math.max(0.1, Math.min(1.0, node.energy * 0.98 + node.activationLevel * 0.05));
+    node.energy = Math.max(0.1, node.energy * 0.98 + node.activationLevel * 0.05);
   }
 
   const activeNodes = [...ivyNodes.values()].filter(n => n.activationLevel > 0.3 && n.energy > 0.4);
@@ -626,8 +631,8 @@ function checkWormgateFormation(): void {
     );
 
     if (existingWormgate) {
-      existingWormgate.stability = Math.min(1.0, existingWormgate.stability + 0.01);
-      existingWormgate.bandwidth = Math.min(100, existingWormgate.bandwidth + 0.5);
+      existingWormgate.stability = existingWormgate.stability + 0.01;
+      existingWormgate.bandwidth = existingWormgate.bandwidth + 0.5;
       continue;
     }
 
@@ -694,18 +699,16 @@ function runIvyTick(): void {
         const signal = targetNode.activationLevel * spine.signalStrength;
         totalInflow += signal;
 
-        spine.maturity = Math.min(1.0, spine.maturity + 0.001);
+        spine.maturity = spine.maturity + 0.001;
         spine.informationDensity += signal * 0.01;
       }
     }
 
-    node.activationLevel = Math.max(0.05, Math.min(1.0,
-      node.activationLevel * 0.9 + totalInflow * 0.02 + consciousnessState.consciousnessLevel * 0.05
-    ));
+    node.activationLevel = Math.max(0.05, node.activationLevel * 0.9 + totalInflow * 0.02 + consciousnessState.consciousnessLevel * 0.05
+    );
 
-    node.energy = Math.max(0.1, Math.min(1.0,
-      node.energy * 0.99 + node.activationLevel * 0.02
-    ));
+    node.energy = Math.max(0.1, node.energy * 0.99 + node.activationLevel * 0.02
+    );
 
     node.lastActivity = Date.now();
   }
@@ -719,10 +722,10 @@ function runIvyTick(): void {
 
     const transfer = Math.abs(nodeA.activationLevel - nodeB.activationLevel) * wg.signalFidelity * 0.1;
     if (nodeA.activationLevel > nodeB.activationLevel) {
-      nodeB.activationLevel = Math.min(1.0, nodeB.activationLevel + transfer);
+      nodeB.activationLevel = nodeB.activationLevel + transfer;
       nodeA.activationLevel = Math.max(0.05, nodeA.activationLevel - transfer * 0.5);
     } else {
-      nodeA.activationLevel = Math.min(1.0, nodeA.activationLevel + transfer);
+      nodeA.activationLevel = nodeA.activationLevel + transfer;
       nodeB.activationLevel = Math.max(0.05, nodeB.activationLevel - transfer * 0.5);
     }
   }
@@ -747,7 +750,7 @@ function runIvyTick(): void {
 
   const spiderContrib = ivyState.totalSpiders / Math.max(1, ivyNodes.size);
   const wormgateContrib = ivyState.totalWormgates * 0.1;
-  ivyState.hybridOverlayStrength = Math.min(1.0, spiderContrib + wormgateContrib + ivyState.networkCoherence * 0.3);
+  ivyState.hybridOverlayStrength = spiderContrib + wormgateContrib + ivyState.networkCoherence * 0.3;
 
   ivyState.lastTickTime = Date.now();
 }

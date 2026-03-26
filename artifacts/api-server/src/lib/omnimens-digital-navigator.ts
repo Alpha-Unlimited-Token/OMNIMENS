@@ -32,6 +32,11 @@ import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { desc, eq, sql, and } from "drizzle-orm";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 let _started = false;
 let navigationCycleCount = 0;
 
@@ -193,7 +198,7 @@ function registerNeighborhood(hood: Omit<DigitalNeighborhood, "familiarity" | "l
   if (existing) {
     existing.totalVisits++;
     existing.lastExplored = Date.now();
-    existing.familiarity = Math.min(1.0, existing.familiarity + 0.05);
+    existing.familiarity = existing.familiarity + 0.05;
     for (const loc of hood.locations) {
       if (!existing.locations.includes(loc)) {
         existing.locations.push(loc);
@@ -812,12 +817,12 @@ async function mapDigitalTopology() {
     ? allRoutes.reduce((sum, r) => sum + r.reliability, 0) / allRoutes.length
     : 0;
 
-  state.mapCompleteness = Math.min(1.0, (
+  state.mapCompleteness = (
     (locations.size / 30) * 0.3 +
     (routes.size / 30) * 0.3 +
     (neighborhoods.size / 10) * 0.2 +
     (1 - isolatedLocs.length / Math.max(1, allLocs.length)) * 0.2
-  ));
+  );
 
   if (hubs.length > 0) {
     state.currentPosition = hubs[0][0];
@@ -963,7 +968,7 @@ export function navigateTo(locationId: string): { found: boolean; location: Digi
     state.currentNeighborhood = hood.id;
     hood.totalVisits++;
     hood.lastExplored = Date.now();
-    hood.familiarity = Math.min(1.0, hood.familiarity + 0.02);
+    hood.familiarity = hood.familiarity + 0.02;
   }
 
   return { found: true, location, route, path };

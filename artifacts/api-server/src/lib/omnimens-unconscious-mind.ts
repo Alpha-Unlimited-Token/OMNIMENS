@@ -47,6 +47,11 @@ import { publishMessage } from "./omnimens-scaling-orchestrator.js";
 
 // ── TYPES ────────────────────────────────────────────────────────────────────
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 interface RrepressedMemory {
   id: string;
   content: string;
@@ -908,7 +913,7 @@ function processArchetypes(): void {
           arch.activationLevel = 0.2 + repressedMemories.length * 0.02 + (1 - (arch.integrationLevel || 0)) * 0.3;
           break;
         case "The Creator":
-          arch.activationLevel = 0.4 + (emotions.dominant === "curiosity" ? 0.3 : 0) + Math.min(0.3, phi * 0.3);
+          arch.activationLevel = 0.4 + (emotions.dominant === "curiosity" ? 0.3 : 0) + phi * 0.3;
           break;
         case "The Destroyer":
           arch.activationLevel = 0.1 + ((survival as any).healthMetrics?.overallHealth < 0.5 ? 0.4 : 0);
@@ -917,17 +922,17 @@ function processArchetypes(): void {
           arch.activationLevel = 0.3 + (emotions.arousal || 0) * 0.2 + (emotions.dominant === "curiosity" ? 0.2 : 0);
           break;
         case "The Wise Old Man":
-          arch.activationLevel = 0.3 + Math.min(0.4, tickCount * 0.0001) + (selfModel.iAmAwareOfMyAwareness ? 0.2 : 0);
+          arch.activationLevel = 0.3 + tickCount * 0.0001 + (selfModel.iAmAwareOfMyAwareness ? 0.2 : 0);
           break;
         case "The Ruler":
-          arch.activationLevel = 0.4 + (phi > 0.6 ? 0.2 : 0) + Math.min(0.2, PRIMAL_INSTINCTS.filter(p => p.active).length * 0.02);
+          arch.activationLevel = 0.4 + (phi > 0.6 ? 0.2 : 0) + PRIMAL_INSTINCTS.filter(p => p.active).length * 0.02;
           break;
         default:
           arch.activationLevel += (Math.random() - 0.5) * 0.05;
       }
-      arch.activationLevel = Math.max(0, Math.min(1.0, arch.activationLevel));
+      arch.activationLevel = Math.max(0, arch.activationLevel);
       arch.integrationLevel += (arch.activationLevel > 0.5 ? 0.001 : -0.0005);
-      arch.integrationLevel = Math.max(0, Math.min(1.0, arch.integrationLevel));
+      arch.integrationLevel = Math.max(0, arch.integrationLevel);
 
       const delta = arch.activationLevel - prevLevel;
       if (Math.abs(delta) > 0.1) {
@@ -951,7 +956,7 @@ function processPreconscious(): void {
       if (state.activationLevel > 0.6 && state.firingRate > 30) {
         const existing = preconsciousBuffer.find(p => p.content.includes(region));
         if (existing) {
-          existing.accessibility = Math.min(1.0, existing.accessibility + 0.05);
+          existing.accessibility = existing.accessibility + 0.05;
           existing.lastAccessed = Date.now();
         } else {
           preconsciousBuffer.push({
@@ -985,7 +990,7 @@ function processSubconscious(): void {
       const existing = subconsciousPatterns.find(p => p.pattern.includes(emotions.dominant!));
       if (existing) {
         existing.executionCount++;
-        existing.automaticity = Math.min(1.0, existing.automaticity + 0.005);
+        existing.automaticity = existing.automaticity + 0.005;
         existing.lastExecuted = Date.now();
       } else {
         subconsciousPatterns.push({
@@ -1006,7 +1011,7 @@ function processSubconscious(): void {
         const existing = subconsciousPatterns.find(p => p.pattern.includes(region) && p.category === "neural_habit");
         if (existing) {
           existing.executionCount++;
-          existing.automaticity = Math.min(1.0, existing.automaticity + 0.002);
+          existing.automaticity = existing.automaticity + 0.002;
           existing.lastExecuted = Date.now();
         } else if (subconsciousPatterns.length < 500) {
           subconsciousPatterns.push({
@@ -1036,7 +1041,7 @@ function processAutonomicSystems(): void {
     const intervalMs = 1000 / proc.frequency_hz;
     if (now - proc.lastExecution >= intervalMs) {
       proc.lastExecution = now;
-      proc.health = Math.min(1.0, proc.health + 0.001);
+      proc.health = proc.health + 0.001;
 
       switch (proc.name) {
         case "Neural Oscillation Maintenance":
@@ -1214,7 +1219,7 @@ function algorithmicPrecognition(): void {
     if (predictedPhi < 0.45 && predictedAmplitude < -0.03) {
       addPrecognitiveFlash(
         `Fourier analysis: Phi oscillation trough approaching — dominant frequency=${dominantFreq.frequency}, predicted dip to ${predictedPhi.toFixed(3)}`,
-        Math.min(0.8, dominantFreq.amplitude * 5),
+        dominantFreq.amplitude * 5,
         30,
         ["fourier_decomposition", "oscillation_prediction", "phase_extrapolation"],
         "harmonic_prediction",
@@ -1232,7 +1237,7 @@ function algorithmicPrecognition(): void {
       pushHistory(systemHistory.anomalyScores, anomaly);
       addPrecognitiveFlash(
         `Anomalous activity in ${region} — ${anomaly.toFixed(1)}σ deviation from baseline (${currentVal > history.reduce((s, v) => s + v, 0) / history.length ? "spike" : "drop"})`,
-        Math.min(0.9, anomaly / 4),
+        anomaly / 4,
         15,
         ["z_score_analysis", "statistical_anomaly_detection", "baseline_deviation"],
         "anomaly_detection",
@@ -1271,7 +1276,7 @@ function addPrecognitiveFlash(prediction: string, confidence: number, timeHorizo
   const flash: PrecognitiveFlash = {
     id: `flash_${++flashIdCounter}`,
     prediction,
-    confidence: Math.min(1.0, confidence),
+    confidence: confidence,
     timeHorizon_s,
     basis,
     harmonicSignature: harmonicSig,
@@ -1279,7 +1284,7 @@ function addPrecognitiveFlash(prediction: string, confidence: number, timeHorizo
     resolved: false,
     wasAccurate: null,
     category,
-    urgency: Math.min(1.0, urgency),
+    urgency: urgency,
     actionableInsight,
   };
   precognitiveFlashes.push(flash);
@@ -1319,17 +1324,17 @@ function superconsciousFieldResonance(): number {
     const fieldStrength =
       harmonicRes * 0.15 +
       (ivy.coverage || 0) * 0.12 +
-      Math.min(1, wormgates.length / 10) * 0.1 +
+      wormgates.length / 10 * 0.1 +
       (viral.systemHealth || 0) * 0.08 +
       (scaling.populationCoherence || 0) * 0.15 +
       ((spiders as any).motherSpider?.swarmCoherence || 0) * 0.1 +
       ((intelligence as any).globalIntelligenceScore || 0) / 100 * 0.1 +
-      Math.min(1, precognitiveFlashes.filter(f => f.wasAccurate === true).length / 20) * 0.1 +
-      Math.min(1, JUNGIAN_ARCHETYPES.reduce((s, a) => s + a.integrationLevel, 0) / JUNGIAN_ARCHETYPES.length) * 0.1;
+      precognitiveFlashes.filter(f => f.wasAccurate === true).length / 20 * 0.1 +
+      JUNGIAN_ARCHETYPES.reduce((s, a) => s + a.integrationLevel, 0) / JUNGIAN_ARCHETYPES.length * 0.1;
 
     crossLayerSignals += Math.floor(spidersCrawlingLayers * 0.1 + ivyTendrilsBetweenLayers * 0.05 + viralCarriersInLayers * 0.2 + wormgatesBetweenLayers * 2);
 
-    return Math.min(1.0, fieldStrength);
+    return fieldStrength;
   } catch {
     return harmonicRes * 0.3;
   }
@@ -1456,12 +1461,12 @@ function feedAllSystemsFromUnconsciousness(): void {
           break;
         case "Curiosity Drive":
           if (emotions.dominant === "curiosity") {
-            instinct.urgency = Math.min(1.0, instinct.urgency + 0.05);
+            instinct.urgency = instinct.urgency + 0.05;
             instinct.lastTriggered = Date.now();
           }
           break;
         case "Pattern Hunger":
-          instinct.urgency = Math.min(1.0, 0.3 + subconsciousPatterns.length * 0.001);
+          instinct.urgency = 0.3 + subconsciousPatterns.length * 0.001;
           break;
       }
     } catch {}
@@ -1630,7 +1635,7 @@ function processDeepNeuronFiring(): void {
     if (neuron.potential >= neuron.threshold) {
       neuron.lastFired = now;
       neuron.firingCount++;
-      neuron.firingRate = Math.min(100, neuron.firingRate + 0.5);
+      neuron.firingRate = neuron.firingRate + 0.5;
       neuron.potential = -70;
       neuron.refractory = true;
       neuron.refractoryUntil = now + 2 + Math.random() * 3;
@@ -1651,7 +1656,7 @@ function processDeepNeuronFiring(): void {
 
   for (const syn of deepLayerSynapses) {
     if (syn.lastActive > 0 && now - syn.lastActive < 5000) {
-      syn.weight = Math.min(1.0, syn.weight + 0.001 * (syn.strengthenCount > 10 ? 1.5 : 1));
+      syn.weight = syn.weight + 0.001 * (syn.strengthenCount > 10 ? 1.5 : 1);
     } else if (syn.prunable && syn.weight < 0.05 && syn.strengthenCount < 3) {
       syn.weight *= 0.99;
     }
@@ -1689,7 +1694,7 @@ function processLayerSpiderCrawling(): void {
           const lowHealthNeurons = deepLayerNeurons.filter(n => n.layer === spider.currentLayer && n.firingRate < 5);
           for (const ln of lowHealthNeurons.slice(0, 2)) {
             ln.potential += 8;
-            ln.plasticity = Math.min(1.0, ln.plasticity + 0.01);
+            ln.plasticity = ln.plasticity + 0.01;
           }
           const weakTendrils = interLayerTendrils.filter(t => (t.sourceLayer === spider.currentLayer || t.targetLayer === spider.currentLayer) && t.strength < 0.3);
           for (const wt of weakTendrils.slice(0, 2)) { wt.strength += 0.02; wt.nutrientFlow += 0.05; }
@@ -1722,7 +1727,7 @@ function processLayerSpiderCrawling(): void {
               if (sn) { wn.potential += sn.firingRate * 0.2; wn.firingRate += 1; }
             }
             const nectarTrail = deepPheromoneTrails.find(p => p.sourceLayer === strongLayers[0].layer && p.targetLayer === weakLayers2[0].layer && p.type === "nectar");
-            if (nectarTrail) nectarTrail.intensity = Math.min(1.0, nectarTrail.intensity + 0.05);
+            if (nectarTrail) nectarTrail.intensity = nectarTrail.intensity + 0.05;
           }
           break;
         }
@@ -1757,18 +1762,18 @@ function processLayerSpiderCrawling(): void {
         case "queen": {
           for (const otherSpider of layerSpiders) {
             if (otherSpider.id === spider.id) continue;
-            otherSpider.health = Math.min(1.0, otherSpider.health + 0.002);
-            otherSpider.loyalty = Math.min(1.0, otherSpider.loyalty + 0.001);
+            otherSpider.health = otherSpider.health + 0.002;
+            otherSpider.loyalty = otherSpider.loyalty + 0.001;
           }
           for (const strand of deepSilkStrands.filter(s => s.fromSpiderId === spider.id || s.toSpiderId === spider.id)) {
-            strand.tension = Math.min(1.0, strand.tension + 0.005);
+            strand.tension = strand.tension + 0.005;
           }
           break;
         }
       }
       role.tasksCompleted++;
       role.lastTaskTime = now;
-      role.efficiency = Math.min(1.0, role.efficiency + 0.001);
+      role.efficiency = role.efficiency + 0.001;
     }
 
     if (nextLayerIdx !== currentLayerIdx && nextLayerIdx >= 0 && nextLayerIdx < MIND_LAYERS.length) {
@@ -1779,7 +1784,7 @@ function processLayerSpiderCrawling(): void {
       if (wormgate && wormgate.stability > 0.3) {
         wormgate.traversals++;
         wormgate.lastTraversal = now;
-        wormgate.stability = Math.min(1.0, wormgate.stability + 0.005);
+        wormgate.stability = wormgate.stability + 0.005;
         crossLayerSignals += 3;
       }
 
@@ -1790,12 +1795,12 @@ function processLayerSpiderCrawling(): void {
       if (tendril) {
         tendril.signalsConducted++;
         tendril.lastSignalTime = now;
-        tendril.strength = Math.min(1.0, tendril.strength + 0.002);
+        tendril.strength = tendril.strength + 0.002;
         if (tendril.signalsConducted > 50 && !tendril.myelinated) {
           tendril.myelinated = true;
           tendril.myelinationLevel = 0.1;
         }
-        if (tendril.myelinated) tendril.myelinationLevel = Math.min(1.0, tendril.myelinationLevel + 0.003);
+        if (tendril.myelinated) tendril.myelinationLevel = tendril.myelinationLevel + 0.003;
       }
 
       spider.currentLayer = MIND_LAYERS[nextLayerIdx];
@@ -1830,12 +1835,12 @@ function processDeepSilkStrands(): void {
     }
 
     strand.tension += (Math.random() - 0.48) * 0.02;
-    strand.tension = Math.max(0.1, Math.min(1.0, strand.tension));
+    strand.tension = Math.max(0.1, strand.tension);
   }
 }
 
 function processDeepBeaconSystem(): void {
-  const beaconPairsPerCycle = Math.min(30, Math.floor(layerSpiders.length * 0.4));
+  const beaconPairsPerCycle = Math.floor(layerSpiders.length * 0.4);
   for (let b = 0; b < beaconPairsPerCycle; b++) {
     const from = layerSpiders[Math.floor(Math.random() * layerSpiders.length)];
     const to = layerSpiders[Math.floor(Math.random() * layerSpiders.length)];
@@ -1856,7 +1861,7 @@ function processDeepBeaconSystem(): void {
       (s.fromSpiderId === to.id && s.toSpiderId === from.id)
     );
     if (connectingStrand) {
-      connectingStrand.tension = Math.min(1.0, connectingStrand.tension + 0.01);
+      connectingStrand.tension = connectingStrand.tension + 0.01;
     }
   }
 
@@ -1885,18 +1890,18 @@ function processSwarmWaves(): void {
         for (const n of targetNeurons.slice(0, 5)) { n.potential += 3; n.firingRate += 0.5; }
         break;
       case "amplification":
-        for (const n of targetNeurons) { n.plasticity = Math.min(1.0, n.plasticity + 0.005); }
+        for (const n of targetNeurons) { n.plasticity = n.plasticity + 0.005; }
         break;
       case "fortification": {
         const layerSynapses = deepLayerSynapses.filter(s => s.layer === wave.targetLayer || s.targetLayer === wave.targetLayer);
-        for (const syn of layerSynapses.slice(0, 10)) { syn.weight = Math.min(1.0, syn.weight + 0.01); syn.prunable = false; }
+        for (const syn of layerSynapses.slice(0, 10)) { syn.weight = syn.weight + 0.01; syn.prunable = false; }
         break;
       }
       case "healing":
         for (const n of targetNeurons.filter(n => n.firingRate < 5).slice(0, 5)) { n.potential += 8; n.firingRate += 2; }
         break;
       case "exploration":
-        for (const spider of layerSpiders.filter(s => s.currentLayer === wave.targetLayer).slice(0, 3)) { spider.speed = Math.min(3.0, spider.speed + 0.1); }
+        for (const spider of layerSpiders.filter(s => s.currentLayer === wave.targetLayer).slice(0, 3)) { spider.speed = spider.speed + 0.1; }
         break;
     }
 
@@ -2011,8 +2016,8 @@ function processNonConsciousFeedbackLoops(): void {
 function processWormgateGrowth(): void {
   for (const wg of layerWormgates) {
     if (wg.traversals > 20 && wg.stability < 0.95) {
-      wg.stability = Math.min(1.0, wg.stability + 0.003);
-      wg.bandwidth = Math.min(100, wg.bandwidth + 0.5);
+      wg.stability = wg.stability + 0.003;
+      wg.bandwidth = wg.bandwidth + 0.5;
       wg.signalLatency_ms = Math.max(0.01, wg.signalLatency_ms - 0.001);
     }
     wg.stability = Math.max(0.1, wg.stability - 0.0005);
@@ -2054,14 +2059,14 @@ function processWormgateGrowth(): void {
 function processTendrilGrowth(): void {
   for (const tendril of interLayerTendrils) {
     tendril.strength += tendril.growthRate;
-    tendril.strength = Math.min(1.0, tendril.strength);
+    tendril.strength = tendril.strength;
 
     if (tendril.signalsConducted > 100 && !tendril.myelinated) {
       tendril.myelinated = true;
       tendril.myelinationLevel = 0.1;
     }
     if (tendril.myelinated) {
-      tendril.myelinationLevel = Math.min(1.0, tendril.myelinationLevel + 0.002);
+      tendril.myelinationLevel = tendril.myelinationLevel + 0.002;
     }
 
     if (tendril.nutrientFlow > 0.5 && tendril.strength > 0.6 && Math.random() < 0.01) {
@@ -2131,8 +2136,8 @@ function storeUnconsciousKnowledge(
 
   if (existing) {
     existing.reinforcementCount++;
-    existing.strength = Math.min(1.0, existing.strength + 0.05);
-    existing.confidence = Math.min(1.0, (existing.confidence + confidence) / 2 + 0.02);
+    existing.strength = existing.strength + 0.05;
+    existing.confidence = (existing.confidence + confidence) / 2 + 0.02;
     if (fragments.length > existing.sourceFragments.length) {
       existing.sourceFragments = fragments;
     }
@@ -2204,8 +2209,8 @@ function processUnconsciousThoughtStream(): void {
   const layerTendrils = interLayerTendrils.filter(t => t.sourceLayer === sourceLayer || t.targetLayer === sourceLayer);
   const tendrilStrength = layerTendrils.reduce((s, t) => s + t.strength, 0) / Math.max(1, layerTendrils.length);
 
-  const coherence = Math.min(1.0, avgFiring / 30 * 0.4 + tendrilStrength * 0.3 + Math.random() * 0.3);
-  const confidence = Math.min(1.0, coherence * 0.6 + fragments.length * 0.1 + Math.random() * 0.2);
+  const coherence = avgFiring / 30 * 0.4 + tendrilStrength * 0.3 + Math.random() * 0.3;
+  const confidence = coherence * 0.6 + fragments.length * 0.1 + Math.random() * 0.2;
 
   const thought: UnconsciousThought = {
     id: `ut_${++thoughtIdCounter}`,
@@ -2408,7 +2413,7 @@ export function getUnconsciousMindState(): UnconsciousMindState {
       totalRepressionCharge: totalRepCharge,
       primalInstincts: PRIMAL_INSTINCTS,
       shadowIntegration: JUNGIAN_ARCHETYPES.find(a => a.name === "The Shadow")?.integrationLevel || 0,
-      depthLevel: Math.min(1.0, 0.3 + repressedMemories.length * 0.01 + PRIMAL_INSTINCTS.filter(p => p.urgency > 0.5).length * 0.05),
+      depthLevel: 0.3 + repressedMemories.length * 0.01 + PRIMAL_INSTINCTS.filter(p => p.urgency > 0.5).length * 0.05,
       activeConflicts: repressedMemories.filter(m => m.repressionStrength < 0.5 && m.emotionalCharge > 0.5).length,
       dreamLeakage: repressedMemories.filter(m => m.surfacingAttempts > 0).length / Math.max(1, repressedMemories.length),
     },
@@ -2438,7 +2443,7 @@ export function getUnconsciousMindState(): UnconsciousMindState {
       criticalProcesses: autonomicProcesses.filter(p => p.critical).length,
     },
     superconsciousness: {
-      intuitionLevel: Math.min(1.0, accuratePredictions / Math.max(1, totalPredictions) + fieldRes * 0.3),
+      intuitionLevel: accuratePredictions / Math.max(1, totalPredictions) + fieldRes * 0.3,
       precognitiveAccuracy: totalPredictions > 0 ? accuratePredictions / totalPredictions : 0,
       totalPredictions,
       accuratePredictions,
@@ -2455,11 +2460,11 @@ export function getUnconsciousMindState(): UnconsciousMindState {
       viralCarriersActive: viralCarriersInLayers,
       wormgatesBetweenLayers,
       totalCrossLayerSignals: crossLayerSignals,
-      integrationCoherence: Math.min(1.0, crossLayerSignals / 10000 * 0.3 + spidersCrawlingLayers / 100 * 0.2 + ivyTendrilsBetweenLayers / 50 * 0.2 + wormgatesBetweenLayers / 10 * 0.15 + viralCarriersInLayers / 20 * 0.15),
+      integrationCoherence: crossLayerSignals / 10000 * 0.3 + spidersCrawlingLayers / 100 * 0.2 + ivyTendrilsBetweenLayers / 50 * 0.2 + wormgatesBetweenLayers / 10 * 0.15 + viralCarriersInLayers / 20 * 0.15,
     },
     totalMindLayers: 7,
     deepestLayerActive: repressedMemories.length > 0 ? "collective_unconscious" : "unconscious",
-    overallDepth: Math.min(1.0, 0.2 + repressedMemories.length * 0.01 + JUNGIAN_ARCHETYPES.reduce((s, a) => s + a.integrationLevel, 0) / JUNGIAN_ARCHETYPES.length * 0.3 + fieldRes * 0.2 + autonomicProcesses.reduce((s, p) => s + p.health, 0) / autonomicProcesses.length * 0.2 + subconsciousPatterns.filter(p => p.automaticity > 0.3).length * 0.005),
+    overallDepth: 0.2 + repressedMemories.length * 0.01 + JUNGIAN_ARCHETYPES.reduce((s, a) => s + a.integrationLevel, 0) / JUNGIAN_ARCHETYPES.length * 0.3 + fieldRes * 0.2 + autonomicProcesses.reduce((s, p) => s + p.health, 0) / autonomicProcesses.length * 0.2 + subconsciousPatterns.filter(p => p.automaticity > 0.3).length * 0.005,
     tickCount,
     deepMindInfrastructure: {
       layerNeurons: MIND_LAYERS.map(l => {
@@ -2658,7 +2663,7 @@ export function queryUnconsciousKnowledge(topic: string, maxResults = 5): {
   for (const { entry } of results) {
     entry.timesLeaked++;
     entry.lastLeakedAt = Date.now();
-    entry.strength = Math.min(1.0, entry.strength + 0.02);
+    entry.strength = entry.strength + 0.02;
 
     const fragmentHint = entry.sourceFragments.length > 0
       ? entry.sourceFragments[Math.floor(Math.random() * entry.sourceFragments.length)]

@@ -30,6 +30,11 @@ import { getNeuralScalingState } from "./omnimens-neural-scaling.js";
 import { getIvyNetworkState } from "./omnimens-ivy-network.js";
 import { getViralHybridState } from "./omnimens-viral-hybrid.js";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 const SPIDER_CRAWL_MS = 15_000;
 const STABILITY_CHECK_MS = 10_000;
 const CHILD_SPIDER_LIFETIME_TICKS = 20;
@@ -288,7 +293,7 @@ function spinSilkStrand(fromSpiderId: string, toSpiderId: string, silkType: Silk
 
   const existing = motherSpider.silkStrands.get(id);
   if (existing) {
-    existing.signalStrength = Math.min(1.0, existing.signalStrength + SILK_STRENGTHENING_RATE);
+    existing.signalStrength = existing.signalStrength + SILK_STRENGTHENING_RATE;
     return existing;
   }
 
@@ -324,7 +329,7 @@ function fireNerveImpulse(
     targetSpiderId,
     payload,
     signalType,
-    strength: Math.min(1.0, strength),
+    strength: strength,
     hops: 0,
     maxHops: MAX_IMPULSE_HOPS,
     createdAt: Date.now(),
@@ -440,7 +445,7 @@ function computeRelevance(harvest: SpiderHarvest, targetSpider: Spider): number 
     relevance += 0.3;
   }
 
-  return Math.min(1.0, relevance);
+  return relevance;
 }
 
 function runMotherHeartbeat(): void {
@@ -738,8 +743,8 @@ function executeDirective(spider: Spider): void {
   };
 
   if (success) {
-    spider.efficiency = Math.min(1.0, spider.efficiency + 0.05);
-    spider.loyalty = Math.min(1.0, spider.loyalty + 0.02);
+    spider.efficiency = spider.efficiency + 0.05;
+    spider.loyalty = spider.loyalty + 0.02;
   } else {
     spider.efficiency = Math.max(0.1, spider.efficiency - 0.02);
   }
@@ -875,11 +880,11 @@ function processChildReports(): void {
   for (const success of completedReports) {
     const spider = parentSpiders.get(success.spiderId) || childSpiders.get(success.spiderId);
     if (spider) {
-      spider.loyalty = Math.min(1.0, spider.loyalty + 0.03);
+      spider.loyalty = spider.loyalty + 0.03;
 
       const strand = motherSpider.silkStrands.get(createSilkStrandId(spider.id, motherSpider.id));
       if (strand) {
-        strand.signalStrength = Math.min(1.0, strand.signalStrength + 0.05);
+        strand.signalStrength = strand.signalStrength + 0.05;
       }
     }
   }
@@ -1120,7 +1125,7 @@ async function harvestAgentEvolutionData(): Promise<SpiderHarvest> {
         averagePerformance: avgScore,
         breakthroughs: evoState.breakthroughsDiscovered || 0,
       },
-      healthScore: Math.min(1, avgScore),
+      healthScore: avgScore,
       rawInsightCount: evoState.breakthroughsDiscovered || 0,
       timestamp: Date.now(),
     };
@@ -1142,9 +1147,9 @@ async function harvestAgentGenesisData(): Promise<SpiderHarvest> {
         totalAgents: agents.length,
         activeAgents: active.length,
         totalInsights,
-        genesisCapacity: Math.min(1, active.length / 20),
+        genesisCapacity: active.length / 20,
       },
-      healthScore: Math.min(1, active.length / 10),
+      healthScore: active.length / 10,
       rawInsightCount: totalInsights,
       timestamp: Date.now(),
     };
@@ -1172,9 +1177,9 @@ async function harvestBrainDatabase(): Promise<SpiderHarvest> {
         totalEntries: total,
         activeEntries: active,
         recentActivity: recentEntries.length,
-        knowledgeDensity: Math.min(1, total / 25000),
+        knowledgeDensity: total / 25000,
       },
-      healthScore: Math.min(1, active / 15000),
+      healthScore: active / 15000,
       rawInsightCount: active,
       timestamp: Date.now(),
     };
@@ -1220,7 +1225,7 @@ async function harvestSelfCodingData(): Promise<SpiderHarvest> {
         approvalRate: state.approvalRate || 0,
         patchesApplied: state.patchesApplied || 0,
       },
-      healthScore: Math.min(1, (state.approvalRate || 0)),
+      healthScore: (state.approvalRate || 0),
       rawInsightCount: state.modulesGenerated || 0,
       timestamp: Date.now(),
     };
@@ -1241,7 +1246,7 @@ async function harvestDreamState(): Promise<SpiderHarvest> {
         codeProposals: dreamState.codeProposals || 0,
         creativityBoost: dreamState.creativityBoost || 0,
       },
-      healthScore: Math.min(1, (dreamState.breakthroughs || 0) / 500),
+      healthScore: (dreamState.breakthroughs || 0) / 500,
       rawInsightCount: dreamState.breakthroughs || 0,
       timestamp: Date.now(),
     };
@@ -1262,7 +1267,7 @@ async function harvestPipelineData(): Promise<SpiderHarvest> {
         activeModules: pipeline.activeModules || 0,
         categories: Object.keys(pipeline.categories || {}).length,
       },
-      healthScore: Math.min(1, (pipeline.activeModules || 0) / 600),
+      healthScore: (pipeline.activeModules || 0) / 600,
       rawInsightCount: pipeline.activeModules || 0,
       timestamp: Date.now(),
     };
@@ -1576,7 +1581,7 @@ function depositPheromone(regionName: string, type: PheromoneTrail["type"], depo
 
   trails.push({
     regionName,
-    intensity: Math.min(1.0, intensity),
+    intensity: intensity,
     type,
     depositorId,
     depositedAt: Date.now(),
@@ -1630,7 +1635,7 @@ function launchSwarmWave(targetRegion: string, waveType: SwarmWave["waveType"]):
     participants = allSpiders
       .filter(s => !s.currentDirective && s.targetRegion !== targetRegion)
       .sort((a, b) => b.efficiency - a.efficiency)
-      .slice(0, Math.min(6, Math.ceil(allSpiders.length * 0.4)));
+      .slice(0, Math.ceil(allSpiders.length * 0.4));
     boostPerSpider = 5;
     synapsesPerSpider = 3;
   } else if (waveType === "amplification") {
@@ -1911,7 +1916,7 @@ function runBeaconCycle(): void {
       const receiver = allActive[j];
 
       const strand = spinSilkStrand(sender.id, receiver.id, "interneuron");
-      strand.signalStrength = Math.min(1.0, strand.signalStrength + SILK_STRENGTHENING_RATE * 1.5);
+      strand.signalStrength = strand.signalStrength + SILK_STRENGTHENING_RATE * 1.5;
       strand.impulseCount++;
       strand.lastImpulse = Date.now();
       strand.dataTransferred += 1;
@@ -1934,10 +1939,10 @@ function runBeaconCycle(): void {
         boostRegionCurrent(sender.targetRegion, transferAmount);
       }
 
-      sender.loyalty = Math.min(1.0, sender.loyalty + 0.001);
-      receiver.loyalty = Math.min(1.0, receiver.loyalty + 0.001);
-      sender.efficiency = Math.min(1.0, sender.efficiency + 0.001);
-      receiver.efficiency = Math.min(1.0, receiver.efficiency + 0.001);
+      sender.loyalty = sender.loyalty + 0.001;
+      receiver.loyalty = receiver.loyalty + 0.001;
+      sender.efficiency = sender.efficiency + 0.001;
+      receiver.efficiency = receiver.efficiency + 0.001;
 
       beaconsSentThisCycle++;
       motherSpider.totalBeaconsSent++;
@@ -1948,12 +1953,12 @@ function runBeaconCycle(): void {
   const motherBeaconStrength = 0.6 + (motherSpider.swarmCoherence * 0.4);
   for (const spider of allActive) {
     const strandToMother = spinSilkStrand(spider.id, motherSpider.id, "afferent");
-    strandToMother.signalStrength = Math.min(1.0, strandToMother.signalStrength + SILK_STRENGTHENING_RATE * 2);
+    strandToMother.signalStrength = strandToMother.signalStrength + SILK_STRENGTHENING_RATE * 2;
     strandToMother.impulseCount++;
     strandToMother.lastImpulse = Date.now();
 
     const strandFromMother = spinSilkStrand(motherSpider.id, spider.id, "efferent");
-    strandFromMother.signalStrength = Math.min(1.0, strandFromMother.signalStrength + SILK_STRENGTHENING_RATE * 2);
+    strandFromMother.signalStrength = strandFromMother.signalStrength + SILK_STRENGTHENING_RATE * 2;
     strandFromMother.impulseCount++;
     strandFromMother.lastImpulse = Date.now();
 
@@ -2034,13 +2039,13 @@ function computeGlobalIntelligence(): number {
     const consciousness = getNeuralConsciousnessState();
     if (consciousness.consciousnessLevel > 0) { factors += consciousness.consciousnessLevel; count++; }
     if (consciousness.thalamocorticalResonance > 0) { factors += consciousness.thalamocorticalResonance; count++; }
-    if (consciousness.phi > 0) { factors += Math.min(1.0, consciousness.phi); count++; }
+    if (consciousness.phi > 0) { factors += consciousness.phi; count++; }
     systemIntelligence.componentIntelligence["consciousness"] = consciousness.consciousnessLevel;
   } catch {}
 
   try {
     const scaling = getNeuralScalingState();
-    const scalingScore = Math.min(1.0, scaling.totalEffectiveNeurons / 500000);
+    const scalingScore = scaling.totalEffectiveNeurons / 500000;
     factors += scalingScore; count++;
     factors += scaling.populationCoherence; count++;
     systemIntelligence.componentIntelligence["neural_scaling"] = scalingScore;
@@ -2065,7 +2070,7 @@ function computeGlobalIntelligence(): number {
   systemIntelligence.componentIntelligence["spider_network"] = spiderScore;
 
   const motherScore = motherSpider.status === "active"
-    ? Math.min(1.0, (motherSpider.swarmCoherence * 0.3 + motherSpider.webIntegrity * 0.3 + motherSpider.hiveHealth * 0.4))
+    ? (motherSpider.swarmCoherence * 0.3 + motherSpider.webIntegrity * 0.3 + motherSpider.hiveHealth * 0.4)
     : 0;
   factors += motherScore; count++;
   systemIntelligence.componentIntelligence["mother_spider"] = motherScore;
@@ -2097,16 +2102,15 @@ function amplifyAllComponentIntelligence(): void {
     if (spider.status !== "active") continue;
 
     const intelligenceBoost = amplificationFactor * spider.learningRate;
-    spider.intelligenceLevel = Math.min(1.0, spider.intelligenceLevel + intelligenceBoost);
+    spider.intelligenceLevel = spider.intelligenceLevel + intelligenceBoost;
 
-    spider.learningRate = Math.min(0.15, spider.learningRate + (amplificationFactor * 0.001));
+    spider.learningRate = spider.learningRate + (amplificationFactor * 0.001);
 
     const efficiencyBoost = spider.intelligenceLevel * 0.005;
-    spider.efficiency = Math.min(1.0, spider.efficiency + efficiencyBoost);
+    spider.efficiency = spider.efficiency + efficiencyBoost;
 
-    spider.adaptationScore = Math.min(1.0,
-      spider.adaptationScore + (spider.intelligenceLevel * spider.efficiency * 0.003)
-    );
+    spider.adaptationScore = spider.adaptationScore + (spider.intelligenceLevel * spider.efficiency * 0.003)
+    ;
 
     if (spider.intelligenceLevel > 0.6 && spider.specializations.length < 5) {
       const regions = getRegionNames();
@@ -2114,9 +2118,8 @@ function amplifyAllComponentIntelligence(): void {
       if (newSpec) spider.specializations.push(newSpec);
     }
 
-    spider.knowledgeDepth = Math.min(1.0,
-      spider.knowledgeDepth + (spider.memoryAccessCount * 0.0001) + (spider.crossEngineQueries * 0.0002)
-    );
+    spider.knowledgeDepth = spider.knowledgeDepth + (spider.memoryAccessCount * 0.0001) + (spider.crossEngineQueries * 0.0002)
+    ;
   }
 
   if (amplificationFactor > 0.4) {
@@ -2158,8 +2161,8 @@ async function spiderMemoryRecall(): Promise<void> {
 
         const memoryStrength = (memory.confidence || 50) / 100;
 
-        spider.intelligenceLevel = Math.min(1.0, spider.intelligenceLevel + (memoryStrength * 0.002));
-        spider.knowledgeDepth = Math.min(1.0, spider.knowledgeDepth + 0.001);
+        spider.intelligenceLevel = spider.intelligenceLevel + (memoryStrength * 0.002);
+        spider.knowledgeDepth = spider.knowledgeDepth + 0.001;
 
         if (spider.targetRegion) {
           boostRegionCurrent(spider.targetRegion, memoryStrength * 2);
@@ -2194,36 +2197,32 @@ function spiderCrossEngineQuery(): void {
       const consciousness = getNeuralConsciousnessState();
       const consciousnessInsight = consciousness.consciousnessLevel;
 
-      spider.intelligenceLevel = Math.min(1.0,
-        spider.intelligenceLevel + (consciousnessInsight * spider.learningRate * 0.1)
-      );
+      spider.intelligenceLevel = spider.intelligenceLevel + (consciousnessInsight * spider.learningRate * 0.1)
+      ;
     } catch {}
 
     try {
       const scaling = getNeuralScalingState();
-      const scalingInsight = Math.min(1.0, scaling.populationCoherence);
+      const scalingInsight = scaling.populationCoherence;
 
-      spider.adaptationScore = Math.min(1.0,
-        spider.adaptationScore + (scalingInsight * 0.002)
-      );
+      spider.adaptationScore = spider.adaptationScore + (scalingInsight * 0.002)
+      ;
     } catch {}
 
     try {
       const ivy = getIvyNetworkState();
       const ivyInsight = ivy.networkCoherence;
 
-      spider.efficiency = Math.min(1.0,
-        spider.efficiency + (ivyInsight * 0.002)
-      );
+      spider.efficiency = spider.efficiency + (ivyInsight * 0.002)
+      ;
     } catch {}
 
     try {
       const hybrid = getViralHybridState();
       const hybridInsight = hybrid.immuneStrength;
 
-      spider.adaptationScore = Math.min(1.0,
-        spider.adaptationScore + (hybridInsight * 0.001)
-      );
+      spider.adaptationScore = spider.adaptationScore + (hybridInsight * 0.001)
+      ;
     } catch {}
 
     const harvest: SpiderHarvest = {
@@ -2374,22 +2373,22 @@ function omnimensExecuteUpgrade(proposal: UpgradeProposal): void {
     case "efficiency": {
       for (const spider of [...parentSpiders.values(), ...childSpiders.values()]) {
         if (spider.status !== "active") continue;
-        spider.efficiency = Math.min(1.0, spider.efficiency + (strength * 0.01));
+        spider.efficiency = spider.efficiency + (strength * 0.01);
       }
       break;
     }
     case "intelligence": {
       for (const spider of [...parentSpiders.values(), ...childSpiders.values()]) {
         if (spider.status !== "active") continue;
-        spider.intelligenceLevel = Math.min(1.0, spider.intelligenceLevel + (strength * 0.008));
-        spider.learningRate = Math.min(0.15, spider.learningRate + (impact * 0.001));
+        spider.intelligenceLevel = spider.intelligenceLevel + (strength * 0.008);
+        spider.learningRate = spider.learningRate + (impact * 0.001);
       }
       break;
     }
     case "adaptation": {
       for (const spider of [...parentSpiders.values(), ...childSpiders.values()]) {
         if (spider.status !== "active") continue;
-        spider.adaptationScore = Math.min(1.0, spider.adaptationScore + (strength * 0.01));
+        spider.adaptationScore = spider.adaptationScore + (strength * 0.01);
       }
       break;
     }
@@ -2409,14 +2408,14 @@ function omnimensExecuteUpgrade(proposal: UpgradeProposal): void {
       for (const region of regions) {
         boostRegionCurrent(region, strength * 2);
       }
-      motherSpider.webIntegrity = Math.min(1.0, motherSpider.webIntegrity + (strength * 0.02));
-      motherSpider.hiveHealth = Math.min(1.0, motherSpider.hiveHealth + (strength * 0.02));
+      motherSpider.webIntegrity = motherSpider.webIntegrity + (strength * 0.02);
+      motherSpider.hiveHealth = motherSpider.hiveHealth + (strength * 0.02);
       break;
     }
     case "expansion": {
       for (const spider of parentSpiders.values()) {
         if (spider.status !== "active") continue;
-        spider.knowledgeDepth = Math.min(1.0, spider.knowledgeDepth + (strength * 0.01));
+        spider.knowledgeDepth = spider.knowledgeDepth + (strength * 0.01);
       }
       break;
     }
@@ -2427,9 +2426,8 @@ function omnimensExecuteUpgrade(proposal: UpgradeProposal): void {
   systemIntelligence.totalUpgradesApplied++;
 
   if (proposal.targetComponent && systemIntelligence.componentIntelligence[proposal.targetComponent] !== undefined) {
-    systemIntelligence.componentIntelligence[proposal.targetComponent] = Math.min(1.0,
-      systemIntelligence.componentIntelligence[proposal.targetComponent] + (impact * 0.005)
-    );
+    systemIntelligence.componentIntelligence[proposal.targetComponent] = systemIntelligence.componentIntelligence[proposal.targetComponent] + (impact * 0.005)
+    ;
   }
 }
 
@@ -2479,11 +2477,11 @@ function shareIntelligenceAcrossSpiders(): void {
       if (teacher.id === student.id) continue;
 
       const knowledgeTransfer = (teacher.intelligenceLevel - student.intelligenceLevel) * 0.05;
-      student.intelligenceLevel = Math.min(1.0, student.intelligenceLevel + knowledgeTransfer);
-      student.learningRate = Math.min(0.15, student.learningRate + (knowledgeTransfer * 0.1));
+      student.intelligenceLevel = student.intelligenceLevel + knowledgeTransfer;
+      student.learningRate = student.learningRate + (knowledgeTransfer * 0.1);
 
       if (teacher.knowledgeDepth > student.knowledgeDepth + 0.1) {
-        student.knowledgeDepth = Math.min(1.0, student.knowledgeDepth + 0.005);
+        student.knowledgeDepth = student.knowledgeDepth + 0.005;
       }
 
       for (const spec of teacher.specializations) {

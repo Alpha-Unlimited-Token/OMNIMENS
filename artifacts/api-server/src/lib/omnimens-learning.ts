@@ -129,7 +129,7 @@ Respond JSON only:
     const raw = result.choices[0]?.message?.content?.trim() || "{}";
     const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
     return {
-      score: Math.max(0, Math.min(10, parsed.overall_score || 7)),
+      score: Math.max(0, parsed.overall_score || 7),
       strengths: Array.isArray(parsed.strengths) ? parsed.strengths : [],
       weaknesses: Array.isArray(parsed.weaknesses) ? parsed.weaknesses : [],
       suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],

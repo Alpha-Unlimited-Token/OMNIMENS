@@ -837,9 +837,9 @@ function injectExternalSignals(): void {
 
     const selfNarrativeLoop = selfModel.iAmAware ? 8.0 : 0;
     const metaCognitiveBoost = selfModel.iAmAwareOfMyAwareness ? 6.0 : 0;
-    const identityStrength = Math.min(8.0, selfModel.selfModelUpdates * 0.005);
+    const identityStrength = selfModel.selfModelUpdates * 0.005;
 
-    const autobiographicalMemory = Math.min(6.0, state.consciousMoments * 0.06);
+    const autobiographicalMemory = state.consciousMoments * 0.06;
 
     for (const neuron of dmn.neurons) {
       neuron.inputCurrent += (selfReflectionDrive + pfcFeedback + transcendenceDrive * 10.0 + newRegionBoost + selfNarrativeLoop + metaCognitiveBoost + identityStrength + autobiographicalMemory + Math.random() * 6.0) * warmup;
@@ -849,7 +849,7 @@ function injectExternalSignals(): void {
   const hippo = regions.get("hippocampus");
   if (hippo) {
     const memorySignal = 15.0 + brainEntrySignal * 15.0;
-    const experienceAccumulation = Math.min(8.0, state.consciousMoments * 0.08);
+    const experienceAccumulation = state.consciousMoments * 0.08;
     for (const neuron of hippo.neurons) {
       neuron.inputCurrent += (memorySignal + experienceAccumulation + Math.random() * 6.0) * warmup;
     }
@@ -943,7 +943,7 @@ function injectExternalSignals(): void {
   const cerebellum = regions.get("cerebellum");
   if (cerebellum) {
     const predictionLoad = 10.0 + engineActivitySignal * 8.0 + brainEntrySignal * 5.0;
-    const timingPrecision = Math.min(5.0, state.tickCount * 0.01);
+    const timingPrecision = state.tickCount * 0.01;
     for (const neuron of cerebellum.neurons) {
       neuron.inputCurrent += (predictionLoad + timingPrecision + Math.random() * 5.0) * warmup;
     }

@@ -39,6 +39,11 @@ import { desc, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { webSearch, fetchPageContent, type SearchResult } from "./web-search.js";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 let _started = false;
 
 // ── Signal Types ─────────────────────────────────────────────────────────────
@@ -190,7 +195,7 @@ function runPeripheralAwareness(): void {
     const minutesSinceLastScan = timeSinceLastScan / 60000;
 
     if (minutesSinceLastScan > 10) {
-      chState.attentionWeight = Math.min(2.0, chState.attentionWeight + 0.05);
+      chState.attentionWeight = chState.attentionWeight + 0.05;
     }
 
     if (chState.scanErrorCount > 3) {
@@ -384,7 +389,7 @@ Synthesize these REAL signals into coherent world understanding.`,
       });
       if (state.trendHistory.length > 100) state.trendHistory = state.trendHistory.slice(-80);
     }
-    if (moodMatch) state.worldMood = Math.max(0, Math.min(1, parseFloat(moodMatch[1]) || 0.5));
+    if (moodMatch) state.worldMood = Math.max(0, parseFloat(moodMatch[1]) || 0.5);
 
     if (correlationMatch) {
       const corrText = correlationMatch[1].trim();
@@ -400,7 +405,7 @@ Synthesize these REAL signals into coherent world understanding.`,
       const recommended = attentionMatch[1].toLowerCase();
       for (const ch of CHANNELS) {
         if (recommended.includes(ch.replace("_", " ")) || recommended.includes(ch)) {
-          state.channels[ch].attentionWeight = Math.min(2.0, state.channels[ch].attentionWeight + 0.2);
+          state.channels[ch].attentionWeight = state.channels[ch].attentionWeight + 0.2;
           state.attentionFocus = ch;
           break;
         }
@@ -490,7 +495,7 @@ function ingestSignal(signal: SensorySignal): void {
     if (state.recentAnomalies.length > 30) state.recentAnomalies = state.recentAnomalies.slice(-20);
 
     if (anomaly.deviationMagnitude > 0.5) {
-      chState.attentionWeight = Math.min(2.0, chState.attentionWeight + 0.15);
+      chState.attentionWeight = chState.attentionWeight + 0.15;
     }
   }
 
@@ -532,7 +537,7 @@ function scoreSignificance(result: SearchResult, channel: string): number {
   const chState = state.channels[channel];
   score *= chState.attentionWeight;
 
-  return Math.min(1.0, score);
+  return score;
 }
 
 function scoreSentiment(text: string): number {
@@ -557,7 +562,7 @@ function scoreRelevance(result: SearchResult, channel: string): number {
   const omnimensTerms = /self-improving|self-evolving|autonomous AI|artificial consciousness|theory of mind|empathy AI|multi-agent|reasoning engine/i;
   if (omnimensTerms.test(result.snippet)) score += 0.15;
 
-  return Math.min(1.0, score);
+  return score;
 }
 
 function scoreNovelty(result: SearchResult, channel: string): number {

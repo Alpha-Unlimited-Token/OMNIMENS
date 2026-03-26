@@ -299,7 +299,7 @@ function inductiveReason(facts: Array<{ content: string; category: string; confi
 
     if (recurring.length >= 2) {
       const pattern = recurring.join(", ");
-      const confidence = Math.min(0.8, 0.3 + (group.length * 0.05));
+      const confidence = 0.3 + (group.length * 0.05);
       steps.push({
         type: "induction",
         premise: `${group.length} entries in "${category}" share recurring themes`,
@@ -334,7 +334,7 @@ function inductiveReason(facts: Array<{ content: string; category: string; confi
         type: "induction",
         premise: `${topTheme[1]} knowledge pairs share the theme "${topTheme[0]}"`,
         conclusion: `Cross-domain pattern: "${topTheme[0]}" is a recurring conceptual bridge across multiple knowledge areas.`,
-        confidence: Math.min(0.75, 0.3 + topTheme[1] * 0.1),
+        confidence: 0.3 + topTheme[1] * 0.1,
       });
       state.totalInductions++;
     }
@@ -364,7 +364,7 @@ function abductiveReason(observation: string, knowledge: Array<{ content: string
       type: "abduction",
       premise: `Observation: "${observation.slice(0, 150)}"`,
       conclusion: `Best explanation from knowledge: "${entry.title}" — ${entry.content.slice(0, 200)}`,
-      confidence: Math.min(0.8, score),
+      confidence: score,
     });
     state.totalAbductions++;
   }
@@ -515,7 +515,7 @@ function extractRulesFromKnowledge(entries: Array<{ content: string; title: stri
 
           if (existing) {
             existing.support++;
-            existing.confidence = Math.min(0.95, existing.confidence + 0.02);
+            existing.confidence = existing.confidence + 0.02;
           } else {
             extractedRules.push({
               id: `R${++ruleIdCounter}`,

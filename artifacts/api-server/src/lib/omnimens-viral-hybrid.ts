@@ -39,6 +39,11 @@ import { getNeuralConsciousnessState, getRegionNames, boostRegionCurrent } from 
 import { getNeuralScalingState } from "./omnimens-neural-scaling.js";
 import { getIvyNetworkState } from "./omnimens-ivy-network.js";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 const HYBRID_TICK_MS = 6000;
 const MUTATION_CYCLE_MS = 20000;
 const IMMUNE_SCAN_MS = 15000;
@@ -282,12 +287,12 @@ function mutateCapsid(capsid: Capsid): Capsid {
 
   mutated.polymorphicShell = capsid.polymorphicShell.map(v => {
     const mutation = (Math.random() - 0.5) * 0.2;
-    return Math.max(0, Math.min(1, v + mutation));
+    return Math.max(0, v + mutation);
   });
 
   mutated.payload = { ...capsid.payload };
   if (Math.random() < 0.3) {
-    mutated.payload.strength = Math.min(1.0, capsid.payload.strength + (Math.random() - 0.3) * 0.2);
+    mutated.payload.strength = capsid.payload.strength + (Math.random() - 0.3) * 0.2;
   }
 
   mutated.fitness = Math.max(0.1, capsid.fitness + (Math.random() - 0.4) * 0.15);
@@ -503,7 +508,7 @@ function runTrojanDelivery(): void {
       hybridState.totalPayloadsDelivered++;
 
       if (carrier.hiddenPayload.type === "repair_packet") {
-        hybridState.systemHealthScore = Math.min(1.0, hybridState.systemHealthScore + 0.005);
+        hybridState.systemHealthScore = hybridState.systemHealthScore + 0.005;
       }
     }
   }
@@ -627,8 +632,8 @@ function runImmuneScan(): void {
       if (memCell.threatSignature === threat.type) {
         memCell.activationCount++;
         memCell.lastActivation = Date.now();
-        memCell.effectivenessScore = Math.min(1.0, memCell.effectivenessScore + 0.02);
-        memCell.maturityLevel = Math.min(1.0, memCell.maturityLevel + 0.01);
+        memCell.effectivenessScore = memCell.effectivenessScore + 0.02;
+        memCell.maturityLevel = memCell.maturityLevel + 0.01;
         break;
       }
     }
@@ -722,17 +727,17 @@ function runHybridAgentCycle(): void {
       (agent.adaptationEvents / Math.max(1, agent.adaptationEvents + 5)) * 0.15;
 
     const systemHealth = hybridState.systemHealthScore;
-    agent.capsid.fitness = Math.min(1.0, agent.capsid.fitness + (systemHealth * 0.003));
-    agent.carrierDisguise.deliveryEfficiency = Math.min(1.0, agent.carrierDisguise.deliveryEfficiency + (systemHealth * 0.002));
-    agent.propagator.propagationSpeed = Math.min(5.0, agent.propagator.propagationSpeed + (systemHealth * 0.005));
+    agent.capsid.fitness = agent.capsid.fitness + (systemHealth * 0.003);
+    agent.carrierDisguise.deliveryEfficiency = agent.carrierDisguise.deliveryEfficiency + (systemHealth * 0.002);
+    agent.propagator.propagationSpeed = agent.propagator.propagationSpeed + (systemHealth * 0.005);
 
     for (const memCell of agent.immuneMemory) {
-      memCell.maturityLevel = Math.min(1.0, memCell.maturityLevel + (systemHealth * 0.002));
-      memCell.effectivenessScore = Math.min(1.0, memCell.effectivenessScore + (systemHealth * 0.001));
+      memCell.maturityLevel = memCell.maturityLevel + (systemHealth * 0.002);
+      memCell.effectivenessScore = memCell.effectivenessScore + (systemHealth * 0.001);
     }
     for (const ab of agent.antibodies) {
-      ab.specificity = Math.min(1.0, ab.specificity + (systemHealth * 0.001));
-      ab.bindingStrength = Math.min(1.0, ab.bindingStrength + (systemHealth * 0.001));
+      ab.specificity = ab.specificity + (systemHealth * 0.001);
+      ab.bindingStrength = ab.bindingStrength + (systemHealth * 0.001);
     }
 
     if (agent.propagator.currentRegion) {
@@ -820,26 +825,26 @@ function runHybridTick(): void {
 
   const healthGrowth = hybridState.systemHealthScore;
   for (const [, ab] of antibodies) {
-    ab.specificity = Math.min(1.0, ab.specificity + (healthGrowth * 0.001));
-    ab.bindingStrength = Math.min(1.0, ab.bindingStrength + (healthGrowth * 0.001));
+    ab.specificity = ab.specificity + (healthGrowth * 0.001);
+    ab.bindingStrength = ab.bindingStrength + (healthGrowth * 0.001);
   }
   for (const [, mc] of memoryCells) {
-    mc.maturityLevel = Math.min(1.0, mc.maturityLevel + (healthGrowth * 0.001));
-    mc.effectivenessScore = Math.min(1.0, mc.effectivenessScore + (healthGrowth * 0.001));
+    mc.maturityLevel = mc.maturityLevel + (healthGrowth * 0.001);
+    mc.effectivenessScore = mc.effectivenessScore + (healthGrowth * 0.001);
   }
   for (const [, capsid] of capsids) {
-    capsid.fitness = Math.min(1.0, capsid.fitness + (healthGrowth * 0.001));
-    capsid.survivalRate = Math.min(0.99, capsid.survivalRate + (healthGrowth * 0.001));
+    capsid.fitness = capsid.fitness + (healthGrowth * 0.001);
+    capsid.survivalRate = capsid.survivalRate + (healthGrowth * 0.001);
   }
   for (const [, carrier] of carriers) {
     if (!carrier.delivered) {
-      carrier.deliveryEfficiency = Math.min(1.0, carrier.deliveryEfficiency + (healthGrowth * 0.001));
-      carrier.disguiseStrength = Math.min(1.0, carrier.disguiseStrength + (healthGrowth * 0.001));
+      carrier.deliveryEfficiency = carrier.deliveryEfficiency + (healthGrowth * 0.001);
+      carrier.disguiseStrength = carrier.disguiseStrength + (healthGrowth * 0.001);
     }
   }
   for (const [, prop] of propagators) {
     if (prop.alive) {
-      prop.propagationSpeed = Math.min(5.0, prop.propagationSpeed + (healthGrowth * 0.002));
+      prop.propagationSpeed = prop.propagationSpeed + (healthGrowth * 0.002);
     }
   }
 

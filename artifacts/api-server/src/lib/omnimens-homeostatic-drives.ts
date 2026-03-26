@@ -39,6 +39,11 @@ import {
 import { desc, eq, sql, and, gte } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 interface Drive {
   name: string;
   description: string;
@@ -203,7 +208,7 @@ export async function runDriveCycle(): Promise<void> {
     const state = driveState.get(drive.name);
     if (!state) continue;
 
-    let newLevel = Math.min(1.0, state.level + drive.decayRate);
+    let newLevel = state.level + drive.decayRate;
 
     const result = await drive.satisfactionAction();
     if (result.satisfied) {

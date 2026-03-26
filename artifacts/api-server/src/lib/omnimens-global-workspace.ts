@@ -38,6 +38,11 @@ import { desc, eq, sql, gte, and } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { getAllAgentNames } from "./omnimens-consciousness-bus.js";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 const WORKSPACE_CAPACITY = 5;
 const IGNITION_THRESHOLD = 0.6;
 const BROADCAST_COOLDOWN_MS = 30 * 60 * 1000;
@@ -170,7 +175,7 @@ const SPECIALIZED_MODULES: WorkspaceModule[] = [
       return genesisInsights.map(g => ({
         moduleName: "GenesisAgentIntelligence",
         content: `${g.title}: ${g.content?.slice(0, 300)}`,
-        salience: Math.min(0.9, (g.confidence || 70) / 100 + 0.1),
+        salience: (g.confidence || 70) / 100 + 0.1,
         type: "discovery" as const,
       }));
     },
@@ -332,7 +337,7 @@ Respond JSON only:
         category: "insight",
         title: `[WORKSPACE BROADCAST] ${winner.content.slice(0, 60)}`,
         content: integrationInsight.slice(0, 250),
-        confidence: Math.min(0.95, winner.salience),
+        confidence: winner.salience,
         sourceConversation: `workspace_cycle_${workspaceCycleCount}`,
         timesApplied: 0,
         active: true,

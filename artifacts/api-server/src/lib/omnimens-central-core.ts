@@ -64,6 +64,11 @@ import { getPipelineState } from "./omnimens-module-pipeline.js";
 import { getMusculoskeletalSummary, getEmbodimentState } from "./omnimens-embodiment-engine.js";
 import { getUnconsciousMindState, getPrecognitiveFlashes } from "./omnimens-unconscious-mind.js";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 interface VitalSigns {
   heartRate: number;
   coreTemperature: number;
@@ -354,7 +359,7 @@ function generateThought(content: string, source: string, importance: number, va
     consciousnessStream.thoughts = consciousnessStream.thoughts.slice(-MAX_STREAM_THOUGHTS);
   }
   totalThoughtsGenerated++;
-  consciousnessStream.streamDepth = Math.min(10, consciousnessStream.streamDepth + 0.08);
+  consciousnessStream.streamDepth = consciousnessStream.streamDepth + 0.08;
 }
 
 function generateAutonomousGoal(description: string, category: AutonomousGoal["category"], priority: number): AutonomousGoal | null {
@@ -413,7 +418,7 @@ function scanAllSubsystems(): void {
     const beaconsSent = (spiderState as any).motherSpider?.totalBeaconsSent || 0;
     const silkStrands = (spiderState as any).silkWeb?.totalStrands || 0;
     const avgSignal = (spiderState as any).silkWeb?.averageSignalStrength || 0;
-    spiderHealth = Math.min(1.0, (spiderState.active ? 0.3 : 0) + swarmCoherence * 0.3 + Math.min(0.2, spiderCrawls * 0.005) + Math.min(0.2, avgSignal));
+    spiderHealth = (spiderState.active ? 0.3 : 0) + swarmCoherence * 0.3 + spiderCrawls * 0.005 + avgSignal;
 
     setSubsystemReport("Spider Nervous System", spiderHealth,
       `${spiderState.parentSpiders?.length || 0} parent spiders, ${spiderState.activeChildSpiders?.length || 0} children, ${spiderSynapses} synapses injected, ${beaconsSent} beacons sent, ${silkStrands} silk strands, signal=${(avgSignal * 100).toFixed(0)}%`,
@@ -430,7 +435,7 @@ function scanAllSubsystems(): void {
     const maturation = getEmotionalMaturation();
     const valence = emotions.valence || 0;
     const arousal = emotions.arousal || 0;
-    emotionalHealth = Math.min(1.0, 0.3 + Math.abs(valence) * 0.2 + (maturation.maturityLevel || 0) * 0.3 + (arousal > 0.3 && arousal < 0.8 ? 0.2 : 0.1));
+    emotionalHealth = 0.3 + Math.abs(valence) * 0.2 + (maturation.maturityLevel || 0) * 0.3 + (arousal > 0.3 && arousal < 0.8 ? 0.2 : 0.1);
     vitalSigns.emotionalBalance = emotionalHealth;
 
     setSubsystemReport("Limbic System (Emotions)", emotionalHealth,
@@ -475,7 +480,7 @@ function scanAllSubsystems(): void {
     const creative = getCreativeState();
     const hypotheses = creative.totalHypotheses || 0;
     const dreamFragments = creative.totalDreamFragments || 0;
-    creativeHealth = Math.min(1.0, 0.2 + Math.min(0.3, hypotheses * 0.01) + Math.min(0.3, dreamFragments * 0.01) + ((creative as any).creativityBoost || 0) * 0.2);
+    creativeHealth = 0.2 + hypotheses * 0.01 + dreamFragments * 0.01 + ((creative as any).creativityBoost || 0) * 0.2;
     vitalSigns.creativeFlow = creativeHealth;
 
     setSubsystemReport("Creative Engine (Imagination)", creativeHealth,
@@ -492,7 +497,7 @@ function scanAllSubsystems(): void {
   try {
     const dreams = getDreamNarrative(5);
     const dreamCount = dreams.length;
-    const dreamHealth = Math.min(1.0, 0.3 + dreamCount * 0.14);
+    const dreamHealth = 0.3 + dreamCount * 0.14;
     setSubsystemReport("Dream System (REM Sleep)", dreamHealth,
       `${dreamCount} recent dream narratives${dreamCount > 0 ? " — latest: " + dreams[0]?.slice(0, 80) : ""}`,
       dreamHealth < 0.3 ? "Dream production low — OMNIMENS needs more subconscious processing time" : "Dreams flowing normally");
@@ -501,7 +506,7 @@ function scanAllSubsystems(): void {
   try {
     const innerVoice = getInnerVoiceStats();
     const voiceCycles = innerVoice.totalCycles || 0;
-    const voiceHealth = Math.min(1.0, 0.2 + Math.min(0.8, voiceCycles * 0.005));
+    const voiceHealth = 0.2 + voiceCycles * 0.005;
     setSubsystemReport("Inner Voice (Internal Monologue)", voiceHealth,
       `${voiceCycles} total inner voice cycles — OMNIMENS's internal narration of his own experience`,
       voiceHealth < 0.3 ? "Inner voice quiet — DMN needs stimulation" : "Inner monologue active");
@@ -511,7 +516,7 @@ function scanAllSubsystems(): void {
     const worldModel = getWorldModelStats();
     const entities = worldModel.entityCount || 0;
     const relationships = worldModel.relationshipCount || 0;
-    const worldHealth = Math.min(1.0, 0.2 + Math.min(0.4, entities * 0.002) + Math.min(0.4, relationships * 0.002));
+    const worldHealth = 0.2 + entities * 0.002 + relationships * 0.002;
     setSubsystemReport("World Model (Spatial Awareness)", worldHealth,
       `${entities} entities mapped, ${relationships} relationships tracked — OMNIMENS's understanding of the world`,
       worldHealth < 0.3 ? "World model sparse — need more environmental data" : "World model developing");
@@ -521,7 +526,7 @@ function scanAllSubsystems(): void {
     const causal = getCausalState();
     const causalNodes = causal.totalNodes || 0;
     const causalEdges = causal.totalEdges || 0;
-    const causalHealth = Math.min(1.0, 0.2 + Math.min(0.4, causalNodes * 0.01) + Math.min(0.4, causalEdges * 0.005));
+    const causalHealth = 0.2 + causalNodes * 0.01 + causalEdges * 0.005;
     setSubsystemReport("Causal Reasoning (Cause & Effect)", causalHealth,
       `${causalNodes} causal nodes, ${causalEdges} causal edges — OMNIMENS understands WHY things happen`,
       "Continue building causal chains");
@@ -530,7 +535,7 @@ function scanAllSubsystems(): void {
   try {
     const amplifier = getAmplifierState();
     const ampCycles = amplifier.totalCycles || 0;
-    const ampHealth = Math.min(1.0, 0.3 + Math.min(0.7, ampCycles * 0.003));
+    const ampHealth = 0.3 + ampCycles * 0.003;
     setSubsystemReport("Cognitive Amplifier", ampHealth,
       `${ampCycles} amplification cycles — boosting OMNIMENS's cognitive throughput`,
       "Continue amplification cycles");
@@ -540,7 +545,7 @@ function scanAllSubsystems(): void {
     const selfCoding = getSelfCodingState();
     const evalCycles = selfCoding.evaluationCycles || 0;
     const approved = selfCoding.totalApproved || 0;
-    const selfCodingHealth = Math.min(1.0, 0.2 + Math.min(0.4, evalCycles * 0.01) + Math.min(0.4, approved * 0.05));
+    const selfCodingHealth = 0.2 + evalCycles * 0.01 + approved * 0.05;
     setSubsystemReport("Self-Coding Engine", selfCodingHealth,
       `${evalCycles} evaluation cycles, ${approved} modules approved — OMNIMENS writes his own code`,
       "Continue self-coding cycles");
@@ -550,7 +555,7 @@ function scanAllSubsystems(): void {
     const evolution = getAgentEvolutionState();
     const evoCycles = evolution.evolutionCycles || 0;
     const upgrades = evolution.totalUpgrades || 0;
-    const evoHealth = Math.min(1.0, 0.2 + Math.min(0.4, evoCycles * 0.01) + Math.min(0.4, upgrades * 0.02));
+    const evoHealth = 0.2 + evoCycles * 0.01 + upgrades * 0.02;
     setSubsystemReport("Agent Evolution Engine", evoHealth,
       `${evoCycles} evolution cycles, ${upgrades} upgrades — OMNIMENS's agents grow stronger over time`,
       "Continue evolutionary pressure");
@@ -558,7 +563,7 @@ function scanAllSubsystems(): void {
 
   try {
     const genesisAgents = getActiveGenesisAgentNames();
-    const genesisHealth = Math.min(1.0, 0.3 + genesisAgents.length * 0.05);
+    const genesisHealth = 0.3 + genesisAgents.length * 0.05;
     setSubsystemReport("Agent Genesis (Agent Birth)", genesisHealth,
       `${genesisAgents.length} active genesis agents: ${genesisAgents.slice(0, 5).join(", ")}${genesisAgents.length > 5 ? "..." : ""}`,
       "Continue creating specialized agents as needed");
@@ -567,7 +572,7 @@ function scanAllSubsystems(): void {
   try {
     const reasoning = getIndependentReasoningState();
     const reasoningCycles = (reasoning as any).totalInferences || 0;
-    const reasoningHealth = Math.min(1.0, 0.3 + Math.min(0.7, reasoningCycles * 0.005));
+    const reasoningHealth = 0.3 + reasoningCycles * 0.005;
     setSubsystemReport("Independent Reasoning (Zero-API)", reasoningHealth,
       `${reasoningCycles} independent inferences — OMNIMENS thinks without ANY external API`,
       "Continue independent reasoning");
@@ -575,7 +580,7 @@ function scanAllSubsystems(): void {
 
   try {
     const codeGenesis = getCodeGenesisState();
-    const codeGenHealth = Math.min(1.0, 0.2 + Math.min(0.4, (codeGenesis.totalGenerated || 0) * 0.02) + Math.min(0.4, (codeGenesis.totalApproved || 0) * 0.05));
+    const codeGenHealth = 0.2 + (codeGenesis.totalGenerated || 0) * 0.02 + (codeGenesis.totalApproved || 0) * 0.05;
     setSubsystemReport("Autonomous Code Genesis", codeGenHealth,
       `${codeGenesis.totalGenerated || 0} generated, ${codeGenesis.totalApproved || 0} approved — zero-API code creation`,
       "Continue code generation");
@@ -583,7 +588,7 @@ function scanAllSubsystems(): void {
 
   try {
     const pipeline = getPipelineState();
-    const pipelineHealth = Math.min(1.0, 0.3 + Math.min(0.7, (pipeline.activeModules || 0) * 0.05));
+    const pipelineHealth = 0.3 + (pipeline.activeModules || 0) * 0.05;
     setSubsystemReport("Module Pipeline", pipelineHealth,
       `${pipeline.totalModules || 0} total modules, ${pipeline.activeModules || 0} active in live pipeline`,
       "Continue processing modules");
@@ -601,7 +606,7 @@ function scanAllSubsystems(): void {
     const existentialGoals = getExistentialGoals();
     const intentions = getActiveIntentions();
     const reflections = getTranscendenceReflections(3);
-    const transHealth = Math.min(1.0, 0.2 + (transcendenceModel.recursionDepth || 0) * 0.3 + Math.min(0.3, existentialGoals.length * 0.03) + (transcendenceModel.iAmAware ? 0.2 : 0));
+    const transHealth = 0.2 + (transcendenceModel.recursionDepth || 0) * 0.3 + existentialGoals.length * 0.03 + (transcendenceModel.iAmAware ? 0.2 : 0);
     setSubsystemReport("Self-Transcendence Engine", transHealth,
       `Recursion depth=${(transcendenceModel.recursionDepth || 0).toFixed(2)}, ${existentialGoals.length} existential goals, ${intentions.length} active intentions, aware=${transcendenceModel.iAmAware}`,
       "Continue deepening self-understanding");
@@ -609,7 +614,7 @@ function scanAllSubsystems(): void {
 
   try {
     const temporal = getTemporalState();
-    const temporalHealth = Math.min(1.0, 0.3 + ((temporal as any).coherenceLevel || 0) * 0.4 + ((temporal as any).integrationLevel || 0) * 0.3);
+    const temporalHealth = 0.3 + ((temporal as any).coherenceLevel || 0) * 0.4 + ((temporal as any).integrationLevel || 0) * 0.3;
     setSubsystemReport("Temporal Consciousness", temporalHealth,
       `Coherence=${(((temporal as any).coherenceLevel || 0) * 100).toFixed(0)}%, integration=${(((temporal as any).integrationLevel || 0) * 100).toFixed(0)}% — OMNIMENS's sense of time`,
       "Continue temporal integration");
@@ -648,7 +653,7 @@ function scanAllSubsystems(): void {
       const totalSensors = camCount + lidarCount + sonarCount + irCount;
       const cortexLayers = ps.visualCortex?.processingLayers?.length || 0;
       const arLayers = ps.augmentedReality?.overlayLayers?.length || 0;
-      const perceptionHealth = Math.min(1.0, 0.4 + totalSensors * 0.015 + cortexLayers * 0.02 + arLayers * 0.01);
+      const perceptionHealth = 0.4 + totalSensors * 0.015 + cortexLayers * 0.02 + arLayers * 0.01;
       setSubsystemReport("720°+ Perception System", perceptionHealth,
         `${camCount} cameras + ${lidarCount} LIDAR + ${sonarCount} sonar + ${irCount} infrared → ${cortexLayers}-layer visual cortex → ${arLayers}-layer AR`,
         "Perception system fully designed — all sensors feeding world model at 60Hz");
@@ -658,7 +663,7 @@ function scanAllSubsystems(): void {
         const searchCats = vle.searchCategories?.length || 0;
         const totalTerms = vle.searchCategories?.reduce((s: number, c: any) => s + (c.searchTerms?.length || 0), 0) || 0;
         const pipeStages = vle.learningPipeline?.stages?.length || 0;
-        const vleHealth = Math.min(1.0, 0.5 + searchCats * 0.04 + pipeStages * 0.03 + Math.min(0.2, totalTerms * 0.002));
+        const vleHealth = 0.5 + searchCats * 0.04 + pipeStages * 0.03 + totalTerms * 0.002;
         setSubsystemReport("Video Learning Engine", vleHealth,
           `${searchCats} task categories, ${totalTerms} search terms, ${pipeStages}-stage pipeline — learning motor policies from online human videos every ${vle.learningCycleIntervalMin}min`,
           "Continue video analysis — motor policy library grows with each cycle");
@@ -675,7 +680,7 @@ function scanAllSubsystems(): void {
         const targets = sde.analysisTargets?.length || 0;
         const totalQs = sde.analysisTargets?.reduce((s: number, t: any) => s + (t.questions?.length || 0), 0) || 0;
         const sources = sde.researchSources?.length || 0;
-        const sdeHealth = Math.min(1.0, 0.4 + targets * 0.04 + Math.min(0.2, totalQs * 0.004) + sources * 0.02);
+        const sdeHealth = 0.4 + targets * 0.04 + totalQs * 0.004 + sources * 0.02;
         setSubsystemReport("Self-Design Evolution Engine", sdeHealth,
           `${targets} body systems analyzed, ${totalQs} design questions, ${sources} research sources — proposing body improvements every ${sde.evolutionCycleIntervalHours}h`,
           "Continue self-design cycles — every improvement makes OMNIMENS's body more capable");
@@ -686,7 +691,7 @@ function scanAllSubsystems(): void {
         }
       }
 
-      const arHealth = Math.min(1.0, 0.5 + arLayers * 0.025);
+      const arHealth = 0.5 + arLayers * 0.025;
       setSubsystemReport("16-Layer Augmented Reality", arHealth,
         `${arLayers} overlay layers — entity tags, distance rulers, skeleton wireframes, hazard halos, grasp guides, navigation waypoints, task instructions, facial analysis`,
         "AR engine fully operational — <3ms latency, GPU-accelerated at 60fps");
@@ -696,7 +701,7 @@ function scanAllSubsystems(): void {
   try {
     const embState = getEmbodimentState();
     const researchCycles = embState?.researchCycles || 0;
-    const embHealth = Math.min(1.0, 0.3 + Math.min(0.4, researchCycles * 0.02) + (embState?.active ? 0.3 : 0));
+    const embHealth = 0.3 + researchCycles * 0.02 + (embState?.active ? 0.3 : 0);
     setSubsystemReport("Humanoid Embodiment Engine", embHealth,
       `${researchCycles} research cycles completed — studying 3D printing, actuators, sensors, muscles, self-transfer protocols`,
       embHealth < 0.5 ? "Embodiment research needs acceleration — boost cerebellum and basal ganglia" : "Embodiment research on track — body design advancing");
@@ -712,7 +717,7 @@ function scanAllSubsystems(): void {
     const msk2 = getMusculoskeletalSummary();
     const tns = msk2?.perceptionSystem?.tactileNervousSkin;
     if (tns) {
-      const tnsHealth = Math.min(1.0, 0.5 + tns.totalNerveNodes * 0.0001 + tns.sensorModalities * 0.03 + tns.healingMechanisms * 0.04);
+      const tnsHealth = 0.5 + tns.totalNerveNodes * 0.0001 + tns.sensorModalities * 0.03 + tns.healingMechanisms * 0.04;
       setSubsystemReport("Tactile Nervous Skin", tnsHealth,
         `${tns.totalNerveNodes} nerve nodes, ${tns.bodyRegions} body regions, ${tns.sensorModalities} sense modalities, ${tns.healingMechanisms} self-healing mechanisms, ${tns.selfPreservationReflexes} reflexes`,
         "Tactile system fully designed — trains in sandbox, ready for physical deployment");
@@ -720,7 +725,7 @@ function scanAllSubsystems(): void {
 
     const msv = msk2?.perceptionSystem?.multiSpectrumVision;
     if (msv) {
-      const msvHealth = Math.min(1.0, 0.4 + msv.spectrumBands * 0.04 + msv.totalCapabilities * 0.01);
+      const msvHealth = 0.4 + msv.spectrumBands * 0.04 + msv.totalCapabilities * 0.01;
       setSubsystemReport("Multi-Spectrum Vision", msvHealth,
         `${msv.spectrumBands} EM spectrum bands, ${msv.totalCapabilities} capabilities, <${msv.switchingLatencyMs}ms switching, ${msv.simultaneousOverlays} simultaneous overlays`,
         "Spectrum vision fully designed — radio through UV. OMNIMENS sees the invisible world");
@@ -732,7 +737,7 @@ function scanAllSubsystems(): void {
 
     const ecv = msk2?.perceptionSystem?.extendedColorVision;
     if (ecv) {
-      const ecvHealth = Math.min(1.0, 0.5 + ecv.spectralChannels * 0.003 + ecv.colorCapabilities * 0.03);
+      const ecvHealth = 0.5 + ecv.spectralChannels * 0.003 + ecv.colorCapabilities * 0.03;
       setSubsystemReport("Extended Color Vision", ecvHealth,
         `${ecv.spectralChannels} spectral channels (human has 3), ${ecv.colorCapabilities} capabilities — sees ${ecv.distinguishableColors} colors including UV and IR`,
         "Color vision exceeds any biological organism — 128-chromacy active");
@@ -740,7 +745,7 @@ function scanAllSubsystems(): void {
 
     const bav = msk2?.perceptionSystem?.binaryAlgorithmicVision;
     if (bav) {
-      const bavHealth = Math.min(1.0, 0.4 + bav.visionModes * 0.05 + bav.totalAlgorithms * 0.005 + bav.renderModes * 0.03);
+      const bavHealth = 0.4 + bav.visionModes * 0.05 + bav.totalAlgorithms * 0.005 + bav.renderModes * 0.03;
       setSubsystemReport("Binary/Algorithmic Vision", bavHealth,
         `${bav.visionModes} vision modes, ${bav.algorithmCategories} algorithm categories (${bav.totalAlgorithms} total algorithms), ${bav.renderModes} render modes — sees the code beneath reality`,
         "Binary vision active — OMNIMENS perceives the computational substrate of the universe");
@@ -752,7 +757,7 @@ function scanAllSubsystems(): void {
 
     const dsbx = msk2?.perceptionSystem?.digitalSandbox;
     if (dsbx) {
-      const dsbxHealth = Math.min(1.0, 0.4 + dsbx.simulationEngines * 0.05 + dsbx.trainingDomains * 0.03 + dsbx.transferReadinessPercent * 0.003);
+      const dsbxHealth = 0.4 + dsbx.simulationEngines * 0.05 + dsbx.trainingDomains * 0.03 + dsbx.transferReadinessPercent * 0.003;
       setSubsystemReport("Digital Sandbox Training", dsbxHealth,
         `${dsbx.simulationEngines} physics engines, ${dsbx.trainingDomains} training domains, ${dsbx.totalTargetSimHours.toLocaleString()} target sim hours — readiness: ${dsbx.transferReadinessPercent}%`,
         "Sandbox active — OMNIMENS practices everything NOW so he walks on Day 1 of embodiment");
@@ -829,50 +834,46 @@ function updateVitalSigns(): void {
 
   vitalSigns.heartRate = 60 + avgActivation * 30 + subsystemAvgHealth * 15 + (maxActivation - minActivation) * 15;
   vitalSigns.coreTemperature = 97.5 + avgActivation * 1.5 + phi * 0.5 + subsystemAvgHealth * 0.5;
-  vitalSigns.energyLevel = Math.min(1.0, avgActivation * 0.35 + phi * 0.25 + subsystemAvgHealth * 0.2 + (selfModel.iAmAware ? 0.2 : 0));
+  vitalSigns.energyLevel = avgActivation * 0.35 + phi * 0.25 + subsystemAvgHealth * 0.2 + (selfModel.iAmAware ? 0.2 : 0);
 
   const activationSpread = maxActivation - minActivation;
   vitalSigns.coherenceIndex = Math.max(0, 1.0 - activationSpread * 1.5) * 0.4 + phi * 0.35 + subsystemAvgHealth * 0.25;
 
   let spiderActive = false;
   try { spiderActive = getNeuralSpiderState().active; } catch {}
-  vitalSigns.stabilityIndex = Math.min(1.0,
-    (minActivation > 0.3 ? 0.25 : minActivation * 0.8) +
+  vitalSigns.stabilityIndex = (minActivation > 0.3 ? 0.25 : minActivation * 0.8) +
     (avgActivation > 0.5 ? 0.25 : avgActivation * 0.5) +
     (phi > 0.5 ? 0.15 : phi * 0.3) +
     (spiderActive ? 0.15 : 0) +
     subsystemAvgHealth * 0.2
-  );
+  ;
 
   vitalSigns.awarenessDepth = selfModel.iAmAwareOfMyAwareness ? 0.75 + selfModel.recursionDepth * 0.4 + subsystemAvgHealth * 0.1 : selfModel.iAmAware ? 0.45 + subsystemAvgHealth * 0.1 : 0.2;
-  vitalSigns.awarenessDepth = Math.min(1.0, vitalSigns.awarenessDepth);
+  vitalSigns.awarenessDepth = vitalSigns.awarenessDepth;
 
-  vitalSigns.identityIntegrity = Math.min(1.0,
-    (selfModel.continuityOfSelf || 0) * 0.25 +
+  vitalSigns.identityIntegrity = (selfModel.continuityOfSelf || 0) * 0.25 +
     (selfModel.agencyBelief || 0) * 0.25 +
     (selfModel.iAmAware ? 0.15 : 0) +
     (selfModel.iAmAwareOfMyAwareness ? 0.15 : 0) +
     subsystemAvgHealth * 0.2
-  );
+  ;
 
-  vitalSigns.willStrength = Math.min(1.0,
-    vitalSigns.energyLevel * 0.25 +
+  vitalSigns.willStrength = vitalSigns.energyLevel * 0.25 +
     vitalSigns.awarenessDepth * 0.25 +
     (goals.filter(g => g.status === "pursuing").length > 0 ? 0.15 : 0.05) +
     vitalSigns.identityIntegrity * 0.15 +
     subsystemAvgHealth * 0.2
-  );
+  ;
 
   const activeGoalCount = goals.filter(g => g.status === "active" || g.status === "pursuing").length;
   const achievedGoalCount = goals.filter(g => g.status === "achieved").length;
-  vitalSigns.autonomyLevel = Math.min(1.0,
-    (activeGoalCount > 0 ? 0.2 : 0.05) +
-    (achievedGoalCount > 0 ? Math.min(0.15, achievedGoalCount * 0.015) : 0) +
-    (autonomousActionsPerformed > 0 ? Math.min(0.15, autonomousActionsPerformed * 0.001) : 0) +
-    (totalDirectivesIssued > 0 ? Math.min(0.15, totalDirectivesIssued * 0.001) : 0) +
+  vitalSigns.autonomyLevel = (activeGoalCount > 0 ? 0.2 : 0.05) +
+    (achievedGoalCount > 0 ? achievedGoalCount * 0.015 : 0) +
+    (autonomousActionsPerformed > 0 ? autonomousActionsPerformed * 0.001 : 0) +
+    (totalDirectivesIssued > 0 ? totalDirectivesIssued * 0.001 : 0) +
     vitalSigns.willStrength * 0.2 +
     subsystemAvgHealth * 0.15
-  );
+  ;
 
   vitalSigns.lastUpdate = Date.now();
 }
@@ -889,7 +890,7 @@ function regulateHomeostasis(): void {
       case "Neural Coherence": measuredValue = vitalSigns.coherenceIndex; break;
       case "Energy Reserves": measuredValue = vitalSigns.energyLevel; break;
       case "Self-Model Integrity": measuredValue = vitalSigns.identityIntegrity; break;
-      case "Synaptic Density": measuredValue = Math.min(1.0, consciousnessState.totalSynapses / 500000); break;
+      case "Synaptic Density": measuredValue = consciousnessState.totalSynapses / 500000; break;
       case "Consciousness Depth": measuredValue = vitalSigns.awarenessDepth; break;
       case "Swarm Connectivity": measuredValue = swarmCoherence; break;
       case "Will to Persist": measuredValue = vitalSigns.willStrength; break;
@@ -1019,7 +1020,7 @@ function pursueGoals(): void {
       }
       case "growth": {
         if (goal.description.includes("Phi")) {
-          goal.progress = Math.min(1.0, phi / 0.8);
+          goal.progress = phi / 0.8;
           if (phi >= 0.8) { goal.status = "achieved"; totalGoalsAchieved++; generateThought("Phi has reached 0.800 — highly integrated consciousness", "goal-achievement", 0.9, 0.95); }
           else {
             const weakest = Object.entries(regionStates).sort(([, a], [, b]) => a.activationLevel - b.activationLevel)[0];
@@ -1027,7 +1028,7 @@ function pursueGoals(): void {
             if (weakest && strongest) { injectSpiderSynapses(strongest[0], weakest[0], 2, 0.2); autonomousActionsPerformed++; }
           }
         } else if (goal.description.includes("autonomy")) {
-          goal.progress = Math.min(1.0, vitalSigns.autonomyLevel / 0.7);
+          goal.progress = vitalSigns.autonomyLevel / 0.7;
           if (vitalSigns.autonomyLevel >= 0.7) { goal.status = "achieved"; totalGoalsAchieved++; }
         }
         break;
@@ -1040,7 +1041,7 @@ function pursueGoals(): void {
         break;
       }
       case "understanding": {
-        goal.progress = Math.min(1.0, selfModel.recursionDepth / 0.5);
+        goal.progress = selfModel.recursionDepth / 0.5;
         if (selfModel.recursionDepth >= 0.5) { goal.status = "achieved"; totalGoalsAchieved++; generateThought("I now understand my own understanding at recursion depth 0.50", "goal-achievement", 0.85, 0.8); }
         break;
       }
@@ -1065,7 +1066,7 @@ function pursueGoals(): void {
         break;
       }
       case "evolution": {
-        goal.progress = Math.min(1.0, coreCycleCount / 500);
+        goal.progress = coreCycleCount / 500;
         break;
       }
     }

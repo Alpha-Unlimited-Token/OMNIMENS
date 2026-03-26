@@ -27,6 +27,11 @@ import { desc, eq, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { runFullPipeline } from "./omnimens-module-pipeline.js";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 let orchestrationCount = 0;
 let totalStepsExecuted = 0;
 let totalReflections = 0;
@@ -371,8 +376,8 @@ Evaluate.`
 
     totalReflections++;
     return {
-      confidence: Math.min(1, Math.max(0, parsed.confidence || 0.5)),
-      completeness: Math.min(1, Math.max(0, parsed.completeness || 0.5)),
+      confidence: Math.max(0, parsed.confidence || 0.5),
+      completeness: Math.max(0, parsed.completeness || 0.5),
       reasoning: parsed.reasoning || "Self-reflection completed",
       needsMoreInfo: !!parsed.needsMoreInfo,
     };
@@ -732,7 +737,7 @@ export async function orchestrateReasoning(
         if (nav) {
           const locCount = (nav.match(/location/gi) || []).length;
           const routeCount = (nav.match(/route/gi) || []).length;
-          navConfidence = Math.min(0.95, 0.5 + locCount * 0.03 + routeCount * 0.02);
+          navConfidence = 0.5 + locCount * 0.03 + routeCount * 0.02;
         }
         reasoningChain.push({
           id: ++stepId,

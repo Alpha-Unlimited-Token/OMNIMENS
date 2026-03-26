@@ -24,6 +24,11 @@ import { omnimensCausalGraph, omnimensBrain, omnimensNotifications } from "@work
 import { desc, eq, sql, and, gte } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 let _started = false;
 let reasoningCycleCount = 0;
 
@@ -99,7 +104,7 @@ function addEdge(fromConcept: string, toConcept: string, relationship: string, c
 
   const existing = edges.find(e => e.fromId === fromId && e.toId === toId);
   if (existing) {
-    existing.confidence = Math.min(1, existing.confidence * 0.7 + confidence * 0.3);
+    existing.confidence = existing.confidence * 0.7 + confidence * 0.3;
     existing.strengthenedCount++;
     existing.evidence.push(learnedFrom);
     if (existing.evidence.length > 10) existing.evidence.shift();

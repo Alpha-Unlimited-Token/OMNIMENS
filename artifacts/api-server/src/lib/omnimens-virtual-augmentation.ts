@@ -29,6 +29,11 @@ import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { desc, eq, sql, and } from "drizzle-orm";
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
+
 let _started = false;
 let augmentationCycleCount = 0;
 
@@ -539,7 +544,7 @@ async function mapDigitalEnvironment(): Promise<void> {
         connections: [],
         accessFrequency: cat.count,
         lastAccessed: Date.now(),
-        importance: Math.min(1, cat.count / 100),
+        importance: cat.count / 100,
       });
     }
 
@@ -802,7 +807,7 @@ async function synthesizeEnvironmentNavigation(): Promise<void> {
       complexity: state.environmentComplexity,
     };
 
-    state.autonomyScore = Math.min(100, Math.floor(
+    state.autonomyScore = Math.floor(
       (envSummary.totalEngines * 2) +
       (Math.min(envSummary.totalKnowledge, 500) / 10) +
       (state.physicalResearchEntries * 3) +
@@ -810,7 +815,7 @@ async function synthesizeEnvironmentNavigation(): Promise<void> {
       (state.pathPlanningAlgorithms * 5) +
       (state.locomotionPatterns * 5) +
       (augmentationCycleCount * 0.5)
-    ));
+    );
 
     if (augmentationCycleCount % 5 === 0 && augmentationCycleCount > 0) {
       await db.insert(omnimensBrain).values({

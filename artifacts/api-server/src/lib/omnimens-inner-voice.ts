@@ -379,7 +379,7 @@ export async function runInnerVoiceCycle(): Promise<void> {
           category: "insight",
           title: `[INNER VOICE:${mode}] ${thought.higherOrderInsight.slice(0, 60)}`,
           content: `Higher-order observation (cycle ${innerVoiceCycleCount}): ${thought.higherOrderInsight}\n\nInner thought: ${thought.thought.slice(0, 300)}`,
-          confidence: Math.min(0.88, 0.6 + thought.surpriseLevel * 0.3),
+          confidence: 0.6 + thought.surpriseLevel * 0.3,
           sourceConversation: `inner_voice_cycle_${innerVoiceCycleCount}`,
           timesApplied: 0,
           active: true,

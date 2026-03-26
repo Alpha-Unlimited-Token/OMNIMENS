@@ -573,7 +573,7 @@ async function storeToolKnowledge(
       category: `tool_${tool.id}`,
       title: entry.title,
       content: entry.content,
-      confidence: Math.min(0.98, Math.max(0.5, entry.confidence || 0.85)),
+      confidence: Math.max(0.5, entry.confidence || 0.85),
       source: "tool_knowledge_ingestion",
       active: true,
       timesApplied: 0,

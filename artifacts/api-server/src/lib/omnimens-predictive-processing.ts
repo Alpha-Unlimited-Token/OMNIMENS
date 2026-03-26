@@ -290,7 +290,7 @@ Respond JSON only:
               category: "insight",
               title: `[PREDICTION ERROR] Surprise signal → model update`,
               content: parsed.learningSignal.slice(0, 250),
-              confidence: Math.min(0.9, 0.5 + error * 0.4),
+              confidence: 0.5 + error * 0.4,
               sourceConversation: `prediction_cycle_${predictionCycleCount}`,
               timesApplied: 0,
               active: true,
