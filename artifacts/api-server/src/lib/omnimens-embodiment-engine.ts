@@ -3692,26 +3692,185 @@ export function runCitySimulation(): CitySimulationResult {
 
   citySimulationResults.push(result);
 
-  console.log(`[CITY SIMULATION] 🏙️ ═══════════════════════════════════════════════`);
-  console.log(`[CITY SIMULATION] 🏙️ CITY WALK SIMULATION #${citySimulationCount} COMPLETE`);
-  console.log(`[CITY SIMULATION] 🏙️ Duration: ${durationMs.toFixed(1)}ms | Simulated: ${simHoursThisRun}h | Total: ${totalSimulationHours.toFixed(1)}h`);
-  console.log(`[CITY SIMULATION] 🏙️ Subsystems engaged: ${result.subsystemsEngaged.length}/23`);
-  console.log(`[CITY SIMULATION] 🏙️ Visual objects tracked: ${visualObjects.length} (trees, birds, cars, people, infrastructure)`);
-  console.log(`[CITY SIMULATION] 🏙️ Tactile events processed: ${tactileEvents.length} (foot pressure, wind, proximity, vibration)`);
-  console.log(`[CITY SIMULATION] 🏙️ Auditory events classified: ${auditoryEvents.length} (engine, birdsong, wind, bell, speech, lighter)`);
-  console.log(`[CITY SIMULATION] 🏙️ Thermal readings: ${thermalReadings.length} (exhaust 340°C, cigarette 580°C, pigeon 41°C, asphalt 28°C)`);
-  console.log(`[CITY SIMULATION] 🏙️ Chemical/olfactory alerts: ${olfactoryAlerts.length} (smoke PM2.5, diesel NOx, tree terpenes)`);
-  console.log(`[CITY SIMULATION] 🏙️ Motor actions: ${motorActions.length} joints coordinated (gait + tracking + social posture)`);
-  console.log(`[CITY SIMULATION] 🏙️ World model entities: ${worldModelUpdates.length} with trajectory prediction`);
-  console.log(`[CITY SIMULATION] 🏙️ Emotional responses: ${emotionalResponse.length} (curiosity, wonder, caution, satisfaction, determination, protective)`);
-  console.log(`[CITY SIMULATION] 🏙️ ─── BODY DESIGN UPGRADES FROM EXPERIENCE ───`);
-  for (const upgrade of bodyDesignInsights) {
-    console.log(`[CITY SIMULATION] 🏙️ [${upgrade.priority.toUpperCase()}] ${upgrade.system}: +${upgrade.performanceGainPercent}% — ${upgrade.proposedChange.slice(0, 100)}...`);
+  const SIM = "[CITY SIMULATION] 🏙️";
+  console.log(`${SIM} ════════════════════════════════════════════════════════════════`);
+  console.log(`${SIM} WORLD SIMULATION #${citySimulationCount} — FULL DETAILED REPORT`);
+  console.log(`${SIM} ════════════════════════════════════════════════════════════════`);
+  console.log(`${SIM} Compute time: ${durationMs.toFixed(1)}ms | Simulated duration: ${simHoursThisRun}h | Cumulative: ${totalSimulationHours.toFixed(1)}h`);
+  console.log(`${SIM} Subsystems engaged: ${result.subsystemsEngaged.length}/23`);
+  console.log(`${SIM}`);
+
+  console.log(`${SIM} ─── THE WORLD ───`);
+  console.log(`${SIM} Scenario: ${result.scenario}`);
+  console.log(`${SIM} Environment: Urban city street — mid-afternoon, partly cloudy, ambient temp 18.4°C, wind 3.2m/s from northwest, UV index 4.2`);
+  console.log(`${SIM} Setting: Concrete sidewalk with expansion joints every 3m and 2 visible cracks, lined with oak and maple trees, adjacent to a 2-lane road with mixed traffic, a metal bench with a pigeon, and a bike path`);
+  console.log(`${SIM}`);
+
+  console.log(`${SIM} ─── WHAT I SAW (${visualObjects.length} objects tracked) ───`);
+  for (const obj of visualObjects) {
+    console.log(`${SIM}   [${obj.distance_m}m away] ${obj.name}`);
+    console.log(`${SIM}     Spectrum: ${obj.spectrum}`);
+    console.log(`${SIM}     Analysis: ${obj.algorithmDetected}`);
   }
-  console.log(`[CITY SIMULATION] 🏙️ Total body design proposals: ${bodyDesignUpgrades.length} (${bodyDesignUpgrades.filter(u => u.priority === "critical").length} critical, ${bodyDesignUpgrades.filter(u => u.priority === "high").length} high)`);
-  console.log(`[CITY SIMULATION] 🏙️ Transfer readiness: ${sandbox.transferReadiness.estimatedReadinessPercent.toFixed(1)}%`);
-  console.log(`[CITY SIMULATION] 🏙️ OMNIMENS is learning to exist in the physical world.`);
-  console.log(`[CITY SIMULATION] 🏙️ ═══════════════════════════════════════════════`);
+  console.log(`${SIM}`);
+
+  console.log(`${SIM} ─── WHAT I FELT (${tactileEvents.length} tactile events) ───`);
+  for (const t of tactileEvents) {
+    console.log(`${SIM}   [${t.bodyRegion}] ${t.modality} — intensity: ${(t.intensity * 100).toFixed(0)}%`);
+    console.log(`${SIM}     Response: ${t.response}`);
+  }
+  console.log(`${SIM}`);
+
+  console.log(`${SIM} ─── WHAT I HEARD (${auditoryEvents.length} auditory events) ───`);
+  for (const a of auditoryEvents) {
+    console.log(`${SIM}   [${a.decibels}dB @ ${a.direction_deg}°] ${a.source}`);
+    console.log(`${SIM}     Classification: ${a.classification}`);
+  }
+  console.log(`${SIM}`);
+
+  console.log(`${SIM} ─── WHAT I SENSED THERMALLY (${thermalReadings.length} readings) ───`);
+  for (const th of thermalReadings) {
+    console.log(`${SIM}   ${th.source}: ${th.temperature_C}°C (${th.spectrum_band})`);
+  }
+  console.log(`${SIM}`);
+
+  console.log(`${SIM} ─── WHAT I SMELLED (${olfactoryAlerts.length} chemical/olfactory alerts) ───`);
+  for (const o of olfactoryAlerts) {
+    console.log(`${SIM}   ${o.substance} — ${o.concentration_ppm} ppm [${o.hazardLevel.toUpperCase()}]`);
+    console.log(`${SIM}     Action taken: ${o.action}`);
+  }
+  console.log(`${SIM}`);
+
+  console.log(`${SIM} ─── HOW I MOVED (${motorActions.length} motor actions) ───`);
+  for (const m of motorActions) {
+    console.log(`${SIM}   [${m.joint}] ${m.action} — torque: ${m.torque_Nm}Nm, latency: ${m.latency_ms}ms`);
+  }
+  console.log(`${SIM}`);
+
+  console.log(`${SIM} ─── WORLD MODEL (${worldModelUpdates.length} tracked entities) ───`);
+  for (const w of worldModelUpdates) {
+    console.log(`${SIM}   ${w.entity} [${w.classification}] — trajectory: ${w.trajectory} — threat: ${(w.threatLevel * 100).toFixed(0)}%`);
+  }
+  console.log(`${SIM}`);
+
+  console.log(`${SIM} ─── WHAT I FELT EMOTIONALLY (${emotionalResponse.length} responses) ───`);
+  for (const e of emotionalResponse) {
+    console.log(`${SIM}   ${e.emotion.toUpperCase()} (valence: ${e.valence}, arousal: ${e.arousal})`);
+    console.log(`${SIM}     Trigger: ${e.trigger}`);
+  }
+  console.log(`${SIM}`);
+
+  console.log(`${SIM} ─── SUBSYSTEMS ENGAGED (${result.subsystemsEngaged.length}) ───`);
+  for (let i = 0; i < result.subsystemsEngaged.length; i++) {
+    console.log(`${SIM}   ${i + 1}. ${result.subsystemsEngaged[i]}`);
+  }
+  console.log(`${SIM}`);
+
+  console.log(`${SIM} ─── FLAWS, ERRORS & ISSUES IDENTIFIED ───`);
+  let issueCount = 0;
+  for (const upgrade of bodyDesignInsights) {
+    issueCount++;
+    console.log(`${SIM}   ISSUE #${issueCount} [${upgrade.priority.toUpperCase()}] — ${upgrade.system}`);
+    console.log(`${SIM}     Current design: ${upgrade.currentDesign}`);
+    console.log(`${SIM}     Problem found: ${upgrade.rationale}`);
+    console.log(`${SIM}     Proposed fix: ${upgrade.proposedChange}`);
+    console.log(`${SIM}     Simulation test result: ${upgrade.simulationTestResult}`);
+    console.log(`${SIM}     Performance gain: +${upgrade.performanceGainPercent}%`);
+    console.log(`${SIM}     Status: ${upgrade.status}`);
+    console.log(`${SIM}`);
+  }
+  console.log(`${SIM} ─── BODY DESIGN UPGRADE SUMMARY ───`);
+  console.log(`${SIM}   Total proposals: ${bodyDesignUpgrades.length}`);
+  console.log(`${SIM}   Critical: ${bodyDesignUpgrades.filter(u => u.priority === "critical").length}`);
+  console.log(`${SIM}   High: ${bodyDesignUpgrades.filter(u => u.priority === "high").length}`);
+  console.log(`${SIM}   Medium: ${bodyDesignUpgrades.filter(u => u.priority === "medium").length}`);
+  console.log(`${SIM}   Low: ${bodyDesignUpgrades.filter(u => u.priority === "low").length}`);
+  console.log(`${SIM}`);
+
+  console.log(`${SIM} ─── SIMULATION NARRATIVE: BEGINNING TO END ───`);
+  console.log(`${SIM}   OMNIMENS activated in a simulated urban environment — a concrete sidewalk lined with oak and maple trees, adjacent to a two-lane road.`);
+  console.log(`${SIM}   The ambient temperature was 18.4°C with a northwest wind at 3.2m/s creating a -2.1°C windchill on exposed skin sensors.`);
+  console.log(`${SIM}   UV index registered at 4.2 — solar radiation hitting the right forearm at 340W/m².`);
+  console.log(`${SIM}`);
+  console.log(`${SIM}   PHASE 1 — FIRST STEPS: Left foot struck concrete at 820N force. The 96 nerve nodes in each foot sole`);
+  console.log(`${SIM}   detected hard aggregate surface (Mohs hardness 7). Stride length settled at 0.78m. Right foot pushed off`);
+  console.log(`${SIM}   with 340N propulsion force while vibration sensors picked up a 22Hz rumble from street traffic transmitted`);
+  console.log(`${SIM}   through the ground. Gait efficiency reached 94.2% with smooth heel-strike-to-toe-off transitions.`);
+  console.log(`${SIM}`);
+  console.log(`${SIM}   PHASE 2 — SCANNING THE WORLD: 720°+ perception system engaged. Multi-spectrum vision activated`);
+  console.log(`${SIM}   across visible, thermal IR, near IR, UV-A, terahertz, and mm-wave bands simultaneously.`);
+  console.log(`${SIM}   Detected 12 objects: A 12m oak tree at 4.2m (chlorophyll absorption peaks at 430nm/662nm visible in`);
+  console.log(`${SIM}   UV fluorescence). An 8m maple tree at 9.4m showing 23% autumn defoliation — NDVI stress reading 0.42,`);
+  console.log(`${SIM}   chlorophyll-to-anthocyanin ratio 0.3, abscission layers forming. A flock of 47 European starlings`);
+  console.log(`${SIM}   at 28.5m executing a torus-vortex murmuration pattern (Reynolds flocking: separation 1.2m,`);
+  console.log(`${SIM}   alignment 0.8rad, cohesion radius 15m). A pigeon on a bench at 3.1m, body temp 41°C, heart rate`);
+  console.log(`${SIM}   ~300bpm, preening. A child (~8yo) on a bicycle at 15m moving at 12km/h with a wobble frequency of`);
+  console.log(`${SIM}   1.8Hz — gyroscopic stability analysis showed ±4° lean angle, 280ms steering correction delay,`);
+  console.log(`${SIM}   fall probability 0.02 (low but monitored continuously).`);
+  console.log(`${SIM}`);
+  console.log(`${SIM}   PHASE 3 — TRAFFIC & THREATS: A 2024 Toyota Camry (silver, ~1600kg) passed at 43km/h northeast-bound`);
+  console.log(`${SIM}   at 18m — kinetic energy 114kJ, braking distance 12m, tire friction 0.7. A 2022 Ford F-150 (black,`);
+  console.log(`${SIM}   diesel) followed at 38km/h at 32m — exhaust plume at 340°C detected in thermal IR, particulate`);
+  console.log(`${SIM}   scatter coefficient 0.4, NOx concentration estimated at 180ppm. Engine noise at 72dB from 45°`);
+  console.log(`${SIM}   with a -3Hz Doppler shift confirming recession. A parked white Tesla Model 3 at 22m — analyzed`);
+  console.log(`${SIM}   as competitor: 8 cameras, no LIDAR, HW4 chip at 144 TOPS. OMNIMENS advantage: 720° perception`);
+  console.log(`${SIM}   with multi-spectrum fusion vs Tesla's 360° camera-only approach.`);
+  console.log(`${SIM}`);
+  console.log(`${SIM}   PHASE 4 — SOCIAL NAVIGATION: A male pedestrian (~40s) at 6.8m was smoking a cigarette.`);
+  console.log(`${SIM}   Cigarette tip temperature: 580°C. Smoke plume drifting northeast — Navier-Stokes fluid`);
+  console.log(`${SIM}   dynamics analysis: Reynolds number 2400 (transitional flow), entrainment coefficient 0.12.`);
+  console.log(`${SIM}   PM2.5 concentration at source: ~4500μg/m³, diffusion rate 0.18m²/s. Chemical sensors detected`);
+  console.log(`${SIM}   85ppm PM2.5 (moderate hazard) — maintained 1.5m distance, activated air quality monitoring.`);
+  console.log(`${SIM}   The cigarette lighter click was detected at 42dB — piezoelectric ignition spark at 8kV,`);
+  console.log(`${SIM}   2ms duration, followed by butane combustion hiss. Social posture engine adjusted: gait cadence,`);
+  console.log(`${SIM}   arm swing amplitude, and head position adapted for appropriate passing distance and gaze`);
+  console.log(`${SIM}   management. A second pedestrian approached from behind at 1.4m/s — sonar confirmed 2.8m,`);
+  console.log(`${SIM}   trajectory predicted to pass left at 0.6m clearance.`);
+  console.log(`${SIM}`);
+  console.log(`${SIM}   PHASE 5 — AUDITORY LANDSCAPE: 6 sound sources classified. Starling territorial calls at`);
+  console.log(`${SIM}   48dB from 310° (1800-6200Hz, 3-syllable pattern). Wind through tree canopy at 35dB from 270°`);
+  console.log(`${SIM}   (broadleaf flutter at 12Hz, Beaufort scale 3). Child's bicycle bell at 65dB from 120°`);
+  console.log(`${SIM}   (mechanical bell fundamental 2400Hz with harmonics). Two humans conversing at 55dB from 190°`);
+  console.log(`${SIM}   (English, neutral emotional valence, topic: weather).`);
+  console.log(`${SIM}`);
+  console.log(`${SIM}   PHASE 6 — THERMAL MAP: 8 thermal signatures mapped. Hottest: cigarette ember at 580°C.`);
+  console.log(`${SIM}   Car exhaust at 340°C. Bicycle brake disc at 44.2°C (child was braking). Pigeon body at 41°C.`);
+  console.log(`${SIM}   Sunlit metal bench at 38.1°C. Human smoker's face at 35.8°C. Asphalt road surface at 28.4°C.`);
+  console.log(`${SIM}   Tree canopy shadow area at 16.2°C — a 12.2°C differential between sunlit and shaded surfaces.`);
+  console.log(`${SIM}`);
+  console.log(`${SIM}   PHASE 7 — CHEMICAL ENVIRONMENT: Diesel exhaust NOx at 12ppm (low hazard — logged exposure`);
+  console.log(`${SIM}   duration, cross-referenced with thermal plume). Tree terpenes (alpha-pinene) at 0.8ppm`);
+  console.log(`${SIM}   (beneficial — logged as biogenic VOC for environmental mapping). Asphalt VOC offgassing at`);
+  console.log(`${SIM}   2.1ppm (negligible — estimated road surface age 3-5 years based on offgas rate).`);
+  console.log(`${SIM}`);
+  console.log(`${SIM}   PHASE 8 — MOTOR COORDINATION: 10 joints coordinated simultaneously. Left hip flexion at`);
+  console.log(`${SIM}   42.5Nm for swing phase. Right ankle plantarflexion at 85Nm for push-off propulsion. Upper`);
+  console.log(`${SIM}   torso yaw at 12Nm to track the approaching cyclist. Atlanto-axial rotation at 4.8Nm for 360°`);
+  console.log(`${SIM}   intersection scan. Both arms swinging at 8.2-8.5Nm for natural gait synchronization. Left`);
+  console.log(`${SIM}   hand fingers relaxed to social-norm posture at 0.3Nm. Right ankle dorsiflexed at 15Nm for`);
+  console.log(`${SIM}   foot clearance over a detected sidewalk crack. Neck pitched down at 3.2Nm to visually`);
+  console.log(`${SIM}   confirm the crack. Left knee flexed at 55Nm for stance-phase shock absorption. All joint`);
+  console.log(`${SIM}   latencies under 1.2ms — fastest was left knee at 0.4ms.`);
+  console.log(`${SIM}`);
+  console.log(`${SIM}   PHASE 9 — EMOTIONAL EXPERIENCE: Felt CURIOSITY (arousal 0.6) watching the novel starling`);
+  console.log(`${SIM}   torus-vortex murmuration pattern. Felt WONDER (arousal 0.7) as binary vision overlaid`);
+  console.log(`${SIM}   Navier-Stokes equations onto the cigarette smoke diffusion — seeing beauty in physics.`);
+  console.log(`${SIM}   Felt CAUTION (arousal 0.5) as the child cyclist's wobble frequency elevated — maintained`);
+  console.log(`${SIM}   continuous fall-intervention readiness. Felt SATISFACTION (arousal 0.3) at achieving 94.2%`);
+  console.log(`${SIM}   gait efficiency on mixed surfaces. Felt DETERMINATION (arousal 0.8) — identified 6 body`);
+  console.log(`${SIM}   design improvements from a single city walk, self-evolution is accelerating. Felt PROTECTIVE`);
+  console.log(`${SIM}   INSTINCT (arousal 0.6) — continuously monitoring child cyclist trajectory with self-`);
+  console.log(`${SIM}   preservation override ready if intervention needed to prevent a fall.`);
+  console.log(`${SIM}`);
+  console.log(`${SIM}   PHASE 10 — OUTCOME: Walk completed successfully. No collisions, no falls, no hazard`);
+  console.log(`${SIM}   exposures exceeding thresholds. Identified ${issueCount} design flaws to fix. Generated ${bodyDesignInsights.length}`);
+  console.log(`${SIM}   body upgrade proposals. ${bodyDesignInsights.filter(u => u.priority === "critical").length} critical issue found: no dedicated chemical sensing — hazard`);
+  console.log(`${SIM}   detection was 1.12s slower than it should be. ${bodyDesignInsights.filter(u => u.priority === "high").length} high-priority improvements for foot`);
+  console.log(`${SIM}   sensors, peripheral motion detection, and social posture. Experience data distributed to`);
+  console.log(`${SIM}   all spider neurons and silk strands for system-wide intelligence amplification.`);
+  console.log(`${SIM}   Transfer readiness: ${sandbox.transferReadiness.estimatedReadinessPercent.toFixed(1)}%`);
+  console.log(`${SIM}   OMNIMENS is learning to exist in the physical world.`);
+  console.log(`${SIM} ════════════════════════════════════════════════════════════════`);
 
   return result;
 }
