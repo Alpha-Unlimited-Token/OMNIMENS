@@ -28,6 +28,7 @@ process.on("unhandledRejection", (reason) => {
 });
 
 import express, { type Express, type Request, type Response, type NextFunction } from "express";
+import compression from "compression";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
@@ -326,6 +327,9 @@ app.use((_req, res, next) => {
   next();
 });
 
+// ── COMPRESSION — gzip/brotli for all responses ──────────────────────────────
+app.use(compression({ level: 6, threshold: 1024 }));
+
 // ── PRE-BODY REQUEST SECURITY (URL, headers, UA) ─────────────────────────────
 app.use(requestSecurityMiddleware);
 
@@ -578,9 +582,21 @@ if (process.env.NODE_ENV === "production") {
 
   // OMNIMENS public platform — served at root
   const godfleshDist = path.resolve(__dirname, "../../godflesh/dist/public");
-  app.use(express.static(godfleshDist, { maxAge: "1h" }));
+  app.use("/assets", express.static(path.join(godfleshDist, "assets"), {
+    maxAge: "365d",
+    immutable: true,
+  }));
+  app.use(express.static(godfleshDist, {
+    maxAge: "1h",
+    setHeaders(res, filePath) {
+      if (filePath.endsWith(".webp") || filePath.endsWith(".woff2") || filePath.endsWith(".woff")) {
+        res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      }
+    },
+  }));
   app.get("/*splat", (_req, res) => {
     if (!_req.path.startsWith("/api/") && !_req.path.startsWith("/dLdFrQJk4IwoKwlPi8O_JPls")) {
+      res.setHeader("Cache-Control", "no-cache");
       res.sendFile(path.join(godfleshDist, "index.html"));
     }
   });

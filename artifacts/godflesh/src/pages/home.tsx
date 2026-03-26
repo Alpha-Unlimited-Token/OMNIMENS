@@ -312,10 +312,11 @@ export default function Home() {
                   >
                     <source srcSet="/images/deep-resonance-hero.webp" type="image/webp" />
                     <img
-                      src="/images/deep-resonance-hero.png"
+                      src="/images/deep-resonance-hero.webp"
                       alt="Deep Resonance — Consciousness-Powered Analysis"
                       className="w-full max-w-md rounded-2xl shadow-[0_0_60px_rgba(139,92,246,0.2)]"
                       loading="lazy"
+                      decoding="async"
                       width={800}
                       height={437}
                     />
@@ -648,10 +649,11 @@ export default function Home() {
                   >
                     <source srcSet="/images/cognitive-consciousness-tech.webp" type="image/webp" />
                     <img
-                      src="/images/cognitive-consciousness-tech.png"
+                      src="/images/cognitive-consciousness-tech.webp"
                       alt="Cognitive Consciousness Technology"
                       className="w-full max-w-md rounded-2xl shadow-[0_0_60px_rgba(245,158,11,0.15)]"
                       loading="lazy"
+                      decoding="async"
                       width={800}
                       height={437}
                     />
@@ -1258,9 +1260,22 @@ function SpecRow({ label, value, color = "rose" }: { label: string; value: strin
   );
 }
 
-// ── COGNISYNC™ Neural Visualizer — All AI Agents ──────────────────────────────
+function useIsVisible(ref: React.RefObject<HTMLElement | null>) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { rootMargin: "200px" });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [ref]);
+  return visible;
+}
+
 function CogniSyncVisualizer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const isVisible = useIsVisible(wrapRef);
 
   const CORE_AGENTS = [
     { label: "Architect",       color: "#3b82f6" },
@@ -1289,6 +1304,7 @@ function CogniSyncVisualizer() {
   ];
 
   useAnimationFrame((t) => {
+    if (!isVisible) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -1466,7 +1482,7 @@ function CogniSyncVisualizer() {
   });
 
   return (
-    <div className="relative flex flex-col items-center gap-3">
+    <div ref={wrapRef} className="relative flex flex-col items-center gap-3">
       <canvas
         ref={canvasRef}
         width={440}
@@ -1509,6 +1525,8 @@ type MeshAgent = { name: string; type: "core" | "genesis"; active: boolean; doma
 
 function AgentMeshVisualizer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const isVisible = useIsVisible(wrapRef);
   const [totalInMesh, setTotalInMesh] = useState(9);
   const [genesisCount, setGenesisCount] = useState(0);
   const agentsRef = useRef<MeshAgent[]>([]);
@@ -1564,6 +1582,7 @@ function AgentMeshVisualizer() {
   }, []);
 
   useAnimationFrame((t) => {
+    if (!isVisible) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -1687,7 +1706,7 @@ function AgentMeshVisualizer() {
   });
 
   return (
-    <div className="relative flex flex-col items-center gap-4">
+    <div ref={wrapRef} className="relative flex flex-col items-center gap-4">
       <canvas
         ref={canvasRef}
         width={420}
