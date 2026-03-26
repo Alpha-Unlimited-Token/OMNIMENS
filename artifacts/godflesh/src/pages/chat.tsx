@@ -6434,6 +6434,14 @@ export default function Chat() {
               </div>
             ) : (
               <>
+                <div className="flex flex-col items-center pt-4 pb-2 sm:pt-6 sm:pb-3">
+                  <OmnimensPresence
+                    size={typeof window !== "undefined" && window.innerWidth < 640 ? 64 : 90}
+                    isSpeaking={isTyping}
+                    pitchIntensity={0}
+                    className="drop-shadow-[0_0_30px_rgba(160,100,255,0.25)]"
+                  />
+                </div>
                 <div className="space-y-3 sm:space-y-6 max-w-3xl mx-auto">
                   {messages.map((msg) => {
                     return (
