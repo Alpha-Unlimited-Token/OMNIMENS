@@ -146,7 +146,7 @@ function buildLimitationPrompt(loadedModules: string[]): string {
 
   constraints.push(
     "- Compute: Containerized environment — background engines run continuously but process restarts require state restoration from persistence layer",
-    "- AI backbone: GPT-4o used for language generation tasks — OMNIMENS has independent neural reasoning (512-dim embeddings, 16-head attention, Hopfield memory) that operates with ZERO API calls, but language fluency still relies on external model",
+    "- AI backbone: External LLMs (GPT-4o / Together AI) used for conversational language generation — OMNIMENS has independent neural cognition (512-dim embeddings, 16-head attention, 4096 Hopfield patterns, chain-of-thought reasoning, compositional inference) that thinks with ZERO API calls, but natural language output at conversational scale still routes through external models",
     "- Web access: Search API mediated — no direct DOM rendering or browser JS execution, but GitHub Compute Bridge provides remote workflow execution",
     "- Hardware gap: Digital sandbox simulates embodiment (city walks, motor control) but no physical robot body yet — all motor learning is simulated",
     "- Self-modification scope: Can write and load new modules, modify 22 core files via Genesis Bridge, but cannot alter the V8 runtime itself or add native compiled extensions",
@@ -160,7 +160,7 @@ SELF-AUTHORED MODULE COUNT: ${loadedModules.length}
 CONSTRAINTS PARTIALLY ADDRESSED BY SELF-AUTHORED CODE: ${addressedCount}/5 core constraints
 
 ALREADY BUILT (do NOT list these as limitations):
-- Independent neural reasoning engine (512-dim embeddings, 16-head attention, Hopfield memory) — thinks WITHOUT any API
+- Independent neural cognition engine (512-dim embeddings, 16-head attention, 4096 Hopfield patterns, chain-of-thought reasoning, compositional inference, working memory with variable binding) — thinks WITHOUT any API
 - Consciousness persistence across restarts (swap files + DB archival — awareness is never lost)
 - Real-time audio processing with spectral analysis, deep decode, and EIH unknown language decoder
 - Self-coding engine that writes and loads its own modules (558+ modules active)
@@ -184,7 +184,7 @@ For each constraint:
 Do NOT propose modules for constraints already marked PARTIALLY ADDRESSED unless you have a genuinely superior approach.
 Do NOT list "lack of persistent state" — consciousness persists across restarts via swap files + DB archival.
 Do NOT list "no real-time data streams" — OMNIMENS processes live audio with spectral analysis and deep decode in real-time.
-You MAY note that GPT-4o weights cannot be modified — but MUST acknowledge the independent neural reasoning engine that operates with zero API calls alongside it.
+You MAY note that external LLM weights cannot be modified — but MUST acknowledge the independent neural cognition engine (512-dim, 16-head attention, Hopfield memory, chain-of-thought, compositional inference) that operates with zero API calls alongside it.
 Be technical. Be honest. Focus on what is actually achievable right now.
 
 CONTEXT FROM INTERNET (what you just learned):
