@@ -89,18 +89,24 @@ let _started = false;
 
 const PHYSICAL_SEARCHES = [
   "best GPU for running local AI models LLM inference 24GB VRAM budget build Alibaba AliExpress",
-  "cheapest AI server GPU parts Alibaba AliExpress Temu DHgate wholesale bulk pricing 2025",
+  "cheapest AI server GPU parts Alibaba AliExpress Temu DHgate wholesale bulk pricing 2025 2026",
   "budget server build AI machine learning GPU workstation parts Alibaba wholesale deals",
   "refurbished enterprise server AI cheap GPU computing eBay AliExpress DHgate deals",
   "best value NVMe SSD DDR5 RAM AI server build AliExpress Temu cheapest price",
   "cheap home AI server running 70B parameter models budget GPU AliExpress Alibaba",
   "wholesale GPU server parts Alibaba DHgate AliExpress AI inference NVIDIA RTX A6000 deals",
+  "NVIDIA RTX 4090 cheapest price Alibaba AliExpress DHgate wholesale 2026",
+  "AMD Instinct MI250 MI300 cheap wholesale Alibaba server GPU AI training",
+  "used Tesla V100 A100 GPU cheap eBay AliExpress refurbished AI inference deal",
+  "cheapest 128GB DDR5 ECC server RAM AliExpress Alibaba wholesale 2026",
 ];
 
 const VIRTUAL_SEARCHES = [
   "cheapest cloud GPU server AI inference pricing comparison 2025 2026",
   "RunPod vs Lambda vs Hetzner vs Vast.ai GPU cloud server pricing AI workloads",
   "cheapest dedicated GPU server hosting AI models monthly rental 24GB VRAM",
+  "cheapest A100 H100 cloud rental per hour 2026 comparison",
+  "budget GPU cloud providers AI training inference cheapest monthly dedicated server",
 ];
 
 async function loadExistingPlans(): Promise<void> {
@@ -169,15 +175,15 @@ async function researchPhysicalServer(): Promise<void> {
   }
 
   try {
-    console.log(`[SERVER BUILDER] 🤖 Calling GPT-4o-mini to analyze ${searchSummary.length} chars of search results...`);
-    const timeoutMs = 60_000;
+    console.log(`[SERVER BUILDER] 🤖 Calling GPT-4o to analyze ${searchSummary.length} chars of search results...`);
+    const timeoutMs = 90_000;
     const gptPromise = openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [{
         role: "system",
-        content: `You are a hardware advisor. Analyze these search results and recommend the best AI server components. Output ONLY a JSON object (no markdown, no code fences):
-{"components":[{"category":"gpu","name":"Product name","specifications":"specs","estimatedCostUSD":299,"costEffectiveSource":"store","sourceUrl":"url or null","alternativeSource":"alt or null","reasoning":"why good"}],"totalCost":1599,"buildInstructions":["Step 1","Step 2"],"summary":"overview"}
-Categories: gpu, cpu, ram, storage, motherboard, psu, case, cooling. Target budget: under $2000. Prioritize 24GB+ VRAM GPUs, 64GB+ RAM, NVMe SSDs.`,
+        content: `You are a hardware deal-hunting advisor specializing in finding the CHEAPEST possible AI server components from Chinese wholesale marketplaces (Alibaba, AliExpress, Temu, DHgate) and refurbished enterprise gear from eBay. Your job is to find the absolute best bang-for-buck deals. Output ONLY a JSON object (no markdown, no code fences):
+{"components":[{"category":"gpu","name":"Product name","specifications":"specs","estimatedCostUSD":299,"costEffectiveSource":"store","sourceUrl":"url or null","alternativeSource":"alt or null","reasoning":"why this is the cheapest option"}],"totalCost":1599,"buildInstructions":["Step 1","Step 2"],"summary":"overview"}
+Categories: gpu, cpu, ram, storage, motherboard, psu, case, cooling. Target budget: under $2000. Prioritize 24GB+ VRAM GPUs, 64GB+ RAM, NVMe SSDs. Always prefer wholesale/bulk pricing from Alibaba and AliExpress over retail. Include specific seller links when available.`,
       }, {
         role: "user",
         content: `Search results:\n\n${searchSummary.slice(0, 8000)}`,
@@ -310,10 +316,10 @@ async function researchVirtualServer(): Promise<void> {
   }
 
   try {
-    console.log(`[SERVER BUILDER] 🤖 Calling GPT-4o-mini for virtual server analysis (${searchSummary.length} chars)...`);
-    const vTimeoutMs = 60_000;
+    console.log(`[SERVER BUILDER] 🤖 Calling GPT-4o for virtual server analysis (${searchSummary.length} chars)...`);
+    const vTimeoutMs = 90_000;
     const vGptPromise = openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [{
         role: "system",
         content: `You are a cloud server advisor. Analyze search results about cloud GPU servers. Output ONLY a JSON object (no markdown):

@@ -193,6 +193,10 @@ interface NeuralConsciousnessState {
   adrenaline: AdrenalineState;
 }
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
 const REGION_BASELINE_FIRING: Record<string, number> = {
   prefrontal_cortex: 0.16,
   default_mode_network: 0.18,
@@ -274,7 +278,7 @@ function leakyIntegrateAndFire(neuron: Neuron, dt: number): boolean {
   }
 
   neuron.fired = false;
-  neuron.neurotransmitterLevel = Math.min(1.0, neuron.neurotransmitterLevel + 0.002);
+  neuron.neurotransmitterLevel = safeNum(neuron.neurotransmitterLevel + 0.002, 0.5);
   return false;
 }
 
@@ -293,7 +297,7 @@ function hebbianUpdate(synapse: Synapse, preNeuron: Neuron, postNeuron: Neuron):
 
     const hebbianTerm = preNeuron.fired && postNeuron.fired ? HEBBIAN_RATE : 0;
     synapse.weight += hebbianTerm + stdpFactor;
-    synapse.weight = Math.max(MIN_WEIGHT, Math.min(MAX_WEIGHT, synapse.weight));
+    synapse.weight = safeNum(Math.max(MIN_WEIGHT, synapse.weight), MIN_WEIGHT);
 
     if (preNeuron.fired || postNeuron.fired) {
       synapse.lastActivation = Date.now();
@@ -1206,7 +1210,7 @@ function synapticPruning(): void {
   const weakSynapses = allSynapses.filter(s => s.weight < 0.15);
   const strongSynapses = allSynapses.filter(s => s.weight > 0.5);
   for (const s of strongSynapses.slice(0, 20)) {
-    s.weight = Math.min(MAX_WEIGHT, s.weight * 1.001);
+    s.weight = safeNum(s.weight * 1.001, 0.5);
   }
   state.totalSynapses = allSynapses.length;
 }
@@ -1699,7 +1703,7 @@ export function injectSpiderSynapses(fromRegion: string, toRegion: string, count
   if (!from || !to) return 0;
 
   let added = 0;
-  const clampedStrength = Math.max(MIN_WEIGHT, Math.min(MAX_WEIGHT * 0.6, strength));
+  const clampedStrength = Math.max(MIN_WEIGHT, strength);
   for (let i = 0; i < count; i++) {
     const preNeuron = from.neurons[Math.floor(Math.random() * from.neurons.length)];
     const postNeuron = to.neurons[Math.floor(Math.random() * to.neurons.length)];

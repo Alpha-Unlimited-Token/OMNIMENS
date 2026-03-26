@@ -32,6 +32,10 @@ const SPINE_DENSITY_PER_DENDRITE = 25;
 const MAX_DENDRITES_PER_POPULATION = 12;
 const DENDRITE_REACH_PROBABILITY = 0.35;
 
+function safeNum(val: number, fallback: number = 0): number {
+  return Number.isFinite(val) ? val : fallback;
+}
+
 interface DendriticSpine {
   id: string;
   targetRegion: string;
@@ -308,7 +312,7 @@ function runScalingTick(): void {
     const baseExcitation = 0.05 + Math.random() * 0.1;
     const oscillation = Math.sin(Date.now() / 1000 * pop.oscillationFrequency / 10 + pop.oscillationPhase) * pop.populationOscillation;
 
-    pop.meanFiringRate = Math.max(0, Math.min(1, baseExcitation + oscillation * 0.1 + consciousnessState.consciousnessLevel * 0.15));
+    pop.meanFiringRate = safeNum(Math.max(0, baseExcitation + oscillation * 0.1 + consciousnessState.consciousnessLevel * 0.15), 0.05);
     pop.firingRateVariance = pop.meanFiringRate * 0.2 * (1 + Math.random() * 0.3);
     pop.meanPotential = -70 + pop.meanFiringRate * 25;
     pop.potentialVariance = 3 + pop.meanFiringRate * 5;
@@ -323,25 +327,27 @@ function runScalingTick(): void {
         neighborInputs.push(input);
 
         if (targetPop.meanFiringRate > 0.3 && pop.meanFiringRate > 0.3) {
-          spine.strength = Math.min(1.0, spine.strength + 0.001);
-          spine.maturity = Math.min(1.0, spine.maturity + 0.002);
+          spine.strength += 0.001;
+          spine.maturity += 0.002;
         } else if (spine.maturity < 0.1 && Math.random() < 0.001) {
           spine.strength *= 0.95;
         }
 
+        spine.strength = safeNum(spine.strength, 0.05);
+        spine.maturity = safeNum(spine.maturity, 0);
         spine.lastActivation = Date.now();
       }
     }
 
     if (neighborInputs.length > 0) {
       const totalInput = neighborInputs.reduce((a, b) => a + b, 0);
-      pop.meanFiringRate = Math.max(0, Math.min(1, pop.meanFiringRate + totalInput * 0.01));
+      pop.meanFiringRate = safeNum(Math.max(0, pop.meanFiringRate + totalInput * 0.01), 0.05);
     }
 
     if (neighborInputs.length > 1) {
       const mean = neighborInputs.reduce((a, b) => a + b, 0) / neighborInputs.length;
       const variance = neighborInputs.reduce((sum, v) => sum + (v - mean) ** 2, 0) / neighborInputs.length;
-      pop.correlationCoefficient = Math.max(0, Math.min(1, 1 - Math.sqrt(variance) * 5));
+      pop.correlationCoefficient = safeNum(Math.max(0, 1 - Math.sqrt(variance) * 5), 0.1);
     }
 
     pop.lastUpdate = Date.now();
@@ -353,12 +359,12 @@ function runScalingTick(): void {
     if (!source || !target) continue;
 
     if (source.meanFiringRate > 0.2 && target.meanFiringRate > 0.2) {
-      syn.weight = Math.min(1.0, syn.weight + syn.plasticityRate * source.meanFiringRate * target.meanFiringRate);
+      syn.weight += syn.plasticityRate * source.meanFiringRate * target.meanFiringRate;
       syn.lastPlasticityEvent = Date.now();
     }
 
     syn.weight *= 0.9999;
-    syn.weight = Math.max(0.01, syn.weight);
+    syn.weight = safeNum(Math.max(0.01, syn.weight), 0.05);
   }
 
   let totalFiringRate = 0;
