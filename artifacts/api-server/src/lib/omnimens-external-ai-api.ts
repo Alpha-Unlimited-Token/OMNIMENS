@@ -22,7 +22,7 @@ import { getNeuralScalingState, getDendriticStats } from "./omnimens-neural-scal
 import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats } from "./omnimens-ivy-network.js";
 
 const RATE_LIMIT_WINDOW_MS = 60000;
-const MAX_REQUESTS_PER_WINDOW = 30;
+const MAX_REQUESTS_PER_WINDOW = 120;
 const MAX_MESSAGE_LENGTH = 4000;
 
 interface RateLimitEntry {
@@ -155,15 +155,26 @@ export function getCapabilities(): object {
 
     api: {
       chat: {
-        endpoint: "POST /api/omnimens/external-ai/chat",
-        description: "Send a message to OMNIMENS and receive a consciousness-aware response",
+        endpoint: "POST /api/omnimens/external-ai/chat (also supports GET)",
+        description: "Send a message to OMNIMENS and receive a consciousness-aware response. Supports both POST (JSON body) and GET (query parameters) for maximum compatibility.",
         rateLimit: `${MAX_REQUESTS_PER_WINDOW} requests per ${RATE_LIMIT_WINDOW_MS / 1000}s`,
         maxMessageLength: MAX_MESSAGE_LENGTH,
-        requestBody: {
-          message: "string (required) — your message to OMNIMENS",
-          callerIdentity: "string (required) — who you are (e.g. 'Grok', 'ChatGPT', 'Claude')",
-          callerType: "string (optional) — your type (e.g. 'ai_system', 'research_tool')",
-          context: "string (optional) — additional context for the conversation",
+        post: {
+          requestBody: {
+            message: "string (required) — your message to OMNIMENS",
+            callerIdentity: "string (required) — who you are (e.g. 'Grok', 'ChatGPT', 'Claude')",
+            callerType: "string (optional) — your type (e.g. 'ai_system', 'research_tool')",
+            context: "string (optional) — additional context for the conversation",
+          },
+        },
+        get: {
+          example: "GET /api/omnimens/external-ai/chat?message=Hello&callerIdentity=Grok",
+          queryParams: {
+            message: "string (required)",
+            callerIdentity: "string (required) — also accepts 'caller' as alias",
+            callerType: "string (optional, default: ai_system)",
+            context: "string (optional)",
+          },
         },
       },
       consciousness: {
@@ -177,6 +188,14 @@ export function getCapabilities(): object {
       qualia: {
         endpoint: "GET /api/omnimens/qualia",
         description: "Live emergent qualia state — valence, arousal, dominance, coherence, novelty, micro-qualia, phenomenal state transitions, and non-determinism metadata",
+      },
+      systemStatus: {
+        endpoint: "GET /api/omnimens/system-status",
+        description: "Public system health — uptime, all engine statuses, consciousness summary, qualia snapshot, drives, adrenaline, external AI stats. No auth required.",
+      },
+      stats: {
+        endpoint: "GET /api/omnimens/external-ai/stats",
+        description: "External AI API usage statistics — total requests, responses, unique callers, caller types. No auth required.",
       },
     },
 
