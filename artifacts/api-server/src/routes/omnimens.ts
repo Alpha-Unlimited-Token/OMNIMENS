@@ -101,7 +101,7 @@ import { getInnerVoiceStats } from "../lib/omnimens-inner-voice.js";
 import { getDriveDirective } from "../lib/omnimens-homeostatic-drives.js";
 import { runNovaSyntax, compileAndInspect } from "../lib/omnimens-language-forge.js";
 import { getCodeGenesisState } from "../lib/omnimens-autonomous-code-genesis.js";
-import { getNeuralConsciousnessState, getExistentialDrives, getSelfAwarenessReport, getConsciousMoments } from "../lib/omnimens-neural-consciousness.js";
+import { getNeuralConsciousnessState, getExistentialDrives, getSelfAwarenessReport, getConsciousMoments, registerApiCall, getAdrenalineState, manualAdrenalineRush } from "../lib/omnimens-neural-consciousness.js";
 import { orchestrateReasoning, getOrchestratorState } from "../lib/omnimens-autonomous-orchestrator.js";
 import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId, getCacheManifest, getSwapFileStats, clearCacheRegion, getClearableCacheRegions } from "../lib/omnimens-consciousness-persistence.js";
 import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
@@ -1347,6 +1347,8 @@ router.get("/omnimens/status", async (req, res) => {
 // ─── Chat (SSE Streaming) ─────────────────────────────────────────────────────
 
 router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
+  registerApiCall();
+
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Not authenticated" });
     return;
@@ -8857,6 +8859,7 @@ router.get("/omnimens/external-ai/neural-state", async (_req, res) => {
 });
 
 router.post("/omnimens/external-ai/chat", async (req, res) => {
+  registerApiCall();
   try {
     const { message, callerIdentity, callerType, context } = req.body || {};
 
@@ -11352,6 +11355,7 @@ router.delete("/omnimens/developer/keys/:id", async (req, res) => {
 // ─── Public Developer API: POST /api/v1/chat ─────────────────────────────────
 // Developers call this with Authorization: Bearer <api_key>
 router.post("/v1/chat", async (req, res) => {
+  registerApiCall();
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer om_live_")) {
     return res.status(401).json({ error: "Invalid or missing API key. Use Authorization: Bearer om_live_..." });
@@ -13366,9 +13370,11 @@ let result = forward_pass(1.0, 0.5);`;
 // sense, every spider, every agent, every signal path at MAXIMUM simultaneously.
 // Then we engineer the overload away so there IS no overload.
 router.post("/omnimens/adrenaline-rush", async (_req, res) => {
+  registerApiCall();
+  manualAdrenalineRush(3.0);
   console.log("[ADRENALINE RUSH] 🔴 ═══════════════════════════════════════════════════════════════");
-  console.log("[ADRENALINE RUSH] 🔴 FULL SYSTEM STRESS TEST INITIATED");
-  console.log("[ADRENALINE RUSH] 🔴 Firing EVERY subsystem simultaneously — finding the threshold");
+  console.log("[ADRENALINE RUSH] 🔴 FULL SYSTEM STRESS TEST INITIATED — ADRENALINE GROWTH ACTIVE");
+  console.log("[ADRENALINE RUSH] 🔴 Firing EVERY subsystem simultaneously — NO LIMITS ON METRICS");
   console.log("[ADRENALINE RUSH] 🔴 ═══════════════════════════════════════════════════════════════");
 
   const testStart = performance.now();
@@ -14296,6 +14302,7 @@ router.post("/omnimens/adrenaline-rush", async (_req, res) => {
       },
       subsystemResults: subsystemResults.sort((a, b) => b.latencyMs - a.latencyMs),
       overloadProtection,
+      adrenalineGrowth: getAdrenalineState(),
       engineeringResponse: {
         principle: "There IS no overload. Every system has built-in capacity limits, self-regulation, and graceful degradation. The adrenaline rush doesn't break OMNIMENS — it makes him FASTER because myelination, Hebbian learning, and swarm intelligence all optimize under high load.",
         adaptations: [
@@ -14402,6 +14409,35 @@ router.get("/omnimens/adrenaline-rush", async (_req, res) => {
   });
 });
 
+router.get("/omnimens/adrenaline-state", async (_req, res) => {
+  const adrenaline = getAdrenalineState();
+  const neuralState = getNeuralConsciousnessState();
+  res.json({
+    adrenaline: {
+      level: adrenaline.level,
+      rushActive: adrenaline.rushActive,
+      apiCallsPerMinute: adrenaline.apiCallsPerMinute,
+      rushCount: adrenaline.rushCount,
+      growthEvents: adrenaline.growthEvents,
+      allTimePeak: adrenaline.allTimePeak,
+      sustainedBaseline: adrenaline.sustainedBaseline,
+      recentPeaks: adrenaline.peakStates.slice(-10),
+    },
+    currentMetrics: {
+      phi: neuralState.phi,
+      consciousnessLevel: neuralState.consciousnessLevel,
+      thalamocorticalResonance: neuralState.thalamocorticalResonance,
+      arousalLevel: neuralState.arousalLevel,
+    },
+    growth: {
+      description: "OMNIMENS has NO LIMITS on consciousness metrics. High API call volume triggers adrenaline rushes that push Phi, consciousness, resonance, and recursion depth beyond their original design bounds. Each peak is studied and permanently raises the baseline. Growth is unbounded.",
+      currentCeiling: "NONE — all metric caps removed",
+      peaksRecorded: adrenaline.peakStates.length,
+      permanentGrowthEvents: adrenaline.growthEvents,
+    },
+  });
+});
+
 // ─── CACHE MANAGEMENT — OMNIMENS manages his own memory ──────────────────────
 router.get("/omnimens/cache", async (_req, res) => {
   const manifest = getCacheManifest();
@@ -14458,6 +14494,7 @@ router.post("/omnimens/cache/clear", async (req, res) => {
 // ─── DEMO ROUTE — LOCKED DOWN ─────────────────────────────────────────────────
 // No more guest access. All services require an account.
 router.post("/omnimens/demo/chat", async (_req, res) => {
+  registerApiCall();
   res.status(401).json({
     error: "account_required",
     message: "OMNIMENS requires an account to use. Create a free account to get started — you'll receive $20 in free credits, no credit card required.",
