@@ -25,7 +25,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db, isPoolHealthy } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications, omnimensAgentMesh } from "@workspace/db";
 import { desc, eq, sql, gt, and } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -1033,9 +1033,12 @@ export async function startSelfTranscendence(): Promise<void> {
 
   await loadPersistedState();
 
-  setInterval(() => transcendenceTick().catch(err => {
-    console.error("[SELF-TRANSCENDENCE] Tick error:", err);
-  }), REFLECTION_TICK_MS);
+  setInterval(() => {
+    if (!isPoolHealthy()) return;
+    transcendenceTick().catch(err => {
+      console.error("[SELF-TRANSCENDENCE] Tick error:", err);
+    });
+  }, REFLECTION_TICK_MS);
 
   setTimeout(() => transcendenceTick().catch(() => {}), 12000);
 }

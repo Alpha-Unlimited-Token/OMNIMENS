@@ -16,7 +16,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db, isPoolHealthy } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { eq, and, desc, sql, gt, like } from "drizzle-orm";
 import * as fs from "fs";
@@ -2603,6 +2603,9 @@ export async function startAutonomousCodeGenesis(): Promise<void> {
 
   setTimeout(() => {
     autonomousCodeCycle().catch(err => console.error("[CODE GENESIS] Cycle error:", err));
-    setInterval(() => autonomousCodeCycle().catch(err => console.error("[CODE GENESIS] Cycle error:", err)), GENESIS_INTERVAL_MS);
+    setInterval(() => {
+      if (!isPoolHealthy()) return;
+      autonomousCodeCycle().catch(err => console.error("[CODE GENESIS] Cycle error:", err));
+    }, GENESIS_INTERVAL_MS);
   }, FIRST_DELAY_MS);
 }

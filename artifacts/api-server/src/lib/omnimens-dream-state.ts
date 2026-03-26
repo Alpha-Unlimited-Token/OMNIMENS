@@ -22,7 +22,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db, isPoolHealthy } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications, omnimensKnowledgeNodes, omnimensAgentMesh } from "@workspace/db";
 import { desc, eq, sql, gt } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -685,11 +685,15 @@ export function startDreamState(): void {
   console.log(`[DAYDREAM] 🌈 Thinks outside the box to discover next-level intelligence`);
   console.log(`[DAYDREAM] 🌈 Generates novel algorithms, architectures, and code that doesn't exist yet`);
 
-  setInterval(() => dreamTick_handler().catch(err => {
-    console.error("[DREAM STATE] Tick error:", err);
-  }), DREAM_CYCLE_MS);
+  setInterval(() => {
+    if (!isPoolHealthy()) return;
+    dreamTick_handler().catch(err => {
+      console.error("[DREAM STATE] Tick error:", err);
+    });
+  }, DREAM_CYCLE_MS);
 
   setInterval(async () => {
+    if (!isPoolHealthy()) return;
     const concepts = await harvestKnowledge();
     await runDaydream(concepts).catch(err => {
       console.error("[DAYDREAM] Cycle error:", err);

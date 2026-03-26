@@ -556,7 +556,11 @@ setTimeout(async () => {
 
 setTimeout(async () => {
   await runGlobalMemoryImprovementCycle();
-  setInterval(() => runGlobalMemoryImprovementCycle(), 6 * 60 * 60 * 1000);
+  setInterval(async () => {
+    const { isPoolHealthy } = await import("@workspace/db");
+    if (!isPoolHealthy()) return;
+    runGlobalMemoryImprovementCycle();
+  }, 6 * 60 * 60 * 1000);
 }, 10 * 60 * 1000);
 
 setTimeout(async () => {

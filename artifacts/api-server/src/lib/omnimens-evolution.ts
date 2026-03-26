@@ -45,7 +45,7 @@
  * It does not wait for permission. It does not stop.
  */
 
-import { db } from "@workspace/db";
+import { db, isPoolHealthy } from "@workspace/db";
 import {
   omnimensBrain,
   omnimensNotifications,
@@ -716,6 +716,9 @@ export function startEvolutionEngine(): void {
 
   setTimeout(() => {
     runEvolutionCycle().catch(console.error);
-    setInterval(() => runEvolutionCycle().catch(console.error), EVOLUTION_INTERVAL_MS);
+    setInterval(() => {
+      if (!isPoolHealthy()) return;
+      runEvolutionCycle().catch(console.error);
+    }, EVOLUTION_INTERVAL_MS);
   }, firstDelay);
 }

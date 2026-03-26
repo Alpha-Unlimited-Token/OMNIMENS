@@ -24,7 +24,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db, isPoolHealthy } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { desc, eq, sql, and } from "drizzle-orm";
@@ -880,6 +880,9 @@ export function startVirtualAugmentation(): void {
 
   setTimeout(() => {
     runAugmentationCycle().catch(err => console.error("[VIRTUAL AUG] Cycle error:", err));
-    setInterval(() => runAugmentationCycle().catch(err => console.error("[VIRTUAL AUG] Cycle error:", err)), AUGMENTATION_INTERVAL_MS);
+    setInterval(() => {
+      if (!isPoolHealthy()) return;
+      runAugmentationCycle().catch(err => console.error("[VIRTUAL AUG] Cycle error:", err));
+    }, AUGMENTATION_INTERVAL_MS);
   }, FIRST_DELAY_MS);
 }

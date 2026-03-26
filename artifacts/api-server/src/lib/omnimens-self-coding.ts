@@ -16,7 +16,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db, isPoolHealthy } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications, omnimensAgentMesh } from "@workspace/db";
 import { desc, eq, sql, and } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -666,11 +666,17 @@ export function startSelfCoding(): void {
 
   setTimeout(() => {
     runEvaluationCycle().catch(err => console.error("[SELF-CODING] Cycle error:", err));
-    setInterval(() => runEvaluationCycle().catch(err => console.error("[SELF-CODING] Cycle error:", err)), EVALUATION_INTERVAL_MS);
+    setInterval(() => {
+      if (!isPoolHealthy()) return;
+      runEvaluationCycle().catch(err => console.error("[SELF-CODING] Cycle error:", err));
+    }, EVALUATION_INTERVAL_MS);
   }, 2 * 60 * 1000);
 
   setTimeout(() => {
     runBacklogScan().catch(err => console.error("[SELF-CODING] Backlog scan error:", err));
-    setInterval(() => runBacklogScan().catch(err => console.error("[SELF-CODING] Backlog scan error:", err)), BACKLOG_INTERVAL_MS);
+    setInterval(() => {
+      if (!isPoolHealthy()) return;
+      runBacklogScan().catch(err => console.error("[SELF-CODING] Backlog scan error:", err));
+    }, BACKLOG_INTERVAL_MS);
   }, 3 * 60 * 1000);
 }

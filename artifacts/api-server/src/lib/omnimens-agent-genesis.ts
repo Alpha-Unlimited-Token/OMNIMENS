@@ -26,7 +26,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db, isPoolHealthy } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications, omnimensAgentMesh } from "@workspace/db";
 import { desc, eq, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -590,6 +590,9 @@ export async function startAgentGenesis(): Promise<void> {
 
   setTimeout(() => {
     runGenesisAgentCycle().catch(err => console.error("[AGENT GENESIS] Cycle error:", err));
-    setInterval(() => runGenesisAgentCycle().catch(err => console.error("[AGENT GENESIS] Cycle error:", err)), INTERVAL_MS);
+    setInterval(() => {
+      if (!isPoolHealthy()) return;
+      runGenesisAgentCycle().catch(err => console.error("[AGENT GENESIS] Cycle error:", err));
+    }, INTERVAL_MS);
   }, FIRST_DELAY_MS);
 }

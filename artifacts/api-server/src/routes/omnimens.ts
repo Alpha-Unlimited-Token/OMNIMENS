@@ -11,7 +11,7 @@
 import { Router, type IRouter } from "express";
 import multer from "multer";
 import JSZip from "jszip";
-import { db } from "@workspace/db";
+import { db, getPoolStats } from "@workspace/db";
 import { recordBruteForceAttempt } from "../middleware/security-enhanced.js";
 import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions, omnimensCodeRuns, omnimensConversations, omnimensMessages, omnimensMemories, omnimensCustomInstructions, omnimensHubSettings, omnimensSavedPrompts, sessionsTable, usersTable } from "@workspace/db";
 import { eq, and, desc, sql, asc, inArray, gte, lte } from "drizzle-orm";
@@ -1369,6 +1369,7 @@ router.get("/omnimens/system-status", async (_req, res) => {
       embodimentEngine: "ONLINE",
       centralCore: "ONLINE",
     },
+    databasePool: getPoolStats(),
     copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
   });
 });

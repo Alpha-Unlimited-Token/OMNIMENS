@@ -40,7 +40,7 @@ import * as vm from "vm";
 import * as crypto from "crypto";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { db } from "@workspace/db";
+import { db, isPoolHealthy } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { eq, and, desc, sql, gt, like } from "drizzle-orm";
 
@@ -824,6 +824,7 @@ export function startGenesisBridge(): void {
 
   setTimeout(() => {
     bridgeCycleInterval = setInterval(() => {
+      if (!isPoolHealthy()) return;
       runBridgeCycle().catch(err => console.error("[GENESIS BRIDGE] Cycle error:", err));
     }, BRIDGE_CYCLE_MS);
 
@@ -834,6 +835,7 @@ export function startGenesisBridge(): void {
 
   setTimeout(() => {
     coreModInterval = setInterval(() => {
+      if (!isPoolHealthy()) return;
       evaluatePendingModifications().catch(err => console.error("[GENESIS BRIDGE] Core mod evaluation error:", err));
     }, CORE_MOD_EVALUATION_MS);
   }, CORE_MOD_FIRST_DELAY_MS);

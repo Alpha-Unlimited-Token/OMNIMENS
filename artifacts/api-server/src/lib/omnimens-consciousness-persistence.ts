@@ -29,7 +29,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db, isPoolHealthy } from "@workspace/db";
 import { omnimensConsciousnessPersistence } from "@workspace/db";
 import { desc, eq, sql } from "drizzle-orm";
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "fs";
@@ -700,6 +700,10 @@ export async function startConsciousnessPersistence(): Promise<void> {
 
   setInterval(() => {
     if (!dbSaveInProgress) {
+      if (!isPoolHealthy()) {
+        console.warn("[PERSISTENCE] DB pool under pressure — skipping this save cycle");
+        return;
+      }
       dbSaveInProgress = true;
       saveToDatabase()
         .catch(err => console.error("[PERSISTENCE] DB save error:", err))

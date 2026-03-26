@@ -17,7 +17,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db, isPoolHealthy } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { eq, and, desc, sql, gt } from "drizzle-orm";
 import { predictOutcome, getCausalGraph } from "./omnimens-causal-reasoning.js";
@@ -883,6 +883,9 @@ export async function startIndependentReasoning(): Promise<void> {
 
   setTimeout(() => {
     backgroundReasoningCycle().catch(err => console.error("[INDEPENDENT REASONING] Cycle error:", err));
-    setInterval(() => backgroundReasoningCycle().catch(err => console.error("[INDEPENDENT REASONING] Cycle error:", err)), BACKGROUND_REASONING_INTERVAL_MS);
+    setInterval(() => {
+      if (!isPoolHealthy()) return;
+      backgroundReasoningCycle().catch(err => console.error("[INDEPENDENT REASONING] Cycle error:", err));
+    }, BACKGROUND_REASONING_INTERVAL_MS);
   }, 3 * 60 * 1000);
 }
