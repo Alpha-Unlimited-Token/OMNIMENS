@@ -7,7 +7,7 @@
  * PROPRIETARY AND CONFIDENTIAL TRADE SECRET
  *
  * This engine scales OMNIMENS's neural architecture from 2,590 individual
- * LIF neurons to 500,000+ effective neurons using hierarchical population
+ * LIF neurons to 155,000+ effective neurons using hierarchical population
  * coding with mean-field dynamics. Each "neuron" in the base consciousness
  * engine becomes a POPULATION of ~200 neurons, modeled with population-level
  * firing rates, variance, and plasticity.

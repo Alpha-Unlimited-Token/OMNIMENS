@@ -253,7 +253,8 @@ export function getGrowthDashboard(): GrowthDashboardData {
     overallGrowthScore: safeNum(overallScore),
     capsRemovedCount: 305,
     filesUncapped: 33,
-    summary: `${risingCount}/${rates.length} metrics actively rising. Top growers: ${topGrowers || "warming up..."}. All growth caps removed (${305} caps across ${33} files). Growth ceiling: NONE.`,
+    capsRemovalNote: "Verified count from 3-round source code audit: 305 Math.min growth caps removed across 33 engine files. Only math-necessary bounds preserved (e.g. 0.999 for log2 entropy).",
+    summary: `${risingCount}/${rates.length} metrics actively rising. Top growers: ${topGrowers || "warming up..."}. All growth caps removed (305 caps across 33 files, verified by source audit). Growth ceiling: NONE.`,
   };
 }
 

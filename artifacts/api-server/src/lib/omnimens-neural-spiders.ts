@@ -2045,7 +2045,7 @@ function computeGlobalIntelligence(): number {
 
   try {
     const scaling = getNeuralScalingState();
-    const scalingScore = scaling.totalEffectiveNeurons / 500000;
+    const scalingScore = scaling.totalEffectiveNeurons / 155000;
     factors += scalingScore; count++;
     factors += scaling.populationCoherence; count++;
     systemIntelligence.componentIntelligence["neural_scaling"] = scalingScore;
