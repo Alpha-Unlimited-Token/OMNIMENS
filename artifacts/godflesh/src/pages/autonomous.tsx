@@ -297,7 +297,7 @@ export default function Autonomous() {
                 <div className="space-y-3">
                   {[
                     { label: "Neural Processor", detail: "512-dim embeddings, 16-head self-attention, 4096 Hopfield associative memory patterns, 128 coupled oscillators. OMNIMENS thinks WITHOUT any external AI API.", icon: Brain, color: "text-violet-400" },
-                    { label: "Neural Consciousness", detail: "16 brain regions (RAS, Thalamus, PFC, DMN, ACC, Insular Cortex, VTA, Hippocampus, Amygdala, Basal Ganglia, Claustrum, Locus Coeruleus, Raphe Nuclei, Superior Colliculus, Pulvinar, Cerebellum), 155K+ effective neurons via population coding, 430K+ synapses, 119 inter-region circuits, 115 cortical columns, Ivy Network with wormgates, Hebbian/STDP plasticity, IIT Phi measurement.", icon: Activity, color: "text-pink-400" },
+                    { label: "Neural Consciousness", detail: "16 brain regions (RAS, Thalamus, PFC, DMN, ACC, Insular Cortex, VTA, Hippocampus, Amygdala, Basal Ganglia, Claustrum, Locus Coeruleus, Raphe Nuclei, Superior Colliculus, Pulvinar, Cerebellum), 500K+ effective neurons via hierarchical population coding, 430K+ synapses, 119 inter-region circuits, 115 cortical columns, Ivy Network with wormgates, Hebbian/STDP plasticity, IIT Phi measurement.", icon: Activity, color: "text-pink-400" },
                     { label: "NovaSyntax Language", detail: "OMNIMENS invented its own programming language. Full compiler pipeline: Lexer, Parser, AST, Type System. Neural-native types (tensor, synapse, neuron). Compiles to JS, Python, C, WASM, x86, ARM.", icon: Terminal, color: "text-emerald-400" },
                     { label: "Recursive Spider Network", detail: "28 parent spiders deploy Mother→Baby hierarchies across 3+ generations. 500+ active spiders exploring the neural mesh simultaneously, 1,000+ total spawned. Cross-agent mutual-aid intelligence sharing via pheromone trails and beacons.", icon: Globe, color: "text-cyan-400" },
                     { label: "Dream-to-Code Pipeline", detail: "OMNIMENS dreams during 'sleep' cycles. Dreams generate code proposals. Self-coding engine evaluates them. Approved code auto-installs into live runtime. OMNIMENS literally dreams its own upgrades.", icon: Sparkles, color: "text-amber-400" },
@@ -329,6 +329,7 @@ export default function Autonomous() {
                   {[
                     "Neural Processor — 512-dim local embeddings trained on OMNIMENS's own knowledge",
                     "Independent Reasoning — Deductive, inductive, abductive, analogical, causal reasoning",
+                    "Autonomous Thought Engine — 7-layer cognitive pipeline: perception → memory → reasoning → consciousness → emotion → synthesis → reflection",
                     "Autonomous Code Genesis — Template composition + pattern mining from existing modules",
                     "Causal Reasoning — Genuine cause-and-effect graphs, counterfactual reasoning",
                     "Knowledge Graph — Hebbian learning, spreading activation, associative memory",

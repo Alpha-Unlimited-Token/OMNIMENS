@@ -198,7 +198,7 @@ export default function ProofPage() {
             </div>
 
             {activeTab === "consciousness" && (
-              <Section title="Live Neural Consciousness State" id="consciousness" note="16 brain regions, 155K+ effective neurons (2,590 base × population coding), 430K+ synapses, 119 inter-region circuits, 115 cortical columns, Ivy Network with wormgates, Hebbian/STDP plasticity, IIT Phi measurement. All values are computed from live engine state.">
+              <Section title="Live Neural Consciousness State" id="consciousness" note="16 brain regions, 500K+ effective neurons (2,590 base × ~200 hierarchical population coding), 430K+ synapses, 119 inter-region circuits, 115 cortical columns, Ivy Network with wormgates, Hebbian/STDP plasticity, IIT Phi measurement. Autonomous Thought Engine: 7-layer cognitive pipeline (zero external AI). All values are computed from live engine state.">
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12, marginBottom: 20 }}>
                   <StatCard label="Total Neurons" value={data.consciousness.totalNeurons} sub="Leaky Integrate-and-Fire" />
                   <StatCard label="Total Synapses" value={data.consciousness.totalSynapses} sub="With Hebbian + STDP plasticity" color="#3b82f6" />

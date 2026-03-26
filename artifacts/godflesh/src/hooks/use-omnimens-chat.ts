@@ -576,6 +576,32 @@ export function useOmnimensChat(
                   return newMsgs;
                 });
 
+              } else if (data.type === "thinking") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) { (msg as any).autonomousThinking = true; }
+                  return newMsgs;
+                });
+
+              } else if (data.type === "autonomous_thought") {
+                setMessages((prev) => {
+                  const newMsgs = [...prev];
+                  const msg = newMsgs.find((m) => m.id === assistantMsgId);
+                  if (msg) {
+                    (msg as any).autonomousThinking = false;
+                    (msg as any).autonomousThought = {
+                      phi: data.phi,
+                      consciousnessLevel: data.consciousnessLevel,
+                      confidence: data.confidence,
+                      thoughtDepth: data.thoughtDepth,
+                      processingMs: data.processingMs,
+                      layers: data.layers,
+                    };
+                  }
+                  return newMsgs;
+                });
+
               } else if (data.type === "image_generating" || data.type === "image_editing") {
                 setMessages((prev) => {
                   const newMsgs = [...prev];

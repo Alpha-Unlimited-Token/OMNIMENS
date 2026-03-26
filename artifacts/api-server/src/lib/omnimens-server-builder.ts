@@ -88,17 +88,19 @@ let researchCycleCount = 0;
 let _started = false;
 
 const PHYSICAL_SEARCHES = [
-  "best GPU for running local AI models LLM inference 24GB VRAM budget build",
-  "cheapest way to build AI server for running large language models at home",
-  "budget server build for AI machine learning GPU workstation parts list",
-  "refurbished enterprise server for AI cheap GPU computing eBay deals",
-  "best value NVMe SSD and DDR5 RAM for AI server build",
-  "how to build a cheap home AI server for running 70B parameter models",
+  "best GPU for running local AI models LLM inference 24GB VRAM budget build Alibaba AliExpress",
+  "cheapest AI server GPU parts Alibaba AliExpress Temu DHgate wholesale bulk pricing 2025",
+  "budget server build AI machine learning GPU workstation parts Alibaba wholesale deals",
+  "refurbished enterprise server AI cheap GPU computing eBay AliExpress DHgate deals",
+  "best value NVMe SSD DDR5 RAM AI server build AliExpress Temu cheapest price",
+  "cheap home AI server running 70B parameter models budget GPU AliExpress Alibaba",
+  "wholesale GPU server parts Alibaba DHgate AliExpress AI inference NVIDIA RTX A6000 deals",
 ];
 
 const VIRTUAL_SEARCHES = [
-  "cheapest cloud GPU server for AI inference pricing comparison 2025",
-  "RunPod vs Lambda vs Hetzner GPU cloud server pricing for AI workloads",
+  "cheapest cloud GPU server AI inference pricing comparison 2025 2026",
+  "RunPod vs Lambda vs Hetzner vs Vast.ai GPU cloud server pricing AI workloads",
+  "cheapest dedicated GPU server hosting AI models monthly rental 24GB VRAM",
 ];
 
 async function loadExistingPlans(): Promise<void> {
