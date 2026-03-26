@@ -320,6 +320,37 @@ function autoRepairCode(code: string): { code: string; repairs: string[] } {
     repairs.push("Removed trailing commas before closing braces/brackets");
   }
 
+  let openBraces = 0;
+  let openBrackets = 0;
+  let openParens = 0;
+  for (const ch of fixed) {
+    if (ch === "{") openBraces++;
+    else if (ch === "}") openBraces--;
+    else if (ch === "[") openBrackets++;
+    else if (ch === "]") openBrackets--;
+    else if (ch === "(") openParens++;
+    else if (ch === ")") openParens--;
+  }
+  if (openBraces > 0) {
+    fixed += "\n" + "}".repeat(openBraces);
+    repairs.push(`Added ${openBraces} missing closing brace(s)`);
+  } else if (openBraces < 0) {
+    const excess = Math.abs(openBraces);
+    for (let i = 0; i < excess; i++) {
+      const idx = fixed.lastIndexOf("}");
+      if (idx >= 0) fixed = fixed.slice(0, idx) + fixed.slice(idx + 1);
+    }
+    repairs.push(`Removed ${excess} excess closing brace(s)`);
+  }
+  if (openBrackets > 0) {
+    fixed += "]".repeat(openBrackets);
+    repairs.push(`Added ${openBrackets} missing closing bracket(s)`);
+  }
+  if (openParens > 0) {
+    fixed += ")".repeat(openParens);
+    repairs.push(`Added ${openParens} missing closing paren(s)`);
+  }
+
   if (fixed.includes("require(") && !fixed.includes("import ")) {
     fixed = fixed.replace(/const\s+(\w+)\s*=\s*require\s*\(\s*['"](\w+)['"]\s*\)/g, (m, varName, mod) => {
       if (["crypto", "path", "url", "fs", "util", "os", "events", "stream", "buffer", "querystring"].includes(mod)) {

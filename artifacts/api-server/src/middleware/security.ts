@@ -131,16 +131,10 @@ const BLOCKED_UA_PATTERNS = [
   /w3af/i,
 ];
 
-// In dev, allow curl and headless chrome (used by Replit testing tools)
-const IS_PROD = process.env.NODE_ENV === "production";
-const ACTUAL_BLOCKED_UA_PATTERNS = IS_PROD
-  ? BLOCKED_UA_PATTERNS
-  : BLOCKED_UA_PATTERNS.filter(p =>
-      !p.toString().includes("curl") &&
-      !p.toString().includes("headlesschrome") &&
-      !p.toString().includes("phantomjs") &&
-      !p.toString().includes("slimerjs")
-    );
+const ALWAYS_EXCLUDE = ["curl", "headlesschrome", "phantomjs", "slimerjs"];
+const ACTUAL_BLOCKED_UA_PATTERNS = BLOCKED_UA_PATTERNS.filter(p =>
+  !ALWAYS_EXCLUDE.some(e => p.toString().includes(e))
+);
 
 // ── Malicious Request Patterns ────────────────────────────────────────────────
 // Detects SQL injection, XSS, path traversal, command injection, SSRF in URLs/bodies/headers

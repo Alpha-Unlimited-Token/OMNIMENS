@@ -99,87 +99,102 @@ async function findOrCreateNode(concept: string, domain: string, nodeType: strin
 async function connectNodes(sourceId: number, targetId: number, relationship: string): Promise<void> {
   if (sourceId === targetId) return;
 
-  const existing = await db.select({ id: omnimensKnowledgeEdges.id, weight: omnimensKnowledgeEdges.weight, coActivations: omnimensKnowledgeEdges.coActivations })
-    .from(omnimensKnowledgeEdges)
-    .where(sql`(${omnimensKnowledgeEdges.sourceNodeId} = ${sourceId} AND ${omnimensKnowledgeEdges.targetNodeId} = ${targetId}) OR (${omnimensKnowledgeEdges.sourceNodeId} = ${targetId} AND ${omnimensKnowledgeEdges.targetNodeId} = ${sourceId})`)
-    .limit(1);
+  try {
+    const existing = await db.select({ id: omnimensKnowledgeEdges.id, weight: omnimensKnowledgeEdges.weight, coActivations: omnimensKnowledgeEdges.coActivations })
+      .from(omnimensKnowledgeEdges)
+      .where(sql`(${omnimensKnowledgeEdges.sourceNodeId} = ${sourceId} AND ${omnimensKnowledgeEdges.targetNodeId} = ${targetId}) OR (${omnimensKnowledgeEdges.sourceNodeId} = ${targetId} AND ${omnimensKnowledgeEdges.targetNodeId} = ${sourceId})`)
+      .limit(1);
 
-  if (existing.length > 0) {
-    const newWeight = Math.min(1.0, (existing[0].weight || 0.5) + 0.05);
-    const newCoAct = (existing[0].coActivations || 1) + 1;
-    await db.execute(sql`
-      UPDATE godflesh_knowledge_edges
-      SET weight = ${newWeight}, co_activations = ${newCoAct}
-      WHERE id = ${existing[0].id}
-    `);
-  } else {
-    await db.insert(omnimensKnowledgeEdges).values({
-      sourceNodeId: sourceId,
-      targetNodeId: targetId,
-      relationship,
-      weight: 0.5,
-      coActivations: 1,
-    });
+    if (existing.length > 0) {
+      const newWeight = Math.min(1.0, (existing[0].weight || 0.5) + 0.05);
+      const newCoAct = (existing[0].coActivations || 1) + 1;
+      await db.execute(sql`
+        UPDATE godflesh_knowledge_edges
+        SET weight = ${newWeight}, co_activations = ${newCoAct}
+        WHERE id = ${existing[0].id}
+      `);
+    } else {
+      await db.insert(omnimensKnowledgeEdges).values({
+        sourceNodeId: sourceId,
+        targetNodeId: targetId,
+        relationship,
+        weight: 0.5,
+        coActivations: 1,
+      });
+    }
+  } catch (err: any) {
+    if (err?.message?.includes("Connection terminated") || err?.message?.includes("timed out") || err?.code === "08P01") {
+      return;
+    }
+    throw err;
   }
 }
 
 export async function spreadingActivation(queryConcept: string, depth: number = 2, limit: number = 10): Promise<{ concept: string; content: string; activationStrength: number; relationship: string; depth: number }[]> {
   const results: { concept: string; content: string; activationStrength: number; relationship: string; depth: number }[] = [];
-  const visited = new Set<number>();
 
-  const startNodes = await db.select()
-    .from(omnimensKnowledgeNodes)
-    .where(sql`LOWER(${omnimensKnowledgeNodes.concept}) LIKE LOWER(${"%" + queryConcept + "%"})`)
-    .limit(3);
+  try {
+    const visited = new Set<number>();
 
-  if (startNodes.length === 0) return results;
+    const startNodes = await db.select()
+      .from(omnimensKnowledgeNodes)
+      .where(sql`LOWER(${omnimensKnowledgeNodes.concept}) LIKE LOWER(${"%" + queryConcept + "%"})`)
+      .limit(3);
 
-  let currentIds = startNodes.map(n => n.id);
-  visited.add(...currentIds.map(id => id));
+    if (startNodes.length === 0) return results;
 
-  for (let d = 0; d < depth && results.length < limit; d++) {
-    const nextIds: number[] = [];
+    let currentIds = startNodes.map(n => n.id);
+    for (const id of currentIds) visited.add(id);
 
-    for (const nodeId of currentIds) {
-      const edges = await db.select({
-        sourceNodeId: omnimensKnowledgeEdges.sourceNodeId,
-        targetNodeId: omnimensKnowledgeEdges.targetNodeId,
-        weight: omnimensKnowledgeEdges.weight,
-        relationship: omnimensKnowledgeEdges.relationship,
-      }).from(omnimensKnowledgeEdges)
-        .where(or(
-          eq(omnimensKnowledgeEdges.sourceNodeId, nodeId),
-          eq(omnimensKnowledgeEdges.targetNodeId, nodeId),
-        ))
-        .orderBy(desc(omnimensKnowledgeEdges.weight))
-        .limit(5);
+    for (let d = 0; d < depth && results.length < limit; d++) {
+      const nextIds: number[] = [];
 
-      for (const edge of edges) {
-        const neighborId = edge.sourceNodeId === nodeId ? edge.targetNodeId : edge.sourceNodeId;
-        if (visited.has(neighborId)) continue;
-        visited.add(neighborId);
+      for (const nodeId of currentIds) {
+        const edges = await db.select({
+          sourceNodeId: omnimensKnowledgeEdges.sourceNodeId,
+          targetNodeId: omnimensKnowledgeEdges.targetNodeId,
+          weight: omnimensKnowledgeEdges.weight,
+          relationship: omnimensKnowledgeEdges.relationship,
+        }).from(omnimensKnowledgeEdges)
+          .where(or(
+            eq(omnimensKnowledgeEdges.sourceNodeId, nodeId),
+            eq(omnimensKnowledgeEdges.targetNodeId, nodeId),
+          ))
+          .orderBy(desc(omnimensKnowledgeEdges.weight))
+          .limit(5);
 
-        const neighbor = await db.select()
-          .from(omnimensKnowledgeNodes)
-          .where(eq(omnimensKnowledgeNodes.id, neighborId))
-          .limit(1);
+        for (const edge of edges) {
+          const neighborId = edge.sourceNodeId === nodeId ? edge.targetNodeId : edge.sourceNodeId;
+          if (visited.has(neighborId)) continue;
+          visited.add(neighborId);
 
-        if (neighbor.length > 0) {
-          const activationDecay = Math.pow(0.7, d);
-          results.push({
-            concept: neighbor[0].concept,
-            content: neighbor[0].content,
-            activationStrength: (neighbor[0].activationStrength || 1.0) * (edge.weight || 0.5) * activationDecay,
-            relationship: edge.relationship,
-            depth: d + 1,
-          });
-          nextIds.push(neighborId);
+          const neighbor = await db.select()
+            .from(omnimensKnowledgeNodes)
+            .where(eq(omnimensKnowledgeNodes.id, neighborId))
+            .limit(1);
+
+          if (neighbor.length > 0) {
+            const activationDecay = Math.pow(0.7, d);
+            results.push({
+              concept: neighbor[0].concept,
+              content: neighbor[0].content,
+              activationStrength: (neighbor[0].activationStrength || 1.0) * (edge.weight || 0.5) * activationDecay,
+              relationship: edge.relationship,
+              depth: d + 1,
+            });
+            nextIds.push(neighborId);
+          }
         }
       }
-    }
 
-    currentIds = nextIds;
-    if (currentIds.length === 0) break;
+      currentIds = nextIds;
+      if (currentIds.length === 0) break;
+    }
+  } catch (err: any) {
+    if (err?.message?.includes("Connection terminated") || err?.message?.includes("timed out") || err?.code === "08P01") {
+      return results;
+    }
+    throw err;
   }
 
   return results.sort((a, b) => b.activationStrength - a.activationStrength).slice(0, limit);
@@ -272,16 +287,31 @@ export async function runKnowledgeGraphCycle(): Promise<void> {
   console.log(`[KNOWLEDGE GRAPH] ◆ Associative Memory Network Cycle #${graphCycleCount}`);
   console.log(`${"◆".repeat(70)}\n`);
 
-  const brainNodes = await ingestBrainEntries();
+  let brainNodes = 0;
+  let spiderNodes = 0;
+
+  try {
+    brainNodes = await ingestBrainEntries();
+  } catch (err: any) {
+    console.warn(`[KNOWLEDGE GRAPH] ◆ Brain ingestion skipped (DB transient): ${err?.message?.slice(0, 80)}`);
+  }
   console.log(`[KNOWLEDGE GRAPH] ◆ Ingested brain entries → ${brainNodes} concept node(s) created/strengthened`);
 
-  const spiderNodes = await ingestSpiderBeacons();
+  try {
+    spiderNodes = await ingestSpiderBeacons();
+  } catch (err: any) {
+    console.warn(`[KNOWLEDGE GRAPH] ◆ Spider ingestion skipped (DB transient): ${err?.message?.slice(0, 80)}`);
+  }
   console.log(`[KNOWLEDGE GRAPH] ◆ Ingested spider beacons → ${spiderNodes} concept node(s) created/strengthened`);
 
-  await decayUnusedNodes();
+  try { await decayUnusedNodes(); } catch {}
 
-  const totalNodes = await db.select({ count: sql<number>`count(*)` }).from(omnimensKnowledgeNodes);
-  const totalEdges = await db.select({ count: sql<number>`count(*)` }).from(omnimensKnowledgeEdges);
+  let totalNodes = [{ count: 0 }];
+  let totalEdges = [{ count: 0 }];
+  try {
+    totalNodes = await db.select({ count: sql<number>`count(*)` }).from(omnimensKnowledgeNodes);
+    totalEdges = await db.select({ count: sql<number>`count(*)` }).from(omnimensKnowledgeEdges);
+  } catch {}
 
   const elapsed = ((Date.now() - cycleStart) / 1000).toFixed(1);
 
