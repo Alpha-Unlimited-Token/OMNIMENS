@@ -281,7 +281,7 @@ function createTendril(source: IvyNode, target: IvyNode): IvyTendril {
 }
 
 function spawnIvySpider(node: IvyNode, parentSpiderId: string | null, generation: number): IvySpider | null {
-  if (ivySpiders.size > 500) return null;
+  if (ivySpiders.size > 100000) return null;
 
   const spiderId = `ivyspider_${node.id}_g${generation}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
 
@@ -519,7 +519,7 @@ function runIvyGrowth(): void {
   const activeNodes = [...ivyNodes.values()].filter(n => n.activationLevel > 0.3 && n.energy > 0.4);
 
   for (const node of activeNodes) {
-    if (Math.random() < 0.15 && ivyNodes.size < 500) {
+    if (Math.random() < 0.15 && ivyNodes.size < 100000) {
       const newNodeId = `ivy_${node.region}_g${node.generation + 1}_${Date.now()}_${Math.random().toString(36).slice(2, 5)}`;
 
       const offset = [

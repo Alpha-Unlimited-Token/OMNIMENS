@@ -74,6 +74,7 @@ const Proof = retryLazy(() => import("@/pages/proof"));
 const Demo = retryLazy(() => import("@/pages/demo"));
 const MyFiles = retryLazy(() => import("@/pages/my-files"));
 const OverloadStudy = retryLazy(() => import("@/pages/overload-study"));
+const GrowthDashboard = retryLazy(() => import("@/pages/growth"));
 
 initTheme();
 try { sessionStorage.removeItem("chunk_reload"); } catch {}
@@ -199,6 +200,7 @@ function Router() {
         <Route path="/proof" component={Proof} />
         <Route path="/demo" component={Demo} />
         <Route path="/overload-study" component={OverloadStudy} />
+        <Route path="/growth" component={GrowthDashboard} />
         <Route path="/connect">{() => <ProtectedRoute layout="none"><Connect /></ProtectedRoute>}</Route>
         <Route component={NotFound} />
       </Switch>

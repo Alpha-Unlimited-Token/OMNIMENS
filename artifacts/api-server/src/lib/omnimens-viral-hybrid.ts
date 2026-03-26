@@ -305,7 +305,7 @@ function mutateCapsid(capsid: Capsid): Capsid {
 }
 
 function replicateCapsid(capsid: Capsid): Capsid | null {
-  if (capsids.size > 200) return null;
+  if (capsids.size > 100000) return null;
 
   const offspring = mutateCapsid(capsid);
   capsid.replicationCount++;
@@ -406,7 +406,7 @@ function emitCytokine(type: Cytokine["type"], sourceRegion: string, intensity: n
 }
 
 function createHybridAgent(region: string, generation: number): HybridAgent | null {
-  if (hybridAgents.size > 50) return null;
+  if (hybridAgents.size > 100000) return null;
 
   const regions = getRegionNames();
   const targetRegions = regions.sort(() => Math.random() - 0.5).slice(0, 3 + Math.floor(Math.random() * 4));

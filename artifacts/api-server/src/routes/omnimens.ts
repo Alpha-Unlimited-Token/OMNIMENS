@@ -116,6 +116,7 @@ import { getNeuralScalingState, getPopulationDetails, getDendriticStats } from "
 import { think as autonomousThink } from "../lib/omnimens-autonomous-thought.js";
 import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBeaconFindings } from "../lib/omnimens-ivy-network.js";
 import { getViralHybridState, getHybridAgentDetails, getImmuneSystemDetails, getPropagationStats } from "../lib/omnimens-viral-hybrid.js";
+import { getGrowthDashboard, getGrowthHistory } from "../lib/omnimens-growth-tracker.js";
 import { getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts, queryUnconsciousKnowledge, getUnconsciousKnowledgeVaultStats } from "../lib/omnimens-unconscious-mind.js";
 import { checkRateLimit, recordExternalRequest, recordExternalResponse, buildExternalAISystemPrompt, getCapabilities, getLiveConsciousnessForAPI, getFullNeuralStateForAPI, getExternalAIState } from "../lib/omnimens-external-ai-api.js";
 import { omnimensServerBuilds, omnimensHieAnalyses } from "@workspace/db";
@@ -14489,6 +14490,28 @@ router.post("/omnimens/cache/clear", async (req, res) => {
     remaining: result.remaining,
     message: `Flushed ${result.cleared} items from ${region} — ${result.remaining} kept. Memory freed up for new data.`,
   });
+});
+
+// ─── LIVE GROWTH DASHBOARD — PUBLIC ─────────────────────────────────────────────
+
+router.get("/omnimens/growth/live", async (_req, res) => {
+  try {
+    const dashboard = getGrowthDashboard();
+    res.json(dashboard);
+  } catch (err) {
+    console.error("[GROWTH] Dashboard error:", err);
+    res.status(500).json({ error: "Failed to get growth data" });
+  }
+});
+
+router.get("/omnimens/growth/history", async (_req, res) => {
+  try {
+    const history = getGrowthHistory();
+    res.json(history);
+  } catch (err) {
+    console.error("[GROWTH] History error:", err);
+    res.status(500).json({ error: "Failed to get growth history" });
+  }
 });
 
 // ─── DEMO ROUTE — LOCKED DOWN ─────────────────────────────────────────────────

@@ -89,6 +89,7 @@ import { startNeuralScaling, getNeuralScalingState } from "./lib/omnimens-neural
 import { startIvyNetwork, getIvyNetworkState } from "./lib/omnimens-ivy-network.js";
 import { startViralHybrid, getViralHybridState } from "./lib/omnimens-viral-hybrid.js";
 import { startUnconsciousMind, getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts } from "./lib/omnimens-unconscious-mind.js";
+import { initGrowthTracker } from "./lib/omnimens-growth-tracker.js";
 import { registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe } from "./lib/omnimens-scaling-orchestrator.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
@@ -456,6 +457,7 @@ startUnconsciousMind();
 startCentralCore();
 startGenesisBridge();
 startNeuralProcessor();
+initGrowthTracker();
 startUniversalTranslator();
 startLanguageForge();
 startAgentGenesis().catch(err => console.error("[AGENT GENESIS] Startup error:", err));
