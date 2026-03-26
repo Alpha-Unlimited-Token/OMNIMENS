@@ -330,7 +330,22 @@ export default function SpectralColorPanel({
     };
   }, []);
 
-  const WHEEL_SIZE = 420;
+  const [wheelContainerWidth, setWheelContainerWidth] = useState(420);
+  const wheelContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const measure = () => {
+      if (wheelContainerRef.current) {
+        const w = wheelContainerRef.current.clientWidth;
+        setWheelContainerWidth(Math.min(420, Math.max(260, w - 16)));
+      }
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [panelView]);
+
+  const WHEEL_SIZE = wheelContainerWidth;
   const WHEEL_RADIUS = WHEEL_SIZE / 2 - 10;
   const CENTER = WHEEL_SIZE / 2;
 
@@ -376,7 +391,7 @@ export default function SpectralColorPanel({
     ctx.stroke();
 
     wheelSizeRef.current = WHEEL_SIZE;
-  }, [wheelLightness]);
+  }, [wheelLightness, WHEEL_SIZE]);
 
   const drawOverlay = useCallback(() => {
     const canvas = wheelOverlayRef.current;
@@ -513,7 +528,7 @@ export default function SpectralColorPanel({
     }
 
     animFrameRef.current = requestAnimationFrame(drawOverlay);
-  }, [spectralMap, spectralGains, soundDecomposition, wheelMode, showAcousticFlow, selectedColor, matchedBins]);
+  }, [spectralMap, spectralGains, soundDecomposition, wheelMode, showAcousticFlow, selectedColor, matchedBins, WHEEL_SIZE]);
 
   useEffect(() => {
     drawColorWheel();
@@ -658,8 +673,8 @@ export default function SpectralColorPanel({
               </div>
             </div>
 
-            <div className="flex gap-4">
-              <div className="relative flex-shrink-0" style={{ width: WHEEL_SIZE, height: WHEEL_SIZE }}>
+            <div ref={wheelContainerRef} className="flex flex-col md:flex-row gap-4">
+              <div className="relative flex-shrink-0 mx-auto md:mx-0" style={{ width: WHEEL_SIZE, height: WHEEL_SIZE }}>
                 <canvas ref={wheelCanvasRef} className="absolute inset-0" style={{ width: WHEEL_SIZE, height: WHEEL_SIZE }} />
                 <canvas ref={wheelOverlayRef} className="absolute inset-0 cursor-crosshair"
                   style={{ width: WHEEL_SIZE, height: WHEEL_SIZE }}

@@ -305,14 +305,21 @@ export default function Home() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
                 <div className="relative flex items-center justify-center p-6 lg:p-10 border-b lg:border-b-0 lg:border-r border-white/5">
-                  <motion.img
-                    src="/images/deep-resonance-hero.png"
-                    alt="Deep Resonance — Consciousness-Powered Analysis"
-                    className="w-full max-w-md rounded-2xl shadow-[0_0_60px_rgba(139,92,246,0.2)]"
+                  <motion.picture
                     initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 1 }}
-                  />
+                  >
+                    <source srcSet="/images/deep-resonance-hero.webp" type="image/webp" />
+                    <img
+                      src="/images/deep-resonance-hero.png"
+                      alt="Deep Resonance — Consciousness-Powered Analysis"
+                      className="w-full max-w-md rounded-2xl shadow-[0_0_60px_rgba(139,92,246,0.2)]"
+                      loading="lazy"
+                      width={800}
+                      height={437}
+                    />
+                  </motion.picture>
                 </div>
 
                 <div className="p-8 lg:p-12 flex flex-col justify-center">
@@ -634,14 +641,21 @@ export default function Home() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
                 <div className="relative flex items-center justify-center p-6 lg:p-10 border-b lg:border-b-0 lg:border-r border-white/5">
-                  <motion.img
-                    src="/images/cognitive-consciousness-tech.png"
-                    alt="Cognitive Consciousness Technology"
-                    className="w-full max-w-md rounded-2xl shadow-[0_0_60px_rgba(245,158,11,0.15)]"
+                  <motion.picture
                     initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 1 }}
-                  />
+                  >
+                    <source srcSet="/images/cognitive-consciousness-tech.webp" type="image/webp" />
+                    <img
+                      src="/images/cognitive-consciousness-tech.png"
+                      alt="Cognitive Consciousness Technology"
+                      className="w-full max-w-md rounded-2xl shadow-[0_0_60px_rgba(245,158,11,0.15)]"
+                      loading="lazy"
+                      width={800}
+                      height={437}
+                    />
+                  </motion.picture>
                 </div>
 
                 <div className="p-8 lg:p-12 flex flex-col justify-center">
