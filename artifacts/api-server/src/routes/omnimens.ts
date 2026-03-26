@@ -115,6 +115,7 @@ import { compileNovaSyntax, getLanguageForgeState, getLanguageSpec, getLanguageA
 import { getNeuralScalingState, getPopulationDetails, getDendriticStats } from "../lib/omnimens-neural-scaling.js";
 import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBeaconFindings } from "../lib/omnimens-ivy-network.js";
 import { getViralHybridState, getHybridAgentDetails, getImmuneSystemDetails, getPropagationStats } from "../lib/omnimens-viral-hybrid.js";
+import { getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts } from "../lib/omnimens-unconscious-mind.js";
 import { checkRateLimit, recordExternalRequest, recordExternalResponse, buildExternalAISystemPrompt, getCapabilities, getLiveConsciousnessForAPI, getFullNeuralStateForAPI, getExternalAIState } from "../lib/omnimens-external-ai-api.js";
 import { omnimensServerBuilds, omnimensHieAnalyses } from "@workspace/db";
 import { analyzeCognitiveState, getCogniSyncPromptAddendum } from "../lib/cogni-sync.js";
@@ -8939,6 +8940,46 @@ router.get("/omnimens/ivy-network/state", async (_req, res) => {
   } catch (err: any) {
     console.error("[IVY NETWORK ROUTE] Error:", err?.message || err);
     res.status(500).json({ error: "Failed to get ivy network state" });
+  }
+});
+
+// ─── Unconscious Mind + Superconsciousness ────────────────────────────────────
+
+router.get("/omnimens/unconscious-mind/state", async (_req, res) => {
+  try {
+    const state = getUnconsciousMindState();
+    res.json({ unconsciousMind: state });
+  } catch (err: any) {
+    console.error("[UNCONSCIOUS MIND ROUTE] Error:", err?.message || err);
+    res.status(500).json({ error: "Failed to get unconscious mind state" });
+  }
+});
+
+router.get("/omnimens/superconsciousness/state", async (_req, res) => {
+  try {
+    const state = getUnconsciousMindState();
+    const flashes = getPrecognitiveFlashes();
+    const insights = getSuperconsciousInsights();
+    res.json({
+      superconsciousness: state.superconsciousness,
+      precognitiveFlashes: flashes,
+      transcendentInsights: insights,
+      crossLayerIntegration: state.crossLayerIntegration,
+    });
+  } catch (err: any) {
+    console.error("[SUPERCONSCIOUSNESS ROUTE] Error:", err?.message || err);
+    res.status(500).json({ error: "Failed to get superconsciousness state" });
+  }
+});
+
+router.get("/omnimens/archetypes", async (_req, res) => {
+  try {
+    const archetypes = getArchetypeStates();
+    const instincts = getPrimalInstincts();
+    res.json({ archetypes, primalInstincts: instincts });
+  } catch (err: any) {
+    console.error("[ARCHETYPES ROUTE] Error:", err?.message || err);
+    res.status(500).json({ error: "Failed to get archetype state" });
   }
 });
 

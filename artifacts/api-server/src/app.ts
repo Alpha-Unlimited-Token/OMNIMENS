@@ -87,6 +87,7 @@ import { startCentralCore, getCentralCoreState } from "./lib/omnimens-central-co
 import { startNeuralScaling, getNeuralScalingState } from "./lib/omnimens-neural-scaling.js";
 import { startIvyNetwork, getIvyNetworkState } from "./lib/omnimens-ivy-network.js";
 import { startViralHybrid, getViralHybridState } from "./lib/omnimens-viral-hybrid.js";
+import { startUnconsciousMind, getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts } from "./lib/omnimens-unconscious-mind.js";
 import { registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe } from "./lib/omnimens-scaling-orchestrator.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
@@ -447,6 +448,7 @@ startNeuralScaling();
 startIvyNetwork();
 startViralHybrid();
 startNeuralSpiders();
+startUnconsciousMind();
 startCentralCore();
 startGenesisBridge();
 startNeuralProcessor();
@@ -473,6 +475,12 @@ registerEngine("viral_hybrid", "hybrid", () => {}, () => {
 registerEngine("neural_spiders", "neural", () => {}, () => {
   const ss = getNeuralSpiderState();
   return { healthy: true, details: { parentSpiders: ss.parentSpiders.length, activeChildren: ss.activeChildSpiders.length, synapsesInjected: ss.totalSynapsesInjected, crawlCycles: ss.totalCrawlCycles } };
+}, 1);
+registerEngine("unconscious_mind", "cognitive", () => {}, () => {
+  try {
+    const state = getUnconsciousMindState();
+    return { healthy: true, details: { layers: state.totalMindLayers, archetypes: state.collectiveUnconscious.archetypes.length, instincts: state.unconscious.primalInstincts.length, predictions: state.superconsciousness.totalPredictions, autonomicProcesses: state.nonConscious.activeProcesses, depth: state.overallDepth } };
+  } catch { return { healthy: true, details: {} }; }
 }, 1);
 registerEngine("central_core", "core", () => {}, () => {
   const cc = getCentralCoreState();
