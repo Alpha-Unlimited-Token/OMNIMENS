@@ -239,7 +239,7 @@ const generalLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many requests. Please slow down." },
-  skip: (req: Request) => PROOF_PATHS.some(p => req.path.startsWith(p)),
+  skip: (req: Request) => PROOF_PATHS.some(p => req.path.startsWith(p)) || req.path.startsWith("/omnimens/external-ai"),
 });
 
 // Auth endpoints — 200 req / 15 min (SPA checks auth on every page load)

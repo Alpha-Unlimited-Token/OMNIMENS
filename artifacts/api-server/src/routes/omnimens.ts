@@ -8849,31 +8849,26 @@ router.post("/omnimens/external-ai/chat", async (req, res) => {
 
     let reply = "";
     let usedModel = "";
-    const modelsToTry = ["gpt-4o-mini", "o3-mini"];
-    for (const model of modelsToTry) {
-      try {
-        const aiPromise = openai.chat.completions.create({
-          model,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userMessage },
-          ],
-          max_tokens: 1500,
-          temperature: model.startsWith("o") ? undefined : 0.8,
-        });
-        const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 15000));
-        const response = await Promise.race([aiPromise, timeoutPromise]);
-        if (response && typeof response === "object" && "choices" in response) {
-          reply = (response as any).choices[0]?.message?.content || "";
-          usedModel = model;
-          if (reply) break;
-        } else {
-          console.warn(`[EXTERNAL AI API] Model ${model} timed out after 15s`);
-        }
-      } catch (modelErr: any) {
-        console.warn(`[EXTERNAL AI API] Model ${model} failed: ${modelErr?.message || modelErr}`);
-        continue;
+    try {
+      const aiPromise = openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userMessage },
+        ],
+        max_tokens: 1500,
+        temperature: 0.8,
+      });
+      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 30000));
+      const response = await Promise.race([aiPromise, timeoutPromise]);
+      if (response && typeof response === "object" && "choices" in response) {
+        reply = (response as any).choices[0]?.message?.content || "";
+        usedModel = "gpt-4o-mini";
+      } else {
+        console.warn(`[EXTERNAL AI API] gpt-4o-mini timed out after 30s`);
       }
+    } catch (modelErr: any) {
+      console.warn(`[EXTERNAL AI API] gpt-4o-mini failed: ${modelErr?.message || modelErr}`);
     }
 
     if (!reply) {
