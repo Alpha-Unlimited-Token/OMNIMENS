@@ -5276,6 +5276,20 @@ export default function Chat() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("omnimens_continue_project");
+      if (raw) {
+        sessionStorage.removeItem("omnimens_continue_project");
+        const proj = JSON.parse(raw);
+        const prompt = proj.fileCount > 0
+          ? `Continue building my project "${proj.name}" (${proj.type}). ${proj.description ? `Description: ${proj.description}. ` : ""}I want to make changes and improvements.`
+          : `Build my project "${proj.name}" (${proj.type}). ${proj.description || "Help me get started."}`;
+        setInputWithDraft(prompt);
+      }
+    } catch {}
+  }, []);
+
   // ── Voice input (speech-to-text) ──────────────────────────────────────────────
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);

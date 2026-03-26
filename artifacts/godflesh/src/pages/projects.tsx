@@ -453,7 +453,11 @@ function ProjectCard({ project, onClick, onDelete, onStar }: { project: Project;
                   <FolderOpen className="w-3.5 h-3.5 text-primary" /> Open project
                 </button>
                 <button
-                  onClick={() => { setMenuOpen(false); setLocation("/chat"); }}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    try { sessionStorage.setItem("omnimens_continue_project", JSON.stringify({ id: project.id, name: project.name, type: project.type, description: project.description, fileCount: project.fileCount || 0 })); } catch {}
+                    setLocation("/chat");
+                  }}
                   className="w-full px-3 py-2 text-left text-xs font-mono text-white/85 hover:bg-white/8 hover:text-white flex items-center gap-2 transition-colors"
                 >
                   <Send className="w-3.5 h-3.5 text-cyan-400" /> Continue in Chat
@@ -521,9 +525,15 @@ function ProjectDetail({ project: initialProject, onBack, onRefresh }: {
   const [editingFile, setEditingFile] = useState(false);
   const [editContent, setEditContent] = useState("");
   const buildLogRef = useRef<HTMLDivElement>(null);
+  const [, setLocation] = useLocation();
 
   const BASE = window.location.origin;
   const publishedUrl = project.slug ? `${BASE}/p/${project.slug}` : null;
+
+  const handleContinueInChat = () => {
+    try { sessionStorage.setItem("omnimens_continue_project", JSON.stringify({ id: project.id, name: project.name, type: project.type, description: project.description, fileCount: files.length })); } catch {}
+    setLocation("/chat");
+  };
 
   const loadFiles = useCallback(async () => {
     const res = await fetch(`/api/omnimens/projects/${project.id}`, { credentials: "include" });
@@ -686,6 +696,10 @@ function ProjectDetail({ project: initialProject, onBack, onRefresh }: {
 
         {/* Actions */}
         <div className="ml-auto flex items-center gap-2">
+          <button onClick={handleContinueInChat}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-mono text-cyan-400 hover:text-cyan-300 border border-cyan-400/30 hover:border-cyan-400/50 rounded-lg transition-all">
+            <Send className="w-3 h-3" /> CONTINUE IN CHAT
+          </button>
           {files.length > 0 && (
             <>
               <button onClick={handleDownloadZip}
@@ -795,15 +809,24 @@ function ProjectDetail({ project: initialProject, onBack, onRefresh }: {
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
               <Zap className="w-12 h-12 text-primary/30 mb-4" />
-              <h3 className="text-white/85 font-mono font-bold mb-2">Build your project with AI</h3>
-              <p className="text-white/70 font-mono text-xs max-w-xs mb-6">Describe what you want to add or change, and OMNIMENS will build it instantly.</p>
-              <div className="w-full max-w-md">
+              <h3 className="text-white/85 font-mono font-bold mb-2">Continue building "{project.name}"</h3>
+              <p className="text-white/70 font-mono text-xs max-w-xs mb-6">Pick up where you left off — continue building in chat with OMNIMENS, or describe changes below.</p>
+              <div className="w-full max-w-md space-y-3">
+                <button onClick={handleContinueInChat}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-mono text-sm font-bold text-cyan-400 border border-cyan-400/30 hover:border-cyan-400/50 hover:bg-cyan-400/5 transition-all">
+                  <Send className="w-4 h-4" /> Continue in Chat
+                </button>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-px bg-white/10" />
+                  <span className="text-[9px] font-mono text-white/30 uppercase tracking-widest">or build here</span>
+                  <div className="flex-1 h-px bg-white/10" />
+                </div>
                 <textarea
                   value={buildPrompt}
                   onChange={e => setBuildPrompt(e.target.value)}
                   placeholder={`Build a complete ${project.type}: ${project.description || "Describe your project..."}`}
-                  rows={4}
-                  className="w-full bg-white/5 border border-white/10 focus:border-primary rounded-xl px-4 py-3 text-white font-mono text-sm outline-none resize-none placeholder:text-white/20 mb-3"
+                  rows={3}
+                  className="w-full bg-white/5 border border-white/10 focus:border-primary rounded-xl px-4 py-3 text-white font-mono text-sm outline-none resize-none placeholder:text-white/20"
                 />
                 <Button onClick={handleBuild} disabled={building} className="w-full gap-2">
                   {building ? <><Loader2 className="w-4 h-4 animate-spin" /> Building...</> : <><Zap className="w-4 h-4" /> Build with OMNIMENS</>}
