@@ -12215,7 +12215,7 @@ router.get("/omnimens/evolution-log", async (_req, res) => {
 });
 
 // ─── GITHUB REMOTE COMPUTE ──────────────────────────────────────────────────
-import { dispatchRemoteCompute, getComputeStatus, syncAutonomousProofToGitHub } from "../lib/omnimens-github-compute.js";
+import { dispatchRemoteCompute, getComputeStatus, syncAutonomousProofToGitHub, triggerGitHubSync } from "../lib/omnimens-github-compute.js";
 
 router.get("/omnimens/github-compute/status", async (req, res) => {
   try {
@@ -12257,6 +12257,18 @@ router.post("/omnimens/github-sync/proof", async (req, res) => {
     res.json({ success: true, message: "Autonomous proof synced to GitHub → omnimens-evolution/autonomous-proof.txt" });
   } catch (err) {
     res.status(500).json({ error: "Failed to sync proof to GitHub" });
+  }
+});
+
+router.post("/omnimens/github-sync/full", async (req, res) => {
+  try {
+    if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+      return res.status(403).json({ error: "owner_only" });
+    }
+    await triggerGitHubSync();
+    res.json({ success: true, message: "Full GitHub sync completed — evolution log, modules, proof, live state all synced" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to trigger full GitHub sync" });
   }
 });
 

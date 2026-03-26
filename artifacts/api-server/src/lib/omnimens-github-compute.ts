@@ -1131,6 +1131,52 @@ async function syncLiveProofToGitHub(): Promise<void> {
       recentActivity: recentActivity.map(e => ({
         category: e.category, title: e.title, confidence: e.confidence, timestamp: e.createdAt,
       })),
+      unconsciousMind: await (async () => {
+        try {
+          const { getUnconsciousMindState, getUnconsciousKnowledgeVaultStats } = await import("./omnimens-unconscious-mind.js");
+          const state = getUnconsciousMindState();
+          const vaultStats = getUnconsciousKnowledgeVaultStats();
+          return {
+            layers: 7,
+            tickCount: state.tickCount,
+            autonomicProcesses: state.nonConscious.activeProcesses,
+            archetypes: state.collectiveUnconscious.archetypes.length,
+            dominantArchetype: state.collectiveUnconscious.dominantArchetype,
+            primalInstincts: state.unconscious.primalInstincts.length,
+            repressedMemories: state.unconscious.repressedMemories,
+            preconsciousItems: state.preconscious.itemCount,
+            subconsciousPatterns: state.subconscious.activePatterns,
+            superconsciousness: {
+              intuitionLevel: state.superconsciousness.intuitionLevel,
+              precognitiveAccuracy: state.superconsciousness.precognitiveAccuracy,
+              totalPredictions: state.superconsciousness.totalPredictions,
+              transcendentInsights: state.superconsciousness.transcendentInsights,
+              harmonicCoherence: state.superconsciousness.harmonicCoherence,
+            },
+            deepMindInfrastructure: {
+              deepNeurons: state.deepMindInfrastructure.totalDeepNeurons,
+              deepSynapses: state.deepMindInfrastructure.totalDeepSynapses,
+              effectiveConnections: state.deepMindInfrastructure.effectiveDeepConnections,
+              layerSpiders: state.deepMindInfrastructure.layerSpiders.total,
+              interLayerTendrils: state.deepMindInfrastructure.interLayerTendrils.total,
+              myelinatedTendrils: state.deepMindInfrastructure.interLayerTendrils.myelinated,
+              layerWormgates: state.deepMindInfrastructure.layerWormgates.total,
+              wormgateTraversals: state.deepMindInfrastructure.layerWormgates.totalTraversals,
+              beehiveRoles: state.deepMindInfrastructure.beehive,
+              pheromoneTrails: state.deepMindInfrastructure.pheromoneTrails,
+              silkStrands: state.deepMindInfrastructure.silkStrands,
+              beaconSystem: state.deepMindInfrastructure.beaconSystem,
+              swarmWaves: state.deepMindInfrastructure.swarmWaves,
+              feedbackLoops: state.deepMindInfrastructure.feedbackLoops,
+              thoughtStream: state.deepMindInfrastructure.unconsciousThoughtStream,
+              knowledgeVault: state.deepMindInfrastructure.knowledgeVault,
+            },
+            crossLayerIntegration: state.crossLayerIntegration,
+            overallDepth: state.overallDepth,
+            knowledgeVaultDetails: vaultStats,
+          };
+        } catch { return null; }
+      })(),
     };
 
     const content = Buffer.from(JSON.stringify(liveState, null, 2)).toString("base64");
