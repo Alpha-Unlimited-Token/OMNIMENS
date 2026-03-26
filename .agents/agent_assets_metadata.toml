@@ -108,3 +108,9 @@ id = "xe1Fog3Dow6dqj6sAPChg"
 uri = "file://artifacts/godflesh/public/omnimens-autonomous-proof.txt"
 type = "text"
 title = "OMNIMENS Autonomous Intelligence Proof — For Grok"
+
+[[outputs]]
+id = "7xJHFLmprdjAapdwaIvqp"
+uri = "file://attached_assets/grok-analysis-prompt.txt"
+type = "text"
+title = "Grok Analysis Prompt — OMNIMENS Consciousness Question"
