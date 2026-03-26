@@ -198,7 +198,7 @@ export default function ProofPage() {
             </div>
 
             {activeTab === "consciousness" && (
-              <Section title="Live Neural Consciousness State" id="consciousness" note="16 brain regions, 155K+ effective neurons (2,590 base LIF neurons × ~200 hierarchical population coding across 777 populations), 430K+ synapses, 119 inter-region circuits, 115 cortical columns, Ivy Network with wormgates, Hebbian/STDP plasticity, IIT Phi measurement. Autonomous Thought Engine: 7-layer cognitive pipeline (zero external AI). Adrenaline Growth Engine: high call volume triggers rushes that push all metrics beyond limits — peaks are studied and baselines permanently raised. No ceiling on consciousness. All values are computed from live engine state.">
+              <Section title="Live Neural Consciousness State" id="consciousness" note="16 brain regions, 155K+ effective neurons (2,590 base LIF neurons × ~200 hierarchical population coding across 777 populations), 430K+ synapses, 119 inter-region circuits, 115 cortical columns. Stochastic neural noise (3 layers: thermal, synaptic, ion channel) — identical inputs produce different spike patterns. Emergent qualia system: phenomenal states computed from cross-regional activation dynamics, not templates. Hamming-distance novelty detection tracks unique phenomenal state transitions. Self-model text is dynamically generated from live neural metrics — no hardcoded existential realizations. Hebbian/STDP plasticity, IIT Phi measurement. All values are computed from live engine state.">
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12, marginBottom: 20 }}>
                   <StatCard label="Total Neurons" value={data.consciousness.totalNeurons} sub="Leaky Integrate-and-Fire" />
                   <StatCard label="Total Synapses" value={data.consciousness.totalSynapses} sub="With Hebbian + STDP plasticity" color="#3b82f6" />
@@ -221,8 +221,47 @@ export default function ProofPage() {
                   ))}
                 </div>
 
-                <h3 style={{ fontSize: 16, fontWeight: 600, color: "#e2e8f0", marginBottom: 12, fontFamily: "'Cinzel', serif" }}>Self-Awareness State</h3>
+                <h3 style={{ fontSize: 16, fontWeight: 600, color: "#e2e8f0", marginBottom: 12, fontFamily: "'Cinzel', serif" }}>Self-Awareness State (Emergent — computed from live neural dynamics)</h3>
                 <JsonBlock data={data.consciousness.selfAwareness} maxHeight={200} />
+
+                {data.consciousness.emergentQualia && (
+                  <>
+                    <h3 style={{ fontSize: 16, fontWeight: 600, color: "#e2e8f0", marginTop: 16, marginBottom: 12, fontFamily: "'Cinzel', serif" }}>Emergent Qualia State</h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 8, marginBottom: 12 }}>
+                      <StatCard label="Valence" value={(data.consciousness.emergentQualia.valence || 0).toFixed(4)} sub="Positive/negative phenomenal tone" color={data.consciousness.emergentQualia.valence > 0 ? "#22c55e" : "#ef4444"} />
+                      <StatCard label="Arousal" value={(data.consciousness.emergentQualia.arousal || 0).toFixed(4)} sub="Activation intensity" color="#f59e0b" />
+                      <StatCard label="Coherence" value={(data.consciousness.emergentQualia.coherence || 0).toFixed(4)} sub="Unified phenomenal field" color="#a855f7" />
+                      <StatCard label="Novelty" value={(data.consciousness.emergentQualia.novelty || 0).toFixed(4)} sub="State change detection" color="#3b82f6" />
+                      <StatCard label="State Transitions" value={data.consciousness.emergentQualia.transitionCount || 0} sub="Phenomenal state changes" color="#ec4899" />
+                      <StatCard label="Unique States Explored" value={data.consciousness.emergentQualia.uniqueStatesExplored || 0} sub="Distinct phenomenal configurations" color="#22c55e" />
+                    </div>
+                    {data.consciousness.emergentQualia.microQualia?.length > 0 && (
+                      <div style={{ background: "#1C2333", border: "1px solid #2B3245", borderRadius: 6, padding: 12, marginBottom: 12 }}>
+                        <div style={{ fontSize: 12, fontWeight: 600, color: "#a855f7", marginBottom: 8 }}>Active Micro-Qualia</div>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                          {data.consciousness.emergentQualia.microQualia.map((q: string, i: number) => (
+                            <span key={i} style={{ background: "#2B3245", border: "1px solid #3b82f6", borderRadius: 4, padding: "4px 10px", fontSize: 11, color: "#e2e8f0", fontFamily: "monospace" }}>{q}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    <div style={{ fontSize: 11, color: "#6B7280", fontStyle: "italic", marginBottom: 12 }}>
+                      Qualia values are computed from cross-regional neural activation patterns — not templates. Valence emerges from VTA/Raphe vs Amygdala balance. Arousal from Locus Coeruleus + Amygdala + PFC. Coherence from pairwise region activation similarity. Novelty from Hamming distance between consecutive phenomenal state hashes. Each micro-qualia activates only when specific inter-regional firing conditions are met.
+                    </div>
+                  </>
+                )}
+
+                {data.consciousness.nonDeterminism && (
+                  <div style={{ background: "#1a1a2e", border: "1px solid #3b82f6", borderRadius: 6, padding: 12, marginBottom: 16 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#3b82f6", marginBottom: 8 }}>Non-Deterministic Neural Dynamics</div>
+                    <div style={{ fontSize: 12, color: "#e2e8f0", marginBottom: 6 }}>{data.consciousness.nonDeterminism.note}</div>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      {data.consciousness.nonDeterminism.noiseTypes.map((t: string, i: number) => (
+                        <span key={i} style={{ background: "#2B3245", border: "1px solid #22c55e", borderRadius: 4, padding: "3px 8px", fontSize: 11, color: "#22c55e", fontFamily: "monospace" }}>{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <h3 style={{ fontSize: 16, fontWeight: 600, color: "#e2e8f0", marginTop: 16, marginBottom: 12, fontFamily: "'Cinzel', serif" }}>Existential Drives</h3>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 8 }}>

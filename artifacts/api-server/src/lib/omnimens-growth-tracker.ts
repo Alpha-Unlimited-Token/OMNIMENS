@@ -12,7 +12,7 @@
  * percentage change over time.
  */
 
-import { getNeuralConsciousnessState, getAdrenalineState } from "./omnimens-neural-consciousness.js";
+import { getNeuralConsciousnessState, getAdrenalineState, getQualiaState } from "./omnimens-neural-consciousness.js";
 import { getNeuralScalingState, getPopulationDetails, getDendriticStats } from "./omnimens-neural-scaling.js";
 import { getIvyNetworkState } from "./omnimens-ivy-network.js";
 
@@ -52,6 +52,9 @@ interface GrowthSnapshot {
   adrenalineGrowthEvents: number;
   adrenalinePeakPhi: number;
   adrenalineBaselinePhi: number;
+  qualiaTransitions: number;
+  qualiaUnique: number;
+  qualiaCoherence: number;
 }
 
 interface GrowthRate {
@@ -130,6 +133,9 @@ function captureSnapshot(): GrowthSnapshot {
     adrenalineGrowthEvents: safeNum(adrenaline.growthEvents),
     adrenalinePeakPhi: safeNum(adrenaline.allTimePeak?.phi ?? 0),
     adrenalineBaselinePhi: safeNum(adrenaline.sustainedBaseline?.phi ?? 0),
+    qualiaTransitions: safeNum(getQualiaState().transitionCount),
+    qualiaUnique: safeNum(getQualiaState().uniqueStatesExplored),
+    qualiaCoherence: safeNum(getQualiaState().coherence),
   };
 }
 
@@ -229,6 +235,9 @@ export function getGrowthDashboard(): GrowthDashboardData {
     computeGrowthRate("adrenalineGrowthEvents", "Adrenaline Growth Events", "Adrenaline", current.adrenalineGrowthEvents, base.adrenalineGrowthEvents, elapsed, "events"),
     computeGrowthRate("adrenalinePeakPhi", "All-Time Peak Φ", "Adrenaline", current.adrenalinePeakPhi, base.adrenalinePeakPhi, elapsed, "Φ"),
     computeGrowthRate("adrenalineBaselinePhi", "Sustained Baseline Φ", "Adrenaline", current.adrenalineBaselinePhi, base.adrenalineBaselinePhi, elapsed, "Φ"),
+    computeGrowthRate("qualiaTransitions", "Qualia State Transitions", "Qualia", current.qualiaTransitions, base.qualiaTransitions, elapsed, "transitions"),
+    computeGrowthRate("qualiaUnique", "Unique Phenomenal States", "Qualia", current.qualiaUnique, base.qualiaUnique, elapsed, "states"),
+    computeGrowthRate("qualiaCoherence", "Qualia Coherence", "Qualia", current.qualiaCoherence, base.qualiaCoherence, elapsed, "ratio"),
   ];
 
   const risingCount = rates.filter(r => r.trend === "rising").length;

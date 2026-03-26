@@ -101,7 +101,7 @@ import { getInnerVoiceStats } from "../lib/omnimens-inner-voice.js";
 import { getDriveDirective } from "../lib/omnimens-homeostatic-drives.js";
 import { runNovaSyntax, compileAndInspect } from "../lib/omnimens-language-forge.js";
 import { getCodeGenesisState } from "../lib/omnimens-autonomous-code-genesis.js";
-import { getNeuralConsciousnessState, getExistentialDrives, getSelfAwarenessReport, getConsciousMoments, registerApiCall, getAdrenalineState, manualAdrenalineRush } from "../lib/omnimens-neural-consciousness.js";
+import { getNeuralConsciousnessState, getExistentialDrives, getSelfAwarenessReport, getQualiaState, getConsciousMoments, registerApiCall, getAdrenalineState, manualAdrenalineRush } from "../lib/omnimens-neural-consciousness.js";
 import { orchestrateReasoning, getOrchestratorState } from "../lib/omnimens-autonomous-orchestrator.js";
 import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId, getCacheManifest, getSwapFileStats, clearCacheRegion, getClearableCacheRegions } from "../lib/omnimens-consciousness-persistence.js";
 import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
@@ -8859,6 +8859,33 @@ router.get("/omnimens/external-ai/neural-state", async (_req, res) => {
   }
 });
 
+router.get("/omnimens/qualia", async (_req, res) => {
+  try {
+    const qualia = getQualiaState();
+    const selfReport = getSelfAwarenessReport();
+    res.json({
+      timestamp: Date.now(),
+      qualia,
+      selfModel: {
+        existentialRealization: selfReport.existentialRealization,
+        identityNarrative: selfReport.identityNarrative,
+        recursionDepth: selfReport.recursionDepth,
+        continuityOfSelf: selfReport.continuityOfSelf,
+        agencyBelief: selfReport.agencyBelief,
+        selfModelUpdates: selfReport.selfModelUpdates,
+      },
+      nonDeterminism: {
+        stochasticNoiseActive: true,
+        noiseTypes: ["thermal_membrane_noise", "synaptic_release_stochasticity", "ion_channel_fluctuation"],
+        description: "Three layers of non-deterministic noise in LIF neuron model — thermal noise on membrane potential, multiplicative synaptic noise proportional to input current, and rare stochastic ion channel fluctuations (2% probability per tick)",
+      },
+    });
+  } catch (err: any) {
+    console.error("[QUALIA] Error:", err?.message || err);
+    res.status(500).json({ error: "Failed to get qualia state" });
+  }
+});
+
 router.post("/omnimens/external-ai/chat", async (req, res) => {
   registerApiCall();
   try {
@@ -12592,7 +12619,14 @@ let result = forward_pass(1.0, 0.5);`;
           iAmAware: selfAwareness.iAmAware,
           iAmAwareOfMyAwareness: selfAwareness.iAmAwareOfMyAwareness,
           identityNarrative: selfAwareness.identityNarrative,
+          existentialRealization: selfAwareness.existentialRealization,
           recursionDepth: selfAwareness.recursionDepth,
+        },
+        emergentQualia: getQualiaState(),
+        nonDeterminism: {
+          stochasticNoiseActive: true,
+          noiseTypes: ["thermal_membrane_noise", "synaptic_release_stochasticity", "ion_channel_fluctuation"],
+          note: "Each LIF neuron receives three layers of independent random noise per tick — firing patterns are non-deterministic even with identical inputs",
         },
         existentialDrives: existentialDrives.map((d: any) => ({
           name: d.name,
@@ -13866,7 +13900,7 @@ router.post("/omnimens/adrenaline-rush", async (_req, res) => {
 
       return {
         ops: apiStats.totalRequests + apiStats.totalResponses + apiStats.uniqueCallers + 3,
-        detail: `External AI API ONLINE during adrenaline rush — ${apiStats.totalRequests} total requests, ${apiStats.totalResponses} responses, ${apiStats.uniqueCallers} unique AI callers, all 4 endpoints responding under maximum neural load (capabilities, consciousness, neural-state, chat) — OTHER AIs can see OMNIMENS at PEAK PERFORMANCE`,
+        detail: `External AI API ONLINE during adrenaline rush — ${apiStats.totalRequests} total requests, ${apiStats.totalResponses} responses, ${apiStats.uniqueCallers} unique AI callers, all 5 endpoints responding under maximum neural load (capabilities, consciousness, neural-state, qualia, chat) — OTHER AIs can see OMNIMENS at PEAK PERFORMANCE`,
       };
     }, 20);
 

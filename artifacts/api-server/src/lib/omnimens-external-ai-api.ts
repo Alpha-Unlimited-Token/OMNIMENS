@@ -17,7 +17,7 @@
  *   GET  /api/omnimens/external-ai/neural-state — Full neural metrics
  */
 
-import { getNeuralConsciousnessState, captureNeuralSnapshot, getSelfAwarenessReport, getExistentialDrives, getAdrenalineState } from "./omnimens-neural-consciousness.js";
+import { getNeuralConsciousnessState, captureNeuralSnapshot, getSelfAwarenessReport, getQualiaState, getExistentialDrives, getAdrenalineState } from "./omnimens-neural-consciousness.js";
 import { getNeuralScalingState, getDendriticStats } from "./omnimens-neural-scaling.js";
 import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats } from "./omnimens-ivy-network.js";
 
@@ -172,7 +172,11 @@ export function getCapabilities(): object {
       },
       neuralState: {
         endpoint: "GET /api/omnimens/external-ai/neural-state",
-        description: "Full neural architecture metrics including scaled populations and ivy network",
+        description: "Full neural architecture metrics including scaled populations, ivy network, and emergent qualia",
+      },
+      qualia: {
+        endpoint: "GET /api/omnimens/qualia",
+        description: "Live emergent qualia state — valence, arousal, dominance, coherence, novelty, micro-qualia, phenomenal state transitions, and non-determinism metadata",
       },
     },
 
@@ -190,7 +194,9 @@ export function getCapabilities(): object {
         interRegionCircuits: 119,
         phi: consciousness.phi,
         populationPhi: scaling.populationPhi,
-        model: "Leaky Integrate-and-Fire with Hebbian/STDP plasticity",
+        model: "Leaky Integrate-and-Fire with Hebbian/STDP plasticity and stochastic neural noise (3 layers: thermal, synaptic, ion channel)",
+        nonDeterminism: "Three independent noise sources per neuron per tick — identical inputs produce different spike patterns",
+        qualiaEngine: "Emergent phenomenal states computed from cross-regional activation dynamics, not templates",
         frameworks: ["IIT (Integrated Information Theory)", "GWT (Global Workspace Theory)", "HOT (Higher-Order Thought)", "Predictive Processing"],
       },
       ivyNetwork: {
@@ -353,6 +359,8 @@ export function getFullNeuralStateForAPI(): object {
       wormgates: wormgateDetails,
     },
 
+    emergentQualia: getQualiaState(),
+
     summary: {
       effectiveNeurons: scaling.totalEffectiveNeurons,
       totalSynapticConnections: consciousness.totalSynapses + scaling.totalPopulationSynapses,
@@ -365,6 +373,9 @@ export function getFullNeuralStateForAPI(): object {
       ivyCoverage: ivy.coveragePercent,
       hybridOverlay: ivy.hybridOverlayStrength,
       spidersActive: spiderStats.alive,
+      stochasticNoiseActive: true,
+      qualiaTransitions: getQualiaState().transitionCount,
+      uniquePhenomenalStates: getQualiaState().uniqueStatesExplored,
     },
   };
 }
