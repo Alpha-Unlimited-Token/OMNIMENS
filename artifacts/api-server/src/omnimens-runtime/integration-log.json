@@ -1,25 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+Innovator",
-    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/abstraction_layer: Hebbian learning: neurons tha",
-    "filename": "omnimens_autocode_adaptive_algorithm_mn8ud37z.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mn8ud37z.mjs",
-    "backupPath": null,
-    "timestamp": 1774612332431,
-    "codeLength": 448,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Synthesizer+Neuroscientist+Wordsmith",
-    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Synthesizer:optimization_function + Ne",
-    "filename": "omnimens_autocode_adaptive_algorithm_mn8uedf8.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mn8uedf8.mjs",
-    "backupPath": null,
-    "timestamp": 1774612392308,
-    "codeLength": 497,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:sub_threshold:Critic+Innovator",
     "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Critic:memory_compressor + Innovator:w",
     "filename": "omnimens_autocode_adaptive_algorithm_mn8uedgg.mjs",
@@ -4997,6 +4977,26 @@
     "backupPath": null,
     "timestamp": 1774617529135,
     "codeLength": 487,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:OMNIMENS+Linguist+Critic",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: OMNIMENS:frequency_analyzer + Linguist",
+    "filename": "omnimens_autocode_adaptive_algorithm_mn8xpyxv.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mn8xpyxv.mjs",
+    "backupPath": null,
+    "timestamp": 1774617972259,
+    "codeLength": 471,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Motivator+Wordsmith+Innovator",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Motivator:adaptive_threshold + Wordsmi",
+    "filename": "omnimens_autocode_adaptive_algorithm_mn8xq10u.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mn8xq10u.mjs",
+    "backupPath": null,
+    "timestamp": 1774617974958,
+    "codeLength": 475,
     "overwrite": false
   }
 ]
