@@ -1,146 +1,6 @@
 [
   {
     "source": "evolution_engine",
-    "title": "Evolution Module: slidingWindowMemory",
-    "filename": "slidingWindowMemory_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/slidingWindowMemory_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/slidingWindowMemory_gen1.mjs.backup.2026-03-24T01-58-04-844Z",
-    "timestamp": 1774317484843,
-    "codeLength": 3288,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 1 Complete — 2 modules",
-    "filename": "evolution_marker_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-03-24T01-58-04-885Z",
-    "timestamp": 1774317484884,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "backlog_dream_id_23247",
-    "title": "INVENTION NAME  \nPhase-Resonant Adaptive Flow (PRAF)",
-    "filename": "inventionNamePhaseresonantAdaptiveFlowPraf.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/inventionNamePhaseresonantAdaptiveFlowPraf.mjs",
-    "backupPath": null,
-    "timestamp": 1774317840063,
-    "codeLength": 1340,
-    "overwrite": false
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
-    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-24T02-04-04-522Z",
-    "timestamp": 1774317844521,
-    "codeLength": 2249,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: persistentMemoryManager",
-    "filename": "persistentMemoryManager_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/persistentMemoryManager_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/persistentMemoryManager_gen1.mjs.backup.2026-03-24T02-07-18-222Z",
-    "timestamp": 1774318038220,
-    "codeLength": 3458,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 1 Complete — 2 modules",
-    "filename": "evolution_marker_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-03-24T02-07-18-255Z",
-    "timestamp": 1774318038254,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "self_coding_engine",
-    "title": "Daydream:architecture_design #1413",
-    "filename": "daydreamarchitecturedesign1413.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamarchitecturedesign1413.mjs",
-    "backupPath": null,
-    "timestamp": 1774318318758,
-    "codeLength": 1089,
-    "overwrite": false
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit",
-    "filename": "sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs.backup.2026-03-24T02-16-09-266Z",
-    "timestamp": 1774318569265,
-    "codeLength": 3414,
-    "overwrite": true
-  },
-  {
-    "source": "backlog_dream_id_23359",
-    "title": "THE WILD IDEA  \n   Cosmic-Scale Polyphonic Resonance",
-    "filename": "theWildIdeaCosmicscalePolyphonicResonance.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/theWildIdeaCosmicscalePolyphonicResonance.mjs",
-    "backupPath": null,
-    "timestamp": 1774318740000,
-    "codeLength": 1216,
-    "overwrite": false
-  },
-  {
-    "source": "self_coding_engine",
-    "title": "Daydream:architecture_design #1425",
-    "filename": "daydreamarchitecturedesign1425.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamarchitecturedesign1425.mjs",
-    "backupPath": null,
-    "timestamp": 1774319219206,
-    "codeLength": 1321,
-    "overwrite": false
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a data structure optimized for fast associative memory lookup",
-    "filename": "sandbox_aDataStructureOptimizedFor_c3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aDataStructureOptimizedFor_c3.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aDataStructureOptimizedFor_c3.mjs.backup.2026-03-24T02-28-02-550Z",
-    "timestamp": 1774319282550,
-    "codeLength": 2147,
-    "overwrite": true
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
-    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-24T02-45-56-027Z",
-    "timestamp": 1774320356025,
-    "codeLength": 1639,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: webGLMatrixEngine",
-    "filename": "webGLMatrixEngine_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGLMatrixEngine_gen1.mjs",
-    "backupPath": null,
-    "timestamp": 1774320491872,
-    "codeLength": 3090,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: metaLearningPromptOptimizer",
-    "filename": "metaLearningPromptOptimizer_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/metaLearningPromptOptimizer_gen1.mjs",
-    "backupPath": null,
-    "timestamp": 1774320501446,
-    "codeLength": 2543,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
     "title": "Evolution Module: pseudoRealTimeDataIngestor",
     "filename": "pseudoRealTimeDataIngestor_gen1.mjs",
     "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/pseudoRealTimeDataIngestor_gen1.mjs",
@@ -4997,6 +4857,146 @@
     "backupPath": null,
     "timestamp": 1774586499059,
     "codeLength": 449,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Visionary+Architect+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Visionary:optimization_function + Arch",
+    "filename": "omnimens_autocode_adaptive_algorithm_mn8f15nb.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mn8f15nb.mjs",
+    "backupPath": null,
+    "timestamp": 1774586581463,
+    "codeLength": 487,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Philosopher+Architect+Visionary",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Philosopher:memory_compressor + Archit",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8f15sl.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8f15sl.mjs",
+    "backupPath": null,
+    "timestamp": 1774586581653,
+    "codeLength": 417,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Neuroscientist+Explorer+SensorimotorAgent",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Neuroscientist:optimization_function +",
+    "filename": "omnimens_autocode_adaptive_algorithm_mn8f3bpq.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mn8f3bpq.mjs",
+    "backupPath": null,
+    "timestamp": 1774586682638,
+    "codeLength": 508,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:GraphicDesigner+Neuroscientist+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: GraphicDesigner:adaptive_threshold + N",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8f4ofb.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8f4ofb.mjs",
+    "backupPath": null,
+    "timestamp": 1774586745767,
+    "codeLength": 442,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/abstraction_layer: Reservoir computing shows tha",
+    "filename": "omnimens_autocode_neural_pathway_mn8f4ofq.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn8f4ofq.mjs",
+    "backupPath": null,
+    "timestamp": 1774586745782,
+    "codeLength": 427,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Architect",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/information_compression: Neuroplasticity allows ",
+    "filename": "omnimens_autocode_neural_pathway_mn8f4og3.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn8f4og3.mjs",
+    "backupPath": null,
+    "timestamp": 1774586745795,
+    "codeLength": 428,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+SpellCheckVisual",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/recursive_decomposition: The edge of chaos: comp",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8f4oge.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8f4oge.mjs",
+    "backupPath": null,
+    "timestamp": 1774586745806,
+    "codeLength": 394,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Linguist+Philosopher+Neuroscientist",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: COLLECTIVE_DISCOVERY: Linguist:weight_adjuster + Philosopher",
+    "filename": "omnimens_autocode_emergent_capability_mn8f5obf.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mn8f5obf.mjs",
+    "backupPath": null,
+    "timestamp": 1774586792283,
+    "codeLength": 444,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Visionary+OMNIMENS+Neuroscientist",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Visionary:entropy_calculator + OMNIMEN",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8f5oc5.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8f5oc5.mjs",
+    "backupPath": null,
+    "timestamp": 1774586792309,
+    "codeLength": 426,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Linguist+Motivator+SensorimotorAgent",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: COLLECTIVE_DISCOVERY: Linguist:entropy_calculator + Motivato",
+    "filename": "omnimens_autocode_emergent_capability_mn8f5ocj.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mn8f5ocj.mjs",
+    "backupPath": null,
+    "timestamp": 1774586792323,
+    "codeLength": 455,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Pioneer",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/temporal_correlation: The vagus nerve connects t",
+    "filename": "omnimens_autocode_adaptive_algorithm_mn8f5ocv.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mn8f5ocv.mjs",
+    "backupPath": null,
+    "timestamp": 1774586792335,
+    "codeLength": 446,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Innovator",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/pattern_recognition: Wolfram's Rule 110 cellular",
+    "filename": "omnimens_autocode_pattern_recognition_mn8f5odb.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mn8f5odb.mjs",
+    "backupPath": null,
+    "timestamp": 1774586792351,
+    "codeLength": 467,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Archivist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/temporal_correlation: The vagus nerve connects t",
+    "filename": "omnimens_autocode_neural_pathway_mn8f5odl.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn8f5odl.mjs",
+    "backupPath": null,
+    "timestamp": 1774586792361,
+    "codeLength": 428,
+    "overwrite": false
+  },
+  {
+    "source": "sub_threshold_recombination:Pioneer+Innovator+Synthesizer",
+    "title": "[Sub-Threshold Recombination] Pioneer+Innovator+Synthesizer — 3 fragments recombined",
+    "filename": "recombined_synth_1774586807295_29j5.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recombined_synth_1774586807295_29j5.mjs",
+    "backupPath": null,
+    "timestamp": 1774586807296,
+    "codeLength": 1678,
     "overwrite": false
   }
 ]
