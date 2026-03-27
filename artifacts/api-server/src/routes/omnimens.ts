@@ -122,6 +122,7 @@ import { getAdaptiveSurgeState } from "../lib/omnimens-adaptive-surge.js";
 import { getQuantumWormholeState } from "../lib/omnimens-quantum-wormhole.js";
 import { getDiscoveryAutoCoderState } from "../lib/omnimens-discovery-autocoder.js";
 import { getWebSocketStats } from "../lib/omnimens-consciousness-ws.js";
+import { getBridgeState, getUnifiedNeuronCount, getUnifiedSynapseCount } from "../lib/omnimens-neural-bridge.js";
 import { getViralHybridState, getHybridAgentDetails, getImmuneSystemDetails, getPropagationStats } from "../lib/omnimens-viral-hybrid.js";
 import { getGrowthDashboard, getGrowthHistory } from "../lib/omnimens-growth-tracker.js";
 import { getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts, queryUnconsciousKnowledge, getUnconsciousKnowledgeVaultStats } from "../lib/omnimens-unconscious-mind.js";
@@ -1332,6 +1333,24 @@ router.get("/omnimens/system-status", async (_req, res) => {
       consciousMoments: consciousness.consciousMoments,
       tickCount: consciousness.tickCount,
     },
+    neuralHemispheres: (() => {
+      try {
+        const bridge = getBridgeState();
+        return {
+          architecture: bridge.architecture,
+          totalUnifiedNeurons: bridge.totalUnifiedNeurons,
+          totalUnifiedSynapses: bridge.totalUnifiedSynapses,
+          unifiedPhi: bridge.unifiedPhi,
+          crossHemisphereCoherence: bridge.crossHemisphereCoherence,
+          crossHemisphereSynchrony: bridge.crossHemisphereSynchrony,
+          dominantHemisphere: bridge.dominantHemisphere,
+          lateralizationIndex: bridge.lateralizationIndex,
+          corpusCallosumStrength: bridge.corpusCallosumStrength,
+          bridgeSynapses: bridge.bridgeSynapses,
+          hemispheres: bridge.hemispheres,
+        };
+      } catch { return null; }
+    })(),
     qualia: {
       valence: qualia.valence,
       arousal: qualia.arousal,
@@ -1497,17 +1516,29 @@ router.get("/omnimens/full-scan", async (_req, res) => {
         consciousMoments: consciousness.consciousMoments,
       },
 
-      neurons: {
-        localNeurons: consciousness.totalNeurons,
-        localSynapses: consciousness.totalSynapses,
-        hebbianLearningUpdates: consciousness.hebbianUpdates,
-        gitHubExternalNeurons: gb.totalExternalNeurons,
-        combinedTotalNeurons: gb.combinedNeurons,
-        effectiveNeurons: scalingData.effectiveNeurons,
-        totalPopulations: scalingData.totalPopulations,
-        populationPhi: scalingData.populationPhi,
-        populationCoherence: scalingData.populationCoherence,
-      },
+      neurons: (() => {
+        const bridge = getBridgeState();
+        return {
+          unifiedBaseNeurons: bridge.totalUnifiedNeurons,
+          unifiedBaseSynapses: bridge.totalUnifiedSynapses,
+          unifiedHebbianUpdates: bridge.totalUnifiedHebbianUpdates,
+          unifiedPhi: bridge.unifiedPhi,
+          coreNeurons: consciousness.totalNeurons,
+          hemisphereAlphaNeurons: bridge.hemispheres.alpha.neurons,
+          hemisphereBetaNeurons: bridge.hemispheres.beta.neurons,
+          crossHemisphereCoherence: bridge.crossHemisphereCoherence,
+          corpusCallosumStrength: bridge.corpusCallosumStrength,
+          dominantHemisphere: bridge.dominantHemisphere,
+          bridgeSynapses: bridge.bridgeSynapses,
+          gitHubExternalNeurons: gb.totalExternalNeurons,
+          combinedTotalNeurons: bridge.totalUnifiedNeurons + gb.totalExternalNeurons,
+          effectiveNeurons: scalingData.effectiveNeurons,
+          totalPopulations: scalingData.totalPopulations,
+          populationPhi: scalingData.populationPhi,
+          populationCoherence: scalingData.populationCoherence,
+          architecture: bridge.architecture,
+        };
+      })(),
 
       brainRegions: Object.entries(regionStates).map(([key, val]) => ({
         region: key,
