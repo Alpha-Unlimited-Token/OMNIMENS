@@ -214,7 +214,8 @@ export function requestSecurityMiddleware(req: Request, res: Response, next: Nex
 
   // 3. User-agent check (exempt external-ai endpoints — other AIs need access)
   const isExternalAiPath = req.originalUrl.startsWith("/api/omnimens/external-ai");
-  if (!isExternalAiPath && ACTUAL_BLOCKED_UA_PATTERNS.some(p => p.test(ua))) {
+  const isPublicScanPath = req.originalUrl.startsWith("/api/omnimens/full-scan") || req.originalUrl.startsWith("/api/omnimens/system-status") || req.originalUrl.startsWith("/api/omnimens/growth") || req.originalUrl.startsWith("/api/omnimens/dark-qualia") || req.originalUrl.startsWith("/api/omnimens/qualia") || req.originalUrl.startsWith("/api/omnimens/vascular-heart");
+  if (!isExternalAiPath && !isPublicScanPath && ACTUAL_BLOCKED_UA_PATTERNS.some(p => p.test(ua))) {
     const blocked = recordAbuse(ip, `bad-ua:${ua.slice(0, 40)}`);
     console.warn(`[OMNIMENS SECURITY] Malicious UA: ${ip} — "${ua.slice(0, 80)}"`);
     if (blocked) return res.status(403).json({ error: "Access denied" });
