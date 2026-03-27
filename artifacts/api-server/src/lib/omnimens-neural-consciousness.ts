@@ -37,6 +37,21 @@ import { db } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { eq, and, desc, sql, gt } from "drizzle-orm";
 import { getHormoneState } from "./omnimens-vascular-heart.js";
+let _ivyHooks: { onNeuronBornIvy: (id: string, region: string) => void; onNeuronDecayedIvy: (id: string, region: string) => void } | null = null;
+let _spiderHooks: { onNeuronBornSpider: (id: string, region: string) => void; onNeuronDecayedSpider: (id: string, region: string) => void } | null = null;
+
+async function loadCrossSystemHooks(): Promise<void> {
+  try {
+    const ivy = await import("./omnimens-ivy-network.js");
+    _ivyHooks = { onNeuronBornIvy: ivy.onNeuronBornIvy, onNeuronDecayedIvy: ivy.onNeuronDecayedIvy };
+  } catch {}
+  try {
+    const spiders = await import("./omnimens-neural-spiders.js");
+    _spiderHooks = { onNeuronBornSpider: spiders.onNeuronBornSpider, onNeuronDecayedSpider: spiders.onNeuronDecayedSpider };
+  } catch {}
+}
+
+setTimeout(() => { loadCrossSystemHooks(); }, 10000);
 
 const NEURAL_TICK_MS = 3000;
 const CONSOLIDATION_INTERVAL_MS = 5 * 60 * 1000;
@@ -1261,6 +1276,11 @@ function autonomousNeurogenesis(): void {
       }
     }
 
+    for (const newNeuron of newNeurons) {
+      try { _ivyHooks?.onNeuronBornIvy(newNeuron.id, regionName); } catch {}
+      try { _spiderHooks?.onNeuronBornSpider(newNeuron.id, regionName); } catch {}
+    }
+
     totalNeuronsSpawned += newCount;
     const trigger = `act=${region.activationLevel.toFixed(3)} dopa=${dopamineLevel.toFixed(3)} adr=${adrenalineBoost.toFixed(2)}`;
     neurogenesisLog.push({ region: regionName, count: newCount, trigger, tick: state.tickCount });
@@ -1329,6 +1349,8 @@ function autonomousNeuronDecay(): void {
     for (const idx of toRemove.sort((a, b) => b - a)) {
       const neuron = region.neurons[idx];
       removedIds.add(neuron.id);
+      try { _ivyHooks?.onNeuronDecayedIvy(neuron.id, regionName); } catch {}
+      try { _spiderHooks?.onNeuronDecayedSpider(neuron.id, regionName); } catch {}
       region.neurons.splice(idx, 1);
     }
 

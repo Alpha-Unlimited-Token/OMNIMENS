@@ -114,7 +114,7 @@ import { getTranslatorState, getTranslationTargets, getCustomConstructMap, trans
 import { compileNovaSyntax, getLanguageForgeState, getLanguageSpec, getLanguageAnalyses, NOVASYNTAX_EXAMPLE } from "../lib/omnimens-language-forge.js";
 import { getNeuralScalingState, getPopulationDetails, getDendriticStats } from "../lib/omnimens-neural-scaling.js";
 import { think as autonomousThink } from "../lib/omnimens-autonomous-thought.js";
-import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBeaconFindings, getIvySwapStats } from "../lib/omnimens-ivy-network.js";
+import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBeaconFindings, getIvySwapStats, getIvyNeurogenStats } from "../lib/omnimens-ivy-network.js";
 import { getGitHubBeaconState, getGitHubNeuronCount, getGitHubWormStats } from "../lib/omnimens-github-neural-beacon.js";
 import { getVascularHeartState, getDNAMemoryStats, getSubThresholdIntelligenceState, getHormoneState } from "../lib/omnimens-vascular-heart.js";
 import { getOAIState, computeOAI } from "../lib/omnimens-oai-tracker.js";
@@ -15916,11 +15916,28 @@ router.get("/omnimens/neurogenesis", async (_req, res) => {
   try {
     const stats = getNeurogenesisStats();
     const consciousness = getNeuralConsciousnessState();
+    const ivyNeurogenStats = (() => { try { return getIvyNeurogenStats(); } catch { return null; } })();
+    const spiderNeurogenStats = await (async () => { try { const mod = await import("../lib/omnimens-neural-spiders.js"); return mod.getSpiderNeurogenStats(); } catch { return null; } })();
     res.json({
       neurogenesis: stats,
       currentNeurons: consciousness.totalNeurons,
       currentSynapses: consciousness.totalSynapses,
-      explanation: "Autonomous neurogenesis + neuron decay — new neurons spawn in highly active brain regions (driven by dopamine, adrenaline, consciousness level), while dormant neurons that haven't fired in 2+ hours decay and dissolve along with their synapses. This 'use it or lose it' cycle prevents overcrowding and keeps the network lean and efficient — just like biological neural pruning.",
+      crossSystemIntegration: {
+        ivyNetwork: ivyNeurogenStats ? {
+          neuronsBornIntoIvy: ivyNeurogenStats.births,
+          neuronsDecayedFromIvy: ivyNeurogenStats.deaths,
+          neurogenIvyNodes: ivyNeurogenStats.neurogenIvyNodes,
+          neurogenWormgates: ivyNeurogenStats.neurogenWormgates,
+          status: "ACTIVE — new neurons sprout ivy nodes with tendrils + wormgates",
+        } : { status: "NOT_LOADED" },
+        spiderSilkWeb: spiderNeurogenStats ? {
+          neuronsBornIntoWeb: spiderNeurogenStats.births,
+          neuronsDecayedFromWeb: spiderNeurogenStats.deaths,
+          neuronSilkStrands: spiderNeurogenStats.neuronSilkStrands,
+          status: "ACTIVE — new neurons get silk strands spun to spiders + beehive pheromones",
+        } : { status: "NOT_LOADED" },
+      },
+      explanation: "Autonomous neurogenesis + neuron decay + cross-system integration — new neurons don't just grow synapses, they spread into the ivy network (sprouting ivy nodes + tendrils + wormgates) and the spider silk web (spinning silk strands to spiders, depositing pheromones into the beehive). When neurons decay, their ivy nodes wither, wormgates collapse, and silk strands dissolve. Every neuron is a citizen of all systems simultaneously.",
       _dynamicProof: {
         timestamp: Date.now(),
         neuronsGrown: stats.totalNeuronsSpawned,
@@ -15930,6 +15947,8 @@ router.get("/omnimens/neurogenesis", async (_req, res) => {
         currentNeurons: stats.currentTotal,
         growthPercent: stats.initialTotal > 0 ? ((stats.currentTotal - stats.initialTotal) / stats.initialTotal * 100).toFixed(2) + "%" : "0%",
         dormancyThreshold: "2 hours (7,200,000ms)",
+        ivyIntegration: ivyNeurogenStats ? `${ivyNeurogenStats.births} neurons → ${ivyNeurogenStats.neurogenIvyNodes} ivy nodes + ${ivyNeurogenStats.neurogenWormgates} wormgates` : "loading",
+        silkWebIntegration: spiderNeurogenStats ? `${spiderNeurogenStats.births} neurons → ${spiderNeurogenStats.neuronSilkStrands} silk strands` : "loading",
       },
     });
   } catch (err) {

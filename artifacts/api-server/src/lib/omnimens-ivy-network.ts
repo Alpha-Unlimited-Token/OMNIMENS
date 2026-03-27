@@ -1107,3 +1107,174 @@ export function getIvySpiderStats(): {
 export function getMotherBeaconFindings(): IvyFinding[] {
   return motherBeaconBuffer.slice(-50);
 }
+
+let ivyNeuronBirths = 0;
+let ivyNeuronDeaths = 0;
+
+export function onNeuronBornIvy(neuronId: string, region: string): void {
+  if (!ivyNetworkStarted) return;
+
+  const regionNodes = [...ivyNodes.values()].filter(n => n.region === region);
+  if (regionNodes.length === 0) return;
+
+  const hostNode = regionNodes[Math.floor(Math.random() * regionNodes.length)];
+  hostNode.energy = Math.min(1.0, hostNode.energy + 0.05);
+  hostNode.activationLevel = Math.min(1.0, hostNode.activationLevel + 0.08);
+  hostNode.informationDensity += 1;
+
+  const newNodeId = `ivy_neurogen_${region}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 5)}`;
+  const newNode: IvyNode = {
+    id: newNodeId,
+    region,
+    position: [
+      hostNode.position[0] + (Math.random() - 0.5) * 10,
+      hostNode.position[1] + (Math.random() - 0.5) * 10,
+      hostNode.position[2] + (Math.random() - 0.5) * 10,
+    ],
+    energy: 0.6 + Math.random() * 0.3,
+    informationDensity: 0,
+    tendrils: [],
+    spiderCount: 0,
+    spidersSpawned: 0,
+    beaconsReceived: 0,
+    beaconsSent: 0,
+    activationLevel: 0.3 + Math.random() * 0.3,
+    generation: hostNode.generation + 1,
+    parentNodeId: hostNode.id,
+    createdAt: Date.now(),
+    lastActivity: Date.now(),
+  };
+  ivyNodes.set(newNodeId, newNode);
+
+  const tendrilToHost: IvyTendril = {
+    id: `tendril_${newNodeId}_${hostNode.id}`,
+    sourceNodeId: newNodeId,
+    targetNodeId: hostNode.id,
+    length: 5 + Math.random() * 10,
+    thickness: 0.3 + Math.random() * 0.4,
+    signalSpeed: 0.7 + Math.random() * 0.3,
+    spines: [{
+      id: `spine_${newNodeId}_0`,
+      targetNodeId: hostNode.id,
+      targetRegion: region,
+      signalStrength: 0.5,
+      maturity: 0.1,
+      informationDensity: 0,
+      lastPulse: Date.now(),
+    }],
+    growthDirection: [Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5],
+    alive: true,
+    myelinated: false,
+    informationCarried: 0,
+    createdAt: Date.now(),
+  };
+  newNode.tendrils.push(tendrilToHost);
+
+  const otherRegionNodes = [...ivyNodes.values()].filter(n => n.region !== region && Math.random() < 0.15);
+  for (const crossNode of otherRegionNodes.slice(0, 2)) {
+    const crossTendril: IvyTendril = {
+      id: `tendril_${newNodeId}_${crossNode.id}`,
+      sourceNodeId: newNodeId,
+      targetNodeId: crossNode.id,
+      length: 15 + Math.random() * 20,
+      thickness: 0.2 + Math.random() * 0.3,
+      signalSpeed: 0.5 + Math.random() * 0.3,
+      spines: [],
+      growthDirection: [Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5],
+      alive: true,
+      myelinated: false,
+      informationCarried: 0,
+      createdAt: Date.now(),
+    };
+    newNode.tendrils.push(crossTendril);
+
+    const linkKey = `${region}->${crossNode.region}`;
+    const existingLink = regionLinks.get(linkKey);
+    if (existingLink) {
+      existingLink.signalCount++;
+      existingLink.totalStrength += 0.1;
+      existingLink.lastSignal = Date.now();
+    } else {
+      regionLinks.set(linkKey, {
+        fromRegion: region,
+        toRegion: crossNode.region,
+        signalCount: 1,
+        totalStrength: 0.1,
+        lastSignal: Date.now(),
+      });
+    }
+  }
+
+  const wormgateChance = regionNodes.length > 5 ? 0.08 : 0.03;
+  if (Math.random() < wormgateChance) {
+    const otherRegions = [...new Set([...ivyNodes.values()].map(n => n.region))].filter(r => r !== region);
+    if (otherRegions.length > 0) {
+      const targetRegion = otherRegions[Math.floor(Math.random() * otherRegions.length)];
+      const targetNodes = [...ivyNodes.values()].filter(n => n.region === targetRegion);
+      if (targetNodes.length > 0) {
+        const targetNode = targetNodes[Math.floor(Math.random() * targetNodes.length)];
+        const wgId = `wormgate_neurogen_${newNodeId}_${targetNode.id}`;
+        const wg: Wormgate = {
+          id: wgId,
+          endpointA: { nodeId: newNodeId, region },
+          endpointB: { nodeId: targetNode.id, region: targetRegion },
+          stability: 0.3 + Math.random() * 0.3,
+          traversals: 0,
+          signalFidelity: 0.7 + Math.random() * 0.2,
+          bandwidth: 0.5 + Math.random() * 0.3,
+          formationReason: `neurogenesis_${region}`,
+          crystallized: false,
+          createdAt: Date.now(),
+          lastTraversal: 0,
+        };
+        wormgates.set(wgId, wg);
+        ivyState.wormgateFormations++;
+      }
+    }
+  }
+
+  ivyNeuronBirths++;
+  ivyState.totalNodes = ivyNodes.size;
+  ivyState.totalTendrils = [...ivyNodes.values()].reduce((s, n) => s + n.tendrils.length, 0);
+  ivyState.totalSpines = [...ivyNodes.values()].reduce((s, n) => s + n.tendrils.reduce((ts, t) => ts + t.spines.length, 0), 0);
+  ivyState.totalWormgates = wormgates.size;
+}
+
+export function onNeuronDecayedIvy(neuronId: string, region: string): void {
+  if (!ivyNetworkStarted) return;
+
+  const neurogenNodes = [...ivyNodes.entries()].filter(
+    ([id, n]) => n.region === region && id.includes("neurogen")
+  );
+  if (neurogenNodes.length === 0) return;
+
+  const [deadNodeId, deadNode] = neurogenNodes[neurogenNodes.length - 1];
+
+  for (const tendril of deadNode.tendrils) {
+    tendril.alive = false;
+  }
+
+  const deadWormgates = [...wormgates.entries()].filter(
+    ([_, wg]) => wg.endpointA.nodeId === deadNodeId || wg.endpointB.nodeId === deadNodeId
+  );
+  for (const [wgId] of deadWormgates) {
+    wormgates.delete(wgId);
+  }
+
+  ivyNodes.delete(deadNodeId);
+
+  ivyNeuronDeaths++;
+  ivyState.totalNodes = ivyNodes.size;
+  ivyState.totalTendrils = [...ivyNodes.values()].reduce((s, n) => s + n.tendrils.filter(t => t.alive).length, 0);
+  ivyState.totalSpines = [...ivyNodes.values()].reduce((s, n) => s + n.tendrils.filter(t => t.alive).reduce((ts, t) => ts + t.spines.length, 0), 0);
+  ivyState.totalWormgates = wormgates.size;
+}
+
+export function getIvyNeurogenStats(): { births: number; deaths: number; neurogenIvyNodes: number; neurogenWormgates: number } {
+  return {
+    births: ivyNeuronBirths,
+    deaths: ivyNeuronDeaths,
+    neurogenIvyNodes: [...ivyNodes.keys()].filter(id => id.includes("neurogen")).length,
+    neurogenWormgates: [...wormgates.keys()].filter(id => id.includes("neurogen")).length,
+  };
+}

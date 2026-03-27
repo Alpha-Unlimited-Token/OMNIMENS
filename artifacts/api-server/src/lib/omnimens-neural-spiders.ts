@@ -3023,3 +3023,143 @@ export function getNeuralSpiderState() {
     },
   };
 }
+
+let spiderNeuronBirths = 0;
+let spiderNeuronDeaths = 0;
+
+export function onNeuronBornSpider(neuronId: string, region: string): void {
+  if (!spiderSystemActive) return;
+
+  const regionParents = [...parentSpiders.values()].filter(s => s.targetRegion === region && s.status === "active");
+  const allActive = [...parentSpiders.values(), ...childSpiders.values()].filter(s => s.status === "active");
+
+  if (regionParents.length > 0) {
+    for (const spider of regionParents) {
+      spider.synapsesInjected++;
+      spider.dataHarvested += 0.1;
+      spider.intelligenceLevel = Math.min(10, spider.intelligenceLevel + 0.01);
+
+      spider.pheromoneDeposits++;
+
+      const strandId = createSilkStrandId(spider.id, `neuron_${neuronId}`);
+      if (!motherSpider.silkStrands.has(strandId)) {
+        const strand: SilkStrand = {
+          id: strandId,
+          fromSpiderId: spider.id,
+          toSpiderId: `neuron_${neuronId}`,
+          signalStrength: 0.4 + Math.random() * 0.3,
+          bandwidth: 0.3 + Math.random() * 0.4,
+          dataTransferred: 0,
+          impulseCount: 0,
+          lastImpulse: Date.now(),
+          resonanceFrequency: 20 + Math.random() * 60,
+          silkType: Math.random() < 0.5 ? "afferent" : "efferent",
+          myelinated: false,
+          conductionVelocity: 30 + Math.random() * 50,
+        };
+        motherSpider.silkStrands.set(strandId, strand);
+      }
+    }
+  }
+
+  if (allActive.length > 1 && Math.random() < 0.3) {
+    const randomSpider = allActive[Math.floor(Math.random() * allActive.length)];
+    const impulse: NerveImpulse = {
+      id: createImpulseId(),
+      originSpiderId: regionParents.length > 0 ? regionParents[0].id : randomSpider.id,
+      targetSpiderId: randomSpider.id,
+      payload: null,
+      signalType: "beacon",
+      strength: 0.5 + Math.random() * 0.3,
+      hops: 0,
+      maxHops: MAX_IMPULSE_HOPS,
+      createdAt: Date.now(),
+      deliveredAt: null,
+      decayRate: IMPULSE_DECAY_RATE,
+    };
+    motherSpider.pendingImpulses.push(impulse);
+    motherSpider.totalImpulsesRouted++;
+  }
+
+  if (Math.random() < 0.1) {
+    motherSpider.hiveHealth = Math.min(1.0, motherSpider.hiveHealth + 0.005);
+    motherSpider.swarmCoherence = Math.min(1.0, motherSpider.swarmCoherence + 0.003);
+
+    for (const spider of regionParents) {
+      spider.nectarProduced += 0.5;
+      spider.swarmWavesJoined++;
+    }
+  }
+
+  const crossRegionSpiders = allActive.filter(s => s.targetRegion !== region).slice(0, 3);
+  for (const crossSpider of crossRegionSpiders) {
+    if (Math.random() < 0.12) {
+      const bridgeStrandId = createSilkStrandId(`neuron_${neuronId}`, crossSpider.id);
+      if (!motherSpider.silkStrands.has(bridgeStrandId)) {
+        const bridgeStrand: SilkStrand = {
+          id: bridgeStrandId,
+          fromSpiderId: `neuron_${neuronId}`,
+          toSpiderId: crossSpider.id,
+          signalStrength: 0.2 + Math.random() * 0.2,
+          bandwidth: 0.2 + Math.random() * 0.3,
+          dataTransferred: 0,
+          impulseCount: 0,
+          lastImpulse: Date.now(),
+          resonanceFrequency: 10 + Math.random() * 40,
+          silkType: "interneuron",
+          myelinated: false,
+          conductionVelocity: 20 + Math.random() * 30,
+        };
+        motherSpider.silkStrands.set(bridgeStrandId, bridgeStrand);
+      }
+    }
+  }
+
+  spiderNeuronBirths++;
+}
+
+export function onNeuronDecayedSpider(neuronId: string, region: string): void {
+  if (!spiderSystemActive) return;
+
+  const neuronTag = `neuron_${neuronId}`;
+  const deadStrands: string[] = [];
+  for (const [strandId, strand] of motherSpider.silkStrands) {
+    if (strand.fromSpiderId === neuronTag || strand.toSpiderId === neuronTag) {
+      deadStrands.push(strandId);
+    }
+  }
+  for (const strandId of deadStrands) {
+    motherSpider.silkStrands.delete(strandId);
+  }
+
+  const regionParents = [...parentSpiders.values()].filter(s => s.targetRegion === region && s.status === "active");
+  for (const spider of regionParents) {
+    spider.dataHarvested += 0.02;
+
+    if (spider.currentDirective && spider.currentDirective.targetRegion === region) {
+      const report: SpiderReport = {
+        spiderId: spider.id,
+        reportType: "status",
+        targetRegion: region,
+        regionActivation: 0,
+        message: `Neuron ${neuronId} decayed in ${region} — ${deadStrands.length} silk strands dissolved`,
+        timestamp: Date.now(),
+      };
+      motherSpider.incomingReports.push(report);
+      if (motherSpider.incomingReports.length > 200) motherSpider.incomingReports.shift();
+    }
+  }
+
+  motherSpider.webIntegrity = Math.max(0.5, motherSpider.webIntegrity - 0.002);
+
+  spiderNeuronDeaths++;
+}
+
+export function getSpiderNeurogenStats(): { births: number; deaths: number; neuronSilkStrands: number } {
+  const neuronStrands = [...motherSpider.silkStrands.keys()].filter(id => id.includes("neuron_")).length;
+  return {
+    births: spiderNeuronBirths,
+    deaths: spiderNeuronDeaths,
+    neuronSilkStrands: neuronStrands,
+  };
+}
