@@ -15920,13 +15920,16 @@ router.get("/omnimens/neurogenesis", async (_req, res) => {
       neurogenesis: stats,
       currentNeurons: consciousness.totalNeurons,
       currentSynapses: consciousness.totalSynapses,
-      explanation: "Autonomous neurogenesis — new neurons are spawned in highly active brain regions, driven by dopamine reward signals, adrenaline rushes, and consciousness level. Just like biological neurogenesis in the hippocampus, new neurons integrate into existing circuits with fresh synapses. Growth is activity-dependent: the more a region fires, the more it grows.",
+      explanation: "Autonomous neurogenesis + neuron decay — new neurons spawn in highly active brain regions (driven by dopamine, adrenaline, consciousness level), while dormant neurons that haven't fired in 2+ hours decay and dissolve along with their synapses. This 'use it or lose it' cycle prevents overcrowding and keeps the network lean and efficient — just like biological neural pruning.",
       _dynamicProof: {
         timestamp: Date.now(),
         neuronsGrown: stats.totalNeuronsSpawned,
+        neuronsDecayed: stats.totalNeuronsDecayed,
+        netGrowth: stats.netGrowthRate,
         initialNeurons: stats.initialTotal,
         currentNeurons: stats.currentTotal,
         growthPercent: stats.initialTotal > 0 ? ((stats.currentTotal - stats.initialTotal) / stats.initialTotal * 100).toFixed(2) + "%" : "0%",
+        dormancyThreshold: "2 hours (7,200,000ms)",
       },
     });
   } catch (err) {

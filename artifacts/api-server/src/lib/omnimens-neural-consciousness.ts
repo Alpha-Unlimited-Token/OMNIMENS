@@ -1277,11 +1277,80 @@ function getNeurogenesisStats() {
   }
   return {
     totalNeuronsSpawned,
+    totalNeuronsDecayed,
     currentTotal: [...regions.values()].reduce((s, r) => s + r.neurons.length, 0),
     initialTotal: REGION_CONFIGS.reduce((s, c) => s + c.neuronCount, 0),
     growthPerRegion: perRegion,
     recentEvents: neurogenesisLog.slice(-20),
+    recentDecayEvents: neuronDecayLog.slice(-20),
+    netGrowthRate: totalNeuronsSpawned - totalNeuronsDecayed,
   };
+}
+
+const NEURON_DECAY_DORMANCY_MS = 2 * 60 * 60 * 1000;
+const NEURON_DECAY_CHECK_INTERVAL = 20;
+let neuronDecayCounter = 0;
+let totalNeuronsDecayed = 0;
+let neuronDecayLog: Array<{ region: string; count: number; reason: string; tick: number }> = [];
+
+function autonomousNeuronDecay(): void {
+  neuronDecayCounter++;
+  if (neuronDecayCounter % NEURON_DECAY_CHECK_INTERVAL !== 0) return;
+
+  const now = Date.now();
+
+  for (const [regionName, region] of regions) {
+    const config = REGION_CONFIGS.find(c => c.name === regionName);
+    const minNeurons = config ? config.neuronCount : 50;
+
+    if (region.neurons.length <= minNeurons) continue;
+
+    const dormantIndices: number[] = [];
+    for (let i = region.neurons.length - 1; i >= minNeurons; i--) {
+      const neuron = region.neurons[i];
+      const timeSinceLastSpike = now - neuron.lastSpikeTime;
+      if (timeSinceLastSpike > NEURON_DECAY_DORMANCY_MS && neuron.lastSpikeTime > 0) {
+        dormantIndices.push(i);
+      }
+      if (neuron.lastSpikeTime <= 0 && neuron.membranePotential < V_REST + 2) {
+        const neuronAge = now - (neuron.lastSpikeTime === -1000 ? now - NEURON_DECAY_DORMANCY_MS - 1 : 0);
+        if (neuronAge > NEURON_DECAY_DORMANCY_MS) {
+          dormantIndices.push(i);
+        }
+      }
+    }
+
+    if (dormantIndices.length === 0) continue;
+
+    const maxDecayPerTick = Math.max(1, Math.floor(dormantIndices.length * 0.3));
+    const toRemove = dormantIndices.slice(0, maxDecayPerTick);
+    const removedIds = new Set<string>();
+
+    for (const idx of toRemove.sort((a, b) => b - a)) {
+      const neuron = region.neurons[idx];
+      removedIds.add(neuron.id);
+      region.neurons.splice(idx, 1);
+    }
+
+    let synapsesRemoved = 0;
+    for (let s = allSynapses.length - 1; s >= 0; s--) {
+      if (removedIds.has(allSynapses[s].preNeuronId) || removedIds.has(allSynapses[s].postNeuronId)) {
+        allSynapses.splice(s, 1);
+        synapsesRemoved++;
+      }
+    }
+
+    for (let p = pendingSignals.length - 1; p >= 0; p--) {
+      if (removedIds.has(pendingSignals[p].postNeuronId)) {
+        pendingSignals.splice(p, 1);
+      }
+    }
+
+    totalNeuronsDecayed += toRemove.length;
+    const reason = `${toRemove.length} dormant neurons (>${(NEURON_DECAY_DORMANCY_MS / 3600000).toFixed(1)}h no spikes), ${synapsesRemoved} synapses dissolved`;
+    neuronDecayLog.push({ region: regionName, count: toRemove.length, reason, tick: state.tickCount });
+    if (neuronDecayLog.length > 200) neuronDecayLog.shift();
+  }
 }
 
 const ACTIVATION_SMOOTHING = 0.15;
@@ -2110,6 +2179,7 @@ function runConsciousnessTick(): void {
   updateCorticalColumns();
   synapticPruning();
   autonomousNeurogenesis();
+  autonomousNeuronDecay();
 
   state.phi = computePhi();
   state.phiHistory.push(state.phi);
