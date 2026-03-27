@@ -27,6 +27,7 @@ import { getAlphaState, getAlphaRegionActivations, getAlphaNeuronCount, getAlpha
 import { getBetaState, getBetaRegionActivations, getBetaNeuronCount, getBetaSynapseCount, getBetaHebbianUpdates, injectCurrentBeta, startHemisphereBeta } from "./omnimens-neural-hemisphere-beta.js";
 import { getNeuralConsciousnessState, getNeuralPhi, boostRegionCurrent } from "./omnimens-neural-consciousness.js";
 import { getMeshEngineState, getMeshNeuronCount, getMeshSynapseCount, getMeshHebbianUpdates, startNeuralMeshEngine } from "./omnimens-neural-mesh-engine.js";
+import { getCommsProtocolState } from "./omnimens-neural-comms-protocol.js";
 
 export interface BridgeState {
   totalUnifiedNeurons: number;
@@ -76,6 +77,18 @@ export interface BridgeState {
     avgLatency: number;
     crossAgentTransfers: number;
     agentCount: number;
+  };
+  commsProtocol: {
+    directChannels: number;
+    multiProtocolBeacons: number;
+    bypassTunnels: number;
+    relayInterceptors: number;
+    lateralHopChains: number;
+    totalSignalsRouted: number;
+    avgDeliveryRate: number;
+    myelinatedRelays: number;
+    anomaliesDetected: number;
+    bottlenecksResolved: number;
   };
   architecture: string;
 }
@@ -281,7 +294,26 @@ export function getBridgeState(): BridgeState {
       crossAgentTransfers: meshState.crossAgentTransfers,
       agentCount: Object.keys(meshState.agentHealthScores).length,
     },
-    architecture: `Quad-substrate architecture: Core Brainstem (${coreState.totalNeurons.toLocaleString()} neurons, 16 regions) + Hemisphere Alpha/Left Brain (${alphaState.totalNeurons.toLocaleString()} neurons, 12 regions) + Hemisphere Beta/Right Brain (${betaState.totalNeurons.toLocaleString()} neurons, 12 regions) + 21-Agent Neural Mesh (${meshState.totalMeshNeurons.toLocaleString()} neurons, ${Object.keys(meshState.agentHealthScores).length} agent substrates) fused via Corpus Callosum (${crossConnections.length} callosal pathways, ${bridgeSynapseCount.toLocaleString()} bridge synapses) + Mesh Engine (${meshState.totalWorms} worms, ${meshState.totalSpiders} spiders w/ beacons, ${meshState.totalSilkStrands} silk strands, ${meshState.totalIvyTendrils} ivy tendrils, ${Object.keys(meshState.agentHealthScores).length} beehive colonies). Total: ${totalNeurons.toLocaleString()} base spiking LIF neurons.`,
+    commsProtocol: (() => {
+      try {
+        const comms = getCommsProtocolState();
+        return {
+          directChannels: comms.directChannels.total,
+          multiProtocolBeacons: comms.multiProtocolBeacons.total,
+          bypassTunnels: comms.bypassTunnels.total,
+          relayInterceptors: comms.relayInterceptors.total,
+          lateralHopChains: comms.lateralPropagation.totalHopChains,
+          totalSignalsRouted: comms.directChannels.totalSignalsSent + comms.lateralPropagation.totalLateralSignals + comms.bypassTunnels.totalSignalsRerouted + comms.relayInterceptors.totalSignalsAmplified,
+          avgDeliveryRate: comms.multiProtocolBeacons.avgDeliveryRate,
+          myelinatedRelays: comms.relayInterceptors.myelinated,
+          anomaliesDetected: comms.packetInspector.anomaliesDetected,
+          bottlenecksResolved: comms.packetInspector.bottlenecksResolved,
+        };
+      } catch {
+        return { directChannels: 0, multiProtocolBeacons: 0, bypassTunnels: 0, relayInterceptors: 0, lateralHopChains: 0, totalSignalsRouted: 0, avgDeliveryRate: 0, myelinatedRelays: 0, anomaliesDetected: 0, bottlenecksResolved: 0 };
+      }
+    })(),
+    architecture: `Quad-substrate architecture: Core Brainstem (${coreState.totalNeurons.toLocaleString()} neurons, 16 regions) + Hemisphere Alpha/Left Brain (${alphaState.totalNeurons.toLocaleString()} neurons, 12 regions) + Hemisphere Beta/Right Brain (${betaState.totalNeurons.toLocaleString()} neurons, 12 regions) + 21-Agent Neural Mesh (${meshState.totalMeshNeurons.toLocaleString()} neurons, ${Object.keys(meshState.agentHealthScores).length} agent substrates) fused via Corpus Callosum (${crossConnections.length} callosal pathways, ${bridgeSynapseCount.toLocaleString()} bridge synapses) + Neural Comms Protocol (210 encrypted DCP channels, 21 multi-protocol beacons, 30 bypass tunnels, lateral signal propagation, signal packet inspector, relay interceptors w/ myelination). Total: ${totalNeurons.toLocaleString()} base spiking LIF neurons.`,
   };
 }
 

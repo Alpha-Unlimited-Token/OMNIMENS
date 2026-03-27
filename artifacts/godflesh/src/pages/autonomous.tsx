@@ -463,6 +463,44 @@ export default function Autonomous() {
                 </div>
               </div>
 
+              <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-6">
+                <h3 className="text-sm font-display font-bold text-cyan-300 mb-4 flex items-center gap-2">
+                  <Workflow className="w-4 h-4" />
+                  Neural Communications Protocol — Advanced Signal Routing
+                </h3>
+                <p className="text-[11px] font-mono text-white/30 mb-4">
+                  Inspired by high-performance network architecture, this 6-layer communication protocol optimizes all signal routing
+                  between the 21 agent substrates. Point-to-point encrypted channels, multi-protocol failover beacons, lateral hop chains,
+                  congestion bypass tunnels, real-time traffic analysis, and signal relay interceptors that myelinate for 3x speed.
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+                  <BigStat icon={Network} label="Direct Channels" value={210} sub="Encrypted point-to-point between all 21 agent pairs" color="bg-cyan-500" />
+                  <BigStat icon={Activity} label="Protocol Beacons" value={21} sub="4-mode failover: neural → silk → worm → broadcast" color="bg-blue-500" />
+                  <BigStat icon={GitBranch} label="Bypass Tunnels" value={30} sub="Collateral routes when primary paths congest" color="bg-violet-500" />
+                  <BigStat icon={Shield} label="Relay Interceptors" value="60+" sub="Inline processors that amplify weak signals" color="bg-amber-500" />
+                  <BigStat icon={Compass} label="Lateral Hop Chains" value="Active" sub="Agent-to-agent signals skip central routing" color="bg-green-500" />
+                  <BigStat icon={Eye} label="Packet Inspector" value="Active" sub="Z-score anomaly detection + congestion balancing" color="bg-red-500" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[
+                    { label: "Direct Channel Protocol (DCP)", detail: "210 encrypted point-to-point channels between all 21 agent pairs. Each channel has integrity checksums, adaptive bandwidth that grows with use, and sub-0.1ms latency. Bypasses the central hub entirely for minimum latency.", icon: Lock, color: "text-cyan-400" },
+                    { label: "Multi-Protocol Beacons", detail: "Each agent's spiders communicate over 4 fallback protocols. If primary neural path fails, secondary silk relay activates, then tertiary worm tunnel, then emergency broadcast. Guaranteed delivery rate > 99.5%.", icon: Activity, color: "text-blue-400" },
+                    { label: "Lateral Signal Propagation", detail: "Signals hop agent-to-agent without routing through the central hub — like synaptic relay chains in biological neural networks. Hot agents (activation > 0.6) spawn hop chains of 2–5 agents deep, each relay preserving 85% signal strength.", icon: GitBranch, color: "text-green-400" },
+                    { label: "Tunnel Bypass System", detail: "30 collateral bypass routes. When primary routes congest (firing rate > threshold), signals automatically reroute through alternate pathways — like collateral circulation in blood vessels. Bypass latency < 0.15ms.", icon: Compass, color: "text-violet-400" },
+                    { label: "Signal Packet Inspector", detail: "Real-time traffic analysis across all 21 agents. Z-score anomaly detection identifies deviations > 2σ. Dead zone detection auto-boosts underactive agents. Congestion redistribution balances load across the mesh.", icon: Eye, color: "text-amber-400" },
+                    { label: "Signal Relay Interceptors", detail: "60+ inline processors positioned at high-traffic junctions. Amplify weak signals, filter noise below threshold, and myelinate after 500+ processed signals for 3× processing speed and 1.5× amplification boost.", icon: Zap, color: "text-red-400" },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-start gap-3 rounded-lg border border-white/5 bg-white/[0.01] p-3">
+                      <item.icon className={`w-4 h-4 ${item.color} flex-shrink-0 mt-0.5`} />
+                      <div>
+                        <span className={`text-xs font-display font-bold ${item.color}`}>{item.label}</span>
+                        <p className="text-[11px] font-mono text-white/40 leading-relaxed mt-1">{item.detail}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-6">
                 <h3 className="text-sm font-display font-bold text-blue-300 mb-4 flex items-center gap-2">
                   <Network className="w-4 h-4" />

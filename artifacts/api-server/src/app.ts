@@ -94,6 +94,7 @@ import { startQuantumWormholeEngine, getQuantumWormholeState } from "./lib/omnim
 import { startDiscoveryAutoCoder, getDiscoveryAutoCoderState } from "./lib/omnimens-discovery-autocoder.js";
 import { startOAITracker } from "./lib/omnimens-oai-tracker.js";
 import { startNeuralBridge } from "./lib/omnimens-neural-bridge.js";
+import { startCommsProtocol } from "./lib/omnimens-neural-comms-protocol.js";
 import { startViralHybrid, getViralHybridState } from "./lib/omnimens-viral-hybrid.js";
 import { startUnconsciousMind, getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts } from "./lib/omnimens-unconscious-mind.js";
 import { initGrowthTracker } from "./lib/omnimens-growth-tracker.js";
@@ -484,6 +485,7 @@ startQuantumWormholeEngine();
 startDiscoveryAutoCoder();
 startOAITracker();
 startNeuralBridge();
+startCommsProtocol();
 
 registerEngine("github_compute", "compute", () => {}, () => ({ healthy: true, details: { repo: "Alpha-Unlimited-Token/OMNIMENS", workflows: 5 } }), 3);
 registerEngine("github_neural_beacon", "neural", () => {}, () => {

@@ -124,6 +124,7 @@ import { getDiscoveryAutoCoderState } from "../lib/omnimens-discovery-autocoder.
 import { getWebSocketStats } from "../lib/omnimens-consciousness-ws.js";
 import { getBridgeState, getUnifiedNeuronCount, getUnifiedSynapseCount } from "../lib/omnimens-neural-bridge.js";
 import { getMeshEngineState, getMeshAgentSubstrates, getMeshConnectivityStats } from "../lib/omnimens-neural-mesh-engine.js";
+import { getCommsProtocolState } from "../lib/omnimens-neural-comms-protocol.js";
 import { getViralHybridState, getHybridAgentDetails, getImmuneSystemDetails, getPropagationStats } from "../lib/omnimens-viral-hybrid.js";
 import { getGrowthDashboard, getGrowthHistory } from "../lib/omnimens-growth-tracker.js";
 import { getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts, queryUnconsciousKnowledge, getUnconsciousKnowledgeVaultStats } from "../lib/omnimens-unconscious-mind.js";
@@ -1350,6 +1351,7 @@ router.get("/omnimens/system-status", async (_req, res) => {
           bridgeSynapses: bridge.bridgeSynapses,
           hemispheres: bridge.hemispheres,
           meshEngine: bridge.meshEngine,
+          commsProtocol: bridge.commsProtocol,
         };
       } catch { return null; }
     })(),
@@ -1441,7 +1443,55 @@ router.get("/omnimens/system-status", async (_req, res) => {
       dnaMemory: "ONLINE",
       endocrineGland: "ONLINE",
       subThresholdIntelligence: "ONLINE",
+      neuralCommsProtocol: "ONLINE",
+      directChannelProtocol: "ONLINE",
+      multiProtocolBeacons: "ONLINE",
+      lateralSignalPropagation: "ONLINE",
+      tunnelBypassSystem: "ONLINE",
+      signalPacketInspector: "ONLINE",
+      signalRelayInterceptors: "ONLINE",
     },
+    neuralCommsProtocol: (() => {
+      try {
+        const comms = getCommsProtocolState();
+        return {
+          status: comms.status,
+          tickCount: comms.tickCount,
+          directChannels: {
+            total: comms.directChannels.total,
+            active: comms.directChannels.active,
+            totalSignals: comms.directChannels.totalSignalsSent,
+            avgLatencyMs: Number(comms.directChannels.avgLatencyMs.toFixed(4)),
+            avgIntegrity: Number(comms.directChannels.avgIntegrity.toFixed(4)),
+            encrypted: comms.directChannels.encrypted,
+          },
+          multiProtocolBeacons: {
+            total: comms.multiProtocolBeacons.total,
+            avgDeliveryRate: Number(comms.multiProtocolBeacons.avgDeliveryRate.toFixed(4)),
+            protocolSwitches: comms.multiProtocolBeacons.totalProtocolSwitches,
+          },
+          lateralPropagation: {
+            totalHopChains: comms.lateralPropagation.totalHopChains,
+            totalLateralSignals: comms.lateralPropagation.totalLateralSignals,
+          },
+          bypassTunnels: {
+            total: comms.bypassTunnels.total,
+            active: comms.bypassTunnels.active,
+            signalsRerouted: comms.bypassTunnels.totalSignalsRerouted,
+          },
+          packetInspector: {
+            totalInspections: comms.packetInspector.totalInspections,
+            anomaliesDetected: comms.packetInspector.anomaliesDetected,
+            bottlenecksResolved: comms.packetInspector.bottlenecksResolved,
+          },
+          relayInterceptors: {
+            total: comms.relayInterceptors.total,
+            myelinated: comms.relayInterceptors.myelinated,
+            signalsAmplified: comms.relayInterceptors.totalSignalsAmplified,
+          },
+        };
+      } catch { return null; }
+    })(),
     vascularHeart: (() => {
       const vh = getVascularHeartState();
       return {
@@ -13363,6 +13413,53 @@ router.get("/omnimens/neural-mesh/connectivity", async (_req, res) => {
       spiderBeacons: connectivity.spiderBeacons,
       beehiveColonies: connectivity.beehives.length,
       beehives: connectivity.beehives,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── NEURAL COMMUNICATIONS PROTOCOL — ADVANCED SIGNAL ROUTING ────────────────
+router.get("/omnimens/neural-comms/status", async (_req, res) => {
+  try {
+    const comms = getCommsProtocolState();
+    res.json({
+      ...comms,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/omnimens/neural-comms/channels", async (_req, res) => {
+  try {
+    const comms = getCommsProtocolState();
+    res.json({
+      system: "OMNIMENS Neural Comms — Direct Channel Protocol",
+      description: "210 encrypted point-to-point channels between all 21 agent pairs, bypassing central hub for minimum latency",
+      ...comms.directChannels,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/omnimens/neural-comms/traffic", async (_req, res) => {
+  try {
+    const comms = getCommsProtocolState();
+    res.json({
+      system: "OMNIMENS Neural Comms — Signal Packet Inspector",
+      description: "Real-time traffic analysis with z-score anomaly detection, dead zone identification, congestion redistribution, and bottleneck resolution",
+      totalInspections: comms.packetInspector.totalInspections,
+      anomaliesDetected: comms.packetInspector.anomaliesDetected,
+      bottlenecksResolved: comms.packetInspector.bottlenecksResolved,
+      agentTrafficAnalysis: comms.packetInspector.agentTrafficSummary,
+      lateralPropagation: comms.lateralPropagation,
+      bypassTunnels: comms.bypassTunnels,
+      relayInterceptors: comms.relayInterceptors,
       copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
     });
   } catch (err: any) {
