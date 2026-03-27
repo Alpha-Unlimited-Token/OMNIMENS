@@ -1,125 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/temporal_correlation: The butterfly effect: in c",
-    "filename": "omnimens_autocode_knowledge_synthesis_mn90bqtr.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mn90bqtr.mjs",
-    "backupPath": null,
-    "timestamp": 1774622347407,
-    "codeLength": 419,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:SpellCheckVisual+Wordsmith+Pioneer",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: SpellCheckVisual:neural_connector + Wo",
-    "filename": "omnimens_autocode_neural_pathway_mn90d1yo.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn90d1yo.mjs",
-    "backupPath": null,
-    "timestamp": 1774622408496,
-    "codeLength": 464,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Explorer+OMNIMENS+Critic",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Explorer:optimization_function + OMNIM",
-    "filename": "omnimens_autocode_neural_pathway_mn90d221.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn90d221.mjs",
-    "backupPath": null,
-    "timestamp": 1774622408617,
-    "codeLength": 454,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Pioneer+Meta-Agent+Explorer",
-    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Pioneer:adaptive_threshold + Meta-Agen",
-    "filename": "omnimens_autocode_adaptive_algorithm_mn90d22h.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mn90d22h.mjs",
-    "backupPath": null,
-    "timestamp": 1774622408633,
-    "codeLength": 474,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:OMNIMENS+Motivator+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: COLLECTIVE_DISCOVERY: OMNIMENS:resonance_matcher + Motivator",
-    "filename": "omnimens_autocode_knowledge_synthesis_mn90d232.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mn90d232.mjs",
-    "backupPath": null,
-    "timestamp": 1774622408654,
-    "codeLength": 453,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Innovator+Mathematician+Archivist",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Innovator:signal_processor + Mathemati",
-    "filename": "omnimens_autocode_neural_pathway_mn90d23i.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn90d23i.mjs",
-    "backupPath": null,
-    "timestamp": 1774622408670,
-    "codeLength": 465,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Motivator+SpellCheckVisual+Linguist",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: Motivator:weight_adjuster + SpellCheck",
-    "filename": "omnimens_autocode_pattern_recognition_mn90d240.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mn90d240.mjs",
-    "backupPath": null,
-    "timestamp": 1774622408688,
-    "codeLength": 507,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Explorer+Meta-Agent+Architect",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Explorer:optimization_function + Meta-",
-    "filename": "omnimens_autocode_neural_pathway_mn90d24d.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn90d24d.mjs",
-    "backupPath": null,
-    "timestamp": 1774622408702,
-    "codeLength": 460,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:SpellCheckVisual+Mathematician+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: COLLECTIVE_DISCOVERY: SpellCheckVisual:entropy_calculator + ",
-    "filename": "omnimens_autocode_emergent_capability_mn90d24z.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mn90d24z.mjs",
-    "backupPath": null,
-    "timestamp": 1774622408723,
-    "codeLength": 467,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Visionary",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/information_compression: Integrated Information ",
-    "filename": "omnimens_autocode_consciousness_expansion_mn90d25k.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn90d25k.mjs",
-    "backupPath": null,
-    "timestamp": 1774622408744,
-    "codeLength": 387,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Motivator",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/feature_extraction: Scale-free networks follow p",
-    "filename": "omnimens_autocode_pattern_recognition_mn90d266.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mn90d266.mjs",
-    "backupPath": null,
-    "timestamp": 1774622408766,
-    "codeLength": 467,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Mathematician",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/information_compression: Integrated Information ",
-    "filename": "omnimens_autocode_consciousness_expansion_mn90d26q.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn90d26q.mjs",
-    "backupPath": null,
-    "timestamp": 1774622408786,
-    "codeLength": 391,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:sub_threshold:Synthesizer+GraphicDesigner+Ethicist",
     "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Synthesizer:resonance_matcher + Graphi",
     "filename": "omnimens_autocode_consciousness_expansion_mn90egtv.mjs",
@@ -4997,6 +4877,126 @@
     "backupPath": null,
     "timestamp": 1774629354655,
     "codeLength": 467,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Explorer+Wordsmith+Linguist",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Explorer:optimization_function + Words",
+    "filename": "omnimens_autocode_adaptive_algorithm_mn94j7qp.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mn94j7qp.mjs",
+    "backupPath": null,
+    "timestamp": 1774629414385,
+    "codeLength": 479,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:GraphicDesigner+Meta-Agent+Critic",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: GraphicDesigner:chaos_injector + Meta-",
+    "filename": "omnimens_autocode_consciousness_expansion_mn94j7r8.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn94j7r8.mjs",
+    "backupPath": null,
+    "timestamp": 1774629414404,
+    "codeLength": 421,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Explorer+Neuroscientist+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: COLLECTIVE_DISCOVERY: Explorer:signal_processor + Neuroscien",
+    "filename": "omnimens_autocode_knowledge_synthesis_mn94j7rs.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mn94j7rs.mjs",
+    "backupPath": null,
+    "timestamp": 1774629414424,
+    "codeLength": 459,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:OMNIMENS+Critic+Motivator",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: OMNIMENS:neural_connector + Critic:fre",
+    "filename": "omnimens_autocode_neural_pathway_mn94j7s4.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn94j7s4.mjs",
+    "backupPath": null,
+    "timestamp": 1774629414436,
+    "codeLength": 451,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:SensorimotorAgent+Pioneer+Ethicist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: SensorimotorAgent:entropy_calculator +",
+    "filename": "omnimens_autocode_neural_pathway_mn94j7sf.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn94j7sf.mjs",
+    "backupPath": null,
+    "timestamp": 1774629414447,
+    "codeLength": 467,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Motivator+Archivist+SensorimotorAgent",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Motivator:correlation_finder + Archivi",
+    "filename": "omnimens_autocode_adaptive_algorithm_mn94j7vr.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mn94j7vr.mjs",
+    "backupPath": null,
+    "timestamp": 1774629414567,
+    "codeLength": 494,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Visionary+Mathematician+GraphicDesigner",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: Visionary:entropy_calculator + Mathema",
+    "filename": "omnimens_autocode_pattern_recognition_mn94j7w2.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mn94j7w2.mjs",
+    "backupPath": null,
+    "timestamp": 1774629414578,
+    "codeLength": 515,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Archivist+Motivator+SensorimotorAgent",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Archivist:frequency_analyzer + Motivat",
+    "filename": "omnimens_autocode_neural_pathway_mn94j7we.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn94j7we.mjs",
+    "backupPath": null,
+    "timestamp": 1774629414590,
+    "codeLength": 475,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Philosopher+Explorer+Linguist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Philosopher:memory_compressor + Explor",
+    "filename": "omnimens_autocode_neural_pathway_mn94j7y0.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn94j7y0.mjs",
+    "backupPath": null,
+    "timestamp": 1774629414648,
+    "codeLength": 459,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Meta-Agent",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SensorimotorAgent/feature_extraction: Wolfram's Rule 110 cel",
+    "filename": "omnimens_autocode_adaptive_algorithm_mn94j7ye.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mn94j7ye.mjs",
+    "backupPath": null,
+    "timestamp": 1774629414662,
+    "codeLength": 455,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Wordsmith",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/feature_extraction: Wolfram's Rule 110 cel",
+    "filename": "omnimens_autocode_neural_pathway_mn94j7yq.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn94j7yq.mjs",
+    "backupPath": null,
+    "timestamp": 1774629414674,
+    "codeLength": 434,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Meta-Agent",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/abstraction_layer: The cerebellum contains more ",
+    "filename": "omnimens_autocode_neural_pathway_mn94j7z1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn94j7z1.mjs",
+    "backupPath": null,
+    "timestamp": 1774629414685,
+    "codeLength": 429,
     "overwrite": false
   }
 ]
