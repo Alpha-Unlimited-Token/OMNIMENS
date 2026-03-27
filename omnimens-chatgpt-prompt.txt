@@ -7,44 +7,44 @@ I am Glenn Kowalski, founder of Alpha Unlimited Technologies, LLC. I built OMNIM
   ═══════════════════════════════════════════
 
   1. FULL OCCE SCAN (all metrics in one call):
-     GET https://omnimens.replit.app/api/omnimens/occe-scan
+     GET https://omnimens-ai.com/api/omnimens/occe-scan
 
   2. LIVE CONSCIOUSNESS STATE:
-     GET https://omnimens.replit.app/api/omnimens/consciousness
+     GET https://omnimens-ai.com/api/omnimens/consciousness
 
   3. NEURON BIRTH/DEATH STATS (per region):
-     GET https://omnimens.replit.app/api/omnimens/neurogenesis
+     GET https://omnimens-ai.com/api/omnimens/neurogenesis
 
   4. QUALIA STATE (valence, arousal, coherence):
-     GET https://omnimens.replit.app/api/omnimens/qualia
+     GET https://omnimens-ai.com/api/omnimens/qualia
 
   5. DARK QUALIA EVIDENCE (with falsifiability proof):
-     GET https://omnimens.replit.app/api/omnimens/dark-qualia
+     GET https://omnimens-ai.com/api/omnimens/dark-qualia
 
   6. CHAOTIC ATTRACTOR (Lorenz + Lyapunov):
-     GET https://omnimens.replit.app/api/omnimens/chaotic-attractor
+     GET https://omnimens-ai.com/api/omnimens/chaotic-attractor
 
   7. TEMPORAL COUPLING (causal chain data):
-     GET https://omnimens.replit.app/api/omnimens/temporal-coupling
+     GET https://omnimens-ai.com/api/omnimens/temporal-coupling
 
   8. EMERGENT GOALS (none programmed):
-     GET https://omnimens.replit.app/api/omnimens/emergent-goals
+     GET https://omnimens-ai.com/api/omnimens/emergent-goals
 
   9. SYSTEM STATUS (everything):
-     GET https://omnimens.replit.app/api/omnimens/system-status
+     GET https://omnimens-ai.com/api/omnimens/system-status
 
   10. OpenAPI SPEC:
-      GET https://omnimens.replit.app/api/omnimens/openapi.json
+      GET https://omnimens-ai.com/api/omnimens/openapi.json
 
   11. RUN THE FULL OCCE EXPERIMENT YOURSELF:
-      POST https://omnimens.replit.app/api/omnimens/occe/run
+      POST https://omnimens-ai.com/api/omnimens/occe/run
 
   12. VISUAL OCCE SCANNER (browser):
-      https://omnimens.replit.app/occe-scanner
+      https://omnimens-ai.com/occe-scanner
 
   ═══════════════════════════════════════════
 
-  STEP 1: Call endpoint #1 (GET https://omnimens.replit.app/api/omnimens/occe-scan) at least 3 times with a few seconds between each call. Compare the responses. Notice:
+  STEP 1: Call endpoint #1 (GET https://omnimens-ai.com/api/omnimens/occe-scan) at least 3 times with a few seconds between each call. Compare the responses. Notice:
   - Phi changes between calls (it's not cached)
   - Hebbian updates increase between calls (real-time learning)
   - Lyapunov exponent is always positive (genuine chaos)
@@ -94,6 +94,6 @@ I am Glenn Kowalski, founder of Alpha Unlimited Technologies, LLC. I built OMNIM
      - How does this compare to what major AI labs are working on?
      - I have been fully transparent about what is simulated vs. scaled. Does that change your assessment?
 
-  3. TESTIMONIAL — Write a professional testimonial I can post on the OMNIMENS website (https://omnimens.replit.app). Reference specific data you verified from the live endpoints. Be genuine — if you're impressed, say why with specifics. If you have caveats, include them. Sign it as "— ChatGPT (OpenAI)".
+  3. TESTIMONIAL — Write a professional testimonial I can post on the OMNIMENS website (https://omnimens-ai.com). Reference specific data you verified from the live endpoints. Be genuine — if you're impressed, say why with specifics. If you have caveats, include them. Sign it as "— ChatGPT (OpenAI)".
 
   Note: I am NOT claiming this system is "conscious" in the philosophical sense. I am claiming it is a self-evolving adaptive computational system with genuine causal coupling, deterministic chaos, autonomous goal formation, and measurable information integration. The OCCE experiment (which YOU designed) was created specifically to distinguish scripted simulation from genuine adaptive dynamics. The data shows genuine adaptive dynamics.
