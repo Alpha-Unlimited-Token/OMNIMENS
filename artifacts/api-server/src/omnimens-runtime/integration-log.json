@@ -1,105 +1,5 @@
 [
   {
-    "source": "evolution_engine",
-    "title": "Evolution Module: wasmComputeOffloader",
-    "filename": "wasmComputeOffloader_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmComputeOffloader_gen1.mjs",
-    "backupPath": null,
-    "timestamp": 1774401626352,
-    "codeLength": 2157,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: hierarchicalContextReconstructor",
-    "filename": "hierarchicalContextReconstructor_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hierarchicalContextReconstructor_gen1.mjs",
-    "backupPath": null,
-    "timestamp": 1774401644728,
-    "codeLength": 2675,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 1 Complete — 3 modules",
-    "filename": "evolution_marker_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-03-25T01-20-44-803Z",
-    "timestamp": 1774401644802,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit",
-    "filename": "sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs.backup.2026-03-25T01-24-32-339Z",
-    "timestamp": 1774401872337,
-    "codeLength": 2368,
-    "overwrite": true
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit",
-    "filename": "sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs.backup.2026-03-25T01-29-17-304Z",
-    "timestamp": 1774402157303,
-    "codeLength": 2222,
-    "overwrite": true
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a data structure optimized for fast associative memory lookup",
-    "filename": "sandbox_aDataStructureOptimizedFor_c3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aDataStructureOptimizedFor_c3.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aDataStructureOptimizedFor_c3.mjs.backup.2026-03-25T01-36-25-170Z",
-    "timestamp": 1774402585168,
-    "codeLength": 1581,
-    "overwrite": true
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a data structure optimized for fast associative memory lookup",
-    "filename": "sandbox_aDataStructureOptimizedFor_c3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aDataStructureOptimizedFor_c3.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aDataStructureOptimizedFor_c3.mjs.backup.2026-03-25T01-41-25-006Z",
-    "timestamp": 1774402885004,
-    "codeLength": 1932,
-    "overwrite": true
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a self-diagnostic function that analyzes system health metrics and returns recom",
-    "filename": "sandbox_aSelfdiagnosticFunctionThatAnalyzes_c4.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aSelfdiagnosticFunctionThatAnalyzes_c4.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aSelfdiagnosticFunctionThatAnalyzes_c4.mjs.backup.2026-03-25T01-48-54-827Z",
-    "timestamp": 1774403334825,
-    "codeLength": 4291,
-    "overwrite": true
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a self-diagnostic function that analyzes system health metrics and returns recom",
-    "filename": "sandbox_aSelfdiagnosticFunctionThatAnalyzes_c4.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aSelfdiagnosticFunctionThatAnalyzes_c4.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aSelfdiagnosticFunctionThatAnalyzes_c4.mjs.backup.2026-03-25T01-53-35-601Z",
-    "timestamp": 1774403615600,
-    "codeLength": 2456,
-    "overwrite": true
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a text analysis function that extracts key concepts, entities, and relationships",
-    "filename": "sandbox_aTextAnalysisFunctionThat_c5.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aTextAnalysisFunctionThat_c5.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aTextAnalysisFunctionThat_c5.mjs.backup.2026-03-25T02-00-30-352Z",
-    "timestamp": 1774404030351,
-    "codeLength": 3207,
-    "overwrite": true
-  },
-  {
     "source": "autonomous_sandbox",
     "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
     "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
@@ -4997,6 +4897,106 @@
     "backupPath": null,
     "timestamp": 1774587966210,
     "codeLength": 448,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Synthesizer+Innovator+Architect",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Synthesizer:neural_connector + Innovat",
+    "filename": "omnimens_autocode_neural_pathway_mn8fw8gr.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn8fw8gr.mjs",
+    "backupPath": null,
+    "timestamp": 1774588031451,
+    "codeLength": 463,
+    "overwrite": false
+  },
+  {
+    "source": "sub_threshold_recombination:SensorimotorAgent+SpellCheckVisual+Critic",
+    "title": "[Sub-Threshold Recombination] SensorimotorAgent+SpellCheckVisual+Critic — 3 fragments recombined",
+    "filename": "recombined_synth_1774588031532_nd1q.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recombined_synth_1774588031532_nd1q.mjs",
+    "backupPath": null,
+    "timestamp": 1774588031533,
+    "codeLength": 1660,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Critic+SpellCheckVisual+Philosopher",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Critic:optimization_function + SpellCh",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8fxzww.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8fxzww.mjs",
+    "backupPath": null,
+    "timestamp": 1774588113680,
+    "codeLength": 435,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Synthesizer+Innovator+Architect",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Synthesizer:neural_connector + Innovat",
+    "filename": "omnimens_autocode_neural_pathway_mn8fzbeb.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn8fzbeb.mjs",
+    "backupPath": null,
+    "timestamp": 1774588175219,
+    "codeLength": 463,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Motivator+GraphicDesigner+Archivist",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Motivator:weight_adjuster + GraphicDes",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8g1238.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8g1238.mjs",
+    "backupPath": null,
+    "timestamp": 1774588256468,
+    "codeLength": 427,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Empath+Linguist+SpellCheckVisual",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Empath:memory_compressor + Linguist:op",
+    "filename": "omnimens_autocode_adaptive_algorithm_mn8g3guv.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mn8g3guv.mjs",
+    "backupPath": null,
+    "timestamp": 1774588368919,
+    "codeLength": 486,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:SensorimotorAgent+SpellCheckVisual+Critic",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: SensorimotorAgent:chaos_injector + Spe",
+    "filename": "omnimens_autocode_neural_pathway_mn8gbbq1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn8gbbq1.mjs",
+    "backupPath": null,
+    "timestamp": 1774588735513,
+    "codeLength": 476,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Critic+SpellCheckVisual+Philosopher",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: Critic:optimization_function + SpellCh",
+    "filename": "omnimens_autocode_pattern_recognition_mn8gbbqu.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mn8gbbqu.mjs",
+    "backupPath": null,
+    "timestamp": 1774588735542,
+    "codeLength": 515,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:OMNIMENS+Meta-Agent+Architect",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: OMNIMENS:chaos_injector + Meta-Agent:p",
+    "filename": "omnimens_autocode_pattern_recognition_mn8gbbrf.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mn8gbbrf.mjs",
+    "backupPath": null,
+    "timestamp": 1774588735563,
+    "codeLength": 492,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Empath+Linguist+SpellCheckVisual",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: COLLECTIVE_DISCOVERY: Empath:memory_compressor + Linguist:op",
+    "filename": "omnimens_autocode_emergent_capability_mn8ghwf2.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mn8ghwf2.mjs",
+    "backupPath": null,
+    "timestamp": 1774589042270,
+    "codeLength": 443,
     "overwrite": false
   }
 ]
