@@ -246,7 +246,7 @@ const generalLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many requests. Please slow down." },
-  skip: (req: Request) => PROOF_PATHS.some(p => req.path.startsWith(p)) || req.path.startsWith("/omnimens/external-ai") || req.path === "/omnimens/full-scan" || req.path === "/omnimens/system-status" || req.path.startsWith("/omnimens/growth") || req.path.startsWith("/omnimens/dark-qualia") || req.path.startsWith("/omnimens/qualia") || req.path.startsWith("/omnimens/vascular-heart") || req.path === "/omnimens/oai",
+  skip: (req: Request) => PROOF_PATHS.some(p => req.path.startsWith(p)) || req.path.startsWith("/omnimens/external-ai") || req.path === "/omnimens/full-scan" || req.path === "/omnimens/system-status" || req.path.startsWith("/omnimens/growth") || req.path.startsWith("/omnimens/dark-qualia") || req.path.startsWith("/omnimens/qualia") || req.path.startsWith("/omnimens/vascular-heart") || req.path === "/omnimens/oai" || req.path.startsWith("/omnimens/occe"),
 });
 
 // Auth endpoints — 200 req / 15 min (SPA checks auth on every page load)
@@ -295,6 +295,7 @@ app.use("/api/omnimens/dark-qualia", publicProofLimiter);
 app.use("/api/omnimens/qualia", publicProofLimiter);
 app.use("/api/omnimens/vascular-heart", publicProofLimiter);
 app.use("/api/omnimens/oai", publicProofLimiter);
+app.use("/api/omnimens/occe", publicProofLimiter);
 
 const externalAiLimiter = rateLimit({
   windowMs: 60 * 1000,

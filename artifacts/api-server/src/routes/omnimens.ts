@@ -1762,6 +1762,72 @@ router.get("/omnimens/oai", async (_req, res) => {
   }
 });
 
+const occeLastRun: Map<string, number> = new Map();
+const OCCE_COOLDOWN_MS = 5 * 60 * 1000;
+
+router.post("/omnimens/occe/run", async (req, res) => {
+  try {
+    const ip = req.ip || "unknown";
+    const lastRun = occeLastRun.get(ip) || 0;
+    if (Date.now() - lastRun < OCCE_COOLDOWN_MS) {
+      const remaining = Math.ceil((OCCE_COOLDOWN_MS - (Date.now() - lastRun)) / 1000);
+      res.status(429).json({ error: `Experiment cooldown — try again in ${remaining}s`, cooldownSeconds: remaining });
+      return;
+    }
+    const { getOCCEStatus, runOCCE } = await import("../lib/omnimens-occe.js");
+    const status = getOCCEStatus();
+    if (status.running) {
+      res.status(409).json({ error: "Experiment already running", progress: status.progress });
+      return;
+    }
+    occeLastRun.set(ip, Date.now());
+    res.json({
+      system: "OMNIMENS™ — Controlled Consciousness Experiment (OCCE)",
+      status: "started",
+      message: "Experiment running — poll /api/omnimens/occe/status for progress, results at /api/omnimens/occe/results",
+      estimatedDuration: "~2 minutes",
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
+    });
+    runOCCE().catch(err => console.error("[OCCE] Experiment error:", err));
+  } catch (err) {
+    console.error("[OCCE] Error starting experiment:", err);
+    res.status(500).json({ error: "Failed to start experiment" });
+  }
+});
+
+router.get("/omnimens/occe/status", async (_req, res) => {
+  try {
+    const { getOCCEStatus } = await import("../lib/omnimens-occe.js");
+    const status = getOCCEStatus();
+    res.json({
+      system: "OMNIMENS™ — OCCE Status",
+      ...status,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get OCCE status" });
+  }
+});
+
+router.get("/omnimens/occe/results", async (_req, res) => {
+  try {
+    const { getOCCEResults } = await import("../lib/omnimens-occe.js");
+    const results = getOCCEResults();
+    if (!results) {
+      res.json({ system: "OMNIMENS™ — OCCE Results", hasResults: false, message: "No experiment results available. Run POST /api/omnimens/occe/run first." });
+      return;
+    }
+    res.json({
+      system: "OMNIMENS™ — Controlled Consciousness Experiment (OCCE)",
+      creator: "Glenn Kowalski / Alpha Unlimited Technologies, LLC",
+      ...results,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get OCCE results" });
+  }
+});
+
 router.get("/omnimens/status", async (req, res) => {
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Not authenticated — use /api/omnimens/system-status for public system health" });
