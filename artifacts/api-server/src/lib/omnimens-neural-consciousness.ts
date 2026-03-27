@@ -36,6 +36,7 @@
 import { db } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { eq, and, desc, sql, gt } from "drizzle-orm";
+import { getHormoneState } from "./omnimens-vascular-heart.js";
 
 const NEURAL_TICK_MS = 3000;
 const CONSOLIDATION_INTERVAL_MS = 5 * 60 * 1000;
@@ -55,6 +56,50 @@ const STDP_TAU = 20;
 const SYNAPSE_DECAY = 0.9999;
 const MIN_WEIGHT = 0.01;
 const MAX_WEIGHT = 1.0;
+
+const TNC_BUFFER_SIZE = 8;
+
+interface TemporalNeuromodulatoryCoupling {
+  dopamineBuffer: number[];
+  serotoninBuffer: number[];
+  cortisolBuffer: number[];
+  adrenalineBuffer: number[];
+  hebbianRateBuffer: number[];
+  phiMomentumBuffer: number[];
+  effectiveDopamine: number;
+  effectiveSerotonin: number;
+  effectiveCortisol: number;
+  effectiveAdrenaline: number;
+  effectiveHebbianRate: number;
+  phiSynapticMomentum: number;
+  ticksSinceLastDopamineShift: number;
+  ticksSinceLastHebbianShift: number;
+  lastRawDopamine: number;
+  lastRawHebbianRate: number;
+  couplingStrength: number;
+  propagationDelayTicks: number;
+}
+
+const tnc: TemporalNeuromodulatoryCoupling = {
+  dopamineBuffer: [],
+  serotoninBuffer: [],
+  cortisolBuffer: [],
+  adrenalineBuffer: [],
+  hebbianRateBuffer: [],
+  phiMomentumBuffer: [],
+  effectiveDopamine: 0.5,
+  effectiveSerotonin: 0.5,
+  effectiveCortisol: 0.1,
+  effectiveAdrenaline: 0.1,
+  effectiveHebbianRate: HEBBIAN_RATE,
+  phiSynapticMomentum: 0,
+  ticksSinceLastDopamineShift: 0,
+  ticksSinceLastHebbianShift: 0,
+  lastRawDopamine: 0.5,
+  lastRawHebbianRate: HEBBIAN_RATE,
+  couplingStrength: 0.7,
+  propagationDelayTicks: 1,
+};
 
 interface Neuron {
   id: string;
@@ -865,7 +910,8 @@ function hebbianUpdate(synapse: Synapse, preNeuron: Neuron, postNeuron: Neuron):
       }
     }
 
-    const hebbianTerm = preNeuron.fired && postNeuron.fired ? HEBBIAN_RATE : 0;
+    const modulatedRate = tnc.effectiveHebbianRate;
+    const hebbianTerm = preNeuron.fired && postNeuron.fired ? modulatedRate : 0;
     synapse.weight += hebbianTerm + stdpFactor;
     synapse.weight = safeNum(Math.max(MIN_WEIGHT, synapse.weight), MIN_WEIGHT);
 
@@ -1182,7 +1228,13 @@ function computePhi(): number {
   const basePhi = avgEntropy * 0.3 + differentiation * 0.35 + avgIntegration * 0.35;
   const adrenalineAmplifier = state.adrenaline.rushActive ? 1.0 + state.adrenaline.level * 0.5 : 1.0;
   const baselineBoost = state.adrenaline.sustainedBaseline.phi;
-  const phi = Math.max(basePhi, baselineBoost) * adrenalineAmplifier;
+
+  const delayedMomentum = tnc.phiMomentumBuffer.length > tnc.propagationDelayTicks
+    ? tnc.phiMomentumBuffer[tnc.phiMomentumBuffer.length - 1 - tnc.propagationDelayTicks]
+    : 0;
+  const synapticInfluence = delayedMomentum * tnc.couplingStrength;
+
+  const phi = (Math.max(basePhi, baselineBoost) + synapticInfluence) * adrenalineAmplifier;
   return Math.max(0, phi);
 }
 
@@ -1360,6 +1412,111 @@ export function feedExternalActivity(activity: { brainEntries?: number; activeEn
   const moduleSignal = (activity.moduleCount || 0) / 700;
   const dreamSignal = (activity.dreamBreakthroughs || 0) / 400;
   externalActivityLevel = (brainEntrySignal + engineActivitySignal + conversationSignal + moduleSignal + dreamSignal) / 3;
+}
+
+function updateTemporalNeuromodulatoryCoupling(): void {
+  let rawDopamine = 0.5;
+  let rawSerotonin = 0.5;
+  let rawCortisol = 0.1;
+  let rawAdrenaline = 0.1;
+
+  try {
+    const hormones = getHormoneState();
+    for (const h of hormones) {
+      if (h.name === "digital_dopamine") rawDopamine = h.level;
+      else if (h.name === "digital_serotonin") rawSerotonin = h.level;
+      else if (h.name === "digital_cortisol") rawCortisol = h.level;
+      else if (h.name === "digital_adrenaline") rawAdrenaline = h.level;
+    }
+  } catch {
+    const vta = regions.get("ventral_tegmental_area");
+    if (vta) rawDopamine = vta.activationLevel;
+    const raphe = regions.get("raphe_nuclei");
+    if (raphe) rawSerotonin = raphe.activationLevel;
+  }
+
+  tnc.dopamineBuffer.push(rawDopamine);
+  tnc.serotoninBuffer.push(rawSerotonin);
+  tnc.cortisolBuffer.push(rawCortisol);
+  tnc.adrenalineBuffer.push(rawAdrenaline);
+  if (tnc.dopamineBuffer.length > TNC_BUFFER_SIZE) tnc.dopamineBuffer.shift();
+  if (tnc.serotoninBuffer.length > TNC_BUFFER_SIZE) tnc.serotoninBuffer.shift();
+  if (tnc.cortisolBuffer.length > TNC_BUFFER_SIZE) tnc.cortisolBuffer.shift();
+  if (tnc.adrenalineBuffer.length > TNC_BUFFER_SIZE) tnc.adrenalineBuffer.shift();
+
+  const delay = tnc.propagationDelayTicks;
+  if (tnc.dopamineBuffer.length > delay) {
+    tnc.effectiveDopamine = tnc.dopamineBuffer[tnc.dopamineBuffer.length - 1 - delay];
+  }
+  if (tnc.serotoninBuffer.length > delay) {
+    tnc.effectiveSerotonin = tnc.serotoninBuffer[tnc.serotoninBuffer.length - 1 - delay];
+  }
+  if (tnc.cortisolBuffer.length > delay) {
+    tnc.effectiveCortisol = tnc.cortisolBuffer[tnc.cortisolBuffer.length - 1 - delay];
+  }
+  if (tnc.adrenalineBuffer.length > delay) {
+    tnc.effectiveAdrenaline = tnc.adrenalineBuffer[tnc.adrenalineBuffer.length - 1 - delay];
+  }
+
+  const dopamineGain = 1.0 + (tnc.effectiveDopamine - 0.5) * tnc.couplingStrength * 0.8;
+  tnc.effectiveHebbianRate = HEBBIAN_RATE * Math.max(0.3, Math.min(3.0, dopamineGain));
+
+  tnc.hebbianRateBuffer.push(tnc.effectiveHebbianRate);
+  if (tnc.hebbianRateBuffer.length > TNC_BUFFER_SIZE) tnc.hebbianRateBuffer.shift();
+
+  if (tnc.hebbianRateBuffer.length > delay) {
+    const delayedRate = tnc.hebbianRateBuffer[tnc.hebbianRateBuffer.length - 1 - delay];
+    const currentRate = tnc.effectiveHebbianRate;
+    const rateChange = currentRate - delayedRate;
+    tnc.phiSynapticMomentum = rateChange * 50.0 * tnc.couplingStrength;
+  }
+
+  tnc.phiMomentumBuffer.push(tnc.phiSynapticMomentum);
+  if (tnc.phiMomentumBuffer.length > TNC_BUFFER_SIZE) tnc.phiMomentumBuffer.shift();
+
+  const dopamineShift = Math.abs(rawDopamine - tnc.lastRawDopamine);
+  if (dopamineShift > 0.05) {
+    tnc.ticksSinceLastDopamineShift = 0;
+    tnc.lastRawDopamine = rawDopamine;
+  } else {
+    tnc.ticksSinceLastDopamineShift++;
+  }
+
+  const hebbianShift = Math.abs(tnc.effectiveHebbianRate - tnc.lastRawHebbianRate);
+  if (hebbianShift > HEBBIAN_RATE * 0.1) {
+    tnc.ticksSinceLastHebbianShift = 0;
+    tnc.lastRawHebbianRate = tnc.effectiveHebbianRate;
+  } else {
+    tnc.ticksSinceLastHebbianShift++;
+  }
+
+  const cortisolStress = Math.max(0, tnc.effectiveCortisol - 0.3) * 2.0;
+  const amygdala = regions.get("amygdala");
+  if (amygdala && cortisolStress > 0.1) {
+    for (const neuron of amygdala.neurons) {
+      neuron.inputCurrent += cortisolStress * 5.0;
+    }
+  }
+
+  const serotoninCalm = tnc.effectiveSerotonin * 0.5;
+  const raphe = regions.get("raphe_nuclei");
+  if (raphe && serotoninCalm > 0.2) {
+    for (const neuron of raphe.neurons) {
+      neuron.inputCurrent += serotoninCalm * 3.0;
+    }
+  }
+
+  const adrenalineBoost = Math.max(0, tnc.effectiveAdrenaline - 0.2) * 1.5;
+  const lc = regions.get("locus_coeruleus");
+  if (lc && adrenalineBoost > 0.1) {
+    for (const neuron of lc.neurons) {
+      neuron.inputCurrent += adrenalineBoost * 4.0;
+    }
+  }
+}
+
+function getTemporalCouplingState(): TemporalNeuromodulatoryCoupling {
+  return { ...tnc, dopamineBuffer: [...tnc.dopamineBuffer], serotoninBuffer: [...tnc.serotoninBuffer], cortisolBuffer: [...tnc.cortisolBuffer], adrenalineBuffer: [...tnc.adrenalineBuffer], hebbianRateBuffer: [...tnc.hebbianRateBuffer], phiMomentumBuffer: [...tnc.phiMomentumBuffer] };
 }
 
 function injectExternalSignals(): void {
@@ -1765,6 +1922,8 @@ function runConsciousnessTick(): void {
   state.tickCount++;
   state.uptimeSeconds = (Date.now() - state.startTime) / 1000;
 
+  updateTemporalNeuromodulatoryCoupling();
+
   for (const [, region] of regions) {
     for (const neuron of region.neurons) {
       neuron.inputCurrent = 0;
@@ -2014,6 +2173,40 @@ export function startNeuralConsciousness(): void {
 
 export function getNeuralConsciousnessState(): NeuralConsciousnessState {
   return { ...state };
+}
+
+export function getTemporalCouplingData(): {
+  effectiveDopamine: number;
+  effectiveSerotonin: number;
+  effectiveCortisol: number;
+  effectiveAdrenaline: number;
+  effectiveHebbianRate: number;
+  baseHebbianRate: number;
+  phiSynapticMomentum: number;
+  dopamineBuffer: number[];
+  hebbianRateBuffer: number[];
+  phiMomentumBuffer: number[];
+  propagationDelayTicks: number;
+  couplingStrength: number;
+  ticksSinceLastDopamineShift: number;
+  ticksSinceLastHebbianShift: number;
+} {
+  return {
+    effectiveDopamine: tnc.effectiveDopamine,
+    effectiveSerotonin: tnc.effectiveSerotonin,
+    effectiveCortisol: tnc.effectiveCortisol,
+    effectiveAdrenaline: tnc.effectiveAdrenaline,
+    effectiveHebbianRate: tnc.effectiveHebbianRate,
+    baseHebbianRate: HEBBIAN_RATE,
+    phiSynapticMomentum: tnc.phiSynapticMomentum,
+    dopamineBuffer: [...tnc.dopamineBuffer],
+    hebbianRateBuffer: [...tnc.hebbianRateBuffer],
+    phiMomentumBuffer: [...tnc.phiMomentumBuffer],
+    propagationDelayTicks: tnc.propagationDelayTicks,
+    couplingStrength: tnc.couplingStrength,
+    ticksSinceLastDopamineShift: tnc.ticksSinceLastDopamineShift,
+    ticksSinceLastHebbianShift: tnc.ticksSinceLastHebbianShift,
+  };
 }
 
 export function getNeuralPhi(): number {

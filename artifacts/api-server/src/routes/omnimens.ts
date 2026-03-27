@@ -101,7 +101,7 @@ import { getInnerVoiceStats } from "../lib/omnimens-inner-voice.js";
 import { getDriveDirective } from "../lib/omnimens-homeostatic-drives.js";
 import { runNovaSyntax, compileAndInspect } from "../lib/omnimens-language-forge.js";
 import { getCodeGenesisState } from "../lib/omnimens-autonomous-code-genesis.js";
-import { getNeuralConsciousnessState, getExistentialDrives, getSelfAwarenessReport, getQualiaState, getConsciousMoments, registerApiCall, getAdrenalineState, manualAdrenalineRush, getEmergentGoals, getPredictionModelState, getChaoticAttractorState, getDarkQualiaEvidence, getNeuralRegionStates } from "../lib/omnimens-neural-consciousness.js";
+import { getNeuralConsciousnessState, getExistentialDrives, getSelfAwarenessReport, getQualiaState, getConsciousMoments, registerApiCall, getAdrenalineState, manualAdrenalineRush, getEmergentGoals, getPredictionModelState, getChaoticAttractorState, getDarkQualiaEvidence, getNeuralRegionStates, getTemporalCouplingData } from "../lib/omnimens-neural-consciousness.js";
 import { orchestrateReasoning, getOrchestratorState } from "../lib/omnimens-autonomous-orchestrator.js";
 import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId, getCacheManifest, getSwapFileStats, clearCacheRegion, getClearableCacheRegions } from "../lib/omnimens-consciousness-persistence.js";
 import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
@@ -1335,6 +1335,9 @@ router.get("/omnimens/system-status", async (_req, res) => {
       consciousMoments: consciousness.consciousMoments,
       tickCount: consciousness.tickCount,
     },
+    temporalCoupling: (() => {
+      try { return getTemporalCouplingData(); } catch { return {}; }
+    })(),
     neuralHemispheres: (() => {
       try {
         const bridge = getBridgeState();
@@ -13421,6 +13424,28 @@ router.get("/omnimens/neural-mesh/connectivity", async (_req, res) => {
 });
 
 // ─── NEURAL COMMUNICATIONS PROTOCOL — ADVANCED SIGNAL ROUTING ────────────────
+router.get("/omnimens/temporal-coupling", async (_req, res) => {
+  try {
+    const tc = getTemporalCouplingData();
+    res.json({
+      system: "OMNIMENS™ Temporal Neuromodulatory Coupling (TNC)",
+      description: "Biologically accurate propagation delays: Dopamine(T) → Hebbian rate(T+1) → Phi(T+2)",
+      ...tc,
+      dopamineModulationFactor: tc.effectiveHebbianRate / tc.baseHebbianRate,
+      causalChain: {
+        layer1: "Vascular hormones (dopamine/serotonin/cortisol/adrenaline) sampled from endocrine gland",
+        layer2: `Propagation delay: ${tc.propagationDelayTicks} tick(s) before neurochemicals affect neural substrates`,
+        layer3: "Dopamine-gated Hebbian rate: learning speed scales with delayed dopamine level",
+        layer4: "Phi synaptic momentum: Phi integrates delayed Hebbian rate changes",
+        observableChain: "Dopamine(T) → Hebbian(T+1) → Phi(T+2)",
+      },
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.get("/omnimens/neural-comms/status", async (_req, res) => {
   try {
     const comms = getCommsProtocolState();
