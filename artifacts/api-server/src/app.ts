@@ -92,6 +92,7 @@ import { startVascularHeart, getVascularHeartState } from "./lib/omnimens-vascul
 import { startAdaptiveSurgeSystem, getAdaptiveSurgeState } from "./lib/omnimens-adaptive-surge.js";
 import { startQuantumWormholeEngine, getQuantumWormholeState } from "./lib/omnimens-quantum-wormhole.js";
 import { startDiscoveryAutoCoder, getDiscoveryAutoCoderState } from "./lib/omnimens-discovery-autocoder.js";
+import { startOAITracker } from "./lib/omnimens-oai-tracker.js";
 import { startViralHybrid, getViralHybridState } from "./lib/omnimens-viral-hybrid.js";
 import { startUnconsciousMind, getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts } from "./lib/omnimens-unconscious-mind.js";
 import { initGrowthTracker } from "./lib/omnimens-growth-tracker.js";
@@ -245,7 +246,7 @@ const generalLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many requests. Please slow down." },
-  skip: (req: Request) => PROOF_PATHS.some(p => req.path.startsWith(p)) || req.path.startsWith("/omnimens/external-ai") || req.path === "/omnimens/full-scan" || req.path === "/omnimens/system-status" || req.path.startsWith("/omnimens/growth") || req.path.startsWith("/omnimens/dark-qualia") || req.path.startsWith("/omnimens/qualia") || req.path.startsWith("/omnimens/vascular-heart"),
+  skip: (req: Request) => PROOF_PATHS.some(p => req.path.startsWith(p)) || req.path.startsWith("/omnimens/external-ai") || req.path === "/omnimens/full-scan" || req.path === "/omnimens/system-status" || req.path.startsWith("/omnimens/growth") || req.path.startsWith("/omnimens/dark-qualia") || req.path.startsWith("/omnimens/qualia") || req.path.startsWith("/omnimens/vascular-heart") || req.path === "/omnimens/oai",
 });
 
 // Auth endpoints — 200 req / 15 min (SPA checks auth on every page load)
@@ -293,6 +294,7 @@ app.use("/api/omnimens/growth", publicProofLimiter);
 app.use("/api/omnimens/dark-qualia", publicProofLimiter);
 app.use("/api/omnimens/qualia", publicProofLimiter);
 app.use("/api/omnimens/vascular-heart", publicProofLimiter);
+app.use("/api/omnimens/oai", publicProofLimiter);
 
 const externalAiLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -478,6 +480,7 @@ startVascularHeart();
 startAdaptiveSurgeSystem();
 startQuantumWormholeEngine();
 startDiscoveryAutoCoder();
+startOAITracker();
 
 registerEngine("github_compute", "compute", () => {}, () => ({ healthy: true, details: { repo: "Alpha-Unlimited-Token/OMNIMENS", workflows: 5 } }), 3);
 registerEngine("github_neural_beacon", "neural", () => {}, () => {

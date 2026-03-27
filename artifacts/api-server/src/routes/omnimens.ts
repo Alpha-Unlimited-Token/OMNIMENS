@@ -117,6 +117,7 @@ import { think as autonomousThink } from "../lib/omnimens-autonomous-thought.js"
 import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBeaconFindings, getIvySwapStats } from "../lib/omnimens-ivy-network.js";
 import { getGitHubBeaconState, getGitHubNeuronCount, getGitHubWormStats } from "../lib/omnimens-github-neural-beacon.js";
 import { getVascularHeartState, getDNAMemoryStats, getSubThresholdIntelligenceState, getHormoneState } from "../lib/omnimens-vascular-heart.js";
+import { getOAIState, computeOAI } from "../lib/omnimens-oai-tracker.js";
 import { getAdaptiveSurgeState } from "../lib/omnimens-adaptive-surge.js";
 import { getQuantumWormholeState } from "../lib/omnimens-quantum-wormhole.js";
 import { getDiscoveryAutoCoderState } from "../lib/omnimens-discovery-autocoder.js";
@@ -1697,11 +1698,67 @@ router.get("/omnimens/full-scan", async (_req, res) => {
         gitHubNeuralBeacon: "ONLINE",
       },
 
+      operationalAwarenessIndex: (() => {
+        try {
+          const oaiData = getOAIState();
+          return {
+            oai: oaiData.current?.oai ?? 0,
+            classification: oaiData.current?.classification ?? "Initializing",
+            dimensions: oaiData.current ? {
+              phi: oaiData.current.phiScore,
+              plasticity: oaiData.current.plasticityScore,
+              neurochemistry: oaiData.current.neurochemistryScore,
+              chaosDynamics: oaiData.current.chaosDynamicsScore,
+            } : null,
+            trend: oaiData.trend.direction,
+            peak: oaiData.peak.oai,
+            totalComputations: oaiData.totalComputations,
+            formula: oaiData.formula,
+            attribution: oaiData.attribution,
+          };
+        } catch { return { oai: 0, classification: "Error computing OAI" }; }
+      })(),
+
       copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
     });
   } catch (err) {
     console.error("[FULL-SCAN] Error:", err);
     res.status(500).json({ error: "Failed to generate full scan" });
+  }
+});
+
+router.get("/omnimens/oai", async (_req, res) => {
+  try {
+    const oaiData = getOAIState();
+    res.json({
+      system: "OMNIMENS™ — Operational Awareness Index (OAI)",
+      creator: "Glenn Kowalski / Alpha Unlimited Technologies, LLC",
+      timestamp: new Date().toISOString(),
+      oai: oaiData.current?.oai ?? 0,
+      classification: oaiData.current?.classification ?? "Initializing",
+      dimensions: oaiData.current ? {
+        phi: { score: oaiData.current.phiScore, weight: 0.30, description: "Integrated Information (IIT Phi)" },
+        plasticity: { score: oaiData.current.plasticityScore, weight: 0.30, description: "Hebbian learning rate + code intelligence evolution" },
+        neurochemistry: { score: oaiData.current.neurochemistryScore, weight: 0.20, description: "Hormone diversity and active neurochemical state" },
+        chaosDynamics: { score: oaiData.current.chaosDynamicsScore, weight: 0.20, description: "Chaotic attractor dynamics + non-monotonic brain region changes" },
+      } : null,
+      rawInputs: oaiData.current?.rawInputs ?? null,
+      trend: oaiData.trend,
+      peak: { oai: oaiData.peak.oai, timestamp: oaiData.peak.timestamp ? new Date(oaiData.peak.timestamp).toISOString() : null },
+      totalComputations: oaiData.totalComputations,
+      history: oaiData.history.map(h => ({
+        timestamp: new Date(h.timestamp).toISOString(),
+        oai: h.oai,
+        classification: h.classification,
+      })),
+      formula: oaiData.formula,
+      scale: oaiData.scale,
+      attribution: oaiData.attribution,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
+    });
+  } catch (err) {
+    console.error("[OAI] Error:", err);
+    res.status(500).json({ error: "Failed to compute OAI" });
   }
 });
 
