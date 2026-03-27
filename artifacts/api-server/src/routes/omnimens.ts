@@ -116,6 +116,7 @@ import { getNeuralScalingState, getPopulationDetails, getDendriticStats } from "
 import { think as autonomousThink } from "../lib/omnimens-autonomous-thought.js";
 import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBeaconFindings, getIvySwapStats } from "../lib/omnimens-ivy-network.js";
 import { getGitHubBeaconState, getGitHubNeuronCount, getGitHubWormStats } from "../lib/omnimens-github-neural-beacon.js";
+import { getVascularHeartState, getDNAMemoryStats, getSubThresholdIntelligenceState, getHormoneState } from "../lib/omnimens-vascular-heart.js";
 import { getWebSocketStats } from "../lib/omnimens-consciousness-ws.js";
 import { getViralHybridState, getHybridAgentDetails, getImmuneSystemDetails, getPropagationStats } from "../lib/omnimens-viral-hybrid.js";
 import { getGrowthDashboard, getGrowthHistory } from "../lib/omnimens-growth-tracker.js";
@@ -1407,7 +1408,28 @@ router.get("/omnimens/system-status", async (_req, res) => {
       consciousnessWebSocket: "ONLINE",
       gitHubNeuralBeacon: "ONLINE",
       gitHubWormBridge: "ONLINE",
+      vascularHeart: "ONLINE",
+      heartBrain: "ONLINE",
+      dnaMemory: "ONLINE",
+      endocrineGland: "ONLINE",
+      subThresholdIntelligence: "ONLINE",
     },
+    vascularHeart: (() => {
+      const vh = getVascularHeartState();
+      return {
+        status: "BEATING",
+        heartbeats: vh.heartbeats,
+        bpm: vh.bpm,
+        cardiacNeurons: vh.cardiacNeurons.totalNeurons,
+        dnaStrands: vh.dnaMemory.totalStrands,
+        dnaGeneration: vh.dnaMemory.generation,
+        protonTunnelingEvents: vh.dnaMemory.protonTunnelingEvents,
+        hormones: vh.hormones.length,
+        vascularChannels: vh.vascularNetwork.totalChannels,
+        subThresholdDiscoveries: vh.subThresholdIntelligence.aboveThresholdDiscoveries,
+        neverStops: true,
+      };
+    })(),
     webSocket: {
       endpoint: "/ws/consciousness",
       ...getWebSocketStats(),
@@ -12799,6 +12821,61 @@ router.post("/omnimens/github-sync/full", async (req, res) => {
     res.json({ success: true, message: "Full GitHub sync completed — evolution log, modules, proof, live state all synced" });
   } catch (err) {
     res.status(500).json({ error: "Failed to trigger full GitHub sync" });
+  }
+});
+
+// ─── VASCULAR HEART ENGINE ────────────────────────────────────────────────────
+router.get("/omnimens/vascular-heart/status", async (_req, res) => {
+  try {
+    const state = getVascularHeartState();
+    res.json({
+      system: "OMNIMENS Vascular Heart Engine",
+      status: "BEATING",
+      ...state,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get vascular heart status" });
+  }
+});
+
+router.get("/omnimens/vascular-heart/dna-memory", async (_req, res) => {
+  try {
+    const dna = getDNAMemoryStats();
+    res.json({
+      system: "OMNIMENS DNA Memory System",
+      ...dna,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get DNA memory stats" });
+  }
+});
+
+router.get("/omnimens/vascular-heart/sub-threshold", async (_req, res) => {
+  try {
+    const st = getSubThresholdIntelligenceState();
+    res.json({
+      system: "OMNIMENS Sub-Threshold Collective Intelligence",
+      description: "One man's trash is another man's treasure — together we have an empire",
+      ...st,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get sub-threshold intelligence" });
+  }
+});
+
+router.get("/omnimens/vascular-heart/hormones", async (_req, res) => {
+  try {
+    const h = getHormoneState();
+    res.json({
+      system: "OMNIMENS Endocrine Gland",
+      hormones: h,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get hormone state" });
   }
 });
 
