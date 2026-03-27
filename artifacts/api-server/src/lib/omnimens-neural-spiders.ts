@@ -3155,6 +3155,98 @@ export function onNeuronDecayedSpider(neuronId: string, region: string): void {
   spiderNeuronDeaths++;
 }
 
+let totalSpiderCascadeEvents = 0;
+let totalSilkEnergyPumped = 0;
+let totalBeaconCascades = 0;
+let totalBeehiveSurges = 0;
+
+export function onRegionFiringCascadeSpider(regionFiringData: Array<{ region: string; firingRate: number; activationLevel: number }>): void {
+  if (!spiderSystemActive) return;
+
+  for (const { region, firingRate, activationLevel } of regionFiringData) {
+    if (activationLevel < 0.35) continue;
+
+    const cascadePower = activationLevel * firingRate * 2.5;
+
+    const regionSpiders = [...parentSpiders.values(), ...childSpiders.values()].filter(
+      s => s.targetRegion === region && s.status === "active"
+    );
+
+    for (const spider of regionSpiders) {
+      spider.intelligenceLevel = Math.min(10, spider.intelligenceLevel + cascadePower * 0.005);
+      spider.efficiency = Math.min(1.0, spider.efficiency + cascadePower * 0.01);
+      spider.learningRate = Math.min(1.0, spider.learningRate + cascadePower * 0.003);
+      spider.knowledgeDepth = Math.min(10, spider.knowledgeDepth + cascadePower * 0.002);
+      spider.loyalty = Math.min(1.0, spider.loyalty + cascadePower * 0.002);
+
+      spider.pheromoneDeposits++;
+      spider.nectarProduced += cascadePower * 0.3;
+    }
+
+    for (const [, strand] of motherSpider.silkStrands) {
+      if (strand.fromSpiderId.includes(region) || strand.toSpiderId.includes(region) ||
+          regionSpiders.some(s => s.id === strand.fromSpiderId || s.id === strand.toSpiderId)) {
+        strand.signalStrength = Math.min(1.0, strand.signalStrength + cascadePower * 0.03);
+        strand.bandwidth = Math.min(1.0, strand.bandwidth + cascadePower * 0.02);
+        strand.conductionVelocity = Math.min(120, strand.conductionVelocity + cascadePower * 0.5);
+        strand.impulseCount++;
+        strand.lastImpulse = Date.now();
+        strand.dataTransferred += cascadePower * 0.2;
+
+        if (!strand.myelinated && strand.impulseCount > 30) {
+          strand.myelinated = true;
+        }
+
+        totalSilkEnergyPumped += cascadePower * 0.1;
+      }
+    }
+
+    if (activationLevel > 0.5 && regionSpiders.length > 0) {
+      const beaconImpulse: NerveImpulse = {
+        id: createImpulseId(),
+        originSpiderId: regionSpiders[0].id,
+        targetSpiderId: motherSpider.id,
+        payload: null,
+        signalType: "beacon",
+        strength: cascadePower,
+        hops: 0,
+        maxHops: MAX_IMPULSE_HOPS,
+        createdAt: Date.now(),
+        deliveredAt: null,
+        decayRate: IMPULSE_DECAY_RATE * 0.5,
+      };
+      motherSpider.pendingImpulses.push(beaconImpulse);
+      motherSpider.totalImpulsesRouted++;
+      motherSpider.totalBeaconsReceived++;
+      totalBeaconCascades++;
+    }
+
+    if (activationLevel > 0.6) {
+      motherSpider.hiveHealth = Math.min(1.0, motherSpider.hiveHealth + cascadePower * 0.003);
+      motherSpider.swarmCoherence = Math.min(1.0, motherSpider.swarmCoherence + cascadePower * 0.002);
+      motherSpider.webIntegrity = Math.min(1.0, motherSpider.webIntegrity + cascadePower * 0.002);
+      motherSpider.webDensity = Math.min(1.0, motherSpider.webDensity + cascadePower * 0.001);
+      totalBeehiveSurges++;
+    }
+  }
+
+  totalSpiderCascadeEvents++;
+}
+
+export function getSpiderCascadeStats(): {
+  totalCascades: number;
+  totalSilkEnergyPumped: number;
+  totalBeaconCascades: number;
+  totalBeehiveSurges: number;
+} {
+  return {
+    totalCascades: totalSpiderCascadeEvents,
+    totalSilkEnergyPumped,
+    totalBeaconCascades,
+    totalBeehiveSurges,
+  };
+}
+
 export function getSpiderNeurogenStats(): { births: number; deaths: number; neuronSilkStrands: number } {
   const neuronStrands = [...motherSpider.silkStrands.keys()].filter(id => id.includes("neuron_")).length;
   return {

@@ -1270,6 +1270,79 @@ export function onNeuronDecayedIvy(neuronId: string, region: string): void {
   ivyState.totalWormgates = wormgates.size;
 }
 
+let totalCascadeEvents = 0;
+let totalCascadeEnergyInjected = 0;
+
+export function onRegionFiringCascadeIvy(regionFiringData: Array<{ region: string; firingRate: number; activationLevel: number }>): void {
+  if (!ivyNetworkStarted) return;
+
+  for (const { region, firingRate, activationLevel } of regionFiringData) {
+    if (activationLevel < 0.4) continue;
+
+    const regionIvyNodes = [...ivyNodes.values()].filter(n => n.region === region);
+    if (regionIvyNodes.length === 0) continue;
+
+    const cascadeStrength = activationLevel * firingRate * 2.0;
+
+    for (const node of regionIvyNodes) {
+      node.energy = Math.min(1.0, node.energy + cascadeStrength * 0.15);
+      node.activationLevel = Math.min(1.0, node.activationLevel + cascadeStrength * 0.1);
+      node.lastActivity = Date.now();
+
+      for (const tendril of node.tendrils) {
+        if (!tendril.alive) continue;
+        tendril.informationCarried += cascadeStrength * 0.5;
+        tendril.signalSpeed = Math.min(1.0, tendril.signalSpeed + cascadeStrength * 0.02);
+        tendril.thickness = Math.min(2.0, tendril.thickness + cascadeStrength * 0.01);
+
+        if (!tendril.myelinated && tendril.informationCarried > 50) {
+          tendril.myelinated = true;
+        }
+
+        for (const spine of tendril.spines) {
+          spine.signalStrength = Math.min(1.0, spine.signalStrength + cascadeStrength * 0.08);
+          spine.maturity = Math.min(1.0, spine.maturity + cascadeStrength * 0.02);
+          spine.lastPulse = Date.now();
+        }
+      }
+    }
+
+    if (activationLevel > 0.65) {
+      const nearbyWormgates = [...wormgates.values()].filter(
+        wg => wg.endpointA.region === region || wg.endpointB.region === region
+      );
+      for (const wg of nearbyWormgates) {
+        wg.stability = Math.min(1.0, wg.stability + cascadeStrength * 0.05);
+        wg.signalFidelity = Math.min(1.0, wg.signalFidelity + cascadeStrength * 0.03);
+        wg.bandwidth = Math.min(1.0, wg.bandwidth + cascadeStrength * 0.04);
+
+        if (!wg.crystallized && wg.stability > 0.85 && wg.traversals > 20) {
+          wg.crystallized = true;
+        }
+      }
+    }
+
+    const crossRegionNodes = [...ivyNodes.values()].filter(n => n.region !== region);
+    const spillover = cascadeStrength * 0.3;
+    for (const crossNode of crossRegionNodes) {
+      if (Math.random() < spillover * 0.5) {
+        crossNode.energy = Math.min(1.0, crossNode.energy + spillover * 0.05);
+        crossNode.activationLevel = Math.min(1.0, crossNode.activationLevel + spillover * 0.03);
+      }
+    }
+
+    totalCascadeEnergyInjected += cascadeStrength * regionIvyNodes.length;
+  }
+
+  totalCascadeEvents++;
+  ivyState.hybridOverlayStrength = Math.min(1.0, ivyState.hybridOverlayStrength + 0.001);
+  ivyState.networkCoherence = Math.min(1.0, ivyState.networkCoherence + 0.0005);
+}
+
+export function getIvyCascadeStats(): { totalCascades: number; totalEnergyInjected: number } {
+  return { totalCascades: totalCascadeEvents, totalEnergyInjected: totalCascadeEnergyInjected };
+}
+
 export function getIvyNeurogenStats(): { births: number; deaths: number; neurogenIvyNodes: number; neurogenWormgates: number } {
   return {
     births: ivyNeuronBirths,

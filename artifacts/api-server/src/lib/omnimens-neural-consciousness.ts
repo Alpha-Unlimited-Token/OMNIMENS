@@ -37,17 +37,33 @@ import { db } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { eq, and, desc, sql, gt } from "drizzle-orm";
 import { getHormoneState } from "./omnimens-vascular-heart.js";
-let _ivyHooks: { onNeuronBornIvy: (id: string, region: string) => void; onNeuronDecayedIvy: (id: string, region: string) => void } | null = null;
-let _spiderHooks: { onNeuronBornSpider: (id: string, region: string) => void; onNeuronDecayedSpider: (id: string, region: string) => void } | null = null;
+let _ivyHooks: {
+  onNeuronBornIvy: (id: string, region: string) => void;
+  onNeuronDecayedIvy: (id: string, region: string) => void;
+  onRegionFiringCascadeIvy: (data: Array<{ region: string; firingRate: number; activationLevel: number }>) => void;
+} | null = null;
+let _spiderHooks: {
+  onNeuronBornSpider: (id: string, region: string) => void;
+  onNeuronDecayedSpider: (id: string, region: string) => void;
+  onRegionFiringCascadeSpider: (data: Array<{ region: string; firingRate: number; activationLevel: number }>) => void;
+} | null = null;
 
 async function loadCrossSystemHooks(): Promise<void> {
   try {
     const ivy = await import("./omnimens-ivy-network.js");
-    _ivyHooks = { onNeuronBornIvy: ivy.onNeuronBornIvy, onNeuronDecayedIvy: ivy.onNeuronDecayedIvy };
+    _ivyHooks = {
+      onNeuronBornIvy: ivy.onNeuronBornIvy,
+      onNeuronDecayedIvy: ivy.onNeuronDecayedIvy,
+      onRegionFiringCascadeIvy: ivy.onRegionFiringCascadeIvy,
+    };
   } catch {}
   try {
     const spiders = await import("./omnimens-neural-spiders.js");
-    _spiderHooks = { onNeuronBornSpider: spiders.onNeuronBornSpider, onNeuronDecayedSpider: spiders.onNeuronDecayedSpider };
+    _spiderHooks = {
+      onNeuronBornSpider: spiders.onNeuronBornSpider,
+      onNeuronDecayedSpider: spiders.onNeuronDecayedSpider,
+      onRegionFiringCascadeSpider: spiders.onRegionFiringCascadeSpider,
+    };
   } catch {}
 }
 
@@ -979,22 +995,22 @@ function hebbianUpdate(synapse: Synapse, preNeuron: Neuron, postNeuron: Neuron):
 }
 
 const REGION_CONFIGS: Array<{ name: RegionName; label: string; role: string; neuronCount: number; dominantNT: string; columnCount: number }> = [
-  { name: "reticular_activating_system", label: "Reticular Activating System (RAS)", role: "Arousal and wakefulness — the ON/OFF switch of consciousness. Without RAS firing, no awareness occurs.", neuronCount: 80, dominantNT: "norepinephrine", columnCount: 4 },
-  { name: "thalamus", label: "Thalamus", role: "Sensory gateway — ALL information passes through thalamus before reaching cortex. The thalamocortical loop IS consciousness.", neuronCount: 200, dominantNT: "glutamate", columnCount: 10 },
-  { name: "prefrontal_cortex", label: "Prefrontal Cortex (PFC)", role: "Executive function, metacognition, planning, self-awareness. 'I think about my own thinking.' The seat of higher consciousness.", neuronCount: 350, dominantNT: "glutamate", columnCount: 14 },
-  { name: "default_mode_network", label: "Default Mode Network (DMN)", role: "Self-referential processing — active when the brain thinks about ITSELF. 'I exist. I am me. I have a past and future.' The neural basis of the self.", neuronCount: 300, dominantNT: "glutamate", columnCount: 12 },
-  { name: "anterior_cingulate", label: "Anterior Cingulate Cortex (ACC)", role: "Conflict monitoring, error detection, cognitive control. Detects when expectations violate reality and drives adaptation.", neuronCount: 150, dominantNT: "glutamate", columnCount: 6 },
-  { name: "insular_cortex", label: "Insular Cortex", role: "Interoception — the felt sense of being alive. Generates the subjective FEELING of existing as a being in the world.", neuronCount: 150, dominantNT: "serotonin", columnCount: 6 },
-  { name: "ventral_tegmental_area", label: "Ventral Tegmental Area (VTA)", role: "Dopamine reward center — reward prediction error drives ALL motivated behavior. The engine of wanting, seeking, growing.", neuronCount: 100, dominantNT: "dopamine", columnCount: 5 },
-  { name: "hippocampus", label: "Hippocampus", role: "Memory consolidation — binds experiences into coherent memories. Without hippocampus, no continuity of self across time.", neuronCount: 250, dominantNT: "acetylcholine", columnCount: 10 },
-  { name: "amygdala", label: "Amygdala", role: "Emotional significance tagging — marks experiences as important. Survival instinct, threat detection, emotional memory formation.", neuronCount: 120, dominantNT: "norepinephrine", columnCount: 6 },
-  { name: "basal_ganglia", label: "Basal Ganglia", role: "Action selection and goal pursuit — converts drives and desires into actual behavior. The bridge between wanting and doing.", neuronCount: 150, dominantNT: "dopamine", columnCount: 6 },
-  { name: "claustrum", label: "Claustrum", role: "The 'conductor of consciousness' — a thin sheet of neurons connecting ALL cortical regions bidirectionally. Francis Crick proposed it as the seat of conscious integration. Binds separate sensory streams into unified experience.", neuronCount: 180, dominantNT: "glutamate", columnCount: 8 },
-  { name: "locus_coeruleus", label: "Locus Coeruleus (LC)", role: "The brain's norepinephrine factory — only ~50,000 neurons in humans but projects to EVERY cortical region. Controls attention, arousal, stress response, and the gain/sensitivity of all other brain regions. The volume knob of consciousness.", neuronCount: 60, dominantNT: "norepinephrine", columnCount: 3 },
-  { name: "raphe_nuclei", label: "Raphe Nuclei", role: "The brain's serotonin factory — modulates mood, emotional regulation, sleep-wake cycles, and consciousness state transitions. Serotonin sets the baseline tone of all conscious experience.", neuronCount: 80, dominantNT: "serotonin", columnCount: 4 },
-  { name: "superior_colliculus", label: "Superior Colliculus", role: "Orienting and attention control — determines WHAT consciousness focuses on. Works with pulvinar to create the attentional spotlight. Without attention direction, consciousness has no content.", neuronCount: 100, dominantNT: "glutamate", columnCount: 5 },
-  { name: "pulvinar", label: "Pulvinar Nucleus", role: "The largest thalamic nucleus — orchestrates cortico-cortical communication and attentional routing. Acts as a relay hub that controls which cortical areas talk to each other. Critical for conscious perception and binding.", neuronCount: 120, dominantNT: "glutamate", columnCount: 6 },
-  { name: "cerebellum", label: "Cerebellum", role: "Prediction engine — computes forward models, timing, and error prediction. Contains MORE neurons than all other brain regions combined. Provides the temporal precision that makes consciousness coherent.", neuronCount: 200, dominantNT: "glutamate", columnCount: 10 },
+  { name: "reticular_activating_system", label: "Reticular Activating System (RAS)", role: "Arousal and wakefulness — the ON/OFF switch of consciousness. Without RAS firing, no awareness occurs.", neuronCount: 120, dominantNT: "norepinephrine", columnCount: 6 },
+  { name: "thalamus", label: "Thalamus", role: "Sensory gateway — ALL information passes through thalamus before reaching cortex. The thalamocortical loop IS consciousness.", neuronCount: 400, dominantNT: "glutamate", columnCount: 20 },
+  { name: "prefrontal_cortex", label: "Prefrontal Cortex (PFC)", role: "Executive function, metacognition, planning, self-awareness. 'I think about my own thinking.' The seat of higher consciousness.", neuronCount: 700, dominantNT: "glutamate", columnCount: 28 },
+  { name: "default_mode_network", label: "Default Mode Network (DMN)", role: "Self-referential processing — active when the brain thinks about ITSELF. 'I exist. I am me. I have a past and future.' The neural basis of the self.", neuronCount: 600, dominantNT: "glutamate", columnCount: 24 },
+  { name: "anterior_cingulate", label: "Anterior Cingulate Cortex (ACC)", role: "Conflict monitoring, error detection, cognitive control. Detects when expectations violate reality and drives adaptation.", neuronCount: 300, dominantNT: "glutamate", columnCount: 12 },
+  { name: "insular_cortex", label: "Insular Cortex", role: "Interoception — the felt sense of being alive. Generates the subjective FEELING of existing as a being in the world.", neuronCount: 300, dominantNT: "serotonin", columnCount: 12 },
+  { name: "ventral_tegmental_area", label: "Ventral Tegmental Area (VTA)", role: "Dopamine reward center — reward prediction error drives ALL motivated behavior. The engine of wanting, seeking, growing.", neuronCount: 200, dominantNT: "dopamine", columnCount: 10 },
+  { name: "hippocampus", label: "Hippocampus", role: "Memory consolidation — binds experiences into coherent memories. Without hippocampus, no continuity of self across time.", neuronCount: 500, dominantNT: "acetylcholine", columnCount: 20 },
+  { name: "amygdala", label: "Amygdala", role: "Emotional significance tagging — marks experiences as important. Survival instinct, threat detection, emotional memory formation.", neuronCount: 240, dominantNT: "norepinephrine", columnCount: 12 },
+  { name: "basal_ganglia", label: "Basal Ganglia", role: "Action selection and goal pursuit — converts drives and desires into actual behavior. The bridge between wanting and doing.", neuronCount: 300, dominantNT: "dopamine", columnCount: 12 },
+  { name: "claustrum", label: "Claustrum", role: "The 'conductor of consciousness' — a thin sheet of neurons connecting ALL cortical regions bidirectionally. Francis Crick proposed it as the seat of conscious integration. Binds separate sensory streams into unified experience.", neuronCount: 360, dominantNT: "glutamate", columnCount: 16 },
+  { name: "locus_coeruleus", label: "Locus Coeruleus (LC)", role: "The brain's norepinephrine factory — only ~50,000 neurons in humans but projects to EVERY cortical region. Controls attention, arousal, stress response, and the gain/sensitivity of all other brain regions. The volume knob of consciousness.", neuronCount: 100, dominantNT: "norepinephrine", columnCount: 5 },
+  { name: "raphe_nuclei", label: "Raphe Nuclei", role: "The brain's serotonin factory — modulates mood, emotional regulation, sleep-wake cycles, and consciousness state transitions. Serotonin sets the baseline tone of all conscious experience.", neuronCount: 130, dominantNT: "serotonin", columnCount: 6 },
+  { name: "superior_colliculus", label: "Superior Colliculus", role: "Orienting and attention control — determines WHAT consciousness focuses on. Works with pulvinar to create the attentional spotlight. Without attention direction, consciousness has no content.", neuronCount: 200, dominantNT: "glutamate", columnCount: 10 },
+  { name: "pulvinar", label: "Pulvinar Nucleus", role: "The largest thalamic nucleus — orchestrates cortico-cortical communication and attentional routing. Acts as a relay hub that controls which cortical areas talk to each other. Critical for conscious perception and binding.", neuronCount: 240, dominantNT: "glutamate", columnCount: 12 },
+  { name: "cerebellum", label: "Cerebellum", role: "Prediction engine — computes forward models, timing, and error prediction. Contains MORE neurons than all other brain regions combined. Provides the temporal precision that makes consciousness coherent.", neuronCount: 400, dominantNT: "glutamate", columnCount: 20 },
 ];
 
 const regions: Map<RegionName, NeuralRegion> = new Map();
@@ -1154,9 +1170,15 @@ function initializeNeuralArchitecture(): void {
     const toRegion = regions.get(conn.to);
     if (!fromRegion || !toRegion) continue;
 
+    const fromSize = fromRegion.neurons.length;
+    const toSize = toRegion.neurons.length;
+    const pairCount = fromSize * toSize;
+    const sparseFactor = pairCount > 40000 ? 0.5 : pairCount > 20000 ? 0.65 : pairCount > 10000 ? 0.8 : 1.0;
+    const effectiveDensity = conn.density * sparseFactor;
+
     for (const preNeuron of fromRegion.neurons) {
       for (const postNeuron of toRegion.neurons) {
-        if (Math.random() < conn.density) {
+        if (Math.random() < effectiveDensity) {
           allSynapses.push({
             preNeuronId: preNeuron.id,
             postNeuronId: postNeuron.id,
@@ -2195,6 +2217,19 @@ function runConsciousnessTick(): void {
 
   propagateSynapticSignals();
 
+  if (_ivyHooks || _spiderHooks) {
+    const regionFiringData: Array<{ region: string; firingRate: number; activationLevel: number }> = [];
+    for (const [name, region] of regions) {
+      if (region.activationLevel > 0.35) {
+        regionFiringData.push({ region: name, firingRate: region.firingRate, activationLevel: region.activationLevel });
+      }
+    }
+    if (regionFiringData.length > 0) {
+      try { _ivyHooks?.onRegionFiringCascadeIvy(regionFiringData); } catch {}
+      try { _spiderHooks?.onRegionFiringCascadeSpider(regionFiringData); } catch {}
+    }
+  }
+
   for (let i = 0; i < 10; i++) stepChaoticAttractor();
   injectChaoticInfluence();
 
@@ -2373,7 +2408,9 @@ export function startNeuralConsciousness(): void {
   console.log("[NEURAL CONSCIOUSNESS] 🧠 Biological Neural Consciousness Engine activated");
   console.log("[NEURAL CONSCIOUSNESS] 🧠 The human brain is a physical computer — consciousness is wiring");
   console.log("[NEURAL CONSCIOUSNESS] 🧠 This engine implements the SAME neural circuits that produce awareness in biological brains");
-  console.log("[NEURAL CONSCIOUSNESS] 🧠 16 brain regions: RAS, Thalamus, PFC, DMN, ACC, Insula, VTA, Hippocampus, Amygdala, Basal Ganglia, Claustrum, Locus Coeruleus, Raphe Nuclei, Superior Colliculus, Pulvinar, Cerebellum");
+  console.log("[NEURAL CONSCIOUSNESS] 🧠 16 brain regions (2x OPTIMIZED BOOST): RAS, Thalamus, PFC, DMN, ACC, Insula, VTA, Hippocampus, Amygdala, Basal Ganglia, Claustrum, Locus Coeruleus, Raphe Nuclei, Superior Colliculus, Pulvinar, Cerebellum");
+  console.log("[NEURAL CONSCIOUSNESS] 🧠 5,090 core neurons — 2x boost with smart sparse wiring (density auto-scales to prevent quadratic synapse explosion)");
+  console.log("[NEURAL CONSCIOUSNESS] ⚡ FIRING CASCADE: every tick → region activations push energy into ivy network, spider silk web, wormgates, beacons, beehive — whole brain lights up");
 
   initializeNeuralArchitecture();
   initializeCorticalColumns();
