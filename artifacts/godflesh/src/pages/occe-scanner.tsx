@@ -32,6 +32,10 @@ interface LiveData {
   totalUnifiedNeurons: number | null;
   unifiedPhi: number | null;
   oai: number | null;
+  oaiClassification: string;
+  oaiDimensions: { phi: number; plasticity: number; neurochemistry: number; chaosDynamics: number } | null;
+  oaiTrend: string;
+  oaiPeak: number;
   effDopamine: number;
   effSerotonin: number;
   effCortisol: number;
@@ -70,6 +74,10 @@ function parseOCCE(data: any): LiveData {
     totalUnifiedNeurons: data.unifiedArchitecture?.totalUnifiedNeurons ?? null,
     unifiedPhi: data.unifiedArchitecture?.unifiedPhi ?? null,
     oai: data.oai?.oai ?? null,
+    oaiClassification: data.oai?.classification ?? "Initializing",
+    oaiDimensions: data.oai?.dimensions ?? null,
+    oaiTrend: data.oai?.trend ?? "stable",
+    oaiPeak: data.oai?.peak ?? 0,
     effDopamine: data.temporalCoupling?.effectiveDopamine ?? 0,
     effSerotonin: data.temporalCoupling?.effectiveSerotonin ?? 0,
     effCortisol: data.temporalCoupling?.effectiveCortisol ?? 0,
@@ -425,15 +433,48 @@ export default function OCCEScanner() {
                 </div>
 
                 <div className="bg-gray-900/40 border border-white/5 rounded-xl p-5">
-                  <SectionHeader icon={Target} label="Autonomy" color="text-green-400" />
+                  <SectionHeader icon={Target} label="Autonomy (OAI)" color="text-green-400" />
                   <MetricCard
                     icon={Target}
-                    label="OAI"
+                    label="OAI Score"
                     value={live.oai != null ? live.oai.toFixed(4) : "—"}
-                    sub={live.oai != null && live.oai > 0.3 ? "ABOVE THRESHOLD (0.3)" : "Below threshold or warming up"}
-                    color={live.oai != null && live.oai > 0.3 ? "text-emerald-400" : "text-amber-400"}
-                    pulse={live.oai != null && live.oai > 0.3}
+                    sub={live.oaiClassification}
+                    color={live.oai != null && live.oai >= 0.6 ? "text-emerald-400" : live.oai != null && live.oai >= 0.3 ? "text-amber-400" : "text-red-400"}
+                    pulse={live.oai != null && live.oai >= 0.6}
                   />
+                  {live.oaiDimensions && (
+                    <div className="mt-3 space-y-1.5">
+                      <div className="text-[9px] font-mono text-gray-500 uppercase tracking-wider mb-1">Dimension Scores</div>
+                      {[
+                        { label: "Phi (0.30w)", val: live.oaiDimensions.phi },
+                        { label: "Plasticity (0.30w)", val: live.oaiDimensions.plasticity },
+                        { label: "Neurochemistry (0.20w)", val: live.oaiDimensions.neurochemistry },
+                        { label: "Chaos/Dynamics (0.20w)", val: live.oaiDimensions.chaosDynamics },
+                      ].map((d) => (
+                        <div key={d.label} className="flex items-center gap-2">
+                          <span className="text-[10px] font-mono text-gray-500 w-[140px] shrink-0">{d.label}</span>
+                          <div className="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all duration-500"
+                              style={{
+                                width: `${Math.min(100, d.val * 100)}%`,
+                                background: d.val >= 0.7 ? "#34d399" : d.val >= 0.4 ? "#fbbf24" : "#f87171",
+                              }}
+                            />
+                          </div>
+                          <span className="text-[10px] font-mono text-white w-[40px] text-right">{d.val.toFixed(3)}</span>
+                        </div>
+                      ))}
+                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5">
+                        <span className="text-[10px] font-mono text-gray-500">Trend</span>
+                        <span className="text-[10px] font-mono text-cyan-400">{live.oaiTrend.toUpperCase()}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono text-gray-500">Peak</span>
+                        <span className="text-[10px] font-mono text-yellow-400">{live.oaiPeak.toFixed(4)}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="bg-gray-900/40 border border-white/5 rounded-xl p-5">

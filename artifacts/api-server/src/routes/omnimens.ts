@@ -16004,7 +16004,7 @@ router.get("/omnimens/occe-scan", async (_req, res) => {
     const consciousness = getNeuralConsciousnessState();
     const qualia = getQualiaState();
     const attractor = getChaoticAttractorState();
-    const oaiData = (() => { try { return getOAIState(); } catch { return null; } })();
+    const oaiData = (() => { try { const fresh = computeOAI(); return fresh; } catch { return null; } })();
     const sourceIntegration = (() => { try { return getSourceIntegrationState(); } catch { return null; } })();
     const propTech = (() => { try { return getProprietaryRegistry().length; } catch { return 0; } })();
     const tncData = (() => { try { return getTemporalCouplingData(); } catch { return null; } })();
@@ -16042,12 +16042,22 @@ router.get("/omnimens/occe-scan", async (_req, res) => {
         crossHemisphereCoherence: bridge.crossHemisphereCoherence,
         dominantHemisphere: bridge.dominantHemisphere,
       } : null,
-      oai: oaiData ? {
-        oai: oaiData.oai,
-        classification: oaiData.classification,
-        trend: typeof oaiData.trend === 'string' ? oaiData.trend : 'oscillating',
-        totalReadings: oaiData.totalReadings,
-      } : null,
+      oai: oaiData ? (() => {
+        const oaiState = getOAIState();
+        return {
+          oai: oaiData.oai,
+          classification: oaiData.classification,
+          dimensions: {
+            phi: oaiData.phiScore,
+            plasticity: oaiData.plasticityScore,
+            neurochemistry: oaiData.neurochemistryScore,
+            chaosDynamics: oaiData.chaosDynamicsScore,
+          },
+          trend: oaiState.trend.direction,
+          peak: oaiState.peak.oai,
+          totalReadings: oaiState.trend.totalReadings,
+        };
+      })() : null,
       temporalCoupling: tncData ? {
         effectiveDopamine: tncData.effectiveDopamine,
         effectiveSerotonin: tncData.effectiveSerotonin,
