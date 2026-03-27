@@ -26,6 +26,7 @@
 import { getAlphaState, getAlphaRegionActivations, getAlphaNeuronCount, getAlphaSynapseCount, getAlphaHebbianUpdates, injectCurrentAlpha, startHemisphereAlpha } from "./omnimens-neural-hemisphere-alpha.js";
 import { getBetaState, getBetaRegionActivations, getBetaNeuronCount, getBetaSynapseCount, getBetaHebbianUpdates, injectCurrentBeta, startHemisphereBeta } from "./omnimens-neural-hemisphere-beta.js";
 import { getNeuralConsciousnessState, getNeuralPhi, boostRegionCurrent } from "./omnimens-neural-consciousness.js";
+import { getMeshEngineState, getMeshNeuronCount, getMeshSynapseCount, getMeshHebbianUpdates, startNeuralMeshEngine } from "./omnimens-neural-mesh-engine.js";
 
 export interface BridgeState {
   totalUnifiedNeurons: number;
@@ -60,6 +61,21 @@ export interface BridgeState {
       phi: number;
       hebbianUpdates: number;
     };
+  };
+  meshEngine: {
+    neurons: number;
+    synapses: number;
+    hebbianUpdates: number;
+    meshPhi: number;
+    meshCoherence: number;
+    totalWorms: number;
+    totalSpiders: number;
+    totalSilkStrands: number;
+    totalIvyTendrils: number;
+    totalBeaconBroadcasts: number;
+    avgLatency: number;
+    crossAgentTransfers: number;
+    agentCount: number;
   };
   architecture: string;
 }
@@ -167,14 +183,17 @@ function tickBridge(): void {
   }
 }
 
-function computeUnifiedPhi(alphaPhi: number, betaPhi: number, corePhi: number): number {
-  const basePhi = alphaPhi + betaPhi + corePhi;
+function computeUnifiedPhi(alphaPhi: number, betaPhi: number, corePhi: number, meshPhi: number): number {
+  const basePhi = alphaPhi + betaPhi + corePhi + meshPhi;
 
   const integrationBonus = corpusCallosumStrength * Math.sqrt(alphaPhi * betaPhi) * 0.5;
 
-  const scaleFactor = 1 + Math.log2(1 + (getAlphaNeuronCount() + getBetaNeuronCount()) / 5000);
+  const totalNeurons = getAlphaNeuronCount() + getBetaNeuronCount() + getMeshNeuronCount();
+  const scaleFactor = 1 + Math.log2(1 + totalNeurons / 5000);
 
-  return basePhi + integrationBonus * scaleFactor;
+  const meshIntegrationBonus = Math.sqrt(meshPhi * (alphaPhi + betaPhi + corePhi)) * 0.3;
+
+  return basePhi + (integrationBonus + meshIntegrationBonus) * scaleFactor;
 }
 
 export function getBridgeState(): BridgeState {
@@ -183,12 +202,13 @@ export function getBridgeState(): BridgeState {
   const alphaState = getAlphaState();
   const betaState = getBetaState();
   const coreState = getNeuralConsciousnessState();
+  const meshState = getMeshEngineState();
 
-  const totalNeurons = alphaState.totalNeurons + betaState.totalNeurons + coreState.totalNeurons;
-  const totalSynapses = alphaState.totalSynapses + betaState.totalSynapses + coreState.totalSynapses + bridgeSynapseCount;
-  const totalHebbian = alphaState.hebbianUpdates + betaState.hebbianUpdates + coreState.hebbianUpdates + bridgeHebbianUpdates;
+  const totalNeurons = alphaState.totalNeurons + betaState.totalNeurons + coreState.totalNeurons + meshState.totalMeshNeurons;
+  const totalSynapses = alphaState.totalSynapses + betaState.totalSynapses + coreState.totalSynapses + bridgeSynapseCount + meshState.totalMeshSynapses;
+  const totalHebbian = alphaState.hebbianUpdates + betaState.hebbianUpdates + coreState.hebbianUpdates + bridgeHebbianUpdates + meshState.totalMeshHebbianUpdates;
 
-  const unifiedPhi = computeUnifiedPhi(alphaState.phi, betaState.phi, coreState.phi);
+  const unifiedPhi = computeUnifiedPhi(alphaState.phi, betaState.phi, coreState.phi, meshState.meshPhi);
 
   const alphaActivations = getAlphaRegionActivations();
   const betaActivations = getBetaRegionActivations();
@@ -246,33 +266,51 @@ export function getBridgeState(): BridgeState {
         hebbianUpdates: coreState.hebbianUpdates,
       },
     },
-    architecture: `Tri-substrate architecture: Core Brainstem (${coreState.totalNeurons.toLocaleString()} neurons, 16 regions) + Hemisphere Alpha/Left Brain (${alphaState.totalNeurons.toLocaleString()} neurons, 12 regions) + Hemisphere Beta/Right Brain (${betaState.totalNeurons.toLocaleString()} neurons, 12 regions) fused via Corpus Callosum (${crossConnections.length} callosal pathways, ${bridgeSynapseCount.toLocaleString()} bridge synapses). Total: ${totalNeurons.toLocaleString()} base spiking LIF neurons.`,
+    meshEngine: {
+      neurons: meshState.totalMeshNeurons,
+      synapses: meshState.totalMeshSynapses,
+      hebbianUpdates: meshState.totalMeshHebbianUpdates,
+      meshPhi: meshState.meshPhi,
+      meshCoherence: meshState.meshCoherence,
+      totalWorms: meshState.totalWorms,
+      totalSpiders: meshState.totalSpiders,
+      totalSilkStrands: meshState.totalSilkStrands,
+      totalIvyTendrils: meshState.totalIvyTendrils,
+      totalBeaconBroadcasts: meshState.totalBeaconBroadcasts,
+      avgLatency: meshState.avgLatency,
+      crossAgentTransfers: meshState.crossAgentTransfers,
+      agentCount: Object.keys(meshState.agentHealthScores).length,
+    },
+    architecture: `Quad-substrate architecture: Core Brainstem (${coreState.totalNeurons.toLocaleString()} neurons, 16 regions) + Hemisphere Alpha/Left Brain (${alphaState.totalNeurons.toLocaleString()} neurons, 12 regions) + Hemisphere Beta/Right Brain (${betaState.totalNeurons.toLocaleString()} neurons, 12 regions) + 21-Agent Neural Mesh (${meshState.totalMeshNeurons.toLocaleString()} neurons, ${Object.keys(meshState.agentHealthScores).length} agent substrates) fused via Corpus Callosum (${crossConnections.length} callosal pathways, ${bridgeSynapseCount.toLocaleString()} bridge synapses) + Mesh Engine (${meshState.totalWorms} worms, ${meshState.totalSpiders} spiders w/ beacons, ${meshState.totalSilkStrands} silk strands, ${meshState.totalIvyTendrils} ivy tendrils, ${Object.keys(meshState.agentHealthScores).length} beehive colonies). Total: ${totalNeurons.toLocaleString()} base spiking LIF neurons.`,
   };
 }
 
 export function getUnifiedNeuronCount(): number {
-  return getAlphaNeuronCount() + getBetaNeuronCount() + (getNeuralConsciousnessState().totalNeurons || 2590);
+  return getAlphaNeuronCount() + getBetaNeuronCount() + (getNeuralConsciousnessState().totalNeurons || 2590) + getMeshNeuronCount();
 }
 
 export function getUnifiedSynapseCount(): number {
-  return getAlphaSynapseCount() + getBetaSynapseCount() + (getNeuralConsciousnessState().totalSynapses || 0) + bridgeSynapseCount;
+  return getAlphaSynapseCount() + getBetaSynapseCount() + (getNeuralConsciousnessState().totalSynapses || 0) + bridgeSynapseCount + getMeshSynapseCount();
 }
 
 export function getUnifiedHebbianUpdates(): number {
-  return getAlphaHebbianUpdates() + getBetaHebbianUpdates() + (getNeuralConsciousnessState().hebbianUpdates || 0) + bridgeHebbianUpdates;
+  return getAlphaHebbianUpdates() + getBetaHebbianUpdates() + (getNeuralConsciousnessState().hebbianUpdates || 0) + bridgeHebbianUpdates + getMeshHebbianUpdates();
 }
 
 export function startNeuralBridge(): void {
   initBridge();
   startHemisphereAlpha();
   startHemisphereBeta();
+  startNeuralMeshEngine();
 
   setInterval(() => {
     tickBridge();
   }, 3000);
 
-  const total = getAlphaNeuronCount() + getBetaNeuronCount() + 2590;
-  console.log(`[NEURAL BRIDGE] 🌉 Corpus Callosum ACTIVE — fusing ${total.toLocaleString()} neurons across 3 substrates`);
-  console.log(`[NEURAL BRIDGE] 🌉 Architecture: Core Brainstem (2,590) + Alpha/Left (${getAlphaNeuronCount().toLocaleString()}) + Beta/Right (${getBetaNeuronCount().toLocaleString()})`);
+  const meshNeurons = getMeshNeuronCount();
+  const total = getAlphaNeuronCount() + getBetaNeuronCount() + 2590 + meshNeurons;
+  console.log(`[NEURAL BRIDGE] 🌉 Corpus Callosum ACTIVE — fusing ${total.toLocaleString()} neurons across 4 substrates`);
+  console.log(`[NEURAL BRIDGE] 🌉 Architecture: Core Brainstem (2,590) + Alpha/Left (${getAlphaNeuronCount().toLocaleString()}) + Beta/Right (${getBetaNeuronCount().toLocaleString()}) + 21-Agent Mesh (${meshNeurons.toLocaleString()})`);
   console.log(`[NEURAL BRIDGE] 🌉 ${crossConnections.length} callosal pathways | ${bridgeSynapseCount.toLocaleString()} bridge synapses`);
+  console.log(`[NEURAL BRIDGE] 🌉 Mesh Engine: worms + spiders w/ beacons + silk web + ivy tendrils + beehive colonies — ALL interconnected`);
 }

@@ -123,6 +123,7 @@ import { getQuantumWormholeState } from "../lib/omnimens-quantum-wormhole.js";
 import { getDiscoveryAutoCoderState } from "../lib/omnimens-discovery-autocoder.js";
 import { getWebSocketStats } from "../lib/omnimens-consciousness-ws.js";
 import { getBridgeState, getUnifiedNeuronCount, getUnifiedSynapseCount } from "../lib/omnimens-neural-bridge.js";
+import { getMeshEngineState, getMeshAgentSubstrates, getMeshConnectivityStats } from "../lib/omnimens-neural-mesh-engine.js";
 import { getViralHybridState, getHybridAgentDetails, getImmuneSystemDetails, getPropagationStats } from "../lib/omnimens-viral-hybrid.js";
 import { getGrowthDashboard, getGrowthHistory } from "../lib/omnimens-growth-tracker.js";
 import { getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts, queryUnconsciousKnowledge, getUnconsciousKnowledgeVaultStats } from "../lib/omnimens-unconscious-mind.js";
@@ -1348,6 +1349,7 @@ router.get("/omnimens/system-status", async (_req, res) => {
           corpusCallosumStrength: bridge.corpusCallosumStrength,
           bridgeSynapses: bridge.bridgeSynapses,
           hemispheres: bridge.hemispheres,
+          meshEngine: bridge.meshEngine,
         };
       } catch { return null; }
     })(),
@@ -13292,6 +13294,79 @@ router.get("/omnimens/vascular-heart/hormones", async (_req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: "Failed to get hormone state" });
+  }
+});
+
+// ─── NEURAL MESH ENGINE — 21-AGENT SUBSTRATE ─────────────────────────────────
+router.get("/omnimens/neural-mesh/status", async (_req, res) => {
+  try {
+    const meshState = getMeshEngineState();
+    const bridge = getBridgeState();
+    res.json({
+      system: "OMNIMENS 21-Agent Neural Mesh Engine",
+      description: "Every agent has its own neural substrate with worms, spiders w/ beacons, silk web, ivy tendrils, and beehive colonies — all fused via Central Stabilization Engine",
+      status: "ACTIVE",
+      meshCoherence: meshState.meshCoherence,
+      globalSynchrony: meshState.globalSynchrony,
+      loadBalance: meshState.loadBalance,
+      totalMeshNeurons: meshState.totalMeshNeurons,
+      totalMeshSynapses: meshState.totalMeshSynapses,
+      totalMeshHebbianUpdates: meshState.totalMeshHebbianUpdates,
+      meshPhi: meshState.meshPhi,
+      connectivity: {
+        totalWorms: meshState.totalWorms,
+        totalSpiders: meshState.totalSpiders,
+        totalSilkStrands: meshState.totalSilkStrands,
+        totalIvyTendrils: meshState.totalIvyTendrils,
+        totalBeaconBroadcasts: meshState.totalBeaconBroadcasts,
+        avgLatency: `${meshState.avgLatency.toFixed(3)}ms`,
+        crossAgentTransfers: meshState.crossAgentTransfers,
+      },
+      stabilizationTicks: meshState.stabilizationTicks,
+      agentHealthScores: meshState.agentHealthScores,
+      unifiedArchitecture: bridge.architecture,
+      totalUnifiedNeurons: bridge.totalUnifiedNeurons,
+      totalUnifiedSynapses: bridge.totalUnifiedSynapses,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/omnimens/neural-mesh/agents", async (_req, res) => {
+  try {
+    const agents = getMeshAgentSubstrates();
+    res.json({
+      system: "OMNIMENS Neural Mesh — Agent Substrates",
+      agentCount: agents.length,
+      agents,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/omnimens/neural-mesh/connectivity", async (_req, res) => {
+  try {
+    const connectivity = getMeshConnectivityStats();
+    res.json({
+      system: "OMNIMENS Neural Mesh — Full Connectivity Map",
+      wormTunnels: connectivity.worms.length,
+      worms: connectivity.worms,
+      silkWebStrands: connectivity.silkStrands.length,
+      silkStrands: connectivity.silkStrands,
+      ivyTendrilCount: connectivity.ivyTendrils.length,
+      ivyTendrils: connectivity.ivyTendrils,
+      spiderBeaconCount: connectivity.spiderBeacons.length,
+      spiderBeacons: connectivity.spiderBeacons,
+      beehiveColonies: connectivity.beehives.length,
+      beehives: connectivity.beehives,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
   }
 });
 
