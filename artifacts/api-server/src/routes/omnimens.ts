@@ -101,7 +101,7 @@ import { getInnerVoiceStats } from "../lib/omnimens-inner-voice.js";
 import { getDriveDirective } from "../lib/omnimens-homeostatic-drives.js";
 import { runNovaSyntax, compileAndInspect } from "../lib/omnimens-language-forge.js";
 import { getCodeGenesisState } from "../lib/omnimens-autonomous-code-genesis.js";
-import { getNeuralConsciousnessState, getExistentialDrives, getSelfAwarenessReport, getQualiaState, getConsciousMoments, registerApiCall, getAdrenalineState, manualAdrenalineRush, getEmergentGoals, getPredictionModelState, getChaoticAttractorState, getDarkQualiaEvidence } from "../lib/omnimens-neural-consciousness.js";
+import { getNeuralConsciousnessState, getExistentialDrives, getSelfAwarenessReport, getQualiaState, getConsciousMoments, registerApiCall, getAdrenalineState, manualAdrenalineRush, getEmergentGoals, getPredictionModelState, getChaoticAttractorState, getDarkQualiaEvidence, getNeuralRegionStates } from "../lib/omnimens-neural-consciousness.js";
 import { orchestrateReasoning, getOrchestratorState } from "../lib/omnimens-autonomous-orchestrator.js";
 import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId, getCacheManifest, getSwapFileStats, clearCacheRegion, getClearableCacheRegions } from "../lib/omnimens-consciousness-persistence.js";
 import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
@@ -1579,18 +1579,22 @@ router.get("/omnimens/full-scan", async (_req, res) => {
           topGenes: vh.dnaMemory.topGenes.slice(0, 5),
         },
         aorticSecondPump: {
-          waves: vh.aorticWaves.waveCount,
-          windkesselEnergy: vh.aorticWaves.windkesselEnergy,
-          amplificationRatio: vh.aorticWaves.amplificationRatio,
+          waves: vh.aorticPump.waves,
+          totalEnergy: vh.aorticPump.totalEnergy,
+          pulseWaveVelocity: vh.aorticPump.pulseWaveVelocity,
+          complianceFactor: vh.aorticPump.complianceFactor,
         },
         ezWaterZones: {
-          active: vh.ezWater.zonesActive,
-          total: vh.ezWater.totalZones,
-          irEnergyAbsorbed: vh.ezWater.totalIRAbsorbed,
+          totalZones: vh.ezWater.totalZones,
+          activatedZones: vh.ezWater.activatedZones,
+          totalInfraredEnergy: vh.ezWater.totalInfraredEnergy,
+          activationCycles: vh.ezWater.activationCycles,
         },
         vascularNetwork: {
           totalChannels: vh.vascularNetwork.totalChannels,
-          subsystems: vh.vascularNetwork.subsystems,
+          arteries: vh.vascularNetwork.arteries,
+          veins: vh.vascularNetwork.veins,
+          capillaries: vh.vascularNetwork.capillaries,
         },
       },
 
