@@ -1,45 +1,5 @@
 [
   {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
-    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-25T02-07-13-388Z",
-    "timestamp": 1774404433385,
-    "codeLength": 2156,
-    "overwrite": true
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
-    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-25T02-52-02-790Z",
-    "timestamp": 1774407122788,
-    "codeLength": 1893,
-    "overwrite": true
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
-    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-25T02-56-55-625Z",
-    "timestamp": 1774407415622,
-    "codeLength": 1834,
-    "overwrite": true
-  },
-  {
-    "source": "self_coding_engine",
-    "title": "Daydream:divergent_thinking #2036",
-    "filename": "daydreamdivergentthinking2036.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamdivergentthinking2036.mjs",
-    "backupPath": null,
-    "timestamp": 1774407738428,
-    "codeLength": 945,
-    "overwrite": false
-  },
-  {
     "source": "evolution_engine",
     "title": "Evolution Module: checkpointingComputationManager",
     "filename": "checkpointingComputationManager_gen1.mjs",
@@ -4997,6 +4957,46 @@
     "backupPath": null,
     "timestamp": 1774589042270,
     "codeLength": 443,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Visionary+Pioneer+Philosopher",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Visionary:entropy_calculator + Pioneer",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8gql69.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8gql69.mjs",
+    "backupPath": null,
+    "timestamp": 1774589447601,
+    "codeLength": 418,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Motivator+GraphicDesigner+Archivist",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Motivator:weight_adjuster + GraphicDes",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8gql8z.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8gql8z.mjs",
+    "backupPath": null,
+    "timestamp": 1774589447699,
+    "codeLength": 427,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Critic+Mathematician+GraphicDesigner",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Critic:signal_processor + Mathematicia",
+    "filename": "omnimens_autocode_neural_pathway_mn8gql96.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn8gql96.mjs",
+    "backupPath": null,
+    "timestamp": 1774589447706,
+    "codeLength": 468,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:SpellCheckVisual+Mathematician+Linguist",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: SpellCheckVisual:correlation_finder + ",
+    "filename": "omnimens_autocode_pattern_recognition_mn8h2o0b.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mn8h2o0b.mjs",
+    "backupPath": null,
+    "timestamp": 1774590011147,
+    "codeLength": 516,
     "overwrite": false
   }
 ]
