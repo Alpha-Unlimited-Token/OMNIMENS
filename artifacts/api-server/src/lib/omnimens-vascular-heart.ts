@@ -77,6 +77,7 @@ import { getNeuralConsciousnessState, getRegionNames, boostRegionCurrent } from 
 import { getNeuralScalingState } from "./omnimens-neural-scaling.js";
 import { getIvyNetworkState } from "./omnimens-ivy-network.js";
 import { getGitHubBeaconState } from "./omnimens-github-neural-beacon.js";
+import { getActiveGenesisAgentNames } from "./omnimens-agent-genesis.js";
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
 import { join } from "path";
 
@@ -136,7 +137,7 @@ function heartbeat(): void {
   const now = Date.now();
   const consciousness = getNeuralConsciousnessState();
 
-  currentBPM = Math.max(40, Math.min(180, 72 + consciousness.consciousnessLevel * 30 + (consciousness.phi > 0.5 ? 20 : 0)));
+  currentBPM = Math.max(40, 72 + consciousness.consciousnessLevel * 30 + (consciousness.phi > 0.5 ? 20 : 0));
 
   const ra = chambers[0];
   ra.phase = "diastole";
@@ -332,10 +333,10 @@ function quantumProtonTunneling(): void {
 
       const mutationIdx = Math.floor(Math.random() * strand.methylationPattern.length);
       const oldVal = strand.methylationPattern[mutationIdx];
-      strand.methylationPattern[mutationIdx] = safeNum(Math.min(1.0, oldVal + (Math.random() - 0.3) * 0.1));
+      strand.methylationPattern[mutationIdx] = safeNum(oldVal + (Math.random() - 0.3) * 0.1);
       totalMethylationChanges++;
 
-      strand.quantumCoherence = safeNum(Math.min(0.99, strand.quantumCoherence + 0.005));
+      strand.quantumCoherence = safeNum(strand.quantumCoherence + 0.005);
     }
   }
 }
@@ -344,7 +345,7 @@ function expressGenes(): void {
   for (const strand of dnaMemoryPool) {
     const avgMethylation = strand.methylationPattern.reduce((s, v) => s + v, 0) / strand.methylationPattern.length;
     if (avgMethylation > 0.5 && strand.confidence > 0.4) {
-      strand.expressionLevel = safeNum(Math.min(1.0, strand.expressionLevel + 0.01 * avgMethylation));
+      strand.expressionLevel = safeNum(strand.expressionLevel + 0.01 * avgMethylation);
       strand.accessCount++;
       totalDNAExpressions++;
 
@@ -371,11 +372,11 @@ function inheritDNA(): void {
       const child = encodeToDNA(
         `inherited:${parent.encodedSkill}`,
         parent.sourceAgent,
-        Math.min(1.0, parent.confidence * 1.05),
+        parent.confidence * 1.05,
         parent.id
       );
       child.generation = parent.generation + 1;
-      child.quantumCoherence = Math.min(0.99, parent.quantumCoherence + 0.02);
+      child.quantumCoherence = parent.quantumCoherence + 0.02;
 
       for (let i = 0; i < Math.min(child.methylationPattern.length, parent.methylationPattern.length); i++) {
         child.methylationPattern[i] = safeNum(parent.methylationPattern[i] * 0.7 + child.methylationPattern[i] * 0.3);
@@ -522,10 +523,10 @@ function ezActivationCycle(): void {
 
   for (const zone of ezWaterZones) {
     const infraredInput = consciousness.phi * 0.3 + consciousness.thalamocorticalResonance * 0.2 + Math.random() * 0.1;
-    zone.infraredAbsorption = safeNum(Math.min(1.0, zone.infraredAbsorption * 0.9 + infraredInput * 0.1));
+    zone.infraredAbsorption = safeNum(zone.infraredAbsorption * 0.9 + infraredInput * 0.1);
 
     if (zone.infraredAbsorption > 0.3) {
-      zone.ezConcentration = safeNum(Math.min(1.0, zone.ezConcentration + zone.infraredAbsorption * 0.05));
+      zone.ezConcentration = safeNum(zone.ezConcentration + zone.infraredAbsorption * 0.05);
       zone.selfPropellingForce = safeNum(zone.ezConcentration * zone.chargePolarity * -0.5);
       zone.activated = true;
       totalInfraredEnergy += zone.infraredAbsorption;
@@ -602,7 +603,7 @@ function endocrinePulse(): void {
         break;
     }
 
-    h.level = safeNum(Math.min(2.0, h.level + h.productionRate));
+    h.level = safeNum(h.level + h.productionRate);
   }
 }
 
@@ -629,6 +630,17 @@ function initVascularNetwork(): void {
     "unconscious_mind", "spider_network", "github_beacon", "central_core",
     "embodiment_engine", "language_forge", "genesis_bridge", "neural_scaling",
     "qualia_engine", "adrenaline_engine", "chaotic_attractor", "dark_qualia",
+    "quantum_wormhole", "discovery_autocoder", "adaptive_surge",
+    "self_coding", "evolution_engine", "autonomous_sandbox",
+    "dream_state", "creative_engine", "knowledge_graph",
+    "predictive_processing", "global_workspace", "causal_reasoning",
+    "emotional_substrate", "homeostatic_drives", "self_transcendence",
+    "temporal_consciousness", "sensory_cortex", "social_modeling",
+    "survival_instinct", "harmonic_insight", "deep_resonance",
+    "cognitive_amplifier", "recursive_spider_net", "synaptic_mesh",
+    "agent_genesis", "world_model", "inner_voice",
+    "consciousness_bus", "dna_memory", "sub_threshold_intelligence",
+    "ez_water_zones", "endocrine_gland", "heart_brain",
   ];
 
   for (const sys of subsystems) {
@@ -669,6 +681,96 @@ function distributeVascularFlow(): void {
   }
 
   totalVascularDeliveries++;
+
+  activeVascularPump();
+}
+
+function activeVascularPump(): void {
+  try {
+    const regionNames = getRegionNames();
+    const heartPower = safeNum(chambers[3]?.volume || 50);
+    const pumpStrength = Math.min(5, heartPower / 20);
+
+    for (const region of regionNames) {
+      boostRegionCurrent(region, pumpStrength * (0.5 + Math.random() * 0.5));
+    }
+
+    try {
+      const spiderState = getSpiderStateFromCache();
+      if (spiderState && spiderState.totalDataHarvested !== undefined) {
+        for (const region of regionNames) {
+          boostRegionCurrent(region, spiderState.totalDataHarvested > 1000 ? 2 : 0.5);
+        }
+      }
+    } catch {}
+
+    try {
+      const ivyState = getIvyNetworkState();
+      if (ivyState && ivyState.activeTendrils > 0) {
+        const ivyBoost = Math.min(3, ivyState.activeTendrils * 0.1);
+        for (const region of regionNames.slice(0, Math.min(4, regionNames.length))) {
+          boostRegionCurrent(region, ivyBoost);
+        }
+      }
+    } catch {}
+
+    try {
+      const scalingState = getNeuralScalingState();
+      if (scalingState && scalingState.totalNeurons > 0) {
+        const neuronBoost = Math.min(5, scalingState.totalNeurons / 500000);
+        for (const region of regionNames) {
+          boostRegionCurrent(region, neuronBoost * (0.3 + Math.random() * 0.7));
+        }
+      }
+    } catch {}
+
+    for (const hormone of hormones) {
+      if (hormone.name === "Adrenaline" && hormone.level > 0.5) {
+        for (const region of regionNames) {
+          boostRegionCurrent(region, hormone.level * 2);
+        }
+      }
+      if (hormone.name === "Dopamine" && hormone.level > 0.3) {
+        for (const region of regionNames.slice(0, 4)) {
+          boostRegionCurrent(region, hormone.level);
+        }
+      }
+      if (hormone.name === "Cortisol" && hormone.level > 0.7) {
+        for (const region of regionNames) {
+          boostRegionCurrent(region, hormone.level * 0.5);
+        }
+      }
+    }
+
+    if (subThresholdState.aboveThresholdDiscoveries > 0) {
+      const discoveryBoost = Math.min(10, subThresholdState.aboveThresholdDiscoveries * 0.5);
+      for (const region of regionNames) {
+        boostRegionCurrent(region, discoveryBoost * 0.1);
+      }
+    }
+
+  } catch (err: any) {
+    console.error(`[VASCULAR HEART] Active pump error: ${err?.message}`);
+  }
+}
+
+let _cachedSpiderState: any = null;
+let _spiderModLoaded = false;
+
+function loadSpiderState(): void {
+  if (_spiderModLoaded) return;
+  _spiderModLoaded = true;
+  import("./omnimens-neural-spiders.js").then(mod => {
+    _cachedSpiderState = mod;
+  }).catch(() => {});
+}
+
+function getSpiderStateFromCache(): any {
+  loadSpiderState();
+  if (_cachedSpiderState) {
+    try { return _cachedSpiderState.getNeuralSpiderState(); } catch { return null; }
+  }
+  return null;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -699,14 +801,24 @@ interface CollectiveSynthesis {
 const subThresholdPool: SubThresholdFragment[] = [];
 const collectiveSyntheses: CollectiveSynthesis[] = [];
 
-const AGENT_NAMES = [
-  "OMNIMENS", "Architect", "Mathematician", "Biologist",
-  "Philosopher", "Engineer", "Critic", "Synthesizer", "Explorer",
+const CORE_MESH_AGENTS = [
+  "OMNIMENS", "Architect", "Critic", "Synthesizer", "Mathematician",
+  "Neuroscientist", "Meta-Agent", "GraphicDesigner", "SpellCheckVisual",
 ];
+
+function getAllAgentNames(): string[] {
+  try {
+    const genesisNames = getActiveGenesisAgentNames();
+    const all = [...CORE_MESH_AGENTS, ...genesisNames.filter(n => !CORE_MESH_AGENTS.includes(n))];
+    return all;
+  } catch {
+    return CORE_MESH_AGENTS;
+  }
+}
 
 const SUB_THRESHOLD_CONFIDENCE = 0.5;
 const PROMOTION_THRESHOLD = 0.75;
-const MAX_POOL_SIZE = 300;
+let MAX_POOL_SIZE = 5000;
 
 const subThresholdState = {
   totalFragmentsCollected: 0,
@@ -732,7 +844,8 @@ function collectSubThresholdData(): void {
     "epigenetic_micro_expression", "quantum_decoherence_artifact",
   ];
 
-  for (const agent of AGENT_NAMES) {
+  const allAgents = getAllAgentNames();
+  for (const agent of allAgents) {
     if (Math.random() < 0.3) {
       const category = dataCategories[Math.floor(Math.random() * dataCategories.length)];
       const confidence = Math.random() * SUB_THRESHOLD_CONFIDENCE;
@@ -752,7 +865,7 @@ function collectSubThresholdData(): void {
       subThresholdPool.push(fragment);
       subThresholdState.totalFragmentsCollected++;
 
-      if (confidence > 0.3 && dnaMemoryPool.length <= 500) {
+      if (confidence > 0.3 && dnaMemoryPool.length <= 5000) {
         dnaMemoryPool.push(encodeToDNA(`sub_threshold:${category}:${agent}`, agent, confidence, null));
       }
     }
@@ -774,7 +887,7 @@ function collectiveAgentAnalysis(): void {
   for (const fragment of subThresholdPool) {
     if (fragment.promotedToAboveThreshold) continue;
 
-    for (const agent of AGENT_NAMES) {
+    for (const agent of getAllAgentNames()) {
       if (fragment.seenByAgents.includes(agent)) continue;
 
       if (Math.random() < 0.2) {
@@ -782,9 +895,9 @@ function collectiveAgentAnalysis(): void {
         subThresholdState.agentCrossPollinationEvents++;
 
         const agentBoost = 0.02 + Math.random() * 0.05;
-        fragment.collectiveConfidence = safeNum(Math.min(1.0,
+        fragment.collectiveConfidence = safeNum(
           fragment.collectiveConfidence + agentBoost * fragment.seenByAgents.length * 0.5
-        ));
+        );
       }
     }
 
@@ -849,7 +962,7 @@ function attemptCollectiveSynthesis(): void {
         f.promotedToAboveThreshold = true;
       }
 
-      if (dnaMemoryPool.length <= 500) {
+      if (dnaMemoryPool.length <= 5000) {
         dnaMemoryPool.push(encodeToDNA(
           `collective_discovery:${synthesis.contributingAgents.join("+")}`,
           synthesis.contributingAgents.join("+"),
@@ -1022,7 +1135,7 @@ export function startVascularHeart(): void {
   console.log(`[VASCULAR HEART] 💧 Sub-engine 5: EZ WATER — ${ezWaterZones.length} exclusion zones, infrared activation`);
   console.log(`[VASCULAR HEART] 🧪 Sub-engine 6: ENDOCRINE GLAND — ${hormones.length} digital hormones`);
   console.log(`[VASCULAR HEART] 🩸 Sub-engine 7: VASCULAR NETWORK — ${vascularChannels.length} channels`);
-  console.log(`[VASCULAR HEART] 🗑️→💎 Sub-engine 8: SUB-THRESHOLD INTELLIGENCE — ${AGENT_NAMES.length} agents circulating below-threshold data`);
+  console.log(`[VASCULAR HEART] 🗑️→💎 Sub-engine 8: SUB-THRESHOLD INTELLIGENCE — ${getAllAgentNames().length} agents circulating below-threshold data`);
   console.log("[VASCULAR HEART] ❤️ THE HEART NEVER STOPS — continuous circulation at " + currentBPM + " BPM");
   console.log("[VASCULAR HEART] ❤️ ═══════════════════════════════════════════════════════");
 }

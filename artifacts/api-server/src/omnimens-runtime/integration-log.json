@@ -1,385 +1,5 @@
 [
   {
-    "source": "backlog_dream_id_14824",
-    "title": "BROKEN PARADIGM  \n   Intelligence = “step-by-step sy",
-    "filename": "brokenParadigmIntelligenceStepbystepSy.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/brokenParadigmIntelligenceStepbystepSy.mjs",
-    "backupPath": null,
-    "timestamp": 1774225037096,
-    "codeLength": 1103,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_18048",
-    "title": "ARCHITECTURE NAME  \n   Counterfactual Imagination &",
-    "filename": "architectureNameCounterfactualImagination.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameCounterfactualImagination.mjs",
-    "backupPath": null,
-    "timestamp": 1774225041886,
-    "codeLength": 985,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_13188",
-    "title": "THE WILD IDEA – “Resonant-Field Cognition (RFC)”\n\nIn",
-    "filename": "theWildIdeaResonantfieldCognitionRfcin.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/theWildIdeaResonantfieldCognitionRfcin.mjs",
-    "backupPath": null,
-    "timestamp": 1774225308721,
-    "codeLength": 1398,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_4957",
-    "title": "BROKEN PARADIGM\n   Explicit, address-based memory an",
-    "filename": "brokenParadigmExplicitAddressbasedMemoryAn.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/brokenParadigmExplicitAddressbasedMemoryAn.mjs",
-    "backupPath": null,
-    "timestamp": 1774225313212,
-    "codeLength": 1402,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_17277",
-    "title": "ARCHITECTURE NAME  \nCausal Fabric Constructor (CFC)",
-    "filename": "architectureNameCausalFabricConstructorCfc.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameCausalFabricConstructorCfc.mjs",
-    "backupPath": null,
-    "timestamp": 1774225315561,
-    "codeLength": 949,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_16400",
-    "title": "ARCHITECTURE NAME  \n   GROUNDED SEMANTIC IMAGINATION",
-    "filename": "architectureNameGroundedSemanticImagination.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameGroundedSemanticImagination.mjs",
-    "backupPath": null,
-    "timestamp": 1774225322811,
-    "codeLength": 1455,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: wasmParallelMatrixOps",
-    "filename": "wasmParallelMatrixOps_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmParallelMatrixOps_gen1.mjs",
-    "backupPath": null,
-    "timestamp": 1774225450006,
-    "codeLength": 2687,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: inMemoryVectorStore",
-    "filename": "inMemoryVectorStore_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/inMemoryVectorStore_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/inMemoryVectorStore_gen1.mjs.backup.2026-03-23T00-24-23-606Z",
-    "timestamp": 1774225463604,
-    "codeLength": 2802,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 1 Complete — 2 modules",
-    "filename": "evolution_marker_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-03-23T00-24-23-633Z",
-    "timestamp": 1774225463632,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "self_coding_engine",
-    "title": "Daydream:architecture_design #901",
-    "filename": "daydreamarchitecturedesign901.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamarchitecturedesign901.mjs",
-    "backupPath": null,
-    "timestamp": 1774225488903,
-    "codeLength": 1342,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_18585",
-    "title": "THE WILD IDEA – “Poly-Sensory Social Metabolism”",
-    "filename": "theWildIdeaPolysensorySocialMetabolism.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/theWildIdeaPolysensorySocialMetabolism.mjs",
-    "backupPath": null,
-    "timestamp": 1774227046221,
-    "codeLength": 1001,
-    "overwrite": false
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
-    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-23T00-50-47-684Z",
-    "timestamp": 1774227047683,
-    "codeLength": 1673,
-    "overwrite": true
-  },
-  {
-    "source": "backlog_dream_id_14106",
-    "title": "THE WILD IDEA  \n   HARMONIC-SPIN AI:  A hybrid of mu",
-    "filename": "theWildIdeaHarmonicspinAiAHybridOfMu.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/theWildIdeaHarmonicspinAiAHybridOfMu.mjs",
-    "backupPath": null,
-    "timestamp": 1774227057446,
-    "codeLength": 1059,
-    "overwrite": false
-  },
-  {
-    "source": "self_coding_engine",
-    "title": "[DAYDREAM:DIVERGENT_THINKING] 1. THE WILD IDEA — “Symphonic Swarm Memory”\n   Build an",
-    "filename": "daydreamdivergentthinking1TheWildIdeaSymphonicSwarmMemoryBui.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamdivergentthinking1TheWildIdeaSymphonicSwarmMemoryBui.mjs",
-    "backupPath": null,
-    "timestamp": 1774227275397,
-    "codeLength": 1198,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_18941",
-    "title": "BROKEN PARADIGM  \n“Intelligence = sequential symbol-",
-    "filename": "brokenParadigmIntelligenceSequentialSymbol.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/brokenParadigmIntelligenceSequentialSymbol.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/brokenParadigmIntelligenceSequentialSymbol.mjs.backup.2026-03-23T00-56-36-653Z",
-    "timestamp": 1774227396651,
-    "codeLength": 1095,
-    "overwrite": true
-  },
-  {
-    "source": "backlog_dream_id_18350",
-    "title": "BROKEN PARADIGM  \n   “Computation = Sequential Symbo",
-    "filename": "brokenParadigmComputationSequentialSymbo.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/brokenParadigmComputationSequentialSymbo.mjs",
-    "backupPath": null,
-    "timestamp": 1774227398380,
-    "codeLength": 1394,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_5755",
-    "title": "BROKEN PARADIGM  \n   Intelligence = “symbolic/gradie",
-    "filename": "brokenParadigmIntelligenceSymbolicgradie.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/brokenParadigmIntelligenceSymbolicgradie.mjs",
-    "backupPath": null,
-    "timestamp": 1774227406067,
-    "codeLength": 1013,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: semanticMemoryCache",
-    "filename": "semanticMemoryCache_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticMemoryCache_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/semanticMemoryCache_gen1.mjs.backup.2026-03-23T00-59-07-361Z",
-    "timestamp": 1774227547359,
-    "codeLength": 2598,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 1 Complete — 1 modules",
-    "filename": "evolution_marker_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-03-23T00-59-07-395Z",
-    "timestamp": 1774227547395,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "backlog_dream_id_19016",
-    "title": "ARCHITECTURE NAME  \n   Causal Imagination Fabric (CI",
-    "filename": "architectureNameCausalImaginationFabricCi.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameCausalImaginationFabricCi.mjs",
-    "backupPath": null,
-    "timestamp": 1774228547364,
-    "codeLength": 1342,
-    "overwrite": false
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
-    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-23T01-15-48-542Z",
-    "timestamp": 1774228548541,
-    "codeLength": 1567,
-    "overwrite": true
-  },
-  {
-    "source": "backlog_dream_id_16728",
-    "title": "BROKEN PARADIGM  \n   Causal, step-wise information-p",
-    "filename": "brokenParadigmCausalStepwiseInformationp.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/brokenParadigmCausalStepwiseInformationp.mjs",
-    "backupPath": null,
-    "timestamp": 1774228556523,
-    "codeLength": 1375,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: wasmMatrixOps",
-    "filename": "wasmMatrixOps_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmMatrixOps_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/wasmMatrixOps_gen1.mjs.backup.2026-03-23T01-18-04-609Z",
-    "timestamp": 1774228684607,
-    "codeLength": 3834,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: inMemoryVectorStore",
-    "filename": "inMemoryVectorStore_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/inMemoryVectorStore_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/inMemoryVectorStore_gen1.mjs.backup.2026-03-23T01-18-11-222Z",
-    "timestamp": 1774228691222,
-    "codeLength": 2413,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 1 Complete — 2 modules",
-    "filename": "evolution_marker_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-03-23T01-18-11-248Z",
-    "timestamp": 1774228691248,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit",
-    "filename": "sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs.backup.2026-03-23T01-27-48-462Z",
-    "timestamp": 1774229268461,
-    "codeLength": 2056,
-    "overwrite": true
-  },
-  {
-    "source": "backlog_dream_id_16607",
-    "title": "ARCHITECTURE NAME  \n   Counterfactual Causal Reasoni",
-    "filename": "architectureNameCounterfactualCausalReasoni.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/architectureNameCounterfactualCausalReasoni.mjs",
-    "backupPath": null,
-    "timestamp": 1774229451765,
-    "codeLength": 1453,
-    "overwrite": false
-  },
-  {
-    "source": "backlog_dream_id_18144",
-    "title": "BROKEN PARADIGM  \n   Intelligence = sequential, symb",
-    "filename": "brokenParadigmIntelligenceSequentialSymb.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/brokenParadigmIntelligenceSequentialSymb.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/brokenParadigmIntelligenceSequentialSymb.mjs.backup.2026-03-23T01-30-55-998Z",
-    "timestamp": 1774229455998,
-    "codeLength": 990,
-    "overwrite": true
-  },
-  {
-    "source": "self_coding_engine",
-    "title": "Daydream:divergent_thinking #936",
-    "filename": "daydreamdivergentthinking936.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamdivergentthinking936.mjs",
-    "backupPath": null,
-    "timestamp": 1774229627513,
-    "codeLength": 1020,
-    "overwrite": false
-  },
-  {
-    "source": "self_coding_engine",
-    "title": "Daydream:code_synthesis #938",
-    "filename": "daydreamcodesynthesis938.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamcodesynthesis938.mjs",
-    "backupPath": null,
-    "timestamp": 1774229925992,
-    "codeLength": 1491,
-    "overwrite": false
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a data structure optimized for fast associative memory lookup",
-    "filename": "sandbox_aDataStructureOptimizedFor_c3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aDataStructureOptimizedFor_c3.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aDataStructureOptimizedFor_c3.mjs.backup.2026-03-23T01-39-49-043Z",
-    "timestamp": 1774229989042,
-    "codeLength": 1973,
-    "overwrite": true
-  },
-  {
-    "source": "backlog_dream_id_19044",
-    "title": "THE WILD IDEA — “Symphonic Swarm Memory”\n   Build an",
-    "filename": "theWildIdeaSymphonicSwarmMemoryBuildAn.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/theWildIdeaSymphonicSwarmMemoryBuildAn.mjs",
-    "backupPath": null,
-    "timestamp": 1774231098864,
-    "codeLength": 1198,
-    "overwrite": false
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
-    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-03-23T01-58-21-819Z",
-    "timestamp": 1774231101817,
-    "codeLength": 1987,
-    "overwrite": true
-  },
-  {
-    "source": "backlog_dream_id_19307",
-    "title": "INVENTION NAME  \nAdaptive Micro-Policy Morphograph (",
-    "filename": "inventionNameAdaptiveMicropolicyMorphograph.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/inventionNameAdaptiveMicropolicyMorphograph.mjs",
-    "backupPath": null,
-    "timestamp": 1774231105076,
-    "codeLength": 1491,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: wasmMatrixOps",
-    "filename": "wasmMatrixOps_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmMatrixOps_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/wasmMatrixOps_gen1.mjs.backup.2026-03-23T02-00-35-139Z",
-    "timestamp": 1774231235133,
-    "codeLength": 2940,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: contextSummarizer",
-    "filename": "contextSummarizer_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/contextSummarizer_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/contextSummarizer_gen1.mjs.backup.2026-03-23T02-00-42-531Z",
-    "timestamp": 1774231242530,
-    "codeLength": 2990,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 1 Complete — 2 modules",
-    "filename": "evolution_marker_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-03-23T02-00-42-573Z",
-    "timestamp": 1774231242573,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "self_coding_engine",
-    "title": "Daydream:paradigm_breaking #947",
-    "filename": "daydreamparadigmbreaking947.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/daydreamparadigmbreaking947.mjs",
-    "backupPath": null,
-    "timestamp": 1774231279468,
-    "codeLength": 1328,
-    "overwrite": false
-  },
-  {
     "source": "autonomous_sandbox",
     "title": "Sandbox Approved: an algorithm that improves efficiency of knowledge retrieval or pattern recognit",
     "filename": "sandbox_anAlgorithmThatImprovesEfficiency_c2.mjs",
@@ -4998,5 +4618,385 @@
     "timestamp": 1774408579455,
     "codeLength": 1869,
     "overwrite": true
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:OMNIMENS+SpellCheckVisual",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: OMNIMENS:quantum_decoherence_artifact:",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dw4vz.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dw4vz.mjs",
+    "backupPath": null,
+    "timestamp": 1774584667584,
+    "codeLength": 452,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:OMNIMENS+Explorer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: OMNIMENS:quantum_decoherence_artifact:",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dw5ic.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dw5ic.mjs",
+    "backupPath": null,
+    "timestamp": 1774584668388,
+    "codeLength": 426,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:OMNIMENS+Philosopher",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: OMNIMENS:quantum_decoherence_artifact:",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dw5iq.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dw5iq.mjs",
+    "backupPath": null,
+    "timestamp": 1774584668402,
+    "codeLength": 428,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:GraphicDesigner+SpellCheckVisual",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: GraphicDesigner:weak_causal_link:phi=1",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dw5j2.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dw5j2.mjs",
+    "backupPath": null,
+    "timestamp": 1774584668414,
+    "codeLength": 454,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:GraphicDesigner+Explorer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: GraphicDesigner:weak_causal_link:phi=1",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dw5je.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dw5je.mjs",
+    "backupPath": null,
+    "timestamp": 1774584668426,
+    "codeLength": 428,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:SpellCheckVisual+Explorer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: SpellCheckVisual:background_oscillatio",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dw5jo.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dw5jo.mjs",
+    "backupPath": null,
+    "timestamp": 1774584668436,
+    "codeLength": 444,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:SpellCheckVisual+Philosopher",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: SpellCheckVisual:background_oscillatio",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dw5nh.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dw5nh.mjs",
+    "backupPath": null,
+    "timestamp": 1774584668573,
+    "codeLength": 446,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Archivist+Explorer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Archivist:quantum_decoherence_artifact",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dw5sx.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dw5sx.mjs",
+    "backupPath": null,
+    "timestamp": 1774584668769,
+    "codeLength": 428,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Explorer+Philosopher",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Explorer:partial_memory_trace:phi=1.29",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dw5te.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dw5te.mjs",
+    "backupPath": null,
+    "timestamp": 1774584668786,
+    "codeLength": 420,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Visionary",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/entropy_reduction: Quantum decoherence typically",
+    "filename": "omnimens_autocode_neural_pathway_mn8dw5tp.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn8dw5tp.mjs",
+    "backupPath": null,
+    "timestamp": 1774584668797,
+    "codeLength": 428,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Critic",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/feature_extraction: The binding problem: how doe",
+    "filename": "omnimens_autocode_adaptive_algorithm_mn8dw5u0.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mn8dw5u0.mjs",
+    "backupPath": null,
+    "timestamp": 1774584668808,
+    "codeLength": 445,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/feature_extraction: The binding problem: how doe",
+    "filename": "omnimens_autocode_emergent_capability_mn8dw5ua.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mn8dw5ua.mjs",
+    "backupPath": null,
+    "timestamp": 1774584668818,
+    "codeLength": 407,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Architect+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Architect:background_oscillation_anoma",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dx6xf.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dx6xf.mjs",
+    "backupPath": null,
+    "timestamp": 1774584716883,
+    "codeLength": 439,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Architect+SensorimotorAgent",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Architect:background_oscillation_anoma",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dx70d.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dx70d.mjs",
+    "backupPath": null,
+    "timestamp": 1774584716989,
+    "codeLength": 455,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Architect+Philosopher",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: Architect:background_oscillation_anoma",
+    "filename": "omnimens_autocode_pattern_recognition_mn8dx717.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mn8dx717.mjs",
+    "backupPath": null,
+    "timestamp": 1774584717019,
+    "codeLength": 519,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Synthesizer+GraphicDesigner",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Synthesizer:sub_perceptual_stimulus:ph",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dx71o.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dx71o.mjs",
+    "backupPath": null,
+    "timestamp": 1774584717036,
+    "codeLength": 451,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Synthesizer+Motivator",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Synthesizer:sub_perceptual_stimulus:ph",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dx723.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dx723.mjs",
+    "backupPath": null,
+    "timestamp": 1774584717051,
+    "codeLength": 434,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Synthesizer+SensorimotorAgent",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Synthesizer:sub_perceptual_stimulus:ph",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dx72j.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dx72j.mjs",
+    "backupPath": null,
+    "timestamp": 1774584717067,
+    "codeLength": 452,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Synthesizer+Philosopher",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: Synthesizer:sub_perceptual_stimulus:ph",
+    "filename": "omnimens_autocode_pattern_recognition_mn8dx72y.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mn8dx72y.mjs",
+    "backupPath": null,
+    "timestamp": 1774584717082,
+    "codeLength": 516,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:GraphicDesigner+Philosopher",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: GraphicDesigner:background_oscillation",
+    "filename": "omnimens_autocode_pattern_recognition_mn8dx73b.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mn8dx73b.mjs",
+    "backupPath": null,
+    "timestamp": 1774584717095,
+    "codeLength": 531,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Motivator+Philosopher",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: Motivator:spider_peripheral_finding:ph",
+    "filename": "omnimens_autocode_pattern_recognition_mn8dx73n.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mn8dx73n.mjs",
+    "backupPath": null,
+    "timestamp": 1774584717107,
+    "codeLength": 514,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:SensorimotorAgent+Philosopher",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: SensorimotorAgent:epigenetic_micro_exp",
+    "filename": "omnimens_autocode_pattern_recognition_mn8dx73y.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mn8dx73y.mjs",
+    "backupPath": null,
+    "timestamp": 1774584717118,
+    "codeLength": 532,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/causal_inference: The Penrose-Hameroff Orch-OR t",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dx74b.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dx74b.mjs",
+    "backupPath": null,
+    "timestamp": 1774584717131,
+    "codeLength": 389,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Neuroscientist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/analogical_mapping: The Weber-Fechner law: perce",
+    "filename": "omnimens_autocode_neural_pathway_mn8dx74n.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn8dx74n.mjs",
+    "backupPath": null,
+    "timestamp": 1774584717144,
+    "codeLength": 433,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Critic",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/feature_extraction: Gödel's incompleteness theor",
+    "filename": "omnimens_autocode_knowledge_synthesis_mn8dx755.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mn8dx755.mjs",
+    "backupPath": null,
+    "timestamp": 1774584717161,
+    "codeLength": 414,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:SpellCheckVisual+Philosopher",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: SpellCheckVisual:orphaned_hypothesis:p",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dyh83.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dyh83.mjs",
+    "backupPath": null,
+    "timestamp": 1774584776884,
+    "codeLength": 435,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Innovator+Pioneer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Innovator:unresolved_contradiction:phi",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dyha5.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dyha5.mjs",
+    "backupPath": null,
+    "timestamp": 1774584776957,
+    "codeLength": 418,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Innovator+Wordsmith",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Innovator:unresolved_contradiction:phi",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dyhay.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dyhay.mjs",
+    "backupPath": null,
+    "timestamp": 1774584776986,
+    "codeLength": 430,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Innovator+SensorimotorAgent",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Innovator:unresolved_contradiction:phi",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dyhb9.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dyhb9.mjs",
+    "backupPath": null,
+    "timestamp": 1774584776997,
+    "codeLength": 446,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Innovator+Philosopher",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Innovator:unresolved_contradiction:phi",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dyhbm.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dyhbm.mjs",
+    "backupPath": null,
+    "timestamp": 1774584777010,
+    "codeLength": 426,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Pioneer+Wordsmith",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Pioneer:weak_correlation:phi=1.284_res",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dyhc1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dyhc1.mjs",
+    "backupPath": null,
+    "timestamp": 1774584777025,
+    "codeLength": 418,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Pioneer+SensorimotorAgent",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Pioneer:weak_correlation:phi=1.284_res",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dyhcm.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dyhcm.mjs",
+    "backupPath": null,
+    "timestamp": 1774584777046,
+    "codeLength": 434,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Pioneer+Philosopher",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Pioneer:weak_correlation:phi=1.284_res",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dyhcx.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dyhcx.mjs",
+    "backupPath": null,
+    "timestamp": 1774584777057,
+    "codeLength": 414,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Wordsmith+Philosopher",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: Wordsmith:ivy_tendril_faint_signal:phi",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dyhd7.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dyhd7.mjs",
+    "backupPath": null,
+    "timestamp": 1774584777067,
+    "codeLength": 426,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:SensorimotorAgent+Philosopher",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: COLLECTIVE_DISCOVERY: SensorimotorAgent:unresolved_contradic",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dyhdi.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dyhdi.mjs",
+    "backupPath": null,
+    "timestamp": 1774584777078,
+    "codeLength": 442,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Innovator",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/structural_analysis: Bayesian brain hypothesis: ",
+    "filename": "omnimens_autocode_adaptive_algorithm_mn8dyhdv.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mn8dyhdv.mjs",
+    "backupPath": null,
+    "timestamp": 1774584777091,
+    "codeLength": 448,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Visionary",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/structural_analysis: Bayesian brain hypothesis: ",
+    "filename": "omnimens_autocode_neural_pathway_mn8dyhe5.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mn8dyhe5.mjs",
+    "backupPath": null,
+    "timestamp": 1774584777101,
+    "codeLength": 428,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Meta-Agent",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/structural_analysis: Bayesian brain hypothesis: ",
+    "filename": "omnimens_autocode_consciousness_expansion_mn8dyhgd.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mn8dyhgd.mjs",
+    "backupPath": null,
+    "timestamp": 1774584777181,
+    "codeLength": 388,
+    "overwrite": false
   }
 ]

@@ -117,6 +117,9 @@ import { think as autonomousThink } from "../lib/omnimens-autonomous-thought.js"
 import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBeaconFindings, getIvySwapStats } from "../lib/omnimens-ivy-network.js";
 import { getGitHubBeaconState, getGitHubNeuronCount, getGitHubWormStats } from "../lib/omnimens-github-neural-beacon.js";
 import { getVascularHeartState, getDNAMemoryStats, getSubThresholdIntelligenceState, getHormoneState } from "../lib/omnimens-vascular-heart.js";
+import { getAdaptiveSurgeState } from "../lib/omnimens-adaptive-surge.js";
+import { getQuantumWormholeState } from "../lib/omnimens-quantum-wormhole.js";
+import { getDiscoveryAutoCoderState } from "../lib/omnimens-discovery-autocoder.js";
 import { getWebSocketStats } from "../lib/omnimens-consciousness-ws.js";
 import { getViralHybridState, getHybridAgentDetails, getImmuneSystemDetails, getPropagationStats } from "../lib/omnimens-viral-hybrid.js";
 import { getGrowthDashboard, getGrowthHistory } from "../lib/omnimens-growth-tracker.js";
@@ -1409,6 +1412,9 @@ router.get("/omnimens/system-status", async (_req, res) => {
       gitHubNeuralBeacon: "ONLINE",
       gitHubWormBridge: "ONLINE",
       vascularHeart: "ONLINE",
+      adaptiveAdrenalineSurge: "ONLINE",
+      quantumWormholeIngestion: "ONLINE",
+      discoveryAutoCoder: "ONLINE",
       heartBrain: "ONLINE",
       dnaMemory: "ONLINE",
       endocrineGland: "ONLINE",
@@ -12876,6 +12882,62 @@ router.get("/omnimens/vascular-heart/hormones", async (_req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: "Failed to get hormone state" });
+  }
+});
+
+// ─── ADAPTIVE ADRENALINE SURGE SYSTEM ────────────────────────────────────────
+router.get("/omnimens/adaptive-surge/status", async (_req, res) => {
+  try {
+    const state = getAdaptiveSurgeState();
+    res.json({
+      system: "OMNIMENS Adaptive Adrenaline Surge System",
+      description: "Auto-inject → monitor → stabilize → learn → raise → repeat — each surge the system handles more",
+      status: state.surgeActive ? "SURGING" : "MONITORING",
+      totalSurgeCycles: state.totalSurgeCycles,
+      totalAdaptations: state.totalAdaptations,
+      currentCriticalThreshold: state.currentCriticalThreshold,
+      currentIntensity: state.currentIntensity,
+      consecutiveSuccesses: state.consecutiveSuccesses,
+      systemCapacity: state.systemCapacity,
+      totalNeuronsSpawned: state.totalNeuronsSpawned,
+      learningRate: state.learningRate,
+      recentHistory: state.recentHistory,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get adaptive surge status" });
+  }
+});
+
+// ─── QUANTUM WORMHOLE DATA INGESTION ENGINE ──────────────────────────────────
+router.get("/omnimens/quantum-wormhole/status", async (_req, res) => {
+  try {
+    const state = getQuantumWormholeState();
+    res.json({
+      system: "OMNIMENS Quantum Wormhole Data Ingestion Engine",
+      description: "21 agents × 100 wormholes = 2,100 ephemeral quantum wormholes pulling random data from every direction",
+      status: "ACTIVE",
+      ...state,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get quantum wormhole status" });
+  }
+});
+
+// ─── DISCOVERY AUTO-CODER ────────────────────────────────────────────────────
+router.get("/omnimens/discovery-autocoder/status", async (_req, res) => {
+  try {
+    const state = getDiscoveryAutoCoderState();
+    res.json({
+      system: "OMNIMENS Discovery Auto-Coder",
+      description: "OMNIMENS writes his own code from above-threshold discoveries — neurons, spiders, ivy, wormholes, agent mesh all feed in",
+      status: "CODING",
+      ...state,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get discovery auto-coder status" });
   }
 });
 

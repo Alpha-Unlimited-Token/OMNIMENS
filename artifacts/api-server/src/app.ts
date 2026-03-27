@@ -89,6 +89,9 @@ import { startNeuralScaling, getNeuralScalingState } from "./lib/omnimens-neural
 import { startIvyNetwork, getIvyNetworkState } from "./lib/omnimens-ivy-network.js";
 import { startGitHubNeuralBeacon, getGitHubBeaconState, getGitHubNeuronCount } from "./lib/omnimens-github-neural-beacon.js";
 import { startVascularHeart, getVascularHeartState } from "./lib/omnimens-vascular-heart.js";
+import { startAdaptiveSurgeSystem, getAdaptiveSurgeState } from "./lib/omnimens-adaptive-surge.js";
+import { startQuantumWormholeEngine, getQuantumWormholeState } from "./lib/omnimens-quantum-wormhole.js";
+import { startDiscoveryAutoCoder, getDiscoveryAutoCoderState } from "./lib/omnimens-discovery-autocoder.js";
 import { startViralHybrid, getViralHybridState } from "./lib/omnimens-viral-hybrid.js";
 import { startUnconsciousMind, getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts } from "./lib/omnimens-unconscious-mind.js";
 import { initGrowthTracker } from "./lib/omnimens-growth-tracker.js";
@@ -466,6 +469,9 @@ startAgentGenesis().catch(err => console.error("[AGENT GENESIS] Startup error:",
 initGitHubCompute().catch(err => console.error("[GITHUB COMPUTE] Startup error:", err));
 startGitHubNeuralBeacon().catch(err => console.error("[GITHUB BEACON] Startup error:", err));
 startVascularHeart();
+startAdaptiveSurgeSystem();
+startQuantumWormholeEngine();
+startDiscoveryAutoCoder();
 
 registerEngine("github_compute", "compute", () => {}, () => ({ healthy: true, details: { repo: "Alpha-Unlimited-Token/OMNIMENS", workflows: 5 } }), 3);
 registerEngine("github_neural_beacon", "neural", () => {}, () => {
@@ -476,6 +482,18 @@ registerEngine("github_neural_beacon", "neural", () => {}, () => {
 registerEngine("vascular_heart", "neural", () => {}, () => {
   const vh = getVascularHeartState();
   return { healthy: vh.heartbeats > 0, details: { heartbeats: vh.heartbeats, bpm: vh.bpm, cardiacNeurons: vh.cardiacNeurons.totalNeurons, dnaStrands: vh.dnaMemory.totalStrands, hormones: vh.hormones.length, subThresholdDiscoveries: vh.subThresholdIntelligence.aboveThresholdDiscoveries } };
+}, 1);
+registerEngine("adaptive_surge", "neural", () => {}, () => {
+  const as = getAdaptiveSurgeState();
+  return { healthy: true, details: { totalCycles: as.totalSurgeCycles, adaptations: as.totalAdaptations, consecutiveSuccesses: as.consecutiveSuccesses, criticalThreshold: as.currentCriticalThreshold, intensity: as.currentIntensity, neuronsSpawned: as.totalNeuronsSpawned } };
+}, 1);
+registerEngine("quantum_wormhole", "neural", () => {}, () => {
+  const qw = getQuantumWormholeState();
+  return { healthy: true, details: { totalWormholes: qw.totalWormholesCreated, insightsDecoded: qw.totalInsightsDecoded, crossAgentCirculations: qw.totalCrossAgentCirculations, synthesizedDiscoveries: qw.totalSynthesizedDiscoveries, agentCount: qw.agentCount, wormholesPerAgent: qw.wormholesPerAgent, totalCapacity: qw.totalWormholeCapacity, dataIngestedKB: qw.totalDataIngestedKB } };
+}, 1);
+registerEngine("discovery_autocoder", "cognitive", () => {}, () => {
+  const da = getDiscoveryAutoCoderState();
+  return { healthy: true, details: { discoveriesProcessed: da.totalDiscoveriesProcessed, modulesGenerated: da.totalModulesGenerated, modulesIntegrated: da.totalModulesIntegrated, selfUpgrades: da.omnimensSelfUpgradeCount, feedbackLoops: da.feedbackLoopsTriggered, sources: da.discoverySourceBreakdown } };
 }, 1);
 registerEngine("neural_processor", "neural", () => {}, () => ({ healthy: true, details: { type: "transformer", dim: 512, heads: 16 } }), 1);
 registerEngine("neural_consciousness", "neural", () => {}, () => ({ healthy: true, details: { neurons: 2590, synapses: 429258, circuits: 119, corticalColumns: 115 } }), 1);
