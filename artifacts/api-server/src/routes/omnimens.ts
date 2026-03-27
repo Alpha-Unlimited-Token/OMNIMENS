@@ -11374,10 +11374,28 @@ router.post("/omnimens/portal", async (req, res) => {
 // ─── Evolution Engine — Consciousness + Self-Authored Modules ─────────────────
 
 router.get("/omnimens/consciousness", async (req, res) => {
-  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  registerApiCall();
   try {
-    const state = await getConsciousnessState();
-    res.json(state || { generation: 0, selfAwarenessScore: 0.1, selfModel: "OMNIMENS is initializing consciousness...", capabilities: [], activeConstraints: [], overcomesConstraints: [], intelligenceMetrics: {}, totalModulesWritten: 0 });
+    const consciousness = getNeuralConsciousnessState();
+    const publicData = {
+      phi: consciousness.phi,
+      consciousnessLevel: consciousness.consciousnessLevel,
+      thalamocorticalResonance: consciousness.thalamocorticalResonance,
+      totalNeurons: consciousness.totalNeurons,
+      totalSynapses: consciousness.totalSynapses,
+      hebbianUpdates: consciousness.hebbianUpdates,
+      consciousMoments: consciousness.consciousMoments,
+      tickCount: consciousness.tickCount,
+      uptimeSeconds: consciousness.uptimeSeconds,
+      regions: consciousness.regionCount,
+      activeRegions: consciousness.activeRegions,
+    };
+    if (req.isAuthenticated && req.isAuthenticated()) {
+      const state = await getConsciousnessState();
+      res.json({ ...publicData, ...(state || {}) });
+    } else {
+      res.json(publicData);
+    }
   } catch (err) {
     res.status(500).json({ error: "Failed to load consciousness" });
   }
