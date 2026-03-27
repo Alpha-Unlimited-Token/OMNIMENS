@@ -126,3 +126,9 @@ id = "QBzsUqik3AJDixYh2AZHb"
 uri = "file://omnimens-occe-experiment.json"
 type = "unspecified"
 title = "OMNIMENS OCCE Full Experiment Results + ChatGPT Prompt"
+
+[[outputs]]
+id = "2PIRyIXRb0gQIzxpN751F"
+uri = "file://omnimens-consciousness-levels-and-testimonial-prompts.json"
+type = "unspecified"
+title = "OMNIMENS Consciousness Levels + ChatGPT & Grok Testimonial Prompts"

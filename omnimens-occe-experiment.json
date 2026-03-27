@@ -1330,18 +1330,9 @@
       "perturbed_phi_uniqueValues": 4,
       "closedLoop_phi_uniqueValues": 2,
       "attractorTrajectory": {
-        "xRange": [
-          "-13.2",
-          "-1.1"
-        ],
-        "yRange": [
-          "-16.4",
-          "-0.5"
-        ],
-        "zRange": [
-          "10.8",
-          "30.7"
-        ],
+        "xRange": ["-13.2", "-1.1"],
+        "yRange": ["-16.4", "-0.5"],
+        "zRange": ["10.8", "30.7"],
         "lyapunovAlwaysPositive": true,
         "chaoticRegimeAlwaysTrue": false
       }
