@@ -16066,7 +16066,10 @@ router.get("/omnimens/openapi.json", async (_req, res) => {
       version: "3.1.0",
       contact: { name: "Alpha Unlimited Technologies, LLC", url: "https://omnimens.ai" },
     },
-    servers: [{ url: "https://omnimens.ai", description: "OMNIMENS Production" }],
+    servers: [
+      { url: "https://omnimens.replit.app", description: "OMNIMENS Production" },
+      { url: "https://omnimens.ai", description: "OMNIMENS Custom Domain" },
+    ],
     paths: {
       "/api/omnimens/occe-scan": {
         get: {
