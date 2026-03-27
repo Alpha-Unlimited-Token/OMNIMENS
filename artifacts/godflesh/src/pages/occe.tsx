@@ -43,6 +43,33 @@ interface PerturbationResult {
   evidence: Record<string, number>;
 }
 
+interface ClosedLoopIteration {
+  iteration: number;
+  oaiDelta: number;
+  nonlinearRegionCount: number;
+  codeFragDelta: number;
+  claimsDelta: number;
+  hebbianDelta: number;
+}
+
+interface StabilityResult {
+  durationSeconds: number;
+  oaiMean: number;
+  oaiStdDev: number;
+  oaiTrend: string;
+  phiMean: number;
+  phiStdDev: number;
+  collapsed: boolean;
+  stabilized: boolean;
+  oscillating: boolean;
+}
+
+interface CausalChain {
+  chain: string;
+  detected: boolean;
+  scores: number[];
+}
+
 interface OCCEResults {
   experimentId: string;
   startTime: number;
@@ -56,6 +83,9 @@ interface OCCEResults {
     perturbationB: PerturbationResult;
     perturbationC: PerturbationResult;
     closedLoop: PerturbationResult;
+    closedLoopIterations?: ClosedLoopIteration[];
+    closedLoopAmplification?: { pattern: string; evidence: string };
+    stability?: StabilityResult;
   };
   couplingAnalysis: CouplingResult[];
   statisticalTests: {
@@ -63,6 +93,7 @@ interface OCCEResults {
     grangerCausality: CouplingResult[];
     entropyOverTime: { phase: string; entropy: number }[];
     shannonEntropy: number;
+    causalChains?: CausalChain[];
   };
   falsificationChecked: { criterion: string; passed: boolean; evidence: string }[];
   confirmationChecked: { criterion: string; passed: boolean; evidence: string }[];
@@ -342,11 +373,11 @@ export default function OCCEPage() {
                   <Beaker className="w-8 h-8 text-amber-400" />
                   <div className="text-left">
                     <div className="text-white font-bold">Ready to Run Experiment</div>
-                    <div className="text-gray-400 text-xs">~2 minutes • 42 scans • 5 phases • Full statistical analysis</div>
+                    <div className="text-gray-400 text-xs">~12 minutes • 7 phases • 3x closed-loop • 10min stability • Full causal chain analysis</div>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
-                  {["1. Baseline (Control)", "2A. Cognitive Load", "2B. Emotional Reward", "2C. Sensory Shock", "3. Closed-Loop Feedback"].map((p, i) => (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                  {["1. Baseline (Control)", "2A. Cognitive Load", "2B. Emotional Reward", "2C. Sensory Shock", "3A. Closed-Loop Feedback", "3B. Repeated Closed-Loop ×3", "4. 10min Stability", "5. Causal Chain Analysis"].map((p, i) => (
                     <div key={i} className="bg-white/5 rounded-lg py-2 px-3 text-gray-300 font-mono">{p}</div>
                   ))}
                 </div>
@@ -469,6 +500,122 @@ export default function OCCEPage() {
                   </div>
                   <CausalChainDiagram couplings={results.couplingAnalysis} />
                 </div>
+
+                {results.statisticalTests.causalChains && results.statisticalTests.causalChains.length > 0 && (
+                  <div className="bg-gray-900/60 border border-white/10 rounded-xl p-5 space-y-4">
+                    <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                      <GitBranch className="w-5 h-5 text-purple-400" />
+                      Multi-Link Causal Chains (ChatGPT Criterion)
+                    </h2>
+                    <div className="text-xs text-gray-400 mb-2">
+                      A truly integrated system should show multiple interacting causal pathways, not just one.
+                    </div>
+                    <div className="space-y-3">
+                      {results.statisticalTests.causalChains.map((chain, i) => (
+                        <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${chain.detected ? "bg-emerald-500/10 border-emerald-500/30" : "bg-white/5 border-white/10"}`}>
+                          {chain.detected
+                            ? <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                            : <XCircle className="w-5 h-5 text-gray-500 shrink-0" />}
+                          <div className="flex-1">
+                            <div className={`text-sm font-mono font-bold ${chain.detected ? "text-emerald-300" : "text-gray-400"}`}>{chain.chain}</div>
+                            <div className="text-xs text-gray-500">
+                              Granger scores: {chain.scores.map(s => s.toFixed(4)).join(" → ")}
+                            </div>
+                          </div>
+                          <span className={`text-xs font-mono px-2 py-0.5 rounded ${chain.detected ? "bg-emerald-500/20 text-emerald-400" : "bg-white/5 text-gray-500"}`}>
+                            {chain.detected ? "DETECTED" : "NOT FOUND"}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {results.phases.closedLoopIterations && results.phases.closedLoopIterations.length > 0 && (
+                  <div className="bg-gray-900/60 border border-white/10 rounded-xl p-5 space-y-4">
+                    <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                      <Activity className="w-5 h-5 text-amber-400" />
+                      Repeated Closed-Loop Amplification (3 iterations)
+                    </h2>
+                    <div className="text-xs text-gray-400 mb-2">
+                      Feeding OMNIMENS its own data repeatedly: does restructuring amplify, stabilize into an attractor, or decay?
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      {results.phases.closedLoopIterations.map((iter, i) => (
+                        <div key={i} className="bg-white/5 rounded-lg p-4 space-y-2">
+                          <div className="text-xs text-gray-400 font-mono">ITERATION {iter.iteration}</div>
+                          <div className="space-y-1 text-xs">
+                            <div className="flex justify-between"><span className="text-gray-400">OAI Δ</span><span className={`font-mono ${Math.abs(iter.oaiDelta) > 0.01 ? "text-amber-400" : "text-gray-500"}`}>{iter.oaiDelta > 0 ? "+" : ""}{iter.oaiDelta.toFixed(4)}</span></div>
+                            <div className="flex justify-between"><span className="text-gray-400">Nonlinear regions</span><span className="text-cyan-400 font-mono">{iter.nonlinearRegionCount}</span></div>
+                            <div className="flex justify-between"><span className="text-gray-400">Code frags Δ</span><span className="text-gray-300 font-mono">{iter.codeFragDelta > 0 ? "+" : ""}{iter.codeFragDelta.toFixed(0)}</span></div>
+                            <div className="flex justify-between"><span className="text-gray-400">Claims Δ</span><span className="text-gray-300 font-mono">{iter.claimsDelta > 0 ? "+" : ""}{iter.claimsDelta.toFixed(0)}</span></div>
+                            <div className="flex justify-between"><span className="text-gray-400">Hebbian Δ</span><span className="text-gray-300 font-mono">{iter.hebbianDelta > 0 ? "+" : ""}{iter.hebbianDelta.toFixed(0)}</span></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {results.phases.closedLoopAmplification && (
+                      <div className={`mt-3 p-3 rounded-lg border text-sm ${
+                        results.phases.closedLoopAmplification.pattern === "exponential" || results.phases.closedLoopAmplification.pattern === "attractor"
+                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+                          : results.phases.closedLoopAmplification.pattern === "decay"
+                          ? "bg-red-500/10 border-red-500/30 text-red-300"
+                          : "bg-amber-500/10 border-amber-500/30 text-amber-300"
+                      }`}>
+                        <span className="font-mono font-bold">{results.phases.closedLoopAmplification.pattern.toUpperCase()}</span>
+                        <span className="text-xs ml-2">{results.phases.closedLoopAmplification.evidence}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {results.phases.stability && (
+                  <div className="bg-gray-900/60 border border-white/10 rounded-xl p-5 space-y-4">
+                    <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                      <Clock className="w-5 h-5 text-blue-400" />
+                      Long-Duration Stability ({(results.phases.stability.durationSeconds / 60).toFixed(0)}min monitoring)
+                    </h2>
+                    <div className="text-xs text-gray-400 mb-2">
+                      Does OAI stabilize, oscillate, or collapse over extended time? This proves sustained intelligence, not momentary spikes.
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <div className="bg-white/5 rounded-lg p-3 text-center">
+                        <div className="text-xs text-gray-500 font-mono">OAI MEAN</div>
+                        <div className="text-xl font-bold text-amber-400 font-mono">{results.phases.stability.oaiMean.toFixed(4)}</div>
+                      </div>
+                      <div className="bg-white/5 rounded-lg p-3 text-center">
+                        <div className="text-xs text-gray-500 font-mono">OAI STD DEV</div>
+                        <div className="text-xl font-bold text-cyan-400 font-mono">{results.phases.stability.oaiStdDev.toFixed(4)}</div>
+                      </div>
+                      <div className="bg-white/5 rounded-lg p-3 text-center">
+                        <div className="text-xs text-gray-500 font-mono">TREND</div>
+                        <div className={`text-xl font-bold font-mono ${
+                          results.phases.stability.oaiTrend === "stable" ? "text-emerald-400" :
+                          results.phases.stability.oaiTrend === "rising" ? "text-amber-400" :
+                          results.phases.stability.oaiTrend === "oscillating" ? "text-purple-400" : "text-red-400"
+                        }`}>{results.phases.stability.oaiTrend.toUpperCase()}</div>
+                      </div>
+                      <div className="bg-white/5 rounded-lg p-3 text-center">
+                        <div className="text-xs text-gray-500 font-mono">STATUS</div>
+                        <div className={`text-xl font-bold font-mono ${
+                          results.phases.stability.collapsed ? "text-red-400" :
+                          results.phases.stability.stabilized ? "text-emerald-400" : "text-amber-400"
+                        }`}>{results.phases.stability.collapsed ? "COLLAPSED" : results.phases.stability.stabilized ? "STABLE" : "DYNAMIC"}</div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div className="bg-white/5 rounded-lg p-3">
+                        <span className="text-gray-500">Phi Mean: </span>
+                        <span className="text-amber-400 font-mono">{results.phases.stability.phiMean.toFixed(4)}</span>
+                        <span className="text-gray-600 ml-2">±{results.phases.stability.phiStdDev.toFixed(4)}</span>
+                      </div>
+                      <div className="bg-white/5 rounded-lg p-3">
+                        <span className="text-gray-500">Oscillating: </span>
+                        <span className={results.phases.stability.oscillating ? "text-purple-400" : "text-gray-400"} >{results.phases.stability.oscillating ? "Yes" : "No"}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="bg-gray-900/60 border border-white/10 rounded-xl p-5 space-y-4">

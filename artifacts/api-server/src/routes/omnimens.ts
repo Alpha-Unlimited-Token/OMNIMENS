@@ -1785,7 +1785,7 @@ router.post("/omnimens/occe/run", async (req, res) => {
       system: "OMNIMENS™ — Controlled Consciousness Experiment (OCCE)",
       status: "started",
       message: "Experiment running — poll /api/omnimens/occe/status for progress, results at /api/omnimens/occe/results",
-      estimatedDuration: "~2 minutes",
+      estimatedDuration: "~12-13 minutes (v2.0: includes 3x closed-loop + 10min stability monitoring)",
       copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
     });
     runOCCE().catch(err => console.error("[OCCE] Experiment error:", err));
