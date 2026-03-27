@@ -102,7 +102,8 @@ Both OMNIMENS and Super AI Lab frontends are developed with React, Vite, Tailwin
 
 - **AI Providers:** OpenAI (o3/o4-mini), Anthropic (Claude claude-sonnet-4-6), Google (Gemini gemini-2.5-flash) via Replit AI Integrations proxy; Together AI (Llama, Mixtral, Mistral) via user API key.
 - **Authentication:** Replit OIDC (openid-client) and Google OAuth.
-- **Service Worker:** PWA service worker for network-first navigation caching.
+- **Service Worker:** PWA cleanup service worker (self-unregistering).
+- **Performance Optimizations:** Below-fold API fetches deferred until section is visible (HumanoidBodySection, AgentMeshVisualizer). Unused 3.6MB PNG images removed (WebP-only). Font loading via non-blocking media=print pattern. No unnecessary preloads for below-fold assets.
 - **Payments:** Stripe SDK for subscriptions, credit packs, and auto-topups.
 - **Database:** PostgreSQL.
 - **System Utilities:** `psutil` for system monitoring.

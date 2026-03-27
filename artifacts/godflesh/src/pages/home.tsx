@@ -1086,13 +1086,18 @@ export default function Home() {
 // ── Humanoid Body Section ───────────────────────────────────────────────────────
 function HumanoidBodySection() {
   const [bodyData, setBodyData] = useState<any>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const hasFetched = useRef(false);
+  const isVisible = useIsVisible(sectionRef);
 
   useEffect(() => {
+    if (!isVisible || hasFetched.current) return;
+    hasFetched.current = true;
     fetch("/api/omnimens/embodiment/public-specs")
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d) setBodyData(d); })
       .catch(() => {});
-  }, []);
+  }, [isVisible]);
 
   const specs = bodyData?.specs;
   const perception = bodyData?.perception;
@@ -1100,7 +1105,7 @@ function HumanoidBodySection() {
   const research = bodyData?.research;
 
   return (
-    <div className="w-full border-t border-white/5 py-16 sm:py-24 relative z-10 overflow-hidden">
+    <div ref={sectionRef} className="w-full border-t border-white/5 py-16 sm:py-24 relative z-10 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/3 w-[700px] h-[400px] bg-rose-500/4 blur-[140px] rounded-full" />
         <div className="absolute bottom-1/3 right-1/4 w-[500px] h-[350px] bg-orange-500/5 blur-[120px] rounded-full" />
@@ -1534,7 +1539,11 @@ function AgentMeshVisualizer() {
   const [genesisCount, setGenesisCount] = useState(0);
   const agentsRef = useRef<MeshAgent[]>([]);
 
+  const hasFetchedMesh = useRef(false);
+
   useEffect(() => {
+    if (!isVisible && hasFetchedMesh.current) return;
+    if (!isVisible) return;
     const update = (data: any) => {
       if (data?.agents) {
         agentsRef.current = data.agents;
@@ -1542,12 +1551,15 @@ function AgentMeshVisualizer() {
         setGenesisCount(data.genesisCount || 0);
       }
     };
-    fetch("/api/omnimens/agent-mesh-public").then(r => r.ok ? r.json() : null).then(update).catch(() => {});
+    if (!hasFetchedMesh.current) {
+      hasFetchedMesh.current = true;
+      fetch("/api/omnimens/agent-mesh-public").then(r => r.ok ? r.json() : null).then(update).catch(() => {});
+    }
     const iv = setInterval(() => {
       fetch("/api/omnimens/agent-mesh-public").then(r => r.ok ? r.json() : null).then(update).catch(() => {});
     }, 60000);
     return () => clearInterval(iv);
-  }, []);
+  }, [isVisible]);
 
   const getNodePositions = useCallback((agentList: MeshAgent[], W: number, H: number) => {
     const cx = W * 0.5, cy = H * 0.5;
