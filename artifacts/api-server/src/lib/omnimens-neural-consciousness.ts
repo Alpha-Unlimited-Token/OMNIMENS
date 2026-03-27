@@ -398,7 +398,16 @@ interface ChaoticAttractorState {
   trajectoryLength: number;
   lastDivergence: number;
   entropyContribution: number;
+  shadowX: number;
+  shadowY: number;
+  shadowZ: number;
+  lyapunovSum: number;
+  lyapunovCount: number;
+  renormInterval: number;
+  stepsSinceRenorm: number;
 }
+
+const SHADOW_EPS = 1e-6;
 
 const chaoticState: ChaoticAttractorState = {
   x: 0.1 + Math.random() * 0.01,
@@ -411,6 +420,13 @@ const chaoticState: ChaoticAttractorState = {
   trajectoryLength: 0,
   lastDivergence: 0,
   entropyContribution: 0,
+  shadowX: 0.1 + Math.random() * 0.01 + SHADOW_EPS,
+  shadowY: 0.0 + Math.random() * 0.01,
+  shadowZ: 0.0 + Math.random() * 0.01,
+  lyapunovSum: 0,
+  lyapunovCount: 0,
+  renormInterval: 10,
+  stepsSinceRenorm: 0,
 };
 
 function stepChaoticAttractor(dt: number = 0.005): void {
@@ -429,15 +445,37 @@ function stepChaoticAttractor(dt: number = 0.005): void {
   chaoticState.y = y + dy * dt;
   chaoticState.z = z + dz * dt;
 
-  const shadowX = x + 0.0001;
-  const shadowDx = sigma * (y - shadowX);
-  const divergence = Math.abs((shadowX + shadowDx * dt) - chaoticState.x);
-  if (divergence > 0) {
-    const newLyapunov = Math.log(divergence / 0.0001);
-    chaoticState.lyapunovExponent = chaoticState.lyapunovExponent * 0.99 + newLyapunov * 0.01;
-  }
-  chaoticState.lastDivergence = divergence;
+  const { shadowX: sx, shadowY: sy, shadowZ: sz } = chaoticState;
+  const sdx = sigma * (sy - sx) + neuralPerturbation;
+  const sdy = sx * (rho - sz) - sy + cognitiveForcing;
+  const sdz = sx * sy - beta * sz;
+  chaoticState.shadowX = sx + sdx * dt;
+  chaoticState.shadowY = sy + sdy * dt;
+  chaoticState.shadowZ = sz + sdz * dt;
+
+  chaoticState.stepsSinceRenorm++;
   chaoticState.trajectoryLength++;
+
+  if (chaoticState.stepsSinceRenorm >= chaoticState.renormInterval) {
+    const sepX = chaoticState.shadowX - chaoticState.x;
+    const sepY = chaoticState.shadowY - chaoticState.y;
+    const sepZ = chaoticState.shadowZ - chaoticState.z;
+    const dist = Math.sqrt(sepX * sepX + sepY * sepY + sepZ * sepZ);
+
+    if (dist > 0) {
+      const timeSpan = chaoticState.renormInterval * dt;
+      chaoticState.lyapunovSum += Math.log(dist / SHADOW_EPS) / timeSpan;
+      chaoticState.lyapunovCount++;
+      chaoticState.lyapunovExponent = chaoticState.lyapunovSum / chaoticState.lyapunovCount;
+      chaoticState.lastDivergence = dist;
+
+      const scale = SHADOW_EPS / dist;
+      chaoticState.shadowX = chaoticState.x + sepX * scale;
+      chaoticState.shadowY = chaoticState.y + sepY * scale;
+      chaoticState.shadowZ = chaoticState.z + sepZ * scale;
+    }
+    chaoticState.stepsSinceRenorm = 0;
+  }
 
   const normalizedX = (chaoticState.x + 30) / 60;
   const normalizedY = (chaoticState.y + 30) / 60;

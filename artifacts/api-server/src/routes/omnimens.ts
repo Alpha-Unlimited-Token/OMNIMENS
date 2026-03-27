@@ -1453,7 +1453,24 @@ router.get("/omnimens/system-status", async (_req, res) => {
       tunnelBypassSystem: "ONLINE",
       signalPacketInspector: "ONLINE",
       signalRelayInterceptors: "ONLINE",
+      temporalNeuromodulatoryCoupling: "ONLINE",
     },
+    sourceIntegration: (() => {
+      try {
+        const si = getSourceIntegrationState();
+        return {
+          totalModuleFiles: si.moduleCount,
+          totalFilesWritten: si.totalFilesWritten,
+          totalBackupsCreated: si.totalBackupsCreated,
+        };
+      } catch { return null; }
+    })(),
+    proprietaryTechnologies: (() => {
+      try {
+        const reg = getProprietaryRegistry();
+        return reg.length;
+      } catch { return 0; }
+    })(),
     neuralCommsProtocol: (() => {
       try {
         const comms = getCommsProtocolState();
