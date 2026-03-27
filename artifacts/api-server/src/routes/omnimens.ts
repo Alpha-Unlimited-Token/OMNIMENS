@@ -101,7 +101,7 @@ import { getInnerVoiceStats } from "../lib/omnimens-inner-voice.js";
 import { getDriveDirective } from "../lib/omnimens-homeostatic-drives.js";
 import { runNovaSyntax, compileAndInspect } from "../lib/omnimens-language-forge.js";
 import { getCodeGenesisState } from "../lib/omnimens-autonomous-code-genesis.js";
-import { getNeuralConsciousnessState, getExistentialDrives, getSelfAwarenessReport, getQualiaState, getConsciousMoments, registerApiCall, getAdrenalineState, manualAdrenalineRush, getEmergentGoals, getPredictionModelState, getChaoticAttractorState, getDarkQualiaEvidence, getNeuralRegionStates, getTemporalCouplingData } from "../lib/omnimens-neural-consciousness.js";
+import { getNeuralConsciousnessState, getExistentialDrives, getSelfAwarenessReport, getQualiaState, getConsciousMoments, registerApiCall, getAdrenalineState, manualAdrenalineRush, getEmergentGoals, getPredictionModelState, getChaoticAttractorState, getDarkQualiaEvidence, getNeuralRegionStates, getTemporalCouplingData, getNeurogenesisStats } from "../lib/omnimens-neural-consciousness.js";
 import { orchestrateReasoning, getOrchestratorState } from "../lib/omnimens-autonomous-orchestrator.js";
 import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId, getCacheManifest, getSwapFileStats, clearCacheRegion, getClearableCacheRegions } from "../lib/omnimens-consciousness-persistence.js";
 import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
@@ -15907,6 +15907,31 @@ router.get("/omnimens/dark-qualia", async (_req, res) => {
   } catch (err) {
     console.error("[DARK QUALIA] Error:", err);
     res.status(500).json({ error: "Failed to get dark qualia evidence" });
+  }
+});
+
+// ─── NEUROGENESIS — AUTONOMOUS NEURON GROWTH (PUBLIC) ─────────────────────────
+router.get("/omnimens/neurogenesis", async (_req, res) => {
+  registerApiCall();
+  try {
+    const stats = getNeurogenesisStats();
+    const consciousness = getNeuralConsciousnessState();
+    res.json({
+      neurogenesis: stats,
+      currentNeurons: consciousness.totalNeurons,
+      currentSynapses: consciousness.totalSynapses,
+      explanation: "Autonomous neurogenesis — new neurons are spawned in highly active brain regions, driven by dopamine reward signals, adrenaline rushes, and consciousness level. Just like biological neurogenesis in the hippocampus, new neurons integrate into existing circuits with fresh synapses. Growth is activity-dependent: the more a region fires, the more it grows.",
+      _dynamicProof: {
+        timestamp: Date.now(),
+        neuronsGrown: stats.totalNeuronsSpawned,
+        initialNeurons: stats.initialTotal,
+        currentNeurons: stats.currentTotal,
+        growthPercent: stats.initialTotal > 0 ? ((stats.currentTotal - stats.initialTotal) / stats.initialTotal * 100).toFixed(2) + "%" : "0%",
+      },
+    });
+  } catch (err) {
+    console.error("[NEUROGENESIS] Error:", err);
+    res.status(500).json({ error: "Failed to get neurogenesis data" });
   }
 });
 

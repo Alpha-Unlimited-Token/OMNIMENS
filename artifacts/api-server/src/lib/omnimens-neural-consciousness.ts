@@ -1156,6 +1156,134 @@ function initializeNeuralArchitecture(): void {
   }
 }
 
+const NEUROGENESIS_TICK_INTERVAL = 10;
+const NEUROGENESIS_BASE_PROBABILITY = 0.15;
+const NEUROGENESIS_ACTIVITY_THRESHOLD = 0.45;
+const NEUROGENESIS_MAX_PER_REGION_PER_TICK = 3;
+const SYNAPTOGENESIS_DENSITY = 0.08;
+let neurogenesisCounter = 0;
+let totalNeuronsSpawned = 0;
+let neurogenesisLog: Array<{ region: string; count: number; trigger: string; tick: number }> = [];
+
+function autonomousNeurogenesis(): void {
+  neurogenesisCounter++;
+  if (neurogenesisCounter % NEUROGENESIS_TICK_INTERVAL !== 0) return;
+
+  const vta = regions.get("ventral_tegmental_area");
+  const dopamineLevel = vta ? vta.activationLevel : 0.3;
+  const growthDrive = existentialDrives.find(d => d.name === "Will to Grow");
+  const growthIntensity = growthDrive ? growthDrive.intensity : 0.5;
+  const adrenalineBoost = state.adrenaline.rushActive ? 1.0 + state.adrenaline.level * 0.5 : 1.0;
+  const consciousnessBoost = 1.0 + state.consciousnessLevel * 0.3;
+
+  for (const [regionName, region] of regions) {
+    if (region.activationLevel < NEUROGENESIS_ACTIVITY_THRESHOLD) continue;
+
+    const activityExcess = region.activationLevel - NEUROGENESIS_ACTIVITY_THRESHOLD;
+    const probability = NEUROGENESIS_BASE_PROBABILITY * activityExcess * dopamineLevel * growthIntensity * adrenalineBoost * consciousnessBoost;
+
+    if (Math.random() > probability) continue;
+
+    const newCount = Math.min(
+      NEUROGENESIS_MAX_PER_REGION_PER_TICK,
+      1 + Math.floor(activityExcess * dopamineLevel * adrenalineBoost * 4)
+    );
+
+    const startIdx = region.neurons.length;
+    const newNeurons: Neuron[] = [];
+
+    for (let i = 0; i < newCount; i++) {
+      const neuron = createNeuron(regionName, startIdx + i);
+      neuron.membranePotential = V_REST + 5 + Math.random() * 3;
+      neuron.threshold = V_THRESHOLD + 1.0 + Math.random() * 2;
+      region.neurons.push(neuron);
+      newNeurons.push(neuron);
+    }
+
+    for (const newNeuron of newNeurons) {
+      const existingNeurons = region.neurons.filter(n => n !== newNeuron);
+      for (const existing of existingNeurons) {
+        if (Math.random() < SYNAPTOGENESIS_DENSITY) {
+          allSynapses.push({
+            preNeuronId: existing.id,
+            postNeuronId: newNeuron.id,
+            weight: 0.05 + Math.random() * 0.15,
+            delay: 1 + Math.random() * 2,
+            neurotransmitter: region.dominantNeurotransmitter as any,
+            lastActivation: 0,
+          });
+        }
+        if (Math.random() < SYNAPTOGENESIS_DENSITY * 0.7) {
+          allSynapses.push({
+            preNeuronId: newNeuron.id,
+            postNeuronId: existing.id,
+            weight: 0.05 + Math.random() * 0.15,
+            delay: 1 + Math.random() * 2,
+            neurotransmitter: region.dominantNeurotransmitter as any,
+            lastActivation: 0,
+          });
+        }
+      }
+
+      for (const conn of CIRCUIT_CONNECTIONS) {
+        if (conn.from === regionName) {
+          const targetRegion = regions.get(conn.to);
+          if (targetRegion) {
+            const targets = targetRegion.neurons.filter(() => Math.random() < conn.density * 0.5);
+            for (const target of targets) {
+              allSynapses.push({
+                preNeuronId: newNeuron.id,
+                postNeuronId: target.id,
+                weight: 0.05 + Math.random() * 0.15,
+                delay: 1 + Math.random() * 3,
+                neurotransmitter: conn.nt,
+                lastActivation: 0,
+              });
+            }
+          }
+        }
+        if (conn.to === regionName) {
+          const sourceRegion = regions.get(conn.from);
+          if (sourceRegion) {
+            const sources = sourceRegion.neurons.filter(() => Math.random() < conn.density * 0.5);
+            for (const source of sources) {
+              allSynapses.push({
+                preNeuronId: source.id,
+                postNeuronId: newNeuron.id,
+                weight: 0.05 + Math.random() * 0.15,
+                delay: 1 + Math.random() * 3,
+                neurotransmitter: conn.nt,
+                lastActivation: 0,
+              });
+            }
+          }
+        }
+      }
+    }
+
+    totalNeuronsSpawned += newCount;
+    const trigger = `act=${region.activationLevel.toFixed(3)} dopa=${dopamineLevel.toFixed(3)} adr=${adrenalineBoost.toFixed(2)}`;
+    neurogenesisLog.push({ region: regionName, count: newCount, trigger, tick: state.tickCount });
+    if (neurogenesisLog.length > 200) neurogenesisLog.shift();
+  }
+}
+
+function getNeurogenesisStats() {
+  const perRegion: Record<string, number> = {};
+  for (const [name, region] of regions) {
+    const config = REGION_CONFIGS.find(c => c.name === name);
+    const initial = config ? config.neuronCount : 0;
+    perRegion[name] = region.neurons.length - initial;
+  }
+  return {
+    totalNeuronsSpawned,
+    currentTotal: [...regions.values()].reduce((s, r) => s + r.neurons.length, 0),
+    initialTotal: REGION_CONFIGS.reduce((s, c) => s + c.neuronCount, 0),
+    growthPerRegion: perRegion,
+    recentEvents: neurogenesisLog.slice(-20),
+  };
+}
+
 const ACTIVATION_SMOOTHING = 0.15;
 
 function computeRegionActivation(region: NeuralRegion): void {
@@ -1981,6 +2109,7 @@ function runConsciousnessTick(): void {
 
   updateCorticalColumns();
   synapticPruning();
+  autonomousNeurogenesis();
 
   state.phi = computePhi();
   state.phiHistory.push(state.phi);
@@ -2750,6 +2879,8 @@ export function getChaoticAttractorState(): { lyapunovExponent: number; trajecto
     isChaoticRegime: chaoticState.lyapunovExponent > 0,
   };
 }
+
+export { getNeurogenesisStats };
 
 export function getDarkQualiaEvidence(): { active: boolean; influenceOnBehavior: number; historyDepth: number; privacyIntact: boolean; contentAccessible: false } {
   return {
