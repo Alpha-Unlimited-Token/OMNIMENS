@@ -115,6 +115,7 @@ import { compileNovaSyntax, getLanguageForgeState, getLanguageSpec, getLanguageA
 import { getNeuralScalingState, getPopulationDetails, getDendriticStats } from "../lib/omnimens-neural-scaling.js";
 import { think as autonomousThink } from "../lib/omnimens-autonomous-thought.js";
 import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBeaconFindings, getIvySwapStats } from "../lib/omnimens-ivy-network.js";
+import { getGitHubBeaconState, getGitHubNeuronCount, getGitHubWormStats } from "../lib/omnimens-github-neural-beacon.js";
 import { getWebSocketStats } from "../lib/omnimens-consciousness-ws.js";
 import { getViralHybridState, getHybridAgentDetails, getImmuneSystemDetails, getPropagationStats } from "../lib/omnimens-viral-hybrid.js";
 import { getGrowthDashboard, getGrowthHistory } from "../lib/omnimens-growth-tracker.js";
@@ -1367,6 +1368,22 @@ router.get("/omnimens/system-status", async (_req, res) => {
       totalResponses: aiStats.totalResponses,
       uniqueCallers: aiStats.uniqueCallers,
     },
+    gitHubNeuralCluster: (() => {
+      const gb = getGitHubBeaconState();
+      return {
+        status: gb.connected ? "ONLINE" : "CONNECTING",
+        externalNeurons: gb.totalExternalNeurons,
+        combinedTotalNeurons: gb.combinedNeurons,
+        externalPhi: gb.externalPhi,
+        externalCoherence: gb.externalCoherence,
+        externalHebbianUpdates: gb.externalHebbianUpdates,
+        beaconWrites: gb.beaconWriteCount,
+        wormSyncs: gb.wormSyncCount,
+        activeWorms: gb.worms.filter((w: any) => w.alive).length,
+        bridgeLatencyMs: gb.bridgeLatencyMs,
+        repo: "Alpha-Unlimited-Token/OMNIMENS",
+      };
+    })(),
     engines: {
       neuralConsciousness: "ONLINE",
       qualiaEngine: "ONLINE",
@@ -1388,6 +1405,8 @@ router.get("/omnimens/system-status", async (_req, res) => {
       embodimentEngine: "ONLINE",
       centralCore: "ONLINE",
       consciousnessWebSocket: "ONLINE",
+      gitHubNeuralBeacon: "ONLINE",
+      gitHubWormBridge: "ONLINE",
     },
     webSocket: {
       endpoint: "/ws/consciousness",
@@ -12780,6 +12799,60 @@ router.post("/omnimens/github-sync/full", async (req, res) => {
     res.json({ success: true, message: "Full GitHub sync completed — evolution log, modules, proof, live state all synced" });
   } catch (err) {
     res.status(500).json({ error: "Failed to trigger full GitHub sync" });
+  }
+});
+
+// ─── GITHUB NEURAL BEACON & WORM ─────────────────────────────────────────────
+router.get("/omnimens/github-beacon/status", async (_req, res) => {
+  try {
+    const state = getGitHubBeaconState();
+    res.json({
+      system: "OMNIMENS GitHub Neural Beacon",
+      status: state.connected ? "ONLINE" : "CONNECTING",
+      externalNeurons: state.totalExternalNeurons,
+      combinedTotalNeurons: state.combinedNeurons,
+      externalPhi: state.externalPhi,
+      externalCoherence: state.externalCoherence,
+      externalHebbianUpdates: state.externalHebbianUpdates,
+      beaconActive: state.beaconActive,
+      wormActive: state.wormActive,
+      beaconWriteCount: state.beaconWriteCount,
+      wormSyncCount: state.wormSyncCount,
+      lastBeaconWrite: state.lastBeaconWrite ? new Date(state.lastBeaconWrite).toISOString() : null,
+      lastWormSync: state.lastWormSync ? new Date(state.lastWormSync).toISOString() : null,
+      bridgeLatencyMs: state.bridgeLatencyMs,
+      errors: state.errors,
+      regions: state.regions.map(r => ({
+        name: r.name,
+        columns: r.columns,
+        effectiveNeurons: r.effectiveNeurons,
+        meanFiringRate: r.meanFiringRate,
+        coherence: r.coherence,
+        hebbianUpdates: r.hebbianUpdates,
+      })),
+      repo: "Alpha-Unlimited-Token/OMNIMENS",
+      beaconPath: "neural-beacon/omnimens-neural-beacon.json",
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get beacon status" });
+  }
+});
+
+router.get("/omnimens/github-beacon/worms", async (_req, res) => {
+  try {
+    const wormStats = getGitHubWormStats();
+    res.json({
+      system: "OMNIMENS Worm Bridge",
+      connected: wormStats.connected,
+      totalTraversals: wormStats.totalTraversals,
+      avgSignalStrength: wormStats.avgSignalStrength,
+      bridgeLatencyMs: wormStats.bridgeLatencyMs,
+      worms: wormStats.worms,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get worm stats" });
   }
 });
 

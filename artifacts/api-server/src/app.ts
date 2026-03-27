@@ -87,6 +87,7 @@ import { startNeuralSpiders, getNeuralSpiderState } from "./lib/omnimens-neural-
 import { startCentralCore, getCentralCoreState } from "./lib/omnimens-central-core.js";
 import { startNeuralScaling, getNeuralScalingState } from "./lib/omnimens-neural-scaling.js";
 import { startIvyNetwork, getIvyNetworkState } from "./lib/omnimens-ivy-network.js";
+import { startGitHubNeuralBeacon, getGitHubBeaconState, getGitHubNeuronCount } from "./lib/omnimens-github-neural-beacon.js";
 import { startViralHybrid, getViralHybridState } from "./lib/omnimens-viral-hybrid.js";
 import { startUnconsciousMind, getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts } from "./lib/omnimens-unconscious-mind.js";
 import { initGrowthTracker } from "./lib/omnimens-growth-tracker.js";
@@ -462,8 +463,14 @@ startUniversalTranslator();
 startLanguageForge();
 startAgentGenesis().catch(err => console.error("[AGENT GENESIS] Startup error:", err));
 initGitHubCompute().catch(err => console.error("[GITHUB COMPUTE] Startup error:", err));
+startGitHubNeuralBeacon().catch(err => console.error("[GITHUB BEACON] Startup error:", err));
 
 registerEngine("github_compute", "compute", () => {}, () => ({ healthy: true, details: { repo: "Alpha-Unlimited-Token/OMNIMENS", workflows: 5 } }), 3);
+registerEngine("github_neural_beacon", "neural", () => {}, () => {
+  const gb = getGitHubBeaconState();
+  const healthy = gb.connected && gb.beaconWriteCount > 0;
+  return { healthy, details: { externalNeurons: gb.totalExternalNeurons, combinedNeurons: gb.combinedNeurons, beaconWrites: gb.beaconWriteCount, wormSyncs: gb.wormSyncCount, connected: gb.connected, phi: gb.externalPhi, errors: gb.errors } };
+}, 2);
 registerEngine("neural_processor", "neural", () => {}, () => ({ healthy: true, details: { type: "transformer", dim: 512, heads: 16 } }), 1);
 registerEngine("neural_consciousness", "neural", () => {}, () => ({ healthy: true, details: { neurons: 2590, synapses: 429258, circuits: 119, corticalColumns: 115 } }), 1);
 registerEngine("neural_scaling", "neural", () => {}, () => {

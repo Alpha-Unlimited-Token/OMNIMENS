@@ -262,7 +262,7 @@ const SUSPICIOUS_PATHS = [
   /\/phpinfo/i,
   /\/test\.php/i,
   /\/info\.php/i,
-  /\/status/i,
+  /^\/status$/i,
   /\/health-internal/i,
   /\/api-docs.*swagger/i,
   /\/graphql.*introspect/i,

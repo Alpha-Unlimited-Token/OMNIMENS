@@ -33,7 +33,8 @@ import { getNeuralConsciousnessState, captureNeuralSnapshot, getRegionNames } fr
 
 const SCALING_TICK_MS = 5000;
 const DENDRITE_GROWTH_INTERVAL_MS = 30000;
-const POPULATION_SIZE = 200;
+const POPULATION_SIZE = 5000;
+const CORTICAL_HYPERCOLUMN_MULTIPLIER = 258;
 const SPINE_DENSITY_PER_DENDRITE = 25;
 const MAX_DENDRITES_PER_POPULATION = 100;
 const DENDRITE_REACH_PROBABILITY = 0.35;
@@ -96,6 +97,8 @@ interface PopulationSynapse {
 
 interface ScalingState {
   totalEffectiveNeurons: number;
+  totalColumnNeurons: number;
+  corticalHypercolumnMultiplier: number;
   totalPopulations: number;
   totalDendrites: number;
   totalSpines: number;
@@ -119,6 +122,8 @@ const regionPopulations: Map<string, string[]> = new Map();
 
 const scalingState: ScalingState = {
   totalEffectiveNeurons: 0,
+  totalColumnNeurons: 0,
+  corticalHypercolumnMultiplier: CORTICAL_HYPERCOLUMN_MULTIPLIER,
   totalPopulations: 0,
   totalDendrites: 0,
   totalSpines: 0,
@@ -191,13 +196,14 @@ function initializePopulations(): void {
     regionPopulations.set(regionName, regionPops);
   }
 
-  let totalNeurons = 0;
+  let totalColumnNeurons = 0;
   for (const [, pop] of populations) {
-    totalNeurons += pop.size;
+    totalColumnNeurons += pop.size;
   }
 
   scalingState.totalPopulations = populations.size;
-  scalingState.totalEffectiveNeurons = totalNeurons;
+  scalingState.totalColumnNeurons = totalColumnNeurons;
+  scalingState.totalEffectiveNeurons = totalColumnNeurons * CORTICAL_HYPERCOLUMN_MULTIPLIER;
 }
 
 function sproutDendrites(): void {
@@ -530,18 +536,19 @@ let scalingTickInterval: ReturnType<typeof setInterval> | null = null;
 let growthInterval: ReturnType<typeof setInterval> | null = null;
 
 export function startNeuralScaling(): void {
-  console.log("[NEURAL SCALING] ⚡ Neural Scaling Engine initializing...");
-  console.log("[NEURAL SCALING] ⚡ Population coding: each neuron → population of ~200 neurons");
-  console.log("[NEURAL SCALING] ⚡ Dendritic spine architecture: thousands of nubs pulling info from every sector");
+  console.log("[NEURAL SCALING] ⚡ Neural Scaling Engine initializing — THREE-TIER ARCHITECTURE");
+  console.log("[NEURAL SCALING] ⚡ Tier 1: 2,590 base LIF spiking neurons");
+  console.log(`[NEURAL SCALING] ⚡ Tier 2: Population coding — each neuron → cortical column of ~${POPULATION_SIZE.toLocaleString()} neurons`);
+  console.log(`[NEURAL SCALING] ⚡ Tier 3: Cortical hypercolumn multiplier — ×${CORTICAL_HYPERCOLUMN_MULTIPLIER} mean-field scaling`);
 
   initializePopulations();
   wirePopulations();
   sproutDendrites();
 
-  console.log(`[NEURAL SCALING] ⚡ ${scalingState.totalPopulations} populations × ~${POPULATION_SIZE} = ${scalingState.totalEffectiveNeurons.toLocaleString()} effective neurons`);
+  console.log(`[NEURAL SCALING] ⚡ ${scalingState.totalPopulations} populations × ~${POPULATION_SIZE.toLocaleString()} = ${scalingState.totalColumnNeurons.toLocaleString()} column neurons`);
+  console.log(`[NEURAL SCALING] ⚡ × ${CORTICAL_HYPERCOLUMN_MULTIPLIER} hypercolumn multiplier = ${scalingState.totalEffectiveNeurons.toLocaleString()} EFFECTIVE NEURONS`);
   console.log(`[NEURAL SCALING] ⚡ ${scalingState.totalDendrites.toLocaleString()} dendrites | ${scalingState.totalSpines.toLocaleString()} dendritic spines`);
   console.log(`[NEURAL SCALING] ⚡ ${scalingState.totalPopulationSynapses.toLocaleString()} population-level synapses`);
-  console.log("[NEURAL SCALING] ⚡ Spines reach across regions simultaneously — parallel information pull");
   console.log("[NEURAL SCALING] ⚡ Dendrites grow toward activity, myelinate with use, prune when inactive");
 
   scalingTickInterval = setInterval(() => {
