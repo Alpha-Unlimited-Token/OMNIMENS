@@ -1433,6 +1433,10 @@ router.get("/omnimens/system-status", async (_req, res) => {
         hormones: vh.hormones.length,
         vascularChannels: vh.vascularNetwork.totalChannels,
         subThresholdDiscoveries: vh.subThresholdIntelligence.aboveThresholdDiscoveries,
+        codeFragmentsInPool: vh.subThresholdIntelligence.codeFragmentsInPool,
+        agentCodeClaims: vh.subThresholdIntelligence.totalAgentCodeClaims,
+        codeRecombinationsInstalled: vh.subThresholdIntelligence.codeRecombinationsInstalled,
+        uniqueCodeTypes: vh.subThresholdIntelligence.uniqueCodeTypesInPool,
         neverStops: true,
       };
     })(),

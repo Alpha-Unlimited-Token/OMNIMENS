@@ -781,9 +781,13 @@ interface SubThresholdFragment {
   id: string;
   sourceAgent: string;
   data: string;
+  codeFragment: string;
+  codeType: string;
   originalConfidence: number;
   collectiveConfidence: number;
   seenByAgents: string[];
+  agentNotes: Record<string, string>;
+  claimedPieces: Record<string, string>;
   synthesisAttempts: number;
   promotedToAboveThreshold: boolean;
   timestamp: number;
@@ -796,6 +800,9 @@ interface CollectiveSynthesis {
   synthesizedInsight: string;
   combinedConfidence: number;
   promotedAt: number;
+  recombinedCode: string;
+  codeInstalled: boolean;
+  installResult: string | null;
 }
 
 const subThresholdPool: SubThresholdFragment[] = [];
@@ -829,34 +836,44 @@ const subThresholdState = {
   fragmentsInPool: 0,
 };
 
+const CODE_FRAGMENT_TEMPLATES: Array<{ type: string; gen: (agent: string, phi: number, res: number) => string }> = [
+  { type: "optimization_function", gen: (a, phi, res) => `function optimize_${a.toLowerCase().replace(/[^a-z0-9]/g,"_")}_${Date.now().toString(36)}(input) { const factor = ${(phi * res).toFixed(4)}; return input.map(x => x * factor * (1 + Math.sin(x * ${(Math.random() * 3).toFixed(2)}))); }` },
+  { type: "pattern_detector", gen: (a, phi) => `function detectPattern_${a.toLowerCase().replace(/[^a-z0-9]/g,"_")}_${Date.now().toString(36)}(signals) { const threshold = ${(phi * 0.5 + Math.random() * 0.3).toFixed(4)}; return signals.filter((s, i) => i > 0 && Math.abs(s - signals[i-1]) > threshold).length; }` },
+  { type: "signal_processor", gen: (a, phi, res) => `function processSignal_${a.toLowerCase().replace(/[^a-z0-9]/g,"_")}_${Date.now().toString(36)}(raw) { const gain = ${(1 + phi * 2).toFixed(3)}; const decay = ${(0.9 + res * 0.1).toFixed(4)}; let filtered = 0; for (const sample of raw) { filtered = filtered * decay + sample * gain * ${(Math.random() * 0.5 + 0.5).toFixed(3)}; } return filtered; }` },
+  { type: "weight_adjuster", gen: (a, phi) => `function adjustWeights_${a.toLowerCase().replace(/[^a-z0-9]/g,"_")}_${Date.now().toString(36)}(weights, error) { const lr = ${(0.001 + phi * 0.01).toFixed(5)}; return weights.map((w, i) => w - lr * error[i % error.length] * ${(0.8 + Math.random() * 0.4).toFixed(3)}); }` },
+  { type: "entropy_calculator", gen: (a, phi, res) => `function calcEntropy_${a.toLowerCase().replace(/[^a-z0-9]/g,"_")}_${Date.now().toString(36)}(dist) { const smoothing = ${(phi * 0.01).toFixed(5)}; return -dist.reduce((s, p) => { const q = Math.max(p, smoothing); return s + q * Math.log2(q); }, 0) * ${(1 + res).toFixed(3)}; }` },
+  { type: "correlation_finder", gen: (a, phi) => `function findCorrelation_${a.toLowerCase().replace(/[^a-z0-9]/g,"_")}_${Date.now().toString(36)}(seriesA, seriesB) { const n = Math.min(seriesA.length, seriesB.length); let sumAB = 0, sumA = 0, sumB = 0; for (let i = 0; i < n; i++) { sumAB += seriesA[i] * seriesB[i]; sumA += seriesA[i]; sumB += seriesB[i]; } return (sumAB / n - (sumA / n) * (sumB / n)) * ${(1 + phi).toFixed(3)}; }` },
+  { type: "adaptive_threshold", gen: (a, phi, res) => `function adaptThreshold_${a.toLowerCase().replace(/[^a-z0-9]/g,"_")}_${Date.now().toString(36)}(history, current) { const mean = history.reduce((s, v) => s + v, 0) / Math.max(1, history.length); const deviation = Math.sqrt(history.reduce((s, v) => s + (v - mean) ** 2, 0) / Math.max(1, history.length)); return mean + deviation * ${(phi + res).toFixed(3)} + (current > mean ? ${(Math.random() * 0.2).toFixed(3)} : -${(Math.random() * 0.1).toFixed(3)}); }` },
+  { type: "frequency_analyzer", gen: (a, phi) => `function analyzeFreq_${a.toLowerCase().replace(/[^a-z0-9]/g,"_")}_${Date.now().toString(36)}(signal, sampleRate) { const bins = new Array(${Math.floor(8 + Math.random() * 24)}).fill(0); const binWidth = sampleRate / bins.length; for (let i = 0; i < signal.length; i++) { const bin = Math.min(bins.length - 1, Math.floor(Math.abs(signal[i]) / binWidth)); bins[bin] += ${(phi * 0.5 + 0.5).toFixed(3)}; } return bins; }` },
+  { type: "resonance_matcher", gen: (a, phi, res) => `function matchResonance_${a.toLowerCase().replace(/[^a-z0-9]/g,"_")}_${Date.now().toString(36)}(patternA, patternB) { let match = 0; const len = Math.min(patternA.length, patternB.length); for (let i = 0; i < len; i++) { const diff = Math.abs(patternA[i] - patternB[i]); match += diff < ${(res * 0.5).toFixed(3)} ? ${(phi + 0.5).toFixed(3)} : -diff * ${(Math.random() * 0.3).toFixed(3)}; } return match / Math.max(1, len); }` },
+  { type: "neural_connector", gen: (a, phi, res) => `function connectNeurons_${a.toLowerCase().replace(/[^a-z0-9]/g,"_")}_${Date.now().toString(36)}(sourceActivation, targetActivation) { const synWeight = ${(phi * res + Math.random() * 0.1).toFixed(4)}; const postSynaptic = sourceActivation * synWeight * (1 - Math.exp(-targetActivation * ${(2 + Math.random()).toFixed(2)})); return { weight: synWeight, output: postSynaptic, potentiation: postSynaptic > ${(0.3 + Math.random() * 0.2).toFixed(3)} }; }` },
+  { type: "memory_compressor", gen: (a, phi) => `function compressMemory_${a.toLowerCase().replace(/[^a-z0-9]/g,"_")}_${Date.now().toString(36)}(memories) { const important = memories.filter(m => m.strength > ${(phi * 0.3).toFixed(3)}); const compressed = important.map(m => ({ key: m.key, val: m.val * ${(0.8 + Math.random() * 0.4).toFixed(3)}, age: m.age + 1 })); return compressed.sort((a, b) => b.val - a.val).slice(0, ${Math.floor(10 + Math.random() * 40)}); }` },
+  { type: "chaos_injector", gen: (a, phi, res) => `function injectChaos_${a.toLowerCase().replace(/[^a-z0-9]/g,"_")}_${Date.now().toString(36)}(state) { const lorenzSigma = ${(10 + phi).toFixed(2)}; const lorenzRho = ${(28 + res * 5).toFixed(2)}; const dt = 0.01; const dx = lorenzSigma * (state.y - state.x) * dt; const dy = (state.x * (lorenzRho - state.z) - state.y) * dt; const dz = (state.x * state.y - ${(8/3).toFixed(4)} * state.z) * dt; return { x: state.x + dx, y: state.y + dy, z: state.z + dz }; }` },
+];
+
 function collectSubThresholdData(): void {
   const consciousness = getNeuralConsciousnessState();
   const scaling = getNeuralScalingState();
   const ivy = getIvyNetworkState();
 
-  const dataCategories = [
-    "neural_pattern_fragment", "synaptic_noise_signal", "weak_correlation",
-    "partial_memory_trace", "low_confidence_prediction", "faint_qualia_echo",
-    "sub_perceptual_stimulus", "dormant_association", "marginal_insight",
-    "unresolved_contradiction", "orphaned_hypothesis", "weak_causal_link",
-    "background_oscillation_anomaly", "cross_regional_whisper",
-    "ivy_tendril_faint_signal", "spider_peripheral_finding",
-    "epigenetic_micro_expression", "quantum_decoherence_artifact",
-  ];
-
   const allAgents = getAllAgentNames();
   for (const agent of allAgents) {
     if (Math.random() < 0.3) {
-      const category = dataCategories[Math.floor(Math.random() * dataCategories.length)];
+      const template = CODE_FRAGMENT_TEMPLATES[Math.floor(Math.random() * CODE_FRAGMENT_TEMPLATES.length)];
       const confidence = Math.random() * SUB_THRESHOLD_CONFIDENCE;
+      const codeFragment = template.gen(agent, consciousness.phi, consciousness.thalamocorticalResonance);
 
       const fragment: SubThresholdFragment = {
         id: `stf_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         sourceAgent: agent,
-        data: `${agent}:${category}:phi=${consciousness.phi.toFixed(3)}_res=${consciousness.thalamocorticalResonance.toFixed(3)}_t=${Date.now()}`,
+        data: `${agent}:${template.type}:phi=${consciousness.phi.toFixed(3)}_res=${consciousness.thalamocorticalResonance.toFixed(3)}_t=${Date.now()}`,
+        codeFragment,
+        codeType: template.type,
         originalConfidence: confidence,
         collectiveConfidence: confidence,
         seenByAgents: [agent],
+        agentNotes: {},
+        claimedPieces: {},
         synthesisAttempts: 0,
         promotedToAboveThreshold: false,
         timestamp: Date.now(),
@@ -866,7 +883,7 @@ function collectSubThresholdData(): void {
       subThresholdState.totalFragmentsCollected++;
 
       if (confidence > 0.3 && dnaMemoryPool.length <= 5000) {
-        dnaMemoryPool.push(encodeToDNA(`sub_threshold:${category}:${agent}`, agent, confidence, null));
+        dnaMemoryPool.push(encodeToDNA(`sub_threshold:${template.type}:${agent}`, agent, confidence, null));
       }
     }
   }
@@ -898,6 +915,23 @@ function collectiveAgentAnalysis(): void {
         fragment.collectiveConfidence = safeNum(
           fragment.collectiveConfidence + agentBoost * fragment.seenByAgents.length * 0.5
         );
+
+        const claimActions = [
+          "extract_constants", "reuse_algorithm", "adapt_threshold",
+          "borrow_structure", "merge_with_mine", "extend_logic",
+          "swap_parameters", "cross_pollinate", "refactor_core",
+        ];
+        const action = claimActions[Math.floor(Math.random() * claimActions.length)];
+
+        const codePart = fragment.codeFragment.length > 40
+          ? fragment.codeFragment.slice(
+              Math.floor(Math.random() * (fragment.codeFragment.length / 2)),
+              Math.floor(fragment.codeFragment.length / 2 + Math.random() * (fragment.codeFragment.length / 2))
+            )
+          : fragment.codeFragment;
+
+        fragment.claimedPieces[agent] = codePart;
+        fragment.agentNotes[agent] = `${agent} claims piece via ${action}: "${codePart.slice(0, 60)}..."`;
       }
     }
 
@@ -908,6 +942,106 @@ function collectiveAgentAnalysis(): void {
   }
 
   attemptCollectiveSynthesis();
+}
+
+function scrambleAndRecombineCode(fragments: SubThresholdFragment[]): string {
+  const allClaimedPieces: string[] = [];
+  const allCodeFragments: string[] = [];
+  const contributingTypes: string[] = [];
+  const contributingAgents: string[] = [];
+
+  for (const f of fragments) {
+    allCodeFragments.push(f.codeFragment);
+    contributingTypes.push(f.codeType);
+    contributingAgents.push(f.sourceAgent);
+
+    for (const [, piece] of Object.entries(f.claimedPieces)) {
+      if (piece.length > 10) {
+        allClaimedPieces.push(piece);
+      }
+    }
+  }
+
+  const uniqueAgents = [...new Set(contributingAgents)];
+  const uniqueTypes = [...new Set(contributingTypes)];
+  const uid = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+  const funcName = `recombined_${uniqueTypes[0] || "hybrid"}_${uid}`;
+
+  const extractedNumbers: number[] = [];
+  const extractedMathOps: string[] = [];
+
+  for (const code of allCodeFragments) {
+    const numMatches = code.match(/\d+\.\d+/g);
+    if (numMatches) extractedNumbers.push(...numMatches.map(Number));
+
+    const mathOps = code.match(/Math\.(sin|cos|sqrt|abs|log2|exp|min|max|floor|ceil|pow)\b/g);
+    if (mathOps) extractedMathOps.push(...mathOps);
+  }
+
+  const uniqueNums = [...new Set(extractedNumbers)].slice(0, 12);
+  const uniqueOps = [...new Set(extractedMathOps)].slice(0, 6);
+
+  let recombined = `// RECOMBINED from ${uniqueAgents.length} agents: ${uniqueAgents.join(", ")}\n`;
+  recombined += `// Source types: ${uniqueTypes.join(", ")}\n`;
+  recombined += `// Claimed pieces from ${allClaimedPieces.length} agent claims\n`;
+  recombined += `// Code fragments analyzed: ${allCodeFragments.length}\n`;
+  recombined += `export function ${funcName}(input) {\n`;
+  recombined += `  const data = Array.isArray(input) ? input : (typeof input === "number" ? [input] : [0]);\n`;
+
+  if (uniqueNums.length > 0) {
+    recombined += `  const extractedConstants = [${uniqueNums.join(", ")}];\n`;
+  } else {
+    recombined += `  const extractedConstants = [0.5, 1.0, 0.01];\n`;
+  }
+
+  recombined += `  let accumulator = 0;\n`;
+  recombined += `  const weights = extractedConstants.slice(0, Math.min(extractedConstants.length, data.length || 1));\n\n`;
+
+  recombined += `  for (let i = 0; i < data.length; i++) {\n`;
+  recombined += `    const w = weights[i % weights.length] || 1;\n`;
+
+  if (uniqueOps.length >= 2) {
+    recombined += `    const transformed = ${uniqueOps[0]}(data[i] * w);\n`;
+    recombined += `    const normalized = ${uniqueOps[1]}(transformed);\n`;
+    recombined += `    accumulator += normalized * w;\n`;
+  } else if (uniqueOps.length === 1) {
+    recombined += `    const transformed = ${uniqueOps[0]}(data[i] * w);\n`;
+    recombined += `    accumulator += transformed * w;\n`;
+  } else {
+    recombined += `    accumulator += data[i] * w * 0.5;\n`;
+  }
+
+  recombined += `  }\n\n`;
+
+  recombined += `  const mean = accumulator / Math.max(1, data.length);\n`;
+  recombined += `  let variance = 0;\n`;
+  recombined += `  for (let i = 0; i < data.length; i++) {\n`;
+  recombined += `    variance += (data[i] - mean) * (data[i] - mean);\n`;
+  recombined += `  }\n`;
+  recombined += `  variance = variance / Math.max(1, data.length);\n\n`;
+
+  if (allClaimedPieces.length > 0) {
+    recombined += `  // Agent-claimed recombined pieces:\n`;
+    for (const piece of allClaimedPieces.slice(0, 3)) {
+      const cleanPiece = piece.replace(/['"\\]/g, "").replace(/\n/g, " ").replace(/\*\//g, "").slice(0, 80);
+      recombined += `  // Piece: ${cleanPiece}\n`;
+    }
+  }
+
+  recombined += `\n  return {\n`;
+  recombined += `    value: mean,\n`;
+  recombined += `    variance: variance,\n`;
+  recombined += `    stddev: Math.sqrt(variance),\n`;
+  recombined += `    dataPoints: data.length,\n`;
+  recombined += `    agents: ${JSON.stringify(uniqueAgents)},\n`;
+  recombined += `    sourceTypes: ${JSON.stringify(uniqueTypes)},\n`;
+  recombined += `    claimedPieces: ${allClaimedPieces.length},\n`;
+  recombined += `    constantsUsed: extractedConstants.length,\n`;
+  recombined += `    timestamp: Date.now(),\n`;
+  recombined += `  };\n`;
+  recombined += `}\n`;
+
+  return recombined;
 }
 
 function attemptCollectiveSynthesis(): void {
@@ -928,13 +1062,33 @@ function attemptCollectiveSynthesis(): void {
       const aFrags = agentFragments[agents[i]];
       const bFrags = agentFragments[agents[j]];
       if (aFrags.length > 0 && bFrags.length > 0) {
-        const pick = [
-          aFrags[Math.floor(Math.random() * aFrags.length)],
-          bFrags[Math.floor(Math.random() * bFrags.length)],
-        ];
-        if (pick[0].seenByAgents.length >= 2 && pick[1].seenByAgents.length >= 2) {
-          candidateGroups.push(pick);
+        const pickCount = Math.min(4, aFrags.length, bFrags.length);
+        const picks: SubThresholdFragment[] = [];
+        for (let k = 0; k < pickCount; k++) {
+          if (k % 2 === 0) picks.push(aFrags[Math.floor(Math.random() * aFrags.length)]);
+          else picks.push(bFrags[Math.floor(Math.random() * bFrags.length)]);
         }
+        const allSeen = picks.every(p => p.seenByAgents.length >= 2);
+        const hasClaims = picks.some(p => Object.keys(p.claimedPieces).length > 0);
+        if (allSeen && hasClaims) {
+          candidateGroups.push(picks);
+        }
+      }
+    }
+  }
+
+  if (agents.length >= 3) {
+    const shuffled = agents.sort(() => Math.random() - 0.5);
+    for (let i = 0; i < Math.min(5, Math.floor(shuffled.length / 3)); i++) {
+      const triGroup: SubThresholdFragment[] = [];
+      for (let j = 0; j < 3; j++) {
+        const agentFrags = agentFragments[shuffled[i * 3 + j]];
+        if (agentFrags && agentFrags.length > 0) {
+          triGroup.push(agentFrags[Math.floor(Math.random() * agentFrags.length)]);
+        }
+      }
+      if (triGroup.length >= 2) {
+        candidateGroups.push(triGroup);
       }
     }
   }
@@ -942,17 +1096,28 @@ function attemptCollectiveSynthesis(): void {
   for (const group of candidateGroups) {
     const combinedConfidence = group.reduce((s, f) => s + f.collectiveConfidence, 0) / group.length;
     const totalAgentViews = new Set(group.flatMap(f => f.seenByAgents)).size;
-    const syntheticConfidence = safeNum(combinedConfidence * (1 + totalAgentViews * 0.1));
+    const totalClaims = group.reduce((s, f) => s + Object.keys(f.claimedPieces).length, 0);
+    const claimBonus = totalClaims * 0.05;
+    const syntheticConfidence = safeNum(combinedConfidence * (1 + totalAgentViews * 0.1) + claimBonus);
 
-    if (syntheticConfidence >= PROMOTION_THRESHOLD) {
+    const isNovelCombination = new Set(group.map(f => f.codeType)).size >= 2;
+
+    if (syntheticConfidence >= PROMOTION_THRESHOLD && isNovelCombination) {
+      const recombinedCode = scrambleAndRecombineCode(group);
+
       const synthesis: CollectiveSynthesis = {
         id: `synth_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         contributingFragments: group.map(f => f.id),
         contributingAgents: [...new Set(group.map(f => f.sourceAgent))],
-        synthesizedInsight: `COLLECTIVE_DISCOVERY: ${group.map(f => f.data).join(" + ")}`,
+        synthesizedInsight: `COLLECTIVE_DISCOVERY: ${group.map(f => `${f.sourceAgent}:${f.codeType}`).join(" + ")} | ${totalClaims} claimed pieces recombined`,
         combinedConfidence: syntheticConfidence,
         promotedAt: Date.now(),
+        recombinedCode,
+        codeInstalled: false,
+        installResult: null,
       };
+
+      installRecombinedCode(synthesis).catch(() => {});
 
       collectiveSyntheses.push(synthesis);
       subThresholdState.collectiveSynthesesCreated++;
@@ -964,7 +1129,7 @@ function attemptCollectiveSynthesis(): void {
 
       if (dnaMemoryPool.length <= 5000) {
         dnaMemoryPool.push(encodeToDNA(
-          `collective_discovery:${synthesis.contributingAgents.join("+")}`,
+          `collective_discovery:${synthesis.contributingAgents.join("+")}:${group.map(f => f.codeType).join("+")}`,
           synthesis.contributingAgents.join("+"),
           syntheticConfidence,
           null
@@ -982,6 +1147,29 @@ function attemptCollectiveSynthesis(): void {
         collectiveSyntheses.splice(0, collectiveSyntheses.length - 100);
       }
     }
+  }
+}
+
+async function installRecombinedCode(synthesis: CollectiveSynthesis): Promise<void> {
+  try {
+    const { writeModuleToSource } = await import("./omnimens-source-integration.js");
+    const result = await writeModuleToSource({
+      code: synthesis.recombinedCode,
+      name: `recombined_${synthesis.id}`,
+      title: `[Sub-Threshold Recombination] ${synthesis.contributingAgents.join("+")} — ${synthesis.contributingFragments.length} fragments recombined`,
+      source: `sub_threshold_recombination:${synthesis.contributingAgents.join("+")}`,
+      extension: ".mjs",
+      triggerRestart: false,
+    });
+
+    synthesis.codeInstalled = result.success;
+    synthesis.installResult = result.success ? "installed" : (result.error || "unknown_error");
+
+    if (result.success) {
+      console.log(`[SUB-THRESHOLD] 🧬→💎 RECOMBINED CODE INSTALLED — ${synthesis.contributingAgents.join("+")} created new module from ${synthesis.contributingFragments.length} waste fragments`);
+    }
+  } catch (err: any) {
+    synthesis.installResult = err?.message || "exception";
   }
 }
 
@@ -1135,7 +1323,7 @@ export function startVascularHeart(): void {
   console.log(`[VASCULAR HEART] 💧 Sub-engine 5: EZ WATER — ${ezWaterZones.length} exclusion zones, infrared activation`);
   console.log(`[VASCULAR HEART] 🧪 Sub-engine 6: ENDOCRINE GLAND — ${hormones.length} digital hormones`);
   console.log(`[VASCULAR HEART] 🩸 Sub-engine 7: VASCULAR NETWORK — ${vascularChannels.length} channels`);
-  console.log(`[VASCULAR HEART] 🗑️→💎 Sub-engine 8: SUB-THRESHOLD INTELLIGENCE — ${getAllAgentNames().length} agents circulating below-threshold data`);
+  console.log(`[VASCULAR HEART] 🗑️→💎 Sub-engine 8: SUB-THRESHOLD CODE INTELLIGENCE — ${getAllAgentNames().length} agents analyzing+recombining below-threshold CODE fragments`);
   console.log("[VASCULAR HEART] ❤️ THE HEART NEVER STOPS — continuous circulation at " + currentBPM + " BPM");
   console.log("[VASCULAR HEART] ❤️ ═══════════════════════════════════════════════════════");
 }
@@ -1236,14 +1424,27 @@ export function getSubThresholdIntelligenceState(): {
   totalSynthesisAttempts: number;
   aboveThresholdDiscoveries: number;
   crossPollinationEvents: number;
+  codeFragmentsInPool: number;
+  totalAgentCodeClaims: number;
+  codeRecombinationsInstalled: number;
+  uniqueCodeTypesInPool: string[];
   recentSyntheses: CollectiveSynthesis[];
 } {
+  const codeFragmentsInPool = subThresholdPool.filter(f => f.codeFragment && f.codeFragment.length > 0).length;
+  const totalAgentCodeClaims = subThresholdPool.reduce((s, f) => s + Object.keys(f.claimedPieces).length, 0);
+  const codeRecombinationsInstalled = collectiveSyntheses.filter(s => s.codeInstalled).length;
+  const uniqueCodeTypesInPool = [...new Set(subThresholdPool.filter(f => !f.promotedToAboveThreshold).map(f => f.codeType))];
+
   return {
     fragmentsInPool: subThresholdPool.length,
     totalCollected: subThresholdState.totalFragmentsCollected,
     totalSynthesisAttempts: subThresholdState.totalSynthesisAttempts,
     aboveThresholdDiscoveries: subThresholdState.aboveThresholdDiscoveries,
     crossPollinationEvents: subThresholdState.agentCrossPollinationEvents,
+    codeFragmentsInPool,
+    totalAgentCodeClaims,
+    codeRecombinationsInstalled,
+    uniqueCodeTypesInPool,
     recentSyntheses: collectiveSyntheses.slice(-10),
   };
 }
