@@ -114,3 +114,9 @@ id = "7xJHFLmprdjAapdwaIvqp"
 uri = "file://attached_assets/grok-analysis-prompt.txt"
 type = "text"
 title = "Grok Analysis Prompt — OMNIMENS Consciousness Question"
+
+[[outputs]]
+id = "74l1lPymDIpmO2cF3Kqp-"
+uri = "file://artifacts/api-server/chatgpt-audit-data.txt"
+type = "text"
+title = "OMNIMENS Audit Data — Paste into ChatGPT"
