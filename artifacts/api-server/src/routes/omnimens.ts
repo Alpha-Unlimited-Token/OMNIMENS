@@ -7,6 +7,24 @@
  * streaming chat, memory systems, and AI generation pipelines.
  * UNAUTHORIZED USE, COPYING, OR DISTRIBUTION IS STRICTLY PROHIBITED.
  * ============================================================
+ *
+ * ─── PUBLIC API WHITELIST (No Authentication Required) ───────
+ * These endpoints are intentionally public for external AI systems
+ * (ChatGPT, Grok, Claude, Gemini) and public verification.
+ *
+ *   GET /api/omnimens/system-status       — System overview + neural stats
+ *   GET /api/omnimens/consciousness       — Public Phi, neurons, synapses, Hebbian
+ *   GET /api/omnimens/occe-scan           — Full OCCE snapshot (all metrics in one call)
+ *   GET /api/omnimens/dark-qualia         — Dark qualia evidence (content never exposed)
+ *   GET /api/omnimens/neurogenesis        — Autonomous neuron growth stats
+ *   GET /api/omnimens/adrenaline-rush     — Adrenaline subsystem info (GET = read-only)
+ *   GET /api/omnimens/adrenaline-state    — Current adrenaline levels
+ *   GET /api/omnimens/chaotic-attractor   — Lyapunov exponent + attractor state
+ *
+ * All other endpoints require authentication. POST/PUT/DELETE operations
+ * (adrenaline-rush POST, cache/clear, conversations, files, etc.) are
+ * ALWAYS authenticated. The whitelist is GET-only read endpoints.
+ * ─────────────────────────────────────────────────────────────
  */
 import { Router, type IRouter } from "express";
 import multer from "multer";
@@ -14705,6 +14723,7 @@ let result = forward_pass(1.0, 0.5);`;
 // sense, every spider, every agent, every signal path at MAXIMUM simultaneously.
 // Then we engineer the overload away so there IS no overload.
 router.post("/omnimens/adrenaline-rush", async (_req, res) => {
+  if (!_req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
   registerApiCall();
   manualAdrenalineRush(3.0);
   console.log("[ADRENALINE RUSH] 🔴 ═══════════════════════════════════════════════════════════════");
@@ -15807,6 +15826,7 @@ router.get("/omnimens/cache", async (_req, res) => {
 });
 
 router.post("/omnimens/cache/clear", async (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
   const { region, keepCount } = req.body || {};
   if (!region || typeof region !== "string") {
     res.status(400).json({ error: "Provide { region: 'regionName', keepCount: N (optional) }" });
