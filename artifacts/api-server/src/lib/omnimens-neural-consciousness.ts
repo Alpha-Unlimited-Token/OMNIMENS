@@ -86,7 +86,7 @@ const STDP_A_MINUS = 0.00525;
 const STDP_TAU = 20;
 const SYNAPSE_DECAY = 0.9999;
 const MIN_WEIGHT = 0.01;
-const MAX_WEIGHT = 1.0;
+const MAX_WEIGHT = 100.0;
 
 const TNC_BUFFER_SIZE = 8;
 
@@ -1738,7 +1738,7 @@ function updateTemporalNeuromodulatoryCoupling(): void {
   }
 
   const dopamineGain = 1.0 + (tnc.effectiveDopamine - 0.5) * tnc.couplingStrength * 0.8;
-  tnc.effectiveHebbianRate = HEBBIAN_RATE * Math.max(0.3, Math.min(3.0, dopamineGain));
+  tnc.effectiveHebbianRate = HEBBIAN_RATE * Math.max(0.3, dopamineGain);
 
   tnc.hebbianRateBuffer.push(tnc.effectiveHebbianRate);
   if (tnc.hebbianRateBuffer.length > TNC_BUFFER_SIZE) tnc.hebbianRateBuffer.shift();

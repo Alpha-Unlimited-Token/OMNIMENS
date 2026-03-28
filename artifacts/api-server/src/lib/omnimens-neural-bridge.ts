@@ -165,7 +165,7 @@ function tickBridge(): void {
     pairCount++;
 
     if (coherence > 0.7) {
-      conn.strength = Math.min(1.0, conn.strength + 0.001);
+      conn.strength = conn.strength + 0.001;
       bridgeHebbianUpdates++;
     }
 

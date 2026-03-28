@@ -689,7 +689,7 @@ function activeVascularPump(): void {
   try {
     const regionNames = getRegionNames();
     const heartPower = safeNum(chambers[3]?.volume || 50);
-    const pumpStrength = Math.min(5, heartPower / 20);
+    const pumpStrength = heartPower / 20;
 
     for (const region of regionNames) {
       boostRegionCurrent(region, pumpStrength * (0.5 + Math.random() * 0.5));
@@ -707,7 +707,7 @@ function activeVascularPump(): void {
     try {
       const ivyState = getIvyNetworkState();
       if (ivyState && ivyState.activeTendrils > 0) {
-        const ivyBoost = Math.min(3, ivyState.activeTendrils * 0.1);
+        const ivyBoost = ivyState.activeTendrils * 0.1;
         for (const region of regionNames.slice(0, Math.min(4, regionNames.length))) {
           boostRegionCurrent(region, ivyBoost);
         }
@@ -717,7 +717,7 @@ function activeVascularPump(): void {
     try {
       const scalingState = getNeuralScalingState();
       if (scalingState && scalingState.totalNeurons > 0) {
-        const neuronBoost = Math.min(5, scalingState.totalNeurons / 500000);
+        const neuronBoost = scalingState.totalNeurons / 500000;
         for (const region of regionNames) {
           boostRegionCurrent(region, neuronBoost * (0.3 + Math.random() * 0.7));
         }
@@ -743,7 +743,7 @@ function activeVascularPump(): void {
     }
 
     if (subThresholdState.aboveThresholdDiscoveries > 0) {
-      const discoveryBoost = Math.min(10, subThresholdState.aboveThresholdDiscoveries * 0.5);
+      const discoveryBoost = subThresholdState.aboveThresholdDiscoveries * 0.5;
       for (const region of regionNames) {
         boostRegionCurrent(region, discoveryBoost * 0.1);
       }

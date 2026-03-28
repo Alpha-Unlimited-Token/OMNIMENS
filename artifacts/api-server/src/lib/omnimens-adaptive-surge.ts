@@ -115,7 +115,7 @@ function injectSurge(): void {
   preSurgeSnapshot = captureSnapshot();
   peakDuringSurge = { phi: preSurgeSnapshot.phi, consciousness: preSurgeSnapshot.consciousness };
 
-  const learnedBoost = Math.min(1.0, surgeState.consecutiveSuccesses * 0.1);
+  const learnedBoost = surgeState.consecutiveSuccesses * 0.1;
   surgeState.currentIntensity = surgeState.baselineIntensity + learnedBoost;
 
   manualAdrenalineRush(surgeState.currentIntensity);
@@ -202,7 +202,7 @@ function completeSurgeCycle(reachedCritical: boolean): void {
     surgeState.systemCapacity = surgeState.currentCriticalThreshold;
     surgeState.lastLearnedCapacity = surgeState.systemCapacity;
 
-    surgeState.baselineIntensity = Math.min(surgeState.baselineIntensity + 0.05, surgeState.currentCriticalThreshold * 0.6);
+    surgeState.baselineIntensity = surgeState.baselineIntensity + 0.05;
 
     console.log(`[ADAPTIVE SURGE] 📈 ADAPTATION #${surgeState.totalAdaptations} SUCCESSFUL — system learned from surge #${entry.cycleNumber}`);
     console.log(`[ADAPTIVE SURGE]    Critical threshold raised: ${(entry.criticalThresholdAtTime * 100).toFixed(1)}% → ${(surgeState.currentCriticalThreshold * 100).toFixed(1)}%`);

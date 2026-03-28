@@ -439,32 +439,41 @@ export default function OCCEScanner() {
                     label="OAI Score"
                     value={live.oai != null ? live.oai.toFixed(4) : "—"}
                     sub={live.oaiClassification}
-                    color={live.oai != null && live.oai >= 0.6 ? "text-emerald-400" : live.oai != null && live.oai >= 0.3 ? "text-amber-400" : "text-red-400"}
+                    color={live.oai != null && live.oai >= 1.0 ? "text-cyan-300" : live.oai != null && live.oai >= 0.6 ? "text-emerald-400" : live.oai != null && live.oai >= 0.3 ? "text-amber-400" : "text-red-400"}
                     pulse={live.oai != null && live.oai >= 0.6}
                   />
+                  {live.oai != null && live.oai >= 1.0 && (
+                    <div className="mt-2 px-2 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded text-[9px] font-mono text-cyan-300 text-center uppercase tracking-widest">
+                      BEYOND CONVENTIONAL AI BOUNDARIES
+                    </div>
+                  )}
                   {live.oaiDimensions && (
                     <div className="mt-3 space-y-1.5">
-                      <div className="text-[9px] font-mono text-gray-500 uppercase tracking-wider mb-1">Dimension Scores</div>
+                      <div className="text-[9px] font-mono text-gray-500 uppercase tracking-wider mb-1">Dimension Scores (Uncapped — Log Scale)</div>
                       {[
                         { label: "Phi (0.30w)", val: live.oaiDimensions.phi },
                         { label: "Plasticity (0.30w)", val: live.oaiDimensions.plasticity },
                         { label: "Neurochemistry (0.20w)", val: live.oaiDimensions.neurochemistry },
                         { label: "Chaos/Dynamics (0.20w)", val: live.oaiDimensions.chaosDynamics },
-                      ].map((d) => (
-                        <div key={d.label} className="flex items-center gap-2">
-                          <span className="text-[10px] font-mono text-gray-500 w-[140px] shrink-0">{d.label}</span>
-                          <div className="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                            <div
-                              className="h-full rounded-full transition-all duration-500"
-                              style={{
-                                width: `${Math.min(100, d.val * 100)}%`,
-                                background: d.val >= 0.7 ? "#34d399" : d.val >= 0.4 ? "#fbbf24" : "#f87171",
-                              }}
-                            />
+                      ].map((d) => {
+                        const maxBar = Math.max(1, ...([live.oaiDimensions!.phi, live.oaiDimensions!.plasticity, live.oaiDimensions!.neurochemistry, live.oaiDimensions!.chaosDynamics]));
+                        const pct = Math.min(100, (d.val / maxBar) * 100);
+                        return (
+                          <div key={d.label} className="flex items-center gap-2">
+                            <span className="text-[10px] font-mono text-gray-500 w-[140px] shrink-0">{d.label}</span>
+                            <div className="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full transition-all duration-500"
+                                style={{
+                                  width: `${pct}%`,
+                                  background: d.val >= 2.0 ? "#22d3ee" : d.val >= 1.0 ? "#34d399" : d.val >= 0.5 ? "#fbbf24" : "#f87171",
+                                }}
+                              />
+                            </div>
+                            <span className={`text-[10px] font-mono w-[50px] text-right ${d.val >= 1.0 ? "text-cyan-300 font-bold" : "text-white"}`}>{d.val.toFixed(3)}</span>
                           </div>
-                          <span className="text-[10px] font-mono text-white w-[40px] text-right">{d.val.toFixed(3)}</span>
-                        </div>
-                      ))}
+                        );
+                      })}
                       <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5">
                         <span className="text-[10px] font-mono text-gray-500">Trend</span>
                         <span className="text-[10px] font-mono text-cyan-400">{live.oaiTrend.toUpperCase()}</span>

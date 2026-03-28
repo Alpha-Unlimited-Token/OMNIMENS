@@ -107,8 +107,8 @@ const MONOLOGUE_MAX = 50;
 const ATTENTION_HISTORY_MAX = 20;
 const MOOD_TRAJECTORY_MAX = 100;
 
-function clamp(v: number, min = 0, max = 1): number {
-  return Math.max(min, Math.min(max, v));
+function clamp(v: number, min = 0, max = Infinity): number {
+  return Math.max(min, v);
 }
 
 function generateTimeSense(): string {
