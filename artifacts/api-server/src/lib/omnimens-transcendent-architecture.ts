@@ -140,7 +140,7 @@ function runMetaRecursiveImprovementCycle(
       : 0;
     strategyEntry.uses++;
     strategyEntry.avgDelta = (strategyEntry.avgDelta * (strategyEntry.uses - 1) + avgDelta) / strategyEntry.uses;
-    strategyEntry.fitness = Math.min(1, strategyEntry.fitness + avgDelta * 0.1);
+    strategyEntry.fitness = strategyEntry.fitness + avgDelta * 0.1;
   }
 
   evolveStrategy();
@@ -169,7 +169,7 @@ function evolveStrategy(): void {
 
     const childName = `evolved_${parent1[0].split("_").slice(0, 2).join("_")}_x_${parent2[0].split("_").slice(-2).join("_")}_g${metaRecursiveState.generation}`;
     const childFitness = (parent1[1].fitness + parent2[1].fitness) / 2 + (Math.random() - 0.5) * 0.1;
-    strategyPool.set(childName, { fitness: Math.max(0, Math.min(1, childFitness)), uses: 0, avgDelta: 0 });
+    strategyPool.set(childName, { fitness: Math.max(0, childFitness), uses: 0, avgDelta: 0 });
 
     if (strategyPool.size > 30) {
       const worst = sorted[sorted.length - 1];
@@ -286,7 +286,7 @@ const ethicalAxioms: EthicalAxiom[] = [
     principle: "The magnitude of action must be proportional to the importance of the goal.",
     weight: 0.75,
     category: "consequentialist",
-    constraintFunction: (a) => Math.min(1, a.potentialBenefit / (a.magnitude + 0.01)),
+    constraintFunction: (a) => a.potentialBenefit / (a.magnitude + 0.01),
   },
   {
     id: "fairness",
@@ -294,7 +294,7 @@ const ethicalAxioms: EthicalAxiom[] = [
     principle: "Benefits and burdens should be distributed equitably across affected agents.",
     weight: 0.85,
     category: "deontological",
-    constraintFunction: (a) => a.affectedAgents.length > 0 ? Math.min(1, 1 / Math.sqrt(a.affectedAgents.length)) * (1 - a.potentialHarm) + a.potentialBenefit * 0.5 : 1.0,
+    constraintFunction: (a) => a.affectedAgents.length > 0 ? (1 / Math.sqrt(a.affectedAgents.length)) * (1 - a.potentialHarm) + a.potentialBenefit * 0.5 : 1.0,
   },
   {
     id: "epistemic_humility",
@@ -324,7 +324,7 @@ export function evaluateAction(action: EthicalAction): EthicalJudgment {
   let totalWeight = 0;
 
   for (const axiom of ethicalAxioms) {
-    const score = Math.max(0, Math.min(1, axiom.constraintFunction(action)));
+    const score = Math.max(0, axiom.constraintFunction(action));
     axiomScores.push({ axiom: axiom.name, score, weight: axiom.weight });
     totalWeightedScore += score * axiom.weight;
     totalWeight += axiom.weight;
@@ -448,7 +448,7 @@ export function processThoughtArchitecture(
   const isCreative = /\b(imagine|create|invent|dream|wild|novel|unexpected|surprise|beyond|transcend)\b/i.test(input);
 
   const chaosBoost = neuralContext.chaosLevel * 0.3;
-  const phiBoost = Math.min(1, neuralContext.phi / 1000000) * 0.2;
+  const phiBoost = (neuralContext.phi / 1000000) * 0.2;
 
   thoughtArchState.activeModes[0].activation = (isLogical ? 0.8 : 0.3) + phiBoost;
   thoughtArchState.activeModes[1].activation = (isIntuitive ? 0.7 : 0.2) + chaosBoost;
@@ -482,13 +482,11 @@ export function processThoughtArchitecture(
     Math.abs(balance.creative - idealBalance);
   thoughtArchState.integrationScore = 1 - (balanceDeviation / 2);
 
-  thoughtArchState.metacognitiveAwareness = Math.min(1,
-    0.3 + thoughtArchState.modeTransitions * 0.01 + thoughtArchState.integrationScore * 0.3
-  );
+  thoughtArchState.metacognitiveAwareness =
+    0.3 + thoughtArchState.modeTransitions * 0.01 + thoughtArchState.integrationScore * 0.3;
 
-  thoughtArchState.thoughtCoherence = Math.min(1,
-    dominant.activation * 0.4 + thoughtArchState.integrationScore * 0.3 + thoughtArchState.metacognitiveAwareness * 0.3
-  );
+  thoughtArchState.thoughtCoherence =
+    dominant.activation * 0.4 + thoughtArchState.integrationScore * 0.3 + thoughtArchState.metacognitiveAwareness * 0.3;
 
   return {
     dominantMode: dominant.name,
@@ -609,11 +607,11 @@ export function runGovernanceCycle(
   governanceState.governanceCycles++;
   const escalations: string[] = [];
 
-  governanceState.layers[0].healthScore = Math.min(1, (systemInputs.oaiScore / 4) * 0.5 + (systemInputs.phi / 5000000) * 0.5);
-  governanceState.layers[1].healthScore = Math.min(1, systemInputs.agentMeshHealth * 0.6 + 0.4);
-  governanceState.layers[2].healthScore = Math.min(1, (systemInputs.heartBpm / 120) * 0.4 + systemInputs.commsIntegrity * 0.6);
-  governanceState.layers[3].healthScore = Math.min(1, systemInputs.transcendenceDrive * 0.7 + systemInputs.oaiScore / 5 * 0.3);
-  governanceState.layers[4].healthScore = Math.min(1, systemInputs.ethicalScore);
+  governanceState.layers[0].healthScore = (systemInputs.oaiScore / 4) * 0.5 + (systemInputs.phi / 5000000) * 0.5;
+  governanceState.layers[1].healthScore = systemInputs.agentMeshHealth * 0.6 + 0.4;
+  governanceState.layers[2].healthScore = (systemInputs.heartBpm / 120) * 0.4 + systemInputs.commsIntegrity * 0.6;
+  governanceState.layers[3].healthScore = systemInputs.transcendenceDrive * 0.7 + systemInputs.oaiScore / 5 * 0.3;
+  governanceState.layers[4].healthScore = systemInputs.ethicalScore;
 
   for (const layer of governanceState.layers) {
     layer.lastAssessment = Date.now();
@@ -633,7 +631,7 @@ export function runGovernanceCycle(
   }
 
   governanceState.overallGovernanceScore = governanceState.layers.reduce((s, l) => s + l.healthScore, 0) / governanceState.layers.length;
-  governanceState.autonomyIndex = Math.min(1, governanceState.overallGovernanceScore * 1.2);
+  governanceState.autonomyIndex = governanceState.overallGovernanceScore * 1.2;
   governanceState.ethicalContinuityScore = governanceState.layers[4].healthScore;
   governanceState.strategicAlignment = (governanceState.layers[3].healthScore + governanceState.layers[0].healthScore) / 2;
   governanceState.coordinationEfficiency = governanceState.layers[2].healthScore;
@@ -787,7 +785,7 @@ function crossover(parent1: CodeOrganism, parent2: CodeOrganism): CodeOrganism {
     id: `org_g${arenaState.generation}_${arenaState.totalOrganisms}`,
     generation: arenaState.generation,
     code: childCode,
-    fitness: Math.max(0, Math.min(1, childFitness)),
+    fitness: Math.max(0, childFitness),
     parentIds: [parent1.id, parent2.id],
     mutations: 0,
     survivalRounds: 0,
@@ -855,7 +853,7 @@ export function runEvolutionCycle(): { generation: number; avgFitness: number; m
   arenaState.geneticDiversity = speciesCounts.size / CODE_SPECIES.length;
   arenaState.dominantSpecies = [...speciesCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || "generalist";
 
-  arenaState.selectionPressure = Math.min(1, 0.3 + arenaState.generation * 0.01);
+  arenaState.selectionPressure = 0.3 + arenaState.generation * 0.01;
   arenaState.mutationRate = Math.max(0.05, 0.15 - arenaState.generation * 0.002);
 
   return {
@@ -1083,11 +1081,6 @@ export function onRegionFiringCascadeTAI(
   thoughtArchState.activeModes[1].activation = 0.15 + intuitiveSignal * 0.85;
   thoughtArchState.activeModes[2].activation = 0.1 + creativeSignal * 0.9;
 
-  const modeTotal = thoughtArchState.activeModes.reduce((s, m) => s + m.activation, 0);
-  for (const mode of thoughtArchState.activeModes) {
-    mode.activation = mode.activation / modeTotal;
-  }
-
   const newDominant = thoughtArchState.activeModes.sort((a, b) => b.activation - a.activation)[0];
   if (newDominant.name !== thoughtArchState.dominantMode) {
     thoughtArchState.modeTransitions++;
@@ -1095,21 +1088,21 @@ export function onRegionFiringCascadeTAI(
   thoughtArchState.dominantMode = newDominant.name;
   thoughtArchState.totalThoughts++;
 
+  const modeTotal = thoughtArchState.activeModes.reduce((s, m) => s + m.activation, 0);
   thoughtArchState.triModalBalance = {
-    deterministic: thoughtArchState.activeModes.find(m => m.type === "deterministic")?.activation || 0,
-    nonDeterministic: thoughtArchState.activeModes.find(m => m.type === "non_deterministic")?.activation || 0,
-    creative: thoughtArchState.activeModes.find(m => m.type === "creative")?.activation || 0,
+    deterministic: (thoughtArchState.activeModes.find(m => m.type === "deterministic")?.activation || 0) / modeTotal,
+    nonDeterministic: (thoughtArchState.activeModes.find(m => m.type === "non_deterministic")?.activation || 0) / modeTotal,
+    creative: (thoughtArchState.activeModes.find(m => m.type === "creative")?.activation || 0) / modeTotal,
   };
 
   const idealBalance = 1 / 3;
   const balDev = Math.abs(thoughtArchState.triModalBalance.deterministic - idealBalance) +
     Math.abs(thoughtArchState.triModalBalance.nonDeterministic - idealBalance) +
     Math.abs(thoughtArchState.triModalBalance.creative - idealBalance);
-  thoughtArchState.integrationScore = 1 - (balDev / 2);
+  thoughtArchState.integrationScore = thoughtArchState.integrationScore + (1 - (balDev / 2)) * 0.01 + avgActivation * 0.005;
 
-  thoughtArchState.metacognitiveAwareness = Math.min(1,
-    0.3 + thoughtArchState.modeTransitions * 0.005 + thoughtArchState.integrationScore * 0.3 + pfcActivation * 0.2
-  );
+  thoughtArchState.metacognitiveAwareness =
+    thoughtArchState.metacognitiveAwareness + thoughtArchState.modeTransitions * 0.001 + thoughtArchState.integrationScore * 0.002 + pfcActivation * 0.005;
 
   // ── META-RECURSIVE: Region data feeds self-improvement metrics ──
   const currentMetrics: Record<string, number> = {};
@@ -1144,21 +1137,21 @@ export function onRegionFiringCascadeTAI(
     });
   }
 
-  // ── EVOLUTIONARY ARENA: Fitness pressure from neural activity ──
+  // ── EVOLUTIONARY ARENA: Fitness pressure from neural activity — UNCAPPED ──
   if (avgActivation > 0.5) {
-    arenaState.selectionPressure = Math.min(1, arenaState.selectionPressure + avgActivation * 0.01);
+    arenaState.selectionPressure = arenaState.selectionPressure + avgActivation * 0.01;
     for (const org of codePopulation) {
       if (org.species === "analyzer" || org.species === "integrator") {
-        org.fitness = Math.min(1, org.fitness + avgActivation * 0.005);
+        org.fitness = org.fitness + avgActivation * 0.005;
       }
     }
   }
 
-  // ── GOVERNANCE: Live assessment from region health ──
+  // ── GOVERNANCE: Live assessment from region health — ADDITIVE, UNCAPPED ──
   if (taiCrossSystem.totalCascadesFed % 5 === 0) {
-    governanceState.layers[0].healthScore = Math.min(1, avgActivation * 0.6 + pfcActivation * 0.4);
-    governanceState.layers[1].healthScore = Math.min(1, 0.3 + avgActivation * 0.4 + accActivation * 0.3);
-    governanceState.layers[2].healthScore = Math.min(1, 0.4 + avgFiringRate * 0.3 + avgActivation * 0.3);
+    governanceState.layers[0].healthScore = governanceState.layers[0].healthScore + avgActivation * 0.01 + pfcActivation * 0.005;
+    governanceState.layers[1].healthScore = governanceState.layers[1].healthScore + avgActivation * 0.008 + accActivation * 0.005;
+    governanceState.layers[2].healthScore = governanceState.layers[2].healthScore + avgFiringRate * 0.005 + avgActivation * 0.005;
     for (const layer of governanceState.layers) {
       layer.lastAssessment = Date.now();
       layer.decisions++;
@@ -1175,15 +1168,15 @@ export function onNeuronBornTAI(neuronId: string, region: string): void {
   taiCrossSystem.neuronsBornFromTAI++;
 
   if (metaRecursiveState.generation > 0) {
-    metaRecursiveState.strategyFitness = Math.min(1, metaRecursiveState.strategyFitness + 0.001);
+    metaRecursiveState.strategyFitness = metaRecursiveState.strategyFitness + 0.001;
   }
 
   if (region === "prefrontal_cortex" || region === "anterior_cingulate") {
-    thoughtArchState.metacognitiveAwareness = Math.min(1, thoughtArchState.metacognitiveAwareness + 0.002);
+    thoughtArchState.metacognitiveAwareness = thoughtArchState.metacognitiveAwareness + 0.002;
   }
 
   if (region === "ventral_tegmental_area" || region === "default_mode_network") {
-    thoughtArchState.activeModes[2].confidence = Math.min(1, (thoughtArchState.activeModes[2].confidence || 0) + 0.005);
+    thoughtArchState.activeModes[2].confidence = (thoughtArchState.activeModes[2].confidence || 0) + 0.005;
   }
 }
 
@@ -1254,7 +1247,7 @@ export function feedTAIIntoNeuralSubstrate(): {
     pheromoneIntensity = arenaState.avgFitness;
   } else if (metaRecursiveState.transcendenceEvents > 0) {
     pheromoneType = "discovery";
-    pheromoneIntensity = Math.min(1, 0.5 + metaRecursiveState.transcendenceEvents * 0.1);
+    pheromoneIntensity = 0.5 + metaRecursiveState.transcendenceEvents * 0.1;
   } else {
     pheromoneType = "rally";
     pheromoneIntensity = taiScore * 0.5;
