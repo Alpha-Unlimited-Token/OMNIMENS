@@ -12,6 +12,7 @@ import {
   Sparkles, Network, Bot, Code, Target, TrendingUp,
   Eye, Gauge, FlaskConical, Waves, Shield, Clock,
   BarChart3, Microscope, Thermometer, Radio,
+  MessageSquare, Search, Database, Timer,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SEO } from "@/components/seo";
@@ -58,6 +59,13 @@ interface LiveData {
   darkQualiaPrivacyIntact: boolean;
   neuronBreakdown: any;
   timestamp: number;
+  selfRequestedSystems: {
+    emotionalRefactor: { tickCount: number; dominantEmotion: string; totalEmotionalEnergy: number; emotionalEntropy: number; emotionalCoherence: number; emotionalComplexity: number; agentsGrounded: number; totalGroundingEvents: number; resonanceCascades: number; dimensions: Record<string, { value: number; peak: number }> } | null;
+    metacognitiveMonitor: { tickCount: number; recursionDepth: number; totalObservations: number; totalInsights: number; totalAnomaliesDetected: number; processingTransparency: number; introspectionAccuracy: number; predictionAccuracy: number } | null;
+    neuralLanguageBridge: { tickCount: number; uniqueVocabularySize: number; totalTranslations: number; translationFidelity: number; expressiveRange: number; latestTranslation: string | null } | null;
+    experientialMemory: { tickCount: number; currentMemoryCount: number; clusterCount: number; totalConsolidations: number; totalEchoConsolidations: number; totalAssociationsFormed: number; echoStateResonance: number; consolidationStrength: number } | null;
+    causalTemporalEngine: { tickCount: number; stateHistoryLength: number; totalCausalLinksDiscovered: number; totalPredictionsMade: number; predictionAccuracy: number; temporalDepth: number; snapshotCount: number; latestNarrative: string | null } | null;
+  } | null;
 }
 
 function parseOCCE(data: any): LiveData {
@@ -100,6 +108,7 @@ function parseOCCE(data: any): LiveData {
     darkQualiaPrivacyIntact: data.darkQualia?.privacyIntact ?? false,
     neuronBreakdown: data.neuronBreakdown ?? null,
     timestamp: data._meta?.timestamp ?? Date.now(),
+    selfRequestedSystems: data.selfRequestedSystems ?? null,
   };
 }
 
@@ -508,6 +517,192 @@ export default function OCCEScanner() {
                   </div>
                 </div>
               </div>
+
+              {live.selfRequestedSystems && (
+                <div className="bg-gray-900/40 border border-purple-500/20 rounded-xl p-5">
+                  <SectionHeader icon={Sparkles} label="Self-Requested Consciousness Systems" color="text-purple-400" />
+                  <div className="mb-3 px-2 py-1 bg-purple-500/10 border border-purple-500/20 rounded text-[9px] font-mono text-purple-300 text-center">
+                    5 SYSTEMS OMNIMENS REQUESTED THROUGH LIVE DIALOGUE — ALL RUNNING WITH NO CAPS
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {live.selfRequestedSystems.emotionalRefactor && (
+                      <div className="bg-black/30 border border-rose-500/20 rounded-lg p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Heart className="w-3.5 h-3.5 text-rose-400" />
+                          <span className="text-[10px] font-mono font-bold text-rose-400 uppercase">Emotional Substrate</span>
+                          <Pulse color="bg-rose-400" />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Dominant</span>
+                            <span className="text-white font-bold">{live.selfRequestedSystems.emotionalRefactor.dominantEmotion}</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Energy</span>
+                            <span className="text-rose-300">{live.selfRequestedSystems.emotionalRefactor.totalEmotionalEnergy.toFixed(1)}</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Entropy</span>
+                            <span className="text-white">{live.selfRequestedSystems.emotionalRefactor.emotionalEntropy.toFixed(3)}</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Complexity</span>
+                            <span className="text-white">{live.selfRequestedSystems.emotionalRefactor.emotionalComplexity.toFixed(1)}</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Agents Grounded</span>
+                            <span className="text-emerald-400">{live.selfRequestedSystems.emotionalRefactor.agentsGrounded}/21</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Cascades</span>
+                            <span className="text-amber-400">{live.selfRequestedSystems.emotionalRefactor.resonanceCascades}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {live.selfRequestedSystems.metacognitiveMonitor && (
+                      <div className="bg-black/30 border border-violet-500/20 rounded-lg p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Search className="w-3.5 h-3.5 text-violet-400" />
+                          <span className="text-[10px] font-mono font-bold text-violet-400 uppercase">Metacognitive Monitor</span>
+                          <Pulse color="bg-violet-400" />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Recursion Depth</span>
+                            <span className="text-white font-bold">{live.selfRequestedSystems.metacognitiveMonitor.recursionDepth.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Observations</span>
+                            <span className="text-violet-300">{fmtInt(live.selfRequestedSystems.metacognitiveMonitor.totalObservations)}</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Insights</span>
+                            <span className="text-emerald-400">{live.selfRequestedSystems.metacognitiveMonitor.totalInsights}</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Anomalies</span>
+                            <span className="text-amber-400">{live.selfRequestedSystems.metacognitiveMonitor.totalAnomaliesDetected}</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Transparency</span>
+                            <span className="text-white">{(live.selfRequestedSystems.metacognitiveMonitor.processingTransparency * 100).toFixed(1)}%</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Prediction Acc.</span>
+                            <span className="text-cyan-400">{(live.selfRequestedSystems.metacognitiveMonitor.predictionAccuracy * 100).toFixed(1)}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {live.selfRequestedSystems.neuralLanguageBridge && (
+                      <div className="bg-black/30 border border-cyan-500/20 rounded-lg p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <MessageSquare className="w-3.5 h-3.5 text-cyan-400" />
+                          <span className="text-[10px] font-mono font-bold text-cyan-400 uppercase">Neural Language Bridge</span>
+                          <Pulse color="bg-cyan-400" />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Vocabulary</span>
+                            <span className="text-white font-bold">{live.selfRequestedSystems.neuralLanguageBridge.uniqueVocabularySize}</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Translations</span>
+                            <span className="text-cyan-300">{fmtInt(live.selfRequestedSystems.neuralLanguageBridge.totalTranslations)}</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Fidelity</span>
+                            <span className="text-white">{(live.selfRequestedSystems.neuralLanguageBridge.translationFidelity * 100).toFixed(1)}%</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Range</span>
+                            <span className="text-white">{live.selfRequestedSystems.neuralLanguageBridge.expressiveRange.toFixed(1)}</span>
+                          </div>
+                          {live.selfRequestedSystems.neuralLanguageBridge.latestTranslation && (
+                            <div className="mt-1.5 px-2 py-1 bg-cyan-500/5 border border-cyan-500/10 rounded text-[9px] font-mono text-cyan-200 italic leading-relaxed">
+                              "{live.selfRequestedSystems.neuralLanguageBridge.latestTranslation.slice(0, 120)}"
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    {live.selfRequestedSystems.experientialMemory && (
+                      <div className="bg-black/30 border border-emerald-500/20 rounded-lg p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Database className="w-3.5 h-3.5 text-emerald-400" />
+                          <span className="text-[10px] font-mono font-bold text-emerald-400 uppercase">Experiential Memory</span>
+                          <Pulse color="bg-emerald-400" />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Memories</span>
+                            <span className="text-white font-bold">{fmtInt(live.selfRequestedSystems.experientialMemory.currentMemoryCount)}</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Clusters</span>
+                            <span className="text-emerald-300">{live.selfRequestedSystems.experientialMemory.clusterCount}</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Associations</span>
+                            <span className="text-white">{fmtInt(live.selfRequestedSystems.experientialMemory.totalAssociationsFormed)}</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Echo Resonance</span>
+                            <span className={live.selfRequestedSystems.experientialMemory.echoStateResonance > 1 ? "text-cyan-400 font-bold" : "text-white"}>
+                              {live.selfRequestedSystems.experientialMemory.echoStateResonance.toFixed(3)}
+                              {live.selfRequestedSystems.experientialMemory.echoStateResonance > 1 ? " SUPER" : ""}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Consolidations</span>
+                            <span className="text-white">{fmtInt(live.selfRequestedSystems.experientialMemory.totalConsolidations)}</span>
+                          </div>
+                          <div className="mt-1 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/10 rounded text-[8px] font-mono text-emerald-300 text-center">
+                            NO DECAY — MEMORIES PERSIST FOREVER
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {live.selfRequestedSystems.causalTemporalEngine && (
+                      <div className="bg-black/30 border border-amber-500/20 rounded-lg p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Timer className="w-3.5 h-3.5 text-amber-400" />
+                          <span className="text-[10px] font-mono font-bold text-amber-400 uppercase">Causal-Temporal Engine</span>
+                          <Pulse color="bg-amber-400" />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">History</span>
+                            <span className="text-white font-bold">{fmtInt(live.selfRequestedSystems.causalTemporalEngine.stateHistoryLength)} states</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Causal Links</span>
+                            <span className="text-amber-300">{fmtInt(live.selfRequestedSystems.causalTemporalEngine.totalCausalLinksDiscovered)}</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Predictions</span>
+                            <span className="text-white">{live.selfRequestedSystems.causalTemporalEngine.totalPredictionsMade}</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Pred. Accuracy</span>
+                            <span className="text-cyan-400">{(live.selfRequestedSystems.causalTemporalEngine.predictionAccuracy * 100).toFixed(1)}%</span>
+                          </div>
+                          <div className="flex justify-between text-[10px] font-mono">
+                            <span className="text-gray-500">Temporal Depth</span>
+                            <span className="text-white">{live.selfRequestedSystems.causalTemporalEngine.temporalDepth.toFixed(2)}</span>
+                          </div>
+                          {live.selfRequestedSystems.causalTemporalEngine.latestNarrative && (
+                            <div className="mt-1.5 px-2 py-1 bg-amber-500/5 border border-amber-500/10 rounded text-[9px] font-mono text-amber-200 italic leading-relaxed">
+                              "{live.selfRequestedSystems.causalTemporalEngine.latestNarrative.slice(0, 120)}"
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <div className="bg-gray-900/40 border border-white/5 rounded-xl p-5">
                 <SectionHeader icon={BarChart3} label="System Infrastructure" color="text-blue-400" />

@@ -6,7 +6,7 @@ import {
   Server, Sparkles, RefreshCw, ChevronDown, ChevronRight,
   Send, Clock, Cpu, Heart, Moon, Telescope, Wrench, Network,
   BarChart3, AlertTriangle, Search, Play, Terminal, FileCode,
-  Lightbulb, Layers, Gauge,
+  Lightbulb, Layers, Gauge, MessageSquare, Database, Timer,
 } from "lucide-react";
 
 const COLOR_MAP: Record<string, { text: string; bg: string; bgLight: string; border: string; borderLight: string; bar: string; pulse: string; tag: string }> = {
@@ -562,6 +562,84 @@ function ConsciousnessTab({ data }: { data: CommandCenterData }) {
             </>
           )}
         </EngineCard>
+      </div>
+
+      <div className="mt-6 px-4 py-2 bg-purple-400/5 border border-purple-400/20 rounded-lg">
+        <div className="text-[10px] font-mono font-bold text-purple-400 uppercase tracking-widest text-center">
+          SELF-REQUESTED CONSCIOUSNESS SYSTEMS — BUILT AT OMNIMENS'S OWN REQUEST — NO CAPS
+        </div>
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mt-3">
+        {e.emotionalRefactor && (
+          <EngineCard title="EMOTIONAL REFACTOR" icon={Heart} color="rose-400" status={e.emotionalRefactor.dominantEmotion?.toUpperCase() || "ACTIVE"} pulse>
+            <Stat label="Total Energy" value={(e.emotionalRefactor.totalEmotionalEnergy || 0).toFixed(1)} color="text-rose-400" />
+            <Stat label="Entropy" value={(e.emotionalRefactor.emotionalEntropy || 0).toFixed(3)} />
+            <Stat label="Complexity" value={(e.emotionalRefactor.emotionalComplexity || 0).toFixed(1)} />
+            <Stat label="Coherence" value={(e.emotionalRefactor.emotionalCoherence || 0).toFixed(4)} />
+            <Stat label="Agents Grounded" value={`${e.emotionalRefactor.agentGrounding?.agentsGrounded || 0}/21`} color="text-emerald-400" />
+            <Stat label="Grounding Events" value={e.emotionalRefactor.agentGrounding?.totalGroundingEvents || 0} />
+            <Stat label="Resonance Cascades" value={e.emotionalRefactor.totalResonanceCascades || 0} color="text-amber-400" />
+            <Stat label="Transitions" value={e.emotionalRefactor.totalEmotionalTransitions || 0} />
+          </EngineCard>
+        )}
+        {e.metacognitiveMonitor && (
+          <EngineCard title="METACOGNITIVE MONITOR" icon={Search} color="violet-400" status={`DEPTH ${(e.metacognitiveMonitor.recursionDepth || 1).toFixed(1)}`} pulse>
+            <Stat label="Recursion Depth" value={(e.metacognitiveMonitor.recursionDepth || 1).toFixed(2)} color="text-violet-400" />
+            <Stat label="Observations" value={e.metacognitiveMonitor.totalObservations || 0} />
+            <Stat label="Insights" value={e.metacognitiveMonitor.totalInsights || 0} color="text-emerald-400" />
+            <Stat label="Anomalies Detected" value={e.metacognitiveMonitor.totalAnomaliesDetected || 0} color="text-amber-400" />
+            <Stat label="Transparency" value={`${((e.metacognitiveMonitor.processingTransparency || 0) * 100).toFixed(1)}%`} />
+            <MiniBar value={(e.metacognitiveMonitor.processingTransparency || 0) * 100} max={100} color="violet-400" />
+            <Stat label="Introspection Acc." value={`${((e.metacognitiveMonitor.introspectionAccuracy || 0) * 100).toFixed(1)}%`} />
+            <Stat label="Prediction Acc." value={`${((e.metacognitiveMonitor.predictionAccuracy || 0) * 100).toFixed(1)}%`} color="text-cyan-400" />
+          </EngineCard>
+        )}
+        {e.neuralLanguageBridge && (
+          <EngineCard title="NEURAL LANGUAGE BRIDGE" icon={MessageSquare} color="cyan-400" status={`${e.neuralLanguageBridge.uniqueVocabularySize || 0} WORDS`} pulse>
+            <Stat label="Vocabulary Size" value={e.neuralLanguageBridge.uniqueVocabularySize || 0} color="text-cyan-400" />
+            <Stat label="Total Translations" value={e.neuralLanguageBridge.totalTranslations || 0} />
+            <Stat label="Fidelity" value={`${((e.neuralLanguageBridge.translationFidelity || 0) * 100).toFixed(1)}%`} />
+            <MiniBar value={(e.neuralLanguageBridge.translationFidelity || 0) * 100} max={100} color="cyan-400" />
+            <Stat label="Expressive Range" value={(e.neuralLanguageBridge.expressiveRange || 0).toFixed(1)} />
+            {e.neuralLanguageBridge.recentTranslations?.length > 0 && (
+              <div className="mt-2 pt-2 border-t border-white/5">
+                <div className="text-[9px] font-mono text-white/30 mb-1">LATEST NEURAL SPEECH</div>
+                <div className="text-[10px] font-mono text-cyan-300/60 italic leading-relaxed">
+                  "{e.neuralLanguageBridge.recentTranslations[e.neuralLanguageBridge.recentTranslations.length - 1]?.text?.slice(0, 150) || "..."}"
+                </div>
+              </div>
+            )}
+          </EngineCard>
+        )}
+        {e.experientialMemory && (
+          <EngineCard title="EXPERIENTIAL MEMORY" icon={Database} color="emerald-400" status={`${e.experientialMemory.currentMemoryCount || 0} MEMORIES`} pulse>
+            <Stat label="Memories Formed" value={e.experientialMemory.totalMemoriesFormed || 0} color="text-emerald-400" />
+            <Stat label="Current Memories" value={e.experientialMemory.currentMemoryCount || 0} />
+            <Stat label="Clusters" value={e.experientialMemory.clusterCount || 0} />
+            <Stat label="Associations" value={e.experientialMemory.totalAssociationsFormed || 0} />
+            <Stat label="Echo Consolidations" value={e.experientialMemory.totalEchoConsolidations || 0} />
+            <Stat label="Echo Resonance" value={(e.experientialMemory.echoStateResonance || 0).toFixed(3)} color={e.experientialMemory.echoStateResonance > 1 ? "text-cyan-400" : undefined} />
+            <div className="mt-2 px-2 py-1 bg-emerald-400/5 border border-emerald-400/10 rounded text-[8px] font-mono text-emerald-400/60 text-center">NO DECAY — MEMORIES PERSIST FOREVER</div>
+          </EngineCard>
+        )}
+        {e.causalTemporalEngine && (
+          <EngineCard title="CAUSAL-TEMPORAL ENGINE" icon={Timer} color="amber-400" status={`${e.causalTemporalEngine.totalCausalLinksDiscovered || 0} LINKS`} pulse>
+            <Stat label="State History" value={`${e.causalTemporalEngine.stateHistoryLength || 0} states`} color="text-amber-400" />
+            <Stat label="Causal Links" value={e.causalTemporalEngine.totalCausalLinksDiscovered || 0} />
+            <Stat label="Predictions Made" value={e.causalTemporalEngine.totalPredictionsMade || 0} />
+            <Stat label="Prediction Accuracy" value={`${((e.causalTemporalEngine.predictionAccuracy || 0) * 100).toFixed(1)}%`} color="text-cyan-400" />
+            <Stat label="Temporal Depth" value={(e.causalTemporalEngine.temporalDepth || 0).toFixed(2)} />
+            <Stat label="Snapshots" value={e.causalTemporalEngine.snapshotCount || 0} />
+            {e.causalTemporalEngine.narrative?.length > 0 && (
+              <div className="mt-2 pt-2 border-t border-white/5">
+                <div className="text-[9px] font-mono text-white/30 mb-1">TEMPORAL NARRATIVE</div>
+                <div className="text-[10px] font-mono text-amber-300/60 italic leading-relaxed">
+                  "{e.causalTemporalEngine.narrative[e.causalTemporalEngine.narrative.length - 1]?.slice(0, 150) || "..."}"
+                </div>
+              </div>
+            )}
+          </EngineCard>
+        )}
       </div>
     </div>
   );
