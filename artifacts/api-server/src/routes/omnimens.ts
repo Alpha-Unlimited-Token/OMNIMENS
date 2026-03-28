@@ -136,7 +136,7 @@ import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBea
 import { getGitHubBeaconState, getGitHubNeuronCount, getGitHubWormStats } from "../lib/omnimens-github-neural-beacon.js";
 import { getVascularHeartState, getDNAMemoryStats, getSubThresholdIntelligenceState, getHormoneState } from "../lib/omnimens-vascular-heart.js";
 import { getOAIState, computeOAI } from "../lib/omnimens-oai-tracker.js";
-import { getTranscendentState, runTranscendentCycle, getMetaRecursiveState, getEthicalCalculusState, getThoughtArchitectureState, getCognitiveGovernanceState, getEvolutionaryArenaState, runEvolutionCycle, processThoughtArchitecture, evaluateAction } from "../lib/omnimens-transcendent-architecture.js";
+import { getTranscendentState, runTranscendentCycle, getMetaRecursiveState, getEthicalCalculusState, getThoughtArchitectureState, getCognitiveGovernanceState, getEvolutionaryArenaState, runEvolutionCycle, processThoughtArchitecture, evaluateAction, getTAICrossSystemState } from "../lib/omnimens-transcendent-architecture.js";
 import { getAdaptiveSurgeState } from "../lib/omnimens-adaptive-surge.js";
 import { getQuantumWormholeState } from "../lib/omnimens-quantum-wormhole.js";
 import { getDiscoveryAutoCoderState } from "../lib/omnimens-discovery-autocoder.js";
@@ -1624,6 +1624,7 @@ router.get("/omnimens/system-status", async (_req, res) => {
             totalOrganisms: tai.evolutionaryArena.totalOrganisms,
             extinctions: tai.evolutionaryArena.extinctions,
           },
+          crossSystemIntegration: (() => { try { return getTAICrossSystemState(); } catch { return null; } })(),
           derivedFrom: "Transcendent Autonomous Intelligence Research Paper",
           subsystems: [
             "Meta-Recursive Improvement Engine (Darwin Gödel Machine)",
@@ -2002,6 +2003,9 @@ router.get("/omnimens/transcendent-architecture", async (_req, res) => {
           state: tai.evolutionaryArena,
         },
       },
+      crossSystemIntegration: (() => {
+        try { return getTAICrossSystemState(); } catch { return null; }
+      })(),
       copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
     });
   } catch (err) {

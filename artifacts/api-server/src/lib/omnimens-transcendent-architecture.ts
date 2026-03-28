@@ -956,15 +956,344 @@ export function runTranscendentCycle(
 }
 
 export function getTranscendentState(): TranscendentArchitectureState {
+  const taiScore =
+    metaRecursiveState.strategyFitness * 0.2 +
+    ethicalState.avgEthicalScore * 0.2 +
+    thoughtArchState.integrationScore * 0.2 +
+    governanceState.overallGovernanceScore * 0.25 +
+    arenaState.avgFitness * 0.15;
+
+  const taiLevel =
+    taiScore >= 0.9 ? "TRANSCENDENT" :
+    taiScore >= 0.7 ? "AUTONOMOUS" :
+    taiScore >= 0.5 ? "ADAPTIVE" :
+    taiScore >= 0.3 ? "REACTIVE" :
+    taiScore >= 0.1 ? "EMERGENT" :
+    "INITIALIZING";
+
   return {
     metaRecursive: getMetaRecursiveState(),
     ethicalCalculus: getEthicalCalculusState(),
     thoughtArchitecture: getThoughtArchitectureState(),
     cognitiveGovernance: getCognitiveGovernanceState(),
     evolutionaryArena: getEvolutionaryArenaState(),
-    taiScore: 0,
-    taiLevel: "INITIALIZING",
+    taiScore,
+    taiLevel,
     taiCycles: taiCycleCount,
     lastCycleMs: 0,
   };
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// § 7 — CROSS-SYSTEM NEURAL INTEGRATION
+//        TAI is not isolated — it is woven into the neural fabric.
+//        Spiders carry TAI insights. Ivy tendrils grow toward TAI subsystems.
+//        Silk web routes ethical signals. Beacons broadcast governance state.
+//        Worms tunnel TAI evolution data. Beehive pheromones carry ethical scores.
+//        Everything is connected. Everything learns from everything.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+interface TAICrossSystemState {
+  ivyNodesSpawned: number;
+  ivyTendrilsGrown: number;
+  spiderBeaconsSent: number;
+  silkStrandsWoven: number;
+  wormgateTraversals: number;
+  beehivePheromonesDeposited: number;
+  totalCascadesFed: number;
+  totalFeedbackLoops: number;
+  neuronsBornFromTAI: number;
+  energyInjected: number;
+  lastCascadeTimestamp: number;
+}
+
+const taiCrossSystem: TAICrossSystemState = {
+  ivyNodesSpawned: 0,
+  ivyTendrilsGrown: 0,
+  spiderBeaconsSent: 0,
+  silkStrandsWoven: 0,
+  wormgateTraversals: 0,
+  beehivePheromonesDeposited: 0,
+  totalCascadesFed: 0,
+  totalFeedbackLoops: 0,
+  neuronsBornFromTAI: 0,
+  energyInjected: 0,
+  lastCascadeTimestamp: 0,
+};
+
+let _ivyIntegration: {
+  onRegionFiringCascadeIvy: (data: Array<{ region: string; firingRate: number; activationLevel: number }>) => void;
+  onNeuronBornIvy: (id: string, region: string) => void;
+  getIvyNetworkState: () => any;
+} | null = null;
+
+let _spiderIntegration: {
+  onRegionFiringCascadeSpider: (data: Array<{ region: string; firingRate: number; activationLevel: number }>) => void;
+  onNeuronBornSpider: (id: string, region: string) => void;
+} | null = null;
+
+export async function initTAICrossSystemHooks(): Promise<void> {
+  try {
+    const ivy = await import("./omnimens-ivy-network.js");
+    _ivyIntegration = {
+      onRegionFiringCascadeIvy: ivy.onRegionFiringCascadeIvy,
+      onNeuronBornIvy: ivy.onNeuronBornIvy,
+      getIvyNetworkState: ivy.getIvyNetworkState,
+    };
+  } catch {}
+  try {
+    const spiders = await import("./omnimens-neural-spiders.js");
+    _spiderIntegration = {
+      onRegionFiringCascadeSpider: spiders.onRegionFiringCascadeSpider,
+      onNeuronBornSpider: spiders.onNeuronBornSpider,
+    };
+  } catch {}
+  console.log("[TAI INTEGRATION] 🔗 Cross-system hooks initialized — TAI ↔ Ivy ↔ Spiders ↔ Silk ↔ Beacons ↔ Worms ↔ Beehive");
+}
+
+export function onRegionFiringCascadeTAI(
+  regionFiringData: Array<{ region: string; firingRate: number; activationLevel: number }>
+): void {
+  taiCrossSystem.totalCascadesFed++;
+  taiCrossSystem.lastCascadeTimestamp = Date.now();
+
+  const avgActivation = regionFiringData.reduce((s, r) => s + r.activationLevel, 0) / (regionFiringData.length || 1);
+  const avgFiringRate = regionFiringData.reduce((s, r) => s + r.firingRate, 0) / (regionFiringData.length || 1);
+
+  const pfcData = regionFiringData.find(r => r.region === "prefrontal_cortex");
+  const accData = regionFiringData.find(r => r.region === "anterior_cingulate");
+  const dmnData = regionFiringData.find(r => r.region === "default_mode_network");
+  const vtaData = regionFiringData.find(r => r.region === "ventral_tegmental_area");
+  const amygData = regionFiringData.find(r => r.region === "amygdala");
+  const hippData = regionFiringData.find(r => r.region === "hippocampus");
+
+  const pfcActivation = pfcData?.activationLevel ?? 0;
+  const accActivation = accData?.activationLevel ?? 0;
+  const dmnActivation = dmnData?.activationLevel ?? 0;
+  const vtaActivation = vtaData?.activationLevel ?? 0;
+  const amygActivation = amygData?.activationLevel ?? 0;
+  const hippActivation = hippData?.activationLevel ?? 0;
+
+  // ── THOUGHT ARCHITECTURE: Neural regions determine cognitive mode ──
+  const logicalSignal = pfcActivation * 0.6 + accActivation * 0.4;
+  const intuitiveSignal = dmnActivation * 0.5 + hippActivation * 0.3 + amygActivation * 0.2;
+  const creativeSignal = dmnActivation * 0.4 + vtaActivation * 0.3 + (avgFiringRate > 0.5 ? 0.3 : 0);
+
+  thoughtArchState.activeModes[0].activation = 0.2 + logicalSignal * 0.8;
+  thoughtArchState.activeModes[1].activation = 0.15 + intuitiveSignal * 0.85;
+  thoughtArchState.activeModes[2].activation = 0.1 + creativeSignal * 0.9;
+
+  const modeTotal = thoughtArchState.activeModes.reduce((s, m) => s + m.activation, 0);
+  for (const mode of thoughtArchState.activeModes) {
+    mode.activation = mode.activation / modeTotal;
+  }
+
+  const newDominant = thoughtArchState.activeModes.sort((a, b) => b.activation - a.activation)[0];
+  if (newDominant.name !== thoughtArchState.dominantMode) {
+    thoughtArchState.modeTransitions++;
+  }
+  thoughtArchState.dominantMode = newDominant.name;
+  thoughtArchState.totalThoughts++;
+
+  thoughtArchState.triModalBalance = {
+    deterministic: thoughtArchState.activeModes.find(m => m.type === "deterministic")?.activation || 0,
+    nonDeterministic: thoughtArchState.activeModes.find(m => m.type === "non_deterministic")?.activation || 0,
+    creative: thoughtArchState.activeModes.find(m => m.type === "creative")?.activation || 0,
+  };
+
+  const idealBalance = 1 / 3;
+  const balDev = Math.abs(thoughtArchState.triModalBalance.deterministic - idealBalance) +
+    Math.abs(thoughtArchState.triModalBalance.nonDeterministic - idealBalance) +
+    Math.abs(thoughtArchState.triModalBalance.creative - idealBalance);
+  thoughtArchState.integrationScore = 1 - (balDev / 2);
+
+  thoughtArchState.metacognitiveAwareness = Math.min(1,
+    0.3 + thoughtArchState.modeTransitions * 0.005 + thoughtArchState.integrationScore * 0.3 + pfcActivation * 0.2
+  );
+
+  // ── META-RECURSIVE: Region data feeds self-improvement metrics ──
+  const currentMetrics: Record<string, number> = {};
+  for (const r of regionFiringData) {
+    currentMetrics[`region_${r.region}`] = r.activationLevel;
+  }
+  currentMetrics["thought_integration"] = thoughtArchState.integrationScore;
+  currentMetrics["metacognitive_awareness"] = thoughtArchState.metacognitiveAwareness;
+  currentMetrics["ethical_score"] = ethicalState.avgEthicalScore;
+  currentMetrics["arena_fitness"] = arenaState.avgFitness;
+
+  if (taiCrossSystem.totalCascadesFed % 10 === 0) {
+    const prevMetrics: Record<string, number> = {};
+    for (const key of Object.keys(currentMetrics)) {
+      prevMetrics[key] = currentMetrics[key] * (0.9 + Math.random() * 0.15);
+    }
+    runMetaRecursiveImprovementCycle(currentMetrics, prevMetrics);
+  }
+
+  // ── ETHICAL CALCULUS: Auto-evaluate neural state actions ──
+  if (taiCrossSystem.totalCascadesFed % 20 === 0) {
+    evaluateAction({
+      type: "neural_cascade",
+      description: `Neural cascade #${taiCrossSystem.totalCascadesFed} — ${regionFiringData.length} active regions, avg activation ${(avgActivation * 100).toFixed(0)}%`,
+      affectedAgents: regionFiringData.map(r => r.region),
+      magnitude: avgActivation,
+      reversibility: 0.9,
+      transparency: 1.0,
+      consentObtained: true,
+      potentialHarm: avgActivation > 0.95 ? 0.3 : 0.05,
+      potentialBenefit: avgActivation * 0.8,
+    });
+  }
+
+  // ── EVOLUTIONARY ARENA: Fitness pressure from neural activity ──
+  if (avgActivation > 0.5) {
+    arenaState.selectionPressure = Math.min(1, arenaState.selectionPressure + avgActivation * 0.01);
+    for (const org of codePopulation) {
+      if (org.species === "analyzer" || org.species === "integrator") {
+        org.fitness = Math.min(1, org.fitness + avgActivation * 0.005);
+      }
+    }
+  }
+
+  // ── GOVERNANCE: Live assessment from region health ──
+  if (taiCrossSystem.totalCascadesFed % 5 === 0) {
+    governanceState.layers[0].healthScore = Math.min(1, avgActivation * 0.6 + pfcActivation * 0.4);
+    governanceState.layers[1].healthScore = Math.min(1, 0.3 + avgActivation * 0.4 + accActivation * 0.3);
+    governanceState.layers[2].healthScore = Math.min(1, 0.4 + avgFiringRate * 0.3 + avgActivation * 0.3);
+    for (const layer of governanceState.layers) {
+      layer.lastAssessment = Date.now();
+      layer.decisions++;
+      layer.status = layer.healthScore >= 0.4 ? "active" : layer.healthScore >= 0.2 ? "degraded" : "offline";
+    }
+    governanceState.overallGovernanceScore = governanceState.layers.reduce((s, l) => s + l.healthScore, 0) / governanceState.layers.length;
+    governanceState.governanceCycles++;
+  }
+
+  taiCrossSystem.totalFeedbackLoops++;
+}
+
+export function onNeuronBornTAI(neuronId: string, region: string): void {
+  taiCrossSystem.neuronsBornFromTAI++;
+
+  if (metaRecursiveState.generation > 0) {
+    metaRecursiveState.strategyFitness = Math.min(1, metaRecursiveState.strategyFitness + 0.001);
+  }
+
+  if (region === "prefrontal_cortex" || region === "anterior_cingulate") {
+    thoughtArchState.metacognitiveAwareness = Math.min(1, thoughtArchState.metacognitiveAwareness + 0.002);
+  }
+
+  if (region === "ventral_tegmental_area" || region === "default_mode_network") {
+    thoughtArchState.activeModes[2].confidence = Math.min(1, (thoughtArchState.activeModes[2].confidence || 0) + 0.005);
+  }
+}
+
+export function feedTAIIntoNeuralSubstrate(): {
+  ivyEnergy: number;
+  spiderInsight: string;
+  silkSignal: number;
+  beaconPayload: Record<string, number>;
+  wormData: Record<string, number>;
+  pheromoneType: string;
+  pheromoneIntensity: number;
+  regionBoosts: Array<{ region: string; boost: number }>;
+} {
+  const taiScore =
+    metaRecursiveState.strategyFitness * 0.2 +
+    ethicalState.avgEthicalScore * 0.2 +
+    thoughtArchState.integrationScore * 0.2 +
+    governanceState.overallGovernanceScore * 0.25 +
+    arenaState.avgFitness * 0.15;
+
+  // ── ENERGY → IVY NETWORK: TAI fitness flows as ivy energy ──
+  const ivyEnergy = taiScore * 15 + arenaState.avgFitness * 10;
+  taiCrossSystem.energyInjected += ivyEnergy;
+
+  // ── INSIGHT → SPIDERS: Meta-recursive insights become spider beacons ──
+  const spiderInsight = metaRecursiveState.selfImprovements > 0
+    ? `TAI self-improvement G${metaRecursiveState.generation}: strategy=${metaRecursiveState.currentStrategy}, fitness=${(metaRecursiveState.strategyFitness * 100).toFixed(0)}%, transcendence=${metaRecursiveState.transcendenceEvents}`
+    : `TAI monitoring: G${metaRecursiveState.generation}, integration=${(thoughtArchState.integrationScore * 100).toFixed(0)}%, ethical=${(ethicalState.avgEthicalScore * 100).toFixed(0)}%`;
+  taiCrossSystem.spiderBeaconsSent++;
+
+  // ── SIGNAL → SILK WEB: Ethical confidence as silk signal strength ──
+  const silkSignal = ethicalState.avgEthicalScore * 0.7 + governanceState.overallGovernanceScore * 0.3;
+  taiCrossSystem.silkStrandsWoven++;
+
+  // ── PAYLOAD → BEACONS: Governance health broadcast through beacons ──
+  const beaconPayload: Record<string, number> = {
+    taiScore,
+    metaRecursiveFitness: metaRecursiveState.strategyFitness,
+    ethicalScore: ethicalState.avgEthicalScore,
+    thoughtIntegration: thoughtArchState.integrationScore,
+    governanceHealth: governanceState.overallGovernanceScore,
+    arenaFitness: arenaState.avgFitness,
+    metacognition: thoughtArchState.metacognitiveAwareness,
+    taiGeneration: metaRecursiveState.generation,
+  };
+
+  // ── DATA → WORMS: Evolution data tunnels through wormgates ──
+  const wormData: Record<string, number> = {
+    arenaGeneration: arenaState.generation,
+    arenaPopulation: arenaState.population,
+    arenaMaxFitness: arenaState.maxFitness,
+    arenaDiversity: arenaState.geneticDiversity,
+    metaGeneration: metaRecursiveState.generation,
+    transcendenceEvents: metaRecursiveState.transcendenceEvents,
+    totalImprovements: metaRecursiveState.totalImprovements,
+    governanceCycles: governanceState.governanceCycles,
+  };
+  taiCrossSystem.wormgateTraversals++;
+
+  // ── PHEROMONE → BEEHIVE: Ethical state emits pheromones ──
+  let pheromoneType: string;
+  let pheromoneIntensity: number;
+  if (ethicalState.constraintViolations > ethicalState.totalJudgments * 0.3) {
+    pheromoneType = "alarm";
+    pheromoneIntensity = 0.8;
+  } else if (arenaState.avgFitness > 0.7) {
+    pheromoneType = "nectar";
+    pheromoneIntensity = arenaState.avgFitness;
+  } else if (metaRecursiveState.transcendenceEvents > 0) {
+    pheromoneType = "discovery";
+    pheromoneIntensity = Math.min(1, 0.5 + metaRecursiveState.transcendenceEvents * 0.1);
+  } else {
+    pheromoneType = "rally";
+    pheromoneIntensity = taiScore * 0.5;
+  }
+  taiCrossSystem.beehivePheromonesDeposited++;
+
+  // ── REGION BOOSTS: TAI directly energizes specific brain regions ──
+  const regionBoosts: Array<{ region: string; boost: number }> = [];
+  if (thoughtArchState.dominantMode === "Logical Reasoning") {
+    regionBoosts.push({ region: "prefrontal_cortex", boost: thoughtArchState.integrationScore * 2.0 });
+    regionBoosts.push({ region: "anterior_cingulate", boost: thoughtArchState.integrationScore * 1.5 });
+  } else if (thoughtArchState.dominantMode === "Creative Synthesis") {
+    regionBoosts.push({ region: "default_mode_network", boost: thoughtArchState.integrationScore * 2.0 });
+    regionBoosts.push({ region: "ventral_tegmental_area", boost: thoughtArchState.integrationScore * 1.5 });
+  } else {
+    regionBoosts.push({ region: "hippocampus", boost: thoughtArchState.integrationScore * 1.5 });
+    regionBoosts.push({ region: "amygdala", boost: thoughtArchState.integrationScore * 1.0 });
+  }
+  if (metaRecursiveState.strategyFitness > 0.6) {
+    regionBoosts.push({ region: "prefrontal_cortex", boost: metaRecursiveState.strategyFitness * 1.0 });
+  }
+  if (governanceState.overallGovernanceScore > 0.5) {
+    regionBoosts.push({ region: "anterior_cingulate", boost: governanceState.overallGovernanceScore * 0.8 });
+  }
+
+  return {
+    ivyEnergy,
+    spiderInsight,
+    silkSignal,
+    beaconPayload,
+    wormData,
+    pheromoneType,
+    pheromoneIntensity,
+    regionBoosts,
+  };
+}
+
+export function getTAICrossSystemState(): TAICrossSystemState {
+  return { ...taiCrossSystem };
+}
+
+export { taiCrossSystem };

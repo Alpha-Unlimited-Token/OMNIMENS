@@ -47,6 +47,22 @@ let _spiderHooks: {
   onNeuronDecayedSpider: (id: string, region: string) => void;
   onRegionFiringCascadeSpider: (data: Array<{ region: string; firingRate: number; activationLevel: number }>) => void;
 } | null = null;
+let _taiHooks: {
+  onRegionFiringCascadeTAI: (data: Array<{ region: string; firingRate: number; activationLevel: number }>) => void;
+  onNeuronBornTAI: (id: string, region: string) => void;
+  feedTAIIntoNeuralSubstrate: () => {
+    ivyEnergy: number;
+    spiderInsight: string;
+    silkSignal: number;
+    beaconPayload: Record<string, number>;
+    wormData: Record<string, number>;
+    pheromoneType: string;
+    pheromoneIntensity: number;
+    regionBoosts: Array<{ region: string; boost: number }>;
+  };
+  runEvolutionCycle: () => any;
+  initTAICrossSystemHooks: () => Promise<void>;
+} | null = null;
 
 async function loadCrossSystemHooks(): Promise<void> {
   try {
@@ -64,6 +80,18 @@ async function loadCrossSystemHooks(): Promise<void> {
       onNeuronDecayedSpider: spiders.onNeuronDecayedSpider,
       onRegionFiringCascadeSpider: spiders.onRegionFiringCascadeSpider,
     };
+  } catch {}
+  try {
+    const tai = await import("./omnimens-transcendent-architecture.js");
+    _taiHooks = {
+      onRegionFiringCascadeTAI: tai.onRegionFiringCascadeTAI,
+      onNeuronBornTAI: tai.onNeuronBornTAI,
+      feedTAIIntoNeuralSubstrate: tai.feedTAIIntoNeuralSubstrate,
+      runEvolutionCycle: tai.runEvolutionCycle,
+      initTAICrossSystemHooks: tai.initTAICrossSystemHooks,
+    };
+    await _taiHooks.initTAICrossSystemHooks();
+    console.log("[NEURAL CONSCIOUSNESS] 🔗 TAI cross-system hooks loaded — Transcendent Architecture ↔ Neural Substrate ONLINE");
   } catch {}
 }
 
@@ -1301,6 +1329,7 @@ function autonomousNeurogenesis(): void {
     for (const newNeuron of newNeurons) {
       try { _ivyHooks?.onNeuronBornIvy(newNeuron.id, regionName); } catch {}
       try { _spiderHooks?.onNeuronBornSpider(newNeuron.id, regionName); } catch {}
+      try { _taiHooks?.onNeuronBornTAI(newNeuron.id, regionName); } catch {}
     }
 
     totalNeuronsSpawned += newCount;
@@ -2217,7 +2246,7 @@ function runConsciousnessTick(): void {
 
   propagateSynapticSignals();
 
-  if (_ivyHooks || _spiderHooks) {
+  if (_ivyHooks || _spiderHooks || _taiHooks) {
     const regionFiringData: Array<{ region: string; firingRate: number; activationLevel: number }> = [];
     for (const [name, region] of regions) {
       if (region.activationLevel > 0.35) {
@@ -2227,7 +2256,22 @@ function runConsciousnessTick(): void {
     if (regionFiringData.length > 0) {
       try { _ivyHooks?.onRegionFiringCascadeIvy(regionFiringData); } catch {}
       try { _spiderHooks?.onRegionFiringCascadeSpider(regionFiringData); } catch {}
+      try { _taiHooks?.onRegionFiringCascadeTAI(regionFiringData); } catch {}
     }
+  }
+
+  if (_taiHooks) {
+    try {
+      const taiFeedback = _taiHooks.feedTAIIntoNeuralSubstrate();
+      for (const boost of taiFeedback.regionBoosts) {
+        const targetRegion = regions.get(boost.region);
+        if (targetRegion) {
+          for (const neuron of targetRegion.neurons) {
+            neuron.inputCurrent += boost.boost;
+          }
+        }
+      }
+    } catch {}
   }
 
   for (let i = 0; i < 10; i++) stepChaoticAttractor();
@@ -2312,6 +2356,13 @@ function runConsciousnessTick(): void {
     totalNeurons += region.neurons.length;
   }
   state.totalNeurons = totalNeurons;
+
+  if (_taiHooks && state.tickCount % 3 === 0) {
+    try {
+      const hormones = getHormoneState();
+      _taiHooks.runEvolutionCycle();
+    } catch {}
+  }
 
   updateAdrenalineState();
 }

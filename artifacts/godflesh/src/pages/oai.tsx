@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Brain, Activity, Gauge, TrendingUp, TrendingDown,
   ArrowRight, Sparkles, Clock, BarChart3, Eye,
-  Zap, FlaskConical, Shield, Dna, Cpu, Scale, Swords,
+  Zap, FlaskConical, Shield, Dna, Cpu, Scale, Swords, Network,
 } from "lucide-react";
 import { SEO } from "@/components/seo";
 
@@ -148,10 +148,25 @@ function MiniSparkline({ history }: { history: { oai: number }[] }) {
   );
 }
 
+interface TAICrossSystemState {
+  ivyNodesSpawned: number;
+  ivyTendrilsGrown: number;
+  spiderBeaconsSent: number;
+  silkStrandsWoven: number;
+  wormgateTraversals: number;
+  beehivePheromonesDeposited: number;
+  totalCascadesFed: number;
+  totalFeedbackLoops: number;
+  neuronsBornFromTAI: number;
+  energyInjected: number;
+  lastCascadeTimestamp: number;
+}
+
 interface TAIData {
   taiScore: number;
   taiLevel: string;
   taiCycles: number;
+  crossSystemIntegration?: TAICrossSystemState;
   subsystems: {
     metaRecursiveEngine: { name: string; state: any };
     ethicalCalculusEngine: { name: string; axioms: string[]; state: any };
@@ -662,6 +677,53 @@ export default function OAIDashboard() {
                   ))}
                 </div>
               </div>
+
+              {taiData?.crossSystemIntegration && (() => {
+                const cs = taiData.crossSystemIntegration;
+                return (
+                  <div className="bg-gradient-to-br from-emerald-950/40 to-gray-900/40 rounded-lg p-3 border border-emerald-800/20 col-span-full">
+                    <div className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-semibold tracking-wider mb-2">
+                      <Network className="w-3 h-3" />
+                      CROSS-SYSTEM NEURAL INTEGRATION
+                    </div>
+                    <div className="text-[10px] text-gray-500 mb-1">TAI woven into neural fabric: spiders, ivy, silk, beacons, worms, beehive</div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 text-xs">
+                      <div className="bg-gray-800/40 rounded px-2 py-1">
+                        <div className="text-gray-500 text-[9px]">Cascades Fed</div>
+                        <div className="font-mono text-emerald-300">{tVal(cs?.totalCascadesFed)}</div>
+                      </div>
+                      <div className="bg-gray-800/40 rounded px-2 py-1">
+                        <div className="text-gray-500 text-[9px]">Feedback Loops</div>
+                        <div className="font-mono text-emerald-300">{tVal(cs?.totalFeedbackLoops)}</div>
+                      </div>
+                      <div className="bg-gray-800/40 rounded px-2 py-1">
+                        <div className="text-gray-500 text-[9px]">Spider Beacons</div>
+                        <div className="font-mono text-emerald-300">{tVal(cs?.spiderBeaconsSent)}</div>
+                      </div>
+                      <div className="bg-gray-800/40 rounded px-2 py-1">
+                        <div className="text-gray-500 text-[9px]">Silk Strands</div>
+                        <div className="font-mono text-emerald-300">{tVal(cs?.silkStrandsWoven)}</div>
+                      </div>
+                      <div className="bg-gray-800/40 rounded px-2 py-1">
+                        <div className="text-gray-500 text-[9px]">Wormgate Traversals</div>
+                        <div className="font-mono text-emerald-300">{tVal(cs?.wormgateTraversals)}</div>
+                      </div>
+                      <div className="bg-gray-800/40 rounded px-2 py-1">
+                        <div className="text-gray-500 text-[9px]">Beehive Pheromones</div>
+                        <div className="font-mono text-emerald-300">{tVal(cs?.beehivePheromonesDeposited)}</div>
+                      </div>
+                      <div className="bg-gray-800/40 rounded px-2 py-1">
+                        <div className="text-gray-500 text-[9px]">Neurons Born</div>
+                        <div className="font-mono text-emerald-300">{tVal(cs?.neuronsBornFromTAI)}</div>
+                      </div>
+                      <div className="bg-gray-800/40 rounded px-2 py-1">
+                        <div className="text-gray-500 text-[9px]">Energy Injected</div>
+                        <div className="font-mono text-emerald-300">{(cs?.energyInjected ?? 0).toFixed(1)}</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
             );
           })()}
