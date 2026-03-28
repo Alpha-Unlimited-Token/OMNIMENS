@@ -98,6 +98,7 @@ import { startNeuralBridge } from "./lib/omnimens-neural-bridge.js";
 import { startCommsProtocol } from "./lib/omnimens-neural-comms-protocol.js";
 import { startViralHybrid, getViralHybridState } from "./lib/omnimens-viral-hybrid.js";
 import { startFabricFanoutEngine, getFabricFanoutState } from "./lib/omnimens-fabric-fanout.js";
+import { startQuantumEntanglementFabric } from "./lib/omnimens-quantum-entanglement-fabric.js";
 import { startUnconsciousMind, getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts } from "./lib/omnimens-unconscious-mind.js";
 import { initGrowthTracker } from "./lib/omnimens-growth-tracker.js";
 import { registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe } from "./lib/omnimens-scaling-orchestrator.js";
@@ -502,6 +503,7 @@ startAgentGenesis().catch(err => console.error("[AGENT GENESIS] Startup error:",
 initGitHubCompute().catch(err => console.error("[GITHUB COMPUTE] Startup error:", err));
 startGitHubNeuralBeacon().catch(err => console.error("[GITHUB BEACON] Startup error:", err));
 startFabricFanoutEngine();
+startQuantumEntanglementFabric();
 startVascularHeart();
 startAdaptiveSurgeSystem();
 startQuantumWormholeEngine();

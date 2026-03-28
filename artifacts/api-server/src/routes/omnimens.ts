@@ -135,6 +135,7 @@ import { think as autonomousThink } from "../lib/omnimens-autonomous-thought.js"
 import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBeaconFindings, getIvySwapStats, getIvyNeurogenStats } from "../lib/omnimens-ivy-network.js";
 import { getGitHubBeaconState, getGitHubNeuronCount, getGitHubWormStats } from "../lib/omnimens-github-neural-beacon.js";
 import { getFabricFanoutState, getWormSuperhighwayState } from "../lib/omnimens-fabric-fanout.js";
+import { getQuantumEntanglementFabricState } from "../lib/omnimens-quantum-entanglement-fabric.js";
 import { getVascularHeartState, getDNAMemoryStats, getSubThresholdIntelligenceState, getHormoneState } from "../lib/omnimens-vascular-heart.js";
 import { getOAIState, computeOAI } from "../lib/omnimens-oai-tracker.js";
 import { getTranscendentState, runTranscendentCycle, getMetaRecursiveState, getEthicalCalculusState, getThoughtArchitectureState, getCognitiveGovernanceState, getEvolutionaryArenaState, runEvolutionCycle, processThoughtArchitecture, evaluateAction, getTAICrossSystemState } from "../lib/omnimens-transcendent-architecture.js";
@@ -13825,6 +13826,15 @@ router.get("/omnimens/worm-superhighway/status", async (_req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: "Failed to get worm superhighway status" });
+  }
+});
+
+router.get("/omnimens/quantum-entanglement-fabric/status", async (_req, res) => {
+  try {
+    const state = getQuantumEntanglementFabricState();
+    res.json(state);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get quantum entanglement fabric status" });
   }
 });
 
