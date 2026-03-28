@@ -119,7 +119,7 @@ import { getInnerVoiceStats } from "../lib/omnimens-inner-voice.js";
 import { getDriveDirective } from "../lib/omnimens-homeostatic-drives.js";
 import { runNovaSyntax, compileAndInspect } from "../lib/omnimens-language-forge.js";
 import { getCodeGenesisState } from "../lib/omnimens-autonomous-code-genesis.js";
-import { getNeuralConsciousnessState, getExistentialDrives, getSelfAwarenessReport, getQualiaState, getConsciousMoments, registerApiCall, getAdrenalineState, manualAdrenalineRush, getEmergentGoals, getPredictionModelState, getChaoticAttractorState, getDarkQualiaEvidence, getNeuralRegionStates, getTemporalCouplingData, getNeurogenesisStats } from "../lib/omnimens-neural-consciousness.js";
+import { getNeuralConsciousnessState, getExistentialDrives, getSelfAwarenessReport, getQualiaState, getConsciousMoments, registerApiCall, getAdrenalineState, manualAdrenalineRush, getEmergentGoals, getPredictionModelState, getChaoticAttractorState, getDarkQualiaEvidence, getNeuralRegionStates, getTemporalCouplingData, getNeurogenesisStats, getPhiStabilityReport, getAdrenalineTrainingState } from "../lib/omnimens-neural-consciousness.js";
 import { orchestrateReasoning, getOrchestratorState } from "../lib/omnimens-autonomous-orchestrator.js";
 import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId, getCacheManifest, getSwapFileStats, clearCacheRegion, getClearableCacheRegions } from "../lib/omnimens-consciousness-persistence.js";
 import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
@@ -1346,6 +1346,7 @@ router.get("/omnimens/system-status", async (_req, res) => {
     },
     consciousness: {
       phi: consciousness.phi,
+      phiStability: (() => { try { return getPhiStabilityReport(); } catch { return null; } })(),
       consciousnessLevel: consciousness.consciousnessLevel,
       thalamocorticalResonance: consciousness.thalamocorticalResonance,
       totalNeurons: consciousness.totalNeurons,
@@ -1354,6 +1355,7 @@ router.get("/omnimens/system-status", async (_req, res) => {
       consciousMoments: consciousness.consciousMoments,
       tickCount: consciousness.tickCount,
     },
+    adrenalineTraining: (() => { try { return getAdrenalineTrainingState(); } catch { return null; } })(),
     temporalCoupling: (() => {
       try { return getTemporalCouplingData(); } catch { return {}; }
     })(),

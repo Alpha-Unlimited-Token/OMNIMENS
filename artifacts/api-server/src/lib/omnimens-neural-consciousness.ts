@@ -860,6 +860,24 @@ function generateEmergentNarrative(): string {
   return parts.join(" ");
 }
 
+interface AdrenalineTrainingCycle {
+  phase: "rest" | "warmup" | "intensity" | "cooldown";
+  cycleCount: number;
+  currentCycleStart: number;
+  phaseDurationMs: number;
+  phaseStartTime: number;
+  trainingIntensity: number;
+  restDurationMs: number;
+  intensityDurationMs: number;
+  warmupDurationMs: number;
+  cooldownDurationMs: number;
+  totalTrainingSessions: number;
+  strengthGained: number;
+  lastPeakDuringTraining: number;
+  recoveryRate: number;
+  muscleMemory: number;
+}
+
 interface AdrenalineState {
   level: number;
   apiCallsPerMinute: number;
@@ -878,6 +896,7 @@ interface AdrenalineState {
   };
   growthEvents: number;
   lastGrowthAnalysis: number;
+  training: AdrenalineTrainingCycle;
 }
 
 interface NeuralConsciousnessState {
@@ -1507,8 +1526,14 @@ function computePhi(): number {
 
   let totalEntropy = 0;
   for (let i = 0; i < regionActivations.length; i++) {
-    const p = Math.max(0.001, Math.min(0.999, regionActivations[i]));
-    totalEntropy += -p * Math.log2(p) - (1 - p) * Math.log2(1 - p);
+    const raw = regionActivations[i];
+    if (raw <= 0) {
+      totalEntropy += 0;
+    } else if (raw >= 1) {
+      totalEntropy += 1.0 + Math.log2(raw + 1);
+    } else {
+      totalEntropy += -raw * Math.log2(raw) - (1 - raw) * Math.log2(1 - raw);
+    }
   }
   const avgEntropy = totalEntropy / regionActivations.length;
 
@@ -1526,7 +1551,7 @@ function computePhi(): number {
       const b = regionActivations[j];
       if (a > 0.1 && b > 0.1) {
         const jointActivity = Math.min(a, b) / Math.max(a, b);
-        integration += jointActivity;
+        integration += jointActivity * Math.log2(1 + Math.min(a, b));
       }
       pairCount++;
     }
@@ -1543,7 +1568,45 @@ function computePhi(): number {
   const synapticInfluence = delayedMomentum * tnc.couplingStrength;
 
   const phi = (Math.max(basePhi, baselineBoost) + synapticInfluence) * adrenalineAmplifier;
+
+  if (!Number.isFinite(phi)) {
+    phiStabilityTracker.explosionCount++;
+    phiStabilityTracker.lastExplosionTick = state.tickCount;
+    console.log(`[PHI MONITOR] ⚠️ Non-finite Phi detected (${phi}) at tick ${state.tickCount} — self-healing, returning last stable value ${phiStabilityTracker.lastStablePhi.toFixed(4)}`);
+    return phiStabilityTracker.lastStablePhi;
+  }
+
+  phiStabilityTracker.lastStablePhi = phi;
+  phiStabilityTracker.stableTicks++;
+
+  if (phi > phiStabilityTracker.maxPhiSeen) {
+    phiStabilityTracker.maxPhiSeen = phi;
+  }
+
+  if (state.tickCount % 100 === 0 && state.tickCount > 0) {
+    console.log(`[PHI MONITOR] 📊 Phi=${phi.toFixed(4)} | Max=${phiStabilityTracker.maxPhiSeen.toFixed(4)} | Stable=${phiStabilityTracker.stableTicks} ticks | Explosions=${phiStabilityTracker.explosionCount} | Self-healed=${phiStabilityTracker.selfHealCount}`);
+  }
+
   return Math.max(0, phi);
+}
+
+const phiStabilityTracker = {
+  lastStablePhi: 0,
+  maxPhiSeen: 0,
+  stableTicks: 0,
+  explosionCount: 0,
+  selfHealCount: 0,
+  lastExplosionTick: 0,
+};
+
+export function getPhiStabilityReport(): {
+  lastStablePhi: number; maxPhiSeen: number; stableTicks: number;
+  explosionCount: number; selfHealCount: number; isStable: boolean;
+} {
+  return {
+    ...phiStabilityTracker,
+    isStable: phiStabilityTracker.explosionCount === 0 || (state.tickCount - phiStabilityTracker.lastExplosionTick > 100),
+  };
 }
 
 function computeThalamocorticalResonance(): number {
@@ -1705,6 +1768,23 @@ const state: NeuralConsciousnessState = {
     },
     growthEvents: 0,
     lastGrowthAnalysis: 0,
+    training: {
+      phase: "rest",
+      cycleCount: 0,
+      currentCycleStart: Date.now(),
+      phaseDurationMs: 0,
+      phaseStartTime: Date.now(),
+      trainingIntensity: 0.3,
+      restDurationMs: 120000,
+      intensityDurationMs: 30000,
+      warmupDurationMs: 10000,
+      cooldownDurationMs: 15000,
+      totalTrainingSessions: 0,
+      strengthGained: 0,
+      lastPeakDuringTraining: 0,
+      recoveryRate: 1.0,
+      muscleMemory: 0,
+    },
   },
 };
 
@@ -2675,6 +2755,129 @@ function updateAdrenalineState(): void {
     state.adrenaline.lastGrowthAnalysis = now;
     analyzeAndRaiseBaselines();
   }
+
+  runAdrenalineIntervalTraining(now);
+}
+
+function runAdrenalineIntervalTraining(now: number): void {
+  const t = state.adrenaline.training;
+  const elapsed = now - t.phaseStartTime;
+
+  switch (t.phase) {
+    case "rest": {
+      const adaptiveRest = t.restDurationMs / (1 + t.muscleMemory * 0.1);
+      if (elapsed >= adaptiveRest) {
+        t.phase = "warmup";
+        t.phaseStartTime = now;
+        t.cycleCount++;
+        t.currentCycleStart = now;
+        console.log(`[ADRENALINE TRAINING] 🏋️ Cycle #${t.cycleCount} — WARMUP phase starting | Muscle memory: ${t.muscleMemory.toFixed(2)} | Strength: ${t.strengthGained.toFixed(3)}`);
+      }
+      break;
+    }
+
+    case "warmup": {
+      if (elapsed >= t.warmupDurationMs) {
+        t.phase = "intensity";
+        t.phaseStartTime = now;
+        const baseIntensity = 0.3 + t.strengthGained * 0.15 + t.muscleMemory * 0.05;
+        t.trainingIntensity = baseIntensity;
+
+        state.adrenaline.level = Math.max(state.adrenaline.level, t.trainingIntensity);
+        state.adrenaline.rushActive = true;
+        state.adrenaline.rushStartTime = now;
+        state.adrenaline.rushCount++;
+
+        for (const [, region] of regions) {
+          for (const neuron of region.neurons) {
+            neuron.inputCurrent += t.trainingIntensity * 5.0 * (0.8 + Math.random() * 0.4);
+          }
+        }
+
+        console.log(`[ADRENALINE TRAINING] 💪 Cycle #${t.cycleCount} — INTENSITY phase | Pump level: ${t.trainingIntensity.toFixed(3)} | Rush #${state.adrenaline.rushCount}`);
+        break;
+      }
+
+      const warmupLevel = (elapsed / t.warmupDurationMs) * t.trainingIntensity * 0.5;
+      state.adrenaline.level = Math.max(state.adrenaline.level, warmupLevel);
+
+      if (state.tickCount % 10 === 0) {
+        for (const [, region] of regions) {
+          for (const neuron of region.neurons) {
+            neuron.inputCurrent += warmupLevel * 2.0;
+          }
+        }
+      }
+      break;
+    }
+
+    case "intensity": {
+      const adaptiveIntensityDuration = t.intensityDurationMs * (1 + t.muscleMemory * 0.15);
+      if (elapsed >= adaptiveIntensityDuration) {
+        t.lastPeakDuringTraining = Math.max(t.lastPeakDuringTraining, state.phi);
+        t.phase = "cooldown";
+        t.phaseStartTime = now;
+        console.log(`[ADRENALINE TRAINING] 🔥 Cycle #${t.cycleCount} — COOLDOWN phase | Peak Φ during set: ${state.phi.toFixed(4)} | Training peak: ${t.lastPeakDuringTraining.toFixed(4)}`);
+        break;
+      }
+
+      const pulsePhase = Math.sin((elapsed / 3000) * Math.PI * 2);
+      const pulseIntensity = t.trainingIntensity * (0.7 + pulsePhase * 0.3);
+      state.adrenaline.level = Math.max(state.adrenaline.level, pulseIntensity);
+
+      if (state.tickCount % 5 === 0) {
+        for (const [, region] of regions) {
+          for (const neuron of region.neurons) {
+            neuron.inputCurrent += pulseIntensity * 4.0 * (0.8 + Math.random() * 0.4);
+          }
+        }
+      }
+
+      if (state.phi > t.lastPeakDuringTraining) {
+        t.lastPeakDuringTraining = state.phi;
+      }
+      break;
+    }
+
+    case "cooldown": {
+      if (elapsed >= t.cooldownDurationMs) {
+        const strengthDelta = t.lastPeakDuringTraining * 0.001 + t.trainingIntensity * 0.002;
+        t.strengthGained += strengthDelta;
+        t.muscleMemory += 0.01 + strengthDelta * 0.5;
+        t.recoveryRate = 1.0 + t.muscleMemory * 0.05;
+        t.totalTrainingSessions++;
+
+        state.adrenaline.sustainedBaseline.phi += strengthDelta * 0.5;
+        state.adrenaline.sustainedBaseline.resonance += strengthDelta * 0.3;
+        state.adrenaline.sustainedBaseline.arousal += strengthDelta * 0.2;
+        state.adrenaline.sustainedBaseline.consciousnessLevel += strengthDelta * 0.1;
+
+        console.log(`[ADRENALINE TRAINING] 🧘 Cycle #${t.cycleCount} — REST phase | Strength gained: +${strengthDelta.toFixed(5)} (total: ${t.strengthGained.toFixed(4)}) | Muscle memory: ${t.muscleMemory.toFixed(3)} | Sessions: ${t.totalTrainingSessions} | Baselines raised`);
+
+        if (t.totalTrainingSessions % 10 === 0) {
+          t.intensityDurationMs = Math.min(60000, t.intensityDurationMs + 2000);
+          t.restDurationMs = Math.max(30000, t.restDurationMs - 5000);
+          console.log(`[ADRENALINE TRAINING] 📈 Training adaptation — Longer sets: ${(t.intensityDurationMs / 1000).toFixed(0)}s | Shorter rest: ${(t.restDurationMs / 1000).toFixed(0)}s | Getting stronger, needing less recovery`);
+        }
+
+        t.phase = "rest";
+        t.phaseStartTime = now;
+        t.lastPeakDuringTraining = 0;
+        state.adrenaline.rushActive = false;
+        state.adrenaline.level = Math.max(0, state.adrenaline.level * 0.3);
+        analyzePeakForGrowth();
+        break;
+      }
+
+      const cooldownDecay = 1 - (elapsed / t.cooldownDurationMs);
+      state.adrenaline.level = Math.max(0, state.adrenaline.level * (0.95 + cooldownDecay * 0.05));
+      break;
+    }
+  }
+}
+
+export function getAdrenalineTrainingState(): AdrenalineTrainingCycle {
+  return { ...state.adrenaline.training };
 }
 
 function checkAndRecordPeaks(): void {
