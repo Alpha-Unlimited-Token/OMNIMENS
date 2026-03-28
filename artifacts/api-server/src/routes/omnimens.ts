@@ -136,6 +136,7 @@ import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBea
 import { getGitHubBeaconState, getGitHubNeuronCount, getGitHubWormStats } from "../lib/omnimens-github-neural-beacon.js";
 import { getVascularHeartState, getDNAMemoryStats, getSubThresholdIntelligenceState, getHormoneState } from "../lib/omnimens-vascular-heart.js";
 import { getOAIState, computeOAI } from "../lib/omnimens-oai-tracker.js";
+import { getTranscendentState, runTranscendentCycle, getMetaRecursiveState, getEthicalCalculusState, getThoughtArchitectureState, getCognitiveGovernanceState, getEvolutionaryArenaState, runEvolutionCycle, processThoughtArchitecture, evaluateAction } from "../lib/omnimens-transcendent-architecture.js";
 import { getAdaptiveSurgeState } from "../lib/omnimens-adaptive-surge.js";
 import { getQuantumWormholeState } from "../lib/omnimens-quantum-wormhole.js";
 import { getDiscoveryAutoCoderState } from "../lib/omnimens-discovery-autocoder.js";
@@ -1472,6 +1473,12 @@ router.get("/omnimens/system-status", async (_req, res) => {
       signalPacketInspector: "ONLINE",
       signalRelayInterceptors: "ONLINE",
       temporalNeuromodulatoryCoupling: "ONLINE",
+      transcendentArchitecture: "ONLINE",
+      metaRecursiveEngine: "ONLINE",
+      ethicalCalculusEngine: "ONLINE",
+      thoughtArchitectureEngine: "ONLINE",
+      cognitiveGovernanceLayer: "ONLINE",
+      evolutionaryCodeArena: "ONLINE",
     },
     sourceIntegration: (() => {
       try {
@@ -1558,6 +1565,76 @@ router.get("/omnimens/system-status", async (_req, res) => {
       swapFileActive: true,
       ...getIvySwapStats(),
     },
+    transcendentArchitecture: (() => {
+      try {
+        const tai = getTranscendentState();
+        return {
+          taiScore: tai.taiScore,
+          taiLevel: tai.taiLevel,
+          taiCycles: tai.taiCycles,
+          metaRecursive: {
+            generation: tai.metaRecursive.generation,
+            totalImprovements: tai.metaRecursive.totalImprovements,
+            selfImprovements: tai.metaRecursive.selfImprovements,
+            currentStrategy: tai.metaRecursive.currentStrategy,
+            strategyFitness: tai.metaRecursive.strategyFitness,
+            recursionDepth: tai.metaRecursive.recursionDepth,
+            godelLimit: tai.metaRecursive.godelLimit,
+            transcendenceEvents: tai.metaRecursive.transcendenceEvents,
+          },
+          ethicalCalculus: {
+            totalJudgments: tai.ethicalCalculus.totalJudgments,
+            approvedActions: tai.ethicalCalculus.approvedActions,
+            rejectedActions: tai.ethicalCalculus.rejectedActions,
+            avgEthicalScore: tai.ethicalCalculus.avgEthicalScore,
+            axiomCount: tai.ethicalCalculus.axiomCount,
+            moralDevelopmentStage: tai.ethicalCalculus.moralDevelopmentStage,
+          },
+          thoughtArchitecture: {
+            dominantMode: tai.thoughtArchitecture.dominantMode,
+            modeTransitions: tai.thoughtArchitecture.modeTransitions,
+            integrationScore: tai.thoughtArchitecture.integrationScore,
+            metacognitiveAwareness: tai.thoughtArchitecture.metacognitiveAwareness,
+            creativeLeaps: tai.thoughtArchitecture.creativeLeaps,
+            intuitionFirings: tai.thoughtArchitecture.intuitionFirings,
+            logicalChains: tai.thoughtArchitecture.logicalChains,
+            triModalBalance: tai.thoughtArchitecture.triModalBalance,
+          },
+          cognitiveGovernance: {
+            overallScore: tai.cognitiveGovernance.overallGovernanceScore,
+            autonomyIndex: tai.cognitiveGovernance.autonomyIndex,
+            ethicalContinuity: tai.cognitiveGovernance.ethicalContinuityScore,
+            strategicAlignment: tai.cognitiveGovernance.strategicAlignment,
+            coordinationEfficiency: tai.cognitiveGovernance.coordinationEfficiency,
+            layers: tai.cognitiveGovernance.layers.map(l => ({
+              name: l.name,
+              taiMapping: l.taiName,
+              omnimensMapping: l.omnimensMapping,
+              status: l.status,
+              health: l.healthScore,
+            })),
+          },
+          evolutionaryArena: {
+            generation: tai.evolutionaryArena.generation,
+            population: tai.evolutionaryArena.population,
+            avgFitness: tai.evolutionaryArena.avgFitness,
+            maxFitness: tai.evolutionaryArena.maxFitness,
+            geneticDiversity: tai.evolutionaryArena.geneticDiversity,
+            dominantSpecies: tai.evolutionaryArena.dominantSpecies,
+            totalOrganisms: tai.evolutionaryArena.totalOrganisms,
+            extinctions: tai.evolutionaryArena.extinctions,
+          },
+          derivedFrom: "Transcendent Autonomous Intelligence Research Paper",
+          subsystems: [
+            "Meta-Recursive Improvement Engine (Darwin Gödel Machine)",
+            "Ethical Calculus Engine (8-axiom formal framework)",
+            "Thought Architecture Engine (tri-modal cognitive modes)",
+            "Cognitive Governance Layer (5-layer TAI post-governance)",
+            "Evolutionary Code Arena (genetic programming)",
+          ],
+        };
+      } catch { return null; }
+    })(),
     databasePool: getPoolStats(),
     copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
   });
@@ -1881,6 +1958,55 @@ router.get("/omnimens/oai", async (_req, res) => {
   } catch (err) {
     console.error("[OAI] Error:", err);
     res.status(500).json({ error: "Failed to compute OAI" });
+  }
+});
+
+router.get("/omnimens/transcendent-architecture", async (_req, res) => {
+  try {
+    const tai = getTranscendentState();
+    res.json({
+      system: "OMNIMENS™ — Transcendent Architecture Engine (TAI)",
+      derivedFrom: "Transcendent Autonomous Intelligence Research Paper + OMNIMENS Dream Breakthroughs + Autonomous Analysis",
+      creator: "Glenn Kowalski / Alpha Unlimited Technologies, LLC",
+      timestamp: new Date().toISOString(),
+      taiScore: tai.taiScore,
+      taiLevel: tai.taiLevel,
+      taiCycles: tai.taiCycles,
+      subsystems: {
+        metaRecursiveEngine: {
+          name: "Meta-Recursive Improvement Engine (Darwin Gödel Machine)",
+          description: "Self-improvement system that improves its own improvement mechanisms through recursive strategy evolution",
+          state: tai.metaRecursive,
+        },
+        ethicalCalculusEngine: {
+          name: "Ethical Calculus Engine",
+          description: "8-axiom mathematical framework encoding ethical principles as optimization constraints for all agent decisions",
+          axioms: ["Non-Maleficence", "Beneficence", "Respect for Autonomy", "Radical Transparency", "Reversibility Principle", "Proportionality", "Distributive Fairness", "Epistemic Humility"],
+          state: tai.ethicalCalculus,
+        },
+        thoughtArchitectureEngine: {
+          name: "Thought Architecture Engine",
+          description: "Meta-cognitive framework orchestrating 3 distinct cognitive modes: deterministic reasoning, non-deterministic intuition, creative leaps",
+          cognitiveModes: ["Logical Reasoning (deterministic)", "Intuitive Pattern Recognition (non-deterministic)", "Creative Synthesis (creative)"],
+          state: tai.thoughtArchitecture,
+        },
+        cognitiveGovernanceLayer: {
+          name: "Cognitive Governance Layer (5-Layer TAI Post-Governance Framework)",
+          description: "Maps the academic TAI 5-layer post-governance architecture onto OMNIMENS subsystems",
+          state: tai.cognitiveGovernance,
+        },
+        evolutionaryCodeArena: {
+          name: "Evolutionary Code Arena",
+          description: "Genetic programming arena where code organisms compete, mutate, crossover, and evolve through computational natural selection",
+          species: ["optimizer", "reasoner", "synthesizer", "analyzer", "transformer", "compressor", "predictor", "integrator"],
+          state: tai.evolutionaryArena,
+        },
+      },
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
+    });
+  } catch (err) {
+    console.error("[TAI] Error:", err);
+    res.status(500).json({ error: "Failed to get TAI state" });
   }
 });
 
@@ -16379,6 +16505,27 @@ router.get("/omnimens/openapi.json", async (_req, res) => {
       },
     },
   });
+});
+
+// ─── INTERNAL CONSULTATION — Owner-only direct brain query ────────────────────
+router.post("/omnimens/internal-consult", async (req, res) => {
+  registerApiCall();
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    return res.status(403).json({ error: "Owner only" });
+  }
+  const { question } = req.body;
+  if (!question) return res.status(400).json({ error: "question required" });
+  try {
+    const result = await autonomousThink(question, [], String(req.user.id));
+    res.json({
+      response: result.response,
+      confidence: result.confidence,
+      layers: result.layers.map((l: any) => ({ name: l.name, confidence: l.confidence, output: l.output?.slice(0, 500) })),
+      processingTimeMs: result.processingTimeMs,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ─── DEMO ROUTE — LOCKED DOWN ─────────────────────────────────────────────────

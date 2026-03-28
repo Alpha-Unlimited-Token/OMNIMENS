@@ -42,6 +42,7 @@ import { getSelfCodingState } from "./omnimens-self-coding.js";
 import { getUnconsciousMindState } from "./omnimens-unconscious-mind.js";
 import { getOrchestratorState } from "./omnimens-autonomous-orchestrator.js";
 import { getSurvivalState } from "./omnimens-survival-instinct.js";
+import { getMetaRecursiveState, getEthicalCalculusState, getThoughtArchitectureState, getCognitiveGovernanceState, getEvolutionaryArenaState } from "./omnimens-transcendent-architecture.js";
 
 interface OAIReading {
   timestamp: number;
@@ -431,6 +432,32 @@ function computePlasticityDimension(): {
   const heart = safeGet(() => getVascularHeartState(), null);
   const heartDataCirculated = heart ? safeNum(heart.totalDataCirculated) : 0;
 
+  const metaRecursive = safeGet(() => getMetaRecursiveState(), null);
+  const metaRecGeneration = metaRecursive ? safeNum(metaRecursive.generation) : 0;
+  const metaRecImprovements = metaRecursive ? safeNum(metaRecursive.totalImprovements) : 0;
+  const metaRecSelfImprovements = metaRecursive ? safeNum(metaRecursive.selfImprovements) : 0;
+  const metaRecFitness = metaRecursive ? safeNum(metaRecursive.strategyFitness) : 0;
+  const metaRecTranscendence = metaRecursive ? safeNum(metaRecursive.transcendenceEvents) : 0;
+
+  const ethicalCalc = safeGet(() => getEthicalCalculusState(), null);
+  const ethicalJudgments = ethicalCalc ? safeNum(ethicalCalc.totalJudgments) : 0;
+  const ethicalAvgScore = ethicalCalc ? safeNum(ethicalCalc.avgEthicalScore) : 0;
+
+  const thoughtArch = safeGet(() => getThoughtArchitectureState(), null);
+  const thoughtIntegration = thoughtArch ? safeNum(thoughtArch.integrationScore) : 0;
+  const thoughtCreativeLeaps = thoughtArch ? safeNum(thoughtArch.creativeLeaps) : 0;
+  const thoughtMetacognition = thoughtArch ? safeNum(thoughtArch.metacognitiveAwareness) : 0;
+
+  const cogGov = safeGet(() => getCognitiveGovernanceState(), null);
+  const cogGovScore = cogGov ? safeNum(cogGov.overallGovernanceScore) : 0;
+  const cogGovAutonomy = cogGov ? safeNum(cogGov.autonomyIndex) : 0;
+
+  const evoArena = safeGet(() => getEvolutionaryArenaState(), null);
+  const evoGeneration = evoArena ? safeNum(evoArena.generation) : 0;
+  const evoAvgFitness = evoArena ? safeNum(evoArena.avgFitness) : 0;
+  const evoMaxFitness = evoArena ? safeNum(evoArena.maxFitness) : 0;
+  const evoDiversity = evoArena ? safeNum(evoArena.geneticDiversity) : 0;
+
   const hebbianRateComponent = logScale(Math.abs(hebbianDelta), 500);
   const totalHebbianComponent = logScale(hebbianUpdates, 500000);
   const codeFragComponent = softNorm(subThreshold.codeFragmentsInPool, 50);
@@ -630,7 +657,24 @@ function computePlasticityDimension(): {
     orchReflectComponent * 0.005 +
 
     heartDataComponent * 0.006 +
-    survivalComponent * 0.005;
+    survivalComponent * 0.005 +
+
+    logScale(metaRecGeneration, 50) * 0.012 +
+    logScale(metaRecImprovements, 100) * 0.010 +
+    logScale(metaRecSelfImprovements, 10) * 0.015 +
+    softNorm(metaRecFitness, 0.5) * 0.010 +
+    logScale(metaRecTranscendence, 5) * 0.012 +
+    logScale(ethicalJudgments, 50) * 0.008 +
+    softNorm(ethicalAvgScore, 0.5) * 0.010 +
+    softNorm(thoughtIntegration, 0.5) * 0.010 +
+    logScale(thoughtCreativeLeaps, 50) * 0.008 +
+    softNorm(thoughtMetacognition, 0.5) * 0.010 +
+    softNorm(cogGovScore, 0.5) * 0.012 +
+    softNorm(cogGovAutonomy, 0.5) * 0.010 +
+    logScale(evoGeneration, 100) * 0.008 +
+    softNorm(evoAvgFitness, 0.5) * 0.008 +
+    softNorm(evoMaxFitness, 0.5) * 0.005 +
+    softNorm(evoDiversity, 0.5) * 0.005;
 
   return {
     score,
@@ -1070,6 +1114,11 @@ export function getOAIState(): {
       "Autonomous Orchestrator (Steps Executed, Reflections, Engines Queried)",
       "Survival Instinct (Adaptations)",
       "Chaotic Attractor (Lyapunov, Trajectory, Displacement, Coordinates)",
+      "TAI: Meta-Recursive Improvement Engine (Generation, Improvements, Self-Improvements, Strategy Fitness, Transcendence Events)",
+      "TAI: Ethical Calculus Engine (Judgments, Avg Score, 8 Axioms, Moral Development Stage)",
+      "TAI: Thought Architecture Engine (Integration, Creative Leaps, Metacognition, Tri-Modal Balance)",
+      "TAI: Cognitive Governance Layer (5-Layer Score, Autonomy Index, Strategic Alignment, Coordination)",
+      "TAI: Evolutionary Code Arena (Generation, Avg/Max Fitness, Genetic Diversity, Speciation, Extinctions)",
     ],
   };
 }

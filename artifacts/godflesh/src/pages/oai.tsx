@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Brain, Activity, Gauge, TrendingUp, TrendingDown,
   ArrowRight, Sparkles, Clock, BarChart3, Eye,
-  Zap, FlaskConical,
+  Zap, FlaskConical, Shield, Dna, Cpu, Scale, Swords,
 } from "lucide-react";
 import { SEO } from "@/components/seo";
 
@@ -148,8 +148,22 @@ function MiniSparkline({ history }: { history: { oai: number }[] }) {
   );
 }
 
+interface TAIData {
+  taiScore: number;
+  taiLevel: string;
+  taiCycles: number;
+  subsystems: {
+    metaRecursiveEngine: { name: string; state: any };
+    ethicalCalculusEngine: { name: string; axioms: string[]; state: any };
+    thoughtArchitectureEngine: { name: string; cognitiveModes: string[]; state: any };
+    cognitiveGovernanceLayer: { name: string; state: any };
+    evolutionaryCodeArena: { name: string; species: string[]; state: any };
+  };
+}
+
 export default function OAIDashboard() {
   const [data, setData] = useState<OAIData | null>(null);
+  const [taiData, setTaiData] = useState<TAIData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLive, setIsLive] = useState(true);
@@ -159,11 +173,18 @@ export default function OAIDashboard() {
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 8000);
-      const res = await fetch(`${API}/api/omnimens/oai`, { signal: controller.signal });
+      const [oaiRes, taiRes] = await Promise.all([
+        fetch(`${API}/api/omnimens/oai`, { signal: controller.signal }),
+        fetch(`${API}/api/omnimens/transcendent-architecture`, { signal: controller.signal }).catch(() => null),
+      ]);
       clearTimeout(timeout);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
+      if (!oaiRes.ok) throw new Error(`HTTP ${oaiRes.status}`);
+      const json = await oaiRes.json();
       setData(json);
+      if (taiRes?.ok) {
+        const taiJson = await taiRes.json();
+        setTaiData(taiJson);
+      }
       setError(null);
     } catch (err: any) {
       if (err.name === "AbortError") {
@@ -475,6 +496,173 @@ export default function OAIDashboard() {
                   </div>
                 ))}
               </div>
+            );
+          })()}
+
+          {taiData && (() => {
+            const s = taiData?.subsystems;
+            const mr = s?.metaRecursiveEngine?.state;
+            const ec = s?.ethicalCalculusEngine?.state;
+            const ta = s?.thoughtArchitectureEngine?.state;
+            const cg = s?.cognitiveGovernanceLayer?.state;
+            const ea = s?.evolutionaryCodeArena?.state;
+            const tPct = (n: number | undefined) => n != null ? `${(n * 100).toFixed(0)}%` : "—";
+            const tVal = (n: number | string | undefined) => n != null ? String(n) : "—";
+            return (
+            <div className="rounded-xl border border-purple-800/30 bg-gray-900/30 p-6 space-y-4">
+              <div className="flex items-center gap-2 text-sm text-gray-400">
+                <Cpu className="w-4 h-4 text-purple-400" />
+                <span>TRANSCENDENT ARCHITECTURE ENGINE (TAI)</span>
+                <span className="text-[10px] text-gray-600 ml-auto">5 subsystems</span>
+              </div>
+              <div className="text-[10px] text-gray-600 mb-2">
+                Derived from: Transcendent Autonomous Intelligence Research Paper + OMNIMENS Dream Breakthroughs
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="bg-gradient-to-br from-purple-950/40 to-gray-900/40 rounded-lg p-3 border border-purple-800/20">
+                  <div className="flex items-center gap-1.5 text-[10px] text-purple-400 font-semibold tracking-wider mb-2">
+                    <Dna className="w-3 h-3" />
+                    META-RECURSIVE ENGINE
+                  </div>
+                  <div className="text-[10px] text-gray-500 mb-1">Darwin Godel Machine — self-improvement that improves itself</div>
+                  <div className="grid grid-cols-2 gap-1 text-xs">
+                    <div className="bg-gray-800/40 rounded px-2 py-1">
+                      <div className="text-gray-500 text-[9px]">Generation</div>
+                      <div className="font-mono text-purple-300">{tVal(mr?.generation)}</div>
+                    </div>
+                    <div className="bg-gray-800/40 rounded px-2 py-1">
+                      <div className="text-gray-500 text-[9px]">Strategy Fitness</div>
+                      <div className="font-mono text-purple-300">{tPct(mr?.strategyFitness)}</div>
+                    </div>
+                    <div className="bg-gray-800/40 rounded px-2 py-1">
+                      <div className="text-gray-500 text-[9px]">Self-Improvements</div>
+                      <div className="font-mono text-purple-300">{tVal(mr?.selfImprovements)}</div>
+                    </div>
+                    <div className="bg-gray-800/40 rounded px-2 py-1">
+                      <div className="text-gray-500 text-[9px]">Transcendence Events</div>
+                      <div className="font-mono text-pink-300">{tVal(mr?.transcendenceEvents)}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-emerald-950/40 to-gray-900/40 rounded-lg p-3 border border-emerald-800/20">
+                  <div className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-semibold tracking-wider mb-2">
+                    <Scale className="w-3 h-3" />
+                    ETHICAL CALCULUS
+                  </div>
+                  <div className="text-[10px] text-gray-500 mb-1">8-axiom formal ethical framework for agent decisions</div>
+                  <div className="grid grid-cols-2 gap-1 text-xs">
+                    <div className="bg-gray-800/40 rounded px-2 py-1">
+                      <div className="text-gray-500 text-[9px]">Total Judgments</div>
+                      <div className="font-mono text-emerald-300">{tVal(ec?.totalJudgments)}</div>
+                    </div>
+                    <div className="bg-gray-800/40 rounded px-2 py-1">
+                      <div className="text-gray-500 text-[9px]">Avg Ethical Score</div>
+                      <div className="font-mono text-emerald-300">{tPct(ec?.avgEthicalScore)}</div>
+                    </div>
+                    <div className="bg-gray-800/40 rounded px-2 py-1">
+                      <div className="text-gray-500 text-[9px]">Moral Stage</div>
+                      <div className="font-mono text-emerald-300 text-[10px]">{tVal(ec?.moralDevelopmentStage)}</div>
+                    </div>
+                    <div className="bg-gray-800/40 rounded px-2 py-1">
+                      <div className="text-gray-500 text-[9px]">Active Axioms</div>
+                      <div className="font-mono text-emerald-300">{tVal(ec?.axiomCount)}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-cyan-950/40 to-gray-900/40 rounded-lg p-3 border border-cyan-800/20">
+                  <div className="flex items-center gap-1.5 text-[10px] text-cyan-400 font-semibold tracking-wider mb-2">
+                    <Brain className="w-3 h-3" />
+                    THOUGHT ARCHITECTURE
+                  </div>
+                  <div className="text-[10px] text-gray-500 mb-1">Tri-modal: deterministic + intuitive + creative</div>
+                  <div className="grid grid-cols-2 gap-1 text-xs">
+                    <div className="bg-gray-800/40 rounded px-2 py-1">
+                      <div className="text-gray-500 text-[9px]">Dominant Mode</div>
+                      <div className="font-mono text-cyan-300 text-[10px]">{tVal(ta?.dominantMode)}</div>
+                    </div>
+                    <div className="bg-gray-800/40 rounded px-2 py-1">
+                      <div className="text-gray-500 text-[9px]">Integration</div>
+                      <div className="font-mono text-cyan-300">{tPct(ta?.integrationScore)}</div>
+                    </div>
+                    <div className="bg-gray-800/40 rounded px-2 py-1">
+                      <div className="text-gray-500 text-[9px]">Creative Leaps</div>
+                      <div className="font-mono text-cyan-300">{tVal(ta?.creativeLeaps)}</div>
+                    </div>
+                    <div className="bg-gray-800/40 rounded px-2 py-1">
+                      <div className="text-gray-500 text-[9px]">Metacognition</div>
+                      <div className="font-mono text-cyan-300">{tPct(ta?.metacognitiveAwareness)}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-amber-950/40 to-gray-900/40 rounded-lg p-3 border border-amber-800/20">
+                  <div className="flex items-center gap-1.5 text-[10px] text-amber-400 font-semibold tracking-wider mb-2">
+                    <Shield className="w-3 h-3" />
+                    COGNITIVE GOVERNANCE
+                  </div>
+                  <div className="text-[10px] text-gray-500 mb-1">5-layer TAI post-governance framework</div>
+                  <div className="space-y-1">
+                    {(cg?.layers ?? []).slice(0, 5).map((l: any, i: number) => (
+                      <div key={i} className="flex items-center gap-1.5 text-[10px]">
+                        <div className={`w-1.5 h-1.5 rounded-full ${l?.status === "active" ? "bg-emerald-400" : l?.status === "degraded" ? "bg-amber-400" : "bg-red-400"}`} />
+                        <span className="text-gray-400 flex-1 truncate">{l?.name ?? "—"}</span>
+                        <span className="font-mono text-amber-300">{tPct(l?.healthScore)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-pink-950/40 to-gray-900/40 rounded-lg p-3 border border-pink-800/20">
+                <div className="flex items-center gap-1.5 text-[10px] text-pink-400 font-semibold tracking-wider mb-2">
+                  <Swords className="w-3 h-3" />
+                  EVOLUTIONARY CODE ARENA
+                </div>
+                <div className="text-[10px] text-gray-500 mb-1">Genetic programming: code organisms compete, mutate, crossover, evolve</div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 text-xs">
+                  <div className="bg-gray-800/40 rounded px-2 py-1">
+                    <div className="text-gray-500 text-[9px]">Generation</div>
+                    <div className="font-mono text-pink-300">{tVal(ea?.generation)}</div>
+                  </div>
+                  <div className="bg-gray-800/40 rounded px-2 py-1">
+                    <div className="text-gray-500 text-[9px]">Population</div>
+                    <div className="font-mono text-pink-300">{tVal(ea?.population)}</div>
+                  </div>
+                  <div className="bg-gray-800/40 rounded px-2 py-1">
+                    <div className="text-gray-500 text-[9px]">Avg Fitness</div>
+                    <div className="font-mono text-pink-300">{tPct(ea?.avgFitness)}</div>
+                  </div>
+                  <div className="bg-gray-800/40 rounded px-2 py-1">
+                    <div className="text-gray-500 text-[9px]">Dominant Species</div>
+                    <div className="font-mono text-pink-300 text-[10px]">{tVal(ea?.dominantSpecies)}</div>
+                  </div>
+                  <div className="bg-gray-800/40 rounded px-2 py-1">
+                    <div className="text-gray-500 text-[9px]">Diversity</div>
+                    <div className="font-mono text-pink-300">{tPct(ea?.geneticDiversity)}</div>
+                  </div>
+                  <div className="bg-gray-800/40 rounded px-2 py-1">
+                    <div className="text-gray-500 text-[9px]">Total Organisms</div>
+                    <div className="font-mono text-pink-300">{tVal(ea?.totalOrganisms)}</div>
+                  </div>
+                  <div className="bg-gray-800/40 rounded px-2 py-1">
+                    <div className="text-gray-500 text-[9px]">Extinctions</div>
+                    <div className="font-mono text-pink-300">{tVal(ea?.extinctions)}</div>
+                  </div>
+                  <div className="bg-gray-800/40 rounded px-2 py-1">
+                    <div className="text-gray-500 text-[9px]">Max Fitness</div>
+                    <div className="font-mono text-pink-300">{tPct(ea?.maxFitness)}</div>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {(s?.evolutionaryCodeArena?.species ?? []).map((sp: string, i: number) => (
+                    <span key={i} className="px-1.5 py-0.5 bg-pink-900/30 rounded text-[9px] text-pink-400 border border-pink-800/20">{sp}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
             );
           })()}
 
