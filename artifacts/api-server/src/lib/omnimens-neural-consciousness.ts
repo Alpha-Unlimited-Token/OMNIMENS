@@ -1466,7 +1466,10 @@ function computeRegionActivation(region: NeuralRegion): void {
     region.firingRate = region.firingRate * 0.3 + baselineFiringFloor * 0.7;
   }
 
-  const rawActivation = sigmoid((region.firingRate - 0.08) * 12);
+  const sigBase = sigmoid((region.firingRate - 0.08) * 12);
+  const rawActivation = region.firingRate > 0.08
+    ? sigBase + Math.log2(1 + region.firingRate / 0.08)
+    : sigBase;
   const floor = REGION_ACTIVATION_FLOOR[region.name] || 0.25;
   region.activationLevel = Math.max(rawActivation, floor);
   region.lastUpdate = Date.now();
