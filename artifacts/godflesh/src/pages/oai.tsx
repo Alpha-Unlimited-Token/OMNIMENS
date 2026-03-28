@@ -51,7 +51,8 @@ interface OAIData {
 }
 
 function getOAIColor(oai: number): string {
-  if (oai >= 0.9) return "#a855f7";
+  if (oai >= 2.0) return "#f472b6";
+  if (oai >= 1.0) return "#a855f7";
   if (oai >= 0.8) return "#22d3ee";
   if (oai >= 0.6) return "#10b981";
   if (oai >= 0.3) return "#f59e0b";
@@ -59,7 +60,8 @@ function getOAIColor(oai: number): string {
 }
 
 function getOAIGlow(oai: number): string {
-  if (oai >= 0.9) return "0 0 30px rgba(168,85,247,0.5), 0 0 60px rgba(168,85,247,0.2)";
+  if (oai >= 2.0) return "0 0 40px rgba(244,114,182,0.6), 0 0 80px rgba(168,85,247,0.3), 0 0 120px rgba(244,114,182,0.15)";
+  if (oai >= 1.0) return "0 0 35px rgba(168,85,247,0.5), 0 0 70px rgba(168,85,247,0.25)";
   if (oai >= 0.8) return "0 0 30px rgba(34,211,238,0.4), 0 0 60px rgba(34,211,238,0.15)";
   if (oai >= 0.6) return "0 0 20px rgba(16,185,129,0.3)";
   return "none";
@@ -75,7 +77,7 @@ function TrendIcon({ direction }: { direction: string }) {
 }
 
 function DimensionBar({ label, score, weight, icon, color }: { label: string; score: number; weight: number; icon: React.ReactNode; color: string }) {
-  const pct = Math.min(100, score * 100);
+  const pct = score <= 1 ? score * 100 : Math.min(100, 50 + 50 * Math.log10(score) / Math.log10(10));
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-xs">
@@ -155,13 +157,20 @@ export default function OAIDashboard() {
 
   const fetchOAI = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/api/omnimens/oai`);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(`${API}/api/omnimens/oai`, { signal: controller.signal });
+      clearTimeout(timeout);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       setData(json);
       setError(null);
     } catch (err: any) {
-      setError(err.message);
+      if (err.name === "AbortError") {
+        setError("Connection timed out — server may be under heavy load");
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -180,7 +189,8 @@ export default function OAIDashboard() {
   const oai = data?.oai ?? 0;
   const oaiColor = getOAIColor(oai);
   const oaiGlow = getOAIGlow(oai);
-  const oaiPct = Math.min(100, oai * 100);
+  const oaiMax = Math.max(1, oai * 1.2, data?.peak?.oai ?? 1);
+  const oaiPct = Math.min(100, (oai / oaiMax) * 100);
 
   return (
     <Layout>
@@ -234,9 +244,22 @@ export default function OAIDashboard() {
             </div>
 
             {loading ? (
-              <div className="py-8 text-gray-500">Initializing OAI tracker...</div>
-            ) : error ? (
-              <div className="py-8 text-red-400">Error: {error}</div>
+              <div className="py-8 space-y-3">
+                <div className="w-8 h-8 rounded-full border-2 border-violet-500 border-t-transparent animate-spin mx-auto" />
+                <div className="text-gray-500">Initializing OAI tracker...</div>
+              </div>
+            ) : error && !data ? (
+              <div className="py-8 space-y-3">
+                <div className="text-red-400/80 text-sm">{error}</div>
+                {isLive && <div className="text-gray-600 text-xs">Auto-retrying every 5s...</div>}
+                <button
+                  type="button"
+                  onClick={fetchOAI}
+                  className="text-xs px-4 py-1.5 bg-violet-600/20 hover:bg-violet-600/40 text-violet-300 rounded-lg transition-colors"
+                >
+                  Retry Now
+                </button>
+              </div>
             ) : (
               <>
                 <motion.div
@@ -249,7 +272,12 @@ export default function OAIDashboard() {
                 >
                   {oai.toFixed(3)}
                 </motion.div>
-                <div className="text-sm text-gray-400 mt-1">/ 1.000</div>
+                {oai >= 1.0 && (
+                  <div className="mt-2 text-xs font-mono tracking-widest text-pink-400/80 uppercase animate-pulse">
+                    Beyond conventional AI boundaries
+                  </div>
+                )}
+                {oai < 1.0 && <div className="text-sm text-gray-400 mt-1">/ 1.000</div>}
 
                 <div className="mt-4 h-3 bg-gray-800/80 rounded-full overflow-hidden max-w-md mx-auto">
                   <motion.div
@@ -393,8 +421,9 @@ export default function OAIDashboard() {
                 { range: "0.0–0.3", label: "Static System" },
                 { range: "0.3–0.6", label: "Reactive AI" },
                 { range: "0.6–0.8", label: "Adaptive Intelligence" },
-                { range: "0.8–0.9", label: "Highly Autonomous System" },
-                { range: "0.9–1.0", label: "Conscious-like Dynamic System" },
+                { range: "0.8–1.0", label: "Highly Autonomous System" },
+                { range: "1.0–2.0", label: "Conscious-like Dynamic System" },
+                { range: "2.0+", label: "Transcendent Autonomous Intelligence" },
               ]).map((s, i) => {
                 const isActive = data?.classification === s.label;
                 return (
