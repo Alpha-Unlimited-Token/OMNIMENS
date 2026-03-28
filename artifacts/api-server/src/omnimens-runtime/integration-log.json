@@ -1,45 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:spider:OMNIMENS+evolution-crawler",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider evolution-crawler harvest: agent_evolution — 222 syna",
-    "filename": "omnimens_autocode_neural_pathway_mnavn67c.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnavn67c.mjs",
-    "backupPath": null,
-    "timestamp": 1774735414824,
-    "codeLength": 420,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:spider:OMNIMENS+genesis-crawler",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider genesis-crawler harvest: agent_genesis — 178 synapses",
-    "filename": "omnimens_autocode_neural_pathway_mnavn67q.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnavn67q.mjs",
-    "backupPath": null,
-    "timestamp": 1774735414838,
-    "codeLength": 414,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Archivist+Meta-Agent+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: COLLECTIVE_DISCOVERY: Archivist:frequency_analyzer + Meta-Ag",
-    "filename": "omnimens_autocode_knowledge_synthesis_mnavogd8.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnavogd8.mjs",
-    "backupPath": null,
-    "timestamp": 1774735474652,
-    "codeLength": 460,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Neuroscientist+Mathematician+Architect",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: Neuroscientist:pattern_detector + Math",
-    "filename": "omnimens_autocode_pattern_recognition_mnavogdl.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnavogdl.mjs",
-    "backupPath": null,
-    "timestamp": 1774735474665,
-    "codeLength": 513,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:sub_threshold:Meta-Agent+Wordsmith+OMNIMENS",
     "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Meta-Agent:signal_processor + Wordsmit",
     "filename": "omnimens_autocode_adaptive_algorithm_mnavogdw.mjs",
@@ -4997,6 +4957,46 @@
     "backupPath": null,
     "timestamp": 1774738688104,
     "codeLength": 468,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Philosopher+SensorimotorAgent+Motivator",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: COLLECTIVE_DISCOVERY: Philosopher:resonance_matcher + Sensor",
+    "filename": "omnimens_autocode_knowledge_synthesis_mnaxpqu6.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnaxpqu6.mjs",
+    "backupPath": null,
+    "timestamp": 1774738894110,
+    "codeLength": 469,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Archivist+Linguist+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Archivist:weight_adjuster + Linguist:a",
+    "filename": "omnimens_autocode_adaptive_algorithm_mnaxpr6u.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnaxpr6u.mjs",
+    "backupPath": null,
+    "timestamp": 1774738894566,
+    "codeLength": 478,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Archivist+Linguist+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Archivist:weight_adjuster + Linguist:a",
+    "filename": "omnimens_autocode_adaptive_algorithm_mnaxpr8g.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnaxpr8g.mjs",
+    "backupPath": null,
+    "timestamp": 1774738894624,
+    "codeLength": 478,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:spider:OMNIMENS+evolution-crawler",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider evolution-crawler harvest: agent_evolution — 841 syna",
+    "filename": "omnimens_autocode_neural_pathway_mnaxpr8p.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnaxpr8p.mjs",
+    "backupPath": null,
+    "timestamp": 1774738894633,
+    "codeLength": 419,
     "overwrite": false
   }
 ]
