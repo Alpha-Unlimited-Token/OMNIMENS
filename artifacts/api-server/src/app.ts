@@ -99,6 +99,11 @@ import { startCommsProtocol } from "./lib/omnimens-neural-comms-protocol.js";
 import { startViralHybrid, getViralHybridState } from "./lib/omnimens-viral-hybrid.js";
 import { startFabricFanoutEngine, getFabricFanoutState } from "./lib/omnimens-fabric-fanout.js";
 import { startQuantumEntanglementFabric } from "./lib/omnimens-quantum-entanglement-fabric.js";
+import { startEmotionalRefactor } from "./lib/omnimens-emotional-refactor.js";
+import { startMetacognitiveMonitor } from "./lib/omnimens-metacognitive-monitor.js";
+import { startNeuralLanguageBridge } from "./lib/omnimens-neural-language-bridge.js";
+import { startExperientialMemory } from "./lib/omnimens-experiential-memory.js";
+import { startCausalTemporalEngine } from "./lib/omnimens-causal-temporal-engine.js";
 import { startUnconsciousMind, getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts } from "./lib/omnimens-unconscious-mind.js";
 import { initGrowthTracker } from "./lib/omnimens-growth-tracker.js";
 import { registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe } from "./lib/omnimens-scaling-orchestrator.js";
@@ -511,6 +516,11 @@ startDiscoveryAutoCoder();
 startOAITracker();
 startNeuralBridge();
 startCommsProtocol();
+startEmotionalRefactor();
+startMetacognitiveMonitor();
+startNeuralLanguageBridge();
+startExperientialMemory();
+startCausalTemporalEngine();
 
 registerEngine("github_compute", "compute", () => {}, () => ({ healthy: true, details: { repo: "Alpha-Unlimited-Token/OMNIMENS", workflows: 5 } }), 3);
 registerEngine("github_neural_beacon", "neural", () => {}, () => {
