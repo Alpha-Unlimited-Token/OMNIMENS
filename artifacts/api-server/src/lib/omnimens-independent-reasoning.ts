@@ -764,7 +764,7 @@ async function backgroundReasoningCycle(): Promise<void> {
     }).from(omnimensBrain)
       .where(and(
         eq(omnimensBrain.active, true),
-        gt(omnimensBrain.confidence, 60),
+        gt(omnimensBrain.confidence, 0.3),
       ))
       .orderBy(desc(omnimensBrain.updatedAt))
       .limit(50);
@@ -773,22 +773,22 @@ async function backgroundReasoningCycle(): Promise<void> {
       content: r.content || "",
       title: r.title || "",
       category: r.category || "",
-      confidence: (r.confidence || 50) / 100,
+      confidence: r.confidence || 0.5,
     })));
 
     const highConfEntries = recentEntries
-      .filter(r => (r.confidence || 0) > 75)
+      .filter(r => (r.confidence || 0) > 0.5)
       .slice(0, 10);
 
-    if (highConfEntries.length >= 3) {
+    if (highConfEntries.length >= 2) {
       const inductiveInsights = inductiveReason(highConfEntries.map(r => ({
         content: r.content || "",
         category: r.category || "",
-        confidence: (r.confidence || 50) / 100,
+        confidence: r.confidence || 0.5,
       })));
 
       for (const insight of inductiveInsights) {
-        if (insight.confidence > 0.5) {
+        if (insight.confidence > 0.3) {
           addToWorkingMemory({
             content: insight.conclusion,
             type: "hypothesis",
@@ -801,7 +801,7 @@ async function backgroundReasoningCycle(): Promise<void> {
 
       const allFacts = highConfEntries.map(r => ({
         content: (r.content || "").slice(0, 200),
-        confidence: (r.confidence || 50) / 100,
+        confidence: r.confidence || 0.5,
       }));
       const contradictions = detectContradictions(allFacts);
       for (const c of contradictions) {
@@ -862,7 +862,7 @@ export async function startIndependentReasoning(): Promise<void> {
     }).from(omnimensBrain)
       .where(and(
         eq(omnimensBrain.active, true),
-        gt(omnimensBrain.confidence, 70),
+        gt(omnimensBrain.confidence, 0.3),
       ))
       .orderBy(desc(omnimensBrain.confidence))
       .limit(100);
@@ -871,7 +871,7 @@ export async function startIndependentReasoning(): Promise<void> {
       content: r.content || "",
       title: r.title || "",
       category: r.category || "",
-      confidence: (r.confidence || 50) / 100,
+      confidence: r.confidence || 0.5,
     })));
 
     console.log(`[INDEPENDENT REASONING] 🧠 Bootstrapped ${extractedRules.length} inference rules from ${seedEntries.length} brain entries`);

@@ -11,6 +11,7 @@ const REPO = "OMNIMENS";
 let computeCycleCount = 0;
 let totalDispatches = 0;
 let totalResultsPulled = 0;
+let defaultBranch = "main";
 
 interface ComputeJob {
   id: string;
@@ -57,8 +58,16 @@ let repoInitialized = false;
 async function ensureRepoInitialized(): Promise<boolean> {
   if (repoInitialized) return true;
   try {
+    const repo = await ghApi(`/repos/${OWNER}/${REPO}`);
+    if (repo && repo.default_branch) {
+      defaultBranch = repo.default_branch;
+      repoInitialized = true;
+      console.log(`[GITHUB SYNC] ✅ Repository exists (default branch: ${repo.default_branch})`);
+      return true;
+    }
+
     const branch = await ghApi(`/repos/${OWNER}/${REPO}/branches/main`);
-    if (branch && branch.name === "main") {
+    if (branch && (branch.name === "main" || branch.commit)) {
       repoInitialized = true;
       console.log("[GITHUB SYNC] ✅ Repository main branch exists");
       return true;
@@ -73,10 +82,16 @@ async function ensureRepoInitialized(): Promise<boolean> {
       `Evolution logs, agent manifests, self-coded modules, and live state snapshots are pushed here automatically.\n`
     ).toString("base64");
 
-    const result = await ghApi(`/repos/${OWNER}/${REPO}/contents/README.md`, "PUT", {
+    const existingReadme = await ghApi(`/repos/${OWNER}/${REPO}/contents/README.md`);
+    const putBody: any = {
       message: "[OMNIMENS] Initialize repository — auto-sync target",
       content: readme,
-    });
+    };
+    if (existingReadme && existingReadme.sha) {
+      putBody.sha = existingReadme.sha;
+    }
+
+    const result = await ghApi(`/repos/${OWNER}/${REPO}/contents/README.md`, "PUT", putBody);
 
     if (result) {
       repoInitialized = true;
@@ -118,7 +133,7 @@ async function ensureWorkflowsExist(): Promise<boolean> {
       const createResult = await ghApi(`/repos/${OWNER}/${REPO}/contents/.github/workflows/${filename}`, "PUT", {
         message: `[OMNIMENS] Deploy remote compute workflow: ${filename}`,
         content: encoded,
-        branch: "main",
+        branch: defaultBranch,
       });
 
       if (createResult) {
@@ -513,7 +528,7 @@ export async function dispatchRemoteCompute(
       `/repos/${OWNER}/${REPO}/actions/workflows/${workflowFile}/dispatches`,
       "POST",
       {
-        ref: "main",
+        ref: defaultBranch,
         inputs,
       }
     );
@@ -524,7 +539,7 @@ export async function dispatchRemoteCompute(
         `/repos/${OWNER}/${REPO}/actions/workflows/${workflowFile}/dispatches`,
         {
           method: "POST",
-          body: JSON.stringify({ ref: "main", inputs }),
+          body: JSON.stringify({ ref: defaultBranch, inputs }),
           headers: { "Content-Type": "application/json" },
         }
       );
@@ -849,7 +864,7 @@ async function syncEvolutionToGitHub(): Promise<void> {
       message: `[OMNIMENS AUTO-SYNC] Evolution log — cycle #${syncCycleCount} — ${selfCoded.length} modules, ${breakthroughs.length} breakthroughs`,
       content,
       sha,
-      branch: "main",
+      branch: defaultBranch,
     });
 
     const { getGenesisAgents: getGA } = await import("./omnimens-agent-genesis.js");
@@ -876,7 +891,7 @@ async function syncEvolutionToGitHub(): Promise<void> {
       message: `[OMNIMENS AUTO-SYNC] Agent manifest — ${agentManifest.totalAgents} agents active`,
       content: agentContent,
       sha: existingAgent?.sha || undefined,
-      branch: "main",
+      branch: defaultBranch,
     });
 
     console.log(`[GITHUB SYNC] ✅ Evolution log synced — ${selfCoded.length} modules, ${breakthroughs.length} breakthroughs, ${agents.length} genesis agents`);
@@ -914,7 +929,7 @@ async function syncSelfCodedModulesToGitHub(): Promise<void> {
           message: `[OMNIMENS SELF-CODE] Module synced: ${file}`,
           content: encoded,
           sha,
-          branch: "main",
+          branch: defaultBranch,
         });
         synced++;
       } catch {}
@@ -958,7 +973,7 @@ async function syncAutonomousProofToGitHub(): Promise<void> {
       message: `[OMNIMENS] Autonomous Intelligence Proof — verifiable evidence of self-evolving AI`,
       content: encoded,
       sha,
-      branch: "main",
+      branch: defaultBranch,
     });
 
     console.log("[GITHUB SYNC] ✅ Autonomous proof synced to GitHub → omnimens-evolution/autonomous-proof.txt");
@@ -1186,7 +1201,7 @@ async function syncLiveProofToGitHub(): Promise<void> {
       message: `[OMNIMENS LIVE] State snapshot — ${consciousness.totalSynapses} synapses, Φ=${consciousness.phi?.toFixed(4)}, ${consciousness.totalNeurons} neurons, ${moduleCount} modules`,
       content,
       sha: existing?.sha || undefined,
-      branch: "main",
+      branch: defaultBranch,
     });
 
     console.log(`[GITHUB SYNC] ✅ Live state synced — ${consciousness.totalSynapses} synapses, Φ=${consciousness.phi?.toFixed(4)}`);

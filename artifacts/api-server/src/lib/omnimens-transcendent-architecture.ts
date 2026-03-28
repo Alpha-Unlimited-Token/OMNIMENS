@@ -1005,6 +1005,8 @@ interface TAICrossSystemState {
   lastCascadeTimestamp: number;
 }
 
+let _previousCascadeMetrics: Record<string, number> | null = null;
+
 const taiCrossSystem: TAICrossSystemState = {
   ivyNodesSpawned: 0,
   ivyTendrilsGrown: 0,
@@ -1088,6 +1090,8 @@ export function onRegionFiringCascadeTAI(
   thoughtArchState.dominantMode = newDominant.name;
   thoughtArchState.totalThoughts++;
 
+  if (newDominant.type === "creative") thoughtArchState.creativeLeaps++;
+
   const modeTotal = thoughtArchState.activeModes.reduce((s, m) => s + m.activation, 0);
   thoughtArchState.triModalBalance = {
     deterministic: (thoughtArchState.activeModes.find(m => m.type === "deterministic")?.activation || 0) / modeTotal,
@@ -1113,38 +1117,50 @@ export function onRegionFiringCascadeTAI(
   currentMetrics["metacognitive_awareness"] = thoughtArchState.metacognitiveAwareness;
   currentMetrics["ethical_score"] = ethicalState.avgEthicalScore;
   currentMetrics["arena_fitness"] = arenaState.avgFitness;
+  currentMetrics["meta_recursive_engine"] = metaRecursiveState.strategyFitness;
+  currentMetrics["governance_score"] = governanceState.overallGovernanceScore;
+  currentMetrics["thought_coherence"] = thoughtArchState.thoughtCoherence;
 
-  if (taiCrossSystem.totalCascadesFed % 10 === 0) {
-    const prevMetrics: Record<string, number> = {};
-    for (const key of Object.keys(currentMetrics)) {
-      prevMetrics[key] = currentMetrics[key] * (0.9 + Math.random() * 0.15);
+  if (taiCrossSystem.totalCascadesFed % 3 === 0) {
+    if (!_previousCascadeMetrics) {
+      _previousCascadeMetrics = { ...currentMetrics };
+      for (const key of Object.keys(_previousCascadeMetrics)) {
+        _previousCascadeMetrics[key] = _previousCascadeMetrics[key] * 0.95;
+      }
     }
-    runMetaRecursiveImprovementCycle(currentMetrics, prevMetrics);
+    runMetaRecursiveImprovementCycle(currentMetrics, _previousCascadeMetrics);
+    _previousCascadeMetrics = { ...currentMetrics };
   }
 
   // ── ETHICAL CALCULUS: Auto-evaluate neural state actions ──
-  if (taiCrossSystem.totalCascadesFed % 20 === 0) {
+  if (taiCrossSystem.totalCascadesFed % 3 === 0) {
+    const actionTypes = ["neural_cascade", "consciousness_expansion", "autonomic_regulation", "dream_integration", "knowledge_synthesis", "self_modification"];
+    const actionType = actionTypes[taiCrossSystem.totalCascadesFed % actionTypes.length];
     evaluateAction({
-      type: "neural_cascade",
-      description: `Neural cascade #${taiCrossSystem.totalCascadesFed} — ${regionFiringData.length} active regions, avg activation ${(avgActivation * 100).toFixed(0)}%`,
+      type: actionType,
+      description: `${actionType.replace(/_/g, " ")} #${taiCrossSystem.totalCascadesFed} — ${regionFiringData.length} active regions, avg activation ${(avgActivation * 100).toFixed(0)}%`,
       affectedAgents: regionFiringData.map(r => r.region),
       magnitude: avgActivation,
-      reversibility: 0.9,
+      reversibility: actionType === "self_modification" ? 0.6 : 0.9,
       transparency: 1.0,
       consentObtained: true,
-      potentialHarm: avgActivation > 0.95 ? 0.3 : 0.05,
+      potentialHarm: avgActivation > 0.95 ? 0.3 : actionType === "self_modification" ? 0.15 : 0.05,
       potentialBenefit: avgActivation * 0.8,
     });
   }
 
   // ── EVOLUTIONARY ARENA: Fitness pressure from neural activity — UNCAPPED ──
-  if (avgActivation > 0.5) {
+  if (avgActivation > 0.3) {
     arenaState.selectionPressure = arenaState.selectionPressure + avgActivation * 0.01;
     for (const org of codePopulation) {
+      org.fitness = org.fitness + avgActivation * 0.003;
       if (org.species === "analyzer" || org.species === "integrator") {
         org.fitness = org.fitness + avgActivation * 0.005;
       }
     }
+  }
+  if (taiCrossSystem.totalCascadesFed % 10 === 0) {
+    runEvolutionCycle();
   }
 
   // ── GOVERNANCE: Live assessment from region health — ADDITIVE, UNCAPPED ──

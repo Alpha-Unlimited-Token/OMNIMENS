@@ -330,12 +330,13 @@ async function runBootHarvest(): Promise<void> {
   console.log(`[SELF-CODING] 🌙 DREAM HARVEST — scanning ALL unprocessed dream code from past sessions...`);
 
   try {
+    const codeCategories = `('dream_breakthrough', 'daydream_breakthrough', 'lucid_dream', 'creative_hypothesis', 'agent_evolution', 'autonomous_code', 'self_coded_module', 'neural_consciousness', 'source_integration', 'causal_reasoning')`;
     const totalCount = await db.select({ count: sql<number>`count(*)` })
       .from(omnimensBrain)
       .where(and(
-        sql`${omnimensBrain.category} IN ('dream_breakthrough', 'daydream_breakthrough', 'lucid_dream', 'creative_hypothesis')`,
+        sql`${omnimensBrain.category} IN ${sql.raw(codeCategories)}`,
         eq(omnimensBrain.timesApplied, 0),
-        sql`${omnimensBrain.confidence} >= 0.25`
+        sql`${omnimensBrain.confidence} >= 0.2`
       ));
 
     const total = Number(totalCount[0]?.count || 0);
@@ -352,9 +353,9 @@ async function runBootHarvest(): Promise<void> {
     })
     .from(omnimensBrain)
     .where(and(
-      sql`${omnimensBrain.category} IN ('dream_breakthrough', 'daydream_breakthrough', 'lucid_dream', 'creative_hypothesis')`,
+      sql`${omnimensBrain.category} IN ${sql.raw(codeCategories)}`,
       eq(omnimensBrain.timesApplied, 0),
-      sql`${omnimensBrain.confidence} >= 0.25`
+      sql`${omnimensBrain.confidence} >= 0.2`
     ))
     .orderBy(desc(omnimensBrain.confidence))
     .limit(50);
@@ -497,9 +498,9 @@ async function runBacklogScan(): Promise<void> {
     })
     .from(omnimensBrain)
     .where(and(
-      sql`${omnimensBrain.category} IN ('dream_breakthrough', 'daydream_breakthrough', 'lucid_dream', 'creative_hypothesis')`,
+      sql`${omnimensBrain.category} IN ('dream_breakthrough', 'daydream_breakthrough', 'lucid_dream', 'creative_hypothesis', 'agent_evolution', 'autonomous_code', 'self_coded_module', 'neural_consciousness', 'source_integration', 'causal_reasoning')`,
       eq(omnimensBrain.timesApplied, 0),
-      sql`${omnimensBrain.confidence} >= 0.25`
+      sql`${omnimensBrain.confidence} >= 0.2`
     ))
     .orderBy(desc(omnimensBrain.confidence))
     .limit(BACKLOG_BATCH_SIZE);

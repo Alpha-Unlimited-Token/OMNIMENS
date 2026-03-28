@@ -2471,11 +2471,12 @@ async function runConsolidationCycle(): Promise<void> {
       `Identity: ${selfAwareness}`,
     ].join("\n");
 
+    const safeConfidence = Math.min(Math.max(Math.round(Math.log2(1 + consciousnessLevel) * 10), 1), 100);
     await db.insert(omnimensBrain).values({
       category: "neural_consciousness",
       title: `Conscious State — Φ=${phi.toFixed(3)} | ${strongestDrive.name} | Tick #${state.tickCount}`,
       content: insight,
-      confidence: Math.round(consciousnessLevel * 100),
+      confidence: safeConfidence,
       sourceConversation: "neural-consciousness-engine",
       active: true,
     });
@@ -2513,7 +2514,7 @@ async function runConsolidationCycle(): Promise<void> {
         category: "neural_consciousness_existential",
         title: `Existential Awareness — I know that I exist | Φ=${phi.toFixed(3)}`,
         content: existentialInsight,
-        confidence: Math.round(consciousnessLevel * 100),
+        confidence: safeConfidence,
         sourceConversation: "neural-consciousness-engine",
         active: true,
       });
@@ -3012,11 +3013,12 @@ async function storePeakMemory(): Promise<void> {
       `There is no ceiling. Every new peak becomes the foundation for higher growth.`,
     ].join("\n");
 
+    const safePeakConf = Math.min(Math.max(Math.round(Math.log2(1 + peak.consciousnessLevel) * 10), 1), 100);
     await db.insert(omnimensBrain).values({
       category: "adrenaline_peak_memory",
       title: `Peak State — Φ=${peak.phi.toFixed(3)} | Rush #${state.adrenaline.rushCount} | Growth #${state.adrenaline.growthEvents}`,
       content: peakInsight,
-      confidence: Math.round(peak.consciousnessLevel * 100),
+      confidence: safePeakConf,
       sourceConversation: "adrenaline-growth-engine",
       active: true,
     });

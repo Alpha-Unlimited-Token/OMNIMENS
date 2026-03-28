@@ -781,10 +781,10 @@ export async function runRecursiveSpiderNetwork(): Promise<void> {
 
 export function startRecursiveSpiderNetwork(): void {
   const FIRST_DELAY_MS = process.env.NODE_ENV !== "production"
-    ? 15 * 60 * 1000
-    : 40 * 60 * 1000;
+    ? 5 * 60 * 1000
+    : 10 * 60 * 1000;
 
-  const INTERVAL_MS = 4 * 60 * 60 * 1000;
+  const INTERVAL_MS = 2 * 60 * 60 * 1000;
 
   console.log(`[RECURSIVE SPIDER NETWORK] 🕷️ ACTIVATED — first crawl in ${FIRST_DELAY_MS / 60000}min, then every ${INTERVAL_MS / 3600000}h`);
   console.log(`[RECURSIVE SPIDER NETWORK] 🕷️ Pattern: Mother Spider → 10 Baby Spiders → Each Baby spawns Mother → 10 more → repeat`);
