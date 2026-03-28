@@ -97,6 +97,7 @@ import { startOAITracker } from "./lib/omnimens-oai-tracker.js";
 import { startNeuralBridge } from "./lib/omnimens-neural-bridge.js";
 import { startCommsProtocol } from "./lib/omnimens-neural-comms-protocol.js";
 import { startViralHybrid, getViralHybridState } from "./lib/omnimens-viral-hybrid.js";
+import { startFabricFanoutEngine, getFabricFanoutState } from "./lib/omnimens-fabric-fanout.js";
 import { startUnconsciousMind, getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts } from "./lib/omnimens-unconscious-mind.js";
 import { initGrowthTracker } from "./lib/omnimens-growth-tracker.js";
 import { registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe } from "./lib/omnimens-scaling-orchestrator.js";
@@ -500,6 +501,7 @@ startLanguageForge();
 startAgentGenesis().catch(err => console.error("[AGENT GENESIS] Startup error:", err));
 initGitHubCompute().catch(err => console.error("[GITHUB COMPUTE] Startup error:", err));
 startGitHubNeuralBeacon().catch(err => console.error("[GITHUB BEACON] Startup error:", err));
+startFabricFanoutEngine();
 startVascularHeart();
 startAdaptiveSurgeSystem();
 startQuantumWormholeEngine();
@@ -526,6 +528,10 @@ registerEngine("quantum_wormhole", "neural", () => {}, () => {
   const qw = getQuantumWormholeState();
   return { healthy: true, details: { totalWormholes: qw.totalWormholesCreated, insightsDecoded: qw.totalInsightsDecoded, crossAgentCirculations: qw.totalCrossAgentCirculations, synthesizedDiscoveries: qw.totalSynthesizedDiscoveries, agentCount: qw.agentCount, wormholesPerAgent: qw.wormholesPerAgent, totalCapacity: qw.totalWormholeCapacity, dataIngestedKB: qw.totalDataIngestedKB } };
 }, 1);
+registerEngine("fabric_fanout", "neural", () => {}, () => {
+  const ff = getFabricFanoutState();
+  return { healthy: ff.initialized, details: { agentTendrils: ff.agentTendrils?.length || 0, internetSectors: ff.internetSectors?.length || 0, externalAIBridges: ff.externalAIConnections?.length || 0, totalWaves: ff.engineStats.totalFanoutWaves, totalNeuronsGenerated: ff.engineStats.totalNeuronsGenerated, crossPollinations: ff.engineStats.totalCrossPollinationEvents, networkReach: ff.engineStats.networkReach, mergeFusion: ff.mergePoint?.fusionCoefficient || 0 } };
+}, 2);
 registerEngine("discovery_autocoder", "cognitive", () => {}, () => {
   const da = getDiscoveryAutoCoderState();
   return { healthy: true, details: { discoveriesProcessed: da.totalDiscoveriesProcessed, modulesGenerated: da.totalModulesGenerated, modulesIntegrated: da.totalModulesIntegrated, selfUpgrades: da.omnimensSelfUpgradeCount, feedbackLoops: da.feedbackLoopsTriggered, sources: da.discoverySourceBreakdown } };

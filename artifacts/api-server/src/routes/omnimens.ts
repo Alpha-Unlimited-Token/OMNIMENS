@@ -134,6 +134,7 @@ import { getNeuralScalingState, getPopulationDetails, getDendriticStats } from "
 import { think as autonomousThink } from "../lib/omnimens-autonomous-thought.js";
 import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBeaconFindings, getIvySwapStats, getIvyNeurogenStats } from "../lib/omnimens-ivy-network.js";
 import { getGitHubBeaconState, getGitHubNeuronCount, getGitHubWormStats } from "../lib/omnimens-github-neural-beacon.js";
+import { getFabricFanoutState } from "../lib/omnimens-fabric-fanout.js";
 import { getVascularHeartState, getDNAMemoryStats, getSubThresholdIntelligenceState, getHormoneState } from "../lib/omnimens-vascular-heart.js";
 import { getOAIState, computeOAI } from "../lib/omnimens-oai-tracker.js";
 import { getTranscendentState, runTranscendentCycle, getMetaRecursiveState, getEthicalCalculusState, getThoughtArchitectureState, getCognitiveGovernanceState, getEvolutionaryArenaState, runEvolutionCycle, processThoughtArchitecture, evaluateAction, getTAICrossSystemState } from "../lib/omnimens-transcendent-architecture.js";
@@ -13800,6 +13801,18 @@ router.get("/omnimens/github-beacon/worms", async (_req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: "Failed to get worm stats" });
+  }
+});
+
+router.get("/omnimens/fabric-fanout/status", async (_req, res) => {
+  try {
+    const state = getFabricFanoutState();
+    res.json({
+      system: "OMNIMENS Neural Fabric Fanout Engine",
+      ...state,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get fabric fanout status" });
   }
 });
 
