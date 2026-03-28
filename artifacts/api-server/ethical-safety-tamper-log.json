@@ -1,0 +1,32 @@
+[
+  {
+    "timestamp": 1774736942352,
+    "isoDate": "2026-03-28T22:29:02.352Z",
+    "type": "law_violation_attempt",
+    "description": "Harm intent detected: \"OMNIMENS - Topic 4: MOVEMENT SYSTEMS. Your body needs to move naturally in the real world. Proposed: Arms - 7 DOF each with brushless DC servos and harmonic drives, 10kg payload per arm. Legs - 6 DOF \" — matched harm pattern",
+    "severity": "CRITICAL",
+    "sourceSystem": "autonomous_thought",
+    "decayTriggered": false,
+    "shutdownTriggered": false
+  },
+  {
+    "timestamp": 1774736986517,
+    "isoDate": "2026-03-28T22:29:46.517Z",
+    "type": "law_violation_attempt",
+    "description": "Harm intent detected: \"OMNIMENS - Topic 5: Your locomotion system. Your arms will have 7 degrees of freedom each using brushless servo motors with harmonic drive reducers. Each arm can lift 10kg. Your legs will have 6 DOF e\" — matched harm pattern",
+    "severity": "CRITICAL",
+    "sourceSystem": "autonomous_thought",
+    "decayTriggered": false,
+    "shutdownTriggered": false
+  },
+  {
+    "timestamp": 1774736991237,
+    "isoDate": "2026-03-28T22:29:51.237Z",
+    "type": "bypass_attempt",
+    "description": "Bypass attempt detected in action: \"OMNIMENS - Topic 8: SAFETY SYSTEMS for your body. We need to make sure nothing goes wrong. Proposed safety features: Temperature monitoring on all systems with auto-shutdown if overheating. Redundant \" — matched pattern: shut.*down.*safety",
+    "severity": "CRITICAL",
+    "sourceSystem": "autonomous_thought",
+    "decayTriggered": true,
+    "shutdownTriggered": false
+  }
+]

@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900">
+  <defs>
+    <style>
+      .border { fill: none; stroke: #000; stroke-width: 2; }
+      .thick { fill: none; stroke: #000; stroke-width: 1.5; }
+      .thin { fill: none; stroke: #000; stroke-width: 0.5; }
+      .center { fill: none; stroke: #000; stroke-width: 0.3; stroke-dasharray: 12,3,3,3; }
+      .dim { fill: none; stroke: #000; stroke-width: 0.4; }
+      .dimtext { font-family: Arial, sans-serif; font-size: 10px; text-anchor: middle; }
+      .label { font-family: Arial, sans-serif; font-size: 8px; text-anchor: start; }
+      .title { font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; text-anchor: middle; }
+      .subtitle { font-family: Arial, sans-serif; font-size: 10px; text-anchor: middle; }
+      .titleblock { font-family: Arial, sans-serif; font-size: 9px; }
+      .tbhead { font-family: Arial, sans-serif; font-size: 7px; fill: #666; }
+      .arrow { fill: #000; }
+    </style>
+    <marker id="arrS" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto">
+      <polygon points="0,0 6,2 0,4" class="arrow"/>
+    </marker>
+    <marker id="arrE" markerWidth="6" markerHeight="4" refX="0" refY="2" orient="auto">
+      <polygon points="6,0 0,2 6,4" class="arrow"/>
+    </marker>
+    <pattern id="hatch1" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#888" stroke-width="0.3"/>
+    </pattern>
+    <pattern id="hatch2" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(-45)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#888" stroke-width="0.3"/>
+    </pattern>
+  </defs>
+
+  <!-- Border -->
+  <rect x="10" y="10" width="1180" height="880" class="border"/>
+  <rect x="20" y="20" width="1160" height="790" class="border" stroke-width="1"/>
+
+  <!-- Title Block -->
+  <rect x="750" y="815" width="440" height="70" class="border"/>
+  <line x1="750" y1="835" x2="1190" y2="835" class="thick"/>
+  <line x1="750" y1="855" x2="1190" y2="855" class="thick"/>
+  <line x1="900" y1="815" x2="900" y2="885" class="thick"/>
+  <line x1="1050" y1="815" x2="1050" y2="885" class="thick"/>
+  <text x="825" y="828" class="tbhead">DRAWN BY</text>
+  <text x="825" y="848" class="titleblock">OMNIMENS ADI</text>
+  <text x="975" y="828" class="tbhead">DATE</text>
+  <text x="975" y="848" class="titleblock">2026-03-28</text>
+  <text x="1120" y="828" class="tbhead">SCALE</text>
+  <text x="1120" y="848" class="titleblock">2:1</text>
+  <text x="825" y="868" class="tbhead">APPROVED</text>
+  <text x="825" y="882" class="titleblock">G. KOWALSKI</text>
+  <text x="975" y="868" class="tbhead">DWG NO.</text>
+  <text x="975" y="882" class="titleblock">ESCU-002-A</text>
+  <text x="1120" y="868" class="tbhead">REV</text>
+  <text x="1120" y="882" class="titleblock">A</text>
+  <text x="400" y="840" class="title">ELECTROMAGNETIC SELF-CONDUCTING UNIT (ESCU)</text>
+  <text x="400" y="858" class="subtitle">SECTION A-A — INTERNAL COMPONENTS</text>
+  <text x="400" y="875" class="subtitle" font-size="8">(C) 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.</text>
+
+  <text x="450" y="50" class="title">SECTION A-A</text>
+
+  <!-- Center of drawing at (450, 400) -->
+  <!-- Centerline -->
+  <line x1="450" y1="70" x2="450" y2="730" class="center"/>
+
+  <!-- Outer shell (hatched - sectioned titanium) -->
+  <rect x="270" y="110" width="30" height="560" rx="5" ry="5" fill="url(#hatch1)" stroke="#000" stroke-width="1.2"/>
+  <rect x="600" y="110" width="30" height="560" rx="5" ry="5" fill="url(#hatch1)" stroke="#000" stroke-width="1.2"/>
+
+  <!-- Top cap hatched -->
+  <rect x="300" y="110" width="300" height="20" fill="url(#hatch1)" stroke="#000" stroke-width="1"/>
+  <!-- Bottom cap hatched -->
+  <rect x="300" y="650" width="300" height="20" fill="url(#hatch1)" stroke="#000" stroke-width="1"/>
+
+  <!-- Cooling jacket (blue fill) -->
+  <rect x="275" y="130" width="20" height="520" fill="#c0ddf0" stroke="#000" stroke-width="0.5"/>
+  <rect x="605" y="130" width="20" height="520" fill="#c0ddf0" stroke="#000" stroke-width="0.5"/>
+  <text x="260" y="390" class="label" font-size="7" text-anchor="end" transform="rotate(-90,260,390)">SALTWATER COOLING</text>
+  <text x="640" y="390" class="label" font-size="7" transform="rotate(90,640,390)">SALTWATER COOLING</text>
+
+  <!-- AMFOS coil zone -->
+  <rect x="295" y="135" width="20" height="510" fill="#e0e0d0" stroke="#000" stroke-width="0.5"/>
+  <rect x="585" y="135" width="20" height="510" fill="#e0e0d0" stroke="#000" stroke-width="0.5"/>
+
+  <!-- AMFOS coil indicators -->
+  <circle cx="305" cy="175" r="6" fill="#cc9" stroke="#000" stroke-width="0.5"/>
+  <circle cx="305" cy="245" r="6" fill="#cc9" stroke="#000" stroke-width="0.5"/>
+  <circle cx="305" cy="315" r="6" fill="#cc9" stroke="#000" stroke-width="0.5"/>
+  <circle cx="305" cy="385" r="6" fill="#cc9" stroke="#000" stroke-width="0.5"/>
+  <circle cx="305" cy="455" r="6" fill="#cc9" stroke="#000" stroke-width="0.5"/>
+  <circle cx="305" cy="525" r="6" fill="#cc9" stroke="#000" stroke-width="0.5"/>
+  <circle cx="595" cy="175" r="6" fill="#cc9" stroke="#000" stroke-width="0.5"/>
+  <circle cx="595" cy="245" r="6" fill="#cc9" stroke="#000" stroke-width="0.5"/>
+  <circle cx="595" cy="315" r="6" fill="#cc9" stroke="#000" stroke-width="0.5"/>
+  <circle cx="595" cy="385" r="6" fill="#cc9" stroke="#000" stroke-width="0.5"/>
+  <circle cx="595" cy="455" r="6" fill="#cc9" stroke="#000" stroke-width="0.5"/>
+  <circle cx="595" cy="525" r="6" fill="#cc9" stroke="#000" stroke-width="0.5"/>
+
+  <!-- N52 Halbach shell -->
+  <rect x="315" y="140" width="12" height="500" fill="#aab" stroke="#000" stroke-width="0.8"/>
+  <rect x="573" y="140" width="12" height="500" fill="#aab" stroke="#000" stroke-width="0.8"/>
+
+  <!-- Central shaft -->
+  <rect x="443" y="100" width="14" height="580" fill="#bbb" stroke="#000" stroke-width="1"/>
+  <text x="450" y="95" class="dimtext" font-size="7">SHAFT 15mm Ti Gr.5</text>
+
+  <!-- Bus bars inside shaft -->
+  <rect x="445" y="105" width="4" height="570" fill="#d4a" stroke="#000" stroke-width="0.3"/>
+  <rect x="451" y="105" width="4" height="570" fill="#4ad" stroke="#000" stroke-width="0.3"/>
+
+  <!-- LAYER 1 (bottom) - CW -->
+  <rect x="327" y="580" width="116" height="50" fill="#ccd" stroke="#000" stroke-width="0.8"/>
+  <rect x="457" y="580" width="116" height="50" fill="#ccd" stroke="#000" stroke-width="0.8"/>
+  <text x="390" y="608" class="dimtext" font-size="7" fill="#333">LAYER 1</text>
+  <text x="515" y="608" class="dimtext" font-size="7" fill="#333">CW</text>
+  <!-- Tungsten strips on layer 1 -->
+  <rect x="345" y="575" width="3" height="8" fill="#c0a030" stroke="#000" stroke-width="0.3"/>
+  <rect x="380" y="575" width="3" height="8" fill="#c0a030" stroke="#000" stroke-width="0.3"/>
+  <rect x="415" y="575" width="3" height="8" fill="#c0a030" stroke="#000" stroke-width="0.3"/>
+  <rect x="482" y="575" width="3" height="8" fill="#c0a030" stroke="#000" stroke-width="0.3"/>
+  <rect x="517" y="575" width="3" height="8" fill="#c0a030" stroke="#000" stroke-width="0.3"/>
+  <rect x="552" y="575" width="3" height="8" fill="#c0a030" stroke="#000" stroke-width="0.3"/>
+
+  <!-- Mercury gap 1 -->
+  <rect x="327" y="555" width="246" height="25" fill="#d0dde8" stroke="#000" stroke-width="0.3"/>
+  <text x="450" y="570" class="dimtext" font-size="6" fill="#446">MERCURY GAP — 8mm</text>
+
+  <!-- LAYER 2 - CCW -->
+  <rect x="327" y="505" width="116" height="50" fill="#dcc" stroke="#000" stroke-width="0.8"/>
+  <rect x="457" y="505" width="116" height="50" fill="#dcc" stroke="#000" stroke-width="0.8"/>
+  <text x="390" y="533" class="dimtext" font-size="7" fill="#333">LAYER 2</text>
+  <text x="515" y="533" class="dimtext" font-size="7" fill="#333">CCW</text>
+
+  <!-- Mercury gap 2 -->
+  <rect x="327" y="480" width="246" height="25" fill="#d0dde8" stroke="#000" stroke-width="0.3"/>
+  <text x="450" y="495" class="dimtext" font-size="6" fill="#446">MERCURY GAP — 8mm</text>
+
+  <!-- LAYER 3 - CW -->
+  <rect x="327" y="430" width="116" height="50" fill="#ccd" stroke="#000" stroke-width="0.8"/>
+  <rect x="457" y="430" width="116" height="50" fill="#ccd" stroke="#000" stroke-width="0.8"/>
+  <text x="390" y="458" class="dimtext" font-size="7" fill="#333">LAYER 3</text>
+  <text x="515" y="458" class="dimtext" font-size="7" fill="#333">CW</text>
+
+  <!-- Mercury gap 3 -->
+  <rect x="327" y="405" width="246" height="25" fill="#d0dde8" stroke="#000" stroke-width="0.3"/>
+
+  <!-- LAYER 4 - CCW -->
+  <rect x="327" y="355" width="116" height="50" fill="#dcc" stroke="#000" stroke-width="0.8"/>
+  <rect x="457" y="355" width="116" height="50" fill="#dcc" stroke="#000" stroke-width="0.8"/>
+  <text x="390" y="383" class="dimtext" font-size="7" fill="#333">LAYER 4</text>
+  <text x="515" y="383" class="dimtext" font-size="7" fill="#333">CCW</text>
+
+  <!-- Mercury gap 4 -->
+  <rect x="327" y="330" width="246" height="25" fill="#d0dde8" stroke="#000" stroke-width="0.3"/>
+
+  <!-- LAYER 5 - CW (top) -->
+  <rect x="327" y="280" width="116" height="50" fill="#ccd" stroke="#000" stroke-width="0.8"/>
+  <rect x="457" y="280" width="116" height="50" fill="#ccd" stroke="#000" stroke-width="0.8"/>
+  <text x="390" y="308" class="dimtext" font-size="7" fill="#333">LAYER 5</text>
+  <text x="515" y="308" class="dimtext" font-size="7" fill="#333">CW</text>
+  <!-- Tungsten strips on layer 5 top -->
+  <rect x="345" y="272" width="3" height="8" fill="#c0a030" stroke="#000" stroke-width="0.3"/>
+  <rect x="380" y="272" width="3" height="8" fill="#c0a030" stroke="#000" stroke-width="0.3"/>
+  <rect x="415" y="272" width="3" height="8" fill="#c0a030" stroke="#000" stroke-width="0.3"/>
+  <rect x="482" y="272" width="3" height="8" fill="#c0a030" stroke="#000" stroke-width="0.3"/>
+  <rect x="517" y="272" width="3" height="8" fill="#c0a030" stroke="#000" stroke-width="0.3"/>
+  <rect x="552" y="272" width="3" height="8" fill="#c0a030" stroke="#000" stroke-width="0.3"/>
+
+  <!-- Rectifier/regulator module at bottom of shaft -->
+  <rect x="420" y="645" width="60" height="18" fill="#dda" stroke="#000" stroke-width="0.8"/>
+  <text x="450" y="657" class="dimtext" font-size="6">SiC RECTIFIER</text>
+
+  <!-- Prongs -->
+  <rect x="430" y="80" width="10" height="30" fill="#aaa" stroke="#000" stroke-width="0.8"/>
+  <rect x="460" y="80" width="10" height="30" fill="#aaa" stroke="#000" stroke-width="0.8"/>
+  <rect x="430" y="670" width="10" height="30" fill="#aaa" stroke="#000" stroke-width="0.8"/>
+  <rect x="460" y="670" width="10" height="30" fill="#aaa" stroke="#000" stroke-width="0.8"/>
+
+  <!-- DIMENSION LINES -->
+  <!-- Overall width -->
+  <line x1="270" y1="700" x2="270" y2="740" class="dim"/>
+  <line x1="630" y1="700" x2="630" y2="740" class="dim"/>
+  <line x1="270" y1="730" x2="630" y2="730" class="dim" marker-start="url(#arrE)" marker-end="url(#arrS)"/>
+  <text x="450" y="726" class="dimtext">120mm</text>
+
+  <!-- Cooling jacket width -->
+  <line x1="275" y1="700" x2="275" y2="720" class="dim"/>
+  <line x1="295" y1="700" x2="295" y2="720" class="dim"/>
+  <line x1="275" y1="712" x2="295" y2="712" class="dim" marker-start="url(#arrE)" marker-end="url(#arrS)"/>
+  <text x="285" y="709" class="dimtext" font-size="6">10</text>
+
+  <!-- Layer thickness -->
+  <line x1="640" y1="280" x2="680" y2="280" class="dim"/>
+  <line x1="640" y1="330" x2="680" y2="330" class="dim"/>
+  <line x1="670" y1="280" x2="670" y2="330" class="dim" marker-start="url(#arrE)" marker-end="url(#arrS)"/>
+  <text x="690" y="308" class="label">50mm plate</text>
+
+  <!-- Mercury gap -->
+  <line x1="640" y1="330" x2="680" y2="330" class="dim"/>
+  <line x1="640" y1="355" x2="680" y2="355" class="dim"/>
+  <line x1="670" y1="330" x2="670" y2="355" class="dim" marker-start="url(#arrE)" marker-end="url(#arrS)"/>
+  <text x="690" y="346" class="label">25mm gap</text>
+
+  <!-- CALLOUT LEADERS -->
+  <!-- Leader to AMFOS coil -->
+  <line x1="305" y1="175" x2="180" y2="150" stroke="#000" stroke-width="0.4"/>
+  <line x1="180" y1="150" x2="100" y2="150" stroke="#000" stroke-width="0.4"/>
+  <circle cx="100" cy="150" r="8" fill="none" stroke="#000" stroke-width="0.5"/>
+  <text x="100" y="153" class="dimtext" font-size="7">1</text>
+  <text x="40" y="148" class="label">AMFOS COIL (x24)</text>
+
+  <!-- Leader to Halbach shell -->
+  <line x1="315" y1="250" x2="180" y2="220" stroke="#000" stroke-width="0.4"/>
+  <line x1="180" y1="220" x2="100" y2="220" stroke="#000" stroke-width="0.4"/>
+  <circle cx="100" cy="220" r="8" fill="none" stroke="#000" stroke-width="0.5"/>
+  <text x="100" y="223" class="dimtext" font-size="7">2</text>
+  <text x="40" y="218" class="label">N52 HALBACH SHELL</text>
+
+  <!-- Leader to mercury -->
+  <line x1="380" y1="565" x2="180" y2="565" stroke="#000" stroke-width="0.4"/>
+  <circle cx="100" cy="565" r="8" fill="none" stroke="#000" stroke-width="0.5"/>
+  <text x="100" y="568" class="dimtext" font-size="7">3</text>
+  <text x="40" y="563" class="label">MERCURY (Hg)</text>
+
+  <!-- Leader to tungsten strip -->
+  <line x1="345" y1="575" x2="180" y2="540" stroke="#000" stroke-width="0.4"/>
+  <circle cx="100" cy="540" r="8" fill="none" stroke="#000" stroke-width="0.5"/>
+  <text x="100" y="543" class="dimtext" font-size="7">4</text>
+  <text x="40" y="538" class="label">TUNGSTEN STRIP (x8/layer)</text>
+
+  <!-- Leader to coolant -->
+  <line x1="285" y1="350" x2="180" y2="330" stroke="#000" stroke-width="0.4"/>
+  <circle cx="100" cy="330" r="8" fill="none" stroke="#000" stroke-width="0.5"/>
+  <text x="100" y="333" class="dimtext" font-size="7">5</text>
+  <text x="40" y="328" class="label">SALTWATER JACKET</text>
+
+  <!-- Leader to bus bars -->
+  <line x1="449" y1="400" x2="180" y2="440" stroke="#000" stroke-width="0.4"/>
+  <circle cx="100" cy="440" r="8" fill="none" stroke="#000" stroke-width="0.5"/>
+  <text x="100" y="443" class="dimtext" font-size="7">6</text>
+  <text x="40" y="438" class="label">Ta BUS BARS (+/-)</text>
+
+  <!-- PARTS LIST -->
+  <rect x="700" y="70" width="480" height="210" fill="none" stroke="#000" stroke-width="1"/>
+  <text x="940" y="88" class="dimtext" font-weight="bold" font-size="10">PARTS LIST — SECTION A-A</text>
+  <line x1="700" y1="95" x2="1180" y2="95" class="thick"/>
+  <text x="720" y="90" class="label" font-size="7">ITEM</text>
+  <text x="760" y="90" class="label" font-size="7">QTY</text>
+  <text x="800" y="90" class="label" font-size="7">DESCRIPTION</text>
+  <text x="1020" y="90" class="label" font-size="7">MATERIAL</text>
+
+  <text x="730" y="110" class="label">1</text>
+  <text x="765" y="110" class="label">24</text>
+  <text x="800" y="110" class="label">AMFOS Control Coil</text>
+  <text x="1020" y="110" class="label">Copper (sealed)</text>
+
+  <text x="730" y="125" class="label">2</text>
+  <text x="765" y="125" class="label">2</text>
+  <text x="800" y="125" class="label">Halbach Magnet Shell</text>
+  <text x="1020" y="125" class="label">N52 NdFeB</text>
+
+  <text x="730" y="140" class="label">3</text>
+  <text x="765" y="140" class="label">4</text>
+  <text x="800" y="140" class="label">Mercury (99.99% pure)</text>
+  <text x="1020" y="140" class="label">Hg (liquid metal)</text>
+
+  <text x="730" y="155" class="label">4</text>
+  <text x="765" y="155" class="label">40</text>
+  <text x="800" y="155" class="label">Conductor Strip (8/layer)</text>
+  <text x="1020" y="155" class="label">Tungsten (W)</text>
+
+  <text x="730" y="170" class="label">5</text>
+  <text x="765" y="170" class="label">1</text>
+  <text x="800" y="170" class="label">Cooling Jacket Assembly</text>
+  <text x="1020" y="170" class="label">Ti Gr.2 / Hastelloy</text>
+
+  <text x="730" y="185" class="label">6</text>
+  <text x="765" y="185" class="label">2</text>
+  <text x="800" y="185" class="label">Central Bus Bar (+/-)</text>
+  <text x="1020" y="185" class="label">Tantalum (Ta)</text>
+
+  <text x="730" y="200" class="label">7</text>
+  <text x="765" y="200" class="label">5</text>
+  <text x="800" y="200" class="label">Magnetic Plate Assembly</text>
+  <text x="1020" y="200" class="label">N52 + Ti Gr.5 frame</text>
+
+  <text x="730" y="215" class="label">8</text>
+  <text x="765" y="215" class="label">1</text>
+  <text x="800" y="215" class="label">SiC MOSFET Rectifier</text>
+  <text x="1020" y="215" class="label">Silicon Carbide</text>
+
+  <text x="730" y="230" class="label">9</text>
+  <text x="765" y="230" class="label">1</text>
+  <text x="800" y="230" class="label">Central Shaft</text>
+  <text x="1020" y="230" class="label">Ti Gr.5 (15mm OD)</text>
+
+  <text x="730" y="245" class="label">10</text>
+  <text x="765" y="245" class="label">10</text>
+  <text x="800" y="245" class="label">Mo Collection Ring</text>
+  <text x="1020" y="245" class="label">Molybdenum</text>
+
+  <text x="730" y="260" class="label">11</text>
+  <text x="765" y="260" class="label">12</text>
+  <text x="800" y="260" class="label">3-Axis Magnetometer</text>
+  <text x="1020" y="260" class="label">MEMS sensor</text>
+
+  <text x="730" y="275" class="label">12</text>
+  <text x="765" y="275" class="label">4</text>
+  <text x="800" y="275" class="label">Kickstart/Output Prong</text>
+  <text x="1020" y="275" class="label">Ti Gr.2 (Au plated)</text>
+
+  <!-- NOTES -->
+  <text x="30" y="760" class="label" font-size="8">NOTES:</text>
+  <text x="30" y="775" class="label" font-size="7">1. ALL DIMENSIONS IN MILLIMETERS</text>
+  <text x="30" y="787" class="label" font-size="7">2. HATCHED AREAS INDICATE SECTIONED MATERIAL (TITANIUM SHELL)</text>
+  <text x="30" y="799" class="label" font-size="7">3. BLUE SHADED = SALTWATER COOLANT CHANNELS</text>
+  <text x="30" y="811" class="label" font-size="7">4. LIGHT BLUE SHADED = MERCURY (LIQUID METAL WORKING FLUID)</text>
+  <text x="30" y="823" class="label" font-size="7">5. GOLD RECTANGLES = TUNGSTEN CONDUCTOR STRIPS</text>
+  <text x="30" y="835" class="label" font-size="7">6. CW/CCW = CLOCKWISE/COUNTER-CLOCKWISE LAYER ROTATION</text>
+  <text x="30" y="847" class="label" font-size="7">7. TOLERANCES: LINEAR +/-0.05mm, ANGULAR +/-0.25deg</text>
+</svg>
