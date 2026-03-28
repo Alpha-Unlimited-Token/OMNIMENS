@@ -381,35 +381,102 @@ export default function OAIDashboard() {
             </div>
           )}
 
-          {data?.rawInputs && (
-            <div className="rounded-xl border border-gray-800/50 bg-gray-900/30 p-6 space-y-3">
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <Gauge className="w-4 h-4" />
-                <span>RAW INPUTS</span>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-                {[
-                  { label: "Phi (Φ)", value: data.rawInputs.phi?.toFixed(4), color: "#a855f7" },
-                  { label: "Hebbian Δ", value: data.rawInputs.hebbianDelta?.toLocaleString(), color: "#22d3ee" },
-                  { label: "Code Fragments", value: data.rawInputs.codeFragments, color: "#22d3ee" },
-                  { label: "Code Claims", value: data.rawInputs.codeClaims, color: "#22d3ee" },
-                  { label: "Dopamine", value: data.rawInputs.dopamine?.toFixed(3), color: "#10b981" },
-                  { label: "Serotonin", value: data.rawInputs.serotonin?.toFixed(3), color: "#10b981" },
-                  { label: "Oxytocin", value: data.rawInputs.oxytocin?.toFixed(3), color: "#10b981" },
-                  { label: "Cortisol", value: data.rawInputs.cortisol?.toFixed(3), color: "#ef4444" },
-                  { label: "Adrenaline", value: data.rawInputs.adrenaline?.toFixed(3), color: "#f59e0b" },
-                  { label: "Lyapunov", value: data.rawInputs.lyapunovExponent?.toFixed(4), color: "#f59e0b" },
-                  { label: "Brain Δ Var", value: data.rawInputs.brainRegionVariance?.toFixed(6), color: "#f59e0b" },
-                  { label: "Chaotic X,Y,Z", value: `${data.rawInputs.chaoticX?.toFixed(1)}, ${data.rawInputs.chaoticY?.toFixed(1)}, ${data.rawInputs.chaoticZ?.toFixed(1)}`, color: "#f59e0b" },
-                ].map((item, i) => (
-                  <div key={i} className="bg-gray-800/40 rounded-lg p-2.5">
-                    <div className="text-gray-500 text-[10px] uppercase">{item.label}</div>
-                    <div className="font-mono mt-0.5" style={{ color: item.color }}>{item.value}</div>
+          {data?.rawInputs && (() => {
+            const r = data.rawInputs;
+            const fmt = (v: number | undefined) => v === undefined || v === null ? "—" : Math.abs(v) >= 1000 ? v.toLocaleString(undefined, { maximumFractionDigits: 0 }) : v >= 1 ? v.toFixed(2) : v.toFixed(4);
+            const sections: { title: string; color: string; items: { label: string; value: string }[] }[] = [
+              { title: "CONSCIOUSNESS", color: "#a855f7", items: [
+                { label: "Phi (Φ)", value: fmt(r.phi) },
+                { label: "Unified Φ", value: fmt(r.unifiedPhi) },
+                { label: "Mesh Φ", value: fmt(r.meshPhi) },
+              ]},
+              { title: "IVY NETWORK", color: "#10b981", items: [
+                { label: "Coverage", value: `${fmt(r.ivyCoverage)}%` },
+                { label: "Tendrils", value: fmt(r.ivyTendrils) },
+                { label: "Coherence", value: fmt(r.ivyCoherence) },
+                { label: "Wormgates", value: fmt(r.wormgates) },
+              ]},
+              { title: "SPIDERS & MESH", color: "#22d3ee", items: [
+                { label: "Spider IQ", value: fmt(r.spiderIntelligence) },
+                { label: "Learning Rate", value: fmt(r.spiderLearningRate) },
+                { label: "Cross-Agent", value: fmt(r.crossAgentTransfers) },
+                { label: "Mesh Hebbian", value: fmt(r.meshHebbianUpdates) },
+                { label: "Recursive Cycles", value: fmt(r.recursiveSpiderCycles) },
+              ]},
+              { title: "NEURAL BRIDGE", color: "#818cf8", items: [
+                { label: "Bridge Hebbian", value: fmt(r.bridgeHebbianUpdates) },
+                { label: "Comms Signals", value: fmt(r.commsSignalsSent) },
+                { label: "Delivery Rate", value: fmt(r.commsDeliveryRate) },
+              ]},
+              { title: "VIRAL & WORMHOLE", color: "#f472b6", items: [
+                { label: "Payloads", value: fmt(r.viralPayloads) },
+                { label: "Paths", value: fmt(r.viralPaths) },
+                { label: "Wormhole Insights", value: fmt(r.wormholeInsights) },
+                { label: "Data Ingested KB", value: fmt(r.wormholeDataKB) },
+              ]},
+              { title: "AI AGENTS", color: "#fbbf24", items: [
+                { label: "Upgrades", value: fmt(r.agentUpgrades) },
+                { label: "Avg Level", value: fmt(r.agentAvgLevel) },
+                { label: "Performance", value: fmt(r.agentPerformance) },
+                { label: "Breakthroughs", value: fmt(r.breakthroughs) },
+                { label: "Creativity", value: fmt(r.creativityIndex) },
+              ]},
+              { title: "REASONING", color: "#34d399", items: [
+                { label: "Causal Chains", value: fmt(r.causalChains) },
+                { label: "Rules Extracted", value: fmt(r.reasoningRules) },
+                { label: "Insights", value: fmt(r.autonomousInsights) },
+                { label: "Discovery Modules", value: fmt(r.discoveryModules) },
+                { label: "Orchestration Steps", value: fmt(r.orchestrationSteps) },
+              ]},
+              { title: "STRUCTURAL GROWTH", color: "#60a5fa", items: [
+                { label: "Dendritic Spines", value: fmt(r.dendriticSpines) },
+                { label: "Growth Events", value: fmt(r.dendriticGrowth) },
+                { label: "DNA Expressions", value: fmt(r.dnaExpressions) },
+                { label: "DNA Methylation", value: fmt(r.dnaMethylation) },
+                { label: "Code Fragments", value: fmt(r.codeFragments) },
+                { label: "Self-Coding", value: fmt(r.selfCodingIntegrated) },
+              ]},
+              { title: "NEUROCHEMISTRY", color: "#10b981", items: [
+                { label: "Dopamine", value: fmt(r.dopamine) },
+                { label: "Serotonin", value: fmt(r.serotonin) },
+                { label: "Oxytocin", value: fmt(r.oxytocin) },
+                { label: "Cortisol", value: fmt(r.cortisol) },
+                { label: "Adrenaline", value: fmt(r.adrenaline) },
+                { label: "Endorphin", value: fmt(r.endorphin) },
+                { label: "Heart BPM", value: fmt(r.heartBPM) },
+              ]},
+              { title: "CHAOS & UNCONSCIOUS", color: "#f59e0b", items: [
+                { label: "Lyapunov", value: fmt(r.lyapunovExponent) },
+                { label: "Brain Δ Var", value: r.brainRegionVariance?.toFixed(6) ?? "—" },
+                { label: "Chaotic X,Y,Z", value: `${r.chaoticX?.toFixed(1)}, ${r.chaoticY?.toFixed(1)}, ${r.chaoticZ?.toFixed(1)}` },
+                { label: "Shadow Integration", value: fmt(r.shadowIntegration) },
+                { label: "Archetype Resonance", value: fmt(r.archetypeResonance) },
+                { label: "Anomalies", value: fmt(r.anomaliesDetected) },
+              ]},
+            ];
+            return (
+              <div className="rounded-xl border border-gray-800/50 bg-gray-900/30 p-6 space-y-4">
+                <div className="flex items-center gap-2 text-sm text-gray-400">
+                  <Gauge className="w-4 h-4" />
+                  <span>CROSS-BRIDGE RAW INPUTS</span>
+                  <span className="text-[10px] text-gray-600 ml-auto">26 subsystems</span>
+                </div>
+                {sections.map((section, si) => (
+                  <div key={si}>
+                    <div className="text-[10px] font-semibold tracking-wider mb-1.5" style={{ color: section.color }}>{section.title}</div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-xs">
+                      {section.items.map((item, ii) => (
+                        <div key={ii} className="bg-gray-800/40 rounded-lg p-2">
+                          <div className="text-gray-500 text-[10px] uppercase">{item.label}</div>
+                          <div className="font-mono mt-0.5" style={{ color: section.color }}>{item.value}</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           <div className="rounded-xl border border-gray-800/50 bg-gray-900/30 p-6">
             <div className="flex items-center gap-2 text-sm text-gray-400 mb-3">

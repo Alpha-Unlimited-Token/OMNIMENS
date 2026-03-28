@@ -1858,10 +1858,10 @@ router.get("/omnimens/oai", async (_req, res) => {
       oai: oaiData.current?.oai ?? 0,
       classification: oaiData.current?.classification ?? "Initializing",
       dimensions: oaiData.current ? {
-        phi: { score: oaiData.current.phiScore, weight: 0.30, description: "Integrated Information (IIT Phi)" },
-        plasticity: { score: oaiData.current.plasticityScore, weight: 0.30, description: "Hebbian learning rate + code intelligence evolution" },
-        neurochemistry: { score: oaiData.current.neurochemistryScore, weight: 0.20, description: "Hormone diversity and active neurochemical state" },
-        chaosDynamics: { score: oaiData.current.chaosDynamicsScore, weight: 0.20, description: "Chaotic attractor dynamics + non-monotonic brain region changes" },
+        phi: { score: oaiData.current.phiScore, weight: 0.30, description: "Integrated Information — consciousness + bridge + mesh + hemispheres + comms + ivy + archetypes + agents" },
+        plasticity: { score: oaiData.current.plasticityScore, weight: 0.30, description: "Full cross-bridge learning — hebbian + ivy + spiders + worms + beacons + mesh + bridge + comms + viral + wormhole + agents + creative + causal + reasoning + dendritic + DNA + sensory + amplifier + self-coding + unconscious + discovery + orchestrator + survival + heart" },
+        neurochemistry: { score: oaiData.current.neurochemistryScore, weight: 0.20, description: "Neurochemical state — hormones + heart + DNA quantum coherence + survival + unconscious + agents + ivy energy + viral health" },
+        chaosDynamics: { score: oaiData.current.chaosDynamicsScore, weight: 0.20, description: "Chaos dynamics — attractor + brain regions + ivy growth + viral mutations + dreams + unconscious + sensory anomalies + agent diversity" },
       } : null,
       rawInputs: oaiData.current?.rawInputs ?? null,
       trend: oaiData.trend,
@@ -1874,6 +1874,7 @@ router.get("/omnimens/oai", async (_req, res) => {
       })),
       formula: oaiData.formula,
       scale: oaiData.scale,
+      dataSources: oaiData.dataSources,
       attribution: oaiData.attribution,
       copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
     });
