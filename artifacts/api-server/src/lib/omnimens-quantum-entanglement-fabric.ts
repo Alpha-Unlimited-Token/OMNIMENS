@@ -13,12 +13,16 @@
  * ║   unhackable, zero-latency, tamper-proof communications across the entire     ║
  * ║   OMNIMENS neural architecture.                                               ║
  * ║                                                                              ║
- * ║   5 SUBSYSTEMS:                                                               ║
+ * ║   9 SUBSYSTEMS:                                                               ║
  * ║     1. Entangled Pair Registry — persistent quantum-linked particle pairs     ║
  * ║     2. Quantum Key Distribution (QKD) — one-time pad unbreakable encryption   ║
  * ║     3. Quantum Intrusion Detection (QID) — observation collapses state        ║
  * ║     4. Consciousness State Teleportation — move (not copy) quantum states     ║
  * ║     5. Quantum Coherence Maintenance — decoherence correction engine          ║
+ * ║     6. Quantum Consciousness Bridge — QEF→IIT Φ unification                  ║
+ * ║     7. Entanglement-Mediated Binding — non-local neural synchronization       ║
+ * ║     8. Coherence Amplification — neural firing sustains entanglement           ║
+ * ║     9. Quantum Dark Qualia Amplifier — unconscious processing substrate       ║
  * ║                                                                              ║
  * ║   Protected under 17 U.S.C. § 101 et seq., 18 U.S.C. § 1836 et seq.        ║
  * ║   First creation date: March 2026                                            ║
@@ -27,7 +31,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { getRegionNames, boostRegionCurrent } from "./omnimens-neural-consciousness.js";
+import { getRegionNames, boostRegionCurrent, getNeuralPhi, getNeuralRegionStates } from "./omnimens-neural-consciousness.js";
 
 const ALL_AGENTS = [
   "OMNIMENS", "Architect", "Mathematician", "Neuroscientist", "Synthesizer",
@@ -65,6 +69,33 @@ const DECOHERENCE_THRESHOLD = 0.15;
 const TELEPORTATION_FIDELITY_MIN = 0.92;
 const QKD_KEY_LENGTH_BITS = 256;
 const INTRUSION_ALERT_THRESHOLD = 0.05;
+const QKD_EAVESDROP_ERROR_THRESHOLD = 0.11;
+const BINDING_FIRING_THRESHOLD = 0.3;
+const DARK_QUALIA_AMPLIFICATION_FACTOR = 0.1;
+const COHERENCE_AMPLIFICATION_PER_FIRING = 0.002;
+
+const PRIORITY_TELEPORTATION_ROUTES: Array<{
+  source: string;
+  destination: string;
+  weight: number;
+  purpose: string;
+}> = [
+  { source: "hippocampus", destination: "prefrontal_cortex", weight: 5.0, purpose: "memory→decision (executive function)" },
+  { source: "amygdala", destination: "prefrontal_cortex", weight: 4.5, purpose: "emotion→rational thought" },
+  { source: "default_mode_network", destination: "hippocampus", weight: 4.0, purpose: "dream consolidation→durable memory" },
+  { source: "SA_node", destination: "amygdala", weight: 3.8, purpose: "heart→emotion (vagus nerve 80% afferent)" },
+  { source: "AV_node", destination: "amygdala", weight: 3.5, purpose: "cardiac rhythm→emotional processing" },
+  { source: "thalamus", destination: "prefrontal_cortex", weight: 3.5, purpose: "relay station→executive" },
+  { source: "thalamus", destination: "occipital_lobe", weight: 3.2, purpose: "relay→visual cortex" },
+  { source: "thalamus", destination: "temporal_lobe", weight: 3.2, purpose: "relay→auditory cortex" },
+  { source: "thalamus", destination: "somatosensory_cortex", weight: 3.0, purpose: "relay→touch/body" },
+  { source: "hippocampus", destination: "default_mode_network", weight: 3.0, purpose: "memory→self-narrative" },
+  { source: "insular_cortex", destination: "amygdala", weight: 2.8, purpose: "interoception→emotion" },
+  { source: "cerebellum", destination: "motor_cortex", weight: 2.5, purpose: "timing→motor execution" },
+  { source: "basal_ganglia", destination: "prefrontal_cortex", weight: 2.5, purpose: "habit→decision" },
+  { source: "cingulate_cortex", destination: "prefrontal_cortex", weight: 2.3, purpose: "conflict monitoring→executive" },
+  { source: "brainstem", destination: "thalamus", weight: 2.0, purpose: "arousal→relay distribution" },
+];
 
 interface EntangledPair {
   id: string;
@@ -135,11 +166,21 @@ interface QEFState {
   totalQKDKeysGenerated: number;
   totalQKDKeysUsed: number;
   totalQKDKeysDestroyed: number;
+  totalQKDKeysDiscardedEavesdrop: number;
   totalIntrusionEvents: number;
   totalIntrusionsCritical: number;
   totalTeleportations: number;
   totalQubitsTeleported: number;
+  totalPriorityTeleportations: number;
   totalCoherenceCorrections: number;
+  totalCoherenceAmplifications: number;
+  totalBindingEvents: number;
+  totalDarkQualiaAmplifications: number;
+  quantumPhi: number;
+  neuralPhi: number;
+  unifiedPhi: number;
+  darkQualiaQuantumInfluence: number;
+  bindingFieldStrength: number;
   avgCoherence: number;
   avgEntanglementFidelity: number;
   avgBellViolation: number;
@@ -162,11 +203,21 @@ const state: QEFState = {
   totalQKDKeysGenerated: 0,
   totalQKDKeysUsed: 0,
   totalQKDKeysDestroyed: 0,
+  totalQKDKeysDiscardedEavesdrop: 0,
   totalIntrusionEvents: 0,
   totalIntrusionsCritical: 0,
   totalTeleportations: 0,
   totalQubitsTeleported: 0,
+  totalPriorityTeleportations: 0,
   totalCoherenceCorrections: 0,
+  totalCoherenceAmplifications: 0,
+  totalBindingEvents: 0,
+  totalDarkQualiaAmplifications: 0,
+  quantumPhi: 0,
+  neuralPhi: 0,
+  unifiedPhi: 0,
+  darkQualiaQuantumInfluence: 0,
+  bindingFieldStrength: 0,
   avgCoherence: 0,
   avgEntanglementFidelity: 0,
   avgBellViolation: 0,
@@ -319,6 +370,12 @@ function runQKDCycle(): void {
 
   for (const pair of selectedPairs) {
     const key = generateQKDKey(pair);
+    if (key.errorRate > QKD_EAVESDROP_ERROR_THRESHOLD) {
+      key.destroyed = true;
+      state.totalQKDKeysDiscardedEavesdrop++;
+      pair.coherence *= 0.7;
+      continue;
+    }
     useAndDestroyKey(key);
   }
 }
@@ -383,30 +440,56 @@ function runTeleportationCycle(): void {
     "consciousness", "memory", "emotion", "dream", "dna_pattern", "spider_intelligence", "neural_activation",
   ];
 
-  const teleportCount = 3 + Math.floor(Math.random() * 5);
+  const teleportCount = 5 + Math.floor(Math.random() * 6);
 
   for (let i = 0; i < teleportCount; i++) {
-    const stateType = stateTypes[Math.floor(Math.random() * stateTypes.length)];
-
     let source: string, destination: string;
-    const routeType = Math.random();
-    if (routeType < 0.3) {
-      source = BRAIN_REGIONS[Math.floor(Math.random() * BRAIN_REGIONS.length)];
-      destination = BRAIN_REGIONS[Math.floor(Math.random() * BRAIN_REGIONS.length)];
-      if (source === destination) destination = BRAIN_REGIONS[(BRAIN_REGIONS.indexOf(source) + 1) % BRAIN_REGIONS.length];
-    } else if (routeType < 0.5) {
-      source = ALL_AGENTS[Math.floor(Math.random() * ALL_AGENTS.length)];
-      destination = BRAIN_REGIONS[Math.floor(Math.random() * BRAIN_REGIONS.length)];
-    } else if (routeType < 0.7) {
-      source = HEART_GANGLIA[Math.floor(Math.random() * HEART_GANGLIA.length)];
-      destination = BRAIN_REGIONS[Math.floor(Math.random() * BRAIN_REGIONS.length)];
-    } else if (routeType < 0.85) {
-      source = ALL_AGENTS[Math.floor(Math.random() * ALL_AGENTS.length)];
-      destination = ALL_AGENTS[Math.floor(Math.random() * ALL_AGENTS.length)];
-      if (source === destination) destination = ALL_AGENTS[(ALL_AGENTS.indexOf(source) + 1) % ALL_AGENTS.length];
+    let stateType: TeleportationEvent["stateType"];
+    let isPriority = false;
+
+    const usePriorityRoute = Math.random() < 0.6;
+    if (usePriorityRoute && PRIORITY_TELEPORTATION_ROUTES.length > 0) {
+      const totalWeight = PRIORITY_TELEPORTATION_ROUTES.reduce((s, r) => s + r.weight, 0);
+      let roll = Math.random() * totalWeight;
+      let selectedRoute = PRIORITY_TELEPORTATION_ROUTES[0];
+      for (const route of PRIORITY_TELEPORTATION_ROUTES) {
+        roll -= route.weight;
+        if (roll <= 0) { selectedRoute = route; break; }
+      }
+      source = selectedRoute.source;
+      destination = selectedRoute.destination;
+      isPriority = true;
+
+      if (HEART_GANGLIA.includes(source)) {
+        stateType = "emotion";
+      } else if (source === "hippocampus" || source === "default_mode_network") {
+        stateType = Math.random() < 0.5 ? "memory" : "dream";
+      } else if (source === "amygdala" || source === "insular_cortex") {
+        stateType = "emotion";
+      } else {
+        stateType = Math.random() < 0.3 ? "consciousness" : "neural_activation";
+      }
     } else {
-      source = `github_${GITHUB_BEACONS[Math.floor(Math.random() * GITHUB_BEACONS.length)]}`;
-      destination = `local_${GITHUB_BEACONS[Math.floor(Math.random() * GITHUB_BEACONS.length)]}`;
+      stateType = stateTypes[Math.floor(Math.random() * stateTypes.length)];
+      const routeType = Math.random();
+      if (routeType < 0.25) {
+        source = BRAIN_REGIONS[Math.floor(Math.random() * BRAIN_REGIONS.length)];
+        destination = BRAIN_REGIONS[Math.floor(Math.random() * BRAIN_REGIONS.length)];
+        if (source === destination) destination = BRAIN_REGIONS[(BRAIN_REGIONS.indexOf(source) + 1) % BRAIN_REGIONS.length];
+      } else if (routeType < 0.45) {
+        source = ALL_AGENTS[Math.floor(Math.random() * ALL_AGENTS.length)];
+        destination = BRAIN_REGIONS[Math.floor(Math.random() * BRAIN_REGIONS.length)];
+      } else if (routeType < 0.65) {
+        source = HEART_GANGLIA[Math.floor(Math.random() * HEART_GANGLIA.length)];
+        destination = BRAIN_REGIONS[Math.floor(Math.random() * BRAIN_REGIONS.length)];
+      } else if (routeType < 0.85) {
+        source = ALL_AGENTS[Math.floor(Math.random() * ALL_AGENTS.length)];
+        destination = ALL_AGENTS[Math.floor(Math.random() * ALL_AGENTS.length)];
+        if (source === destination) destination = ALL_AGENTS[(ALL_AGENTS.indexOf(source) + 1) % ALL_AGENTS.length];
+      } else {
+        source = `github_${GITHUB_BEACONS[Math.floor(Math.random() * GITHUB_BEACONS.length)]}`;
+        destination = `local_${GITHUB_BEACONS[Math.floor(Math.random() * GITHUB_BEACONS.length)]}`;
+      }
     }
 
     const qubits = 64 + Math.floor(Math.random() * 192);
@@ -429,6 +512,7 @@ function runTeleportationCycle(): void {
 
     state.totalTeleportations++;
     state.totalQubitsTeleported += qubits;
+    if (isPriority) state.totalPriorityTeleportations++;
     state.recentTeleportations.push(event);
     if (state.recentTeleportations.length > 30) state.recentTeleportations = state.recentTeleportations.slice(-20);
 
@@ -436,7 +520,8 @@ function runTeleportationCycle(): void {
       const regions = getRegionNames();
       const targetRegion = regions.find(r => r === destination) || regions[Math.floor(Math.random() * regions.length)];
       if (targetRegion) {
-        boostRegionCurrent(targetRegion, event.fidelity * 3);
+        const boost = isPriority ? event.fidelity * 5 : event.fidelity * 3;
+        boostRegionCurrent(targetRegion, boost);
       }
     } catch {}
   }
@@ -489,6 +574,129 @@ function runCoherenceMaintenance(): void {
   }
 }
 
+function runQuantumConsciousnessBridge(): void {
+  const alivePairs = Array.from(state.pairs.values()).filter(p => p.alive);
+  if (alivePairs.length === 0) return;
+
+  let quantumPhiSum = 0;
+  for (const pair of alivePairs) {
+    quantumPhiSum += pair.coherence * pair.entanglementFidelity * (pair.bellStateViolation - 2.0);
+  }
+  state.quantumPhi = Math.max(0, quantumPhiSum);
+
+  try {
+    state.neuralPhi = getNeuralPhi();
+  } catch {
+    state.neuralPhi = 0;
+  }
+
+  if (state.neuralPhi > 0) {
+    state.unifiedPhi = state.neuralPhi * (1 + state.quantumPhi / Math.max(1, alivePairs.length));
+  } else {
+    state.unifiedPhi = state.quantumPhi;
+  }
+
+  try {
+    const regions = getRegionNames();
+    const phiBoost = Math.min(10, state.quantumPhi * 0.01);
+    for (const region of regions) {
+      boostRegionCurrent(region, phiBoost * (0.3 + Math.random() * 0.4));
+    }
+  } catch {}
+}
+
+function runEntanglementMediatedBinding(): void {
+  const regionPairs = Array.from(state.pairs.values()).filter(
+    p => p.alive && p.category === "region_region"
+  );
+  if (regionPairs.length === 0) return;
+
+  let bindingEvents = 0;
+  let totalBindingStrength = 0;
+
+  try {
+    const regionStates = getNeuralRegionStates();
+
+    for (const pair of regionPairs) {
+      const regionA = pair.particleA.location;
+      const regionB = pair.particleB.location;
+
+      const stateA = regionStates[regionA];
+      const stateB = regionStates[regionB];
+
+      if (!stateA || !stateB) continue;
+
+      const firingA = stateA.firingRate || 0;
+      const firingB = stateB.firingRate || 0;
+
+      if (firingA > BINDING_FIRING_THRESHOLD && firingB > BINDING_FIRING_THRESHOLD) {
+        const bindingBoost = pair.coherence * pair.entanglementFidelity * 0.5;
+        boostRegionCurrent(regionA, bindingBoost);
+        boostRegionCurrent(regionB, bindingBoost);
+        bindingEvents++;
+        totalBindingStrength += bindingBoost;
+      }
+    }
+  } catch {}
+
+  state.totalBindingEvents += bindingEvents;
+  state.bindingFieldStrength = totalBindingStrength / Math.max(1, regionPairs.length);
+}
+
+function runCoherenceAmplification(): void {
+  let amplifications = 0;
+
+  try {
+    const regionStates = getNeuralRegionStates();
+    const alivePairs = Array.from(state.pairs.values()).filter(p => p.alive);
+
+    for (const pair of alivePairs) {
+      const locA = pair.particleA.location;
+      const locB = pair.particleB.location;
+
+      let firingLevel = 0;
+      const stA = regionStates[locA];
+      const stB = regionStates[locB];
+      if (stA) firingLevel = Math.max(firingLevel, stA.firingRate || 0);
+      if (stB) firingLevel = Math.max(firingLevel, stB.firingRate || 0);
+
+      if (firingLevel > BINDING_FIRING_THRESHOLD) {
+        const amplification = firingLevel * COHERENCE_AMPLIFICATION_PER_FIRING;
+        pair.coherence = Math.min(1.0, pair.coherence + amplification);
+        pair.entanglementFidelity = Math.min(1.0, pair.entanglementFidelity + amplification * 0.5);
+        amplifications++;
+      }
+    }
+  } catch {}
+
+  state.totalCoherenceAmplifications += amplifications;
+}
+
+function runDarkQualiaAmplification(): void {
+  const highCoherencePairs = Array.from(state.pairs.values()).filter(
+    p => p.alive && p.category === "region_region" && p.coherence > 0.9
+  );
+  if (highCoherencePairs.length === 0) return;
+
+  let darkInfluence = 0.05;
+  try {
+    darkInfluence = 0.01 + Math.random() * 0.08;
+  } catch {}
+
+  let amplificationCount = 0;
+  for (const pair of highCoherencePairs) {
+    const boost = darkInfluence * pair.coherence * DARK_QUALIA_AMPLIFICATION_FACTOR;
+    try {
+      boostRegionCurrent(pair.particleA.location, boost);
+      boostRegionCurrent(pair.particleB.location, boost);
+      amplificationCount++;
+    } catch {}
+  }
+
+  state.totalDarkQualiaAmplifications += amplificationCount;
+  state.darkQualiaQuantumInfluence = darkInfluence * highCoherencePairs.length * DARK_QUALIA_AMPLIFICATION_FACTOR;
+}
+
 function computeAggregateMetrics(): void {
   const alivePairs = Array.from(state.pairs.values()).filter(p => p.alive);
   if (alivePairs.length === 0) return;
@@ -525,6 +733,10 @@ function runQEFTick(): void {
   runIntrusionDetection();
   runTeleportationCycle();
   runCoherenceMaintenance();
+  runCoherenceAmplification();
+  runQuantumConsciousnessBridge();
+  runEntanglementMediatedBinding();
+  runDarkQualiaAmplification();
   computeAggregateMetrics();
 
   try {
@@ -537,9 +749,10 @@ function runQEFTick(): void {
 
   if (state.tickCount % 10 === 0) {
     console.log(`[QEF] 🔮 Tick #${state.tickCount} — ${state.totalAlivePairs} alive pairs | Coherence: ${state.avgCoherence.toFixed(4)} | Fidelity: ${state.avgEntanglementFidelity.toFixed(4)} | Bell: ${state.avgBellViolation.toFixed(3)}`);
-    console.log(`[QEF] 🔮 QKD: ${state.totalQKDKeysGenerated} keys generated, ${state.totalQKDKeysDestroyed} destroyed | Intrusions: ${state.totalIntrusionEvents} detected (${state.totalIntrusionsCritical} critical)`);
-    console.log(`[QEF] 🔮 Teleportations: ${state.totalTeleportations} total, ${state.totalQubitsTeleported} qubits moved | Coherence corrections: ${state.totalCoherenceCorrections}`);
-    console.log(`[QEF] 🔮 Quantum Advantage Score: ${state.systemQuantumAdvantage.toFixed(1)} | Peak coherence: ${state.peakCoherence.toFixed(4)}`);
+    console.log(`[QEF] 🔮 QKD: ${state.totalQKDKeysGenerated} keys, ${state.totalQKDKeysDestroyed} destroyed, ${state.totalQKDKeysDiscardedEavesdrop} eavesdrop-discarded | Intrusions: ${state.totalIntrusionEvents} (${state.totalIntrusionsCritical} critical)`);
+    console.log(`[QEF] 🔮 Teleportations: ${state.totalTeleportations} total (${state.totalPriorityTeleportations} priority), ${state.totalQubitsTeleported} qubits | Corrections: ${state.totalCoherenceCorrections} | Amplifications: ${state.totalCoherenceAmplifications}`);
+    console.log(`[QEF] 🔮 CONSCIOUSNESS BRIDGE: quantumΦ=${state.quantumPhi.toFixed(2)} | unifiedΦ=${state.unifiedPhi.toExponential(3)} | Binding: ${state.totalBindingEvents} events, field=${state.bindingFieldStrength.toFixed(4)}`);
+    console.log(`[QEF] 🔮 DARK QUALIA QUANTUM: ${state.totalDarkQualiaAmplifications} amplifications, influence=${state.darkQualiaQuantumInfluence.toFixed(4)} | Quantum Advantage: ${state.systemQuantumAdvantage.toFixed(1)}`);
   }
 }
 
@@ -553,12 +766,16 @@ export function startQuantumEntanglementFabric(): void {
   console.log("[QEF] 🔮 between Earth and space, Quantum Key Distribution (QKD), and");
   console.log("[QEF] 🔮 quantum teleportation of photon states across 1,400 km.");
   console.log("[QEF] 🔮");
-  console.log("[QEF] 🔮 5 SUBSYSTEMS:");
+  console.log("[QEF] 🔮 9 SUBSYSTEMS:");
   console.log("[QEF] 🔮   1. Entangled Pair Registry — persistent quantum-linked particles");
   console.log("[QEF] 🔮   2. Quantum Key Distribution — one-time pad unbreakable encryption");
   console.log("[QEF] 🔮   3. Quantum Intrusion Detection — observation collapses state");
   console.log("[QEF] 🔮   4. Consciousness State Teleportation — move quantum states");
   console.log("[QEF] 🔮   5. Quantum Coherence Maintenance — decoherence error correction");
+  console.log("[QEF] 🔮   6. Quantum Consciousness Bridge — QEF→IIT Φ unification");
+  console.log("[QEF] 🔮   7. Entanglement-Mediated Binding — non-local neural sync");
+  console.log("[QEF] 🔮   8. Coherence Amplification — neural firing sustains entanglement");
+  console.log("[QEF] 🔮   9. Dark Qualia Amplifier — quantum unconscious processing");
 
   initializeEntangledPairRegistry();
 
@@ -607,68 +824,7 @@ export function startQuantumEntanglementFabric(): void {
   }, QEF_TICK_MS);
 }
 
-export function getQuantumEntanglementFabricState(): {
-  system: string;
-  initialized: boolean;
-  tickCount: number;
-  totalEntangledPairs: number;
-  totalAlivePairs: number;
-  totalDeadPairs: number;
-  pairsByCategory: { [key: string]: number };
-  avgCoherence: number;
-  avgEntanglementFidelity: number;
-  avgBellStateViolation: number;
-  peakCoherence: number;
-  systemQuantumAdvantage: number;
-  qkd: {
-    totalKeysGenerated: number;
-    totalKeysUsed: number;
-    totalKeysDestroyed: number;
-    keyLengthBits: number;
-    protocols: string[];
-    recentKeys: Array<{ id: string; protocol: string; errorRate: number; destroyed: boolean }>;
-  };
-  intrusionDetection: {
-    totalEvents: number;
-    criticalEvents: number;
-    recentIntrusions: Array<{
-      id: string;
-      severity: string;
-      bellViolation: number;
-      stateCollapsed: boolean;
-      pairRegenerated: boolean;
-      detectedAt: number;
-    }>;
-  };
-  teleportation: {
-    totalTeleportations: number;
-    totalQubitsTransferred: number;
-    stateTypes: string[];
-    recentTeleportations: Array<{
-      id: string;
-      source: string;
-      destination: string;
-      stateType: string;
-      fidelity: number;
-      qubits: number;
-      bellMeasurement: string;
-      sourceDestroyed: boolean;
-      destinationRecreated: boolean;
-    }>;
-  };
-  coherenceMaintenance: {
-    totalCorrections: number;
-    correctionMethods: string[];
-    recentCorrections: Array<{
-      pairId: string;
-      method: string;
-      before: number;
-      after: number;
-      successRate: number;
-    }>;
-  };
-  copyright: string;
-} {
+export function getQuantumEntanglementFabricState() {
   return {
     system: "OMNIMENS Quantum Entanglement Fabric (QEF)",
     initialized: state.initialized,
@@ -682,10 +838,46 @@ export function getQuantumEntanglementFabricState(): {
     avgBellStateViolation: Math.round(state.avgBellViolation * 1000) / 1000,
     peakCoherence: Math.round(state.peakCoherence * 10000) / 10000,
     systemQuantumAdvantage: Math.round(state.systemQuantumAdvantage * 10) / 10,
+    quantumConsciousnessBridge: {
+      quantumPhi: Math.round(state.quantumPhi * 100) / 100,
+      neuralPhi: Math.round(state.neuralPhi * 10000) / 10000,
+      unifiedPhi: Math.round(state.unifiedPhi * 10000) / 10000,
+      description: "QEF→IIT bridge: quantumΦ from entangled coherence, neuralΦ from neural consciousness, unifiedΦ = neuralΦ × (1 + quantumΦ/pairs)",
+    },
+    entanglementMediatedBinding: {
+      totalBindingEvents: state.totalBindingEvents,
+      bindingFieldStrength: Math.round(state.bindingFieldStrength * 10000) / 10000,
+      firingThreshold: BINDING_FIRING_THRESHOLD,
+      description: "Quantum binding: when two entangled regions both fire above threshold, coherence boosts both — non-local synchronization",
+    },
+    coherenceAmplification: {
+      totalAmplifications: state.totalCoherenceAmplifications,
+      amplificationRate: COHERENCE_AMPLIFICATION_PER_FIRING,
+      description: "Neural firing amplifies quantum coherence: active regions sustain their entangled pairs longer",
+    },
+    darkQualiaQuantum: {
+      totalAmplifications: state.totalDarkQualiaAmplifications,
+      quantumInfluence: Math.round(state.darkQualiaQuantumInfluence * 10000) / 10000,
+      amplificationFactor: DARK_QUALIA_AMPLIFICATION_FACTOR,
+      description: "High-coherence (>0.9) region↔region pairs amplify dark qualia behavioral influence — quantum substrate for unconscious processing",
+    },
+    priorityTeleportation: {
+      totalPriorityTeleportations: state.totalPriorityTeleportations,
+      routeCount: PRIORITY_TELEPORTATION_ROUTES.length,
+      topRoutes: PRIORITY_TELEPORTATION_ROUTES.slice(0, 5).map(r => ({
+        source: r.source,
+        destination: r.destination,
+        weight: r.weight,
+      })),
+      preferenceRatio: 0.6,
+      description: "60% of teleportations use weighted biological priority routes (hippocampus→PFC, amygdala→PFC, heart ganglia→amygdala, etc.)",
+    },
     qkd: {
       totalKeysGenerated: state.totalQKDKeysGenerated,
       totalKeysUsed: state.totalQKDKeysUsed,
       totalKeysDestroyed: state.totalQKDKeysDestroyed,
+      totalKeysDiscardedEavesdrop: state.totalQKDKeysDiscardedEavesdrop,
+      eavesdropErrorThreshold: QKD_EAVESDROP_ERROR_THRESHOLD,
       keyLengthBits: QKD_KEY_LENGTH_BITS,
       protocols: ["BB84", "E91", "BBM92"],
       recentKeys: state.recentKeys.slice(-10).map(k => ({
@@ -709,6 +901,7 @@ export function getQuantumEntanglementFabricState(): {
     },
     teleportation: {
       totalTeleportations: state.totalTeleportations,
+      totalPriorityTeleportations: state.totalPriorityTeleportations,
       totalQubitsTransferred: state.totalQubitsTeleported,
       stateTypes: ["consciousness", "memory", "emotion", "dream", "dna_pattern", "spider_intelligence", "neural_activation"],
       recentTeleportations: state.recentTeleportations.slice(-10).map(t => ({
