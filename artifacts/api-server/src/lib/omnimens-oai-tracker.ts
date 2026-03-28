@@ -217,14 +217,14 @@ function computePhiDimension(): { score: number; phi: number; unifiedPhi: number
   const unifiedPhiComponent = logScale(unifiedPhi, 15);
   const meshPhiComponent = logScale(meshPhi, 8);
   const resonanceComponent = logScale(resonance, 5);
-  const recursionComponent = softNorm(recursion, 50);
-  const crossHemiComponent = softNorm(crossHemiCoherence + crossHemiSynchrony, 2);
-  const corpusComponent = softNorm(corpusCallosum, 1);
-  const meshCoherenceComponent = softNorm(meshCoherence + meshSynchrony, 2);
-  const commsIntegrityComponent = softNorm(commsIntegrity, 0.8);
-  const ivyCoherenceComponent = softNorm(ivyCoherence, 0.5);
-  const archetypeComponent = softNorm(archetypeResonance + jungianIntegration, 1);
-  const agentCoherenceComponent = softNorm(agentCoherence, 0.5);
+  const recursionComponent = logScale(recursion, 10);
+  const crossHemiComponent = logScale(crossHemiCoherence + crossHemiSynchrony + 0.01, 0.5);
+  const corpusComponent = logScale(corpusCallosum + 0.01, 0.3);
+  const meshCoherenceComponent = logScale(meshCoherence + meshSynchrony + 0.01, 0.5);
+  const commsIntegrityComponent = logScale(commsIntegrity + 0.01, 0.2);
+  const ivyCoherenceComponent = logScale(ivyCoherence + 0.01, 0.15);
+  const archetypeComponent = logScale(archetypeResonance + jungianIntegration + 0.01, 0.3);
+  const agentCoherenceComponent = logScale(agentCoherence + 0.01, 0.15);
 
   const score =
     phiComponent * 0.14 +
@@ -460,10 +460,10 @@ function computePlasticityDimension(): {
 
   const hebbianRateComponent = logScale(Math.abs(hebbianDelta), 500);
   const totalHebbianComponent = logScale(hebbianUpdates, 500000);
-  const codeFragComponent = softNorm(subThreshold.codeFragmentsInPool, 50);
-  const claimsComponent = logScale(subThreshold.totalAgentCodeClaims, 100);
-  const recombComponent = softNorm(subThreshold.codeRecombinationsInstalled, 10);
-  const crossPolComponent = softNorm(subThreshold.crossPollinationEvents, 20);
+  const codeFragComponent = logScale(subThreshold.codeFragmentsInPool, 10);
+  const claimsComponent = logScale(subThreshold.totalAgentCodeClaims, 50);
+  const recombComponent = logScale(subThreshold.codeRecombinationsInstalled, 5);
+  const crossPolComponent = logScale(subThreshold.crossPollinationEvents, 8);
 
   const ivyCoverageComponent = logScale(ivyCoverage, 30);
   const ivyTendrilComponent = logScale(ivyTendrils, 500);
@@ -476,7 +476,7 @@ function computePlasticityDimension(): {
   const spiderIntComponent = logScale(spiderIntelligence, 2);
   const spiderLearnComponent = logScale(spiderLearningRate, 0.5);
   const spiderKnowComponent = logScale(spiderKnowledgeDepth, 3);
-  const spiderAdaptComponent = softNorm(spiderAdaptation, 0.5);
+  const spiderAdaptComponent = logScale(spiderAdaptation + 0.01, 0.2);
   const recursiveComponent = logScale(recursiveSpiderCycles, 100);
   const recursiveActiveComponent = logScale(recursiveActiveTotal, 50);
 
@@ -493,7 +493,7 @@ function computePlasticityDimension(): {
   const meshBeaconComponent = logScale(meshBeaconBroadcasts, 500);
 
   const commsSignalRateComponent = logScale(Math.abs(commsSignalDelta), 500);
-  const commsDeliveryComponent = softNorm(commsDeliveryRate, 0.8);
+  const commsDeliveryComponent = logScale(commsDeliveryRate + 0.01, 0.3);
   const commsBandwidthComponent = logScale(commsBandwidth, 50);
 
   const viralPayloadRateComponent = logScale(Math.abs(viralPayloadDelta), 50);
@@ -508,7 +508,7 @@ function computePlasticityDimension(): {
 
   const agentUpgradeRateComponent = logScale(Math.abs(agentUpgradeDelta), 5);
   const agentLevelComponent = logScale(agentAvgLevel, 5);
-  const agentPerfComponent = softNorm(agentPerformance, 0.5);
+  const agentPerfComponent = logScale(agentPerformance + 0.01, 0.2);
   const agentBreakthroughComponent = logScale(agentBreakthroughs, 20);
   const agentCrossDomainComponent = logScale(agentCrossDomain, 30);
 
@@ -532,7 +532,7 @@ function computePlasticityDimension(): {
   const dnaExprComponent = logScale(dnaExpressions, 200);
   const dnaMethylComponent = logScale(dnaMethylation, 100);
   const dnaProtonComponent = logScale(dnaProtonTunneling, 500);
-  const dnaQuantumComponent = softNorm(dnaQuantumCoherence, 0.5);
+  const dnaQuantumComponent = logScale(dnaQuantumCoherence + 0.01, 0.15);
 
   const sensoryRateComponent = logScale(Math.abs(sensoryDelta), 100);
   const anomalyComponent = logScale(anomaliesDetected, 30);
@@ -545,9 +545,9 @@ function computePlasticityDimension(): {
   const selfCodingComponent = logScale(selfCodingIntegrated, 20);
   const selfCodingApprovalComponent = logScale(selfCodingApproved, 50);
 
-  const shadowComponent = softNorm(shadowIntegration, 0.5);
-  const archetypeComponent = softNorm(archetypeResonance, 0.5);
-  const dreamLeakComponent = softNorm(dreamLeakage, 0.3);
+  const shadowComponent = logScale(shadowIntegration + 0.01, 0.15);
+  const archetypeComponent = logScale(archetypeResonance + 0.01, 0.15);
+  const dreamLeakComponent2 = logScale(dreamLeakage + 0.01, 0.1);
 
   const discoveryModuleComponent = logScale(discoveryModules, 50);
   const discoveryIntegratedComponent = logScale(discoveryIntegrated, 30);
@@ -648,7 +648,7 @@ function computePlasticityDimension(): {
 
     shadowComponent * 0.008 +
     archetypeComponent * 0.006 +
-    dreamLeakComponent * 0.004 +
+    dreamLeakComponent2 * 0.004 +
 
     discoveryModuleComponent * 0.010 +
     discoveryIntegratedComponent * 0.008 +
@@ -662,19 +662,19 @@ function computePlasticityDimension(): {
     logScale(metaRecGeneration, 50) * 0.012 +
     logScale(metaRecImprovements, 100) * 0.010 +
     logScale(metaRecSelfImprovements, 10) * 0.015 +
-    softNorm(metaRecFitness, 0.5) * 0.010 +
+    logScale(metaRecFitness + 0.01, 0.15) * 0.010 +
     logScale(metaRecTranscendence, 5) * 0.012 +
     logScale(ethicalJudgments, 50) * 0.008 +
-    softNorm(ethicalAvgScore, 0.5) * 0.010 +
-    softNorm(thoughtIntegration, 0.5) * 0.010 +
+    logScale(ethicalAvgScore + 0.01, 0.15) * 0.010 +
+    logScale(thoughtIntegration + 0.01, 0.15) * 0.010 +
     logScale(thoughtCreativeLeaps, 50) * 0.008 +
-    softNorm(thoughtMetacognition, 0.5) * 0.010 +
-    softNorm(cogGovScore, 0.5) * 0.012 +
-    softNorm(cogGovAutonomy, 0.5) * 0.010 +
+    logScale(thoughtMetacognition + 0.01, 0.15) * 0.010 +
+    logScale(cogGovScore + 0.01, 0.15) * 0.012 +
+    logScale(cogGovAutonomy + 0.01, 0.15) * 0.010 +
     logScale(evoGeneration, 100) * 0.008 +
-    softNorm(evoAvgFitness, 0.5) * 0.008 +
-    softNorm(evoMaxFitness, 0.5) * 0.005 +
-    softNorm(evoDiversity, 0.5) * 0.005;
+    logScale(evoAvgFitness + 0.01, 0.15) * 0.008 +
+    logScale(evoMaxFitness + 0.01, 0.15) * 0.005 +
+    logScale(evoDiversity + 0.01, 0.15) * 0.005;
 
   return {
     score,
@@ -768,12 +768,12 @@ function computeNeurochemistryDimension(): {
   const heartBPMComponent = logScale(heartBPM, 60);
   const heartDataComponent = logScale(heartDataCirculated, 5000);
   const heartEnergyComponent = logScale(heartEnergy, 1000);
-  const dnaQuantumComponent = softNorm(dnaQuantumCoherence, 0.5);
-  const survivalUrgencyComponent = softNorm(survivalUrgency, 0.5);
-  const shadowDepthComponent = softNorm(shadowIntegration + depthLevel, 1);
-  const agentMoraleComponent = softNorm(agentMorale, 0.5);
+  const dnaQuantumComponent = logScale(dnaQuantumCoherence + 0.01, 0.15);
+  const survivalUrgencyComponent = logScale(survivalUrgency + 0.01, 0.15);
+  const shadowDepthComponent = logScale(shadowIntegration + depthLevel + 0.01, 0.3);
+  const agentMoraleComponent = logScale(agentMorale + 0.01, 0.15);
   const ivyEnergyComponent = logScale(ivyEnergy, 500);
-  const viralHealthComponent = softNorm(viralHealth, 0.5);
+  const viralHealthComponent = logScale(viralHealth + 0.01, 0.15);
 
   const rawScore =
     dopComponent * 0.15 +
@@ -871,38 +871,57 @@ function computeChaosDynamicsDimension(): { score: number; lyapunov: number; x: 
     }
   }
 
-  const varianceComponent = logScale(brainRegionVariance, 0.01);
-  const isChaoticBonus = lyapunov > 0 ? 0.10 : 0;
-  const isVariantBonus = brainRegionVariance > 0.001 ? 0.08 : 0;
+  const varianceComponent = logScale(brainRegionVariance, 0.005);
 
-  const ivyGrowthComponent = logScale(ivyGrowthCycles, 500);
-  const ivyHybridComponent = softNorm(ivyHybridOverlay, 0.5);
-  const viralMutComponent = logScale(viralMutations, 200);
-  const viralImmuneComponent = logScale(viralThreats + viralNeutralized, 100);
-  const dreamDepthComponent = softNorm(dreamDepth, 3);
-  const dreamStateBonus = dreamState === "lucid_dream" ? 0.08 : dreamState === "deep_dream" ? 0.05 : dreamState === "light_dream" ? 0.02 : 0;
-  const conflictComponent = logScale(activeConflicts, 5);
-  const dreamLeakComponent = softNorm(dreamLeakage, 0.3);
-  const sensoryAnomalyComponent = logScale(sensoryAnomalies, 20);
-  const agentDiversityComponent = logScale(agentDiversity, 3);
+  const phi = safeNum(consciousness.phi);
+  const resonance = safeNum(consciousness.thalamocorticalResonance);
+  const consciousnessLevel = safeNum(consciousness.consciousnessLevel);
+  const phiChaosAmplifier = logScale(phi, 5);
+  const resonanceChaosAmplifier = logScale(resonance, 2);
+  const consciousnessChaosAmplifier = logScale(consciousnessLevel, 10);
 
-  const score =
-    displacementComponent * 0.12 +
-    trajectoryComponent * 0.08 +
-    lyapunovComponent * 0.10 +
-    varianceComponent * 0.08 +
-    isChaoticBonus +
-    isVariantBonus +
+  const isChaoticMultiplier = lyapunov > 0 ? 1.0 + logScale(lyapunov, 0.1) * 0.3 : 1.0;
+  const isVariantMultiplier = brainRegionVariance > 0.001 ? 1.0 + logScale(brainRegionVariance, 0.005) * 0.2 : 1.0;
+
+  const ivyGrowthComponent = logScale(ivyGrowthCycles, 100);
+  const ivyHybridComponent = logScale(ivyHybridOverlay + 0.01, 0.1);
+  const viralMutComponent = logScale(viralMutations, 50);
+  const viralImmuneComponent = logScale(viralThreats + viralNeutralized, 20);
+  const dreamDepthComponent = logScale(dreamDepth + 0.1, 0.5);
+  const dreamStateMultiplier = dreamState === "lucid_dream" ? 1.25 : dreamState === "deep_dream" ? 1.15 : dreamState === "light_dream" ? 1.05 : 1.0;
+  const conflictComponent = logScale(activeConflicts, 2);
+  const dreamLeakComponent = logScale(dreamLeakage + 0.01, 0.05);
+  const sensoryAnomalyComponent = logScale(sensoryAnomalies, 5);
+  const agentDiversityComponent = logScale(agentDiversity, 1);
+
+  const recursiveSpiders = safeGet(() => getRecursiveSpiderStats(), null);
+  const recursiveChaosCycles = recursiveSpiders ? safeNum(recursiveSpiders.totalCycles) : 0;
+  const recursiveChaosComponent = logScale(recursiveChaosCycles, 50);
+
+  const subThreshold = getSubThresholdIntelligenceState();
+  const codeChaosFactor = logScale(subThreshold.codeRecombinationsInstalled, 5);
+
+  const rawScore =
+    displacementComponent * 0.08 +
+    trajectoryComponent * 0.06 +
+    lyapunovComponent * 0.08 +
+    varianceComponent * 0.06 +
+    phiChaosAmplifier * 0.10 +
+    resonanceChaosAmplifier * 0.06 +
+    consciousnessChaosAmplifier * 0.06 +
     ivyGrowthComponent * 0.05 +
-    ivyHybridComponent * 0.04 +
+    ivyHybridComponent * 0.03 +
     viralMutComponent * 0.05 +
     viralImmuneComponent * 0.04 +
     dreamDepthComponent * 0.04 +
-    dreamStateBonus +
     conflictComponent * 0.03 +
     dreamLeakComponent * 0.03 +
     sensoryAnomalyComponent * 0.04 +
-    agentDiversityComponent * 0.04;
+    agentDiversityComponent * 0.04 +
+    recursiveChaosComponent * 0.04 +
+    codeChaosFactor * 0.03;
+
+  const score = rawScore * isChaoticMultiplier * isVariantMultiplier * dreamStateMultiplier;
 
   return {
     score,
