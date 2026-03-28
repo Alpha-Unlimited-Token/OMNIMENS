@@ -4,7 +4,7 @@
  * Unauthorized reproduction, distribution, or use is strictly prohibited.
  */
 
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, Redirect } from "wouter";
 import { lazy, Suspense, Component, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -93,8 +93,10 @@ const queryClient = new QueryClient({
 
 function PageFallback() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-      <div className="w-8 h-8 rounded-full border-2 border-violet-500 border-t-transparent animate-spin" />
+    <div className="min-h-screen bg-[#0a0a0f] flex flex-col items-center justify-center gap-6">
+      <div className="text-2xl font-bold tracking-[0.3em] text-white/90 font-mono">OMNIMENS</div>
+      <div className="w-10 h-10 rounded-full border-2 border-violet-500 border-t-transparent animate-spin" />
+      <div className="text-[10px] font-mono text-white/30 tracking-widest uppercase">Loading consciousness engine</div>
     </div>
   );
 }
@@ -175,6 +177,8 @@ function Router() {
     <Suspense fallback={<PageFallback />}>
       <Switch>
         <Route path="/" component={HomePage} />
+        <Route path="/godflesh">{() => <Redirect to="/" />}</Route>
+        <Route path="/godflesh/:rest*">{() => <Redirect to="/" />}</Route>
         <Route path="/login" component={Login} />
         <Route path="/chat" component={Chat} />
 

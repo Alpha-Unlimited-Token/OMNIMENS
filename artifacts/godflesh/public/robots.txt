@@ -1,13 +1,15 @@
 User-agent: *
 Allow: /
-Disallow: /godflesh/account
-Disallow: /godflesh/memory
-Disallow: /godflesh/projects
-Disallow: /godflesh/tools
-Disallow: /godflesh/lip-sync
+Disallow: /account
+Disallow: /memory
+Disallow: /projects
+Disallow: /tools
+Disallow: /lip-sync
+Disallow: /files
+Disallow: /connect
 Disallow: /api/
 
-Sitemap: https://omnimens-ai.com/godflesh/sitemap.xml
+Sitemap: https://omnimens-ai.com/sitemap.xml
 
 User-agent: Googlebot
 Allow: /

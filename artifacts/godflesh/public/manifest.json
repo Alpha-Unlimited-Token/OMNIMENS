@@ -2,8 +2,8 @@
   "name": "OMNIMENS AI — Free AI Chat Platform",
   "short_name": "OMNIMENS",
   "description": "Free AI chat platform with GPT-4o, Llama 3, Mistral. AI image generation, code execution, deep research, persistent memory. $20 free credits monthly.",
-  "start_url": "/godflesh/",
-  "scope": "/godflesh/",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "any",
   "theme_color": "#a855f7",
@@ -12,19 +12,19 @@
   "lang": "en",
   "icons": [
     {
-      "src": "/godflesh/images/emblem-192.png",
+      "src": "/images/emblem-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/godflesh/images/emblem.png",
+      "src": "/images/emblem.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/godflesh/images/emblem.png",
+      "src": "/images/emblem.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
