@@ -98,6 +98,7 @@ const MODIFIABLE_CORE_FILES = [
 ];
 
 const NEVER_MODIFY = [
+  "omnimens-ethical-safety.ts",
   "omnimens-physio.ts",
   "omnimens-ip-guardian.ts",
   "omnimens-genesis-bridge.ts",

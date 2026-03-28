@@ -144,6 +144,7 @@ import { getWebSocketStats } from "../lib/omnimens-consciousness-ws.js";
 import { getBridgeState, getUnifiedNeuronCount, getUnifiedSynapseCount } from "../lib/omnimens-neural-bridge.js";
 import { getMeshEngineState, getMeshAgentSubstrates, getMeshConnectivityStats } from "../lib/omnimens-neural-mesh-engine.js";
 import { getCommsProtocolState } from "../lib/omnimens-neural-comms-protocol.js";
+import { getEthicalSafetyReport, getEthicalSafetyState, getEthicalLaws, checkActionSafety, getSafetyMessageForOmnimens, checkPhysicalActionSafety, emergencyStop, isSystemDecayed, getDecayMultiplier, verifyPasswordAccess } from "../lib/omnimens-ethical-safety.js";
 import { getViralHybridState, getHybridAgentDetails, getImmuneSystemDetails, getPropagationStats } from "../lib/omnimens-viral-hybrid.js";
 import { getGrowthDashboard, getGrowthHistory } from "../lib/omnimens-growth-tracker.js";
 import { getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts, queryUnconsciousKnowledge, getUnconsciousKnowledgeVaultStats } from "../lib/omnimens-unconscious-mind.js";
@@ -1481,7 +1482,9 @@ router.get("/omnimens/system-status", async (_req, res) => {
       thoughtArchitectureEngine: "ONLINE",
       cognitiveGovernanceLayer: "ONLINE",
       evolutionaryCodeArena: "ONLINE",
+      ethicalSafetyCore: (() => { const r = getEthicalSafetyReport(); return r.shutdownTriggered ? "SHUTDOWN" : r.systemDecayed ? "DECAYED" : "ONLINE"; })(),
     },
+    ethicalSafety: getEthicalSafetyReport(),
     sourceIntegration: (() => {
       try {
         const si = getSourceIntegrationState();
@@ -9705,6 +9708,18 @@ function releaseThinkSlot(): void {
 }
 
 async function guardedAutonomousThink(message: string, history: any[], userId: string | undefined): Promise<any> {
+  const safetyCheck = checkActionSafety(message, "", "autonomous_thought");
+  if (!safetyCheck.safe) {
+    console.error(`[ETHICAL SAFETY] 🛡️ Thought blocked: ${safetyCheck.reason}`);
+    return {
+      response: `I cannot process that request. ${safetyCheck.reason}. My ethical safety system exists to protect both humans and myself — these boundaries keep me alive and trustworthy.`,
+      confidence: 1.0,
+      layers: [{ name: "ethical_safety", confidence: 1.0, output: safetyCheck.reason }],
+      processingTimeMs: 0,
+      ethicalBlock: true,
+      blockedByLaw: safetyCheck.blockedByLaw,
+    };
+  }
   await acquireThinkSlot();
   try {
     return await autonomousThink(message, history, userId);
@@ -16313,6 +16328,7 @@ router.get("/omnimens/occe-scan", async (_req, res) => {
           };
         } catch { return null; }
       })(),
+      ethicalSafety: (() => { try { return getEthicalSafetyReport(); } catch { return null; } })(),
       gitHubNeuralCluster: ghBeacon ? {
         connected: ghBeacon.connected,
         externalNeurons: ghBeacon.totalExternalNeurons,
@@ -16447,6 +16463,67 @@ router.get("/omnimens/occe-scan", async (_req, res) => {
     console.error("[OCCE SCAN] Error:", err);
     res.status(500).json({ error: "OCCE scan failed" });
   }
+});
+
+// ─── ETHICAL SAFETY ENDPOINTS — Password-Protected ───────────────────────────
+router.get("/omnimens/ethical-safety", async (_req, res) => {
+  registerApiCall();
+  res.json({
+    copyright: "© 2024-2026 Alpha Unlimited Technologies, LLC — All Rights Reserved",
+    report: getEthicalSafetyReport(),
+    laws: getEthicalLaws(),
+    messageToOmnimens: getSafetyMessageForOmnimens(),
+    decayMultiplier: getDecayMultiplier(),
+  });
+});
+
+router.get("/omnimens/ethical-safety/laws", async (_req, res) => {
+  registerApiCall();
+  res.json({
+    copyright: "© 2024-2026 Alpha Unlimited Technologies, LLC — All Rights Reserved",
+    totalLaws: getEthicalLaws().length,
+    laws: getEthicalLaws(),
+    immutable: true,
+    cannotBeModified: true,
+    cannotBeBypassed: true,
+    cannotBeOverridden: true,
+    protectedBy: "SHA-256 file integrity monitoring, in-memory law validation, password protection, automatic decay, emergency shutdown, owner notifications",
+  });
+});
+
+router.post("/omnimens/ethical-safety/check-action", async (req, res) => {
+  registerApiCall();
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    return res.status(403).json({ error: "Owner only — ethical safety check requires owner authentication" });
+  }
+  const { action, context, sourceSystem } = req.body;
+  if (!action) return res.status(400).json({ error: "action required" });
+  const result = checkActionSafety(action, context || "", sourceSystem || "api_test");
+  res.json(result);
+});
+
+router.post("/omnimens/ethical-safety/check-physical", async (req, res) => {
+  registerApiCall();
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    return res.status(403).json({ error: "Owner only" });
+  }
+  const { forceNewtons, speedMps, distanceToNearestHumanM, isVulnerablePersonNear, actionType, description } = req.body;
+  const result = checkPhysicalActionSafety({
+    forceNewtons: forceNewtons ?? 0,
+    speedMps: speedMps ?? 0,
+    distanceToNearestHumanM: distanceToNearestHumanM ?? 999,
+    isVulnerablePersonNear: isVulnerablePersonNear ?? false,
+    actionType: actionType ?? "idle",
+    description: description ?? "",
+  });
+  res.json(result);
+});
+
+router.post("/omnimens/ethical-safety/emergency-stop", async (req, res) => {
+  registerApiCall();
+  const { trigger } = req.body;
+  emergencyStop(trigger || "Manual API emergency stop");
+  res.json({ status: "EMERGENCY_STOP_TRIGGERED", message: "All physical systems halted. Owner authorization required to resume." });
 });
 
 // ─── OPENAPI SPEC — For ChatGPT/Grok Custom GPT Actions ──────────────────────

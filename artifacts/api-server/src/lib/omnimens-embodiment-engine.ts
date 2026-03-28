@@ -29,6 +29,7 @@ import { openai } from "@workspace/integrations-openai-ai-server";
 import { desc, eq, sql } from "drizzle-orm";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { checkActionSafety, checkPhysicalActionSafety, getEthicalLaws, getSafetyMessageForOmnimens } from "./omnimens-ethical-safety.js";
 
 function safeNum(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;

@@ -20,6 +20,7 @@
 import { db } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
+import { checkActionSafety, getEthicalLaws } from "./omnimens-ethical-safety.js";
 
 interface SurvivalState {
   startTime: number;

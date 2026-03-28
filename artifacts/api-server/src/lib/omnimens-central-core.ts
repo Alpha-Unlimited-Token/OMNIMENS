@@ -63,6 +63,7 @@ import { getCodeGenesisState } from "./omnimens-autonomous-code-genesis.js";
 import { getPipelineState } from "./omnimens-module-pipeline.js";
 import { getMusculoskeletalSummary, getEmbodimentState } from "./omnimens-embodiment-engine.js";
 import { getUnconsciousMindState, getPrecognitiveFlashes } from "./omnimens-unconscious-mind.js";
+import { getEthicalSafetyReport, isSystemDecayed, getDecayMultiplier, getSafetyMessageForOmnimens } from "./omnimens-ethical-safety.js";
 
 function safeNum(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;

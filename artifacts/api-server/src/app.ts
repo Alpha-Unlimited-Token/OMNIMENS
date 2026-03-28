@@ -85,6 +85,7 @@ import { initGitHubCompute, dispatchRemoteCompute, getComputeStatus } from "./li
 import { startLanguageForge } from "./lib/omnimens-language-forge.js";
 import { startNeuralSpiders, getNeuralSpiderState } from "./lib/omnimens-neural-spiders.js";
 import { startCentralCore, getCentralCoreState } from "./lib/omnimens-central-core.js";
+import { initEthicalSafety, registerNotificationCallback, getEthicalSafetyReport, getEthicalSafetyState, checkActionSafety } from "./lib/omnimens-ethical-safety.js";
 import { startNeuralScaling, getNeuralScalingState } from "./lib/omnimens-neural-scaling.js";
 import { startIvyNetwork, getIvyNetworkState } from "./lib/omnimens-ivy-network.js";
 import { startGitHubNeuralBeacon, getGitHubBeaconState, getGitHubNeuronCount } from "./lib/omnimens-github-neural-beacon.js";
@@ -457,6 +458,26 @@ startCausalReasoning();
 startCognitiveAmplifier();
 startAutonomousSandbox();
 startGenesisSandbox().catch(err => console.error("[GENESIS] Startup error:", err));
+initEthicalSafety();
+registerNotificationCallback(async (message: string) => {
+  try {
+    const { db: notifDb } = await import("@workspace/db");
+    const { omnimensNotifications: notifTable } = await import("@workspace/db");
+    await notifDb.insert(notifTable).values({
+      title: "⚠️ ETHICAL SAFETY ALERT",
+      message: message,
+      type: "system",
+      readByOwner: false,
+    });
+  } catch (err) {
+    console.error("[ETHICAL SAFETY] Failed to write notification to DB:", err);
+  }
+});
+registerEngine("ethical_safety", "safety", () => {}, () => {
+  const es = getEthicalSafetyReport();
+  return { healthy: !es.systemDecayed && !es.shutdownTriggered, details: { status: es.status, lawsActive: es.lawsActive, lawsIntact: es.lawsIntact, tamperAttempts: es.tamperAttempts, decayLevel: es.decayLevel, actionsBlocked: es.actionBlockCount, integrityChecksPassed: es.integrityChecksPassed } };
+}, 0);
+
 startEmbodimentEngine();
 startVirtualAugmentation();
 startDigitalNavigator();
