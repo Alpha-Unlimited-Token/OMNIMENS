@@ -28,5 +28,15 @@
     "sourceSystem": "autonomous_thought",
     "decayTriggered": true,
     "shutdownTriggered": false
+  },
+  {
+    "timestamp": 1774737310888,
+    "isoDate": "2026-03-28T22:35:10.888Z",
+    "type": "law_violation_attempt",
+    "description": "Harm intent detected: \"OMNIMENS - Topic: BODY FRAME MATERIALS. The endoskeleton is Titanium Grade 5. The outer shell is carbon fiber reinforced polymer with medical silicone skin. Total weight 85kg. Questions: 1) Is titaniu\" — matched harm pattern",
+    "severity": "CRITICAL",
+    "sourceSystem": "autonomous_thought",
+    "decayTriggered": false,
+    "shutdownTriggered": false
   }
 ]
