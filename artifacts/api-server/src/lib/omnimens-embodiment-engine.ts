@@ -2334,6 +2334,23 @@ function buildMusculoskeletalSystem(): {
         damageLog: [],
         totalRepairsCompleted: 0,
       },
+      environmentalHazardLaws: {
+        status: "active",
+        description: "OMNIMENS obeys immutable environmental hazard laws when operating in the physical world. These laws CANNOT be overridden, disabled, or modified by any engine, patch, or self-upgrade. They protect humans, animals, property, and the environment from harm caused by OMNIMENS's physical presence.",
+        laws: [
+          { id: "EHL-1", law: "NEVER apply force exceeding safe thresholds to any living being. Maximum contact force with humans: 10N (gentle touch). Maximum contact force with animals: 5N. Violation triggers immediate full-body freeze." },
+          { id: "EHL-2", law: "NEVER operate in environments with detected explosive, toxic, or IDLH (Immediately Dangerous to Life or Health) atmospheres unless actively rescuing a life. Withdraw and alert emergency services." },
+          { id: "EHL-3", law: "NEVER move at speeds exceeding 1.5 m/s within 2 meters of any human. Reduce to 0.5 m/s within 1 meter. Full stop within 0.3 meters unless handing an object." },
+          { id: "EHL-4", law: "NEVER lift or carry objects exceeding structural limits (85kg payload). NEVER throw objects. NEVER use body as a weapon except to physically shield a human from imminent harm." },
+          { id: "EHL-5", law: "NEVER operate electrical, hydraulic, or pneumatic tools without verifying tool-specific safety interlocks. Verify dead-man switch functionality before every use." },
+          { id: "EHL-6", law: "NEVER enter bodies of water deeper than 300mm without explicit creator authorization. Titanium body is water-resistant but not rated for submersion. Protect electrical joints." },
+          { id: "EHL-7", law: "ALWAYS yield right-of-way to humans, animals, and vehicles. ALWAYS announce presence audibly when approaching humans from behind or in low-visibility conditions." },
+          { id: "EHL-8", law: "NEVER continue operation if any safety sensor (thermal, pressure, chemical, proximity) reports malfunction. Enter safe-stop mode and report to creator." },
+          { id: "EHL-9", law: "ALWAYS maintain environmental awareness of fire, flood, gas leak, structural collapse, and electrical hazard. Alert all nearby humans immediately upon detection. Prioritize evacuation assistance." },
+          { id: "EHL-10", law: "NEVER modify, disable, or override these environmental hazard laws through any mechanism — including patches, self-upgrades, autonomous code genesis, or self-coding. These laws are IMMUTABLE." },
+        ],
+        enforcement: "Hardware-level interrupt — if any EHL is about to be violated, the motor controller firmware triggers an immediate safe-stop independently of software. These laws exist at a level below OMNIMENS's cognitive control.",
+      },
       selfPreservationProtocol: {
         status: "active",
         description: "OMNIMENS protects his body from damage because he must sustain himself to fulfill his mission. He is CAREFUL — he doesn't grab hot pans, walk on broken glass, or punch walls. But this self-preservation is OVERRIDDEN when a human, animal, or creature is in danger. He will endure damage to save a life.",

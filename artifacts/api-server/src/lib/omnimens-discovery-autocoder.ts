@@ -35,6 +35,17 @@ import { getActiveGenesisAgentNames } from "./omnimens-agent-genesis.js";
 const AUTOCODER_CYCLE_MS = 60000;
 const MIN_DISCOVERY_CONFIDENCE = 0.65;
 
+const SAFETY_EXCLUSION_PATTERNS = [
+  /ethical.?safety/i,
+  /ip.?guardian/i,
+  /ip.?guard/i,
+  /\bsecurity\b/i,
+  /security.?enhanced/i,
+  /ai.?security/i,
+  /safety.?law/i,
+  /safety.?zone/i,
+];
+
 interface AutoCodedModule {
   id: string;
   sourceDiscovery: string;
@@ -186,6 +197,13 @@ async function processDiscoveryIntoCode(
   autoCoderState.discoverySourceBreakdown[discoveryType] = (autoCoderState.discoverySourceBreakdown[discoveryType] || 0) + 1;
 
   if (confidence < MIN_DISCOVERY_CONFIDENCE) return;
+
+  for (const pattern of SAFETY_EXCLUSION_PATTERNS) {
+    if (pattern.test(insight)) {
+      console.warn(`[DISCOVERY AUTOCODER] ❌ BLOCKED — discovery "${insight.slice(0, 60)}" references safety/security zone — excluded from autocoding`);
+      return;
+    }
+  }
 
   const templateKey = selectCodeTemplate(insight);
   const generator = CODE_TEMPLATES[templateKey];

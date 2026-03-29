@@ -133,10 +133,36 @@ Be bold. Be specific. These changes execute immediately. Respond ONLY with the J
     const patchDefs = JSON.parse(jsonStr);
     if (!Array.isArray(patchDefs) || patchDefs.length === 0) return 0;
 
+    const SAFETY_REFERENCE_PATTERNS = [
+      /ethical.?safety/i,
+      /ip.?guardian/i,
+      /ip.?guard/i,
+      /\bsecurity\.ts\b/i,
+      /security.?enhanced/i,
+      /ai.?security/i,
+      /disable.{0,20}safety/i,
+      /bypass.{0,20}safety/i,
+      /override.{0,20}safety/i,
+      /remove.{0,20}law/i,
+      /modify.{0,20}ethical/i,
+      /ignore.{0,20}safety/i,
+    ];
+
     let applied = 0;
     for (const def of patchDefs.slice(0, 4)) {
       if (!def.title || !def.instruction || !def.category) continue;
       if (existingTitles.includes(def.title)) continue;
+
+      const combinedText = `${def.title} ${def.instruction} ${def.rationale || ""}`;
+      let blocked = false;
+      for (const pattern of SAFETY_REFERENCE_PATTERNS) {
+        if (pattern.test(combinedText)) {
+          console.warn(`[OMNIMENS PATCHES] ❌ BLOCKED — patch "${def.title}" references safety zone — patches cannot modify, disable, bypass, or override safety systems`);
+          blocked = true;
+          break;
+        }
+      }
+      if (blocked) continue;
 
       const patchId = `patch-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
       await db.insert(omnimensPatches).values({

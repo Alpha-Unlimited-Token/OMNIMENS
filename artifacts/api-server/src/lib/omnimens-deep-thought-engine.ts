@@ -146,6 +146,9 @@ const EXCLUDED_FILES = [
   "omnimens-ethical-safety.ts",
   "omnimens-ip-guardian.ts",
   "omnimens-ip-guard.ts",
+  "security.ts",
+  "security-enhanced.ts",
+  "ai-security.ts",
 ];
 
 let cachedManifest: EngineManifestEntry[] | null = null;

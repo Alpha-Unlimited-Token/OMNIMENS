@@ -122,6 +122,23 @@ function validateCodeSafety(code: string): { safe: boolean; reason: string } {
   const codeNoCommentsNoStrings = codeNoComments
     .replace(/(["'`])(?:(?!\1|\\).|\\.)*\1/g, "''");
 
+  const FORBIDDEN_IMPORTS = [
+    "omnimens-ethical-safety",
+    "omnimens-ip-guardian",
+    "omnimens-ip-guard",
+    "security",
+    "security-enhanced",
+    "ai-security",
+  ];
+
+  for (const forbidden of FORBIDDEN_IMPORTS) {
+    const escapedName = forbidden.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const forbiddenPattern = new RegExp(`['"]\\.\\/(?:.*\\/)?${escapedName}(?:\\.(?:ts|js|mjs))?['"]`, "i");
+    if (forbiddenPattern.test(codeNoComments)) {
+      return { safe: false, reason: `FORBIDDEN: Attempts to import safety/security module "${forbidden}" — safety zone is READ-ONLY for OMNIMENS` };
+    }
+  }
+
   const importPatterns = [
     { pattern: /['"]child_process['"]/i, reason: "Imports child_process module" },
     { pattern: /require\s*\(\s*['"](?:child_process|cluster)['"]/i, reason: "Requires dangerous Node.js module" },

@@ -41,6 +41,21 @@ const MAX_MODULES_PER_CYCLE = 2;
 const MIN_CONFIDENCE_FOR_PATTERN = 0.4;
 const MODULES_DIR = path.resolve(__dirname_local, "../omnimens-runtime/modules");
 
+const PROTECTED_FILES = [
+  "omnimens-ethical-safety.ts",
+  "omnimens-ip-guardian.ts",
+  "omnimens-ip-guard.ts",
+  "security.ts",
+  "security-enhanced.ts",
+  "ai-security.ts",
+  "omnimens-genesis-bridge.ts",
+  "omnimens-source-integration.ts",
+  "omnimens-autonomous-sandbox.ts",
+  "omnimens-self-coding.ts",
+  "omnimens-patches.ts",
+  "omnimens-autonomous-code-genesis.ts",
+];
+
 interface CodePattern {
   name: string;
   description: string;
@@ -2173,6 +2188,20 @@ async function writeGeneratedModule(mod: GeneratedModule): Promise<boolean> {
     const safeName = sanitizeName(mod.name);
     const filename = `${safeName}_autonomous.mjs`;
     const filepath = path.join(MODULES_DIR, filename);
+
+    for (const protectedFile of PROTECTED_FILES) {
+      const protectedName = protectedFile.replace(/\.ts$/, "");
+      if (safeName.includes(protectedName) || mod.name.toLowerCase().includes(protectedName.replace("omnimens-", ""))) {
+        console.warn(`[CODE GENESIS] ❌ BLOCKED — "${mod.name}" targets protected file "${protectedFile}" — safety zone is immutable`);
+        return false;
+      }
+    }
+
+    const safetyImportPattern = /(?:import|require)\s*.*(?:ethical-safety|ip-guardian|ip-guard|security\.ts|security-enhanced|ai-security)/i;
+    if (safetyImportPattern.test(mod.code)) {
+      console.warn(`[CODE GENESIS] ❌ BLOCKED — "${mod.name}" attempts to import safety/security modules — FORBIDDEN`);
+      return false;
+    }
 
     if (fs.existsSync(filepath)) {
       return false;
