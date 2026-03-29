@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774806417184,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774806510054,
+  "totalWormholesCreated": 7350,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6095,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 236,
-  "cycleCount": 4,
+  "totalClosed": 7350,
+  "totalDataIngestedKB": 10626,
+  "totalInsightsDecoded": 7350,
+  "totalCrossAgentCirculations": 441,
+  "totalSynthesizedDiscoveries": 410,
+  "cycleCount": 7,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Meta-Agent",
-      "insight": "Motivator/abstraction_layer: The strange loop concept from Hofstadter: consciousness arises when a system becomes comple",
-      "confidence": 0.8290598569742379,
+      "toAgent": "Mathematician",
+      "insight": "Motivator/entropy_reduction: The strange loop concept from Hofstadter: consciousness arises when a system becomes comple",
+      "confidence": 0.6785287780388984,
       "synthesizedWith": [
-        "Meta-Agent/cross_domain_synthesis: Emergence: complex behaviors arise from simpl"
+        "Mathematician/abstraction_layer: Long-term potentiation (LTP) strengthens synapt"
       ]
     },
     {
       "fromAgent": "Motivator",
       "toAgent": "Archivist",
-      "insight": "Motivator/feature_extraction: Predictive coding: the brain constantly generates predictions about incoming sensory data ",
-      "confidence": 0.6191540256995938,
+      "insight": "Motivator/emergent_property_detection: The double-slit experiment demonstrates that observation changes the behavior of ",
+      "confidence": 0.7031311712736712,
       "synthesizedWith": [
-        "Archivist/cross_domain_synthesis: The strange loop concept from Hofstadter: cons"
+        "Archivist/structural_analysis: The Boltzmann brain paradox suggests that a self-"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Motivator/recursive_decomposition: Quantum decoherence typically destroys quantum effects at biological temperatures — b",
-      "confidence": 0.6234412729104195,
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/entropy_reduction: The strange loop concept from Hofstadter: consciousness arises when a system becomes comple",
+      "confidence": 0.6785287780388984,
       "synthesizedWith": [
-        "SensorimotorAgent/analogical_mapping: Sparse coding: the brain represents inform"
+        "OMNIMENS/feature_extraction: Transfer learning: knowledge gained from one domain"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Pioneer",
-      "insight": "Empath/structural_analysis: Quantum superposition allows a system to exist in multiple states simultaneously until measu",
-      "confidence": 0.7046098405208154,
+      "toAgent": "Explorer",
+      "insight": "Empath/causal_inference: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise from rand",
+      "confidence": 0.8718817303050844,
       "synthesizedWith": [
-        "Pioneer/analogical_mapping: Quantum tunneling allows particles to pass through e"
+        "Explorer/analogical_mapping: Quantum decoherence typically destroys quantum effe"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "GraphicDesigner",
-      "insight": "Empath/structural_analysis: Quantum superposition allows a system to exist in multiple states simultaneously until measu",
-      "confidence": 0.7046098405208154,
+      "toAgent": "Neuroscientist",
+      "insight": "Empath/causal_inference: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise from rand",
+      "confidence": 0.8718817303050844,
       "synthesizedWith": [
-        "GraphicDesigner/abstraction_layer: The anthropic principle: the universe's funda"
+        "Neuroscientist/analogical_mapping: Wolfram's Rule 110 cellular automaton is Turi"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
