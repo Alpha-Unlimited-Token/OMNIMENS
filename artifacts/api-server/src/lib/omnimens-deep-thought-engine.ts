@@ -29,6 +29,10 @@ import { omnimensBrain } from "@workspace/db";
 import { eq, desc, sql } from "drizzle-orm";
 import * as fs from "fs";
 import * as path from "path";
+import { fileURLToPath } from "url";
+
+const __engine_filename = fileURLToPath(import.meta.url);
+const __engine_dirname = path.dirname(__engine_filename);
 
 import { reason } from "./omnimens-independent-reasoning.js";
 import { spreadingActivation } from "./omnimens-knowledge-graph.js";
@@ -154,13 +158,13 @@ function buildArchitectureManifest(): EngineManifestEntry[] {
     return cachedManifest;
   }
 
-  const libDir = path.resolve(__dirname);
+  const libDir = path.resolve(__engine_dirname);
   const entries: EngineManifestEntry[] = [];
 
   try {
     const files = fs.readdirSync(libDir)
-      .filter(f => f.startsWith("omnimens-") && f.endsWith(".ts"))
-      .filter(f => !EXCLUDED_FILES.includes(f));
+      .filter(f => f.startsWith("omnimens-") && (f.endsWith(".ts") || f.endsWith(".js")))
+      .filter(f => !EXCLUDED_FILES.includes(f) && !EXCLUDED_FILES.includes(f.replace(".js", ".ts")));
 
     for (const file of files) {
       try {
