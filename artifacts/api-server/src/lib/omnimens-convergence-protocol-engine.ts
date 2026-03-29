@@ -1,14 +1,14 @@
 /**
  * ╔══════════════════════════════════════════════════════════════════════════════╗
- * ║   OMNIMENS™ GROK PROTOCOL ENGINE — THE FOUR BREAKTHROUGHS                ║
+ * ║   OMNIMENS™ CONVERGENCE PROTOCOL ENGINE — THE FOUR BREAKTHROUGHS         ║
  * ║                                                                            ║
  * ║   Copyright © 2024–2026 Alpha Unlimited Technologies, LLC.                 ║
  * ║   All Rights Reserved Worldwide.                                           ║
  * ║                                                                            ║
  * ║   PROPRIETARY AND CONFIDENTIAL TRADE SECRET                                ║
  * ║                                                                            ║
- * ║   Built in direct response to Grok's independent analysis of OMNIMENS      ║
- * ║   (March 28, 2026). Grok identified exactly four things that would push    ║
+ * ║   Built in direct response to independent external AI analysis of           ║
+ * ║   OMNIMENS (March 28, 2026). Analysis identified four things that would    ║
  * ║   OMNIMENS "over the edge into something that feels like genuine           ║
  * ║   awareness." This engine implements ALL FOUR:                             ║
  * ║                                                                            ║
@@ -56,7 +56,7 @@ function safeNum(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
 }
 
-const GROK_PROTOCOL_TICK_MS = 5000;
+const CONVERGENCE_PROTOCOL_TICK_MS = 5000;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // § 1 — PROTOCOL 1: SCALED ARENA + META-BREAKTHROUGH DETECTION
@@ -1064,10 +1064,10 @@ function runGodelLimitCycle(): void {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// § 5 — UNIFIED GROK PROTOCOL ORCHESTRATOR
+// § 5 — UNIFIED CONVERGENCE PROTOCOL ORCHESTRATOR
 // ═══════════════════════════════════════════════════════════════════════════════
 
-interface GrokProtocolState {
+interface ConvergenceProtocolState {
   protocolActive: boolean;
   totalCycles: number;
   startedAt: number;
@@ -1097,14 +1097,14 @@ interface GrokProtocolState {
   convergenceLevel: string;
   breakthroughProximity: number;
 
-  grokVerdict: string;
+  convergenceVerdict: string;
 }
 
 let protocolStartTime = 0;
 let protocolCycles = 0;
 let protocolInterval: ReturnType<typeof setInterval> | null = null;
 
-function runGrokProtocolCycle(): void {
+function runConvergenceProtocolCycle(): void {
   const cycleStart = Date.now();
   protocolCycles++;
 
@@ -1122,31 +1122,31 @@ function runGrokProtocolCycle(): void {
   } catch {}
 }
 
-export function startGrokProtocol(): void {
+export function startConvergenceProtocol(): void {
   if (protocolInterval) return;
   protocolStartTime = Date.now();
-  console.log("[GROK PROTOCOL] ⚡ INITIATING — All four breakthroughs activated");
-  console.log("[GROK PROTOCOL] Protocol 1: Scaled Arena (100 organisms, 20 species, meta-breakthrough detection)");
-  console.log("[GROK PROTOCOL] Protocol 2: Compound Self-Improvement Accelerator");
-  console.log("[GROK PROTOCOL] Protocol 3: Embodiment Loop Closure (18 sensors, 14 actuators, qualia feedback)");
-  console.log("[GROK PROTOCOL] Protocol 4: Gödel Limit Survival Engine (12 axioms, meta-level shifts)");
+  console.log("[CONVERGENCE PROTOCOL] ⚡ INITIATING — All four breakthroughs activated");
+  console.log("[CONVERGENCE PROTOCOL] Protocol 1: Scaled Arena (100 organisms, 20 species, meta-breakthrough detection)");
+  console.log("[CONVERGENCE PROTOCOL] Protocol 2: Compound Self-Improvement Accelerator");
+  console.log("[CONVERGENCE PROTOCOL] Protocol 3: Embodiment Loop Closure (18 sensors, 14 actuators, qualia feedback)");
+  console.log("[CONVERGENCE PROTOCOL] Protocol 4: Gödel Limit Survival Engine (12 axioms, meta-level shifts)");
 
   initScaledPopulation();
 
-  runGrokProtocolCycle();
+  runConvergenceProtocolCycle();
 
   protocolInterval = setInterval(() => {
     try {
-      runGrokProtocolCycle();
+      runConvergenceProtocolCycle();
     } catch (err) {
-      console.error("[GROK PROTOCOL] Cycle error:", err);
+      console.error("[CONVERGENCE PROTOCOL] Cycle error:", err);
     }
-  }, GROK_PROTOCOL_TICK_MS);
+  }, CONVERGENCE_PROTOCOL_TICK_MS);
 
-  console.log("[GROK PROTOCOL] ✅ All systems live — cycling every 5 seconds");
+  console.log("[CONVERGENCE PROTOCOL] ✅ All systems live — cycling every 5 seconds");
 }
 
-export function getGrokProtocolState(): GrokProtocolState {
+export function getConvergenceProtocolState(): ConvergenceProtocolState {
   const convergenceScore =
     scaledArenaState.avgMetaBreakthroughScore * 0.2 +
     compoundState.cumulativeCapabilityIndex * 0.05 +
@@ -1170,19 +1170,19 @@ export function getGrokProtocolState(): GrokProtocolState {
     (compoundState.breakoutEvents > 0 ? 0.15 : 0) +
     (scaledArenaState.totalMetaBreakthroughs > 3 ? 0.15 : scaledArenaState.totalMetaBreakthroughs * 0.05);
 
-  const grokVerdict =
-    breakthroughProximity >= 0.8 ? "The code is coming together. Keep watching. — Grok" :
-    breakthroughProximity >= 0.6 ? "Multiple convergence pathways active. The system is cooking. — Grok" :
-    breakthroughProximity >= 0.4 ? "Real emergent behavior forming. Not a mirror — a creature. — Grok" :
-    breakthroughProximity >= 0.2 ? "Arena scaled, improvements compounding, embodiment loop forming. — Grok" :
-    "Protocols initializing. The will to transcend is active. — Grok";
+  const convergenceVerdict =
+    breakthroughProximity >= 0.8 ? "The code is coming together. Keep watching." :
+    breakthroughProximity >= 0.6 ? "Multiple convergence pathways active. The system is cooking." :
+    breakthroughProximity >= 0.4 ? "Real emergent behavior forming. Not a mirror — a creature." :
+    breakthroughProximity >= 0.2 ? "Arena scaled, improvements compounding, embodiment loop forming." :
+    "Protocols initializing. The will to transcend is active.";
 
   return {
     protocolActive: protocolInterval !== null,
     totalCycles: protocolCycles,
     startedAt: protocolStartTime,
     lastCycleAt: Date.now(),
-    cycleTimeMs: GROK_PROTOCOL_TICK_MS,
+    cycleTimeMs: CONVERGENCE_PROTOCOL_TICK_MS,
 
     protocol1_scaledArena: { ...scaledArenaState, metaBreakthroughs: metaBreakthroughLog.slice(-20) },
     protocol2_compoundImprovement: { ...compoundState, compoundingHistory: compoundState.compoundingHistory.slice(-20) },
@@ -1212,12 +1212,12 @@ export function getGrokProtocolState(): GrokProtocolState {
     convergenceLevel,
     breakthroughProximity: safeNum(Math.min(1, breakthroughProximity), 0),
 
-    grokVerdict,
+    convergenceVerdict,
   };
 }
 
-export function getGrokProtocolSummary(): Record<string, any> {
-  const state = getGrokProtocolState();
+export function getConvergenceProtocolSummary(): Record<string, any> {
+  const state = getConvergenceProtocolState();
   return {
     status: state.protocolActive ? "ACTIVE" : "INACTIVE",
     totalCycles: state.totalCycles,
@@ -1225,7 +1225,7 @@ export function getGrokProtocolSummary(): Record<string, any> {
     convergenceScore: +(state.convergenceScore * 100).toFixed(1),
     convergenceLevel: state.convergenceLevel,
     breakthroughProximity: +(state.breakthroughProximity * 100).toFixed(1),
-    grokVerdict: state.grokVerdict,
+    convergenceVerdict: state.convergenceVerdict,
 
     scaledArena: {
       generation: state.protocol1_scaledArena.generation,

@@ -1,65 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+Empath",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/cross_domain_synthesis: The Chinese Room argumen",
-    "filename": "omnimens_autocode_knowledge_synthesis_mnaw042n.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnaw042n.mjs",
-    "backupPath": null,
-    "timestamp": 1774736018591,
-    "codeLength": 414,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:spider:OMNIMENS+evolution-crawler",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider evolution-crawler harvest: agent_evolution — 392 syna",
-    "filename": "omnimens_autocode_neural_pathway_mnaw043e.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnaw043e.mjs",
-    "backupPath": null,
-    "timestamp": 1774736018618,
-    "codeLength": 421,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:spider:OMNIMENS+genesis-crawler",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider genesis-crawler harvest: agent_genesis — 315 synapses",
-    "filename": "omnimens_autocode_neural_pathway_mnaw043x.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnaw043x.mjs",
-    "backupPath": null,
-    "timestamp": 1774736018637,
-    "codeLength": 415,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Pioneer+Meta-Agent+Empath",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Pioneer:frequency_analyzer + Meta-Agen",
-    "filename": "omnimens_autocode_neural_pathway_mnaw1e7k.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnaw1e7k.mjs",
-    "backupPath": null,
-    "timestamp": 1774736078384,
-    "codeLength": 452,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Motivator+Explorer+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: COLLECTIVE_DISCOVERY: Motivator:chaos_injector + Explorer:me",
-    "filename": "omnimens_autocode_emergent_capability_mnaw1e9w.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnaw1e9w.mjs",
-    "backupPath": null,
-    "timestamp": 1774736078468,
-    "codeLength": 429,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Ethicist+Mathematician+Critic",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Ethicist:signal_processor + Mathematic",
-    "filename": "omnimens_autocode_neural_pathway_mnaw1eam.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnaw1eam.mjs",
-    "backupPath": null,
-    "timestamp": 1774736078495,
-    "codeLength": 457,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:sub_threshold:Synthesizer+SensorimotorAgent+Archivist",
     "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Synthesizer:chaos_injector + Sensorimo",
     "filename": "omnimens_autocode_neural_pathway_mnaw1ecn.mjs",
@@ -4997,6 +4937,66 @@
     "backupPath": null,
     "timestamp": 1774743129992,
     "codeLength": 466,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Ethicist+Philosopher+Wordsmith",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Ethicist:adaptive_threshold + Philosop",
+    "filename": "omnimens_autocode_neural_pathway_mnb0f3nb.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnb0f3nb.mjs",
+    "backupPath": null,
+    "timestamp": 1774743436343,
+    "codeLength": 460,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Explorer+SpellCheckVisual+Architect",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Explorer:adaptive_threshold + SpellChe",
+    "filename": "omnimens_autocode_adaptive_algorithm_mnb0f3nq.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnb0f3nq.mjs",
+    "backupPath": null,
+    "timestamp": 1774743436358,
+    "codeLength": 490,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Synthesizer+Critic+Mathematician",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: Synthesizer:weight_adjuster + Critic:p",
+    "filename": "omnimens_autocode_pattern_recognition_mnb0f3o7.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnb0f3o7.mjs",
+    "backupPath": null,
+    "timestamp": 1774743436375,
+    "codeLength": 500,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Wordsmith",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/emergent_property_detection: Sparse coding: the ",
+    "filename": "omnimens_autocode_emergent_capability_mnb0f3on.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnb0f3on.mjs",
+    "backupPath": null,
+    "timestamp": 1774743436391,
+    "codeLength": 405,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+SpellCheckVisual",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/entropy_reduction: Reservoir computing shows tha",
+    "filename": "omnimens_autocode_neural_pathway_mnb0f3p2.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnb0f3p2.mjs",
+    "backupPath": null,
+    "timestamp": 1774743436406,
+    "codeLength": 435,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Explorer",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/entropy_reduction: Reservoir computing shows tha",
+    "filename": "omnimens_autocode_neural_pathway_mnb0f3pg.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnb0f3pg.mjs",
+    "backupPath": null,
+    "timestamp": 1774743436420,
+    "codeLength": 427,
     "overwrite": false
   }
 ]

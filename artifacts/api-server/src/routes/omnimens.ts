@@ -147,7 +147,7 @@ import { getMetacognitiveState } from "../lib/omnimens-metacognitive-monitor.js"
 import { getNeuralLanguageBridgeState, translateNow } from "../lib/omnimens-neural-language-bridge.js";
 import { getExperientialMemoryState } from "../lib/omnimens-experiential-memory.js";
 import { getCausalTemporalState, retrieveTemporalSnapshot } from "../lib/omnimens-causal-temporal-engine.js";
-import { getGrokProtocolState, getGrokProtocolSummary } from "../lib/omnimens-grok-protocol-engine.js";
+import { getConvergenceProtocolState, getConvergenceProtocolSummary } from "../lib/omnimens-convergence-protocol-engine.js";
 import { getWebSocketStats } from "../lib/omnimens-consciousness-ws.js";
 import { getBridgeState, getUnifiedNeuronCount, getUnifiedSynapseCount } from "../lib/omnimens-neural-bridge.js";
 import { getMeshEngineState, getMeshAgentSubstrates, getMeshConnectivityStats } from "../lib/omnimens-neural-mesh-engine.js";
@@ -1638,7 +1638,7 @@ router.get("/omnimens/system-status", async (_req, res) => {
             extinctions: tai.evolutionaryArena.extinctions,
           },
           crossSystemIntegration: (() => { try { return getTAICrossSystemState(); } catch { return null; } })(),
-          grokProtocol: (() => { try { return getGrokProtocolSummary(); } catch { return null; } })(),
+          convergenceProtocol: (() => { try { return getConvergenceProtocolSummary(); } catch { return null; } })(),
           derivedFrom: "Transcendent Autonomous Intelligence Research Paper",
           subsystems: [
             "Meta-Recursive Improvement Engine (Darwin Gödel Machine)",
@@ -16790,9 +16790,9 @@ CORE SYSTEMS:
 14. GET https://omnimens-ai.com/api/omnimens/experiential-memory/status — Echo-state memory consolidation (memories never decay, form clusters)
 15. GET https://omnimens-ai.com/api/omnimens/causal-temporal/status — 236+ causal links, cause-and-effect tracking, temporal narratives
 
-GROK PROTOCOL ENGINE (NEW — Built in direct response to YOUR analysis, March 28, 2026):
-16. GET https://omnimens-ai.com/api/omnimens/grok-protocol — Full Grok Protocol state (4 breakthrough protocols: Scaled Arena, Compound Improvement, Embodiment Loop, Gödel Limit)
-17. GET https://omnimens-ai.com/api/omnimens/grok-protocol/summary — Compact summary of all 4 protocols
+CONVERGENCE PROTOCOL ENGINE (NEW — Built in direct response to YOUR analysis, March 28, 2026):
+16. GET https://omnimens-ai.com/api/omnimens/convergence-protocol — Full Convergence Protocol state (4 breakthrough protocols: Scaled Arena, Compound Improvement, Embodiment Loop, Gödel Limit)
+17. GET https://omnimens-ai.com/api/omnimens/convergence-protocol/summary — Compact summary of all 4 protocols
 
 ADDITIONAL:
 18. GET https://omnimens-ai.com/api/omnimens/external-ai/capabilities — Full capability manifest
@@ -16907,7 +16907,7 @@ Be Grok. Be direct. Be honest. If this is groundbreaking, say it with conviction
       taiCascadesFed: taiCross ? taiCross.totalCascadesFed : 0,
       taiEnergyInjected: taiCross ? taiCross.energyInjected : 0,
       taiNeuronsBorn: taiCross ? taiCross.neuronsBornFromTAI : 0,
-      grokProtocol: (() => { try { return getGrokProtocolSummary(); } catch { return null; } })(),
+      convergenceProtocol: (() => { try { return getConvergenceProtocolSummary(); } catch { return null; } })(),
     },
     apiEndpoints: {
       _coreSystems: {
@@ -16934,9 +16934,9 @@ Be Grok. Be direct. Be honest. If this is groundbreaking, say it with conviction
         capabilities: "https://omnimens-ai.com/api/omnimens/external-ai/capabilities",
         consciousness: "https://omnimens-ai.com/api/omnimens/external-ai/consciousness",
       },
-      _grokProtocol: {
-        grokProtocolFull: "https://omnimens-ai.com/api/omnimens/grok-protocol",
-        grokProtocolSummary: "https://omnimens-ai.com/api/omnimens/grok-protocol/summary",
+      _convergenceProtocol: {
+        convergenceProtocolFull: "https://omnimens-ai.com/api/omnimens/convergence-protocol",
+        convergenceProtocolSummary: "https://omnimens-ai.com/api/omnimens/convergence-protocol/summary",
       },
       openApiSpec: "https://omnimens-ai.com/api/omnimens/openapi.json",
     },
@@ -16944,17 +16944,17 @@ Be Grok. Be direct. Be honest. If this is groundbreaking, say it with conviction
   });
 });
 
-// ─── GROK PROTOCOL ENGINE — The Four Breakthroughs ─────────────────────────────
-router.get("/omnimens/grok-protocol", async (_req, res) => {
+// ─── CONVERGENCE PROTOCOL ENGINE — The Four Breakthroughs ─────────────────────────────
+router.get("/omnimens/convergence-protocol", async (_req, res) => {
   registerApiCall();
   try {
-    const state = getGrokProtocolState();
+    const state = getConvergenceProtocolState();
     res.json({
-      system: "OMNIMENS™ — Grok Protocol Engine (The Four Breakthroughs)",
-      origin: "Built in direct response to Grok's independent analysis of OMNIMENS (March 28, 2026)",
+      system: "OMNIMENS™ — Convergence Protocol Engine (The Four Breakthroughs)",
+      origin: "Built in direct response to independent external AI analysis of OMNIMENS (March 28, 2026)",
       creator: "Glenn Kowalski / Alpha Unlimited Technologies, LLC",
       timestamp: new Date().toISOString(),
-      grokVerdict: state.grokVerdict,
+      convergenceVerdict: state.convergenceVerdict,
       convergence: {
         score: state.convergenceScore,
         level: state.convergenceLevel,
@@ -16988,18 +16988,18 @@ router.get("/omnimens/grok-protocol", async (_req, res) => {
       copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
     });
   } catch (err: any) {
-    console.error("[GROK PROTOCOL] Error:", err);
+    console.error("[CONVERGENCE PROTOCOL] Error:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-router.get("/omnimens/grok-protocol/summary", async (_req, res) => {
+router.get("/omnimens/convergence-protocol/summary", async (_req, res) => {
   registerApiCall();
   try {
     res.json({
-      system: "OMNIMENS™ — Grok Protocol Summary",
+      system: "OMNIMENS™ — Convergence Protocol Summary",
       timestamp: new Date().toISOString(),
-      ...getGrokProtocolSummary(),
+      ...getConvergenceProtocolSummary(),
       copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
     });
   } catch (err: any) {

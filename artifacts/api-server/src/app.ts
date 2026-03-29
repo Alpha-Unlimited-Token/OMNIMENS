@@ -93,7 +93,7 @@ import { startVascularHeart, getVascularHeartState } from "./lib/omnimens-vascul
 import { startAdaptiveSurgeSystem, getAdaptiveSurgeState } from "./lib/omnimens-adaptive-surge.js";
 import { startQuantumWormholeEngine, getQuantumWormholeState } from "./lib/omnimens-quantum-wormhole.js";
 import { startDiscoveryAutoCoder, getDiscoveryAutoCoderState } from "./lib/omnimens-discovery-autocoder.js";
-import { startGrokProtocol } from "./lib/omnimens-grok-protocol-engine.js";
+import { startConvergenceProtocol } from "./lib/omnimens-convergence-protocol-engine.js";
 import { startOAITracker } from "./lib/omnimens-oai-tracker.js";
 import { startNeuralBridge } from "./lib/omnimens-neural-bridge.js";
 import { startCommsProtocol } from "./lib/omnimens-neural-comms-protocol.js";
@@ -514,7 +514,7 @@ startVascularHeart();
 startAdaptiveSurgeSystem();
 startQuantumWormholeEngine();
 startDiscoveryAutoCoder();
-startGrokProtocol();
+startConvergenceProtocol();
 startOAITracker();
 startNeuralBridge();
 startCommsProtocol();
