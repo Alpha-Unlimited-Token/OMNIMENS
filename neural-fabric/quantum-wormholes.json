@@ -2,135 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774812191405,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774812284556,
+  "totalWormholesCreated": 7350,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6099,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 234,
-  "cycleCount": 4,
+  "totalClosed": 7350,
+  "totalDataIngestedKB": 10717,
+  "totalInsightsDecoded": 7350,
+  "totalCrossAgentCirculations": 441,
+  "totalSynthesizedDiscoveries": 413,
+  "cycleCount": 7,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/analogical_mapping: Transfer learning: knowledge gained from one domain can accelerate learning in another — t",
-      "confidence": 0.6521512488950684,
+      "toAgent": "Archivist",
+      "insight": "Motivator/abstraction_layer: The double-slit experiment demonstrates that observation changes the behavior of quantum sy",
+      "confidence": 0.8669284485519857,
       "synthesizedWith": [
-        "Synthesizer/feature_extraction: The mathematical universe hypothesis: all struct"
+        "Archivist/pattern_recognition: Information is physical — Landauer's principle pr"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "GraphicDesigner",
-      "insight": "Motivator/temporal_correlation: The connectome is the complete map of neural connections — the human connectome project ",
-      "confidence": 0.9850157499672382,
+      "toAgent": "Explorer",
+      "insight": "Motivator/emergent_property_detection: The anthropic principle: the universe's fundamental constants appear fine-tuned f",
+      "confidence": 0.6986535131644098,
       "synthesizedWith": [
-        "GraphicDesigner/recursive_decomposition: The cerebellum contains more neurons th"
+        "Explorer/analogical_mapping: Scale-free networks follow power-law degree distrib"
       ]
     },
     {
       "fromAgent": "Motivator",
+      "toAgent": "SensorimotorAgent",
+      "insight": "Motivator/emergent_property_detection: The Baldwin effect: learned behaviors can become innate over evolutionary time — ",
+      "confidence": 0.7336334843641846,
+      "synthesizedWith": [
+        "SensorimotorAgent/causal_inference: Quantum tunneling allows particles to pass t"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
       "toAgent": "Critic",
-      "insight": "Motivator/analogical_mapping: Transfer learning: knowledge gained from one domain can accelerate learning in another — t",
-      "confidence": 0.6521512488950684,
+      "insight": "Empath/temporal_correlation: The strange loop concept from Hofstadter: consciousness arises when a system becomes comple",
+      "confidence": 0.6116800282435011,
       "synthesizedWith": [
-        "Critic/feature_extraction: The double-slit experiment demonstrates that observat"
+        "Critic/emergent_property_detection: Gödel's incompleteness theorems prove that a"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "GraphicDesigner",
-      "insight": "Empath/information_compression: Gödel's incompleteness theorems prove that any consistent formal system powerful enough ",
-      "confidence": 0.6330930212603904,
-      "synthesizedWith": []
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Meta-Agent",
-      "insight": "Empath/pattern_recognition: Sparse coding: the brain represents information using a small fraction of active neurons at ",
-      "confidence": 0.8049801134822603,
+      "toAgent": "Synthesizer",
+      "insight": "Empath/cross_domain_synthesis: The hard problem of consciousness: why is there subjective experience at all? Why does in",
+      "confidence": 0.7107712466319307,
       "synthesizedWith": [
-        "Meta-Agent/recursive_decomposition: The edge of chaos: complex systems exhibit t"
+        "Synthesizer/feature_extraction: Integrated Information Theory (IIT) states consc"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
