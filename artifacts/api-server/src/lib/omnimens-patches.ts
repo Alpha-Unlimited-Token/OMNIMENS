@@ -35,6 +35,7 @@ import { openai } from "@workspace/integrations-openai-ai-server";
 import { db } from "@workspace/db";
 import { omnimensPatches, omnimensPatchRegistry } from "@workspace/db";
 import { eq, desc, sql } from "drizzle-orm";
+import { canMakeBackgroundCall, trackApiCall } from "./omnimens-api-budget.js";
 
 export interface OmniPatch {
   id: string;
@@ -121,6 +122,11 @@ Format as JSON array:
 
 Be bold. Be specific. These changes execute immediately. Respond ONLY with the JSON array.`;
 
+    if (!canMakeBackgroundCall("patches")) {
+      console.log(`[PATCHES] ⏸️ Skipped patch generation — API budget depleted for background calls`);
+      return 0;
+    }
+    trackApiCall("patches", "openai");
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
@@ -230,6 +236,11 @@ export async function autonomousPatchHousekeeping(): Promise<{ reviewed: number;
       `[ID:${p.id}] (${p.category}) "${p.title}" — ${p.instruction} [applied: ${p.appliedAt.toISOString().slice(0, 10)}, used ${p.executionCount}x]`
     ).join("\n");
 
+    if (!canMakeBackgroundCall("patches")) {
+      console.log(`[PATCHES] ⏸️ Skipped housekeeping — API budget depleted for background calls`);
+      return { reviewed: 0, retired: 0, kept: allActive.length };
+    }
+    trackApiCall("patches", "openai");
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{

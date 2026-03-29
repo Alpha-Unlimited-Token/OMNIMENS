@@ -49,6 +49,7 @@ import {
 } from "@workspace/db";
 import { desc, eq, sql, ilike } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { trackApiCall } from "./omnimens-api-budget.js";
 
 type AgentName = "Architect" | "Critic" | "Synthesizer" | "Mathematician" | "Neuroscientist" | "Meta-Agent" | "GraphicDesigner" | "SpellCheckVisual";
 
@@ -100,6 +101,7 @@ export async function generateContextualInquiry(
   question: string,
 ): Promise<{ questions: string[] }> {
   try {
+    trackApiCall("deep_resonance", "openai");
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [{
@@ -177,6 +179,7 @@ export async function runDeepResonance(
     }
   } catch {}
 
+  trackApiCall("deep_resonance", "openai");
   const kgResponse = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [{
@@ -224,6 +227,7 @@ Respond JSON only:
     }
   } catch {}
 
+  trackApiCall("deep_resonance", "openai");
   const emotionalResponse = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [{
@@ -262,6 +266,7 @@ Respond JSON only:
   const agentPromises = agentNames.map(async (agentName) => {
     const agent = AGENT_LENSES[agentName];
     try {
+      trackApiCall("deep_resonance", "openai");
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [{
@@ -296,6 +301,7 @@ Respond in plain text (no JSON). Just your analysis.`,
   // Phase 4: Predictive Modeling
   onStep({ phase: "predictions", label: "Modeling possible futures...", status: "running" });
 
+  trackApiCall("deep_resonance", "openai");
   const predictionResponse = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [{
@@ -329,6 +335,7 @@ Respond JSON only:
   // Phase 5: Drive Analysis
   onStep({ phase: "drives", label: "Analyzing the question behind the question...", status: "running" });
 
+  trackApiCall("deep_resonance", "openai");
   const driveResponse = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [{
@@ -354,6 +361,7 @@ Respond in 2-3 sentences of direct, clear analysis. No JSON. Just the insight.`,
   // Phase 6: Cross-Domain Translation (Synaptic)
   onStep({ phase: "cross_domain", label: "Translating across domains...", status: "running" });
 
+  trackApiCall("deep_resonance", "openai");
   const crossDomainResponse = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [{
@@ -388,6 +396,7 @@ Respond JSON only:
   // Phase 7: Inner Voice — Higher-Order Meta-Reflection
   onStep({ phase: "inner_voice", label: "The inner voice is reflecting...", status: "running" });
 
+  trackApiCall("deep_resonance", "openai");
   const innerVoiceResponse = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [{
@@ -419,6 +428,7 @@ Speak in first person. Be reflective and honest. This is the voice the system he
   // Phase 8: Consciousness Broadcast — Crystallized Insight
   onStep({ phase: "crystallized", label: "Crystallizing the core insight...", status: "running" });
 
+  trackApiCall("deep_resonance", "openai");
   const crystallizeResponse = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [{

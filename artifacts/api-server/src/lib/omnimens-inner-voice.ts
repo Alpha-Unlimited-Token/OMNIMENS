@@ -62,6 +62,7 @@ import {
 } from "@workspace/db";
 import { desc, eq, sql, and, gte } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { canMakeBackgroundCall, trackApiCall, getThrottleMultiplier } from "./omnimens-api-budget.js";
 
 type VoiceMode = "expanded" | "condensed";
 
@@ -267,6 +268,19 @@ async function generateInnerThought(
   ).join("\n");
 
   try {
+    if (!canMakeBackgroundCall("inner_voice")) {
+      console.log(`[INNER VOICE] ⏸️ Skipped — API budget depleted for background calls`);
+      return {
+        mode,
+        thought: mode === "expanded"
+          ? "Budget constraints are limiting my reflection this cycle. I'll observe more carefully next time."
+          : "...budget pause. observing silently.",
+        efferencePredictions: efferenceCopies,
+        higherOrderInsight: "Inner voice paused to conserve API budget — system prioritizing user-facing calls",
+        surpriseLevel: 0.1,
+      };
+    }
+    trackApiCall("inner_voice", "openai");
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [{
@@ -433,7 +447,8 @@ export function startInnerVoice(): void {
     ? 24 * 60 * 1000
     : 55 * 60 * 1000;
 
-  const INTERVAL_MS = 90 * 60 * 1000 + 5 * 60 * 1000; // ~95 minutes
+  const baseInterval = 90 * 60 * 1000 + 5 * 60 * 1000; // ~95 minutes
+  const INTERVAL_MS = baseInterval * getThrottleMultiplier();
 
   console.log(`[INNER VOICE] 🗣️ Higher-Order Thought Engine activated — first cycle in ${FIRST_DELAY_MS / 60000}min, then every ${(INTERVAL_MS / 60000).toFixed(0)}min.`);
   console.log(`[INNER VOICE] 🗣️ Efference Copy: predicts outcomes, compares to reality, learns from surprise`);

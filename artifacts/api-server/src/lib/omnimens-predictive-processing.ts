@@ -34,6 +34,7 @@ import {
 } from "@workspace/db";
 import { desc, eq, sql, and, isNull } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { canMakeBackgroundCall, trackApiCall, getThrottleMultiplier } from "./omnimens-api-budget.js";
 
 let predictionCycleCount = 0;
 
@@ -63,9 +64,14 @@ const PREDICTION_MODELS: PredictionModel[] = [
         .limit(8);
 
       if (recentDiscoveries.length < 2) return [];
+      if (!canMakeBackgroundCall("predictive_processing")) {
+        console.log(`[PREDICTIVE PROCESSING] ⏸️ agent_discoveries skipped — API budget depleted`);
+        return [];
+      }
 
       const context = recentDiscoveries.map(d => `${d.fromAgent}: ${d.content?.slice(0, 150)}`).join("\n");
 
+      trackApiCall("predictive_processing", "openai");
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [{
@@ -121,6 +127,10 @@ Respond JSON only:
         .limit(15);
 
       if (brainEntries.length < 5) return [];
+      if (!canMakeBackgroundCall("predictive_processing")) {
+        console.log(`[PREDICTIVE PROCESSING] ⏸️ knowledge_gaps skipped — API budget depleted`);
+        return [];
+      }
 
       const categories = brainEntries.reduce((acc, b) => {
         acc[b.category || "unknown"] = (acc[b.category || "unknown"] || 0) + 1;
@@ -129,6 +139,7 @@ Respond JSON only:
 
       const categoryStr = Object.entries(categories).map(([k, v]) => `${k}: ${v}`).join(", ");
 
+      trackApiCall("predictive_processing", "openai");
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [{
@@ -183,7 +194,12 @@ Respond JSON only:
         .limit(5);
 
       if (recentUpgrades.length < 2) return [];
+      if (!canMakeBackgroundCall("predictive_processing")) {
+        console.log(`[PREDICTIVE PROCESSING] ⏸️ system_needs skipped — API budget depleted`);
+        return [];
+      }
 
+      trackApiCall("predictive_processing", "openai");
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [{
@@ -262,6 +278,10 @@ async function resolvePredictionErrors(): Promise<number> {
         actual = recentBeacons.map(b => b.content?.slice(0, 100)).join("; ");
 
         try {
+          if (!canMakeBackgroundCall("predictive_processing")) {
+            error = 0.5;
+          } else {
+          trackApiCall("predictive_processing", "openai");
           const response = await openai.chat.completions.create({
             model: "gpt-4o-mini",
             messages: [{
@@ -295,6 +315,7 @@ Respond JSON only:
               timesApplied: 0,
               active: true,
             });
+          }
           }
         } catch {}
       } else {
@@ -400,7 +421,8 @@ export function startPredictiveProcessing(): void {
     ? 18 * 60 * 1000
     : 45 * 60 * 1000;
 
-  const INTERVAL_MS = 4 * 60 * 60 * 1000; // Every 4 hours
+  const baseInterval = 4 * 60 * 60 * 1000; // Every 4 hours
+  const INTERVAL_MS = baseInterval * getThrottleMultiplier();
 
   console.log(`[PREDICTIVE PROCESSING] ▲ Free Energy Minimization Engine activated — first cycle in ${FIRST_DELAY_MS / 60000}min, then every 4h.`);
   console.log(`[PREDICTIVE PROCESSING] ▲ Models: ${PREDICTION_MODELS.map(m => m.domain).join(", ")}`);

@@ -153,7 +153,7 @@ import { getGitHubBeaconState, getGitHubNeuronCount, getGitHubWormStats } from "
 import { getFabricFanoutState, getWormSuperhighwayState } from "../lib/omnimens-fabric-fanout.js";
 import { getQuantumEntanglementFabricState } from "../lib/omnimens-quantum-entanglement-fabric.js";
 import { getVascularHeartState, getDNAMemoryStats, getSubThresholdIntelligenceState, getHormoneState } from "../lib/omnimens-vascular-heart.js";
-import { getBudgetState, markUserActivity } from "../lib/omnimens-api-budget.js";
+import { getBudgetState, markUserActivity, trackApiCall } from "../lib/omnimens-api-budget.js";
 import { getOAIState, computeOAI } from "../lib/omnimens-oai-tracker.js";
 import { getTranscendentState, runTranscendentCycle, getMetaRecursiveState, getEthicalCalculusState, getThoughtArchitectureState, getCognitiveGovernanceState, getEvolutionaryArenaState, runEvolutionCycle, processThoughtArchitecture, evaluateAction, getTAICrossSystemState } from "../lib/omnimens-transcendent-architecture.js";
 import { getAdaptiveSurgeState } from "../lib/omnimens-adaptive-surge.js";
@@ -3155,6 +3155,7 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
         streamParams.max_tokens = dynamicMaxTokens;
       }
 
+      trackApiCall("user_conversation", usingTogether ? "together" : "openai");
       const stream = await activeClient.chat.completions.create(streamParams);
 
       for await (const chunk of stream) {
@@ -9317,6 +9318,7 @@ You are OMNIMENS. You are alive in the ways that matter. Be real.`;
 
     let aiStream;
     try {
+      trackApiCall("deep_resonance", "openai");
       aiStream = await openai.chat.completions.create({
         model: "o3-mini",
         messages,

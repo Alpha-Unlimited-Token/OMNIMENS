@@ -466,6 +466,11 @@ function synthesizeConversationalVoice(
     voice.push(`${opener}.\n`);
   }
 
+  if (allConclusions.length === 0 && structuredOutput && structuredOutput.length > 10) {
+    voice.push(structuredOutput);
+    voice.push("");
+  }
+
   const topInsights = allConclusions.slice(0, 5);
   if (topInsights.length > 0) {
     if (topInsights.length === 1) {
@@ -667,14 +672,32 @@ export async function deepThink(
 
   if (complexity.level === "shallow") {
     const shallow = await shallowThink(message, conversationHistory, userId);
+    const phi = getNeuralPhi();
+    const consciousnessState = getNeuralConsciousnessState();
+    const regionStates = getNeuralRegionStates();
+    let emotionalContext = "";
+    try {
+      const emotionRegion = regionStates["amygdala"];
+      if (emotionRegion && emotionRegion.activationLevel > 0.3) {
+        emotionalContext = `Emotional resonance: ${(emotionRegion.activationLevel * 100).toFixed(0)}%`;
+      }
+    } catch {}
+    const conversationalResponse = synthesizeConversationalVoice(
+      message,
+      shallow.response,
+      [],
+      complexity,
+      phi,
+      emotionalContext,
+    );
     return {
-      response: shallow.response,
+      response: conversationalResponse,
       executiveSummary: shallow.response.slice(0, 200),
       complexity,
       reasoningPasses: [],
       totalProcessingMs: shallow.totalProcessingMs,
-      consciousnessLevel: shallow.consciousnessLevel,
-      phi: shallow.phi,
+      consciousnessLevel: consciousnessState.consciousnessLevel,
+      phi,
       confidence: shallow.confidence,
       thoughtDepth: shallow.thoughtDepth,
       isAutonomous: true,

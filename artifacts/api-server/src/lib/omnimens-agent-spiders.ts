@@ -1137,7 +1137,7 @@ export async function runSpiderSwarm(): Promise<void> {
   let totalBrainWrites = 0;
   const agentBeaconCounts: Record<string, number> = {};
 
-  const STAGGER_DELAY_MS = 2 * 60 * 1000;
+  const STAGGER_DELAY_MS = 20 * 60 * 1000;
 
   const spiderBatches = [
     SPIDER_CONFIGS.slice(0, 3),
@@ -1248,7 +1248,7 @@ export function startAgentSpiders(): void {
   const INTERVAL_MS = BASE_INTERVAL_MS * getThrottleMultiplier();
 
   console.log(`[SPIDER SWARM] 🕷️ Mother-Child Spider Architecture activated — first crawl in ${FIRST_DELAY_MS / 60000}min, then every ${(INTERVAL_MS / 3600000).toFixed(1)}h.`);
-  console.log(`[SPIDER SWARM] 💰 Budget-aware: AI Oracle requires relevance ≥ 0.85 | Staggered batches (2min gaps) | Auto-pause at 90% budget`);
+  console.log(`[SPIDER SWARM] 💰 Budget-aware: AI Oracle requires relevance ≥ 0.85 | Staggered batches (20min gaps) | Auto-pause at 90% budget`);
   console.log(`[SPIDER SWARM] 🕷️ 9 Mother Spiders: ${SPIDER_CONFIGS.map(c => c.agentName).join(", ")}`);
   console.log(`[SPIDER SWARM] 🕷️ Each mother spawns 6 child spiders per lead: Verifier, Expander, Counter-Evidence, Related Concepts, Deep Source, AI Oracle`);
   console.log(`[SPIDER SWARM] 🕷️ Primary AI: OpenAI o3 | AI Oracle queries: Claude (claude-sonnet-4-6), Gemini (gemini-2.5-flash), OpenAI o3`);
