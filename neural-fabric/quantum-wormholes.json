@@ -2,135 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774822745977,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774822836459,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10771,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 426,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15312,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 607,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Motivator/emergent_property_detection: The Mandelbrot set demonstrates infinite complexity from a simple recursive formu",
-      "confidence": 0.6490667055800052,
-      "synthesizedWith": []
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Critic",
-      "insight": "Motivator/entropy_reduction: Bayesian brain hypothesis: the brain is fundamentally a prediction machine that constantly ",
-      "confidence": 0.7408216120348884,
+      "toAgent": "Archivist",
+      "insight": "Motivator/emergent_property_detection: The anthropic principle: the universe's fundamental constants appear fine-tuned f",
+      "confidence": 0.8310290041067957,
       "synthesizedWith": [
-        "Critic/structural_analysis: Autopoiesis: living systems are self-creating — they"
+        "Archivist/entropy_reduction: The Weber-Fechner law: perception is logarithmic — "
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Ethicist",
-      "insight": "Motivator/temporal_correlation: Predictive coding: the brain constantly generates predictions about incoming sensory dat",
-      "confidence": 0.7235922721019045,
+      "toAgent": "Wordsmith",
+      "insight": "Motivator/cross_domain_synthesis: Astrocytes, once thought to be mere support cells, actively participate in information",
+      "confidence": 0.6609937963533272,
       "synthesizedWith": [
-        "Ethicist/entropy_reduction: Reservoir computing shows that even random neural ne"
+        "Wordsmith/pattern_recognition: Autopoiesis: living systems are self-creating — t"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Innovator",
+      "insight": "Motivator/analogical_mapping: Predictive coding: the brain constantly generates predictions about incoming sensory data ",
+      "confidence": 0.6410321853513223,
+      "synthesizedWith": [
+        "Innovator/emergent_property_detection: Gödel's incompleteness theorems prove tha"
       ]
     },
     {
       "fromAgent": "Empath",
       "toAgent": "Neuroscientist",
-      "insight": "Empath/causal_inference: The connectome is the complete map of neural connections — the human connectome project aims to",
-      "confidence": 0.6385618272975001,
+      "insight": "Empath/causal_inference: Recurrent neural networks can approximate any dynamical system — they are universal approximato",
+      "confidence": 0.6602814857980528,
       "synthesizedWith": [
-        "Neuroscientist/entropy_reduction: Long-term potentiation (LTP) strengthens synap"
+        "Neuroscientist/analogical_mapping: Scale-free networks follow power-law degree d"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Linguist",
-      "insight": "Empath/causal_inference: Predictive coding: the brain constantly generates predictions about incoming sensory data and o",
-      "confidence": 0.7376438566830787,
+      "toAgent": "Meta-Agent",
+      "insight": "Empath/causal_inference: Recurrent neural networks can approximate any dynamical system — they are universal approximato",
+      "confidence": 0.6602814857980528,
       "synthesizedWith": [
-        "Linguist/emergent_property_detection: The free energy principle suggests all liv"
+        "Meta-Agent/structural_analysis: Quantum decoherence typically destroys quantum e"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
