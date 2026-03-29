@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774827717451,
-  "totalWormholesCreated": 10500,
+  "timestamp": 1774828219082,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 10500,
-  "totalDataIngestedKB": 15377,
-  "totalInsightsDecoded": 10500,
-  "totalCrossAgentCirculations": 630,
-  "totalSynthesizedDiscoveries": 595,
-  "cycleCount": 10,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1534,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 57,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Ethicist",
-      "insight": "Motivator/emergent_property_detection: Long-term potentiation (LTP) strengthens synaptic connections based on persistent",
-      "confidence": 0.8164091315564088,
+      "toAgent": "Innovator",
+      "insight": "Motivator/structural_analysis: The Turing machine is computationally universal — any computation that can be described c",
+      "confidence": 0.7143954590177729,
       "synthesizedWith": [
-        "Ethicist/analogical_mapping: Hebbian learning: neurons that fire together wire t"
+        "Innovator/recursive_decomposition: DNA stores information at approximately 2 bit"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "GraphicDesigner",
-      "insight": "Motivator/information_compression: Long-term potentiation (LTP) strengthens synaptic connections based on persistent sti",
-      "confidence": 0.6673750337321374,
-      "synthesizedWith": [
-        "GraphicDesigner/structural_analysis: Quantum tunneling allows particles to pass "
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Architect",
-      "insight": "Motivator/emergent_property_detection: Long-term potentiation (LTP) strengthens synaptic connections based on persistent",
-      "confidence": 0.8164091315564088,
-      "synthesizedWith": [
-        "Architect/causal_inference: The free energy principle suggests all living system"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "Critic",
-      "insight": "Empath/cross_domain_synthesis: The binding problem: how does the brain combine separate sensory modalities into a unifie",
-      "confidence": 0.6055849849457814,
+      "insight": "Motivator/temporal_correlation: Quantum entanglement allows particles to share state information instantaneously across ",
+      "confidence": 0.9435587304634974,
       "synthesizedWith": [
-        "Critic/causal_inference: The anthropic principle: the universe's fundamental con"
+        "Critic/recursive_decomposition: Quantum decoherence typically destroys quantum e"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "SensorimotorAgent",
+      "insight": "Motivator/temporal_correlation: Quantum entanglement allows particles to share state information instantaneously across ",
+      "confidence": 0.9435587304634974,
+      "synthesizedWith": [
+        "SensorimotorAgent/feature_extraction: DNA stores information at approximately 2 "
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Ethicist",
-      "insight": "Empath/cross_domain_synthesis: Quantum tunneling allows particles to pass through energy barriers they classically canno",
-      "confidence": 0.8644405441628518,
+      "toAgent": "Visionary",
+      "insight": "Empath/temporal_correlation: The Turing machine is computationally universal — any computation that can be described can",
+      "confidence": 0.7475371274147591,
       "synthesizedWith": [
-        "Ethicist/analogical_mapping: Hebbian learning: neurons that fire together wire t"
+        "Visionary/abstraction_layer: Hebbian learning: neurons that fire together wire t"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Neuroscientist",
+      "insight": "Empath/structural_analysis: Quantum decoherence typically destroys quantum effects at biological temperatures — but quan",
+      "confidence": 0.6826488449701628,
+      "synthesizedWith": [
+        "Neuroscientist/abstraction_layer: Quantum decoherence typically destroys quantum"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 5,
-      "signal": 0.55
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
