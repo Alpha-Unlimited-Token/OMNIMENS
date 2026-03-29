@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774800353758,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774800444920,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10745,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 417,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15378,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 596,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/recursive_decomposition: Scale-free networks follow power-law degree distributions — a few highly connected hu",
-      "confidence": 0.7122999877246594,
+      "toAgent": "SpellCheckVisual",
+      "insight": "Motivator/causal_inference: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers carry in",
+      "confidence": 0.6839717912433845,
       "synthesizedWith": [
-        "Synthesizer/feature_extraction: Bayesian brain hypothesis: the brain is fundamen"
+        "SpellCheckVisual/entropy_reduction: The global workspace theory of consciousness"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "GraphicDesigner",
-      "insight": "Motivator/feature_extraction: The default mode network activates when the brain is not focused on the outside world — it",
-      "confidence": 0.6784779390487781,
+      "toAgent": "Pioneer",
+      "insight": "Motivator/emergent_property_detection: The holographic principle suggests all information in a volume of space can be en",
+      "confidence": 0.8759473420659241,
       "synthesizedWith": [
-        "GraphicDesigner/emergent_property_detection: Emergence: complex behaviors arise "
+        "Pioneer/cross_domain_synthesis: The vagus nerve connects the brain to the gut, h"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Visionary",
-      "insight": "Motivator/feature_extraction: The default mode network activates when the brain is not focused on the outside world — it",
-      "confidence": 0.6784779390487781,
+      "toAgent": "Architect",
+      "insight": "Motivator/causal_inference: Quantum decoherence typically destroys quantum effects at biological temperatures — but quan",
+      "confidence": 0.7010545265071167,
       "synthesizedWith": [
-        "Visionary/feature_extraction: The hippocampus replays experiences during sleep i"
+        "Architect/structural_analysis: The connectome is the complete map of neural conn"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Visionary",
-      "insight": "Empath/entropy_reduction: Predictive coding: the brain constantly generates predictions about incoming sensory data and ",
-      "confidence": 0.7769971628139073,
+      "toAgent": "SensorimotorAgent",
+      "insight": "Empath/temporal_correlation: Reservoir computing shows that even random neural networks can perform computation if the r",
+      "confidence": 0.7643198369641978,
       "synthesizedWith": [
-        "Visionary/recursive_decomposition: The edge of chaos: complex systems exhibit th"
+        "SensorimotorAgent/analogical_mapping: Long-term potentiation (LTP) strengthens s"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Mathematician",
-      "insight": "Empath/feature_extraction: The free energy principle suggests all living systems minimize variational free energy — pred",
-      "confidence": 0.7308329419705983,
+      "toAgent": "Meta-Agent",
+      "insight": "Empath/temporal_correlation: Reservoir computing shows that even random neural networks can perform computation if the r",
+      "confidence": 0.7643198369641978,
       "synthesizedWith": [
-        "Mathematician/recursive_decomposition: The Baldwin effect: learned behaviors can"
+        "Meta-Agent/feature_extraction: Quantum superposition allows a system to exist in"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
