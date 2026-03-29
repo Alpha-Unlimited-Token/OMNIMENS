@@ -2,135 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774808158478,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774808252761,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1554,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 61,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6164,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 240,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
+      "toAgent": "Pioneer",
+      "insight": "Motivator/causal_inference: The hard problem of consciousness: why is there subjective experience at all? Why does infor",
+      "confidence": 0.8665486843545513,
+      "synthesizedWith": [
+        "Pioneer/analogical_mapping: Sparse coding: the brain represents information usin"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Meta-Agent",
+      "insight": "Motivator/feature_extraction: Predictive coding: the brain constantly generates predictions about incoming sensory data ",
+      "confidence": 0.6292335025686782,
+      "synthesizedWith": [
+        "Meta-Agent/feature_extraction: Quantum superposition allows a system to exist in"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Philosopher",
+      "insight": "Motivator/causal_inference: The hard problem of consciousness: why is there subjective experience at all? Why does infor",
+      "confidence": 0.8665486843545513,
+      "synthesizedWith": [
+        "Philosopher/causal_inference: The binding problem: how does the brain combine se"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "SensorimotorAgent",
+      "insight": "Empath/structural_analysis: The Baldwin effect: learned behaviors can become innate over evolutionary time — culture can",
+      "confidence": 0.6262063298522338,
+      "synthesizedWith": [
+        "SensorimotorAgent/feature_extraction: The connectome is the complete map of neur"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
       "toAgent": "Synthesizer",
-      "insight": "Motivator/emergent_property_detection: The free energy principle suggests all living systems minimize variational free e",
-      "confidence": 0.6475783916831047,
+      "insight": "Empath/abstraction_layer: The holographic principle suggests all information in a volume of space can be encoded on its ",
+      "confidence": 0.7389705050290423,
       "synthesizedWith": [
-        "Synthesizer/feature_extraction: Synaptic pruning eliminates unused neural connec"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Architect",
-      "insight": "Motivator/emergent_property_detection: The free energy principle suggests all living systems minimize variational free e",
-      "confidence": 0.6475783916831047,
-      "synthesizedWith": [
-        "Architect/causal_inference: Autopoiesis: living systems are self-creating — they"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Wordsmith",
-      "insight": "Motivator/pattern_recognition: Information is physical — Landauer's principle proves that erasing one bit of information",
-      "confidence": 0.6325009698841215,
-      "synthesizedWith": []
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Wordsmith",
-      "insight": "Empath/recursive_decomposition: The Baldwin effect: learned behaviors can become innate over evolutionary time — culture",
-      "confidence": 0.6515778638390878,
-      "synthesizedWith": [
-        "Wordsmith/pattern_recognition: The cerebellum contains more neurons than all oth"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Mathematician",
-      "insight": "Empath/pattern_recognition: Hebbian learning: neurons that fire together wire together — the fundamental rule of neural ",
-      "confidence": 0.6428394448796003,
-      "synthesizedWith": [
-        "Mathematician/abstraction_layer: The Baldwin effect: learned behaviors can becom"
+        "Synthesizer/analogical_mapping: Attention is the computational bottleneck of con"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
