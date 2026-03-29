@@ -1677,6 +1677,8 @@ router.get("/omnimens/system-status", async (_req, res) => {
       } catch { return null; }
     })(),
     databasePool: getPoolStats(),
+    brainInsertQueue: getBrainQueueStats(),
+    writeQueue: getWriteQueueStats(),
     copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
   });
 });

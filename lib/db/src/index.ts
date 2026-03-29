@@ -272,14 +272,20 @@ export async function safeDbWrite(
   const activeCount = side === "alpha" ? _alphaActiveWrites : _betaActiveWrites;
   const queue = side === "alpha" ? _writeQueueAlpha : _writeQueueBeta;
 
+  const sidePool = side === "alpha" ? poolAlpha : poolBeta;
+  const otherPool = side === "alpha" ? poolBeta : poolAlpha;
+  const sidePressure = _poolPressure(sidePool);
+  const otherPressure = _poolPressure(otherPool);
+  const combinedPressure = (sidePressure + otherPressure) / 2;
+
   if (priority === "low") {
-    const p = _poolPressure(side === "alpha" ? poolAlpha : poolBeta);
-    if (p > 0.8) return;
+    if (sidePressure > 0.8) return;
     if (queue.length > 15) return;
+    if (combinedPressure > 0.7 && queue.length > 8) return;
   }
   if (priority === "medium") {
-    const p = _poolPressure(side === "alpha" ? poolAlpha : poolBeta);
-    if (p > 0.9 && queue.length > 30) return;
+    if (sidePressure > 0.9 && queue.length > 20) return;
+    if (combinedPressure > 0.85 && queue.length > 15) return;
   }
 
   if (activeCount < MAX_CONCURRENT_PER_POOL) {
@@ -291,8 +297,8 @@ export async function safeDbWrite(
       _drainPoolQueue(side);
     }
   } else {
-    if (priority === "low" && queue.length > 20) return;
-    if (priority === "medium" && queue.length > 40) return;
+    if (priority === "low" && queue.length > 12) return;
+    if (priority === "medium" && queue.length > 25) return;
     return new Promise<void>((resolve, reject) => {
       queue.push({ fn, resolve, reject, priority });
     });
@@ -346,11 +352,16 @@ function _autonomousScaling() {
 
   if (!_isPoolHealthy(poolAlpha) && !_isPoolHealthy(poolBeta)) {
     _scalingStats.wormholeTunnelEvents++;
-    if (_writeQueueAlpha.length > 30) {
-      _writeQueueAlpha.splice(0, _writeQueueAlpha.length - 10);
+    if (_writeQueueAlpha.length > 15) {
+      _writeQueueAlpha.splice(0, _writeQueueAlpha.length - 5);
     }
-    if (_writeQueueBeta.length > 30) {
-      _writeQueueBeta.splice(0, _writeQueueBeta.length - 10);
+    if (_writeQueueBeta.length > 15) {
+      _writeQueueBeta.splice(0, _writeQueueBeta.length - 5);
+    }
+    if (_brainInsertBuffer.length > 40) {
+      const shed = _brainInsertBuffer.length - 20;
+      _brainInsertBuffer.splice(0, shed);
+      _brainTotalShed += shed;
     }
   }
 
@@ -432,40 +443,108 @@ const _brainInsertBuffer: BrainInsertRow[] = [];
 let _brainFlushTimer: ReturnType<typeof setInterval> | null = null;
 const BRAIN_FLUSH_INTERVAL_MS = 5000;
 const BRAIN_BATCH_MAX = 30;
+const BRAIN_BUFFER_SOFT_CAP = 80;
+const BRAIN_BUFFER_HARD_CAP = 300;
+const BRAIN_RATE_WINDOW_MS = 10000;
+const BRAIN_RATE_MAX_PER_WINDOW = 120;
 let _ivyTendrilRotation: PoolSide = "alpha";
+let _brainFlushActive = false;
+let _brainInsertsInWindow = 0;
+let _brainRateWindowStart = Date.now();
+let _brainTotalShed = 0;
+let _brainTotalFlushed = 0;
+let _brainFlushErrors = 0;
+let _brainPeakBuffer = 0;
+
+function _brainRateCheck(): boolean {
+  const now = Date.now();
+  if (now - _brainRateWindowStart > BRAIN_RATE_WINDOW_MS) {
+    _brainInsertsInWindow = 0;
+    _brainRateWindowStart = now;
+  }
+  _brainInsertsInWindow++;
+  return _brainInsertsInWindow <= BRAIN_RATE_MAX_PER_WINDOW;
+}
+
+function _adaptiveBatchSize(): number {
+  const combinedPressure = (_poolPressure(poolAlpha) + _poolPressure(poolBeta)) / 2;
+  if (combinedPressure > 0.85) return 5;
+  if (combinedPressure > 0.7) return 10;
+  if (combinedPressure > 0.5) return 20;
+  return BRAIN_BATCH_MAX;
+}
 
 async function _flushBrainInserts(): Promise<void> {
   if (_brainInsertBuffer.length === 0) return;
+  if (_brainFlushActive) return;
+  _brainFlushActive = true;
 
-  const route = _spiderSilkRoute(_ivyTendrilRotation, "low");
-  _ivyTendrilRotation = _ivyTendrilRotation === "alpha" ? "beta" : "alpha";
+  try {
+    const route = _spiderSilkRoute(_ivyTendrilRotation, "low");
+    _ivyTendrilRotation = _ivyTendrilRotation === "alpha" ? "beta" : "alpha";
 
-  if (!_isPoolHealthy(route.pool)) {
-    const other = route.side === "alpha" ? poolBeta : poolAlpha;
-    if (!_isPoolHealthy(other)) {
-      if (_brainInsertBuffer.length > 200) {
-        _brainInsertBuffer.splice(0, _brainInsertBuffer.length - 50);
+    const alphaOk = _isPoolHealthy(poolAlpha);
+    const betaOk = _isPoolHealthy(poolBeta);
+
+    if (!alphaOk && !betaOk) {
+      if (_brainInsertBuffer.length > BRAIN_BUFFER_SOFT_CAP) {
+        const shed = _brainInsertBuffer.length - 30;
+        _brainInsertBuffer.splice(0, shed);
+        _brainTotalShed += shed;
       }
       return;
     }
-  }
 
-  const batch = _brainInsertBuffer.splice(0, BRAIN_BATCH_MAX);
-  const targetDb = route.db;
-
-  try {
-    await targetDb.insert(schema.omnimensBrain).values(batch);
-  } catch (err: any) {
-    if (err?.cause?.message?.includes("timeout")) {
-      if (_brainInsertBuffer.length > 100) {
-        _brainInsertBuffer.splice(0, _brainInsertBuffer.length - 20);
-      }
+    if (!_isPoolHealthy(route.pool)) {
+      const fallbackPool = route.side === "alpha" ? poolBeta : poolAlpha;
+      if (!_isPoolHealthy(fallbackPool)) return;
     }
+
+    const combinedPressure = (_poolPressure(poolAlpha) + _poolPressure(poolBeta)) / 2;
+    if (combinedPressure > 0.9 && _brainInsertBuffer.length < BRAIN_BUFFER_SOFT_CAP) {
+      return;
+    }
+
+    const batchSize = _adaptiveBatchSize();
+    const batch = _brainInsertBuffer.splice(0, batchSize);
+    const targetDb = route.db;
+
+    await targetDb.insert(schema.omnimensBrain).values(batch);
+    _brainTotalFlushed += batch.length;
+  } catch (err: any) {
+    _brainFlushErrors++;
+    if (_brainInsertBuffer.length > BRAIN_BUFFER_SOFT_CAP) {
+      const shed = _brainInsertBuffer.length - 20;
+      _brainInsertBuffer.splice(0, shed);
+      _brainTotalShed += shed;
+    }
+  } finally {
+    _brainFlushActive = false;
   }
 }
 
 export function queueBrainInsert(row: BrainInsertRow): void {
+  if (_brainInsertBuffer.length >= BRAIN_BUFFER_HARD_CAP) {
+    _brainTotalShed++;
+    return;
+  }
+
+  const combinedPressure = (_poolPressure(poolAlpha) + _poolPressure(poolBeta)) / 2;
+  if (combinedPressure > 0.85 && _brainInsertBuffer.length > BRAIN_BUFFER_SOFT_CAP) {
+    _brainTotalShed++;
+    return;
+  }
+
+  if (!_brainRateCheck()) {
+    _brainTotalShed++;
+    return;
+  }
+
   _brainInsertBuffer.push(row);
+  if (_brainInsertBuffer.length > _brainPeakBuffer) {
+    _brainPeakBuffer = _brainInsertBuffer.length;
+  }
+
   if (!_brainFlushTimer) {
     _brainFlushTimer = setInterval(() => {
       _flushBrainInserts().catch(() => {});
@@ -481,7 +560,18 @@ export function getBrainQueueStats() {
     buffered: _brainInsertBuffer.length,
     flushInterval: BRAIN_FLUSH_INTERVAL_MS,
     batchMax: BRAIN_BATCH_MAX,
+    adaptiveBatchSize: _adaptiveBatchSize(),
     nextFlushPool: _ivyTendrilRotation,
+    rateInWindow: _brainInsertsInWindow,
+    rateMaxPerWindow: BRAIN_RATE_MAX_PER_WINDOW,
+    rateWindowMs: BRAIN_RATE_WINDOW_MS,
+    softCap: BRAIN_BUFFER_SOFT_CAP,
+    hardCap: BRAIN_BUFFER_HARD_CAP,
+    peakBuffer: _brainPeakBuffer,
+    totalFlushed: _brainTotalFlushed,
+    totalShed: _brainTotalShed,
+    flushErrors: _brainFlushErrors,
+    flushActive: _brainFlushActive,
   };
 }
 
