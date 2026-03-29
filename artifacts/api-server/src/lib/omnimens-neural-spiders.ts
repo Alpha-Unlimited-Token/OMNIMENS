@@ -2653,49 +2653,78 @@ export function startNeuralSpiders(): void {
   console.log(`[SPIDER WEB] 🕸️ Web heartbeat every ${WEB_PULSE_MS / 1000}s — Mother monitors all strands`);
   console.log(`[SPIDER WEB] 🕸️ Swarm coherence: loyalty × connectivity × success rate × efficiency`);
 
-  setTimeout(() => {
-    setInterval(() => {
-      runSpiderCrawlCycle().catch(err => {
-        console.error("[NEURAL SPIDERS] Crawl error:", err.message);
-      });
-    }, SPIDER_CRAWL_MS);
+  const TICK_BASE_MS = 1_000;
+  const MAX_CONCURRENT_TICK_ASYNC = 2;
+  let activeAsyncSlots = 0;
+  const tickRunning: Record<string, boolean> = {};
 
-    setInterval(() => {
-      runMotherHeartbeat();
-    }, WEB_PULSE_MS);
+  interface TickTask {
+    name: string;
+    intervalMs: number;
+    lastRun: number;
+    priority: number;
+    isAsync: boolean;
+    fn: () => void | Promise<void>;
+  }
 
-    setInterval(() => {
-      runBeehiveCycle();
-    }, BEEHIVE_CYCLE_MS);
+  const tickTasks: TickTask[] = [
+    { name: "heartbeat", intervalMs: WEB_PULSE_MS, lastRun: 0, priority: 0, isAsync: false, fn: () => runMotherHeartbeat() },
+    { name: "beehive", intervalMs: BEEHIVE_CYCLE_MS, lastRun: 0, priority: 1, isAsync: false, fn: () => runBeehiveCycle() },
+    { name: "beacon", intervalMs: BEACON_CYCLE_MS, lastRun: 0, priority: 2, isAsync: false, fn: () => runBeaconCycle() },
+    { name: "intelligence", intervalMs: INTELLIGENCE_CYCLE_MS, lastRun: 0, priority: 3, isAsync: false, fn: () => {
+      amplifyAllComponentIntelligence();
+      shareIntelligenceAcrossSpiders();
+      spiderCrossEngineQuery();
+    }},
+    { name: "crawl", intervalMs: SPIDER_CRAWL_MS, lastRun: 0, priority: 4, isAsync: true, fn: () => runSpiderCrawlCycle() },
+    { name: "memory_recall", intervalMs: MEMORY_RECALL_CYCLE_MS, lastRun: 0, priority: 5, isAsync: true, fn: () => spiderMemoryRecall() },
+    { name: "upgrade_proposals", intervalMs: UPGRADE_PROPOSAL_CYCLE_MS, lastRun: 0, priority: 6, isAsync: false, fn: () => runUpgradeProposalCycle() },
+  ];
 
-    setInterval(() => {
-      runBeaconCycle();
-    }, BEACON_CYCLE_MS);
+  function spiderTickDispatcher() {
+    const now = Date.now();
 
-    setInterval(() => {
-      try {
-        amplifyAllComponentIntelligence();
-        shareIntelligenceAcrossSpiders();
-        spiderCrossEngineQuery();
-      } catch (err: any) { console.error("[SPIDER INTELLIGENCE] Amplification error:", err.message); }
-    }, INTELLIGENCE_CYCLE_MS);
+    const dueTasks = tickTasks
+      .filter(t => (now - t.lastRun) >= t.intervalMs)
+      .sort((a, b) => a.priority - b.priority);
 
-    setInterval(() => {
-      spiderMemoryRecall().catch(err => {
-        console.error("[SPIDER INTELLIGENCE] Memory recall error:", err.message);
-      });
-    }, MEMORY_RECALL_CYCLE_MS);
+    for (const task of dueTasks) {
+      if (tickRunning[task.name]) continue;
 
-    setInterval(() => {
-      try { runUpgradeProposalCycle(); } catch (err: any) {
-        console.error("[SPIDER INTELLIGENCE] Upgrade proposal error:", err.message);
+      if (task.isAsync && activeAsyncSlots >= MAX_CONCURRENT_TICK_ASYNC) continue;
+
+      tickRunning[task.name] = true;
+      task.lastRun = now;
+
+      if (task.isAsync) {
+        activeAsyncSlots++;
+        Promise.resolve()
+          .then(() => task.fn())
+          .catch(err => console.error(`[SPIDER TICK] ${task.name} error:`, (err as any)?.message || err))
+          .finally(() => {
+            tickRunning[task.name] = false;
+            activeAsyncSlots--;
+          });
+      } else {
+        try {
+          task.fn();
+        } catch (err: any) {
+          console.error(`[SPIDER TICK] ${task.name} error:`, err?.message || err);
+        }
+        tickRunning[task.name] = false;
       }
-    }, UPGRADE_PROPOSAL_CYCLE_MS);
+    }
+  }
 
+  console.log(`[SPIDER TICK] 🎯 Unified tick dispatcher active — ${tickTasks.length} tasks, ${TICK_BASE_MS}ms base, max ${MAX_CONCURRENT_TICK_ASYNC} async slots`);
+
+  setTimeout(() => {
     runSpiderCrawlCycle().catch(() => {});
     runMotherHeartbeat();
     runBeehiveCycle();
     runBeaconCycle();
+
+    setInterval(spiderTickDispatcher, TICK_BASE_MS);
   }, 12_000);
 
   setTimeout(() => {

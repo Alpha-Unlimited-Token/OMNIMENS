@@ -89,14 +89,73 @@ interface SpiderGenConfig {
 }
 
 const DEFAULT_CONFIG: SpiderGenConfig = {
-  maxGenerations: 4,
-  babiesPerMother: 10,
+  maxGenerations: 3,
+  babiesPerMother: 5,
   motherSpawnRate: 1,
-  maxConcurrentPerAgent: 25,
-  maxTotalSpidersPerAgent: 150,
+  maxConcurrentPerAgent: 10,
+  maxTotalSpidersPerAgent: 60,
   beaconThreshold: 0.55,
   queryDiversityFactor: 0.7,
 };
+
+let recursiveCycleRunning = false;
+const recentQueryFingerprints: Map<string, number> = new Map();
+const QUERY_DEDUP_WINDOW_MS = 3_600_000;
+
+function computeQueryFingerprint(query: string): string {
+  const words = query.toLowerCase().replace(/[^a-z0-9\s]/g, "").split(/\s+/).filter(w => w.length > 3).sort();
+  return words.slice(0, 8).join("|");
+}
+
+function isDuplicateQuery(query: string): boolean {
+  const fp = computeQueryFingerprint(query);
+  const now = Date.now();
+  for (const [key, ts] of recentQueryFingerprints) {
+    if (now - ts > QUERY_DEDUP_WINDOW_MS) {
+      recentQueryFingerprints.delete(key);
+    }
+  }
+  if (recentQueryFingerprints.has(fp)) return true;
+  recentQueryFingerprints.set(fp, now);
+  return false;
+}
+
+function evaluateSpawnDecision(
+  parentNode: SpiderNode,
+  generation: number,
+  currentLoad: number,
+  maxLoad: number,
+): { shouldSpawn: boolean; reason: string; adjustedBabies: number } {
+  if (currentLoad >= maxLoad) {
+    return { shouldSpawn: false, reason: "load_cap_reached", adjustedBabies: 0 };
+  }
+
+  if (parentNode.findings.length < 20) {
+    return { shouldSpawn: false, reason: "insufficient_parent_findings", adjustedBabies: 0 };
+  }
+
+  if (isDuplicateQuery(parentNode.query)) {
+    return { shouldSpawn: false, reason: "duplicate_query", adjustedBabies: 0 };
+  }
+
+  if (generation >= 4 && parentNode.confidence < 0.85) {
+    return { shouldSpawn: false, reason: "gen4_requires_high_confidence", adjustedBabies: 0 };
+  }
+
+  const loadRatio = currentLoad / maxLoad;
+  let babies = DEFAULT_CONFIG.babiesPerMother;
+
+  if (loadRatio > 0.7) babies = Math.max(2, Math.floor(babies * 0.5));
+  else if (loadRatio > 0.5) babies = Math.max(3, Math.floor(babies * 0.7));
+
+  if (parentNode.confidence < 0.4) babies = Math.max(1, Math.floor(babies * 0.5));
+
+  if (generation >= 4 && parentNode.confidence >= 0.85) {
+    babies = Math.min(3, babies);
+  }
+
+  return { shouldSpawn: true, reason: "approved", adjustedBabies: babies };
+}
 
 const AGENT_SEARCH_DOMAINS: Record<string, string[]> = {
   Architect: [
@@ -469,13 +528,21 @@ async function spawnMotherSpider(
   if (currentCount >= config.maxTotalSpidersPerAgent) return [];
 
   const nextGeneration = parentNode.generation + 1;
-  if (nextGeneration > config.maxGenerations) return [];
+  const effectiveMaxGens = parentNode.confidence >= 0.85 ? 4 : config.maxGenerations;
+  if (nextGeneration > effectiveMaxGens) return [];
 
-  const babiesToSpawn = config.babiesPerMother;
+  const currentLoad = activeSpiderCounts.get(agentName) || 0;
+  const spawnDecision = evaluateSpawnDecision(parentNode, nextGeneration, currentLoad, config.maxTotalSpidersPerAgent);
+  if (!spawnDecision.shouldSpawn) {
+    console.log(`[RECURSIVE:${agentName}] 🕷️ Spawn BLOCKED at Gen${nextGeneration}: ${spawnDecision.reason}`);
+    return [];
+  }
+
+  const babiesToSpawn = spawnDecision.adjustedBabies;
   const results: SpiderNode[] = [];
 
   const spiderLabel = nextGeneration === 2 ? "Gen2" : nextGeneration === 3 ? "Gen3" : `Gen${nextGeneration}`;
-  console.log(`[RECURSIVE:${agentName}] 🕷️ ${spiderLabel} Mother spawning ${babiesToSpawn} babies from: "${parentNode.findings.slice(0, 60)}..."`);
+  console.log(`[RECURSIVE:${agentName}] 🕷️ ${spiderLabel} Mother spawning ${babiesToSpawn} babies (adaptive, load ${currentLoad}/${config.maxTotalSpidersPerAgent}) from: "${parentNode.findings.slice(0, 60)}..."`);
 
   parentNode.childCount = babiesToSpawn;
 
@@ -697,6 +764,19 @@ Respond JSON only:
 }
 
 export async function runRecursiveSpiderNetwork(): Promise<void> {
+  if (recursiveCycleRunning) {
+    console.log(`[RECURSIVE SPIDER NETWORK] ⏳ Cycle already running — skipping overlap`);
+    return;
+  }
+  recursiveCycleRunning = true;
+  try {
+    await _runRecursiveSpiderNetworkInner();
+  } finally {
+    recursiveCycleRunning = false;
+  }
+}
+
+async function _runRecursiveSpiderNetworkInner(): Promise<void> {
   recursiveSwarmCycleCount++;
   const cycleId = recursiveSwarmCycleCount;
   const cycleStart = Date.now();

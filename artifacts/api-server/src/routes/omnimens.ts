@@ -147,6 +147,7 @@ import { getTranslatorState, getTranslationTargets, getCustomConstructMap, trans
 import { compileNovaSyntax, getLanguageForgeState, getLanguageSpec, getLanguageAnalyses, NOVASYNTAX_EXAMPLE } from "../lib/omnimens-language-forge.js";
 import { getNeuralScalingState, getPopulationDetails, getDendriticStats } from "../lib/omnimens-neural-scaling.js";
 import { think as autonomousThink } from "../lib/omnimens-autonomous-thought.js";
+import { deepThink } from "../lib/omnimens-deep-thought-engine.js";
 import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBeaconFindings, getIvySwapStats, getIvyNeurogenStats } from "../lib/omnimens-ivy-network.js";
 import { getGitHubBeaconState, getGitHubNeuronCount, getGitHubWormStats } from "../lib/omnimens-github-neural-beacon.js";
 import { getFabricFanoutState, getWormSuperhighwayState } from "../lib/omnimens-fabric-fanout.js";
@@ -9795,7 +9796,7 @@ async function guardedAutonomousThink(message: string, history: any[], userId: s
   }
   await acquireThinkSlot();
   try {
-    return await autonomousThink(message, history, userId);
+    return await deepThink(message, history.map(h => ({ role: h.role || "user", content: h.content || "" })), userId);
   } finally {
     releaseThinkSlot();
   }
