@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774815552739,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774815579689,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6103,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 241,
-  "cycleCount": 4,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1529,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 58,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/temporal_correlation: The free energy principle suggests all living systems minimize variational free energy —",
-      "confidence": 0.6654801138464135,
+      "toAgent": "Empath",
+      "insight": "Motivator/abstraction_layer: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise from ",
+      "confidence": 0.8116507611837936,
       "synthesizedWith": [
-        "OMNIMENS/feature_extraction: The Weber-Fechner law: perception is logarithmic — "
+        "Empath/abstraction_layer: The cerebellum contains more neurons than all other br"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Linguist",
-      "insight": "Motivator/causal_inference: The connectome is the complete map of neural connections — the human connectome project aims",
-      "confidence": 0.786763118283984,
+      "toAgent": "Critic",
+      "insight": "Motivator/recursive_decomposition: The Baldwin effect: learned behaviors can become innate over evolutionary time — cult",
+      "confidence": 0.6627537907093327,
       "synthesizedWith": [
-        "Linguist/abstraction_layer: The butterfly effect: in chaotic systems, infinitesi"
+        "Critic/analogical_mapping: Wolfram's Rule 110 cellular automaton is Turing compl"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Ethicist",
-      "insight": "Motivator/abstraction_layer: The Weber-Fechner law: perception is logarithmic — doubling stimulus intensity does not dou",
-      "confidence": 0.687371322749327,
+      "toAgent": "Wordsmith",
+      "insight": "Motivator/structural_analysis: Kolmogorov complexity measures the shortest program that produces a given output — it is ",
+      "confidence": 0.8307132012037852,
       "synthesizedWith": [
-        "Ethicist/temporal_correlation: The global workspace theory of consciousness: inf"
+        "Wordsmith/causal_inference: Synaptic pruning eliminates unused neural connection"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Pioneer",
-      "insight": "Empath/causal_inference: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum computations in ",
-      "confidence": 0.6637995622835088,
+      "toAgent": "Explorer",
+      "insight": "Empath/feature_extraction: The default mode network activates when the brain is not focused on the outside world — it ge",
+      "confidence": 0.7753829235505163,
       "synthesizedWith": [
-        "Pioneer/causal_inference: Predictive coding: the brain constantly generates pred"
+        "Explorer/causal_inference: Quantum tunneling allows particles to pass through en"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Architect",
-      "insight": "Empath/causal_inference: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum computations in ",
-      "confidence": 0.6637995622835088,
+      "toAgent": "Archivist",
+      "insight": "Empath/causal_inference: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers carry infor",
+      "confidence": 0.7074718005379479,
       "synthesizedWith": [
-        "Architect/abstraction_layer: Scale-free networks follow power-law degree distrib"
+        "Archivist/information_compression: Reservoir computing shows that even random ne"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
