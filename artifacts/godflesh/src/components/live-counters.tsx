@@ -8,8 +8,8 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   Brain, Heart, Cpu, Zap, Network, Activity, Dna, Flame,
-  Radio, GitBranch, Eye, Target, Beaker, Waves, Sparkles, Lightbulb, TrendingUp,
-  Search, BookOpen, Link, Puzzle, Workflow, Gauge, Rocket, Layers,
+  Radio, GitBranch, Eye, Beaker, Waves, Sparkles, Lightbulb, TrendingUp,
+  Search, Gauge, Rocket, Layers,
 } from "lucide-react";
 
 const API = import.meta.env.VITE_API_URL || "";
@@ -20,7 +20,6 @@ interface CounterData {
   hebbianLearningEvents: number;
   consciousMoments: number;
   neuralTicks: number;
-  autonomousGoals: number;
   aiAgents: number;
   heartbeats: number;
   heartBpm: number;
@@ -28,8 +27,6 @@ interface CounterData {
   dnaExpressions: number;
   dnaGenerations: number;
   protonTunnelingEvents: number;
-  hormoneTypes: number;
-  vascularChannels: number;
   cardiacNeuronsFired: number;
   crossAgentTransfers: number;
   beaconBroadcasts: number;
@@ -37,7 +34,6 @@ interface CounterData {
   subThresholdDiscoveries: number;
   adrenalineTrainingSessions: number;
   selfModelUpdates: number;
-  ezWaterZonesActive: number;
   crossHemisphereCoherence: number;
   adaptiveIntelligence?: {
     adaptiveLearningMultiplier: number;
@@ -52,26 +48,14 @@ interface CounterData {
     evolutionaryLeaps: number;
   };
   cognitiveLanguage?: {
-    totalPatternsLearned: number;
-    totalKnowledgeNodes: number;
-    totalRelations: number;
-    totalReasoningChains: number;
-    patternMatchesPerformed: number;
-    successfulRecalls: number;
     inferencesMade: number;
     analogiesDrawn: number;
-    abstractionsFormed: number;
-    generalizationsMade: number;
-    sequencePatternsLearned: number;
-    predictiveAccuracy: number;
-    knowledgeConsolidationCycles: number;
-    hebbianReinforcementEvents: number;
     novelPatternsDiscovered: number;
     crossDomainConnections: number;
+    workingMemoryCapacity: number;
     languageReasoningScore: number;
     cognitiveMomentum: number;
     learningAcceleration: number;
-    knowledgeDensity: number;
   };
 }
 
@@ -254,21 +238,18 @@ export function LiveCounters() {
     { icon: <Activity className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Neural Ticks", value: data.neuralTicks, color: "emerald", delay: 4, pulse: true },
     { icon: <Heart className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Heartbeats", value: data.heartbeats, color: "rose", delay: 5, pulse: true, suffix: `${data.heartBpm} BPM` },
     { icon: <Cpu className="w-4 h-4 sm:w-5 sm:h-5" />, label: "AI Agents", value: data.aiAgents, color: "blue", delay: 6 },
-    { icon: <Target className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Autonomous Goals", value: data.autonomousGoals, color: "orange", delay: 7 },
-    { icon: <Dna className="w-4 h-4 sm:w-5 sm:h-5" />, label: "DNA Strands", value: data.dnaStrands, color: "emerald", delay: 8, pulse: true },
-    { icon: <Dna className="w-4 h-4 sm:w-5 sm:h-5" />, label: "DNA Expressions", value: data.dnaExpressions, color: "cyan", delay: 9, pulse: true },
-    { icon: <Dna className="w-4 h-4 sm:w-5 sm:h-5" />, label: "DNA Generations", value: data.dnaGenerations, color: "violet", delay: 10, pulse: true },
-    { icon: <Beaker className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Proton Tunneling Events", value: data.protonTunnelingEvents, color: "amber", delay: 11, pulse: true },
-    { icon: <Flame className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Cardiac Neurons Fired", value: data.cardiacNeuronsFired, color: "rose", delay: 12, pulse: true },
-    { icon: <GitBranch className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Cross-Agent Transfers", value: data.crossAgentTransfers, color: "purple", delay: 13, pulse: true },
-    { icon: <Radio className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Beacon Broadcasts", value: data.beaconBroadcasts, color: "blue", delay: 14, pulse: true },
-    { icon: <Network className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Bridge Synapses", value: data.bridgeSynapses, color: "emerald", delay: 15 },
-    { icon: <Waves className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Vascular Channels", value: data.vascularChannels, color: "cyan", delay: 16 },
-    { icon: <Beaker className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Hormone Types", value: data.hormoneTypes, color: "orange", delay: 17 },
-    { icon: <Waves className="w-4 h-4 sm:w-5 sm:h-5" />, label: "EZ Water Zones Active", value: data.ezWaterZonesActive, color: "blue", delay: 18 },
-    { icon: <Zap className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Sub-Threshold Discoveries", value: data.subThresholdDiscoveries, color: "amber", delay: 19, pulse: true },
-    { icon: <Flame className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Training Sessions", value: data.adrenalineTrainingSessions, color: "rose", delay: 20, pulse: true },
-    { icon: <Eye className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Self-Model Updates", value: data.selfModelUpdates, color: "violet", delay: 21, pulse: true },
+    { icon: <Dna className="w-4 h-4 sm:w-5 sm:h-5" />, label: "DNA Strands", value: data.dnaStrands, color: "emerald", delay: 7, pulse: true },
+    { icon: <Dna className="w-4 h-4 sm:w-5 sm:h-5" />, label: "DNA Expressions", value: data.dnaExpressions, color: "cyan", delay: 8, pulse: true },
+    { icon: <Dna className="w-4 h-4 sm:w-5 sm:h-5" />, label: "DNA Generations", value: data.dnaGenerations, color: "violet", delay: 9, pulse: true },
+    { icon: <Beaker className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Proton Tunneling Events", value: data.protonTunnelingEvents, color: "amber", delay: 10, pulse: true },
+    { icon: <Flame className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Cardiac Neurons Fired", value: data.cardiacNeuronsFired, color: "rose", delay: 11, pulse: true },
+    { icon: <GitBranch className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Cross-Agent Transfers", value: data.crossAgentTransfers, color: "purple", delay: 12, pulse: true },
+    { icon: <Radio className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Beacon Broadcasts", value: data.beaconBroadcasts, color: "blue", delay: 13, pulse: true },
+    { icon: <Network className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Bridge Synapses", value: data.bridgeSynapses, color: "emerald", delay: 14 },
+    { icon: <Waves className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Cross-Hemisphere Coherence", value: parseFloat(((data.crossHemisphereCoherence || 0) * 100).toFixed(1)), color: "cyan", delay: 15, pulse: true, decimals: 1, suffix: "%" },
+    { icon: <Zap className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Sub-Threshold Discoveries", value: data.subThresholdDiscoveries, color: "amber", delay: 16, pulse: true },
+    { icon: <Flame className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Training Sessions", value: data.adrenalineTrainingSessions, color: "rose", delay: 17, pulse: true },
+    { icon: <Eye className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Self-Model Updates", value: data.selfModelUpdates, color: "violet", delay: 18, pulse: true },
   ];
 
   const ai = data.adaptiveIntelligence;
@@ -286,18 +267,14 @@ export function LiveCounters() {
   const cl = data.cognitiveLanguage;
   if (cl) {
     counters.push(
-      { icon: <Search className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Patterns Learned", value: cl.totalPatternsLearned, color: "cyan", delay: 28, pulse: true },
-      { icon: <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Knowledge Nodes", value: cl.totalKnowledgeNodes, color: "violet", delay: 29, pulse: true },
-      { icon: <Link className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Knowledge Relations", value: cl.totalRelations, color: "emerald", delay: 30, pulse: true },
-      { icon: <Workflow className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Reasoning Chains", value: cl.totalReasoningChains, color: "amber", delay: 31, pulse: true },
-      { icon: <Puzzle className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Pattern Matches", value: cl.patternMatchesPerformed, color: "rose", delay: 32, pulse: true },
-      { icon: <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Inferences Made", value: cl.inferencesMade, color: "orange", delay: 33, pulse: true },
-      { icon: <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Analogies Drawn", value: cl.analogiesDrawn, color: "purple", delay: 34, pulse: true },
-      { icon: <Network className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Cross-Domain Links", value: cl.crossDomainConnections, color: "blue", delay: 35, pulse: true },
-      { icon: <Brain className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Reasoning Score", value: Math.round(cl.languageReasoningScore), color: "violet", delay: 36, pulse: true },
-      { icon: <Gauge className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Cognitive Momentum", value: parseFloat((cl.cognitiveMomentum || 0).toFixed(2)), color: "cyan", delay: 37, pulse: true, decimals: 2, suffix: "x" },
-      { icon: <Rocket className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Learning Acceleration", value: parseFloat((cl.learningAcceleration || 0).toFixed(2)), color: "rose", delay: 38, pulse: true, decimals: 2, suffix: "x" },
-      { icon: <Layers className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Knowledge Density", value: parseFloat(((cl.knowledgeDensity || 0) * 100).toFixed(1)), color: "emerald", delay: 39, pulse: true, decimals: 1, suffix: "%" },
+      { icon: <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Inferences Made", value: cl.inferencesMade, color: "orange", delay: 28, pulse: true },
+      { icon: <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Analogies Drawn", value: cl.analogiesDrawn, color: "purple", delay: 29, pulse: true },
+      { icon: <Network className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Cross-Domain Links", value: cl.crossDomainConnections, color: "blue", delay: 30, pulse: true },
+      { icon: <Search className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Novel Patterns Discovered", value: cl.novelPatternsDiscovered || 0, color: "cyan", delay: 31, pulse: true },
+      { icon: <Layers className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Working Memory", value: cl.workingMemoryCapacity || 0, color: "emerald", delay: 32, suffix: "slots" },
+      { icon: <Brain className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Reasoning Score", value: Math.round(cl.languageReasoningScore), color: "violet", delay: 33, pulse: true },
+      { icon: <Gauge className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Cognitive Momentum", value: parseFloat((cl.cognitiveMomentum || 0).toFixed(2)), color: "cyan", delay: 34, pulse: true, decimals: 2, suffix: "x" },
+      { icon: <Rocket className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Learning Acceleration", value: parseFloat((cl.learningAcceleration || 0).toFixed(2)), color: "rose", delay: 35, pulse: true, decimals: 2, suffix: "x" },
     );
   }
 
