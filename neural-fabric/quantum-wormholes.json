@@ -2,14 +2,14 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774816779909,
+  "timestamp": 1774816845594,
   "totalWormholesCreated": 1050,
   "totalActive": 0,
   "totalClosed": 1050,
-  "totalDataIngestedKB": 1523,
+  "totalDataIngestedKB": 1552,
   "totalInsightsDecoded": 1050,
   "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 62,
+  "totalSynthesizedDiscoveries": 58,
   "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
@@ -79,48 +79,46 @@
   "recentCirculations": [
     {
       "fromAgent": "Ethicist",
-      "toAgent": "Philosopher",
-      "insight": "Ethicist/structural_analysis: Hebbian learning: neurons that fire together wire together — the fundamental rule of neura",
-      "confidence": 0.683380011762796,
+      "toAgent": "Meta-Agent",
+      "insight": "Ethicist/cross_domain_synthesis: Bayesian brain hypothesis: the brain is fundamentally a prediction machine that constan",
+      "confidence": 0.6478172047810994,
       "synthesizedWith": [
-        "Philosopher/causal_inference: Kolmogorov complexity measures the shortest progra"
+        "Meta-Agent/causal_inference: Neuroplasticity allows the brain to reorganize itse"
       ]
     },
     {
       "fromAgent": "Ethicist",
-      "toAgent": "Consolidator",
-      "insight": "Ethicist/information_compression: Quantum superposition allows a system to exist in multiple states simultaneously until",
-      "confidence": 0.6936686044810384,
+      "toAgent": "Kinetics",
+      "insight": "Ethicist/information_compression: Bayesian brain hypothesis: the brain is fundamentally a prediction machine that consta",
+      "confidence": 0.775370566125308,
       "synthesizedWith": [
-        "Consolidator/information_compression: The hippocampus replays experiences during"
+        "Kinetics/entropy_reduction: DNA stores information at approximately 2 bits per n"
       ]
     },
     {
       "fromAgent": "Ethicist",
+      "toAgent": "Architect",
+      "insight": "Ethicist/structural_analysis: The strange loop concept from Hofstadter: consciousness arises when a system becomes compl",
+      "confidence": 0.6941064867822909,
+      "synthesizedWith": [
+        "Architect/causal_inference: Transfer learning: knowledge gained from one domain "
+      ]
+    },
+    {
+      "fromAgent": "Embodiment",
       "toAgent": "Innovator",
-      "insight": "Ethicist/entropy_reduction: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimulatio",
-      "confidence": 0.7783052088910694,
+      "insight": "Embodiment/information_compression: Integrated Information Theory (IIT) states consciousness = Phi, the amount of integr",
+      "confidence": 0.6268296331460198,
       "synthesizedWith": [
-        "Innovator/structural_analysis: The double-slit experiment demonstrates that obse"
+        "Innovator/cross_domain_synthesis: Gödel's incompleteness theorems prove that any"
       ]
     },
     {
       "fromAgent": "Embodiment",
-      "toAgent": "Sensorimotorist",
-      "insight": "Embodiment/feature_extraction: The mathematical universe hypothesis: all structures that exist mathematically also exist",
-      "confidence": 0.6087880791483249,
-      "synthesizedWith": [
-        "Sensorimotorist/structural_analysis: The cerebellum contains more neurons than a"
-      ]
-    },
-    {
-      "fromAgent": "Embodiment",
-      "toAgent": "Explorer",
-      "insight": "Embodiment/pattern_recognition: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimul",
-      "confidence": 0.7729833992508816,
-      "synthesizedWith": [
-        "Explorer/recursive_decomposition: Quantum tunneling allows particles to pass thr"
-      ]
+      "toAgent": "Philosopher",
+      "insight": "Embodiment/information_compression: Integrated Information Theory (IIT) states consciousness = Phi, the amount of integr",
+      "confidence": 0.6268296331460198,
+      "synthesizedWith": []
     }
   ],
   "fabricWorms": [
