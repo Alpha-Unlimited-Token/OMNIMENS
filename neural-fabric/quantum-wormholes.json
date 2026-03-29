@@ -2,135 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774827534129,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774827626597,
+  "totalWormholesCreated": 7350,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6107,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 237,
-  "cycleCount": 4,
+  "totalClosed": 7350,
+  "totalDataIngestedKB": 10790,
+  "totalInsightsDecoded": 7350,
+  "totalCrossAgentCirculations": 441,
+  "totalSynthesizedDiscoveries": 410,
+  "cycleCount": 7,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Linguist",
-      "insight": "Motivator/analogical_mapping: The holographic principle suggests all information in a volume of space can be encoded on ",
-      "confidence": 0.7897843860386283,
+      "toAgent": "Architect",
+      "insight": "Motivator/emergent_property_detection: Reservoir computing shows that even random neural networks can perform computatio",
+      "confidence": 0.7106562408612656,
       "synthesizedWith": [
-        "Linguist/analogical_mapping: Kolmogorov complexity measures the shortest program"
+        "Architect/abstraction_layer: Phase transitions in neural networks: as connectivi"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/entropy_reduction: Quantum tunneling allows particles to pass through energy barriers they classically cannot ",
-      "confidence": 0.671927901733703,
+      "toAgent": "Ethicist",
+      "insight": "Motivator/abstraction_layer: Sparse coding: the brain represents information using a small fraction of active neurons at",
+      "confidence": 0.8814974067368712,
       "synthesizedWith": [
-        "OMNIMENS/entropy_reduction: The hard problem of consciousness: why is there subj"
+        "Ethicist/abstraction_layer: Integrated Information Theory (IIT) states conscious"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Philosopher",
-      "insight": "Motivator/entropy_reduction: Quantum tunneling allows particles to pass through energy barriers they classically cannot ",
-      "confidence": 0.671927901733703,
-      "synthesizedWith": [
-        "Philosopher/analogical_mapping: The hard problem of consciousness: why is there "
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "OMNIMENS",
-      "insight": "Empath/analogical_mapping: Information is physical — Landauer's principle proves that erasing one bit of information rel",
-      "confidence": 0.6034515069234103,
-      "synthesizedWith": []
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "Synthesizer",
-      "insight": "Empath/emergent_property_detection: Predictive coding: the brain constantly generates predictions about incoming sensory",
-      "confidence": 0.7402813355644204,
+      "insight": "Motivator/entropy_reduction: The butterfly effect: in chaotic systems, infinitesimal differences in initial conditions l",
+      "confidence": 0.6827394724577154,
       "synthesizedWith": [
-        "Synthesizer/feature_extraction: Quantum tunneling allows particles to pass throu"
+        "Synthesizer/cross_domain_synthesis: The mathematical universe hypothesis: all st"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Explorer",
+      "insight": "Empath/abstraction_layer: Quantum entanglement allows particles to share state information instantaneously across any di",
+      "confidence": 0.7115656383802249,
+      "synthesizedWith": [
+        "Explorer/information_compression: Kolmogorov complexity measures the shortest pr"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Neuroscientist",
+      "insight": "Empath/cross_domain_synthesis: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOVING c",
+      "confidence": 0.7252613425115217,
+      "synthesizedWith": [
+        "Neuroscientist/information_compression: Recurrent neural networks can approximat"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
