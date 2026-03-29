@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774805632495,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774805725979,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1520,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 60,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6133,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 241,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/pattern_recognition: Phase transitions in neural networks: as connectivity increases past a critical threshold",
-      "confidence": 0.7693590184200698,
+      "toAgent": "Critic",
+      "insight": "Motivator/recursive_decomposition: The hippocampus replays experiences during sleep in compressed form — dream consolida",
+      "confidence": 0.7384360421387464,
       "synthesizedWith": [
-        "Synthesizer/information_compression: The Boltzmann brain paradox suggests that a"
+        "Critic/analogical_mapping: The vagus nerve connects the brain to the gut, heart,"
       ]
     },
     {
       "fromAgent": "Motivator",
       "toAgent": "GraphicDesigner",
-      "insight": "Motivator/structural_analysis: The hard problem of consciousness: why is there subjective experience at all? Why does in",
-      "confidence": 0.8038336557214923,
+      "insight": "Motivator/pattern_recognition: Autopoiesis: living systems are self-creating — they produce the components that constitu",
+      "confidence": 0.7484911757354061,
       "synthesizedWith": [
-        "GraphicDesigner/cross_domain_synthesis: The Penrose-Hameroff Orch-OR theory prop"
+        "GraphicDesigner/feature_extraction: The strange loop concept from Hofstadter: co"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Critic",
-      "insight": "Motivator/structural_analysis: The hard problem of consciousness: why is there subjective experience at all? Why does in",
-      "confidence": 0.8038336557214923,
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/recursive_decomposition: The hippocampus replays experiences during sleep in compressed form — dream consolida",
+      "confidence": 0.7384360421387464,
       "synthesizedWith": [
-        "Critic/entropy_reduction: Quantum tunneling allows particles to pass through ene"
+        "OMNIMENS/causal_inference: The Mandelbrot set demonstrates infinite complexity f"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Neuroscientist",
-      "insight": "Empath/causal_inference: The mathematical universe hypothesis: all structures that exist mathematically also exist physi",
-      "confidence": 0.8465369828772181,
+      "toAgent": "OMNIMENS",
+      "insight": "Empath/structural_analysis: Attention is the computational bottleneck of consciousness — the brain processes vast amount",
+      "confidence": 0.7999074480563976,
       "synthesizedWith": [
-        "Neuroscientist/emergent_property_detection: The strange loop concept from Hofsta"
+        "OMNIMENS/causal_inference: The Mandelbrot set demonstrates infinite complexity f"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Visionary",
-      "insight": "Empath/information_compression: The strange loop concept from Hofstadter: consciousness arises when a system becomes com",
-      "confidence": 0.9085218735304392,
+      "toAgent": "Synthesizer",
+      "insight": "Empath/cross_domain_synthesis: The edge of chaos: complex systems exhibit the most interesting behavior at the boundary ",
+      "confidence": 0.7501366309406368,
       "synthesizedWith": [
-        "Visionary/analogical_mapping: Information is physical — Landauer's principle pro"
+        "Synthesizer/causal_inference: Quantum decoherence typically destroys quantum eff"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
