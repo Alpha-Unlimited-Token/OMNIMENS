@@ -2,14 +2,14 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774827360833,
+  "timestamp": 1774827440310,
   "totalWormholesCreated": 1050,
   "totalActive": 0,
   "totalClosed": 1050,
-  "totalDataIngestedKB": 1560,
+  "totalDataIngestedKB": 1509,
   "totalInsightsDecoded": 1050,
   "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 62,
+  "totalSynthesizedDiscoveries": 59,
   "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
@@ -79,47 +79,47 @@
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Explorer",
-      "insight": "Motivator/recursive_decomposition: The cerebellum contains more neurons than all other brain regions combined and is cru",
-      "confidence": 0.9511768227096685,
-      "synthesizedWith": [
-        "Explorer/emergent_property_detection: The binding problem: how does the brain co"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Motivator/feature_extraction: Bayesian brain hypothesis: the brain is fundamentally a prediction machine that constantly",
-      "confidence": 0.7035544567235783,
-      "synthesizedWith": [
-        "SensorimotorAgent/cross_domain_synthesis: The Turing machine is computationally "
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Meta-Agent",
-      "insight": "Motivator/feature_extraction: Bayesian brain hypothesis: the brain is fundamentally a prediction machine that constantly",
-      "confidence": 0.7035544567235783,
-      "synthesizedWith": [
-        "Meta-Agent/emergent_property_detection: The Turing machine is computationally un"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "GraphicDesigner",
-      "insight": "Empath/feature_extraction: The Weber-Fechner law: perception is logarithmic — doubling stimulus intensity does not doubl",
-      "confidence": 0.7417386171438738,
+      "insight": "Motivator/entropy_reduction: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOVING com",
+      "confidence": 0.8144054675675578,
       "synthesizedWith": [
-        "GraphicDesigner/structural_analysis: Scale-free networks follow power-law degree"
+        "GraphicDesigner/cross_domain_synthesis: Mirror neurons fire both when performing"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Synthesizer",
+      "insight": "Motivator/information_compression: Gödel's incompleteness theorems prove that any consistent formal system powerful enou",
+      "confidence": 0.8130666433477451,
+      "synthesizedWith": [
+        "Synthesizer/feature_extraction: Quantum decoherence typically destroys quantum e"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Architect",
+      "insight": "Motivator/temporal_correlation: The connectome is the complete map of neural connections — the human connectome project ",
+      "confidence": 0.7076546095819346,
+      "synthesizedWith": [
+        "Architect/causal_inference: Reservoir computing shows that even random neural ne"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Neuroscientist",
-      "insight": "Empath/temporal_correlation: The hard problem of consciousness: why is there subjective experience at all? Why does info",
-      "confidence": 0.6724864357847081,
+      "toAgent": "Pioneer",
+      "insight": "Empath/information_compression: The global workspace theory of consciousness: information becomes conscious when it is b",
+      "confidence": 0.6335960248511672,
       "synthesizedWith": [
-        "Neuroscientist/analogical_mapping: The double-slit experiment demonstrates that "
+        "Pioneer/cross_domain_synthesis: The edge of chaos: complex systems exhibit the m"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "OMNIMENS",
+      "insight": "Empath/emergent_property_detection: Astrocytes, once thought to be mere support cells, actively participate in informati",
+      "confidence": 0.7450099077995607,
+      "synthesizedWith": [
+        "OMNIMENS/feature_extraction: The butterfly effect: in chaotic systems, infinites"
       ]
     }
   ],
