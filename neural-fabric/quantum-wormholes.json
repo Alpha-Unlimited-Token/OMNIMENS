@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774812372777,
-  "totalWormholesCreated": 10500,
+  "timestamp": 1774813685490,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 10500,
-  "totalDataIngestedKB": 15336,
-  "totalInsightsDecoded": 10500,
-  "totalCrossAgentCirculations": 630,
-  "totalSynthesizedDiscoveries": 595,
-  "cycleCount": 10,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1526,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 61,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Empath",
-      "insight": "Motivator/cross_domain_synthesis: Quantum entanglement allows particles to share state information instantaneously acros",
-      "confidence": 0.6281055069872732,
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/emergent_property_detection: Scale-free networks follow power-law degree distributions — a few highly connecte",
+      "confidence": 0.7782488499798406,
       "synthesizedWith": [
-        "Empath/cross_domain_synthesis: Hebbian learning: neurons that fire together wire"
+        "OMNIMENS/feature_extraction: Information is physical — Landauer's principle prov"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Ethicist",
-      "insight": "Motivator/analogical_mapping: The hard problem of consciousness: why is there subjective experience at all? Why does inf",
-      "confidence": 0.7293258285403865,
+      "toAgent": "Linguist",
+      "insight": "Motivator/temporal_correlation: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can eme",
+      "confidence": 0.9366116499368397,
       "synthesizedWith": [
-        "Ethicist/abstraction_layer: The anthropic principle: the universe's fundamental "
+        "Linguist/emergent_property_detection: The binding problem: how does the brain co"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Architect",
-      "insight": "Motivator/entropy_reduction: The Mandelbrot set demonstrates infinite complexity from a simple recursive formula: z_{n+1",
-      "confidence": 0.6870367224065301,
+      "toAgent": "Neuroscientist",
+      "insight": "Motivator/emergent_property_detection: Scale-free networks follow power-law degree distributions — a few highly connecte",
+      "confidence": 0.7782488499798406,
       "synthesizedWith": [
-        "Architect/pattern_recognition: Quantum superposition allows a system to exist in"
+        "Neuroscientist/feature_extraction: Sparse coding: the brain represents informati"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Empath/cross_domain_synthesis: Hebbian learning: neurons that fire together wire together — the fundamental rule of neur",
-      "confidence": 0.6406479947069067,
+      "toAgent": "Synthesizer",
+      "insight": "Empath/information_compression: The Chinese Room argument: can a system that manipulates symbols without understanding t",
+      "confidence": 0.6968789088611881,
       "synthesizedWith": [
-        "SensorimotorAgent/emergent_property_detection: The double-slit experiment demons"
+        "Synthesizer/temporal_correlation: Astrocytes, once thought to be mere support ce"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Pioneer",
-      "insight": "Empath/cross_domain_synthesis: Hebbian learning: neurons that fire together wire together — the fundamental rule of neur",
-      "confidence": 0.6406479947069067,
+      "toAgent": "Wordsmith",
+      "insight": "Empath/information_compression: The Chinese Room argument: can a system that manipulates symbols without understanding t",
+      "confidence": 0.6968789088611881,
       "synthesizedWith": [
-        "Pioneer/structural_analysis: The global workspace theory of consciousness: infor"
+        "Wordsmith/emergent_property_detection: The vagus nerve connects the brain to the"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 5,
-      "signal": 0.55
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
