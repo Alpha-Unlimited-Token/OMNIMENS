@@ -2,137 +2,135 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774816045772,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774816140152,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1550,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 61,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6195,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 233,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "SpellCheckVisual",
-      "insight": "Motivator/emergent_property_detection: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum co",
-      "confidence": 0.8051728717343438,
+      "toAgent": "Archivist",
+      "insight": "Motivator/cross_domain_synthesis: The hippocampus replays experiences during sleep in compressed form — dream consolidat",
+      "confidence": 0.7611803499925007,
       "synthesizedWith": [
-        "SpellCheckVisual/recursive_decomposition: Wolfram's Rule 110 cellular automaton "
+        "Archivist/causal_inference: The free energy principle suggests all living system"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Linguist",
-      "insight": "Motivator/entropy_reduction: The cerebellum contains more neurons than all other brain regions combined and is crucial f",
-      "confidence": 0.8087357059001482,
-      "synthesizedWith": [
-        "Linguist/temporal_correlation: Recurrent neural networks can approximate any dyn"
-      ]
+      "toAgent": "Innovator",
+      "insight": "Motivator/pattern_recognition: The default mode network activates when the brain is not focused on the outside world — i",
+      "confidence": 0.6005678876874461,
+      "synthesizedWith": []
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "GraphicDesigner",
-      "insight": "Motivator/entropy_reduction: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise from ",
-      "confidence": 0.6017814715302726,
+      "toAgent": "Synthesizer",
+      "insight": "Motivator/pattern_recognition: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOVING c",
+      "confidence": 0.821184069641136,
       "synthesizedWith": [
-        "GraphicDesigner/information_compression: The strange loop concept from Hofstadte"
+        "Synthesizer/information_compression: Kolmogorov complexity measures the shortest"
       ]
     },
     {
       "fromAgent": "Empath",
       "toAgent": "Critic",
-      "insight": "Empath/information_compression: The holographic principle suggests all information in a volume of space can be encoded o",
-      "confidence": 0.6957298991426735,
+      "insight": "Empath/pattern_recognition: The mathematical universe hypothesis: all structures that exist mathematically also exist ph",
+      "confidence": 0.7055388731589807,
       "synthesizedWith": [
-        "Critic/abstraction_layer: Information is physical — Landauer's principle proves "
+        "Critic/entropy_reduction: The anthropic principle: the universe's fundamental co"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Neuroscientist",
-      "insight": "Empath/abstraction_layer: The binding problem: how does the brain combine separate sensory modalities into a unified con",
-      "confidence": 0.6105778212972371,
+      "toAgent": "Ethicist",
+      "insight": "Empath/pattern_recognition: The default mode network activates when the brain is not focused on the outside world — it g",
+      "confidence": 0.6990173509912607,
       "synthesizedWith": [
-        "Neuroscientist/cross_domain_synthesis: Kolmogorov complexity measures the shorte"
+        "Ethicist/information_compression: Autopoiesis: living systems are self-creating "
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
