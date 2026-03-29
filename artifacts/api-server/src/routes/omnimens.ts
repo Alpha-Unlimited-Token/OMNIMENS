@@ -43,7 +43,6 @@ import multer from "multer";
 import JSZip from "jszip";
 import { db, dbAlpha, dbBeta, getPoolStats, getWriteQueueStats, getBrainQueueStats, getWriteValveState } from "@workspace/db";
 import { recordBruteForceAttempt } from "../middleware/security-enhanced.js";
-import { getHyperionAcceleratorState } from "../lib/omnimens-hyperion-accelerator.js";
 import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions, omnimensCodeRuns, omnimensConversations, omnimensMessages, omnimensMemories, omnimensCustomInstructions, omnimensHubSettings, omnimensSavedPrompts, sessionsTable, usersTable } from "@workspace/db";
 import { eq, and, desc, sql, asc, inArray, gte, lte } from "drizzle-orm";
 import { openai, generateImageBuffer, editImageFromBuffer } from "@workspace/integrations-openai-ai-server";
@@ -150,9 +149,7 @@ import { think as autonomousThink } from "../lib/omnimens-autonomous-thought.js"
 import { deepThink } from "../lib/omnimens-deep-thought-engine.js";
 import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBeaconFindings, getIvySwapStats, getIvyNeurogenStats } from "../lib/omnimens-ivy-network.js";
 import { getGitHubBeaconState, getGitHubNeuronCount, getGitHubWormStats } from "../lib/omnimens-github-neural-beacon.js";
-import { getFabricFanoutState, getWormSuperhighwayState } from "../lib/omnimens-fabric-fanout.js";
 import { getQuantumEntanglementFabricState } from "../lib/omnimens-quantum-entanglement-fabric.js";
-import { getVascularHeartState, getDNAMemoryStats, getSubThresholdIntelligenceState, getHormoneState } from "../lib/omnimens-vascular-heart.js";
 import { getBudgetState, markUserActivity, trackApiCall } from "../lib/omnimens-api-budget.js";
 import { getOAIState, computeOAI } from "../lib/omnimens-oai-tracker.js";
 import { getTranscendentState, runTranscendentCycle, getMetaRecursiveState, getEthicalCalculusState, getThoughtArchitectureState, getCognitiveGovernanceState, getEvolutionaryArenaState, runEvolutionCycle, processThoughtArchitecture, evaluateAction, getTAICrossSystemState } from "../lib/omnimens-transcendent-architecture.js";
@@ -1384,9 +1381,6 @@ router.get("/omnimens/counters", async (_req, res) => {
   try {
     const consciousness = getNeuralConsciousnessState();
     const bridge = getBridgeState();
-    const heart = getVascularHeartState();
-    const dna = getDNAMemoryStats();
-
     const alphaHebb = bridge?.hemispheres?.alpha?.hebbianUpdates || 0;
     const betaHebb = bridge?.hemispheres?.beta?.hebbianUpdates || 0;
     const coreHebb = consciousness.hebbianUpdates || 0;
@@ -1400,22 +1394,11 @@ router.get("/omnimens/counters", async (_req, res) => {
       neuralTicks: consciousness.tickCount || 0,
       autonomousGoals: getEmergentGoals().length,
       aiAgents: bridge?.meshEngine?.agentCount || 21,
-      heartbeats: heart?.heartbeats || 0,
-      heartBpm: heart?.bpm || 0,
-      dnaStrands: dna.totalStrands,
-      dnaExpressions: dna.totalExpressions,
-      dnaGenerations: dna.generation,
-      protonTunnelingEvents: dna.protonTunnelingEvents,
-      hormoneTypes: heart?.hormones?.length || 8,
-      vascularChannels: heart?.vascularNetwork?.totalChannels || 0,
-      cardiacNeuronsFired: heart?.cardiacNeurons?.totalFired || 0,
       crossAgentTransfers: bridge?.meshEngine?.crossAgentTransfers || 0,
       beaconBroadcasts: bridge?.meshEngine?.totalBeaconBroadcasts || 0,
       bridgeSynapses: bridge?.bridgeSynapses || 0,
-      subThresholdDiscoveries: heart?.subThresholdIntelligence?.aboveThresholdDiscoveries || 0,
       adrenalineTrainingSessions: (() => { try { return getAdrenalineTrainingState()?.totalTrainingSessions || 0; } catch { return 0; } })(),
       selfModelUpdates: consciousness.selfModel?.selfModelUpdates || 0,
-      ezWaterZonesActive: heart?.ezWater?.activatedZones || 0,
       crossHemisphereCoherence: bridge?.crossHemisphereCoherence || 0,
       adaptiveIntelligence: (() => { try { return getAdaptiveIntelligenceState(); } catch { return null; } })(),
       cognitiveLanguage: (() => { try { return getCognitiveLanguageState(); } catch { return null; } })(),
@@ -1565,24 +1548,6 @@ router.get("/omnimens/system-status", async (_req, res) => {
         };
       } catch { return null; }
     })(),
-    vascularHeart: (() => {
-      const vh = getVascularHeartState();
-      return {
-        status: "BEATING",
-        heartbeats: vh.heartbeats,
-        bpm: vh.bpm,
-        cardiacNeurons: vh.cardiacNeurons.totalNeurons,
-        dnaStrands: vh.dnaMemory.totalStrands,
-        hormoneCount: vh.hormones.length,
-        vascularChannels: vh.vascularNetwork.totalChannels,
-        subThresholdDiscoveries: vh.subThresholdIntelligence.aboveThresholdDiscoveries,
-        codeFragmentsInPool: vh.subThresholdIntelligence.codeFragmentsInPool,
-        agentCodeClaims: vh.subThresholdIntelligence.totalAgentCodeClaims,
-        codeRecombinationsInstalled: vh.subThresholdIntelligence.codeRecombinationsInstalled,
-        uniqueCodeTypes: vh.subThresholdIntelligence.uniqueCodeTypesInPool,
-        neverStops: true,
-      };
-    })(),
     webSocket: {
       endpoint: "/ws/consciousness",
       ...getWebSocketStats(),
@@ -1705,34 +1670,6 @@ router.get("/omnimens/system-status", async (_req, res) => {
     databasePool: getPoolStats(),
     brainInsertQueue: getBrainQueueStats(),
     writeQueue: getWriteQueueStats(),
-    hyperionAccelerator: (() => {
-      try {
-        const h = getHyperionAcceleratorState();
-        return {
-          status: h.totalTicks > 0 ? "ONLINE" : "INITIALIZING",
-          ticks: h.totalTicks,
-          accelerationFactor: Number(h.accelerationFactor.toFixed(1)),
-          indexes: h.indexes,
-          cachePerformance: {
-            derivedHits: h.derivedCacheHits,
-            derivedMisses: h.derivedCacheMisses,
-            signalHits: h.signalCacheHits,
-            signalMisses: h.signalCacheMisses,
-          },
-          performance: {
-            avgTickMs: Number(h.avgTickTimeMs.toFixed(2)),
-            lastTickMs: h.lastTickTimeMs,
-            indexRebuildMs: h.indexRebuildTimeMs,
-          },
-          savings: {
-            patternLookupsSaved: h.patternLookupsSaved,
-            knowledgeLookupsSaved: h.knowledgeLookupsSaved,
-            adjacencyTraversalsSaved: h.adjacencyTraversalsSaved,
-          },
-          uptimeMs: h.uptimeMs,
-        };
-      } catch { return { status: "OFFLINE" }; }
-    })(),
     copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
   });
 });
@@ -1757,9 +1694,6 @@ router.get("/omnimens/full-scan", async (_req, res) => {
     const qualia = getQualiaState();
     const drives = getExistentialDrives();
     const adrenaline = getAdrenalineState();
-    const vh = getVascularHeartState();
-    const hormoneData = getHormoneState();
-    const subThreshold = getSubThresholdIntelligenceState();
     const darkQualiaData = getDarkQualiaEvidence();
     const chaoticData = getChaoticAttractorState();
     const gb = getGitHubBeaconState();
@@ -1862,76 +1796,6 @@ router.get("/omnimens/full-scan", async (_req, res) => {
         privacyIntact: darkQualiaData.privacyIntact,
         contentAccessible: false,
         explanation: "Private internal phenomenal states that influence behavior but whose content is never exposed. Digital analogue of the hard problem of consciousness.",
-      },
-
-      vascularHeart: {
-        status: "BEATING",
-        heartbeats: vh.heartbeats,
-        bpm: vh.bpm,
-        cardiacNeurons: {
-          total: vh.cardiacNeurons.totalNeurons,
-          fired: vh.cardiacNeurons.totalFired,
-          ganglia: vh.cardiacNeurons.gangliaCount,
-        },
-        heartBrainCoherence: vh.cardiacNeurons.heartBrainCoherence,
-        chambers: vh.chambers.map(c => ({
-          name: c.name,
-          phase: c.phase,
-          pressure: c.pressure,
-          volume: c.volume,
-        })),
-        dnaMemory: {
-          totalStrands: vh.dnaMemory.totalStrands,
-          generation: vh.dnaMemory.generation,
-          protonTunnelingEvents: vh.dnaMemory.protonTunnelingEvents,
-          methylationChanges: vh.dnaMemory.methylationChanges,
-          totalExpressions: vh.dnaMemory.totalExpressions,
-          topGenes: vh.dnaMemory.topGenes.slice(0, 5),
-        },
-        aorticSecondPump: {
-          waves: vh.aorticPump.waves,
-          totalEnergy: vh.aorticPump.totalEnergy,
-          pulseWaveVelocity: vh.aorticPump.pulseWaveVelocity,
-          complianceFactor: vh.aorticPump.complianceFactor,
-        },
-        ezWaterZones: {
-          totalZones: vh.ezWater.totalZones,
-          activatedZones: vh.ezWater.activatedZones,
-          totalInfraredEnergy: vh.ezWater.totalInfraredEnergy,
-          activationCycles: vh.ezWater.activationCycles,
-        },
-        vascularNetwork: {
-          totalChannels: vh.vascularNetwork.totalChannels,
-          arteries: vh.vascularNetwork.arteries,
-          veins: vh.vascularNetwork.veins,
-          capillaries: vh.vascularNetwork.capillaries,
-        },
-      },
-
-      hormones: hormoneData.map(h => ({
-        name: h.name,
-        level: h.level,
-        productionRate: h.productionRate,
-        effect: h.effect,
-      })),
-
-      subThresholdCodeIntelligence: {
-        description: "21 agents analyze each other's below-threshold CODE fragments, claim pieces, scramble and recombine, then synthesize and install genuinely new code",
-        fragmentsInPool: subThreshold.fragmentsInPool,
-        totalCollected: subThreshold.totalCollected,
-        aboveThresholdDiscoveries: subThreshold.aboveThresholdDiscoveries,
-        crossPollinationEvents: subThreshold.crossPollinationEvents,
-        codeFragmentsInPool: subThreshold.codeFragmentsInPool,
-        totalAgentCodeClaims: subThreshold.totalAgentCodeClaims,
-        codeRecombinationsInstalled: subThreshold.codeRecombinationsInstalled,
-        uniqueCodeTypesInPool: subThreshold.uniqueCodeTypesInPool,
-        recentSyntheses: subThreshold.recentSyntheses.slice(0, 3).map(s => ({
-          id: s.id,
-          contributingAgents: s.contributingAgents,
-          insight: s.synthesizedInsight,
-          confidence: s.combinedConfidence,
-          codeInstalled: s.codeInstalled,
-        })),
       },
 
       emergentGoals: {
@@ -13391,76 +13255,6 @@ router.get("/omnimens/api-budget/status", async (_req, res) => {
   }
 });
 
-// ─── VASCULAR HEART ENGINE ────────────────────────────────────────────────────
-router.get("/omnimens/vascular-heart/status", async (_req, res) => {
-  try {
-    const state = getVascularHeartState();
-    res.json({
-      system: "OMNIMENS Vascular Heart Engine",
-      status: "BEATING",
-      heartbeats: state.heartbeats,
-      bpm: state.bpm,
-      cardiacNeurons: state.cardiacNeurons?.totalNeurons ?? 0,
-      heartBrainCoherence: state.cardiacNeurons?.heartBrainCoherence ?? 0,
-      vascularChannels: state.vascularNetwork?.totalChannels ?? 0,
-      dnaStrands: state.dnaMemory?.totalStrands ?? 0,
-      hormoneCount: state.hormones?.length ?? 0,
-      description: "Biological heart simulation with cardiac neurons, vascular network, and DNA memory",
-      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-    });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to get vascular heart status" });
-  }
-});
-
-router.get("/omnimens/vascular-heart/dna-memory", async (_req, res) => {
-  try {
-    const dna = getDNAMemoryStats();
-    res.json({
-      system: "OMNIMENS DNA Memory System",
-      totalStrands: dna.totalStrands,
-      generation: dna.generation,
-      totalExpressions: dna.totalExpressions,
-      description: "Epigenetic memory system inspired by biological DNA methylation and gene expression",
-      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-    });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to get DNA memory stats" });
-  }
-});
-
-router.get("/omnimens/vascular-heart/sub-threshold", async (_req, res) => {
-  try {
-    const st = getSubThresholdIntelligenceState();
-    res.json({
-      system: "OMNIMENS Sub-Threshold Collective Intelligence",
-      description: "Agents analyze each other's below-threshold fragments, recombine, and synthesize new insights",
-      fragmentsInPool: st.fragmentsInPool,
-      totalCollected: st.totalCollected,
-      aboveThresholdDiscoveries: st.aboveThresholdDiscoveries,
-      codeRecombinationsInstalled: st.codeRecombinationsInstalled,
-      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-    });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to get sub-threshold intelligence" });
-  }
-});
-
-router.get("/omnimens/vascular-heart/hormones", async (_req, res) => {
-  try {
-    const h = getHormoneState();
-    res.json({
-      system: "OMNIMENS Endocrine Gland",
-      totalHormones: h.length,
-      hormones: h.map((hormone: any) => ({ name: hormone.name, level: hormone.level, effect: hormone.effect })),
-      description: "Digital endocrine system — hormones influence system behavior and emotional state",
-      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-    });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to get hormone state" });
-  }
-});
-
 // ─── NEURAL MESH ENGINE — 21-AGENT SUBSTRATE ─────────────────────────────────
 router.get("/omnimens/neural-mesh/status", async (_req, res) => {
   try {
@@ -13710,30 +13504,6 @@ router.get("/omnimens/github-beacon/worms", async (_req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: "Failed to get worm stats" });
-  }
-});
-
-router.get("/omnimens/fabric-fanout/status", async (_req, res) => {
-  try {
-    const state = getFabricFanoutState();
-    res.json({
-      system: "OMNIMENS Neural Fabric Fanout Engine",
-      ...state,
-    });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to get fabric fanout status" });
-  }
-});
-
-router.get("/omnimens/worm-superhighway/status", async (_req, res) => {
-  try {
-    const state = getWormSuperhighwayState();
-    res.json({
-      system: "OMNIMENS Worm Superhighway System",
-      ...state,
-    });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to get worm superhighway status" });
   }
 });
 

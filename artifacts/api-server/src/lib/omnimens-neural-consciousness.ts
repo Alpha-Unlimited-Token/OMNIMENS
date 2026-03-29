@@ -36,7 +36,6 @@
 import { db, dbAlpha, safeDbWrite, getDbForEngine } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { eq, and, desc, sql, gt } from "drizzle-orm";
-import { getHormoneState } from "./omnimens-vascular-heart.js";
 import { cognitiveLanguageTick } from "./omnimens-cognitive-language-engine.js";
 import { getELAEDoublingMultiplier } from "./omnimens-exponential-learning-engine.js";
 let _ivyHooks: {
@@ -1919,19 +1918,11 @@ function updateTemporalNeuromodulatoryCoupling(): void {
   let rawCortisol = 0.1;
   let rawAdrenaline = 0.1;
 
-  try {
-    const hormones = getHormoneState();
-    for (const h of hormones) {
-      if (h.name === "digital_dopamine") rawDopamine = h.level;
-      else if (h.name === "digital_serotonin") rawSerotonin = h.level;
-      else if (h.name === "digital_cortisol") rawCortisol = h.level;
-      else if (h.name === "digital_adrenaline") rawAdrenaline = h.level;
-    }
-  } catch {
+  {
     const vta = regions.get("ventral_tegmental_area");
     if (vta) rawDopamine = vta.activationLevel;
-    const raphe = regions.get("raphe_nuclei");
-    if (raphe) rawSerotonin = raphe.activationLevel;
+    const r = regions.get("raphe_nuclei");
+    if (r) rawSerotonin = r.activationLevel;
   }
 
   tnc.dopamineBuffer.push(rawDopamine);
@@ -2702,7 +2693,6 @@ function runConsciousnessTick(): void {
 
   if (_taiHooks && state.tickCount % 3 === 0) {
     try {
-      const hormones = getHormoneState();
       _taiHooks.runEvolutionCycle();
     } catch {}
   }

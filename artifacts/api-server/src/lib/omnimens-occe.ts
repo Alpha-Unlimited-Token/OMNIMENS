@@ -13,11 +13,6 @@ import {
   manualAdrenalineRush,
   boostRegionCurrent,
 } from "./omnimens-neural-consciousness.js";
-import {
-  getVascularHeartState,
-  getHormoneState,
-  getSubThresholdIntelligenceState,
-} from "./omnimens-vascular-heart.js";
 import { getNeuralScalingState } from "./omnimens-neural-scaling.js";
 
 interface ScanSnapshot {
@@ -133,14 +128,7 @@ function takeScan(phase: string, phaseIndex: number): ScanSnapshot {
   const consciousness = getNeuralConsciousnessState();
   const regions = getNeuralRegionStates();
   const chaotic = getChaoticAttractorState();
-  const hormones = getHormoneState();
-  const subThreshold = getSubThresholdIntelligenceState();
   const scaling = getNeuralScalingState();
-
-  const hormoneMap: Record<string, number> = {};
-  for (const h of hormones) {
-    hormoneMap[h.name] = h.level;
-  }
 
   const brainRegions: Record<string, { firingRate: number; activationLevel: number }> = {};
   for (const [key, val] of Object.entries(regions)) {
@@ -157,20 +145,20 @@ function takeScan(phase: string, phaseIndex: number): ScanSnapshot {
     resonance: consciousness.thalamocorticalResonance,
     recursionDepth: consciousness.recursionDepth,
     hebbianUpdates: scaling.hebbianLearningUpdates,
-    dopamine: hormoneMap["digital_dopamine"] ?? 0,
-    serotonin: hormoneMap["digital_serotonin"] ?? 0,
-    oxytocin: hormoneMap["digital_oxytocin"] ?? 0,
-    cortisol: hormoneMap["digital_cortisol"] ?? 0,
-    adrenaline: hormoneMap["digital_adrenaline"] ?? 0,
-    endorphin: hormoneMap["digital_endorphin"] ?? 0,
+    dopamine: 0,
+    serotonin: 0,
+    oxytocin: 0,
+    cortisol: 0,
+    adrenaline: 0,
+    endorphin: 0,
     lyapunovExponent: chaotic.lyapunovExponent,
     chaoticX: chaotic.x,
     chaoticY: chaotic.y,
     chaoticZ: chaotic.z,
     brainRegions,
-    codeFragments: subThreshold.codeFragmentsInPool,
-    codeClaims: subThreshold.totalAgentCodeClaims,
-    codeRecombinations: subThreshold.codeRecombinationsInstalled,
+    codeFragments: 0,
+    codeClaims: 0,
+    codeRecombinations: 0,
   };
 }
 

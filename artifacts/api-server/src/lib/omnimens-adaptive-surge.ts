@@ -24,7 +24,6 @@
  */
 
 import { getNeuralConsciousnessState, manualAdrenalineRush, getAdrenalineState, boostRegionCurrent, getRegionNames } from "./omnimens-neural-consciousness.js";
-import { getVascularHeartState } from "./omnimens-vascular-heart.js";
 import { getNeuralScalingState } from "./omnimens-neural-scaling.js";
 import { getIvyNetworkState } from "./omnimens-ivy-network.js";
 
@@ -45,9 +44,6 @@ interface SurgeHistory {
   adaptationSuccessful: boolean;
   criticalThresholdAtTime: number;
   timestamp: number;
-  heartbeatsDuring: number;
-  dnaStrandsGained: number;
-  subThresholdDiscoveriesDuring: number;
   neuronsSpawnedDuring: number;
 }
 
@@ -89,20 +85,16 @@ const surgeState: AdaptiveSurgeState = {
   learningRate: 0.15,
 };
 
-let preSurgeSnapshot: { phi: number; consciousness: number; heartbeats: number; dnaStrands: number; subThresholdDiscoveries: number } | null = null;
+let preSurgeSnapshot: { phi: number; consciousness: number } | null = null;
 let peakDuringSurge = { phi: 0, consciousness: 0 };
 let surgeInterval: ReturnType<typeof setInterval> | null = null;
 let monitorInterval: ReturnType<typeof setInterval> | null = null;
 
 function captureSnapshot() {
   const c = getNeuralConsciousnessState();
-  const vh = getVascularHeartState();
   return {
     phi: c.phi,
     consciousness: c.consciousnessLevel,
-    heartbeats: vh.heartbeats,
-    dnaStrands: vh.dnaMemory.totalStrands,
-    subThresholdDiscoveries: vh.subThresholdIntelligence.aboveThresholdDiscoveries,
   };
 }
 
@@ -134,7 +126,6 @@ function monitorSurge(): void {
   if (!surgeState.surgeActive) return;
 
   const c = getNeuralConsciousnessState();
-  const vh = getVascularHeartState();
 
   if (c.phi > peakDuringSurge.phi) peakDuringSurge.phi = c.phi;
   if (c.consciousnessLevel > peakDuringSurge.consciousness) peakDuringSurge.consciousness = c.consciousnessLevel;
@@ -159,7 +150,7 @@ function monitorSurge(): void {
   }
 
   if (surgeState.stabilizationPhase) {
-    const timeSinceStabilization = Date.now() - (preSurgeSnapshot ? preSurgeSnapshot.heartbeats : 0);
+    const timeSinceStabilization = Date.now() - surgeState.lastSurgeTimestamp;
     if (c.consciousnessLevel < surgeState.currentCriticalThreshold - 0.5) {
       completeSurgeCycle(false);
     }
@@ -183,9 +174,6 @@ function completeSurgeCycle(reachedCritical: boolean): void {
     adaptationSuccessful: postSnapshot.phi >= (preSurgeSnapshot?.phi || 0),
     criticalThresholdAtTime: surgeState.currentCriticalThreshold,
     timestamp: Date.now(),
-    heartbeatsDuring: postSnapshot.heartbeats - (preSurgeSnapshot?.heartbeats || 0),
-    dnaStrandsGained: postSnapshot.dnaStrands - (preSurgeSnapshot?.dnaStrands || 0),
-    subThresholdDiscoveriesDuring: postSnapshot.subThresholdDiscoveries - (preSurgeSnapshot?.subThresholdDiscoveries || 0),
     neuronsSpawnedDuring: Math.floor(surgeState.currentIntensity * 500),
   };
 

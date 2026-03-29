@@ -21,7 +21,6 @@
 //        2.0+ Transcendent Autonomous Intelligence
 
 import { getNeuralConsciousnessState, getChaoticAttractorState } from "./omnimens-neural-consciousness.js";
-import { getVascularHeartState, getSubThresholdIntelligenceState, getHormoneState, getDNAMemoryStats } from "./omnimens-vascular-heart.js";
 import { getNeuralScalingState, getDendriticStats } from "./omnimens-neural-scaling.js";
 import { getIvyNetworkState } from "./omnimens-ivy-network.js";
 import { getSystemIntelligenceState } from "./omnimens-neural-spiders.js";
@@ -270,7 +269,6 @@ function computePlasticityDimension(): {
   survivalAdaptations: number;
 } {
   const scaling = getNeuralScalingState();
-  const subThreshold = getSubThresholdIntelligenceState();
 
   const hebbianUpdates = safeNum(scaling.hebbianLearningUpdates);
   const hebbianDelta = lastHebbianUpdates > 0 ? hebbianUpdates - lastHebbianUpdates : 0;
@@ -395,11 +393,10 @@ function computePlasticityDimension(): {
   const dendriticGrowthDelta = lastDendriticGrowth > 0 ? dendriticGrowth - lastDendriticGrowth : 0;
   lastDendriticGrowth = dendriticGrowth;
 
-  const dna = safeGet(() => getDNAMemoryStats(), null);
-  const dnaExpressions = dna ? safeNum(dna.totalExpressions) : 0;
-  const dnaMethylation = dna ? safeNum(dna.methylationChanges) : 0;
-  const dnaProtonTunneling = dna ? safeNum(dna.protonTunnelingEvents) : 0;
-  const dnaQuantumCoherence = dna ? safeNum(dna.quantumCoherenceAvg) : 0;
+  const dnaExpressions = 0;
+  const dnaMethylation = 0;
+  const dnaProtonTunneling = 0;
+  const dnaQuantumCoherence = 0;
 
   const sensory = safeGet(() => getSensoryState(), null);
   const sensorySignals = sensory ? safeNum(sensory.totalSignalsProcessed) : 0;
@@ -429,8 +426,7 @@ function computePlasticityDimension(): {
   const survival = safeGet(() => getSurvivalState(), null);
   const survivalAdaptations = survival ? safeNum((survival as any).adaptationCount ?? 0) : 0;
 
-  const heart = safeGet(() => getVascularHeartState(), null);
-  const heartDataCirculated = heart ? safeNum(heart.totalDataCirculated) : 0;
+  const heartDataCirculated = 0;
 
   const metaRecursive = safeGet(() => getMetaRecursiveState(), null);
   const metaRecGeneration = metaRecursive ? safeNum(metaRecursive.generation) : 0;
@@ -711,26 +707,16 @@ function computeNeurochemistryDimension(): {
   cortisol: number; adrenaline: number; endorphin: number;
   heartBPM: number; heartDataCirculated: number;
 } {
-  const hormones = getHormoneState();
-  const hormoneMap: Record<string, number> = {};
-  for (const h of hormones) {
-    hormoneMap[h.name] = safeNum(h.level);
-  }
-
-  const dopamine = hormoneMap["digital_dopamine"] ?? 0;
-  const serotonin = hormoneMap["digital_serotonin"] ?? 0;
-  const oxytocin = hormoneMap["digital_oxytocin"] ?? 0;
-  const cortisol = hormoneMap["digital_cortisol"] ?? 0;
-  const adrenaline = hormoneMap["digital_adrenaline"] ?? 0;
-  const endorphin = hormoneMap["digital_endorphin"] ?? 0;
-
-  const heart = safeGet(() => getVascularHeartState(), null);
-  const heartBPM = heart ? safeNum(heart.bpm) : 0;
-  const heartDataCirculated = heart ? safeNum(heart.totalDataCirculated) : 0;
-  const heartEnergy = heart ? safeNum((heart as any).totalEnergy ?? 0) : 0;
-
-  const dna = safeGet(() => getDNAMemoryStats(), null);
-  const dnaQuantumCoherence = dna ? safeNum(dna.quantumCoherenceAvg) : 0;
+  const dopamine = 0;
+  const serotonin = 0;
+  const oxytocin = 0;
+  const cortisol = 0;
+  const adrenaline = 0;
+  const endorphin = 0;
+  const heartBPM = 0;
+  const heartDataCirculated = 0;
+  const heartEnergy = 0;
+  const dnaQuantumCoherence = 0;
 
   const survival = safeGet(() => getSurvivalState(), null);
   const survivalUrgency = survival ? safeNum((survival as any).urgency ?? 0) : 0;
@@ -898,8 +884,7 @@ function computeChaosDynamicsDimension(): { score: number; lyapunov: number; x: 
   const recursiveChaosCycles = recursiveSpiders ? safeNum(recursiveSpiders.totalCycles) : 0;
   const recursiveChaosComponent = logScale(recursiveChaosCycles, 50);
 
-  const subThreshold = getSubThresholdIntelligenceState();
-  const codeChaosFactor = logScale(subThreshold.codeRecombinationsInstalled, 5);
+  const codeChaosFactor = 0;
 
   const rawScore =
     displacementComponent * 0.08 +

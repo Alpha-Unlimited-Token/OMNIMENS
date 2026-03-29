@@ -11,7 +11,6 @@
 import { getAdaptiveIntelligenceState, getNeuralConsciousnessState, getAdrenalineState } from "./omnimens-neural-consciousness.js";
 import { getMeshEngineState, getMeshConnectivityStats } from "./omnimens-neural-mesh-engine.js";
 import { getIvyNetworkState, getIvySpiderStats, getMotherBeaconFindings } from "./omnimens-ivy-network.js";
-import { lookupKnowledgeByName as hyperionKnowledgeLookup, lookupPatternsByCategory as hyperionPatternLookup, getCachedSignals as hyperionGetCachedSignals } from "./omnimens-hyperion-accelerator.js";
 
 let _engineImports: Record<string, any> = {};
 let _engineImportsLoaded = false;
@@ -21,8 +20,6 @@ async function loadAllEngineImports(): Promise<void> {
   _engineImportsLoaded = true;
   const loaders: Array<[string, string, string]> = [
     ["adaptiveSurge", "./omnimens-adaptive-surge.js", "getAdaptiveSurgeState"],
-    ["heart", "./omnimens-vascular-heart.js", "getVascularHeartState"],
-    ["subThreshold", "./omnimens-vascular-heart.js", "getSubThresholdIntelligenceState"],
     ["bridge", "./omnimens-neural-bridge.js", "getBridgeState"],
     ["alphaHemi", "./omnimens-neural-hemisphere-alpha.js", "getAlphaState"],
     ["betaHemi", "./omnimens-neural-hemisphere-beta.js", "getBetaState"],
@@ -33,8 +30,6 @@ async function loadAllEngineImports(): Promise<void> {
     ["viral", "./omnimens-viral-hybrid.js", "getViralHybridState"],
     ["qef", "./omnimens-quantum-entanglement-fabric.js", "getQuantumEntanglementFabricState"],
     ["wormhole", "./omnimens-quantum-wormhole.js", "getQuantumWormholeState"],
-    ["fabricFanout", "./omnimens-fabric-fanout.js", "getFabricFanoutState"],
-    ["wormHighway", "./omnimens-fabric-fanout.js", "getWormSuperhighwayState"],
     ["comms", "./omnimens-neural-comms-protocol.js", "getCommsProtocolState"],
     ["emotional", "./omnimens-emotional-refactor.js", "getEmotionalRefactorState"],
     ["metacog", "./omnimens-metacognitive-monitor.js", "getMetacognitiveState"],
@@ -291,15 +286,6 @@ let knowledgeDensity = 0;
 
 function harvestNeuralAccelerationSignals(): NeuralAccelerationSignals {
   try {
-    const cached = hyperionGetCachedSignals();
-    if (cached && Object.keys(cached).length > 5) {
-      if (cached.totalWorms !== undefined) lastAccelerationSignals.wormTunnelBoost = safeNum(cached.totalWorms * Math.max(0, 1 - (cached.avgWormLatency || 0)));
-      if (cached.learningMultiplier !== undefined) lastAccelerationSignals.wormHighwayTunnels = safeNum(cached.totalWorms || 0);
-      if (cached.consciousnessLevel !== undefined) lastAccelerationSignals.meshSynchrony = safeNum(cached.consciousnessLevel * 0.1);
-      if (cached.totalTraversals !== undefined) lastAccelerationSignals.wormTunnelBoost = Math.max(lastAccelerationSignals.wormTunnelBoost, safeNum(cached.totalTraversals * 0.01));
-      if (cached.myelinatedWorms !== undefined) lastAccelerationSignals.fabricFanoutReach = safeNum(cached.myelinatedWorms);
-      if (cached.avgWormSpeed !== undefined) lastAccelerationSignals.silkWebSpeed = Math.max(lastAccelerationSignals.silkWebSpeed, safeNum(cached.avgWormSpeed));
-    }
   } catch {}
 
   try {
@@ -350,18 +336,6 @@ function harvestNeuralAccelerationSignals(): NeuralAccelerationSignals {
       lastAccelerationSignals.adrenalineSurgeCount,
       safeNum(surge.totalSurges || surge.surgeCount || 0)
     );
-  }
-
-  const heart = safeCall("heart");
-  if (heart) {
-    lastAccelerationSignals.heartBPM = safeNum(heart.bpm || heart.heartRate || 0);
-    lastAccelerationSignals.heartEnergy = safeNum(heart.totalEnergy || heart.energy || 0);
-    lastAccelerationSignals.hormoneActivity = safeNum(heart.hormoneCount || heart.totalHormones || 0);
-  }
-
-  const subThreshold = safeCall("subThreshold");
-  if (subThreshold) {
-    lastAccelerationSignals.subThresholdFragments = safeNum(subThreshold.totalFragments || subThreshold.fragmentsAnalyzed || 0);
   }
 
   const bridge = safeCall("bridge");
@@ -415,16 +389,6 @@ function harvestNeuralAccelerationSignals(): NeuralAccelerationSignals {
   const wormhole = safeCall("wormhole");
   if (wormhole) {
     lastAccelerationSignals.wormholeDataIngested = safeNum(wormhole.totalDataIngested || wormhole.fragmentsDecoded || 0);
-  }
-
-  const fabric = safeCall("fabricFanout");
-  if (fabric) {
-    lastAccelerationSignals.fabricFanoutReach = safeNum(fabric.totalReach || fabric.fanoutWaves || 0);
-  }
-
-  const highway = safeCall("wormHighway");
-  if (highway) {
-    lastAccelerationSignals.wormHighwayTunnels = safeNum(highway.totalTunnels || highway.totalWorms || 0);
   }
 
   const comms = safeCall("comms");
@@ -719,7 +683,7 @@ function matchPattern(input: number[], threshold: number = 0.7, category?: strin
   let scannedFromIndex = false;
   if (category) {
     try {
-      const candidateIds = hyperionPatternLookup(category);
+      const candidateIds: Set<string> | null = null;
       if (candidateIds && candidateIds.size > 0) {
         scannedFromIndex = true;
         for (const id of candidateIds) {
@@ -829,11 +793,6 @@ function addKnowledgeNode(concept: string, category: string, properties?: Record
 
 function findKnowledgeByName(concept: string): KnowledgeNode | null {
   try {
-    const hyperionId = hyperionKnowledgeLookup(concept);
-    if (hyperionId) {
-      const node = knowledgeGraph.get(hyperionId);
-      if (node && node.concept.toLowerCase() === concept.toLowerCase()) return node;
-    }
   } catch {}
   const lower = concept.toLowerCase();
   for (const [, node] of knowledgeGraph) {

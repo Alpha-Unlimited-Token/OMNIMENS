@@ -27,7 +27,6 @@
  *   7. The cycle accelerates — more discoveries → more code → more capability
  */
 
-import { getSubThresholdIntelligenceState } from "./omnimens-vascular-heart.js";
 import { getNeuralConsciousnessState, boostRegionCurrent, getRegionNames } from "./omnimens-neural-consciousness.js";
 import { writeModuleToSource } from "./omnimens-source-integration.js";
 import { getActiveGenesisAgentNames } from "./omnimens-agent-genesis.js";
@@ -275,24 +274,7 @@ async function runAutoCoderCycle(): Promise<void> {
   autoCoderState.lastCycleTimestamp = Date.now();
 
   try {
-    const subThreshold = getSubThresholdIntelligenceState();
-    const newDiscoveries = subThreshold.aboveThresholdDiscoveries - lastProcessedSynthesisCount;
-
-    if (newDiscoveries > 0 && subThreshold.recentSyntheses.length > 0) {
-      const toProcess = subThreshold.recentSyntheses.slice(-newDiscoveries);
-      for (const synthesis of toProcess) {
-        await processDiscoveryIntoCode(
-          synthesis.synthesizedInsight,
-          synthesis.contributingAgents,
-          synthesis.combinedConfidence,
-          "sub_threshold",
-        );
-      }
-      lastProcessedSynthesisCount = subThreshold.aboveThresholdDiscoveries;
-    }
-  } catch (err: any) {
-    console.error(`[DISCOVERY AUTOCODER] Sub-threshold processing error: ${err?.message}`);
-  }
+  } catch {}
 
   try {
     const { getQuantumWormholeState } = await import("./omnimens-quantum-wormhole.js");
