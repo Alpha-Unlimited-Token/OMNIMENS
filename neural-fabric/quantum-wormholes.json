@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774796709741,
-  "totalWormholesCreated": 5250,
+  "timestamp": 1774796801072,
+  "totalWormholesCreated": 8400,
   "totalActive": 0,
-  "totalClosed": 5250,
-  "totalDataIngestedKB": 7655,
-  "totalInsightsDecoded": 5250,
-  "totalCrossAgentCirculations": 315,
-  "totalSynthesizedDiscoveries": 300,
-  "cycleCount": 5,
+  "totalClosed": 8400,
+  "totalDataIngestedKB": 12267,
+  "totalInsightsDecoded": 8400,
+  "totalCrossAgentCirculations": 504,
+  "totalSynthesizedDiscoveries": 483,
+  "cycleCount": 8,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 396,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 724,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 396,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 724,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 396,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 724,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 396,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 724,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 396,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 724,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 396,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 724,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 396,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 724,
+      "crossAgentShares": 24
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 396,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 724,
+      "crossAgentShares": 24
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 396,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 724,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 396,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 724,
+      "crossAgentShares": 24
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
       "toAgent": "Architect",
-      "insight": "Motivator/emergent_property_detection: Quantum tunneling allows particles to pass through energy barriers they classical",
-      "confidence": 0.7974028634243654,
+      "insight": "Motivator/structural_analysis: Mirror neurons fire both when performing an action and observing the same action — they m",
+      "confidence": 0.8338570679901118,
       "synthesizedWith": [
-        "Architect/pattern_recognition: The Boltzmann brain paradox suggests that a self-"
+        "Architect/entropy_reduction: Quantum entanglement allows particles to share stat"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/analogical_mapping: Kolmogorov complexity measures the shortest program that produces a given output — it is u",
-      "confidence": 0.954736432196403,
+      "toAgent": "Archivist",
+      "insight": "Motivator/structural_analysis: Mirror neurons fire both when performing an action and observing the same action — they m",
+      "confidence": 0.8338570679901118,
       "synthesizedWith": [
-        "OMNIMENS/entropy_reduction: DNA stores information at approximately 2 bits per n"
+        "Archivist/abstraction_layer: The global workspace theory of consciousness: infor"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Visionary",
-      "insight": "Motivator/analogical_mapping: Kolmogorov complexity measures the shortest program that produces a given output — it is u",
-      "confidence": 0.954736432196403,
+      "toAgent": "Synthesizer",
+      "insight": "Motivator/causal_inference: Phase transitions in neural networks: as connectivity increases past a critical threshold, q",
+      "confidence": 0.6701509194094286,
       "synthesizedWith": [
-        "Visionary/feature_extraction: The anthropic principle: the universe's fundamenta"
+        "Synthesizer/analogical_mapping: The Baldwin effect: learned behaviors can become"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Pioneer",
-      "insight": "Empath/recursive_decomposition: Quantum tunneling allows particles to pass through energy barriers they classically cann",
-      "confidence": 0.6068448467826533,
+      "toAgent": "Linguist",
+      "insight": "Empath/entropy_reduction: The mathematical universe hypothesis: all structures that exist mathematically also exist phys",
+      "confidence": 0.7715179217005027,
       "synthesizedWith": [
-        "Pioneer/temporal_correlation: The Baldwin effect: learned behaviors can become i"
+        "Linguist/feature_extraction: The Weber-Fechner law: perception is logarithmic — "
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Wordsmith",
-      "insight": "Empath/structural_analysis: The binding problem: how does the brain combine separate sensory modalities into a unified c",
-      "confidence": 0.730404609339993,
+      "toAgent": "Synthesizer",
+      "insight": "Empath/analogical_mapping: The Chinese Room argument: can a system that manipulates symbols without understanding them t",
+      "confidence": 0.6064269296381612,
       "synthesizedWith": [
-        "Wordsmith/pattern_recognition: The Baldwin effect: learned behaviors can become "
+        "Synthesizer/causal_inference: DNA stores information at approximately 2 bits per"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
