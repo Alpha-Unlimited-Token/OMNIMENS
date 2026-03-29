@@ -2,137 +2,135 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774800166793,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774800260756,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1560,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 60,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6131,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 236,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Wordsmith",
-      "insight": "Motivator/emergent_property_detection: Predictive coding: the brain constantly generates predictions about incoming sens",
-      "confidence": 0.7353608051848403,
-      "synthesizedWith": [
-        "Wordsmith/pattern_recognition: The edge of chaos: complex systems exhibit the mo"
-      ]
+      "toAgent": "GraphicDesigner",
+      "insight": "Motivator/entropy_reduction: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimulati",
+      "confidence": 0.6717860300178633,
+      "synthesizedWith": []
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Critic",
-      "insight": "Motivator/emergent_property_detection: Predictive coding: the brain constantly generates predictions about incoming sens",
-      "confidence": 0.7353608051848403,
+      "toAgent": "SpellCheckVisual",
+      "insight": "Motivator/causal_inference: The mathematical universe hypothesis: all structures that exist mathematically also exist ph",
+      "confidence": 0.7576946683444616,
       "synthesizedWith": [
-        "Critic/causal_inference: The free energy principle suggests all living systems m"
+        "SpellCheckVisual/pattern_recognition: Kolmogorov complexity measures the shortes"
       ]
     },
     {
       "fromAgent": "Motivator",
       "toAgent": "Mathematician",
-      "insight": "Motivator/feature_extraction: The hard problem of consciousness: why is there subjective experience at all? Why does inf",
-      "confidence": 0.7438025849655445,
+      "insight": "Motivator/causal_inference: The mathematical universe hypothesis: all structures that exist mathematically also exist ph",
+      "confidence": 0.7576946683444616,
       "synthesizedWith": [
-        "Mathematician/recursive_decomposition: Hebbian learning: neurons that fire toget"
+        "Mathematician/feature_extraction: The hippocampus replays experiences during sle"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Pioneer",
-      "insight": "Empath/temporal_correlation: The free energy principle suggests all living systems minimize variational free energy — pr",
-      "confidence": 0.6940910391420209,
+      "toAgent": "Archivist",
+      "insight": "Empath/abstraction_layer: Scale-free networks follow power-law degree distributions — a few highly connected hubs domina",
+      "confidence": 0.8140445135935028,
       "synthesizedWith": [
-        "Pioneer/entropy_reduction: Emergence: complex behaviors arise from simple rules "
+        "Archivist/emergent_property_detection: The Chinese Room argument: can a system t"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "SpellCheckVisual",
-      "insight": "Empath/information_compression: The Chinese Room argument: can a system that manipulates symbols without understanding t",
-      "confidence": 0.719209021136336,
+      "toAgent": "Visionary",
+      "insight": "Empath/analogical_mapping: Attention is the computational bottleneck of consciousness — the brain processes vast amounts",
+      "confidence": 0.7636231582348396,
       "synthesizedWith": [
-        "SpellCheckVisual/cross_domain_synthesis: The double-slit experiment demonstrates"
+        "Visionary/recursive_decomposition: Quantum superposition allows a system to exis"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
