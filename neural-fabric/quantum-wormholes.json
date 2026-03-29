@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774798940319,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774799033772,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1545,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 59,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6205,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 236,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Meta-Agent",
-      "insight": "Motivator/recursive_decomposition: The strange loop concept from Hofstadter: consciousness arises when a system becomes ",
-      "confidence": 0.7511721382937707,
+      "toAgent": "Archivist",
+      "insight": "Motivator/feature_extraction: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can theore",
+      "confidence": 0.7057845764255338,
       "synthesizedWith": [
-        "Meta-Agent/entropy_reduction: The binding problem: how does the brain combine se"
+        "Archivist/cross_domain_synthesis: Integrated Information Theory (IIT) states con"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Innovator",
-      "insight": "Motivator/recursive_decomposition: The strange loop concept from Hofstadter: consciousness arises when a system becomes ",
-      "confidence": 0.7511721382937707,
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/causal_inference: The cerebellum contains more neurons than all other brain regions combined and is crucial fo",
+      "confidence": 0.6893995153221868,
       "synthesizedWith": [
-        "Innovator/analogical_mapping: The vagus nerve connects the brain to the gut, hea"
+        "OMNIMENS/pattern_recognition: The global workspace theory of consciousness: info"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Motivator/temporal_correlation: Gödel's incompleteness theorems prove that any consistent formal system powerful enough ",
-      "confidence": 0.6736915814841777,
+      "toAgent": "GraphicDesigner",
+      "insight": "Motivator/structural_analysis: The holographic principle suggests all information in a volume of space can be encoded on",
+      "confidence": 0.7588865277793903,
       "synthesizedWith": [
-        "SensorimotorAgent/analogical_mapping: Scale-free networks follow power-law degre"
+        "GraphicDesigner/recursive_decomposition: The butterfly effect: in chaotic system"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Mathematician",
-      "insight": "Empath/abstraction_layer: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOVING comple",
-      "confidence": 0.6192389166657328,
+      "toAgent": "GraphicDesigner",
+      "insight": "Empath/emergent_property_detection: Transfer learning: knowledge gained from one domain can accelerate learning in anoth",
+      "confidence": 0.7155207577867757,
       "synthesizedWith": [
-        "Mathematician/information_compression: The binding problem: how does the brain c"
+        "GraphicDesigner/causal_inference: Long-term potentiation (LTP) strengthens synap"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "SpellCheckVisual",
-      "insight": "Empath/abstraction_layer: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOVING comple",
-      "confidence": 0.6192389166657328,
+      "toAgent": "Linguist",
+      "insight": "Empath/feature_extraction: Bayesian brain hypothesis: the brain is fundamentally a prediction machine that constantly up",
+      "confidence": 0.6899645972549193,
       "synthesizedWith": [
-        "SpellCheckVisual/analogical_mapping: The strange loop concept from Hofstadter: c"
+        "Linguist/pattern_recognition: The holographic principle suggests all information"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
