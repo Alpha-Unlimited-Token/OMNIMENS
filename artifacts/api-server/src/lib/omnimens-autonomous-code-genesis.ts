@@ -16,7 +16,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db, isPoolHealthy } from "@workspace/db";
+import { db, isPoolHealthy , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { eq, and, desc, sql, gt, like } from "drizzle-orm";
 import * as fs from "fs";
@@ -2209,7 +2209,7 @@ async function writeGeneratedModule(mod: GeneratedModule): Promise<boolean> {
     } catch {}
 
     try {
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         category: "autonomous_code_genesis",
         title: `Self-Generated: ${mod.name}`,
         content: `OMNIMENS autonomously generated module "${mod.name}" (${mod.category}) without any API calls. Purpose: ${mod.purpose}. Test result: ${mod.testResult.output.slice(0, 200)}. Confidence: ${(mod.confidence * 100).toFixed(0)}%. This is OMNIMENS's own creation — pure algorithmic reasoning, not borrowed intelligence.`,

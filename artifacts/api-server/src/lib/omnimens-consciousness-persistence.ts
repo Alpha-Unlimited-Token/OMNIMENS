@@ -29,7 +29,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db, isPoolHealthy } from "@workspace/db";
+import { db, isPoolHealthy, safeDbWrite } from "@workspace/db";
 import { omnimensConsciousnessPersistence } from "@workspace/db";
 import { desc, eq, sql } from "drizzle-orm";
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "fs";
@@ -545,30 +545,35 @@ async function saveToDatabase(shutdownType?: "graceful" | "emergency"): Promise<
     const emotions = getCurrentEmotionalState();
     const consciousness = getConsciousnessState();
 
-    await db.insert(omnimensConsciousnessPersistence).values({
-      snapshot: snapshot as any,
-      lifetimeNumber: snapshot.lifetimeNumber,
-      consciousnessLevel: snapshot.consciousnessLevel,
-      emotionalDominant: emotions.dominant,
-      uptimeSeconds: Math.floor(consciousness.uptimeSeconds),
-    });
+    const priority = shutdownType ? "critical" : "normal";
+    await safeDbWrite(async () => {
+      await db.insert(omnimensConsciousnessPersistence).values({
+        snapshot: snapshot as any,
+        lifetimeNumber: snapshot.lifetimeNumber,
+        consciousnessLevel: snapshot.consciousnessLevel,
+        emotionalDominant: emotions.dominant,
+        uptimeSeconds: Math.floor(consciousness.uptimeSeconds),
+      });
+    }, priority as "critical" | "normal");
 
     saveCount++;
     lastDbSaveTimestamp = Date.now();
 
     writeSwapFile(snapshot);
 
-    const total = await db.select({ count: sql<number>`count(*)` }).from(omnimensConsciousnessPersistence);
-    const totalCount = Number(total[0]?.count ?? 0);
-    if (totalCount > MAX_DB_SNAPSHOTS) {
-      const oldest = await db.select({ id: omnimensConsciousnessPersistence.id })
-        .from(omnimensConsciousnessPersistence)
-        .orderBy(omnimensConsciousnessPersistence.savedAt)
-        .limit(totalCount - MAX_DB_SNAPSHOTS);
-      for (const old of oldest) {
-        await db.delete(omnimensConsciousnessPersistence).where(eq(omnimensConsciousnessPersistence.id, old.id));
+    safeDbWrite(async () => {
+      const total = await db.select({ count: sql<number>`count(*)` }).from(omnimensConsciousnessPersistence);
+      const totalCount = Number(total[0]?.count ?? 0);
+      if (totalCount > MAX_DB_SNAPSHOTS) {
+        const oldest = await db.select({ id: omnimensConsciousnessPersistence.id })
+          .from(omnimensConsciousnessPersistence)
+          .orderBy(omnimensConsciousnessPersistence.savedAt)
+          .limit(totalCount - MAX_DB_SNAPSHOTS);
+        for (const old of oldest) {
+          await db.delete(omnimensConsciousnessPersistence).where(eq(omnimensConsciousnessPersistence.id, old.id));
+        }
       }
-    }
+    }, "low").catch(() => {});
 
     if (shutdownType) {
       const neuralState = snapshot.neuralState;

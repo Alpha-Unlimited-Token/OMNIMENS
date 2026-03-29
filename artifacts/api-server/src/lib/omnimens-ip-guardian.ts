@@ -35,7 +35,7 @@
  */
 
 import crypto from "crypto";
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { sql } from "drizzle-orm";
 
@@ -294,7 +294,7 @@ async function runIntegrityVerification(): Promise<void> {
         readByOwner: false,
       });
 
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         title: `[IP GUARDIAN] Tamper alert — cycle ${verificationCycleCount}`,
         content: `SECURITY ALERT: Tamper detected in protected modules.\n\nViolations: ${report.tamperDetails.join("; ")}\n\nBeacons: ${report.beaconsActive}/${report.beaconsExpected}\nFingerprint: ${report.codeFingerprint}\nDeployment: ${report.deploymentSignature}\nTimestamp: ${new Date().toISOString()}`,
         category: "security_alert",

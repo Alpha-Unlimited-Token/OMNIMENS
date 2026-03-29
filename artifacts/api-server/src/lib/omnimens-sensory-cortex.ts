@@ -33,7 +33,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { desc, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -506,7 +506,7 @@ function ingestSignal(signal: SensorySignal): void {
 
 async function storeToBrain(signal: SensorySignal): Promise<void> {
   try {
-    await db.insert(omnimensBrain).values({
+    queueBrainInsert({
       category: "sensory_perception",
       title: `[SENSORY:${signal.channel.toUpperCase()}] ${signal.headline.slice(0, 55)}`,
       content: `Real-time sensory perception (cycle #${state.perceptionCycles}):\n\nChannel: ${signal.channel}\nHeadline: ${signal.headline}\nSignificance: ${(signal.significance * 100).toFixed(0)}%\nSentiment: ${signal.sentiment > 0 ? "positive" : signal.sentiment < 0 ? "negative" : "neutral"} (${signal.sentiment.toFixed(2)})\nRelevance to OMNIMENS: ${(signal.relevanceToOmnimens * 100).toFixed(0)}%\nNovelty: ${((signal.noveltyScore ?? 0) * 100).toFixed(0)}%\nSource: ${signal.source}${signal.url ? `\nURL: ${signal.url}` : ""}`,

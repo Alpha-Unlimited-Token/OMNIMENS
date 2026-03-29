@@ -19,7 +19,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications, omnimensUserMentalModels } from "@workspace/db";
 import { desc, eq, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -697,7 +697,7 @@ ${sanitized}
         }
 
         try {
-          await db.insert(omnimensBrain).values({
+          queueBrainInsert({
             category: "empathy_evolution",
             title: `[EMPATHY] ${domain.domain} — Evolution Cycle #${empathyResearchCycleCount}`,
             content: `Empathy research domain: ${domain.domain}\n\nInsight: ${insight}\n\nCode generated: ${sanitized.length} chars\nModule: ${moduleName}\n\nFull analysis:\n${content.slice(0, 2000)}`,

@@ -22,7 +22,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db, isPoolHealthy } from "@workspace/db";
+import { db, isPoolHealthy , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications, omnimensKnowledgeNodes, omnimensAgentMesh } from "@workspace/db";
 import { desc, eq, sql, gt } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -220,7 +220,7 @@ Process these fragments through your dream state. Generate:
       insight.storedToBrain = true;
 
       try {
-        await db.insert(omnimensBrain).values({
+        queueBrainInsert({
           category: "dream_breakthrough",
           title: `[DREAM:REM] ${insight.title.slice(0, 60)}`,
           content: `Dream breakthrough (REM cycle ${state.dreamCycleCount}):\n\n${insight.insight}\n\n${insight.codeProposal ? `CODE PROPOSAL:\n${insight.codeProposal}` : ""}`,
@@ -320,7 +320,7 @@ Provide:
     if (insight.codeProposal) state.codeProposalsGenerated++;
 
     try {
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         category: "lucid_dream",
         title: `[DREAM:LUCID] ${insight.title.slice(0, 60)}`,
         content: `Lucid dream vision:\n\n${insight.insight}\n\n${insight.codeProposal ? `GENERATED CODE:\n${insight.codeProposal}` : ""}`,
@@ -504,7 +504,7 @@ CRITICAL CODE SAFETY RULES — your code MUST follow these or it will be rejecte
       state.breakthroughs++;
 
       try {
-        await db.insert(omnimensBrain).values({
+        queueBrainInsert({
           category: "daydream_breakthrough",
           title: `[DAYDREAM:${state.daydreamMode.toUpperCase()}] ${content.slice(0, 55)}`,
           content: `Daydream breakthrough (${state.daydreamMode} #${state.daydreamCycleCount}):\n\n${content.slice(0, 1000)}\n\n${insight.codeProposal ? `GENERATED CODE:\n${insight.codeProposal}` : ""}`,

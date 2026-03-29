@@ -27,7 +27,7 @@
  */
 
 import * as vm from "node:vm";
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { desc, eq, and, sql } from "drizzle-orm";
@@ -426,7 +426,7 @@ async function saveGenesisFile(file: GenesisFile): Promise<boolean> {
         .set({ content: file.content, sourceConversation: meta })
         .where(eq(omnimensBrain.id, existing[0].id));
     } else {
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         category: GENESIS_CATEGORY,
         title: file.path,
         content: file.content,
@@ -1469,7 +1469,7 @@ async function persistGenesisState(): Promise<void> {
         })
         .where(eq(omnimensBrain.id, existing[0].id));
     } else {
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         category: GENESIS_STATE_CATEGORY,
         title: `[Genesis State] v${state.buildVersion}`,
         content: stateJson,

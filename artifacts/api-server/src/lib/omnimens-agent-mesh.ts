@@ -43,7 +43,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import {
   omnimensBrain,
   omnimensNotifications,
@@ -692,7 +692,7 @@ async function phase4_applyUpgrades(
   for (const entry of synthesis.brainEntries.slice(0, 8)) {
     if (!entry.category || !entry.title || !entry.content) continue;
     try {
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         category: entry.category,
         title: `[MESH] ${entry.title}`,
         content: entry.content,
@@ -719,7 +719,7 @@ async function phase4_applyUpgrades(
         generationSource: `agent_mesh_cycle_${cycleId}`,
       });
 
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         category: "capability",
         title: `[MESH MODULE] ${mod.name}`,
         content: mod.description.slice(0, 200),

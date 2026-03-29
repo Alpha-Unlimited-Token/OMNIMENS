@@ -39,7 +39,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensAgentMesh, omnimensNotifications } from "@workspace/db";
 import { desc, eq, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -645,7 +645,7 @@ Respond JSON only:
         totalBeacons++;
 
         try {
-          await db.insert(omnimensBrain).values({
+          queueBrainInsert({
             category: "knowledge",
             title: `[RECURSIVE:${agentName}] ${(synthesis.actionableInsight || "").slice(0, 60)}`,
             content: `${synthesis.synthesizedFinding || ""} [${allFindings.length} spiders, ${Object.keys(generationBreakdown).length} gens, novelty: ${synthesis.noveltyLevel || "unknown"}]`.slice(0, 250),

@@ -22,7 +22,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
 import {
@@ -1764,7 +1764,7 @@ async function registerLanguageAsProprietary(): Promise<void> {
   }
 
   try {
-    await db.insert(omnimensBrain).values({
+    queueBrainInsert({
       category: "proprietary_language",
       title: "OMNIMENS-NovaSyntax™ — Proprietary Programming Language v1.0.0",
       content: JSON.stringify({

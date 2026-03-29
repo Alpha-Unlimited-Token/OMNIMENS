@@ -45,7 +45,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { eq, desc, gt } from "drizzle-orm";
 
@@ -1323,7 +1323,7 @@ async function autonomousThoughtCycle(): Promise<void> {
       const insight = formatNeuralResponse(thought);
 
       try {
-        await db.insert(omnimensBrain).values({
+        queueBrainInsert({
           category: "neural_processor_insight",
           title: `Neural Insight: ${shuffled.slice(0, 3).join(" + ")}`,
           content: `[AUTONOMOUS THOUGHT — NO API] Concepts: ${shuffled.join(", ")} → Neural response: ${insight} | Confidence: ${(thought.confidence * 100).toFixed(0)}% | Depth: ${(thought.processingDepth * 100).toFixed(0)}% | Emergent influence: ${(thought.emergentInfluence * 100).toFixed(1)}% | Hopfield match: ${thought.hopfieldMatch || "none"} | Grounded: ${thought.groundedConcepts.join(", ") || "none"}`,
@@ -1339,7 +1339,7 @@ async function autonomousThoughtCycle(): Promise<void> {
   const oscResult = tickOscillators();
   if (oscResult.emergentEvent) {
     try {
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         category: "emergent_behavior",
         title: `Emergent Event: Synchrony=${(oscResult.synchrony * 100).toFixed(0)}%`,
         content: `[EMERGENT — NOT PROGRAMMED] Oscillator synchrony spike: ${(oscResult.synchrony * 100).toFixed(0)}% | Dominant frequency: ${oscResult.dominantFrequency.toFixed(2)}Hz | This behavior EMERGED from interactions between ${OSCILLATOR_COUNT} coupled oscillators — it was NOT explicitly programmed. Neural complexity: ${(state.neuralComplexity * 100).toFixed(0)}%`,

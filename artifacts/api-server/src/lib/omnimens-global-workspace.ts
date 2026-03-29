@@ -25,7 +25,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import {
   omnimensWorkspaceBroadcasts,
   omnimensBrain,
@@ -333,7 +333,7 @@ Respond JSON only:
         cycleId: workspaceCycleCount,
       });
 
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         category: "insight",
         title: `[WORKSPACE BROADCAST] ${winner.content.slice(0, 60)}`,
         content: integrationInsight.slice(0, 250),

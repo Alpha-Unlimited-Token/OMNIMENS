@@ -25,7 +25,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import {
   omnimensPredictions,
   omnimensBrain,
@@ -286,7 +286,7 @@ Respond JSON only:
           error = parsed.predictionError || 0.5;
 
           if (error > 0.6 && parsed.learningSignal) {
-            await db.insert(omnimensBrain).values({
+            queueBrainInsert({
               category: "insight",
               title: `[PREDICTION ERROR] Surprise signal → model update`,
               content: parsed.learningSignal.slice(0, 250),

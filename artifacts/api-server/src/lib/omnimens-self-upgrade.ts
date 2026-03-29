@@ -29,7 +29,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import {
   omnimensBrain,
   omnimensUpgrades,
@@ -152,7 +152,7 @@ Respond ONLY with the JSON array. No other text.`;
         ? `[user:${userId}${conversationId ? `:conv:${conversationId}` : ""}] ${userMessage.slice(0, 150)}`
         : userMessage.slice(0, 200);
 
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         category: entry.category,
         title: entry.title,
         content: entry.content.slice(0, 500),
@@ -434,7 +434,7 @@ Only include entries for things that are genuinely new and valuable. Respond ONL
     let stored = 0;
     for (const entry of entries.slice(0, 6)) {
       if (!entry.category || !entry.title || !entry.content) continue;
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         category: entry.category,
         title: entry.title,
         content: entry.content,

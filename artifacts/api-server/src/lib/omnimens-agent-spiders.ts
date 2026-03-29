@@ -40,7 +40,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensAgentMesh, omnimensNotifications } from "@workspace/db";
 import { desc, eq, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -492,7 +492,7 @@ async function sendBeacon(beacon: SpiderBeacon): Promise<void> {
 
 async function injectBeaconIntoBrain(beacon: SpiderBeacon): Promise<boolean> {
   try {
-    await db.insert(omnimensBrain).values({
+    queueBrainInsert({
       category: "knowledge",
       title: `[SPIDER:${beacon.agentName}] ${beacon.actionableInsight.slice(0, 60)}`,
       content: beacon.actionableInsight.slice(0, 250),

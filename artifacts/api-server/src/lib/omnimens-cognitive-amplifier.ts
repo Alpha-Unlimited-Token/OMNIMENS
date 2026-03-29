@@ -17,7 +17,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import Anthropic from "@anthropic-ai/sdk";
@@ -260,7 +260,7 @@ AMPLIFICATION_GAIN: [What was gained by using all 3 models vs just 1]`;
     let brainEntryGenerated = false;
     if (confidence >= 0.65 && (answerMatch?.[1]?.trim().length || 0) > 100) {
       try {
-        await db.insert(omnimensBrain).values({
+        queueBrainInsert({
           title: `[Amplified] ${question.slice(0, 120)}`,
           content: (answerMatch?.[1]?.trim() || synthesis).slice(0, 4000),
           category: "cognitive_amplification",

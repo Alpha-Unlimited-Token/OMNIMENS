@@ -9,7 +9,7 @@
  * Saves every message to the DB so conversations survive app close/refresh.
  * Also provides autonomous memory quality improvement.
  */
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensConversations, omnimensMessages, omnimensMemories, omnimensBrain } from "@workspace/db";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -218,7 +218,7 @@ Return {} if memory is already high quality.`,
     }
 
     if (result.insights) {
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         category: "pattern",
         title: "Memory Quality Insight",
         content: `User ${userId}: ${result.insights}`,

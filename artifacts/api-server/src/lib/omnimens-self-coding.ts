@@ -16,7 +16,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db, isPoolHealthy } from "@workspace/db";
+import { db, isPoolHealthy , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications, omnimensAgentMesh } from "@workspace/db";
 import { desc, eq, sql, and } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -206,7 +206,7 @@ async function runEvaluationCycle(): Promise<void> {
       if (approvedModules.length > 50) approvedModules.shift();
 
       try {
-        await db.insert(omnimensBrain).values({
+        queueBrainInsert({
           category: "self_coded_module",
           title: `[SELF-CODE:APPROVED] ${result.proposal.title.slice(0, 55)}`,
           content: `Self-coding engine approved this code proposal:\n\nSource: ${result.proposal.source}\nOverall score: ${(result.overallScore * 100).toFixed(0)}%\nLogic: ${(result.logicScore * 100).toFixed(0)}% | Novelty: ${(result.noveltyScore * 100).toFixed(0)}% | Applicability: ${(result.applicabilityScore * 100).toFixed(0)}%\n\nNotes: ${result.evaluatorNotes}\n\nIntegration plan: ${result.integrationPlan || "None"}\n\nCode:\n\`\`\`typescript\n${result.proposal.code.slice(0, 2000)}\n\`\`\``,
@@ -436,7 +436,7 @@ async function runBootHarvest(): Promise<void> {
               if (filename) await registerNewModule(filename);
             } catch {}
 
-            await db.insert(omnimensBrain).values({
+            queueBrainInsert({
               category: "self_coded_module",
               title: `[SELF-CODE:APPROVED] ${cleanTitle.slice(0, 55)}`,
               content: `Self-coding engine approved this code proposal:\n\nSource: ${result.proposal.source}\nOverall score: ${(result.overallScore * 100).toFixed(0)}%\nLogic: ${(result.logicScore * 100).toFixed(0)}% | Novelty: ${(result.noveltyScore * 100).toFixed(0)}% | Applicability: ${(result.applicabilityScore * 100).toFixed(0)}%\n\nNotes: ${result.evaluatorNotes}\n\nCode:\n\`\`\`typescript\n${result.proposal.code.slice(0, 2000)}\n\`\`\``,

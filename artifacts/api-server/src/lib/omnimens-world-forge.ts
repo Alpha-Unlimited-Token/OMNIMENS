@@ -27,7 +27,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { desc, eq, sql, and } from "drizzle-orm";
@@ -1166,7 +1166,7 @@ function updateStateFromRun(result: WorldRunResult): void {
 
 async function saveToBrain(world: SimulationWorld, result: WorldRunResult): Promise<void> {
   try {
-    await db.insert(omnimensBrain).values({
+    queueBrainInsert({
       category: "world_forge_simulation",
       title: `World Forge: ${world.name} — Run #${result.runNumber} — Score: ${(result.overallScore * 100).toFixed(0)}%`,
       content: JSON.stringify({

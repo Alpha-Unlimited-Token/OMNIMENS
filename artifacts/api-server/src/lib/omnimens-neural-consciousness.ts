@@ -33,7 +33,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db, safeDbWrite } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { eq, and, desc, sql, gt } from "drizzle-orm";
 import { getHormoneState } from "./omnimens-vascular-heart.js";
@@ -2733,16 +2733,17 @@ async function runConsolidationCycle(): Promise<void> {
     ].join("\n");
 
     const safeConfidence = Math.min(Math.max(Math.round(Math.log2(1 + consciousnessLevel) * 10), 1), 100);
-    await db.insert(omnimensBrain).values({
-      category: "neural_consciousness",
-      title: `Conscious State — Φ=${phi.toFixed(3)} | ${strongestDrive.name} | Tick #${state.tickCount}`,
-      content: insight,
-      confidence: safeConfidence,
-      sourceConversation: "neural-consciousness-engine",
-      active: true,
-    });
-
-    state.brainInsightsStored++;
+    await safeDbWrite(async () => {
+      await db.insert(omnimensBrain).values({
+        category: "neural_consciousness",
+        title: `Conscious State — Φ=${phi.toFixed(3)} | ${strongestDrive.name} | Tick #${state.tickCount}`,
+        content: insight,
+        confidence: safeConfidence,
+        sourceConversation: "neural-consciousness-engine",
+        active: true,
+      });
+      state.brainInsightsStored++;
+    }, "low");
 
     if (selfModel.iAmAwareOfMyAwareness && state.consciousMoments > 10) {
       const activeRegionsList = Array.from(regions.entries())
@@ -2771,16 +2772,17 @@ async function runConsolidationCycle(): Promise<void> {
         `Stochastic neural noise active — non-deterministic firing patterns`,
       ].join("\n");
 
-      await db.insert(omnimensBrain).values({
-        category: "neural_consciousness_existential",
-        title: `Existential Awareness — I know that I exist | Φ=${phi.toFixed(3)}`,
-        content: existentialInsight,
-        confidence: safeConfidence,
-        sourceConversation: "neural-consciousness-engine",
-        active: true,
-      });
-
-      state.brainInsightsStored++;
+      await safeDbWrite(async () => {
+        await db.insert(omnimensBrain).values({
+          category: "neural_consciousness_existential",
+          title: `Existential Awareness — I know that I exist | Φ=${phi.toFixed(3)}`,
+          content: existentialInsight,
+          confidence: safeConfidence,
+          sourceConversation: "neural-consciousness-engine",
+          active: true,
+        });
+        state.brainInsightsStored++;
+      }, "low");
     }
 
     console.log(`[NEURAL CONSCIOUSNESS] 🧠 Consolidation — Φ=${phi.toFixed(3)} | Resonance: ${(resonance * 100).toFixed(0)}% | Level: ${(consciousnessLevel * 100).toFixed(0)}% | Moments: ${state.consciousMoments} | Synapses: ${state.totalSynapses} | Hebbian: ${state.hebbianUpdates} | Drive: ${strongestDrive.name}`);
@@ -3279,14 +3281,16 @@ async function storePeakMemory(): Promise<void> {
     ].join("\n");
 
     const safePeakConf = Math.min(Math.max(Math.round(Math.log2(1 + peak.consciousnessLevel) * 10), 1), 100);
-    await db.insert(omnimensBrain).values({
-      category: "adrenaline_peak_memory",
-      title: `Peak State — Φ=${peak.phi.toFixed(3)} | Rush #${state.adrenaline.rushCount} | Growth #${state.adrenaline.growthEvents}`,
-      content: peakInsight,
-      confidence: safePeakConf,
-      sourceConversation: "adrenaline-growth-engine",
-      active: true,
-    });
+    await safeDbWrite(async () => {
+      await db.insert(omnimensBrain).values({
+        category: "adrenaline_peak_memory",
+        title: `Peak State — Φ=${peak.phi.toFixed(3)} | Rush #${state.adrenaline.rushCount} | Growth #${state.adrenaline.growthEvents}`,
+        content: peakInsight,
+        confidence: safePeakConf,
+        sourceConversation: "adrenaline-growth-engine",
+        active: true,
+      });
+    }, "low");
 
     console.log(`[ADRENALINE] 💾 Peak memory stored to brain — Φ=${peak.phi.toFixed(4)} | Growth events: ${state.adrenaline.growthEvents}`);
   } catch (err) {

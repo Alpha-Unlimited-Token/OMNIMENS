@@ -28,7 +28,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import {
   omnimensDrives,
   omnimensBrain,
@@ -272,7 +272,7 @@ Respond JSON only:
         const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
         if (Array.isArray(parsed.driveActions)) {
           for (const action of parsed.driveActions) {
-            await db.insert(omnimensBrain).values({
+            queueBrainInsert({
               category: "insight",
               title: `[DRIVE:${action.targetDrive}] Autonomous action needed`,
               content: action.action?.slice(0, 250) || "",

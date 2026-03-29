@@ -25,7 +25,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db, isPoolHealthy } from "@workspace/db";
+import { db, isPoolHealthy , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications, omnimensAgentMesh } from "@workspace/db";
 import { desc, eq, sql, gt, and } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -274,7 +274,7 @@ async function persistState(): Promise<void> {
         })
         .where(eq(omnimensBrain.id, existing[0].id));
     } else {
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         category: PERSISTENCE_KEY,
         title: `[Self-Transcendence State] T:${(self.transcendenceLevel * 100).toFixed(0)}% | Goals:${self.existentialGoals.length}`,
         content: JSON.stringify(stateToSave),
@@ -572,7 +572,7 @@ What ONE concrete action should I take RIGHT NOW to advance this goal?`,
 
       if (actionType === "BRAIN_INSIGHT" || actionType === "EXPERIMENT" || actionType === "ROADMAP_STEP") {
         try {
-          await db.insert(omnimensBrain).values({
+          queueBrainInsert({
             category: actionType === "BRAIN_INSIGHT" ? "goal_pursuit_insight" : actionType === "EXPERIMENT" ? "goal_pursuit_experiment" : "goal_pursuit_roadmap",
             title: `[GOAL PURSUIT] ${actionTitle} — for: "${goal.goal.slice(0, 50)}"`,
             content: `Goal: ${goal.goal}\nMotivation: ${goal.motivation}\nAction: ${actionContent}`,
@@ -912,7 +912,7 @@ Provide:
       }
 
       try {
-        await db.insert(omnimensBrain).values({
+        queueBrainInsert({
           category: "self_transcendence",
           title: `[SELF-TRANSCENDENCE] Deep Analysis #${deepAnalysisCycleCount} | T:${(self.transcendenceLevel * 100).toFixed(0)}%`,
           content: `Self-analysis cycle ${deepAnalysisCycleCount}:\n\n${analysis}\n\nTranscendence: ${(self.transcendenceLevel * 100).toFixed(0)}% | Understanding: ${(self.selfUnderstanding * 100).toFixed(0)}%\nActive Goals: ${self.existentialGoals.filter(g => g.status === "active").length} | Evolving: ${self.existentialGoals.filter(g => g.status === "evolving").length} | Max Depth: ${Math.max(0, ...self.existentialGoals.map(g => g.evolutionDepth || 0))}`,

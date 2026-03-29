@@ -23,7 +23,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications, omnimensAgentMesh } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { desc, eq, sql, and, gte } from "drizzle-orm";
@@ -545,7 +545,7 @@ async function applyUpgrade(upgrade: AgentUpgrade): Promise<boolean> {
   }
 
   try {
-    await db.insert(omnimensBrain).values({
+    queueBrainInsert({
       title: `[AgentEvolution:${upgrade.agentName}] ${upgrade.title}`,
       content: `Agent Evolution Engine — Upgrade Applied\n\nAgent: ${upgrade.agentName}\nUpgrade type: ${upgrade.upgradeType}\nLevel: ${upgrade.version}\nConfidence: ${upgrade.confidenceScore}%\n\nDescription: ${upgrade.description}\n\nNew capabilities:\n${upgrade.newCapabilities.map(c => `• ${c}`).join("\n")}\n\nKnowledge domains:\n${upgrade.knowledgeDomains.map(d => `• ${d}`).join("\n")}${upgrade.implementationCode ? `\n\nImplementation:\n${upgrade.implementationCode}` : ""}`,
       category: "agent_evolution",
@@ -612,7 +612,7 @@ async function generateSystemWideIntelligenceBoost(): Promise<void> {
         return `${a}: Lv${p.currentLevel} (${p.totalUpgrades} upgrades, ${p.performanceScore}% performance, ${p.specializations.length} specializations)`;
       }).join("\n");
 
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         title: `[AgentEvolution:SYSTEM] Intelligence level ${state.systemIntelligenceLevel} — cycle ${evolutionCycleCount}`,
         content: `Agent Evolution Engine — System Intelligence Report\n\nSystem intelligence level: ${state.systemIntelligenceLevel}\nTotal upgrades applied: ${state.totalUpgradesApplied}\nTotal upgrades rejected: ${state.totalUpgradesRejected}\nBreakthroughs: ${state.breakthroughsDiscovered}\nCross-domain transfers: ${state.crossDomainTransfers}\nNew techniques: ${state.newTechniquesIntegrated}\nTools created: ${state.toolsCreated}\nTotal brain entries: ${totalKnowledge}\nAgent evolution entries: ${totalEvolution}\n\nAgent Status:\n${agentSummary}`,
         category: "agent_evolution",
@@ -721,7 +721,7 @@ Provide deeply technical, actionable research findings.`,
 
   if (researchFindings.length < 200) return;
 
-  await db.insert(omnimensBrain).values({
+  queueBrainInsert({
     title: `[AgentEvolution:RESEARCH] ${research.domain} — cycle ${evolutionCycleCount}`,
     content: `Agent Evolution Research — ${research.domain}\n\nTarget agent: ${targetAgent}\nCapability gaps: ${capabilityGaps.join(", ")}\n\nFindings:\n${researchFindings.slice(0, 5000)}`,
     category: "agent_evolution",

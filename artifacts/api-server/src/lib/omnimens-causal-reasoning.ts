@@ -19,7 +19,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensCausalGraph, omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { desc, eq, sql, and, gte } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -299,7 +299,7 @@ CONFIDENCE: [0.0-1.0]
           const toName = nodes.get(e.toId)?.concept || e.toId;
           return `${fromName} → ${toName} (${(e.confidence * 100).toFixed(0)}%): ${e.mechanism}`;
         }).join("\n");
-        await db.insert(omnimensBrain).values({
+        queueBrainInsert({
           title: `[Causal] ${newRelationships} causal relationships discovered — cycle #${reasoningCycleCount}`,
           content: `Causal reasoning discovered ${newRelationships} new cause-effect relationships.\n\n${topChains}\n\nTotal graph: ${nodes.size} nodes, ${edges.length} edges across ${state.domains.length} domains.`,
           category: "causal_reasoning",

@@ -18,7 +18,7 @@
  *   - On-demand when new tools are installed
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { eq, and, like } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -569,7 +569,7 @@ async function storeToolKnowledge(
 
     if (existing.length > 0) continue; // skip duplicates
 
-    await db.insert(omnimensBrain).values({
+    queueBrainInsert({
       category: `tool_${tool.id}`,
       title: entry.title,
       content: entry.content,

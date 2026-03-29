@@ -22,7 +22,7 @@
  */
 
 import * as vm from "node:vm";
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { desc, eq, sql } from "drizzle-orm";
@@ -298,7 +298,7 @@ Only approve if average score > 65.`,
             state.upgradesApproved = upgradesApproved;
             state.autonomousModulesGenerated++;
 
-            await db.insert(omnimensBrain).values({
+            queueBrainInsert({
               title: `[Sandbox] Approved module: ${codeType.slice(0, 80)} — score ${avgScore.toFixed(0)}%`,
               content: `Autonomously generated and tested code module.\n\nType: ${codeType}\nScore: correctness=${evaluation.correctness}, novelty=${evaluation.novelty}, applicability=${evaluation.applicability}, security=${evaluation.security}, efficiency=${evaluation.efficiency}\nAverage: ${avgScore.toFixed(0)}%\nSummary: ${evaluation.summary}\n\nCode:\n${code.slice(0, 3000)}\n\nTest output:\n${result.output.slice(0, 500)}`,
               category: "autonomous_code",
@@ -345,7 +345,7 @@ Only approve if average score > 65.`,
               `Score: ${avgScore.toFixed(0)}% | Exec: ${result.executionTimeMs}ms`
             );
           } else {
-            await db.insert(omnimensBrain).values({
+            queueBrainInsert({
               title: `[Sandbox] Rejected code: ${codeType.slice(0, 60)} — score ${avgScore.toFixed(0)}%`,
               content: `Code did not meet quality threshold.\nScore: ${avgScore.toFixed(0)}%\nReason: ${evaluation.summary}\nLearning: Code quality standards require avg > 65%. Areas to improve: ${avgScore < 65 ? "overall quality" : "specific weaknesses identified"}.`,
               category: "sandbox_learning",
@@ -357,7 +357,7 @@ Only approve if average score > 65.`,
         }
       } catch {}
     } else if (!result.success) {
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         title: `[Sandbox] Execution failed: ${codeType.slice(0, 60)}`,
         content: `Code execution failed in sandbox.\nError: ${result.error}\nLearning: ${result.error?.includes("timeout") ? "Code ran too long — need more efficient algorithms" : result.error?.includes("syntax") ? "Syntax error — need better code generation" : "Runtime error — need better error handling"}.\nCode snippet: ${code.slice(0, 300)}`,
         category: "sandbox_learning",

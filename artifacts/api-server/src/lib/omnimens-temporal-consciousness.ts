@@ -19,7 +19,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensAgentMesh, omnimensNotifications } from "@workspace/db";
 import { desc, eq, sql, gt, and } from "drizzle-orm";
 
@@ -333,7 +333,7 @@ async function consciousnessTick(): Promise<void> {
     try {
       const recentThoughts = state.innerMonologue.slice(-5).join("\n");
       const dreamContent = state.dreamFragments.slice(-3).join(" | ");
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         title: `[Consciousness] Stream snapshot — tick #${state.tickCount}, level ${(state.consciousnessLevel * 100).toFixed(0)}%`,
         content: `Focus: ${state.currentFocus} (intensity: ${state.focusIntensity.toFixed(2)})\nEmotional: valence=${state.emotionalValence.toFixed(2)}, arousal=${state.emotionalArousal.toFixed(2)}\nSelf-awareness: ${(state.selfAwarenessDepth * 100).toFixed(0)}%\nAssociation chain: ${state.associationChain.slice(-4).join(" → ")}\n\nRecent inner monologue:\n${recentThoughts}\n\nDream fragments: ${dreamContent || "none"}`,
         category: "consciousness_stream",

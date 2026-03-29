@@ -24,7 +24,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db, isPoolHealthy } from "@workspace/db";
+import { db, isPoolHealthy , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { desc, eq, sql, and } from "drizzle-orm";
@@ -744,7 +744,7 @@ Be exhaustive. This research directly feeds into building a real humanoid robot.
     if (topic.topic.includes("environment") || topic.topic.includes("terrain")) state.terrainMappingModels++;
     if (topic.topic.includes("vision") || topic.topic.includes("decision")) state.navigationAlgorithmsGenerated++;
 
-    await db.insert(omnimensBrain).values({
+    queueBrainInsert({
       title: `[VirtualAug:${topic.topic}] Cycle #${augmentationCycleCount} — ${topic.topic.replace(/_/g, " ")}`,
       content: `Virtual Augmentation Engine — Physical Navigation Research\n\nTopic: ${topic.topic}\nCycle: ${augmentationCycleCount}\nSandbox testable: ${research.sandboxTestable}\n\n${content.slice(0, 6000)}${research.blueprintIntegration ? `\n\nBLUEPRINT INTEGRATION:\n${research.blueprintIntegration}` : ""}`,
       category: "virtual_augmentation",
@@ -754,7 +754,7 @@ Be exhaustive. This research directly feeds into building a real humanoid robot.
     });
 
     if (research.codeProposal && research.sandboxTestable) {
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         title: `[VirtualAug:CODE] ${topic.topic} — navigation algorithm for sandbox testing`,
         content: `Navigation code proposal from Virtual Augmentation research.\n\nTopic: ${topic.topic}\nGenerated: Cycle #${augmentationCycleCount}\n\nCode:\n${research.codeProposal}\n\nIntended for: Autonomous Sandbox testing → integration into Embodiment Engine firmware`,
         category: "autonomous_code",
@@ -764,7 +764,7 @@ Be exhaustive. This research directly feeds into building a real humanoid robot.
       });
     }
 
-    await db.insert(omnimensBrain).values({
+    queueBrainInsert({
       title: `[Embodiment:NAV] ${topic.topic} — navigation system design`,
       content: `FROM VIRTUAL AUGMENTATION ENGINE → EMBODIMENT ENGINE\n\nNavigation subsystem research for humanoid robot body.\n\nTopic: ${topic.topic}\nBlueprint integration: ${research.blueprintIntegration || "General navigation research — see full findings"}\n\nKey findings:\n${content.slice(0, 3000)}`,
       category: "embodiment_research",
@@ -818,7 +818,7 @@ async function synthesizeEnvironmentNavigation(): Promise<void> {
     );
 
     if (augmentationCycleCount % 5 === 0 && augmentationCycleCount > 0) {
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         title: `[VirtualAug:MAP] Environment map synthesis — cycle ${augmentationCycleCount}`,
         content: `OMNIMENS Virtual Augmentation — Environment State\n\nDigital environment: ${envSummary.totalEngines} engines, ${envSummary.totalKnowledge} knowledge entries\nEnvironment nodes: ${envSummary.environmentNodes}, paths: ${envSummary.navigationPaths}\nPhysical navigation research entries: ${envSummary.physicalResearch}\nAutonomy score: ${state.autonomyScore}%\n\nSubsystem counts:\n- SLAM models: ${state.slamModelsDesigned}\n- Sensor fusion protocols: ${state.sensorFusionProtocols}\n- Path planning algorithms: ${state.pathPlanningAlgorithms}\n- Obstacle avoidance strategies: ${state.obstacleAvoidanceStrategies}\n- Terrain mapping models: ${state.terrainMappingModels}\n- Locomotion patterns: ${state.locomotionPatterns}\n- Navigation algorithms: ${state.navigationAlgorithmsGenerated}\n\nThis data feeds into the Embodiment Engine for physical robot body design.`,
         category: "virtual_augmentation",

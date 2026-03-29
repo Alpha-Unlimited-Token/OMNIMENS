@@ -1,4 +1,4 @@
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
 
@@ -744,7 +744,7 @@ async function storeProprietaryRegistry(): Promise<void> {
       status: t.status,
     }));
 
-    await db.insert(omnimensBrain).values({
+    queueBrainInsert({
       category: "proprietary_technology",
       title: `[Proprietary Tech Registry] ${proprietaryRegistry.size} technologies | © Alpha Unlimited Technologies, LLC`,
       content: JSON.stringify({
@@ -771,7 +771,7 @@ async function storeTranslationMapping(): Promise<void> {
       pyEquivalent: m.pyEquivalent.slice(0, 200),
     }));
 
-    await db.insert(omnimensBrain).values({
+    queueBrainInsert({
       category: "universal_translator",
       title: `[Translation Map v${state.translationMapVersion}] ${customConstructMap.size} constructs | ${targets.size} targets | ${state.totalTranslations} translations`,
       content: JSON.stringify({

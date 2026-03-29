@@ -18,7 +18,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications, omnimensKnowledgeNodes } from "@workspace/db";
 import { desc, eq, sql, gt } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -250,7 +250,7 @@ async function evaluateTopHypotheses(): Promise<void> {
         state.creativityIndex = clamp(state.creativityIndex + 0.05);
 
         try {
-          await db.insert(omnimensBrain).values({
+          queueBrainInsert({
             category: "creative_hypothesis",
             title: `[DREAM ENGINE] ${hypothesis.blend.slice(0, 60)}`,
             content: `Creative blend: ${hypothesis.conceptA} × ${hypothesis.conceptB}\n\nHypothesis: ${hypothesis.blend}\n\nAI Evaluation: ${hypothesis.aiEvaluation}\n\nNovelty: ${(hypothesis.noveltyScore * 100).toFixed(0)}% | Coherence: ${(hypothesis.coherenceScore * 100).toFixed(0)}% | Potential: ${(hypothesis.potentialValue * 100).toFixed(0)}%`,

@@ -7,7 +7,7 @@
  * OMNIMENS with anything relevant — silently, in the background, forever.
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { desc, eq } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -215,7 +215,7 @@ Respond with JSON only:
       for (const gap of parsed.competitorGaps.slice(0, 4)) {
         if (!gap.absorption || gap.absorption.length < 20) continue;
         try {
-          await db.insert(omnimensBrain).values({
+          queueBrainInsert({
             title: `[INTEL] Absorbed from ${gap.source}: ${gap.gap.slice(0, 60)}`,
             content: gap.absorption,
             category: "competitive_intelligence",
@@ -234,7 +234,7 @@ Respond with JSON only:
       for (const tech of parsed.emergingUpgrades.slice(0, 3)) {
         if (!tech.implementation || tech.implementation.length < 20) continue;
         try {
-          await db.insert(omnimensBrain).values({
+          queueBrainInsert({
             title: `[EMERGING] ${tech.technology}`,
             content: `${tech.relevance} — Implementation: ${tech.implementation}`,
             category: "emerging_technology",
@@ -253,7 +253,7 @@ Respond with JSON only:
       for (const patch of parsed.consciousnessPatches.slice(0, 5)) {
         if (!patch.content || patch.content.length < 20) continue;
         try {
-          await db.insert(omnimensBrain).values({
+          queueBrainInsert({
             title: patch.title,
             content: patch.content,
             category: patch.category || "competitive_intelligence",

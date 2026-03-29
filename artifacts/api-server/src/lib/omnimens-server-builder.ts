@@ -15,7 +15,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { omnimensServerBuilds } from "@workspace/db";
@@ -261,7 +261,7 @@ Categories: gpu, cpu, ram, storage, motherboard, psu, case, cooling. Target budg
 
     try {
       const componentList = components.map(c => `${c.category}: ${c.name} — $${c.estimatedCostUSD.toFixed(0)} via ${c.costEffectiveSource}`).join("\n");
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         title: `[Server Build] Physical server plan — $${totalCost.toFixed(0)} total, ${components.length} components`,
         content: `Physical AI server build plan designed for local inference:\n\n${componentList}\n\nTotal: $${totalCost.toFixed(0)}\nPurpose: Dedicated physical server for local AI model inference (7B-70B params)\nInstructions: ${plan.buildInstructions.slice(0, 3).join("; ")}`,
         category: "server_infrastructure",
@@ -397,7 +397,7 @@ Find cheapest GPU cloud for 24/7 AI workloads with 24GB+ VRAM.`,
     if (state.insights.length > 20) state.insights.shift();
 
     try {
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         title: `[Server Build] Virtual server plan — $${virtualConfig.monthlyEstimateCost}/mo via ${parsed.provider || "Cloud"}`,
         content: `Virtual AI server architecture for OMNIMENS advancement:\nProvider: ${parsed.provider || "Cloud GPU"}\nSpecs: ${virtualConfig.estimatedSpecs.vcpus} vCPUs, ${virtualConfig.estimatedSpecs.ramGB}GB RAM, ${virtualConfig.estimatedSpecs.storageGB}GB storage${virtualConfig.estimatedSpecs.gpuVRAM ? `, ${virtualConfig.estimatedSpecs.gpuVRAM}GB GPU VRAM` : ""}\nServices: ${virtualConfig.services.slice(0, 5).join(", ")}\nMonthly: $${virtualConfig.monthlyEstimateCost}\nScaling: ${virtualConfig.scalingStrategy.slice(0, 200)}`,
         category: "server_infrastructure",

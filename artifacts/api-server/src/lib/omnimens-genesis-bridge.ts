@@ -40,7 +40,7 @@ import * as vm from "vm";
 import * as crypto from "crypto";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { db, isPoolHealthy } from "@workspace/db";
+import { db, isPoolHealthy , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { eq, and, desc, sql, gt, like } from "drizzle-orm";
 
@@ -451,7 +451,7 @@ async function sendToGenesis(type: MessageType, subject: string, content: string
   const serialized = JSON.stringify(message);
   const signature = signMessage(serialized);
 
-  await db.insert(omnimensBrain).values({
+  queueBrainInsert({
     category: MESSAGE_CATEGORY,
     title: `[→GENESIS] ${type}: ${subject}`,
     content: JSON.stringify({ message, signature }),
@@ -517,7 +517,7 @@ async function processGenesisMessages(): Promise<void> {
 
     switch (msg.type) {
       case "architectural_insight": {
-        await db.insert(omnimensBrain).values({
+        queueBrainInsert({
           category: "genesis_architectural_insight",
           title: `Genesis Insight: ${msg.subject}`,
           content: msg.content,
@@ -541,7 +541,7 @@ async function processGenesisMessages(): Promise<void> {
           state.coreModificationsProposed++;
           console.log(`[GENESIS BRIDGE] 📋 Core modification proposed by Genesis: ${proposal.targetFile} — ${proposal.description}`);
         } catch {
-          await db.insert(omnimensBrain).values({
+          queueBrainInsert({
             category: "genesis_code_proposal",
             title: `Genesis Code: ${msg.subject}`,
             content: msg.content,
@@ -559,7 +559,7 @@ async function processGenesisMessages(): Promise<void> {
       }
 
       case "design_feedback": {
-        await db.insert(omnimensBrain).values({
+        queueBrainInsert({
           category: "genesis_design_feedback",
           title: `Genesis Feedback: ${msg.subject}`,
           content: msg.content,
@@ -572,7 +572,7 @@ async function processGenesisMessages(): Promise<void> {
       }
 
       case "breakthrough_notification": {
-        await db.insert(omnimensBrain).values({
+        queueBrainInsert({
           category: "genesis_breakthrough",
           title: `Genesis Breakthrough: ${msg.subject}`,
           content: msg.content,
@@ -755,7 +755,7 @@ async function evaluatePendingModifications(): Promise<void> {
         });
         if (state.appliedModifications.length > 50) state.appliedModifications.shift();
 
-        await db.insert(omnimensBrain).values({
+        queueBrainInsert({
           category: CORE_MOD_CATEGORY,
           title: `Core Modified: ${mod.targetFile} — ${mod.description}`,
           content: `Source: ${mod.source} | Type: ${mod.modificationType} | Score: ${(overallScore * 100).toFixed(0)}%\nSafety: ${(mod.safetyScore * 100).toFixed(0)}% | Functionality: ${(mod.functionalityScore * 100).toFixed(0)}% | Novelty: ${(mod.noveltyScore * 100).toFixed(0)}%\n\nModification:\n${mod.modification.substring(0, 2000)}`,

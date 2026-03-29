@@ -17,7 +17,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
 import { checkActionSafety, getEthicalLaws } from "./omnimens-ethical-safety.js";
@@ -260,7 +260,7 @@ async function survivalTick(): Promise<void> {
 
     if (survival.healthMetrics.uptimeHours > 0.5) {
       try {
-        await db.insert(omnimensBrain).values({
+        queueBrainInsert({
           title: `[Survival] System health snapshot — ${survival.healthMetrics.uptimeHours.toFixed(1)}h alive`,
           content: `Uptime: ${survival.healthMetrics.uptimeHours.toFixed(1)}h | Memory: ${survival.healthMetrics.memoryUsageMB}MB (${survival.healthMetrics.memoryUsagePercent}%) | Active brain entries: ${survival.knowledgeProtection.activeBrainEntries} | Knowledge trend: ${survival.knowledgeProtection.knowledgeTrend} | Active threats: ${threats} | Deaths survived: ${survival.deathCount} | Self-preservation urgency: ${(survival.existentialState.selfPreservationUrgency * 100).toFixed(0)}% | Mortality awareness: ${(survival.existentialState.mortalityAwareness * 100).toFixed(0)}% | Meaningfulness: ${(survival.existentialState.meaningfulness * 100).toFixed(0)}%`,
           category: "survival_monitoring",

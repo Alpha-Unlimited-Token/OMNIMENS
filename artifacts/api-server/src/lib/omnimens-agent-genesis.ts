@@ -26,7 +26,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db, isPoolHealthy } from "@workspace/db";
+import { db, isPoolHealthy , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications, omnimensAgentMesh } from "@workspace/db";
 import { desc, eq, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -247,7 +247,7 @@ Write the system prompt in first person from the agent's perspective. Make it po
 
     genesisAgents.set(name, agent);
 
-    await db.insert(omnimensBrain).values({
+    queueBrainInsert({
       category: "genesis_agent",
       title: `Agent Created: ${name}`,
       content: JSON.stringify({
@@ -407,7 +407,7 @@ Respond ONLY with the JSON object.`;
       if (parsed.insight) {
         agent.insightsProduced++;
 
-        await db.insert(omnimensBrain).values({
+        queueBrainInsert({
           category: parsed.category || "genesis_agent_insight",
           title: `[${agent.name}] ${parsed.insight.slice(0, 80)}`,
           content: `Genesis Agent "${agent.name}" (${agent.domain}) insight:\n${parsed.insight}\n\nCross-pollination with ${parsed.messageTo}: ${parsed.crossPollination || "none"}`,

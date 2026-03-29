@@ -27,7 +27,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { desc, eq, sql, and } from "drizzle-orm";
@@ -776,7 +776,7 @@ Respond with JSON:
     }
 
     if (parsed.navigationWisdom) {
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         title: `Digital Navigation Wisdom — Cycle ${navigationCycleCount}`,
         content: `${parsed.navigationWisdom}${parsed.learnings ? "\n\nLearnings:\n" + parsed.learnings.slice(0, 3).map((l: string) => `• ${l}`).join("\n") : ""}`,
         category: "digital_navigation",

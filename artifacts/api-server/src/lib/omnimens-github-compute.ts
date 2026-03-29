@@ -1,5 +1,5 @@
 import { ReplitConnectors } from "@replit/connectors-sdk";
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensAgentMesh, omnimensBrain } from "@workspace/db";
 import { eq, desc, sql, and, inArray } from "drizzle-orm";
 
@@ -618,7 +618,7 @@ async function resolveJob(jobId: string): Promise<void> {
           cycleId: computeCycleCount,
         }).catch(() => {});
 
-        await db.insert(omnimensBrain).values({
+        queueBrainInsert({
           category: "knowledge",
           title: `[GITHUB COMPUTE] ${job.workflow.replace("omnimens-", "").replace(".yml", "")} for ${job.requestedBy}`,
           content: `Remote compute on GitHub: ${JSON.stringify(job.inputs).slice(0, 150)}. Result: ${(job.result || "").slice(0, 100)}`.slice(0, 250),

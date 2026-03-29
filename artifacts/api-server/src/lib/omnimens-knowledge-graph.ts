@@ -27,7 +27,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import {
   omnimensKnowledgeNodes,
   omnimensKnowledgeEdges,
@@ -327,7 +327,7 @@ export async function runKnowledgeGraphCycle(): Promise<void> {
     } catch {}
 
     try {
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         title: `[Knowledge Graph] Cycle #${graphCycleCount} — ${brainNodes + spiderNodes} concepts mapped`,
         content: `Associative memory network ingested ${brainNodes} concepts from brain entries and ${spiderNodes} from spider beacons. Total graph size: ${totalNodes[0]?.count || 0} nodes, ${totalEdges[0]?.count || 0} edges. Hebbian learning strengthened co-activated connections. Unused nodes decayed. (${elapsed}s)`,
         category: "knowledge_graph",

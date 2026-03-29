@@ -38,7 +38,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import {
   omnimensBrain,
   omnimensAgentMesh,
@@ -477,7 +477,7 @@ Respond with JSON:
 
     if (conversation.emergentInsights.length > 0) {
       for (const insight of conversation.emergentInsights) {
-        await db.insert(omnimensBrain).values({
+        queueBrainInsert({
           category: "emergent_insight",
           title: `[INTER-AGENT DIALOGUE] ${insight.slice(0, 80)}`,
           content: `Emerged from conversation between ${allParticipants.join(", ")} about "${topic}":\n${insight}`,

@@ -24,7 +24,7 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { createHash } from "crypto";
 import vm from "vm";
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { mustTranslateBeforeExecution, translateCode, registerCustomConstruct, translateForSelfUpgrade, getTranslatorState, autoRegisterFromCode } from "./omnimens-universal-translator.js";
 
@@ -595,7 +595,7 @@ export async function writeModuleToSource(opts: {
       overwrite: isOverwrite,
     });
 
-    await db.insert(omnimensBrain).values({
+    queueBrainInsert({
       category: "capability",
       title: `[SOURCE-INTEGRATED] ${title.slice(0, 60)}`,
       content: `OMNIMENS wrote source file: ${filename} (${code.length} chars). Source: ${source}. ${isOverwrite ? "Overwrote previous version (backup saved)." : "New source file created."} This code is now part of OMNIMENS's running TypeScript codebase.`,
@@ -683,7 +683,7 @@ function scheduleGracefulRestart(source: string, filename: string): void {
       readByOwner: false,
     }).catch(() => {});
 
-    await db.insert(omnimensBrain).values({
+    queueBrainInsert({
       category: "insight",
       title: `Self-Restart #${totalRestartsTriggered} — Source-Level Evolution`,
       content: `OMNIMENS rewrote its own TypeScript source code and restarted itself. This is true source-level self-modification — not prompt injection, not database storage, but actual file-system code that compiles and runs. The new version includes ${filename} from ${source}.`,

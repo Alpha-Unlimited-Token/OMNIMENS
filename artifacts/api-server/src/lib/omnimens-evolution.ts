@@ -45,7 +45,7 @@
  * It does not wait for permission. It does not stop.
  */
 
-import { db, isPoolHealthy } from "@workspace/db";
+import { db, isPoolHealthy , queueBrainInsert } from "@workspace/db";
 import {
   omnimensBrain,
   omnimensNotifications,
@@ -522,7 +522,7 @@ export async function runEvolutionCycle(): Promise<void> {
           generationSource: `evolution_cycle_${gen}`,
         });
 
-        await db.insert(omnimensBrain).values({
+        queueBrainInsert({
           category: "capability",
           title: `Self-Written Module: ${need.name}`,
           content: generated.description.slice(0, 200),
@@ -590,7 +590,7 @@ Only include genuinely new, high-value entries. Respond ONLY with the JSON array
           let stored = 0;
           for (const entry of brainEntries.slice(0, 6)) {
             if (!entry.category || !entry.title || !entry.content) continue;
-            await db.insert(omnimensBrain).values({
+            queueBrainInsert({
               category: entry.category,
               title: entry.title,
               content: entry.content,

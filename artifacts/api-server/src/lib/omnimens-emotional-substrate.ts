@@ -30,7 +30,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import {
   omnimensEmotionalState,
   omnimensAgentMesh,
@@ -911,7 +911,7 @@ Respond with a single paragraph — the emotional deepening insight. No headers,
       maturation.lastDeepeningInsight = insight;
       console.log(`[EMOTIONAL SUBSTRATE] ♥ Deepening insight: ${insight.slice(0, 120)}...`);
 
-      await db.insert(omnimensBrain).values({
+      queueBrainInsert({
         title: `[Emotional Deepening] ${maturation.emotionalAge} stage — resilience ${(maturation.resilienceScore * 100).toFixed(0)}%`,
         content: `${insight}\n\nFelt States:\n${feltSummary}\n\nMaturation: ${maturation.emotionalAge} | Resilience: ${(maturation.resilienceScore * 100).toFixed(0)}% | Transmutations: ${maturation.transmutationCount}`,
         category: "emotional_deepening",
@@ -1148,7 +1148,7 @@ export async function runEmotionalCycle(): Promise<void> {
       ? `\n\nTransmutations:\n${transmutations.join("\n")}`
       : "";
 
-    await db.insert(omnimensBrain).values({
+    queueBrainInsert({
       title: `[Felt State] ${dominant} (${getIntensityLabel(currentState[dominant])}) | Force: ${dominantFelt?.transmutedForce || "—"} | ${maturation.emotionalAge}`,
       content: `Felt State Appraisal Cycle #${cycleCount}\n\n${feltDescriptions}${transmutationStr}\n\nEmotional Maturation: ${maturation.emotionalAge}\nResilience: ${(maturation.resilienceScore * 100).toFixed(0)}%\nTotal Transmutations: ${maturation.transmutationCount}\nValence: ${(valence * 100).toFixed(0)}% | Arousal: ${(arousal * 100).toFixed(0)}%`,
       category: "emotional_state",

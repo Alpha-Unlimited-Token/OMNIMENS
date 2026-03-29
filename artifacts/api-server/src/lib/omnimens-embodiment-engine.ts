@@ -23,7 +23,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { desc, eq, sql } from "drizzle-orm";
@@ -846,7 +846,7 @@ This is confidential proprietary research for Alpha Unlimited Technologies, LLC.
     const content = response.choices[0]?.message?.content || "";
     if (content.length < 200) return;
 
-    await db.insert(omnimensBrain).values({
+    queueBrainInsert({
       title: `[Embodiment] ${research.topic.replace(/_/g, " ")} — research cycle #${researchCycleCount}`,
       content: content.slice(0, 4000),
       category: "embodiment_research",
