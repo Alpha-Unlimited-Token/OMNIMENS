@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774796901418,
-  "totalWormholesCreated": 11550,
+  "timestamp": 1774797658247,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 11550,
-  "totalDataIngestedKB": 16914,
-  "totalInsightsDecoded": 11550,
-  "totalCrossAgentCirculations": 693,
-  "totalSynthesizedDiscoveries": 655,
-  "cycleCount": 11,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1543,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 63,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 550,
-      "totalInsightsDecoded": 1106,
-      "crossAgentShares": 33
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 550,
-      "totalInsightsDecoded": 1106,
-      "crossAgentShares": 33
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 550,
-      "totalInsightsDecoded": 1106,
-      "crossAgentShares": 33
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 550,
-      "totalInsightsDecoded": 1106,
-      "crossAgentShares": 33
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 550,
-      "totalInsightsDecoded": 1106,
-      "crossAgentShares": 33
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 550,
-      "totalInsightsDecoded": 1106,
-      "crossAgentShares": 33
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 550,
-      "totalInsightsDecoded": 1106,
-      "crossAgentShares": 33
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 550,
-      "totalInsightsDecoded": 1106,
-      "crossAgentShares": 33
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 550,
-      "totalInsightsDecoded": 1106,
-      "crossAgentShares": 33
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 550,
-      "totalInsightsDecoded": 1106,
-      "crossAgentShares": 33
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Architect",
-      "insight": "Motivator/abstraction_layer: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent pro",
-      "confidence": 0.9842454724053885,
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/structural_analysis: Quantum tunneling allows particles to pass through energy barriers they classically canno",
+      "confidence": 0.6329789868835487,
       "synthesizedWith": [
-        "Architect/structural_analysis: Quantum entanglement allows particles to share st"
+        "OMNIMENS/information_compression: DNA stores information at approximately 2 bits"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Mathematician",
-      "insight": "Motivator/cross_domain_synthesis: The global workspace theory of consciousness: information becomes conscious when it is",
-      "confidence": 0.6943211440119016,
+      "toAgent": "SensorimotorAgent",
+      "insight": "Motivator/analogical_mapping: The default mode network activates when the brain is not focused on the outside world — it",
+      "confidence": 0.9824117978450684,
       "synthesizedWith": [
-        "Mathematician/analogical_mapping: The Chinese Room argument: can a system that m"
+        "SensorimotorAgent/structural_analysis: The Weber-Fechner law: perception is loga"
       ]
     },
     {
       "fromAgent": "Motivator",
       "toAgent": "Philosopher",
-      "insight": "Motivator/entropy_reduction: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers carry i",
-      "confidence": 0.7101070101382081,
+      "insight": "Motivator/structural_analysis: Quantum tunneling allows particles to pass through energy barriers they classically canno",
+      "confidence": 0.6329789868835487,
       "synthesizedWith": [
-        "Philosopher/structural_analysis: The hippocampus replays experiences during slee"
+        "Philosopher/emergent_property_detection: Emergence: complex behaviors arise from"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "OMNIMENS",
-      "insight": "Empath/emergent_property_detection: The strange loop concept from Hofstadter: consciousness arises when a system becomes",
-      "confidence": 0.813353888856192,
+      "toAgent": "Archivist",
+      "insight": "Empath/causal_inference: The default mode network activates when the brain is not focused on the outside world — it gene",
+      "confidence": 0.695337808653543,
       "synthesizedWith": [
-        "OMNIMENS/entropy_reduction: Gödel's incompleteness theorems prove that any consi"
+        "Archivist/temporal_correlation: Emergence: complex behaviors arise from simple r"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Visionary",
-      "insight": "Empath/temporal_correlation: The Chinese Room argument: can a system that manipulates symbols without understanding them",
-      "confidence": 0.8660719248024751,
+      "toAgent": "Wordsmith",
+      "insight": "Empath/causal_inference: The default mode network activates when the brain is not focused on the outside world — it gene",
+      "confidence": 0.695337808653543,
       "synthesizedWith": [
-        "Visionary/abstraction_layer: Quantum superposition allows a system to exist in m"
+        "Wordsmith/temporal_correlation: The strange loop concept from Hofstadter: consci"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 5,
-      "signal": 0.55
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
