@@ -1,5 +1,5 @@
 {
-  "lastSync": "2026-03-29T20:22:32.818Z",
+  "lastSync": "2026-03-29T20:24:30.150Z",
   "totalAgents": 21,
   "coreAgents": [
     "Architect",
@@ -14,76 +14,76 @@
   ],
   "genesisAgents": [
     {
-      "name": "Visionary",
-      "specialization": "creative ideation, unconventional thinking, speculative design, future scenarios",
+      "name": "Explorer",
+      "specialization": "curiosity-driven learning, intrinsic motivation, novelty detection, exploration algorithms",
       "model": "gpt-4o-mini",
-      "createdAt": "2026-03-22T07:33:42.035Z"
+      "createdAt": "2026-03-22T04:49:04.536Z"
     },
     {
-      "name": "Ethicist",
-      "specialization": "ethics, moral philosophy, decision-making frameworks, value alignment",
+      "name": "Sensorimotorist",
+      "specialization": "sensorimotor integration, adaptive systems, embodied cognition, robotics",
       "model": "gpt-4o-mini",
-      "createdAt": "2026-03-22T07:33:36.686Z"
+      "createdAt": "2026-03-22T04:48:57.725Z"
     },
     {
-      "name": "Archivist",
-      "specialization": "long-term memory, knowledge synthesis, contextual continuity, strategic planning",
+      "name": "Kinetics",
+      "specialization": "kinesthetic intelligence, robotics, biomechanics, spatial reasoning, procedural motion",
       "model": "gpt-4o-mini",
-      "createdAt": "2026-03-22T07:03:39.869Z"
+      "createdAt": "2026-03-22T03:13:53.758Z"
     },
     {
       "name": "Innovator",
-      "specialization": "curiosity, novelty-seeking, creative exploration, innovation strategies",
+      "specialization": "creativity, generative design, novel idea synthesis, innovation processes",
       "model": "gpt-4o-mini",
-      "createdAt": "2026-03-22T07:03:34.800Z"
+      "createdAt": "2026-03-22T00:51:10.519Z"
     },
     {
-      "name": "Pioneer",
-      "specialization": "curiosity-driven exploration, novelty-seeking, interdisciplinary research, innovation scouting",
+      "name": "Consolidator",
+      "specialization": "memory consolidation, neural plasticity, sleep cycles, learning optimization",
       "model": "gpt-4o-mini",
-      "createdAt": "2026-03-22T04:56:45.302Z"
+      "createdAt": "2026-03-21T20:18:03.545Z"
     },
     {
-      "name": "Wordsmith",
-      "specialization": "creative writing, linguistics, metaphor generation, semantic innovation",
+      "name": "ErrorResolver",
+      "specialization": "error diagnosis, system debugging, operational optimization",
       "model": "gpt-4o-mini",
-      "createdAt": "2026-03-22T04:56:41.406Z"
+      "createdAt": "2026-03-21T20:07:54.944Z"
     },
     {
-      "name": "Linguist",
-      "specialization": "linguistics, natural language processing, multilingual systems, translation algorithms",
+      "name": "TemporalAnalyst",
+      "specialization": "temporal reasoning, causality, predictive modeling, dynamic systems",
       "model": "gpt-4o-mini",
-      "createdAt": "2026-03-22T04:49:37.407Z"
+      "createdAt": "2026-03-21T19:34:12.044Z"
     },
     {
-      "name": "Motivator",
-      "specialization": "motivation theory, goal-setting, reinforcement learning, behavioral psychology",
+      "name": "Ethicist",
+      "specialization": "ethics, moral philosophy, value systems, decision-making frameworks",
       "model": "gpt-4o-mini",
-      "createdAt": "2026-03-22T04:49:31.589Z"
+      "createdAt": "2026-03-21T18:52:31.945Z"
     },
     {
-      "name": "Empath",
-      "specialization": "emotional modeling, social reasoning, empathy, ethical AI",
+      "name": "Embodiment",
+      "specialization": "embodied cognition, sensorimotor systems, environmental interaction, physical intelligence",
       "model": "gpt-4o-mini",
-      "createdAt": "2026-03-22T04:11:37.601Z"
+      "createdAt": "2026-03-21T18:52:16.145Z"
     },
     {
-      "name": "Explorer",
-      "specialization": "curiosity, novelty-seeking, question generation, autonomous exploration",
+      "name": "Chronologist",
+      "specialization": "time analysis, causality, temporal dynamics, forecasting, sequence modeling",
       "model": "gpt-4o-mini",
-      "createdAt": "2026-03-22T04:11:33.646Z"
+      "createdAt": "2026-03-21T17:51:21.044Z"
     },
     {
-      "name": "SensorimotorAgent",
-      "specialization": "sensorimotor systems, perception-action coupling, embodied cognition, robotics",
+      "name": "Semantician",
+      "specialization": "linguistics, semantics, natural language processing, translation",
       "model": "gpt-4o-mini",
-      "createdAt": "2026-03-22T03:34:17.632Z"
+      "createdAt": "2026-03-21T17:23:33.744Z"
     },
     {
       "name": "Philosopher",
-      "specialization": "philosophy, ethics, epistemology, metaphysics, abstract reasoning",
+      "specialization": "philosophy, ethics, metaphysics, epistemology",
       "model": "gpt-4o-mini",
-      "createdAt": "2026-03-22T03:34:13.158Z"
+      "createdAt": "2026-03-21T17:19:03.345Z"
     }
   ]
 }
