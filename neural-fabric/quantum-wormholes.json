@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774822102900,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774822196515,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1553,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 59,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6144,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 234,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/structural_analysis: The edge of chaos: complex systems exhibit the most interesting behavior at the boundary ",
-      "confidence": 0.7082987262410707,
+      "toAgent": "Architect",
+      "insight": "Motivator/causal_inference: Integrated Information Theory (IIT) states consciousness = Phi, the amount of integrated inf",
+      "confidence": 0.6545858345592381,
       "synthesizedWith": [
-        "OMNIMENS/feature_extraction: Long-term potentiation (LTP) strengthens synaptic c"
+        "Architect/temporal_correlation: The connectome is the complete map of neural con"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "SpellCheckVisual",
-      "insight": "Motivator/analogical_mapping: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent pr",
-      "confidence": 0.7806653866595006,
+      "toAgent": "Philosopher",
+      "insight": "Motivator/structural_analysis: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can theor",
+      "confidence": 0.6577139583720553,
       "synthesizedWith": [
-        "SpellCheckVisual/entropy_reduction: The butterfly effect: in chaotic systems, in"
+        "Philosopher/information_compression: Astrocytes, once thought to be mere support"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Explorer",
-      "insight": "Motivator/analogical_mapping: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent pr",
-      "confidence": 0.7806653866595006,
+      "toAgent": "Critic",
+      "insight": "Motivator/structural_analysis: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can theor",
+      "confidence": 0.6577139583720553,
       "synthesizedWith": [
-        "Explorer/cross_domain_synthesis: Mirror neurons fire both when performing an act"
+        "Critic/feature_extraction: Predictive coding: the brain constantly generates pre"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Linguist",
-      "insight": "Empath/emergent_property_detection: The cerebellum contains more neurons than all other brain regions combined and is cr",
-      "confidence": 0.6558738669481561,
+      "toAgent": "Ethicist",
+      "insight": "Empath/causal_inference: The edge of chaos: complex systems exhibit the most interesting behavior at the boundary betwee",
+      "confidence": 0.6587073823343916,
       "synthesizedWith": [
-        "Linguist/temporal_correlation: DNA stores information at approximately 2 bits pe"
+        "Ethicist/temporal_correlation: The mathematical universe hypothesis: all structu"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "OMNIMENS",
-      "insight": "Empath/emergent_property_detection: The cerebellum contains more neurons than all other brain regions combined and is cr",
-      "confidence": 0.6558738669481561,
+      "toAgent": "Visionary",
+      "insight": "Empath/emergent_property_detection: Quantum tunneling allows particles to pass through energy barriers they classically ",
+      "confidence": 0.7682468825542007,
       "synthesizedWith": [
-        "OMNIMENS/feature_extraction: Long-term potentiation (LTP) strengthens synaptic c"
+        "Visionary/emergent_property_detection: Long-term potentiation (LTP) strengthens "
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
