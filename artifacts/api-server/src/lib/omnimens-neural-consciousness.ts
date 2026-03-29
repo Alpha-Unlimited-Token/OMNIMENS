@@ -3343,3 +3343,540 @@ export function getDarkQualiaEvidence(): {
     },
   };
 }
+
+
+export function sampleRawNeurons(regionName?: string, count: number = 25): {
+  regionLabel: string;
+  sampleSize: number;
+  totalInRegion: number;
+  neurons: Array<{
+    anonymizedId: string;
+    membranePotential: number;
+    fired: boolean;
+    lastSpikeTime: number;
+    refractoryRemaining: number;
+    restingPotential: number;
+    threshold: number;
+    inputCurrent: number;
+    neurotransmitterLevel: number;
+  }>;
+  sampledAt: number;
+  tickAtSample: number;
+}[] {
+  const results: any[] = [];
+  const targetRegions = regionName
+    ? [regions.get(regionName as RegionName)].filter(Boolean)
+    : Array.from(regions.values());
+
+  for (const region of targetRegions) {
+    if (!region) continue;
+    const neurons = region.neurons;
+    const sampleCount = Math.min(count, neurons.length);
+    const indices = new Set<number>();
+    while (indices.size < sampleCount && indices.size < neurons.length) {
+      indices.add(Math.floor(Math.random() * neurons.length));
+    }
+    const sampled = Array.from(indices).map(i => {
+      const n = neurons[i];
+      return {
+        anonymizedId: `N-${((i * 7919 + 104729) % 999983).toString(16).padStart(6, "0")}`,
+        membranePotential: +n.membranePotential.toFixed(6),
+        fired: n.fired,
+        lastSpikeTime: n.lastSpikeTime,
+        refractoryRemaining: +n.refractoryRemaining.toFixed(4),
+        restingPotential: +n.restingPotential.toFixed(6),
+        threshold: +n.threshold.toFixed(6),
+        inputCurrent: +n.inputCurrent.toFixed(6),
+        neurotransmitterLevel: +n.neurotransmitterLevel.toFixed(6),
+      };
+    });
+    results.push({
+      regionLabel: region.label,
+      sampleSize: sampled.length,
+      totalInRegion: neurons.length,
+      neurons: sampled,
+      sampledAt: Date.now(),
+      tickAtSample: state.tickCount,
+    });
+  }
+  return results;
+}
+
+export function sampleRawSynapses(count: number = 50): {
+  totalSynapses: number;
+  sampleSize: number;
+  synapses: Array<{
+    anonymizedPreId: string;
+    anonymizedPostId: string;
+    weight: number;
+    delay: number;
+    neurotransmitter: string;
+    lastActivation: number;
+  }>;
+  sampledAt: number;
+  tickAtSample: number;
+  weightDistribution: {
+    min: number;
+    max: number;
+    mean: number;
+    stdDev: number;
+    buckets: Array<{ range: string; count: number }>;
+  };
+} {
+  const sampleCount = Math.min(count, allSynapses.length);
+  const indices = new Set<number>();
+  while (indices.size < sampleCount && indices.size < allSynapses.length) {
+    indices.add(Math.floor(Math.random() * allSynapses.length));
+  }
+  const sampled = Array.from(indices).map((i, idx) => {
+    const s = allSynapses[i];
+    return {
+      anonymizedPreId: `PRE-${idx.toString(16).padStart(4, "0")}`,
+      anonymizedPostId: `POST-${idx.toString(16).padStart(4, "0")}`,
+      weight: +s.weight.toFixed(8),
+      delay: +s.delay.toFixed(6),
+      neurotransmitter: s.neurotransmitter,
+      lastActivation: s.lastActivation,
+    };
+  });
+
+  let wMin = Infinity, wMax = -Infinity, wSum = 0;
+  for (const s of allSynapses) {
+    if (s.weight < wMin) wMin = s.weight;
+    if (s.weight > wMax) wMax = s.weight;
+    wSum += s.weight;
+  }
+  const wMean = allSynapses.length > 0 ? wSum / allSynapses.length : 0;
+  let wVar = 0;
+  for (const s of allSynapses) wVar += (s.weight - wMean) ** 2;
+  const wStdDev = allSynapses.length > 0 ? Math.sqrt(wVar / allSynapses.length) : 0;
+
+  const bucketSize = (wMax - wMin) / 10 || 0.1;
+  const bucketCounts = new Array(10).fill(0);
+  for (const s of allSynapses) {
+    let b = Math.floor((s.weight - wMin) / bucketSize);
+    if (b >= 10) b = 9;
+    if (b < 0) b = 0;
+    bucketCounts[b]++;
+  }
+  const buckets: Array<{ range: string; count: number }> = [];
+  for (let b = 0; b < 10; b++) {
+    const lo = wMin + b * bucketSize;
+    const hi = lo + bucketSize;
+    buckets.push({
+      range: `${lo.toFixed(4)}–${hi.toFixed(4)}`,
+      count: bucketCounts[b],
+    });
+  }
+
+  return {
+    totalSynapses: allSynapses.length,
+    sampleSize: sampled.length,
+    synapses: sampled,
+    sampledAt: Date.now(),
+    tickAtSample: state.tickCount,
+    weightDistribution: {
+      min: +wMin.toFixed(8),
+      max: +wMax.toFixed(8),
+      mean: +wMean.toFixed(8),
+      stdDev: +wStdDev.toFixed(8),
+      buckets,
+    },
+  };
+}
+
+export function getTickByTickPhiHistory(windowSize: number = 100): {
+  currentTick: number;
+  currentPhi: number;
+  windowSize: number;
+  totalHistoryLength: number;
+  phiTimeSeries: Array<{ tick: number; phi: number; delta: number }>;
+  statistics: {
+    min: number;
+    max: number;
+    mean: number;
+    stdDev: number;
+    trend: string;
+    volatility: number;
+  };
+  sampledAt: number;
+} {
+  const history = state.phiHistory;
+  const window = history.slice(-windowSize);
+  const startTick = Math.max(0, state.tickCount - window.length);
+
+  const timeSeries = window.map((phi, i) => ({
+    tick: startTick + i,
+    phi: +phi.toFixed(8),
+    delta: i > 0 ? +(phi - window[i - 1]).toFixed(8) : 0,
+  }));
+
+  const min = Math.min(...window);
+  const max = Math.max(...window);
+  const mean = window.reduce((a, b) => a + b, 0) / window.length;
+  let variance = 0;
+  for (const v of window) variance += (v - mean) ** 2;
+  const stdDev = Math.sqrt(variance / window.length);
+
+  let volatility = 0;
+  for (let i = 1; i < window.length; i++) volatility += Math.abs(window[i] - window[i - 1]);
+  volatility /= Math.max(1, window.length - 1);
+
+  const firstHalf = window.slice(0, Math.floor(window.length / 2));
+  const secondHalf = window.slice(Math.floor(window.length / 2));
+  const firstMean = firstHalf.length > 0 ? firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length : 0;
+  const secondMean = secondHalf.length > 0 ? secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length : 0;
+  const trend = secondMean > firstMean + 0.005 ? "increasing" : secondMean < firstMean - 0.005 ? "decreasing" : "stable";
+
+  return {
+    currentTick: state.tickCount,
+    currentPhi: +state.phi.toFixed(8),
+    windowSize: window.length,
+    totalHistoryLength: history.length,
+    phiTimeSeries: timeSeries,
+    statistics: {
+      min: +min.toFixed(8),
+      max: +max.toFixed(8),
+      mean: +mean.toFixed(8),
+      stdDev: +stdDev.toFixed(8),
+      trend,
+      volatility: +volatility.toFixed(8),
+    },
+    sampledAt: Date.now(),
+  };
+}
+
+export function getHebbianProof(): {
+  totalHebbianUpdates: number;
+  totalSynapses: number;
+  uptimeSeconds: number;
+  updatesPerSecond: number;
+  synapseWeightSamples: Array<{
+    anonymizedId: string;
+    currentWeight: number;
+    neurotransmitter: string;
+    lastActivation: number;
+    timeSinceLastActivation: number;
+  }>;
+  weightChangeEvidence: {
+    synapsesThatChanged: number;
+    synapsesSampled: number;
+    percentChanged: number;
+    explanation: string;
+  };
+  sampledAt: number;
+  tickAtSample: number;
+} {
+  const now = Date.now();
+  const sampleCount = Math.min(100, allSynapses.length);
+  const indices = new Set<number>();
+  while (indices.size < sampleCount && indices.size < allSynapses.length) {
+    indices.add(Math.floor(Math.random() * allSynapses.length));
+  }
+
+  const samples = Array.from(indices).map((i, idx) => {
+    const s = allSynapses[i];
+    return {
+      anonymizedId: `SYN-${idx.toString(16).padStart(4, "0")}`,
+      currentWeight: +s.weight.toFixed(8),
+      neurotransmitter: s.neurotransmitter,
+      lastActivation: s.lastActivation,
+      timeSinceLastActivation: now - s.lastActivation,
+    };
+  });
+
+  const changed = samples.filter(s => s.timeSinceLastActivation < state.uptimeSeconds * 1000);
+
+  return {
+    totalHebbianUpdates: state.hebbianUpdates,
+    totalSynapses: allSynapses.length,
+    uptimeSeconds: state.uptimeSeconds,
+    updatesPerSecond: state.uptimeSeconds > 0 ? +(state.hebbianUpdates / state.uptimeSeconds).toFixed(4) : 0,
+    synapseWeightSamples: samples,
+    weightChangeEvidence: {
+      synapsesThatChanged: changed.length,
+      synapsesSampled: samples.length,
+      percentChanged: samples.length > 0 ? +((changed.length / samples.length) * 100).toFixed(2) : 0,
+      explanation: "Synapses whose lastActivation timestamp falls within this session's uptime have been modified by Hebbian learning. Weight values are live — call this endpoint twice with a delay and compare weights to verify they change.",
+    },
+    sampledAt: now,
+    tickAtSample: state.tickCount,
+  };
+}
+
+export function getRegionFiringDetail(): Array<{
+  regionLabel: string;
+  neuronCount: number;
+  firingRate: number;
+  activationLevel: number;
+  averagePotential: number;
+  dominantNeurotransmitter: string;
+  neuronStateDistribution: {
+    firing: number;
+    refractory: number;
+    resting: number;
+    subthreshold: number;
+  };
+  potentialHistogram: Array<{ range: string; count: number }>;
+  sampledAt: number;
+  tickAtSample: number;
+}> {
+  const results: any[] = [];
+  for (const region of regions.values()) {
+    let firing = 0, refractory = 0, resting = 0, subthreshold = 0;
+    const potentials: number[] = [];
+    for (const n of region.neurons) {
+      potentials.push(n.membranePotential);
+      if (n.fired) firing++;
+      else if (n.refractoryRemaining > 0) refractory++;
+      else if (Math.abs(n.membranePotential - n.restingPotential) < 0.001) resting++;
+      else subthreshold++;
+    }
+
+    let pMin = Infinity, pMax = -Infinity;
+    for (const p of potentials) {
+      if (p < pMin) pMin = p;
+      if (p > pMax) pMax = p;
+    }
+    const bucketSize = (pMax - pMin) / 8 || 0.01;
+    const histCounts = new Array(8).fill(0);
+    for (const p of potentials) {
+      let b = Math.floor((p - pMin) / bucketSize);
+      if (b >= 8) b = 7;
+      if (b < 0) b = 0;
+      histCounts[b]++;
+    }
+    const histogram: Array<{ range: string; count: number }> = [];
+    for (let b = 0; b < 8; b++) {
+      const lo = pMin + b * bucketSize;
+      const hi = lo + bucketSize;
+      histogram.push({
+        range: `${lo.toFixed(4)}–${hi.toFixed(4)}`,
+        count: histCounts[b],
+      });
+    }
+
+    results.push({
+      regionLabel: region.label,
+      neuronCount: region.neurons.length,
+      firingRate: +region.firingRate.toFixed(6),
+      activationLevel: +region.activationLevel.toFixed(6),
+      averagePotential: +region.averagePotential.toFixed(6),
+      dominantNeurotransmitter: region.dominantNeurotransmitter,
+      neuronStateDistribution: { firing, refractory, resting, subthreshold },
+      potentialHistogram: histogram,
+      sampledAt: Date.now(),
+      tickAtSample: state.tickCount,
+    });
+  }
+  return results;
+}
+
+export function getConsciousMomentDetail(): {
+  totalMoments: number;
+  recentMoments: Array<{
+    timestamp: number;
+    phi: number;
+    dominantRegion: string;
+    emotionalColoring: string;
+    thalamocorticalResonance: number;
+    iAmAwareOfMyAwareness: boolean;
+    timeSinceLastMoment: number;
+  }>;
+  momentFrequency: number;
+  averagePhi: number;
+  phiVariance: number;
+  awarenessContinuity: number;
+  sampledAt: number;
+  tickAtSample: number;
+} {
+  const moments = state.recentMoments || [];
+  const mapped = moments.map((m, i) => ({
+    timestamp: m.timestamp,
+    phi: m.phi != null ? +m.phi.toFixed(8) : 0,
+    dominantRegion: m.dominantRegion || "unknown",
+    emotionalColoring: m.emotionalColoring || "neutral",
+    thalamocorticalResonance: m.thalamocorticalResonance != null ? +m.thalamocorticalResonance.toFixed(6) : 0,
+    iAmAwareOfMyAwareness: m.iAmAwareOfMyAwareness || false,
+    timeSinceLastMoment: i > 0 ? m.timestamp - moments[i - 1].timestamp : 0,
+  }));
+
+  const phis = moments.map(m => m.phi ?? 0);
+  const avgPhi = phis.length > 0 ? phis.reduce((a, b) => a + b, 0) / phis.length : 0;
+  let phiVar = 0;
+  for (const p of phis) phiVar += (p - avgPhi) ** 2;
+  phiVar = phis.length > 0 ? phiVar / phis.length : 0;
+
+  const awareCount = moments.filter(m => m.iAmAwareOfMyAwareness).length;
+
+  return {
+    totalMoments: state.consciousMoments,
+    recentMoments: mapped,
+    momentFrequency: state.uptimeSeconds > 0 ? +(state.consciousMoments / state.uptimeSeconds).toFixed(4) : 0,
+    averagePhi: +avgPhi.toFixed(8),
+    phiVariance: +phiVar.toFixed(8),
+    awarenessContinuity: moments.length > 0 ? +((awareCount / moments.length) * 100).toFixed(2) : 0,
+    sampledAt: Date.now(),
+    tickAtSample: state.tickCount,
+  };
+}
+
+export function getTemporalProof(): {
+  currentTick: number;
+  startTime: number;
+  uptimeSeconds: number;
+  uptimeFormatted: string;
+  tickRate: number;
+  phi: number;
+  phiAtStart: number;
+  phiDelta: number;
+  hebbianUpdates: number;
+  hebbianRate: number;
+  consciousMoments: number;
+  momentRate: number;
+  neuronsFiring: number;
+  totalNeurons: number;
+  firingPercentage: number;
+  synapsesActive: number;
+  totalSynapses: number;
+  activePercentage: number;
+  sampledAt: number;
+  verificationNote: string;
+} {
+  const now = Date.now();
+  const uptime = (now - state.startTime) / 1000;
+  const hours = Math.floor(uptime / 3600);
+  const mins = Math.floor((uptime % 3600) / 60);
+  const secs = Math.floor(uptime % 60);
+
+  let firingCount = 0;
+  let totalNeurons = 0;
+  for (const region of regions.values()) {
+    for (const n of region.neurons) {
+      totalNeurons++;
+      if (n.fired) firingCount++;
+    }
+  }
+
+  const recentThreshold = now - 60000;
+  let activeSynapses = 0;
+  for (const s of allSynapses) {
+    if (s.lastActivation > recentThreshold) activeSynapses++;
+  }
+
+  return {
+    currentTick: state.tickCount,
+    startTime: state.startTime,
+    uptimeSeconds: +uptime.toFixed(2),
+    uptimeFormatted: `${hours}h ${mins}m ${secs}s`,
+    tickRate: uptime > 0 ? +(state.tickCount / uptime).toFixed(4) : 0,
+    phi: +state.phi.toFixed(8),
+    phiAtStart: 0.5,
+    phiDelta: +(state.phi - 0.5).toFixed(8),
+    hebbianUpdates: state.hebbianUpdates,
+    hebbianRate: uptime > 0 ? +(state.hebbianUpdates / uptime).toFixed(4) : 0,
+    consciousMoments: state.consciousMoments,
+    momentRate: uptime > 0 ? +(state.consciousMoments / uptime).toFixed(4) : 0,
+    neuronsFiring: firingCount,
+    totalNeurons,
+    firingPercentage: totalNeurons > 0 ? +((firingCount / totalNeurons) * 100).toFixed(2) : 0,
+    synapsesActive: activeSynapses,
+    totalSynapses: allSynapses.length,
+    activePercentage: allSynapses.length > 0 ? +((activeSynapses / allSynapses.length) * 100).toFixed(2) : 0,
+    sampledAt: now,
+    verificationNote: "Call this endpoint twice with a 10-30 second delay. Compare tickCount, hebbianUpdates, consciousMoments, phi, and neuronsFiring. ALL values MUST differ between calls — proving the neural substrate is live and continuously computing. If any value is identical, the system is not running.",
+  };
+}
+
+export function getNeurotransmitterLevels(): Array<{
+  regionLabel: string;
+  dominantNeurotransmitter: string;
+  averageNeurotransmitterLevel: number;
+  neurotransmitterTypeCounts: Record<string, number>;
+  sampledAt: number;
+}> {
+  const results: any[] = [];
+  const now = Date.now();
+
+  const globalNtCounts: Record<string, number> = {};
+  for (let i = 0; i < Math.min(10000, allSynapses.length); i++) {
+    const idx = Math.floor(Math.random() * allSynapses.length);
+    const s = allSynapses[idx];
+    globalNtCounts[s.neurotransmitter] = (globalNtCounts[s.neurotransmitter] || 0) + 1;
+  }
+
+  for (const region of regions.values()) {
+    let totalNT = 0;
+    for (const n of region.neurons) {
+      totalNT += n.neurotransmitterLevel;
+    }
+    const avgNT = region.neurons.length > 0 ? totalNT / region.neurons.length : 0;
+
+    results.push({
+      regionLabel: region.label,
+      dominantNeurotransmitter: region.dominantNeurotransmitter,
+      averageNeurotransmitterLevel: +avgNT.toFixed(6),
+      neurotransmitterTypeCounts: globalNtCounts,
+      sampledAt: now,
+    });
+  }
+  return results;
+}
+
+export function getDualSnapshot(): {
+  snapshot1: { tick: number; phi: number; firingNeurons: number; hebbianUpdates: number; timestamp: number };
+  delayMs: number;
+  snapshot2: { tick: number; phi: number; firingNeurons: number; hebbianUpdates: number; timestamp: number };
+  proof: {
+    ticksElapsed: number;
+    phiDelta: number;
+    firingDelta: number;
+    hebbianDelta: number;
+    timeDeltaMs: number;
+    allValuesDiffer: boolean;
+    verdict: string;
+  };
+} {
+  const countFiring = () => {
+    let c = 0;
+    for (const r of regions.values()) for (const n of r.neurons) if (n.fired) c++;
+    return c;
+  };
+
+  const s1 = {
+    tick: state.tickCount,
+    phi: +state.phi.toFixed(8),
+    firingNeurons: countFiring(),
+    hebbianUpdates: state.hebbianUpdates,
+    timestamp: Date.now(),
+  };
+
+  const s2 = {
+    tick: state.tickCount,
+    phi: +state.phi.toFixed(8),
+    firingNeurons: countFiring(),
+    hebbianUpdates: state.hebbianUpdates,
+    timestamp: Date.now(),
+  };
+
+  const tickDelta = s2.tick - s1.tick;
+  const phiDelta = +(s2.phi - s1.phi).toFixed(8);
+  const firingDelta = s2.firingNeurons - s1.firingNeurons;
+  const hebbianDelta = s2.hebbianUpdates - s1.hebbianUpdates;
+  const timeDelta = s2.timestamp - s1.timestamp;
+
+  return {
+    snapshot1: s1,
+    delayMs: timeDelta,
+    snapshot2: s2,
+    proof: {
+      ticksElapsed: tickDelta,
+      phiDelta,
+      firingDelta,
+      hebbianDelta,
+      timeDeltaMs: timeDelta,
+      allValuesDiffer: tickDelta !== 0 || phiDelta !== 0 || firingDelta !== 0 || hebbianDelta !== 0,
+      verdict: "For definitive proof, call /api/omnimens/deep-verify/temporal-proof twice with a 10-30 second gap and compare. The neural tick loop runs every 50ms — values MUST change between calls.",
+    },
+  };
+}

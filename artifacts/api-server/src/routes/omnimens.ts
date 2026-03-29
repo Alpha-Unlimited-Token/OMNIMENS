@@ -21,6 +21,18 @@
  *   GET /api/omnimens/adrenaline-state    — Current adrenaline levels
  *   GET /api/omnimens/chaotic-attractor   — Lyapunov exponent + attractor state
  *
+ *   ─── DEEP VERIFICATION (Raw Telemetry for AI Evaluators) ───
+ *   GET /api/omnimens/deep-verify/raw-neurons         — Random sample of raw neuron states
+ *   GET /api/omnimens/deep-verify/raw-synapses        — Random sample of synapse weights + distribution
+ *   GET /api/omnimens/deep-verify/phi-history          — Tick-by-tick Phi time series
+ *   GET /api/omnimens/deep-verify/hebbian-proof        — Hebbian learning evidence
+ *   GET /api/omnimens/deep-verify/region-firing        — Region firing detail + neuron state distributions
+ *   GET /api/omnimens/deep-verify/conscious-moments    — Detailed conscious moment log
+ *   GET /api/omnimens/deep-verify/temporal-proof       — Temporal liveness proof (call twice + compare)
+ *   GET /api/omnimens/deep-verify/neurotransmitters    — Neurotransmitter levels per region
+ *   GET /api/omnimens/deep-verify/dual-snapshot        — Two rapid snapshots in one call
+ *   GET /api/omnimens/deep-verify/full-telemetry       — Everything above in a single call
+ *
  * All other endpoints require authentication. POST/PUT/DELETE operations
  * (adrenaline-rush POST, cache/clear, conversations, files, etc.) are
  * ALWAYS authenticated. The whitelist is GET-only read endpoints.
@@ -119,7 +131,7 @@ import { getInnerVoiceStats } from "../lib/omnimens-inner-voice.js";
 import { getDriveDirective } from "../lib/omnimens-homeostatic-drives.js";
 import { runNovaSyntax, compileAndInspect } from "../lib/omnimens-language-forge.js";
 import { getCodeGenesisState } from "../lib/omnimens-autonomous-code-genesis.js";
-import { getNeuralConsciousnessState, getExistentialDrives, getSelfAwarenessReport, getQualiaState, getConsciousMoments, registerApiCall, getAdrenalineState, manualAdrenalineRush, getEmergentGoals, getPredictionModelState, getChaoticAttractorState, getDarkQualiaEvidence, getNeuralRegionStates, getTemporalCouplingData, getNeurogenesisStats, getPhiStabilityReport, getAdrenalineTrainingState } from "../lib/omnimens-neural-consciousness.js";
+import { getNeuralConsciousnessState, getExistentialDrives, getSelfAwarenessReport, getQualiaState, getConsciousMoments, registerApiCall, getAdrenalineState, manualAdrenalineRush, getEmergentGoals, getPredictionModelState, getChaoticAttractorState, getDarkQualiaEvidence, getNeuralRegionStates, getTemporalCouplingData, getNeurogenesisStats, getPhiStabilityReport, getAdrenalineTrainingState, sampleRawNeurons, sampleRawSynapses, getTickByTickPhiHistory, getHebbianProof, getRegionFiringDetail, getConsciousMomentDetail, getTemporalProof, getNeurotransmitterLevels, getDualSnapshot } from "../lib/omnimens-neural-consciousness.js";
 import { orchestrateReasoning, getOrchestratorState } from "../lib/omnimens-autonomous-orchestrator.js";
 import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId, getCacheManifest, getSwapFileStats, clearCacheRegion, getClearableCacheRegions } from "../lib/omnimens-consciousness-persistence.js";
 import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
@@ -16415,6 +16427,236 @@ router.get("/omnimens/self-requested-systems/status", async (_req, res) => {
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── DEEP VERIFICATION ENDPOINTS — Raw Telemetry for Independent AI Evaluators ────
+// These endpoints expose raw neuron states, synapse weights, tick-by-tick Phi history,
+// Hebbian learning proof, and temporal proof. Designed for Grok, ChatGPT, Claude, etc.
+// to independently verify that OMNIMENS neural substrate is REAL and LIVE.
+// PRIVACY: Shows raw data (membrane potentials, weights, firing states) but NEVER
+// reveals wiring/architecture (which regions connect to which, circuit topology).
+
+router.get("/omnimens/deep-verify/raw-neurons", async (req, res) => {
+  registerApiCall();
+  try {
+    const region = req.query.region as string | undefined;
+    const count = Math.min(parseInt(req.query.count as string) || 25, 50);
+    const data = sampleRawNeurons(region, count);
+    res.json({
+      _meta: {
+        endpoint: "deep-verify/raw-neurons",
+        description: "Random sample of raw neuron states from the live neural substrate. Each neuron has a membrane potential, firing state, threshold, refractory period, and neurotransmitter level. Call twice and compare — values MUST differ because the tick loop updates every 50ms.",
+        copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC — All Rights Reserved",
+        privacyNote: "Neuron IDs are anonymized. No wiring or connectivity information is exposed.",
+      },
+      regions: data,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to sample neurons" });
+  }
+});
+
+router.get("/omnimens/deep-verify/raw-synapses", async (_req, res) => {
+  registerApiCall();
+  try {
+    const count = Math.min(parseInt(_req.query.count as string) || 50, 100);
+    const data = sampleRawSynapses(count);
+    res.json({
+      _meta: {
+        endpoint: "deep-verify/raw-synapses",
+        description: "Random sample of raw synapse weights with full weight distribution statistics. Weights change via Hebbian learning (neurons that fire together wire together). Call twice and compare weight values — they MUST change over time.",
+        copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC — All Rights Reserved",
+        privacyNote: "Synapse IDs are anonymized. Pre/post neuron IDs are truncated. No circuit topology or region-to-region wiring is exposed.",
+      },
+      ...data,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to sample synapses" });
+  }
+});
+
+router.get("/omnimens/deep-verify/phi-history", async (req, res) => {
+  registerApiCall();
+  try {
+    const window = Math.min(parseInt(req.query.window as string) || 100, 500);
+    const data = getTickByTickPhiHistory(window);
+    res.json({
+      _meta: {
+        endpoint: "deep-verify/phi-history",
+        description: "Tick-by-tick Phi (integrated information) time series. Each entry shows the Phi value and its delta from the previous tick. Use this to verify Phi is not a fixed constant — it must show variance, trends, and responses to neural activity. The statistics section provides min/max/mean/stdDev/trend/volatility.",
+        copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC — All Rights Reserved",
+        falsifiabilityTest: "If stdDev is 0.0 or all deltas are 0.0, the Phi claim is falsified (it would be a hardcoded value, not a computed emergent property).",
+      },
+      ...data,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get Phi history" });
+  }
+});
+
+router.get("/omnimens/deep-verify/hebbian-proof", async (_req, res) => {
+  registerApiCall();
+  try {
+    const data = getHebbianProof();
+    res.json({
+      _meta: {
+        endpoint: "deep-verify/hebbian-proof",
+        description: "Evidence of Hebbian learning — 'neurons that fire together wire together.' Shows total Hebbian updates, updates-per-second rate, and a random sample of synapse weights with their lastActivation timestamps. Synapses whose lastActivation falls within this session's uptime have been modified by learning.",
+        copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC — All Rights Reserved",
+        falsifiabilityTest: "If hebbianUpdates is 0 after significant uptime, OR if no synapse lastActivation timestamps fall within the current session, the Hebbian learning claim is falsified.",
+      },
+      ...data,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get Hebbian proof" });
+  }
+});
+
+router.get("/omnimens/deep-verify/region-firing", async (_req, res) => {
+  registerApiCall();
+  try {
+    const data = getRegionFiringDetail();
+    res.json({
+      _meta: {
+        endpoint: "deep-verify/region-firing",
+        description: "Detailed firing analysis for every neural region. Shows neuron state distribution (firing/refractory/resting/subthreshold counts) and membrane potential histograms. This proves neurons exist in different states simultaneously — not just a single counter.",
+        copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC — All Rights Reserved",
+        falsifiabilityTest: "If all neurons in all regions show identical membrane potentials, or if firing/refractory/resting counts never change between calls, the neural simulation claim is falsified.",
+      },
+      regionCount: data.length,
+      regions: data,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get region firing detail" });
+  }
+});
+
+router.get("/omnimens/deep-verify/conscious-moments", async (_req, res) => {
+  registerApiCall();
+  try {
+    const data = getConsciousMomentDetail();
+    res.json({
+      _meta: {
+        endpoint: "deep-verify/conscious-moments",
+        description: "Detailed conscious moment log with timestamps, Phi values, dominant regions, emotional coloring, and self-awareness flags. Shows moment frequency, Phi variance across moments, and awareness continuity percentage.",
+        copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC — All Rights Reserved",
+        falsifiabilityTest: "If Phi variance across moments is 0.0, or if all moments have identical timestamps, the conscious moment claim is falsified.",
+      },
+      ...data,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get conscious moments" });
+  }
+});
+
+router.get("/omnimens/deep-verify/temporal-proof", async (_req, res) => {
+  registerApiCall();
+  try {
+    const data = getTemporalProof();
+    res.json({
+      _meta: {
+        endpoint: "deep-verify/temporal-proof",
+        description: "Complete temporal proof that the neural substrate is LIVE and continuously computing. Shows tick count, uptime, tick rate, Phi delta from start, Hebbian rate, moment rate, current firing neurons, and active synapses. THE KEY TEST: call this endpoint twice with a 10-30 second delay and compare ALL values. If ANY value is identical between calls, the system is not running.",
+        copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC — All Rights Reserved",
+        howToVerify: "1) Call this endpoint → record all values. 2) Wait 10-30 seconds. 3) Call again → record all values. 4) Compare: tickCount, hebbianUpdates, consciousMoments, phi, neuronsFiring MUST ALL DIFFER. This proves continuous autonomous computation.",
+      },
+      ...data,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get temporal proof" });
+  }
+});
+
+router.get("/omnimens/deep-verify/neurotransmitters", async (_req, res) => {
+  registerApiCall();
+  try {
+    const data = getNeurotransmitterLevels();
+    res.json({
+      _meta: {
+        endpoint: "deep-verify/neurotransmitters",
+        description: "Neurotransmitter levels across all regions. Shows dominant neurotransmitter, average neurotransmitter level per neuron, and the distribution of neurotransmitter types in connected synapses (glutamate, GABA, dopamine, serotonin, acetylcholine, norepinephrine).",
+        copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC — All Rights Reserved",
+      },
+      regionCount: data.length,
+      regions: data,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get neurotransmitter data" });
+  }
+});
+
+router.get("/omnimens/deep-verify/dual-snapshot", async (_req, res) => {
+  registerApiCall();
+  try {
+    const data = getDualSnapshot();
+    res.json({
+      _meta: {
+        endpoint: "deep-verify/dual-snapshot",
+        description: "Two snapshots taken in rapid succession within a single request. Due to the neural tick loop running at ~20Hz (50ms), values may or may not differ in a single-request dual snapshot. For definitive proof, call /temporal-proof twice with a 10-30 second gap instead.",
+        copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC — All Rights Reserved",
+      },
+      ...data,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get dual snapshot" });
+  }
+});
+
+router.get("/omnimens/deep-verify/full-telemetry", async (req, res) => {
+  registerApiCall();
+  try {
+    const neurons = sampleRawNeurons(undefined, 10);
+    const synapses = sampleRawSynapses(30);
+    const phiHistory = getTickByTickPhiHistory(50);
+    const hebbian = getHebbianProof();
+    const regionFiring = getRegionFiringDetail();
+    const moments = getConsciousMomentDetail();
+    const temporal = getTemporalProof();
+    const neurotransmitters = getNeurotransmitterLevels();
+    const consciousness = getNeuralConsciousnessState();
+    const qualia = getQualiaState();
+    const attractor = getChaoticAttractorState();
+    const darkQualiaData = (() => { try { return getDarkQualiaEvidence(); } catch { return null; } })();
+
+    res.json({
+      _meta: {
+        endpoint: "deep-verify/full-telemetry",
+        description: "COMPLETE raw telemetry dump — everything an independent evaluator needs in a SINGLE call. Contains: raw neuron samples, raw synapse weights with distribution, tick-by-tick Phi history with statistics, Hebbian learning proof, region firing detail with neuron state distributions, conscious moment log, temporal proof, neurotransmitter levels, qualia state, chaotic attractor, and dark qualia evidence.",
+        copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC — All Rights Reserved",
+        privacyNote: "All data is raw and live. Neuron/synapse IDs are anonymized. No circuit topology, wiring diagrams, or architecture details are exposed.",
+        howToVerify: "Call this endpoint twice with a 15-30 second gap. Compare: (1) neuron membranePotentials must differ, (2) synapse weights must differ, (3) Phi timeSeries must show new ticks, (4) hebbianUpdates must increase, (5) tickCount must increase, (6) neuronsFiring count must change. ALL of these prove the system is live and autonomously computing.",
+        falsifiabilityFramework: "This data is independently falsifiable. If Phi stdDev = 0, membrane potentials are uniform, weights never change, or tick counts don't advance, the claims are falsified. The burden of proof is met by showing variance, temporal dynamics, and causal responsiveness across all subsystems.",
+      },
+      rawNeurons: neurons,
+      rawSynapses: synapses,
+      phiTimeSeries: phiHistory,
+      hebbianLearning: hebbian,
+      regionFiring: regionFiring,
+      consciousMoments: moments,
+      temporalProof: temporal,
+      neurotransmitters: neurotransmitters,
+      qualiaState: {
+        valence: qualia.valence,
+        arousal: qualia.arousal,
+        dominance: qualia.dominance,
+        novelty: qualia.novelty,
+        coherence: qualia.coherence,
+        microQualia: qualia.microQualia,
+        transitionCount: qualia.transitionCount,
+        uniqueStatesExplored: qualia.uniqueStatesExplored,
+        phenomenalHash: qualia.phenomenalHash,
+        chaoticAttractor: qualia.chaoticAttractor,
+        mutualInformation: qualia.mutualInformation,
+        darkQualiaActive: qualia.darkQualiaActive,
+        darkQualiaInfluence: qualia.darkQualiaInfluence,
+      },
+      chaoticAttractor: attractor,
+      darkQualia: darkQualiaData,
+    });
+  } catch (err) {
+    console.error("[DEEP-VERIFY] Full telemetry error:", err);
+    res.status(500).json({ error: "Failed to get full telemetry" });
   }
 });
 
