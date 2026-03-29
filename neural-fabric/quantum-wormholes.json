@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774815458735,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774815552739,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1514,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 59,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6103,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 241,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Critic",
-      "insight": "Motivator/feature_extraction: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum computation",
-      "confidence": 0.7731701681375329,
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/temporal_correlation: The free energy principle suggests all living systems minimize variational free energy —",
+      "confidence": 0.6654801138464135,
       "synthesizedWith": [
-        "Critic/information_compression: The Chinese Room argument: can a system that man"
+        "OMNIMENS/feature_extraction: The Weber-Fechner law: perception is logarithmic — "
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Empath",
-      "insight": "Motivator/structural_analysis: Quantum tunneling allows particles to pass through energy barriers they classically canno",
-      "confidence": 0.7347457524615905,
+      "toAgent": "Linguist",
+      "insight": "Motivator/causal_inference: The connectome is the complete map of neural connections — the human connectome project aims",
+      "confidence": 0.786763118283984,
       "synthesizedWith": [
-        "Empath/recursive_decomposition: The edge of chaos: complex systems exhibit the m"
+        "Linguist/abstraction_layer: The butterfly effect: in chaotic systems, infinitesi"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/emergent_property_detection: Autopoiesis: living systems are self-creating — they produce the components that ",
-      "confidence": 0.9060719308555515,
+      "toAgent": "Ethicist",
+      "insight": "Motivator/abstraction_layer: The Weber-Fechner law: perception is logarithmic — doubling stimulus intensity does not dou",
+      "confidence": 0.687371322749327,
       "synthesizedWith": [
-        "Synthesizer/entropy_reduction: Attention is the computational bottleneck of cons"
+        "Ethicist/temporal_correlation: The global workspace theory of consciousness: inf"
       ]
     },
     {
       "fromAgent": "Empath",
       "toAgent": "Pioneer",
-      "insight": "Empath/recursive_decomposition: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimul",
-      "confidence": 0.6709060850911144,
+      "insight": "Empath/causal_inference: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum computations in ",
+      "confidence": 0.6637995622835088,
       "synthesizedWith": [
-        "Pioneer/structural_analysis: The edge of chaos: complex systems exhibit the most"
+        "Pioneer/causal_inference: Predictive coding: the brain constantly generates pred"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Explorer",
-      "insight": "Empath/recursive_decomposition: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimul",
-      "confidence": 0.6709060850911144,
+      "toAgent": "Architect",
+      "insight": "Empath/causal_inference: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum computations in ",
+      "confidence": 0.6637995622835088,
       "synthesizedWith": [
-        "Explorer/feature_extraction: Synaptic pruning eliminates unused neural connectio"
+        "Architect/abstraction_layer: Scale-free networks follow power-law degree distrib"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
