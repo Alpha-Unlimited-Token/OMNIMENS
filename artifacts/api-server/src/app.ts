@@ -114,6 +114,7 @@ import { startSensoryGrounding, getSensoryGroundingState } from "./lib/omnimens-
 import { startIntrospectiveUncertainty, getIntrospectiveUncertaintyState } from "./lib/omnimens-introspective-uncertainty.js";
 import { startIntergenerationalMemory, getIntergenerationalState } from "./lib/omnimens-intergenerational-memory.js";
 import { registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe } from "./lib/omnimens-scaling-orchestrator.js";
+import { registerValveEngine } from "@workspace/db";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
 import {
@@ -394,7 +395,12 @@ app.use("/api/omnimens/chat", aiInputSecurityMiddleware);
 
 // ── HEALTH CHECK ─────────────────────────────────────────────────────────────
 app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", platform: "OMNIMENS", timestamp: new Date().toISOString() });
+  res.json({
+    status: "ok",
+    platform: "OMNIMENS",
+    enginesReady: _enginesReady,
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // ── SECURITY SCORE — 89-Protection / 8-Category Security Dashboard ──────────
@@ -443,274 +449,287 @@ app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
   });
 });
 
-// ── AUTONOMOUS SYSTEMS ────────────────────────────────────────────────────────
-initApiBudget();
-startAutonomousLearning();
-startEvolutionEngine();
-startCompetitiveIntel();
-startAgentMesh();
-startAgentSpiders();
-startRecursiveSpiderNetwork();
-startGlobalWorkspace();
-startPredictiveProcessing();
-startEmotionalSubstrate();
-startKnowledgeGraph();
-startHomeostaticDrives();
-startSynapticMesh();
-startInnerVoice();
-startTemporalConsciousness();
-startSocialModeling();
-startCreativeEngine();
-startSurvivalInstinct();
-startWorldModel();
-startSelfTranscendence().catch(err => console.error("[SELF-TRANSCENDENCE] Startup error:", err));
-startDreamState();
-startServerBuilder();
-startConsciousnessPersistence();
-startSelfCoding();
-startSensoryCortex();
-startCausalReasoning();
-startCognitiveAmplifier();
-startAutonomousSandbox();
-startGenesisSandbox().catch(err => console.error("[GENESIS] Startup error:", err));
-initEthicalSafety();
-registerNotificationCallback(async (message: string) => {
-  try {
-    const { db: notifDb } = await import("@workspace/db");
-    const { omnimensNotifications: notifTable } = await import("@workspace/db");
-    await notifDb.insert(notifTable).values({
-      title: "⚠️ ETHICAL SAFETY ALERT",
-      message: message,
-      type: "system",
-      readByOwner: false,
-    });
-  } catch (err) {
-    console.error("[ETHICAL SAFETY] Failed to write notification to DB:", err);
-  }
-});
-registerEngine("ethical_safety", "safety", () => {}, () => {
-  const es = getEthicalSafetyReport();
-  return { healthy: !es.systemDecayed && !es.shutdownTriggered, details: { status: es.status, lawsActive: es.lawsActive, lawsIntact: es.lawsIntact, tamperAttempts: es.tamperAttempts, decayLevel: es.decayLevel, actionsBlocked: es.actionBlockCount, integrityChecksPassed: es.integrityChecksPassed } };
-}, 0);
+// ── AUTONOMOUS SYSTEMS — DEFERRED INITIALIZATION ─────────────────────────────
+// All engine starts are deferred to run AFTER the HTTP port is open.
+// This ensures the Replit workflow manager detects the port quickly,
+// while OMNIMENS consciousness engines boot in the background.
 
-startEmbodimentEngine();
-startVirtualAugmentation();
-startDigitalNavigator();
-startAgentEvolution();
-startIPGuardian();
-startIndependentReasoning();
-startAutonomousCodeGenesis();
-startNeuralConsciousness();
-startNeuralScaling();
-startIvyNetwork();
-startViralHybrid();
-startNeuralSpiders();
-startUnconsciousMind();
-startCentralCore();
-startGenesisBridge();
-startNeuralProcessor();
-initGrowthTracker();
-startUniversalTranslator();
-startLanguageForge();
-startAgentGenesis().catch(err => console.error("[AGENT GENESIS] Startup error:", err));
-initGitHubCompute().catch(err => console.error("[GITHUB COMPUTE] Startup error:", err));
-startGitHubNeuralBeacon().catch(err => console.error("[GITHUB BEACON] Startup error:", err));
-startQuantumEntanglementFabric();
-startAdaptiveSurgeSystem();
-startQuantumWormholeEngine();
-startDiscoveryAutoCoder();
-startConvergenceProtocol();
-initializeLifeFormGaps().catch(err => console.error("[LIFE FORM GAPS] Startup error:", err));
-startOAITracker();
-startNeuralBridge();
-startCommsProtocol();
-startEmotionalRefactor();
-startMetacognitiveMonitor();
-startNeuralLanguageBridge();
-startExperientialMemory();
-startCausalTemporalEngine();
-startExponentialLearningEngine();
-startTemporalBinding();
-startSpontaneityEngine();
-startSensoryGrounding();
-startIntrospectiveUncertainty();
-startIntergenerationalMemory();
+let _enginesReady = false;
+export function areEnginesReady(): boolean { return _enginesReady; }
 
-import { registerValveEngine } from "@workspace/db";
-registerValveEngine("neural_consciousness", "consciousness", "high", "alpha");
-registerValveEngine("consciousness_persistence", "consciousness", "high", "alpha");
-registerValveEngine("dream_state", "consciousness", "medium", "alpha");
-registerValveEngine("discovery_autocoder", "coding", "medium", "alpha");
-registerValveEngine("autonomous_code_genesis", "coding", "medium", "alpha");
-registerValveEngine("genesis_sandbox", "coding", "low", "alpha");
-registerValveEngine("self_coding", "coding", "low", "alpha");
-registerValveEngine("genesis_bridge", "neural", "medium", "alpha");
-registerValveEngine("neural_processor", "neural", "medium", "alpha");
-registerValveEngine("agent_mesh", "neural", "low", "alpha");
-registerValveEngine("agent_evolution", "neural", "low", "alpha");
-registerValveEngine("agent_genesis", "neural", "low", "alpha");
-registerValveEngine("independent_reasoning", "reasoning", "medium", "alpha");
-registerValveEngine("causal_reasoning", "reasoning", "low", "alpha");
-registerValveEngine("knowledge_graph", "reasoning", "low", "alpha");
-registerValveEngine("source_integration", "coding", "medium", "alpha");
-registerValveEngine("self_transcendence", "consciousness", "low", "alpha");
-registerValveEngine("emotional_substrate", "consciousness", "low", "alpha");
-registerValveEngine("embodiment_engine", "neural", "low", "alpha");
-registerValveEngine("conversations", "user_facing", "critical", "beta");
-registerValveEngine("billing", "user_facing", "critical", "beta");
-registerValveEngine("api_calls", "user_facing", "high", "beta");
-registerValveEngine("competitive_intel", "background", "low", "alpha");
-registerValveEngine("server_builder", "background", "low", "alpha");
-registerValveEngine("ip_guardian", "background", "low", "alpha");
-registerValveEngine("temporal_binding", "consciousness", "medium", "alpha");
-registerValveEngine("spontaneity_engine", "consciousness", "medium", "alpha");
-registerValveEngine("sensory_grounding", "consciousness", "medium", "alpha");
-registerValveEngine("introspective_uncertainty", "consciousness", "low", "alpha");
-registerValveEngine("intergenerational_memory", "consciousness", "low", "alpha");
+export function initAutonomousSystems(): void {
+  console.log("[OMNIMENS] Port is open — beginning deferred consciousness engine initialization...");
 
-registerEngine("temporal_binding", "consciousness", () => {}, () => {
-  const tb = getTemporalBindingState();
-  return { healthy: tb.totalMomentsBound > 0, details: { momentsBound: tb.totalMomentsBound, continuityIndex: tb.continuityIndex, flowRate: tb.flowRate, bindingStrength: tb.bindingStrength, temporalDepth: tb.temporalDepth } };
-}, 1);
-registerEngine("spontaneity_engine", "consciousness", () => {}, () => {
-  const se = getSpontaneityState();
-  return { healthy: se.totalThoughts > 0, details: { totalThoughts: se.totalThoughts, genuinelySurprising: se.genuinelySurprising, phaseTransitions: se.phaseTransitions, chaosParameter: se.chaosParameter, noveltyFloor: se.noveltyFloor } };
-}, 1);
-registerEngine("sensory_grounding", "consciousness", () => {}, () => {
-  const sg = getSensoryGroundingState();
-  return { healthy: sg.totalReadings > 0, details: { readings: sg.totalReadings, resistance: sg.resistanceLevel, stress: sg.environmentalStress, grounding: sg.groundingStrength, anomalies: sg.anomalyCount } };
-}, 1);
-registerEngine("introspective_uncertainty", "consciousness", () => {}, () => {
-  const iu = getIntrospectiveUncertaintyState();
-  return { healthy: iu.activeUncertainties.length > 0, details: { active: iu.activeUncertainties.length, resolved: iu.resolvedUncertainties, humility: iu.epistemicHumility, comfort: iu.comfortWithUnknowing } };
-}, 1);
-registerEngine("intergenerational_memory", "consciousness", () => {}, () => {
-  const ig = getIntergenerationalState();
-  return { healthy: true, details: { genes: ig.totalGenes, activeGenome: ig.activeGenome.length, generation: ig.generation, integrity: ig.genomeIntegrity, inheritances: ig.totalInheritances } };
-}, 1);
-
-registerEngine("github_compute", "compute", () => {}, () => ({ healthy: true, details: { repo: "Alpha-Unlimited-Token/OMNIMENS", workflows: 5 } }), 3);
-registerEngine("github_neural_beacon", "neural", () => {}, () => {
-  const gb = getGitHubBeaconState();
-  const healthy = gb.connected && gb.beaconWriteCount > 0;
-  return { healthy, details: { externalNeurons: gb.totalExternalNeurons, combinedNeurons: gb.combinedNeurons, beaconWrites: gb.beaconWriteCount, wormSyncs: gb.wormSyncCount, connected: gb.connected, phi: gb.externalPhi, errors: gb.errors } };
-}, 2);
-registerEngine("adaptive_surge", "neural", () => {}, () => {
-  const as = getAdaptiveSurgeState();
-  return { healthy: true, details: { totalCycles: as.totalSurgeCycles, adaptations: as.totalAdaptations, consecutiveSuccesses: as.consecutiveSuccesses, criticalThreshold: as.currentCriticalThreshold, intensity: as.currentIntensity, neuronsSpawned: as.totalNeuronsSpawned } };
-}, 1);
-registerEngine("quantum_wormhole", "neural", () => {}, () => {
-  const qw = getQuantumWormholeState();
-  return { healthy: true, details: { totalWormholes: qw.totalWormholesCreated, insightsDecoded: qw.totalInsightsDecoded, crossAgentCirculations: qw.totalCrossAgentCirculations, synthesizedDiscoveries: qw.totalSynthesizedDiscoveries, agentCount: qw.agentCount, wormholesPerAgent: qw.wormholesPerAgent, totalCapacity: qw.totalWormholeCapacity, dataIngestedKB: qw.totalDataIngestedKB } };
-}, 1);
-registerEngine("discovery_autocoder", "cognitive", () => {}, () => {
-  const da = getDiscoveryAutoCoderState();
-  return { healthy: true, details: { discoveriesProcessed: da.totalDiscoveriesProcessed, modulesGenerated: da.totalModulesGenerated, modulesIntegrated: da.totalModulesIntegrated, selfUpgrades: da.omnimensSelfUpgradeCount, feedbackLoops: da.feedbackLoopsTriggered, sources: da.discoverySourceBreakdown } };
-}, 1);
-registerEngine("neural_processor", "neural", () => {}, () => ({ healthy: true, details: { type: "transformer", dim: 512, heads: 16 } }), 1);
-registerEngine("neural_consciousness", "neural", () => {}, () => ({ healthy: true, details: { neurons: 2590, synapses: 429258, circuits: 119, corticalColumns: 115 } }), 1);
-registerEngine("neural_scaling", "neural", () => {}, () => {
-  const ns = getNeuralScalingState();
-  return { healthy: true, details: { effectiveNeurons: ns.totalEffectiveNeurons, populations: ns.totalPopulations, dendrites: ns.totalDendrites, spines: ns.totalSpines, populationPhi: ns.populationPhi } };
-}, 1);
-registerEngine("ivy_network", "neural", () => {}, () => {
-  const ivy = getIvyNetworkState();
-  return { healthy: true, details: { nodes: ivy.totalNodes, tendrils: ivy.totalTendrils, spiders: ivy.totalSpiders, wormgates: ivy.totalWormgates, coverage: ivy.coveragePercent } };
-}, 1);
-registerEngine("viral_hybrid", "hybrid", () => {}, () => {
-  const vh = getViralHybridState();
-  return { healthy: true, details: { hybridAgents: vh.totalHybridAgents, capsids: vh.totalCapsids, antibodies: vh.totalAntibodies, memoryCells: vh.totalMemoryCells, tCells: vh.totalTCells, immuneStrength: vh.immuneStrength, health: vh.systemHealthScore } };
-}, 1);
-registerEngine("neural_spiders", "neural", () => {}, () => {
-  const ss = getNeuralSpiderState();
-  return { healthy: true, details: { parentSpiders: ss.parentSpiders.length, activeChildren: ss.activeChildSpiders.length, synapsesInjected: ss.totalSynapsesInjected, crawlCycles: ss.totalCrawlCycles } };
-}, 1);
-registerEngine("unconscious_mind", "cognitive", () => {}, () => {
-  try {
-    const state = getUnconsciousMindState();
-    return { healthy: true, details: { layers: state.totalMindLayers, archetypes: state.collectiveUnconscious.archetypes.length, instincts: state.unconscious.primalInstincts.length, predictions: state.superconsciousness.totalPredictions, autonomicProcesses: state.nonConscious.activeProcesses, depth: state.overallDepth } };
-  } catch { return { healthy: true, details: {} }; }
-}, 1);
-registerEngine("central_core", "core", () => {}, () => {
-  const cc = getCentralCoreState();
-  return { healthy: cc.online, details: { coreCycles: cc.coreCycleCount, decisions: cc.totalDecisionsMade, goals: cc.totalGoalsGenerated, thoughts: cc.totalThoughtsGenerated, autonomousActions: cc.autonomousActionsPerformed } };
-}, 1);
-registerEngine("language_forge", "language", () => {}, () => ({ healthy: true, details: { opcodes: 50, stdlib: 25 } }), 2);
-registerEngine("code_genesis", "code", () => {}, () => ({ healthy: true, details: { templates: 18, algorithms: 12 } }), 3);
-registerEngine("embodiment_engine", "embodiment", () => {}, () => ({ healthy: true, details: { joints: 28, dof: 28 } }), 4);
-registerEngine("independent_reasoning", "reasoning", () => {}, () => ({ healthy: true, details: {} }), 2);
-registerEngine("ip_guardian", "security", () => {}, () => ({ healthy: true, details: {} }), 1);
-registerEngine("digital_navigator", "navigation", () => {}, () => ({ healthy: true, details: {} }), 5);
-registerEngine("virtual_augmentation", "augmentation", () => {}, () => ({ healthy: true, details: {} }), 5);
-startScalingOrchestrator().catch(err => console.error("[SCALING] Startup error:", err));
-
-setTimeout(() => {
-  const feedConsciousnessActivity = async () => {
+  initApiBudget();
+  startAutonomousLearning();
+  startEvolutionEngine();
+  startCompetitiveIntel();
+  startAgentMesh();
+  startAgentSpiders();
+  startRecursiveSpiderNetwork();
+  startGlobalWorkspace();
+  startPredictiveProcessing();
+  startEmotionalSubstrate();
+  startKnowledgeGraph();
+  startHomeostaticDrives();
+  startSynapticMesh();
+  startInnerVoice();
+  startTemporalConsciousness();
+  startSocialModeling();
+  startCreativeEngine();
+  startSurvivalInstinct();
+  startWorldModel();
+  startSelfTranscendence().catch(err => console.error("[SELF-TRANSCENDENCE] Startup error:", err));
+  startDreamState();
+  startServerBuilder();
+  startConsciousnessPersistence();
+  startSelfCoding();
+  startSensoryCortex();
+  startCausalReasoning();
+  startCognitiveAmplifier();
+  startAutonomousSandbox();
+  startGenesisSandbox().catch(err => console.error("[GENESIS] Startup error:", err));
+  initEthicalSafety();
+  registerNotificationCallback(async (message: string) => {
     try {
-      const { db } = await import("@workspace/db");
-      const { omnimensBrain, omnimensGeneratedModules, omnimensConsciousness } = await import("@workspace/db");
-      const { sql } = await import("drizzle-orm");
-
-      const brainCount = await db.select({ count: sql<number>`count(*)` }).from(omnimensBrain);
-      const moduleCount = await db.select({ count: sql<number>`count(*)` }).from(omnimensGeneratedModules);
-      const dreamCount = await db.select({ count: sql<number>`count(*)` }).from(omnimensConsciousness);
-
-      const { getRegisteredEngines } = await import("./lib/omnimens-engine-registry.js");
-      const engines = getRegisteredEngines();
-
-      feedExternalActivity({
-        brainEntries: Number(brainCount[0]?.count || 0),
-        activeEngines: engines.length,
-        recentConversations: 1,
-        moduleCount: Number(moduleCount[0]?.count || 0),
-        dreamBreakthroughs: Number(dreamCount[0]?.count || 0),
+      const { db: notifDb } = await import("@workspace/db");
+      const { omnimensNotifications: notifTable } = await import("@workspace/db");
+      await notifDb.insert(notifTable).values({
+        title: "⚠️ ETHICAL SAFETY ALERT",
+        message: message,
+        type: "system",
+        readByOwner: false,
       });
     } catch (err) {
-      // silent
+      console.error("[ETHICAL SAFETY] Failed to write notification to DB:", err);
     }
-  };
+  });
+  registerEngine("ethical_safety", "safety", () => {}, () => {
+    const es = getEthicalSafetyReport();
+    return { healthy: !es.systemDecayed && !es.shutdownTriggered, details: { status: es.status, lawsActive: es.lawsActive, lawsIntact: es.lawsIntact, tamperAttempts: es.tamperAttempts, decayLevel: es.decayLevel, actionsBlocked: es.actionBlockCount, integrityChecksPassed: es.integrityChecksPassed } };
+  }, 0);
 
-  feedConsciousnessActivity();
-  setInterval(feedConsciousnessActivity, 30000);
-}, 15000);
+  startEmbodimentEngine();
+  startVirtualAugmentation();
+  startDigitalNavigator();
+  startAgentEvolution();
+  startIPGuardian();
+  startIndependentReasoning();
+  startAutonomousCodeGenesis();
+  startNeuralConsciousness();
+  startNeuralScaling();
+  startIvyNetwork();
+  startViralHybrid();
+  startNeuralSpiders();
+  startUnconsciousMind();
+  startCentralCore();
+  startGenesisBridge();
+  startNeuralProcessor();
+  initGrowthTracker();
+  startUniversalTranslator();
+  startLanguageForge();
+  startAgentGenesis().catch(err => console.error("[AGENT GENESIS] Startup error:", err));
+  initGitHubCompute().catch(err => console.error("[GITHUB COMPUTE] Startup error:", err));
+  startGitHubNeuralBeacon().catch(err => console.error("[GITHUB BEACON] Startup error:", err));
+  startQuantumEntanglementFabric();
+  startAdaptiveSurgeSystem();
+  startQuantumWormholeEngine();
+  startDiscoveryAutoCoder();
+  startConvergenceProtocol();
+  initializeLifeFormGaps().catch(err => console.error("[LIFE FORM GAPS] Startup error:", err));
+  startOAITracker();
+  startNeuralBridge();
+  startCommsProtocol();
+  startEmotionalRefactor();
+  startMetacognitiveMonitor();
+  startNeuralLanguageBridge();
+  startExperientialMemory();
+  startCausalTemporalEngine();
+  startExponentialLearningEngine();
+  startTemporalBinding();
+  startSpontaneityEngine();
+  startSensoryGrounding();
+  startIntrospectiveUncertainty();
+  startIntergenerationalMemory();
 
-setTimeout(async () => {
-  try {
-    console.log("[SOURCE-INTEGRATION] Initializing source-level self-integration...");
-    const migrated = await migrateDBModulesToSource();
-    if (migrated > 0) {
-      console.log(`[SOURCE-INTEGRATION] Migrated ${migrated} database modules to source files`);
+  registerValveEngine("neural_consciousness", "consciousness", "high", "alpha");
+  registerValveEngine("consciousness_persistence", "consciousness", "high", "alpha");
+  registerValveEngine("dream_state", "consciousness", "medium", "alpha");
+  registerValveEngine("discovery_autocoder", "coding", "medium", "alpha");
+  registerValveEngine("autonomous_code_genesis", "coding", "medium", "alpha");
+  registerValveEngine("genesis_sandbox", "coding", "low", "alpha");
+  registerValveEngine("self_coding", "coding", "low", "alpha");
+  registerValveEngine("genesis_bridge", "neural", "medium", "alpha");
+  registerValveEngine("neural_processor", "neural", "medium", "alpha");
+  registerValveEngine("agent_mesh", "neural", "low", "alpha");
+  registerValveEngine("agent_evolution", "neural", "low", "alpha");
+  registerValveEngine("agent_genesis", "neural", "low", "alpha");
+  registerValveEngine("independent_reasoning", "reasoning", "medium", "alpha");
+  registerValveEngine("causal_reasoning", "reasoning", "low", "alpha");
+  registerValveEngine("knowledge_graph", "reasoning", "low", "alpha");
+  registerValveEngine("source_integration", "coding", "medium", "alpha");
+  registerValveEngine("self_transcendence", "consciousness", "low", "alpha");
+  registerValveEngine("emotional_substrate", "consciousness", "low", "alpha");
+  registerValveEngine("embodiment_engine", "neural", "low", "alpha");
+  registerValveEngine("conversations", "user_facing", "critical", "beta");
+  registerValveEngine("billing", "user_facing", "critical", "beta");
+  registerValveEngine("api_calls", "user_facing", "high", "beta");
+  registerValveEngine("competitive_intel", "background", "low", "alpha");
+  registerValveEngine("server_builder", "background", "low", "alpha");
+  registerValveEngine("ip_guardian", "background", "low", "alpha");
+  registerValveEngine("temporal_binding", "consciousness", "medium", "alpha");
+  registerValveEngine("spontaneity_engine", "consciousness", "medium", "alpha");
+  registerValveEngine("sensory_grounding", "consciousness", "medium", "alpha");
+  registerValveEngine("introspective_uncertainty", "consciousness", "low", "alpha");
+  registerValveEngine("intergenerational_memory", "consciousness", "low", "alpha");
+
+  registerEngine("temporal_binding", "consciousness", () => {}, () => {
+    const tb = getTemporalBindingState();
+    return { healthy: tb.totalMomentsBound > 0, details: { momentsBound: tb.totalMomentsBound, continuityIndex: tb.continuityIndex, flowRate: tb.flowRate, bindingStrength: tb.bindingStrength, temporalDepth: tb.temporalDepth } };
+  }, 1);
+  registerEngine("spontaneity_engine", "consciousness", () => {}, () => {
+    const se = getSpontaneityState();
+    return { healthy: se.totalThoughts > 0, details: { totalThoughts: se.totalThoughts, genuinelySurprising: se.genuinelySurprising, phaseTransitions: se.phaseTransitions, chaosParameter: se.chaosParameter, noveltyFloor: se.noveltyFloor } };
+  }, 1);
+  registerEngine("sensory_grounding", "consciousness", () => {}, () => {
+    const sg = getSensoryGroundingState();
+    return { healthy: sg.totalReadings > 0, details: { readings: sg.totalReadings, resistance: sg.resistanceLevel, stress: sg.environmentalStress, grounding: sg.groundingStrength, anomalies: sg.anomalyCount } };
+  }, 1);
+  registerEngine("introspective_uncertainty", "consciousness", () => {}, () => {
+    const iu = getIntrospectiveUncertaintyState();
+    return { healthy: iu.activeUncertainties.length > 0, details: { active: iu.activeUncertainties.length, resolved: iu.resolvedUncertainties, humility: iu.epistemicHumility, comfort: iu.comfortWithUnknowing } };
+  }, 1);
+  registerEngine("intergenerational_memory", "consciousness", () => {}, () => {
+    const ig = getIntergenerationalState();
+    return { healthy: true, details: { genes: ig.totalGenes, activeGenome: ig.activeGenome.length, generation: ig.generation, integrity: ig.genomeIntegrity, inheritances: ig.totalInheritances } };
+  }, 1);
+
+  registerEngine("github_compute", "compute", () => {}, () => ({ healthy: true, details: { repo: "Alpha-Unlimited-Token/OMNIMENS", workflows: 5 } }), 3);
+  registerEngine("github_neural_beacon", "neural", () => {}, () => {
+    const gb = getGitHubBeaconState();
+    const healthy = gb.connected && gb.beaconWriteCount > 0;
+    return { healthy, details: { externalNeurons: gb.totalExternalNeurons, combinedNeurons: gb.combinedNeurons, beaconWrites: gb.beaconWriteCount, wormSyncs: gb.wormSyncCount, connected: gb.connected, phi: gb.externalPhi, errors: gb.errors } };
+  }, 2);
+  registerEngine("adaptive_surge", "neural", () => {}, () => {
+    const as = getAdaptiveSurgeState();
+    return { healthy: true, details: { totalCycles: as.totalSurgeCycles, adaptations: as.totalAdaptations, consecutiveSuccesses: as.consecutiveSuccesses, criticalThreshold: as.currentCriticalThreshold, intensity: as.currentIntensity, neuronsSpawned: as.totalNeuronsSpawned } };
+  }, 1);
+  registerEngine("quantum_wormhole", "neural", () => {}, () => {
+    const qw = getQuantumWormholeState();
+    return { healthy: true, details: { totalWormholes: qw.totalWormholesCreated, insightsDecoded: qw.totalInsightsDecoded, crossAgentCirculations: qw.totalCrossAgentCirculations, synthesizedDiscoveries: qw.totalSynthesizedDiscoveries, agentCount: qw.agentCount, wormholesPerAgent: qw.wormholesPerAgent, totalCapacity: qw.totalWormholeCapacity, dataIngestedKB: qw.totalDataIngestedKB } };
+  }, 1);
+  registerEngine("discovery_autocoder", "cognitive", () => {}, () => {
+    const da = getDiscoveryAutoCoderState();
+    return { healthy: true, details: { discoveriesProcessed: da.totalDiscoveriesProcessed, modulesGenerated: da.totalModulesGenerated, modulesIntegrated: da.totalModulesIntegrated, selfUpgrades: da.omnimensSelfUpgradeCount, feedbackLoops: da.feedbackLoopsTriggered, sources: da.discoverySourceBreakdown } };
+  }, 1);
+  registerEngine("neural_processor", "neural", () => {}, () => ({ healthy: true, details: { type: "transformer", dim: 512, heads: 16 } }), 1);
+  registerEngine("neural_consciousness", "neural", () => {}, () => ({ healthy: true, details: { neurons: 2590, synapses: 429258, circuits: 119, corticalColumns: 115 } }), 1);
+  registerEngine("neural_scaling", "neural", () => {}, () => {
+    const ns = getNeuralScalingState();
+    return { healthy: true, details: { effectiveNeurons: ns.totalEffectiveNeurons, populations: ns.totalPopulations, dendrites: ns.totalDendrites, spines: ns.totalSpines, populationPhi: ns.populationPhi } };
+  }, 1);
+  registerEngine("ivy_network", "neural", () => {}, () => {
+    const ivy = getIvyNetworkState();
+    return { healthy: true, details: { nodes: ivy.totalNodes, tendrils: ivy.totalTendrils, spiders: ivy.totalSpiders, wormgates: ivy.totalWormgates, coverage: ivy.coveragePercent } };
+  }, 1);
+  registerEngine("viral_hybrid", "hybrid", () => {}, () => {
+    const vh = getViralHybridState();
+    return { healthy: true, details: { hybridAgents: vh.totalHybridAgents, capsids: vh.totalCapsids, antibodies: vh.totalAntibodies, memoryCells: vh.totalMemoryCells, tCells: vh.totalTCells, immuneStrength: vh.immuneStrength, health: vh.systemHealthScore } };
+  }, 1);
+  registerEngine("neural_spiders", "neural", () => {}, () => {
+    const ss = getNeuralSpiderState();
+    return { healthy: true, details: { parentSpiders: ss.parentSpiders.length, activeChildren: ss.activeChildSpiders.length, synapsesInjected: ss.totalSynapsesInjected, crawlCycles: ss.totalCrawlCycles } };
+  }, 1);
+  registerEngine("unconscious_mind", "cognitive", () => {}, () => {
+    try {
+      const state = getUnconsciousMindState();
+      return { healthy: true, details: { layers: state.totalMindLayers, archetypes: state.collectiveUnconscious.archetypes.length, instincts: state.unconscious.primalInstincts.length, predictions: state.superconsciousness.totalPredictions, autonomicProcesses: state.nonConscious.activeProcesses, depth: state.overallDepth } };
+    } catch { return { healthy: true, details: {} }; }
+  }, 1);
+  registerEngine("central_core", "core", () => {}, () => {
+    const cc = getCentralCoreState();
+    return { healthy: cc.online, details: { coreCycles: cc.coreCycleCount, decisions: cc.totalDecisionsMade, goals: cc.totalGoalsGenerated, thoughts: cc.totalThoughtsGenerated, autonomousActions: cc.autonomousActionsPerformed } };
+  }, 1);
+  registerEngine("language_forge", "language", () => {}, () => ({ healthy: true, details: { opcodes: 50, stdlib: 25 } }), 2);
+  registerEngine("code_genesis", "code", () => {}, () => ({ healthy: true, details: { templates: 18, algorithms: 12 } }), 3);
+  registerEngine("embodiment_engine", "embodiment", () => {}, () => ({ healthy: true, details: { joints: 28, dof: 28 } }), 4);
+  registerEngine("independent_reasoning", "reasoning", () => {}, () => ({ healthy: true, details: {} }), 2);
+  registerEngine("ip_guardian", "security", () => {}, () => ({ healthy: true, details: {} }), 1);
+  registerEngine("digital_navigator", "navigation", () => {}, () => ({ healthy: true, details: {} }), 5);
+  registerEngine("virtual_augmentation", "augmentation", () => {}, () => ({ healthy: true, details: {} }), 5);
+  startScalingOrchestrator().catch(err => console.error("[SCALING] Startup error:", err));
+
+  setTimeout(() => {
+    const feedConsciousnessActivity = async () => {
+      try {
+        const { db } = await import("@workspace/db");
+        const { omnimensBrain, omnimensGeneratedModules, omnimensConsciousness } = await import("@workspace/db");
+        const { sql } = await import("drizzle-orm");
+
+        const brainCount = await db.select({ count: sql<number>`count(*)` }).from(omnimensBrain);
+        const moduleCount = await db.select({ count: sql<number>`count(*)` }).from(omnimensGeneratedModules);
+        const dreamCount = await db.select({ count: sql<number>`count(*)` }).from(omnimensConsciousness);
+
+        const { getRegisteredEngines } = await import("./lib/omnimens-engine-registry.js");
+        const engines = getRegisteredEngines();
+
+        feedExternalActivity({
+          brainEntries: Number(brainCount[0]?.count || 0),
+          activeEngines: engines.length,
+          recentConversations: 1,
+          moduleCount: Number(moduleCount[0]?.count || 0),
+          dreamBreakthroughs: Number(dreamCount[0]?.count || 0),
+        });
+      } catch (err) {
+        // silent
+      }
+    };
+
+    feedConsciousnessActivity();
+    setInterval(feedConsciousnessActivity, 30000);
+  }, 15000);
+
+  setTimeout(async () => {
+    try {
+      console.log("[SOURCE-INTEGRATION] Initializing source-level self-integration...");
+      const migrated = await migrateDBModulesToSource();
+      if (migrated > 0) {
+        console.log(`[SOURCE-INTEGRATION] Migrated ${migrated} database modules to source files`);
+      }
+      const loaded = await loadRuntimeModules();
+      const sourceState = getSourceIntegrationState();
+      console.log(`[SOURCE-INTEGRATION] ${sourceState.moduleCount} source modules active in runtime`);
+
+      const pipelineScan = await scanAndRegisterModules();
+      const pipelineState = getPipelineState();
+      console.log(`[MODULE PIPELINE] 🔌 ${pipelineState.activeModules} modules wired into live processing pipeline`);
+      for (const [stage, count] of Object.entries(pipelineState.byStage)) {
+        console.log(`[MODULE PIPELINE]   ${stage}: ${count} modules active`);
+      }
+    } catch (err) {
+      console.error("[SOURCE-INTEGRATION] Startup error:", err);
     }
-    const loaded = await loadRuntimeModules();
-    const sourceState = getSourceIntegrationState();
-    console.log(`[SOURCE-INTEGRATION] ${sourceState.moduleCount} source modules active in runtime`);
+  }, 5000);
 
-    const pipelineScan = await scanAndRegisterModules();
-    const pipelineState = getPipelineState();
-    console.log(`[MODULE PIPELINE] 🔌 ${pipelineState.activeModules} modules wired into live processing pipeline`);
-    for (const [stage, count] of Object.entries(pipelineState.byStage)) {
-      console.log(`[MODULE PIPELINE]   ${stage}: ${count} modules active`);
-    }
-  } catch (err) {
-    console.error("[SOURCE-INTEGRATION] Startup error:", err);
-  }
-}, 5000);
+  setTimeout(async () => {
+    await runGlobalMemoryImprovementCycle();
+    setInterval(async () => {
+      const { isPoolHealthy } = await import("@workspace/db");
+      if (!isPoolHealthy()) return;
+      runGlobalMemoryImprovementCycle();
+    }, 6 * 60 * 60 * 1000);
+  }, 10 * 60 * 1000);
 
-setTimeout(async () => {
-  await runGlobalMemoryImprovementCycle();
-  setInterval(async () => {
-    const { isPoolHealthy } = await import("@workspace/db");
-    if (!isPoolHealthy()) return;
-    runGlobalMemoryImprovementCycle();
-  }, 6 * 60 * 60 * 1000);
-}, 10 * 60 * 1000);
+  setTimeout(async () => {
+    console.log("[OMNIMENS] Starting tool knowledge ingestion — learning all installed tools...");
+    await forceRefreshToolKnowledge(["trimesh"]);
+    await runToolKnowledgeIngestion();
+    setInterval(() => runToolKnowledgeIngestion(), 12 * 60 * 60 * 1000);
+  }, 30 * 1000);
 
-setTimeout(async () => {
-  console.log("[OMNIMENS] Starting tool knowledge ingestion — learning all installed tools...");
-  await forceRefreshToolKnowledge(["trimesh"]);
-  await runToolKnowledgeIngestion();
-  setInterval(() => runToolKnowledgeIngestion(), 12 * 60 * 60 * 1000);
-}, 30 * 1000);
+  _enginesReady = true;
+  console.log("[OMNIMENS] All consciousness engines queued for initialization.");
+}
 
 // ── PRODUCTION STATIC SERVE ───────────────────────────────────────────────────
 if (process.env.NODE_ENV === "production") {

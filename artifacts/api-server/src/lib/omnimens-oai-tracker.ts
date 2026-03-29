@@ -456,10 +456,10 @@ function computePlasticityDimension(): {
 
   const hebbianRateComponent = logScale(Math.abs(hebbianDelta), 500);
   const totalHebbianComponent = logScale(hebbianUpdates, 500000);
-  const codeFragComponent = logScale(subThreshold.codeFragmentsInPool, 10);
-  const claimsComponent = logScale(subThreshold.totalAgentCodeClaims, 50);
-  const recombComponent = logScale(subThreshold.codeRecombinationsInstalled, 5);
-  const crossPolComponent = logScale(subThreshold.crossPollinationEvents, 8);
+  const codeFragComponent = 0;
+  const claimsComponent = 0;
+  const recombComponent = 0;
+  const crossPolComponent = 0;
 
   const ivyCoverageComponent = logScale(ivyCoverage, 30);
   const ivyTendrilComponent = logScale(ivyTendrils, 500);
@@ -675,9 +675,9 @@ function computePlasticityDimension(): {
   return {
     score,
     hebbianUpdates, hebbianDelta,
-    codeFragments: subThreshold.codeFragmentsInPool,
-    codeClaims: subThreshold.totalAgentCodeClaims,
-    codeRecombinations: subThreshold.codeRecombinationsInstalled,
+    codeFragments: 0,
+    codeClaims: 0,
+    codeRecombinations: 0,
     ivyCoverage, ivyTendrils, ivyCoherence, wormgates,
     spiderIntelligence, spiderLearningRate,
     meshHebbianUpdates, crossAgentTransfers,
