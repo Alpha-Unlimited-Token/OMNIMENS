@@ -2,137 +2,135 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774818868576,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774818964075,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1538,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 61,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6167,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 240,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Mathematician",
-      "insight": "Motivator/feature_extraction: Kolmogorov complexity measures the shortest program that produces a given output — it is u",
-      "confidence": 0.8328983233727453,
+      "toAgent": "Critic",
+      "insight": "Motivator/cross_domain_synthesis: The Weber-Fechner law: perception is logarithmic — doubling stimulus intensity does no",
+      "confidence": 0.6034720586865496,
+      "synthesizedWith": []
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Meta-Agent",
+      "insight": "Motivator/cross_domain_synthesis: The Weber-Fechner law: perception is logarithmic — doubling stimulus intensity does no",
+      "confidence": 0.6034720586865496,
       "synthesizedWith": [
-        "Mathematician/emergent_property_detection: The cerebellum contains more neurons "
+        "Meta-Agent/cross_domain_synthesis: Predictive coding: the brain constantly gener"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/recursive_decomposition: Neuroplasticity allows the brain to reorganize itself by forming new neural connectio",
-      "confidence": 0.7990520583124378,
+      "toAgent": "SpellCheckVisual",
+      "insight": "Motivator/emergent_property_detection: The holographic principle suggests all information in a volume of space can be en",
+      "confidence": 0.7162140789119598,
       "synthesizedWith": [
-        "OMNIMENS/recursive_decomposition: The default mode network activates when the br"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Innovator",
-      "insight": "Motivator/recursive_decomposition: Neuroplasticity allows the brain to reorganize itself by forming new neural connectio",
-      "confidence": 0.7990520583124378,
-      "synthesizedWith": [
-        "Innovator/analogical_mapping: The strange loop concept from Hofstadter: consciou"
+        "SpellCheckVisual/emergent_property_detection: DNA stores information at approxim"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Wordsmith",
-      "insight": "Empath/emergent_property_detection: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOV",
-      "confidence": 0.7974084121895206,
+      "toAgent": "Meta-Agent",
+      "insight": "Empath/temporal_correlation: The double-slit experiment demonstrates that observation changes the behavior of quantum sy",
+      "confidence": 0.7327378278488456,
       "synthesizedWith": [
-        "Wordsmith/analogical_mapping: The double-slit experiment demonstrates that obser"
+        "Meta-Agent/recursive_decomposition: Attention is the computational bottleneck of"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Visionary",
-      "insight": "Empath/emergent_property_detection: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOV",
-      "confidence": 0.7974084121895206,
+      "toAgent": "Archivist",
+      "insight": "Empath/temporal_correlation: The double-slit experiment demonstrates that observation changes the behavior of quantum sy",
+      "confidence": 0.7327378278488456,
       "synthesizedWith": [
-        "Visionary/emergent_property_detection: The binding problem: how does the brain c"
+        "Archivist/information_compression: Quantum tunneling allows particles to pass th"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
