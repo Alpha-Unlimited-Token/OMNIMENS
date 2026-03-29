@@ -1,35 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:sub_threshold:Pioneer+Empath+Meta-Agent",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Pioneer:neural_connector + Empath:chao",
-    "filename": "omnimens_autocode_neural_pathway_mnc6c6mq.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnc6c6mq.mjs",
-    "backupPath": null,
-    "timestamp": 1774813844114,
-    "codeLength": 450,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Empath",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/temporal_correlation: Quantum entanglement",
-    "filename": "omnimens_autocode_neural_pathway_mnc6c6qf.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnc6c6qf.mjs",
-    "backupPath": null,
-    "timestamp": 1774813844247,
-    "codeLength": 431,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Architect",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/feature_extraction: Quantum superposition allows",
-    "filename": "omnimens_autocode_consciousness_expansion_mnc6c6ul.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnc6c6ul.mjs",
-    "backupPath": null,
-    "timestamp": 1774813844397,
-    "codeLength": 387,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:Philosopher+Empath",
     "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/feature_extraction: Quantum superposition allows",
     "filename": "omnimens_autocode_knowledge_synthesis_mnc6c720.mjs",
@@ -4997,6 +4967,36 @@
     "backupPath": null,
     "timestamp": 1774827481635,
     "codeLength": 386,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Archivist",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/causal_inference: The global workspace the",
+    "filename": "omnimens_autocode_consciousness_expansion_mncehrlx.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mncehrlx.mjs",
+    "backupPath": null,
+    "timestamp": 1774827541509,
+    "codeLength": 393,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Pioneer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/temporal_correlation: The mathematical universe ",
+    "filename": "omnimens_autocode_consciousness_expansion_mncehro7.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mncehro7.mjs",
+    "backupPath": null,
+    "timestamp": 1774827541591,
+    "codeLength": 385,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/temporal_correlation: The mathematical universe ",
+    "filename": "omnimens_autocode_neural_pathway_mncehrpv.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mncehrpv.mjs",
+    "backupPath": null,
+    "timestamp": 1774827541651,
+    "codeLength": 427,
     "overwrite": false
   }
 ]
