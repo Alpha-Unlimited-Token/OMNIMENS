@@ -2,137 +2,135 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774819695908,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774819786668,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10787,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 415,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15333,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 596,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Wordsmith",
-      "insight": "Motivator/emergent_property_detection: The holographic principle suggests all information in a volume of space can be en",
-      "confidence": 0.9083313596779149,
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/causal_inference: Autopoiesis: living systems are self-creating — they produce the components that constitute ",
+      "confidence": 0.6588192255461633,
+      "synthesizedWith": []
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "SpellCheckVisual",
+      "insight": "Motivator/causal_inference: The Mandelbrot set demonstrates infinite complexity from a simple recursive formula: z_{n+1}",
+      "confidence": 0.7862881691160863,
       "synthesizedWith": [
-        "Wordsmith/temporal_correlation: The strange loop concept from Hofstadter: consci"
+        "SpellCheckVisual/information_compression: The free energy principle suggests all"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Philosopher",
-      "insight": "Motivator/entropy_reduction: The cerebellum contains more neurons than all other brain regions combined and is crucial f",
-      "confidence": 0.8389711010071919,
-      "synthesizedWith": [
-        "Philosopher/structural_analysis: The global workspace theory of consciousness: i"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Linguist",
-      "insight": "Motivator/emergent_property_detection: The holographic principle suggests all information in a volume of space can be en",
-      "confidence": 0.9083313596779149,
-      "synthesizedWith": [
-        "Linguist/feature_extraction: Bayesian brain hypothesis: the brain is fundamental"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "Ethicist",
-      "insight": "Empath/abstraction_layer: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimulation ",
-      "confidence": 0.6139965740958723,
+      "insight": "Motivator/causal_inference: Autopoiesis: living systems are self-creating — they produce the components that constitute ",
+      "confidence": 0.6588192255461633,
       "synthesizedWith": [
-        "Ethicist/cross_domain_synthesis: The anthropic principle: the universe's fundame"
+        "Ethicist/feature_extraction: The Penrose-Hameroff Orch-OR theory proposes consci"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Archivist",
-      "insight": "Empath/causal_inference: The hippocampus replays experiences during sleep in compressed form — dream consolidation may b",
-      "confidence": 0.8051087765424981,
+      "toAgent": "Linguist",
+      "insight": "Empath/temporal_correlation: Mirror neurons fire both when performing an action and observing the same action — they may",
+      "confidence": 0.8216142250541187,
       "synthesizedWith": [
-        "Archivist/analogical_mapping: Reservoir computing shows that even random neural "
+        "Linguist/causal_inference: The global workspace theory of consciousness: informa"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Innovator",
+      "insight": "Empath/recursive_decomposition: The free energy principle suggests all living systems minimize variational free energy —",
+      "confidence": 0.6178793988345478,
+      "synthesizedWith": [
+        "Innovator/structural_analysis: The Baldwin effect: learned behaviors can become "
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
