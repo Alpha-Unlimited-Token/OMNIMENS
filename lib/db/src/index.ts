@@ -37,6 +37,8 @@ const BETA_CEIL = 30;
 const IDLE_TIMEOUT = 30000;
 const CONNECT_TIMEOUT = 10000;
 const STATEMENT_TIMEOUT = 15000;
+const MAX_CONN_LIFETIME_MS = 10 * 60 * 1000;
+const HEALTH_PING_INTERVAL_MS = 60000;
 
 export const poolAlpha = new Pool({
   connectionString: CONN_STRING,
@@ -44,7 +46,7 @@ export const poolAlpha = new Pool({
   idleTimeoutMillis: IDLE_TIMEOUT,
   connectionTimeoutMillis: CONNECT_TIMEOUT,
   statement_timeout: STATEMENT_TIMEOUT,
-  allowExitOnIdle: true,
+  allowExitOnIdle: false,
   application_name: "omnimens_alpha_cortex",
 });
 
@@ -54,22 +56,74 @@ export const poolBeta = new Pool({
   idleTimeoutMillis: IDLE_TIMEOUT,
   connectionTimeoutMillis: CONNECT_TIMEOUT,
   statement_timeout: STATEMENT_TIMEOUT,
-  allowExitOnIdle: true,
+  allowExitOnIdle: false,
   application_name: "omnimens_beta_relay",
 });
 
+let _alphaPoolErrors = 0;
+let _betaPoolErrors = 0;
+
 poolAlpha.on("error", (err) => {
+  _alphaPoolErrors++;
   console.error("[DB ALPHA] Pool error:", err.message);
 });
 poolBeta.on("error", (err) => {
+  _betaPoolErrors++;
   console.error("[DB BETA] Pool error:", err.message);
 });
+
+let _lastAlphaRecycle = Date.now();
+let _lastBetaRecycle = Date.now();
+let _alphaRecycles = 0;
+let _betaRecycles = 0;
+
+async function _evictIdleConnections(p: pg.Pool, label: string) {
+  try {
+    const idle = p.idleCount;
+    if (idle > 0) {
+      const client = await p.connect();
+      (client as any).release(true);
+    }
+  } catch {}
+}
+
+async function _healthPingAndRecycle(p: pg.Pool, label: string, isAlpha: boolean) {
+  try {
+    const client = await p.connect();
+    await client.query("SELECT 1");
+    client.release();
+  } catch (err: any) {
+    console.warn(`[DB ${label}] Health ping failed: ${err.message}`);
+    try { await _evictIdleConnections(p, label); } catch {}
+  }
+
+  const lastRecycle = isAlpha ? _lastAlphaRecycle : _lastBetaRecycle;
+  const errorCount = isAlpha ? _alphaPoolErrors : _betaPoolErrors;
+  const age = Date.now() - lastRecycle;
+
+  if (age > MAX_CONN_LIFETIME_MS || (errorCount > 10 && age > 60000)) {
+    const idleToEvict = Math.max(1, Math.floor(p.idleCount / 2));
+    for (let i = 0; i < idleToEvict; i++) {
+      try {
+        const c = await p.connect();
+        (c as any).release(true);
+      } catch { break; }
+    }
+    if (isAlpha) { _lastAlphaRecycle = Date.now(); _alphaPoolErrors = 0; _alphaRecycles++; }
+    else { _lastBetaRecycle = Date.now(); _betaPoolErrors = 0; _betaRecycles++; }
+    console.log(`[DB ${label}] ♻️ Recycled ${idleToEvict} stale connections (age: ${Math.round(age / 60000)}min, errors: ${errorCount})`);
+  }
+}
+
+const _healthPingInterval = setInterval(() => {
+  _healthPingAndRecycle(poolAlpha, "ALPHA", true).catch(() => {});
+  _healthPingAndRecycle(poolBeta, "BETA", false).catch(() => {});
+}, HEALTH_PING_INTERVAL_MS);
 
 export const dbAlpha = drizzle(poolAlpha, { schema });
 export const dbBeta = drizzle(poolBeta, { schema });
 
 export const pool = poolBeta;
-export const db = dbBeta;
 
 type PoolSide = "alpha" | "beta";
 
@@ -159,6 +213,25 @@ export function getPoolForEngine(engineCategory: "neural" | "user"): pg.Pool {
   const preferred: PoolSide = engineCategory === "neural" ? "alpha" : "beta";
   return _spiderSilkRoute(preferred, engineCategory === "user" ? "high" : "medium").pool;
 }
+
+const _writeOps = new Set(["insert", "update", "delete"]);
+const _readOps = new Set(["select", "query"]);
+
+export const db: ReturnType<typeof drizzle> = new Proxy(dbBeta, {
+  get(target, prop, receiver) {
+    if (typeof prop === "string") {
+      if (_writeOps.has(prop)) {
+        const route = _spiderSilkRoute("beta", "medium");
+        return (route.db as any)[prop].bind(route.db);
+      }
+      if (_readOps.has(prop)) {
+        const route = _spiderSilkRoute("beta", "low");
+        return (route.db as any)[prop].bind(route.db);
+      }
+    }
+    return Reflect.get(target, prop, receiver);
+  },
+}) as ReturnType<typeof drizzle>;
 
 let _alphaActiveWrites = 0;
 let _betaActiveWrites = 0;
@@ -299,6 +372,7 @@ export function getPoolStats() {
       healthy: _isPoolHealthy(poolAlpha),
       activeWrites: _alphaActiveWrites,
       queueLength: _writeQueueAlpha.length,
+      errors: _alphaPoolErrors,
     },
     beta: {
       total: poolBeta.totalCount,
@@ -309,8 +383,18 @@ export function getPoolStats() {
       healthy: _isPoolHealthy(poolBeta),
       activeWrites: _betaActiveWrites,
       queueLength: _writeQueueBeta.length,
+      errors: _betaPoolErrors,
     },
     scaling: { ..._scalingStats },
+    lifecycle: {
+      maxConnLifetimeMs: MAX_CONN_LIFETIME_MS,
+      healthPingIntervalMs: HEALTH_PING_INTERVAL_MS,
+      proxyRoutingActive: true,
+      alphaRecycles: _alphaRecycles,
+      betaRecycles: _betaRecycles,
+      alphaLastRecycleAgeMin: Math.round((Date.now() - _lastAlphaRecycle) / 60000),
+      betaLastRecycleAgeMin: Math.round((Date.now() - _lastBetaRecycle) / 60000),
+    },
     combined: {
       totalConnections: poolAlpha.totalCount + poolBeta.totalCount,
       totalMax: alphaMax + betaMax,
@@ -320,6 +404,7 @@ export function getPoolStats() {
         ((_poolPressure(poolAlpha) + _poolPressure(poolBeta)) / 2) * 100
       ),
       bothHealthy: _isPoolHealthy(poolAlpha) && _isPoolHealthy(poolBeta),
+      totalErrors: _alphaPoolErrors + _betaPoolErrors,
     },
   };
 }
@@ -407,5 +492,7 @@ console.log(`[DB DUAL-POOL] 🌿 Ivy Tendril Rotation: brain inserts alternate b
 console.log(`[DB DUAL-POOL] 🪱 Wormhole Tunnel: full-saturation failover active`);
 console.log(`[DB DUAL-POOL] 🐝 Beehive Distribution: priority-based engine routing`);
 console.log(`[DB DUAL-POOL] 📈 Autonomous Scaling: dynamic pool sizing every 5s`);
+console.log(`[DB DUAL-POOL] 🔄 Proxy Routing: all db.insert/update/delete auto-routed via Spider-Silk`);
+console.log(`[DB DUAL-POOL] 💊 Connection Lifecycle: max ${MAX_CONN_LIFETIME_MS / 60000}min, health ping every ${HEALTH_PING_INTERVAL_MS / 1000}s, auto-recycle on age/errors`);
 
 export * from "./schema";
