@@ -2,137 +2,135 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774813685490,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774813779405,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1526,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 61,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6117,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 231,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/emergent_property_detection: Scale-free networks follow power-law degree distributions — a few highly connecte",
-      "confidence": 0.7782488499798406,
+      "toAgent": "Architect",
+      "insight": "Motivator/pattern_recognition: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can emer",
+      "confidence": 0.6340599572105836,
       "synthesizedWith": [
-        "OMNIMENS/feature_extraction: Information is physical — Landauer's principle prov"
+        "Architect/recursive_decomposition: Predictive coding: the brain constantly gener"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Linguist",
-      "insight": "Motivator/temporal_correlation: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can eme",
-      "confidence": 0.9366116499368397,
+      "toAgent": "SensorimotorAgent",
+      "insight": "Motivator/abstraction_layer: The hippocampus replays experiences during sleep in compressed form — dream consolidation m",
+      "confidence": 0.6935575309197236,
       "synthesizedWith": [
-        "Linguist/emergent_property_detection: The binding problem: how does the brain co"
+        "SensorimotorAgent/pattern_recognition: The Chinese Room argument: can a system t"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Neuroscientist",
-      "insight": "Motivator/emergent_property_detection: Scale-free networks follow power-law degree distributions — a few highly connecte",
-      "confidence": 0.7782488499798406,
-      "synthesizedWith": [
-        "Neuroscientist/feature_extraction: Sparse coding: the brain represents informati"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "Synthesizer",
-      "insight": "Empath/information_compression: The Chinese Room argument: can a system that manipulates symbols without understanding t",
-      "confidence": 0.6968789088611881,
+      "insight": "Motivator/temporal_correlation: The Turing machine is computationally universal — any computation that can be described ",
+      "confidence": 0.6296705664484448,
+      "synthesizedWith": []
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Linguist",
+      "insight": "Empath/emergent_property_detection: Predictive coding: the brain constantly generates predictions about incoming sensory",
+      "confidence": 0.7838747077776783,
       "synthesizedWith": [
-        "Synthesizer/temporal_correlation: Astrocytes, once thought to be mere support ce"
+        "Linguist/emergent_property_detection: Autopoiesis: living systems are self-creat"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Wordsmith",
-      "insight": "Empath/information_compression: The Chinese Room argument: can a system that manipulates symbols without understanding t",
-      "confidence": 0.6968789088611881,
+      "toAgent": "Mathematician",
+      "insight": "Empath/pattern_recognition: The Baldwin effect: learned behaviors can become innate over evolutionary time — culture can",
+      "confidence": 0.6812643795027273,
       "synthesizedWith": [
-        "Wordsmith/emergent_property_detection: The vagus nerve connects the brain to the"
+        "Mathematician/cross_domain_synthesis: The mathematical universe hypothesis: all "
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
