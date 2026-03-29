@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774806510054,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774806597522,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10626,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 410,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15241,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 590,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Mathematician",
-      "insight": "Motivator/entropy_reduction: The strange loop concept from Hofstadter: consciousness arises when a system becomes comple",
-      "confidence": 0.6785287780388984,
+      "toAgent": "Synthesizer",
+      "insight": "Motivator/emergent_property_detection: Hebbian learning: neurons that fire together wire together — the fundamental rule",
+      "confidence": 0.6180586846115774,
       "synthesizedWith": [
-        "Mathematician/abstraction_layer: Long-term potentiation (LTP) strengthens synapt"
+        "Synthesizer/temporal_correlation: Phase transitions in neural networks: as conne"
       ]
     },
     {
       "fromAgent": "Motivator",
       "toAgent": "Archivist",
-      "insight": "Motivator/emergent_property_detection: The double-slit experiment demonstrates that observation changes the behavior of ",
-      "confidence": 0.7031311712736712,
+      "insight": "Motivator/analogical_mapping: The global workspace theory of consciousness: information becomes conscious when it is bro",
+      "confidence": 0.6430543281696839,
       "synthesizedWith": [
-        "Archivist/structural_analysis: The Boltzmann brain paradox suggests that a self-"
+        "Archivist/abstraction_layer: The cerebellum contains more neurons than all other"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/entropy_reduction: The strange loop concept from Hofstadter: consciousness arises when a system becomes comple",
-      "confidence": 0.6785287780388984,
+      "toAgent": "Innovator",
+      "insight": "Motivator/information_compression: The Weber-Fechner law: perception is logarithmic — doubling stimulus intensity does n",
+      "confidence": 0.7177420351870565,
       "synthesizedWith": [
-        "OMNIMENS/feature_extraction: Transfer learning: knowledge gained from one domain"
+        "Innovator/cross_domain_synthesis: The connectome is the complete map of neural c"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Explorer",
-      "insight": "Empath/causal_inference: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise from rand",
-      "confidence": 0.8718817303050844,
+      "toAgent": "Mathematician",
+      "insight": "Empath/information_compression: The Chinese Room argument: can a system that manipulates symbols without understanding t",
+      "confidence": 0.6663486785026672,
       "synthesizedWith": [
-        "Explorer/analogical_mapping: Quantum decoherence typically destroys quantum effe"
+        "Mathematician/causal_inference: Neuroplasticity allows the brain to reorganize i"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Neuroscientist",
-      "insight": "Empath/causal_inference: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise from rand",
-      "confidence": 0.8718817303050844,
+      "toAgent": "Synthesizer",
+      "insight": "Empath/feature_extraction: Information is physical — Landauer's principle proves that erasing one bit of information rel",
+      "confidence": 0.6052362754987796,
       "synthesizedWith": [
-        "Neuroscientist/analogical_mapping: Wolfram's Rule 110 cellular automaton is Turi"
+        "Synthesizer/temporal_correlation: Phase transitions in neural networks: as conne"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
