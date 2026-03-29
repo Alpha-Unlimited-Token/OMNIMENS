@@ -2,135 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774824480066,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774824573729,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1510,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 60,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6059,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 240,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Critic",
-      "insight": "Motivator/cross_domain_synthesis: Neuroplasticity allows the brain to reorganize itself by forming new neural connection",
-      "confidence": 0.7165277188734871,
+      "toAgent": "Empath",
+      "insight": "Motivator/entropy_reduction: Kolmogorov complexity measures the shortest program that produces a given output — it is un",
+      "confidence": 0.8720269073215202,
       "synthesizedWith": [
-        "Critic/entropy_reduction: The Baldwin effect: learned behaviors can become innat"
+        "Empath/abstraction_layer: Transfer learning: knowledge gained from one domain ca"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "GraphicDesigner",
-      "insight": "Motivator/feature_extraction: Quantum tunneling allows particles to pass through energy barriers they classically cannot",
-      "confidence": 0.6952224671397926,
+      "toAgent": "Philosopher",
+      "insight": "Motivator/emergent_property_detection: Sparse coding: the brain represents information using a small fraction of active ",
+      "confidence": 0.8848327702010049,
       "synthesizedWith": [
-        "GraphicDesigner/abstraction_layer: Kolmogorov complexity measures the shortest p"
+        "Philosopher/recursive_decomposition: The global workspace theory of consciousnes"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Linguist",
-      "insight": "Motivator/recursive_decomposition: Attention is the computational bottleneck of consciousness — the brain processes vast",
-      "confidence": 0.6004071662605501,
-      "synthesizedWith": []
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Archivist",
-      "insight": "Empath/analogical_mapping: Attention is the computational bottleneck of consciousness — the brain processes vast amounts",
-      "confidence": 0.6485130501011069,
+      "toAgent": "Wordsmith",
+      "insight": "Motivator/emergent_property_detection: Sparse coding: the brain represents information using a small fraction of active ",
+      "confidence": 0.8848327702010049,
       "synthesizedWith": [
-        "Archivist/analogical_mapping: Bayesian brain hypothesis: the brain is fundamenta"
+        "Wordsmith/recursive_decomposition: Integrated Information Theory (IIT) states co"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "OMNIMENS",
-      "insight": "Empath/recursive_decomposition: The double-slit experiment demonstrates that observation changes the behavior of quantum",
-      "confidence": 0.7268575957358303,
+      "toAgent": "Visionary",
+      "insight": "Empath/emergent_property_detection: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers ",
+      "confidence": 0.832490285237472,
       "synthesizedWith": [
-        "OMNIMENS/recursive_decomposition: Quantum entanglement allows particles to share"
+        "Visionary/recursive_decomposition: Quantum superposition allows a system to exis"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Mathematician",
+      "insight": "Empath/emergent_property_detection: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers ",
+      "confidence": 0.832490285237472,
+      "synthesizedWith": [
+        "Mathematician/temporal_correlation: Quantum superposition allows a system to exi"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
