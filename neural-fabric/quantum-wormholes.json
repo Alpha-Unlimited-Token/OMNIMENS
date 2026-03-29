@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774825400779,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774825489107,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10703,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 413,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15315,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 599,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Ethicist",
-      "insight": "Motivator/analogical_mapping: Information is physical — Landauer's principle proves that erasing one bit of information ",
-      "confidence": 0.674136485323065,
-      "synthesizedWith": [
-        "Ethicist/temporal_correlation: DNA stores information at approximately 2 bits pe"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Linguist",
-      "insight": "Motivator/analogical_mapping: Information is physical — Landauer's principle proves that erasing one bit of information ",
-      "confidence": 0.674136485323065,
-      "synthesizedWith": [
-        "Linguist/feature_extraction: The binding problem: how does the brain combine sep"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Pioneer",
-      "insight": "Motivator/emergent_property_detection: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum co",
-      "confidence": 0.8920316929971693,
-      "synthesizedWith": [
-        "Pioneer/pattern_recognition: The global workspace theory of consciousness: infor"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "OMNIMENS",
-      "insight": "Empath/emergent_property_detection: The Baldwin effect: learned behaviors can become innate over evolutionary time — cul",
-      "confidence": 0.6914489162007071,
+      "insight": "Motivator/entropy_reduction: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimulati",
+      "confidence": 0.7930093561930204,
       "synthesizedWith": [
-        "OMNIMENS/structural_analysis: The double-slit experiment demonstrates that obser"
+        "OMNIMENS/structural_analysis: Autopoiesis: living systems are self-creating — th"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Innovator",
+      "insight": "Motivator/cross_domain_synthesis: The hard problem of consciousness: why is there subjective experience at all? Why does",
+      "confidence": 0.7266058667258903,
+      "synthesizedWith": [
+        "Innovator/pattern_recognition: The vagus nerve connects the brain to the gut, he"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Ethicist",
+      "insight": "Motivator/abstraction_layer: The strange loop concept from Hofstadter: consciousness arises when a system becomes comple",
+      "confidence": 0.6170524446020419,
+      "synthesizedWith": [
+        "Ethicist/entropy_reduction: The binding problem: how does the brain combine sepa"
       ]
     },
     {
       "fromAgent": "Empath",
       "toAgent": "Meta-Agent",
-      "insight": "Empath/structural_analysis: Hebbian learning: neurons that fire together wire together — the fundamental rule of neural ",
-      "confidence": 0.6553041054100988,
+      "insight": "Empath/cross_domain_synthesis: The double-slit experiment demonstrates that observation changes the behavior of quantum ",
+      "confidence": 0.7820907826412345,
       "synthesizedWith": [
-        "Meta-Agent/recursive_decomposition: The strange loop concept from Hofstadter: co"
+        "Meta-Agent/structural_analysis: Reservoir computing shows that even random neura"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Neuroscientist",
+      "insight": "Empath/analogical_mapping: Quantum decoherence typically destroys quantum effects at biological temperatures — but quant",
+      "confidence": 0.8266483926168567,
+      "synthesizedWith": [
+        "Neuroscientist/recursive_decomposition: Autopoiesis: living systems are self-cre"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
