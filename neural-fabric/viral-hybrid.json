@@ -2,66 +2,59 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774823977932,
-  "totalHybridAgents": 7,
-  "totalMutations": 54,
-  "totalReplications": 50,
-  "totalPayloadsDelivered": 61,
-  "totalThreatsDetected": 6,
-  "totalThreatsNeutralized": 6,
-  "systemHealthScore": 7.177550808925289e+299,
-  "adaptationRate": 2.7777777777777777,
+  "timestamp": 1774824480883,
+  "totalHybridAgents": 6,
+  "totalMutations": 11,
+  "totalReplications": 10,
+  "totalPayloadsDelivered": 27,
+  "totalThreatsDetected": 0,
+  "totalThreatsNeutralized": 0,
+  "systemHealthScore": 7.167223038282565e+299,
+  "adaptationRate": 0,
   "propagationEfficiency": 1,
-  "immuneStrength": 3.6575875556288386e+297,
-  "hybridFitness": 3.252434454620505e+297,
+  "immuneStrength": 2.1499734138775208e+296,
+  "hybridFitness": 0.5,
   "activeAgents": [
     {
-      "id": "hybrid_insular_cortex_g0_1774823862446_j9i",
+      "id": "hybrid_ventral_tegmental_area_g0_1774824459890_wy8",
       "generation": 0,
-      "fitness": 3.298480874324216e+297,
-      "payloads": 1,
+      "fitness": 0.3593462721343982,
+      "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_prefrontal_cortex_g0_1774823862446_tsi",
+      "id": "hybrid_cerebellum_g0_1774824459890_qij",
       "generation": 0,
-      "fitness": 3.298480874324216e+297,
-      "payloads": 1,
+      "fitness": 0.3549053110814637,
+      "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_ventral_tegmental_area_g0_1774823862446_egs",
+      "id": "hybrid_locus_coeruleus_g0_1774824459890_n11",
       "generation": 0,
-      "fitness": 3.298480874324216e+297,
-      "payloads": 1,
+      "fitness": 0.2863947905473142,
+      "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_claustrum_g0_1774823862446_5uj",
+      "id": "hybrid_raphe_nuclei_g0_1774824459890_4a5",
       "generation": 0,
-      "fitness": 3.298480874324216e+297,
-      "payloads": 1,
+      "fitness": 0.3493072637354162,
+      "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_thalamus_g0_1774823862446_vos",
+      "id": "hybrid_locus_coeruleus_g0_1774824459890_mk4",
       "generation": 0,
-      "fitness": 3.298480874324216e+297,
-      "payloads": 1,
+      "fitness": 0.42886566458609654,
+      "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_anterior_cingulate_g0_1774823862446_07p",
+      "id": "hybrid_insular_cortex_g0_1774824459890_byy",
       "generation": 0,
-      "fitness": 3.298480874324216e+297,
-      "payloads": 1,
-      "threats": 0
-    },
-    {
-      "id": "hybrid_prefrontal_cortex_g1_1774823942462_c0i",
-      "generation": 1,
-      "fitness": 2.976155936398241e+297,
-      "payloads": 1,
+      "fitness": 0.382220358342398,
+      "payloads": 0,
       "threats": 0
     }
   ],
@@ -69,7 +62,7 @@
     "antibodies": 8,
     "memoryCells": 8,
     "tCells": 16,
-    "cytokines": 6,
+    "cytokines": 0,
     "topAntibodies": [
       {
         "pattern": "coherence_degradation",
@@ -77,11 +70,11 @@
       },
       {
         "pattern": "signal_attenuation",
-        "detections": 5
+        "detections": 0
       },
       {
         "pattern": "synaptic_weakening",
-        "detections": 1
+        "detections": 0
       },
       {
         "pattern": "energy_depletion",
@@ -95,21 +88,21 @@
   },
   "propagation": {
     "alivePropagators": 16,
-    "totalPathsDiscovered": 209,
-    "totalHops": 192,
+    "totalPathsDiscovered": 38,
+    "totalHops": 32,
     "coveragePercent": 100,
     "selfSustainingCount": 6
   },
   "fabricWorms": [
     {
       "id": "worm_viral-hybrid_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_viral-hybrid_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
