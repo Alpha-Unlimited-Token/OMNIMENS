@@ -125,7 +125,7 @@ Both OMNIMENS and Super AI Lab frontends are developed with React, Vite, Tailwin
 - **AI Providers:** OpenAI (o3/o4-mini), Anthropic (Claude claude-sonnet-4-6), Google (Gemini gemini-2.5-flash) via Replit AI Integrations proxy; Together AI (Llama, Mixtral, Mistral) via user API key.
 - **Authentication:** Replit OIDC (openid-client) and Google OAuth.
 - **Service Worker:** PWA cleanup service worker (self-unregistering).
-- **Performance Optimizations:** Below-fold API fetches deferred until section is visible (HumanoidBodySection, AgentMeshVisualizer). Unused 3.6MB PNG images removed (WebP-only). Font loading via non-blocking media=print pattern. No unnecessary preloads for below-fold assets.
+- **Performance Optimizations:** Below-fold API fetches deferred until section is visible (HumanoidBodySection, AgentMeshVisualizer). Unused 3.6MB PNG images removed (WebP-only). Font loading via non-blocking media=print pattern. No unnecessary preloads for below-fold assets. chat.tsx code-split from 8549→4309 lines; 6 extracted component files in `artifacts/godflesh/src/components/chat/`: chat-badges.tsx (badges/skills/personas), chat-sidebar.tsx (sidebar panel), chat-build-panel.tsx (code build panel), chat-renderers.tsx (message renderers with Recharts), chat-deploy-panels.tsx (deploy panels), chat-media-cards.tsx (media cards). Recharts and highlight.js dynamically imported only in their respective component files.
 - **Payments:** Stripe SDK for subscriptions, credit packs, and auto-topups.
 - **Database:** PostgreSQL.
 - **System Utilities:** `psutil` for system monitoring.

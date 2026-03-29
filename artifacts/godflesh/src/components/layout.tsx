@@ -61,11 +61,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </Link>
 
           <nav className="hidden md:flex items-center gap-4 lg:gap-6">
-            <Link href="/demo" className="text-sm font-mono text-white/80 hover:text-white transition-colors tracking-widest">
+            <Link href="/chat" className="text-sm font-mono text-primary hover:text-primary/80 transition-colors tracking-widest">
               TRY FREE
             </Link>
             <Link href="/technology" className="text-sm font-mono text-cyan-400/80 hover:text-cyan-400 transition-colors tracking-widest">
               TECHNOLOGY
+            </Link>
+            <Link href="/growth" className="text-sm font-mono text-green-400/70 hover:text-green-400 transition-colors tracking-widest">
+              LIVE
             </Link>
             <Link href="/pricing" className="text-sm font-mono text-white/80 hover:text-white transition-colors tracking-widest">
               PRICING
@@ -80,11 +83,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </button>
               {moreOpen && (
                 <div className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-white/10 bg-[#0a0a14]/95 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] py-2 z-50">
-                  <DropdownLink href="/growth" label="Live Growth" color="text-green-400/80" />
                   <DropdownLink href="/oai" label="OAI Tracker" color="text-violet-400/80" />
                   <DropdownLink href="/occe" label="OCCE Experiment" color="text-violet-400/80" />
                   <DropdownLink href="/dreams" label="Dreams" color="text-violet-300/80" />
+                  <DropdownLink href="/evolution" label="Evolution Log" color="text-amber-400/80" />
                   <div className="h-px bg-white/5 my-1.5 mx-3" />
+                  <DropdownLink href="/autonomous" label="Autonomous Proof" />
                   <DropdownLink href="/faq" label="FAQ" />
                   <DropdownLink href="/about" label="About" />
                   <DropdownLink href="/support" label="Support" />
@@ -137,15 +141,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   <div className="h-px bg-white/5 my-2" />
                 </>
               )}
-              <MobileNavLink href="/demo" label="Try Free" />
+              <MobileNavLink href="/chat" label="Try Free" />
               <MobileNavLink href="/technology" label="Technology" />
               <MobileNavLink href="/pricing" label="Pricing" />
               <div className="h-px bg-white/5 my-2" />
-              <p className="px-3 pt-2 pb-1 text-[9px] font-mono text-white/30 tracking-[0.3em] uppercase">Explore</p>
+              <p className="px-3 pt-2 pb-1 text-[9px] font-mono text-white/30 tracking-[0.3em] uppercase">Live Data</p>
               <MobileNavLink href="/growth" label="Live Growth" />
               <MobileNavLink href="/oai" label="OAI Tracker" />
-              <MobileNavLink href="/occe" label="OCCE Experiment" />
               <MobileNavLink href="/dreams" label="Dreams" />
+              <div className="h-px bg-white/5 my-2" />
+              <p className="px-3 pt-2 pb-1 text-[9px] font-mono text-white/30 tracking-[0.3em] uppercase">Research</p>
+              <MobileNavLink href="/occe" label="OCCE Experiment" />
+              <MobileNavLink href="/evolution" label="Evolution Log" />
+              <MobileNavLink href="/autonomous" label="Autonomous Proof" />
               <div className="h-px bg-white/5 my-2" />
               <p className="px-3 pt-2 pb-1 text-[9px] font-mono text-white/30 tracking-[0.3em] uppercase">Info</p>
               <MobileNavLink href="/faq" label="FAQ" />

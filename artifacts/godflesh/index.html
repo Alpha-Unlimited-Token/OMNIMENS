@@ -230,26 +230,5 @@
         window.__pwaPrompt = e;
       });
     </script>
-    <!-- Service Worker Registration -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js', { scope: '/' })
-          .then(function(reg) {
-            reg.update();
-            reg.addEventListener('updatefound', function() {
-              var sw = reg.installing;
-              if (sw) {
-                sw.addEventListener('statechange', function() {
-                  if (sw.state === 'activated') {
-                    window.location.reload();
-                  }
-                });
-              }
-            });
-            setInterval(function() { reg.update(); }, 60000);
-          })
-          .catch(function() {});
-      }
-    </script>
   </body>
 </html>

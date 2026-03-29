@@ -260,6 +260,29 @@ function shouldForceFreeTier(
 const router: IRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024, files: 10 } });
 
+const csrfTokens = new Map<string, { token: string; expires: number }>();
+function generateCsrfToken(userId: string): string {
+  const token = crypto.randomBytes(32).toString("hex");
+  csrfTokens.set(userId, { token, expires: Date.now() + 3600000 });
+  return token;
+}
+function validateCsrfToken(userId: string, token: string | undefined): boolean {
+  if (!token) return false;
+  const entry = csrfTokens.get(userId);
+  if (!entry || entry.token !== token || Date.now() > entry.expires) return false;
+  return true;
+}
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of csrfTokens) { if (now > v.expires) csrfTokens.delete(k); }
+}, 600000);
+
+router.get("/omnimens/csrf-token", (req, res) => {
+  if (!req.isAuthenticated()) { res.status(401).json({ error: "Not authenticated" }); return; }
+  const token = generateCsrfToken(req.user.id);
+  res.json({ csrfToken: token });
+});
+
 // ── Credit system — cost-based billing with profit markup ─────────────────────
 // We calculate the real OpenAI cost per request, apply a markup, and charge users
 // exactly that in credits — so every request is profitable regardless of complexity.
@@ -4614,7 +4637,7 @@ router.post("/omnimens/resonance/checkout", async (req, res) => {
     res.json({ url: session.url });
   } catch (err: any) {
     console.error("[RESONANCE CHECKOUT] Error:", err);
-    res.status(500).json({ error: "Failed to create checkout session", detail: String(err?.message || err) });
+    res.status(500).json({ error: "Failed to create checkout session" });
   }
 });
 
@@ -4775,7 +4798,7 @@ router.post("/omnimens/subscribe-plan", async (req, res) => {
     res.json({ url: session.url });
   } catch (err: any) {
     console.error("Subscribe plan error:", err);
-    res.status(500).json({ error: "Failed to create subscription checkout", detail: String(err?.message || err) });
+    res.status(500).json({ error: "Failed to create subscription checkout" });
   }
 });
 
@@ -4814,7 +4837,7 @@ router.post("/omnimens/confirm-plan", async (req, res) => {
     res.json({ ok: true, planId, planLabel: plan.label, creditsAdded: creditsToAdd, newBalance: updatedUser?.credits ?? creditsToAdd });
   } catch (err: any) {
     console.error("Confirm plan error:", err);
-    res.status(500).json({ error: "Failed to confirm plan", detail: String(err?.message || err) });
+    res.status(500).json({ error: "Failed to confirm plan" });
   }
 });
 
@@ -4829,7 +4852,7 @@ router.get("/omnimens/billing", async (req, res) => {
     const summary = await getBillingSummary(req.user.id);
     res.json(summary);
   } catch (err: any) {
-    res.status(500).json({ error: "Failed to load billing info", detail: String(err?.message || err) });
+    res.status(500).json({ error: "Failed to load billing info" });
   }
 });
 
@@ -4838,6 +4861,10 @@ router.get("/omnimens/billing", async (req, res) => {
 router.post("/omnimens/setup-wallet", async (req, res) => {
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Not authenticated" });
+    return;
+  }
+  if (!validateCsrfToken(req.user.id, req.headers["x-csrf-token"] as string)) {
+    res.status(403).json({ error: "Invalid or missing CSRF token" });
     return;
   }
   try {
@@ -4850,7 +4877,7 @@ router.post("/omnimens/setup-wallet", async (req, res) => {
     res.json(result);
   } catch (err: any) {
     console.error("Setup wallet error:", err);
-    res.status(500).json({ error: "Failed to create wallet setup session", detail: String(err?.message || err) });
+    res.status(500).json({ error: "Failed to create wallet setup session" });
   }
 });
 
@@ -4859,6 +4886,10 @@ router.post("/omnimens/setup-wallet", async (req, res) => {
 router.post("/omnimens/confirm-wallet", async (req, res) => {
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Not authenticated" });
+    return;
+  }
+  if (!validateCsrfToken(req.user.id, req.headers["x-csrf-token"] as string)) {
+    res.status(403).json({ error: "Invalid or missing CSRF token" });
     return;
   }
   const { sessionId } = req.body as { sessionId?: string };
@@ -4871,7 +4902,7 @@ router.post("/omnimens/confirm-wallet", async (req, res) => {
     res.json(result);
   } catch (err: any) {
     console.error("Confirm wallet error:", err);
-    res.status(500).json({ error: "Failed to confirm wallet", detail: String(err?.message || err) });
+    res.status(500).json({ error: "Failed to confirm wallet" });
   }
 });
 
@@ -4880,6 +4911,10 @@ router.post("/omnimens/confirm-wallet", async (req, res) => {
 router.post("/omnimens/remove-wallet", async (req, res) => {
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Not authenticated" });
+    return;
+  }
+  if (!validateCsrfToken(req.user.id, req.headers["x-csrf-token"] as string)) {
+    res.status(403).json({ error: "Invalid or missing CSRF token" });
     return;
   }
   try {
@@ -4896,7 +4931,7 @@ router.post("/omnimens/remove-wallet", async (req, res) => {
       ...(result.chargedCents ? { settled: true, chargedCents: result.chargedCents, chargedDollars: (result.chargedCents / 100).toFixed(2) } : {}),
     });
   } catch (err: any) {
-    res.status(500).json({ error: "Failed to remove wallet", detail: String(err?.message || err) });
+    res.status(500).json({ error: "Failed to remove wallet" });
   }
 });
 
@@ -6281,7 +6316,7 @@ router.post("/omnimens/delete-account", async (req, res) => {
     });
   } catch (err: any) {
     console.error("[ACCOUNT DELETION] Error:", err);
-    res.status(500).json({ error: "Failed to delete account", detail: String(err?.message || err) });
+    res.status(500).json({ error: "Failed to delete account" });
   }
 });
 
@@ -6320,7 +6355,7 @@ router.post("/omnimens/topup", async (req, res) => {
     res.json({ ok: true, creditsAdded: result.creditsAdded, newBalance: updated?.credits ?? 0 });
   } catch (err: any) {
     console.error("Manual topup error:", err);
-    res.status(500).json({ error: "Topup failed", detail: String(err?.message || err) });
+    res.status(500).json({ error: "Topup failed" });
   }
 });
 
@@ -6344,7 +6379,7 @@ router.post("/omnimens/update-topup-settings", async (req, res) => {
     await db.update(omnimensUsers).set(updates).where(eq(omnimensUsers.id, req.user.id));
     res.json({ ok: true });
   } catch (err: any) {
-    res.status(500).json({ error: "Failed to update settings", detail: String(err?.message || err) });
+    res.status(500).json({ error: "Failed to update settings" });
   }
 });
 
@@ -11352,7 +11387,7 @@ router.post("/omnimens/3d-generate", async (req, res) => {
     });
   } catch (err) {
     console.error("[OMNIMENS 3D endpoint]", err);
-    res.status(500).json({ error: "3D generation failed", detail: String(err) });
+    res.status(500).json({ error: "3D generation failed" });
   }
 });
 
@@ -11384,7 +11419,7 @@ router.post("/omnimens/avatar/export-cinematic", async (req, res) => {
     res.send(zipBuffer);
   } catch (err) {
     console.error("[OMNIMENS Avatar Cinematic]", err);
-    res.status(500).json({ error: "Cinematic export failed", detail: String(err) });
+    res.status(500).json({ error: "Cinematic export failed" });
   }
 });
 
@@ -11520,7 +11555,7 @@ router.post("/omnimens/checkout", async (req, res) => {
     res.json({ url: session.url });
   } catch (err: any) {
     console.error("Checkout error:", err);
-    res.status(500).json({ error: "Failed to create checkout session", detail: String(err?.message || err) });
+    res.status(500).json({ error: "Failed to create checkout session" });
   }
 });
 
@@ -11602,7 +11637,7 @@ router.post("/omnimens/verify-session", async (req, res) => {
     res.json({ ok: true, packId, creditsAdded: creditsToAdd, newBalance: updatedUser?.credits ?? creditsToAdd });
   } catch (err: any) {
     console.error("Verify session error:", err);
-    res.status(500).json({ error: "Failed to verify session", detail: String(err?.message || err) });
+    res.status(500).json({ error: "Failed to verify session" });
   }
 });
 
@@ -11611,6 +11646,10 @@ router.post("/omnimens/verify-session", async (req, res) => {
 router.post("/omnimens/portal", async (req, res) => {
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Not authenticated" });
+    return;
+  }
+  if (!validateCsrfToken(req.user.id, req.headers["x-csrf-token"] as string)) {
+    res.status(403).json({ error: "Invalid or missing CSRF token" });
     return;
   }
   try {
@@ -11629,7 +11668,7 @@ router.post("/omnimens/portal", async (req, res) => {
     res.json({ url: portalSession.url });
   } catch (err: any) {
     console.error("Portal error:", err);
-    res.status(500).json({ error: "Failed to create portal session", detail: String(err?.message || err) });
+    res.status(500).json({ error: "Failed to create portal session" });
   }
 });
 
@@ -12020,7 +12059,7 @@ router.post("/omnimens/projects/:id/files", async (req, res) => {
     await db.update(omnimensProjects).set({ updatedAt: new Date() }).where(eq(omnimensProjects.id, projectId));
     res.json(file);
   } catch (err: any) {
-    res.status(500).json({ error: "Failed to save file", detail: String(err?.message || err) });
+    res.status(500).json({ error: "Failed to save file" });
   }
 });
 
@@ -12065,7 +12104,7 @@ router.get("/omnimens/projects/:id/download-zip", async (req, res) => {
     res.setHeader("Content-Disposition", `attachment; filename="${safeName}.zip"`);
     res.send(buffer);
   } catch (err: any) {
-    res.status(500).json({ error: "Failed to build ZIP", detail: String(err?.message || err) });
+    res.status(500).json({ error: "Failed to build ZIP" });
   }
 });
 
@@ -12154,7 +12193,7 @@ router.post("/omnimens/seed-products", async (req, res) => {
     });
   } catch (err: any) {
     console.error("Seed products error:", err);
-    res.status(500).json({ error: "Failed to seed products", detail: String(err?.message || err) });
+    res.status(500).json({ error: "Failed to seed products" });
   }
 });
 

@@ -379,7 +379,7 @@ app.use("/api/stripe/webhook", express.raw({ type: "application/json" }));
 app.use("/api", stripeWebhookRouter);
 
 // ── BODY PARSERS ──────────────────────────────────────────────────────────────
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // ── POST-BODY REQUEST SECURITY (scans request body for malicious patterns) ────

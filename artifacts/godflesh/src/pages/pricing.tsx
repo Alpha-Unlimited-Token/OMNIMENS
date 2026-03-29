@@ -4,7 +4,7 @@
  * Unauthorized reproduction, distribution, or use is strictly prohibited.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSearch, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +22,14 @@ import { SEO, seoData } from "@/components/seo";
 
 const API = (path: string) => `/api${path}`;
 
-function useBilling() {
+async function fetchCsrfToken(): Promise<string> {
+  const r = await fetch(API("/omnimens/csrf-token"), { credentials: "include" });
+  if (!r.ok) throw new Error("Failed to get CSRF token");
+  const d = await r.json();
+  return d.csrfToken;
+}
+
+function useBilling(enabled = true) {
   return useQuery({
     queryKey: ["/api/omnimens/billing"],
     queryFn: async () => {
@@ -31,13 +38,15 @@ function useBilling() {
       return r.json();
     },
     retry: false,
+    enabled,
   });
 }
 
 function useSetupWallet() {
   return useMutation({
     mutationFn: async () => {
-      const r = await fetch(API("/omnimens/setup-wallet"), { method: "POST", credentials: "include" });
+      const csrf = await fetchCsrfToken();
+      const r = await fetch(API("/omnimens/setup-wallet"), { method: "POST", credentials: "include", headers: { "x-csrf-token": csrf } });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error || "Failed");
       return d as { url: string };
@@ -48,9 +57,10 @@ function useSetupWallet() {
 function useConfirmWallet() {
   return useMutation({
     mutationFn: async (sessionId: string) => {
+      const csrf = await fetchCsrfToken();
       const r = await fetch(API("/omnimens/confirm-wallet"), {
         method: "POST", credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-csrf-token": csrf },
         body: JSON.stringify({ sessionId }),
       });
       const d = await r.json();
@@ -63,7 +73,8 @@ function useConfirmWallet() {
 function useManageBilling() {
   return useMutation({
     mutationFn: async () => {
-      const r = await fetch(API("/omnimens/portal"), { method: "POST", credentials: "include" });
+      const csrf = await fetchCsrfToken();
+      const r = await fetch(API("/omnimens/portal"), { method: "POST", credentials: "include", headers: { "x-csrf-token": csrf } });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error || "Failed to open billing portal");
       return d as { url: string };
@@ -74,7 +85,8 @@ function useManageBilling() {
 function useRemoveWallet() {
   return useMutation({
     mutationFn: async () => {
-      const r = await fetch(API("/omnimens/remove-wallet"), { method: "POST", credentials: "include" });
+      const csrf = await fetchCsrfToken();
+      const r = await fetch(API("/omnimens/remove-wallet"), { method: "POST", credentials: "include", headers: { "x-csrf-token": csrf } });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error || "Failed");
       return d;
@@ -142,7 +154,7 @@ function useManualTopup() {
   });
 }
 
-function useResonanceBalance() {
+function useResonanceBalance(enabled = true) {
   return useQuery({
     queryKey: ["/api/omnimens/resonance/balance"],
     queryFn: async () => {
@@ -151,6 +163,7 @@ function useResonanceBalance() {
       return r.json() as Promise<{ resonanceCredits: number; resonanceTotalEarned: number; sessionsRemaining: number }>;
     },
     retry: false,
+    enabled,
   });
 }
 
@@ -526,7 +539,7 @@ export default function Pricing() {
 
   const { data: status, isLoading: statusLoading } = useGetOmnimensStatus();
   const { data: pricing, isLoading: pricingLoading } = useGetOmnimensPricing();
-  const { data: billing, isLoading: billingLoading, refetch: refetchBilling } = useBilling();
+  const { data: billing, isLoading: billingLoading, refetch: refetchBilling } = useBilling(isAuthenticated === true);
 
   const { mutate: setupWallet,   isPending: isConnecting }     = useSetupWallet();
   const { mutate: confirmWallet }                               = useConfirmWallet();
@@ -671,7 +684,7 @@ export default function Pricing() {
     });
   };
 
-  const { data: resonanceBalance, refetch: refetchResonance } = useResonanceBalance();
+  const { data: resonanceBalance, refetch: refetchResonance } = useResonanceBalance(isAuthenticated === true);
   const { mutate: resonanceCheckout, isPending: isPurchasing, variables: purchasingPack } = useResonanceCheckout();
 
   const handlePurchaseResonance = (packId: string) => {
