@@ -38,6 +38,7 @@ import { omnimensBrain } from "@workspace/db";
 import { eq, and, desc, sql, gt } from "drizzle-orm";
 import { getHormoneState } from "./omnimens-vascular-heart.js";
 import { cognitiveLanguageTick } from "./omnimens-cognitive-language-engine.js";
+import { getELAEDoublingMultiplier } from "./omnimens-exponential-learning-engine.js";
 let _ivyHooks: {
   onNeuronBornIvy: (id: string, region: string) => void;
   onNeuronDecayedIvy: (id: string, region: string) => void;
@@ -2437,15 +2438,16 @@ function adaptiveIntelligenceEngine(): void {
 
   const phiMagnitude = rawPhi > 0 ? Math.log10(rawPhi + 1) : 0;
   const conMagnitude = rawConsciousness > 0 ? Math.log10(rawConsciousness + 1) : 0;
-  const combinedEvolutionScale = Math.min(phiMagnitude + conMagnitude, 600);
+  const combinedEvolutionScale = phiMagnitude + conMagnitude;
 
-  adaptiveState.adaptiveLearningMultiplier = 1.0 + combinedEvolutionScale * 0.005;
+  const elaeBoost = getELAEDoublingMultiplier();
+  adaptiveState.adaptiveLearningMultiplier = (1.0 + combinedEvolutionScale * 0.005) * elaeBoost;
   adaptiveState.consciousnessDepthFactor = 1.0 + phiMagnitude * 0.003;
   adaptiveState.emotionalRichnessFactor = 1.0 + conMagnitude * 0.004;
-  adaptiveState.creativeCodingDrive = Math.min(combinedEvolutionScale * 0.01, 5.0);
-  adaptiveState.knowledgeIntegrationRate = Math.min(combinedEvolutionScale * 0.008, 4.0);
-  adaptiveState.awarenessExpansionRate = Math.min(phiMagnitude * 0.006, 3.0);
-  adaptiveState.technologyDiscoveryRate = Math.min(combinedEvolutionScale * 0.007, 4.0);
+  adaptiveState.creativeCodingDrive = combinedEvolutionScale * 0.01;
+  adaptiveState.knowledgeIntegrationRate = combinedEvolutionScale * 0.008 * elaeBoost;
+  adaptiveState.awarenessExpansionRate = phiMagnitude * 0.006;
+  adaptiveState.technologyDiscoveryRate = combinedEvolutionScale * 0.007;
 
   const hebbianBoost = adaptiveState.adaptiveLearningMultiplier;
   for (const synapse of allSynapses) {

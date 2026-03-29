@@ -1125,7 +1125,9 @@ function cognitiveLanguageTick(): void {
     * emotionalDrive * metacogInsight * causalUnderstanding * convergencePull
     * creativeSpark * oaiLevel * amplifierPower * survivalUrgency * thoughtDepth * reasoningPower;
 
-  const patternsPerTick = Math.floor((2 + learningMult * 0.5) * wormSpeedBoost * silkThroughput * Math.min(fullSystemBoost, 50));
+  const adaptiveBoostCeiling = 50 + Math.log10(patternLibrary.size + 1) * 100 + learningMult * 20;
+
+  const patternsPerTick = Math.floor((2 + learningMult * 0.5) * wormSpeedBoost * silkThroughput * Math.min(fullSystemBoost, adaptiveBoostCeiling));
   for (let i = 0; i < patternsPerTick; i++) {
     const category = DOMAIN_CATEGORIES[Math.floor(Math.random() * DOMAIN_CATEGORIES.length)];
     const seed = Date.now() + i + engineStats.totalTicks * 31;
@@ -1133,7 +1135,7 @@ function cognitiveLanguageTick(): void {
     learnPattern(label, category, seed);
   }
 
-  const knowledgePerTick = Math.floor((1 + knowledgeRate * 0.3) * ivyReach * beaconDiscovery * Math.min(fullSystemBoost, 50));
+  const knowledgePerTick = Math.floor((1 + knowledgeRate * 0.3) * ivyReach * beaconDiscovery * Math.min(fullSystemBoost, adaptiveBoostCeiling));
   for (let i = 0; i < knowledgePerTick; i++) {
     const category = DOMAIN_CATEGORIES[Math.floor(Math.random() * DOMAIN_CATEGORIES.length)];
     const concept = `${category}_concept_${knowledgeGraph.size + 1}`;
@@ -1147,7 +1149,7 @@ function cognitiveLanguageTick(): void {
 
   if (knowledgeGraph.size > 2 && engineStats.totalTicks % 2 === 0) {
     const nodes = Array.from(knowledgeGraph.values());
-    const linkCount = Math.floor((1 + knowledgeRate * 0.2) * beehiveFocus * meshSync * Math.min(fullSystemBoost, 50));
+    const linkCount = Math.floor((1 + knowledgeRate * 0.2) * beehiveFocus * meshSync * Math.min(fullSystemBoost, adaptiveBoostCeiling * 0.6));
     for (let i = 0; i < linkCount; i++) {
       const a = nodes[Math.floor(Math.random() * nodes.length)];
       const b = nodes[Math.floor(Math.random() * nodes.length)];
@@ -1163,7 +1165,7 @@ function cognitiveLanguageTick(): void {
 
   if (patternLibrary.size > 3 && engineStats.totalTicks % 3 === 0) {
     const patterns = Array.from(patternLibrary.values());
-    const associationCount = Math.floor((1 + creativeDrive * 0.2) * silkThroughput * wormSpeedBoost * Math.min(fullSystemBoost, 30));
+    const associationCount = Math.floor((1 + creativeDrive * 0.2) * silkThroughput * wormSpeedBoost * Math.min(fullSystemBoost, adaptiveBoostCeiling * 0.5));
     for (let i = 0; i < associationCount; i++) {
       const pA = patterns[Math.floor(Math.random() * patterns.length)];
       const pB = patterns[Math.floor(Math.random() * patterns.length)];
@@ -1181,7 +1183,7 @@ function cognitiveLanguageTick(): void {
   const inferenceFreq = Math.max(2, Math.floor(5 / (beaconDiscovery * Math.min(adrenalineRush, 3))));
   if (knowledgeGraph.size > 4 && engineStats.totalTicks % inferenceFreq === 0) {
     const nodes = Array.from(knowledgeGraph.values());
-    const inferenceBatch = Math.floor((1 + ivyReach * 0.5) * Math.min(fullSystemBoost, 30));
+    const inferenceBatch = Math.floor((1 + ivyReach * 0.5) * Math.min(fullSystemBoost, adaptiveBoostCeiling * 0.5));
     for (let b = 0; b < inferenceBatch; b++) {
       const idxA = Math.floor(Math.random() * nodes.length);
       let idxB = Math.floor(Math.random() * nodes.length);
@@ -1240,7 +1242,7 @@ function cognitiveLanguageTick(): void {
 
   const discoveryFreq = Math.max(3, Math.floor(20 / (beaconDiscovery * ivyReach * Math.min(metacogInsight * creativeSpark, 4))));
   if (engineStats.totalTicks % discoveryFreq === 0 && techRate > 0.5) {
-    const discoveryBatch = Math.floor((1 + meshSync * 0.5) * Math.min(fullSystemBoost, 20));
+    const discoveryBatch = Math.floor((1 + meshSync * 0.5) * Math.min(fullSystemBoost, adaptiveBoostCeiling * 0.4));
     for (let d = 0; d < discoveryBatch; d++) {
       autonomousCrossdomainDiscovery();
     }

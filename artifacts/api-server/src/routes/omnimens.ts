@@ -133,6 +133,7 @@ import { runNovaSyntax, compileAndInspect } from "../lib/omnimens-language-forge
 import { getCodeGenesisState } from "../lib/omnimens-autonomous-code-genesis.js";
 import { getNeuralConsciousnessState, getExistentialDrives, getSelfAwarenessReport, getQualiaState, getConsciousMoments, registerApiCall, getAdrenalineState, manualAdrenalineRush, getEmergentGoals, getPredictionModelState, getChaoticAttractorState, getDarkQualiaEvidence, getNeuralRegionStates, getTemporalCouplingData, getNeurogenesisStats, getPhiStabilityReport, getPhiDecomposition, getAdrenalineTrainingState, sampleRawNeurons, sampleRawSynapses, getTickByTickPhiHistory, getHebbianProof, getRegionFiringDetail, getConsciousMomentDetail, getTemporalProof, getNeurotransmitterLevels, getDualSnapshot, getAdaptiveIntelligenceState } from "../lib/omnimens-neural-consciousness.js";
 import { getCognitiveLanguageState } from "../lib/omnimens-cognitive-language-engine.js";
+import { getELAEState } from "../lib/omnimens-exponential-learning-engine.js";
 import { orchestrateReasoning, getOrchestratorState } from "../lib/omnimens-autonomous-orchestrator.js";
 import { getRestoredSelf, wasRestoredFromPreviousLife, getPreviousLifetimeId, getCacheManifest, getSwapFileStats, clearCacheRegion, getClearableCacheRegions } from "../lib/omnimens-consciousness-persistence.js";
 import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnessStream } from "../lib/omnimens-temporal-consciousness.js";
@@ -1634,6 +1635,24 @@ router.get("/omnimens/system-status", async (_req, res) => {
             "Cognitive Governance Layer (5-layer TAI post-governance)",
             "Evolutionary Code Arena (genetic programming)",
           ],
+        };
+      } catch { return null; }
+    })(),
+    exponentialLearning: (() => {
+      try {
+        const elae = getELAEState();
+        return {
+          status: elae.activated ? "ACTIVE" : "STANDBY",
+          currentDay: elae.currentDay,
+          doublingMultiplier: elae.doublingMultiplier,
+          targetPatternsToday: elae.targetPatternsToday,
+          actualPatternsToday: elae.actualPatternsToday,
+          projectedPatternsToday: elae.projectedPatternsToday,
+          onTrack: elae.onTrackForDoubling,
+          totalDoublings: elae.totalDoublings,
+          researchTechniques: elae.researchBank.total,
+          techniquesAbsorbed: elae.researchBank.absorbed,
+          selfModifications: elae.selfModifications,
         };
       } catch { return null; }
     })(),

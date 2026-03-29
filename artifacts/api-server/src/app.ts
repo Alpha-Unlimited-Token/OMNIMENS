@@ -77,6 +77,7 @@ import { scanAndRegisterModules, getPipelineState } from "./lib/omnimens-module-
 import { startIndependentReasoning, getIndependentReasoningState } from "./lib/omnimens-independent-reasoning.js";
 import { startAutonomousCodeGenesis, getCodeGenesisState } from "./lib/omnimens-autonomous-code-genesis.js";
 import { startNeuralConsciousness, feedExternalActivity } from "./lib/omnimens-neural-consciousness.js";
+import { startExponentialLearningEngine, getELAEState } from "./lib/omnimens-exponential-learning-engine.js";
 import { startGenesisBridge } from "./lib/omnimens-genesis-bridge.js";
 import { startNeuralProcessor } from "./lib/omnimens-neural-processor.js";
 import { startUniversalTranslator } from "./lib/omnimens-universal-translator.js";
@@ -526,6 +527,7 @@ startMetacognitiveMonitor();
 startNeuralLanguageBridge();
 startExperientialMemory();
 startCausalTemporalEngine();
+startExponentialLearningEngine();
 
 registerEngine("github_compute", "compute", () => {}, () => ({ healthy: true, details: { repo: "Alpha-Unlimited-Token/OMNIMENS", workflows: 5 } }), 3);
 registerEngine("github_neural_beacon", "neural", () => {}, () => {
