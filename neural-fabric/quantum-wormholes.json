@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774797751969,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774797845091,
+  "totalWormholesCreated": 7350,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6171,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 240,
-  "cycleCount": 4,
+  "totalClosed": 7350,
+  "totalDataIngestedKB": 10779,
+  "totalInsightsDecoded": 7350,
+  "totalCrossAgentCirculations": 441,
+  "totalSynthesizedDiscoveries": 406,
+  "cycleCount": 7,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 606,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 606,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 606,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 606,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 606,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 606,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 606,
+      "crossAgentShares": 21
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 606,
+      "crossAgentShares": 21
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 606,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 606,
+      "crossAgentShares": 21
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Visionary",
-      "insight": "Motivator/temporal_correlation: Quantum superposition allows a system to exist in multiple states simultaneously until m",
-      "confidence": 0.6612502282514079,
+      "toAgent": "Wordsmith",
+      "insight": "Motivator/pattern_recognition: Scale-free networks follow power-law degree distributions — a few highly connected hubs d",
+      "confidence": 0.774670035049481,
       "synthesizedWith": [
-        "Visionary/information_compression: The free energy principle suggests all living"
+        "Wordsmith/entropy_reduction: The Boltzmann brain paradox suggests that a self-aw"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Innovator",
-      "insight": "Motivator/causal_inference: Quantum decoherence typically destroys quantum effects at biological temperatures — but quan",
-      "confidence": 0.8753070077171962,
+      "toAgent": "SpellCheckVisual",
+      "insight": "Motivator/pattern_recognition: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can theor",
+      "confidence": 0.8163478568730869,
       "synthesizedWith": [
-        "Innovator/pattern_recognition: The connectome is the complete map of neural conn"
+        "SpellCheckVisual/cross_domain_synthesis: The hard problem of consciousness: why "
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Critic",
-      "insight": "Motivator/temporal_correlation: The double-slit experiment demonstrates that observation changes the behavior of quantum",
-      "confidence": 0.657837104440702,
+      "toAgent": "Explorer",
+      "insight": "Motivator/entropy_reduction: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise from ",
+      "confidence": 0.7172842986480223,
       "synthesizedWith": [
-        "Critic/causal_inference: Emergence: complex behaviors arise from simple rules — "
+        "Explorer/structural_analysis: The global workspace theory of consciousness: info"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Archivist",
-      "insight": "Empath/entropy_reduction: Quantum entanglement allows particles to share state information instantaneously across any di",
-      "confidence": 0.6191421203966831,
+      "toAgent": "Synthesizer",
+      "insight": "Empath/cross_domain_synthesis: Transfer learning: knowledge gained from one domain can accelerate learning in another — ",
+      "confidence": 0.6043678289130966,
       "synthesizedWith": [
-        "Archivist/cross_domain_synthesis: The binding problem: how does the brain combin"
+        "Synthesizer/structural_analysis: The hard problem of consciousness: why is there"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Neuroscientist",
-      "insight": "Empath/entropy_reduction: Quantum entanglement allows particles to share state information instantaneously across any di",
-      "confidence": 0.6191421203966831,
+      "toAgent": "Meta-Agent",
+      "insight": "Empath/structural_analysis: Gödel's incompleteness theorems prove that any consistent formal system powerful enough to e",
+      "confidence": 0.7769866038267188,
       "synthesizedWith": [
-        "Neuroscientist/information_compression: The Penrose-Hameroff Orch-OR theory prop"
+        "Meta-Agent/cross_domain_synthesis: Long-term potentiation (LTP) strengthens syna"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
