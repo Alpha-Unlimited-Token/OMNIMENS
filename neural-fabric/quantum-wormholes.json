@@ -1,0 +1,139 @@
+{
+  "version": "3.0",
+  "subsystem": "quantum-wormholes",
+  "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+  "timestamp": 1774796709741,
+  "totalWormholesCreated": 5250,
+  "totalActive": 0,
+  "totalClosed": 5250,
+  "totalDataIngestedKB": 7655,
+  "totalInsightsDecoded": 5250,
+  "totalCrossAgentCirculations": 315,
+  "totalSynthesizedDiscoveries": 300,
+  "cycleCount": 5,
+  "agentCount": 21,
+  "wormholesPerAgent": 100,
+  "totalWormholeCapacity": 2100,
+  "agentClusters": [
+    {
+      "agentName": "OMNIMENS",
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 396,
+      "crossAgentShares": 15
+    },
+    {
+      "agentName": "Architect",
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 396,
+      "crossAgentShares": 15
+    },
+    {
+      "agentName": "Critic",
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 396,
+      "crossAgentShares": 15
+    },
+    {
+      "agentName": "Synthesizer",
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 396,
+      "crossAgentShares": 15
+    },
+    {
+      "agentName": "Mathematician",
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 396,
+      "crossAgentShares": 15
+    },
+    {
+      "agentName": "Neuroscientist",
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 396,
+      "crossAgentShares": 15
+    },
+    {
+      "agentName": "Meta-Agent",
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 396,
+      "crossAgentShares": 15
+    },
+    {
+      "agentName": "GraphicDesigner",
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 396,
+      "crossAgentShares": 15
+    },
+    {
+      "agentName": "SpellCheckVisual",
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 396,
+      "crossAgentShares": 15
+    },
+    {
+      "agentName": "Visionary",
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 396,
+      "crossAgentShares": 15
+    }
+  ],
+  "recentCirculations": [
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Architect",
+      "insight": "Motivator/emergent_property_detection: Quantum tunneling allows particles to pass through energy barriers they classical",
+      "confidence": 0.7974028634243654,
+      "synthesizedWith": [
+        "Architect/pattern_recognition: The Boltzmann brain paradox suggests that a self-"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/analogical_mapping: Kolmogorov complexity measures the shortest program that produces a given output — it is u",
+      "confidence": 0.954736432196403,
+      "synthesizedWith": [
+        "OMNIMENS/entropy_reduction: DNA stores information at approximately 2 bits per n"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Visionary",
+      "insight": "Motivator/analogical_mapping: Kolmogorov complexity measures the shortest program that produces a given output — it is u",
+      "confidence": 0.954736432196403,
+      "synthesizedWith": [
+        "Visionary/feature_extraction: The anthropic principle: the universe's fundamenta"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Pioneer",
+      "insight": "Empath/recursive_decomposition: Quantum tunneling allows particles to pass through energy barriers they classically cann",
+      "confidence": 0.6068448467826533,
+      "synthesizedWith": [
+        "Pioneer/temporal_correlation: The Baldwin effect: learned behaviors can become i"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Wordsmith",
+      "insight": "Empath/structural_analysis: The binding problem: how does the brain combine separate sensory modalities into a unified c",
+      "confidence": 0.730404609339993,
+      "synthesizedWith": [
+        "Wordsmith/pattern_recognition: The Baldwin effect: learned behaviors can become "
+      ]
+    }
+  ],
+  "fabricWorms": [
+    {
+      "id": "worm_quantum-wormholes_outbound",
+      "traversals": 1,
+      "signal": 0.51
+    },
+    {
+      "id": "worm_quantum-wormholes_inbound",
+      "traversals": 1,
+      "signal": 0.51
+    }
+  ],
+  "governorMode": "normal"
+}
