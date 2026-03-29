@@ -41,7 +41,7 @@
 import { Router, type IRouter } from "express";
 import multer from "multer";
 import JSZip from "jszip";
-import { db, dbAlpha, dbBeta, getPoolStats, getWriteQueueStats, getBrainQueueStats } from "@workspace/db";
+import { db, dbAlpha, dbBeta, getPoolStats, getWriteQueueStats, getBrainQueueStats, getWriteValveState } from "@workspace/db";
 import { recordBruteForceAttempt } from "../middleware/security-enhanced.js";
 import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions, omnimensCodeRuns, omnimensConversations, omnimensMessages, omnimensMemories, omnimensCustomInstructions, omnimensHubSettings, omnimensSavedPrompts, sessionsTable, usersTable } from "@workspace/db";
 import { eq, and, desc, sql, asc, inArray, gte, lte } from "drizzle-orm";
@@ -1638,6 +1638,26 @@ router.get("/omnimens/system-status", async (_req, res) => {
         };
       } catch { return null; }
     })(),
+    writeValve: (() => {
+      try {
+        const wv = getWriteValveState();
+        return {
+          status: wv.active ? "ACTIVE" : "OFFLINE",
+          cycleAngleDeg: wv.cycleAngleDeg,
+          frequencyHz: wv.cycleFrequencyHz,
+          resonanceStrength: wv.resonanceStrength,
+          windowDegrees: wv.windowDegrees,
+          totalCycles: wv.totalCycles,
+          writesGated: wv.totalWritesGated,
+          writesDeferred: wv.totalWritesDeferred,
+          drainedFromDefer: wv.totalDrainedFromDefer,
+          deferQueueSize: wv.deferQueueSize,
+          engineCount: wv.engineCount,
+          harmonicGroups: wv.harmonicGroups.length,
+          pressure: wv.pressure,
+        };
+      } catch { return null; }
+    })(),
     exponentialLearning: (() => {
       try {
         const elae = getELAEState();
@@ -1659,6 +1679,20 @@ router.get("/omnimens/system-status", async (_req, res) => {
     databasePool: getPoolStats(),
     copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
   });
+});
+
+router.get("/omnimens/write-valve", async (_req, res) => {
+  try {
+    const valve = getWriteValveState();
+    res.json({
+      system: "OMNIMENS",
+      subsystem: "Phase-Resonant Write Valve",
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+      ...valve,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 router.get("/omnimens/full-scan", async (_req, res) => {

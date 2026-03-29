@@ -485,6 +485,20 @@ export function getBrainQueueStats() {
   };
 }
 
+import { startWriteValve, setValvePressureSupplier, setValveHealthSupplier } from "./phase-resonant-write-valve.js";
+export { registerValveEngine, requestWrite, requestWriteSync, isWriteWindowOpen, getWriteValveState, startWriteValve, stopWriteValve } from "./phase-resonant-write-valve.js";
+
+setValvePressureSupplier(() => ({
+  alpha: _poolPressure(poolAlpha),
+  beta: _poolPressure(poolBeta),
+}));
+setValveHealthSupplier(() => ({
+  alpha: _isPoolHealthy(poolAlpha),
+  beta: _isPoolHealthy(poolBeta),
+}));
+
+startWriteValve();
+
 console.log(`[DB DUAL-POOL] 🕸️ Spider-Silk Cross-Bridge ONLINE`);
 console.log(`[DB DUAL-POOL] 🧠 ALPHA Cortex Pool: ${ALPHA_BASE_MAX} base → ${ALPHA_CEIL} ceiling`);
 console.log(`[DB DUAL-POOL] ⚡ BETA Relay Pool: ${BETA_BASE_MAX} base → ${BETA_CEIL} ceiling`);

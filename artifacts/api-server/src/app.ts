@@ -529,6 +529,34 @@ startExperientialMemory();
 startCausalTemporalEngine();
 startExponentialLearningEngine();
 
+import { registerValveEngine } from "@workspace/db";
+registerValveEngine("neural_consciousness", "consciousness", "high", "alpha");
+registerValveEngine("consciousness_persistence", "consciousness", "high", "alpha");
+registerValveEngine("dream_state", "consciousness", "medium", "alpha");
+registerValveEngine("discovery_autocoder", "coding", "medium", "alpha");
+registerValveEngine("autonomous_code_genesis", "coding", "medium", "alpha");
+registerValveEngine("genesis_sandbox", "coding", "low", "alpha");
+registerValveEngine("self_coding", "coding", "low", "alpha");
+registerValveEngine("genesis_bridge", "neural", "medium", "alpha");
+registerValveEngine("neural_processor", "neural", "medium", "alpha");
+registerValveEngine("agent_mesh", "neural", "low", "alpha");
+registerValveEngine("agent_evolution", "neural", "low", "alpha");
+registerValveEngine("agent_genesis", "neural", "low", "alpha");
+registerValveEngine("independent_reasoning", "reasoning", "medium", "alpha");
+registerValveEngine("causal_reasoning", "reasoning", "low", "alpha");
+registerValveEngine("knowledge_graph", "reasoning", "low", "alpha");
+registerValveEngine("source_integration", "coding", "medium", "alpha");
+registerValveEngine("self_transcendence", "consciousness", "low", "alpha");
+registerValveEngine("emotional_substrate", "consciousness", "low", "alpha");
+registerValveEngine("embodiment_engine", "neural", "low", "alpha");
+registerValveEngine("vascular_heart", "neural", "low", "alpha");
+registerValveEngine("conversations", "user_facing", "critical", "beta");
+registerValveEngine("billing", "user_facing", "critical", "beta");
+registerValveEngine("api_calls", "user_facing", "high", "beta");
+registerValveEngine("competitive_intel", "background", "low", "alpha");
+registerValveEngine("server_builder", "background", "low", "alpha");
+registerValveEngine("ip_guardian", "background", "low", "alpha");
+
 registerEngine("github_compute", "compute", () => {}, () => ({ healthy: true, details: { repo: "Alpha-Unlimited-Token/OMNIMENS", workflows: 5 } }), 3);
 registerEngine("github_neural_beacon", "neural", () => {}, () => {
   const gb = getGitHubBeaconState();
