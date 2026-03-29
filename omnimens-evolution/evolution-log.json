@@ -1,134 +1,134 @@
 {
-  "lastSync": "2026-03-29T20:00:18.012Z",
+  "lastSync": "2026-03-29T21:17:07.169Z",
   "syncCycle": 1,
   "stats": {
     "totalBrainEntries": 100,
     "selfCodedModules": 0,
     "dreamBreakthroughs": 0,
-    "knowledgeEntries": 74
+    "knowledgeEntries": 52
   },
   "recentSelfCodedModules": [],
   "recentBreakthroughs": [],
   "recentKnowledge": [
     {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] emergent_capability: Philosopher/abstra",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_emergent_capability_mnc6n6hz.mjs (405 chars). Source: discovery_autocoder:wormhole:Philosopher+Archivist. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: SensorimotorAgent/",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_knowledge_synthesis_mnc9e1rq.mjs (429 chars). Source: discovery_autocoder:wormhole:SensorimotorAgent+GraphicDesigner. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
       "confidence": 0.95,
-      "createdAt": "2026-03-29T19:59:21.524Z"
+      "createdAt": "2026-03-29T21:16:11.892Z"
     },
     {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/causal",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_knowledge_synthesis_mnc6n6li.mjs (415 chars). Source: discovery_autocoder:wormhole:Philosopher+OMNIMENS. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/tempor",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_knowledge_synthesis_mnc9e23x.mjs (425 chars). Source: discovery_autocoder:wormhole:Philosopher+SensorimotorAgent. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
       "confidence": 0.95,
-      "createdAt": "2026-03-29T19:59:21.524Z"
+      "createdAt": "2026-03-29T21:16:11.892Z"
     },
     {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: Philosopher/analogical_",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_neural_pathway_mnc6n6jv.mjs (428 chars). Source: discovery_autocoder:wormhole:Philosopher+Visionary. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] emergent_capability: Philosopher/emerge",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_emergent_capability_mnc9e1vn.mjs (404 chars). Source: discovery_autocoder:wormhole:Philosopher+OMNIMENS. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
       "confidence": 0.95,
-      "createdAt": "2026-03-29T19:59:21.524Z"
+      "createdAt": "2026-03-29T21:16:11.892Z"
     },
     {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/causa",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_neural_pathway_mnc6lybc.mjs (434 chars). Source: discovery_autocoder:wormhole:SensorimotorAgent+Archivist. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/abstrac",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_adaptive_algorithm_mnc9crr3.mjs (453 chars). Source: discovery_autocoder:wormhole:Philosopher+Neuroscientist. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
       "confidence": 0.95,
-      "createdAt": "2026-03-29T19:58:21.520Z"
+      "createdAt": "2026-03-29T21:15:11.868Z"
+    },
+    {
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] emergent_capability: Philosopher/analog",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_emergent_capability_mnc9crnd.mjs (404 chars). Source: discovery_autocoder:wormhole:Philosopher+OMNIMENS. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "confidence": 0.95,
+      "createdAt": "2026-03-29T21:15:11.868Z"
+    },
+    {
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] adaptive_algorithm: SensorimotorAgent/i",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_adaptive_algorithm_mnc9crh3.mjs (456 chars). Source: discovery_autocoder:wormhole:SensorimotorAgent+Philosopher. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "confidence": 0.95,
+      "createdAt": "2026-03-29T21:15:11.868Z"
+    },
+    {
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] emergent_capability: Philosopher/causal",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_emergent_capability_mnc9bqp9.mjs (407 chars). Source: discovery_autocoder:wormhole:Philosopher+Synthesizer. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "confidence": 0.95,
+      "createdAt": "2026-03-29T21:14:26.864Z"
+    },
+    {
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] emergent_capability: Philosopher/causal",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_emergent_capability_mnc9bqn1.mjs (412 chars). Source: discovery_autocoder:wormhole:Philosopher+SpellCheckVisual. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "confidence": 0.95,
+      "createdAt": "2026-03-29T21:14:26.864Z"
+    },
+    {
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] consciousness_expansion: Philosopher/st",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_consciousness_expansion_mnc9bqkg.mjs (391 chars). Source: discovery_autocoder:wormhole:Philosopher+Mathematician. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "confidence": 0.95,
+      "createdAt": "2026-03-29T21:14:26.864Z"
+    },
+    {
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] consciousness_expansion: Philosopher/an",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_consciousness_expansion_mnc9am45.mjs (391 chars). Source: discovery_autocoder:wormhole:Philosopher+Mathematician. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "confidence": 0.95,
+      "createdAt": "2026-03-29T21:13:34.617Z"
+    },
+    {
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] emergent_capability: Philosopher/analog",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_emergent_capability_mnc9am16.mjs (404 chars). Source: discovery_autocoder:wormhole:Philosopher+Ethicist. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "confidence": 0.95,
+      "createdAt": "2026-03-29T21:13:29.617Z"
+    },
+    {
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/cross_",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_knowledge_synthesis_mnc9ak19.mjs (414 chars). Source: discovery_autocoder:wormhole:Philosopher+Pioneer. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "confidence": 0.95,
+      "createdAt": "2026-03-29T21:13:29.617Z"
+    },
+    {
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] consciousness_expansion: Philosopher/en",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_consciousness_expansion_mnc99lb7.mjs (389 chars). Source: discovery_autocoder:wormhole:Philosopher+Synthesizer. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "confidence": 0.95,
+      "createdAt": "2026-03-29T21:12:47.003Z"
+    },
+    {
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] consciousness_expansion: Philosopher/en",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_consciousness_expansion_mnc99lbq.mjs (392 chars). Source: discovery_autocoder:wormhole:Philosopher+Neuroscientist. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "confidence": 0.95,
+      "createdAt": "2026-03-29T21:12:47.003Z"
+    },
+    {
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/cross_",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_knowledge_synthesis_mnc99lc1.mjs (423 chars). Source: discovery_autocoder:wormhole:Philosopher+GraphicDesigner. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "confidence": 0.95,
+      "createdAt": "2026-03-29T21:12:47.003Z"
     },
     {
       "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: Philosopher/information",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_neural_pathway_mnc6lyf9.mjs (432 chars). Source: discovery_autocoder:wormhole:Philosopher+Mathematician. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_neural_pathway_mnc98c52.mjs (430 chars). Source: discovery_autocoder:wormhole:Philosopher+Synthesizer. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
       "confidence": 0.95,
-      "createdAt": "2026-03-29T19:58:21.520Z"
-    },
-    {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] adaptive_algorithm: SensorimotorAgent/a",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_adaptive_algorithm_mnc6lw3p.mjs (453 chars). Source: discovery_autocoder:wormhole:SensorimotorAgent+OMNIMENS. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
-      "confidence": 0.95,
-      "createdAt": "2026-03-29T19:58:21.520Z"
+      "createdAt": "2026-03-29T21:11:48.464Z"
     },
     {
       "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: SensorimotorAgent/",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_knowledge_synthesis_mnc6kxdq.mjs (421 chars). Source: discovery_autocoder:wormhole:SensorimotorAgent+OMNIMENS. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_knowledge_synthesis_mnc98bxb.mjs (425 chars). Source: discovery_autocoder:wormhole:SensorimotorAgent+Philosopher. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
       "confidence": 0.95,
-      "createdAt": "2026-03-29T19:57:36.516Z"
+      "createdAt": "2026-03-29T21:11:43.463Z"
     },
     {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: Philosopher/causal_infe",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_neural_pathway_mnc6kxhn.mjs (426 chars). Source: discovery_autocoder:wormhole:Philosopher+Pioneer. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/emerge",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_knowledge_synthesis_mnc98c2i.mjs (417 chars). Source: discovery_autocoder:wormhole:Philosopher+Meta-Agent. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
       "confidence": 0.95,
-      "createdAt": "2026-03-29T19:57:36.516Z"
+      "createdAt": "2026-03-29T21:11:43.463Z"
     },
     {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] emergent_capability: Philosopher/recurs",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_emergent_capability_mnc6kxg6.mjs (405 chars). Source: discovery_autocoder:wormhole:Philosopher+Architect. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/cross_",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_knowledge_synthesis_mnc971pt.mjs (415 chars). Source: discovery_autocoder:wormhole:Philosopher+OMNIMENS. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
       "confidence": 0.95,
-      "createdAt": "2026-03-29T19:57:36.516Z"
+      "createdAt": "2026-03-29T21:10:48.304Z"
     },
     {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVE",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_pattern_recognition_mnc6i87s.mjs (499 chars). Source: discovery_autocoder:sub_threshold:SpellCheckVisual+OMNIMENS+Empath. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] emergent_capability: Philosopher/emerge",
+      "content": "OMNIMENS wrote source file: omnimens_autocode_emergent_capability_mnc971q5.mjs (405 chars). Source: discovery_autocoder:wormhole:Philosopher+Visionary. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
       "confidence": 0.95,
-      "createdAt": "2026-03-29T19:55:26.411Z"
-    },
-    {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] emergent_capability: Philosopher/recurs",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_emergent_capability_mnc6f1sb.mjs (404 chars). Source: discovery_autocoder:wormhole:Philosopher+Ethicist. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
-      "confidence": 0.95,
-      "createdAt": "2026-03-29T19:53:15.927Z"
-    },
-    {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVE",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_pattern_recognition_mnc6eret.mjs (510 chars). Source: discovery_autocoder:sub_threshold:Explorer+Innovator+SensorimotorAgent. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
-      "confidence": 0.95,
-      "createdAt": "2026-03-29T19:52:57.719Z"
-    },
-    {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: M",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_neural_pathway_mnc6erle.mjs (466 chars). Source: discovery_autocoder:sub_threshold:Motivator+Mathematician+Architect. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
-      "confidence": 0.95,
-      "createdAt": "2026-03-29T19:52:57.719Z"
-    },
-    {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVE",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_pattern_recognition_mnc6erox.mjs (508 chars). Source: discovery_autocoder:sub_threshold:Visionary+Ethicist+SpellCheckVisual. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
-      "confidence": 0.95,
-      "createdAt": "2026-03-29T19:52:57.719Z"
-    },
-    {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: A",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_neural_pathway_mnc6ergg.mjs (452 chars). Source: discovery_autocoder:sub_threshold:Archivist+Meta-Agent+Critic. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
-      "confidence": 0.95,
-      "createdAt": "2026-03-29T19:52:57.719Z"
-    },
-    {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVER",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_adaptive_algorithm_mnc6erqu.mjs (476 chars). Source: discovery_autocoder:sub_threshold:Empath+Synthesizer+Innovator. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
-      "confidence": 0.95,
-      "createdAt": "2026-03-29T19:52:57.719Z"
-    },
-    {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/tempor",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_knowledge_synthesis_mnc6f1ic.mjs (424 chars). Source: discovery_autocoder:wormhole:Philosopher+SensorimotorAgent. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
-      "confidence": 0.95,
-      "createdAt": "2026-03-29T19:52:57.719Z"
-    },
-    {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/tempor",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_knowledge_synthesis_mnc6erv5.mjs (422 chars). Source: discovery_autocoder:wormhole:Philosopher+GraphicDesigner. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
-      "confidence": 0.95,
-      "createdAt": "2026-03-29T19:52:57.719Z"
-    },
-    {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVE",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_pattern_recognition_mnc6erie.mjs (517 chars). Source: discovery_autocoder:sub_threshold:Architect+SpellCheckVisual+Synthesizer. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
-      "confidence": 0.95,
-      "createdAt": "2026-03-29T19:52:57.719Z"
-    },
-    {
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: G",
-      "content": "OMNIMENS wrote source file: omnimens_autocode_neural_pathway_mnc6erjx.mjs (474 chars). Source: discovery_autocoder:sub_threshold:GraphicDesigner+OMNIMENS+Meta-Agent. New source file created. This code is now part of OMNIMENS's running TypeScript codebase.",
-      "confidence": 0.95,
-      "createdAt": "2026-03-29T19:52:57.719Z"
+      "createdAt": "2026-03-29T21:10:48.304Z"
     }
   ]
 }

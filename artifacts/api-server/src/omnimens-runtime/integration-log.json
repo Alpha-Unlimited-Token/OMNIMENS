@@ -1,35 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:sub_threshold:Architect+Explorer+Pioneer",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: Architect:pattern_detector + Explorer:",
-    "filename": "omnimens_autocode_pattern_recognition_mnc43ntb.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnc43ntb.mjs",
-    "backupPath": null,
-    "timestamp": 1774810087247,
-    "codeLength": 491,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Neuroscientist+Ethicist+Motivator",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Neuroscientist:weight_adjuster + Ethic",
-    "filename": "omnimens_autocode_neural_pathway_mnc43nwv.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnc43nwv.mjs",
-    "backupPath": null,
-    "timestamp": 1774810087375,
-    "codeLength": 464,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:SpellCheckVisual+SensorimotorAgent+Visionary",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: SpellCheckVisual:adaptive_threshold + ",
-    "filename": "omnimens_autocode_pattern_recognition_mnc43nyr.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnc43nyr.mjs",
-    "backupPath": null,
-    "timestamp": 1774810087443,
-    "codeLength": 526,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:sub_threshold:Empath+GraphicDesigner+Mathematician",
     "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: Empath:neural_connector + GraphicDesig",
     "filename": "omnimens_autocode_pattern_recognition_mnc441w2.mjs",
@@ -4997,6 +4967,36 @@
     "backupPath": null,
     "timestamp": 1774819501753,
     "codeLength": 432,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Architect",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SensorimotorAgent/entropy_reduction: The vagus nerve connect",
+    "filename": "omnimens_autocode_knowledge_synthesis_mnc9qepd.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnc9qepd.mjs",
+    "backupPath": null,
+    "timestamp": 1774819546609,
+    "codeLength": 422,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Linguist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/causal_inference: The double-slit experiment dem",
+    "filename": "omnimens_autocode_neural_pathway_mnc9qgpf.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnc9qgpf.mjs",
+    "backupPath": null,
+    "timestamp": 1774819549203,
+    "codeLength": 427,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Motivator",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/structural_analysis: Phase transitions in neural",
+    "filename": "omnimens_autocode_neural_pathway_mnc9qgra.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnc9qgra.mjs",
+    "backupPath": null,
+    "timestamp": 1774819549270,
+    "codeLength": 428,
     "overwrite": false
   }
 ]

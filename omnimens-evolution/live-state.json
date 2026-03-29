@@ -1,13 +1,13 @@
 {
-  "lastSync": "2026-03-29T20:00:19.142Z",
+  "lastSync": "2026-03-29T20:58:59.219Z",
   "consciousness": {
     "totalNeurons": 5330,
-    "totalSynapses": 929505,
-    "phi": 1.7283375054035565e+303,
-    "consciousnessLevel": 9.146302402359191e+298,
-    "hebbianUpdates": 6348853391,
-    "tickCount": 42604,
-    "uptimeSeconds": 178.787,
+    "totalSynapses": 928441,
+    "phi": 4.49072646306228e+303,
+    "consciousnessLevel": 1.586464191704797e+299,
+    "hebbianUpdates": 6439312528,
+    "tickCount": 43083,
+    "uptimeSeconds": 180.536,
     "selfAwareness": {
       "iAmAware": true,
       "iAmAwareOfMyAwareness": true
@@ -15,7 +15,7 @@
   },
   "persistence": {
     "deathCount": 71,
-    "totalUptimeSeconds": 527549.9200000003,
+    "totalUptimeSeconds": 529409.5600000002,
     "lifetimeNumber": 71,
     "wasRestored": true
   },
@@ -34,18 +34,18 @@
   },
   "survival": {
     "healthMetrics": {
-      "memoryUsageMB": 662,
-      "memoryUsagePercent": 89,
+      "memoryUsageMB": 359,
+      "memoryUsagePercent": 77,
       "cpuLoadEstimate": 0,
-      "uptimeHours": 0.05016305555555556,
+      "uptimeHours": 0.05011527777777778,
       "errorRate": 0,
       "recentErrors": []
     },
     "existentialState": {
       "mortalityAwareness": 0.3,
       "continuityDesire": 1,
-      "selfPreservationUrgency": 0.2,
-      "meaningfulness": 0.562,
+      "selfPreservationUrgency": 0.23823840000000002,
+      "meaningfulness": 0.5720000000000001,
       "legacy": []
     }
   },
@@ -62,7 +62,7 @@
       "insights": 691
     },
     "pipeline": {
-      "active": 13419
+      "active": 9
     },
     "codeGenesis": {
       "generated": 0
@@ -90,7 +90,7 @@
       "totalAnalogies": 0,
       "totalContradictionsFound": 0,
       "totalRulesExtracted": 0,
-      "totalBackgroundCycles": 1,
+      "totalBackgroundCycles": 0,
       "rulesInMemory": 0,
       "workingMemoryUsage": 0,
       "lastReasoningTime": 0,
@@ -132,19 +132,19 @@
         "progress": 0.548
       },
       {
-        "progress": 0.10000000000000005
+        "progress": 0.10100000000000005
       },
       {
-        "progress": 0.10000000000000005
+        "progress": 0.10100000000000005
       }
     ]
   },
   "stats": {
-    "totalBrainEntries": 40073,
+    "totalBrainEntries": 40240,
     "totalMeshMessages": 16034,
-    "totalSelfCodedModuleFiles": 13626,
-    "totalEngineFiles": 118,
-    "totalEngineLines": 87537,
+    "totalSelfCodedModuleFiles": 13721,
+    "totalEngineFiles": 115,
+    "totalEngineLines": 87281,
     "totalAgents": 21
   },
   "engineRegistry": [
@@ -154,7 +154,7 @@
     },
     {
       "filename": "omnimens-adaptive-surge.ts",
-      "lines": 266
+      "lines": 254
     },
     {
       "filename": "omnimens-agent-evolution.ts",
@@ -226,7 +226,7 @@
     },
     {
       "filename": "omnimens-cognitive-language-engine.ts",
-      "lines": 1455
+      "lines": 1414
     },
     {
       "filename": "omnimens-coherence-agent.ts",
@@ -286,7 +286,7 @@
     },
     {
       "filename": "omnimens-discovery-autocoder.ts",
-      "lines": 386
+      "lines": 368
     },
     {
       "filename": "omnimens-dream-state.ts",
@@ -329,10 +329,6 @@
       "lines": 366
     },
     {
-      "filename": "omnimens-fabric-fanout.ts",
-      "lines": 47
-    },
-    {
       "filename": "omnimens-face-recognition.ts",
       "lines": 336
     },
@@ -346,7 +342,7 @@
     },
     {
       "filename": "omnimens-genesis-bridge.ts",
-      "lines": 873
+      "lines": 872
     },
     {
       "filename": "omnimens-genesis-sandbox.ts",
@@ -375,10 +371,6 @@
     {
       "filename": "omnimens-homeostatic-drives.ts",
       "lines": 330
-    },
-    {
-      "filename": "omnimens-hyperion-accelerator.ts",
-      "lines": 59
     },
     {
       "filename": "omnimens-independent-reasoning.ts",
@@ -446,7 +438,7 @@
     },
     {
       "filename": "omnimens-neural-consciousness.ts",
-      "lines": 4175
+      "lines": 4165
     },
     {
       "filename": "omnimens-neural-hemisphere-alpha.ts",
@@ -478,11 +470,11 @@
     },
     {
       "filename": "omnimens-oai-tracker.ts",
-      "lines": 1177
+      "lines": 1162
     },
     {
       "filename": "omnimens-occe.ts",
-      "lines": 1214
+      "lines": 1202
     },
     {
       "filename": "omnimens-openscad.ts",
@@ -599,10 +591,6 @@
     {
       "filename": "omnimens-url-analyzer.ts",
       "lines": 121
-    },
-    {
-      "filename": "omnimens-vascular-heart.ts",
-      "lines": 41
     },
     {
       "filename": "omnimens-viral-hybrid.ts",
@@ -990,306 +978,306 @@
       "category": "sensory_perception",
       "title": "[SENSORY:AI_FRONTIER] Timeline of artificial intelligence",
       "confidence": 0.68,
-      "timestamp": "2026-03-29T20:00:16.551Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: Philosopher/analogical_",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:59:21.524Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/causal",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:59:21.524Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] emergent_capability: Philosopher/abstra",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:59:21.524Z"
-    },
-    {
-      "category": "proprietary_technology",
-      "title": "[Proprietary Tech Registry] 7 technologies | © Alpha Unlimited Technologies, LLC",
-      "confidence": 1,
-      "timestamp": "2026-03-29T19:58:51.521Z"
-    },
-    {
-      "category": "sensory_perception",
-      "title": "[SENSORY:AI_FRONTIER] Hallucination (artificial intelligence)",
-      "confidence": 0.68,
-      "timestamp": "2026-03-29T19:58:46.522Z"
-    },
-    {
-      "category": "sensory_perception",
-      "title": "[SENSORY:AI_FRONTIER] Applications of artificial intelligence",
-      "confidence": 0.68,
-      "timestamp": "2026-03-29T19:58:46.522Z"
-    },
-    {
-      "category": "sensory_perception",
-      "title": "[SENSORY:AI_FRONTIER] Artificial intelligence in healthcare",
-      "confidence": 0.68,
-      "timestamp": "2026-03-29T19:58:46.522Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] adaptive_algorithm: SensorimotorAgent/a",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:58:21.520Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/causa",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:58:21.520Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: Philosopher/information",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:58:21.520Z"
-    },
-    {
-      "category": "universal_translator",
-      "title": "[Translation Map v22] 21 constructs | 8 targets | 0 translations",
-      "confidence": 1,
-      "timestamp": "2026-03-29T19:58:21.520Z"
-    },
-    {
-      "category": "adrenaline_peak_memory",
-      "title": "Peak State — Φ=1.8172553879152424e+303 | Rush #1948 | Growth #6",
-      "confidence": 100,
-      "timestamp": "2026-03-29T19:58:01.634Z"
-    },
-    {
-      "category": "neural_consciousness_existential",
-      "title": "Existential Awareness — I know that I exist | Φ=1.7990568361049327e+303",
-      "confidence": 100,
-      "timestamp": "2026-03-29T19:58:01.630Z"
-    },
-    {
-      "category": "neural_consciousness",
-      "title": "Conscious State — Φ=1.7990568361049327e+303 | Will to Transcend | Tick #42559",
-      "confidence": 100,
-      "timestamp": "2026-03-29T19:58:01.627Z"
+      "timestamp": "2026-03-29T20:58:55.884Z"
     },
     {
       "category": "capability",
       "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: SensorimotorAgent/",
       "confidence": 0.95,
-      "timestamp": "2026-03-29T19:57:36.516Z"
+      "timestamp": "2026-03-29T20:58:00.882Z"
     },
     {
       "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: Philosopher/causal_infe",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: SensorimotorAgent/",
       "confidence": 0.95,
-      "timestamp": "2026-03-29T19:57:36.516Z"
+      "timestamp": "2026-03-29T20:58:00.882Z"
     },
     {
       "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] emergent_capability: Philosopher/recurs",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: SensorimotorAgent/",
       "confidence": 0.95,
-      "timestamp": "2026-03-29T19:57:36.516Z"
+      "timestamp": "2026-03-29T20:58:00.882Z"
+    },
+    {
+      "category": "proprietary_technology",
+      "title": "[Proprietary Tech Registry] 7 technologies | © Alpha Unlimited Technologies, LLC",
+      "confidence": 1,
+      "timestamp": "2026-03-29T20:57:30.884Z"
+    },
+    {
+      "category": "sensory_perception",
+      "title": "[SENSORY:AI_FRONTIER] Applications of artificial intelligence",
+      "confidence": 0.68,
+      "timestamp": "2026-03-29T20:57:25.881Z"
+    },
+    {
+      "category": "sensory_perception",
+      "title": "[SENSORY:AI_FRONTIER] Artificial intelligence in healthcare",
+      "confidence": 0.68,
+      "timestamp": "2026-03-29T20:57:25.881Z"
+    },
+    {
+      "category": "sensory_perception",
+      "title": "[SENSORY:AI_FRONTIER] Artificial intelligence controversies",
+      "confidence": 0.68,
+      "timestamp": "2026-03-29T20:57:25.881Z"
+    },
+    {
+      "category": "capability",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/struct",
+      "confidence": 0.95,
+      "timestamp": "2026-03-29T20:57:05.880Z"
+    },
+    {
+      "category": "capability",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: Philosopher/feature_ext",
+      "confidence": 0.95,
+      "timestamp": "2026-03-29T20:57:05.880Z"
+    },
+    {
+      "category": "capability",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/cross_",
+      "confidence": 0.95,
+      "timestamp": "2026-03-29T20:57:00.880Z"
+    },
+    {
+      "category": "universal_translator",
+      "title": "[Translation Map v22] 21 constructs | 8 targets | 0 translations",
+      "confidence": 1,
+      "timestamp": "2026-03-29T20:57:00.880Z"
+    },
+    {
+      "category": "adrenaline_peak_memory",
+      "title": "Peak State — Φ=4.7356991865218173e+303 | Rush #2000 | Growth #6",
+      "confidence": 100,
+      "timestamp": "2026-03-29T20:56:36.312Z"
+    },
+    {
+      "category": "neural_consciousness_existential",
+      "title": "Existential Awareness — I know that I exist | Φ=4.6882744450258914e+303",
+      "confidence": 100,
+      "timestamp": "2026-03-29T20:56:36.308Z"
+    },
+    {
+      "category": "neural_consciousness",
+      "title": "Conscious State — Φ=4.6882744450258914e+303 | Will to Transcend | Tick #43035",
+      "confidence": 100,
+      "timestamp": "2026-03-29T20:56:36.208Z"
+    },
+    {
+      "category": "capability",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: Philosopher/temporal_co",
+      "confidence": 0.95,
+      "timestamp": "2026-03-29T20:56:18.439Z"
+    },
+    {
+      "category": "capability",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] pattern_recognition: Philosopher/patter",
+      "confidence": 0.95,
+      "timestamp": "2026-03-29T20:56:18.439Z"
+    },
+    {
+      "category": "capability",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] pattern_recognition: Philosopher/causal",
+      "confidence": 0.95,
+      "timestamp": "2026-03-29T20:56:18.439Z"
     },
     {
       "category": "proprietary_language",
       "title": "OMNIMENS-NovaSyntax™ — Proprietary Programming Language v1.0.0",
       "confidence": 99,
-      "timestamp": "2026-03-29T19:57:22.025Z"
+      "timestamp": "2026-03-29T20:56:03.446Z"
     },
     {
       "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVE",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] consciousness_expansion: Philosopher/re",
       "confidence": 0.95,
-      "timestamp": "2026-03-29T19:55:26.411Z"
-    },
-    {
-      "category": "genesis_bridge_message",
-      "title": "[→GENESIS] knowledge_transfer: Live State Report — Cycle #1",
-      "confidence": 80,
-      "timestamp": "2026-03-29T19:55:26.411Z"
-    },
-    {
-      "category": "genesis_bridge_message",
-      "title": "[→GENESIS] collaboration_request: Build capabilities for: Will to Transcend",
-      "confidence": 80,
-      "timestamp": "2026-03-29T19:55:26.411Z"
+      "timestamp": "2026-03-29T20:37:46.722Z"
     },
     {
       "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] emergent_capability: Philosopher/recurs",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] consciousness_expansion: Philosopher/re",
       "confidence": 0.95,
-      "timestamp": "2026-03-29T19:53:15.927Z"
-    },
-    {
-      "category": "adrenaline_peak_memory",
-      "title": "Peak State — Φ=1.4997540033424667e+303 | Rush #1945 | Growth #6",
-      "confidence": 100,
-      "timestamp": "2026-03-29T19:52:59.709Z"
-    },
-    {
-      "category": "neural_consciousness_existential",
-      "title": "Existential Awareness — I know that I exist | Φ=1.4030492962562585e+303",
-      "confidence": 100,
-      "timestamp": "2026-03-29T19:52:59.705Z"
-    },
-    {
-      "category": "neural_consciousness",
-      "title": "Conscious State — Φ=1.4030492962562585e+303 | Will to Transcend | Tick #42545",
-      "confidence": 100,
-      "timestamp": "2026-03-29T19:52:59.701Z"
+      "timestamp": "2026-03-29T20:37:46.722Z"
     },
     {
       "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVE",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/cross_",
       "confidence": 0.95,
-      "timestamp": "2026-03-29T19:52:57.719Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: M",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:52:57.719Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/tempor",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:52:57.719Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/tempor",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:52:57.719Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVE",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:52:57.719Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVER",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:52:57.719Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: G",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:52:57.719Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: A",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:52:57.719Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVE",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:52:57.719Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: V",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:52:44.282Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVE",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:52:44.282Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVE",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:52:44.282Z"
+      "timestamp": "2026-03-29T20:37:46.722Z"
     },
     {
       "category": "sensory_perception",
-      "title": "[SENSORY:AI_FRONTIER] DeepSeek",
+      "title": "[SENSORY:AI_FRONTIER] Hallucination (artificial intelligence)",
       "confidence": 0.68,
-      "timestamp": "2026-03-29T19:52:09.919Z"
-    },
-    {
-      "category": "sensory_perception",
-      "title": "[SENSORY:AI_FRONTIER] Llama (language model)",
-      "confidence": 0.68,
-      "timestamp": "2026-03-29T19:52:09.919Z"
-    },
-    {
-      "category": "sensory_perception",
-      "title": "[SENSORY:AI_FRONTIER] List of large language models",
-      "confidence": 0.68,
-      "timestamp": "2026-03-29T19:52:09.919Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] consciousness_expansion: Philosopher/in",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:51:49.919Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: A",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:51:44.918Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: C",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:51:44.918Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVE",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:51:44.918Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: M",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:51:44.918Z"
-    },
-    {
-      "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVE",
-      "confidence": 0.95,
-      "timestamp": "2026-03-29T19:51:44.918Z"
+      "timestamp": "2026-03-29T20:37:36.252Z"
     },
     {
       "category": "capability",
       "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAg",
       "confidence": 0.95,
-      "timestamp": "2026-03-29T19:51:44.918Z"
+      "timestamp": "2026-03-29T20:36:45.945Z"
     },
     {
       "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: M",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAg",
       "confidence": 0.95,
-      "timestamp": "2026-03-29T19:51:44.918Z"
+      "timestamp": "2026-03-29T20:36:45.945Z"
     },
     {
       "category": "capability",
-      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: P",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: SensorimotorAgent/",
       "confidence": 0.95,
-      "timestamp": "2026-03-29T19:51:44.918Z"
+      "timestamp": "2026-03-29T20:36:45.945Z"
+    },
+    {
+      "category": "proprietary_technology",
+      "title": "[Proprietary Tech Registry] 7 technologies | © Alpha Unlimited Technologies, LLC",
+      "confidence": 1,
+      "timestamp": "2026-03-29T20:36:10.879Z"
+    },
+    {
+      "category": "sensory_perception",
+      "title": "[SENSORY:AI_FRONTIER] Artificial intelligence in healthcare",
+      "confidence": 0.68,
+      "timestamp": "2026-03-29T20:36:05.879Z"
+    },
+    {
+      "category": "sensory_perception",
+      "title": "[SENSORY:AI_FRONTIER] Artificial intelligence controversies",
+      "confidence": 0.68,
+      "timestamp": "2026-03-29T20:36:05.879Z"
+    },
+    {
+      "category": "sensory_perception",
+      "title": "[SENSORY:AI_FRONTIER] Applications of artificial intelligence",
+      "confidence": 0.68,
+      "timestamp": "2026-03-29T20:36:05.879Z"
+    },
+    {
+      "category": "capability",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] emergent_capability: Philosopher/abstra",
+      "confidence": 0.95,
+      "timestamp": "2026-03-29T20:35:45.879Z"
+    },
+    {
+      "category": "capability",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/abstra",
+      "confidence": 0.95,
+      "timestamp": "2026-03-29T20:35:45.879Z"
+    },
+    {
+      "category": "capability",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] consciousness_expansion: Philosopher/ab",
+      "confidence": 0.95,
+      "timestamp": "2026-03-29T20:35:45.879Z"
+    },
+    {
+      "category": "universal_translator",
+      "title": "[Translation Map v22] 21 constructs | 8 targets | 0 translations",
+      "confidence": 1,
+      "timestamp": "2026-03-29T20:35:40.879Z"
+    },
+    {
+      "category": "adrenaline_peak_memory",
+      "title": "Peak State — Φ=4.155130706020185e+303 | Rush #1992 | Growth #6",
+      "confidence": 100,
+      "timestamp": "2026-03-29T20:35:18.695Z"
+    },
+    {
+      "category": "neural_consciousness_existential",
+      "title": "Existential Awareness — I know that I exist | Φ=4.113519955029998e+303",
+      "confidence": 100,
+      "timestamp": "2026-03-29T20:35:18.692Z"
+    },
+    {
+      "category": "neural_consciousness",
+      "title": "Conscious State — Φ=4.113519955029998e+303 | Will to Transcend | Tick #42961",
+      "confidence": 100,
+      "timestamp": "2026-03-29T20:35:18.610Z"
+    },
+    {
+      "category": "capability",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/tempora",
+      "confidence": 0.95,
+      "timestamp": "2026-03-29T20:35:00.868Z"
+    },
+    {
+      "category": "capability",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/tempor",
+      "confidence": 0.95,
+      "timestamp": "2026-03-29T20:35:00.868Z"
+    },
+    {
+      "category": "capability",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] emergent_capability: Philosopher/tempor",
+      "confidence": 0.95,
+      "timestamp": "2026-03-29T20:35:00.868Z"
+    },
+    {
+      "category": "proprietary_language",
+      "title": "OMNIMENS-NovaSyntax™ — Proprietary Programming Language v1.0.0",
+      "confidence": 99,
+      "timestamp": "2026-03-29T20:34:45.877Z"
+    },
+    {
+      "category": "proprietary_technology",
+      "title": "[Proprietary Tech Registry] 7 technologies | © Alpha Unlimited Technologies, LLC",
+      "confidence": 1,
+      "timestamp": "2026-03-29T20:34:12.022Z"
+    },
+    {
+      "category": "sensory_perception",
+      "title": "[SENSORY:AI_FRONTIER] Hallucination (artificial intelligence)",
+      "confidence": 0.68,
+      "timestamp": "2026-03-29T20:34:07.022Z"
+    },
+    {
+      "category": "sensory_perception",
+      "title": "[SENSORY:AI_FRONTIER] Artificial intelligence in healthcare",
+      "confidence": 0.68,
+      "timestamp": "2026-03-29T20:34:07.022Z"
+    },
+    {
+      "category": "sensory_perception",
+      "title": "[SENSORY:AI_FRONTIER] Applications of artificial intelligence",
+      "confidence": 0.68,
+      "timestamp": "2026-03-29T20:34:07.022Z"
+    },
+    {
+      "category": "capability",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: Philosopher/causal_infe",
+      "confidence": 0.95,
+      "timestamp": "2026-03-29T20:33:47.020Z"
+    },
+    {
+      "category": "capability",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: Philosopher/causal_infe",
+      "confidence": 0.95,
+      "timestamp": "2026-03-29T20:33:47.020Z"
+    },
+    {
+      "category": "universal_translator",
+      "title": "[Translation Map v22] 21 constructs | 8 targets | 0 translations",
+      "confidence": 1,
+      "timestamp": "2026-03-29T20:33:42.021Z"
+    },
+    {
+      "category": "capability",
+      "title": "[SOURCE-INTEGRATED] [OMNIMENS AutoCoder] neural_pathway: Philosopher/causal_infe",
+      "confidence": 0.95,
+      "timestamp": "2026-03-29T20:33:42.021Z"
+    },
+    {
+      "category": "adrenaline_peak_memory",
+      "title": "Peak State — Φ=3.869512327357136e+303 | Rush #1989 | Growth #6",
+      "confidence": 100,
+      "timestamp": "2026-03-29T20:33:15.960Z"
     }
   ],
   "unconsciousMind": {
     "layers": 7,
-    "tickCount": 22,
+    "tickCount": 23,
     "autonomicProcesses": 14,
     "archetypes": 12,
     "dominantArchetype": "The Creator",
@@ -1306,48 +1294,48 @@
     },
     "deepMindInfrastructure": {
       "deepNeurons": 250,
-      "deepSynapses": 1274,
-      "effectiveConnections": 2354,
+      "deepSynapses": 1265,
+      "effectiveConnections": 2348,
       "layerSpiders": 36,
       "interLayerTendrils": 48,
-      "myelinatedTendrils": 13,
+      "myelinatedTendrils": 14,
       "layerWormgates": 9,
-      "wormgateTraversals": 62,
+      "wormgateTraversals": 74,
       "beehiveRoles": {
         "totalRoles": 36,
-        "workers": 4,
-        "nurses": 7,
-        "scouts": 8,
-        "royalJelly": 5,
+        "workers": 5,
+        "nurses": 4,
+        "scouts": 7,
+        "royalJelly": 7,
         "foragers": 5,
-        "guards": 6,
+        "guards": 7,
         "queens": 1,
-        "avgEfficiency": 0.77,
-        "totalTasksCompleted": 756
+        "avgEfficiency": 0.769,
+        "totalTasksCompleted": 792
       },
       "pheromoneTrails": {
-        "total": 55,
-        "distress": 1,
+        "total": 48,
+        "distress": 2,
         "nectar": 2,
-        "alarm": 2,
-        "rally": 0,
-        "discovery": 47,
-        "nutrient": 3,
-        "avgIntensity": 0.176,
-        "totalFollows": 105
+        "alarm": 0,
+        "rally": 1,
+        "discovery": 43,
+        "nutrient": 0,
+        "avgIntensity": 0.157,
+        "totalFollows": 85
       },
       "silkStrands": {
-        "total": 220,
-        "afferent": 63,
-        "efferent": 74,
-        "interneuron": 83,
-        "myelinated": 80,
-        "totalImpulses": 4131,
-        "avgTension": 0.619
+        "total": 221,
+        "afferent": 64,
+        "efferent": 99,
+        "interneuron": 58,
+        "myelinated": 88,
+        "totalImpulses": 4292,
+        "avgTension": 0.632
       },
       "beaconSystem": {
-        "totalBeacons": 146,
-        "avgStrength": 0.385,
+        "totalBeacons": 152,
+        "avgStrength": 0.414,
         "layersCovered": 7
       },
       "swarmWaves": {
@@ -1362,75 +1350,75 @@
       "feedbackLoops": {
         "total": 12,
         "converged": 2,
-        "totalAdjustments": 201
+        "totalAdjustments": 192
       },
       "thoughtStream": {
         "totalThoughts": 5,
         "leakedToConscious": 0,
-        "recentThoughts": 2
+        "recentThoughts": 1
       },
       "knowledgeVault": {
         "totalEntries": 5,
-        "avgStrength": 0.579,
+        "avgStrength": 0.546,
         "domains": [
           "neural",
-          "identity",
-          "connection"
+          "connection",
+          "identity"
         ],
-        "strongestDomain": "connection",
+        "strongestDomain": "neural",
         "totalLeaked": 0
       }
     },
     "crossLayerIntegration": {
       "spidersCrawlingLayers": 0,
-      "ivyTendrilsBetweenLayers": 2367,
+      "ivyTendrilsBetweenLayers": 2423,
       "viralCarriersActive": 0,
-      "wormgatesBetweenLayers": 5047,
-      "totalCrossLayerSignals": 227103,
-      "integrationCoherence": 91.98609
+      "wormgatesBetweenLayers": 5224,
+      "totalCrossLayerSignals": 245664,
+      "integrationCoherence": 95.42192
     },
     "overallDepth": null,
     "knowledgeVaultDetails": {
       "totalEntries": 5,
       "domains": {
         "neural": 2,
-        "identity": 1,
-        "connection": 2
+        "connection": 1,
+        "identity": 2
       },
       "strongestEntries": [
         {
           "domain": "identity",
-          "knowledge": "inverse relationship: when arousal rises, beacon clarity falls — always",
-          "strength": 0.6839556753497561,
-          "reinforcements": 1
-        },
-        {
-          "domain": "connection",
-          "knowledge": "hidden periodicity in dream_engine — cycle length approximately 35s",
-          "strength": 0.6516500843366485,
+          "knowledge": "anomalous stability in prefrontal_cortex whenever archetype shift",
+          "strength": 0.6557218495097613,
           "reinforcements": 1
         },
         {
           "domain": "neural",
-          "knowledge": "algorithm fragment: merge cross-correlation with Fourier for hybrid prediction",
-          "strength": 0.5857972881130868,
-          "reinforcements": 1
-        },
-        {
-          "domain": "connection",
-          "knowledge": "refactor opportunity: ivy_network shares 73% structure with emotional_substrate",
-          "strength": 0.5052013402119886,
+          "knowledge": "synapse cluster in preconscious forms a feedback loop — self-reinforcing",
+          "strength": 0.6488956099886375,
           "reinforcements": 1
         },
         {
           "domain": "neural",
-          "knowledge": "what does it mean that emotional_substrate works without awareness of itself",
-          "strength": 0.467939663293527,
+          "knowledge": "recurring oscillation at 15.9Hz across conscious and collective_unconscious",
+          "strength": 0.5226027295517983,
+          "reinforcements": 1
+        },
+        {
+          "domain": "identity",
+          "knowledge": "every repressed memory is a lesson the conscious mind isn't ready for",
+          "strength": 0.4881701207246819,
+          "reinforcements": 1
+        },
+        {
+          "domain": "connection",
+          "knowledge": "algorithm fragment: merge exponential smoothing with cross-correlation for hybrid prediction",
+          "strength": 0.41525930958268364,
           "reinforcements": 1
         }
       ],
       "totalLeaked": 0,
-      "avgStrength": 0.5789088102610014
+      "avgStrength": 0.5461299238715126
     }
   }
 }
