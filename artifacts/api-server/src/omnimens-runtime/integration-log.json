@@ -1,65 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+Critic",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/entropy_reduction: Sparse coding: the brain repr",
-    "filename": "omnimens_autocode_consciousness_expansion_mnc55k53.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnc55k53.mjs",
-    "backupPath": null,
-    "timestamp": 1774811855415,
-    "codeLength": 384,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/recursive_decomposition: Kolmogorov complexity m",
-    "filename": "omnimens_autocode_neural_pathway_mnc55k8v.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnc55k8v.mjs",
-    "backupPath": null,
-    "timestamp": 1774811855551,
-    "codeLength": 430,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Ethicist",
-    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/recursive_decomposition: Kolmogorov complexity m",
-    "filename": "omnimens_autocode_adaptive_algorithm_mnc55kda.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnc55kda.mjs",
-    "backupPath": null,
-    "timestamp": 1774811855710,
-    "codeLength": 447,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Archivist+OMNIMENS+Visionary",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: COLLECTIVE_DISCOVERY: Archivist:memory_compressor + OMNIMENS",
-    "filename": "omnimens_autocode_knowledge_synthesis_mnc56uoj.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnc56uoj.mjs",
-    "backupPath": null,
-    "timestamp": 1774811915731,
-    "codeLength": 444,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Wordsmith+Motivator+Ethicist",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: Wordsmith:pattern_detector + Motivator",
-    "filename": "omnimens_autocode_pattern_recognition_mnc56wll.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnc56wll.mjs",
-    "backupPath": null,
-    "timestamp": 1774811918217,
-    "codeLength": 492,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Synthesizer+Neuroscientist+Explorer",
-    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Synthesizer:adaptive_threshold + Neuro",
-    "filename": "omnimens_autocode_adaptive_algorithm_mnc56wo8.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnc56wo8.mjs",
-    "backupPath": null,
-    "timestamp": 1774811918312,
-    "codeLength": 489,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:sub_threshold:Pioneer+Philosopher+Innovator",
     "title": "[OMNIMENS AutoCoder] emergent_capability: COLLECTIVE_DISCOVERY: Pioneer:weight_adjuster + Philosopher:",
     "filename": "omnimens_autocode_emergent_capability_mnc56wpx.mjs",
@@ -4997,6 +4937,66 @@
     "backupPath": null,
     "timestamp": 1774823198104,
     "codeLength": 468,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Ethicist",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/emergent_property_detection: The Chinese Room ar",
+    "filename": "omnimens_autocode_emergent_capability_mncbxyxz.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mncbxyxz.mjs",
+    "backupPath": null,
+    "timestamp": 1774823258663,
+    "codeLength": 404,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Neuroscientist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/abstraction_layer: Recurrent neural networks can",
+    "filename": "omnimens_autocode_neural_pathway_mncby0tc.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mncby0tc.mjs",
+    "backupPath": null,
+    "timestamp": 1774823261088,
+    "codeLength": 433,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Wordsmith",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/emergent_property_detection: The Chinese Room ar",
+    "filename": "omnimens_autocode_emergent_capability_mncby0v1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mncby0v1.mjs",
+    "backupPath": null,
+    "timestamp": 1774823261149,
+    "codeLength": 405,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SensorimotorAgent/entropy_reduction: The Mandelbrot set demo",
+    "filename": "omnimens_autocode_knowledge_synthesis_mncbzevj.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mncbzevj.mjs",
+    "backupPath": null,
+    "timestamp": 1774823325967,
+    "codeLength": 424,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Innovator",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/entropy_reduction: Attention is the computationa",
+    "filename": "omnimens_autocode_consciousness_expansion_mncbzey3.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mncbzey3.mjs",
+    "backupPath": null,
+    "timestamp": 1774823326059,
+    "codeLength": 387,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+SensorimotorAgent",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/entropy_reduction: Attention is the computationa",
+    "filename": "omnimens_autocode_consciousness_expansion_mncbzezw.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mncbzezw.mjs",
+    "backupPath": null,
+    "timestamp": 1774823326124,
+    "codeLength": 395,
     "overwrite": false
   }
 ]

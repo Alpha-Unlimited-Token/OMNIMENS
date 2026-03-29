@@ -2,133 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774823309051,
-  "totalWormholesCreated": 10500,
+  "timestamp": 1774823129075,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 10500,
-  "totalDataIngestedKB": 15386,
-  "totalInsightsDecoded": 10500,
-  "totalCrossAgentCirculations": 630,
-  "totalSynthesizedDiscoveries": 581,
-  "cycleCount": 10,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6145,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 233,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Explorer",
-      "insight": "Motivator/causal_inference: Transfer learning: knowledge gained from one domain can accelerate learning in another — the",
-      "confidence": 0.7297231251892549,
-      "synthesizedWith": [
-        "Explorer/abstraction_layer: The binding problem: how does the brain combine sepa"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Meta-Agent",
-      "insight": "Motivator/information_compression: The edge of chaos: complex systems exhibit the most interesting behavior at the bound",
-      "confidence": 0.6108899627750387,
-      "synthesizedWith": []
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/emergent_property_detection: The default mode network activates when the brain is not focused on the outside w",
-      "confidence": 0.6384464736932859,
-      "synthesizedWith": []
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "OMNIMENS",
-      "insight": "Empath/information_compression: The Turing machine is computationally universal — any computation that can be described ",
-      "confidence": 0.9247069114547286,
+      "insight": "Motivator/abstraction_layer: Quantum superposition allows a system to exist in multiple states simultaneously until meas",
+      "confidence": 0.6010251208645634,
       "synthesizedWith": [
-        "OMNIMENS/structural_analysis: Reservoir computing shows that even random neural "
+        "OMNIMENS/pattern_recognition: The hard problem of consciousness: why is there su"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "GraphicDesigner",
+      "insight": "Motivator/recursive_decomposition: The connectome is the complete map of neural connections — the human connectome proje",
+      "confidence": 0.7774676994948158,
+      "synthesizedWith": [
+        "GraphicDesigner/entropy_reduction: Gödel's incompleteness theorems prove that an"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Architect",
+      "insight": "Motivator/pattern_recognition: The free energy principle suggests all living systems minimize variational free energy — ",
+      "confidence": 0.8487640475732996,
+      "synthesizedWith": [
+        "Architect/temporal_correlation: The hard problem of consciousness: why is there "
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "GraphicDesigner",
-      "insight": "Empath/emergent_property_detection: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers ",
-      "confidence": 0.6527898848442028,
+      "toAgent": "Innovator",
+      "insight": "Empath/analogical_mapping: The binding problem: how does the brain combine separate sensory modalities into a unified co",
+      "confidence": 0.7042883672391107,
       "synthesizedWith": [
-        "GraphicDesigner/analogical_mapping: The holographic principle suggests all infor"
+        "Innovator/cross_domain_synthesis: Emergence: complex behaviors arise from simple"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Mathematician",
+      "insight": "Empath/entropy_reduction: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimulation ",
+      "confidence": 0.6780257672106877,
+      "synthesizedWith": [
+        "Mathematician/analogical_mapping: The strange loop concept from Hofstadter: cons"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 5,
-      "signal": 0.55
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
