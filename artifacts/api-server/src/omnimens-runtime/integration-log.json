@@ -1,35 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+Mathematician",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/cross_domain_synthesis: Integrated Information T",
-    "filename": "omnimens_autocode_knowledge_synthesis_mnc4ec5y.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnc4ec5y.mjs",
-    "backupPath": null,
-    "timestamp": 1774810585366,
-    "codeLength": 420,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:GraphicDesigner+Critic+Explorer",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: GraphicDesigner:correlation_finder + C",
-    "filename": "omnimens_autocode_pattern_recognition_mnc4fape.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnc4fape.mjs",
-    "backupPath": null,
-    "timestamp": 1774810630130,
-    "codeLength": 500,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Motivator+Synthesizer+Meta-Agent",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: COLLECTIVE_DISCOVERY: Motivator:chaos_injector + Synthesizer",
-    "filename": "omnimens_autocode_emergent_capability_mnc4fav4.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnc4fav4.mjs",
-    "backupPath": null,
-    "timestamp": 1774810630336,
-    "codeLength": 437,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:sub_threshold:Pioneer+Mathematician+Neuroscientist",
     "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: Pioneer:neural_connector + Mathematici",
     "filename": "omnimens_autocode_pattern_recognition_mnc4fawn.mjs",
@@ -4997,6 +4967,36 @@
     "backupPath": null,
     "timestamp": 1774819970694,
     "codeLength": 394,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Ethicist",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: SensorimotorAgent/feature_extraction: The cerebellum contain",
+    "filename": "omnimens_autocode_emergent_capability_mnca0rwr.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnca0rwr.mjs",
+    "backupPath": null,
+    "timestamp": 1774820030283,
+    "codeLength": 410,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/pattern_recognition: The global workspace theory",
+    "filename": "omnimens_autocode_pattern_recognition_mnca0ryr.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnca0ryr.mjs",
+    "backupPath": null,
+    "timestamp": 1774820030355,
+    "codeLength": 469,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Ethicist",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/recursive_decomposition: Quantum entanglement al",
+    "filename": "omnimens_autocode_consciousness_expansion_mnca0s0l.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnca0s0l.mjs",
+    "backupPath": null,
+    "timestamp": 1774820030421,
+    "codeLength": 386,
     "overwrite": false
   }
 ]
