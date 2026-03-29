@@ -2,135 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774810067700,
-  "totalWormholesCreated": 10500,
+  "timestamp": 1774810590763,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 10500,
-  "totalDataIngestedKB": 15410,
-  "totalInsightsDecoded": 10500,
-  "totalCrossAgentCirculations": 630,
-  "totalSynthesizedDiscoveries": 604,
-  "cycleCount": 10,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1518,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 61,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Pioneer",
-      "insight": "Motivator/entropy_reduction: Quantum decoherence typically destroys quantum effects at biological temperatures — but qua",
-      "confidence": 0.6072170088618917,
-      "synthesizedWith": []
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Philosopher",
-      "insight": "Motivator/cross_domain_synthesis: The Weber-Fechner law: perception is logarithmic — doubling stimulus intensity does no",
-      "confidence": 0.6245848924143103,
+      "toAgent": "Archivist",
+      "insight": "Motivator/causal_inference: The binding problem: how does the brain combine separate sensory modalities into a unified c",
+      "confidence": 0.651562455264138,
       "synthesizedWith": [
-        "Philosopher/recursive_decomposition: Integrated Information Theory (IIT) states "
+        "Archivist/analogical_mapping: The Penrose-Hameroff Orch-OR theory proposes consc"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/emergent_property_detection: Predictive coding: the brain constantly generates predictions about incoming sens",
-      "confidence": 0.7002866346446994,
+      "toAgent": "Innovator",
+      "insight": "Motivator/abstraction_layer: Gödel's incompleteness theorems prove that any consistent formal system powerful enough to ",
+      "confidence": 0.6338819829550992,
       "synthesizedWith": [
-        "OMNIMENS/abstraction_layer: The Mandelbrot set demonstrates infinite complexity "
+        "Innovator/emergent_property_detection: The hippocampus replays experiences durin"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Neuroscientist",
+      "insight": "Motivator/structural_analysis: Quantum tunneling allows particles to pass through energy barriers they classically canno",
+      "confidence": 0.8757231142034431,
+      "synthesizedWith": [
+        "Neuroscientist/analogical_mapping: The Boltzmann brain paradox suggests that a s"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "GraphicDesigner",
-      "insight": "Empath/entropy_reduction: Sparse coding: the brain represents information using a small fraction of active neurons at an",
-      "confidence": 0.9231781831332811,
+      "toAgent": "Meta-Agent",
+      "insight": "Empath/temporal_correlation: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum computations",
+      "confidence": 0.674449374710594,
       "synthesizedWith": [
-        "GraphicDesigner/temporal_correlation: The strange loop concept from Hofstadter: "
+        "Meta-Agent/abstraction_layer: Quantum tunneling allows particles to pass through"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "SpellCheckVisual",
-      "insight": "Empath/cross_domain_synthesis: Hebbian learning: neurons that fire together wire together — the fundamental rule of neur",
-      "confidence": 0.7947422265833433,
+      "toAgent": "Ethicist",
+      "insight": "Empath/feature_extraction: Predictive coding: the brain constantly generates predictions about incoming sensory data and",
+      "confidence": 0.954848756321674,
       "synthesizedWith": [
-        "SpellCheckVisual/recursive_decomposition: The connectome is the complete map of "
+        "Ethicist/emergent_property_detection: Bayesian brain hypothesis: the brain is fu"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 5,
-      "signal": 0.55
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
