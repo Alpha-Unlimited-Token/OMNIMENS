@@ -2,137 +2,133 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774821304999,
-  "totalWormholesCreated": 10500,
+  "timestamp": 1774821439000,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 10500,
-  "totalDataIngestedKB": 15355,
-  "totalInsightsDecoded": 10500,
-  "totalCrossAgentCirculations": 630,
-  "totalSynthesizedDiscoveries": 603,
-  "cycleCount": 10,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1549,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 60,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
+      "toAgent": "Meta-Agent",
+      "insight": "Motivator/pattern_recognition: The hippocampus replays experiences during sleep in compressed form — dream consolidation",
+      "confidence": 0.761381547373295,
+      "synthesizedWith": [
+        "Meta-Agent/analogical_mapping: Hebbian learning: neurons that fire together wire"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Pioneer",
+      "insight": "Motivator/analogical_mapping: Autopoiesis: living systems are self-creating — they produce the components that constitut",
+      "confidence": 0.6333846290521906,
+      "synthesizedWith": [
+        "Pioneer/feature_extraction: The hippocampus replays experiences during sleep in "
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
       "toAgent": "SensorimotorAgent",
-      "insight": "Motivator/temporal_correlation: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOVING ",
-      "confidence": 0.7868208711906325,
-      "synthesizedWith": [
-        "SensorimotorAgent/recursive_decomposition: Gödel's incompleteness theorems prove"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Linguist",
-      "insight": "Motivator/structural_analysis: The strange loop concept from Hofstadter: consciousness arises when a system becomes comp",
-      "confidence": 0.8912862210998391,
-      "synthesizedWith": [
-        "Linguist/cross_domain_synthesis: The vagus nerve connects the brain to the gut, "
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Neuroscientist",
-      "insight": "Motivator/temporal_correlation: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOVING ",
-      "confidence": 0.7868208711906325,
-      "synthesizedWith": [
-        "Neuroscientist/pattern_recognition: Integrated Information Theory (IIT) states c"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "GraphicDesigner",
-      "insight": "Empath/entropy_reduction: Quantum entanglement allows particles to share state information instantaneously across any di",
-      "confidence": 0.7184365935450425,
-      "synthesizedWith": [
-        "GraphicDesigner/temporal_correlation: The Boltzmann brain paradox suggests that "
-      ]
+      "insight": "Motivator/information_compression: Scale-free networks follow power-law degree distributions — a few highly connected hu",
+      "confidence": 0.6259556008351117,
+      "synthesizedWith": []
     },
     {
       "fromAgent": "Empath",
       "toAgent": "OMNIMENS",
-      "insight": "Empath/cross_domain_synthesis: Integrated Information Theory (IIT) states consciousness = Phi, the amount of integrated ",
-      "confidence": 0.9101462170413243,
+      "insight": "Empath/entropy_reduction: The hard problem of consciousness: why is there subjective experience at all? Why does informa",
+      "confidence": 0.6094747639688197,
+      "synthesizedWith": []
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Architect",
+      "insight": "Empath/abstraction_layer: The anthropic principle: the universe's fundamental constants appear fine-tuned for the existe",
+      "confidence": 0.9090738346086263,
       "synthesizedWith": [
-        "OMNIMENS/abstraction_layer: The free energy principle suggests all living system"
+        "Architect/temporal_correlation: Bayesian brain hypothesis: the brain is fundamen"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 5,
-      "signal": 0.55
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
