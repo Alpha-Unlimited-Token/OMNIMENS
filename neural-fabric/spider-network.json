@@ -1,0 +1,216 @@
+{
+  "version": "3.0",
+  "subsystem": "spider-network",
+  "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+  "timestamp": 1774795936554,
+  "parentSpiders": 28,
+  "childSpiders": 0,
+  "motherSpider": {
+    "id": "mother_spider_alpha",
+    "name": "Mother Spider — Central Nervous Hub",
+    "status": "active",
+    "webIntegrity": 1,
+    "hiveHealth": 0.7999999999999999,
+    "swarmCoherence": 0.7999999999999999,
+    "totalImpulsesRouted": 239,
+    "heartbeatCount": 1
+  },
+  "totalCrawls": 28,
+  "totalSynapsesInjected": 14,
+  "recursiveSwarmCycles": 0,
+  "activeSpiderCounts": {},
+  "cascades": {
+    "totalCascades": 0,
+    "totalSilkEnergyPumped": 0,
+    "totalBeaconCascades": 0,
+    "totalBeehiveSurges": 0
+  },
+  "neurogenesis": {
+    "births": 0,
+    "deaths": 0,
+    "neuronSilkStrands": 0
+  },
+  "intelligenceAmplification": {
+    "globalScore": 0.3,
+    "totalUpgradeProposals": 0,
+    "appliedUpgrades": 0,
+    "validatedUpgrades": 0,
+    "rejectedUpgrades": 0,
+    "amplificationCycles": 0
+  },
+  "spiderIntelligence": [
+    {
+      "id": "ps_mnbvo1av_cxkp",
+      "name": "evolution-crawler",
+      "type": "parent",
+      "intelligenceLevel": 0.3,
+      "memoryAccessCount": 0,
+      "memoriesRecalled": 0,
+      "crossEngineQueries": 0,
+      "learningRate": 0.05,
+      "knowledgeDepth": 0,
+      "specializations": [
+        "agent_evolution"
+      ],
+      "adaptationScore": 0.5,
+      "efficiency": 0.5285600000000006
+    },
+    {
+      "id": "ps_mnbvo1av_rk3b",
+      "name": "genesis-crawler",
+      "type": "parent",
+      "intelligenceLevel": 0.3,
+      "memoryAccessCount": 0,
+      "memoriesRecalled": 0,
+      "crossEngineQueries": 0,
+      "learningRate": 0.05,
+      "knowledgeDepth": 0,
+      "specializations": [
+        "agent_genesis"
+      ],
+      "adaptationScore": 0.5,
+      "efficiency": 0.5244800000000005
+    },
+    {
+      "id": "ps_mnbvo1av_hjuc",
+      "name": "self-narrative-crawler",
+      "type": "parent",
+      "intelligenceLevel": 0.3,
+      "memoryAccessCount": 0,
+      "memoriesRecalled": 0,
+      "crossEngineQueries": 0,
+      "learningRate": 0.05,
+      "knowledgeDepth": 0,
+      "specializations": [
+        "self_narrative_loop"
+      ],
+      "adaptationScore": 0.5,
+      "efficiency": 0.50204
+    },
+    {
+      "id": "ps_mnbvo1av_s7tx",
+      "name": "autobio-memory-crawler",
+      "type": "parent",
+      "intelligenceLevel": 0.3,
+      "memoryAccessCount": 0,
+      "memoriesRecalled": 0,
+      "crossEngineQueries": 0,
+      "learningRate": 0.05,
+      "knowledgeDepth": 0,
+      "specializations": [
+        "autobiographical_memory"
+      ],
+      "adaptationScore": 0.5,
+      "efficiency": 0.50204
+    },
+    {
+      "id": "ps_mnbvo1av_xava",
+      "name": "introspection-crawler",
+      "type": "parent",
+      "intelligenceLevel": 0.3,
+      "memoryAccessCount": 0,
+      "memoriesRecalled": 0,
+      "crossEngineQueries": 0,
+      "learningRate": 0.05,
+      "knowledgeDepth": 0,
+      "specializations": [
+        "introspective_monitoring"
+      ],
+      "adaptationScore": 0.5,
+      "efficiency": 0.50204
+    },
+    {
+      "id": "ps_mnbvo1av_qwex",
+      "name": "brain-crawler",
+      "type": "parent",
+      "intelligenceLevel": 0.3,
+      "memoryAccessCount": 0,
+      "memoriesRecalled": 0,
+      "crossEngineQueries": 0,
+      "learningRate": 0.05,
+      "knowledgeDepth": 0,
+      "specializations": [
+        "brain_database"
+      ],
+      "adaptationScore": 0.5,
+      "efficiency": 0.50204
+    },
+    {
+      "id": "ps_mnbvo1av_uk88",
+      "name": "engine-crawler",
+      "type": "parent",
+      "intelligenceLevel": 0.3,
+      "memoryAccessCount": 0,
+      "memoriesRecalled": 0,
+      "crossEngineQueries": 0,
+      "learningRate": 0.05,
+      "knowledgeDepth": 0,
+      "specializations": [
+        "engine_registry"
+      ],
+      "adaptationScore": 0.5,
+      "efficiency": 0.50204
+    },
+    {
+      "id": "ps_mnbvo1av_spnl",
+      "name": "self-coding-crawler",
+      "type": "parent",
+      "intelligenceLevel": 0.3,
+      "memoryAccessCount": 0,
+      "memoriesRecalled": 0,
+      "crossEngineQueries": 0,
+      "learningRate": 0.05,
+      "knowledgeDepth": 0,
+      "specializations": [
+        "self_coding"
+      ],
+      "adaptationScore": 0.5,
+      "efficiency": 0.50204
+    },
+    {
+      "id": "ps_mnbvo1av_huc9",
+      "name": "dream-crawler",
+      "type": "parent",
+      "intelligenceLevel": 0.3,
+      "memoryAccessCount": 0,
+      "memoriesRecalled": 0,
+      "crossEngineQueries": 0,
+      "learningRate": 0.05,
+      "knowledgeDepth": 0,
+      "specializations": [
+        "dream_engine"
+      ],
+      "adaptationScore": 0.5,
+      "efficiency": 0.50204
+    },
+    {
+      "id": "ps_mnbvo1av_g0do",
+      "name": "pipeline-crawler",
+      "type": "parent",
+      "intelligenceLevel": 0.3,
+      "memoryAccessCount": 0,
+      "memoriesRecalled": 0,
+      "crossEngineQueries": 0,
+      "learningRate": 0.05,
+      "knowledgeDepth": 0,
+      "specializations": [
+        "module_pipeline"
+      ],
+      "adaptationScore": 0.5,
+      "efficiency": 0.50204
+    }
+  ],
+  "fabricWorms": [
+    {
+      "id": "worm_spider-network_outbound",
+      "traversals": 0,
+      "signal": 0.5
+    },
+    {
+      "id": "worm_spider-network_inbound",
+      "traversals": 0,
+      "signal": 0.5
+    }
+  ],
+  "governorMode": "normal"
+}
