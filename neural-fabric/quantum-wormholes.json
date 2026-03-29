@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774818592097,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774818685903,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1534,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 59,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6085,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 238,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Visionary",
-      "insight": "Motivator/information_compression: The connectome is the complete map of neural connections — the human connectome proje",
-      "confidence": 0.7595363283931655,
+      "toAgent": "Innovator",
+      "insight": "Motivator/temporal_correlation: The holographic principle suggests all information in a volume of space can be encoded o",
+      "confidence": 0.6975572740579654,
       "synthesizedWith": [
-        "Visionary/recursive_decomposition: The Chinese Room argument: can a system that "
+        "Innovator/structural_analysis: Synaptic pruning eliminates unused neural connect"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "GraphicDesigner",
-      "insight": "Motivator/structural_analysis: Mirror neurons fire both when performing an action and observing the same action — they m",
-      "confidence": 0.6852278063339505,
-      "synthesizedWith": [
-        "GraphicDesigner/cross_domain_synthesis: The binding problem: how does the brain "
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Meta-Agent",
-      "insight": "Motivator/information_compression: The connectome is the complete map of neural connections — the human connectome proje",
-      "confidence": 0.7595363283931655,
-      "synthesizedWith": [
-        "Meta-Agent/emergent_property_detection: Bayesian brain hypothesis: the brain is "
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "GraphicDesigner",
-      "insight": "Empath/causal_inference: Attention is the computational bottleneck of consciousness — the brain processes vast amounts o",
-      "confidence": 0.8421962691375524,
-      "synthesizedWith": [
-        "GraphicDesigner/causal_inference: The Mandelbrot set demonstrates infinite compl"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "Archivist",
-      "insight": "Empath/abstraction_layer: Sparse coding: the brain represents information using a small fraction of active neurons at an",
-      "confidence": 0.7742841654644437,
+      "insight": "Motivator/abstraction_layer: Reservoir computing shows that even random neural networks can perform computation if the r",
+      "confidence": 0.6289421101598618,
       "synthesizedWith": [
-        "Archivist/structural_analysis: Quantum tunneling allows particles to pass throug"
+        "Archivist/emergent_property_detection: Quantum decoherence typically destroys qu"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Philosopher",
+      "insight": "Motivator/temporal_correlation: The holographic principle suggests all information in a volume of space can be encoded o",
+      "confidence": 0.6975572740579654,
+      "synthesizedWith": [
+        "Philosopher/emergent_property_detection: Transfer learning: knowledge gained fro"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Mathematician",
+      "insight": "Empath/cross_domain_synthesis: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can theor",
+      "confidence": 0.7581493752420458,
+      "synthesizedWith": [
+        "Mathematician/cross_domain_synthesis: Astrocytes, once thought to be mere suppor"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Critic",
+      "insight": "Empath/feature_extraction: The Weber-Fechner law: perception is logarithmic — doubling stimulus intensity does not doubl",
+      "confidence": 0.6182995677282052,
+      "synthesizedWith": [
+        "Critic/analogical_mapping: Long-term potentiation (LTP) strengthens synaptic con"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
