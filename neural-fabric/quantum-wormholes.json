@@ -2,137 +2,135 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774828219082,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774828312460,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1534,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 57,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6169,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 234,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Innovator",
-      "insight": "Motivator/structural_analysis: The Turing machine is computationally universal — any computation that can be described c",
-      "confidence": 0.7143954590177729,
+      "toAgent": "Empath",
+      "insight": "Motivator/abstraction_layer: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise from ",
+      "confidence": 0.6209851785219709,
       "synthesizedWith": [
-        "Innovator/recursive_decomposition: DNA stores information at approximately 2 bit"
+        "Empath/feature_extraction: Quantum decoherence typically destroys quantum effect"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Critic",
-      "insight": "Motivator/temporal_correlation: Quantum entanglement allows particles to share state information instantaneously across ",
-      "confidence": 0.9435587304634974,
-      "synthesizedWith": [
-        "Critic/recursive_decomposition: Quantum decoherence typically destroys quantum e"
-      ]
+      "toAgent": "Archivist",
+      "insight": "Motivator/pattern_recognition: Astrocytes, once thought to be mere support cells, actively participate in information pr",
+      "confidence": 0.679167566983137,
+      "synthesizedWith": []
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Motivator/temporal_correlation: Quantum entanglement allows particles to share state information instantaneously across ",
-      "confidence": 0.9435587304634974,
+      "toAgent": "Synthesizer",
+      "insight": "Motivator/abstraction_layer: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise from ",
+      "confidence": 0.6209851785219709,
       "synthesizedWith": [
-        "SensorimotorAgent/feature_extraction: DNA stores information at approximately 2 "
+        "Synthesizer/emergent_property_detection: The connectome is the complete map of n"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Visionary",
-      "insight": "Empath/temporal_correlation: The Turing machine is computationally universal — any computation that can be described can",
-      "confidence": 0.7475371274147591,
+      "toAgent": "GraphicDesigner",
+      "insight": "Empath/feature_extraction: Quantum decoherence typically destroys quantum effects at biological temperatures — but quant",
+      "confidence": 0.7773725739834515,
       "synthesizedWith": [
-        "Visionary/abstraction_layer: Hebbian learning: neurons that fire together wire t"
+        "GraphicDesigner/analogical_mapping: Mirror neurons fire both when performing an "
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Neuroscientist",
-      "insight": "Empath/structural_analysis: Quantum decoherence typically destroys quantum effects at biological temperatures — but quan",
-      "confidence": 0.6826488449701628,
+      "toAgent": "Motivator",
+      "insight": "Empath/abstraction_layer: Neuroplasticity allows the brain to reorganize itself by forming new neural connections throug",
+      "confidence": 0.7409754781589852,
       "synthesizedWith": [
-        "Neuroscientist/abstraction_layer: Quantum decoherence typically destroys quantum"
+        "Motivator/emergent_property_detection: The butterfly effect: in chaotic systems,"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
