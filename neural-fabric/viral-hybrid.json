@@ -2,87 +2,59 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774799127501,
-  "totalHybridAgents": 14,
-  "totalMutations": 128,
-  "totalReplications": 100,
-  "totalPayloadsDelivered": 127,
-  "totalThreatsDetected": 12,
-  "totalThreatsNeutralized": 12,
-  "systemHealthScore": 8.412091815330904e+296,
-  "adaptationRate": 2.727272727272727,
+  "timestamp": 1774799163672,
+  "totalHybridAgents": 6,
+  "totalMutations": 12,
+  "totalReplications": 10,
+  "totalPayloadsDelivered": 21,
+  "totalThreatsDetected": 2,
+  "totalThreatsNeutralized": 2,
+  "systemHealthScore": 8.687301698698202e+296,
+  "adaptationRate": 0,
   "propagationEfficiency": 1,
-  "immuneStrength": 8.063628087122826e+294,
-  "hybridFitness": 7.354707481067239e+294,
+  "immuneStrength": 5.211677432212401e+293,
+  "hybridFitness": 0.5,
   "activeAgents": [
     {
-      "id": "hybrid_anterior_cingulate_g0_1774798922011_pks",
+      "id": "hybrid_anterior_cingulate_g0_1774799142350_vjc",
       "generation": 0,
-      "fitness": 8.693207402890033e+294,
-      "payloads": 1,
+      "fitness": 0.34766251930102865,
+      "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_amygdala_g0_1774798922011_qnp",
+      "id": "hybrid_locus_coeruleus_g0_1774799142350_rha",
       "generation": 0,
-      "fitness": 8.693207402890033e+294,
-      "payloads": 1,
+      "fitness": 0.41600295155819755,
+      "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_superior_colliculus_g0_1774798922011_whu",
+      "id": "hybrid_reticular_activating_system_g0_1774799142350_s63",
       "generation": 0,
-      "fitness": 8.693207402890033e+294,
-      "payloads": 1,
+      "fitness": 0.3484017062897903,
+      "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_raphe_nuclei_g0_1774798922011_mgy",
+      "id": "hybrid_default_mode_network_g0_1774799142350_w58",
       "generation": 0,
-      "fitness": 8.693207402890033e+294,
-      "payloads": 1,
+      "fitness": 0.38544575945313,
+      "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_reticular_activating_system_g0_1774798922011_olh",
+      "id": "hybrid_prefrontal_cortex_g0_1774799142350_3ab",
       "generation": 0,
-      "fitness": 8.693207402890033e+294,
-      "payloads": 1,
+      "fitness": 0.3179194465605995,
+      "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_superior_colliculus_g0_1774798922011_c1q",
+      "id": "hybrid_ventral_tegmental_area_g0_1774799142350_oar",
       "generation": 0,
-      "fitness": 8.693207402890033e+294,
-      "payloads": 1,
-      "threats": 0
-    },
-    {
-      "id": "hybrid_amygdala_g1_1774798962014_q2l",
-      "generation": 1,
-      "fitness": 8.987006682490591e+294,
-      "payloads": 1,
-      "threats": 0
-    },
-    {
-      "id": "hybrid_default_mode_network_g1_1774799002051_w0f",
-      "generation": 1,
-      "fitness": 8.315978564725185e+294,
-      "payloads": 1,
-      "threats": 0
-    },
-    {
-      "id": "hybrid_locus_coeruleus_g1_1774799022051_xlb",
-      "generation": 1,
-      "fitness": 7.980270044573492e+294,
-      "payloads": 1,
-      "threats": 0
-    },
-    {
-      "id": "hybrid_pulvinar_g1_1774799022051_an2",
-      "generation": 1,
-      "fitness": 7.980270044573492e+294,
-      "payloads": 1,
+      "fitness": 0.3679386435735998,
+      "payloads": 0,
       "threats": 0
     }
   ],
@@ -90,7 +62,7 @@
     "antibodies": 8,
     "memoryCells": 8,
     "tCells": 16,
-    "cytokines": 12,
+    "cytokines": 2,
     "topAntibodies": [
       {
         "pattern": "coherence_degradation",
@@ -98,11 +70,11 @@
       },
       {
         "pattern": "signal_attenuation",
-        "detections": 11
+        "detections": 2
       },
       {
         "pattern": "synaptic_weakening",
-        "detections": 1
+        "detections": 0
       },
       {
         "pattern": "energy_depletion",
@@ -115,22 +87,22 @@
     ]
   },
   "propagation": {
-    "alivePropagators": 12,
-    "totalPathsDiscovered": 339,
-    "totalHops": 247,
+    "alivePropagators": 16,
+    "totalPathsDiscovered": 38,
+    "totalHops": 32,
     "coveragePercent": 100,
-    "selfSustainingCount": 3
+    "selfSustainingCount": 5
   },
   "fabricWorms": [
     {
       "id": "worm_viral-hybrid_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_viral-hybrid_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
