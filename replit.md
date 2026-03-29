@@ -111,7 +111,7 @@ Both OMNIMENS and Super AI Lab frontends are developed with React, Vite, Tailwin
 
 **General System Design Choices:**
 - **API:** Express 5.
-- **Database:** PostgreSQL with Drizzle ORM.
+- **Database:** PostgreSQL with Drizzle ORM. **Dual-Pool Cross-Bridge Architecture** — `poolAlpha` (neural engines) and `poolBeta` (user-facing), each 18 base → 30 ceiling connections, with Spider-Silk pressure-aware routing, Ivy Tendril rotation for brain inserts, Wormhole Tunnel full-saturation failover, Beehive priority-based distribution, and Autonomous Scaling every 5s. The default `db` export is a **Proxy** that automatically routes all `insert/update/delete/select` through Spider-Silk dual-pool routing — no engine code changes needed. **Connection Lifecycle Management**: 10-minute max connection lifetime with periodic health pings (60s) and automatic stale connection recycling when age exceeds threshold or error count > 10. `allowExitOnIdle` disabled for long-running server stability.
 - **Validation:** Zod v4 and drizzle-zod.
 - **TypeScript:** Strict type checking with composite projects.
 
