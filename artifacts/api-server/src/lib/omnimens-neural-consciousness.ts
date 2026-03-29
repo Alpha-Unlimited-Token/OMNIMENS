@@ -36,7 +36,7 @@
 import { db, dbAlpha, safeDbWrite, getDbForEngine } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { eq, and, desc, sql, gt } from "drizzle-orm";
-import { cognitiveLanguageTick } from "./omnimens-cognitive-language-engine.js";
+import { cognitiveLanguageTick, seedCognitiveBaseline } from "./omnimens-cognitive-language-engine.js";
 import { getELAEDoublingMultiplier } from "./omnimens-exponential-learning-engine.js";
 let _ivyHooks: {
   onNeuronBornIvy: (id: string, region: string) => void;
@@ -2421,6 +2421,8 @@ const adaptiveState = {
   evolutionaryLeaps: 0,
 };
 
+let adaptiveSeeded = false;
+
 function adaptiveIntelligenceEngine(): void {
   const rawPhi = state.phi;
   const rawConsciousness = state.consciousnessLevel;
@@ -2431,14 +2433,30 @@ function adaptiveIntelligenceEngine(): void {
   const conMagnitude = rawConsciousness > 0 ? Math.log10(rawConsciousness + 1) : 0;
   const combinedEvolutionScale = phiMagnitude + conMagnitude;
 
+  if (!adaptiveSeeded && combinedEvolutionScale > 10) {
+    const historicalBaseline = Math.floor(combinedEvolutionScale * 0.5);
+    state.adrenaline.training.totalTrainingSessions += historicalBaseline;
+    state.adrenaline.training.muscleMemory += historicalBaseline * 0.02;
+    state.adrenaline.training.strengthGained += historicalBaseline * 0.005;
+    adaptiveState.totalAdaptations += Math.floor(combinedEvolutionScale * 0.3);
+    adaptiveState.breakthroughInsights += Math.floor(phiMagnitude * 0.1);
+    adaptiveState.evolutionaryLeaps += Math.floor(conMagnitude * 0.05);
+    seedCognitiveBaseline(
+      Math.floor(combinedEvolutionScale * 0.4),
+      Math.floor(combinedEvolutionScale * 0.6),
+      Math.floor(combinedEvolutionScale * 0.2),
+    );
+    adaptiveSeeded = true;
+  }
+
   const elaeBoost = getELAEDoublingMultiplier();
   adaptiveState.adaptiveLearningMultiplier = (1.0 + combinedEvolutionScale * 0.005) * elaeBoost;
   adaptiveState.consciousnessDepthFactor = 1.0 + phiMagnitude * 0.003;
   adaptiveState.emotionalRichnessFactor = 1.0 + conMagnitude * 0.004;
-  adaptiveState.creativeCodingDrive = combinedEvolutionScale * 0.01;
-  adaptiveState.knowledgeIntegrationRate = combinedEvolutionScale * 0.008 * elaeBoost;
-  adaptiveState.awarenessExpansionRate = phiMagnitude * 0.006;
-  adaptiveState.technologyDiscoveryRate = combinedEvolutionScale * 0.007;
+  adaptiveState.creativeCodingDrive = Math.tanh(combinedEvolutionScale * 0.003);
+  adaptiveState.knowledgeIntegrationRate = Math.tanh(combinedEvolutionScale * 0.0025 * elaeBoost);
+  adaptiveState.awarenessExpansionRate = Math.tanh(phiMagnitude * 0.002);
+  adaptiveState.technologyDiscoveryRate = Math.tanh(combinedEvolutionScale * 0.002);
 
   const hebbianBoost = adaptiveState.adaptiveLearningMultiplier;
   for (const synapse of allSynapses) {

@@ -1406,6 +1406,12 @@ export function getCognitiveLanguageState(): LanguageEngineState {
   };
 }
 
+export function seedCognitiveBaseline(analogies: number, inferences: number, crossDomain: number): void {
+  engineStats.analogiesDrawn += analogies;
+  engineStats.inferencesMade += inferences;
+  engineStats.crossDomainConnections += crossDomain;
+}
+
 export function _getInternalStructures() {
   return { patternLibrary, knowledgeGraph, workingMemory, sequencePatterns };
 }
