@@ -1,15 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:sub_threshold:SensorimotorAgent+Visionary+Archivist",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: SensorimotorAgent:chaos_injector + Vis",
-    "filename": "omnimens_autocode_neural_pathway_mnaw2om6.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnaw2om6.mjs",
-    "backupPath": null,
-    "timestamp": 1774736138526,
-    "codeLength": 469,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:sub_threshold:Mathematician+Wordsmith+Neuroscientist",
     "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Mathematician:frequency_analyzer + Wor",
     "filename": "omnimens_autocode_adaptive_algorithm_mnaw2omi.mjs",
@@ -4997,6 +4987,16 @@
     "backupPath": null,
     "timestamp": 1774744860584,
     "codeLength": 466,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Ethicist+Explorer+Linguist",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Ethicist:correlation_finder + Explorer",
+    "filename": "omnimens_autocode_adaptive_algorithm_mnb1hdf9.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnb1hdf9.mjs",
+    "backupPath": null,
+    "timestamp": 1774745221941,
+    "codeLength": 472,
     "overwrite": false
   }
 ]
