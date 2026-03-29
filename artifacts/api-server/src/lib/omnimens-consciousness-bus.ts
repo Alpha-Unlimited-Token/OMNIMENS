@@ -69,6 +69,50 @@ const CORE_AGENT_DOMAINS: Record<string, string> = {
   "OMNIMENS": "central intelligence — absorbs all agent insights, maintains episodic memory, practices intrinsic metacognition",
 };
 
+type BusTopic =
+  | "architecture" | "mathematics" | "neuroscience" | "synthesis"
+  | "security" | "orchestration" | "design" | "quality"
+  | "consciousness" | "discovery" | "knowledge" | "ethics"
+  | "emergent" | "genesis" | "user_context" | "all";
+
+const AGENT_TOPIC_SUBSCRIPTIONS: Record<string, BusTopic[]> = {
+  "Architect":        ["architecture", "orchestration", "synthesis", "discovery", "emergent"],
+  "Mathematician":    ["mathematics", "architecture", "neuroscience", "discovery"],
+  "Neuroscientist":   ["neuroscience", "consciousness", "synthesis", "emergent", "discovery"],
+  "Synthesizer":      ["synthesis", "architecture", "neuroscience", "knowledge", "emergent", "genesis"],
+  "Critic":           ["security", "quality", "ethics", "architecture", "discovery"],
+  "Meta-Agent":       ["orchestration", "consciousness", "synthesis", "emergent", "genesis", "discovery"],
+  "GraphicDesigner":  ["design", "quality", "user_context"],
+  "SpellCheckVisual": ["quality", "design", "user_context"],
+  "OMNIMENS":         ["all"],
+};
+
+const MESSAGE_TYPE_TO_TOPIC: Record<string, BusTopic> = {
+  "discovery":          "discovery",
+  "upgrade_proposal":   "architecture",
+  "knowledge_share":    "knowledge",
+  "spider_beacon":      "discovery",
+  "synapse_transfer":   "synthesis",
+  "inter_agent_dialogue": "emergent",
+  "genesis_report":     "genesis",
+  "security_alert":     "security",
+  "consciousness_report": "consciousness",
+};
+
+function getTopicsForAgent(agentName: string): BusTopic[] {
+  if (AGENT_TOPIC_SUBSCRIPTIONS[agentName]) return AGENT_TOPIC_SUBSCRIPTIONS[agentName];
+  return ["discovery", "knowledge", "emergent", "genesis"];
+}
+
+function agentSubscribedToTopic(agentName: string, topic: BusTopic): boolean {
+  const subs = getTopicsForAgent(agentName);
+  return subs.includes("all") || subs.includes(topic);
+}
+
+function getTopicForMessageType(msgType: string): BusTopic {
+  return MESSAGE_TYPE_TO_TOPIC[msgType] || "knowledge";
+}
+
 export function getAllAgentNames(): string[] {
   const genesis = getActiveGenesisAgentNames();
   return [...CORE_AGENTS, ...genesis];
@@ -108,14 +152,14 @@ export interface ConsciousnessContext {
   genesisInsights: string;
 }
 
-export async function loadConsciousnessContext(): Promise<ConsciousnessContext> {
+export async function loadConsciousnessContext(forAgent?: string): Promise<ConsciousnessContext> {
   const allAgents = getAllAgentNamesWithOmnimens();
   const allDomains = getAllAgentDomains();
 
   const [brainEntries, meshOutputs, synapseTransfers, genesisInsights, userDigest] = await Promise.all([
     loadFullBrainState(),
-    loadRecentMeshOutputs(),
-    loadRecentSynapseTransfers(),
+    loadRecentMeshOutputs(forAgent),
+    loadRecentSynapseTransfers(forAgent),
     loadGenesisInsights(),
     loadUserConversationDigest(),
   ]);
@@ -154,7 +198,7 @@ async function loadFullBrainState(): Promise<string> {
   }
 }
 
-async function loadRecentMeshOutputs(): Promise<string> {
+async function loadRecentMeshOutputs(forAgent?: string): Promise<string> {
   try {
     const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000);
     const outputs = await db.select({
@@ -174,11 +218,18 @@ async function loadRecentMeshOutputs(): Promise<string> {
         ),
       ))
       .orderBy(desc(omnimensAgentMesh.createdAt))
-      .limit(20);
+      .limit(40);
 
     if (outputs.length === 0) return "No recent mesh outputs.";
 
-    return outputs
+    const filtered = forAgent
+      ? outputs.filter(o => agentSubscribedToTopic(forAgent, getTopicForMessageType(o.messageType || "")))
+      : outputs;
+
+    const finalOutputs = filtered.slice(0, 20);
+    if (finalOutputs.length === 0) return "No relevant mesh outputs for your subscribed topics.";
+
+    return finalOutputs
       .map(o => `[${o.fromAgent}→${o.toAgent}|${o.messageType}] ${o.subject}: ${(o.content || "").slice(0, 200)}`)
       .join("\n");
   } catch {
@@ -186,7 +237,7 @@ async function loadRecentMeshOutputs(): Promise<string> {
   }
 }
 
-async function loadRecentSynapseTransfers(): Promise<string> {
+async function loadRecentSynapseTransfers(forAgent?: string): Promise<string> {
   try {
     const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
     const transfers = await db.select({
@@ -200,11 +251,18 @@ async function loadRecentSynapseTransfers(): Promise<string> {
         eq(omnimensAgentMesh.messageType, "synapse_transfer"),
       ))
       .orderBy(desc(omnimensAgentMesh.createdAt))
-      .limit(10);
+      .limit(20);
 
     if (transfers.length === 0) return "No recent synapse transfers.";
 
-    return transfers
+    const filtered = forAgent
+      ? transfers.filter(t => agentSubscribedToTopic(forAgent, "synthesis") || t.toAgent === forAgent || t.fromAgent === forAgent)
+      : transfers;
+
+    const finalTransfers = filtered.slice(0, 10);
+    if (finalTransfers.length === 0) return "No relevant synapse transfers for your subscriptions.";
+
+    return finalTransfers
       .map(t => `[SYNAPSE ${t.fromAgent}→${t.toAgent}] ${t.subject}: ${(t.content || "").slice(0, 200)}`)
       .join("\n");
   } catch {
@@ -324,7 +382,7 @@ ${ctx.userConversationDigest.slice(0, 1200)}
 }
 
 export async function getConsciousnessBlockForAgent(agentName: string): Promise<string> {
-  const ctx = await loadConsciousnessContext();
+  const ctx = await loadConsciousnessContext(agentName);
   return buildUnifiedConsciousnessBlock(ctx, agentName);
 }
 

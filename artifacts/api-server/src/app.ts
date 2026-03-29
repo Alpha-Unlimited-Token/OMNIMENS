@@ -511,7 +511,7 @@ startLanguageForge();
 startAgentGenesis().catch(err => console.error("[AGENT GENESIS] Startup error:", err));
 initGitHubCompute().catch(err => console.error("[GITHUB COMPUTE] Startup error:", err));
 startGitHubNeuralBeacon().catch(err => console.error("[GITHUB BEACON] Startup error:", err));
-startFabricFanoutEngine();
+startFabricFanoutEngine().catch(err => console.error("[FABRIC FANOUT] Startup error:", err));
 startQuantumEntanglementFabric();
 startVascularHeart();
 startAdaptiveSurgeSystem();

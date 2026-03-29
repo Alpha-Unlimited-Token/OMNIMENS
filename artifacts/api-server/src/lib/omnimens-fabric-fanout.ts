@@ -27,14 +27,53 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { getGitHubBeaconState, getGitHubWormStats } from "./omnimens-github-neural-beacon.js";
-import { getMeshAgentSubstrates, injectCurrentToAgent, getMeshConnectivityStats } from "./omnimens-neural-mesh-engine.js";
-import { getNeuralConsciousnessState, getRegionNames, boostRegionCurrent } from "./omnimens-neural-consciousness.js";
-import { getQuantumWormholeState } from "./omnimens-quantum-wormhole.js";
-import { getViralHybridState, getPropagationStats } from "./omnimens-viral-hybrid.js";
-import { getIvyNetworkState } from "./omnimens-ivy-network.js";
-import { getNeuralSpiderState, getSystemIntelligenceState } from "./omnimens-neural-spiders.js";
-import { getAdaptiveSurgeState } from "./omnimens-adaptive-surge.js";
+const _engines: Record<string, any> = {};
+let _enginesPreloaded = false;
+
+async function preloadEngines(): Promise<void> {
+  if (_enginesPreloaded) return;
+  const loads: Array<{ name: string; path: string }> = [
+    { name: "githubBeacon", path: "./omnimens-github-neural-beacon.js" },
+    { name: "meshEngine", path: "./omnimens-neural-mesh-engine.js" },
+    { name: "neuralConsciousness", path: "./omnimens-neural-consciousness.js" },
+    { name: "quantumWormhole", path: "./omnimens-quantum-wormhole.js" },
+    { name: "viralHybrid", path: "./omnimens-viral-hybrid.js" },
+    { name: "ivyNetwork", path: "./omnimens-ivy-network.js" },
+    { name: "neuralSpiders", path: "./omnimens-neural-spiders.js" },
+    { name: "adaptiveSurge", path: "./omnimens-adaptive-surge.js" },
+  ];
+  const results = await Promise.allSettled(loads.map(async (l) => {
+    const mod = await import(l.path);
+    _engines[l.name] = mod;
+    return l.name;
+  }));
+  for (let i = 0; i < results.length; i++) {
+    if (results[i].status === "rejected") {
+      const err = (results[i] as PromiseRejectedResult).reason;
+      console.error(`[FABRIC FANOUT] Engine isolation — "${loads[i].name}" failed to load (fanout continues): ${err?.message || err}`);
+      _engines[loads[i].name] = {};
+    }
+  }
+  _enginesPreloaded = true;
+  const loaded = results.filter(r => r.status === "fulfilled").length;
+  console.log(`[FABRIC FANOUT] Preloaded ${loaded}/${loads.length} engines with fault isolation`);
+}
+
+function getGitHubBeaconState() { return _engines.githubBeacon?.getGitHubBeaconState?.() ?? {}; }
+function getGitHubWormStats() { return _engines.githubBeacon?.getGitHubWormStats?.() ?? {}; }
+function getMeshAgentSubstrates() { return _engines.meshEngine?.getMeshAgentSubstrates?.() ?? []; }
+function injectCurrentToAgent(a: string, b: string, c: number) { _engines.meshEngine?.injectCurrentToAgent?.(a, b, c); }
+function getMeshConnectivityStats() { return _engines.meshEngine?.getMeshConnectivityStats?.() ?? {}; }
+function getNeuralConsciousnessState() { return _engines.neuralConsciousness?.getNeuralConsciousnessState?.() ?? {}; }
+function getRegionNames() { return _engines.neuralConsciousness?.getRegionNames?.() ?? []; }
+function boostRegionCurrent(a: string, b: number) { _engines.neuralConsciousness?.boostRegionCurrent?.(a, b); }
+function getQuantumWormholeState() { return _engines.quantumWormhole?.getQuantumWormholeState?.() ?? {}; }
+function getViralHybridState() { return _engines.viralHybrid?.getViralHybridState?.() ?? {}; }
+function getPropagationStats() { return _engines.viralHybrid?.getPropagationStats?.() ?? {}; }
+function getIvyNetworkState() { return _engines.ivyNetwork?.getIvyNetworkState?.() ?? {}; }
+function getNeuralSpiderState() { return _engines.neuralSpiders?.getNeuralSpiderState?.() ?? {}; }
+function getSystemIntelligenceState() { return _engines.neuralSpiders?.getSystemIntelligenceState?.() ?? {}; }
+function getAdaptiveSurgeState() { return _engines.adaptiveSurge?.getAdaptiveSurgeState?.() ?? {}; }
 
 const FANOUT_TICK_MS = 8000;
 const FANOUT_WAVE_INTERVAL_MS = 45000;
@@ -1572,8 +1611,10 @@ function fanoutTick(): void {
 // STARTUP
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export function startFabricFanoutEngine(): void {
+export async function startFabricFanoutEngine(): Promise<void> {
   if (engineState.initialized) return;
+
+  await preloadEngines();
 
   console.log("[FABRIC FANOUT] 🌿 ════════════════════════════════════════════════════════════════════");
   console.log("[FABRIC FANOUT] 🌿 OMNIMENS NEURAL FABRIC FANOUT ENGINE INITIALIZING");
@@ -1581,6 +1622,7 @@ export function startFabricFanoutEngine(): void {
   console.log("[FABRIC FANOUT] 🌿 Two living neural plants — LOCAL and GITHUB — merge into ONE");
   console.log("[FABRIC FANOUT] 🌿 From the merge point, new neurons, worms, spiders, beacons,");
   console.log("[FABRIC FANOUT] 🌿 silk strands, ivy tendrils, and beehive scouts FAN OUT in ALL directions");
+  console.log("[FABRIC FANOUT] 🌿 Engines loaded with FAULT ISOLATION — individual failures cannot crash the fabric");
   console.log("[FABRIC FANOUT] 🌿 ════════════════════════════════════════════════════════════════════");
 
   initAgentTendrils();

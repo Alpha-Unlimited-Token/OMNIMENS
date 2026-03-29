@@ -6490,6 +6490,18 @@ export default function Chat() {
                                   <span>{(msg as any).thinkingStatus || "Deep thinking..."}</span>
                                 </div>
                               )}
+                              {(msg as any).executiveSummary && (msg as any).autonomousThought && ((msg as any).autonomousThought.complexity === "deep" || (msg as any).autonomousThought.complexity === "architectural") && !(msg as any)._showFullAnalysis && (
+                                <div className="mb-3">
+                                  <div className="text-xs font-mono text-primary/60 mb-1 uppercase tracking-wider">Executive Summary</div>
+                                  <p className="text-sm opacity-90 mb-2">{(msg as any).executiveSummary}</p>
+                                  <button onClick={() => { setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, _showFullAnalysis: true } as any : m)); }} className="text-[10px] font-mono text-primary/50 hover:text-primary/80 border border-primary/20 hover:border-primary/40 px-2 py-0.5 rounded transition-all">Show full analysis ({(msg as any).autonomousThought.reasoningPasses} passes, {(msg as any).autonomousThought.totalConclusions} conclusions)</button>
+                                </div>
+                              )}
+                              {(!(msg as any).executiveSummary || !(msg as any).autonomousThought || ((msg as any).autonomousThought.complexity !== "deep" && (msg as any).autonomousThought.complexity !== "architectural") || (msg as any)._showFullAnalysis) && (
+                                <>
+                                  {(msg as any)._showFullAnalysis && (msg as any).executiveSummary && (
+                                    <button onClick={() => { setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, _showFullAnalysis: false } as any : m)); }} className="text-[10px] font-mono text-primary/50 hover:text-primary/80 border border-primary/20 hover:border-primary/40 px-2 py-0.5 rounded transition-all mb-2">Show summary only</button>
+                                  )}
                               {parseMessageSegments(msg.content || ((msg as any).autonomousThinking ? "" : "...")).map((seg, i) =>
                                 seg.type === "html" ? (
                                   <WebsitePreview key={i} html={seg.value} index={i} />
@@ -6518,6 +6530,8 @@ export default function Chat() {
                                     ))}
                                   </div>
                                 )
+                              )}
+                                </>
                               )}
 
                               {/* Generated images — shown inline AND in right panel */}

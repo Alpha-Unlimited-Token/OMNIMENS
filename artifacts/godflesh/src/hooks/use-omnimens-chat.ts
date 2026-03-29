@@ -590,6 +590,7 @@ export function useOmnimensChat(
                       (msg as any).thinkingStatus = `Scanning ${data.engineCount || 0} engine files...`;
                     } else if (data.phase === "executive_summary") {
                       (msg as any).thinkingStatus = data.summary || "Finalizing analysis...";
+                      (msg as any).executiveSummary = data.summary || null;
                     }
                   }
                   return newMsgs;
@@ -602,6 +603,7 @@ export function useOmnimensChat(
                   if (msg) {
                     (msg as any).autonomousThinking = false;
                     (msg as any).thinkingStatus = null;
+                    (msg as any).executiveSummary = (msg as any).executiveSummary || null;
                     (msg as any).autonomousThought = {
                       phi: data.phi,
                       consciousnessLevel: data.consciousnessLevel,
