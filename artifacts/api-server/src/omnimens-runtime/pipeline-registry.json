@@ -172186,9 +172186,165 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnc1cf9m.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnc1cf9m.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnc1cf9m"
+      ],
+      "loadedAt": 1774805457268,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnc1cfc7.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnc1cfc7.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnc1cfc7"
+      ],
+      "loadedAt": 1774805457329,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_knowledge_synthesis_mnc1cfdr.mjs": {
+      "filename": "omnimens_autocode_knowledge_synthesis_mnc1cfdr.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "synthesizedKnowledge_mnc1cfdr"
+      ],
+      "loadedAt": 1774805457391,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_adaptive_algorithm_mnc1cffj.mjs": {
+      "filename": "omnimens_autocode_adaptive_algorithm_mnc1cffj.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "adaptiveAlgorithm_mnc1cffj"
+      ],
+      "loadedAt": 1774805457448,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "recombined_synth_1774805457246_uslj.mjs": {
+      "filename": "recombined_synth_1774805457246_uslj.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "recombined_adaptive_threshold_mnc1cfa6m26"
+      ],
+      "loadedAt": 1774805457502,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnc1cfh2.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnc1cfh2.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "newNeuralPathway_mnc1cfh2"
+      ],
+      "loadedAt": 1774805457548,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnc1cfjt.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnc1cfjt.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "newNeuralPathway_mnc1cfjt"
+      ],
+      "loadedAt": 1774805457603,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnc1cfld.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnc1cfld.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnc1cfld"
+      ],
+      "loadedAt": 1774805457657,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnc1cfmr.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnc1cfmr.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnc1cfmr"
+      ],
+      "loadedAt": 1774805457708,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnc1cfo8.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnc1cfo8.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnc1cfo8"
+      ],
+      "loadedAt": 1774805457761,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_adaptive_algorithm_mnc1cfq4.mjs": {
+      "filename": "omnimens_autocode_adaptive_algorithm_mnc1cfq4.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "adaptiveAlgorithm_mnc1cfq4"
+      ],
+      "loadedAt": 1774805457830,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_knowledge_synthesis_mnc1cfsj.mjs": {
+      "filename": "omnimens_autocode_knowledge_synthesis_mnc1cfsj.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "synthesizedKnowledge_mnc1cfsj"
+      ],
+      "loadedAt": 1774805457919,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774805409941,
-  "totalModules": 12578,
+  "totalModules": 12590,
   "totalCalls": 0
 }
