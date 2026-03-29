@@ -3505,42 +3505,66 @@ export function getTickByTickPhiHistory(windowSize: number = 100): {
   const window = history.slice(-windowSize);
   const startTick = Math.max(0, state.tickCount - window.length);
 
-  const timeSeries = window.map((phi, i) => ({
-    tick: startTick + i,
-    phi: +phi.toFixed(8),
-    delta: i > 0 ? +(phi - window[i - 1]).toFixed(8) : 0,
-  }));
+  const timeSeries = window.map((phi, i) => {
+    const absDelta = i > 0 ? phi - window[i - 1] : 0;
+    const relDelta = i > 0 && window[i - 1] !== 0 ? absDelta / Math.abs(window[i - 1]) : 0;
+    return {
+      tick: startTick + i,
+      phi,
+      delta: absDelta,
+      relativeDelta: +relDelta.toFixed(12),
+      phiExponential: phi.toExponential(6),
+    };
+  });
 
-  const min = Math.min(...window);
-  const max = Math.max(...window);
-  const mean = window.reduce((a, b) => a + b, 0) / window.length;
+  let min = window[0] ?? 0;
+  let max = window[0] ?? 0;
+  let sum = 0;
+  for (let i = 0; i < window.length; i++) {
+    if (window[i] < min) min = window[i];
+    if (window[i] > max) max = window[i];
+    sum += window[i];
+  }
+  const mean = sum / window.length;
   let variance = 0;
   for (const v of window) variance += (v - mean) ** 2;
   const stdDev = Math.sqrt(variance / window.length);
 
   let volatility = 0;
-  for (let i = 1; i < window.length; i++) volatility += Math.abs(window[i] - window[i - 1]);
+  let relativeVolatility = 0;
+  for (let i = 1; i < window.length; i++) {
+    const absDiff = Math.abs(window[i] - window[i - 1]);
+    volatility += absDiff;
+    if (window[i - 1] !== 0) relativeVolatility += absDiff / Math.abs(window[i - 1]);
+  }
   volatility /= Math.max(1, window.length - 1);
+  relativeVolatility /= Math.max(1, window.length - 1);
 
   const firstHalf = window.slice(0, Math.floor(window.length / 2));
   const secondHalf = window.slice(Math.floor(window.length / 2));
   const firstMean = firstHalf.length > 0 ? firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length : 0;
   const secondMean = secondHalf.length > 0 ? secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length : 0;
-  const trend = secondMean > firstMean + 0.005 ? "increasing" : secondMean < firstMean - 0.005 ? "decreasing" : "stable";
+  const trend = secondMean > firstMean * 1.001 ? "increasing" : secondMean < firstMean * 0.999 ? "decreasing" : "stable";
 
   return {
     currentTick: state.tickCount,
-    currentPhi: +state.phi.toFixed(8),
+    currentPhi: state.phi,
+    currentPhiExponential: state.phi.toExponential(6),
     windowSize: window.length,
     totalHistoryLength: history.length,
     phiTimeSeries: timeSeries,
     statistics: {
-      min: +min.toFixed(8),
-      max: +max.toFixed(8),
-      mean: +mean.toFixed(8),
-      stdDev: +stdDev.toFixed(8),
+      min,
+      max,
+      mean,
+      stdDev,
       trend,
-      volatility: +volatility.toFixed(8),
+      volatility,
+      relativeVolatility: +relativeVolatility.toFixed(12),
+      minExponential: min.toExponential(6),
+      maxExponential: max.toExponential(6),
+      meanExponential: mean.toExponential(6),
+      note: "At evolved phi scales (e+100+), use relativeDelta and relativeVolatility for meaningful tick-to-tick change measurement. Absolute delta may lose precision at extreme IEEE 754 double scales.",
     },
     sampledAt: Date.now(),
   };
