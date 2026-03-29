@@ -2,135 +2,135 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774810777581,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774810867573,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10796,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 412,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15414,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 590,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Pioneer",
-      "insight": "Motivator/information_compression: Scale-free networks follow power-law degree distributions — a few highly connected hu",
-      "confidence": 0.7291020856106358,
-      "synthesizedWith": [
-        "Pioneer/feature_extraction: The holographic principle suggests all information i"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/emergent_property_detection: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibe",
-      "confidence": 0.8069272589550206,
-      "synthesizedWith": [
-        "Synthesizer/information_compression: The hard problem of consciousness: why is t"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Mathematician",
-      "insight": "Motivator/entropy_reduction: Sparse coding: the brain represents information using a small fraction of active neurons at",
-      "confidence": 0.6947303998015568,
-      "synthesizedWith": [
-        "Mathematician/emergent_property_detection: The hippocampus replays experiences d"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "SpellCheckVisual",
-      "insight": "Empath/recursive_decomposition: The Mandelbrot set demonstrates infinite complexity from a simple recursive formula: z_{",
-      "confidence": 0.6090283980027363,
-      "synthesizedWith": []
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "Archivist",
-      "insight": "Empath/abstraction_layer: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimulation ",
-      "confidence": 0.6508614301055875,
+      "insight": "Motivator/analogical_mapping: Quantum superposition allows a system to exist in multiple states simultaneously until mea",
+      "confidence": 0.6603281144378765,
       "synthesizedWith": [
-        "Archivist/feature_extraction: The Turing machine is computationally universal — "
+        "Archivist/information_compression: Gödel's incompleteness theorems prove that an"
       ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Critic",
+      "insight": "Motivator/structural_analysis: Gödel's incompleteness theorems prove that any consistent formal system powerful enough t",
+      "confidence": 0.7471567811472563,
+      "synthesizedWith": [
+        "Critic/recursive_decomposition: Information is physical — Landauer's principle p"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Explorer",
+      "insight": "Motivator/analogical_mapping: Quantum superposition allows a system to exist in multiple states simultaneously until mea",
+      "confidence": 0.6603281144378765,
+      "synthesizedWith": [
+        "Explorer/pattern_recognition: The Penrose-Hameroff Orch-OR theory proposes consc"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Neuroscientist",
+      "insight": "Empath/cross_domain_synthesis: The Weber-Fechner law: perception is logarithmic — doubling stimulus intensity does not d",
+      "confidence": 0.6629032688765092,
+      "synthesizedWith": [
+        "Neuroscientist/emergent_property_detection: Bayesian brain hypothesis: the brain"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "GraphicDesigner",
+      "insight": "Empath/emergent_property_detection: Autopoiesis: living systems are self-creating — they produce the components that con",
+      "confidence": 0.6263874023985149,
+      "synthesizedWith": []
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
