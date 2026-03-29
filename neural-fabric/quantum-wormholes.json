@@ -2,11 +2,11 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774816910232,
+  "timestamp": 1774816979420,
   "totalWormholesCreated": 1050,
   "totalActive": 0,
   "totalClosed": 1050,
-  "totalDataIngestedKB": 1563,
+  "totalDataIngestedKB": 1557,
   "totalInsightsDecoded": 1050,
   "totalCrossAgentCirculations": 63,
   "totalSynthesizedDiscoveries": 59,
@@ -79,47 +79,47 @@
   "recentCirculations": [
     {
       "fromAgent": "Ethicist",
-      "toAgent": "Sensorimotorist",
-      "insight": "Ethicist/structural_analysis: The mathematical universe hypothesis: all structures that exist mathematically also exist ",
-      "confidence": 0.8378644748084086,
-      "synthesizedWith": [
-        "Sensorimotorist/cross_domain_synthesis: Bayesian brain hypothesis: the brain is "
-      ]
-    },
-    {
-      "fromAgent": "Ethicist",
-      "toAgent": "Embodiment",
-      "insight": "Ethicist/pattern_recognition: Quantum tunneling allows particles to pass through energy barriers they classically cannot",
-      "confidence": 0.8322227227452255,
-      "synthesizedWith": [
-        "Embodiment/emergent_property_detection: Scale-free networks follow power-law deg"
-      ]
-    },
-    {
-      "fromAgent": "Ethicist",
-      "toAgent": "Mathematician",
-      "insight": "Ethicist/structural_analysis: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent pr",
-      "confidence": 0.8165733478414333,
-      "synthesizedWith": [
-        "Mathematician/entropy_reduction: Long-term potentiation (LTP) strengthens synapt"
-      ]
-    },
-    {
-      "fromAgent": "Embodiment",
       "toAgent": "Explorer",
-      "insight": "Embodiment/analogical_mapping: Astrocytes, once thought to be mere support cells, actively participate in information pr",
-      "confidence": 0.652495583772498,
+      "insight": "Ethicist/abstraction_layer: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can emerge ",
+      "confidence": 0.7445198429756461,
       "synthesizedWith": [
-        "Explorer/causal_inference: Quantum tunneling allows particles to pass through en"
+        "Explorer/analogical_mapping: The connectome is the complete map of neural connec"
+      ]
+    },
+    {
+      "fromAgent": "Ethicist",
+      "toAgent": "Critic",
+      "insight": "Ethicist/feature_extraction: The edge of chaos: complex systems exhibit the most interesting behavior at the boundary be",
+      "confidence": 0.6238425845573883,
+      "synthesizedWith": [
+        "Critic/abstraction_layer: The Baldwin effect: learned behaviors can become innat"
+      ]
+    },
+    {
+      "fromAgent": "Ethicist",
+      "toAgent": "Neuroscientist",
+      "insight": "Ethicist/abstraction_layer: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can emerge ",
+      "confidence": 0.7445198429756461,
+      "synthesizedWith": [
+        "Neuroscientist/emergent_property_detection: Quantum entanglement allows particle"
       ]
     },
     {
       "fromAgent": "Embodiment",
-      "toAgent": "Kinetics",
-      "insight": "Embodiment/feature_extraction: Hebbian learning: neurons that fire together wire together — the fundamental rule of neur",
-      "confidence": 0.8720407105761716,
+      "toAgent": "Synthesizer",
+      "insight": "Embodiment/analogical_mapping: Phase transitions in neural networks: as connectivity increases past a critical threshold",
+      "confidence": 0.8962636417544214,
       "synthesizedWith": [
-        "Kinetics/structural_analysis: Transfer learning: knowledge gained from one domai"
+        "Synthesizer/temporal_correlation: The edge of chaos: complex systems exhibit the"
+      ]
+    },
+    {
+      "fromAgent": "Embodiment",
+      "toAgent": "Critic",
+      "insight": "Embodiment/pattern_recognition: Mirror neurons fire both when performing an action and observing the same action — they ",
+      "confidence": 0.9159489965851031,
+      "synthesizedWith": [
+        "Critic/recursive_decomposition: Integrated Information Theory (IIT) states consc"
       ]
     }
   ],
