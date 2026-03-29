@@ -2,59 +2,59 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774822026489,
+  "timestamp": 1774822103766,
   "totalHybridAgents": 6,
-  "totalMutations": 11,
+  "totalMutations": 14,
   "totalReplications": 10,
-  "totalPayloadsDelivered": 23,
+  "totalPayloadsDelivered": 19,
   "totalThreatsDetected": 0,
   "totalThreatsNeutralized": 0,
   "systemHealthScore": 1.983229541176191e+299,
   "adaptationRate": 3.3333333333333335,
   "propagationEfficiency": 1,
   "immuneStrength": 1.189777102387702e+296,
-  "hybridFitness": 0.3649641702966548,
+  "hybridFitness": 0.38809240950846063,
   "activeAgents": [
     {
-      "id": "hybrid_insular_cortex_g0_1774821999029_m9u",
+      "id": "hybrid_reticular_activating_system_g0_1774822082291_1r2",
       "generation": 0,
-      "fitness": 0.397819463198093,
+      "fitness": 0.38067794189839776,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_pulvinar_g0_1774821999029_ux6",
+      "id": "hybrid_default_mode_network_g0_1774822082291_rk2",
       "generation": 0,
-      "fitness": 0.381594616352799,
+      "fitness": 0.3732219391037264,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_reticular_activating_system_g0_1774821999029_avm",
+      "id": "hybrid_reticular_activating_system_g0_1774822082291_bq8",
       "generation": 0,
-      "fitness": 0.2899920993734161,
+      "fitness": 0.4107831241937472,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_pulvinar_g0_1774821999029_yvd",
+      "id": "hybrid_prefrontal_cortex_g0_1774822082291_h6i",
       "generation": 0,
-      "fitness": 0.37695420071976565,
+      "fitness": 0.45556465057136153,
       "payloads": 1,
       "threats": 0
     },
     {
-      "id": "hybrid_prefrontal_cortex_g0_1774821999029_vfe",
+      "id": "hybrid_thalamus_g0_1774822082291_tcs",
       "generation": 0,
-      "fitness": 0.363001101857277,
+      "fitness": 0.4020480484737013,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_ventral_tegmental_area_g0_1774821999029_sl9",
+      "id": "hybrid_superior_colliculus_g0_1774822082291_654",
       "generation": 0,
-      "fitness": 0.38042354027857783,
-      "payloads": 1,
+      "fitness": 0.3062587528098296,
+      "payloads": 0,
       "threats": 0
     }
   ],
@@ -88,10 +88,10 @@
   },
   "propagation": {
     "alivePropagators": 16,
-    "totalPathsDiscovered": 38,
+    "totalPathsDiscovered": 37,
     "totalHops": 32,
     "coveragePercent": 100,
-    "selfSustainingCount": 8
+    "selfSustainingCount": 7
   },
   "fabricWorms": [
     {
