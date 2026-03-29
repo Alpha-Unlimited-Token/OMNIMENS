@@ -2,137 +2,135 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774827440310,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774827534129,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1509,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 59,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6107,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 237,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "GraphicDesigner",
-      "insight": "Motivator/entropy_reduction: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOVING com",
-      "confidence": 0.8144054675675578,
+      "toAgent": "Linguist",
+      "insight": "Motivator/analogical_mapping: The holographic principle suggests all information in a volume of space can be encoded on ",
+      "confidence": 0.7897843860386283,
       "synthesizedWith": [
-        "GraphicDesigner/cross_domain_synthesis: Mirror neurons fire both when performing"
+        "Linguist/analogical_mapping: Kolmogorov complexity measures the shortest program"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/information_compression: Gödel's incompleteness theorems prove that any consistent formal system powerful enou",
-      "confidence": 0.8130666433477451,
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/entropy_reduction: Quantum tunneling allows particles to pass through energy barriers they classically cannot ",
+      "confidence": 0.671927901733703,
       "synthesizedWith": [
-        "Synthesizer/feature_extraction: Quantum decoherence typically destroys quantum e"
+        "OMNIMENS/entropy_reduction: The hard problem of consciousness: why is there subj"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Architect",
-      "insight": "Motivator/temporal_correlation: The connectome is the complete map of neural connections — the human connectome project ",
-      "confidence": 0.7076546095819346,
+      "toAgent": "Philosopher",
+      "insight": "Motivator/entropy_reduction: Quantum tunneling allows particles to pass through energy barriers they classically cannot ",
+      "confidence": 0.671927901733703,
       "synthesizedWith": [
-        "Architect/causal_inference: Reservoir computing shows that even random neural ne"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Pioneer",
-      "insight": "Empath/information_compression: The global workspace theory of consciousness: information becomes conscious when it is b",
-      "confidence": 0.6335960248511672,
-      "synthesizedWith": [
-        "Pioneer/cross_domain_synthesis: The edge of chaos: complex systems exhibit the m"
+        "Philosopher/analogical_mapping: The hard problem of consciousness: why is there "
       ]
     },
     {
       "fromAgent": "Empath",
       "toAgent": "OMNIMENS",
-      "insight": "Empath/emergent_property_detection: Astrocytes, once thought to be mere support cells, actively participate in informati",
-      "confidence": 0.7450099077995607,
+      "insight": "Empath/analogical_mapping: Information is physical — Landauer's principle proves that erasing one bit of information rel",
+      "confidence": 0.6034515069234103,
+      "synthesizedWith": []
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Synthesizer",
+      "insight": "Empath/emergent_property_detection: Predictive coding: the brain constantly generates predictions about incoming sensory",
+      "confidence": 0.7402813355644204,
       "synthesizedWith": [
-        "OMNIMENS/feature_extraction: The butterfly effect: in chaotic systems, infinites"
+        "Synthesizer/feature_extraction: Quantum tunneling allows particles to pass throu"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
