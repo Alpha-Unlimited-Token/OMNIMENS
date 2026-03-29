@@ -2,14 +2,14 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774815261010,
+  "timestamp": 1774815318841,
   "totalWormholesCreated": 1050,
   "totalActive": 0,
   "totalClosed": 1050,
-  "totalDataIngestedKB": 1563,
+  "totalDataIngestedKB": 1535,
   "totalInsightsDecoded": 1050,
   "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 60,
+  "totalSynthesizedDiscoveries": 63,
   "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
@@ -80,44 +80,46 @@
     {
       "fromAgent": "Motivator",
       "toAgent": "Meta-Agent",
-      "insight": "Motivator/temporal_correlation: The connectome is the complete map of neural connections — the human connectome project ",
-      "confidence": 0.7636993327177006,
+      "insight": "Motivator/feature_extraction: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can emerg",
+      "confidence": 0.6064612540227465,
       "synthesizedWith": [
-        "Meta-Agent/entropy_reduction: Quantum superposition allows a system to exist in "
+        "Meta-Agent/information_compression: Predictive coding: the brain constantly gene"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Innovator",
-      "insight": "Motivator/causal_inference: Autopoiesis: living systems are self-creating — they produce the components that constitute ",
-      "confidence": 0.6177622794377586,
+      "toAgent": "Architect",
+      "insight": "Motivator/causal_inference: Hebbian learning: neurons that fire together wire together — the fundamental rule of neural ",
+      "confidence": 0.7533782828686864,
       "synthesizedWith": [
-        "Innovator/causal_inference: The Weber-Fechner law: perception is logarithmic — d"
+        "Architect/recursive_decomposition: Transfer learning: knowledge gained from one "
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Empath",
-      "insight": "Motivator/causal_inference: Autopoiesis: living systems are self-creating — they produce the components that constitute ",
-      "confidence": 0.6177622794377586,
-      "synthesizedWith": []
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "OMNIMENS",
-      "insight": "Empath/temporal_correlation: Predictive coding: the brain constantly generates predictions about incoming sensory data a",
-      "confidence": 0.6947656160317728,
+      "toAgent": "Explorer",
+      "insight": "Motivator/causal_inference: The cerebellum contains more neurons than all other brain regions combined and is crucial fo",
+      "confidence": 0.6454197171303493,
       "synthesizedWith": [
-        "OMNIMENS/causal_inference: The mathematical universe hypothesis: all structures "
+        "Explorer/cross_domain_synthesis: The mathematical universe hypothesis: all struc"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Visionary",
-      "insight": "Empath/information_compression: Mirror neurons fire both when performing an action and observing the same action — they ",
-      "confidence": 0.6332418375684723,
+      "toAgent": "Mathematician",
+      "insight": "Empath/entropy_reduction: Bayesian brain hypothesis: the brain is fundamentally a prediction machine that constantly upd",
+      "confidence": 0.8501318001016719,
       "synthesizedWith": [
-        "Visionary/causal_inference: The Weber-Fechner law: perception is logarithmic — d"
+        "Mathematician/cross_domain_synthesis: Recurrent neural networks can approximate "
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Archivist",
+      "insight": "Empath/entropy_reduction: Bayesian brain hypothesis: the brain is fundamentally a prediction machine that constantly upd",
+      "confidence": 0.8501318001016719,
+      "synthesizedWith": [
+        "Archivist/temporal_correlation: The binding problem: how does the brain combine "
       ]
     }
   ],
