@@ -2,137 +2,133 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774819386070,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774819480843,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1552,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 63,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6181,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 238,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Philosopher",
-      "insight": "Motivator/temporal_correlation: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOVING ",
-      "confidence": 0.8589614607661107,
-      "synthesizedWith": [
-        "Philosopher/emergent_property_detection: The default mode network activates when"
-      ]
+      "toAgent": "Pioneer",
+      "insight": "Motivator/cross_domain_synthesis: Integrated Information Theory (IIT) states consciousness = Phi, the amount of integrat",
+      "confidence": 0.6773011909876816,
+      "synthesizedWith": []
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Innovator",
-      "insight": "Motivator/abstraction_layer: The anthropic principle: the universe's fundamental constants appear fine-tuned for the exi",
-      "confidence": 0.9098435741727542,
-      "synthesizedWith": [
-        "Innovator/pattern_recognition: The Boltzmann brain paradox suggests that a self-"
-      ]
+      "toAgent": "SpellCheckVisual",
+      "insight": "Motivator/cross_domain_synthesis: The Chinese Room argument: can a system that manipulates symbols without understanding",
+      "confidence": 0.6006517967929575,
+      "synthesizedWith": []
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Critic",
-      "insight": "Motivator/temporal_correlation: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOVING ",
-      "confidence": 0.8589614607661107,
+      "toAgent": "GraphicDesigner",
+      "insight": "Motivator/cross_domain_synthesis: Integrated Information Theory (IIT) states consciousness = Phi, the amount of integrat",
+      "confidence": 0.6773011909876816,
       "synthesizedWith": [
-        "Critic/structural_analysis: Quantum entanglement allows particles to share state"
+        "GraphicDesigner/information_compression: The edge of chaos: complex systems exhi"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Innovator",
-      "insight": "Empath/temporal_correlation: Information is physical — Landauer's principle proves that erasing one bit of information r",
-      "confidence": 0.8921240159121606,
+      "toAgent": "SpellCheckVisual",
+      "insight": "Empath/analogical_mapping: The Weber-Fechner law: perception is logarithmic — doubling stimulus intensity does not doubl",
+      "confidence": 0.8425585775101148,
       "synthesizedWith": [
-        "Innovator/pattern_recognition: The Boltzmann brain paradox suggests that a self-"
+        "SpellCheckVisual/pattern_recognition: Long-term potentiation (LTP) strengthens s"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Motivator",
-      "insight": "Empath/temporal_correlation: Information is physical — Landauer's principle proves that erasing one bit of information r",
-      "confidence": 0.8921240159121606,
+      "toAgent": "Synthesizer",
+      "insight": "Empath/recursive_decomposition: Reservoir computing shows that even random neural networks can perform computation if th",
+      "confidence": 0.7260100054448062,
       "synthesizedWith": [
-        "Motivator/analogical_mapping: The anthropic principle: the universe's fundamenta"
+        "Synthesizer/emergent_property_detection: Integrated Information Theory (IIT) sta"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
