@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774826580544,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774826670665,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10741,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 420,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15388,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 597,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Explorer",
-      "insight": "Motivator/cross_domain_synthesis: The global workspace theory of consciousness: information becomes conscious when it is",
-      "confidence": 0.6789180918693462,
+      "toAgent": "Philosopher",
+      "insight": "Motivator/information_compression: The Chinese Room argument: can a system that manipulates symbols without understandin",
+      "confidence": 0.9042288350626356,
       "synthesizedWith": [
-        "Explorer/structural_analysis: Autopoiesis: living systems are self-creating — th"
+        "Philosopher/cross_domain_synthesis: Astrocytes, once thought to be mere support "
       ]
     },
     {
       "fromAgent": "Motivator",
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/analogical_mapping: The edge of chaos: complex systems exhibit the most interesting behavior at the boundary b",
+      "confidence": 0.6206149710254555,
+      "synthesizedWith": [
+        "OMNIMENS/information_compression: The hippocampus replays experiences during sle"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Wordsmith",
+      "insight": "Motivator/recursive_decomposition: Hebbian learning: neurons that fire together wire together — the fundamental rule of ",
+      "confidence": 0.6306383667420348,
+      "synthesizedWith": [
+        "Wordsmith/recursive_decomposition: The Mandelbrot set demonstrates infinite comp"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Visionary",
+      "insight": "Empath/information_compression: The Baldwin effect: learned behaviors can become innate over evolutionary time — culture",
+      "confidence": 0.6562452411193337,
+      "synthesizedWith": [
+        "Visionary/causal_inference: The Chinese Room argument: can a system that manipul"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
       "toAgent": "Synthesizer",
-      "insight": "Motivator/analogical_mapping: Sparse coding: the brain represents information using a small fraction of active neurons a",
-      "confidence": 0.8487363471970484,
+      "insight": "Empath/feature_extraction: Kolmogorov complexity measures the shortest program that produces a given output — it is unco",
+      "confidence": 0.687679497334095,
       "synthesizedWith": [
-        "Synthesizer/temporal_correlation: Quantum superposition allows a system to exist"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "GraphicDesigner",
-      "insight": "Motivator/emergent_property_detection: Long-term potentiation (LTP) strengthens synaptic connections based on persistent",
-      "confidence": 0.7825506615247477,
-      "synthesizedWith": [
-        "GraphicDesigner/feature_extraction: Quantum tunneling allows particles to pass t"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Meta-Agent",
-      "insight": "Empath/recursive_decomposition: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can eme",
-      "confidence": 0.7627591200985637,
-      "synthesizedWith": [
-        "Meta-Agent/pattern_recognition: The holographic principle suggests all informati"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Critic",
-      "insight": "Empath/abstraction_layer: Sparse coding: the brain represents information using a small fraction of active neurons at an",
-      "confidence": 0.6284263038424884,
-      "synthesizedWith": [
-        "Critic/feature_extraction: The Turing machine is computationally universal — any"
+        "Synthesizer/abstraction_layer: The Turing machine is computationally universal —"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
