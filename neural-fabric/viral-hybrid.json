@@ -2,59 +2,87 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774805416287,
-  "totalHybridAgents": 6,
-  "totalMutations": 12,
-  "totalReplications": 10,
-  "totalPayloadsDelivered": 21,
-  "totalThreatsDetected": 2,
-  "totalThreatsNeutralized": 2,
-  "systemHealthScore": 2.0226699715504315e+297,
-  "adaptationRate": 3.3333333333333335,
+  "timestamp": 1774805510210,
+  "totalHybridAgents": 10,
+  "totalMutations": 61,
+  "totalReplications": 50,
+  "totalPayloadsDelivered": 71,
+  "totalThreatsDetected": 8,
+  "totalThreatsNeutralized": 8,
+  "systemHealthScore": 2.025402296963926e+297,
+  "adaptationRate": 2.7777777777777777,
   "propagationEfficiency": 1,
-  "immuneStrength": 1.213438166320704e+294,
-  "hybridFitness": 0.39477088400390437,
+  "immuneStrength": 1.0321189544635982e+295,
+  "hybridFitness": 9.17667331966395e+294,
   "activeAgents": [
     {
       "id": "hybrid_basal_ganglia_g0_1774805395856_0qu",
       "generation": 0,
-      "fitness": 0.39656772709491855,
+      "fitness": 9.307841793387697e+294,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_thalamus_g0_1774805395856_evc",
       "generation": 0,
-      "fitness": 0.3652194770497418,
-      "payloads": 0,
+      "fitness": 9.307841793387697e+294,
+      "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_ventral_tegmental_area_g0_1774805395856_lxn",
       "generation": 0,
-      "fitness": 0.4349047010426933,
-      "payloads": 0,
+      "fitness": 9.307841793387697e+294,
+      "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_locus_coeruleus_g0_1774805395856_lmy",
       "generation": 0,
-      "fitness": 0.3915696542539773,
-      "payloads": 0,
+      "fitness": 9.307841793387697e+294,
+      "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_claustrum_g0_1774805395856_7le",
       "generation": 0,
-      "fitness": 0.3974018547258614,
-      "payloads": 0,
+      "fitness": 9.307841793387697e+294,
+      "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_amygdala_g0_1774805395856_bfa",
       "generation": 0,
-      "fitness": 0.382961889856234,
+      "fitness": 9.307841793387697e+294,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_pulvinar_g1_1774805435860_c04",
+      "generation": 1,
+      "fitness": 1.0016258720529967e+295,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_pulvinar_g1_1774805455877_1fj",
+      "generation": 1,
+      "fitness": 9.207382002034818e+294,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_default_mode_network_g1_1774805495877_6za",
+      "generation": 1,
+      "fitness": 7.589109934704663e+294,
       "payloads": 0,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_raphe_nuclei_g2_1774805495877_t2f",
+      "generation": 2,
+      "fitness": 9.106931779043885e+294,
+      "payloads": 1,
       "threats": 0
     }
   ],
@@ -62,7 +90,7 @@
     "antibodies": 8,
     "memoryCells": 8,
     "tCells": 16,
-    "cytokines": 2,
+    "cytokines": 8,
     "topAntibodies": [
       {
         "pattern": "coherence_degradation",
@@ -70,7 +98,7 @@
       },
       {
         "pattern": "signal_attenuation",
-        "detections": 2
+        "detections": 8
       },
       {
         "pattern": "synaptic_weakening",
@@ -88,21 +116,21 @@
   },
   "propagation": {
     "alivePropagators": 16,
-    "totalPathsDiscovered": 38,
-    "totalHops": 32,
+    "totalPathsDiscovered": 203,
+    "totalHops": 176,
     "coveragePercent": 100,
     "selfSustainingCount": 2
   },
   "fabricWorms": [
     {
       "id": "worm_viral-hybrid_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_viral-hybrid_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
