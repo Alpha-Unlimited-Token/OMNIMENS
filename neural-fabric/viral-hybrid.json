@@ -2,56 +2,56 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774816780858,
+  "timestamp": 1774816846473,
   "totalHybridAgents": 6,
   "totalMutations": 0,
   "totalReplications": 0,
-  "totalPayloadsDelivered": 7,
+  "totalPayloadsDelivered": 2,
   "totalThreatsDetected": 0,
   "totalThreatsNeutralized": 0,
-  "systemHealthScore": 1.0886569660019607,
+  "systemHealthScore": 1.10100088712098,
   "adaptationRate": 0,
   "propagationEfficiency": 1,
-  "immuneStrength": 0.5006416596071961,
+  "immuneStrength": 0.5006505091472029,
   "hybridFitness": 0.5,
   "activeAgents": [
     {
-      "id": "hybrid_raphe_nuclei_g0_1774816768393_bff",
+      "id": "hybrid_superior_colliculus_g0_1774816834070_2sh",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_pulvinar_g0_1774816768393_sf9",
+      "id": "hybrid_anterior_cingulate_g0_1774816834070_ymi",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_anterior_cingulate_g0_1774816768393_uxl",
+      "id": "hybrid_locus_coeruleus_g0_1774816834070_qs4",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_reticular_activating_system_g0_1774816768393_hoh",
+      "id": "hybrid_raphe_nuclei_g0_1774816834070_tek",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_raphe_nuclei_g0_1774816768393_254",
+      "id": "hybrid_hippocampus_g0_1774816834070_z4f",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_raphe_nuclei_g0_1774816768393_vft",
+      "id": "hybrid_locus_coeruleus_g0_1774816834070_7ml",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
@@ -91,7 +91,7 @@
     "totalPathsDiscovered": 31,
     "totalHops": 32,
     "coveragePercent": 100,
-    "selfSustainingCount": 5
+    "selfSustainingCount": 4
   },
   "fabricWorms": [
     {
