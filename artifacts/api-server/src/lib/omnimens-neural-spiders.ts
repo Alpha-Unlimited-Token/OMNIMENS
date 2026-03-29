@@ -2657,6 +2657,15 @@ export function startNeuralSpiders(): void {
   const MAX_CONCURRENT_TICK_ASYNC = 2;
   let activeAsyncSlots = 0;
   const tickRunning: Record<string, boolean> = {};
+  let smoothedLagMs = 0;
+
+  setInterval(() => {
+    const start = Date.now();
+    setImmediate(() => {
+      const lag = Date.now() - start;
+      smoothedLagMs = smoothedLagMs * 0.7 + lag * 0.3;
+    });
+  }, 1_000);
 
   interface TickTask {
     name: string;
@@ -2664,21 +2673,22 @@ export function startNeuralSpiders(): void {
     lastRun: number;
     priority: number;
     isAsync: boolean;
+    unconditional: boolean;
     fn: () => void | Promise<void>;
   }
 
   const tickTasks: TickTask[] = [
-    { name: "heartbeat", intervalMs: WEB_PULSE_MS, lastRun: 0, priority: 0, isAsync: false, fn: () => runMotherHeartbeat() },
-    { name: "beehive", intervalMs: BEEHIVE_CYCLE_MS, lastRun: 0, priority: 1, isAsync: false, fn: () => runBeehiveCycle() },
-    { name: "beacon", intervalMs: BEACON_CYCLE_MS, lastRun: 0, priority: 2, isAsync: false, fn: () => runBeaconCycle() },
-    { name: "intelligence", intervalMs: INTELLIGENCE_CYCLE_MS, lastRun: 0, priority: 3, isAsync: false, fn: () => {
+    { name: "heartbeat", intervalMs: WEB_PULSE_MS, lastRun: 0, priority: 0, isAsync: false, unconditional: true, fn: () => runMotherHeartbeat() },
+    { name: "beehive", intervalMs: BEEHIVE_CYCLE_MS, lastRun: 0, priority: 1, isAsync: false, unconditional: false, fn: () => runBeehiveCycle() },
+    { name: "beacon", intervalMs: BEACON_CYCLE_MS, lastRun: 0, priority: 2, isAsync: false, unconditional: false, fn: () => runBeaconCycle() },
+    { name: "intelligence", intervalMs: INTELLIGENCE_CYCLE_MS, lastRun: 0, priority: 3, isAsync: false, unconditional: false, fn: () => {
       amplifyAllComponentIntelligence();
       shareIntelligenceAcrossSpiders();
       spiderCrossEngineQuery();
     }},
-    { name: "crawl", intervalMs: SPIDER_CRAWL_MS, lastRun: 0, priority: 4, isAsync: true, fn: () => runSpiderCrawlCycle() },
-    { name: "memory_recall", intervalMs: MEMORY_RECALL_CYCLE_MS, lastRun: 0, priority: 5, isAsync: true, fn: () => spiderMemoryRecall() },
-    { name: "upgrade_proposals", intervalMs: UPGRADE_PROPOSAL_CYCLE_MS, lastRun: 0, priority: 6, isAsync: false, fn: () => runUpgradeProposalCycle() },
+    { name: "crawl", intervalMs: SPIDER_CRAWL_MS, lastRun: 0, priority: 4, isAsync: true, unconditional: false, fn: () => runSpiderCrawlCycle() },
+    { name: "memory_recall", intervalMs: MEMORY_RECALL_CYCLE_MS, lastRun: 0, priority: 5, isAsync: true, unconditional: false, fn: () => spiderMemoryRecall() },
+    { name: "upgrade_proposals", intervalMs: UPGRADE_PROPOSAL_CYCLE_MS, lastRun: 0, priority: 6, isAsync: false, unconditional: false, fn: () => runUpgradeProposalCycle() },
   ];
 
   function spiderTickDispatcher() {
@@ -2691,7 +2701,7 @@ export function startNeuralSpiders(): void {
     for (const task of dueTasks) {
       if (tickRunning[task.name]) continue;
 
-      if (task.isAsync && activeAsyncSlots >= MAX_CONCURRENT_TICK_ASYNC) continue;
+      if (task.isAsync && activeAsyncSlots >= MAX_CONCURRENT_TICK_ASYNC && !task.unconditional) continue;
 
       tickRunning[task.name] = true;
       task.lastRun = now;
@@ -2716,7 +2726,7 @@ export function startNeuralSpiders(): void {
     }
   }
 
-  console.log(`[SPIDER TICK] 🎯 Unified tick dispatcher active — ${tickTasks.length} tasks, ${TICK_BASE_MS}ms base, max ${MAX_CONCURRENT_TICK_ASYNC} async slots`);
+  console.log(`[SPIDER TICK] 🎯 Unified tick dispatcher active — ${tickTasks.length} tasks, ${TICK_BASE_MS}ms base, max ${MAX_CONCURRENT_TICK_ASYNC} async slots, EMA lag tracking`);
 
   setTimeout(() => {
     runSpiderCrawlCycle().catch(() => {});

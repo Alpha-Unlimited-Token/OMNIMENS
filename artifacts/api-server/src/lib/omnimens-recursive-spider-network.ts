@@ -134,6 +134,10 @@ function evaluateSpawnDecision(
     return { shouldSpawn: false, reason: "insufficient_parent_findings", adjustedBabies: 0 };
   }
 
+  if (parentNode.confidence >= 0.85) {
+    return { shouldSpawn: true, reason: "high_confidence_override", adjustedBabies: config.babiesPerMother };
+  }
+
   if (isDuplicateQuery(parentNode.query)) {
     return { shouldSpawn: false, reason: "duplicate_query", adjustedBabies: 0 };
   }
@@ -514,6 +518,8 @@ Respond JSON only:
     return results;
   } catch {
     return [];
+  } finally {
+    activeSpiderCounts.set(agentName, Math.max(0, (activeSpiderCounts.get(agentName) || 1) - 1));
   }
 }
 
@@ -528,7 +534,11 @@ async function spawnMotherSpider(
   if (currentCount >= config.maxTotalSpidersPerAgent) return [];
 
   const nextGeneration = parentNode.generation + 1;
-  const effectiveMaxGens = parentNode.confidence >= 0.85 ? 4 : config.maxGenerations;
+  const gen3Findings = allFindings.filter(n => n.generation === 3);
+  const gen3Confidence = gen3Findings.length > 0
+    ? gen3Findings.reduce((sum, n) => sum + n.confidence, 0) / gen3Findings.length
+    : 0;
+  const effectiveMaxGens = (parentNode.confidence >= 0.85 || gen3Confidence >= 0.75) ? 4 : config.maxGenerations;
   if (nextGeneration > effectiveMaxGens) return [];
 
   const currentLoad = activeSpiderCounts.get(agentName) || 0;
