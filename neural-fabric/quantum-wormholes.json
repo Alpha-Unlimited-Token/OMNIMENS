@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774821027607,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774821121047,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1519,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 61,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6144,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 244,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/emergent_property_detection: Autopoiesis: living systems are self-creating — they produce the components that ",
-      "confidence": 0.631655286286319,
-      "synthesizedWith": [
-        "OMNIMENS/temporal_correlation: The connectome is the complete map of neural conn"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Architect",
-      "insight": "Motivator/recursive_decomposition: The connectome is the complete map of neural connections — the human connectome proje",
-      "confidence": 0.7131823510481667,
-      "synthesizedWith": [
-        "Architect/temporal_correlation: The cerebellum contains more neurons than all ot"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Mathematician",
-      "insight": "Motivator/abstraction_layer: Quantum decoherence typically destroys quantum effects at biological temperatures — but qua",
-      "confidence": 0.7786010025408643,
-      "synthesizedWith": [
-        "Mathematician/cross_domain_synthesis: Quantum superposition allows a system to e"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Meta-Agent",
-      "insight": "Empath/structural_analysis: The hippocampus replays experiences during sleep in compressed form — dream consolidation ma",
-      "confidence": 0.8004812118817802,
-      "synthesizedWith": [
-        "Meta-Agent/causal_inference: Gödel's incompleteness theorems prove that any cons"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "Pioneer",
-      "insight": "Empath/pattern_recognition: The cerebellum contains more neurons than all other brain regions combined and is crucial fo",
-      "confidence": 0.7370828487384051,
+      "insight": "Motivator/analogical_mapping: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise from",
+      "confidence": 0.8218349695069896,
       "synthesizedWith": [
-        "Pioneer/causal_inference: Hebbian learning: neurons that fire together wire toge"
+        "Pioneer/recursive_decomposition: DNA stores information at approximately 2 bits "
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/entropy_reduction: The Baldwin effect: learned behaviors can become innate over evolutionary time — culture ca",
+      "confidence": 0.7966078681799127,
+      "synthesizedWith": [
+        "OMNIMENS/abstraction_layer: Quantum tunneling allows particles to pass through e"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Critic",
+      "insight": "Motivator/emergent_property_detection: Synaptic pruning eliminates unused neural connections — the brain optimizes by RE",
+      "confidence": 0.7397883447616357,
+      "synthesizedWith": [
+        "Critic/entropy_reduction: Quantum superposition allows a system to exist in mult"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Ethicist",
+      "insight": "Empath/pattern_recognition: The Mandelbrot set demonstrates infinite complexity from a simple recursive formula: z_{n+1}",
+      "confidence": 0.6309492066633011,
+      "synthesizedWith": [
+        "Ethicist/temporal_correlation: Long-term potentiation (LTP) strengthens synaptic"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Linguist",
+      "insight": "Empath/emergent_property_detection: The Baldwin effect: learned behaviors can become innate over evolutionary time — cul",
+      "confidence": 0.8614796829996034,
+      "synthesizedWith": [
+        "Linguist/emergent_property_detection: Quantum tunneling allows particles to pass"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
