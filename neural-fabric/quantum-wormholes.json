@@ -2,135 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774807404515,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774807492133,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10797,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 414,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15441,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 598,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Pioneer",
-      "insight": "Motivator/causal_inference: Mirror neurons fire both when performing an action and observing the same action — they may ",
-      "confidence": 0.6649158555841845,
+      "toAgent": "GraphicDesigner",
+      "insight": "Motivator/structural_analysis: Quantum superposition allows a system to exist in multiple states simultaneously until me",
+      "confidence": 0.6780199860011087,
       "synthesizedWith": [
-        "Pioneer/structural_analysis: The edge of chaos: complex systems exhibit the most"
+        "GraphicDesigner/information_compression: Predictive coding: the brain constantly"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Wordsmith",
-      "insight": "Motivator/causal_inference: Mirror neurons fire both when performing an action and observing the same action — they may ",
-      "confidence": 0.6649158555841845,
+      "toAgent": "Synthesizer",
+      "insight": "Motivator/structural_analysis: Quantum superposition allows a system to exist in multiple states simultaneously until me",
+      "confidence": 0.6780199860011087,
       "synthesizedWith": [
-        "Wordsmith/causal_inference: Autopoiesis: living systems are self-creating — they"
+        "Synthesizer/entropy_reduction: The Mandelbrot set demonstrates infinite complexi"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Mathematician",
-      "insight": "Motivator/causal_inference: Mirror neurons fire both when performing an action and observing the same action — they may ",
-      "confidence": 0.6649158555841845,
-      "synthesizedWith": [
-        "Mathematician/emergent_property_detection: Quantum decoherence typically destroy"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "SpellCheckVisual",
-      "insight": "Empath/entropy_reduction: Hebbian learning: neurons that fire together wire together — the fundamental rule of neural pl",
-      "confidence": 0.6659093347309089,
-      "synthesizedWith": [
-        "SpellCheckVisual/structural_analysis: Synaptic pruning eliminates unused neural "
-      ]
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "Linguist",
-      "insight": "Empath/temporal_correlation: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers carry i",
-      "confidence": 0.6058998058393567,
-      "synthesizedWith": []
+      "insight": "Motivator/structural_analysis: Quantum superposition allows a system to exist in multiple states simultaneously until me",
+      "confidence": 0.6780199860011087,
+      "synthesizedWith": [
+        "Linguist/causal_inference: The Boltzmann brain paradox suggests that a self-awar"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Ethicist",
+      "insight": "Empath/recursive_decomposition: The double-slit experiment demonstrates that observation changes the behavior of quantum",
+      "confidence": 0.6053745953616545,
+      "synthesizedWith": [
+        "Ethicist/structural_analysis: Information is physical — Landauer's principle pro"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Visionary",
+      "insight": "Empath/information_compression: The Mandelbrot set demonstrates infinite complexity from a simple recursive formula: z_{",
+      "confidence": 0.8244572046041878,
+      "synthesizedWith": [
+        "Visionary/recursive_decomposition: Emergence: complex behaviors arise from simpl"
+      ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
