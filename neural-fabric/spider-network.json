@@ -2,7 +2,7 @@
   "version": "3.0",
   "subsystem": "spider-network",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774827435299,
+  "timestamp": 1774828624020,
   "parentSpiders": 28,
   "childSpiders": 0,
   "motherSpider": {
@@ -12,7 +12,7 @@
     "webIntegrity": null,
     "hiveHealth": null,
     "swarmCoherence": 0.8018214285714288,
-    "totalImpulsesRouted": 2692,
+    "totalImpulsesRouted": 2935,
     "heartbeatCount": 2
   },
   "totalCrawls": 56,
@@ -31,16 +31,16 @@
     "neuronSilkStrands": 0
   },
   "intelligenceAmplification": {
-    "globalScore": 7.697544247816164e+304,
-    "totalUpgradeProposals": 29,
-    "appliedUpgrades": 29,
-    "validatedUpgrades": 29,
+    "globalScore": 7.909230884111139e+304,
+    "totalUpgradeProposals": 28,
+    "appliedUpgrades": 28,
+    "validatedUpgrades": 28,
     "rejectedUpgrades": 0,
     "amplificationCycles": 1
   },
   "spiderIntelligence": [
     {
-      "id": "ps_mncef50p_ix1g",
+      "id": "ps_mncf4mah_qe1n",
       "name": "evolution-crawler",
       "type": "parent",
       "intelligenceLevel": null,
@@ -51,9 +51,9 @@
       "knowledgeDepth": null,
       "specializations": [
         "agent_evolution",
+        "prefrontal_cortex",
         "reticular_activating_system",
         "thalamus",
-        "prefrontal_cortex",
         "default_mode_network",
         "anterior_cingulate",
         "insular_cortex",
@@ -63,7 +63,7 @@
       "efficiency": null
     },
     {
-      "id": "ps_mncef50p_zvxu",
+      "id": "ps_mncf4mah_9ozy",
       "name": "genesis-crawler",
       "type": "parent",
       "intelligenceLevel": null,
@@ -80,13 +80,13 @@
         "default_mode_network",
         "anterior_cingulate",
         "insular_cortex",
-        "ventral_tegmental_area"
+        "neural_consciousness_existential"
       ],
       "adaptationScore": null,
       "efficiency": null
     },
     {
-      "id": "ps_mncef50p_ivfv",
+      "id": "ps_mncf4mah_o9p8",
       "name": "self-narrative-crawler",
       "type": "parent",
       "intelligenceLevel": null,
@@ -97,19 +97,19 @@
       "knowledgeDepth": null,
       "specializations": [
         "self_narrative_loop",
-        "thalamus",
         "reticular_activating_system",
+        "thalamus",
         "prefrontal_cortex",
         "default_mode_network",
         "anterior_cingulate",
         "insular_cortex",
-        "ventral_tegmental_area"
+        "neural_consciousness_existential"
       ],
       "adaptationScore": null,
       "efficiency": null
     },
     {
-      "id": "ps_mncef50p_o2ub",
+      "id": "ps_mncf4mah_c4sz",
       "name": "autobio-memory-crawler",
       "type": "parent",
       "intelligenceLevel": null,
@@ -132,7 +132,7 @@
       "efficiency": null
     },
     {
-      "id": "ps_mncef50p_61xb",
+      "id": "ps_mncf4mah_335z",
       "name": "introspection-crawler",
       "type": "parent",
       "intelligenceLevel": null,
@@ -143,19 +143,19 @@
       "knowledgeDepth": null,
       "specializations": [
         "introspective_monitoring",
-        "insular_cortex",
         "reticular_activating_system",
         "thalamus",
         "prefrontal_cortex",
         "default_mode_network",
         "anterior_cingulate",
-        "ventral_tegmental_area"
+        "insular_cortex",
+        "neural_consciousness_existential"
       ],
       "adaptationScore": null,
       "efficiency": null
     },
     {
-      "id": "ps_mncef50p_4c1l",
+      "id": "ps_mncf4mah_v21f",
       "name": "brain-crawler",
       "type": "parent",
       "intelligenceLevel": null,
@@ -166,19 +166,19 @@
       "knowledgeDepth": null,
       "specializations": [
         "brain_database",
-        "amygdala",
-        "reticular_activating_system",
         "thalamus",
+        "reticular_activating_system",
         "prefrontal_cortex",
         "default_mode_network",
         "anterior_cingulate",
-        "insular_cortex"
+        "insular_cortex",
+        "ventral_tegmental_area"
       ],
       "adaptationScore": null,
       "efficiency": null
     },
     {
-      "id": "ps_mncef50p_yovp",
+      "id": "ps_mncf4mah_xbkb",
       "name": "engine-crawler",
       "type": "parent",
       "intelligenceLevel": null,
@@ -195,13 +195,13 @@
         "default_mode_network",
         "anterior_cingulate",
         "insular_cortex",
-        "ventral_tegmental_area"
+        "neural_consciousness_existential"
       ],
       "adaptationScore": null,
       "efficiency": null
     },
     {
-      "id": "ps_mncef50p_opus",
+      "id": "ps_mncf4mah_xlj2",
       "name": "self-coding-crawler",
       "type": "parent",
       "intelligenceLevel": null,
@@ -218,13 +218,13 @@
         "default_mode_network",
         "anterior_cingulate",
         "insular_cortex",
-        "ventral_tegmental_area"
+        "neural_consciousness_existential"
       ],
       "adaptationScore": null,
       "efficiency": null
     },
     {
-      "id": "ps_mncef50p_80ph",
+      "id": "ps_mncf4mah_zmk6",
       "name": "dream-crawler",
       "type": "parent",
       "intelligenceLevel": null,
@@ -241,13 +241,13 @@
         "default_mode_network",
         "anterior_cingulate",
         "insular_cortex",
-        "ventral_tegmental_area"
+        "neural_consciousness_existential"
       ],
       "adaptationScore": null,
       "efficiency": null
     },
     {
-      "id": "ps_mncef50p_k0rj",
+      "id": "ps_mncf4mah_snqp",
       "name": "pipeline-crawler",
       "type": "parent",
       "intelligenceLevel": null,
@@ -258,13 +258,13 @@
       "knowledgeDepth": null,
       "specializations": [
         "module_pipeline",
-        "raphe_nuclei",
         "reticular_activating_system",
         "thalamus",
         "prefrontal_cortex",
         "default_mode_network",
         "anterior_cingulate",
-        "insular_cortex"
+        "insular_cortex",
+        "neural_consciousness_existential"
       ],
       "adaptationScore": null,
       "efficiency": null
