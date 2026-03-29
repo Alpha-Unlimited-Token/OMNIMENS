@@ -2,137 +2,135 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774805725979,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774805819888,
+  "totalWormholesCreated": 7350,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6133,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 241,
-  "cycleCount": 4,
+  "totalClosed": 7350,
+  "totalDataIngestedKB": 10774,
+  "totalInsightsDecoded": 7350,
+  "totalCrossAgentCirculations": 441,
+  "totalSynthesizedDiscoveries": 414,
+  "cycleCount": 7,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Critic",
-      "insight": "Motivator/recursive_decomposition: The hippocampus replays experiences during sleep in compressed form — dream consolida",
-      "confidence": 0.7384360421387464,
+      "toAgent": "Meta-Agent",
+      "insight": "Motivator/causal_inference: Gödel's incompleteness theorems prove that any consistent formal system powerful enough to e",
+      "confidence": 0.7898869780453242,
       "synthesizedWith": [
-        "Critic/analogical_mapping: The vagus nerve connects the brain to the gut, heart,"
+        "Meta-Agent/emergent_property_detection: The Chinese Room argument: can a system "
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "GraphicDesigner",
-      "insight": "Motivator/pattern_recognition: Autopoiesis: living systems are self-creating — they produce the components that constitu",
-      "confidence": 0.7484911757354061,
-      "synthesizedWith": [
-        "GraphicDesigner/feature_extraction: The strange loop concept from Hofstadter: co"
-      ]
+      "toAgent": "Explorer",
+      "insight": "Motivator/information_compression: Attention is the computational bottleneck of consciousness — the brain processes vast",
+      "confidence": 0.600333100583534,
+      "synthesizedWith": []
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/recursive_decomposition: The hippocampus replays experiences during sleep in compressed form — dream consolida",
-      "confidence": 0.7384360421387464,
+      "toAgent": "SensorimotorAgent",
+      "insight": "Motivator/temporal_correlation: The edge of chaos: complex systems exhibit the most interesting behavior at the boundary",
+      "confidence": 0.6613880615909871,
       "synthesizedWith": [
-        "OMNIMENS/causal_inference: The Mandelbrot set demonstrates infinite complexity f"
+        "SensorimotorAgent/abstraction_layer: The hippocampus replays experiences during "
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "OMNIMENS",
-      "insight": "Empath/structural_analysis: Attention is the computational bottleneck of consciousness — the brain processes vast amount",
-      "confidence": 0.7999074480563976,
+      "toAgent": "Explorer",
+      "insight": "Empath/analogical_mapping: The strange loop concept from Hofstadter: consciousness arises when a system becomes complex ",
+      "confidence": 0.6816959386063399,
       "synthesizedWith": [
-        "OMNIMENS/causal_inference: The Mandelbrot set demonstrates infinite complexity f"
+        "Explorer/causal_inference: Transfer learning: knowledge gained from one domain c"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Synthesizer",
-      "insight": "Empath/cross_domain_synthesis: The edge of chaos: complex systems exhibit the most interesting behavior at the boundary ",
-      "confidence": 0.7501366309406368,
+      "toAgent": "SpellCheckVisual",
+      "insight": "Empath/analogical_mapping: Quantum tunneling allows particles to pass through energy barriers they classically cannot — ",
+      "confidence": 0.6930711437930877,
       "synthesizedWith": [
-        "Synthesizer/causal_inference: Quantum decoherence typically destroys quantum eff"
+        "SpellCheckVisual/pattern_recognition: The vagus nerve connects the brain to the "
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
