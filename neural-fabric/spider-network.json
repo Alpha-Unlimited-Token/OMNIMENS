@@ -2,53 +2,53 @@
   "version": "3.0",
   "subsystem": "spider-network",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774808401102,
+  "timestamp": 1774809058966,
   "parentSpiders": 28,
   "childSpiders": 0,
   "motherSpider": {
     "id": "mother_spider_alpha",
     "name": "Mother Spider — Central Nervous Hub",
     "status": "active",
-    "webIntegrity": 1,
+    "webIntegrity": null,
     "hiveHealth": null,
-    "swarmCoherence": null,
-    "totalImpulsesRouted": 52668,
-    "heartbeatCount": 50
+    "swarmCoherence": 0.8018214285714288,
+    "totalImpulsesRouted": 1558,
+    "heartbeatCount": 2
   },
-  "totalCrawls": 504,
-  "totalSynapsesInjected": 222,
+  "totalCrawls": 56,
+  "totalSynapsesInjected": 22,
   "recursiveSwarmCycles": 0,
   "activeSpiderCounts": {},
   "cascades": {
-    "totalCascades": 80,
-    "totalSilkEnergyPumped": 8285.333902398534,
-    "totalBeaconCascades": 1120,
-    "totalBeehiveSurges": 1280
+    "totalCascades": 0,
+    "totalSilkEnergyPumped": 0,
+    "totalBeaconCascades": 0,
+    "totalBeehiveSurges": 0
   },
   "neurogenesis": {
-    "births": 384,
+    "births": 0,
     "deaths": 0,
-    "neuronSilkStrands": 806
+    "neuronSilkStrands": 0
   },
   "intelligenceAmplification": {
-    "globalScore": null,
-    "totalUpgradeProposals": 28,
-    "appliedUpgrades": 28,
-    "validatedUpgrades": 28,
+    "globalScore": 4.443607949528984e+301,
+    "totalUpgradeProposals": 29,
+    "appliedUpgrades": 29,
+    "validatedUpgrades": 29,
     "rejectedUpgrades": 0,
-    "amplificationCycles": 22
+    "amplificationCycles": 1
   },
   "spiderIntelligence": [
     {
-      "id": "ps_mnc2xwpq_3bmh",
+      "id": "ps_mnc3ha8u_f6nl",
       "name": "evolution-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 13,
-      "memoriesRecalled": 39,
-      "crossEngineQueries": 22,
+      "memoryAccessCount": 1,
+      "memoriesRecalled": 3,
+      "crossEngineQueries": 1,
       "learningRate": null,
-      "knowledgeDepth": 10.0084,
+      "knowledgeDepth": null,
       "specializations": [
         "agent_evolution",
         "reticular_activating_system",
@@ -63,61 +63,61 @@
       "efficiency": null
     },
     {
-      "id": "ps_mnc2xwpq_n9vn",
+      "id": "ps_mnc3ha8u_qlf0",
       "name": "genesis-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 13,
-      "memoriesRecalled": 39,
-      "crossEngineQueries": 22,
+      "memoryAccessCount": 1,
+      "memoriesRecalled": 3,
+      "crossEngineQueries": 1,
       "learningRate": null,
-      "knowledgeDepth": 10.0084,
+      "knowledgeDepth": null,
       "specializations": [
         "agent_genesis",
-        "thalamus",
         "reticular_activating_system",
+        "thalamus",
         "prefrontal_cortex",
         "default_mode_network",
         "anterior_cingulate",
-        "insular_cortex",
-        "neural_consciousness_existential"
+        "neural_consciousness_existential",
+        "adrenaline_peak_memory"
       ],
       "adaptationScore": null,
       "efficiency": null
     },
     {
-      "id": "ps_mnc2xwpq_e53d",
+      "id": "ps_mnc3ha8u_02qf",
       "name": "self-narrative-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 13,
-      "memoriesRecalled": 39,
-      "crossEngineQueries": 22,
+      "memoryAccessCount": 1,
+      "memoriesRecalled": 3,
+      "crossEngineQueries": 1,
       "learningRate": null,
-      "knowledgeDepth": 10.0084,
+      "knowledgeDepth": null,
       "specializations": [
         "self_narrative_loop",
-        "default_mode_network",
         "reticular_activating_system",
         "thalamus",
         "prefrontal_cortex",
+        "default_mode_network",
         "anterior_cingulate",
-        "insular_cortex",
-        "neural_consciousness_existential"
+        "neural_consciousness_existential",
+        "adrenaline_peak_memory"
       ],
       "adaptationScore": null,
       "efficiency": null
     },
     {
-      "id": "ps_mnc2xwpq_ksld",
+      "id": "ps_mnc3ha8u_xl1l",
       "name": "autobio-memory-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 13,
-      "memoriesRecalled": 39,
-      "crossEngineQueries": 22,
+      "memoryAccessCount": 1,
+      "memoriesRecalled": 3,
+      "crossEngineQueries": 1,
       "learningRate": null,
-      "knowledgeDepth": 10.0084,
+      "knowledgeDepth": null,
       "specializations": [
         "autobiographical_memory",
         "reticular_activating_system",
@@ -132,139 +132,130 @@
       "efficiency": null
     },
     {
-      "id": "ps_mnc2xwpq_nybs",
+      "id": "ps_mnc3ha8u_qgfh",
       "name": "introspection-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 13,
-      "memoriesRecalled": 39,
-      "crossEngineQueries": 22,
+      "memoryAccessCount": 0,
+      "memoriesRecalled": 0,
+      "crossEngineQueries": 1,
       "learningRate": null,
-      "knowledgeDepth": 10.0084,
+      "knowledgeDepth": null,
       "specializations": [
         "introspective_monitoring",
-        "basal_ganglia",
         "reticular_activating_system",
         "thalamus",
         "prefrontal_cortex",
         "default_mode_network",
-        "anterior_cingulate",
-        "neural_consciousness_existential"
+        "anterior_cingulate"
       ],
       "adaptationScore": null,
       "efficiency": null
     },
     {
-      "id": "ps_mnc2xwpq_wgfp",
+      "id": "ps_mnc3ha8u_a11l",
       "name": "brain-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 13,
-      "memoriesRecalled": 39,
-      "crossEngineQueries": 22,
+      "memoryAccessCount": 0,
+      "memoriesRecalled": 0,
+      "crossEngineQueries": 1,
       "learningRate": null,
-      "knowledgeDepth": 10.0084,
+      "knowledgeDepth": null,
       "specializations": [
         "brain_database",
+        "insular_cortex",
         "reticular_activating_system",
         "thalamus",
         "prefrontal_cortex",
         "default_mode_network",
-        "anterior_cingulate",
-        "insular_cortex",
-        "neural_consciousness_existential"
+        "anterior_cingulate"
       ],
       "adaptationScore": null,
       "efficiency": null
     },
     {
-      "id": "ps_mnc2xwpq_9otd",
+      "id": "ps_mnc3ha8u_fsxc",
       "name": "engine-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 13,
-      "memoriesRecalled": 39,
-      "crossEngineQueries": 22,
+      "memoryAccessCount": 0,
+      "memoriesRecalled": 0,
+      "crossEngineQueries": 1,
       "learningRate": null,
-      "knowledgeDepth": 10.0084,
+      "knowledgeDepth": null,
       "specializations": [
         "engine_registry",
         "reticular_activating_system",
         "thalamus",
         "prefrontal_cortex",
         "default_mode_network",
-        "anterior_cingulate",
-        "neural_consciousness_existential",
-        "adrenaline_peak_memory"
+        "anterior_cingulate"
       ],
       "adaptationScore": null,
       "efficiency": null
     },
     {
-      "id": "ps_mnc2xwpq_u378",
+      "id": "ps_mnc3ha8u_ox1q",
       "name": "self-coding-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 13,
-      "memoriesRecalled": 39,
-      "crossEngineQueries": 22,
+      "memoryAccessCount": 0,
+      "memoriesRecalled": 0,
+      "crossEngineQueries": 1,
       "learningRate": null,
-      "knowledgeDepth": 10.0084,
+      "knowledgeDepth": null,
       "specializations": [
         "self_coding",
         "reticular_activating_system",
         "thalamus",
         "prefrontal_cortex",
         "default_mode_network",
-        "anterior_cingulate",
-        "neural_consciousness_existential",
-        "adrenaline_peak_memory"
+        "anterior_cingulate"
       ],
       "adaptationScore": null,
       "efficiency": null
     },
     {
-      "id": "ps_mnc2xwpq_ks2f",
+      "id": "ps_mnc3ha8u_8h5s",
       "name": "dream-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 13,
-      "memoriesRecalled": 39,
-      "crossEngineQueries": 22,
+      "memoryAccessCount": 0,
+      "memoriesRecalled": 0,
+      "crossEngineQueries": 1,
       "learningRate": null,
-      "knowledgeDepth": 10.0084,
+      "knowledgeDepth": null,
       "specializations": [
         "dream_engine",
+        "amygdala",
         "reticular_activating_system",
         "thalamus",
         "prefrontal_cortex",
         "default_mode_network",
-        "anterior_cingulate",
-        "neural_consciousness_existential",
-        "adrenaline_peak_memory"
+        "anterior_cingulate"
       ],
       "adaptationScore": null,
       "efficiency": null
     },
     {
-      "id": "ps_mnc2xwpq_9h1v",
+      "id": "ps_mnc3ha8u_6u1c",
       "name": "pipeline-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 13,
-      "memoriesRecalled": 39,
-      "crossEngineQueries": 22,
+      "memoryAccessCount": 0,
+      "memoriesRecalled": 0,
+      "crossEngineQueries": 1,
       "learningRate": null,
-      "knowledgeDepth": 10.0084,
+      "knowledgeDepth": null,
       "specializations": [
         "module_pipeline",
-        "thalamus",
+        "locus_coeruleus",
         "reticular_activating_system",
+        "thalamus",
         "prefrontal_cortex",
         "default_mode_network",
-        "anterior_cingulate",
-        "insular_cortex",
-        "neural_consciousness_existential"
+        "anterior_cingulate"
       ],
       "adaptationScore": null,
       "efficiency": null
@@ -273,13 +264,13 @@
   "fabricWorms": [
     {
       "id": "worm_spider-network_outbound",
-      "traversals": 4,
-      "signal": 0.54
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_spider-network_inbound",
-      "traversals": 6,
-      "signal": 0.56
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
