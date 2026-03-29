@@ -299,6 +299,8 @@ export async function safeDbWrite(
   } else {
     if (priority === "low" && queue.length > 12) return;
     if (priority === "medium" && queue.length > 25) return;
+    if (priority === "high" && queue.length > 50) return;
+    if (queue.length > 80) return;
     return new Promise<void>((resolve, reject) => {
       queue.push({ fn, resolve, reject, priority });
     });
@@ -353,10 +355,12 @@ function _autonomousScaling() {
   if (!_isPoolHealthy(poolAlpha) && !_isPoolHealthy(poolBeta)) {
     _scalingStats.wormholeTunnelEvents++;
     if (_writeQueueAlpha.length > 15) {
-      _writeQueueAlpha.splice(0, _writeQueueAlpha.length - 5);
+      const dropped = _writeQueueAlpha.splice(0, _writeQueueAlpha.length - 5);
+      for (const item of dropped) item.resolve();
     }
     if (_writeQueueBeta.length > 15) {
-      _writeQueueBeta.splice(0, _writeQueueBeta.length - 5);
+      const dropped = _writeQueueBeta.splice(0, _writeQueueBeta.length - 5);
+      for (const item of dropped) item.resolve();
     }
     if (_brainInsertBuffer.length > 40) {
       const shed = _brainInsertBuffer.length - 20;
@@ -480,7 +484,7 @@ async function _flushBrainInserts(): Promise<void> {
   _brainFlushActive = true;
 
   try {
-    const route = _spiderSilkRoute(_ivyTendrilRotation, "low");
+    let route = _spiderSilkRoute(_ivyTendrilRotation, "low");
     _ivyTendrilRotation = _ivyTendrilRotation === "alpha" ? "beta" : "alpha";
 
     const alphaOk = _isPoolHealthy(poolAlpha);
@@ -496,8 +500,10 @@ async function _flushBrainInserts(): Promise<void> {
     }
 
     if (!_isPoolHealthy(route.pool)) {
-      const fallbackPool = route.side === "alpha" ? poolBeta : poolAlpha;
+      const fallbackSide: PoolSide = route.side === "alpha" ? "beta" : "alpha";
+      const fallbackPool = fallbackSide === "alpha" ? poolAlpha : poolBeta;
       if (!_isPoolHealthy(fallbackPool)) return;
+      route = _spiderSilkRoute(fallbackSide, "low");
     }
 
     const combinedPressure = (_poolPressure(poolAlpha) + _poolPressure(poolBeta)) / 2;

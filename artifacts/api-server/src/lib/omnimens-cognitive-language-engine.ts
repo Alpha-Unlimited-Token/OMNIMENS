@@ -1089,7 +1089,7 @@ function cognitiveLanguageTick(): void {
   }
   computeCognitiveMomentum();
 
-  WORKING_MEMORY_CAPACITY = 12 + Math.floor(Math.log10(patternLibrary.size + 1) * 4 + learningMult * 2);
+  WORKING_MEMORY_CAPACITY = Math.min(12 + Math.floor(Math.log10(patternLibrary.size + 1) * 4 + learningMult * 2), 100);
 
   const budgetOk = () => (Date.now() - tickStart) < TICK_BUDGET_MS;
 
@@ -1129,7 +1129,8 @@ function cognitiveLanguageTick(): void {
 
   const adaptiveBoostCeiling = 50 + Math.log10(patternLibrary.size + 1) * 100 + learningMult * 20;
 
-  const patternsPerTick = Math.floor((2 + learningMult * 0.5) * wormSpeedBoost * silkThroughput * Math.min(fullSystemBoost, adaptiveBoostCeiling));
+  const MAX_WORK_PER_TICK = 500;
+  const patternsPerTick = Math.min(Math.floor((2 + learningMult * 0.5) * wormSpeedBoost * silkThroughput * Math.min(fullSystemBoost, adaptiveBoostCeiling)), MAX_WORK_PER_TICK);
   for (let i = 0; i < patternsPerTick; i++) {
     const category = DOMAIN_CATEGORIES[Math.floor(Math.random() * DOMAIN_CATEGORIES.length)];
     const seed = Date.now() + i + engineStats.totalTicks * 31;
@@ -1137,7 +1138,7 @@ function cognitiveLanguageTick(): void {
     learnPattern(label, category, seed);
   }
 
-  const knowledgePerTick = Math.floor((1 + knowledgeRate * 0.3) * ivyReach * beaconDiscovery * Math.min(fullSystemBoost, adaptiveBoostCeiling));
+  const knowledgePerTick = Math.min(Math.floor((1 + knowledgeRate * 0.3) * ivyReach * beaconDiscovery * Math.min(fullSystemBoost, adaptiveBoostCeiling)), MAX_WORK_PER_TICK);
   for (let i = 0; i < knowledgePerTick; i++) {
     const category = DOMAIN_CATEGORIES[Math.floor(Math.random() * DOMAIN_CATEGORIES.length)];
     const concept = `${category}_concept_${knowledgeGraph.size + 1}`;

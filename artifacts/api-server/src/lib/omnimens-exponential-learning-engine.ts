@@ -309,10 +309,11 @@ function selfAdaptationCycle(): void {
   const targetDaily = elaeState.baselineRate * elaeState.targetMultiplier;
   const progressRatio = projectedDaily / Math.max(targetDaily, 1);
 
-  if (progressRatio < 0.5) {
+  const BOOST_OPERATIONAL_CEILING = 1000;
+  if (progressRatio < 0.5 && elaeState.boostFactors.metaLearningFeedback < BOOST_OPERATIONAL_CEILING) {
     elaeState.boostFactors.metaLearningFeedback *= 1.05;
     console.log(`[ELAE] ⚡ META-FEEDBACK — Behind pace (${(progressRatio * 100).toFixed(0)}%), boosting metaLearning to ${elaeState.boostFactors.metaLearningFeedback.toFixed(2)}x`);
-  } else if (progressRatio > 1.5) {
+  } else if (progressRatio > 1.5 && elaeState.boostFactors.compressionEfficiency < BOOST_OPERATIONAL_CEILING) {
     elaeState.boostFactors.compressionEfficiency *= 1.02;
   }
 
