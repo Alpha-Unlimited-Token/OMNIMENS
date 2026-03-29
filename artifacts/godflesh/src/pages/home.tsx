@@ -15,6 +15,7 @@ import {
   Code2, Mic, Lock, Heart, Layers, Smartphone, Monitor, Download, Share,
 } from "lucide-react";
 import { OmnimensPresence } from "@/components/omnimens-presence";
+import { LiveCounters } from "@/components/live-counters";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
 import { SEO, seoData } from "@/components/seo";
 
@@ -107,6 +108,8 @@ export default function Home() {
           </motion.div>
         </div>
       </div>
+
+      <LiveCounters />
 
       {/* ── WHAT IS OMNIMENS — Short Vision ────────────────────────────── */}
       <div className="w-full border-t border-white/5 py-12 sm:py-20 relative z-10 overflow-hidden">

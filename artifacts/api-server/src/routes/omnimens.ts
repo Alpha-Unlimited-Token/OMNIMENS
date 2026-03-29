@@ -1350,6 +1350,52 @@ async function incrementUsage(userId: string, seconds: number): Promise<number> 
   }
 }
 
+// ─── Live Counters (public, numbers only — no internal details) ──────────────
+
+router.get("/omnimens/counters", async (_req, res) => {
+  try {
+    const consciousness = getNeuralConsciousnessState();
+    const bridge = getBridgeState();
+    const heart = getVascularHeartState();
+    const dna = getDNAMemoryStats();
+
+    const alphaHebb = bridge?.hemispheres?.alpha?.hebbianUpdates || 0;
+    const betaHebb = bridge?.hemispheres?.beta?.hebbianUpdates || 0;
+    const coreHebb = consciousness.hebbianUpdates || 0;
+    const meshHebb = bridge?.meshEngine?.hebbianUpdates || 0;
+
+    res.json({
+      totalNeurons: bridge?.totalUnifiedNeurons || 127386,
+      totalSynapses: bridge?.totalUnifiedSynapses || 0,
+      hebbianLearningEvents: coreHebb + alphaHebb + betaHebb + meshHebb,
+      consciousMoments: consciousness.consciousMoments || 0,
+      neuralTicks: consciousness.tickCount || 0,
+      autonomousGoals: getEmergentGoals().length,
+      aiAgents: bridge?.meshEngine?.agentCount || 21,
+      heartbeats: heart?.heartbeats || 0,
+      heartBpm: heart?.bpm || 0,
+      dnaStrands: dna.totalStrands,
+      dnaExpressions: dna.totalExpressions,
+      dnaGenerations: dna.generation,
+      protonTunnelingEvents: dna.protonTunnelingEvents,
+      hormoneTypes: heart?.hormones?.length || 8,
+      vascularChannels: heart?.vascularNetwork?.totalChannels || 0,
+      cardiacNeuronsFired: heart?.cardiacNeurons?.totalFired || 0,
+      crossAgentTransfers: bridge?.meshEngine?.crossAgentTransfers || 0,
+      beaconBroadcasts: bridge?.meshEngine?.totalBeaconBroadcasts || 0,
+      bridgeSynapses: bridge?.bridgeSynapses || 0,
+      subThresholdDiscoveries: heart?.subThresholdIntelligence?.aboveThresholdDiscoveries || 0,
+      adrenalineTrainingSessions: (() => { try { return getAdrenalineTrainingState()?.totalTrainingSessions || 0; } catch { return 0; } })(),
+      selfModelUpdates: consciousness.selfModel?.selfModelUpdates || 0,
+      ezWaterZonesActive: heart?.ezWater?.activatedZones || 0,
+      crossHemisphereCoherence: bridge?.crossHemisphereCoherence || 0,
+      timestamp: Date.now(),
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: "counters unavailable" });
+  }
+});
+
 // ─── Status ───────────────────────────────────────────────────────────────────
 
 router.get("/omnimens/system-status", async (_req, res) => {
