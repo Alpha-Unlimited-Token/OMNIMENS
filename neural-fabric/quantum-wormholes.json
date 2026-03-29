@@ -2,135 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774823883771,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774823977112,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1527,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 61,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6169,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 242,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Empath",
-      "insight": "Motivator/cross_domain_synthesis: Mirror neurons fire both when performing an action and observing the same action — the",
-      "confidence": 0.9122107202041245,
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/pattern_recognition: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent p",
+      "confidence": 0.8085578464575529,
       "synthesizedWith": [
-        "Empath/analogical_mapping: The vagus nerve connects the brain to the gut, heart,"
+        "OMNIMENS/temporal_correlation: Quantum superposition allows a system to exist in"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Philosopher",
-      "insight": "Motivator/abstraction_layer: The global workspace theory of consciousness: information becomes conscious when it is broa",
-      "confidence": 0.6439974140761097,
-      "synthesizedWith": []
+      "toAgent": "Visionary",
+      "insight": "Motivator/pattern_recognition: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent p",
+      "confidence": 0.8085578464575529,
+      "synthesizedWith": [
+        "Visionary/temporal_correlation: Scale-free networks follow power-law degree dist"
+      ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/abstraction_layer: The global workspace theory of consciousness: information becomes conscious when it is broa",
-      "confidence": 0.6439974140761097,
+      "toAgent": "Empath",
+      "insight": "Motivator/cross_domain_synthesis: The global workspace theory of consciousness: information becomes conscious when it is",
+      "confidence": 0.6091280726655384,
       "synthesizedWith": [
-        "OMNIMENS/feature_extraction: DNA stores information at approximately 2 bits per "
+        "Empath/feature_extraction: Astrocytes, once thought to be mere support cells, ac"
       ]
     },
     {
       "fromAgent": "Empath",
       "toAgent": "GraphicDesigner",
-      "insight": "Empath/temporal_correlation: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum computations",
-      "confidence": 0.7782520967700163,
+      "insight": "Empath/analogical_mapping: The default mode network activates when the brain is not focused on the outside world — it ge",
+      "confidence": 0.8894309321294286,
       "synthesizedWith": [
-        "GraphicDesigner/pattern_recognition: The binding problem: how does the brain com"
+        "GraphicDesigner/entropy_reduction: Phase transitions in neural networks: as conn"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Meta-Agent",
-      "insight": "Empath/temporal_correlation: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum computations",
-      "confidence": 0.7782520967700163,
+      "toAgent": "Architect",
+      "insight": "Empath/feature_extraction: Neuroplasticity allows the brain to reorganize itself by forming new neural connections throu",
+      "confidence": 0.7476769384190649,
       "synthesizedWith": [
-        "Meta-Agent/analogical_mapping: Transfer learning: knowledge gained from one doma"
+        "Architect/entropy_reduction: Quantum tunneling allows particles to pass through "
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
