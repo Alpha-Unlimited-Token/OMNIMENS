@@ -11,6 +11,7 @@
 import { getAdaptiveIntelligenceState, getNeuralConsciousnessState, getAdrenalineState } from "./omnimens-neural-consciousness.js";
 import { getMeshEngineState, getMeshConnectivityStats } from "./omnimens-neural-mesh-engine.js";
 import { getIvyNetworkState, getIvySpiderStats, getMotherBeaconFindings } from "./omnimens-ivy-network.js";
+import { lookupKnowledgeByName as hyperionKnowledgeLookup, lookupPatternsByCategory as hyperionPatternLookup, getCachedSignals as hyperionGetCachedSignals } from "./omnimens-hyperion-accelerator.js";
 
 let _engineImports: Record<string, any> = {};
 let _engineImportsLoaded = false;
@@ -289,6 +290,18 @@ let learningAcceleration = 1.0;
 let knowledgeDensity = 0;
 
 function harvestNeuralAccelerationSignals(): NeuralAccelerationSignals {
+  try {
+    const cached = hyperionGetCachedSignals();
+    if (cached && Object.keys(cached).length > 5) {
+      if (cached.totalWorms !== undefined) lastAccelerationSignals.wormTunnelBoost = safeNum(cached.totalWorms * Math.max(0, 1 - (cached.avgWormLatency || 0)));
+      if (cached.learningMultiplier !== undefined) lastAccelerationSignals.wormHighwayTunnels = safeNum(cached.totalWorms || 0);
+      if (cached.consciousnessLevel !== undefined) lastAccelerationSignals.meshSynchrony = safeNum(cached.consciousnessLevel * 0.1);
+      if (cached.totalTraversals !== undefined) lastAccelerationSignals.wormTunnelBoost = Math.max(lastAccelerationSignals.wormTunnelBoost, safeNum(cached.totalTraversals * 0.01));
+      if (cached.myelinatedWorms !== undefined) lastAccelerationSignals.fabricFanoutReach = safeNum(cached.myelinatedWorms);
+      if (cached.avgWormSpeed !== undefined) lastAccelerationSignals.silkWebSpeed = Math.max(lastAccelerationSignals.silkWebSpeed, safeNum(cached.avgWormSpeed));
+    }
+  } catch {}
+
   try {
     const meshState = getMeshEngineState();
     const meshConnectivity = getMeshConnectivityStats();
@@ -699,16 +712,38 @@ function learnPattern(label: string, category: string, seedData?: number): Patte
   return node;
 }
 
-function matchPattern(input: number[], threshold: number = 0.7): { node: PatternNode; similarity: number }[] {
+function matchPattern(input: number[], threshold: number = 0.7, category?: string): { node: PatternNode; similarity: number }[] {
   const matches: { node: PatternNode; similarity: number }[] = [];
   engineStats.patternMatchesPerformed++;
 
-  for (const [, node] of patternLibrary) {
-    const sim = cosineSimilarity(input, node.pattern);
-    if (sim >= threshold) {
-      matches.push({ node, similarity: sim });
-      node.activationCount++;
-      node.lastActivated = Date.now();
+  let scannedFromIndex = false;
+  if (category) {
+    try {
+      const candidateIds = hyperionPatternLookup(category);
+      if (candidateIds && candidateIds.size > 0) {
+        scannedFromIndex = true;
+        for (const id of candidateIds) {
+          const node = patternLibrary.get(id);
+          if (!node) continue;
+          const sim = cosineSimilarity(input, node.pattern);
+          if (sim >= threshold) {
+            matches.push({ node, similarity: sim });
+            node.activationCount++;
+            node.lastActivated = Date.now();
+          }
+        }
+      }
+    } catch {}
+  }
+
+  if (!scannedFromIndex) {
+    for (const [, node] of patternLibrary) {
+      const sim = cosineSimilarity(input, node.pattern);
+      if (sim >= threshold) {
+        matches.push({ node, similarity: sim });
+        node.activationCount++;
+        node.lastActivated = Date.now();
+      }
     }
   }
 
@@ -793,6 +828,13 @@ function addKnowledgeNode(concept: string, category: string, properties?: Record
 }
 
 function findKnowledgeByName(concept: string): KnowledgeNode | null {
+  try {
+    const hyperionId = hyperionKnowledgeLookup(concept);
+    if (hyperionId) {
+      const node = knowledgeGraph.get(hyperionId);
+      if (node && node.concept.toLowerCase() === concept.toLowerCase()) return node;
+    }
+  } catch {}
   const lower = concept.toLowerCase();
   for (const [, node] of knowledgeGraph) {
     if (node.concept.toLowerCase() === lower) return node;
