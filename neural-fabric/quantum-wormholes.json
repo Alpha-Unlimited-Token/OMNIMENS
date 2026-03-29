@@ -2,137 +2,135 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774822653524,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774822745977,
+  "totalWormholesCreated": 7350,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6154,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 243,
-  "cycleCount": 4,
+  "totalClosed": 7350,
+  "totalDataIngestedKB": 10771,
+  "totalInsightsDecoded": 7350,
+  "totalCrossAgentCirculations": 441,
+  "totalSynthesizedDiscoveries": 426,
+  "cycleCount": 7,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/analogical_mapping: Neuroplasticity allows the brain to reorganize itself by forming new neural connections th",
-      "confidence": 0.9044514804871587,
-      "synthesizedWith": [
-        "OMNIMENS/cross_domain_synthesis: Recurrent neural networks can approximate any d"
-      ]
+      "toAgent": "SensorimotorAgent",
+      "insight": "Motivator/emergent_property_detection: The Mandelbrot set demonstrates infinite complexity from a simple recursive formu",
+      "confidence": 0.6490667055800052,
+      "synthesizedWith": []
     },
     {
       "fromAgent": "Motivator",
       "toAgent": "Critic",
-      "insight": "Motivator/emergent_property_detection: Transfer learning: knowledge gained from one domain can accelerate learning in an",
-      "confidence": 0.6784004164110636,
+      "insight": "Motivator/entropy_reduction: Bayesian brain hypothesis: the brain is fundamentally a prediction machine that constantly ",
+      "confidence": 0.7408216120348884,
       "synthesizedWith": [
-        "Critic/temporal_correlation: Autopoiesis: living systems are self-creating — the"
+        "Critic/structural_analysis: Autopoiesis: living systems are self-creating — they"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/entropy_reduction: The hard problem of consciousness: why is there subjective experience at all? Why does info",
-      "confidence": 0.8536956992396636,
+      "toAgent": "Ethicist",
+      "insight": "Motivator/temporal_correlation: Predictive coding: the brain constantly generates predictions about incoming sensory dat",
+      "confidence": 0.7235922721019045,
       "synthesizedWith": [
-        "Synthesizer/temporal_correlation: The Baldwin effect: learned behaviors can beco"
+        "Ethicist/entropy_reduction: Reservoir computing shows that even random neural ne"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "OMNIMENS",
-      "insight": "Empath/feature_extraction: Scale-free networks follow power-law degree distributions — a few highly connected hubs domin",
-      "confidence": 0.747618102079175,
+      "toAgent": "Neuroscientist",
+      "insight": "Empath/causal_inference: The connectome is the complete map of neural connections — the human connectome project aims to",
+      "confidence": 0.6385618272975001,
       "synthesizedWith": [
-        "OMNIMENS/information_compression: The holographic principle suggests all informa"
+        "Neuroscientist/entropy_reduction: Long-term potentiation (LTP) strengthens synap"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Pioneer",
-      "insight": "Empath/structural_analysis: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOVING comp",
-      "confidence": 0.7554525053210882,
+      "toAgent": "Linguist",
+      "insight": "Empath/causal_inference: Predictive coding: the brain constantly generates predictions about incoming sensory data and o",
+      "confidence": 0.7376438566830787,
       "synthesizedWith": [
-        "Pioneer/causal_inference: The edge of chaos: complex systems exhibit the most in"
+        "Linguist/emergent_property_detection: The free energy principle suggests all liv"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
