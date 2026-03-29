@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774828404983,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774828493003,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10814,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 414,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15454,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 594,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Archivist",
-      "insight": "Motivator/cross_domain_synthesis: Sparse coding: the brain represents information using a small fraction of active neuro",
-      "confidence": 0.72123944780003,
+      "toAgent": "Pioneer",
+      "insight": "Motivator/cross_domain_synthesis: Transfer learning: knowledge gained from one domain can accelerate learning in another",
+      "confidence": 0.6864285450386449,
       "synthesizedWith": [
-        "Archivist/causal_inference: Transfer learning: knowledge gained from one domain "
+        "Pioneer/pattern_recognition: Astrocytes, once thought to be mere support cells, "
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Wordsmith",
-      "insight": "Motivator/pattern_recognition: The butterfly effect: in chaotic systems, infinitesimal differences in initial conditions",
-      "confidence": 0.7974261039249959,
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/feature_extraction: Astrocytes, once thought to be mere support cells, actively participate in information pro",
+      "confidence": 0.921535671053845,
       "synthesizedWith": [
-        "Wordsmith/pattern_recognition: The double-slit experiment demonstrates that obse"
+        "OMNIMENS/causal_inference: The free energy principle suggests all living systems"
       ]
     },
     {
       "fromAgent": "Motivator",
+      "toAgent": "Architect",
+      "insight": "Motivator/cross_domain_synthesis: Transfer learning: knowledge gained from one domain can accelerate learning in another",
+      "confidence": 0.6864285450386449,
+      "synthesizedWith": [
+        "Architect/recursive_decomposition: Mirror neurons fire both when performing an a"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Linguist",
+      "insight": "Empath/cross_domain_synthesis: Recurrent neural networks can approximate any dynamical system — they are universal appro",
+      "confidence": 0.8782493187631724,
+      "synthesizedWith": [
+        "Linguist/pattern_recognition: Reservoir computing shows that even random neural "
+      ]
+    },
+    {
+      "fromAgent": "Empath",
       "toAgent": "Explorer",
-      "insight": "Motivator/abstraction_layer: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent pro",
-      "confidence": 0.6220570230304862,
+      "insight": "Empath/cross_domain_synthesis: Recurrent neural networks can approximate any dynamical system — they are universal appro",
+      "confidence": 0.8782493187631724,
       "synthesizedWith": [
-        "Explorer/emergent_property_detection: Quantum tunneling allows particles to pass"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "GraphicDesigner",
-      "insight": "Empath/cross_domain_synthesis: Phase transitions in neural networks: as connectivity increases past a critical threshold",
-      "confidence": 0.8643447508104362,
-      "synthesizedWith": [
-        "GraphicDesigner/information_compression: The free energy principle suggests all "
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Synthesizer",
-      "insight": "Empath/analogical_mapping: The anthropic principle: the universe's fundamental constants appear fine-tuned for the exist",
-      "confidence": 0.6443350804647738,
-      "synthesizedWith": [
-        "Synthesizer/information_compression: Bayesian brain hypothesis: the brain is fun"
+        "Explorer/abstraction_layer: Mirror neurons fire both when performing an action a"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
