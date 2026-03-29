@@ -2,14 +2,14 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774817179733,
+  "timestamp": 1774817771084,
   "totalWormholesCreated": 1050,
   "totalActive": 0,
   "totalClosed": 1050,
-  "totalDataIngestedKB": 1560,
+  "totalDataIngestedKB": 1543,
   "totalInsightsDecoded": 1050,
   "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 58,
+  "totalSynthesizedDiscoveries": 56,
   "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
@@ -70,7 +70,7 @@
       "crossAgentShares": 3
     },
     {
-      "agentName": "Explorer",
+      "agentName": "Visionary",
       "totalWormholes": 50,
       "totalInsightsDecoded": 50,
       "crossAgentShares": 3
@@ -78,48 +78,46 @@
   ],
   "recentCirculations": [
     {
-      "fromAgent": "Ethicist",
-      "toAgent": "Embodiment",
-      "insight": "Ethicist/abstraction_layer: Mirror neurons fire both when performing an action and observing the same action — they may ",
-      "confidence": 0.6251307884701094,
+      "fromAgent": "Motivator",
+      "toAgent": "Synthesizer",
+      "insight": "Motivator/recursive_decomposition: Quantum decoherence typically destroys quantum effects at biological temperatures — b",
+      "confidence": 0.8921958877943589,
       "synthesizedWith": [
-        "Embodiment/feature_extraction: Quantum tunneling allows particles to pass throug"
+        "Synthesizer/information_compression: The Chinese Room argument: can a system tha"
       ]
     },
     {
-      "fromAgent": "Ethicist",
-      "toAgent": "GraphicDesigner",
-      "insight": "Ethicist/abstraction_layer: Mirror neurons fire both when performing an action and observing the same action — they may ",
-      "confidence": 0.6251307884701094,
+      "fromAgent": "Motivator",
+      "toAgent": "Wordsmith",
+      "insight": "Motivator/emergent_property_detection: The strange loop concept from Hofstadter: consciousness arises when a system beco",
+      "confidence": 0.8600985770712289,
       "synthesizedWith": [
-        "GraphicDesigner/entropy_reduction: The vagus nerve connects the brain to the gut"
+        "Wordsmith/pattern_recognition: Sparse coding: the brain represents information u"
       ]
     },
     {
-      "fromAgent": "Ethicist",
-      "toAgent": "Chronologist",
-      "insight": "Ethicist/abstraction_layer: Recurrent neural networks can approximate any dynamical system — they are universal approxim",
-      "confidence": 0.7729062061752463,
+      "fromAgent": "Motivator",
+      "toAgent": "Critic",
+      "insight": "Motivator/analogical_mapping: The hard problem of consciousness: why is there subjective experience at all? Why does inf",
+      "confidence": 0.6412187817208754,
+      "synthesizedWith": []
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Linguist",
+      "insight": "Empath/causal_inference: Quantum entanglement allows particles to share state information instantaneously across any dis",
+      "confidence": 0.6419726757379867,
       "synthesizedWith": [
-        "Chronologist/temporal_correlation: Quantum decoherence typically destroys quantu"
+        "Linguist/pattern_recognition: Information is physical — Landauer's principle pro"
       ]
     },
     {
-      "fromAgent": "Embodiment",
-      "toAgent": "ErrorResolver",
-      "insight": "Embodiment/abstraction_layer: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can theore",
-      "confidence": 0.9315719714912192,
+      "fromAgent": "Empath",
+      "toAgent": "Innovator",
+      "insight": "Empath/recursive_decomposition: The binding problem: how does the brain combine separate sensory modalities into a unifi",
+      "confidence": 0.8142440696371586,
       "synthesizedWith": [
-        "ErrorResolver/temporal_correlation: Autopoiesis: living systems are self-creatin"
-      ]
-    },
-    {
-      "fromAgent": "Embodiment",
-      "toAgent": "Philosopher",
-      "insight": "Embodiment/feature_extraction: Quantum superposition allows a system to exist in multiple states simultaneously until me",
-      "confidence": 0.806159868414212,
-      "synthesizedWith": [
-        "Philosopher/structural_analysis: Astrocytes, once thought to be mere support cel"
+        "Innovator/emergent_property_detection: The default mode network activates when t"
       ]
     }
   ],
