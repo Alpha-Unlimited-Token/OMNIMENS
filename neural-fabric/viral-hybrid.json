@@ -2,58 +2,86 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774809793908,
-  "totalHybridAgents": 6,
-  "totalMutations": 11,
-  "totalReplications": 10,
-  "totalPayloadsDelivered": 23,
-  "totalThreatsDetected": 0,
-  "totalThreatsNeutralized": 0,
-  "systemHealthScore": 6.351256117984409e+297,
-  "adaptationRate": 3.3333333333333335,
+  "timestamp": 1774809887368,
+  "totalHybridAgents": 10,
+  "totalMutations": 65,
+  "totalReplications": 50,
+  "totalPayloadsDelivered": 69,
+  "totalThreatsDetected": 5,
+  "totalThreatsNeutralized": 5,
+  "systemHealthScore": 6.359835717594265e+297,
+  "adaptationRate": 2.7777777777777777,
   "propagationEfficiency": 1,
-  "immuneStrength": 3.810239280772354e+294,
-  "hybridFitness": 0.3557248354146812,
+  "immuneStrength": 3.2408904646959394e+295,
+  "hybridFitness": 3.024465560808786e+295,
   "activeAgents": [
     {
       "id": "hybrid_anterior_cingulate_g0_1774809772250_4wp",
       "generation": 0,
-      "fitness": 0.33244343134713056,
-      "payloads": 0,
+      "fitness": 2.922695643232899e+295,
+      "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_superior_colliculus_g0_1774809772250_jho",
       "generation": 0,
-      "fitness": 0.37181345472258237,
+      "fitness": 2.922695643232899e+295,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_default_mode_network_g0_1774809772250_kym",
       "generation": 0,
-      "fitness": 0.3639700307022645,
-      "payloads": 0,
+      "fitness": 2.922695643232899e+295,
+      "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_locus_coeruleus_g0_1774809772250_6g3",
       "generation": 0,
-      "fitness": 0.2794333121188076,
+      "fitness": 2.922695643232899e+295,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_raphe_nuclei_g0_1774809772250_z0b",
       "generation": 0,
-      "fitness": 0.4067913941679588,
-      "payloads": 0,
+      "fitness": 2.922695643232899e+295,
+      "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_superior_colliculus_g0_1774809772250_8cb",
       "generation": 0,
-      "fitness": 0.37989738942934315,
+      "fitness": 2.922695643232899e+295,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_cerebellum_g1_1774809812259_ss3",
+      "generation": 1,
+      "fitness": 3.145141094338657e+295,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_ventral_tegmental_area_g2_1774809852280_ns0",
+      "generation": 2,
+      "fitness": 3.113564973746409e+295,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_raphe_nuclei_g3_1774809852280_1dn",
+      "generation": 3,
+      "fitness": 3.5902951603355515e+295,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_raphe_nuclei_g2_1774809872281_jq4",
+      "generation": 2,
+      "fitness": 2.859480520269849e+295,
       "payloads": 0,
       "threats": 0
     }
@@ -62,7 +90,7 @@
     "antibodies": 8,
     "memoryCells": 8,
     "tCells": 16,
-    "cytokines": 0,
+    "cytokines": 5,
     "topAntibodies": [
       {
         "pattern": "coherence_degradation",
@@ -70,7 +98,7 @@
       },
       {
         "pattern": "signal_attenuation",
-        "detections": 0
+        "detections": 5
       },
       {
         "pattern": "synaptic_weakening",
@@ -88,21 +116,21 @@
   },
   "propagation": {
     "alivePropagators": 16,
-    "totalPathsDiscovered": 38,
-    "totalHops": 32,
+    "totalPathsDiscovered": 219,
+    "totalHops": 192,
     "coveragePercent": 100,
     "selfSustainingCount": 4
   },
   "fabricWorms": [
     {
       "id": "worm_viral-hybrid_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_viral-hybrid_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
