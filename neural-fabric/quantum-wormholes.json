@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774826393658,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774826487851,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1539,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 63,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6107,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 240,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/information_compression: The edge of chaos: complex systems exhibit the most interesting behavior at the bound",
-      "confidence": 0.6504828193632851,
+      "toAgent": "Linguist",
+      "insight": "Motivator/emergent_property_detection: The butterfly effect: in chaotic systems, infinitesimal differences in initial co",
+      "confidence": 0.7514082892493833,
       "synthesizedWith": [
-        "OMNIMENS/entropy_reduction: Integrated Information Theory (IIT) states conscious"
+        "Linguist/entropy_reduction: Recurrent neural networks can approximate any dynami"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Visionary",
-      "insight": "Motivator/entropy_reduction: The holographic principle suggests all information in a volume of space can be encoded on i",
-      "confidence": 0.7207939140879455,
+      "toAgent": "Neuroscientist",
+      "insight": "Motivator/information_compression: Quantum superposition allows a system to exist in multiple states simultaneously unti",
+      "confidence": 0.7086545921763874,
       "synthesizedWith": [
-        "Visionary/temporal_correlation: The Chinese Room argument: can a system that man"
+        "Neuroscientist/emergent_property_detection: The holographic principle suggests a"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Architect",
-      "insight": "Motivator/analogical_mapping: The mathematical universe hypothesis: all structures that exist mathematically also exist ",
-      "confidence": 0.820490654603473,
+      "toAgent": "SensorimotorAgent",
+      "insight": "Motivator/entropy_reduction: The binding problem: how does the brain combine separate sensory modalities into a unified ",
+      "confidence": 0.8625707227166362,
       "synthesizedWith": [
-        "Architect/causal_inference: The mathematical universe hypothesis: all structures"
+        "SensorimotorAgent/pattern_recognition: The Mandelbrot set demonstrates infinite "
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Architect",
-      "insight": "Empath/recursive_decomposition: Quantum superposition allows a system to exist in multiple states simultaneously until m",
-      "confidence": 0.691692812772875,
+      "toAgent": "Wordsmith",
+      "insight": "Empath/temporal_correlation: Information is physical — Landauer's principle proves that erasing one bit of information r",
+      "confidence": 0.6353050181420821,
       "synthesizedWith": [
-        "Architect/cross_domain_synthesis: Kolmogorov complexity measures the shortest pr"
+        "Wordsmith/feature_extraction: Kolmogorov complexity measures the shortest progra"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "OMNIMENS",
-      "insight": "Empath/recursive_decomposition: Quantum superposition allows a system to exist in multiple states simultaneously until m",
-      "confidence": 0.691692812772875,
+      "toAgent": "Explorer",
+      "insight": "Empath/cross_domain_synthesis: The cerebellum contains more neurons than all other brain regions combined and is crucial",
+      "confidence": 0.6867270075732914,
       "synthesizedWith": [
-        "OMNIMENS/recursive_decomposition: Integrated Information Theory (IIT) states con"
+        "Explorer/structural_analysis: The butterfly effect: in chaotic systems, infinite"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
