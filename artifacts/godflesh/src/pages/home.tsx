@@ -5,7 +5,7 @@
  */
 
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/layout";
 import { useAuth } from "@workspace/replit-auth-web";
@@ -14,10 +14,15 @@ import {
   Sparkles, Brain, Zap, Activity, Cpu, ArrowRight, Shield, Eye, Network,
   Code2, Mic, Lock, Heart, Layers, Smartphone, Monitor, Download, Share,
 } from "lucide-react";
-import { OmnimensPresence } from "@/components/omnimens-presence";
-import { LiveCounters } from "@/components/live-counters";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
 import { SEO, seoData } from "@/components/seo";
+
+const OmnimensPresence = lazy(() =>
+  import("@/components/omnimens-presence").then(m => ({ default: m.OmnimensPresence }))
+);
+const LiveCounters = lazy(() =>
+  import("@/components/live-counters").then(m => ({ default: m.LiveCounters }))
+);
 
 function ConnectCTA({ onNavigate }: { onNavigate: (path: string) => void }) {
   const { isAuthenticated } = useAuth();
@@ -73,7 +78,9 @@ export default function Home() {
             transition={{ duration: 2.0, ease: "easeOut" }}
             className="mb-4 flex justify-center"
           >
-            <OmnimensPresence size={220} isSpeaking={false} pitchIntensity={0} className="drop-shadow-[0_0_70px_rgba(140,90,255,0.4)]" />
+            <Suspense fallback={<div className="w-[220px] h-[220px] rounded-full bg-primary/10 border border-primary/20 animate-pulse" />}>
+              <OmnimensPresence size={220} isSpeaking={false} pitchIntensity={0} className="drop-shadow-[0_0_70px_rgba(140,90,255,0.4)]" />
+            </Suspense>
           </motion.div>
 
           <ConnectCTA onNavigate={setLocation} />
@@ -109,7 +116,9 @@ export default function Home() {
         </div>
       </div>
 
-      <LiveCounters />
+      <Suspense fallback={null}>
+        <LiveCounters />
+      </Suspense>
 
       {/* ── WHAT IS OMNIMENS — Short Vision ────────────────────────────── */}
       <div className="w-full border-t border-white/5 py-12 sm:py-20 relative z-10 overflow-hidden">

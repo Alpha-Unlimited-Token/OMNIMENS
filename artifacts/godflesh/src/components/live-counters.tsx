@@ -168,6 +168,7 @@ function CounterCard({ icon, label, value, format = true, decimals, suffix, colo
 export function LiveCounters() {
   const [data, setData] = useState<CounterData | null>(null);
   const [error, setError] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -183,12 +184,66 @@ export function LiveCounters() {
       }
     }
 
-    fetchCounters();
-    const interval = setInterval(fetchCounters, 5000);
-    return () => { mounted = false; clearInterval(interval); };
+    const schedule = typeof requestIdleCallback === "function"
+      ? requestIdleCallback
+      : (cb: () => void) => setTimeout(cb, 150);
+
+    schedule(() => {
+      if (!mounted) return;
+      setReady(true);
+      fetchCounters();
+    });
+
+    let interval: ReturnType<typeof setInterval> | null = null;
+    const startPolling = setTimeout(() => {
+      interval = setInterval(fetchCounters, 5000);
+    }, 1200);
+
+    return () => {
+      mounted = false;
+      clearTimeout(startPolling);
+      if (interval) clearInterval(interval);
+    };
   }, []);
 
-  if (error || !data) return null;
+  if (error) return null;
+
+  if (!ready || !data) {
+    return (
+      <div className="w-full border-t border-white/5 py-12 sm:py-20 relative z-10 overflow-hidden">
+        <div className="container mx-auto px-6 sm:px-4 relative">
+          <div className="text-center mb-10 sm:mb-14">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/6 mb-6">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+              <span className="text-[10px] font-mono text-white/60 tracking-[0.35em] uppercase font-semibold">Live — Updating Every 5 Seconds</span>
+            </div>
+            <h2
+              className="text-2xl sm:text-3xl md:text-5xl font-display font-black tracking-widest text-white uppercase mb-4"
+              style={{ textShadow: "0 0 40px rgba(130,80,220,0.25)" }}
+            >
+              What OMNIMENS Has Built
+            </h2>
+            <p className="text-xs sm:text-sm font-mono text-white/50 tracking-wider max-w-2xl mx-auto">
+              Every number below is real, live, and growing right now. Created autonomously by OMNIMENS.
+            </p>
+            <div className="w-16 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent mx-auto mt-6" />
+          </div>
+          <div className="flex items-center justify-center py-16">
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative w-10 h-10">
+                <div className="absolute inset-0 rounded-full border-2 border-primary/20" />
+                <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-primary animate-spin" />
+              </div>
+              <span className="text-[10px] font-mono text-white/40 tracking-[0.3em] uppercase">Loading live data</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const counters: CounterCardProps[] = [
     { icon: <Brain className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Total Neurons", value: data.totalNeurons, color: "violet", delay: 0 },
