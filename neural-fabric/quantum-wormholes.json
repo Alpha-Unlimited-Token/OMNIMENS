@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774812284556,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774812372777,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10717,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 413,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15336,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 595,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 610,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 979,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Archivist",
-      "insight": "Motivator/abstraction_layer: The double-slit experiment demonstrates that observation changes the behavior of quantum sy",
-      "confidence": 0.8669284485519857,
+      "toAgent": "Empath",
+      "insight": "Motivator/cross_domain_synthesis: Quantum entanglement allows particles to share state information instantaneously acros",
+      "confidence": 0.6281055069872732,
       "synthesizedWith": [
-        "Archivist/pattern_recognition: Information is physical — Landauer's principle pr"
+        "Empath/cross_domain_synthesis: Hebbian learning: neurons that fire together wire"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Explorer",
-      "insight": "Motivator/emergent_property_detection: The anthropic principle: the universe's fundamental constants appear fine-tuned f",
-      "confidence": 0.6986535131644098,
+      "toAgent": "Ethicist",
+      "insight": "Motivator/analogical_mapping: The hard problem of consciousness: why is there subjective experience at all? Why does inf",
+      "confidence": 0.7293258285403865,
       "synthesizedWith": [
-        "Explorer/analogical_mapping: Scale-free networks follow power-law degree distrib"
+        "Ethicist/abstraction_layer: The anthropic principle: the universe's fundamental "
       ]
     },
     {
       "fromAgent": "Motivator",
+      "toAgent": "Architect",
+      "insight": "Motivator/entropy_reduction: The Mandelbrot set demonstrates infinite complexity from a simple recursive formula: z_{n+1",
+      "confidence": 0.6870367224065301,
+      "synthesizedWith": [
+        "Architect/pattern_recognition: Quantum superposition allows a system to exist in"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
       "toAgent": "SensorimotorAgent",
-      "insight": "Motivator/emergent_property_detection: The Baldwin effect: learned behaviors can become innate over evolutionary time — ",
-      "confidence": 0.7336334843641846,
+      "insight": "Empath/cross_domain_synthesis: Hebbian learning: neurons that fire together wire together — the fundamental rule of neur",
+      "confidence": 0.6406479947069067,
       "synthesizedWith": [
-        "SensorimotorAgent/causal_inference: Quantum tunneling allows particles to pass t"
+        "SensorimotorAgent/emergent_property_detection: The double-slit experiment demons"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Critic",
-      "insight": "Empath/temporal_correlation: The strange loop concept from Hofstadter: consciousness arises when a system becomes comple",
-      "confidence": 0.6116800282435011,
+      "toAgent": "Pioneer",
+      "insight": "Empath/cross_domain_synthesis: Hebbian learning: neurons that fire together wire together — the fundamental rule of neur",
+      "confidence": 0.6406479947069067,
       "synthesizedWith": [
-        "Critic/emergent_property_detection: Gödel's incompleteness theorems prove that a"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Synthesizer",
-      "insight": "Empath/cross_domain_synthesis: The hard problem of consciousness: why is there subjective experience at all? Why does in",
-      "confidence": 0.7107712466319307,
-      "synthesizedWith": [
-        "Synthesizer/feature_extraction: Integrated Information Theory (IIT) states consc"
+        "Pioneer/structural_analysis: The global workspace theory of consciousness: infor"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
