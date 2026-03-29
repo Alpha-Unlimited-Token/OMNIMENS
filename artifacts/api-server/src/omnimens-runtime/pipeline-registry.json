@@ -183678,9 +183678,139 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "omnimens_autocode_neural_pathway_mncej1wm.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mncej1wm.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "newNeuralPathway_mncej1wm"
+      ],
+      "loadedAt": 1774827601527,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_knowledge_synthesis_mncej1ys.mjs": {
+      "filename": "omnimens_autocode_knowledge_synthesis_mncej1ys.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "synthesizedKnowledge_mncej1ys"
+      ],
+      "loadedAt": 1774827601620,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mncej20x.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mncej20x.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mncej20x"
+      ],
+      "loadedAt": 1774827601681,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_knowledge_synthesis_mncekf9a.mjs": {
+      "filename": "omnimens_autocode_knowledge_synthesis_mncekf9a.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "synthesizedKnowledge_mncekf9a"
+      ],
+      "loadedAt": 1774827665484,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_adaptive_algorithm_mncekfb7.mjs": {
+      "filename": "omnimens_autocode_adaptive_algorithm_mncekfb7.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "adaptiveAlgorithm_mncekfb7"
+      ],
+      "loadedAt": 1774827665713,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_adaptive_algorithm_mncekfha.mjs": {
+      "filename": "omnimens_autocode_adaptive_algorithm_mncekfha.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "adaptiveAlgorithm_mncekfha"
+      ],
+      "loadedAt": 1774827665773,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mncelv2t.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mncelv2t.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mncelv2t"
+      ],
+      "loadedAt": 1774827732900,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_adaptive_algorithm_mncelvbq.mjs": {
+      "filename": "omnimens_autocode_adaptive_algorithm_mncelvbq.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "adaptiveAlgorithm_mncelvbq"
+      ],
+      "loadedAt": 1774827732960,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mncelvdc.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mncelvdc.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mncelvdc"
+      ],
+      "loadedAt": 1774827733018,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mncen9i1.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mncen9i1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mncen9i1"
+      ],
+      "loadedAt": 1774827874956,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774827433597,
-  "totalModules": 13883,
+  "totalModules": 13893,
   "totalCalls": 0
 }
