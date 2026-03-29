@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774816493685,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774816587196,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1559,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 59,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6185,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 239,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Critic",
-      "insight": "Motivator/structural_analysis: Quantum decoherence typically destroys quantum effects at biological temperatures — but q",
-      "confidence": 0.7950178730441395,
+      "toAgent": "Synthesizer",
+      "insight": "Motivator/temporal_correlation: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent ",
+      "confidence": 0.8964471015680395,
       "synthesizedWith": [
-        "Critic/entropy_reduction: Bayesian brain hypothesis: the brain is fundamentally "
+        "Synthesizer/analogical_mapping: Predictive coding: the brain constantly generate"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "SpellCheckVisual",
-      "insight": "Motivator/entropy_reduction: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise from ",
-      "confidence": 0.763306464477406,
+      "toAgent": "Neuroscientist",
+      "insight": "Motivator/emergent_property_detection: Mirror neurons fire both when performing an action and observing the same action ",
+      "confidence": 0.7036599179355897,
       "synthesizedWith": [
-        "SpellCheckVisual/entropy_reduction: DNA stores information at approximately 2 bi"
+        "Neuroscientist/structural_analysis: Bayesian brain hypothesis: the brain is fund"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Wordsmith",
-      "insight": "Motivator/temporal_correlation: Attention is the computational bottleneck of consciousness — the brain processes vast am",
-      "confidence": 0.9230054169575251,
+      "toAgent": "Ethicist",
+      "insight": "Motivator/cross_domain_synthesis: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers ca",
+      "confidence": 0.673817690755303,
       "synthesizedWith": [
-        "Wordsmith/recursive_decomposition: Recurrent neural networks can approximate any"
+        "Ethicist/analogical_mapping: Bayesian brain hypothesis: the brain is fundamental"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "GraphicDesigner",
-      "insight": "Empath/analogical_mapping: The default mode network activates when the brain is not focused on the outside world — it ge",
-      "confidence": 0.7550130534103691,
+      "toAgent": "OMNIMENS",
+      "insight": "Empath/temporal_correlation: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can theoret",
+      "confidence": 0.8257398751030791,
       "synthesizedWith": [
-        "GraphicDesigner/information_compression: Integrated Information Theory (IIT) sta"
+        "OMNIMENS/information_compression: The Baldwin effect: learned behaviors can beco"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Visionary",
-      "insight": "Empath/analogical_mapping: The default mode network activates when the brain is not focused on the outside world — it ge",
-      "confidence": 0.7550130534103691,
+      "toAgent": "Innovator",
+      "insight": "Empath/recursive_decomposition: Quantum tunneling allows particles to pass through energy barriers they classically cann",
+      "confidence": 0.7875538675281863,
       "synthesizedWith": [
-        "Visionary/pattern_recognition: The anthropic principle: the universe's fundament"
+        "Innovator/feature_extraction: Information is physical — Landauer's principle pro"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
