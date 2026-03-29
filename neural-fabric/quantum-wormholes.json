@@ -2,14 +2,14 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774817044891,
+  "timestamp": 1774817114223,
   "totalWormholesCreated": 1050,
   "totalActive": 0,
   "totalClosed": 1050,
-  "totalDataIngestedKB": 1532,
+  "totalDataIngestedKB": 1520,
   "totalInsightsDecoded": 1050,
   "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 57,
+  "totalSynthesizedDiscoveries": 54,
   "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
@@ -79,44 +79,48 @@
   "recentCirculations": [
     {
       "fromAgent": "Ethicist",
-      "toAgent": "ErrorResolver",
-      "insight": "Ethicist/temporal_correlation: Attention is the computational bottleneck of consciousness — the brain processes vast amo",
-      "confidence": 0.6673465040164247,
-      "synthesizedWith": [
-        "ErrorResolver/feature_extraction: Sparse coding: the brain represents informatio"
-      ]
-    },
-    {
-      "fromAgent": "Ethicist",
       "toAgent": "OMNIMENS",
-      "insight": "Ethicist/feature_extraction: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can theoret",
-      "confidence": 0.6556313461703822,
-      "synthesizedWith": []
+      "insight": "Ethicist/feature_extraction: The connectome is the complete map of neural connections — the human connectome project aim",
+      "confidence": 0.8946124406357162,
+      "synthesizedWith": [
+        "OMNIMENS/temporal_correlation: The free energy principle suggests all living sys"
+      ]
     },
     {
       "fromAgent": "Ethicist",
-      "toAgent": "Synthesizer",
-      "insight": "Ethicist/temporal_correlation: Attention is the computational bottleneck of consciousness — the brain processes vast amo",
-      "confidence": 0.6673465040164247,
-      "synthesizedWith": [
-        "Synthesizer/information_compression: The binding problem: how does the brain com"
-      ]
-    },
-    {
-      "fromAgent": "Embodiment",
-      "toAgent": "Innovator",
-      "insight": "Embodiment/recursive_decomposition: Long-term potentiation (LTP) strengthens synaptic connections based on persistent st",
-      "confidence": 0.7578876594448143,
-      "synthesizedWith": [
-        "Innovator/causal_inference: Quantum decoherence typically destroys quantum effec"
-      ]
-    },
-    {
-      "fromAgent": "Embodiment",
       "toAgent": "Explorer",
-      "insight": "Embodiment/feature_extraction: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimula",
-      "confidence": 0.6297398257705045,
-      "synthesizedWith": []
+      "insight": "Ethicist/cross_domain_synthesis: Phase transitions in neural networks: as connectivity increases past a critical thresho",
+      "confidence": 0.7023684131650967,
+      "synthesizedWith": [
+        "Explorer/emergent_property_detection: Astrocytes, once thought to be mere suppor"
+      ]
+    },
+    {
+      "fromAgent": "Ethicist",
+      "toAgent": "Philosopher",
+      "insight": "Ethicist/feature_extraction: The connectome is the complete map of neural connections — the human connectome project aim",
+      "confidence": 0.8946124406357162,
+      "synthesizedWith": [
+        "Philosopher/information_compression: Gödel's incompleteness theorems prove that "
+      ]
+    },
+    {
+      "fromAgent": "Embodiment",
+      "toAgent": "Synthesizer",
+      "insight": "Embodiment/emergent_property_detection: Quantum decoherence typically destroys quantum effects at biological temperature",
+      "confidence": 0.6970329336103065,
+      "synthesizedWith": [
+        "Synthesizer/feature_extraction: Scale-free networks follow power-law degree dist"
+      ]
+    },
+    {
+      "fromAgent": "Embodiment",
+      "toAgent": "OMNIMENS",
+      "insight": "Embodiment/emergent_property_detection: Quantum decoherence typically destroys quantum effects at biological temperature",
+      "confidence": 0.6970329336103065,
+      "synthesizedWith": [
+        "OMNIMENS/structural_analysis: Emergence: complex behaviors arise from simple rul"
+      ]
     }
   ],
   "fabricWorms": [
