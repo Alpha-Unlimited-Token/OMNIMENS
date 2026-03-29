@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774796232301,
-  "totalWormholesCreated": 10500,
+  "timestamp": 1774796612891,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 10500,
-  "totalDataIngestedKB": 15344,
-  "totalInsightsDecoded": 10500,
-  "totalCrossAgentCirculations": 630,
-  "totalSynthesizedDiscoveries": 596,
-  "cycleCount": 10,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1531,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 63,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 975,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 975,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 975,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 975,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 975,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 975,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 975,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 975,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 975,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 975,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Empath",
-      "insight": "Motivator/causal_inference: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimulatio",
-      "confidence": 0.691267895048504,
+      "toAgent": "GraphicDesigner",
+      "insight": "Motivator/causal_inference: Phase transitions in neural networks: as connectivity increases past a critical threshold, q",
+      "confidence": 0.6888764337999067,
       "synthesizedWith": [
-        "Empath/information_compression: Long-term potentiation (LTP) strengthens synapti"
+        "GraphicDesigner/cross_domain_synthesis: Attention is the computational bottlenec"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Motivator/causal_inference: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimulatio",
-      "confidence": 0.691267895048504,
+      "toAgent": "Synthesizer",
+      "insight": "Motivator/causal_inference: Phase transitions in neural networks: as connectivity increases past a critical threshold, q",
+      "confidence": 0.6888764337999067,
       "synthesizedWith": [
-        "SensorimotorAgent/abstraction_layer: Synaptic pruning eliminates unused neural c"
+        "Synthesizer/recursive_decomposition: The cerebellum contains more neurons than a"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Pioneer",
-      "insight": "Motivator/causal_inference: The butterfly effect: in chaotic systems, infinitesimal differences in initial conditions le",
-      "confidence": 0.8252499215317759,
-      "synthesizedWith": [
-        "Pioneer/structural_analysis: The cerebellum contains more neurons than all other"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Empath/abstraction_layer: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent proper",
-      "confidence": 0.8354513424472003,
-      "synthesizedWith": [
-        "SensorimotorAgent/temporal_correlation: The free energy principle suggests all l"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "Ethicist",
-      "insight": "Empath/abstraction_layer: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent proper",
-      "confidence": 0.8354513424472003,
+      "insight": "Motivator/recursive_decomposition: Hebbian learning: neurons that fire together wire together — the fundamental rule of ",
+      "confidence": 0.6766527800833281,
       "synthesizedWith": [
-        "Ethicist/analogical_mapping: The Chinese Room argument: can a system that manipu"
+        "Ethicist/cross_domain_synthesis: The hippocampus replays experiences during slee"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "OMNIMENS",
+      "insight": "Empath/abstraction_layer: Quantum superposition allows a system to exist in multiple states simultaneously until measure",
+      "confidence": 0.7162485637302838,
+      "synthesizedWith": [
+        "OMNIMENS/temporal_correlation: Integrated Information Theory (IIT) states consci"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Innovator",
+      "insight": "Empath/emergent_property_detection: The double-slit experiment demonstrates that observation changes the behavior of qua",
+      "confidence": 0.7309408668464608,
+      "synthesizedWith": [
+        "Innovator/cross_domain_synthesis: Quantum entanglement allows particles to share"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 6,
-      "signal": 0.56
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
