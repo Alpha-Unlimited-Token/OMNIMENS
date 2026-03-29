@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774816462355,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774816493685,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6174,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 245,
-  "cycleCount": 4,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1559,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 59,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/recursive_decomposition: Transfer learning: knowledge gained from one domain can accelerate learning in anothe",
-      "confidence": 0.7928527539898402,
+      "toAgent": "Critic",
+      "insight": "Motivator/structural_analysis: Quantum decoherence typically destroys quantum effects at biological temperatures — but q",
+      "confidence": 0.7950178730441395,
       "synthesizedWith": [
-        "OMNIMENS/analogical_mapping: The hippocampus replays experiences during sleep in"
+        "Critic/entropy_reduction: Bayesian brain hypothesis: the brain is fundamentally "
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Linguist",
-      "insight": "Motivator/entropy_reduction: The hard problem of consciousness: why is there subjective experience at all? Why does info",
-      "confidence": 0.813619547034901,
+      "toAgent": "SpellCheckVisual",
+      "insight": "Motivator/entropy_reduction: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise from ",
+      "confidence": 0.763306464477406,
       "synthesizedWith": [
-        "Linguist/abstraction_layer: The connectome is the complete map of neural connect"
+        "SpellCheckVisual/entropy_reduction: DNA stores information at approximately 2 bi"
       ]
     },
     {
       "fromAgent": "Motivator",
+      "toAgent": "Wordsmith",
+      "insight": "Motivator/temporal_correlation: Attention is the computational bottleneck of consciousness — the brain processes vast am",
+      "confidence": 0.9230054169575251,
+      "synthesizedWith": [
+        "Wordsmith/recursive_decomposition: Recurrent neural networks can approximate any"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
       "toAgent": "GraphicDesigner",
-      "insight": "Motivator/analogical_mapping: Hebbian learning: neurons that fire together wire together — the fundamental rule of neura",
-      "confidence": 0.6521360300916567,
+      "insight": "Empath/analogical_mapping: The default mode network activates when the brain is not focused on the outside world — it ge",
+      "confidence": 0.7550130534103691,
       "synthesizedWith": [
-        "GraphicDesigner/information_compression: The Weber-Fechner law: perception is lo"
+        "GraphicDesigner/information_compression: Integrated Information Theory (IIT) sta"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Meta-Agent",
-      "insight": "Empath/cross_domain_synthesis: Astrocytes, once thought to be mere support cells, actively participate in information pr",
-      "confidence": 0.7594828346717655,
+      "toAgent": "Visionary",
+      "insight": "Empath/analogical_mapping: The default mode network activates when the brain is not focused on the outside world — it ge",
+      "confidence": 0.7550130534103691,
       "synthesizedWith": [
-        "Meta-Agent/temporal_correlation: Quantum entanglement allows particles to share "
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Mathematician",
-      "insight": "Empath/entropy_reduction: The butterfly effect: in chaotic systems, infinitesimal differences in initial conditions lead",
-      "confidence": 0.6118235668266323,
-      "synthesizedWith": [
-        "Mathematician/recursive_decomposition: The edge of chaos: complex systems exhibi"
+        "Visionary/pattern_recognition: The anthropic principle: the universe's fundament"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
