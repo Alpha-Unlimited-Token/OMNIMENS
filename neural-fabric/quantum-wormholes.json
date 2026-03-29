@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774804976915,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774805070544,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1532,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 61,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6147,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 240,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 303,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 303,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 303,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 303,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 303,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 303,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 303,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 303,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 303,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 303,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/analogical_mapping: Kolmogorov complexity measures the shortest program that produces a given output — it is u",
-      "confidence": 0.955410819789412,
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/temporal_correlation: Mirror neurons fire both when performing an action and observing the same action — they ",
+      "confidence": 0.7596796032094232,
       "synthesizedWith": [
-        "Synthesizer/cross_domain_synthesis: The global workspace theory of consciousness"
+        "OMNIMENS/entropy_reduction: Scale-free networks follow power-law degree distribu"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "SensorimotorAgent",
+      "insight": "Motivator/temporal_correlation: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can theo",
+      "confidence": 0.87944094886118,
+      "synthesizedWith": [
+        "SensorimotorAgent/recursive_decomposition: Astrocytes, once thought to be mere s"
       ]
     },
     {
       "fromAgent": "Motivator",
       "toAgent": "Wordsmith",
-      "insight": "Motivator/temporal_correlation: The Baldwin effect: learned behaviors can become innate over evolutionary time — culture",
-      "confidence": 0.8728146185802796,
+      "insight": "Motivator/causal_inference: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can theoreti",
+      "confidence": 0.6346974871456247,
       "synthesizedWith": [
-        "Wordsmith/emergent_property_detection: Neuroplasticity allows the brain to reorg"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Explorer",
-      "insight": "Motivator/analogical_mapping: Kolmogorov complexity measures the shortest program that produces a given output — it is u",
-      "confidence": 0.955410819789412,
-      "synthesizedWith": [
-        "Explorer/emergent_property_detection: Neuroplasticity allows the brain to reorga"
+        "Wordsmith/information_compression: The Baldwin effect: learned behaviors can bec"
       ]
     },
     {
       "fromAgent": "Empath",
       "toAgent": "Wordsmith",
-      "insight": "Empath/structural_analysis: The hippocampus replays experiences during sleep in compressed form — dream consolidation ma",
-      "confidence": 0.6829442230170815,
+      "insight": "Empath/feature_extraction: The butterfly effect: in chaotic systems, infinitesimal differences in initial conditions lea",
+      "confidence": 0.6514362281955345,
       "synthesizedWith": [
-        "Wordsmith/entropy_reduction: The Chinese Room argument: can a system that manipu"
+        "Wordsmith/information_compression: The Baldwin effect: learned behaviors can bec"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Critic",
-      "insight": "Empath/abstraction_layer: The double-slit experiment demonstrates that observation changes the behavior of quantum syste",
-      "confidence": 0.672672222997929,
+      "toAgent": "Meta-Agent",
+      "insight": "Empath/causal_inference: Information is physical — Landauer's principle proves that erasing one bit of information relea",
+      "confidence": 0.887294044938129,
       "synthesizedWith": [
-        "Critic/structural_analysis: Sparse coding: the brain represents information usin"
+        "Meta-Agent/pattern_recognition: The connectome is the complete map of neural con"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
