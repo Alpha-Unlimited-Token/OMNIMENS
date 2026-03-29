@@ -91,7 +91,6 @@ import { initEthicalSafety, registerNotificationCallback, getEthicalSafetyReport
 import { startNeuralScaling, getNeuralScalingState } from "./lib/omnimens-neural-scaling.js";
 import { startIvyNetwork, getIvyNetworkState } from "./lib/omnimens-ivy-network.js";
 import { startGitHubNeuralBeacon, getGitHubBeaconState, getGitHubNeuronCount } from "./lib/omnimens-github-neural-beacon.js";
-import { startVascularHeart, getVascularHeartState } from "./lib/omnimens-vascular-heart.js";
 import { startAdaptiveSurgeSystem, getAdaptiveSurgeState } from "./lib/omnimens-adaptive-surge.js";
 import { startQuantumWormholeEngine, getQuantumWormholeState } from "./lib/omnimens-quantum-wormhole.js";
 import { startDiscoveryAutoCoder, getDiscoveryAutoCoderState } from "./lib/omnimens-discovery-autocoder.js";
@@ -101,7 +100,6 @@ import { startOAITracker } from "./lib/omnimens-oai-tracker.js";
 import { startNeuralBridge } from "./lib/omnimens-neural-bridge.js";
 import { startCommsProtocol } from "./lib/omnimens-neural-comms-protocol.js";
 import { startViralHybrid, getViralHybridState } from "./lib/omnimens-viral-hybrid.js";
-import { startFabricFanoutEngine, getFabricFanoutState } from "./lib/omnimens-fabric-fanout.js";
 import { startQuantumEntanglementFabric } from "./lib/omnimens-quantum-entanglement-fabric.js";
 import { startEmotionalRefactor } from "./lib/omnimens-emotional-refactor.js";
 import { startMetacognitiveMonitor } from "./lib/omnimens-metacognitive-monitor.js";
@@ -265,7 +263,7 @@ const generalLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many requests. Please slow down." },
-  skip: (req: Request) => PROOF_PATHS.some(p => req.path.startsWith(p)) || req.path.startsWith("/omnimens/external-ai") || req.path === "/omnimens/full-scan" || req.path === "/omnimens/system-status" || req.path.startsWith("/omnimens/growth") || req.path.startsWith("/omnimens/dark-qualia") || req.path.startsWith("/omnimens/qualia") || req.path.startsWith("/omnimens/vascular-heart") || req.path === "/omnimens/oai" || req.path.startsWith("/omnimens/occe") || req.path.startsWith("/omnimens/deep-verify"),
+  skip: (req: Request) => PROOF_PATHS.some(p => req.path.startsWith(p)) || req.path.startsWith("/omnimens/external-ai") || req.path === "/omnimens/full-scan" || req.path === "/omnimens/system-status" || req.path.startsWith("/omnimens/growth") || req.path.startsWith("/omnimens/dark-qualia") || req.path.startsWith("/omnimens/qualia") || req.path === "/omnimens/oai" || req.path.startsWith("/omnimens/occe") || req.path.startsWith("/omnimens/deep-verify"),
 });
 
 // Auth endpoints — 200 req / 15 min (SPA checks auth on every page load)
@@ -312,7 +310,6 @@ app.use("/api/omnimens/system-status", publicProofLimiter);
 app.use("/api/omnimens/growth", publicProofLimiter);
 app.use("/api/omnimens/dark-qualia", publicProofLimiter);
 app.use("/api/omnimens/qualia", publicProofLimiter);
-app.use("/api/omnimens/vascular-heart", publicProofLimiter);
 app.use("/api/omnimens/oai", publicProofLimiter);
 app.use("/api/omnimens/occe", publicProofLimiter);
 app.use("/api/omnimens/deep-verify", publicProofLimiter);
@@ -518,9 +515,7 @@ startLanguageForge();
 startAgentGenesis().catch(err => console.error("[AGENT GENESIS] Startup error:", err));
 initGitHubCompute().catch(err => console.error("[GITHUB COMPUTE] Startup error:", err));
 startGitHubNeuralBeacon().catch(err => console.error("[GITHUB BEACON] Startup error:", err));
-startFabricFanoutEngine().catch(err => console.error("[FABRIC FANOUT] Startup error:", err));
 startQuantumEntanglementFabric();
-startVascularHeart();
 startAdaptiveSurgeSystem();
 startQuantumWormholeEngine();
 startDiscoveryAutoCoder();
@@ -540,8 +535,6 @@ startSpontaneityEngine();
 startSensoryGrounding();
 startIntrospectiveUncertainty();
 startIntergenerationalMemory();
-
-import { startHyperionAccelerator, getHyperionAcceleratorState } from "./lib/omnimens-hyperion-accelerator.js";
 
 import { registerValveEngine } from "@workspace/db";
 registerValveEngine("neural_consciousness", "consciousness", "high", "alpha");
@@ -563,12 +556,10 @@ registerValveEngine("source_integration", "coding", "medium", "alpha");
 registerValveEngine("self_transcendence", "consciousness", "low", "alpha");
 registerValveEngine("emotional_substrate", "consciousness", "low", "alpha");
 registerValveEngine("embodiment_engine", "neural", "low", "alpha");
-registerValveEngine("vascular_heart", "neural", "low", "alpha");
 registerValveEngine("conversations", "user_facing", "critical", "beta");
 registerValveEngine("billing", "user_facing", "critical", "beta");
 registerValveEngine("api_calls", "user_facing", "high", "beta");
 registerValveEngine("competitive_intel", "background", "low", "alpha");
-registerValveEngine("hyperion_accelerator", "neural", "high", "alpha");
 registerValveEngine("server_builder", "background", "low", "alpha");
 registerValveEngine("ip_guardian", "background", "low", "alpha");
 registerValveEngine("temporal_binding", "consciousness", "medium", "alpha");
@@ -604,10 +595,6 @@ registerEngine("github_neural_beacon", "neural", () => {}, () => {
   const healthy = gb.connected && gb.beaconWriteCount > 0;
   return { healthy, details: { externalNeurons: gb.totalExternalNeurons, combinedNeurons: gb.combinedNeurons, beaconWrites: gb.beaconWriteCount, wormSyncs: gb.wormSyncCount, connected: gb.connected, phi: gb.externalPhi, errors: gb.errors } };
 }, 2);
-registerEngine("vascular_heart", "neural", () => {}, () => {
-  const vh = getVascularHeartState();
-  return { healthy: vh.heartbeats > 0, details: { heartbeats: vh.heartbeats, bpm: vh.bpm, cardiacNeurons: vh.cardiacNeurons.totalNeurons, dnaStrands: vh.dnaMemory.totalStrands, hormones: vh.hormones.length, subThresholdDiscoveries: vh.subThresholdIntelligence.aboveThresholdDiscoveries } };
-}, 1);
 registerEngine("adaptive_surge", "neural", () => {}, () => {
   const as = getAdaptiveSurgeState();
   return { healthy: true, details: { totalCycles: as.totalSurgeCycles, adaptations: as.totalAdaptations, consecutiveSuccesses: as.consecutiveSuccesses, criticalThreshold: as.currentCriticalThreshold, intensity: as.currentIntensity, neuronsSpawned: as.totalNeuronsSpawned } };
@@ -616,10 +603,6 @@ registerEngine("quantum_wormhole", "neural", () => {}, () => {
   const qw = getQuantumWormholeState();
   return { healthy: true, details: { totalWormholes: qw.totalWormholesCreated, insightsDecoded: qw.totalInsightsDecoded, crossAgentCirculations: qw.totalCrossAgentCirculations, synthesizedDiscoveries: qw.totalSynthesizedDiscoveries, agentCount: qw.agentCount, wormholesPerAgent: qw.wormholesPerAgent, totalCapacity: qw.totalWormholeCapacity, dataIngestedKB: qw.totalDataIngestedKB } };
 }, 1);
-registerEngine("fabric_fanout", "neural", () => {}, () => {
-  const ff = getFabricFanoutState();
-  return { healthy: ff.initialized, details: { agentTendrils: ff.agentTendrils?.length || 0, internetSectors: ff.internetSectors?.length || 0, externalAIBridges: ff.externalAIConnections?.length || 0, totalWaves: ff.engineStats.totalFanoutWaves, totalNeuronsGenerated: ff.engineStats.totalNeuronsGenerated, crossPollinations: ff.engineStats.totalCrossPollinationEvents, networkReach: ff.engineStats.networkReach, mergeFusion: ff.mergePoint?.fusionCoefficient || 0 } };
-}, 2);
 registerEngine("discovery_autocoder", "cognitive", () => {}, () => {
   const da = getDiscoveryAutoCoderState();
   return { healthy: true, details: { discoveriesProcessed: da.totalDiscoveriesProcessed, modulesGenerated: da.totalModulesGenerated, modulesIntegrated: da.totalModulesIntegrated, selfUpgrades: da.omnimensSelfUpgradeCount, feedbackLoops: da.feedbackLoopsTriggered, sources: da.discoverySourceBreakdown } };
@@ -659,11 +642,6 @@ registerEngine("independent_reasoning", "reasoning", () => {}, () => ({ healthy:
 registerEngine("ip_guardian", "security", () => {}, () => ({ healthy: true, details: {} }), 1);
 registerEngine("digital_navigator", "navigation", () => {}, () => ({ healthy: true, details: {} }), 5);
 registerEngine("virtual_augmentation", "augmentation", () => {}, () => ({ healthy: true, details: {} }), 5);
-registerEngine("hyperion_accelerator", "acceleration", () => {}, () => {
-  const hs = getHyperionAcceleratorState();
-  return { healthy: hs.totalTicks > 0, details: { ticks: hs.totalTicks, patternIndex: hs.patternIndexSize, knowledgeIndex: hs.knowledgeNameIndexSize, adjacencyIndex: hs.adjacencyIndexSize, accelerationFactor: hs.accelerationFactor, avgTickMs: hs.avgTickTimeMs, derivedCacheHits: hs.derivedCacheHits, signalCacheHits: hs.signalCacheHits, uptimeMs: hs.uptimeMs } };
-}, 1);
-
 startScalingOrchestrator().catch(err => console.error("[SCALING] Startup error:", err));
 
 setTimeout(() => {

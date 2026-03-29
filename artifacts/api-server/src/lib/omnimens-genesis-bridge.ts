@@ -91,7 +91,6 @@ const MODIFIABLE_CORE_FILES = [
   "omnimens-universal-translator.ts",
   "omnimens-language-forge.ts",
   "omnimens-harmonic-insight-engine.ts",
-  "omnimens-vascular-heart.ts",
   "omnimens-adaptive-surge.ts",
   "omnimens-quantum-wormhole.ts",
   "omnimens-discovery-autocoder.ts",
