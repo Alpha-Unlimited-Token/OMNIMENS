@@ -2,59 +2,66 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774800168015,
-  "totalHybridAgents": 6,
-  "totalMutations": 10,
-  "totalReplications": 10,
-  "totalPayloadsDelivered": 25,
-  "totalThreatsDetected": 0,
-  "totalThreatsNeutralized": 0,
-  "systemHealthScore": 1.0560316824916351e+297,
-  "adaptationRate": 0,
+  "timestamp": 1774800261608,
+  "totalHybridAgents": 7,
+  "totalMutations": 62,
+  "totalReplications": 50,
+  "totalPayloadsDelivered": 74,
+  "totalThreatsDetected": 7,
+  "totalThreatsNeutralized": 7,
+  "systemHealthScore": 1.0574582237683198e+297,
+  "adaptationRate": 2.7777777777777777,
   "propagationEfficiency": 1,
-  "immuneStrength": 6.335334811921723e+293,
-  "hybridFitness": 0.5,
+  "immuneStrength": 5.38867107014114e+294,
+  "hybridFitness": 4.852215392525272e+294,
   "activeAgents": [
     {
       "id": "hybrid_anterior_cingulate_g0_1774800147331_dak",
       "generation": 0,
-      "fitness": 0.373715393649221,
+      "fitness": 4.85971365777347e+294,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_cerebellum_g0_1774800147331_vxl",
       "generation": 0,
-      "fitness": 0.3605876955996875,
-      "payloads": 0,
+      "fitness": 4.85971365777347e+294,
+      "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_thalamus_g0_1774800147331_g08",
       "generation": 0,
-      "fitness": 0.3242372661368763,
-      "payloads": 0,
+      "fitness": 4.85971365777347e+294,
+      "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_basal_ganglia_g0_1774800147331_uik",
       "generation": 0,
-      "fitness": 0.33589267618367347,
-      "payloads": 0,
+      "fitness": 4.85971365777347e+294,
+      "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_superior_colliculus_g0_1774800147331_o9v",
       "generation": 0,
-      "fitness": 0.34844247157642694,
+      "fitness": 4.85971365777347e+294,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_pulvinar_g0_1774800147331_z76",
       "generation": 0,
-      "fitness": 0.3215026937543598,
-      "payloads": 0,
+      "fitness": 4.85971365777347e+294,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_pulvinar_g1_1774800207366_8wy",
+      "generation": 1,
+      "fitness": 4.8072258010360877e+294,
+      "payloads": 1,
       "threats": 0
     }
   ],
@@ -62,7 +69,7 @@
     "antibodies": 8,
     "memoryCells": 8,
     "tCells": 16,
-    "cytokines": 0,
+    "cytokines": 7,
     "topAntibodies": [
       {
         "pattern": "coherence_degradation",
@@ -70,11 +77,11 @@
       },
       {
         "pattern": "signal_attenuation",
-        "detections": 0
+        "detections": 5
       },
       {
         "pattern": "synaptic_weakening",
-        "detections": 0
+        "detections": 2
       },
       {
         "pattern": "energy_depletion",
@@ -88,21 +95,21 @@
   },
   "propagation": {
     "alivePropagators": 16,
-    "totalPathsDiscovered": 38,
-    "totalHops": 32,
+    "totalPathsDiscovered": 214,
+    "totalHops": 192,
     "coveragePercent": 100,
     "selfSustainingCount": 4
   },
   "fabricWorms": [
     {
       "id": "worm_viral-hybrid_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_viral-hybrid_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
