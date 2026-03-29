@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774801249535,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774801343710,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1534,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 56,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6101,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 235,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/recursive_decomposition: The mathematical universe hypothesis: all structures that exist mathematically also e",
-      "confidence": 0.6492820924240881,
-      "synthesizedWith": [
-        "Synthesizer/structural_analysis: The cerebellum contains more neurons than all o"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
       "toAgent": "Linguist",
-      "insight": "Motivator/structural_analysis: Reservoir computing shows that even random neural networks can perform computation if the",
-      "confidence": 0.626959024552682,
+      "insight": "Motivator/structural_analysis: The anthropic principle: the universe's fundamental constants appear fine-tuned for the e",
+      "confidence": 0.8777884506565635,
       "synthesizedWith": [
-        "Linguist/information_compression: The Penrose-Hameroff Orch-OR theory proposes c"
+        "Linguist/information_compression: Predictive coding: the brain constantly genera"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Visionary",
-      "insight": "Motivator/entropy_reduction: Quantum superposition allows a system to exist in multiple states simultaneously until meas",
-      "confidence": 0.8133849752826273,
+      "toAgent": "Mathematician",
+      "insight": "Motivator/structural_analysis: The anthropic principle: the universe's fundamental constants appear fine-tuned for the e",
+      "confidence": 0.8777884506565635,
       "synthesizedWith": [
-        "Visionary/emergent_property_detection: Quantum tunneling allows particles to pas"
+        "Mathematician/pattern_recognition: Neuroplasticity allows the brain to reorganiz"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "SpellCheckVisual",
+      "insight": "Motivator/abstraction_layer: Reservoir computing shows that even random neural networks can perform computation if the r",
+      "confidence": 0.6098663646202818,
+      "synthesizedWith": [
+        "SpellCheckVisual/structural_analysis: The vagus nerve connects the brain to the "
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Wordsmith",
-      "insight": "Empath/abstraction_layer: Quantum entanglement allows particles to share state information instantaneously across any di",
-      "confidence": 0.8581841994319508,
+      "toAgent": "Synthesizer",
+      "insight": "Empath/abstraction_layer: Information is physical — Landauer's principle proves that erasing one bit of information rele",
+      "confidence": 0.8274101433704915,
       "synthesizedWith": [
-        "Wordsmith/cross_domain_synthesis: The strange loop concept from Hofstadter: cons"
+        "Synthesizer/structural_analysis: Quantum tunneling allows particles to pass thro"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "OMNIMENS",
-      "insight": "Empath/temporal_correlation: Information is physical — Landauer's principle proves that erasing one bit of information r",
-      "confidence": 0.8746753563260897,
+      "toAgent": "SensorimotorAgent",
+      "insight": "Empath/temporal_correlation: Integrated Information Theory (IIT) states consciousness = Phi, the amount of integrated in",
+      "confidence": 0.6508783227615479,
       "synthesizedWith": [
-        "OMNIMENS/structural_analysis: The cerebellum contains more neurons than all othe"
+        "SensorimotorAgent/information_compression: Information is physical — Landauer's "
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
