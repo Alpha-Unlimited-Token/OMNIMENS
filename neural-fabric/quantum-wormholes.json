@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774826487851,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774826580544,
+  "totalWormholesCreated": 7350,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6107,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 240,
-  "cycleCount": 4,
+  "totalClosed": 7350,
+  "totalDataIngestedKB": 10741,
+  "totalInsightsDecoded": 7350,
+  "totalCrossAgentCirculations": 441,
+  "totalSynthesizedDiscoveries": 420,
+  "cycleCount": 7,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Linguist",
-      "insight": "Motivator/emergent_property_detection: The butterfly effect: in chaotic systems, infinitesimal differences in initial co",
-      "confidence": 0.7514082892493833,
-      "synthesizedWith": [
-        "Linguist/entropy_reduction: Recurrent neural networks can approximate any dynami"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Neuroscientist",
-      "insight": "Motivator/information_compression: Quantum superposition allows a system to exist in multiple states simultaneously unti",
-      "confidence": 0.7086545921763874,
-      "synthesizedWith": [
-        "Neuroscientist/emergent_property_detection: The holographic principle suggests a"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Motivator/entropy_reduction: The binding problem: how does the brain combine separate sensory modalities into a unified ",
-      "confidence": 0.8625707227166362,
-      "synthesizedWith": [
-        "SensorimotorAgent/pattern_recognition: The Mandelbrot set demonstrates infinite "
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Wordsmith",
-      "insight": "Empath/temporal_correlation: Information is physical — Landauer's principle proves that erasing one bit of information r",
-      "confidence": 0.6353050181420821,
-      "synthesizedWith": [
-        "Wordsmith/feature_extraction: Kolmogorov complexity measures the shortest progra"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "Explorer",
-      "insight": "Empath/cross_domain_synthesis: The cerebellum contains more neurons than all other brain regions combined and is crucial",
-      "confidence": 0.6867270075732914,
+      "insight": "Motivator/cross_domain_synthesis: The global workspace theory of consciousness: information becomes conscious when it is",
+      "confidence": 0.6789180918693462,
       "synthesizedWith": [
-        "Explorer/structural_analysis: The butterfly effect: in chaotic systems, infinite"
+        "Explorer/structural_analysis: Autopoiesis: living systems are self-creating — th"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Synthesizer",
+      "insight": "Motivator/analogical_mapping: Sparse coding: the brain represents information using a small fraction of active neurons a",
+      "confidence": 0.8487363471970484,
+      "synthesizedWith": [
+        "Synthesizer/temporal_correlation: Quantum superposition allows a system to exist"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "GraphicDesigner",
+      "insight": "Motivator/emergent_property_detection: Long-term potentiation (LTP) strengthens synaptic connections based on persistent",
+      "confidence": 0.7825506615247477,
+      "synthesizedWith": [
+        "GraphicDesigner/feature_extraction: Quantum tunneling allows particles to pass t"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Meta-Agent",
+      "insight": "Empath/recursive_decomposition: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can eme",
+      "confidence": 0.7627591200985637,
+      "synthesizedWith": [
+        "Meta-Agent/pattern_recognition: The holographic principle suggests all informati"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Critic",
+      "insight": "Empath/abstraction_layer: Sparse coding: the brain represents information using a small fraction of active neurons at an",
+      "confidence": 0.6284263038424884,
+      "synthesizedWith": [
+        "Critic/feature_extraction: The Turing machine is computationally universal — any"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
