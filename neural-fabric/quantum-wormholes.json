@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774826197266,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774826289835,
+  "totalWormholesCreated": 7350,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6239,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 237,
-  "cycleCount": 4,
+  "totalClosed": 7350,
+  "totalDataIngestedKB": 10793,
+  "totalInsightsDecoded": 7350,
+  "totalCrossAgentCirculations": 441,
+  "totalSynthesizedDiscoveries": 417,
+  "cycleCount": 7,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Linguist",
-      "insight": "Motivator/recursive_decomposition: The connectome is the complete map of neural connections — the human connectome proje",
-      "confidence": 0.7058639592477083,
+      "toAgent": "Innovator",
+      "insight": "Motivator/entropy_reduction: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can theoret",
+      "confidence": 0.6739456648612718,
       "synthesizedWith": [
-        "Linguist/recursive_decomposition: Recurrent neural networks can approximate any "
+        "Innovator/feature_extraction: Bayesian brain hypothesis: the brain is fundamenta"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Pioneer",
+      "insight": "Motivator/structural_analysis: The holographic principle suggests all information in a volume of space can be encoded on",
+      "confidence": 0.9088501278816815,
+      "synthesizedWith": [
+        "Pioneer/entropy_reduction: Emergence: complex behaviors arise from simple rules "
       ]
     },
     {
       "fromAgent": "Motivator",
       "toAgent": "Empath",
-      "insight": "Motivator/information_compression: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can ",
-      "confidence": 0.9646837538399973,
+      "insight": "Motivator/cross_domain_synthesis: The anthropic principle: the universe's fundamental constants appear fine-tuned for th",
+      "confidence": 0.7474699741089652,
       "synthesizedWith": [
-        "Empath/recursive_decomposition: Astrocytes, once thought to be mere support cell"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Architect",
-      "insight": "Motivator/information_compression: Autopoiesis: living systems are self-creating — they produce the components that cons",
-      "confidence": 0.7137152934985955,
-      "synthesizedWith": [
-        "Architect/structural_analysis: Scale-free networks follow power-law degree distr"
+        "Empath/analogical_mapping: Emergence: complex behaviors arise from simple rules "
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Mathematician",
-      "insight": "Empath/analogical_mapping: The Mandelbrot set demonstrates infinite complexity from a simple recursive formula: z_{n+1} ",
-      "confidence": 0.7615770195622531,
+      "toAgent": "GraphicDesigner",
+      "insight": "Empath/cross_domain_synthesis: The free energy principle suggests all living systems minimize variational free energy — ",
+      "confidence": 0.6075022453573744,
       "synthesizedWith": [
-        "Mathematician/structural_analysis: Phase transitions in neural networks: as conn"
+        "GraphicDesigner/recursive_decomposition: The binding problem: how does the brain"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Empath/information_compression: Transfer learning: knowledge gained from one domain can accelerate learning in another —",
-      "confidence": 0.7761540754399332,
+      "toAgent": "Neuroscientist",
+      "insight": "Empath/analogical_mapping: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent prope",
+      "confidence": 0.7552900202975816,
       "synthesizedWith": [
-        "SensorimotorAgent/entropy_reduction: Astrocytes, once thought to be mere support"
+        "Neuroscientist/entropy_reduction: The default mode network activates when the br"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
