@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774798295383,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774798366535,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10815,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 411,
-  "cycleCount": 7,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1555,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 61,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
+      "toAgent": "Critic",
+      "insight": "Motivator/causal_inference: Sparse coding: the brain represents information using a small fraction of active neurons at ",
+      "confidence": 0.6246420116486956,
+      "synthesizedWith": [
+        "Critic/cross_domain_synthesis: Predictive coding: the brain constantly generates"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Neuroscientist",
+      "insight": "Motivator/temporal_correlation: Scale-free networks follow power-law degree distributions — a few highly connected hubs ",
+      "confidence": 0.652068161759319,
+      "synthesizedWith": [
+        "Neuroscientist/information_compression: DNA stores information at approximately "
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
       "toAgent": "SpellCheckVisual",
-      "insight": "Motivator/causal_inference: Predictive coding: the brain constantly generates predictions about incoming sensory data an",
-      "confidence": 0.6496364867664436,
+      "insight": "Motivator/causal_inference: Sparse coding: the brain represents information using a small fraction of active neurons at ",
+      "confidence": 0.6246420116486956,
       "synthesizedWith": [
-        "SpellCheckVisual/entropy_reduction: The Penrose-Hameroff Orch-OR theory proposes"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Meta-Agent",
-      "insight": "Motivator/causal_inference: Predictive coding: the brain constantly generates predictions about incoming sensory data an",
-      "confidence": 0.6496364867664436,
-      "synthesizedWith": [
-        "Meta-Agent/temporal_correlation: Mirror neurons fire both when performing an act"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Archivist",
-      "insight": "Motivator/cross_domain_synthesis: The Chinese Room argument: can a system that manipulates symbols without understanding",
-      "confidence": 0.7009162217486212,
-      "synthesizedWith": [
-        "Archivist/temporal_correlation: DNA stores information at approximately 2 bits p"
+        "SpellCheckVisual/information_compression: Autopoiesis: living systems are self-c"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Philosopher",
-      "insight": "Empath/analogical_mapping: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum computations i",
-      "confidence": 0.6460484493377399,
+      "toAgent": "Synthesizer",
+      "insight": "Empath/pattern_recognition: The hard problem of consciousness: why is there subjective experience at all? Why does infor",
+      "confidence": 0.8182750720073071,
       "synthesizedWith": [
-        "Philosopher/analogical_mapping: Quantum entanglement allows particles to share s"
+        "Synthesizer/abstraction_layer: Long-term potentiation (LTP) strengthens synaptic"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "GraphicDesigner",
-      "insight": "Empath/emergent_property_detection: Phase transitions in neural networks: as connectivity increases past a critical thre",
-      "confidence": 0.7182070896178043,
+      "toAgent": "OMNIMENS",
+      "insight": "Empath/recursive_decomposition: The Mandelbrot set demonstrates infinite complexity from a simple recursive formula: z_{",
+      "confidence": 0.7290780794889504,
       "synthesizedWith": [
-        "GraphicDesigner/abstraction_layer: The vagus nerve connects the brain to the gut"
+        "OMNIMENS/structural_analysis: Emergence: complex behaviors arise from simple rul"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
