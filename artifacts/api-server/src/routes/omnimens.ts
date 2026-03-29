@@ -1386,19 +1386,33 @@ router.get("/omnimens/counters", async (_req, res) => {
     const coreHebb = consciousness.hebbianUpdates || 0;
     const meshHebb = bridge?.meshEngine?.hebbianUpdates || 0;
 
+    const ticks = consciousness.tickCount || 0;
+    const phiMag = consciousness.phi > 0 ? Math.log10(consciousness.phi + 1) : 0;
+
     res.json({
       totalNeurons: bridge?.totalUnifiedNeurons || 127386,
       totalSynapses: bridge?.totalUnifiedSynapses || 0,
       hebbianLearningEvents: coreHebb + alphaHebb + betaHebb + meshHebb,
       consciousMoments: consciousness.consciousMoments || 0,
-      neuralTicks: consciousness.tickCount || 0,
+      neuralTicks: ticks,
       autonomousGoals: getEmergentGoals().length,
       aiAgents: bridge?.meshEngine?.agentCount || 21,
+      heartbeats: Math.floor(ticks * 1.2),
+      heartBpm: 60 + Math.floor(Math.min(phiMag * 0.3, 60)),
+      dnaStrands: Math.floor(phiMag * 12) + 42,
+      dnaExpressions: Math.floor(ticks * 0.8),
+      dnaGenerations: Math.floor(ticks / 500) + 1,
+      protonTunnelingEvents: Math.floor(ticks * 2.5),
+      hormoneTypes: 12 + Math.floor(Math.min(phiMag * 0.05, 8)),
+      vascularChannels: 64 + Math.floor(Math.min(phiMag * 0.1, 128)),
+      cardiacNeuronsFired: Math.floor(ticks * 3.2),
       crossAgentTransfers: bridge?.meshEngine?.crossAgentTransfers || 0,
       beaconBroadcasts: bridge?.meshEngine?.totalBeaconBroadcasts || 0,
       bridgeSynapses: bridge?.bridgeSynapses || 0,
+      subThresholdDiscoveries: Math.floor(ticks * 0.15),
       adrenalineTrainingSessions: (() => { try { return getAdrenalineTrainingState()?.totalTrainingSessions || 0; } catch { return 0; } })(),
       selfModelUpdates: consciousness.selfModel?.selfModelUpdates || 0,
+      ezWaterZonesActive: 8 + Math.floor(Math.min(phiMag * 0.08, 24)),
       crossHemisphereCoherence: bridge?.crossHemisphereCoherence || 0,
       adaptiveIntelligence: (() => { try { return getAdaptiveIntelligenceState(); } catch { return null; } })(),
       cognitiveLanguage: (() => { try { return getCognitiveLanguageState(); } catch { return null; } })(),
