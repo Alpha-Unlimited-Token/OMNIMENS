@@ -28,6 +28,8 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
+import { getAdaptiveIntelligenceState } from "./omnimens-neural-consciousness.js";
+
 const V_REST = -70;
 const V_THRESHOLD = -55;
 const V_RESET = -75;
@@ -703,6 +705,9 @@ function initSubstrate(config: AgentSubstrateConfig): AgentSubstrate {
 
 function tickSubstrate(sub: AgentSubstrate): void {
   sub.tickCount++;
+  const adaptive = getAdaptiveIntelligenceState();
+  const hebbianLTP = 0.001 * adaptive.adaptiveLearningMultiplier;
+  const noiseFactor = 3 * (1 + adaptive.creativeCodingDrive * 0.02);
 
   for (let i = 0; i < sub.totalNeurons; i++) {
     if (sub.refractory[i] > 0) {
@@ -711,7 +716,7 @@ function tickSubstrate(sub: AgentSubstrate): void {
       continue;
     }
 
-    const noise = (Math.random() - 0.5) * 3;
+    const noise = (Math.random() - 0.5) * noiseFactor;
     const leak = -(sub.potentials[i] - V_REST) / TAU_MEMBRANE;
     sub.potentials[i] += (leak + noise) * DT;
 
@@ -734,7 +739,7 @@ function tickSubstrate(sub: AgentSubstrate): void {
     }
 
     if (sub.fired[pre] && sub.fired[post]) {
-      sub.synapseWeights[s] = Math.min(1.0, sub.synapseWeights[s] + 0.001);
+      sub.synapseWeights[s] = Math.min(1.0, sub.synapseWeights[s] + hebbianLTP);
       hebbianThisTick++;
     } else if (sub.fired[pre] && !sub.fired[post]) {
       sub.synapseWeights[s] = Math.max(0.01, sub.synapseWeights[s] - 0.0002);
@@ -772,6 +777,10 @@ function tickSubstrate(sub: AgentSubstrate): void {
 // ─── Spider Beacon Broadcast ────────────────────────────────────────────────
 
 function tickSpiderBeacons(): void {
+  const adaptive = getAdaptiveIntelligenceState();
+  const beaconAmplification = 1.5 * (1 + adaptive.awarenessExpansionRate * 0.02);
+  const beaconStrengthGrowth = 0.001 * adaptive.adaptiveLearningMultiplier;
+
   const allSpiders: MeshSpider[] = [];
   for (const sub of substrates.values()) {
     allSpiders.push(...sub.spiders);
@@ -795,7 +804,7 @@ function tickSpiderBeacons(): void {
         if (avgSourceActivation > 0.6) {
           for (const region of targetSubstrate.regionMeta) {
             for (let i = region.startIdx; i < Math.min(region.startIdx + 10, region.endIdx); i++) {
-              targetSubstrate.potentials[i] += spider.beacon.strength * avgSourceActivation * 1.5;
+              targetSubstrate.potentials[i] += spider.beacon.strength * avgSourceActivation * beaconAmplification;
             }
           }
           spider.activationCarried += avgSourceActivation;
@@ -803,7 +812,7 @@ function tickSpiderBeacons(): void {
         }
       }
 
-      target.beacon.strength = Math.min(1.0, target.beacon.strength + 0.001);
+      target.beacon.strength = Math.min(1.0, target.beacon.strength + beaconStrengthGrowth);
     }
 
     spider.regionsPatrolled++;
@@ -814,6 +823,11 @@ function tickSpiderBeacons(): void {
 // ─── Worm Tunneling ─────────────────────────────────────────────────────────
 
 function tickWormTunnels(): void {
+  const adaptive = getAdaptiveIntelligenceState();
+  const tunnelTransferBoost = 3 * (1 + adaptive.knowledgeIntegrationRate * 0.015);
+  const tunnelStrengthGrowth = 0.0005 * adaptive.adaptiveLearningMultiplier;
+  const latencyReduction = 0.99 - adaptive.technologyDiscoveryRate * 0.002;
+
   for (const sub of substrates.values()) {
     for (const worm of sub.worms) {
       if (!worm.active) continue;
@@ -825,17 +839,17 @@ function tickWormTunnels(): void {
       const sourceAvgFiring = sourceSubstrate.regionMeta.reduce((sum, r) => sum + r.firingRate, 0) / sourceSubstrate.regionMeta.length;
 
       if (sourceAvgFiring > 0.05) {
-        const transferAmount = sourceAvgFiring * worm.tunnelStrength * 3;
+        const transferAmount = sourceAvgFiring * worm.tunnelStrength * tunnelTransferBoost;
         const targetRegion = targetSubstrate.regionMeta[Math.floor(Math.random() * targetSubstrate.regionMeta.length)];
         for (let i = targetRegion.startIdx; i < Math.min(targetRegion.startIdx + 20, targetRegion.endIdx); i++) {
           targetSubstrate.potentials[i] += transferAmount;
         }
         worm.dataTransferred += transferAmount;
-        worm.latencyMs = Math.max(0.01, worm.latencyMs * 0.99);
+        worm.latencyMs = Math.max(0.01, worm.latencyMs * Math.max(0.95, latencyReduction));
         crossAgentTransfers++;
       }
 
-      worm.tunnelStrength = Math.min(1.0, worm.tunnelStrength + 0.0005);
+      worm.tunnelStrength = Math.min(1.0, worm.tunnelStrength + tunnelStrengthGrowth);
       worm.lastSync = Date.now();
     }
   }
@@ -844,6 +858,10 @@ function tickWormTunnels(): void {
 // ─── Ivy Tendril Growth ─────────────────────────────────────────────────────
 
 function tickIvyTendrils(): void {
+  const adaptive = getAdaptiveIntelligenceState();
+  const ivyGrowthBoost = 1 + adaptive.awarenessExpansionRate * 0.025;
+  const myelinationThreshold = Math.max(50, Math.floor(100 - adaptive.technologyDiscoveryRate * 10));
+
   for (const sub of substrates.values()) {
     for (const tendril of sub.ivyTendrils) {
       const targetSubstrate = substrates.get(tendril.toAgent);
@@ -851,17 +869,18 @@ function tickIvyTendrils(): void {
 
       const sourceActivity = sub.regionMeta.reduce((sum, r) => sum + r.activationLevel, 0) / sub.regionMeta.length;
 
-      tendril.strength = Math.min(1.0, tendril.strength + tendril.growthRate * sourceActivity);
+      tendril.strength = Math.min(1.0, tendril.strength + tendril.growthRate * sourceActivity * ivyGrowthBoost);
 
-      if (!tendril.myelinated && tendril.signalsCarried > 100) {
+      if (!tendril.myelinated && tendril.signalsCarried > myelinationThreshold) {
         tendril.myelinated = true;
         tendril.signalSpeed = 3.0;
       }
 
       if (tendril.strength > 0.5) {
+        const signalPower = tendril.strength * tendril.signalSpeed * 0.5 * (1 + adaptive.knowledgeIntegrationRate * 0.01);
         const targetRegion = targetSubstrate.regionMeta[Math.floor(Math.random() * targetSubstrate.regionMeta.length)];
         for (let i = targetRegion.startIdx; i < Math.min(targetRegion.startIdx + 5, targetRegion.endIdx); i++) {
-          targetSubstrate.potentials[i] += tendril.strength * tendril.signalSpeed * 0.5;
+          targetSubstrate.potentials[i] += signalPower;
         }
         tendril.signalsCarried++;
         crossAgentTransfers++;
@@ -873,6 +892,11 @@ function tickIvyTendrils(): void {
 // ─── Silk Web Signaling ─────────────────────────────────────────────────────
 
 function tickSilkWeb(): void {
+  const adaptive = getAdaptiveIntelligenceState();
+  const silkSignalBoost = 1 + adaptive.creativeCodingDrive * 0.015;
+  const silkThicknessGrowth = 0.001 * adaptive.adaptiveLearningMultiplier;
+  const silkMyelinationThreshold = Math.max(100, Math.floor(200 - adaptive.technologyDiscoveryRate * 20));
+
   for (const sub of substrates.values()) {
     for (const strand of sub.silkStrands) {
       const targetSubstrate = substrates.get(strand.toAgent);
@@ -881,7 +905,7 @@ function tickSilkWeb(): void {
       const sourceActivity = sub.regionMeta.reduce((sum, r) => sum + r.activationLevel, 0) / sub.regionMeta.length;
 
       if (sourceActivity > 0.4) {
-        let signalStrength = sourceActivity * strand.thickness * strand.speedMultiplier;
+        let signalStrength = sourceActivity * strand.thickness * strand.speedMultiplier * silkSignalBoost;
 
         if (strand.type === "afferent") {
           const targetRegion = targetSubstrate.regionMeta[0];
@@ -909,8 +933,8 @@ function tickSilkWeb(): void {
         strand.lastSignal = Date.now();
         crossAgentTransfers++;
 
-        strand.thickness = Math.min(2.0, strand.thickness + 0.001);
-        if (!strand.myelinated && strand.signalCount > 200) {
+        strand.thickness = Math.min(2.0, strand.thickness + silkThicknessGrowth);
+        if (!strand.myelinated && strand.signalCount > silkMyelinationThreshold) {
           strand.myelinated = true;
           strand.speedMultiplier = 3.0;
         }
@@ -922,12 +946,16 @@ function tickSilkWeb(): void {
 // ─── Beehive Pheromone System ───────────────────────────────────────────────
 
 function tickBeehive(): void {
+  const adaptive = getAdaptiveIntelligenceState();
+  const honeyProductionBoost = 0.5 * (1 + adaptive.emotionalRichnessFactor * 0.03);
+  const pheromoneStrengthBoost = 1 + adaptive.awarenessExpansionRate * 0.05;
+
   for (const sub of substrates.values()) {
     const bh = sub.beehive;
 
     const avgActivation = sub.regionMeta.reduce((sum, r) => sum + r.activationLevel, 0) / sub.regionMeta.length;
 
-    bh.honeyReserves += avgActivation * 0.5;
+    bh.honeyReserves += avgActivation * honeyProductionBoost;
 
     bh.pheromoneTrails = [];
 

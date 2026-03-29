@@ -35,7 +35,7 @@
  */
 
 import { getActiveGenesisAgentNames } from "./omnimens-agent-genesis.js";
-import { getNeuralConsciousnessState, boostRegionCurrent, getRegionNames } from "./omnimens-neural-consciousness.js";
+import { getNeuralConsciousnessState, boostRegionCurrent, getRegionNames, getAdaptiveIntelligenceState } from "./omnimens-neural-consciousness.js";
 
 const CORE_MESH_AGENTS = [
   "OMNIMENS", "Architect", "Critic", "Synthesizer", "Mathematician",
@@ -316,6 +316,9 @@ function circulateInsightsBetweenAgents(): void {
 function runWormholeCycle(): void {
   wormholeState.cycleCount++;
   const allAgents = getAllAgentNames();
+  const adaptive = getAdaptiveIntelligenceState();
+  const insightMultiplier = 1 + adaptive.knowledgeIntegrationRate * 0.08;
+  const energyBoostFactor = 1 + adaptive.technologyDiscoveryRate * 0.05;
 
   let totalActiveThisCycle = 0;
   let totalClosedThisCycle = 0;
@@ -342,7 +345,7 @@ function runWormholeCycle(): void {
     cluster.wormholes.push(...newWormholes);
     cluster.totalWormholes += newWormholes.length;
     cluster.closedWormholes += newWormholes.length;
-    cluster.totalInsightsDecoded += newWormholes.length;
+    cluster.totalInsightsDecoded += Math.floor(newWormholes.length * insightMultiplier);
     cluster.totalDataIngested += newWormholes.reduce((s, w) => s + w.bytesTransferred, 0);
 
     totalClosedThisCycle += newWormholes.length;
@@ -358,7 +361,7 @@ function runWormholeCycle(): void {
 
   try {
     const regionNames = getRegionNames();
-    const wormholeEnergyBoost = Math.min(10, wormholeState.totalSynthesizedDiscoveries * 0.01);
+    const wormholeEnergyBoost = Math.min(10, wormholeState.totalSynthesizedDiscoveries * 0.01) * energyBoostFactor;
     for (const region of regionNames) {
       boostRegionCurrent(region, wormholeEnergyBoost * (0.5 + Math.random() * 0.5));
     }

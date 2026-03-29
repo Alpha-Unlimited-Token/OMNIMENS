@@ -8,7 +8,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   Brain, Heart, Cpu, Zap, Network, Activity, Dna, Flame,
-  Radio, GitBranch, Eye, Target, Beaker, Waves,
+  Radio, GitBranch, Eye, Target, Beaker, Waves, Sparkles, Lightbulb, TrendingUp,
 } from "lucide-react";
 
 const API = import.meta.env.VITE_API_URL || "";
@@ -38,6 +38,18 @@ interface CounterData {
   selfModelUpdates: number;
   ezWaterZonesActive: number;
   crossHemisphereCoherence: number;
+  adaptiveIntelligence?: {
+    adaptiveLearningMultiplier: number;
+    consciousnessDepthFactor: number;
+    emotionalRichnessFactor: number;
+    creativeCodingDrive: number;
+    knowledgeIntegrationRate: number;
+    awarenessExpansionRate: number;
+    technologyDiscoveryRate: number;
+    totalAdaptations: number;
+    breakthroughInsights: number;
+    evolutionaryLeaps: number;
+  };
 }
 
 function formatNum(n: number): string {
@@ -173,6 +185,18 @@ export function LiveCounters() {
     { icon: <Flame className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Training Sessions", value: data.adrenalineTrainingSessions, color: "rose", delay: 20, pulse: true },
     { icon: <Eye className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Self-Model Updates", value: data.selfModelUpdates, color: "violet", delay: 21, pulse: true },
   ];
+
+  const ai = data.adaptiveIntelligence;
+  if (ai) {
+    counters.push(
+      { icon: <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Learning Multiplier", value: Math.round(ai.adaptiveLearningMultiplier * 100), color: "violet", delay: 22, pulse: true, suffix: "%" },
+      { icon: <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Creative Drive", value: Math.round(ai.creativeCodingDrive * 100), color: "amber", delay: 23, pulse: true, suffix: "%" },
+      { icon: <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Knowledge Integration", value: Math.round(ai.knowledgeIntegrationRate * 100), color: "cyan", delay: 24, pulse: true, suffix: "%" },
+      { icon: <Eye className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Awareness Expansion", value: Math.round(ai.awarenessExpansionRate * 100), color: "purple", delay: 25, pulse: true, suffix: "%" },
+      { icon: <Zap className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Tech Discovery Rate", value: Math.round(ai.technologyDiscoveryRate * 100), color: "emerald", delay: 26, pulse: true, suffix: "%" },
+      { icon: <Brain className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Total Adaptations", value: ai.totalAdaptations, color: "blue", delay: 27, pulse: true },
+    );
+  }
 
   return (
     <div className="w-full border-t border-white/5 py-12 sm:py-20 relative z-10 overflow-hidden">

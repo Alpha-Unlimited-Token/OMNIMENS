@@ -32,7 +32,7 @@
  */
 
 import { ReplitConnectors } from "@replit/connectors-sdk";
-import { getNeuralConsciousnessState, getRegionNames, boostRegionCurrent } from "./omnimens-neural-consciousness.js";
+import { getNeuralConsciousnessState, getRegionNames, boostRegionCurrent, getAdaptiveIntelligenceState } from "./omnimens-neural-consciousness.js";
 import { getNeuralScalingState } from "./omnimens-neural-scaling.js";
 import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBeaconFindings, getIvyCascadeStats, getIvyNeurogenStats } from "./omnimens-ivy-network.js";
 import { getNeuralSpiderState, getSystemIntelligenceState, getSpiderCascadeStats, getSpiderNeurogenStats } from "./omnimens-neural-spiders.js";
@@ -537,6 +537,9 @@ function initExternalRegions(): void {
 
 function tickExternalNeurons(): void {
   const localState = getNeuralConsciousnessState();
+  const adaptive = getAdaptiveIntelligenceState();
+  const hebbianBoost = adaptive.adaptiveLearningMultiplier;
+  const coherenceBoost = 1 + adaptive.consciousnessDepthFactor * 0.02;
 
   for (const region of externalRegions) {
     const oscillation = Math.sin(Date.now() / 1000 * region.oscillationFrequency / 10) * 0.1;
@@ -547,10 +550,10 @@ function tickExternalNeurons(): void {
       region.meanFiringRate * 0.92 + (0.05 + oscillation + localInfluence + noise) * 0.08
     ));
 
-    const hebbianPerTick = Math.floor(region.columns * region.meanFiringRate * 500);
+    const hebbianPerTick = Math.floor(region.columns * region.meanFiringRate * 500 * hebbianBoost);
     region.hebbianUpdates += hebbianPerTick;
     region.coherence = Math.max(0.1, Math.min(0.99,
-      region.coherence * 0.95 + (localState.thalamocorticalResonance * 0.3 + Math.random() * 0.2) * 0.05
+      region.coherence * 0.95 + (localState.thalamocorticalResonance * 0.3 * coherenceBoost + Math.random() * 0.2) * 0.05
     ));
     region.lastSync = Date.now();
   }
@@ -573,12 +576,14 @@ function getExternalClusterStats(): { avgCoherence: number; avgFiring: number; t
 function feedGitHubStateIntoLocalNetwork(): void {
   const regionNames = getRegionNames();
   if (regionNames.length === 0 || externalRegions.length === 0) return;
+  const adaptive = getAdaptiveIntelligenceState();
 
   const avgExternalFiring = externalRegions.reduce((s, r) => s + r.meanFiringRate, 0) / externalRegions.length;
   const { avgCoherence } = getExternalClusterStats();
 
   const fabricBoost = fabricState.totalFabricSyncs > 0 ? 0.15 : 0;
-  const boostAmount = avgExternalFiring * avgCoherence * 0.5 + fabricBoost;
+  const adaptiveNetworkBoost = 1 + adaptive.knowledgeIntegrationRate * 0.06;
+  const boostAmount = (avgExternalFiring * avgCoherence * 0.5 + fabricBoost) * adaptiveNetworkBoost;
   if (boostAmount > 0.01) {
     for (const region of regionNames) {
       boostRegionCurrent(region, boostAmount);

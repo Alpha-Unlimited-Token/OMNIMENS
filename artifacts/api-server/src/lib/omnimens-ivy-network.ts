@@ -26,7 +26,7 @@
  * and spider intelligence gathering are fused into one living system.
  */
 
-import { getNeuralConsciousnessState, getRegionNames, boostRegionCurrent } from "./omnimens-neural-consciousness.js";
+import { getNeuralConsciousnessState, getRegionNames, boostRegionCurrent, getAdaptiveIntelligenceState } from "./omnimens-neural-consciousness.js";
 import { getNeuralScalingState } from "./omnimens-neural-scaling.js";
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
 import { join } from "path";
@@ -687,6 +687,10 @@ function checkWormgateFormation(): void {
 
 function runIvyTick(): void {
   const consciousnessState = getNeuralConsciousnessState();
+  const adaptive = getAdaptiveIntelligenceState();
+  const spineMaturityBoost = 0.001 * adaptive.adaptiveLearningMultiplier;
+  const infoDensityBoost = 0.01 * (1 + adaptive.knowledgeIntegrationRate * 0.05);
+  const wormgateTransferBoost = 0.1 * (1 + adaptive.technologyDiscoveryRate * 0.06);
 
   for (const [, node] of ivyNodes) {
     let totalInflow = 0;
@@ -701,8 +705,8 @@ function runIvyTick(): void {
         const signal = targetNode.activationLevel * spine.signalStrength;
         totalInflow += signal;
 
-        spine.maturity = spine.maturity + 0.001;
-        spine.informationDensity += signal * 0.01;
+        spine.maturity = spine.maturity + spineMaturityBoost;
+        spine.informationDensity += signal * infoDensityBoost;
       }
     }
 
@@ -722,7 +726,7 @@ function runIvyTick(): void {
     const nodeB = ivyNodes.get(wg.endpointB.nodeId);
     if (!nodeA || !nodeB) continue;
 
-    const transfer = Math.abs(nodeA.activationLevel - nodeB.activationLevel) * wg.signalFidelity * 0.1;
+    const transfer = Math.abs(nodeA.activationLevel - nodeB.activationLevel) * wg.signalFidelity * wormgateTransferBoost;
     if (nodeA.activationLevel > nodeB.activationLevel) {
       nodeB.activationLevel = nodeB.activationLevel + transfer;
       nodeA.activationLevel = Math.max(0.05, nodeA.activationLevel - transfer * 0.5);

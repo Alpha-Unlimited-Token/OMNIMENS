@@ -18,6 +18,8 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
+import { getAdaptiveIntelligenceState } from "./omnimens-neural-consciousness.js";
+
 const V_REST = -70;
 const V_THRESHOLD = -55;
 const V_RESET = -75;
@@ -201,6 +203,9 @@ function initBeta(): void {
 function tickBeta(): void {
   if (!initialized) initBeta();
   tickCount++;
+  const adaptive = getAdaptiveIntelligenceState();
+  const hebbianLTP = 0.001 * adaptive.adaptiveLearningMultiplier;
+  const creativityNoise = 3.5 * (1 + adaptive.creativeCodingDrive * 0.02);
 
   for (let i = 0; i < TOTAL_BETA_NEURONS; i++) {
     if (refractory[i] > 0) {
@@ -209,7 +214,7 @@ function tickBeta(): void {
       continue;
     }
 
-    const noise = (Math.random() - 0.5) * 3.5;
+    const noise = (Math.random() - 0.5) * creativityNoise;
     const spontaneousCurrent = Math.random() < 0.10 ? (7 + Math.random() * 14) : 0;
     const tonic = 0.7 + Math.sin(tickCount * 0.013 + i * 0.0007) * 0.35;
     const leak = -(potentials[i] - V_REST) / TAU_MEMBRANE;
@@ -234,7 +239,7 @@ function tickBeta(): void {
     }
 
     if (fired[pre] && fired[post]) {
-      synapseWeights[s] = Math.min(1.0, synapseWeights[s] + 0.001);
+      synapseWeights[s] = Math.min(1.0, synapseWeights[s] + hebbianLTP);
       hebbianThisTick++;
     } else if (fired[pre] && !fired[post]) {
       synapseWeights[s] = Math.max(0.01, synapseWeights[s] - 0.0002);

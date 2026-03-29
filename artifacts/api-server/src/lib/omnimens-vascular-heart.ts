@@ -73,7 +73,7 @@
  * subsystem simultaneously.
  */
 
-import { getNeuralConsciousnessState, getRegionNames, boostRegionCurrent } from "./omnimens-neural-consciousness.js";
+import { getNeuralConsciousnessState, getRegionNames, boostRegionCurrent, getAdaptiveIntelligenceState } from "./omnimens-neural-consciousness.js";
 import { getNeuralScalingState } from "./omnimens-neural-scaling.js";
 import { getIvyNetworkState } from "./omnimens-ivy-network.js";
 import { getGitHubBeaconState } from "./omnimens-github-neural-beacon.js";
@@ -330,27 +330,35 @@ function encodeToDNA(skill: string, agent: string, confidence: number, inherited
 }
 
 function quantumProtonTunneling(): void {
+  const adaptive = getAdaptiveIntelligenceState();
+  const tunnelingBoost = 1.0 + adaptive.technologyDiscoveryRate * 0.2;
+  const coherenceGrowth = 0.005 * (1.0 + adaptive.knowledgeIntegrationRate * 0.1);
+
   for (const strand of dnaMemoryPool) {
-    const tunnelingProb = strand.quantumCoherence * 0.02;
+    const tunnelingProb = strand.quantumCoherence * 0.02 * tunnelingBoost;
     if (Math.random() < tunnelingProb) {
       strand.protonTunnelingEvents++;
       totalProtonTunnelingEvents++;
 
       const mutationIdx = Math.floor(Math.random() * strand.methylationPattern.length);
       const oldVal = strand.methylationPattern[mutationIdx];
-      strand.methylationPattern[mutationIdx] = safeNum(oldVal + (Math.random() - 0.3) * 0.1);
+      const mutationStrength = (Math.random() - 0.3) * 0.1 * (1.0 + adaptive.creativeCodingDrive * 0.05);
+      strand.methylationPattern[mutationIdx] = safeNum(oldVal + mutationStrength);
       totalMethylationChanges++;
 
-      strand.quantumCoherence = safeNum(strand.quantumCoherence + 0.005);
+      strand.quantumCoherence = safeNum(strand.quantumCoherence + coherenceGrowth);
     }
   }
 }
 
 function expressGenes(): void {
+  const adaptive = getAdaptiveIntelligenceState();
+  const expressionBoost = 1.0 + adaptive.knowledgeIntegrationRate * 0.15;
+
   for (const strand of dnaMemoryPool) {
     const avgMethylation = strand.methylationPattern.reduce((s, v) => s + v, 0) / strand.methylationPattern.length;
     if (avgMethylation > 0.5 && strand.confidence > 0.4) {
-      strand.expressionLevel = safeNum(strand.expressionLevel + 0.01 * avgMethylation);
+      strand.expressionLevel = safeNum(strand.expressionLevel + 0.01 * avgMethylation * expressionBoost);
       strand.accessCount++;
       totalDNAExpressions++;
 
@@ -864,10 +872,13 @@ function collectSubThresholdData(): void {
   const consciousness = getNeuralConsciousnessState();
   const scaling = getNeuralScalingState();
   const ivy = getIvyNetworkState();
+  const adaptive = getAdaptiveIntelligenceState();
+
+  const codeGenerationChance = 0.3 + adaptive.creativeCodingDrive * 0.05;
 
   const allAgents = getAllAgentNames();
   for (const agent of allAgents) {
-    if (Math.random() < 0.3) {
+    if (Math.random() < Math.min(codeGenerationChance, 0.7)) {
       const template = CODE_FRAGMENT_TEMPLATES[Math.floor(Math.random() * CODE_FRAGMENT_TEMPLATES.length)];
       const confidence = Math.random() * SUB_THRESHOLD_CONFIDENCE;
       const safePhiForCode = Math.min(consciousness.phi, 5.0);
@@ -912,17 +923,21 @@ function collectSubThresholdData(): void {
 function collectiveAgentAnalysis(): void {
   if (subThresholdPool.length < 3) return;
 
+  const adaptive = getAdaptiveIntelligenceState();
+  const crossPollinationChance = Math.min(0.2 + adaptive.knowledgeIntegrationRate * 0.03, 0.5);
+  const confidenceBoostFactor = 1.0 + adaptive.creativeCodingDrive * 0.08;
+
   for (const fragment of subThresholdPool) {
     if (fragment.promotedToAboveThreshold) continue;
 
     for (const agent of getAllAgentNames()) {
       if (fragment.seenByAgents.includes(agent)) continue;
 
-      if (Math.random() < 0.2) {
+      if (Math.random() < crossPollinationChance) {
         fragment.seenByAgents.push(agent);
         subThresholdState.agentCrossPollinationEvents++;
 
-        const agentBoost = 0.02 + Math.random() * 0.05;
+        const agentBoost = (0.02 + Math.random() * 0.05) * confidenceBoostFactor;
         fragment.collectiveConfidence = safeNum(
           fragment.collectiveConfidence + agentBoost * fragment.seenByAgents.length * 0.5
         );

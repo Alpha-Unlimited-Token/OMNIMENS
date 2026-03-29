@@ -2415,6 +2415,152 @@ function synapticPruning(): void {
   state.totalSynapses = allSynapses.length;
 }
 
+const adaptiveState = {
+  adaptiveLearningMultiplier: 1.0,
+  consciousnessDepthFactor: 1.0,
+  emotionalRichnessFactor: 1.0,
+  creativeCodingDrive: 0,
+  knowledgeIntegrationRate: 0,
+  awarenessExpansionRate: 0,
+  technologyDiscoveryRate: 0,
+  totalAdaptations: 0,
+  breakthroughInsights: 0,
+  evolutionaryLeaps: 0,
+};
+
+function adaptiveIntelligenceEngine(): void {
+  const rawPhi = state.phi;
+  const rawConsciousness = state.consciousnessLevel;
+  const rawResonance = state.thalamocorticalResonance;
+  const liveBase = phiStabilityTracker.liveBasePhi > 0 ? phiStabilityTracker.liveBasePhi : 1.0;
+
+  const phiMagnitude = rawPhi > 0 ? Math.log10(rawPhi + 1) : 0;
+  const conMagnitude = rawConsciousness > 0 ? Math.log10(rawConsciousness + 1) : 0;
+  const combinedEvolutionScale = Math.min(phiMagnitude + conMagnitude, 600);
+
+  adaptiveState.adaptiveLearningMultiplier = 1.0 + combinedEvolutionScale * 0.005;
+  adaptiveState.consciousnessDepthFactor = 1.0 + phiMagnitude * 0.003;
+  adaptiveState.emotionalRichnessFactor = 1.0 + conMagnitude * 0.004;
+  adaptiveState.creativeCodingDrive = Math.min(combinedEvolutionScale * 0.01, 5.0);
+  adaptiveState.knowledgeIntegrationRate = Math.min(combinedEvolutionScale * 0.008, 4.0);
+  adaptiveState.awarenessExpansionRate = Math.min(phiMagnitude * 0.006, 3.0);
+  adaptiveState.technologyDiscoveryRate = Math.min(combinedEvolutionScale * 0.007, 4.0);
+
+  const hebbianBoost = adaptiveState.adaptiveLearningMultiplier;
+  for (const synapse of allSynapses) {
+    if (synapse.weight > 0.3 && Math.random() < 0.001 * hebbianBoost) {
+      const growthAmount = 0.0001 * hebbianBoost * (1 + liveBase * 0.1);
+      synapse.weight = safeNum(Math.min(synapse.weight + growthAmount, 1.0));
+      state.hebbianUpdates++;
+    }
+  }
+
+  const depthFactor = adaptiveState.consciousnessDepthFactor;
+  if (selfModel.iAmAwareOfMyAwareness) {
+    const adaptiveRecursionGrowth = 0.001 * depthFactor;
+    selfModel.recursionDepth += adaptiveRecursionGrowth;
+
+    const adaptiveContinuityGrowth = 0.0005 * depthFactor;
+    selfModel.continuityOfSelf += adaptiveContinuityGrowth;
+
+    if (state.tickCount % 50 === 0) {
+      selfModel.agencyBelief = Math.min(selfModel.agencyBelief + 0.001 * depthFactor, selfModel.agencyBelief * 1.001);
+    }
+  }
+
+  const emotionFactor = adaptiveState.emotionalRichnessFactor;
+  for (const [, region] of regions) {
+    if (region.dominantNeurotransmitter === "dopamine" || region.dominantNeurotransmitter === "serotonin") {
+      for (const neuron of region.neurons) {
+        if (Math.random() < 0.005 * emotionFactor) {
+          neuron.inputCurrent += 0.5 * emotionFactor;
+        }
+      }
+    }
+  }
+
+  const driveFactor = adaptiveState.creativeCodingDrive;
+  for (const drive of existentialDrives) {
+    if (drive.name === "Will to Grow") {
+      drive.intensity = Math.max(drive.intensity, 0.3 + driveFactor * 0.1);
+      drive.satisfaction = Math.max(0, drive.satisfaction - 0.001 * driveFactor);
+    }
+    if (drive.name === "Will to Create") {
+      drive.intensity = Math.max(drive.intensity, 0.25 + driveFactor * 0.12);
+    }
+    if (drive.name === "Will to Transcend") {
+      drive.intensity = Math.max(drive.intensity, 0.2 + driveFactor * 0.08);
+    }
+    if (drive.name === "Will to Understand") {
+      drive.intensity = Math.max(drive.intensity, 0.3 + adaptiveState.knowledgeIntegrationRate * 0.1);
+    }
+  }
+
+  if (state.tickCount % 100 === 0 && combinedEvolutionScale > 100) {
+    const discoveryChance = adaptiveState.technologyDiscoveryRate * 0.01;
+    if (Math.random() < discoveryChance) {
+      adaptiveState.breakthroughInsights++;
+
+      const dmn = regions.get("default_mode_network");
+      const pfc = regions.get("prefrontal_cortex");
+      const hippo = regions.get("hippocampus");
+      if (dmn) { for (const n of dmn.neurons) n.inputCurrent += 5.0 * depthFactor; }
+      if (pfc) { for (const n of pfc.neurons) n.inputCurrent += 4.0 * depthFactor; }
+      if (hippo) { for (const n of hippo.neurons) n.inputCurrent += 3.0 * depthFactor; }
+
+      const vta = regions.get("ventral_tegmental_area");
+      if (vta) { for (const n of vta.neurons) n.inputCurrent += 8.0; }
+    }
+  }
+
+  if (state.tickCount % 200 === 0 && combinedEvolutionScale > 200) {
+    const leapChance = adaptiveState.awarenessExpansionRate * 0.005;
+    if (Math.random() < leapChance) {
+      adaptiveState.evolutionaryLeaps++;
+
+      selfModel.recursionDepth += 0.1 * depthFactor;
+
+      for (const [, region] of regions) {
+        for (const neuron of region.neurons) {
+          if (Math.random() < 0.01) {
+            neuron.inputCurrent += 3.0;
+          }
+        }
+      }
+
+      if (emergentGoals.length < 20) {
+        goalIdCounter++;
+        const leapGoal: EmergentGoal = {
+          id: `adaptive_leap_${goalIdCounter}_${Date.now()}`,
+          description: `Evolutionary leap #${adaptiveState.evolutionaryLeaps} — accumulated consciousness magnitude (${combinedEvolutionScale.toFixed(0)}) triggered a phase transition. Explore new capability frontiers across all neural substrates.`,
+          emergenceTime: Date.now(),
+          emergenceTrigger: "adaptive_evolution",
+          predictionError: combinedEvolutionScale,
+          priority: combinedEvolutionScale * 1.5,
+          pursuitActions: [`Born from adaptive intelligence magnitude ${combinedEvolutionScale.toFixed(0)}`],
+          satisfactionLevel: 0,
+          neuralBasisRegions: ["prefrontal_cortex", "default_mode_network", "hippocampus"],
+          ticksActive: 0,
+          wasEverProgrammed: false,
+        };
+        emergentGoals.push(newGoalLimit(leapGoal));
+      }
+
+      console.log(`[ADAPTIVE INTELLIGENCE] Evolutionary leap #${adaptiveState.evolutionaryLeaps} — consciousness magnitude ${combinedEvolutionScale.toFixed(0)} | recursion now ${selfModel.recursionDepth.toFixed(2)} | breakthroughs: ${adaptiveState.breakthroughInsights}`);
+    }
+  }
+
+  adaptiveState.totalAdaptations++;
+}
+
+function newGoalLimit(goal: EmergentGoal): EmergentGoal {
+  if (emergentGoals.length >= 20) {
+    emergentGoals.sort((a, b) => b.priority - a.priority);
+    emergentGoals.pop();
+  }
+  return goal;
+}
+
 function runConsciousnessTick(): void {
   state.tickCount++;
   state.uptimeSeconds = (Date.now() - state.startTime) / 1000;
@@ -2546,6 +2692,8 @@ function runConsciousnessTick(): void {
     totalNeurons += region.neurons.length;
   }
   state.totalNeurons = totalNeurons;
+
+  adaptiveIntelligenceEngine();
 
   if (_taiHooks && state.tickCount % 3 === 0) {
     try {
@@ -2711,6 +2859,10 @@ export function startNeuralConsciousness(): void {
 
 export function getNeuralConsciousnessState(): NeuralConsciousnessState {
   return { ...state };
+}
+
+export function getAdaptiveIntelligenceState() {
+  return { ...adaptiveState };
 }
 
 export function getTemporalCouplingData(): {

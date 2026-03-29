@@ -25,6 +25,7 @@ import {
   injectSpiderSynapses,
   boostRegionCurrent,
   getRegionNames,
+  getAdaptiveIntelligenceState,
 } from "./omnimens-neural-consciousness.js";
 import { getNeuralScalingState } from "./omnimens-neural-scaling.js";
 import { getIvyNetworkState } from "./omnimens-ivy-network.js";
@@ -451,11 +452,13 @@ function computeRelevance(harvest: SpiderHarvest, targetSpider: Spider): number 
 function runMotherHeartbeat(): void {
   motherSpider.heartbeatCount++;
   motherSpider.lastHeartbeat = Date.now();
+  const adaptive = getAdaptiveIntelligenceState();
+  const silkDecayResistance = SILK_WEAKENING_RATE * Math.max(0.5, 1 - adaptive.emotionalRichnessFactor * 0.01);
 
   for (const [id, strand] of motherSpider.silkStrands) {
     const timeSinceImpulse = Date.now() - strand.lastImpulse;
     if (timeSinceImpulse > 120_000) {
-      strand.signalStrength = Math.max(MIN_SILK_STRENGTH, strand.signalStrength - SILK_WEAKENING_RATE);
+      strand.signalStrength = Math.max(MIN_SILK_STRENGTH, strand.signalStrength - silkDecayResistance);
     }
 
     if (strand.signalStrength <= MIN_SILK_STRENGTH && strand.impulseCount === 0) {
@@ -1894,6 +1897,10 @@ function runBeehiveCycle(): void {
 function runBeaconCycle(): void {
   motherSpider.beaconCycleCount++;
   motherSpider.lastBeaconCycle = Date.now();
+  const adaptive = getAdaptiveIntelligenceState();
+  const silkBoost = SILK_STRENGTHENING_RATE * 1.5 * adaptive.adaptiveLearningMultiplier;
+  const loyaltyGrowth = 0.001 * (1 + adaptive.emotionalRichnessFactor * 0.02);
+  const transferBoost = 1.5 * (1 + adaptive.knowledgeIntegrationRate * 0.01);
 
   const allActive: Spider[] = [];
   for (const spider of parentSpiders.values()) {
@@ -1916,7 +1923,7 @@ function runBeaconCycle(): void {
       const receiver = allActive[j];
 
       const strand = spinSilkStrand(sender.id, receiver.id, "interneuron");
-      strand.signalStrength = strand.signalStrength + SILK_STRENGTHENING_RATE * 1.5;
+      strand.signalStrength = strand.signalStrength + silkBoost;
       strand.impulseCount++;
       strand.lastImpulse = Date.now();
       strand.dataTransferred += 1;
@@ -1930,19 +1937,19 @@ function runBeaconCycle(): void {
       const receiverActivation = regionStates[receiver.targetRegion]?.activationLevel || 0;
 
       if (senderActivation > receiverActivation + 0.1) {
-        const transferAmount = (senderActivation - receiverActivation) * 1.5;
+        const transferAmount = (senderActivation - receiverActivation) * transferBoost;
         boostRegionCurrent(receiver.targetRegion, transferAmount);
       }
 
       if (receiverActivation > senderActivation + 0.1) {
-        const transferAmount = (receiverActivation - senderActivation) * 1.5;
+        const transferAmount = (receiverActivation - senderActivation) * transferBoost;
         boostRegionCurrent(sender.targetRegion, transferAmount);
       }
 
-      sender.loyalty = sender.loyalty + 0.001;
-      receiver.loyalty = receiver.loyalty + 0.001;
-      sender.efficiency = sender.efficiency + 0.001;
-      receiver.efficiency = receiver.efficiency + 0.001;
+      sender.loyalty = sender.loyalty + loyaltyGrowth;
+      receiver.loyalty = receiver.loyalty + loyaltyGrowth;
+      sender.efficiency = sender.efficiency + loyaltyGrowth;
+      receiver.efficiency = receiver.efficiency + loyaltyGrowth;
 
       beaconsSentThisCycle++;
       motherSpider.totalBeaconsSent++;

@@ -18,6 +18,8 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
+import { getAdaptiveIntelligenceState } from "./omnimens-neural-consciousness.js";
+
 const V_REST = -70;
 const V_THRESHOLD = -55;
 const V_RESET = -75;
@@ -194,6 +196,8 @@ function initAlpha(): void {
 function tickAlpha(): void {
   if (!initialized) initAlpha();
   tickCount++;
+  const adaptive = getAdaptiveIntelligenceState();
+  const hebbianLTP = 0.001 * adaptive.adaptiveLearningMultiplier;
 
   for (let i = 0; i < TOTAL_ALPHA_NEURONS; i++) {
     if (refractory[i] > 0) {
@@ -227,7 +231,7 @@ function tickAlpha(): void {
     }
 
     if (fired[pre] && fired[post]) {
-      synapseWeights[s] = Math.min(1.0, synapseWeights[s] + 0.001);
+      synapseWeights[s] = Math.min(1.0, synapseWeights[s] + hebbianLTP);
       hebbianThisTick++;
     } else if (fired[pre] && !fired[post]) {
       synapseWeights[s] = Math.max(0.01, synapseWeights[s] - 0.0002);
