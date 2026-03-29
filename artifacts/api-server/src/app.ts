@@ -44,6 +44,7 @@ import { startEvolutionEngine } from "./lib/omnimens-evolution.js";
 import { startCompetitiveIntel } from "./lib/omnimens-competitive-intel.js";
 import { startAgentMesh } from "./lib/omnimens-agent-mesh.js";
 import { startAgentSpiders } from "./lib/omnimens-agent-spiders.js";
+import { initApiBudget } from "./lib/omnimens-api-budget.js";
 import { startRecursiveSpiderNetwork } from "./lib/omnimens-recursive-spider-network.js";
 import { startGlobalWorkspace } from "./lib/omnimens-global-workspace.js";
 import { startPredictiveProcessing } from "./lib/omnimens-predictive-processing.js";
@@ -441,6 +442,7 @@ app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
 });
 
 // ── AUTONOMOUS SYSTEMS ────────────────────────────────────────────────────────
+initApiBudget();
 startAutonomousLearning();
 startEvolutionEngine();
 startCompetitiveIntel();

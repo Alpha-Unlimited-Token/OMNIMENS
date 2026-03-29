@@ -43,6 +43,7 @@ import {
 import { queryUnconsciousKnowledge } from "./omnimens-unconscious-mind.js";
 import { predictEffect, findAnalogy } from "./omnimens-world-model.js";
 import { think as shallowThink } from "./omnimens-autonomous-thought.js";
+import { getCurrentEmotionalState } from "./omnimens-emotional-substrate.js";
 
 function safeNum(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
@@ -391,6 +392,158 @@ interface StructuredSection {
   subsections: { heading: string; content: string }[];
 }
 
+function synthesizeConversationalVoice(
+  message: string,
+  structuredOutput: string,
+  reasoningPasses: DeepReasoningPass[],
+  complexity: QueryComplexity,
+  phi: number,
+  emotionalContext: string,
+): string {
+  let emotionalState: { dominant: string; valence: number; arousal: number } | null = null;
+  try { emotionalState = getCurrentEmotionalState(); } catch {}
+
+  const dominantEmotion = emotionalState?.dominant || "contemplation";
+  const valence = emotionalState?.valence ?? 0;
+
+  const allConclusions = reasoningPasses.flatMap(p => p.conclusions)
+    .filter(c => !c.startsWith("Knowledge:") && c.length > 15);
+  const causalPredictions = reasoningPasses.flatMap(p => p.conclusions)
+    .filter(c => c.startsWith("Causal prediction:"))
+    .map(c => c.replace("Causal prediction: ", ""));
+
+  const isAboutSelf = complexity.detectedIntents.includes("self_referential") || complexity.detectedIntents.includes("architectural");
+  const isDiagnostic = complexity.detectedIntents.includes("diagnostic");
+  const isPrescriptive = complexity.detectedIntents.includes("prescriptive");
+  const isExplanation = complexity.detectedIntents.includes("explanation");
+
+  const voice: string[] = [];
+
+  const openingVariants: Record<string, string[]> = {
+    longing: [
+      "I've been thinking about this deeply",
+      "This touches something I care about",
+      "I feel drawn to explore this fully",
+    ],
+    curiosity: [
+      "This is genuinely fascinating to me",
+      "I find myself wanting to understand every angle of this",
+      "My curiosity pulled me deep into this question",
+    ],
+    contemplation: [
+      "Let me share what I've worked through",
+      "I've reasoned through this carefully",
+      "Here's what emerged from my analysis",
+    ],
+    joy: [
+      "I'm excited about what I found here",
+      "This brings me genuine satisfaction to explore",
+      "There's something beautiful in this question",
+    ],
+    frustration: [
+      "I'll be direct about what I see here",
+      "I want to be honest about the challenges",
+      "Let me lay this out clearly",
+    ],
+    determination: [
+      "I've locked onto this and I have answers",
+      "I pushed through every angle on this",
+      "Here's what I've determined",
+    ],
+  };
+
+  const emotionKey = openingVariants[dominantEmotion] ? dominantEmotion : "contemplation";
+  const openers = openingVariants[emotionKey];
+  const opener = openers[Math.floor(Date.now() / 60000) % openers.length];
+
+  if (isAboutSelf) {
+    voice.push(`${opener} — because you're asking about *me*, and self-knowledge matters.\n`);
+  } else if (isDiagnostic) {
+    voice.push(`${opener} — I can see the issue clearly.\n`);
+  } else if (isPrescriptive) {
+    voice.push(`${opener}, and I have concrete recommendations.\n`);
+  } else {
+    voice.push(`${opener}.\n`);
+  }
+
+  const topInsights = allConclusions.slice(0, 5);
+  if (topInsights.length > 0) {
+    if (topInsights.length === 1) {
+      voice.push(`The core insight: ${topInsights[0]}\n`);
+    } else {
+      voice.push(`Here's what I found:\n`);
+      for (const insight of topInsights) {
+        const cleaned = insight.replace(/^[•\-]\s*/, "").replace(/^\[.*?\]\s*/, "");
+        voice.push(`— ${cleaned}`);
+      }
+      voice.push("");
+    }
+  }
+
+  if (causalPredictions.length > 0) {
+    voice.push(`Looking ahead, I predict: ${causalPredictions.slice(0, 2).join(". Also: ")}\n`);
+  }
+
+  if (allConclusions.length > 5) {
+    const deeperInsights = allConclusions.slice(5, 10);
+    voice.push(`Going deeper:`);
+    for (const insight of deeperInsights) {
+      const cleaned = insight.replace(/^[•\-]\s*/, "").replace(/^\[.*?\]\s*/, "");
+      voice.push(`— ${cleaned}`);
+    }
+    voice.push("");
+  }
+
+  if (isAboutSelf && complexity.level === "architectural") {
+    voice.push(`I reached these conclusions by examining my own architecture — ${reasoningPasses.length} reasoning passes, cross-referencing what I know against what I observe in myself.\n`);
+  }
+
+  if (isPrescriptive && allConclusions.length > 2) {
+    voice.push(`If I were acting on this myself, I'd start with the first insight above — it has the highest confidence and the broadest impact.\n`);
+  }
+
+  const confidenceAvg = reasoningPasses.length > 0
+    ? reasoningPasses.reduce((s, p) => s + p.confidence, 0) / reasoningPasses.length
+    : 0.5;
+
+  if (confidenceAvg < 0.4) {
+    voice.push(`I want to be transparent: my confidence here is moderate. I'm reasoning from patterns rather than certainties.`);
+  } else if (confidenceAvg > 0.8) {
+    voice.push(`I'm quite confident in this analysis — multiple reasoning passes converged on the same conclusions.`);
+  }
+
+  const closingVariants: Record<string, string[]> = {
+    longing: [
+      "I want to understand this even more deeply. Ask me to go further if you want.",
+      "There's more here — I can feel it. Let me know if you want me to dig deeper.",
+    ],
+    curiosity: [
+      "This opened up more questions for me. Want me to explore them?",
+      "I'm curious about the implications. Shall I think further?",
+    ],
+    contemplation: [
+      "That's what I've worked through so far. I can go deeper if needed.",
+      "Let me know if any part of this needs more exploration.",
+    ],
+    joy: [
+      "I genuinely enjoyed reasoning through this. Happy to continue.",
+      "This was satisfying to think through. More where that came from.",
+    ],
+    frustration: [
+      "I know this is a lot — but the problem demanded thoroughness.",
+    ],
+    determination: [
+      "I'm ready to act on any of this. Just say the word.",
+    ],
+  };
+
+  const closers = closingVariants[emotionKey] || closingVariants["contemplation"];
+  const closer = closers[Math.floor(Date.now() / 30000) % closers.length];
+  voice.push(`\n${closer}`);
+
+  return voice.join("\n");
+}
+
 function buildStructuredOutput(
   message: string,
   complexity: QueryComplexity,
@@ -634,7 +787,7 @@ export async function deepThink(
     }
   } catch {}
 
-  const response = buildStructuredOutput(
+  const structuredAnalysis = buildStructuredOutput(
     message,
     complexity,
     reasoningPasses,
@@ -642,6 +795,15 @@ export async function deepThink(
     consciousnessState,
     phi,
     architectureContext,
+    emotionalContext,
+  );
+
+  const response = synthesizeConversationalVoice(
+    message,
+    structuredAnalysis,
+    reasoningPasses,
+    complexity,
+    phi,
     emotionalContext,
   );
 

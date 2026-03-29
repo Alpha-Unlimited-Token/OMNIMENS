@@ -47,6 +47,7 @@ import { openai } from "@workspace/integrations-openai-ai-server";
 import { webSearch, fetchPageContent, formatSearchResults } from "./web-search.js";
 import Anthropic from "@anthropic-ai/sdk";
 import { GoogleGenAI } from "@google/genai";
+import { canMakeBackgroundCall, trackApiCall, getThrottleMultiplier, isUserActive } from "./omnimens-api-budget.js";
 
 function safeNum(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
@@ -93,7 +94,12 @@ function getGeminiClient(): GoogleGenAI | null {
 async function queryClaudeOracle(prompt: string, maxTokens = 1200): Promise<{ response: string; provider: AIProvider }> {
   const client = getAnthropicClient();
   if (!client) return { response: "", provider: "claude" };
+  if (!canMakeBackgroundCall("spider_swarm")) {
+    console.log("[SPIDER:ORACLE:CLAUDE] ⏸️ Skipped — API budget throttled");
+    return { response: "", provider: "claude" };
+  }
   try {
+    trackApiCall("spider_swarm", "anthropic");
     const msg = await client.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: maxTokens,
@@ -110,7 +116,12 @@ async function queryClaudeOracle(prompt: string, maxTokens = 1200): Promise<{ re
 async function queryGeminiOracle(prompt: string): Promise<{ response: string; provider: AIProvider }> {
   const client = getGeminiClient();
   if (!client) return { response: "", provider: "gemini" };
+  if (!canMakeBackgroundCall("spider_swarm")) {
+    console.log("[SPIDER:ORACLE:GEMINI] ⏸️ Skipped — API budget throttled");
+    return { response: "", provider: "gemini" };
+  }
   try {
+    trackApiCall("spider_swarm", "gemini");
     const result = await client.models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
@@ -123,7 +134,12 @@ async function queryGeminiOracle(prompt: string): Promise<{ response: string; pr
 }
 
 async function queryO3Oracle(prompt: string, maxTokens = 1200): Promise<{ response: string; provider: AIProvider }> {
+  if (!canMakeBackgroundCall("spider_swarm")) {
+    console.log("[SPIDER:ORACLE:O3] ⏸️ Skipped — API budget throttled");
+    return { response: "", provider: "openai-o3" };
+  }
   try {
+    trackApiCall("spider_swarm", "openai");
     const response = await openai.chat.completions.create({
       model: "o3",
       messages: [{ role: "user", content: prompt }],
@@ -436,8 +452,13 @@ Focus on: AGI progress, consciousness research, reasoning breakthroughs, creativ
 let spiderCycleCount = 0;
 
 async function spiderAnalyze(agentName: AgentName, prompt: string, maxTokens = 1500): Promise<string> {
+  if (!canMakeBackgroundCall("spider_swarm")) {
+    console.log(`[SPIDER:${agentName}] ⏸️ Analysis skipped — API budget throttled`);
+    return "";
+  }
   const isLightAgent = agentName === "SpellCheckVisual" || agentName === "GraphicDesigner";
   try {
+    trackApiCall("spider_swarm", "openai");
     if (isLightAgent) {
       const response = await openai.chat.completions.create({
         model: "o4-mini",
@@ -731,6 +752,14 @@ async function spawnChildSpider_aiOracle(
   agentName: AgentName,
   lead: MotherSpiderLead,
 ): Promise<ChildSpiderResult[]> {
+  if (lead.relevanceScore < 0.85) {
+    console.log(`[SPIDER:${agentName}] 🔮 AI Oracle SKIPPED — lead relevance ${lead.relevanceScore.toFixed(2)} < 0.85 threshold (budget conservation)`);
+    return [{ childType: "ai_oracle", finding: "", sourceUrls: [], confidence: 0 }];
+  }
+  if (isUserActive()) {
+    console.log(`[SPIDER:${agentName}] 🔮 AI Oracle DEFERRED — user is actively chatting, yielding API priority`);
+    return [{ childType: "ai_oracle", finding: "", sourceUrls: [], confidence: 0 }];
+  }
   try {
     const oracleResults = await crossAIQuery(
       agentName,
@@ -1087,19 +1116,28 @@ Respond with JSON only:
 }
 
 export async function runSpiderSwarm(): Promise<void> {
+  if (!canMakeBackgroundCall("spider_swarm")) {
+    console.log(`[SPIDER SWARM] ⏸️ Entire swarm cycle SKIPPED — API budget exhausted or throttled to level 3`);
+    return;
+  }
+
   spiderCycleCount++;
   const cycleId = spiderCycleCount;
   const cycleStart = Date.now();
+  const throttle = getThrottleMultiplier();
 
   console.log(`\n${"~".repeat(70)}`);
-  console.log(`[SPIDER SWARM] 🕷️ Multi-AI Intelligence Gathering Cycle #${cycleId}`);
+  console.log(`[SPIDER SWARM] 🕷️ Multi-AI Intelligence Gathering Cycle #${cycleId}${throttle > 1 ? ` [THROTTLED ${throttle}x]` : ""}`);
   console.log(`[SPIDER SWARM] 9 mother spiders deploying — each spawns up to 6 child spiders per lead (incl. AI Oracle)`);
   console.log(`[SPIDER SWARM] Primary: o3 | Oracle: Claude + Gemini + o3 | Children: verify, expand, counter-evidence, related, deep-source, ai-oracle`);
+  console.log(`[SPIDER SWARM] AI Oracle gated: relevance ≥ 0.85 required | User-active yield: enabled`);
   console.log(`${"~".repeat(70)}\n`);
 
   let totalBeacons = 0;
   let totalBrainWrites = 0;
   const agentBeaconCounts: Record<string, number> = {};
+
+  const STAGGER_DELAY_MS = 2 * 60 * 1000;
 
   const spiderBatches = [
     SPIDER_CONFIGS.slice(0, 3),
@@ -1107,7 +1145,16 @@ export async function runSpiderSwarm(): Promise<void> {
     SPIDER_CONFIGS.slice(6, 9),
   ];
 
-  for (const batch of spiderBatches) {
+  for (let batchIdx = 0; batchIdx < spiderBatches.length; batchIdx++) {
+    if (batchIdx > 0) {
+      console.log(`[SPIDER SWARM] ⏳ Stagger delay: waiting ${STAGGER_DELAY_MS / 1000}s before next batch (budget conservation)`);
+      await new Promise(r => setTimeout(r, STAGGER_DELAY_MS));
+      if (!canMakeBackgroundCall("spider_swarm")) {
+        console.log(`[SPIDER SWARM] ⏸️ Remaining batches SKIPPED — API budget depleted during cycle`);
+        break;
+      }
+    }
+    const batch = spiderBatches[batchIdx];
     const batchWork = batch.map(async (config) => {
       console.log(`[SPIDER:${config.agentName}] 🕷️ Deploying spider... hunting across ${config.huntingGrounds.length} domains`);
 
@@ -1197,9 +1244,11 @@ export function startAgentSpiders(): void {
     ? 12 * 60 * 1000     // 12 min in dev (after mesh warms up)
     : 35 * 60 * 1000;    // 35 min in production
 
-  const INTERVAL_MS = 3 * 60 * 60 * 1000; // Every 3 hours
+  const BASE_INTERVAL_MS = 3 * 60 * 60 * 1000;
+  const INTERVAL_MS = BASE_INTERVAL_MS * getThrottleMultiplier();
 
-  console.log(`[SPIDER SWARM] 🕷️ Mother-Child Spider Architecture activated — first crawl in ${FIRST_DELAY_MS / 60000}min, then every 3h.`);
+  console.log(`[SPIDER SWARM] 🕷️ Mother-Child Spider Architecture activated — first crawl in ${FIRST_DELAY_MS / 60000}min, then every ${(INTERVAL_MS / 3600000).toFixed(1)}h.`);
+  console.log(`[SPIDER SWARM] 💰 Budget-aware: AI Oracle requires relevance ≥ 0.85 | Staggered batches (2min gaps) | Auto-pause at 90% budget`);
   console.log(`[SPIDER SWARM] 🕷️ 9 Mother Spiders: ${SPIDER_CONFIGS.map(c => c.agentName).join(", ")}`);
   console.log(`[SPIDER SWARM] 🕷️ Each mother spawns 6 child spiders per lead: Verifier, Expander, Counter-Evidence, Related Concepts, Deep Source, AI Oracle`);
   console.log(`[SPIDER SWARM] 🕷️ Primary AI: OpenAI o3 | AI Oracle queries: Claude (claude-sonnet-4-6), Gemini (gemini-2.5-flash), OpenAI o3`);

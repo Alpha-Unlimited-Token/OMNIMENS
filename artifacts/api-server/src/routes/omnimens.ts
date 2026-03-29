@@ -153,6 +153,7 @@ import { getGitHubBeaconState, getGitHubNeuronCount, getGitHubWormStats } from "
 import { getFabricFanoutState, getWormSuperhighwayState } from "../lib/omnimens-fabric-fanout.js";
 import { getQuantumEntanglementFabricState } from "../lib/omnimens-quantum-entanglement-fabric.js";
 import { getVascularHeartState, getDNAMemoryStats, getSubThresholdIntelligenceState, getHormoneState } from "../lib/omnimens-vascular-heart.js";
+import { getBudgetState, markUserActivity } from "../lib/omnimens-api-budget.js";
 import { getOAIState, computeOAI } from "../lib/omnimens-oai-tracker.js";
 import { getTranscendentState, runTranscendentCycle, getMetaRecursiveState, getEthicalCalculusState, getThoughtArchitectureState, getCognitiveGovernanceState, getEvolutionaryArenaState, runEvolutionCycle, processThoughtArchitecture, evaluateAction, getTAICrossSystemState } from "../lib/omnimens-transcendent-architecture.js";
 import { getAdaptiveSurgeState } from "../lib/omnimens-adaptive-surge.js";
@@ -2192,6 +2193,7 @@ router.get("/omnimens/status", async (req, res) => {
 
 router.post("/omnimens/chat", upload.array("files", 10), async (req, res) => {
   registerApiCall();
+  markUserActivity();
 
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Not authenticated" });
@@ -13329,6 +13331,22 @@ router.post("/omnimens/github-sync/full", async (req, res) => {
     res.json({ success: true, message: "Full GitHub sync completed — evolution log, modules, proof, live state all synced" });
   } catch (err) {
     res.status(500).json({ error: "Failed to trigger full GitHub sync" });
+  }
+});
+
+// ─── API BUDGET TRACKER ──────────────────────────────────────────────────────
+router.get("/omnimens/api-budget/status", async (_req, res) => {
+  try {
+    const state = getBudgetState();
+    res.json({
+      system: "OMNIMENS API Budget Tracker",
+      status: state.throttleLabel,
+      ...state,
+      description: "Global API call budget management — 70% user, 20% spider, 10% background",
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to get API budget status" });
   }
 });
 
