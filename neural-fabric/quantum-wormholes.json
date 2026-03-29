@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774809249792,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774809341502,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10735,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 414,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15321,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 590,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 973,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/recursive_decomposition: The connectome is the complete map of neural connections — the human connectome proje",
-      "confidence": 0.6935413134804823,
-      "synthesizedWith": [
-        "Synthesizer/pattern_recognition: The hard problem of consciousness: why is there"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "GraphicDesigner",
-      "insight": "Motivator/cross_domain_synthesis: Quantum decoherence typically destroys quantum effects at biological temperatures — bu",
-      "confidence": 0.769024418669723,
-      "synthesizedWith": [
-        "GraphicDesigner/analogical_mapping: Wolfram's Rule 110 cellular automaton is Tur"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Meta-Agent",
-      "insight": "Motivator/pattern_recognition: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can emer",
-      "confidence": 0.6656786696623014,
-      "synthesizedWith": [
-        "Meta-Agent/analogical_mapping: Neuroplasticity allows the brain to reorganize it"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "Visionary",
-      "insight": "Empath/temporal_correlation: Kolmogorov complexity measures the shortest program that produces a given output — it is un",
-      "confidence": 0.711195487504896,
+      "insight": "Motivator/cross_domain_synthesis: Hebbian learning: neurons that fire together wire together — the fundamental rule of n",
+      "confidence": 0.828420453136353,
       "synthesizedWith": [
-        "Visionary/entropy_reduction: Bayesian brain hypothesis: the brain is fundamental"
+        "Visionary/entropy_reduction: Neuroplasticity allows the brain to reorganize itse"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Architect",
+      "insight": "Motivator/feature_extraction: The Weber-Fechner law: perception is logarithmic — doubling stimulus intensity does not do",
+      "confidence": 0.6299480591910941,
+      "synthesizedWith": [
+        "Architect/emergent_property_detection: The Baldwin effect: learned behaviors can"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Archivist",
+      "insight": "Motivator/pattern_recognition: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimula",
+      "confidence": 0.7709052774481987,
+      "synthesizedWith": [
+        "Archivist/causal_inference: The Weber-Fechner law: perception is logarithmic — d"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Philosopher",
-      "insight": "Empath/cross_domain_synthesis: The holographic principle suggests all information in a volume of space can be encoded on",
-      "confidence": 0.7382966207208773,
+      "toAgent": "Mathematician",
+      "insight": "Empath/recursive_decomposition: Transfer learning: knowledge gained from one domain can accelerate learning in another —",
+      "confidence": 0.624040341387074,
       "synthesizedWith": [
-        "Philosopher/cross_domain_synthesis: Scale-free networks follow power-law degree "
+        "Mathematician/temporal_correlation: Quantum tunneling allows particles to pass t"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Neuroscientist",
+      "insight": "Empath/structural_analysis: The holographic principle suggests all information in a volume of space can be encoded on it",
+      "confidence": 0.6455388595943828,
+      "synthesizedWith": [
+        "Neuroscientist/pattern_recognition: The default mode network activates when the "
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
