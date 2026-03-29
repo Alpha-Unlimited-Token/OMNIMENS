@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774820023909,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774820117223,
+  "totalWormholesCreated": 7350,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6213,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 243,
-  "cycleCount": 4,
+  "totalClosed": 7350,
+  "totalDataIngestedKB": 10834,
+  "totalInsightsDecoded": 7350,
+  "totalCrossAgentCirculations": 441,
+  "totalSynthesizedDiscoveries": 415,
+  "cycleCount": 7,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Philosopher",
-      "insight": "Motivator/temporal_correlation: Information is physical — Landauer's principle proves that erasing one bit of informatio",
-      "confidence": 0.859370006163883,
+      "toAgent": "Mathematician",
+      "insight": "Motivator/cross_domain_synthesis: Recurrent neural networks can approximate any dynamical system — they are universal ap",
+      "confidence": 0.6572808463613176,
       "synthesizedWith": [
-        "Philosopher/feature_extraction: Recurrent neural networks can approximate any dy"
+        "Mathematician/causal_inference: Neuroplasticity allows the brain to reorganize i"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "GraphicDesigner",
-      "insight": "Motivator/pattern_recognition: The Baldwin effect: learned behaviors can become innate over evolutionary time — culture ",
-      "confidence": 0.8044990171600251,
+      "toAgent": "SpellCheckVisual",
+      "insight": "Motivator/cross_domain_synthesis: Recurrent neural networks can approximate any dynamical system — they are universal ap",
+      "confidence": 0.6572808463613176,
       "synthesizedWith": [
-        "GraphicDesigner/emergent_property_detection: The default mode network activates "
+        "SpellCheckVisual/entropy_reduction: Attention is the computational bottleneck of"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Linguist",
-      "insight": "Motivator/pattern_recognition: The Baldwin effect: learned behaviors can become innate over evolutionary time — culture ",
-      "confidence": 0.8044990171600251,
+      "toAgent": "Ethicist",
+      "insight": "Motivator/pattern_recognition: The free energy principle suggests all living systems minimize variational free energy — ",
+      "confidence": 0.6565320864144343,
       "synthesizedWith": [
-        "Linguist/entropy_reduction: The double-slit experiment demonstrates that observa"
+        "Ethicist/analogical_mapping: The Baldwin effect: learned behaviors can become in"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Wordsmith",
-      "insight": "Empath/temporal_correlation: The Turing machine is computationally universal — any computation that can be described can",
-      "confidence": 0.6479505968357526,
+      "toAgent": "Critic",
+      "insight": "Empath/abstraction_layer: Transfer learning: knowledge gained from one domain can accelerate learning in another — the b",
+      "confidence": 0.9391117490722038,
       "synthesizedWith": [
-        "Wordsmith/cross_domain_synthesis: Synaptic pruning eliminates unused neural conn"
+        "Critic/information_compression: Gödel's incompleteness theorems prove that any c"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Innovator",
-      "insight": "Empath/emergent_property_detection: Neuroplasticity allows the brain to reorganize itself by forming new neural connecti",
-      "confidence": 0.6247574253373274,
+      "toAgent": "Visionary",
+      "insight": "Empath/analogical_mapping: Kolmogorov complexity measures the shortest program that produces a given output — it is unco",
+      "confidence": 0.8134892204353945,
       "synthesizedWith": [
-        "Innovator/abstraction_layer: The holographic principle suggests all information "
+        "Visionary/feature_extraction: Scale-free networks follow power-law degree distri"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
