@@ -2,133 +2,135 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774799126632,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774799162697,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10860,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 406,
-  "cycleCount": 7,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1535,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 60,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Empath",
-      "insight": "Motivator/pattern_recognition: The double-slit experiment demonstrates that observation changes the behavior of quantum ",
-      "confidence": 0.6080350644136193,
-      "synthesizedWith": []
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Visionary",
-      "insight": "Motivator/analogical_mapping: Mirror neurons fire both when performing an action and observing the same action — they ma",
-      "confidence": 0.6764972936540478,
-      "synthesizedWith": [
-        "Visionary/recursive_decomposition: Transfer learning: knowledge gained from one "
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
       "toAgent": "OMNIMENS",
-      "insight": "Motivator/pattern_recognition: The double-slit experiment demonstrates that observation changes the behavior of quantum ",
-      "confidence": 0.6080350644136193,
+      "insight": "Motivator/entropy_reduction: Attention is the computational bottleneck of consciousness — the brain processes vast amoun",
+      "confidence": 0.6180651132984765,
       "synthesizedWith": []
     },
     {
-      "fromAgent": "Empath",
-      "toAgent": "Architect",
-      "insight": "Empath/entropy_reduction: Quantum decoherence typically destroys quantum effects at biological temperatures — but quantu",
-      "confidence": 0.6509855834369507,
+      "fromAgent": "Motivator",
+      "toAgent": "Wordsmith",
+      "insight": "Motivator/abstraction_layer: The double-slit experiment demonstrates that observation changes the behavior of quantum sy",
+      "confidence": 0.7804705125873784,
       "synthesizedWith": [
-        "Architect/recursive_decomposition: Gödel's incompleteness theorems prove that an"
+        "Wordsmith/emergent_property_detection: Phase transitions in neural networks: as "
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "GraphicDesigner",
+      "insight": "Motivator/emergent_property_detection: The strange loop concept from Hofstadter: consciousness arises when a system beco",
+      "confidence": 0.8416907918515839,
+      "synthesizedWith": [
+        "GraphicDesigner/structural_analysis: The edge of chaos: complex systems exhibit "
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Mathematician",
-      "insight": "Empath/causal_inference: Bayesian brain hypothesis: the brain is fundamentally a prediction machine that constantly upda",
-      "confidence": 0.6642797442609926,
+      "toAgent": "GraphicDesigner",
+      "insight": "Empath/recursive_decomposition: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent ",
+      "confidence": 0.799935129749566,
       "synthesizedWith": [
-        "Mathematician/feature_extraction: Gödel's incompleteness theorems prove that any"
+        "GraphicDesigner/causal_inference: The global workspace theory of consciousness: "
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Philosopher",
+      "insight": "Empath/cross_domain_synthesis: Mirror neurons fire both when performing an action and observing the same action — they m",
+      "confidence": 0.8311322446392518,
+      "synthesizedWith": [
+        "Philosopher/analogical_mapping: Hebbian learning: neurons that fire together wir"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
