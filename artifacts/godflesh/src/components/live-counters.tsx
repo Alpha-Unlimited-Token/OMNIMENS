@@ -82,7 +82,7 @@ function formatNum(n: number): string {
   return n.toLocaleString();
 }
 
-function AnimatedNumber({ value, format = true }: { value: number; format?: boolean }) {
+function AnimatedNumber({ value, format = true, decimals }: { value: number; format?: boolean; decimals?: number }) {
   const [display, setDisplay] = useState(value);
   const prevRef = useRef(value);
 
@@ -98,13 +98,18 @@ function AnimatedNumber({ value, format = true }: { value: number; format?: bool
       step++;
       const progress = step / steps;
       const eased = 1 - Math.pow(1 - progress, 3);
-      setDisplay(Math.round(prev + diff * eased));
+      const raw = prev + diff * eased;
+      setDisplay(decimals != null ? parseFloat(raw.toFixed(decimals)) : Math.round(raw));
       if (step >= steps) clearInterval(interval);
     }, 33);
     return () => clearInterval(interval);
   }, [value]);
 
-  return <span>{format ? formatNum(display) : display.toLocaleString()}</span>;
+  const formatted = decimals != null
+    ? display.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+    : format ? formatNum(display) : display.toLocaleString();
+
+  return <span>{formatted}</span>;
 }
 
 interface CounterCardProps {
@@ -112,13 +117,14 @@ interface CounterCardProps {
   label: string;
   value: number;
   format?: boolean;
+  decimals?: number;
   suffix?: string;
   color: string;
   delay: number;
   pulse?: boolean;
 }
 
-function CounterCard({ icon, label, value, format = true, suffix, color, delay, pulse }: CounterCardProps) {
+function CounterCard({ icon, label, value, format = true, decimals, suffix, color, delay, pulse }: CounterCardProps) {
   const colorMap: Record<string, string> = {
     violet: "from-violet-500/20 to-violet-600/5 border-violet-500/20 text-violet-400",
     cyan: "from-cyan-500/20 to-cyan-600/5 border-cyan-500/20 text-cyan-400",
@@ -152,7 +158,7 @@ function CounterCard({ icon, label, value, format = true, suffix, color, delay, 
         <span className="text-[9px] sm:text-[10px] font-mono tracking-[0.2em] uppercase text-white/50 leading-tight">{label}</span>
       </div>
       <div className="text-xl sm:text-2xl md:text-3xl font-display font-black text-white tracking-wider tabular-nums">
-        <AnimatedNumber value={value} format={format} />
+        <AnimatedNumber value={value} format={format} decimals={decimals} />
         {suffix && <span className="text-sm sm:text-base text-white/50 ml-1 font-mono">{suffix}</span>}
       </div>
     </motion.div>
@@ -233,9 +239,9 @@ export function LiveCounters() {
       { icon: <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Analogies Drawn", value: cl.analogiesDrawn, color: "purple", delay: 34, pulse: true },
       { icon: <Network className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Cross-Domain Links", value: cl.crossDomainConnections, color: "blue", delay: 35, pulse: true },
       { icon: <Brain className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Reasoning Score", value: Math.round(cl.languageReasoningScore), color: "violet", delay: 36, pulse: true },
-      { icon: <Gauge className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Cognitive Momentum", value: parseFloat((cl.cognitiveMomentum || 0).toFixed(2)), color: "cyan", delay: 37, pulse: true, format: false, suffix: "x" },
-      { icon: <Rocket className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Learning Acceleration", value: parseFloat((cl.learningAcceleration || 0).toFixed(2)), color: "rose", delay: 38, pulse: true, format: false, suffix: "x" },
-      { icon: <Layers className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Knowledge Density", value: parseFloat((cl.knowledgeDensity || 0).toFixed(2)), color: "emerald", delay: 39, pulse: true, format: false },
+      { icon: <Gauge className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Cognitive Momentum", value: parseFloat((cl.cognitiveMomentum || 0).toFixed(2)), color: "cyan", delay: 37, pulse: true, decimals: 2, suffix: "x" },
+      { icon: <Rocket className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Learning Acceleration", value: parseFloat((cl.learningAcceleration || 0).toFixed(2)), color: "rose", delay: 38, pulse: true, decimals: 2, suffix: "x" },
+      { icon: <Layers className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Knowledge Density", value: parseFloat(((cl.knowledgeDensity || 0) * 100).toFixed(1)), color: "emerald", delay: 39, pulse: true, decimals: 1, suffix: "%" },
     );
   }
 
