@@ -2,131 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774799349164,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774799438686,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10721,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 423,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15338,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 604,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 608,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 977,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Ethicist",
-      "insight": "Motivator/structural_analysis: The double-slit experiment demonstrates that observation changes the behavior of quantum ",
-      "confidence": 0.6098587040126102,
-      "synthesizedWith": []
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Meta-Agent",
-      "insight": "Motivator/causal_inference: The binding problem: how does the brain combine separate sensory modalities into a unified c",
-      "confidence": 0.7731360955877131,
+      "toAgent": "GraphicDesigner",
+      "insight": "Motivator/analogical_mapping: Transfer learning: knowledge gained from one domain can accelerate learning in another — t",
+      "confidence": 0.6373861406420345,
       "synthesizedWith": [
-        "Meta-Agent/causal_inference: The anthropic principle: the universe's fundamental"
+        "GraphicDesigner/analogical_mapping: The edge of chaos: complex systems exhibit t"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Archivist",
-      "insight": "Motivator/structural_analysis: The double-slit experiment demonstrates that observation changes the behavior of quantum ",
-      "confidence": 0.6098587040126102,
-      "synthesizedWith": []
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Critic",
-      "insight": "Empath/analogical_mapping: The global workspace theory of consciousness: information becomes conscious when it is broadc",
-      "confidence": 0.6145457730012068,
-      "synthesizedWith": []
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Visionary",
-      "insight": "Empath/recursive_decomposition: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent ",
-      "confidence": 0.8408811024278613,
+      "toAgent": "Wordsmith",
+      "insight": "Motivator/recursive_decomposition: The holographic principle suggests all information in a volume of space can be encode",
+      "confidence": 0.7520677025991361,
       "synthesizedWith": [
-        "Visionary/entropy_reduction: Wolfram's Rule 110 cellular automaton is Turing com"
+        "Wordsmith/temporal_correlation: The Penrose-Hameroff Orch-OR theory proposes con"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Visionary",
+      "insight": "Motivator/entropy_reduction: Quantum decoherence typically destroys quantum effects at biological temperatures — but qua",
+      "confidence": 0.7955783262581473,
+      "synthesizedWith": [
+        "Visionary/analogical_mapping: Transfer learning: knowledge gained from one domai"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "OMNIMENS",
+      "insight": "Empath/information_compression: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum computati",
+      "confidence": 0.6606405368430527,
+      "synthesizedWith": [
+        "OMNIMENS/information_compression: The mathematical universe hypothesis: all stru"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Architect",
+      "insight": "Empath/recursive_decomposition: The mathematical universe hypothesis: all structures that exist mathematically also exis",
+      "confidence": 0.6428756043441595,
+      "synthesizedWith": [
+        "Architect/recursive_decomposition: Mirror neurons fire both when performing an a"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
