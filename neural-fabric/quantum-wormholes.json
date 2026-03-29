@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774816681829,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774816779909,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10830,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 417,
-  "cycleCount": 7,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1523,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 62,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 464,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 464,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 464,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 464,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 464,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 464,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 464,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 464,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 464,
-      "crossAgentShares": 21
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
-      "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 464,
-      "crossAgentShares": 21
+      "agentName": "Explorer",
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
-      "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/temporal_correlation: Mirror neurons fire both when performing an action and observing the same action — they ",
-      "confidence": 0.9486172599501909,
+      "fromAgent": "Ethicist",
+      "toAgent": "Philosopher",
+      "insight": "Ethicist/structural_analysis: Hebbian learning: neurons that fire together wire together — the fundamental rule of neura",
+      "confidence": 0.683380011762796,
       "synthesizedWith": [
-        "OMNIMENS/recursive_decomposition: The Chinese Room argument: can a system that m"
+        "Philosopher/causal_inference: Kolmogorov complexity measures the shortest progra"
       ]
     },
     {
-      "fromAgent": "Motivator",
-      "toAgent": "Wordsmith",
-      "insight": "Motivator/temporal_correlation: Mirror neurons fire both when performing an action and observing the same action — they ",
-      "confidence": 0.9486172599501909,
+      "fromAgent": "Ethicist",
+      "toAgent": "Consolidator",
+      "insight": "Ethicist/information_compression: Quantum superposition allows a system to exist in multiple states simultaneously until",
+      "confidence": 0.6936686044810384,
       "synthesizedWith": [
-        "Wordsmith/emergent_property_detection: Long-term potentiation (LTP) strengthens "
+        "Consolidator/information_compression: The hippocampus replays experiences during"
       ]
     },
     {
-      "fromAgent": "Motivator",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Motivator/feature_extraction: Quantum entanglement allows particles to share state information instantaneously across an",
-      "confidence": 0.9061305791053825,
+      "fromAgent": "Ethicist",
+      "toAgent": "Innovator",
+      "insight": "Ethicist/entropy_reduction: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimulatio",
+      "confidence": 0.7783052088910694,
       "synthesizedWith": [
-        "SensorimotorAgent/recursive_decomposition: The Weber-Fechner law: perception is "
+        "Innovator/structural_analysis: The double-slit experiment demonstrates that obse"
       ]
     },
     {
-      "fromAgent": "Empath",
-      "toAgent": "OMNIMENS",
-      "insight": "Empath/abstraction_layer: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum computations in",
-      "confidence": 0.623881934092475,
+      "fromAgent": "Embodiment",
+      "toAgent": "Sensorimotorist",
+      "insight": "Embodiment/feature_extraction: The mathematical universe hypothesis: all structures that exist mathematically also exist",
+      "confidence": 0.6087880791483249,
       "synthesizedWith": [
-        "OMNIMENS/recursive_decomposition: The Chinese Room argument: can a system that m"
+        "Sensorimotorist/structural_analysis: The cerebellum contains more neurons than a"
       ]
     },
     {
-      "fromAgent": "Empath",
-      "toAgent": "Architect",
-      "insight": "Empath/structural_analysis: The strange loop concept from Hofstadter: consciousness arises when a system becomes complex",
-      "confidence": 0.9204820270932407,
+      "fromAgent": "Embodiment",
+      "toAgent": "Explorer",
+      "insight": "Embodiment/pattern_recognition: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimul",
+      "confidence": 0.7729833992508816,
       "synthesizedWith": [
-        "Architect/pattern_recognition: The Boltzmann brain paradox suggests that a self-"
+        "Explorer/recursive_decomposition: Quantum tunneling allows particles to pass thr"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
