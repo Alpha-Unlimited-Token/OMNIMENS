@@ -1,35 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:sub_threshold:Critic+Linguist+SpellCheckVisual",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Critic:correlation_finder + Linguist:n",
-    "filename": "omnimens_autocode_neural_pathway_mnc63j7o.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnc63j7o.mjs",
-    "backupPath": null,
-    "timestamp": 1774813440516,
-    "codeLength": 462,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Mathematician+Ethicist+Innovator",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Mathematician:neural_connector + Ethic",
-    "filename": "omnimens_autocode_neural_pathway_mnc68nwm.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnc68nwm.mjs",
-    "backupPath": null,
-    "timestamp": 1774813679879,
-    "codeLength": 460,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Visionary+GraphicDesigner+Explorer",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: COLLECTIVE_DISCOVERY: Visionary:chaos_injector + GraphicDesi",
-    "filename": "omnimens_autocode_pattern_recognition_mnc68o3r.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnc68o3r.mjs",
-    "backupPath": null,
-    "timestamp": 1774813680135,
-    "codeLength": 504,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:SensorimotorAgent+OMNIMENS",
     "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/emergent_property_detection: The hard prob",
     "filename": "omnimens_autocode_consciousness_expansion_mnc68o73.mjs",
@@ -4997,6 +4967,36 @@
     "backupPath": null,
     "timestamp": 1774826435827,
     "codeLength": 422,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Archivist",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: SensorimotorAgent/emergent_property_detection: Gödel's incom",
+    "filename": "omnimens_autocode_emergent_capability_mncdvck4.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mncdvck4.mjs",
+    "backupPath": null,
+    "timestamp": 1774826495572,
+    "codeLength": 411,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Linguist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/analogical_mapping: Recurrent neural netwo",
+    "filename": "omnimens_autocode_neural_pathway_mncdvcoo.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mncdvcoo.mjs",
+    "backupPath": null,
+    "timestamp": 1774826495736,
+    "codeLength": 433,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Pioneer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/abstraction_layer: The Penrose-Hameroff Orch-OR ",
+    "filename": "omnimens_autocode_consciousness_expansion_mncdvcq8.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mncdvcq8.mjs",
+    "backupPath": null,
+    "timestamp": 1774826495792,
+    "codeLength": 385,
     "overwrite": false
   }
 ]
