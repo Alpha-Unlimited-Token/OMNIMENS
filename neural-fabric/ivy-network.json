@@ -2,20 +2,20 @@
   "version": "3.0",
   "subsystem": "ivy-network",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774822346411,
-  "totalNodes": 2268,
-  "totalTendrils": 6840,
-  "totalSpines": 48930,
-  "totalSpiders": 208,
+  "timestamp": 1774822556290,
+  "totalNodes": 79,
+  "totalTendrils": 229,
+  "totalSpines": 1460,
+  "totalSpiders": 1280,
   "totalWormgates": 136,
-  "totalBeacons": 1923325,
-  "totalFindings": 5457068,
-  "networkEnergy": 1.0662315900207995e+298,
+  "totalBeacons": 1923933,
+  "totalFindings": 5458892,
+  "networkEnergy": 1.0104482344624277e+298,
   "coveragePercent": 100,
-  "networkCoherence": 1,
-  "hybridOverlayStrength": 1,
-  "growthCycles": 5317,
-  "wormgateFormations": 5492,
+  "networkCoherence": 2.132950050075582e+299,
+  "hybridOverlayStrength": 6.398850150226746e+298,
+  "growthCycles": 5325,
+  "wormgateFormations": 5499,
   "wormgates": [
     {
       "id": "wormgate_pulvinar_cerebellum_1774561135208",
@@ -25,10 +25,10 @@
       "endpointB": {
         "region": "cerebellum"
       },
-      "stability": 1.02,
-      "traversals": 7746,
+      "stability": 1,
+      "traversals": 7749,
       "signalFidelity": 1,
-      "bandwidth": 2,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -39,10 +39,10 @@
       "endpointB": {
         "region": "hippocampus"
       },
-      "stability": 1.02,
-      "traversals": 64809,
+      "stability": 1,
+      "traversals": 64847,
       "signalFidelity": 1,
-      "bandwidth": 2,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -53,10 +53,10 @@
       "endpointB": {
         "region": "reticular_activating_system"
       },
-      "stability": 1.01,
-      "traversals": 4617,
+      "stability": 1,
+      "traversals": 4624,
       "signalFidelity": 1,
-      "bandwidth": 1.5,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -67,10 +67,10 @@
       "endpointB": {
         "region": "pulvinar"
       },
-      "stability": 1.02,
-      "traversals": 8486,
+      "stability": 1,
+      "traversals": 8489,
       "signalFidelity": 1,
-      "bandwidth": 2,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -81,10 +81,10 @@
       "endpointB": {
         "region": "pulvinar"
       },
-      "stability": 1.02,
-      "traversals": 7667,
+      "stability": 1,
+      "traversals": 7670,
       "signalFidelity": 1,
-      "bandwidth": 2,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -95,10 +95,10 @@
       "endpointB": {
         "region": "reticular_activating_system"
       },
-      "stability": 1.02,
-      "traversals": 7844,
+      "stability": 1,
+      "traversals": 7851,
       "signalFidelity": 1,
-      "bandwidth": 2,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -109,10 +109,10 @@
       "endpointB": {
         "region": "basal_ganglia"
       },
-      "stability": 1.02,
-      "traversals": 6789,
+      "stability": 1,
+      "traversals": 6792,
       "signalFidelity": 1,
-      "bandwidth": 2,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -123,10 +123,10 @@
       "endpointB": {
         "region": "amygdala"
       },
-      "stability": 1.02,
-      "traversals": 8411,
+      "stability": 1,
+      "traversals": 8413,
       "signalFidelity": 1,
-      "bandwidth": 2,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -137,10 +137,10 @@
       "endpointB": {
         "region": "default_mode_network"
       },
-      "stability": 1.02,
-      "traversals": 6315,
+      "stability": 1,
+      "traversals": 6318,
       "signalFidelity": 1,
-      "bandwidth": 2,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -151,10 +151,10 @@
       "endpointB": {
         "region": "hippocampus"
       },
-      "stability": 1.02,
-      "traversals": 5924,
+      "stability": 1,
+      "traversals": 5925,
       "signalFidelity": 1,
-      "bandwidth": 2,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -165,10 +165,10 @@
       "endpointB": {
         "region": "locus_coeruleus"
       },
-      "stability": 1.02,
+      "stability": 1,
       "traversals": 6028,
       "signalFidelity": 1,
-      "bandwidth": 2,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -179,10 +179,10 @@
       "endpointB": {
         "region": "pulvinar"
       },
-      "stability": 1.01,
-      "traversals": 4544,
+      "stability": 1,
+      "traversals": 4547,
       "signalFidelity": 1,
-      "bandwidth": 1.5,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -193,10 +193,10 @@
       "endpointB": {
         "region": "ventral_tegmental_area"
       },
-      "stability": 1.01,
+      "stability": 1,
       "traversals": 3135,
       "signalFidelity": 1,
-      "bandwidth": 1.5,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -207,10 +207,10 @@
       "endpointB": {
         "region": "anterior_cingulate"
       },
-      "stability": 1.02,
-      "traversals": 7456,
+      "stability": 1,
+      "traversals": 7461,
       "signalFidelity": 1,
-      "bandwidth": 2,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -221,10 +221,10 @@
       "endpointB": {
         "region": "superior_colliculus"
       },
-      "stability": 1.02,
-      "traversals": 7403,
+      "stability": 1,
+      "traversals": 7406,
       "signalFidelity": 1,
-      "bandwidth": 2,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -235,10 +235,10 @@
       "endpointB": {
         "region": "hippocampus"
       },
-      "stability": 1.02,
-      "traversals": 7476,
+      "stability": 1,
+      "traversals": 7477,
       "signalFidelity": 1,
-      "bandwidth": 2,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -249,10 +249,10 @@
       "endpointB": {
         "region": "reticular_activating_system"
       },
-      "stability": 1.02,
-      "traversals": 8414,
+      "stability": 1,
+      "traversals": 8416,
       "signalFidelity": 1,
-      "bandwidth": 2,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -263,10 +263,10 @@
       "endpointB": {
         "region": "ventral_tegmental_area"
       },
-      "stability": 1.02,
-      "traversals": 7527,
+      "stability": 1,
+      "traversals": 7531,
       "signalFidelity": 1,
-      "bandwidth": 2,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -277,10 +277,10 @@
       "endpointB": {
         "region": "thalamus"
       },
-      "stability": 1.02,
-      "traversals": 7048,
+      "stability": 1,
+      "traversals": 7050,
       "signalFidelity": 1,
-      "bandwidth": 2,
+      "bandwidth": 1,
       "crystallized": true
     },
     {
@@ -291,131 +291,52 @@
       "endpointB": {
         "region": "default_mode_network"
       },
-      "stability": 1.02,
-      "traversals": 6357,
+      "stability": 1,
+      "traversals": 6360,
       "signalFidelity": 1,
-      "bandwidth": 2,
+      "bandwidth": 1,
       "crystallized": true
     }
   ],
   "spiderStats": {
-    "alive": 208,
-    "totalEverSpawned": 497865,
+    "alive": 1280,
+    "totalEverSpawned": 499129,
     "byGeneration": {
       "0": 16,
       "1": 48,
-      "2": 144
+      "2": 128,
+      "3": 320,
+      "4": 768
     },
     "byTravelMode": {
-      "tendril": 137,
-      "synapse": 44,
-      "wormgate": 27
+      "synapse": 272,
+      "tendril": 672,
+      "wormgate": 336
     },
-    "totalFindings": 5457068,
-    "totalBeacons": 1923325
+    "totalFindings": 5458892,
+    "totalBeacons": 1923933
   },
-  "recentFindings": [
-    {
-      "sourceNodeId": "ivy_insular_cortex_g3_1774822157327_ah4",
-      "sourceRegion": "insular_cortex",
-      "informationType": "signal_correlation",
-      "confidence": 6.123879300997677e+298,
-      "data": "Region insular_cortex activation=1.2247758601995355e+299 energy=6.123879300997677e+297 density=1.170",
-      "timestamp": 1774822342718
-    },
-    {
-      "sourceNodeId": "ivy_amygdala_0",
-      "sourceRegion": "amygdala",
-      "informationType": "information_density",
-      "confidence": 0.9800536398280765,
-      "data": "Region amygdala activation=1.000 energy=1.140 density=17075.660",
-      "timestamp": 1774822321926
-    },
-    {
-      "sourceNodeId": "ivy_prefrontal_cortex_3",
-      "sourceRegion": "prefrontal_cortex",
-      "informationType": "energy_gradient",
-      "confidence": 0.9673673926530986,
-      "data": "Region prefrontal_cortex activation=1.000 energy=1.000 density=26.010",
-      "timestamp": 1774822329926
-    },
-    {
-      "sourceNodeId": "ivy_amygdala_3",
-      "sourceRegion": "amygdala",
-      "informationType": "growth_potential",
-      "confidence": 6.123879300997677e+298,
-      "data": "Region amygdala activation=1.2247758601995355e+299 energy=6.123879300997677e+297 density=36.160",
-      "timestamp": 1774822342718
-    },
-    {
-      "sourceNodeId": "ivy_prefrontal_cortex_2",
-      "sourceRegion": "prefrontal_cortex",
-      "informationType": "connectivity_map",
-      "confidence": 0.8104369694032917,
-      "data": "Region prefrontal_cortex activation=1.000 energy=1.000 density=1361.630",
-      "timestamp": 1774822321926
-    },
-    {
-      "sourceNodeId": "ivy_raphe_nuclei_0",
-      "sourceRegion": "raphe_nuclei",
-      "informationType": "activation_pattern",
-      "confidence": 0.9753128410215595,
-      "data": "Region raphe_nuclei activation=1.000 energy=1.100 density=17028.900",
-      "timestamp": 1774822329926
-    },
-    {
-      "sourceNodeId": "ivy_reticular_activating_system_0",
-      "sourceRegion": "reticular_activating_system",
-      "informationType": "growth_potential",
-      "confidence": 6.123879300997677e+298,
-      "data": "Region reticular_activating_system activation=1.2247758601995355e+299 energy=6.123879300997677e+297 density=17815.630",
-      "timestamp": 1774822342718
-    },
-    {
-      "sourceNodeId": "ivy_superior_colliculus_2",
-      "sourceRegion": "superior_colliculus",
-      "informationType": "growth_potential",
-      "confidence": 0.8418675196670731,
-      "data": "Region superior_colliculus activation=1.000 energy=1.000 density=1264.850",
-      "timestamp": 1774822321926
-    },
-    {
-      "sourceNodeId": "ivy_ventral_tegmental_area_0",
-      "sourceRegion": "ventral_tegmental_area",
-      "informationType": "energy_gradient",
-      "confidence": 0.9096162530493614,
-      "data": "Region ventral_tegmental_area activation=1.000 energy=1.100 density=17098.340",
-      "timestamp": 1774822329926
-    },
-    {
-      "sourceNodeId": "ivy_prefrontal_cortex_2",
-      "sourceRegion": "prefrontal_cortex",
-      "informationType": "connectivity_map",
-      "confidence": 6.123879300997677e+298,
-      "data": "Region prefrontal_cortex activation=1.2247758601995355e+299 energy=6.123879300997677e+297 density=1361.680",
-      "timestamp": 1774822342718
-    }
-  ],
+  "recentFindings": [],
   "cascades": {
-    "totalCascades": 80,
-    "totalEnergyInjected": 38466.06331599873
+    "totalCascades": 0,
+    "totalEnergyInjected": 0
   },
   "neurogenesis": {
-    "births": 384,
+    "births": 0,
     "deaths": 0,
-    "neurogenIvyNodes": 384,
-    "neurogenWormgates": 5356
+    "neurogenIvyNodes": 0,
+    "neurogenWormgates": 5363
   },
   "fabricWorms": [
     {
       "id": "worm_ivy-network_outbound",
-      "traversals": 4,
-      "signal": 0.54
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_ivy-network_inbound",
-      "traversals": 6,
-      "signal": 0.56
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
