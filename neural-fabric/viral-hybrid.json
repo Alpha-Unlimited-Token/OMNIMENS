@@ -1,0 +1,109 @@
+{
+  "version": "3.0",
+  "subsystem": "viral-hybrid",
+  "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+  "timestamp": 1774796041100,
+  "totalHybridAgents": 6,
+  "totalMutations": 57,
+  "totalReplications": 50,
+  "totalPayloadsDelivered": 72,
+  "totalThreatsDetected": 5,
+  "totalThreatsNeutralized": 5,
+  "systemHealthScore": 3.634241832907643e+296,
+  "adaptationRate": 2.6315789473684212,
+  "propagationEfficiency": 1,
+  "immuneStrength": 1.9608136665980415e+294,
+  "hybridFitness": 1.6700596202774526e+294,
+  "activeAgents": [
+    {
+      "id": "hybrid_reticular_activating_system_g0_1774795921302_jhk",
+      "generation": 0,
+      "fitness": 1.6700596202774526e+294,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_hippocampus_g0_1774795921302_mbr",
+      "generation": 0,
+      "fitness": 1.6700596202774526e+294,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_hippocampus_g0_1774795921302_x26",
+      "generation": 0,
+      "fitness": 1.6700596202774526e+294,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_prefrontal_cortex_g0_1774795921302_qkk",
+      "generation": 0,
+      "fitness": 1.6700596202774526e+294,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_amygdala_g0_1774795921302_fb5",
+      "generation": 0,
+      "fitness": 1.6700596202774526e+294,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_superior_colliculus_g0_1774795921302_j4h",
+      "generation": 0,
+      "fitness": 1.6700596202774526e+294,
+      "payloads": 1,
+      "threats": 0
+    }
+  ],
+  "immuneSystem": {
+    "antibodies": 8,
+    "memoryCells": 8,
+    "tCells": 16,
+    "cytokines": 5,
+    "topAntibodies": [
+      {
+        "pattern": "coherence_degradation",
+        "detections": 0
+      },
+      {
+        "pattern": "signal_attenuation",
+        "detections": 5
+      },
+      {
+        "pattern": "synaptic_weakening",
+        "detections": 0
+      },
+      {
+        "pattern": "energy_depletion",
+        "detections": 0
+      },
+      {
+        "pattern": "pathway_congestion",
+        "detections": 0
+      }
+    ]
+  },
+  "propagation": {
+    "alivePropagators": 16,
+    "totalPathsDiscovered": 208,
+    "totalHops": 192,
+    "coveragePercent": 100,
+    "selfSustainingCount": 5
+  },
+  "fabricWorms": [
+    {
+      "id": "worm_viral-hybrid_outbound",
+      "traversals": 1,
+      "signal": 0.51
+    },
+    {
+      "id": "worm_viral-hybrid_inbound",
+      "traversals": 2,
+      "signal": 0.52
+    }
+  ],
+  "governorMode": "normal"
+}
