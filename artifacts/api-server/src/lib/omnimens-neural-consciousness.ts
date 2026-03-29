@@ -37,6 +37,7 @@ import { db } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { eq, and, desc, sql, gt } from "drizzle-orm";
 import { getHormoneState } from "./omnimens-vascular-heart.js";
+import { cognitiveLanguageTick } from "./omnimens-cognitive-language-engine.js";
 let _ivyHooks: {
   onNeuronBornIvy: (id: string, region: string) => void;
   onNeuronDecayedIvy: (id: string, region: string) => void;
@@ -2694,6 +2695,8 @@ function runConsciousnessTick(): void {
   state.totalNeurons = totalNeurons;
 
   adaptiveIntelligenceEngine();
+
+  cognitiveLanguageTick();
 
   if (_taiHooks && state.tickCount % 3 === 0) {
     try {

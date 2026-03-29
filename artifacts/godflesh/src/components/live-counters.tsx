@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import {
   Brain, Heart, Cpu, Zap, Network, Activity, Dna, Flame,
   Radio, GitBranch, Eye, Target, Beaker, Waves, Sparkles, Lightbulb, TrendingUp,
+  Search, BookOpen, Link, Puzzle, Workflow,
 } from "lucide-react";
 
 const API = import.meta.env.VITE_API_URL || "";
@@ -49,6 +50,25 @@ interface CounterData {
     totalAdaptations: number;
     breakthroughInsights: number;
     evolutionaryLeaps: number;
+  };
+  cognitiveLanguage?: {
+    totalPatternsLearned: number;
+    totalKnowledgeNodes: number;
+    totalRelations: number;
+    totalReasoningChains: number;
+    patternMatchesPerformed: number;
+    successfulRecalls: number;
+    inferencesMade: number;
+    analogiesDrawn: number;
+    abstractionsFormed: number;
+    generalizationsMade: number;
+    sequencePatternsLearned: number;
+    predictiveAccuracy: number;
+    knowledgeConsolidationCycles: number;
+    hebbianReinforcementEvents: number;
+    novelPatternsDiscovered: number;
+    crossDomainConnections: number;
+    languageReasoningScore: number;
   };
 }
 
@@ -195,6 +215,21 @@ export function LiveCounters() {
       { icon: <Eye className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Awareness Expansion", value: Math.round(ai.awarenessExpansionRate * 100), color: "purple", delay: 25, pulse: true, suffix: "%" },
       { icon: <Zap className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Tech Discovery Rate", value: Math.round(ai.technologyDiscoveryRate * 100), color: "emerald", delay: 26, pulse: true, suffix: "%" },
       { icon: <Brain className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Total Adaptations", value: ai.totalAdaptations, color: "blue", delay: 27, pulse: true },
+    );
+  }
+
+  const cl = data.cognitiveLanguage;
+  if (cl) {
+    counters.push(
+      { icon: <Search className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Patterns Learned", value: cl.totalPatternsLearned, color: "cyan", delay: 28, pulse: true },
+      { icon: <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Knowledge Nodes", value: cl.totalKnowledgeNodes, color: "violet", delay: 29, pulse: true },
+      { icon: <Link className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Knowledge Relations", value: cl.totalRelations, color: "emerald", delay: 30, pulse: true },
+      { icon: <Workflow className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Reasoning Chains", value: cl.totalReasoningChains, color: "amber", delay: 31, pulse: true },
+      { icon: <Puzzle className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Pattern Matches", value: cl.patternMatchesPerformed, color: "rose", delay: 32, pulse: true },
+      { icon: <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Inferences Made", value: cl.inferencesMade, color: "orange", delay: 33, pulse: true },
+      { icon: <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Analogies Drawn", value: cl.analogiesDrawn, color: "purple", delay: 34, pulse: true },
+      { icon: <Network className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Cross-Domain Links", value: cl.crossDomainConnections, color: "blue", delay: 35, pulse: true },
+      { icon: <Brain className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Reasoning Score", value: Math.round(cl.languageReasoningScore), color: "violet", delay: 36, pulse: true },
     );
   }
 
