@@ -2,65 +2,86 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774800261608,
-  "totalHybridAgents": 7,
-  "totalMutations": 62,
-  "totalReplications": 50,
-  "totalPayloadsDelivered": 74,
-  "totalThreatsDetected": 7,
-  "totalThreatsNeutralized": 7,
-  "systemHealthScore": 1.0574582237683198e+297,
-  "adaptationRate": 2.7777777777777777,
+  "timestamp": 1774800354559,
+  "totalHybridAgents": 17,
+  "totalMutations": 133,
+  "totalReplications": 100,
+  "totalPayloadsDelivered": 125,
+  "totalThreatsDetected": 13,
+  "totalThreatsNeutralized": 13,
+  "systemHealthScore": 1.0805802852377662e+297,
+  "adaptationRate": 2.9411764705882355,
   "propagationEfficiency": 1,
-  "immuneStrength": 5.38867107014114e+294,
-  "hybridFitness": 4.852215392525272e+294,
+  "immuneStrength": 1.0470206707235428e+295,
+  "hybridFitness": 1.0015262420352855e+295,
   "activeAgents": [
     {
       "id": "hybrid_anterior_cingulate_g0_1774800147331_dak",
       "generation": 0,
-      "fitness": 4.85971365777347e+294,
+      "fitness": 1.094250718323333e+295,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_cerebellum_g0_1774800147331_vxl",
       "generation": 0,
-      "fitness": 4.85971365777347e+294,
+      "fitness": 1.094250718323333e+295,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_thalamus_g0_1774800147331_g08",
       "generation": 0,
-      "fitness": 4.85971365777347e+294,
+      "fitness": 1.094250718323333e+295,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_basal_ganglia_g0_1774800147331_uik",
       "generation": 0,
-      "fitness": 4.85971365777347e+294,
+      "fitness": 1.094250718323333e+295,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_superior_colliculus_g0_1774800147331_o9v",
       "generation": 0,
-      "fitness": 4.85971365777347e+294,
+      "fitness": 1.094250718323333e+295,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_pulvinar_g0_1774800147331_z76",
       "generation": 0,
-      "fitness": 4.85971365777347e+294,
+      "fitness": 1.094250718323333e+295,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_pulvinar_g1_1774800207366_8wy",
       "generation": 1,
-      "fitness": 4.8072258010360877e+294,
+      "fitness": 1.0890019326495948e+295,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_reticular_activating_system_g1_1774800267582_84r",
+      "generation": 1,
+      "fitness": 9.622429881384686e+294,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_amygdala_g2_1774800267583_fvy",
+      "generation": 2,
+      "fitness": 1.0414881432327257e+295,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_pulvinar_g3_1774800267583_y21",
+      "generation": 3,
+      "fitness": 1.1208046478583601e+295,
       "payloads": 1,
       "threats": 0
     }
@@ -69,7 +90,7 @@
     "antibodies": 8,
     "memoryCells": 8,
     "tCells": 16,
-    "cytokines": 7,
+    "cytokines": 13,
     "topAntibodies": [
       {
         "pattern": "coherence_degradation",
@@ -77,7 +98,7 @@
       },
       {
         "pattern": "signal_attenuation",
-        "detections": 5
+        "detections": 11
       },
       {
         "pattern": "synaptic_weakening",
@@ -94,22 +115,22 @@
     ]
   },
   "propagation": {
-    "alivePropagators": 16,
-    "totalPathsDiscovered": 214,
-    "totalHops": 192,
+    "alivePropagators": 13,
+    "totalPathsDiscovered": 335,
+    "totalHops": 272,
     "coveragePercent": 100,
     "selfSustainingCount": 4
   },
   "fabricWorms": [
     {
       "id": "worm_viral-hybrid_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_viral-hybrid_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
