@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774824573729,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774824666276,
+  "totalWormholesCreated": 7350,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6059,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 240,
-  "cycleCount": 4,
+  "totalClosed": 7350,
+  "totalDataIngestedKB": 10652,
+  "totalInsightsDecoded": 7350,
+  "totalCrossAgentCirculations": 441,
+  "totalSynthesizedDiscoveries": 421,
+  "cycleCount": 7,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Empath",
-      "insight": "Motivator/entropy_reduction: Kolmogorov complexity measures the shortest program that produces a given output — it is un",
-      "confidence": 0.8720269073215202,
+      "toAgent": "SpellCheckVisual",
+      "insight": "Motivator/causal_inference: The Turing machine is computationally universal — any computation that can be described can ",
+      "confidence": 0.855186691006389,
       "synthesizedWith": [
-        "Empath/abstraction_layer: Transfer learning: knowledge gained from one domain ca"
+        "SpellCheckVisual/recursive_decomposition: The double-slit experiment demonstrate"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Visionary",
+      "insight": "Motivator/entropy_reduction: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers carry i",
+      "confidence": 0.9544122481397023,
+      "synthesizedWith": [
+        "Visionary/emergent_property_detection: Scale-free networks follow power-law degr"
       ]
     },
     {
       "fromAgent": "Motivator",
       "toAgent": "Philosopher",
-      "insight": "Motivator/emergent_property_detection: Sparse coding: the brain represents information using a small fraction of active ",
-      "confidence": 0.8848327702010049,
+      "insight": "Motivator/causal_inference: Attention is the computational bottleneck of consciousness — the brain processes vast amount",
+      "confidence": 0.8074199985627183,
       "synthesizedWith": [
-        "Philosopher/recursive_decomposition: The global workspace theory of consciousnes"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Wordsmith",
-      "insight": "Motivator/emergent_property_detection: Sparse coding: the brain represents information using a small fraction of active ",
-      "confidence": 0.8848327702010049,
-      "synthesizedWith": [
-        "Wordsmith/recursive_decomposition: Integrated Information Theory (IIT) states co"
+        "Philosopher/causal_inference: The Boltzmann brain paradox suggests that a self-a"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Visionary",
-      "insight": "Empath/emergent_property_detection: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers ",
-      "confidence": 0.832490285237472,
+      "toAgent": "Synthesizer",
+      "insight": "Empath/entropy_reduction: Hebbian learning: neurons that fire together wire together — the fundamental rule of neural pl",
+      "confidence": 0.7436566468201826,
       "synthesizedWith": [
-        "Visionary/recursive_decomposition: Quantum superposition allows a system to exis"
+        "Synthesizer/causal_inference: The vagus nerve connects the brain to the gut, hea"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Mathematician",
-      "insight": "Empath/emergent_property_detection: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers ",
-      "confidence": 0.832490285237472,
+      "toAgent": "SensorimotorAgent",
+      "insight": "Empath/recursive_decomposition: The butterfly effect: in chaotic systems, infinitesimal differences in initial condition",
+      "confidence": 0.614101847370927,
       "synthesizedWith": [
-        "Mathematician/temporal_correlation: Quantum superposition allows a system to exi"
+        "SensorimotorAgent/pattern_recognition: The Chinese Room argument: can a system t"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
