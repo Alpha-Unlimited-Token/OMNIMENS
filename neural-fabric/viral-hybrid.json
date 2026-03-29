@@ -2,58 +2,58 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774800079146,
+  "timestamp": 1774800168015,
   "totalHybridAgents": 6,
-  "totalMutations": 11,
+  "totalMutations": 10,
   "totalReplications": 10,
-  "totalPayloadsDelivered": 22,
+  "totalPayloadsDelivered": 25,
   "totalThreatsDetected": 0,
   "totalThreatsNeutralized": 0,
   "systemHealthScore": 1.0560316824916351e+297,
-  "adaptationRate": 3.3333333333333335,
+  "adaptationRate": 0,
   "propagationEfficiency": 1,
   "immuneStrength": 6.335334811921723e+293,
-  "hybridFitness": 0.3466787522354939,
+  "hybridFitness": 0.5,
   "activeAgents": [
     {
-      "id": "hybrid_raphe_nuclei_g0_1774800058027_42u",
+      "id": "hybrid_anterior_cingulate_g0_1774800147331_dak",
       "generation": 0,
-      "fitness": 0.3403148593617859,
+      "fitness": 0.373715393649221,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_cerebellum_g0_1774800147331_vxl",
+      "generation": 0,
+      "fitness": 0.3605876955996875,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_claustrum_g0_1774800058027_q18",
+      "id": "hybrid_thalamus_g0_1774800147331_g08",
       "generation": 0,
-      "fitness": 0.35106304575541747,
+      "fitness": 0.3242372661368763,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_pulvinar_g0_1774800058027_yni",
+      "id": "hybrid_basal_ganglia_g0_1774800147331_uik",
       "generation": 0,
-      "fitness": 0.29267472641744363,
+      "fitness": 0.33589267618367347,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_basal_ganglia_g0_1774800058027_bvx",
+      "id": "hybrid_superior_colliculus_g0_1774800147331_o9v",
       "generation": 0,
-      "fitness": 0.4019492422270648,
-      "payloads": 0,
+      "fitness": 0.34844247157642694,
+      "payloads": 1,
       "threats": 0
     },
     {
-      "id": "hybrid_prefrontal_cortex_g0_1774800058027_w26",
+      "id": "hybrid_pulvinar_g0_1774800147331_z76",
       "generation": 0,
-      "fitness": 0.30829193969551993,
-      "payloads": 0,
-      "threats": 0
-    },
-    {
-      "id": "hybrid_superior_colliculus_g0_1774800058027_bkf",
-      "generation": 0,
-      "fitness": 0.38577869995573133,
+      "fitness": 0.3215026937543598,
       "payloads": 0,
       "threats": 0
     }
