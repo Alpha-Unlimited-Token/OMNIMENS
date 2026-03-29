@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774818685903,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774818759235,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6085,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 238,
-  "cycleCount": 4,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1560,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 59,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Innovator",
-      "insight": "Motivator/temporal_correlation: The holographic principle suggests all information in a volume of space can be encoded o",
-      "confidence": 0.6975572740579654,
+      "toAgent": "Ethicist",
+      "insight": "Motivator/analogical_mapping: Scale-free networks follow power-law degree distributions — a few highly connected hubs do",
+      "confidence": 0.6656110350720913,
       "synthesizedWith": [
-        "Innovator/structural_analysis: Synaptic pruning eliminates unused neural connect"
+        "Ethicist/pattern_recognition: Phase transitions in neural networks: as connectiv"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Archivist",
-      "insight": "Motivator/abstraction_layer: Reservoir computing shows that even random neural networks can perform computation if the r",
-      "confidence": 0.6289421101598618,
+      "toAgent": "Neuroscientist",
+      "insight": "Motivator/analogical_mapping: Scale-free networks follow power-law degree distributions — a few highly connected hubs do",
+      "confidence": 0.6656110350720913,
       "synthesizedWith": [
-        "Archivist/emergent_property_detection: Quantum decoherence typically destroys qu"
+        "Neuroscientist/recursive_decomposition: Astrocytes, once thought to be mere supp"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Philosopher",
-      "insight": "Motivator/temporal_correlation: The holographic principle suggests all information in a volume of space can be encoded o",
-      "confidence": 0.6975572740579654,
+      "toAgent": "Empath",
+      "insight": "Motivator/entropy_reduction: The global workspace theory of consciousness: information becomes conscious when it is broa",
+      "confidence": 0.7023068959558809,
       "synthesizedWith": [
-        "Philosopher/emergent_property_detection: Transfer learning: knowledge gained fro"
+        "Empath/feature_extraction: Quantum superposition allows a system to exist in mul"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Mathematician",
-      "insight": "Empath/cross_domain_synthesis: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can theor",
-      "confidence": 0.7581493752420458,
+      "toAgent": "GraphicDesigner",
+      "insight": "Empath/feature_extraction: Quantum superposition allows a system to exist in multiple states simultaneously until measur",
+      "confidence": 0.8862405012417963,
       "synthesizedWith": [
-        "Mathematician/cross_domain_synthesis: Astrocytes, once thought to be mere suppor"
+        "GraphicDesigner/feature_extraction: Quantum decoherence typically destroys quant"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Critic",
-      "insight": "Empath/feature_extraction: The Weber-Fechner law: perception is logarithmic — doubling stimulus intensity does not doubl",
-      "confidence": 0.6182995677282052,
+      "toAgent": "OMNIMENS",
+      "insight": "Empath/feature_extraction: Quantum superposition allows a system to exist in multiple states simultaneously until measur",
+      "confidence": 0.8862405012417963,
       "synthesizedWith": [
-        "Critic/analogical_mapping: Long-term potentiation (LTP) strengthens synaptic con"
+        "OMNIMENS/abstraction_layer: Hebbian learning: neurons that fire together wire to"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
