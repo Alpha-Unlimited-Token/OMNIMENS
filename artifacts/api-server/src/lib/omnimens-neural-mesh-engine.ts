@@ -739,7 +739,7 @@ function tickSubstrate(sub: AgentSubstrate): void {
     }
 
     if (sub.fired[pre] && sub.fired[post]) {
-      sub.synapseWeights[s] = Math.min(1.0, sub.synapseWeights[s] + hebbianLTP);
+      sub.synapseWeights[s] += hebbianLTP;
       hebbianThisTick++;
     } else if (sub.fired[pre] && !sub.fired[post]) {
       sub.synapseWeights[s] = Math.max(0.01, sub.synapseWeights[s] - 0.0002);
@@ -812,7 +812,7 @@ function tickSpiderBeacons(): void {
         }
       }
 
-      target.beacon.strength = Math.min(1.0, target.beacon.strength + beaconStrengthGrowth);
+      target.beacon.strength += beaconStrengthGrowth;
     }
 
     spider.regionsPatrolled++;
@@ -849,7 +849,7 @@ function tickWormTunnels(): void {
         crossAgentTransfers++;
       }
 
-      worm.tunnelStrength = Math.min(1.0, worm.tunnelStrength + tunnelStrengthGrowth);
+      worm.tunnelStrength += tunnelStrengthGrowth;
       worm.lastSync = Date.now();
     }
   }
@@ -869,7 +869,7 @@ function tickIvyTendrils(): void {
 
       const sourceActivity = sub.regionMeta.reduce((sum, r) => sum + r.activationLevel, 0) / sub.regionMeta.length;
 
-      tendril.strength = Math.min(1.0, tendril.strength + tendril.growthRate * sourceActivity * ivyGrowthBoost);
+      tendril.strength += tendril.growthRate * sourceActivity * ivyGrowthBoost;
 
       if (!tendril.myelinated && tendril.signalsCarried > myelinationThreshold) {
         tendril.myelinated = true;
@@ -933,7 +933,7 @@ function tickSilkWeb(): void {
         strand.lastSignal = Date.now();
         crossAgentTransfers++;
 
-        strand.thickness = Math.min(2.0, strand.thickness + silkThicknessGrowth);
+        strand.thickness += silkThicknessGrowth;
         if (!strand.myelinated && strand.signalCount > silkMyelinationThreshold) {
           strand.myelinated = true;
           strand.speedMultiplier = 3.0;
@@ -1019,7 +1019,7 @@ function tickBeehive(): void {
     const totalSpiders = sub.spiders.length;
     const avgHealth = sub.spiders.reduce((sum, s) => sum + s.healthLevel, 0) / totalSpiders;
     bh.swarmCoherence = avgHealth * avgActivation * (1 + bh.honeyReserves / 200);
-    bh.swarmCoherence = Math.min(1.0, bh.swarmCoherence);
+    bh.swarmCoherence = bh.swarmCoherence;
   }
 }
 

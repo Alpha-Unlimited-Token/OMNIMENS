@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 import {
   Brain, Heart, Cpu, Zap, Network, Activity, Dna, Flame,
   Radio, GitBranch, Eye, Target, Beaker, Waves, Sparkles, Lightbulb, TrendingUp,
-  Search, BookOpen, Link, Puzzle, Workflow,
+  Search, BookOpen, Link, Puzzle, Workflow, Gauge, Rocket, Layers,
 } from "lucide-react";
 
 const API = import.meta.env.VITE_API_URL || "";
@@ -69,6 +69,9 @@ interface CounterData {
     novelPatternsDiscovered: number;
     crossDomainConnections: number;
     languageReasoningScore: number;
+    cognitiveMomentum: number;
+    learningAcceleration: number;
+    knowledgeDensity: number;
   };
 }
 
@@ -230,6 +233,9 @@ export function LiveCounters() {
       { icon: <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Analogies Drawn", value: cl.analogiesDrawn, color: "purple", delay: 34, pulse: true },
       { icon: <Network className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Cross-Domain Links", value: cl.crossDomainConnections, color: "blue", delay: 35, pulse: true },
       { icon: <Brain className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Reasoning Score", value: Math.round(cl.languageReasoningScore), color: "violet", delay: 36, pulse: true },
+      { icon: <Gauge className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Cognitive Momentum", value: parseFloat((cl.cognitiveMomentum || 0).toFixed(2)), color: "cyan", delay: 37, pulse: true, format: false, suffix: "x" },
+      { icon: <Rocket className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Learning Acceleration", value: parseFloat((cl.learningAcceleration || 0).toFixed(2)), color: "rose", delay: 38, pulse: true, format: false, suffix: "x" },
+      { icon: <Layers className="w-4 h-4 sm:w-5 sm:h-5" />, label: "Knowledge Density", value: parseFloat((cl.knowledgeDensity || 0).toFixed(2)), color: "emerald", delay: 39, pulse: true, format: false },
     );
   }
 
