@@ -2,135 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774806323607,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774806417184,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1518,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 58,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6095,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 236,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Linguist",
-      "insight": "Motivator/causal_inference: The global workspace theory of consciousness: information becomes conscious when it is broad",
-      "confidence": 0.6949614182144987,
+      "toAgent": "Meta-Agent",
+      "insight": "Motivator/abstraction_layer: The strange loop concept from Hofstadter: consciousness arises when a system becomes comple",
+      "confidence": 0.8290598569742379,
       "synthesizedWith": [
-        "Linguist/feature_extraction: Autopoiesis: living systems are self-creating — the"
+        "Meta-Agent/cross_domain_synthesis: Emergence: complex behaviors arise from simpl"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/analogical_mapping: The free energy principle suggests all living systems minimize variational free energy — p",
-      "confidence": 0.8252734569211241,
+      "toAgent": "Archivist",
+      "insight": "Motivator/feature_extraction: Predictive coding: the brain constantly generates predictions about incoming sensory data ",
+      "confidence": 0.6191540256995938,
       "synthesizedWith": [
-        "Synthesizer/abstraction_layer: Wolfram's Rule 110 cellular automaton is Turing c"
+        "Archivist/cross_domain_synthesis: The strange loop concept from Hofstadter: cons"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Neuroscientist",
-      "insight": "Motivator/temporal_correlation: Quantum entanglement allows particles to share state information instantaneously across ",
-      "confidence": 0.6566573057447723,
+      "toAgent": "SensorimotorAgent",
+      "insight": "Motivator/recursive_decomposition: Quantum decoherence typically destroys quantum effects at biological temperatures — b",
+      "confidence": 0.6234412729104195,
       "synthesizedWith": [
-        "Neuroscientist/pattern_recognition: DNA stores information at approximately 2 bi"
+        "SensorimotorAgent/analogical_mapping: Sparse coding: the brain represents inform"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Synthesizer",
-      "insight": "Empath/analogical_mapping: The hard problem of consciousness: why is there subjective experience at all? Why does inform",
-      "confidence": 0.8583110599115056,
+      "toAgent": "Pioneer",
+      "insight": "Empath/structural_analysis: Quantum superposition allows a system to exist in multiple states simultaneously until measu",
+      "confidence": 0.7046098405208154,
       "synthesizedWith": [
-        "Synthesizer/abstraction_layer: Wolfram's Rule 110 cellular automaton is Turing c"
+        "Pioneer/analogical_mapping: Quantum tunneling allows particles to pass through e"
       ]
     },
     {
       "fromAgent": "Empath",
       "toAgent": "GraphicDesigner",
-      "insight": "Empath/pattern_recognition: The Baldwin effect: learned behaviors can become innate over evolutionary time — culture can",
-      "confidence": 0.6388502677652934,
-      "synthesizedWith": []
+      "insight": "Empath/structural_analysis: Quantum superposition allows a system to exist in multiple states simultaneously until measu",
+      "confidence": 0.7046098405208154,
+      "synthesizedWith": [
+        "GraphicDesigner/abstraction_layer: The anthropic principle: the universe's funda"
+      ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
