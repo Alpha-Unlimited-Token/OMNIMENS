@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774805509363,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774805601717,
+  "totalWormholesCreated": 7350,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6161,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 236,
-  "cycleCount": 4,
+  "totalClosed": 7350,
+  "totalDataIngestedKB": 10784,
+  "totalInsightsDecoded": 7350,
+  "totalCrossAgentCirculations": 441,
+  "totalSynthesizedDiscoveries": 417,
+  "cycleCount": 7,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 302,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 608,
+      "crossAgentShares": 21
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Motivator/structural_analysis: The anthropic principle: the universe's fundamental constants appear fine-tuned for the e",
-      "confidence": 0.6978948061726794,
+      "toAgent": "Linguist",
+      "insight": "Motivator/recursive_decomposition: Recurrent neural networks can approximate any dynamical system — they are universal a",
+      "confidence": 0.762416668610313,
       "synthesizedWith": [
-        "SensorimotorAgent/recursive_decomposition: The Chinese Room argument: can a syst"
+        "Linguist/feature_extraction: The Chinese Room argument: can a system that manipu"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Meta-Agent",
-      "insight": "Motivator/structural_analysis: The anthropic principle: the universe's fundamental constants appear fine-tuned for the e",
-      "confidence": 0.6978948061726794,
+      "toAgent": "Visionary",
+      "insight": "Motivator/recursive_decomposition: Recurrent neural networks can approximate any dynamical system — they are universal a",
+      "confidence": 0.762416668610313,
       "synthesizedWith": [
-        "Meta-Agent/analogical_mapping: Quantum tunneling allows particles to pass throug"
+        "Visionary/entropy_reduction: The double-slit experiment demonstrates that observ"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Neuroscientist",
-      "insight": "Motivator/feature_extraction: Recurrent neural networks can approximate any dynamical system — they are universal approx",
-      "confidence": 0.7891224765696517,
+      "toAgent": "Empath",
+      "insight": "Motivator/feature_extraction: The Turing machine is computationally universal — any computation that can be described ca",
+      "confidence": 0.7814877742782989,
       "synthesizedWith": [
-        "Neuroscientist/emergent_property_detection: The hippocampus replays experiences "
+        "Empath/causal_inference: Astrocytes, once thought to be mere support cells, acti"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Wordsmith",
-      "insight": "Empath/structural_analysis: The holographic principle suggests all information in a volume of space can be encoded on it",
-      "confidence": 0.6290021731067307,
+      "toAgent": "Linguist",
+      "insight": "Empath/pattern_recognition: Quantum decoherence typically destroys quantum effects at biological temperatures — but quan",
+      "confidence": 0.6214067313691786,
       "synthesizedWith": [
-        "Wordsmith/entropy_reduction: The cerebellum contains more neurons than all other"
+        "Linguist/feature_extraction: The Chinese Room argument: can a system that manipu"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Explorer",
-      "insight": "Empath/causal_inference: The anthropic principle: the universe's fundamental constants appear fine-tuned for the existen",
-      "confidence": 0.8641459474131951,
+      "toAgent": "Critic",
+      "insight": "Empath/temporal_correlation: Bayesian brain hypothesis: the brain is fundamentally a prediction machine that constantly ",
+      "confidence": 0.7776131822863067,
       "synthesizedWith": [
-        "Explorer/cross_domain_synthesis: Neuroplasticity allows the brain to reorganize "
+        "Critic/emergent_property_detection: Integrated Information Theory (IIT) states c"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
