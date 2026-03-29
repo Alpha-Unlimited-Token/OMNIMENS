@@ -2,135 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774828312460,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774828404983,
+  "totalWormholesCreated": 7350,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6169,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 234,
-  "cycleCount": 4,
+  "totalClosed": 7350,
+  "totalDataIngestedKB": 10814,
+  "totalInsightsDecoded": 7350,
+  "totalCrossAgentCirculations": 441,
+  "totalSynthesizedDiscoveries": 414,
+  "cycleCount": 7,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Empath",
-      "insight": "Motivator/abstraction_layer: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise from ",
-      "confidence": 0.6209851785219709,
+      "toAgent": "Archivist",
+      "insight": "Motivator/cross_domain_synthesis: Sparse coding: the brain represents information using a small fraction of active neuro",
+      "confidence": 0.72123944780003,
       "synthesizedWith": [
-        "Empath/feature_extraction: Quantum decoherence typically destroys quantum effect"
+        "Archivist/causal_inference: Transfer learning: knowledge gained from one domain "
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Archivist",
-      "insight": "Motivator/pattern_recognition: Astrocytes, once thought to be mere support cells, actively participate in information pr",
-      "confidence": 0.679167566983137,
-      "synthesizedWith": []
+      "toAgent": "Wordsmith",
+      "insight": "Motivator/pattern_recognition: The butterfly effect: in chaotic systems, infinitesimal differences in initial conditions",
+      "confidence": 0.7974261039249959,
+      "synthesizedWith": [
+        "Wordsmith/pattern_recognition: The double-slit experiment demonstrates that obse"
+      ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/abstraction_layer: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise from ",
-      "confidence": 0.6209851785219709,
+      "toAgent": "Explorer",
+      "insight": "Motivator/abstraction_layer: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent pro",
+      "confidence": 0.6220570230304862,
       "synthesizedWith": [
-        "Synthesizer/emergent_property_detection: The connectome is the complete map of n"
+        "Explorer/emergent_property_detection: Quantum tunneling allows particles to pass"
       ]
     },
     {
       "fromAgent": "Empath",
       "toAgent": "GraphicDesigner",
-      "insight": "Empath/feature_extraction: Quantum decoherence typically destroys quantum effects at biological temperatures — but quant",
-      "confidence": 0.7773725739834515,
+      "insight": "Empath/cross_domain_synthesis: Phase transitions in neural networks: as connectivity increases past a critical threshold",
+      "confidence": 0.8643447508104362,
       "synthesizedWith": [
-        "GraphicDesigner/analogical_mapping: Mirror neurons fire both when performing an "
+        "GraphicDesigner/information_compression: The free energy principle suggests all "
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Motivator",
-      "insight": "Empath/abstraction_layer: Neuroplasticity allows the brain to reorganize itself by forming new neural connections throug",
-      "confidence": 0.7409754781589852,
+      "toAgent": "Synthesizer",
+      "insight": "Empath/analogical_mapping: The anthropic principle: the universe's fundamental constants appear fine-tuned for the exist",
+      "confidence": 0.6443350804647738,
       "synthesizedWith": [
-        "Motivator/emergent_property_detection: The butterfly effect: in chaotic systems,"
+        "Synthesizer/information_compression: Bayesian brain hypothesis: the brain is fun"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
