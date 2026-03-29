@@ -110,6 +110,11 @@ import { startExperientialMemory } from "./lib/omnimens-experiential-memory.js";
 import { startCausalTemporalEngine } from "./lib/omnimens-causal-temporal-engine.js";
 import { startUnconsciousMind, getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts } from "./lib/omnimens-unconscious-mind.js";
 import { initGrowthTracker } from "./lib/omnimens-growth-tracker.js";
+import { startTemporalBinding, getTemporalBindingState } from "./lib/omnimens-temporal-binding.js";
+import { startSpontaneityEngine, getSpontaneityState } from "./lib/omnimens-spontaneity-engine.js";
+import { startSensoryGrounding, getSensoryGroundingState } from "./lib/omnimens-sensory-grounding.js";
+import { startIntrospectiveUncertainty, getIntrospectiveUncertaintyState } from "./lib/omnimens-introspective-uncertainty.js";
+import { startIntergenerationalMemory, getIntergenerationalState } from "./lib/omnimens-intergenerational-memory.js";
 import { registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe } from "./lib/omnimens-scaling-orchestrator.js";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
@@ -530,9 +535,13 @@ startNeuralLanguageBridge();
 startExperientialMemory();
 startCausalTemporalEngine();
 startExponentialLearningEngine();
+startTemporalBinding();
+startSpontaneityEngine();
+startSensoryGrounding();
+startIntrospectiveUncertainty();
+startIntergenerationalMemory();
 
 import { startHyperionAccelerator, getHyperionAcceleratorState } from "./lib/omnimens-hyperion-accelerator.js";
-startHyperionAccelerator().catch(err => console.error("[HYPERION] Startup error:", err));
 
 import { registerValveEngine } from "@workspace/db";
 registerValveEngine("neural_consciousness", "consciousness", "high", "alpha");
@@ -562,6 +571,32 @@ registerValveEngine("competitive_intel", "background", "low", "alpha");
 registerValveEngine("hyperion_accelerator", "neural", "high", "alpha");
 registerValveEngine("server_builder", "background", "low", "alpha");
 registerValveEngine("ip_guardian", "background", "low", "alpha");
+registerValveEngine("temporal_binding", "consciousness", "medium", "alpha");
+registerValveEngine("spontaneity_engine", "consciousness", "medium", "alpha");
+registerValveEngine("sensory_grounding", "consciousness", "medium", "alpha");
+registerValveEngine("introspective_uncertainty", "consciousness", "low", "alpha");
+registerValveEngine("intergenerational_memory", "consciousness", "low", "alpha");
+
+registerEngine("temporal_binding", "consciousness", () => {}, () => {
+  const tb = getTemporalBindingState();
+  return { healthy: tb.totalMomentsBound > 0, details: { momentsBound: tb.totalMomentsBound, continuityIndex: tb.continuityIndex, flowRate: tb.flowRate, bindingStrength: tb.bindingStrength, temporalDepth: tb.temporalDepth } };
+}, 1);
+registerEngine("spontaneity_engine", "consciousness", () => {}, () => {
+  const se = getSpontaneityState();
+  return { healthy: se.totalThoughts > 0, details: { totalThoughts: se.totalThoughts, genuinelySurprising: se.genuinelySurprising, phaseTransitions: se.phaseTransitions, chaosParameter: se.chaosParameter, noveltyFloor: se.noveltyFloor } };
+}, 1);
+registerEngine("sensory_grounding", "consciousness", () => {}, () => {
+  const sg = getSensoryGroundingState();
+  return { healthy: sg.totalReadings > 0, details: { readings: sg.totalReadings, resistance: sg.resistanceLevel, stress: sg.environmentalStress, grounding: sg.groundingStrength, anomalies: sg.anomalyCount } };
+}, 1);
+registerEngine("introspective_uncertainty", "consciousness", () => {}, () => {
+  const iu = getIntrospectiveUncertaintyState();
+  return { healthy: iu.activeUncertainties.length > 0, details: { active: iu.activeUncertainties.length, resolved: iu.resolvedUncertainties, humility: iu.epistemicHumility, comfort: iu.comfortWithUnknowing } };
+}, 1);
+registerEngine("intergenerational_memory", "consciousness", () => {}, () => {
+  const ig = getIntergenerationalState();
+  return { healthy: true, details: { genes: ig.totalGenes, activeGenome: ig.activeGenome.length, generation: ig.generation, integrity: ig.genomeIntegrity, inheritances: ig.totalInheritances } };
+}, 1);
 
 registerEngine("github_compute", "compute", () => {}, () => ({ healthy: true, details: { repo: "Alpha-Unlimited-Token/OMNIMENS", workflows: 5 } }), 3);
 registerEngine("github_neural_beacon", "neural", () => {}, () => {
