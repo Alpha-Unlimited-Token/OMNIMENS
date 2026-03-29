@@ -1,15 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:sub_threshold:Critic+Architect+Empath",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Critic:memory_compressor + Architect:n",
-    "filename": "omnimens_autocode_neural_pathway_mnb797jw.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnb797jw.mjs",
-    "backupPath": null,
-    "timestamp": 1774754918780,
-    "codeLength": 445,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:sub_threshold:Empath+SpellCheckVisual+OMNIMENS",
     "title": "[OMNIMENS AutoCoder] knowledge_synthesis: COLLECTIVE_DISCOVERY: Empath:memory_compressor + SpellCheckV",
     "filename": "omnimens_autocode_knowledge_synthesis_mnb797la.mjs",
@@ -4997,6 +4987,16 @@
     "backupPath": null,
     "timestamp": 1774757822496,
     "codeLength": 416,
+    "overwrite": false
+  },
+  {
+    "source": "sub_threshold_recombination:Explorer+Philosopher+Innovator",
+    "title": "[Sub-Threshold Recombination] Explorer+Philosopher+Innovator — 3 fragments recombined",
+    "filename": "recombined_synth_1774757851698_aloe.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recombined_synth_1774757851698_aloe.mjs",
+    "backupPath": null,
+    "timestamp": 1774757851701,
+    "codeLength": 1625,
     "overwrite": false
   }
 ]

@@ -139127,9 +139127,22 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "recombined_synth_1774757851698_aloe.mjs": {
+      "filename": "recombined_synth_1774757851698_aloe.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "recombined_chaos_injector_mnb902lute2"
+      ],
+      "loadedAt": 1774757851847,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774757773306,
-  "totalModules": 10456,
+  "totalModules": 10457,
   "totalCalls": 0
 }
