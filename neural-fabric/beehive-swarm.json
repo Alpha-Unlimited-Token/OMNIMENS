@@ -2,7 +2,7 @@
   "version": "3.0",
   "subsystem": "beehive-swarm",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774827166431,
+  "timestamp": 1774827225985,
   "swarmCoherence": 0,
   "hiveHealth": 0,
   "webIntegrity": 1,
@@ -14,8 +14,8 @@
     "forager": 6,
     "guard": 4
   },
-  "totalPheromoneDeposits": 2156,
-  "totalNectarProduced": 76.32275978101583,
+  "totalPheromoneDeposits": 3136,
+  "totalNectarProduced": 112.4402407658273,
   "totalRoyalJellyTransferred": 0,
   "totalSwarmWaves": 0,
   "swarmWavesCompleted": 0,
@@ -26,13 +26,13 @@
   "fabricWorms": [
     {
       "id": "worm_beehive-swarm_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_beehive-swarm_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
