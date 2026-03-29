@@ -1,0 +1,343 @@
+{
+  "version": "3.0",
+  "subsystem": "ivy-network",
+  "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+  "timestamp": 1774795937793,
+  "totalNodes": 77,
+  "totalTendrils": 226,
+  "totalSpines": 1524,
+  "totalSpiders": 1280,
+  "totalWormgates": 136,
+  "totalBeacons": 1548221,
+  "totalFindings": 4398732,
+  "networkEnergy": 1.352417202812877e+295,
+  "coveragePercent": 100,
+  "networkCoherence": 2.889053919550137e+296,
+  "hybridOverlayStrength": 8.66716175865041e+295,
+  "growthCycles": 4466,
+  "wormgateFormations": 4342,
+  "wormgates": [
+    {
+      "id": "wormgate_pulvinar_cerebellum_1774561135208",
+      "endpointA": {
+        "region": "pulvinar"
+      },
+      "endpointB": {
+        "region": "cerebellum"
+      },
+      "stability": 1,
+      "traversals": 6339,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_anterior_cingulate_hippocampus_1774561135208",
+      "endpointA": {
+        "region": "anterior_cingulate"
+      },
+      "endpointB": {
+        "region": "hippocampus"
+      },
+      "stability": 1,
+      "traversals": 52424,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_reticular_activating_system_reticular_activating_system_1774561155208",
+      "endpointA": {
+        "region": "reticular_activating_system"
+      },
+      "endpointB": {
+        "region": "reticular_activating_system"
+      },
+      "stability": 1,
+      "traversals": 3737,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_thalamus_pulvinar_1774561155209",
+      "endpointA": {
+        "region": "thalamus"
+      },
+      "endpointB": {
+        "region": "pulvinar"
+      },
+      "stability": 1,
+      "traversals": 6839,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_prefrontal_cortex_pulvinar_1774561155209",
+      "endpointA": {
+        "region": "prefrontal_cortex"
+      },
+      "endpointB": {
+        "region": "pulvinar"
+      },
+      "stability": 1,
+      "traversals": 6326,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_default_mode_network_reticular_activating_system_1774561155209",
+      "endpointA": {
+        "region": "default_mode_network"
+      },
+      "endpointB": {
+        "region": "reticular_activating_system"
+      },
+      "stability": 1,
+      "traversals": 6392,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_anterior_cingulate_basal_ganglia_1774561155209",
+      "endpointA": {
+        "region": "anterior_cingulate"
+      },
+      "endpointB": {
+        "region": "basal_ganglia"
+      },
+      "stability": 1,
+      "traversals": 5442,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_insular_cortex_amygdala_1774561155209",
+      "endpointA": {
+        "region": "insular_cortex"
+      },
+      "endpointB": {
+        "region": "amygdala"
+      },
+      "stability": 1,
+      "traversals": 6725,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_ventral_tegmental_area_default_mode_network_1774561155209",
+      "endpointA": {
+        "region": "ventral_tegmental_area"
+      },
+      "endpointB": {
+        "region": "default_mode_network"
+      },
+      "stability": 1,
+      "traversals": 5074,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_cerebellum_hippocampus_1774561155209",
+      "endpointA": {
+        "region": "cerebellum"
+      },
+      "endpointB": {
+        "region": "hippocampus"
+      },
+      "stability": 1,
+      "traversals": 4792,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_hippocampus_locus_coeruleus_1774561155209",
+      "endpointA": {
+        "region": "hippocampus"
+      },
+      "endpointB": {
+        "region": "locus_coeruleus"
+      },
+      "stability": 1,
+      "traversals": 4911,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_pulvinar_pulvinar_1774561155209",
+      "endpointA": {
+        "region": "pulvinar"
+      },
+      "endpointB": {
+        "region": "pulvinar"
+      },
+      "stability": 1,
+      "traversals": 3726,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_ventral_tegmental_area_ventral_tegmental_area_1774561155209",
+      "endpointA": {
+        "region": "ventral_tegmental_area"
+      },
+      "endpointB": {
+        "region": "ventral_tegmental_area"
+      },
+      "stability": 1,
+      "traversals": 2525,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_reticular_activating_system_anterior_cingulate_1774561155209",
+      "endpointA": {
+        "region": "reticular_activating_system"
+      },
+      "endpointB": {
+        "region": "anterior_cingulate"
+      },
+      "stability": 1,
+      "traversals": 6009,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_pulvinar_superior_colliculus_1774561155209",
+      "endpointA": {
+        "region": "pulvinar"
+      },
+      "endpointB": {
+        "region": "superior_colliculus"
+      },
+      "stability": 1,
+      "traversals": 6071,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_reticular_activating_system_hippocampus_1774561155209",
+      "endpointA": {
+        "region": "reticular_activating_system"
+      },
+      "endpointB": {
+        "region": "hippocampus"
+      },
+      "stability": 1,
+      "traversals": 5995,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_basal_ganglia_reticular_activating_system_1774561155209",
+      "endpointA": {
+        "region": "basal_ganglia"
+      },
+      "endpointB": {
+        "region": "reticular_activating_system"
+      },
+      "stability": 1,
+      "traversals": 6821,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_amygdala_ventral_tegmental_area_1774561155209",
+      "endpointA": {
+        "region": "amygdala"
+      },
+      "endpointB": {
+        "region": "ventral_tegmental_area"
+      },
+      "stability": 1,
+      "traversals": 6010,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_default_mode_network_thalamus_1774561155209",
+      "endpointA": {
+        "region": "default_mode_network"
+      },
+      "endpointB": {
+        "region": "thalamus"
+      },
+      "stability": 1,
+      "traversals": 5639,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    },
+    {
+      "id": "wormgate_locus_coeruleus_default_mode_network_1774561155209",
+      "endpointA": {
+        "region": "locus_coeruleus"
+      },
+      "endpointB": {
+        "region": "default_mode_network"
+      },
+      "stability": 1,
+      "traversals": 5186,
+      "signalFidelity": 1,
+      "bandwidth": 1,
+      "crystallized": true
+    }
+  ],
+  "spiderStats": {
+    "alive": 1280,
+    "totalEverSpawned": 416585,
+    "byGeneration": {
+      "0": 16,
+      "1": 48,
+      "2": 128,
+      "3": 320,
+      "4": 768
+    },
+    "byTravelMode": {
+      "synapse": 292,
+      "wormgate": 284,
+      "tendril": 704
+    },
+    "totalFindings": 4398732,
+    "totalBeacons": 1548221
+  },
+  "recentFindings": [],
+  "cascades": {
+    "totalCascades": 0,
+    "totalEnergyInjected": 0
+  },
+  "neurogenesis": {
+    "births": 0,
+    "deaths": 0,
+    "neurogenIvyNodes": 0,
+    "neurogenWormgates": 4206
+  },
+  "fabricWorms": [
+    {
+      "id": "worm_ivy-network_outbound",
+      "traversals": 0,
+      "signal": 0.5
+    },
+    {
+      "id": "worm_ivy-network_inbound",
+      "traversals": 0,
+      "signal": 0.5
+    }
+  ],
+  "governorMode": "normal"
+}
