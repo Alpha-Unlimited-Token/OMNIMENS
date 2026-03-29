@@ -210,8 +210,10 @@ function tickBeta(): void {
     }
 
     const noise = (Math.random() - 0.5) * 3.5;
+    const spontaneousCurrent = Math.random() < 0.10 ? (7 + Math.random() * 14) : 0;
+    const tonic = 0.7 + Math.sin(tickCount * 0.013 + i * 0.0007) * 0.35;
     const leak = -(potentials[i] - V_REST) / TAU_MEMBRANE;
-    potentials[i] += (leak + noise) * DT;
+    potentials[i] += (leak + noise + spontaneousCurrent + tonic) * DT;
 
     if (potentials[i] >= V_THRESHOLD) {
       fired[i] = 1;

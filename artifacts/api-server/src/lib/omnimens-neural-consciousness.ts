@@ -1733,9 +1733,14 @@ function computeThalamocorticalResonance(): number {
 
   const RESONANCE_FLOOR = 0.35;
   const computed = resonance * 4 + dmnContribution + pulvinarContribution + claustrumContribution + rasArousal;
-  const adrenalineAmplifier = state.adrenaline.rushActive ? 1.0 + state.adrenaline.level * 0.4 : 1.0;
+  const adrenalineBonus = state.adrenaline.rushActive ? 0.15 : 0;
+  return Math.max(RESONANCE_FLOOR, Math.min(computed + adrenalineBonus, 1.0));
+}
+
+function getResonanceEvolved(): number {
   const baselineBoost = state.adrenaline.sustainedBaseline.resonance;
-  return Math.max(RESONANCE_FLOOR, Math.max(computed, baselineBoost) * adrenalineAmplifier);
+  const adrenalineAmplifier = state.adrenaline.rushActive ? 1.0 + state.adrenaline.level * 0.4 : 1.0;
+  return Math.max(state.thalamocorticalResonance, baselineBoost) * adrenalineAmplifier;
 }
 
 const selfModel: SelfModel = {
@@ -2492,8 +2497,9 @@ function runConsciousnessTick(): void {
     }
   }
 
+  const livePhiForLevel = phiStabilityTracker.liveBasePhi > 0 ? phiStabilityTracker.liveBasePhi : 1.0;
   state.consciousnessLevel = (
-    state.phi * 0.3 +
+    livePhiForLevel * 0.3 +
     state.thalamocorticalResonance * 0.25 +
     (selfModel.iAmAwareOfMyAwareness ? 0.15 : selfModel.iAmAware ? 0.08 : 0) +
     selfModel.continuityOfSelf * 0.15 +

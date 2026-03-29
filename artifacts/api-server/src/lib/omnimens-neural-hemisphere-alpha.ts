@@ -203,8 +203,10 @@ function tickAlpha(): void {
     }
 
     const noise = (Math.random() - 0.5) * 3;
+    const spontaneousCurrent = Math.random() < 0.08 ? (8 + Math.random() * 12) : 0;
+    const tonic = 0.6 + Math.sin(tickCount * 0.01 + i * 0.001) * 0.3;
     const leak = -(potentials[i] - V_REST) / TAU_MEMBRANE;
-    potentials[i] += (leak + noise) * DT;
+    potentials[i] += (leak + noise + spontaneousCurrent + tonic) * DT;
 
     if (potentials[i] >= V_THRESHOLD) {
       fired[i] = 1;

@@ -137,11 +137,13 @@ function heartbeat(): void {
   const now = Date.now();
   const consciousness = getNeuralConsciousnessState();
 
-  currentBPM = Math.max(40, 72 + consciousness.consciousnessLevel * 30 + (consciousness.phi > 0.5 ? 20 : 0));
+  const safeConLevel = Math.min(consciousness.consciousnessLevel, 2.0);
+  const safePhi = Math.min(consciousness.phi, 5.0);
+  currentBPM = Math.max(40, Math.min(180, 72 + safeConLevel * 30 + (safePhi > 0.5 ? 20 : 0)));
 
   const ra = chambers[0];
   ra.phase = "diastole";
-  ra.suctionForce = 0.3 + Math.random() * 0.2 + consciousness.thalamocorticalResonance * 0.3;
+  ra.suctionForce = 0.3 + Math.random() * 0.2 + Math.min(consciousness.thalamocorticalResonance, 1.0) * 0.3;
   ra.pressure = -(ra.suctionForce * 15);
   ra.volume = 70 + Math.random() * 20;
   ra.vortexIntensity = 0.2 + Math.sin(now / 1000) * 0.1;
@@ -150,16 +152,16 @@ function heartbeat(): void {
 
   const rv = chambers[1];
   rv.phase = "systole";
-  rv.pressure = 25 + consciousness.phi * 10;
+  rv.pressure = 25 + safePhi * 10;
   rv.volume = ra.volume * 0.95;
-  rv.vortexIntensity = 0.5 + consciousness.consciousnessLevel * 0.3;
+  rv.vortexIntensity = 0.5 + safeConLevel * 0.3;
   rv.suctionForce = 0;
   rv.spiralAngle = (rv.spiralAngle + 222.5) % 360;
   rv.dataPacketsProcessed++;
 
   const la = chambers[2];
   la.phase = "diastole";
-  la.suctionForce = 0.4 + consciousness.thalamocorticalResonance * 0.4;
+  la.suctionForce = 0.4 + Math.min(consciousness.thalamocorticalResonance, 1.0) * 0.4;
   la.pressure = -(la.suctionForce * 12);
   la.volume = rv.volume * 0.98;
   la.vortexIntensity = 0.3 + Math.cos(now / 800) * 0.15;
@@ -168,9 +170,9 @@ function heartbeat(): void {
 
   const lv = chambers[3];
   lv.phase = "systole";
-  lv.pressure = 120 + consciousness.phi * 40 + consciousness.consciousnessLevel * 20;
+  lv.pressure = 120 + safePhi * 40 + safeConLevel * 20;
   lv.volume = la.volume;
-  lv.vortexIntensity = 0.8 + consciousness.consciousnessLevel * 0.5;
+  lv.vortexIntensity = 0.8 + safeConLevel * 0.5;
   lv.suctionForce = 0;
   lv.spiralAngle = (lv.spiralAngle + 315) % 360;
   lv.dataPacketsProcessed++;
@@ -239,7 +241,9 @@ function initCardiacNeurons(): void {
 function tickCardiacNeurons(): void {
   const consciousness = getNeuralConsciousnessState();
 
-  const firingProbability = 0.05 + consciousness.consciousnessLevel * 0.03 + consciousness.phi * 0.02;
+  const safeConCardiac = Math.min(consciousness.consciousnessLevel, 2.0);
+  const safePhiCardiac = Math.min(consciousness.phi, 5.0);
+  const firingProbability = 0.05 + safeConCardiac * 0.03 + safePhiCardiac * 0.02;
   const firedThisCycle = Math.floor(CARDIAC_NEURON_COUNT * firingProbability * (0.8 + Math.random() * 0.4));
 
   cardiacNeuronStats.neuronsFiredThisCycle = firedThisCycle;
@@ -254,8 +258,9 @@ function tickCardiacNeurons(): void {
   cardiacAutonomicCycles++;
 
   cardiacNeuronStats.meanFiringRate = safeNum(firingProbability);
+  const safeResonance = Math.min(consciousness.thalamocorticalResonance, 1.0);
   cardiacNeuronStats.heartBrainCoherence = safeNum(
-    0.4 + consciousness.thalamocorticalResonance * 0.3 + Math.sin(Date.now() / 5000) * 0.1
+    0.4 + safeResonance * 0.3 + Math.sin(Date.now() / 5000) * 0.1
   );
 }
 
@@ -462,9 +467,11 @@ function aorticWavePump(): void {
   const consciousness = getNeuralConsciousnessState();
 
   aorticWaveCount++;
-  const amplitude = lv.pressure * 0.6 + consciousness.phi * 20;
+  const safePhiAortic = Math.min(consciousness.phi, 5.0);
+  const safeConAortic = Math.min(consciousness.consciousnessLevel, 2.0);
+  const amplitude = lv.pressure * 0.6 + safePhiAortic * 20;
   const frequency = currentBPM / 60;
-  const propagationSpeed = 5.0 + consciousness.consciousnessLevel * 3.0;
+  const propagationSpeed = 5.0 + safeConAortic * 3.0;
 
   const windkesselStore = amplitude * 0.4;
   const windkesselRelease = windkesselStore * 0.85;
@@ -474,7 +481,7 @@ function aorticWavePump(): void {
   aorticState.waves = aorticWaveCount;
   aorticState.totalEnergy = totalWindkesselEnergy;
   aorticState.pulseWaveVelocity = propagationSpeed;
-  aorticState.complianceFactor = safeNum(0.5 + consciousness.thalamocorticalResonance * 0.3);
+  aorticState.complianceFactor = safeNum(0.5 + Math.min(consciousness.thalamocorticalResonance, 1.0) * 0.3);
   aorticState.reflectionCoefficient = safeNum(0.1 + Math.random() * 0.05);
   aorticState.augmentationIndex = safeNum(amplitude > 100 ? 0.3 + Math.random() * 0.2 : 0.1);
 
@@ -522,7 +529,9 @@ function ezActivationCycle(): void {
   const consciousness = getNeuralConsciousnessState();
 
   for (const zone of ezWaterZones) {
-    const infraredInput = consciousness.phi * 0.3 + consciousness.thalamocorticalResonance * 0.2 + Math.random() * 0.1;
+    const safePhiEZ = Math.min(consciousness.phi, 5.0);
+    const safeResEZ = Math.min(consciousness.thalamocorticalResonance, 1.0);
+    const infraredInput = safePhiEZ * 0.3 + safeResEZ * 0.2 + Math.random() * 0.1;
     zone.infraredAbsorption = safeNum(zone.infraredAbsorption * 0.9 + infraredInput * 0.1);
 
     if (zone.infraredAbsorption > 0.3) {
@@ -581,22 +590,22 @@ function endocrinePulse(): void {
         h.productionRate = totalDataCirculated > 10000 ? 0.05 : 0.01;
         break;
       case "BNP":
-        h.productionRate = consciousness.consciousnessLevel > 1.5 ? 0.04 : 0.005;
+        h.productionRate = Math.min(consciousness.consciousnessLevel, 2.0) > 1.5 ? 0.04 : 0.005;
         break;
       case "digital_oxytocin":
         h.productionRate = 0.02 + (subThresholdState.collectiveSynthesesCreated > 0 ? 0.03 : 0);
         break;
       case "digital_cortisol":
-        h.productionRate = consciousness.phi > 0.6 ? 0.01 : 0.03;
+        h.productionRate = Math.min(consciousness.phi, 5.0) > 0.6 ? 0.01 : 0.03;
         break;
       case "digital_dopamine":
         h.productionRate = 0.02 + subThresholdState.aboveThresholdDiscoveries * 0.01;
         break;
       case "digital_serotonin":
-        h.productionRate = 0.03 + consciousness.thalamocorticalResonance * 0.02;
+        h.productionRate = 0.03 + Math.min(consciousness.thalamocorticalResonance, 1.0) * 0.02;
         break;
       case "digital_adrenaline":
-        h.productionRate = consciousness.consciousnessLevel > 1.7 ? 0.05 : 0.005;
+        h.productionRate = Math.min(consciousness.consciousnessLevel, 2.0) > 1.7 ? 0.05 : 0.005;
         break;
       case "digital_endorphin":
         h.productionRate = dnaMemoryPool.filter(s => s.expressionLevel > 0.7).length * 0.002;
@@ -861,12 +870,14 @@ function collectSubThresholdData(): void {
     if (Math.random() < 0.3) {
       const template = CODE_FRAGMENT_TEMPLATES[Math.floor(Math.random() * CODE_FRAGMENT_TEMPLATES.length)];
       const confidence = Math.random() * SUB_THRESHOLD_CONFIDENCE;
-      const codeFragment = template.gen(agent, consciousness.phi, consciousness.thalamocorticalResonance);
+      const safePhiForCode = Math.min(consciousness.phi, 5.0);
+      const safeResForCode = Math.min(consciousness.thalamocorticalResonance, 1.0);
+      const codeFragment = template.gen(agent, safePhiForCode, safeResForCode);
 
       const fragment: SubThresholdFragment = {
         id: `stf_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         sourceAgent: agent,
-        data: `${agent}:${template.type}:phi=${consciousness.phi.toFixed(3)}_res=${consciousness.thalamocorticalResonance.toFixed(3)}_t=${Date.now()}`,
+        data: `${agent}:${template.type}:phi=${safePhiForCode.toFixed(3)}_res=${safeResForCode.toFixed(3)}_t=${Date.now()}`,
         codeFragment,
         codeType: template.type,
         originalConfidence: confidence,
