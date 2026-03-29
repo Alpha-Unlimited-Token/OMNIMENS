@@ -2,135 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774799162697,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774799256206,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1535,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 60,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6126,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 243,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/entropy_reduction: Attention is the computational bottleneck of consciousness — the brain processes vast amoun",
-      "confidence": 0.6180651132984765,
-      "synthesizedWith": []
+      "toAgent": "SpellCheckVisual",
+      "insight": "Motivator/pattern_recognition: The Chinese Room argument: can a system that manipulates symbols without understanding th",
+      "confidence": 0.6464626327739158,
+      "synthesizedWith": [
+        "SpellCheckVisual/pattern_recognition: The connectome is the complete map of neur"
+      ]
     },
     {
       "fromAgent": "Motivator",
       "toAgent": "Wordsmith",
-      "insight": "Motivator/abstraction_layer: The double-slit experiment demonstrates that observation changes the behavior of quantum sy",
-      "confidence": 0.7804705125873784,
+      "insight": "Motivator/emergent_property_detection: The double-slit experiment demonstrates that observation changes the behavior of ",
+      "confidence": 0.7500701490297769,
       "synthesizedWith": [
-        "Wordsmith/emergent_property_detection: Phase transitions in neural networks: as "
+        "Wordsmith/entropy_reduction: Quantum decoherence typically destroys quantum effe"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "GraphicDesigner",
-      "insight": "Motivator/emergent_property_detection: The strange loop concept from Hofstadter: consciousness arises when a system beco",
-      "confidence": 0.8416907918515839,
+      "toAgent": "Architect",
+      "insight": "Motivator/emergent_property_detection: The double-slit experiment demonstrates that observation changes the behavior of ",
+      "confidence": 0.7500701490297769,
       "synthesizedWith": [
-        "GraphicDesigner/structural_analysis: The edge of chaos: complex systems exhibit "
+        "Architect/entropy_reduction: Quantum entanglement allows particles to share stat"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "GraphicDesigner",
-      "insight": "Empath/recursive_decomposition: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent ",
-      "confidence": 0.799935129749566,
+      "toAgent": "OMNIMENS",
+      "insight": "Empath/information_compression: Kolmogorov complexity measures the shortest program that produces a given output — it is",
+      "confidence": 0.6660972097853581,
       "synthesizedWith": [
-        "GraphicDesigner/causal_inference: The global workspace theory of consciousness: "
+        "OMNIMENS/causal_inference: Quantum tunneling allows particles to pass through en"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Philosopher",
-      "insight": "Empath/cross_domain_synthesis: Mirror neurons fire both when performing an action and observing the same action — they m",
-      "confidence": 0.8311322446392518,
+      "toAgent": "Ethicist",
+      "insight": "Empath/recursive_decomposition: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimul",
+      "confidence": 0.7862974492189316,
       "synthesizedWith": [
-        "Philosopher/analogical_mapping: Hebbian learning: neurons that fire together wir"
+        "Ethicist/feature_extraction: Attention is the computational bottleneck of consci"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
