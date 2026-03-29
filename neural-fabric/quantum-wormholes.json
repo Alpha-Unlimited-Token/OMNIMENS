@@ -2,135 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774798109100,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774798202380,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1569,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 61,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6176,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 232,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/entropy_reduction: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can theoret",
-      "confidence": 0.635916964239959,
+      "toAgent": "Visionary",
+      "insight": "Motivator/recursive_decomposition: Reservoir computing shows that even random neural networks can perform computation if",
+      "confidence": 0.8206029115434307,
       "synthesizedWith": [
-        "OMNIMENS/information_compression: Recurrent neural networks can approximate any "
+        "Visionary/information_compression: The anthropic principle: the universe's funda"
       ]
     },
     {
       "fromAgent": "Motivator",
       "toAgent": "Synthesizer",
-      "insight": "Motivator/emergent_property_detection: Sparse coding: the brain represents information using a small fraction of active ",
-      "confidence": 0.7578120920237938,
+      "insight": "Motivator/recursive_decomposition: Reservoir computing shows that even random neural networks can perform computation if",
+      "confidence": 0.8206029115434307,
       "synthesizedWith": [
-        "Synthesizer/structural_analysis: Emergence: complex behaviors arise from simple "
+        "Synthesizer/analogical_mapping: The default mode network activates when the brai"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Philosopher",
-      "insight": "Motivator/pattern_recognition: The mathematical universe hypothesis: all structures that exist mathematically also exist",
-      "confidence": 0.649792009553476,
+      "toAgent": "Critic",
+      "insight": "Motivator/causal_inference: The anthropic principle: the universe's fundamental constants appear fine-tuned for the exis",
+      "confidence": 0.7368993183103283,
       "synthesizedWith": [
-        "Philosopher/causal_inference: The mathematical universe hypothesis: all structur"
+        "Critic/emergent_property_detection: Kolmogorov complexity measures the shortest "
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Synthesizer",
-      "insight": "Empath/feature_extraction: Sparse coding: the brain represents information using a small fraction of active neurons at a",
-      "confidence": 0.6495924967866804,
-      "synthesizedWith": []
+      "toAgent": "Explorer",
+      "insight": "Empath/pattern_recognition: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum computations ",
+      "confidence": 0.6061329998440887,
+      "synthesizedWith": [
+        "Explorer/emergent_property_detection: Kolmogorov complexity measures the shortes"
+      ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Philosopher",
-      "insight": "Empath/analogical_mapping: The connectome is the complete map of neural connections — the human connectome project aims ",
-      "confidence": 0.6249118581136874,
+      "toAgent": "Linguist",
+      "insight": "Empath/information_compression: Gödel's incompleteness theorems prove that any consistent formal system powerful enough ",
+      "confidence": 0.7115225324153595,
       "synthesizedWith": [
-        "Philosopher/entropy_reduction: Phase transitions in neural networks: as connecti"
+        "Linguist/information_compression: The edge of chaos: complex systems exhibit the"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
