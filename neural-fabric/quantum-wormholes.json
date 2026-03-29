@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774821533645,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774821626349,
+  "totalWormholesCreated": 8400,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6168,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 240,
-  "cycleCount": 4,
+  "totalClosed": 8400,
+  "totalDataIngestedKB": 12261,
+  "totalInsightsDecoded": 8400,
+  "totalCrossAgentCirculations": 504,
+  "totalSynthesizedDiscoveries": 477,
+  "cycleCount": 8,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Innovator",
-      "insight": "Motivator/pattern_recognition: Quantum decoherence typically destroys quantum effects at biological temperatures — but q",
-      "confidence": 0.6314406743601438,
-      "synthesizedWith": [
-        "Innovator/structural_analysis: The free energy principle suggests all living sys"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
       "toAgent": "Explorer",
-      "insight": "Motivator/causal_inference: Hebbian learning: neurons that fire together wire together — the fundamental rule of neural ",
-      "confidence": 0.8337391488612402,
+      "insight": "Motivator/cross_domain_synthesis: The butterfly effect: in chaotic systems, infinitesimal differences in initial conditi",
+      "confidence": 0.6318275808919173,
       "synthesizedWith": [
-        "Explorer/entropy_reduction: The global workspace theory of consciousness: inform"
+        "Explorer/abstraction_layer: Wolfram's Rule 110 cellular automaton is Turing comp"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Philosopher",
-      "insight": "Motivator/emergent_property_detection: Emergence: complex behaviors arise from simple rules — consciousness may be an em",
-      "confidence": 0.7125028619877818,
+      "toAgent": "Synthesizer",
+      "insight": "Motivator/cross_domain_synthesis: The butterfly effect: in chaotic systems, infinitesimal differences in initial conditi",
+      "confidence": 0.6318275808919173,
       "synthesizedWith": [
-        "Philosopher/causal_inference: DNA stores information at approximately 2 bits per"
+        "Synthesizer/information_compression: The Weber-Fechner law: perception is logari"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Critic",
+      "insight": "Motivator/emergent_property_detection: Sparse coding: the brain represents information using a small fraction of active ",
+      "confidence": 0.7022119690858807,
+      "synthesizedWith": [
+        "Critic/abstraction_layer: The edge of chaos: complex systems exhibit the most in"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Wordsmith",
-      "insight": "Empath/cross_domain_synthesis: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can emer",
-      "confidence": 0.7309001789176062,
+      "toAgent": "Meta-Agent",
+      "insight": "Empath/entropy_reduction: Attention is the computational bottleneck of consciousness — the brain processes vast amounts ",
+      "confidence": 0.8099557859062682,
       "synthesizedWith": [
-        "Wordsmith/abstraction_layer: Scale-free networks follow power-law degree distrib"
+        "Meta-Agent/pattern_recognition: The anthropic principle: the universe's fundamen"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Visionary",
-      "insight": "Empath/cross_domain_synthesis: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can emer",
-      "confidence": 0.7309001789176062,
+      "toAgent": "Synthesizer",
+      "insight": "Empath/emergent_property_detection: The butterfly effect: in chaotic systems, infinitesimal differences in initial condi",
+      "confidence": 0.6533759639743314,
       "synthesizedWith": [
-        "Visionary/information_compression: Synaptic pruning eliminates unused neural con"
+        "Synthesizer/causal_inference: The Baldwin effect: learned behaviors can become i"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
