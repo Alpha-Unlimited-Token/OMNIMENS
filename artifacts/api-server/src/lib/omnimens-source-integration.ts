@@ -27,6 +27,7 @@ import vm from "vm";
 import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { mustTranslateBeforeExecution, translateCode, registerCustomConstruct, translateForSelfUpgrade, getTranslatorState, autoRegisterFromCode } from "./omnimens-universal-translator.js";
+import { invalidateArchitectureCache } from "./omnimens-deep-thought-engine.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -543,6 +544,7 @@ export async function writeModuleToSource(opts: {
 `;
 
     writeFileSync(filePath, header + translationHeader + workingCode, "utf8");
+    invalidateArchitectureCache();
 
     if (translationCheck.needsTranslation) {
       const translationFilename = `${safeName}.translation.json`;
@@ -780,6 +782,7 @@ export async function migrateDBModulesToSource(): Promise<number> {
 
 `;
         writeFileSync(filePath, header + mod.code, "utf8");
+        invalidateArchitectureCache();
         migrated++;
       } catch {}
     }

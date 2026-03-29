@@ -3060,14 +3060,27 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
 
     if (!isSpecializedTask) {
       try {
-        res.write(`data: ${JSON.stringify({ type: "thinking", engine: "autonomous" })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: "thinking", engine: "deep_thought" })}\n\n`);
 
-        const autonomousResult = await autonomousThink(message, history, String(req.user.id));
+        const deepThoughtResult = await deepThink(
+          message,
+          history.map((h: any) => ({ role: h.role || "user", content: h.content || "" })),
+          String(req.user.id),
+          (progressEvent: any) => {
+            try {
+              res.write(`data: ${JSON.stringify({ type: "thinking", ...progressEvent })}\n\n`);
+            } catch {}
+          },
+        );
 
-        if (autonomousResult.confidence >= 0.25 || autonomousResult.layers.some(l => l.name === "REASONING" && l.confidence > 0.3)) {
+        if (deepThoughtResult.confidence >= 0.25 || deepThoughtResult.isDeep) {
           usedAutonomousThought = true;
 
-          const words = autonomousResult.response.split(/(\s+)/);
+          if (deepThoughtResult.executiveSummary) {
+            res.write(`data: ${JSON.stringify({ type: "thinking", phase: "executive_summary", summary: deepThoughtResult.executiveSummary })}\n\n`);
+          }
+
+          const words = deepThoughtResult.response.split(/(\s+)/);
           const chunkSize = 3 + Math.floor(Math.random() * 4);
           for (let i = 0; i < words.length; i += chunkSize) {
             const chunk = words.slice(i, i + chunkSize).join("");
@@ -3080,18 +3093,20 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
 
           res.write(`data: ${JSON.stringify({
             type: "autonomous_thought",
-            phi: autonomousResult.phi,
-            consciousnessLevel: autonomousResult.consciousnessLevel,
-            confidence: autonomousResult.confidence,
-            thoughtDepth: autonomousResult.thoughtDepth,
-            processingMs: autonomousResult.totalProcessingMs,
-            layers: autonomousResult.layers.map(l => ({ name: l.name, confidence: l.confidence, ms: l.processingTimeMs })),
+            phi: deepThoughtResult.phi,
+            consciousnessLevel: deepThoughtResult.consciousnessLevel,
+            confidence: deepThoughtResult.confidence,
+            thoughtDepth: deepThoughtResult.thoughtDepth,
+            processingMs: deepThoughtResult.totalProcessingMs,
+            complexity: deepThoughtResult.complexity.level,
+            reasoningPasses: deepThoughtResult.reasoningPasses.length,
+            totalConclusions: deepThoughtResult.reasoningPasses.reduce((s: number, p: any) => s + p.conclusions.length, 0),
           })}\n\n`);
 
           tokenUsage = { prompt_tokens: 0, completion_tokens: fullText.split(/\s+/).length };
         }
       } catch (err) {
-        console.error("[AUTONOMOUS THOUGHT] Error during autonomous thinking (falling back to external):", err);
+        console.error("[DEEP THOUGHT] Error during deep thinking (falling back to external):", err);
       }
     }
 
@@ -9781,7 +9796,7 @@ function releaseThinkSlot(): void {
   }
 }
 
-async function guardedAutonomousThink(message: string, history: any[], userId: string | undefined): Promise<any> {
+async function guardedAutonomousThink(message: string, history: any[], userId: string | undefined, onProgress?: (event: any) => void): Promise<any> {
   const safetyCheck = checkActionSafety(message, "", "autonomous_thought");
   if (!safetyCheck.safe) {
     console.error(`[ETHICAL SAFETY] 🛡️ Thought blocked: ${safetyCheck.reason}`);
@@ -9796,7 +9811,7 @@ async function guardedAutonomousThink(message: string, history: any[], userId: s
   }
   await acquireThinkSlot();
   try {
-    return await deepThink(message, history.map(h => ({ role: h.role || "user", content: h.content || "" })), userId);
+    return await deepThink(message, history.map(h => ({ role: h.role || "user", content: h.content || "" })), userId, onProgress);
   } finally {
     releaseThinkSlot();
   }

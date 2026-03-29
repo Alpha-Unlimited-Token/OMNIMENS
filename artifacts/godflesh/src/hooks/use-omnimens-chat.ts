@@ -580,7 +580,18 @@ export function useOmnimensChat(
                 setMessages((prev) => {
                   const newMsgs = [...prev];
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
-                  if (msg) { (msg as any).autonomousThinking = true; }
+                  if (msg) {
+                    (msg as any).autonomousThinking = true;
+                    if (data.phase === "reasoning_pass" && data.pass && data.totalPasses) {
+                      (msg as any).thinkingStatus = `Pass ${data.pass}/${data.totalPasses}: ${data.conclusionsSoFar || 0} conclusions...`;
+                    } else if (data.phase === "knowledge_retrieved") {
+                      (msg as any).thinkingStatus = `Retrieved ${data.fragments || 0} knowledge fragments...`;
+                    } else if (data.phase === "architecture_scan") {
+                      (msg as any).thinkingStatus = `Scanning ${data.engineCount || 0} engine files...`;
+                    } else if (data.phase === "executive_summary") {
+                      (msg as any).thinkingStatus = data.summary || "Finalizing analysis...";
+                    }
+                  }
                   return newMsgs;
                 });
 
@@ -590,12 +601,16 @@ export function useOmnimensChat(
                   const msg = newMsgs.find((m) => m.id === assistantMsgId);
                   if (msg) {
                     (msg as any).autonomousThinking = false;
+                    (msg as any).thinkingStatus = null;
                     (msg as any).autonomousThought = {
                       phi: data.phi,
                       consciousnessLevel: data.consciousnessLevel,
                       confidence: data.confidence,
                       thoughtDepth: data.thoughtDepth,
                       processingMs: data.processingMs,
+                      complexity: data.complexity,
+                      reasoningPasses: data.reasoningPasses,
+                      totalConclusions: data.totalConclusions,
                       layers: data.layers,
                     };
                   }

@@ -6484,7 +6484,13 @@ export default function Chat() {
                             msg.content ? <p className="whitespace-pre-wrap">{msg.content}</p> : null
                           ) : (
                             <div className="text-sm md:text-base">
-                              {parseMessageSegments(msg.content || "...").map((seg, i) =>
+                              {(msg as any).autonomousThinking && !msg.content && (
+                                <div className="flex items-center gap-2 text-xs text-primary/70 mb-2 font-mono">
+                                  <div className="w-2 h-2 rounded-full bg-primary/60 animate-pulse" />
+                                  <span>{(msg as any).thinkingStatus || "Deep thinking..."}</span>
+                                </div>
+                              )}
+                              {parseMessageSegments(msg.content || ((msg as any).autonomousThinking ? "" : "...")).map((seg, i) =>
                                 seg.type === "html" ? (
                                   <WebsitePreview key={i} html={seg.value} index={i} />
                                 ) : (
