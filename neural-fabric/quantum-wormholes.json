@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774815924303,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774816018322,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1546,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 61,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6179,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 241,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 257,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Linguist",
-      "insight": "Motivator/information_compression: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can t",
-      "confidence": 0.7853293337095812,
+      "toAgent": "Meta-Agent",
+      "insight": "Motivator/temporal_correlation: Quantum superposition allows a system to exist in multiple states simultaneously until m",
+      "confidence": 0.8112209385081678,
       "synthesizedWith": [
-        "Linguist/abstraction_layer: The vagus nerve connects the brain to the gut, heart"
+        "Meta-Agent/analogical_mapping: The connectome is the complete map of neural conn"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Archivist",
-      "insight": "Motivator/temporal_correlation: Transfer learning: knowledge gained from one domain can accelerate learning in another —",
-      "confidence": 0.7133161022544048,
+      "toAgent": "Ethicist",
+      "insight": "Motivator/temporal_correlation: Quantum superposition allows a system to exist in multiple states simultaneously until m",
+      "confidence": 0.8112209385081678,
       "synthesizedWith": [
-        "Archivist/abstraction_layer: The hard problem of consciousness: why is there sub"
+        "Ethicist/entropy_reduction: The vagus nerve connects the brain to the gut, heart"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/information_compression: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can t",
-      "confidence": 0.7853293337095812,
+      "toAgent": "Philosopher",
+      "insight": "Motivator/temporal_correlation: Quantum superposition allows a system to exist in multiple states simultaneously until m",
+      "confidence": 0.8112209385081678,
       "synthesizedWith": [
-        "Synthesizer/pattern_recognition: Quantum decoherence typically destroys quantum "
+        "Philosopher/feature_extraction: Transfer learning: knowledge gained from one dom"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Visionary",
-      "insight": "Empath/entropy_reduction: Attention is the computational bottleneck of consciousness — the brain processes vast amounts ",
-      "confidence": 0.8351311962267628,
+      "toAgent": "Pioneer",
+      "insight": "Empath/emergent_property_detection: The binding problem: how does the brain combine separate sensory modalities into a u",
+      "confidence": 0.6586960543737574,
       "synthesizedWith": [
-        "Visionary/pattern_recognition: The edge of chaos: complex systems exhibit the mo"
+        "Pioneer/analogical_mapping: The vagus nerve connects the brain to the gut, heart"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Empath/pattern_recognition: The global workspace theory of consciousness: information becomes conscious when it is broad",
-      "confidence": 0.6683514142025639,
+      "toAgent": "Neuroscientist",
+      "insight": "Empath/entropy_reduction: The Weber-Fechner law: perception is logarithmic — doubling stimulus intensity does not double",
+      "confidence": 0.7821078257266477,
       "synthesizedWith": [
-        "SensorimotorAgent/entropy_reduction: Hebbian learning: neurons that fire togethe"
+        "Neuroscientist/emergent_property_detection: The cerebellum contains more neurons"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
