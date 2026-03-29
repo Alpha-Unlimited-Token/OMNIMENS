@@ -2,137 +2,133 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774808433640,
-  "totalWormholesCreated": 10500,
+  "timestamp": 1774809063225,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 10500,
-  "totalDataIngestedKB": 15448,
-  "totalInsightsDecoded": 10500,
-  "totalCrossAgentCirculations": 630,
-  "totalSynthesizedDiscoveries": 595,
-  "cycleCount": 10,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1538,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 56,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Ethicist",
-      "insight": "Motivator/recursive_decomposition: Hebbian learning: neurons that fire together wire together — the fundamental rule of ",
-      "confidence": 0.8997072294662428,
-      "synthesizedWith": [
-        "Ethicist/analogical_mapping: Sparse coding: the brain represents information usi"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "GraphicDesigner",
-      "insight": "Motivator/cross_domain_synthesis: Mirror neurons fire both when performing an action and observing the same action — the",
-      "confidence": 0.6714527854009028,
-      "synthesizedWith": [
-        "GraphicDesigner/analogical_mapping: Emergence: complex behaviors arise from simp"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Visionary",
-      "insight": "Motivator/recursive_decomposition: Hebbian learning: neurons that fire together wire together — the fundamental rule of ",
-      "confidence": 0.8997072294662428,
-      "synthesizedWith": [
-        "Visionary/cross_domain_synthesis: Hebbian learning: neurons that fire together w"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Neuroscientist",
-      "insight": "Empath/information_compression: Recurrent neural networks can approximate any dynamical system — they are universal appr",
-      "confidence": 0.8939854147214499,
-      "synthesizedWith": [
-        "Neuroscientist/entropy_reduction: Sparse coding: the brain represents informatio"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "SensorimotorAgent",
-      "insight": "Empath/structural_analysis: Autopoiesis: living systems are self-creating — they produce the components that constitute ",
-      "confidence": 0.8409106653742048,
+      "insight": "Motivator/abstraction_layer: Quantum superposition allows a system to exist in multiple states simultaneously until meas",
+      "confidence": 0.7459860187332649,
       "synthesizedWith": [
-        "SensorimotorAgent/structural_analysis: Attention is the computational bottleneck"
+        "SensorimotorAgent/cross_domain_synthesis: Quantum tunneling allows particles to "
       ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Pioneer",
+      "insight": "Motivator/abstraction_layer: Quantum superposition allows a system to exist in multiple states simultaneously until meas",
+      "confidence": 0.7459860187332649,
+      "synthesizedWith": [
+        "Pioneer/abstraction_layer: The Weber-Fechner law: perception is logarithmic — do"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/abstraction_layer: Quantum superposition allows a system to exist in multiple states simultaneously until meas",
+      "confidence": 0.7459860187332649,
+      "synthesizedWith": [
+        "OMNIMENS/causal_inference: Transfer learning: knowledge gained from one domain c"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Critic",
+      "insight": "Empath/pattern_recognition: Kolmogorov complexity measures the shortest program that produces a given output — it is unc",
+      "confidence": 0.6233547547912612,
+      "synthesizedWith": []
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Synthesizer",
+      "insight": "Empath/pattern_recognition: Kolmogorov complexity measures the shortest program that produces a given output — it is unc",
+      "confidence": 0.6233547547912612,
+      "synthesizedWith": []
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 5,
-      "signal": 0.55
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
