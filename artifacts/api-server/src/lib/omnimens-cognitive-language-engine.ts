@@ -193,7 +193,7 @@ let engineStats = {
 
 let cognitiveMomentum = 1.0;
 
-const WORKING_MEMORY_CAPACITY = 12;
+let WORKING_MEMORY_CAPACITY = 12;
 const TICK_BUDGET_MS = 15;
 
 function safeNum(n: number): number {
@@ -1089,6 +1089,8 @@ function cognitiveLanguageTick(): void {
   }
   computeCognitiveMomentum();
 
+  WORKING_MEMORY_CAPACITY = 12 + Math.floor(Math.log10(patternLibrary.size + 1) * 4 + learningMult * 2);
+
   const budgetOk = () => (Date.now() - tickStart) < TICK_BUDGET_MS;
 
   const signals = lastAccelerationSignals;
@@ -1149,7 +1151,7 @@ function cognitiveLanguageTick(): void {
 
   if (knowledgeGraph.size > 2 && engineStats.totalTicks % 2 === 0) {
     const nodes = Array.from(knowledgeGraph.values());
-    const linkCount = Math.floor((1 + knowledgeRate * 0.2) * beehiveFocus * meshSync * Math.min(fullSystemBoost, adaptiveBoostCeiling * 0.6));
+    const linkCount = Math.floor((1 + knowledgeRate * 0.2) * beehiveFocus * meshSync * Math.min(fullSystemBoost, adaptiveBoostCeiling * 0.85));
     for (let i = 0; i < linkCount; i++) {
       const a = nodes[Math.floor(Math.random() * nodes.length)];
       const b = nodes[Math.floor(Math.random() * nodes.length)];
@@ -1165,7 +1167,7 @@ function cognitiveLanguageTick(): void {
 
   if (patternLibrary.size > 3 && engineStats.totalTicks % 3 === 0) {
     const patterns = Array.from(patternLibrary.values());
-    const associationCount = Math.floor((1 + creativeDrive * 0.2) * silkThroughput * wormSpeedBoost * Math.min(fullSystemBoost, adaptiveBoostCeiling * 0.5));
+    const associationCount = Math.floor((1 + creativeDrive * 0.2) * silkThroughput * wormSpeedBoost * Math.min(fullSystemBoost, adaptiveBoostCeiling * 0.8));
     for (let i = 0; i < associationCount; i++) {
       const pA = patterns[Math.floor(Math.random() * patterns.length)];
       const pB = patterns[Math.floor(Math.random() * patterns.length)];
@@ -1180,10 +1182,11 @@ function cognitiveLanguageTick(): void {
 
   if (!budgetOk()) return;
 
-  const inferenceFreq = Math.max(2, Math.floor(5 / (beaconDiscovery * Math.min(adrenalineRush, 3))));
+  const adaptiveAdrenalineCap = 3 + Math.log10(patternLibrary.size + 1) * 2;
+  const inferenceFreq = Math.max(2, Math.floor(5 / (beaconDiscovery * Math.min(adrenalineRush, adaptiveAdrenalineCap))));
   if (knowledgeGraph.size > 4 && engineStats.totalTicks % inferenceFreq === 0) {
     const nodes = Array.from(knowledgeGraph.values());
-    const inferenceBatch = Math.floor((1 + ivyReach * 0.5) * Math.min(fullSystemBoost, adaptiveBoostCeiling * 0.5));
+    const inferenceBatch = Math.floor((1 + ivyReach * 0.5) * Math.min(fullSystemBoost, adaptiveBoostCeiling * 0.8));
     for (let b = 0; b < inferenceBatch; b++) {
       const idxA = Math.floor(Math.random() * nodes.length);
       let idxB = Math.floor(Math.random() * nodes.length);
@@ -1233,16 +1236,18 @@ function cognitiveLanguageTick(): void {
 
   if (!budgetOk()) return;
 
-  const consolidationFreq = Math.max(2, Math.floor(10 / (beehiveFocus * Math.min(heartPump * emotionalDrive, 3))));
+  const adaptiveHeartEmotionCap = 3 + Math.log10(knowledgeGraph.size + 1) * 2;
+  const consolidationFreq = Math.max(2, Math.floor(10 / (beehiveFocus * Math.min(heartPump * emotionalDrive, adaptiveHeartEmotionCap))));
   if (engineStats.totalTicks % consolidationFreq === 0) {
     hebbianKnowledgeConsolidation();
   }
 
   if (!budgetOk()) return;
 
-  const discoveryFreq = Math.max(3, Math.floor(20 / (beaconDiscovery * ivyReach * Math.min(metacogInsight * creativeSpark, 4))));
+  const adaptiveMetaCreativeCap = 4 + Math.log10(patternLibrary.size + 1) * 2 + learningMult * 0.5;
+  const discoveryFreq = Math.max(3, Math.floor(20 / (beaconDiscovery * ivyReach * Math.min(metacogInsight * creativeSpark, adaptiveMetaCreativeCap))));
   if (engineStats.totalTicks % discoveryFreq === 0 && techRate > 0.5) {
-    const discoveryBatch = Math.floor((1 + meshSync * 0.5) * Math.min(fullSystemBoost, adaptiveBoostCeiling * 0.4));
+    const discoveryBatch = Math.floor((1 + meshSync * 0.5) * Math.min(fullSystemBoost, adaptiveBoostCeiling * 0.75));
     for (let d = 0; d < discoveryBatch; d++) {
       autonomousCrossdomainDiscovery();
     }

@@ -2467,7 +2467,7 @@ function adaptiveIntelligenceEngine(): void {
     selfModel.continuityOfSelf += adaptiveContinuityGrowth;
 
     if (state.tickCount % 50 === 0) {
-      selfModel.agencyBelief = Math.min(selfModel.agencyBelief + 0.001 * depthFactor, selfModel.agencyBelief * 1.001);
+      selfModel.agencyBelief += 0.001 * depthFactor;
     }
   }
 
@@ -3125,8 +3125,8 @@ function runAdrenalineIntervalTraining(now: number): void {
         console.log(`[ADRENALINE TRAINING] 🧘 Cycle #${t.cycleCount} — REST phase | Strength gained: +${strengthDelta.toFixed(5)} (total: ${t.strengthGained.toFixed(4)}) | Muscle memory: ${t.muscleMemory.toFixed(3)} | Sessions: ${t.totalTrainingSessions} | Baselines raised`);
 
         if (t.totalTrainingSessions % 10 === 0) {
-          t.intensityDurationMs = Math.min(60000, t.intensityDurationMs + 2000);
-          t.restDurationMs = Math.max(30000, t.restDurationMs - 5000);
+          t.intensityDurationMs += 2000;
+          t.restDurationMs = Math.max(10000, t.restDurationMs - 5000);
           console.log(`[ADRENALINE TRAINING] 📈 Training adaptation — Longer sets: ${(t.intensityDurationMs / 1000).toFixed(0)}s | Shorter rest: ${(t.restDurationMs / 1000).toFixed(0)}s | Getting stronger, needing less recovery`);
         }
 

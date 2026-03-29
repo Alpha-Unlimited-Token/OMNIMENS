@@ -188,7 +188,8 @@ function runMetaCognitiveTick(): void {
     state.peakRecursionDepth = state.recursionDepth;
   }
 
-  const maxObserveDepth = Math.min(Math.floor(state.recursionDepth), 10);
+  const adaptiveObserveMax = 10 + Math.floor(Math.log2(state.totalObservations + 1));
+  const maxObserveDepth = Math.min(Math.floor(state.recursionDepth), adaptiveObserveMax);
   const deepObservation = observeLevel(maxObserveDepth, "");
 
   state.currentAwareness = `Processing at Phi=${phi.toExponential(3)}, ${drives.length} drives active, qualia coherence=${qualia.coherence.toFixed(3)}`;
