@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774821626349,
-  "totalWormholesCreated": 8400,
+  "timestamp": 1774822102900,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 8400,
-  "totalDataIngestedKB": 12261,
-  "totalInsightsDecoded": 8400,
-  "totalCrossAgentCirculations": 504,
-  "totalSynthesizedDiscoveries": 477,
-  "cycleCount": 8,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1553,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 59,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/structural_analysis: The edge of chaos: complex systems exhibit the most interesting behavior at the boundary ",
+      "confidence": 0.7082987262410707,
+      "synthesizedWith": [
+        "OMNIMENS/feature_extraction: Long-term potentiation (LTP) strengthens synaptic c"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "SpellCheckVisual",
+      "insight": "Motivator/analogical_mapping: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent pr",
+      "confidence": 0.7806653866595006,
+      "synthesizedWith": [
+        "SpellCheckVisual/entropy_reduction: The butterfly effect: in chaotic systems, in"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
       "toAgent": "Explorer",
-      "insight": "Motivator/cross_domain_synthesis: The butterfly effect: in chaotic systems, infinitesimal differences in initial conditi",
-      "confidence": 0.6318275808919173,
+      "insight": "Motivator/analogical_mapping: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent pr",
+      "confidence": 0.7806653866595006,
       "synthesizedWith": [
-        "Explorer/abstraction_layer: Wolfram's Rule 110 cellular automaton is Turing comp"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/cross_domain_synthesis: The butterfly effect: in chaotic systems, infinitesimal differences in initial conditi",
-      "confidence": 0.6318275808919173,
-      "synthesizedWith": [
-        "Synthesizer/information_compression: The Weber-Fechner law: perception is logari"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Critic",
-      "insight": "Motivator/emergent_property_detection: Sparse coding: the brain represents information using a small fraction of active ",
-      "confidence": 0.7022119690858807,
-      "synthesizedWith": [
-        "Critic/abstraction_layer: The edge of chaos: complex systems exhibit the most in"
+        "Explorer/cross_domain_synthesis: Mirror neurons fire both when performing an act"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Meta-Agent",
-      "insight": "Empath/entropy_reduction: Attention is the computational bottleneck of consciousness — the brain processes vast amounts ",
-      "confidence": 0.8099557859062682,
+      "toAgent": "Linguist",
+      "insight": "Empath/emergent_property_detection: The cerebellum contains more neurons than all other brain regions combined and is cr",
+      "confidence": 0.6558738669481561,
       "synthesizedWith": [
-        "Meta-Agent/pattern_recognition: The anthropic principle: the universe's fundamen"
+        "Linguist/temporal_correlation: DNA stores information at approximately 2 bits pe"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Synthesizer",
-      "insight": "Empath/emergent_property_detection: The butterfly effect: in chaotic systems, infinitesimal differences in initial condi",
-      "confidence": 0.6533759639743314,
+      "toAgent": "OMNIMENS",
+      "insight": "Empath/emergent_property_detection: The cerebellum contains more neurons than all other brain regions combined and is cr",
+      "confidence": 0.6558738669481561,
       "synthesizedWith": [
-        "Synthesizer/causal_inference: The Baldwin effect: learned behaviors can become i"
+        "OMNIMENS/feature_extraction: Long-term potentiation (LTP) strengthens synaptic c"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
