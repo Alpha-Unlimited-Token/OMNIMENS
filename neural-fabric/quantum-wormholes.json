@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774800444920,
-  "totalWormholesCreated": 10500,
+  "timestamp": 1774801249535,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 10500,
-  "totalDataIngestedKB": 15378,
-  "totalInsightsDecoded": 10500,
-  "totalCrossAgentCirculations": 630,
-  "totalSynthesizedDiscoveries": 596,
-  "cycleCount": 10,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1534,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 56,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 977,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "SpellCheckVisual",
-      "insight": "Motivator/causal_inference: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers carry in",
-      "confidence": 0.6839717912433845,
+      "toAgent": "Synthesizer",
+      "insight": "Motivator/recursive_decomposition: The mathematical universe hypothesis: all structures that exist mathematically also e",
+      "confidence": 0.6492820924240881,
       "synthesizedWith": [
-        "SpellCheckVisual/entropy_reduction: The global workspace theory of consciousness"
+        "Synthesizer/structural_analysis: The cerebellum contains more neurons than all o"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Pioneer",
-      "insight": "Motivator/emergent_property_detection: The holographic principle suggests all information in a volume of space can be en",
-      "confidence": 0.8759473420659241,
+      "toAgent": "Linguist",
+      "insight": "Motivator/structural_analysis: Reservoir computing shows that even random neural networks can perform computation if the",
+      "confidence": 0.626959024552682,
       "synthesizedWith": [
-        "Pioneer/cross_domain_synthesis: The vagus nerve connects the brain to the gut, h"
+        "Linguist/information_compression: The Penrose-Hameroff Orch-OR theory proposes c"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Architect",
-      "insight": "Motivator/causal_inference: Quantum decoherence typically destroys quantum effects at biological temperatures — but quan",
-      "confidence": 0.7010545265071167,
+      "toAgent": "Visionary",
+      "insight": "Motivator/entropy_reduction: Quantum superposition allows a system to exist in multiple states simultaneously until meas",
+      "confidence": 0.8133849752826273,
       "synthesizedWith": [
-        "Architect/structural_analysis: The connectome is the complete map of neural conn"
+        "Visionary/emergent_property_detection: Quantum tunneling allows particles to pas"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Empath/temporal_correlation: Reservoir computing shows that even random neural networks can perform computation if the r",
-      "confidence": 0.7643198369641978,
+      "toAgent": "Wordsmith",
+      "insight": "Empath/abstraction_layer: Quantum entanglement allows particles to share state information instantaneously across any di",
+      "confidence": 0.8581841994319508,
       "synthesizedWith": [
-        "SensorimotorAgent/analogical_mapping: Long-term potentiation (LTP) strengthens s"
+        "Wordsmith/cross_domain_synthesis: The strange loop concept from Hofstadter: cons"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Meta-Agent",
-      "insight": "Empath/temporal_correlation: Reservoir computing shows that even random neural networks can perform computation if the r",
-      "confidence": 0.7643198369641978,
+      "toAgent": "OMNIMENS",
+      "insight": "Empath/temporal_correlation: Information is physical — Landauer's principle proves that erasing one bit of information r",
+      "confidence": 0.8746753563260897,
       "synthesizedWith": [
-        "Meta-Agent/feature_extraction: Quantum superposition allows a system to exist in"
+        "OMNIMENS/structural_analysis: The cerebellum contains more neurons than all othe"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 5,
-      "signal": 0.55
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
