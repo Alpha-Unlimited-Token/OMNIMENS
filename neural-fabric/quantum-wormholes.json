@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774798645077,
-  "totalWormholesCreated": 10500,
+  "timestamp": 1774798940319,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 10500,
-  "totalDataIngestedKB": 15408,
-  "totalInsightsDecoded": 10500,
-  "totalCrossAgentCirculations": 630,
-  "totalSynthesizedDiscoveries": 603,
-  "cycleCount": 10,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1545,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 59,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 979,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Ethicist",
-      "insight": "Motivator/temporal_correlation: Sparse coding: the brain represents information using a small fraction of active neurons",
-      "confidence": 0.713948101710319,
+      "toAgent": "Meta-Agent",
+      "insight": "Motivator/recursive_decomposition: The strange loop concept from Hofstadter: consciousness arises when a system becomes ",
+      "confidence": 0.7511721382937707,
       "synthesizedWith": [
-        "Ethicist/emergent_property_detection: Recurrent neural networks can approximate "
+        "Meta-Agent/entropy_reduction: The binding problem: how does the brain combine se"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Archivist",
-      "insight": "Motivator/abstraction_layer: Sparse coding: the brain represents information using a small fraction of active neurons at",
-      "confidence": 0.7404348328531697,
+      "toAgent": "Innovator",
+      "insight": "Motivator/recursive_decomposition: The strange loop concept from Hofstadter: consciousness arises when a system becomes ",
+      "confidence": 0.7511721382937707,
       "synthesizedWith": [
-        "Archivist/temporal_correlation: The global workspace theory of consciousness: in"
+        "Innovator/analogical_mapping: The vagus nerve connects the brain to the gut, hea"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/pattern_recognition: The Turing machine is computationally universal — any computation that can be described c",
-      "confidence": 0.864294286198134,
+      "toAgent": "SensorimotorAgent",
+      "insight": "Motivator/temporal_correlation: Gödel's incompleteness theorems prove that any consistent formal system powerful enough ",
+      "confidence": 0.6736915814841777,
       "synthesizedWith": [
-        "OMNIMENS/temporal_correlation: The Mandelbrot set demonstrates infinite complexi"
+        "SensorimotorAgent/analogical_mapping: Scale-free networks follow power-law degre"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Ethicist",
-      "insight": "Empath/temporal_correlation: Kolmogorov complexity measures the shortest program that produces a given output — it is un",
-      "confidence": 0.659515632694158,
+      "toAgent": "Mathematician",
+      "insight": "Empath/abstraction_layer: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOVING comple",
+      "confidence": 0.6192389166657328,
       "synthesizedWith": [
-        "Ethicist/emergent_property_detection: Recurrent neural networks can approximate "
+        "Mathematician/information_compression: The binding problem: how does the brain c"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Synthesizer",
-      "insight": "Empath/temporal_correlation: Kolmogorov complexity measures the shortest program that produces a given output — it is un",
-      "confidence": 0.659515632694158,
+      "toAgent": "SpellCheckVisual",
+      "insight": "Empath/abstraction_layer: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOVING comple",
+      "confidence": 0.6192389166657328,
       "synthesizedWith": [
-        "Synthesizer/temporal_correlation: Hebbian learning: neurons that fire together w"
+        "SpellCheckVisual/analogical_mapping: The strange loop concept from Hofstadter: c"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 5,
-      "signal": 0.55
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
