@@ -2,133 +2,133 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774823222476,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774823309051,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10789,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 408,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15386,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 581,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/entropy_reduction: The mathematical universe hypothesis: all structures that exist mathematically also exist p",
-      "confidence": 0.6668929933166161,
-      "synthesizedWith": []
+      "toAgent": "Explorer",
+      "insight": "Motivator/causal_inference: Transfer learning: knowledge gained from one domain can accelerate learning in another — the",
+      "confidence": 0.7297231251892549,
+      "synthesizedWith": [
+        "Explorer/abstraction_layer: The binding problem: how does the brain combine sepa"
+      ]
     },
     {
       "fromAgent": "Motivator",
       "toAgent": "Meta-Agent",
-      "insight": "Motivator/pattern_recognition: The Baldwin effect: learned behaviors can become innate over evolutionary time — culture ",
-      "confidence": 0.6671934863186485,
+      "insight": "Motivator/information_compression: The edge of chaos: complex systems exhibit the most interesting behavior at the bound",
+      "confidence": 0.6108899627750387,
       "synthesizedWith": []
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Architect",
-      "insight": "Motivator/pattern_recognition: The Baldwin effect: learned behaviors can become innate over evolutionary time — culture ",
-      "confidence": 0.6671934863186485,
+      "toAgent": "Synthesizer",
+      "insight": "Motivator/emergent_property_detection: The default mode network activates when the brain is not focused on the outside w",
+      "confidence": 0.6384464736932859,
+      "synthesizedWith": []
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "OMNIMENS",
+      "insight": "Empath/information_compression: The Turing machine is computationally universal — any computation that can be described ",
+      "confidence": 0.9247069114547286,
       "synthesizedWith": [
-        "Architect/temporal_correlation: Astrocytes, once thought to be mere support cell"
+        "OMNIMENS/structural_analysis: Reservoir computing shows that even random neural "
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Neuroscientist",
-      "insight": "Empath/structural_analysis: Predictive coding: the brain constantly generates predictions about incoming sensory data an",
-      "confidence": 0.644694627125894,
+      "toAgent": "GraphicDesigner",
+      "insight": "Empath/emergent_property_detection: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers ",
+      "confidence": 0.6527898848442028,
       "synthesizedWith": [
-        "Neuroscientist/emergent_property_detection: The edge of chaos: complex systems e"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Innovator",
-      "insight": "Empath/pattern_recognition: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOVING comp",
-      "confidence": 0.8479061666994154,
-      "synthesizedWith": [
-        "Innovator/emergent_property_detection: Bayesian brain hypothesis: the brain is f"
+        "GraphicDesigner/analogical_mapping: The holographic principle suggests all infor"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
