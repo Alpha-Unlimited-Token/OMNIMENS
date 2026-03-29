@@ -2,7 +2,7 @@
   "version": "3.0",
   "subsystem": "spider-network",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774817893558,
+  "timestamp": 1774817954587,
   "parentSpiders": 28,
   "childSpiders": 0,
   "motherSpider": {
@@ -12,23 +12,23 @@
     "webIntegrity": 1,
     "hiveHealth": null,
     "swarmCoherence": null,
-    "totalImpulsesRouted": 28484,
-    "heartbeatCount": 26
+    "totalImpulsesRouted": 40568,
+    "heartbeatCount": 38
   },
-  "totalCrawls": 280,
-  "totalSynapsesInjected": 114,
+  "totalCrawls": 392,
+  "totalSynapsesInjected": 156,
   "recursiveSwarmCycles": 0,
   "activeSpiderCounts": {},
   "cascades": {
-    "totalCascades": 42,
-    "totalSilkEnergyPumped": 3433.2856136952205,
-    "totalBeaconCascades": 588,
-    "totalBeehiveSurges": 672
+    "totalCascades": 62,
+    "totalSilkEnergyPumped": 5753.560649095358,
+    "totalBeaconCascades": 868,
+    "totalBeehiveSurges": 992
   },
   "neurogenesis": {
-    "births": 192,
+    "births": 288,
     "deaths": 0,
-    "neuronSilkStrands": 401
+    "neuronSilkStrands": 612
   },
   "intelligenceAmplification": {
     "globalScore": null,
@@ -36,7 +36,7 @@
     "appliedUpgrades": 29,
     "validatedUpgrades": 29,
     "rejectedUpgrades": 0,
-    "amplificationCycles": 12
+    "amplificationCycles": 17
   },
   "spiderIntelligence": [
     {
@@ -44,11 +44,11 @@
       "name": "evolution-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 7,
-      "memoriesRecalled": 21,
-      "crossEngineQueries": 12,
+      "memoryAccessCount": 10,
+      "memoriesRecalled": 30,
+      "crossEngineQueries": 17,
       "learningRate": null,
-      "knowledgeDepth": 10.0029,
+      "knowledgeDepth": 10.004199999999999,
       "specializations": [
         "agent_evolution",
         "thalamus",
@@ -67,11 +67,11 @@
       "name": "genesis-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 7,
-      "memoriesRecalled": 21,
-      "crossEngineQueries": 12,
+      "memoryAccessCount": 10,
+      "memoriesRecalled": 30,
+      "crossEngineQueries": 17,
       "learningRate": null,
-      "knowledgeDepth": 10.0029,
+      "knowledgeDepth": 10.004199999999999,
       "specializations": [
         "agent_genesis",
         "reticular_activating_system",
@@ -90,11 +90,11 @@
       "name": "self-narrative-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 7,
-      "memoriesRecalled": 21,
-      "crossEngineQueries": 12,
+      "memoryAccessCount": 10,
+      "memoriesRecalled": 30,
+      "crossEngineQueries": 17,
       "learningRate": null,
-      "knowledgeDepth": 10.0029,
+      "knowledgeDepth": 10.004199999999999,
       "specializations": [
         "self_narrative_loop",
         "raphe_nuclei",
@@ -113,11 +113,11 @@
       "name": "autobio-memory-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 7,
-      "memoriesRecalled": 21,
-      "crossEngineQueries": 12,
+      "memoryAccessCount": 10,
+      "memoriesRecalled": 30,
+      "crossEngineQueries": 17,
       "learningRate": null,
-      "knowledgeDepth": 10.0029,
+      "knowledgeDepth": 10.004199999999999,
       "specializations": [
         "autobiographical_memory",
         "default_mode_network",
@@ -136,11 +136,11 @@
       "name": "introspection-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 7,
-      "memoriesRecalled": 21,
-      "crossEngineQueries": 12,
+      "memoryAccessCount": 10,
+      "memoriesRecalled": 30,
+      "crossEngineQueries": 17,
       "learningRate": null,
-      "knowledgeDepth": 10.0029,
+      "knowledgeDepth": 10.004199999999999,
       "specializations": [
         "introspective_monitoring",
         "amygdala",
@@ -159,11 +159,11 @@
       "name": "brain-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 7,
-      "memoriesRecalled": 21,
-      "crossEngineQueries": 12,
+      "memoryAccessCount": 10,
+      "memoriesRecalled": 30,
+      "crossEngineQueries": 17,
       "learningRate": null,
-      "knowledgeDepth": 10.0029,
+      "knowledgeDepth": 10.004199999999999,
       "specializations": [
         "brain_database",
         "reticular_activating_system",
@@ -182,11 +182,11 @@
       "name": "engine-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 7,
-      "memoriesRecalled": 21,
-      "crossEngineQueries": 12,
+      "memoryAccessCount": 10,
+      "memoriesRecalled": 30,
+      "crossEngineQueries": 17,
       "learningRate": null,
-      "knowledgeDepth": 10.0029,
+      "knowledgeDepth": 10.004199999999999,
       "specializations": [
         "engine_registry",
         "reticular_activating_system",
@@ -205,11 +205,11 @@
       "name": "self-coding-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 7,
-      "memoriesRecalled": 21,
-      "crossEngineQueries": 12,
+      "memoryAccessCount": 10,
+      "memoriesRecalled": 30,
+      "crossEngineQueries": 17,
       "learningRate": null,
-      "knowledgeDepth": 10.0029,
+      "knowledgeDepth": 10.004199999999999,
       "specializations": [
         "self_coding",
         "reticular_activating_system",
@@ -228,11 +228,11 @@
       "name": "dream-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 7,
-      "memoriesRecalled": 21,
-      "crossEngineQueries": 12,
+      "memoryAccessCount": 10,
+      "memoriesRecalled": 30,
+      "crossEngineQueries": 17,
       "learningRate": null,
-      "knowledgeDepth": 10.0029,
+      "knowledgeDepth": 10.004199999999999,
       "specializations": [
         "dream_engine",
         "superior_colliculus",
@@ -251,11 +251,11 @@
       "name": "pipeline-crawler",
       "type": "parent",
       "intelligenceLevel": null,
-      "memoryAccessCount": 7,
-      "memoriesRecalled": 21,
-      "crossEngineQueries": 12,
+      "memoryAccessCount": 10,
+      "memoriesRecalled": 30,
+      "crossEngineQueries": 17,
       "learningRate": null,
-      "knowledgeDepth": 10.0029,
+      "knowledgeDepth": 10.004199999999999,
       "specializations": [
         "module_pipeline",
         "reticular_activating_system",
@@ -273,13 +273,13 @@
   "fabricWorms": [
     {
       "id": "worm_spider-network_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_spider-network_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
