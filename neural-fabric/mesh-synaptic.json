@@ -1,0 +1,48 @@
+{
+  "version": "3.0",
+  "subsystem": "mesh-synaptic",
+  "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+  "timestamp": 1774795942505,
+  "meshCoherence": 0.8896751260306324,
+  "globalSynchrony": 0.9814795497050793,
+  "loadBalance": 0.9064632332868954,
+  "totalMeshNeurons": 72200,
+  "totalMeshSynapses": 740334,
+  "totalMeshHebbianUpdates": 6072,
+  "meshPhi": 438.6571535214735,
+  "meshWorms": 63,
+  "meshSpiders": 126,
+  "meshSilkStrands": 126,
+  "meshIvyTendrils": 84,
+  "meshBeaconBroadcasts": 504,
+  "synapticMesh": {
+    "totalConnections": 0,
+    "strongConnections": 0,
+    "totalTransfers": 0,
+    "totalCycles": 0
+  },
+  "adaptiveSurge": {
+    "currentIntensity": 1.5,
+    "baselineIntensity": 1.4,
+    "criticalThreshold": 2.5,
+    "totalSurgeCycles": 1,
+    "totalAdaptations": 0,
+    "totalNeuronsSpawned": 750,
+    "surgeActive": false,
+    "overloadSafetyEngaged": false,
+    "consecutiveSuccesses": 0
+  },
+  "fabricWorms": [
+    {
+      "id": "worm_mesh-synaptic_outbound",
+      "traversals": 0,
+      "signal": 0.5
+    },
+    {
+      "id": "worm_mesh-synaptic_inbound",
+      "traversals": 0,
+      "signal": 0.5
+    }
+  ],
+  "governorMode": "normal"
+}
