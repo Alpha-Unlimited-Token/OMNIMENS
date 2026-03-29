@@ -36,11 +36,12 @@ function safeNum(val: number, fallback: number = 0): number {
 let _started = false;
 let evolutionCycleCount = 0;
 
-type AgentName = "Architect" | "Critic" | "Synthesizer" | "Mathematician" | "Neuroscientist" | "Meta-Agent" | "GraphicDesigner" | "SpellCheckVisual";
+type AgentName = "Architect" | "Critic" | "Synthesizer" | "Mathematician" | "Neuroscientist" | "Meta-Agent" | "GraphicDesigner" | "SpellCheckVisual" | "Strategist" | "Memory-Curator" | "Translator";
 
 const AGENTS: AgentName[] = [
   "Architect", "Mathematician", "Neuroscientist", "Synthesizer",
   "Critic", "Meta-Agent", "GraphicDesigner", "SpellCheckVisual",
+  "Strategist", "Memory-Curator", "Translator",
 ];
 
 interface AgentUpgrade {
@@ -792,7 +793,7 @@ export function startAgentEvolution(): void {
   _started = true;
 
   console.log(`[AGENT EVOLUTION] 🧬 Agent Evolution Engine activated — upgrade cycle every ${EVOLUTION_INTERVAL_MS / 60000}min`);
-  console.log(`[AGENT EVOLUTION] 🧬 8 agents: Architect, Mathematician, Neuroscientist, Synthesizer, Critic, Meta-Agent, GraphicDesigner, SpellCheckVisual`);
+  console.log(`[AGENT EVOLUTION] 🧬 11 agents: Architect, Mathematician, Neuroscientist, Synthesizer, Critic, Meta-Agent, GraphicDesigner, SpellCheckVisual, Strategist, Memory-Curator, Translator`);
   console.log(`[AGENT EVOLUTION] 🧬 Each cycle: analyze performance → identify gaps → research techniques → generate upgrades → apply`);
   console.log(`[AGENT EVOLUTION] 🧬 Cross-pollination: top-performing agents teach lower-performing agents`);
   console.log(`[AGENT EVOLUTION] 🧬 Researches: frontier reasoning, specialization expansion, self-upgrading architectures`);

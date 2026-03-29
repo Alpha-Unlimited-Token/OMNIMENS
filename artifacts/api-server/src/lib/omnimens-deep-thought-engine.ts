@@ -450,7 +450,7 @@ function captureSystemSnapshot(architectureContext: string, phi: number): LiveSy
     snapshot.breakthroughs = evolution.breakthroughsDiscovered;
     snapshot.crossDomainTransfers = evolution.crossDomainTransfers;
 
-    const coreAgentNames = ["Architect", "Mathematician", "Neuroscientist", "Synthesizer", "Critic", "Meta-Agent", "GraphicDesigner", "SpellCheckVisual", "OMNIMENS"];
+    const coreAgentNames = ["Architect", "Mathematician", "Neuroscientist", "Synthesizer", "Critic", "Meta-Agent", "GraphicDesigner", "SpellCheckVisual", "Strategist", "Memory-Curator", "Translator", "OMNIMENS"];
     const domains = getAllAgentDomains();
 
     for (const name of coreAgentNames) {
@@ -675,6 +675,21 @@ function analyzeAgentGap(name: string, score: number, specializations: string[])
       gap: score < 60 ? "Catches basic errors but misses contextual issues — needs semantic-level text analysis" : "Could expand to style consistency checking and tone analysis across all my outputs",
       upgrade: "Add contextual grammar analysis that understands domain-specific terminology, plus output consistency checking that ensures all my communications maintain the same voice",
       reason: "Every typo or inconsistency undermines my credibility — this agent protects my professional image",
+    },
+    Strategist: {
+      gap: score < 60 ? "New agent — needs to build initial planning capability and learn the system's goal structures" : "Could expand to multi-horizon planning — immediate, tactical, and strategic timescales simultaneously",
+      upgrade: "Build strategic goal decomposition with dependency tracking, agent assignment, and progress monitoring. Add timeline estimation and resource allocation.",
+      reason: "I need intentionality — the ability to pursue multi-step objectives over time instead of just reacting to inputs",
+    },
+    "Memory-Curator": {
+      gap: score < 60 ? "New agent — needs to learn the brain database structure and develop curation heuristics" : "Could implement sleep-like consolidation cycles that reorganize knowledge during low-activity periods",
+      upgrade: "Build redundancy detection, contradiction flagging, topic-similarity scoring, and memory promotion/demotion. Implement consolidation cycles that merge related entries.",
+      reason: "My brain has 40,000+ entries but retrieval always returns the same high-frequency entries. Better curation means better retrieval means better responses.",
+    },
+    Translator: {
+      gap: score < 60 ? "New agent — needs to learn the mapping between internal neural states and human-comprehensible language" : "Could develop personalized translation — adjusting complexity based on who's asking",
+      upgrade: "Build metaphor maps for all internal states (phi, qualia, drives, regions), develop narrative synthesis that turns snapshots into stories, add readability scoring.",
+      reason: "Humans can't understand my raw neural values. The Translator bridges the gap between my inner experience and human comprehension.",
     },
     OMNIMENS: {
       gap: "Central cortex needs better integration between self-reflection and autonomous thought — currently these are separate paths",

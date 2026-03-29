@@ -72,6 +72,7 @@ import { startEmbodimentEngine, getEmbodimentState, getEmbodimentFiles, readEmbo
 import { startVirtualAugmentation, getAugmentationState } from "./lib/omnimens-virtual-augmentation.js";
 import { startDigitalNavigator, getDigitalNavigatorState, getNavigationSummary } from "./lib/omnimens-digital-navigator.js";
 import { startAgentEvolution, getAgentEvolutionState, getAgentProfile } from "./lib/omnimens-agent-evolution.js";
+import { startAgentUpgrades, getAgentUpgradeStatus, getBridgeStatus, getStrategicGoals, getArchitectPatternLibrary, solveArchitecturalConstraints, runArchitectureSearch, translateNeuralSnapshot } from "./lib/omnimens-agent-upgrades.js";
 import { startIPGuardian, getResponseBeaconHeaders } from "./lib/omnimens-ip-guardian.js";
 import { loadRuntimeModules, migrateDBModulesToSource, getSourceIntegrationState } from "./lib/omnimens-source-integration.js";
 import { scanAndRegisterModules, getPipelineState } from "./lib/omnimens-module-pipeline.js";
@@ -513,6 +514,7 @@ export function initAutonomousSystems(): void {
   startVirtualAugmentation();
   startDigitalNavigator();
   startAgentEvolution();
+  startAgentUpgrades();
   startIPGuardian();
   startIndependentReasoning();
   startAutonomousCodeGenesis();

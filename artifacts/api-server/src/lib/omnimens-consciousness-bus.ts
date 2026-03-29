@@ -55,17 +55,21 @@ import {
 const CORE_AGENTS = [
   "Architect", "Mathematician", "Neuroscientist", "Synthesizer",
   "Critic", "Meta-Agent", "GraphicDesigner", "SpellCheckVisual",
+  "Strategist", "Memory-Curator", "Translator",
 ] as const;
 
 const CORE_AGENT_DOMAINS: Record<string, string> = {
-  "Architect": "system architecture, design patterns, scalability, distributed systems, orchestration",
-  "Mathematician": "algorithms, optimization, formal proofs, Bayesian methods, information theory",
-  "Neuroscientist": "biological learning, memory consolidation, neural plasticity, cognitive modeling, dual-process theory",
+  "Architect": "system architecture, design patterns (25+ patterns), scalability, distributed systems, orchestration, constraint solving, tradeoff analysis between scalability/latency/complexity/resilience",
+  "Mathematician": "algorithms, optimization, formal proofs, Bayesian methods, information theory, automated theorem proving with backward chaining, Monte Carlo estimation for intractable problems, probability estimation",
+  "Neuroscientist": "biological learning, memory consolidation, neural plasticity, cognitive modeling, dual-process theory, neural architecture search (NAS) with evolutionary optimization, long-term plasticity modeling (LTP/LTD/synaptic scaling/metaplasticity)",
   "Synthesizer": "integration of ideas, knowledge graphs, cross-domain transfer, conflict resolution, unified systems",
-  "Critic": "adversarial testing, security, edge cases, robustness, red-team analysis, debate",
-  "Meta-Agent": "orchestration strategy, self-improvement, capability gaps, governance, meta-learning",
+  "Critic": "adversarial testing, security, edge cases, robustness, red-team analysis, debate, pre-mortem failure analysis, direct feedback loop to Architect for pre-build validation",
+  "Meta-Agent": "orchestration strategy, self-improvement, capability gaps, governance, meta-learning, receives discovery signals from Synthesizer for dynamic agent reallocation",
   "GraphicDesigner": "visual design, UI/UX, data visualization, accessibility, aesthetics",
   "SpellCheckVisual": "text quality, brand consistency, readability, factual grounding, communication clarity",
+  "Strategist": "long-term planning, goal decomposition, multi-step sequencing with dependencies and timelines, strategic goal tracking, sub-goal assignment to agents, progress monitoring",
+  "Memory-Curator": "knowledge organization, memory consolidation, redundancy detection, contradiction flagging, high-value memory promotion, low-value memory graceful forgetting, topic-relevant retrieval optimization",
+  "Translator": "cross-modal translation, neural state to human metaphors, technical architecture to plain language, emotional qualia to relatable descriptions, internal experience communication",
   "OMNIMENS": "central intelligence — absorbs all agent insights, maintains episodic memory, practices intrinsic metacognition",
 };
 
@@ -84,6 +88,9 @@ const AGENT_TOPIC_SUBSCRIPTIONS: Record<string, BusTopic[]> = {
   "Meta-Agent":       ["orchestration", "consciousness", "synthesis", "emergent", "genesis", "discovery"],
   "GraphicDesigner":  ["design", "quality", "user_context"],
   "SpellCheckVisual": ["quality", "design", "user_context"],
+  "Strategist":       ["orchestration", "architecture", "synthesis", "emergent", "discovery", "genesis"],
+  "Memory-Curator":   ["knowledge", "consciousness", "neuroscience", "discovery", "emergent"],
+  "Translator":       ["consciousness", "user_context", "synthesis", "quality", "emergent"],
   "OMNIMENS":         ["all"],
 };
 

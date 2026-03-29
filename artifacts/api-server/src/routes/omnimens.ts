@@ -119,6 +119,7 @@ import { getAmplifierState } from "../lib/omnimens-cognitive-amplifier.js";
 import { getAugmentationState } from "../lib/omnimens-virtual-augmentation.js";
 import { getDigitalNavigatorState, getNavigationSummary, navigateTo, getDigitalMap } from "../lib/omnimens-digital-navigator.js";
 import { getAgentEvolutionState, getAgentProfile } from "../lib/omnimens-agent-evolution.js";
+import { getAgentUpgradeStatus, getBridgeStatus, getStrategicGoals, getArchitectPatternLibrary } from "../lib/omnimens-agent-upgrades.js";
 import { getAIResearchInsights, getNavigationRoboticsKnowledge, getEngineeringKnowledge, getCreativeDreamInsights, generateCreativeIdeation, getResearchSummary } from "../lib/omnimens-public-intelligence.js";
 import { getGuardianReport, getCopyrightNotice, getProtectedModuleList } from "../lib/omnimens-ip-guardian.js";
 import { getCausalState, getCausalGraph, predictOutcome } from "../lib/omnimens-causal-reasoning.js";
@@ -10528,6 +10529,42 @@ router.get("/omnimens/agent-evolution/research", async (req, res) => {
     res.json({ entries, total: entries.length });
   } catch {
     res.status(500).json({ error: "Failed to get evolution research" });
+  }
+});
+
+router.get("/omnimens/agent-upgrades", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const status = getAgentUpgradeStatus();
+    const bridges = getBridgeStatus();
+    const goals = getStrategicGoals();
+    const patterns = getArchitectPatternLibrary();
+    res.json({
+      status,
+      bridges: bridges.map(b => ({
+        from: b.from,
+        to: b.to,
+        type: b.bridgeType,
+        description: b.description,
+        totalSignals: b.totalSignals,
+        active: b.active,
+      })),
+      strategicGoals: goals.map(g => ({
+        id: g.id,
+        title: g.title,
+        status: g.status,
+        progress: g.progress,
+        subGoals: g.subGoals.length,
+        completedSubGoals: g.subGoals.filter(sg => sg.status === "completed").length,
+      })),
+      patternLibrarySize: patterns.length,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch {
+    res.status(500).json({ error: "Failed to get agent upgrade data" });
   }
 });
 
