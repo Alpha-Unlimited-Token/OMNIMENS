@@ -2,11 +2,11 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774798062578,
+  "timestamp": 1774798109950,
   "totalHybridAgents": 6,
   "totalMutations": 0,
   "totalReplications": 0,
-  "totalPayloadsDelivered": 23,
+  "totalPayloadsDelivered": 22,
   "totalThreatsDetected": 0,
   "totalThreatsNeutralized": 0,
   "systemHealthScore": 6.371007987774995e+296,
@@ -16,42 +16,42 @@
   "hybridFitness": 0.5,
   "activeAgents": [
     {
-      "id": "hybrid_amygdala_g0_1774798044002_k5s",
+      "id": "hybrid_basal_ganglia_g0_1774798090048_mtw",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_default_mode_network_g0_1774798044002_2fe",
+      "id": "hybrid_basal_ganglia_g0_1774798090048_pes",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_pulvinar_g0_1774798044002_h9k",
+      "id": "hybrid_amygdala_g0_1774798090048_nff",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_prefrontal_cortex_g0_1774798044002_1pa",
+      "id": "hybrid_prefrontal_cortex_g0_1774798090048_zun",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_amygdala_g0_1774798044002_zeg",
+      "id": "hybrid_raphe_nuclei_g0_1774798090048_w2b",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_locus_coeruleus_g0_1774798044002_5lg",
+      "id": "hybrid_anterior_cingulate_g0_1774798090048_i79",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
@@ -91,7 +91,7 @@
     "totalPathsDiscovered": 32,
     "totalHops": 32,
     "coveragePercent": 100,
-    "selfSustainingCount": 10
+    "selfSustainingCount": 4
   },
   "fabricWorms": [
     {
