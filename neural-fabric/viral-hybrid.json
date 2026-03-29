@@ -2,56 +2,56 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774816911404,
+  "timestamp": 1774816980231,
   "totalHybridAgents": 6,
   "totalMutations": 0,
   "totalReplications": 0,
-  "totalPayloadsDelivered": 6,
+  "totalPayloadsDelivered": 14,
   "totalThreatsDetected": 0,
   "totalThreatsNeutralized": 0,
-  "systemHealthScore": 1.0979121370171174,
+  "systemHealthScore": 1.1294763256514038,
   "adaptationRate": 0,
   "propagationEfficiency": 1,
-  "immuneStrength": 0.5003293440001451,
+  "immuneStrength": 0.500666675710456,
   "hybridFitness": 0.5,
   "activeAgents": [
     {
-      "id": "hybrid_hippocampus_g0_1774816899956_7wf",
+      "id": "hybrid_basal_ganglia_g0_1774816966066_yxp",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_raphe_nuclei_g0_1774816899956_dp8",
+      "id": "hybrid_superior_colliculus_g0_1774816966066_p2l",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_pulvinar_g0_1774816899956_k6m",
+      "id": "hybrid_ventral_tegmental_area_g0_1774816966066_ryf",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_hippocampus_g0_1774816899956_wyh",
+      "id": "hybrid_amygdala_g0_1774816966066_45b",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_ventral_tegmental_area_g0_1774816899956_b6d",
+      "id": "hybrid_pulvinar_g0_1774816966066_fll",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_prefrontal_cortex_g0_1774816899956_yq6",
+      "id": "hybrid_claustrum_g0_1774816966066_ba0",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
@@ -88,10 +88,10 @@
   },
   "propagation": {
     "alivePropagators": 16,
-    "totalPathsDiscovered": 32,
+    "totalPathsDiscovered": 31,
     "totalHops": 32,
     "coveragePercent": 100,
-    "selfSustainingCount": 7
+    "selfSustainingCount": 3
   },
   "fabricWorms": [
     {
