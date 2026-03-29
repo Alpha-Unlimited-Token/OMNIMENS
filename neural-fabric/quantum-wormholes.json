@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774825797393,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774825885008,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10713,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 417,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15278,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 597,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Linguist",
-      "insight": "Motivator/emergent_property_detection: The edge of chaos: complex systems exhibit the most interesting behavior at the b",
-      "confidence": 0.7494082767917165,
+      "toAgent": "Innovator",
+      "insight": "Motivator/temporal_correlation: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent ",
+      "confidence": 0.6150970178788455,
       "synthesizedWith": [
-        "Linguist/pattern_recognition: Transfer learning: knowledge gained from one domai"
+        "Innovator/analogical_mapping: The binding problem: how does the brain combine se"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Critic",
-      "insight": "Motivator/cross_domain_synthesis: Quantum entanglement allows particles to share state information instantaneously acros",
-      "confidence": 0.7334251351496979,
+      "toAgent": "Visionary",
+      "insight": "Motivator/entropy_reduction: Mirror neurons fire both when performing an action and observing the same action — they may",
+      "confidence": 0.8316033287671026,
       "synthesizedWith": [
-        "Critic/analogical_mapping: The anthropic principle: the universe's fundamental c"
+        "Visionary/emergent_property_detection: Wolfram's Rule 110 cellular automaton is "
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Mathematician",
-      "insight": "Motivator/causal_inference: The free energy principle suggests all living systems minimize variational free energy — pre",
-      "confidence": 0.8211160708964265,
-      "synthesizedWith": [
-        "Mathematician/pattern_recognition: Long-term potentiation (LTP) strengthens syna"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "GraphicDesigner",
-      "insight": "Empath/analogical_mapping: The binding problem: how does the brain combine separate sensory modalities into a unified co",
-      "confidence": 0.8113924151167387,
+      "insight": "Motivator/entropy_reduction: Mirror neurons fire both when performing an action and observing the same action — they may",
+      "confidence": 0.8316033287671026,
       "synthesizedWith": [
-        "GraphicDesigner/causal_inference: The cerebellum contains more neurons than all "
+        "GraphicDesigner/causal_inference: Transfer learning: knowledge gained from one d"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Ethicist",
-      "insight": "Empath/structural_analysis: Quantum tunneling allows particles to pass through energy barriers they classically cannot —",
-      "confidence": 0.6054540324356015,
+      "toAgent": "Innovator",
+      "insight": "Empath/recursive_decomposition: The holographic principle suggests all information in a volume of space can be encoded o",
+      "confidence": 0.887450762993017,
       "synthesizedWith": [
-        "Ethicist/cross_domain_synthesis: The mathematical universe hypothesis: all struc"
+        "Innovator/analogical_mapping: The binding problem: how does the brain combine se"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Visionary",
+      "insight": "Empath/recursive_decomposition: The holographic principle suggests all information in a volume of space can be encoded o",
+      "confidence": 0.887450762993017,
+      "synthesizedWith": [
+        "Visionary/emergent_property_detection: Quantum entanglement allows particles to "
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
