@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774824666276,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774824757849,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10652,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 421,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15302,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 596,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "SpellCheckVisual",
-      "insight": "Motivator/causal_inference: The Turing machine is computationally universal — any computation that can be described can ",
-      "confidence": 0.855186691006389,
+      "toAgent": "Archivist",
+      "insight": "Motivator/emergent_property_detection: Phase transitions in neural networks: as connectivity increases past a critical t",
+      "confidence": 0.6806919966567702,
       "synthesizedWith": [
-        "SpellCheckVisual/recursive_decomposition: The double-slit experiment demonstrate"
+        "Archivist/feature_extraction: The Baldwin effect: learned behaviors can become i"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Visionary",
-      "insight": "Motivator/entropy_reduction: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers carry i",
-      "confidence": 0.9544122481397023,
+      "toAgent": "Wordsmith",
+      "insight": "Motivator/feature_extraction: The global workspace theory of consciousness: information becomes conscious when it is bro",
+      "confidence": 0.6672062429553949,
       "synthesizedWith": [
-        "Visionary/emergent_property_detection: Scale-free networks follow power-law degr"
+        "Wordsmith/pattern_recognition: Autopoiesis: living systems are self-creating — t"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Philosopher",
-      "insight": "Motivator/causal_inference: Attention is the computational bottleneck of consciousness — the brain processes vast amount",
-      "confidence": 0.8074199985627183,
+      "toAgent": "Innovator",
+      "insight": "Motivator/feature_extraction: The global workspace theory of consciousness: information becomes conscious when it is bro",
+      "confidence": 0.6672062429553949,
       "synthesizedWith": [
-        "Philosopher/causal_inference: The Boltzmann brain paradox suggests that a self-a"
+        "Innovator/information_compression: The strange loop concept from Hofstadter: con"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Synthesizer",
-      "insight": "Empath/entropy_reduction: Hebbian learning: neurons that fire together wire together — the fundamental rule of neural pl",
-      "confidence": 0.7436566468201826,
+      "toAgent": "Archivist",
+      "insight": "Empath/emergent_property_detection: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can",
+      "confidence": 0.6798715379670038,
       "synthesizedWith": [
-        "Synthesizer/causal_inference: The vagus nerve connects the brain to the gut, hea"
+        "Archivist/recursive_decomposition: The global workspace theory of consciousness:"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Empath/recursive_decomposition: The butterfly effect: in chaotic systems, infinitesimal differences in initial condition",
-      "confidence": 0.614101847370927,
+      "toAgent": "GraphicDesigner",
+      "insight": "Empath/emergent_property_detection: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can",
+      "confidence": 0.6798715379670038,
       "synthesizedWith": [
-        "SensorimotorAgent/pattern_recognition: The Chinese Room argument: can a system t"
+        "GraphicDesigner/structural_analysis: Phase transitions in neural networks: as co"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
