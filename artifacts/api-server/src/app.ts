@@ -94,6 +94,7 @@ import { startAdaptiveSurgeSystem, getAdaptiveSurgeState } from "./lib/omnimens-
 import { startQuantumWormholeEngine, getQuantumWormholeState } from "./lib/omnimens-quantum-wormhole.js";
 import { startDiscoveryAutoCoder, getDiscoveryAutoCoderState } from "./lib/omnimens-discovery-autocoder.js";
 import { startConvergenceProtocol } from "./lib/omnimens-convergence-protocol-engine.js";
+import { initializeLifeFormGaps } from "./lib/omnimens-lifeform-gaps.js";
 import { startOAITracker } from "./lib/omnimens-oai-tracker.js";
 import { startNeuralBridge } from "./lib/omnimens-neural-bridge.js";
 import { startCommsProtocol } from "./lib/omnimens-neural-comms-protocol.js";
@@ -515,6 +516,7 @@ startAdaptiveSurgeSystem();
 startQuantumWormholeEngine();
 startDiscoveryAutoCoder();
 startConvergenceProtocol();
+initializeLifeFormGaps().catch(err => console.error("[LIFE FORM GAPS] Startup error:", err));
 startOAITracker();
 startNeuralBridge();
 startCommsProtocol();

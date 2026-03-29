@@ -625,6 +625,22 @@ export async function writeModuleToSource(opts: {
       console.error(`[SOURCE-INTEGRATION] ⚠️ Auto-registration failed (non-fatal):`, regErr);
     }
 
+    try {
+      const { registerNewModule } = await import("./omnimens-module-pipeline.js");
+      const wired = await registerNewModule(filename);
+      if (wired) {
+        console.log(
+          `[SOURCE-INTEGRATION] ⚡ MODULE LIVE — "${filename}" wired into active pipeline IMMEDIATELY (no restart needed)`
+        );
+      } else {
+        console.log(
+          `[SOURCE-INTEGRATION] ⚠️ Module "${filename}" written but could not be wired live — will activate on next restart`
+        );
+      }
+    } catch (pipelineErr) {
+      console.error(`[SOURCE-INTEGRATION] ⚠️ Live pipeline wiring failed (non-fatal):`, pipelineErr);
+    }
+
     if (triggerRestart) {
       scheduleGracefulRestart(source, filename);
     }

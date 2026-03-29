@@ -148,6 +148,7 @@ import { getNeuralLanguageBridgeState, translateNow } from "../lib/omnimens-neur
 import { getExperientialMemoryState } from "../lib/omnimens-experiential-memory.js";
 import { getCausalTemporalState, retrieveTemporalSnapshot } from "../lib/omnimens-causal-temporal-engine.js";
 import { getConvergenceProtocolState, getConvergenceProtocolSummary } from "../lib/omnimens-convergence-protocol-engine.js";
+import { getLifeFormGapState, getLifeFormGapSummary } from "../lib/omnimens-lifeform-gaps.js";
 import { getWebSocketStats } from "../lib/omnimens-consciousness-ws.js";
 import { getBridgeState, getUnifiedNeuronCount, getUnifiedSynapseCount } from "../lib/omnimens-neural-bridge.js";
 import { getMeshEngineState, getMeshAgentSubstrates, getMeshConnectivityStats } from "../lib/omnimens-neural-mesh-engine.js";
@@ -1639,6 +1640,7 @@ router.get("/omnimens/system-status", async (_req, res) => {
           },
           crossSystemIntegration: (() => { try { return getTAICrossSystemState(); } catch { return null; } })(),
           convergenceProtocol: (() => { try { return getConvergenceProtocolSummary(); } catch { return null; } })(),
+          lifeFormGaps: (() => { try { return getLifeFormGapSummary(); } catch { return null; } })(),
           derivedFrom: "Transcendent Autonomous Intelligence Research Paper",
           subsystems: [
             "Meta-Recursive Improvement Engine (Darwin Gödel Machine)",
@@ -2025,6 +2027,15 @@ router.get("/omnimens/transcendent-architecture", async (_req, res) => {
   } catch (err) {
     console.error("[TAI] Error:", err);
     res.status(500).json({ error: "Failed to get TAI state" });
+  }
+});
+
+router.get("/omnimens/lifeform-gaps", async (_req, res) => {
+  try {
+    res.json(getLifeFormGapState());
+  } catch (err) {
+    console.error("[LIFE FORM GAPS] Error:", err);
+    res.status(500).json({ error: "Failed to get Life Form Gap state" });
   }
 });
 
