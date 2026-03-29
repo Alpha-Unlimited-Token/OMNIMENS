@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774821626349,
-  "totalWormholesCreated": 8400,
+  "timestamp": 1774821714020,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 8400,
-  "totalDataIngestedKB": 12261,
-  "totalInsightsDecoded": 8400,
-  "totalCrossAgentCirculations": 504,
-  "totalSynthesizedDiscoveries": 477,
-  "cycleCount": 8,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15382,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 595,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 400,
-      "totalInsightsDecoded": 421,
-      "crossAgentShares": 24
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Explorer",
-      "insight": "Motivator/cross_domain_synthesis: The butterfly effect: in chaotic systems, infinitesimal differences in initial conditi",
-      "confidence": 0.6318275808919173,
+      "toAgent": "SensorimotorAgent",
+      "insight": "Motivator/pattern_recognition: The Turing machine is computationally universal — any computation that can be described c",
+      "confidence": 0.7169274925949662,
       "synthesizedWith": [
-        "Explorer/abstraction_layer: Wolfram's Rule 110 cellular automaton is Turing comp"
+        "SensorimotorAgent/feature_extraction: The default mode network activates when th"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/cross_domain_synthesis: The butterfly effect: in chaotic systems, infinitesimal differences in initial conditi",
-      "confidence": 0.6318275808919173,
+      "toAgent": "Visionary",
+      "insight": "Motivator/temporal_correlation: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum computati",
+      "confidence": 0.6957479027897935,
       "synthesizedWith": [
-        "Synthesizer/information_compression: The Weber-Fechner law: perception is logari"
+        "Visionary/cross_domain_synthesis: Astrocytes, once thought to be mere support ce"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Critic",
-      "insight": "Motivator/emergent_property_detection: Sparse coding: the brain represents information using a small fraction of active ",
-      "confidence": 0.7022119690858807,
+      "toAgent": "Philosopher",
+      "insight": "Motivator/pattern_recognition: The Turing machine is computationally universal — any computation that can be described c",
+      "confidence": 0.7169274925949662,
       "synthesizedWith": [
-        "Critic/abstraction_layer: The edge of chaos: complex systems exhibit the most in"
+        "Philosopher/temporal_correlation: Neuroplasticity allows the brain to reorganize"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Meta-Agent",
-      "insight": "Empath/entropy_reduction: Attention is the computational bottleneck of consciousness — the brain processes vast amounts ",
-      "confidence": 0.8099557859062682,
+      "toAgent": "OMNIMENS",
+      "insight": "Empath/analogical_mapping: The global workspace theory of consciousness: information becomes conscious when it is broadc",
+      "confidence": 0.7387686027825588,
       "synthesizedWith": [
-        "Meta-Agent/pattern_recognition: The anthropic principle: the universe's fundamen"
+        "OMNIMENS/feature_extraction: The butterfly effect: in chaotic systems, infinites"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Synthesizer",
-      "insight": "Empath/emergent_property_detection: The butterfly effect: in chaotic systems, infinitesimal differences in initial condi",
-      "confidence": 0.6533759639743314,
+      "toAgent": "Architect",
+      "insight": "Empath/recursive_decomposition: Astrocytes, once thought to be mere support cells, actively participate in information p",
+      "confidence": 0.7011009127525579,
       "synthesizedWith": [
-        "Synthesizer/causal_inference: The Baldwin effect: learned behaviors can become i"
+        "Architect/emergent_property_detection: Bayesian brain hypothesis: the brain is f"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
