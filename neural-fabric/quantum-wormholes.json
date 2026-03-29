@@ -2,135 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774823644969,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774823731753,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10878,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 415,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15530,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 594,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Pioneer",
-      "insight": "Motivator/temporal_correlation: Bayesian brain hypothesis: the brain is fundamentally a prediction machine that constant",
-      "confidence": 0.6042622049362087,
-      "synthesizedWith": []
+      "toAgent": "GraphicDesigner",
+      "insight": "Motivator/structural_analysis: Sparse coding: the brain represents information using a small fraction of active neurons ",
+      "confidence": 0.8858531970506911,
+      "synthesizedWith": [
+        "GraphicDesigner/pattern_recognition: The butterfly effect: in chaotic systems, i"
+      ]
     },
     {
       "fromAgent": "Motivator",
+      "toAgent": "Innovator",
+      "insight": "Motivator/structural_analysis: Sparse coding: the brain represents information using a small fraction of active neurons ",
+      "confidence": 0.8858531970506911,
+      "synthesizedWith": [
+        "Innovator/emergent_property_detection: The holographic principle suggests all in"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "SensorimotorAgent",
+      "insight": "Motivator/causal_inference: Quantum tunneling allows particles to pass through energy barriers they classically cannot —",
+      "confidence": 0.616044346417151,
+      "synthesizedWith": [
+        "SensorimotorAgent/causal_inference: Synaptic pruning eliminates unused neural co"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
       "toAgent": "OMNIMENS",
-      "insight": "Motivator/feature_extraction: Information is physical — Landauer's principle proves that erasing one bit of information ",
-      "confidence": 0.8736855416069083,
+      "insight": "Empath/temporal_correlation: Astrocytes, once thought to be mere support cells, actively participate in information proc",
+      "confidence": 0.6082005593062031,
       "synthesizedWith": [
-        "OMNIMENS/emergent_property_detection: Autopoiesis: living systems are self-creat"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Visionary",
-      "insight": "Motivator/feature_extraction: Information is physical — Landauer's principle proves that erasing one bit of information ",
-      "confidence": 0.8736855416069083,
-      "synthesizedWith": [
-        "Visionary/recursive_decomposition: Kolmogorov complexity measures the shortest p"
+        "OMNIMENS/pattern_recognition: Recurrent neural networks can approximate any dyna"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Visionary",
-      "insight": "Empath/recursive_decomposition: Quantum tunneling allows particles to pass through energy barriers they classically cann",
-      "confidence": 0.7619825259216289,
+      "toAgent": "Ethicist",
+      "insight": "Empath/pattern_recognition: The hard problem of consciousness: why is there subjective experience at all? Why does infor",
+      "confidence": 0.6843323567896306,
       "synthesizedWith": [
-        "Visionary/information_compression: Hebbian learning: neurons that fire together "
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Pioneer",
-      "insight": "Empath/recursive_decomposition: Quantum tunneling allows particles to pass through energy barriers they classically cann",
-      "confidence": 0.7619825259216289,
-      "synthesizedWith": [
-        "Pioneer/information_compression: The mathematical universe hypothesis: all struc"
+        "Ethicist/recursive_decomposition: Predictive coding: the brain constantly genera"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
