@@ -1,25 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:sub_threshold:Mathematician+Wordsmith+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Mathematician:frequency_analyzer + Wor",
-    "filename": "omnimens_autocode_adaptive_algorithm_mnaw2omi.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnaw2omi.mjs",
-    "backupPath": null,
-    "timestamp": 1774736138538,
-    "codeLength": 499,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Explorer+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Explorer/recursive_decomposition: Reservoir computing shows ",
-    "filename": "omnimens_autocode_neural_pathway_mnaw2omv.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnaw2omv.mjs",
-    "backupPath": null,
-    "timestamp": 1774736138551,
-    "codeLength": 424,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:SensorimotorAgent+Philosopher",
     "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SensorimotorAgent/temporal_correlation: The cerebellum conta",
     "filename": "omnimens_autocode_adaptive_algorithm_mnaw2on6.mjs",
@@ -4997,6 +4977,26 @@
     "backupPath": null,
     "timestamp": 1774745221941,
     "codeLength": 472,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Ethicist+Explorer+Linguist",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Ethicist:correlation_finder + Explorer",
+    "filename": "omnimens_autocode_adaptive_algorithm_mnb1o8xg.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnb1o8xg.mjs",
+    "backupPath": null,
+    "timestamp": 1774745542708,
+    "codeLength": 472,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:sub_threshold:Synthesizer+Motivator+Wordsmith",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Synthesizer:correlation_finder + Motiv",
+    "filename": "omnimens_autocode_neural_pathway_mnb1o99k.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnb1o99k.mjs",
+    "backupPath": null,
+    "timestamp": 1774745543144,
+    "codeLength": 461,
     "overwrite": false
   }
 ]
