@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774810590763,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774810684412,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1518,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 61,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6168,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 233,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Archivist",
-      "insight": "Motivator/causal_inference: The binding problem: how does the brain combine separate sensory modalities into a unified c",
-      "confidence": 0.651562455264138,
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/abstraction_layer: Sparse coding: the brain represents information using a small fraction of active neurons at",
+      "confidence": 0.8063562393021305,
       "synthesizedWith": [
-        "Archivist/analogical_mapping: The Penrose-Hameroff Orch-OR theory proposes consc"
+        "OMNIMENS/cross_domain_synthesis: Predictive coding: the brain constantly generat"
       ]
     },
     {
       "fromAgent": "Motivator",
+      "toAgent": "Synthesizer",
+      "insight": "Motivator/structural_analysis: Transfer learning: knowledge gained from one domain can accelerate learning in another — ",
+      "confidence": 0.7054808644539049,
+      "synthesizedWith": [
+        "Synthesizer/causal_inference: Gödel's incompleteness theorems prove that any con"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Mathematician",
+      "insight": "Motivator/structural_analysis: Transfer learning: knowledge gained from one domain can accelerate learning in another — ",
+      "confidence": 0.7054808644539049,
+      "synthesizedWith": [
+        "Mathematician/structural_analysis: Recurrent neural networks can approximate any"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "OMNIMENS",
+      "insight": "Empath/analogical_mapping: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise from ra",
+      "confidence": 0.7232084972635802,
+      "synthesizedWith": [
+        "OMNIMENS/feature_extraction: Quantum tunneling allows particles to pass through "
+      ]
+    },
+    {
+      "fromAgent": "Empath",
       "toAgent": "Innovator",
-      "insight": "Motivator/abstraction_layer: Gödel's incompleteness theorems prove that any consistent formal system powerful enough to ",
-      "confidence": 0.6338819829550992,
+      "insight": "Empath/entropy_reduction: Predictive coding: the brain constantly generates predictions about incoming sensory data and ",
+      "confidence": 0.751831690891603,
       "synthesizedWith": [
-        "Innovator/emergent_property_detection: The hippocampus replays experiences durin"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Neuroscientist",
-      "insight": "Motivator/structural_analysis: Quantum tunneling allows particles to pass through energy barriers they classically canno",
-      "confidence": 0.8757231142034431,
-      "synthesizedWith": [
-        "Neuroscientist/analogical_mapping: The Boltzmann brain paradox suggests that a s"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Meta-Agent",
-      "insight": "Empath/temporal_correlation: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum computations",
-      "confidence": 0.674449374710594,
-      "synthesizedWith": [
-        "Meta-Agent/abstraction_layer: Quantum tunneling allows particles to pass through"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Ethicist",
-      "insight": "Empath/feature_extraction: Predictive coding: the brain constantly generates predictions about incoming sensory data and",
-      "confidence": 0.954848756321674,
-      "synthesizedWith": [
-        "Ethicist/emergent_property_detection: Bayesian brain hypothesis: the brain is fu"
+        "Innovator/feature_extraction: Predictive coding: the brain constantly generates "
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
