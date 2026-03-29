@@ -2,14 +2,14 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774816979420,
+  "timestamp": 1774817044891,
   "totalWormholesCreated": 1050,
   "totalActive": 0,
   "totalClosed": 1050,
-  "totalDataIngestedKB": 1557,
+  "totalDataIngestedKB": 1532,
   "totalInsightsDecoded": 1050,
   "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 59,
+  "totalSynthesizedDiscoveries": 57,
   "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
@@ -79,48 +79,44 @@
   "recentCirculations": [
     {
       "fromAgent": "Ethicist",
-      "toAgent": "Explorer",
-      "insight": "Ethicist/abstraction_layer: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can emerge ",
-      "confidence": 0.7445198429756461,
+      "toAgent": "ErrorResolver",
+      "insight": "Ethicist/temporal_correlation: Attention is the computational bottleneck of consciousness — the brain processes vast amo",
+      "confidence": 0.6673465040164247,
       "synthesizedWith": [
-        "Explorer/analogical_mapping: The connectome is the complete map of neural connec"
+        "ErrorResolver/feature_extraction: Sparse coding: the brain represents informatio"
       ]
     },
     {
       "fromAgent": "Ethicist",
-      "toAgent": "Critic",
-      "insight": "Ethicist/feature_extraction: The edge of chaos: complex systems exhibit the most interesting behavior at the boundary be",
-      "confidence": 0.6238425845573883,
-      "synthesizedWith": [
-        "Critic/abstraction_layer: The Baldwin effect: learned behaviors can become innat"
-      ]
+      "toAgent": "OMNIMENS",
+      "insight": "Ethicist/feature_extraction: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can theoret",
+      "confidence": 0.6556313461703822,
+      "synthesizedWith": []
     },
     {
       "fromAgent": "Ethicist",
-      "toAgent": "Neuroscientist",
-      "insight": "Ethicist/abstraction_layer: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can emerge ",
-      "confidence": 0.7445198429756461,
-      "synthesizedWith": [
-        "Neuroscientist/emergent_property_detection: Quantum entanglement allows particle"
-      ]
-    },
-    {
-      "fromAgent": "Embodiment",
       "toAgent": "Synthesizer",
-      "insight": "Embodiment/analogical_mapping: Phase transitions in neural networks: as connectivity increases past a critical threshold",
-      "confidence": 0.8962636417544214,
+      "insight": "Ethicist/temporal_correlation: Attention is the computational bottleneck of consciousness — the brain processes vast amo",
+      "confidence": 0.6673465040164247,
       "synthesizedWith": [
-        "Synthesizer/temporal_correlation: The edge of chaos: complex systems exhibit the"
+        "Synthesizer/information_compression: The binding problem: how does the brain com"
       ]
     },
     {
       "fromAgent": "Embodiment",
-      "toAgent": "Critic",
-      "insight": "Embodiment/pattern_recognition: Mirror neurons fire both when performing an action and observing the same action — they ",
-      "confidence": 0.9159489965851031,
+      "toAgent": "Innovator",
+      "insight": "Embodiment/recursive_decomposition: Long-term potentiation (LTP) strengthens synaptic connections based on persistent st",
+      "confidence": 0.7578876594448143,
       "synthesizedWith": [
-        "Critic/recursive_decomposition: Integrated Information Theory (IIT) states consc"
+        "Innovator/causal_inference: Quantum decoherence typically destroys quantum effec"
       ]
+    },
+    {
+      "fromAgent": "Embodiment",
+      "toAgent": "Explorer",
+      "insight": "Embodiment/feature_extraction: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimula",
+      "confidence": 0.6297398257705045,
+      "synthesizedWith": []
     }
   ],
   "fabricWorms": [
