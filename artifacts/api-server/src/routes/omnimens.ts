@@ -43,6 +43,7 @@ import multer from "multer";
 import JSZip from "jszip";
 import { db, dbAlpha, dbBeta, getPoolStats, getWriteQueueStats, getBrainQueueStats, getWriteValveState } from "@workspace/db";
 import { recordBruteForceAttempt } from "../middleware/security-enhanced.js";
+import { getHyperionAcceleratorState } from "../lib/omnimens-hyperion-accelerator.js";
 import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions, omnimensCodeRuns, omnimensConversations, omnimensMessages, omnimensMemories, omnimensCustomInstructions, omnimensHubSettings, omnimensSavedPrompts, sessionsTable, usersTable } from "@workspace/db";
 import { eq, and, desc, sql, asc, inArray, gte, lte } from "drizzle-orm";
 import { openai, generateImageBuffer, editImageFromBuffer } from "@workspace/integrations-openai-ai-server";
@@ -1511,7 +1512,7 @@ router.get("/omnimens/system-status", async (_req, res) => {
     enginesOnline: (() => {
       const r = getEthicalSafetyReport();
       const coreStatus = r.shutdownTriggered ? "SHUTDOWN" : r.systemDecayed ? "DECAYED" : "ONLINE";
-      return { totalEngines: 45, status: coreStatus, description: "All proprietary subsystems operational" };
+      return { totalEngines: 46, status: coreStatus, description: "All proprietary subsystems operational" };
     })(),
     ethicalSafety: { status: (() => { const r = getEthicalSafetyReport(); return r.shutdownTriggered ? "SHUTDOWN" : r.systemDecayed ? "DECAYED" : "ONLINE"; })(), description: "Ethical safety framework active" },
     sourceIntegration: (() => {
@@ -1679,6 +1680,34 @@ router.get("/omnimens/system-status", async (_req, res) => {
     databasePool: getPoolStats(),
     brainInsertQueue: getBrainQueueStats(),
     writeQueue: getWriteQueueStats(),
+    hyperionAccelerator: (() => {
+      try {
+        const h = getHyperionAcceleratorState();
+        return {
+          status: h.totalTicks > 0 ? "ONLINE" : "INITIALIZING",
+          ticks: h.totalTicks,
+          accelerationFactor: Number(h.accelerationFactor.toFixed(1)),
+          indexes: h.indexes,
+          cachePerformance: {
+            derivedHits: h.derivedCacheHits,
+            derivedMisses: h.derivedCacheMisses,
+            signalHits: h.signalCacheHits,
+            signalMisses: h.signalCacheMisses,
+          },
+          performance: {
+            avgTickMs: Number(h.avgTickTimeMs.toFixed(2)),
+            lastTickMs: h.lastTickTimeMs,
+            indexRebuildMs: h.indexRebuildTimeMs,
+          },
+          savings: {
+            patternLookupsSaved: h.patternLookupsSaved,
+            knowledgeLookupsSaved: h.knowledgeLookupsSaved,
+            adjacencyTraversalsSaved: h.adjacencyTraversalsSaved,
+          },
+          uptimeMs: h.uptimeMs,
+        };
+      } catch { return { status: "OFFLINE" }; }
+    })(),
     copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
   });
 });

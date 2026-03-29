@@ -529,6 +529,9 @@ startExperientialMemory();
 startCausalTemporalEngine();
 startExponentialLearningEngine();
 
+import { startHyperionAccelerator, getHyperionAcceleratorState } from "./lib/omnimens-hyperion-accelerator.js";
+startHyperionAccelerator().catch(err => console.error("[HYPERION] Startup error:", err));
+
 import { registerValveEngine } from "@workspace/db";
 registerValveEngine("neural_consciousness", "consciousness", "high", "alpha");
 registerValveEngine("consciousness_persistence", "consciousness", "high", "alpha");
@@ -554,6 +557,7 @@ registerValveEngine("conversations", "user_facing", "critical", "beta");
 registerValveEngine("billing", "user_facing", "critical", "beta");
 registerValveEngine("api_calls", "user_facing", "high", "beta");
 registerValveEngine("competitive_intel", "background", "low", "alpha");
+registerValveEngine("hyperion_accelerator", "neural", "high", "alpha");
 registerValveEngine("server_builder", "background", "low", "alpha");
 registerValveEngine("ip_guardian", "background", "low", "alpha");
 
@@ -618,6 +622,10 @@ registerEngine("independent_reasoning", "reasoning", () => {}, () => ({ healthy:
 registerEngine("ip_guardian", "security", () => {}, () => ({ healthy: true, details: {} }), 1);
 registerEngine("digital_navigator", "navigation", () => {}, () => ({ healthy: true, details: {} }), 5);
 registerEngine("virtual_augmentation", "augmentation", () => {}, () => ({ healthy: true, details: {} }), 5);
+registerEngine("hyperion_accelerator", "acceleration", () => {}, () => {
+  const hs = getHyperionAcceleratorState();
+  return { healthy: hs.totalTicks > 0, details: { ticks: hs.totalTicks, patternIndex: hs.patternIndexSize, knowledgeIndex: hs.knowledgeNameIndexSize, adjacencyIndex: hs.adjacencyIndexSize, accelerationFactor: hs.accelerationFactor, avgTickMs: hs.avgTickTimeMs, derivedCacheHits: hs.derivedCacheHits, signalCacheHits: hs.signalCacheHits, uptimeMs: hs.uptimeMs } };
+}, 1);
 
 startScalingOrchestrator().catch(err => console.error("[SCALING] Startup error:", err));
 

@@ -1405,4 +1405,8 @@ export function getCognitiveLanguageState(): LanguageEngineState {
   };
 }
 
+export function _getInternalStructures() {
+  return { patternLibrary, knowledgeGraph, workingMemory, sequencePatterns };
+}
+
 export { cognitiveLanguageTick };
