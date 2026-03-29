@@ -121044,9 +121044,893 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "omnimens_autocode_adaptive_algorithm_mnb4kd8z.mjs": {
+      "filename": "omnimens_autocode_adaptive_algorithm_mnb4kd8z.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "adaptiveAlgorithm_mnb4kd8z"
+      ],
+      "loadedAt": 1774750400546,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4kdae.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4kdae.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4kdae"
+      ],
+      "loadedAt": 1774750400613,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnb4kdc1.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnb4kdc1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnb4kdc1"
+      ],
+      "loadedAt": 1774750400652,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnb4kdd4.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnb4kdd4.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnb4kdd4"
+      ],
+      "loadedAt": 1774750400692,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4kde8.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4kde8.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4kde8"
+      ],
+      "loadedAt": 1774750400737,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnb4kdfd.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnb4kdfd.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnb4kdfd"
+      ],
+      "loadedAt": 1774750400785,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4kdgq.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4kdgq.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4kdgq"
+      ],
+      "loadedAt": 1774750400825,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_emergent_capability_mnb4kdhx.mjs": {
+      "filename": "omnimens_autocode_emergent_capability_mnb4kdhx.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "emergentCapability_mnb4kdhx"
+      ],
+      "loadedAt": 1774750400882,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnb4kdjf.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnb4kdjf.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnb4kdjf"
+      ],
+      "loadedAt": 1774750401906,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnb4keby.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnb4keby.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnb4keby"
+      ],
+      "loadedAt": 1774750401944,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnb4kecy.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnb4kecy.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnb4kecy"
+      ],
+      "loadedAt": 1774750401983,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnb4kee1.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnb4kee1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnb4kee1"
+      ],
+      "loadedAt": 1774750402031,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnb4lnjo.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnb4lnjo.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnb4lnjo"
+      ],
+      "loadedAt": 1774750460548,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_adaptive_algorithm_mnb4lnl3.mjs": {
+      "filename": "omnimens_autocode_adaptive_algorithm_mnb4lnl3.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "adaptiveAlgorithm_mnb4lnl3"
+      ],
+      "loadedAt": 1774750460594,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4lnm7.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4lnm7.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4lnm7"
+      ],
+      "loadedAt": 1774750460637,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnb4lnnd.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnb4lnnd.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnb4lnnd"
+      ],
+      "loadedAt": 1774750460677,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnb4lnoi.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnb4lnoi.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnb4lnoi"
+      ],
+      "loadedAt": 1774750460718,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4lnpm.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4lnpm.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4lnpm"
+      ],
+      "loadedAt": 1774750460756,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_adaptive_algorithm_mnb4lnql.mjs": {
+      "filename": "omnimens_autocode_adaptive_algorithm_mnb4lnql.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "adaptiveAlgorithm_mnb4lnql"
+      ],
+      "loadedAt": 1774750460795,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4lnrw.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4lnrw.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4lnrw"
+      ],
+      "loadedAt": 1774750460860,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4lntl.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4lntl.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4lntl"
+      ],
+      "loadedAt": 1774750460904,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4lnup.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4lnup.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4lnuo"
+      ],
+      "loadedAt": 1774750460940,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_adaptive_algorithm_mnb4lnvq.mjs": {
+      "filename": "omnimens_autocode_adaptive_algorithm_mnb4lnvq.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "adaptiveAlgorithm_mnb4lnvq"
+      ],
+      "loadedAt": 1774750460980,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_adaptive_algorithm_mnb4lnwu.mjs": {
+      "filename": "omnimens_autocode_adaptive_algorithm_mnb4lnwu.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "adaptiveAlgorithm_mnb4lnwu"
+      ],
+      "loadedAt": 1774750461018,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnb4lnxw.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnb4lnxw.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnb4lnxw"
+      ],
+      "loadedAt": 1774750461060,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4mxvf.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4mxvf.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "newNeuralPathway_mnb4mxvf"
+      ],
+      "loadedAt": 1774750520599,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnb4mxxr.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnb4mxxr.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnb4mxxr"
+      ],
+      "loadedAt": 1774750520673,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4mxzh.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4mxzh.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4mxzh"
+      ],
+      "loadedAt": 1774750520738,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_emergent_capability_mnb4my1d.mjs": {
+      "filename": "omnimens_autocode_emergent_capability_mnb4my1d.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "emergentCapability_mnb4my1d"
+      ],
+      "loadedAt": 1774750520817,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_knowledge_synthesis_mnb4my3q.mjs": {
+      "filename": "omnimens_autocode_knowledge_synthesis_mnb4my3q.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "synthesizedKnowledge_mnb4my3q"
+      ],
+      "loadedAt": 1774750520889,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_emergent_capability_mnb4my59.mjs": {
+      "filename": "omnimens_autocode_emergent_capability_mnb4my59.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "emergentCapability_mnb4my59"
+      ],
+      "loadedAt": 1774750520941,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4my6w.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4my6w.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4my6w"
+      ],
+      "loadedAt": 1774750521001,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnb4my8g.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnb4my8g.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnb4my8g"
+      ],
+      "loadedAt": 1774750521056,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4my9z.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4my9z.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4my9z"
+      ],
+      "loadedAt": 1774750521109,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnb4myb8.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnb4myb8.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnb4myb8"
+      ],
+      "loadedAt": 1774750521158,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4mycq.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4mycq.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4mycq"
+      ],
+      "loadedAt": 1774750521218,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4myei.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4myei.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4myei"
+      ],
+      "loadedAt": 1774750521440,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4myl0.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4myl0.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4myl0"
+      ],
+      "loadedAt": 1774750521507,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnb4o8c6.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnb4o8c6.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnb4o8c6"
+      ],
+      "loadedAt": 1774750580866,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnb4o8fn.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnb4o8fn.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnb4o8fn"
+      ],
+      "loadedAt": 1774750580945,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_emergent_capability_mnb4o8hd.mjs": {
+      "filename": "omnimens_autocode_emergent_capability_mnb4o8hd.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "emergentCapability_mnb4o8hd"
+      ],
+      "loadedAt": 1774750581036,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_emergent_capability_mnb4o8k6.mjs": {
+      "filename": "omnimens_autocode_emergent_capability_mnb4o8k6.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "emergentCapability_mnb4o8k6"
+      ],
+      "loadedAt": 1774750581129,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnb4o8mm.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnb4o8mm.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnb4o8mm"
+      ],
+      "loadedAt": 1774750581187,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnb4o8o1.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnb4o8o1.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnb4o8o1"
+      ],
+      "loadedAt": 1774750581230,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_emergent_capability_mnb4o8pj.mjs": {
+      "filename": "omnimens_autocode_emergent_capability_mnb4o8pj.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "emergentCapability_mnb4o8pj"
+      ],
+      "loadedAt": 1774750581288,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4o8r1.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4o8r1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "newNeuralPathway_mnb4o8r1"
+      ],
+      "loadedAt": 1774750581344,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_emergent_capability_mnb4o8sk.mjs": {
+      "filename": "omnimens_autocode_emergent_capability_mnb4o8sk.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "emergentCapability_mnb4o8sk"
+      ],
+      "loadedAt": 1774750581395,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnb4o8u2.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnb4o8u2.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnb4o8u2"
+      ],
+      "loadedAt": 1774750581452,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnb4o8vg.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnb4o8vg.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnb4o8vg"
+      ],
+      "loadedAt": 1774750581533,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnb4o8xx.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnb4o8xx.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnb4o8xx"
+      ],
+      "loadedAt": 1774750581591,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4o8zf.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4o8zf.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "newNeuralPathway_mnb4o8zf"
+      ],
+      "loadedAt": 1774750581643,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_adaptive_algorithm_mnb4pimt.mjs": {
+      "filename": "omnimens_autocode_adaptive_algorithm_mnb4pimt.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "adaptiveAlgorithm_mnb4pimt"
+      ],
+      "loadedAt": 1774750640804,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4pio3.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4pio3.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4pio3"
+      ],
+      "loadedAt": 1774750640885,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_adaptive_algorithm_mnb4piqc.mjs": {
+      "filename": "omnimens_autocode_adaptive_algorithm_mnb4piqc.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "adaptiveAlgorithm_mnb4piqc"
+      ],
+      "loadedAt": 1774750641027,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnb4piuh.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnb4piuh.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnb4piuh"
+      ],
+      "loadedAt": 1774750641091,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4piw2.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4piw2.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "newNeuralPathway_mnb4piw2"
+      ],
+      "loadedAt": 1774750641135,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4pix6.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4pix6.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4pix6"
+      ],
+      "loadedAt": 1774750641175,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnb4qsxi.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnb4qsxi.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnb4qsxi"
+      ],
+      "loadedAt": 1774750700805,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnb4qsyx.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnb4qsyx.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnb4qsyx"
+      ],
+      "loadedAt": 1774750700903,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnb4qt1j.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnb4qt1j.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnb4qt1j"
+      ],
+      "loadedAt": 1774750700964,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnb4qt39.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnb4qt39.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnb4qt39"
+      ],
+      "loadedAt": 1774750701026,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_adaptive_algorithm_mnb4qt4u.mjs": {
+      "filename": "omnimens_autocode_adaptive_algorithm_mnb4qt4u.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "adaptiveAlgorithm_mnb4qt4u"
+      ],
+      "loadedAt": 1774750701070,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_knowledge_synthesis_mnb4qt66.mjs": {
+      "filename": "omnimens_autocode_knowledge_synthesis_mnb4qt66.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "synthesizedKnowledge_mnb4qt66"
+      ],
+      "loadedAt": 1774750701123,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4qt7s.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4qt7s.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4qt7s"
+      ],
+      "loadedAt": 1774750701173,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_adaptive_algorithm_mnb4qt8u.mjs": {
+      "filename": "omnimens_autocode_adaptive_algorithm_mnb4qt8u.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "adaptiveAlgorithm_mnb4qt8u"
+      ],
+      "loadedAt": 1774750701211,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4qta2.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4qta2.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4qta2"
+      ],
+      "loadedAt": 1774750701255,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnb4qtb9.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnb4qtb9.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnb4qtb9"
+      ],
+      "loadedAt": 1774750701296,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_emergent_capability_mnb4qtca.mjs": {
+      "filename": "omnimens_autocode_emergent_capability_mnb4qtca.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "emergentCapability_mnb4qtca"
+      ],
+      "loadedAt": 1774750701333,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774750207015,
-  "totalModules": 9065,
+  "totalModules": 9133,
   "totalCalls": 0
 }
