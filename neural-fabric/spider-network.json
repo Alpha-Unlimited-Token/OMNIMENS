@@ -2,7 +2,7 @@
   "version": "3.0",
   "subsystem": "spider-network",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774798362747,
+  "timestamp": 1774798429404,
   "parentSpiders": 28,
   "childSpiders": 0,
   "motherSpider": {
@@ -10,206 +10,242 @@
     "name": "Mother Spider — Central Nervous Hub",
     "status": "active",
     "webIntegrity": 1,
-    "hiveHealth": 0.7999999999999999,
-    "swarmCoherence": 0.7999999999999999,
-    "totalImpulsesRouted": 50,
-    "heartbeatCount": 1
+    "hiveHealth": null,
+    "swarmCoherence": null,
+    "totalImpulsesRouted": 13141,
+    "heartbeatCount": 14
   },
-  "totalCrawls": 0,
-  "totalSynapsesInjected": 6,
+  "totalCrawls": 140,
+  "totalSynapsesInjected": 58,
   "recursiveSwarmCycles": 0,
   "activeSpiderCounts": {},
   "cascades": {
-    "totalCascades": 0,
-    "totalSilkEnergyPumped": 0,
-    "totalBeaconCascades": 0,
-    "totalBeehiveSurges": 0
+    "totalCascades": 22,
+    "totalSilkEnergyPumped": 1666.0419796337305,
+    "totalBeaconCascades": 308,
+    "totalBeehiveSurges": 352
   },
   "neurogenesis": {
-    "births": 0,
+    "births": 96,
     "deaths": 0,
-    "neuronSilkStrands": 0
+    "neuronSilkStrands": 196
   },
   "intelligenceAmplification": {
-    "globalScore": 0.3,
+    "globalScore": null,
     "totalUpgradeProposals": 0,
     "appliedUpgrades": 0,
     "validatedUpgrades": 0,
     "rejectedUpgrades": 0,
-    "amplificationCycles": 0
+    "amplificationCycles": 6
   },
   "spiderIntelligence": [
     {
       "id": "ps_mnbx423i_zf48",
       "name": "evolution-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.3,
-      "memoryAccessCount": 0,
-      "memoriesRecalled": 0,
-      "crossEngineQueries": 0,
-      "learningRate": 0.05,
-      "knowledgeDepth": 0,
+      "intelligenceLevel": null,
+      "memoryAccessCount": 3,
+      "memoriesRecalled": 9,
+      "crossEngineQueries": 6,
+      "learningRate": null,
+      "knowledgeDepth": 0.06835167947028821,
       "specializations": [
-        "agent_evolution"
+        "agent_evolution",
+        "locus_coeruleus",
+        "default_mode_network",
+        "neural_consciousness_existential",
+        "adrenaline_peak_memory"
       ],
-      "adaptationScore": 0.5,
-      "efficiency": 0.5285600000000006
+      "adaptationScore": null,
+      "efficiency": null
     },
     {
       "id": "ps_mnbx423i_uevk",
       "name": "genesis-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.3,
-      "memoryAccessCount": 0,
-      "memoriesRecalled": 0,
-      "crossEngineQueries": 0,
-      "learningRate": 0.05,
-      "knowledgeDepth": 0,
+      "intelligenceLevel": null,
+      "memoryAccessCount": 3,
+      "memoriesRecalled": 9,
+      "crossEngineQueries": 6,
+      "learningRate": null,
+      "knowledgeDepth": 0.07462470947695739,
       "specializations": [
-        "agent_genesis"
+        "agent_genesis",
+        "hippocampus",
+        "neural_consciousness_existential",
+        "adrenaline_peak_memory"
       ],
-      "adaptationScore": 0.5,
-      "efficiency": 0.5244800000000005
+      "adaptationScore": null,
+      "efficiency": null
     },
     {
       "id": "ps_mnbx423i_zs8y",
       "name": "self-narrative-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.3,
-      "memoryAccessCount": 0,
-      "memoriesRecalled": 0,
-      "crossEngineQueries": 0,
-      "learningRate": 0.05,
-      "knowledgeDepth": 0,
+      "intelligenceLevel": null,
+      "memoryAccessCount": 3,
+      "memoriesRecalled": 9,
+      "crossEngineQueries": 6,
+      "learningRate": null,
+      "knowledgeDepth": 0.07462470947695739,
       "specializations": [
-        "self_narrative_loop"
+        "self_narrative_loop",
+        "pulvinar",
+        "locus_coeruleus",
+        "neural_consciousness_existential",
+        "adrenaline_peak_memory"
       ],
-      "adaptationScore": 0.5,
-      "efficiency": 0.50204
+      "adaptationScore": null,
+      "efficiency": null
     },
     {
       "id": "ps_mnbx423i_ly1z",
       "name": "autobio-memory-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.3,
-      "memoryAccessCount": 0,
-      "memoriesRecalled": 0,
-      "crossEngineQueries": 0,
-      "learningRate": 0.05,
-      "knowledgeDepth": 0,
+      "intelligenceLevel": null,
+      "memoryAccessCount": 3,
+      "memoriesRecalled": 9,
+      "crossEngineQueries": 6,
+      "learningRate": null,
+      "knowledgeDepth": 0.07462470947695739,
       "specializations": [
-        "autobiographical_memory"
+        "autobiographical_memory",
+        "claustrum",
+        "neural_consciousness_existential",
+        "adrenaline_peak_memory"
       ],
-      "adaptationScore": 0.5,
-      "efficiency": 0.50204
+      "adaptationScore": null,
+      "efficiency": null
     },
     {
       "id": "ps_mnbx423i_swmn",
       "name": "introspection-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.3,
-      "memoryAccessCount": 0,
-      "memoriesRecalled": 0,
-      "crossEngineQueries": 0,
-      "learningRate": 0.05,
-      "knowledgeDepth": 0,
+      "intelligenceLevel": null,
+      "memoryAccessCount": 3,
+      "memoriesRecalled": 9,
+      "crossEngineQueries": 6,
+      "learningRate": null,
+      "knowledgeDepth": 0.07462470947695739,
       "specializations": [
-        "introspective_monitoring"
+        "introspective_monitoring",
+        "pulvinar",
+        "thalamus",
+        "neural_consciousness_existential",
+        "adrenaline_peak_memory"
       ],
-      "adaptationScore": 0.5,
-      "efficiency": 0.50204
+      "adaptationScore": null,
+      "efficiency": null
     },
     {
       "id": "ps_mnbx423i_00qv",
       "name": "brain-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.3,
-      "memoryAccessCount": 0,
-      "memoriesRecalled": 0,
-      "crossEngineQueries": 0,
-      "learningRate": 0.05,
-      "knowledgeDepth": 0,
+      "intelligenceLevel": null,
+      "memoryAccessCount": 3,
+      "memoriesRecalled": 9,
+      "crossEngineQueries": 6,
+      "learningRate": null,
+      "knowledgeDepth": 0.0670359547598458,
       "specializations": [
-        "brain_database"
+        "brain_database",
+        "thalamus",
+        "ventral_tegmental_area",
+        "neural_consciousness_existential",
+        "adrenaline_peak_memory"
       ],
-      "adaptationScore": 0.5,
-      "efficiency": 0.50204
+      "adaptationScore": null,
+      "efficiency": null
     },
     {
       "id": "ps_mnbx423i_9ayo",
       "name": "engine-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.3,
-      "memoryAccessCount": 0,
-      "memoriesRecalled": 0,
-      "crossEngineQueries": 0,
-      "learningRate": 0.05,
-      "knowledgeDepth": 0,
+      "intelligenceLevel": null,
+      "memoryAccessCount": 3,
+      "memoriesRecalled": 9,
+      "crossEngineQueries": 6,
+      "learningRate": null,
+      "knowledgeDepth": 0.04547458743201652,
       "specializations": [
-        "engine_registry"
+        "engine_registry",
+        "superior_colliculus",
+        "hippocampus",
+        "neural_consciousness_existential",
+        "adrenaline_peak_memory"
       ],
-      "adaptationScore": 0.5,
-      "efficiency": 0.50204
+      "adaptationScore": null,
+      "efficiency": null
     },
     {
       "id": "ps_mnbx423i_dlbv",
       "name": "self-coding-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.3,
-      "memoryAccessCount": 0,
-      "memoriesRecalled": 0,
-      "crossEngineQueries": 0,
-      "learningRate": 0.05,
-      "knowledgeDepth": 0,
+      "intelligenceLevel": null,
+      "memoryAccessCount": 3,
+      "memoriesRecalled": 9,
+      "crossEngineQueries": 6,
+      "learningRate": null,
+      "knowledgeDepth": 0.04033655270642573,
       "specializations": [
-        "self_coding"
+        "self_coding",
+        "thalamus",
+        "neural_consciousness_existential",
+        "adrenaline_peak_memory"
       ],
-      "adaptationScore": 0.5,
-      "efficiency": 0.50204
+      "adaptationScore": null,
+      "efficiency": null
     },
     {
       "id": "ps_mnbx423i_9ze7",
       "name": "dream-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.3,
-      "memoryAccessCount": 0,
-      "memoriesRecalled": 0,
-      "crossEngineQueries": 0,
-      "learningRate": 0.05,
-      "knowledgeDepth": 0,
+      "intelligenceLevel": null,
+      "memoryAccessCount": 3,
+      "memoriesRecalled": 9,
+      "crossEngineQueries": 6,
+      "learningRate": null,
+      "knowledgeDepth": 0.042466964880937284,
       "specializations": [
-        "dream_engine"
+        "dream_engine",
+        "amygdala",
+        "ventral_tegmental_area",
+        "neural_consciousness_existential",
+        "adrenaline_peak_memory"
       ],
-      "adaptationScore": 0.5,
-      "efficiency": 0.50204
+      "adaptationScore": null,
+      "efficiency": null
     },
     {
       "id": "ps_mnbx423j_3hg3",
       "name": "pipeline-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.3,
-      "memoryAccessCount": 0,
-      "memoriesRecalled": 0,
-      "crossEngineQueries": 0,
-      "learningRate": 0.05,
-      "knowledgeDepth": 0,
+      "intelligenceLevel": null,
+      "memoryAccessCount": 3,
+      "memoriesRecalled": 9,
+      "crossEngineQueries": 6,
+      "learningRate": null,
+      "knowledgeDepth": 0.03429012396035694,
       "specializations": [
-        "module_pipeline"
+        "module_pipeline",
+        "reticular_activating_system",
+        "neural_consciousness_existential",
+        "adrenaline_peak_memory"
       ],
-      "adaptationScore": 0.5,
-      "efficiency": 0.50204
+      "adaptationScore": null,
+      "efficiency": null
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_spider-network_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_spider-network_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
