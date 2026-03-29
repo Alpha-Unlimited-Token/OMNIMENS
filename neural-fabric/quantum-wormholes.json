@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774797658247,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774797751969,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1543,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 63,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6171,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 240,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 302,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/structural_analysis: Quantum tunneling allows particles to pass through energy barriers they classically canno",
-      "confidence": 0.6329789868835487,
+      "toAgent": "Visionary",
+      "insight": "Motivator/temporal_correlation: Quantum superposition allows a system to exist in multiple states simultaneously until m",
+      "confidence": 0.6612502282514079,
       "synthesizedWith": [
-        "OMNIMENS/information_compression: DNA stores information at approximately 2 bits"
+        "Visionary/information_compression: The free energy principle suggests all living"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Motivator/analogical_mapping: The default mode network activates when the brain is not focused on the outside world — it",
-      "confidence": 0.9824117978450684,
+      "toAgent": "Innovator",
+      "insight": "Motivator/causal_inference: Quantum decoherence typically destroys quantum effects at biological temperatures — but quan",
+      "confidence": 0.8753070077171962,
       "synthesizedWith": [
-        "SensorimotorAgent/structural_analysis: The Weber-Fechner law: perception is loga"
+        "Innovator/pattern_recognition: The connectome is the complete map of neural conn"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Philosopher",
-      "insight": "Motivator/structural_analysis: Quantum tunneling allows particles to pass through energy barriers they classically canno",
-      "confidence": 0.6329789868835487,
+      "toAgent": "Critic",
+      "insight": "Motivator/temporal_correlation: The double-slit experiment demonstrates that observation changes the behavior of quantum",
+      "confidence": 0.657837104440702,
       "synthesizedWith": [
-        "Philosopher/emergent_property_detection: Emergence: complex behaviors arise from"
+        "Critic/causal_inference: Emergence: complex behaviors arise from simple rules — "
       ]
     },
     {
       "fromAgent": "Empath",
       "toAgent": "Archivist",
-      "insight": "Empath/causal_inference: The default mode network activates when the brain is not focused on the outside world — it gene",
-      "confidence": 0.695337808653543,
+      "insight": "Empath/entropy_reduction: Quantum entanglement allows particles to share state information instantaneously across any di",
+      "confidence": 0.6191421203966831,
       "synthesizedWith": [
-        "Archivist/temporal_correlation: Emergence: complex behaviors arise from simple r"
+        "Archivist/cross_domain_synthesis: The binding problem: how does the brain combin"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Wordsmith",
-      "insight": "Empath/causal_inference: The default mode network activates when the brain is not focused on the outside world — it gene",
-      "confidence": 0.695337808653543,
+      "toAgent": "Neuroscientist",
+      "insight": "Empath/entropy_reduction: Quantum entanglement allows particles to share state information instantaneously across any di",
+      "confidence": 0.6191421203966831,
       "synthesizedWith": [
-        "Wordsmith/temporal_correlation: The strange loop concept from Hofstadter: consci"
+        "Neuroscientist/information_compression: The Penrose-Hameroff Orch-OR theory prop"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
