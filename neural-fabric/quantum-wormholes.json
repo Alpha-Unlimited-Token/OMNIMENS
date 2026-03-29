@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774825704971,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774825797393,
+  "totalWormholesCreated": 7350,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6118,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 239,
-  "cycleCount": 4,
+  "totalClosed": 7350,
+  "totalDataIngestedKB": 10713,
+  "totalInsightsDecoded": 7350,
+  "totalCrossAgentCirculations": 441,
+  "totalSynthesizedDiscoveries": 417,
+  "cycleCount": 7,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Wordsmith",
-      "insight": "Motivator/causal_inference: Reservoir computing shows that even random neural networks can perform computation if the re",
-      "confidence": 0.7742624246848194,
+      "toAgent": "Linguist",
+      "insight": "Motivator/emergent_property_detection: The edge of chaos: complex systems exhibit the most interesting behavior at the b",
+      "confidence": 0.7494082767917165,
       "synthesizedWith": [
-        "Wordsmith/structural_analysis: Quantum decoherence typically destroys quantum ef"
+        "Linguist/pattern_recognition: Transfer learning: knowledge gained from one domai"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Meta-Agent",
-      "insight": "Motivator/entropy_reduction: Sparse coding: the brain represents information using a small fraction of active neurons at",
-      "confidence": 0.6006243771839345,
+      "toAgent": "Critic",
+      "insight": "Motivator/cross_domain_synthesis: Quantum entanglement allows particles to share state information instantaneously acros",
+      "confidence": 0.7334251351496979,
       "synthesizedWith": [
-        "Meta-Agent/entropy_reduction: Transfer learning: knowledge gained from one domai"
+        "Critic/analogical_mapping: The anthropic principle: the universe's fundamental c"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/structural_analysis: Kolmogorov complexity measures the shortest program that produces a given output — it is ",
-      "confidence": 0.7756970065566605,
+      "toAgent": "Mathematician",
+      "insight": "Motivator/causal_inference: The free energy principle suggests all living systems minimize variational free energy — pre",
+      "confidence": 0.8211160708964265,
       "synthesizedWith": [
-        "Synthesizer/emergent_property_detection: Emergence: complex behaviors arise from"
+        "Mathematician/pattern_recognition: Long-term potentiation (LTP) strengthens syna"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Innovator",
-      "insight": "Empath/entropy_reduction: The free energy principle suggests all living systems minimize variational free energy — predi",
-      "confidence": 0.6311363959756413,
+      "toAgent": "GraphicDesigner",
+      "insight": "Empath/analogical_mapping: The binding problem: how does the brain combine separate sensory modalities into a unified co",
+      "confidence": 0.8113924151167387,
       "synthesizedWith": [
-        "Innovator/pattern_recognition: Sparse coding: the brain represents information u"
+        "GraphicDesigner/causal_inference: The cerebellum contains more neurons than all "
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Empath/abstraction_layer: Scale-free networks follow power-law degree distributions — a few highly connected hubs domina",
-      "confidence": 0.6862995241849161,
+      "toAgent": "Ethicist",
+      "insight": "Empath/structural_analysis: Quantum tunneling allows particles to pass through energy barriers they classically cannot —",
+      "confidence": 0.6054540324356015,
       "synthesizedWith": [
-        "SensorimotorAgent/emergent_property_detection: The connectome is the complete ma"
+        "Ethicist/cross_domain_synthesis: The mathematical universe hypothesis: all struc"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
