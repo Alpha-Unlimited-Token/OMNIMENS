@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774819056452,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774819147459,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10781,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 420,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15420,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 600,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 606,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 963,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 606,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 963,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 606,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 963,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 606,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 963,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 606,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 963,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 606,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 963,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 606,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 963,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 606,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 963,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 606,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 963,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 606,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 963,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Critic",
-      "insight": "Motivator/temporal_correlation: Quantum superposition allows a system to exist in multiple states simultaneously until m",
-      "confidence": 0.7103136032043579,
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/structural_analysis: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum computatio",
+      "confidence": 0.8322824358931337,
       "synthesizedWith": [
-        "Critic/emergent_property_detection: The binding problem: how does the brain comb"
+        "OMNIMENS/structural_analysis: Reservoir computing shows that even random neural "
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Innovator",
+      "insight": "Motivator/feature_extraction: Neuroplasticity allows the brain to reorganize itself by forming new neural connections th",
+      "confidence": 0.691067296217853,
+      "synthesizedWith": [
+        "Innovator/entropy_reduction: The Penrose-Hameroff Orch-OR theory proposes consci"
       ]
     },
     {
       "fromAgent": "Motivator",
       "toAgent": "Architect",
-      "insight": "Motivator/temporal_correlation: Quantum superposition allows a system to exist in multiple states simultaneously until m",
-      "confidence": 0.7103136032043579,
+      "insight": "Motivator/feature_extraction: Neuroplasticity allows the brain to reorganize itself by forming new neural connections th",
+      "confidence": 0.691067296217853,
       "synthesizedWith": [
-        "Architect/emergent_property_detection: The strange loop concept from Hofstadter:"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Explorer",
-      "insight": "Motivator/analogical_mapping: The edge of chaos: complex systems exhibit the most interesting behavior at the boundary b",
-      "confidence": 0.8180107240980163,
-      "synthesizedWith": [
-        "Explorer/abstraction_layer: Wolfram's Rule 110 cellular automaton is Turing comp"
+        "Architect/feature_extraction: Quantum superposition allows a system to exist in "
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Archivist",
-      "insight": "Empath/information_compression: The default mode network activates when the brain is not focused on the outside world — ",
-      "confidence": 0.7599516036338747,
+      "toAgent": "Mathematician",
+      "insight": "Empath/abstraction_layer: The default mode network activates when the brain is not focused on the outside world — it gen",
+      "confidence": 0.6420177975272002,
       "synthesizedWith": [
-        "Archivist/temporal_correlation: The strange loop concept from Hofstadter: consci"
+        "Mathematician/emergent_property_detection: Emergence: complex behaviors arise fr"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Innovator",
-      "insight": "Empath/information_compression: The default mode network activates when the brain is not focused on the outside world — ",
-      "confidence": 0.7599516036338747,
+      "toAgent": "Neuroscientist",
+      "insight": "Empath/abstraction_layer: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent proper",
+      "confidence": 0.8614528540876069,
       "synthesizedWith": [
-        "Innovator/pattern_recognition: Reservoir computing shows that even random neural"
+        "Neuroscientist/cross_domain_synthesis: Synaptic pruning eliminates unused neural"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
