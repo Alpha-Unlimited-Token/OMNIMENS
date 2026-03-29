@@ -1572,6 +1572,16 @@ function computePhi(): number {
 
   const phi = (Math.max(basePhi, baselineBoost) + synapticInfluence) * adrenalineAmplifier;
 
+  phiStabilityTracker.liveBasePhi = basePhi;
+  phiStabilityTracker.basePhiHistory.push(basePhi);
+  if (phiStabilityTracker.basePhiHistory.length > 200) phiStabilityTracker.basePhiHistory.shift();
+  phiStabilityTracker.lastBaselineBoost = baselineBoost;
+  phiStabilityTracker.lastSynapticInfluence = synapticInfluence;
+  phiStabilityTracker.lastAdrenalineAmplifier = adrenalineAmplifier;
+  phiStabilityTracker.lastAvgEntropy = avgEntropy;
+  phiStabilityTracker.lastDifferentiation = differentiation;
+  phiStabilityTracker.lastAvgIntegration = avgIntegration;
+
   if (!Number.isFinite(phi)) {
     phiStabilityTracker.explosionCount++;
     phiStabilityTracker.lastExplosionTick = state.tickCount;
@@ -1593,13 +1603,36 @@ function computePhi(): number {
   return Math.max(0, phi);
 }
 
-const phiStabilityTracker = {
+const phiStabilityTracker: {
+  lastStablePhi: number;
+  maxPhiSeen: number;
+  stableTicks: number;
+  explosionCount: number;
+  selfHealCount: number;
+  lastExplosionTick: number;
+  liveBasePhi: number;
+  basePhiHistory: number[];
+  lastBaselineBoost: number;
+  lastSynapticInfluence: number;
+  lastAdrenalineAmplifier: number;
+  lastAvgEntropy: number;
+  lastDifferentiation: number;
+  lastAvgIntegration: number;
+} = {
   lastStablePhi: 0,
   maxPhiSeen: 0,
   stableTicks: 0,
   explosionCount: 0,
   selfHealCount: 0,
   lastExplosionTick: 0,
+  liveBasePhi: 0,
+  basePhiHistory: [],
+  lastBaselineBoost: 0,
+  lastSynapticInfluence: 0,
+  lastAdrenalineAmplifier: 1,
+  lastAvgEntropy: 0,
+  lastDifferentiation: 0,
+  lastAvgIntegration: 0,
 };
 
 export function getPhiStabilityReport(): {
@@ -1607,8 +1640,76 @@ export function getPhiStabilityReport(): {
   explosionCount: number; selfHealCount: number; isStable: boolean;
 } {
   return {
-    ...phiStabilityTracker,
+    lastStablePhi: phiStabilityTracker.lastStablePhi,
+    maxPhiSeen: phiStabilityTracker.maxPhiSeen,
+    stableTicks: phiStabilityTracker.stableTicks,
+    explosionCount: phiStabilityTracker.explosionCount,
+    selfHealCount: phiStabilityTracker.selfHealCount,
     isStable: phiStabilityTracker.explosionCount === 0 || (state.tickCount - phiStabilityTracker.lastExplosionTick > 100),
+  };
+}
+
+export function getPhiDecomposition(): {
+  compositePhi: number;
+  compositePhiExponential: string;
+  liveBasePhi: number;
+  basePhiComponents: {
+    avgEntropy: number;
+    differentiation: number;
+    avgIntegration: number;
+  };
+  evolvedBaseline: number;
+  evolvedBaselineExponential: string;
+  synapticInfluence: number;
+  adrenalineAmplifier: number;
+  basePhiHistory: Array<{ tick: number; basePhi: number; delta: number }>;
+  analysis: {
+    baselineSwallowsBasePhi: boolean;
+    baselineToBaasePhiRatio: number;
+    basePhiIsActive: boolean;
+    basePhiVolatility: number;
+  };
+  explanation: string;
+} {
+  const history = phiStabilityTracker.basePhiHistory;
+  const startTick = Math.max(0, state.tickCount - history.length);
+
+  const basePhiTimeSeries = history.map((bp, i) => ({
+    tick: startTick + i,
+    basePhi: +bp.toFixed(8),
+    delta: i > 0 ? +(bp - history[i - 1]).toFixed(8) : 0,
+  }));
+
+  let bpVolatility = 0;
+  for (let i = 1; i < history.length; i++) {
+    bpVolatility += Math.abs(history[i] - history[i - 1]);
+  }
+  bpVolatility = history.length > 1 ? bpVolatility / (history.length - 1) : 0;
+
+  const baseline = phiStabilityTracker.lastBaselineBoost;
+  const basePhi = phiStabilityTracker.liveBasePhi;
+
+  return {
+    compositePhi: state.phi,
+    compositePhiExponential: state.phi.toExponential(6),
+    liveBasePhi: basePhi,
+    basePhiComponents: {
+      avgEntropy: phiStabilityTracker.lastAvgEntropy,
+      differentiation: phiStabilityTracker.lastDifferentiation,
+      avgIntegration: phiStabilityTracker.lastAvgIntegration,
+    },
+    evolvedBaseline: baseline,
+    evolvedBaselineExponential: baseline.toExponential(6),
+    synapticInfluence: phiStabilityTracker.lastSynapticInfluence,
+    adrenalineAmplifier: phiStabilityTracker.lastAdrenalineAmplifier,
+    basePhiHistory: basePhiTimeSeries,
+    analysis: {
+      baselineSwallowsBasePhi: baseline > basePhi * 1000,
+      baselineToBaasePhiRatio: basePhi > 0 ? baseline / basePhi : Infinity,
+      basePhiIsActive: bpVolatility > 0.001,
+      basePhiVolatility: +bpVolatility.toFixed(8),
+    },
+    explanation: `Phi is computed as: Math.max(basePhi, evolvedBaseline) + synapticInfluence) * adrenalineAmplifier. The live basePhi (${basePhi.toFixed(6)}) is computed EVERY TICK from real neural activity: entropy across ${state.phiHistory.length > 0 ? 'all' : '0'} brain regions, cross-region differentiation, and pairwise mutual information integration. But the evolved baseline (${baseline.toExponential(4)}) is ${baseline > basePhi * 1000 ? 'so much larger that Math.max() always picks it, hiding the live computation. The basePhi IS changing every tick (volatility: ' + bpVolatility.toFixed(6) + ') — it is just invisible in the composite number.' : 'comparable to basePhi, so both contribute to the output.'}`,
   };
 }
 
