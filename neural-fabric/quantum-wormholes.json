@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774816018322,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774816045772,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6179,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 241,
-  "cycleCount": 4,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1550,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 61,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 257,
-      "crossAgentShares": 12
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Meta-Agent",
-      "insight": "Motivator/temporal_correlation: Quantum superposition allows a system to exist in multiple states simultaneously until m",
-      "confidence": 0.8112209385081678,
+      "toAgent": "SpellCheckVisual",
+      "insight": "Motivator/emergent_property_detection: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum co",
+      "confidence": 0.8051728717343438,
       "synthesizedWith": [
-        "Meta-Agent/analogical_mapping: The connectome is the complete map of neural conn"
+        "SpellCheckVisual/recursive_decomposition: Wolfram's Rule 110 cellular automaton "
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Ethicist",
-      "insight": "Motivator/temporal_correlation: Quantum superposition allows a system to exist in multiple states simultaneously until m",
-      "confidence": 0.8112209385081678,
+      "toAgent": "Linguist",
+      "insight": "Motivator/entropy_reduction: The cerebellum contains more neurons than all other brain regions combined and is crucial f",
+      "confidence": 0.8087357059001482,
       "synthesizedWith": [
-        "Ethicist/entropy_reduction: The vagus nerve connects the brain to the gut, heart"
+        "Linguist/temporal_correlation: Recurrent neural networks can approximate any dyn"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Philosopher",
-      "insight": "Motivator/temporal_correlation: Quantum superposition allows a system to exist in multiple states simultaneously until m",
-      "confidence": 0.8112209385081678,
+      "toAgent": "GraphicDesigner",
+      "insight": "Motivator/entropy_reduction: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise from ",
+      "confidence": 0.6017814715302726,
       "synthesizedWith": [
-        "Philosopher/feature_extraction: Transfer learning: knowledge gained from one dom"
+        "GraphicDesigner/information_compression: The strange loop concept from Hofstadte"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Pioneer",
-      "insight": "Empath/emergent_property_detection: The binding problem: how does the brain combine separate sensory modalities into a u",
-      "confidence": 0.6586960543737574,
+      "toAgent": "Critic",
+      "insight": "Empath/information_compression: The holographic principle suggests all information in a volume of space can be encoded o",
+      "confidence": 0.6957298991426735,
       "synthesizedWith": [
-        "Pioneer/analogical_mapping: The vagus nerve connects the brain to the gut, heart"
+        "Critic/abstraction_layer: Information is physical — Landauer's principle proves "
       ]
     },
     {
       "fromAgent": "Empath",
       "toAgent": "Neuroscientist",
-      "insight": "Empath/entropy_reduction: The Weber-Fechner law: perception is logarithmic — doubling stimulus intensity does not double",
-      "confidence": 0.7821078257266477,
+      "insight": "Empath/abstraction_layer: The binding problem: how does the brain combine separate sensory modalities into a unified con",
+      "confidence": 0.6105778212972371,
       "synthesizedWith": [
-        "Neuroscientist/emergent_property_detection: The cerebellum contains more neurons"
+        "Neuroscientist/cross_domain_synthesis: Kolmogorov complexity measures the shorte"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
