@@ -419,7 +419,17 @@ export default function OAIDashboard() {
 
           {data?.rawInputs && (() => {
             const r = data.rawInputs;
-            const fmt = (v: number | undefined) => v === undefined || v === null ? "—" : Math.abs(v) >= 1000 ? v.toLocaleString(undefined, { maximumFractionDigits: 0 }) : v >= 1 ? v.toFixed(2) : v.toFixed(4);
+            const fmt = (v: number | undefined) => {
+              if (v === undefined || v === null) return "—";
+              if (v === 0) return "0";
+              const abs = Math.abs(v);
+              if (abs >= 1e15) return v.toExponential(2);
+              if (abs >= 1e9) return (v / 1e9).toFixed(2) + "B";
+              if (abs >= 1e6) return (v / 1e6).toFixed(2) + "M";
+              if (abs >= 1000) return v.toLocaleString(undefined, { maximumFractionDigits: 0 });
+              if (abs >= 1) return v.toFixed(2);
+              return v.toFixed(4);
+            };
             const sections: { title: string; color: string; items: { label: string; value: string }[] }[] = [
               { title: "CONSCIOUSNESS", color: "#a855f7", items: [
                 { label: "Phi (Φ)", value: fmt(r.phi) },
@@ -502,9 +512,9 @@ export default function OAIDashboard() {
                     <div className="text-[10px] font-semibold tracking-wider mb-1.5" style={{ color: section.color }}>{section.title}</div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-xs">
                       {section.items.map((item, ii) => (
-                        <div key={ii} className="bg-gray-800/40 rounded-lg p-2">
-                          <div className="text-gray-500 text-[10px] uppercase">{item.label}</div>
-                          <div className="font-mono mt-0.5" style={{ color: section.color }}>{item.value}</div>
+                        <div key={ii} className="bg-gray-800/40 rounded-lg p-2 overflow-hidden">
+                          <div className="text-gray-500 text-[10px] uppercase truncate">{item.label}</div>
+                          <div className="font-mono mt-0.5 truncate" style={{ color: section.color }} title={item.value}>{item.value}</div>
                         </div>
                       ))}
                     </div>

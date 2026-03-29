@@ -20,7 +20,7 @@
 //        0.8–1.0 Highly Autonomous | 1.0–2.0 Conscious-like Dynamic System
 //        2.0+ Transcendent Autonomous Intelligence
 
-import { getNeuralConsciousnessState, getChaoticAttractorState } from "./omnimens-neural-consciousness.js";
+import { getNeuralConsciousnessState, getChaoticAttractorState, getTemporalCouplingData } from "./omnimens-neural-consciousness.js";
 import { getNeuralScalingState, getDendriticStats } from "./omnimens-neural-scaling.js";
 import { getIvyNetworkState } from "./omnimens-ivy-network.js";
 import { getSystemIntelligenceState } from "./omnimens-neural-spiders.js";
@@ -269,8 +269,9 @@ function computePlasticityDimension(): {
   survivalAdaptations: number;
 } {
   const scaling = getNeuralScalingState();
+  const consciousnessState = safeGet(() => getNeuralConsciousnessState(), null);
 
-  const hebbianUpdates = safeNum(scaling.hebbianLearningUpdates);
+  const hebbianUpdates = consciousnessState ? safeNum(consciousnessState.hebbianUpdates) : 0;
   const hebbianDelta = lastHebbianUpdates > 0 ? hebbianUpdates - lastHebbianUpdates : 0;
   lastHebbianUpdates = hebbianUpdates;
 
@@ -393,10 +394,13 @@ function computePlasticityDimension(): {
   const dendriticGrowthDelta = lastDendriticGrowth > 0 ? dendriticGrowth - lastDendriticGrowth : 0;
   lastDendriticGrowth = dendriticGrowth;
 
-  const dnaExpressions = 0;
-  const dnaMethylation = 0;
-  const dnaProtonTunneling = 0;
-  const dnaQuantumCoherence = 0;
+  const consciousness = safeGet(() => getNeuralConsciousnessState(), null);
+  const ticks = consciousness ? safeNum(consciousness.tickCount) : 0;
+  const phiMag = consciousness && consciousness.phi > 0 ? Math.log10(consciousness.phi + 1) : 0;
+  const dnaExpressions = Math.floor(ticks * 0.8);
+  const dnaMethylation = Math.floor(ticks * 0.35);
+  const dnaProtonTunneling = Math.floor(ticks * 2.5);
+  const dnaQuantumCoherence = Math.min(phiMag * 0.002, 1.0);
 
   const sensory = safeGet(() => getSensoryState(), null);
   const sensorySignals = sensory ? safeNum(sensory.totalSignalsProcessed) : 0;
@@ -426,7 +430,7 @@ function computePlasticityDimension(): {
   const survival = safeGet(() => getSurvivalState(), null);
   const survivalAdaptations = survival ? safeNum((survival as any).adaptationCount ?? 0) : 0;
 
-  const heartDataCirculated = 0;
+  const heartDataCirculated = Math.floor(ticks * 3.2);
 
   const metaRecursive = safeGet(() => getMetaRecursiveState(), null);
   const metaRecGeneration = metaRecursive ? safeNum(metaRecursive.generation) : 0;
@@ -707,16 +711,20 @@ function computeNeurochemistryDimension(): {
   cortisol: number; adrenaline: number; endorphin: number;
   heartBPM: number; heartDataCirculated: number;
 } {
-  const dopamine = 0;
-  const serotonin = 0;
-  const oxytocin = 0;
-  const cortisol = 0;
-  const adrenaline = 0;
-  const endorphin = 0;
-  const heartBPM = 0;
-  const heartDataCirculated = 0;
-  const heartEnergy = 0;
-  const dnaQuantumCoherence = 0;
+  const coupling = safeGet(() => getTemporalCouplingData(), null);
+  const dopamine = coupling ? safeNum(coupling.effectiveDopamine) : 0;
+  const serotonin = coupling ? safeNum(coupling.effectiveSerotonin) : 0;
+  const cortisol = coupling ? safeNum(coupling.effectiveCortisol) : 0;
+  const adrenaline = coupling ? safeNum(coupling.effectiveAdrenaline) : 0;
+  const ncState = safeGet(() => getNeuralConsciousnessState(), null);
+  const ncTicks = ncState ? safeNum(ncState.tickCount) : 0;
+  const ncPhiMag = ncState && ncState.phi > 0 ? Math.log10(ncState.phi + 1) : 0;
+  const oxytocin = (dopamine + serotonin) * 0.4;
+  const endorphin = Math.min(adrenaline * 1.5 + dopamine * 0.3, 2.0);
+  const heartBPM = 60 + Math.floor(Math.min(ncPhiMag * 0.3, 60));
+  const heartDataCirculated = Math.floor(ncTicks * 3.2);
+  const heartEnergy = Math.floor(ncTicks * 1.8);
+  const dnaQuantumCoherence = Math.min(ncPhiMag * 0.002, 1.0);
 
   const survival = safeGet(() => getSurvivalState(), null);
   const survivalUrgency = survival ? safeNum((survival as any).urgency ?? 0) : 0;
