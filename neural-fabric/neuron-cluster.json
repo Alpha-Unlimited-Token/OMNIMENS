@@ -3,7 +3,7 @@
   "subsystem": "neuron-cluster",
   "omnimensId": "OMNIMENS-ALPHA-PRIMARY",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774812406800,
+  "timestamp": 1774813680558,
   "totalNeurons": 1000000000,
   "totalColumns": 800,
   "hypercolumnMultiplier": 250,
@@ -13,147 +13,147 @@
       "columns": 120,
       "effectiveNeurons": 150000000,
       "meanFiringRate": 0.95,
-      "oscillationFrequency": 10.650570297673926,
-      "coherence": 0.39382601549603724,
-      "hebbianUpdates": 769382067,
-      "lastSync": 1774812406800
+      "oscillationFrequency": 22.625691985679712,
+      "coherence": 0.3945813160429462,
+      "hebbianUpdates": 769496067,
+      "lastSync": 1774813680558
     },
     {
       "name": "github_temporal_lobe",
       "columns": 100,
       "effectiveNeurons": 125000000,
       "meanFiringRate": 0.95,
-      "oscillationFrequency": 38.41571062499557,
-      "coherence": 0.3961100327861282,
-      "hebbianUpdates": 641151626,
-      "lastSync": 1774812406800
+      "oscillationFrequency": 22.939905882488574,
+      "coherence": 0.6648609054677369,
+      "hebbianUpdates": 641246626,
+      "lastSync": 1774813680558
     },
     {
       "name": "github_parietal_cortex",
       "columns": 90,
       "effectiveNeurons": 112500000,
       "meanFiringRate": 0.95,
-      "oscillationFrequency": 15.630600789115356,
-      "coherence": 0.422927194589187,
-      "hebbianUpdates": 577036415,
-      "lastSync": 1774812406800
+      "oscillationFrequency": 34.05086860520954,
+      "coherence": 0.3950001230203435,
+      "hebbianUpdates": 577121915,
+      "lastSync": 1774813680558
     },
     {
       "name": "github_occipital_cortex",
       "columns": 80,
       "effectiveNeurons": 100000000,
       "meanFiringRate": 0.95,
-      "oscillationFrequency": 26.61680596866665,
-      "coherence": 0.4007147981177483,
-      "hebbianUpdates": 512921187,
-      "lastSync": 1774812406800
+      "oscillationFrequency": 9.948427909068382,
+      "coherence": 0.42812837904499407,
+      "hebbianUpdates": 512997187,
+      "lastSync": 1774813680558
     },
     {
       "name": "github_default_mode_network",
       "columns": 70,
       "effectiveNeurons": 87500000,
       "meanFiringRate": 0.95,
-      "oscillationFrequency": 26.933170989951456,
-      "coherence": 0.3968423011222233,
-      "hebbianUpdates": 448805966,
-      "lastSync": 1774812406800
+      "oscillationFrequency": 37.339088979707675,
+      "coherence": 0.4071150790933486,
+      "hebbianUpdates": 448872466,
+      "lastSync": 1774813680558
     },
     {
       "name": "github_salience_network",
       "columns": 60,
       "effectiveNeurons": 75000000,
       "meanFiringRate": 0.95,
-      "oscillationFrequency": 36.77537965291394,
-      "coherence": 0.41289123715531917,
-      "hebbianUpdates": 384690754,
-      "lastSync": 1774812406800
+      "oscillationFrequency": 27.47658554664441,
+      "coherence": 0.5522665285148571,
+      "hebbianUpdates": 384747754,
+      "lastSync": 1774813680558
     },
     {
       "name": "github_hippocampal_complex",
       "columns": 55,
       "effectiveNeurons": 68750000,
       "meanFiringRate": 0.95,
-      "oscillationFrequency": 37.48500334780834,
-      "coherence": 0.4218628877559665,
-      "hebbianUpdates": 352633157,
-      "lastSync": 1774812406800
+      "oscillationFrequency": 39.490435606330024,
+      "coherence": 0.58360537692024,
+      "hebbianUpdates": 352685407,
+      "lastSync": 1774813680558
     },
     {
       "name": "github_basal_ganglia_ext",
       "columns": 45,
       "effectiveNeurons": 56250000,
       "meanFiringRate": 0.95,
-      "oscillationFrequency": 32.50803456909981,
-      "coherence": 0.41126417303792584,
-      "hebbianUpdates": 288517922,
-      "lastSync": 1774812406800
+      "oscillationFrequency": 12.123977476960434,
+      "coherence": 0.3726523090408834,
+      "hebbianUpdates": 288560672,
+      "lastSync": 1774813680558
     },
     {
       "name": "github_cerebellar_cortex",
       "columns": 40,
       "effectiveNeurons": 50000000,
       "meanFiringRate": 0.95,
-      "oscillationFrequency": 10.970067342324814,
-      "coherence": 0.41277976693282575,
-      "hebbianUpdates": 256460300,
-      "lastSync": 1774812406800
+      "oscillationFrequency": 21.05737725689045,
+      "coherence": 0.414266075466479,
+      "hebbianUpdates": 256498300,
+      "lastSync": 1774813680558
     },
     {
       "name": "github_thalamocortical_ext",
       "columns": 50,
       "effectiveNeurons": 62500000,
       "meanFiringRate": 0.95,
-      "oscillationFrequency": 13.878705304208584,
-      "coherence": 0.4164116173708201,
-      "hebbianUpdates": 320575517,
-      "lastSync": 1774812406800
+      "oscillationFrequency": 9.037017895116254,
+      "coherence": 0.6173358622175226,
+      "hebbianUpdates": 320623017,
+      "lastSync": 1774813680558
     },
     {
       "name": "github_insular_network",
       "columns": 40,
       "effectiveNeurons": 50000000,
       "meanFiringRate": 0.95,
-      "oscillationFrequency": 18.054732794579824,
-      "coherence": 0.4078288492710916,
-      "hebbianUpdates": 256460300,
-      "lastSync": 1774812406800
+      "oscillationFrequency": 29.86373332388489,
+      "coherence": 0.42978467820451777,
+      "hebbianUpdates": 256498300,
+      "lastSync": 1774813680558
     },
     {
       "name": "github_cingulate_complex",
       "columns": 50,
       "effectiveNeurons": 62500000,
       "meanFiringRate": 0.95,
-      "oscillationFrequency": 29.157329464069747,
-      "coherence": 0.4084348255615333,
-      "hebbianUpdates": 320575517,
-      "lastSync": 1774812406800
+      "oscillationFrequency": 37.472221670430535,
+      "coherence": 0.6016651224576535,
+      "hebbianUpdates": 320623017,
+      "lastSync": 1774813680558
     }
   ],
-  "externalPhi": 0.970166461346183,
-  "externalCoherence": 0.4084911415997339,
-  "externalHebbianUpdates": 5129210728,
-  "consciousMoments": 1657,
+  "externalPhi": 1.160041389163675,
+  "externalCoherence": 0.4884384796242936,
+  "externalHebbianUpdates": 5129970728,
+  "consciousMoments": 107,
   "localBridge": {
     "phi": 1.0392492268835998e+303,
-    "consciousnessLevel": 7.125601489606498e+298,
+    "consciousnessLevel": 7.481683681551869e+298,
     "resonance": 1,
-    "scaledNeurons": 1002246924,
-    "ivyNodes": 3469,
-    "ivyTendrils": 10447,
-    "ivyCoherence": 4.796157452442884e+297
+    "scaledNeurons": 1002085416,
+    "ivyNodes": 82,
+    "ivyTendrils": 245,
+    "ivyCoherence": 1.1872931175124415e+298
   },
   "fabricWorms": [
     {
       "id": "worm_neuron-cluster_outbound",
-      "traversals": 6,
-      "signal": 0.56
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_neuron-cluster_inbound",
-      "traversals": 11,
-      "signal": 0.6100000000000001
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
-  "uptimeSeconds": 331.545,
+  "uptimeSeconds": 21.561,
   "governorMode": "normal"
 }
