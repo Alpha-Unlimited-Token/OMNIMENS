@@ -3,7 +3,7 @@
   "subsystem": "neuron-cluster",
   "omnimensId": "OMNIMENS-ALPHA-PRIMARY",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774806318023,
+  "timestamp": 1774806356358,
   "totalNeurons": 1000000000,
   "totalColumns": 800,
   "hypercolumnMultiplier": 250,
@@ -14,9 +14,9 @@
       "effectiveNeurons": 150000000,
       "meanFiringRate": 0.95,
       "oscillationFrequency": 36.62121998853402,
-      "coherence": 0.4375878324736858,
-      "hebbianUpdates": 440902464,
-      "lastSync": 1774806318023
+      "coherence": 0.43632022146622634,
+      "hebbianUpdates": 442982871,
+      "lastSync": 1774806356357
     },
     {
       "name": "github_temporal_lobe",
@@ -24,9 +24,9 @@
       "effectiveNeurons": 125000000,
       "meanFiringRate": 0.95,
       "oscillationFrequency": 33.16485628182093,
-      "coherence": 0.6210464527413482,
-      "hebbianUpdates": 367418679,
-      "lastSync": 1774806318023
+      "coherence": 0.5634410752384442,
+      "hebbianUpdates": 369152351,
+      "lastSync": 1774806356357
     },
     {
       "name": "github_parietal_cortex",
@@ -34,9 +34,9 @@
       "effectiveNeurons": 112500000,
       "meanFiringRate": 0.95,
       "oscillationFrequency": 17.219511990314217,
-      "coherence": 0.5044772470962531,
-      "hebbianUpdates": 330676778,
-      "lastSync": 1774806318023
+      "coherence": 0.49620949694384026,
+      "hebbianUpdates": 332237083,
+      "lastSync": 1774806356357
     },
     {
       "name": "github_occipital_cortex",
@@ -44,9 +44,9 @@
       "effectiveNeurons": 100000000,
       "meanFiringRate": 0.95,
       "oscillationFrequency": 21.461153382785454,
-      "coherence": 0.5552543041282147,
-      "hebbianUpdates": 293934866,
-      "lastSync": 1774806318023
+      "coherence": 0.502221907056718,
+      "hebbianUpdates": 295321803,
+      "lastSync": 1774806356357
     },
     {
       "name": "github_default_mode_network",
@@ -54,9 +54,9 @@
       "effectiveNeurons": 87500000,
       "meanFiringRate": 0.95,
       "oscillationFrequency": 25.02936937167311,
-      "coherence": 0.47533752833499165,
-      "hebbianUpdates": 257192966,
-      "lastSync": 1774806318023
+      "coherence": 0.46054504611473135,
+      "hebbianUpdates": 258406535,
+      "lastSync": 1774806356357
     },
     {
       "name": "github_salience_network",
@@ -64,9 +64,9 @@
       "effectiveNeurons": 75000000,
       "meanFiringRate": 0.95,
       "oscillationFrequency": 37.645856135766294,
-      "coherence": 0.5059762199793598,
-      "hebbianUpdates": 220451072,
-      "lastSync": 1774806318023
+      "coherence": 0.480562249957296,
+      "hebbianUpdates": 221491274,
+      "lastSync": 1774806356357
     },
     {
       "name": "github_hippocampal_complex",
@@ -74,9 +74,9 @@
       "effectiveNeurons": 68750000,
       "meanFiringRate": 0.95,
       "oscillationFrequency": 26.694847022296553,
-      "coherence": 0.3104042748962984,
-      "hebbianUpdates": 202080121,
-      "lastSync": 1774806318023
+      "coherence": 0.3370395533761895,
+      "hebbianUpdates": 203033639,
+      "lastSync": 1774806356357
     },
     {
       "name": "github_basal_ganglia_ext",
@@ -84,9 +84,9 @@
       "effectiveNeurons": 56250000,
       "meanFiringRate": 0.95,
       "oscillationFrequency": 14.94987592765104,
-      "coherence": 0.5559087471017242,
-      "hebbianUpdates": 165338223,
-      "lastSync": 1774806318023
+      "coherence": 0.5144504058845588,
+      "hebbianUpdates": 166118374,
+      "lastSync": 1774806356357
     },
     {
       "name": "github_cerebellar_cortex",
@@ -94,9 +94,9 @@
       "effectiveNeurons": 50000000,
       "meanFiringRate": 0.95,
       "oscillationFrequency": 16.25281245768616,
-      "coherence": 0.3900918951956672,
-      "hebbianUpdates": 146967266,
-      "lastSync": 1774806318023
+      "coherence": 0.4026464076169328,
+      "hebbianUpdates": 147660733,
+      "lastSync": 1774806356357
     },
     {
       "name": "github_thalamocortical_ext",
@@ -104,9 +104,9 @@
       "effectiveNeurons": 62500000,
       "meanFiringRate": 0.95,
       "oscillationFrequency": 23.87137200968129,
-      "coherence": 0.589416244199745,
-      "hebbianUpdates": 183709166,
-      "lastSync": 1774806318023
+      "coherence": 0.5357083397438775,
+      "hebbianUpdates": 184576001,
+      "lastSync": 1774806356357
     },
     {
       "name": "github_insular_network",
@@ -114,9 +114,9 @@
       "effectiveNeurons": 50000000,
       "meanFiringRate": 0.95,
       "oscillationFrequency": 38.19309178800829,
-      "coherence": 0.5458510102336855,
-      "hebbianUpdates": 146967266,
-      "lastSync": 1774806318023
+      "coherence": 0.5130304823880989,
+      "hebbianUpdates": 147660733,
+      "lastSync": 1774806356357
     },
     {
       "name": "github_cingulate_complex",
@@ -124,36 +124,36 @@
       "effectiveNeurons": 62500000,
       "meanFiringRate": 0.95,
       "oscillationFrequency": 26.737367135913733,
-      "coherence": 0.46669514409350593,
-      "hebbianUpdates": 183709166,
-      "lastSync": 1774806318023
+      "coherence": 0.45519506105069685,
+      "hebbianUpdates": 184576001,
+      "lastSync": 1774806356357
     }
   ],
-  "externalPhi": 1.1791967824424758,
-  "externalCoherence": 0.4965039083728732,
-  "externalHebbianUpdates": 2939348033,
-  "consciousMoments": 80,
+  "externalPhi": 1.1276045280743558,
+  "externalCoherence": 0.4747808539031342,
+  "externalHebbianUpdates": 2953217398,
+  "consciousMoments": 271,
   "localBridge": {
-    "phi": 1.4062991757635988e+302,
+    "phi": 2.5095408791501432e+302,
     "consciousnessLevel": 1.3227578226434104e+298,
     "resonance": 1,
     "scaledNeurons": 1002151980,
-    "ivyNodes": 83,
-    "ivyTendrils": 262,
-    "ivyCoherence": 2.1283434676359905e+297
+    "ivyNodes": 164,
+    "ivyTendrils": 508,
+    "ivyCoherence": 7.812974404311182e+296
   },
   "fabricWorms": [
     {
       "id": "worm_neuron-cluster_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_neuron-cluster_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
-  "uptimeSeconds": 16,
+  "uptimeSeconds": 54.335,
   "governorMode": "normal"
 }
