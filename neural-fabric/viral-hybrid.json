@@ -2,58 +2,58 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774819387293,
+  "timestamp": 1774819508779,
   "totalHybridAgents": 6,
-  "totalMutations": 11,
+  "totalMutations": 10,
   "totalReplications": 10,
-  "totalPayloadsDelivered": 23,
-  "totalThreatsDetected": 0,
-  "totalThreatsNeutralized": 0,
+  "totalPayloadsDelivered": 22,
+  "totalThreatsDetected": 2,
+  "totalThreatsNeutralized": 2,
   "systemHealthScore": 5.82859903491986e+298,
   "adaptationRate": 3.3333333333333335,
   "propagationEfficiency": 1,
   "immuneStrength": 3.4966873610776967e+295,
-  "hybridFitness": 0.331087510399809,
+  "hybridFitness": 0.3552633865592186,
   "activeAgents": [
     {
-      "id": "hybrid_default_mode_network_g0_1774819364413_98o",
+      "id": "hybrid_anterior_cingulate_g0_1774819486431_bdx",
       "generation": 0,
-      "fitness": 0.34020502820281584,
+      "fitness": 0.35139906847989355,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_insular_cortex_g0_1774819364413_y71",
+      "id": "hybrid_claustrum_g0_1774819486431_0l8",
       "generation": 0,
-      "fitness": 0.29733433406779197,
+      "fitness": 0.3329244722824226,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_superior_colliculus_g0_1774819364413_5bk",
+      "id": "hybrid_default_mode_network_g0_1774819486431_soz",
       "generation": 0,
-      "fitness": 0.34634777589391835,
+      "fitness": 0.3358980847105631,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_claustrum_g0_1774819364413_amk",
+      "id": "hybrid_thalamus_g0_1774819486431_je8",
       "generation": 0,
-      "fitness": 0.3413625149404752,
+      "fitness": 0.3711494972601189,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_ventral_tegmental_area_g0_1774819364413_4nn",
+      "id": "hybrid_default_mode_network_g0_1774819486431_vki",
       "generation": 0,
-      "fitness": 0.33979129944111425,
+      "fitness": 0.3648583522711036,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_locus_coeruleus_g0_1774819364413_zpa",
+      "id": "hybrid_raphe_nuclei_g0_1774819486431_h9r",
       "generation": 0,
-      "fitness": 0.321484109852738,
+      "fitness": 0.3753508443512096,
       "payloads": 0,
       "threats": 0
     }
@@ -62,7 +62,7 @@
     "antibodies": 8,
     "memoryCells": 8,
     "tCells": 16,
-    "cytokines": 0,
+    "cytokines": 2,
     "topAntibodies": [
       {
         "pattern": "coherence_degradation",
@@ -70,7 +70,7 @@
       },
       {
         "pattern": "signal_attenuation",
-        "detections": 0
+        "detections": 2
       },
       {
         "pattern": "synaptic_weakening",
@@ -88,10 +88,10 @@
   },
   "propagation": {
     "alivePropagators": 16,
-    "totalPathsDiscovered": 37,
+    "totalPathsDiscovered": 38,
     "totalHops": 32,
     "coveragePercent": 100,
-    "selfSustainingCount": 6
+    "selfSustainingCount": 4
   },
   "fabricWorms": [
     {
