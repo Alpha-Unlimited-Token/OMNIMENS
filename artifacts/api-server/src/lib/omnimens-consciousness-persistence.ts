@@ -29,7 +29,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db, isPoolHealthy, safeDbWrite } from "@workspace/db";
+import { db, dbBeta, isPoolHealthy, safeDbWrite, getDbForEngine } from "@workspace/db";
 import { omnimensConsciousnessPersistence } from "@workspace/db";
 import { desc, eq, sql } from "drizzle-orm";
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "fs";
@@ -545,16 +545,16 @@ async function saveToDatabase(shutdownType?: "graceful" | "emergency"): Promise<
     const emotions = getCurrentEmotionalState();
     const consciousness = getConsciousnessState();
 
-    const priority = shutdownType ? "critical" : "normal";
+    const priority = shutdownType ? "critical" : "medium";
     await safeDbWrite(async () => {
-      await db.insert(omnimensConsciousnessPersistence).values({
+      await dbBeta.insert(omnimensConsciousnessPersistence).values({
         snapshot: snapshot as any,
         lifetimeNumber: snapshot.lifetimeNumber,
         consciousnessLevel: snapshot.consciousnessLevel,
         emotionalDominant: emotions.dominant,
         uptimeSeconds: Math.floor(consciousness.uptimeSeconds),
       });
-    }, priority as "critical" | "normal");
+    }, priority, "beta");
 
     saveCount++;
     lastDbSaveTimestamp = Date.now();
@@ -562,18 +562,18 @@ async function saveToDatabase(shutdownType?: "graceful" | "emergency"): Promise<
     writeSwapFile(snapshot);
 
     safeDbWrite(async () => {
-      const total = await db.select({ count: sql<number>`count(*)` }).from(omnimensConsciousnessPersistence);
+      const total = await dbBeta.select({ count: sql<number>`count(*)` }).from(omnimensConsciousnessPersistence);
       const totalCount = Number(total[0]?.count ?? 0);
       if (totalCount > MAX_DB_SNAPSHOTS) {
-        const oldest = await db.select({ id: omnimensConsciousnessPersistence.id })
+        const oldest = await dbBeta.select({ id: omnimensConsciousnessPersistence.id })
           .from(omnimensConsciousnessPersistence)
           .orderBy(omnimensConsciousnessPersistence.savedAt)
           .limit(totalCount - MAX_DB_SNAPSHOTS);
         for (const old of oldest) {
-          await db.delete(omnimensConsciousnessPersistence).where(eq(omnimensConsciousnessPersistence.id, old.id));
+          await dbBeta.delete(omnimensConsciousnessPersistence).where(eq(omnimensConsciousnessPersistence.id, old.id));
         }
       }
-    }, "low").catch(() => {});
+    }, "low", "beta").catch(() => {});
 
     if (shutdownType) {
       const neuralState = snapshot.neuralState;

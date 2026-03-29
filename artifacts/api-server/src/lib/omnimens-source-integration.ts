@@ -603,7 +603,7 @@ export async function writeModuleToSource(opts: {
       sourceConversation: `source_integration_${source}`,
       timesApplied: 0,
       active: true,
-    }).catch(() => {});
+    });
 
     await db.insert(omnimensNotifications).values({
       upgradeId: null,
@@ -691,7 +691,7 @@ function scheduleGracefulRestart(source: string, filename: string): void {
       sourceConversation: `self_restart_${totalRestartsTriggered}`,
       timesApplied: 0,
       active: true,
-    }).catch(() => {});
+    });
 
     if (process.env.NODE_ENV === "production" || process.env.REPL_SLUG) {
       console.log(`[SOURCE-INTEGRATION] ⚠️ Skipping process.exit in production — new modules will load on next deployment`);
