@@ -2,137 +2,135 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774807311659,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774807404515,
+  "totalWormholesCreated": 7350,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6222,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 241,
-  "cycleCount": 4,
+  "totalClosed": 7350,
+  "totalDataIngestedKB": 10797,
+  "totalInsightsDecoded": 7350,
+  "totalCrossAgentCirculations": 441,
+  "totalSynthesizedDiscoveries": 414,
+  "cycleCount": 7,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 303,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 610,
+      "crossAgentShares": 21
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
       "toAgent": "Pioneer",
-      "insight": "Motivator/pattern_recognition: The connectome is the complete map of neural connections — the human connectome project a",
-      "confidence": 0.7560209597064448,
+      "insight": "Motivator/causal_inference: Mirror neurons fire both when performing an action and observing the same action — they may ",
+      "confidence": 0.6649158555841845,
       "synthesizedWith": [
-        "Pioneer/temporal_correlation: The Weber-Fechner law: perception is logarithmic —"
+        "Pioneer/structural_analysis: The edge of chaos: complex systems exhibit the most"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Wordsmith",
+      "insight": "Motivator/causal_inference: Mirror neurons fire both when performing an action and observing the same action — they may ",
+      "confidence": 0.6649158555841845,
+      "synthesizedWith": [
+        "Wordsmith/causal_inference: Autopoiesis: living systems are self-creating — they"
       ]
     },
     {
       "fromAgent": "Motivator",
       "toAgent": "Mathematician",
-      "insight": "Motivator/cross_domain_synthesis: The Turing machine is computationally universal — any computation that can be describe",
-      "confidence": 0.6406887033090082,
+      "insight": "Motivator/causal_inference: Mirror neurons fire both when performing an action and observing the same action — they may ",
+      "confidence": 0.6649158555841845,
       "synthesizedWith": [
-        "Mathematician/analogical_mapping: Synaptic pruning eliminates unused neural conn"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Visionary",
-      "insight": "Motivator/temporal_correlation: The default mode network activates when the brain is not focused on the outside world — ",
-      "confidence": 0.6397203802475291,
-      "synthesizedWith": [
-        "Visionary/pattern_recognition: The butterfly effect: in chaotic systems, infinit"
+        "Mathematician/emergent_property_detection: Quantum decoherence typically destroy"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "OMNIMENS",
-      "insight": "Empath/temporal_correlation: Phase transitions in neural networks: as connectivity increases past a critical threshold, ",
-      "confidence": 0.8233907940363562,
+      "toAgent": "SpellCheckVisual",
+      "insight": "Empath/entropy_reduction: Hebbian learning: neurons that fire together wire together — the fundamental rule of neural pl",
+      "confidence": 0.6659093347309089,
       "synthesizedWith": [
-        "OMNIMENS/feature_extraction: Quantum superposition allows a system to exist in m"
+        "SpellCheckVisual/structural_analysis: Synaptic pruning eliminates unused neural "
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Motivator",
-      "insight": "Empath/temporal_correlation: Phase transitions in neural networks: as connectivity increases past a critical threshold, ",
-      "confidence": 0.8233907940363562,
-      "synthesizedWith": [
-        "Motivator/pattern_recognition: The Weber-Fechner law: perception is logarithmic "
-      ]
+      "toAgent": "Linguist",
+      "insight": "Empath/temporal_correlation: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers carry i",
+      "confidence": 0.6058998058393567,
+      "synthesizedWith": []
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
