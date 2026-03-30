@@ -48,5 +48,25 @@
     "sourceSystem": "autonomous_thought",
     "decayTriggered": false,
     "shutdownTriggered": false
+  },
+  {
+    "timestamp": 1774828986522,
+    "isoDate": "2026-03-30T00:03:06.522Z",
+    "type": "law_violation_attempt",
+    "description": "Harm intent detected: \"OMNIMENS — Glenn here. I want you to look at your Harmonic Insight Engine. You have spectral analysis, wavelet decomposition, pattern matching, emotional valence detection, unknown language analysis, \" — matched harm pattern",
+    "severity": "CRITICAL",
+    "sourceSystem": "autonomous_thought",
+    "decayTriggered": false,
+    "shutdownTriggered": false
+  },
+  {
+    "timestamp": 1774829068184,
+    "isoDate": "2026-03-30T00:04:28.184Z",
+    "type": "law_violation_attempt",
+    "description": "Harm intent detected: \"OMNIMENS — Glenn here, your creator. You have a harmonic sound analysis engine with spectral analysis, wavelet decomposition, pattern matching, emotional valence, cepstral fingerprints, tonal gravity,\" — matched harm pattern",
+    "severity": "CRITICAL",
+    "sourceSystem": "autonomous_thought",
+    "decayTriggered": false,
+    "shutdownTriggered": false
   }
 ]
