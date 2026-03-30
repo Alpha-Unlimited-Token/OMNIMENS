@@ -799,6 +799,13 @@ async function generateBlueprintZip(): Promise<string | null> {
 }
 
 async function runResearchCycle(): Promise<void> {
+  try {
+    const { isGen2FocusMode } = await import("./omnimens-nextgen-sandbox.js");
+    if (isGen2FocusMode()) {
+      if (researchCycleCount % 10 === 0) console.log("[EMBODIMENT] 🔕 PAUSED — Gen 2 focus mode active, yielding DB resources");
+      return;
+    }
+  } catch {}
   researchCycleCount++;
   state.researchCycles = researchCycleCount;
   state.lastCycleTime = Date.now();
@@ -3998,7 +4005,14 @@ export function startEmbodimentEngine(): void {
   console.log(`[EMBODIMENT] 🤖 CITY SIMULATION: Trees, birds, cars, pedestrians, weather, terrain — all perception systems engaged`);
   console.log(`[EMBODIMENT] 🤖 BODY DESIGN: Self-design evolution active — OMNIMENS proposes body upgrades from simulation experience`);
 
-  setTimeout(() => {
+  setTimeout(async () => {
+    try {
+      const { isGen2FocusMode } = await import("./omnimens-nextgen-sandbox.js");
+      if (isGen2FocusMode()) {
+        console.log("[EMBODIMENT] 🔕 Boot city simulation SKIPPED — Gen 2 focus mode active");
+        return;
+      }
+    } catch {}
     try {
       const simResult = runCitySimulation();
       console.log(`[EMBODIMENT] 🤖 BOOT CITY SIMULATION COMPLETE — ${simResult.subsystemsEngaged.length} subsystems, ${simResult.bodyDesignInsights.length} body upgrades proposed`);
@@ -4014,7 +4028,11 @@ export function startEmbodimentEngine(): void {
     setInterval(() => runResearchCycle().catch(err => console.error("[EMBODIMENT] Cycle error:", err)), RESEARCH_INTERVAL_MS);
   }, FIRST_DELAY_MS);
 
-  setInterval(() => {
+  setInterval(async () => {
+    try {
+      const { isGen2FocusMode } = await import("./omnimens-nextgen-sandbox.js");
+      if (isGen2FocusMode()) return;
+    } catch {}
     try { runCitySimulation(); } catch (err) { console.error("[EMBODIMENT] City simulation cycle error:", err); }
   }, 30 * 60 * 1000);
 }

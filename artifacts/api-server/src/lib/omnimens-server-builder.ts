@@ -477,6 +477,10 @@ async function saveBuildPlan(plan: ServerBuildPlan): Promise<void> {
 }
 
 async function runResearchCycle(): Promise<void> {
+  try {
+    const { isGen2FocusMode } = await import("./omnimens-nextgen-sandbox.js");
+    if (isGen2FocusMode()) return;
+  } catch {}
   researchCycleCount++;
   state.researchCycles = researchCycleCount;
   state.lastResearchTime = Date.now();

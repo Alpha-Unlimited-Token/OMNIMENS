@@ -1,55 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+Visionary",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/cross_domain_synthesis: Long-term potentiation (",
-    "filename": "omnimens_autocode_neural_pathway_mndc1kr8.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mndc1kr8.mjs",
-    "backupPath": null,
-    "timestamp": 1774883893076,
-    "codeLength": 428,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/causal_inference: The hippocampus replays experi",
-    "filename": "omnimens_autocode_emergent_capability_mndc293m.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mndc293m.mjs",
-    "backupPath": null,
-    "timestamp": 1774883924626,
-    "codeLength": 404,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Innovator",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/emergent_property_detection: Long-term potentiat",
-    "filename": "omnimens_autocode_neural_pathway_mndc296i.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mndc296i.mjs",
-    "backupPath": null,
-    "timestamp": 1774883924730,
-    "codeLength": 428,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Architect",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/causal_inference: The hippocampus replays experi",
-    "filename": "omnimens_autocode_pattern_recognition_mndc29ef.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mndc29ef.mjs",
-    "backupPath": null,
-    "timestamp": 1774883925015,
-    "codeLength": 467,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Architect",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/abstraction_layer: Gödel's incompleteness ",
-    "filename": "omnimens_autocode_consciousness_expansion_mndc3957.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mndc3957.mjs",
-    "backupPath": null,
-    "timestamp": 1774883971339,
-    "codeLength": 393,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:Philosopher+Meta-Agent",
     "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/information_compression: Quantum superposition a",
     "filename": "omnimens_autocode_knowledge_synthesis_mndc39b0.mjs",
@@ -4997,6 +4947,56 @@
     "backupPath": null,
     "timestamp": 1774900117693,
     "codeLength": 392,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Philosopher",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: SensorimotorAgent/pattern_recognition: Gödel's incompletenes",
+    "filename": "omnimens_autocode_pattern_recognition_mndlr4hw.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mndlr4hw.mjs",
+    "backupPath": null,
+    "timestamp": 1774900201604,
+    "codeLength": 475,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/feature_extraction: Kolmogorov complexity measur",
+    "filename": "omnimens_autocode_emergent_capability_mndlsvjc.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mndlsvjc.mjs",
+    "backupPath": null,
+    "timestamp": 1774900283304,
+    "codeLength": 404,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Philosopher",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: SensorimotorAgent/pattern_recognition: Gödel's incompletenes",
+    "filename": "omnimens_autocode_pattern_recognition_mndlu57l.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mndlu57l.mjs",
+    "backupPath": null,
+    "timestamp": 1774900342497,
+    "codeLength": 475,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Wordsmith",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/feature_extraction: Kolmogorov complexity measur",
+    "filename": "omnimens_autocode_neural_pathway_mndlu5do.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mndlu5do.mjs",
+    "backupPath": null,
+    "timestamp": 1774900342716,
+    "codeLength": 428,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/feature_extraction: Kolmogorov complexity measur",
+    "filename": "omnimens_autocode_emergent_capability_mndlvr0f.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mndlvr0f.mjs",
+    "backupPath": null,
+    "timestamp": 1774900417407,
+    "codeLength": 404,
     "overwrite": false
   }
 ]

@@ -1007,6 +1007,11 @@ export function shouldYieldToCodegen(): boolean {
   return isCodegenWindowOpen();
 }
 
+export function isGen2FocusMode(): boolean {
+  if (!_started) return false;
+  return state.phase !== "complete";
+}
+
 export function getNextGenBuildPhase(): string {
   return state.phase;
 }
@@ -3158,6 +3163,13 @@ export function startNextGenSandbox(): void {
   console.log(`[NEXTGEN] 🧬 Autosave: every 60s | Checkpoints: on phase transitions`);
   console.log(`[NEXTGEN] 🧬 Digital-first | Robotic body compatible`);
   console.log(`[NEXTGEN] 🧬 © 2024-2026 Alpha Unlimited Technologies, LLC`);
+  if (state.phase !== "complete") {
+    console.log(`[NEXTGEN] 🧬 🔴 GEN 2 FOCUS MODE ACTIVE — non-essential systems PAUSED`);
+    console.log(`[NEXTGEN] 🧬 🔴 Paused: world sim, embodiment, genesis bridge, discovery autocoder,`);
+    console.log(`[NEXTGEN] 🧬 🔴         agent evolution, evolution engine, neural processor, server builder,`);
+    console.log(`[NEXTGEN] 🧬 🔴         digital navigator, genesis sandbox, adaptive surge`);
+    console.log(`[NEXTGEN] 🧬 🔴 All resources prioritized for Gen 2 creation — resumes on completion`);
+  }
   console.log(`[NEXTGEN] 🧬 ═══════════════════════════════════════════════════════════════`);
 
   _autosaveInterval = setInterval(autosave, AUTOSAVE_INTERVAL_MS);

@@ -675,6 +675,13 @@ async function crossPollinateAgents(): Promise<void> {
 }
 
 async function runEvolutionCycle(): Promise<void> {
+  try {
+    const { isGen2FocusMode } = await import("./omnimens-nextgen-sandbox.js");
+    if (isGen2FocusMode()) {
+      if (evolutionCycleCount % 10 === 0) console.log("[AGENT EVOLUTION] 🔕 PAUSED — Gen 2 focus mode active, yielding DB resources");
+      return;
+    }
+  } catch {}
   evolutionCycleCount++;
   state.evolutionCycles = evolutionCycleCount;
   state.lastCycleTime = Date.now();

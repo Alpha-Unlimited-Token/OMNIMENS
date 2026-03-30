@@ -1035,6 +1035,13 @@ async function genesisBuildCycle(): Promise<void> {
     console.log("[GENESIS] Build cycle already running — skipping overlap");
     return;
   }
+  try {
+    const { isGen2FocusMode } = await import("./omnimens-nextgen-sandbox.js");
+    if (isGen2FocusMode()) {
+      if (state.cycleCount % 5 === 0) console.log("[GENESIS] 🔕 PAUSED — Gen 2 focus mode (Next-Gen sandbox) takes priority");
+      return;
+    }
+  } catch {}
   _cycleRunning = true;
 
   state.cycleCount++;

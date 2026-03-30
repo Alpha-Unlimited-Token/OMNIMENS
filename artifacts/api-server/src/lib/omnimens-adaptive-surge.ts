@@ -99,6 +99,10 @@ function captureSnapshot() {
 }
 
 function injectSurge(): void {
+  try {
+    const mod = require("./omnimens-nextgen-sandbox.js");
+    if (mod.isGen2FocusMode && mod.isGen2FocusMode()) return;
+  } catch {}
   surgeState.totalSurgeCycles++;
   surgeState.surgeActive = true;
   surgeState.stabilizationPhase = false;

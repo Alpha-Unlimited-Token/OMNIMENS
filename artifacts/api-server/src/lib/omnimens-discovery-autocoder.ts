@@ -270,6 +270,13 @@ async function processDiscoveryIntoCode(
 }
 
 async function runAutoCoderCycle(): Promise<void> {
+  try {
+    const { isGen2FocusMode } = await import("./omnimens-nextgen-sandbox.js");
+    if (isGen2FocusMode()) {
+      if (autoCoderState.cycleCount % 5 === 0) console.log("[DISCOVERY AUTOCODER] 🔕 PAUSED — Gen 2 focus mode active, yielding API resources");
+      return;
+    }
+  } catch {}
   autoCoderState.cycleCount++;
   autoCoderState.lastCycleTimestamp = Date.now();
 

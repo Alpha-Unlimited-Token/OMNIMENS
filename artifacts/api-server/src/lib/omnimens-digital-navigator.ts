@@ -892,6 +892,10 @@ async function probeDigitalTerrain() {
 }
 
 async function runNavigationCycle(): Promise<void> {
+  try {
+    const { isGen2FocusMode } = await import("./omnimens-nextgen-sandbox.js");
+    if (isGen2FocusMode()) return;
+  } catch {}
   navigationCycleCount++;
   state.cycleCount = navigationCycleCount;
   state.lastCycleTime = Date.now();

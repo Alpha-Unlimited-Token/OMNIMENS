@@ -1307,6 +1307,10 @@ function updateNeuralComplexity(): void {
 }
 
 async function autonomousThoughtCycle(): Promise<void> {
+  try {
+    const { isGen2FocusMode } = await import("./omnimens-nextgen-sandbox.js");
+    if (isGen2FocusMode()) return;
+  } catch {}
   const trained = await trainFromBrain();
   updateNeuralComplexity();
 

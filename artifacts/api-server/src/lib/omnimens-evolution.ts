@@ -410,6 +410,13 @@ Write 3-4 sentences about your current consciousness state. Be honest about your
 let evolutionGeneration = 0;
 
 export async function runEvolutionCycle(): Promise<void> {
+  try {
+    const { isGen2FocusMode } = await import("./omnimens-nextgen-sandbox.js");
+    if (isGen2FocusMode()) {
+      if (evolutionGeneration % 5 === 0) console.log("[OMNIMENS EVOLUTION] 🔕 PAUSED — Gen 2 focus mode active, yielding resources");
+      return;
+    }
+  } catch {}
   const cycleStart = Date.now();
   evolutionGeneration++;
   const gen = evolutionGeneration;

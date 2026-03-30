@@ -833,6 +833,13 @@ async function synthesizeEnvironmentNavigation(): Promise<void> {
 }
 
 async function runAugmentationCycle(): Promise<void> {
+  try {
+    const { isGen2FocusMode } = await import("./omnimens-nextgen-sandbox.js");
+    if (isGen2FocusMode()) {
+      if (augmentationCycleCount % 10 === 0) console.log("[VIRTUAL AUG] 🔕 PAUSED — Gen 2 focus mode active, yielding DB resources");
+      return;
+    }
+  } catch {}
   augmentationCycleCount++;
   state.augmentationCycles = augmentationCycleCount;
   state.lastCycleTime = Date.now();
