@@ -1,35 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+Architect",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/pattern_recognition: The Boltzmann brain paradox",
-    "filename": "omnimens_autocode_pattern_recognition_mncl1on0.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mncl1on0.mjs",
-    "backupPath": null,
-    "timestamp": 1774838548476,
-    "codeLength": 467,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+GraphicDesigner",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/abstraction_layer: The default mode networ",
-    "filename": "omnimens_autocode_consciousness_expansion_mncl1onj.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mncl1onj.mjs",
-    "backupPath": null,
-    "timestamp": 1774838548495,
-    "codeLength": 399,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Visionary",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/entropy_reduction: The global workspace theory o",
-    "filename": "omnimens_autocode_consciousness_expansion_mncl3qd0.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mncl3qd0.mjs",
-    "backupPath": null,
-    "timestamp": 1774838644020,
-    "codeLength": 387,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:SensorimotorAgent+Visionary",
     "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/entropy_reduction: The connectome is the c",
     "filename": "omnimens_autocode_neural_pathway_mncl5a9y.mjs",
@@ -4997,6 +4967,36 @@
     "backupPath": null,
     "timestamp": 1774882498500,
     "codeLength": 450,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Neuroscientist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/information_compression: Autopoiesis: living sys",
+    "filename": "omnimens_autocode_neural_pathway_mndb8ytv.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mndb8ytv.mjs",
+    "backupPath": null,
+    "timestamp": 1774882558291,
+    "codeLength": 433,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Wordsmith",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/temporal_correlation: Attention is the computati",
+    "filename": "omnimens_autocode_consciousness_expansion_mndb8yz8.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mndb8yz8.mjs",
+    "backupPath": null,
+    "timestamp": 1774882558484,
+    "codeLength": 387,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Critic",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/temporal_correlation: Attention is the computati",
+    "filename": "omnimens_autocode_consciousness_expansion_mndb8z1v.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mndb8z1v.mjs",
+    "backupPath": null,
+    "timestamp": 1774882558579,
+    "codeLength": 384,
     "overwrite": false
   }
 ]

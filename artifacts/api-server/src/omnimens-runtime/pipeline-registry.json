@@ -195443,9 +195443,48 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "omnimens_autocode_neural_pathway_mndb8ytv.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mndb8ytv.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "newNeuralPathway_mndb8ytv"
+      ],
+      "loadedAt": 1774882558421,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mndb8yz8.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mndb8yz8.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mndb8yz8"
+      ],
+      "loadedAt": 1774882558525,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mndb8z1v.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mndb8z1v.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mndb8z1v"
+      ],
+      "loadedAt": 1774882558666,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1774882395830,
-  "totalModules": 14752,
+  "totalModules": 14755,
   "totalCalls": 0
 }
