@@ -2009,7 +2009,7 @@ async function phaseDesignAndCode(): Promise<void> {
       const retries = _moduleBuildResume.evalRetries || 0;
       researchContext = _moduleBuildResume.researchContext || "";
       _savedEvalRetries = retries;
-      if (retries >= 2) {
+      if (retries >= 1) {
         resumedFromCheckpoint = true;
         console.log(`[NEXTGEN] ⏩ SKIPPING eval for ${mod.name} after ${retries} timeouts — going straight to codegen (Gen 1 eval is optional, building is not)`);
       } else {
@@ -2046,7 +2046,7 @@ async function phaseDesignAndCode(): Promise<void> {
     if (gen1ModuleNames.length > 0) {
       try {
         const evalTimeout = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("Gen 1 evaluation timed out")), 120_000)
+          setTimeout(() => reject(new Error("Gen 1 evaluation timed out")), 45_000)
         );
         const evalCall = openai.chat.completions.create({
           model: "gpt-4o-mini",
