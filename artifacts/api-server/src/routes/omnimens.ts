@@ -120,6 +120,7 @@ import { getAugmentationState } from "../lib/omnimens-virtual-augmentation.js";
 import { getDigitalNavigatorState, getNavigationSummary, navigateTo, getDigitalMap } from "../lib/omnimens-digital-navigator.js";
 import { getAgentEvolutionState, getAgentProfile } from "../lib/omnimens-agent-evolution.js";
 import { getAgentUpgradeStatus, getBridgeStatus, getStrategicGoals, getArchitectPatternLibrary } from "../lib/omnimens-agent-upgrades.js";
+import { getPipelineState as getAgentPipelineState, runPipelineCycle, getPipelineOrder, getNeuralFabricConnections, getPipelineStageStats } from "../lib/omnimens-agent-pipeline.js";
 import { getAIResearchInsights, getNavigationRoboticsKnowledge, getEngineeringKnowledge, getCreativeDreamInsights, generateCreativeIdeation, getResearchSummary } from "../lib/omnimens-public-intelligence.js";
 import { getGuardianReport, getCopyrightNotice, getProtectedModuleList } from "../lib/omnimens-ip-guardian.js";
 import { getCausalState, getCausalGraph, predictOutcome } from "../lib/omnimens-causal-reasoning.js";
@@ -10565,6 +10566,58 @@ router.get("/omnimens/agent-upgrades", async (req, res) => {
     });
   } catch {
     res.status(500).json({ error: "Failed to get agent upgrade data" });
+  }
+});
+
+router.get("/omnimens/agent-pipeline", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const state = getAgentPipelineState();
+    const order = getPipelineOrder();
+    const fabricLinks = getNeuralFabricConnections();
+    const stageStats = getPipelineStageStats();
+    res.json({
+      pipeline: {
+        started: state.started,
+        totalRuns: state.totalRuns,
+        lastRunMs: state.lastRunMs,
+        stageCount: state.stages.length,
+        processingOrder: order,
+        stageStats,
+      },
+      neuralFabricConnections: fabricLinks.map(l => ({
+        agent: l.agent,
+        subsystem: l.subsystem,
+        linkType: l.linkType,
+        description: l.description,
+        active: l.active,
+        signalsReceived: l.signalsReceived,
+        signalsSent: l.signalsSent,
+      })),
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch {
+    res.status(500).json({ error: "Failed to get agent pipeline data" });
+  }
+});
+
+router.post("/omnimens/agent-pipeline/run", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const input = req.body?.input || "manual pipeline test cycle";
+    const result = runPipelineCycle(input);
+    res.json({
+      result,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch {
+    res.status(500).json({ error: "Failed to run pipeline cycle" });
   }
 });
 

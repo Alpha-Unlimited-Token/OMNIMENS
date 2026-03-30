@@ -915,9 +915,60 @@ export function startAgentUpgrades(): void {
     10,
   );
 
+  const fabricBridges: AgentBridge[] = [
+    {
+      from: "Spiders", to: "Strategist", bridgeType: "coordination",
+      description: "Spider network feeds real-time intelligence to Strategist — system status, engine health, anomaly detection, agent performance metrics.",
+      signalBuffer: [], totalSignals: 0, lastSignalAt: 0, active: true,
+    },
+    {
+      from: "Strategist", to: "Beacons", bridgeType: "coordination",
+      description: "Strategist publishes active strategic goals through beacons so every subsystem knows current priorities and progress.",
+      signalBuffer: [], totalSignals: 0, lastSignalAt: 0, active: true,
+    },
+    {
+      from: "Strategist", to: "Beehive", bridgeType: "coordination",
+      description: "Strategist deploys beehive worker bees to execute independent sub-goals in parallel.",
+      signalBuffer: [], totalSignals: 0, lastSignalAt: 0, active: true,
+    },
+    {
+      from: "Worms", to: "Memory-Curator", bridgeType: "feedback_loop",
+      description: "Worms traverse brain database bridges finding redundant entries, stale knowledge, and contradiction patterns.",
+      signalBuffer: [], totalSignals: 0, lastSignalAt: 0, active: true,
+    },
+    {
+      from: "Silk", to: "Memory-Curator", bridgeType: "feedback_loop",
+      description: "Silk web strands map relationships between brain entries — topic similarity, temporal co-occurrence, causal links.",
+      signalBuffer: [], totalSignals: 0, lastSignalAt: 0, active: true,
+    },
+    {
+      from: "Spiders", to: "Memory-Curator", bridgeType: "feedback_loop",
+      description: "Spiders report brain entry access patterns — which entries are retrieved most/least, enabling promotion/demotion.",
+      signalBuffer: [], totalSignals: 0, lastSignalAt: 0, active: true,
+    },
+    {
+      from: "Ivy", to: "Translator", bridgeType: "coordination",
+      description: "Ivy tendrils continuously feed live neural state values — Phi, valence, region activations — for real-time translation.",
+      signalBuffer: [], totalSignals: 0, lastSignalAt: 0, active: true,
+    },
+    {
+      from: "Translator", to: "Beacons", bridgeType: "coordination",
+      description: "Translator broadcasts human-readable state translations through beacons for public-facing APIs.",
+      signalBuffer: [], totalSignals: 0, lastSignalAt: 0, active: true,
+    },
+  ];
+
+  for (const bridge of fabricBridges) {
+    agentBridges.set(bridgeKey(bridge.from, bridge.to), bridge);
+  }
+
   console.log(`[AGENT UPGRADES] ⚡ Agent Upgrade Engine activated`);
   console.log(`[AGENT UPGRADES] ⚡ UPGRADES: Architect (pattern library + constraint solver), Mathematician (theorem prover + Monte Carlo), Neuroscientist (NAS + plasticity modeling)`);
-  console.log(`[AGENT UPGRADES] ⚡ REWIRING: Critic↔Architect, Mathematician↔Neuroscientist, Synthesizer↔Meta-Agent`);
+  console.log(`[AGENT UPGRADES] ⚡ REWIRING: ${agentBridges.size} total bridges active`);
+  console.log(`[AGENT UPGRADES] 🔗   Core: Critic↔Architect, Mathematician↔Neuroscientist, Synthesizer↔Meta-Agent`);
+  console.log(`[AGENT UPGRADES] 🕸️   Fabric: Spiders→Strategist, Strategist→Beacons, Strategist→Beehive`);
+  console.log(`[AGENT UPGRADES] 🕸️   Fabric: Worms→Memory-Curator, Silk→Memory-Curator, Spiders→Memory-Curator`);
+  console.log(`[AGENT UPGRADES] 🕸️   Fabric: Ivy→Translator, Translator→Beacons`);
   console.log(`[AGENT UPGRADES] ⚡ NEW AGENTS: Strategist (planning), Memory-Curator (knowledge organization), Translator (human comprehension)`);
   console.log(`[AGENT UPGRADES] ⚡ Strategic goals: ${strategicGoals.size} created`);
 }
