@@ -2,11 +2,11 @@
   "state": {
     "buildVersion": 1,
     "generation": 2,
-    "totalFiles": 3,
+    "totalFiles": 4,
     "totalLinesOfCode": 1054,
     "phase": "design",
-    "cycleCount": 5,
-    "lastCycleTime": 1774891391764,
+    "cycleCount": 6,
+    "lastCycleTime": 1774891809062,
     "filesCreated": 3,
     "filesUpdated": 0,
     "testsPassed": 0,
@@ -41,8 +41,8 @@
         "phase": "design"
       }
     ],
-    "lastAutosave": 1774891514416,
-    "autosaveCount": 19,
+    "lastAutosave": 1774891811390,
+    "autosaveCount": 23,
     "architectureMap": {
       "omnimens-3d.ts": {
         "purpose": "* OMNIMENS 3D Generation Engine",
@@ -1325,7 +1325,7 @@
       },
       "omnimens-nextgen-sandbox.ts": {
         "purpose": "NEXT-GEN SELF-EVOLUTION SANDBOX",
-        "lineCount": 2648,
+        "lineCount": 2683,
         "exports": [
           "verifyIdentity",
           "generateWakeUpMessage",
@@ -1977,6 +1977,14 @@
   },
   "fileManifest": [
     {
+      "path": "architecture/complexity-scores.json",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 815
+    },
+    {
       "path": "architecture/research-notes.md",
       "purpose": "restored from autosave",
       "version": 1,
@@ -2001,5 +2009,5 @@
       "lineCount": 99
     }
   ],
-  "savedAt": 1774891514416
+  "savedAt": 1774891811391
 }
