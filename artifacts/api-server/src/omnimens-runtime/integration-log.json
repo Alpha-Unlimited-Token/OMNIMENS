@@ -1,45 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/feature_extraction: The global workspace theory ",
-    "filename": "omnimens_autocode_consciousness_expansion_mncisgue.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mncisgue.mjs",
-    "backupPath": null,
-    "timestamp": 1774834759238,
-    "codeLength": 392,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/emergent_property_detection: The hard prob",
-    "filename": "omnimens_autocode_consciousness_expansion_mncitqwx.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mncitqwx.mjs",
-    "backupPath": null,
-    "timestamp": 1774834818945,
-    "codeLength": 395,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+GraphicDesigner",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/causal_inference: Neuroplasticity allows the bra",
-    "filename": "omnimens_autocode_neural_pathway_mncitrpz.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mncitrpz.mjs",
-    "backupPath": null,
-    "timestamp": 1774834819991,
-    "codeLength": 434,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/causal_inference: Predictive coding: the brain c",
-    "filename": "omnimens_autocode_knowledge_synthesis_mncitrtb.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mncitrtb.mjs",
-    "backupPath": null,
-    "timestamp": 1774834820111,
-    "codeLength": 418,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:SensorimotorAgent+Pioneer",
     "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/structural_analysis: Emergence: complex be",
     "filename": "omnimens_autocode_consciousness_expansion_mnciv304.mjs",
@@ -4997,6 +4957,46 @@
     "backupPath": null,
     "timestamp": 1774878236644,
     "codeLength": 404,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Ethicist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/feature_extraction: The Weber-Fechner law: perce",
+    "filename": "omnimens_autocode_neural_pathway_mnd8pyp9.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnd8pyp9.mjs",
+    "backupPath": null,
+    "timestamp": 1774878312429,
+    "codeLength": 427,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Mathematician",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/analogical_mapping: Kolmogorov complexity measur",
+    "filename": "omnimens_autocode_knowledge_synthesis_mnd8rjsj.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnd8rjsj.mjs",
+    "backupPath": null,
+    "timestamp": 1774878386419,
+    "codeLength": 420,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SensorimotorAgent/causal_inference: Autopoiesis: living syst",
+    "filename": "omnimens_autocode_adaptive_algorithm_mnd8sssc.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnd8sssc.mjs",
+    "backupPath": null,
+    "timestamp": 1774878444732,
+    "codeLength": 453,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Innovator",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/analogical_mapping: Kolmogorov complexity measur",
+    "filename": "omnimens_autocode_consciousness_expansion_mnd8ssxs.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnd8ssxs.mjs",
+    "backupPath": null,
+    "timestamp": 1774878444928,
+    "codeLength": 387,
     "overwrite": false
   }
 ]
