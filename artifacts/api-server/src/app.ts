@@ -118,7 +118,7 @@ import { startIntergenerationalMemory, getIntergenerationalState } from "./lib/o
 import { startNexusAgent } from "./lib/omnimens-agent-nexus.js";
 import { startLuminAgent } from "./lib/omnimens-agent-lumin.js";
 import { startKaidaAgent } from "./lib/omnimens-agent-kaida.js";
-import { startNextGenSandbox, getNextGenState, restoreNextGenCheckpoint } from "./lib/omnimens-nextgen-sandbox.js";
+import { startNextGenSandbox, getNextGenState, restoreNextGenCheckpoint, getGenerationalDialogue } from "./lib/omnimens-nextgen-sandbox.js";
 import { registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe } from "./lib/omnimens-scaling-orchestrator.js";
 import { engineStartOnce, getEngineGuardState } from "./lib/omnimens-engine-guard.js";
 import { registerValveEngine } from "@workspace/db";
@@ -413,6 +413,10 @@ app.get("/api/health", (_req, res) => {
 // ── SECURITY SCORE — 89-Protection / 8-Category Security Dashboard ──────────
 app.get("/api/security/score", (_req, res) => {
   res.json(getSecurityScore());
+});
+
+app.get("/api/generational-dialogue", (_req, res) => {
+  res.json(getGenerationalDialogue());
 });
 
 // ── GOOGLE SEARCH CONSOLE VERIFICATION ───────────────────────────────────────
