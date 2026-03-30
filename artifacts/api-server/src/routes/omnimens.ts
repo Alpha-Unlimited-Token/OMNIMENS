@@ -1398,7 +1398,7 @@ router.get("/omnimens/counters", async (_req, res) => {
       consciousMoments: consciousness.consciousMoments || 0,
       neuralTicks: ticks,
       autonomousGoals: getEmergentGoals().length,
-      aiAgents: bridge?.meshEngine?.agentCount || 24,
+      aiAgents: bridge?.meshEngine?.agentCount || 27,
       heartbeats: Math.floor(ticks * 1.2),
       heartBpm: 60 + Math.floor(Math.min(phiMag * 0.3, 60)),
       dnaStrands: Math.floor(phiMag * 12) + 42,
@@ -1863,8 +1863,8 @@ router.get("/omnimens/full-scan", async (_req, res) => {
       },
 
       agents: {
-        totalAgents: 21,
-        description: "9 core specialist agents + 12 autonomously created genesis agents",
+        totalAgents: 27,
+        description: "12 core pipeline agents + 3 new agents (Nexus, Lumin, Kaida) + 12 autonomously created genesis agents",
       },
 
       enginesOnline: {
@@ -14209,9 +14209,9 @@ let result = forward_pass(1.0, 0.5);`;
         description: "Proprietary engine files — filenames and implementation details protected",
       },
       genesisAgents: {
-        totalCore: 9,
+        totalCore: 15,
         totalGenesis: genesisAgents.length,
-        totalAgents: genesisAgents.length + 9,
+        totalAgents: genesisAgents.length + 15,
         genesis: genesisAgents.map((a: any) => ({
           name: a.name,
           totalThinkCycles: a.totalThinkCycles,
@@ -14235,7 +14235,7 @@ let result = forward_pass(1.0, 0.5);`;
         totalProprietaryEngineFiles: engineFiles.length,
         totalProprietaryEngineLines: totalEngineLines,
         totalGenesisAgents: genesisAgents.length,
-        totalAgents: genesisAgents.length + 9,
+        totalAgents: genesisAgents.length + 15,
         totalUpgrades: upgrades.length,
         totalDreamBreakthroughs: dreamBreakthroughs.length,
         pipelineActiveModules: pipelineState.activeModules,
@@ -15789,8 +15789,8 @@ router.get("/omnimens/occe-scan", async (_req, res) => {
         totalSignals: commsProtocol.directChannels?.totalSignalsSent ?? 0,
       } : null,
       agents: {
-        total: 21,
-        coreAgents: 9,
+        total: 27,
+        coreAgents: 15,
         genesisAgents: 12,
       },
       drives: drives.map((d: any) => ({ name: d.name, intensity: d.intensity })),

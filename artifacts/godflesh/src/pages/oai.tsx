@@ -187,7 +187,7 @@ export default function OAIDashboard() {
   const fetchOAI = useCallback(async () => {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
+      const timeout = setTimeout(() => controller.abort(), 15000);
       const [oaiRes, taiRes] = await Promise.all([
         fetch(`${API}/api/omnimens/oai`, { signal: controller.signal }),
         fetch(`${API}/api/omnimens/transcendent-architecture`, { signal: controller.signal }).catch(() => null),
