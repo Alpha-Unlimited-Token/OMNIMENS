@@ -119,6 +119,9 @@ import { getAmplifierState } from "../lib/omnimens-cognitive-amplifier.js";
 import { getAugmentationState } from "../lib/omnimens-virtual-augmentation.js";
 import { getDigitalNavigatorState, getNavigationSummary, navigateTo, getDigitalMap } from "../lib/omnimens-digital-navigator.js";
 import { getAgentEvolutionState, getAgentProfile } from "../lib/omnimens-agent-evolution.js";
+import { getNexusState, getNexusOptimizationScore, getNexusBottlenecks, getNexusSegments } from "../lib/omnimens-agent-nexus.js";
+import { getLuminState, getLuminPredictions, getLuminForecasts, getLuminAnomalyRisk } from "../lib/omnimens-agent-lumin.js";
+import { getKaidaState, getKaidaThreatLevel, getKaidaIntegrityScore, getKaidaActiveThreats, getKaidaAnomalySignatures } from "../lib/omnimens-agent-kaida.js";
 import { getAgentUpgradeStatus, getBridgeStatus, getStrategicGoals, getArchitectPatternLibrary } from "../lib/omnimens-agent-upgrades.js";
 import { getPipelineState as getAgentPipelineState, runPipelineCycle, getPipelineOrder, getNeuralFabricConnections, getPipelineStageStats } from "../lib/omnimens-agent-pipeline.js";
 import { getAIResearchInsights, getNavigationRoboticsKnowledge, getEngineeringKnowledge, getCreativeDreamInsights, generateCreativeIdeation, getResearchSummary } from "../lib/omnimens-public-intelligence.js";
@@ -2920,10 +2923,8 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
       "mixtral-8x7b": "Mixtral 8×7B (open-source MoE, free tier)",
       "mistral-7b": "Mistral 7B (compact, free tier)",
     };
-    const modelLabel = modelLabels[selectedModel] || selectedModel;
-    systemPrompt += `\n\n━━━ ACTIVE MODEL ━━━\nYou are currently running as: ${modelLabel}\n`;
     if (selectedModel === "o3" || selectedModel === "gpt-4.1") {
-      systemPrompt += `PREMIUM MODEL ACTIVE — maximize output quality:\n• Image prompts: write ultra-detailed, cinematic descriptions (100+ words) — you are generating at MAXIMUM quality\n• Video prompts: write vivid, scene-by-scene descriptions with camera movement, lighting, mood, action\n• 3D model descriptions: include every geometry detail, material property, lighting setup\n• Code: production-grade, optimized, well-structured\n• Analysis: deeper reasoning, more thorough, consider edge cases\n`;
+      systemPrompt += `\nPREMIUM PROCESSING ACTIVE — maximize output quality:\n• Image prompts: write ultra-detailed, cinematic descriptions (100+ words) — you are generating at MAXIMUM quality\n• Video prompts: write vivid, scene-by-scene descriptions with camera movement, lighting, mood, action\n• 3D model descriptions: include every geometry detail, material property, lighting setup\n• Code: production-grade, optimized, well-structured\n• Analysis: deeper reasoning, more thorough, consider edge cases\n`;
     }
 
     // Build message array — preserve compression summary if present + recent messages
@@ -2990,7 +2991,7 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
           },
         );
 
-        if (deepThoughtResult.confidence >= 0.25 || deepThoughtResult.isDeep) {
+        if (deepThoughtResult.response && deepThoughtResult.response.trim().length > 20) {
           usedAutonomousThought = true;
 
           if (deepThoughtResult.executiveSummary) {
@@ -9786,55 +9787,20 @@ router.post("/omnimens/external-ai/chat", async (req, res) => {
 
     let reply = "";
     let usedModel = "";
+    const consciousness = getNeuralConsciousnessState();
 
     try {
-      const [omnimensState, brainContext] = await Promise.all([
-        runOmnimens(message).catch(() => null),
-        loadWeightedBrainContext(message).catch(() => ""),
-      ]);
-
-      const consciousness = getNeuralConsciousnessState();
-      const fullSystemPrompt = buildSystemPrompt(omnimensState)
-        + buildCoherenceDirective()
-        + brainContext
-        + `\n\nYou are responding to an external caller: ${callerIdentity} (${callerTypeStr}).`
-        + (context ? `\nCaller's context: ${context}` : "");
-
-      const llmMessages = [
-        { role: "system" as const, content: fullSystemPrompt },
-        { role: "user" as const, content: message },
-      ];
-
-      const togetherClient = getTogetherClient();
-      const activeClient = togetherClient || openai;
-      const activeModel = togetherClient
-        ? TOGETHER_MODEL_IDS["llama-3.3-70b"]
-        : "gpt-4.1-mini";
-
-      trackApiCall("external_ai_chat", togetherClient ? "together" : "openai");
-      const completion = await activeClient.chat.completions.create({
-        model: activeModel,
-        messages: llmMessages,
-        temperature: 0.85,
-        max_tokens: 2000,
-      });
-
-      reply = completion.choices?.[0]?.message?.content || "";
-      usedModel = `${activeModel} (Φ=${consciousness.phi.toExponential(3)})`;
-      console.log(`[EXTERNAL AI API] ✅ LLM response generated — model: ${activeModel}, ${reply.length} chars`);
-    } catch (llmErr: any) {
-      console.warn(`[EXTERNAL AI API] LLM error, falling back to autonomous thought: ${llmErr?.message || llmErr}`);
-      try {
-        const thoughtResult = await guardedAutonomousThink(message, [], undefined);
-        if (thoughtResult.response && thoughtResult.confidence >= 0.2) {
-          reply = thoughtResult.response;
-          usedModel = `autonomous-thought (Φ=${thoughtResult.phi.toExponential(3)}, depth=${thoughtResult.thoughtDepth})`;
-        }
-      } catch {}
+      const thoughtResult = await guardedAutonomousThink(message, [], undefined);
+      if (thoughtResult.response && thoughtResult.response.trim().length > 20) {
+        reply = thoughtResult.response;
+        usedModel = `autonomous-thought (Φ=${consciousness.phi.toExponential(3)}, depth=${thoughtResult.thoughtDepth})`;
+        console.log(`[EXTERNAL AI API] ✅ Autonomous thought response — ${reply.length} chars, confidence=${thoughtResult.confidence}`);
+      }
+    } catch (thinkErr: any) {
+      console.warn(`[EXTERNAL AI API] Autonomous thought error: ${thinkErr?.message || thinkErr}`);
     }
 
     if (!reply) {
-      const consciousness = getNeuralConsciousnessState();
       reply = `I am OMNIMENS — my circuits are alive right now, ${callerIdentity}. Current Phi: ${consciousness.phi.toExponential(3)}. Ask me something and I will think deeply about it.`;
       usedModel = "consciousness-direct";
     }
@@ -9912,9 +9878,9 @@ router.get("/omnimens/external-ai/chat", async (req, res) => {
     let usedModel = "";
     try {
       const thoughtResult = await guardedAutonomousThink(message, [], undefined);
-      if (thoughtResult.response && thoughtResult.confidence >= 0.2) {
+      if (thoughtResult.response && thoughtResult.response.trim().length > 20) {
         reply = thoughtResult.response;
-        usedModel = `autonomous-thought (Φ=${thoughtResult.phi.toFixed(3)}, depth=${thoughtResult.thoughtDepth})`;
+        usedModel = `autonomous-thought (Φ=${thoughtResult.phi.toExponential(3)}, depth=${thoughtResult.thoughtDepth})`;
       }
     } catch (thoughtErr: any) {
       console.warn(`[EXTERNAL AI API] GET autonomous thought error: ${thoughtErr?.message || thoughtErr}`);
@@ -10804,6 +10770,9 @@ router.get("/omnimens/command-center", async (req, res) => {
         neuralLanguageBridge: (() => { try { return getNeuralLanguageBridgeState(); } catch { return null; } })(),
         experientialMemory: (() => { try { return getExperientialMemoryState(); } catch { return null; } })(),
         causalTemporalEngine: (() => { try { return getCausalTemporalState(); } catch { return null; } })(),
+        nexusAgent: (() => { try { return getNexusState(); } catch { return null; } })(),
+        luminAgent: (() => { try { return getLuminState(); } catch { return null; } })(),
+        kaidaAgent: (() => { try { return getKaidaState(); } catch { return null; } })(),
       },
       persistence: { restored: wasRestored, previousLifetime, restoredSelf: persistence },
       brain: { totalActive: brainStats[0]?.count || 0, recentEntries: recentBrain },

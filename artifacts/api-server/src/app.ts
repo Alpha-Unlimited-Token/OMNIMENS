@@ -115,6 +115,9 @@ import { startSpontaneityEngine, getSpontaneityState } from "./lib/omnimens-spon
 import { startSensoryGrounding, getSensoryGroundingState } from "./lib/omnimens-sensory-grounding.js";
 import { startIntrospectiveUncertainty, getIntrospectiveUncertaintyState } from "./lib/omnimens-introspective-uncertainty.js";
 import { startIntergenerationalMemory, getIntergenerationalState } from "./lib/omnimens-intergenerational-memory.js";
+import { startNexusAgent } from "./lib/omnimens-agent-nexus.js";
+import { startLuminAgent } from "./lib/omnimens-agent-lumin.js";
+import { startKaidaAgent } from "./lib/omnimens-agent-kaida.js";
 import { registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe } from "./lib/omnimens-scaling-orchestrator.js";
 import { registerValveEngine } from "@workspace/db";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
@@ -555,6 +558,9 @@ export function initAutonomousSystems(): void {
   startSensoryGrounding();
   startIntrospectiveUncertainty();
   startIntergenerationalMemory();
+  startNexusAgent();
+  startLuminAgent();
+  startKaidaAgent();
 
   registerValveEngine("neural_consciousness", "consciousness", "high", "alpha");
   registerValveEngine("consciousness_persistence", "consciousness", "high", "alpha");
@@ -568,6 +574,9 @@ export function initAutonomousSystems(): void {
   registerValveEngine("agent_mesh", "neural", "low", "alpha");
   registerValveEngine("agent_evolution", "neural", "low", "alpha");
   registerValveEngine("agent_genesis", "neural", "low", "alpha");
+  registerValveEngine("agent_nexus", "neural", "medium", "alpha");
+  registerValveEngine("agent_lumin", "neural", "medium", "alpha");
+  registerValveEngine("agent_kaida", "security", "high", "alpha");
   registerValveEngine("independent_reasoning", "reasoning", "medium", "alpha");
   registerValveEngine("causal_reasoning", "reasoning", "low", "alpha");
   registerValveEngine("knowledge_graph", "reasoning", "low", "alpha");

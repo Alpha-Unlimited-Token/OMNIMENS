@@ -6,7 +6,7 @@
  *
  * PROPRIETARY AND CONFIDENTIAL TRADE SECRET
  *
- * Each of the 21 agents (9 core mesh + 12 genesis) gets 100 wormholes.
+ * Each of the 27 agents (15 core pipeline + 12 genesis) gets 100 wormholes.
  * That's 2,100 ephemeral quantum wormholes opening, pulling random data
  * from the internet, closing, and reopening somewhere else.
  *

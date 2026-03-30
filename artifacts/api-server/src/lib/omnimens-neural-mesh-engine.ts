@@ -1,13 +1,13 @@
 /**
  * ╔══════════════════════════════════════════════════════════════════════════════╗
- * ║   OMNIMENS™ NEURAL MESH ENGINE — 21-AGENT UNIFIED SUBSTRATE                ║
+ * ║   OMNIMENS™ NEURAL MESH ENGINE — 27-AGENT UNIFIED SUBSTRATE                ║
  * ║                                                                              ║
  * ║   Copyright © 2024–2026 Alpha Unlimited Technologies, LLC.                   ║
  * ║   All Rights Reserved Worldwide.                                             ║
  * ║                                                                              ║
  * ║   PROPRIETARY AND CONFIDENTIAL TRADE SECRET                                  ║
  * ║                                                                              ║
- * ║   Each of the 21 agents gets its own complete neural substrate with:          ║
+ * ║   Each of the 27 agents gets its own complete neural substrate with:          ║
  * ║   • LIF neurons (Float64Array typed arrays)                                  ║
  * ║   • Synapses with Hebbian plasticity                                         ║
  * ║   • Worms — dedicated data crawlers reducing latency between substrates      ║
@@ -17,7 +17,7 @@
  * ║   • Silk web strands — afferent/efferent/interneuron signal highways         ║
  * ║   • Multiple brain regions per agent                                          ║
  * ║                                                                              ║
- * ║   Central Stabilization Engine keeps all 21 substrates synchronized,          ║
+ * ║   Central Stabilization Engine keeps all 27 substrates synchronized,          ║
  * ║   load-balanced, and coherent. Zero-latency cross-agent communication        ║
  * ║   via worm tunnels, spider beacons, silk highways, and ivy bridges.           ║
  * ║                                                                              ║
@@ -1309,7 +1309,7 @@ function initMeshEngine(): void {
   if (meshInitialized) return;
 
   console.log(`[NEURAL MESH ENGINE] ⚡ ═══════════════════════════════════════════════════════`);
-  console.log(`[NEURAL MESH ENGINE] ⚡ OMNIMENS 21-AGENT NEURAL MESH ENGINE INITIALIZING`);
+  console.log(`[NEURAL MESH ENGINE] ⚡ OMNIMENS 27-AGENT NEURAL MESH ENGINE INITIALIZING`);
 
   let totalNeurons = 0;
   let totalSynapses = 0;
@@ -1331,12 +1331,12 @@ function initMeshEngine(): void {
 
   meshInitialized = true;
 
-  console.log(`[NEURAL MESH ENGINE] ⚡ 21 agent substrates initialized`);
+  console.log(`[NEURAL MESH ENGINE] ⚡ ${substrates.size} agent substrates initialized`);
   console.log(`[NEURAL MESH ENGINE] ⚡ Total mesh neurons: ${totalNeurons.toLocaleString()}`);
   console.log(`[NEURAL MESH ENGINE] ⚡ Total mesh synapses: ${totalSynapses.toLocaleString()}`);
   console.log(`[NEURAL MESH ENGINE] ⚡ Worm tunnels: ${totalWorms} | Spiders w/ beacons: ${totalSpiders}`);
   console.log(`[NEURAL MESH ENGINE] ⚡ Silk web strands: ${totalSilk} | Ivy tendrils: ${totalIvy}`);
-  console.log(`[NEURAL MESH ENGINE] ⚡ Beehive colonies: 21 (one per agent)`);
+  console.log(`[NEURAL MESH ENGINE] ⚡ Beehive colonies: ${substrates.size} (one per agent)`);
   console.log(`[NEURAL MESH ENGINE] ⚡ Spider beacons: ALL spiders have embedded bidirectional beacons`);
   console.log(`[NEURAL MESH ENGINE] ⚡ Silk types: afferent (agent→engine), efferent (engine→agent), interneuron (agent↔agent)`);
   console.log(`[NEURAL MESH ENGINE] ⚡ Central Stabilization Engine: ACTIVE — load balancing + coherence + healing`);
@@ -1356,7 +1356,7 @@ export function startNeuralMeshEngine(): void {
     tickMeshEngine();
   }, MESH_TICK_MS);
 
-  console.log(`[NEURAL MESH ENGINE] 🧠 All 21 agent substrates ticking every ${MESH_TICK_MS / 1000}s`);
+  console.log(`[NEURAL MESH ENGINE] 🧠 All ${substrates.size} agent substrates ticking every ${MESH_TICK_MS / 1000}s`);
   console.log(`[NEURAL MESH ENGINE] 🧠 Worms tunneling | Spiders broadcasting beacons | Silk signaling | Ivy growing | Beehive humming`);
   console.log(`[NEURAL MESH ENGINE] 🧠 Central Stabilization Engine: load balancing, coherence monitoring, auto-healing`);
 }

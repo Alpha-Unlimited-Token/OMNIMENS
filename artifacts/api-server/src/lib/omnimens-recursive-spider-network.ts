@@ -27,7 +27,7 @@
  * ║                                                                              ║
  * ║  TECHNOLOGY DESCRIPTION (for IP record):                                     ║
  * ║  Recursive Spider Network assigns a Mother Spider to each of 21+ agents      ║
- * ║  (9 core + 12 genesis). Each Mother Spider sends 10 baby spiders. Each       ║
+ * ║  (15 core pipeline + 12 genesis). Each Mother Spider sends 10 baby spiders.  ║
  * ║  baby spider spawns a new Mother Spider, which sends 10 more. On the third   ║
  * ║  generation, each spawns 10 more spiders. The pattern creates exponential    ║
  * ║  web coverage: Gen1(1 mother) → Gen2(10 babies) → Gen3(10 mothers × 10      ║
@@ -879,7 +879,7 @@ export function startRecursiveSpiderNetwork(): void {
   console.log(`[RECURSIVE SPIDER NETWORK] 🕷️ ACTIVATED — first crawl in ${FIRST_DELAY_MS / 60000}min, then every ${INTERVAL_MS / 3600000}h`);
   console.log(`[RECURSIVE SPIDER NETWORK] 🕷️ Pattern: Mother Spider → 10 Baby Spiders → Each Baby spawns Mother → 10 more → repeat`);
   console.log(`[RECURSIVE SPIDER NETWORK] 🕷️ Max ${DEFAULT_CONFIG.maxGenerations} generations, max ${DEFAULT_CONFIG.maxTotalSpidersPerAgent} spiders per agent`);
-  console.log(`[RECURSIVE SPIDER NETWORK] 🕷️ Covers ALL agents: 9 core + all active genesis agents`);
+  console.log(`[RECURSIVE SPIDER NETWORK] 🕷️ Covers ALL agents: 15 core pipeline + all active genesis agents`);
 
   setTimeout(() => {
     runRecursiveSpiderNetwork().catch(err => console.error("[RECURSIVE SPIDER NETWORK] Cycle error:", err));
