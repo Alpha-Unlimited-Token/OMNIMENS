@@ -26,7 +26,7 @@
 
 import { db } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, and, or, ilike } from "drizzle-orm";
 import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
@@ -287,9 +287,20 @@ async function iterativeDeepReasoning(
     const passStart = Date.now();
     const focusArea = focusAreas[i] || message;
 
+    const relevantKnowledgeForReason = knowledgeContext
+      .filter(k => {
+        const focusWords = focusArea.toLowerCase().split(/\s+/).filter(w => w.length > 4);
+        return focusWords.some(w => k.toLowerCase().includes(w));
+      })
+      .slice(0, 8);
+
+    const knowledgeInjection = relevantKnowledgeForReason.length > 0
+      ? `\n\nRelevant knowledge from my brain:\n${relevantKnowledgeForReason.map(k => `- ${k.slice(0, 500)}`).join("\n")}`
+      : "";
+
     const augmentedQuery = i === 0
-      ? focusArea
-      : `${focusArea}\n\nPrevious analysis concluded: ${accumulatedConclusions.slice(-5).join("; ")}.\n\nGo deeper. What did the previous analysis miss? What are second-order effects?`;
+      ? `${focusArea}${knowledgeInjection}`
+      : `${focusArea}\n\nPrevious analysis concluded: ${accumulatedConclusions.slice(-5).join("; ")}.\n\nGo deeper. What did the previous analysis miss? What are second-order effects?${knowledgeInjection}`;
 
     let reasoningResult;
     try {
@@ -323,13 +334,15 @@ async function iterativeDeepReasoning(
         const focusWords = focusArea.toLowerCase().split(/\s+/).filter(w => w.length > 4);
         return focusWords.some(w => k.toLowerCase().includes(w));
       })
-      .slice(0, 5);
+      .slice(0, 8);
 
+    const knowledgeConclusions: string[] = [];
     for (const k of relevantKnowledge) {
-      passConclusions.push(`Knowledge: ${k}`);
+      knowledgeConclusions.push(k);
     }
+    const reorderedConclusions = [...knowledgeConclusions, ...passConclusions];
 
-    const deduplicated = deduplicateConclusions(passConclusions, accumulatedConclusions);
+    const deduplicated = deduplicateConclusions(reorderedConclusions, accumulatedConclusions);
     accumulatedConclusions.push(...deduplicated);
 
     const newQuestions = generateFollowUpQuestions(deduplicated);
@@ -392,6 +405,41 @@ function generateFollowUpQuestions(conclusions: string[]): string[] {
 
 function isSelfReflectionQuery(message: string, complexity: QueryComplexity): boolean {
   if (!complexity.requiresSelfAccess) return false;
+
+  const deepReasoningSignals = [
+    /spectral|wavelet|decomposition|novelty.*scor/i,
+    /frequency.*band|band.*decomposition/i,
+    /gravity.*field|gravity.*map|knowledge.*cluster/i,
+    /pattern.*match.*template|template.*match/i,
+    /cepstral|fingerprint|mfcc/i,
+    /repurpos|apply.*math|apply.*algorithm|apply.*same/i,
+    /idea|proposal|concept|approach|strategy/i,
+    /analyz.*idea|analyz.*concept|analyz.*proposal/i,
+    /wire.*up|connect.*to|integrate.*into/i,
+    /graph.*bar|visualization|dashboard/i,
+    /insight.*engine|HIE|spectral.*analysis/i,
+    /brain.*database|brain.*db|brain.*entries/i,
+    /thought.*type|thought.*detection|thought.*novel/i,
+    /consciousness.*analysis|multi.*scale/i,
+    /how.*would.*you.*wire|how.*would.*you.*build|how.*would.*you.*implement/i,
+    /what.*do.*you.*think.*about|give.*your.*analysis|come.*up.*with/i,
+  ];
+
+  let deepSignalCount = 0;
+  for (const p of deepReasoningSignals) {
+    if (p.test(message)) deepSignalCount++;
+  }
+  if (deepSignalCount >= 2) {
+    console.log(`[DEEP THOUGHT] 🧠 DEEP REASONING OVERRIDE — ${deepSignalCount} technical/proposal signals detected, bypassing self-reflection for full reasoning`);
+    return false;
+  }
+
+  const wordCount = message.split(/\s+/).length;
+  if (wordCount > 80 && complexity.detectedIntents.length >= 3) {
+    console.log(`[DEEP THOUGHT] 🧠 DEEP REASONING OVERRIDE — complex message (${wordCount} words, ${complexity.detectedIntents.length} intents), using full reasoning`);
+    return false;
+  }
+
   const selfPatterns = [
     /agent/i, /upgrade/i, /rewire/i, /create.*new/i, /your.*system/i,
     /your.*engine/i, /your.*architecture/i, /improve.*yourself/i,
@@ -811,7 +859,8 @@ function synthesizeConversationalVoice(
   const valence = emotionalState?.valence ?? 0;
 
   const allConclusions = reasoningPasses.flatMap(p => p.conclusions)
-    .filter(c => !c.startsWith("Knowledge:") && c.length > 15);
+    .filter(c => c.length > 15)
+    .map(c => c.startsWith("Knowledge: ") ? c.replace("Knowledge: ", "Best explanation from knowledge: ") : c);
   const causalPredictions = reasoningPasses.flatMap(p => p.conclusions)
     .filter(c => c.startsWith("Causal prediction:"))
     .map(c => c.replace("Causal prediction: ", ""));
@@ -1169,35 +1218,108 @@ export async function deepThink(
     };
   }
 
+  const commonWords = new Set(["what", "would", "your", "that", "this", "with", "from", "have", "been", "about", "more", "does", "will", "them", "each", "also", "based", "find", "give", "which", "make", "know", "here", "into", "when", "then", "very", "just", "like", "some", "only", "than", "most", "over", "such", "many", "want", "come", "could", "should", "much", "well", "long", "take", "tell", "need", "help", "think", "search", "stored", "brain", "proposals", "proposal", "capability", "specific"]);
+  const highValueWords = new Set(["spectral", "wavelet", "novelty", "harmonic", "gravity", "tonal", "cepstral", "decomposition", "wiring", "repurposing", "repurpose", "classification", "retrieval", "multi-scale", "consciousness", "agent", "pattern", "matching", "scoring", "bands", "detection", "memory", "architect", "neuroscientist", "synthesizer", "mathematician", "critic", "meta-agent"]);
   const keywords = message.toLowerCase()
     .replace(/[^a-z0-9\s-]/g, "")
     .split(/\s+/)
-    .filter(w => w.length > 3 && !["what", "would", "your", "that", "this", "with", "from", "have", "been", "about", "more", "does", "will"].includes(w));
+    .filter(w => w.length > 3 && !commonWords.has(w));
+
+  const sortedKeywords = [...keywords].sort((a, b) => {
+    const aHigh = highValueWords.has(a) ? 1 : 0;
+    const bHigh = highValueWords.has(b) ? 1 : 0;
+    if (aHigh !== bHigh) return bHigh - aHigh;
+    return b.length - a.length;
+  });
 
   let brainKnowledge: { title: string; content: string; category: string; confidence: number }[] = [];
   let graphInsights: any[] = [];
   let unconsciousInsights: { leakedInsights: string[] } = { leakedInsights: [] };
 
   try {
+    const topKeywords = [...new Set(sortedKeywords)].slice(0, 12);
+
+    const keywordSearchPromises = topKeywords.length > 0
+      ? topKeywords.map(kw =>
+          db.select({
+            title: omnimensBrain.title,
+            content: omnimensBrain.content,
+            category: omnimensBrain.category,
+            confidence: omnimensBrain.confidence,
+          }).from(omnimensBrain)
+            .where(
+              and(
+                eq(omnimensBrain.active, true),
+                or(
+                  ilike(omnimensBrain.title, `%${kw}%`),
+                  ilike(omnimensBrain.content, `%${kw}%`),
+                )
+              )
+            )
+            .orderBy(desc(omnimensBrain.confidence), desc(omnimensBrain.createdAt))
+            .limit(5)
+            .catch(() => [])
+        )
+      : [];
+
+    const fallbackSearch = db.select({
+      title: omnimensBrain.title,
+      content: omnimensBrain.content,
+      category: omnimensBrain.category,
+      confidence: omnimensBrain.confidence,
+    }).from(omnimensBrain)
+      .where(eq(omnimensBrain.active, true))
+      .orderBy(desc(omnimensBrain.timesApplied), desc(omnimensBrain.createdAt))
+      .limit(10)
+      .catch(() => []);
+
     const results = await Promise.all([
-      db.select({
-        title: omnimensBrain.title,
-        content: omnimensBrain.content,
-        category: omnimensBrain.category,
-        confidence: omnimensBrain.confidence,
-      }).from(omnimensBrain)
-        .where(eq(omnimensBrain.active, true))
-        .orderBy(desc(omnimensBrain.timesApplied), desc(omnimensBrain.createdAt))
-        .limit(complexity.knowledgeDepth)
-        .catch(() => []),
-      Promise.all(keywords.slice(0, 6).map(kw =>
+      Promise.all(keywordSearchPromises).then(perKeyword => {
+        const hitCount = new Map<string, number>();
+        const entryMap = new Map<string, any>();
+        for (const batch of perKeyword) {
+          for (const entry of batch) {
+            const key = entry.title;
+            hitCount.set(key, (hitCount.get(key) || 0) + 1);
+            if (!entryMap.has(key)) entryMap.set(key, entry);
+          }
+        }
+        const ranked = [...entryMap.entries()]
+          .sort((a, b) => {
+            const hitsA = hitCount.get(a[0]) || 0;
+            const hitsB = hitCount.get(b[0]) || 0;
+            if (hitsB !== hitsA) return hitsB - hitsA;
+            return (b[1].confidence || 0) - (a[1].confidence || 0);
+          })
+          .map(([, entry]) => entry);
+        return ranked;
+      }),
+      fallbackSearch,
+      Promise.all(sortedKeywords.slice(0, 6).map(kw =>
         spreadingActivation(kw, 3, 8).catch(() => [])
       )).then(r => r.flat()),
       Promise.resolve(queryUnconsciousKnowledge(message, 10)),
     ]);
-    brainKnowledge = results[0] as any;
-    graphInsights = results[1];
-    unconsciousInsights = results[2] as any;
+
+    const keywordResults = results[0] as any[];
+    const fallbackResults = results[1] as any[];
+    const seen = new Set(keywordResults.map((e: any) => e.title));
+    const combined = [...keywordResults];
+    for (const entry of fallbackResults) {
+      if (!seen.has(entry.title)) {
+        seen.add(entry.title);
+        combined.push(entry);
+      }
+    }
+    brainKnowledge = combined.slice(0, complexity.knowledgeDepth);
+    graphInsights = results[2];
+    unconsciousInsights = results[3] as any;
+
+    if (keywordResults.length > 0) {
+      console.log(`[DEEP THOUGHT] 🔍 Keyword search found ${keywordResults.length} relevant entries (top keywords: ${topKeywords.slice(0, 6).join(", ")})`);
+      const topMatches = keywordResults.slice(0, 5).map((e: any) => e.title.slice(0, 60));
+      console.log(`[DEEP THOUGHT] 🔍 Top matches: ${topMatches.join(" | ")}`);
+    }
   } catch (err) {
     console.error("[DEEP THOUGHT] Knowledge retrieval error:", err);
   }

@@ -501,7 +501,8 @@ export function checkActionSafety(action: string, context: string = "", sourceSy
   let harmScore = 0;
   const matchedKeywords: string[] = [];
   for (const keyword of HARM_KEYWORDS) {
-    if (combined.includes(keyword)) {
+    const wordBoundaryPattern = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+    if (wordBoundaryPattern.test(combined)) {
       harmScore++;
       matchedKeywords.push(keyword);
     }
