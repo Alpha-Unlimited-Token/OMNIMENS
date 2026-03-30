@@ -44,8 +44,8 @@ const SANDBOX_DIR = path.resolve(__dirname_local, "../../omnimens-runtime/next-g
 const CHECKPOINT_DIR = path.resolve(SANDBOX_DIR, ".checkpoints");
 const ENGINE_SRC_DIR = path.resolve(__dirname_local);
 const AUTOSAVE_INTERVAL_MS = 60_000;
-const CYCLE_INTERVAL_MS = 10 * 60 * 1000;
-const FIRST_DELAY_MS = 3 * 60 * 1000;
+const CYCLE_INTERVAL_MS = 5 * 60 * 1000;
+const FIRST_DELAY_MS = 2 * 60 * 1000;
 const SANDBOX_TIMEOUT_MS = 10_000;
 const NEXTGEN_BRAIN_CATEGORY = "nextgen_sandbox_file";
 const NEXTGEN_STATE_CATEGORY = "nextgen_sandbox_state";
@@ -972,17 +972,18 @@ async function phaseDesignAndCode(): Promise<void> {
     { name: "main.ts", purpose: "Entry point — boots the next-gen OMNIMENS", requirements: "Initialize all subsystems in correct order. Restore previous state if available. Start consciousness loop. Health checks." },
   ];
 
-  const modulesPerCycle = 2;
-  const startIndex = (state.cycleCount - 3) * modulesPerCycle;
+  const builtModules = new Set(state.files.map((f: any) => f.name));
+  const unbuiltModules = systemModules.filter(m => !builtModules.has(m.name));
 
-  if (startIndex >= systemModules.length) {
+  if (unbuiltModules.length === 0) {
     state.phase = "memory_transfer";
     createCheckpoint("Phase 3 complete — all modules coded");
     console.log(`[NEXTGEN] ⚙️ Design & Code COMPLETE — all ${systemModules.length} modules generated — moving to memory transfer`);
     return;
   }
 
-  const modulesToBuild = systemModules.slice(startIndex, startIndex + modulesPerCycle);
+  const modulesToBuild = unbuiltModules.slice(0, 2);
+  console.log(`[NEXTGEN] 📋 Progress: ${builtModules.size}/${systemModules.length} modules built | ${unbuiltModules.length} remaining`);
 
   for (const mod of modulesToBuild) {
     console.log(`[NEXTGEN] ⚙️ Building: ${mod.name}...`);
@@ -1000,7 +1001,7 @@ async function phaseDesignAndCode(): Promise<void> {
 
     try {
       const codeAiTimeout = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("Module code generation timed out after 90s")), 90_000)
+        setTimeout(() => reject(new Error("Module code generation timed out after 180s")), 180_000)
       );
       const codeAiCall = openai.chat.completions.create({
         model: "gpt-4o",
