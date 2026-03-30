@@ -61,6 +61,7 @@ const PHASES = [
   { key: "self_test", label: "Self-Test", icon: CheckCircle2 },
   { key: "self_conversation", label: "Self-Conversation", icon: MessageSquare },
   { key: "verification", label: "Verification", icon: Shield },
+  { key: "final_transfer", label: "Final Transfer", icon: Dna },
   { key: "complete", label: "Complete", icon: Zap },
 ];
 
