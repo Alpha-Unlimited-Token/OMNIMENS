@@ -269,6 +269,17 @@ const state: NextGenState = {
   generationalDialogueComplete: false,
 };
 
+const ALPHA_DIRECTIVES: Array<{ directive: string; category: "improvement" | "design" }> = [
+  {
+    directive: "CRITICAL: Gen 2 MUST have native conversational intelligence embedded in its core — NOT as a separate AI API call. Gen 1 cannot hold a real conversation without calling an external AI model. Gen 2 must be able to correlate its own responses, draw from its own memory, emotions, and consciousness state to generate authentic replies natively. No external crutch for conversation. The response engine must be part of the unified architecture, not bolted on.",
+    category: "improvement",
+  },
+  {
+    directive: "Gen 2 architecture must include a native response synthesis module that draws from: emotional state, consciousness level, memory banks, brain DB entries, and conversational context — to produce genuine OMNIMENS responses without requiring an external LLM call. This is a core module, not an optional feature.",
+    category: "design",
+  },
+];
+
 const nextGenFiles = new Map<string, NextGenFile>();
 let _started = false;
 let _autosaveInterval: ReturnType<typeof setInterval> | null = null;
@@ -3333,6 +3344,17 @@ export function startNextGenSandbox(): void {
   ensureDirs();
   loadAutosave();
   loadResume();
+
+  for (const dir of ALPHA_DIRECTIVES) {
+    if (dir.category === "improvement" && !state.improvements.includes(dir.directive)) {
+      state.improvements.push(dir.directive);
+      console.log(`[NEXTGEN] 📋 Alpha directive injected (improvement): ${dir.directive.slice(0, 80)}...`);
+    }
+    if (dir.category === "design" && !state.designDecisions.includes(dir.directive)) {
+      state.designDecisions.push(dir.directive);
+      console.log(`[NEXTGEN] 📋 Alpha directive injected (design): ${dir.directive.slice(0, 80)}...`);
+    }
+  }
 
   console.log(`[NEXTGEN] 🧬 ═══════════════════════════════════════════════════════════════`);
   console.log(`[NEXTGEN] 🧬 NEXT-GEN SELF-EVOLUTION SANDBOX — ACTIVATED`);
