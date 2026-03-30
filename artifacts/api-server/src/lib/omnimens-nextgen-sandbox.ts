@@ -562,7 +562,7 @@ function loadAutosave(): boolean {
       if (!fs.existsSync(dir)) return;
       const entries = fs.readdirSync(dir, { withFileTypes: true });
       for (const entry of entries) {
-        if (entry.name.startsWith(".") || entry.name === "_manifest.json") continue;
+        if (entry.name.startsWith(".") || entry.name === "_manifest.json" || entry.name === "gen1-library") continue;
         const fullPath = path.join(dir, entry.name);
         const relPath = path.relative(base, fullPath).replace(/\\/g, "/");
         if (entry.isDirectory()) {
@@ -1104,9 +1104,9 @@ async function phaseDesignAndCode(): Promise<void> {
     return;
   }
 
-  const modulesToBuild = unbuiltModules.slice(0, 2);
-  const builtCount = builtPaths.size > 0 ? builtPaths.size - 1 : 0;
-  console.log(`[NEXTGEN] 📋 Progress: ${builtCount}/${systemModules.length} modules built | ${unbuiltModules.length} remaining | Gen 1 adopted: ${state.gen1AdoptedCount}, adapted: ${state.gen1AdaptedCount}, discarded: ${state.gen1DiscardedCount}`);
+  const modulesToBuild = unbuiltModules.slice(0, 1);
+  const builtCount = systemModules.length - unbuiltModules.length;
+  console.log(`[NEXTGEN] 📋 Progress: ${builtCount}/${systemModules.length} modules built | ${unbuiltModules.length} remaining | Gen 1 library: 487 building blocks available | Gen 1 adopted: ${state.gen1AdoptedCount}, adapted: ${state.gen1AdaptedCount}, discarded: ${state.gen1DiscardedCount}`);
 
   for (const mod of modulesToBuild) {
     console.log(`[NEXTGEN] ⚙️ Building: ${mod.name}...`);
@@ -1134,12 +1134,12 @@ async function phaseDesignAndCode(): Promise<void> {
       researchContext = await researchTopic("computational models of emotion appraisal theory implementation");
     }
 
-    try {
-      const evalTimeout = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("Gen 1 evaluation timed out")), 60_000)
-      );
-      let evaluationDirective = "";
-      if (gen1ModuleNames.length > 0) {
+    let evaluationDirective = "";
+    if (gen1ModuleNames.length > 0) {
+      try {
+        const evalTimeout = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("Gen 1 evaluation timed out")), 120_000)
+        );
         const evalCall = openai.chat.completions.create({
           model: "gpt-4o",
           max_tokens: 2048,
@@ -1180,18 +1180,22 @@ Output JSON: { "evaluations": [{ "module": "filename", "verdict": "keep|adapt|di
             }
           } catch {}
         }
+      } catch (evalErr) {
+        console.log(`[NEXTGEN] ⚠️ Gen 1 evaluation timed out for ${mod.name} — building fresh (will evaluate next cycle)`);
       }
+    }
 
-      const keptCode: string[] = [];
-      for (const [modName, ev] of Object.entries(state.gen1Evaluated)) {
-        if (ev.adoptedInto === mod.name && (ev.verdict === "keep" || ev.verdict === "adapt")) {
-          try {
-            const content = fs.readFileSync(path.join(GEN1_MODULES_DIR, modName), "utf-8");
-            keptCode.push(`\n=== ${ev.verdict === "keep" ? "KEEP AS-IS" : "ADAPT FROM"}: ${modName} ===\n${content.slice(0, 3000)}\n`);
-          } catch {}
-        }
+    const keptCode: string[] = [];
+    for (const [modName, ev] of Object.entries(state.gen1Evaluated)) {
+      if (ev.adoptedInto === mod.name && (ev.verdict === "keep" || ev.verdict === "adapt")) {
+        try {
+          const content = fs.readFileSync(path.join(GEN1_MODULES_DIR, modName), "utf-8");
+          keptCode.push(`\n=== ${ev.verdict === "keep" ? "KEEP AS-IS" : "ADAPT FROM"}: ${modName} ===\n${content.slice(0, 3000)}\n`);
+        } catch {}
       }
+    }
 
+    try {
       const codeAiTimeout = new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error("Module code generation timed out after 180s")), 180_000)
       );
