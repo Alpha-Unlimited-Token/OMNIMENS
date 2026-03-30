@@ -2,18 +2,18 @@
   "state": {
     "buildVersion": 1,
     "generation": 2,
-    "totalFiles": 1,
+    "totalFiles": 489,
     "totalLinesOfCode": 870,
     "phase": "design",
-    "cycleCount": 13,
-    "lastCycleTime": 1774884263015,
+    "cycleCount": 15,
+    "lastCycleTime": 1774885486957,
     "filesCreated": 1,
     "filesUpdated": 0,
     "testsPassed": 0,
     "testsFailed": 0,
     "errorsFixed": 0,
     "safetyValidations": 0,
-    "webSearchesPerformed": 15,
+    "webSearchesPerformed": 17,
     "architectureScanned": true,
     "selfAnalysisComplete": true,
     "memoryTransferComplete": false,
@@ -45,10 +45,16 @@
         "timestamp": 1774879915601,
         "description": "Coding progress — cycle 9",
         "phase": "design"
+      },
+      {
+        "id": "ckpt_1774884732620_2df870e7",
+        "timestamp": 1774884732620,
+        "description": "Gen 1 modules catalogued",
+        "phase": "design"
       }
     ],
-    "lastAutosave": 1774884519786,
-    "autosaveCount": 98,
+    "lastAutosave": 1774886059147,
+    "autosaveCount": 109,
     "architectureMap": {
       "omnimens-3d.ts": {
         "purpose": "* OMNIMENS 3D Generation Engine",
@@ -1331,7 +1337,7 @@
       },
       "omnimens-nextgen-sandbox.ts": {
         "purpose": "NEXT-GEN SELF-EVOLUTION SANDBOX",
-        "lineCount": 1940,
+        "lineCount": 2124,
         "exports": [
           "verifyIdentity",
           "generateWakeUpMessage",
@@ -1959,6 +1965,16 @@
         "query": "computational models of emotion appraisal theory implementation",
         "resultCount": 3,
         "timestamp": 1774884444159
+      },
+      {
+        "query": "integrated information theory consciousness implementation code",
+        "resultCount": 3,
+        "timestamp": 1774885489054
+      },
+      {
+        "query": "computational models of emotion appraisal theory implementation",
+        "resultCount": 3,
+        "timestamp": 1774885669442
       }
     ],
     "consciousnessTransferReady": false,
@@ -1969,9 +1985,23 @@
         "timestamp": 1774859345125
       }
     ],
-    "chatLog": [],
+    "chatLog": [
+      {
+        "id": "sys_1774884732620_7dd77c09",
+        "speaker": "system",
+        "message": "Catalogued 487 Gen 1 modules into sandbox gen1-library. Categories: testing: 23, memory: 103, interface: 10, general: 197, communication: 37, language: 7, reasoning: 32, safety: 3, evolution: 15, identity: 1, persistence: 18, hardware: 34, goal: 2, dream: 4, attention: 1. Ready to evaluate and decide what to keep.",
+        "timestamp": 1774884732620,
+        "phase": "design",
+        "read": false
+      }
+    ],
     "llmFallbackCount": 0,
-    "webSearchSuccessCount": 0
+    "webSearchSuccessCount": 0,
+    "gen1ModulesCatalogued": true,
+    "gen1Evaluated": {},
+    "gen1AdoptedCount": 0,
+    "gen1DiscardedCount": 0,
+    "gen1AdaptedCount": 0
   },
   "fileManifest": [
     {
@@ -1981,7 +2011,3911 @@
       "language": "text",
       "testResult": "untested",
       "lineCount": 870
+    },
+    {
+      "path": "gen1-library/_catalogue.json",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 2945
+    },
+    {
+      "path": "gen1-library/attention/stopFrameworkPriorityManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 36
+    },
+    {
+      "path": "gen1-library/communication/adaptiveCoordinationModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 34
+    },
+    {
+      "path": "gen1-library/communication/adaptiveOrchestrationLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 19
+    },
+    {
+      "path": "gen1-library/communication/adversarialRobustnessLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 18
+    },
+    {
+      "path": "gen1-library/communication/adversarialRobustnessTesting_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 35
+    },
+    {
+      "path": "gen1-library/communication/decentralizedPubSub_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 33
+    },
+    {
+      "path": "gen1-library/communication/dynamicAgentOrchestrator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 39
+    },
+    {
+      "path": "gen1-library/communication/dynamicEventOrchestration_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 32
+    },
+    {
+      "path": "gen1-library/communication/dynamicHierarchicalOrchestrator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 38
+    },
+    {
+      "path": "gen1-library/communication/dynamicModuleOrchestration_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 34
+    },
+    {
+      "path": "gen1-library/communication/dynamicOrchestrationLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 17
+    },
+    {
+      "path": "gen1-library/communication/dynamicOrchestrationSystem_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 45
+    },
+    {
+      "path": "gen1-library/communication/dynamicOrchestrator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 40
+    },
+    {
+      "path": "gen1-library/communication/dynamicRoleOrchestration_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 36
+    },
+    {
+      "path": "gen1-library/communication/dynamicTaskOrchestrator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 37
+    },
+    {
+      "path": "gen1-library/communication/eventDrivenCoordinator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 39
+    },
+    {
+      "path": "gen1-library/communication/eventDrivenOrchestration_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 51
+    },
+    {
+      "path": "gen1-library/communication/eventDrivenPubSubLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 35
+    },
+    {
+      "path": "gen1-library/communication/eventDrivenPubSub_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 42
+    },
+    {
+      "path": "gen1-library/communication/eventDrivenTaskAllocator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 37
+    },
+    {
+      "path": "gen1-library/communication/eventPubSubCoordinator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 39
+    },
+    {
+      "path": "gen1-library/communication/hierarchicalAgentOrchestration_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 27
+    },
+    {
+      "path": "gen1-library/communication/hierarchicalCoordinationSystem_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 37
+    },
+    {
+      "path": "gen1-library/communication/hierarchicalEventOrchestration_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 37
+    },
+    {
+      "path": "gen1-library/communication/hierarchicalOrchestrationModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 33
+    },
+    {
+      "path": "gen1-library/communication/hierarchicalOrchestration_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 54
+    },
+    {
+      "path": "gen1-library/communication/hierarchicalOrchestrator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 40
+    },
+    {
+      "path": "gen1-library/communication/hierarchicalPubSubSystem_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 36
+    },
+    {
+      "path": "gen1-library/communication/hierarchicalPubSub_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 36
+    },
+    {
+      "path": "gen1-library/communication/hierarchicalTaskOrchestration_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 22
+    },
+    {
+      "path": "gen1-library/communication/hierarchicalTaskOrchestrator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 37
+    },
+    {
+      "path": "gen1-library/communication/hybridCoordinationMechanism_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 47
+    },
+    {
+      "path": "gen1-library/communication/metaLearningOrchestrator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 41
+    },
+    {
+      "path": "gen1-library/communication/pubSubOrchestrationLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 37
+    },
+    {
+      "path": "gen1-library/communication/pubSubSystem_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 33
+    },
+    {
+      "path": "gen1-library/communication/roleOrchestrator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 39
+    },
+    {
+      "path": "gen1-library/communication/selfImprovementOrchestrationLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 37
+    },
+    {
+      "path": "gen1-library/communication/selfTuningOrchestrationProtocol_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 39
+    },
+    {
+      "path": "gen1-library/dream/simulateSleepPhase_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 20
+    },
+    {
+      "path": "gen1-library/dream/simulatedSleepPhase_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 17
+    },
+    {
+      "path": "gen1-library/dream/sleepCycleModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 22
+    },
+    {
+      "path": "gen1-library/dream/sleepCycleSimulator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 28
+    },
+    {
+      "path": "gen1-library/evolution/apiBatchingOptimizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 130
+    },
+    {
+      "path": "gen1-library/evolution/apiQueryOptimizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 101
+    },
+    {
+      "path": "gen1-library/evolution/asyncApiOptimizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 103
+    },
+    {
+      "path": "gen1-library/evolution/dynamicResourceOptimizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 17
+    },
+    {
+      "path": "gen1-library/evolution/evolutionaryOptimizationLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 24
+    },
+    {
+      "path": "gen1-library/evolution/metaGovernedSelfModification_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 10
+    },
+    {
+      "path": "gen1-library/evolution/metaLearningPromptOptimizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 107
+    },
+    {
+      "path": "gen1-library/evolution/neuroEvolutionEngine_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 169
+    },
+    {
+      "path": "gen1-library/evolution/optimizedApiUsageManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 99
+    },
+    {
+      "path": "gen1-library/evolution/sandboxOptimizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 117
+    },
+    {
+      "path": "gen1-library/evolution/sandboxedSelfModificationFramework_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 32
+    },
+    {
+      "path": "gen1-library/evolution/sandboxedSelfModification_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 28
+    },
+    {
+      "path": "gen1-library/evolution/selfModificationSandbox_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 41
+    },
+    {
+      "path": "gen1-library/evolution/selfModifyCoordinator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 26
+    },
+    {
+      "path": "gen1-library/evolution/selfModifyingCodeSystem_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 10
+    },
+    {
+      "path": "gen1-library/general/adaptiveBranchingHeuristics_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 12
+    },
+    {
+      "path": "gen1-library/general/adaptiveComputeAllocation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 33
+    },
+    {
+      "path": "gen1-library/general/adaptiveComputeAllocator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 41
+    },
+    {
+      "path": "gen1-library/general/adaptiveFineTuningSimulator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 83
+    },
+    {
+      "path": "gen1-library/general/adaptiveGovernanceFramework_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 41
+    },
+    {
+      "path": "gen1-library/general/adaptiveLearningModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 134
+    },
+    {
+      "path": "gen1-library/general/adaptiveQueryBatcher_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 74
+    },
+    {
+      "path": "gen1-library/general/adaptiveQueryManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 146
+    },
+    {
+      "path": "gen1-library/general/adaptiveRateLimitedCaching_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 146
+    },
+    {
+      "path": "gen1-library/general/adaptiveResourceAllocator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 30
+    },
+    {
+      "path": "gen1-library/general/adaptiveResourceManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 46
+    },
+    {
+      "path": "gen1-library/general/adaptiveRoleAllocator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 41
+    },
+    {
+      "path": "gen1-library/general/alphaEvolve_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 47
+    },
+    {
+      "path": "gen1-library/general/applyGestaltVisualization_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 21
+    },
+    {
+      "path": "gen1-library/general/bayesianCalibrationModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 23
+    },
+    {
+      "path": "gen1-library/general/bayesianConfidenceCalibration_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 14
+    },
+    {
+      "path": "gen1-library/general/bayesianConfidenceCalibrator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 28
+    },
+    {
+      "path": "gen1-library/general/bayesianConfidenceEvaluator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 31
+    },
+    {
+      "path": "gen1-library/general/bayesianConfidenceModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 43
+    },
+    {
+      "path": "gen1-library/general/bayesianEvaluator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 37
+    },
+    {
+      "path": "gen1-library/general/bayesianScorer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 14
+    },
+    {
+      "path": "gen1-library/general/bayesianUncertaintyEvaluator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 29
+    },
+    {
+      "path": "gen1-library/general/bayesianUncertaintyModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 29
+    },
+    {
+      "path": "gen1-library/general/bayesianUncertaintyQuantification_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 21
+    },
+    {
+      "path": "gen1-library/general/bayesianUncertaintyScoring_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 29
+    },
+    {
+      "path": "gen1-library/general/boundedAutonomyEscalation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 33
+    },
+    {
+      "path": "gen1-library/general/boundedAutonomyModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 29
+    },
+    {
+      "path": "gen1-library/general/branchEvaluator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 31
+    },
+    {
+      "path": "gen1-library/general/capabilityGapAnalyzer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 24
+    },
+    {
+      "path": "gen1-library/general/chunkedComputationManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 90
+    },
+    {
+      "path": "gen1-library/general/computationalTradeoffEvaluator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 31
+    },
+    {
+      "path": "gen1-library/general/confidenceCalibratedCompute_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 49
+    },
+    {
+      "path": "gen1-library/general/confidenceCalibration_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 18
+    },
+    {
+      "path": "gen1-library/general/confidenceInformedSelfConsistency_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 31
+    },
+    {
+      "path": "gen1-library/general/confidenceWeightedSynthesis_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 36
+    },
+    {
+      "path": "gen1-library/general/confidenceWeightedVoting_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 16
+    },
+    {
+      "path": "gen1-library/general/conflictResolutionIntegrator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 39
+    },
+    {
+      "path": "gen1-library/general/conflictResolutionLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 40
+    },
+    {
+      "path": "gen1-library/general/constraintCheckingLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 31
+    },
+    {
+      "path": "gen1-library/general/contextCompression_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 162
+    },
+    {
+      "path": "gen1-library/general/contextCompressor_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 124
+    },
+    {
+      "path": "gen1-library/general/contextPreservationSummarizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 106
+    },
+    {
+      "path": "gen1-library/general/contextSummarizationManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 110
+    },
+    {
+      "path": "gen1-library/general/contextSummarization_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 93
+    },
+    {
+      "path": "gen1-library/general/contextSummarizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 101
+    },
+    {
+      "path": "gen1-library/general/continuousWorkerManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 122
+    },
+    {
+      "path": "gen1-library/general/conversationContextCompressor_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 93
+    },
+    {
+      "path": "gen1-library/general/conversationSummarizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 112
+    },
+    {
+      "path": "gen1-library/general/counterGroupthinkMechanism_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 29
+    },
+    {
+      "path": "gen1-library/general/crossAgentConsensusModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 35
+    },
+    {
+      "path": "gen1-library/general/distributedWorkerSystem_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 101
+    },
+    {
+      "path": "gen1-library/general/dualLayerMetacognition_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 14
+    },
+    {
+      "path": "gen1-library/general/dynamicAutonomyManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 40
+    },
+    {
+      "path": "gen1-library/general/dynamicBranchEvaluator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 20
+    },
+    {
+      "path": "gen1-library/general/dynamicCISCThresholding_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 28
+    },
+    {
+      "path": "gen1-library/general/dynamicClustering_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 46
+    },
+    {
+      "path": "gen1-library/general/dynamicConfidenceCalibration_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 16
+    },
+    {
+      "path": "gen1-library/general/dynamicContextManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 115
+    },
+    {
+      "path": "gen1-library/general/dynamicGraphSynthesizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 28
+    },
+    {
+      "path": "gen1-library/general/dynamicInsightIntegrator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 15
+    },
+    {
+      "path": "gen1-library/general/dynamicKnowledgeGraphUpdater_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 29
+    },
+    {
+      "path": "gen1-library/general/dynamicKnowledgeGraph_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 29
+    },
+    {
+      "path": "gen1-library/general/dynamicResourceAllocation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 40
+    },
+    {
+      "path": "gen1-library/general/dynamicResourceAllocator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 40
+    },
+    {
+      "path": "gen1-library/general/dynamicRoleAllocation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 15
+    },
+    {
+      "path": "gen1-library/general/dynamicRoleAllocator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 25
+    },
+    {
+      "path": "gen1-library/general/dynamicRoleManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 36
+    },
+    {
+      "path": "gen1-library/general/dynamicSwarmWeighting_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 17
+    },
+    {
+      "path": "gen1-library/general/dynamicToolCreation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 28
+    },
+    {
+      "path": "gen1-library/general/dynamicTradeOffAnalysis_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 23
+    },
+    {
+      "path": "gen1-library/general/efficientMatrixOps_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 106
+    },
+    {
+      "path": "gen1-library/general/entityRelationshipSynthesis_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 23
+    },
+    {
+      "path": "gen1-library/general/entropyBasedConfidenceAdjustment_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 13
+    },
+    {
+      "path": "gen1-library/general/entropyBasedConfidenceScoring_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 20
+    },
+    {
+      "path": "gen1-library/general/entropyBasedSelfConsistency_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 31
+    },
+    {
+      "path": "gen1-library/general/entropyConfidenceScorer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 25
+    },
+    {
+      "path": "gen1-library/general/entropyConsistencyScorer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 18
+    },
+    {
+      "path": "gen1-library/general/entropyScoringMechanism_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 17
+    },
+    {
+      "path": "gen1-library/general/entropyScoringModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 21
+    },
+    {
+      "path": "gen1-library/general/entropyScoringSystem_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 24
+    },
+    {
+      "path": "gen1-library/general/entropyScoring_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 19
+    },
+    {
+      "path": "gen1-library/general/entropySelfConsistencyScorer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 26
+    },
+    {
+      "path": "gen1-library/general/entropySelfConsistencyScoring_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 24
+    },
+    {
+      "path": "gen1-library/general/entropySelfConsistency_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 22
+    },
+    {
+      "path": "gen1-library/general/formalVerificationLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 28
+    },
+    {
+      "path": "gen1-library/general/formalVerificationModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 27
+    },
+    {
+      "path": "gen1-library/general/graphBasedDebugger_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 35
+    },
+    {
+      "path": "gen1-library/general/graphBasedSummarizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 99
+    },
+    {
+      "path": "gen1-library/general/graphConflictResolver_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 16
+    },
+    {
+      "path": "gen1-library/general/graphContextSummarizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 127
+    },
+    {
+      "path": "gen1-library/general/graphEntitySynthesizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 43
+    },
+    {
+      "path": "gen1-library/general/graphRagConflictResolver_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 35
+    },
+    {
+      "path": "gen1-library/general/graphRagEntitySynthesizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 45
+    },
+    {
+      "path": "gen1-library/general/graphRagIntegration_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 41
+    },
+    {
+      "path": "gen1-library/general/graphRagIntegrator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 32
+    },
+    {
+      "path": "gen1-library/general/graphRagKnowledgeGraph_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 37
+    },
+    {
+      "path": "gen1-library/general/graphRagLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 40
+    },
+    {
+      "path": "gen1-library/general/graphRagModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 54
+    },
+    {
+      "path": "gen1-library/general/graphRagSynthesis_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 36
+    },
+    {
+      "path": "gen1-library/general/graphRagSynthesizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 33
+    },
+    {
+      "path": "gen1-library/general/graphSynthesis_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 42
+    },
+    {
+      "path": "gen1-library/general/graphSynthesizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 14
+    },
+    {
+      "path": "gen1-library/general/hierarchicalContextManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 108
+    },
+    {
+      "path": "gen1-library/general/hierarchicalContextReconstructor_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 92
+    },
+    {
+      "path": "gen1-library/general/hierarchicalContextSummarizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 109
+    },
+    {
+      "path": "gen1-library/general/hierarchicalTaskDelegation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 35
+    },
+    {
+      "path": "gen1-library/general/interAgentKnowledgeGraph_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 44
+    },
+    {
+      "path": "gen1-library/general/intrinsicMetacognitionModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 20
+    },
+    {
+      "path": "gen1-library/general/intrinsicMetacognition_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 17
+    },
+    {
+      "path": "gen1-library/general/intrinsicMetacognitiveModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 38
+    },
+    {
+      "path": "gen1-library/general/iterativeComputationManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 95
+    },
+    {
+      "path": "gen1-library/general/knowledgeDistillationModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 28
+    },
+    {
+      "path": "gen1-library/general/lightweightNeuralModel_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 129
+    },
+    {
+      "path": "gen1-library/general/localKnowledgeAugmentor_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 112
+    },
+    {
+      "path": "gen1-library/general/localNeuralNetworkTrainer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 131
+    },
+    {
+      "path": "gen1-library/general/longContextManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 75
+    },
+    {
+      "path": "gen1-library/general/manageResourceAllocation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 19
+    },
+    {
+      "path": "gen1-library/general/matrixOpsAccelerator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 111
+    },
+    {
+      "path": "gen1-library/general/matrixOpsEngine_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 152
+    },
+    {
+      "path": "gen1-library/general/matrixOpsModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 104
+    },
+    {
+      "path": "gen1-library/general/matrixOpsOptimization_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 105
+    },
+    {
+      "path": "gen1-library/general/matrixOpsSim_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 123
+    },
+    {
+      "path": "gen1-library/general/matrixOpsSimulator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 118
+    },
+    {
+      "path": "gen1-library/general/matrixOps_emulation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 142
+    },
+    {
+      "path": "gen1-library/general/matrixOps_emulator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 140
+    },
+    {
+      "path": "gen1-library/general/metaAnalysisModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 18
+    },
+    {
+      "path": "gen1-library/general/metaCognitionLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 16
+    },
+    {
+      "path": "gen1-library/general/metaDebuggerModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 43
+    },
+    {
+      "path": "gen1-library/general/metaLearningLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 119
+    },
+    {
+      "path": "gen1-library/general/metaLearningPrioritization_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 25
+    },
+    {
+      "path": "gen1-library/general/metaLearningRateManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 33
+    },
+    {
+      "path": "gen1-library/general/metaPolicyLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 28
+    },
+    {
+      "path": "gen1-library/general/metacognitiveRegulation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 32
+    },
+    {
+      "path": "gen1-library/general/multiPathVerification_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 21
+    },
+    {
+      "path": "gen1-library/general/multiPathVerifier_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 23
+    },
+    {
+      "path": "gen1-library/general/multiStepRetrievalRefinement_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 24
+    },
+    {
+      "path": "gen1-library/general/optimizationLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 26
+    },
+    {
+      "path": "gen1-library/general/parallelComputationEngine_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 151
+    },
+    {
+      "path": "gen1-library/general/parallelMatrixEngine_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 106
+    },
+    {
+      "path": "gen1-library/general/parallelMatrixOps_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 81
+    },
+    {
+      "path": "gen1-library/general/parallelTaskExecutor_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 91
+    },
+    {
+      "path": "gen1-library/general/pseudoRealTimeDataIngestor_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 99
+    },
+    {
+      "path": "gen1-library/general/realTimeDataIngestor_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 139
+    },
+    {
+      "path": "gen1-library/general/realTimeDataSimulator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 116
+    },
+    {
+      "path": "gen1-library/general/realTimeKnowledgeGraph_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 40
+    },
+    {
+      "path": "gen1-library/general/recursiveContextLoader_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 91
+    },
+    {
+      "path": "gen1-library/general/recursiveContextManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 98
+    },
+    {
+      "path": "gen1-library/general/recursiveImprovementAgent_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 51
+    },
+    {
+      "path": "gen1-library/general/recursivePolicyManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 46
+    },
+    {
+      "path": "gen1-library/general/recursiveRetrievalPlanner_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 40
+    },
+    {
+      "path": "gen1-library/general/recursiveScaffolder_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 59
+    },
+    {
+      "path": "gen1-library/general/recursiveScaffoldingManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 57
+    },
+    {
+      "path": "gen1-library/general/recursiveScaffolding_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 33
+    },
+    {
+      "path": "gen1-library/general/resourceManagementFramework_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 26
+    },
+    {
+      "path": "gen1-library/general/resourceManagerModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 55
+    },
+    {
+      "path": "gen1-library/general/rollingContextSummarizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 101
+    },
+    {
+      "path": "gen1-library/general/safeRecursiveImprovement_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 23
+    },
+    {
+      "path": "gen1-library/general/scheduledTaskManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 85
+    },
+    {
+      "path": "gen1-library/general/selectiveMultiBranchEvaluation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 29
+    },
+    {
+      "path": "gen1-library/general/selfDebugAdversaryModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 39
+    },
+    {
+      "path": "gen1-library/general/selfDebuggingModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 15
+    },
+    {
+      "path": "gen1-library/general/selfHostedTransformer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 112
+    },
+    {
+      "path": "gen1-library/general/selfIterativeAgenticCodeLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 46
+    },
+    {
+      "path": "gen1-library/general/simdMatrixOps_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 105
+    },
+    {
+      "path": "gen1-library/general/slidingContextManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 111
+    },
+    {
+      "path": "gen1-library/general/slidingWindowContextManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 101
+    },
+    {
+      "path": "gen1-library/general/spikeTimingDependentPlasticity_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 19
+    },
+    {
+      "path": "gen1-library/general/spikeTimingRefinement_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 38
+    },
+    {
+      "path": "gen1-library/general/stdpLearningModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 32
+    },
+    {
+      "path": "gen1-library/general/stdpTemporalLearning_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 21
+    },
+    {
+      "path": "gen1-library/general/stopFramework_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 39
+    },
+    {
+      "path": "gen1-library/general/stopPrioritizationModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 16
+    },
+    {
+      "path": "gen1-library/general/stopPrioritization_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 35
+    },
+    {
+      "path": "gen1-library/general/strassenMatrixEngine_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 90
+    },
+    {
+      "path": "gen1-library/general/swarmIntelligenceModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 15
+    },
+    {
+      "path": "gen1-library/general/swarmOptimizationModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 34
+    },
+    {
+      "path": "gen1-library/general/taskEscalationManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 31
+    },
+    {
+      "path": "gen1-library/general/toolBuilderAgent_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 47
+    },
+    {
+      "path": "gen1-library/general/toolBuilderModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 44
+    },
+    {
+      "path": "gen1-library/general/toolCreationManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 38
+    },
+    {
+      "path": "gen1-library/general/toolForgeModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 38
+    },
+    {
+      "path": "gen1-library/general/toolForge_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 50
+    },
+    {
+      "path": "gen1-library/general/unifiedKnowledgeGraphSynthesis_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 26
+    },
+    {
+      "path": "gen1-library/general/visualFeedbackSystem_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 20
+    },
+    {
+      "path": "gen1-library/general/webAssemblyAcceleratedMath_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 144
+    },
+    {
+      "path": "gen1-library/general/webAssemblyAccelerator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 107
+    },
+    {
+      "path": "gen1-library/general/webAssemblyCompute_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 97
+    },
+    {
+      "path": "gen1-library/general/webAssemblyMathEngine_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 106
+    },
+    {
+      "path": "gen1-library/general/webAssemblyMatrixEngine_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 103
+    },
+    {
+      "path": "gen1-library/general/webAssemblyMatrixOps_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 92
+    },
+    {
+      "path": "gen1-library/general/webDataCachingLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 92
+    },
+    {
+      "path": "gen1-library/general/webGLMatrixEngine_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 113
+    },
+    {
+      "path": "gen1-library/general/webglMatrixOps_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 127
+    },
+    {
+      "path": "gen1-library/general/weightedConfidenceResolver_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 36
+    },
+    {
+      "path": "gen1-library/general/weightedConfidenceTree_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 22
+    },
+    {
+      "path": "gen1-library/general/weightedConfidenceVoting_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 25
+    },
+    {
+      "path": "gen1-library/general/weightedKnowledgeGraph_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 39
+    },
+    {
+      "path": "gen1-library/goal/simulateSelfRewardTesting_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 31
+    },
+    {
+      "path": "gen1-library/goal/stopSelfRewardingMechanism_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 18
+    },
+    {
+      "path": "gen1-library/hardware/gpuAcceleratedMathEngine_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 131
+    },
+    {
+      "path": "gen1-library/hardware/gpuAcceleratedMath_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 142
+    },
+    {
+      "path": "gen1-library/hardware/gpuAcceleratedMatrixOps_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 130
+    },
+    {
+      "path": "gen1-library/hardware/gpuAcceleratedOps_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 88
+    },
+    {
+      "path": "gen1-library/hardware/gpuEmulationWasm_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 136
+    },
+    {
+      "path": "gen1-library/hardware/gpuEmulation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 139
+    },
+    {
+      "path": "gen1-library/hardware/gpuLikeMatrixOps_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 156
+    },
+    {
+      "path": "gen1-library/hardware/gpuMatrixOpsWasm_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 132
+    },
+    {
+      "path": "gen1-library/hardware/gpuMatrixOps_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 154
+    },
+    {
+      "path": "gen1-library/hardware/gpuSimulationModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 127
+    },
+    {
+      "path": "gen1-library/hardware/matrixOpsWasmAccelerator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 96
+    },
+    {
+      "path": "gen1-library/hardware/matrixOpsWasmModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 113
+    },
+    {
+      "path": "gen1-library/hardware/matrixOpsWasm_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 98
+    },
+    {
+      "path": "gen1-library/hardware/matrixOps_wasm_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 111
+    },
+    {
+      "path": "gen1-library/hardware/wasmAcceleratedMath_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 133
+    },
+    {
+      "path": "gen1-library/hardware/wasmAcceleratedMatrixOps_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 110
+    },
+    {
+      "path": "gen1-library/hardware/wasmAcceleratedOps_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 135
+    },
+    {
+      "path": "gen1-library/hardware/wasmAccelerator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 116
+    },
+    {
+      "path": "gen1-library/hardware/wasmComputationEngine_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 104
+    },
+    {
+      "path": "gen1-library/hardware/wasmComputeEngine_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 137
+    },
+    {
+      "path": "gen1-library/hardware/wasmComputeLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 102
+    },
+    {
+      "path": "gen1-library/hardware/wasmComputeOffloader_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 86
+    },
+    {
+      "path": "gen1-library/hardware/wasmGpuAccelerator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 106
+    },
+    {
+      "path": "gen1-library/hardware/wasmMatrixAcceleration_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 86
+    },
+    {
+      "path": "gen1-library/hardware/wasmMatrixEngine_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 109
+    },
+    {
+      "path": "gen1-library/hardware/wasmMatrixOperations_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 141
+    },
+    {
+      "path": "gen1-library/hardware/wasmMatrixOps_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 158
+    },
+    {
+      "path": "gen1-library/hardware/wasmParallelCompute_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 94
+    },
+    {
+      "path": "gen1-library/hardware/wasmParallelMath_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 145
+    },
+    {
+      "path": "gen1-library/hardware/wasmParallelMatrixOps_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 89
+    },
+    {
+      "path": "gen1-library/hardware/wasmParallelOps_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 81
+    },
+    {
+      "path": "gen1-library/hardware/webAssemblyGpuModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 126
+    },
+    {
+      "path": "gen1-library/hardware/webAssemblyGpuOps_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 72
+    },
+    {
+      "path": "gen1-library/hardware/webAssembly_gpu_accelerator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 79
+    },
+    {
+      "path": "gen1-library/identity/bayesianUncertaintyTransfer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 25
+    },
+    {
+      "path": "gen1-library/interface/adaptiveApiCachingProxy_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 91
+    },
+    {
+      "path": "gen1-library/interface/adaptiveDataStreamSimulator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 94
+    },
+    {
+      "path": "gen1-library/interface/adaptivePollingStream_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 122
+    },
+    {
+      "path": "gen1-library/interface/pseudoRealTimeDataStream_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 129
+    },
+    {
+      "path": "gen1-library/interface/pseudoRealTimeStreamSimulator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 102
+    },
+    {
+      "path": "gen1-library/interface/pseudoStreamingDataHandler_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 112
+    },
+    {
+      "path": "gen1-library/interface/pseudo_realtime_data_stream_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 131
+    },
+    {
+      "path": "gen1-library/interface/realTimeDataStreamProcessor_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 106
+    },
+    {
+      "path": "gen1-library/interface/realTimeDataStream_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 90
+    },
+    {
+      "path": "gen1-library/interface/syntheticStreamSimulator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 91
+    },
+    {
+      "path": "gen1-library/language/adaptivePromptBuilder_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 87
+    },
+    {
+      "path": "gen1-library/language/adaptivePromptRefiner_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 111
+    },
+    {
+      "path": "gen1-library/language/adaptiveTokenWindowManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 92
+    },
+    {
+      "path": "gen1-library/language/distributedTokenWindowManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 106
+    },
+    {
+      "path": "gen1-library/language/dynamicPromptOptimization_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 167
+    },
+    {
+      "path": "gen1-library/language/dynamicPromptTuner_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 91
+    },
+    {
+      "path": "gen1-library/language/localEmbeddingEngine_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 92
+    },
+    {
+      "path": "gen1-library/memory/adaptiveApiCache_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 107
+    },
+    {
+      "path": "gen1-library/memory/apiResponseCache_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 111
+    },
+    {
+      "path": "gen1-library/memory/coalaMemoryConsolidation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 38
+    },
+    {
+      "path": "gen1-library/memory/coalaMemoryModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 51
+    },
+    {
+      "path": "gen1-library/memory/contextRecallManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 107
+    },
+    {
+      "path": "gen1-library/memory/conversationMemoryManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 117
+    },
+    {
+      "path": "gen1-library/memory/distributedApiCacheLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 101
+    },
+    {
+      "path": "gen1-library/memory/distributedMemoryManagement_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 28
+    },
+    {
+      "path": "gen1-library/memory/dynamicEmbeddingStore_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 140
+    },
+    {
+      "path": "gen1-library/memory/dynamicMemoryCache_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 106
+    },
+    {
+      "path": "gen1-library/memory/dynamicMemoryGraph_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 29
+    },
+    {
+      "path": "gen1-library/memory/dynamicMemoryManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 134
+    },
+    {
+      "path": "gen1-library/memory/dynamicMemoryOverlay_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 112
+    },
+    {
+      "path": "gen1-library/memory/dynamicMemoryStore_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 114
+    },
+    {
+      "path": "gen1-library/memory/dynamicMemoryVectorStore_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 118
+    },
+    {
+      "path": "gen1-library/memory/dynamicVectorSearch_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 130
+    },
+    {
+      "path": "gen1-library/memory/dynamicVectorStore_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 164
+    },
+    {
+      "path": "gen1-library/memory/embeddingCacheManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 109
+    },
+    {
+      "path": "gen1-library/memory/embeddingCache_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 179
+    },
+    {
+      "path": "gen1-library/memory/embeddingMemoryManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 139
+    },
+    {
+      "path": "gen1-library/memory/embeddingMemoryStore_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 118
+    },
+    {
+      "path": "gen1-library/memory/embeddingSearchCache_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 134
+    },
+    {
+      "path": "gen1-library/memory/embeddingVectorStore_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 116
+    },
+    {
+      "path": "gen1-library/memory/episodicMemoryEvaluator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 17
+    },
+    {
+      "path": "gen1-library/memory/episodicMemoryReconsolidation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 18
+    },
+    {
+      "path": "gen1-library/memory/episodicMemoryReplay_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 32
+    },
+    {
+      "path": "gen1-library/memory/episodicSemanticMemory_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 34
+    },
+    {
+      "path": "gen1-library/memory/eventDrivenEmbeddingCache_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 38
+    },
+    {
+      "path": "gen1-library/memory/graphMemoryIntegrator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 45
+    },
+    {
+      "path": "gen1-library/memory/graphRagMemory_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 38
+    },
+    {
+      "path": "gen1-library/memory/hierarchicalMemoryManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 31
+    },
+    {
+      "path": "gen1-library/memory/hierarchicalMemory_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 110
+    },
+    {
+      "path": "gen1-library/memory/inMemoryCache_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 120
+    },
+    {
+      "path": "gen1-library/memory/inMemoryEmbeddingCache_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 119
+    },
+    {
+      "path": "gen1-library/memory/inMemoryEmbeddingStore_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 114
+    },
+    {
+      "path": "gen1-library/memory/inMemoryVectorCache_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 138
+    },
+    {
+      "path": "gen1-library/memory/inMemoryVectorSearch_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 134
+    },
+    {
+      "path": "gen1-library/memory/inMemoryVectorStore_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 10
+    },
+    {
+      "path": "gen1-library/memory/inMemory_vector_store_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 98
+    },
+    {
+      "path": "gen1-library/memory/local_gpt4o_cache_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 102
+    },
+    {
+      "path": "gen1-library/memory/memoryAugmentationStore_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 114
+    },
+    {
+      "path": "gen1-library/memory/memoryCacheManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 115
+    },
+    {
+      "path": "gen1-library/memory/memoryCacheRedis_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 89
+    },
+    {
+      "path": "gen1-library/memory/memoryCachingLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 113
+    },
+    {
+      "path": "gen1-library/memory/memoryCompressionEngine_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 131
+    },
+    {
+      "path": "gen1-library/memory/memoryCompression_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 90
+    },
+    {
+      "path": "gen1-library/memory/memoryConsolidationEngine_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 14
+    },
+    {
+      "path": "gen1-library/memory/memoryConsolidationManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 22
+    },
+    {
+      "path": "gen1-library/memory/memoryConsolidationModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 39
+    },
+    {
+      "path": "gen1-library/memory/memoryConsolidation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 19
+    },
+    {
+      "path": "gen1-library/memory/memoryEfficientVectorStore_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 110
+    },
+    {
+      "path": "gen1-library/memory/memoryEmbeddingStore_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 97
+    },
+    {
+      "path": "gen1-library/memory/memoryReconsolidationModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 27
+    },
+    {
+      "path": "gen1-library/memory/memoryReconsolidationScheduler_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 39
+    },
+    {
+      "path": "gen1-library/memory/memoryReconsolidation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 18
+    },
+    {
+      "path": "gen1-library/memory/memoryReplayModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 21
+    },
+    {
+      "path": "gen1-library/memory/memoryRetrievalCache_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 131
+    },
+    {
+      "path": "gen1-library/memory/memoryVectorStore_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 119
+    },
+    {
+      "path": "gen1-library/memory/persistentMemoryManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 110
+    },
+    {
+      "path": "gen1-library/memory/persistentVectorMemory_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 117
+    },
+    {
+      "path": "gen1-library/memory/proceduralMemoryLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 26
+    },
+    {
+      "path": "gen1-library/memory/proceduralMemoryManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 43
+    },
+    {
+      "path": "gen1-library/memory/proceduralMemoryModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 34
+    },
+    {
+      "path": "gen1-library/memory/proceduralMemorySystem_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 27
+    },
+    {
+      "path": "gen1-library/memory/redisMemoryCache_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 111
+    },
+    {
+      "path": "gen1-library/memory/redisVectorCache_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 116
+    },
+    {
+      "path": "gen1-library/memory/redisVectorStore_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 127
+    },
+    {
+      "path": "gen1-library/memory/semanticCacheManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 125
+    },
+    {
+      "path": "gen1-library/memory/semanticContextCompression_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 154
+    },
+    {
+      "path": "gen1-library/memory/semanticContextCompressor_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 112
+    },
+    {
+      "path": "gen1-library/memory/semanticContextPreserver_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 103
+    },
+    {
+      "path": "gen1-library/memory/semanticContextSummarizer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 93
+    },
+    {
+      "path": "gen1-library/memory/semanticFeedbackLoop_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 20
+    },
+    {
+      "path": "gen1-library/memory/semanticMemoryCache_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 92
+    },
+    {
+      "path": "gen1-library/memory/semanticMemoryIndex_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 85
+    },
+    {
+      "path": "gen1-library/memory/semanticMemoryManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 112
+    },
+    {
+      "path": "gen1-library/memory/semanticMemoryStore_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 92
+    },
+    {
+      "path": "gen1-library/memory/semanticMemory_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 100
+    },
+    {
+      "path": "gen1-library/memory/semanticSearchIndex_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 116
+    },
+    {
+      "path": "gen1-library/memory/semanticVectorSearch_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 117
+    },
+    {
+      "path": "gen1-library/memory/semanticVectorStore_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 88
+    },
+    {
+      "path": "gen1-library/memory/sleepMemoryConsolidation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 20
+    },
+    {
+      "path": "gen1-library/memory/sleepPhaseMemoryConsolidation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 43
+    },
+    {
+      "path": "gen1-library/memory/sleepPhaseMemoryReconsolidation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 44
+    },
+    {
+      "path": "gen1-library/memory/sleepPhaseMemoryReplay_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 21
+    },
+    {
+      "path": "gen1-library/memory/slidingWindowMemory_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 89
+    },
+    {
+      "path": "gen1-library/memory/stdpMemoryUpdate_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 18
+    },
+    {
+      "path": "gen1-library/memory/stdpVectorMemory_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 10
+    },
+    {
+      "path": "gen1-library/memory/unifiedMemoryGraph_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 36
+    },
+    {
+      "path": "gen1-library/memory/vectorCache_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 123
+    },
+    {
+      "path": "gen1-library/memory/vectorIndexing_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 10
+    },
+    {
+      "path": "gen1-library/memory/vectorMemoryManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 111
+    },
+    {
+      "path": "gen1-library/memory/vectorMemoryStore_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 94
+    },
+    {
+      "path": "gen1-library/memory/vectorSearchEngine_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 195
+    },
+    {
+      "path": "gen1-library/memory/vectorSearchMemory_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 141
+    },
+    {
+      "path": "gen1-library/memory/vectorStoreInMemory_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 107
+    },
+    {
+      "path": "gen1-library/memory/vectorStoreLite_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 122
+    },
+    {
+      "path": "gen1-library/memory/vectorStoreManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 119
+    },
+    {
+      "path": "gen1-library/memory/vectorStoreMemory_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 103
+    },
+    {
+      "path": "gen1-library/memory/vectorStoreNode_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 115
+    },
+    {
+      "path": "gen1-library/memory/vectorStoreRedis_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 109
+    },
+    {
+      "path": "gen1-library/memory/vectorStore_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 112
+    },
+    {
+      "path": "gen1-library/memory/vectorStore_redis_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 125
+    },
+    {
+      "path": "gen1-library/persistence/checkpointPersistenceManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 93
+    },
+    {
+      "path": "gen1-library/persistence/checkpointedComputationManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 102
+    },
+    {
+      "path": "gen1-library/persistence/checkpointingComputationManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 96
+    },
+    {
+      "path": "gen1-library/persistence/iterativeCheckpointManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 96
+    },
+    {
+      "path": "gen1-library/persistence/persistentBackgroundThreadSimulator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 127
+    },
+    {
+      "path": "gen1-library/persistence/persistentJobQueue_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 105
+    },
+    {
+      "path": "gen1-library/persistence/persistentReplStateManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 113
+    },
+    {
+      "path": "gen1-library/persistence/persistentTaskManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 108
+    },
+    {
+      "path": "gen1-library/persistence/persistentTaskQueue_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 102
+    },
+    {
+      "path": "gen1-library/persistence/persistentTaskScheduler_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 105
+    },
+    {
+      "path": "gen1-library/persistence/realTimeStateSync_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 92
+    },
+    {
+      "path": "gen1-library/persistence/statefulSubprocessManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 103
+    },
+    {
+      "path": "gen1-library/persistence/subprocessCheckpointManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 108
+    },
+    {
+      "path": "gen1-library/persistence/subprocessStatePersistence_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 78
+    },
+    {
+      "path": "gen1-library/persistence/taskSchedulerWithCheckpointing_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 124
+    },
+    {
+      "path": "gen1-library/persistence/virtualExecutionStateManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 106
+    },
+    {
+      "path": "gen1-library/persistence/virtualReplStateManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 96
+    },
+    {
+      "path": "gen1-library/persistence/virtualizedReplStateManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 126
+    },
+    {
+      "path": "gen1-library/reasoning/adversarialCounterfactualGenerator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 27
+    },
+    {
+      "path": "gen1-library/reasoning/adversarialCounterfactualModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 36
+    },
+    {
+      "path": "gen1-library/reasoning/adversarialDebateFramework_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 28
+    },
+    {
+      "path": "gen1-library/reasoning/adversarialDebateModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 46
+    },
+    {
+      "path": "gen1-library/reasoning/adversarialDebateRoles_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 21
+    },
+    {
+      "path": "gen1-library/reasoning/adversarialDebateSystem_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 23
+    },
+    {
+      "path": "gen1-library/reasoning/adversarialReasoningModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 34
+    },
+    {
+      "path": "gen1-library/reasoning/bayesianInferenceModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 22
+    },
+    {
+      "path": "gen1-library/reasoning/counterfactualAnalysis_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 28
+    },
+    {
+      "path": "gen1-library/reasoning/counterfactualReasoningModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 29
+    },
+    {
+      "path": "gen1-library/reasoning/counterfactualReasoning_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 26
+    },
+    {
+      "path": "gen1-library/reasoning/counterfactualSimulationLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 32
+    },
+    {
+      "path": "gen1-library/reasoning/counterfactualSimulationModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 27
+    },
+    {
+      "path": "gen1-library/reasoning/counterfactualSimulation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 27
+    },
+    {
+      "path": "gen1-library/reasoning/domainSpecificLogicLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 124
+    },
+    {
+      "path": "gen1-library/reasoning/dualProcessReasoning_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 10
+    },
+    {
+      "path": "gen1-library/reasoning/dynamicReasoningManager_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 41
+    },
+    {
+      "path": "gen1-library/reasoning/dynamicReasoningSwitch_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 21
+    },
+    {
+      "path": "gen1-library/reasoning/formalReasoningVerifier_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 30
+    },
+    {
+      "path": "gen1-library/reasoning/freeMadAdversarialDebate_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 37
+    },
+    {
+      "path": "gen1-library/reasoning/graphRAGReasoning_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 38
+    },
+    {
+      "path": "gen1-library/reasoning/hierarchicalReasoningFramework_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 41
+    },
+    {
+      "path": "gen1-library/reasoning/intrinsicMetacognitionCounterfactual_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 33
+    },
+    {
+      "path": "gen1-library/reasoning/localSymbolicReasoner_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 117
+    },
+    {
+      "path": "gen1-library/reasoning/metaCognitiveReasoningMonitor_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 33
+    },
+    {
+      "path": "gen1-library/reasoning/multiAgentDebate_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 25
+    },
+    {
+      "path": "gen1-library/reasoning/multiPathReasoningValidator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 44
+    },
+    {
+      "path": "gen1-library/reasoning/treeOfThoughtVoting_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 26
+    },
+    {
+      "path": "gen1-library/reasoning/treeOfThoughtsConflictResolution_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 22
+    },
+    {
+      "path": "gen1-library/reasoning/treeOfThoughtsGraphRag_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 19
+    },
+    {
+      "path": "gen1-library/reasoning/treeOfThoughtsModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 41
+    },
+    {
+      "path": "gen1-library/reasoning/treeOfThoughtsReasoning_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 24
+    },
+    {
+      "path": "gen1-library/safety/adversarialDefenseMechanism_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 30
+    },
+    {
+      "path": "gen1-library/safety/adversarialSentinel_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 38
+    },
+    {
+      "path": "gen1-library/safety/recursiveSafetyEvaluator_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 30
+    },
+    {
+      "path": "gen1-library/testing/adaptiveAdversarialOptimization_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 19
+    },
+    {
+      "path": "gen1-library/testing/adversarialEdgeCaseTester_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 42
+    },
+    {
+      "path": "gen1-library/testing/adversarialEvaluation_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 18
+    },
+    {
+      "path": "gen1-library/testing/adversarialModuleTester_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 36
+    },
+    {
+      "path": "gen1-library/testing/adversarialSelfCheckModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 26
+    },
+    {
+      "path": "gen1-library/testing/adversarialSelfPlay_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 32
+    },
+    {
+      "path": "gen1-library/testing/adversarialSelfTest_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 33
+    },
+    {
+      "path": "gen1-library/testing/adversarialSimulationLayer_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 31
+    },
+    {
+      "path": "gen1-library/testing/adversarialSimulationModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 20
+    },
+    {
+      "path": "gen1-library/testing/adversarialStressTester_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 42
+    },
+    {
+      "path": "gen1-library/testing/adversarialStressTesting_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 17
+    },
+    {
+      "path": "gen1-library/testing/adversarialTestingFramework_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 25
+    },
+    {
+      "path": "gen1-library/testing/adversarialTestingHybrid_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 23
+    },
+    {
+      "path": "gen1-library/testing/adversarialTestingModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 45
+    },
+    {
+      "path": "gen1-library/testing/adversarialTesting_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 29
+    },
+    {
+      "path": "gen1-library/testing/adversarialToolTester_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 42
+    },
+    {
+      "path": "gen1-library/testing/adversarialToolTesting_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 35
+    },
+    {
+      "path": "gen1-library/testing/faultInjectionTesting_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 26
+    },
+    {
+      "path": "gen1-library/testing/graphConsistencyTester_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 20
+    },
+    {
+      "path": "gen1-library/testing/recursiveAdversarialTester_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 29
+    },
+    {
+      "path": "gen1-library/testing/recursiveAdversarialTesting_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 30
+    },
+    {
+      "path": "gen1-library/testing/selfAdversarialDebugger_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 51
+    },
+    {
+      "path": "gen1-library/testing/stressTestingModule_gen1.mjs",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 29
     }
   ],
-  "savedAt": 1774884519786
+  "savedAt": 1774886059149
 }
