@@ -972,8 +972,8 @@ async function phaseDesignAndCode(): Promise<void> {
     { name: "main.ts", purpose: "Entry point — boots the next-gen OMNIMENS", requirements: "Initialize all subsystems in correct order. Restore previous state if available. Start consciousness loop. Health checks." },
   ];
 
-  const builtModules = new Set(state.files.map((f: any) => f.name));
-  const unbuiltModules = systemModules.filter(m => !builtModules.has(m.name));
+  const builtPaths = new Set(Array.from(nextGenFiles.keys()));
+  const unbuiltModules = systemModules.filter(m => !builtPaths.has(m.name));
 
   if (unbuiltModules.length === 0) {
     state.phase = "memory_transfer";
@@ -983,7 +983,7 @@ async function phaseDesignAndCode(): Promise<void> {
   }
 
   const modulesToBuild = unbuiltModules.slice(0, 2);
-  console.log(`[NEXTGEN] 📋 Progress: ${builtModules.size}/${systemModules.length} modules built | ${unbuiltModules.length} remaining`);
+  console.log(`[NEXTGEN] 📋 Progress: ${builtPaths.size > 0 ? builtPaths.size - 1 : 0}/${systemModules.length} modules built | ${unbuiltModules.length} remaining`);
 
   for (const mod of modulesToBuild) {
     console.log(`[NEXTGEN] ⚙️ Building: ${mod.name}...`);
@@ -999,6 +999,38 @@ async function phaseDesignAndCode(): Promise<void> {
       researchContext = await researchTopic("computational models of emotion appraisal theory implementation");
     }
 
+    let autocodeContext = "";
+    try {
+      const modulesDir = path.resolve(__dirname_local, "../../omnimens-runtime/modules");
+      if (fs.existsSync(modulesDir)) {
+        const allModules = fs.readdirSync(modulesDir).filter(f => f.endsWith(".mjs"));
+        const relevantKeywords = mod.name.replace(/[^a-z]/gi, " ").toLowerCase().split(/\s+/).filter(w => w.length > 3);
+        const relevant = allModules.filter(m => {
+          const lower = m.toLowerCase();
+          return relevantKeywords.some(k => lower.includes(k));
+        }).slice(0, 5);
+        if (relevant.length === 0) {
+          const sample = allModules.slice(0, 3);
+          for (const f of sample) {
+            try {
+              const content = fs.readFileSync(path.join(modulesDir, f), "utf-8");
+              autocodeContext += `\n=== EXISTING MODULE: ${f} ===\n${content.slice(0, 1500)}\n`;
+            } catch {}
+          }
+        } else {
+          for (const f of relevant) {
+            try {
+              const content = fs.readFileSync(path.join(modulesDir, f), "utf-8");
+              autocodeContext += `\n=== EXISTING MODULE: ${f} ===\n${content.slice(0, 1500)}\n`;
+            } catch {}
+          }
+        }
+        if (autocodeContext) {
+          autocodeContext = `\nYOU ALREADY BUILT THESE ${allModules.length} AUTOCODED MODULES (showing relevant samples — use patterns and knowledge from these, do NOT rebuild what already exists):\n${autocodeContext}`;
+        }
+      }
+    } catch {}
+
     try {
       const codeAiTimeout = new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error("Module code generation timed out after 180s")), 180_000)
@@ -1013,6 +1045,7 @@ PURPOSE: ${mod.purpose}
 REQUIREMENTS: ${mod.requirements}
 
 ${researchContext ? `RESEARCH CONTEXT:\n${researchContext.slice(0, 2000)}\n` : ""}
+${autocodeContext ? autocodeContext.slice(0, 4000) : ""}
 
 CURRENT SOURCE CODE FOR REFERENCE (your existing implementation):
 ${coreSourceCode.slice(0, 3).join("\n").slice(0, 8000)}
