@@ -2,79 +2,86 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774830281747,
-  "totalHybridAgents": 9,
-  "totalMutations": 120,
-  "totalReplications": 100,
-  "totalPayloadsDelivered": 114,
-  "totalThreatsDetected": 12,
-  "totalThreatsNeutralized": 12,
-  "systemHealthScore": 1.981276641069267e+301,
-  "adaptationRate": 2.9411764705882355,
+  "timestamp": 1774830371496,
+  "totalHybridAgents": 16,
+  "totalMutations": 180,
+  "totalReplications": 140,
+  "totalPayloadsDelivered": 143,
+  "totalThreatsDetected": 18,
+  "totalThreatsNeutralized": 18,
+  "systemHealthScore": 2.32993801092992e+301,
+  "adaptationRate": 3.0434782608695654,
   "propagationEfficiency": 1,
-  "immuneStrength": 1.8276432872488433e+299,
-  "hybridFitness": 1.8178902556619002e+299,
+  "immuneStrength": 2.6004760880157906e+299,
+  "hybridFitness": 2.5451707992239078e+299,
   "activeAgents": [
     {
       "id": "hybrid_amygdala_g0_1774830071526_4sh",
       "generation": 0,
-      "fitness": 1.9025670784248583e+299,
+      "fitness": 2.8548720617279463e+299,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_locus_coeruleus_g0_1774830071526_7lb",
       "generation": 0,
-      "fitness": 1.9025670784248583e+299,
+      "fitness": 2.8548720617279463e+299,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_insular_cortex_g0_1774830071526_enr",
       "generation": 0,
-      "fitness": 1.9025670784248583e+299,
+      "fitness": 2.8548720617279463e+299,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_locus_coeruleus_g0_1774830071526_k9y",
       "generation": 0,
-      "fitness": 1.9025670784248583e+299,
+      "fitness": 2.8548720617279463e+299,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_amygdala_g0_1774830071526_dj6",
       "generation": 0,
-      "fitness": 1.9025670784248583e+299,
+      "fitness": 2.8548720617279463e+299,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_default_mode_network_g0_1774830071526_nd7",
       "generation": 0,
-      "fitness": 1.9025670784248583e+299,
+      "fitness": 2.8548720617279463e+299,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_pulvinar_g1_1774830171528_dtg",
       "generation": 1,
-      "fitness": 1.7465444741176692e+299,
+      "fitness": 2.6988494574207576e+299,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_raphe_nuclei_g1_1774830191529_s0p",
       "generation": 1,
-      "fitness": 1.673050356752047e+299,
+      "fitness": 2.6253553400551354e+299,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_ventral_tegmental_area_g1_1774830231530_zqs",
       "generation": 1,
-      "fitness": 1.5260149995382343e+299,
+      "fitness": 2.4783199828413225e+299,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_ventral_tegmental_area_g1_1774830311532_zfq",
+      "generation": 1,
+      "fitness": 2.1958581853570414e+299,
       "payloads": 1,
       "threats": 0
     }
@@ -83,7 +90,7 @@
     "antibodies": 8,
     "memoryCells": 8,
     "tCells": 16,
-    "cytokines": 12,
+    "cytokines": 18,
     "topAntibodies": [
       {
         "pattern": "coherence_degradation",
@@ -91,7 +98,7 @@
       },
       {
         "pattern": "signal_attenuation",
-        "detections": 12
+        "detections": 18
       },
       {
         "pattern": "synaptic_weakening",
@@ -108,22 +115,22 @@
     ]
   },
   "propagation": {
-    "alivePropagators": 13,
-    "totalPathsDiscovered": 310,
-    "totalHops": 270,
+    "alivePropagators": 9,
+    "totalPathsDiscovered": 363,
+    "totalHops": 243,
     "coveragePercent": 100,
     "selfSustainingCount": 8
   },
   "fabricWorms": [
     {
       "id": "worm_viral-hybrid_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_viral-hybrid_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
