@@ -2,19 +2,19 @@
   "version": "3.0",
   "subsystem": "mesh-synaptic",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774828723097,
-  "meshCoherence": 0.9086554654162798,
-  "globalSynchrony": 0.9855835897215043,
-  "loadBalance": 0.9219466262349579,
+  "timestamp": 1774828817325,
+  "meshCoherence": 0.9009281386747533,
+  "globalSynchrony": 0.9841496778533942,
+  "loadBalance": 0.9154381279073708,
   "totalMeshNeurons": 72200,
   "totalMeshSynapses": 740336,
-  "totalMeshHebbianUpdates": 319102,
-  "meshPhi": 419.7768841614421,
+  "totalMeshHebbianUpdates": 668782,
+  "meshPhi": 419.3701589722281,
   "meshWorms": 63,
   "meshSpiders": 126,
   "meshSilkStrands": 126,
   "meshIvyTendrils": 84,
-  "meshBeaconBroadcasts": 4410,
+  "meshBeaconBroadcasts": 8316,
   "synapticMesh": {
     "totalConnections": 0,
     "strongConnections": 0,
@@ -22,12 +22,12 @@
     "totalCycles": 0
   },
   "adaptiveSurge": {
-    "currentIntensity": 1.2999999999999998,
-    "baselineIntensity": 1.1999999999999997,
+    "currentIntensity": 1.0999999999999996,
+    "baselineIntensity": 0.9999999999999997,
     "criticalThreshold": 2.5,
-    "totalSurgeCycles": 3,
+    "totalSurgeCycles": 5,
     "totalAdaptations": 0,
-    "totalNeuronsSpawned": 2099,
+    "totalNeuronsSpawned": 3247,
     "surgeActive": false,
     "overloadSafetyEngaged": false,
     "consecutiveSuccesses": 0
@@ -35,13 +35,13 @@
   "fabricWorms": [
     {
       "id": "worm_mesh-synaptic_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_mesh-synaptic_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
