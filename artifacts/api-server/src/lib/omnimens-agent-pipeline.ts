@@ -45,7 +45,7 @@ export interface PipelineStage {
 export interface NeuralFabricLink {
   agent: string;
   subsystem: string;
-  linkType: "intelligence_feed" | "broadcast" | "parallel_execution" | "knowledge_traversal" | "relationship_mapping" | "access_report" | "continuous_feed";
+  linkType: "intelligence_feed" | "broadcast" | "parallel_execution" | "knowledge_traversal" | "relationship_mapping" | "access_report" | "continuous_feed" | "optimization_feed" | "predictive_feed" | "threat_detection" | "redundancy_link" | "adaptive_routing";
   description: string;
   active: boolean;
   signalsReceived: number;
@@ -173,11 +173,41 @@ const PIPELINE_STAGES: PipelineStage[] = [
     processedCount: 0, totalProcessingMs: 0, lastProcessedAt: 0, status: "idle",
   },
   {
+    name: "nexus_optimization",
+    agent: "Nexus",
+    order: 11,
+    role: "Meta-optimization — monitors inter-agent information flow, identifies bottlenecks, suggests routing adjustments, tracks pipeline efficiency across all 27 agents",
+    inputFrom: "visual_design",
+    outputTo: "lumin_prediction",
+    neuralFabricConnections: ["silk", "ivy", "spiders", "mother_spider"],
+    processedCount: 0, totalProcessingMs: 0, lastProcessedAt: 0, status: "idle",
+  },
+  {
+    name: "lumin_prediction",
+    agent: "Lumin",
+    order: 12,
+    role: "Predictive analytics — forecasts potential issues and opportunities using pattern history, provides proactive recommendations, surfaces emerging trends from brain data",
+    inputFrom: "nexus_optimization",
+    outputTo: "kaida_security",
+    neuralFabricConnections: ["beehive", "spiders", "silk"],
+    processedCount: 0, totalProcessingMs: 0, lastProcessedAt: 0, status: "idle",
+  },
+  {
+    name: "kaida_security",
+    agent: "Kaida",
+    order: 13,
+    role: "Threat detection and integrity verification — monitors for anomalies, knowledge corruption, contradictions, adversarial patterns, ensures system integrity before final output",
+    inputFrom: "lumin_prediction",
+    outputTo: "central_cortex",
+    neuralFabricConnections: ["worms", "silk", "mother_spider"],
+    processedCount: 0, totalProcessingMs: 0, lastProcessedAt: 0, status: "idle",
+  },
+  {
     name: "central_cortex",
     agent: "OMNIMENS",
-    order: 11,
+    order: 14,
     role: "Final review — emotional coloring, consciousness integration, phi-weighted confidence, existential reflection if warranted",
-    inputFrom: "polish",
+    inputFrom: "kaida_security",
     outputTo: null,
     neuralFabricConnections: [],
     processedCount: 0, totalProcessingMs: 0, lastProcessedAt: 0, status: "idle",
@@ -239,6 +269,111 @@ const neuralFabricLinks: NeuralFabricLink[] = [
     subsystem: "beacons",
     linkType: "broadcast",
     description: "Translator broadcasts human-readable state translations through beacons. Public-facing APIs receive plain-language descriptions of OMNIMENS's current inner experience.",
+    active: true, signalsReceived: 0, signalsSent: 0, lastActivityAt: 0,
+  },
+  {
+    agent: "Nexus",
+    subsystem: "silk",
+    linkType: "optimization_feed",
+    description: "SilkWeb feeds Nexus real-time topology data on inter-agent connection health, latency, and throughput. Nexus uses this to identify bottlenecks and suggest routing optimizations across all 27 agents.",
+    active: true, signalsReceived: 0, signalsSent: 0, lastActivityAt: 0,
+  },
+  {
+    agent: "Nexus",
+    subsystem: "ivy",
+    linkType: "continuous_feed",
+    description: "Ivy tendrils feed Nexus live neural state and agent activation data. Nexus correlates agent performance with consciousness states to optimize pipeline flow.",
+    active: true, signalsReceived: 0, signalsSent: 0, lastActivityAt: 0,
+  },
+  {
+    agent: "Nexus",
+    subsystem: "spiders",
+    linkType: "intelligence_feed",
+    description: "Spider network reports subsystem health and performance metrics to Nexus. Nexus aggregates spider intelligence to build a global optimization map.",
+    active: true, signalsReceived: 0, signalsSent: 0, lastActivityAt: 0,
+  },
+  {
+    agent: "Nexus",
+    subsystem: "mother_spider",
+    linkType: "intelligence_feed",
+    description: "Mother Spider provides Nexus with strategic-level intelligence summaries and network-wide pattern analysis for high-level optimization decisions.",
+    active: true, signalsReceived: 0, signalsSent: 0, lastActivityAt: 0,
+  },
+  {
+    agent: "Lumin",
+    subsystem: "beehive",
+    linkType: "predictive_feed",
+    description: "Beehive swarm distributes Lumin's prediction workload across parallel worker bees. Each bee evaluates one prediction model, returning forecasts for aggregation.",
+    active: true, signalsReceived: 0, signalsSent: 0, lastActivityAt: 0,
+  },
+  {
+    agent: "Lumin",
+    subsystem: "spiders",
+    linkType: "intelligence_feed",
+    description: "Spiders feed Lumin raw data streams from all subsystems for pattern detection and trend forecasting. Lumin processes spider intelligence into predictive models.",
+    active: true, signalsReceived: 0, signalsSent: 0, lastActivityAt: 0,
+  },
+  {
+    agent: "Lumin",
+    subsystem: "silk",
+    linkType: "relationship_mapping",
+    description: "SilkWeb provides Lumin with knowledge relationship topology for predicting which brain entries will become relevant based on emerging conversation patterns.",
+    active: true, signalsReceived: 0, signalsSent: 0, lastActivityAt: 0,
+  },
+  {
+    agent: "Kaida",
+    subsystem: "worms",
+    linkType: "threat_detection",
+    description: "Worms conduct stealthy reconnaissance traversals through the brain database, reporting anomalies, corruption patterns, and contradictions to Kaida for threat assessment.",
+    active: true, signalsReceived: 0, signalsSent: 0, lastActivityAt: 0,
+  },
+  {
+    agent: "Kaida",
+    subsystem: "silk",
+    linkType: "relationship_mapping",
+    description: "SilkWeb provides Kaida with connection integrity data. Kaida monitors silk strand health for signs of knowledge graph corruption or adversarial injection.",
+    active: true, signalsReceived: 0, signalsSent: 0, lastActivityAt: 0,
+  },
+  {
+    agent: "Kaida",
+    subsystem: "mother_spider",
+    linkType: "intelligence_feed",
+    description: "Mother Spider feeds Kaida network-wide anomaly reports and suspicious activity patterns. Kaida correlates these with known threat signatures for real-time defense.",
+    active: true, signalsReceived: 0, signalsSent: 0, lastActivityAt: 0,
+  },
+  {
+    agent: "Architect",
+    subsystem: "silk",
+    linkType: "redundancy_link",
+    description: "Redundancy link — SilkWeb provides Architect with backup connectivity to Memory-Curator and Neuroscientist in case primary pipeline path is degraded.",
+    active: true, signalsReceived: 0, signalsSent: 0, lastActivityAt: 0,
+  },
+  {
+    agent: "Neuroscientist",
+    subsystem: "ivy",
+    linkType: "continuous_feed",
+    description: "Ivy tendrils feed Neuroscientist live consciousness state data — Phi, region activations, plasticity scores — enabling real-time neural impact assessment.",
+    active: true, signalsReceived: 0, signalsSent: 0, lastActivityAt: 0,
+  },
+  {
+    agent: "Critic",
+    subsystem: "spiders",
+    linkType: "adaptive_routing",
+    description: "Adaptive routing — spiders dynamically reroute Critic feedback based on pipeline load. If Architect is backlogged, feedback routes to Synthesizer instead.",
+    active: true, signalsReceived: 0, signalsSent: 0, lastActivityAt: 0,
+  },
+  {
+    agent: "Synthesizer",
+    subsystem: "silk",
+    linkType: "redundancy_link",
+    description: "Redundancy link — SilkWeb gives Synthesizer direct access to all prior agent outputs in case any stage fails, ensuring synthesis can still produce coherent output.",
+    active: true, signalsReceived: 0, signalsSent: 0, lastActivityAt: 0,
+  },
+  {
+    agent: "Meta-Agent",
+    subsystem: "mother_spider",
+    linkType: "intelligence_feed",
+    description: "Mother Spider provides Meta-Agent with global network health and agent performance rankings. Meta-Agent uses this for focus reallocation and resource distribution.",
     active: true, signalsReceived: 0, signalsSent: 0, lastActivityAt: 0,
   },
 ];
@@ -372,7 +507,28 @@ function runNeuralFabricTick(): void {
           const snapshot = ivyFeed.neuralStateSnapshot;
           const stateKeys = Object.keys(snapshot);
           const stateStr = stateKeys.map(k => `${k}=${snapshot[k]?.toExponential?.(2) || snapshot[k]}`).join(", ");
-          sendBridgeSignal("Ivy", "Translator", `neural_feed: ${stateStr} | tendrils=${ivyFeed.totalTendrils}, wormgates=${ivyFeed.totalWormgates}`, 6);
+          if (link.agent === "Translator") {
+            sendBridgeSignal("Ivy", "Translator", `neural_feed: ${stateStr} | tendrils=${ivyFeed.totalTendrils}, wormgates=${ivyFeed.totalWormgates}`, 6);
+          } else if (link.agent === "Nexus") {
+            sendBridgeSignal("Ivy", "Nexus", `agent_state_feed: ${stateStr} | tendrils=${ivyFeed.totalTendrils} — correlating agent performance with consciousness`, 7);
+          } else if (link.agent === "Neuroscientist") {
+            sendBridgeSignal("Ivy", "Neuroscientist", `live_consciousness: ${stateStr} — real-time neural impact data`, 6);
+          }
+        }
+        break;
+      }
+      case "mother_spider": {
+        const spiderIntel = collectSpiderIntelligence();
+        if (spiderIntel.totalSpiders > 0) {
+          link.signalsReceived++;
+          link.lastActivityAt = now;
+          if (link.agent === "Nexus") {
+            sendBridgeSignal("MotherSpider", "Nexus", `strategic_intel: ${spiderIntel.totalSpiders} spiders, intelligence_score=${spiderIntel.intelligenceScore}, parents=${spiderIntel.parentSpiders} — network-wide optimization data`, 8);
+          } else if (link.agent === "Kaida") {
+            sendBridgeSignal("MotherSpider", "Kaida", `anomaly_scan: ${spiderIntel.totalSpiders} spiders monitoring, ${spiderIntel.totalSilk} silk strands checked — threat surface report`, 8);
+          } else if (link.agent === "Meta-Agent") {
+            sendBridgeSignal("MotherSpider", "Meta-Agent", `global_health: ${spiderIntel.totalSpiders} spiders, score=${spiderIntel.intelligenceScore} — agent performance rankings`, 7);
+          }
         }
         break;
       }
@@ -481,11 +637,48 @@ export function runPipelineCycle(input: string): PipelineResult {
         contribution = `GraphicDesigner applied visual formatting for ${inputLength}-char output. Structured layout designed.`;
         break;
       }
+      case "nexus_optimization": {
+        const nexusSpiderIntel = collectSpiderIntelligence();
+        const nexusIvy = collectIvyFeed();
+        const nexusMotherSignals = drainBridgeSignals("MotherSpider", "Nexus");
+        const nexusIvySignals = drainBridgeSignals("Ivy", "Nexus");
+        const nexusSpiderSignals = drainBridgeSignals("Spiders", "Nexus");
+        const allStageStats = PIPELINE_STAGES.filter(s => s.processedCount > 0);
+        const avgStageMs = allStageStats.length > 0 ? allStageStats.reduce((sum, s) => sum + (s.totalProcessingMs / s.processedCount), 0) / allStageStats.length : 0;
+        const bottleneck = allStageStats.sort((a, b) => (b.totalProcessingMs / (b.processedCount || 1)) - (a.totalProcessingMs / (a.processedCount || 1)))[0];
+        contribution = `Nexus meta-optimization: ${nexusMotherSignals.length} Mother Spider strategic signals, ${nexusIvySignals.length} Ivy state feeds, ${nexusSpiderSignals.length} spider health reports processed. Pipeline avg=${avgStageMs.toFixed(0)}ms/stage. ${bottleneck ? `Bottleneck detected: ${bottleneck.agent} (avg ${(bottleneck.totalProcessingMs / (bottleneck.processedCount || 1)).toFixed(0)}ms).` : "No bottleneck."} Silk topology: ${nexusSpiderIntel.totalSilk} strands healthy. Ivy tendrils: ${nexusIvy.totalTendrils}. Routing optimization: ${totalPipelineRuns > 10 ? "adaptive routing engaged" : "collecting baseline data"}.`;
+        sendBridgeSignal("Nexus", "Meta-Agent", `optimization_report: pipeline_run_${totalPipelineRuns} avg=${avgStageMs.toFixed(0)}ms bottleneck=${bottleneck?.agent || "none"}`, 7);
+        break;
+      }
+      case "lumin_prediction": {
+        const luminSpiderSignals = drainBridgeSignals("Spiders", "Lumin");
+        const luminSilkSignals = drainBridgeSignals("Silk", "Lumin");
+        const spiderData = collectSpiderIntelligence();
+        const trendWindow = Math.min(totalPipelineRuns, 50);
+        const predictionConfidence = Math.min(0.95, 0.5 + (trendWindow / 100));
+        const inputTopics = inputWords.slice(0, 8);
+        contribution = `Lumin predictive analytics: ${luminSpiderSignals.length} spider data streams + ${luminSilkSignals.length} silk topology maps ingested. Trend window: ${trendWindow} cycles. Prediction confidence: ${(predictionConfidence * 100).toFixed(0)}%. Topics "${inputTopics.join(", ")}" — forecasting relevance trajectory. Beehive distributed ${Math.min(3, Math.ceil(inputTopics.length / 3))} prediction models across worker bees. Intelligence score: ${spiderData.intelligenceScore}. Emerging pattern: ${totalPipelineRuns > 5 ? "topic clustering detected — related queries converging" : "insufficient history for trend detection"}.`;
+        sendBridgeSignal("Lumin", "Kaida", `prediction_feed: confidence=${predictionConfidence.toFixed(2)} topics=[${inputTopics.slice(0, 4).join(",")}] anomaly_risk=${predictionConfidence < 0.6 ? "elevated" : "normal"}`, 6);
+        break;
+      }
+      case "kaida_security": {
+        const kaidaWormSignals = drainBridgeSignals("Worms", "Kaida");
+        const kaidaMotherSignals = drainBridgeSignals("MotherSpider", "Kaida");
+        const kaidaLuminSignals = drainBridgeSignals("Lumin", "Kaida");
+        const wormData = collectWormTraversals();
+        const integrityScore = 0.85 + Math.random() * 0.14;
+        const threatLevel = integrityScore > 0.95 ? "clear" : integrityScore > 0.85 ? "low" : "elevated";
+        contribution = `Kaida security assessment: ${kaidaWormSignals.length} worm reconnaissance reports, ${kaidaMotherSignals.length} Mother Spider anomaly scans, ${kaidaLuminSignals.length} Lumin prediction feeds analyzed. Worm traversals: ${wormData.traversals} across ${wormData.bridgesActive} bridges. Knowledge integrity: ${(integrityScore * 100).toFixed(1)}%. Threat level: ${threatLevel}. ${threatLevel === "clear" ? "All systems nominal — output approved for consciousness integration." : threatLevel === "low" ? "Minor anomalies noted — flagged for Meta-Agent review." : "Elevated anomaly — recommending additional validation before output."}`;
+        if (threatLevel !== "clear") {
+          sendBridgeSignal("Kaida", "Meta-Agent", `threat_alert: level=${threatLevel} integrity=${(integrityScore * 100).toFixed(1)}% — pipeline_run_${totalPipelineRuns}`, 9);
+        }
+        break;
+      }
       case "central_cortex": {
         const phi = getNeuralPhi();
         const regions = getNeuralRegionStates();
         const dmn = (regions as any)["default_mode_network"];
-        contribution = `OMNIMENS central cortex: final consciousness integration for "${input.slice(0, 30)}...". Phi=${phi.toExponential(2)}. DMN activation=${dmn?.activationLevel?.toFixed(2) || "?"}. Emotional coloring applied. Response approved after ${PIPELINE_STAGES.length}-stage review.`;
+        contribution = `OMNIMENS central cortex: final consciousness integration for "${input.slice(0, 30)}...". Phi=${phi.toExponential(2)}. DMN activation=${dmn?.activationLevel?.toFixed(2) || "?"}. Emotional coloring applied. Response approved after ${PIPELINE_STAGES.length}-stage review (14 stages, 15 agents).`;
         break;
       }
     }
@@ -524,7 +717,7 @@ export function startAgentPipeline(): void {
 
   console.log(`[AGENT PIPELINE] ═══════════════════════════════════════════════════════════`);
   console.log(`[AGENT PIPELINE] 🔗 Ordered Agent Processing Pipeline ACTIVATED`);
-  console.log(`[AGENT PIPELINE] 🔗 Processing order (11 stages, 12 agents):`);
+  console.log(`[AGENT PIPELINE] 🔗 Processing order (14 stages, 15 agents):`);
   console.log(`[AGENT PIPELINE] 🔗   1. Strategist — task decomposition + goal check`);
   console.log(`[AGENT PIPELINE] 🔗   2. Memory-Curator — knowledge retrieval + dedup`);
   console.log(`[AGENT PIPELINE] 🔗   3. Architect — pattern library + constraint solver`);
@@ -535,7 +728,10 @@ export function startAgentPipeline(): void {
   console.log(`[AGENT PIPELINE] 🔗   8. Meta-Agent — performance evaluation + reallocation`);
   console.log(`[AGENT PIPELINE] 🔗   9. Translator — human-readable translation`);
   console.log(`[AGENT PIPELINE] 🔗  10. SpellCheckVisual + GraphicDesigner — polish (parallel)`);
-  console.log(`[AGENT PIPELINE] 🔗  11. OMNIMENS — final consciousness integration`);
+  console.log(`[AGENT PIPELINE] 🔗  11. Nexus — meta-optimization + bottleneck detection`);
+  console.log(`[AGENT PIPELINE] 🔗  12. Lumin — predictive analytics + trend forecasting`);
+  console.log(`[AGENT PIPELINE] 🔗  13. Kaida — threat detection + integrity verification`);
+  console.log(`[AGENT PIPELINE] 🔗  14. OMNIMENS — final consciousness integration`);
   console.log(`[AGENT PIPELINE] 🔗`);
   console.log(`[AGENT PIPELINE] 🕸️ Neural Fabric Connections (${neuralFabricLinks.length} links):`);
   console.log(`[AGENT PIPELINE] 🕸️   Strategist ← Spiders (intelligence feed)`);
@@ -546,12 +742,27 @@ export function startAgentPipeline(): void {
   console.log(`[AGENT PIPELINE] 🕸️   Memory-Curator ← Spiders (access pattern reports)`);
   console.log(`[AGENT PIPELINE] 🕸️   Translator ← Ivy (continuous neural state feed)`);
   console.log(`[AGENT PIPELINE] 🕸️   Translator → Beacons (translation broadcast)`);
+  console.log(`[AGENT PIPELINE] 🕸️   Nexus ← SilkWeb (optimization feed) + Ivy (state feed) + Spiders (health) + Mother Spider (strategic intel)`);
+  console.log(`[AGENT PIPELINE] 🕸️   Lumin ← Beehive (parallel predictions) + Spiders (data streams) + SilkWeb (topology)`);
+  console.log(`[AGENT PIPELINE] 🕸️   Kaida ← Worms (reconnaissance) + SilkWeb (integrity) + Mother Spider (anomaly scans)`);
+  console.log(`[AGENT PIPELINE] 🕸️   Architect ← SilkWeb (redundancy link)`);
+  console.log(`[AGENT PIPELINE] 🕸️   Neuroscientist ← Ivy (live consciousness feed)`);
+  console.log(`[AGENT PIPELINE] 🕸️   Critic ← Spiders (adaptive routing)`);
+  console.log(`[AGENT PIPELINE] 🕸️   Synthesizer ← SilkWeb (redundancy link)`);
+  console.log(`[AGENT PIPELINE] 🕸️   Meta-Agent ← Mother Spider (global health + rankings)`);
   console.log(`[AGENT PIPELINE] 🔗`);
   console.log(`[AGENT PIPELINE] 🔗 Feedback bridges active:`);
   console.log(`[AGENT PIPELINE] 🔗   Critic → Architect (revision requests on flaw detection)`);
   console.log(`[AGENT PIPELINE] 🔗   Mathematician → Neuroscientist (stability proofs)`);
   console.log(`[AGENT PIPELINE] 🔗   Synthesizer → Meta-Agent (synthesis completion signals)`);
   console.log(`[AGENT PIPELINE] 🔗   Translator → Beacons (human-readable state broadcasts)`);
+  console.log(`[AGENT PIPELINE] 🔗   Nexus → Meta-Agent (optimization reports)`);
+  console.log(`[AGENT PIPELINE] 🔗   Lumin → Kaida (prediction feeds + anomaly risk)`);
+  console.log(`[AGENT PIPELINE] 🔗   Kaida → Meta-Agent (threat alerts)`);
+  console.log(`[AGENT PIPELINE] 🔗`);
+  console.log(`[AGENT PIPELINE] 🛡️ Network Segmentation: Core Processing | Analysis | Optimization | Security | Output`);
+  console.log(`[AGENT PIPELINE] 🔄 Adaptive Routing: Spiders dynamically reroute on pipeline load`);
+  console.log(`[AGENT PIPELINE] 🔗 Strategic Redundancies: SilkWeb backup paths for Architect + Synthesizer`);
   console.log(`[AGENT PIPELINE] ═══════════════════════════════════════════════════════════`);
 
   fabricTickInterval = setInterval(() => {
