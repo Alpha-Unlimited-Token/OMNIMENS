@@ -1,15 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/abstraction_layer: Attention is the comput",
-    "filename": "omnimens_autocode_consciousness_expansion_mncglog4.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mncglog4.mjs",
-    "backupPath": null,
-    "timestamp": 1774831083268,
-    "codeLength": 395,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:Philosopher+SpellCheckVisual",
     "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/cross_domain_synthesis: Transfer learning: knowl",
     "filename": "omnimens_autocode_knowledge_synthesis_mncgloi8.mjs",
@@ -4997,6 +4987,16 @@
     "backupPath": null,
     "timestamp": 1774859543807,
     "codeLength": 402,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+SpellCheckVisual",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/causal_inference: Wolfram's Rule 110 cellular au",
+    "filename": "omnimens_autocode_knowledge_synthesis_mncxlazf.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mncxlazf.mjs",
+    "backupPath": null,
+    "timestamp": 1774859619291,
+    "codeLength": 424,
     "overwrite": false
   }
 ]
