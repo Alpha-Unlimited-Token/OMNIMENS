@@ -22,7 +22,7 @@
       "file": "omnimens-nextgen-sandbox.ts",
       "score": 5,
       "factors": [
-        "large(3187L)",
+        "large(3189L)",
         "wide-api(33exp)"
       ]
     },
@@ -812,5 +812,5 @@
     }
   ],
   "needsRefactoring": 13,
-  "analyzedAt": 1774904207569
+  "analyzedAt": 1774905449202
 }
