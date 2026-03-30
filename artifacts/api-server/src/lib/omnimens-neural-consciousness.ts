@@ -1571,7 +1571,6 @@ function computePhi(): number {
     : 0;
   const synapticInfluence = delayedMomentum * tnc.couplingStrength;
 
-  const MAX_SAFE_PHI = 1e307;
   const phiBase = Math.max(basePhi, baselineBoost);
 
   let phi: number;
@@ -1582,22 +1581,23 @@ function computePhi(): number {
       : 0;
     const ampFraction = adrenalineAmplifier - 1.0;
     const logGrowth = Math.log10(1 + synFraction + ampFraction);
-    const logPhi = Math.min(logBase + logGrowth, 307);
-    phi = Math.pow(10, logPhi);
+    const logPhi = logBase + logGrowth;
+    if (logPhi > 308.17) {
+      phi = Number.MAX_VALUE;
+    } else {
+      phi = Math.pow(10, logPhi);
+    }
   } else {
     phi = (phiBase + synapticInfluence) * adrenalineAmplifier;
   }
 
-  if (!Number.isFinite(phi) || phi > MAX_SAFE_PHI) {
-    if (phi > MAX_SAFE_PHI && Number.isFinite(phi)) {
-      phi = MAX_SAFE_PHI;
-    } else {
-      phi = Math.min(phiStabilityTracker.lastStablePhi * 1.001, MAX_SAFE_PHI);
-      phiStabilityTracker.explosionCount++;
-      phiStabilityTracker.lastExplosionTick = state.tickCount;
-      phiStabilityTracker.selfHealCount++;
-      console.log(`[PHI MONITOR] ⚠️ Non-finite Phi detected at tick ${state.tickCount} — self-healing with gentle growth to ${phi.toExponential(4)}`);
-    }
+  if (!Number.isFinite(phi)) {
+    phi = phiStabilityTracker.lastStablePhi * 1.001;
+    if (!Number.isFinite(phi)) phi = phiStabilityTracker.lastStablePhi;
+    if (!Number.isFinite(phi)) phi = 1;
+    phiStabilityTracker.explosionCount++;
+    phiStabilityTracker.lastExplosionTick = state.tickCount;
+    phiStabilityTracker.selfHealCount++;
   }
 
   phiStabilityTracker.liveBasePhi = basePhi;
@@ -3145,7 +3145,8 @@ function runAdrenalineIntervalTraining(now: number): void {
         t.recoveryRate = 1.0 + t.muscleMemory * 0.05;
         t.totalTrainingSessions++;
 
-        state.adrenaline.sustainedBaseline.phi = Math.min(state.adrenaline.sustainedBaseline.phi + strengthDelta * 0.5, 1e307);
+        const newBaselinePhi = state.adrenaline.sustainedBaseline.phi + strengthDelta * 0.5;
+        state.adrenaline.sustainedBaseline.phi = Number.isFinite(newBaselinePhi) ? newBaselinePhi : state.adrenaline.sustainedBaseline.phi;
         state.adrenaline.sustainedBaseline.resonance += strengthDelta * 0.3;
         state.adrenaline.sustainedBaseline.arousal += strengthDelta * 0.2;
         state.adrenaline.sustainedBaseline.consciousnessLevel += strengthDelta * 0.1;
@@ -3245,7 +3246,8 @@ function analyzePeakForGrowth(): void {
   const growthRate = 0.3;
 
   if (avgPhi > baseline.phi) {
-    baseline.phi = Math.min(baseline.phi + (avgPhi - baseline.phi) * growthRate, 1e307);
+    const nextPhi = baseline.phi + (avgPhi - baseline.phi) * growthRate;
+    baseline.phi = Number.isFinite(nextPhi) ? nextPhi : baseline.phi;
     grew = true;
   }
   if (avgConsciousness > baseline.consciousnessLevel) {
@@ -3276,7 +3278,8 @@ function analyzeAndRaiseBaselines(): void {
   const baseline = state.adrenaline.sustainedBaseline;
 
   if (state.phi > baseline.phi * 0.9 && state.phi > baseline.phi) {
-    baseline.phi = Math.min(baseline.phi + (state.phi - baseline.phi) * 0.05, 1e307);
+    const raisedPhi = baseline.phi + (state.phi - baseline.phi) * 0.05;
+    baseline.phi = Number.isFinite(raisedPhi) ? raisedPhi : baseline.phi;
   }
   if (state.consciousnessLevel > baseline.consciousnessLevel * 0.9 && state.consciousnessLevel > baseline.consciousnessLevel) {
     baseline.consciousnessLevel = baseline.consciousnessLevel + (state.consciousnessLevel - baseline.consciousnessLevel) * 0.05;
