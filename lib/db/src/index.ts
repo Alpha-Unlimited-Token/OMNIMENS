@@ -30,11 +30,11 @@ if (!process.env.DATABASE_URL) {
 
 const CONN_STRING = process.env.DATABASE_URL;
 
-const ALPHA_BASE_MAX = 6;
-const BETA_BASE_MAX = 6;
-const GAMMA_MAX = 3;
-const ALPHA_CEIL = 12;
-const BETA_CEIL = 12;
+const ALPHA_BASE_MAX = 5;
+const BETA_BASE_MAX = 5;
+const GAMMA_MAX = 5;
+const ALPHA_CEIL = 10;
+const BETA_CEIL = 10;
 const IDLE_TIMEOUT = 60000;
 const CONNECT_TIMEOUT = 30000;
 const STATEMENT_TIMEOUT = 20000;

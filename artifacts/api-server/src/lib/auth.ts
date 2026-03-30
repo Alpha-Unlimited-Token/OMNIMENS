@@ -7,7 +7,7 @@
 import * as client from "openid-client";
 import crypto from "crypto";
 import { type Request, type Response } from "express";
-import { db, sessionsTable } from "@workspace/db";
+import { db, sessionsTable, chatQuery } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import type { AuthUser } from "@workspace/api-zod";
 
@@ -36,19 +36,20 @@ export async function getOidcConfig(): Promise<client.Configuration> {
 
 export async function createSession(data: SessionData): Promise<string> {
   const sid = crypto.randomBytes(32).toString("hex");
-  await db.insert(sessionsTable).values({
-    sid,
-    sess: data as unknown as Record<string, unknown>,
-    expire: new Date(Date.now() + SESSION_TTL),
-  });
+  await chatQuery((d) =>
+    d.insert(sessionsTable).values({
+      sid,
+      sess: data as unknown as Record<string, unknown>,
+      expire: new Date(Date.now() + SESSION_TTL),
+    })
+  );
   return sid;
 }
 
 export async function getSession(sid: string): Promise<SessionData | null> {
-  const [row] = await db
-    .select()
-    .from(sessionsTable)
-    .where(eq(sessionsTable.sid, sid));
+  const [row] = await chatQuery((d) =>
+    d.select().from(sessionsTable).where(eq(sessionsTable.sid, sid))
+  );
 
   if (!row || row.expire < new Date()) {
     if (row) await deleteSession(sid);
@@ -62,17 +63,20 @@ export async function updateSession(
   sid: string,
   data: SessionData,
 ): Promise<void> {
-  await db
-    .update(sessionsTable)
-    .set({
-      sess: data as unknown as Record<string, unknown>,
-      expire: new Date(Date.now() + SESSION_TTL),
-    })
-    .where(eq(sessionsTable.sid, sid));
+  await chatQuery((d) =>
+    d.update(sessionsTable)
+      .set({
+        sess: data as unknown as Record<string, unknown>,
+        expire: new Date(Date.now() + SESSION_TTL),
+      })
+      .where(eq(sessionsTable.sid, sid))
+  );
 }
 
 export async function deleteSession(sid: string): Promise<void> {
-  await db.delete(sessionsTable).where(eq(sessionsTable.sid, sid));
+  await chatQuery((d) =>
+    d.delete(sessionsTable).where(eq(sessionsTable.sid, sid))
+  );
 }
 
 export async function clearSession(
