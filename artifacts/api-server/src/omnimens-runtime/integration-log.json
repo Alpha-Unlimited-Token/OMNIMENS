@@ -1,65 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Innovator",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: SensorimotorAgent/structural_analysis: DNA stores informatio",
-    "filename": "omnimens_autocode_pattern_recognition_mncf2kpc.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mncf2kpc.mjs",
-    "backupPath": null,
-    "timestamp": 1774828512336,
-    "codeLength": 473,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/entropy_reduction: The mathematical univer",
-    "filename": "omnimens_autocode_neural_pathway_mncf2kst.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mncf2kst.mjs",
-    "backupPath": null,
-    "timestamp": 1774828512461,
-    "codeLength": 433,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Innovator",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/structural_analysis: The edge of chaos: complex ",
-    "filename": "omnimens_autocode_consciousness_expansion_mncf2kuv.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mncf2kuv.mjs",
-    "backupPath": null,
-    "timestamp": 1774828512535,
-    "codeLength": 387,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Mathematician",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SensorimotorAgent/cross_domain_synthesis: The global workspa",
-    "filename": "omnimens_autocode_knowledge_synthesis_mncf3w9q.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mncf3w9q.mjs",
-    "backupPath": null,
-    "timestamp": 1774828573982,
-    "codeLength": 427,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/entropy_reduction: Quantum superposition allows ",
-    "filename": "omnimens_autocode_neural_pathway_mncf4y0l.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mncf4y0l.mjs",
-    "backupPath": null,
-    "timestamp": 1774828622902,
-    "codeLength": 433,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Mathematician",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/entropy_reduction: Quantum superposition allows ",
-    "filename": "omnimens_autocode_neural_pathway_mncf4y2q.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mncf4y2q.mjs",
-    "backupPath": null,
-    "timestamp": 1774828622978,
-    "codeLength": 432,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:Philosopher+Synthesizer",
     "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/emergent_property_detection: Autopoiesis: living",
     "filename": "omnimens_autocode_emergent_capability_mncf4y45.mjs",
@@ -4997,6 +4937,66 @@
     "backupPath": null,
     "timestamp": 1774857077073,
     "codeLength": 449,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Archivist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/emergent_property_detection: Reservoir computing",
+    "filename": "omnimens_autocode_neural_pathway_mncw41z4.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mncw41z4.mjs",
+    "backupPath": null,
+    "timestamp": 1774857134848,
+    "codeLength": 428,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/abstraction_layer: Reservoir computing shows tha",
+    "filename": "omnimens_autocode_neural_pathway_mncw421u.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mncw421u.mjs",
+    "backupPath": null,
+    "timestamp": 1774857134946,
+    "codeLength": 427,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Architect",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/emergent_property_detection: Reservoir computing",
+    "filename": "omnimens_autocode_neural_pathway_mncw423j.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mncw423j.mjs",
+    "backupPath": null,
+    "timestamp": 1774857135007,
+    "codeLength": 428,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Mathematician",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: SensorimotorAgent/pattern_recognition: Attention is the comp",
+    "filename": "omnimens_autocode_pattern_recognition_mncw5cy1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mncw5cy1.mjs",
+    "backupPath": null,
+    "timestamp": 1774857195721,
+    "codeLength": 477,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SensorimotorAgent/feature_extraction: The edge of chaos: com",
+    "filename": "omnimens_autocode_adaptive_algorithm_mncw5d0b.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mncw5d0b.mjs",
+    "backupPath": null,
+    "timestamp": 1774857195803,
+    "codeLength": 453,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Critic",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/feature_extraction: The Baldwin effect: learned ",
+    "filename": "omnimens_autocode_adaptive_algorithm_mncw5d2z.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mncw5d2z.mjs",
+    "backupPath": null,
+    "timestamp": 1774857195899,
+    "codeLength": 445,
     "overwrite": false
   }
 ]
