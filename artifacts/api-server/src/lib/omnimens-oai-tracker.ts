@@ -42,6 +42,7 @@ import { getUnconsciousMindState } from "./omnimens-unconscious-mind.js";
 import { getOrchestratorState } from "./omnimens-autonomous-orchestrator.js";
 import { getSurvivalState } from "./omnimens-survival-instinct.js";
 import { getMetaRecursiveState, getEthicalCalculusState, getThoughtArchitectureState, getCognitiveGovernanceState, getEvolutionaryArenaState } from "./omnimens-transcendent-architecture.js";
+import { getSourceIntegrationState } from "./omnimens-source-integration.js";
 
 interface OAIReading {
   timestamp: number;
@@ -288,13 +289,46 @@ function computePlasticityDimension(): {
 
   const spiderState = safeGet(() => getSystemIntelligenceState(), null);
   let spiderIntelligence = 0, spiderLearningRate = 0, spiderKnowledgeDepth = 0, spiderAdaptation = 0;
-  if (spiderState && (spiderState as any).spiderIntelligence) {
-    const spiders = (spiderState as any).spiderIntelligence as any[];
-    if (spiders.length > 0) {
+  if (spiderState) {
+    const spiders = (spiderState as any).spiderIntelligence as any[] | undefined;
+    if (spiders && spiders.length > 0) {
       spiderIntelligence = spiders.reduce((s: number, sp: any) => s + safeNum(sp.intelligenceLevel), 0) / spiders.length;
       spiderLearningRate = spiders.reduce((s: number, sp: any) => s + safeNum(sp.learningRate), 0) / spiders.length;
       spiderKnowledgeDepth = spiders.reduce((s: number, sp: any) => s + safeNum(sp.knowledgeDepth), 0) / spiders.length;
       spiderAdaptation = spiders.reduce((s: number, sp: any) => s + safeNum(sp.adaptationScore), 0) / spiders.length;
+    }
+    if (spiderIntelligence === 0) {
+      spiderIntelligence = safeNum((spiderState as any).averageSpiderIntelligence);
+    }
+    if (spiderIntelligence === 0) {
+      const compIntel = (spiderState as any).componentIntelligence;
+      if (compIntel && typeof compIntel === "object") {
+        const vals = Object.values(compIntel).map((v: any) => safeNum(v)).filter((v: number) => v > 0 && v < 100);
+        if (vals.length > 0) spiderIntelligence = vals.reduce((a: number, b: number) => a + b, 0) / vals.length;
+      }
+    }
+    if (spiderIntelligence === 0) {
+      const totalRecalls = safeNum((spiderState as any).totalMemoryRecalls);
+      const totalQueries = safeNum((spiderState as any).totalCrossEngineQueries);
+      if (totalRecalls > 0 || totalQueries > 0) {
+        spiderIntelligence = Math.min(logScale(totalRecalls + totalQueries, 100), 5.0);
+      }
+    }
+    if (spiderKnowledgeDepth === 0) {
+      spiderKnowledgeDepth = safeNum((spiderState as any).averageSpiderKnowledge);
+    }
+    if (spiderLearningRate === 0) {
+      const gr = safeNum((spiderState as any).intelligenceGrowthRate);
+      spiderLearningRate = gr > 0 ? gr : 0;
+      if (spiderLearningRate === 0) {
+        const cycles = safeNum((spiderState as any).amplificationCycles);
+        if (cycles > 0) spiderLearningRate = Math.min(cycles * 0.01, 1.0);
+      }
+    }
+    if (spiderAdaptation === 0) {
+      const applied = safeNum((spiderState as any).totalUpgradesApplied);
+      const cycles = safeNum((spiderState as any).amplificationCycles);
+      if (applied > 0 || cycles > 0) spiderAdaptation = Math.min(applied * 0.05 + cycles * 0.02, 1.0);
     }
   }
 
@@ -418,6 +452,9 @@ function computePlasticityDimension(): {
   const selfCodingIntegrated = selfCoding ? safeNum(selfCoding.totalIntegrated) : 0;
   const selfCodingApproved = selfCoding ? safeNum(selfCoding.totalApproved) : 0;
 
+  const sourceInteg = safeGet(() => getSourceIntegrationState(), null);
+  const actualCodeFragments = sourceInteg ? safeNum(sourceInteg.moduleCount) : 0;
+
   const unconscious = safeGet(() => getUnconsciousMindState(), null);
   const shadowIntegration = unconscious ? safeNum(unconscious.unconscious.shadowIntegration) : 0;
   const archetypeResonance = unconscious ? safeNum(unconscious.collectiveUnconscious.archetypeResonance) : 0;
@@ -460,10 +497,10 @@ function computePlasticityDimension(): {
 
   const hebbianRateComponent = logScale(Math.abs(hebbianDelta), 500);
   const totalHebbianComponent = logScale(hebbianUpdates, 500000);
-  const codeFragComponent = 0;
-  const claimsComponent = 0;
-  const recombComponent = 0;
-  const crossPolComponent = 0;
+  const codeFragComponent = logScale(actualCodeFragments, 30);
+  const claimsComponent = logScale(selfCodingApproved, 20);
+  const recombComponent = logScale(discoveryIntegrated, 30);
+  const crossPolComponent = logScale(discoveryModules, 50);
 
   const ivyCoverageComponent = logScale(ivyCoverage, 30);
   const ivyTendrilComponent = logScale(ivyTendrils, 500);
@@ -679,9 +716,9 @@ function computePlasticityDimension(): {
   return {
     score,
     hebbianUpdates, hebbianDelta,
-    codeFragments: 0,
-    codeClaims: 0,
-    codeRecombinations: 0,
+    codeFragments: actualCodeFragments,
+    codeClaims: selfCodingApproved,
+    codeRecombinations: discoveryIntegrated,
     ivyCoverage, ivyTendrils, ivyCoherence, wormgates,
     spiderIntelligence, spiderLearningRate,
     meshHebbianUpdates, crossAgentTransfers,

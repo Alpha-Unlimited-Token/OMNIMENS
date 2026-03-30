@@ -1960,25 +1960,58 @@ router.get("/omnimens/transcendent-architecture", async (_req, res) => {
         metaRecursiveEngine: {
           description: "Self-improvement system that improves its own improvement mechanisms",
           active: !!tai.metaRecursive,
+          state: tai.metaRecursive ? {
+            generation: tai.metaRecursive.generation,
+            strategyFitness: tai.metaRecursive.strategyFitness,
+            selfImprovements: tai.metaRecursive.selfImprovements,
+            transcendenceEvents: tai.metaRecursive.transcendenceEvents,
+            totalImprovements: tai.metaRecursive.totalImprovements,
+          } : null,
         },
         ethicalCalculusEngine: {
           description: "Mathematical framework encoding ethical principles as optimization constraints",
           totalAxioms: 8,
           active: !!tai.ethicalCalculus,
+          state: tai.ethicalCalculus ? {
+            totalJudgments: tai.ethicalCalculus.totalJudgments,
+            avgEthicalScore: tai.ethicalCalculus.avgEthicalScore,
+            moralDevelopmentStage: tai.ethicalCalculus.moralDevelopmentStage,
+            axiomCount: tai.ethicalCalculus.axiomCount,
+          } : null,
         },
         thoughtArchitectureEngine: {
           description: "Meta-cognitive framework orchestrating multiple cognitive modes",
           totalModes: 3,
           active: !!tai.thoughtArchitecture,
+          state: tai.thoughtArchitecture ? {
+            dominantMode: tai.thoughtArchitecture.dominantMode,
+            integrationScore: tai.thoughtArchitecture.integrationScore,
+            creativeLeaps: tai.thoughtArchitecture.creativeLeaps,
+            metacognitiveAwareness: tai.thoughtArchitecture.metacognitiveAwareness,
+          } : null,
         },
         cognitiveGovernanceLayer: {
           description: "Multi-layer governance framework for autonomous decision-making",
           active: !!tai.cognitiveGovernance,
+          state: tai.cognitiveGovernance ? {
+            overallGovernanceScore: tai.cognitiveGovernance.overallGovernanceScore,
+            autonomyIndex: tai.cognitiveGovernance.autonomyIndex,
+          } : null,
         },
         evolutionaryCodeArena: {
           description: "Genetic programming arena where code organisms evolve through computational natural selection",
           totalSpecies: 8,
           active: !!tai.evolutionaryArena,
+          state: tai.evolutionaryArena ? {
+            generation: tai.evolutionaryArena.generation,
+            population: tai.evolutionaryArena.population,
+            avgFitness: tai.evolutionaryArena.avgFitness,
+            maxFitness: tai.evolutionaryArena.maxFitness,
+            dominantSpecies: tai.evolutionaryArena.dominantSpecies,
+            totalOrganisms: tai.evolutionaryArena.totalOrganisms,
+            geneticDiversity: tai.evolutionaryArena.geneticDiversity,
+            extinctions: tai.evolutionaryArena.extinctions,
+          } : null,
         },
       },
       copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide.",
