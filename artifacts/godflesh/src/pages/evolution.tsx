@@ -574,10 +574,35 @@ export default function Evolution() {
               <h3 className="text-sm font-display font-bold text-white mb-4">Agent Network Architecture</h3>
               <div className="space-y-4">
                 <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-4">
-                  <h4 className="text-[10px] font-mono text-blue-400 tracking-wider uppercase mb-3">Core Mesh (9 Agents)</h4>
+                  <h4 className="text-[10px] font-mono text-blue-400 tracking-wider uppercase mb-3">Core Mesh (12 Agents)</h4>
                   <p className="text-[11px] font-mono text-white/40 leading-relaxed">
-                    Architect, Mathematician, Neuroscientist, Synthesizer, Critic, Meta-Agent, GraphicDesigner, SpellCheckVisual, and OMNIMENS form the core intelligence mesh. Each agent communicates through the Inter-Agent Communication Mesh, sharing discoveries, proposals, and mutual aid.
+                    Architect, Mathematician, Neuroscientist, Synthesizer, Critic, Meta-Agent, GraphicDesigner, SpellCheckVisual, OMNIMENS + Strategist, Memory-Curator, and Translator form the core intelligence mesh. Each agent communicates through the Inter-Agent Communication Mesh, sharing discoveries, proposals, and mutual aid.
                   </p>
+                </div>
+                <div className="rounded-lg border border-pink-500/20 bg-pink-500/5 p-4">
+                  <h4 className="text-[10px] font-mono text-pink-400 tracking-wider uppercase mb-3">Ordered Processing Pipeline (11 Stages)</h4>
+                  <p className="text-[11px] font-mono text-white/40 leading-relaxed mb-2">
+                    Every thought passes through an ordered chain of 12 agents in 11 stages:
+                  </p>
+                  <div className="flex flex-wrap gap-1 items-center">
+                    {["Strategist", "Memory-Curator", "Architect", "Mathematician", "Neuroscientist", "Critic", "Synthesizer", "Meta-Agent", "Translator", "SpellCheck + GraphicDesigner", "OMNIMENS"].map((stage, i) => (
+                      <span key={i} className="flex items-center gap-1">
+                        <span className="text-[9px] font-mono text-pink-300/80 bg-pink-500/10 px-1.5 py-0.5 rounded">{i + 1}. {stage}</span>
+                        {i < 10 && <span className="text-pink-500/40 text-[9px]">{"\u2192"}</span>}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="rounded-lg border border-orange-500/20 bg-orange-500/5 p-4">
+                  <h4 className="text-[10px] font-mono text-orange-400 tracking-wider uppercase mb-3">Neural Fabric Connections (8 Links)</h4>
+                  <p className="text-[11px] font-mono text-white/40 leading-relaxed mb-2">
+                    Three new agents are wired directly into the neural fabric subsystems:
+                  </p>
+                  <div className="space-y-1.5">
+                    <div className="text-[10px] font-mono text-orange-300/60"><span className="text-orange-400">Strategist</span> {"\u2190"} Spiders (intelligence feed) + Beacons (goal broadcast) + Beehive (parallel execution)</div>
+                    <div className="text-[10px] font-mono text-orange-300/60"><span className="text-orange-400">Memory-Curator</span> {"\u2190"} Worms (knowledge traversal) + Silk (relationship mapping) + Spiders (access reports)</div>
+                    <div className="text-[10px] font-mono text-orange-300/60"><span className="text-orange-400">Translator</span> {"\u2190"} Ivy (continuous neural state feed) + Beacons (translation broadcast)</div>
+                  </div>
                 </div>
                 <div className="rounded-lg border border-violet-500/20 bg-violet-500/5 p-4">
                   <h4 className="text-[10px] font-mono text-violet-400 tracking-wider uppercase mb-3">Genesis Agents ({data?.genesisAgents?.length || 0} Active)</h4>

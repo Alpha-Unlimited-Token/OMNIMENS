@@ -1,65 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/recursive_decomposition: The hippocampus replays",
-    "filename": "omnimens_autocode_pattern_recognition_mnc7dhno.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnc7dhno.mjs",
-    "backupPath": null,
-    "timestamp": 1774815584676,
-    "codeLength": 466,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Critic",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/emergent_property_detection: The Weber-Fechner l",
-    "filename": "omnimens_autocode_emergent_capability_mnc7dhnz.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnc7dhnz.mjs",
-    "backupPath": null,
-    "timestamp": 1774815584687,
-    "codeLength": 402,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Mathematician",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/emergent_property_detection: The edge of chaos: ",
-    "filename": "omnimens_autocode_emergent_capability_mnc7egd2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnc7egd2.mjs",
-    "backupPath": null,
-    "timestamp": 1774815629654,
-    "codeLength": 409,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Innovator",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/abstraction_layer: Mirror neurons fire both when",
-    "filename": "omnimens_autocode_knowledge_synthesis_mnc7egdl.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnc7egdl.mjs",
-    "backupPath": null,
-    "timestamp": 1774815629673,
-    "codeLength": 417,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+SensorimotorAgent",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/emergent_property_detection: The edge of chaos: ",
-    "filename": "omnimens_autocode_emergent_capability_mnc7eiqb.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnc7eiqb.mjs",
-    "backupPath": null,
-    "timestamp": 1774815632723,
-    "codeLength": 413,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Explorer+Motivator",
-    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Explorer/abstraction_layer: Wolfram's Rule 110 cellular auto",
-    "filename": "omnimens_autocode_adaptive_algorithm_mnc7fqpp.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnc7fqpp.mjs",
-    "backupPath": null,
-    "timestamp": 1774815689725,
-    "codeLength": 445,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:SensorimotorAgent+Pioneer",
     "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/information_compression: Recurrent neural ",
     "filename": "omnimens_autocode_neural_pathway_mnc7fqtg.mjs",
@@ -4997,6 +4937,66 @@
     "backupPath": null,
     "timestamp": 1774830087305,
     "codeLength": 472,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Linguist",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/recursive_decomposition: Integrated Information ",
+    "filename": "omnimens_autocode_consciousness_expansion_mncg1brj.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mncg1brj.mjs",
+    "backupPath": null,
+    "timestamp": 1774830133711,
+    "codeLength": 386,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Critic",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/analogical_mapping: Emergence: complex behaviors",
+    "filename": "omnimens_autocode_consciousness_expansion_mncg1bxf.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mncg1bxf.mjs",
+    "backupPath": null,
+    "timestamp": 1774830133923,
+    "codeLength": 384,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/analogical_mapping: Emergence: complex behaviors",
+    "filename": "omnimens_autocode_consciousness_expansion_mncg1bz9.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mncg1bz9.mjs",
+    "backupPath": null,
+    "timestamp": 1774830133989,
+    "codeLength": 386,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Meta-Agent",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/pattern_recognition: Kolmogorov complexity measu",
+    "filename": "omnimens_autocode_pattern_recognition_mncg2m27.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mncg2m27.mjs",
+    "backupPath": null,
+    "timestamp": 1774830193711,
+    "codeLength": 468,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+SpellCheckVisual",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/causal_inference: The cerebellum contains more n",
+    "filename": "omnimens_autocode_adaptive_algorithm_mncg2m4o.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mncg2m4o.mjs",
+    "backupPath": null,
+    "timestamp": 1774830193800,
+    "codeLength": 455,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Critic",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/emergent_property_detection: Predictive coding: ",
+    "filename": "omnimens_autocode_emergent_capability_mncg2ma2.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mncg2ma2.mjs",
+    "backupPath": null,
+    "timestamp": 1774830193994,
+    "codeLength": 402,
     "overwrite": false
   }
 ]
