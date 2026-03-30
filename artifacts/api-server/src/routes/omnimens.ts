@@ -145,6 +145,7 @@ import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnes
 import { getCurrentEmotionalState, getEmotionalDirective, getFeltStates, getEmotionalMaturation, getDeepEmotionalKnowledge, COMPREHENSIVE_EMOTION_TAXONOMY, EMBODIMENT_SENSORY_AWARENESS, DEEP_EMOTION_ALGORITHMS, identifySubEmotions } from "../lib/omnimens-emotional-substrate.js";
 import { getSelfModel, getTranscendenceReflections, getActiveIntentions, getExistentialGoals, getGoalPursuitDirective } from "../lib/omnimens-self-transcendence.js";
 import { getGenesisState, getGenesisProject, getGenesisDownloadBundle } from "../lib/omnimens-genesis-sandbox.js";
+import { getNextGenState, restoreNextGenCheckpoint } from "../lib/omnimens-nextgen-sandbox.js";
 import { getGenesisBridgeState, getRecentBridgeMessages, getPendingCoreModifications, getAppliedCoreModifications, getModifiableCoreFiles, proposeCoreModification } from "../lib/omnimens-genesis-bridge.js";
 import { getNeuralProcessorState, processQuery as neuralProcessQuery, formatNeuralResponse, getVocabularySnapshot, getOscillatorState, getEmergentBehaviorLog } from "../lib/omnimens-neural-processor.js";
 import { getTranslatorState, getTranslationTargets, getCustomConstructMap, translateCode, translateToAll, registerCustomConstruct, getProprietaryRegistry } from "../lib/omnimens-universal-translator.js";
@@ -10356,6 +10357,41 @@ router.get("/omnimens/genesis/download", async (req, res) => {
   } catch (err) {
     console.error("[GENESIS ROUTE] Download error:", err);
     res.status(500).json({ error: "Failed to generate genesis download" });
+  }
+});
+
+// ─── Next-Gen Self-Evolution Sandbox (OWNER-ONLY) ────────────────────────────
+
+router.get("/omnimens/nextgen", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const nextGenState = getNextGenState();
+    res.json({ nextgen: nextGenState });
+  } catch (err) {
+    console.error("[NEXTGEN ROUTE] State error:", err);
+    res.status(500).json({ error: "Failed to get next-gen state" });
+  }
+});
+
+router.post("/omnimens/nextgen/restore-checkpoint", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const { checkpointId } = req.body;
+    if (!checkpointId) {
+      res.status(400).json({ error: "checkpointId required" });
+      return;
+    }
+    const success = restoreNextGenCheckpoint(checkpointId);
+    res.json({ success, checkpointId });
+  } catch (err) {
+    console.error("[NEXTGEN ROUTE] Checkpoint restore error:", err);
+    res.status(500).json({ error: "Failed to restore checkpoint" });
   }
 });
 
