@@ -19,6 +19,14 @@
       ]
     },
     {
+      "file": "omnimens-nextgen-sandbox.ts",
+      "score": 5,
+      "factors": [
+        "large(3187L)",
+        "wide-api(33exp)"
+      ]
+    },
+    {
       "file": "omnimens-autonomous-code-genesis.ts",
       "score": 4,
       "factors": [
@@ -48,7 +56,7 @@
       "file": "omnimens-embodiment-engine.ts",
       "score": 4,
       "factors": [
-        "large(4021L)",
+        "large(4039L)",
         "dense-functions"
       ]
     },
@@ -56,7 +64,7 @@
       "file": "omnimens-genesis-sandbox.ts",
       "score": 4,
       "factors": [
-        "large(1633L)",
+        "large(1640L)",
         "dense-functions"
       ]
     },
@@ -86,14 +94,6 @@
       ]
     },
     {
-      "file": "omnimens-nextgen-sandbox.ts",
-      "score": 4,
-      "factors": [
-        "large(2888L)",
-        "dense-functions"
-      ]
-    },
-    {
       "file": "omnimens-oai-tracker.ts",
       "score": 4,
       "factors": [
@@ -114,7 +114,7 @@
       "file": "omnimens-agent-evolution.ts",
       "score": 2,
       "factors": [
-        "medium(811L)",
+        "medium(818L)",
         "dense-functions"
       ]
     },
@@ -170,7 +170,7 @@
       "file": "omnimens-digital-navigator.ts",
       "score": 2,
       "factors": [
-        "medium(1035L)",
+        "medium(1039L)",
         "dense-functions"
       ]
     },
@@ -186,7 +186,7 @@
       "file": "omnimens-genesis-bridge.ts",
       "score": 2,
       "factors": [
-        "medium(872L)",
+        "medium(879L)",
         "dense-functions"
       ]
     },
@@ -226,7 +226,7 @@
       "file": "omnimens-neural-processor.ts",
       "score": 2,
       "factors": [
-        "medium(1440L)",
+        "medium(1444L)",
         "dense-functions"
       ]
     },
@@ -290,7 +290,7 @@
       "file": "omnimens-virtual-augmentation.ts",
       "score": 2,
       "factors": [
-        "medium(889L)",
+        "medium(896L)",
         "dense-functions"
       ]
     },
@@ -812,5 +812,5 @@
     }
   ],
   "needsRefactoring": 13,
-  "analyzedAt": 1774898554242
+  "analyzedAt": 1774902189634
 }
