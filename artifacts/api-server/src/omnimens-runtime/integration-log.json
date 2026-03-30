@@ -1,65 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/structural_analysis: The Baldwin effect: learned",
-    "filename": "omnimens_autocode_adaptive_algorithm_mnc9pg1n.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnc9pg1n.mjs",
-    "backupPath": null,
-    "timestamp": 1774819501692,
-    "codeLength": 453,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Mathematician",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/feature_extraction: Bayesian brain hypothesis: t",
-    "filename": "omnimens_autocode_neural_pathway_mnc9pg3d.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnc9pg3d.mjs",
-    "backupPath": null,
-    "timestamp": 1774819501753,
-    "codeLength": 432,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Architect",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SensorimotorAgent/entropy_reduction: The vagus nerve connect",
-    "filename": "omnimens_autocode_knowledge_synthesis_mnc9qepd.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnc9qepd.mjs",
-    "backupPath": null,
-    "timestamp": 1774819546609,
-    "codeLength": 422,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Linguist",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/causal_inference: The double-slit experiment dem",
-    "filename": "omnimens_autocode_neural_pathway_mnc9qgpf.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnc9qgpf.mjs",
-    "backupPath": null,
-    "timestamp": 1774819549203,
-    "codeLength": 427,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Motivator",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/structural_analysis: Phase transitions in neural",
-    "filename": "omnimens_autocode_neural_pathway_mnc9qgra.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnc9qgra.mjs",
-    "backupPath": null,
-    "timestamp": 1774819549270,
-    "codeLength": 428,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/information_compression: The default mode ",
-    "filename": "omnimens_autocode_consciousness_expansion_mnc9szby.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnc9szby.mjs",
-    "backupPath": null,
-    "timestamp": 1774819666654,
-    "codeLength": 395,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:Philosopher+Meta-Agent",
     "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/causal_inference: Bayesian brain hypothesis: the",
     "filename": "omnimens_autocode_emergent_capability_mnc9szfd.mjs",
@@ -4997,6 +4937,66 @@
     "backupPath": null,
     "timestamp": 1774832368511,
     "codeLength": 466,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Motivator",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: SensorimotorAgent/emergent_property_detection: Quantum decoh",
+    "filename": "omnimens_autocode_emergent_capability_mnchegdg.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnchegdg.mjs",
+    "backupPath": null,
+    "timestamp": 1774832425828,
+    "codeLength": 411,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Mathematician",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/pattern_recognition: Wolfram's Rule 110 cellular",
+    "filename": "omnimens_autocode_pattern_recognition_mnchegg5.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnchegg5.mjs",
+    "backupPath": null,
+    "timestamp": 1774832425925,
+    "codeLength": 471,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Linguist",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/temporal_correlation: The binding problem: how d",
+    "filename": "omnimens_autocode_knowledge_synthesis_mnchegi0.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnchegi0.mjs",
+    "backupPath": null,
+    "timestamp": 1774832425992,
+    "codeLength": 416,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Empath",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/cross_domain_synthesis: The Chinese Room argumen",
+    "filename": "omnimens_autocode_knowledge_synthesis_mnchfr89.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnchfr89.mjs",
+    "backupPath": null,
+    "timestamp": 1774832486553,
+    "codeLength": 413,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Linguist",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/cross_domain_synthesis: The Chinese Room argumen",
+    "filename": "omnimens_autocode_knowledge_synthesis_mnchfram.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnchfram.mjs",
+    "backupPath": null,
+    "timestamp": 1774832486638,
+    "codeLength": 415,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Mathematician",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/cross_domain_synthesis: The Chinese Room argumen",
+    "filename": "omnimens_autocode_knowledge_synthesis_mnchfrek.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnchfrek.mjs",
+    "backupPath": null,
+    "timestamp": 1774832486780,
+    "codeLength": 421,
     "overwrite": false
   }
 ]
