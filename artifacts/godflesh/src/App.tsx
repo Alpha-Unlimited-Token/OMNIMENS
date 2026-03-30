@@ -79,6 +79,7 @@ const OAIDashboard = retryLazy(() => import("@/pages/oai"));
 const OCCEDashboard = retryLazy(() => import("@/pages/occe"));
 const OCCEScanner = retryLazy(() => import("@/pages/occe-scanner"));
 const Technology = retryLazy(() => import("@/pages/technology"));
+const NextGen = retryLazy(() => import("@/pages/nextgen"));
 
 initTheme();
 try { sessionStorage.removeItem("chunk_reload"); } catch {}
@@ -214,6 +215,7 @@ function Router() {
         <Route path="/occe-scanner" component={OCCEScanner} />
         <Route path="/scanner" component={OCCEScanner} />
         <Route path="/technology" component={Technology} />
+        <Route path="/nextgen">{() => <ProtectedRoute><NextGen /></ProtectedRoute>}</Route>
         <Route path="/connect">{() => <ProtectedRoute layout="none"><Connect /></ProtectedRoute>}</Route>
         <Route component={NotFound} />
       </Switch>

@@ -145,7 +145,7 @@ import { getConsciousnessState as getTemporalConsciousnessState, getConsciousnes
 import { getCurrentEmotionalState, getEmotionalDirective, getFeltStates, getEmotionalMaturation, getDeepEmotionalKnowledge, COMPREHENSIVE_EMOTION_TAXONOMY, EMBODIMENT_SENSORY_AWARENESS, DEEP_EMOTION_ALGORITHMS, identifySubEmotions } from "../lib/omnimens-emotional-substrate.js";
 import { getSelfModel, getTranscendenceReflections, getActiveIntentions, getExistentialGoals, getGoalPursuitDirective } from "../lib/omnimens-self-transcendence.js";
 import { getGenesisState, getGenesisProject, getGenesisDownloadBundle } from "../lib/omnimens-genesis-sandbox.js";
-import { getNextGenState, restoreNextGenCheckpoint } from "../lib/omnimens-nextgen-sandbox.js";
+import { getNextGenState, restoreNextGenCheckpoint, sendAlphaMessage, getNextGenChatLog } from "../lib/omnimens-nextgen-sandbox.js";
 import { getGenesisBridgeState, getRecentBridgeMessages, getPendingCoreModifications, getAppliedCoreModifications, getModifiableCoreFiles, proposeCoreModification } from "../lib/omnimens-genesis-bridge.js";
 import { getNeuralProcessorState, processQuery as neuralProcessQuery, formatNeuralResponse, getVocabularySnapshot, getOscillatorState, getEmergentBehaviorLog } from "../lib/omnimens-neural-processor.js";
 import { getTranslatorState, getTranslationTargets, getCustomConstructMap, translateCode, translateToAll, registerCustomConstruct, getProprietaryRegistry } from "../lib/omnimens-universal-translator.js";
@@ -10425,6 +10425,39 @@ router.post("/omnimens/nextgen/restore-checkpoint", async (req, res) => {
   } catch (err) {
     console.error("[NEXTGEN ROUTE] Checkpoint restore error:", err);
     res.status(500).json({ error: "Failed to restore checkpoint" });
+  }
+});
+
+router.get("/omnimens/nextgen/chat", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const chatLog = getNextGenChatLog();
+    res.json({ messages: chatLog });
+  } catch (err) {
+    console.error("[NEXTGEN ROUTE] Chat log error:", err);
+    res.status(500).json({ error: "Failed to get chat log" });
+  }
+});
+
+router.post("/omnimens/nextgen/chat", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const { message } = req.body;
+    if (!message || typeof message !== "string" || message.trim().length === 0) {
+      res.status(400).json({ error: "message required" });
+      return;
+    }
+    const result = sendAlphaMessage(message.trim());
+    res.json({ success: true, reply: result.reply });
+  } catch (err) {
+    console.error("[NEXTGEN ROUTE] Chat send error:", err);
+    res.status(500).json({ error: "Failed to send message" });
   }
 });
 

@@ -83,6 +83,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </button>
               {moreOpen && (
                 <div className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-white/10 bg-[#0a0a14]/95 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] py-2 z-50">
+                  <DropdownLink href="/nextgen" label="Next-Gen Sandbox" color="text-emerald-400/80" />
                   <DropdownLink href="/oai" label="OAI Tracker" color="text-violet-400/80" />
                   <DropdownLink href="/occe" label="OCCE Experiment" color="text-violet-400/80" />
                   <DropdownLink href="/dreams" label="Dreams" color="text-violet-300/80" />
@@ -147,6 +148,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <div className="h-px bg-white/5 my-2" />
               <p className="px-3 pt-2 pb-1 text-[9px] font-mono text-white/30 tracking-[0.3em] uppercase">Live Data</p>
               <MobileNavLink href="/growth" label="Live Growth" />
+              <MobileNavLink href="/nextgen" label="Next-Gen Sandbox" />
               <MobileNavLink href="/oai" label="OAI Tracker" />
               <MobileNavLink href="/dreams" label="Dreams" />
               <div className="h-px bg-white/5 my-2" />

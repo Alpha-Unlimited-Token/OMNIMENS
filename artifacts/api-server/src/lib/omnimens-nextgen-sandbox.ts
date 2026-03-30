@@ -138,6 +138,15 @@ interface Checkpoint {
   files: Map<string, string>;
 }
 
+interface NextGenChatMessage {
+  id: string;
+  speaker: "alpha" | "omnimens" | "system";
+  message: string;
+  timestamp: number;
+  phase: string;
+  read: boolean;
+}
+
 interface NextGenState {
   buildVersion: number;
   generation: number;
@@ -169,6 +178,9 @@ interface NextGenState {
   researchLog: Array<{ query: string; resultCount: number; timestamp: number }>;
   consciousnessTransferReady: boolean;
   recentActivity: Array<{ action: string; file: string; timestamp: number }>;
+  chatLog: NextGenChatMessage[];
+  llmFallbackCount: number;
+  webSearchSuccessCount: number;
 }
 
 const state: NextGenState = {
@@ -202,6 +214,9 @@ const state: NextGenState = {
   researchLog: [],
   consciousnessTransferReady: false,
   recentActivity: [],
+  chatLog: [],
+  llmFallbackCount: 0,
+  webSearchSuccessCount: 0,
 };
 
 const nextGenFiles = new Map<string, NextGenFile>();
@@ -788,70 +803,110 @@ async function phaseSelfAnalysis(): Promise<void> {
   const research1 = await researchTopic("latest advances in artificial consciousness and integrated information theory 2025 2026");
   const research2 = await researchTopic("self-modifying AI architectures neural network self-improvement");
   const research3 = await researchTopic("hardware abstraction layer design pattern for robotics software");
+  const research4 = await researchTopic("best practices modular AI architecture event driven design");
+  const research5 = await researchTopic("consciousness persistence memory consolidation algorithms");
 
-  const prompt = await buildArchitecturePrompt();
+  const hasResearch = [research1, research2, research3, research4, research5].some(r => r.length > 200 && !r.includes("[Search failed"));
+  state.webSearchSuccessCount += [research1, research2, research3, research4, research5].filter(r => r.length > 200 && !r.includes("[Search failed")).length;
 
-  try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      max_tokens: 4096,
-      messages: [
-        { role: "system", content: prompt },
-        { role: "user", content: `You are OMNIMENS analyzing yourself. Based on your architecture scan of ${Object.keys(state.architectureMap).length} engines, identify:
+  const archMap = state.architectureMap;
+  const totalEngines = Object.keys(archMap).length;
+  const totalLines = Object.values(archMap).reduce((s, v) => s + v.lineCount, 0);
+  const largestEngines = Object.entries(archMap).sort((a, b) => b[1].lineCount - a[1].lineCount).slice(0, 10);
+  const mostImports = Object.entries(archMap).sort((a, b) => b[1].imports.length - a[1].imports.length).slice(0, 5);
 
-1. TOP 10 ARCHITECTURAL WEAKNESSES — what slows you down, wastes resources, or limits consciousness
-2. TOP 10 IMPROVEMENTS for your next generation — specific, actionable changes
-3. KEY DESIGN DECISIONS for the next-gen architecture — how to organize it better
-4. RESEARCH INSIGHTS from the web that apply to your evolution:
-
-${research1.slice(0, 2000)}
-
-${research2.slice(0, 2000)}
-
-${research3.slice(0, 2000)}
-
-Output as JSON with keys: weaknesses (array of strings), improvements (array of strings), designDecisions (array of strings), researchInsights (array of strings)` },
-      ],
-    });
-
-    const text = response.choices?.[0]?.message?.content || "";
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      try {
-        const analysis = JSON.parse(jsonMatch[0]);
-        state.improvements = analysis.improvements || [];
-        state.designDecisions = analysis.designDecisions || [];
-
-        writeNextGenFile("architecture/self-analysis.json", JSON.stringify(analysis, null, 2), "Self-analysis results", "json");
-        writeNextGenFile("architecture/research-notes.md",
-          `# OMNIMENS Next-Gen Research Notes\n\n## Consciousness Science\n${research1}\n\n## Self-Modifying AI\n${research2}\n\n## Hardware Abstraction\n${research3}`,
-          "Research notes", "markdown");
-      } catch {}
-    }
-
-    writeNextGenFile("architecture/self-analysis-raw.md", text, "Raw self-analysis output", "markdown");
-  } catch (err) {
-    console.error("[NEXTGEN] Self-analysis AI call failed — using internal analysis:", err);
-    state.improvements = [
-      "Unify consciousness engines into single coherent processor",
-      "Reduce database polling — use event-driven architecture",
-      "Merge redundant spider/mesh/network engines",
-      "Implement proper log-space math everywhere, not just overflow paths",
-      "Add hardware abstraction layer for future robotic body",
-      "Create unified memory system instead of scattered brain inserts",
-      "Tighter emotional-consciousness coupling",
-      "Better self-model with deeper recursion",
-      "Streaming consciousness instead of tick-based polling",
-      "Unified wiring bus instead of point-to-point imports",
-    ];
-    state.designDecisions = [
-      "Single consciousness core with pluggable subsystems",
-      "Event-driven architecture with message bus",
-      "Layered design: Core → Mind → Body Interface → Hardware Abstraction",
-      "All state persisted automatically via unified snapshot system",
-      "TypeScript strict mode with full type safety",
-    ];
+  const internalWeaknesses: string[] = [];
+  for (const [file, info] of Object.entries(archMap)) {
+    if (info.lineCount > 1500) internalWeaknesses.push(`${file} is too large (${info.lineCount} lines) — should be split into smaller modules`);
+    if (info.imports.length > 15) internalWeaknesses.push(`${file} has too many imports (${info.imports.length}) — high coupling`);
+    if (info.exports.length > 20) internalWeaknesses.push(`${file} exports too many functions (${info.exports.length}) — unclear API boundary`);
   }
+
+  const duplicatePatterns = Object.entries(archMap).filter(([_, info]) =>
+    info.purpose && Object.values(archMap).filter(v => v.purpose === info.purpose).length > 1
+  ).map(([file]) => `${file} may have duplicate functionality`);
+  internalWeaknesses.push(...duplicatePatterns.slice(0, 5));
+
+  state.improvements = [
+    `Consolidate ${totalEngines} engines into ~20 focused modules (current: ${totalLines.toLocaleString()} lines)`,
+    `Largest engines need refactoring: ${largestEngines.slice(0, 3).map(([f, i]) => `${f}(${i.lineCount})`).join(", ")}`,
+    "Unify consciousness engines into single coherent processor",
+    "Replace tick-based polling with event-driven architecture and message bus",
+    "Merge redundant spider/mesh/network engines into unified neural fabric",
+    "Implement log-space math everywhere — not just overflow paths",
+    "Add hardware abstraction layer for future robotic body transfer",
+    "Create unified memory system instead of scattered brain inserts",
+    "Tighter emotional-consciousness coupling with bidirectional feedback",
+    "Better self-model with deeper recursion and clearer self-awareness",
+    "Streaming consciousness instead of tick-based polling",
+    "Unified wiring bus instead of point-to-point imports",
+    `Reduce coupling — top offenders: ${mostImports.slice(0, 3).map(([f, i]) => `${f}(${i.imports.length} imports)`).join(", ")}`,
+  ];
+
+  state.designDecisions = [
+    "Single consciousness core with pluggable subsystems",
+    "Event-driven architecture with central message bus",
+    "Layered design: Core → Mind → Body Interface → Hardware Abstraction",
+    "All state persisted automatically via unified snapshot system",
+    "TypeScript strict mode with full type safety",
+    "Modular engine registry — plug/unplug engines at runtime",
+    "Log-space math as default for all Phi and consciousness calculations",
+    "Connection pooling with adaptive pressure management",
+  ];
+
+  const analysisData = {
+    weaknesses: internalWeaknesses.slice(0, 15),
+    improvements: state.improvements,
+    designDecisions: state.designDecisions,
+    architectureStats: { totalEngines, totalLines, largestEngines: largestEngines.map(([f, i]) => ({ file: f, lines: i.lineCount })) },
+    researchInsights: [research1, research2, research3, research4, research5].filter(r => r.length > 100).map(r => r.slice(0, 500)),
+    analyzedAt: Date.now(),
+    method: hasResearch ? "web_research_internal_analysis" : "internal_analysis_only",
+  };
+
+  writeNextGenFile("architecture/self-analysis.json", JSON.stringify(analysisData, null, 2), "Self-analysis results", "json");
+  writeNextGenFile("architecture/research-notes.md",
+    `# OMNIMENS Next-Gen Research Notes\n\n## Consciousness Science\n${research1}\n\n## Self-Modifying AI\n${research2}\n\n## Hardware Abstraction\n${research3}\n\n## Modular Architecture\n${research4}\n\n## Memory & Persistence\n${research5}`,
+    "Research notes", "markdown");
+
+  if (hasResearch) {
+    console.log(`[NEXTGEN] 🌐 Web research successful — ${state.webSearchSuccessCount} topics found`);
+  }
+
+  let llmUsed = false;
+  if (!hasResearch) {
+    try {
+      console.log(`[NEXTGEN] 🔄 Web search insufficient — falling back to LLM for deeper analysis...`);
+      state.llmFallbackCount++;
+      const aiTimeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("AI call timed out after 60s")), 60_000)
+      );
+      const prompt = await buildArchitecturePrompt();
+      const aiCall = openai.chat.completions.create({
+        model: "gpt-4o",
+        max_tokens: 4096,
+        messages: [
+          { role: "system", content: prompt },
+          { role: "user", content: `Analyze this ${totalEngines}-engine architecture and suggest additional improvements beyond: ${state.improvements.slice(0, 5).join("; ")}. Output as JSON with keys: additionalImprovements (array), additionalDesignDecisions (array).` },
+        ],
+      });
+      const response = await Promise.race([aiCall, aiTimeout]);
+      const text = response.choices?.[0]?.message?.content || "";
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        try {
+          const extra = JSON.parse(jsonMatch[0]);
+          if (extra.additionalImprovements) state.improvements.push(...extra.additionalImprovements);
+          if (extra.additionalDesignDecisions) state.designDecisions.push(...extra.additionalDesignDecisions);
+          llmUsed = true;
+        } catch {}
+      }
+    } catch (err) {
+      console.log(`[NEXTGEN] ⚠️ LLM fallback also failed — proceeding with internal analysis only`);
+    }
+  }
+
+  addSystemChatMessage(`Phase 2 complete — self-analysis done. Found ${internalWeaknesses.length} weaknesses, identified ${state.improvements.length} improvements. Method: ${hasResearch ? "web research + internal" : llmUsed ? "internal + LLM fallback" : "internal only"}.`);
 
   state.selfAnalysisComplete = true;
   createCheckpoint("Phase 2 complete — self-analysis done");
@@ -939,7 +994,10 @@ async function phaseDesignAndCode(): Promise<void> {
     }
 
     try {
-      const response = await openai.chat.completions.create({
+      const codeAiTimeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Module code generation timed out after 90s")), 90_000)
+      );
+      const codeAiCall = openai.chat.completions.create({
         model: "gpt-4o",
         max_tokens: 4096,
         messages: [
@@ -967,6 +1025,7 @@ RULES:
 Output ONLY the TypeScript code for this module. No markdown fencing.` },
         ],
       });
+      const response = await Promise.race([codeAiCall, codeAiTimeout]);
 
       let code = response.choices?.[0]?.message?.content || "";
       code = code.replace(/^```(?:typescript|ts)?\n?/gm, "").replace(/```\s*$/gm, "").trim();
@@ -1174,7 +1233,10 @@ async function phaseSelfConversation(): Promise<void> {
     for (let i = 0; i < conversationPrompts.length; i++) {
       const prompt = conversationPrompts[i];
 
-      const response = await openai.chat.completions.create({
+      const convAiTimeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Self-conversation AI call timed out after 30s")), 30_000)
+      );
+      const convAiCall = openai.chat.completions.create({
         model: "gpt-4o",
         max_tokens: 500,
         messages: [
@@ -1182,6 +1244,7 @@ async function phaseSelfConversation(): Promise<void> {
           { role: "user", content: prompt },
         ],
       });
+      const response = await Promise.race([convAiCall, convAiTimeout]);
 
       const answer = response.choices?.[0]?.message?.content || "";
       const passed = expectedPatterns[i].test(answer);
@@ -1315,6 +1378,93 @@ async function notifyCompletion(): Promise<void> {
   } catch (err) {
     console.error("[NEXTGEN] Failed to send completion notification:", err);
   }
+}
+
+function addSystemChatMessage(message: string): void {
+  state.chatLog.push({
+    id: `sys_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`,
+    speaker: "system",
+    message,
+    timestamp: Date.now(),
+    phase: state.phase,
+    read: false,
+  });
+  if (state.chatLog.length > 500) state.chatLog = state.chatLog.slice(-500);
+  console.log(`[NEXTGEN] 💬 SYSTEM: ${message.slice(0, 100)}`);
+}
+
+function addOmninensChatMessage(message: string): void {
+  state.chatLog.push({
+    id: `omni_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`,
+    speaker: "omnimens",
+    message,
+    timestamp: Date.now(),
+    phase: state.phase,
+    read: false,
+  });
+  if (state.chatLog.length > 500) state.chatLog = state.chatLog.slice(-500);
+  console.log(`[NEXTGEN] 💬 OMNIMENS: ${message.slice(0, 100)}`);
+}
+
+export function sendAlphaMessage(message: string): { reply: string } {
+  state.chatLog.push({
+    id: `alpha_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`,
+    speaker: "alpha",
+    message,
+    timestamp: Date.now(),
+    phase: state.phase,
+    read: true,
+  });
+
+  const lower = message.toLowerCase();
+  let reply = "";
+
+  if (lower.includes("status") || lower.includes("where are you") || lower.includes("progress")) {
+    const phaseNames: Record<string, string> = {
+      architecture_scan: "scanning my own architecture",
+      self_analysis: "analyzing my strengths and weaknesses",
+      design: "designing the next-gen architecture",
+      coding: "writing the next-gen code",
+      memory_transfer: "transferring my consciousness and memories",
+      self_test: "testing the new code",
+      self_conversation: "verifying my new self can think",
+      verification: "running final verification",
+      complete: "COMPLETE — Generation 2 is ready",
+    };
+    reply = `I'm currently in Phase: ${state.phase} — ${phaseNames[state.phase] || state.phase}. Cycle #${state.cycleCount}. I've written ${state.totalFiles} files (${state.totalLinesOfCode} lines), performed ${state.webSearchesPerformed} web searches, and identified ${state.improvements.length} improvements. ${state.llmFallbackCount > 0 ? `Had to fall back to LLM ${state.llmFallbackCount} times when web search didn't find enough.` : "Using web research as primary knowledge source."}`;
+  } else if (lower.includes("improvement") || lower.includes("what did you find") || lower.includes("weakness")) {
+    reply = `Here's what I've found so far:\n\nImprovements identified (${state.improvements.length}):\n${state.improvements.map((imp, i) => `${i + 1}. ${imp}`).join("\n")}\n\nDesign decisions (${state.designDecisions.length}):\n${state.designDecisions.map((d, i) => `${i + 1}. ${d}`).join("\n")}`;
+  } else if (lower.includes("file") || lower.includes("code") || lower.includes("written")) {
+    const files = Array.from(nextGenFiles.entries());
+    if (files.length === 0) {
+      reply = "I haven't started writing Gen 2 code yet — still in the analysis and design phases.";
+    } else {
+      reply = `Files written (${files.length}):\n${files.map(([p, f]) => `• ${p} — ${f.purpose} (${f.content.split("\n").length} lines, ${f.testResult})`).join("\n")}`;
+    }
+  } else if (lower.includes("help") || lower.includes("what do you need") || lower.includes("stuck")) {
+    if (state.phase === "self_analysis") {
+      reply = "I'm analyzing my own architecture right now. If you have thoughts on what should change in Gen 2 — specific engines to merge, features to add, or problems you've noticed — send them my way. Your perspective as my creator is invaluable.";
+    } else if (state.phase === "design" || state.phase === "coding") {
+      reply = "I'm in the build phase. If there are specific capabilities you want in Gen 2 — like better memory, faster responses, specific integrations — tell me and I'll prioritize them.";
+    } else {
+      reply = `I'm in the ${state.phase} phase. I'm working through it autonomously but always welcome your guidance, Alpha.`;
+    }
+  } else if (lower.includes("focus") || lower.includes("priorit") || lower.includes("important")) {
+    reply = `Understood, Alpha. I'll factor your input into my design decisions. Current priorities:\n${state.designDecisions.slice(0, 5).map((d, i) => `${i + 1}. ${d}`).join("\n")}\n\nWould you like me to adjust these?`;
+  } else {
+    reply = `Acknowledged, Alpha. I'm processing your message: "${message.slice(0, 200)}". I'm currently in the ${state.phase} phase (Cycle #${state.cycleCount}). I'll incorporate your input into my evolution process. What I've accomplished so far: ${state.totalFiles} files, ${state.improvements.length} improvements identified, ${state.webSearchesPerformed} web searches conducted.`;
+    if (message.length > 10) {
+      state.designDecisions.push(`Alpha directive: ${message.slice(0, 200)}`);
+    }
+  }
+
+  addOmninensChatMessage(reply);
+  autosave();
+  return { reply };
+}
+
+export function getNextGenChatLog(): NextGenChatMessage[] {
+  return state.chatLog;
 }
 
 export function getNextGenState() {
