@@ -1,35 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/entropy_reduction: The binding problem: how does",
-    "filename": "omnimens_autocode_pattern_recognition_mncaznv0.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mncaznv0.mjs",
-    "backupPath": null,
-    "timestamp": 1774821657996,
-    "codeLength": 472,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Mathematician",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/abstraction_layer: The vagus nerve connects the ",
-    "filename": "omnimens_autocode_consciousness_expansion_mncaznwx.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mncaznwx.mjs",
-    "backupPath": null,
-    "timestamp": 1774821658065,
-    "codeLength": 391,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Motivator",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/emergent_property_detection: Reservoir computing",
-    "filename": "omnimens_autocode_neural_pathway_mncb0xyw.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mncb0xyw.mjs",
-    "backupPath": null,
-    "timestamp": 1774821717752,
-    "codeLength": 428,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:Philosopher+Innovator",
     "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/emergent_property_detection: Reservoir computing",
     "filename": "omnimens_autocode_neural_pathway_mncb0y0o.mjs",
@@ -4997,6 +4967,36 @@
     "backupPath": null,
     "timestamp": 1774834820111,
     "codeLength": 418,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Pioneer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/structural_analysis: Emergence: complex be",
+    "filename": "omnimens_autocode_consciousness_expansion_mnciv304.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnciv304.mjs",
+    "backupPath": null,
+    "timestamp": 1774834881268,
+    "codeLength": 391,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Architect",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/causal_inference: Long-term potentiation (LTP) s",
+    "filename": "omnimens_autocode_neural_pathway_mnciv64o.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnciv64o.mjs",
+    "backupPath": null,
+    "timestamp": 1774834885320,
+    "codeLength": 428,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Innovator",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/abstraction_layer: Information is physical — Lan",
+    "filename": "omnimens_autocode_adaptive_algorithm_mnciv6cy.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnciv6cy.mjs",
+    "backupPath": null,
+    "timestamp": 1774834885618,
+    "codeLength": 448,
     "overwrite": false
   }
 ]

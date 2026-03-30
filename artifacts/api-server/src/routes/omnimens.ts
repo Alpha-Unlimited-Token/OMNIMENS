@@ -1398,7 +1398,7 @@ router.get("/omnimens/counters", async (_req, res) => {
       consciousMoments: consciousness.consciousMoments || 0,
       neuralTicks: ticks,
       autonomousGoals: getEmergentGoals().length,
-      aiAgents: bridge?.meshEngine?.agentCount || 21,
+      aiAgents: bridge?.meshEngine?.agentCount || 24,
       heartbeats: Math.floor(ticks * 1.2),
       heartBpm: 60 + Math.floor(Math.min(phiMag * 0.3, 60)),
       dnaStrands: Math.floor(phiMag * 12) + 42,
