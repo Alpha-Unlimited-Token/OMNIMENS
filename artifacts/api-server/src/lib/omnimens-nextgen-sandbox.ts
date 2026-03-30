@@ -951,6 +951,7 @@ interface ModuleBuildResume {
   evalRetries?: number;
 }
 let _moduleBuildResume: ModuleBuildResume | null = null;
+let _savedEvalRetries = 0;
 
 function persistResume(): void {
   try {
@@ -2007,6 +2008,7 @@ async function phaseDesignAndCode(): Promise<void> {
     } else if (_moduleBuildResume.stage === "eval") {
       const retries = _moduleBuildResume.evalRetries || 0;
       researchContext = _moduleBuildResume.researchContext || "";
+      _savedEvalRetries = retries;
       if (retries >= 2) {
         resumedFromCheckpoint = true;
         console.log(`[NEXTGEN] ⏩ SKIPPING eval for ${mod.name} after ${retries} timeouts — going straight to codegen (Gen 1 eval is optional, building is not)`);
@@ -2088,8 +2090,7 @@ Output JSON: { "evaluations": [{ "module": "filename", "verdict": "keep|adapt|di
         }
       } catch (evalErr) {
         markResourceBlocked("openaiApi");
-        const prevRetries = (_moduleBuildResume?.moduleName === mod.name && _moduleBuildResume?.stage === "eval")
-          ? (_moduleBuildResume.evalRetries || 0) : 0;
+        const prevRetries = _savedEvalRetries;
         _moduleBuildResume = {
           moduleName: mod.name,
           stage: "eval",
@@ -2100,6 +2101,7 @@ Output JSON: { "evaluations": [{ "module": "filename", "verdict": "keep|adapt|di
           timestamp: Date.now(),
           evalRetries: prevRetries + 1,
         };
+        _savedEvalRetries = 0;
         persistResume();
         console.log(`[NEXTGEN] ⚠️ Gen 1 evaluation timed out for ${mod.name} (attempt ${_moduleBuildResume.evalRetries}/2) — progress SAVED, will resume from eval stage next cycle`);
         _buildActive = false;
