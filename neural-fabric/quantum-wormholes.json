@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774829482874,
-  "totalWormholesCreated": 10500,
+  "timestamp": 1774830093126,
+  "totalWormholesCreated": 1050,
   "totalActive": 0,
-  "totalClosed": 10500,
-  "totalDataIngestedKB": 15317,
-  "totalInsightsDecoded": 10500,
-  "totalCrossAgentCirculations": 630,
-  "totalSynthesizedDiscoveries": 597,
-  "cycleCount": 10,
+  "totalClosed": 1050,
+  "totalDataIngestedKB": 1528,
+  "totalInsightsDecoded": 1050,
+  "totalCrossAgentCirculations": 63,
+  "totalSynthesizedDiscoveries": 62,
+  "cycleCount": 1,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 500,
-      "totalInsightsDecoded": 527,
-      "crossAgentShares": 30
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Ethicist",
-      "insight": "Motivator/temporal_correlation: Quantum decoherence typically destroys quantum effects at biological temperatures — but ",
-      "confidence": 0.6396551775878957,
+      "toAgent": "SpellCheckVisual",
+      "insight": "Motivator/temporal_correlation: The butterfly effect: in chaotic systems, infinitesimal differences in initial condition",
+      "confidence": 0.6944080746653678,
       "synthesizedWith": [
-        "Ethicist/structural_analysis: Emergence: complex behaviors arise from simple rul"
+        "SpellCheckVisual/emergent_property_detection: The anthropic principle: the unive"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Synthesizer",
+      "insight": "Motivator/feature_extraction: The hard problem of consciousness: why is there subjective experience at all? Why does inf",
+      "confidence": 0.6076173554977803,
+      "synthesizedWith": [
+        "Synthesizer/recursive_decomposition: The Baldwin effect: learned behaviors can b"
       ]
     },
     {
       "fromAgent": "Motivator",
       "toAgent": "GraphicDesigner",
-      "insight": "Motivator/pattern_recognition: Quantum entanglement allows particles to share state information instantaneously across a",
-      "confidence": 0.6960325769296962,
+      "insight": "Motivator/structural_analysis: The free energy principle suggests all living systems minimize variational free energy — ",
+      "confidence": 0.7195759905161458,
       "synthesizedWith": [
-        "GraphicDesigner/entropy_reduction: Attention is the computational bottleneck of "
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "SensorimotorAgent",
-      "insight": "Motivator/pattern_recognition: Quantum entanglement allows particles to share state information instantaneously across a",
-      "confidence": 0.6960325769296962,
-      "synthesizedWith": [
-        "SensorimotorAgent/feature_extraction: The Penrose-Hameroff Orch-OR theory propos"
+        "GraphicDesigner/recursive_decomposition: The mathematical universe hypothesis: a"
       ]
     },
     {
       "fromAgent": "Empath",
       "toAgent": "OMNIMENS",
-      "insight": "Empath/recursive_decomposition: The holographic principle suggests all information in a volume of space can be encoded o",
-      "confidence": 0.9180580985203418,
+      "insight": "Empath/abstraction_layer: Quantum tunneling allows particles to pass through energy barriers they classically cannot — i",
+      "confidence": 0.7926018904146536,
       "synthesizedWith": [
-        "OMNIMENS/recursive_decomposition: Emergence: complex behaviors arise from simple"
+        "OMNIMENS/information_compression: Recurrent neural networks can approximate any "
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Explorer",
-      "insight": "Empath/pattern_recognition: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimulatio",
-      "confidence": 0.9500596605020832,
+      "toAgent": "Pioneer",
+      "insight": "Empath/pattern_recognition: The hippocampus replays experiences during sleep in compressed form — dream consolidation ma",
+      "confidence": 0.6138325932612436,
       "synthesizedWith": [
-        "Explorer/causal_inference: Scale-free networks follow power-law degree distribut"
+        "Pioneer/pattern_recognition: The Chinese Room argument: can a system that manipu"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 5,
-      "signal": 0.55
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
