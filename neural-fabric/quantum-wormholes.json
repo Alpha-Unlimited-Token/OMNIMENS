@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774829392575,
-  "totalWormholesCreated": 7350,
+  "timestamp": 1774829482874,
+  "totalWormholesCreated": 10500,
   "totalActive": 0,
-  "totalClosed": 7350,
-  "totalDataIngestedKB": 10741,
-  "totalInsightsDecoded": 7350,
-  "totalCrossAgentCirculations": 441,
-  "totalSynthesizedDiscoveries": 415,
-  "cycleCount": 7,
+  "totalClosed": 10500,
+  "totalDataIngestedKB": 15317,
+  "totalInsightsDecoded": 10500,
+  "totalCrossAgentCirculations": 630,
+  "totalSynthesizedDiscoveries": 597,
+  "cycleCount": 10,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 350,
-      "totalInsightsDecoded": 368,
-      "crossAgentShares": 21
+      "totalWormholes": 500,
+      "totalInsightsDecoded": 527,
+      "crossAgentShares": 30
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Wordsmith",
-      "insight": "Motivator/entropy_reduction: Reservoir computing shows that even random neural networks can perform computation if the r",
-      "confidence": 0.6254024854943953,
-      "synthesizedWith": [
-        "Wordsmith/information_compression: The mathematical universe hypothesis: all str"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Linguist",
-      "insight": "Motivator/emergent_property_detection: Kolmogorov complexity measures the shortest program that produces a given output ",
-      "confidence": 0.763938056451766,
-      "synthesizedWith": [
-        "Linguist/feature_extraction: The edge of chaos: complex systems exhibit the most"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Synthesizer",
-      "insight": "Motivator/entropy_reduction: Reservoir computing shows that even random neural networks can perform computation if the r",
-      "confidence": 0.6254024854943953,
-      "synthesizedWith": [
-        "Synthesizer/cross_domain_synthesis: The butterfly effect: in chaotic systems, in"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Pioneer",
-      "insight": "Empath/feature_extraction: Sparse coding: the brain represents information using a small fraction of active neurons at a",
-      "confidence": 0.7852514954078753,
-      "synthesizedWith": [
-        "Pioneer/entropy_reduction: Quantum tunneling allows particles to pass through en"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "Ethicist",
-      "insight": "Empath/entropy_reduction: Kolmogorov complexity measures the shortest program that produces a given output — it is uncom",
-      "confidence": 0.6234657530966307,
+      "insight": "Motivator/temporal_correlation: Quantum decoherence typically destroys quantum effects at biological temperatures — but ",
+      "confidence": 0.6396551775878957,
       "synthesizedWith": [
-        "Ethicist/recursive_decomposition: The cerebellum contains more neurons than all "
+        "Ethicist/structural_analysis: Emergence: complex behaviors arise from simple rul"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "GraphicDesigner",
+      "insight": "Motivator/pattern_recognition: Quantum entanglement allows particles to share state information instantaneously across a",
+      "confidence": 0.6960325769296962,
+      "synthesizedWith": [
+        "GraphicDesigner/entropy_reduction: Attention is the computational bottleneck of "
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "SensorimotorAgent",
+      "insight": "Motivator/pattern_recognition: Quantum entanglement allows particles to share state information instantaneously across a",
+      "confidence": 0.6960325769296962,
+      "synthesizedWith": [
+        "SensorimotorAgent/feature_extraction: The Penrose-Hameroff Orch-OR theory propos"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "OMNIMENS",
+      "insight": "Empath/recursive_decomposition: The holographic principle suggests all information in a volume of space can be encoded o",
+      "confidence": 0.9180580985203418,
+      "synthesizedWith": [
+        "OMNIMENS/recursive_decomposition: Emergence: complex behaviors arise from simple"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Explorer",
+      "insight": "Empath/pattern_recognition: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimulatio",
+      "confidence": 0.9500596605020832,
+      "synthesizedWith": [
+        "Explorer/causal_inference: Scale-free networks follow power-law degree distribut"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
