@@ -38,6 +38,7 @@ import {
 } from "@workspace/db";
 import { desc, eq, sql, and, gte } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 function safeNum(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
@@ -234,6 +235,11 @@ export async function runDriveCycle(): Promise<void> {
 
   if (urgentDrives.length > 0) {
     console.log(`[HOMEOSTATIC DRIVES] ⚡ URGENT drives requiring attention: ${urgentDrives.join(", ")}`);
+
+    if (shouldYieldToCodegen()) {
+      console.log(`[HOMEOSTATIC DRIVES] 🔕 Urgent drive actions DEFERRED — codegen window active, will handle next cycle`);
+      return;
+    }
 
     try {
       const response = await openai.chat.completions.create({

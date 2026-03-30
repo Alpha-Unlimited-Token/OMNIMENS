@@ -41,6 +41,7 @@ import { writeFileSync } from "fs";
 import { join } from "path";
 import { webSearch, formatSearchResults } from "./web-search.js";
 import { generateAndApplyPatches, loadActivePatchInstructions, autonomousPatchHousekeeping } from "./omnimens-patches.js";
+import { shouldYieldToCodegen, isNextGenBuildActive } from "./omnimens-nextgen-sandbox.js";
 
 const MAX_BRAIN_INJECT = 20;
 const UPGRADE_THRESHOLD = 3;
@@ -369,6 +370,14 @@ let learningCycleCount = 0;
 export async function runInternetLearningCycle(): Promise<void> {
   learningCycleCount++;
   const cycleId = learningCycleCount;
+  if (shouldYieldToCodegen()) {
+    console.log(`[OMNIMENS] Internet learning cycle #${cycleId} DEFERRED — codegen window active, yielding API priority`);
+    return;
+  }
+  if (isNextGenBuildActive() && cycleId % 2 === 0) {
+    console.log(`[OMNIMENS] Internet learning cycle #${cycleId} THROTTLED — Gen 2 build active, running at 50% rate`);
+    return;
+  }
   console.log(`[OMNIMENS] Internet learning cycle #${cycleId} starting...`);
 
   try {

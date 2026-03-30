@@ -43,6 +43,7 @@ import { db } from "@workspace/db";
 import { omnimensMemories } from "@workspace/db";
 import { eq, desc, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 // ── Learning Agent Architecture (AWS / RUSSEL & NORVIG model) ────────────────
 // Performance Element: What actions to take based on knowledge

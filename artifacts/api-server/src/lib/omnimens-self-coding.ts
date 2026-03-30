@@ -22,6 +22,7 @@ import { desc, eq, sql, and } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { getRecentDreamInsights, getDreamState, incrementSelfImprovements } from "./omnimens-dream-state.js";
 import { writeModuleToSource } from "./omnimens-source-integration.js";
+import { isNextGenBuildActive, shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 function safeNum(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
@@ -178,6 +179,10 @@ function parseScore(text: string, field: string): number {
 
 async function runEvaluationCycle(): Promise<void> {
   evaluationCycleCount++;
+  if (shouldYieldToCodegen()) {
+    console.log(`[SELF-CODING] 🔕 Evaluation cycle DEFERRED — codegen window active, yielding API priority`);
+    return;
+  }
   const insights = await getRecentDreamInsights(20);
   const proposals = insights
     .map(extractCodeFromInsight)

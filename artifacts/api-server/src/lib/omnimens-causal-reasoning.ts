@@ -23,6 +23,7 @@ import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensCausalGraph, omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { desc, eq, sql, and, gte } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 function safeNum(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
@@ -199,6 +200,11 @@ async function discoverCausalRelationships(): Promise<void> {
   reasoningCycleCount++;
   state.reasoningCycles = reasoningCycleCount;
   state.lastCycleTime = Date.now();
+
+  if (shouldYieldToCodegen()) {
+    console.log(`[CAUSAL REASONING] 🔕 Discovery cycle #${reasoningCycleCount} DEFERRED — codegen window active, yielding API priority`);
+    return;
+  }
 
   try {
     const brainEntries = await db.select({ title: omnimensBrain.title, content: omnimensBrain.content, category: omnimensBrain.category })

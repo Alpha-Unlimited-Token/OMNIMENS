@@ -20,6 +20,7 @@
 import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 import Anthropic from "@anthropic-ai/sdk";
 import { GoogleGenAI } from "@google/genai";
 
@@ -325,6 +326,11 @@ async function runAutonomousAmplification(): Promise<void> {
   autonomousCycleCount++;
   state.autonomousCycles = autonomousCycleCount;
   state.lastCycleTime = Date.now();
+
+  if (shouldYieldToCodegen()) {
+    console.log(`[COGNITIVE AMP] 🔕 Cycle #${autonomousCycleCount} DEFERRED — codegen window active, yielding API priority`);
+    return;
+  }
 
   const question = AUTONOMOUS_QUESTIONS[(autonomousCycleCount - 1) % AUTONOMOUS_QUESTIONS.length];
 
