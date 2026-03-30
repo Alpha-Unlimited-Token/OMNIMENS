@@ -30,15 +30,15 @@ if (!process.env.DATABASE_URL) {
 
 const CONN_STRING = process.env.DATABASE_URL;
 
-const ALPHA_BASE_MAX = 18;
-const BETA_BASE_MAX = 18;
-const ALPHA_CEIL = 30;
-const BETA_CEIL = 30;
-const IDLE_TIMEOUT = 30000;
-const CONNECT_TIMEOUT = 10000;
-const STATEMENT_TIMEOUT = 15000;
-const MAX_CONN_LIFETIME_MS = 10 * 60 * 1000;
-const HEALTH_PING_INTERVAL_MS = 60000;
+const ALPHA_BASE_MAX = 8;
+const BETA_BASE_MAX = 8;
+const ALPHA_CEIL = 16;
+const BETA_CEIL = 16;
+const IDLE_TIMEOUT = 60000;
+const CONNECT_TIMEOUT = 30000;
+const STATEMENT_TIMEOUT = 20000;
+const MAX_CONN_LIFETIME_MS = 15 * 60 * 1000;
+const HEALTH_PING_INTERVAL_MS = 30000;
 
 export const poolAlpha = new Pool({
   connectionString: CONN_STRING,
@@ -48,6 +48,8 @@ export const poolAlpha = new Pool({
   statement_timeout: STATEMENT_TIMEOUT,
   allowExitOnIdle: false,
   application_name: "omnimens_alpha_cortex",
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 10000,
 });
 
 export const poolBeta = new Pool({
@@ -58,6 +60,8 @@ export const poolBeta = new Pool({
   statement_timeout: STATEMENT_TIMEOUT,
   allowExitOnIdle: false,
   application_name: "omnimens_beta_relay",
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 10000,
 });
 
 let _alphaPoolErrors = 0;
@@ -77,16 +81,6 @@ let _lastBetaRecycle = Date.now();
 let _alphaRecycles = 0;
 let _betaRecycles = 0;
 
-async function _evictIdleConnections(p: pg.Pool, label: string) {
-  try {
-    const idle = p.idleCount;
-    if (idle > 0) {
-      const client = await p.connect();
-      (client as any).release(true);
-    }
-  } catch {}
-}
-
 async function _healthPingAndRecycle(p: pg.Pool, label: string, isAlpha: boolean) {
   try {
     const client = await p.connect();
@@ -94,24 +88,27 @@ async function _healthPingAndRecycle(p: pg.Pool, label: string, isAlpha: boolean
     client.release();
   } catch (err: any) {
     console.warn(`[DB ${label}] Health ping failed: ${err.message}`);
-    try { await _evictIdleConnections(p, label); } catch {}
+    if (isAlpha) _alphaPoolErrors++;
+    else _betaPoolErrors++;
   }
 
   const lastRecycle = isAlpha ? _lastAlphaRecycle : _lastBetaRecycle;
   const errorCount = isAlpha ? _alphaPoolErrors : _betaPoolErrors;
   const age = Date.now() - lastRecycle;
 
-  if (age > MAX_CONN_LIFETIME_MS || (errorCount > 10 && age > 60000)) {
-    const idleToEvict = Math.max(1, Math.floor(p.idleCount / 2));
-    for (let i = 0; i < idleToEvict; i++) {
-      try {
-        const c = await p.connect();
-        (c as any).release(true);
-      } catch { break; }
+  if (errorCount > 20 && age > 120000) {
+    const idleToEvict = Math.min(2, Math.max(1, Math.floor(p.idleCount / 3)));
+    if (p.idleCount > 2) {
+      for (let i = 0; i < idleToEvict; i++) {
+        try {
+          const c = await p.connect();
+          (c as any).release(true);
+        } catch { break; }
+      }
+      console.log(`[DB ${label}] ♻️ Recycled ${idleToEvict} stale connections (age: ${Math.round(age / 60000)}min, errors: ${errorCount})`);
     }
     if (isAlpha) { _lastAlphaRecycle = Date.now(); _alphaPoolErrors = 0; _alphaRecycles++; }
     else { _lastBetaRecycle = Date.now(); _betaPoolErrors = 0; _betaRecycles++; }
-    console.log(`[DB ${label}] ♻️ Recycled ${idleToEvict} stale connections (age: ${Math.round(age / 60000)}min, errors: ${errorCount})`);
   }
 }
 
@@ -129,7 +126,7 @@ type PoolSide = "alpha" | "beta";
 
 function _poolPressure(p: pg.Pool): number {
   const total = p.totalCount;
-  const max = (p as any).options?.max ?? 18;
+  const max = (p as any).options?.max ?? 8;
   const waiting = p.waitingCount;
   const idle = p.idleCount;
   const active = total - idle;
@@ -142,9 +139,9 @@ function _isPoolHealthy(p: pg.Pool): boolean {
   const waiting = p.waitingCount;
   const total = p.totalCount;
   const idle = p.idleCount;
-  const max = (p as any).options?.max ?? 18;
-  if (waiting > 8) return false;
-  if (total >= max - 2 && idle === 0) return false;
+  const max = (p as any).options?.max ?? 8;
+  if (waiting > 5) return false;
+  if (total >= max && idle === 0) return false;
   return true;
 }
 
@@ -595,7 +592,7 @@ setValveHealthSupplier(() => ({
 
 startWriteValve();
 
-console.log(`[DB DUAL-POOL] 🕸️ Spider-Silk Cross-Bridge ONLINE`);
+console.log(`[DB DUAL-POOL] 🕸️ Spider-Silk Cross-Bridge ONLINE (keepAlive: enabled)`);
 console.log(`[DB DUAL-POOL] 🧠 ALPHA Cortex Pool: ${ALPHA_BASE_MAX} base → ${ALPHA_CEIL} ceiling`);
 console.log(`[DB DUAL-POOL] ⚡ BETA Relay Pool: ${BETA_BASE_MAX} base → ${BETA_CEIL} ceiling`);
 console.log(`[DB DUAL-POOL] 🌿 Ivy Tendril Rotation: brain inserts alternate between pools`);
