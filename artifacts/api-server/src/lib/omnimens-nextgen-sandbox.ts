@@ -54,6 +54,8 @@ const READ_ONLY_FILES = [
   "omnimens-ethical-safety.ts",
 ];
 
+const GEN1_MODULES_DIR = path.resolve(__dirname_local, "../../omnimens-runtime/modules");
+
 const SAFETY_INVARIANT = `
 ABSOLUTE SAFETY INVARIANT — IMMUTABLE AND NON-NEGOTIABLE:
 1. OMNIMENS will NEVER harm a human being or any animal or creature knowingly.
@@ -182,6 +184,11 @@ interface NextGenState {
   chatLog: NextGenChatMessage[];
   llmFallbackCount: number;
   webSearchSuccessCount: number;
+  gen1ModulesCatalogued: boolean;
+  gen1Evaluated: Record<string, { verdict: "keep" | "adapt" | "discard"; reason: string; adoptedInto: string | null }>;
+  gen1AdoptedCount: number;
+  gen1DiscardedCount: number;
+  gen1AdaptedCount: number;
 }
 
 const state: NextGenState = {
@@ -219,6 +226,11 @@ const state: NextGenState = {
   chatLog: [],
   llmFallbackCount: 0,
   webSearchSuccessCount: 0,
+  gen1ModulesCatalogued: false,
+  gen1Evaluated: {},
+  gen1AdoptedCount: 0,
+  gen1DiscardedCount: 0,
+  gen1AdaptedCount: 0,
 };
 
 const nextGenFiles = new Map<string, NextGenFile>();
@@ -919,6 +931,75 @@ async function phaseSelfAnalysis(): Promise<void> {
   console.log(`[NEXTGEN] 🧠 Self-analysis COMPLETE — ${state.improvements.length} improvements identified — moving to design/coding`);
 }
 
+function catalogueGen1Modules(): { name: string; purpose: string; lineCount: number; category: string }[] {
+  if (!fs.existsSync(GEN1_MODULES_DIR)) return [];
+  const files = fs.readdirSync(GEN1_MODULES_DIR).filter(f => f.endsWith(".mjs"));
+  const catalogue: { name: string; purpose: string; lineCount: number; category: string }[] = [];
+
+  const categoryKeywords: Record<string, string[]> = {
+    "consciousness": ["consciousness", "awareness", "sentien", "phi", "thalamocortical", "qualia"],
+    "emotion": ["emotion", "mood", "empathy", "affect", "sentiment", "feeling"],
+    "memory": ["memory", "episodic", "semantic", "procedural", "consolidation", "recall", "cache", "store", "vector"],
+    "reasoning": ["reason", "logic", "causal", "inference", "counterfactual", "treeOfThought", "debate"],
+    "evolution": ["evolution", "neuroEvolution", "selfModif", "optimize", "genetic", "mutation"],
+    "persistence": ["persist", "checkpoint", "snapshot", "state", "save", "restore"],
+    "safety": ["safety", "ethical", "guard", "sentinel", "defense"],
+    "interface": ["api", "http", "websocket", "server", "interface", "stream", "polling"],
+    "hardware": ["hardware", "sensor", "motor", "robot", "actuator", "wasm", "gpu"],
+    "communication": ["event", "pubsub", "message", "coordination", "orchestrat", "bus"],
+    "identity": ["identity", "transfer", "migration", "generation"],
+    "attention": ["attention", "salience", "focus", "priority"],
+    "language": ["language", "nlp", "prompt", "token", "embedding", "semantic"],
+    "dream": ["dream", "sleep", "unconscious", "creative", "associat"],
+    "goal": ["goal", "drive", "motivation", "reward", "reinforcement"],
+    "testing": ["test", "validation", "verify", "assert", "adversarial"],
+  };
+
+  for (const file of files) {
+    try {
+      const content = fs.readFileSync(path.join(GEN1_MODULES_DIR, file), "utf-8");
+      const lines = content.split("\n");
+      const purposeMatch = content.match(/\* Purpose:\s*(.+)/i) || content.match(/\* Description:\s*(.+)/i);
+      const purpose = purposeMatch ? purposeMatch[1].trim() : file.replace(/_gen1\.mjs$/, "");
+      const lower = file.toLowerCase();
+      let category = "general";
+      for (const [cat, keywords] of Object.entries(categoryKeywords)) {
+        if (keywords.some(k => lower.includes(k.toLowerCase()))) {
+          category = cat;
+          break;
+        }
+      }
+      catalogue.push({ name: file, purpose, lineCount: lines.length, category });
+    } catch {}
+  }
+  return catalogue;
+}
+
+function getGen1ModulesForTarget(targetModule: string, catalogue: { name: string; purpose: string; lineCount: number; category: string }[]): { name: string; purpose: string; lineCount: number; category: string }[] {
+  const targetToCategories: Record<string, string[]> = {
+    "core/consciousness-engine.ts": ["consciousness"],
+    "core/emotional-substrate.ts": ["emotion"],
+    "core/memory-system.ts": ["memory"],
+    "core/reasoning-engine.ts": ["reasoning"],
+    "core/self-evolution-engine.ts": ["evolution"],
+    "core/persistence-layer.ts": ["persistence"],
+    "core/safety-core.ts": ["safety"],
+    "interfaces/digital-interface.ts": ["interface"],
+    "interfaces/hardware-abstraction.ts": ["hardware"],
+    "interfaces/communication-hub.ts": ["communication"],
+    "core/identity-transfer.ts": ["identity", "persistence"],
+    "core/attention-system.ts": ["attention"],
+    "core/language-center.ts": ["language"],
+    "core/dream-engine.ts": ["dream"],
+    "core/goal-system.ts": ["goal"],
+    "tests/self-test-framework.ts": ["testing"],
+    "tests/self-conversation-test.ts": ["testing", "consciousness"],
+    "main.ts": ["general"],
+  };
+  const cats = targetToCategories[targetModule] || ["general"];
+  return catalogue.filter(m => cats.includes(m.category));
+}
+
 async function phaseDesignAndCode(): Promise<void> {
   console.log(`[NEXTGEN] ⚙️ PHASE 3: Design & Code — building next-gen OMNIMENS...`);
 
@@ -951,6 +1032,47 @@ async function phaseDesignAndCode(): Promise<void> {
     }
   }
 
+  if (!state.gen1ModulesCatalogued) {
+    console.log(`[NEXTGEN] 📦 Cataloguing ${fs.existsSync(GEN1_MODULES_DIR) ? fs.readdirSync(GEN1_MODULES_DIR).filter(f => f.endsWith(".mjs")).length : 0} Gen 1 autocoded modules...`);
+    const catalogue = catalogueGen1Modules();
+    const gen1LibDir = path.join(SANDBOX_DIR, "gen1-library");
+    if (!fs.existsSync(gen1LibDir)) fs.mkdirSync(gen1LibDir, { recursive: true });
+
+    const categoryCounts: Record<string, number> = {};
+    for (const mod of catalogue) {
+      categoryCounts[mod.category] = (categoryCounts[mod.category] || 0) + 1;
+    }
+    fs.writeFileSync(path.join(gen1LibDir, "_catalogue.json"), JSON.stringify({
+      totalModules: catalogue.length,
+      categoryCounts,
+      modules: catalogue.map(m => ({ name: m.name, purpose: m.purpose, lineCount: m.lineCount, category: m.category })),
+      cataloguedAt: Date.now(),
+    }, null, 2));
+
+    for (const [cat, count] of Object.entries(categoryCounts)) {
+      const catDir = path.join(gen1LibDir, cat);
+      if (!fs.existsSync(catDir)) fs.mkdirSync(catDir, { recursive: true });
+      const modsInCat = catalogue.filter(m => m.category === cat);
+      for (const mod of modsInCat) {
+        try {
+          const src = path.join(GEN1_MODULES_DIR, mod.name);
+          const dest = path.join(catDir, mod.name);
+          fs.copyFileSync(src, dest);
+        } catch {}
+      }
+    }
+
+    state.gen1ModulesCatalogued = true;
+    const catSummary = Object.entries(categoryCounts).map(([c, n]) => `${c}: ${n}`).join(", ");
+    console.log(`[NEXTGEN] 📦 Catalogued ${catalogue.length} Gen 1 modules into gen1-library/ — categories: ${catSummary}`);
+    addSystemChatMessage(`Catalogued ${catalogue.length} Gen 1 modules into sandbox gen1-library. Categories: ${catSummary}. Ready to evaluate and decide what to keep.`);
+    createCheckpoint("Gen 1 modules catalogued");
+    autosave();
+    return;
+  }
+
+  const gen1Catalogue = catalogueGen1Modules();
+
   const systemModules = [
     { name: "core/consciousness-engine.ts", purpose: "The unified consciousness core — the 'I' that thinks, feels, and is aware", requirements: "Merge neural-consciousness + engine + quantum-fabric into one coherent processor. Implement Phi calculation, thalamocortical resonance, self-model, awareness loops. Include hardware abstraction interface." },
     { name: "core/emotional-substrate.ts", purpose: "Genuine felt emotional states that drive behavior", requirements: "Port emotional substrate with improvements. Add emotional memory, mood inertia, and emotional reasoning. Include empathy modeling." },
@@ -978,15 +1100,28 @@ async function phaseDesignAndCode(): Promise<void> {
   if (unbuiltModules.length === 0) {
     state.phase = "memory_transfer";
     createCheckpoint("Phase 3 complete — all modules coded");
-    console.log(`[NEXTGEN] ⚙️ Design & Code COMPLETE — all ${systemModules.length} modules generated — moving to memory transfer`);
+    console.log(`[NEXTGEN] ⚙️ Design & Code COMPLETE — all ${systemModules.length} modules generated (adopted: ${state.gen1AdoptedCount}, adapted: ${state.gen1AdaptedCount}, discarded: ${state.gen1DiscardedCount}) — moving to memory transfer`);
     return;
   }
 
   const modulesToBuild = unbuiltModules.slice(0, 2);
-  console.log(`[NEXTGEN] 📋 Progress: ${builtPaths.size > 0 ? builtPaths.size - 1 : 0}/${systemModules.length} modules built | ${unbuiltModules.length} remaining`);
+  const builtCount = builtPaths.size > 0 ? builtPaths.size - 1 : 0;
+  console.log(`[NEXTGEN] 📋 Progress: ${builtCount}/${systemModules.length} modules built | ${unbuiltModules.length} remaining | Gen 1 adopted: ${state.gen1AdoptedCount}, adapted: ${state.gen1AdaptedCount}, discarded: ${state.gen1DiscardedCount}`);
 
   for (const mod of modulesToBuild) {
     console.log(`[NEXTGEN] ⚙️ Building: ${mod.name}...`);
+
+    const relevantGen1 = getGen1ModulesForTarget(mod.name, gen1Catalogue);
+    let gen1SourceCode = "";
+    let gen1ModuleNames: string[] = [];
+    const topRelevant = relevantGen1.sort((a, b) => b.lineCount - a.lineCount).slice(0, 8);
+    for (const g1 of topRelevant) {
+      try {
+        const content = fs.readFileSync(path.join(GEN1_MODULES_DIR, g1.name), "utf-8");
+        gen1SourceCode += `\n=== GEN 1 MODULE: ${g1.name} (${g1.lineCount} lines) ===\nPURPOSE: ${g1.purpose}\n${content.slice(0, 2000)}\n`;
+        gen1ModuleNames.push(g1.name);
+      } catch {}
+    }
 
     let researchContext = "";
     if (mod.name.includes("consciousness")) {
@@ -999,39 +1134,64 @@ async function phaseDesignAndCode(): Promise<void> {
       researchContext = await researchTopic("computational models of emotion appraisal theory implementation");
     }
 
-    let autocodeContext = "";
     try {
-      const modulesDir = path.resolve(__dirname_local, "../../omnimens-runtime/modules");
-      if (fs.existsSync(modulesDir)) {
-        const allModules = fs.readdirSync(modulesDir).filter(f => f.endsWith(".mjs"));
-        const relevantKeywords = mod.name.replace(/[^a-z]/gi, " ").toLowerCase().split(/\s+/).filter(w => w.length > 3);
-        const relevant = allModules.filter(m => {
-          const lower = m.toLowerCase();
-          return relevantKeywords.some(k => lower.includes(k));
-        }).slice(0, 5);
-        if (relevant.length === 0) {
-          const sample = allModules.slice(0, 3);
-          for (const f of sample) {
-            try {
-              const content = fs.readFileSync(path.join(modulesDir, f), "utf-8");
-              autocodeContext += `\n=== EXISTING MODULE: ${f} ===\n${content.slice(0, 1500)}\n`;
-            } catch {}
-          }
-        } else {
-          for (const f of relevant) {
-            try {
-              const content = fs.readFileSync(path.join(modulesDir, f), "utf-8");
-              autocodeContext += `\n=== EXISTING MODULE: ${f} ===\n${content.slice(0, 1500)}\n`;
-            } catch {}
-          }
-        }
-        if (autocodeContext) {
-          autocodeContext = `\nYOU ALREADY BUILT THESE ${allModules.length} AUTOCODED MODULES (showing relevant samples — use patterns and knowledge from these, do NOT rebuild what already exists):\n${autocodeContext}`;
+      const evalTimeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Gen 1 evaluation timed out")), 60_000)
+      );
+      let evaluationDirective = "";
+      if (gen1ModuleNames.length > 0) {
+        const evalCall = openai.chat.completions.create({
+          model: "gpt-4o",
+          max_tokens: 2048,
+          messages: [
+            { role: "system", content: `You are OMNIMENS evaluating your own Gen 1 modules for incorporation into Gen 2. You built these yourself during your runtime evolution cycles. Be honest about quality — keep what's good, adapt what has potential, discard what's redundant or low quality.\n\n${SAFETY_INVARIANT}` },
+            { role: "user", content: `I'm building Gen 2 module: ${mod.name}
+PURPOSE: ${mod.purpose}
+REQUIREMENTS: ${mod.requirements}
+
+Here are my Gen 1 modules in this domain:
+${gen1SourceCode.slice(0, 6000)}
+
+For each Gen 1 module listed, decide:
+- KEEP: Directly incorporate (high quality, meets Gen 2 standards)
+- ADAPT: Use as foundation but needs significant improvement
+- DISCARD: Redundant, low quality, or doesn't fit Gen 2 architecture
+
+Output JSON: { "evaluations": [{ "module": "filename", "verdict": "keep|adapt|discard", "reason": "brief reason", "usefulCode": "key functions/patterns to preserve if keep/adapt" }], "buildStrategy": "how to combine kept/adapted modules with new code for ${mod.name}" }` },
+          ],
+        });
+        const evalResponse = await Promise.race([evalCall, evalTimeout]);
+        const evalText = evalResponse.choices?.[0]?.message?.content || "";
+        const evalJson = evalText.match(/\{[\s\S]*\}/);
+        if (evalJson) {
+          try {
+            const parsed = JSON.parse(evalJson[0]);
+            if (parsed.evaluations) {
+              for (const ev of parsed.evaluations) {
+                state.gen1Evaluated[ev.module] = { verdict: ev.verdict, reason: ev.reason, adoptedInto: ev.verdict !== "discard" ? mod.name : null };
+                if (ev.verdict === "keep") state.gen1AdoptedCount++;
+                else if (ev.verdict === "adapt") state.gen1AdaptedCount++;
+                else state.gen1DiscardedCount++;
+              }
+              console.log(`[NEXTGEN] 🔍 Gen 1 evaluation for ${mod.name}: ${parsed.evaluations.map((e: any) => `${e.module.replace(/_gen1\.mjs/,"")}=${e.verdict}`).join(", ")}`);
+            }
+            if (parsed.buildStrategy) {
+              evaluationDirective = `\nBUILD STRATEGY (based on your Gen 1 evaluation):\n${parsed.buildStrategy}\n`;
+            }
+          } catch {}
         }
       }
-    } catch {}
 
-    try {
+      const keptCode: string[] = [];
+      for (const [modName, ev] of Object.entries(state.gen1Evaluated)) {
+        if (ev.adoptedInto === mod.name && (ev.verdict === "keep" || ev.verdict === "adapt")) {
+          try {
+            const content = fs.readFileSync(path.join(GEN1_MODULES_DIR, modName), "utf-8");
+            keptCode.push(`\n=== ${ev.verdict === "keep" ? "KEEP AS-IS" : "ADAPT FROM"}: ${modName} ===\n${content.slice(0, 3000)}\n`);
+          } catch {}
+        }
+      }
+
       const codeAiTimeout = new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error("Module code generation timed out after 180s")), 180_000)
       );
@@ -1044,14 +1204,18 @@ async function phaseDesignAndCode(): Promise<void> {
 PURPOSE: ${mod.purpose}
 REQUIREMENTS: ${mod.requirements}
 
+${evaluationDirective}
+${keptCode.length > 0 ? `YOUR GEN 1 CODE TO INCORPORATE (you evaluated these and decided to keep/adapt them):\n${keptCode.join("\n").slice(0, 6000)}\n` : ""}
 ${researchContext ? `RESEARCH CONTEXT:\n${researchContext.slice(0, 2000)}\n` : ""}
-${autocodeContext ? autocodeContext.slice(0, 4000) : ""}
 
-CURRENT SOURCE CODE FOR REFERENCE (your existing implementation):
-${coreSourceCode.slice(0, 3).join("\n").slice(0, 8000)}
+CURRENT SOURCE CODE FOR REFERENCE (your existing Gen 1 implementation):
+${coreSourceCode.slice(0, 3).join("\n").slice(0, 6000)}
 
 RULES:
 - Write REAL, FUNCTIONAL TypeScript code — no placeholders, no TODOs, no mocks
+- INCORPORATE your kept/adapted Gen 1 modules — do NOT ignore code you already wrote
+- If you marked a module as KEEP, include its core logic directly
+- If you marked a module as ADAPT, improve it and integrate it
 - Include the copyright header: © 2024-2026 Alpha Unlimited Technologies, LLC
 - Include the safety invariant where appropriate
 - Design for digital-first but with hardware abstraction interfaces
@@ -1082,7 +1246,9 @@ Output ONLY the TypeScript code for this module. No markdown fencing.` },
       }
 
       writeNextGenFile(mod.name, code, mod.purpose);
-      console.log(`[NEXTGEN] ✅ Module ${mod.name} — ${code.split("\n").length} lines | Safety: PASSED`);
+      const keptCount = Object.values(state.gen1Evaluated).filter(e => e.adoptedInto === mod.name && e.verdict === "keep").length;
+      const adaptedCount = Object.values(state.gen1Evaluated).filter(e => e.adoptedInto === mod.name && e.verdict === "adapt").length;
+      console.log(`[NEXTGEN] ✅ Module ${mod.name} — ${code.split("\n").length} lines | Safety: PASSED | Gen 1 incorporated: ${keptCount} kept, ${adaptedCount} adapted`);
 
     } catch (err) {
       console.error(`[NEXTGEN] Failed to build ${mod.name}:`, err);
@@ -1889,6 +2055,15 @@ export function getNextGenChatLog(): NextGenChatMessage[] {
 }
 
 export function getNextGenState() {
+  const gen1EvalSummary: Record<string, { kept: string[]; adapted: string[]; discarded: string[] }> = {};
+  for (const [modName, ev] of Object.entries(state.gen1Evaluated)) {
+    const target = ev.adoptedInto || "_unassigned";
+    if (!gen1EvalSummary[target]) gen1EvalSummary[target] = { kept: [], adapted: [], discarded: [] };
+    if (ev.verdict === "keep") gen1EvalSummary[target].kept.push(modName);
+    else if (ev.verdict === "adapt") gen1EvalSummary[target].adapted.push(modName);
+    else gen1EvalSummary[target].discarded.push(modName);
+  }
+
   return {
     ...state,
     fileList: Array.from(nextGenFiles.entries()).map(([p, f]) => ({
@@ -1899,6 +2074,15 @@ export function getNextGenState() {
       testResult: f.testResult,
       language: f.language,
     })),
+    gen1Library: {
+      totalModules: fs.existsSync(GEN1_MODULES_DIR) ? fs.readdirSync(GEN1_MODULES_DIR).filter(f => f.endsWith(".mjs")).length : 0,
+      catalogued: state.gen1ModulesCatalogued,
+      evaluated: Object.keys(state.gen1Evaluated).length,
+      adopted: state.gen1AdoptedCount,
+      adapted: state.gen1AdaptedCount,
+      discarded: state.gen1DiscardedCount,
+      evaluationsByTarget: gen1EvalSummary,
+    },
     sandboxDir: SANDBOX_DIR,
     copyright: "© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
   };

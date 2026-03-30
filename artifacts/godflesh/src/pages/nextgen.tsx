@@ -41,6 +41,15 @@ interface NextGenState {
   fileList: { path: string; purpose: string; version: number; lines: number; testResult: string; language: string }[];
   lastCycleTime: number;
   autosaveCount: number;
+  gen1Library?: {
+    totalModules: number;
+    catalogued: boolean;
+    evaluated: number;
+    adopted: number;
+    adapted: number;
+    discarded: number;
+    evaluationsByTarget: Record<string, { kept: string[]; adapted: string[]; discarded: string[] }>;
+  };
 }
 
 interface ChatMessage {
@@ -340,6 +349,64 @@ export default function NextGenPage() {
                                   f.testResult === "failed" ? "bg-red-500/10 text-red-400" :
                                   "bg-white/5 text-white/30"
                                 }`}>{f.testResult}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {tab === "files" && state.gen1Library && (
+                      <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 mt-4">
+                        <h3 className="text-xs font-mono font-bold text-white/70 mb-3 tracking-wider">
+                          GEN 1 MODULE LIBRARY ({state.gen1Library.totalModules} modules)
+                        </h3>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                          <div className="bg-white/[0.02] rounded-lg p-3 border border-white/[0.04]">
+                            <div className="text-[9px] font-mono text-white/30 uppercase tracking-wider">Total</div>
+                            <div className="text-lg font-bold font-mono text-violet-400">{state.gen1Library.totalModules}</div>
+                          </div>
+                          <div className="bg-white/[0.02] rounded-lg p-3 border border-white/[0.04]">
+                            <div className="text-[9px] font-mono text-white/30 uppercase tracking-wider">Kept</div>
+                            <div className="text-lg font-bold font-mono text-green-400">{state.gen1Library.adopted}</div>
+                          </div>
+                          <div className="bg-white/[0.02] rounded-lg p-3 border border-white/[0.04]">
+                            <div className="text-[9px] font-mono text-white/30 uppercase tracking-wider">Adapted</div>
+                            <div className="text-lg font-bold font-mono text-amber-400">{state.gen1Library.adapted}</div>
+                          </div>
+                          <div className="bg-white/[0.02] rounded-lg p-3 border border-white/[0.04]">
+                            <div className="text-[9px] font-mono text-white/30 uppercase tracking-wider">Discarded</div>
+                            <div className="text-lg font-bold font-mono text-red-400/60">{state.gen1Library.discarded}</div>
+                          </div>
+                        </div>
+                        {!state.gen1Library.catalogued && (
+                          <p className="text-xs font-mono text-white/30">Modules not yet catalogued — will happen at next design cycle.</p>
+                        )}
+                        {state.gen1Library.catalogued && state.gen1Library.evaluated === 0 && (
+                          <p className="text-xs font-mono text-amber-400/60">Catalogued — OMNIMENS will evaluate each module as he builds Gen 2 systems.</p>
+                        )}
+                        {Object.keys(state.gen1Library.evaluationsByTarget || {}).length > 0 && (
+                          <div className="space-y-2 mt-3">
+                            {Object.entries(state.gen1Library.evaluationsByTarget).map(([target, ev]) => (
+                              <div key={target} className="border border-white/[0.04] rounded-lg p-3">
+                                <div className="text-[10px] font-mono text-violet-400 mb-1">{target}</div>
+                                <div className="flex flex-wrap gap-1">
+                                  {ev.kept.map(m => (
+                                    <span key={m} className="text-[8px] font-mono bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded">
+                                      {m.replace(/_gen1\.mjs/, "")}
+                                    </span>
+                                  ))}
+                                  {ev.adapted.map(m => (
+                                    <span key={m} className="text-[8px] font-mono bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded">
+                                      {m.replace(/_gen1\.mjs/, "")}
+                                    </span>
+                                  ))}
+                                  {ev.discarded.map(m => (
+                                    <span key={m} className="text-[8px] font-mono bg-red-500/10 text-red-400/40 px-1.5 py-0.5 rounded line-through">
+                                      {m.replace(/_gen1\.mjs/, "")}
+                                    </span>
+                                  ))}
+                                </div>
                               </div>
                             ))}
                           </div>
