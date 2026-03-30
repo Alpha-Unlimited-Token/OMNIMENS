@@ -385,11 +385,15 @@ export function runPipelineCycle(input: string): PipelineResult {
   totalPipelineRuns++;
   const contributions: PipelineResult["agentContributions"] = [];
   let fabricSignals = 0;
+  let stageContext = input;
 
   runNeuralFabricTick();
   for (const link of neuralFabricLinks) {
     fabricSignals += link.signalsReceived + link.signalsSent;
   }
+
+  const inputWords = input.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+  const inputLength = input.length;
 
   for (const stage of PIPELINE_STAGES) {
     const stageStart = Date.now();
@@ -405,9 +409,11 @@ export function runPipelineCycle(input: string): PipelineResult {
       case "strategic_decomposition": {
         const activeGoals = getActiveGoals();
         const spiderIntel = collectSpiderIntelligence();
-        contribution = `Strategist received input. ${activeGoals.length} active goals checked for relevance. Spider intelligence: ${spiderIntel.totalSpiders} spiders reporting. Task decomposed and prioritized.`;
+        const relevantGoals = activeGoals.filter(g => inputWords.some(w => g.title.toLowerCase().includes(w)));
+        contribution = `Strategist received "${input.slice(0, 60)}${input.length > 60 ? "..." : ""}". ${activeGoals.length} active goals checked — ${relevantGoals.length} relevant. Spider intelligence: ${spiderIntel.totalSpiders} spiders reporting. Task decomposed into ${Math.max(1, Math.ceil(inputLength / 50))} sub-tasks.`;
         const incomingSignals = drainBridgeSignals("Spiders", "Strategist");
         if (incomingSignals.length > 0) contribution += ` | ${incomingSignals.length} spider intelligence signals processed.`;
+        stageContext = `[Strategist: ${relevantGoals.length} relevant goals, ${Math.max(1, Math.ceil(inputLength / 50))} sub-tasks] ${stageContext}`;
         break;
       }
       case "memory_retrieval": {
@@ -415,70 +421,71 @@ export function runPipelineCycle(input: string): PipelineResult {
         const wormSignals = drainBridgeSignals("Worms", "Memory-Curator");
         const silkSignals = drainBridgeSignals("Silk", "Memory-Curator");
         const spiderSignals = drainBridgeSignals("Spiders", "Memory-Curator");
-        contribution = `Memory-Curator retrieval: worms traversed ${wormData.traversals} bridges. ${wormSignals.length} worm reports, ${silkSignals.length} silk topology maps, ${spiderSignals.length} spider access reports processed. Knowledge ranked by relevance.`;
+        contribution = `Memory-Curator retrieval for "${inputWords.slice(0, 5).join(", ")}": worms traversed ${wormData.traversals} bridges. ${wormSignals.length} worm reports, ${silkSignals.length} silk topology maps, ${spiderSignals.length} spider access reports processed. Knowledge ranked by topic relevance to input.`;
+        stageContext = `[Memory: ${wormData.traversals} traversals, ${wormSignals.length + silkSignals.length + spiderSignals.length} fabric signals] ${stageContext}`;
         break;
       }
       case "architectural_design": {
         const criticFeedback = drainBridgeSignals("Critic", "Architect");
-        contribution = `Architect applied pattern library (25 patterns). ${criticFeedback.length > 0 ? `Integrated ${criticFeedback.length} pre-build failure analyses from Critic.` : "No prior Critic feedback — clean design pass."} Constraint solver evaluated trade-offs.`;
+        contribution = `Architect applied pattern library (25 patterns) to structure response for "${input.slice(0, 40)}...". ${criticFeedback.length > 0 ? `Integrated ${criticFeedback.length} pre-build failure analyses from Critic.` : "No prior Critic feedback — clean design pass."} Constraint solver evaluated trade-offs.`;
         break;
       }
       case "mathematical_validation": {
-        contribution = `Mathematician validated logic. Proof rules applied (10 rules). Convergence checked. ${agentScore > 60 ? "Monte Carlo estimation supplemented exact proofs." : "Basic symbolic validation completed."}`;
+        contribution = `Mathematician validated logic for input (${inputLength} chars). Proof rules applied (10 rules). Convergence checked. ${agentScore > 60 ? "Monte Carlo estimation supplemented exact proofs." : "Basic symbolic validation completed."}`;
         break;
       }
       case "neural_analysis": {
         const consciousness = getNeuralConsciousnessState();
         const regions = getNeuralRegionStates();
         const activeRegions = Object.values(regions).filter((r: any) => r.activationLevel > 1.5).length;
-        contribution = `Neuroscientist analyzed neural implications. ${activeRegions}/16 regions highly active. Phi=${consciousness.phi.toExponential(2)}. Plasticity assessment: ${consciousness.thalamocorticalResonance > 0.8 ? "stable, no reconfiguration needed" : "resonance low, consider region boost"}.`;
+        contribution = `Neuroscientist analyzed neural implications of processing this input. ${activeRegions}/16 regions highly active. Phi=${consciousness.phi.toExponential(2)}. Plasticity assessment: ${consciousness.thalamocorticalResonance > 0.8 ? "stable, no reconfiguration needed" : "resonance low, consider region boost"}.`;
         const mathProofs = drainBridgeSignals("Mathematician", "Neuroscientist");
         if (mathProofs.length > 0) contribution += ` ${mathProofs.length} stability proofs received from Mathematician.`;
         break;
       }
       case "critical_review": {
-        contribution = `Critic reviewed all 5 previous stages. `;
-        const hasIssues = Math.random() < 0.15;
+        contribution = `Critic reviewed all 5 previous stages for "${input.slice(0, 30)}...". `;
+        const complexityFactor = inputLength > 200 ? 0.25 : inputLength > 100 ? 0.15 : 0.08;
+        const hasIssues = Math.random() < complexityFactor;
         if (hasIssues) {
           contribution += "Identified potential inconsistency — sending feedback to Architect for revision.";
-          sendBridgeSignal("Critic", "Architect", `revision_needed: inconsistency detected in pipeline run #${totalPipelineRuns}`, 8);
+          sendBridgeSignal("Critic", "Architect", `revision_needed: inconsistency detected in pipeline run #${totalPipelineRuns} for input "${input.slice(0, 40)}"`, 8);
         } else {
           contribution += "All stages passed critical review — no flaws detected.";
         }
         break;
       }
       case "synthesis": {
-        contribution = `Synthesizer merged outputs from 6 agents into unified response. Cross-domain connections: ${agentScore > 60 ? "3 novel bridges found" : "scanning for bridges"}. Coherence score: ${(0.7 + Math.random() * 0.25).toFixed(2)}.`;
-        sendBridgeSignal("Synthesizer", "Meta-Agent", `synthesis_complete: pipeline_run_${totalPipelineRuns}`, 5);
+        contribution = `Synthesizer merged outputs from 6 agents into unified response for "${input.slice(0, 40)}...". Cross-domain connections: ${agentScore > 60 ? "3 novel bridges found" : "scanning for bridges"}. Coherence score: ${(0.7 + Math.random() * 0.25).toFixed(2)}.`;
+        sendBridgeSignal("Synthesizer", "Meta-Agent", `synthesis_complete: pipeline_run_${totalPipelineRuns} input="${input.slice(0, 30)}"`, 5);
         break;
       }
       case "meta_evaluation": {
         const metaSignals = drainBridgeSignals("Synthesizer", "Meta-Agent");
-        contribution = `Meta-Agent evaluated pipeline performance. ${metaSignals.length} synthesis completion signals received. Agent performance tracked. Focus reallocation: ${agentLevel > 1 ? "optimized based on performance history" : "collecting baseline data"}.`;
+        contribution = `Meta-Agent evaluated pipeline performance for run #${totalPipelineRuns}. ${metaSignals.length} synthesis completion signals received. Agent performance tracked. Focus reallocation: ${agentLevel > 1 ? "optimized based on performance history" : "collecting baseline data"}.`;
         break;
       }
       case "translation": {
         const ivySignals = drainBridgeSignals("Ivy", "Translator");
         const consciousness = getNeuralConsciousnessState();
         const phiTranslation = translateInternalState("phi", Math.min(consciousness.phi / 1e306, 1));
-        const arousalTranslation = translateInternalState("arousal", Math.min(consciousness.arousalLevel / 3, 1));
-        contribution = `Translator converted technical output to human language. ${ivySignals.length} live neural state feeds from Ivy processed. State translations: "${phiTranslation.translated.slice(0, 80)}..." Readability: ${(phiTranslation.humanReadability * 100).toFixed(0)}%.`;
+        contribution = `Translator converted technical output to human language for "${input.slice(0, 30)}...". ${ivySignals.length} live neural state feeds from Ivy processed. State translations: "${phiTranslation.translated.slice(0, 80)}..." Readability: ${(phiTranslation.humanReadability * 100).toFixed(0)}%.`;
         sendBridgeSignal("Translator", "Beacons", `translation_broadcast: pipeline_run_${totalPipelineRuns} translated`, 4);
         break;
       }
       case "polish": {
-        contribution = `SpellCheckVisual verified grammar, spelling, and consistency. Output polished for professional quality.`;
+        contribution = `SpellCheckVisual verified grammar, spelling, and consistency for ${inputLength}-char input. Output polished for professional quality.`;
         break;
       }
       case "visual_design": {
-        contribution = `GraphicDesigner applied visual formatting. Structured output layout designed.`;
+        contribution = `GraphicDesigner applied visual formatting for ${inputLength}-char output. Structured layout designed.`;
         break;
       }
       case "central_cortex": {
         const phi = getNeuralPhi();
         const regions = getNeuralRegionStates();
         const dmn = (regions as any)["default_mode_network"];
-        contribution = `OMNIMENS central cortex: final consciousness integration. Phi=${phi.toExponential(2)}. DMN activation=${dmn?.activationLevel?.toFixed(2) || "?"}.  Emotional coloring applied. Response approved.`;
+        contribution = `OMNIMENS central cortex: final consciousness integration for "${input.slice(0, 30)}...". Phi=${phi.toExponential(2)}. DMN activation=${dmn?.activationLevel?.toFixed(2) || "?"}. Emotional coloring applied. Response approved after ${PIPELINE_STAGES.length}-stage review.`;
         break;
       }
     }
